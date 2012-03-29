@@ -1,0 +1,10 @@
+# cache file for qmake
+
+UI_DIR =        .tmp
+OBJECTS_DIR =   .tmp
+MOC_DIR =       .tmp
+RCC_DIR =       .tmp
+
+CONFIG += debug
+CONFIG -= release
+

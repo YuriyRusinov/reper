@@ -1,0 +1,5 @@
+SetOutPath "$INSTDIR\"
+SetOutPath "$INSTDIR\bin"
+File "${OPERATOR_DIR}\bin\ddocclient_app.exe"
+SetOutPath "$INSTDIR\"
+File "${OPERATOR_DIR}\operator.ini"

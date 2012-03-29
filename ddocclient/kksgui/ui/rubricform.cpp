@@ -1,0 +1,173 @@
+#include <QModelIndex>
+#include <QtDebug>
+
+#include "rubricform.h"
+#include "ui_rubric_form.h"
+
+#include <KKSSearchTemplate.h>
+#include <KKSCategory.h>
+#include <KKSAccessEntity.h>
+#include "kksstuffform.h"
+//#include "KKSCheckableModel.h"
+
+RubricForm :: RubricForm (QString defaultRubricName, QWidget* parent, Qt::WFlags f)
+    : QDialog (parent, f),
+    UI (new Ui::rubric_form),
+    searchTemplate (0),
+    cat (0),
+    stuffForm (0)
+{
+    UI->setupUi (this);
+    UI->lERubricName->setText (defaultRubricName);
+
+    //this->initPrivilegiesModel ();
+
+    connect (UI->tbSearchTemplate, SIGNAL (clicked()), this, SLOT (loadSearchTemplate()) );
+    connect (UI->tbCategory, SIGNAL (clicked()), this, SLOT (loadCategory ()) );
+
+    connect (UI->pbOk, SIGNAL (clicked()), this, SLOT (accept()) );
+    connect (UI->pbCancel, SIGNAL (clicked()), this, SLOT (reject()) );
+}
+
+RubricForm :: ~RubricForm (void)
+{
+    delete UI;
+}
+
+QString RubricForm :: getRubricName (void) const
+{
+    return UI->lERubricName->text ();
+}
+
+void RubricForm :: setRubricName (QString rName)
+{
+    UI->lERubricName->setText (rName);
+}
+
+KKSSearchTemplate* RubricForm :: getSearchTemplate (void) const
+{
+    return searchTemplate;
+}
+
+void RubricForm :: setSearchTemplate (KKSSearchTemplate * st)
+{
+    UI->lESearchTemplate->clear ();
+    if (searchTemplate)
+        searchTemplate->release ();
+
+    searchTemplate = st;
+
+    if (searchTemplate)
+    {
+        searchTemplate->addRef ();
+        UI->lESearchTemplate->setText (searchTemplate->name());
+    }
+}
+
+KKSCategory * RubricForm :: getCategory (void) const
+{
+    return cat;
+}
+
+void RubricForm :: setCategory (KKSCategory * c)
+{
+    UI->lECategory->clear ();
+    if (cat)
+        cat->release ();
+
+    cat = c;
+    if (cat)
+    { 
+        cat->addRef ();
+        UI->lECategory->setText (cat->name());
+    }
+}
+
+
+void RubricForm :: loadSearchTemplate (void)
+{
+    emit requestSearchTemplate ();
+}
+
+void RubricForm :: loadCategory (void)
+{
+    emit requestCategory ();
+}
+/*
+QAbstractItemModel * RubricForm :: getStuffModel (void) const
+{
+    return UI->tvStuffStruct->model ();
+}
+
+void RubricForm :: setStuffModel (QAbstractItemModel *stMod)
+{
+    QAbstractItemModel * oldModel = UI->tvStuffStruct->model ();
+    UI->tvStuffStruct->setModel (stMod);
+    if (oldModel && stMod != oldModel)
+        delete oldModel;
+}
+
+void RubricForm :: initPrivilegiesModel (void)
+{
+    QStandardItemModel * privModel = new KKSCheckableModel (4, 1);
+    QStringList privList;
+    privList << tr ("Read of presense")
+             << tr ("Read parameters")
+             << tr ("Edit")
+             << tr ("Remove");
+
+    for (int i=0; i<privList.count(); i++)
+    {
+        QModelIndex wIndex = privModel->index (i, 0);
+        privModel->setData (wIndex, privList[i], Qt::DisplayRole);
+        privModel->setData (wIndex, Qt::Checked, Qt::CheckStateRole);
+    }
+    UI->lvPrivilegies->setModel (privModel);
+
+    connect (UI->lvPrivilegies, SIGNAL (clicked (const QModelIndex&)),
+             this,
+             SLOT (currentPrivilegiesChanged (const QModelIndex&))
+             );
+}
+
+void RubricForm :: currentPrivilegiesChanged (const QModelIndex& ind)
+{
+    qDebug () << __PRETTY_FUNCTION__ << ind;
+}
+*/
+
+KKSStuffForm * RubricForm :: getStuffForm (void)
+{
+    return stuffForm;
+}
+
+void RubricForm :: setStuffForm (KKSStuffForm * _sForm)
+{
+    if (stuffForm)
+    {
+        stuffForm->setParent (0);
+        delete stuffForm;
+    }
+    stuffForm = _sForm;
+    stuffForm->setParent (UI->gbAccessRules);
+    QGridLayout * gLay = qobject_cast<QGridLayout *>(UI->gbAccessRules->layout());
+    if (!gLay)
+    {
+        UI->gbAccessRules->setLayout (0);
+        gLay = new QGridLayout(UI->gbAccessRules);
+    }
+    gLay->addWidget (stuffForm, 0, 0, 1, 1);
+//    connect (stuffForm, SIGNAL (accessRulesChanged(KKSAccessEntity *)), this, SLOT (setAccessEntity (KKSAccessEntity *)));
+}
+
+KKSAccessEntity * RubricForm :: getAccessEntity (void) const
+{
+    KKSAccessEntity * acl = stuffForm ? stuffForm->getAccessEntity() : 0;
+    return acl;
+}
+
+void RubricForm :: setAccessEntity (KKSAccessEntity * _acl)
+{
+    if (stuffForm)
+        stuffForm->setAccessEntity (_acl);
+}

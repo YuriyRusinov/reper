@@ -1,0 +1,5 @@
+SetOutPath "$INSTDIR\"
+SetOutPath "$INSTDIR\bin"
+File "${ADMIN_DIR}\bin\ddocclient_adm.exe"
+SetOutPath "$INSTDIR\"
+File "${ADMIN_DIR}\admin.ini"

@@ -1,0 +1,1625 @@
+/***********************************************************************
+ * Module:  KKSViewFactory.cpp
+ * Author:  sergey
+ * Modified: 27 ноября 2008 г. 13:28:59
+ * Purpose: Implementation of the class KKSViewFactory
+ * Comment: данный класс предназначен для загрузки из БД всего необходимого для инициализации класса KKSView
+ *    Он имеет статический метод createView() для этого
+ ***********************************************************************/
+
+#include <QObject>
+#include <QWidget>
+#include <QAbstractItemModel>
+#include <QAbstractProxyModel>
+#include <QStandardItemModel>
+#include <QHeaderView>
+#include <QModelIndex>
+#include <QObject>
+#include <QMessageBox>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <QAction>
+//#include <QToolButton>
+#include <QTreeView>
+#include <QItemSelectionModel>
+#include <QItemSelection>
+#include <QGroupBox>
+#include <QTime>
+#include <QProgressDialog>
+#include <QKeySequence>
+#include <QColor>
+#include <QtDebug>
+
+#include "KKSViewFactory.h"
+
+#include <KKSTemplate.h>
+#include <KKSObject.h>
+#include "KKSLoader.h"
+#include <KKSObjEditor.h>
+#include <KKSCategoryTemplateWidget.h>
+#include <KKSRecWidget.h>
+#include <KKSAttributesEditor.h>
+#include <KKSAttrType.h>
+#include <KKSCategory.h>
+#include <KKSEIOData.h>
+#include <KKSCategory.h>
+#include <KKSCategoryAttr.h>
+#include <KKSSortFilterProxyModel.h>
+#include <KKSAttributesModel.h>
+#include <KKSCatAttrsModel.h>
+#include <KKSItemDelegate.h>
+#include <KKSObjectExemplar.h>
+#include <KKSEventFilter.h>
+#include <KKSCheckableModel.h>
+#include <KKSAttrGroup.h>
+#include <defines.h>
+
+////////////////////////////////////////////////////////////////////////
+// Name:       KKSViewFactory::createView(KKSTemplate* theTemplate, QString tableName)
+// Purpose:    Implementation of KKSViewFactory::createView()
+// Parameters:
+// - theTemplate -- шаблон табличной категории
+// - objEditor -- редактор ИО
+// - obj -- ИО-справочник
+// - l -- загрузчик данных из БД
+// - filters -- применяемые фильтры
+// - parent -- родительский виджет
+// - f -- флаги визуального отображения
+// Return:     KKSRecWidget * с моделью данных
+////////////////////////////////////////////////////////////////////////
+
+KKSRecWidget * KKSViewFactory :: createView (KKSTemplate* theTemplate, 
+                                        KKSObjEditor *objEditor, 
+                                        KKSObject* obj, 
+                                        KKSLoader *l,
+                                        const KKSList<const KKSFilterGroup *> & filters,
+                                        QWidget *parent,
+                                        Qt::WindowFlags f)
+{
+//    KKSView *tv = new KKSView ();
+    QTreeView *tv = new QTreeView ();
+    tv->header()->setClickable (true);
+    tv->header()->setSortIndicatorShown (true);
+    tv->header()->setSortIndicator (0, Qt::AscendingOrder);
+    tv->setSortingEnabled (true);
+    KKSItemDelegate *itemDeleg = new KKSItemDelegate (objEditor);
+    itemDeleg->setCategory (theTemplate->category());
+    tv->setItemDelegate (itemDeleg);
+    KKSRecWidget *resWidget = new KKSRecWidget (tv, false, parent, f);
+    KKSEventFilter *ef = new KKSEventFilter (resWidget);
+    tv->viewport()->installEventFilter (ef);
+    if (tv->selectionModel())
+        tv->selectionModel()->clearSelection ();
+
+    if (resWidget->actFilter)
+        QObject::connect (resWidget->actFilter, SIGNAL (triggered()), objEditor, SLOT (filterObjectE()) );
+    if (resWidget->actFilterSep)
+    {
+        QAction * actSearchT = new QAction (QIcon(":/ddoc/search_template.png"), QObject::tr("Search by template"), resWidget);
+        resWidget->insertToolBarAction(resWidget->actFilterSep, actSearchT);
+        QObject::connect (actSearchT, SIGNAL (triggered()), objEditor, SLOT (filterObjectT()) );
+    }
+    if (resWidget->actAdd)
+        QObject::connect (resWidget->actAdd, SIGNAL (triggered()), objEditor, SLOT (addObjectE()) );
+    if (resWidget->actEdit)
+    {
+        QKeySequence kEdit (Qt::Key_F4);
+        resWidget->actEdit->setShortcut (kEdit);
+        QObject::connect (resWidget->actEdit, SIGNAL (triggered()), objEditor, SLOT (editObjectE()) );
+    }
+    if (resWidget->actDel)
+        QObject::connect (resWidget->actDel, SIGNAL (triggered()), objEditor, SLOT (delObjectE()) );
+    if (resWidget->actImport)
+        QObject::connect (resWidget->actImport, SIGNAL (triggered()), objEditor, SLOT (importObjectE()) );
+    if (resWidget->actExport)
+        QObject::connect (resWidget->actExport, SIGNAL (triggered()), objEditor, SLOT (exportObjectE()) );
+    if (resWidget->actSetView)
+        QObject::connect (resWidget->actSetView, SIGNAL (triggered()), objEditor, SLOT (setView()) );
+
+    QObject::connect (tv, SIGNAL (doubleClicked(const QModelIndex&)), objEditor, SLOT (editCurrentRec(const QModelIndex&)) );
+    
+    loadEIOEx (objEditor, obj, l, theTemplate, tv, filters, true);
+    return resWidget;
+   // TODO : implement
+}
+
+////////////////////////////////////////////////////////////////////////
+// Name:       KKSViewFactory::KKSViewFactory()
+// Purpose:    Implementation of KKSViewFactory::KKSViewFactory()
+// Return:     
+////////////////////////////////////////////////////////////////////////
+
+KKSViewFactory::KKSViewFactory()
+{
+}
+
+////////////////////////////////////////////////////////////////////////
+// Name:       KKSViewFactory::~KKSViewFactory()
+// Purpose:    Implementation of KKSViewFactory::~KKSViewFactory()
+// Return:     
+////////////////////////////////////////////////////////////////////////
+
+KKSViewFactory::~KKSViewFactory()
+{
+   // TODO : implement
+}
+
+/* Метод осуществляет загрузку записей ИО-справочника в модель.
+ * Параметры:
+ * editor -- редактор ИО
+ * pObj -- ИО-справочник
+ * l -- загрузчик данных из БД
+ * tv -- целевой виджет для модели
+ * filters -- применяемые фильтры
+ * resize -- переразмерка колонок
+ * cat -- категория справочника
+ * tableName -- название таблицы
+ * pgDial -- если не 0, то индикатор загрузки данных
+ * isCheckable -- флаг наличия чекбоксов в 1й колонке
+ */
+void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor, 
+                                  KKSObject *pObj, 
+                                  KKSLoader *l, 
+                                  const KKSTemplate *t, 
+                                  QTreeView *tv, 
+                                  const KKSList<const KKSFilterGroup *> & filters,
+                                  bool resize,
+                                  const KKSCategory * cat,
+                                  const QString& tableName,
+                                  QProgressDialog *pgDial,
+                                  bool isCheckable
+                                  )
+{
+    if ( !t || !tv)
+        return; 
+
+    //
+    // сортируем будущие колонки таблицы по порядку (KKSAttrView::order())
+    //
+    QList<KKSAttrView*> attrs_list = t->sortedAttrs();
+    int ncols = 0;
+    QStringList headers;
+    QList<int> visible_attrs;
+    for (int i=0; i<attrs_list.count(); i++)
+        if (attrs_list[i]->isVisible() && \
+                (attrs_list[i]->type ()->attrType () != KKSAttrType::atRecordColor) && \
+                (attrs_list[i]->type ()->attrType () != KKSAttrType::atRecordColorRef) && \
+                (attrs_list[i]->type ()->attrType () != KKSAttrType::atRecordTextColor) && \
+                (attrs_list[i]->type ()->attrType () != KKSAttrType::atRecordTextColorRef)
+           )
+        {
+            ncols++;
+            visible_attrs.append (i);
+            headers << attrs_list[i]->title();
+        }
+
+    KKSSortFilterProxyModel *sortModel = 0;
+
+    if (!tv->model())
+    {
+        sortModel = new KKSSortFilterProxyModel (editor);
+        tv->setModel (sortModel);
+    }
+    else
+    {
+        sortModel = qobject_cast <KKSSortFilterProxyModel *>(tv->model());
+        if (!sortModel)
+            sortModel = new KKSSortFilterProxyModel (editor);
+        sortModel->clearAttrs ();
+        //itemDeleg->clearAttrs ();
+        qDebug () << __PRETTY_FUNCTION__ << "Model was previously set";
+    }
+    sortModel->setDynamicSortFilter (true);
+
+    QAbstractItemModel *objModel = sortModel->sourceModel();//new QStandardItemModel ();
+    if (!objModel)
+        objModel = isCheckable ? new KKSCheckableModel (0, ncols) : new QStandardItemModel (0, ncols);
+    else
+        sortModel->setSourceModel (0);
+    QItemSelectionModel *selModel = tv->selectionModel ();
+    if (editor)
+    {
+        QObject::connect (selModel, SIGNAL (currentChanged(const QModelIndex&, const QModelIndex&)), editor, SLOT (currentRecordChanged (const QModelIndex&, const QModelIndex&)) );
+        QObject::connect (selModel, SIGNAL (selectionChanged (const QItemSelection&, const QItemSelection&)), editor, SLOT (currentRecSelChanged (const QItemSelection& , const QItemSelection&)) );
+    }
+
+    int i=0;
+
+    bool isSetH ( objModel->rowCount () == 0);
+    if (objModel->rowCount () > 0)
+    {
+        objModel->removeRows (0, objModel->rowCount());
+        if (resize)
+            objModel->removeColumns (0, objModel->columnCount());
+    }
+    if (objModel->columnCount () == 0)
+        objModel->insertColumns (0, ncols);
+
+    if (editor)
+        editor->clearW ();
+
+    for (int ii=0; ii<ncols; ii++)
+    {
+        KKSAttrView * v = attrs_list [visible_attrs[ii]];
+        QString attrCode = v->code();
+        sortModel->addAttrView (v);
+//        itemDeleg->addAttrView (v);
+
+        if ((isSetH || resize) && v )
+        {
+            int w = v->defWidth();
+            if (editor)
+                editor->addWidth (w);
+            else
+                tv->header()->resizeSection (i, w);
+        }
+    }
+
+    KKSMap<int, KKSEIOData *> objEx;
+    if (!cat || tableName.isEmpty())
+        objEx = l->loadEIOList (pObj, filters);
+    else
+        objEx = l->loadEIOList (cat, tableName, filters);
+    KKSMap<int, KKSEIOData *>::const_iterator p;
+    int nObjC = objEx.count ();
+    qDebug () << __PRETTY_FUNCTION__ << nObjC;
+    objModel->insertRows (0, nObjC);
+
+    if (pgDial)
+    {
+        pgDial->setMinimum (0);
+        pgDial->setMaximum (nObjC*ncols);
+    }
+
+    int c = 0;
+    for (p=objEx.constBegin(); p!=objEx.constEnd(); p++)
+    {
+        QTime time;
+        time.start ();
+        if (pgDial)
+            pgDial->setValue (c);
+        QModelIndex wIndex = objModel->index (i, 0);
+        //QVariant bkColVal = QVariant ();
+        objModel->setData (wIndex, p.key(), Qt::UserRole);
+        KKSEIOData * d = p.value();
+
+        const KKSCategory * cat = t->category();
+        QVariant bkColVal = drawViewCells (cat, d, KKSAttrType::atRecordColor, l, objModel, wIndex);
+        QVariant fgColVal = drawViewCells (cat, d, KKSAttrType::atRecordTextColor, l, objModel, wIndex);
+
+        for (int ii=0; ii<ncols; ii++)
+        {
+            if (pgDial)
+                pgDial->setValue (c++);
+            int j = visible_attrs[ii];
+            KKSAttrView * v = attrs_list [j];
+            QString attrCode = v->code();
+            
+            QString attrValue;
+            if( v->type()->attrType() == KKSAttrType::atJPG || 
+               (v->refType() && v->refType()->attrType() == KKSAttrType::atJPG)
+               )
+            {
+                attrValue = QObject::tr("<Image data %1>").arg (i);
+            }
+            else if( v->type()->attrType() == KKSAttrType::atSVG || 
+                    (v->refType() && v->refType()->attrType() == KKSAttrType::atSVG)
+                   )
+            {
+                attrValue = QObject::tr("<SVG data %1>").arg (i);
+            }
+            else if( v->type()->attrType() == KKSAttrType::atXMLDoc || 
+                    (v->refType() && v->refType()->attrType() == KKSAttrType::atXMLDoc)
+                   )
+            {
+                attrValue = QObject::tr("<XML document %1>").arg (i);
+            }
+            else if( v->type()->attrType() == KKSAttrType::atVideo || 
+                    (v->refType() && v->refType()->attrType() == KKSAttrType::atVideo)
+                   )
+            {
+                attrValue = QObject::tr("<Video data %1>").arg (i);
+            }
+            else{
+                attrValue = d->fields().value (attrCode);
+                if (attrValue.isEmpty())
+                    attrValue = d->fields().value (attrCode.toLower());
+                else if (attrValue.contains ("\n"))
+                    attrValue = attrValue.mid (0, attrValue.indexOf("\n")) + "...";
+            }
+
+            QModelIndex wcIndex = objModel->index (i, ii);
+            objModel->setData (wcIndex, attrValue, Qt::DisplayRole);
+            if (bkColVal.isValid ())
+                objModel->setData (wcIndex, bkColVal, Qt::BackgroundRole);
+            if (fgColVal.isValid ())
+                objModel->setData (wcIndex, fgColVal, Qt::ForegroundRole);
+            if (ii == 0 && isCheckable)
+                objModel->setData (wcIndex, false, Qt::CheckStateRole);
+        }
+
+        i++;
+        //qDebug () << __PRETTY_FUNCTION__ << QString ("Iteration %1. Time elapsed %2 ms").arg (i).arg (t.elapsed());
+    }
+
+    if (isSetH || resize)
+        for (int j=0; j<qMin (objModel->columnCount(), headers.count()); j++)
+            objModel->setHeaderData (j, Qt::Horizontal, headers[j], Qt::DisplayRole);
+
+    sortModel->setSourceModel (objModel);
+    int sortCol = tv->header()->sortIndicatorSection ();
+    Qt::SortOrder sOrder = tv->header()->sortIndicatorOrder ();
+    sortModel->sort (sortCol, sOrder);
+}
+
+/* Метод осуществляет отрисовку строк ИО-справочника в случае наличия атрибутов,
+ * ответственных за цвет текста-фона.
+ * Параметры:
+ * cat -- категория таблицы
+ * d -- данные
+ * type -- тип атрибута
+ * l -- загрузчик из БД
+ * objModel -- модель с данными
+ * wIndex -- индекс записи
+ * icolor -- если атрибутов несколько, то номер требуемого атрибута (обычно 0).
+ * В рамках данного метода коды атрибутов категории являются уникальными,
+т.к. категория описывает таблицу. Поэтому использование кода атрибута в качестве ключа допустимо
+*/
+QVariant KKSViewFactory :: drawViewCells (const KKSCategory * cat, 
+                                          KKSEIOData * d, 
+                                          int type, 
+                                          KKSLoader *l, 
+                                          QAbstractItemModel * objModel, 
+                                          const QModelIndex& wIndex, 
+                                          int icolor)
+{
+    if (!cat || !d || !l)
+        return QVariant();
+
+    if ( (KKSAttrType::KKSAttrTypes)type != KKSAttrType::atRecordColor && 
+         (KKSAttrType::KKSAttrTypes)type != KKSAttrType::atRecordTextColor
+         )
+    {
+        return QVariant();
+    }
+
+    bool isBackGround ((KKSAttrType::KKSAttrTypes)type == KKSAttrType::atRecordColor);
+    KKSAttrType::KKSAttrTypes aType = ( isBackGround ? KKSAttrType::atRecordColorRef : KKSAttrType::atRecordTextColorRef);
+    
+    QList<int> colors = cat ? cat->searchAttributesByType (type) : QList<int>();
+    QVariant colVal = QVariant ();
+    
+    if (colors.isEmpty() && cat)
+        colors += cat->searchAttributesByType (aType);
+    
+    if (!colors.isEmpty())
+    {
+        int idAttr = -1;
+        if (icolor >= 0 && icolor < colors.size())
+            idAttr = colors[icolor];
+        else if (icolor >= colors.size())
+            idAttr = colors [colors.size()-1];
+        else
+            idAttr = colors[0];
+
+        KKSAttrView * vcol = new KKSAttrView (*(cat->attribute(idAttr)));
+
+        QRgb rgb_col ((isBackGround ? 0xFFFFFFFF : 0x00000000));
+        QVariant vc;
+        
+        if (!d->fields().value (vcol->code().toLower()).isEmpty() && 
+            vcol->type()->attrType() == type)
+        {
+            unsigned int vl = d->fields().value (vcol->code().toLower()).toUInt();
+            rgb_col = vl;
+            vc = QColor::fromRgba(rgb_col);//d->fields().value (vcol->code().toLower()));
+            colVal = QBrush (vc.value<QColor>());
+        }
+        else if (vcol->type()->attrType() == aType)//KKSAttrType::atRecordColorRef)
+        {
+            int idVal = d->fields().value (vcol->code().toLower()).toInt ();
+            KKSObject * objCRef = l->loadIO (vcol->tableName(), true);
+            KKSCategory * cRef = objCRef->category()->tableCategory();
+            if(!cRef){
+                objCRef->release ();
+                return QVariant();
+            }
+            
+            //cRef является табличной категорией, поэтому в ней все атрибуты имеют уникальные коды
+            //использование данного вызова допустимо
+            KKSAttribute * a = cRef->attribute(vcol->columnName());
+            if(!a){
+                objCRef->release ();
+                return QVariant();
+            }
+
+            KKSObjectExemplar * colorC = l->loadEIO (idVal, objCRef);
+            
+            KKSAttrValue * av = colorC->attrValue (a->id());
+            
+            //rgb_col = av->value().valueVariant().toQColor();
+            vc = av->value().valueVariant(); //(QColor::fromRgba(rgb_col));//d->fields().value (vcol->code().toLower()));
+            colorC->release ();
+            objCRef->release ();
+            //qDebug () << __PRETTY_FUNCTION__ << vc << vc.value<QColor>();
+            colVal = QBrush (vc.value<QColor>());
+        }
+        bool ier = false;
+        if (isBackGround)
+            ier = objModel->setData (wIndex, colVal, Qt::BackgroundRole);
+        else
+            ier = objModel->setData (wIndex, colVal, Qt::ForegroundRole);
+        vcol->release ();
+        if (ier)
+            return colVal;
+        else
+            return QVariant();
+    }
+    
+    return colVal;
+}
+
+/* Метод осуществляет загрузку записей ИО-справочника в модель.
+ * Параметры:
+ * editor -- редактор ИО
+ * pObj -- ИО-справочник
+ * l -- загрузчик данных из БД
+ * t -- шаблон табличной категории
+ * tv -- целевой виджет для модели
+ * filters -- применяемые фильтры
+ * pgDial -- если не 0, то индикатор загрузки данных
+ * isCheckable -- флаг наличия чекбоксов в 1й колонке
+ */
+void KKSViewFactory :: loadEIOEx (QWidget *editor,
+                                  KKSObject *pObj, 
+                                  KKSLoader *l, 
+                                  const KKSTemplate *t, 
+                                  QTreeView *tv, 
+                                  const KKSList<const KKSFilterGroup *> & filters,
+                                  QProgressDialog *pgDial
+                                 )
+{
+    if (!t || !tv)
+        return; 
+
+    KKSMap<int, KKSEIOData *> objEx = l->loadEIOList (pObj, filters);
+    KKSMap<int, KKSEIOData *>::const_iterator p;
+
+    //
+    // сортируем будущие колонки таблицы по порядку (KKSAttrView::order())
+    //
+    QList<KKSAttrView*> attrs_list = t->sortedAttrs();
+
+    KKSSortFilterProxyModel *sortModel = new KKSSortFilterProxyModel (editor);
+    QAbstractItemModel *oldModel = tv->model ();
+    tv->setModel (sortModel);
+
+    sortModel->setDynamicSortFilter (true);
+
+    if (!sortModel->sourceModel())
+        sortModel->setSourceModel (new QStandardItemModel());
+
+    QAbstractItemModel *objModel = sortModel->sourceModel();//new QStandardItemModel ();
+    QItemSelectionModel *selModel = tv->selectionModel ();
+    if (qobject_cast<KKSObjEditor*>(editor))
+    {
+        QObject::connect (selModel, SIGNAL (currentChanged(const QModelIndex&, const QModelIndex&)), editor, SLOT (currentRecordChanged (const QModelIndex&, const QModelIndex&)) );
+        QObject::connect (selModel, SIGNAL (selectionChanged (const QItemSelection&, const QItemSelection&)), editor, SLOT (currentRecSelChanged (const QItemSelection& , const QItemSelection&)) );
+    }
+
+    int i=0;
+
+    if (objModel->rowCount () > 0)
+    {
+        objModel->removeRows (0, objModel->rowCount());
+        objModel->removeColumns (0, objModel->columnCount());
+    }
+    QAbstractItemModel *oldObjModel = qobject_cast <QAbstractProxyModel *>(oldModel) ? qobject_cast <QAbstractProxyModel *>(oldModel)->sourceModel () : oldModel;
+    objModel->insertColumns (0, oldObjModel ? oldObjModel->columnCount() : 1);
+    if (oldObjModel)
+        for (int i=0; i<objModel->columnCount(); i++)
+            objModel->setHeaderData (i, Qt::Horizontal, oldObjModel->headerData (i, Qt::Horizontal));
+
+    QStringList headers;
+
+    if (pgDial)
+    {
+        pgDial->setMinimum (0);
+        pgDial->setMaximum (objEx.count()*attrs_list.count());
+    }
+    int ncols = 1;
+    int counter = 0;
+    for (p=objEx.constBegin(); p!=objEx.constEnd(); p++)
+    {
+        if (pgDial)
+            pgDial->setValue (counter);
+        objModel->insertRows (i, 1);
+        QModelIndex wIndex = objModel->index (i, 0);
+        objModel->setData (wIndex, p.key(), Qt::UserRole);
+        KKSEIOData * d = p.value();
+
+        const KKSCategory * cat = t->category();
+        QVariant bkColVal = drawViewCells (cat, d, KKSAttrType::atRecordColor, l, objModel, wIndex);
+        QVariant fgColVal = drawViewCells (cat, d, KKSAttrType::atRecordTextColor, l, objModel, wIndex);
+
+        int ii=0;
+        
+        for (int index=0; index<attrs_list.count(); index++)
+        {
+            if (pgDial)
+                pgDial->setValue (counter++);
+            KKSAttrView * v = attrs_list [index];
+            QString attrCode = v->code();
+            QString attrValue;
+            if(v->type()->attrType() == KKSAttrType::atJPG){
+                attrValue = QObject::tr("<Image data %1>").arg (i);
+            }
+            else if(v->type()->attrType() == KKSAttrType::atSVG){
+                attrValue = QObject::tr("<SVG data %1>").arg (i);
+            }
+            else if(v->type()->attrType() == KKSAttrType::atXMLDoc){
+                attrValue = QObject::tr("<XML document %1>").arg (i);
+            }
+            else if(v->type()->attrType() == KKSAttrType::atVideo){
+                attrValue = QObject::tr("<Video data %1>").arg (i);
+            }
+            else
+            {
+                attrValue = d->fields().value(attrCode);
+                if(attrValue.isEmpty())
+                    attrValue = d->fields().value(attrCode.toLower());
+                else if (attrValue.contains ("\n"))
+                    attrValue = attrValue.mid (0, attrValue.indexOf("\n")) + "...";
+            }
+
+            if (i==0 && v->isVisible())
+            {
+                headers << v->title();
+                sortModel->addAttrView (v);
+                if (ii>0)
+                {
+                    if (!oldModel)
+                        objModel->insertColumns (0, 1);
+                    ncols++;
+                }
+            }
+            QModelIndex wcIndex = objModel->index (i, ii);
+            if (bkColVal.isValid ())
+                objModel->setData (wcIndex, bkColVal, Qt::BackgroundRole);
+            if (fgColVal.isValid ())
+                objModel->setData (wcIndex, fgColVal, Qt::ForegroundRole);
+            if (v->isVisible())
+            {
+                objModel->setData (wcIndex, attrValue, Qt::DisplayRole);
+                ii++;
+            }
+            else
+                objModel->setData (wcIndex, attrValue, Qt::UserRole+1);
+        }
+        i++;
+    }
+
+    if (!oldModel)
+        for (int j=0; j<qMin (objModel->columnCount(), headers.count()); j++)
+            objModel->setHeaderData (j, Qt::Horizontal, headers[j], Qt::DisplayRole);
+
+    if (oldModel)
+        delete oldModel;
+
+}
+
+/* Метод осуществляет обновление записи ИО-справочника в модели.
+ * Параметры:
+ * l -- загрузчик данных из БД
+ * pObj -- ИО-справочник
+ * idObjEx -- идентификатор ЭИО в ИО-справочнике
+ * t -- шаблон табличной категории
+ * sourceModel -- модель с ЭИО
+ * row -- номер строки в модели
+ * cat -- категория справочника
+ * tableName -- название таблицы
+ */
+void KKSViewFactory :: updateEIOEx (KKSLoader *l,
+                                    KKSObject *pObj,
+                                    int idObjEx,
+                                    const KKSTemplate *t,
+                                    QAbstractItemModel *sourceModel,
+                                    int row,
+                                    const KKSCategory * cat,
+                                    const QString& tableName
+                                   )
+{
+    if (row < 0 || !pObj || !t || !sourceModel)
+        return;
+
+    qDebug () << __PRETTY_FUNCTION__ << sourceModel->rowCount () << sourceModel->columnCount ();
+    QModelIndex wIndex = sourceModel->index (row, 0);
+    if (!wIndex.isValid())
+        return;
+   
+    sourceModel->setData (wIndex, idObjEx, Qt::UserRole);
+    QList<KKSAttrView*> attrs_list = t->sortedAttrs();
+    KKSMap<int, KKSEIOData *> objExList;
+    if (!cat || tableName.isEmpty())
+        objExList = l->loadEIOList (pObj);//, filters);
+    else
+        objExList = l->loadEIOList (cat, tableName);
+
+    QVariant bkColVal = QVariant();
+    QVariant fgColVal = QVariant();
+
+    KKSMap<int, KKSEIOData *>::const_iterator p = objExList.find (idObjEx);
+    if (p == objExList.constEnd())
+        return;
+    else
+    {
+        //const KKSCategory * cat = t->category();
+        KKSEIOData * d = p.value ();
+
+        bkColVal = drawViewCells (cat, d, KKSAttrType::atRecordColor, l, sourceModel, wIndex);
+        fgColVal = drawViewCells (cat, d, KKSAttrType::atRecordTextColor, l, sourceModel, wIndex);
+    }
+
+    int ii=0;
+    for (int i=0; i<attrs_list.count(); i++)
+    {
+        if (attrs_list[i]->isVisible() && 
+			attrs_list[i]->type()->attrType () != KKSAttrType::atRecordColor 
+			&& attrs_list[i]->type()->attrType () != KKSAttrType::atRecordColorRef 
+			&& attrs_list[i]->type()->attrType () != KKSAttrType::atRecordTextColor 
+			&& attrs_list[i]->type()->attrType () != KKSAttrType::atRecordTextColorRef)
+        {
+            QModelIndex cIndex = sourceModel->index (row, ii);
+            KKSAttrView * v = attrs_list [i];
+            QString attrCode = v->code ();
+
+            QString attrValue;
+            if( v->type()->attrType() == KKSAttrType::atJPG || 
+               (v->refType() && v->refType()->attrType() == KKSAttrType::atJPG)
+               )
+            {
+                attrValue = QObject::tr("<Image data %1>").arg (row);
+            }
+            else if( v->type()->attrType() == KKSAttrType::atSVG || 
+               (v->refType() && v->refType()->attrType() == KKSAttrType::atSVG)
+               )
+            {
+                attrValue = QObject::tr("<SVG data %1>").arg (row);
+            }
+            else if( v->type()->attrType() == KKSAttrType::atXMLDoc || 
+               (v->refType() && v->refType()->attrType() == KKSAttrType::atXMLDoc)
+               )
+            {
+                attrValue = QObject::tr("<XML document %1>").arg (row);
+            }
+            else if( v->type()->attrType() == KKSAttrType::atVideo || 
+               (v->refType() && v->refType()->attrType() == KKSAttrType::atVideo)
+               )
+            {
+                attrValue = QObject::tr("<Video data %1>").arg (row);
+            }
+            else
+            {
+                attrValue = p.value()->fields().value (attrCode);
+                if(attrValue.isEmpty())
+                    attrValue = p.value()->fields().value (attrCode.toLower());
+                else if (attrValue.contains ("\n"))
+                    attrValue = attrValue.mid (0, attrValue.indexOf("\n")) + "...";
+            }
+
+            sourceModel->setData (cIndex, attrValue, Qt::DisplayRole);
+            //if (bkColVal.isValid())
+            sourceModel->setData (cIndex, bkColVal, Qt::BackgroundRole);
+            //if (fgColVal.isValid())
+            sourceModel->setData (cIndex, fgColVal, Qt::ForegroundRole);
+            ii++;
+        }
+    }
+}
+
+/* Метод загружает категории верхнего уровня в соответствующий виджет.
+ * Параметры:
+ * catTemplW -- виджет с моделью
+ * l -- загрузчик из БД
+ * filters -- применяемые фильтры
+ */
+void KKSViewFactory :: loadCategories (KKSCategoryTemplateWidget* catTemplW, 
+                                       KKSLoader* l, 
+                                       const KKSList<const KKSFilterGroup *> & filters)
+{
+    KKSObject *catTypeObj = l->loadIO (IO_CAT_TYPE_ID, true);
+    if(!catTypeObj)
+        return;
+
+    KKSMap<int, KKSEIOData *> categTypeMap = l->loadEIOList (catTypeObj, filters);
+    int n = categTypeMap.count ();
+    QStandardItemModel *catTypeTemplModel = new QStandardItemModel (n, 1);
+    catTypeTemplModel->setHeaderData (0, Qt::Horizontal, QObject::tr("Select category and template"), Qt::DisplayRole);
+    KKSMap<int, KKSEIOData *>::const_iterator pCatTypes;
+
+    KKSObject * refCatObj = l->loadIO (IO_CAT_ID, true);
+    if (!refCatObj)
+        return;
+
+    KKSFilter * cMainFilter = refCatObj->category()->tableCategory()->createFilter (17, QString("true"), KKSFilter::foEq);
+    if (!cMainFilter)
+        return;
+
+    int itype=0;
+    for (pCatTypes=categTypeMap.constBegin(); pCatTypes != categTypeMap.constEnd(); ++pCatTypes)
+    {
+        QModelIndex ctIndex = catTypeTemplModel->index (itype++, 0);
+        catTypeTemplModel->setData (ctIndex, pCatTypes.value()->fields().value("name"), Qt::DisplayRole);
+        catTypeTemplModel->setData (ctIndex, pCatTypes.key(), Qt::UserRole);
+        catTypeTemplModel->setData (ctIndex, 2, Qt::UserRole+USER_ENTITY);
+        KKSList<const KKSFilterGroup *> cFilterGroups;
+        KKSList<const KKSFilter*> catFilters;
+        catFilters.append (cMainFilter);
+        KKSFilterGroup * cGroup = new KKSFilterGroup (true);
+        KKSFilter * cTypeFilter = refCatObj->category()->tableCategory()->createFilter (10, QString::number (pCatTypes.key()), KKSFilter::foEq);
+        if (!cTypeFilter)
+            continue;
+        catFilters.append (cTypeFilter);
+        cTypeFilter->release ();
+        cGroup->setFilters (catFilters);
+        cFilterGroups.append (cGroup);
+        cGroup->release ();
+        KKSMap<int, KKSEIOData *> categMap = l->loadEIOList (refCatObj, cFilterGroups);
+        catTypeTemplModel->insertRows (0, categMap.count(), ctIndex);
+        catTypeTemplModel->insertColumns (0, 1, ctIndex);
+        KKSMap<int, KKSEIOData *>::const_iterator pCat;
+        
+        int i=0;
+        for (pCat=categMap.constBegin(); pCat != categMap.constEnd(); pCat++){
+            KKSEIOData * cat = pCat.value();
+            if(!cat)
+                continue;
+
+            QModelIndex cIndex = catTypeTemplModel->index (i, 0, ctIndex);
+
+            catTypeTemplModel->setData (cIndex, cat->fieldValue("name"), Qt::DisplayRole);
+            catTypeTemplModel->setData (cIndex, cat->fieldValue("id"), Qt::UserRole);
+            catTypeTemplModel->setData (cIndex, 1, Qt::UserRole+USER_ENTITY);
+            i++;
+        }
+        /*
+        for (pCat=categMap.constBegin(); pCat != categMap.constEnd(); pCat++)
+        {
+            KKSCategory * cat = l->loadCategory (pCat.key());
+            if (!cat)
+                continue;
+            QModelIndex cIndex = catTypeTemplModel->index (i, 0, ctIndex);
+            catTypeTemplModel->setData (cIndex, cat->name(), Qt::DisplayRole);
+            catTypeTemplModel->setData (cIndex, cat->id(), Qt::UserRole);
+            catTypeTemplModel->setData (cIndex, 1, Qt::UserRole+USER_ENTITY);
+            i++;
+            cat->release();
+        }
+        */
+    }
+
+    cMainFilter->release ();
+    refCatObj->release ();
+    catTypeObj->release ();
+    catTemplW->uploadModel (catTypeTemplModel);
+}
+
+/* Метод создает виджет с записями шаблонов категорий.
+ * Параметры:
+ * idCat -- идентификатор категории
+ * l -- загрузчик из БД
+ * parent, f -- атрибуты Qt для целевого виджета.
+ * Результат:
+ * виджет с записями шаблонов.
+ */
+KKSRecWidget * KKSViewFactory :: createCategoryTemplates (int idCat, KKSLoader *l, QWidget *parent, Qt::WindowFlags f)
+{
+    QTreeView *tv = new QTreeView ();
+    if (!tv)
+        return 0;
+    tv->header()->setClickable (true);
+    tv->header()->setSortIndicatorShown (true);
+    tv->header()->setSortIndicator (0, Qt::AscendingOrder);
+    tv->setSortingEnabled (true);
+    KKSRecWidget *resWidget = new KKSRecWidget (tv, false, parent, f);
+    resWidget->hideGroup (0);//gbSearch->setVisible (false);
+    resWidget->hideGroup (3);//tbSetView->setVisible (false);
+    resWidget->hideGroup (2);//gbImportExport->setVisible (false);
+    KKSItemDelegate *itemDeleg = new KKSItemDelegate (resWidget);
+    tv->setItemDelegate (itemDeleg);
+    QSortFilterProxyModel *sortTemplModel = new QSortFilterProxyModel (resWidget);
+    if (!sortTemplModel)
+        return resWidget;
+
+    sortTemplModel->setSortCaseSensitivity (Qt::CaseInsensitive);
+    sortTemplModel->setDynamicSortFilter (true);
+    tv->setModel (sortTemplModel);
+    QStandardItemModel * tModel = new QStandardItemModel (0, 1);
+    sortTemplModel->setSourceModel (tModel);
+    if (idCat > 0)
+    {
+        KKSList<KKSTemplate*> lTempls = l->loadCategoryTemplates (idCat);
+        loadCategoryDbTemplates (lTempls, tModel);
+    }
+
+    tModel->setHeaderData (0, Qt::Horizontal, QObject::tr ("Category templates"));
+
+    return resWidget;
+}
+
+/* Метод осуществляет загрузку шаблонов категорий в модель.
+ * Параметры:
+ * lTempls -- список шаблонов категории
+ * model -- модель данных
+ * parent -- индекс родительской категории.
+ */
+void KKSViewFactory :: loadCategoryDbTemplates (const KKSList<KKSTemplate*>& lTempls,
+                                                QAbstractItemModel *model,
+                                                const QModelIndex& parent)
+{
+    if (!model || lTempls.isEmpty())
+        return;
+
+    int nTempls = lTempls.count();
+
+    if (model->rowCount (parent) > 0)
+        model->removeRows (0, model->rowCount (parent), parent);
+
+    if (model->columnCount (parent) > 1)
+        model->removeColumns (0, model->columnCount (parent)-1, parent);
+    else if (model->columnCount (parent) == 0)
+        model->insertColumns (0, 1, parent);
+
+    model->insertRows (0, nTempls, parent);
+    for (int i=0; i<nTempls; i++)
+    {
+        QModelIndex wIndex = model->index (i, 0, parent);
+        model->setData (wIndex, lTempls[i]->name(), Qt::DisplayRole);
+        model->setData (wIndex, lTempls[i]->id(), Qt::UserRole);
+        model->setData (wIndex, 0, Qt::UserRole+USER_ENTITY);
+    }
+}
+
+/* Метод осуществляет загрузку шаблонов категорий в модель.
+ * Параметры:
+ * idCat -- идентификатор категории
+ * l -- загрузчик из БД
+ * model -- модель данных
+ * parent -- индекс родительской категории.
+ */
+void KKSViewFactory :: loadCategoryTemplates (int idCat,
+                                              KKSLoader* l,
+                                              QAbstractItemModel *model,
+                                              const QModelIndex& parent)
+{
+    if (!model || !l)
+        return;
+
+    KKSCategory *cat = l->loadCategory (idCat);
+    if (!cat)
+    {
+        QMessageBox::warning (0, QObject::tr("Category"), QObject::tr("Cannot load category id=%1").arg (idCat));
+        return;
+    }
+
+    if (!model)
+        return;
+
+    KKSTemplate *defT = new KKSTemplate (cat->defTemplate());
+    if (!defT)
+    {
+        QMessageBox::warning (0, QObject::tr("Default template"), QObject::tr("Cannot load default template"));
+        return;
+    }
+
+    KKSList<KKSTemplate*> lTempls = l->loadCategoryTemplates (idCat);
+    int nTempls = lTempls.count();
+    if (model->rowCount (parent) > 0)
+        model->removeRows (0, model->rowCount (parent), parent);
+    model->insertRows (0, (nTempls > 0 ? 2 : 1), parent);
+    if (model->columnCount (parent) == 0)
+        model->insertColumns (0, 1, parent);
+    QModelIndex defTInd = model->index (0, 0, parent);
+    if (!defTInd.isValid())
+        return;
+    model->setData (defTInd, defT->name(), Qt::DisplayRole);
+    model->setData (defTInd, defT->id(), Qt::UserRole);
+    model->setData (defTInd, 0, Qt::UserRole+USER_ENTITY);
+
+    if (nTempls>0)
+    {
+        QModelIndex dTInd = model->index (1, 0, parent);
+        model->setData (dTInd, QObject::tr("Templates"), Qt::DisplayRole);
+        model->setData (dTInd, -1, Qt::UserRole);
+        model->setData (dTInd, -1, Qt::UserRole+USER_ENTITY);
+
+        loadCategoryDbTemplates (lTempls, model, dTInd);
+    }
+    defT->release ();
+
+    if (cat->tableCategory())
+    {
+        model->insertRows (0, 1, parent);
+        QModelIndex childCatIndex = model->index (0, 0, parent);
+        if (!childCatIndex.isValid())
+            return;
+        int idChildCat = cat->tableCategory()->id();
+        model->setData (childCatIndex, cat->tableCategory()->name(), Qt::DisplayRole);
+        model->setData (childCatIndex, idChildCat, Qt::UserRole);
+        model->setData (childCatIndex, 1, Qt::UserRole+USER_ENTITY);
+        loadCategoryTemplates (idChildCat, l, model, childCatIndex);
+    }
+
+    cat->release ();
+}
+
+/* Метод осуществляет загрузку записей атрибутов категории.
+ * Параметры:
+ * cat -- категория
+ * parent -- родительский виджет
+ * f -- флаги визуального отображения
+ * Результат:
+ * виджет с атрибутами
+ */
+KKSRecWidget * KKSViewFactory :: createCategAttrsView (const KKSCategory *cat,
+                                                    QWidget *parent,
+                                                    Qt::WindowFlags f)
+{
+    if (!cat)
+        return 0;
+    QTreeView *tv = new QTreeView ();
+    KKSRecWidget * recWidget = new KKSRecWidget (tv, false, parent, f);
+    //
+    // QObject::tr("Filter"), QObject::tr("&Add"), QObject::tr ("&Edit"), QObject::tr ("&Delete"), QObject::tr("&Import"), QObject::tr("E&xport"), 
+    //
+    recWidget->hideGroup (0);//gbSearch->setVisible (false);
+    recWidget->hideGroup (2);//tbSetView->setVisible (false);
+    recWidget->hideGroup (3);//gbImportExport->setVisible (false);
+    QStandardItemModel * acModel = new KKSCatAttrsModel (0, 4);//QStandardItemModel (0, 4);
+    acModel->setHeaderData (0, Qt::Horizontal, QObject::tr ("Name"));
+    acModel->setHeaderData (1, Qt::Horizontal, QObject::tr ("Default value"));
+    acModel->setHeaderData (2, Qt::Horizontal, QObject::tr ("Mandatory"));
+    acModel->setHeaderData (3, Qt::Horizontal, QObject::tr ("Read only"));
+    updateAttrModel (cat, acModel);
+    tv->setModel (acModel);
+    tv->setDragEnabled (true);
+    tv->setAcceptDrops (true);
+    tv->setDropIndicatorShown (true);
+    KKSItemDelegate *itemDeleg = new KKSItemDelegate (recWidget);
+    tv->setItemDelegate (itemDeleg);
+
+    return recWidget;
+}
+
+/* Метод осуществляет обновление модели атрибутов.
+ * Параметры:
+ * cat --категория
+ * model -- целевая модель.
+ */
+void KKSViewFactory :: updateAttrModel (const KKSCategory *cat, QAbstractItemModel *model)
+{
+    if (!cat || !model)
+        return;
+    int n=model->rowCount ();
+    KKSMap<int, KKSCategoryAttr *> attrs = cat->attributes();
+    int nCol = model->columnCount ();
+    if (nCol < 4)
+        return;
+    bool isOk = true;
+    if (n < attrs.size())
+        isOk = model->insertRows (n, attrs.size()-n);
+    else if (n > attrs.size())
+        isOk = model->removeRows (attrs.size(), n-attrs.size());
+
+    if (!isOk)
+        return;
+
+    int i=0;
+    KKSMap<int, KKSCategoryAttr*>::const_iterator p;
+    for (p=attrs.constBegin(); p != attrs.constEnd(); p++)
+    {
+        QModelIndex wIndex = model->index (i, 0);
+        if (!wIndex.isValid())
+            continue;
+        model->setData (wIndex, p.key(), Qt::UserRole);
+        if (!p.value())
+            continue;
+        p.value()->addRef ();
+        QString ctitle (p.value()->title());
+        qDebug () << __PRETTY_FUNCTION__ << p.value()->id();//(title.isNull () ? QString() : title);
+        model->setData (wIndex, ctitle, Qt::DisplayRole);
+        wIndex = model->index (i, 1);
+        model->setData (wIndex, p.value()->defValue().valueVariant(), Qt::DisplayRole);
+        wIndex = model->index (i, 2);
+        model->setData (wIndex, (p.value()->isMandatory() ? QObject::tr("Yes") : QObject::tr("No")), Qt::DisplayRole);
+        wIndex = model->index (i, 3);
+        model->setData (wIndex, (p.value()->isReadOnly() ? QObject::tr("Yes") : QObject::tr("No")), Qt::DisplayRole);
+        p.value()->release ();
+        i++;
+    }
+}
+
+/* Метод осуществляет загрузку списка атрибутов по группам.
+ * Параметры:
+ * l -- загрузчик из БД
+ * filters -- применяемые фильтры
+ * mode -- наличие-отсутствие кнопок OK, Cancel, Apply
+ * parent -- родительский виджет
+ * f -- флаги визуального отображения.
+ * Результат:
+ * виджет с атрибутами
+ */
+KKSAttributesEditor * KKSViewFactory :: createAttrView (KKSLoader *l,
+                                                        const KKSList<const KKSFilterGroup *> & filters,
+                                                        bool mode,
+                                                        QWidget *parent,
+                                                        Qt::WindowFlags f)
+{
+    if (!l)
+        return 0;
+
+    KKSObject *attrTypesIO = l->loadIO (IO_ATTR_TYPE_ID, true);
+    if (!attrTypesIO)
+    {
+        QMessageBox::warning (parent, QObject::tr ("Attributes types"), QObject::tr ("Cannot load attribute types"), QMessageBox::Ok);
+        return 0;
+    }
+
+    KKSMap<int, KKSAttrType*> availAttrTypes;
+    KKSMap<int, KKSEIOData *> attrTypesList = l->loadEIOList (attrTypesIO);
+    KKSMap<int, KKSEIOData *>::const_iterator pAttrs;
+    for (pAttrs = attrTypesList.constBegin(); pAttrs != attrTypesList.constEnd(); pAttrs++)
+    {
+        KKSAttrType *aType = new KKSAttrType ();
+        if (!aType)
+            continue;
+        aType->setId (pAttrs.key());
+        aType->setName (pAttrs.value()->fields ().value ("name"));
+        aType->setCode (pAttrs.value()->fields ().value ("code"));
+        availAttrTypes.insert (pAttrs.key(), aType);
+        if (aType)
+            aType->release ();
+    }
+
+    QString val_ref = QString("select id from io_categories where id_io_category_type in (1,2,8,9)");
+    int attrId = 12;
+
+    KKSList<const KKSFilterGroup *> filterGroupsRefs = AttrRefsFilters (l, attrId, val_ref);
+    
+    QMap<int, QString> io_refs = loadAttrRefs (l, filterGroupsRefs);
+    
+    KKSMap<int, KKSAGroup*> avAttrGroups = l->loadAvailAttrsGroups ();
+
+    KKSAttributesEditor *aEditor = new KKSAttributesEditor (availAttrTypes, avAttrGroups, io_refs, parent, f);
+    KKSObject *attrIO = l->loadIO (IO_ATTR_ID, true);
+    if (!attrIO)
+    {
+        QMessageBox::warning (parent, QObject::tr ("Attributes"), QObject::tr ("Cannot load attributes"), QMessageBox::Ok);
+        return 0;
+    }
+
+    QTreeView *tvAttrs = new QTreeView ();
+    tvAttrs->header()->setClickable (true);
+    tvAttrs->header()->setSortIndicatorShown (true);
+    tvAttrs->header()->setSortIndicator (0, Qt::AscendingOrder);
+    tvAttrs->setSortingEnabled (true);
+    tvAttrs->setSelectionMode (QAbstractItemView::ExtendedSelection);
+    tvAttrs->setDragDropMode (QAbstractItemView::DragOnly);
+    tvAttrs->setDropIndicatorShown (true);
+
+    KKSRecWidget *recW = new KKSRecWidget (tvAttrs, mode, aEditor);
+    aEditor->setRecordsWidget (recW);
+    recW->hideGroup (3);//setVisible (false);
+    recW->pbApply->setVisible (false);
+//    recW->hideGroup (0);//gbSearch->setVisible (true);
+    recW->hideGroup (2);//gbImportExport->setVisible (false);
+    KKSEventFilter *ef = new KKSEventFilter (recW);
+    tvAttrs->viewport()->installEventFilter (ef);
+
+    //KKSMap<int, KKSEIOData *> attrList = l->loadEIOList (attrIO, filters);
+    //KKSMap<int, KKSEIOData *>::const_iterator p;
+    QSortFilterProxyModel *sortFilterProxyModel = new KKSSortFilterProxyModel (recW);
+    tvAttrs->setModel (sortFilterProxyModel);
+    sortFilterProxyModel->setDynamicSortFilter (true);
+    KKSItemDelegate *itemDeleg = new KKSItemDelegate (aEditor);
+    tvAttrs->setItemDelegate (itemDeleg);
+    
+    KKSMap<int, KKSAGroup*> attrsGroups = l->loadAttrsGroups();
+    
+    QAbstractItemModel *wModel = new QStandardItemModel (attrsGroups.size(), 4);//QStandardItemModel  (attrList.size(), 3);
+    KKSMap<int, KKSAGroup*>::const_iterator p;
+    sortFilterProxyModel->setSourceModel (wModel);
+    sortFilterProxyModel->setSortCaseSensitivity (Qt::CaseInsensitive);
+    sortFilterProxyModel->sort (0, Qt::AscendingOrder);
+    wModel->setHeaderData (0, Qt::Horizontal, QObject::tr("Attribute"));
+    wModel->setHeaderData (1, Qt::Horizontal, QObject::tr("Attribute type"));
+    wModel->setHeaderData (2, Qt::Horizontal, QObject::tr("Attribute name"));
+    wModel->setHeaderData (3, Qt::Horizontal, QObject::tr("Attribute reference"));
+    int i=0;
+    for (p=attrsGroups.constBegin(); p != attrsGroups.constEnd(); p++)
+    {
+        QModelIndex wIndex = wModel->index (i, 0);
+        parseAttrGroup (l, p.value(), filters, wModel, wIndex);
+        i++;
+    }
+    tvAttrs->update ();
+
+    if (mode)
+    {
+        recW->pbOk->setDefault (true);
+        recW->pbOk->setAutoDefault (true);
+        QKeySequence cancel_key (Qt::Key_Escape);
+        recW->pbCancel->setShortcut (cancel_key);
+
+        QObject::connect (recW->pbOk, SIGNAL(clicked()), aEditor, SLOT (accept()));
+        QObject::connect (recW->pbCancel, SIGNAL(clicked()), aEditor, SLOT (reject()));
+    }
+    QObject::connect (recW->getView (), SIGNAL (doubleClicked (const QModelIndex &)), aEditor, SLOT (setAttr (const QModelIndex &)) );
+
+    if (attrIO)
+        attrIO->release ();
+
+    if (attrTypesIO)
+        attrTypesIO->release ();
+
+    return aEditor;
+}
+
+/* Метод осуществляет обновление модели атрибутов.
+ * Параметры:
+ * l -- загрузчик из БД
+ * wModel -- модель с атрибутами
+ */
+void KKSViewFactory :: updateAttributesModel (KKSLoader *l, QAbstractItemModel * wModel)
+{
+    if (!l || !wModel)
+        return;
+
+    KKSMap<int, KKSAGroup*> attrsGroups = l->loadAttrsGroups();
+    if (wModel->rowCount() > 0)
+    {
+        int nr = wModel->rowCount();
+        wModel->removeRows (0, nr);
+    }
+    wModel->insertRows (0, attrsGroups.count());
+    if (wModel->columnCount() < 4)
+    {
+        int nc = wModel->columnCount();
+        wModel->insertColumns (nc, 4-nc);
+    }
+    KKSMap<int, KKSAGroup*>::const_iterator p;
+    int i=0;
+    for (p=attrsGroups.constBegin(); p != attrsGroups.constEnd(); p++)
+    {
+        QModelIndex wIndex = wModel->index (i, 0);
+        parseAttrGroup (l, p.value(), KKSList<const KKSFilterGroup *>(), wModel, wIndex);
+        i++;
+    }
+}
+
+/* Метод осуществляет фильтрацию списка атрибутов.
+ * Параметры:
+ * l -- загрузчик из БД
+ * filters -- применяемые фильтры
+ * aModel -- модель атрибутов
+ */
+void KKSViewFactory :: filterAttributesModel (KKSLoader *l, const KKSList<const KKSFilterGroup *> & filters, QAbstractItemModel * aModel)
+{
+    if (!l || !aModel)
+        return;
+    KKSMap<int, KKSAGroup*> attrsGroups = l->loadAttrsGroups();
+    if (aModel->rowCount() > 0)
+    {
+        int nr = aModel->rowCount();
+        aModel->removeRows (0, nr);
+    }
+    aModel->insertRows (0, attrsGroups.count());
+    if (aModel->columnCount() < 4)
+    {
+        int nc = aModel->columnCount();
+        aModel->insertColumns (nc, 4-nc);
+    }
+    KKSMap<int, KKSAGroup*>::const_iterator p;
+    int i=0;
+    for (p=attrsGroups.constBegin(); p != attrsGroups.constEnd(); p++)
+    {
+        QModelIndex wIndex = aModel->index (i, 0);
+        parseAttrGroup (l, p.value(), filters, aModel, wIndex);
+        i++;
+    }
+
+}
+
+void KKSViewFactory :: parseAttrGroup (KKSLoader *l, const KKSAGroup* aGroup, const KKSList<const KKSFilterGroup *> & filters, QAbstractItemModel * aModel, const QModelIndex& parent)
+{
+    if (!l || !aGroup || !aModel)
+        return;
+
+    KKSObject * io = l->loadIO (IO_ATTR_ID, true);
+    if (!io)
+        return;
+
+    //--KKSMap<int, KKSEIOData *> attrs = l->loadEIOList (io, filters);
+    //--QList<int> attrsKeys = attrs.keys();
+    
+    QModelIndex pIndex;
+    if (parent.isValid())
+        pIndex = parent;
+    else
+    {
+        aModel->insertRows (0, 1, parent);
+        pIndex = aModel->index (0, 0, parent);
+    }
+    
+    aModel->setData (pIndex, aGroup->id(), Qt::UserRole);
+    aModel->setData (pIndex, aGroup->name(), Qt::DisplayRole);
+    aModel->setData (pIndex, 0, Qt::UserRole+USER_ENTITY);
+    
+    int nChild = aGroup->childGroups().size();
+    aModel->insertRows (0, nChild, pIndex);
+    if (!aModel->columnCount (pIndex))
+        aModel->insertColumns (0, 4, pIndex);
+    
+    int i=0;
+    for (KKSMap<int, KKSAGroup*>::const_iterator p = aGroup->childGroups().constBegin();
+            p != aGroup->childGroups().constEnd();
+            p++)
+    {
+        QModelIndex wIndex = aModel->index (i, 0, pIndex);
+        aModel->setData (wIndex, p.key(), Qt::UserRole);
+        aModel->setData (wIndex, p.value()->name(), Qt::DisplayRole);
+        aModel->setData (wIndex, 0, Qt::UserRole+USER_ENTITY);
+        parseAttrGroup (l, p.value(), KKSList<const KKSFilterGroup *>(), aModel, wIndex);
+        i++;
+    }
+    //int nAttrs = aGroup->getAttributes().count();
+    //aModel->insertRows (nChild, nAttrs, pIndex);
+    for (KKSMap<int, KKSAttribute*>::const_iterator pa = aGroup->getAttributes().constBegin();
+            pa != aGroup->getAttributes().constEnd();
+            pa++)
+    {
+        //--if (!attrsKeys.contains (pa.key()))
+        //--    continue;
+        aModel->insertRows (i, 1, pIndex);
+        QModelIndex wIndex = aModel->index (i, 0, pIndex);
+        KKSAttribute *attr = pa.value();//l->loadAttribute (pa.key());
+        if (attr)
+        {
+            aModel->setData (wIndex, pa.key(), Qt::UserRole);
+            aModel->setData (wIndex, pa.value()->name(), Qt::DisplayRole);
+            aModel->setData (wIndex, 1, Qt::UserRole+USER_ENTITY);
+            QModelIndex tIndex = aModel->index (i, 1, pIndex);
+            aModel->setData (tIndex, attr->type()->name(), Qt::DisplayRole);
+            QModelIndex titleIndex = aModel->index (i, 2, pIndex);
+            aModel->setData (titleIndex, attr->title(), Qt::DisplayRole);
+            QModelIndex nIndex = aModel->index (i, 3, pIndex);
+            if (attr->type()->id() == 2 ||
+                attr->type()->id() == 7 ||
+                attr->type()->id() == 12 ||
+                attr->type()->id() == 17 ||
+                attr->type()->id() == 19 ||
+                attr->type()->id() == 26
+            )
+            {
+                KKSObject * io = l->loadIO (attr->tableName(), true);
+                QString refVal = QString("%1(%2)").arg ((io ? io->name() : QString())).arg (attr->name());
+                aModel->setData (nIndex, refVal, Qt::DisplayRole);
+                if (io)
+                    io->release();
+            }
+        }
+        i++;
+    }
+    io->release ();
+}
+
+/* Метод осуществляет зугрузку атрибутов в виджет.
+ * Параметры:
+ * avAttrs -- списк возможный атрибутов
+ * parent -- родительский виджет
+ * f -- флаги визуального отображения
+ * Результат:
+ * виджет со списком атрибутов
+ */
+KKSAttributesEditor * KKSViewFactory :: createAvailAttrView (const KKSMap<int, KKSCategoryAttr *>& avAttrs,
+                                                             QWidget *parent,
+                                                             Qt::WindowFlags f)
+{
+    KKSAttributesEditor *aEditor = new KKSAttributesEditor ( parent, f);
+    QTreeView *tvAttrs = new QTreeView ();
+    KKSRecWidget *recW = new KKSRecWidget (tvAttrs, true, aEditor);
+    aEditor->setRecordsWidget (recW);
+    recW->pbApply->setVisible (false);
+    for (int i=0; i<=3; i++)
+        recW->hideGroup (i);//gbEdit->setVisible (false);
+//    recW->gbSearch->setVisible (false);
+//    recW->gbImportExport->setVisible (false);
+//    recW->tbSetView->setVisible (false);
+
+    QAbstractProxyModel * aSortModel = new KKSSortFilterProxyModel ();
+    QStandardItemModel *wModel = new QStandardItemModel (avAttrs.size(), 1);
+    wModel->setHeaderData (0, Qt::Horizontal, QObject::tr("Attribute"));
+    int i=0;
+    KKSMap<int, KKSCategoryAttr *>::const_iterator p;
+    for (p=avAttrs.constBegin(); p!= avAttrs.constEnd(); p++)
+    {
+        QModelIndex wIndex = wModel->index (i, 0);
+        wModel->setData (wIndex, p.key(), Qt::UserRole);
+        wModel->setData (wIndex, p.value()->title(), Qt::DisplayRole);
+        wModel->setData (wIndex, 1, Qt::UserRole+USER_ENTITY);
+        KKSAttrView * av = new KKSAttrView (*p.value());
+        (qobject_cast<KKSSortFilterProxyModel *>(aSortModel))->addAttrView (av);
+        av->release ();
+        i++;
+    }
+    aSortModel->setSourceModel (wModel);
+    tvAttrs->setModel (aSortModel);
+    KKSItemDelegate *itemDeleg = new KKSItemDelegate (aEditor);
+    tvAttrs->setItemDelegate (itemDeleg);
+
+    QObject::connect (recW->pbOk, SIGNAL(clicked()), aEditor, SLOT (accept()));
+    QObject::connect (recW->pbCancel, SIGNAL(clicked()), aEditor, SLOT (reject()));
+
+    return aEditor;
+}
+
+/* Метод осуществляет загрузку групп шаблона в модель.
+ * Параметры
+ * t -- шаблон
+ * tModel -- модель
+ */
+void KKSViewFactory :: initTemplateGroups (KKSTemplate *t, QAbstractItemModel *tModel)
+{
+    if (!tModel || (tModel->columnCount () == 0 && !tModel->insertColumns (0, 1)))
+        return;
+
+    KKSMap<int, KKSAttrGroup *> tGroups = t->groups ();
+    tModel->removeRows (0, tModel->rowCount());
+    if (tModel->columnCount () > 3)
+        tModel->removeColumns (0, tModel->columnCount()-3);
+    qDebug () << __PRETTY_FUNCTION__ << tGroups.count();
+    if (!tModel->insertRows (0, tGroups.count()))
+        return;
+
+    KKSMap<int, KKSAttrGroup *>::const_iterator pg = tGroups.constBegin();
+    int i=0;
+    for (; pg != tGroups.constEnd(); pg++)
+    {
+        insertTemplateGroup (pg.value(), QModelIndex(), i, tModel);
+        i++;
+    }
+}
+
+/* Метод добавляет группу атрибутов шаблона в модель.
+ * Параметры:
+ * tAGroup -- группа атрибутов
+ * parent -- родительский индекс
+ * ind -- приоритет группы
+ * tModel -- модель шаблона
+ */
+void KKSViewFactory :: insertTemplateGroup (KKSAttrGroup *tAGroup, const QModelIndex& parent, int ind, QAbstractItemModel *tModel)
+{
+    qDebug () << __PRETTY_FUNCTION__ << ind << tAGroup->order() << tAGroup->id();
+    if (!tModel || !tAGroup || (!parent.isValid() && tAGroup->order() != ind) )
+        return;
+
+    int nR = tModel->rowCount (parent);
+    if (nR <= ind)
+        tModel->insertRows (nR, ind-nR+1, parent);
+
+    QModelIndex wIndex = tModel->index (ind, 0, parent);
+    qDebug () << __PRETTY_FUNCTION__ << wIndex;
+    if (!wIndex.isValid())
+        return;
+
+    tModel->setData (wIndex, tAGroup->name(), Qt::DisplayRole);
+    tModel->setData (wIndex, tAGroup->id(), Qt::UserRole);
+    tModel->setData (wIndex, 1, Qt::UserRole+USER_ENTITY);
+    KKSMap<int, KKSAttrView *>::const_iterator p = tAGroup->attrViews().constBegin ();
+    if ((tModel->columnCount (wIndex) < 3 && !tModel->insertColumns (0, 3, wIndex)) || (tModel->rowCount (wIndex) < tAGroup->attrViews ().size() && !tModel->insertRows (0, tAGroup->attrViews ().size(), wIndex)))
+        return;
+
+    KKSList < KKSAttrView *>  avList;
+    for (;p != tAGroup->attrViews().constEnd(); p++)
+        avList.append (p.value());
+
+    qStableSort (avList.begin(), avList.end(), compareAttrViews);
+    for (int i=0; i<avList.count(); i++)
+    {
+        QModelIndex attrIndex = tModel->index (i, 0, wIndex);
+        tModel->setData (attrIndex, avList[i]->title(), Qt::DisplayRole);
+        tModel->setData (attrIndex, avList[i]->id (), Qt::UserRole);
+        tModel->setData (attrIndex, 0, Qt::UserRole+USER_ENTITY);
+        attrIndex = tModel->index (i, 1, wIndex);
+        tModel->setData (attrIndex, avList[i]->defValue().valueVariant(), Qt::DisplayRole);
+        tModel->setData (attrIndex, avList[i]->defValue().value(), Qt::UserRole);
+        attrIndex = tModel->index (i, 2, wIndex);
+        tModel->setData (attrIndex, avList[i]->isReadOnly() ? QObject::tr("Yes") : QObject::tr ("No"), Qt::DisplayRole);
+        tModel->setData (attrIndex, avList[i]->isReadOnly(), Qt::UserRole);
+    }
+
+    const KKSList<KKSAttrGroup *> childGroups = tAGroup->sortedChildGroups ();
+    for (int i=0; i<childGroups.count(); i++)
+    {
+        qDebug () << __PRETTY_FUNCTION__ << i << childGroups[i]->id() << wIndex;
+        insertTemplateGroup (childGroups[i], wIndex, avList.count()+i, tModel);
+    }
+}
+
+/* Метод обновляет группу атрибутов шаблона в модели.
+ * Параметры:
+ * tAGroup -- группа атрибутов
+ * gIndex -- индекс группы
+ * tModel -- модель шаблона
+ */
+void KKSViewFactory :: updateTemplateGroup (KKSAttrGroup *tAGroup, const QModelIndex& gIndex, QAbstractItemModel *tModel)
+{
+    if (!tModel || !tAGroup || !gIndex.isValid())// && tAGroup->order() != ind))
+        return;
+
+    QModelIndex wIndex = gIndex;//tModel->index (ind, 0, parent);
+    if (!wIndex.isValid())
+        return;
+
+    qDebug () << __PRETTY_FUNCTION__ << wIndex.data (Qt::DisplayRole).toString() << wIndex.data (Qt::UserRole).toInt() << wIndex.data (Qt::UserRole+USER_ENTITY).toInt();
+    tModel->setData (wIndex, tAGroup->name(), Qt::DisplayRole);
+    tModel->setData (wIndex, tAGroup->id(), Qt::UserRole);
+    tModel->setData (wIndex, 1, Qt::UserRole+USER_ENTITY);
+    if (tModel->rowCount (wIndex) > 0)
+    {
+        int nr = tModel->rowCount (wIndex);
+        int nc = tModel->columnCount (wIndex);
+        tModel->removeRows (0, nr, wIndex);
+        tModel->removeColumns (0, nc, wIndex);
+    }
+
+    KKSMap<int, KKSAttrView *>::const_iterator p = tAGroup->attrViews().constBegin ();
+    if ((tModel->columnCount (wIndex) < 3 && !tModel->insertColumns (0, 3, wIndex)) || (tModel->rowCount (wIndex) < tAGroup->attrViews ().size() && !tModel->insertRows (0, tAGroup->attrViews ().size(), wIndex)))
+        return;
+
+    KKSList < KKSAttrView *>  avList;
+    for (;p != tAGroup->attrViews().constEnd(); p++)
+        avList.append (p.value());
+
+    qStableSort (avList.begin(), avList.end(), compareAttrViews);
+    for (int i=0; i<avList.count(); i++)
+    {
+        QModelIndex attrIndex = tModel->index (i, 0, wIndex);
+        tModel->setData (attrIndex, avList[i]->title(), Qt::DisplayRole);
+        tModel->setData (attrIndex, avList[i]->id (), Qt::UserRole);
+        tModel->setData (attrIndex, 0, Qt::UserRole+USER_ENTITY);
+        attrIndex = tModel->index (i, 1, wIndex);
+        tModel->setData (attrIndex, avList[i]->defValue().valueVariant(), Qt::DisplayRole);
+        tModel->setData (attrIndex, avList[i]->defValue().value(), Qt::UserRole);
+        attrIndex = tModel->index (i, 2, wIndex);
+        tModel->setData (attrIndex, avList[i]->isReadOnly() ? QObject::tr("Yes") : QObject::tr ("No"), Qt::DisplayRole);
+        tModel->setData (attrIndex, avList[i]->isReadOnly(), Qt::UserRole);
+    }
+}
+
+/* Метод осуществляет загрузку id и названий ИО в соответствии с применяемыми фильтрами
+ * Параметры:
+ * l -- загрузчик из БД
+ * filters -- применяемые фильтры
+ * Результат:
+ * QMap<int, QString> контейнер, содержащий ключи и названия ЭИО.
+ */
+QMap<int, QString> KKSViewFactory :: loadAttrRefs (KKSLoader *l, const KKSList<const KKSFilterGroup *> & filters)
+{
+    QMap<int, QString> io_refs;
+
+    KKSObject *io = l->loadIO (IO_IO_ID, true);
+    if(!io)
+        return io_refs;
+
+    KKSMap<int, KKSEIOData *> io_data = l->loadEIOList (io, filters);
+    KKSMap<int, KKSEIOData *>::const_iterator p;
+
+    io_refs.clear ();
+    for (p=io_data.constBegin(); p != io_data.constEnd(); p++)
+        io_refs.insert (p.key(), p.value()->fields ().value ("name"));
+
+    io->release ();
+    return io_refs;
+}
+
+KKSList<const KKSFilterGroup *> KKSViewFactory :: AttrRefsFilters (KKSLoader *l, int attrId, QString val_ref)
+{
+    KKSList<const KKSFilterGroup *> filterGroupsRefs;
+
+    KKSList<const KKSFilter *> filtersRefs;
+
+    KKSObject *io = l->loadIO (IO_IO_ID, true);
+    if (!io)
+        return filterGroupsRefs;
+
+    KKSCategory *c = io->category()->tableCategory();
+    if(!c)
+    {
+        io->release();
+        return filterGroupsRefs;
+    }
+    const KKSFilter * fc = c->createFilter (attrId, val_ref, KKSFilter::foInSQL);
+    
+    io->release();
+
+    if (!fc)
+        return filterGroupsRefs;
+    
+    filtersRefs.append (fc);
+    fc->release();
+
+    KKSFilterGroup * group = new KKSFilterGroup(true);
+    group->setFilters(filtersRefs);
+    filterGroupsRefs.append(group);
+    group->release();
+
+    return filterGroupsRefs;
+}
+
+////////////////////////////////////////////////////////////////////////
+// Name:       KKSViewFactory::createAdditionalView(KKSTemplate* theTemplate, QString tableName)
+// Purpose:    Implementation of KKSViewFactory::createAdditionalView()
+// Метод осуществляет загрузку данных дополнительной таблицы
+// Parameters:
+// - t -- шаблон табличной категории
+// - objEditor -- редактор ИО
+// - cat -- категория доп. таблицы
+// - l -- загрузчик данных из БД
+// - tableName -- название доп. таблицы
+// - filters -- применяемые фильтры
+// - parent -- родительский виджет
+// - f -- флаги визуального отображения
+// Return:     KKSRecWidget * с моделью данных
+////////////////////////////////////////////////////////////////////////
+
+
+KKSRecWidget * KKSViewFactory :: createAdditionalView (KKSTemplate *t,
+                                                       KKSObjEditor *objEditor,
+                                                       const KKSCategory *cat,
+                                                       KKSLoader *l,
+                                                       QString tableName,
+                                                       const KKSList<const KKSFilterGroup *> & filters,
+                                                       QWidget *parent,
+                                                       Qt::WindowFlags f)
+{
+    QTreeView *tv = new QTreeView ();
+    tv->header()->setClickable (true);
+    tv->header()->setSortIndicatorShown (true);
+    tv->header()->setSortIndicator (0, Qt::AscendingOrder);
+    tv->setSortingEnabled (true);
+    KKSItemDelegate *itemDeleg = new KKSItemDelegate (tv);
+    tv->setItemDelegate (itemDeleg);
+    KKSRecWidget *resWidget = new KKSRecWidget (tv, false, parent, f);
+    KKSEventFilter *ef = new KKSEventFilter (resWidget);
+    tv->viewport()->installEventFilter (ef);
+    if (tv->selectionModel())
+        tv->selectionModel()->clearSelection ();
+
+    if (resWidget->actFilter)
+        QObject::connect (resWidget->actFilter, SIGNAL (triggered()), objEditor, SLOT (filterObjectE()) );
+    if (resWidget->actAdd)
+        QObject::connect (resWidget->actAdd, SIGNAL (triggered()), objEditor, SLOT (addObjectE()) );
+    if (resWidget->actEdit)
+    {
+        QKeySequence kEdit (Qt::Key_F4);
+        resWidget->actEdit->setShortcut (kEdit);
+        QObject::connect (resWidget->actEdit, SIGNAL (triggered()), objEditor, SLOT (editObjectE()) );
+    }
+    if (resWidget->actDel)
+        QObject::connect (resWidget->actDel, SIGNAL (triggered()), objEditor, SLOT (delObjectE()) );
+    if (resWidget->actImport)
+        QObject::connect (resWidget->actImport, SIGNAL (triggered()), objEditor, SLOT (importObjectE()) );
+    if (resWidget->actExport)
+        QObject::connect (resWidget->actExport, SIGNAL (triggered()), objEditor, SLOT (exportObjectE()) );
+    if (resWidget->actSetView)
+        QObject::connect (resWidget->actSetView, SIGNAL (triggered()), objEditor, SLOT (setView()) );
+
+    QObject::connect (tv, SIGNAL (doubleClicked(const QModelIndex&)), objEditor, SLOT (editCurrentRec(const QModelIndex&)) );
+    if ( !t )
+        return resWidget; 
+
+    loadEIOEx (objEditor, 0, l, t, tv, filters, true, cat, tableName);
+    return resWidget;
+}

@@ -1,0 +1,29 @@
+delete from shape_segments;
+delete from element_shapes;
+delete from segment_types;
+delete from graph_styles;
+delete from shape_types;
+delete from fault_devices;
+delete from guard_objects_devices;
+delete from guard_objects;
+delete from alarm_events;
+delete from devices;
+delete from graph_plans;
+delete from access_cards_access_plan;
+delete from access_plan;
+delete from access_cards;
+delete from card_statuses;
+delete from card_types;
+delete from persons;
+delete from tso_positions;
+delete from tso_units;
+
+--delete from tso_params;
+
+delete from alarm_events_q;
+delete from fault_devices_q;
+delete from dev_object_q;
+delete from personal_q;
+delete from access_cards_q;
+delete from xml_query_responses;
+--delete from xml_queries;

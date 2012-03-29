@@ -1,0 +1,1 @@
+--insert into transport (name) values ('Обмен по протоколу "Юпитер"');

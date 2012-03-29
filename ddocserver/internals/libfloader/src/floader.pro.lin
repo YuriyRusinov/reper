@@ -1,0 +1,32 @@
+TEMPLATE = lib
+CONFIG -= qt
+TARGET = floader
+DEPENDPATH += .
+INCLUDEPATH += .
+
+CONFIG += warn_on dll release
+
+DESTDIR = ./bld
+
+PGSERVER_HOME=/usr
+
+INCLUDEPATH += $${PGSERVER_HOME}/include/pgsql/server
+LIBS *= -L$${PGSERVER_HOME}/lib/pgsql
+
+DEFINES += FLOADER_DLL
+
+# Input
+HEADERS += kksversion.c floader.h floader_config.h
+win32{
+    HEADERS += dirent_win.h
+}
+
+SOURCES += exec_spi.c \
+           cstring_to_text.c \
+           rgetfile.c \
+	   rdeletefile.c \
+           rgetabsurl.c \
+           rgetfilebyurl.c \
+           rgetfilesizebyurl.c \
+           rwritefile.c \
+           text_to_cstring.c 

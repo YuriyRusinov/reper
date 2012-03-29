@@ -1,0 +1,48 @@
+insert into a_views (id, name) values (1, 'Чекбокс');
+insert into a_views (id, name) values (2, 'выбор из списка (комбобокс)');
+insert into a_views (id, name) values (3, 'дата');
+insert into a_views (id, name) values (4, 'дата-время');
+insert into a_views (id, name) values (5, 'строка текста');
+insert into a_views (id, name) values (6, 'интервал');
+insert into a_views (id, name) values (7, 'набор элементов');
+insert into a_views (id, name) values (8, 'поле текста');
+insert into a_views (id, name) values (9, 'строка текста фиксированнрой длины');
+insert into a_views (id, name) values (10, 'Изображение JPG');
+insert into a_views (id, name) values (11, 'Выбор цвета');
+insert into a_views (id, name) values (12, 'Набор пространственных точек');
+insert into a_views (id, name) values (13, 'Объект SVG');
+insert into a_views (id, name) values (14, 'Видео-ролик');
+insert into a_views (id, name) values (15, 'Время');
+
+
+insert into a_types (id, id_a_view, name, code) values (1, 1, 'Логический', 'BOOL');
+insert into a_types (id, id_a_view, name, code) values (2, 2, 'Элемент справочника', 'INT4');
+insert into a_types (id, id_a_view, name, code) values (3, 2, 'Родитель/Потомок', 'INT4');
+insert into a_types (id, id_a_view, name, code) values (4, 3, 'Дата', 'DATE');
+insert into a_types (id, id_a_view, name, code) values (5, 3, 'Дата-время', 'TIMESTAMP');
+insert into a_types (id, id_a_view, name, code) values (6, 5, 'Дробное значение', 'FLOAT8');
+insert into a_types (id, id_a_view, name, code) values (7, 5, 'Ссылка на информационный объект', 'INT4');
+insert into a_types (id, id_a_view, name, code) values (8, 5, 'Целочисленное значение', 'INT4');
+insert into a_types (id, id_a_view, name, code) values (9, 5, 'Строка', 'VARCHAR');
+insert into a_types (id, id_a_view, name, code) values (10, 6, 'Временной интервал (дни)', 'INT4[]');
+insert into a_types (id, id_a_view, name, code) values (11, 5, 'Гиперссылка', 'VARCHAR');
+insert into a_types (id, id_a_view, name, code) values (12, 7, 'Набор элементов справочника (старый вариант)', 'INT4[]');
+insert into a_types (id, id_a_view, name, code) values (13, 8, 'Текст', 'TEXT');
+insert into a_types (id, id_a_view, name, code) values (14, 9, 'Строка фиксированной длины', 'VARCHAR');
+insert into a_types (id, id_a_view, name, code) values (15, 10, 'Изображение JPG', 'VARCHAR');
+insert into a_types (id, id_a_view, name, code) values (16, 5, 'Мандатная метка', 'MACLABEL');
+
+insert into a_types (id, id_a_view, name, code) values (17, 7, 'Набор элементов справочника', 'INT4[]');
+insert into a_types (id, id_a_view, name, code) values (18, 11, 'Цвет записи в справочнике (фон)', 'INT8');
+insert into a_types (id, id_a_view, name, code) values (19, 11, 'Ссылка на цвет записи (фон)', 'INT4');
+insert into a_types (id, id_a_view, name, code) values (20, 8, 'XML-документ', 'XML');
+insert into a_types (id, id_a_view, name, code) values (21, 6, 'Временной интервал (часы)', 'INT4[3]');
+insert into a_types (id, id_a_view, name, code) values (22, 12, 'Набор пространственных точек', 'POINT[]');
+insert into a_types (id, id_a_view, name, code) values (23, 13, 'Объект SVG', 'XML');
+insert into a_types (id, id_a_view, name, code) values (24, 14, 'Видео-ролик', 'BYTEA');
+insert into a_types (id, id_a_view, name, code) values (25, 11, 'Цвет записи в справочнике (текст)', 'INT8');
+insert into a_types (id, id_a_view, name, code) values (26, 11, 'Ссылка на цвет записи (текст)', 'INT4');
+insert into a_types (id, id_a_view, name, code) values (27, 15, 'Время', 'TIME');
+
+SELECT pg_catalog.setval('a_views_id_seq', 15, true);
+SELECT pg_catalog.setval('a_types_id_seq', 27, true);

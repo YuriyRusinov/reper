@@ -1,0 +1,5 @@
+SetOutPath "$INSTDIR\"
+SetOutPath "$INSTDIR\bin"
+File "${CONNECTOR_DIR}\bin\http_connector.exe"
+SetOutPath "$INSTDIR\"
+File "${CONNECTOR_DIR}\connector.ini"

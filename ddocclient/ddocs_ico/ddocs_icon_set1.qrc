@@ -1,0 +1,34 @@
+<RCC>
+  <qresource prefix="ddoc">
+    <file>organization.png</file>
+    <file>organization_add.png</file>
+    <file>organization_edit.png</file>
+    <file>organization_remove.png</file>
+    <file>position.png</file>
+    <file>position_add.png</file>
+    <file>position_delete.png</file>
+    <file>position_edit.png</file>
+    <file>refreshIcon.png</file>
+    <file>reload.png</file>
+    <file>unit.png</file>
+    <file>unit_add.png</file>
+    <file>unit_delete.png</file>
+    <file>unit_edit.png</file>
+    <file>user.png</file>
+    <file>user_add.png</file>
+    <file>user_delete.png</file>
+    <file>user_edit.png</file>
+    <file>user_from_pos.png</file>
+    <file>user_to_pos.png</file>
+    <file>add.png</file>
+    <file>delete.png</file>
+    <file>edit.png</file>
+    <file>search.png</file>
+    <file>export_qualifier.png</file>
+    <file>import_qualifier.png</file>
+    <file>apply_template.png</file>
+    <file>accept.png</file>
+    <file>exec_cmd.png</file>
+    <file>send_as_mail.png</file>
+  </qresource>
+</RCC>

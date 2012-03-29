@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>KKSMainWindowDlg</class>
+ <widget class="QMainWindow" name="KKSMainWindowDlg">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>770</width>
+    <height>471</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>EDS Оператор</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../../../../:/ico/app_logo_32.xpm</normaloff>../../../../:/ico/app_logo_32.xpm</iconset>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout">
+    <property name="margin">
+     <number>2</number>
+    </property>
+    <property name="spacing">
+     <number>2</number>
+    </property>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>770</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>БД</string>
+    </property>
+    <addaction name="aConnect"/>
+    <addaction name="aChangeUser"/>
+    <addaction name="aDisconnect"/>
+    <addaction name="separator"/>
+    <addaction name="aConnInfo"/>
+    <addaction name="separator"/>
+    <addaction name="aQuit"/>
+   </widget>
+   <widget class="QMenu" name="menuJournals">
+    <property name="title">
+     <string>Журналы</string>
+    </property>
+    <addaction name="aCreateMsg"/>
+    <addaction name="aCreateCmd"/>
+    <addaction name="separator"/>
+    <addaction name="aCreateTSDRecord"/>
+    <addaction name="aShowTSD"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Помощь</string>
+    </property>
+    <addaction name="aAbout"/>
+   </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Параметры</string>
+    </property>
+    <addaction name="aSettings"/>
+   </widget>
+   <widget class="QMenu" name="menuDocs">
+    <property name="title">
+     <string>Документы</string>
+    </property>
+    <addaction name="aCreateDoc"/>
+    <addaction name="aFindDoc"/>
+    <addaction name="separator"/>
+    <addaction name="aMyDocs"/>
+    <addaction name="aRubricControl"/>
+    <addaction name="separator"/>
+    <addaction name="aPrintDoc"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>Вид</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="aWindowMenu">
+    <property name="title">
+     <string>Окно</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuSearch">
+    <property name="title">
+     <string>Поиск</string>
+    </property>
+    <addaction name="aCreateSearchQuery"/>
+    <addaction name="aShowSearchQueries"/>
+   </widget>
+   <widget class="QMenu" name="menuAdmin">
+    <property name="title">
+     <string>Администрирование</string>
+    </property>
+    <addaction name="aCreateCat"/>
+    <addaction name="aViewCat"/>
+    <addaction name="separator"/>
+    <addaction name="aViewAttrs"/>
+    <addaction name="separator"/>
+    <addaction name="aEditOSS"/>
+    <addaction name="separator"/>
+    <addaction name="aSysQualifiers"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuView"/>
+   <addaction name="menuDocs"/>
+   <addaction name="menuSearch"/>
+   <addaction name="menuJournals"/>
+   <addaction name="menuAdmin"/>
+   <addaction name="menuTools"/>
+   <addaction name="aWindowMenu"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="aQuit">
+   <property name="text">
+    <string>Выход</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="aAbout">
+   <property name="text">
+    <string>О программе...</string>
+   </property>
+  </action>
+  <action name="aSettings">
+   <property name="icon">
+    <iconset>
+     <normaloff>C:/Users/ksa/.designer/backup</normaloff>C:/Users/ksa/.designer/backup</iconset>
+   </property>
+   <property name="text">
+    <string>Настройки...</string>
+   </property>
+  </action>
+  <action name="aConnect">
+   <property name="text">
+    <string>Соединиться с БД...</string>
+   </property>
+  </action>
+  <action name="aChangeUser">
+   <property name="text">
+    <string>Сменить пользователя...</string>
+   </property>
+  </action>
+  <action name="aDisconnect">
+   <property name="text">
+    <string>Отключиться от БД...</string>
+   </property>
+  </action>
+  <action name="aCreateDoc">
+   <property name="text">
+    <string>Создать...</string>
+   </property>
+   <property name="toolTip">
+    <string>Создать документ</string>
+   </property>
+  </action>
+  <action name="aFindDoc">
+   <property name="text">
+    <string>Найти...</string>
+   </property>
+   <property name="toolTip">
+    <string> Найти документ в БД</string>
+   </property>
+  </action>
+  <action name="aCreateMsg">
+   <property name="text">
+    <string>Создать почтовое сообщение...</string>
+   </property>
+  </action>
+  <action name="aMyDocs">
+   <property name="text">
+    <string>Мои документы...</string>
+   </property>
+  </action>
+  <action name="aRubricControl">
+   <property name="text">
+    <string>Рубрикаторы...</string>
+   </property>
+   <property name="iconText">
+    <string>Управление рубрикаторами...</string>
+   </property>
+  </action>
+  <action name="aPrintDoc">
+   <property name="text">
+    <string>Печать...</string>
+   </property>
+  </action>
+  <action name="aCreateTSDRecord">
+   <property name="text">
+    <string>Создать запись табеля срочных донесений...</string>
+   </property>
+  </action>
+  <action name="aConnInfo">
+   <property name="text">
+    <string>Информация о подключении...</string>
+   </property>
+  </action>
+  <action name="aCreateCmd">
+   <property name="text">
+    <string>Создать распоряжение...</string>
+   </property>
+  </action>
+  <action name="aShowTSD">
+   <property name="text">
+    <string>Открыть табель срочных донесений...</string>
+   </property>
+  </action>
+  <action name="aCreateSearchQuery">
+   <property name="text">
+    <string>Создать поисковый запрос...</string>
+   </property>
+  </action>
+  <action name="aShowSearchQueries">
+   <property name="text">
+    <string>Открыть список поисковых запросов...</string>
+   </property>
+  </action>
+  <action name="aCreateCat">
+   <property name="text">
+    <string>Создать категорию...</string>
+   </property>
+  </action>
+  <action name="aViewCat">
+   <property name="text">
+    <string>Открыть категорию/шаблон...</string>
+   </property>
+  </action>
+  <action name="aViewAttrs">
+   <property name="text">
+    <string>Атрибуты...</string>
+   </property>
+  </action>
+  <action name="aEditOSS">
+   <property name="text">
+    <string>Редактирование ОШС...</string>
+   </property>
+  </action>
+  <action name="aSysQualifiers">
+   <property name="text">
+    <string>Системные справочники...</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
