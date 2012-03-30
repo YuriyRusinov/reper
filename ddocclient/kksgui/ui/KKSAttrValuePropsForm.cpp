@@ -7,6 +7,8 @@
 #include <QDoubleValidator>
 #include <QIntValidator>
 #include <QtDebug>
+#include <QMessageBox>
+
 #include <KKSAttrValue.h>
 #include <KKSObject.h>
 
@@ -44,6 +46,7 @@ KKSAttrValuePropsForm::KKSAttrValuePropsForm(KKSAttrValue * av, bool mode, QWidg
     connect (UI->pbOk, SIGNAL (clicked()), this, SLOT (apply()) );
     connect (UI->pbApply, SIGNAL (clicked()), this, SLOT (saveAttrValue()) );
     connect (UI->pbCancel, SIGNAL (clicked()), this, SLOT (reject ()) );
+    connect (UI->pbViewHistory, SIGNAL(clicked()), this, SLOT (pbHistoryClicked()));
 }
 
 KKSAttrValuePropsForm::~KKSAttrValuePropsForm()
@@ -252,4 +255,17 @@ void KKSAttrValuePropsForm :: initForm (bool mode)
     UI->tEDescription->setPlainText (m_av->desc());
 
     UI->cbActual->setChecked(m_av->isActual());
+}
+
+
+void KKSAttrValuePropsForm::pbHistoryClicked()
+{
+    emit loadHistory(m_av);
+}
+
+void KKSAttrValuePropsForm::viewHistory(const KKSList<KKSAttrValue*> & history)
+{
+    //—юда вставить свой код
+    //параметр history уже содержит всю небходимую информацию
+    //QMessageBox::information(this, tr(""), tr(""), QMessageBox::Ok);
 }

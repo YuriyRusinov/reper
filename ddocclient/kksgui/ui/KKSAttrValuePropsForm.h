@@ -10,6 +10,7 @@
 
 #include <QDialog>
 #include "kksgui_config.h"
+#include <KKSList.h>
 
 class QLineEdit;
 
@@ -41,11 +42,14 @@ private slots:
     
     void chToStateChanged (int state);
 
+    void viewHistory(const KKSList<KKSAttrValue*> & history);
+    void pbHistoryClicked();
+
 signals:
     void viewIOSrc (KKSObject*, QWidget *);
-    //void viewIOSrc1 (KKSObject*);
     void loadIOSrc (KKSObject **);
-    //void loadIOSrc1 (const KKSAttrValue*, QLineEdit *);
+    void loadHistory(const KKSAttrValue *);
+
 private:
     //
     // Functions

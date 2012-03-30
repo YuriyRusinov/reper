@@ -104,6 +104,8 @@ void KKSAttrValueLabel :: showAttrValueProps()
     KKSAttrValuePropsForm * f = new KKSAttrValuePropsForm(m_av, true, this);
     connect(f, SIGNAL(loadIOSrc(KKSObject **)), this, SIGNAL(loadIOSrc(KKSObject **)));
     connect(f, SIGNAL(viewIOSrc(KKSObject *, QWidget *)), this, SIGNAL(viewIOSrc(KKSObject *, QWidget *)));
+    connect(f, SIGNAL(loadHistory(const KKSAttrValue *)), this, SIGNAL(loadHistory(const KKSAttrValue *)));
+    connect(this, SIGNAL(viewHistory(const KKSList<KKSAttrValue *> &)), f, SLOT(viewHistory(const KKSList<KKSAttrValue *> &)));
 
     if(f->exec() == QDialog::Accepted)
         emit attrValueChanged();

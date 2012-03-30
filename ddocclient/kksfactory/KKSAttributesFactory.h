@@ -62,6 +62,10 @@ private slots:
     void slotLoadIOSrc  (KKSObject ** io);
     void viewIOSrc (KKSObject * io, QWidget * parent);
     //void slotLoadIOSrc1 (const KKSAttrValue * av, QLineEdit * lESrc1);
+    void loadIOAttrValueHistory(const KKSAttrValue * av);
+
+signals:
+    void viewHistory(const KKSList<KKSAttrValue *> &);
 
 private:
     //

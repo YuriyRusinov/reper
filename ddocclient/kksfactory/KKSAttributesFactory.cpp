@@ -608,6 +608,9 @@ QLabel * KKSAttributesFactory :: createAttrTitle (KKSAttrValue * av, bool isSyst
     QLabel * lTitle = new KKSAttrValueLabel(av, isSystem);
     connect(lTitle, SIGNAL(loadIOSrc(KKSObject ** )), this, SLOT(slotLoadIOSrc(KKSObject ** )));
     connect(lTitle, SIGNAL(viewIOSrc(KKSObject *, QWidget *)), this, SLOT(viewIOSrc(KKSObject *, QWidget *)));
+    connect (lTitle, SIGNAL(loadHistory(const KKSAttrValue *)), this, SLOT(loadIOAttrValueHistory(const KKSAttrValue *)));
+    connect (this, SIGNAL(viewHistory(const KKSList<KKSAttrValue *> &)), lTitle, SIGNAL(viewHistory(const KKSList<KKSAttrValue *> &)));
+
     if(objEditor)
         connect(lTitle, SIGNAL(attrValueChanged()), objEditor, SLOT(attrValueChanged())); 
 	av->release();
@@ -1862,4 +1865,11 @@ void KKSAttributesFactory :: viewIOSrc (KKSObject * io, QWidget * parent)
     
     KKSObject * o = loader->loadIO (idObj, true);
     m_oef->editExistOE(parent, IO_IO_ID, idObj, o->category(), s, 0, mode);
+}
+
+void KKSAttributesFactory::loadIOAttrValueHistory(const KKSAttrValue * av)
+{
+    KKSList<KKSAttrValue *> avList = loader->loadIOAttrValueHistory(av);
+
+    emit viewHistory(avList);
 }

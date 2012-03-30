@@ -15,8 +15,8 @@ KKS_DATA_DIR = $$KKS_PREFIX/data
 
 
 #external libraries paths
-EXT = "C:/Program Files/DynamicSoft/DynamicDocs Client "
-EXTERNAL_PREFIX = $$EXT$$KKS_VERSION
+EXT = "C:/Program Files/DynamicSoft/DynamicDocs Client 0.13.0"
+EXTERNAL_PREFIX = $$EXT
 PSQL_HOME = $$EXTERNAL_PREFIX
 PSQL_INCLUDE_DIR = $$EXTERNAL_PREFIX/include
 PSQL_LIB_DIR = $$EXTERNAL_PREFIX/lib

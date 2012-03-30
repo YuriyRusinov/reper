@@ -11,6 +11,7 @@
 #include <QLabel>
 
 #include "kksgui_config.h"
+#include <KKSList.h>
 
 class KKSAttrValue;
 class KKSObject;
@@ -29,6 +30,9 @@ class _GUI_EXPORT KKSAttrValueLabel : public QLabel
         void loadIOSrc (KKSObject **);
         void viewIOSrc(KKSObject *, QWidget *);
         void attrValueChanged();
+
+        void loadHistory(const KKSAttrValue *);
+        void viewHistory(const KKSList<KKSAttrValue *> &);
 
 
     public slots:

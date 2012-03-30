@@ -5,118 +5,111 @@
     <name>AcademicDegreeForm</name>
     <message>
         <source>DB not connected ! Check server status and try again</source>
-        <translation>Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
     </message>
     <message>
         <source>Academic Degree Table</source>
-        <translation>Таблица ученых степеней</translation>
+        <translation type="obsolete">Таблица ученых степеней</translation>
     </message>
     <message>
         <source>Name of Academic Degree</source>
-        <translation>Ученая степень</translation>
+        <translation type="obsolete">Ученая степень</translation>
     </message>
     <message>
         <source>Code</source>
-        <translation>Сокращение</translation>
+        <translation type="obsolete">Сокращение</translation>
     </message>
 </context>
 <context>
     <name>AcademicRankForm</name>
     <message>
         <source>DB not connected ! Check server status and try again</source>
-        <translation>Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
     </message>
     <message>
         <source>Academic Ranks Table</source>
-        <translation>Таблица ученых званий</translation>
+        <translation type="obsolete">Таблица ученых званий</translation>
     </message>
     <message>
         <source>Name of Academic Rank</source>
-        <translation>Ученое звание</translation>
+        <translation type="obsolete">Ученое звание</translation>
     </message>
     <message>
         <source>Code</source>
-        <translation>Сокращение</translation>
+        <translation type="obsolete">Сокращение</translation>
     </message>
 </context>
 <context>
     <name>AccMandatoryForm</name>
     <message>
         <source>DB not connected ! Check server status and try again</source>
-        <translation>Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
     </message>
     <message>
         <source>Acc Mandatory&apos;s Table</source>
-        <translation>Таблица ограничений</translation>
+        <translation type="obsolete">Таблица ограничений</translation>
     </message>
     <message>
         <source>Name of Mandatory</source>
-        <translation>Ограничение</translation>
+        <translation type="obsolete">Ограничение</translation>
     </message>
     <message>
         <source>Description</source>
-        <translation>Описание</translation>
-    </message>
-</context>
-<context>
-    <name>AddScheduleFormClass</name>
-    <message>
-        <source>AddScheduleForm</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Описание</translation>
     </message>
 </context>
 <context>
     <name>AuditoryForm</name>
     <message>
         <source>DB not connected ! Check server status and try again</source>
-        <translation>Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
     </message>
     <message>
         <source>Kafedra</source>
-        <translation>Кафедра</translation>
+        <translation type="obsolete">Кафедра</translation>
     </message>
     <message>
         <source>Auditory Type</source>
-        <translation>Тип аудитории</translation>
+        <translation type="obsolete">Тип аудитории</translation>
     </message>
     <message>
         <source>Education Building</source>
-        <translation>Учебный корпус</translation>
+        <translation type="obsolete">Учебный корпус</translation>
     </message>
     <message>
         <source>Auditory Table</source>
-        <translation>Таблица аудиторий</translation>
+        <translation type="obsolete">Таблица аудиторий</translation>
     </message>
     <message>
         <source>Auditory Name</source>
-        <translation>Название аудитории</translation>
+        <translation type="obsolete">Название аудитории</translation>
     </message>
     <message>
         <source>Code</source>
-        <translation>Код (номер) аудитроии</translation>
+        <translation type="obsolete">Код (номер) аудитроии</translation>
     </message>
     <message>
         <source>Capacity</source>
-        <translation>Вместимость</translation>
+        <translation type="obsolete">Вместимость</translation>
     </message>
     <message>
         <source>Mac Label</source>
-        <translation>Метка</translation>
+        <translation type="obsolete">Метка</translation>
     </message>
 </context>
 <context>
     <name>AuditoryTypeForm</name>
     <message>
         <source>DB not connected ! Check server status and try again</source>
-        <translation>Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
     </message>
     <message>
         <source>Auditory Type Table</source>
-        <translation>Таблица типов аудиторий</translation>
+        <translation type="obsolete">Таблица типов аудиторий</translation>
     </message>
     <message>
         <source>Auditory Type</source>
-        <translation>Тип аудитории</translation>
+        <translation type="obsolete">Тип аудитории</translation>
     </message>
 </context>
 <context>
@@ -246,48 +239,32 @@
     <name>Base_Simple_Form</name>
     <message>
         <source>Form</source>
-        <translation>Форма</translation>
-    </message>
-    <message>
-        <source>Military Rank table</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>id</source>
-        <translation></translation>
+        <translation type="obsolete">Форма</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation>Название</translation>
-    </message>
-    <message>
-        <source>Short Name</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>ShortName</source>
-        <translation></translation>
+        <translation type="obsolete">Название</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation>Добавить</translation>
+        <translation type="obsolete">Добавить</translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation>Удалить
+        <translation type="obsolete">Удалить
 </translation>
     </message>
     <message>
         <source>Edit</source>
-        <translation>Редактировать</translation>
+        <translation type="obsolete">Редактировать</translation>
     </message>
     <message>
         <source>Reload</source>
-        <translation>Отмена</translation>
+        <translation type="obsolete">Отмена</translation>
     </message>
     <message>
         <source>DB Update </source>
-        <translation>Подтвердить</translation>
+        <translation type="obsolete">Подтвердить</translation>
     </message>
 </context>
 <context>
@@ -341,149 +318,7 @@
     <name>Builder</name>
     <message>
         <source>No</source>
-        <translation type="unfinished">Нет</translation>
-    </message>
-</context>
-<context>
-    <name>CAllPlanner</name>
-    <message>
-        <source>All lost planner.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Zach</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>CForPlanner</name>
-    <message>
-        <source>Four planner</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Four planner.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>CLoadAll</name>
-    <message>
-        <source>Load All KTP</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Load All KTPr.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>CLoadFac</name>
-    <message>
-        <source>Load KTP Fac</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Load KTP Fac.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>CLoadKaf</name>
-    <message>
-        <source>Load KTP Kaf</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Load KTP Kaf.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>CLoadOne</name>
-    <message>
-        <source>Load KTP one</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Load KTP One Groupe.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>COneGroupPlanner</name>
-    <message>
-        <source>COneGroupPlanner planner</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Plans one education group.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>CPlanStream</name>
-    <message>
-        <source>Plan stream lessons</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Plan stream lessons.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>CPlanningWidget</name>
-    <message>
-        <source>Start date:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>End date:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>ID:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Planners Name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Planners status</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Planned</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Ready for planning</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>UnAvailable</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unknown</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Work planner:</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>CSessionPlanner</name>
-    <message>
-        <source>Session</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Session planner. Planns examens and session dates</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Нет</translation>
     </message>
 </context>
 <context>
@@ -629,17 +464,6 @@ Please specify a UNIQUE name for this color.</source>
     </message>
 </context>
 <context>
-    <name>ConfirmDeleteDlg</name>
-    <message utf8="true">
-        <source>Подтвердите удаление</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Вы действительно желаете удалить этот элемент ?</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>CrossTabEditor</name>
     <message>
         <source>Properties (Field)</source>
@@ -778,19 +602,19 @@ Please specify a UNIQUE name for this color.</source>
     <name>CycleForm</name>
     <message>
         <source>DB not connected ! Check server status and try again</source>
-        <translation>Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
     </message>
     <message>
         <source>Disciplines Cycle Table</source>
-        <translation>Таблица циклов дисциплин</translation>
+        <translation type="obsolete">Таблица циклов дисциплин</translation>
     </message>
     <message>
         <source>Cycle&apos;s name</source>
-        <translation>Название цикла</translation>
+        <translation type="obsolete">Название цикла</translation>
     </message>
     <message>
         <source>Cycle&apos;s code</source>
-        <translation>Код цикла</translation>
+        <translation type="obsolete">Код цикла</translation>
     </message>
 </context>
 <context>
@@ -965,42 +789,42 @@ Please specify a UNIQUE name for this color.</source>
     <name>DisciplineGroupForm</name>
     <message>
         <source>DB not connected ! Check server status and try again</source>
-        <translation>Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
     </message>
     <message>
         <source>Discipline group Table</source>
-        <translation>Таблица групп дисциплин</translation>
+        <translation type="obsolete">Таблица групп дисциплин</translation>
     </message>
 </context>
 <context>
     <name>DisciplineThemeForm</name>
     <message>
         <source>DB not connected ! Check server status and try again</source>
-        <translation>Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
     </message>
     <message>
         <source>Discipline</source>
-        <translation>Дисциплина</translation>
+        <translation type="obsolete">Дисциплина</translation>
     </message>
     <message>
         <source>Lesson Type</source>
-        <translation>Вид занятия</translation>
+        <translation type="obsolete">Вид занятия</translation>
     </message>
     <message>
         <source>Discipline Themes Table</source>
-        <translation>Таблица тем дисциплин</translation>
+        <translation type="obsolete">Таблица тем дисциплин</translation>
     </message>
     <message>
         <source>Theme</source>
-        <translation>Тема</translation>
+        <translation type="obsolete">Тема</translation>
     </message>
     <message>
         <source>Code</source>
-        <translation>Код</translation>
+        <translation type="obsolete">Код</translation>
     </message>
     <message>
         <source>Total Hours</source>
-        <translation>Всего часов</translation>
+        <translation type="obsolete">Всего часов</translation>
     </message>
 </context>
 <context>
@@ -1241,335 +1065,176 @@ Do you want to save the changes before closing?</source>
     </message>
 </context>
 <context>
-    <name>Edit_Record_Form</name>
-    <message>
-        <source>Dialog</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>TextLabel</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>Edit_Theme_Lessons</name>
-    <message>
-        <source>Dialog</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>id_theme</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Краткое название</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Полное название</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message utf8="true">
         <source>Всего часов</source>
-        <translation type="unfinished">Всего часов</translation>
-    </message>
-    <message>
-        <source>New Column</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Всего часов</translation>
     </message>
 </context>
 <context>
     <name>EduKtpEntry</name>
     <message>
         <source>No</source>
-        <translation type="unfinished">Нет</translation>
+        <translation type="obsolete">Нет</translation>
     </message>
 </context>
 <context>
     <name>EducBuildingForm</name>
     <message>
         <source>DB not connected ! Check server status and try again</source>
-        <translation>Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
     </message>
     <message>
         <source>Education Buildings Table</source>
-        <translation>Таблица учебных корпусов</translation>
+        <translation type="obsolete">Таблица учебных корпусов</translation>
     </message>
     <message>
         <source>Building Name</source>
-        <translation>Название учебного корпуса</translation>
+        <translation type="obsolete">Название учебного корпуса</translation>
     </message>
     <message>
         <source>Address</source>
-        <translation>Обозначение</translation>
+        <translation type="obsolete">Обозначение</translation>
     </message>
     <message>
         <source>Weight</source>
-        <translation>Удаленность</translation>
+        <translation type="obsolete">Удаленность</translation>
     </message>
 </context>
 <context>
     <name>EducGroupForm</name>
     <message>
         <source>DB not connected ! Check server status and try again</source>
-        <translation>Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
     </message>
     <message>
         <source>Specialization</source>
-        <translation>Военная специальность</translation>
+        <translation type="obsolete">Военная специальность</translation>
     </message>
     <message>
         <source>Kurator</source>
-        <translation>Наставник</translation>
+        <translation type="obsolete">Наставник</translation>
     </message>
     <message>
         <source>Kafedra</source>
-        <translation>Кафедра</translation>
+        <translation type="obsolete">Кафедра</translation>
     </message>
     <message>
         <source>Kurs</source>
-        <translation>Курс по принадлежности</translation>
+        <translation type="obsolete">Курс по принадлежности</translation>
     </message>
     <message>
         <source>Education Group Table</source>
-        <translation>Таблица учебных групп</translation>
+        <translation type="obsolete">Таблица учебных групп</translation>
     </message>
     <message>
         <source>Group Leader</source>
-        <translation>Командир группы</translation>
+        <translation type="obsolete">Командир группы</translation>
     </message>
     <message>
         <source>Member Count</source>
-        <translation>количество людей</translation>
+        <translation type="obsolete">количество людей</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation>Название группы</translation>
+        <translation type="obsolete">Название группы</translation>
     </message>
     <message>
         <source>Code</source>
-        <translation>Обозначение</translation>
+        <translation type="obsolete">Обозначение</translation>
     </message>
     <message>
         <source>Mac Label</source>
-        <translation>Метка</translation>
+        <translation type="obsolete">Метка</translation>
     </message>
     <message>
         <source>Start Date</source>
-        <translation>Дата начала обучения</translation>
+        <translation type="obsolete">Дата начала обучения</translation>
     </message>
 </context>
 <context>
     <name>EducMandatoryForm</name>
     <message>
         <source>DB not connected ! Check server status and try again</source>
-        <translation>Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
     </message>
     <message>
         <source>educmandatory Table</source>
-        <translation>Таблица ограничений</translation>
+        <translation type="obsolete">Таблица ограничений</translation>
     </message>
 </context>
 <context>
     <name>EducationDurationForm</name>
     <message>
         <source>DB not connected ! Check server status and try again</source>
-        <translation>Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
     </message>
     <message>
         <source>Education Duration Table</source>
-        <translation>Таблица сроков обучения</translation>
+        <translation type="obsolete">Таблица сроков обучения</translation>
     </message>
 </context>
 <context>
     <name>EducationKursForm</name>
     <message>
         <source>DB not connected ! Check server status and try again</source>
-        <translation>Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
     </message>
     <message>
         <source>Education Kurs Table</source>
-        <translation>Таблица годов обучения</translation>
-    </message>
-</context>
-<context>
-    <name>EntireScheduleForm</name>
-    <message>
-        <source>Schedule entry delete</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The selected entry will be deleted completely.
-Do you want to progress?</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Таблица годов обучения</translation>
     </message>
 </context>
 <context>
     <name>EntireScheduleFormClass</name>
     <message>
-        <source>Add event</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Delete event</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Filter</source>
-        <translation type="unfinished">Поиск</translation>
+        <translation type="obsolete">Поиск</translation>
     </message>
     <message>
         <source>View</source>
-        <translation type="unfinished">Вид</translation>
-    </message>
-    <message>
-        <source>Edit plan</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Create grid</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Calculate</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Grid</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Compute</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Entire schedule</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Version control</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Вид</translation>
     </message>
 </context>
 <context>
     <name>EventFilterFormClass</name>
     <message>
         <source>Filter</source>
-        <translation type="unfinished">Поиск</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Filter tuning</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Units to select</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Start date</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&gt;&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;&lt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Units to filter</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>End date</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Поиск</translation>
     </message>
 </context>
 <context>
     <name>EventFormClass</name>
     <message>
-        <source>accept</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Date</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Pair</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Study section</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Discipline</source>
-        <translation type="unfinished">Дисциплина</translation>
-    </message>
-    <message>
-        <source>Lesson type</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Дисциплина</translation>
     </message>
     <message>
         <source>Theme</source>
-        <translation type="unfinished">Тема</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Тема</translation>
     </message>
     <message>
         <source>Apply</source>
-        <translation type="unfinished">Применить</translation>
-    </message>
-    <message>
-        <source>Auditories</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Teachers</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Применить</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation type="unfinished">Добавить</translation>
+        <translation type="obsolete">Добавить</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Удалить</translation>
-    </message>
-    <message utf8="true">
-        <source>Занятие</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Stream: NO</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Удалить</translation>
     </message>
 </context>
 <context>
     <name>FacultetForm</name>
     <message>
         <source>DB not connected ! Check server status and try again</source>
-        <translation>Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
     </message>
     <message>
         <source>Facultet Table</source>
-        <translation>Таблица факультетов</translation>
+        <translation type="obsolete">Таблица факультетов</translation>
     </message>
 </context>
 <context>
@@ -1715,536 +1380,132 @@ Do you want to progress?</source>
     <name>Five_Lists_Form</name>
     <message>
         <source>Form</source>
-        <translation>Форма</translation>
-    </message>
-    <message>
-        <source>Name of Table </source>
-        <translation></translation>
-    </message>
-    <message>
-        <source> Name</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Short Name</source>
-        <translation></translation>
+        <translation type="obsolete">Форма</translation>
     </message>
     <message>
         <source>Others</source>
-        <translation>Остальные</translation>
-    </message>
-    <message>
-        <source>Others2</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk2_combo</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk1_combo</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk3_combo</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk5_combo</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk4_combo</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>id_pk</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>id_fk1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>id_fk2</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>id_fk3</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>id_fk4</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>id_fk5</source>
-        <translation></translation>
+        <translation type="obsolete">Остальные</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation>Название</translation>
-    </message>
-    <message>
-        <source>Name2</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Name3</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Name4</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Name5</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Name6</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Name7</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk1_Name</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk2_Name</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk3_Name</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk4_Name</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk5_Name</source>
-        <translation></translation>
+        <translation type="obsolete">Название</translation>
     </message>
     <message>
         <source>Reload</source>
-        <translation>Отменить</translation>
+        <translation type="obsolete">Отменить</translation>
     </message>
     <message>
         <source>DB Update </source>
-        <translation>Подтвердить</translation>
+        <translation type="obsolete">Подтвердить</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation>Добавить</translation>
+        <translation type="obsolete">Добавить</translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation>Удалить</translation>
+        <translation type="obsolete">Удалить</translation>
     </message>
     <message>
         <source>Edit</source>
-        <translation>Редактировать</translation>
+        <translation type="obsolete">Редактировать</translation>
     </message>
 </context>
 <context>
     <name>Five_Lists_Form_Dialog</name>
     <message>
-        <source>Name of Table </source>
-        <translation></translation>
-    </message>
-    <message>
-        <source> Name</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Short Name</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Others</source>
-        <translation>Остальные</translation>
-    </message>
-    <message>
-        <source>Others2</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk2_combo</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk1_combo</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk3_combo</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk5_combo</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk4_combo</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>id_pk</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>id_fk1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>id_fk2</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>id_fk3</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>id_fk4</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>id_fk5</source>
-        <translation></translation>
+        <translation type="obsolete">Остальные</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation>Название</translation>
-    </message>
-    <message>
-        <source>Name2</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Name3</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Name4</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Name5</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Name6</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Name7</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk1_Name</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk2_Name</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk3_Name</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk4_Name</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk5_Name</source>
-        <translation></translation>
+        <translation type="obsolete">Название</translation>
     </message>
     <message>
         <source>Reload</source>
-        <translation>Отменить</translation>
+        <translation type="obsolete">Отменить</translation>
     </message>
     <message>
         <source>DB Update </source>
-        <translation>Подтвердить</translation>
+        <translation type="obsolete">Подтвердить</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation>Добавить</translation>
+        <translation type="obsolete">Добавить</translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation>Удалить</translation>
+        <translation type="obsolete">Удалить</translation>
     </message>
     <message>
         <source>Edit</source>
-        <translation>Редактировать</translation>
+        <translation type="obsolete">Редактировать</translation>
     </message>
 </context>
 <context>
     <name>Four_Lists_Form</name>
     <message>
         <source>Form</source>
-        <translation>Форма</translation>
-    </message>
-    <message>
-        <source>Name of Table </source>
-        <translation></translation>
-    </message>
-    <message>
-        <source> Name</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Short Name</source>
-        <translation></translation>
+        <translation type="obsolete">Форма</translation>
     </message>
     <message>
         <source>Others</source>
-        <translation>Остальные</translation>
-    </message>
-    <message>
-        <source>Others2</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Others3</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Others4</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk2_combo</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk1_combo</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk3_combo</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk4_combo</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>id_pk</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>id_fk1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>id_fk2</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>id_fk3</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>id_fk4</source>
-        <translation></translation>
+        <translation type="obsolete">Остальные</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation>Название</translation>
-    </message>
-    <message>
-        <source>Name2</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Name3</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Name4</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Name5</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Name6</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk1_Name</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk2_Name</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk3_Name</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk4_Name</source>
-        <translation></translation>
+        <translation type="obsolete">Название</translation>
     </message>
     <message>
         <source>Reload</source>
-        <translation>Отменить</translation>
+        <translation type="obsolete">Отменить</translation>
     </message>
     <message>
         <source>DB Update </source>
-        <translation>Подтвердить</translation>
+        <translation type="obsolete">Подтвердить</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation>Добавить</translation>
+        <translation type="obsolete">Добавить</translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation>Удалить</translation>
+        <translation type="obsolete">Удалить</translation>
     </message>
     <message>
         <source>Edit</source>
-        <translation>Редактировать</translation>
+        <translation type="obsolete">Редактировать</translation>
     </message>
 </context>
 <context>
     <name>Four_Lists_Form_Dialog</name>
     <message>
-        <source>Dialog</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Name of Table </source>
-        <translation></translation>
-    </message>
-    <message>
-        <source> Name</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Short Name</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Others</source>
-        <translation>Остальные</translation>
-    </message>
-    <message>
-        <source>Others2</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Others3</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Others4</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk2_combo</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk1_combo</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk3_combo</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk4_combo</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>id_pk</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>id_fk1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>id_fk2</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>id_fk3</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>id_fk4</source>
-        <translation></translation>
+        <translation type="obsolete">Остальные</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation>Название</translation>
-    </message>
-    <message>
-        <source>Name2</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Name3</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Name4</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Name5</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Name6</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk1_Name</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk2_Name</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk3_Name</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk4_Name</source>
-        <translation></translation>
+        <translation type="obsolete">Название</translation>
     </message>
     <message>
         <source>Reload</source>
-        <translation>Отменить</translation>
+        <translation type="obsolete">Отменить</translation>
     </message>
     <message>
         <source>DB Update </source>
-        <translation>Подтвердить</translation>
+        <translation type="obsolete">Подтвердить</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation>Добавить</translation>
+        <translation type="obsolete">Добавить</translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation>Удалить</translation>
+        <translation type="obsolete">Удалить</translation>
     </message>
     <message>
         <source>Edit</source>
-        <translation>Редактировать</translation>
+        <translation type="obsolete">Редактировать</translation>
     </message>
 </context>
 <context>
@@ -2651,13 +1912,9 @@ Do you want to progress?</source>
         <source>OK</source>
         <translation>OK</translation>
     </message>
-    <message utf8="true">
-        <source>Версия 0.5.0</source>
-        <translation></translation>
-    </message>
     <message>
         <source>EDS Operator</source>
-        <translation>EDS Оператор</translation>
+        <translation type="obsolete">EDS Оператор</translation>
     </message>
     <message>
         <source>DynamicDocs Operator</source>
@@ -4053,7 +3310,7 @@ Proceed?</source>
     </message>
     <message>
         <source>User-defined qualifiers</source>
-        <translation>Пользовательские словари</translation>
+        <translation type="obsolete">Пользовательские словари</translation>
     </message>
     <message>
         <source>System qualifiers</source>
@@ -4061,7 +3318,7 @@ Proceed?</source>
     </message>
     <message>
         <source>Save toolbar</source>
-        <translation>Панель сохранения</translation>
+        <translation type="obsolete">Панель сохранения</translation>
     </message>
     <message>
         <source>Error</source>
@@ -4069,7 +3326,7 @@ Proceed?</source>
     </message>
     <message>
         <source>Current version of KKS SITO Operator does not print this window</source>
-        <translation>Текущая версия ККС СИТО Оператор не поддерживает печать содержимого данного окна</translation>
+        <translation type="obsolete">Текущая версия ККС СИТО Оператор не поддерживает печать содержимого данного окна</translation>
     </message>
     <message>
         <source>Insufficient privileges!</source>
@@ -4077,103 +3334,103 @@ Proceed?</source>
     </message>
     <message>
         <source>Output forms</source>
-        <translation>Формы вывода</translation>
+        <translation type="obsolete">Формы вывода</translation>
     </message>
     <message>
         <source>Academic Degrees</source>
-        <translation>Ученые степени</translation>
+        <translation type="obsolete">Ученые степени</translation>
     </message>
     <message>
         <source>Academic Ranks</source>
-        <translation>Ученые звания</translation>
+        <translation type="obsolete">Ученые звания</translation>
     </message>
     <message>
         <source>Accumulate Mandatory</source>
-        <translation>Ограничения</translation>
+        <translation type="obsolete">Ограничения</translation>
     </message>
     <message>
         <source>Auditory Types</source>
-        <translation>Типы аудиторий</translation>
+        <translation type="obsolete">Типы аудиторий</translation>
     </message>
     <message>
         <source>Auditory</source>
-        <translation>Список аудиторий</translation>
+        <translation type="obsolete">Список аудиторий</translation>
     </message>
     <message>
         <source>Education Duration</source>
-        <translation>Сроки обучения</translation>
+        <translation type="obsolete">Сроки обучения</translation>
     </message>
     <message>
         <source>Education Kurses</source>
-        <translation>Учебные курсы </translation>
+        <translation type="obsolete">Учебные курсы </translation>
     </message>
     <message>
         <source>Education Mandatory</source>
-        <translation>Ограничения по обучаемым</translation>
+        <translation type="obsolete">Ограничения по обучаемым</translation>
     </message>
     <message>
         <source>Education Buildings</source>
-        <translation>Список учебных корпусов</translation>
+        <translation type="obsolete">Список учебных корпусов</translation>
     </message>
     <message>
         <source>Kurses</source>
-        <translation>Годы обучения</translation>
+        <translation type="obsolete">Годы обучения</translation>
     </message>
     <message>
         <source>Lector Mandatory Reasons</source>
-        <translation>Причины ограничений преподавателей</translation>
+        <translation type="obsolete">Причины ограничений преподавателей</translation>
     </message>
     <message>
         <source>Lesson Types</source>
-        <translation>Виды занятий</translation>
+        <translation type="obsolete">Виды занятий</translation>
     </message>
     <message>
         <source>Military Ranks</source>
-        <translation>Воинские звания</translation>
+        <translation type="obsolete">Воинские звания</translation>
     </message>
     <message>
         <source>Positions</source>
-        <translation>Должности</translation>
+        <translation type="obsolete">Должности</translation>
     </message>
     <message>
         <source>Qualifications</source>
-        <translation>Квалификации выпускников</translation>
+        <translation type="obsolete">Квалификации выпускников</translation>
     </message>
     <message>
         <source>Reporting Types</source>
-        <translation>Виды отчетности</translation>
+        <translation type="obsolete">Виды отчетности</translation>
     </message>
     <message>
         <source>Streams</source>
-        <translation>Потоки</translation>
+        <translation type="obsolete">Потоки</translation>
     </message>
     <message>
         <source>Auditory stock</source>
-        <translation>Аудиторный фонд</translation>
+        <translation type="obsolete">Аудиторный фонд</translation>
     </message>
     <message>
         <source>Academics</source>
-        <translation>Справочники атрибутов личного состава</translation>
+        <translation type="obsolete">Справочники атрибутов личного состава</translation>
     </message>
     <message>
         <source>Mandatories</source>
-        <translation>Ограничения</translation>
+        <translation type="obsolete">Ограничения</translation>
     </message>
     <message>
         <source>Lecture Plans and Programs</source>
-        <translation>Учебные планы и программы</translation>
+        <translation type="obsolete">Учебные планы и программы</translation>
     </message>
     <message>
         <source>KTP</source>
-        <translation>Комплексно-тематические планы</translation>
+        <translation type="obsolete">Комплексно-тематические планы</translation>
     </message>
     <message>
         <source>KTP Tree</source>
-        <translation>Комплексно-тематические планы</translation>
+        <translation type="obsolete">Комплексно-тематические планы</translation>
     </message>
     <message>
         <source>Units</source>
-        <translation>Подразделения</translation>
+        <translation type="obsolete">Подразделения</translation>
     </message>
     <message>
         <source>Organization toolbar</source>
@@ -4251,79 +3508,7 @@ Please connect to your system administrator.</source>
         <translation></translation>
     </message>
     <message utf8="true">
-        <source>Создать новый формуляр</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Редактировать...</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Редактировать формуляр</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Найти формуляр</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Табель срочных донесений...</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Журнал входящих распоряжений...</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Журнал исходящих распоряжений...</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Контроль исполнения...</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Журнал исходящих сообщений...</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Отправить сообщение...</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Создать словарь...</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Открыть словарь...</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Редактировать словарь...</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
         <source>Создать категорию...</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Открыть категорию...</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Создать шаблон...</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Открыть шаблон...</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Редактировать шаблон...</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Редактировать категорию...</source>
         <translation></translation>
     </message>
     <message utf8="true">
@@ -4347,55 +3532,19 @@ Please connect to your system administrator.</source>
         <translation></translation>
     </message>
     <message utf8="true">
-        <source>Почта</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Словари</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
         <source>Вид</source>
         <translation></translation>
     </message>
     <message>
         <source>&amp;Add periodic report</source>
-        <translation>&amp;Добавить донесение</translation>
+        <translation type="obsolete">&amp;Добавить донесение</translation>
     </message>
     <message>
         <source>&amp;View reports</source>
-        <translation>&amp;Табель срочных донесений</translation>
-    </message>
-    <message utf8="true">
-        <source>Открыть редактор ОШС...</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Организации...</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Подразделения...</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Должностные лица...</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Пользователи...</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Должности...</source>
-        <translation></translation>
+        <translation type="obsolete">&amp;Табель срочных донесений</translation>
     </message>
     <message utf8="true">
         <source>Окно</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Список категорий...</source>
         <translation></translation>
     </message>
     <message>
@@ -4404,18 +3553,6 @@ Please connect to your system administrator.</source>
     </message>
     <message utf8="true">
         <source>Мои документы...</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Мои документы</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Документы, отобранные пользователем для своих нужд</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Журнал сообщений...</source>
         <translation></translation>
     </message>
     <message utf8="true">
@@ -4439,32 +3576,12 @@ Please connect to your system administrator.</source>
         <translation></translation>
     </message>
     <message utf8="true">
-        <source>Файл</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Справочники</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Создать новое расписание</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Открыть расписание</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
         <source>КТП</source>
-        <translation>КТП</translation>
+        <translation type="obsolete">КТП</translation>
     </message>
     <message utf8="true">
         <source>Учебный план</source>
-        <translation>Учебный план</translation>
-    </message>
-    <message utf8="true">
-        <source>EDS Оператор версия 1.1</source>
-        <translation></translation>
+        <translation type="obsolete">Учебный план</translation>
     </message>
     <message utf8="true">
         <source>Атрибуты...</source>
@@ -4512,14 +3629,6 @@ Please connect to your system administrator.</source>
     </message>
     <message utf8="true">
         <source>Системные справочники...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Расписание - создать</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Расписание - открыть</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5587,19 +4696,19 @@ Further work is impossible. You should use equal versions of client and server s
     </message>
     <message>
         <source>Input commands</source>
-        <translation>Входящие распоряжения</translation>
+        <translation type="obsolete">Входящие распоряжения</translation>
     </message>
     <message>
         <source>Input messages</source>
-        <translation>Входящие сообщения</translation>
+        <translation type="obsolete">Входящие сообщения</translation>
     </message>
     <message>
         <source>Welcome, %1!. You are connected as %2. Access level: %3</source>
-        <translation>Добро пожаловать %1! Вы подключились как %2. Уровень доступа %3</translation>
+        <translation type="obsolete">Добро пожаловать %1! Вы подключились как %2. Уровень доступа %3</translation>
     </message>
     <message>
         <source>Welcome, %1! You are connected as %2.Access level: %3</source>
-        <translation>Добро пожаловать %1! Вы подключились как %2. Уровень доступа %3</translation>
+        <translation type="obsolete">Добро пожаловать %1! Вы подключились как %2. Уровень доступа %3</translation>
     </message>
     <message>
         <source>Welcome, %1! (%2)</source>
@@ -6226,23 +5335,23 @@ Further work is impossible. You should use equal versions of client and server s
     <name>KtpForm</name>
     <message>
         <source>Check KTP started</source>
-        <translation>Проверка начата</translation>
+        <translation type="obsolete">Проверка начата</translation>
     </message>
     <message>
         <source>In education plan </source>
-        <translation>По учебному плану</translation>
+        <translation type="obsolete">По учебному плану</translation>
     </message>
     <message>
         <source> in KTP </source>
-        <translation>в КТП</translation>
+        <translation type="obsolete">в КТП</translation>
     </message>
     <message>
         <source>Check KTP complete succesfull!!!</source>
-        <translation>Проверка завершена успешно!</translation>
+        <translation type="obsolete">Проверка завершена успешно!</translation>
     </message>
     <message>
         <source>Check KTP complete with errors!!!</source>
-        <translation>Присутствуют ошибки!</translation>
+        <translation type="obsolete">Присутствуют ошибки!</translation>
     </message>
     <message>
         <source></source>
@@ -6253,11 +5362,11 @@ Further work is impossible. You should use equal versions of client and server s
     <name>KursForm</name>
     <message>
         <source>DB not connected ! Check server status and try again</source>
-        <translation>Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
     </message>
     <message>
         <source>Kurs Table</source>
-        <translation>Таблица курсов</translation>
+        <translation type="obsolete">Таблица курсов</translation>
     </message>
 </context>
 <context>
@@ -6378,60 +5487,30 @@ Further work is impossible. You should use equal versions of client and server s
     <name>LecMandatoryReasonForm</name>
     <message>
         <source>DB not connected ! Check server status and try again</source>
-        <translation>Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
     </message>
     <message>
         <source>Lec Mandatory Reason Table</source>
-        <translation>Таблица причин ограничений преподавателей</translation>
+        <translation type="obsolete">Таблица причин ограничений преподавателей</translation>
     </message>
 </context>
 <context>
     <name>LessonTypeForm</name>
     <message>
         <source>DB not connected ! Check server status and try again</source>
-        <translation>Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
     </message>
     <message>
         <source>Lessons Types</source>
-        <translation>Виды занятий</translation>
+        <translation type="obsolete">Виды занятий</translation>
     </message>
     <message>
         <source>Lesson Type Name</source>
-        <translation>Вид занятий</translation>
+        <translation type="obsolete">Вид занятий</translation>
     </message>
     <message>
         <source>Short Name</source>
-        <translation>Сокращение</translation>
-    </message>
-</context>
-<context>
-    <name>LinkKafSpecializationForm</name>
-    <message>
-        <source>Edit Link Kaf-Specialization</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Add Link Kaf-Specialization</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Delete Link Kaf-Specialization</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>LinkSpecialityVUSForm</name>
-    <message>
-        <source>Edit VUS</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Add VUS</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Delete VUS</source>
-        <translation></translation>
+        <translation type="obsolete">Сокращение</translation>
     </message>
 </context>
 <context>
@@ -6542,49 +5621,10 @@ Further work is impossible. You should use equal versions of client and server s
     </message>
 </context>
 <context>
-    <name>MainWindow</name>
-    <message>
-        <source>Disciplines</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Military Rank</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Tree of disciplines</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Table of Military Ranks</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>Main_Window</name>
     <message>
-        <source>ESSR GUI</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Forms</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>DataBase</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Connect</source>
-        <translation>Соединить</translation>
-    </message>
-    <message>
-        <source>Disconnect</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>EditDiscipline</source>
-        <translation></translation>
+        <translation type="obsolete">Соединить</translation>
     </message>
 </context>
 <context>
@@ -6637,59 +5677,59 @@ Further work is impossible. You should use equal versions of client and server s
     <name>MilitaryRankForm</name>
     <message>
         <source>DB not connected ! Check server status and try again</source>
-        <translation>Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
     </message>
     <message>
         <source>Military Rank Table</source>
-        <translation>Списов воинских званий</translation>
+        <translation type="obsolete">Списов воинских званий</translation>
     </message>
 </context>
 <context>
     <name>MilitaryRankForm1</name>
     <message>
         <source>DB not connected ! Check server status and try again</source>
-        <translation>Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
     </message>
     <message>
         <source>Military Rank Table</source>
-        <translation>Список воинских званий</translation>
+        <translation type="obsolete">Список воинских званий</translation>
     </message>
 </context>
 <context>
     <name>NagruzKafForm</name>
     <message>
         <source>spring</source>
-        <translation>весенний</translation>
+        <translation type="obsolete">весенний</translation>
     </message>
     <message>
         <source>autumn</source>
-        <translation>осенний</translation>
+        <translation type="obsolete">осенний</translation>
     </message>
 </context>
 <context>
     <name>NagruzKafPrepForm</name>
     <message>
         <source>autumn</source>
-        <translation>осенний</translation>
+        <translation type="obsolete">осенний</translation>
     </message>
     <message>
         <source>spring</source>
-        <translation>весенний</translation>
+        <translation type="obsolete">весенний</translation>
     </message>
     <message>
         <source>Total</source>
-        <translation>Всего</translation>
+        <translation type="obsolete">Всего</translation>
     </message>
 </context>
 <context>
     <name>NagruzPrepForm</name>
     <message>
         <source>spring</source>
-        <translation>весенний</translation>
+        <translation type="obsolete">весенний</translation>
     </message>
     <message>
         <source>autumn</source>
-        <translation>осенний</translation>
+        <translation type="obsolete">осенний</translation>
     </message>
 </context>
 <context>
@@ -6764,198 +5804,47 @@ Further work is impossible. You should use equal versions of client and server s
 <context>
     <name>One_List_Form</name>
     <message>
-        <source>Form</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Name of Table</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source> Name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Short Name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Others</source>
-        <translation type="unfinished">Остальные</translation>
-    </message>
-    <message>
-        <source>fk1_combo</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>id_pk</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>id_fk1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>id_fk2</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Остальные</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished">Название</translation>
-    </message>
-    <message>
-        <source>Other</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>fk1_Name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>fk2_Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Название</translation>
     </message>
     <message>
         <source>Reload</source>
-        <translation>Отменить</translation>
+        <translation type="obsolete">Отменить</translation>
     </message>
     <message>
         <source>DB Update </source>
-        <translation>Подтвердить</translation>
+        <translation type="obsolete">Подтвердить</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation>Добавить</translation>
+        <translation type="obsolete">Добавить</translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation>Удалить</translation>
+        <translation type="obsolete">Удалить</translation>
     </message>
     <message>
         <source>Edit</source>
-        <translation>Изменить</translation>
-    </message>
-</context>
-<context>
-    <name>OpenScheduleFormClass</name>
-    <message>
-        <source>OpenScheduleForm</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Изменить</translation>
     </message>
 </context>
 <context>
     <name>OutputForm</name>
     <message>
         <source>ERROR</source>
-        <translation>Ошибка</translation>
+        <translation type="obsolete">Ошибка</translation>
     </message>
     <message>
         <source>KTP is apsent in database</source>
-        <translation>КТП отсутствует в базе данных</translation>
-    </message>
-    <message>
-        <source>absent in database</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Print KTP</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Print EPR</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Print Lesson Scheduler</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Print Unit Loading</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Print Calendar Plan</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Print worker Scheduler</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>KTP Print</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>EPR Print</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Export union shedule...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Abort</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Lesson Sheduler Print</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unit Loading Print</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Calendar Plan Print</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Ð¾ÑÐµÐ½Ð½Ð¸Ð¹</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Ð²ÐµÑÐµÐ½Ð½Ð¸Ð¹</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Create unit loading...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Print SvR </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unit svr Print</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Create worker loading...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Print Worker Loading</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Worker Loading Print</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Export worker loading...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Print all schedule...</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">КТП отсутствует в базе данных</translation>
     </message>
     <message>
         <source>User</source>
         <translation type="obsolete">Пользователь</translation>
-    </message>
-    <message>
-        <source>Print all svodrasp...</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7236,11 +6125,11 @@ The root node is not &apos;report&apos;.</source>
     <name>PositionForm</name>
     <message>
         <source>DB not connected ! Check server status and try again</source>
-        <translation>Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
     </message>
     <message>
         <source>Position Table</source>
-        <translation>Список должностей</translation>
+        <translation type="obsolete">Список должностей</translation>
     </message>
 </context>
 <context>
@@ -7520,179 +6409,179 @@ Attributes:</source>
     </message>
     <message>
         <source>Add Facultet</source>
-        <translation>Добавить факультет</translation>
+        <translation type="obsolete">Добавить факультет</translation>
     </message>
     <message>
         <source>Edit Facultet</source>
-        <translation>Изменить факультет</translation>
+        <translation type="obsolete">Изменить факультет</translation>
     </message>
     <message>
         <source>Delete Facultet</source>
-        <translation>Удалить факультет</translation>
+        <translation type="obsolete">Удалить факультет</translation>
     </message>
     <message>
         <source>Add Kafedra</source>
-        <translation>Добавить кафедру</translation>
+        <translation type="obsolete">Добавить кафедру</translation>
     </message>
     <message>
         <source>Edit Kafedra</source>
-        <translation>Изменить кафедру</translation>
+        <translation type="obsolete">Изменить кафедру</translation>
     </message>
     <message>
         <source>Delete Kafedra</source>
-        <translation>Удалить кафедру</translation>
+        <translation type="obsolete">Удалить кафедру</translation>
     </message>
     <message>
         <source>Edit Worker List</source>
-        <translation>Список личного состава</translation>
+        <translation type="obsolete">Список личного состава</translation>
     </message>
     <message>
         <source>Add Specialization</source>
-        <translation>Добавить военную специальность</translation>
+        <translation type="obsolete">Добавить военную специальность</translation>
     </message>
     <message>
         <source>Edit Specialization</source>
-        <translation>Изменить военную специальность</translation>
+        <translation type="obsolete">Изменить военную специальность</translation>
     </message>
     <message>
         <source>Edit Education Groups</source>
-        <translation>Изменить учебные группы</translation>
+        <translation type="obsolete">Изменить учебные группы</translation>
     </message>
     <message>
         <source>Delete Specialization</source>
-        <translation>Удалить военную специальность</translation>
+        <translation type="obsolete">Удалить военную специальность</translation>
     </message>
     <message>
         <source>Add Discipline</source>
-        <translation>Добавить дисциплину</translation>
+        <translation type="obsolete">Добавить дисциплину</translation>
     </message>
     <message>
         <source>Paste Discipline</source>
-        <translation>Вставить дисциплину</translation>
+        <translation type="obsolete">Вставить дисциплину</translation>
     </message>
     <message>
         <source>Edit Discipline</source>
-        <translation>Изменить дисциплину</translation>
+        <translation type="obsolete">Изменить дисциплину</translation>
     </message>
     <message>
         <source>Delete Discipline</source>
-        <translation>Удалить дисциплину</translation>
+        <translation type="obsolete">Удалить дисциплину</translation>
     </message>
     <message>
         <source>Copy Discipline</source>
-        <translation>Копировать дисциплину</translation>
+        <translation type="obsolete">Копировать дисциплину</translation>
     </message>
     <message>
         <source>Add Theme</source>
-        <translation>Добавить тему</translation>
+        <translation type="obsolete">Добавить тему</translation>
     </message>
     <message>
         <source>Edit KTP</source>
-        <translation>Редактировать КТП</translation>
+        <translation type="obsolete">Редактировать КТП</translation>
     </message>
     <message>
         <source>Add Lesson Type</source>
-        <translation>Добавить вид занятий</translation>
+        <translation type="obsolete">Добавить вид занятий</translation>
     </message>
     <message>
         <source>Edit Theme</source>
-        <translation>Изменить тему</translation>
+        <translation type="obsolete">Изменить тему</translation>
     </message>
     <message>
         <source>Delete Theme</source>
-        <translation>Удалить тему</translation>
+        <translation type="obsolete">Удалить тему</translation>
     </message>
     <message>
         <source>Edit Lesson Type</source>
-        <translation>Изменить вид занятий</translation>
+        <translation type="obsolete">Изменить вид занятий</translation>
     </message>
     <message>
         <source>Delete Lesson Type</source>
-        <translation>Удалить вид занятий</translation>
+        <translation type="obsolete">Удалить вид занятий</translation>
     </message>
     <message>
         <source>VKA im. A.F.Mogayskogo</source>
-        <translation>ВКА имени А.Ф.Можайского</translation>
+        <translation type="obsolete">ВКА имени А.Ф.Можайского</translation>
     </message>
     <message>
         <source>Lesson Type</source>
-        <translation>Вид занятия</translation>
+        <translation type="obsolete">Вид занятия</translation>
     </message>
     <message>
         <source>Hours</source>
-        <translation>Часов</translation>
+        <translation type="obsolete">Часов</translation>
     </message>
     <message>
         <source>Header</source>
-        <translation>Руководитель</translation>
+        <translation type="obsolete">Руководитель</translation>
     </message>
     <message>
         <source>Education Building</source>
-        <translation>Учебный корпус</translation>
+        <translation type="obsolete">Учебный корпус</translation>
     </message>
     <message>
         <source>Short Name</source>
-        <translation>Сокращение</translation>
+        <translation type="obsolete">Сокращение</translation>
     </message>
     <message>
         <source>Speciality</source>
-        <translation>Специальность</translation>
+        <translation type="obsolete">Специальность</translation>
     </message>
     <message>
         <source>Speciality Code</source>
-        <translation>Код специальности</translation>
+        <translation type="obsolete">Код специальности</translation>
     </message>
     <message>
         <source>Qualification</source>
-        <translation>Квалификация</translation>
+        <translation type="obsolete">Квалификация</translation>
     </message>
     <message>
         <source>Education Duration</source>
-        <translation>Срок обучения</translation>
+        <translation type="obsolete">Срок обучения</translation>
     </message>
     <message>
         <source>Purpose</source>
-        <translation>Предназначение выпускников</translation>
+        <translation type="obsolete">Предназначение выпускников</translation>
     </message>
     <message>
         <source>Theme Name</source>
-        <translation>Название темы</translation>
+        <translation type="obsolete">Название темы</translation>
     </message>
     <message>
         <source>Code</source>
-        <translation>Сокращение</translation>
+        <translation type="obsolete">Сокращение</translation>
     </message>
     <message>
         <source>Learning Unit</source>
-        <translation>Читающая кафедра</translation>
+        <translation type="obsolete">Читающая кафедра</translation>
     </message>
     <message>
         <source>Discipline Name</source>
-        <translation>Название дисциплины</translation>
+        <translation type="obsolete">Название дисциплины</translation>
     </message>
     <message>
         <source>Index</source>
-        <translation>Индекс</translation>
+        <translation type="obsolete">Индекс</translation>
     </message>
     <message>
         <source>Total Hour</source>
-        <translation>Всего часов</translation>
+        <translation type="obsolete">Всего часов</translation>
     </message>
     <message>
         <source>Facultets Name</source>
-        <translation>Название факультета</translation>
+        <translation type="obsolete">Название факультета</translation>
     </message>
     <message>
         <source>KTP</source>
-        <translation>КТП</translation>
+        <translation type="obsolete">КТП</translation>
     </message>
     <message>
         <source>Clear KTP</source>
-        <translation>Очистить КТП</translation>
+        <translation type="obsolete">Очистить КТП</translation>
     </message>
     <message>
         <source>Ôàêóëüòåò / ×èòàþùàÿ êàôåäðà / Êîìó ÷èòàåò / Äèñöèïëèíà / Ñåìåñòð / Òåìà / Âèä çàíÿòèé </source>
-        <translation>Факультет / Читающая кафедра / Для кого / Дисциплина / Семестр / Тема / Вид занятия</translation>
+        <translation type="obsolete">Факультет / Читающая кафедра / Для кого / Дисциплина / Семестр / Тема / Вид занятия</translation>
     </message>
     <message>
         <source>STORM_TSFZ1</source>
@@ -7701,10 +6590,6 @@ Attributes:</source>
     <message>
         <source></source>
         <translation></translation>
-    </message>
-    <message>
-        <source> </source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Report Definition Not Found</source>
@@ -7821,58 +6706,6 @@ Please contact your Systems Administrator and report this issue.</source>
         <translation>&lt;Фрагмент видео-файла %1&gt;</translation>
     </message>
     <message>
-        <source>unknown</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Type 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Type 1C</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Type 3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>TrueType</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>CID Type 0</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>CID Type 0C</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>CID TrueType</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Type 1C (OpenType)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>TrueType (OpenType)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>CID Type 0C (OpenType)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>CID TrueType (OpenType)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Bug: unexpected font type. Notify poppler mailing list!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>&lt;XML document %1&gt;</source>
         <translation>&lt;Фрагмент XML документа %1&gt;</translation>
     </message>
@@ -7946,40 +6779,21 @@ Please contact your Systems Administrator and report this issue.</source>
     </message>
 </context>
 <context>
-    <name>QXPDFMainWindow</name>
-    <message>
-        <source>Select pdf file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>PDF files (*.pdf);;All files (*)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>PDF file example</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Invalid document</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QXPdfWidget</name>
     <message>
         <source>&amp;Close</source>
-        <translation type="unfinished">&amp;Закрыть</translation>
+        <translation type="obsolete">&amp;Закрыть</translation>
     </message>
 </context>
 <context>
     <name>QualificationForm</name>
     <message>
         <source>DB not connected ! Check server status and try again</source>
-        <translation>Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
     </message>
     <message>
         <source>Qualification Table</source>
-        <translation>Список квалификаций выпускников</translation>
+        <translation type="obsolete">Список квалификаций выпускников</translation>
     </message>
 </context>
 <context>
@@ -8785,19 +7599,19 @@ Please contact your Systems Administrator and report this issue.</source>
     <name>ReportingTypeForm</name>
     <message>
         <source>DB not connected ! Check server status and try again</source>
-        <translation>Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
     </message>
     <message>
         <source>Reporting Types</source>
-        <translation>Виды отчетности</translation>
+        <translation type="obsolete">Виды отчетности</translation>
     </message>
     <message>
         <source>Report Name</source>
-        <translation>Вид отчетности</translation>
+        <translation type="obsolete">Вид отчетности</translation>
     </message>
     <message>
         <source>Short Name</source>
-        <translation>Обозначение</translation>
+        <translation type="obsolete">Обозначение</translation>
     </message>
 </context>
 <context>
@@ -8818,181 +7632,37 @@ Please contact your Systems Administrator and report this issue.</source>
 <context>
     <name>ScheduleCreateFormClass</name>
     <message>
-        <source>New schedule</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Start date</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Finish date</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Cancel</source>
-        <translation type="unfinished">Отмена</translation>
-    </message>
-    <message>
-        <source>Create</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Semestr</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Autamn/Winter</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Spring/Summer</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>yyyy</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>School year</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Notes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>From calendar</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Отмена</translation>
     </message>
 </context>
 <context>
     <name>ScheduleEntryModel</name>
     <message>
-        <source>Monday</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Tuesday</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Wendsday</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Thursday</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Friday</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Saturday</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Sunday</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Study section</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Date</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Period</source>
-        <translation type="unfinished">Периодичность</translation>
-    </message>
-    <message>
-        <source>Subject</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Lecture theme</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Lesson type</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Classroom</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Lecturer</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Периодичность</translation>
     </message>
 </context>
 <context>
     <name>ScheduleIterationsFormClass</name>
     <message>
-        <source>ScheduleIterationsForm</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Shedule versions</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Cancel</source>
-        <translation type="unfinished">Отмена</translation>
-    </message>
-    <message>
-        <source>Make current</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Отмена</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Удалить</translation>
-    </message>
-    <message>
-        <source>Rollback</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ScheduleSelectForm</name>
-    <message>
-        <source>from %1 till %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Schedule delete</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The selected schedule will be deleted entirely.
-Do you want to progress?</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Удалить</translation>
     </message>
 </context>
 <context>
     <name>ScheduleSelectFormClass</name>
     <message>
-        <source>Schedules list</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Cancel</source>
-        <translation type="unfinished">Отмена</translation>
-    </message>
-    <message>
-        <source>Open</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Schedule selection</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Отмена</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Удалить</translation>
+        <translation type="obsolete">Удалить</translation>
     </message>
 </context>
 <context>
@@ -9102,104 +7772,76 @@ Do you want to progress?</source>
     <name>SemesterForm</name>
     <message>
         <source>DB not connected ! Check server status and try again</source>
-        <translation>Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
     </message>
     <message>
         <source>Kurs</source>
-        <translation>Год обучения</translation>
+        <translation type="obsolete">Год обучения</translation>
     </message>
     <message>
         <source>Semesters Table</source>
-        <translation>Список семестров</translation>
+        <translation type="obsolete">Список семестров</translation>
     </message>
     <message>
         <source>Semesters Name</source>
-        <translation>Название семестра</translation>
+        <translation type="obsolete">Название семестра</translation>
     </message>
     <message>
         <source>Order</source>
-        <translation>Порядок</translation>
+        <translation type="obsolete">Порядок</translation>
     </message>
 </context>
 <context>
     <name>Speciality_VUS_Link</name>
     <message>
         <source>Disciplines</source>
-        <translation>Дисциплина</translation>
-    </message>
-    <message utf8="true">
-        <source>Удалить</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Изменить</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Добавить связь</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Отменить изменения</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Сохранить изменения</source>
-        <translation></translation>
+        <translation type="obsolete">Дисциплина</translation>
     </message>
     <message utf8="true">
         <source>Обновить из базы</source>
-        <translation>отменить</translation>
-    </message>
-    <message utf8="true">
-        <source>Специализация  /  ВУС </source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>id</source>
-        <translation></translation>
+        <translation type="obsolete">отменить</translation>
     </message>
 </context>
 <context>
     <name>SpecializationForm</name>
     <message>
         <source>DB not connected ! Check server status and try again</source>
-        <translation>Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
     </message>
     <message>
         <source>Duration</source>
-        <translation>Срок обучения</translation>
+        <translation type="obsolete">Срок обучения</translation>
     </message>
     <message>
         <source>Qualification</source>
-        <translation>Квалификация</translation>
+        <translation type="obsolete">Квалификация</translation>
     </message>
     <message>
         <source>Specialization Table</source>
-        <translation>Таблица военных специальностей</translation>
+        <translation type="obsolete">Таблица военных специальностей</translation>
     </message>
     <message>
         <source>Specializations Name</source>
-        <translation>Военная специальность</translation>
+        <translation type="obsolete">Военная специальность</translation>
     </message>
     <message>
         <source>Short Name</source>
-        <translation>Сокращение</translation>
+        <translation type="obsolete">Сокращение</translation>
     </message>
     <message>
         <source>Purpose</source>
-        <translation>Предназначение выпускников</translation>
+        <translation type="obsolete">Предназначение выпускников</translation>
     </message>
 </context>
 <context>
     <name>StreamForm</name>
     <message>
         <source>DB not connected ! Check server status and try again</source>
-        <translation>Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
     </message>
     <message>
         <source>Stream Table</source>
-        <translation>Список потоков</translation>
+        <translation type="obsolete">Список потоков</translation>
     </message>
 </context>
 <context>
@@ -9238,53 +7880,6 @@ Do you want to progress?</source>
     </message>
     <message>
         <source>Alt+C</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>StudyCalendarClass</name>
-    <message>
-        <source>StudyCalendar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Коррекция отмеченных данных</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Мероприятие</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Внести изменение</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Записать и закрыть</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Очистить выделенное</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Открыть редактор</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Фильтр</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Факультет</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Применить</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Сбросить</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -9407,95 +8002,35 @@ Do you want to progress?</source>
     <name>Three_Lists_Form</name>
     <message>
         <source>Form</source>
-        <translation>Форма</translation>
-    </message>
-    <message>
-        <source>Name of Table </source>
-        <translation></translation>
-    </message>
-    <message>
-        <source> Name</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Short Name</source>
-        <translation></translation>
+        <translation type="obsolete">Форма</translation>
     </message>
     <message>
         <source>Others</source>
-        <translation>Остальные</translation>
-    </message>
-    <message>
-        <source>Others2</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk2_combo</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk1_combo</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk3_combo</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>id_pk</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>id_fk1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>id_fk2</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>id_fk3</source>
-        <translation></translation>
+        <translation type="obsolete">Остальные</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation>Название</translation>
-    </message>
-    <message>
-        <source>Other</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk1_Name</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk2_Name</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk3_Name</source>
-        <translation></translation>
+        <translation type="obsolete">Название</translation>
     </message>
     <message>
         <source>Reload</source>
-        <translation>Отменить</translation>
+        <translation type="obsolete">Отменить</translation>
     </message>
     <message>
         <source>DB Update </source>
-        <translation>Подтвердить</translation>
+        <translation type="obsolete">Подтвердить</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation>Добавить</translation>
+        <translation type="obsolete">Добавить</translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation>Удалить</translation>
+        <translation type="obsolete">Удалить</translation>
     </message>
     <message>
         <source>Edit</source>
-        <translation>Редактировать</translation>
+        <translation type="obsolete">Редактировать</translation>
     </message>
 </context>
 <context>
@@ -9545,243 +8080,163 @@ Do you want to progress?</source>
     <name>Two_Lists_Form</name>
     <message>
         <source>Form</source>
-        <translation>Форма</translation>
-    </message>
-    <message>
-        <source>Name of Table</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source> Name</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Short Name</source>
-        <translation></translation>
+        <translation type="obsolete">Форма</translation>
     </message>
     <message>
         <source>Others</source>
-        <translation>Остальные</translation>
-    </message>
-    <message>
-        <source>fk2_combo</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk1_combo</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>id_pk</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>id_fk1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>id_fk2</source>
-        <translation></translation>
+        <translation type="obsolete">Остальные</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation>Название</translation>
-    </message>
-    <message>
-        <source>Other</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk1_Name</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>fk2_Name</source>
-        <translation></translation>
+        <translation type="obsolete">Название</translation>
     </message>
     <message>
         <source>Reload</source>
-        <translation>Отменить</translation>
+        <translation type="obsolete">Отменить</translation>
     </message>
     <message>
         <source>DB Update </source>
-        <translation>Подтвердить</translation>
+        <translation type="obsolete">Подтвердить</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation>Добавить</translation>
+        <translation type="obsolete">Добавить</translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation>Удалить</translation>
+        <translation type="obsolete">Удалить</translation>
     </message>
     <message>
         <source>Edit</source>
-        <translation>Редактировать</translation>
+        <translation type="obsolete">Редактировать</translation>
     </message>
 </context>
 <context>
     <name>UiPlanningWidget</name>
     <message>
-        <source>Planning manager</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Up</source>
-        <translation type="unfinished">Вверх</translation>
+        <translation type="obsolete">Вверх</translation>
     </message>
     <message>
         <source>Down</source>
-        <translation type="unfinished">Вниз</translation>
-    </message>
-    <message>
-        <source>StartAll</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Вниз</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished">Название</translation>
-    </message>
-    <message>
-        <source>Status</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Start date:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>ID:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>End date:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Active planner:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Log</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Название</translation>
     </message>
 </context>
 <context>
     <name>UnitForm</name>
     <message>
         <source>DB not connected ! Check server status and try again</source>
-        <translation>Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
     </message>
     <message>
         <source>Facultet</source>
-        <translation>Факультет</translation>
+        <translation type="obsolete">Факультет</translation>
     </message>
     <message>
         <source>Header of Unit</source>
-        <translation>Руководитель</translation>
+        <translation type="obsolete">Руководитель</translation>
     </message>
     <message>
         <source>Education Building</source>
-        <translation>Учебный корпус</translation>
+        <translation type="obsolete">Учебный корпус</translation>
     </message>
     <message>
         <source>Units Table</source>
-        <translation>Таблица кафедр</translation>
+        <translation type="obsolete">Таблица кафедр</translation>
     </message>
     <message>
         <source>Unit Name</source>
-        <translation>Название кафедры</translation>
+        <translation type="obsolete">Название кафедры</translation>
     </message>
     <message>
         <source>Short Name</source>
-        <translation>Короткое название</translation>
+        <translation type="obsolete">Короткое название</translation>
     </message>
     <message>
         <source>Speciality</source>
-        <translation>Специальность</translation>
+        <translation type="obsolete">Специальность</translation>
     </message>
     <message>
         <source>Speciality Code</source>
-        <translation>Код специальности</translation>
+        <translation type="obsolete">Код специальности</translation>
     </message>
     <message>
         <source>Unit Header</source>
-        <translation>Руководитель</translation>
+        <translation type="obsolete">Руководитель</translation>
     </message>
 </context>
 <context>
     <name>VusForm</name>
     <message>
         <source>DB not connected ! Check server status and try again</source>
-        <translation>Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
     </message>
     <message>
         <source>Vus Table</source>
-        <translation>ВУС</translation>
+        <translation type="obsolete">ВУС</translation>
     </message>
 </context>
 <context>
     <name>WorkerForm</name>
     <message>
         <source>DB not connected ! Check server status and try again</source>
-        <translation>Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
     </message>
     <message>
         <source>Acad. Rank</source>
-        <translation>Ученое звание</translation>
+        <translation type="obsolete">Ученое звание</translation>
     </message>
     <message>
         <source>Acad. Degree</source>
-        <translation>Ученая степень</translation>
+        <translation type="obsolete">Ученая степень</translation>
     </message>
     <message>
         <source>Mil. Rank</source>
-        <translation>Воинское звание</translation>
+        <translation type="obsolete">Воинское звание</translation>
     </message>
     <message>
         <source>Position</source>
-        <translation>Должность</translation>
+        <translation type="obsolete">Должность</translation>
     </message>
     <message>
         <source>Kafedra</source>
-        <translation>Кафедра</translation>
+        <translation type="obsolete">Кафедра</translation>
     </message>
     <message>
         <source>Workers Table</source>
-        <translation>Таблица ППС</translation>
+        <translation type="obsolete">Таблица ППС</translation>
     </message>
     <message>
         <source>LastName</source>
-        <translation>Фамилия</translation>
+        <translation type="obsolete">Фамилия</translation>
     </message>
     <message>
         <source>FirstName</source>
-        <translation>Имя</translation>
+        <translation type="obsolete">Имя</translation>
     </message>
     <message>
         <source>SirName</source>
-        <translation>Отчество</translation>
+        <translation type="obsolete">Отчество</translation>
     </message>
     <message>
         <source>FIO</source>
-        <translation>Фамилия, ИО</translation>
+        <translation type="obsolete">Фамилия, ИО</translation>
     </message>
     <message>
         <source>Desc</source>
-        <translation>Описание</translation>
+        <translation type="obsolete">Описание</translation>
     </message>
     <message>
         <source>Telephone</source>
-        <translation>Телефон</translation>
+        <translation type="obsolete">Телефон</translation>
     </message>
     <message>
         <source>Mac Label</source>
-        <translation>Метка</translation>
+        <translation type="obsolete">Метка</translation>
     </message>
 </context>
 <context>
@@ -9855,191 +8310,67 @@ Do you want to progress?</source>
     <name>add_auditory_list_form</name>
     <message>
         <source>Form</source>
-        <translation type="unfinished">Форма</translation>
-    </message>
-    <message>
-        <source>&gt;&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Отмена</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;&lt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Готово</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Форма</translation>
     </message>
     <message>
         <source>1</source>
-        <translation type="unfinished">1</translation>
+        <translation type="obsolete">1</translation>
     </message>
     <message>
         <source>2</source>
-        <translation type="unfinished">2</translation>
+        <translation type="obsolete">2</translation>
     </message>
     <message>
         <source>3</source>
-        <translation type="unfinished">3</translation>
+        <translation type="obsolete">3</translation>
     </message>
     <message>
         <source>4</source>
-        <translation type="unfinished">4</translation>
+        <translation type="obsolete">4</translation>
     </message>
     <message>
         <source>5</source>
-        <translation type="unfinished">5</translation>
+        <translation type="obsolete">5</translation>
     </message>
     <message>
         <source>6</source>
-        <translation type="unfinished">6</translation>
-    </message>
-    <message utf8="true">
-        <source>Доступные преподаватели</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Нездоровин Н.В.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Выбраные преподаватели</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Номер кафедры</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">6</translation>
     </message>
     <message>
         <source>61</source>
-        <translation type="unfinished">61</translation>
+        <translation type="obsolete">61</translation>
     </message>
     <message>
         <source>62</source>
-        <translation type="unfinished">62</translation>
+        <translation type="obsolete">62</translation>
     </message>
     <message>
         <source>63</source>
-        <translation type="unfinished">63</translation>
+        <translation type="obsolete">63</translation>
     </message>
     <message>
         <source>64</source>
-        <translation type="unfinished">64</translation>
+        <translation type="obsolete">64</translation>
     </message>
     <message>
         <source>65</source>
-        <translation type="unfinished">65</translation>
-    </message>
-    <message utf8="true">
-        <source>Факультет</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>  Доступные аудитории  </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>306а-34</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">65</translation>
     </message>
     <message>
         <source>306-6</source>
-        <translation type="unfinished">306-6</translation>
+        <translation type="obsolete">306-6</translation>
     </message>
     <message>
         <source>240-6</source>
-        <translation type="unfinished">240-6</translation>
-    </message>
-    <message utf8="true">
-        <source>  Выбраные аудитории  </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Лекционные</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Компьютеризированные</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Специализированные</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Фактический тип аудитории</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Лекционная</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Компьтеризированные</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Специализированная</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Корпус</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Nomer</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">240-6</translation>
     </message>
     <message>
         <source>Index</source>
-        <translation type="unfinished">Индекс</translation>
-    </message>
-    <message>
-        <source>AuditoryTypeS</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>SelectedN</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>BackA</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Test</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Индекс</translation>
     </message>
     <message>
         <source>FIO</source>
-        <translation type="unfinished">Фамилия, ИО</translation>
-    </message>
-    <message>
-        <source>BackL</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Выбранный тип аудитории</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>pbTest</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>pbTest_2</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Фамилия, ИО</translation>
     </message>
 </context>
 <context>
@@ -10416,155 +8747,55 @@ p, li { white-space: pre-wrap; }
     <name>edit_discipline_form</name>
     <message>
         <source>Disciplines</source>
-        <translation>Дисциплина</translation>
+        <translation type="obsolete">Дисциплина</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation>Добавить</translation>
+        <translation type="obsolete">Добавить</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation>Удалить</translation>
+        <translation type="obsolete">Удалить</translation>
     </message>
     <message>
         <source>Edit</source>
-        <translation>Редактировать</translation>
-    </message>
-    <message>
-        <source>^</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>v</source>
-        <translation></translation>
+        <translation type="obsolete">Редактировать</translation>
     </message>
     <message>
         <source>Check KTP</source>
-        <translation>Пересчитать часы занятий по КТП</translation>
+        <translation type="obsolete">Пересчитать часы занятий по КТП</translation>
     </message>
     <message>
         <source>Learning Plan</source>
-        <translation>Учебные планы и учебные программы</translation>
+        <translation type="obsolete">Учебные планы и учебные программы</translation>
     </message>
     <message>
         <source>Not Connected </source>
-        <translation>Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
     </message>
     <message>
         <source>Refresh All from DB</source>
-        <translation>Обновить все из базы данных</translation>
+        <translation type="obsolete">Обновить все из базы данных</translation>
     </message>
     <message utf8="true">
         <source>Факультет / Кафедра : Специальность / Специализация  /  Группа дисциплин  /  Компонент  /  Дисциплина / Семестр / Вид занятий                                                 </source>
-        <translation>Факультет / Кафедра / Военная специальность  /  Цикл дисциплин /  Группа дисциплин   /  Дисциплина / Семестр / Тема / Вид занятий</translation>
+        <translation type="obsolete">Факультет / Кафедра / Военная специальность  /  Цикл дисциплин /  Группа дисциплин   /  Дисциплина / Семестр / Тема / Вид занятий</translation>
     </message>
     <message utf8="true">
         <source>Отчетность</source>
-        <translation>Отчетность</translation>
-    </message>
-    <message utf8="true">
-        <source>часов занятий</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>часов СП</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>id</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>2</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>3</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>4</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>5</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>6</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>7</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>8</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>9</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>10</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>11</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>12</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>13</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>14</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>15</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>16</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>17</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>18</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>19</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>20</source>
-        <translation></translation>
+        <translation type="obsolete">Отчетность</translation>
     </message>
     <message>
         <source>Recalculate                          Hours</source>
-        <translation>Проверить учебные программы</translation>
+        <translation type="obsolete">Проверить учебные программы</translation>
     </message>
     <message utf8="true">
         <source>Всего часов</source>
-        <translation>Всего часов</translation>
+        <translation type="obsolete">Всего часов</translation>
     </message>
     <message utf8="true">
         <source>Часов с преп.</source>
-        <translation>Часов с преп.</translation>
+        <translation type="obsolete">Часов с преп.</translation>
     </message>
 </context>
 <context>
@@ -10578,810 +8809,182 @@ p, li { white-space: pre-wrap; }
     <name>edit_ktp_form</name>
     <message utf8="true">
         <source>КТП</source>
-        <translation type="unfinished">КТП</translation>
-    </message>
-    <message utf8="true">
-        <source>  Кто проводит  </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Факультет</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">КТП</translation>
     </message>
     <message>
         <source>1</source>
-        <translation type="unfinished">1</translation>
+        <translation type="obsolete">1</translation>
     </message>
     <message>
         <source>2</source>
-        <translation type="unfinished">2</translation>
+        <translation type="obsolete">2</translation>
     </message>
     <message>
         <source>3</source>
-        <translation type="unfinished">3</translation>
+        <translation type="obsolete">3</translation>
     </message>
     <message>
         <source>4</source>
-        <translation type="unfinished">4</translation>
+        <translation type="obsolete">4</translation>
     </message>
     <message>
         <source>5</source>
-        <translation type="unfinished">5</translation>
+        <translation type="obsolete">5</translation>
     </message>
     <message>
         <source>6</source>
-        <translation type="unfinished">6</translation>
+        <translation type="obsolete">6</translation>
     </message>
     <message>
         <source>61</source>
-        <translation type="unfinished">61</translation>
+        <translation type="obsolete">61</translation>
     </message>
     <message>
         <source>62</source>
-        <translation type="unfinished">62</translation>
+        <translation type="obsolete">62</translation>
     </message>
     <message>
         <source>63</source>
-        <translation type="unfinished">63</translation>
+        <translation type="obsolete">63</translation>
     </message>
     <message>
         <source>64</source>
-        <translation type="unfinished">64</translation>
+        <translation type="obsolete">64</translation>
     </message>
     <message>
         <source>65</source>
-        <translation type="unfinished">65</translation>
-    </message>
-    <message utf8="true">
-        <source>Кафедра №</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>  Сведения о дисциплине  </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Название дисциплины</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Введение в специальность</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Компьютерная графика</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Семестр</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">65</translation>
     </message>
     <message>
         <source>2010/2011</source>
-        <translation type="unfinished">2010/2011</translation>
-    </message>
-    <message utf8="true">
-        <source>Учебный год</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>  Для кого проводит  </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Учебная группа</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Специальность</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>PushButton</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">2010/2011</translation>
     </message>
     <message>
         <source>10</source>
-        <translation type="unfinished">10</translation>
-    </message>
-    <message utf8="true">
-        <source>Логическая схема изучения дисциплины</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Э</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Лекция</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Семинар</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Лаб. работа</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Пр. зан-е</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Групповое занятие</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Групповое упражнение</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Тактическое занятие</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Курсовая работа</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Констрольная работа</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Др. вид уч. зан-й</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Зачет</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>ВВ</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Т.1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Т.2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Т.3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Т.4</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Т.5</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Т.6</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Закл.</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">10</translation>
     </message>
     <message utf8="true">
         <source>Отчетность</source>
-        <translation type="unfinished">Отчетность</translation>
+        <translation type="obsolete">Отчетность</translation>
     </message>
     <message>
         <source>Lesson Type</source>
-        <translation type="unfinished">Вид занятия</translation>
-    </message>
-    <message>
-        <source>LessonShortName</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Вид занятия</translation>
     </message>
     <message>
         <source>12</source>
-        <translation type="unfinished">12</translation>
+        <translation type="obsolete">12</translation>
     </message>
     <message>
         <source>8</source>
-        <translation type="unfinished">8</translation>
+        <translation type="obsolete">8</translation>
     </message>
     <message>
         <source>14</source>
-        <translation type="unfinished">14</translation>
-    </message>
-    <message utf8="true">
-        <source>Л</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>С</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>ЛР</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>П</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Г</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>ГУ</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">14</translation>
     </message>
     <message>
         <source>7</source>
-        <translation type="unfinished">7</translation>
-    </message>
-    <message utf8="true">
-        <source>Т</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>К</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">7</translation>
     </message>
     <message>
         <source>9</source>
-        <translation type="unfinished">9</translation>
-    </message>
-    <message utf8="true">
-        <source>А</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Р</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">9</translation>
     </message>
     <message>
         <source>13</source>
-        <translation type="unfinished">13</translation>
-    </message>
-    <message utf8="true">
-        <source>З</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Вид занятия</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Часы</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Преподаватель</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Аудитория</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>typeLesson</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Lector1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Lector2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Lector3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Auditory1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Auditory2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Auditory3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Auditory4</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Auditory5</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Auditory6</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Auditory7</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Auditory8</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Auditory9</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Auditory10</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Удалить запись</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>  Ввод нового занятия  </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Лекция (Л)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Семинар (С)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Лабораторная работа (ЛР)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Практическое занятие (П)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Групповое занятие (Г)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Групповое упражнение (У)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Тактическое занятие (Т)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Курсовой проект (К)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Контрольная работа (А)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Сам. работа под руков. преподавателя (Р)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Экзамен (Э)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Зачет с оценкой (ЗО)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Зачет (З)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Тип аудитории</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Лекционные</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Компьютеризированные</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Специализированные</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Добавить занятие</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Преподаватели</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Кол-во часов</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Изменить</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>№ темы</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Удалить записи</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>  Условные обозначения  </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Л - лекция</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>С - семинар</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>ЛР - лабораторная работа  </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>П - практическое занятие </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Г - групповое занятие</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>ГУ - групповое упражнение</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Т - тактическое занятие</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>К - курсовой проект</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>А - контрольная работа</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Р - сам. работа под руков. преподавателя</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Э - экзамен</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>ЗО - зачет с оценкой</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>З - зачет</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>ОК</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>  Список условных обозначений</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Проверить</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Взаимосвязь с другими дисциплинами</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Создать зависимость</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Удалить зависимость</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Текущий КТП</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Тема №</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Дисциплина</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Тема</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>№ п/п</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Базовая дисциплина</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Список тем</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Таблица зависимостей</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Занятие</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Ограничения</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>  Желаемые часы проведения занятий    </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>ПН</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>ВТ</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>СР</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>ЧТ</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>ПТ</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>СБ</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>1-2 часы</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>3-4 часы</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>5-6 часы</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>7-8 часы</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>  Ограничения преподавателя  </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Начало периода</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Конец периода</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Причина</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">13</translation>
     </message>
     <message>
         <source>10.11.2010</source>
-        <translation type="unfinished">10.11.2010</translation>
+        <translation type="obsolete">10.11.2010</translation>
     </message>
     <message>
         <source>20.12.2010</source>
-        <translation type="unfinished">20.12.2010</translation>
-    </message>
-    <message utf8="true">
-        <source>Отпуск</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">20.12.2010</translation>
     </message>
     <message>
         <source>22.03.2011</source>
-        <translation type="unfinished">22.03.2011</translation>
+        <translation type="obsolete">22.03.2011</translation>
     </message>
     <message>
         <source>27.03.2011</source>
-        <translation type="unfinished">27.03.2011</translation>
-    </message>
-    <message utf8="true">
-        <source>Участие в отраслевой научно-практической конференции</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>ЗО</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Разобраться с потоком</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Специализация</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Сети связи и системы коммутации</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>TextLabel</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">27.03.2011</translation>
     </message>
     <message>
         <source>124</source>
-        <translation type="unfinished">124</translation>
+        <translation type="obsolete">124</translation>
     </message>
     <message>
         <source>128</source>
-        <translation type="unfinished">128</translation>
+        <translation type="obsolete">128</translation>
     </message>
     <message>
         <source>131</source>
-        <translation type="unfinished">131</translation>
+        <translation type="obsolete">131</translation>
     </message>
     <message>
         <source>167</source>
-        <translation type="unfinished">167</translation>
+        <translation type="obsolete">167</translation>
     </message>
     <message>
         <source>203</source>
-        <translation type="unfinished">203</translation>
+        <translation type="obsolete">203</translation>
     </message>
     <message>
         <source>208</source>
-        <translation type="unfinished">208</translation>
+        <translation type="obsolete">208</translation>
     </message>
     <message>
         <source>221</source>
-        <translation type="unfinished">221</translation>
+        <translation type="obsolete">221</translation>
     </message>
     <message>
         <source>222</source>
-        <translation type="unfinished">222</translation>
+        <translation type="obsolete">222</translation>
     </message>
     <message>
         <source>224</source>
-        <translation type="unfinished">224</translation>
+        <translation type="obsolete">224</translation>
     </message>
     <message>
         <source>236</source>
-        <translation type="unfinished">236</translation>
+        <translation type="obsolete">236</translation>
     </message>
     <message>
         <source>241</source>
-        <translation type="unfinished">241</translation>
+        <translation type="obsolete">241</translation>
     </message>
     <message>
         <source>305</source>
-        <translation type="unfinished">305</translation>
+        <translation type="obsolete">305</translation>
     </message>
     <message>
         <source>306</source>
-        <translation type="unfinished">306</translation>
+        <translation type="obsolete">306</translation>
     </message>
     <message>
         <source>308</source>
-        <translation type="unfinished">308</translation>
+        <translation type="obsolete">308</translation>
     </message>
     <message>
         <source>311</source>
-        <translation type="unfinished">311</translation>
-    </message>
-    <message utf8="true">
-        <source>Бородько Д.Н.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Мышко В.В</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Нездоровин Н.В.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Кравцов А.Н.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Сучков В.И.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Обработка и анализ ТМИ</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>pbTest</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Записать КТП в базу данных</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Выход</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Вверх</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Вниз</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>   Сведения о дисциплине   </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>   Распределение учебного времени   </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>   Логическая схема изучения дисциплины   </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Кол-во</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Кол-во аудиторий</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">311</translation>
     </message>
 </context>
 <context>
     <name>error_form</name>
     <message>
         <source>Error</source>
-        <translation>Ошибка</translation>
+        <translation type="obsolete">Ошибка</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation>Да</translation>
+        <translation type="obsolete">Да</translation>
     </message>
     <message>
         <source>Error text</source>
-        <translation>Ошибка</translation>
+        <translation type="obsolete">Ошибка</translation>
     </message>
 </context>
 <context>
@@ -11814,25 +9417,6 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
-    <name>listtoselectClass</name>
-    <message>
-        <source>listtoselect</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Objects list</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Accept</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>log_form</name>
     <message>
         <source>...</source>
@@ -12030,21 +9614,9 @@ System Error &apos;%1&apos;
 </context>
 <context>
     <name>message_form</name>
-    <message utf8="true">
-        <source>Внимание</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Идет запись в базу данных</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Запись в базу данных завершена</source>
-        <translation></translation>
-    </message>
     <message>
         <source>pbOk</source>
-        <translation>Готово</translation>
+        <translation type="obsolete">Готово</translation>
     </message>
 </context>
 <context>
@@ -12123,37 +9695,6 @@ System Error &apos;%1&apos;
     </message>
 </context>
 <context>
-    <name>modifyCalendarForm</name>
-    <message utf8="true">
-        <source>Редактирование календаря</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Учебные группы</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Дата начала</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Дата окончания</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Мероприятие</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>msg_journal_settings_form</name>
     <message utf8="true">
         <source>Настройки функционирования журнала распоряжений</source>
@@ -12207,601 +9748,53 @@ System Error &apos;%1&apos;
 <context>
     <name>nagruz_kaf_form</name>
     <message utf8="true">
-        <source>Название дисциплины</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Всего</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Лекции</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>СР</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Лектор</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>ФИО 1-го пр.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>ФИО 2-го пр.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
         <source>Отчетность</source>
-        <translation>Отчетность</translation>
-    </message>
-    <message utf8="true">
-        <source>Учебная нагрузка кафедры на семестр</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Распределение учебной нагрузки на</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>vesenniy</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>семестр</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>2009/2010</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>учебного года</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>25 кафедра</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Уч. группа</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Семинары</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Лаб. раб</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Пр. зан.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Гр. упр. и зан.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Т(С)З и Т(С)У</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>КШУ</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>ВИ и ВСИ</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Конфер.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Контр. раб.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Консульт.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Войск. ст. и пр.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Курс. раб.(пр.)</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>ВКР</source>
-        <translation></translation>
+        <translation type="obsolete">Отчетность</translation>
     </message>
 </context>
 <context>
     <name>nagruz_kaf_prep_form</name>
-    <message utf8="true">
-        <source>Ф.И.О.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Лекции</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>ПрЗ, СР, КПр, ЛабР</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Звонковая нагрузка</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Вр. на консульт.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Прием экз.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Пров КтрР</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Прием ЛбрР</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Прием КПр</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Обуч. по Ипл</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Экспл/Уч практика</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Войск. стаж.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Дипл. пр., ГАК</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Всего</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Соотнош. 1-м/общ.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Распределение учебной нагрузки среди преподавателей кафедры</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Распеределение учебной нагрузки среди преподавателей кафедры</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>25 кафедра</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>на</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>vesenniy</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>семестр</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>2009/2010</source>
-        <translation type="unfinished">2009/2010</translation>
-    </message>
-    <message utf8="true">
-        <source>учебного года</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">2009/2010</translation>
     </message>
 </context>
 <context>
     <name>nagruz_prep_form</name>
-    <message utf8="true">
-        <source>ФИО преподавателя</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Распределение учебной нагрузки на </source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>2009/2010</source>
-        <translation type="unfinished">2009/2010</translation>
-    </message>
-    <message utf8="true">
-        <source>учебного года</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Уч. группа</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Назв. дисциплины, учебной нагрузки</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Всего</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Лекции</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Зачет</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Лектор</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Распределение учебной нагрузки преподавателя на семестр</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>весенний</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>семестр</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Другие виды занятий</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">2009/2010</translation>
     </message>
 </context>
 <context>
     <name>output_form</name>
-    <message utf8="true">
-        <source>Выходные данные</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Печать</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>1-2</source>
-        <translation type="unfinished">1-2</translation>
+        <translation type="obsolete">1-2</translation>
     </message>
     <message>
         <source>3-4</source>
-        <translation type="unfinished">3-4</translation>
+        <translation type="obsolete">3-4</translation>
     </message>
     <message>
         <source>5-6</source>
-        <translation type="unfinished">5-6</translation>
+        <translation type="obsolete">5-6</translation>
     </message>
     <message>
         <source>7-8</source>
-        <translation type="unfinished">7-8</translation>
-    </message>
-    <message utf8="true">
-        <source>Обозн.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Дисциплина</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Каф.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Др. виды занятий</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Лекции (часы)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Др. зан. (часы)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Отчет</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Поток лекционный</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>ДЗ</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Выдача</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Сдача</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>6. Учебный план и Учебная программа</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Учебная программа</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Дисциплина:</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">7-8</translation>
     </message>
     <message utf8="true">
         <source>Учебный план</source>
-        <translation type="unfinished">Учебный план</translation>
-    </message>
-    <message utf8="true">
-        <source>Формирование учебного плана...</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Учебный план</translation>
     </message>
     <message>
         <source>month</source>
-        <translation type="unfinished">месяц</translation>
+        <translation type="obsolete">месяц</translation>
     </message>
     <message>
         <source>year</source>
-        <translation type="unfinished">год</translation>
-    </message>
-    <message utf8="true">
-        <source>Учебное подразделение</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Факультет</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Год набора</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Номер учебной группы</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>2. Загрузка аудиторий</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Учебная аудитория:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Кафедра</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Аудитория</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Количество академических часов</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Учебный корпус</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>TextLabel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>3. Учебная нагрузка</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Учебная нагрузка кафедры</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Вывод на экран</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Факультет/ОАК</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Преподаватель</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Нагрузка преподавателя</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>ФИО </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>1. Расписание преподавателя</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>4. Доля учёных среди ППС</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Соотношение (%)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Ученых (человек)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Всего (человек)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Академия</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Специальность</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>5. КТП</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>2. Распределение учебной нагрузки среди преподавателей на текущий семестр</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>3. Сводное расписание кафедры на текущий семестр</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>1. Распределение учебной нагрузки кафедры на текущий семестр</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Для cпециальности</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Семестр</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Версия расписания</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Для учебной группы</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Формирование учебной программы...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>1. Расписание учебных занятий и календарный план</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Печать календарного плана</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Печать расписания</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Печать всех расписаний</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>-&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Лектор, Уч. ст., Уч. зв.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Аудитория:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Кол-во часов:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Период:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Печать сводного расписания</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Печать расписания преподавателя</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;span style=&quot; color:#0a03cb;&quot;&gt;  2. Распределение учебной нагрузки на семестр&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Print all ktp&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Распечатать все КТП</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Печать подвала по КТП </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Печать всех загрузок аудиторий</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Версия расписания:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Печать всех сводных расписаний</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Расписание  преподавателей факультета</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">год</translation>
     </message>
 </context>
 <context>
@@ -12871,77 +9864,7 @@ p, li { white-space: pre-wrap; }
     <name>print_form</name>
     <message>
         <source>Error</source>
-        <translation type="unfinished">Ошибка</translation>
-    </message>
-    <message utf8="true">
-        <source>Предпросмотр</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Печать</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Экспорт в PDF</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>qxpdf_mainwindow</name>
-    <message>
-        <source>MainWindow</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;File</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Open</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Ctrl+O</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>E&amp;xit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Ctrl+Q</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>rasp_discipline</name>
-    <message utf8="true">
-        <source>Место и тип занятия</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Название дисциплины</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Уч. корпус</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Аудитория</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Тип занятия</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Номер темы</source>
-        <translation></translation>
-    </message>
-    <message utf8="true">
-        <source>Учебная группа</source>
-        <translation></translation>
+        <translation type="obsolete">Ошибка</translation>
     </message>
 </context>
 <context>
@@ -12997,466 +9920,30 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>stream_form</name>
     <message utf8="true">
-        <source>Формирование потоков</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>   Фильтрация списка потоков </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>    Обучающие    </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Факультет</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Кафедра</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Список потоков</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Обучающие</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Название потока</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Учебные группы</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>id_stream_name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Новый поток</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Редактировать</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Удалить</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Выход</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>  Выбор учебных групп  </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>   Обучающие    </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Семестр</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>    Обучаемые    </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Специальность</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Название дисциплины</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Уч. группа</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Добавить</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Список учебных групп и дисциплин, объединяемых в поток</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>№ учебной группы</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Дисциплина</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>ID_группы</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>ID_семестр</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>ID_дисциплины</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Далее</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Назад</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>  Логика построения потоковых занятий  </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Поток</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Занятие</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Тема</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Группа</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Часы</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Преподаватели</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Аудитории</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>7 id_group</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>8 id_theme</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>9 id_lesson_type</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>10 id_stream</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>11 id_stream_scheme</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>12 id_scheme</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Новое занятие</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Удалить занятие</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Учебная группа</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
         <source>КТП</source>
-        <translation type="unfinished">КТП</translation>
-    </message>
-    <message utf8="true">
-        <source>часы</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>in_stream</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>id_lesson__type</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>id_stream</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>stream_name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>ОК</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Сохранить поток</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>Проверить поток</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>pbTest</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>0 Вид занятия</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>1 Часы</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>2 Преподаватель</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <source>3 Аудитория</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>4 typeLesson</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>5 Lector1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>6 Lector2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>7 Lector3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>8 Auditory1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>9 Auditory2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>10 Auditory3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>11 Auditory4</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>12 Auditory5</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>13 Auditory6</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>14 Auditory7</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>15 Auditory8</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>16 Auditory9</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>17 Auditory10</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>18 id_group</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>19 discipline</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>20 id_scheme</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>21 id_theme</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>22 id_lesson_type</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>23 id_stream</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>24 id_stream_scheme</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>25 stream_name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>TextLabel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>PushButton</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">КТП</translation>
     </message>
 </context>
 <context>
     <name>streamunit</name>
     <message>
         <source>Error</source>
-        <translation type="unfinished">Ошибка</translation>
-    </message>
-    <message>
-        <source>Stream not named!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Group not selected!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Group count not correct!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This group is already added!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Semester NOT compatible with added!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Lesson</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This lesson is already in current stream!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Current lesson in stream </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This group is already in current stream lesson!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Lesson type incompatible!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Hours incompatible!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Errors in stream!</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Ошибка</translation>
     </message>
     <message>
         <source>Information</source>
-        <translation type="unfinished">Информация о документе</translation>
-    </message>
-    <message>
-        <source>Stream is saved!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Check stream started</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>is empty</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Lesson is alone</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Lecturer not compatible</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Auditory not compatible</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Stream OK</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Stream is empty</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Информация о документе</translation>
     </message>
 </context>
 <context>
     <name>svodn_rasp</name>
-    <message utf8="true">
-        <source>Сводное расписание кафедры</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;-</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>month</source>
-        <translation type="unfinished">месяц</translation>
+        <translation type="obsolete">месяц</translation>
     </message>
     <message>
         <source>year</source>
-        <translation type="unfinished">год</translation>
-    </message>
-    <message>
-        <source>-&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">год</translation>
     </message>
 </context>
 <context>
