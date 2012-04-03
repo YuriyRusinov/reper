@@ -1141,7 +1141,8 @@ void KKSMainWindow::slotViewCat()
     m_mdiArea->addSubWindow (ctw);
     QSizePolicy ctwSP (QSizePolicy::Expanding, QSizePolicy::Expanding);
     ctw->setSizePolicy (ctwSP);
-    ctw->showNormal ();}
+    ctw->showNormal ();
+}
 
 void KKSMainWindow::slotViewAttrs()
 {

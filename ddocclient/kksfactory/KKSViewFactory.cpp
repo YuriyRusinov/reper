@@ -264,7 +264,7 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
     KKSMap<int, KKSEIOData *>::const_iterator p;
     int nObjC = objEx.count ();
     qDebug () << __PRETTY_FUNCTION__ << nObjC;
-    objModel->insertRows (0, nObjC);
+    //objModel->insertRows (0, nObjC);
 
     if (pgDial)
     {
@@ -273,16 +273,52 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
     }
 
     int c = 0;
+    QModelIndex wIndex;
+    QModelIndex prevIndex (wIndex);
+    QList<int> pattrs;
+    KKSCategory * cobjCat (0);//= pObj->category()->tableCategory();
+    int idPAttr (-1);
+    if (cat && cat->isAttrTypeContains(KKSAttrType::atParent) )
+        pattrs = cat->searchAttributesByType (KKSAttrType::atParent);
+    else if (pObj && pObj->category() && pObj->category()->tableCategory())
+    {
+        cobjCat = pObj->category()->tableCategory();
+        pattrs = cobjCat->searchAttributesByType (KKSAttrType::atParent);
+    }
+    if (!pattrs.isEmpty())
+        idPAttr = pattrs[0];
     for (p=objEx.constBegin(); p!=objEx.constEnd(); p++)
     {
         QTime time;
         time.start ();
         if (pgDial)
             pgDial->setValue (c);
-        QModelIndex wIndex = objModel->index (i, 0);
+        KKSEIOData * d = p.value();
+        if (idPAttr > 0)
+        {
+            const KKSCategoryAttr * cAttr = cat ? cat->attribute(idPAttr) : cobjCat->attribute (idPAttr);
+            QString attrValue = d->fields().value ((cAttr->code(false)));
+            KKSObjectExemplar * ioc = l->loadEIO(p.key(), pObj);
+            KKSAttrValue * av = ioc ? ioc->attrValue (idPAttr) : 0;
+            int idp = av ? av->value().valueVariant().toInt() : 0;
+            if (idp > 0)
+            {
+                prevIndex = wIndex;
+                while (prevIndex.isValid() && prevIndex.data (Qt::UserRole).toInt() != idp)
+                    prevIndex = prevIndex.parent();
+            }
+            else
+                prevIndex = QModelIndex();
+            //qDebug () << __PRETTY_FUNCTION__ << av->value().valueVariant().toInt() << cAttr->code (false);
+        }
+        int nr = objModel->rowCount(prevIndex);
+        objModel->insertRows (nr, 1, prevIndex);
+        if (objModel->columnCount (prevIndex) == 0)
+            objModel->insertColumns (0, ncols, prevIndex);
+        wIndex = objModel->index (nr, 0, prevIndex);
+
         //QVariant bkColVal = QVariant ();
         objModel->setData (wIndex, p.key(), Qt::UserRole);
-        KKSEIOData * d = p.value();
 
         const KKSCategory * cat = t->category();
         QVariant bkColVal = drawViewCells (cat, d, KKSAttrType::atRecordColor, l, objModel, wIndex);
@@ -329,7 +365,7 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
                     attrValue = attrValue.mid (0, attrValue.indexOf("\n")) + "...";
             }
 
-            QModelIndex wcIndex = objModel->index (i, ii);
+            QModelIndex wcIndex = objModel->index (wIndex.row(), ii, prevIndex);
             objModel->setData (wcIndex, attrValue, Qt::DisplayRole);
             if (bkColVal.isValid ())
                 objModel->setData (wcIndex, bkColVal, Qt::BackgroundRole);
@@ -530,14 +566,45 @@ void KKSViewFactory :: loadEIOEx (QWidget *editor,
     }
     int ncols = 1;
     int counter = 0;
+    QModelIndex wIndex;
+    QModelIndex prevIndex (wIndex);
+    QList<int> pattrs;
+    KKSCategory * cobjCat (0);//= pObj->category()->tableCategory();
+    int idPAttr (-1);
+    if (pObj && pObj->category() && pObj->category()->tableCategory())
+    {
+        cobjCat = pObj->category()->tableCategory();
+        pattrs = cobjCat->searchAttributesByType (KKSAttrType::atParent);
+    }
+    if (!pattrs.isEmpty())
+        idPAttr = pattrs[0];
     for (p=objEx.constBegin(); p!=objEx.constEnd(); p++)
     {
         if (pgDial)
             pgDial->setValue (counter);
-        objModel->insertRows (i, 1);
-        QModelIndex wIndex = objModel->index (i, 0);
-        objModel->setData (wIndex, p.key(), Qt::UserRole);
         KKSEIOData * d = p.value();
+        if (idPAttr > 0)
+        {
+            const KKSCategoryAttr * cAttr = cobjCat->attribute (idPAttr);
+            QString attrValue = d->fields().value ((cAttr->code(false)));
+            KKSObjectExemplar * ioc = l->loadEIO(p.key(), pObj);
+            KKSAttrValue * av = ioc ? ioc->attrValue (idPAttr) : 0;
+            int idp = av ? av->value().valueVariant().toInt() : 0;
+            if (idp > 0)
+            {
+                prevIndex = wIndex;
+                while (prevIndex.isValid() && prevIndex.data (Qt::UserRole).toInt() != idp)
+                    prevIndex = prevIndex.parent();
+            }
+            else
+                prevIndex = QModelIndex();
+            //qDebug () << __PRETTY_FUNCTION__ << av->value().valueVariant().toInt() << cAttr->code (false);
+        }
+        int nr = objModel->rowCount(prevIndex);
+        objModel->insertRows (nr, 1, prevIndex);
+        if (objModel->columnCount (prevIndex) == 0)
+            objModel->insertColumns (0, ncols, prevIndex);
+        wIndex = objModel->index (nr, 0, prevIndex);
 
         const KKSCategory * cat = t->category();
         QVariant bkColVal = drawViewCells (cat, d, KKSAttrType::atRecordColor, l, objModel, wIndex);
@@ -584,7 +651,7 @@ void KKSViewFactory :: loadEIOEx (QWidget *editor,
                     ncols++;
                 }
             }
-            QModelIndex wcIndex = objModel->index (i, ii);
+            QModelIndex wcIndex = objModel->index (wIndex.row(), ii, prevIndex);
             if (bkColVal.isValid ())
                 objModel->setData (wcIndex, bkColVal, Qt::BackgroundRole);
             if (fgColVal.isValid ())
@@ -1233,6 +1300,7 @@ void KKSViewFactory :: filterAttributesModel (KKSLoader *l, const KKSList<const 
 
 void KKSViewFactory :: parseAttrGroup (KKSLoader *l, const KKSAGroup* aGroup, const KKSList<const KKSFilterGroup *> & filters, QAbstractItemModel * aModel, const QModelIndex& parent)
 {
+    Q_UNUSED (filters);
     if (!l || !aGroup || !aModel)
         return;
 
