@@ -1,5 +1,5 @@
 /*select f_safe_drop_type('h_get_category_attrs');
-create type h_get_category_attrs as(id_attribute int4, 
+create type h_get_attribute as(     id_attribute int4, 
                                     id_attr_type int4,
                                     attr_code varchar,
                                     attr_name varchar,
@@ -18,13 +18,15 @@ create type h_get_category_attrs as(id_attribute int4,
                                     unique_id varchar,
                                     id_search_template int4,
                                     ref_column_name varchar,
-                                    id_ex);
+                                    attr_group_id int4,
+                                    attr_group_name varchar,
+                                    id_ex int4);//id либо из таблицы attrs_attrs либо category_attrs (в зависимости от вызываемой функции)
 */
 
-create or replace function cGetCategoryAttrs(int4) returns setof h_get_attribute as
+create or replace function aGetAttrAttrs(int4) returns setof h_get_attribute as
 $BODY$
 declare
-    idCategory alias for $1;
+    idAttr alias for $1;
     r h_get_attribute%rowtype;
     rr RECORD;
 begin
@@ -41,9 +43,9 @@ begin
             a.def_width, 
             att.name, 
             att.code, 
-            ca.def_value, 
-            ca.is_mandatory, 
-            ca.is_read_only,
+            aa.def_value, 
+            aa.is_mandatory, 
+            aa.is_read_only,
             a.id_ref_attr_type as ref_attr_type_id, --(case when a.column_name isnull then NULL else (select a1.id_a_type from attributes a1 where a1.code = a.column_name) end) as ref_attr_type 
             NULL as ref_attr_type_name,
             NULL as ref_attr_type_code,
@@ -52,80 +54,17 @@ begin
             a.ref_column_name,
             a.id_attr_group,
             ag.name,
-            ca.id
+            aa.id
         from  
-            attrs_categories ca,
+            attrs_attrs aa,
             attributes a,
             a_types att,
             attrs_groups ag
         where 
-	    ca.id_io_category = idCategory
-	    and ca.id_io_attribute = a.id 
+	    aa.id_attr_parent = idAttr
+	    and aa.id_attr_child = a.id 
 	    and a.id_a_type = att.id
             and a.id_attr_group = ag.id
-    loop
-        if(r.column_name is not null) then
-            for rr in 
-                select * from atGetAttrType(r.ref_attr_type_id)
-            loop
-                --r.ref_attr_type_id = rr.id;
-                r.ref_attr_type_name = rr.name;
-                r.ref_attr_type_code = rr.code;
-            end loop;  
-        end if;
-        
-        return next r;
-    end loop;
-    
-    return;
-end
-$BODY$
-language 'plpgsql';
-
-create or replace function cGetSystemAttrs () returns setof h_get_attribute as
-$BODY$
-declare
-    r h_get_attribute%rowtype;
-    rr RECORD;
-    idCategory int4;
-begin
-
-    select into idCategory c.id_child from io_categories c inner join f_sel_io_objects(7) io on (c.id=io.id_io_category and io.id=7);
-
-    for r in 
-        select 
-            a.id, 
-            att.id, 
-            a.code, 
-            a.name, 
-            a.title, 
-            a.table_name, 
-            a.column_name, 
-            a.def_width, 
-            att.name, 
-            att.code, 
-            ca.def_value, 
-            ca.is_mandatory, 
-            ca.is_read_only,
-            a.id_ref_attr_type as ref_attr_type_id, --(case when a.column_name isnull then NULL else (select a1.id_a_type from attributes a1 where a1.code = a.column_name) end) as ref_attr_type 
-            NULL as ref_attr_type_name,
-            NULL as ref_attr_type_code,
-            a.unique_id,
-            a.id_search_template,
-            a.ref_column_name,
-            a.id_attr_group,
-            ag.name,
-            ca.id
-        from  
-            attrs_categories ca,
-            attributes a,
-            a_types att ,
-            attrs_groups ag
-        where 
-	    ca.id_io_category = idCategory
-	    and ca.id_io_attribute = a.id 
-	    and a.id_a_type = att.id
-            and ag.id = a.id_attr_group
     loop
         if(r.column_name is not null) then
             for rr in 

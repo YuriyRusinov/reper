@@ -637,6 +637,13 @@ insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main
 insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
 values(188, -10, true, true, false, false, true);
 
+insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values ('localorg-categories-189', 189, 10, NULL, false, 'Атрибуты в атрибутах', 'SYSCATEGORY_189', NULL::varchar, true, true, 1);
+insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
+values(189, -10, true, true, false, false, true);
+insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values ('localorg-categories-190', 190, 8, 189, true, 'Справочник атрибутов в атрибутах', 'SYSCATEGORY_190', NULL::varchar, true, true, 1);
+insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
+values(190, -10, true, true, false, false, true);
+
 SELECT pg_catalog.setval('io_categories_id_seq', 300, true); --все пользовательские категории будут начинаться с номера 301
                                                              --это сделано для того, чтобы оставить резерв для системных категорий 
 
@@ -1182,6 +1189,11 @@ insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (
 insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (188, 1, 2);
 insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (188, 2, 1);
 
+insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (189, 1, 2);
+insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (189, 2, 1);
+
+insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (190, 1, 2);
+insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (190, 2, 1);
 
 --атрибуты "дочерних категорий"
 --ВАЖНО!!! Для атрибутов ссылочных здесь не устанавливается тип атрибута, на который они ссылаются. Это делается отдельной операцией в конце данного скрипта
@@ -1559,6 +1571,8 @@ insert into attributes (unique_id, id, id_a_type, code, name, title, table_name,
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-305', 305, 1, 'is_read_only', 'Значение атрибута не редактируемо', 'Значение атрибута не редактируемо', NULL, NULL, 150, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-306', 306, 2, 'id_attr_parent', 'Описываемый атрибут', 'Описываемый атрибут', 'attributes', 'name', 150, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-307', 307, 2, 'id_attr_child', 'Описывающий атрибут', 'Описывающий атрибут', 'attributes', 'name', 150, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-308', 308, 2, 'id_attr_attr', 'Атрибут', 'Атрибут', 'attrs_attrs', 'name', 150, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-309', 309, 2, 'id_attr_value', 'Значение атрибута', 'Значение атрибута', 'attrs_values', 'value', 150, TRUE);
 
 
 SELECT pg_catalog.setval('attributes_id_seq', 1000, true); --все пользовательские атрибуты будут начинаться с номера 1001
@@ -2489,13 +2503,19 @@ insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (518, 185, 305, 'false', true, false); --is_read_only
 
 --таблица значений атрибутов в атрибутах
-insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (519, 187, 1, NULL, true, true); --id
-insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (520, 187, 306, NULL, true, false); --id_attr_parent
-insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (521, 187, 307, NULL, true, false); --id_attr_child
-insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (522, 187, 301, NULL, true, false); --value
-insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (523, 187, 304, NULL, false, false); --def_value
-insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (524, 187, 128, 'false', true, false); --is_mandatory
-insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (525, 187, 305, 'false', true, false); --is_read_only
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (526, 187, 1, NULL, true, true); --id
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (527, 187, 309, NULL, true, false); --id_attr_value
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (528, 187, 308, NULL, true, false); --id_attr_attr
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (529, 187, 301, NULL, true, false); --value
+
+--таблица атрибутов в атрибутах
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (519, 189, 1, NULL, true, true); --id
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (520, 189, 306, NULL, true, false); --id_attr_parent
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (521, 189, 307, NULL, true, false); --id_attr_child
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (522, 189, 2, NULL, false, false); --name
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (523, 189, 304, NULL, false, false); --def_value
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (524, 189, 128, 'false', true, false); --is_mandatory
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (525, 189, 305, 'false', true, false); --is_read_only
 
 
 
@@ -2957,6 +2977,11 @@ insert into tbl_io_objects (unique_id, id, id_io_category, author, id_io_state, 
 values ('localorg-io_objects-91', 91, 188, 1, 1, 'Справочник значений атрибутов в атрибутах', 'attrs_attrs_values', NULL, 'Системный объект', true, true, 5, current_timestamp, 1, NULL, 3);
 insert into access_table (id_io_object, id_role, allow_readlist, allow_read, allow_delete, allow_update)
 values (91, -10, TRUE, TRUE, FALSE, FALSE);
+
+insert into tbl_io_objects (unique_id, id, id_io_category, author, id_io_state, name, table_name, description, information, is_system, is_global, id_sync_type, insert_time, id_maclabel, id_owner_org, id_io_type)
+values ('localorg-io_objects-92', 92, 190, 1, 1, 'Справочник атрибутов в атрибутах', 'attrs_attrs', NULL, 'Системный объект', true, true, 5, current_timestamp, 1, NULL, 3);
+insert into access_table (id_io_object, id_role, allow_readlist, allow_read, allow_delete, allow_update)
+values (92, -10, TRUE, TRUE, FALSE, FALSE);
 
 SELECT pg_catalog.setval('tbl_io_objects_id_seq', 300, true); --все пользовательские информационные объекты будут начинаться с номера 301
                                                           --это сделано для того, чтобы оставить резерв для системных ИО

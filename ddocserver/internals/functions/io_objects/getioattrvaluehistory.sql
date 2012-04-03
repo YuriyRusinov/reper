@@ -79,7 +79,7 @@ begin
             (f_sel_attrs_values(idObject) av inner join attrs_categories ac on (av.id_attr_category = ac.id) inner join attributes a on (ac.id_io_attribute=a.id and av.id_io_object = idObject))
         where 
             av.start_time >= iStartTime 
-            and av.stop_time <= iStopTime
+            and (av.stop_time isnull or av.stop_time <= iStopTime)
             and av.id_attr_category = idAttrCategory
     loop
         return next r;

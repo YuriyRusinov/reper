@@ -20,7 +20,8 @@ create type h_get_attribute as(     id_attribute int4,
                                     id_search_template int4,
                                     ref_column_name varchar,
                                     attr_group_id int4,
-                                    attr_group_name varchar);
+                                    attr_group_name varchar,
+                                    id_ex int4);--id либо из таблицы attrs_attrs либо category_attrs (в зависимости от вызываемой функции)
 
 create or replace function aGetAttribute(int4) returns setof h_get_attribute as
 $BODY$
@@ -52,7 +53,8 @@ begin
             a.id_search_template,
             a.ref_column_name,
             a.id_attr_group,
-            ag.name
+            ag.name,
+            NULL
         from  
             attributes a,
             a_types att,
@@ -110,8 +112,8 @@ begin
             a.id_search_template,
             a.ref_column_name,
             a.id_attr_group,
-            ag.name
-
+            ag.name,
+            NULL
         from  
             attributes a,
             a_types att,
@@ -171,7 +173,8 @@ begin
             a.id_search_template,
             a.ref_column_name,
             a.id_attr_group,
-            ag.name
+            ag.name,
+            NULL
 
         from  
             attributes a,

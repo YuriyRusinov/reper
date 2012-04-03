@@ -67,7 +67,8 @@ begin
             a.id_search_template,
             a.ref_column_name,
             a.id_attr_group,
-            ag.name
+            ag.name,
+            NULL
         from  
             attributes a left join a_types att_ref on (att_ref.id = a.id_ref_attr_type)
             inner join a_types att on (a.id_a_type = att.id)

@@ -8,22 +8,27 @@ declare
     isReadOnly alias for $5;
 
     cnt int4;
+    idCategoryAttr int4;
 begin
 
-    select count(*) into cnt from attrs_categories where id_io_category = idCategory and id_io_attribute = idAttr;
-    if(cnt > 0) then
-        return 1;
+    select id into idCategoryAttr from attrs_categories where id_io_category = idCategory and id_io_attribute = idAttr;
+    if(idCategoryAttr is not null) then
+        update attrs_categories set def_value = defValue, is_mandatory = isMandatory, is_read_only = isReadOnly where id_io_category = idCategory and id_io_attribute = idAttr;
+        return idCategoryAttr;
     end if;
 
-    insert into attrs_categories (id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only)
-    values(idCategory, idAttr, defValue, isMandatory, isReadOnly);
+    idCategoryAttr := getNextSeq('attrs_categories', 'id');
+
+    insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only)
+    values(idCategoryAttr, idCategory, idAttr, defValue, isMandatory, isReadOnly);
 
     if(FOUND = FALSE) then
         return -1;
     end if;
     
-    return 1;
+    return idCategoryAttr;
 
 end
 $BODY$
 language 'plpgsql';
+

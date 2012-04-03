@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     28.03.2012 16:20:06                          */
+/* Created on:     03.04.2012 9:41:11                           */
 /*==============================================================*/
 
 
@@ -494,41 +494,42 @@ select setMacToNULL('attributes');
 select createTriggerUID('attributes');
 
 /*==============================================================*/
-/* Table: attrs_attrs_values                                    */
+/* Table: attrs_attrs                                           */
 /*==============================================================*/
-create table attrs_attrs_values (
+create table attrs_attrs (
    id                   SERIAL               not null,
    id_attr_parent       INT4                 null,
    id_attr_child        INT4                 null,
-   value                VARCHAR              null,
+   name                 VARCHAR              null,
    def_value            VARCHAR              null,
    is_mandatory         BOOL                 null,
    is_read_only         BOOL                 null,
-   constraint PK_ATTRS_ATTRS_VALUES primary key (id)
+   constraint PK_ATTRS_ATTRS primary key (id)
 )
 inherits (root_table);
 
-comment on table attrs_attrs_values is
+comment on table attrs_attrs is
 'Таблица описывает взаимосвязи атрибутов.
 Атрибут может описываться набором других атрибутов, которым могут быть присвоены значения.
 И так далее вниз по иерархии.
 Иными словами, атрибут может напоминать категорию, но ТОЛЬКО в смысле возможности описания дополнительных характеристик для значения атрибута (ибо как мы помним категория это не только набор атрибутов, но и много чего другого).
-Данная возможность описывает принцип вложенности атрибутов';
+Данная возможность описывает принцип вложенности атрибутов.
+Поле name описывает название описывающего атрибута.';
 
-select setMacToNULL('attrs_attrs_values');
-select createTriggerUID('attrs_attrs_values');
+select setMacToNULL('attrs_attrs');
+select createTriggerUID('attrs_attrs');
 
 /*==============================================================*/
 /* Index: i_aav_parent                                          */
 /*==============================================================*/
-create  index i_aav_parent on attrs_attrs_values (
+create  index i_aav_parent on attrs_attrs (
 id_attr_parent
 );
 
 /*==============================================================*/
 /* Index: i_aav_parent_child                                    */
 /*==============================================================*/
-create unique index i_aav_parent_child on attrs_attrs_values (
+create unique index i_aav_parent_child on attrs_attrs (
 id_attr_parent,
 id_attr_child
 );
@@ -3613,12 +3614,12 @@ alter table attributes
       references a_types (id)
       on delete restrict on update restrict;
 
-alter table attrs_attrs_values
+alter table attrs_attrs
    add constraint FK_ATTRS_ATTRS_PARENT foreign key (id_attr_parent)
       references attributes (id)
       on delete restrict on update restrict;
 
-alter table attrs_attrs_values
+alter table attrs_attrs
    add constraint FK_ATTRS_ATTRS_CHILD foreign key (id_attr_child)
       references attributes (id)
       on delete restrict on update restrict;
