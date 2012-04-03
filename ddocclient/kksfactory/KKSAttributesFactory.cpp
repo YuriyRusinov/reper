@@ -52,7 +52,7 @@
 #include <KKSRecWidget.h>
 #include <KKSCatAttrsModel.h>
 #include <KKSItemDelegate.h>
-#include <KKSAttrAttrEditor.h>
+#include <kksattrattreditor.h>
 
 #include <KKSFilter.h>
 #include <KKSObject.h>

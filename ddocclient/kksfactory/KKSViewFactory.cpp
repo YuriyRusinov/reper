@@ -701,7 +701,41 @@ void KKSViewFactory :: updateEIOEx (KKSLoader *l,
         return;
 
     qDebug () << __PRETTY_FUNCTION__ << sourceModel->rowCount () << sourceModel->columnCount ();
-    QModelIndex wIndex = sourceModel->index (row, 0);
+    KKSCategory * cobjCat (0);//= pObj->category()->tableCategory();
+    int idPAttr (-1);
+    QList<int> pattrs;
+    if (cat && cat->isAttrTypeContains(KKSAttrType::atParent) )
+        pattrs = cat->searchAttributesByType (KKSAttrType::atParent);
+    else if (pObj && pObj->category() && pObj->category()->tableCategory())
+    {
+        cobjCat = pObj->category()->tableCategory();
+        pattrs = cobjCat->searchAttributesByType (KKSAttrType::atParent);
+    }
+    if (!pattrs.isEmpty())
+        idPAttr = pattrs[0];
+    QModelIndex wIndex;
+    if (idPAttr < 0)
+        wIndex = sourceModel->index (row, 0);
+    else
+    {
+        KKSObjectExemplar * ioc = l->loadEIO(idObjEx, pObj);
+        KKSAttrValue * av = ioc ? ioc->attrValue (idPAttr) : 0;
+        int idp = av ? av->value().valueVariant().toInt() : 0;
+        if (idp > 0)
+        {
+            QModelIndex cIndex = searchModelIndex (sourceModel, idObjEx, QModelIndex(), Qt::UserRole);
+            int ir = cIndex.row();
+            QModelIndex pIndex = searchModelIndex (sourceModel, idp, QModelIndex(), Qt::UserRole);
+            sourceModel->removeRows (ir, 1, cIndex.parent());
+            int nr = sourceModel->rowCount(pIndex);
+            sourceModel->insertRows (nr, 1, pIndex);
+            if (sourceModel->columnCount (pIndex) == 0)
+                sourceModel->insertColumns (0, sourceModel->columnCount(), pIndex);
+            wIndex = sourceModel->index (nr, 0, pIndex);
+        }
+        else
+            wIndex = sourceModel->index (row, 0);
+    }
     if (!wIndex.isValid())
         return;
    
@@ -737,7 +771,7 @@ void KKSViewFactory :: updateEIOEx (KKSLoader *l,
 			&& attrs_list[i]->type()->attrType () != KKSAttrType::atRecordTextColor 
 			&& attrs_list[i]->type()->attrType () != KKSAttrType::atRecordTextColorRef)
         {
-            QModelIndex cIndex = sourceModel->index (row, ii);
+            QModelIndex cIndex = wIndex.sibling (wIndex.row(), ii);//sourceModel->index (row, ii);
             KKSAttrView * v = attrs_list [i];
             QString attrCode = v->code ();
 
@@ -1788,4 +1822,33 @@ KKSRecWidget * KKSViewFactory :: createAdditionalView (KKSTemplate *t,
 
     loadEIOEx (objEditor, 0, l, t, tv, filters, true, cat, tableName);
     return resWidget;
+}
+
+/* Метод осуществляет поиск целочисленных данных iData внутри модели sourceMod, начиная с родительского индекса parent в роли role.
+ */
+QModelIndex KKSViewFactory :: searchModelIndex (QAbstractItemModel * sourceMod, int iData, const QModelIndex& parent, int role)
+{
+    if (!sourceMod)
+        return QModelIndex ();
+
+    QModelIndex pIndex = parent;
+    int nr = sourceMod->rowCount (pIndex);
+    int nc = sourceMod->columnCount (pIndex);
+    
+    for (int i=0; i<nr; i++)
+        for (int j=0; j<nc; j++)
+        {
+            QModelIndex wIndex = sourceMod->index (i, j, pIndex);
+            if (wIndex.data (role).toInt() == iData)
+                return wIndex;
+            else if (sourceMod->rowCount (wIndex) > 0)
+            {
+                QModelIndex childIndex = searchModelIndex (sourceMod, iData, wIndex, role);
+                if (childIndex.isValid())
+                    return childIndex;
+            }
+            else
+                continue;
+        }
+    return QModelIndex();
 }
