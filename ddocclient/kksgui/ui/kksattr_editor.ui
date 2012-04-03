@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>267</width>
-    <height>377</height>
+    <width>434</width>
+    <height>367</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -258,6 +258,13 @@
    <item row="8" column="0" colspan="3">
     <layout class="QHBoxLayout">
      <item>
+      <widget class="QPushButton" name="pbAddAttrs">
+       <property name="text">
+        <string>Add extended attributes</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -274,6 +281,9 @@
       <widget class="QPushButton" name="pbOK">
        <property name="text">
         <string>&amp;OK</string>
+       </property>
+       <property name="default">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

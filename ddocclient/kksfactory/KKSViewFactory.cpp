@@ -1059,6 +1059,46 @@ KKSRecWidget * KKSViewFactory :: createCategAttrsView (const KKSCategory *cat,
     return recWidget;
 }
 
+/* Метод осуществляет загрузку записей атрибутов атрибута.
+ * Параметры:
+ * a -- атрибут
+ * parent -- родительский виджет
+ * f -- флаги визуального отображения
+ * Результат:
+ * виджет с атрибутами
+ */
+KKSRecWidget * KKSViewFactory :: createAttrAttrsView (const KKSAttribute *a,
+                                                    QWidget *parent,
+                                                    Qt::WindowFlags f)
+{
+    if (!a)
+        return 0;
+    
+    QTreeView *tv = new QTreeView ();
+    KKSRecWidget * recWidget = new KKSRecWidget (tv, false, parent, f);
+
+    recWidget->hideGroup (0);//gbSearch->setVisible (false);
+    recWidget->hideGroup (2);//tbSetView->setVisible (false);
+    recWidget->hideGroup (3);//gbImportExport->setVisible (false);
+    
+    QStandardItemModel * acModel = new KKSCatAttrsModel (0, 4);//QStandardItemModel (0, 4);
+    acModel->setHeaderData (0, Qt::Horizontal, QObject::tr ("Name"));
+    acModel->setHeaderData (1, Qt::Horizontal, QObject::tr ("Default value"));
+    acModel->setHeaderData (2, Qt::Horizontal, QObject::tr ("Mandatory"));
+    acModel->setHeaderData (3, Qt::Horizontal, QObject::tr ("Read only"));
+    
+    updateAttrAttrsModel (a, acModel);
+    
+    tv->setModel (acModel);
+    tv->setDragEnabled (true);
+    tv->setAcceptDrops (true);
+    tv->setDropIndicatorShown (true);
+    KKSItemDelegate *itemDeleg = new KKSItemDelegate (recWidget);
+    tv->setItemDelegate (itemDeleg);
+
+    return recWidget;
+}
+
 /* Метод осуществляет обновление модели атрибутов.
  * Параметры:
  * cat --категория
@@ -1103,6 +1143,63 @@ void KKSViewFactory :: updateAttrModel (const KKSCategory *cat, QAbstractItemMod
         wIndex = model->index (i, 3);
         model->setData (wIndex, (p.value()->isReadOnly() ? QObject::tr("Yes") : QObject::tr("No")), Qt::DisplayRole);
         p.value()->release ();
+        i++;
+    }
+}
+
+/* Метод осуществляет обновление модели атрибутов в атрибуте.
+ * Параметры:
+ * a --атрибут
+ * model -- целевая модель.
+ */
+void KKSViewFactory :: updateAttrAttrsModel (const KKSAttribute *a, QAbstractItemModel *model)
+{
+    if (!a || !model)
+        return;
+    
+    int n=model->rowCount ();
+    KKSMap<int, KKSAttrAttr *> attrs = a->attrsAttrs();
+    
+    int nCol = model->columnCount ();
+    if (nCol < 4)
+        return;
+    
+    bool isOk = true;
+    if (n < attrs.size())
+        isOk = model->insertRows (n, attrs.size()-n);
+    else if (n > attrs.size())
+        isOk = model->removeRows (attrs.size(), n-attrs.size());
+
+    if (!isOk)
+        return;
+
+    int i=0;
+    KKSMap<int, KKSAttrAttr*>::const_iterator p;
+    for (p=attrs.constBegin(); p != attrs.constEnd(); p++)
+    {
+        QModelIndex wIndex = model->index (i, 0);
+        if (!wIndex.isValid())
+            continue;
+        model->setData (wIndex, p.key(), Qt::UserRole);
+        if (!p.value())
+            continue;
+
+        p.value()->addRef ();
+        
+        QString ctitle (p.value()->title());
+        model->setData (wIndex, ctitle, Qt::DisplayRole);
+
+        wIndex = model->index (i, 1);
+        model->setData (wIndex, p.value()->defValue().valueVariant(), Qt::DisplayRole);
+
+        wIndex = model->index (i, 2);
+        model->setData (wIndex, (p.value()->isMandatory() ? QObject::tr("Yes") : QObject::tr("No")), Qt::DisplayRole);
+
+        wIndex = model->index (i, 3);
+        model->setData (wIndex, (p.value()->isReadOnly() ? QObject::tr("Yes") : QObject::tr("No")), Qt::DisplayRole);
+        
+        p.value()->release ();
+        
         i++;
     }
 }
@@ -1382,7 +1479,7 @@ void KKSViewFactory :: parseAttrGroup (KKSLoader *l, const KKSAGroup* aGroup, co
     io->release ();
 }
 
-/* Метод осуществляет зугрузку атрибутов в виджет.
+/* Метод осуществляет зугрузку атрибутов в виджет. Используется для случая с пользовательскими шаблонами отображения
  * Параметры:
  * avAttrs -- списк возможный атрибутов
  * parent -- родительский виджет
@@ -1395,6 +1492,7 @@ KKSAttributesEditor * KKSViewFactory :: createAvailAttrView (const KKSMap<int, K
                                                              Qt::WindowFlags f)
 {
     KKSAttributesEditor *aEditor = new KKSAttributesEditor ( parent, f);
+
     QTreeView *tvAttrs = new QTreeView ();
     KKSRecWidget *recW = new KKSRecWidget (tvAttrs, true, aEditor);
     aEditor->setRecordsWidget (recW);

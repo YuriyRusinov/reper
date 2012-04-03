@@ -302,6 +302,7 @@ KKSMap<int, KKSCategoryAttr *> KKSLoader::loadCategoryAttrs(int idCategory) cons
     for(int row=0; row<count; row++){
         //параметры самого атрибута
         KKSCategoryAttr * attr = new KKSCategoryAttr();
+        attr->setIdCategoryAttr(res->getCellAsInt(row, 21));
         attr->setId(res->getCellAsInt(row, 0));
         attr->setCode(res->getCellAsString(row, 2));
         attr->setName(res->getCellAsString(row, 3));
@@ -1556,6 +1557,7 @@ KKSMap<int, KKSAttrGroup *> KKSLoader::loadTemplateAttrsGroups(int idTemplate) c
             //
             KKSAttrView * attr = new KKSAttrView( );
 
+            attr->setIdViewAttr(res->getCellAsInt(row, 22));
             attr->setId (id);
             attr->setCode (res->getCellAsString(row, 3));
             attr->setName (res->getCellAsString(row, 4));
@@ -3389,26 +3391,6 @@ bool KKSLoader::getPrivilege(int idRole, int idObject, int whatPrivilege, bool w
     return ok;
 }
 
-
-
-#ifdef Q_WS_WIN
-//for web
-
-std::string KKSLoader::getDlName_w() const
-{
-	std::string s;
-	s = getDlName().toUtf8();
-	return s;
-}
-
-std::string KKSLoader::getUserName_w() const
-{
-	std::string s;
-	s = getUserName().toUtf8();
-	return s;
-}
-#endif
-
 KKSList<KKSSearchTemplate *> KKSLoader::loadSearchTemplates (void) const
 {
     KKSList<KKSSearchTemplate *> stList;
@@ -4808,4 +4790,143 @@ KKSList<KKSAttrValue *> KKSLoader::loadIOAttrValueHistory(const KKSAttrValue * a
     
     return avList;
 
+}
+
+void KKSLoader::loadAttrAttrs(KKSAttribute * a) const
+{
+    if(!a || a->id() <= 0)
+        return;
+
+    KKSMap<int, KKSAttrAttr *> aaList = loadAttrAttrs(a->id());
+    
+    a->setAttrsAttrs(aaList);
+    
+    return;
+}
+
+KKSMap<int, KKSAttrAttr*> KKSLoader::loadAttrAttrs(int idAttr) const
+{
+    KKSMap<int, KKSAttrAttr *> aaList;
+
+    if(idAttr <= 0)
+        return aaList;
+
+    QString sql = QString("select * from aGetAttrAttrs(%1)").arg(idAttr);
+    KKSResult * res = db->execute (sql);
+    int cnt = 0;
+    if (!res || (cnt = res->getRowCount()) <= 0)
+    {
+        if (res)
+            delete res;
+        return aaList;
+    }
+
+    for(int row=0; row<cnt; row++){
+        KKSAttrAttr * attr = new KKSAttrAttr();
+        int idAttrAttr = res->getCellAsInt(row, 21);
+        
+/**/
+        attr->setId(res->getCellAsInt(row, 0));
+        attr->setCode(res->getCellAsString(row, 2));
+        attr->setName(res->getCellAsString(row, 3));
+        attr->setTitle(res->getCellAsString(row, 4));
+        attr->setTableName(res->getCellAsString(row, 5));
+        attr->setColumnName(res->getCellAsString(row, 6));
+        attr->setDefWidth(res->getCellAsInt(row, 7));
+
+        attr->setIdAttrAttr(idAttrAttr);
+        attr->setIdParentAttr(idAttr);
+        
+        //тип атрибута
+        KKSAttrType * type = new KKSAttrType();
+        type->setId(res->getCellAsInt(row, 1));
+        type->setName(res->getCellAsString(row, 8));
+        type->setCode(res->getCellAsString(row, 9));
+
+        if(!attr->columnName().isEmpty()){
+            KKSAttrType * refType = new KKSAttrType();
+            int idRefType = res->getCellAsInt(row, 13);
+            if (idRefType != KKSAttrType::atList)//это когда атрибут является ссылкой на некоторое обычное значение
+            {
+                refType->setId (idRefType);
+                refType->setName(res->getCellAsString(row, 14));
+                refType->setCode(res->getCellAsString(row, 15));
+            }
+            else//это когда атрибут является ссылкой на атрибут типа ссылка (ссылка на ссылку)
+            {
+                bool isLow = false;
+                QString aRefCode = attr->columnName();
+                while (!isLow)
+                {
+                    KKSAttribute * refAttr = loadAttribute (aRefCode, attr->tableName());
+                    if (!refAttr)
+                        break;
+                    aRefCode = refAttr->code ();
+                    isLow = (refAttr->refType()->id() != KKSAttrType::atList);
+                    if (isLow)
+                    {
+                        //qDebug () << __PRETTY_FUNCTION__ << isLow << refAttr->refType()->id();
+                        refType->setId (refAttr->refType()->id());
+                        refType->setName (refAttr->refType()->name());
+                        refType->setCode (refAttr->refType()->code());
+                    }
+                    refAttr->release ();
+                }
+            }
+
+            attr->setRefType(refType);
+            refType->release();
+        }
+
+
+        attr->setType(type);
+        type->release();
+
+        //параметры атрибута в категории
+        //дефолтное значение
+        KKSValue defValue = constructValue(res->getCellAsString(row, 10), attr);
+        if(!defValue.isValid())
+            qWarning("defValue for attribute is NOT valid! defValue = %s, idAttrAttr = %d", 
+                        res->getCellAsString(row, 10).toLocal8Bit().data(), 
+                        idAttrAttr);
+
+        attr->setDefValue(defValue);
+
+        //обязательный атрибут
+        attr->setMandatory(res->getCellAsBool(row, 11));
+        //только для чтения атрибут
+        attr->setReadOnly(res->getCellAsBool(row, 12));
+
+        //поисковый запрос
+        if(res->isEmpty(row, 17))
+            attr->setSearchTemplate(NULL);
+        else{
+            KKSSearchTemplate * st = this->loadSearchTemplate(res->getCellAsInt(row, 17));
+            if(st){
+                attr->setSearchTemplate(st);
+                st->release();
+            }
+        }
+
+        //название ссылочной колонки
+        if(!res->isEmpty(row, 18)){
+            attr->setRefColumnName(res->getCellAsString(row, 18));
+            attr->setRefColumnType(type);
+        }
+
+        //группа атрибута
+        int idGroup = res->getCellAsInt(row, 19);
+        QString groupName = res->getCellAsString(row, 20);
+        KKSAGroup * g = new KKSAGroup(idGroup, groupName);
+        attr->setGroup(g);
+        g->release();
+/**/
+        aaList.insert(idAttrAttr, attr);
+        attr->release();
+
+    }
+    
+    delete res;
+
+    return aaList;
 }

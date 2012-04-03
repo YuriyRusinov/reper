@@ -1241,10 +1241,11 @@ int KKSPPFactory::insertAttrView(int idCategory, int idTemplate, int idGroup, KK
     if(!inTransaction())
         db->begin();
 
+    int idCategoryAttr = av->idCategoryAttr();
     int idAttr = av->id();
 
     //атрибут не сохранен в БД
-    if(idAttr <= 0){
+    if(idAttr <= 0 || idCategoryAttr <= 0){
         int ok = insertCategoryAttr(idCategory, av);
         if(ok != OK_CODE){
             if(!inTransaction())
@@ -1259,23 +1260,36 @@ int KKSPPFactory::insertAttrView(int idCategory, int idTemplate, int idGroup, KK
     bool isReadOnly = av->isReadOnly();
     int order = av->order();
 
-    QString sql = QString("insert into io_views (id_io_category, id_io_attribute, id_io_template, "
-                          "id_a_group, is_read_only, \"order\", def_value) "
-                          " values(%1, %2, %3, %4, %5, %6, %7);")
-                            .arg(idCategory)
-                            .arg(idAttr)
+    QString sql = QString("select ivInsert(%1, %2, %3, %4, %5, %6)")
+                            .arg(idCategoryAttr)
                             .arg(idTemplate)
                             .arg(idGroup)
                             .arg(isReadOnly ? "true" : "false")
                             .arg(order)
                             .arg(defVal);
 
-    int ok = db->executeCmd(sql);
-    if(ok != OK_CODE){
+    
+    KKSResult * res = db->execute (sql);
+    if (!res || res->getRowCount() != 1)
+    {
+        if (res)
+            delete res;
+
         if(!inTransaction())
             db->rollback();
         return ERROR_CODE;
     }
+
+    int idViewAttr = res->getCellAsInt(0, 0);
+    delete res;
+
+    if(idViewAttr <= 0){
+        if(!inTransaction())
+            db->rollback();
+        return ERROR_CODE;
+    }
+
+    av->setIdViewAttr(idViewAttr);
 
     if(!inTransaction())
         db->commit();
@@ -1986,20 +2000,29 @@ int KKSPPFactory::insertCategoryAttr(int idCategory, KKSCategoryAttr * a) const
     bool isMandatory = a->isMandatory();
     bool isReadOnly = a->isReadOnly();
 
-    QString sql = QString("insert into attrs_categories "
-                          "(id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) "
-                          "values (%1, %2, %3, %4, %5)")
+    QString sql = QString("select cAddAttr(%1, %2, %3, %4, %5)")
                             .arg(idCategory)
                             .arg(idAttr)
                             .arg(defVal)
                             .arg(isMandatory ? "true" : "false")
                             .arg(isReadOnly ? "true" : "false");
 
+    KKSResult * res = db->execute(sql);
 
-    int ok = db->executeCmd(sql);
-    if(ok != OK_CODE){
+    if(!res || res->getRowCount() != 1){
+        if(res)
+            delete res;
+
         return ERROR_CODE;
     }
+
+    int idCategoryAttr = res->getCellAsInt(0, 0);
+    delete res;
+
+    if(idCategoryAttr <= 0)
+        return ERROR_CODE;
+
+    a->setIdCategoryAttr(idCategoryAttr);
 
     return OK_CODE;
 }
@@ -3933,5 +3956,88 @@ int KKSPPFactory :: writePrivilegies (KKSAccessEntity * at, const KKSMap<int, KK
     }
     if (!inTransaction())
         db->commit();
+    return OK_CODE;
+}
+
+int KKSPPFactory::insertAttrAttr(int idParentAttr, KKSAttrAttr * aa) const
+{
+    if(!db || !aa)
+        return ERROR_CODE;
+
+    if(aa->id() <= 0){
+        aa->setId(-1);
+        KKSObjectExemplar * eio = KKSConverter::attributeToExemplar(loader, aa);
+        int ok = eiof->insertEIO(eio);
+        if(ok == ERROR_CODE){
+            return ERROR_CODE;
+        }
+        aa->setId(eio->id());
+        eio->release();
+    }
+
+    int idAttr = aa->id();
+    QString defVal = aa->defValue().valueForInsert();
+    bool isMandatory = aa->isMandatory();
+    bool isReadOnly = aa->isReadOnly();
+
+    QString sql = QString("select aInsertAttrAttr(%1, %2, %3, %4, %5)")
+                            .arg(idParentAttr)
+                            .arg(idAttr)
+                            .arg(defVal)
+                            .arg(isMandatory ? "true" : "false")
+                            .arg(isReadOnly ? "true" : "false");
+
+
+    KKSResult * res = db->execute (sql);
+    if (!res || res->getRowCount() != 1)
+    {
+        if (res)
+            delete res;
+
+        return ERROR_CODE;
+    }
+
+    int idAttrAttr = res->getCellAsInt(0, 0);
+
+    delete res;
+
+    return idAttrAttr;
+}
+
+int KKSPPFactory::insertAttrAttrs(const KKSAttribute * a) const
+{
+    if(!db || !a || a->id() <= 0)
+        return ERROR_CODE;
+
+    QString sqlIn = "-1";
+
+    KKSMap<int, KKSAttrAttr *>::const_iterator pca;
+    for (pca = a->attrsAttrs().constBegin(); pca != a->attrsAttrs().constEnd(); pca++)
+    {
+        KKSAttrAttr * aa = pca.value();
+
+        int idAttrAttr = insertAttrAttr(a->id(), aa);
+        if(idAttrAttr == ERROR_CODE){
+            return ERROR_CODE;
+        }
+        sqlIn += QString(", %1").arg(idAttrAttr);
+    }
+
+    QString sql = QString("select aDeleteAttrAttrs(%1, ARRAY[%2])").arg(a->id()).arg(sqlIn);
+    KKSResult * res = db->execute (sql);
+    if (!res || res->getRowCount() != 1)
+    {
+        if (res)
+            delete res;
+
+        return ERROR_CODE;
+    }
+
+    int ok = res->getCellAsInt(0, 0);
+    delete res;
+
+    if(ok <= 0)
+        return ERROR_CODE;
+
     return OK_CODE;
 }

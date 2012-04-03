@@ -24,6 +24,7 @@ class QModelIndex;
 class KKSLoader;
 class KKSEIOFactory;
 class KKSObjEditorFactory;
+class KKSPPFactory;
 class KKSAttributesEditor;
 class KKSAttrEditor;
 class KKSAttrValue;
@@ -63,17 +64,24 @@ private slots:
     void viewIOSrc (KKSObject * io, QWidget * parent);
     //void slotLoadIOSrc1 (const KKSAttrValue * av, QLineEdit * lESrc1);
     void loadIOAttrValueHistory(const KKSAttrValue * av);
+    
+    void showAttrsWidget(KKSAttribute *, KKSAttrEditor *);//показать виджет с атрибутами для случая с описывающими атрибутами атрибута
+    void addAttribute (KKSAttribute *a, QAbstractItemModel * attrModel, KKSAttrEditor *editor);
+    void editAttribute (int id, KKSAttribute *a, QAbstractItemModel * attrModel, KKSAttrEditor *editor);
+    void delAttribute (int id, KKSAttribute *a, QAbstractItemModel * attrModel, KKSAttrEditor *editor);
+
 
 signals:
     void viewHistory(const KKSList<KKSAttrValue *> &);
-
+    
 private:
     //
     // Functions
     //
     friend class KKSSito;
-    KKSAttributesFactory (KKSLoader *l, KKSEIOFactory *_eiof, KKSObjEditorFactory * _oef);
+    KKSAttributesFactory (KKSLoader *l, KKSEIOFactory *_eiof, KKSObjEditorFactory * _oef, KKSPPFactory * _ppf);
     virtual ~KKSAttributesFactory (void);
+
 
     QLabel * createAttrTitle (KKSAttrValue * av, bool isSystem = false, KKSObjEditor *objEditor = NULL);
     QCheckBox * createChDateTime (bool isMandatory, QGridLayout *gLayout, QLabel *lTitle, int n_str);
@@ -101,6 +109,7 @@ private:
     KKSLoader * loader;
     KKSEIOFactory *eiof;
     KKSObjEditorFactory * m_oef;
+    KKSPPFactory * m_ppf;
 
 private:
     Q_OBJECT

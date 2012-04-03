@@ -14,6 +14,7 @@ KKSAttrView::KKSAttrView() : KKSCategoryAttr()
     m_visible = true;
     m_order = 0;
     m_readOnly = false;
+    m_idViewAttr = -1;
 }
 
 KKSAttrView::KKSAttrView(const KKSAttrView & av) : KKSCategoryAttr(av)
@@ -22,6 +23,7 @@ KKSAttrView::KKSAttrView(const KKSAttrView & av) : KKSCategoryAttr(av)
     m_order = av.order();
     m_readOnly = av.isReadOnly();
     m_defValue = av.defValue();
+    m_idViewAttr = av.idViewAttr();
 }
 
 KKSAttrView::KKSAttrView(const KKSCategoryAttr & ca) : KKSCategoryAttr(ca)
@@ -30,6 +32,7 @@ KKSAttrView::KKSAttrView(const KKSCategoryAttr & ca) : KKSCategoryAttr(ca)
     m_order = 0;
     m_readOnly = ca.isReadOnly();
     m_defValue = ca.defValue();
+    m_idViewAttr = -1;
 }
 
 KKSAttrView::~KKSAttrView()
@@ -124,3 +127,19 @@ KKSValue & KKSAttrView::defValue()
 {
     return m_defValue;
 }
+
+int KKSAttrView::idViewAttr() const
+{
+    return m_idViewAttr;
+}
+
+int KKSAttrView::idViewAttr()
+{
+    return m_idViewAttr;
+}
+
+void KKSAttrView::setIdViewAttr(int id)
+{
+    m_idViewAttr = id;
+}
+

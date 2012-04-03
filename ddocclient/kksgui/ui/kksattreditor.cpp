@@ -21,6 +21,7 @@
 #include <KKSAttrType.h>
 #include <KKSAttribute.h>
 #include <KKSObject.h>
+#include <KKSRecWidget.h>
 #include <KKSSearchTemplate.h>
 #include "kksattreditor.h"
 #include "ui_kksattr_editor.h"
@@ -37,7 +38,8 @@ KKSAttrEditor :: KKSAttrEditor (KKSAttribute *attr,
     ioRefs (Refs),
     ui (new Ui::kksattr_editor),
     io (0),
-    searchTemplate(NULL)
+    searchTemplate(NULL),
+    m_recW(NULL)
 {
     if (attribute)
         attribute->addRef ();
@@ -66,11 +68,14 @@ KKSAttrEditor :: KKSAttrEditor (KKSAttribute *attr,
         }
         ui->chManually->setCheckState (Qt::Checked);
         setCodeEnabled (Qt::Checked);
+
+        ui->pbAddAttrs->setText(tr("Show extended attributes"));
     }
     else
     {
         ui->lEDefWidth->setText (QString::number (100));
         setCodeEnabled (Qt::Unchecked);
+        ui->pbAddAttrs->setText(tr("Add extended attributes"));
     }
 
     QIntValidator *vDefWidthVal = new QIntValidator (0, 300, this);
@@ -82,6 +87,7 @@ KKSAttrEditor :: KKSAttrEditor (KKSAttribute *attr,
     connect (ui->chManually, SIGNAL (stateChanged (int)), this, SLOT (setCodeEnabled (int)) );
     connect (ui->tbAddFilter, SIGNAL (clicked()), this, SLOT (slotAddFilterClicked()) );
     connect (ui->tbDelFilter, SIGNAL (clicked()), this, SLOT (slotDelFilterClicked()) );
+    connect (ui->pbAddAttrs, SIGNAL(clicked()), this, SLOT(addAttrs()));
     
     cRefTypes << KKSAttrType::atList 
               << KKSAttrType::atParent 
@@ -420,4 +426,33 @@ void KKSAttrEditor :: setTitleText (const QString& text)
     if (text.startsWith(titleStr) || text.endsWith(titleStr) ||
         titleStr.isEmpty())
         ui->lETitle->setText (text);
+}
+
+void KKSAttrEditor::addAttrs()
+{
+    emit showAttrsWidget(attribute, this);
+}
+
+void KKSAttrEditor::setRecWidget(KKSRecWidget* recW)
+{
+    m_recW = recW;
+}
+
+void KKSAttrEditor::addTriggered()
+{
+    emit addAttribute(attribute, m_recW->getModel(), this);
+}
+
+void KKSAttrEditor::editTriggered()
+{
+    //int answer = QMessageBox::question(this, tr(""), tr(), QMessageBox::Yes|QMessageBox::No, QMessageBox::No);
+    //if(answer == QMessageBox::Yes)
+        emit editAttribute(m_recW->getID(), attribute, m_recW->getModel(), this);
+}
+
+void KKSAttrEditor::delTriggered()
+{
+    int answer = QMessageBox::question(this, tr("Remove attribute"), tr("Do you really want to remove selected attribute from list?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::No);
+    if(answer == QMessageBox::Yes)
+        emit delAttribute(m_recW->getID(), attribute, m_recW->getModel(), this);
 }

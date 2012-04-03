@@ -26,6 +26,11 @@ class _PP_EXPORT KKSAttrView : public KKSCategoryAttr
         void setDefValue(const KKSValue & v);
         const KKSValue & defValue() const;
         KKSValue & defValue();
+
+       int idViewAttr() const;
+       int idViewAttr();
+       void setIdViewAttr(int id);
+
    
         KKSAttrView();
         KKSAttrView(const KKSAttrView & av);
@@ -37,6 +42,8 @@ class _PP_EXPORT KKSAttrView : public KKSCategoryAttr
         bool m_readOnly;
         int m_order;
         bool m_visible;
+
+        int m_idViewAttr;
    
         KKSValue m_defValue;
 

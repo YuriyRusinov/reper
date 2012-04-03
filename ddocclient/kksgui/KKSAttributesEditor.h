@@ -69,6 +69,13 @@ signals:
     void insertAttr (KKSAttribute * a, int idType, QAbstractItemModel *aModel, int idAGroup, KKSAttributesEditor *attrEditor);
     void updateAttr (int idAttr, QAbstractItemModel *aModel, const QModelIndex& parent, KKSAttributesEditor *attrEditor);
     void deleteAttr (int idAttr, QAbstractItemModel *aModel, const QModelIndex& parent, KKSAttributesEditor *attrEditor);
+    //void showAttrsWidget(KKSAttribute *, KKSAttrEditor *);//показать виджет с атрибутами для случая с описывающими атрибутами атрибута
+
+    void showAttrsWidget(KKSAttribute *, KKSAttrEditor *);//показать виджет с атрибутами для случая с описывающими атрибутами атрибута
+    void addAttribute(KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *);
+    void editAttribute(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *);
+    void delAttribute(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *);
+
 
 //    void requestAttr (int idAttr, KKSAttributesEditor *);
 

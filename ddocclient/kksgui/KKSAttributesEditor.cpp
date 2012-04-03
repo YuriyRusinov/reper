@@ -20,7 +20,11 @@
 #include "KKSAttributesEditor.h"
 #include "defines.h"
 
-KKSAttributesEditor :: KKSAttributesEditor (const KKSMap<int, KKSAttrType*>& aTypes, const KKSMap<int, KKSAGroup *>& aGroups, const QMap<int, QString>& io_refs, QWidget *parent, Qt::WindowFlags f)
+KKSAttributesEditor :: KKSAttributesEditor (const KKSMap<int, KKSAttrType*>& aTypes, 
+                                            const KKSMap<int, KKSAGroup *>& aGroups, 
+                                            const QMap<int, QString>& io_refs, 
+                                            QWidget *parent, 
+                                            Qt::WindowFlags f)
     : KKSDialog (parent, f),
     recW (0),
     attrTypes (aTypes),
@@ -104,6 +108,27 @@ void KKSAttributesEditor :: addAttribute (void)
              SIGNAL (getSearchTemplate (KKSAttrEditor *)),
              this,
              SLOT (slotGetSearchTemplate (KKSAttrEditor *)) );
+    
+    connect (aEditor, 
+             SIGNAL(showAttrsWidget(KKSAttribute *, KKSAttrEditor *)), 
+             this, 
+             SIGNAL(showAttrsWidget(KKSAttribute *, KKSAttrEditor *)) ); //передаем все в KKSAttributesFactory
+
+    connect (aEditor, 
+             SIGNAL(addAttribute(KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)), 
+             this, 
+             SIGNAL(addAttribute(KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)) );//передаем все в KKSAttributesFactory
+
+    connect (aEditor, 
+             SIGNAL(editAttribute(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)), 
+             this, 
+             SIGNAL(editAttribute(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)) );//передаем все в KKSAttributesFactory
+
+    connect (aEditor, 
+             SIGNAL(delAttribute(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)), 
+             this, 
+             SIGNAL(delAttribute(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)) );//передаем все в KKSAttributesFactory
+
 
     QModelIndex pIndex = recW->getSourceIndex();
     int idEType = pIndex.data (Qt::UserRole+USER_ENTITY).toInt();

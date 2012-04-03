@@ -23,6 +23,8 @@
 #include <QRegExpValidator>
 #include <QRegExp>
 #include <QColor>
+#include <QTreeView>
+#include <QAction>
 
 #include <KKSAttributesEditor.h>
 #include <KKSObjEditor.h>
@@ -47,6 +49,11 @@
 #include <KKSSearchTemplate.h>
 #include <KKSVideoPlayer.h>
 
+#include <KKSRecWidget.h>
+#include <KKSCatAttrsModel.h>
+#include <KKSItemDelegate.h>
+#include <KKSAttrAttrEditor.h>
+
 #include <KKSFilter.h>
 #include <KKSObject.h>
 #include <KKSCategory.h>
@@ -59,6 +66,7 @@
 #include "KKSLoader.h"
 #include "KKSConverter.h"
 #include "KKSEIOFactory.h"
+#include "KKSPPFactory.h"
 
 #include <defines.h>
 
@@ -78,20 +86,47 @@ KKSAttributesEditor * KKSAttributesFactory :: viewAttributes (const KKSList<cons
 
     connect (aEditor, SIGNAL (findInAttributes (int, QAbstractItemModel *, KKSAttributesEditor *)), this, SLOT (findAttributes (int, QAbstractItemModel *, KKSAttributesEditor * )) );
     connect (aEditor, SIGNAL (insertAttr (KKSAttribute *, int, QAbstractItemModel *, int, KKSAttributesEditor *)), this, SLOT (saveAttribute (KKSAttribute *, int, QAbstractItemModel*, int, KKSAttributesEditor *)) );
-    connect (aEditor, SIGNAL (updateAttr (int, QAbstractItemModel *, const QModelIndex&, KKSAttributesEditor *)), this, SLOT (loadAttribute(int, QAbstractItemModel *, const QModelIndex&, KKSAttributesEditor *)) );
+    connect (aEditor, 
+             SIGNAL (updateAttr (int, QAbstractItemModel *, const QModelIndex&, KKSAttributesEditor *)), 
+             this, 
+             SLOT (loadAttribute(int, QAbstractItemModel *, const QModelIndex&, KKSAttributesEditor *)) );
+    
     connect (aEditor, SIGNAL (deleteAttr (int, QAbstractItemModel *, const QModelIndex&, KKSAttributesEditor *)), this, SLOT (delAttribute(int, QAbstractItemModel *, const QModelIndex&, KKSAttributesEditor *)) );
     connect (aEditor, SIGNAL (getFieldsOfReference (KKSAttribute *, int, KKSAttrEditor * )), this, SLOT (loadAttrsRefFields (KKSAttribute *, int, KKSAttrEditor *)) );
     connect (aEditor, SIGNAL (getSearchTemplate (KKSAttrEditor * )), this, SLOT (loadSearchTemplates (KKSAttrEditor *)) );
+    
     connect (aEditor, SIGNAL (insertAttrGroup (QAbstractItemModel *,KKSAttributesEditor *)), this, SLOT (addAttrGroup (QAbstractItemModel *, KKSAttributesEditor *)) );
     connect (aEditor, SIGNAL (updateAttrGroup (int, QAbstractItemModel *, const QModelIndex&, KKSAttributesEditor *)), this, SLOT (editAttrGroup (int, QAbstractItemModel *, const QModelIndex&,  KKSAttributesEditor *)) );
     connect (aEditor, SIGNAL (deleteAttrGroup (int, QAbstractItemModel *, const QModelIndex&,  KKSAttributesEditor *)), this, SLOT (delAttrGroup (int, QAbstractItemModel *, const QModelIndex&, KKSAttributesEditor *)) );
+
+    connect (aEditor, 
+             SIGNAL(showAttrsWidget(KKSAttribute *, KKSAttrEditor *)), 
+             this, 
+             SLOT(showAttrsWidget(KKSAttribute *, KKSAttrEditor *)) );
+
+    connect (aEditor, 
+             SIGNAL(addAttribute(KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)), 
+             this, 
+             SLOT(addAttribute(KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)) );
+
+    connect (aEditor, 
+             SIGNAL(editAttribute(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)), 
+             this, 
+             SLOT(editAttribute(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)) );
+
+    connect (aEditor, 
+             SIGNAL(delAttribute(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)), 
+             this, 
+             SLOT(delAttribute(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)) );
+
     return aEditor;
 }
 
-KKSAttributesFactory :: KKSAttributesFactory (KKSLoader *l, KKSEIOFactory *_eiof, KKSObjEditorFactory * _oef)
+KKSAttributesFactory :: KKSAttributesFactory (KKSLoader *l, KKSEIOFactory *_eiof, KKSObjEditorFactory * _oef, KKSPPFactory * kks_pp)
     : loader (l),
     eiof (_eiof),
-    m_oef (_oef)
+    m_oef (_oef),
+    m_ppf (kks_pp)
 {
 }
 void KKSAttributesFactory ::setOEF(KKSObjEditorFactory * _oef)
@@ -194,6 +229,8 @@ void KKSAttributesFactory :: saveAttribute (KKSAttribute * cAttr, int idType, QA
     if (isInsert)
         cAttr->setId (objC->id());
 
+    m_ppf->insertAttrAttrs(cAttr);
+
     KKSViewFactory::updateAttributesModel (loader, aModel);
 
     if (aType)
@@ -215,9 +252,11 @@ void KKSAttributesFactory :: loadAttribute (int idAttr, QAbstractItemModel * aMo
     if (!attr)
         return;
 
-    KKSCategoryAttr *cAttr = KKSCategoryAttr :: create (attr, false, false, QString());
-    if (!cAttr)
-        return;
+    //KKSCategoryAttr *cAttr = KKSCategoryAttr :: create (attr, false, false, QString());
+    //if (!cAttr)
+    //    return;
+
+    loader->loadAttrAttrs(attr);
 
     KKSAttrEditor *attrEditor = new KKSAttrEditor (attr, aEditor->getTypes(), aEditor->getAvailableGroups(), aEditor->getReferences (), aEditor);
     if (attr->type()->attrType () == KKSAttrType::atList || 
@@ -243,6 +282,26 @@ void KKSAttributesFactory :: loadAttribute (int idAttr, QAbstractItemModel * aMo
              SIGNAL (getSearchTemplate (KKSAttrEditor *)),
              this,
              SLOT (loadSearchTemplates (KKSAttrEditor *)) );
+    connect (attrEditor, 
+             SIGNAL(showAttrsWidget(KKSAttribute *, KKSAttrEditor *)), 
+             this, 
+             SLOT(showAttrsWidget(KKSAttribute *, KKSAttrEditor *)) );
+
+    connect (attrEditor, 
+             SIGNAL(addAttribute(KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)), 
+             this, 
+             SLOT(addAttribute(KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)) );
+
+    connect (attrEditor, 
+             SIGNAL(editAttribute(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)), 
+             this, 
+             SLOT(editAttribute(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)) );
+
+    connect (attrEditor, 
+             SIGNAL(delAttribute(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)), 
+             this, 
+             SLOT(delAttribute(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)) );
+
 
     QModelIndex pIndex = aIndex;
     while (pIndex.parent().isValid() && pIndex.data(Qt::UserRole+USER_ENTITY).toInt() > 0)
@@ -252,20 +311,30 @@ void KKSAttributesFactory :: loadAttribute (int idAttr, QAbstractItemModel * aMo
     if (attrEditor->exec () == QDialog::Accepted)
     {
         KKSAttribute *cAttrRes = attrEditor->getAttribute ();
+
         int idAttrGr = attrEditor->getGroupId ();
         KKSAGroup * aGr = loader->loadAttrGroup(idAttrGr);
         cAttrRes->setGroup (aGr);
         aGr->release ();
-        qDebug () << __PRETTY_FUNCTION__ << cAttrRes->id () << cAttrRes->tableName() << cAttrRes->columnName ();
+
         KKSObjectExemplar * oe = KKSConverter::attributeToExemplar (loader, cAttrRes);
         if (!oe)
             return;
-        eiof->updateEIO (oe);
+        
+        int ok = eiof->updateEIO (oe);
+        
+        //сохраняем описательные атрибуты данного атрибута
+        if(ok == OK_CODE){
+            m_ppf->insertAttrAttrs(cAttrRes);
+        }
+
         oe->release ();
+
         aModel->setData (aIndex, cAttrRes->id(), Qt::UserRole);
         aModel->setData (aIndex, cAttrRes->name(), Qt::DisplayRole);
         QModelIndex titleIndex = aIndex.sibling (aIndex.row(), 2);
         aModel->setData (titleIndex, cAttrRes->title(), Qt::DisplayRole);
+
         KKSViewFactory::updateAttributesModel (loader, aModel);
     }
 
@@ -275,7 +344,7 @@ void KKSAttributesFactory :: loadAttribute (int idAttr, QAbstractItemModel * aMo
         delete attrEditor;
     }
     attr->release ();
-    cAttr->release ();
+    //cAttr->release ();
 }
 
 /* Метод осуществляет удаление атрибута из БД.
@@ -1872,4 +1941,156 @@ void KKSAttributesFactory::loadIOAttrValueHistory(const KKSAttrValue * av)
     KKSList<KKSAttrValue *> avList = loader->loadIOAttrValueHistory(av);
 
     emit viewHistory(avList);
+}
+
+void KKSAttributesFactory :: showAttrsWidget (KKSAttribute *a, KKSAttrEditor *parent)
+{
+    KKSRecWidget * rw (0);
+
+    if (a){
+        rw = KKSViewFactory :: createAttrAttrsView (a, parent, parent->windowFlags());
+        parent->setRecWidget(rw);
+    }
+    else
+    {
+        QTreeView * tvTableAttrs = new QTreeView ();
+        rw = new KKSRecWidget (tvTableAttrs, true, parent, parent->windowFlags());
+        rw->hideGroup (0);//gbSearch->setVisible (false);
+        rw->hideGroup (2);//tbSetView->setVisible (false);
+        rw->hideGroup (3);//gbImportExport->setVisible (false);
+        QAbstractItemModel * acModel = new KKSCatAttrsModel (0, 4);//QStandardItemModel (0, 4);
+        acModel->setHeaderData (0, Qt::Horizontal, QObject::tr ("Name"));
+        acModel->setHeaderData (1, Qt::Horizontal, QObject::tr ("Default value"));
+        acModel->setHeaderData (2, Qt::Horizontal, QObject::tr ("Mandatory"));
+        acModel->setHeaderData (3, Qt::Horizontal, QObject::tr ("Read only"));
+        
+        KKSViewFactory::updateAttrAttrsModel (0, acModel);
+        
+        tvTableAttrs->setModel (acModel);
+        
+        KKSItemDelegate *itemDeleg = new KKSItemDelegate (rw);
+        tvTableAttrs->setItemDelegate (itemDeleg);
+
+        parent->setRecWidget(rw);
+    }
+    
+    connect (rw->actAdd, SIGNAL (triggered()), parent, SLOT (addTriggered()) );
+    connect (rw->actEdit, SIGNAL (triggered()), parent, SLOT (editTriggered()) );
+    connect (rw->actDel, SIGNAL (triggered()), parent, SLOT (delTriggered()) );
+
+
+    if(rw){
+        rw->setWindowModality(Qt::WindowModal);
+        rw->move(parent->pos());
+        rw->setWindowTitle(tr("Select attribute"));
+        rw->show();
+    }
+}
+
+void KKSAttributesFactory :: addAttribute (KKSAttribute *a, QAbstractItemModel * attrModel, KKSAttrEditor *editor)
+{
+    if (!a || !attrModel)
+        return;
+
+    KKSList<const KKSFilterGroup *> filters;
+    KKSAttributesEditor *aEditor = viewAttributes (filters, true, editor, Qt::Dialog);
+
+    if (!aEditor)
+        return;
+
+    aEditor->setWindowModality (Qt::WindowModal);
+    
+
+    if (aEditor->exec() == QDialog::Accepted)
+    {
+        QList<int> idAttrsList = aEditor->getAttributesId();
+        KKSMap<int, KKSAttrAttr*> aAttrs = a->attrsAttrs();
+
+        for (int i=0; i<idAttrsList.size(); i++)
+        {
+            KKSAttribute * attr = loader->loadAttribute (idAttrsList[i]);
+            if (!attr)
+                continue;
+
+            bool is_bad;
+            KKSAttrAttr *aAttr = KKSAttrAttr::create (attr, false, false, QString(), &is_bad);
+            if (is_bad || !aAttr)
+            {
+                if (aAttr)
+                    aAttr->release ();
+                return;
+            }
+
+            KKSMap<int, KKSAttrAttr *>::const_iterator pca;
+            bool bFound = false;
+            for (pca = aAttrs.constBegin(); pca != aAttrs.constEnd(); pca++)
+            {
+                KKSAttrAttr * aa = pca.value();
+                if(aa->id() == aAttr->id()){
+                    bFound = true;
+                    break;
+                }
+            }
+            
+            if(!bFound)
+                aAttrs.insert(aAttr->idAttrAttr(), aAttr);
+            
+            aAttr->release ();
+            attr->release();
+        }
+        
+        a->setAttrsAttrs(aAttrs);
+        
+        KKSViewFactory::updateAttrAttrsModel(a, attrModel);
+    }
+    editor->update ();
+}
+
+void KKSAttributesFactory :: editAttribute (int id, KKSAttribute *a, QAbstractItemModel * attrModel, KKSAttrEditor *editor)
+{
+    if (!a || !attrModel)
+        return;
+
+    KKSMap<int, KKSAttrAttr*> aaList = a->attrsAttrs();
+
+    KKSAttrAttr * aAttr = aaList.value(id, NULL);
+    if (!aAttr)
+        return;
+
+    KKSAttrAttr * aa = new KKSAttrAttr(*aAttr);
+    KKSAttrAttrEditor *acEditor = new KKSAttrAttrEditor (aa, false, editor);
+
+    if (acEditor->exec () != QDialog::Accepted){
+        if (acEditor)
+        {
+            acEditor->setParent (0);
+            delete acEditor;
+        }
+
+        aa->release();
+        return;
+    }
+    
+    aaList.remove(aa->idAttrAttr());
+    aaList.insert(aa->idAttrAttr(), aa);//will be replaced
+    aa->release();
+
+    a->setAttrsAttrs(aaList);
+
+    KKSViewFactory::updateAttrAttrsModel (a, attrModel);
+    editor->update ();
+}
+
+void KKSAttributesFactory :: delAttribute (int id, KKSAttribute *a, QAbstractItemModel * attrModel, KKSAttrEditor *editor)
+{
+    if (!a || !attrModel)
+        return;
+
+
+    KKSMap<int, KKSAttrAttr*> aaList = a->attrsAttrs();
+    aaList.remove(id);
+    a->setAttrsAttrs(aaList);
+
+    KKSViewFactory::updateAttrAttrsModel(a, attrModel);
+    editor->update ();
 }

@@ -197,11 +197,10 @@ class _F_EXPORT KKSLoader
         KKSIndicator * loadIndicator (int idIndicator) const;
         KKSMap<int, KKSIndicatorType *> loadIndicatorTypes (void) const;
 
-#ifdef Q_WS_WIN
-        //for web
-        std::string getDlName_w() const;
-        std::string getUserName_w() const;
-#endif
+        void loadAttrAttrs(KKSAttribute * a) const;
+        KKSMap<int, KKSAttrAttr*> loadAttrAttrs(int idAttr) const;
+
+
         KKSLoader();
         ~KKSLoader();
     protected:

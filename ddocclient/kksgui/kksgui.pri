@@ -57,6 +57,7 @@ HEADERS += \
 		ui/kksstatisticview.h \
                 ui/kksattreditor.h \
                 ui/kkscatattreditor.h \
+                ui/kksattrattreditor.h \
                 ui/messageform.h \
                 ui/periodicreportform.h \
                 ui/rubricform.h \
@@ -122,6 +123,7 @@ SOURCES += \
                 ui/msgjournalsettingsform.cpp \
                 ui/kksattreditor.cpp \
                 ui/kkscatattreditor.cpp \
+                ui/kksattrattreditor.cpp \
 		ui/kksfilterseditorform.cpp \
 		ui/kksfilewidget.cpp \
 		kksincludeswidget.cpp \
@@ -152,6 +154,7 @@ FORMS   += \
                 ui/kksxml_form.ui \
                 ui/kksattr_editor.ui \
                 ui/kkscatattr_editor.ui \
+                ui/kksattrattr_editor.ui \
 #                ui/kksstuff_form.ui \
                 ui/message_form.ui \
                 ui/periodic_report_form.ui \
@@ -216,6 +219,7 @@ headers.files += \
                 ui/kksxmlform.h \
                 ui/kksattreditor.h \
                 ui/kkscatattreditor.h \
+                ui/kksattrattreditor.h \
                 kksstuffform.h \
                 ui/messageform.h \
                 ui/periodicreportform.h \

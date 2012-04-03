@@ -25,6 +25,7 @@ class KKSCategory;
 class KKSObject;
 class KKSLifeCycle;
 class KKSAttribute;
+class KKSAttrAttr;
 class KKSType;
 class KKSState;
 class KKSTemplate;
@@ -63,6 +64,9 @@ class _F_EXPORT KKSPPFactory
         int insertState(KKSState * s) const;
         int insertCategoryAttr(int idCategory, KKSCategoryAttr * a) const;
         int insertLifeCycle(int idCategory, KKSLifeCycle * lc) const;
+
+        int insertAttrAttr(int idParentAttr, KKSAttrAttr * aa) const;
+        int insertAttrAttrs(const KKSAttribute * a) const;
     
         int updateCategory(const KKSCategory* c) const;
         int deleteCategory(KKSCategory* c) const;

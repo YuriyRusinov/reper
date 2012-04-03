@@ -973,7 +973,7 @@ void KKSSito::initFactories()
     m_ppf->setParams(m_loader, m_fileLoader, m_eiof, db());
 
     if (!m_attrf)
-        m_attrf = new KKSAttributesFactory (m_loader, m_eiof, NULL);
+        m_attrf = new KKSAttributesFactory (m_loader, m_eiof, NULL, m_ppf);
 
     if (!m_objf)
         m_objf = new KKSObjEditorFactory(m_ppf, m_loader, m_fileLoader, m_attrf, m_eiof);

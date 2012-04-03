@@ -25,6 +25,10 @@ public:
    KKSValue  & defValue();
    void setDefValue(const KKSValue & _defValue);
 
+   int idCategoryAttr() const;
+   int idCategoryAttr();
+   void setIdCategoryAttr(int id);
+
    KKSCategoryAttr();
    KKSCategoryAttr(const KKSAttribute & a);
    KKSCategoryAttr(const KKSCategoryAttr & a);
@@ -46,6 +50,7 @@ private:
 
    bool m_isMandatory;
    bool m_isReadOnly;
+   int m_idCategoryAttr;
    
    KKSValue m_defValue;
 

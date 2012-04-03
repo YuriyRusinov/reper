@@ -25,6 +25,9 @@ class KKSAttrType;
 class KKSAGroup;
 class KKSObject;
 class KKSSearchTemplate;
+class KKSRecWidget;
+
+class QAbstractItemModel;
 
 class _GUI_EXPORT KKSAttrEditor : public QDialog
 {
@@ -45,10 +48,23 @@ class _GUI_EXPORT KKSAttrEditor : public QDialog
         void setCurrentRef (const QString& text);
         void setSearchTemplate(KKSSearchTemplate * st);
 
+        void setRecWidget(KKSRecWidget *recW);
+
+
     signals:
         void getReferences (KKSAttribute * attr, KKSAttrEditor * aEditor);
         void getReferenceFields (KKSAttribute * attr, int idRef, KKSAttrEditor * aEditor);
         void getSearchTemplate(KKSAttrEditor * aEditor);
+        
+        void showAttrsWidget(KKSAttribute *, KKSAttrEditor *);//показать виджет с атрибутами для случая с описывающими атрибутами атрибута
+        void addAttribute(KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *);
+        void editAttribute(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *);
+        void delAttribute(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *);
+
+    public slots:
+        void addTriggered();//испускает сигнал addAttribute
+        void editTriggered();//испускает сигнал editAttribute
+        void delTriggered();//испускает сигнал delAttribute
 
     private slots:
         void accept ();
@@ -58,6 +74,7 @@ class _GUI_EXPORT KKSAttrEditor : public QDialog
         void slotAddFilterClicked();
         void slotDelFilterClicked();
         void setTitleText (const QString& text);
+        void addAttrs();
 
     private:
         //
@@ -68,7 +85,8 @@ class _GUI_EXPORT KKSAttrEditor : public QDialog
         void set_references (void);
         void set_groups (void);
 
-    private:
+
+private:
         //
         // Variables
         //
@@ -81,6 +99,13 @@ class _GUI_EXPORT KKSAttrEditor : public QDialog
         QList<int> cRefTypes;
 
         KKSSearchTemplate * searchTemplate;//текущий фильтр (если не задан, то < 0)
+
+        KKSRecWidget * m_recW;//сохраняется модель отображения атрибутов в атрибуте при выводе соответствующей формы
+                              //а также текущая выделенная строка
+                              //необходима из-за сложного механизма подачи сигналов на отображение этой формы 
+                              //и реакции на соответствующие кнопки
+                              //напрямую в данном классе не используется
+
 
     private:
         Q_OBJECT

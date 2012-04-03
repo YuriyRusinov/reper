@@ -36,7 +36,9 @@ HEADERS += \
 	   KKSPrivilege.h \
            KKSSearchTemplate.h \
            KKSIndicator.h \
-           KKSIndicatorValue.h
+           KKSIndicatorValue.h \
+           KKSAttrAttr.h \
+           KKSAttrAttrValue.h 
 
 
 SOURCES += \
@@ -75,7 +77,10 @@ SOURCES += \
 	   KKSPrivilege.cpp \
            KKSSearchTemplate.cpp \
            KKSIndicator.cpp \
-           KKSIndicatorValue.cpp
+           KKSIndicatorValue.cpp \
+           KKSAttrAttr.cpp \
+           KKSAttrAttrValue.cpp 
+
 
 
 headers.files += \
@@ -115,5 +120,9 @@ headers.files += \
 	   KKSPrivilege.h \
            KKSSearchTemplate.h \
            KKSIndicator.h \
-           KKSIndicatorValue.h
+           KKSIndicatorValue.h \
+           KKSAttrAttr.h \
+           KKSAttrAttrValue.h 
+
+
 

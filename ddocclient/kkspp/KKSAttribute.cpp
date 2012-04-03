@@ -20,7 +20,8 @@ KKSAttribute::KKSAttribute() : KKSIndAttr(),
     m_defWidth (100),
     m_group (0),
     m_st (0),
-    m_isSystem (false)
+    m_isSystem (false),
+    m_attrsLoaded(false)
 {
 //   m_refType = NULL;
 //   m_refColumnType = NULL;
@@ -31,29 +32,16 @@ KKSAttribute::KKSAttribute(const KKSAttribute & a) : KKSIndAttr(a),
     m_defWidth (a.m_defWidth),
     m_group (a.m_group),
     m_st (a.m_st),
-    m_isSystem (a.m_isSystem)
+    m_isSystem (a.m_isSystem),
+    m_attrsAttrs(a.m_attrsAttrs),
+    m_attrsLoaded(a.m_attrsLoaded)
 {
-//    m_refType = NULL;
-//    m_refColumnType = NULL;
-//    m_st = NULL;
-//    setType(const_cast<KKSAttrType*>(a.type()));
-//    setGroup(const_cast<KKSAGroup*>(a.group()));
     if (m_group)
         m_group->addRef ();
-//    setRefType(const_cast<KKSAttrType*>(a.refType()));
-//    setRefColumnType(const_cast<KKSAttrType*>(a.refColumnType()));
-//    setSearchTemplate(const_cast<KKSSearchTemplate*>(a.searchTemplate()));
+
     if (m_st)
         m_st->addRef ();
 
-//    m_title = a.title();
-//    m_tableName = a.tableName();
-//    setColumnName(a.columnName());
-//    setRefColumnName(a.refColumnName());
-//    //m_columnName = a.columnName();
-//    //m_quotedColumnName = a.columnName(true);
-//    m_defWidth = a.defWidth();
-//    m_isSystem = a.isSystem();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -64,131 +52,20 @@ KKSAttribute::KKSAttribute(const KKSAttribute & a) : KKSIndAttr(a),
 
 KKSAttribute::~KKSAttribute()
 {
-//   if(m_type)
-//       m_type->release();
 
    if(m_group)
        m_group->release();
 
-//   if(m_refType)
-//       m_refType->release();
-
-//   if(m_refColumnType)
-//       m_refColumnType->release();
 
    if(m_st)
        m_st->release();
 
 }
 
-////////////////////////////////////////////////////////////////////////
-// Name:       KKSAttribute::getColumnName()
-// Purpose:    Implementation of KKSAttribute::getColumnName()
-// Return:     QString
-////////////////////////////////////////////////////////////////////////
-/*
-const QString & KKSAttribute::columnName(bool quoted) const
-{
-    if(quoted){
-        if(m_quotedColumnName.isEmpty() && !m_columnName.isEmpty())
-            m_quotedColumnName = QString("\"") + m_columnName + QString("\"");
-
-        return m_quotedColumnName;
-    }
-   
-   return m_columnName;
-}
-
-////////////////////////////////////////////////////////////////////////
-// Name:       KKSAttribute::setColumnName(QString newColumnName)
-// Purpose:    Implementation of KKSAttribute::setColumnName()
-// Parameters:
-// - newColumnName
-// Return:     void
-////////////////////////////////////////////////////////////////////////
-
-void KKSAttribute::setColumnName(const QString & newColumnName)
-{
-    m_columnName = newColumnName;
-    if(!m_columnName.isEmpty())
-        m_quotedColumnName = QString("\"") + m_columnName + QString("\"");
-}
-
-////////////////////////////////////////////////////////////////////////
-// Name:       KKSAttribute::getRefColumnName()
-// Purpose:    Implementation of KKSAttribute::getColumnName()
-// Return:     QString
-////////////////////////////////////////////////////////////////////////
-
-const QString & KKSAttribute::refColumnName(bool quoted) const
-{
-    if(quoted){
-        if(m_quotedRefColumnName.isEmpty() && !m_refColumnName.isEmpty())
-            m_quotedRefColumnName = QString("\"") + m_refColumnName + QString("\"");
-
-        return m_quotedRefColumnName;
-    }
-   
-   return m_refColumnName;
-}
-
-////////////////////////////////////////////////////////////////////////
-// Name:       KKSAttribute::setColumnName(QString newColumnName)
-// Purpose:    Implementation of KKSAttribute::setColumnName()
-// Parameters:
-// - newColumnName
-// Return:     void
-////////////////////////////////////////////////////////////////////////
-
-void KKSAttribute::setRefColumnName(const QString & newColumnName)
-{
-    m_refColumnName = newColumnName;
-    if(!m_refColumnName.isEmpty())
-        m_quotedRefColumnName = QString("\"") + m_refColumnName + QString("\"");
-}
-
-////////////////////////////////////////////////////////////////////////
-// Name:       KKSAttribute::getTableName()
-// Purpose:    Implementation of KKSAttribute::getTableName()
-// Return:     QString
-////////////////////////////////////////////////////////////////////////
-
-const QString & KKSAttribute::tableName(void) const
-{
-   return m_tableName;
-}
-
-////////////////////////////////////////////////////////////////////////
-// Name:       KKSAttribute::setTableName(QString newTableName)
-// Purpose:    Implementation of KKSAttribute::setTableName()
-// Parameters:
-// - newTableName
-// Return:     void
-////////////////////////////////////////////////////////////////////////
-
-void KKSAttribute::setTableName(const QString & newTableName)
-{
-   m_tableName = newTableName;
-}
-*/
-////////////////////////////////////////////////////////////////////////
-// Name:       KKSAttribute::getTitle()
-// Purpose:    Implementation of KKSAttribute::getTitle()
-// Return:     QString
-////////////////////////////////////////////////////////////////////////
-
 const QString & KKSAttribute::title(void) const
 {
    return m_title;
 }
-
-////////////////////////////////////////////////////////////////////////
-// Name:       KKSAttribute::setTitle(QString newTitle)
-// Purpose:    Implementation of KKSAttribute::setTitle()
-// Parameters:
-// - newTitle
-// Return:     void
-////////////////////////////////////////////////////////////////////////
 
 void KKSAttribute::setTitle(const QString & newTitle)
 {
@@ -263,43 +140,28 @@ bool KKSAttribute::isAttribute (void) const
     return true;
 }
 
-/*
-#ifdef Q_WS_WIN
-		//for web 
-std::string KKSAttribute::columnName_w(void) const
-{
-	std::string s;
-    s = columnName().toUtf8();
-    return s;
-}
-void KKSAttribute::setColumnName_w(std::string & newColumnName)
-{
-	return setColumnName(QString::fromUtf8(newColumnName.c_str()));
-}
-std::string KKSAttribute::tableName_w(void) const
-{
-	std::string s;
-    s = tableName().toUtf8();
-    return s;
-}
-void KKSAttribute::setTableName(std::string & newTableName)
-{
-	return setTableName(QString::fromUtf8(newTableName.c_str()));
-}
-std::string KKSAttribute::title_w(void) const
-{
-	std::string s;
-    s = title().toUtf8();
-    return s;
-}
-void KKSAttribute::setTitle_w(std::string & newTitle)
-{
-	return setTitle(QString::fromUtf8(newTitle.c_str()));
-}
-#endif
-*/
 
-/*----------------------------*/
+void KKSAttribute::setAttrsAttrs(const KKSMap<int, KKSAttrAttr *> & attrs)
+{
+    m_attrsAttrs = attrs;
+    m_attrsLoaded = true;
+}
+
+const KKSMap<int, KKSAttrAttr*> & KKSAttribute::attrsAttrs() const
+{
+    return m_attrsAttrs;
+}
+
+KKSMap<int, KKSAttrAttr*> & KKSAttribute::attrsAttrs()
+{
+    return m_attrsAttrs;
+}
+
+
+
+/**************************************
+****************KKSAGroup**************
+***************************************/
 
 KKSAGroup::KKSAGroup() : KKSRecord()
 {

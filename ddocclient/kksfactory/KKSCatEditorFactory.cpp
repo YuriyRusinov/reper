@@ -192,11 +192,12 @@ void KKSCatEditorFactory :: addCategory (QWidget *ctw, int idCatType, bool isChi
     KKSCatEditor * catEditor = this->createCategoryEditor (-1, filterGroups, isChild, idCatType, mode, cwModal, parent, Qt::Dialog);
     if (!catEditor)
         return;
+
     catEditor->setWindowTitle (tr("Creation new category"));
     if (cwModal != Qt::NonModal)
         (qobject_cast<QWidget *>(catEditor))->setAttribute (Qt::WA_DeleteOnClose);
+
     catEditor->show ();
-    qDebug () << __PRETTY_FUNCTION__ << catEditor->pCategory->id();
 }
 
 void KKSCatEditorFactory :: addCopyCategory (QWidget *ctw, int idCat, bool isChild)
@@ -371,8 +372,10 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (int idCategory, // ид
             if (tableCat)
                 tableCat->release ();
         }
+        
         if (ct)
             ct->release ();
+        
         KKSAccessEntity * acl = new KKSAccessEntity ();
         cat->setAccessRules (acl);
         if (cat->tableCategory())
@@ -443,9 +446,11 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (int idCategory, // ид
     connect (cEditor, SIGNAL (setAttribute (int, KKSCategory*, QAbstractItemModel *, KKSCatEditor *)), this, SLOT (loadCatAttribute (int, KKSCategory*, QAbstractItemModel *, KKSCatEditor *)));
     connect (cEditor, SIGNAL (setAttribute (KKSCategoryAttr *, KKSCategory*, QAbstractItemModel *, KKSCatEditor *)), this, SLOT (loadCatAttribute (KKSCategoryAttr *, KKSCategory*, QAbstractItemModel *, KKSCatEditor *)) );
     connect (cEditor, SIGNAL (delAttrFromCategory (int, KKSCategory *, QAbstractItemModel *, KKSCatEditor *)), this, SLOT (delCatAttribute(int, KKSCategory *, QAbstractItemModel *, KKSCatEditor *)) );
+    
     connect (cEditor, SIGNAL (saveCategory (KKSCategory *, int, int, KKSCatEditor *)), this, SLOT (saveCategory (KKSCategory *, int, int, KKSCatEditor *)) );
     connect (cEditor, SIGNAL (addChildCat (QWidget *, int, bool)), this, SLOT (addCategory (QWidget *, int, bool)) );
     connect (cEditor, SIGNAL (editChildCat (QWidget *, int, bool)), this, SLOT (editCategory (QWidget *, int, bool)) );
+    
     connect (cEditor, SIGNAL (addNewCategoryTemplate (QWidget *, int, QAbstractItemModel *)), tf, SLOT (addTemplate (QWidget *, int, QAbstractItemModel *)) );
     connect (cEditor, SIGNAL (editCategoryTemplate (QWidget *, int, QAbstractItemModel *, const QModelIndex& )), tf, SLOT (editTemplate (QWidget *, int, QAbstractItemModel *, const QModelIndex&)) );
     connect (cEditor, SIGNAL (delCategoryTemplate (QWidget *, int, QAbstractItemModel *, const QModelIndex& )), tf, SLOT (delTemplate (QWidget *, int, QAbstractItemModel *, const QModelIndex&)) );

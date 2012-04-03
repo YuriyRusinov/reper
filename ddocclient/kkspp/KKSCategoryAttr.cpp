@@ -20,6 +20,7 @@ KKSCategoryAttr::KKSCategoryAttr() : KKSAttribute()
     //m_defValue = NULL;
     m_isMandatory = false;
     m_isReadOnly = false;
+    m_idCategoryAttr = -1;
 }
 
 KKSCategoryAttr::KKSCategoryAttr(const KKSAttribute & a) : KKSAttribute(a)
@@ -27,6 +28,7 @@ KKSCategoryAttr::KKSCategoryAttr(const KKSAttribute & a) : KKSAttribute(a)
     //m_defValue = NULL;
     m_isMandatory = false;
     m_isReadOnly = false;
+    m_idCategoryAttr = -1;
 }
 
 KKSCategoryAttr::KKSCategoryAttr(const KKSCategoryAttr & a) : KKSAttribute(a)
@@ -34,6 +36,7 @@ KKSCategoryAttr::KKSCategoryAttr(const KKSCategoryAttr & a) : KKSAttribute(a)
     m_defValue = a.defValue();
     m_isMandatory = a.isMandatory();
     m_isReadOnly = a.isReadOnly();
+    m_idCategoryAttr = a.idCategoryAttr();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -133,3 +136,19 @@ KKSCategoryAttr * KKSCategoryAttr::create(KKSAttribute * a,
     
     return ca;
 }
+
+int KKSCategoryAttr::idCategoryAttr() const
+{
+    return m_idCategoryAttr;
+}
+
+int KKSCategoryAttr::idCategoryAttr()
+{
+    return m_idCategoryAttr;
+}
+
+void KKSCategoryAttr::setIdCategoryAttr(int id)
+{
+    m_idCategoryAttr = id;
+}
+

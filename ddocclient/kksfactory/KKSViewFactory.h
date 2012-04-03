@@ -97,6 +97,10 @@ class _F_EXPORT KKSViewFactory
                                                     QWidget *parent=0,
                                                     Qt::WindowFlags f=0);
 
+        static KKSRecWidget * createAttrAttrsView (const KKSAttribute *a,
+                                                   QWidget *parent,
+                                                   Qt::WindowFlags f);
+
         static KKSAttributesEditor * createAttrView (KKSLoader *l,
                                                      const KKSList<const KKSFilterGroup *> & filters,
                                                      bool mode,
@@ -108,6 +112,7 @@ class _F_EXPORT KKSViewFactory
         static void filterAttributesModel (KKSLoader *l, const KKSList<const KKSFilterGroup *> & filters, QAbstractItemModel * wModel);
 
         static void updateAttrModel (const KKSCategory *cat, QAbstractItemModel *model);
+        static void updateAttrAttrsModel (const KKSAttribute *a, QAbstractItemModel *model);
 
         static void initTemplateGroups (KKSTemplate *t, QAbstractItemModel *tModel);
         static void insertTemplateGroup (KKSAttrGroup *tAGroup, const QModelIndex& parent, int ind, QAbstractItemModel *tModel);
