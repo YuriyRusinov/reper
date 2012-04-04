@@ -303,9 +303,9 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
             int idp = av ? av->value().valueVariant().toInt() : 0;
             if (idp > 0)
             {
-                prevIndex = wIndex;
-                while (prevIndex.isValid() && prevIndex.data (Qt::UserRole).toInt() != idp)
-                    prevIndex = prevIndex.parent();
+                prevIndex = searchModelIndex (objModel, idp, QModelIndex(), Qt::UserRole);//wIndex;
+                //while (prevIndex.isValid() && prevIndex.data (Qt::UserRole).toInt() != idp)
+                //    prevIndex = prevIndex.parent();
             }
             else
                 prevIndex = QModelIndex();
