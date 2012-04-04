@@ -578,6 +578,9 @@ void KKSCatEditorFactory :: addAttributeIntoCategory (KKSCategory *c, QAbstractI
         }
         KKSViewFactory::updateAttrModel (c, attrModel);
     }
+    editor->resize(editor->size() + QSize(1, 1));
+    editor->update ();
+    editor->resize(editor->size() - QSize(1, 1));
     editor->update ();
 }
 

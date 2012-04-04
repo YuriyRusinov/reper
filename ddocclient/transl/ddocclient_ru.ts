@@ -1974,6 +1974,22 @@ Do you want to save the changes before closing?</source>
         <source>Set reference field</source>
         <translation>Задать поле справочника</translation>
     </message>
+    <message>
+        <source>Show extended attributes</source>
+        <translation>Показать расширенные атрибуты</translation>
+    </message>
+    <message>
+        <source>Add extended attributes</source>
+        <translation>Добавить расширенные атрибуты</translation>
+    </message>
+    <message>
+        <source>Remove attribute</source>
+        <translation>Удаление атрибута</translation>
+    </message>
+    <message>
+        <source>Do you really want to remove selected attribute from list?</source>
+        <translation>Вы действительно хотите удалить выбранный атрибут из списка?</translation>
+    </message>
 </context>
 <context>
     <name>KKSAttrValueLabel</name>
@@ -2094,6 +2110,10 @@ Do you want to save the changes before closing?</source>
     <message>
         <source>Select document</source>
         <translation>Выберите информационный объект</translation>
+    </message>
+    <message>
+        <source>Select attribute</source>
+        <translation>Выберите атрибут</translation>
     </message>
 </context>
 <context>
@@ -9198,6 +9218,10 @@ p, li { white-space: pre-wrap; }
         <source>Group :</source>
         <translation>Группа:</translation>
     </message>
+    <message>
+        <source>Add extended attributes</source>
+        <translation>Добавить расширенные атрибуты</translation>
+    </message>
 </context>
 <context>
     <name>kksattr_value_props_form</name>
@@ -9255,7 +9279,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>Transfer :</source>
-        <translation type="unfinished">Довел :</translation>
+        <translation>Довел :</translation>
     </message>
     <message>
         <source>Set new transfer...</source>
@@ -9288,6 +9312,61 @@ p, li { white-space: pre-wrap; }
     <message>
         <source>&amp;Apply</source>
         <translation>&amp;Применить</translation>
+    </message>
+    <message>
+        <source>View History</source>
+        <translation>Просмотреть историю</translation>
+    </message>
+</context>
+<context>
+    <name>kksattrattr_editor</name>
+    <message>
+        <source>Attribute in category</source>
+        <translation>Атрибут в категории</translation>
+    </message>
+    <message>
+        <source>Attribute</source>
+        <translation>Атрибут</translation>
+    </message>
+    <message>
+        <source>Code :</source>
+        <translation>Код :</translation>
+    </message>
+    <message>
+        <source>Name :</source>
+        <translation>Название :</translation>
+    </message>
+    <message>
+        <source>Title :</source>
+        <translation>Заголовок :</translation>
+    </message>
+    <message>
+        <source>Type :</source>
+        <translation>Тип :</translation>
+    </message>
+    <message>
+        <source>Editable values</source>
+        <translation>Редактируемые параметры</translation>
+    </message>
+    <message>
+        <source>Default value :</source>
+        <translation>Значение по умолчанию :</translation>
+    </message>
+    <message>
+        <source>Mandatory</source>
+        <translation>Обязательно</translation>
+    </message>
+    <message>
+        <source>ReadOnly</source>
+        <translation>Только чтение</translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation>&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>&amp;Отмена</translation>
     </message>
 </context>
 <context>
