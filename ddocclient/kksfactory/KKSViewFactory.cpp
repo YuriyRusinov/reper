@@ -1084,6 +1084,16 @@ KKSRecWidget * KKSViewFactory :: createCategAttrsView (const KKSCategory *cat,
     acModel->setHeaderData (3, Qt::Horizontal, QObject::tr ("Read only"));
     updateAttrModel (cat, acModel);
     tv->setModel (acModel);
+
+    QHeaderView * header = tv->header();
+    int lIndex = header->logicalIndex(0);
+    header->setResizeMode(lIndex, QHeaderView::ResizeToContents);
+    int size = header->sectionSize(lIndex);
+    if(size > 300){
+        header->setResizeMode(QHeaderView::Interactive);
+        header->resizeSection(lIndex, 300);
+    }
+
     tv->setDragEnabled (true);
     tv->setAcceptDrops (true);
     tv->setDropIndicatorShown (true);
@@ -1120,10 +1130,20 @@ KKSRecWidget * KKSViewFactory :: createAttrAttrsView (const KKSAttribute *a,
     acModel->setHeaderData (1, Qt::Horizontal, QObject::tr ("Default value"));
     acModel->setHeaderData (2, Qt::Horizontal, QObject::tr ("Mandatory"));
     acModel->setHeaderData (3, Qt::Horizontal, QObject::tr ("Read only"));
-    
+
     updateAttrAttrsModel (a, acModel);
     
     tv->setModel (acModel);
+
+    QHeaderView * header = tv->header();
+    int lIndex = header->logicalIndex(0);
+    header->setResizeMode(lIndex, QHeaderView::ResizeToContents);
+    int size = header->sectionSize(lIndex);
+    if(size > 300){
+        header->setResizeMode(QHeaderView::Interactive);
+        header->resizeSection(lIndex, 300);
+    }
+
     tv->setDragEnabled (true);
     tv->setAcceptDrops (true);
     tv->setDropIndicatorShown (true);
@@ -1341,6 +1361,17 @@ KKSAttributesEditor * KKSViewFactory :: createAttrView (KKSLoader *l,
         parseAttrGroup (l, p.value(), filters, wModel, wIndex);
         i++;
     }
+    
+    QHeaderView * header = tvAttrs->header();
+    int lIndex = header->logicalIndex(0);
+    header->setResizeMode(lIndex, QHeaderView::ResizeToContents);
+    int size = header->sectionSize(lIndex);
+    if(size > 300){
+        header->setResizeMode(QHeaderView::Interactive);
+        header->resizeSection(lIndex, 300);
+    }
+
+
     tvAttrs->update ();
 
     if (mode)

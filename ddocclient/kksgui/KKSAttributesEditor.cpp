@@ -243,6 +243,7 @@ void KKSAttributesEditor :: init_widgets (void)
 {
     if (!recW)
         return;
+    
     QGridLayout *gLay = new QGridLayout ();
     this->setLayout (gLay);
     gLay->addWidget (recW, 0, 0, 1, 1);

@@ -13,6 +13,8 @@
 #include <QAbstractItemDelegate>
 #include <QSize>
 #include <QtDebug>
+#include <QMdiArea>
+#include <QMdiSubWindow>
 
 #include "KKSSortFilterProxyModel.h"
 #include "KKSRecWidget.h"
@@ -72,6 +74,27 @@ KKSRecWidget :: KKSRecWidget (const QString& filterTitle, const QString& addTitl
 KKSRecWidget :: ~KKSRecWidget (void)
 {
 }
+
+QSize KKSRecWidget::sizeHint() const
+{
+    QWidget * parent = parentWidget();
+    if(!parent)
+        return QSize(500, 500);
+
+    QString parentName = QString(parent->metaObject()->className());
+    if(parentName == QString("QMdiSubWindow")){
+        QMdiSubWindow * w = qobject_cast<QMdiSubWindow *>(parent);
+        if(!w)
+            return QSize(500, 500);
+        QMdiArea *a = w->mdiArea();
+        if(!a)
+            return QSize(500, 500);
+        return a->size();
+    }
+
+    return parent->size();
+}
+
 
 int KKSRecWidget :: getID (void) const
 {

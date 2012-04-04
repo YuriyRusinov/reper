@@ -25,6 +25,7 @@
 #include <QColor>
 #include <QTreeView>
 #include <QAction>
+#include <QHeaderView>
 
 #include <KKSAttributesEditor.h>
 #include <KKSObjEditor.h>
@@ -1968,6 +1969,15 @@ void KKSAttributesFactory :: showAttrsWidget (KKSAttribute *a, KKSAttrEditor *pa
         
         tvTableAttrs->setModel (acModel);
         
+        QHeaderView * header = tvTableAttrs->header();
+        int lIndex = header->logicalIndex(0);
+        header->setResizeMode(lIndex, QHeaderView::ResizeToContents);
+        int size = header->sectionSize(lIndex);
+        if(size > 300){
+            header->setResizeMode(QHeaderView::Interactive);
+            header->resizeSection(lIndex, 300);
+        }
+
         KKSItemDelegate *itemDeleg = new KKSItemDelegate (rw);
         tvTableAttrs->setItemDelegate (itemDeleg);
 

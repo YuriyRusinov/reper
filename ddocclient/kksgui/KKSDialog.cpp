@@ -1,5 +1,7 @@
 #include <QEventLoop>
 #include <QPointer>
+#include <QMdiArea>
+#include <QMdiSubWindow>
 
 #include "KKSDialog.h"
 
@@ -21,6 +23,26 @@ KKSDialog :: ~KKSDialog (void)
         delete pEventL;
         pEventL = 0;
     }
+}
+
+QSize KKSDialog::sizeHint() const
+{
+    QWidget * parent = parentWidget();
+    if(!parent)
+        return QSize(500, 500);
+
+    QString parentName = QString(parent->metaObject()->className());
+    if(parentName == QString("QMdiSubWindow")){
+        QMdiSubWindow * w = qobject_cast<QMdiSubWindow *>(parent);
+        if(!w)
+            return QSize(500, 500);
+        QMdiArea *a = w->mdiArea();
+        if(!a)
+            return QSize(500, 500);
+        return a->size();
+    }
+
+    return parent->size();
 }
 
 int KKSDialog :: exec (void)

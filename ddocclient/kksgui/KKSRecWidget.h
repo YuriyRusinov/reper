@@ -61,6 +61,8 @@ public:
     void insertToolBarAction (QAction * before, QAction * action);
     void removeToolBarAction (QAction * action);
 
+    QSize sizeHint() const;
+
 signals:
     void addEntity (QAbstractItemModel * sourceMod, const QModelIndex& pIndex);
     void editEntity (QAbstractItemModel * sourceMod, const QModelIndex& wIndex);
