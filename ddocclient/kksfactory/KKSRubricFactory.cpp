@@ -374,18 +374,18 @@ void KKSRubricFactory :: viewAttachments (QAbstractItemModel * attachModel, cons
             continue;
         i++;
     }
-
+    
     for (int i=0; i<nRows; i++)
     {
         int j=1;
-        KKSObject * io = loader->loadIO (docList[i]->id(), true);
-        if (!io)
+        int id_io = docList[i]->id();
+        KKSObject * cio = loader->loadIO (id_io);
+        if (!cio)
             continue;
         QModelIndex nIndex = objModel->index (i, 0);
-        objModel->setData (nIndex, io->name(), Qt::DisplayRole);
-        objModel->setData (nIndex, io->id(), Qt::UserRole);
+        objModel->setData (nIndex, cio->name(), Qt::DisplayRole);
+        objModel->setData (nIndex, cio->id(), Qt::UserRole);
         QVariant bkColVal;
-        io->release();
 
         if (!bkColors.isEmpty())
         {
@@ -393,7 +393,7 @@ void KKSRubricFactory :: viewAttachments (QAbstractItemModel * attachModel, cons
             KKSAttrView * vcol = new KKSAttrView (*(c->attribute(idAttr)));
             //QRgb rgb_col (0xFFFFFFFF);
             QVariant vc;
-            KKSAttrValue * av = io->attrValueId (vcol->id());
+            KKSAttrValue * av = cio->attrValueId (vcol->id());
             if (av && !av->value ().value().isEmpty() && vcol->type()->attrType() == KKSAttrType::atRecordColor)
             {
                 vc = av->value ().valueVariant ();//QColor::fromRgba(rgb_col);
@@ -442,7 +442,7 @@ void KKSRubricFactory :: viewAttachments (QAbstractItemModel * attachModel, cons
             KKSAttrView * vcol = new KKSAttrView (*(c->attribute(idAttr)));
             //QRgb rgb_colf (0x00000000);
             QVariant vc;
-            KKSAttrValue * av = io->attrValueId (vcol->id());
+            KKSAttrValue * av = cio->attrValueId (vcol->id());
             if (av && !av->value ().value().isEmpty() && vcol->type()->attrType() == KKSAttrType::atRecordTextColor)
             {
                 vc = av->value().valueVariant ();//(QColor::fromRgba(rgb_colf));
@@ -493,7 +493,8 @@ void KKSRubricFactory :: viewAttachments (QAbstractItemModel * attachModel, cons
                 pa.value()->type()->attrType () == KKSAttrType::atRecordTextColor ||
                 pa.value()->type()->attrType () == KKSAttrType::atRecordTextColorRef )
                 continue;
-            KKSAttrValue * av = io->attrValueId (pa.value()->id());
+            const KKSAttrValue * av = cio->attrValueId (pa.key());//value()->id());
+            qDebug () << __PRETTY_FUNCTION__ << pa.key() << pa.value()->code() << av;
             if (av)
             {
                 if( av->attribute()->type()->attrType() == KKSAttrType::atJPG || 
@@ -574,6 +575,7 @@ void KKSRubricFactory :: viewAttachments (QAbstractItemModel * attachModel, cons
                 objModel->setData (wIndex, fgColVal, Qt::ForegroundRole);
             j++;
         }
+        cio->release ();
     }
 }
 
