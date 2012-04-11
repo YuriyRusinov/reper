@@ -64,6 +64,7 @@ HEADERS += \
                 ui/indexform.h \
                 ui/KKSAttrValuePropsForm.h \
                 ui/IndicatorForm.h \
+                ui/attrhistory.h \
 		kkscmdjournallv.h \
 		kkscmdjournalitem.h \
 		kksmsgjournallv.h \
@@ -136,6 +137,7 @@ SOURCES += \
                 ui/indexform.cpp \
                 ui/KKSAttrValuePropsForm.cpp \
                 ui/IndicatorForm.cpp \
+                ui/attrhistory.cpp \
 		kkscmdjournallv.cpp \
 		kkscmdjournalitem.cpp \
 		kksmsgjournallv.cpp \
@@ -161,7 +163,8 @@ FORMS   += \
                 ui/rubric_form.ui \
                 ui/index_form.ui \
                 ui/indicator_form.ui \
-                ui/kksattr_value_props_form.ui
+                ui/kksattr_value_props_form.ui \
+                ui/attr_history.ui
 
 headers.files += \
                 KKSAttrCheckListWidget.h \

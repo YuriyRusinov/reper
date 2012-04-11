@@ -11,6 +11,7 @@
 
 #include <KKSAttrValue.h>
 #include <KKSObject.h>
+#include <attrhistory.h>
 
 #include "KKSAttrValuePropsForm.h"
 #include "ui_kksattr_value_props_form.h"
@@ -268,4 +269,8 @@ void KKSAttrValuePropsForm::viewHistory(const KKSList<KKSAttrValue*> & history)
     //—юда вставить свой код
     //параметр history уже содержит всю небходимую информацию
     //QMessageBox::information(this, tr(""), tr(""), QMessageBox::Ok);
+    AttrHistory * hForm = new AttrHistory(history, this);
+    hForm->exec();
+    delete hForm;
+
 }

@@ -367,7 +367,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
     if (io || isAttrCheckEx)
     {
         attachW = new QWidget ();
-        tabObj->addTab (attachW, tr ("Enclosures"));
+        tabObj->addTab (attachW, tr ("Tables"));
         tabObj->setCurrentIndex (tabObj->count ()-1);
         gAttachLay = new QGridLayout (attachW);
         tabEnc = new QTabWidget (attachW);
@@ -753,7 +753,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditorParam (int idObject,// идент
     if (io || isAttrCheckEx)
     {
         attachW = new QWidget ();
-        tabObj->addTab (attachW, tr ("Enclosures"));
+        tabObj->addTab (attachW, tr ("Tables"));
         tabObj->setCurrentIndex (tabObj->count ()-1);
         gAttachLay = new QGridLayout (attachW);
         tabEnc = new QTabWidget (attachW);
@@ -6201,7 +6201,7 @@ void KKSObjEditorFactory :: putRubricator (KKSObject * obj, KKSObjEditor * edito
 
     //connect(this, SIGNAL(includeSelected(int, QString)), objEditorWidget, SLOT(slotIncludeSelected(int, QString)));
     editor->addIncludesWidget (iW);
-    tabObj->addTab (iW/*includesW*/, tr("Headings"));
+    tabObj->addTab (iW/*includesW*/, tr("Assotiated IO"));
     //gIncludesLay->addWidget (iW, 0, 0, 1, 1);
 }
 

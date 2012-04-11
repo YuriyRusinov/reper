@@ -59,6 +59,41 @@
     </message>
 </context>
 <context>
+    <name>AttrHistory</name>
+    <message>
+        <source>Id</source>
+        <translation>ИД</translation>
+    </message>
+    <message>
+        <source>Start</source>
+        <translation>Актуален с</translation>
+    </message>
+    <message>
+        <source>Stop</source>
+        <translation>Актуален по</translation>
+    </message>
+    <message>
+        <source>Value</source>
+        <translation>Значение</translation>
+    </message>
+    <message>
+        <source>Measured</source>
+        <translation>Измерено к</translation>
+    </message>
+    <message>
+        <source>Source</source>
+        <translation>Источник</translation>
+    </message>
+    <message>
+        <source>Transfer</source>
+        <translation>Довел</translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation>Описание</translation>
+    </message>
+</context>
+<context>
     <name>AuditoryForm</name>
     <message>
         <source>DB not connected ! Check server status and try again</source>
@@ -115,6 +150,30 @@
 <context>
     <name>BarcodeEditor</name>
     <message>
+        <source>128</source>
+        <translation type="unfinished">128</translation>
+    </message>
+    <message>
+        <source>5</source>
+        <translation type="unfinished">5</translation>
+    </message>
+    <message>
+        <source>0.00</source>
+        <translation type="unfinished">0.00</translation>
+    </message>
+    <message>
+        <source>0.01</source>
+        <translation type="unfinished">0.01</translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation type="unfinished">&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
+    <message>
         <source>Bar Code Properties</source>
         <translation type="unfinished"></translation>
     </message>
@@ -139,10 +198,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>128</source>
-        <translation type="unfinished">128</translation>
-    </message>
-    <message>
         <source>ean13</source>
         <translation type="unfinished"></translation>
     </message>
@@ -161,10 +216,6 @@
     <message>
         <source>Maximum Length of Value</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>5</source>
-        <translation type="unfinished">5</translation>
     </message>
     <message>
         <source>Alignment</source>
@@ -191,16 +242,8 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>0.00</source>
-        <translation type="unfinished">0.00</translation>
-    </message>
-    <message>
         <source>Width:</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>0.01</source>
-        <translation type="unfinished">0.01</translation>
     </message>
     <message>
         <source>Y:</source>
@@ -219,16 +262,8 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;OK</source>
-        <translation type="unfinished">&amp;OK</translation>
-    </message>
-    <message>
         <source>Alt+O</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
     </message>
     <message>
         <source>Alt+C</source>
@@ -270,6 +305,18 @@
 <context>
     <name>BoolEdit</name>
     <message>
+        <source>Name:</source>
+        <translation type="unfinished">Название:</translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation type="unfinished">&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
+    <message>
         <source>Bool</source>
         <translation type="unfinished"></translation>
     </message>
@@ -294,20 +341,8 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Name:</source>
-        <translation type="unfinished">Название:</translation>
-    </message>
-    <message>
-        <source>&amp;OK</source>
-        <translation type="unfinished">&amp;OK</translation>
-    </message>
-    <message>
         <source>Alt+O</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
     </message>
     <message>
         <source>Alt+C</source>
@@ -335,12 +370,24 @@
 <context>
     <name>ColorEditor</name>
     <message>
-        <source>Color Editor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Name:</source>
         <translation type="unfinished">Название:</translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation type="unfinished">&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
+    <message>
+        <source>0</source>
+        <translation type="unfinished">0</translation>
+    </message>
+    <message>
+        <source>Color Editor</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Components</source>
@@ -359,28 +406,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;OK</source>
-        <translation type="unfinished">&amp;OK</translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
-    </message>
-    <message>
         <source>Color...</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>0</source>
-        <translation type="unfinished">0</translation>
     </message>
 </context>
 <context>
     <name>ColorList</name>
-    <message>
-        <source>Color Definitions</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>&amp;Close</source>
         <translation type="unfinished">&amp;Закрыть</translation>
@@ -402,12 +433,16 @@
         <translation type="unfinished">Ошибка</translation>
     </message>
     <message>
-        <source>This dialog was not properly setup and cannot perform the requested action!</source>
+        <source>Warning</source>
+        <translation type="unfinished">Внимание</translation>
+    </message>
+    <message>
+        <source>Color Definitions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Warning</source>
-        <translation type="unfinished">Внимание</translation>
+        <source>This dialog was not properly setup and cannot perform the requested action!</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>No color name was specified!
@@ -465,6 +500,14 @@ Please specify a UNIQUE name for this color.</source>
 </context>
 <context>
     <name>CrossTabEditor</name>
+    <message>
+        <source>&amp;OK</source>
+        <translation type="unfinished">&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
     <message>
         <source>Properties (Field)</source>
         <translation type="unfinished"></translation>
@@ -582,16 +625,8 @@ Please specify a UNIQUE name for this color.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;OK</source>
-        <translation type="unfinished">&amp;OK</translation>
-    </message>
-    <message>
         <source>Alt+O</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
     </message>
     <message>
         <source>Alt+C</source>
@@ -620,6 +655,14 @@ Please specify a UNIQUE name for this color.</source>
 <context>
     <name>DBFileDialog</name>
     <message>
+        <source>&amp;OK</source>
+        <translation type="unfinished">&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
+    <message>
         <source>Database File</source>
         <translation type="unfinished"></translation>
     </message>
@@ -643,6 +686,9 @@ Please specify a UNIQUE name for this color.</source>
         <source>##</source>
         <translation type="unfinished"></translation>
     </message>
+</context>
+<context>
+    <name>DetailGroupSectionDialog</name>
     <message>
         <source>&amp;OK</source>
         <translation type="unfinished">&amp;OK</translation>
@@ -651,9 +697,6 @@ Please specify a UNIQUE name for this color.</source>
         <source>&amp;Cancel</source>
         <translation type="unfinished">&amp;Отмена</translation>
     </message>
-</context>
-<context>
-    <name>DetailGroupSectionDialog</name>
     <message>
         <source>Group Section Editor</source>
         <translation type="unfinished"></translation>
@@ -678,17 +721,25 @@ Please specify a UNIQUE name for this color.</source>
         <source>Insert Page Break After this Footer</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>&amp;OK</source>
-        <translation type="unfinished">&amp;OK</translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
-    </message>
 </context>
 <context>
     <name>DetailSectionDialog</name>
+    <message>
+        <source>&amp;Add</source>
+        <translation type="unfinished">&amp;Добавить</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation type="unfinished">&amp;Редактировать</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">Удалить</translation>
+    </message>
+    <message>
+        <source>&amp;Close</source>
+        <translation type="unfinished">&amp;Закрыть</translation>
+    </message>
     <message>
         <source>Detail Section Properties</source>
         <translation type="unfinished"></translation>
@@ -710,28 +761,12 @@ Please specify a UNIQUE name for this color.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;Add</source>
-        <translation type="unfinished">&amp;Добавить</translation>
-    </message>
-    <message>
-        <source>&amp;Edit</source>
-        <translation type="unfinished">&amp;Редактировать</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation type="unfinished">Удалить</translation>
-    </message>
-    <message>
         <source>Move &amp;Up</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Move &amp;Down</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Close</source>
-        <translation type="unfinished">&amp;Закрыть</translation>
     </message>
     <message>
         <source>Alt+C</source>
@@ -830,6 +865,10 @@ Please specify a UNIQUE name for this color.</source>
 <context>
     <name>DocumentScene</name>
     <message>
+        <source>Ok</source>
+        <translation type="unfinished">Да</translation>
+    </message>
+    <message>
         <source>No Section</source>
         <translation type="unfinished"></translation>
     </message>
@@ -896,10 +935,6 @@ permissions to the file you are trying to save to.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Ok</source>
-        <translation type="unfinished">Да</translation>
-    </message>
-    <message>
         <source>Choose filename to save</source>
         <translation type="unfinished"></translation>
     </message>
@@ -919,6 +954,14 @@ permissions to the file you are trying to save to.</source>
 <context>
     <name>DocumentWindow</name>
     <message>
+        <source>Save</source>
+        <translation type="unfinished">Сохранить</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Отмена</translation>
+    </message>
+    <message>
         <source>Untitled Document</source>
         <translation type="unfinished"></translation>
     </message>
@@ -936,20 +979,24 @@ Do you want to save the changes before closing?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Save</source>
-        <translation type="unfinished">Сохранить</translation>
-    </message>
-    <message>
         <source>Discard</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="unfinished">Отмена</translation>
     </message>
 </context>
 <context>
     <name>DoubleEdit</name>
+    <message>
+        <source>Name:</source>
+        <translation type="unfinished">Название:</translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation type="unfinished">&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
     <message>
         <source>Double</source>
         <translation type="unfinished"></translation>
@@ -967,20 +1014,8 @@ Do you want to save the changes before closing?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Name:</source>
-        <translation type="unfinished">Название:</translation>
-    </message>
-    <message>
-        <source>&amp;OK</source>
-        <translation type="unfinished">&amp;OK</translation>
-    </message>
-    <message>
         <source>Alt+O</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
     </message>
     <message>
         <source>Alt+C</source>
@@ -996,6 +1031,14 @@ Do you want to save the changes before closing?</source>
 </context>
 <context>
     <name>EditPreferences</name>
+    <message>
+        <source>&amp;OK</source>
+        <translation type="unfinished">&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
     <message>
         <source>Preferences</source>
         <translation type="unfinished"></translation>
@@ -1039,14 +1082,6 @@ Do you want to save the changes before closing?</source>
     <message>
         <source>Symetrical values</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;OK</source>
-        <translation type="unfinished">&amp;OK</translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
     </message>
 </context>
 <context>
@@ -1240,6 +1275,22 @@ Do you want to save the changes before closing?</source>
 <context>
     <name>FieldEditor</name>
     <message>
+        <source>0.01</source>
+        <translation type="unfinished">0.01</translation>
+    </message>
+    <message>
+        <source>0.00</source>
+        <translation type="unfinished">0.00</translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation type="unfinished">&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
+    <message>
         <source>Properties (Field)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1320,10 +1371,6 @@ Do you want to save the changes before closing?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>0.01</source>
-        <translation type="unfinished">0.01</translation>
-    </message>
-    <message>
         <source>Y:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1344,10 +1391,6 @@ Do you want to save the changes before closing?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>0.00</source>
-        <translation type="unfinished">0.00</translation>
-    </message>
-    <message>
         <source>Preview:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1356,16 +1399,8 @@ Do you want to save the changes before closing?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;OK</source>
-        <translation type="unfinished">&amp;OK</translation>
-    </message>
-    <message>
         <source>Alt+O</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
     </message>
     <message>
         <source>Alt+C</source>
@@ -1511,6 +1546,26 @@ Do you want to save the changes before closing?</source>
 <context>
     <name>GraphEditor</name>
     <message>
+        <source>0.01</source>
+        <translation type="unfinished">0.01</translation>
+    </message>
+    <message>
+        <source>0.00</source>
+        <translation type="unfinished">0.00</translation>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation type="unfinished">Название:</translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation type="unfinished">&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
+    <message>
         <source>Graph Editor</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1525,10 +1580,6 @@ Do you want to save the changes before closing?</source>
     <message>
         <source>Position/Size</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>0.01</source>
-        <translation type="unfinished">0.01</translation>
     </message>
     <message>
         <source>Y:</source>
@@ -1549,10 +1600,6 @@ Do you want to save the changes before closing?</source>
     <message>
         <source>in inches</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>0.00</source>
-        <translation type="unfinished">0.00</translation>
     </message>
     <message>
         <source>Base Font</source>
@@ -1659,10 +1706,6 @@ Do you want to save the changes before closing?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Name:</source>
-        <translation type="unfinished">Название:</translation>
-    </message>
-    <message>
         <source>Style</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1679,16 +1722,8 @@ Do you want to save the changes before closing?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;OK</source>
-        <translation type="unfinished">&amp;OK</translation>
-    </message>
-    <message>
         <source>Alt+O</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
     </message>
     <message>
         <source>Alt+C</source>
@@ -1749,6 +1784,26 @@ Do you want to save the changes before closing?</source>
 <context>
     <name>ImageEditor</name>
     <message>
+        <source>Database</source>
+        <translation type="unfinished">Локальная база данных</translation>
+    </message>
+    <message>
+        <source>0.01</source>
+        <translation type="unfinished">0.01</translation>
+    </message>
+    <message>
+        <source>0.00</source>
+        <translation type="unfinished">0.00</translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation type="unfinished">&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
+    <message>
         <source>Image Editor</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1777,10 +1832,6 @@ Do you want to save the changes before closing?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Database</source>
-        <translation type="unfinished">Локальная база данных</translation>
-    </message>
-    <message>
         <source>Column:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1791,10 +1842,6 @@ Do you want to save the changes before closing?</source>
     <message>
         <source>Position/Size</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>0.01</source>
-        <translation type="unfinished">0.01</translation>
     </message>
     <message>
         <source>Y:</source>
@@ -1817,20 +1864,8 @@ Do you want to save the changes before closing?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>0.00</source>
-        <translation type="unfinished">0.00</translation>
-    </message>
-    <message>
-        <source>&amp;OK</source>
-        <translation type="unfinished">&amp;OK</translation>
-    </message>
-    <message>
         <source>Alt+O</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
     </message>
     <message>
         <source>Alt+C</source>
@@ -1859,6 +1894,18 @@ Do you want to save the changes before closing?</source>
 <context>
     <name>IntEdit</name>
     <message>
+        <source>Name:</source>
+        <translation type="unfinished">Название:</translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation type="unfinished">&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
+    <message>
         <source>Int</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1875,20 +1922,8 @@ Do you want to save the changes before closing?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Name:</source>
-        <translation type="unfinished">Название:</translation>
-    </message>
-    <message>
-        <source>&amp;OK</source>
-        <translation type="unfinished">&amp;OK</translation>
-    </message>
-    <message>
         <source>Alt+O</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
     </message>
     <message>
         <source>Alt+C</source>
@@ -4225,11 +4260,11 @@ try to rename it with extention. Example: filename.vsd</source>
     </message>
     <message>
         <source>Headings</source>
-        <translation>Рубрикатор</translation>
+        <translation type="obsolete">Рубрикатор</translation>
     </message>
     <message>
         <source>Enclosures</source>
-        <translation>Вложения</translation>
+        <translation type="obsolete">Вложения</translation>
     </message>
     <message>
         <source>Add additional table</source>
@@ -4350,6 +4385,14 @@ Press OK to continue or Cancel to cancel the operation</source>
     <message>
         <source>Cannot find selected attribute!</source>
         <translation>Не могу найти выбранный атрибут!</translation>
+    </message>
+    <message>
+        <source>Tables</source>
+        <translation>Таблицы</translation>
+    </message>
+    <message>
+        <source>Assotiated IO</source>
+        <translation>Ассоциированные ИО</translation>
     </message>
 </context>
 <context>
@@ -5392,6 +5435,22 @@ Further work is impossible. You should use equal versions of client and server s
 <context>
     <name>LabelEditor</name>
     <message>
+        <source>0.01</source>
+        <translation type="unfinished">0.01</translation>
+    </message>
+    <message>
+        <source>0.00</source>
+        <translation type="unfinished">0.00</translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation type="unfinished">&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
+    <message>
         <source>Properties (Label)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5440,10 +5499,6 @@ Further work is impossible. You should use equal versions of client and server s
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>0.01</source>
-        <translation type="unfinished">0.01</translation>
-    </message>
-    <message>
         <source>Y:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5464,10 +5519,6 @@ Further work is impossible. You should use equal versions of client and server s
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>0.00</source>
-        <translation type="unfinished">0.00</translation>
-    </message>
-    <message>
         <source>Preview:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5476,16 +5527,8 @@ Further work is impossible. You should use equal versions of client and server s
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;OK</source>
-        <translation type="unfinished">&amp;OK</translation>
-    </message>
-    <message>
         <source>Alt+O</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
     </message>
     <message>
         <source>Alt+C</source>
@@ -5536,12 +5579,32 @@ Further work is impossible. You should use equal versions of client and server s
 <context>
     <name>ListEdit</name>
     <message>
-        <source>List</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Name:</source>
         <translation type="unfinished">Название:</translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation type="unfinished">&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation type="unfinished">&amp;Редактировать</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">Удалить</translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation type="unfinished">Внимание</translation>
+    </message>
+    <message>
+        <source>List</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>name</source>
@@ -5556,16 +5619,8 @@ Further work is impossible. You should use equal versions of client and server s
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;OK</source>
-        <translation type="unfinished">&amp;OK</translation>
-    </message>
-    <message>
         <source>Alt+O</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
     </message>
     <message>
         <source>Alt+C</source>
@@ -5588,10 +5643,6 @@ Further work is impossible. You should use equal versions of client and server s
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;Edit</source>
-        <translation type="unfinished">&amp;Редактировать</translation>
-    </message>
-    <message>
         <source>Alt+E</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5602,10 +5653,6 @@ Further work is impossible. You should use equal versions of client and server s
     <message>
         <source>Alt+D</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation type="unfinished">Удалить</translation>
     </message>
     <message>
         <source>String</source>
@@ -5630,10 +5677,6 @@ Further work is impossible. You should use equal versions of client and server s
     <message>
         <source>I do not understand the type %1.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Warning</source>
-        <translation type="unfinished">Внимание</translation>
     </message>
     <message>
         <source>I do not know how to edit QVariant type %1.</source>
@@ -5755,12 +5798,24 @@ Further work is impossible. You should use equal versions of client and server s
 <context>
     <name>NewVariant</name>
     <message>
+        <source>Name:</source>
+        <translation type="unfinished">Название:</translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation type="unfinished">&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
+    <message>
         <source>New Variant</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Type:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Тип:</translation>
     </message>
     <message>
         <source>String</source>
@@ -5783,20 +5838,8 @@ Further work is impossible. You should use equal versions of client and server s
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Name:</source>
-        <translation type="unfinished">Название:</translation>
-    </message>
-    <message>
-        <source>&amp;OK</source>
-        <translation type="unfinished">&amp;OK</translation>
-    </message>
-    <message>
         <source>Alt+O</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
     </message>
     <message>
         <source>Alt+C</source>
@@ -5870,6 +5913,18 @@ Further work is impossible. You should use equal versions of client and server s
 <context>
     <name>PageSetup</name>
     <message>
+        <source>8.5</source>
+        <translation type="unfinished">8.5</translation>
+    </message>
+    <message>
+        <source>11.0</source>
+        <translation type="unfinished">11.0</translation>
+    </message>
+    <message>
+        <source>1.0</source>
+        <translation type="unfinished">1.0</translation>
+    </message>
+    <message>
         <source>Edit page settings...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5886,16 +5941,8 @@ Further work is impossible. You should use equal versions of client and server s
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>8.5</source>
-        <translation type="unfinished">8.5</translation>
-    </message>
-    <message>
         <source>Height:</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>11.0</source>
-        <translation type="unfinished">11.0</translation>
     </message>
     <message>
         <source>in Inches</source>
@@ -5908,10 +5955,6 @@ Further work is impossible. You should use equal versions of client and server s
     <message>
         <source>Top:</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>1.0</source>
-        <translation type="unfinished">1.0</translation>
     </message>
     <message>
         <source>Bottom:</source>
@@ -5985,6 +6028,10 @@ Further work is impossible. You should use equal versions of client and server s
 <context>
     <name>ParamListEdit</name>
     <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Отмена</translation>
+    </message>
+    <message>
         <source>List</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5996,25 +6043,9 @@ Further work is impossible. You should use equal versions of client and server s
         <source>Select</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="unfinished">Отмена</translation>
-    </message>
 </context>
 <context>
     <name>ParameterEdit</name>
-    <message>
-        <source>Parameter List</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Active</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>Type</source>
         <translation type="unfinished">Тип</translation>
@@ -6028,12 +6059,36 @@ Further work is impossible. You should use equal versions of client and server s
         <translation type="unfinished">&amp;OK</translation>
     </message>
     <message>
-        <source>Alt+O</source>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation type="unfinished">&amp;Редактировать</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">Удалить</translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation type="unfinished">Внимание</translation>
+    </message>
+    <message>
+        <source>Parameter List</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
+        <source>Active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+O</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Alt+C</source>
@@ -6048,20 +6103,12 @@ Further work is impossible. You should use equal versions of client and server s
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;Edit</source>
-        <translation type="unfinished">&amp;Редактировать</translation>
-    </message>
-    <message>
         <source>Alt+E</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>List</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation type="unfinished">Удалить</translation>
     </message>
     <message>
         <source>Not a Valid Report</source>
@@ -6104,10 +6151,6 @@ The root node is not &apos;report&apos;.</source>
     <message>
         <source>I do not understand the type %1.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Warning</source>
-        <translation type="unfinished">Внимание</translation>
     </message>
     <message>
         <source>I do not know how to edit QVariant type %1.</source>
@@ -6155,6 +6198,10 @@ The root node is not &apos;report&apos;.</source>
 <context>
     <name>PreviewDialog</name>
     <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Отмена</translation>
+    </message>
+    <message>
         <source>Print Preview</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6169,10 +6216,6 @@ The root node is not &apos;report&apos;.</source>
     <message>
         <source>Print</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="unfinished">Отмена</translation>
     </message>
 </context>
 <context>
@@ -6612,21 +6655,83 @@ Attributes:</source>
         <translation></translation>
     </message>
     <message>
-        <source>Report Definition Not Found</source>
+        <source>&lt;SVG data %1&gt;</source>
+        <translation>&lt;Фрагмент файла SVG %1&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Video data %1&gt;</source>
+        <translation>&lt;Фрагмент видео-файла %1&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;XML document %1&gt;</source>
+        <translation>&lt;Фрагмент XML документа %1&gt;</translation>
+    </message>
+    <message>
+        <source>Not received yet!</source>
+        <translation>Еще не получено!</translation>
+    </message>
+    <message>
+        <source>Mark as accepted!</source>
+        <translation>Пометьте как принятое</translation>
+    </message>
+    <message>
+        <source>Not accepted yet!</source>
+        <translation>Еще не принято!</translation>
+    </message>
+    <message>
+        <source>An error was occured while updating the command!</source>
+        <translation>Произошла ошибка при обновлении распоряжения!</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Ошибка</translation>
+    </message>
+    <message>
+        <source>Can&apos;t find %1 district</source>
+        <translation type="obsolete">Не могу найти %1 подразделение</translation>
+    </message>
+    <message>
+        <source>Can&apos;t added user %1</source>
+        <translation type="obsolete">Не могу добавить пользователя %1</translation>
+    </message>
+    <message>
+        <source>Edit user</source>
+        <translation type="obsolete">Изменить пользователя</translation>
+    </message>
+    <message>
+        <source>Please select user</source>
+        <translation type="obsolete">Выберите пользователя</translation>
+    </message>
+    <message>
+        <source>Can&apos;t edit user with user_id %1</source>
+        <translation type="obsolete">Не могу редактировать пользователя с ИД = %1</translation>
+    </message>
+    <message>
+        <source>administrator</source>
+        <translation>Администратор</translation>
+    </message>
+    <message>
+        <source>operator</source>
+        <translation>Оператор</translation>
+    </message>
+    <message>
+        <source>Attribute reference</source>
+        <translation>Название справочника</translation>
+    </message>
+    <message>
+        <source>New indicator</source>
+        <translation>Новый показатель</translation>
+    </message>
+    <message>
+        <source>Search by template</source>
+        <translation>Поиск по шаблону</translation>
+    </message>
+    <message>
+        <source>DynamicDocs </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The report definition for this report, &quot;%1&quot; cannot be found.
-Please contact your Systems Administrator and report this issue.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unknown Error</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>An unknown error was encountered while processing your request.
-Please contact your Systems Administrator and report this issue.</source>
+        <source>DynamicDocs Client</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6718,83 +6823,21 @@ Please contact your Systems Administrator and report this issue.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;SVG data %1&gt;</source>
-        <translation>&lt;Фрагмент файла SVG %1&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Video data %1&gt;</source>
-        <translation>&lt;Фрагмент видео-файла %1&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;XML document %1&gt;</source>
-        <translation>&lt;Фрагмент XML документа %1&gt;</translation>
-    </message>
-    <message>
-        <source>Not received yet!</source>
-        <translation>Еще не получено!</translation>
-    </message>
-    <message>
-        <source>Mark as accepted!</source>
-        <translation>Пометьте как принятое</translation>
-    </message>
-    <message>
-        <source>Not accepted yet!</source>
-        <translation>Еще не принято!</translation>
-    </message>
-    <message>
-        <source>An error was occured while updating the command!</source>
-        <translation>Произошла ошибка при обновлении распоряжения!</translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation>Ошибка</translation>
-    </message>
-    <message>
-        <source>Can&apos;t find %1 district</source>
-        <translation type="obsolete">Не могу найти %1 подразделение</translation>
-    </message>
-    <message>
-        <source>Can&apos;t added user %1</source>
-        <translation type="obsolete">Не могу добавить пользователя %1</translation>
-    </message>
-    <message>
-        <source>Edit user</source>
-        <translation type="obsolete">Изменить пользователя</translation>
-    </message>
-    <message>
-        <source>Please select user</source>
-        <translation type="obsolete">Выберите пользователя</translation>
-    </message>
-    <message>
-        <source>Can&apos;t edit user with user_id %1</source>
-        <translation type="obsolete">Не могу редактировать пользователя с ИД = %1</translation>
-    </message>
-    <message>
-        <source>administrator</source>
-        <translation>Администратор</translation>
-    </message>
-    <message>
-        <source>operator</source>
-        <translation>Оператор</translation>
-    </message>
-    <message>
-        <source>Attribute reference</source>
-        <translation>Название справочника</translation>
-    </message>
-    <message>
-        <source>New indicator</source>
-        <translation>Новый показатель</translation>
-    </message>
-    <message>
-        <source>Search by template</source>
-        <translation>Поиск по шаблону</translation>
-    </message>
-    <message>
-        <source>DynamicDocs </source>
+        <source>Report Definition Not Found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>DynamicDocs Client</source>
+        <source>The report definition for this report, &quot;%1&quot; cannot be found.
+Please contact your Systems Administrator and report this issue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An unknown error was encountered while processing your request.
+Please contact your Systems Administrator and report this issue.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6834,20 +6877,8 @@ Please contact your Systems Administrator and report this issue.</source>
 <context>
     <name>QueryEditor</name>
     <message>
-        <source>Query Editor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Name:</source>
         <translation type="unfinished">Название:</translation>
-    </message>
-    <message>
-        <source>Load MetaSQL from Database</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Group:</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>&amp;OK</source>
@@ -6856,6 +6887,18 @@ Please contact your Systems Administrator and report this issue.</source>
     <message>
         <source>&amp;Cancel</source>
         <translation type="unfinished">&amp;Отмена</translation>
+    </message>
+    <message>
+        <source>Query Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load MetaSQL from Database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group:</source>
+        <translation type="unfinished">Группа:</translation>
     </message>
     <message>
         <source>Query:</source>
@@ -6873,14 +6916,6 @@ Please contact your Systems Administrator and report this issue.</source>
 <context>
     <name>QueryList</name>
     <message>
-        <source>Query List</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Querys:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>&amp;Close</source>
         <translation type="unfinished">&amp;Закрыть</translation>
     </message>
@@ -6897,6 +6932,14 @@ Please contact your Systems Administrator and report this issue.</source>
         <translation type="unfinished">Удалить</translation>
     </message>
     <message>
+        <source>Query List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Querys:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Duplicate Name</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6908,6 +6951,34 @@ Please contact your Systems Administrator and report this issue.</source>
 <context>
     <name>ReportHandler</name>
     <message>
+        <source>Save &amp;As...</source>
+        <translation type="unfinished">Сохранить &amp;как...</translation>
+    </message>
+    <message>
+        <source>&amp;Close</source>
+        <translation type="unfinished">&amp;Закрыть</translation>
+    </message>
+    <message>
+        <source>Cu&amp;t</source>
+        <translation type="unfinished">Выр&amp;езать атрибут</translation>
+    </message>
+    <message>
+        <source>&amp;Paste</source>
+        <translation type="unfinished">&amp;Вставить атрибут</translation>
+    </message>
+    <message>
+        <source>&amp;Delete</source>
+        <translation type="unfinished">&amp;Удалить</translation>
+    </message>
+    <message>
+        <source>Properties</source>
+        <translation type="unfinished">Свойства</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation type="unfinished">&amp;Редактировать</translation>
+    </message>
+    <message>
         <source>&amp;New File</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6918,14 +6989,6 @@ Please contact your Systems Administrator and report this issue.</source>
     <message>
         <source>&amp;Save File</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Save &amp;As...</source>
-        <translation type="unfinished">Сохранить &amp;как...</translation>
-    </message>
-    <message>
-        <source>&amp;Close</source>
-        <translation type="unfinished">&amp;Закрыть</translation>
     </message>
     <message>
         <source>Print Preview...</source>
@@ -6944,20 +7007,8 @@ Please contact your Systems Administrator and report this issue.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cu&amp;t</source>
-        <translation type="unfinished">Выр&amp;езать атрибут</translation>
-    </message>
-    <message>
         <source>&amp;Copy</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Paste</source>
-        <translation type="unfinished">&amp;Вставить атрибут</translation>
-    </message>
-    <message>
-        <source>&amp;Delete</source>
-        <translation type="unfinished">&amp;Удалить</translation>
     </message>
     <message>
         <source>Preferences</source>
@@ -6966,10 +7017,6 @@ Please contact your Systems Administrator and report this issue.</source>
     <message>
         <source>Select All</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Properties</source>
-        <translation type="unfinished">Свойства</translation>
     </message>
     <message>
         <source>Show Grid</source>
@@ -7124,10 +7171,6 @@ Please contact your Systems Administrator and report this issue.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;Edit</source>
-        <translation type="unfinished">&amp;Редактировать</translation>
-    </message>
-    <message>
         <source>&amp;Insert</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7229,16 +7272,36 @@ Please contact your Systems Administrator and report this issue.</source>
 <context>
     <name>ReportParameter</name>
     <message>
-        <source>Parameter</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Name:</source>
         <translation type="unfinished">Название:</translation>
     </message>
     <message>
-        <source>Type:</source>
+        <source>&amp;OK</source>
+        <translation type="unfinished">&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation type="unfinished">Описание</translation>
+    </message>
+    <message>
+        <source>Value</source>
+        <translation type="unfinished">Значение</translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation type="unfinished">Добавить</translation>
+    </message>
+    <message>
+        <source>Parameter</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Type:</source>
+        <translation type="unfinished">Тип:</translation>
     </message>
     <message>
         <source>String</source>
@@ -7265,18 +7328,6 @@ Please contact your Systems Administrator and report this issue.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;OK</source>
-        <translation type="unfinished">&amp;OK</translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
-    </message>
-    <message>
-        <source>Description</source>
-        <translation type="unfinished">Описание</translation>
-    </message>
-    <message>
         <source>Defined List</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7297,16 +7348,8 @@ Please contact your Systems Administrator and report this issue.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Value</source>
-        <translation type="unfinished">Значение</translation>
-    </message>
-    <message>
         <source>Label</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation type="unfinished">Добавить</translation>
     </message>
     <message>
         <source>Edit</source>
@@ -7324,14 +7367,6 @@ Please contact your Systems Administrator and report this issue.</source>
 <context>
     <name>ReportParameterList</name>
     <message>
-        <source>Parameter List</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Parameters:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>&amp;Close</source>
         <translation type="unfinished">&amp;Закрыть</translation>
     </message>
@@ -7347,9 +7382,25 @@ Please contact your Systems Administrator and report this issue.</source>
         <source>Delete</source>
         <translation type="unfinished">Удалить</translation>
     </message>
+    <message>
+        <source>Parameter List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parameters:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ReportParameterListItem</name>
+    <message>
+        <source>&amp;OK</source>
+        <translation type="unfinished">&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
     <message>
         <source>List Item</source>
         <translation type="unfinished"></translation>
@@ -7363,16 +7414,8 @@ Please contact your Systems Administrator and report this issue.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;OK</source>
-        <translation type="unfinished">&amp;OK</translation>
-    </message>
-    <message>
         <source>Alt+O</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
     </message>
     <message>
         <source>Alt+C</source>
@@ -7381,6 +7424,38 @@ Please contact your Systems Administrator and report this issue.</source>
 </context>
 <context>
     <name>ReportProperties</name>
+    <message>
+        <source>Name:</source>
+        <translation type="unfinished">Название:</translation>
+    </message>
+    <message>
+        <source>Database</source>
+        <translation type="unfinished">Локальная база данных</translation>
+    </message>
+    <message>
+        <source>10%</source>
+        <translation type="unfinished">10%</translation>
+    </message>
+    <message>
+        <source>11.0</source>
+        <translation type="unfinished">11.0</translation>
+    </message>
+    <message>
+        <source>0.0</source>
+        <translation type="unfinished">0.0</translation>
+    </message>
+    <message>
+        <source>8.5</source>
+        <translation type="unfinished">8.5</translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation type="unfinished">&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
     <message>
         <source>Report Properties</source>
         <translation type="unfinished"></translation>
@@ -7392,10 +7467,6 @@ Please contact your Systems Administrator and report this issue.</source>
     <message>
         <source>Title:</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Name:</source>
-        <translation type="unfinished">Название:</translation>
     </message>
     <message>
         <source>Description:</source>
@@ -7415,7 +7486,7 @@ Please contact your Systems Administrator and report this issue.</source>
     </message>
     <message>
         <source>Source</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Источник</translation>
     </message>
     <message>
         <source>Static</source>
@@ -7424,10 +7495,6 @@ Please contact your Systems Administrator and report this issue.</source>
     <message>
         <source>Dynamic</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Database</source>
-        <translation type="unfinished">Локальная база данных</translation>
     </message>
     <message>
         <source>Column:</source>
@@ -7445,10 +7512,6 @@ Please contact your Systems Administrator and report this issue.</source>
         <source>0%
 (transparent)</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>10%</source>
-        <translation type="unfinished">10%</translation>
     </message>
     <message>
         <source>100%
@@ -7520,20 +7583,8 @@ Please contact your Systems Administrator and report this issue.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>11.0</source>
-        <translation type="unfinished">11.0</translation>
-    </message>
-    <message>
         <source>Height:</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>0.0</source>
-        <translation type="unfinished">0.0</translation>
-    </message>
-    <message>
-        <source>8.5</source>
-        <translation type="unfinished">8.5</translation>
     </message>
     <message>
         <source>in inches</source>
@@ -7576,14 +7627,6 @@ Please contact your Systems Administrator and report this issue.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;OK</source>
-        <translation type="unfinished">&amp;OK</translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
-    </message>
-    <message>
         <source>Choose a file</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7595,6 +7638,14 @@ Please contact your Systems Administrator and report this issue.</source>
 <context>
     <name>ReportWriterWindow</name>
     <message>
+        <source>&amp;Cascade</source>
+        <translation type="unfinished">&amp;Каскадом</translation>
+    </message>
+    <message>
+        <source>&amp;Tile</source>
+        <translation type="unfinished">&amp;Мозайкой</translation>
+    </message>
+    <message>
         <source>E&amp;xit</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7605,14 +7656,6 @@ Please contact your Systems Administrator and report this issue.</source>
     <message>
         <source>%1 - %2 on %3/%4 AS %5</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Cascade</source>
-        <translation type="unfinished">&amp;Каскадом</translation>
-    </message>
-    <message>
-        <source>&amp;Tile</source>
-        <translation type="unfinished">&amp;Мозайкой</translation>
     </message>
 </context>
 <context>
@@ -7688,6 +7731,22 @@ Please contact your Systems Administrator and report this issue.</source>
 <context>
     <name>SectionEditor</name>
     <message>
+        <source>&amp;Add</source>
+        <translation type="unfinished">&amp;Добавить</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation type="unfinished">&amp;Редактировать</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">Удалить</translation>
+    </message>
+    <message>
+        <source>&amp;Close</source>
+        <translation type="unfinished">&amp;Закрыть</translation>
+    </message>
+    <message>
         <source>Section Editor</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7740,28 +7799,12 @@ Please contact your Systems Administrator and report this issue.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;Add</source>
-        <translation type="unfinished">&amp;Добавить</translation>
-    </message>
-    <message>
-        <source>&amp;Edit</source>
-        <translation type="unfinished">&amp;Редактировать</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation type="unfinished">Удалить</translation>
-    </message>
-    <message>
         <source>Move &amp;Up</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Move &amp;Down</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Close</source>
-        <translation type="unfinished">&amp;Закрыть</translation>
     </message>
     <message>
         <source>Alt+C</source>
@@ -7867,6 +7910,18 @@ Please contact your Systems Administrator and report this issue.</source>
 <context>
     <name>StringEdit</name>
     <message>
+        <source>Name:</source>
+        <translation type="unfinished">Название:</translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation type="unfinished">&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
+    <message>
         <source>String</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7883,20 +7938,8 @@ Please contact your Systems Administrator and report this issue.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Name:</source>
-        <translation type="unfinished">Название:</translation>
-    </message>
-    <message>
-        <source>&amp;OK</source>
-        <translation type="unfinished">&amp;OK</translation>
-    </message>
-    <message>
         <source>Alt+O</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
     </message>
     <message>
         <source>Alt+C</source>
@@ -7905,6 +7948,22 @@ Please contact your Systems Administrator and report this issue.</source>
 </context>
 <context>
     <name>TextEditor</name>
+    <message>
+        <source>0.01</source>
+        <translation type="unfinished">0.01</translation>
+    </message>
+    <message>
+        <source>0.00</source>
+        <translation type="unfinished">0.00</translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation type="unfinished">&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
     <message>
         <source>Properties (Text)</source>
         <translation type="unfinished"></translation>
@@ -7962,10 +8021,6 @@ Please contact your Systems Administrator and report this issue.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>0.01</source>
-        <translation type="unfinished">0.01</translation>
-    </message>
-    <message>
         <source>Y:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7986,10 +8041,6 @@ Please contact your Systems Administrator and report this issue.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>0.00</source>
-        <translation type="unfinished">0.00</translation>
-    </message>
-    <message>
         <source>Preview:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7998,16 +8049,8 @@ Please contact your Systems Administrator and report this issue.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;OK</source>
-        <translation type="unfinished">&amp;OK</translation>
-    </message>
-    <message>
         <source>Alt+O</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
     </message>
     <message>
         <source>Alt+C</source>
@@ -8391,6 +8434,65 @@ Please contact your Systems Administrator and report this issue.</source>
     <message>
         <source>FIO</source>
         <translation type="obsolete">Фамилия, ИО</translation>
+    </message>
+</context>
+<context>
+    <name>attr_history</name>
+    <message>
+        <source>Altered attribute history</source>
+        <translation>История изменений атрибута</translation>
+    </message>
+    <message>
+        <source>Alteration history</source>
+        <translation>История изменений</translation>
+    </message>
+    <message>
+        <source>Properties</source>
+        <translation>Свойства</translation>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation>Название:</translation>
+    </message>
+    <message>
+        <source>Type:</source>
+        <translation>Тип:</translation>
+    </message>
+    <message>
+        <source>Group:</source>
+        <translation>Группа:</translation>
+    </message>
+    <message>
+        <source>ID</source>
+        <translation type="obsolete">ID</translation>
+    </message>
+    <message>
+        <source>Start</source>
+        <translation type="obsolete">Актуален с</translation>
+    </message>
+    <message>
+        <source>Stop</source>
+        <translation type="obsolete">Актуален по</translation>
+    </message>
+    <message>
+        <source>Measured</source>
+        <translation type="obsolete">Измерено к</translation>
+    </message>
+    <message>
+        <source>Inserted in DB</source>
+        <translation type="obsolete">Добавлено в БД</translation>
+    </message>
+    <message>
+        <source>Source</source>
+        <translation type="obsolete">Источник</translation>
+    </message>
+    <message>
+        <source>Transfer</source>
+        <translation type="obsolete">Довел</translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation type="obsolete">Описание</translation>
     </message>
 </context>
 <context>
@@ -9315,7 +9417,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>View History</source>
-        <translation>Просмотреть историю</translation>
+        <translation>Просмотр истории</translation>
     </message>
 </context>
 <context>
@@ -9509,6 +9611,10 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>login</name>
     <message>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
+    <message>
         <source>Log In</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9531,10 +9637,6 @@ p, li { white-space: pre-wrap; }
     <message>
         <source>&amp;Database:</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
     </message>
     <message>
         <source>&amp;Login</source>
@@ -9591,6 +9693,14 @@ System Error &apos;%1&apos;
 <context>
     <name>loginOptions</name>
     <message>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
+    <message>
+        <source>&amp;Save</source>
+        <translation type="unfinished">&amp;Сохранить</translation>
+    </message>
+    <message>
         <source>Login Options</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9617,14 +9727,6 @@ System Error &apos;%1&apos;
     <message>
         <source>ODBC</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
-    </message>
-    <message>
-        <source>&amp;Save</source>
-        <translation type="unfinished">&amp;Сохранить</translation>
     </message>
 </context>
 <context>
