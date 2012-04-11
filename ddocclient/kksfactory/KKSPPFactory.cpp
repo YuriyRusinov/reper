@@ -2000,7 +2000,7 @@ int KKSPPFactory::insertCategoryAttr(int idCategory, KKSCategoryAttr * a) const
     bool isMandatory = a->isMandatory();
     bool isReadOnly = a->isReadOnly();
 
-    QString sql = QString("select cAddAttr(%1, %2, %3, %4, %5)")
+    QString sql = QString("select cAddAttr(%1, %2, asString(%3, true), %4, %5)")
                             .arg(idCategory)
                             .arg(idAttr)
                             .arg(defVal)

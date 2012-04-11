@@ -565,6 +565,10 @@ void KKSRubricFactory :: viewAttachments (QAbstractItemModel * attachModel, cons
                     oe->release ();
                     refObj->release ();
                 }
+                else if (av->attribute()->type()->attrType() == KKSAttrType::atDateTime)
+                    objModel->setData (wIndex, QDateTime::fromString(av->value().value(), Qt::ISODate).toString("dd.MM.yyyy hh:mm:ss"), Qt::DisplayRole);
+                else if (av->attribute()->type()->attrType() == KKSAttrType::atTime)
+                    objModel->setData (wIndex, QDateTime::fromString(av->value().value(), Qt::ISODate).toString("hh:mm:ss"), Qt::DisplayRole);
                 else
                     objModel->setData (wIndex, av->value().value(), Qt::DisplayRole);
             }
@@ -603,5 +607,8 @@ void KKSRubricFactory :: copyFromRubric (KKSRubric * rDest, QAbstractItemModel *
         if (rSource)
             rDest->addRubric (rSource);
     }
+    else
+        if (oEditor)
+            delete oEditor;
     refIO->release();
 }
