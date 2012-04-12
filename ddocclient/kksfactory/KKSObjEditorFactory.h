@@ -79,6 +79,7 @@ public:
                                       const QString & extraTitle,
                                       const KKSCategory* wCat=0, // категория информационных объектов
                                       bool mode=true, // наличие кнопок OK, Cancel, Apply
+                                      bool toolB = false, // видимость тулбара
                                       Qt::WindowModality windowModality=Qt::NonModal, // модальность окна
                                       QWidget *parent=0,
                                       Qt::WindowFlags f=0);
@@ -230,7 +231,11 @@ public slots:
     void createNewEditor (QWidget * editor, int idObject, const KKSCategory * c, QString tableName, int nTab, bool isModal);
     void createNewEditorParam (QWidget * editor, int idObject, const KKSCategory * c, QString tableName, int nTab, bool isModal, const KKSMap<int, KKSAttrValue *>& ioAvals, const KKSMap<int, KKSAttrValue *>& aVals);
     void editExistOE (QWidget * editor, int idObject, int idObjEx, const KKSCategory * c, QString tableName, int nTab, bool isModal);
-     int deleteOE (QWidget * editor, int idObject, int idObjEx, QString tableName, int drow);
+    int deleteOE (QWidget * editor, int idObject, int idObjEx, QString tableName, int drow);
+    
+    void addAttrSearchTemplate (void);
+    void editAttrSearchTemplate (void);
+    void delAttrSearchTemplate (void);
 
 private slots:
     void setEIOTemplates (KKSObjEditor* editor, KKSObject* wObj);

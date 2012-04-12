@@ -1283,6 +1283,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjRecEditor (int idObject,// идентиф
                                                          const QString & extraTitle,
                                                          const KKSCategory* wCat, // категория информационных объектов
                                                          bool mode, // наличие кнопок OK, Cancel, Apply
+                                                         bool toolB,
                                                          Qt::WindowModality windowModality, // модальность окна
                                                          QWidget *parent, 
                                                          Qt::WindowFlags f)
@@ -1359,7 +1360,15 @@ KKSObjEditor* KKSObjEditorFactory :: createObjRecEditor (int idObject,// идентиф
             if (nTemplC <= 0)
                 tChild->release ();
         }
-        recW->hideToolBar();//hideAllButtons ();//gbSearch->setVisible (true);
+        if (toolB)
+        {
+            recW->showToolBar();
+            recW->hideGroup (0);
+            recW->hideGroup (2);
+            recW->hideGroup (3);
+        }
+        else
+            recW->hideToolBar();//hideAllButtons ();//gbSearch->setVisible (true);
 //        recW->hideGroup (1);//gbEdit->setVisible (false);
 //        recW->hideGroup (2);//gbImportExport->setVisible (false);
 //        recW->tbSetView->setVisible (false);
@@ -2815,6 +2824,7 @@ void KKSObjEditorFactory :: loadAttributeReference (QString tableName, QWidget *
                                                          "",
                                                          c,
                                                          true,
+                                                         false,
                                                          wEditor ? wEditor->windowModality () : Qt::ApplicationModal,
                                                          wEditor, 
                                                          Qt::Dialog);
@@ -3224,6 +3234,7 @@ void KKSObjEditorFactory :: loadExecReference (QAbstractItemModel *exModel)
                                                          "",
                                                          c,
                                                          true,
+                                                         false,
                                                          wEditor ? wEditor->windowModality () : Qt::ApplicationModal,
                                                          wEditor, 
                                                          Qt::Dialog);
@@ -3300,7 +3311,7 @@ void KKSObjEditorFactory :: addExecReference (QString tableName, QAbstractItemMo
                                                          filters,
                                                          "",
                                                          c,
-                                                         true,
+                                                         true, false,
                                                          wEditor ? wEditor->windowModality () : Qt::ApplicationModal,
                                                          wEditor, 
                                                          Qt::Dialog);
@@ -4681,7 +4692,7 @@ void KKSObjEditorFactory :: addSendIO (void)
                                                       filterGroup,
                                                       "",
                                                       io->category(),
-                                                      true,
+                                                      true, false,
                                                       Qt::WindowModal,
                                                       messDial,
                                                       Qt::Dialog);
@@ -5119,9 +5130,22 @@ void KKSObjEditorFactory :: addNewSearchTempl (QAbstractItemModel * searchMod)
             if(searchMod){
                 int nr = searchMod->rowCount();
                 searchMod->insertRows (nr, 1);
-                QModelIndex wIndex = searchMod->index (nr, 0);
-                searchMod->setData (wIndex, stName, Qt::DisplayRole);
-                searchMod->setData (wIndex, res, Qt::UserRole);
+                if (searchMod->columnCount() == 1)
+                {
+                    QModelIndex wIndex = searchMod->index (nr, 0);
+                    searchMod->setData (wIndex, stName, Qt::DisplayRole);
+                    searchMod->setData (wIndex, res, Qt::UserRole);
+                }
+                else
+                {
+                    QModelIndex wIndex = searchMod->index (nr, 0);
+                    searchMod->setData (wIndex, res, Qt::DisplayRole);
+                    searchMod->setData (wIndex, res, Qt::UserRole);
+                    
+                    wIndex = searchMod->index (nr, 1);
+                    searchMod->setData (wIndex, stName, Qt::DisplayRole);
+                    searchMod->setData (wIndex, res, Qt::UserRole);
+                }
             }
         }
     }
@@ -5247,8 +5271,22 @@ void KKSObjEditorFactory :: updateSearchTempl (const QModelIndex& wIndex, QAbstr
                 {
                     stName = stdb->name ();
                     stdb->release ();
-                    searchMod->setData (wIndex, stName, Qt::DisplayRole);
-                    searchMod->setData (wIndex, stres, Qt::UserRole);
+                    if (searchMod->columnCount() == 1)
+                    {
+                        searchMod->setData (wIndex, stName, Qt::DisplayRole);
+                        searchMod->setData (wIndex, stres, Qt::UserRole);
+                    }
+                    else
+                    {
+                        QModelIndex wcIndex = wIndex.sibling (wIndex.row(), 0);
+                        searchMod->setData (wcIndex, res, Qt::DisplayRole);
+                        searchMod->setData (wcIndex, res, Qt::UserRole);
+
+                        wcIndex = wIndex.sibling (wIndex.row(), 1);
+                        searchMod->setData (wcIndex, stName, Qt::DisplayRole);
+                        searchMod->setData (wcIndex, res, Qt::UserRole);
+                        
+                    }
                 }
                 int dres = ppf->deleteSearchGroup (oldIdGroup);//m_group->id());
                 qDebug () << __PRETTY_FUNCTION__ << dres;
@@ -5361,7 +5399,7 @@ void KKSObjEditorFactory :: addIOTable (KKSObject * wObj, KKSObjEditor * editor)
                                                          filters,
                                                          "",
                                                          c,//o->category (),
-                                                         true,
+                                                         true, false,
                                                          Qt::ApplicationModal,
                                                          editor, 
                                                          Qt::Dialog);
@@ -5477,7 +5515,7 @@ void KKSObjEditorFactory :: loadObjAttrRef (KKSObject * wObj, const KKSAttrValue
                                                          filters, 
                                                          "",
                                                          c,
-                                                         true,
+                                                         true, false,
                                                          wEditor ? wEditor->windowModality () : Qt::ApplicationModal,
                                                          wEditor, 
                                                          Qt::Dialog);
@@ -5584,7 +5622,7 @@ void KKSObjEditorFactory :: loadObjCAttrRef (KKSObjectExemplar * wObjE, const KK
                                                          filters, 
                                                          "",
                                                          c,
-                                                         true,
+                                                         true, false,
                                                          wEditor ? wEditor->windowModality () : Qt::ApplicationModal,
                                                          wEditor, 
                                                          Qt::Dialog);
@@ -6327,4 +6365,38 @@ void KKSObjEditorFactory :: putSyncWidget (KKSObjEditor * editor, KKSObjectExemp
 void KKSObjEditorFactory :: setIndicesFactory (KKSIndFactory * _indf)
 {
     m_indf = _indf;
+}
+
+void KKSObjEditorFactory :: addAttrSearchTemplate (void)
+{
+    QAction * act = qobject_cast<QAction *>(this->sender());
+    KKSRecWidget * rw = qobject_cast<KKSRecWidget *> (act->parentWidget());
+    if (!rw)
+        return;
+    QAbstractItemModel * sModel = rw->getSourceModel ();
+    addNewSearchTempl (sModel);
+}
+
+void KKSObjEditorFactory :: editAttrSearchTemplate (void)
+{
+    QAction * act = qobject_cast<QAction *>(this->sender());
+    KKSRecWidget * rw = qobject_cast<KKSRecWidget *> (act->parentWidget());
+    if (!rw)
+        return;
+    QAbstractItemModel * sModel = rw->getSourceModel ();
+    QModelIndex wIndex = rw->getSourceIndex();
+    wIndex = wIndex.sibling (wIndex.row(), 0);
+    updateSearchTempl (wIndex, sModel);
+}
+
+void KKSObjEditorFactory :: delAttrSearchTemplate (void)
+{
+    QAction * act = qobject_cast<QAction *>(this->sender());
+    KKSRecWidget * rw = qobject_cast<KKSRecWidget *> (act->parentWidget());
+    if (!rw)
+        return;
+    QAbstractItemModel * sModel = rw->getSourceModel ();
+    QModelIndex wIndex = rw->getSourceIndex();
+    wIndex = wIndex.sibling (wIndex.row(), 0);
+    deleleSearchTempl (wIndex, sModel);
 }

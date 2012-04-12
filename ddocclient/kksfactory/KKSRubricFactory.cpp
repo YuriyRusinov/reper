@@ -294,7 +294,7 @@ void KKSRubricFactory :: loadCategory (RubricForm * rForm)
                                                         filters, 
                                                         "",
                                                         c,
-                                                        true,
+                                                        true, false,
                                                         Qt::ApplicationModal,
                                                         rForm, 
                                                         Qt::Dialog);

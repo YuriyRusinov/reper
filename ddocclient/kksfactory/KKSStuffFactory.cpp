@@ -927,7 +927,7 @@ void KKSStuffFactory :: setUserToPosition (const QModelIndex& posIndex, QAbstrac
     KKSObject * wObj = loader->loadIO (IO_USERS_ID, true);
     KKSCategory * wCat = wObj->category()->tableCategory();
     QWidget * parentWidget = qobject_cast<QWidget *>(this->sender());
-    KKSObjEditor * usersEditor = oef->createObjRecEditor(IO_IO_ID, IO_USERS_ID, filters, tr ("Set user onto position"), wCat, true, Qt::WindowModal, parentWidget, Qt::Dialog);
+    KKSObjEditor * usersEditor = oef->createObjRecEditor(IO_IO_ID, IO_USERS_ID, filters, tr ("Set user onto position"), wCat, true, false, Qt::WindowModal, parentWidget, Qt::Dialog);
     if (usersEditor->exec() == QDialog::Accepted)
     {
         int idUser = usersEditor->getID();

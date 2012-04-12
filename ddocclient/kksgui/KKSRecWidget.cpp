@@ -260,6 +260,8 @@ void KKSRecWidget :: hideGroup (int num_gr)
         case 0: {
                     actFilter->setVisible (false);
                     actFilterSep->setVisible (false);
+                    QList<QAction*> acts = tBActions->actions();
+                    acts.at (1)->setVisible (false);
                     break;
                 }
         case 1: 

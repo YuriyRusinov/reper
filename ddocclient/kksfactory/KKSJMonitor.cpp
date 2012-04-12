@@ -835,7 +835,7 @@ void KKSJMonitor::slotExecuteExCmd(int idJournal, int idCategory)
                                                         filterGroups, 
                                                         "",
                                                         o->category(),
-                                                        true,
+                                                        true, false,
                                                         Qt::WindowModal,
                                                         parent, 
                                                         Qt::Dialog);

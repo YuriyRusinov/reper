@@ -402,23 +402,48 @@ void KKSAttributesFactory :: loadSearchTemplates (KKSAttrEditor * aEditor)
                                                         "",
                                                         o->category(),
                                                         true,
+                                                        true,
                                                         Qt::WindowModal,
                                                         parent, 
                                                         Qt::Dialog);
+
+    KKSRecWidget * rw = objEditor->getRecordsWidget();
+    disconnect (rw);
+    disconnect (objEditor);
+    rw->actAdd->disconnect (objEditor);
+    rw->actEdit->disconnect (objEditor);
+    rw->actDel->disconnect (objEditor);
+    connect (rw->actAdd, SIGNAL (triggered()), m_oef, SLOT (addAttrSearchTemplate()) );
+    connect (rw->actEdit, SIGNAL (triggered()), m_oef, SLOT (editAttrSearchTemplate()) );
+    connect (rw->actDel, SIGNAL (triggered()), m_oef, SLOT (delAttrSearchTemplate()) );
     int idSearchTemplate = 0;
-    if (objEditor->exec () == QDialog::Accepted){
+    if (objEditor->exec () == QDialog::Accepted)
+    {
         idSearchTemplate = objEditor->getID();
         if(idSearchTemplate <= 0)
+        {
+            o->release ();
+            objEditor->setParent (0);
+            delete objEditor;
             return;
+        }
     }
     else
+    {
+        o->release ();
+        objEditor->setParent (0);
+        delete objEditor;
         return;
+    }
 
     
     KKSSearchTemplate * st = loader->loadSearchTemplate(idSearchTemplate);
     aEditor->setSearchTemplate(st);
     if(st)
         st->release();
+    o->release ();
+    objEditor->setParent (0);
+    delete objEditor;
 }
 
 /* Метод осуществляет загрузку колонок справочника для атрибута-ссылки.
@@ -1914,7 +1939,7 @@ void KKSAttributesFactory :: slotLoadIOSrc (KKSObject ** io)
     
     QWidget * parentW = qobject_cast<QWidget *>(this->sender());
     
-    KKSObjEditor* ioSrc = m_oef->createObjRecEditor(IO_IO_ID, IO_IO_ID, filters, tr ("Select document"), 0, true, Qt::WindowModal, parentW);
+    KKSObjEditor* ioSrc = m_oef->createObjRecEditor(IO_IO_ID, IO_IO_ID, filters, tr ("Select document"), 0, true, false, Qt::WindowModal, parentW);
     if (ioSrc->exec () == QDialog::Accepted)
     {
         int idObject = ioSrc->getID();

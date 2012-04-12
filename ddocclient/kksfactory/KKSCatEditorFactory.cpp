@@ -598,7 +598,7 @@ void KKSCatEditorFactory :: copyAttributesIntoCategory (KKSCategory *c, QAbstrac
                                                        filters,
                                                        tr ("Select source category"),
                                                        ioCat->category(),
-                                                       true,
+                                                       true, false,
                                                        Qt::WindowModal,
                                                        cEditor,
                                                        Qt::Dialog
