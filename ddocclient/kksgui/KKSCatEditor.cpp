@@ -197,7 +197,7 @@ void KKSCatEditor :: apply (void)
     if (pCategory->tableCategory())
     {
         emit saveCategory (pTableCategory, -1, 10, this);
-        if (pTableCategory->id() <= 0)
+        if (pTableCategory->id() <= 0 || isCloseIgnored)
             return;
         pCategory->tableCategory()->setId (pTableCategory->id());
     }
@@ -205,7 +205,7 @@ void KKSCatEditor :: apply (void)
     //cbChildCat->itemData (cbChildCat->currentIndex()).toInt()
     emit saveCategory (pCategory, (pTableCategory ? pTableCategory->id() : -1), cbTypes->itemData (cbTypes->currentIndex()).toInt(), this);
 
-    bool isSaved (pCategory->id() > 0);
+    bool isSaved (pCategory->id() > 0 && !isCloseIgnored);
     recCatTemplatesW->setEnabled (isSaved);
     if (pCategory->tableCategory() && recTableCatTemplatesW)
         recTableCatTemplatesW->setEnabled (isSaved);
@@ -659,4 +659,9 @@ void KKSCatEditor :: copyAttributesFrom (void)
     qDebug () << __PRETTY_FUNCTION__;
     QAbstractItemModel * aModel = recTableW->getSourceModel ();
     emit copyAttrsFromAnotherCat (pTableCategory, aModel, this);
+}
+
+void KKSCatEditor :: catDbError (void)
+{
+    this->isCloseIgnored = true;
 }

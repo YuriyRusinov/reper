@@ -54,6 +54,8 @@ class _GUI_EXPORT KKSTemplateEditor : public KKSDialog
 
         void moveUp (void);
         void moveDown (void);
+        
+        void saveErr (void);
 
     signals:
         void saveTemplate (KKSTemplate *, KKSTemplateEditor *);
@@ -116,6 +118,8 @@ class _GUI_EXPORT KKSTemplateEditor : public KKSDialog
         QPushButton *pbOk;
         QPushButton *pbCancel;
         QPushButton *pbApply;
+        
+        bool dbErr;
 
     private:
         Q_OBJECT

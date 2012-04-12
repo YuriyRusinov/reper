@@ -105,9 +105,7 @@ KKSCategoryTemplateWidget* KKSCatEditorFactory :: viewCategories (const KKSList<
                                                                   QWidget *parent,
                                                                   Qt::WindowFlags f)
 {
-    bool asAdmin = false;
-    if(loader->getUserId() == ADMIN_ROLE)
-        asAdmin = true;
+    bool asAdmin (loader->getUserId() == ADMIN_ROLE);
 
     KKSCategoryTemplateWidget *ctWidget = new KKSCategoryTemplateWidget (mode, asAdmin, parent, f);
     if (!ctWidget)
@@ -454,6 +452,8 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (int idCategory, // ид
     connect (cEditor, SIGNAL (addNewCategoryTemplate (QWidget *, int, QAbstractItemModel *)), tf, SLOT (addTemplate (QWidget *, int, QAbstractItemModel *)) );
     connect (cEditor, SIGNAL (editCategoryTemplate (QWidget *, int, QAbstractItemModel *, const QModelIndex& )), tf, SLOT (editTemplate (QWidget *, int, QAbstractItemModel *, const QModelIndex&)) );
     connect (cEditor, SIGNAL (delCategoryTemplate (QWidget *, int, QAbstractItemModel *, const QModelIndex& )), tf, SLOT (delTemplate (QWidget *, int, QAbstractItemModel *, const QModelIndex&)) );
+    
+    connect (this, SIGNAL (categoryDbError ()), cEditor, SLOT (catDbError()) );
 
     cEditor->setWindowModality (windowModality);
     if (windowModality != Qt::NonModal)
@@ -712,6 +712,7 @@ void KKSCatEditorFactory :: saveCategory (KKSCategory *cat, int idTableCat, int 
 
     if (res == ERROR_CODE)
     {
+        emit categoryDbError ();
         QMessageBox::warning (cEditor, tr ("Category"), tr("Category is not saved"));
         return;
     }

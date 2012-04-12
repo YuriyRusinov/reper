@@ -143,6 +143,8 @@ void KKSTemplateEditorFactory :: initTemplateConnections (KKSTemplateEditor *tEd
             this,
             SLOT (updateTemplate (KKSTemplate *, KKSTemplateEditor *))
             );
+    
+    connect (this, SIGNAL (templateDbError()), tEditor, SLOT (saveErr()) );
 }
 
 KKSTemplate * KKSTemplateEditorFactory :: initTemplate (int idTemplate, QString name, KKSCategory *c)
@@ -687,6 +689,7 @@ void KKSTemplateEditorFactory :: saveTemplate (KKSTemplate *t, KKSTemplateEditor
     qDebug () << __PRETTY_FUNCTION__ << wIndex << t->name() << t->id();
     if (res == ERROR_CODE)
     {
+        emit templateDbError();
         QMessageBox::warning (tEditor, tr("Save template"), tr("Cannot save template"));
         return;
     }

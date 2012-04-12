@@ -91,6 +91,7 @@ class _GUI_EXPORT KKSCatEditor : public KKSDialog
         void setAccessRules (KKSAccessEntity * acl);
 
         void setTableCategoryName (const QString& tName);
+        void catDbError (void);
 
     signals:
         void addAttrsIntoCat (KKSCategory *c, QAbstractItemModel * attrModel, KKSCatEditor *editor);

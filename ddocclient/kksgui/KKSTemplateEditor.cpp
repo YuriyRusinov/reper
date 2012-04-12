@@ -42,7 +42,8 @@ KKSTemplateEditor :: KKSTemplateEditor (KKSTemplate *t, bool mode, QWidget *pare
     tableAttrs (new QTableView()),
     pbOk (new QPushButton (tr("&OK"))),
     pbCancel (new QPushButton (tr("&Cancel"))),
-    pbApply (new QPushButton (tr("A&pply")))
+    pbApply (new QPushButton (tr("A&pply"))),
+    dbErr (false)
 {
     if (t)
         tRef->addRef ();
@@ -99,7 +100,8 @@ void KKSTemplateEditor :: save (void)
 void KKSTemplateEditor :: saveClose (void)
 {
     save ();
-    accept ();
+    if (!dbErr)
+        accept ();
 }
 
 void KKSTemplateEditor :: init_widgets (bool mode)
@@ -521,4 +523,9 @@ void KKSTemplateEditor :: setItemDelegate (QAbstractItemDelegate *iDeleg)
     this->tvGroups->setItemDelegate (iDeleg);
     if (oldDeleg)
         delete oldDeleg;
+}
+
+void KKSTemplateEditor :: saveErr (void)
+{
+    dbErr = true;
 }

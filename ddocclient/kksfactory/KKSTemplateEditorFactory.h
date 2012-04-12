@@ -41,6 +41,7 @@ class _F_EXPORT KKSTemplateEditorFactory : public KKSEntityFactory
         void templateEditorCreated (KKSTemplateEditor *tEditor);
         void templateEditorCreatedModal (KKSTemplateEditor *tEditor);
         void templateAdded (KKSTemplate *templ);
+        void templateDbError ();
 
     private slots:
         void addTemplate (QWidget *ctw, int idCat, QAbstractItemModel * templMod);

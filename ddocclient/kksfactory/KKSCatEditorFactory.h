@@ -62,6 +62,7 @@ class _F_EXPORT KKSCatEditorFactory : public KKSEntityFactory
         void categoryEditorCreatedModal (KKSCatEditor *cEditor);
         void categoryAdded (KKSCategory *cat);
         void attributesListLoaded (KKSAttributesEditor *aEditor);
+        void categoryDbError ();
 
     private slots:
         void loadCatTemplates (KKSCategoryTemplateWidget *ctw, int idCat, const QModelIndex& ind);

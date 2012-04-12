@@ -1260,7 +1260,7 @@ int KKSPPFactory::insertAttrView(int idCategory, int idTemplate, int idGroup, KK
     bool isReadOnly = av->isReadOnly();
     int order = av->order();
 
-    QString sql = QString("select ivInsert(%1, %2, %3, %4, %5, %6)")
+    QString sql = QString("select ivInsert(%1, %2, %3, %4, %5, asString (%6, true))")
                             .arg(idCategoryAttr)
                             .arg(idTemplate)
                             .arg(idGroup)
