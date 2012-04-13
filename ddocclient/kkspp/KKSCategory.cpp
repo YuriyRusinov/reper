@@ -29,6 +29,7 @@ KKSCategory::KKSCategory() : KKSRecord(),
     m_isMain (true),
     m_type (NULL),
     m_tableCategory (NULL),
+    m_recAttrCategory(NULL),
     m_lifeCycle (KKSLifeCycle::defLifeCycle()),
     m_isSystem(false),
     m_isGlobal(false),
@@ -54,19 +55,17 @@ KKSCategory::KKSCategory(const KKSCategory & c) : KKSRecord(c),
 {
     m_type = NULL;
     m_tableCategory = NULL;
+    m_recAttrCategory = NULL;
     m_lifeCycle = NULL;
     if (m_acl)
         m_acl->addRef ();
-    
-//    m_isMain = c.isMain();
 
     setType(const_cast<KKSType *>(c.type()));
 
     setState(const_cast<KKSState*>(c.state()));
     
     setTableCategory(const_cast<KKSCategory *>(c.tableCategory()));
-
-//    m_attributes = c.attributes();
+    setRecAttrCategory(const_cast<KKSCategory *>(c.recAttrCategory()));
 
     setLifeCycle(const_cast<KKSLifeCycle*>(c.lifeCycle()));
 
@@ -77,6 +76,7 @@ KKSCategory::KKSCategory(int id, const QString & name, KKSType * type) : KKSReco
     m_isMain (true),
     m_type (NULL),
     m_tableCategory (NULL),
+    m_recAttrCategory(NULL),
     m_lifeCycle (KKSLifeCycle::defLifeCycle()),
     m_isSystem(false),
     m_isGlobal(false),
@@ -105,6 +105,9 @@ KKSCategory::~KKSCategory()
 
     if(m_tableCategory)
         m_tableCategory->release();
+
+    if(m_recAttrCategory)
+        m_recAttrCategory->release();
 
     if(m_lifeCycle)
         m_lifeCycle->release();
@@ -150,6 +153,16 @@ KKSCategory * KKSCategory::tableCategory()
     return m_tableCategory;
 }
 
+const KKSCategory * KKSCategory::recAttrCategory() const
+{
+    return m_recAttrCategory;
+}
+
+KKSCategory * KKSCategory::recAttrCategory()
+{
+    return m_recAttrCategory;
+}
+
 const KKSType * KKSCategory::type() const
 {
     return m_type;
@@ -188,6 +201,17 @@ void KKSCategory::setTableCategory(KKSCategory * _tableCategory)
     m_tableCategory = _tableCategory;
     if(m_tableCategory)
         m_tableCategory->addRef();
+}
+
+void KKSCategory::setRecAttrCategory(KKSCategory * _recAttrCategory)
+{
+    if(m_recAttrCategory && m_recAttrCategory != _recAttrCategory)
+        m_recAttrCategory->release();
+
+    m_recAttrCategory = _recAttrCategory;
+    
+    if(m_recAttrCategory)
+        m_recAttrCategory->addRef();
 }
 
 void KKSCategory::setType(KKSType * _type)

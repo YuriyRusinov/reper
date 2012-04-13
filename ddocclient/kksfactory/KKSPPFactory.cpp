@@ -1580,6 +1580,20 @@ int KKSPPFactory::insertCategory(KKSCategory* c) const
         }
     }
 
+
+    if(c->recAttrCategory()){
+        if(c->recAttrCategory()->id() <= 0){
+            setInTransaction();
+            int ok = insertCategory(c->recAttrCategory());
+            restoreInTransaction();
+            if(ok != OK_CODE){
+                if(!inTransaction())
+                    db->rollback();
+                return ERROR_CODE;
+            }
+        }
+    }
+
     //если у категории не сохранен тип - сохраним его
     if(c->type()->id() <= 0){
         setInTransaction();
@@ -1747,6 +1761,20 @@ int KKSPPFactory::updateCategory(const KKSCategory* c) const
         }
     }
 
+    if(c->recAttrCategory()){
+        //если категория не сохранена - сохраним
+        if(c->recAttrCategory()->id() <= 0){
+            setInTransaction();
+            int ok = insertCategory(const_cast<KKSCategory*>(c->recAttrCategory()));
+            restoreInTransaction();
+            if(ok != OK_CODE){
+                if(!inTransaction())
+                    db->rollback();
+                return ERROR_CODE;
+            }
+        }
+    }
+
     //если у категории не сохранен тип - сохраним его
     if(c->type()->id() <= 0){
         setInTransaction();
@@ -1871,70 +1899,18 @@ int KKSPPFactory::deleteCategory(KKSCategory* c) const
     if(!inTransaction())
         db->begin();
 
-    QString sql = QString("delete from io_views where id_attr_category in (select id from attrs_categories where id_io_category =  %1)").arg(c->id());
-    int ok = db->executeCmd(sql);
-    if(ok != OK_CODE){
+    QString sql = QString("select cDeleteCategory(%1)").arg(c->id());
+    KKSResult * res = db->execute(sql);
+    if(!res || res->getRowCount() != 1 || res->getCellAsInt(0, 0) != 1){
         if(!inTransaction())
             db->rollback();
+        
+        if(res)
+            delete res;
+
         return ERROR_CODE;
     }
     
-    sql = QString("delete from io_templates where id_io_category = %1").arg(c->id());
-    ok = db->executeCmd(sql);
-    if(ok != OK_CODE){
-        if(!inTransaction())
-            db->rollback();
-        return ERROR_CODE;
-    }
-
-    /*sql = QString("delete from attrs_values where id_io_category = %1").arg(c->id());
-    ok = db->executeCmd(sql);
-    if(ok != OK_CODE){
-        if(!inTransaction())
-            db->rollback();
-        return ERROR_CODE;
-    }
-    */
-
-    sql = QString("delete from attrs_categories where id_io_category = %1").arg(c->id());
-    ok = db->executeCmd(sql);
-    if(ok != OK_CODE){
-        if(!inTransaction())
-            db->rollback();
-        return ERROR_CODE;
-    }
-
-    sql = QString("delete from io_life_cycle where id_io_category = %1").arg(c->id());
-    ok = db->executeCmd(sql);
-    if(ok != OK_CODE){
-        if(!inTransaction())
-            db->rollback();
-        return ERROR_CODE;
-    }
-
-    ok = cDeleteRubrics(c->id());
-    if(ok != OK_CODE){
-        if(!inTransaction())
-            db->rollback();
-        return ERROR_CODE;
-    }
-
-    sql = QString("delete from access_categories_table where id_io_category = %1").arg(c->id());
-    ok = db->executeCmd(sql);
-    if(ok != OK_CODE){
-        if(!inTransaction())
-            db->rollback();
-        return ERROR_CODE;
-    }
-
-    sql = QString("delete from io_categories where id = %1").arg(c->id());
-    ok = db->executeCmd(sql);
-    if(ok != OK_CODE){
-        if(!inTransaction())
-            db->rollback();
-        return ERROR_CODE;
-    }
-
     if(!inTransaction())
         db->commit();
 

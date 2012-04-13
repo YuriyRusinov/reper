@@ -26,17 +26,6 @@ public:
    const QString & code(bool quoted = false) const;
    virtual void setCode(const QString & newCode);
 
-#ifdef Q_WS_WIN
-   //
-   //for web
-   //
-   std::string name_w();
-   void setName_w(const std::string & name);
-   std::string desc_w();
-   void setDesc_w(const std::string & desc);
-   std::string code_w();
-   void setCode_w(const std::string & code);
-#endif
 
    virtual void setParent(KKSRecord * p);
    const KKSRecord * parent() const;

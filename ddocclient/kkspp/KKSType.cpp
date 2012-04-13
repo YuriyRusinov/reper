@@ -15,16 +15,17 @@
 
 KKSType::KKSType() : KKSRecord()
 {
+    m_isQualifier = false;
 }
 
 KKSType::KKSType(const KKSType & t) : KKSRecord(t)
 {
-
+    m_isQualifier = t.m_isQualifier;
 }
 
 KKSType::KKSType(int id, const QString & name, const QString & desc) : KKSRecord(id, name, desc)
 {
-    
+    m_isQualifier = false;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -41,6 +42,27 @@ KKSType::~KKSType()
 KKSType * KKSType::defType1()
 {
     KKSType * type = new KKSType(1, QString::fromLocal8Bit("Общие документы"));
+    type->setAsQualifier(false);
 
     return type;
+}
+
+bool KKSType::isQualifier() const
+{
+    return m_isQualifier;
+}
+
+void KKSType::setAsQualifier(bool yes)
+{
+    m_isQualifier = yes;
+}
+
+void KKSType::setRName(const QString & rName)
+{
+    m_rName = rName;
+}
+
+const QString & KKSType::rName() const
+{
+    return m_rName;
 }

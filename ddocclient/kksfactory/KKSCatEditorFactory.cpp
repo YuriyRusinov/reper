@@ -334,6 +334,7 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (int idCategory, // ид
     {
         cat = new KKSCategory ();
         KKSType *cType = new KKSType (10, tr ("Child category"));
+        cType->setAsQualifier(false);
         if (!cType)
             return 0;
         cat->setType (cType);

@@ -167,8 +167,12 @@ KKSObjectExemplar * KKSConverter::typeToExemplar(const KKSLoader * loader, const
     appendAttrValue(tc, attrValues, 1, QString::number(t->id()), KKSAttrType::atInt);
     //name
     appendAttrValue(tc, attrValues, 2, t->name(), KKSAttrType::atString);
+    //r_name
+    appendAttrValue(tc, attrValues, 187, t->rName(), KKSAttrType::atString);
     //description
     appendAttrValue(tc, attrValues, 3, t->desc(), KKSAttrType::atString);
+    //is_qualifier
+    appendAttrValue(tc, attrValues, 310, t->isQualifier() ? "TRUE" : "FALSE", KKSAttrType::atBool);
 
     eio->setAttrValues(attrValues);
 
@@ -275,11 +279,19 @@ KKSObjectExemplar * KKSConverter::categoryToExemplar(const KKSLoader * loader, c
     appendAttrValue(tc, attrValues, 1, QString::number(c->id()), KKSAttrType::atInt);
     //id_io_category_type
     appendAttrValue(tc, attrValues, 10, QString::number(c->type()->id()), KKSAttrType::atInt);//id_io_category_type
+    
     //id_child
     if(c->tableCategory())
         appendAttrValue(tc, attrValues, 11, QString::number(c->tableCategory()->id()), KKSAttrType::atInt);//id_child
     else
         appendAttrValue(tc, attrValues, 11, QString::null, KKSAttrType::atInt);
+    
+    //id_child2
+    if(c->recAttrCategory())
+        appendAttrValue(tc, attrValues, 311, QString::number(c->recAttrCategory()->id()), KKSAttrType::atInt);//id_child2
+    else
+        appendAttrValue(tc, attrValues, 311, QString::null, KKSAttrType::atInt);
+
     //is_main
     appendAttrValue(tc, attrValues, 17, c->isMain() ? "true" : "false", KKSAttrType::atBool);//is_main
     //name

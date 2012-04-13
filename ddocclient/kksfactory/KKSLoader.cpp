@@ -534,6 +534,7 @@ KKSCategory * KKSLoader::loadCategory(int id, bool simplify) const
     type->setId(res->getCellAsInt(0, 1));
     type->setName(res->getCellAsString(0, 5));
     type->setDesc(res->getCellAsString(0, 6));
+    type->setAsQualifier(res->getCellAsBool(0, 15));
     
     KKSState * state = new KKSState();
     state->setId(res->getCellAsInt(0, 11));
@@ -563,6 +564,15 @@ KKSCategory * KKSLoader::loadCategory(int id, bool simplify) const
         if(c1)
             c1->release();
     }
+
+    //дочерняя категория 2 (для контейнерных ИО)
+    if(!res->isEmpty(0, 16)){
+        KKSCategory * c2 = loadCategory(res->getCellAsInt(0, 16));
+        c->setRecAttrCategory(c2);
+        if(c2)
+            c2->release();
+    }
+
     //is_main
     c->setMain(res->getCellAsBool(0, 7));
     //is_system
@@ -716,7 +726,7 @@ KKSObject * KKSLoader::loadIO(int id, bool simplify) const
     io->setState(s);
     s->release();
 
-    KKSType * type = new KKSType();
+    KKSType * type = new KKSType();//здесть экземпляр данного класса является типом ИО, поэтому метод KKSType::isQualifier() смысла не имеет
     type->setId(res->getCellAsInt(0, 25));
     type->setName(res->getCellAsString(0, 26));
     type->setDesc(res->getCellAsString(0, 27));
@@ -917,11 +927,7 @@ KKSObjectExemplar * KKSLoader::loadEIO(int id, KKSObject * io, const KKSCategory
 
 KKSType * KKSLoader::loadType(int id) const
 {
-    QString tableNames = QString(VIEW_PREFIX) + "io_category_types t ";
-
-    QString sql = QString("select t.id, t.name, t.description "
-                          "from %1 "
-                          "where t.id = %2 ").arg(tableNames).arg(id);
+    QString sql = QString("select * from cGetCategoryTypes(%1);").arg(id);
 
     KKSResult * res = db->execute(sql);
     if(!res)
@@ -936,7 +942,9 @@ KKSType * KKSLoader::loadType(int id) const
     KKSType * type = new KKSType();
     type->setId(res->getCellAsInt(0, 0));
     type->setName(res->getCellAsString(0, 1));
-    type->setDesc(res->getCellAsString(0, 2));
+    type->setRName(res->getCellAsString(0, 2));
+    type->setDesc(res->getCellAsString(0, 3));
+    type->setAsQualifier(res->getCellAsBool(0, 4));
     
     delete res;
 
@@ -974,62 +982,35 @@ KKSType * KKSLoader::loadIOType(int id) const
 KKSMap<int, KKSType *> KKSLoader::loadAvailableTypes (void) const
 {
     KKSMap<int, KKSType*> typeList;
-    KKSObject *typeRef = this->loadIO (IO_CAT_TYPE_ID, true);
-    if (!typeRef)
-        return typeList;
-
-    KKSList<const KKSFilterGroup *> catTypeFilters;
-    KKSList<const KKSFilter *> fCatTypes;
-    const KKSFilter * fCatType = typeRef->category()->tableCategory()->createFilter (1, "select id from io_category_types where id >=1 and id<=7 or id=11 or id=12", KKSFilter::foInSQL);
-    if (!fCatType)
-        return typeList;
-
-    fCatTypes.append (fCatType);
-    fCatType->release ();
-    KKSFilterGroup *fCatTypeGroup = new KKSFilterGroup (true);
-    fCatTypeGroup->setFilters (fCatTypes);
-    catTypeFilters.append (fCatTypeGroup);
-    fCatTypeGroup->release ();
-
-    KKSMap<int, KKSEIOData *> typeEx = this->loadEIOList (typeRef, catTypeFilters);
-    //int cInd = -1;
-    KKSMap<int, KKSEIOData *>::const_iterator p;
-    for (p=typeEx.constBegin(); p!= typeEx.constEnd(); p++)
-    {
-        KKSType * type = new KKSType (p.key(), p.value()->fieldValue("name"), p.value()->fieldValue("description"));
-        typeList.insert (p.key(), type);
-        if (type)
-            type->release ();
-    }
-    typeRef->release ();
-/*    QString tableNames = QString(VIEW_PREFIX) + "io_category_types t ";
-
-    QString sql = QString("select t.id, t.name, t.description "
-                          "from %1 "
-                          ).arg(tableNames);
+    
+    QString sql = QString("select * from cGetCategoryTypes() where id not in (8, 9, 10);");
 
     KKSResult * res = db->execute(sql);
     if(!res)
         return typeList;
 
     int count = res->getRowCount();
-    if (count <= 0)
-    {
+    if(count <= 0){
         delete res;
         return typeList;
     }
 
-    for (int i=0; i<count; i++)
-    {
-        int idType (res->getCellAsInt(i, 0));
-        KKSType * type = new KKSType(idType, res->getCellAsString(i, 1), res->getCellAsString(i, 2));
-        typeList.insert (idType, type);
-        if (type)
-            type->release ();
+    for (int row=0; row<count; row++){
+        KKSType * type = new KKSType();
+        int id = res->getCellAsInt(row, 0);
+        
+        type->setId(id);
+        type->setName(res->getCellAsString(row, 1));
+        type->setRName(res->getCellAsString(row, 2));
+        type->setDesc(res->getCellAsString(row, 3));
+        type->setAsQualifier(res->getCellAsBool(row, 4));
+        
+        typeList.insert(id, type);
+        type->release();
     }
-
+    
     delete res;
-*/
+    
     return typeList;
 }
 

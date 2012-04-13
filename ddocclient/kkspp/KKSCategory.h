@@ -33,6 +33,9 @@ class _PP_EXPORT KKSCategory : public KKSRecord
 
         const KKSCategory * tableCategory() const;
         KKSCategory * tableCategory();
+        const KKSCategory * recAttrCategory() const;
+        KKSCategory * recAttrCategory();
+
         const KKSType * type() const;
         KKSType * type();
 
@@ -80,6 +83,7 @@ class _PP_EXPORT KKSCategory : public KKSRecord
         KKSLifeCycle * lifeCycle();
 
         void setTableCategory(KKSCategory * _tableCategory);
+        void setRecAttrCategory(KKSCategory * _recAttrCategory);
         void setType(KKSType * _type);
         void setLifeCycle(KKSLifeCycle * _lifeCycle);
 
@@ -139,7 +143,8 @@ class _PP_EXPORT KKSCategory : public KKSRecord
         void setModified(bool yes);
 
         KKSType* m_type;
-        KKSCategory* m_tableCategory;
+        KKSCategory* m_tableCategory; //категория описывает набор атрибутов, которые соответствуют колонкам в подчиненной таблице
+        KKSCategory* m_recAttrCategory;//категория описывает набор пользовательских атрибутов (показателей), которыми могут обладать записи справочников
         KKSMap<int, KKSCategoryAttr *> m_attributes;
         KKSLifeCycle* m_lifeCycle;
 
