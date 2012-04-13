@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     03.04.2012 9:41:11                           */
+/* Created on:     13.04.2012 14:46:45                          */
 /*==============================================================*/
 
 
@@ -1360,6 +1360,7 @@ create table io_categories (
    id                   SERIAL not null,
    id_io_category_type  INT4                 not null,
    id_child             INT4                 null,
+   id_child2            INT4                 null,
    id_io_state          INT4                 not null default 1,
    is_main              BOOL                 not null default true,
    name                 VARCHAR              not null,
@@ -1369,6 +1370,7 @@ create table io_categories (
    is_global            BOOL                 not null default FALSE,
    is_completed         INT4                 not null default 0
       constraint CKC_IS_COMPLETED_IO_CATEG check (is_completed in (0,1,2)),
+   is_archived          BOOL                 not null default FALSE,
    constraint PK_IO_CATEGORIES primary key (id)
 )
 inherits (root_table);
@@ -1377,11 +1379,22 @@ comment on table io_categories is
 'таблица категорий информационных объектов. Каждая категория обладает набором атрибутов, которые должны иметь объекты данной категории. Кроме того, категория может иметь дочернюю категорию, которая определяет структуру таблицы, которая будет содержать записи объекта данной категории, если объект является контейнерным (т.е. содержит экземпляры информационного объекта). Примером такого объекта являются журналы и справочники.
 Если ИО не является конткйнерным, то данное поле (id_child) должно быть пусто (точнее если данное поле пусто, то объекты данной категории не являются контейнерными)';
 
+comment on column io_categories.id_child is
+'У категории, описывающей справочник может быть 2 подчиненных категории, первая описывает таблицу (набор колонок), вторая - допустимый набор пользовательских атрибутов (показателей), которыми могут обладать записи справочников.
+Данное поле описывает категорию для колонок таблицы';
+
+comment on column io_categories.id_child2 is
+'У категории, описывающей справочник может быть 2 подчиненных категории, первая описывает таблицу (набор колонок), вторая - допустимый набор пользовательских атрибутов (показателей), которыми могут обладать записи справочников.
+Данное поле описывает категорию для показателей';
+
 comment on column io_categories.id_io_state is
 'состояние категории с точки зрения синхронизации';
 
 comment on column io_categories.is_global is
 'признак глобальности категории';
+
+comment on column io_categories.is_archived is
+'Архивные категории не используются в работе. Считаются удаленными.';
 
 select setMacToNULL('io_categories');
 select createTriggerUID('io_categories');
@@ -1400,6 +1413,7 @@ create table io_category_types (
    id                   SERIAL not null,
    name                 VARCHAR              not null,
    r_name               VARCHAR              not null,
+   is_qualifier         BOOL                 not null default FALSE,
    description          VARCHAR              null,
    constraint PK_IO_CATEGORY_TYPES primary key (id)
 )
@@ -2685,7 +2699,6 @@ create table roles_actions (
 
 select setMacToNULL('roles_actions');
 
-
 /*==============================================================*/
 /* Table: rubricator                                            */
 /*==============================================================*/
@@ -3830,7 +3843,12 @@ alter table io_categories
       on delete restrict on update restrict;
 
 alter table io_categories
-   add constraint FK_IO_CATEG_REFERENCE_IO_CATEG foreign key (id_child)
+   add constraint FK_IO_CATEG_CHILD1 foreign key (id_child)
+      references io_categories (id)
+      on delete restrict on update restrict;
+
+alter table io_categories
+   add constraint FK_IO_CATEG_CHILD2 foreign key (id_child2)
       references io_categories (id)
       on delete restrict on update restrict;
 

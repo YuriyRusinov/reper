@@ -1573,6 +1573,8 @@ insert into attributes (unique_id, id, id_a_type, code, name, title, table_name,
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-307', 307, 2, 'id_attr_child', 'Описывающий атрибут', 'Описывающий атрибут', 'attributes', 'name', 150, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-308', 308, 2, 'id_attr_attr', 'Атрибут', 'Атрибут', 'attrs_attrs', 'name', 150, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-309', 309, 2, 'id_attr_value', 'Значение атрибута', 'Значение атрибута', 'attrs_values', 'value', 150, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-310', 310, 1, 'is_qualifier', 'Является справочником', 'Является справочником', NULL, NULL, 50, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-311', 311, 3, 'id_child2', 'Подчиненная категория показателей', 'Подчиненная категория показателей', 'io_categories', 'name', 300, TRUE);
 
 
 SELECT pg_catalog.setval('attributes_id_seq', 1000, true); --все пользовательские атрибуты будут начинаться с номера 1001
@@ -1613,6 +1615,7 @@ insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (5, 3, 2, NULL, true, false);--name
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (6, 3, 3, NULL, false, false);--desc
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (7, 3, 187, NULL, true, false);--r_name
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (530, 3, 310, 'FALSE', true, false);--is_qualifier
 
 
 --таблица представлений типов атрибутов
@@ -1647,7 +1650,8 @@ insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is
 --таблица категорий
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (29, 11, 1, NULL, true, true);
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (30, 11, 10, NULL, true, false); --id_io_category_type
-insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (31, 11, 11, NULL, false, false);
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (31, 11, 11, NULL, false, false);--id_child
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (531, 11, 311, NULL, false, false);--id_child2
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (32, 11, 2, NULL, true, false);
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (33, 11, 3, NULL, false, false);
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (34, 11, 6, NULL, true, false);
@@ -2516,8 +2520,8 @@ insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (523, 189, 304, NULL, false, false); --def_value
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (524, 189, 128, 'false', true, false); --is_mandatory
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (525, 189, 305, 'false', true, false); --is_read_only
-
-
+--530 занят для атрибута is_qualifier в справочнике типов категорий
+--531 занят для атрибута id_child2 в справочнике  категорий
 
 
 

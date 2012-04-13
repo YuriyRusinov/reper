@@ -168,7 +168,7 @@ begin
 
     res_query := res_query || ' order by ' || table_name || '.id';
 
-    raise warning '!!!RES_QUERY = %', res_query;
+--    raise warning '!!!RES_QUERY = %', res_query;
 
     return res_query;
 end
@@ -191,21 +191,21 @@ begin
     end if;
     
     select id_group into id_main_group from iogetsearchtemplate (id_search_template);
-    raise notice 'id of filters main group is %', id_main_group;
+    --raise notice 'id of filters main group is %', id_main_group;
 
     if (id_main_group is null) then
         return null;
     end if;
 
-    raise warning '1 RES_QUERY = %', res_query;
+    --raise warning '1 RES_QUERY = %', res_query;
     res_query := parseGroup (id_main_group, table_name);
     if (res_query is null or length (res_query) = 0) then
         return null;
     end if;
 
-    raise warning '2 RES_QUERY = %', res_query;
+    --raise warning '2 RES_QUERY = %', res_query;
     res_query := ' and ' || res_query;
-    raise warning '3 RES_QUERY = %', res_query;
+    --raise warning '3 RES_QUERY = %', res_query;
 
     return res_query;
 end
@@ -237,7 +237,7 @@ begin
         return null;
     end if;
 
-    raise warning '0 idGroup = %,  RES_QUERY = %', idGroup, res_query;
+    --raise warning '0 idGroup = %,  RES_QUERY = %', idGroup, res_query;
 
     tmp := ' ( ';
     select operation into oper from groups g where g.id=idGroup;
@@ -269,7 +269,7 @@ begin
 
         grCount := grCount + 1;
         tmp = '';
-        raise warning '4 idGroup = %,  RES_QUERY = %', idGroup, res_query;
+        --raise warning '4 idGroup = %,  RES_QUERY = %', idGroup, res_query;
     end loop;
 
     tmp := null;
@@ -317,13 +317,13 @@ begin
     else
         res_query := res_query ||  ' ) ';
     end if;
-    raise warning '6 RES_QUERY = %', res_query;
+    --raise warning '6 RES_QUERY = %', res_query;
     if (grCount > 0) then
         res_query := res_query || ' )';
     end if;
 
     --raise notice 'parse group result query is %', res_query;
-    raise warning '7 RES_QUERY = %', res_query;
+    --raise warning '7 RES_QUERY = %', res_query;
     return res_query;
 end
 $BODY$
