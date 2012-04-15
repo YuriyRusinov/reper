@@ -927,7 +927,7 @@ KKSObjectExemplar * KKSLoader::loadEIO(int id, KKSObject * io, const KKSCategory
 
 KKSType * KKSLoader::loadType(int id) const
 {
-    QString sql = QString("select * from cGetCategoryTypes(%1);").arg(id);
+    QString sql = QString("select * from cGetCategoryType(%1);").arg(id);
 
     KKSResult * res = db->execute(sql);
     if(!res)

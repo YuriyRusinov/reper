@@ -358,7 +358,7 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (int idCategory, // ид
         KKSType * ct = loader->loadType (idCatType);
         cat->setType (ct);
         //if (cat && ct && (idCatType == 1 || idCatType == 2 || idCatType == 12))// категории данных типов являются табличными
-        if (cat && ct && (idCatType == 1 || idCatType == 2))// категории данных типов являются табличными
+        if (cat && ct && ct->isQualifier())// категории данных типов являются табличными
         {
             KKSType * cTableT = loader->loadType (10);
             //
