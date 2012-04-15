@@ -5560,6 +5560,7 @@ void KKSObjEditorFactory :: loadObjAttrRef (KKSObject * wObj, const KKSAttrValue
             updateAttrModel (wIndex, sMod, recEditor->getID(), tableName, refObj);
             KKSValue val (sl.join (","), KKSAttrType::atCheckListEx);
             av->setValue (val);
+            const_cast<KKSAttrValue *>(avE)->setValue (val);
         }
         //qDebug () << __PRETTY_FUNCTION__ << sl;
     }
@@ -5683,11 +5684,17 @@ void KKSObjEditorFactory :: loadObjCAttrRef (KKSObjectExemplar * wObjE, const KK
                 sMod->setData (wIndex, recEditor->getID(), Qt::UserRole);
                 updateAttrModel (wIndex, sMod, recEditor->getID(), tableName, refObj);
                 KKSValue val (sl.join (","), KKSAttrType::atCheckListEx);
+                //qDebug () << __PRETTY_FUNCTION__ << sl << av->attribute()->id();
                 av->setValue (val);
+                const_cast<KKSAttrValue *>(avE)->setValue (val);
             }
         }
     }
-
+/*    KKSList<KKSAttrValue *> avals = wObjE->attrValues();
+    for (int i=0; i< avals.size(); i++)
+        if (avals[i]->attribute()->type()->attrType() == KKSAttrType::atCheckListEx)
+            qDebug () << __PRETTY_FUNCTION__ << avals[i]->attribute()->id() << avals[i]->attribute()->id() << avals[i]->value().value();
+*/
     refObj->release ();
 }
 
@@ -5732,12 +5739,21 @@ void KKSObjEditorFactory :: updateAttrModel (const QModelIndex & wIndex, QAbstra
             QVariant val = av ? av->value().valueVariant () : QVariant();
             if (av->attribute()->type()->attrType() == KKSAttrType::atJPG)
                 val = QObject::tr("<Image data %1>").arg (ii);
-            if (av->attribute()->type()->attrType() == KKSAttrType::atSVG)
+            else if (av->attribute()->type()->attrType() == KKSAttrType::atSVG)
                 val = QObject::tr("<SVG data %1>").arg (ii);
-            if (av->attribute()->type()->attrType() == KKSAttrType::atXMLDoc)
+            else if (av->attribute()->type()->attrType() == KKSAttrType::atXMLDoc)
                 val = QObject::tr("<XML document %1>").arg (ii);
-            if (av->attribute()->type()->attrType() == KKSAttrType::atVideo)
+            else if (av->attribute()->type()->attrType() == KKSAttrType::atVideo)
                 val = QObject::tr("<Video data %1>").arg (ii);
+            else if (av->attribute()->type()->attrType() == KKSAttrType::atList ||
+                        av->attribute()->type()->attrType() == KKSAttrType::atParent)
+            {
+                QVariant tVal(val);
+                QMap<int, QString> refColumnValues;
+                QMap<int, QString> avals = loader->loadAttributeValues(av->attribute(), refColumnValues, false, true, av->attribute()->tableName());
+                QString cV = avals.value (tVal.toInt());
+                val = cV;
+            }
             sMod->setData (saInd, pv.key(), Qt::UserRole);
             sMod->setData (saInd, val, Qt::DisplayRole);
             ic++;
@@ -5796,6 +5812,7 @@ void KKSObjEditorFactory :: loadObjDelAttrRef (KKSObject * wObj, const KKSAttrVa
             int nr = sourceModel->rowCount (par);
             KKSValue val (sl.join (","), KKSAttrType::atCheckListEx);
             av->setValue (val);
+            const_cast<KKSAttrValue *>(avE)->setValue (val);
             for (int i=0; i<nr; i++)
                 sourceModel->setData (sourceModel->index (i, 0, par), sl[i].toInt(), Qt::UserRole);
         }
@@ -5843,6 +5860,7 @@ void KKSObjEditorFactory :: loadObjCDelAttrRef (KKSObjectExemplar * wObjE, const
             int nr = sourceModel->rowCount (par);
             KKSValue val (sl.join (","), KKSAttrType::atCheckListEx);
             av->setValue (val);
+            const_cast<KKSAttrValue *>(avE)->setValue (val);
             for (int i=0; i<nr; i++)
                 sourceModel->setData (sourceModel->index (i, 0, par), sl[i].toInt(), Qt::UserRole);
         }

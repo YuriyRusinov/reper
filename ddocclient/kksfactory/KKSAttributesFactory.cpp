@@ -1501,7 +1501,7 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
                     break;
 
                 QStringList vArray = V.toStringList();
-                qDebug () << __PRETTY_FUNCTION__ << vArray << av->id();
+                qDebug () << __PRETTY_FUNCTION__ << vArray << av->id() << av->attribute()->id();
                 KKSObject * refIO = loader->loadIO (tableName, true);
                 if (!refIO)
                     break;
@@ -1575,6 +1575,21 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
                             QVariant val = av ? av->value().valueVariant () : QVariant();
                             if (av->attribute()->type()->attrType() == KKSAttrType::atJPG)
                                 val = QObject::tr("<Image data %1>").arg (ii);
+                            else if (av->attribute()->type()->attrType() == KKSAttrType::atSVG)
+                                val = QObject::tr("<SVG data %1>").arg (ii);
+                            else if (av->attribute()->type()->attrType() == KKSAttrType::atXMLDoc)
+                                val = QObject::tr("<XML document %1>").arg (ii);
+                            else if (av->attribute()->type()->attrType() == KKSAttrType::atVideo)
+                                val = QObject::tr("<Video data %1>").arg (ii);
+                            else if (av->attribute()->type()->attrType() == KKSAttrType::atList ||
+                                     av->attribute()->type()->attrType() == KKSAttrType::atParent)
+                            {
+                                QVariant tVal(val);
+                                QMap<int, QString> refColumnValues;
+                                QMap<int, QString> avals = loader->loadAttributeValues(av->attribute(), refColumnValues, false, true, av->attribute()->tableName());
+                                QString cV = avals.value (tVal.toInt());
+                                val = cV;
+                            }
                             sAttrModel->setData (saInd, key, Qt::UserRole);
                             sAttrModel->setData (saInd, val, Qt::DisplayRole);
                             ic++;

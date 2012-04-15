@@ -327,7 +327,10 @@ int KKSObjEditor :: constructObject()
             int type = cAttrValue->attribute()->type()->attrType();
             QVariant val = cAttrValue->value().valueVariant(); //sysAttributesValues.value (pSysAttrs.key());
             if (type == KKSAttrType::atCheckList || type == KKSAttrType::atCheckListEx)
+            {
                 value = val.toStringList().join(",");
+                //qDebug () << __PRETTY_FUNCTION__ << cAttrValue->attribute()->id() << value;
+            }
             else if (type == KKSAttrType::atRecordColor || type == KKSAttrType::atRecordTextColor)
             {
                 QColor v_col = val.value<QColor>();
