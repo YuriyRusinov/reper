@@ -229,8 +229,12 @@ void KKSTemplateEditorFactory :: addTemplate (QWidget *ctw, int idCat, QAbstract
 
     if (isCat && mode && tEditor->exec () == QDialog::Accepted)
     {
-        templMod->insertRows (templMod->rowCount(), 1);
-        QModelIndex tIndex = templMod->index (templMod->rowCount()-1, 0);
+        QModelIndex tIndex = KKSViewFactory::searchModelIndex (templMod, t->id(), QModelIndex(), Qt::UserRole);
+        if (!tIndex.isValid())
+        {
+            templMod->insertRows (templMod->rowCount(), 1);
+            tIndex = templMod->index (templMod->rowCount()-1, 0);
+        }
         KKSTemplate * t = loader->loadTemplate (tEditor->getTemplateID());
         templMod->setData (tIndex, t->id(), Qt::UserRole);
         templMod->setData (tIndex, t->name(), Qt::DisplayRole);
