@@ -6055,6 +6055,8 @@ int KKSObjEditorFactory :: putAttrsGroupsOnWidget ( KKSObject * obj,
         if (a->type()->attrType() != KKSAttrType::atCheckListEx)
             n_str++;
 
+        if (av->id() < 0)
+            qDebug () << __PRETTY_FUNCTION__ << av->id();
         if (isGrouped)
             m_awf->putAttrWidget (av, editor, gbLay, n_str, true, (tableName.isEmpty () ? obj->tableName() : tableName), (c ? c->id():-1));
         else
@@ -6155,7 +6157,8 @@ void KKSObjEditorFactory :: putAttrsGroupsOnWidget (KKSObject * obj, KKSObjEdito
         //        av = new KKSAttrValue(v, a);
         //    }
         //}
-        
+        if (av->id() < 0)
+            qDebug () << __PRETTY_FUNCTION__ << av->id();        
         if (a->type()->attrType() != KKSAttrType::atCheckListEx)
             n_str++;
 

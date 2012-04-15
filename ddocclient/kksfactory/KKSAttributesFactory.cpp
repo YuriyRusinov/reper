@@ -1279,6 +1279,7 @@ QWidget * KKSAttributesFactory :: createAttrCheckWidget (const KKSAttrValue * av
     if (pCatType->attrType() != KKSAttrType::atCheckListEx)
         return 0;
 
+    qDebug () << __PRETTY_FUNCTION__ << av->id();
     attrWidget = new KKSAttrCheckWidget (av, isSystem);//KKSListWidget (pCategAttr, isSystem);
     attrWidget->setMinimumHeight(40);
     QSizePolicy hPw (QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
@@ -1500,6 +1501,7 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
                     break;
 
                 QStringList vArray = V.toStringList();
+                qDebug () << __PRETTY_FUNCTION__ << vArray << av->id();
                 KKSObject * refIO = loader->loadIO (tableName, true);
                 if (!refIO)
                     break;
