@@ -5114,7 +5114,7 @@ void KKSObjEditorFactory :: addNewSearchTempl (QAbstractItemModel * searchMod)
 
     KKSMap<int, KKSAttribute *> attrsIO;
     attrsIO = loader->loadIOUsedAttrs ();
-    KKSFiltersEditorForm *filterForm = new KKSFiltersEditorForm (c, attrsIO, true, st, pWidget);
+    KKSFiltersEditorForm *filterForm = new KKSFiltersEditorForm (c, attrsIO, false, st, pWidget);
     connect (filterForm, SIGNAL (saveSearchCriteria (KKSFilterGroup *)), this, SLOT (saveSearchCriteria (KKSFilterGroup *)) );
     connect (filterForm, SIGNAL (loadAttributeRefValues (KKSAttribute *, QComboBox *)), this, SLOT (loadAttributeFilters (KKSAttribute *, QComboBox *)) );
     connect (filterForm, SIGNAL (loadAttributeRefValues (KKSAttribute *, QAbstractItemModel *)), this, SLOT (loadAttributeFilters (KKSAttribute *, QAbstractItemModel *)) );
@@ -5245,7 +5245,7 @@ void KKSObjEditorFactory :: updateSearchTempl (const QModelIndex& wIndex, QAbstr
 
         KKSMap<int, KKSAttribute *> attrsIO;
         attrsIO = loader->loadIOUsedAttrs ();
-        KKSFiltersEditorForm *filterForm = new KKSFiltersEditorForm (c, attrsIO, true, st, pWidget);
+        KKSFiltersEditorForm *filterForm = new KKSFiltersEditorForm (c, attrsIO, false, st, pWidget);
         connect (filterForm, SIGNAL (loadAttributeRefValues (KKSAttribute *, QComboBox *)), this, SLOT (loadAttributeFilters (KKSAttribute *, QComboBox *)) );
         connect (filterForm, SIGNAL (loadAttributeRefValues (KKSAttribute *, QAbstractItemModel *)), this, SLOT (loadAttributeFilters (KKSAttribute *, QAbstractItemModel *)) );
         if (stName.isEmpty())

@@ -109,6 +109,8 @@ KKSFiltersEditorForm :: KKSFiltersEditorForm (KKSCategory * _c,
         setFilters (groups);
     }
 
+    ui->pbSaveToDb->setVisible (m_bForIO);
+    ui->pbLoadFromDb->setVisible (m_bForIO);
     connect (ui->pbOK, SIGNAL (clicked()), this, SLOT (saveSQLAccept()) );
     connect (ui->pbCancel, SIGNAL (clicked()), this, SLOT (reject()) );
     connect (ui->pbAddGroup, SIGNAL (clicked()), this, SLOT (addGroup()) );
