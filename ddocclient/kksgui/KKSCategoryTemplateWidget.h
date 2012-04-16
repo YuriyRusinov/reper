@@ -34,7 +34,7 @@ class KKSTemplate;
 class _GUI_EXPORT KKSCategoryTemplateWidget : public KKSDialog
 {
     public:
-        KKSCategoryTemplateWidget (bool mode, bool asAdmin = false, QWidget *parent = 0, Qt::WindowFlags f=0);
+        KKSCategoryTemplateWidget (bool mode, const QList<int>& fTypes, bool asAdmin = false, QWidget *parent = 0, Qt::WindowFlags f=0);
         ~KKSCategoryTemplateWidget (void);
 
         int getCatID (void) const;
@@ -120,6 +120,7 @@ class _GUI_EXPORT KKSCategoryTemplateWidget : public KKSDialog
         //определяет, что АРМ запущен от лица администратора 
         //(надо показать кнопки редактирования категорий и шаблонов)
         bool m_asAdmin;
+        QList<int> forbiddenTypes;
 
     private:
         Q_OBJECT

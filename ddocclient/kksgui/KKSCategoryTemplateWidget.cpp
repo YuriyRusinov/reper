@@ -26,7 +26,7 @@
 #include "KKSEventFilter.h"
 #include "KKSCategoryTemplateWidget.h"
 
-KKSCategoryTemplateWidget :: KKSCategoryTemplateWidget (bool mode, bool asAdmin, QWidget *parent, Qt::WindowFlags f)
+KKSCategoryTemplateWidget :: KKSCategoryTemplateWidget (bool mode, const QList<int>& fTypes, bool asAdmin, QWidget *parent, Qt::WindowFlags f)
     : KKSDialog (parent, f),
     catTemplLayout (new QGridLayout()),
     tvCatTemplate (new QTreeView()),
@@ -40,7 +40,8 @@ KKSCategoryTemplateWidget :: KKSCategoryTemplateWidget (bool mode, bool asAdmin,
     actEditT (new QAction (QIcon (":/ddoc/edit.png"), tr("Edit template"), this)),
     actDelC (new QAction (QIcon (":/ddoc/delete.png"), tr("Delete selected category"), this)),
     actDelT (new QAction (QIcon (":/ddoc/delete.png"), tr("Delete template"), this)),
-    m_asAdmin(asAdmin)
+    m_asAdmin(asAdmin),
+    forbiddenTypes (fTypes)
 {
     this->init_widgets ();
 
@@ -115,12 +116,13 @@ void KKSCategoryTemplateWidget :: addCat (void)
     idCatType = wIndex.data (Qt::UserRole).toInt();
     
     //Разрешаем создавать только несистемные категории
-    QList<int> avTypes;
-    for (int i=1; i<=7; i++)
-        avTypes << i;
-    avTypes << 11 << 12;
     
-    if (avTypes.contains (idCatType))
+//    for (int i=1; i<=7; i++)
+//        avTypes << i;
+//    avTypes << 11 << 12;
+//    forbiddenTypes << 8 << 9 << 10;
+    
+    if (!forbiddenTypes.contains (idCatType))
         emit addNewCategory (this, idCatType, false);
     else
     {
@@ -312,6 +314,14 @@ void KKSCategoryTemplateWidget :: currIndexChanged (const QModelIndex& current, 
 {
     qDebug () << __PRETTY_FUNCTION__ << current << previous;
     QAbstractItemModel * tModel = tvCatTemplate->model ();
+    QModelIndex tIndex (current);
+    while (tIndex.parent().isValid())
+        tIndex = tIndex.parent();
+    bool isActionsDisabled (forbiddenTypes.contains (tIndex.data(Qt::UserRole).toInt()));
+    actAddC->setDisabled (isActionsDisabled);
+    actAddCopyC->setDisabled (isActionsDisabled);
+    actEditC->setDisabled (isActionsDisabled);
+    actDelC->setDisabled (isActionsDisabled);
     if (tModel &&
             current.isValid () && 
             current.parent().isValid() && 

@@ -107,7 +107,8 @@ KKSCategoryTemplateWidget* KKSCatEditorFactory :: viewCategories (const KKSList<
 {
     bool asAdmin (loader->getUserId() == ADMIN_ROLE);
 
-    KKSCategoryTemplateWidget *ctWidget = new KKSCategoryTemplateWidget (mode, asAdmin, parent, f);
+    QList<int> fTypes = loader->getForbiddenTypes ();
+    KKSCategoryTemplateWidget *ctWidget = new KKSCategoryTemplateWidget (mode, fTypes, asAdmin, parent, f);
     if (!ctWidget)
         return 0;
     

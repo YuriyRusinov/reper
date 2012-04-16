@@ -4911,3 +4911,17 @@ KKSMap<int, KKSAttrAttr*> KKSLoader::loadAttrAttrs(int idAttr) const
 
     return aaList;
 }
+
+QList<int> KKSLoader :: getForbiddenTypes (void) const
+{
+    QString sql = QString("select * from cGetForbiddenTypes()");
+    KKSResult * res = db->execute (sql);
+    if (!res)
+        return QList<int>();
+    QStringList fTypesStr = res->getCellAsStringList (0, 0);
+    QList<int> forbiddenTypes;
+    for (int i=0; i< fTypesStr.size(); i++)
+        forbiddenTypes << fTypesStr[i].toInt();
+    delete res;
+    return forbiddenTypes;
+}

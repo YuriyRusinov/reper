@@ -404,6 +404,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
         //tabEnc = new QTabWidget (attachW);
         
         gAttachLay->addWidget (tabEnc, 0, 0, 2, 1);//, Qt::AlignTop);
+#if 0
         QWidget * indWidget = new QWidget ();
         QGridLayout * gIndLay = new QGridLayout (indWidget);
         this->setIndicators(io, indWidget, gIndLay, objEditorWidget);
@@ -412,7 +413,6 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
         objEditorWidget->setIndicatorNumber (nInd);
         
 
-#if 0
         KKSRecWidget * indicesW = m_indf->getIOIndices (io, objEditorWidget);
         connect (indicesW,
                  SIGNAL (addEntity (QAbstractItemModel *, const QModelIndex&)),

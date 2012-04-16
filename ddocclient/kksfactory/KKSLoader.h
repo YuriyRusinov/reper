@@ -199,6 +199,8 @@ class _F_EXPORT KKSLoader
 
         void loadAttrAttrs(KKSAttribute * a) const;
         KKSMap<int, KKSAttrAttr*> loadAttrAttrs(int idAttr) const;
+        
+        QList<int> getForbiddenTypes (void) const;
 
 
         KKSLoader();
