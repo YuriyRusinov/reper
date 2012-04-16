@@ -25,6 +25,7 @@
 \i ./functions/categories/cdeletecategory.sql
 
 \i ./functions/categories/acgetattrcategoryid.sql
+\i ./functions/categories/cforbiddentypes.sql
 
 --invoked in ./internals/initiotriggers.sql
 --\i ./functions/categories/triggers/readd_triggers.sql
