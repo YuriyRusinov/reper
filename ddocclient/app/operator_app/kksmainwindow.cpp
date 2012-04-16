@@ -821,7 +821,7 @@ void KKSMainWindow :: slotCreateNewRubricEditor (KKSIncludesWidget *rEditor)
 
     QMdiSubWindow * m_rubrEditorW = m_mdiArea->addSubWindow (rEditor);
     m_rubrEditorW->setAttribute (Qt::WA_DeleteOnClose);
-    rEditor->show ();
+    rEditor->showMaximized ();
     m_mdiArea->setActiveSubWindow (m_rubrEditorW);
 }
 
@@ -1040,6 +1040,7 @@ void KKSMainWindow :: slotRubricControl (void)
     KKSRubricFactory * rf = kksSito->rf ();
     KKSList<const KKSFilterGroup*> filterGroups;
     KKSIncludesWidget * iW = rf->createRubricEditor (0, filterGroups, this);
+    
     if (!iW)
         return;
 }

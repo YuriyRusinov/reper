@@ -9324,6 +9324,14 @@ p, li { white-space: pre-wrap; }
         <source>Add extended attributes</source>
         <translation>Добавить расширенные атрибуты</translation>
     </message>
+    <message>
+        <source>Set reference filter</source>
+        <translation>Задать шаблон поиска</translation>
+    </message>
+    <message>
+        <source>Clear filters</source>
+        <translation>Очистить шаблон поиска</translation>
+    </message>
 </context>
 <context>
     <name>kksattr_value_props_form</name>
