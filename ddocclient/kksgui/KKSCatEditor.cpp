@@ -38,8 +38,10 @@
 KKSCatEditor :: KKSCatEditor (KKSCategory *c, 
                               KKSRecWidget * rw, 
                               KKSRecWidget * rtw, 
+                              KKSRecWidget * raw,
                               KKSRecWidget * rTemplatesW, 
                               KKSRecWidget * rTableTemplatesW, 
+                              KKSRecWidget * rAttrTemplatesW, 
                               const KKSMap<int, KKSType *>& catTypesList, 
                               int idCatType0, 
                               bool mode, 
@@ -48,6 +50,7 @@ KKSCatEditor :: KKSCatEditor (KKSCategory *c,
     : KKSDialog (parent, f),
     pCategory (c),
     pTableCategory (c->tableCategory()),
+    pRecAttrCategory (c->recAttrCategory()),
     catTypes (catTypesList),
     tableType (0),
     gCatLayout (new QGridLayout()),
@@ -63,8 +66,10 @@ KKSCatEditor :: KKSCatEditor (KKSCategory *c,
     cbGlobal(0),
     recWidget (rw),
     recTableW (rtw),
+    recAttrW (raw), 
     recCatTemplatesW (rTemplatesW),
     recTableCatTemplatesW (rTableTemplatesW),
+    recAttrCatTemplatesW (rAttrTemplatesW),
     rubrW (0),
     sForm (0),
     isCloseIgnored (false)
@@ -101,6 +106,13 @@ KKSCatEditor :: KKSCatEditor (KKSCategory *c,
         connect (recTableCatTemplatesW->actDel, SIGNAL (triggered()), this, SLOT (delTableTemplate()) );
         recTableCatTemplatesW->setEnabled (pCategory->id() >0);
     }
+    
+    if (recAttrCatTemplatesW)
+    {
+        connect (recAttrCatTemplatesW->actAdd, SIGNAL (triggered()), this, SLOT (addIndTemplate()) );
+        connect (recAttrCatTemplatesW->actEdit, SIGNAL (triggered()), this, SLOT (editIndTemplate()) );
+        connect (recAttrCatTemplatesW->actDel, SIGNAL (triggered()), this, SLOT (delIndTemplate()) );
+    }
 
     if (recWidget)
     {
@@ -114,6 +126,13 @@ KKSCatEditor :: KKSCatEditor (KKSCategory *c,
         connect (recTableW->actAdd, SIGNAL (triggered()), this, SLOT (addTableAttribute()) );
         connect (recTableW->actEdit, SIGNAL (triggered()), this, SLOT (editTableAttribute()) );
         connect (recTableW->actDel, SIGNAL (triggered()), this, SLOT (delTableAttribute()) );
+    }
+
+    if (recAttrW)
+    {
+        connect (recAttrW->actAdd, SIGNAL (triggered()), this, SLOT (addIndicator()) );
+        connect (recAttrW->actEdit, SIGNAL (triggered()), this, SLOT (editIndicator()) );
+        connect (recAttrW->actDel, SIGNAL (triggered()), this, SLOT (delIndicator()) );
     }
 
     bool isType ((c && c->id() > 0) || (c && c->type() && c->type()->id() == 10));
@@ -194,13 +213,11 @@ void KKSCatEditor :: apply (void)
 
     pCategory->setAsGlobal(cbGlobal->isChecked());
 
-    if (pCategory->tableCategory())
-    {
-        emit saveCategory (pTableCategory, -1, 10, this);
-        if (pTableCategory->id() <= 0 || isCloseIgnored)
-            return;
-        pCategory->tableCategory()->setId (pTableCategory->id());
-    }
+    if (pTableCategory)
+        pCategory->setTableCategory(pTableCategory);//->setId (pTableCategory->id());
+    
+    if (pRecAttrCategory)
+        pCategory->setRecAttrCategory(pRecAttrCategory);
 
     //cbChildCat->itemData (cbChildCat->currentIndex()).toInt()
     emit saveCategory (pCategory, (pTableCategory ? pTableCategory->id() : -1), cbTypes->itemData (cbTypes->currentIndex()).toInt(), this);
@@ -218,6 +235,7 @@ void KKSCatEditor :: init_widgets (void)
     this->init_parameters ();
     this->init_attributes ();
     this->initTableAttributes ();
+    this->initIndicators ();
 }
 
 void KKSCatEditor :: init_parameters (void)
@@ -318,6 +336,17 @@ void KKSCatEditor :: initTableAttributes (void)
     gAttrTLay->addWidget (recTableW, 0, 0, 1, 1);
 }
 
+void KKSCatEditor :: initIndicators (void)
+{
+    if (!recAttrW)
+        return;
+    QWidget * indW = new QWidget (this);
+    recAttrW->setParent (indW);
+    QGridLayout * gLay = new QGridLayout (indW);
+    tabCat->insertTab (3, indW, tr("Indicators"));
+    gLay->addWidget (recAttrW, 0, 0, 1, 1);
+}
+
 void KKSCatEditor :: setTemplates (KKSRecWidget *rtw)
 {
     if (recCatTemplatesW)
@@ -336,15 +365,22 @@ void KKSCatEditor :: init_templates (void)
         QWidget *catTemplWidget = new QWidget (this);
         QGridLayout *gTemplLay = new QGridLayout ();
         catTemplWidget->setLayout (gTemplLay);
-        tabCat->insertTab (3, catTemplWidget, tr ("Category templates"));
+        tabCat->insertTab (4, catTemplWidget, tr ("Category templates"));
         gTemplLay->addWidget (recCatTemplatesW, 0, 0, 1, 1);
     }
     if (recTableCatTemplatesW)
     {
         QWidget * catTableTemplW = new QWidget (this);
         QGridLayout * gTableTemplLay = new QGridLayout (catTableTemplW);
-        tabCat->insertTab (4, catTableTemplW, tr ("Table category templates"));
+        tabCat->insertTab (5, catTableTemplW, tr ("Table category templates"));
         gTableTemplLay->addWidget (recTableCatTemplatesW, 0, 0, 1, 1);
+    }
+    if (recAttrCatTemplatesW)
+    {
+        QWidget * catAttrTemplW = new QWidget (this);
+        QGridLayout * gAttrTemplLay = new QGridLayout (catAttrTemplW);
+        tabCat->insertTab (6, catAttrTemplW, tr ("Indicator templates"));
+        gAttrTemplLay->addWidget (recAttrCatTemplatesW, 0, 0, 1, 1);
     }
     this->init_rubrics ();
 }
@@ -357,7 +393,7 @@ void KKSCatEditor :: init_rubrics (void)
     QWidget * catRubrW = new QWidget (this);
     rubrW->setParent (catRubrW);
     QGridLayout * gRubrLay = new QGridLayout (catRubrW);
-    tabCat->insertTab (5, catRubrW, tr ("Category rubrics") );
+    tabCat->insertTab (7, catRubrW, tr ("Category rubrics") );
     gRubrLay->addWidget (rubrW, 0, 0, 1, 1);
     QTreeView *tv = rubrW->tvRubr();
     KKSEventFilter *ef = new KKSEventFilter (rubrW);
@@ -375,6 +411,13 @@ void KKSCatEditor :: addTableAttribute (void)
 {
     QAbstractItemModel * aModel (recTableW->getSourceModel ());
     KKSCategory * c (pTableCategory);
+    emit addAttrsIntoCat (c, aModel, this);
+}
+
+void KKSCatEditor :: addIndicator (void)
+{
+    QAbstractItemModel * aModel (recAttrW->getSourceModel ());
+    KKSCategory * c (pRecAttrCategory);
     emit addAttrsIntoCat (c, aModel, this);
 }
 
@@ -423,6 +466,28 @@ void KKSCatEditor :: editTableAttribute (void)
     
 }
 
+void KKSCatEditor :: editIndicator (void)
+{
+    int idAttr = recAttrW->getID();
+    if (idAttr<0)
+        return;
+
+    KKSCategoryAttr * cAttr = pRecAttrCategory->attribute (idAttr);
+    if (!cAttr)
+        return;
+
+    KKSCatAttrEditor *acEditor = new KKSCatAttrEditor (cAttr, attrTypes, false, this);
+
+    if (acEditor->exec () == QDialog::Accepted)
+        emit setAttribute (cAttr, pRecAttrCategory, recAttrW->getSourceModel(), this);
+
+    if (acEditor)
+    {
+        acEditor->setParent (0);
+        delete acEditor;
+    }
+}
+
 void KKSCatEditor :: delAttribute (void)
 {
     int idAttr = recWidget->getID ();
@@ -435,6 +500,13 @@ void KKSCatEditor :: delTableAttribute (void)
     int idAttr = recTableW->getID ();
     if (idAttr >=0 && (QMessageBox::question (this, tr("Delete attribute from category"), tr("Do you really want to delete attribute %1 from category ?").arg (idAttr), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Cancel) == QMessageBox::Yes))
         emit delAttrFromCategory (idAttr, pTableCategory, recTableW->getSourceModel(), this);
+}
+
+void KKSCatEditor :: delIndicator (void)
+{
+    int idAttr = recAttrW->getID ();
+    if (idAttr >=0 && (QMessageBox::question (this, tr("Delete attribute from category"), tr("Do you really want to delete attribute %1 from category ?").arg (idAttr), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Cancel) == QMessageBox::Yes))
+        emit delAttrFromCategory (idAttr, pRecAttrCategory, recAttrW->getSourceModel(), this);
 }
 
 void KKSCatEditor :: setAttrTypes (const KKSMap<int, KKSAttrType*>& aTypes)
@@ -454,6 +526,12 @@ void KKSCatEditor :: addTableTemplate (void)
         emit addNewCategoryTemplate (this, pTableCategory->id (), recTableCatTemplatesW->getSourceModel());
 }
 
+void KKSCatEditor :: addIndTemplate (void)
+{
+    if (this->pRecAttrCategory && pRecAttrCategory->id() > 0)
+        emit addNewCategoryTemplate (this, pRecAttrCategory->id(), recAttrCatTemplatesW->getSourceModel());
+}
+
 void KKSCatEditor :: editTemplate (void)
 {
     if (!recCatTemplatesW || !recCatTemplatesW->getSelectionModel()->currentIndex().isValid())
@@ -468,6 +546,14 @@ void KKSCatEditor :: editTableTemplate (void)
         return;
     int idTemplate = recTableCatTemplatesW->getID ();
     emit editCategoryTemplate (this, idTemplate, recTableCatTemplatesW->getSourceModel(), recTableCatTemplatesW->getSourceIndex());
+}
+
+void KKSCatEditor :: editIndTemplate (void)
+{
+    if (!recAttrCatTemplatesW || !recAttrCatTemplatesW->getSelectionModel())
+        return;
+    int idTemplate = recAttrCatTemplatesW->getID ();
+    emit editCategoryTemplate (this, idTemplate, recAttrCatTemplatesW->getSourceModel (), recAttrCatTemplatesW->getSourceIndex() );
 }
 
 void KKSCatEditor :: delTemplate (void)
@@ -486,6 +572,15 @@ void KKSCatEditor :: delTableTemplate (void)
     int idTemplate = recTableCatTemplatesW->getID ();
     if (idTemplate >= 0 && (QMessageBox::question (this, tr("Delete template from category"), tr("Do you really want to delete template %1 ?").arg (idTemplate), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Cancel) == QMessageBox::Yes) )
         emit delCategoryTemplate (this, idTemplate, recTableCatTemplatesW->getSourceModel(), recTableCatTemplatesW->getSourceIndex());
+}
+
+void KKSCatEditor :: delIndTemplate (void)
+{
+    if (!recAttrCatTemplatesW)
+        return;
+    int idTemplate = recAttrCatTemplatesW->getID ();
+    if (idTemplate >= 0 && (QMessageBox::question (this, tr("Delete template from category"), tr("Do you really want to delete template %1 ?").arg (idTemplate), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Cancel) == QMessageBox::Yes) )
+        emit delCategoryTemplate (this, idTemplate, recAttrCatTemplatesW->getSourceModel(), recTableCatTemplatesW->getSourceIndex());
 }
 
 void KKSCatEditor :: setIsChildCat (bool isChild)
@@ -531,7 +626,7 @@ void KKSCatEditor :: setCurrentType (int index)
         pCategory->setTableCategory (0);
         if (pCategory->id() > 0)
         {
-            tabCat->removeTab (4);
+            tabCat->removeTab (5);
             tabCat->removeTab (2);
         }
     }
@@ -614,7 +709,7 @@ void KKSCatEditor :: setAccessWidget (KKSStuffForm * _sForm)
     if (!sForm)
         return;
     sForm->setParent (this);
-    tabCat->insertTab (6, sForm, tr ("Access Rules"));
+    tabCat->insertTab (7, sForm, tr ("Access Rules"));
 
     connect (sForm, SIGNAL (accessRulesChanged (KKSAccessEntity *)), this, SLOT (setAccessRules (KKSAccessEntity *)));
 }
@@ -631,16 +726,23 @@ void KKSCatEditor :: setAccessRules (KKSAccessEntity * acl)
         pTableCategory->setAccessRules (acl);
         this->isCloseIgnored = true;
     }
+    if (pRecAttrCategory)
+    {
+        pRecAttrCategory->setAccessRules (acl);
+        this->isCloseIgnored = true;
+    }
 }
 
 void KKSCatEditor :: setTableCategoryName (const QString& tName)
 {
     pCategory->setName (tName);
-    if (!this->pTableCategory)
-        return;
 
     QString tableCName = tr("Table of %1").arg (tName);
-    pTableCategory->setName (tableCName);
+    if (this->pTableCategory)
+        pTableCategory->setName (tableCName);
+    QString indCName = tr("Indicators of %1").arg (tName);
+    if (pRecAttrCategory)
+        this->pRecAttrCategory->setName (indCName);
 }
 
 void KKSCatEditor :: setTableType (KKSType * tType)

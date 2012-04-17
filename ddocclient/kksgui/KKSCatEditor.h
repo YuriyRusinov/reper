@@ -45,7 +45,7 @@ class KKSType;
 class _GUI_EXPORT KKSCatEditor : public KKSDialog
 {
     public:
-        KKSCatEditor (KKSCategory *c, KKSRecWidget * rw, KKSRecWidget * rtw, KKSRecWidget * rTemplatesW, KKSRecWidget * rTableTemplatesW, const KKSMap<int, KKSType *>& catTypesList, int idCatType0 = -1, bool mode=true, QWidget *parent=0, Qt::WindowFlags f=0);
+        KKSCatEditor (KKSCategory *c, KKSRecWidget * rw, KKSRecWidget * rtw, KKSRecWidget * raw, KKSRecWidget * rTemplatesW, KKSRecWidget * rTableTemplatesW, KKSRecWidget * rAttrTemplatesW, const KKSMap<int, KKSType *>& catTypesList, int idCatType0 = -1, bool mode=true, QWidget *parent=0, Qt::WindowFlags f=0);
         ~KKSCatEditor (void);
 
         void save (void);
@@ -77,6 +77,11 @@ class _GUI_EXPORT KKSCatEditor : public KKSDialog
         void addTableAttribute (void);
         void editTableAttribute (void);
         void delTableAttribute (void);
+
+        void addIndicator (void);
+        void editIndicator (void);
+        void delIndicator (void);
+
         void copyAttributesFrom (void);
 
         void addTemplate (void);
@@ -86,6 +91,10 @@ class _GUI_EXPORT KKSCatEditor : public KKSDialog
         void addTableTemplate (void);
         void editTableTemplate (void);
         void delTableTemplate (void);
+
+        void addIndTemplate (void);
+        void editIndTemplate (void);
+        void delIndTemplate (void);
 
         void setCurrentType (int index);
         void setAccessRules (KKSAccessEntity * acl);
@@ -115,6 +124,7 @@ class _GUI_EXPORT KKSCatEditor : public KKSDialog
         void init_parameters (void);
         void init_attributes (void);
         void initTableAttributes (void);
+        void initIndicators (void);
         void init_templates (void);
         void init_rubrics (void);
 //        void setAttrs (KKSRecWidget *rw);
@@ -132,6 +142,7 @@ class _GUI_EXPORT KKSCatEditor : public KKSDialog
 
         KKSCategory *pCategory;
         KKSCategory *pTableCategory;
+        KKSCategory *pRecAttrCategory;
         KKSMap<int, KKSAttrType *> attrTypes;
         KKSMap<int, KKSType *> catTypes;
         KKSType * tableType;
@@ -153,8 +164,10 @@ class _GUI_EXPORT KKSCatEditor : public KKSDialog
 
         KKSRecWidget *recWidget;
         KKSRecWidget *recTableW;
+        KKSRecWidget *recAttrW;
         KKSRecWidget *recCatTemplatesW;
         KKSRecWidget *recTableCatTemplatesW;
+        KKSRecWidget *recAttrCatTemplatesW;
         KKSIncludesWidget * rubrW;
         KKSStuffForm * sForm;
 

@@ -331,6 +331,7 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (int idCategory, // ид
     Q_UNUSED (filters);
     KKSCategory *cat (0);
     KKSCategory * tableCat (0);//= new KKSCategory(-1, QString(), cTableT);
+    KKSCategory * indCat (0);
     if (idCategory <= 0 && isChildCat)
     {
         cat = new KKSCategory ();
@@ -359,19 +360,23 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (int idCategory, // ид
         KKSType * ct = loader->loadType (idCatType);
         cat->setType (ct);
         //if (cat && ct && (idCatType == 1 || idCatType == 2 || idCatType == 12))// категории данных типов являются табличными
+        KKSType * cTableT = loader->loadType (10);
+        indCat = new KKSCategory (-1, QString(), cTableT);
+        cat->setRecAttrCategory (indCat);
+        if (indCat)
+            indCat->release ();
         if (cat && ct && ct->isQualifier())// категории данных типов являются табличными
         {
-            KKSType * cTableT = loader->loadType (10);
             //
             // загрузка типа "подчиненная категория"
             //
             tableCat = new KKSCategory (-1, QString(), cTableT);
             cat->setTableCategory (tableCat);
-            if (cTableT)
-                cTableT->release ();
             if (tableCat)
                 tableCat->release ();
         }
+        if (cTableT)
+            cTableT->release ();
         
         if (ct)
             ct->release ();
@@ -380,6 +385,8 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (int idCategory, // ид
         cat->setAccessRules (acl);
         if (cat->tableCategory())
             cat->tableCategory()->setAccessRules (acl);
+        if (cat->recAttrCategory())
+            cat->recAttrCategory()->setAccessRules (acl);
         acl->release ();
     }
 
@@ -396,6 +403,7 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (int idCategory, // ид
     //cEditor->setAttrs (rw);
     KKSType * cTableT = loader->loadType (10);
     KKSRecWidget * rAttrTCw = getAttrsWidget (cat->tableCategory(), mode, 0);
+    KKSRecWidget * recAttrCw = getAttrsWidget (cat->recAttrCategory(), mode, 0);
     QAction * actCopyFrom = new QAction (QIcon (":/ddoc/add_copy.png"), tr("Copy attributes from"), rAttrTCw);
     rAttrTCw->addToolBarAction (actCopyFrom);
     KKSMap<int, KKSType*> cTypes = loader->loadAvailableTypes();
@@ -403,8 +411,9 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (int idCategory, // ид
     KKSRecWidget *rwt = getTemplateWidget (cat, false, 0);//KKSViewFactory :: createCategoryTemplates (cat->id (), loader, 0);
 //    cEditor->setTemplates (rwt);
     KKSRecWidget *rwtT = getTemplateWidget (cat->tableCategory(), false, 0);
+    KKSRecWidget *rawtT = getTemplateWidget (cat->recAttrCategory(), false, 0);
 
-    KKSCatEditor *cEditor = new KKSCatEditor (cat, rAttrCw, rAttrTCw, rwt, rwtT, cTypes, idCatType, mode, parent, f);
+    KKSCatEditor *cEditor = new KKSCatEditor (cat, rAttrCw, rAttrTCw, recAttrCw, rwt, rwtT, rawtT, cTypes, idCatType, mode, parent, f);
     if (!cEditor)
         return 0;
     connect (actCopyFrom, SIGNAL (triggered()), cEditor, SLOT (copyAttributesFrom()));
