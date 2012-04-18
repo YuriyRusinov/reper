@@ -353,7 +353,21 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (int idCategory, // ид
         c->release ();
     }
     else if (idCategory > 0)
+    {
         cat = loader->loadCategory (idCategory);
+        if (!cat->recAttrCategory())
+        {
+            KKSType * cTableT = loader->loadType (10);
+            indCat = new KKSCategory (-1, QString(), cTableT);
+            KKSAccessEntity * acl = new KKSAccessEntity ();
+            indCat->setAccessRules (acl);
+            cat->setRecAttrCategory (indCat);
+            if (acl)
+                acl->release ();
+            if (indCat)
+                indCat->release ();
+        }
+    }
     else
     {
         cat = new KKSCategory ();
