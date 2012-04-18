@@ -56,6 +56,7 @@ class _GUI_EXPORT KKSTemplateEditor : public KKSDialog
         void moveDown (void);
         
         void saveErr (void);
+        void dropErr (void);
 
     signals:
         void saveTemplate (KKSTemplate *, KKSTemplateEditor *);

@@ -61,6 +61,7 @@ KKSTemplateEditor :: KKSTemplateEditor (KKSTemplate *t, bool mode, QWidget *pare
 
     pbUp->setEnabled (false);
     pbDown->setEnabled (false);
+    pbApply->setVisible (false);
 //    connect (pbUp, SIGNAL (clicked()), this, SLOT (moveUp()) );
 //    connect (pbDown, SIGNAL (clicked()), this, SLOT (moveDown()) );
 
@@ -528,4 +529,9 @@ void KKSTemplateEditor :: setItemDelegate (QAbstractItemDelegate *iDeleg)
 void KKSTemplateEditor :: saveErr (void)
 {
     dbErr = true;
+}
+
+void KKSTemplateEditor :: dropErr (void)
+{
+    dbErr = false;
 }

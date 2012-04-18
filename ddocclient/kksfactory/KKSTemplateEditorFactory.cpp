@@ -145,6 +145,7 @@ void KKSTemplateEditorFactory :: initTemplateConnections (KKSTemplateEditor *tEd
             );
     
     connect (this, SIGNAL (templateDbError()), tEditor, SLOT (saveErr()) );
+    connect (this, SIGNAL (saveSuccess()), tEditor, SLOT (dropErr()) );
 }
 
 KKSTemplate * KKSTemplateEditorFactory :: initTemplate (int idTemplate, QString name, KKSCategory *c)
@@ -298,7 +299,9 @@ void KKSTemplateEditorFactory :: delTemplate (QWidget *ctw, int idTempl, QAbstra
         //
         // Вызов пришел от редактора категорий
         //
-        templMod->removeRows (tIndex.row(), 1);
+        int trow (tIndex.row());
+        QModelIndex pInd (tIndex.parent());
+        templMod->removeRows (trow, 1, pInd);
 /*        KKSCatEditor *cEditor = qobject_cast<KKSCatEditor *>(this->sender());
         QAbstractItemModel * sortTemplModel = 0;
         QAbstractItemModel * tModel = 0;
@@ -712,6 +715,7 @@ void KKSTemplateEditorFactory :: saveTemplate (KKSTemplate *t, KKSTemplateEditor
     }
 
     emit templateAdded (t);
+    emit saveSuccess ();
 }
 
 void KKSTemplateEditorFactory :: updateTemplate (KKSTemplate *t, KKSTemplateEditor *tEditor)

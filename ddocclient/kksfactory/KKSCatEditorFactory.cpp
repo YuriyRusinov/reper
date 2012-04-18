@@ -139,6 +139,7 @@ KKSCategoryTemplateWidget* KKSCatEditorFactory :: viewCategories (const KKSList<
              SLOT (delCategory(QWidget *, int ))
              );
 
+/*    
     connect (ctWidget, SIGNAL (addNewTemplate (QWidget *, int)),
              tf,
              SLOT (addTemplate (QWidget *, int))
@@ -149,11 +150,11 @@ KKSCategoryTemplateWidget* KKSCatEditorFactory :: viewCategories (const KKSList<
              SLOT (editTemplate (QWidget *, int))
              );
 
-    connect (ctWidget, SIGNAL (deleteT (QWidget *, int)),
+    connect (ctWidget, SIGNAL (deleteT (QWidget *, int, QAbstractItemModel*, const QModelIndex&)),
              tf,
-             SLOT (delTemplate (QWidget *, int))
+             SLOT (delTemplate (QWidget *, int, QAbstractItemModel*, const QModelIndex&))
              );
-
+*/
     connect (this, SIGNAL (categoryAdded (KKSCategory *)),
              ctWidget,
              SLOT (addCatRec (KKSCategory *))

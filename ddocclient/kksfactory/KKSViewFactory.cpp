@@ -1632,7 +1632,7 @@ void KKSViewFactory :: initTemplateGroups (KKSTemplate *t, QAbstractItemModel *t
 void KKSViewFactory :: insertTemplateGroup (KKSAttrGroup *tAGroup, const QModelIndex& parent, int ind, QAbstractItemModel *tModel)
 {
     qDebug () << __PRETTY_FUNCTION__ << ind << tAGroup->order() << tAGroup->id();
-    if (!tModel || !tAGroup || (!parent.isValid() && tAGroup->order() != ind) )
+    if (!tModel || !tAGroup || (!parent.isValid() && tAGroup->order()-ind > 1) )
         return;
 
     int nR = tModel->rowCount (parent);
