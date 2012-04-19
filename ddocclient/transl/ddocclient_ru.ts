@@ -2241,6 +2241,22 @@ Do you want to save the changes before closing?</source>
         <source>Table of %1</source>
         <translation>Таблица категории %1</translation>
     </message>
+    <message>
+        <source>Indicators</source>
+        <translation>Показатели</translation>
+    </message>
+    <message>
+        <source>Indicator templates</source>
+        <translation>Шаблоны для показателей</translation>
+    </message>
+    <message>
+        <source>Do you really want to delete selected template?</source>
+        <translation>Действительно удалить выбранный шаблон?</translation>
+    </message>
+    <message>
+        <source>Indicators of %1</source>
+        <translation>Показатели %1</translation>
+    </message>
 </context>
 <context>
     <name>KKSCatEditorFactory</name>

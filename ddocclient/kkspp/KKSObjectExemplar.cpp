@@ -12,6 +12,7 @@
 #include "KKSValue.h"
 #include "KKSAttrType.h"
 #include "KKSCategoryAttr.h"
+#include "defines.h"
 
 ////////////////////////////////////////////////////////////////////////
 // Name:       KKSObjectExemplar::KKSObjectExemplar()
@@ -32,6 +33,7 @@ KKSObjectExemplar::KKSObjectExemplar(const KKSObjectExemplar & eio) : KKSRecord(
     }
 
     m_attrValues = eio.attrValues();
+    m_indValues = eio.indValues();
 }
 
 KKSObjectExemplar::KKSObjectExemplar(int id, const QString & name, KKSObject * io) : KKSRecord(id, name)
@@ -58,16 +60,6 @@ KKSObject * KKSObjectExemplar::io() const
     return m_io;
 }
 
-const KKSList<KKSAttrValue *> & KKSObjectExemplar::attrValues() const
-{
-    return m_attrValues;
-}
-
-KKSList<KKSAttrValue *> & KKSObjectExemplar::attrValues()
-{
-    return m_attrValues;
-}
-
 void KKSObjectExemplar::setIo(KKSObject * _io)
 {
     if(m_io)
@@ -79,15 +71,11 @@ void KKSObjectExemplar::setIo(KKSObject * _io)
 
 }
 
-void KKSObjectExemplar::setAttrValues(const KKSList<KKSAttrValue*> & _attrValues)
-{
-    m_attrValues = _attrValues;
-}
 
 void KKSObjectExemplar::setName(const QString & newName)
 {
     KKSRecord::setName(newName);
-    KKSAttrValue * av = attrValue(2);
+    KKSAttrValue * av = attrValue(ATTR_NAME);
     if(!av)
         qWarning("Parameter 'name' does not present in object exemplar attributes!");
     else
@@ -102,7 +90,7 @@ void KKSObjectExemplar::setId(int newId)
 {
     KKSRecord::setId(newId);
 
-    KKSAttrValue * av = attrValue(1);
+    KKSAttrValue * av = attrValue(ATTR_ID);
     if(!av)
         qWarning("Parameter 'id' does not present in object exemplar attributes!");
     else
@@ -116,7 +104,7 @@ void KKSObjectExemplar::setId(int newId)
 void KKSObjectExemplar::setDesc(const QString & newDesc)
 {
     KKSRecord::setDesc(newDesc);
-    KKSAttrValue * av = attrValue(3);
+    KKSAttrValue * av = attrValue(ATTR_DESCRIPTION);
     if(!av)
         qWarning("Parameter 'description' does not present in object exemplar attributes!");
     else
@@ -130,7 +118,7 @@ void KKSObjectExemplar::setDesc(const QString & newDesc)
 void KKSObjectExemplar::setCode(const QString & newCode)
 {
     KKSRecord::setCode(newCode);
-    KKSAttrValue * av = attrValue(6);
+    KKSAttrValue * av = attrValue(ATTR_CODE);
     if(!av)
         qWarning("Parameter 'code' does not present in object exemplar attributes!");
     else{
@@ -139,6 +127,25 @@ void KKSObjectExemplar::setCode(const QString & newCode)
         av->setValue(v);
     }
 }
+
+//------------------------------------------------------------------------
+////методы для работы с атрибутами записей справочников (колонками таблиц)
+//------------------------------------------------------------------------
+const KKSList<KKSAttrValue *> & KKSObjectExemplar::attrValues() const
+{
+    return m_attrValues;
+}
+
+KKSList<KKSAttrValue *> & KKSObjectExemplar::attrValues()
+{
+    return m_attrValues;
+}
+
+void KKSObjectExemplar::setAttrValues(const KKSList<KKSAttrValue*> & _attrValues)
+{
+    m_attrValues = _attrValues;
+}
+
 
 KKSAttrValue * KKSObjectExemplar::attrValue(int id)
 {
@@ -231,5 +238,119 @@ const KKSAttrValue * KKSObjectExemplar::attrValueIndex(int index) const
         return av;
 
     av = m_attrValues.at(index);
+    return av;
+}
+
+
+//------------------------------------------------------------------------
+////методы для работы с показателями записей справочников 
+//------------------------------------------------------------------------
+const KKSList<KKSAttrValue *> & KKSObjectExemplar::indValues() const
+{
+    return m_indValues;
+}
+
+KKSList<KKSAttrValue *> & KKSObjectExemplar::indValues()
+{
+    return m_indValues;
+}
+
+void KKSObjectExemplar::setIndValues(const KKSList<KKSAttrValue*> & _indValues)
+{
+    m_indValues = _indValues;
+}
+
+
+KKSAttrValue * KKSObjectExemplar::indValue(int id)
+{
+    KKSAttrValue * av = NULL;
+    for (int i=0; i<m_indValues.count(); i++)
+    {
+        KKSAttrValue * av1 = m_indValues [i];
+        if(av1->attribute()->id() == id){
+            av = av1;
+            break;            
+        }
+    }
+
+    return av;
+}
+
+const KKSAttrValue * KKSObjectExemplar::indValue(int id) const
+{
+    const KKSAttrValue * av = NULL;
+    
+    for (int i=0; i<m_indValues.count(); i++)
+    {
+        KKSAttrValue * av1 = m_indValues [i];
+        if(av1->attribute()->id() == id){
+            av = av1;
+            break;            
+        }
+    }
+
+    return av;
+}
+
+void KKSObjectExemplar::addIndValue(const QString & value, KKSCategoryAttr * attr, bool * bBadValue)
+{
+    if(!attr){
+        if(bBadValue)
+            *bBadValue = true;
+        return;
+    }
+
+    bool badValue = false;
+    KKSValue v;
+    v.setValue(value, attr->type()->attrType());
+    if(!v.isValid())
+        badValue = true;
+    
+    KKSAttrValue * av = new KKSAttrValue(v, attr);
+    addIndValue(av);
+    av->release();
+
+    if(bBadValue)
+        *bBadValue = badValue;
+}
+
+void KKSObjectExemplar::addIndValue(KKSAttrValue * av)
+{
+    if(!av)
+        return;
+
+    m_indValues.append(av);
+}
+
+void KKSObjectExemplar::removeIndValue(KKSAttrValue * av)
+{
+    if(!av)
+        return;
+    
+    m_indValues.removeAll(av);
+}
+
+void KKSObjectExemplar::removeIndValue(int index)
+{
+    m_indValues.removeAt(index);
+}
+
+KKSAttrValue * KKSObjectExemplar::indValueIndex(int index)
+{
+    KKSAttrValue * av = NULL;
+    if(index >= m_indValues.count())
+        return av;
+
+    av = m_indValues[index];
+    return av;
+}
+
+const KKSAttrValue * KKSObjectExemplar::indValueIndex(int index) const
+{
+    const KKSAttrValue * av = NULL;
+    if(index >= m_indValues.count())
+        return av;
+
+    av = m_indValues.at(index);
     return av;
 }

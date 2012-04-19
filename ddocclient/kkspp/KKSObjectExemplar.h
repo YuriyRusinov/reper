@@ -25,6 +25,7 @@ public:
    KKSObjectExemplar(int id, const QString & name, KKSObject * io);
    virtual ~KKSObjectExemplar();
 
+   //методы для работы с атрибутами записей справочников (колонками таблиц)
    const KKSList<KKSAttrValue *> & attrValues() const;
    KKSList<KKSAttrValue *> & attrValues();
    void setAttrValues(const KKSList<KKSAttrValue*> & _attrValues);
@@ -38,6 +39,22 @@ public:
    void addAttrValue(const QString & value, KKSCategoryAttr * attr, bool * bBadValue = NULL);
    void removeAttrValue(KKSAttrValue * av);
    void removeAttrValue(int index);
+
+   //методы для работы с показателями записей справочников
+   const KKSList<KKSAttrValue *> & indValues() const;
+   KKSList<KKSAttrValue *> & indValues();
+   void setIndValues(const KKSList<KKSAttrValue*> & _indValues);
+
+   KKSAttrValue * indValueIndex(int index);
+   const KKSAttrValue * indValueIndex(int index) const;
+   KKSAttrValue * indValue(int id);
+   const KKSAttrValue * indValue(int id) const;
+   
+   void addIndValue(KKSAttrValue * av);
+   void addIndValue(const QString & value, KKSCategoryAttr * attr, bool * bBadValue = NULL);
+   void removeIndValue(KKSAttrValue * av);
+   void removeIndValue(int index);
+
 
    KKSObject * io() const;
    void setIo(KKSObject * _io);
@@ -60,6 +77,7 @@ protected:
 private:
    KKSObject* m_io;
    KKSList<KKSAttrValue*> m_attrValues;
+   KKSList<KKSAttrValue*> m_indValues;//показатели записей справочников
 
 
 };
