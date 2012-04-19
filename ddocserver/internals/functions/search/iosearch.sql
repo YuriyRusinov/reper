@@ -77,6 +77,9 @@ begin
                 end if;
             end loop;
         end if;
+    elsif(is_boolean(ioValue)) then
+        query := query || 'upper(av.value) ' || oper || ' ';
+        query := query || 'upper(' || quote_literal(ioValue) || ')';
     else
         query := query || ' av.value ' || oper || ' ';
         query := query || quote_literal (ioValue);
@@ -173,6 +176,9 @@ raise warning 'asasas';
                 end if;
             end loop;
         end if;
+    elsif(is_boolean(ioValue)) then
+        query := query || 'upper(av.value) ' || oper || ' ';
+        query := query || 'upper(' || quote_literal(ioValue) || ')';
     else
         query := query || ' av.value ' || oper || ' ';
         query := query || quote_literal (ioValue);

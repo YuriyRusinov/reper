@@ -35,7 +35,7 @@ begin
 
     if(isExist = 0) then
         q = 'alter sequence "' || tableName || '_id_seq" rename to "tbl_' || tableName || '_id_seq"';
-        execute q;
+        --execute q;
     end if;
 
     q = 'create or replace function "f_sel_' || tableName || '"() returns setof "tbl_' || tableName || E'" as \n\$BODY\$\n';
@@ -61,7 +61,7 @@ begin
 
     if(isExist = 0) then
         q = 'grant all on "tbl_' || tableName || '_id_seq" to public';
-        execute q;
+        --execute q;
     end if;
 
 
@@ -126,10 +126,10 @@ begin
     --raise warning E'%\n\n', qRule;
     execute qRule;
 
-    qDelete = 'create or replace function "f_del_' || tableName || E'"(int4) returns int4 as \n\$BODY\$ \ndeclare \n ii_id alias for $1; \nbegin \n';
+    qDelete = 'create or replace function "f_del_' || tableName || E'"(int8) returns int4 as \n\$BODY\$ \ndeclare \n ii_id alias for $1; \nbegin \n';
     qDelete = qDelete || 'if(getPrivilege(getCurrentUser(), ioGetObjectIDByTableName(' || quote_literal(tableName) || '), 4, true) = false) then raise exception ' || quote_literal('You have insufficient permissions to do the operation!') || E'; return 0; end if;\n';
     qDelete = qDelete || 'delete from "tbl_' ||tableName || E'" where id = ii_id;\n';
-    qDelete = qDelete || E'return 1; \nend \n\$BODY\$ \nlanguage ' || quote_literal('plpgsql');
+    qDelete = qDelete || E'return 1::int4; \nend \n\$BODY\$ \nlanguage ' || quote_literal('plpgsql');
     qDelete = qDelete || ' security definer;';
 
     --raise warning E'%\n\n', qDelete;

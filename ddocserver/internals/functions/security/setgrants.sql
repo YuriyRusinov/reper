@@ -230,6 +230,9 @@ begin
         execute q;
     end loop;
 
+    q = 'grant all on q_base_table_id_seq to ' || rName;
+    execute q;
+
     return 1;
 
 end
@@ -303,6 +306,10 @@ begin
     query := ' grant all on ' || theTable || '_id_seq to public';
     execute query;
 
+    query = 'grant all on q_base_table_id_seq to public';
+    execute query;
+
+
     return 1;
 
 end
@@ -361,6 +368,9 @@ begin
     execute query;
 
     query := ' grant all on ' || theTable || '_id_seq to ' || gr || theUser;
+    execute query;
+
+    query = 'grant all on q_base_table_id_seq to ' || gr || theUser;
     execute query;
 
     return 1;

@@ -25,7 +25,7 @@ begin
         end if;
     end if;
 
-    delete from attrs_values where id_io_object = idObject;
+    delete from tbl_attrs_values where id_io_object = idObject;
 
     --delete from access_table where id_io_object = idObject;
 

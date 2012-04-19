@@ -8,10 +8,13 @@ select setCurrentDl(4);
 select setAsNotLogging(1);
 select setAsNotLogging(2);
 
+drop function getnextseq(varchar, varchar);
+
 \i ./functions/misc/f_safe_drop_trigger.sql
 \i ./functions/misc/f_create_trigger.sql
 \i ./functions/misc/f_is_table_exist.sql
 
+\i ./functions/contribs/readd_contribs.sql
 
 --In readd_functions this calls does not invoked
 --So, we should to invoke that here
@@ -74,6 +77,18 @@ alter table io_categories
    add constraint FK_IO_CATEG_CHILD2 foreign key (id_child2)
       references io_categories (id)
       on delete restrict on update restrict;
+
+alter sequence io_types_id_seq rename to io_category_types_id_seq;
+alter sequence io_types_id_seq1 rename to io_types_id_seq;
+
+create table q_base_table (
+   id                   BIGSERIAL            not null,
+   uuid_t               UUID                 not null,
+   constraint PK_Q_BASE_TABLE primary key (id)
+)
+inherits (root_table);
+
+alter table q_base_table alter column uuid_t set default uuid_generate_v1();
 
 
 --почему-то иногда ряд атрибутов не обновляется.

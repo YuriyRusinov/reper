@@ -11,5 +11,7 @@
 \i ./functions/general/recupdate.sql
 \i ./functions/general/gettablebyuid.sql
 
+\i ./functions/general/generateuuid.sql
+
 --invoked in /internals/initdb.sql
 --\i ./functions/general/generateuid.sql

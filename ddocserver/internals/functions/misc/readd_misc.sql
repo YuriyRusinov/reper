@@ -3,6 +3,7 @@
 \i ./functions/misc/f_is_view_exist.sql
 \i ./functions/misc/f_is_column_exist.sql
 \i ./functions/misc/f_is_index_exist.sql
+\i ./functions/misc/f_is_table_has_parent.sql
 
 \i ./functions/misc/f_create_trigger.sql
 

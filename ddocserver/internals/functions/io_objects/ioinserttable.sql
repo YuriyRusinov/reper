@@ -102,7 +102,8 @@ begin
         return NULL;
     end if;
 
-    create_query := 'create table ' || table_name || ' (id serial not null, ';
+    create_query := 'create table ' || table_name || ' (id int8 not null default pg_catalog.nextval(' || quote_literal('q_base_table_id_seq') || '), ';
+
     query := 'select 
                    a.id, 
                    a.code, 
@@ -251,11 +252,12 @@ begin
 
     create_query := create_query || ' constraint PK_' || table_name || ' primary key (id)) ';
     if (bInheritRootTable = TRUE) then
-        create_query := create_query || ' inherits (root_table); ';
+        create_query := create_query || ' inherits (root_table, q_base_table); ';
         
         create_query := create_query || ' create trigger trgSetUID before insert or update on ' || table_name || ' for each row execute procedure uidCheck(); ';
         create_query := create_query || ' create trigger trgSyncRecords before insert or update or delete on ' || table_name || ' for each row execute procedure syncRecords(); ';
         create_query := create_query || ' create trigger trgCheckTableForOwner before insert or update or delete on ' || table_name || ' for each row execute procedure checkTableForOwner(); ';
+        create_query := create_query || ' create trigger trgSetUUID before insert or update on ' || table_name || ' for each row execute procedure uuidCheck(); ';
         create_query := create_query || ' create unique index i_unique_id_' || table_name || ' on ' || table_name || ' using BTREE (unique_id); ';
     end if;
  
@@ -264,7 +266,7 @@ begin
     s_user = session_user;
 
     create_query := create_query || ' alter table ' || table_name || ' owner to ' || s_user;
-    create_query := create_query || '; grant all on ' || table_name || '_id_seq to ' || s_user;
+    --create_query := create_query || '; grant all on ' || table_name || '_id_seq to ' || s_user;
     
 
     execute create_query;

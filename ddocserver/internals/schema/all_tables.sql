@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     13.04.2012 14:46:45                          */
+/* Created on:     19.04.2012 8:25:47                           */
 /*==============================================================*/
 
 
@@ -533,6 +533,25 @@ create unique index i_aav_parent_child on attrs_attrs (
 id_attr_parent,
 id_attr_child
 );
+
+/*==============================================================*/
+/* Table: attrs_attrs_values                                    */
+/*==============================================================*/
+create table attrs_attrs_values (
+   id                   SERIAL               not null,
+   id_attr_value        INT4                 not null,
+   id_attr_attr         INT4                 not null,
+   value                VARCHAR              not null,
+   constraint PK_ATTRS_ATTRS_VALUES primary key (id)
+)
+inherits (root_table);
+
+comment on table attrs_attrs_values is
+'Значения атрибутов, описывающих другие атрибуты.
+Записи в данной таблице появляются при редактировании Значения атрибута в информационном объекте';
+
+select setMacToNULL('attrs_attrs_values');
+select createTriggerUID('attrs_attrs_values');
 
 /*==============================================================*/
 /* Table: attrs_categories                                      */
@@ -2468,7 +2487,7 @@ select createTriggerUID('persons');
 /* Table: "position"                                            */
 /*==============================================================*/
 create table "position" (
---   id                   SERIAL               not null,
+   id                   INT4                 not null,
    id_unit              INT4                 not null,
    id_maclabel          INT4                 not null default 1,
    id_user_vrio         INT4                 null,
@@ -2491,6 +2510,9 @@ inherits
 comment on table "position" is
 'Справочник должностей';
 
+comment on column "position".id is
+'НЕ НАДО ЭТО ПОЛЕ ДЕЛАТЬ SERIAL! Оно наследуется от kks_roles. После создания данной таблицы отрабатывает скрипт, который задает ему значение по умолчанию в nextval(''kks_roles_id_seq'');';
+
 comment on column "position".email_prefix is
 'Данное поле используется для однозначной идентификации должностного лица внутри организации.
 В частности это может быть полезно при обмене сообщениями и распоряжениями между организациями.
@@ -2501,6 +2523,7 @@ comment on column "position".is_public is
 
 select setMacToNULL('"position"');
 select createTriggerUID('"position"');
+alter table "position" alter column id set default pg_catalog.nextval('kks_roles_id_seq');
 
 /*==============================================================*/
 /* Index: i_dl_email                                            */
@@ -2542,6 +2565,18 @@ comment on table position_work_mode is
 select setMacToNULL('position_work_mode');
 
 /*==============================================================*/
+/* Table: q_base_table                                          */
+/*==============================================================*/
+create table q_base_table (
+   id                   BIGSERIAL            not null,
+   uuid_t               UUID                 not null,
+   constraint PK_Q_BASE_TABLE primary key (id)
+)
+inherits (root_table);
+
+alter table q_base_table alter column uuid_t set default uuid_generate_v1();
+
+/*==============================================================*/
 /* Table: queue_results                                         */
 /*==============================================================*/
 create table queue_results (
@@ -2574,6 +2609,67 @@ comment on column ranks.code is
 
 select setMacToNULL('ranks');
 select createTriggerUID('ranks');
+
+/*==============================================================*/
+/* Table: rec_attrs_values                                      */
+/*==============================================================*/
+create table rec_attrs_values (
+   id                   SERIAL               not null,
+   id_attr_category     INT4                 not null,
+   id_record            BIGSERIAL            not null,
+   value                VARCHAR              not null,
+   start_time           TIMESTAMP            not null default CURRENT_TIMESTAMP,
+   stop_time            TIMESTAMP            null,
+   meas_time            TIMESTAMP            not null default CURRENT_TIMESTAMP,
+   insert_time          TIMESTAMP            not null default CURRENT_TIMESTAMP,
+   id_io_object_src     INT4                 null,
+   id_io_object_src1    INT4                 null,
+   description          VARCHAR              null,
+   is_actual            BOOL                 not null default TRUE,
+   constraint PK_REC_ATTRS_VALUES primary key (id)
+)
+inherits (root_table);
+
+comment on table rec_attrs_values is
+'Значения атрибутов (показателей) для записей справочников
+Хранит сами значения атрибутов и их дополнительные характеристики.
+Применительно к данной таблице поддерживается темпоральная модель.
+Каждое значение атрибута имеет диапазон актуальности.
+
+При изменении значения атрибута фактически происходит создание новой записи в этой таблице. При этом поле value получает новое актуальное значение. Поле start_time по умлчанию устанавливается в current_timestamp, поле stop_time - в NULL, поле meas_time - в current_timestamp, поле insert_time - в current_timestamp, is_actual - в true.
+Указанные поля пользователь может задать самостоятельно, однако start_time все равно будет выставлено в current_timestamp, а поле stop_time - в NULL.
+Старая (исходная) запись при этом остается. Однако ее поле is_actual устанавливается в false, stop_time - в current_timestamp.
+
+При удалении строки из данной таблицы реального удаления не происходит. Исходная запись остается. Однако ее поле is_actual устанавливается в false, stop_time - в current_timestamp.
+';
+
+comment on column rec_attrs_values.value is
+'Значение атрибута в текстовом представлении';
+
+comment on column rec_attrs_values.start_time is
+'Момент начала актуальности значения атрибута';
+
+comment on column rec_attrs_values.stop_time is
+'Момент утери актуальности значения атрибута';
+
+comment on column rec_attrs_values.meas_time is
+'Дата и время измерения значения атрибута';
+
+comment on column rec_attrs_values.insert_time is
+'Дата и время доведения значения атрибута в систему';
+
+comment on column rec_attrs_values.id_io_object_src is
+'Идентификатор ИО, который явился источником информации о значении атрибута.';
+
+comment on column rec_attrs_values.id_io_object_src1 is
+'Идентификатор объекта, за кого передали информацию. Если источник передаёт информацию сам за себя, то значение в этом поле совпадает со значением в поле <Источник>';
+
+comment on column rec_attrs_values.is_actual is
+'Флаг, определяющий актуально ли данное значение атрибута, било оно архивное.
+Данный флаг задается автоматически при создании и изменении атрибута, зависит от значения поля "момент утери актуальности". Если текущая дата-время попадает в диапазон (момент начала актуальности) - (момент утери актуальности), то флаг устанавливается в true, в противном случае он равен false.';
+
+select setMacToNULL('rec_attrs_values');
+select createTriggerUID('rec_attrs_values');
 
 /*==============================================================*/
 /* Table: receive_order                                         */
@@ -2698,6 +2794,7 @@ create table roles_actions (
 );
 
 select setMacToNULL('roles_actions');
+
 
 /*==============================================================*/
 /* Table: rubricator                                            */
@@ -3021,7 +3118,7 @@ select createTriggerUID('tso_units');
 /* Table: units                                                 */
 /*==============================================================*/
 create table units (
---   id                   SERIAL not null,
+   id                   SERIAL not null,
    id_organization      INT4                 null,
    id_parent            INT4                 null,
    id_curr_mode         INT4                 not null,
@@ -3044,6 +3141,9 @@ inherits
 comment on table units is
 'Справочник подразделений';
 
+comment on column units.id is
+'НЕ НАДО ЭТО ПОЛЕ ДЕЛАТЬ SERIAL! Оно наследуется от kks_roles. После создания данной таблицы отрабатывает скрипт, который задает ему значение по умолчанию в nextval(''kks_roles_id_seq'');';
+
 comment on column units.id_organization is
 'Организация, к которой относится данное подразделение.
 Данное поле не является обязательным, поскольку в системе существуют системные пользователи (должностные дица) такие как admin, jupiter, которые не принадлежат ни одной организации';
@@ -3059,6 +3159,7 @@ comment on column units.time_elapsed is
 
 select setMacToNULL('units');
 select createTriggerUID('units');
+alter table units alter column id set default pg_catalog.nextval('kks_roles_id_seq');
 
 /*==============================================================*/
 /* Table: units_work_mode                                       */
@@ -3276,7 +3377,7 @@ select setMacToNULL('user_templates');
 /* Table: users                                                 */
 /*==============================================================*/
 create table users (
---   id                   SERIAL not null,
+   id                   SERIAL not null,
    id_rank              INT4                 not null,
    id_state             INT4                 not null,
    id_maclabel          INT4                 not null default 1,
@@ -3299,6 +3400,9 @@ inherits
 
 comment on table users is
 'Таблица (справочник) пользователей, зарегистрированных в системе';
+
+comment on column users.id is
+'НЕ НАДО ЭТО ПОЛЕ ДЕЛАТЬ SERIAL! Оно наследуется от kks_roles. После создания данной таблицы отрабатывает скрипт, который задает ему значение по умолчанию в nextval(''kks_roles_id_seq'');';
 
 comment on column users.lastname is
 'фамилия';
@@ -3325,6 +3429,7 @@ comment on column users.acc_right_date is
 
 select setMacToNULL('users');
 select createTriggerUID('users');
+alter table users alter column id set default pg_catalog.nextval('kks_roles_id_seq');
 
 /*==============================================================*/
 /* Table: work_mode                                             */
@@ -3635,6 +3740,16 @@ alter table attrs_attrs
 alter table attrs_attrs
    add constraint FK_ATTRS_ATTRS_CHILD foreign key (id_attr_child)
       references attributes (id)
+      on delete restrict on update restrict;
+
+alter table attrs_attrs_values
+   add constraint FK_ATTRS_AT_REFERENCE_ATTRS_VA foreign key (id_attr_value)
+      references attrs_values (id)
+      on delete restrict on update restrict;
+
+alter table attrs_attrs_values
+   add constraint FK_ATTRS_AT_REFERENCE_ATTRS_AT foreign key (id_attr_attr)
+      references attrs_attrs (id)
       on delete restrict on update restrict;
 
 alter table attrs_categories
@@ -4135,6 +4250,16 @@ alter table position_work_mode
 alter table queue_results
    add constraint FK_QUEUE_RE_REFERENCE_TRANSPOR foreign key (id_transport)
       references transport (id)
+      on delete restrict on update restrict;
+
+alter table rec_attrs_values
+   add constraint FK_REC_ATTR_REFERENCE_Q_BASE_T foreign key (id_record)
+      references q_base_table (id)
+      on delete restrict on update restrict;
+
+alter table rec_attrs_values
+   add constraint FK_REC_ATTR_REFERENCE_ATTRS_CA foreign key (id_attr_category)
+      references attrs_categories (id)
       on delete restrict on update restrict;
 
 alter table receivers

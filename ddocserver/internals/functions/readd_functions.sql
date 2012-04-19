@@ -1,4 +1,7 @@
 \i ./functions/misc/readd_misc.sql
+--invoked in initdb.sql
+--\i ./functions/contribs/readd_contribs.sql
+
 \i ./functions/io_objects/readd_io_objects.sql
 \i ./functions/journals/readd_journals.sql
 

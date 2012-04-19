@@ -4,8 +4,12 @@ begin;
 \i ./functions/misc/f_create_lang.sql
 \i ./functions/misc/setmactonull.sql
 \i ./functions/misc/f_is_type_exist.sql
+\i ./functions/misc/f_safe_drop_type.sql
 \i ./functions/general/generateuid.sql
 commit;
+
+\i ./functions/contribs/readd_contribs.sql
+
 
 \encoding koi8r
 
