@@ -60,7 +60,7 @@ private slots:
     void editAttrGroup (int idAttrGroup, QAbstractItemModel *aModel, const QModelIndex& aIndex, KKSAttributesEditor *attrEditor);
     void delAttrGroup (int idAttrGroup, QAbstractItemModel *aModel, const QModelIndex& aIndex, KKSAttributesEditor *attrEditor);
 
-    void slotLoadIOSrc  (KKSObject ** io);
+    void slotLoadIOSrc  (KKSObject ** io, QWidget * parent);
     void viewIOSrc (KKSObject * io, QWidget * parent);
     //void slotLoadIOSrc1 (const KKSAttrValue * av, QLineEdit * lESrc1);
     void loadIOAttrValueHistory(const KKSAttrValue * av);

@@ -27,7 +27,7 @@ class _GUI_EXPORT KKSAttrValueLabel : public QLabel
 
     signals:
         void clicked();
-        void loadIOSrc (KKSObject **);
+        void loadIOSrc (KKSObject **, QWidget *);
         void viewIOSrc(KKSObject *, QWidget *);
         void attrValueChanged();
 

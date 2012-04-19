@@ -106,7 +106,7 @@ void KKSAttrValuePropsForm :: viewIOSource (void)
 void KKSAttrValuePropsForm :: loadIOSource (void)
 {
     KKSObject * io = NULL;
-    emit loadIOSrc (&io);
+    emit loadIOSrc (&io, this);
     if(!io){
         //UI->lESource->setText(QString::null);
         return;
@@ -131,7 +131,7 @@ void KKSAttrValuePropsForm :: viewIOTransfer (void)
 void KKSAttrValuePropsForm :: loadIOTransfer (void)
 {
     KKSObject * io = NULL;
-    emit loadIOSrc (&io);
+    emit loadIOSrc (&io, this);
     if(!io){
         //UI->lESource->setText(QString::null);
         return;
@@ -266,9 +266,9 @@ void KKSAttrValuePropsForm::pbHistoryClicked()
 
 void KKSAttrValuePropsForm::viewHistory(const KKSList<KKSAttrValue*> & history)
 {
-    //—юда вставить свой код
-    //параметр history уже содержит всю небходимую информацию
-    //QMessageBox::information(this, tr(""), tr(""), QMessageBox::Ok);
+    if(history.count() == 0)
+        return;
+
     AttrHistory * hForm = new AttrHistory(history, this);
     hForm->exec();
     delete hForm;

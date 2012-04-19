@@ -98,11 +98,11 @@ void KKSAttrValueLabel :: setLabelProps()
 
 void KKSAttrValueLabel :: showAttrValueProps()
 {
-    if(!m_av || m_av->attribute()->isSystem())
+    if(!m_av || m_isSystem)
         return;
 
     KKSAttrValuePropsForm * f = new KKSAttrValuePropsForm(m_av, true, this);
-    connect(f, SIGNAL(loadIOSrc(KKSObject **)), this, SIGNAL(loadIOSrc(KKSObject **)));
+    connect(f, SIGNAL(loadIOSrc(KKSObject **, QWidget *)), this, SIGNAL(loadIOSrc(KKSObject **, QWidget *)));
     connect(f, SIGNAL(viewIOSrc(KKSObject *, QWidget *)), this, SIGNAL(viewIOSrc(KKSObject *, QWidget *)));
     connect(f, SIGNAL(loadHistory(const KKSAttrValue *)), this, SIGNAL(loadHistory(const KKSAttrValue *)));
     connect(this, SIGNAL(viewHistory(const KKSList<KKSAttrValue *> &)), f, SLOT(viewHistory(const KKSList<KKSAttrValue *> &)));

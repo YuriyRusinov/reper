@@ -57,6 +57,7 @@ void KKSLoader::clearCache()
     for(int i=0; i<a.count(); i++){
         a.at(i)->release();
     }
+    loadedObjects.clear();
 }
 
 void KKSLoader::setDb(KKSDatabase * _db)

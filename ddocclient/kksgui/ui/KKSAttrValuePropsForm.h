@@ -47,7 +47,7 @@ private slots:
 
 signals:
     void viewIOSrc (KKSObject*, QWidget *);
-    void loadIOSrc (KKSObject **);
+    void loadIOSrc (KKSObject **, QWidget *);
     void loadHistory(const KKSAttrValue *);
 
 private:

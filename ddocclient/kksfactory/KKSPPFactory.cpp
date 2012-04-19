@@ -1735,8 +1735,10 @@ int KKSPPFactory::updateCategory(const KKSCategory* c) const
     //производится удаление категории (вызов deleteCategory())
     //проверка, смогли ли удалить (если смогли, значит категория не используется)
     //и выполнение отката (транзакции или savepoint'а), т.к. реально мы ее здесь не удаляем
-    if(categoryInUse(const_cast<KKSCategory *>(c)))
-        return ERROR_CODE;
+    
+    //!!!TODO Пока данную проверку делвть не надо, поскольку мы не изменяем набор атрибутов
+    //if(categoryInUse(const_cast<KKSCategory *>(c)))
+    //    return ERROR_CODE;
 
     if(!inTransaction())
         db->begin();
@@ -1797,6 +1799,8 @@ int KKSPPFactory::updateCategory(const KKSCategory* c) const
     }
     
     //теперь обновим атрибуты категории
+    /*TODO На время запрещаем обновление атрибутов в категориях*/
+    /*
     setInTransaction();
     ok = deleteCategoryAttrs(c->id());
     restoreInTransaction();
@@ -1820,6 +1824,7 @@ int KKSPPFactory::updateCategory(const KKSCategory* c) const
             return ERROR_CODE;
         }
     }
+    */
 
     //теперь обновим жизненный цикл
     ok = deleteLifeCycle(c->id());

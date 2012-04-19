@@ -701,7 +701,7 @@ QLabel * KKSAttributesFactory :: createAttrTitle (KKSAttrValue * av, bool isSyst
         return new QLabel();
 
     QLabel * lTitle = new KKSAttrValueLabel(av, isSystem);
-    connect(lTitle, SIGNAL(loadIOSrc(KKSObject ** )), this, SLOT(slotLoadIOSrc(KKSObject ** )));
+    connect(lTitle, SIGNAL(loadIOSrc(KKSObject **, QWidget * )), this, SLOT(slotLoadIOSrc(KKSObject **, QWidget * )));
     connect(lTitle, SIGNAL(viewIOSrc(KKSObject *, QWidget *)), this, SLOT(viewIOSrc(KKSObject *, QWidget *)));
     connect (lTitle, SIGNAL(loadHistory(const KKSAttrValue *)), this, SLOT(loadIOAttrValueHistory(const KKSAttrValue *)));
     connect (this, SIGNAL(viewHistory(const KKSList<KKSAttrValue *> &)), lTitle, SIGNAL(viewHistory(const KKSList<KKSAttrValue *> &)));
@@ -1947,16 +1947,16 @@ void KKSAttributesFactory :: connectToSlots (QObject *aw, QWidget* wEditor)
     QObject::connect (aw, SIGNAL (valueChanged(int, bool, QVariant)), wEditor, SLOT (setValue (int, bool, QVariant)) );
 }
 
-void KKSAttributesFactory :: slotLoadIOSrc (KKSObject ** io)
+void KKSAttributesFactory :: slotLoadIOSrc (KKSObject ** io, QWidget * parent)
 {
     if (!io)
         return;
 
     KKSList<const KKSFilterGroup *> filters;
     
-    QWidget * parentW = qobject_cast<QWidget *>(this->sender());
+    //QWidget * parentW = qobject_cast<QWidget *>(this->sender());
     
-    KKSObjEditor* ioSrc = m_oef->createObjRecEditor(IO_IO_ID, IO_IO_ID, filters, tr ("Select document"), 0, true, false, Qt::WindowModal, parentW);
+    KKSObjEditor* ioSrc = m_oef->createObjRecEditor(IO_IO_ID, IO_IO_ID, filters, tr ("Select document"), 0, true, false, Qt::WindowModal, parent);
     if (ioSrc->exec () == QDialog::Accepted)
     {
         int idObject = ioSrc->getID();
