@@ -419,6 +419,8 @@ int KKSObjEditor :: constructObject()
             v = cAttrValue->attribute()->defValue ();
 
         KKSAttrValue *av = new KKSAttrValue (*cAttrValue);
+        if (av->attribute()->code(false)==QString("id_maclabel"))
+            qDebug () << __PRETTY_FUNCTION__ << v.valueForInsert() << v.isNull();
         av->setValue(v);
         
         avalList.append (av);
@@ -566,15 +568,15 @@ int KKSObjEditor :: constructObject()
         }
 
         pObj->setAttrValues(avalList);
-        
-        
+
+/*
         KKSList<KKSIndicatorValue *> rIVals;
         for (int i=0; i<pObj->indicatorValues().count(); i++)
         {
             int idInd = pObj->indicatorValues().at (i)->id();
             const KKSIndicator * ind = pObj->indicatorValue(i)->indicator();//ioIndicators.value (idInd);
             int type = ind->type()->attrType();
-            QString v = ioIndicatorsValues.value (idInd).toString();
+            QString v = ioIndicatorValues.value (idInd).toString();
             qDebug () << __PRETTY_FUNCTION__ << v << idInd;
             KKSValue val (v, type);
             KKSIndicatorValue * iVal = new KKSIndicatorValue(idInd, const_cast<KKSIndicator *>(ind), val);
@@ -582,7 +584,7 @@ int KKSObjEditor :: constructObject()
         }
 
         pObj->setIndicatorValues (rIVals);
-        
+*/        
         
         //
         // добавляем файлы
@@ -1036,12 +1038,15 @@ void KKSObjEditor :: setValue (int idAttrValue, bool sys, QVariant val)
 void KKSObjEditor :: setIndValue (int id, bool sys, QVariant val)
 {
     Q_UNUSED (sys);
-    if (!ioIndicators.contains (id))
+    if (!ioIndicatorValues.contains (id))
         return;
-    ioIndicatorsValues [id] = val;
+    KKSAttrValue * av = ioIndicatorValues [id];
+    KKSValue v(val.toString(), av->attribute()->type()->attrType());
+    av->setValue(v);
     isChanged = true;
 }
 
+/*
 void KKSObjEditor :: addTbQList (QToolButton * tbView, int idIndicator)
 {
     if (tbView && idIndicator > 0)
@@ -1068,6 +1073,7 @@ void KKSObjEditor :: addTbDelList (QToolButton * tbDel, int idIndicator)
         connect (tbDel, SIGNAL (clicked()), this, SLOT (delIndicator()) );
     }
 }
+ */
 
 void KKSObjEditor :: clearOptionals (void)
 {
@@ -1832,7 +1838,7 @@ void KKSObjEditor :: refreshIndices (QAbstractItemModel * sourceMod)
 
 void KKSObjEditor :: clearIndicators (void)
 {
-    this->ioIndicators.clear();
+    this->ioIndicatorValues.clear();
     QList <QToolButton *> tbv = tbViews.keys();
     tbViews.clear ();
     for (int i=0; i<tbv.size(); i++)
@@ -1840,6 +1846,19 @@ void KKSObjEditor :: clearIndicators (void)
             delete tbv[i];
 }
 
+void KKSObjEditor :: setIndValue (KKSAttrValue *av)
+{
+    int id = av->id ();
+    av->addRef ();
+    if (ioIndicatorValues.contains (id))
+    {
+        ioIndicatorValues.value (id)->release ();
+        ioIndicatorValues.remove (id);
+    }
+    ioIndicatorValues.insert (id, av);
+
+}
+/*
 void KKSObjEditor :: setIndicator (const KKSIndicator *ind, QVariant val)
 {
     int id = ind->id ();
@@ -1852,6 +1871,7 @@ void KKSObjEditor :: setIndicator (const KKSIndicator *ind, QVariant val)
     ioIndicators.insert (id, ind);
     ioIndicatorsValues.insert (id, val);
 }
+*/
 
 void KKSObjEditor :: viewIndicator (void)
 {
@@ -1862,6 +1882,7 @@ void KKSObjEditor :: viewIndicator (void)
     emit viewIOIndicator (pObj, idIndicator);
 }
 
+/*
 void KKSObjEditor :: editIndicator (void)
 {
     QToolButton * tb = qobject_cast<QToolButton *>(this->sender());
@@ -1914,3 +1935,4 @@ void KKSObjEditor :: addIndicator (void)
     QWidget * indW = tabObj->widget (indNumW);
     emit addIOIndicator (pObj, indW);
 }
+ */

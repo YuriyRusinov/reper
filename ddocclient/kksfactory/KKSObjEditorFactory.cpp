@@ -2481,6 +2481,8 @@ int KKSObjEditorFactory :: setAttributes (const KKSTemplate *t,
         {
             v = KKSValue(QString::number (loader->getUserId()), KKSAttrType::atList);
         }
+        if (av->attribute()->code(false)==QString("id_maclabel"))
+            qDebug () << __PRETTY_FUNCTION__ << av->attribute()->code(false) << v.valueForInsert() << v.value();
 
         av->setValue(v);
 
@@ -2700,6 +2702,7 @@ int KKSObjEditorFactory :: setAttributes (const KKSTemplate *t,
  * editor -- редактор ИО
  * updateView -- не используется
  */
+/*
 void KKSObjEditorFactory :: setIndicators (KKSObject * obj,
                                            QWidget * indWidget,
                                            QGridLayout * gIndLay,
@@ -2719,7 +2722,7 @@ void KKSObjEditorFactory :: setIndicators (KKSObject * obj,
         qDebug () << __PRETTY_FUNCTION__ << av << (av ? av->value().value() : 0);
         //<< pa.value()->id() << obj->attrValueId (pa.value()->id());
         val = av ? av->value().valueVariant () : QVariant();//obj->indicatorValues().at(i)->defValue().valueVariant();
-        editor->setIndicator (av->indicator());
+        editor->setIndValue (av);//->indicator());
         qDebug () << __PRETTY_FUNCTION__ << val;
         if (av)
             indMap.insert (av->id(), av);
@@ -2744,6 +2747,114 @@ void KKSObjEditorFactory :: setIndicators (KKSObject * obj,
     qDebug () << __PRETTY_FUNCTION__ << gIndLay->rowCount();
     gIndLay->addItem (sp, nr, 0, 1, 4);//, Qt::AlignLeft | Qt::AlignBottom);
     qDebug () << __PRETTY_FUNCTION__ << gIndLay->rowCount();
+}
+ */
+
+int KKSObjEditorFactory :: setIndicators (const KKSTemplate *t,
+                                          KKSObject * obj,
+                                          QWidget * indWidget,
+                                          QGridLayout * gIndLay,
+                                          const KKSCategory *c,
+                                          KKSObjectExemplar *wObjE,
+                                          const QString& tableName,
+                                          KKSObjEditor * editor,
+                                          bool updateView
+                                          )
+{
+    if (!t || !obj || !wObjE || (!c && !t->category()) || !indWidget || !gIndLay || !editor)
+        return 0;
+
+    KKSList<KKSAttrValue*> avs = wObjE->attrValues();
+    //int cnt = avs.count();
+    //for(int i=0; i<cnt; i++)
+    
+    //Системные атрибуты, а также атрибуты записей справочников не поддерживают темпоральность
+    //поэтому можно однозначно по ИД атрибута идентифицировать его значение
+
+    for (KKSMap<int, KKSCategoryAttr*>::const_iterator pa = t->category()->attributes().constBegin(); pa != t->category()->attributes().constEnd(); pa++)
+    {
+        
+        KKSCategoryAttr * ca = pa.value();
+        KKSAttrValue *av1 = wObjE->attrValue (ca->id());
+        KKSAttrValue *av = NULL;
+        if(av1)
+            av = new KKSAttrValue(*av1);
+        else
+            av = new KKSAttrValue(ca->defValue(), ca);
+
+        KKSValue v = av1 ? av1->value() : KKSValue();
+        
+        if (c && ((av && av->attribute()->tableName () == "io_categories") || ca->id () == ATTR_ID_IO_CATEGORY))
+        {
+            v = KKSValue(QString::number (c->id()), KKSAttrType::atList);
+        }
+        else if (wObjE->io()->id() == IO_IO_ID && ca->id () == ATTR_AUTHOR && wObjE->id() <= 0)
+        {
+            v = KKSValue(QString::number (loader->getUserId()), KKSAttrType::atList);
+        }
+
+        av->setValue(v);
+
+        editor->setIndValue(av);
+
+        av->release();
+    }
+    int nc = 0;
+    KKSMap<int, KKSAttrGroup *> attrGroups = t->groups();
+    int nattrg = attrGroups.count();
+    bool isWid = false;
+    if (nattrg == 0)
+        return 0;
+
+    KKSMap<int, KKSAttrGroup *>::const_iterator pg = attrGroups.constBegin();
+    bool isGrouped (nattrg>=2 ||
+                   (nattrg == 1 && pg.value() && !pg.value()->childGroups().isEmpty()));
+    
+    for (; pg != attrGroups.constEnd(); pg++)
+    {
+        KKSAttrGroup * aGroup = pg.value();//attrGroups[i];
+        if (!aGroup)
+            continue;
+        KKSMap<int, KKSAttrView*> attrs = aGroup->attrViews();
+        KKSList<KKSAttrView *> attrs_list;
+        for (KKSMap<int, KKSAttrView*>::const_iterator pa = attrs.constBegin(); pa != attrs.constEnd(); pa++)
+            attrs_list.append (pa.value());
+        qSort (attrs_list.begin(), attrs_list.end(), compareAttrViews);
+
+        //
+        // проверка на то, что группа может содержать только атрибуты с типом KKSAttrType::atCheckListEx
+        //
+        bool isAtCheckListEx = !aGroup->childGroups().isEmpty();//false;
+        for (int ii=0; ii<attrs_list.count() && !isAtCheckListEx; ii++)
+            isAtCheckListEx = isAtCheckListEx || (attrs_list[ii]->type()->attrType() != KKSAttrType::atCheckListEx);
+
+        if (!isAtCheckListEx && isGrouped)
+            continue;
+
+        QGroupBox *gbAttr = 0;
+        QGridLayout *gbLay = 0;
+        if (isGrouped)
+        {
+            gbAttr = new QGroupBox (aGroup->name(), indWidget);
+            gIndLay->addWidget (gbAttr, nc, 0, 1, 1);
+            isWid = true;
+            gbLay = new QGridLayout ();
+            gbLay->setVerticalSpacing (10);
+            //gbLay->setAlignment (Qt::AlignJustify);//Qt::AlignRight | Qt::AlignVCenter);
+            gbLay->setContentsMargins (5, 5, 5, 5);
+            gbAttr->setLayout (gbLay);
+            gbAttr->setSizePolicy (QSizePolicy::MinimumExpanding, QSizePolicy::Expanding);
+            nc++;
+        }
+
+        putAttrsGroupsOnWidget (obj, wObjE, editor, nc, c, tableName, aGroup, gbLay, gIndLay, isGrouped);
+    }
+
+//    QVBoxLayout *vLay = new QVBoxLayout ();
+//    vLay->addStretch (10);
+//    gSysLayout->addLayout (vLay, nc, 0, 1, 2);
+
+    return nc;
 }
 
 /* Метод загружает значение атрибута-ссылки в его виджет.

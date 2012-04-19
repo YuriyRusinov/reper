@@ -1,1 +1,1 @@
-#define KKS_VERSION "0.13.1"
+#define KKS_VERSION "0.13.2"

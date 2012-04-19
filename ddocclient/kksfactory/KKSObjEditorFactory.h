@@ -185,12 +185,23 @@ private:
                              bool updateView=false
                              );
 
-    void setIndicators (KKSObject * obj,
+/*    void setIndicators (KKSObject * obj,
                         QWidget * indWidget,
                         QGridLayout * gIndLay,
                         KKSObjEditor * editor,
                         bool updateView=false
-                       );
+                       );*/
+    
+    int setIndicators (const KKSTemplate *t,
+                       KKSObject * obj,
+                       QWidget * indWidget,
+                       QGridLayout * gIndLay,
+                       const KKSCategory *c,
+                       KKSObjectExemplar *wObjE,
+                       const QString& tableName,
+                       KKSObjEditor * editor,
+                       bool updateView=false
+                      );
 
     void initActions (QToolBar *tBar, KKSObjEditor *editor);
 

@@ -179,9 +179,9 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void refreshIndices (QAbstractItemModel * sourceMod);
 
         void viewIndicator (void);
-        void editIndicator (void);
-        void delIndicator (void);
-        void addIndicator (void);
+//        void editIndicator (void);
+//        void delIndicator (void);
+//        void addIndicator (void);
 
     signals:
         void filterObjectEx(KKSObjEditor*, int idObject, const KKSCategory * c, QString tableName);
@@ -255,6 +255,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void clearAttributes (void);
         void setSysAttrValue( KKSAttrValue* av);
         void setIOAttrValue ( KKSAttrValue* av);
+        void setIndValue (KKSAttrValue *av);
         KKSMap<int, KKSAttrValue*> & getSysAttrValues();
         KKSMap<int, KKSAttrValue*> & getIOAttrValues();
 
@@ -263,6 +264,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void clearOptionals (void);
         void clearSysOpts (void);
         void clearW (void);
+        void clearIndicators (void);
         void addWidth (int w);
 
         void clearCbList (void);
@@ -279,15 +281,13 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void addListAttrWidget (QToolButton *tb, QWidget *aw, const KKSAttrValue* av);
         void setOpt (int id, bool isSystem, QCheckBox* ch);
         void addOptWidget (int id, bool isSystem, QWidget *w);
-
-        void clearIndicators (void);
-        void setIndicator (const KKSIndicator *ind, QVariant val=QVariant());
+/*
         void addTbQList (QToolButton * tbView, int idIndicator);
         void addTbEditList (QToolButton * tbView, int idIndicator);
         void addTbDelList (QToolButton * tbDel, int idIndicator);
         
         void addIndRow (int idIndicator, QWidget *editor, QLabel * lab);
-
+*/
     private:
         //
         // Functions
@@ -347,13 +347,16 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         KKSMap<int, const KKSAttrValue*> listAttrValues;
 
         int indNumW;
-        KKSMap<int, const KKSIndicator*> ioIndicators;
-        QMap<int, QVariant> ioIndicatorsValues;
+        KKSMap<int, KKSAttrValue *> ioIndicatorValues;
+        QMap<QCheckBox*, int> chIndOpt;
+        QMultiMap<int, QWidget*> chIndOptWidgets;
         QMap<QToolButton *, int> tbViews;
+/*        KKSMap<int, const KKSIndicator*> ioIndicators;
+        QMap<int, QVariant> ioIndicatorsValues;
         QMap<QToolButton *, int> tbIEdit;
         QMap<QToolButton *, int> tbDelInds;
         QMap<int, QWidget *> indWidgets;
-        QMap<int, QLabel *> indLabels;
+        QMap<int, QLabel *> indLabels;*/
 
         QList<int> hAttrWidths;
 
