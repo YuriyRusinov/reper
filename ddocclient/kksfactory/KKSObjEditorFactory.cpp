@@ -212,8 +212,10 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
     KKSObject *obj = 0;
     KKSObjectExemplar * wObjE = 0;
     const KKSTemplate * tSystem = 0;
+    const KKSTemplate * tRecAttr (0);
 
     this->loadEntities (obj, wObjE, wCat, idObject, idObjE, tableName, tSystem, false, parent);
+    this->loadRecEntities (obj, wObjE, wCat, idObject, idObjE, tableName, tRecAttr, false, parent);
 
     const KKSTemplate * ioTemplate = NULL;
     KKSObject * io = NULL;
@@ -1116,6 +1118,58 @@ void KKSObjEditorFactory :: loadEntities (KKSObject *& obj,
     }
     else if (!tSystem)
         tSystem = new KKSTemplate (obj->category()->tableCategory()->defTemplate());
+    
+    //qDebug () << __PRETTY_FUNCTION__ << obj->category()->tableCategory()->id () << (wCat && wCat->tableCategory() ? wCat->tableCategory()->id() : -1);
+
+    //obj->release();
+    return;
+}
+
+void KKSObjEditorFactory :: loadRecEntities (KKSObject *& obj, KKSObjectExemplar *& wObjE, const KKSCategory* wCat, int idObject, int idObjE, const QString& tableName, const KKSTemplate *& tRecAttr, bool defTemplateOnly, QWidget * parent)
+{
+    obj = loader->loadIO (idObject, true);
+    if(!obj)
+    {
+        qWarning() << "There is no object with id = " << idObject;
+        return;
+    }
+    if (!obj->category() || (!obj->category()->recAttrCategory() && !wCat->recAttrCategory()))
+    {
+        qWarning() << "Corrupt table category of object with id = " << idObject;
+        return;
+    }
+
+    wObjE = NULL;
+    if (idObjE > 0)
+    {
+        wObjE = loader->loadEIO (idObjE, obj, wCat, tableName);
+        if (!wObjE)
+        {
+            qWarning() << "There is no object exemplar with id = " << idObjE;
+            return;
+        }
+    }
+    else
+       wObjE = new KKSObjectExemplar (-1, tr("New record"), obj);
+
+    /*const KKSTemplate * */
+    //tSystem = NULL;
+    //
+    //открываем системные атрибуты элемента справочника в выбранном пользователем шаблоне,
+    //если шаблонов у категории несколько
+    //
+    bool withMand (idObjE<=0);
+    if (!tRecAttr && !defTemplateOnly)
+    {
+        if (wCat && wCat->recAttrCategory () && idObject != IO_IO_ID)
+            tRecAttr = getTemplate (wCat->recAttrCategory(), withMand, parent);
+        else if (wCat && wCat->type()->id () == 10 && idObject != IO_IO_ID)
+            tRecAttr = getTemplate (wCat, withMand, parent);
+        else
+            tRecAttr = getTemplate (obj->category()->recAttrCategory(), withMand, parent);
+    }
+    else if (!tRecAttr)
+        tRecAttr = new KKSTemplate (obj->category()->recAttrCategory()->defTemplate());
     
     //qDebug () << __PRETTY_FUNCTION__ << obj->category()->tableCategory()->id () << (wCat && wCat->tableCategory() ? wCat->tableCategory()->id() : -1);
 

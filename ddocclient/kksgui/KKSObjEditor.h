@@ -296,6 +296,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void addIncludesWidget (KKSIncludesWidget *iw);
         void setSysAttrWidgets (QWidget *wSysAttr, QScrollArea *scSysAttr, QWidget *sysAttrs);
         void setIOAttrWidgets (QWidget *wIOAttr, QScrollArea *scIOattr, QWidget *ioAttrs);
+        void setRecIndWidgets (QWidget *wIOAttr, QScrollArea *scIOattr, QWidget *ioAttrs);
         void setTabWidget (QTabWidget *tObj);
 
         void clearAdditionalCopies (void);
@@ -380,6 +381,10 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         QWidget *ioAttrWidget;
         QScrollArea *scIOAttrs;
         QWidget *ioAttrsW;
+
+        QWidget *recIndWidget;
+        QScrollArea *scRecInd;
+        QWidget *recIndW;
 
         KKSRecWidget * recWidget;
         QList <KKSRecWidget *> addRecWidgets;

@@ -1440,6 +1440,31 @@ void KKSObjEditor :: setIOAttrWidgets (QWidget *wIOAttr, QScrollArea *scIOattr, 
     scIOAttrs->setWidget (ioAttrsW);
 }
 
+void KKSObjEditor :: setRecIndWidgets (QWidget *w, QScrollArea *sc, QWidget *indW)
+{
+    if (recIndWidget && recIndWidget != w)
+    {
+        recIndWidget->setParent (0);
+        delete recIndWidget;
+    }
+    recIndWidget = w;
+    if (scRecInd && scRecInd != sc)
+    {
+        scRecInd->setParent (0);
+        scRecInd->setWidget (0);
+        delete scRecInd;
+    }
+    scRecInd = sc;
+    scRecInd->setWidget (0);
+    if (recIndW && recIndW != indW)
+    {
+        recIndW->setParent (0);
+        delete recIndW;
+    }
+    recIndW = indW;
+    scRecInd->setWidget (recIndW);
+}
+
 void KKSObjEditor :: setSysAttrWidgets (QWidget *wSysAttr, QScrollArea *scSysAttr, QWidget *sysAttrs)
 {
     if (sysAttrWidget && sysAttrWidget != wSysAttr)
