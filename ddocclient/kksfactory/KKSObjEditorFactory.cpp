@@ -263,10 +263,17 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
     QGridLayout *gTabLay = new QGridLayout ();
     tabObj->setLayout (gTabLay);
     QWidget * propertiesWidget = 0;
+
     QWidget *sysAttrTabWidget = new QWidget ();
+    QWidget *sysRecAttrWidget = new QWidget ();
+
     QWidget *ioAttrWidget = 0;
+
     QGridLayout *gSysLay = new QGridLayout ();
     sysAttrTabWidget->setLayout (gSysLay);
+    QGridLayout *gRecAttrLay = new QGridLayout ();
+    sysRecAttrWidget->setLayout (gRecAttrLay);
+
     QGridLayout *gIOLay = 0;
     if (idObject == IO_IO_ID)// && idObjE > 0 )
     {
@@ -1134,10 +1141,8 @@ void KKSObjEditorFactory :: loadRecEntities (KKSObject *& obj, KKSObjectExemplar
         return;
     }
     if (!obj->category() || (!obj->category()->recAttrCategory() && !wCat->recAttrCategory()))
-    {
-        qWarning() << "Corrupt table category of object with id = " << idObject;
         return;
-    }
+        //qWarning() << "Corrupt table category of object with id = " << idObject;
 
     wObjE = NULL;
     if (idObjE > 0)
@@ -1161,7 +1166,7 @@ void KKSObjEditorFactory :: loadRecEntities (KKSObject *& obj, KKSObjectExemplar
     bool withMand (idObjE<=0);
     if (!tRecAttr && !defTemplateOnly)
     {
-        if (wCat && wCat->recAttrCategory () && idObject != IO_IO_ID)
+        if (wCat && wCat->recAttrCategory () )//&& idObject != IO_IO_ID)
             tRecAttr = getTemplate (wCat->recAttrCategory(), withMand, parent);
         else if (wCat && wCat->type()->id () == 10 && idObject != IO_IO_ID)
             tRecAttr = getTemplate (wCat, withMand, parent);
