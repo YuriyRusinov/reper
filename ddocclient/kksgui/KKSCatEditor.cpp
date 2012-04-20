@@ -79,6 +79,9 @@ KKSCatEditor :: KKSCatEditor (KKSCategory *c,
 
     if (pTableCategory)
         pTableCategory->addRef ();
+    
+    if (pRecAttrCategory)
+        pRecAttrCategory->addRef ();
 
     this->setLayout (gCatLayout);
     int cInd = 2;
@@ -166,6 +169,8 @@ KKSCatEditor :: ~KKSCatEditor (void)
         pCategory->release ();
     if (pTableCategory)
         pTableCategory->release ();
+    if (pRecAttrCategory)
+        pRecAttrCategory->release ();
     catTypes.clear ();
 }
 
@@ -214,10 +219,16 @@ void KKSCatEditor :: apply (void)
     pCategory->setAsGlobal(cbGlobal->isChecked());
 
     if (pTableCategory)
+    {
         pCategory->setTableCategory(pTableCategory);//->setId (pTableCategory->id());
+        emit saveCategory (pTableCategory, pTableCategory->id(), 10, this);
+    }
     
     if (pRecAttrCategory)
+    {
         pCategory->setRecAttrCategory(pRecAttrCategory);
+        emit saveCategory (pRecAttrCategory, pRecAttrCategory->id(), 10, this);
+    }
 
     //cbChildCat->itemData (cbChildCat->currentIndex()).toInt()
     emit saveCategory (pCategory, (pTableCategory ? pTableCategory->id() : -1), cbTypes->itemData (cbTypes->currentIndex()).toInt(), this);
