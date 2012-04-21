@@ -274,6 +274,21 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
     QGridLayout *gRecAttrLay = new QGridLayout ();
     sysRecAttrWidget->setLayout (gRecAttrLay);
 
+    if (tRecAttr)
+    {
+        QScrollArea *scIndAttrs = new QScrollArea (sysRecAttrWidget);
+        scIndAttrs->setWidgetResizable (true);
+        QWidget *indWidget = new QWidget ();
+        scIndAttrs->setWidget (indWidget);
+        QGridLayout * gIndLay = new QGridLayout (indWidget);
+        gRecAttrLay->addWidget (scIndAttrs, 0, 0, 1, 1);
+        indWidget->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Fixed);
+        tabObj->addTab (sysRecAttrWidget, tr ("Record Attributes"));
+        int nInds = setIndicators (tRecAttr, obj, indWidget, gIndLay, wCat, wObjE, tableName, objEditorWidget);
+    }
+//    qDebug () << __PRETTY_FUNCTION__ << nCount;
+//    nCount = setAttrsToEditor (t, obj, scSysAttrs, sysAttrWidget, mainLayout, wObjE, objEditorWidget, true, nCount);
+    
     QGridLayout *gIOLay = 0;
     if (idObject == IO_IO_ID)// && idObjE > 0 )
     {
@@ -386,8 +401,6 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
     nCount = setAttributes (tSystem, obj, attrWidget, gAttrLay, wCat, wObjE, tableName, objEditorWidget);
 
     objEditorWidget->setSysAttrWidgets (qobject_cast<QWidget *>(scSysAttrs->parent()), scSysAttrs, attrWidget);
-//    qDebug () << __PRETTY_FUNCTION__ << nCount;
-//    nCount = setAttrsToEditor (t, obj, scSysAttrs, sysAttrWidget, mainLayout, wObjE, objEditorWidget, true, nCount);
 
     if (ioAttrWidget)
         this->initIOAttrs(io, wObjE, wCat, objEditorWidget, ioAttrWidget, gIOLay);
@@ -1166,7 +1179,7 @@ void KKSObjEditorFactory :: loadRecEntities (KKSObject *& obj, KKSObjectExemplar
     bool withMand (idObjE<=0);
     if (!tRecAttr && !defTemplateOnly)
     {
-        if (wCat && wCat->recAttrCategory () )//&& idObject != IO_IO_ID)
+        if (wCat && wCat->recAttrCategory () && idObject != IO_IO_ID)
             tRecAttr = getTemplate (wCat->recAttrCategory(), withMand, parent);
         else if (wCat && wCat->type()->id () == 10 && idObject != IO_IO_ID)
             tRecAttr = getTemplate (wCat, withMand, parent);
@@ -2906,7 +2919,7 @@ int KKSObjEditorFactory :: setIndicators (const KKSTemplate *t,
             nc++;
         }
 
-        putAttrsGroupsOnWidget (obj, wObjE, editor, nc, c, tableName, aGroup, gbLay, gIndLay, isGrouped);
+        putRecAttrsGroupsOnWidget (obj, wObjE, editor, nc, c, tableName, aGroup, gbLay, gIndLay, isGrouped);
     }
 
 //    QVBoxLayout *vLay = new QVBoxLayout ();
@@ -6243,7 +6256,7 @@ int KKSObjEditorFactory :: putAttrsGroupsOnWidget ( KKSObject * obj,
         if (a->type()->attrType() != KKSAttrType::atCheckListEx)
             n_str++;
 
-        if (av->id() < 0)
+        if (av && av->id() < 0)
             qDebug () << __PRETTY_FUNCTION__ << av->id();
         if (isGrouped)
             m_awf->putAttrWidget (av, editor, gbLay, n_str, true, (tableName.isEmpty () ? obj->tableName() : tableName), (c ? c->id():-1));
@@ -6268,6 +6281,118 @@ int KKSObjEditorFactory :: putAttrsGroupsOnWidget ( KKSObject * obj,
         QGridLayout * gLay = new QGridLayout (gb);
         gLay->setContentsMargins (0, 0, 0, 0);
         int ngr = putAttrsGroupsOnWidget (obj, wObjE, editor, nc, c, tableName, pg.value(), gLay, gAttrLayout, true);
+        n_str++;
+        qDebug () << __PRETTY_FUNCTION__ << ngr << gbLay->columnCount ();
+        gbLay->addWidget (gb, n_str, 0, 1, 3);//, Qt::AlignHCenter);
+    }
+
+    return n_str;
+}
+
+int KKSObjEditorFactory :: putRecAttrsGroupsOnWidget ( KKSObject * obj,
+                                                       KKSObjectExemplar *wObjE,
+                                                       KKSObjEditor * editor,
+                                                       int& nc,
+                                                       const KKSCategory *c,
+                                                       QString tableName,
+                                                       KKSAttrGroup * aGroup,
+                                                       QGridLayout *gbLay,
+                                                       QGridLayout * gAttrLayout,
+                                                       bool isGrouped)
+{
+    if (!aGroup)
+        return 0;
+
+    KKSMap<int, KKSAttrView*> attrs = aGroup->attrViews();
+    KKSList<KKSAttrView *> attrs_list;
+    for (KKSMap<int, KKSAttrView*>::const_iterator pa = attrs.constBegin(); pa != attrs.constEnd(); pa++)
+        attrs_list.append (pa.value());
+    qSort (attrs_list.begin(), attrs_list.end(), compareAttrViews);
+
+    //
+    // проверка на то, что группа может содержать только атрибуты с типом KKSAttrType::atCheckListEx
+    //
+    bool isAtCheckListEx = !aGroup->childGroups().isEmpty();//false;
+    for (int ii=0; ii<attrs_list.count() && !isAtCheckListEx; ii++)
+        isAtCheckListEx = isAtCheckListEx || (attrs_list[ii]->type()->attrType() != KKSAttrType::atCheckListEx);
+
+    if (!isAtCheckListEx && isGrouped)
+        return 0;
+
+    int n_str=0;
+    for (int ii=0; ii<attrs_list.count() && isAtCheckListEx; ii++)
+    {
+        KKSAttrView * a = attrs_list[ii];
+        if (!a->isVisible() || (obj->id () == IO_IO_ID && (a->id () == ATTR_NAME || a->id () == ATTR_MACLABEL)) )
+            continue;
+
+        int id = a->id();
+        
+        KKSAttrValue * av = NULL;
+        //bool isAvalsSet = false;
+        
+        KKSMap<int, KKSAttrValue*> recAttrValue = editor->getRecAttrValues();
+        for (KKSMap<int, KKSAttrValue*>::const_iterator pa = recAttrValue.constBegin(); pa != recAttrValue.constEnd(); pa++)
+        {
+            KKSAttrValue * av1 = pa.value();
+            if(av1->attribute()->id() == a->id()){
+                av = av1;
+                break;
+            }
+        }
+
+        if (av)
+            av->addRef ();
+
+
+        //for (int iii=0; iii<wObjE->attrValues().count() && !isAvalsSet; iii++)
+        //    isAvalsSet = (wObjE->attrValueIndex (iii)->attribute()->id() == a->id());
+        
+        //if (wObjE->id() <= 0 && !isAvalsSet)
+        //    av = new KKSAttrValue (a->defValue(), a);
+        //else
+        //{
+            //av = wObjE->attrValue (id);
+
+            //if (av)
+            //    av->addRef ();
+            //else
+            //{
+            //    KKSValue v;
+            //    if (!a->defValue().value().isEmpty())
+            //        v = a->defValue ();
+            //    av = new KKSAttrValue(v, a);
+            //}
+        //}
+
+        if (a->type()->attrType() != KKSAttrType::atCheckListEx)
+            n_str++;
+
+        if (av && av->id() < 0)
+            qDebug () << __PRETTY_FUNCTION__ << av->id();
+        if (isGrouped)
+            m_awf->putAttrWidget (av, editor, gbLay, n_str, true, (tableName.isEmpty () ? obj->tableName() : tableName), (c ? c->id():-1));
+        else
+        {
+            gAttrLayout->setVerticalSpacing (10);
+            m_awf->putAttrWidget (av, editor, gAttrLayout, nc, true, obj->tableName(), (c ? c->id():-1));
+            if (a->type()->attrType() != KKSAttrType::atCheckListEx)
+                nc++;
+        }
+
+        av->release ();
+    }
+
+    KKSMap<int, KKSAttrGroup *> subGroups = aGroup->childGroups ();
+    for (KKSMap<int, KKSAttrGroup *>::const_iterator pg = subGroups.constBegin(); \
+            pg != subGroups.constEnd(); \
+            pg++)
+    {
+        QGroupBox * gb = new QGroupBox ();
+        gb->setTitle (pg.value()->name());
+        QGridLayout * gLay = new QGridLayout (gb);
+        gLay->setContentsMargins (0, 0, 0, 0);
+        int ngr = putRecAttrsGroupsOnWidget (obj, wObjE, editor, nc, c, tableName, pg.value(), gLay, gAttrLayout, true);
         n_str++;
         qDebug () << __PRETTY_FUNCTION__ << ngr << gbLay->columnCount ();
         gbLay->addWidget (gb, n_str, 0, 1, 3);//, Qt::AlignHCenter);

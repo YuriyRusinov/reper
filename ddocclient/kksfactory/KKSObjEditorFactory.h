@@ -303,6 +303,7 @@ private:
     //KKSList<const KKSFilterGroup *> viewMainCategories (void);
     void updateAttrModel (const QModelIndex & wIndex, QAbstractItemModel * sMod, int id, QString tableName, KKSObject * refIO);
     int putAttrsGroupsOnWidget (KKSObject * obj, KKSObjectExemplar * wObjE, KKSObjEditor * editor, int& nc, const KKSCategory *c, QString tableName, KKSAttrGroup * aGroup, QGridLayout *gbLay, QGridLayout * gAttrLayout, bool isGrouped);
+    int putRecAttrsGroupsOnWidget (KKSObject * obj, KKSObjectExemplar * wObjE, KKSObjEditor * editor, int& nc, const KKSCategory *c, QString tableName, KKSAttrGroup * aGroup, QGridLayout *gbLay, QGridLayout * gAttrLayout, bool isGrouped);
     void putAttrsGroupsOnWidget (KKSObject * obj, KKSObjEditor * editor, int& nc, const KKSCategory *c, KKSAttrGroup * aGroup, QGridLayout *gbLay, QGridLayout * gAttrLayout, bool isGrouped, bool updateView);
     void putIndicatorsGroupsOnToWidget (KKSObject * obj, KKSObjEditor * editor, int& nc, const KKSMap<int, KKSIndicatorValue*>& indMap, QGridLayout *gbLay, QGridLayout * gAttrLayout, bool isGrouped, bool updateView);
     void putRubricator (KKSObject * obj, KKSObjEditor * editor, QTabWidget * tabObj);

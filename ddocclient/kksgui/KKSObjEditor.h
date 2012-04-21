@@ -258,7 +258,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void setIndValue (KKSAttrValue *av);
         KKSMap<int, KKSAttrValue*> & getSysAttrValues();
         KKSMap<int, KKSAttrValue*> & getIOAttrValues();
-
+        KKSMap<int, KKSAttrValue*> & getRecAttrValues();
 
 
         void clearOptionals (void);

@@ -1008,6 +1008,10 @@ KKSMap<int, KKSAttrValue*> & KKSObjEditor :: getIOAttrValues()
     return ioAttrValues;
 }
 
+KKSMap<int, KKSAttrValue*> & KKSObjEditor :: getRecAttrValues()
+{
+    return ioIndicatorValues;
+}
 
 void KKSObjEditor :: setValue (int idAttrValue, bool sys, QVariant val)
 {
