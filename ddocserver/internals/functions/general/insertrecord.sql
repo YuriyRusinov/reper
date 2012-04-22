@@ -16,7 +16,7 @@ declare
     ct int4;
     i int4;
     nid int4;
-    idval int4;
+    idval int8;
     attr_query varchar;
     acode varchar;
     attr_type varchar;

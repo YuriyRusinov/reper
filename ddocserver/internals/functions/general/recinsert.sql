@@ -1,11 +1,11 @@
-create or replace function recInsert (varchar, varchar[], varchar[]) returns int4 as
+create or replace function recInsert (varchar, varchar[], varchar[]) returns int8 as
 $BODY$
 declare
     ref_uid alias for $1;
     attrs_uids alias for $2;
     attrs_values alias for $3;
 
-    idRec int4;
+    idRec int8;
     ref_table_name varchar;
     query varchar;
     values_query varchar;

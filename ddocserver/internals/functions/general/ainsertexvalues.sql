@@ -1,4 +1,4 @@
-create or replace function aInsertExValues(varchar, int4, int4[], varchar, varchar) returns int4 as
+create or replace function aInsertExValues(varchar, int8, int4[], varchar, varchar) returns int4 as
 $BODY$
 declare
     tableName alias for $1;
@@ -47,7 +47,7 @@ end
 $BODY$
 language 'plpgsql';
 
-create or replace function aInsertExValues(varchar, int4, varchar, varchar, varchar) returns int4 as
+create or replace function aInsertExValues(varchar, int8, varchar, varchar, varchar) returns int4 as
 $BODY$
 declare
     tableName alias for $1;

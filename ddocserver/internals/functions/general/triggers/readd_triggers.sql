@@ -1,0 +1,1 @@
+\i ./functions/general/triggers/trgeioinsertindicator.sql

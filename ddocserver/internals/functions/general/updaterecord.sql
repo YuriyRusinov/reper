@@ -2,7 +2,7 @@
 --необходимо учесть обработку атрибутов типа atCheckListEx!
 --сейчас здесь это НЕ делается
 
-create or replace function updaterecord (varchar, int4, int4[], varchar[]) returns int4 as
+create or replace function updaterecord (varchar, int8, int4[], varchar[]) returns int8 as
 $BODY$
 declare
     tableName alias for $1;

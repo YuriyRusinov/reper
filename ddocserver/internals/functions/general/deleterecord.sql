@@ -1,4 +1,4 @@
-create or replace function deleterecord (int4, varchar) returns int4 as
+create or replace function deleterecord (int8, varchar) returns int4 as
 $BODY$
 declare
     idrec alias for $1;

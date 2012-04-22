@@ -7,7 +7,7 @@ declare
     key_attr alias for $4;
     key_val alias for $5;
 
-    idRec int4;
+    idRec int8;
     ref_table_name varchar;
     r_query varchar;
     n int4;

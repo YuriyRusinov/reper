@@ -63,13 +63,6 @@ alter table operations add column the_value varchar;
 update operations set the_value = name;
 alter table operations alter column the_value set not null;
 
-alter table operations add column unique_id varchar, add column last_update timestamp;
-update operations set unique_id = generateUID(id, 'operations'), last_update = current_timestamp;
-alter table operations alter column unique_id set not null;
-alter table operations alter column last_update set not null;
-alter table operations alter column last_update set default current_timestamp;
-alter table operations inherit root_table;
-select createTriggerUID('operations');
 
 
 select f_safe_drop_trigger('trgioinsert', 'io_objects');

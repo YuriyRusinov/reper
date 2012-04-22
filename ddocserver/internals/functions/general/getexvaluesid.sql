@@ -1,4 +1,4 @@
-create or replace function getExValuesId(int4, varchar, varchar, varchar) returns int4[] as
+create or replace function getExValuesId(int8, varchar, varchar, varchar) returns int4[] as
 $BODY$
 declare
     idRecord alias for $1;
@@ -8,10 +8,10 @@ declare
 
     r record;
     q varchar;
-    iValues int4[];
+    iValues int8[];
 begin
 
-    iValues := '{}'::int4[];
+    iValues := '{}'::int8[];
 
     q = 'select ' || childColumn || ' as ids from ' || refTable || ' where ' || mainColumn || ' = ' || idRecord;
 

@@ -1,4 +1,4 @@
-create or replace function getEIO (int4, int4) returns varchar as
+create or replace function getEIO (int8, int4) returns varchar as
 $BODY$
 declare
     id_copy alias for $1;

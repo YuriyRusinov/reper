@@ -1,4 +1,4 @@
-create or replace function generateUID(int4, varchar) returns varchar as
+create or replace function generateUID(int8, varchar) returns varchar as
 $BODY$
 declare
     localId alias for $1;
@@ -44,7 +44,7 @@ language 'plpgsql';
 create or replace function uidCheck() returns trigger as
 $BODY$
 declare
-    localId int4;
+    localId int8;
     tableName varchar;
     UID varchar;
     idUser int4;
