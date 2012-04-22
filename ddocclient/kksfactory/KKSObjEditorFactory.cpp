@@ -1032,8 +1032,8 @@ void KKSObjEditorFactory :: setIONameSecret (KKSObjEditor * editor, KKSObjectExe
     //const KKSValue pVal = attr->value();
     //const KKSCategoryAttr * pCategAttr = attr->attribute();
     
-    QLineEdit * lEIOName = new KKSEdit (attr, true, io->name (), parentWProp);//QLineEdit (io->name (), parentWProp);
-    connect (lEIOName, SIGNAL (valueChanged(int, bool, QVariant)), editor, SLOT (setValue (int, bool, QVariant)) );
+    QLineEdit * lEIOName = new KKSEdit (attr, 0, io->name (), parentWProp);//QLineEdit (io->name (), parentWProp);
+    connect (lEIOName, SIGNAL (valueChanged(int, int, QVariant)), editor, SLOT (setValue (int, int, QVariant)) );
     lEIOName->setReadOnly (io->isSystem ());
     hIOLay->addWidget (lIOName);
     hIOLay->addWidget (lEIOName);
@@ -1076,9 +1076,9 @@ void KKSObjEditorFactory :: setIONameSecret (KKSObjEditor * editor, KKSObjectExe
     tbMac->setText ("...");
     editor->addListAttrWidget (tbMac, aRefW, attr);
     connect (tbMac, SIGNAL (clicked()), editor, SLOT (setList()) );
-    aRefW->setValue (attr->id(), true, cV);
+    aRefW->setValue (attr->id(), 0, cV);
     aRefW->setAttrWidget (lEIOMacLabel);
-    connect (aRefW, SIGNAL (valueChanged(int, bool, QVariant)), editor, SLOT (setValue (int, bool, QVariant)) );
+    connect (aRefW, SIGNAL (valueChanged(int, int, QVariant)), editor, SLOT (setValue (int, int, QVariant)) );
     hIOLay->addWidget (tbMac);
     tbMac->setEnabled (!io->isSystem ());
 
@@ -2836,7 +2836,7 @@ int KKSObjEditorFactory :: setIndicators (const KKSTemplate *t,
     if (!t || !obj || !wObjE || (!c && !t->category()) || !indWidget || !gIndLay || !editor)
         return 0;
 
-    KKSList<KKSAttrValue*> avs = wObjE->attrValues();
+    KKSList<KKSAttrValue*> avs = wObjE->indValues();
     //int cnt = avs.count();
     //for(int i=0; i<cnt; i++)
     
@@ -2847,7 +2847,7 @@ int KKSObjEditorFactory :: setIndicators (const KKSTemplate *t,
     {
         
         KKSCategoryAttr * ca = pa.value();
-        KKSAttrValue *av1 = wObjE->attrValue (ca->id());
+        KKSAttrValue *av1 = wObjE->indValue (ca->id());
         KKSAttrValue *av = NULL;
         if(av1)
             av = new KKSAttrValue(*av1);
