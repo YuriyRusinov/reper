@@ -14,14 +14,14 @@ class KKSAttrValue;
 class _GUI_EXPORT KKSIntervalWidget : public QWidget, public KKSAttrWidget
 {
     public:
-        KKSIntervalWidget (const KKSAttrValue *attr, bool isSys, QWidget *parent=NULL);
+        KKSIntervalWidget (const KKSAttrValue *attr, int isSys, QWidget *parent=NULL);
         ~KKSIntervalWidget (void);
 
         void setLineEdit (QLineEdit *le);
         void setComboUnits (QComboBox *cb);
 
     signals:
-        void valueChanged (int id, bool isSys, QVariant val);
+        void valueChanged (int id, int isSys, QVariant val);
 
     public slots:
         void setValue (void);
@@ -32,7 +32,7 @@ class _GUI_EXPORT KKSIntervalWidget : public QWidget, public KKSAttrWidget
         // Variables
         //
 //        const KKSIndAttr *attribute;
-//        bool isSystem;
+//        int isSystem;
 
         QLineEdit *lEValue;
         QComboBox *cbUnit;

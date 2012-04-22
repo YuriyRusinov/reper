@@ -20,15 +20,15 @@ class KKSAttrValue;
 class _GUI_EXPORT KKSPixmap : public QLabel, public KKSAttrWidget
 {
     public:
-        KKSPixmap (const KKSAttrValue*attr, bool isSys, QWidget *parent=NULL);
-        KKSPixmap (const KKSAttrValue*attr, bool isSys, const QString& contents, QWidget *parent=NULL);
+        KKSPixmap (const KKSAttrValue*attr, int isSys, QWidget *parent=NULL);
+        KKSPixmap (const KKSAttrValue*attr, int isSys, const QString& contents, QWidget *parent=NULL);
         virtual ~KKSPixmap (void);
 
         const QPixmap & pixmap() const;
         QByteArray save();
 
     signals:
-        void valueChanged (int id, bool isSys, QVariant val);
+        void valueChanged (int id, int isSys, QVariant val);
 
     public slots:
         
@@ -44,7 +44,7 @@ class _GUI_EXPORT KKSPixmap : public QLabel, public KKSAttrWidget
         // Variables
         //
 //        const KKSIndAttr *attribute;
-//        bool isSystem;
+//        int isSystem;
         QPixmap m_px;
 
     private:

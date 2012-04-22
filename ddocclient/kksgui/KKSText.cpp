@@ -9,14 +9,14 @@
 #include "KKSAttrValue.h"
 
 
-KKSText :: KKSText (const KKSAttrValue *attr, bool isSys, QWidget *parent)
+KKSText :: KKSText (const KKSAttrValue *attr, int isSys, QWidget *parent)
     : QTextEdit (parent), KKSAttrWidget(attr, isSys),
     m_fixedSymCount(0)
 {
     connect (this, SIGNAL (textChanged()), this, SLOT (setValPrivate()) );
 }
 
-KKSText :: KKSText (const KKSAttrValue *attr, bool isSys, const QString& contents, QWidget *parent)
+KKSText :: KKSText (const KKSAttrValue *attr, int isSys, const QString& contents, QWidget *parent)
     //: QTextEdit (contents, parent),
     : QTextEdit (parent), KKSAttrWidget(attr, isSys),
     m_fixedSymCount(0)

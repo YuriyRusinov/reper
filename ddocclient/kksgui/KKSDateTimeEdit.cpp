@@ -14,25 +14,25 @@
 // Return:     
 ////////////////////////////////////////////////////////////////////////
 
-KKSDateTimeEdit :: KKSDateTimeEdit (const KKSAttrValue *attr, bool isSys, QWidget* parent) :
+KKSDateTimeEdit :: KKSDateTimeEdit (const KKSAttrValue *attr, int isSys, QWidget* parent) :
     QDateTimeEdit (parent), KKSAttrWidget(attr, isSys)
 {
     connect (this, SIGNAL (dateTimeChanged (const QDateTime&)), this, SLOT (setDateTime (const QDateTime&)) );
 }
 
-KKSDateTimeEdit :: KKSDateTimeEdit (const KKSAttrValue *attr, bool isSys, const QDateTime& datetime, QWidget *parent)
+KKSDateTimeEdit :: KKSDateTimeEdit (const KKSAttrValue *attr, int isSys, const QDateTime& datetime, QWidget *parent)
     : QDateTimeEdit (datetime, parent), KKSAttrWidget(attr, isSys)
 {
     connect (this, SIGNAL (dateTimeChanged (const QDateTime&)), this, SLOT (setDateTime (const QDateTime&)) );
 }
 
-KKSDateTimeEdit :: KKSDateTimeEdit (const KKSAttrValue *attr, bool isSys, const QDate& date, QWidget *parent)
+KKSDateTimeEdit :: KKSDateTimeEdit (const KKSAttrValue *attr, int isSys, const QDate& date, QWidget *parent)
     : QDateTimeEdit (date, parent), KKSAttrWidget(attr, isSys)
 {
     connect (this, SIGNAL (dateTimeChanged (const QDateTime&)), this, SLOT (setDateTime (const QDateTime&)) );
 }
 
-KKSDateTimeEdit :: KKSDateTimeEdit (const KKSAttrValue *attr, bool isSys, const QTime& time, QWidget * parent)
+KKSDateTimeEdit :: KKSDateTimeEdit (const KKSAttrValue *attr, int isSys, const QTime& time, QWidget * parent)
     : QDateTimeEdit (time, parent), KKSAttrWidget(attr, isSys)
 {
     connect (this, SIGNAL (dateTimeChanged (const QDateTime&)), this, SLOT (setDateTime (const QDateTime&)) );

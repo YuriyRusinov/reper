@@ -13,7 +13,7 @@
 #include <KKSAttrType.h>
 #include "KKSColorWidget.h"
 
-KKSColorWidget :: KKSColorWidget (const KKSAttrValue *attr, bool isSys, QColor rgb_col, QWidget *parent, Qt::WindowFlags flags)
+KKSColorWidget :: KKSColorWidget (const KKSAttrValue *attr, int isSys, QColor rgb_col, QWidget *parent, Qt::WindowFlags flags)
     : QWidget (parent, flags), KKSAttrWidget(attr, isSys),
     lSampleText (new QLabel (tr("Sample text"), this)),
     tbColor (new QToolButton (this))

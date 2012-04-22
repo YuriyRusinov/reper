@@ -15,7 +15,7 @@
 #include "KKSPointsItemDelegate.h"
 #include "KKSPointTable.h"
 
-KKSPointTable :: KKSPointTable (const KKSAttrValue *attr, bool isSys, QWidget *parent)
+KKSPointTable :: KKSPointTable (const KKSAttrValue *attr, int isSys, QWidget *parent)
     : QTableView (parent), KKSAttrWidget(attr, isSys),
     currVal (QVariant()),
     popupMenu (new QMenu())
@@ -24,7 +24,7 @@ KKSPointTable :: KKSPointTable (const KKSAttrValue *attr, bool isSys, QWidget *p
     initModel ();
 }
 
-KKSPointTable :: KKSPointTable (const KKSAttrValue *attr, bool isSys, const QList<QVariant>& v, QWidget *parent)
+KKSPointTable :: KKSPointTable (const KKSAttrValue *attr, int isSys, const QList<QVariant>& v, QWidget *parent)
     : QTableView (parent), KKSAttrWidget(attr, isSys),
     currVal (v),
     popupMenu (new QMenu())

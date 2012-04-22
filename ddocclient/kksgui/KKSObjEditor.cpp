@@ -454,6 +454,126 @@ int KKSObjEditor :: constructObject()
         pObjectEx->setAttrValues (avalList);
     }
 
+    KKSList<KKSAttrValue*> avalIndList;
+    KKSMap<int, KKSAttrValue*>::const_iterator pIndAttrValues;
+    
+    for (pIndAttrValues=ioIndicatorValues.constBegin (); pIndAttrValues != ioIndicatorValues.constEnd(); pIndAttrValues++)
+    {
+        const KKSAttrValue *cAttrValue = pIndAttrValues.value();
+        //int idAttr = cAttr->id();
+        KKSValue v;
+        /*if (cAttr->id() == 97)
+            qDebug () << __PRETTY_FUNCTION__ << sysAttributesValues.value (pSysAttrs.key());*/
+        if (!chIndOptWidgets.contains (pIndAttrValues.key()) || chIndOptWidgets.value (pIndAttrValues.key())->isEnabled())
+        {
+            //
+            // Mandatory or enabled optional parameter
+            //
+            //qWarning() << cAttr->code();
+            QString value;
+            int type = cAttrValue->attribute()->type()->attrType();
+            QVariant val = cAttrValue->value().valueVariant(); //sysAttributesValues.value (pSysAttrs.key());
+            if (type == KKSAttrType::atCheckList || type == KKSAttrType::atCheckListEx)
+            {
+                value = val.toStringList().join(",");
+                //qDebug () << __PRETTY_FUNCTION__ << cAttrValue->attribute()->id() << value;
+            }
+            else if (type == KKSAttrType::atRecordColor || type == KKSAttrType::atRecordTextColor)
+            {
+                QColor v_col = val.value<QColor>();
+                //qDebug () << __PRETTY_FUNCTION__ << v_col << v_col.value() << v_col.rgba() << (pObj ? pObj->recordFillColor() : QString());
+                if (v_col.isValid())
+                {
+                    QRgb v_rgba = v_col.rgba ();
+                    //value = QString ("(%1)::bigint").arg (v_rgba);
+                    value = QString ("%1").arg (v_rgba);
+                }
+                else
+                    value = QString();//::number (v_col.value());
+            }
+            else if (type == KKSAttrType::atXMLDoc && !val.isNull() && !val.toByteArray().isEmpty())
+            {
+#if QT_VERSION >= 0x040600
+                /*--ksa 
+                //Данный код не работает! Даже при поавильном XML выдается, что инвалидный контент
+                QXmlSchema * xmlSchema = new QXmlSchema ();
+                if (!xmlSchema)
+                    return ERROR_CODE;
+                ////qDebug () << __PRETTY_FUNCTION__ << val << val.toByteArray();
+                xmlSchema->load (val.toByteArray());
+                if (!xmlSchema->isValid())
+                {
+                    QMessageBox::warning (this, tr ("XML Document"), tr ("Invalid xml contents"), QMessageBox::Ok, QMessageBox::NoButton);
+                    return ERROR_CODE;
+                }
+                delete xmlSchema;
+                */
+#endif
+                value = val.toString();
+            }
+            else if (type == KKSAttrType::atDate)// || type== KKSAttrType::atDateTime)
+            {
+                if (val.toDate().isValid())
+                    value = val.toDate().toString (Qt::ISODate);
+                else
+                    value = QString ();
+            }
+            else if (type == KKSAttrType::atDateTime)
+            {
+                if (val.toDateTime().isValid())
+                    value = val.toDateTime().toString (Qt::ISODate);
+                else
+                    value = QString ();
+            }
+            else if (type == KKSAttrType::atTime)
+            {
+                if (val.toTime().isValid())
+                    value = val.toTime().toString (Qt::ISODate);
+                else
+                    value = QString ();
+            }
+            else
+                value = val.toString(); 
+
+            qDebug () << __PRETTY_FUNCTION__ << val << value;
+            if (cAttrValue->attribute()->isMandatory() && cAttrValue->attribute()->defValue().value().isEmpty() && (val.isNull() || value.isEmpty()))
+            {
+                QMessageBox::warning (this, tr ("Save document"), tr ("Mandatory attribute %1 has to be set").arg (cAttrValue->attribute()->name()), QMessageBox::Ok);
+                return ERROR_CODE;
+            }
+            else if (cAttrValue->attribute()->isMandatory() && (val.isNull() || value.isEmpty())){
+                if(type == KKSAttrType::atCheckList ||
+                   type == KKSAttrType::atCheckListEx)
+                {
+                    value = cAttrValue->attribute()->defValue().valueVariant().toStringList().join(",");
+                }
+                else
+                    value = cAttrValue->attribute()->defValue().value();
+            }
+            else if (!cAttrValue->attribute()->isMandatory() && (val.isNull() || value.isEmpty()))
+            {
+                if(type == KKSAttrType::atCheckList || 
+                   type == KKSAttrType::atCheckListEx)
+                {
+                    value = cAttrValue->attribute()->defValue().valueVariant().toStringList().join(",");
+                }
+                else
+                    value = QString();
+            }
+
+            v = KKSValue(value, type);
+        }
+        else
+            v = cAttrValue->attribute()->defValue ();
+
+        KKSAttrValue *av = new KKSAttrValue (*cAttrValue);
+        qDebug () << __PRETTY_FUNCTION__ << v.valueForInsert() << v.isNull();
+        av->setValue(v);
+        
+        avalIndList.append (av);
+    }
+    pObjectEx->setIndValues (avalIndList);
+
     //
     // если редактируемый ЭИО является ИО, то надо сохранить его атрибуты
     // а также задать ему его системные атрибуты, фактически преобразовав ЭИО в ИО
@@ -1013,41 +1133,45 @@ KKSMap<int, KKSAttrValue*> & KKSObjEditor :: getRecAttrValues()
     return ioIndicatorValues;
 }
 
-void KKSObjEditor :: setValue (int idAttrValue, bool sys, QVariant val)
+void KKSObjEditor :: setValue (int idAttrValue, int sys, QVariant val)
 {
     
-    if (sys)
+    switch (sys)
     {
-        if (!sysAttrValues.contains (idAttrValue))
-            return;
-        
-        KKSAttrValue * av = sysAttrValues[idAttrValue];
-        KKSValue v(val.toString(), av->attribute()->type()->attrType());
+        case 0: default:
+        {
+            if (!sysAttrValues.contains (idAttrValue))
+                return;
 
-        av->setValue(v);
-        isChanged = true;
+            KKSAttrValue * av = sysAttrValues[idAttrValue];
+            KKSValue v(val.toString(), av->attribute()->type()->attrType());
+
+            av->setValue(v);
+            isChanged = true;
+            break;
+        }
+        case 1:
+        {
+            if (!ioAttrValues.contains (idAttrValue))
+                return;
+
+            KKSAttrValue * av = ioAttrValues[idAttrValue];
+            KKSValue v(val.toString(), av->attribute()->type()->attrType());
+            av->setValue(v);
+            isChanged = true;
+            break;
+        }
+        case 2:
+        {
+            if (!ioIndicatorValues.contains (idAttrValue))
+                return;
+            KKSAttrValue * av = ioIndicatorValues [idAttrValue];
+            KKSValue v(val.toString(), av->attribute()->type()->attrType());
+            av->setValue(v);
+            isChanged = true;
+            break;
+        }
     }
-    else
-    {
-        if (!ioAttrValues.contains (idAttrValue))
-            return;
-
-        KKSAttrValue * av = ioAttrValues[idAttrValue];
-        KKSValue v(val.toString(), av->attribute()->type()->attrType());
-        av->setValue(v);
-        isChanged = true;
-    }
-}
-
-void KKSObjEditor :: setIndValue (int id, bool sys, QVariant val)
-{
-    Q_UNUSED (sys);
-    if (!ioIndicatorValues.contains (id))
-        return;
-    KKSAttrValue * av = ioIndicatorValues [id];
-    KKSValue v(val.toString(), av->attribute()->type()->attrType());
-    av->setValue(v);
-    isChanged = true;
 }
 
 /*

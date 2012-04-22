@@ -24,8 +24,8 @@ class KKSAttrValue;
 class _GUI_EXPORT KKSPointTable : public QTableView, public KKSAttrWidget
 {
 public:
-    KKSPointTable (const KKSAttrValue*attr, bool isSys, QWidget *parent=0);
-    KKSPointTable (const KKSAttrValue*attr, bool isSys, const QList<QVariant>& v, QWidget *parent=0);
+    KKSPointTable (const KKSAttrValue*attr, int isSys, QWidget *parent=0);
+    KKSPointTable (const KKSAttrValue*attr, int isSys, const QList<QVariant>& v, QWidget *parent=0);
     virtual ~KKSPointTable (void);
 
     void setData (const QList<QVariant>& pvList);
@@ -42,7 +42,7 @@ private slots:
     void delCurrPoint (void);
 
 signals:
-    void valueChanged (int id, bool isSys, QVariant val);
+    void valueChanged (int id, int isSys, QVariant val);
 
 protected:
     //
@@ -61,7 +61,7 @@ private:
     // Variables
     //
     //const KKSIndAttr *attribute;
-    //bool isSystem;
+    //int isSystem;
     QVariant currVal;
 
     QMenu *popupMenu;

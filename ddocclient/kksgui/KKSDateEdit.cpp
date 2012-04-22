@@ -1,13 +1,13 @@
 #include "KKSAttrValue.h"
 #include "KKSDateEdit.h"
 
-KKSDateEdit :: KKSDateEdit (const KKSAttrValue *attr, bool isSys, QWidget *parent)
+KKSDateEdit :: KKSDateEdit (const KKSAttrValue *attr, int isSys, QWidget *parent)
     : QDateEdit (parent), KKSAttrWidget(attr, isSys)
 {
     connect (this, SIGNAL (dateChanged (const QDate&)), this, SLOT (setDate (const QDate&)) );
 }
 
-KKSDateEdit :: KKSDateEdit (const KKSAttrValue *attr, bool isSys, const QDate& date, QWidget *parent)
+KKSDateEdit :: KKSDateEdit (const KKSAttrValue *attr, int isSys, const QDate& date, QWidget *parent)
     : QDateEdit (date, parent), KKSAttrWidget(attr, isSys)
 {
     connect (this, SIGNAL (dateChanged (const QDate&)), this, SLOT (setDate (const QDate&)) );

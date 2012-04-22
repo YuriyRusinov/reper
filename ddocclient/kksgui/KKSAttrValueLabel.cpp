@@ -11,7 +11,7 @@
 #include <QMessageBox>
 #include <KKSAttrValuePropsForm.h>
 
-KKSAttrValueLabel :: KKSAttrValueLabel (KKSAttrValue * av, bool isSystem, QWidget *parent)
+KKSAttrValueLabel :: KKSAttrValueLabel (KKSAttrValue * av, int isSystem, QWidget *parent)
     : QLabel (parent)
 {
     m_av = NULL;
@@ -72,7 +72,7 @@ void KKSAttrValueLabel :: setLabelProps()
     QString coloredText;
    
     //coloredText = tr("<font color='%1'>%2</font>").arg( colour. ).arg(text);
-    if(!m_isSystem)
+    if(m_isSystem==1)
         coloredText = tr("<font color='blue'>%2</font>").arg(text);
     else
         coloredText = text;
@@ -88,9 +88,9 @@ void KKSAttrValueLabel :: setLabelProps()
 
 	this->setFont (lFont);
 
-    if(!m_isSystem){
+    if(m_isSystem==1){
         setToolTip(tr("Click on label to show extended attribute properties"));
-	    setCursor(Qt::PointingHandCursor);
+        setCursor(Qt::PointingHandCursor);
     }
 
 
@@ -98,7 +98,7 @@ void KKSAttrValueLabel :: setLabelProps()
 
 void KKSAttrValueLabel :: showAttrValueProps()
 {
-    if(!m_av || m_isSystem)
+    if(!m_av || m_isSystem==0)
         return;
 
     KKSAttrValuePropsForm * f = new KKSAttrValuePropsForm(m_av, true, this);

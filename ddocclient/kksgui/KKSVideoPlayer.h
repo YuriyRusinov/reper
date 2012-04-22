@@ -21,13 +21,13 @@ class KKSAttrValue;
 class _GUI_EXPORT KKSVideoPlayer : public QLabel, public KKSAttrWidget
 {
 public:
-    KKSVideoPlayer (const KKSAttrValue*attr, bool isSys, QWidget * parent=0, Qt::WindowFlags flags=0);
+    KKSVideoPlayer (const KKSAttrValue*attr, int isSys, QWidget * parent=0, Qt::WindowFlags flags=0);
     virtual ~KKSVideoPlayer (void);
 
     QByteArray save (void);
 
 signals:
-    void valueChanged (int id, bool isSys, QVariant val);
+    void valueChanged (int id, int isSys, QVariant val);
 
 public slots:
 
@@ -43,7 +43,7 @@ private:
     // Variables
     //
 //    const KKSIndAttr *attribute;
-//    bool isSystem;
+//    int isSystem;
     QMovie * m_movie;
 
 private:

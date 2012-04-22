@@ -14,7 +14,7 @@
 #include <QBuffer>
 
 
-KKSPixmap :: KKSPixmap (const KKSAttrValue *attr, bool isSys, QWidget *parent)
+KKSPixmap :: KKSPixmap (const KKSAttrValue *attr, int isSys, QWidget *parent)
     : QLabel (parent), KKSAttrWidget(attr, isSys)
 {
 
@@ -23,7 +23,7 @@ KKSPixmap :: KKSPixmap (const KKSAttrValue *attr, bool isSys, QWidget *parent)
     //connect (this, SIGNAL (textChanged()), this, SLOT (setValPrivate()) );
 }
 
-KKSPixmap :: KKSPixmap (const KKSAttrValue *attr, bool isSys, const QString& contents, QWidget *parent)
+KKSPixmap :: KKSPixmap (const KKSAttrValue *attr, int isSys, const QString& contents, QWidget *parent)
     : QLabel (parent), KKSAttrWidget(attr, isSys)
 {
     

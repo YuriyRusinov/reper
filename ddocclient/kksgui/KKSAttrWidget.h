@@ -15,7 +15,7 @@ class KKSAttrValue;
 class _GUI_EXPORT KKSAttrWidget 
 {
     public:
-        KKSAttrWidget(const KKSAttrValue *av, bool isSys);
+        KKSAttrWidget(const KKSAttrValue *av, int isSys);
         virtual ~KKSAttrWidget (void);
 
         void setAttrValue(const KKSAttrValue * av);
@@ -29,7 +29,7 @@ class _GUI_EXPORT KKSAttrWidget
         // Variables
         //
         const KKSAttrValue *m_av;
-        bool m_isSystem;
+        int m_isSystem;
 
     //private:
         //Q_OBJECT

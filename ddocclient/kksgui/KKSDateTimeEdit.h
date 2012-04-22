@@ -18,14 +18,14 @@ class KKSAttrValue;
 class _GUI_EXPORT KKSDateTimeEdit : public QDateTimeEdit, public KKSAttrWidget
 {
     public:
-        KKSDateTimeEdit (const KKSAttrValue *attr, bool isSys, QWidget *parent=NULL);
-        KKSDateTimeEdit (const KKSAttrValue *attr, bool isSys, const QDateTime& datetime, QWidget *parent=NULL);
-        KKSDateTimeEdit (const KKSAttrValue *attr, bool isSys, const QDate& date, QWidget *parent=NULL);
-        KKSDateTimeEdit (const KKSAttrValue *attr, bool isSys, const QTime& time, QWidget * parent=NULL);
+        KKSDateTimeEdit (const KKSAttrValue *attr, int isSys, QWidget *parent=NULL);
+        KKSDateTimeEdit (const KKSAttrValue *attr, int isSys, const QDateTime& datetime, QWidget *parent=NULL);
+        KKSDateTimeEdit (const KKSAttrValue *attr, int isSys, const QDate& date, QWidget *parent=NULL);
+        KKSDateTimeEdit (const KKSAttrValue *attr, int isSys, const QTime& time, QWidget * parent=NULL);
         virtual ~KKSDateTimeEdit (void);
 
     signals:
-        void valueChanged (int id, bool isSys, QVariant val);
+        void valueChanged (int id, int isSys, QVariant val);
 
     public slots:
         void setDateTime (const QDateTime& dt);
@@ -35,7 +35,7 @@ class _GUI_EXPORT KKSDateTimeEdit : public QDateTimeEdit, public KKSAttrWidget
         // Variables
         //
 //        const KKSIndAttr *attribute;
-//        bool isSystem;
+//        int isSystem;
 
     private:
         Q_OBJECT

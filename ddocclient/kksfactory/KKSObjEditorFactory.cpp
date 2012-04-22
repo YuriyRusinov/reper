@@ -6259,11 +6259,11 @@ int KKSObjEditorFactory :: putAttrsGroupsOnWidget ( KKSObject * obj,
         if (av && av->id() < 0)
             qDebug () << __PRETTY_FUNCTION__ << av->id();
         if (isGrouped)
-            m_awf->putAttrWidget (av, editor, gbLay, n_str, true, (tableName.isEmpty () ? obj->tableName() : tableName), (c ? c->id():-1));
+            m_awf->putAttrWidget (av, editor, gbLay, n_str, 0, (tableName.isEmpty () ? obj->tableName() : tableName), (c ? c->id():-1));
         else
         {
             gAttrLayout->setVerticalSpacing (10);
-            m_awf->putAttrWidget (av, editor, gAttrLayout, nc, true, obj->tableName(), (c ? c->id():-1));
+            m_awf->putAttrWidget (av, editor, gAttrLayout, nc, 0, obj->tableName(), (c ? c->id():-1));
             if (a->type()->attrType() != KKSAttrType::atCheckListEx)
                 nc++;
         }
@@ -6371,11 +6371,11 @@ int KKSObjEditorFactory :: putRecAttrsGroupsOnWidget ( KKSObject * obj,
         if (av && av->id() < 0)
             qDebug () << __PRETTY_FUNCTION__ << av->id();
         if (isGrouped)
-            m_awf->putAttrWidget (av, editor, gbLay, n_str, true, (tableName.isEmpty () ? obj->tableName() : tableName), (c ? c->id():-1));
+            m_awf->putAttrWidget (av, editor, gbLay, n_str, 2, (tableName.isEmpty () ? obj->tableName() : tableName), (c ? c->id():-1));
         else
         {
             gAttrLayout->setVerticalSpacing (10);
-            m_awf->putAttrWidget (av, editor, gAttrLayout, nc, true, obj->tableName(), (c ? c->id():-1));
+            m_awf->putAttrWidget (av, editor, gAttrLayout, nc, 2, obj->tableName(), (c ? c->id():-1));
             if (a->type()->attrType() != KKSAttrType::atCheckListEx)
                 nc++;
         }
@@ -6476,11 +6476,11 @@ void KKSObjEditorFactory :: putAttrsGroupsOnWidget (KKSObject * obj, KKSObjEdito
             n_str++;
 
         if (isGrouped)
-            m_awf->putAttrWidget (av, editor, gbLay, n_str, false, obj->tableName(), (c ? c->id():-1));
+            m_awf->putAttrWidget (av, editor, gbLay, n_str, 1, obj->tableName(), (c ? c->id():-1));
         else
         {
             gAttrLayout->setVerticalSpacing (10);
-            m_awf->putAttrWidget (av, editor, gAttrLayout, nc, false, obj->tableName(), (c ? c->id():-1));
+            m_awf->putAttrWidget (av, editor, gAttrLayout, nc, 1, obj->tableName(), (c ? c->id():-1));
             nc++;
         }
         av->release ();

@@ -12,7 +12,7 @@
 
 #include "KKSHIntervalW.h"
 
-KKSHIntervalW :: KKSHIntervalW (const KKSAttrValue *attr, bool isSys, QWidget * parent, Qt::WindowFlags f)
+KKSHIntervalW :: KKSHIntervalW (const KKSAttrValue *attr, int isSys, QWidget * parent, Qt::WindowFlags f)
     : QWidget (parent, f), KKSAttrWidget(attr, isSys),
     spHour (new QSpinBox (this)),
     spMinute (new QSpinBox (this)),

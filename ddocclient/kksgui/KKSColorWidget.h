@@ -22,7 +22,7 @@ class KKSAttrValue;
 class _GUI_EXPORT KKSColorWidget : public QWidget, public KKSAttrWidget
 {
 public:
-    KKSColorWidget (const KKSAttrValue *attr, bool isSys, QColor rgb_col, QWidget *parent=NULL, Qt::WindowFlags flags=0);
+    KKSColorWidget (const KKSAttrValue *attr, int isSys, QColor rgb_col, QWidget *parent=NULL, Qt::WindowFlags flags=0);
     virtual ~KKSColorWidget (void);
 
     void hideToolButton (void);
@@ -30,7 +30,7 @@ public:
     void setColor (QColor rgb_col);
 
 signals:
-    void valueChanged (int id, bool isSys, QVariant val);
+    void valueChanged (int id, int isSys, QVariant val);
 
 public slots:
     void setColor (void);

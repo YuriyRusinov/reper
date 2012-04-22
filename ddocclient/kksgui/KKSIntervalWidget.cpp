@@ -4,7 +4,7 @@
 #include "KKSIntervalWidget.h"
 #include "KKSAttrValue.h"
 
-KKSIntervalWidget :: KKSIntervalWidget (const KKSAttrValue *attr, bool isSys, QWidget *parent)
+KKSIntervalWidget :: KKSIntervalWidget (const KKSAttrValue *attr, int isSys, QWidget *parent)
     : QWidget (parent), KKSAttrWidget(attr, isSys),
     lEValue (0),
     cbUnit (0)

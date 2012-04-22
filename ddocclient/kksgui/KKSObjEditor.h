@@ -120,8 +120,8 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void setRecTab (QTabWidget * tabEnc);
         
     public slots:
-        void setValue (int id, bool sys, QVariant val);
-        void setIndValue (int id, bool sys, QVariant val);
+        void setValue (int id, int sys, QVariant val);
+        //void setIndValue (int id, bool sys, QVariant val);
 
     private slots:
 

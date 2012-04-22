@@ -9,7 +9,7 @@ KKSAttrRefWidget :: KKSAttrRefWidget (QWidget *parent, Qt::WindowFlags f)
     gAttrLay (new QGridLayout()),
     idAttrValue (-1),
     cVal (QVariant()),
-    isSystem (false)
+    isSystem (1)
 {
     this->setLayout (gAttrLay);
     gAttrLay->setContentsMargins (0, 0, 0, 0);
@@ -47,7 +47,7 @@ QGridLayout * KKSAttrRefWidget :: getLayout (void) const
     return gAttrLay;
 }
 
-void KKSAttrRefWidget :: setValue (int id, bool sys, QVariant val)
+void KKSAttrRefWidget :: setValue (int id, int sys, QVariant val)
 {
     idAttrValue = id;
     isSystem = sys;
@@ -60,7 +60,7 @@ int KKSAttrRefWidget :: getIdAttrValue (void) const
     return idAttrValue;
 }
 
-bool KKSAttrRefWidget :: isSysAttr (void) const
+int KKSAttrRefWidget :: isSysAttr (void) const
 {
     return isSystem;
 }

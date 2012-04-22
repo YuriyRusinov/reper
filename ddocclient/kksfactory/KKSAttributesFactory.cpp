@@ -639,7 +639,7 @@ KKSAttrValue* KKSAttributesFactory::createAttrValue (const QString & xml)
  * tableName -- название таблицы для атрибутов, связанных со справочниками
  * idCat -- идентификатор категории
  */
-void KKSAttributesFactory :: putAttrWidget (KKSAttrValue* av, KKSObjEditor * objEditor, QGridLayout *gLayout, int n_str, bool isSystem, QString tableName, int idCat)
+void KKSAttributesFactory :: putAttrWidget (KKSAttrValue* av, KKSObjEditor * objEditor, QGridLayout *gLayout, int n_str, int isSystem, QString tableName, int idCat)
 {
     const KKSValue pVal = av->value();
     const KKSCategoryAttr * pCategAttr = av->attribute();
@@ -695,7 +695,7 @@ QString KKSAttributesFactory :: toXML (KKSCategoryAttr* attr)
  * Результат:
  * QLabel * c названием атрибута
  */
-QLabel * KKSAttributesFactory :: createAttrTitle (KKSAttrValue * av, bool isSystem, KKSObjEditor *objEditor)
+QLabel * KKSAttributesFactory :: createAttrTitle (KKSAttrValue * av, int isSystem, KKSObjEditor *objEditor)
 {
 	if(!av)
         return new QLabel();
@@ -759,7 +759,7 @@ QCheckBox * KKSAttributesFactory :: createChDateTime (bool isMandatory, QGridLay
  * Результат:
  * виджет, соотвествующий атрибуту.
  */
-QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av, KKSObjEditor *objEditor, bool is_mandatory, const KKSAttrType *pCatType, bool isSystem, QGridLayout *gLayout, int n_str, const QVariant& V, QLabel *lTitle, QToolButton *&tbRef, QCheckBox *&ch, bool isRef)
+QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av, KKSObjEditor *objEditor, bool is_mandatory, const KKSAttrType *pCatType, int isSystem, QGridLayout *gLayout, int n_str, const QVariant& V, QLabel *lTitle, QToolButton *&tbRef, QCheckBox *&ch, bool isRef)
 {
     QWidget * attrWidget = 0;
     if (!pCatType)
@@ -1270,7 +1270,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av, KKSObjEdi
  * Результат:
  * виджет атрибута, добавленный в tabW.
  */
-QWidget * KKSAttributesFactory :: createAttrCheckWidget (const KKSAttrValue * av, const KKSAttrType *pCatType,  bool isSystem, QTabWidget * tabW)
+QWidget * KKSAttributesFactory :: createAttrCheckWidget (const KKSAttrValue * av, const KKSAttrType *pCatType,  int isSystem, QTabWidget * tabW)
 {
     QWidget * attrWidget = 0;
     if (!av || !pCatType || !tabW)
@@ -1308,7 +1308,7 @@ QWidget * KKSAttributesFactory :: createAttrCheckWidget (const KKSAttrValue * av
 void KKSAttributesFactory :: setValue (QWidget *aw, 
                                        const KKSAttrValue * av, 
                                        const KKSAttrType *pCatType, 
-                                       bool isSystem, 
+                                       int isSystem, 
                                        const QVariant& V, 
                                        bool isObjExist, 
                                        QString tableName, 
@@ -1944,7 +1944,7 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
 void KKSAttributesFactory :: connectToSlots (QObject *aw, QWidget* wEditor)
 {
 //    if (aw->metaObject ()->indexOfSignal (SIGNAL (valueChanged(int, bool, QVariant))) >= 0)
-    QObject::connect (aw, SIGNAL (valueChanged(int, bool, QVariant)), wEditor, SLOT (setValue (int, bool, QVariant)) );
+    QObject::connect (aw, SIGNAL (valueChanged(int, int, QVariant)), wEditor, SLOT (setValue (int, int, QVariant)) );
 }
 
 void KKSAttributesFactory :: slotLoadIOSrc (KKSObject ** io, QWidget * parent)
