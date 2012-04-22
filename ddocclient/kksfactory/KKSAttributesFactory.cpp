@@ -1553,11 +1553,11 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
                 int ii=0;
                 if (!vals.isEmpty())
                 {
-                    KKSMap<int, KKSEIOData *> eioList = loader->loadEIOList (refIO, filters);
+                    KKSMap<qint64, KKSEIOData *> eioList = loader->loadEIOList (refIO, filters);
                     //
                     // заполняем матрицу
                     //
-                    for (KKSMap<int, KKSEIOData *>::const_iterator pv = eioList.constBegin(); pv!=eioList.constEnd(); pv++)
+                    for (KKSMap<qint64, KKSEIOData *>::const_iterator pv = eioList.constBegin(); pv!=eioList.constEnd(); pv++)
                     {
                         sAttrModel->insertRows (ii, 1);
                         QModelIndex saInd = sAttrModel->index (ii, 0);

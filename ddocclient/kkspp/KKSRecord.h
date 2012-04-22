@@ -19,8 +19,8 @@ public:
    /* Возвращает название записи (ИО или экз. ИО) */
    const QString & name(void) const;
    virtual void setName(const QString & newName);
-   int id(void) const;
-   virtual void setId(int newId);
+   qint64 id(void) const;
+   virtual void setId(qint64 newId);
    const QString & desc(void) const;
    virtual void setDesc(const QString & newDesc);
    const QString & code(bool quoted = false) const;
@@ -33,12 +33,12 @@ public:
    
    KKSRecord();
    KKSRecord(const KKSRecord & r);
-   KKSRecord(int id, const QString & name, const QString & desc = QString::null, const QString & code = QString::null);
+   KKSRecord(qint64 id, const QString & name, const QString & desc = QString::null, const QString & code = QString::null);
    virtual ~KKSRecord();
 
 protected:
 private:
-   int m_id;
+   qint64 m_id;
    QString m_name;
 
    //Атрибут может описывать поле таблицы. 

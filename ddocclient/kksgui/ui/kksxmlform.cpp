@@ -398,7 +398,7 @@ const QStringList& KKSXMLForm :: getAttrCodeList (void) const
     return attrCodes;
 }
 
-int KKSXMLForm :: initExportData (const KKSMap<int, KKSEIOData *>& ioData, const KKSCategory *c)
+int KKSXMLForm :: initExportData (const KKSMap<qint64, KKSEIOData *>& ioData, const KKSCategory *c)
 {
     if (!c || !isExport)
         return ERROR_CODE;
@@ -426,7 +426,7 @@ int KKSXMLForm :: initExportData (const KKSMap<int, KKSEIOData *>& ioData, const
 
     QList<KKSAttrView*> attrs_list = t->sortedAttrs();
     QStringList headers;
-    for (KKSMap<int, KKSEIOData *>::const_iterator pio=ioData.constBegin(); pio != ioData.constEnd(); pio++)
+    for (KKSMap<qint64, KKSEIOData *>::const_iterator pio=ioData.constBegin(); pio != ioData.constEnd(); pio++)
     {
         pModel->insertRows (i, 1);
         QModelIndex wIndex = pModel->index (i, 0);

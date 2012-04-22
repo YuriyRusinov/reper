@@ -4268,7 +4268,7 @@ void KKSObjEditorFactory :: exportEIO (KKSObjEditor * editor, int idObject, cons
         oe->release ();
     }
 
-    KKSMap<int, KKSEIOData *> objEx = loader->loadEIOList (c0, tableName, editor->filters());
+    KKSMap<qint64, KKSEIOData *> objEx = loader->loadEIOList (c0, tableName, editor->filters());
     KKSXMLForm *xmlForm = new KKSXMLForm (io, tr("Export IO %1").arg (io->name()), true, editor);
     if (!xmlForm)
     {
@@ -5057,8 +5057,8 @@ void KKSObjEditorFactory :: loadAttributeFilters (KKSAttribute * attr, QComboBox
         filters.append(fg);
         fg->release();
     }
-    KKSMap<int, KKSEIOData *> refRec = loader->loadEIOList (refObj, filters);
-    KKSMap<int, KKSEIOData *>::const_iterator p;
+    KKSMap<qint64, KKSEIOData *> refRec = loader->loadEIOList (refObj, filters);
+    KKSMap<qint64, KKSEIOData *>::const_iterator p;
     cbList->clear ();
     for (p = refRec.constBegin(); p != refRec.constEnd(); p++)
     {
@@ -5904,10 +5904,10 @@ void KKSObjEditorFactory :: updateAttrModel (const QModelIndex & wIndex, QAbstra
     fg->setFilters (fl);
     filters.append (fg);
     fg->release ();
-    KKSMap<int, KKSEIOData *> eioList = loader->loadEIOList (refIO, filters);
+    KKSMap<qint64, KKSEIOData *> eioList = loader->loadEIOList (refIO, filters);
     KKSMap<int, KKSCategoryAttr *> attrs = ct->attributes ();
     int ii=0;
-    for (KKSMap<int, KKSEIOData *>::const_iterator pv = eioList.constBegin(); pv!=eioList.constEnd(); pv++)
+    for (KKSMap<qint64, KKSEIOData *>::const_iterator pv = eioList.constBegin(); pv!=eioList.constEnd(); pv++)
     {
         KKSObjectExemplar * wObjC = loader->loadEIO (pv.key(), refIO);
         if (!wObjC)

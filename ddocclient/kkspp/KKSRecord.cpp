@@ -38,7 +38,7 @@ void KKSRecord::setName(const QString & newName)
 // Return:     int
 ////////////////////////////////////////////////////////////////////////
 
-int KKSRecord::id(void) const
+qint64 KKSRecord::id(void) const
 {
    return m_id;
 }
@@ -51,7 +51,7 @@ int KKSRecord::id(void) const
 // Return:     void
 ////////////////////////////////////////////////////////////////////////
 
-void KKSRecord::setId(int newId)
+void KKSRecord::setId(qint64 newId)
 {
    m_id = newId;
 }
@@ -133,7 +133,7 @@ KKSRecord::KKSRecord(const KKSRecord & r)
     setParent(const_cast<KKSRecord*>(r.parent()));
 }
 
-KKSRecord::KKSRecord(int _id, const QString & _name, const QString & _desc, const QString & _code)
+KKSRecord::KKSRecord(qint64 _id, const QString & _name, const QString & _desc, const QString & _code)
 {
     m_id = _id;
     m_name = _name;

@@ -256,14 +256,15 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
         }
     }
 
-    KKSMap<int, KKSEIOData *> objEx;
+    KKSMap<qint64, KKSEIOData *> objEx;
     if (!cat || tableName.isEmpty())
         objEx = l->loadEIOList (pObj, filters);
     else
         objEx = l->loadEIOList (cat, tableName, filters);
-    KKSMap<int, KKSEIOData *>::const_iterator p;
+    
+    KKSMap<qint64, KKSEIOData *>::const_iterator p;
     int nObjC = objEx.count ();
-    qDebug () << __PRETTY_FUNCTION__ << nObjC;
+    //qDebug () << __PRETTY_FUNCTION__ << nObjC;
     //objModel->insertRows (0, nObjC);
 
     if (pgDial)
@@ -519,8 +520,8 @@ void KKSViewFactory :: loadEIOEx (QWidget *editor,
     if (!t || !tv)
         return; 
 
-    KKSMap<int, KKSEIOData *> objEx = l->loadEIOList (pObj, filters);
-    KKSMap<int, KKSEIOData *>::const_iterator p;
+    KKSMap<qint64, KKSEIOData *> objEx = l->loadEIOList (pObj, filters);
+    KKSMap<qint64, KKSEIOData *>::const_iterator p;
 
     //
     // сортируем будущие колонки таблицы по порядку (KKSAttrView::order())
@@ -741,7 +742,7 @@ void KKSViewFactory :: updateEIOEx (KKSLoader *l,
    
     sourceModel->setData (wIndex, idObjEx, Qt::UserRole);
     QList<KKSAttrView*> attrs_list = t->sortedAttrs();
-    KKSMap<int, KKSEIOData *> objExList;
+    KKSMap<qint64, KKSEIOData *> objExList;
     if (!cat || tableName.isEmpty())
         objExList = l->loadEIOList (pObj);//, filters);
     else
@@ -750,7 +751,7 @@ void KKSViewFactory :: updateEIOEx (KKSLoader *l,
     QVariant bkColVal = QVariant();
     QVariant fgColVal = QVariant();
 
-    KKSMap<int, KKSEIOData *>::const_iterator p = objExList.find (idObjEx);
+    KKSMap<qint64, KKSEIOData *>::const_iterator p = objExList.find (idObjEx);
     if (p == objExList.constEnd())
         return;
     else
@@ -833,11 +834,11 @@ void KKSViewFactory :: loadCategories (KKSCategoryTemplateWidget* catTemplW,
     if(!catTypeObj)
         return;
 
-    KKSMap<int, KKSEIOData *> categTypeMap = l->loadEIOList (catTypeObj, filters);
+    KKSMap<qint64, KKSEIOData *> categTypeMap = l->loadEIOList (catTypeObj, filters);
     int n = categTypeMap.count ();
     QStandardItemModel *catTypeTemplModel = new QStandardItemModel (n, 1);
     catTypeTemplModel->setHeaderData (0, Qt::Horizontal, QObject::tr("Select category and template"), Qt::DisplayRole);
-    KKSMap<int, KKSEIOData *>::const_iterator pCatTypes;
+    KKSMap<qint64, KKSEIOData *>::const_iterator pCatTypes;
 
     KKSObject * refCatObj = l->loadIO (IO_CAT_ID, true);
     if (!refCatObj)
@@ -866,10 +867,10 @@ void KKSViewFactory :: loadCategories (KKSCategoryTemplateWidget* catTemplW,
         cGroup->setFilters (catFilters);
         cFilterGroups.append (cGroup);
         cGroup->release ();
-        KKSMap<int, KKSEIOData *> categMap = l->loadEIOList (refCatObj, cFilterGroups);
+        KKSMap<qint64, KKSEIOData *> categMap = l->loadEIOList (refCatObj, cFilterGroups);
         catTypeTemplModel->insertRows (0, categMap.count(), ctIndex);
         catTypeTemplModel->insertColumns (0, 1, ctIndex);
-        KKSMap<int, KKSEIOData *>::const_iterator pCat;
+        KKSMap<qint64, KKSEIOData *>::const_iterator pCat;
         
         int i=0;
         for (pCat=categMap.constBegin(); pCat != categMap.constEnd(); pCat++){
@@ -1285,8 +1286,8 @@ KKSAttributesEditor * KKSViewFactory :: createAttrView (KKSLoader *l,
     }
 
     KKSMap<int, KKSAttrType*> availAttrTypes;
-    KKSMap<int, KKSEIOData *> attrTypesList = l->loadEIOList (attrTypesIO);
-    KKSMap<int, KKSEIOData *>::const_iterator pAttrs;
+    KKSMap<qint64, KKSEIOData *> attrTypesList = l->loadEIOList (attrTypesIO);
+    KKSMap<qint64, KKSEIOData *>::const_iterator pAttrs;
     for (pAttrs = attrTypesList.constBegin(); pAttrs != attrTypesList.constEnd(); pAttrs++)
     {
         KKSAttrType *aType = new KKSAttrType ();
@@ -1744,8 +1745,8 @@ QMap<int, QString> KKSViewFactory :: loadAttrRefs (KKSLoader *l, const KKSList<c
     if(!io)
         return io_refs;
 
-    KKSMap<int, KKSEIOData *> io_data = l->loadEIOList (io, filters);
-    KKSMap<int, KKSEIOData *>::const_iterator p;
+    KKSMap<qint64, KKSEIOData *> io_data = l->loadEIOList (io, filters);
+    KKSMap<qint64, KKSEIOData *>::const_iterator p;
 
     io_refs.clear ();
     for (p=io_data.constBegin(); p != io_data.constEnd(); p++)

@@ -443,8 +443,8 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (int idCategory, // ид
     }
 
     KKSMap<int, KKSAttrType*> availAttrTypes;
-    KKSMap<int, KKSEIOData *> attrTypesList = loader->loadEIOList (attrTypesIO);
-    KKSMap<int, KKSEIOData *>::const_iterator pAttrs;
+    KKSMap<qint64, KKSEIOData *> attrTypesList = loader->loadEIOList (attrTypesIO);
+    KKSMap<qint64, KKSEIOData *>::const_iterator pAttrs;
     for (pAttrs = attrTypesList.constBegin(); pAttrs != attrTypesList.constEnd(); pAttrs++)
     {
         KKSAttrType *aType = new KKSAttrType ();

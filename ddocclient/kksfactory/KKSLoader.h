@@ -90,16 +90,16 @@ class _F_EXPORT KKSLoader
         //то возвращается NULL
         KKSObject * loadIO(const QString & tableName, bool simplify = false) const;
 
-        KKSObjectExemplar * loadEIO(int id, KKSObject * io, const KKSCategory *c0=0, const QString& table=QString()) const;
+        KKSObjectExemplar * loadEIO(qint64 id, KKSObject * io, const KKSCategory *c0=0, const QString& table=QString()) const;
         //метод производит загрузку всех ЭИО данного ИО (в соответствии с фильтрами. 
         //Фильтры применимы только к таблице, содержащей экземпляры ИО).
         //Возвращается KKSMap, который в качестве ключа содержит идентификатор ЭИО
         //а в качестве значения - объект KKSEIOData, который содержит KKSMap<QString, QString>
         //где в качестве ключа выступает код атрибута (см. KKSAttribute::code() ), а в качестве значения - значение атрибута
-        KKSMap<int, KKSEIOData *> loadEIOList(const KKSObject * io, 
+        KKSMap<qint64, KKSEIOData *> loadEIOList(const KKSObject * io, 
                                               const KKSList<const KKSFilterGroup *> filters = KKSList<const KKSFilterGroup*>()) const;
 
-        KKSMap<int, KKSEIOData *> loadEIOList(const KKSCategory * c0,
+        KKSMap<qint64, KKSEIOData *> loadEIOList(const KKSCategory * c0,
                                               const QString& tableName,
                                               const KKSList<const KKSFilterGroup *> filters = KKSList<const KKSFilterGroup*>()) const;
         
@@ -224,7 +224,8 @@ class _F_EXPORT KKSLoader
         void loadPrivileges(KKSRubric * rubr) const;
         KKSMap<int, KKSCategoryAttr *> loadCategoryAttrs(int idCategory) const;
         KKSList<KKSAttrValue *> loadAttrValues(KKSObject * io) const;
-        KKSList<KKSIndicatorValue *> loadIndicatorValues(KKSObject * io) const;
+        KKSList<KKSAttrValue *> loadIndValues(KKSObjectExemplar * eio) const;
+        KKSList<KKSIndicatorValue *> loadIndicatorValues(KKSObject * io) const; //не используется!!!
         void loadUserTemplates(KKSObject * io) const;
         void loadRubrics(KKSObject * io) const;
         void loadRubrics(KKSCategory * c) const;
@@ -232,7 +233,7 @@ class _F_EXPORT KKSLoader
         KKSLifeCycle * loadLifeCycle(int idCategory) const;
         QString loadColumnValue(const QString & tName,
                                 const QString & cName, 
-                                int id, 
+                                qint64 id, 
                                 const QString & parentTable = QString()) const;
         KKSMap<int, KKSAttrGroup *> loadTemplateAttrsGroups(int idTemplate) const;
 

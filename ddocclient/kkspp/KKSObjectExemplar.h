@@ -22,7 +22,7 @@ class _PP_EXPORT KKSObjectExemplar : public KKSRecord
 public:
    KKSObjectExemplar();
    KKSObjectExemplar(const KKSObjectExemplar & eio);
-   KKSObjectExemplar(int id, const QString & name, KKSObject * io);
+   KKSObjectExemplar(qint64 id, const QString & name, KKSObject * io);
    virtual ~KKSObjectExemplar();
 
    //методы для работы с атрибутами записей справочников (колонками таблиц)
@@ -68,7 +68,7 @@ public:
    //Если соответствующего атрибута нет - надо генерировать предупреждение, 
    //что задается параметр, которого нет в списке атрибутов
    void setName(const QString & newName);
-   void setId(int newId);
+   void setId(qint64 newId);
    void setDesc(const QString & newDesc);
    void setCode(const QString & newCode);
 

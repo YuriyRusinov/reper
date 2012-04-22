@@ -136,7 +136,7 @@ int KKSEIOFactory::insertRecord(KKSObjectExemplar* eio,
     QString exQuery;//если таблица содержит атрибуты типа atCheckListEx (отношение многие-ко-многим)
 
     //данный метод генерит реальный SQL-запрос в БД на инсерт в таблицу
-    int id = generateInsertQuery(tableName, attrs, attrValues, query, exQuery);
+    qint64 id = generateInsertQuery(tableName, attrs, attrValues, query, exQuery);
     if(id == ERROR_CODE || query.isEmpty())
         return ERROR_CODE;
 
@@ -167,6 +167,14 @@ int KKSEIOFactory::insertRecord(KKSObjectExemplar* eio,
     //после того, как ЭИО сохранен в БД, присваиваем ему ИД
     eio->setId(id);
 
+
+    //Сохраняем значения показателей ЕИО
+    //добавляем значения атрибутов
+    bool ok = insertIndValues(eio);
+    if(ok != OK_CODE){
+        eio->setId(-1);
+        return ERROR_CODE;
+    }
 
     return OK_CODE;
 }
@@ -219,7 +227,7 @@ int KKSEIOFactory::updateRecord(const KKSObjectExemplar* eio,
     QString query;
     QString exQuery;
     //данный метод генерит реальный SQL-запрос в БД на апдейт в таблицу
-    int id = generateUpdateQuery(tableName, attrs, attrValues, eio->id(), query, exQuery);
+    qint64 id = generateUpdateQuery(tableName, attrs, attrValues, eio->id(), query, exQuery);
     if(id == ERROR_CODE || (query.isEmpty() && exQuery.isEmpty()))
         return ERROR_CODE;
 
@@ -250,6 +258,14 @@ int KKSEIOFactory::updateRecord(const KKSObjectExemplar* eio,
         delete res;
     }
 
+    //Сохраняем значения показателей ЕИО
+    //добавляем значения атрибутов
+    bool ok = updateIndValues(eio);
+    if(ok != OK_CODE){
+        return ERROR_CODE;
+    }
+
+
     return OK_CODE;
 }
 
@@ -267,12 +283,12 @@ int KKSEIOFactory::updateRecord(const KKSObjectExemplar* eio,
 // поскольку они создаются с ограничением ON DELETE CASCADE
 ////////////////////////////////////////////////////////////////////////
 
-int KKSEIOFactory::deleteRecord(int id, const QString & table) const
+int KKSEIOFactory::deleteRecord(qint64 id, const QString & table) const
 {
     if(!db)
         return ERROR_CODE;
 
-    QString sql = QString("delete from %1 where id = %2").arg(table).arg(id);
+    QString sql = QString("delete from %1 where id = %2::int8").arg(table).arg(id);
 
     KKSResult * res = db->execute(sql);
     if(!res || (res->resultStatus() != KKSResult::CommandOk && res->resultStatus() != KKSResult::TuplesOk)){
@@ -284,6 +300,8 @@ int KKSEIOFactory::deleteRecord(int id, const QString & table) const
     }
     
     delete res;
+
+    sql = QString("select eioDeleteIndicators(%1::int8);").arg(id);
 
     return OK_CODE;
 }
@@ -304,7 +322,7 @@ int KKSEIOFactory::deleteRecord(KKSObjectExemplar* eio, const QString& table) co
         return ERROR_CODE;
     
     QString tableName = table.isEmpty () ? eio->io()->tableName() : table;
-    int id = eio->id();
+    qint64 id = eio->id();
 
     int res = deleteRecord(id, tableName);
     if(res != OK_CODE)
@@ -319,7 +337,7 @@ int KKSEIOFactory::deleteRecord(KKSObjectExemplar* eio, const QString& table) co
 //INSERT INTO <tableName> (id, <attributes>) values (idValue, <attr_values>);
 //при этом делается запрос к БД с целью получения idValue
 //метод возвращает идентификатор записи, который получит новый ЭИО при выполнении сгенерированного запроса
-int KKSEIOFactory::generateInsertQuery(const QString & tableName, 
+qint64 KKSEIOFactory::generateInsertQuery(const QString & tableName, 
                                        const KKSMap<int, KKSCategoryAttr *> & attrs, 
                                        const KKSList<KKSAttrValue *> & attrValues, 
                                        QString & query,
@@ -327,6 +345,7 @@ int KKSEIOFactory::generateInsertQuery(const QString & tableName,
 {
     if (tableName.isEmpty())
         return ERROR_CODE;
+    
     query.clear();
     exQuery.clear();
 
@@ -341,7 +360,7 @@ int KKSEIOFactory::generateInsertQuery(const QString & tableName,
     if((count = attrs.count()) != attrValues.count())
         return ERROR_CODE;
 
-    int idValue = 0;
+    qint64 idValue = 0;
     QString attrArray;
     QString valueArray;
     
@@ -452,7 +471,7 @@ int KKSEIOFactory::generateInsertQuery(const QString & tableName,
                 {
                     QString atName = (iType == KKSAttrType::atParent ? tableName : attr->tableName ());
                     qDebug () << __PRETTY_FUNCTION__ << atName << value.value ();
-                    int idV = getNextSeq (atName, "id");
+                    qint64 idV = getNextSeq (atName, "id");
                     aQuery = QString ("INSERT INTO %1 (id, %2) VALUES (%4, '%3');")
                                         .arg (atName)
                                         .arg (attr->columnName ())
@@ -525,10 +544,10 @@ int KKSEIOFactory::generateInsertQuery(const QString & tableName,
 //генерится SQL-запрос следующего вида:
 //UPDATE <tableName> SET (<attribute1=value1, ...>) where id = <id>;
 //метод возвращает OK_CODE при успехе
-int KKSEIOFactory::generateUpdateQuery(const QString & tableName, 
+qint64 KKSEIOFactory::generateUpdateQuery(const QString & tableName, 
                                        const KKSMap<int, KKSCategoryAttr *> & attrs, 
                                        const KKSList<KKSAttrValue *> & attrValues, 
-                                       int idEIO,
+                                       qint64 idEIO,
                                        QString & query,
                                        QString & exQuery) const
 {
@@ -630,12 +649,12 @@ int KKSEIOFactory::generateUpdateQuery(const QString & tableName,
     }
 
     if(!attrArray.trimmed().isEmpty())
-        query = QString("UPDATE %1 SET %2 WHERE id = %3;").arg(tableName).arg(attrArray).arg(idEIO);
+        query = QString("UPDATE %1 SET %2 WHERE id = %3::int8;").arg(tableName).arg(attrArray).arg(idEIO);
 
     return OK_CODE;
 }
 
-int KKSEIOFactory::getNextSeq(QString tableName, QString idColumn) const
+qint64 KKSEIOFactory::getNextSeq(QString tableName, QString idColumn) const
 {
     QString tName;
     QString sql = QString("select ref_table_name from io_objects where table_name = '%1'").arg(tableName);
@@ -656,7 +675,7 @@ int KKSEIOFactory::getNextSeq(QString tableName, QString idColumn) const
     if(!res)
         return ERROR_CODE;
 
-    int id = res->getCellAsInt(0, 0);
+    qint64 id = res->getCellAsInt64(0, 0);
     
     delete res;
     
@@ -807,3 +826,280 @@ int KKSEIOFactory::insertTSDRecord(KKSObjectExemplar* eio) const
     return OK_CODE;
 }
 
+
+/*
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+*/
+
+int KKSEIOFactory::insertIndValues(const KKSObjectExemplar * eio) const
+{
+    if(!eio)
+        return ERROR_CODE;
+
+    KKSList<KKSAttrValue * > indValues = eio->indValues();
+
+    QString sql;
+    QString sqlEx;
+    for (int i=0; i<indValues.count(); i++)
+    {
+        KKSAttrValue * av = indValues[i];
+        if(!av)
+            continue;
+
+        KKSCategoryAttr * a = av->attribute();
+        KKSValue v = av->value();
+        
+        if(av->value().isNull())
+            continue;
+
+        if(a->type()->attrType() == KKSAttrType::atCheckListEx){
+            //коррекция для системных справочников, имеющих атрибут данного типа
+            //такими справочниками являются organization, units, position
+            //для них названия переходных таблиц являются жестко заданными при генерации БД
+            QString rTable = "io_object_" + a->tableName();
+            QString refTable;
+            if(rTable == ORGANIZATION_WORK_MODE || 
+               rTable == POSITION_WORK_MODE || 
+               rTable == UNITS_WORK_MODE ||
+               rTable == IO_OBJECTS_ORGANIZATION ||
+               //rTable == IO_CATEGORIES_ORGANIZATION ||
+               rTable == USER_CHAINS_ORGANIZATION || 
+               rTable == REPORT_ORGANIZATION ||
+               rTable == GUARD_OBJ_DEVICES_TSO ||
+               rTable == ACCESS_CARDS_ACCESS_PLAN_TSO ||
+			   rTable == MAIL_LISTS_POSITION ||
+               rTable == SHU_DLS_POSITION
+               )
+            {
+                refTable = rTable;
+            }
+            else
+                refTable = rTable + "_ref_" + QString::number(a->id());
+
+            QString ids = av->value().valueForInsert();
+            QString mainAttr = QString("id_io_object");
+            QString childAttr = QString("id_%1").arg(a->tableName());
+            sqlEx += QString("select aInsertExValues('%1', %2, %3, '%4', '%5');")
+                                .arg(refTable)
+                                .arg(eio->id())
+                                .arg(ids)
+                                .arg(mainAttr)
+                                .arg(childAttr);
+        }
+
+        QDateTime dt = av->startDateTime();
+        QString tVal; 
+        QString dtStart;
+        QString dtStop;
+        QString dtMeas;
+        
+        if(dt.isValid()){
+            tVal = dt.toString("dd.MM.yyyy hh:mm:ss");
+            dtStart = QString("to_timestamp('%1', 'DD.MM.YYYY HH24:MI:SS')::timestamp").arg(tVal);
+        }
+        else{
+            dtStart = QString("current_timestamp::timestamp");
+        }
+        
+        dt = av->stopDateTime();
+        if(dt.isValid()){
+            tVal = dt.toString("dd.MM.yyyy hh:mm:ss");
+            dtStop = QString("to_timestamp('%1', 'DD.MM.YYYY HH24:MI:SS')::timestamp").arg(tVal);
+        }
+        else
+            dtStop = QString("NULL::timestamp");
+
+        dt = av->measDateTime();
+        if(dt.isValid()){
+            tVal = dt.toString("dd.MM.yyyy hh:mm:ss");
+            dtMeas = QString("to_timestamp('%1', 'DD.MM.YYYY HH24:MI:SS')::timestamp").arg(tVal);
+        }
+        else
+            dtMeas = QString("current_timestamp::timestamp");
+
+        //eio->indValue(1)->attribute()->idCategoryAttr
+        sql += QString("select eioInsertIndicator(%1, %2, %3::varchar, %4, %5, %6, %7, %8, %9);")
+                              .arg(eio->id())
+                              .arg(a->idCategoryAttr())
+                              .arg(v.valueForInsert())
+                              .arg(dtStart)
+                              .arg(dtStop)
+                              .arg(dtMeas)
+                              .arg(av->ioSrc() ? QString::number (av->ioSrc()->id()) : QString ("NULL::int4"))
+                              .arg(av->ioSrc1() ? QString::number (av->ioSrc1()->id()) : QString ("NULL::int4"))
+                              .arg(av->desc().isEmpty() ? QString("NULL") : QString("'") + av->desc() + QString("'"));
+
+    }
+
+    if(sql.isEmpty())
+        return OK_CODE;
+
+    KKSResult * res = db->execute(sql);
+    if(!res)
+        return ERROR_CODE;
+    if(res->getRowCount() == 0){
+        delete res;
+        return ERROR_CODE;
+    }
+
+    int ok = res->getCellAsInt(0, 0);
+    delete res;
+    if(ok != 1)
+        return ERROR_CODE;
+
+    if(!sqlEx.isEmpty()){
+        KKSResult * res = db->execute(sqlEx);
+        if(!res)
+            return ERROR_CODE;
+        if(res->getRowCount() == 0){
+            delete res;
+            return ERROR_CODE;
+        }
+
+        int ok = res->getCellAsInt(0, 0);
+        delete res;
+        if(ok != 1)
+            return ERROR_CODE;
+    }
+
+    return OK_CODE;
+}
+
+
+int KKSEIOFactory::updateIndValues(const KKSObjectExemplar * eio) const
+{
+    if(!eio)
+        return ERROR_CODE;
+
+    KKSList<KKSAttrValue * > indValues = eio->indValues();
+
+    QString sql;
+    QString sqlEx;
+    for (int i=0; i<indValues.count(); i++)
+    {
+        KKSAttrValue * av = indValues[i];
+        if(!av){
+            qWarning() << "WARNING!! Some of indicators of EIO is NULL pointer! Check data integrity!";
+            continue;
+        }
+
+        KKSCategoryAttr * a = av->attribute();
+        KKSValue v = av->value();
+        
+        if(a->type()->attrType() == KKSAttrType::atCheckListEx){
+            //коррекция для системных справочников, имеющих атрибут данного типа
+            //такими справочниками являются organization, units, position
+            //для них названия переходных таблиц являются жестко заданными при генерации БД
+            QString rTable = "io_object_" + a->tableName();
+            QString refTable;
+            if(rTable == ORGANIZATION_WORK_MODE || 
+               rTable == POSITION_WORK_MODE || 
+               rTable == UNITS_WORK_MODE ||
+               rTable == IO_OBJECTS_ORGANIZATION ||
+               //rTable == IO_CATEGORIES_ORGANIZATION ||
+               rTable == USER_CHAINS_ORGANIZATION ||
+               rTable == REPORT_ORGANIZATION ||
+               rTable == GUARD_OBJ_DEVICES_TSO ||
+               rTable == ACCESS_CARDS_ACCESS_PLAN_TSO ||
+			   rTable == MAIL_LISTS_POSITION ||
+               rTable == SHU_DLS_POSITION
+               )
+            {
+                refTable = rTable;
+            }
+            else
+                refTable = rTable + "_ref_" + QString::number(a->id());
+
+            QString ids = av->value().valueForInsert();
+            QString mainAttr = QString("id_io_object");
+            QString childAttr = QString("id_%1").arg(a->tableName());
+            sqlEx += QString("select aInsertExValues('%1', %2, %3, '%4', '%5');")
+                                .arg(refTable)
+                                .arg(eio->id())
+                                .arg(ids)
+                                .arg(mainAttr)
+                                .arg(childAttr);
+        }
+
+        QDateTime dt = av->startDateTime();
+        QString tVal; 
+        QString dtStart;
+        QString dtStop;
+        QString dtMeas;
+        
+        if(dt.isValid()){
+            tVal = dt.toString("dd.MM.yyyy hh:mm:ss");
+            dtStart = QString("to_timestamp('%1', 'DD.MM.YYYY HH24:MI:SS')::timestamp").arg(tVal);
+        }
+        else{
+            dtStart = QString("current_timestamp::timestamp");
+        }
+        
+        dt = av->stopDateTime();
+        if(dt.isValid()){
+            tVal = dt.toString("dd.MM.yyyy hh:mm:ss");
+            dtStop = QString("to_timestamp('%1', 'DD.MM.YYYY HH24:MI:SS')::timestamp").arg(tVal);
+        }
+        else
+            dtStop = QString("NULL::timestamp");
+
+        dt = av->measDateTime();
+        qDebug() << dt;
+        if(dt.isValid()){
+            tVal = dt.toString("dd.MM.yyyy hh:mm:ss");
+            dtMeas = QString("to_timestamp('%1', 'DD.MM.YYYY HH24:MI:SS')::timestamp").arg(tVal);
+        }
+        else
+            dtMeas = QString("current_timestamp::timestamp");
+
+        
+        QString s = QString("select eioUpdateIndicator(%1, %2, %3::varchar, NULL, NULL, %4, %5, %6, %7);")
+                              .arg(eio->id())
+                              .arg(a->idCategoryAttr())
+                              .arg(v.valueForInsert())
+                              //.arg(dtStart)
+                              //.arg(dtStop)
+                              .arg(dtMeas)
+                              .arg(av->ioSrc() ? QString::number (av->ioSrc()->id()) : QString ("NULL"))
+                              .arg(av->ioSrc1() ? QString::number (av->ioSrc1()->id()) : QString ("NULL"))
+                              .arg(av->desc().isEmpty() ? QString("NULL") : QString("'") + av->desc() + QString("'"));
+        qDebug() << s;
+
+        sql += s;
+    }
+
+    if(sql.isEmpty())
+        return OK_CODE;
+
+    
+    KKSResult * res = db->execute(sql);
+    if(!res)
+        return ERROR_CODE;
+    if(res->getRowCount() == 0){
+        delete res;
+        return ERROR_CODE;
+    }
+
+    int ok = res->getCellAsInt(0, 0);
+    delete res;
+    if(ok != 1)
+        return ERROR_CODE;
+
+    if(!sqlEx.isEmpty()){
+        KKSResult * res = db->execute(sqlEx);
+        if(!res)
+            return ERROR_CODE;
+        if(res->getRowCount() == 0){
+            delete res;
+            return ERROR_CODE;
+        }
+
+        int ok = res->getCellAsInt(0, 0);
+        delete res;
+        if(ok != 1)
+            return ERROR_CODE;
+    }
+
+    return OK_CODE;
+}

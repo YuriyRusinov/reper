@@ -248,7 +248,7 @@ KKSList<KKSAttrValue *> KKSLoader::loadAttrValues(KKSObject * io) const
 
 QString KKSLoader::loadColumnValue(const QString & tName, 
                                    const QString & cName,
-                                   int id, 
+                                   qint64 id, 
                                    const QString & parentTable) const
 {
     QString value;
@@ -785,7 +785,7 @@ KKSObject * KKSLoader::loadIO(const QString & tableName, bool simplify) const
     return io;
 }
 
-KKSObjectExemplar * KKSLoader::loadEIO(int id, KKSObject * io, const KKSCategory *c0, const QString& table) const
+KKSObjectExemplar * KKSLoader::loadEIO(qint64 id, KKSObject * io, const KKSCategory *c0, const QString& table) const
 {
     KKSObjectExemplar * eio = NULL;
     
@@ -918,8 +918,11 @@ KKSObjectExemplar * KKSLoader::loadEIO(int id, KKSObject * io, const KKSCategory
     }
 
     eio->setAttrValues(attrValues);
+    
     eio->setId(id);
     
+    eio->setIndValues(loadIndValues(eio));
+
     delete res;
 
     return eio;
@@ -1834,10 +1837,10 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
     return sql;
 }
 
-KKSMap<int, KKSEIOData *> KKSLoader::loadEIOList(const KKSObject * io, 
+KKSMap<qint64, KKSEIOData *> KKSLoader::loadEIOList(const KKSObject * io, 
                                                  const KKSList<const KKSFilterGroup *> filters) const
 {
-    KKSMap<int, KKSEIOData *> eioList;
+    KKSMap<qint64, KKSEIOData *> eioList;
     if(!io || 
        !io->id() || 
        !io->category() || 
@@ -1849,14 +1852,15 @@ KKSMap<int, KKSEIOData *> KKSLoader::loadEIOList(const KKSObject * io,
         return eioList;
     }
     eioList = loadEIOList (io->category()->tableCategory(), io->tableName(), filters);
+    
     return eioList;
 }
 
-KKSMap<int, KKSEIOData *> KKSLoader::loadEIOList(const KKSCategory * c0, 
+KKSMap<qint64, KKSEIOData *> KKSLoader::loadEIOList(const KKSCategory * c0, 
                                                  const QString& tableName,
                                                  const KKSList<const KKSFilterGroup *> filters) const
 {
-    KKSMap<int, KKSEIOData *> eioList;
+    KKSMap<qint64, KKSEIOData *> eioList;
 
     QString sql = generateSelectEIOQuery(c0, tableName, filters);
     //qDebug () << __PRETTY_FUNCTION__ << sql;
@@ -1945,7 +1949,7 @@ KKSMap<int, KKSEIOData *> KKSLoader::loadEIOList(const KKSCategory * c0,
             }
         }
         //ID всегда идет первым в списке
-        int id = res->getCellAsInt(row, 0);
+        qint64 id = res->getCellAsInt64(row, 0);
         eioList.insert(id, eio);
         eio->release();
     }
@@ -4925,4 +4929,90 @@ QList<int> KKSLoader :: getForbiddenTypes (void) const
         forbiddenTypes << fTypesStr[i].toInt();
     delete res;
     return forbiddenTypes;
+}
+
+KKSList<KKSAttrValue *> KKSLoader::loadIndValues(KKSObjectExemplar * eio) const
+{
+    KKSList<KKSAttrValue *> attrs;
+
+    if(!eio || 
+        eio->id() <= 0 || 
+       !eio->io()->category() || 
+       !eio->io()->category()->recAttrCategory()
+       )
+    {
+        return attrs;
+    }
+    
+    QString sql = QString("select * from eioGetIndicators(%1, true, NULL::timestamp, NULL::timestamp)").arg(eio->id());
+    KKSResult * res = db->execute(sql);
+    if(!res)
+        return attrs;
+
+    int count = res->getRowCount();
+    if(count == 0){
+        //qWarning("The object does not contain any values of attributes");
+        delete res;
+        return attrs;
+    }
+
+    KKSCategory * c = eio->io()->category()->recAttrCategory();
+
+    for(int row=0; row<count; row++){
+        //параметры самого атрибута
+        int idAttr = res->getCellAsInt(row, 2);
+        KKSCategoryAttr * a = c->attribute(idAttr);
+        if(!a){
+            qWarning("The object contain attr-value but category does not contain attribute! idAttr = %d, idObjectExemplar = %d, idCategory = %d", idAttr, eio->id(), c->id());
+            continue;
+        }
+
+        KKSAttrValue * attr = new KKSAttrValue();
+        attr->setAttribute(a);
+
+        KKSValue v = constructValue(res->getCellAsString(row, 3), a, eio->io()->tableName());
+        if(!v.isValid())
+        {
+            qWarning("Value for attribute is NOT valid! Value = %s, idCategory = %d, idAttribute = %d, idObjectExemplar = %d",
+                        res->getCellAsString(row, 3).toLocal8Bit().data(),
+                        c->id(),
+                        res->getCellAsInt(row, 2),
+                        eio->id());
+        }
+
+        attr->setValue(v);
+        
+        //устанавливаем дополнительные характеристики значения атрибута
+        attr->setId(res->getCellAsInt(row, 7));
+        attr->setStartDateTime(res->getCellAsDateTime(row, 8));
+        attr->setStopDateTime(res->getCellAsDateTime(row, 9));
+        attr->setMeasDateTime(res->getCellAsDateTime(row, 10));
+        attr->setInsertDateTime(res->getCellAsDateTime(row, 11));
+        attr->setDesc(res->getCellAsString(row, 15));
+
+        int idObjSrc = res->getCellAsInt(row, 12);
+        if(idObjSrc > 0){
+            KKSObject * o = loadIO(idObjSrc, true);//упрощенно
+            attr->setIOSrc(o);
+            if(o)
+                o->release();
+        }
+
+        int idObjSrc1 = res->getCellAsInt(row, 13);
+        if(idObjSrc1 > 0){
+            KKSObject * o = loadIO(idObjSrc1, true);//упрощенно
+            attr->setIOSrc1(o);
+            if(o)
+                o->release();
+        }
+
+        attr->setActual(res->getCellAsBool(row, 14));
+
+        attrs.append(attr);
+        attr->release();
+    }
+    
+    delete res;
+
+    return attrs;
 }

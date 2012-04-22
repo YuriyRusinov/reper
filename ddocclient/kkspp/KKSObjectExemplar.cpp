@@ -36,7 +36,7 @@ KKSObjectExemplar::KKSObjectExemplar(const KKSObjectExemplar & eio) : KKSRecord(
     m_indValues = eio.indValues();
 }
 
-KKSObjectExemplar::KKSObjectExemplar(int id, const QString & name, KKSObject * io) : KKSRecord(id, name)
+KKSObjectExemplar::KKSObjectExemplar(qint64 id, const QString & name, KKSObject * io) : KKSRecord(id, name)
 {
     m_io = NULL;
     setIo(io);
@@ -86,7 +86,7 @@ void KKSObjectExemplar::setName(const QString & newName)
     }
 }
 
-void KKSObjectExemplar::setId(int newId)
+void KKSObjectExemplar::setId(qint64 newId)
 {
     KKSRecord::setId(newId);
 

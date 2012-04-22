@@ -27,7 +27,7 @@ public:
     int insertEIO(KKSObjectExemplar* eio, const KKSCategory* cat=0, const QString& table=QString()) const;
     int updateEIO(const KKSObjectExemplar* eio, const KKSCategory* cat=0, const QString& table=QString()) const;
     int deleteEIO(KKSObjectExemplar* eio, const QString& table=QString()) const;
-    int deleteRecord(int id, const QString & table) const;
+    int deleteRecord(qint64 id, const QString & table) const;
     int deleteAllRecords(const QString & table) const;
     int insertEIOList(KKSList<KKSObjectExemplar*> eioList,  const KKSCategory* cat=0, const QString & table=QString(), QProgressDialog *pgDial=0) const;
 
@@ -57,18 +57,21 @@ private:
                      const QString& table=QString()) const;
     int deleteRecord(KKSObjectExemplar* eio, const QString& table=QString()) const;
 
-    int generateInsertQuery(const QString & tableName, 
+    qint64 generateInsertQuery(const QString & tableName, 
                             const KKSMap<int, KKSCategoryAttr *> & attrs, 
                             const KKSList<KKSAttrValue *> & attrValues, 
                             QString & query,
                             QString & exQuery) const;
-    int generateUpdateQuery(const QString & tableName, 
+    qint64 generateUpdateQuery(const QString & tableName, 
                             const KKSMap<int, KKSCategoryAttr *> & attrs, 
                             const KKSList<KKSAttrValue *> & attrValues, 
-                            int id,
+                            qint64 id,
                             QString & query,
                             QString & exQuery) const;
-    int getNextSeq(QString tableName, QString idColumn = QString("id")) const;
+    qint64 getNextSeq(QString tableName, QString idColumn = QString("id")) const;
+
+    int updateIndValues(const KKSObjectExemplar * eio) const;
+    int insertIndValues(const KKSObjectExemplar * eio) const;
 
     
 };
