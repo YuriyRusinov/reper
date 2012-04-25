@@ -27,10 +27,10 @@ declare
     idCategory alias for $1;
     r h_get_attribute%rowtype;
     rr RECORD;
+    query varchar;
 begin
 
-    for r in 
-        select 
+    query := E'select 
             a.id, 
             att.id, 
             a.code, 
@@ -44,7 +44,7 @@ begin
             ca.def_value, 
             ca.is_mandatory, 
             ca.is_read_only,
-            a.id_ref_attr_type as ref_attr_type_id, --(case when a.column_name isnull then NULL else (select a1.id_a_type from attributes a1 where a1.code = a.column_name) end) as ref_attr_type 
+            a.id_ref_attr_type as ref_attr_type_id,  
             NULL as ref_attr_type_name,
             NULL as ref_attr_type_code,
             a.unique_id,
@@ -54,15 +54,11 @@ begin
             ag.name,
             ca.id
         from  
-            attrs_categories ca,
-            attributes a,
-            a_types att,
-            attrs_groups ag
-        where 
-	    ca.id_io_category = idCategory
-	    and ca.id_io_attribute = a.id 
-	    and a.id_a_type = att.id
-            and a.id_attr_group = ag.id
+            attrs_categories ca inner join attributes a on (ca.id_io_category = ' || idCategory || E' and ca.id_io_attribute = a.id) inner join a_types att on (a.id_a_type = att.id) inner join attrs_groups ag on (a.id_attr_group = ag.id)';
+    raise warning 'query is %', query;
+--(case when a.column_name isnull then NULL else (select a1.id_a_type from attributes a1 where a1.code = a.column_name) end) as ref_attr_type
+    for r in 
+        execute query
     loop
         if(r.column_name is not null) then
             for rr in 
