@@ -15,21 +15,22 @@ begin
 
 
     if(trim(new.table_name) = '') then
-        new.table_name = NULL;
+        new.table_name := NULL;
     end if;
 
     if(trim(new.ref_column_name) = '') then
-        new.ref_column_name = NULL;
+        new.ref_column_name := NULL;
     end if;
 
+    raise warning '% % %', new.id, new.table_name, new.column_name;
     if(new.table_name isnull) then
-        new.ref_column_name = NULL;
+        new.ref_column_name := NULL;
         --для атрибута типа родитель-потомок мы не знаем название таблицы, поэтому на данном этапе не можем вычислить 
         -- тип атрибута, на который это все ссылается. В качестве компромиссной меры считаем этот тип строковым (9)
         if(new.column_name is not null and new.table_name is null) then
-            new.id_ref_attr_type = 9;
+            new.id_ref_attr_type := 9;
             if (new.ref_column_name isnull) then
-                new.ref_column_name = 'id';
+                new.ref_column_name := 'id';
             end if;
         end if;
         return new;
@@ -37,11 +38,17 @@ begin
 
     --здесь уже однозначно обрабатываем случай ссылочного атрибута
     if (new.ref_column_name isnull) then
-        new.ref_column_name = 'id';
+        new.ref_column_name := 'id';
     end if;
 
     if(new.column_name is not null and new.table_name is not null) then
-        new.id_ref_attr_type = (select id from atGetAttrType(new.column_name, new.table_name) limit 1);
+        for r in
+            select id from atGetAttrType(new.column_name, new.table_name) limit 1
+        loop
+            raise warning '%', r.id;
+            new.id_ref_attr_type := r.id;
+        end loop;
+        raise warning '% % % %', new.id, new.table_name, new.column_name, new.id_ref_attr_type;
     end if;
 
 
@@ -57,12 +64,12 @@ begin
             return new;
         end if;
 
-        new.table_name = r.ref_table_name;
+        new.table_name := r.ref_table_name;
 
         if(new.id_search_template is not null) then
-            new.id_search_template = aggSearchTemplates(new.id_search_template, r.id_search_template);
+            new.id_search_template := aggSearchTemplates(new.id_search_template, r.id_search_template);
         else
-            new.id_search_template = r.id_search_template;
+            new.id_search_template := r.id_search_template;
         end if;
 
     end loop;
