@@ -259,7 +259,7 @@ begin
 
     select into idOrg id_organization from getlocalorg();
 
-    select into idObject ioinsert (ioName, idCat, 2/*jupiter*/, 1, null::varchar, null::varchar, NULL::varchar, 1,  NULL::varchar, 1, idOrg, false, null::int4, null::varchar, null::int8, null::int8);
+    select into idObject ioinsert (ioName, idCat, 2/*jupiter*/, 1, null::varchar, null::varchar, NULL::varchar, 1,  NULL::varchar, 1, idOrg, false, null::int4, null::varchar, null::int8, null::int8, 1);
     --raise warning 'Document id is %', idObject;
     if (idObject is null or idObject <= 0) then
         return false;
@@ -269,8 +269,8 @@ begin
     for r in
         select id_attr, a_val from XXX
     loop
-	--raise warning '____ % % % ', idobject, r.id_attr, r.a_val;
-        select into idAttrRes ioInsertAttr (idObject, r.id_attr, r.a_val, current_timestamp, NULL, current_timestamp, NULL, NULL);
+	--raise warning '____ % % % ', idObject, r.id_attr, r.a_val;
+        select into idAttrRes ioInsertAttr (idObject, r.id_attr, quote_literal (r.a_val)::varchar, current_timestamp::timestamp without time zone, null::timestamp without time zone, current_timestamp::timestamp without time zone, null::int4, null::int4, null::varchar);
         if (idAttrRes is null or idAttrRes <0) then
             return null;
         end if;
