@@ -755,10 +755,16 @@ int JKKSLoader :: updateDocument (JKKSDocument *doc) const
     QMap<QString, QString> attrVals = doc->getAttrValues ();
     for (QMap<QString, QString>::const_iterator pa = attrVals.constBegin(); pa != attrVals.constEnd(); pa++)
     {
-        QString attrSql = QString ("select * from ioUpdateAttrEx (%1, %2, %3, NULL::timestamp, NULLL::timestamp, NULL::timestamp, NULL::int4, NULL::int4, NULL::varchar);")
+        QString val (pa.value());
+        if (val.startsWith("'"))
+            val = val.mid (1);
+        if (val.endsWith("'"))
+            val = val.mid (0, val.length()-1);
+        val = val.trimmed();
+        QString attrSql = QString ("select * from ioUpdateAttrEx (%1, %2, %3, NULL::timestamp, NULL::timestamp, NULL::timestamp, NULL::int4, NULL::int4, NULL::varchar);")
             .arg (doc->id())
             .arg (QString("'")+pa.key()+QString("'")) //здесь в качестве ключа используется unique_id
-            .arg (pa.value().isEmpty() ? QString ("NULL") : QString("'")+pa.value()+QString("'"));
+            .arg (val.isEmpty() ? QString ("NULL") : QString("'")+val+QString("'"));
         KKSResult * attrRes = dbWrite->execute (attrSql);
 
         int attr_ier = ERROR_CODE;
@@ -996,7 +1002,7 @@ int JKKSLoader :: insertDocument (JKKSDocument *doc) const
     QMap<QString, QString> attrVals = doc->getAttrValues ();
     for (QMap<QString, QString>::const_iterator pa = attrVals.constBegin(); pa != attrVals.constEnd(); pa++)
     {
-        QString attrSql = QString ("select * from ioInsertAttrEx (%1, %2, %3, NULL::timestamp, NULLL::timestamp, NULL::timestamp, NULL::int4, NULL::int4, NULL::varchar);")
+        QString attrSql = QString ("select * from ioInsertAttrEx (%1, %2, %3, NULL::timestamp, NULL::timestamp, NULL::timestamp, NULL::int4, NULL::int4, NULL::varchar);")
             .arg (doc->id())
             .arg (QString("'")+pa.key()+QString("'")) //здесь в качестве ключа используется unique_id
             .arg (pa.value().isEmpty() ? QString ("NULL") : QString("'")+pa.value()+QString("'"));
