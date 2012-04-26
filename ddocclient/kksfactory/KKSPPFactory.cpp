@@ -1977,14 +1977,16 @@ int KKSPPFactory::insertCategoryAttr(int idCategory, KKSCategoryAttr * a) const
     }
 
     int idAttr = a->id();
-    QString defVal = a->defValue().valueForInsert();
+    QString defVal;
+    if(!a->defValue().isNull())
+        defVal = a->defValue().valueForInsert();
     bool isMandatory = a->isMandatory();
     bool isReadOnly = a->isReadOnly();
 
-    QString sql = QString("select cAddAttr(%1, %2, asString(%3, true), %4, %5)")
+    QString sql = QString("select cAddAttr(%1, %2, %3, %4, %5)")
                             .arg(idCategory)
                             .arg(idAttr)
-                            .arg(defVal)
+                            .arg(defVal.isEmpty() ? QString("NULL") : QString("asString(%1, true)").arg(defVal))
                             .arg(isMandatory ? "true" : "false")
                             .arg(isReadOnly ? "true" : "false");
 

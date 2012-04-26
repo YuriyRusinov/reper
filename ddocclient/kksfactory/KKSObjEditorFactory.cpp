@@ -3103,7 +3103,10 @@ void KKSObjEditorFactory :: loadAttributeReference (QString tableName, QWidget *
             v_str = pv.value();
 
         if(!refColumnValues.isEmpty()){
-            QString s = refColumnValues.constFind (recEditor->getID()).value();
+            int id = recEditor->getID();
+            if(id <= 0)
+                return;
+            QString s = refColumnValues.constFind (id).value();
             //реальным значением атрибута (которое в дальнейшем пойдет в соответствующий INSERT или UPDATE)
             //должен быть внешний ключ. Поэтому мы сюда всегда записываем именно его, 
             //а в m_awf (т.е. в визуальный элемент) записываем значение из values
