@@ -871,7 +871,7 @@ KKSObjectExemplar * KKSLoader::loadEIO(qint64 id, KKSObject * io, const KKSCateg
         sql = QString("select %1 from %2 where id = %3").arg(fields).arg(tableName).arg(id);
     }
 
-    //qWarning() << sql;
+    qDebug() << __PRETTY_FUNCTION__ << sql;
 
     KKSResult * res = db->execute(sql);
     if(!res)

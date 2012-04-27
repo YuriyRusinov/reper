@@ -1145,10 +1145,9 @@ void KKSObjEditorFactory :: loadEntities (KKSObject *& obj,
     return;
 }
 
-void KKSObjEditorFactory :: loadRecEntities (KKSObject *& obj, KKSObjectExemplar *& wObjE, const KKSCategory* wCat, int idObject, int idObjE, const QString& tableName, const KKSTemplate *& tRecAttr, bool defTemplateOnly, QWidget * parent)
+void KKSObjEditorFactory :: loadRecEntities (KKSObject * obj, KKSObjectExemplar * wObjE, const KKSCategory* wCat, int idObject, int idObjE, const QString& tableName, const KKSTemplate *& tRecAttr, bool defTemplateOnly, QWidget * parent)
 {
-    obj = loader->loadIO (idObject, true);
-    if(!obj)
+    if(!obj || obj->id() != idObject)
     {
         qWarning() << "There is no object with id = " << idObject;
         return;
@@ -1156,8 +1155,7 @@ void KKSObjEditorFactory :: loadRecEntities (KKSObject *& obj, KKSObjectExemplar
     if (!obj->category() || (!obj->category()->recAttrCategory() && !wCat->recAttrCategory()))
         return;
         //qWarning() << "Corrupt table category of object with id = " << idObject;
-
-    wObjE = NULL;
+/*
     if (idObjE > 0)
     {
         wObjE = loader->loadEIO (idObjE, obj, wCat, tableName);
@@ -1169,7 +1167,7 @@ void KKSObjEditorFactory :: loadRecEntities (KKSObject *& obj, KKSObjectExemplar
     }
     else
        wObjE = new KKSObjectExemplar (-1, tr("New record"), obj);
-
+ */
     /*const KKSTemplate * */
     //tSystem = NULL;
     //
@@ -1214,7 +1212,8 @@ void KKSObjEditorFactory :: loadEIOasIO (const KKSTemplate *& ioTemplate, KKSObj
             ioTemplate = new KKSTemplate (io->category()->defTemplate ());
 
         for (int i=0; i< io->attrValues().count(); i++)
-            wObjE->addAttrValue (io->attrValue(i));
+            if (io->attrValue(i))
+                wObjE->addAttrValue (io->attrValue(i));
     }
     else if (idObject == IO_IO_ID && idObjE <= 0)
     {
@@ -6657,27 +6656,26 @@ void KKSObjEditorFactory :: putSyncWidget (KKSObjEditor * editor, KKSObjectExemp
     
     //KKSAttribute * syncAttr = loader->loadAttribute (ATTR_IO_OBJECTS_ORGANIZATION);
     KKSCategoryAttr * syncAttr = ct->attribute (ATTR_IO_OBJECTS_ORGANIZATION); 
+    KKSAttrValue * syncAttrVal (0);//= new KKSAttrValue (sVal, syncAttr);
     if (idObjE < 0)
     {
         KKSValue val (QString ("{}"), KKSAttrType::atCheckListEx);
-        //KKSCategoryAttr * cAttr = KKSCategoryAttr::create (syncAttr, true, false);
-//        KKSCategoryAttr * cAttr = ct->attribute (ATTR_IO_OBJECTS_ORGANIZATION); 
-        KKSAttrValue * av = new KKSAttrValue (val, syncAttr);
-        wObjE->addAttrValue (av);
-        editor->setSysAttrValue(av);
-        av->release ();
-        //cAttr->release ();
+        syncAttrVal = new KKSAttrValue (val, syncAttr);
+        wObjE->addAttrValue (syncAttrVal);
+        editor->setSysAttrValue(syncAttrVal);
     }
     else
     {
         KKSAttrValue * av = wObjE->attrValue (ATTR_IO_OBJECTS_ORGANIZATION);
         editor->setSysAttrValue (av);
     }
-    syncW->setSyncAttr (syncAttr);
+    syncW->setSyncAttrVal (syncAttrVal);
+    if (idObjE < 0)
+        syncAttrVal->release ();
     connect (syncW, SIGNAL (setIsGlobal (bool)), editor, SLOT (setIOGlobal (bool)) );
     connect (syncW, SIGNAL (setSyncType (QLineEdit *)), editor, SLOT (setSyncType (QLineEdit *)) );
-    connect (syncW, SIGNAL (addSyncOrganization (KKSAttribute *, QAbstractItemModel *)), editor, SLOT (addSyncOrg (KKSAttribute *, QAbstractItemModel *)) );
-    connect (syncW, SIGNAL (delSyncOrganization (KKSAttribute *, const QModelIndex&, QAbstractItemModel *)), editor, SLOT (delSyncOrg (KKSAttribute *, const QModelIndex&, QAbstractItemModel *)) );
+    connect (syncW, SIGNAL (addSyncOrganization (KKSAttrValue *, QAbstractItemModel *)), editor, SLOT (addSyncOrg (KKSAttrValue *, QAbstractItemModel *)) );
+    connect (syncW, SIGNAL (delSyncOrganization (KKSAttrValue *, const QModelIndex&, QAbstractItemModel *)), editor, SLOT (delSyncOrg (KKSAttrValue *, const QModelIndex&, QAbstractItemModel *)) );
     tabObj->addTab (syncW, tr ("Syncronization"));
 }
 

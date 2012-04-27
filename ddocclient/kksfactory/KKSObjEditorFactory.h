@@ -310,7 +310,7 @@ private:
     void putSyncWidget (KKSObjEditor * editor, KKSObjectExemplar * wObjE, int idObjE, QTabWidget * tabObj);
     void setIONameSecret (KKSObjEditor * editor, KKSObjectExemplar * wObjE, KKSObject * io, int& nWR, QGridLayout * mainLayout);
     void loadEntities (KKSObject *& obj, KKSObjectExemplar *& wObjE, const KKSCategory* wCat, int idObject, int idObjE, const QString& tableName, const KKSTemplate *& tSystem, bool defTemplateOnly = false, QWidget * parent=0);
-    void loadRecEntities (KKSObject *& obj, KKSObjectExemplar *& wObjE, const KKSCategory* wCat, int idObject, int idObjE, const QString& tableName, const KKSTemplate *& tRecAttr, bool defTemplateOnly = false, QWidget * parent=0);
+    void loadRecEntities (KKSObject * obj, KKSObjectExemplar * wObjE, const KKSCategory* wCat, int idObject, int idObjE, const QString& tableName, const KKSTemplate *& tRecAttr, bool defTemplateOnly = false, QWidget * parent=0);
     void loadEIOasIO (const KKSTemplate *& ioTemplate, KKSObject *& io, int idObject, int idObjE, KKSObjectExemplar * wObjE, const KKSCategory* wCat);
     KKSTemplate * getRecordTemplate (KKSObject * io, const KKSCategory* wCat);
     void initIOAttrs (KKSObject * io, KKSObjectExemplar * wObjE, const KKSCategory* wCat, KKSObjEditor * editor, QWidget * ioAttrWidget, QGridLayout * gIOLay);

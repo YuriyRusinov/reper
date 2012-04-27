@@ -20,6 +20,7 @@
 #include "KKSSortFilterProxyModel.h"
 #include "KKSEventFilter.h"
 #include "KKSAttribute.h"
+#include "KKSAttrValue.h"
 #include "KKSSyncWidget.h"
 
 KKSSyncWidget :: KKSSyncWidget (QWidget * parent, bool accessOk, Qt::WFlags f)
@@ -35,7 +36,7 @@ KKSSyncWidget :: KKSSyncWidget (QWidget * parent, bool accessOk, Qt::WFlags f)
     actDel (new QAction (QIcon(":/ddoc/delete.png"), tr("&Delete"), this)),
     tvSync (new QTreeView (this)),
     gLay (new QGridLayout (this)),
-    syncAttr (0),
+    syncAttrVal (0),
     sortModel (new KKSSortFilterProxyModel())
 {
     //Q_INIT_RESOURCE (kksgui_icon_set);
@@ -62,8 +63,8 @@ KKSSyncWidget :: KKSSyncWidget (QWidget * parent, bool accessOk, Qt::WFlags f)
 
 KKSSyncWidget :: ~KKSSyncWidget (void)
 {
-    if (syncAttr)
-        syncAttr->release ();
+    if (syncAttrVal)
+        syncAttrVal->release ();
 }
 
 bool KKSSyncWidget :: isCheckGlobal (void) const
@@ -100,15 +101,15 @@ void KKSSyncWidget :: setSyncOrgModel (QAbstractItemModel * sMod)
         delete oldModel;
 }
 
-void KKSSyncWidget :: setSyncAttr (KKSAttribute * attr)
+void KKSSyncWidget :: setSyncAttrVal (KKSAttrValue * attrVal)
 {
-    if (syncAttr)
-        syncAttr->release ();
+    if (syncAttrVal)
+        syncAttrVal->release ();
 
-    syncAttr = attr;
+    syncAttrVal = attrVal;
 
-    if (syncAttr)
-        syncAttr->addRef ();
+    if (syncAttrVal)
+        syncAttrVal->addRef ();
 }
 
 void KKSSyncWidget :: setGlobal (int state)
@@ -127,7 +128,7 @@ void KKSSyncWidget :: setSyncType (void)
 void KKSSyncWidget :: addSyncOrg (void)
 {
     qDebug () << __PRETTY_FUNCTION__;
-    emit addSyncOrganization (syncAttr, sortModel->sourceModel());
+    emit addSyncOrganization (syncAttrVal, sortModel->sourceModel());
 }
 
 void KKSSyncWidget :: delSyncOrg (void)
@@ -144,7 +145,7 @@ void KKSSyncWidget :: delSyncOrg (void)
 
     QModelIndex wInd = sIndexes[0].sibling (sIndexes[0].row(), 0);
     wInd = sortModel->mapToSource (wInd);
-    emit delSyncOrganization (syncAttr, wInd, sortModel->sourceModel ());
+    emit delSyncOrganization (syncAttrVal, wInd, sortModel->sourceModel ());
 }
 
 void KKSSyncWidget :: setupWidget (void)

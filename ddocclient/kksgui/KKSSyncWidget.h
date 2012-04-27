@@ -20,6 +20,7 @@ class QLabel;
 
 class KKSAttribute;
 class KKSSortFilterProxyModel;
+class KKSAttrValue;
 
 class _GUI_EXPORT KKSSyncWidget : public QWidget
 {
@@ -33,7 +34,7 @@ public:
     void setSyncType (const QString& syncName);
 
     void setSyncOrgModel (QAbstractItemModel * sMod);
-    void setSyncAttr (KKSAttribute * attr);
+    void setSyncAttrVal (KKSAttrValue * attrVal);
 
     KKSSortFilterProxyModel * getSortModel (void) const;
 
@@ -46,8 +47,8 @@ private slots:
 signals:
     void setIsGlobal (bool isSync);
     void setSyncType (QLineEdit * leType);
-    void addSyncOrganization (KKSAttribute * attr, QAbstractItemModel * sMod);
-    void delSyncOrganization (KKSAttribute * attr, const QModelIndex& oInd, QAbstractItemModel * sMod);
+    void addSyncOrganization (KKSAttrValue * av, QAbstractItemModel * sMod);
+    void delSyncOrganization (KKSAttrValue * av, const QModelIndex& oInd, QAbstractItemModel * sMod);
 
 private:
     //
@@ -73,7 +74,7 @@ private:
     
     bool m_accessOk;
 
-    KKSAttribute * syncAttr;
+    KKSAttrValue * syncAttrVal;
     KKSSortFilterProxyModel * sortModel;
 
 private:
