@@ -2,9 +2,10 @@ create or replace function cDeleteCategory(int4) returns int4 as
 $BODY$
 declare
     idCategory alias for $1;
+    r record;
 begin
 
-    select cDeleteRubrics(idCategory);
+    perform cDeleteRubrics(idCategory);
     update rubricator set id_io_category = NULL where id_io_category = idCategory;--рубрики, которые используют категорию перестанут ее использовать
     delete from access_categories_table where id_io_category = idCategory;
 
@@ -28,7 +29,7 @@ begin
     delete from tsd where id_io_category = idCategory;
 */
 
-    select tDeleteTemplate(id) from io_templates where id_io_category = idCategory;
+    perform tDeleteTemplate(id) from io_templates where id_io_category = idCategory;
 
     --delete from tbl_attrs_values where id_attr_category in (select id from attrs_categories where id_io_category = idCategory);
     --delete from attrs_categories where id_io_category = idCategory;
@@ -36,8 +37,18 @@ begin
     
     update io_categories set is_archived = true where id = idCategory;
 
-    select cDeleteCategory(id_child) from io_categories where id = idCategory and id_child is not null;
-    select cDeleteCategory(id_child2) from io_categories where id = idCategory and id_child is not null;
+    for r in
+        select id_child from io_categories where id = idCategory
+    loop
+        raise warning '%', r.id_child;
+        perform cDeleteCategory(r.id_child);-- from io_categories where id = idCategory and id_child is not null;
+    end loop;
+    for r in
+        select id_child2 from io_categories where id = idCategory
+    loop
+        raise warning '%', r.id_child2;
+        perform cDeleteCategory(r.id_child2);-- from io_categories where id = idCategory and id_child is not null;
+    end loop;
 
     return 1;
 
