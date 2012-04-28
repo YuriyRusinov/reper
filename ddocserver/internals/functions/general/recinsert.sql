@@ -156,7 +156,6 @@ begin
                     end if;
                     raise warning 'external query is %, record id is % ids is %', exQuery, idRec, ids;
 
-                    --query := query || '( select getExValuesId (' || id_copy || ',' || quote_literal (refTable) || ',' || quote_literal (mainAttr) || ',' || quote_literal (childAttr) || '))';
                     continue;
                 elsif (id_a_type = 12) then
                     query := query || '"' || attr_code || '"';

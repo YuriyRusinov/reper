@@ -2,7 +2,7 @@
 
 . ./user.config
 
-VERSION=0.13.2
+VERSION=0.13.3
 
 PROJECT_NAME=DynamicDocs
 
