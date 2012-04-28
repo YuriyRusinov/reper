@@ -640,7 +640,7 @@ int JKKSLoader :: writeMessage (JKKSDocument *doc, int syncType) const
         return ERROR_CODE;
     }
 
-	doc->setCategory (pairToMap(cCats));
+    doc->setCategory (pairToMap(cCats));
     
     doc->setIdIoCat(cCats.mainCategory().id());//задаем категорию документа (в приемной БД, ее ИД отличается от ИД БД-источника)
 
@@ -2345,7 +2345,23 @@ int JKKSLoader :: writeMessage (JKKSRefRecord *refRec, const QString& sender_uid
                 if (pa.value().transferrable())
                 {
                     attrsUids += QString ("'%1'").arg (pa.value().uid());
-                    attrsValues += QString ("'%1'").arg (attrsVals[ic]);
+                    int a_type = pa.value().idAttrType();
+                    if (a_type == 9 || //KKSAttrType::atString ||
+                        a_type == 14 || //KKSAttrType::atFixString ||
+                        a_type == 13 || //KKSAttrType::atText ||
+                        a_type == 20) //KKSAttrType::atXMLDoc)
+                    {
+                        QString sVal (attrsVals[ic]);
+                        QString escVal (sVal);
+                        escVal.replace("'", "''");
+                        escVal.replace("\\", "\\\\");
+                        escVal.replace("\"", "\\\"");
+                        qDebug () << __PRETTY_FUNCTION__ << escVal;
+                        attrsValues += QString("'%1'")
+                                        .arg (escVal);//.isEmpty() ? "NULL::varchar" : value)
+                    }
+                    else
+                        attrsValues += QString ("'%1'").arg (attrsVals[ic]);
                     if (ic < attrsVals.count()-1)
                     {
                         attrsUids += QString (",");
@@ -3133,10 +3149,26 @@ QPair<int, int> JKKSLoader :: getIDMap (const QString& ref_uid, const JKKSRefRec
                 return id_old_new;
  */
         }
-
-        attrs_vals += QString("'%1'%2")
-                        .arg (value)//.isEmpty() ? "NULL::varchar" : value)
-                        .arg (i < nAttrsV-1 ? QString (",") : QString ("]"));
+        int a_type = pa.value().idAttrType();
+        if (a_type == 9 || //KKSAttrType::atString ||
+            a_type == 14 || //KKSAttrType::atFixString ||
+            a_type == 13 || //KKSAttrType::atText ||
+            a_type == 20) //KKSAttrType::atXMLDoc)
+        {
+            QString sVal (value);
+            QString escVal (sVal);
+            escVal.replace("'", "''");
+            escVal.replace("\\", "\\\\");
+            escVal.replace("\"", "\\\"");
+            qDebug () << __PRETTY_FUNCTION__ << escVal;
+            attrs_vals += QString("'%1'%2")
+                            .arg (escVal)//.isEmpty() ? "NULL::varchar" : value)
+                            .arg (i < nAttrsV-1 ? QString (",") : QString ("]"));
+        }
+        else
+            attrs_vals += QString("'%1'%2")
+                            .arg (value)//.isEmpty() ? "NULL::varchar" : value)
+                            .arg (i < nAttrsV-1 ? QString (",") : QString ("]"));
         i++;
     }
 

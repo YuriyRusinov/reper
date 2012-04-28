@@ -694,6 +694,22 @@ QString KKSValue::valueForInsert() const
         val = QString::number (vCol.rgba());
         return val;
     }
+    
+    if (a_type == KKSAttrType::atString ||
+        a_type == KKSAttrType::atFixString ||
+        a_type == KKSAttrType::atText ||
+        a_type == KKSAttrType::atXMLDoc)
+    {
+        QString sVal (value());
+        QString escVal (sVal);
+        escVal.replace("'", "''");
+        escVal.replace("\\", "\\\\");
+        escVal.replace("\"", "\\\"");
+        escVal.prepend("'");
+        escVal.append ("'");
+        qDebug () << __PRETTY_FUNCTION__ << escVal;
+        return escVal;
+    }
 
     if(isLiteral())
         val += QString("'%1'").arg(value());
