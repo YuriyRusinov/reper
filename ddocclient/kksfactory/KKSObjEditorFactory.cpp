@@ -6667,10 +6667,13 @@ void KKSObjEditorFactory :: putSyncWidget (KKSObjEditor * editor, KKSObjectExemp
     else
     {
         KKSAttrValue * av = wObjE->attrValue (ATTR_IO_OBJECTS_ORGANIZATION);
-        editor->setSysAttrValue (av);
+        syncAttrVal = av;
+        if (av)
+            syncAttrVal->addRef ();
+        editor->setSysAttrValue(syncAttrVal);
     }
     syncW->setSyncAttrVal (syncAttrVal);
-    if (idObjE < 0)
+    if (syncAttrVal)
         syncAttrVal->release ();
     connect (syncW, SIGNAL (setIsGlobal (bool)), editor, SLOT (setIOGlobal (bool)) );
     connect (syncW, SIGNAL (setSyncType (QLineEdit *)), editor, SLOT (setSyncType (QLineEdit *)) );
