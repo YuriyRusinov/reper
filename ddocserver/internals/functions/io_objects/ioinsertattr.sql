@@ -111,7 +111,7 @@ begin
 
     if(idType <> 2 and idType <> 3 and idType <> 7 and idType <> 12 and idType <> 17 and idType <> 19 and idType <> 26)  then
         
-        select ioInsertAttr(idObject, idAttr, ioValue) into ok;
+        select ioInsertAttr(idObject, idAttr, ioValue, iStartTime, iStopTime, iMeasTime, iIdObjectSrc, iIdObjectSrc1, iDesc) into ok;
         return ok;
     end if;
 

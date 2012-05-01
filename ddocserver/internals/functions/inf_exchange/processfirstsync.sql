@@ -264,7 +264,7 @@ begin
     q = 'select unique_id, id from ' || tableName || ' order by 2';
     for r in execute q
     loop
-        perform addSyncRecord(idOrg, r.id, r.unique_id, ioUID, tableName, 1, 3);
+        perform addSyncRecord(idOrg, r.id::int4, r.unique_id, ioUID, tableName, 1, 3);
     end loop;
 
     for r in 
