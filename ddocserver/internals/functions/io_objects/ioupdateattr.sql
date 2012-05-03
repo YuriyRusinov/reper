@@ -14,25 +14,70 @@ declare
     idCategory int4;
     idCatAttr int4;
     ok int4;
+    query varchar;
 begin
 
     idCatAttr = acGetAttrCategoryIdByIO(idObject, idAttr);
+    raise warning 'idCatAttr is %', idCatAttr;
 
     if(ioValue isnull) then
         delete from attrs_values where id_io_object = idObject and id_attr_category = idCatAttr;
         return 1;
     end if;
 
-    if(ioCatAttrExist(idObject, idCatAttr) = true) then
-        update attrs_values set 
-            value = ioValue, 
-            meas_time = iMeasTime, 
-            id_io_object_src = iIdObjectSrc, 
-            id_io_object_src1 = iIdObjectSrc1, 
-            description = iDesc 
-        where 
-            id_io_object = idObject 
-            and id_attr_category = idCatAttr;
+    if(ioCatAttrExist(idObject, idCatAttr) ) then
+        query := E'update attrs_values set value = ';
+        if (ioValue is not null) then
+            query := query || quote_literal (ioValue);
+        else
+            query := query || 'NULL::varchar';
+        end if;
+
+        query := query ||',' || 'meas_time = ';
+        if (iMeasTime is not null) then
+            query := query || '''' || iMeasTime || '''' || '::timestamp';
+        else
+            query := query || 'NULL';
+        end if;
+
+        query := query ||',' || 'stop_time = ';
+        if (iStopTime is not null) then
+            query := query || '''' || iStopTime || '''' || '::timestamp';
+        else
+            query := query || 'NULL';
+        end if;
+
+        query := query ||',' || 'start_time = ';
+        if (iStartTime is not null) then
+            query := query || '''' || iStartTime || '''' || '::timestamp';
+        else
+            query := query || 'NULL';
+        end if;
+
+        query := query ||','|| 'id_io_object_src = ';
+        if (iIdObjectSrc is not null) then
+            query := query || iIdObjectSrc;
+        else
+            query := query || 'NULL';
+        end if;
+
+        query := query ||','|| 'id_io_object_src1 = ';
+        if (iIdObjectSrc1 is not null) then
+            query := query || iIdObjectSrc1;
+        else
+            query := query || 'NULL';
+        end if;
+
+        query := query ||','|| 'description = ';
+        if (iDesc is not null) then
+            query := query || iDesc;
+        else
+            query := query || 'NULL';
+        end if;
+
+        query := query || ' where ' || 'id_io_object = ' || idObject || ' and id_attr_category = ' ||idCatAttr ||';';
+        raise warning 'query is %', query;
+        execute query;
     else
         select ioInsertAttr(idObject, idAttr, ioValue, iStartTime, iStopTime, iMeasTime, iIdObjectSrc, iIdObjectSrc1, iDesc) into ok;
         return ok;
@@ -135,7 +180,15 @@ declare
     query varchar;
     cnt int4;
     i int4;
+    start_time timestamp;
 begin
+
+    if (iStartTime is null and iStopTime is null and iMeasTime is null) then
+        raise warning 'All time stamps are null';
+        start_time := current_timestamp;
+    else
+        start_time := iStartTime;
+    end if;
 
     if(idObject isnull or uniqueId isnull or ioValue isnull) then
         return 1;
@@ -154,14 +207,14 @@ begin
     end if;
 
     if(idType <> 2 and idType <> 3 and idType <> 7 and idType <> 12 and idType <> 17 and idType <> 19 and idType <> 26)  then
-        
-        select ioUpdateAttr(idObject, idAttr, ioValue, iStartTime, iStopTime, iMeasTime, iIdObjectSrc, iIdObjectSrc1, iDesc) into ok;
+        raise warning 'type is %', idType;
+        select ioUpdateAttr(idObject, idAttr, ioValue, start_time, iStopTime, iMeasTime, iIdObjectSrc, iIdObjectSrc1, iDesc) into ok;
         return ok;
     end if;
 
     if(ioValue = '{}')  then
         
-        select ioUpdateAttr(idObject, idAttr, ioValue, iStartTime, iStopTime, iMeasTime, iIdObjectSrc, iIdObjectSrc1, iDesc) into ok;
+        select ioUpdateAttr(idObject, idAttr, ioValue, start_time, iStopTime, iMeasTime, iIdObjectSrc, iIdObjectSrc1, iDesc) into ok;
         return ok;
     end if;
 
@@ -169,7 +222,7 @@ begin
         theValue = getIDByUID(tableName, ioValue);
 
         if(theValue is not null) then
-            select ioUpdateAttr(idObject, idAttr, theValue, iStartTime, iStopTime, iMeasTime, iIdObjectSrc, iIdObjectSrc1, iDesc) into ok;
+            select ioUpdateAttr(idObject, idAttr, theValue, start_time, iStopTime, iMeasTime, iIdObjectSrc, iIdObjectSrc1, iDesc) into ok;
         end if;
 
         return ok;
@@ -198,7 +251,7 @@ begin
 
     theValue = theValue || '}';
 
-    select ioUpdateAttr(idObject, idAttr, theValue, iStartTime, iStopTime, iMeasTime, iIdObjectSrc, iIdObjectSrc1, iDesc) into ok;
+    select ioUpdateAttr(idObject, idAttr, theValue, start_time, iStopTime, iMeasTime, iIdObjectSrc, iIdObjectSrc1, iDesc) into ok;
     
     return ok;
 

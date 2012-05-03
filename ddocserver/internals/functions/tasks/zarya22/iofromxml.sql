@@ -16,9 +16,9 @@ begin
     isMakeIO := true;
     execute query INTO isMakeIO;
 
-    IF isMakeIO is FALSE
-    THEN
-    return isMakeIO;       
+    if (not isMakeIO ) then
+        raise warning 'Invalid XML';
+        return isMakeIO;       
     END IF;
 
    -- get type of xml message
@@ -28,6 +28,7 @@ begin
     query := 'SELECT trim((xpath(' || quote_literal(tbody) || ', ' || quote_literal(value) || '::xml))[1]::varchar) As metadataname';
 
     execute query INTO xml_type;
+    raise warning 'xml type is %', xml_type;
 
     IF xml_type is NULL
     THEN

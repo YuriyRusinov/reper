@@ -28,7 +28,7 @@ begin
     if(new.stop_time isnull) then
         new.is_actual := true;
     else
-        if(new.start_time >= new.stop_time) then
+        if(new.start_time > new.stop_time) then
             raise exception 'start_time of the attribute value cannot be greather then stop_time!';
             return NULL;
         end if;
