@@ -5667,7 +5667,7 @@ void KKSObjEditorFactory :: loadObjAttrRef (KKSObject * wObj, const KKSAttrValue
         return;
     }
 
-    QWidget * wEditor = qobject_cast<QWidget *>(this->sender());
+    KKSObjEditor * wEditor = qobject_cast<KKSObjEditor *>(this->sender());
     KKSList<const KKSFilterGroup*> filters;
     KKSCategory * ct = c->tableCategory ();
     if (!ct){
@@ -5731,6 +5731,7 @@ void KKSObjEditorFactory :: loadObjAttrRef (KKSObject * wObj, const KKSAttrValue
 
             av = new KKSAttrValue (val, cAttr);
             wObj->addAttrValue (av);
+            wEditor->setObjChanged (true);
         }
         qDebug () << __PRETTY_FUNCTION__ << (av ? av->value().value() : QString());
         if (av)
@@ -5746,6 +5747,7 @@ void KKSObjEditorFactory :: loadObjAttrRef (KKSObject * wObj, const KKSAttrValue
             KKSValue val (sl.join (","), KKSAttrType::atCheckListEx);
             av->setValue (val);
             const_cast<KKSAttrValue *>(avE)->setValue (val);
+            wEditor->setObjChanged (true);
         }
         //qDebug () << __PRETTY_FUNCTION__ << sl;
     }
@@ -5775,7 +5777,7 @@ void KKSObjEditorFactory :: loadObjCAttrRef (KKSObjectExemplar * wObjE, const KK
         return;
     }
 
-    QWidget * wEditor = qobject_cast<QWidget *>(this->sender());
+    KKSObjEditor * wEditor = qobject_cast<KKSObjEditor *>(this->sender());
     KKSList<const KKSFilterGroup*> filters;
     KKSCategory * ct = c->tableCategory ();
     if (!ct){
@@ -5851,6 +5853,7 @@ void KKSObjEditorFactory :: loadObjCAttrRef (KKSObjectExemplar * wObjE, const KK
 
             av = new KKSAttrValue (val, cAttr);
             wObjE->addAttrValue (av);
+            wEditor->setObjChanged (true);
         }
         //qDebug () << __PRETTY_FUNCTION__ << (av ? av->value().value() : QString());
         if (!av)
@@ -5872,6 +5875,7 @@ void KKSObjEditorFactory :: loadObjCAttrRef (KKSObjectExemplar * wObjE, const KK
                 //qDebug () << __PRETTY_FUNCTION__ << sl << av->attribute()->id();
                 av->setValue (val);
                 const_cast<KKSAttrValue *>(avE)->setValue (val);
+                wEditor->setObjChanged (true);
             }
         }
     }
