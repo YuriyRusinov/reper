@@ -107,7 +107,7 @@ declare
 begin
 
     for r in 
-        select id_io_object, id_attr_category from attrs_values where id = idAttrValue
+        select id_io_object, id_attr_category from tbl_attrs_values where id = idAttrValue
     loop
         return r;
     end loop;

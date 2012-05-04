@@ -6,6 +6,11 @@ declare
     query varchar;
 begin
     
+    if(old.is_actual = false) then
+        raise exception 'You cannot delete attribute values placed in archive!';
+        return NULL;
+    end if;
+
     for r in 
         select a.id, a.id_a_type, a.table_name 
         from attributes a, attrs_categories ac

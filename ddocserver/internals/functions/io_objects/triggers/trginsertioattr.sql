@@ -10,6 +10,12 @@ declare
     isExist int4;
 begin
 
+    if(TG_OP = 'UPDATE') then
+        if(old.is_actual = false) then
+            raise exception 'You cannot update attribute values placed in archive!';
+            return NULL;
+        end if;
+    end if;
 
     if(checkIOForOwner(new.id_io_object) = false) then
         return NULL;
