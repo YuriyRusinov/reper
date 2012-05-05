@@ -47,9 +47,9 @@ begin
     end if;
 
     if(new.is_actual = true) then
-        select count(id) into cnt from f_sel_attrs_values(new.id_io_object) where id_attr_category = new.id_attr_category and is_actual = true;
+        select count(id) into cnt from f_sel_attrs_values(new.id_io_object) where id_attr_category = new.id_attr_category and is_actual = true and id <> new.id;
         if(cnt > 0) then
-            raise exception 'Current version of DynamicDocs Server does not support multiple actual copies of the attribute value! id_io_object = %, id_attr_category = %', id_io_object, id_attr_category;
+            raise exception 'Current version of DynamicDocs Server does not support multiple actual copies of the attribute value! id_io_object = %, id_attr_category = %', new.id_io_object, new.id_attr_category;
             return NULL;
         end if;
     end if;
