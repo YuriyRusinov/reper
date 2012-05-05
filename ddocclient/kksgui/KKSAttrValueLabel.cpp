@@ -71,8 +71,8 @@ void KKSAttrValueLabel :: setLabelProps()
 	QColor colour(Qt::darkBlue); 
     QString coloredText;
    
-    //coloredText = tr("<font color='%1'>%2</font>").arg( colour. ).arg(text);
-    if(m_isSystem==1)
+    
+    if(m_isSystem == 1)
         coloredText = tr("<font color='blue'>%2</font>").arg(text);
     else
         coloredText = text;
@@ -80,7 +80,7 @@ void KKSAttrValueLabel :: setLabelProps()
     this->setText( coloredText );	
 	
 	QFont lFont = this->font ();
-	lFont.setUnderline(!m_isSystem);
+    lFont.setUnderline( m_isSystem == 1 ? true : false);
 	if (isMandatory)
     {
         lFont.setBold (true);
@@ -88,7 +88,7 @@ void KKSAttrValueLabel :: setLabelProps()
 
 	this->setFont (lFont);
 
-    if(m_isSystem==1){
+    if(m_isSystem == 1){
         setToolTip(tr("Click on label to show extended attribute properties"));
         setCursor(Qt::PointingHandCursor);
     }
@@ -98,7 +98,7 @@ void KKSAttrValueLabel :: setLabelProps()
 
 void KKSAttrValueLabel :: showAttrValueProps()
 {
-    if(!m_av || m_isSystem==0)
+    if(!m_av || m_isSystem != 1)
         return;
 
     KKSAttrValuePropsForm * f = new KKSAttrValuePropsForm(m_av, true, this);
