@@ -62,5 +62,6 @@
     <file>delete.png</file>
     <file>refreshIcon.png</file>
     <file>add_index.png</file>
+    <file>category_copy.png</file>
   </qresource>
 </RCC>

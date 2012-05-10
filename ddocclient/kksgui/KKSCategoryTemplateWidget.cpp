@@ -35,6 +35,7 @@ KKSCategoryTemplateWidget :: KKSCategoryTemplateWidget (bool mode, const QList<i
     tbCatTempl (new QToolBar (tr ("Category and templates editor"), this)),
     actAddC (new QAction (QIcon(":/ddoc/category_add.png"), tr("Add empty category"), this)),
     actAddCopyC (new QAction (QIcon (":/ddoc/add_copy.png"), tr ("Add copy of selected category"), this)),
+    actAddConBase (new QAction (QIcon (":/ddoc/category_copy.png"), tr ("Add new category on exists"), this)),
     actAddT (new QAction (QIcon(":/ddoc/add.png"), tr("Add template"), this)),
     actEditC (new QAction (QIcon (":/ddoc/edit.png"), tr("Edit selected category"), this)),
     actEditT (new QAction (QIcon (":/ddoc/edit.png"), tr("Edit template"), this)),
@@ -68,6 +69,7 @@ KKSCategoryTemplateWidget :: KKSCategoryTemplateWidget (bool mode, const QList<i
 
     connect (actAddC, SIGNAL (triggered()), this, SLOT (addCat()) );
     connect (actAddCopyC, SIGNAL (triggered()), this, SLOT (addCopyCat()) );
+    connect (actAddConBase, SIGNAL (triggered()), this, SLOT (addCloneCat()) );
     connect (actAddT, SIGNAL (triggered()), this, SLOT (addTemplate()) );
     connect (actEditC, SIGNAL (triggered()), this, SLOT (editCat()) );
     connect (actEditT, SIGNAL (triggered()), this, SLOT (editTemplate()) );
@@ -140,6 +142,20 @@ void KKSCategoryTemplateWidget :: addCopyCat (void)
         if (wIndex.data (Qt::UserRole+USER_ENTITY).toInt() > 0)
             pCatInd.insert (idCat, wIndex);
         emit addCopyCategory(this, idCat, false);
+    }
+    else
+        QMessageBox::warning (this, tr("Warning"), tr("Please select category"), QMessageBox::Ok);
+}
+
+void KKSCategoryTemplateWidget :: addCloneCat (void)
+{
+    int idCat = this->getCurrentCategoryId ();
+    QModelIndex wIndex = tvCatTemplate->selectionModel()->currentIndex ();
+    if (idCat > 0)
+    {
+        if (wIndex.data (Qt::UserRole+USER_ENTITY).toInt() > 0)
+            pCatInd.insert (idCat, wIndex);
+        emit addNewCategoryE(this, idCat, false);
     }
     else
         QMessageBox::warning (this, tr("Warning"), tr("Please select category"), QMessageBox::Ok);
@@ -235,6 +251,7 @@ void KKSCategoryTemplateWidget :: init_widgets (void)
     catTemplLayout->addWidget (tbCatTempl, 0, 0, 1, 1);
     tbCatTempl->addAction (actAddC);
     tbCatTempl->addAction (actAddCopyC);
+    tbCatTempl->addAction (actAddConBase);
     tbCatTempl->addAction (actEditC);
     tbCatTempl->addAction (actDelC);
     //tbCatTempl->addSeparator ();

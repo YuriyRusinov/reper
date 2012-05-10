@@ -55,6 +55,7 @@ class _GUI_EXPORT KKSCategoryTemplateWidget : public KKSDialog
 
         void addCat (void);
         void addCopyCat (void);
+        void addCloneCat (void);
         void addTemplate (void);
         void editCat (void);
         void editTemplate (void);
@@ -68,6 +69,7 @@ class _GUI_EXPORT KKSCategoryTemplateWidget : public KKSDialog
     signals:
         void addNewCategory (QWidget *ctw, int idCatType, bool isChild);
         void addCopyCategory (QWidget *ctw, int idCat, bool isChild);
+        void addNewCategoryE (QWidget *ctw, int idCatType, bool isChild);
         void addNewTemplate (QWidget *ctw, int idCat);
         void editCategory (QWidget *ctw, int idCat, bool isChild);
         void editTempl (QWidget *ctw, int idTempl);
@@ -106,6 +108,7 @@ class _GUI_EXPORT KKSCategoryTemplateWidget : public KKSDialog
         QToolBar * tbCatTempl;
         QAction * actAddC;
         QAction * actAddCopyC;
+        QAction * actAddConBase;
         QAction *actAddT;
 
         QAction *actEditC;

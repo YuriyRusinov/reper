@@ -57,6 +57,15 @@ class _F_EXPORT KKSCatEditorFactory : public KKSEntityFactory
                                             QWidget *parent=0,
                                             Qt::WindowFlags f=0);
 
+        KKSCatEditor* createCategoryEditor (KKSCategory *cat, // категория
+                                            const KKSList<const KKSFilterGroup *> & filters,
+                                            bool isChildCat, // создается или редактируется дочерняя категория
+                                            int idCatType, // тип категории по умолчанию
+                                            bool mode=false,
+                                            Qt::WindowModality windowModality=Qt::NonModal,
+                                            QWidget *parent=0,
+                                            Qt::WindowFlags f=0);
+
     signals:
         void categoryEditorCreated (KKSCatEditor *cEditor);
         void categoryEditorCreatedModal (KKSCatEditor *cEditor);
@@ -68,6 +77,7 @@ class _F_EXPORT KKSCatEditorFactory : public KKSEntityFactory
         void loadCatTemplates (KKSCategoryTemplateWidget *ctw, int idCat, const QModelIndex& ind);
         void addCategory (QWidget *ctw, int idCatType, bool isChild);
         void addCopyCategory (QWidget *ctw, int idCat, bool isChild);
+        void addCloneCategory (QWidget *ctw, int idCat, bool isChild);
         void editCategory (QWidget* ctw, int idCat, bool isChild);
         void delCategory (QWidget * ctw, int idCat);
         //void loadAttributes (KKSCatEditor *editor);

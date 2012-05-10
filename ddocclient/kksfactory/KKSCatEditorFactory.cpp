@@ -129,6 +129,11 @@ KKSCategoryTemplateWidget* KKSCatEditorFactory :: viewCategories (const KKSList<
              SLOT (addCopyCategory (QWidget *, int, bool))
              );
 
+    connect (ctWidget, SIGNAL (addNewCategoryE (QWidget *, int, bool)),
+             this,
+             SLOT (addCloneCategory (QWidget *, int, bool))
+             );
+    
     connect (ctWidget, SIGNAL (editCategory(QWidget*, int, bool)),
              this,
              SLOT (editCategory (QWidget*, int, bool))
@@ -238,6 +243,59 @@ void KKSCatEditorFactory :: addCopyCategory (QWidget *ctw, int idCat, bool isChi
     }
 
     emit categoryAdded(c);
+}
+
+void KKSCatEditorFactory :: addCloneCategory (QWidget *ctw, int idCat, bool isChild)
+{
+    Q_UNUSED (isChild);
+    KKSCategory *c = loader->loadCategory (idCat);
+    if (!c)
+    {
+        QMessageBox::critical(ctw, tr("Error!"), tr("Cannot load the category!"), QMessageBox::Ok);
+        return;
+    }
+
+    if (c->tableCategory())
+    {
+        KKSCategory * ct = c->tableCategory();
+        ct->setId (-1);
+        ct->setName(ct->name() + tr(" (copy)"));
+        ct->setCode (QString());
+        //int res = ppf->insertCategory(ct);
+        /*if (res == ERROR_CODE)
+        {
+            QMessageBox::critical(ctw, tr("Error!"), tr("Cannot create copy of the category"), QMessageBox::Ok);
+            c->release();
+            return;
+        }*/
+
+    }
+    c->setId(-1);
+    c->setName(c->name() + tr(" (copy)"));
+    c->setCode(QString::null);
+    KKSList<const KKSFilterGroup *> filterGroups;
+    bool mode = (ctw->windowModality() != Qt::NonModal);
+    QWidget *parent = 0;//(isChild ? (KKSCatEditor *)this->sender() : 0);
+    Qt::WindowModality cwModal = ctw->windowModality();
+    if (isChild && qobject_cast<KKSCatEditor *>(this->sender()))
+    {
+        //
+        // Вызов пришел от редактора категорий
+        //
+        parent = qobject_cast<KKSCatEditor *>(this->sender());
+        mode = true;
+        cwModal = Qt::WindowModal;
+    }
+    int idCatType = c->type()->id();
+    KKSCatEditor * catEditor = this->createCategoryEditor (c, filterGroups, isChild, idCatType, mode, cwModal, parent, Qt::Dialog);
+    if (!catEditor)
+        return;
+
+    catEditor->setWindowTitle (tr("Creation new category on %1").arg (c->name()));
+    if (cwModal != Qt::NonModal)
+        (qobject_cast<QWidget *>(catEditor))->setAttribute (Qt::WA_DeleteOnClose);
+
+    catEditor->show ();
 }
 
 void KKSCatEditorFactory :: editCategory (QWidget* ctw, int idCat, bool isChild)
@@ -405,6 +463,104 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (int idCategory, // ид
         acl->release ();
     }
 
+    if (!cat)
+        return 0;
+
+    if (isChildCat && qobject_cast<KKSCatEditor *>(parent))
+    {
+        KKSCatEditor *pEditor = qobject_cast<KKSCatEditor *>(parent);
+        pEditor->category()->setTableCategory (cat);
+    }
+
+    KKSRecWidget *rAttrCw = getAttrsWidget (cat, mode, 0);
+    //cEditor->setAttrs (rw);
+    KKSType * cTableT = loader->loadType (10);
+    KKSRecWidget * rAttrTCw = getAttrsWidget (cat->tableCategory(), mode, 0);
+    KKSRecWidget * recAttrCw = getAttrsWidget (cat->recAttrCategory(), mode, 0);
+    QAction * actCopyFrom = new QAction (QIcon (":/ddoc/add_copy.png"), tr("Copy attributes from"), rAttrTCw);
+    rAttrTCw->addToolBarAction (actCopyFrom);
+    KKSMap<int, KKSType*> cTypes = loader->loadAvailableTypes();
+
+    KKSRecWidget *rwt = getTemplateWidget (cat, false, 0);//KKSViewFactory :: createCategoryTemplates (cat->id (), loader, 0);
+//    cEditor->setTemplates (rwt);
+    KKSRecWidget *rwtT = getTemplateWidget (cat->tableCategory(), false, 0);
+    KKSRecWidget *rawtT = getTemplateWidget (cat->recAttrCategory(), false, 0);
+
+    KKSCatEditor *cEditor = new KKSCatEditor (cat, rAttrCw, rAttrTCw, recAttrCw, rwt, rwtT, rawtT, cTypes, idCatType, mode, parent, f);
+    if (!cEditor)
+        return 0;
+    connect (actCopyFrom, SIGNAL (triggered()), cEditor, SLOT (copyAttributesFrom()));
+
+    cEditor->setTableType (cTableT);
+
+    KKSObject *attrTypesIO = loader->loadIO (IO_ATTR_TYPE_ID, true);
+    if (!attrTypesIO)
+    {
+        QMessageBox::warning (parent, QObject::tr ("Attributes types"), QObject::tr ("Cannot load attribute types"), QMessageBox::Ok);
+        return 0;
+    }
+
+    KKSMap<int, KKSAttrType*> availAttrTypes;
+    KKSMap<qint64, KKSEIOData *> attrTypesList = loader->loadEIOList (attrTypesIO);
+    KKSMap<qint64, KKSEIOData *>::const_iterator pAttrs;
+    for (pAttrs = attrTypesList.constBegin(); pAttrs != attrTypesList.constEnd(); pAttrs++)
+    {
+        KKSAttrType *aType = new KKSAttrType ();
+        if (!aType)
+            continue;
+        aType->setId (pAttrs.key());
+        aType->setName (pAttrs.value()->fields ().value ("name"));
+        aType->setCode (pAttrs.value()->fields ().value ("code"));
+        availAttrTypes.insert (pAttrs.key(), aType);
+        if (aType)
+            aType->release ();
+    }
+
+    cEditor->setAttrTypes (availAttrTypes);
+    if (!isChildCat)
+    {
+        KKSStuffForm *sForm = stuffF->createStuffEditorForm (cat->getAccessRules(), 1, cEditor);
+        cEditor->setAccessWidget (sForm);
+    }
+
+    connect (cEditor, SIGNAL (addAttrsIntoCat (KKSCategory *, QAbstractItemModel *, KKSCatEditor *)), this, SLOT (addAttributeIntoCategory (KKSCategory *, QAbstractItemModel *, KKSCatEditor *)) );
+    connect (cEditor, SIGNAL (copyAttrsFromAnotherCat (KKSCategory *, QAbstractItemModel *, KKSCatEditor *)), this, SLOT (copyAttributesIntoCategory (KKSCategory *, QAbstractItemModel *, KKSCatEditor *)) );
+    connect (cEditor, SIGNAL (setAttribute (int, KKSCategory*, QAbstractItemModel *, KKSCatEditor *)), this, SLOT (loadCatAttribute (int, KKSCategory*, QAbstractItemModel *, KKSCatEditor *)));
+    connect (cEditor, SIGNAL (setAttribute (KKSCategoryAttr *, KKSCategory*, QAbstractItemModel *, KKSCatEditor *)), this, SLOT (loadCatAttribute (KKSCategoryAttr *, KKSCategory*, QAbstractItemModel *, KKSCatEditor *)) );
+    connect (cEditor, SIGNAL (delAttrFromCategory (int, KKSCategory *, QAbstractItemModel *, KKSCatEditor *)), this, SLOT (delCatAttribute(int, KKSCategory *, QAbstractItemModel *, KKSCatEditor *)) );
+    
+    connect (cEditor, SIGNAL (saveCategory (KKSCategory *, int, int, KKSCatEditor *)), this, SLOT (saveCategory (KKSCategory *, int, int, KKSCatEditor *)) );
+    connect (cEditor, SIGNAL (addChildCat (QWidget *, int, bool)), this, SLOT (addCategory (QWidget *, int, bool)) );
+    connect (cEditor, SIGNAL (editChildCat (QWidget *, int, bool)), this, SLOT (editCategory (QWidget *, int, bool)) );
+    
+    connect (cEditor, SIGNAL (addNewCategoryTemplate (QWidget *, int, QAbstractItemModel *)), tf, SLOT (addTemplate (QWidget *, int, QAbstractItemModel *)) );
+    connect (cEditor, SIGNAL (editCategoryTemplate (QWidget *, int, QAbstractItemModel *, const QModelIndex& )), tf, SLOT (editTemplate (QWidget *, int, QAbstractItemModel *, const QModelIndex&)) );
+    connect (cEditor, SIGNAL (delCategoryTemplate (QWidget *, int, QAbstractItemModel *, const QModelIndex& )), tf, SLOT (delTemplate (QWidget *, int, QAbstractItemModel *, const QModelIndex&)) );
+    
+    connect (this, SIGNAL (categoryDbError ()), cEditor, SLOT (catDbError()) );
+
+    cEditor->setWindowModality (windowModality);
+    if (windowModality != Qt::NonModal)
+    {
+        cEditor->show ();
+        emit categoryEditorCreatedModal (cEditor);
+    }
+    else
+        emit categoryEditorCreated (cEditor);
+//    typeRef->release ();
+//    cat->release ();
+    return cEditor;
+}
+
+KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (KKSCategory *cat, // категория
+                                                           const KKSList<const KKSFilterGroup *> & filters,
+                                                           bool isChildCat, // создается или редактируется дочерняя категория
+                                                           int idCatType, // тип категории по умолчанию
+                                                           bool mode,
+                                                           Qt::WindowModality windowModality,
+                                                           QWidget *parent,
+                                                           Qt::WindowFlags f)
+{
     if (!cat)
         return 0;
 
