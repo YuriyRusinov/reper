@@ -4386,7 +4386,16 @@ int KKSObjEditorFactory :: exportHeader (QIODevice *xmlDev, // XML-פאיכ, סמהונזא
         QString acode = QString ("code");
         QString atitle = QString ("name");
         QString atype = QString ("type");
+        QString aunique_id = QString ("unique_id");
+
         xmlWriter->writeStartElement (fieldName);
+        xmlWriter->writeCharacters ("\n        ");
+
+        xmlWriter->writeStartElement (aunique_id);
+//        
+//        xmlWriter->writeCharacters (pc.value()->);
+//        
+        xmlWriter->writeEndElement ();
         xmlWriter->writeCharacters ("\n        ");
 
         xmlWriter->writeStartElement (acode);
@@ -4484,6 +4493,10 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // צוכוגמי CSV פאיכ
 
         QString fstr;
         QTextStream oeStream (&fstr, QIODevice::WriteOnly);
+        //
+        // TODO: גûגמה unique_id
+        //
+        oeStream << tDelim << QString("unique_id%1").arg (oeList[i]->id()) << tDelim << fDelim;
         KKSMap<int, KKSCategoryAttr*>::const_iterator pc;
         int j=0;
         for (pc = c->attributes().constBegin(); pc != c->attributes().constEnd(); pc++)
