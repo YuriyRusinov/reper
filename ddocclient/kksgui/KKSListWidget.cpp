@@ -4,6 +4,7 @@
  * Modified: 1 декабря 2008 г. 12:13:21
  * Purpose: Implementation of the class KKSComboBox
  ***********************************************************************/
+#include <QtDebug>
 
 #include "KKSListWidget.h"
 #include "KKSAttrValue.h"

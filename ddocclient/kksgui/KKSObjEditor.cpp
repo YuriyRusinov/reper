@@ -1151,6 +1151,8 @@ void KKSObjEditor :: setValue (int idAttrValue, int sys, QVariant val)
 
             KKSAttrValue * av = sysAttrValues[idAttrValue];
             KKSValue v(val.toString(), av->attribute()->type()->attrType());
+            if (av->attribute()->type()->attrType() == KKSAttrType::atCheckList)
+                v.setValue (QString("{%1}").arg (val.toStringList().join(",")), KKSAttrType::atCheckList);
 
             av->setValue(v);
             isChanged = true;
@@ -1163,6 +1165,9 @@ void KKSObjEditor :: setValue (int idAttrValue, int sys, QVariant val)
 
             KKSAttrValue * av = ioAttrValues[idAttrValue];
             KKSValue v(val.toString(), av->attribute()->type()->attrType());
+            if (av->attribute()->type()->attrType() == KKSAttrType::atCheckList)
+                v.setValue (QString("{%1}").arg (val.toStringList().join(",")), KKSAttrType::atCheckList);
+            qDebug () << __PRETTY_FUNCTION__ << val << val.toString() << v.value(); 
             av->setValue(v);
             isChanged = true;
             break;
@@ -1173,6 +1178,8 @@ void KKSObjEditor :: setValue (int idAttrValue, int sys, QVariant val)
                 return;
             KKSAttrValue * av = ioIndicatorValues [idAttrValue];
             KKSValue v(val.toString(), av->attribute()->type()->attrType());
+            if (av->attribute()->type()->attrType() == KKSAttrType::atCheckList)
+                v.setValue (QString("{%1}").arg (val.toStringList().join(",")), KKSAttrType::atCheckList);
             av->setValue(v);
             isChanged = true;
             break;
