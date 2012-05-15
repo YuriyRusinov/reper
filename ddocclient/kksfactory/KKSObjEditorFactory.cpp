@@ -2539,6 +2539,9 @@ int KKSObjEditorFactory :: setAttributes (const KKSTemplate *t,
         KKSAttrValue *av = NULL;
         if(av1)
             av = new KKSAttrValue(*av1);
+        else if (t->availableAttrs().contains(pa.key())
+                && t->availableAttrs().value(pa.key()))
+            av = new KKSAttrValue (t->availableAttrs().value(pa.key())->defValue(), ca);
         else
             av = new KKSAttrValue(ca->defValue(), ca);
 
