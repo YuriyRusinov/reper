@@ -35,6 +35,8 @@ class _PP_EXPORT KKSTemplate : public KKSRecord
         const KKSMap<int, KKSCategoryAttr *> availableAttrs() const;
         const KKSList<KKSAttrView*> sortedAttrs() const;
 
+        const KKSMap<int, KKSAttrView *> attributes() const;  //возвращает перечень атрибутов, используемых шаблонов. Возвращаются только используемые
+
         const KKSMap<int, KKSAttrGroup *> & groups() const;
         void setGroups(const KKSMap<int, KKSAttrGroup *> & g);
         void addGroup(KKSAttrGroup * g);

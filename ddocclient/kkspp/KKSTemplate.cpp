@@ -211,6 +211,30 @@ const KKSList<KKSAttrView*> KKSTemplate::sortedAttrs() const
     return aViews;
 }
 
+const KKSMap<int, KKSAttrView *> KKSTemplate::attributes() const
+{
+    KKSMap<int, KKSAttrView *> aViews;
+    
+    QList<KKSAttrGroup*> groups = m_groups.values();
+    
+    for (int i=0; i<groups.count(); i++)
+    {
+        KKSAttrGroup * g = groups[i];
+        KKSMap<int, KKSAttrView*> attrs = g->attrViews();
+        QList<KKSAttrView *> attrs_list = attrs.values();
+
+        for (int ii=0; ii<attrs_list.count(); ii++)
+        {
+            KKSAttrView * a = attrs_list [ii];
+            aViews.insert(a->id(), a);
+        }
+    }
+
+    return aViews;
+
+}
+
+
 const KKSMap<int, KKSCategoryAttr *> KKSTemplate::availableAttrs() const
 {
     KKSMap<int, KKSCategoryAttr *> aAttrs;
