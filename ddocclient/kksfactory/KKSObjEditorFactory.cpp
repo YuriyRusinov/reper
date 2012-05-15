@@ -2539,13 +2539,25 @@ int KKSObjEditorFactory :: setAttributes (const KKSTemplate *t,
         KKSAttrValue *av = NULL;
         if(av1)
             av = new KKSAttrValue(*av1);
-        else if (t->availableAttrs().contains(pa.key())
-                && t->availableAttrs().value(pa.key()))
-            av = new KKSAttrValue (t->availableAttrs().value(pa.key())->defValue(), ca);
+        else if (t->attributes().contains(pa.key())
+                && t->attributes().value(pa.key()))
+        {
+            KKSValue v = t->attributes().value(pa.key())->defValue().isNull() ? ca->defValue() : t->attributes().value(pa.key())->defValue();
+            qDebug () << __PRETTY_FUNCTION__ << pa.key() << v.value();
+            av = new KKSAttrValue (v, ca);
+        }
         else
             av = new KKSAttrValue(ca->defValue(), ca);
 
-        KKSValue v = av1 ? av1->value() : KKSValue();
+        KKSValue v;
+        if (av1)
+            v = av1->value();
+        else if (t->attributes().value(pa.key(), 0))
+            v = t->attributes().value(pa.key())->defValue().isNull() ? ca->defValue() : t->attributes().value(pa.key())->defValue();
+        else if (!ca->defValue().isNull())
+            v = ca->defValue();
+        else
+            v = KKSValue();
         
         if (c && ((av && av->attribute()->tableName () == "io_categories") || ca->id () == ATTR_ID_IO_CATEGORY))
         {
@@ -2555,8 +2567,8 @@ int KKSObjEditorFactory :: setAttributes (const KKSTemplate *t,
         {
             v = KKSValue(QString::number (loader->getUserId()), KKSAttrType::atList);
         }
-        if (av->attribute()->code(false)==QString("id_maclabel"))
-            qDebug () << __PRETTY_FUNCTION__ << av->attribute()->code(false) << v.valueForInsert() << v.value();
+        if (av->attribute()->id()==77 or av->attribute()->id()==78)
+            qDebug () << __PRETTY_FUNCTION__ << av->attribute()->id() << v.valueForInsert() << v.value();
 
         av->setValue(v);
 
