@@ -142,7 +142,7 @@ Q_OBJECT
 
 
         QAction *aSaveIO;
-        //MassWidget *m_masscreateW;
+        MassWidget *m_masscreateW;
         
         QLabel * lModeName;
         QLabel * lOrgLogo;

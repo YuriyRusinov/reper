@@ -58,7 +58,8 @@
 #include <QFlags>
 
 KKSMainWindow::KKSMainWindow(QWidget *parent)
-: QMainWindow(parent)
+    : QMainWindow(parent),
+      m_masscreateW (0)
 {
 //    Q_INIT_RESOURCE(icon_set);
 
@@ -318,6 +319,8 @@ void KKSMainWindow::initToolBars()
     tbActions->addAction(ui->aCreateDoc);
     tbActions->addAction(ui->aFindDoc);
     tbActions->addAction(aSaveIO);
+    m_masscreateW = new MassWidget ();
+    tbActions->addWidget (m_masscreateW);
     tbActions->addAction(ui->aPrintDoc);
     
     tbActions->addSeparator();
@@ -383,9 +386,9 @@ void KKSMainWindow::initIcons()
 {
 
     ui->aConnect->setIcon(QIcon(":/ddoc/connect.png"));
-	ui->aChangeUser->setIcon(QIcon(":/ddoc/change_user.png"));
-	ui->aDisconnect->setIcon(QIcon(":/ddoc/disconnect.png"));
-	ui->aConnInfo->setIcon(QIcon(":/ddoc/connection_info.png"));
+    ui->aChangeUser->setIcon(QIcon(":/ddoc/change_user.png"));
+    ui->aDisconnect->setIcon(QIcon(":/ddoc/disconnect.png"));
+    ui->aConnInfo->setIcon(QIcon(":/ddoc/connection_info.png"));
     //ui->aQuit->setIcon();
 
     ui->aCreateDoc->setIcon(QIcon(":/ddoc/new_doc.png"));
@@ -654,8 +657,9 @@ void KKSMainWindow::saveActiveSubWindow()
 
     if (editor)
     {
-        //editor->save (m_masscreateW ? m_masscreateW->num () : 1);
-        editor->save();
+        int num = m_masscreateW ? m_masscreateW->num () : 1;
+        editor->save (num);
+        //editor->save();
         return;
     }
 
