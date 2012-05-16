@@ -312,7 +312,7 @@ int KKSObjEditor :: constructObject()
     
     for (pSysAttrValues=sysAttrValues.constBegin (); pSysAttrValues != sysAttrValues.constEnd(); pSysAttrValues++)
     {
-        const KKSAttrValue *cAttrValue = pSysAttrValues.value();
+         const KKSAttrValue *cAttrValue = pSysAttrValues.value();
         //int idAttr = cAttr->id();
         KKSValue v;
         /*if (cAttr->id() == 97)
@@ -428,6 +428,7 @@ int KKSObjEditor :: constructObject()
         avalList.append (av);
     }
 
+    /*
     if(pObjectEx->attrValue(ATTR_TABLE_NAME) != NULL){
         QString tableName;
         //QString ioCode;
@@ -452,9 +453,9 @@ int KKSObjEditor :: constructObject()
             //}
         //}
     }
-    else{
+    else{*/
         pObjectEx->setAttrValues (avalList);
-    }
+    //}
 
     KKSList<KKSAttrValue*> avalIndList;
     KKSMap<int, KKSAttrValue*>::const_iterator pIndAttrValues;

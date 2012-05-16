@@ -210,6 +210,7 @@ class _F_EXPORT KKSLoader
         friend class KKSSito;
         friend class KKSSitoWeb;
         friend class KKSJMonitor;
+        friend class KKSPPFactory;
       // KKSLoader();
        // ~KKSLoader();
 

@@ -6,6 +6,7 @@
  ***********************************************************************/
 #include <QRegExp>
 #include <QtDebug>
+#include <QHash>
 
 #include "KKSPPFactory.h"
 #include "KKSEIOFactory.h"
@@ -440,7 +441,8 @@ int KKSPPFactory::updateIO(KKSObject * io)
     }
     delete res;
 
-    //переименовываем таблицу
+    //переименовываем таблицу ---делается в триггере
+    /*
     if(tmp->tableName() != io->tableName()){
         QString sql = QString("alter table %1 rename to %1").arg(tmp->tableName()).arg(io->tableName());
         int ok = db->executeCmd(sql);
@@ -450,6 +452,7 @@ int KKSPPFactory::updateIO(KKSObject * io)
             return ERROR_CODE;
         }
     }
+    */
 
     tmp->release();
     
@@ -616,6 +619,19 @@ int KKSPPFactory::updateIO(KKSObject * io)
 
 
     commitRubrics(io->rootRubric());//помечаем рубрики ИО, как созданные а в БД
+
+    KKSObject * io1 = loader->loadedObjects.value(io->id(), NULL);
+    if(!io1)
+        return OK_CODE;
+    
+    loader->loadedObjects.remove(io1->id());
+    io1->release();
+    io->addRef();
+    loader->loadedObjects.insert(io->id(), io);
+    
+   // io->addRef();
+    //    return io;
+   // }
 
     return OK_CODE;
 }

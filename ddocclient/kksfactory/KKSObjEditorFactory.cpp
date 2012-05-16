@@ -2276,7 +2276,7 @@ void KKSObjEditorFactory :: editExistOE (QWidget * editor, int idObject, int idO
 
     if(idObject == IO_IO_ID)
     {
-        io = loader->loadIO(idObjEx, true);
+        io = loader->loadIO(idObjEx, false);
         if(!io)
             return;
         c = io->category();//->tableCategory();
@@ -2567,8 +2567,6 @@ int KKSObjEditorFactory :: setAttributes (const KKSTemplate *t,
         {
             v = KKSValue(QString::number (loader->getUserId()), KKSAttrType::atList);
         }
-        if (av->attribute()->id()==77 or av->attribute()->id()==78)
-            qDebug () << __PRETTY_FUNCTION__ << av->attribute()->id() << v.valueForInsert() << v.value();
 
         av->setValue(v);
 
@@ -3768,7 +3766,7 @@ void KKSObjEditorFactory :: slotOpenRubricItemRequested(int idObject, KKSObjEdit
     emit editorCreated(newObjEditor);
 }
 
-/* Слот выбирает подходящий пользовательский шаблон и перегруппировыввает атрибуты.
+/* Слот выбирает подходящий пользовательский шаблон и перегруппировывает атрибуты.
  */
 void KKSObjEditorFactory :: regroupAttrs (QWidget *wIOAttr, QScrollArea *scIOattr, QWidget *ioAttrs, int idObj, const KKSCategory *c, bool isSystem, KKSObjEditor *editor)
 {
