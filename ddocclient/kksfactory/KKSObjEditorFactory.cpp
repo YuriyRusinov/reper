@@ -1602,7 +1602,7 @@ void KKSObjEditorFactory :: saveObjectEx (KKSObjEditor * editor, KKSObjectExempl
 
     if (wObjE->id() >=0 && num > 1)
     {
-        QMessageBox::warning (editor, tr ("Warning"), tr ("Save IO copy. Only existing copy will be updated"), QMessageBox::Ok);
+        QMessageBox::warning (editor, tr ("Warning"), tr ("Save IO copy. Only current copy will be updated"), QMessageBox::Ok);
     }
     bool isNew (wObjE->id() < 0);
 

@@ -8,25 +8,29 @@ class QSpinBox;
 
 class MassWidget : public QWidget
 {
-    public:
-        MassWidget (QWidget *parent=0, Qt::WindowFlags f=0);
-        virtual ~MassWidget (void);
+public:
+    MassWidget (QWidget *parent=0, Qt::WindowFlags f=0);
+    virtual ~MassWidget (void);
 
-        bool isMass (void) const;
-        int num (void) const;
+    bool isMass (void) const;
+    int num (void) const;
 
-    private slots:
-        void setMass (int state);
+private slots:
+    void setMass (int state);
+    void setNumb (int val);
 
-    private:
-        //
-        // Variables
-        //
-        QCheckBox * chMass;
-        QSpinBox *sbNum;
+signals:
+    void setNum (int);
 
-    private:
-        Q_OBJECT
+private:
+    //
+    // Variables
+    //
+    QCheckBox * chMass;
+    QSpinBox *sbNum;
+
+private:
+    Q_OBJECT
 };
 
 #endif

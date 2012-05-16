@@ -747,6 +747,9 @@ void KKSMainWindow::slotCreateNewObjEditor(KKSObjEditor * objEditor)
     objEditor->setWindowState (objEditor->windowState() | Qt::WindowMaximized | Qt::WindowActive);
     m_objEditorW->setWindowState (m_objEditorW->windowState() | Qt::WindowMaximized | Qt::WindowActive);
     objEditor->show();//Maximized();
+    objEditor->setNumCopies (m_masscreateW->num());
+
+    connect (this->m_masscreateW, SIGNAL (setNum(int)), objEditor, SLOT (setNumCopies (int)) );
     //    qDebug () << __PRETTY_FUNCTION__ << objEditor->size () << m_objEditorW->size ();
 //    }
 //    else

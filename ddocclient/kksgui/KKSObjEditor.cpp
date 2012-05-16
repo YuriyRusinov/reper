@@ -92,6 +92,7 @@ KKSObjEditor :: KKSObjEditor (const KKSTemplate *t,
     m_draft (false),
     m_showExecButton(false),
     indNumW (-1),
+    numCopies (1),
     pbOk (mode ? new QPushButton (tr("&OK")) : 0),
     pbCancel (mode ? new QPushButton (tr("&Cancel")) : 0),
     pbApply (mode ? new QPushButton (tr("&Apply")) : 0),
@@ -297,7 +298,7 @@ void KKSObjEditor :: accept (void)
 {
     if (constructObject () == ERROR_CODE)
         return;
-    this->saveToDb ();
+    this->saveToDb (numCopies);
     if (!isChanged)
     {
         KKSDialog::accept ();
@@ -734,10 +735,11 @@ int KKSObjEditor :: constructObject()
 
 int KKSObjEditor :: apply (int num)
 {
+    Q_UNUSED (num);
     int res = constructObject();
     if (res == ERROR_CODE)
         return res;
-    this->saveToDb (num);
+    this->saveToDb (numCopies);// : num);
     return res;
 }
 
@@ -1651,7 +1653,7 @@ void KKSObjEditor :: setAttrView (void)
             return;
         else if (res == QMessageBox::Yes)
         {
-            int res = apply (1);
+            int res = apply (numCopies);
             if (res == ERROR_CODE)
                 return;
         }
@@ -2103,3 +2105,7 @@ void KKSObjEditor :: addIndicator (void)
     emit addIOIndicator (pObj, indW);
 }
  */
+void KKSObjEditor :: setNumCopies (int n)
+{
+    numCopies = n;
+}

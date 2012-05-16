@@ -19,6 +19,7 @@ MassWidget :: MassWidget (QWidget *parent, Qt::WindowFlags f)
     this->setMass (chMass->checkState());
     sbNum->setRange (1, 1000);
     connect (chMass, SIGNAL (stateChanged (int)), this, SLOT (setMass(int)) );
+    connect (sbNum, SIGNAL (valueChanged(int)), this, SLOT (setNumb(int)) );
 }
 
 MassWidget :: ~MassWidget (void)
@@ -47,4 +48,10 @@ void MassWidget :: setMass (int state)
 {
     bool isEnable (state == Qt::Checked);
     sbNum->setEnabled (isEnable);
+    emit setNum (num());
+}
+
+void MassWidget :: setNumb (int val)
+{
+    emit setNum (val);
 }

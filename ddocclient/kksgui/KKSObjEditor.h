@@ -233,6 +233,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void slotIncludeSelected(int idObject, QString name);
         void slotIncludeRequested();
         void slotOpenRubricItemRequested(int idObject);
+        void setNumCopies (int n);
 
    protected:
         //
@@ -358,6 +359,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         QMap<QToolButton *, int> tbDelInds;
         QMap<int, QWidget *> indWidgets;
         QMap<int, QLabel *> indLabels;*/
+        int numCopies;
 
         QList<int> hAttrWidths;
 
