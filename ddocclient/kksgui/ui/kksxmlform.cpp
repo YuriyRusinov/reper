@@ -220,7 +220,10 @@ void KKSXMLForm :: xmlParse (void)
     if (c)
         c->release ();
 
-    c = new KKSCategory ();
+    if (io && io->category() && io->category()->tableCategory())
+        c = new KKSCategory (*io->category()->tableCategory());
+    else
+        c = new KKSCategory ();
     QStringList codeList;
     attrCodes.clear ();
     for (int i=0; i<nAttrs; i++)

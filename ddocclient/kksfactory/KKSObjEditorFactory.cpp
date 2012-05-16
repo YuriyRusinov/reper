@@ -274,7 +274,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
     QGridLayout *gRecAttrLay = new QGridLayout ();
     sysRecAttrWidget->setLayout (gRecAttrLay);
 
-    if (tRecAttr)
+    if (tRecAttr && !tRecAttr->attributes().isEmpty())
     {
         QScrollArea *scIndAttrs = new QScrollArea (sysRecAttrWidget);
         scIndAttrs->setWidgetResizable (true);
@@ -4117,15 +4117,25 @@ void KKSObjEditorFactory :: importCSV (QIODevice *csvDev, QString codeName, QStr
     }
 }
 
+/* Метод осуществляет импорт экземпляров справочника из матрицы строк в БД.
+ * Параметры :
+ * io -- целевой информационный объект-справочник
+ * attrCodeList -- список кодов атрибутов
+ * oesList -- список импортируемых записей должен соответствовать категории ИО
+ * oEditor -- редактор Ио-справочника
+ * cat -- категория справочника должна соответствовать категории таблиц справочника ИО
+ * tableName -- название целевой таблицы
+ */
 void KKSObjEditorFactory :: importCopies (KKSObject *io, const QStringList& attrCodeList, const QList<QStringList>& oesList, KKSObjEditor *oEditor, const KKSCategory *cat, const QString& tableName)
 {
     if (!io || !oEditor)
         return;
-    Q_UNUSED (attrCodeList);
+/*    Q_UNUSED (attrCodeList);
     Q_UNUSED (oesList);
     Q_UNUSED (cat);
     Q_UNUSED (tableName);
-    /*
+ */
+
     KKSList<KKSObjectExemplar *> oeList;
     int n = oesList.count();
     int m = attrCodeList.count();
@@ -4174,10 +4184,10 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io, const QStringList& attr
             }
             QString attrCode = attrCodeList[j];
             //qDebug () << __PRETTY_FUNCTION__ << attrCode;
-            KKSAttribute *attr = loader->loadAttribute (attrCode);
+            KKSAttribute *attr = loader->loadAttribute (attrCode, io->tableName());
             if (!attr)
                 continue;
-            KKSCategoryAttr *cAttr = KKSCategoryAttr::create (attr, false, false);
+            const KKSCategoryAttr *cAttr = cat->attribute(attr->id());//KKSCategoryAttr::create (attr, false, false);
             if (!cAttr)
             {
                 attr->release ();
@@ -4188,14 +4198,13 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io, const QStringList& attr
             KKSValue val (oesList[i][j], iType);//cAttr->type()->attrType());
             //if (iType == KKSAttrType :: atSVG)
                 //qDebug () << __PRETTY_FUNCTION__ << cAttr->code (true) << val.value() << iType << val.isNull();
-            KKSAttrValue *av = new KKSAttrValue (val, cAttr);
+            KKSAttrValue *av = new KKSAttrValue (val, const_cast<KKSCategoryAttr*>(cAttr));
             if (av)
             {
                 oe->addAttrValue (av);
                 av->release ();
             }
             attr->release ();
-            cAttr->release ();
         }
         oeList.append (oe);
         oe->release ();
@@ -4238,7 +4247,6 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io, const QStringList& attr
     tChild->release ();
     pImportD->setParent (0);
     delete pImportD;
-    */
 }
 
 /* Метод осуществляет экспорт содержимого ИО-справочника.
