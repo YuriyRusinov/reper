@@ -4529,6 +4529,7 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // צוכוגמי CSV פאיכ
                                 pc.value()->type()->attrType() == KKSAttrType::atBool
                                 )
                             {
+                                qDebug () << __PRETTY_FUNCTION__ << (av ? av->value().value () : QString());
                                 oeStream << (av ? av->value().value() : QString());
                             }
                             else
@@ -4540,6 +4541,7 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // צוכוגמי CSV פאיכ
                                     av_str.replace (QChar('\''), QString("\\'"), Qt::CaseInsensitive);
                                     av_str.replace (tDelim, QString("\\%1").arg (tDelim), Qt::CaseInsensitive);
                                 }
+                                qDebug () << __PRETTY_FUNCTION__ << tDelim << av_str << tDelim;
                                 oeStream << tDelim << av_str << tDelim;
                             }
                         }
