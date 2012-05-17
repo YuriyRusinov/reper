@@ -73,7 +73,7 @@ begin
     end if;
 
     --в противном случае просто помечаем значение атрибута как неактуальное. Сохраняем его в истории
-    update "tbl_attrs_values" set is_actual = false, stop_time = current_timestamp where id_io_object = ii_id_io_object and id_attr_category = ii_id_attr_category;
+    update "tbl_attrs_values" set is_actual = false, stop_time = current_timestamp where id_io_object = ii_id_io_object and id_attr_category = ii_id_attr_category and is_actual = true;
     
     return 1; 
 end 
@@ -106,7 +106,7 @@ begin
         select * from tbl_attrs_values where id_io_object = old_id_io_object and id_attr_category = old_id_attr_category and is_actual = true
     loop
         if(r.value = iValue and 
-           r.meas_time = iMeasTime and 
+           --r.meas_time = iMeasTime and 
            ((r.id_io_object_src isnull and iIdObjectSrc isnull) or r.id_io_object_src = iIdObjectSrc) and 
            ((r.id_io_object_src1 isnull and iIdObjectSrc1 isnull) or r.id_io_object_src1 = iIdObjectSrc1) and 
            ((r.description isnull and iDesc isnull) or r.description = iDesc)
@@ -116,7 +116,7 @@ begin
     end loop;
 
     --помечаем текущее значение атрибута как неактуальное. Сохраняем его в истории
-    update "tbl_attrs_values" set is_actual = false, stop_time = current_timestamp where id_io_object = old_id_io_object and id_attr_category = old_id_attr_category;
+    update "tbl_attrs_values" set is_actual = false, stop_time = current_timestamp where id_io_object = old_id_io_object and id_attr_category = old_id_attr_category and is_actual = true;
 
     --потом создаем новое, как копию и присваиваем новые значения
     insert into "tbl_attrs_values" (id_io_object, id_attr_category, "value", start_time, stop_time, meas_time, id_io_object_src, id_io_object_src1, is_actual, description) 

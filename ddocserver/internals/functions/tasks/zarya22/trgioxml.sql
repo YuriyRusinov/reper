@@ -33,6 +33,10 @@ begin
     end if;
 
     xml2Text = xmlText(val);
+    if(xml2Text isnull or trim(xml2Text) = '') then
+        raise exception E'Error! This message should be sended to legacy system\'s position. But XML2Text has NULL value. Nothing to send!';
+        return NULL;
+    end if;
 
     
 

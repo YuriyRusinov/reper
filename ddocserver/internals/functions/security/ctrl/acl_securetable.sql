@@ -22,6 +22,8 @@ declare
     sUpdateValues varchar;
     updateIndex int4;
     isExist int4;
+
+    dropFuncsQuery varchar;
     
 begin
 
@@ -46,8 +48,7 @@ begin
     q = q || ' security definer;';
     --raise warning '%', q;
     --return 1;
-    execute q;
-    
+    execute q;    
 
     --q = 'create or replace view ' || tableName || ' as select * from tbl_' || tableName || ' where true = getPrivilege(getCurrentUser(), ioGetObjectIDByTableName(' || quote_literal(tableName) || '), 2, true);';
     q = 'create or replace view "' || tableName || '" as select * from "f_sel_' || tableName || '"()';
@@ -151,6 +152,19 @@ begin
     qRuleUpdate = 'create or replace rule "r_upd_' || tableName || '" as on update to "' || tableName || '" do instead select "f_upd_' || tableName || '" (' || sRuleAttrs || ');';
     --raise warning E'%\n\n', qRuleUpdate;
     execute qRuleUpdate;
+
+    --данная функция будет при необходимости удалять функции, создаваемые в данной процедуре
+    --функция должна создаваться как выполняемая не с правами администратора
+    dropFuncsQuery := 'create or replace function "f_drop_funcs_' || tableName || E'"() returns int4 as \n\$BODY\$\n';
+    dropFuncsQuery := dropFuncsQuery || E'begin \n';
+    dropFuncsQuery := dropFuncsQuery || ' drop function f_sel_' || tableName || E'();\n';
+    dropFuncsQuery := dropFuncsQuery || ' drop function f_del_' || tableName || E'(int8);\n';
+    dropFuncsQuery := dropFuncsQuery || ' drop function f_ins_' || tableName || E'(' || sParams || E');\n';
+    dropFuncsQuery := dropFuncsQuery || ' drop function f_upd_' || tableName || E'(' || sParams || E');\n';
+    dropFuncsQuery := dropFuncsQuery || E' return 1;\n end \n\$BODY\$ \nlanguage ' || quote_literal('plpgsql');
+
+    execute dropFuncsQuery;
+
 
     return 1; 
 end
