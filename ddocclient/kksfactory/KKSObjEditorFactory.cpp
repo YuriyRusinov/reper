@@ -4524,13 +4524,62 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // צוכוגמי CSV פאיכ
                             KKSAttrValue * av = oeList[i]->attrValueIndex (j);//pc.key());
                             if (pc.value()->type()->attrType() == KKSAttrType::atDouble || 
                                 pc.value()->type()->attrType() == KKSAttrType::atInt || 
-                                pc.value()->type()->attrType() == KKSAttrType::atList || 
-                                pc.value()->type()->attrType() == KKSAttrType::atParent || 
                                 pc.value()->type()->attrType() == KKSAttrType::atBool
                                 )
                             {
                                 qDebug () << __PRETTY_FUNCTION__ << (av ? av->value().value () : QString());
                                 oeStream << (av ? av->value().value() : QString());
+                            }
+                            else if (pc.value()->type()->attrType() == KKSAttrType::atList || 
+                                     pc.value()->type()->attrType() == KKSAttrType::atParent ||
+                                     pc.value()->type()->attrType() == KKSAttrType::atRecordColorRef ||
+                                     pc.value()->type()->attrType() == KKSAttrType::atRecordTextColorRef)
+                            {
+                                KKSAttrValue * av = oeList[i]->attrValueIndex (j);//pc.key());
+                                if (!av)
+                                {
+                                    oeStream << QString();
+                                    continue;
+                                }
+                                QMap<int, QString> values;
+                                QMap<int, QString> refColumnValues;
+                                if (pc.value()->type()->attrType() != KKSAttrType::atParent)
+                                {
+                                    QString tName = av->attribute()->tableName ();
+                                    KKSObject * refObj = loader->loadIO (tName, true);
+                                    if (!refObj)
+                                        break;
+
+                                    KKSCategory * cRef = refObj->category();
+                                    if (!cRef)
+                                    {
+                                        refObj->release ();
+                                        break;
+                                    }
+                                    bool isXml = false;
+                                    cRef = cRef->tableCategory();
+                                    if (cRef)
+                                        isXml = isXml || cRef->isAttrTypeContains(KKSAttrType::atXMLDoc) || cRef->isAttrTypeContains (KKSAttrType::atSVG);
+                                    refObj->release ();
+
+                                    values = loader->loadAttributeValues (av->attribute(), 
+                                                                        refColumnValues,
+                                                                        isXml, 
+                                                                        !isXml, 
+                                                                        QString::null, 
+                                                                        KKSList<const KKSFilterGroup*>());
+
+                                }
+                                else
+                                {
+                                    values = loader->loadAttributeValues (av->attribute(), 
+                                                                        refColumnValues,
+                                                                        true, 
+                                                                        true, 
+                                                                        av->attribute()->tableName(),
+                                                                        KKSList<const KKSFilterGroup*>());
+                                }
+
                             }
                             else
                             {
