@@ -4193,7 +4193,80 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io, const QStringList& attr
             }
             KKSAttrType :: KKSAttrTypes iType = cAttr->type()->attrType();
             //qDebug () << __PRETTY_FUNCTION__ << iType << cAttr->code (true) << attr->code (true);
-            KKSValue val (oesList[i][j], iType);//cAttr->type()->attrType());
+            KKSValue val;// (oesList[i][j], iType);//cAttr->type()->attrType());
+            if (iType == KKSAttrType::atList || 
+                iType == KKSAttrType::atParent ||
+                iType == KKSAttrType::atRecordColorRef ||
+                iType == KKSAttrType::atRecordTextColorRef)
+            {
+                QString av_str (oesList[i][j]);
+                KKSValue refVal (av_str, cAttr->refType()->attrType());
+                QMap<int, QString> values;
+                QMap<int, QString> refColumnValues;
+                if (iType != KKSAttrType::atParent)
+                {
+                    QString tName = cAttr->tableName ();
+                    KKSObject * refObj = loader->loadIO (tName, true);
+                    if (!refObj)
+                        continue;
+
+                    KKSCategory * cRef = refObj->category();
+                    if (!cRef)
+                    {
+                        refObj->release ();
+                        continue;
+                    }
+                    bool isXml = false;
+                    cRef = cRef->tableCategory();
+                    if (cRef)
+                        isXml = isXml || cRef->isAttrTypeContains(KKSAttrType::atXMLDoc) || cRef->isAttrTypeContains (KKSAttrType::atSVG);
+                    int iVal (-1);
+                    KKSAttribute * rattr = loader->loadAttribute (cAttr->columnName(), tName);
+                    if (!rattr)
+                    {
+                        refObj->release ();
+                        continue;
+                    }
+                    KKSCategoryAttr * refAttr = cRef->attribute(rattr->id());
+                    
+                    values = loader->loadAttributeValues (cAttr, refColumnValues, isXml, !isXml, QString(), KKSList<const KKSFilterGroup*>());
+                    for (QMap<int, QString>::iterator pv=values.begin(); pv!= values.end(); pv++)
+                    {
+                        pv.value().replace (QChar('\n'), QString("\\n"), Qt::CaseInsensitive);
+                        pv.value().replace (QChar('\''), QString("\\'"), Qt::CaseInsensitive);
+                        pv.value().replace (QChar('\"'), QString("\\\""), Qt::CaseInsensitive);
+                    }
+                    //qDebug () << __PRETTY_FUNCTION__ << QString::compare (values.begin().value().mid (0, 100), refVal.value().mid (0, 100), Qt::CaseInsensitive) << values.begin().value().mid (1, 100) << refVal.value().mid(1, 100) << oesList[i][j].size();
+                    int pkey = values.key (refVal.value(), -1);
+                    QMap<int, QString>::const_iterator pv = values.constFind (pkey);
+                    if (pv != values.constEnd())
+                        val = KKSValue (QString::number (pv.key()), iType);
+                    else
+                        val = KKSValue (QString(), iType);
+                    rattr->release ();
+                    refObj->release ();
+
+                }
+                else
+                {
+                    values = loader->loadAttributeValues (cAttr, refColumnValues, true, true, QString(), KKSList<const KKSFilterGroup*>());
+                    for (QMap<int, QString>::iterator pv=values.begin(); pv!= values.end(); pv++)
+                    {
+                        pv.value().replace (QChar('\n'), QString("\\n"), Qt::CaseInsensitive);
+                        pv.value().replace (QChar('\''), QString("\\'"), Qt::CaseInsensitive);
+                        pv.value().replace (QChar('\"'), QString("\\\""), Qt::CaseInsensitive);
+                    }
+                    //qDebug () << __PRETTY_FUNCTION__ << QString::compare (values.begin().value().mid (0, 100), refVal.value().mid (0, 100), Qt::CaseInsensitive) << values.begin().value().mid (1, 100) << refVal.value().mid(1, 100) << oesList[i][j].size();
+                    int pkey = values.key (refVal.value(), -1);
+                    QMap<int, QString>::const_iterator pv = values.constFind (pkey);
+                    if (pv != values.constEnd())
+                        val = KKSValue (QString::number (pv.key()), iType);
+                    else
+                        val = KKSValue (QString(), iType);
+                }
+            }
+            else
+                val = KKSValue (oesList[i][j], iType);
             //if (iType == KKSAttrType :: atSVG)
                 //qDebug () << __PRETTY_FUNCTION__ << cAttr->code (true) << val.value() << iType << val.isNull();
             KKSAttrValue *av = new KKSAttrValue (val, const_cast<KKSCategoryAttr*>(cAttr));
@@ -4548,13 +4621,13 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // צוכוגמי CSV פאיכ
                                     QString tName = av->attribute()->tableName ();
                                     KKSObject * refObj = loader->loadIO (tName, true);
                                     if (!refObj)
-                                        break;
+                                        continue;
 
                                     KKSCategory * cRef = refObj->category();
                                     if (!cRef)
                                     {
                                         refObj->release ();
-                                        break;
+                                        continue;
                                     }
                                     bool isXml = false;
                                     cRef = cRef->tableCategory();
@@ -4579,6 +4652,39 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // צוכוגמי CSV פאיכ
                                                                         av->attribute()->tableName(),
                                                                         KKSList<const KKSFilterGroup*>());
                                 }
+                                int iVal = 0;
+                                QVariant cV = av->value().valueVariant();
+                                if (av->attribute()->refColumnName().isEmpty() || 
+                                    av->attribute()->refColumnName() == "id")
+                                {
+                                    bool ok = false;
+                                    iVal = cV.toString().toInt(&ok);
+                                    if(!ok){
+                                        int id = refColumnValues.key(cV.toString());
+                                        if (id > 0)
+                                            iVal = id;
+                                    }
+                                }
+                                else{
+                                    int id = refColumnValues.key(cV.toString());
+                                    if (id > 0)
+                                        iVal = id;
+                                }
+
+                                QMap<int, QString>::const_iterator pv = values.constFind (iVal);
+                                if (pv != values.constEnd())
+                                {
+                                    QString av_str (pv.value());
+                                    if (!av_str.isEmpty ())
+                                    {
+                                        av_str.replace (QChar('\n'), QString("\\n"), Qt::CaseInsensitive);
+                                        av_str.replace (QChar('\''), QString("\\'"), Qt::CaseInsensitive);
+                                        av_str.replace (tDelim, QString("\\%1").arg (tDelim), Qt::CaseInsensitive);
+                                    }
+                                    oeStream << tDelim << av_str << tDelim;
+                                }
+                                else
+                                    oeStream << tDelim << QString() << tDelim;
 
                             }
                             else
