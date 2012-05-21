@@ -4687,6 +4687,85 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // צוכוגמי CSV פאיכ
                                     oeStream << tDelim << QString() << tDelim;
 
                             }
+                            else if (pc.value()->type()->attrType() == KKSAttrType::atCheckList ||
+                                     pc.value()->type()->attrType() == KKSAttrType::atCheckListEx)
+                            {
+                                KKSAttrValue * av = oeList[i]->attrValueIndex (j);//pc.key());
+                                if (!av)
+                                {
+                                    oeStream << QString();
+                                    continue;
+                                }
+                                QMap<int, QString> values;
+                                QMap<int, QString> refColumnValues;
+                                QString tName = av->attribute()->tableName ();
+                                KKSObject * refObj = loader->loadIO (tName, true);
+                                if (!refObj)
+                                    continue;
+
+                                KKSCategory * cRef = refObj->category();
+                                if (!cRef)
+                                {
+                                    refObj->release ();
+                                    continue;
+                                }
+                                bool isXml = false;
+                                cRef = cRef->tableCategory();
+                                if (cRef)
+                                    isXml = isXml || cRef->isAttrTypeContains(KKSAttrType::atXMLDoc) || cRef->isAttrTypeContains (KKSAttrType::atSVG);
+                                refObj->release ();
+
+                                values = loader->loadAttributeValues (av->attribute(), 
+                                                                      refColumnValues,
+                                                                      isXml, 
+                                                                      !isXml, 
+                                                                      QString::null, 
+                                                                      KKSList<const KKSFilterGroup*>());
+
+                                QVariant cV = av->value().valueVariant();
+                                QList<int> iVals;
+                                QStringList sVals;
+                                if (av->attribute()->refColumnName().isEmpty() || 
+                                    av->attribute()->refColumnName() == "id")
+                                {
+                                    bool ok = false;
+                                    sVals = cV.toStringList();//toInt(&ok);
+                                    for (int ii=0; ii<sVals.count(); ii++)
+                                        iVals.append (sVals[ii].toInt());
+                                }
+                                else{
+                                    sVals = cV.toStringList();
+                                    for (int ii=0; ii<sVals.count(); ii++)
+                                    {
+                                        int id = refColumnValues.key(sVals[ii]);
+                                        if (id > 0)
+                                            iVals.append (id);
+                                    }
+                                }
+                                qDebug () << __PRETTY_FUNCTION__ << iVals << cV;
+
+                                oeStream << QString("{");
+                                for (int ii=0; ii<iVals.count(); ii++)
+                                {
+                                    QMap<int, QString>::const_iterator pv = values.constFind (iVals[ii]);
+                                    if (pv != values.constEnd())
+                                    {
+                                        QString av_str (pv.value());
+                                        if (!av_str.isEmpty ())
+                                        {
+                                            av_str.replace (QChar('\n'), QString("\\n"), Qt::CaseInsensitive);
+                                            av_str.replace (QChar('\''), QString("\\'"), Qt::CaseInsensitive);
+                                            av_str.replace (tDelim, QString("\\%1").arg (tDelim), Qt::CaseInsensitive);
+                                        }
+                                        oeStream << tDelim << av_str << tDelim;
+                                    }
+                                    else
+                                        oeStream << tDelim << QString() << tDelim;
+                                    if (ii<iVals.count()-1)
+                                        oeStream << fDelim;
+                                }
+                                oeStream << QString("}");
+                            }
                             else
                             {
                                 QString av_str = (av ? av->value().value() : QString());
