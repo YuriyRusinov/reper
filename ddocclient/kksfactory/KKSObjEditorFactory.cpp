@@ -4073,7 +4073,17 @@ void KKSObjEditorFactory :: importCSV (QIODevice *csvDev, QString codeName, QStr
         {
             for (int i=0; i<lineData.count(); )
             {
-                while (lineData[i].startsWith (tDelim) && (!lineData[i].endsWith (tDelim) ||lineData[i].endsWith (QString("\\%1").arg (tDelim)) ))
+                if (lineData[i].startsWith ("{"))
+                {
+                    while (!lineData[i].endsWith("}"))
+                    {
+                        lineData[i] += (i < lineData.count()-1 ? QString (",%1").arg (lineData[i+1]) : tDelim);
+                        if (i < lineData.count()-1)
+                            lineData.removeAt (i + 1);
+                    }
+                }
+                while (lineData[i].startsWith (tDelim) && (!lineData[i].endsWith (tDelim) ||
+                                                            lineData[i].endsWith (QString("\\%1").arg (tDelim)) ))
                 {
                     lineData[i] += fDelim + (i < lineData.count()-1 ? lineData[i+1] : tDelim);
                     if (i < lineData.count()-1)
@@ -4085,7 +4095,7 @@ void KKSObjEditorFactory :: importCSV (QIODevice *csvDev, QString codeName, QStr
 
         if (lineData.count() != dataModel->columnCount())
         {
-            qDebug () << __PRETTY_FUNCTION__ << lineData.count() << dataModel->columnCount() << fstr;
+            qDebug () << __PRETTY_FUNCTION__ << lineData.count() << dataModel->columnCount() << lineData;
             if (dataModel->rowCount())
                 dataModel->removeRows (0, dataModel->rowCount());
             QMessageBox::warning (xmlForm, tr("Import data"), tr ("Inconsistence data on row %1").arg (i0));
@@ -4264,6 +4274,60 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io, const QStringList& attr
                     else
                         val = KKSValue (QString(), iType);
                 }
+            }
+            else if (iType == KKSAttrType::atCheckList ||
+                        iType == KKSAttrType::atCheckListEx)
+            {
+                QString av_str (oesList[i][j].mid(oesList[i][j].indexOf("{")+1, oesList[i][j].lastIndexOf("}")-1));
+                QStringList rValues = av_str.split (",");
+                QMap<int, QString> values;
+                QMap<int, QString> refColumnValues;
+                QString tName = cAttr->tableName ();
+                KKSObject * refObj = loader->loadIO (tName, true);
+                if (!refObj)
+                    continue;
+
+                KKSCategory * cRef = refObj->category();
+                if (!cRef)
+                {
+                    refObj->release ();
+                    continue;
+                }
+                bool isXml = false;
+                cRef = cRef->tableCategory();
+                if (cRef)
+                    isXml = isXml || cRef->isAttrTypeContains(KKSAttrType::atXMLDoc) || cRef->isAttrTypeContains (KKSAttrType::atSVG);
+                int iVal (-1);
+                KKSAttribute * rattr = loader->loadAttribute (cAttr->columnName(), tName);
+                if (!rattr)
+                {
+                    refObj->release ();
+                    continue;
+                }
+                KKSCategoryAttr * refAttr = cRef->attribute(rattr->id());
+
+                values = loader->loadAttributeValues (cAttr, refColumnValues, isXml, !isXml, QString(), KKSList<const KKSFilterGroup*>());
+                for (QMap<int, QString>::iterator pv=values.begin(); pv!= values.end(); pv++)
+                {
+                    pv.value().replace (QChar('\n'), QString("\\n"), Qt::CaseInsensitive);
+                    pv.value().replace (QChar('\''), QString("\\'"), Qt::CaseInsensitive);
+                    pv.value().replace (QChar('\"'), QString("\\\""), Qt::CaseInsensitive);
+                }
+                //qDebug () << __PRETTY_FUNCTION__ << rValues << values;
+                QList<int> pKeys;
+                for (int ii=0; ii<rValues.count(); ii++)
+                {
+                    int pkey = values.key (rValues[ii].mid(1, rValues[ii].count()-2), -1);
+                    if (pkey > 0)
+                        pKeys.append (pkey);
+                }
+                QString vArr ("{");
+                for (int ii=0; ii<pKeys.count(); ii++)
+                    vArr += QString("%1%2").arg (pKeys[ii]).arg (ii<pKeys.count()-1 ? QString (",") : QString("}"));
+                qDebug () << __PRETTY_FUNCTION__ << vArr;
+                val = KKSValue (vArr, iType);
+                rattr->release ();
+                refObj->release ();
             }
             else
                 val = KKSValue (oesList[i][j], iType);
