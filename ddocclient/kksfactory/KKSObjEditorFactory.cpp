@@ -4068,7 +4068,8 @@ void KKSObjEditorFactory :: importCSV (QIODevice *csvDev, QString codeName, QStr
     {
         QString fstr = csvStrings[i0];
         QStringList lineData;
-        QString escFDelim = QString("%1(?!(\\{(.)*(%1)*(.)*\\}))").arg (QRegExp::escape(fDelim));
+        QString escFDelim = QString("%1").arg (QRegExp::escape(fDelim));
+        // (?!(\\{(.)*(%1)*(.)*\\}))
         //escFDelim += QString("(({(.)*}))*");//[\^(\{%1*\})]").arg (QRegExp::escape (fDelim));
         QRegExp fRegExp(escFDelim);
         lineData = fstr.split (fRegExp);
@@ -4291,6 +4292,13 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io, const QStringList& attr
             {
                 QString av_str (oesList[i][j].mid(oesList[i][j].indexOf("{")+1, oesList[i][j].lastIndexOf("}")-1));
                 QStringList rValues = av_str.split (",");
+                for (int ii=0; ii<rValues.count(); ii++)
+                {
+                    if (rValues[ii].startsWith("\""))
+                        rValues[ii] = rValues[ii].mid (1);
+                    if (rValues[ii].endsWith("\""))
+                        rValues[ii] = rValues[ii].mid (0, rValues[ii].size()-1);
+                }
                 QMap<int, QString> values;
                 QMap<int, QString> refColumnValues;
                 QString tName = cAttr->tableName ();
@@ -4328,8 +4336,8 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io, const QStringList& attr
                 QList<int> pKeys;
                 for (int ii=0; ii<rValues.count(); ii++)
                 {
-                    qDebug () << __PRETTY_FUNCTION__ << QString::compare (rValues[ii].mid (2, 50), values.constBegin().value().mid (1, 50), Qt::CaseInsensitive) << rValues[ii].mid (1, 50) << values.constBegin().value().mid (1, 50);
-                    int pkey = values.key (rValues[ii].mid(1, rValues[ii].count()-2), -1);
+                    qDebug () << __PRETTY_FUNCTION__ << QString::compare (rValues[ii], values.constBegin().value(), Qt::CaseInsensitive) << rValues[ii] << values.constBegin().value();
+                    int pkey = values.key (rValues[ii], -1);
                     if (pkey > 0)
                         pKeys.append (pkey);
                 }
