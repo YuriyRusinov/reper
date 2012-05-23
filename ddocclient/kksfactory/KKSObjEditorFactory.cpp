@@ -4086,7 +4086,7 @@ void KKSObjEditorFactory :: importCSV (QIODevice *csvDev, QString codeName, QStr
                     while (!lineData[i].endsWith("}"))
                     {
                         lineData[i] += (i < lineData.count()-1 ? QString (",%1").arg (lineData[i+1]) : tDelim);
-                        qDebug () << __PRETTY_FUNCTION__ << lineData[i];
+                        //qDebug () << __PRETTY_FUNCTION__ << lineData[i];
                         if (i < lineData.count()-1)
                             lineData.removeAt (i + 1);
                     }
@@ -4100,7 +4100,7 @@ void KKSObjEditorFactory :: importCSV (QIODevice *csvDev, QString codeName, QStr
                     if (i < lineData.count()-1)
                         lineData.removeAt (i + 1);
                 }
-                qDebug () << __PRETTY_FUNCTION__ << lineData[i];
+                //qDebug () << __PRETTY_FUNCTION__ << lineData[i];
                 i++;
             }
         }

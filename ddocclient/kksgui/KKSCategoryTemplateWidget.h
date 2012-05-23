@@ -107,7 +107,7 @@ class _GUI_EXPORT KKSCategoryTemplateWidget : public KKSDialog
 
         QToolBar * tbCatTempl;
         QAction * actAddC;
-        QAction * actAddCopyC;
+        //QAction * actAddCopyC;
         QAction * actAddConBase;
         QAction *actAddT;
 

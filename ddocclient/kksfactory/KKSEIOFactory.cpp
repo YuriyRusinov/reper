@@ -707,8 +707,6 @@ int KKSEIOFactory::insertEIOList(KKSList<KKSObjectExemplar*> eioList, const KKSC
     if(count == 0)
         return OK_CODE;
     
-    db->begin();
-
     if (pgDial)
     {
         pgDial->setMinimum (0);
@@ -719,6 +717,7 @@ int KKSEIOFactory::insertEIOList(KKSList<KKSObjectExemplar*> eioList, const KKSC
     {
         if (pgDial)
             pgDial->setValue (i);
+        db->begin();
         KKSObjectExemplar * eio = eioList.at(i);
 //        if(!eio->io() || eio->io()->tableName() != table){
 //            db->rollback();
@@ -728,11 +727,11 @@ int KKSEIOFactory::insertEIOList(KKSList<KKSObjectExemplar*> eioList, const KKSC
         int res = insertEIO(eio, cat, table);
         if(res != OK_CODE){
             db->rollback();
-            return ERROR_CODE;
+            continue;
         }
+        db->commit();
     }
     
-    db->commit();
     
     return OK_CODE;
 }

@@ -34,7 +34,7 @@ KKSCategoryTemplateWidget :: KKSCategoryTemplateWidget (bool mode, const QList<i
     pbCancel (new QPushButton (tr("&Cancel"))),
     tbCatTempl (new QToolBar (tr ("Category and templates editor"), this)),
     actAddC (new QAction (QIcon(":/ddoc/category_add.png"), tr("Add empty category"), this)),
-    actAddCopyC (new QAction (QIcon (":/ddoc/add_copy.png"), tr ("Add copy of selected category"), this)),
+    //actAddCopyC (new QAction (QIcon (":/ddoc/add_copy.png"), tr ("Add copy of selected category"), this)),
     actAddConBase (new QAction (QIcon (":/ddoc/category_copy.png"), tr ("Add new category on exists"), this)),
     actAddT (new QAction (QIcon(":/ddoc/add.png"), tr("Add template"), this)),
     actEditC (new QAction (QIcon (":/ddoc/edit.png"), tr("Edit selected category"), this)),
@@ -68,7 +68,7 @@ KKSCategoryTemplateWidget :: KKSCategoryTemplateWidget (bool mode, const QList<i
     pbCancel->setShortcut (cancel_key);
 
     connect (actAddC, SIGNAL (triggered()), this, SLOT (addCat()) );
-    connect (actAddCopyC, SIGNAL (triggered()), this, SLOT (addCopyCat()) );
+    //connect (actAddCopyC, SIGNAL (triggered()), this, SLOT (addCopyCat()) );
     connect (actAddConBase, SIGNAL (triggered()), this, SLOT (addCloneCat()) );
     connect (actAddT, SIGNAL (triggered()), this, SLOT (addTemplate()) );
     connect (actEditC, SIGNAL (triggered()), this, SLOT (editCat()) );
@@ -250,7 +250,7 @@ void KKSCategoryTemplateWidget :: init_widgets (void)
     this->setLayout (catTemplLayout);
     catTemplLayout->addWidget (tbCatTempl, 0, 0, 1, 1);
     tbCatTempl->addAction (actAddC);
-    tbCatTempl->addAction (actAddCopyC);
+    //tbCatTempl->addAction (actAddCopyC);
     tbCatTempl->addAction (actAddConBase);
     tbCatTempl->addAction (actEditC);
     tbCatTempl->addAction (actDelC);
@@ -336,7 +336,7 @@ void KKSCategoryTemplateWidget :: currIndexChanged (const QModelIndex& current, 
         tIndex = tIndex.parent();
     bool isActionsDisabled (forbiddenTypes.contains (tIndex.data(Qt::UserRole).toInt()));
     actAddC->setDisabled (isActionsDisabled);
-    actAddCopyC->setDisabled (isActionsDisabled);
+    //actAddCopyC->setDisabled (isActionsDisabled);
     actEditC->setDisabled (isActionsDisabled);
     actDelC->setDisabled (isActionsDisabled);
     if (tModel &&
