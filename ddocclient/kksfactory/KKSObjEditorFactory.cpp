@@ -4075,12 +4075,16 @@ void KKSObjEditorFactory :: importCSV (QIODevice *csvDev, QString codeName, QStr
             {
                 if (lineData[i].startsWith ("{"))
                 {
+                    lineData[i] = lineData[i].mid(1);
                     while (!lineData[i].endsWith("}"))
                     {
                         lineData[i] += (i < lineData.count()-1 ? QString (",%1").arg (lineData[i+1]) : tDelim);
+                        qDebug () << __PRETTY_FUNCTION__ << lineData[i];
                         if (i < lineData.count()-1)
                             lineData.removeAt (i + 1);
                     }
+                    lineData[i] = lineData[i].mid (1, lineData[i].count()-2);
+                    qDebug () << __PRETTY_FUNCTION__ << lineData[i];
                 }
                 while (lineData[i].startsWith (tDelim) && (!lineData[i].endsWith (tDelim) ||
                                                             lineData[i].endsWith (QString("\\%1").arg (tDelim)) ))
@@ -4089,6 +4093,7 @@ void KKSObjEditorFactory :: importCSV (QIODevice *csvDev, QString codeName, QStr
                     if (i < lineData.count()-1)
                         lineData.removeAt (i + 1);
                 }
+                qDebug () << __PRETTY_FUNCTION__ << lineData[i];
                 i++;
             }
         }
@@ -4313,17 +4318,19 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io, const QStringList& attr
                     pv.value().replace (QChar('\''), QString("\\'"), Qt::CaseInsensitive);
                     pv.value().replace (QChar('\"'), QString("\\\""), Qt::CaseInsensitive);
                 }
-                //qDebug () << __PRETTY_FUNCTION__ << rValues << values;
+                qDebug () << __PRETTY_FUNCTION__ << rValues << values;
                 QList<int> pKeys;
                 for (int ii=0; ii<rValues.count(); ii++)
                 {
+                    qDebug () << __PRETTY_FUNCTION__ << QString::compare (rValues[ii].mid (2, 50), values.constBegin().value().mid (1, 50), Qt::CaseInsensitive) << rValues[ii].mid (1, 50) << values.constBegin().value().mid (1, 50);
                     int pkey = values.key (rValues[ii].mid(1, rValues[ii].count()-2), -1);
                     if (pkey > 0)
                         pKeys.append (pkey);
                 }
                 QString vArr ("{");
                 for (int ii=0; ii<pKeys.count(); ii++)
-                    vArr += QString("%1%2").arg (pKeys[ii]).arg (ii<pKeys.count()-1 ? QString (",") : QString("}"));
+                    vArr += QString("%1%2").arg (pKeys[ii]).arg (ii<pKeys.count()-1 ? QString (",") : QString());
+                vArr += QString ("}");
                 qDebug () << __PRETTY_FUNCTION__ << vArr;
                 val = KKSValue (vArr, iType);
                 rattr->release ();
