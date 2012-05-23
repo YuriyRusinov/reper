@@ -4068,7 +4068,13 @@ void KKSObjEditorFactory :: importCSV (QIODevice *csvDev, QString codeName, QStr
     {
         QString fstr = csvStrings[i0];
         QStringList lineData;
-        lineData = fstr.split (fDelim);
+        QString escFDelim = QString("%1(?!(\\{(.)*(%1)*(.)*\\}))").arg (QRegExp::escape(fDelim));
+        //escFDelim += QString("(({(.)*}))*");//[\^(\{%1*\})]").arg (QRegExp::escape (fDelim));
+        QRegExp fRegExp(escFDelim);
+        lineData = fstr.split (fRegExp);
+        qDebug () << __PRETTY_FUNCTION__ << lineData.size() << escFDelim << fstr;
+        for (int ii=0; ii<lineData.size(); ii++)
+            qDebug () << __PRETTY_FUNCTION__ << lineData[ii];// << escFDelim << fRegExp;
         if (fstr.contains (tDelim))
         {
             for (int i=0; i<lineData.count(); )
