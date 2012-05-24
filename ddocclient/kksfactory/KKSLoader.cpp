@@ -2130,6 +2130,13 @@ QString KKSLoader::parseFilter(const KKSFilter * f, const QString & tableName) c
         qDebug () << __PRETTY_FUNCTION__ << sql;
         return sql;
     }
+    else if (a->type()->attrType() == KKSAttrType::atCheckList)
+    {
+        sql += QString (" %1.%2 @> %3").arg(tableName).arg(code).arg (values.at(0)->valueForInsert());
+        sql += endUpper;
+        qDebug () << __PRETTY_FUNCTION__ << sql;
+        return sql;
+    }
     else
         sql += QString(" %1.%2 ").arg(tableName).arg(code);
     
