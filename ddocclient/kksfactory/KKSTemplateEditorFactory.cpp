@@ -673,8 +673,9 @@ void KKSTemplateEditorFactory :: saveTemplate (KKSTemplate *t, KKSTemplateEditor
                 pa++)
         {
             KKSAttrView * av = pa.value ();
-            if (pa.key()==765)
-                qDebug () << __PRETTY_FUNCTION__ << g->id() << av->id() << t->id();
+            if (!av)
+                continue;
+            qDebug () << __PRETTY_FUNCTION__ << av->defValue().valueForInsert() << av->defValue().valueVariant();
         }
     }
     if (t->id() < 0)

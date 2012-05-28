@@ -1108,7 +1108,7 @@ void KKSObjEditor :: setSysAttrValue(KKSAttrValue * attrValue)
     attrValue->addRef ();
     if (sysAttrValues.contains (id))
     {
-        sysAttrValues.value (id)->release ();
+        //sysAttrValues.value (id)->release ();
         sysAttrValues.remove (id);
     }
     sysAttrValues.insert (id, attrValue);
@@ -1121,7 +1121,7 @@ void KKSObjEditor :: setIOAttrValue(KKSAttrValue * av)
     av->addRef ();
     if (ioAttrValues.contains (id))
     {
-        ioAttrValues.value (id)->release ();
+        //ioAttrValues.value (id)->release ();
         ioAttrValues.remove (id);
     }
     ioAttrValues.insert (id, av);

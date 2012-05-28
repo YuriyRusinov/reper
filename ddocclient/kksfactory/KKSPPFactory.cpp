@@ -1276,13 +1276,14 @@ int KKSPPFactory::insertAttrView(int idCategory, int idTemplate, int idGroup, KK
     bool isReadOnly = av->isReadOnly();
     int order = av->order();
 
-    QString sql = QString("select ivInsert(%1, %2, %3, %4, %5, asString (%6, true))")
+    QString sql = QString("select ivInsert(%1, %2, %3, %4, %5, %6)")
                             .arg(idCategoryAttr)
                             .arg(idTemplate)
                             .arg(idGroup)
                             .arg(isReadOnly ? "true" : "false")
                             .arg(order)
-                            .arg(defVal);
+                            .arg(defVal.isEmpty() || av->defValue().isNull() ? QString("NULL") : QString ("asString(%1, true)").arg (defVal));
+    //qDebug () << __PRETTY_FUNCTION__ << sql;
 
     
     KKSResult * res = db->execute (sql);

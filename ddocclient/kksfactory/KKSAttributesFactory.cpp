@@ -989,7 +989,12 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av, KKSObjEdi
                 }
                 double v = V.toDouble ();
                 int vi = V.toInt ();
-                attrWidget = new KKSEdit (av, isSystem, (pCatType->attrType() == KKSAttrType::atDouble ? QString::number (v) : QString::number (vi)));
+                QString val;
+                if (pCatType->attrType() == KKSAttrType::atDouble && !V.toString().isEmpty())
+                    val = QString::number (v);
+                else if (pCatType->attrType() == KKSAttrType::atInt && !V.toString().isEmpty())
+                    val = QString::number (vi);
+                attrWidget = new KKSEdit (av, isSystem, val);//(pCatType->attrType() == KKSAttrType::atDouble ? QString::number (v) : QString::number (vi)));
                 qobject_cast<QLineEdit *>(attrWidget)->setReadOnly (isRef);
                 QValidator *dval = 0;
                 if (pCatType->attrType() == KKSAttrType::atDouble)
@@ -1764,18 +1769,18 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
                 double v = V.toDouble ();
                 int vi = V.toInt ();
                 KKSEdit *lEdit = qobject_cast<KKSEdit *>(aw);
-                if (pCatType->attrType() == KKSAttrType::atDouble)
+                if (pCatType->attrType() == KKSAttrType::atDouble && !V.toString().isEmpty())
                     lEdit->setVal (QString::number (v));
-                else
+                else if (pCatType->attrType() == KKSAttrType::atInt && !V.toString().isEmpty())
                     lEdit->setVal (QString::number (vi));
 
                 if (!isRef)
                     connectToSlots (aw, wEditor);
                 else
                 {
-                    if (pCatType->attrType() == KKSAttrType::atDouble)
+                    if (pCatType->attrType() == KKSAttrType::atDouble && !V.toString().isEmpty())
                         lEdit->setText (QString::number (v, 'f', 16));
-                    else
+                    else if (pCatType->attrType() == KKSAttrType::atInt && !V.toString().isEmpty())
                         lEdit->setText (QString::number (vi));
                 }
                 lEdit->setVal (lEdit->text());
