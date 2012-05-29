@@ -4271,7 +4271,8 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io, const QStringList& attr
                 }
                 else
                 {
-                    values = loader->loadAttributeValues (cAttr, refColumnValues, true, true, QString(), KKSList<const KKSFilterGroup*>());
+                    values = loader->loadAttributeValues (cAttr, refColumnValues, true, true, tableName.isEmpty() ? cAttr->tableName() : tableName, KKSList<const KKSFilterGroup*>());
+                    qDebug () << __PRETTY_FUNCTION__ << values;
                     for (QMap<int, QString>::iterator pv=values.begin(); pv!= values.end(); pv++)
                     {
                         pv.value().replace (QChar('\n'), QString("\\n"), Qt::CaseInsensitive);
@@ -4434,10 +4435,11 @@ void KKSObjEditorFactory :: exportEIO (KKSObjEditor * editor, int idObject, cons
         tv = editor->addRecWidgets[i-1]->getView();
 
     KKSList<KKSObjectExemplar*> oeList;
-    for (int i=0; i<tv->model()->rowCount(); i++)
+    QList<int> idOe;
+    this->getModelIds (tv->model(), QModelIndex(), idOe);
+    for (int i=0; i<idOe.count(); i++)
     {
-        QModelIndex wIndex = tv->model()->index (i, 0);
-        int id = wIndex.data (Qt::UserRole).toInt();
+        int id = idOe[i];//wIndex.data (Qt::UserRole).toInt();
         KKSObjectExemplar * oe = loader->loadEIO (id, io, c0, tableName);
         if (!oe)
         {
@@ -4489,7 +4491,7 @@ void KKSObjEditorFactory :: exportEIO (KKSObjEditor * editor, int idObject, cons
             return;
         }
         QFile fCSV (csvFileName);
-        res = this->exportCopies (&fCSV, c0 /*io->category()->tableCategory()*/, oeList, charSet, fDelim, tDelim, editor);
+        res = this->exportCopies (&fCSV, c0 /*io->category()->tableCategory()*/, oeList, charSet, fDelim, tDelim, editor, tableName);
         if (res == ERROR_CODE)
         {
             if (io)
@@ -4506,6 +4508,19 @@ void KKSObjEditorFactory :: exportEIO (KKSObjEditor * editor, int idObject, cons
 
     if (io)
         io->release ();
+}
+
+void KKSObjEditorFactory :: getModelIds (QAbstractItemModel * mod, const QModelIndex& wIndex, QList<int>& ids) const
+{
+    if (!mod)
+        return;
+    for (int i=0; i<mod->rowCount (wIndex); i++)
+    {
+        QModelIndex ind = mod->index(i, 0, wIndex);
+        int id = mod->data (ind, Qt::UserRole).toInt();
+        ids.append (id);
+        getModelIds (mod, ind, ids);
+    }
 }
 
 /* Вспомогательный метод экспорта колонок таблицы в xml-файл.
@@ -4621,7 +4636,8 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // целевой CSV файл
                                          QString codeName, // кодировка выходных данных
                                          QString fDelim, // разделитель полей
                                          QString tDelim, // разделитель текста
-                                         KKSObjEditor *oEditor // родительский редактор ИО и ЭИО
+                                         KKSObjEditor *oEditor, // родительский редактор ИО и ЭИО
+                                         QString tableName
                                          )
 {
     if (!csvDev)
@@ -4734,11 +4750,13 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // целевой CSV файл
                                                                         refColumnValues,
                                                                         true, 
                                                                         true, 
-                                                                        av->attribute()->tableName(),
+                                                                        tableName.isEmpty() ? av->attribute()->tableName() : tableName,
                                                                         KKSList<const KKSFilterGroup*>());
                                 }
                                 int iVal = 0;
                                 QVariant cV = av->value().valueVariant();
+                                
+                                qDebug () << __PRETTY_FUNCTION__ << cV;
                                 if (av->attribute()->refColumnName().isEmpty() || 
                                     av->attribute()->refColumnName() == "id")
                                 {
@@ -4756,6 +4774,7 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // целевой CSV файл
                                         iVal = id;
                                 }
 
+                                qDebug () << __PRETTY_FUNCTION__ << iVal << values;
                                 QMap<int, QString>::const_iterator pv = values.constFind (iVal);
                                 if (pv != values.constEnd())
                                 {

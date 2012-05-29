@@ -107,7 +107,8 @@ public:
                       QString codeName, // кодировка выходных данных
                       QString fDelim, // разделитель полей
                       QString tDelim, // разделитель текста
-                      KKSObjEditor *oEditor // родительский редактор ИО и ЭИО
+                      KKSObjEditor *oEditor, // родительский редактор ИО и ЭИО
+                      QString tableName // таблица экспорта
                       );
 
     int exportCopies (QIODevice *csvDev, // целевой CSV файл
@@ -316,6 +317,7 @@ private:
     void initIOAttrs (KKSObject * io, KKSObjectExemplar * wObjE, const KKSCategory* wCat, KKSObjEditor * editor, QWidget * ioAttrWidget, QGridLayout * gIOLay);
     void setPreliminaryAttrs (KKSObject * io, const KKSMap<int, KKSAttrValue *>& aVals) const;
     void setPreliminaryAttrs (KKSObjectExemplar * cio, const KKSMap<int, KKSAttrValue *>& aVals) const;
+    void getModelIds (QAbstractItemModel * mod, const QModelIndex& wIndex, QList<int>& ids) const;
 
 private:
     //
