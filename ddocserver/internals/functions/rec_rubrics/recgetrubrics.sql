@@ -21,7 +21,7 @@ begin
             r.id_record, 
             r.name, 
             r.description, 
-            0,
+            0
         from record_rubricator r
         where r.id_record = idRecord
         order by r.id1
@@ -82,30 +82,24 @@ declare
     idRubric alias for $1;
     r h_get_rec_rubrics%rowtype;
 begin
-/*
-    for r in 
-        select 
-            ior.id_io_object, 
-            ior.id_rubric, 
-            NULL, 
-            rubr.id_search_template, 
-            rubr.id_io_category, 
-            o.name, 
-            NULL, --o.code, 
-            o.description, 
-            2, 
-            rubr.unique_id,
-            ior.is_automated
-        from rubric_records ior 
-             inner join tbl_io_objects o on (ior.id_rubric = idRubric and ior.id_io_object = o.id)
-             inner join rubricator rubr on (ior.id_rubric = rubr.id)
-        where 
-             true = getPrivilege(getCurrentUser(), ior.id_io_object, 1, true) 
+
+    for r in
+        select
+            rr.id_record,
+            NULL,
+            rr.id_rubric,
+            NULL,
+            NULL,
+            2
+        from
+            rubric_records rr inner join
+            record_rubricator rec
+            on (rr.id_rubric = rec.id1 and rec.id1=idRubric)
         order by 1
     loop
         return next r;
     end loop;
-*/    
+
     return;
 end
 $BODY$
