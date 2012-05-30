@@ -318,6 +318,7 @@ private:
     void setPreliminaryAttrs (KKSObject * io, const KKSMap<int, KKSAttrValue *>& aVals) const;
     void setPreliminaryAttrs (KKSObjectExemplar * cio, const KKSMap<int, KKSAttrValue *>& aVals) const;
     void getModelIds (QAbstractItemModel * mod, const QModelIndex& wIndex, QList<int>& ids) const;
+    int searchParents (const KKSList<KKSObjectExemplar *>& oeList, const KKSCategoryAttr *cAttr, const KKSValue& refVal);
 
 private:
     //

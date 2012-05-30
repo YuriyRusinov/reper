@@ -4271,8 +4271,9 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io, const QStringList& attr
                 }
                 else
                 {
-                    values = loader->loadAttributeValues (cAttr, refColumnValues, true, true, tableName.isEmpty() ? cAttr->tableName() : tableName, KKSList<const KKSFilterGroup*>());
-                    qDebug () << __PRETTY_FUNCTION__ << values;
+                    QString tName = tableName.isEmpty() ? cAttr->tableName() : tableName;
+                    //values loader->loadAttributeValues (cAttr, refColumnValues, true, true, tName, KKSList<const KKSFilterGroup*>());
+                    qDebug () << __PRETTY_FUNCTION__ << values << tName;
                     for (QMap<int, QString>::iterator pv=values.begin(); pv!= values.end(); pv++)
                     {
                         pv.value().replace (QChar('\n'), QString("\\n"), Qt::CaseInsensitive);
@@ -4280,10 +4281,9 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io, const QStringList& attr
                         pv.value().replace (QChar('\"'), QString("\\\""), Qt::CaseInsensitive);
                     }
                     //qDebug () << __PRETTY_FUNCTION__ << QString::compare (values.begin().value().mid (0, 100), refVal.value().mid (0, 100), Qt::CaseInsensitive) << values.begin().value().mid (1, 100) << refVal.value().mid(1, 100) << oesList[i][j].size();
-                    int pkey = values.key (refVal.value(), -1);
-                    QMap<int, QString>::const_iterator pv = values.constFind (pkey);
-                    if (pv != values.constEnd())
-                        val = KKSValue (QString::number (pv.key()), iType);
+                    int pkey = this->searchParents(oeList, cAttr, refVal);//values.key (refVal.value(), -1);
+                    if (pkey > 0)
+                        val = KKSValue (QString::number (pkey), iType);
                     else
                         val = KKSValue (QString(), iType);
                 }
@@ -4404,6 +4404,33 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io, const QStringList& attr
     tChild->release ();
     pImportD->setParent (0);
     delete pImportD;
+}
+
+int KKSObjEditorFactory :: searchParents (const KKSList<KKSObjectExemplar *>& oeList, const KKSCategoryAttr *cAttr, const KKSValue& refVal)
+{
+    int pKey (-1);
+    if (!cAttr)
+        return pKey;
+    for (int i=0; i<oeList.count() && pKey<0; i++)
+    {
+        KKSObjectExemplar * oe = oeList[i];
+        if (!oe)
+            continue;
+        KKSAttrValue * av(0);// = oe->
+        for (int ii=0; ii<oe->attrValues().count() && !av; ii++)
+        {
+            if (oe->attrValue(ii) && oe->attrValue(ii)->attribute() && cAttr->columnName(false) == oe->attrValue(ii)->attribute()->code(false))
+            {
+                av = oe->attrValue(ii);
+                av->addRef();
+            }
+        }
+        if (av && QString::compare (av->value().value(), refVal.value(), Qt::CaseInsensitive) == 0)
+            pKey = i;//oe->id();
+        if (av)
+            av->release ();
+    }
+    return pKey;
 }
 
 /* Метод осуществляет экспорт содержимого ИО-справочника.
@@ -4756,7 +4783,7 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // целевой CSV файл
                                 int iVal = 0;
                                 QVariant cV = av->value().valueVariant();
                                 
-                                qDebug () << __PRETTY_FUNCTION__ << cV;
+                                //qDebug () << __PRETTY_FUNCTION__ << cV;
                                 if (av->attribute()->refColumnName().isEmpty() || 
                                     av->attribute()->refColumnName() == "id")
                                 {
@@ -4774,7 +4801,7 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // целевой CSV файл
                                         iVal = id;
                                 }
 
-                                qDebug () << __PRETTY_FUNCTION__ << iVal << values;
+                                //qDebug () << __PRETTY_FUNCTION__ << iVal << values;
                                 QMap<int, QString>::const_iterator pv = values.constFind (iVal);
                                 if (pv != values.constEnd())
                                 {
