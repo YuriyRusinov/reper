@@ -719,6 +719,21 @@ int KKSEIOFactory::insertEIOList(KKSList<KKSObjectExemplar*> eioList, const KKSC
             pgDial->setValue (i);
         db->begin();
         KKSObjectExemplar * eio = eioList.at(i);
+        for (int ii=0; ii<eio->attrValues().count(); ii++)
+        {
+            if (eio->attrValueIndex(ii) && 
+                eio->attrValueIndex(ii)->attribute() &&
+                eio->attrValueIndex(ii)->attribute()->type()->attrType() == KKSAttrType::atParent &&
+                eio->attrValueIndex(ii)->value().value().toInt() > 0 &&
+                eio->attrValueIndex(ii)->value().value().toInt() <= i)
+            {
+                KKSAttrValue * av = eio->attrValueIndex(ii);
+                int pKey = eio->attrValueIndex(ii)->value().value().toInt();
+                int pId = eioList.at (pKey-1)->id();
+                KKSValue val = KKSValue (QString::number(pId), KKSAttrType::atParent);
+                av->setValue(val);
+            }
+        }
 //        if(!eio->io() || eio->io()->tableName() != table){
 //            db->rollback();
 //            return ERROR_CODE;

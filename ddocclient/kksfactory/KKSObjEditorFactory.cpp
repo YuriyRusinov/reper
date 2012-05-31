@@ -4409,7 +4409,7 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io, const QStringList& attr
 int KKSObjEditorFactory :: searchParents (const KKSList<KKSObjectExemplar *>& oeList, const KKSCategoryAttr *cAttr, const KKSValue& refVal)
 {
     int pKey (-1);
-    if (!cAttr)
+    if (!cAttr || !cAttr->type() || cAttr->type()->attrType() != KKSAttrType::atParent || refVal.value().isEmpty())
         return pKey;
     for (int i=0; i<oeList.count() && pKey<0; i++)
     {
@@ -4419,14 +4419,14 @@ int KKSObjEditorFactory :: searchParents (const KKSList<KKSObjectExemplar *>& oe
         KKSAttrValue * av(0);// = oe->
         for (int ii=0; ii<oe->attrValues().count() && !av; ii++)
         {
-            if (oe->attrValue(ii) && oe->attrValue(ii)->attribute() && cAttr->columnName(false) == oe->attrValue(ii)->attribute()->code(false))
+            if (oe->attrValueIndex(ii) && oe->attrValueIndex(ii)->attribute() && cAttr->columnName(false) == oe->attrValueIndex(ii)->attribute()->code(false))
             {
-                av = oe->attrValue(ii);
+                av = oe->attrValueIndex(ii);
                 av->addRef();
             }
         }
         if (av && QString::compare (av->value().value(), refVal.value(), Qt::CaseInsensitive) == 0)
-            pKey = i;//oe->id();
+            pKey = i+1;//oe->id();
         if (av)
             av->release ();
     }
