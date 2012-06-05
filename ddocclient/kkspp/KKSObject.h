@@ -145,7 +145,7 @@ class _PP_EXPORT KKSObject : public KKSRecord
         void setAttrTemplate(KKSTemplate * t);
         KKSTemplate * attrTemplate() const;
 
-        //данные методы используются здя задания и получения корневой рубрики, 
+        //данные методы используются для задания и получения корневой рубрики, 
         //которая содержит вложения данного ИО (особенно полезно для формуляров)
         //корневая рубрика у ИО может быть только одна или не быть вообще.
         void setRootRubric(KKSRubric * r);

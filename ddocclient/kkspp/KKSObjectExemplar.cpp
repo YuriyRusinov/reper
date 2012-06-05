@@ -12,6 +12,7 @@
 #include "KKSValue.h"
 #include "KKSAttrType.h"
 #include "KKSCategoryAttr.h"
+#include "KKSRubric.h"
 #include "defines.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -20,23 +21,28 @@
 // Return:     
 ////////////////////////////////////////////////////////////////////////
 
-KKSObjectExemplar::KKSObjectExemplar() : KKSRecord()
+KKSObjectExemplar::KKSObjectExemplar() : KKSRecord(),
+        m_rootRubric (0)
 {
    m_io = NULL;
 }
 
-KKSObjectExemplar::KKSObjectExemplar(const KKSObjectExemplar & eio) : KKSRecord(eio)
+KKSObjectExemplar::KKSObjectExemplar(const KKSObjectExemplar & eio) : KKSRecord(eio),
+        m_rootRubric (eio.m_rootRubric)
 {
     m_io = NULL;
     if(eio.io()){
         setIo(eio.io());
     }
+    if (m_rootRubric)
+        m_rootRubric->addRef ();
 
     m_attrValues = eio.attrValues();
     m_indValues = eio.indValues();
 }
 
-KKSObjectExemplar::KKSObjectExemplar(qint64 id, const QString & name, KKSObject * io) : KKSRecord(id, name)
+KKSObjectExemplar::KKSObjectExemplar(qint64 id, const QString & name, KKSObject * io) : KKSRecord(id, name),
+        m_rootRubric (0)
 {
     m_io = NULL;
     setIo(io);
@@ -52,6 +58,8 @@ KKSObjectExemplar::~KKSObjectExemplar()
 {
     if(m_io)
         m_io->release();
+    if (m_rootRubric)
+        m_rootRubric->release ();
 
 }
 
@@ -353,4 +361,20 @@ const KKSAttrValue * KKSObjectExemplar::indValueIndex(int index) const
 
     av = m_indValues.at(index);
     return av;
+}
+
+void KKSObjectExemplar::setRootRubric(KKSRubric * r)
+{
+    if(m_rootRubric)
+        m_rootRubric->release();
+
+    m_rootRubric = r;
+
+    if(m_rootRubric)
+        m_rootRubric->addRef();
+}
+
+KKSRubric * KKSObjectExemplar::rootRubric() const
+{
+    return m_rootRubric;
 }
