@@ -230,6 +230,7 @@ class _F_EXPORT KKSLoader
         void loadUserTemplates(KKSObject * io) const;
         void loadRubrics(KKSObject * io) const;
         void loadRubrics(KKSCategory * c) const;
+        void loadRecRubrics (KKSObjectExemplar * eio) const;
         KKSList<KKSFile *> loadFiles(KKSObject * io) const;
         KKSLifeCycle * loadLifeCycle(int idCategory) const;
         QString loadColumnValue(const QString & tName,

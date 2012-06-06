@@ -922,6 +922,8 @@ KKSObjectExemplar * KKSLoader::loadEIO(qint64 id, KKSObject * io, const KKSCateg
     eio->setId(id);
     
     eio->setIndValues(loadIndValues(eio));
+    
+    loadRecRubrics (eio);
 
     delete res;
 
@@ -2785,6 +2787,98 @@ void KKSLoader::loadRubrics(KKSCategory * c) const
 
     if(rootRubric)
         rootRubric->release();
+}
+
+void KKSLoader::loadRecRubrics (KKSObjectExemplar * eio) const
+{
+    if(!eio || eio->id() <= 0)
+        return;
+
+    QString sql = QString("select * from recGetRubrics(%1) order by 5,1").arg(eio->id());
+    KKSResult * res = db->execute(sql);
+    if(!res || res->getRowCount() == 0){
+        if(res)
+            delete res;
+        return;
+    }
+    
+    KKSRubric * rootRubric = NULL;
+    int cnt = res->getRowCount();
+    for(int i=0; i<cnt; i++){
+        int id = res->getCellAsInt(i, 0);
+        
+        int idParent = -1;
+        if(!res->isEmpty(i, 1))
+            idParent = res->getCellAsInt(i, 1);
+
+        KKSSearchTemplate * st = 0;
+        KKSCategory * c = 0;
+
+        QString name = res->getCellAsString(i, 3);
+        QString code = QString();//res->getCellAsString(i, 6);
+        QString desc = res->getCellAsString(i, 4);
+
+        int type = res->getCellAsInt(i, 5);
+
+        if(type == 0){//root rubric
+            rootRubric = new KKSRubric(id, name);
+            rootRubric->setCode(code);
+            rootRubric->setDesc(desc);
+            rootRubric->setSearchTemplate (st);
+            rootRubric->setCategory(c);
+            
+            rootRubric->m_intId = id;//рубрика информационного объекта загружена из БД (используется в операции update класса KKSPPFactory)
+
+            eio->setRootRubric(rootRubric);
+        }
+        else if(type == 1){//subrubrics
+            KKSRubric * subRubric = new KKSRubric(id, name);
+            subRubric->setCode(code);
+            subRubric->setDesc(desc);
+            subRubric->setSearchTemplate (st);
+            subRubric->setCategory(c);
+            subRubric->m_intId = id;
+
+            if(idParent <= 0){
+                qWarning() << "Bad subRubric!";
+                subRubric->release();
+                continue;
+            }
+            KKSRubric * parent = eio->rootRubric()->rubricForId(idParent);
+            if(!parent){
+                qWarning() << "Bad subRubric! Parent is NULL!";
+                subRubric->release();
+                continue;
+            }
+            parent->addRubric(subRubric);
+            subRubric->release();
+        }
+        else if(type == 2){//rubric items
+            bool isAutomated = false;//res->getCellAsBool(i, 10);
+            KKSRubricItem * item = new KKSRubricItem(id, name, isAutomated);
+
+            if(idParent <= 0){
+                qWarning() << "Bad subRubric!";
+                item->release();
+                continue;
+            }
+            KKSRubric * parent = eio->rootRubric()->rubricForId(idParent);
+            if(!parent){
+                qWarning() << "Bad subRubric! Parent is NULL!";
+                item->release();
+                continue;
+            }
+            parent->addItem(item);
+            item->release();
+        }
+
+        if (st)
+            st->release ();
+    }
+
+    if(rootRubric)
+        rootRubric->release();
+
 }
 
 KKSRubric * KKSLoader::loadRubricators(bool bOnlyMyDocs) const
