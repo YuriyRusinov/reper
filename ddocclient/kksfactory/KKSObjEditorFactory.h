@@ -308,7 +308,7 @@ private:
     void putAttrsGroupsOnWidget (KKSObject * obj, KKSObjEditor * editor, int& nc, const KKSCategory *c, KKSAttrGroup * aGroup, QGridLayout *gbLay, QGridLayout * gAttrLayout, bool isGrouped, bool updateView);
     void putIndicatorsGroupsOnToWidget (KKSObject * obj, KKSObjEditor * editor, int& nc, const KKSMap<int, KKSIndicatorValue*>& indMap, QGridLayout *gbLay, QGridLayout * gAttrLayout, bool isGrouped, bool updateView);
     void putRubricator (KKSObject * obj, KKSObjEditor * editor, QTabWidget * tabObj);
-    void putSyncWidget (KKSObjEditor * editor, KKSObjectExemplar * wObjE, int idObjE, QTabWidget * tabObj);
+    void putRubricator (KKSObjectExemplar * eio, KKSObjEditor * editor, QTabWidget * tabObj);    void putSyncWidget (KKSObjEditor * editor, KKSObjectExemplar * wObjE, int idObjE, QTabWidget * tabObj);
     void setIONameSecret (KKSObjEditor * editor, KKSObjectExemplar * wObjE, KKSObject * io, int& nWR, QGridLayout * mainLayout);
     void loadEntities (KKSObject *& obj, KKSObjectExemplar *& wObjE, const KKSCategory* wCat, int idObject, int idObjE, const QString& tableName, const KKSTemplate *& tSystem, bool defTemplateOnly = false, QWidget * parent=0);
     void loadRecEntities (KKSObject * obj, KKSObjectExemplar * wObjE, const KKSCategory* wCat, int idObject, int idObjE, const QString& tableName, const KKSTemplate *& tRecAttr, bool defTemplateOnly = false, QWidget * parent=0);

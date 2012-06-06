@@ -356,6 +356,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
         tabObj->addTab (sysAttrTabWidget, tr ("Attributes"));
     }
 
+    this->putRubricator(wObjE, objEditorWidget, tabObj);
     QScrollArea *scSysAttrs = new QScrollArea (sysAttrTabWidget);
     scSysAttrs->setWidgetResizable (true);
     QWidget *attrWidget = new QWidget ();
@@ -6939,6 +6940,37 @@ void KKSObjEditorFactory :: putRubricator (KKSObject * obj, KKSObjEditor * edito
     //qDebug () << __PRETTY_FUNCTION__ << includesW->sizePolicy ();
     //QGridLayout *gIncludesLay = new QGridLayout (includesW);
     KKSIncludesWidget * iW = new KKSIncludesWidget (obj->rootRubric());//, true, false, false, includesW);
+    iW->setSizePolicy (iwSizePolicy);
+    if (iW && m_rf)
+    {
+        connect (iW, SIGNAL (loadStuffModel(RubricForm *)), m_rf, SLOT (loadRubricPrivilegies(RubricForm *)) );
+        connect (iW, SIGNAL (loadSearchtemplate (RubricForm *)), m_rf, SLOT (loadSearchTemplate (RubricForm *)) );
+        connect (iW, SIGNAL (loadCategory (RubricForm *)), m_rf, SLOT (loadCategory (RubricForm *)) );
+        connect (iW, SIGNAL (rubricAttachmentsView (QAbstractItemModel *, const KKSRubric *)), m_rf, SLOT (viewAttachments (QAbstractItemModel *, const KKSRubric *)) );
+    }
+    QTreeView *tv = iW->tvRubr();
+    KKSEventFilter *ef = new KKSEventFilter (iW);
+    tv->viewport()->installEventFilter (ef);
+
+    //connect(this, SIGNAL(includeSelected(int, QString)), objEditorWidget, SLOT(slotIncludeSelected(int, QString)));
+    editor->addIncludesWidget (iW);
+    tabObj->addTab (iW/*includesW*/, tr("Assotiated IO"));
+    //gIncludesLay->addWidget (iW, 0, 0, 1, 1);
+}
+
+void KKSObjEditorFactory :: putRubricator (KKSObjectExemplar * eio, KKSObjEditor * editor, QTabWidget * tabObj)
+{
+    if (!eio || !editor || ! tabObj)
+        return;
+    //
+    // Рубрикатор
+    //
+    //QWidget * includesW = new QWidget ();
+    QSizePolicy iwSizePolicy (QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+    //includesW->setSizePolicy (iwSizePolicy);
+    //qDebug () << __PRETTY_FUNCTION__ << includesW->sizePolicy ();
+    //QGridLayout *gIncludesLay = new QGridLayout (includesW);
+    KKSIncludesWidget * iW = new KKSIncludesWidget (eio->rootRubric());//, true, false, false, includesW);
     iW->setSizePolicy (iwSizePolicy);
     if (iW && m_rf)
     {
