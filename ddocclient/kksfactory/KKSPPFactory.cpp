@@ -1514,6 +1514,7 @@ int KKSPPFactory::deleteTemplate(int idTemplate) const
     if(!inTransaction())
         db->begin();
 
+    /*
     QString sql = QString("delete from io_views where id_io_template = %1").arg(idTemplate);
     int ok = db->executeCmd(sql);
     if(ok != OK_CODE){
@@ -1537,6 +1538,18 @@ int KKSPPFactory::deleteTemplate(int idTemplate) const
             db->rollback();
         return ERROR_CODE;
     }
+    */
+
+    QString sql = QString("select tDeleteTemplate(%1)").arg(idTemplate);
+    KKSResult * res = db->execute(sql);
+    if(!res || res->getCellAsInt(0, 0) != 1){
+        if(res)
+            delete res;
+        if(!inTransaction())
+            db->rollback();
+        return ERROR_CODE;
+    }
+    delete res;
 
     if(!inTransaction())
         db->commit();

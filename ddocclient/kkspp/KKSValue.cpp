@@ -279,17 +279,17 @@ void KKSValue::verify(void) const
         int nv = m_value.toString().toInt (&ok);        
         Q_UNUSED (nv);
 
-        if(ok){
+        /*if(ok){
             m_isLiteral = false;
         }
-        else
+        else*/
             m_isLiteral = true;
         
         m_isValid = true;
         return;
     }
 
-    //для типов int, список и список-родитель и ссылка на информационный объект
+    //для типов int, ссылка на информационный объект, ссылки на цвета
     //значение атрибута ВСЕГДА должно быть целочисленным!
     if( a_type == KKSAttrType::atInt ||
         a_type == KKSAttrType::atObjRef ||
@@ -707,7 +707,6 @@ QString KKSValue::valueForInsert() const
         escVal.replace("\"", "\\\"");
         escVal.prepend("'");
         escVal.append ("'");
-        qDebug () << __PRETTY_FUNCTION__ << escVal;
         return escVal;
     }
 

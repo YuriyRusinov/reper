@@ -233,10 +233,16 @@ class _F_EXPORT KKSLoader
         void loadRecRubrics (KKSObjectExemplar * eio) const;
         KKSList<KKSFile *> loadFiles(KKSObject * io) const;
         KKSLifeCycle * loadLifeCycle(int idCategory) const;
+        /*
         QString loadColumnValue(const QString & tName,
                                 const QString & cName, 
                                 qint64 id, 
                                 const QString & parentTable = QString()) const;
+        */
+        QString loadColumnValue(const KKSIndAttr * a, 
+                                qint64 id, 
+                                const QString & parentTable = QString()) const;
+
         KKSMap<int, KKSAttrGroup *> loadTemplateAttrsGroups(int idTemplate) const;
 
         void addAttributesToGroup(KKSAGroup * ag) const;

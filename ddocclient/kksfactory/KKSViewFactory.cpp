@@ -278,7 +278,9 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
     QModelIndex prevIndex (wIndex);
     QList<int> pattrs;
     KKSCategory * cobjCat (0);//= pObj->category()->tableCategory();
+    
     int idPAttr (-1);
+    
     if (cat && cat->isAttrTypeContains(KKSAttrType::atParent) )
         pattrs = cat->searchAttributesByType (KKSAttrType::atParent);
     else if (pObj && pObj->category() && pObj->category()->tableCategory())
@@ -286,6 +288,7 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
         cobjCat = pObj->category()->tableCategory();
         pattrs = cobjCat->searchAttributesByType (KKSAttrType::atParent);
     }
+    
     if (!pattrs.isEmpty())
         idPAttr = pattrs[0];
     for (p=objEx.constBegin(); p!=objEx.constEnd(); p++)
@@ -305,6 +308,10 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
             if (idp > 0)
             {
                 prevIndex = searchModelIndex (objModel, idp, QModelIndex(), Qt::UserRole);//wIndex;
+                if (!prevIndex.isValid())
+                    prevIndex = searchModelIndex (objModel, idp, QModelIndex(), Qt::DisplayRole);
+                if(!prevIndex.isValid())
+                    prevIndex = QModelIndex();
                 //while (prevIndex.isValid() && prevIndex.data (Qt::UserRole).toInt() != idp)
                 //    prevIndex = prevIndex.parent();
             }
@@ -375,6 +382,7 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
             if (ii == 0 && isCheckable)
                 objModel->setData (wcIndex, false, Qt::CheckStateRole);
         }
+
 
         i++;
         //qDebug () << __PRETTY_FUNCTION__ << QString ("Iteration %1. Time elapsed %2 ms").arg (i).arg (t.elapsed());

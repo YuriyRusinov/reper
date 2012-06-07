@@ -117,7 +117,8 @@ QMap<int, QString> KKSLoader::loadAttributeValues(const KKSAttribute * a,
     KKSAttribute * refAttr = loadAttribute (columnName, tableName);
 
     QString sql;
-	if (refAttr->tableName().isEmpty()){
+	//Т.е. проверяем ситуацию "ссылка на ссылку"
+    if (refAttr->tableName().isEmpty()){
 		sql = QString("select id, \"%1\", \"%2\" from %3 %4")
                         .arg(columnName)
                         .arg(refColumnName)
@@ -126,12 +127,13 @@ QMap<int, QString> KKSLoader::loadAttributeValues(const KKSAttribute * a,
 	}
     else
     {
-        sql = QString ("select %5 %2.id, %2.\"%1\" from %2 inner join %3 on (%2.id = %3.\"%4\")")
-                    .arg (refAttr->columnName())
+        sql = QString ("select %4 %2.id, %2.\"%3\", %1.\"%5\" from %1 inner join %2 on (%1.%5 = %2.\"%3\")")
+                    //.arg (refAttr->columnName())
                     .arg (refAttr->tableName())
                     .arg (tableName)
                     .arg (columnName)
-                    .arg (isXml ? QString() : QString("distinct"));
+                    .arg (isXml ? QString() : QString("distinct"))
+                    .arg(refAttr->refColumnName());
                     //.arg (order);
         //qDebug () << __PRETTY_FUNCTION__ << sql;
     }
@@ -246,11 +248,13 @@ KKSList<KKSAttrValue *> KKSLoader::loadAttrValues(KKSObject * io) const
     return attrs;
 }
 
-QString KKSLoader::loadColumnValue(const QString & tName, 
-                                   const QString & cName,
+QString KKSLoader::loadColumnValue(const KKSIndAttr * a,
                                    qint64 id, 
                                    const QString & parentTable) const
 {
+    QString tName = a->tableName();
+    QString cName = a->columnName();
+    
     QString value;
 
     if(tName.isEmpty() && cName.isEmpty())
@@ -264,10 +268,16 @@ QString KKSLoader::loadColumnValue(const QString & tName,
 	if(tableName == "io_objects"){
 		tableName = QString("f_sel_io_objects(%1)").arg(id);
 	}
-	QString sql = QString("select \"%1\" from %2 where id = %3")
+
+    QString pKeyName = a->refColumnName();
+    if(pKeyName.isEmpty())
+        pKeyName = "id";
+
+	QString sql = QString("select \"%1\" from %2 where \"%4\" = %3")
                                         .arg(cName)
                                         .arg(tableName)
-                                        .arg(id);
+                                        .arg(id)
+                                        .arg(pKeyName);
 
     KKSResult * res = db->execute(sql);
     if(!res)
@@ -494,8 +504,7 @@ KKSValue  KKSLoader::constructValue(const QString & value,
         )
     {
         //в случае атрибутов типа список необходимо загрузить в KKSValue реальное значение из соответствующей таблицы БД
-        QString cv = loadColumnValue(a->tableName(), 
-                                     a->columnName(), 
+        QString cv = loadColumnValue(a, 
                                      v.valueVariant().toInt(), 
                                      parentTable);
         if(!cv.isEmpty())
@@ -4794,8 +4803,7 @@ KKSValue  KKSLoader::constructValue(const QString & value,
         )
     {
         //в случае атрибутов типа список необходимо загрузить в KKSValue реальное значение из соответствующей таблицы БД
-        QString cv = loadColumnValue(i->tableName(), 
-                                     i->columnName(), 
+        QString cv = loadColumnValue(i, 
                                      v.valueVariant().toInt(), 
                                      parentTable);
         if(!cv.isEmpty())
