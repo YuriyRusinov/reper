@@ -1,3 +1,14 @@
+create or replace function generateUUID() returns uuid as
+$BODY$
+declare
+    
+begin
+    return uuid_generate_v1();
+end
+$BODY$
+language 'plpgsql';
+
+
 create or replace function uuidCheck() returns trigger as
 $BODY$
 declare
@@ -6,7 +17,7 @@ declare
 begin
 
     if(new.uuid_t isnull) then
-        new.uuid_t = uuid_generate_v1();
+        new.uuid_t = generateUUID();
     end if;
 
     return new;

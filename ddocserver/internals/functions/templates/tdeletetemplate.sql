@@ -4,8 +4,10 @@ declare
     idTemplate alias for $1;
 begin
 
-    select tDeleteGroups(idTemplate);
     delete from io_views where id_io_template = idTemplate;
+
+    perform tDeleteGroups(idTemplate);
+
     delete from user_templates where id_template = idTemplate;
     delete from io_templates where id = idTemplate;
     

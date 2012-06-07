@@ -54,7 +54,7 @@ begin
 
     execute query;
 
-    create table public.ex_table (id serial) inherits (root_table);
+    create table public.ex_table () inherits (root_table, q_base_table);
 
     currentTable = '';
     isReadOnly = false;
@@ -68,7 +68,7 @@ begin
 
     for r in 
         select * 
-        from translateColumnsToAttrs(schemas)
+        from translateColumnsToAttrs(schemas) --where relname <> 'rubr_group'
     loop
 
         if(currentTable <> r.relname) then
@@ -94,18 +94,23 @@ begin
 
             query = 'alter table ' || r.relname || ' owner to admin';
             execute query;
-            query = 'alter table ' || r.relname || ' add column id serial, add column unique_id varchar, add column last_update timestamp';
+            query = 'alter table ' || r.relname || ' add column id bigserial, add column uuid_t uuid, add column unique_id varchar, add column last_update timestamp';
             execute query;
             
-            query = 'update ' || r.relname || ' set id = pg_catalog.nextval(' || quote_literal(r.relname || '_id_seq') || ')';
+            query = 'update ' || r.relname || ' set id = pg_catalog.nextval(' || quote_literal('q_base_table_id_seq') || ')';
             execute query;
 
             query = 'update ' || r.relname || ' set unique_id = generateUID(id, ' || quote_literal(r.relname) || '), last_update = current_timestamp';
             execute query;
 
+            query = 'update ' || r.relname || ' set uuid_t = generateUUID()';
+            execute query;
+
             query = 'alter table ' || r.relname || ' alter column id set not null';
             execute query;
             query = 'alter table ' || r.relname || ' alter column unique_id set not null';
+            execute query;
+            query = 'alter table ' || r.relname || ' alter column uuid_t set not null';
             execute query;
             query = 'alter table ' || r.relname || ' alter column last_update set not null';
             execute query;
@@ -124,6 +129,7 @@ begin
 
             perform setMacToNULL(r.relname);
             perform createTriggerUID(r.relname);
+            perform createTriggerUUID(r.relname);
         end if;
         
         currentTable = r.relname;

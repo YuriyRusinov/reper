@@ -4,7 +4,7 @@ declare
     idTemplate alias for $1;
 begin
     
-    delete from a_groups where id in (select id from tGetAttrGroups(idTemplate) where entity_type = 0);
+    delete from a_groups where id in (select id from tGetAttrGroups(idTemplate) where entity_type = 1);
 
     return 1;
 end

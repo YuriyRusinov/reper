@@ -45,11 +45,10 @@ begin
             from 
                 pg_namespace n,
                 pg_class c 
+                left join pg_description d1 on (d1.objoid = c.oid and d1.objsubid = 0)
                 inner join pg_attribute a on (c.oid = a.attrelid) 
                     left join pg_description d on (a.attnum = d.objsubid and d.objoid = c.oid),
-                pg_type t left join pg_type tt on t.typbasetype = tt.oid,
-                --pg_description d,
-                pg_description d1
+                pg_type t left join pg_type tt on t.typbasetype = tt.oid
     
             where 
                 n.nspname = ANY (schemas) --('nub', 'dic')
@@ -60,8 +59,6 @@ begin
                 and attname not in ('tableoid', 'cmax', 'cmin', 'xmax', 'xmin', 'ctid')
                 --and a.attnum = d.objsubid
                 --and d.objoid = c.oid
-                and d1.objoid = c.oid
-                and d1.objsubid = 0
             ) as attrs 
 
             left join 
