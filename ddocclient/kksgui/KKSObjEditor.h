@@ -204,6 +204,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
 
         void rubricItemSelected(int idObject, QString name);
         void includeRequested(KKSObjEditor * editor);
+        void includeRecRequested(KKSObjEditor * editor);
         void openRubricItemRequested(int idObject, KKSObjEditor * editor);
 
         void updateAttributes (QWidget *ioAttrWidget, QScrollArea *sc, QWidget *ioAttrsW, /*KKSObject * wObj*/ int idObj, const KKSCategory * wCat, bool isSystem, KKSObjEditor* editor);
@@ -233,6 +234,9 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void slotIncludeSelected(int idObject, QString name);
         void slotIncludeRequested();
         void slotOpenRubricItemRequested(int idObject);
+        void slotIncludeRecSelected(int idObjectE, QString name);
+        void slotIncludeRecRequested();
+        void slotOpenRubricRecItemRequested(int idObjectE);
         void setNumCopies (int n);
 
    protected:
@@ -295,6 +299,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         //
         void addFileWidget (KKSFileWidget *fw);
         void addIncludesWidget (KKSIncludesWidget *iw);
+        void addIncludesRecWidget (KKSIncludesWidget *iw);
         void setSysAttrWidgets (QWidget *wSysAttr, QScrollArea *scSysAttr, QWidget *sysAttrs);
         void setIOAttrWidgets (QWidget *wIOAttr, QScrollArea *scIOattr, QWidget *ioAttrs);
         void setRecIndWidgets (QWidget *wIOAttr, QScrollArea *scIOattr, QWidget *ioAttrs);
@@ -392,6 +397,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         QList <KKSRecWidget *> addRecWidgets;
         KKSFileWidget * fileWidget;
         KKSIncludesWidget * includesWidget;
+        KKSIncludesWidget * includesRecWidget;
 
         bool isChanged;
         QMap<int, int> editRows;

@@ -1493,6 +1493,7 @@ KKSTemplate * KKSObjEditorFactory :: getRecordTemplate (KKSObject * io, const KK
 void KKSObjEditorFactory :: setObjConnect (KKSObjEditor *editor)
 {
     connect (editor, SIGNAL(includeRequested(KKSObjEditor*)), this, SLOT(slotIncludeRequested(KKSObjEditor*)));
+    connect (editor, SIGNAL(includeRecRequested(KKSObjEditor*)), this, SLOT(slotIncludeRecRequested(KKSObjEditor*)));
     connect (editor, SIGNAL(openRubricItemRequested(int, KKSObjEditor*)), this, SLOT(slotOpenRubricItemRequested(int, KKSObjEditor*)));
     connect (editor, SIGNAL (updateAttributes (QWidget *, QScrollArea *, QWidget *, int, const KKSCategory *, bool, KKSObjEditor*)), this, SLOT (regroupAttrs (QWidget *, QScrollArea *, QWidget *, int, const KKSCategory*, bool, KKSObjEditor*)) );
     connect (editor, SIGNAL (saveObj(KKSObjEditor*, KKSObject*, KKSObjectExemplar*, int)), this, SLOT (saveObject(KKSObjEditor*, KKSObject*, KKSObjectExemplar*, int)) );
@@ -3664,6 +3665,72 @@ int KKSObjEditorFactory :: updateInControlJournal(int idJournal, int idObject)
 }
 
 void KKSObjEditorFactory :: slotIncludeRequested(KKSObjEditor * editor)
+{
+    if(!editor)
+        return;
+
+    KKSList<const KKSFilter*> filters;
+    
+    KKSObject * o = loader->loadIO(IO_IO_ID, true);
+    if(!o)
+        return;
+    KKSCategory * c = o->category()->tableCategory();
+    if(!c){
+        o->release();
+        return;
+    }
+
+    //KKSObjEditorFactory * oef = kksSito->oef();
+
+    int idUser = loader->getUserId();
+    KKSFilter * filter = c->createFilter(13, QString::number(idUser), KKSFilter::foEq);
+    if(!filter){
+        o->release();
+        return;
+    }
+
+    filters.append(filter);
+    filter->release();
+    KKSList<const KKSFilterGroup *> filterGroups;
+    KKSFilterGroup * group = new KKSFilterGroup(true);
+    group->setFilters(filters);
+    filterGroups.append(group);
+    group->release();
+    
+    KKSObjEditor *objEditor = createObjEditor(IO_IO_ID, 
+                                              IO_IO_ID, 
+                                              filterGroups, 
+                                              "",
+                                              c,
+                                              true,
+                                              QString(),
+                                              false,
+                                              editor->windowModality(),
+                                              editor,
+                                              Qt::Dialog);
+    int res = objEditor->exec();
+    
+    int idObject = -1;
+    QString name;
+
+    if(res == QDialog::Accepted){
+        idObject = objEditor->recWidget->getID();
+        KKSObject * o = loader->loadIO(idObject, true);
+        if(!o){
+            delete objEditor;
+            return;
+        }
+        name = o->name();
+        o->release();
+    }
+    
+    delete objEditor;
+    
+    editor->slotIncludeSelected(idObject, name);
+    o->release();
+}
+
+void KKSObjEditorFactory :: slotIncludeRecRequested(KKSObjEditor * editor)
 {
     if(!editor)
         return;
@@ -6984,8 +7051,8 @@ void KKSObjEditorFactory :: putRubricator (KKSObjectExemplar * eio, KKSObjEditor
     tv->viewport()->installEventFilter (ef);
 
     //connect(this, SIGNAL(includeSelected(int, QString)), objEditorWidget, SLOT(slotIncludeSelected(int, QString)));
-    editor->addIncludesWidget (iW);
-    tabObj->addTab (iW/*includesW*/, tr("Assotiated IO"));
+    editor->addIncludesRecWidget (iW);
+    tabObj->addTab (iW/*includesW*/, tr("Assotiated Records"));
     //gIncludesLay->addWidget (iW, 0, 0, 1, 1);
 }
 

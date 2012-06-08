@@ -109,6 +109,7 @@ KKSObjEditor :: KKSObjEditor (const KKSTemplate *t,
     recWidget (0),
     fileWidget(0),
     includesWidget(0),
+    includesRecWidget (0),
     isChanged (false)
 {
     if (m_sysTemplate)
@@ -579,6 +580,11 @@ int KKSObjEditor :: constructObject()
         avalIndList.append (av);
     }
     pObjectEx->setIndValues (avalIndList);
+    //
+    // добавляем вложения
+    //
+    if (includesRecWidget)
+        pObjectEx->setRootRubric(includesRecWidget->rootRubric());
 
     //
     // если редактируемый ЭИО является ИО, то надо сохранить его атрибуты
@@ -1527,6 +1533,21 @@ void KKSObjEditor :: addIncludesWidget (KKSIncludesWidget *iw)
     connect (this, SIGNAL(rubricItemSelected(int, QString)), includesWidget, SLOT(slotAddRubricItem(int, QString)));
 }
 
+void KKSObjEditor :: addIncludesRecWidget (KKSIncludesWidget *iw)
+{
+    if (includesRecWidget)
+    {
+        delete includesRecWidget;
+        includesRecWidget = 0;
+    }
+    includesRecWidget = iw;
+    includesRecWidget->setParent(this);
+    connect (includesRecWidget, SIGNAL(rubricItemRequested()), this, SLOT(slotIncludeRecRequested()));
+    connect (includesRecWidget, SIGNAL(openRubricItemRequested(int)), this, SLOT(slotOpenRubricItemRecRequested(int)));
+    connect (includesRecWidget, SIGNAL (rubricsChanged()), this, SLOT (rubricsChanged()) );
+    connect (this, SIGNAL(rubricItemSelected(int, QString)), includesRecWidget, SLOT(slotAddRubricItem(int, QString)));
+}
+
 void KKSObjEditor::slotIncludeSelected(int idObject, QString name)
 {
     emit rubricItemSelected(idObject, name);
@@ -1540,6 +1561,22 @@ void KKSObjEditor::slotIncludeRequested()
 void KKSObjEditor::slotOpenRubricItemRequested(int idObject)
 {
     emit openRubricItemRequested(idObject, this);
+}
+
+void KKSObjEditor::slotIncludeRecSelected(int idObjectE, QString name)
+{
+    qDebug () << __PRETTY_FUNCTION__ << idObjectE << name; 
+}
+
+void KKSObjEditor::slotIncludeRecRequested()
+{
+    qDebug () << __PRETTY_FUNCTION__;
+    emit includeRecRequested(this);
+}
+
+void KKSObjEditor::slotOpenRubricRecItemRequested(int idObjectE)
+{
+    qDebug () << __PRETTY_FUNCTION__ << idObjectE;
 }
 
 void KKSObjEditor :: setView (void)
