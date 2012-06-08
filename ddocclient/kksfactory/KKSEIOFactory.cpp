@@ -1117,3 +1117,18 @@ int KKSEIOFactory::updateIndValues(const KKSObjectExemplar * eio) const
 
     return OK_CODE;
 }
+
+int KKSEIOFactory::insertRecRubrics (const KKSObjectExemplar * eio) const
+{
+    if (!eio || eio->id() < 0)
+        return ERROR_CODE;
+
+    KKSRubric * rootRubric = eio->rootRubric();
+    if(!rootRubric)
+        return OK_CODE;
+}
+
+int KKSEIOFactory::clearRecRubrics (const KKSObjectExemplar * eio) const
+{
+
+}

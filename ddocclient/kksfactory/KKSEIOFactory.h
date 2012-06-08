@@ -73,6 +73,8 @@ private:
     int updateIndValues(const KKSObjectExemplar * eio) const;
     int insertIndValues(const KKSObjectExemplar * eio) const;
 
+    int insertRecRubrics (const KKSObjectExemplar * eio) const;
+    int clearRecRubrics (const KKSObjectExemplar * eio) const;
     
 };
 
