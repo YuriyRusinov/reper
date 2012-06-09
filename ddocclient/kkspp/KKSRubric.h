@@ -120,6 +120,7 @@ private:
 
     friend class KKSLoader;
     friend class KKSPPFactory;
+    friend class KKSEIOFactory;
     //
     //дискреционные права доступа
     //

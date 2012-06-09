@@ -17,6 +17,7 @@
 class KKSDatabase;
 class KKSObjectExemplar;
 class KKSCategory;
+class KKSRubric;
 
 class QProgressDialog;
 
@@ -73,8 +74,21 @@ private:
     int updateIndValues(const KKSObjectExemplar * eio) const;
     int insertIndValues(const KKSObjectExemplar * eio) const;
 
-    int insertRecRubrics (const KKSObjectExemplar * eio) const;
-    int clearRecRubrics (const KKSObjectExemplar * eio) const;
+    int updateIncludes(const KKSObjectExemplar * eio) const;
+    int insertIncludes(const KKSObjectExemplar * eio) const;
+    int deleteIncludes(int idObject) const;
+    int updateRubrics(KKSRubric * parent, int idMyDocsRubricator = -1) const;
+    int updateRubric(KKSRubric * r) const;
+    int insertRubrics(KKSRubric * parent, int idMyDocsRubricator = -1) const;
+    int insertRubric(KKSRubric * r, int idParent, int idRec, bool root = false, int idMyDocsRubricator = -1) const;
+    int insertRubricItem(int idRubric, int idRec, bool isAutomated) const;
+    void rollbackRubrics(KKSRubric * r, bool forUpdate = false) const;
+    void rollbackRubric(KKSRubric * r, bool forUpdate = false) const;
+    void commitRubrics(KKSRubric * r) const;
+    void commitRubric(KKSRubric * r) const;
+    int insertRubricators(KKSRubric * rootRubric, int idMyDocsRubricator, bool bMyDocs = false) const;
+    int deleteRubricators(bool bMyDocs = false) const;
+    int deleteRubric(int idRubric) const;
     
 };
 

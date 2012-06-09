@@ -16,6 +16,7 @@
 #include "KKSObject.h"
 #include "KKSCategory.h"
 #include "KKSAttrType.h"
+#include "KKSRubric.h"
 
 ////////////////////////////////////////////////////////////////////////
 // Name:       KKSEIOFactory::KKSEIOFactory()
@@ -55,7 +56,13 @@ int KKSEIOFactory::insertEIO(KKSObjectExemplar* eio, const KKSCategory* cat, con
     if(!eio || !eio->io())
         return ERROR_CODE;
 
-    return insertRecord(eio, cat, table);
+    int res = insertRecord(eio, cat, table);
+    if (res <= 0)
+        return ERROR_CODE;
+    int rres = insertIncludes (eio);
+    if (rres <=0)
+        return ERROR_CODE;
+    return res;
 }
 
 int KKSEIOFactory::updateEIO(const KKSObjectExemplar* eio, const KKSCategory* cat, const QString& table) const
@@ -63,7 +70,13 @@ int KKSEIOFactory::updateEIO(const KKSObjectExemplar* eio, const KKSCategory* ca
     if(!eio || !eio->io())
         return ERROR_CODE;
 
-    return updateRecord(eio, cat, table);
+    int res = updateRecord(eio, cat, table);
+    if (res <= 0)
+        return ERROR_CODE;
+    int rres = insertIncludes (eio);
+    if (rres <=0)
+        return ERROR_CODE;
+    return res;
 }
 
 int KKSEIOFactory::deleteEIO(KKSObjectExemplar* eio, const QString& table) const
@@ -1118,17 +1131,320 @@ int KKSEIOFactory::updateIndValues(const KKSObjectExemplar * eio) const
     return OK_CODE;
 }
 
-int KKSEIOFactory::insertRecRubrics (const KKSObjectExemplar * eio) const
+int KKSEIOFactory::updateIncludes(const KKSObjectExemplar * eio) const
 {
-    if (!eio || eio->id() < 0)
+    if(!eio || eio->id() <= 0)
         return ERROR_CODE;
 
     KKSRubric * rootRubric = eio->rootRubric();
     if(!rootRubric)
         return OK_CODE;
+
+    int cnt = rootRubric->rubrics().count();
+    if(cnt  == 0)
+        return OK_CODE;
+    
+    int ok;
+    if(rootRubric->id() > 0)
+        ok = updateRubric(rootRubric);
+    else
+        ok = insertRubric(rootRubric, -1, eio->id(), true);
+
+    if (ok <= 0 ){
+        rollbackRubrics(rootRubric, true);
+        return ERROR_CODE;
+    }
+
+    ok = updateRubrics(rootRubric);
+    if (ok < 0 )
+    {
+        rollbackRubrics(rootRubric, true);
+        return ERROR_CODE;
+    }
+
+    //удал€ем рубрики, которые не вошли в новый перечень
+    QString ids = rootRubric->getFullTreeOfIdsString();
+    QString sql;
+    if(ids.isEmpty())
+        sql = QString("select recDeleteIncludes(%1, ARRAY[-1])").arg(eio->id());
+    else
+        sql = QString("select recDeleteIncludes(%1, ARRAY[%2])").arg(eio->id()).arg(ids);
+    KKSResult * res = db->execute(sql);
+    ok = -1;
+    if(res){
+        ok = res->getCellAsInt(0, 0);
+        delete res;
+    }
+    if(ok < 0)
+        return ERROR_CODE;
+
+    return OK_CODE;
+
 }
 
-int KKSEIOFactory::clearRecRubrics (const KKSObjectExemplar * eio) const
+int KKSEIOFactory::insertIncludes(const KKSObjectExemplar * eio) const
+{
+    if(!eio || eio->id() <= 0)
+        return ERROR_CODE;
+
+    KKSRubric * rootRubric = eio->rootRubric();
+    if(!rootRubric)
+        return OK_CODE;
+
+    int cnt = rootRubric->rubrics().count();
+    if(cnt  == 0)
+        return OK_CODE;
+    
+    int ok = insertRubric(rootRubric, -1, eio->id(), true);
+    //
+    // “еперь функци€ insertRubric возвращает id добавленной рубрики
+    //
+    if (ok < 0 ){
+        rollbackRubrics(rootRubric);
+        return ERROR_CODE;
+    }
+
+    ok = insertRubrics(rootRubric);
+    if (ok < 0 )// != OK_CODE){
+    {
+        rollbackRubrics(rootRubric);
+        return ERROR_CODE;
+    }
+
+    return OK_CODE;
+
+}
+
+int KKSEIOFactory::deleteIncludes(int idRec) const
+{
+    QString sql = QString("select recDeleteRubrics(%1)").arg(idRec);
+    KKSResult * res = db->execute(sql);
+    if(!res || res->getRowCount() == 0){
+        if(res)
+            delete res;
+        return ERROR_CODE;
+    }
+    int ok = res->getCellAsInt(0, 0);
+    delete res;
+
+    if(ok != 1)
+        return ERROR_CODE;
+
+    return OK_CODE;
+}
+
+int KKSEIOFactory::updateRubrics(KKSRubric * parent, int idMyDocsRubricator) const
+{
+    if(!parent)
+        return ERROR_CODE;
+
+    int cnt = parent->rubrics().count();
+
+    for(int i=0; i<cnt; i++){
+        KKSRubric * r = parent->rubric(i);
+        
+        int ok;
+        if(r->id() <= 0)
+            ok = insertRubric(r, parent->id(), -1, false, idMyDocsRubricator);
+        else
+            ok = updateRubric(r);
+        
+        if (ok <0 )
+            return ERROR_CODE;
+
+        ok = updateRubrics(r, idMyDocsRubricator);
+        if (ok < 0 )
+            return ERROR_CODE;
+    }
+    
+    //сначала удалим все вложени€ в рубрику
+    QString sql = QString("delete from record_rubricator where id_parent = %1").arg(parent->id());
+    int ok = db->executeCmd(sql);
+    if(ok != OK_CODE)
+        return ERROR_CODE;
+
+    cnt = parent->items().count();
+    for(int i=0; i<cnt; i++){
+        const KKSRubricItem * item = parent->item(i);
+        int ok = insertRubricItem(parent->id(), item->id(), item->isAutomated());
+        if(ok != OK_CODE)
+            return ERROR_CODE;
+    }
+
+    return OK_CODE;
+
+}
+
+int KKSEIOFactory::updateRubric(KKSRubric * r) const
+{
+    if (!r || r->id() <= 0)
+        return ERROR_CODE;
+
+    int idRubric = r->id();
+    
+    QString sql = QString("select * from recUpdateRubricLocal (%1, '%2', '%3');")
+                          .arg(r->id())
+                          .arg (r->name())
+                          .arg (r->desc());
+
+    KKSResult * res = db->execute (sql);
+    if (!res)
+    {
+        return ERROR_CODE;
+    }
+    idRubric = res->getCellAsInt (0, 0);
+    delete res;
+
+    r->setId (idRubric);
+
+    return idRubric;
+
+}
+
+int KKSEIOFactory::insertRubrics(KKSRubric * parent, int idMyDocsRubricator) const
+{
+    if(!parent)
+        return ERROR_CODE;
+
+    int cnt = parent->rubrics().count();
+
+    for(int i=0; i<cnt; i++){
+        KKSRubric * r = parent->rubric(i);
+        int ok = insertRubric(r, parent->id(), -1, false, idMyDocsRubricator);
+        if (ok <0 )//!= OK_CODE)
+            return ERROR_CODE;
+
+        ok = insertRubrics(r, idMyDocsRubricator);
+        if (ok < 0 )// != OK_CODE)
+            return ERROR_CODE;
+    }
+
+    cnt = parent->items().count();
+    for(int i=0; i<cnt; i++){
+        const KKSRubricItem * item = parent->item(i);
+        int ok = insertRubricItem(parent->id(), item->id(), item->isAutomated());
+        if(ok != OK_CODE)
+            return ERROR_CODE;
+    }
+
+    return OK_CODE;// parent->id();
+
+}
+
+int KKSEIOFactory::insertRubric(KKSRubric * r, int idParent, int idRec, bool root, int idMyDocsRubricator) const
+{
+    if (!r)
+        return ERROR_CODE;
+
+    int idRubric = ERROR_CODE;//eiof->getNextSeq("rubricator", "id");
+    
+    QString sql = QString("select * from recInsertRubric(%1, %2, '%3', '%4');")
+                          .arg ( (root || idParent <= 0) ? QString("NULL") : QString::number(idParent))
+                          .arg (root ? QString::number(idRec) : QString("NULL"))
+                          .arg (r->name())
+                          .arg (r->desc());
+
+    qDebug () << __PRETTY_FUNCTION__ << sql;
+
+    KKSResult * res = db->execute (sql);
+    if (!res)
+    {
+        return ERROR_CODE;
+    }
+    idRubric = res->getCellAsInt (0, 0);
+    delete res;
+/*
+    if (idMyDocsRubricator > 0 && r->id() == idMyDocsRubricator)
+    {
+        int res = createMyDocsRubricator(idRubric);
+        if (res != OK_CODE)
+            return ERROR_CODE;
+    }
+*/
+    Q_UNUSED (idMyDocsRubricator);
+    r->setId (idRubric);
+
+//    int ok = updateUserPrivileges (r, idRubric);
+//    qDebug () << __PRETTY_FUNCTION__ << ok;
+
+    return idRubric;
+
+}
+
+int KKSEIOFactory::insertRubricItem(int idRubric, int idRec, bool isAutomated) const
+{
+    if(idRubric <= 0 || idRec <= 0)
+        return OK_CODE;
+
+    QString sql = QString("insert into rubric_records (id_record, id_rubric) values(%1, %2)")
+		        .arg(idRec)
+                        .arg(idRubric);
+    
+    int ok = db->executeCmd(sql);
+    if(ok != OK_CODE){
+        return ERROR_CODE;
+    }
+
+    return OK_CODE;
+
+}
+
+void KKSEIOFactory::rollbackRubrics(KKSRubric * parent, bool forUpdate) const
+{
+    if(!parent)
+        return;
+
+    rollbackRubric(parent, forUpdate);
+    for(int i=0; i<parent->rubrics().count(); i++){
+        KKSRubric * r = parent->rubric(i);
+        rollbackRubrics(r, forUpdate);
+    }
+}
+
+void KKSEIOFactory::rollbackRubric(KKSRubric * r, bool forUpdate) const
+{
+    if(!r)
+        return;
+
+    if(forUpdate && r->m_intId > 0) //если рубрика загружена из Ѕƒ, то не надо ее помечать как несозданную
+        return;
+    
+    r->setId(-1);
+    
+}
+
+void KKSEIOFactory::commitRubrics(KKSRubric * parent) const
+{
+    if(!parent)
+        return;
+
+    commitRubric(parent);
+    for(int i=0; i<parent->rubrics().count(); i++){
+        KKSRubric * r = parent->rubric(i);
+        commitRubrics(r);
+    }
+    
+}
+
+void KKSEIOFactory::commitRubric(KKSRubric * r) const
+{
+    if(!r)
+        return;
+
+    r->m_intId = r->id();
+}
+
+int KKSEIOFactory::insertRubricators(KKSRubric * rootRubric, int idMyDocsRubricator, bool bMyDocs) const
+{
+
+}
+
+int KKSEIOFactory::deleteRubricators(bool bMyDocs) const
+{
+
+}
+
+int KKSEIOFactory::deleteRubric(int idRubric) const
 {
 
 }
