@@ -52,7 +52,7 @@ begin
         select r.id1, r.id_parent, NULL, r.name, r.description, 1
         from record_rubricator r
         where r.id_parent = idRubric
-        order by r.id
+        order by r.id1
     loop
 
         return next rec;

@@ -8,9 +8,10 @@ declare
 
     idRubric int4;
     cnt int4;
+    query varchar;
 begin
 
-    select getNextSeq('record_rubricator', 'id') into idRubric;
+    select getNextSeq('record_rubricator', 'id1') into idRubric;
 
     if(idParent is not null and idRecord is not null) then
 
@@ -24,8 +25,30 @@ begin
         return -1;
     end if;
 
-    insert into record_rubricator (id1, id_parent, id_record, name, description) 
-    values (idRubric, idParent, idRecord, rName, rDesc);
+    select count(*) into cnt from q_base_table where id=idRecord;
+
+    raise warning 'cnt is %', cnt;
+
+    query := E'insert into record_rubricator (id1, id_parent, id_record, name, description) values (';
+    query := query || idRubric || E',';
+    if (idParent is null) then
+        query := query || E'NULL,';
+    else
+        query := query || idParent || E',';
+    end if;
+    if (idRecord is null) then
+        query := query || E'NULL,';
+    else
+        query := query || idRecord || E',';
+    end if;
+    query := query || quote_literal (rName) || E',';
+    if (rDesc is null) then
+        query := query || E'NULL)';
+    else
+        query := query || quote_literal (rDesc) || E')';
+    end if;
+    raise warning '%', query;
+    execute query;
     if (not FOUND) then
         return -1;
     end if;
