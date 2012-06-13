@@ -86,8 +86,8 @@ begin
     for r in
         select
             rr.id_record,
-            NULL,
             rr.id_rubric,
+            NULL,
             NULL,
             NULL,
             2
