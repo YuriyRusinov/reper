@@ -40,13 +40,13 @@ begin
     query := query || ' inner join attrs_values av on (';
 
     if (is_int4 (ioValue)) then
-        query := query || ' is_int4 (av.value) and int4 (av.value) ' || oper || ' ';
+        query := query || ' is_int4 (av.value) and to_int4 (av.value) ' || oper || ' ';
         query := query || int4 (ioValue);
     elsif (is_float8 (ioValue)) then
-        query := query || ' is_float8 (av.value) and float8 (av.value) ' || oper || ' ' ;
+        query := query || ' is_float8 (av.value) and to_float8 (av.value) ' || oper || ' ' ;
         query := query || float8 (ioValue);
     elsif (is_int4 (ioValue)) then
-        query := query || ' is_int4 (av.value) and int4 (av.value) ' || oper || ' ';
+        query := query || ' is_int4 (av.value) and to_int4 (av.value) ' || oper || ' ';
         query := query || int4 (ioValue);
     elsif (is_array_int4 (ioValue)) then
         query := query || ' is_array_int4 (av.value) and ';
@@ -85,7 +85,7 @@ begin
         query := query || quote_literal (ioValue);
     end if;
 
-    query := query || ' and av.id_attr_category = ac.id);';
+    query := query || ' and av.id_attr_category = ac.id and av.is_actual = true);';
     r_query := query;
     RAISE WARNING '%', r_query;
 
@@ -139,13 +139,13 @@ raise warning 'asasas';
     query := query || ' inner join attrs_values av on (';
 
     if (is_int4 (ioValue)) then
-        query := query || ' is_int4 (av.value) and int4 (av.value) ' || oper || ' ';
+        query := query || ' is_int4 (av.value) and to_int4 (av.value) ' || oper || ' ';
         query := query || int4 (ioValue);
     elsif (is_float8 (ioValue)) then
-        query := query || ' is_float8 (av.value) and float8 (av.value) ' || oper || ' ' ;
+        query := query || ' is_float8 (av.value) and to_float8 (av.value) ' || oper || ' ' ;
         query := query || float8 (ioValue);
     elsif (is_int4 (ioValue)) then
-        query := query || ' is_int4 (av.value) and int4 (av.value) ' || oper || ' ';
+        query := query || ' is_int4 (av.value) and to_int4 (av.value) ' || oper || ' ';
         query := query || int4 (ioValue);
     elsif (is_array_int4 (ioValue)) then
         query := query || ' is_array_int4 (av.value) and ';
@@ -184,7 +184,7 @@ raise warning 'asasas';
         query := query || quote_literal (ioValue);
     end if;
 
-    query := query || ' and av.id_attr_category = ac.id);';
+    query := query || ' and av.id_attr_category = ac.id and av.is_actual = true);';
     RAISE WARNING '%', query;
 
     for r in 
@@ -260,7 +260,7 @@ begin
     --av.id_io_object from attributes a inner join attrs_values av on (av.id_io_attribute = a.id and (a.table_name isnull and a.column_name isnull and ';
 
     if (isDouble) then
-        query := query || 'is_float8 (av.value) and float8 (av.value) ';
+        query := query || 'is_float8 (av.value) and to_float8 (av.value) ';
     else
         query := query || 'av.value ';
     end if;
