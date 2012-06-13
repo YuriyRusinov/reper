@@ -3754,8 +3754,17 @@ void KKSObjEditorFactory :: slotIncludeRecRequested(KKSObjEditor * editor)
         o->release();
         return;
     }
+    KKSFilter * filterRef = c->createFilter(43, QString::number (2), KKSFilter::foEq);
+    if (!filterRef)
+    {
+        filter->release ();
+        o->release ();
+        return;
+    }
 
-    filters.append(filter);
+    filters.append (filter);
+    filters.append (filterRef);
+    filterRef->release ();
     filter->release();
     KKSList<const KKSFilterGroup *> filterGroups;
     KKSFilterGroup * group = new KKSFilterGroup(true);

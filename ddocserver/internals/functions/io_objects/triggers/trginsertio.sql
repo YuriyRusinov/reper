@@ -101,13 +101,16 @@ begin
         if(new.table_name is null) then
             raise exception 'Cannot generate table with given name! -- %', new.table_name;
             return NULL;
+        elsif (new.id_io_type is null or new.id_io_type=1) then
+            new.id_io_type := 2;
         end if;
 
     end if;
 
     return new;
 
-end$BODY$
+end
+$BODY$
 language 'plpgsql';
 
 select f_safe_drop_trigger('trgioinsert', 'io_objects');

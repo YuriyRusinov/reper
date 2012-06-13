@@ -70,26 +70,19 @@ declare
     excludeIds alias for $2;
 begin
     
-/*    delete 
-    from 
-        access_rubric_table 
-    where 
-        id_rubric in (select id from ioGetRubrics(idObject) where type in (0, 1)) 
-        and id_rubric not in (select id from rubricator where id = ANY (excludeIds));
-*/
     delete 
     from 
         rubric_records 
     where 
         id_rubric in (select id from recGetRubrics(idRecord) where type in (0, 1)) 
-        and id_rubric not in (select id from record_rubricator where id = ANY (excludeIds));
+        and id_rubric not in (select id1 from record_rubricator where id1 = ANY (excludeIds));
     
     delete 
     from 
         record_rubricator 
     where 
-        id in (select id from recGetRubrics(idRecord) where type in (0, 1)) 
-        and id not in (select id from rubricator where id = ANY (excludeIds));
+        id1 in (select id from recGetRubrics(idRecord) where type in (0, 1)) 
+        and id1 not in (select id1 from record_rubricator where id1 = ANY (excludeIds));
 
     return 1;
 

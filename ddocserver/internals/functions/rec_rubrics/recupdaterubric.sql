@@ -43,7 +43,7 @@ begin
     update record_rubricator set
         name = rName,      
         description = rDesc
-    where id = idRubric;
+    where id1 = idRubric;
 
     if (not FOUND) then
         return -1;

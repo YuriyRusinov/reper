@@ -73,9 +73,10 @@ int KKSEIOFactory::updateEIO(const KKSObjectExemplar* eio, const KKSCategory* ca
     int res = updateRecord(eio, cat, table);
     if (res <= 0)
         return ERROR_CODE;
-    int rres = insertIncludes (eio);
+    int rres = updateIncludes (eio);
     if (rres <=0)
         return ERROR_CODE;
+    commitRubrics (eio->rootRubric());
     return res;
 }
 
@@ -1169,6 +1170,7 @@ int KKSEIOFactory::updateIncludes(const KKSObjectExemplar * eio) const
         sql = QString("select recDeleteIncludes(%1, ARRAY[-1])").arg(eio->id());
     else
         sql = QString("select recDeleteIncludes(%1, ARRAY[%2])").arg(eio->id()).arg(ids);
+    qDebug () << __PRETTY_FUNCTION__ << ids << sql;
     KKSResult * res = db->execute(sql);
     ok = -1;
     if(res){
@@ -1258,7 +1260,7 @@ int KKSEIOFactory::updateRubrics(KKSRubric * parent, int idMyDocsRubricator) con
     }
     
     //сначала удалим все вложения в рубрику
-    QString sql = QString("delete from record_rubricator where id_parent = %1").arg(parent->id());
+    QString sql = QString("delete from rubric_records where id_rubric = %1").arg(parent->id());
     int ok = db->executeCmd(sql);
     if(ok != OK_CODE)
         return ERROR_CODE;
