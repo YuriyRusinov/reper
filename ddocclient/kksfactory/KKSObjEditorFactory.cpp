@@ -3772,21 +3772,21 @@ void KKSObjEditorFactory :: slotIncludeRecRequested(KKSObjEditor * editor)
     filterGroups.append(group);
     group->release();
     
-    KKSObjEditor *objEditor = createObjEditor(IO_IO_ID, 
-                                              IO_IO_ID, 
-                                              filterGroups, 
-                                              "",
-                                              c,
-                                              true,
-                                              QString(),
-                                              false,
-                                              editor->windowModality(),
-                                              editor,
-                                              Qt::Dialog);
+    KKSObjEditor *objEditor = createObjRecEditor(IO_IO_ID, 
+                                                 IO_IO_ID, 
+                                                 filterGroups, 
+                                                 "",
+                                                 c,
+                                                 true,
+                                                 false,
+                                                 editor->windowModality(),
+                                                 editor,
+                                                 Qt::Dialog);
     int res = objEditor->exec();
     
     int idObject = -1;
     QString name;
+    int idObjRec (-1);
 
     if(res == QDialog::Accepted){
         idObject = objEditor->recWidget->getID();
@@ -3795,13 +3795,42 @@ void KKSObjEditorFactory :: slotIncludeRecRequested(KKSObjEditor * editor)
             delete objEditor;
             return;
         }
-        name = o->name();
+        /*name = o->name();
+        o->release();*/
+        KKSList<const KKSFilterGroup *> recFilterGroups;
+        KKSObjEditor * refObjEditor = createObjRecEditor (IO_IO_ID,
+                                                          idObject,
+                                                          recFilterGroups,
+                                                          "",
+                                                          o->category()->tableCategory(),
+                                                          true,
+                                                          false,
+                                                          Qt::WindowModal,
+                                                          objEditor,
+                                                          Qt::Dialog);
+        if (refObjEditor->exec() == QDialog::Accepted)
+        {
+            idObjRec = refObjEditor->recWidget->getID();
+            KKSObjectExemplar * rec = loader->loadEIO(idObjRec, o);
+            if (rec)
+            {
+                name = rec->name ();
+                rec->release ();
+            }
+        }
         o->release();
+                
+    }
+    else
+    {
+        o->release();
+        return;
     }
     
     delete objEditor;
     
-    editor->slotIncludeSelected(idObject, name);
+    if (idObjRec > 0)
+        editor->slotIncludeRecSelected(idObjRec, idObject, name);//slotIncludeSelected(idObject, name);
     o->release();
 }
 

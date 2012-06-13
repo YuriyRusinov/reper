@@ -1563,9 +1563,11 @@ void KKSObjEditor::slotOpenRubricItemRequested(int idObject)
     emit openRubricItemRequested(idObject, this);
 }
 
-void KKSObjEditor::slotIncludeRecSelected(int idObjectE, QString name)
+void KKSObjEditor::slotIncludeRecSelected(int idObjectE, int idObject, QString name)
 {
-    qDebug () << __PRETTY_FUNCTION__ << idObjectE << name; 
+    qDebug () << __PRETTY_FUNCTION__ << idObjectE << idObject << name; 
+    emit rubricItemSelected (idObjectE, name);
+    Q_UNUSED (idObject);
 }
 
 void KKSObjEditor::slotIncludeRecRequested()
@@ -1574,7 +1576,7 @@ void KKSObjEditor::slotIncludeRecRequested()
     emit includeRecRequested(this);
 }
 
-void KKSObjEditor::slotOpenRubricRecItemRequested(int idObjectE)
+void KKSObjEditor::slotOpenRubricItemRecRequested(int idObjectE)
 {
     qDebug () << __PRETTY_FUNCTION__ << idObjectE;
 }

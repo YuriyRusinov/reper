@@ -2881,8 +2881,6 @@ void KKSLoader::loadRecRubrics (KKSObjectExemplar * eio) const
             item->release();
         }
 
-        if (st)
-            st->release ();
     }
 
     if(rootRubric)

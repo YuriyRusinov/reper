@@ -234,9 +234,9 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void slotIncludeSelected(int idObject, QString name);
         void slotIncludeRequested();
         void slotOpenRubricItemRequested(int idObject);
-        void slotIncludeRecSelected(int idObjectE, QString name);
+        void slotIncludeRecSelected(int idObjectE, int idObject, QString name);
         void slotIncludeRecRequested();
-        void slotOpenRubricRecItemRequested(int idObjectE);
+        void slotOpenRubricItemRecRequested(int idObjectE);
         void setNumCopies (int n);
 
    protected:
