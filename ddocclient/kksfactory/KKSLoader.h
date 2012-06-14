@@ -202,6 +202,7 @@ class _F_EXPORT KKSLoader
         
         QList<int> getForbiddenTypes (void) const;
 
+        int getRefIO (int idObjectE) const;
 
         KKSLoader();
         ~KKSLoader();

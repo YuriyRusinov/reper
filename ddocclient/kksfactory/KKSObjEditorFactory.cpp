@@ -1495,6 +1495,7 @@ void KKSObjEditorFactory :: setObjConnect (KKSObjEditor *editor)
     connect (editor, SIGNAL(includeRequested(KKSObjEditor*)), this, SLOT(slotIncludeRequested(KKSObjEditor*)));
     connect (editor, SIGNAL(includeRecRequested(KKSObjEditor*)), this, SLOT(slotIncludeRecRequested(KKSObjEditor*)));
     connect (editor, SIGNAL(openRubricItemRequested(int, KKSObjEditor*)), this, SLOT(slotOpenRubricItemRequested(int, KKSObjEditor*)));
+    connect (editor, SIGNAL(openRubricItemRecRequested(int, KKSObjEditor*)), this, SLOT(slotOpenRubricItemRecRequested(int, KKSObjEditor*)));
     connect (editor, SIGNAL (updateAttributes (QWidget *, QScrollArea *, QWidget *, int, const KKSCategory *, bool, KKSObjEditor*)), this, SLOT (regroupAttrs (QWidget *, QScrollArea *, QWidget *, int, const KKSCategory*, bool, KKSObjEditor*)) );
     connect (editor, SIGNAL (saveObj(KKSObjEditor*, KKSObject*, KKSObjectExemplar*, int)), this, SLOT (saveObject(KKSObjEditor*, KKSObject*, KKSObjectExemplar*, int)) );
     connect (editor, SIGNAL (saveObjAsCommandResult(KKSObjEditor*, KKSObject*, KKSObjectExemplar*, int)), this, SLOT (saveObjectAsCommandResult(KKSObjEditor*, KKSObject*, KKSObjectExemplar*, int)) );
@@ -3847,6 +3848,50 @@ void KKSObjEditorFactory :: slotOpenRubricItemRequested(int idObject, KKSObjEdit
 
     KKSObjEditor * newObjEditor = this->createObjEditor (IO_IO_ID, 
                                                          idObject, 
+                                                         KKSList<const KKSFilterGroup*>(), 
+                                                         "",
+                                                         c,
+                                                         false,
+                                                         QString(),
+                                                         false,
+                                                         editor->windowModality (),
+                                                         NULL);
+    o->release();
+
+    if(!newObjEditor)
+    {
+        QMessageBox::critical(editor, 
+                              tr("Error"), 
+                              tr("Cannot create new object editor! Corrupt data!"), 
+                              QMessageBox::Ok);
+        return;
+    }
+
+    connect(newObjEditor, SIGNAL(eioChanged(const QList<int>&, const KKSCategory*, QString, int)), editor, SLOT(updateEIOEx(const QList<int>, const KKSCategory *, QString, int)));
+    newObjEditor->setAttribute (Qt::WA_DeleteOnClose);
+
+    emit editorCreated(newObjEditor);
+}
+
+void KKSObjEditorFactory :: slotOpenRubricItemRecRequested(int idObjectE, KKSObjEditor * editor)
+{
+    int idObject = loader->getRefIO(idObjectE);
+    KKSObject * o = loader->loadIO(idObject, true);
+    if(!o)
+        return;
+    KKSCategory * c = o->category();
+    if(!c){
+        o->release();
+        return;
+    }
+/*    c = c->tableCategory ();
+    if(!c){
+        o->release();
+        return;
+    }*/
+
+    KKSObjEditor * newObjEditor = this->createObjEditor (idObject, 
+                                                         idObjectE, 
                                                          KKSList<const KKSFilterGroup*>(), 
                                                          "",
                                                          c,

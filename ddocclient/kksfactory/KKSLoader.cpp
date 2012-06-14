@@ -5123,3 +5123,31 @@ KKSList<KKSAttrValue *> KKSLoader::loadIndValues(KKSObjectExemplar * eio) const
 
     return attrs;
 }
+
+int KKSLoader :: getRefIO (int idObjectE) const
+{
+    if (idObjectE < 0)
+        return ERROR_CODE;
+    QString sql = QString ("select * from getRecordTable(%1)").arg (idObjectE);
+    KKSResult * res = db->execute (sql);
+    if (!res || res->getRowCount () != 1)
+    {
+        if (res)
+            delete res;
+        return ERROR_CODE;
+    }
+    QString tableName = res->getCellAsString (0, 0);
+    delete res;
+    sql = QString("select ioGetObjectIDByTableName ('%1');").arg(tableName.mid(4));
+    qDebug () << __PRETTY_FUNCTION__ << sql;
+    KKSResult * iores = db->execute (sql);
+    if (!iores || iores->getRowCount() != 1)
+    {
+        if (iores)
+            delete iores;
+        return ERROR_CODE;
+    }
+    int idObject = iores->getCellAsInt (0, 0);
+    delete iores;
+    return idObject;
+}

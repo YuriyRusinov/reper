@@ -206,6 +206,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void includeRequested(KKSObjEditor * editor);
         void includeRecRequested(KKSObjEditor * editor);
         void openRubricItemRequested(int idObject, KKSObjEditor * editor);
+        void openRubricItemRecRequested(int idObjectE, KKSObjEditor * editor);
 
         void updateAttributes (QWidget *ioAttrWidget, QScrollArea *sc, QWidget *ioAttrsW, /*KKSObject * wObj*/ int idObj, const KKSCategory * wCat, bool isSystem, KKSObjEditor* editor);
         void closeEditor (void);

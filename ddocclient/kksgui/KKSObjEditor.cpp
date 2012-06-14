@@ -1579,6 +1579,7 @@ void KKSObjEditor::slotIncludeRecRequested()
 void KKSObjEditor::slotOpenRubricItemRecRequested(int idObjectE)
 {
     qDebug () << __PRETTY_FUNCTION__ << idObjectE;
+    emit openRubricItemRecRequested(idObjectE, this);
 }
 
 void KKSObjEditor :: setView (void)
