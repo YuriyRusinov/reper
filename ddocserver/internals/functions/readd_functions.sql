@@ -22,7 +22,7 @@
 
 \i ./functions/ik_tso/readd_ik_tso.sql
 \i ./functions/rubricator/readd_rubricator.sql
-\i ./functions/rubricator/readd_rec_rubrics.sql
+\i ./functions/rec_rubrics/readd_rec_rubrics.sql
 \i ./functions/indicators/readd_indicators.sql
 
 --\i ./functions/commands/readd_commands.sql

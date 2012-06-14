@@ -469,7 +469,7 @@ begin
     insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(bbb(169, 238), idTemplate+1, idGroup+9, false, 1, NULL);
     insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(bbb(169, 239), idTemplate+1, idGroup+9, false, 2, NULL);
 
-    preform pg_catalog.setval('a_groups_id_seq', idGroup+10, true);
+    perform pg_catalog.setval('a_groups_id_seq', idGroup+10, true);
     perform pg_catalog.setval('io_templates_id_seq', idTemplate+2, true);
 
 

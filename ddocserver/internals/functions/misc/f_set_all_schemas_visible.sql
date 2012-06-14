@@ -13,6 +13,7 @@ begin
     end loop;
 
     execute q;
+    raise warning '%', q;
 
     return 1;
 end

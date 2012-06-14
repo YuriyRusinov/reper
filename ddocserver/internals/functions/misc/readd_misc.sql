@@ -21,3 +21,4 @@
 \i ./functions/misc/getnextseq.sql
 \i ./functions/misc/kkssitoversion.sql
 \i ./functions/misc/getsystemparam.sql
+\i ./functions/misc/getrecordtable.sql

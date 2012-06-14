@@ -48,9 +48,9 @@ begin
 
     
     for r in
-        select rec.id1 from record_rubricator rec inner join rubric_records rr on (rec.id1=rr.id_rubric and rr.id_record=idRecord)
+        select rec.id from record_rubricator rec inner join rubric_records rr on (rec.id = rr.id_rubric and rr.id_record=idRecord)
     loop
-        i := r.id1;
+        i := r.id;
         select into res recDelRubric (i);
         if(res <> 1) then
             return res;
@@ -75,14 +75,14 @@ begin
         rubric_records 
     where 
         id_rubric in (select id from recGetRubrics(idRecord) where type in (0, 1)) 
-        and id_rubric not in (select id1 from record_rubricator where id1 = ANY (excludeIds));
+        and id_rubric not in (select id from record_rubricator where id = ANY (excludeIds));
     
     delete 
     from 
         record_rubricator 
     where 
-        id1 in (select id from recGetRubrics(idRecord) where type in (0, 1)) 
-        and id1 not in (select id1 from record_rubricator where id1 = ANY (excludeIds));
+        id in (select id from recGetRubrics(idRecord) where type in (0, 1)) 
+        and id not in (select id from record_rubricator where id = ANY (excludeIds));
 
     return 1;
 

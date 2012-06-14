@@ -1,4 +1,4 @@
-create or replace function recUpdateRubric(int4, varchar, varchar, int4, int4, int4, int4) returns int4 as
+create or replace function recUpdateRubric(int4, varchar, varchar, int4, int4, int4, int8) returns int4 as
 $BODY$
 declare
     id alias for $1;
@@ -10,7 +10,7 @@ declare
     idRubric int4;
 begin
 
-    select id into idRubric from record_rubricator where id1 = id;
+    select id into idRubric from record_rubricator where id = id;
     if(idRubric is null) then
         idRubric := recInsertRubric(idParent, idRecord, rName, rDesc);
         if(idRubric <= 0) then
@@ -43,7 +43,7 @@ begin
     update record_rubricator set
         name = rName,      
         description = rDesc
-    where id1 = idRubric;
+    where id = idRubric;
 
     if (not FOUND) then
         return -1;

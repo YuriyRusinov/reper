@@ -258,6 +258,7 @@ begin
         create_query := create_query || ' create trigger trgSyncRecords before insert or update or delete on ' || table_name || ' for each row execute procedure syncRecords(); ';
         create_query := create_query || ' create trigger trgCheckTableForOwner before insert or update or delete on ' || table_name || ' for each row execute procedure checkTableForOwner(); ';
         create_query := create_query || ' create trigger trgSetUUID before insert or update on ' || table_name || ' for each row execute procedure uuidCheck(); ';
+        create_query := create_query || ' create trigger trg_fk_q_base_table_check1 before update or delete on ' || table_name || ' for each row execute procedure fkQBaseTableCheck1(); ';
         create_query := create_query || ' create unique index i_unique_id_' || table_name || ' on ' || table_name || ' using BTREE (unique_id); ';
     end if;
  

@@ -130,6 +130,7 @@ begin
             perform setMacToNULL(r.relname);
             perform createTriggerUID(r.relname);
             perform createTriggerUUID(r.relname);
+            perform createTriggerQBaseTableCheck1(r.relname);
         end if;
         
         currentTable = r.relname;

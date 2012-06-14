@@ -1,4 +1,4 @@
-create or replace function recInsertRubric(int4, int4, varchar, varchar) returns int4 as
+create or replace function recInsertRubric(int4, int8, varchar, varchar) returns int4 as
 $BODY$
 declare
     idParent alias for $1;
@@ -11,7 +11,7 @@ declare
     query varchar;
 begin
 
-    select getNextSeq('record_rubricator', 'id1') into idRubric;
+    select getNextSeq('record_rubricator', 'id') into idRubric;
 
     if(idParent is not null and idRecord is not null) then
 
@@ -29,7 +29,7 @@ begin
 
     raise warning 'cnt is %', cnt;
 
-    query := E'insert into record_rubricator (id1, id_parent, id_record, name, description) values (';
+    query := E'insert into record_rubricator (id, id_parent, id_record, name, description) values (';
     query := query || idRubric || E',';
     if (idParent is null) then
         query := query || E'NULL,';

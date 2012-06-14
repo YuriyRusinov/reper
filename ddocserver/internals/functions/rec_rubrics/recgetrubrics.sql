@@ -1,7 +1,7 @@
 select f_safe_drop_type('h_get_rec_rubrics');
 create type h_get_rec_rubrics as (id int4, 
                                   id_parent int4, 
-                                  id_record int4, 
+                                  id_record int8, 
                                   name varchar, 
                                   description varchar, 
                                   type int4);
@@ -16,7 +16,7 @@ begin
 
     for rec in
         select 
-            r.id1, 
+            r.id, 
             r.id_parent, 
             r.id_record, 
             r.name, 
@@ -24,7 +24,7 @@ begin
             0
         from record_rubricator r
         where r.id_record = idRecord
-        order by r.id1
+        order by r.id
     loop
         return next rec;
         for rr in 
@@ -49,10 +49,10 @@ declare
 begin
 
     for rec in 
-        select r.id1, r.id_parent, NULL, r.name, r.description, 1
+        select r.id, r.id_parent, NULL, r.name, r.description, 1
         from record_rubricator r
         where r.id_parent = idRubric
-        order by r.id1
+        order by r.id
     loop
 
         return next rec;
@@ -94,7 +94,7 @@ begin
         from
             rubric_records rr inner join
             record_rubricator rec
-            on (rr.id_rubric = rec.id1 and rec.id1=idRubric)
+            on (rr.id_rubric = rec.id and rec.id = idRubric)
         order by 1
     loop
         return next r;

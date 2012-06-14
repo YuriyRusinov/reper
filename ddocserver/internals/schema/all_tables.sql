@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     19.04.2012 8:25:47                           */
+/* Created on:     14.06.2012 12:17:34                          */
 /*==============================================================*/
 
 
@@ -23,6 +23,7 @@ select setMacToNULL('root_table');
 create unique index Index_1 on root_table using BTREE (
 unique_id
 );
+
 
 /*==============================================================*/
 /* User: public                                                 */
@@ -114,6 +115,15 @@ comment on table a_types is
 - временной интервал (лет, месяцев, дней, часов, минут);
 - гиперссылка.
 ';
+
+comment on column a_types.id is
+'Идентификатор типа атрибута';
+
+comment on column a_types.id_a_view is
+'Идентификатор представления атрибутов данного типа';
+
+comment on column a_types.name is
+'Название типа атрибута';
 
 comment on column a_types.code is
 'Код типа атрибута
@@ -469,10 +479,34 @@ comment on table attributes is
 Атрибуты могут быть системными или пользовательскими. Системные атрибуты используются и заданы при инициализации системы и по умолчанию недоступны для использования.
 Деление на системные и пользовательские атрибцты ведено для того, чтобы из списка доступных пользоватед. атрибутов по умолчанию исключить те, которые ему с большой долей вероятности будут не нужны.
 
-Поле ref_column_name содержит название колонки (ключа) в таблице, на которую ссылается данный атрибут. В общем случае это поле может иметь название, отличное от id (оно используется по умолчанию). Такая ситуация возможна, если уже существующая структура таблиц была "погружена" в среду DynamicDocs.';
+Поле ref_column_name содержит название колонки (ключа) в таблице, на которую ссылается данный атрибут. В общем случае это поле может иметь название, отличное от id (id используется по умолчанию). Такая ситуация возможна, если уже существующая структура таблиц была "погружена" в среду DynamicDocs.';
+
+comment on column attributes.id is
+'Идентификатор атрибута';
+
+comment on column attributes.id_a_type is
+'Идентификатор типа атрибута';
+
+comment on column attributes.id_search_template is
+'Идентификатор поискового запроса';
+
+comment on column attributes.id_attr_group is
+'Идентификатор группы, в которую входит данный атрибут';
 
 comment on column attributes.code is
 'Атрибут может описывать поле таблицы. В этом случае удобно разделить понятие Название и Название Колонки Таблицы. Данное поле хранит Название Колонки Таблицы';
+
+comment on column attributes.name is
+'Название атрибута';
+
+comment on column attributes.title is
+'Заголовок атрибута (выводится как human-readable название колонки таблицы)';
+
+comment on column attributes.table_name is
+'название таблицы БД, в которой присутствует значение атрибута, если текущий атрибут является ссылкой на элемент справочника';
+
+comment on column attributes.column_name is
+'Название колонки в таблице, которая содержит значение атрибута, если атрибут является ссылкой на элемент справочника';
 
 comment on column attributes.def_width is
 'Изначальный размер  колонки в KKSView при визуализации данного атрибута. Измеряется в пикселях.
@@ -480,6 +514,9 @@ comment on column attributes.def_width is
 Для типов атрибутов с идентификаторами 13 и 14. Предполагается иное использование этого параметра. 
 Для типа 13 (многострочный текст) данное поле означает длину измерения oX текста в каждой строке, после превышения которой происходит переход на следующую строку.
 Для типа 14 это поле означает количество символов, которое максимально должно быть введено в поле такого типа. CHAR(3), например.';
+
+comment on column attributes.is_system is
+'Флаг системности';
 
 comment on column attributes.id_ref_attr_type is
 'Служебное поле.
@@ -516,6 +553,25 @@ comment on table attrs_attrs is
 Данная возможность описывает принцип вложенности атрибутов.
 Поле name описывает название описывающего атрибута.';
 
+comment on column attrs_attrs.id_attr_parent is
+'Идентификатор родительского атрибута. Т.е. атрибута который описывается при помощи данного атрибута.
+Т.е. Родительский атрибут в данном смысле представляется показателем';
+
+comment on column attrs_attrs.id_attr_child is
+'Идентификатор описывающего показатель атрибута';
+
+comment on column attrs_attrs.name is
+'Название описыввющего показатель атрибута';
+
+comment on column attrs_attrs.def_value is
+'Значение по умолчанию';
+
+comment on column attrs_attrs.is_mandatory is
+'Флаг обязательности наличия значения у данного описывающего показатель атрибута';
+
+comment on column attrs_attrs.is_read_only is
+'Флаг "только для чтения"';
+
 select setMacToNULL('attrs_attrs');
 select createTriggerUID('attrs_attrs');
 
@@ -547,8 +603,20 @@ create table attrs_attrs_values (
 inherits (root_table);
 
 comment on table attrs_attrs_values is
-'Значения атрибутов, описывающих другие атрибуты.
+'Значения атрибутов, описывающих другие атрибуты (показатели).
 Записи в данной таблице появляются при редактировании Значения атрибута в информационном объекте';
+
+comment on column attrs_attrs_values.id is
+'Идентификатор записи';
+
+comment on column attrs_attrs_values.id_attr_value is
+'Идентификатор значения показателя, к которому относится данное значение атрибута';
+
+comment on column attrs_attrs_values.id_attr_attr is
+'Идентификатор описывающего показатель атрибута';
+
+comment on column attrs_attrs_values.value is
+'Значение (строковое представление) описывающего показатель атрибута';
 
 select setMacToNULL('attrs_attrs_values');
 select createTriggerUID('attrs_attrs_values');
@@ -607,6 +675,15 @@ comment on table attrs_groups is
 'Группы атрибутов. Данный справочник введен потому, что в реальной системе атрибутов может существовать очень много.
 Пользователь может создавать свои группы и помещать атрибуты в них. Потом атрибуты будут выводиться в виде дерева, группируясь по группам.';
 
+comment on column attrs_groups.id is
+'Идентификатор группы';
+
+comment on column attrs_groups.id_parent is
+'Родительская группа';
+
+comment on column attrs_groups.name is
+'Название группы';
+
 select setMacToNULL('attrs_groups');
 select createTriggerUID('attrs_groups');
 
@@ -643,26 +720,38 @@ comment on table attrs_values is
 При удалении строки из данной таблицы реального удаления не происходит. Исходная запись остается. Однако ее поле is_actual устанавливается в false, stop_time - в current_timestamp.
 ';
 
+comment on column attrs_values.id is
+'Идентификатор записи';
+
+comment on column attrs_values.id_io_object is
+'Идентификатор информауционного объекта';
+
+comment on column attrs_values.id_attr_category is
+'Идентификатор показателя';
+
 comment on column attrs_values.value is
-'Значение атрибута в текстовом представлении';
+'Значение атрибута (показателя) в текстовом представлении';
 
 comment on column attrs_values.start_time is
-'Момент начала актуальности значения атрибута';
+'Момент начала актуальности значения атрибута (показателя)';
 
 comment on column attrs_values.stop_time is
-'Момент утери актуальности значения атрибута';
+'Момент утери актуальности значения атрибута (показателя)';
 
 comment on column attrs_values.meas_time is
-'Дата и время измерения значения атрибута';
+'Дата и время измерения значения атрибута (показателя)';
 
 comment on column attrs_values.insert_time is
-'Дата и время доведения значения атрибута в систему';
+'Дата и время доведения значения атрибут (показателя) а в систему';
 
 comment on column attrs_values.id_io_object_src is
-'Идентификатор ИО, который явился источником информации о значении атрибута.';
+'Идентификатор ИО, который явился источником информации о значении атрибута (показателя).';
 
 comment on column attrs_values.id_io_object_src1 is
 'Идентификатор объекта, за кого передали информацию. Если источник передаёт информацию сам за себя, то значение в этом поле совпадает со значением в поле <Источник>';
+
+comment on column attrs_values.description is
+'Подробное описание значения показателя. Как правило указывается причина присвоения данного значения';
 
 comment on column attrs_values.is_actual is
 'Флаг, определяющий актуально ли данное значение атрибута, било оно архивное.
@@ -2487,7 +2576,7 @@ select createTriggerUID('persons');
 /* Table: "position"                                            */
 /*==============================================================*/
 create table "position" (
-   id                   INT4                 not null,
+--   id                   INT4                 not null,
    id_unit              INT4                 not null,
    id_maclabel          INT4                 not null default 1,
    id_user_vrio         INT4                 null,
@@ -2614,9 +2703,9 @@ select createTriggerUID('ranks');
 /* Table: rec_attrs_values                                      */
 /*==============================================================*/
 create table rec_attrs_values (
-   id                   SERIAL               not null,
+   id                   BIGSERIAL            not null,
    id_attr_category     INT4                 not null,
-   id_record            BIGSERIAL            not null,
+   id_record            INT8                 not null,
    value                VARCHAR              not null,
    start_time           TIMESTAMP            not null default CURRENT_TIMESTAMP,
    stop_time            TIMESTAMP            null,
@@ -2641,6 +2730,10 @@ comment on table rec_attrs_values is
 Старая (исходная) запись при этом остается. Однако ее поле is_actual устанавливается в false, stop_time - в current_timestamp.
 
 При удалении строки из данной таблицы реального удаления не происходит. Исходная запись остается. Однако ее поле is_actual устанавливается в false, stop_time - в current_timestamp.
+
+ВАЖНО!!!
+В НАСТОЯЩЕЕ ВРЕМЯ POSTGRESQL  НЕ ПОДДЕРЖИВАЕТ ВНЕШНИЕ КЛЮЧИ НА ИЕРАРХИЮ НАСЛЕДОВАНИЯ ТАБЛИЦ. ПО ЭТОЙ ПРИЧИНЕ ДЕЛАТЬ ВНЕШНИЙ КЛЮЧ ИЗ REC_ATTRS_VALUES НА Q_BASE_TABLE НЕЛЬЗЯ. В ИНТЕРНЕТЕ СУЩЕСТВУЮТ РАЗЛИЧНЫЕ РЕШЕНИЯ ДАННОЙ ПРОБЛЕМЫ, ОДНАКО ИХ РАБОТОСПОСОБНОСТЬ, А ОСОБЕННО БЫСТРОДЕЙСТВИЕ ВЫЗЫВАЮТ СОМНЕНИЕ. ПО ЭТОЙ ПРИЧИНЕ РАССМАТРИВАЕМЫЙ ВНЕШНИЙ КЛЮЧ НЕ ГЕНЕРИРУЕТСЯ СКРИПТОМ СОЗДАНИЯ БД.
+ДЛЯ ПОДДЕРЖАНИЯ ССЫЛОЧНОЙ ЦЕЛОСТНОСТИ НАПИСАН ТРИГГЕР, КОТОРЫЙ ПРОВЕРЯЕТ ФАКТ СУЩЕСТВОВАНИЯ ЗАПИСИ, НА КОТОРУЮ ССЫЛАЕТСЯ СОЗДАВАЕМАЯ (ИЗМЕНЯЕМАЯ) ЗАПИСЬ В REC_ATTRS_VALUES. 
 ';
 
 comment on column rec_attrs_values.value is
@@ -2707,6 +2800,26 @@ comment on table receivers is
 'Адресаты для доведения сигналов и приказов БУ ';
 
 select setMacToNULL('receivers');
+
+/*==============================================================*/
+/* Table: record_rubricator                                     */
+/*==============================================================*/
+create table record_rubricator (
+   id                   BIGSERIAL            not null,
+   id_parent            INT8                 null,
+   id_record            INT8                 null,
+   name                 VARCHAR              not null,
+   description          VARCHAR              null,
+   constraint PK_RECORD_RUBRICATOR primary key (id)
+);
+
+comment on table record_rubricator is
+'рубрикатор для записей справочников
+
+ВАЖНО!!!
+В НАСТОЯЩЕЕ ВРЕМЯ POSTGRESQL  НЕ ПОДДЕРЖИВАЕТ ВНЕШНИЕ КЛЮЧИ НА ИЕРАРХИЮ НАСЛЕДОВАНИЯ ТАБЛИЦ. ПО ЭТОЙ ПРИЧИНЕ ДЕЛАТЬ ВНЕШНИЙ КЛЮЧ ИЗ record_rubricator НА Q_BASE_TABLE НЕЛЬЗЯ. В ИНТЕРНЕТЕ СУЩЕСТВУЮТ РАЗЛИЧНЫЕ РЕШЕНИЯ ДАННОЙ ПРОБЛЕМЫ, ОДНАКО ИХ РАБОТОСПОСОБНОСТЬ, А ОСОБЕННО БЫСТРОДЕЙСТВИЕ ВЫЗЫВАЮТ СОМНЕНИЕ. ПО ЭТОЙ ПРИЧИНЕ РАССМАТРИВАЕМЫЙ ВНЕШНИЙ КЛЮЧ НЕ ГЕНЕРИРУЕТСЯ СКРИПТОМ СОЗДАНИЯ БД.
+ДЛЯ ПОДДЕРЖАНИЯ ССЫЛОЧНОЙ ЦЕЛОСТНОСТИ НАПИСАН ТРИГГЕР, КОТОРЫЙ ПРОВЕРЯЕТ ФАКТ СУЩЕСТВОВАНИЯ ЗАПИСИ, НА КОТОРУЮ ССЫЛАЕТСЯ СОЗДАВАЕМАЯ (ИЗМЕНЯЕМАЯ) ЗАПИСЬ В record_rubricator. 
+';
 
 /*==============================================================*/
 /* Table: report                                                */
@@ -2795,6 +2908,21 @@ create table roles_actions (
 
 select setMacToNULL('roles_actions');
 
+/*==============================================================*/
+/* Table: rubric_records                                        */
+/*==============================================================*/
+create table rubric_records (
+   id_rubric            INT8                 not null,
+   id_record            INT8                 not null,
+   constraint PK_RUBRIC_RECORDS primary key (id_rubric, id_record)
+);
+
+comment on table rubric_records is
+'Записи справочников, которые находятся в соответствующих рубриках
+
+ВАЖНО!!!
+В НАСТОЯЩЕЕ ВРЕМЯ POSTGRESQL  НЕ ПОДДЕРЖИВАЕТ ВНЕШНИЕ КЛЮЧИ НА ИЕРАРХИЮ НАСЛЕДОВАНИЯ ТАБЛИЦ. ПО ЭТОЙ ПРИЧИНЕ ДЕЛАТЬ ВНЕШНИЙ КЛЮЧ ИЗ rubric_records НА Q_BASE_TABLE НЕЛЬЗЯ. В ИНТЕРНЕТЕ СУЩЕСТВУЮТ РАЗЛИЧНЫЕ РЕШЕНИЯ ДАННОЙ ПРОБЛЕМЫ, ОДНАКО ИХ РАБОТОСПОСОБНОСТЬ, А ОСОБЕННО БЫСТРОДЕЙСТВИЕ ВЫЗЫВАЮТ СОМНЕНИЕ. ПО ЭТОЙ ПРИЧИНЕ РАССМАТРИВАЕМЫЙ ВНЕШНИЙ КЛЮЧ НЕ ГЕНЕРИРУЕТСЯ СКРИПТОМ СОЗДАНИЯ БД.
+ДЛЯ ПОДДЕРЖАНИЯ ССЫЛОЧНОЙ ЦЕЛОСТНОСТИ НАПИСАН ТРИГГЕР, КОТОРЫЙ ПРОВЕРЯЕТ ФАКТ СУЩЕСТВОВАНИЯ ЗАПИСИ, НА КОТОРУЮ ССЫЛАЕТСЯ СОЗДАВАЕМАЯ (ИЗМЕНЯЕМАЯ) ЗАПИСЬ В rubric_records. ';
 
 /*==============================================================*/
 /* Table: rubricator                                            */
@@ -3118,7 +3246,7 @@ select createTriggerUID('tso_units');
 /* Table: units                                                 */
 /*==============================================================*/
 create table units (
-   id                   SERIAL not null,
+--   id                   SERIAL not null,
    id_organization      INT4                 null,
    id_parent            INT4                 null,
    id_curr_mode         INT4                 not null,
@@ -3377,7 +3505,7 @@ select setMacToNULL('user_templates');
 /* Table: users                                                 */
 /*==============================================================*/
 create table users (
-   id                   SERIAL not null,
+--   id                   SERIAL not null,
    id_rank              INT4                 not null,
    id_state             INT4                 not null,
    id_maclabel          INT4                 not null default 1,
@@ -4253,11 +4381,6 @@ alter table queue_results
       on delete restrict on update restrict;
 
 alter table rec_attrs_values
-   add constraint FK_REC_ATTR_REFERENCE_Q_BASE_T foreign key (id_record)
-      references q_base_table (id)
-      on delete restrict on update restrict;
-
-alter table rec_attrs_values
    add constraint FK_REC_ATTR_REFERENCE_ATTRS_CA foreign key (id_attr_category)
       references attrs_categories (id)
       on delete restrict on update restrict;
@@ -4282,6 +4405,11 @@ alter table receivers
       references "position" (id)
       on delete restrict on update restrict;
 
+alter table record_rubricator
+   add constraint FK_RECORD_R_REFERENCE_RECORD_R foreign key (id_parent)
+      references record_rubricator (id)
+      on delete restrict on update restrict;
+
 alter table report_organization
    add constraint FK_REPORT_O_REFERENCE_ORGANIZA foreign key (id_organization)
       references organization (id)
@@ -4300,6 +4428,11 @@ alter table roles_actions
 alter table roles_actions
    add constraint FK_ROLES_AC_REFERENCE_ACTIONS foreign key (id_service)
       references actions (id)
+      on delete restrict on update restrict;
+
+alter table rubric_records
+   add constraint FK_RUBRIC_R_REFERENCE_RECORD_R foreign key (id_rubric)
+      references record_rubricator (id)
       on delete restrict on update restrict;
 
 alter table rubricator
