@@ -10,12 +10,14 @@ begin
         end if;
     end if;
 
-    select id into theId from q_base_table where id = new.id_record;
-    if(theId is null) then
-        tName = TG_RELNAME;
-        tName = E'insert or update on table "' || tName || E'" violates foreign key constraint to table q_base_table. \nDETAIL:  Key (id_record)=(' || new.id_record || E') is not present in table "q_base_table" or its childs.';
-        raise exception '%', tName;
-        return NULL;
+    if (new.id_record is not null) then
+        select id into theId from q_base_table where id = new.id_record;
+        if(theId is null) then
+            tName = TG_RELNAME;
+            tName = E'insert or update on table "' || tName || E'" violates foreign key constraint to table q_base_table. \nDETAIL:  Key (id_record)=(' || new.id_record || E') is not present in table "q_base_table" or its childs.';
+            raise exception '%', tName;
+            return NULL;
+        end if;
     end if;
 
     return new;
