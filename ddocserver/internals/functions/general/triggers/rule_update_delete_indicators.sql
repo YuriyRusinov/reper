@@ -22,7 +22,7 @@ end
 $BODY$ 
 language 'plpgsql' security definer;
 
-create or replace function f_upd_rec_attrs_values(int8, int4, varchar, timestamp, timestamp, timestamp, int4, int4, varchar, int8, int4) returns int4 as
+create or replace function f_upd_rec_attrs_values(int8, int4, varchar, timestamp, timestamp, timestamp, int4, int4, varchar, int8, int4, bool) returns int4 as
 $BODY$
 declare
     ii_id_record alias for $1;
@@ -37,6 +37,7 @@ declare
 
     old_id_record alias for $10;
     old_id_attr_category alias for $11;
+    isTemporary alias for $12;
 
     r record;
 begin
@@ -59,8 +60,6 @@ begin
 
     --помечаем текущее значение атрибута как неактуальное. —охран€ем его в истории
     update "rec_attrs_values" set is_actual = false, stop_time = current_timestamp where id_record = old_id_record and id_attr_category = old_id_attr_category and is_actual = true;
-    raise warning E'\n%\n', old_id_record;
-    raise warning E'\n%\n', old_id_attr_category;
 
     --потом создаем новое, как копию и присваиваем новые значени€
     insert into "rec_attrs_values" (id_record , id_attr_category, "value", start_time, stop_time, meas_time, id_io_object_src, id_io_object_src1, is_actual, description) 

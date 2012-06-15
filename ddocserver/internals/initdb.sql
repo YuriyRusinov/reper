@@ -29,6 +29,7 @@ begin;
 alter table io_objects rename to tbl_io_objects;
 alter sequence io_objects_id_seq rename to tbl_io_objects_id_seq;
 alter table attrs_values rename to tbl_attrs_values;
+alter table rec_attrs_values rename to tbl_rec_attrs_values;
 
 \i ./functions/security/readd_security.sql
 

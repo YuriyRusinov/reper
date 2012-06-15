@@ -28,52 +28,8 @@ select setAsNotLogging(2);
 select setAsLogging(1);
 select setAsLogging(2);
 
-create table record_rubricator (
-   id                   BIGSERIAL            not null,
-   id_parent            INT8                 null,
-   id_record            INT8                 null,
-   name                 VARCHAR              not null,
-   description          VARCHAR              null,
-   constraint PK_RECORD_RUBRICATOR primary key (id)
-);
-
-comment on table record_rubricator is
-'ðóáðèêàòîð äëÿ çàïèñåé ñïðàâî÷íèêîâ
-
-ÂÀÆÍÎ!!!
-Â ÍÀÑÒÎßÙÅÅ ÂÐÅÌß POSTGRESQL  ÍÅ ÏÎÄÄÅÐÆÈÂÀÅÒ ÂÍÅØÍÈÅ ÊËÞ×È ÍÀ ÈÅÐÀÐÕÈÞ ÍÀÑËÅÄÎÂÀÍÈß ÒÀÁËÈÖ. ÏÎ ÝÒÎÉ ÏÐÈ×ÈÍÅ ÄÅËÀÒÜ ÂÍÅØÍÈÉ ÊËÞ× ÈÇ record_rubricator ÍÀ Q_BASE_TABLE ÍÅËÜÇß. Â ÈÍÒÅÐÍÅÒÅ ÑÓÙÅÑÒÂÓÞÒ ÐÀÇËÈ×ÍÛÅ ÐÅØÅÍÈß ÄÀÍÍÎÉ ÏÐÎÁËÅÌÛ, ÎÄÍÀÊÎ ÈÕ ÐÀÁÎÒÎÑÏÎÑÎÁÍÎÑÒÜ, À ÎÑÎÁÅÍÍÎ ÁÛÑÒÐÎÄÅÉÑÒÂÈÅ ÂÛÇÛÂÀÞÒ ÑÎÌÍÅÍÈÅ. ÏÎ ÝÒÎÉ ÏÐÈ×ÈÍÅ ÐÀÑÑÌÀÒÐÈÂÀÅÌÛÉ ÂÍÅØÍÈÉ ÊËÞ× ÍÅ ÃÅÍÅÐÈÐÓÅÒÑß ÑÊÐÈÏÒÎÌ ÑÎÇÄÀÍÈß ÁÄ.
-ÄËß ÏÎÄÄÅÐÆÀÍÈß ÑÑÛËÎ×ÍÎÉ ÖÅËÎÑÒÍÎÑÒÈ ÍÀÏÈÑÀÍ ÒÐÈÃÃÅÐ, ÊÎÒÎÐÛÉ ÏÐÎÂÅÐßÅÒ ÔÀÊÒ ÑÓÙÅÑÒÂÎÂÀÍÈß ÇÀÏÈÑÈ, ÍÀ ÊÎÒÎÐÓÞ ÑÑÛËÀÅÒÑß ÑÎÇÄÀÂÀÅÌÀß (ÈÇÌÅÍßÅÌÀß) ÇÀÏÈÑÜ Â record_rubricator. 
-';
-
-alter table record_rubricator
-   add constraint FK_RECORD_R_REFERENCE_RECORD_R foreign key (id_parent)
-      references record_rubricator (id)
-      on delete restrict on update restrict;
-
-
-create table rubric_records (
-   id_rubric            INT8                 not null,
-   id_record            INT8                 not null,
-   constraint PK_RUBRIC_RECORDS primary key (id_rubric, id_record)
-);
-
-comment on table rubric_records is
-'Çàïèñè ñïðàâî÷íèêîâ, êîòîðûå íàõîäÿòñÿ â ñîîòâåòñòâóþùèõ ðóáðèêàõ
-
-ÂÀÆÍÎ!!!
-Â ÍÀÑÒÎßÙÅÅ ÂÐÅÌß POSTGRESQL  ÍÅ ÏÎÄÄÅÐÆÈÂÀÅÒ ÂÍÅØÍÈÅ ÊËÞ×È ÍÀ ÈÅÐÀÐÕÈÞ ÍÀÑËÅÄÎÂÀÍÈß ÒÀÁËÈÖ. ÏÎ ÝÒÎÉ ÏÐÈ×ÈÍÅ ÄÅËÀÒÜ ÂÍÅØÍÈÉ ÊËÞ× ÈÇ rubric_records ÍÀ Q_BASE_TABLE ÍÅËÜÇß. Â ÈÍÒÅÐÍÅÒÅ ÑÓÙÅÑÒÂÓÞÒ ÐÀÇËÈ×ÍÛÅ ÐÅØÅÍÈß ÄÀÍÍÎÉ ÏÐÎÁËÅÌÛ, ÎÄÍÀÊÎ ÈÕ ÐÀÁÎÒÎÑÏÎÑÎÁÍÎÑÒÜ, À ÎÑÎÁÅÍÍÎ ÁÛÑÒÐÎÄÅÉÑÒÂÈÅ ÂÛÇÛÂÀÞÒ ÑÎÌÍÅÍÈÅ. ÏÎ ÝÒÎÉ ÏÐÈ×ÈÍÅ ÐÀÑÑÌÀÒÐÈÂÀÅÌÛÉ ÂÍÅØÍÈÉ ÊËÞ× ÍÅ ÃÅÍÅÐÈÐÓÅÒÑß ÑÊÐÈÏÒÎÌ ÑÎÇÄÀÍÈß ÁÄ.
-ÄËß ÏÎÄÄÅÐÆÀÍÈß ÑÑÛËÎ×ÍÎÉ ÖÅËÎÑÒÍÎÑÒÈ ÍÀÏÈÑÀÍ ÒÐÈÃÃÅÐ, ÊÎÒÎÐÛÉ ÏÐÎÂÅÐßÅÒ ÔÀÊÒ ÑÓÙÅÑÒÂÎÂÀÍÈß ÇÀÏÈÑÈ, ÍÀ ÊÎÒÎÐÓÞ ÑÑÛËÀÅÒÑß ÑÎÇÄÀÂÀÅÌÀß (ÈÇÌÅÍßÅÌÀß) ÇÀÏÈÑÜ Â rubric_records. ';
-
-alter table rubric_records
-   add constraint FK_RUBRIC_R_REFERENCE_RECORD_R foreign key (id_rubric)
-      references record_rubricator (id)
-      on delete restrict on update restrict;
-
-
-
 \i ./functions/readd_functions.sql
 
-alter table rec_attrs_values drop constraint fk_rec_attr_reference_q_base_t;
 alter table rec_attrs_values rename to tbl_rec_attrs_values;
 
 \i ./functions/security/readd_security.sql
@@ -94,12 +50,6 @@ select f_create_trigger('trgioinsert', 'before', 'insert or update', 'io_objects
 select f_create_trigger('zz_trgzioinserttableafter', 'after', 'insert', 'io_objects', 'ioinsertchecktableafter()');
 
 --ÂÑÅ ÎÑÒÀËÜÍÎÅ ÇÄÅÑÜ
-
---äåëàåì ýòî òîëüêî äëÿ íåñèñòåìíûõ ñïðàâî÷íèêîâ DynamicDocs
-select f_set_all_schemas_visible();
-select createTriggerQBaseTableCheck1(table_name) from io_objects where id > 300 and table_name is not null;
---×ÒÎÁÛ Ó×ÅÑÒÜ ÒÀÁËÈÖÛ, "ÐÎÄÍÛÅ" ÄËß DYNAMICDOCS
-select createTriggerQBaseTableCheck1('tbl_' || table_name) from io_objects where id > 300 and table_name is not null;
 
 create or replace view rec_attrs_values as select * from f_sel_rec_attrs_values(NULL);
 revoke all on tbl_rec_attrs_values from public;

@@ -16,6 +16,7 @@
 \i ./functions/general/eiogetindicators.sql
 \i ./functions/general/eioinsertindicator.sql
 \i ./functions/general/eioupdateindicator.sql
+\i ./functions/general/getrecattrvaluehistory.sql
 
 \i ./functions/general/triggers/readd_triggers.sql
 
