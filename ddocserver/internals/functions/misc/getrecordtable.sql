@@ -21,9 +21,9 @@ begin
     --нам необходимо вернуть именно то название (таблицы или представления), которое записано в tbl_io_objects
     --поэтому мы должны проанализировать полученное в tName1 значение
 
-    pos = position('tbl_' in tName1);
-    if(pos == 1) then --если название физической таблицы начинается с tbl_ , то можно предположить, что в io_objects 
-        tName2 = substring(tName1 from 5);
+    pos := position('tbl_' in tName1);
+    if(pos = 1) then --если название физической таблицы начинается с tbl_ , то можно предположить, что в io_objects 
+        tName2 := substring(tName1 from 5);
         if(char_length(tName2) = 0) then
             return tName1;
         end if;
