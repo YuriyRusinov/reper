@@ -15,7 +15,9 @@ KKSAttrValueLabel :: KKSAttrValueLabel (KKSAttrValue * av, int isSystem, QWidget
     : QLabel (parent)
 {
     m_av = NULL;
-    m_isSystem = isSystem;
+    m_isSystem = isSystem; //0 - системный атрибут ИО или табличный атрибут ЭИО. На него НЕ распространяется ведение расширенных свойств и истории значений
+                           //1 - пользовательский атрибут для ИО (хранится в attrs_values). На него распространяется просмотр расширенных свойств и истории значений
+                           //2 - показатель (расширенный атрибут) для ЭИО (хранится в rec_attrs_values). На него распространяется ведение расширенных свойств и истории значений
     setAttrValue(av);
 
     connect( this, SIGNAL( clicked() ), this, SLOT( showAttrValueProps() ) );
@@ -72,7 +74,7 @@ void KKSAttrValueLabel :: setLabelProps()
     QString coloredText;
    
     
-    if(m_isSystem == 1)
+    if(m_isSystem >= 1)
         coloredText = tr("<font color='blue'>%2</font>").arg(text);
     else
         coloredText = text;
@@ -80,7 +82,7 @@ void KKSAttrValueLabel :: setLabelProps()
     this->setText( coloredText );	
 	
 	QFont lFont = this->font ();
-    lFont.setUnderline( m_isSystem == 1 ? true : false);
+    lFont.setUnderline( m_isSystem >= 1 ? true : false);
 	if (isMandatory)
     {
         lFont.setBold (true);
@@ -88,7 +90,7 @@ void KKSAttrValueLabel :: setLabelProps()
 
 	this->setFont (lFont);
 
-    if(m_isSystem == 1){
+    if(m_isSystem >= 1){
         setToolTip(tr("Click on label to show extended attribute properties"));
         setCursor(Qt::PointingHandCursor);
     }
@@ -98,13 +100,17 @@ void KKSAttrValueLabel :: setLabelProps()
 
 void KKSAttrValueLabel :: showAttrValueProps()
 {
-    if(!m_av || m_isSystem != 1)
+    if(!m_av || m_isSystem == 0)
         return;
 
-    KKSAttrValuePropsForm * f = new KKSAttrValuePropsForm(m_av, true, this);
+    KKSAttrValuePropsForm * f = new KKSAttrValuePropsForm(m_av, 
+                                                          true, 
+                                                          m_isSystem == 1 ? false : true,
+                                                          this);
+
     connect(f, SIGNAL(loadIOSrc(KKSObject **, QWidget *)), this, SIGNAL(loadIOSrc(KKSObject **, QWidget *)));
     connect(f, SIGNAL(viewIOSrc(KKSObject *, QWidget *)), this, SIGNAL(viewIOSrc(KKSObject *, QWidget *)));
-    connect(f, SIGNAL(loadHistory(const KKSAttrValue *)), this, SIGNAL(loadHistory(const KKSAttrValue *)));
+    connect(f, SIGNAL(loadHistory(const KKSAttrValue *, bool)), this, SIGNAL(loadHistory(const KKSAttrValue *, bool)));
     connect(this, SIGNAL(viewHistory(const KKSList<KKSAttrValue *> &)), f, SLOT(viewHistory(const KKSList<KKSAttrValue *> &)));
 
     if(f->exec() == QDialog::Accepted)

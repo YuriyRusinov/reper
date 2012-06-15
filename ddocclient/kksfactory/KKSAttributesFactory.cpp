@@ -703,7 +703,7 @@ QLabel * KKSAttributesFactory :: createAttrTitle (KKSAttrValue * av, int isSyste
     QLabel * lTitle = new KKSAttrValueLabel(av, isSystem);
     connect(lTitle, SIGNAL(loadIOSrc(KKSObject **, QWidget * )), this, SLOT(slotLoadIOSrc(KKSObject **, QWidget * )));
     connect(lTitle, SIGNAL(viewIOSrc(KKSObject *, QWidget *)), this, SLOT(viewIOSrc(KKSObject *, QWidget *)));
-    connect (lTitle, SIGNAL(loadHistory(const KKSAttrValue *)), this, SLOT(loadIOAttrValueHistory(const KKSAttrValue *)));
+    connect (lTitle, SIGNAL(loadHistory(const KKSAttrValue *, bool)), this, SLOT(loadIOAttrValueHistory(const KKSAttrValue *, bool)));
     connect (this, SIGNAL(viewHistory(const KKSList<KKSAttrValue *> &)), lTitle, SIGNAL(viewHistory(const KKSList<KKSAttrValue *> &)));
 
     if(objEditor)
@@ -797,7 +797,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av, KKSObjEdi
                 const KKSCategoryAttr * pCategAttr = av->attribute();
                 if (!isRef)
                 {
-                    lTitle = this->createAttrTitle (av, isSystem);//, pCategAttr->title(), is_mandatory);
+                    lTitle = this->createAttrTitle (av, isSystem, objEditor);//, pCategAttr->title(), is_mandatory);
                     Qt::Alignment align=Qt::AlignRight;
                     if (pCategAttr->refType()->attrType() == KKSAttrType::atText )
                         align |= Qt::AlignTop;
@@ -857,7 +857,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av, KKSObjEdi
             {
                 if (!isRef)
                 {
-                    lTitle = this->createAttrTitle (av, isSystem);//, av->attribute()->title(), is_mandatory );
+                    lTitle = this->createAttrTitle (av, isSystem, objEditor);//, av->attribute()->title(), is_mandatory );
                     gLayout->addWidget (lTitle, n_str, 0, 1, 2, Qt::AlignRight);
                 }
                 attrWidget = new KKSListWidget (av, isSystem);
@@ -881,7 +881,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av, KKSObjEdi
             {
                 if (!isRef)
                 {
-                    lTitle = this->createAttrTitle (av, isSystem);//, av->attribute()->title(), is_mandatory);
+                    lTitle = this->createAttrTitle (av, isSystem, objEditor);//, av->attribute()->title(), is_mandatory);
                     ch = this->createChDateTime (is_mandatory, gLayout, lTitle, n_str);
                 }
                 QSizePolicy hPw (QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
@@ -915,7 +915,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av, KKSObjEdi
             {
                 if (!isRef)
                 {
-                    lTitle = this->createAttrTitle (av, isSystem);//, av->attribute()->title(), is_mandatory);
+                    lTitle = this->createAttrTitle (av, isSystem, objEditor);//, av->attribute()->title(), is_mandatory);
                     ch = this->createChDateTime (is_mandatory, gLayout, lTitle, n_str);
                 }
                 QSizePolicy hPw (QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
@@ -949,7 +949,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av, KKSObjEdi
             {
                 if (!isRef)
                 {
-                    lTitle = this->createAttrTitle (av, isSystem);//, av->attribute()->title(), is_mandatory);
+                    lTitle = this->createAttrTitle (av, isSystem, objEditor);//, av->attribute()->title(), is_mandatory);
                     ch = this->createChDateTime (is_mandatory, gLayout, lTitle, n_str);
                 }
                 QSizePolicy hPw (QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
@@ -984,7 +984,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av, KKSObjEdi
             {
                 if (!isRef)
                 {
-                    lTitle = this->createAttrTitle (av, isSystem);//, av->attribute()->title(), is_mandatory);
+                    lTitle = this->createAttrTitle (av, isSystem, objEditor);//, av->attribute()->title(), is_mandatory);
                     gLayout->addWidget (lTitle, n_str, 0, 1, 2, Qt::AlignRight);
                 }
                 double v = V.toDouble ();
@@ -1015,7 +1015,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av, KKSObjEdi
             {
                 if (!isRef)
                 {
-                    lTitle = this->createAttrTitle (av, isSystem);//, av->attribute()->title(), is_mandatory);
+                    lTitle = this->createAttrTitle (av, isSystem, objEditor);//, av->attribute()->title(), is_mandatory);
                     gLayout->addWidget (lTitle, n_str, 0, 1, 2, Qt::AlignRight);
                 }
                 QString v = V.toString ();
@@ -1042,7 +1042,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av, KKSObjEdi
             {
                 if (!isRef)
                 {
-                    lTitle = this->createAttrTitle (av, isSystem);//, av->attribute()->title(), is_mandatory);
+                    lTitle = this->createAttrTitle (av, isSystem, objEditor);//, av->attribute()->title(), is_mandatory);
                     ch = this->createChDateTime (is_mandatory, gLayout, lTitle, n_str);
                 }
                 QSizePolicy hPw (QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -1095,7 +1095,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av, KKSObjEdi
             {
                 if (!isRef)
                 {
-                    lTitle = this->createAttrTitle (av, isSystem);//, av->attribute()->title(), is_mandatory);
+                    lTitle = this->createAttrTitle (av, isSystem, objEditor);//, av->attribute()->title(), is_mandatory);
                     ch = this->createChDateTime (is_mandatory, gLayout, lTitle, n_str);
                 }
                 QSizePolicy hPw (QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -1122,7 +1122,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av, KKSObjEdi
             {
                 if (!isRef)
                 {
-                    lTitle = this->createAttrTitle (av, isSystem);//, av->attribute()->title(), is_mandatory);
+                    lTitle = this->createAttrTitle (av, isSystem, objEditor);//, av->attribute()->title(), is_mandatory);
                     gLayout->addWidget (lTitle, n_str, 0, 2, 2, Qt::AlignRight | Qt::AlignTop);
                 }
                 QString v = V.toString ();
@@ -1141,7 +1141,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av, KKSObjEdi
             {
                 if (!isRef)
                 {
-                    lTitle = this->createAttrTitle (av, isSystem);//, av->attribute()->title(), is_mandatory);
+                    lTitle = this->createAttrTitle (av, isSystem, objEditor);//, av->attribute()->title(), is_mandatory);
                     gLayout->addWidget (lTitle, n_str, 0, 1, 2, Qt::AlignRight);
                 }
                 
@@ -1174,7 +1174,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av, KKSObjEdi
             {
                 if (!isRef)
                 {
-                    lTitle = this->createAttrTitle (av, isSystem);//, av->attribute()->title(), is_mandatory);
+                    lTitle = this->createAttrTitle (av, isSystem, objEditor);//, av->attribute()->title(), is_mandatory);
                     gLayout->addWidget (lTitle, n_str, 0, 1, 1, Qt::AlignRight);
                 }
 
@@ -1203,7 +1203,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av, KKSObjEdi
             {
                 if (!isRef)
                 {
-                    lTitle = this->createAttrTitle (av, isSystem);//, av->attribute()->title(), is_mandatory);
+                    lTitle = this->createAttrTitle (av, isSystem, objEditor);//, av->attribute()->title(), is_mandatory);
                     gLayout->addWidget (lTitle, n_str, 0, 2, 2, Qt::AlignRight | Qt::AlignTop);
                 }
                 QList<QVariant> v = V.toList();
@@ -1220,7 +1220,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av, KKSObjEdi
             {
                 if (!isRef)
                 {
-                    lTitle = this->createAttrTitle (av, isSystem);//, av->attribute()->title(), is_mandatory);
+                    lTitle = this->createAttrTitle (av, isSystem, objEditor);//, av->attribute()->title(), is_mandatory);
                     gLayout->addWidget (lTitle, n_str, 0, 1, 2);//, Qt::AlignRight | Qt::AlignTop);
                 }
                 unsigned int vlc = V.toUInt ();
@@ -1243,7 +1243,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av, KKSObjEdi
             {
                 if (!isRef)
                 {
-                    lTitle = this->createAttrTitle (av, isSystem);//, av->attribute()->title(), is_mandatory);
+                    lTitle = this->createAttrTitle (av, isSystem, objEditor);//, av->attribute()->title(), is_mandatory);
                     gLayout->addWidget (lTitle, n_str, 0, 1, 2);//, Qt::AlignRight | Qt::AlignTop);
                 }
                 attrWidget = new KKSVideoPlayer (av, isSystem);
@@ -1984,9 +1984,9 @@ void KKSAttributesFactory :: viewIOSrc (KKSObject * io, QWidget * parent)
     m_oef->editExistOE(parent, IO_IO_ID, idObj, o->category(), s, 0, mode);
 }
 
-void KKSAttributesFactory::loadIOAttrValueHistory(const KKSAttrValue * av)
+void KKSAttributesFactory::loadIOAttrValueHistory(const KKSAttrValue * av, bool forRecords)
 {
-    KKSList<KKSAttrValue *> avList = loader->loadIOAttrValueHistory(av);
+    KKSList<KKSAttrValue *> avList = loader->loadIOAttrValueHistory(av, forRecords);
 
     emit viewHistory(avList);
 }

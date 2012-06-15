@@ -1438,15 +1438,15 @@ void KKSEIOFactory::commitRubric(KKSRubric * r) const
 
 int KKSEIOFactory::insertRubricators(KKSRubric * rootRubric, int idMyDocsRubricator, bool bMyDocs) const
 {
-
+    return 0;
 }
 
 int KKSEIOFactory::deleteRubricators(bool bMyDocs) const
 {
-
+    return 0;
 }
 
 int KKSEIOFactory::deleteRubric(int idRubric) const
 {
-
+    return 0;
 }

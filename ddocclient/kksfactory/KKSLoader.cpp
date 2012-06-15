@@ -4813,14 +4813,20 @@ KKSValue  KKSLoader::constructValue(const QString & value,
     return v;
 }
 
-KKSList<KKSAttrValue *> KKSLoader::loadIOAttrValueHistory(const KKSAttrValue * av) const
+KKSList<KKSAttrValue *> KKSLoader::loadIOAttrValueHistory(const KKSAttrValue * av, bool forRecords) const
 {
     KKSList<KKSAttrValue *> avList;
 
     if(!av || av->id() <= 0)
         return avList;
 
-    QString sql = QString ("select * from getIOAttrValueHistory(%1, NULL, NULL)").arg (av->id());
+    QString sql;
+    
+    if(forRecords)
+        sql = QString ("select * from getRecAttrValueHistory(%1, NULL, NULL)").arg (av->id());
+    else
+        sql = QString ("select * from getIOAttrValueHistory(%1, NULL, NULL)").arg (av->id());
+
     KKSResult * res = db->execute (sql);
     int cnt = 0;
     if (!res || (cnt = res->getRowCount()) <= 0)

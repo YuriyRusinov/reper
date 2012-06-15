@@ -31,7 +31,7 @@ class _GUI_EXPORT KKSAttrValueLabel : public QLabel
         void viewIOSrc(KKSObject *, QWidget *);
         void attrValueChanged();
 
-        void loadHistory(const KKSAttrValue *);
+        void loadHistory(const KKSAttrValue *, bool);
         void viewHistory(const KKSList<KKSAttrValue *> &);
 
 

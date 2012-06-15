@@ -25,7 +25,7 @@ class KKSObject;
 class _GUI_EXPORT KKSAttrValuePropsForm : public QDialog
 {
 public:
-    KKSAttrValuePropsForm(KKSAttrValue * av, bool mode=true, QWidget * parent=0, Qt::WindowFlags flags=0);
+    KKSAttrValuePropsForm(KKSAttrValue * av, bool mode=true, bool forRecords = false, QWidget * parent=0, Qt::WindowFlags flags=0);
     virtual ~KKSAttrValuePropsForm();
 
     void setAttrValue(KKSAttrValue * av);
@@ -48,7 +48,7 @@ private slots:
 signals:
     void viewIOSrc (KKSObject*, QWidget *);
     void loadIOSrc (KKSObject **, QWidget *);
-    void loadHistory(const KKSAttrValue *);
+    void loadHistory(const KKSAttrValue *, bool);
 
 private:
     //
@@ -61,6 +61,7 @@ private:
     //
     Ui::kksattr_value_props_form *UI;
     KKSAttrValue* m_av;
+    bool m_forRecords;
 
     KKSObject * ioSrc;
     KKSObject * ioSrc1;

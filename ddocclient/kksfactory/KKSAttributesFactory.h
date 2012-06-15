@@ -63,7 +63,7 @@ private slots:
     void slotLoadIOSrc  (KKSObject ** io, QWidget * parent);
     void viewIOSrc (KKSObject * io, QWidget * parent);
     //void slotLoadIOSrc1 (const KKSAttrValue * av, QLineEdit * lESrc1);
-    void loadIOAttrValueHistory(const KKSAttrValue * av);
+    void loadIOAttrValueHistory(const KKSAttrValue * av, bool forRecords = false);
     
     void showAttrsWidget(KKSAttribute *, KKSAttrEditor *);//показать виджет с атрибутами для случая с описывающими атрибутами атрибута
     void addAttribute (KKSAttribute *a, QAbstractItemModel * attrModel, KKSAttrEditor *editor);

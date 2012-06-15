@@ -16,10 +16,11 @@
 #include "KKSAttrValuePropsForm.h"
 #include "ui_kksattr_value_props_form.h"
 
-KKSAttrValuePropsForm::KKSAttrValuePropsForm(KKSAttrValue * av, bool mode, QWidget * parent, Qt::WindowFlags flags)
+KKSAttrValuePropsForm::KKSAttrValuePropsForm(KKSAttrValue * av, bool mode, bool forRecords, QWidget * parent, Qt::WindowFlags flags)
       : QDialog (parent, flags),
         UI (new Ui::kksattr_value_props_form),
         m_av (NULL),
+        m_forRecords(forRecords),
         ioSrc(NULL),
         ioSrc1(NULL)
 {
@@ -261,7 +262,7 @@ void KKSAttrValuePropsForm :: initForm (bool mode)
 
 void KKSAttrValuePropsForm::pbHistoryClicked()
 {
-    emit loadHistory(m_av);
+    emit loadHistory(m_av, m_forRecords);
 }
 
 void KKSAttrValuePropsForm::viewHistory(const KKSList<KKSAttrValue*> & history)
