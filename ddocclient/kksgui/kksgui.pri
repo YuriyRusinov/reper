@@ -43,6 +43,7 @@ HEADERS += \
                 KKSSyncWidget.h \
                 kksstuffform.h \
                 KKSVideoPlayer.h \
+                KKSEIODataModel.h \
                 KKSOrganizationAddrForm.h \
 		ui/cmdjournalsettingsform.h \
 		ui/cmdjournalform.h \
@@ -116,6 +117,7 @@ SOURCES += \
                 KKSSyncWidget.cpp \
                 KKSOrganizationAddrForm.cpp \
                 KKSVideoPlayer.cpp \
+                KKSEIODataModel.cpp \
                 ui/choosetemplateform.cpp \
                 ui/cmdjournalform.cpp \
                 ui/cmdjournalsettingsform.cpp \
@@ -209,6 +211,7 @@ headers.files += \
                 KKSPointsItemDelegate.h \
                 KKSSyncWidget.h \
                 KKSVideoPlayer.h \
+                KKSEIODataModel.h \
                 ui/choosetemplateform.h \
                 ui/cmdjournalform.h \
                 ui/cmdjournalsettingsform.h \
