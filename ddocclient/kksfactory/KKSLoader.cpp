@@ -5144,7 +5144,7 @@ int KKSLoader :: getRefIO (int idObjectE) const
     }
     QString tableName = res->getCellAsString (0, 0);
     delete res;
-    sql = QString("select ioGetObjectIDByTableName ('%1');").arg(tableName.mid(4));
+    sql = QString("select ioGetObjectIDByTableName ('%1');").arg(tableName);
     qDebug () << __PRETTY_FUNCTION__ << sql;
     KKSResult * iores = db->execute (sql);
     if (!iores || iores->getRowCount() != 1)
