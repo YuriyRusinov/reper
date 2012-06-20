@@ -43,6 +43,7 @@
 #include <KKSAttrType.h>
 #include <KKSCategory.h>
 #include <KKSEIOData.h>
+#include <KKSEIODataModel.h>
 #include <KKSCategory.h>
 #include <KKSCategoryAttr.h>
 #include <KKSSortFilterProxyModel.h>
@@ -212,9 +213,16 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
     }
     sortModel->setDynamicSortFilter (true);
 
+    KKSMap<qint64, KKSEIOData *> objEx;
+    if (!cat || tableName.isEmpty())
+        objEx = l->loadEIOList (pObj, filters);
+    else
+        objEx = l->loadEIOList (cat, tableName, filters);
+    
     QAbstractItemModel *objModel = sortModel->sourceModel();//new QStandardItemModel ();
     if (!objModel)
         objModel = isCheckable ? new KKSCheckableModel (0, ncols) : new QStandardItemModel (0, ncols);
+    // new KKSEIODataModel (t, objEx);
     else
         sortModel->setSourceModel (0);
     QItemSelectionModel *selModel = tv->selectionModel ();
@@ -256,12 +264,6 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
         }
     }
 
-    KKSMap<qint64, KKSEIOData *> objEx;
-    if (!cat || tableName.isEmpty())
-        objEx = l->loadEIOList (pObj, filters);
-    else
-        objEx = l->loadEIOList (cat, tableName, filters);
-    
     KKSMap<qint64, KKSEIOData *>::const_iterator p;
     int nObjC = objEx.count ();
     //qDebug () << __PRETTY_FUNCTION__ << nObjC;

@@ -8,6 +8,8 @@
 #if !defined(__KKSSITOOOM_KKSTemplate_h)
 #define __KKSSITOOOM_KKSTemplate_h
 
+#include <QMetaType>
+
 class KKSCategory;
 
 #include "KKSAttrGroup.h"
@@ -74,5 +76,7 @@ class _PP_EXPORT KKSTemplate : public KKSRecord
         KKSCategory* m_category;
         KKSMap<int, KKSAttrGroup*> m_groups;
 };
+
+Q_DECLARE_METATYPE (KKSTemplate);
 
 #endif

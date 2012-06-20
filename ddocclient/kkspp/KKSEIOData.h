@@ -10,8 +10,10 @@
 
 #include <QMap>
 #include <QString>
+#include <QMetaType>
 
 #include "KKSData.h"
+#include "KKSMap.h"
 #include "kkspp_config.h"
 
 
@@ -51,5 +53,10 @@ private:
     QMap<QString, QString> m_fields;
     QString m_null;
 };
+
+typedef KKSMap<qint64, KKSEIOData *> KKSEIODataMap;
+
+Q_DECLARE_METATYPE (KKSEIOData);
+Q_DECLARE_METATYPE (KKSEIODataMap);
 
 #endif

@@ -13,7 +13,7 @@ class KKSEIOData;
 class _GUI_EXPORT KKSEIODataModel : public QAbstractItemModel
 {
 public:
-    KKSEIODataModel (KKSTemplate * t, const KKSMap<qint64, KKSEIOData *>& objRecs, QObject *parent = 0);
+    KKSEIODataModel (const KKSTemplate * t, const KKSMap<qint64, KKSEIOData *>& objRecs, QObject *parent = 0);
     virtual ~KKSEIODataModel ();
 
     virtual int columnCount (const QModelIndex& parent = QModelIndex()) const;
@@ -25,14 +25,16 @@ public:
     virtual QVariant data (const QModelIndex& index, int role = Qt::DisplayRole) const;
     virtual bool setData (const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
     
+    virtual QVariant headerData (int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+/*
     virtual bool insertRows (int row, int count, const QModelIndex& parent = QModelIndex() );
     virtual bool removeRows (int row, int count, const QModelIndex& parent = QModelIndex() );
-
+*/
 private:
     //
     // Variables
     //
-    KKSTemplate * tRef;
+    const KKSTemplate * tRef;
     KKSMap<qint64, KKSEIOData *> objRecords;
 
 private:
