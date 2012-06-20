@@ -48,8 +48,10 @@ int KKSEIODataModel :: rowCount (const QModelIndex& parent) const
                 ncount++;
         return ncount;
     }
+    else if (parent.isValid() )
+        return 0;
     
-    return objRecords.count();
+    return 0;//objRecords.count();
 }
 
 QModelIndex KKSEIODataModel :: index (int row, int column, const QModelIndex& parent) const
@@ -68,6 +70,23 @@ QModelIndex KKSEIODataModel :: parent (const QModelIndex& index) const
 
 QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
 {
+    if (!index.isValid())
+        return QVariant();
+    
+    KKSMap<qint64, KKSEIOData*>::const_iterator p=objRecords.constBegin();
+    p += index.row();
+    if (role == Qt::UserRole)
+    {
+        return p.key();
+    }
+    else if (role == Qt::DisplayRole)
+    {
+        KKSList<KKSAttrView*> avList = tRef ? tRef->sortedAttrs() : KKSList<KKSAttrView*>();
+        if (index.column() >= avList.count())
+            return QVariant ();
+        QString aCode = avList[index.column()]->code(false);
+        return p.value()->fieldValue (aCode);
+    }
     return QVariant();
 }
 
