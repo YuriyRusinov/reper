@@ -66,19 +66,19 @@ Datum rgetfile(PG_FUNCTION_ARGS)
     
     SPI_finish();
 
-    fseek(fFile, 0, SEEK_END);
-    size = ftell(fFile);
+    fseeko(fFile, 0, SEEK_END);
+    size = ftello(fFile);
     if(position>=size){
         fclose(fFile);
-        elog(NOTICE, "File is readed!");
+        elog(ERROR, "File is readed!");
         //pfree(url);
         PG_RETURN_NULL();
     }
 
-    fseek(fFile, (long)position, SEEK_SET);
+    fseeko(fFile, position, SEEK_SET);
     
     if ( ! feof(fFile) ){
-        int          readed;
+        int64        readed;
         bytea        *data;
 
         data = (text*) palloc(VARHDRSZ + blockSize);
@@ -88,7 +88,7 @@ Datum rgetfile(PG_FUNCTION_ARGS)
         readed = fread(VARDATA(data), 1, blockSize, fFile);
         if ( readed != blockSize ){
             SET_VARSIZE(data, (VARHDRSZ + readed));
-            elog(NOTICE,"Read from file less then requested");
+            elog(ERROR,"Read from file less then requested");
         }
         
 

@@ -1658,6 +1658,7 @@ insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (35, 11, 17, 'true', true, true);
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (36, 11, 18, '1', true, false);--id_io_state
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (37, 11, 111, 'false', true, false);--is_global
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (532, 11, 40, 'false', true, true);--is_archived (редактировать нельзя)
 
 
 --таблица информационных объектов
@@ -2522,7 +2523,7 @@ insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (525, 189, 305, 'false', true, false); --is_read_only
 --530 занят для атрибута is_qualifier в справочнике типов категорий
 --531 занят для атрибута id_child2 в справочнике  категорий
-
+--532 занят для атрибута is_archived в справочнике категорий
 
 
 

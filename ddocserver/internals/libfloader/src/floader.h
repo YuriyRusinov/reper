@@ -3,7 +3,6 @@
 
 #include "floader_config.h"
 
-//#include <stdio.h>
 #include <postgres.h>
 #include <funcapi.h>
 #include <fmgr.h>
@@ -12,10 +11,6 @@
 #include <sys/stat.h>
 #include <utils/builtins.h>
 
-//#undef vsnprintf
-//#undef snprintf
-
-//#undef errcode
 #include <stdio.h>
 
 //hack for compatibility with 8.3 and <8.3

@@ -69,7 +69,7 @@ begin
             rav.is_actual,
             rav.description
         from 
-            ( f_sel_rec_attrs_values(idRec) rav inner join attrs_categories ac on (rav.id_attr_category = ac.id) inner join attributes a on (ac.id_io_attribute=a.id and rav.id_rec = idRec))
+            ( f_sel_rec_attrs_values(idRec) rav inner join attrs_categories ac on (rav.id_attr_category = ac.id) inner join attributes a on (ac.id_io_attribute=a.id and rav.id_record = idRec))
             --( rec_attrs_values rav inner join attrs_categories ac on (rav.id_attr_category = ac.id) inner join attributes a on (ac.id_io_attribute=a.id and rav.id_record = idRec))
         where 
             case when isActual = true then rav.is_actual = true else (rav.start_time >= iStartTime and rav.stop_time <= iStopTime) end

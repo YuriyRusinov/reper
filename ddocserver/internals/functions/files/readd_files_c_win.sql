@@ -8,7 +8,7 @@ create or replace function rGetFile(int4, int4, int8) returns bytea
 create or replace function rGetFileByUrl(varchar, int4, int8) returns bytea 
     as 'libfloader.dll', 'rgetfilebyurl'  language 'c' strict security definer;
 
-create or replace function rGetFileSizeByUrl(varchar) returns int4
+create or replace function rGetFileSizeByUrl(varchar) returns int8
     as 'libfloader.dll', 'rgetfilesizebyurl'  language 'c' strict security definer;
 
 create or replace function rWriteFile(int4, bytea, int4) returns int4 

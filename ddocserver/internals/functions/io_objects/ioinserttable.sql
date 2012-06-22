@@ -142,7 +142,7 @@ begin
                 --TODO: need add check that if the table exist that has the structure aka (id_1 int4, id_2 int4)
                 --else we should create the new table
                 if(rr.is_exist <> 1) then
-                    create_ref_table := create_ref_table || ' create table ' || tName || ' (id_' || table_name || ' int4, id_' || r.atabname || ' int4); ';
+                    create_ref_table := create_ref_table || ' create table ' || tName || ' (id_' || table_name || ' int8, id_' || r.atabname || ' int8); ';
                     --На эту таблицу пока проверку на префикс tbl_ делать не надо, ибо она еще не переименована (находится в процессе создания в данном триггере)
                     create_ref_table := create_ref_table || ' alter table '  || tName || ' ADD CONSTRAINT FK_ID_' || tName || '_1 FOREIGN KEY (ID_' || table_name || ') REFERENCES ' || table_name || ' (ID) ON DELETE CASCADE ON UPDATE CASCADE; ';
 

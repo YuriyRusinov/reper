@@ -24,6 +24,9 @@
     typedef int errno_t;
 #endif
 
+#define _LARGEFILE_SOURCE
+#define _FILE_OFFSET_BITS 64
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -31,8 +34,6 @@
 
 
 #include <stddef.h>
-//#include <stdio.h>
-//#include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 #include <limits.h>
@@ -101,6 +102,6 @@
     #define snprintf _snprintf
 #endif
 
-static const char floader_version[] = "LibFilesLoader Version 0.5.3";
+static const char floader_version[] = "LibFilesLoader Version 0.14.0";
 
 #endif /* _FLOADER_CONFIG_H_ */

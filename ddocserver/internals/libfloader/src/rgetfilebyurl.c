@@ -36,8 +36,8 @@ Datum rgetfilebyurl(PG_FUNCTION_ARGS)
     
     pfree(url);
 
-    fseek(fFile, 0, SEEK_END);
-    size = ftell(fFile);
+    fseeko(fFile, 0, SEEK_END);
+    size = ftello(fFile);
     if(position>=size){
         fclose(fFile);
         elog(NOTICE, "File is readed!");
@@ -45,10 +45,10 @@ Datum rgetfilebyurl(PG_FUNCTION_ARGS)
         PG_RETURN_NULL();
     }
     
-    fseek(fFile, (long)position, SEEK_SET);
+    fseeko(fFile, (long)position, SEEK_SET);
     
     if ( ! feof(fFile) ){
-        int          readed;
+        int64        readed;
         bytea        *data;
 
         data = (text*) palloc(VARHDRSZ + blockSize);

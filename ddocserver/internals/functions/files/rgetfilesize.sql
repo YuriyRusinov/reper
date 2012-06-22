@@ -1,9 +1,9 @@
-create or replace function rGetFileSize(int4) returns int4 as
+create or replace function rGetFileSize(int4) returns int8 as
 $BODY$
 declare
     idUrl alias for $1;
     url varchar;
-    fSize int4;
+    fSize int8;
 begin
 
     url = rGetAbsUrl(idUrl);

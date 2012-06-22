@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     14.06.2012 12:17:34                          */
+/* Created on:     22.06.2012 21:32:27                          */
 /*==============================================================*/
 
 
@@ -2765,6 +2765,13 @@ select setMacToNULL('rec_attrs_values');
 select createTriggerUID('rec_attrs_values');
 
 /*==============================================================*/
+/* Index: i_rav_id_record                                       */
+/*==============================================================*/
+create  index i_rav_id_record on rec_attrs_values using BTREE (
+id_record
+);
+
+/*==============================================================*/
 /* Table: receive_order                                         */
 /*==============================================================*/
 create table receive_order (
@@ -3365,6 +3372,20 @@ create table urls_objects (
 );
 
 select setMacToNULL('urls_objects');
+
+/*==============================================================*/
+/* Table: urls_records                                          */
+/*==============================================================*/
+create table urls_records (
+   id_record            INT8                 not null,
+   id_url               INT4                 not null,
+   name                 VARCHAR              null,
+   constraint PK_URLS_RECORDS primary key (id_record, id_url)
+);
+
+comment on table urls_records is
+'Взаимосвязи записей справочников с прикрепленными к ним файлами.
+Сущемствует возможность прикреплять к записям справочников DynamicDocs различные файлы';
 
 /*==============================================================*/
 /* Table: user_acl_templates                                    */
@@ -4562,6 +4583,11 @@ alter table urls_objects
 
 alter table urls_objects
    add constraint FK_URLS_OBJ_REFERENCE_IO_URLS foreign key (id_url)
+      references io_urls (id)
+      on delete restrict on update restrict;
+
+alter table urls_records
+   add constraint FK_URLS_REC_REFERENCE_IO_URLS foreign key (id_url)
       references io_urls (id)
       on delete restrict on update restrict;
 

@@ -28,6 +28,12 @@ select setAsNotLogging(2);
 select setAsLogging(1);
 select setAsLogging(2);
 
+drop function rGetFileSizeByUrl(varchar);
+create or replace function rGetFileSizeByUrl(varchar) returns int8
+    as '$libdir/libfloader.so', 'rgetfilesizebyurl'  language 'c' strict security definer;
+
+drop function rGetFileSize(int4);
+
 \i ./functions/readd_functions.sql
 
 alter table rec_attrs_values rename to tbl_rec_attrs_values;
@@ -39,6 +45,8 @@ alter table rec_attrs_values rename to tbl_rec_attrs_values;
 --ÑŞÄÀ (ÌÅÆÄÓ ÓÄÀËÅÍÈÅÌ È ÑÎÇÄÀÍÈÅÌ ÒĞÈÃÃÅĞÀ) ÏÎÌÅÙÀÅÌ ÇÀÏĞÎÑÛ ÍÀ ÑÎÇÄÀÍÈÅ ÊÀÒÅÃÎĞÈÉ (ÄÎÁÀÂËßÒÜ ÑÒĞÎÊÈ Â ACCESS_CATEGORIES_TABLE ÍÅ ÍÀÄÎ)
 select f_safe_drop_trigger('trgcheckcatforglobal', 'io_categories');
 --ñşäà
+insert into attrs_categories (id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (11, 40, 'false', true, true);--is_archived (ğåäàêòèğîâàòü íåëüçÿ)
+
 select f_create_trigger('trgcheckcatforglobal', 'before', 'insert or update', 'io_categories', 'checkcatforglobal()');
 
 

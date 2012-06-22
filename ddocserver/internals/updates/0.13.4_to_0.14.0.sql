@@ -70,6 +70,11 @@ alter table rubric_records
       on delete restrict on update restrict;
 
 
+drop function rGetFileSizeByUrl(varchar);
+create or replace function rGetFileSizeByUrl(varchar) returns int8
+    as '$libdir/libfloader.so', 'rgetfilesizebyurl'  language 'c' strict security definer;
+
+drop function rGetFileSize(int4);
 
 \i ./functions/readd_functions.sql
 
@@ -83,6 +88,8 @@ alter table rec_attrs_values rename to tbl_rec_attrs_values;
 --ÑŞÄÀ (ÌÅÆÄÓ ÓÄÀËÅÍÈÅÌ È ÑÎÇÄÀÍÈÅÌ ÒĞÈÃÃÅĞÀ) ÏÎÌÅÙÀÅÌ ÇÀÏĞÎÑÛ ÍÀ ÑÎÇÄÀÍÈÅ ÊÀÒÅÃÎĞÈÉ (ÄÎÁÀÂËßÒÜ ÑÒĞÎÊÈ Â ACCESS_CATEGORIES_TABLE ÍÅ ÍÀÄÎ)
 select f_safe_drop_trigger('trgcheckcatforglobal', 'io_categories');
 --ñşäà
+insert into attrs_categories (id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (11, 40, 'false', true, true);--is_archived (ğåäàêòèğîâàòü íåëüçÿ)
+
 select f_create_trigger('trgcheckcatforglobal', 'before', 'insert or update', 'io_categories', 'checkcatforglobal()');
 
 
@@ -108,6 +115,8 @@ grant all on rec_attrs_values to public;
 create or replace rule "r_ins_rec_attrs_values" as on insert to "rec_attrs_values" do instead select "f_ins_rec_attrs_values"(new.id_record, new.id_attr_category, new.value, new.start_time, new.stop_time, new.meas_time, new.id_io_object_src, new.id_io_object_src1, new.description);
 create or replace rule "r_del_rec_attrs_values" as on delete to "rec_attrs_values" do instead select "f_del_rec_attrs_values"(old.id_record, old.id_attr_category, true);
 create or replace rule "r_upd_rec_attrs_values" as on update to "rec_attrs_values" do instead select "f_upd_rec_attrs_values"(new.id_record, new.id_attr_category, new.value, new.start_time, new.stop_time, new.meas_time, new.id_io_object_src, new.id_io_object_src1, new.description, old.id_record, old.id_attr_category, true);
+
+
 
 
 --ïî÷åìó-òî èíîãäà ğÿä àòğèáóòîâ íå îáíîâëÿåòñÿ.

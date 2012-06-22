@@ -6,7 +6,7 @@ create type h_get_rec_rubrics as (id int4,
                                   description varchar, 
                                   type int4);
 
-create or replace function recGetRubrics(int4) returns setof h_get_rec_rubrics as
+create or replace function recGetRubrics(int8) returns setof h_get_rec_rubrics as
 $BODY$
 declare 
     idRecord alias for $1;

@@ -23,10 +23,11 @@ Datum rgetfilesizebyurl(PG_FUNCTION_ARGS)
     
     pfree(url);
 
-    fseek(fFile, 0, SEEK_END);
-    size = ftell(fFile);
+    fseeko(fFile, 0, SEEK_END);
+    size = ftello(fFile);
     fclose(fFile);
     
-    PG_RETURN_INT32(size);
+    
+    PG_RETURN_INT64(size);
 
 }
