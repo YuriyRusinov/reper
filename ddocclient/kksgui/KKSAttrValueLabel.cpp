@@ -74,16 +74,23 @@ void KKSAttrValueLabel :: setLabelProps()
 	QColor colour(Qt::darkBlue); 
     QString coloredText;
    
-    
+#ifdef Q_CC_MSVC
     if(m_isSystem != KKSIndAttr::KKSIndAttrClass::iacTableAttr)
+#else
+    if(m_isSystem != KKSIndAttr::iacTableAttr)
+#endif
         coloredText = tr("<font color='blue'>%2</font>").arg(text);
     else
         coloredText = text;
 
     this->setText( coloredText );	
 	
-	QFont lFont = this->font ();
+    QFont lFont = this->font ();
+#ifdef Q_CC_MSVC
     lFont.setUnderline( m_isSystem != KKSIndAttr::KKSIndAttrClass::iacTableAttr ? true : false);
+#else
+    lFont.setUnderline( m_isSystem != KKSIndAttr::iacTableAttr ? true : false);
+#endif
 	if (isMandatory)
     {
         lFont.setBold (true);
@@ -91,7 +98,11 @@ void KKSAttrValueLabel :: setLabelProps()
 
 	this->setFont (lFont);
 
+#ifdef Q_CC_MSVC
     if(m_isSystem != KKSIndAttr::KKSIndAttrClass::iacTableAttr){
+#else
+    if(m_isSystem != KKSIndAttr::iacTableAttr){
+#endif
         setToolTip(tr("Click on label to show extended attribute properties"));
         setCursor(Qt::PointingHandCursor);
     }
@@ -101,13 +112,23 @@ void KKSAttrValueLabel :: setLabelProps()
 
 void KKSAttrValueLabel :: showAttrValueProps()
 {
+#ifdef Q_CC_MSVC
     if(!m_av || m_isSystem == KKSIndAttr::KKSIndAttrClass::iacTableAttr)
+#else
+    if(!m_av || m_isSystem == KKSIndAttr::iacTableAttr)
+#endif
         return;
-
+#ifdef Q_CC_MSVC
     KKSAttrValuePropsForm * f = new KKSAttrValuePropsForm(m_av, 
                                                           true, 
                                                           m_isSystem == KKSIndAttr::KKSIndAttrClass::iacIOUserAttr ? false : true,
                                                           this);
+#else
+    KKSAttrValuePropsForm * f = new KKSAttrValuePropsForm(m_av, 
+                                                          true, 
+                                                          m_isSystem == KKSIndAttr::iacIOUserAttr ? false : true,
+                                                          this);
+#endif
 
     connect(f, SIGNAL(loadIOSrc(KKSObject **, QWidget *)), this, SIGNAL(loadIOSrc(KKSObject **, QWidget *)));
     connect(f, SIGNAL(viewIOSrc(KKSObject *, QWidget *)), this, SIGNAL(viewIOSrc(KKSObject *, QWidget *)));

@@ -1153,7 +1153,11 @@ void KKSObjEditor :: setValue (int idAttrValue, KKSIndAttr::KKSIndAttrClass sys,
     
     switch (sys)
     {
+#ifdef Q_CC_MSVC
     case KKSIndAttr::KKSIndAttrClass::iacTableAttr: default:
+#else
+    case KKSIndAttr::iacTableAttr: default:
+#endif
         {
             if (!sysAttrValues.contains (idAttrValue))
                 return;
@@ -1167,7 +1171,11 @@ void KKSObjEditor :: setValue (int idAttrValue, KKSIndAttr::KKSIndAttrClass sys,
             isChanged = true;
             break;
         }
-    case KKSIndAttr::KKSIndAttrClass::iacIOUserAttr:
+#ifdef Q_CC_MSVC
+        case KKSIndAttr::KKSIndAttrClass::iacIOUserAttr:
+#else
+        case KKSIndAttr::iacIOUserAttr:
+#endif
         {
             if (!ioAttrValues.contains (idAttrValue))
                 return;
@@ -1181,7 +1189,11 @@ void KKSObjEditor :: setValue (int idAttrValue, KKSIndAttr::KKSIndAttrClass sys,
             isChanged = true;
             break;
         }
+#ifdef Q_CC_MSVC
     case KKSIndAttr::KKSIndAttrClass::iacEIOUserAttr:
+#else
+    case KKSIndAttr::iacEIOUserAttr:
+#endif
         {
             if (!ioIndicatorValues.contains (idAttrValue))
                 return;
@@ -1241,8 +1253,11 @@ void KKSObjEditor :: setOpt (int id, KKSIndAttr::KKSIndAttrClass isSystem, QChec
 {
     if (!ch)
         return;
-
+#ifdef Q_CC_MSVC
     if (isSystem == KKSIndAttr::KKSIndAttrClass::iacTableAttr)
+#else
+    if (isSystem == KKSIndAttr::iacTableAttr)
+#endif
         chSysOpt.insert (ch, id);
     else
         chIOOpt.insert (ch, id);
@@ -1253,7 +1268,11 @@ void KKSObjEditor :: setOpt (int id, KKSIndAttr::KKSIndAttrClass isSystem, QChec
 void KKSObjEditor :: addOptWidget (int id, KKSIndAttr::KKSIndAttrClass isSystem, QWidget *w)
 {
     QList<QCheckBox *> keys;
+#ifdef Q_CC_MSVC
     if (isSystem == KKSIndAttr::KKSIndAttrClass::iacTableAttr)
+#else
+    if (isSystem == KKSIndAttr::iacTableAttr)
+#endif
     {
         chSysOptWidgets.insert (id, w);
         keys = chSysOpt.keys (id);
@@ -1316,7 +1335,11 @@ void KKSObjEditor :: setEnableO (int state)
                         val = QVariant ();
                         dEdit->setDate (QDate());
                     }
+#ifdef Q_CC_MSVC
                     setValue (id, isSystem ? KKSIndAttr::KKSIndAttrClass::iacTableAttr : KKSIndAttr::KKSIndAttrClass::iacIOUserAttr, val);
+#else
+                    setValue (id, isSystem ? KKSIndAttr::iacTableAttr : KKSIndAttr::iacIOUserAttr, val);
+#endif
                 }
                 else if (qobject_cast<QTimeEdit*>(wList[i]))
                 {
@@ -1331,7 +1354,11 @@ void KKSObjEditor :: setEnableO (int state)
                         val = QVariant ();
                         dtEdit->setTime (QTime());
                     }
+#ifdef Q_CC_MSVC
                     setValue (id, isSystem ? KKSIndAttr::KKSIndAttrClass::iacTableAttr : KKSIndAttr::KKSIndAttrClass::iacIOUserAttr, val);
+#else
+                    setValue (id, isSystem ? KKSIndAttr::iacTableAttr : KKSIndAttr::iacIOUserAttr, val);
+#endif
                 }
                 else
                 {
@@ -1346,7 +1373,11 @@ void KKSObjEditor :: setEnableO (int state)
                         val = QVariant ();
                         dtEdit->setDateTime (QDateTime());
                     }
+#ifdef Q_CC_MSVC
                     setValue (id, isSystem ? KKSIndAttr::KKSIndAttrClass::iacTableAttr : KKSIndAttr::KKSIndAttrClass::iacIOUserAttr, val);
+#else
+                    setValue (id, isSystem ? KKSIndAttr::iacTableAttr : KKSIndAttr::iacIOUserAttr, val);
+#endif
                 }
             }
         }
@@ -1699,9 +1730,17 @@ void KKSObjEditor :: setAttrView (void)
         }
     }
     if (sysAttrWidget && (!tabObj || tabObj->currentWidget() == sysAttrWidget ))
+#ifdef Q_CC_MSVC
         emit updateAttributes (sysAttrWidget, scSysAttrs, sysAttrsW,  (pObj ? pObj->id() : pObjectEx->io()->id()), pObjectEx->io()->category()->tableCategory(), KKSIndAttr::KKSIndAttrClass::iacTableAttr, this);
+#else
+        emit updateAttributes (sysAttrWidget, scSysAttrs, sysAttrsW,  (pObj ? pObj->id() : pObjectEx->io()->id()), pObjectEx->io()->category()->tableCategory(), KKSIndAttr::iacTableAttr, this);
+#endif
     else if (ioAttrWidget && (!tabObj || tabObj->currentWidget () == ioAttrWidget))
+#ifdef Q_CC_MSVC
         emit updateAttributes (ioAttrWidget, scIOAttrs, ioAttrsW, pObj->id(), (pObjectEx->id() < 0 ? pCat: pObj->category()), KKSIndAttr::KKSIndAttrClass::iacIOUserAttr, this);
+#else
+        emit updateAttributes (ioAttrWidget, scIOAttrs, ioAttrsW, pObj->id(), (pObjectEx->id() < 0 ? pCat: pObj->category()), KKSIndAttr::iacIOUserAttr, this);
+#endif
     else if (recWidget && (!tabObj || tabObj->currentIndex() == 0))
         this->setView ();
 }
@@ -1864,8 +1903,12 @@ void KKSObjEditor :: editCurrentRec (const QModelIndex& index)
 void KKSObjEditor :: addAttributeCheckReference (const KKSAttrValue * av, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel)
 {
     qDebug () << __PRETTY_FUNCTION__ << av->id() << isSystem << sourceModel;
-    
+
+#ifdef Q_CC_MSVC
     if (m_isIO && isSystem == KKSIndAttr::KKSIndAttrClass::iacIOUserAttr)
+#else
+    if (m_isIO && isSystem == KKSIndAttr::iacIOUserAttr)
+#endif
         emit editObjAttrRef (pObj, av, isSystem, sourceModel);
     else
         emit editObjCAttrRef (pObjectEx, av, isSystem, sourceModel);
@@ -1873,7 +1916,11 @@ void KKSObjEditor :: addAttributeCheckReference (const KKSAttrValue * av, KKSInd
 
 void KKSObjEditor :: delAttributeCheckReference (const KKSAttrValue * av, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel, const QModelIndex& wInd)
 {
+#ifdef Q_CC_MSVC
     if (m_isIO && isSystem == KKSIndAttr::KKSIndAttrClass::iacIOUserAttr)
+#else
+    if (m_isIO && isSystem == KKSIndAttr::iacIOUserAttr)
+#endif
         emit delObjAttrRef (pObj, av, isSystem, sourceModel, wInd);
     else 
         emit delObjCAttrRef (pObjectEx, av, isSystem, sourceModel, wInd);
@@ -1956,8 +2003,11 @@ void KKSObjEditor :: addSyncOrg (KKSAttrValue * av, QAbstractItemModel * sMod)
     {
         setSysAttrValue(av);
     }
-
+#ifdef Q_CC_MSVC
     emit editObjCAttrRef (pObjectEx, av, KKSIndAttr::KKSIndAttrClass::iacTableAttr, sMod);
+#else
+    emit editObjCAttrRef (pObjectEx, av, KKSIndAttr::iacTableAttr, sMod);
+#endif
     
     setSysAttrValue(pObjectEx->attrValue (av->attribute()->id()) );
     
@@ -1974,7 +2024,11 @@ void KKSObjEditor :: delSyncOrg (KKSAttrValue * av, const QModelIndex& wInd, QAb
         setSysAttrValue(av);
     }
 
+#ifdef Q_CC_MSVC
     emit delObjCAttrRef (pObjectEx, av, KKSIndAttr::KKSIndAttrClass::iacTableAttr, sMod, wInd);
+#else
+    emit delObjCAttrRef (pObjectEx, av, KKSIndAttr::iacTableAttr, sMod, wInd);
+#endif
     setSysAttrValue(pObjectEx->attrValue (av->attribute()->id()) );
     isChanged = true;
 }

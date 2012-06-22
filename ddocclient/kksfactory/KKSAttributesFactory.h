@@ -103,8 +103,11 @@ private:
     KKSAttributesFactory (KKSLoader *l, KKSEIOFactory *_eiof, KKSObjEditorFactory * _oef, KKSPPFactory * _ppf);
     virtual ~KKSAttributesFactory (void);
 
-
+#ifdef Q_CC_MSVC
     QLabel * createAttrTitle (KKSAttrValue * av, KKSIndAttr::KKSIndAttrClass isSystem = KKSIndAttr::KKSIndAttrClass::iacIOUserAttr, KKSObjEditor *objEditor = NULL);
+#else
+    QLabel * createAttrTitle (KKSAttrValue * av, KKSIndAttr::KKSIndAttrClass isSystem = KKSIndAttr::iacIOUserAttr, KKSObjEditor *objEditor = NULL);
+#endif
     QCheckBox * createChDateTime (bool isMandatory, QGridLayout *gLayout, QLabel *lTitle, int n_str);
     QWidget * createAttrWidget ( KKSAttrValue * pAttrValue, 
                                  KKSObjEditor *objEditor,

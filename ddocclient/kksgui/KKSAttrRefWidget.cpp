@@ -9,7 +9,11 @@ KKSAttrRefWidget :: KKSAttrRefWidget (QWidget *parent, Qt::WindowFlags f)
     gAttrLay (new QGridLayout()),
     idAttrValue (-1),
     cVal (QVariant()),
+#ifdef Q_CC_MSVC
     isSystem (KKSIndAttr::KKSIndAttrClass::iacIOUserAttr)
+#else
+    isSystem (KKSIndAttr::iacIOUserAttr)
+#endif
 {
     this->setLayout (gAttrLay);
     gAttrLay->setContentsMargins (0, 0, 0, 0);
