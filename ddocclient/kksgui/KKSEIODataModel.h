@@ -9,6 +9,7 @@
 
 class KKSTemplate;
 class KKSEIOData;
+class KKSCategoryAttr;
 
 class _GUI_EXPORT KKSEIODataModel : public QAbstractItemModel
 {
@@ -34,9 +35,15 @@ public:
 */
 private:
     //
+    // Functions
+    //
+    const KKSCategoryAttr * getFirstAttribute (void);
+private:
+    //
     // Variables
     //
     const KKSTemplate * tRef;
+    const KKSCategoryAttr * cAttrP;
     KKSMap<qint64, KKSEIOData *> objRecords;
 
 private:
