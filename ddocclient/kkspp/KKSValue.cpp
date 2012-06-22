@@ -710,6 +710,11 @@ QString KKSValue::valueForInsert() const
         return escVal;
     }
 
+    if(a_type == KKSAttrType::atInt){
+        val += QString("'%1'").arg(value());
+        return val;
+    }
+
     if(isLiteral())
         val += QString("'%1'").arg(value());
     else

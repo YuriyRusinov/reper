@@ -43,6 +43,8 @@ KKSRecWidget :: KKSRecWidget (QTreeView *tView, bool mode, QWidget *parent, Qt::
     connect (actEdit, SIGNAL(triggered()), this, SLOT (editRec()) );
     connect (actDel, SIGNAL(triggered()), this, SLOT (delRec()) );
     connect (actRefresh, SIGNAL(triggered()), this, SLOT (refreshRec()) );
+
+    connect (tView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(tvDoubleClicked(const QModelIndex &)));
 }
 /*
 KKSRecWidget :: KKSRecWidget (const QString& filterTitle, const QString& addTitle, const QString& editTitle, const QString& delTitle, const QString& importTitle, const QString& exportTitle, QTreeView *tView, bool mode, QWidget *parent, Qt::WindowFlags f)
@@ -110,6 +112,16 @@ int KKSRecWidget :: getID (void) const
         return -1;
 
     return wIndex.data (Qt::UserRole).toInt ();
+}
+
+void KKSRecWidget :: tvDoubleClicked(const QModelIndex & index)
+{
+    if (!index.isValid())
+        return;
+
+    int id = index.data (Qt::UserRole).toInt ();
+
+    emit entityDoubleClicked();//id будем получать через getID()
 }
 
 void KKSRecWidget :: setEIOModel (QAbstractItemModel *model)

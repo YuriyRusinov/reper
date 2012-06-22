@@ -9,27 +9,25 @@
 #define __KKSSITOOOM_KKSAttrWidget_h
 
 #include "kksgui_config.h"
+#include "KKSIndAttr.h"
 
 class KKSAttrValue;
 
 class _GUI_EXPORT KKSAttrWidget 
 {
     public:
-        KKSAttrWidget(const KKSAttrValue *av, int isSys);
+        KKSAttrWidget(const KKSAttrValue *av, KKSIndAttr::KKSIndAttrClass isSys);
         virtual ~KKSAttrWidget (void);
 
         void setAttrValue(const KKSAttrValue * av);
         const KKSAttrValue * attrValue() const;
-
-    //signals:
-    //    void valueChanged (int id, bool isSys, QVariant val);
 
     protected:
         //
         // Variables
         //
         const KKSAttrValue *m_av;
-        int m_isSystem;
+        KKSIndAttr::KKSIndAttrClass m_isSystem;
 
     //private:
         //Q_OBJECT

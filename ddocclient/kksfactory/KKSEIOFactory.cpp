@@ -51,14 +51,15 @@ KKSDatabase * KKSEIOFactory::getDb() const
 }
 
 
-int KKSEIOFactory::insertEIO(KKSObjectExemplar* eio, const KKSCategory* cat, const QString& table) const
+int KKSEIOFactory::insertEIO(KKSObjectExemplar* eio, const KKSCategory* cat, const QString& table, bool bImported) const
 {
     if(!eio || !eio->io())
         return ERROR_CODE;
 
-    int res = insertRecord(eio, cat, table);
+    int res = insertRecord(eio, cat, table, bImported);
     if (res <= 0)
         return ERROR_CODE;
+
     int rres = insertIncludes (eio);
     if (rres <=0)
         return ERROR_CODE;
@@ -102,7 +103,8 @@ int KKSEIOFactory::deleteEIO(KKSObjectExemplar* eio, const QString& table) const
 
 int KKSEIOFactory::insertRecord(KKSObjectExemplar* eio, 
                                 const KKSCategory * cat, 
-                                const QString & table) const
+                                const QString & table, 
+                                bool bImported) const
 {
     if(!db || !eio)
         return ERROR_CODE;
@@ -115,13 +117,15 @@ int KKSEIOFactory::insertRecord(KKSObjectExemplar* eio,
     //берем название таблицы, в которую необходимо будет сделать инсерт
     QString tableName = table.isEmpty() ? io->tableName() : table;
 
-    if (cat)
+    /*if (cat)
     {
         for (KKSMap<int, KKSCategoryAttr*>::const_iterator pa = cat->attributes().constBegin(); \
              pa != cat->attributes().constEnd(); \
              pa++)
             qDebug () << __PRETTY_FUNCTION__ << pa.key() << pa.value()->code (false) << pa.value()->code (true);
     }
+    */
+
     const KKSCategory * category = 0;
     if (cat)
         category = cat;
@@ -136,6 +140,7 @@ int KKSEIOFactory::insertRecord(KKSObjectExemplar* eio,
         if (!category)
             return ERROR_CODE;
     }
+
     /*for (KKSMap<int, KKSCategoryAttr*>::const_iterator pa = category->attributes().constBegin(); \
          pa != category->attributes().constEnd(); \
          pa++)
@@ -150,7 +155,7 @@ int KKSEIOFactory::insertRecord(KKSObjectExemplar* eio,
     QString exQuery;//если таблица содержит атрибуты типа atCheckListEx (отношение многие-ко-многим)
 
     //данный метод генерит реальный SQL-запрос в БД на инсерт в таблицу
-    qint64 id = generateInsertQuery(tableName, attrs, attrValues, query, exQuery);
+    qint64 id = generateInsertQuery(tableName, attrs, attrValues, query, exQuery, bImported);
     if(id == ERROR_CODE || query.isEmpty())
         return ERROR_CODE;
 
@@ -355,7 +360,8 @@ qint64 KKSEIOFactory::generateInsertQuery(const QString & tableName,
                                        const KKSMap<int, KKSCategoryAttr *> & attrs, 
                                        const KKSList<KKSAttrValue *> & attrValues, 
                                        QString & query,
-                                       QString & exQuery /*для обработки атрибутов типа atCheckListEx*/) const
+                                       QString & exQuery, /*для обработки атрибутов типа atCheckListEx*/
+                                       bool bImported) const
 {
     if (tableName.isEmpty())
         return ERROR_CODE;
@@ -369,10 +375,27 @@ qint64 KKSEIOFactory::generateInsertQuery(const QString & tableName,
     //с точки зрения не системы (id), а пользователя (column_name в KKSAttribute)
 
     int count = 0;
+    
     //В настоящее время мы загружаем экземпляры информационных объектов таким образом, 
     //что количество атрибутов в их категориях равно количеству созданных значений этих атрибутов для ЕИО
-    if((count = attrs.count()) != attrValues.count())
-        return ERROR_CODE;
+    if((count = attrs.count()) != attrValues.count()){
+        //тем не менее при импорте табличных данных из внешнего файла может сложиться ситуация, при которой поле id отсутствует
+        //в этом случае мы это можем проигнорировать и продолжить работу
+        //при этом мы полагаем, что поле id в списке attrs есть всегда
+        if(count != attrValues.count()+1)
+            return ERROR_CODE;
+
+        bool hasID = false;
+        count = attrValues.count();
+        for(int i=0; i<count; i++){
+            if(attrValues.at(i)->attribute()->code() == "id"){
+                hasID = true;
+                break;
+            }
+        }
+        if(hasID)
+            return ERROR_CODE;
+    }
 
     qint64 idValue = 0;
     QString attrArray;
@@ -412,7 +435,6 @@ qint64 KKSEIOFactory::generateInsertQuery(const QString & tableName,
                 rTable == POSITION_WORK_MODE || 
                rTable == UNITS_WORK_MODE ||
                rTable == IO_OBJECTS_ORGANIZATION ||
-               //rTable == IO_CATEGORIES_ORGANIZATION ||
                rTable == USER_CHAINS_ORGANIZATION ||
                rTable == REPORT_ORGANIZATION ||
                rTable == GUARD_OBJ_DEVICES_TSO ||
@@ -426,9 +448,62 @@ qint64 KKSEIOFactory::generateInsertQuery(const QString & tableName,
             else
                 refTable = rTable + "_ref_" + QString::number(attr->id());
 
-            QString ids = attrValue->value().valueForInsert();
+            QString ids;
+
             QString mainAttr = QString("id_%1").arg(tableName);
             QString childAttr = QString("id_%1").arg(attr->tableName());
+            
+            //Если записи импортируются из внешнего файла, то необходимо получить значения соответствующих идентификаторов
+            if(bImported){
+                
+                KKSValue value = attrValue->value();
+                
+                QString cCast;
+                const KKSAttrType * a = attr->refColumnType();
+                if(a){
+                    if(a->attrType() == KKSAttrType::atString || 
+                       a->attrType() == KKSAttrType::atFixString ||
+                       a->attrType() == KKSAttrType::atText)
+                    {
+                        cCast = "::varchar[]";
+                    }
+
+                }
+                if(cCast.isEmpty())
+                    cCast = "::int8[]";
+
+                QString aQuery = QString ("select 'ARRAY[' || array_to_string(array_agg( '''' || %4 || ''''), ',') || ']%5' from %1 where %2 = ANY (ARRAY[%3]) limit 1")
+                                                 .arg (attr->tableName ())
+                                                 .arg (attr->columnName ())
+                                                 .arg (value.value())
+                                                 .arg (attr->refColumnName().isEmpty() ? "id" : attr->refColumnName())
+                                                 .arg (cCast);
+                
+                KKSResult * aRes = db->execute (aQuery);
+                
+                if (!aRes || aRes->getRowCount () == 0){
+                    if(attr->isMandatory()){
+                        KKSValue defValue = attr->defValue();
+                        ids = defValue.valueForInsert();
+                    }
+                    else{
+                        ids = "NULL";
+                    }
+                }
+                else{
+                    ids = aRes->getCellAsString(0, 0);
+                }
+
+                if (aRes)
+                    delete aRes;
+            }
+            else{
+                ids = attrValue->value().valueForInsert();
+            }
+            
+            if(ids.isEmpty())
+                ids = "NULL";
+
             exQuery += QString("select aInsertExValues('%1', %2, %3, '%4', '%5');")
                                 .arg(refTable)
                                 .arg(idValue)
@@ -439,9 +514,9 @@ qint64 KKSEIOFactory::generateInsertQuery(const QString & tableName,
 
             continue;
         }
+
         attrArray += code;
-        
-        
+                
         //-----
         /*
         Выделяется 3 варианта:
@@ -456,82 +531,105 @@ qint64 KKSEIOFactory::generateInsertQuery(const QString & tableName,
         
         KKSValue value = attrValue->value();
         
-        bool useID = false;
-        QString refColumn = attr->refColumnName();
-        if(refColumn.isEmpty() || refColumn == "id"){
-            useID = true;//вариант 1, иначе - вариант 2
-        }
-        
-        if(useID == true){
-            
-            
-            bool ok (true);
-            int nv = value.value().toInt (&ok);
-            Q_UNUSED (nv);
+        if ((iType == KKSAttrType::atList || iType == KKSAttrType::atParent) && 
+            bImported && //в этом случае надо обязательно делать запрос за значением идентификатора записи.
+            value.value() != QString("NULL") &&
+            !value.value().isEmpty ()
+           )
+        {
+            QString aQuery = QString ("SELECT %4 from %1 where %2='%3' limit 1;")
+                                             .arg ((iType == KKSAttrType::atParent ? tableName : attr->tableName ()))
+                                             .arg (attr->columnName ())
+                                             .arg (value.value())
+                                             .arg(attr->refColumnName().isEmpty() ? "id" : attr->refColumnName());
+            KKSResult * aRes = db->execute (aQuery);
 
-            if ((iType == KKSAttrType::atList || iType == KKSAttrType::atParent) && 
-                !ok && 
-                value.value() != QString("NULL") &&
-                !value.value().isEmpty ()
-            )
+            if (!aRes || aRes->getRowCount () == 0)
             {
-                QString aQuery = QString ("SELECT id from %1 where %2='%3' limit 1;")
-                                                 .arg ((iType == KKSAttrType::atParent ? tableName : attr->tableName ()))
-                                                 .arg (attr->columnName ())
-                                                 .arg (value.value());
-                KKSResult * aRes = db->execute (aQuery);
-
-                if (!aRes || aRes->getRowCount () == 0)
+                QString atName = (iType == KKSAttrType::atParent ? tableName : attr->tableName ());
+                qDebug () << __PRETTY_FUNCTION__ << atName << value.value ();
+                qint64 idV = getNextSeq (atName, "id");
+                aQuery = QString ("INSERT INTO %1 (id, %2) VALUES (%4, '%3');")
+                                    .arg (atName)
+                                    .arg (attr->columnName ())
+                                    .arg (value.value ())
+                                    .arg (idV);
+                KKSResult * aResIns = db->execute (aQuery);
+                if (aResIns)
                 {
-                    QString atName = (iType == KKSAttrType::atParent ? tableName : attr->tableName ());
-                    qDebug () << __PRETTY_FUNCTION__ << atName << value.value ();
-                    qint64 idV = getNextSeq (atName, "id");
-                    aQuery = QString ("INSERT INTO %1 (id, %2) VALUES (%4, '%3');")
-                                        .arg (atName)
-                                        .arg (attr->columnName ())
-                                        .arg (value.value ())
-                                        .arg (idV);
-                    KKSResult * aResIns = db->execute (aQuery);
-                    if (aResIns)
-                    {
-                        valueArray += QString::number (idV);
-                        delete aResIns;
-                    }
-                    else
-                        return ERROR_CODE;
+                    valueArray += QString::number (idV);
+                    delete aResIns;
                 }
                 else
-                    valueArray += QString::number (aRes->getCellAsInt (0, 0));
-
-                if (aRes)
-                    delete aRes;
+                    return ERROR_CODE;
             }
-            //-----
             else
-            {
-                //если значение атрибута отсутствует, то используем значение по умолчанию (при его наличии), 
-                //но только в случае, когда у атрибута параметр isMandatory = true.
-                if(value.isNull()){
-                    if(attr->isMandatory()){
-                        KKSValue defValue = attr->defValue();
-                        valueArray += defValue.valueForInsert();
-                    }
-                    else
-                        valueArray += "NULL";
+                valueArray += QString::number (aRes->getCellAsInt (0, 0));
+
+            if (aRes)
+                delete aRes;
+        }
+        else if((iType == KKSAttrType::atCheckList) && 
+                bImported && //в этом случае надо обязательно делать запрос за значением идентификаторов записей.
+                value.value() != QString("NULL") &&
+                !value.value().isEmpty ())
+        {
+            QString cCast;
+            const KKSAttrType * a = attr->refColumnType();
+            if(a){
+                if(a->attrType() == KKSAttrType::atString || 
+                   a->attrType() == KKSAttrType::atFixString ||
+                   a->attrType() == KKSAttrType::atText)
+                {
+                    cCast = "::varchar[]";
+                }
+
+            }
+            if(cCast.isEmpty())
+                cCast = "::int8[]";
+
+            QString aQuery = QString ("select 'ARRAY[' || array_to_string(array_agg( '''' || %4 || ''''), ',') || ']%5' from %1 where %2 = ANY (ARRAY[%3]) limit 1")
+                                             .arg (attr->tableName ())
+                                             .arg (attr->columnName ())
+                                             .arg (value.value())
+                                             .arg (attr->refColumnName().isEmpty() ? "id" : attr->refColumnName())
+                                             .arg (cCast);
+            
+            KKSResult * aRes = db->execute (aQuery);
+            
+            if (!aRes || aRes->getRowCount () == 0){
+                if(attr->isMandatory()){
+                    KKSValue defValue = attr->defValue();
+                    valueArray += defValue.valueForInsert();
                 }
                 else
-                    valueArray += value.valueForInsert();
+                    valueArray += "NULL";                
+                
+                return ERROR_CODE;
             }
+            else{
+                valueArray += aRes->getCellAsString(0, 0);
+            }
+
+            if (aRes)
+                delete aRes;
         }
-        else{
-            if(value.isNull()){
+        //-----
+        else
+        {
+            //если значение атрибута отсутствует, то используем значение по умолчанию (при его наличии), 
+            //но только в случае, когда у атрибута параметр isMandatory = true.
+            if(value.isNull() ||
+               ((iType == KKSAttrType::atList || iType == KKSAttrType::atParent) && value.valueForInsert() == "''")
+              )
+            {
                 if(attr->isMandatory()){
                     KKSValue defValue = attr->defValue();
                     valueArray += defValue.valueForInsert();
                 }
                 else
                     valueArray += "NULL";
-                }
+            }
             else
                 valueArray += value.valueForInsert();
         }
@@ -712,7 +810,11 @@ int KKSEIOFactory::deleteAllRecords(const QString & table) const
     return OK_CODE;
 }
 
-int KKSEIOFactory::insertEIOList(KKSList<KKSObjectExemplar*> eioList, const KKSCategory* cat, const QString & table, QProgressDialog *pgDial) const
+int KKSEIOFactory::insertEIOList(KKSList<KKSObjectExemplar*> eioList, 
+                                 const KKSCategory* cat, 
+                                 const QString & table, 
+                                 QProgressDialog *pgDial, 
+                                 bool bImported) const
 {
     if(table.isEmpty())
         return ERROR_CODE;
@@ -731,18 +833,21 @@ int KKSEIOFactory::insertEIOList(KKSList<KKSObjectExemplar*> eioList, const KKSC
     {
         if (pgDial)
             pgDial->setValue (i);
+        
         db->begin();
+        
         KKSObjectExemplar * eio = eioList.at(i);
         for (int ii=0; ii<eio->attrValues().count(); ii++)
         {
-            if (eio->attrValueIndex(ii) && 
-                eio->attrValueIndex(ii)->attribute() &&
-                eio->attrValueIndex(ii)->attribute()->type()->attrType() == KKSAttrType::atParent &&
-                eio->attrValueIndex(ii)->value().value().toInt() > 0 &&
-                eio->attrValueIndex(ii)->value().value().toInt() <= i)
+            KKSAttrValue * av = eio->attrValueIndex(ii);
+            if (av && 
+                av->attribute() &&
+                av->attribute()->type()->attrType() == KKSAttrType::atParent &&
+                av->value().value().toInt() > 0 &&
+                av->value().value().toInt() <= i)
             {
-                KKSAttrValue * av = eio->attrValueIndex(ii);
-                int pKey = eio->attrValueIndex(ii)->value().value().toInt();
+                
+                int pKey = av->value().value().toInt();
                 int pId = eioList.at (pKey-1)->id();
                 KKSValue val = KKSValue (QString::number(pId), KKSAttrType::atParent);
                 av->setValue(val);
@@ -753,11 +858,12 @@ int KKSEIOFactory::insertEIOList(KKSList<KKSObjectExemplar*> eioList, const KKSC
 //            return ERROR_CODE;
 //        }
 
-        int res = insertEIO(eio, cat, table);
+        int res = insertEIO(eio, cat, table, bImported);
         if(res != OK_CODE){
             db->rollback();
             continue;
         }
+
         db->commit();
     }
     
@@ -1375,6 +1481,8 @@ int KKSEIOFactory::insertRubric(KKSRubric * r, int idParent, int idRec, bool roo
 
 int KKSEIOFactory::insertRubricItem(int idRubric, int idRec, bool isAutomated) const
 {
+    Q_UNUSED(isAutomated);
+
     if(idRubric <= 0 || idRec <= 0)
         return OK_CODE;
 
@@ -1438,15 +1546,19 @@ void KKSEIOFactory::commitRubric(KKSRubric * r) const
 
 int KKSEIOFactory::insertRubricators(KKSRubric * rootRubric, int idMyDocsRubricator, bool bMyDocs) const
 {
+    Q_UNUSED(bMyDocs);
+    Q_UNUSED(idMyDocsRubricator);
     return 0;
 }
 
 int KKSEIOFactory::deleteRubricators(bool bMyDocs) const
 {
+    Q_UNUSED(bMyDocs);
     return 0;
 }
 
 int KKSEIOFactory::deleteRubric(int idRubric) const
 {
+    Q_UNUSED(idRubric);
     return 0;
 }

@@ -21,13 +21,13 @@ class KKSAttrValue;
 class _GUI_EXPORT KKSVideoPlayer : public QLabel, public KKSAttrWidget
 {
 public:
-    KKSVideoPlayer (const KKSAttrValue*attr, int isSys, QWidget * parent=0, Qt::WindowFlags flags=0);
+    KKSVideoPlayer (const KKSAttrValue*attr, KKSIndAttr::KKSIndAttrClass isSys, QWidget * parent=0, Qt::WindowFlags flags=0);
     virtual ~KKSVideoPlayer (void);
 
     QByteArray save (void);
 
 signals:
-    void valueChanged (int id, int isSys, QVariant val);
+    void valueChanged (int id, KKSIndAttr::KKSIndAttrClass isSys, QVariant val);
 
 public slots:
 

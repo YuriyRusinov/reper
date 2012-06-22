@@ -17,6 +17,7 @@
 //#include "KKSWidget.h"
 
 #include "KKSCategoryAttr.h"
+#include "KKSIndAttr.h"
 #include "KKSMap.h"
 #include "KKSList.h"
 #include "KKSFilter.h"
@@ -120,7 +121,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void setRecTab (QTabWidget * tabEnc);
         
     public slots:
-        void setValue (int id, int sys, QVariant val);
+        void setValue (int id, KKSIndAttr::KKSIndAttrClass sys, QVariant val);
         //void setIndValue (int id, bool sys, QVariant val);
 
     private slots:
@@ -161,8 +162,8 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void privChanged (KKSPrivilege *p, KKSObject * obj);
         void addAnotherTable (void);
 
-        void addAttributeCheckReference (const KKSAttrValue* av, bool isSystem, QAbstractItemModel * sourceModel);
-        void delAttributeCheckReference (const KKSAttrValue* av, bool isSystem, QAbstractItemModel * sourceModel, const QModelIndex& wInd);
+        void addAttributeCheckReference (const KKSAttrValue* av, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel);
+        void delAttributeCheckReference (const KKSAttrValue* av, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel, const QModelIndex& wInd);
         void openReferenceIO (QString tableName);
 
         void setIOGlobal (bool isGlobal);
@@ -208,15 +209,15 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void openRubricItemRequested(int idObject, KKSObjEditor * editor);
         void openRubricItemRecRequested(int idObjectE, KKSObjEditor * editor);
 
-        void updateAttributes (QWidget *ioAttrWidget, QScrollArea *sc, QWidget *ioAttrsW, /*KKSObject * wObj*/ int idObj, const KKSCategory * wCat, bool isSystem, KKSObjEditor* editor);
+        void updateAttributes (QWidget *ioAttrWidget, QScrollArea *sc, QWidget *ioAttrsW, /*KKSObject * wObj*/ int idObj, const KKSCategory * wCat, KKSIndAttr::KKSIndAttrClass isSystem, KKSObjEditor* editor);
         void closeEditor (void);
         void prepareIO (KKSObject* wObj, KKSObjectExemplar * wObjEx, KKSObjEditor* editor);
         void addAnotherTable (KKSObject * wObj, KKSObjEditor* editor);
         
-        void editObjAttrRef (KKSObject * wObj, const KKSAttrValue* av, bool isSystem, QAbstractItemModel * sMod);
-        void editObjCAttrRef (KKSObjectExemplar * wObjE, const KKSAttrValue* av, bool isSystem, QAbstractItemModel * sMod);
-        void delObjAttrRef (KKSObject * wObj, const KKSAttrValue* av, bool isSystem, QAbstractItemModel * sourceModel, const QModelIndex& wInd);
-        void delObjCAttrRef (KKSObjectExemplar * wObjE, const KKSAttrValue* av, bool isSystem, QAbstractItemModel * sourceModel, const QModelIndex& wInd);
+        void editObjAttrRef (KKSObject * wObj, const KKSAttrValue* av, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sMod);
+        void editObjCAttrRef (KKSObjectExemplar * wObjE, const KKSAttrValue* av, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sMod);
+        void delObjAttrRef (KKSObject * wObj, const KKSAttrValue* av, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel, const QModelIndex& wInd);
+        void delObjCAttrRef (KKSObjectExemplar * wObjE, const KKSAttrValue* av, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel, const QModelIndex& wInd);
         
         void openRefIO (QString tableName);
 
@@ -285,8 +286,8 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void setParentTab (int nt);
         int addCatsCount (void) const;
         void addListAttrWidget (QToolButton *tb, QWidget *aw, const KKSAttrValue* av);
-        void setOpt (int id, bool isSystem, QCheckBox* ch);
-        void addOptWidget (int id, bool isSystem, QWidget *w);
+        void setOpt (int id, KKSIndAttr::KKSIndAttrClass isSystem, QCheckBox* ch);
+        void addOptWidget (int id, KKSIndAttr::KKSIndAttrClass isSystem, QWidget *w);
 /*
         void addTbQList (QToolButton * tbView, int idIndicator);
         void addTbEditList (QToolButton * tbView, int idIndicator);

@@ -17,6 +17,7 @@
 #include <QItemSelection>
 
 #include "KKSEntityFactory.h"
+#include "KKSIndAttr.h"
 #include <KKSList.h>
 #include <KKSFilter.h>
 #include <KKSMap.h>
@@ -259,7 +260,7 @@ private slots:
     void exportEIO (KKSObjEditor * editor, int idObject, const KKSCategory * c, QString tableName);
     void updateEIOView (KKSObjEditor * editor, int idObject, const QList<int>& idObjEx, const QList<int>& row, const KKSCategory *c, const QString& tableName, int nTab);
 
-    void regroupAttrs (QWidget *wIOAttr, QScrollArea *scIOattr, QWidget *ioAttrs, int idObj, const KKSCategory *c, bool isSystem, KKSObjEditor *editor);
+    void regroupAttrs (QWidget *wIOAttr, QScrollArea *scIOattr, QWidget *ioAttrs, int idObj, const KKSCategory *c, KKSIndAttr::KKSIndAttrClass isSystem, KKSObjEditor *editor);
 
     void loadAttributeReference (QString tableName, QWidget *awAttr, int attrId);
     void loadExecReference (QAbstractItemModel *exModel);
@@ -270,7 +271,7 @@ private slots:
     //
     // используется для загрузки файлов с сервера в локальную ФС
     //
-    void slotDownloadFile (KKSFile *);
+    void slotDownloadFile (KKSFile *, const QWidget * parent);
 
     void slotIncludeRequested (KKSObjEditor * editor);//используется при редактировании вложений ИО. Вызывает в режиме диалога редактор справочника ИО
     void slotIncludeRecRequested (KKSObjEditor * editor);//используется при редактировании вложений ИО. Вызывает в режиме диалога редактор справочника ИО
@@ -292,10 +293,10 @@ private slots:
 
     void addIOTable (KKSObject * wObj, KKSObjEditor * editor);
 
-    void loadObjAttrRef (KKSObject * wObj, const KKSAttrValue* attr, bool isSystem, QAbstractItemModel * sMod);
-    void loadObjCAttrRef (KKSObjectExemplar * wObjE, const KKSAttrValue* attr, bool isSystem, QAbstractItemModel * sMod);
-    void loadObjDelAttrRef (KKSObject * wObj, const KKSAttrValue* attribute, bool isSystem, QAbstractItemModel * sourceModel, const QModelIndex& wInd);
-    void loadObjCDelAttrRef (KKSObjectExemplar * wObjE, const KKSAttrValue* attribute, bool isSystem, QAbstractItemModel * sourceModel, const QModelIndex& wInd);
+    void loadObjAttrRef (KKSObject * wObj, const KKSAttrValue* attr, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sMod);
+    void loadObjCAttrRef (KKSObjectExemplar * wObjE, const KKSAttrValue* attr, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sMod);
+    void loadObjDelAttrRef (KKSObject * wObj, const KKSAttrValue* attribute, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel, const QModelIndex& wInd);
+    void loadObjCDelAttrRef (KKSObjectExemplar * wObjE, const KKSAttrValue* attribute, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel, const QModelIndex& wInd);
     void loadRefIO (QString tableName);
 
 private:

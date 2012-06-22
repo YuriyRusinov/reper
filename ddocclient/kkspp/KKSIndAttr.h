@@ -28,6 +28,18 @@ public:
     KKSIndAttr(const KKSIndAttr& ia);
     virtual ~KKSIndAttr();
 
+    //заменитель старого атрибута isSystem.
+    //јтрибуты бывают 3-х классов: 
+    //1 - табличные. Ёто атрибуты записей справочников (т.е. колонки таблиц).   ним не примен€етс€ темпоральна€ модель и расширенные характеристики
+    //2 - пользовательские атрибуты информационных объектов (их значени€ хран€тс€ в таблице attrs_values).   ним примен€етс€ темпоральна€ модель и расширенные характеристики
+    //3 - пользовательские атрибуты (показатели) записей справочников(их значени€ хран€тс€ в таблице rec_attrs_values).   ним примен€етс€ темпоральна€ модель и расширенные характеристики
+    enum KKSIndAttrClass 
+    {
+        iacTableAttr = 0,
+        iacIOUserAttr = 1,
+        iacEIOUserAttr = 2
+    };
+    
     const QString & refColumnName(bool quoted = false) const;
     void setRefColumnName(const QString & newColumnName);
 
@@ -48,7 +60,7 @@ public:
     KKSAttrType * refColumnType();
     void setRefColumnType(KKSAttrType * _type);
 
-    virtual bool isSystem() const;
+    virtual KKSIndAttrClass isSystem() const;
     virtual bool isAttribute (void) const=0;
 
 private:

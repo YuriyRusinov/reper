@@ -492,7 +492,7 @@ void KKSMsgJournal::prepareFile (KKSFile *f)
 
     f->setLocalUrl (localFile);
 
-    emit downloadFile (f);//msgFiles[0]);
+    emit downloadFile (f, this);//msgFiles[0]);
     if (!f->loaded() || f->localUrl().isEmpty())
     {
         int answer = QMessageBox::question(this, 

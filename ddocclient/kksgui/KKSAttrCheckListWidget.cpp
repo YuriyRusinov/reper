@@ -18,7 +18,7 @@
 #include "KKSCategoryAttr.h"
 #include "KKSSortFilterProxyModel.h"
 
-KKSAttrCheckWidget :: KKSAttrCheckWidget (const KKSAttrValue * attr, bool isSys, QWidget * parent, Qt::WFlags f)
+KKSAttrCheckWidget :: KKSAttrCheckWidget (const KKSAttrValue * attr, KKSIndAttr::KKSIndAttrClass isSys, QWidget * parent, Qt::WFlags f)
     : QWidget (parent, f), KKSAttrWidget(attr, isSys),
     tv (new QTreeView (this)),
     tbActions (new QToolBar (this)),

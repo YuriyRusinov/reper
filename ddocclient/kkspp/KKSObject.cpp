@@ -1046,7 +1046,7 @@ void KKSObject::setRefTableName(const QString & rtn)
 {
     m_refTableName = rtn;
 }
-
+/*
 const QString & KKSObject::code(bool quoted) const
 {
     Q_UNUSED(quoted);
@@ -1057,7 +1057,7 @@ void KKSObject::setCode(const QString & newCode)
 {
     Q_UNUSED(newCode);
 }
-
+*/
 
 /*************/
 const KKSList<KKSIndicatorValue *> & KKSObject::indicatorValues() const

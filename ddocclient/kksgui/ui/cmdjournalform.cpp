@@ -237,7 +237,7 @@ void KKSCmdJournal::init()
         int idDlFrom = record->fieldValue("id_dl_from").toInt();
         int cmdTypeEx = record->fieldValue("cmd_type").toInt();
         
-        KKSCommand::CmdTypeEx typeEx;
+        //KKSCommand::CmdTypeEx typeEx;
         cmd.setCmdTypeEx((KKSCommand::CmdTypeEx)cmdTypeEx);
 
         KKSCommand::CmdType type;

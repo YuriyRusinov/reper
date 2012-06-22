@@ -28,7 +28,7 @@ public:
     const KKSList<KKSFileType*> & fileTypes() const;
 
 signals:
-    void downloadFile(KKSFile *f);
+    void downloadFile(KKSFile *f, const QWidget* parent);
     void fileListChanged();
 
 private slots:

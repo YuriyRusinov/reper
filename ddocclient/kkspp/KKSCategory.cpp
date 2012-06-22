@@ -395,9 +395,26 @@ KKSFilter * KKSCategory::createFilter(int attrId,
 {
     KKSFilter * f = NULL;
     KKSAttribute * a = attribute(attrId);
+    bool bNeedRelease = false;
+    //в общем случае в категории может отсутствовать атрибут id. 
+    //Тем не менее в таблицах DynamicDocs он всегда присутствует, 
+    //поэтому особо рассматриваем также и случай создания фильтра на атрибут id
     if(!a){
-        qWarning() << __PRETTY_FUNCTION__ << "attribute does not exist!";
-        return f;
+        if(attrId != ATTR_ID){
+            qWarning() << __PRETTY_FUNCTION__ << "attribute does not exist!";   
+            return f;
+        }
+
+        bNeedRelease = true;
+        a = new KKSAttribute();
+        a->setId(ATTR_ID);
+        a->setCode("id");
+        a->setName("ИД");
+        a->setTitle("ИД");
+        a->setAsSystem(KKSIndAttr::KKSIndAttrClass::iacTableAttr);
+        KKSAttrType * t = new KKSAttrType(KKSAttrType::atInt);
+        a->setType(t);
+        t->release();
     }
 
     KKSValue * v = NULL;
@@ -413,12 +430,18 @@ KKSFilter * KKSCategory::createFilter(int attrId,
         
         if(!v->isValid()){
             v->release();
+            if(bNeedRelease)
+                a->release();
             qWarning() << __PRETTY_FUNCTION__ << "KKSValue is not valid!";
             return f;
         }
     }
 
     f = new KKSFilter(a, v, operation);
+    
+    if(bNeedRelease)
+        a->release();
+    
     if(!f->isCorrect()){
         f->release();
         qWarning() << __PRETTY_FUNCTION__ << "KKSFilter is not correct!";
@@ -434,10 +457,33 @@ KKSFilter * KKSCategory::createFilter(int attrId,
 {
     KKSFilter * f = NULL;
     KKSAttribute * a = attribute(attrId);
+    bool bNeedRelease = false;
+    //в общем случае в категории может отсутствовать атрибут id. 
+    //Тем не менее в таблицах DynamicDocs он всегда присутствует, 
+    //поэтому особо рассматриваем также и случай создания фильтра на атрибут id
     if(!a){
-        qWarning() << __PRETTY_FUNCTION__ << "attribute does not exist!";   
-        return f;
+        if(attrId != ATTR_ID){
+            qWarning() << __PRETTY_FUNCTION__ << "attribute does not exist!";   
+            return f;
+        }
+
+        bNeedRelease = true;
+        a = new KKSAttribute();
+        a->setId(ATTR_ID);
+        a->setCode("id");
+        a->setName("ИД");
+        a->setTitle("ИД");
+        a->setAsSystem(KKSIndAttr::KKSIndAttrClass::iacTableAttr);
+        KKSAttrType * t = new KKSAttrType(KKSAttrType::atInt);
+        a->setType(t);
+        t->release();
     }
+
+    KKSAttrType::KKSAttrTypes aType;
+    if(a)
+        aType = a->type()->attrType();
+    else
+        aType = KKSAttrType::atInt;
 
     f = new KKSFilter();
 
@@ -445,10 +491,12 @@ KKSFilter * KKSCategory::createFilter(int attrId,
     for(int i=0; i<cnt; i++)
     {
         QString value = values.at(i);
-        KKSValue * v = new KKSValue(value, a->type()->attrType());
+        KKSValue * v = new KKSValue(value, aType);
         if(!v->isValid()){
             v->release();
             f->release();
+            if(bNeedRelease)
+                a->release();
             qWarning() << __PRETTY_FUNCTION__ << "KKSValue is not valid!";
             return NULL;
         }
@@ -458,6 +506,9 @@ KKSFilter * KKSCategory::createFilter(int attrId,
     
     f->setAttribute(a);
     f->setOperation( operation);
+
+    if(bNeedRelease)
+        a->release();
 
     if(!f->isCorrect()){
         f->release();

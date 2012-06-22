@@ -3,6 +3,12 @@
 #include <QtDebug>
 #include <QFile>
 #include <QFileInfo>
+#include <QProgressDialog>
+#include <QPushButton>
+#include <QLabel>
+#include <QProgressBar>
+#include <QWidget>
+#include <QMessageBox>
 
 //#include "kkssito.h"
 //#include "kkserror.h"
@@ -79,6 +85,31 @@ QString KKSFileLoader::rGetAbsUrl( int idUrl ) const
     return getResultString(res);
 }
 
+qint64 KKSFileLoader::rGetFileSize(int idUrl) const
+{
+    QString sql = QString("select rGetFileSize(%1);").arg(idUrl);
+
+    KKSResult * res = m_db->execute(sql);
+    
+    qint64 fileSize = 0;
+    if(!res || res->getCellAsInt64(0, 0) <= 0){
+        if(res)
+            delete res;
+
+        return 0;
+    }
+    
+    fileSize = res->getCellAsInt64(0, 0);
+    delete res;
+
+    return fileSize;
+
+}
+
+int KKSFileLoader::getDefaultBlockSize() const
+{
+    return 1000000;
+}
 
 /*!\brief ћетод возвращает и сохран€ет в файле локальной файловой системы заданный файл.
 
@@ -93,8 +124,11 @@ QString KKSFileLoader::rGetAbsUrl( int idUrl ) const
 \return 1, при успехе
 \return -1 при ошибке
 */
-int KKSFileLoader::rGetFile(int idUrl, QString toUrl, int blockSize) const
+int KKSFileLoader::rGetFile(int idUrl, QString toUrl, int blockSize, const QWidget * parent) const
 {
+    if(blockSize <= 0)
+        blockSize = getDefaultBlockSize();
+    
     QTime t;
     t.start();
 
@@ -124,6 +158,40 @@ int KKSFileLoader::rGetFile(int idUrl, QString toUrl, int blockSize) const
     char ** paramValues = new char * [1];
     paramValues[0] = new char[40];
 
+    QProgressDialog *pImportD = NULL;
+    QLabel *lImport = NULL;
+    qint64 estimatedFileSize = 0;
+    double k = 1.0;//используетс€ дл€ масштабировани€ шкалы прогрессбара при условии, что размер файла больше _MAX_INT32_
+
+    if(parent){
+        pImportD = new QProgressDialog ();
+        lImport = new QLabel (parent->tr("Download file, please wait..."), pImportD);
+        pImportD->setLabel (lImport);
+        QPushButton *pbCancelButton = new QPushButton (parent->tr("Cancel download"), pImportD);
+        pImportD->setCancelButton (pbCancelButton);
+        QProgressBar *pBar = new QProgressBar (pImportD);
+        pImportD->setBar (pBar);
+
+        pBar->setMinimum (0);
+
+        estimatedFileSize = rGetFileSize(idUrl);
+        qint64 maxInt32 = (qint64)_MAX_INT32_;
+        
+        if(estimatedFileSize > maxInt32){
+            k = (double)estimatedFileSize / maxInt32;
+            pBar->setMaximum (maxInt32);
+        }
+        else
+            pBar->setMaximum (estimatedFileSize);
+
+        pImportD->setWindowTitle (parent->tr("Downloading file"));
+        pImportD->setWindowModality (Qt::WindowModal);
+        QObject::connect (pbCancelButton, SIGNAL (clicked()), pImportD, SLOT (cancel()) );
+
+        pImportD->setMinimumDuration (0);
+        pImportD->show ();
+    }
+
     do{
         sprintf(paramValues[0], "%lld", position);
         paramTypes[0]   = KKSResult::dtInt8;
@@ -139,6 +207,33 @@ int KKSFileLoader::rGetFile(int idUrl, QString toUrl, int blockSize) const
                                           1);
 
         position += blockSize;
+
+        if(pImportD){
+            qint64 timeElapsed = (qint64)(t.elapsed());//в миллисекундах
+            double V = ((double)estimatedFileSize * timeElapsed) / position;
+            double avgSpeed = ((double)position * 1000) / (timeElapsed * 1024);//средн€€ скорость  в Kb/sec
+            double E = (V - (double)timeElapsed) / 1000; //оталось времени дозавершени€ процесса копировани€ в секундах
+            QTime tt(0, 0, 0);
+
+            lImport->setText (parent->tr("Downloading file, please wait... \n\n"
+                                         "Time elapsed: %1\n"
+                                         "Time estimated: %2\n"
+                                         "Avg speed: %3 Kb/sec").arg(tt.addSecs((int)timeElapsed/1000).toString("hh:mm:ss"))
+                                                                .arg(tt.addSecs((int)E).toString("hh:mm:ss"))
+                                                                .arg((int)avgSpeed));
+
+            pImportD->setValue (position/k);
+            if (pImportD->wasCanceled())
+            {
+                //pImportD->setParent (0);
+                //delete pImportD;
+                updateLastError(res);
+                if(res)
+                    delete res;
+                break;
+            }
+        }
+
         if (!res){
             updateLastError(NULL);
 
@@ -180,6 +275,7 @@ int KKSFileLoader::rGetFile(int idUrl, QString toUrl, int blockSize) const
         delete res;
     }while(1);
 
+    
     qWarning() << QString("file transferred from server in ") 
                << t.restart() 
                << QString("ms");
@@ -190,13 +286,34 @@ int KKSFileLoader::rGetFile(int idUrl, QString toUrl, int blockSize) const
     delete[] paramValues;
     
     clearLastError();
+
+    if(pImportD){
+        if(pImportD->wasCanceled()){
+            int yes = QMessageBox::question(pImportD, 
+                                            parent->tr("Cancel download"), 
+                                            parent->tr("Download was cancelled by user. Delete downloaded part of the file?"), 
+                                            QMessageBox::Yes | QMessageBox::No, 
+                                            QMessageBox::Yes);
+            if(yes == QMessageBox::Yes){
+                file.remove();
+            }
+        }
+        pImportD->hide ();
+        pImportD->setParent (0);
+        delete pImportD;
+
+        return ERROR_CODE;
+    }
+
     return OK_CODE;
 }
 
 
 
-int KKSFileLoader::rGetFile(QString fromUrl, QString toUrl, int blockSize) const
+int KKSFileLoader::rGetFile(QString fromUrl, QString toUrl, int blockSize, const QWidget * parent) const
 {
+    if(blockSize <= 0)
+        blockSize = getDefaultBlockSize();
     QTime t;
     t.start();
 
@@ -306,8 +423,12 @@ int KKSFileLoader::rGetFile(QString fromUrl, QString toUrl, int blockSize) const
 int KKSFileLoader::rWriteFile( int idUrl, 
                               QString fromUrl,
                               bool safe, 
-                              int blockSize ) const
+                              int blockSize,
+                              const QWidget * parent) const
 {
+    if(blockSize <= 0)
+        blockSize = getDefaultBlockSize();
+
     QTime t;
     t.start();
 
@@ -336,8 +457,50 @@ int KKSFileLoader::rWriteFile( int idUrl,
     char ** paramValues = new char * [nParams];
     paramValues[0] = new char[blockSize];
 
+    QProgressDialog *pImportD = NULL;
+    QLabel *lImport = NULL;
+    double k = 1.0;//используетс€ дл€ масштабировани€ шкалы прогрессбара при условии, что размер файла больше _MAX_INT32_
+    qint64 estimatedFileSize = 0;
+    
+    if(parent){
+        pImportD = new QProgressDialog ();
+        lImport = new QLabel (parent->tr("Uploading file, please wait..."), pImportD);
+        pImportD->setLabel (lImport);
+        QPushButton *pbCancelButton = new QPushButton (parent->tr("Cancel upload"), pImportD);
+        pImportD->setCancelButton (pbCancelButton);
+        QProgressBar *pBar = new QProgressBar (pImportD);
+        pImportD->setBar (pBar);
+
+        pBar->setMinimum (0);
+        
+        estimatedFileSize = file.size();
+        qint64 maxInt32 = (qint64)_MAX_INT32_;
+        
+        if(estimatedFileSize > maxInt32){
+            k = (double)estimatedFileSize / maxInt32;
+            pBar->setMaximum (maxInt32);
+        }
+        else
+            pBar->setMaximum (estimatedFileSize);
+
+        
+        
+        
+
+        pImportD->setWindowTitle (parent->tr("Uploading file"));
+        pImportD->setWindowModality (Qt::WindowModal);
+        QObject::connect (pbCancelButton, SIGNAL (clicked()), pImportD, SLOT (cancel()) );
+
+        pImportD->setMinimumDuration (0);
+        pImportD->show ();
+    }
+    
+    qint64 position = 0;
+
+
     while( ! file.atEnd() ){
         qint64 size = file.read(paramValues[0], blockSize);
+        
         if(size < 1){
             delete[] paramValues[0];
             delete[] paramTypes;
@@ -347,8 +510,35 @@ int KKSFileLoader::rWriteFile( int idUrl,
             delete[] command;
             file.seek(0);
             file.close();
+            qWarning() << QObject::tr("Time elapsed ")  << t.restart()  << QString("ms");
             return ERROR_CODE;
         }
+
+        if(pImportD){
+            position = position + size;
+            qint64 timeElapsed = (qint64)(t.elapsed());//в миллисекундах
+            
+            double V = ((double)estimatedFileSize * timeElapsed) / position;
+            double avgSpeed = ((double)position * 1000) / (timeElapsed * 1024);//средн€€ скорость  в Kb/sec
+
+            double E = (V - (double)timeElapsed) / 1000; //оталось времени дозавершени€ процесса копировани€ в секундах
+            
+            QTime tt(0, 0, 0); 
+            
+            lImport->setText (parent->tr("Uploading file, please wait... \n\n"
+                                         "Time elapsed: %1\n"
+                                         "Time estimated: %2\n"
+                                         "Avg speed: %3 Kb/sec").arg(tt.addSecs((int)timeElapsed/1000).toString("hh:mm:ss"))
+                                                                .arg(tt.addSecs((int)E).toString("hh:mm:ss"))
+                                                                .arg((int)avgSpeed));
+
+            pImportD->setValue (position/k);
+            if (pImportD->wasCanceled())
+            {
+                break;
+            }
+        }
+
         paramTypes[0]   = KKSResult::dtBytea;
         paramFormats[0] = 1; //binary
         paramLengths[0]  = size;
@@ -381,8 +571,10 @@ int KKSFileLoader::rWriteFile( int idUrl,
             delete[] paramFormats;
             delete[] paramValues;
             delete[] command;
+            qWarning() << QObject::tr("Time elapsed ")  << t.restart()  << QString("ms");
             return ERROR_CODE;
         }
+        
         int status = res->getCellAsInt(0, 0);
         if(status <= 0 ){
             updateLastError(res);
@@ -394,11 +586,13 @@ int KKSFileLoader::rWriteFile( int idUrl,
             delete[] paramFormats;
             delete[] paramValues;
             delete[] command;
+            qWarning() << QObject::tr("Time elapsed ")  << t.restart()  << QString("ms");
             return ERROR_CODE;
         }
         mode = 1;
         delete res;
     }
+
     delete[] paramValues[0];
     delete[] paramTypes;
     delete[] paramLengths;
@@ -415,6 +609,33 @@ int KKSFileLoader::rWriteFile( int idUrl,
                << QString("ms");
 
     clearLastError();
+
+    if(pImportD){
+        if(pImportD->wasCanceled()){
+            int yes = QMessageBox::question(pImportD, 
+                                            parent->tr("Cancel uploading"), 
+                                            parent->tr("Uploading was cancelled by user. Delete uploaded part of the file on server?"), 
+                                            QMessageBox::Yes | QMessageBox::No, 
+                                            QMessageBox::Yes);
+            if(yes == QMessageBox::Yes){
+                int ok = rRemoveUrl(idUrl);
+                if(ok <= 0)
+                    QMessageBox::warning(pImportD, parent->tr("Error"), parent->tr("Cannot delete uploaded part of file"));
+            }
+
+            pImportD->hide ();
+            pImportD->setParent (0);
+            delete pImportD;
+            
+            return ERROR_CODE;
+
+        }
+
+        pImportD->hide ();
+        pImportD->setParent (0);
+        delete pImportD;
+    }
+
     return OK_CODE;
 }
 

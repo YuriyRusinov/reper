@@ -12,7 +12,7 @@
 #include "KKSAttrValue.h"
 #include "KKSSvgWidget.h"
 
-KKSSvgWidget :: KKSSvgWidget (const KKSAttrValue *attr, int isSys, QWidget *parent, Qt::WindowFlags flags)
+KKSSvgWidget :: KKSSvgWidget (const KKSAttrValue *attr, KKSIndAttr::KKSIndAttrClass isSys, QWidget *parent, Qt::WindowFlags flags)
     : QWidget (parent ,flags), KKSAttrWidget(attr, isSys),
     SVGContents (QByteArray()),
     dRend (new QSvgRenderer())
@@ -21,7 +21,7 @@ KKSSvgWidget :: KKSSvgWidget (const KKSAttrValue *attr, int isSys, QWidget *pare
     connect (dRend, SIGNAL (repaintNeeded()), this, SLOT (updateSVG()) );
 }
 
-KKSSvgWidget :: KKSSvgWidget (const KKSAttrValue *attr, int isSys, const QByteArray& contents, QWidget *parent, Qt::WindowFlags flags)
+KKSSvgWidget :: KKSSvgWidget (const KKSAttrValue *attr, KKSIndAttr::KKSIndAttrClass isSys, const QByteArray& contents, QWidget *parent, Qt::WindowFlags flags)
     : QWidget (parent, flags), KKSAttrWidget(attr, isSys),
     SVGContents (contents),
     dRend (new QSvgRenderer(contents))

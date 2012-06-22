@@ -608,7 +608,8 @@ KKSCategory * KKSLoader::loadCategory(int id, bool simplify) const
 
     //рубрики
     loadRubrics(c);
-    KKSAccessEntity * acl = this->loadAccessCat (c);
+    //KKSAccessEntity * acl = 
+    this->loadAccessCat (c);
 
     //TODO!!!
     //c->addRef();
@@ -4578,7 +4579,7 @@ KKSAGroup * KKSLoader :: loadAttrGroup (int idAGr) const
     if (!res)
         return 0;
 
-    int aKey = res->getCellAsInt (0, 0);
+    //int aKey = res->getCellAsInt (0, 0);
     KKSAGroup * ag = new KKSAGroup (idAGr, res->getCellAsString(0, 2));
     delete res;
     
@@ -4840,7 +4841,7 @@ KKSList<KKSAttrValue *> KKSLoader::loadIOAttrValueHistory(const KKSAttrValue * a
 
     for(int row=0; row<cnt; row++){
         //параметры самого атрибута
-        int idAttr = res->getCellAsInt(row, 2);
+        //int idAttr = res->getCellAsInt(row, 2);
         KKSCategoryAttr * a = const_cast<KKSCategoryAttr*>(av->attribute());
 
         KKSAttrValue * attr = new KKSAttrValue();

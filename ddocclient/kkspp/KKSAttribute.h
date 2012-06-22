@@ -23,6 +23,8 @@ class KKSSearchTemplate;
 class KKSAttribute;
 class KKSAttrAttr;
 
+
+
 class _PP_EXPORT KKSAGroup : public KKSRecord
 {
 public:
@@ -78,8 +80,8 @@ public:
     KKSAGroup * group();
     void setGroup(KKSAGroup * _group);
 
-    virtual bool isSystem() const;
-    void setAsSystem(bool yes = true);
+    virtual KKSIndAttrClass isSystem() const;
+    void setAsSystem(KKSIndAttrClass yes = iacTableAttr);
     virtual bool isAttribute (void) const;
 
     void setAttrsAttrs(const KKSMap<int, KKSAttrAttr *> & attrs);
@@ -96,7 +98,7 @@ private:
 
     KKSSearchTemplate * m_st;
 
-    bool m_isSystem;
+    KKSIndAttrClass m_isSystem;
 
     KKSMap<int, KKSAttrAttr*> m_attrsAttrs;//список атрибутов, описывающих данный атрибут. 
                                            //Для ускорения работы системы загружаются только по отдельной команде

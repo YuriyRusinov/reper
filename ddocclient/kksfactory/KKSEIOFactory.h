@@ -25,12 +25,17 @@ class _F_EXPORT KKSEIOFactory
 {
 public:
 
-    int insertEIO(KKSObjectExemplar* eio, const KKSCategory* cat=0, const QString& table=QString()) const;
+    //bImported=true сигнализирует о том, что запись справочника импортируется из внешнего файла
+    int insertEIO(KKSObjectExemplar* eio, const KKSCategory* cat=0, const QString& table=QString(), bool bImported = false) const; 
     int updateEIO(const KKSObjectExemplar* eio, const KKSCategory* cat=0, const QString& table=QString()) const;
     int deleteEIO(KKSObjectExemplar* eio, const QString& table=QString()) const;
     int deleteRecord(qint64 id, const QString & table) const;
     int deleteAllRecords(const QString & table) const;
-    int insertEIOList(KKSList<KKSObjectExemplar*> eioList,  const KKSCategory* cat=0, const QString & table=QString(), QProgressDialog *pgDial=0) const;
+    int insertEIOList(KKSList<KKSObjectExemplar*> eioList,  
+                      const KKSCategory* cat=0, 
+                      const QString & table=QString(), 
+                      QProgressDialog *pgDial=0, 
+                      bool bImported = false) const;
 
     int insertCommand(KKSObjectExemplar* eio) const;
     int insertMessage(KKSObjectExemplar* eio) const;
@@ -52,7 +57,8 @@ private:
 
     int insertRecord(KKSObjectExemplar* eio, 
                      const KKSCategory* cat=0, 
-                     const QString& table=QString()) const;
+                     const QString& table=QString(), 
+                     bool bImported = false) const;
     int updateRecord(const KKSObjectExemplar* eio, 
                      const KKSCategory* cat=0, 
                      const QString& table=QString()) const;
@@ -62,7 +68,8 @@ private:
                             const KKSMap<int, KKSCategoryAttr *> & attrs, 
                             const KKSList<KKSAttrValue *> & attrValues, 
                             QString & query,
-                            QString & exQuery) const;
+                            QString & exQuery, 
+                            bool bImported = false) const;
     qint64 generateUpdateQuery(const QString & tableName, 
                             const KKSMap<int, KKSCategoryAttr *> & attrs, 
                             const KKSList<KKSAttrValue *> & attrValues, 

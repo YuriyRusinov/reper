@@ -75,6 +75,10 @@ KKSCategoryTemplateWidget :: KKSCategoryTemplateWidget (bool mode, const QList<i
     connect (actEditT, SIGNAL (triggered()), this, SLOT (editTemplate()) );
     connect (actDelC, SIGNAL (triggered()), this, SLOT (delCat()) );
     connect (actDelT, SIGNAL (triggered()), this, SLOT (delTemplate()) );
+    
+    connect (tvCatTemplate, SIGNAL (doubleClicked(const QModelIndex &)), this, SLOT(tvDoubleClicked(const QModelIndex & )) );
+
+    
 }
 
 KKSCategoryTemplateWidget :: ~KKSCategoryTemplateWidget (void)
@@ -326,6 +330,46 @@ int KKSCategoryTemplateWidget :: getCurrentTemplateId (void) const
     }
     return idTemplate;
 }
+
+void KKSCategoryTemplateWidget :: tvDoubleClicked(const QModelIndex & wIndex)
+{
+    if (!wIndex.isValid())
+        return;
+
+       
+    if (wIndex.data (Qt::UserRole+USER_ENTITY).toInt() == 0)
+    {
+        //
+        // Template item is selected
+        //
+        int idT = wIndex.data (Qt::UserRole).toInt();
+        if (idT > 0)
+            emit editTempl (this, idT);
+        else
+        {
+            QMessageBox::warning (this, tr("Warning"), tr("Base template cannot be edited"), QMessageBox::Ok);
+        }
+    }
+    else if (wIndex.data (Qt::UserRole+USER_ENTITY).toInt() == 1)
+    {
+        //
+        // Category item is selected
+        //
+        
+        //idCat = wIndex.parent().parent().isValid() ? wIndex.parent().data (Qt::UserRole).toInt () : wIndex.data (Qt::UserRole).toInt ();
+        
+        int idCat = wIndex.data (Qt::UserRole).toInt();
+        emit editCategory (this, idCat, false);
+    }
+    else if (wIndex.data (Qt::UserRole+USER_ENTITY).toInt() < 0)
+    {
+        //
+        // word "Templates"
+        //
+        return;
+    }
+}
+
 
 void KKSCategoryTemplateWidget :: currIndexChanged (const QModelIndex& current, const QModelIndex& previous)
 {

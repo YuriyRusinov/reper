@@ -845,6 +845,7 @@ void KKSViewFactory :: loadCategories (KKSCategoryTemplateWidget* catTemplW,
         return;
 
     KKSMap<qint64, KKSEIOData *> categTypeMap = l->loadEIOList (catTypeObj, filters);
+    
     int n = categTypeMap.count ();
     QStandardItemModel *catTypeTemplModel = new QStandardItemModel (n, 1);
     catTypeTemplModel->setHeaderData (0, Qt::Horizontal, QObject::tr("Select category and template"), Qt::DisplayRole);
@@ -854,8 +855,12 @@ void KKSViewFactory :: loadCategories (KKSCategoryTemplateWidget* catTemplW,
     if (!refCatObj)
         return;
 
-    KKSFilter * cMainFilter = refCatObj->category()->tableCategory()->createFilter (17, QString("true"), KKSFilter::foEq);
+    KKSFilter * cMainFilter = refCatObj->category()->tableCategory()->createFilter (ATTR_IS_MAIN, QString("true"), KKSFilter::foEq);
     if (!cMainFilter)
+        return;
+
+    KKSFilter * cArchFilter = refCatObj->category()->tableCategory()->createFilter (ATTR_IS_ARCHIVED, QString("FALSE"), KKSFilter::foEq);
+    if (!cArchFilter)
         return;
 
     int itype=0;
@@ -865,21 +870,30 @@ void KKSViewFactory :: loadCategories (KKSCategoryTemplateWidget* catTemplW,
         catTypeTemplModel->setData (ctIndex, pCatTypes.value()->fields().value("name"), Qt::DisplayRole);
         catTypeTemplModel->setData (ctIndex, pCatTypes.key(), Qt::UserRole);
         catTypeTemplModel->setData (ctIndex, 2, Qt::UserRole+USER_ENTITY);
+        
         KKSList<const KKSFilterGroup *> cFilterGroups;
         KKSList<const KKSFilter*> catFilters;
+        
         catFilters.append (cMainFilter);
+        catFilters.append (cArchFilter);
+        
         KKSFilterGroup * cGroup = new KKSFilterGroup (true);
-        KKSFilter * cTypeFilter = refCatObj->category()->tableCategory()->createFilter (10, QString::number (pCatTypes.key()), KKSFilter::foEq);
+        KKSFilter * cTypeFilter = refCatObj->category()->tableCategory()->createFilter (ATTR_ID_IO_CAT_TYPE, QString::number (pCatTypes.key()), KKSFilter::foEq);
         if (!cTypeFilter)
             continue;
+
         catFilters.append (cTypeFilter);
+        
         cTypeFilter->release ();
         cGroup->setFilters (catFilters);
         cFilterGroups.append (cGroup);
         cGroup->release ();
+
         KKSMap<qint64, KKSEIOData *> categMap = l->loadEIOList (refCatObj, cFilterGroups);
+
         catTypeTemplModel->insertRows (0, categMap.count(), ctIndex);
         catTypeTemplModel->insertColumns (0, 1, ctIndex);
+
         KKSMap<qint64, KKSEIOData *>::const_iterator pCat;
         
         int i=0;
@@ -912,8 +926,11 @@ void KKSViewFactory :: loadCategories (KKSCategoryTemplateWidget* catTemplW,
     }
 
     cMainFilter->release ();
+    cArchFilter->release ();
+
     refCatObj->release ();
     catTypeObj->release ();
+    
     catTemplW->uploadModel (catTypeTemplModel);
 }
 

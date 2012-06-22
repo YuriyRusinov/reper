@@ -7,6 +7,7 @@
 
 class KKSResult;
 class KKSDatabase;
+class QWidget;
 
 class _F_EXPORT KKSFileLoader
 {
@@ -24,17 +25,20 @@ class _F_EXPORT KKSFileLoader
         void setDb(KKSDatabase * db);
         KKSDatabase * getDb() const;
 
+        int getDefaultBlockSize() const;
         //
         //работа с файлами
         //
         int     rGetFile  ( int idUrl, 
                             QString toUrl, 
-                            int blockSize = 100000 
+                            int blockSize = 100000,
+                            const QWidget * parent = NULL
                             ) const;
 
         int     rGetFile  ( QString fromUrl, 
                             QString toUrl, 
-                            int blockSize = 100000 
+                            int blockSize = 100000,
+                            const QWidget * parent = NULL
                             ) const;
 
         QString rGetAbsUrl( int idUrl ) const;
@@ -46,11 +50,14 @@ class _F_EXPORT KKSFileLoader
         int     rWriteFile(int idUrl, 
                              QString fromUrl, 
                              bool safe, 
-                             int blockSize = 100000 ) const;
+                             int blockSize = 100000,
+                             const QWidget * parent = NULL) const;
 
         int     rDeleteFile( int idUrl ) const;
         
         int     rRemoveUrl( int idUrl ) const;
+
+        qint64  rGetFileSize(int idUrl) const;
 
         QString raGetPath(  ) const;
 

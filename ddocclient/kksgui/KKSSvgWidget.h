@@ -24,8 +24,8 @@ class KKSAttrValue;
 class _GUI_EXPORT KKSSvgWidget : public QWidget, public KKSAttrWidget
 {
 public:
-    KKSSvgWidget (const KKSAttrValue*attr, int isSys, QWidget *parent=NULL, Qt::WindowFlags flags=0);
-    KKSSvgWidget (const KKSAttrValue*attr, int isSys, const QByteArray& contents, QWidget *parent=NULL, Qt::WindowFlags flags=0);
+    KKSSvgWidget (const KKSAttrValue*attr, KKSIndAttr::KKSIndAttrClass isSys, QWidget *parent=NULL, Qt::WindowFlags flags=0);
+    KKSSvgWidget (const KKSAttrValue*attr, KKSIndAttr::KKSIndAttrClass isSys, const QByteArray& contents, QWidget *parent=NULL, Qt::WindowFlags flags=0);
     ~KKSSvgWidget (void);
 
     const QByteArray& getContents (void) const;
@@ -41,7 +41,7 @@ private slots:
     void updateSVG (void);
 
 signals:
-    void valueChanged (int id, int isSys, QVariant val);
+    void valueChanged (int id, KKSIndAttr::KKSIndAttrClass isSys, QVariant val);
 
 protected:
     virtual void paintEvent (QPaintEvent *event);

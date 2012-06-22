@@ -11,7 +11,7 @@
 #include <QMessageBox>
 #include <KKSAttrValuePropsForm.h>
 
-KKSAttrValueLabel :: KKSAttrValueLabel (KKSAttrValue * av, int isSystem, QWidget *parent)
+KKSAttrValueLabel :: KKSAttrValueLabel (KKSAttrValue * av, KKSIndAttr::KKSIndAttrClass isSystem, QWidget *parent)
     : QLabel (parent)
 {
     m_av = NULL;
@@ -31,12 +31,13 @@ KKSAttrValueLabel:: ~KKSAttrValueLabel (void)
 
 void KKSAttrValueLabel::mouseReleaseEvent ( QMouseEvent * event )
 {
+    Q_UNUSED(event);
     emit clicked();
 }
 
 void KKSAttrValueLabel :: mouseMoveEvent( QMouseEvent * event )
 {
-
+    Q_UNUSED(event);
 }
 
 void KKSAttrValueLabel :: setAttrValue(KKSAttrValue * av) 
@@ -74,7 +75,7 @@ void KKSAttrValueLabel :: setLabelProps()
     QString coloredText;
    
     
-    if(m_isSystem >= 1)
+    if(m_isSystem != KKSIndAttr::KKSIndAttrClass::iacTableAttr)
         coloredText = tr("<font color='blue'>%2</font>").arg(text);
     else
         coloredText = text;
@@ -82,7 +83,7 @@ void KKSAttrValueLabel :: setLabelProps()
     this->setText( coloredText );	
 	
 	QFont lFont = this->font ();
-    lFont.setUnderline( m_isSystem >= 1 ? true : false);
+    lFont.setUnderline( m_isSystem != KKSIndAttr::KKSIndAttrClass::iacTableAttr ? true : false);
 	if (isMandatory)
     {
         lFont.setBold (true);
@@ -90,7 +91,7 @@ void KKSAttrValueLabel :: setLabelProps()
 
 	this->setFont (lFont);
 
-    if(m_isSystem >= 1){
+    if(m_isSystem != KKSIndAttr::KKSIndAttrClass::iacTableAttr){
         setToolTip(tr("Click on label to show extended attribute properties"));
         setCursor(Qt::PointingHandCursor);
     }
@@ -100,12 +101,12 @@ void KKSAttrValueLabel :: setLabelProps()
 
 void KKSAttrValueLabel :: showAttrValueProps()
 {
-    if(!m_av || m_isSystem == 0)
+    if(!m_av || m_isSystem == KKSIndAttr::KKSIndAttrClass::iacTableAttr)
         return;
 
     KKSAttrValuePropsForm * f = new KKSAttrValuePropsForm(m_av, 
                                                           true, 
-                                                          m_isSystem == 1 ? false : true,
+                                                          m_isSystem == KKSIndAttr::KKSIndAttrClass::iacIOUserAttr ? false : true,
                                                           this);
 
     connect(f, SIGNAL(loadIOSrc(KKSObject **, QWidget *)), this, SIGNAL(loadIOSrc(KKSObject **, QWidget *)));

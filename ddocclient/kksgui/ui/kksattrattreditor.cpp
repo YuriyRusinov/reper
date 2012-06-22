@@ -92,9 +92,9 @@ const KKSAttrAttr * KKSAttrAttrEditor :: getAttrAttribute (void) const
 void KKSAttrAttrEditor :: set_types (void)
 {
     ui->cbType->clear ();
-    int ind=-1;
+    //int ind=-1;
     KKSMap<int, KKSAttrType *>::const_iterator p;
-    int i=0;
+    //int i=0;
     int cType = ( attribute && attribute->id() >= 0 ? attribute->type ()->attrType() : KKSAttrType::atString);
 
     if (cType == KKSAttrType::atInt)

@@ -204,8 +204,8 @@ void KKSIndAttr :: setRefColumnType(KKSAttrType * _type)
         m_refColumnType->addRef();
 }
 
-bool KKSIndAttr :: isSystem() const
+KKSIndAttr::KKSIndAttrClass KKSIndAttr :: isSystem() const
 {
-    return false;
+    return KKSIndAttr::KKSIndAttrClass::iacIOUserAttr;
 }
 

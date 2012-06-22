@@ -139,7 +139,7 @@ void KKSRubricFactory :: rubricItemUpload (void)
     //KKSObjEditorFactory * oef = kksSito->oef();
 
     int idUser = loader->getUserId();
-    KKSFilter * filter = c->createFilter(1, QString::number(idUser), KKSFilter::foEq);
+    KKSFilter * filter = c->createFilter(ATTR_ID, QString::number(idUser), KKSFilter::foEq);
     if(!filter){
         o->release();
         return;
@@ -276,7 +276,7 @@ void KKSRubricFactory :: loadCategory (RubricForm * rForm)
     }
 
     QString value = QString ("select id from io_categories where id_io_category_type != 10 and not is_system");
-    const KKSFilter * f = ct->createFilter (1, value, KKSFilter::foInSQL);
+    const KKSFilter * f = ct->createFilter (ATTR_ID, value, KKSFilter::foInSQL);
     if (!f){
         refObj->release();
         return;
@@ -587,6 +587,8 @@ void KKSRubricFactory :: copyFromRubric (KKSRubric * rDest, QAbstractItemModel *
 {
     //QWidget * parent = qobject_cast<QWidget *>(this->sender());
 
+    Q_UNUSED(wIndex);
+    Q_UNUSED(aModel);
     KKSList<const KKSFilterGroup *> filters;
     KKSObject * refIO = loader->loadIO(IO_RUBR_ID, true);
     if (!refIO)

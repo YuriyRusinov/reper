@@ -20,6 +20,8 @@ public:
     virtual ~KKSType();
 
     static KKSType * defType1();//использовать только для типов ИО (не для типов категорий ИО) !!!
+
+    static KKSType * createType10();//подчиненные категории
     
     bool isQualifier() const; //используется только для типов категорий
     void setAsQualifier(bool yes);

@@ -12,6 +12,7 @@
 #include <KKSList.h>
 #include <KKSFilter.h>
 #include "KKSEntityFactory.h"
+#include "KKSIndAttr.h"
 
 class QGridLayout;
 class QLabel;
@@ -41,9 +42,29 @@ public:
     KKSAttributesEditor * viewAttributes (const KKSList<const KKSFilterGroup *>& filters, bool mode, QWidget * parent=0, Qt::WFlags f=0);
 
     static KKSAttrValue* createAttrValue(const QString & xml);
-    void putAttrWidget (KKSAttrValue *attr, KKSObjEditor *objEditor, QGridLayout *gLayout, int n_str, int isSystem, QString tableName = QString::null, int idCat=-1);
+    void putAttrWidget (KKSAttrValue *attr, 
+                        KKSObjEditor *objEditor, 
+                        QGridLayout *gLayout, 
+                        int n_str, 
+                        KKSIndAttr::KKSIndAttrClass isSystem, 
+                        QString tableName = QString::null, 
+                        int idCat=-1);
+    
     static QString toXML (KKSCategoryAttr* attr);
-    void setValue (QWidget *aw, const KKSAttrValue * pattrValue, const KKSAttrType *pCatType, int isSystem, const QVariant& v, bool isObjExist, QString tableName, int idCat, QToolButton *tbRef, QCheckBox *ch, QWidget *wEditor, QLabel *lTitle, bool isRef=false);
+    
+    void setValue (QWidget *aw, 
+                   const KKSAttrValue * pattrValue, 
+                   const KKSAttrType *pCatType, 
+                   KKSIndAttr::KKSIndAttrClass isSystem, 
+                   const QVariant& v, 
+                   bool isObjExist, 
+                   QString tableName, 
+                   int idCat, 
+                   QToolButton *tbRef, 
+                   QCheckBox *ch, 
+                   QWidget *wEditor, 
+                   QLabel *lTitle, 
+                   bool isRef=false);
     
     void setOEF(KKSObjEditorFactory * _oef);
 
@@ -83,13 +104,13 @@ private:
     virtual ~KKSAttributesFactory (void);
 
 
-    QLabel * createAttrTitle (KKSAttrValue * av, int isSystem = 1, KKSObjEditor *objEditor = NULL);
+    QLabel * createAttrTitle (KKSAttrValue * av, KKSIndAttr::KKSIndAttrClass isSystem = KKSIndAttr::KKSIndAttrClass::iacIOUserAttr, KKSObjEditor *objEditor = NULL);
     QCheckBox * createChDateTime (bool isMandatory, QGridLayout *gLayout, QLabel *lTitle, int n_str);
     QWidget * createAttrWidget ( KKSAttrValue * pAttrValue, 
                                  KKSObjEditor *objEditor,
                                  bool is_mandatory, 
                                  const KKSAttrType *pCatType,  
-                                 int isSystem, 
+                                 KKSIndAttr::KKSIndAttrClass isSystem, 
                                  QGridLayout *gLayout, 
                                  int n_str, 
                                  const QVariant& V, 
@@ -98,7 +119,7 @@ private:
                                  QCheckBox *&ch, 
                                  bool isRef=false);
 
-    QWidget * createAttrCheckWidget (const KKSAttrValue * pAttrValue, const KKSAttrType *pCatType,  int isSystem, QTabWidget * tabW);
+    QWidget * createAttrCheckWidget (const KKSAttrValue * pAttrValue, const KKSAttrType *pCatType,  KKSIndAttr::KKSIndAttrClass isSystem, QTabWidget * tabW);
 
     void connectToSlots (QObject *aw, QWidget* wEditor);
 

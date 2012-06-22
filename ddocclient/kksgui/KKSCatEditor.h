@@ -45,7 +45,18 @@ class KKSType;
 class _GUI_EXPORT KKSCatEditor : public KKSDialog
 {
     public:
-        KKSCatEditor (KKSCategory *c, KKSRecWidget * rw, KKSRecWidget * rtw, KKSRecWidget * raw, KKSRecWidget * rTemplatesW, KKSRecWidget * rTableTemplatesW, KKSRecWidget * rAttrTemplatesW, const KKSMap<int, KKSType *>& catTypesList, int idCatType0 = -1, bool mode=true, QWidget *parent=0, Qt::WindowFlags f=0);
+        KKSCatEditor (KKSCategory *c, 
+                      KKSRecWidget * rw, 
+                      KKSRecWidget * rtw, 
+                      KKSRecWidget * raw, 
+                      KKSRecWidget * rTemplatesW, 
+                      KKSRecWidget * rTableTemplatesW, 
+                      KKSRecWidget * rAttrTemplatesW, 
+                      const KKSMap<int, KKSType *>& catTypesList, 
+                      int idCatType0 = -1, 
+                      bool mode=true, 
+                      QWidget *parent=0, 
+                      Qt::WindowFlags f=0);
         ~KKSCatEditor (void);
 
         void save (void);

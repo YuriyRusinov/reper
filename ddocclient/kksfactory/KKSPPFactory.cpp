@@ -123,7 +123,7 @@ eio_table_<ID_IO_OBJECT>
 использовать автоматическое создание кода вида
 IO_OBJ_<ID_IO_OBJECT>, где ID_IO_OBJECT - присвоенный идентификатор »ќ
 */
-int KKSPPFactory::insertIO(KKSObject * io, bool useDefaultTable) 
+int KKSPPFactory::insertIO(KKSObject * io, bool useDefaultTable, const QWidget * parent) 
 {
     Q_UNUSED(useDefaultTable);
 
@@ -181,8 +181,9 @@ int KKSPPFactory::insertIO(KKSObject * io, bool useDefaultTable)
     //создаем запись в таблице io_objects
     io->setId(-1);
     KKSObjectExemplar * eio = KKSConverter::objToExemplar(loader, io);
-    KKSAttrValue * avRec = eio->attrValue (ATTR_RECORD_FILL_COLOR);
-    KKSAttrValue * avRecT = eio->attrValue (ATTR_RECORD_TEXT_COLOR);
+    //KKSAttrValue * avRec = eio->attrValue (ATTR_RECORD_FILL_COLOR);
+    //KKSAttrValue * avRecT = eio->attrValue (ATTR_RECORD_TEXT_COLOR);
+    
     int ok = eiof->insertEIO(eio);
     if(ok == ERROR_CODE){
         if(!inTransaction())
@@ -235,7 +236,7 @@ int KKSPPFactory::insertIO(KKSObject * io, bool useDefaultTable)
 
     //добавл€ем прикрепленные файлы
     setInTransaction();
-    ok = insertFiles(io);
+    ok = insertFiles(io, parent);
     restoreInTransaction();
     if(ok != OK_CODE){
         if(!inTransaction())
@@ -335,7 +336,7 @@ int KKSPPFactory::insertIO(KKSObject * io, bool useDefaultTable)
 /*
  атегорию »ќ мен€ть запрещаетс€!
 */
-int KKSPPFactory::updateIO(KKSObject * io)
+int KKSPPFactory::updateIO(KKSObject * io, const QWidget * parent)
 {
     if(!db || !io)
         return ERROR_CODE;
@@ -532,7 +533,7 @@ int KKSPPFactory::updateIO(KKSObject * io)
 
     if(io->m_filesModified){
         //измен€ем прикрепленные файлы
-        ok = updateFiles(io);
+        ok = updateFiles(io, parent);
         if(ok != OK_CODE){
             if(!inTransaction())
                 db->rollback();
@@ -680,12 +681,12 @@ int KKSPPFactory::deleteIO(KKSObject * io) const
     return OK_CODE;
 }
 
-int KKSPPFactory::insertFile(int idObject, KKSFile * f) const
+int KKSPPFactory::insertFile(int idObject, KKSFile * f, const QWidget * parent) const
 {
     if(!f)
         return ERROR_CODE;
 
-    int ok = uploadFile(f);
+    int ok = uploadFile(f, parent);
     if(ok != OK_CODE)
         return ERROR_CODE;
 
@@ -706,7 +707,7 @@ int KKSPPFactory::insertFile(int idObject, KKSFile * f) const
     return OK_CODE;
 }
 
-int KKSPPFactory::insertFiles(const KKSObject * io) const
+int KKSPPFactory::insertFiles(const KKSObject * io, const QWidget * parent) const
 {
     if(!io)
         return ERROR_CODE;
@@ -720,7 +721,7 @@ int KKSPPFactory::insertFiles(const KKSObject * io) const
         if(!f)
             continue;
 
-        ok = insertFile(io->id(), f);
+        ok = insertFile(io->id(), f, parent);
 
         if(ok != OK_CODE){
             return ERROR_CODE;
@@ -790,7 +791,7 @@ int KKSPPFactory::deleteFiles(const KKSObject * io, bool bRemoveFiles) const
 }
 */
 
-int KKSPPFactory::updateFiles(const KKSObject * io) const
+int KKSPPFactory::updateFiles(const KKSObject * io, const QWidget * parent) const
 {
     if(!io)
         return ERROR_CODE;
@@ -805,7 +806,7 @@ int KKSPPFactory::updateFiles(const KKSObject * io) const
         int idUrl = f->id();
         int ok;
         if(idUrl <= 0){
-            ok = insertFile(io->id(), f);
+            ok = insertFile(io->id(), f, parent);
         }
         else{
             ok = updateFileInfo(f);
@@ -868,7 +869,7 @@ int KKSPPFactory::updateFileInfo(KKSFile * f) const
     return OK_CODE;
 }
 
-int KKSPPFactory::uploadFile(KKSFile * f) const
+int KKSPPFactory::uploadFile(KKSFile * f, const QWidget * parent) const
 {
     if(!f)
         return ERROR_CODE;
@@ -905,7 +906,7 @@ int KKSPPFactory::uploadFile(KKSFile * f) const
         f->setId(idUrl);
     }
 
-    int ok = fileLoader->rWriteFile(f->id(), f->localUrl(), true);
+    int ok = fileLoader->rWriteFile(f->id(), f->localUrl(), true, -1, parent);
     if(ok != OK_CODE){
         f->setId(-1);
         return ERROR_CODE;
@@ -1830,6 +1831,7 @@ int KKSPPFactory::updateCategory(const KKSCategory* c) const
     
     //теперь обновим атрибуты категории
     /*TODO Ќа врем€ запрещаем обновление атрибутов в категори€х*/
+
     /*
     setInTransaction();
     ok = deleteCategoryAttrs(c->id());
@@ -1840,13 +1842,14 @@ int KKSPPFactory::updateCategory(const KKSCategory* c) const
             db->rollback();
         return ERROR_CODE;
     }
+    */
 
     KKSMap<int, KKSCategoryAttr *>::const_iterator pca;
     for (pca = c->attributes().constBegin(); pca != c->attributes().constEnd(); pca++)
     {
         KKSCategoryAttr * a = pca.value();
         setInTransaction();
-        int ok = insertCategoryAttr(c->id(), a);
+        int ok = updateCategoryAttr(c->id(), a);
         restoreInTransaction();
         if(ok != OK_CODE){
             if(!inTransaction())
@@ -1854,7 +1857,7 @@ int KKSPPFactory::updateCategory(const KKSCategory* c) const
             return ERROR_CODE;
         }
     }
-    */
+    
 
     //теперь обновим жизненный цикл
     ok = deleteLifeCycle(c->id());
@@ -2036,6 +2039,48 @@ int KKSPPFactory::insertCategoryAttr(int idCategory, KKSCategoryAttr * a) const
         return ERROR_CODE;
 
     a->setIdCategoryAttr(idCategoryAttr);
+
+    return OK_CODE;
+}
+
+int KKSPPFactory::updateCategoryAttr(int idCategory, KKSCategoryAttr * a) const
+{
+    if(!db || !a)
+        return ERROR_CODE;
+
+    if(a->idCategoryAttr() <= 0 || a->id() <= 0){
+        return ERROR_CODE;
+    }
+
+    int idAttr = a->id();
+    
+    QString defVal;
+    if(!a->defValue().isNull())
+        defVal = a->defValue().valueForInsert();
+    bool isMandatory = a->isMandatory();
+    bool isReadOnly = a->isReadOnly();
+
+    QString sql = QString("select cUpdateAttr(%1, %2, %3, %4, %5)")
+                            .arg(idCategory)
+                            .arg(idAttr)
+                            .arg(defVal.isEmpty() ? QString("NULL") : QString("asString(%1, false)").arg(defVal))
+                            .arg(isMandatory ? "true" : "false")
+                            .arg(isReadOnly ? "true" : "false");
+
+    KKSResult * res = db->execute(sql);
+
+    if(!res || res->getRowCount() != 1){
+        if(res)
+            delete res;
+
+        return ERROR_CODE;
+    }
+
+    int idCategoryAttr = res->getCellAsInt(0, 0);
+    delete res;
+
+    if(idCategoryAttr <= 0)
+        return ERROR_CODE;
 
     return OK_CODE;
 }
@@ -2827,6 +2872,7 @@ int KKSPPFactory::createMyDocsRubricator(int idRubricator) const
 
 int KKSPPFactory::updateRubricators(KKSRubric * rootRubric, bool bMyDocs) const
 {
+    Q_UNUSED(bMyDocs);
     if(!rootRubric)
         return ERROR_CODE;
 

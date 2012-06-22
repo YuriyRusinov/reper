@@ -185,6 +185,7 @@ void KKSAttrValuePropsForm :: apply (void)
 
 void KKSAttrValuePropsForm :: initForm (bool mode)
 {
+    Q_UNUSED(mode);
     if (!m_av || !m_av->attribute())
         return;
 

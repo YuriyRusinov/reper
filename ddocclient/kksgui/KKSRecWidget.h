@@ -68,12 +68,16 @@ signals:
     void editEntity (QAbstractItemModel * sourceMod, const QModelIndex& wIndex);
     void delEntity (QAbstractItemModel * sourceMod, const QModelIndex& wIndex);
     void refreshMod (QAbstractItemModel * sourceMod);
+    
+    void entityDoubleClicked();
 
 private slots:
     void addRec (void);
     void editRec (void);
     void delRec (void);
     void refreshRec (void);
+
+    void tvDoubleClicked(const QModelIndex & index);
 
 private:
     //

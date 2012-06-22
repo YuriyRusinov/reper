@@ -91,6 +91,7 @@ KKSCatEditor :: KKSCatEditor (KKSCategory *c,
         if (pt.key() == idCatType0)
             cInd = cbTypes->count()-1;
     }
+
     this->init_widgets ();
     this->init_templates ();
 
@@ -122,6 +123,7 @@ KKSCatEditor :: KKSCatEditor (KKSCategory *c,
         connect (recWidget->actAdd, SIGNAL (triggered()), this, SLOT (addAttribute()) );
         connect (recWidget->actEdit, SIGNAL (triggered()), this, SLOT (editAttribute()) );
         connect (recWidget->actDel, SIGNAL (triggered()), this, SLOT (delAttribute()) );
+        connect (recWidget, SIGNAL (entityDoubleClicked()), this, SLOT (editAttribute()) );
     }
 
     if (recTableW)
@@ -129,6 +131,7 @@ KKSCatEditor :: KKSCatEditor (KKSCategory *c,
         connect (recTableW->actAdd, SIGNAL (triggered()), this, SLOT (addTableAttribute()) );
         connect (recTableW->actEdit, SIGNAL (triggered()), this, SLOT (editTableAttribute()) );
         connect (recTableW->actDel, SIGNAL (triggered()), this, SLOT (delTableAttribute()) );
+        connect (recTableW, SIGNAL (entityDoubleClicked()), this, SLOT (editTableAttribute()) );
     }
 
     if (recAttrW)
@@ -136,6 +139,7 @@ KKSCatEditor :: KKSCatEditor (KKSCategory *c,
         connect (recAttrW->actAdd, SIGNAL (triggered()), this, SLOT (addIndicator()) );
         connect (recAttrW->actEdit, SIGNAL (triggered()), this, SLOT (editIndicator()) );
         connect (recAttrW->actDel, SIGNAL (triggered()), this, SLOT (delIndicator()) );
+        connect (recAttrW, SIGNAL (entityDoubleClicked()), this, SLOT (editIndicator()) );
     }
 
     bool isType ((c && c->id() > 0) || (c && c->type() && c->type()->id() == 10));
@@ -427,6 +431,17 @@ void KKSCatEditor :: addTableAttribute (void)
 
 void KKSCatEditor :: addIndicator (void)
 {
+    if(!pRecAttrCategory){
+        KKSType * cTableT = KKSType::createType10(); //child type
+        pRecAttrCategory = new KKSCategory (-1, QString(), cTableT);
+        pRecAttrCategory->setName("Indicators of " + pCategory->name());
+        KKSAccessEntity * acl = new KKSAccessEntity ();
+        pRecAttrCategory->setAccessRules (acl);
+        pCategory->setRecAttrCategory (pRecAttrCategory);
+        if (acl)
+            acl->release ();
+    }
+
     QAbstractItemModel * aModel (recAttrW->getSourceModel ());
     KKSCategory * c (pRecAttrCategory);
     emit addAttrsIntoCat (c, aModel, this);
@@ -516,8 +531,14 @@ void KKSCatEditor :: delTableAttribute (void)
 void KKSCatEditor :: delIndicator (void)
 {
     int idAttr = recAttrW->getID ();
-    if (idAttr >=0 && (QMessageBox::question (this, tr("Delete attribute from category"), tr("Do you really want to delete attribute %1 from category ?").arg (idAttr), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Cancel) == QMessageBox::Yes))
+    if (idAttr >=0 && (QMessageBox::question (this, 
+                                              tr("Delete attribute from category"), 
+                                              tr("Do you really want to delete attribute %1 from category ?").arg (idAttr), 
+                                              QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Cancel) == QMessageBox::Yes)
+       )
+    {
         emit delAttrFromCategory (idAttr, pRecAttrCategory, recAttrW->getSourceModel(), this);
+    }
 }
 
 void KKSCatEditor :: setAttrTypes (const KKSMap<int, KKSAttrType*>& aTypes)

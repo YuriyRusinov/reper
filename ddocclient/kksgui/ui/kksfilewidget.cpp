@@ -145,7 +145,7 @@ void KKSFileWidget::on_pbDownload_clicked()
 
     f->setLocalUrl(localFile);
 
-    emit downloadFile(f);
+    emit downloadFile(f, this);
 
     int row = ui->twFiles->currentIndex().row();
     QTreeWidgetItem * item = ui->twFiles->topLevelItem(row);

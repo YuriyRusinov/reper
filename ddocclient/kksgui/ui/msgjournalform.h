@@ -83,7 +83,7 @@ signals:
     void viewMsg(int idJournal);
 
     void loadMsgFiles (int idObject);
-    void downloadFile (KKSFile * f);
+    void downloadFile (KKSFile * f, const QWidget *parent);
 
 private:
     //

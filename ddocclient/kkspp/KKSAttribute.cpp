@@ -20,7 +20,7 @@ KKSAttribute::KKSAttribute() : KKSIndAttr(),
     m_defWidth (100),
     m_group (0),
     m_st (0),
-    m_isSystem (false),
+    m_isSystem (iacIOUserAttr),
     m_attrsLoaded(false)
 {
 //   m_refType = NULL;
@@ -125,12 +125,12 @@ void KKSAttribute::setDefWidth(int w)
         m_defWidth = 100;
 }
 
-bool KKSAttribute::isSystem() const
+KKSIndAttr::KKSIndAttrClass KKSAttribute::isSystem() const
 {
     return m_isSystem;
 }
 
-void KKSAttribute::setAsSystem(bool yes)
+void KKSAttribute::setAsSystem(KKSIndAttr::KKSIndAttrClass yes)
 {
     m_isSystem = yes;
 }

@@ -302,8 +302,8 @@ class _PP_EXPORT KKSObject : public KKSRecord
         int m_idSearchTemplate;
         QString m_refTableName;
 
-        const QString & code(bool quoted = false) const;
-        void setCode(const QString & newCode);
+        //const QString & code(bool quoted = false) const;
+        //void setCode(const QString & newCode);
 
 };
 

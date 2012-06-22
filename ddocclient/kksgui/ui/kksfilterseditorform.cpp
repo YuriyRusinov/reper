@@ -526,7 +526,7 @@ void KKSFiltersEditorForm :: addFilter ()
     {
         case 0: value = lEValue->text(); break;
         case 1: value = lEStrValue->text(); break;
-        case 2: value = QString::number (cbValue->itemData (cbValue->currentIndex()).toInt()); break;
+        case 2: value = cbValue->itemData (cbValue->currentIndex()).toString(); break;
         case 3: value = teValue->toPlainText(); break;
         case 4: value = QString ("%1").arg (chValue->checkState() == Qt::Checked ? QString("TRUE") : QString ("FALSE")); break;
         case 5: value = dValue->date().toString (Qt::ISODate); break;

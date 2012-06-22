@@ -7,6 +7,7 @@ KKSAclTemplate :: KKSAclTemplate (int id, QString name, bool isSys)
       //aclName (name),
       m_isSystem (isSys)
 {
+    Q_UNUSED(id);
 }
 
 KKSAclTemplate :: KKSAclTemplate (const KKSAclTemplate& ACT)

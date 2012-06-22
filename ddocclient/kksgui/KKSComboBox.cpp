@@ -32,7 +32,7 @@ int KKSComboBox::loadRecords(void)
 // Return:     
 ////////////////////////////////////////////////////////////////////////
 
-KKSComboBox::KKSComboBox (const KKSAttrValue* attr, int isSys, QWidget *parent)
+KKSComboBox::KKSComboBox (const KKSAttrValue* attr, KKSIndAttr::KKSIndAttrClass isSys, QWidget *parent)
     : QComboBox (parent), KKSAttrWidget(attr, isSys)
 {
     connect (this, SIGNAL (currentIndexChanged(int)), this, SLOT (setCurrentData(int)) );

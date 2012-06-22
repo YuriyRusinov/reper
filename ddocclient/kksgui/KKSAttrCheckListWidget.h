@@ -27,17 +27,17 @@ class KKSAttrValue;
 class _GUI_EXPORT KKSAttrCheckWidget : public QWidget, public KKSAttrWidget
 {
 public:
-    KKSAttrCheckWidget (const KKSAttrValue* attr, bool isSys, QWidget * parent=0, Qt::WFlags f=0);
+    KKSAttrCheckWidget (const KKSAttrValue* attr, KKSIndAttr::KKSIndAttrClass isSys, QWidget * parent=0, Qt::WFlags f=0);
     ~KKSAttrCheckWidget (void);
 
     void setModel (QAbstractItemModel * sourceModel);
 
 signals:
-    void addAttrRef (const KKSAttrValue * attribute, bool isSystem, QAbstractItemModel * sourceModel);
-    void delAttrRef (const KKSAttrValue * attribute, bool isSystem, QAbstractItemModel * sourceModel, const QModelIndex& wInd);
+    void addAttrRef (const KKSAttrValue * attribute, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel);
+    void delAttrRef (const KKSAttrValue * attribute, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel, const QModelIndex& wInd);
     void refIOOpen (QString tableName);
     
-    void valueChanged (int id, bool sys, QVariant val);
+    void valueChanged (int id, KKSIndAttr::KKSIndAttrClass sys, QVariant val);
 
 private slots:
     void addAttrRef (void);
@@ -56,8 +56,6 @@ private:
     //
     // Variables
     //
-//    const KKS* attribute;
-//    bool isSystem;
 
     QTreeView * tv;
     QToolBar * tbActions;

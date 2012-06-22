@@ -12,6 +12,8 @@
 #include <QWidget>
 #include <QVariant>
 
+#include "KKSIndAttr.h"
+
 class QGridLayout;
 
 class _GUI_EXPORT KKSAttrRefWidget : public QWidget
@@ -24,14 +26,14 @@ class _GUI_EXPORT KKSAttrRefWidget : public QWidget
         QWidget * getAttrWidget (void) const;
         QGridLayout * getLayout (void) const;
         int getIdAttrValue (void) const;
-        int isSysAttr (void) const;
+        KKSIndAttr::KKSIndAttrClass isSysAttr (void) const;
         const QVariant& getValue (void) const;
 
     public slots:
-        void setValue (int id, int sys, QVariant val);
+        void setValue (int id, KKSIndAttr::KKSIndAttrClass sys, QVariant val);
 
     signals:
-        void valueChanged (int id, int sys, QVariant val);
+        void valueChanged (int id, KKSIndAttr::KKSIndAttrClass sys, QVariant val);
 
     private:
         //
@@ -41,7 +43,7 @@ class _GUI_EXPORT KKSAttrRefWidget : public QWidget
         QGridLayout * gAttrLay;
         int idAttrValue;
         QVariant cVal;
-        int isSystem;
+        KKSIndAttr::KKSIndAttrClass isSystem;
 
     private:
         Q_OBJECT

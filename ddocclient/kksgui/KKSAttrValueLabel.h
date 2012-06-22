@@ -12,6 +12,7 @@
 
 #include "kksgui_config.h"
 #include <KKSList.h>
+#include "KKSIndAttr.h"
 
 class KKSAttrValue;
 class KKSObject;
@@ -19,7 +20,7 @@ class KKSObject;
 class _GUI_EXPORT KKSAttrValueLabel : public QLabel
 {
     public:
-        KKSAttrValueLabel (KKSAttrValue * av, int isSystem, QWidget *parent=NULL);
+        KKSAttrValueLabel (KKSAttrValue * av, KKSIndAttr::KKSIndAttrClass isSystem, QWidget *parent=NULL);
         virtual ~KKSAttrValueLabel (void);
 
         void setAttrValue(KKSAttrValue * av);
@@ -48,7 +49,7 @@ class _GUI_EXPORT KKSAttrValueLabel : public QLabel
         // Variables
         //
         KKSAttrValue *m_av;
-        int m_isSystem;
+        KKSIndAttr::KKSIndAttrClass m_isSystem;
 
     private:
         Q_OBJECT

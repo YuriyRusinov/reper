@@ -913,23 +913,41 @@ void KKSMainWindow :: slotCreateDoc()
     KKSCatEditorFactory * catf = kksSito->catf();
     KKSList<const KKSFilterGroup *> filterGroups;
     KKSList<const KKSFilter*> filters;
+    
     KKSObject * refCatTypeObj = kksSito->loader()->loadIO (IO_CAT_TYPE_ID, true);
     if (!refCatTypeObj || !refCatTypeObj->category() || !refCatTypeObj->category()->tableCategory())
         return;
 
-    KKSFilter * filter = refCatTypeObj->category()->tableCategory()->createFilter(1, QString::number (10), KKSFilter::foNotEq);
+    KKSFilter * filter = refCatTypeObj->category()->tableCategory()->createFilter(ATTR_ID, QString::number (10), KKSFilter::foNotEq);
     if(!filter)
         return;
 
     filters.append(filter);
     filter->release();
+    
+    refCatTypeObj->release();
 
+    /*
+    KKSObject * refCatObj = kksSito->loader()->loadIO (IO_CAT_ID, true);
+    if (!refCatObj || !refCatObj->category() || !refCatObj->category()->tableCategory())
+        return;
+    
+
+    filter = refCatObj->category()->tableCategory()->createFilter(ATTR_IS_ARCHIVED, QString("FALSE"), KKSFilter::foEq);
+    if(!filter)
+        return;
+
+    filters.append(filter);
+    filter->release();
+    refCatObj->release ();
+    */
+
+////
     KKSFilterGroup * group = new KKSFilterGroup(true);
     group->setFilters(filters);
     filterGroups.append(group);
     group->release();
 
-    refCatTypeObj->release ();
 
     KKSCategoryTemplateWidget* w = catf->viewCategories(filterGroups, 
                                                         true, 
@@ -1000,7 +1018,7 @@ void KKSMainWindow::slotFindDoc()
     KKSObjEditorFactory * oef = kksSito->oef();
 
     int idUser = kksSito->loader()->getUserId();
-    KKSFilter * filter = c->createFilter(13, QString::number(idUser), KKSFilter::foEq);
+    KKSFilter * filter = c->createFilter(ATTR_AUTHOR, QString::number(idUser), KKSFilter::foEq);
     if(!filter)
         return;
 
@@ -1127,19 +1145,36 @@ void KKSMainWindow::slotViewCat()
     if (!refCatTypeObj || !refCatTypeObj->category() || !refCatTypeObj->category()->tableCategory())
         return;
 
-    KKSFilter * filter = refCatTypeObj->category()->tableCategory()->createFilter(1, QString::number (10), KKSFilter::foNotEq);
+    KKSFilter * filter = refCatTypeObj->category()->tableCategory()->createFilter(ATTR_ID, QString::number (10), KKSFilter::foNotEq);
     if(!filter)
         return;
 
     filters.append(filter);
     filter->release();
 
+    refCatTypeObj->release ();
+
+    ////
+    KKSObject * refCatObj = kksSito->loader()->loadIO (IO_CAT_ID, true);
+    if (!refCatObj || !refCatObj->category() || !refCatObj->category()->tableCategory())
+        return;
+
+    filter = refCatObj->category()->tableCategory()->createFilter(ATTR_IS_ARCHIVED, QString("FALSE"), KKSFilter::foEq);
+    if(!filter)
+        return;
+
+    filters.append(filter);
+    filter->release();
+    refCatObj->release ();
+
+////
+
     KKSFilterGroup * group = new KKSFilterGroup(true);
     group->setFilters(filters);
     filterGroups.append(group);
     group->release();
 
-    refCatTypeObj->release ();
+    //refCatTypeObj->release ();
 
     KKSCategoryTemplateWidget* ctw = kksSito->catf()->viewCategories (filterGroups, 
                                                                       false, 
@@ -1163,7 +1198,7 @@ void KKSMainWindow::slotViewAttrs()
     if (!refAttrObj || !refAttrObj->category() || !refAttrObj->category()->tableCategory())
         return;
 
-    KKSFilter * filter = refAttrObj->category()->tableCategory()->createFilter(15, QString("true"), KKSFilter::foNotEq);
+    KKSFilter * filter = refAttrObj->category()->tableCategory()->createFilter(ATTR_IS_SYSTEM, QString("true"), KKSFilter::foNotEq);
     if(!filter)
         return;
 

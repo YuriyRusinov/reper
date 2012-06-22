@@ -2,7 +2,7 @@
 
 #include "KKSCheckBox.h"
 
-KKSCheckBox :: KKSCheckBox (const KKSAttrValue * attr, int isSys, QWidget *parent)
+KKSCheckBox :: KKSCheckBox (const KKSAttrValue * attr, KKSIndAttr::KKSIndAttrClass isSys, QWidget *parent)
     : QCheckBox (parent), KKSAttrWidget(attr, isSys)
 {
 
@@ -11,7 +11,7 @@ KKSCheckBox :: KKSCheckBox (const KKSAttrValue * attr, int isSys, QWidget *paren
     connect (this, SIGNAL (stateChanged(int)), this, SLOT (setState(int)) );
 }
 
-KKSCheckBox :: KKSCheckBox (const KKSAttrValue* attr, int isSys, const QString& text, QWidget *parent)
+KKSCheckBox :: KKSCheckBox (const KKSAttrValue* attr, KKSIndAttr::KKSIndAttrClass isSys, const QString& text, QWidget *parent)
     : QCheckBox (text, parent), KKSAttrWidget(attr, isSys)
 {
     setTristate(false);

@@ -639,7 +639,7 @@ KKSAttrValue* KKSAttributesFactory::createAttrValue (const QString & xml)
  * tableName -- название таблицы для атрибутов, связанных со справочниками
  * idCat -- идентификатор категории
  */
-void KKSAttributesFactory :: putAttrWidget (KKSAttrValue* av, KKSObjEditor * objEditor, QGridLayout *gLayout, int n_str, int isSystem, QString tableName, int idCat)
+void KKSAttributesFactory :: putAttrWidget (KKSAttrValue* av, KKSObjEditor * objEditor, QGridLayout *gLayout, int n_str, KKSIndAttr::KKSIndAttrClass isSystem, QString tableName, int idCat)
 {
     const KKSValue pVal = av->value();
     const KKSCategoryAttr * pCategAttr = av->attribute();
@@ -695,7 +695,7 @@ QString KKSAttributesFactory :: toXML (KKSCategoryAttr* attr)
  * Результат:
  * QLabel * c названием атрибута
  */
-QLabel * KKSAttributesFactory :: createAttrTitle (KKSAttrValue * av, int isSystem, KKSObjEditor *objEditor)
+QLabel * KKSAttributesFactory :: createAttrTitle (KKSAttrValue * av, KKSIndAttr::KKSIndAttrClass isSystem, KKSObjEditor *objEditor)
 {
 	if(!av)
         return new QLabel();
@@ -759,7 +759,18 @@ QCheckBox * KKSAttributesFactory :: createChDateTime (bool isMandatory, QGridLay
  * Результат:
  * виджет, соотвествующий атрибуту.
  */
-QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av, KKSObjEditor *objEditor, bool is_mandatory, const KKSAttrType *pCatType, int isSystem, QGridLayout *gLayout, int n_str, const QVariant& V, QLabel *lTitle, QToolButton *&tbRef, QCheckBox *&ch, bool isRef)
+QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av, 
+                                                    KKSObjEditor *objEditor, 
+                                                    bool is_mandatory, 
+                                                    const KKSAttrType *pCatType, 
+                                                    KKSIndAttr::KKSIndAttrClass isSystem, 
+                                                    QGridLayout *gLayout, 
+                                                    int n_str, 
+                                                    const QVariant& V, 
+                                                    QLabel *lTitle, 
+                                                    QToolButton *&tbRef, 
+                                                    QCheckBox *&ch, 
+                                                    bool isRef)
 {
     QWidget * attrWidget = 0;
     if (!pCatType)
@@ -1275,7 +1286,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av, KKSObjEdi
  * Результат:
  * виджет атрибута, добавленный в tabW.
  */
-QWidget * KKSAttributesFactory :: createAttrCheckWidget (const KKSAttrValue * av, const KKSAttrType *pCatType,  int isSystem, QTabWidget * tabW)
+QWidget * KKSAttributesFactory :: createAttrCheckWidget (const KKSAttrValue * av, const KKSAttrType *pCatType,  KKSIndAttr::KKSIndAttrClass isSystem, QTabWidget * tabW)
 {
     QWidget * attrWidget = 0;
     if (!av || !pCatType || !tabW)
@@ -1313,7 +1324,7 @@ QWidget * KKSAttributesFactory :: createAttrCheckWidget (const KKSAttrValue * av
 void KKSAttributesFactory :: setValue (QWidget *aw, 
                                        const KKSAttrValue * av, 
                                        const KKSAttrType *pCatType, 
-                                       int isSystem, 
+                                       KKSIndAttr::KKSIndAttrClass isSystem, 
                                        const QVariant& V, 
                                        bool isObjExist, 
                                        QString tableName, 
@@ -1534,7 +1545,7 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
                 {
                     QString value = QString ("select id from %1 where id in (%2) ").arg (tableName).arg (vals);
                     //const KKSFilter * filter = ct->createFilter ("id", value, KKSFilter::foInSQL);
-                    const KKSFilter * filter = ct->createFilter (1, value, KKSFilter::foInSQL);
+                    const KKSFilter * filter = ct->createFilter (ATTR_ID, value, KKSFilter::foInSQL);
                     KKSList <const KKSFilter *> fl;
                     fl.append (filter);
                     filter->release ();
@@ -1567,15 +1578,22 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
                         sAttrModel->insertRows (ii, 1);
                         QModelIndex saInd = sAttrModel->index (ii, 0);
                         //QString v = pv.value();
+                        
                         int key = pv.key();
+                        KKSEIOData * eData = pv.value();
                         ic = 0;
-                        KKSObjectExemplar * wObjE = loader->loadEIO (pv.key(), refIO);
+                        
+                        //KKSObjectExemplar * wObjE = loader->loadEIO (pv.key(), refIO);
 
                         for (KKSMap<int, KKSCategoryAttr *>::const_iterator pa = attrs.constBegin(); \
                                                                             pa != attrs.constEnd(); \
                                                                             pa++)
                         {
+                            QString fValue = eData->fieldValue(pa.value()->code());
+
                             QModelIndex saInd = sAttrModel->index (ii, ic);
+                            
+                            /*
                             KKSAttrValue * av = wObjE->attrValue (pa.value()->id());
                             QVariant val = av ? av->value().valueVariant () : QVariant();
                             if (av->attribute()->type()->attrType() == KKSAttrType::atJPG)
@@ -1595,25 +1613,27 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
                                 QString cV = avals.value (tVal.toInt());
                                 val = cV;
                             }
+                            */
+
                             sAttrModel->setData (saInd, key, Qt::UserRole);
-                            sAttrModel->setData (saInd, val, Qt::DisplayRole);
+                            sAttrModel->setData (saInd, fValue, Qt::DisplayRole);
                             ic++;
                         }
-                        wObjE->release ();
+                        //wObjE->release ();
                         ii++;
                     }
                 }
                 //c->release ();
                 refIO->release ();
                 QObject :: connect (arw, \
-                         SIGNAL (addAttrRef (const KKSAttrValue*,  bool, QAbstractItemModel*)), \
+                         SIGNAL (addAttrRef (const KKSAttrValue*,  KKSIndAttr::KKSIndAttrClass, QAbstractItemModel*)), \
                          wEditor, \
-                         SLOT (addAttributeCheckReference (const KKSAttrValue*, bool, QAbstractItemModel *)) \
+                         SLOT (addAttributeCheckReference (const KKSAttrValue*, KKSIndAttr::KKSIndAttrClass, QAbstractItemModel *)) \
                         );
                 QObject :: connect (arw, \
-                         SIGNAL (delAttrRef (const KKSAttrValue*, bool, QAbstractItemModel*, const QModelIndex&)), \
+                         SIGNAL (delAttrRef (const KKSAttrValue*, KKSIndAttr::KKSIndAttrClass, QAbstractItemModel*, const QModelIndex&)), \
                          wEditor, \
-                         SLOT (delAttributeCheckReference (const KKSAttrValue*, bool, QAbstractItemModel*, const QModelIndex&)) \
+                         SLOT (delAttributeCheckReference (const KKSAttrValue*, KKSIndAttr::KKSIndAttrClass, QAbstractItemModel*, const QModelIndex&)) \
                         );
                 QObject :: connect (arw, \
                          SIGNAL (refIOOpen (QString)), \
@@ -1949,7 +1969,7 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
 void KKSAttributesFactory :: connectToSlots (QObject *aw, QWidget* wEditor)
 {
 //    if (aw->metaObject ()->indexOfSignal (SIGNAL (valueChanged(int, bool, QVariant))) >= 0)
-    QObject::connect (aw, SIGNAL (valueChanged(int, int, QVariant)), wEditor, SLOT (setValue (int, int, QVariant)) );
+    QObject::connect (aw, SIGNAL (valueChanged(int, KKSIndAttr::KKSIndAttrClass, QVariant)), wEditor, SLOT (setValue (int, KKSIndAttr::KKSIndAttrClass, QVariant)) );
 }
 
 void KKSAttributesFactory :: slotLoadIOSrc (KKSObject ** io, QWidget * parent)

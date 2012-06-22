@@ -534,7 +534,7 @@ void KKSJMonitor::init()
     // добавлено 20.11.2010 ёрой в св€зи с необходимостью просматривать присоединенные файлы
     //
     connect (journalW, SIGNAL (loadMsgFiles(int)), this, SLOT (slotLoadFiles(int)));
-    connect (journalW, SIGNAL (downloadFile(KKSFile *)), m_oef, SLOT (slotDownloadFile (KKSFile *)) );
+    connect (journalW, SIGNAL (downloadFile(KKSFile *, const QWidget *)), m_oef, SLOT (slotDownloadFile (KKSFile *, const QWidget *)) );
     connect (this, SIGNAL (filesAreLoaded (const KKSList<KKSFile *>&)), journalW, SLOT (isFilesEnabled (const KKSList<KKSFile *>&)) );
     connect(this, SIGNAL(signalMsgError(QString)), journalW, SLOT(slotShowMsgError(QString)));
 }
@@ -818,7 +818,7 @@ void KKSJMonitor::slotExecuteExCmd(int idJournal, int idCategory)
         return;
 
     //KKSFilter * filter = c->createFilter("id_io_category", QString::number(idCategory), KKSFilter::foEq);
-    KKSFilter * filter = c->createFilter(12, QString::number(idCategory), KKSFilter::foEq);
+    KKSFilter * filter = c->createFilter(ATTR_ID_IO_CATEGORY, QString::number(idCategory), KKSFilter::foEq);
     if(!filter)
         return;
 

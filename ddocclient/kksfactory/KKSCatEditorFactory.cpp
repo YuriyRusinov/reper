@@ -391,6 +391,7 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (int idCategory, // ид
     KKSCategory *cat (0);
     KKSCategory * tableCat (0);//= new KKSCategory(-1, QString(), cTableT);
     KKSCategory * indCat (0);
+    
     if (idCategory <= 0 && isChildCat)
     {
         cat = new KKSCategory ();
@@ -414,6 +415,7 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (int idCategory, // ид
     else if (idCategory > 0)
     {
         cat = loader->loadCategory (idCategory);
+        /*
         if (!cat->recAttrCategory())
         {
             KKSType * cTableT = loader->loadType (10);
@@ -426,6 +428,7 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (int idCategory, // ид
             if (indCat)
                 indCat->release ();
         }
+        */
     }
     else
     {
@@ -434,10 +437,10 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (int idCategory, // ид
         cat->setType (ct);
         //if (cat && ct && (idCatType == 1 || idCatType == 2 || idCatType == 12))// категории данных типов являются табличными
         KKSType * cTableT = loader->loadType (10);
-        indCat = new KKSCategory (-1, QString(), cTableT);
-        cat->setRecAttrCategory (indCat);
-        if (indCat)
-            indCat->release ();
+        //indCat = new KKSCategory (-1, QString(), cTableT);
+        //cat->setRecAttrCategory (indCat);
+        //if (indCat)
+        //    indCat->release ();
         if (cat && ct && ct->isQualifier())// категории данных типов являются табличными
         {
             //
@@ -660,7 +663,7 @@ KKSRecWidget * KKSCatEditorFactory :: getAttrsWidget (const KKSCategory *cat, bo
     else
     {
         QTreeView * tvTableAttrs = new QTreeView ();
-        rw = new KKSRecWidget (tvTableAttrs, mode);
+        rw = new KKSRecWidget (tvTableAttrs, false); //mode);
         rw->hideGroup (0);//gbSearch->setVisible (false);
         rw->hideGroup (2);//tbSetView->setVisible (false);
         rw->hideGroup (3);//gbImportExport->setVisible (false);
@@ -914,7 +917,7 @@ KKSList<const KKSFilterGroup *> KKSCatEditorFactory :: viewMainCategories (void)
         return filterGroups;
 
     //KKSFilter * filter = refCatObj->category()->tableCategory()->createFilter("is_main", QString("true"), KKSFilter::foEq);
-    KKSFilter * filter = refCatObj->category()->tableCategory()->createFilter(17, QString("true"), KKSFilter::foEq);
+    KKSFilter * filter = refCatObj->category()->tableCategory()->createFilter(ATTR_IS_MAIN, QString("true"), KKSFilter::foEq);
     if(!filter)
         return filterGroups;
 

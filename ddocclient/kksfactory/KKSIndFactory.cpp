@@ -191,8 +191,29 @@ QCheckBox * KKSIndFactory :: createChDateTime (QGridLayout *gLayout, QLabel *lTi
     return ch;
 }
 
-QWidget * KKSIndFactory :: createIndWidget (const KKSIndicator * pCategAttr, const KKSAttrType *pCatType,  bool isSystem, QGridLayout *gLayout, int n_str, const QVariant& V, QLabel *lTitle, QToolButton *&tbRef, QCheckBox *&ch, KKSObjEditor * objEditor, bool isRef)
+QWidget * KKSIndFactory :: createIndWidget (const KKSIndicator * pCategAttr, 
+                                            const KKSAttrType *pCatType,  
+                                            bool isSystem, 
+                                            QGridLayout *gLayout, 
+                                            int n_str, 
+                                            const QVariant& V, 
+                                            QLabel *lTitle, 
+                                            QToolButton *&tbRef, 
+                                            QCheckBox *&ch, 
+                                            KKSObjEditor * objEditor, 
+                                            bool isRef)
 {
+    Q_UNUSED(isRef);
+    Q_UNUSED(objEditor);
+    Q_UNUSED(ch);
+    Q_UNUSED(tbRef);
+    Q_UNUSED(lTitle);
+    Q_UNUSED(V);
+    Q_UNUSED(n_str);
+    Q_UNUSED(gLayout);
+    Q_UNUSED(isSystem);
+    Q_UNUSED(pCatType);
+    Q_UNUSED(pCategAttr);
     QWidget * attrWidget = 0;
     /*
     if (!pCatType)
@@ -1335,7 +1356,7 @@ void KKSIndFactory :: setValue (QWidget *aw, const KKSIndicator * pCategAttr, co
 
 void KKSIndFactory :: connectToSlots (QObject *aw, QWidget* wEditor)
 {
-    QObject::connect (aw, SIGNAL (valueChanged(int, bool, QVariant)), wEditor, SLOT (setIndValue (int, bool, QVariant)) );
+    QObject::connect (aw, SIGNAL (valueChanged(int, KKSIndAttr::KKSIndAttrClass, QVariant)), wEditor, SLOT (setIndValue (int, KKSIndAttr::KKSIndAttrClass, QVariant)) );
 }
 
 void KKSIndFactory :: viewIOIndicator (KKSObject * io, int idIndicator)
@@ -1567,7 +1588,7 @@ void KKSIndFactory :: addNewIOIndicator (KKSObject * io, QWidget * indWidget)
                 values += QString(",");
         }
         values += QString (")");
-        KKSFilter * f = c->createFilter (1, values, KKSFilter::foInSQL);
+        KKSFilter * f = c->createFilter (ATTR_ID, values, KKSFilter::foInSQL);
         KKSFilterGroup * fg = new KKSFilterGroup (false);
         fg->addFilter (f);
         filters.append (fg);

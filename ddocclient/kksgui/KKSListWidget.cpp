@@ -16,7 +16,7 @@
 // Return:     
 ////////////////////////////////////////////////////////////////////////
 
-KKSListWidget::KKSListWidget(const KKSAttrValue* attr, int isSys, QWidget *parent)
+KKSListWidget::KKSListWidget(const KKSAttrValue* attr, KKSIndAttr::KKSIndAttrClass isSys, QWidget *parent)
     : QListWidget(parent), KKSAttrWidget(attr, isSys)
 {
     

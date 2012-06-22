@@ -284,7 +284,8 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
         gRecAttrLay->addWidget (scIndAttrs, 0, 0, 1, 1);
         indWidget->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Fixed);
         tabObj->addTab (sysRecAttrWidget, tr ("Record Attributes"));
-        int nInds = setIndicators (tRecAttr, obj, indWidget, gIndLay, wCat, wObjE, tableName, objEditorWidget);
+        //int nInds = 
+        setIndicators (tRecAttr, obj, indWidget, gIndLay, wCat, wObjE, tableName, objEditorWidget);
     }
 //    qDebug () << __PRETTY_FUNCTION__ << nCount;
 //    nCount = setAttrsToEditor (t, obj, scSysAttrs, sysAttrWidget, mainLayout, wObjE, objEditorWidget, true, nCount);
@@ -542,7 +543,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
         filesW->setLayout (gFilesLay);
         KKSList<KKSFileType*> fileTypes = loader->loadFileTypes();
         KKSFileWidget * W = new KKSFileWidget(io->files(), fileTypes, false);
-        connect(W, SIGNAL(downloadFile(KKSFile*)), this, SLOT(slotDownloadFile(KKSFile*)));
+        connect(W, SIGNAL(downloadFile(KKSFile*, const QWidget *)), this, SLOT(slotDownloadFile(KKSFile*, const QWidget*)));
         objEditorWidget->addFileWidget (W);
         tabObj->addTab (filesW, tr("Files"));
         gFilesLay->addWidget (W, 0, 0, 1, 1);
@@ -561,6 +562,25 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
     if ((isAttrCheckEx && io) ||
             (tabEnc && tabEnc->count () > 0))
         tabEnc->setCurrentIndex (0);
+
+    if (!io)
+    {
+        //
+        // прикрепленные файлы (теперь они также доступны для записей справочников DynamicDocs)
+        //
+        QWidget * filesW = new QWidget ();
+        QGridLayout *gFilesLay = new QGridLayout ();
+        filesW->setLayout (gFilesLay);
+        KKSList<KKSFileType*> fileTypes = loader->loadFileTypes();
+        KKSList<KKSFile*> files;
+        KKSFileWidget * W = new KKSFileWidget(files, fileTypes, false);
+        connect(W, SIGNAL(downloadFile(KKSFile*, const QWidget *)), this, SLOT(slotDownloadFile(KKSFile*, const QWidget*)));
+        objEditorWidget->addFileWidget (W);
+        tabObj->addTab (filesW, tr("Files"));
+        gFilesLay->addWidget (W, 0, 0, 1, 1);
+
+    }
+
 
     if (mode)
     {
@@ -899,7 +919,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditorParam (int idObject,// идент
         filesW->setLayout (gFilesLay);
         KKSList<KKSFileType*> fileTypes = loader->loadFileTypes();
         KKSFileWidget * W = new KKSFileWidget(io->files(), fileTypes, false);
-        connect(W, SIGNAL(downloadFile(KKSFile*)), this, SLOT(slotDownloadFile(KKSFile*)));
+        connect(W, SIGNAL(downloadFile(KKSFile*, const QWidget*)), this, SLOT(slotDownloadFile(KKSFile*, const QWidget *)));
         objEditorWidget->addFileWidget (W);
         tabObj->addTab (filesW, tr("Files"));
         gFilesLay->addWidget (W, 0, 0, 1, 1);
@@ -1033,8 +1053,8 @@ void KKSObjEditorFactory :: setIONameSecret (KKSObjEditor * editor, KKSObjectExe
     //const KKSValue pVal = attr->value();
     //const KKSCategoryAttr * pCategAttr = attr->attribute();
     
-    QLineEdit * lEIOName = new KKSEdit (attr, 0, io->name (), parentWProp);//QLineEdit (io->name (), parentWProp);
-    connect (lEIOName, SIGNAL (valueChanged(int, int, QVariant)), editor, SLOT (setValue (int, int, QVariant)) );
+    QLineEdit * lEIOName = new KKSEdit (attr, KKSIndAttr::KKSIndAttrClass::iacTableAttr, io->name (), parentWProp);//QLineEdit (io->name (), parentWProp);
+    connect (lEIOName, SIGNAL (valueChanged(int, KKSIndAttr::KKSIndAttrClass, QVariant)), editor, SLOT (setValue (int, KKSIndAttr::KKSIndAttrClass, QVariant)) );
     lEIOName->setReadOnly (io->isSystem ());
     hIOLay->addWidget (lIOName);
     hIOLay->addWidget (lEIOName);
@@ -1068,7 +1088,7 @@ void KKSObjEditorFactory :: setIONameSecret (KKSObjEditor * editor, KKSObjectExe
     if (pv != values.constEnd())
         v_str = pv.value();
 
-    QLineEdit * lEIOMacLabel = new KKSEdit (attr, true, v_str, aRefW);
+    QLineEdit * lEIOMacLabel = new KKSEdit (attr, KKSIndAttr::KKSIndAttrClass::iacTableAttr, v_str, aRefW);
     QSizePolicy spMac (QSizePolicy::Minimum, QSizePolicy::Fixed);
     lEIOMacLabel->setReadOnly (true);
     lEIOMacLabel->setSizePolicy (spMac);
@@ -1077,9 +1097,9 @@ void KKSObjEditorFactory :: setIONameSecret (KKSObjEditor * editor, KKSObjectExe
     tbMac->setText ("...");
     editor->addListAttrWidget (tbMac, aRefW, attr);
     connect (tbMac, SIGNAL (clicked()), editor, SLOT (setList()) );
-    aRefW->setValue (attr->id(), 0, cV);
+    aRefW->setValue (attr->id(), KKSIndAttr::KKSIndAttrClass::iacTableAttr, cV);
     aRefW->setAttrWidget (lEIOMacLabel);
-    connect (aRefW, SIGNAL (valueChanged(int, int, QVariant)), editor, SLOT (setValue (int, int, QVariant)) );
+    connect (aRefW, SIGNAL (valueChanged(int, KKSIndAttr::KKSIndAttrClass, QVariant)), editor, SLOT (setValue (int, KKSIndAttr::KKSIndAttrClass, QVariant)) );
     hIOLay->addWidget (tbMac);
     tbMac->setEnabled (!io->isSystem ());
 
@@ -1146,8 +1166,18 @@ void KKSObjEditorFactory :: loadEntities (KKSObject *& obj,
     return;
 }
 
-void KKSObjEditorFactory :: loadRecEntities (KKSObject * obj, KKSObjectExemplar * wObjE, const KKSCategory* wCat, int idObject, int idObjE, const QString& tableName, const KKSTemplate *& tRecAttr, bool defTemplateOnly, QWidget * parent)
+void KKSObjEditorFactory :: loadRecEntities (KKSObject * obj, 
+                                             KKSObjectExemplar * wObjE, 
+                                             const KKSCategory* wCat, 
+                                             int idObject, 
+                                             int idObjE, 
+                                             const QString& tableName, 
+                                             const KKSTemplate *& tRecAttr, 
+                                             bool defTemplateOnly, 
+                                             QWidget * parent)
 {
+    Q_UNUSED(tableName);
+    Q_UNUSED(wObjE);
     if(!obj || obj->id() != idObject)
     {
         qWarning() << "There is no object with id = " << idObject;
@@ -1266,6 +1296,8 @@ void KKSObjEditorFactory :: loadEIOasIO (const KKSTemplate *& ioTemplate, KKSObj
         acl->release ();
         if (wCat)
         {
+            io->setCategory(const_cast<KKSCategory*>(wCat));
+
             ioTemplate = new KKSTemplate (wCat->defTemplate());
             //если категория имеет рубрики, то они должны стать вложениями данного ИО
             if (wCat->rootRubric())
@@ -1496,7 +1528,7 @@ void KKSObjEditorFactory :: setObjConnect (KKSObjEditor *editor)
     connect (editor, SIGNAL(includeRecRequested(KKSObjEditor*)), this, SLOT(slotIncludeRecRequested(KKSObjEditor*)));
     connect (editor, SIGNAL(openRubricItemRequested(int, KKSObjEditor*)), this, SLOT(slotOpenRubricItemRequested(int, KKSObjEditor*)));
     connect (editor, SIGNAL(openRubricItemRecRequested(int, KKSObjEditor*)), this, SLOT(slotOpenRubricItemRecRequested(int, KKSObjEditor*)));
-    connect (editor, SIGNAL (updateAttributes (QWidget *, QScrollArea *, QWidget *, int, const KKSCategory *, bool, KKSObjEditor*)), this, SLOT (regroupAttrs (QWidget *, QScrollArea *, QWidget *, int, const KKSCategory*, bool, KKSObjEditor*)) );
+    connect (editor, SIGNAL (updateAttributes (QWidget *, QScrollArea *, QWidget *, int, const KKSCategory *, KKSIndAttr::KKSIndAttrClass, KKSObjEditor*)), this, SLOT (regroupAttrs (QWidget *, QScrollArea *, QWidget *, int, const KKSCategory*, KKSIndAttr::KKSIndAttrClass, KKSObjEditor*)) );
     connect (editor, SIGNAL (saveObj(KKSObjEditor*, KKSObject*, KKSObjectExemplar*, int)), this, SLOT (saveObject(KKSObjEditor*, KKSObject*, KKSObjectExemplar*, int)) );
     connect (editor, SIGNAL (saveObjAsCommandResult(KKSObjEditor*, KKSObject*, KKSObjectExemplar*, int)), this, SLOT (saveObjectAsCommandResult(KKSObjEditor*, KKSObject*, KKSObjectExemplar*, int)) );
     connect (editor, SIGNAL (saveObjE(KKSObjEditor*, KKSObjectExemplar *, const KKSCategory*, QString, int)), this, SLOT (saveObjectEx(KKSObjEditor*, KKSObjectExemplar *, const KKSCategory*, QString, int)) );
@@ -1512,10 +1544,10 @@ void KKSObjEditorFactory :: setObjConnect (KKSObjEditor *editor)
     connect (editor, SIGNAL (exportObjectEx (KKSObjEditor *, int, const KKSCategory *, QString)), this, SLOT (exportEIO (KKSObjEditor *, int, const KKSCategory *, QString)) );
     connect (editor, SIGNAL (prepareIO (KKSObject*, KKSObjectExemplar *, KKSObjEditor*)), this, SLOT (sendIO (KKSObject *, KKSObjectExemplar *, KKSObjEditor *)) );
     
-    connect (editor, SIGNAL (editObjAttrRef (KKSObject *, const KKSAttrValue*, bool, QAbstractItemModel *)), this, SLOT (loadObjAttrRef (KKSObject *, const KKSAttrValue*, bool, QAbstractItemModel *)) );
-    connect (editor, SIGNAL (editObjCAttrRef (KKSObjectExemplar *, const KKSAttrValue*, bool, QAbstractItemModel *) ), this, SLOT (loadObjCAttrRef (KKSObjectExemplar *, const KKSAttrValue*, bool, QAbstractItemModel *) ) );
-    connect (editor, SIGNAL (delObjAttrRef (KKSObject *, const KKSAttrValue*, bool, QAbstractItemModel *, const QModelIndex&)), this, SLOT (loadObjDelAttrRef (KKSObject *, const KKSAttrValue*, bool, QAbstractItemModel *, const QModelIndex&)) );
-    connect (editor, SIGNAL (delObjCAttrRef (KKSObjectExemplar *, const KKSAttrValue*, bool, QAbstractItemModel *, const QModelIndex&)), this, SLOT (loadObjCDelAttrRef (KKSObjectExemplar *, const KKSAttrValue*, bool, QAbstractItemModel *, const QModelIndex&)) );
+    connect (editor, SIGNAL (editObjAttrRef (KKSObject *, const KKSAttrValue*, KKSIndAttr::KKSIndAttrClass, QAbstractItemModel *)), this, SLOT (loadObjAttrRef (KKSObject *, const KKSAttrValue*, KKSIndAttr::KKSIndAttrClass, QAbstractItemModel *)) );
+    connect (editor, SIGNAL (editObjCAttrRef (KKSObjectExemplar *, const KKSAttrValue*, KKSIndAttr::KKSIndAttrClass, QAbstractItemModel *) ), this, SLOT (loadObjCAttrRef (KKSObjectExemplar *, const KKSAttrValue*, KKSIndAttr::KKSIndAttrClass, QAbstractItemModel *) ) );
+    connect (editor, SIGNAL (delObjAttrRef (KKSObject *, const KKSAttrValue*, KKSIndAttr::KKSIndAttrClass, QAbstractItemModel *, const QModelIndex&)), this, SLOT (loadObjDelAttrRef (KKSObject *, const KKSAttrValue*, KKSIndAttr::KKSIndAttrClass, QAbstractItemModel *, const QModelIndex&)) );
+    connect (editor, SIGNAL (delObjCAttrRef (KKSObjectExemplar *, const KKSAttrValue*, KKSIndAttr::KKSIndAttrClass, QAbstractItemModel *, const QModelIndex&)), this, SLOT (loadObjCDelAttrRef (KKSObjectExemplar *, const KKSAttrValue*, KKSIndAttr::KKSIndAttrClass, QAbstractItemModel *, const QModelIndex&)) );
 
     connect (editor, SIGNAL (openRefIO (QString)), this, SLOT (loadRefIO (QString)) );
     connect (editor, SIGNAL (printReport(KKSObject*)), this, SLOT (printReport(KKSObject*)));
@@ -1773,7 +1805,7 @@ void KKSObjEditorFactory :: saveObject (KKSObjEditor* editor,
             
             //создание нового ИО
             //операция INSERT всегда разрешена
-            res = (i == 0 ? ppf->insertIO (wObj) : ppf->insertIO (io));
+            res = (i == 0 ? ppf->insertIO (wObj, editor) : ppf->insertIO (io, editor));
             
             if (wObj->id () > 0 && i==0){
                 pObjectEx->setId (wObj->id());
@@ -1807,7 +1839,7 @@ void KKSObjEditorFactory :: saveObject (KKSObjEditor* editor,
         }
         else //изменение существующего ИО
              //данная операция разрешена только для автора или ПОЛЬЗОВАТЕЛЯ, который на это уполномочен
-            res = ppf->updateIO (wObj);
+            res = ppf->updateIO (wObj, editor);
 
         if (res != OK_CODE)
         {
@@ -1936,7 +1968,7 @@ void KKSObjEditorFactory::filterEIO(KKSObjEditor * editor, int idObject, const K
         {
             KKSList<const KKSFilter *> fl;
             QString value = "select id from io_categories where id_io_category_type <> 2";//исключаем журналы
-            const KKSFilter * f = c->createFilter(12, value, KKSFilter::foInSQL);
+            const KKSFilter * f = c->createFilter(ATTR_ID_IO_CATEGORY, value, KKSFilter::foInSQL);
             if(!f){
                 qWarning() << __PRETTY_FUNCTION__ << "Cannon create system filter!!";
                 return;
@@ -1946,7 +1978,7 @@ void KKSObjEditorFactory::filterEIO(KKSObjEditor * editor, int idObject, const K
             f->release();
 
             value = "select id from io_categories where id_io_category_type <> 8";//исключаем системные справочники
-            f = c->createFilter(12, value, KKSFilter::foInSQL);
+            f = c->createFilter(ATTR_ID_IO_CATEGORY, value, KKSFilter::foInSQL);
             if(!f){
                 qWarning() << __PRETTY_FUNCTION__ << "Cannon create system filter!!";
                 return;
@@ -1956,7 +1988,7 @@ void KKSObjEditorFactory::filterEIO(KKSObjEditor * editor, int idObject, const K
             f->release();
 
             value = "select id from io_categories where id_io_category_type <> 9";//исключаем системный справочник категорий
-            f = c->createFilter(12, value, KKSFilter::foInSQL);
+            f = c->createFilter(ATTR_ID_IO_CATEGORY, value, KKSFilter::foInSQL);
             if(!f){
                 qWarning() << __PRETTY_FUNCTION__ << "Cannon create system filter!!";
                 return;
@@ -2848,6 +2880,8 @@ int KKSObjEditorFactory :: setIndicators (const KKSTemplate *t,
                                           bool updateView
                                           )
 {
+    Q_UNUSED(updateView);
+
     if (!t || !obj || !wObjE || (!c && !t->category()) || !indWidget || !gIndLay || !editor)
         return 0;
 
@@ -2984,7 +3018,7 @@ void KKSObjEditorFactory :: loadAttributeReference (QString tableName, QWidget *
             return;
         }
         KKSList<const KKSFilter *> fl;
-        const KKSFilter * f = ct->createFilter (1, value, KKSFilter::foInSQL);
+        const KKSFilter * f = ct->createFilter (ATTR_ID, value, KKSFilter::foInSQL);
         if (!f)
         {
             refObj->release();
@@ -3573,12 +3607,12 @@ void KKSObjEditorFactory :: addExecReference (QString tableName, QAbstractItemMo
 
 /* слот осуществляет скачивание файла из БД в локальную файловую систему.
  */
-void KKSObjEditorFactory :: slotDownloadFile(KKSFile * f)
+void KKSObjEditorFactory :: slotDownloadFile(KKSFile * f, const QWidget * parent)
 {
     if(!f)
         return;
 
-    int res = fileLoader->rGetFile(f->id(), f->localUrl());
+    int res = fileLoader->rGetFile(f->id(), f->localUrl(), -1, parent);
 
     if(res != OK_CODE){
         f->setLocalUrl(QString::null);
@@ -3684,7 +3718,7 @@ void KKSObjEditorFactory :: slotIncludeRequested(KKSObjEditor * editor)
     //KKSObjEditorFactory * oef = kksSito->oef();
 
     int idUser = loader->getUserId();
-    KKSFilter * filter = c->createFilter(13, QString::number(idUser), KKSFilter::foEq);
+    KKSFilter * filter = c->createFilter(ATTR_AUTHOR, QString::number(idUser), KKSFilter::foEq);
     if(!filter){
         o->release();
         return;
@@ -3750,12 +3784,12 @@ void KKSObjEditorFactory :: slotIncludeRecRequested(KKSObjEditor * editor)
     //KKSObjEditorFactory * oef = kksSito->oef();
 
     int idUser = loader->getUserId();
-    KKSFilter * filter = c->createFilter(13, QString::number(idUser), KKSFilter::foEq);
+    KKSFilter * filter = c->createFilter(ATTR_AUTHOR, QString::number(idUser), KKSFilter::foEq);
     if(!filter){
         o->release();
         return;
     }
-    KKSFilter * filterRef = c->createFilter(43, QString::number (2), KKSFilter::foEq);
+    KKSFilter * filterRef = c->createFilter(ATTR_ID_IO_TYPE, QString::number (2), KKSFilter::foEq);
     if (!filterRef)
     {
         filter->release ();
@@ -3919,7 +3953,7 @@ void KKSObjEditorFactory :: slotOpenRubricItemRecRequested(int idObjectE, KKSObj
 
 /* Слот выбирает подходящий пользовательский шаблон и перегруппировывает атрибуты.
  */
-void KKSObjEditorFactory :: regroupAttrs (QWidget *wIOAttr, QScrollArea *scIOattr, QWidget *ioAttrs, int idObj, const KKSCategory *c, bool isSystem, KKSObjEditor *editor)
+void KKSObjEditorFactory :: regroupAttrs (QWidget *wIOAttr, QScrollArea *scIOattr, QWidget *ioAttrs, int idObj, const KKSCategory *c, KKSIndAttr::KKSIndAttrClass isSystem, KKSObjEditor *editor)
 {
     KKSObject *wObj = idObj > 0 ? loader->loadIO (idObj, false) : editor->getObj();
     if (!wObj || !editor )//|| (!c && !isSystem))
@@ -3928,7 +3962,7 @@ void KKSObjEditorFactory :: regroupAttrs (QWidget *wIOAttr, QScrollArea *scIOatt
     KKSTemplate * tDef;
     KKSList<KKSTemplate*> tListDb;
     KKSObject *io = 0;
-    if (isSystem)
+    if (isSystem == KKSIndAttr::KKSIndAttrClass::iacTableAttr)
     {
         io = loader->loadIO (IO_IO_ID, false);
         if (!io)
@@ -3972,7 +4006,7 @@ void KKSObjEditorFactory :: regroupAttrs (QWidget *wIOAttr, QScrollArea *scIOatt
         tRef->addRef();
         if (f->isSave ())
         {
-            if (isSystem)
+            if (isSystem == KKSIndAttr::KKSIndAttrClass::iacTableAttr)
                 io->setAttrTemplate (tRef);
             else
                 wObj->setAttrTemplate (tRef);
@@ -3980,7 +4014,7 @@ void KKSObjEditorFactory :: regroupAttrs (QWidget *wIOAttr, QScrollArea *scIOatt
             //так ни в коем случае нельзя делать!!!
             //int res = ppf->updateIO (isSystem ? io : wObj);
             //надо просто обновить информацию о пользовательских шаблонах
-            int ok = ppf->updateUserTemplates(isSystem ? io : wObj);
+            int ok = ppf->updateUserTemplates(isSystem == KKSIndAttr::KKSIndAttrClass::iacTableAttr ? io : wObj);
             if(ok != OK_CODE){
                 QMessageBox::critical(editor, tr("Error"), tr("Cannot update templates!"), QMessageBox::Ok);
                 f->setParent (0);
@@ -3996,7 +4030,7 @@ void KKSObjEditorFactory :: regroupAttrs (QWidget *wIOAttr, QScrollArea *scIOatt
     if (!tRef)
         return;
 
-    if (isSystem)
+    if (isSystem == KKSIndAttr::KKSIndAttrClass::iacTableAttr)
         editor->setSysTemplate (tRef);
     else
         editor->setIoTemplate (tRef);
@@ -4006,7 +4040,7 @@ void KKSObjEditorFactory :: regroupAttrs (QWidget *wIOAttr, QScrollArea *scIOatt
 
     if (ioAttrs)
     {
-        if (isSystem)
+        if (isSystem == KKSIndAttr::KKSIndAttrClass::iacTableAttr)
             editor->setSysAttrWidgets (wIOAttr, scIOattr, 0);
         else
             editor->setIOAttrWidgets (wIOAttr, scIOattr, 0);
@@ -4025,7 +4059,7 @@ void KKSObjEditorFactory :: regroupAttrs (QWidget *wIOAttr, QScrollArea *scIOatt
     QWidget *ioAttrsW = new QWidget ();
     QGridLayout *gIOAttrLay = new QGridLayout (ioAttrsW);
     ioAttrsW->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Fixed);
-    if (isSystem)
+    if (isSystem == KKSIndAttr::KKSIndAttrClass::iacTableAttr)
     {
         editor->setSysAttrWidgets (wIOAttr, scIOAttrs, ioAttrsW);
         editor->clearSysOpts ();
@@ -4037,7 +4071,7 @@ void KKSObjEditorFactory :: regroupAttrs (QWidget *wIOAttr, QScrollArea *scIOatt
     }
     
     ioAttrsW->setLayout (gIOAttrLay);
-    if (isSystem)
+    if (isSystem == KKSIndAttr::KKSIndAttrClass::iacTableAttr)
     {
         KKSObjectExemplar *wObjE = editor->getObjectEx();//KKSConverter::objToExemplar (loader, wObj);// loader->loadEIO (idObj, io);
         if (!wObjE)
@@ -4297,7 +4331,12 @@ void KKSObjEditorFactory :: importCSV (QIODevice *csvDev, QString codeName, QStr
  * cat -- категория справочника должна соответствовать категории таблиц справочника ИО
  * tableName -- название целевой таблицы
  */
-void KKSObjEditorFactory :: importCopies (KKSObject *io, const QStringList& attrCodeList, const QList<QStringList>& oesList, KKSObjEditor *oEditor, const KKSCategory *cat, const QString& tableName)
+void KKSObjEditorFactory :: importCopies (KKSObject *io, 
+                                          const QStringList& attrCodeList, 
+                                          const QList<QStringList>& oesList, 
+                                          KKSObjEditor *oEditor, 
+                                          const KKSCategory *cat, 
+                                          const QString& tableName)
 {
     if (!io || !oEditor)
         return;
@@ -4310,6 +4349,7 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io, const QStringList& attr
     KKSList<KKSObjectExemplar *> oeList;
     int n = oesList.count();
     int m = attrCodeList.count();
+    
     QProgressDialog *pImportD = new QProgressDialog ();//tr("Import Copies"), tr("Abort import"), 0, n*m);
     QLabel *lImport = new QLabel (tr("Generate Records"), pImportD);
     pImportD->setLabel (lImport);
@@ -4329,6 +4369,53 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io, const QStringList& attr
     pImportD->setMinimumDuration (0);
     pImportD->show ();
     qDebug () << __PRETTY_FUNCTION__ << pImportD->isVisible () << pImportD->labelText();// << pbCancelButton->isVisible () << pBar->isVisible ();
+    
+    KKSList<KKSAttribute *> attrList;
+    KKSList<const KKSCategoryAttr*> cAttrList;
+    //KKSList<KKSObject*> refObjList;
+    
+    for (int j=0; j<m; j++){
+        KKSAttribute *attr = loader->loadAttribute (attrCodeList[j], io->tableName());
+        if(!attr)
+            continue;
+
+        attrList.append(attr);
+
+        const KKSCategoryAttr *cAttr = cat->attribute(attr->id());
+        if(!cAttr)
+            cAttr = new KKSCategoryAttr();
+
+        cAttrList.append(cAttr);
+
+        /*KKSObject * obj = NULL;
+        if(cAttr->id() > 0){
+            KKSAttrType :: KKSAttrTypes iType = cAttr->type()->attrType();
+            if(iType == KKSAttrType::atList || 
+               iType == KKSAttrType::atRecordColorRef ||
+               iType == KKSAttrType::atRecordTextColorRef
+               )
+            {
+                QString tName = cAttr->tableName ();
+                obj = loader->loadIO (tName, true);
+            }
+        }
+        
+        if(!obj)
+            obj = new KKSObject();
+
+        refObjList.append(obj);
+        obj->release();
+        */
+        
+            
+        cAttr->release();
+
+        if(attr)
+            attr->release();
+    }
+    
+    int m1 = attrList.count();
+
     for (int i=0; i<n; i++)
     {
         KKSObjectExemplar *oe = new KKSObjectExemplar ();
@@ -4342,10 +4429,11 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io, const QStringList& attr
         }
         if (!oe)
             continue;
+        
         oe->setIo (io);
-        for (int j=0; j<m; j++)
+        
+        for (int j=0; j<m1; j++)
         {
-            //pBar->setValue (v++);
             pImportD->setValue (v++);
             if (pImportD->wasCanceled())
             {
@@ -4353,54 +4441,54 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io, const QStringList& attr
                 delete pImportD;
                 return;
             }
-            QString attrCode = attrCodeList[j];
-            //qDebug () << __PRETTY_FUNCTION__ << attrCode;
-            KKSAttribute *attr = loader->loadAttribute (attrCode, io->tableName());
-            if (!attr)
+            
+            if (!attrList[j])
                 continue;
-            const KKSCategoryAttr *cAttr = cat->attribute(attr->id());//KKSCategoryAttr::create (attr, false, false);
-            if (!cAttr)
-            {
-                attr->release ();
+
+            const KKSCategoryAttr *cAttr = cAttrList[j];//здесь NULL никогда не вернется
+            if (!cAttr || cAttr->id() <= 0)
                 return;
-            }
+
             KKSAttrType :: KKSAttrTypes iType = cAttr->type()->attrType();
-            //qDebug () << __PRETTY_FUNCTION__ << iType << cAttr->code (true) << attr->code (true);
-            KKSValue val;// (oesList[i][j], iType);//cAttr->type()->attrType());
+
+            KKSValue val;
             if (iType == KKSAttrType::atList || 
                 iType == KKSAttrType::atParent ||
                 iType == KKSAttrType::atRecordColorRef ||
                 iType == KKSAttrType::atRecordTextColorRef)
             {
+                
                 QString av_str (oesList[i][j]);
-                KKSValue refVal (av_str, cAttr->refType()->attrType());
+                av_str.replace(QString("\\\n"), QChar('\n'), Qt::CaseInsensitive);
+                av_str.replace(QString("\\\'"), QChar('\''), Qt::CaseInsensitive);
+                av_str.replace(QString("\\\""), QChar('\"'), Qt::CaseInsensitive);
+                
+                //KKSValue refVal (av_str, cAttr->refType()->attrType());
+                val = KKSValue(av_str, cAttr->refType()->attrType());
+                
+                /*KSA
                 QMap<int, QString> values;
                 QMap<int, QString> refColumnValues;
+                
                 if (iType != KKSAttrType::atParent)
                 {
-                    QString tName = cAttr->tableName ();
-                    KKSObject * refObj = loader->loadIO (tName, true);
-                    if (!refObj)
+                    KKSObject * refObj = refObjList[j];
+                    if (!refObj || refObj->id() <= 0)
                         continue;
 
                     KKSCategory * cRef = refObj->category();
                     if (!cRef)
-                    {
-                        refObj->release ();
                         continue;
-                    }
+                    
                     bool isXml = false;
                     cRef = cRef->tableCategory();
                     if (cRef)
                         isXml = isXml || cRef->isAttrTypeContains(KKSAttrType::atXMLDoc) || cRef->isAttrTypeContains (KKSAttrType::atSVG);
-                    int iVal (-1);
-                    KKSAttribute * rattr = loader->loadAttribute (cAttr->columnName(), tName);
-                    if (!rattr)
-                    {
-                        refObj->release ();
-                        continue;
-                    }
-                    KKSCategoryAttr * refAttr = cRef->attribute(rattr->id());
+                    
+                    //KKSAttribute * rattr = loader->loadAttribute (cAttr->columnName(), tName);
+                    //if (!rattr)
+                    //    continue;
+                    
                     
                     values = loader->loadAttributeValues (cAttr, refColumnValues, isXml, !isXml, QString(), KKSList<const KKSFilterGroup*>());
                     for (QMap<int, QString>::iterator pv=values.begin(); pv!= values.end(); pv++)
@@ -4409,15 +4497,17 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io, const QStringList& attr
                         pv.value().replace (QChar('\''), QString("\\'"), Qt::CaseInsensitive);
                         pv.value().replace (QChar('\"'), QString("\\\""), Qt::CaseInsensitive);
                     }
-                    //qDebug () << __PRETTY_FUNCTION__ << QString::compare (values.begin().value().mid (0, 100), refVal.value().mid (0, 100), Qt::CaseInsensitive) << values.begin().value().mid (1, 100) << refVal.value().mid(1, 100) << oesList[i][j].size();
+                    
                     int pkey = values.key (refVal.value(), -1);
                     QMap<int, QString>::const_iterator pv = values.constFind (pkey);
                     if (pv != values.constEnd())
                         val = KKSValue (QString::number (pv.key()), iType);
                     else
                         val = KKSValue (QString(), iType);
-                    rattr->release ();
-                    refObj->release ();
+
+                    
+                    //rattr->release ();
+                    //refObj->release ();
 
                 }
                 else
@@ -4438,6 +4528,7 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io, const QStringList& attr
                     else
                         val = KKSValue (QString(), iType);
                 }
+                KSA*/
             }
             else if (iType == KKSAttrType::atCheckList ||
                         iType == KKSAttrType::atCheckListEx)
@@ -4451,6 +4542,8 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io, const QStringList& attr
                     if (rValues[ii].endsWith("\""))
                         rValues[ii] = rValues[ii].mid (0, rValues[ii].size()-1);
                 }
+
+                /*KSA
                 QMap<int, QString> values;
                 QMap<int, QString> refColumnValues;
                 QString tName = cAttr->tableName ();
@@ -4468,21 +4561,21 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io, const QStringList& attr
                 cRef = cRef->tableCategory();
                 if (cRef)
                     isXml = isXml || cRef->isAttrTypeContains(KKSAttrType::atXMLDoc) || cRef->isAttrTypeContains (KKSAttrType::atSVG);
-                int iVal (-1);
+                //int iVal (-1);
                 KKSAttribute * rattr = loader->loadAttribute (cAttr->columnName(), tName);
                 if (!rattr)
                 {
                     refObj->release ();
                     continue;
                 }
-                KKSCategoryAttr * refAttr = cRef->attribute(rattr->id());
+                //KKSCategoryAttr * refAttr = cRef->attribute(rattr->id());
 
                 values = loader->loadAttributeValues (cAttr, refColumnValues, isXml, !isXml, QString(), KKSList<const KKSFilterGroup*>());
                 for (QMap<int, QString>::iterator pv=values.begin(); pv!= values.end(); pv++)
                 {
-                    pv.value().replace (QChar('\n'), QString("\\n"), Qt::CaseInsensitive);
-                    pv.value().replace (QChar('\''), QString("\\'"), Qt::CaseInsensitive);
-                    pv.value().replace (QChar('\"'), QString("\\\""), Qt::CaseInsensitive);
+                    pv.value().replace(QString("\\\n"), QChar('\n'), Qt::CaseInsensitive);
+                    pv.value().replace(QString("\\\'"), QChar('\''), Qt::CaseInsensitive);
+                    pv.value().replace(QString("\\\""), QChar('\"'), Qt::CaseInsensitive);
                 }
                 qDebug () << __PRETTY_FUNCTION__ << rValues << values;
                 QList<int> pKeys;
@@ -4493,31 +4586,55 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io, const QStringList& attr
                     if (pkey > 0)
                         pKeys.append (pkey);
                 }
+                KSA*/
+                
                 QString vArr ("{");
-                for (int ii=0; ii<pKeys.count(); ii++)
-                    vArr += QString("%1%2").arg (pKeys[ii]).arg (ii<pKeys.count()-1 ? QString (",") : QString());
+                for (int ii=0; ii<rValues.count(); ii++){
+                    QString a = rValues[ii];
+
+                    a.replace(QString("\\\n"), QChar('\n'), Qt::CaseInsensitive);
+                    a.replace(QString("\\\'"), QChar('\''), Qt::CaseInsensitive);
+                    a.replace(QString("\\\""), QChar('\"'), Qt::CaseInsensitive);
+                    a.replace(QString("\\\,"), QChar('\,'), Qt::CaseInsensitive);
+                
+                    vArr += QString("'%1'%2").arg (rValues[ii])
+                                           .arg (ii<rValues.count()-1 ? QString (",") : QString());
+                }
+
                 vArr += QString ("}");
                 qDebug () << __PRETTY_FUNCTION__ << vArr;
+                
+
                 val = KKSValue (vArr, iType);
-                rattr->release ();
-                refObj->release ();
+                //KSA rattr->release ();
+                //KSA refObj->release ();
             }
-            else
-                val = KKSValue (oesList[i][j], iType);
+            else{
+                QString av_str = oesList[i][j];
+                
+                av_str.replace(QString("\\\n"), QChar('\n'), Qt::CaseInsensitive);
+                av_str.replace(QString("\\\'"), QChar('\''), Qt::CaseInsensitive);
+                av_str.replace(QString("\\\""), QChar('\"'), Qt::CaseInsensitive);
+                val = KKSValue (av_str, iType);
+            }
             //if (iType == KKSAttrType :: atSVG)
                 //qDebug () << __PRETTY_FUNCTION__ << cAttr->code (true) << val.value() << iType << val.isNull();
+            
             KKSAttrValue *av = new KKSAttrValue (val, const_cast<KKSCategoryAttr*>(cAttr));
             if (av)
             {
                 oe->addAttrValue (av);
                 av->release ();
             }
-            attr->release ();
+            
         }
+
         oeList.append (oe);
         oe->release ();
-        //qDebug () << __PRETTY_FUNCTION__ << v << pImportD->value () << n*m;
-    }
+    
+    } //outer for
+
+   
     pImportD->hide ();
 
     pImportD->setMaximum (0);
@@ -4526,7 +4643,7 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io, const QStringList& attr
     pImportD->setWindowTitle (tr("Save into DB"));
     pImportD->show ();
     QString tabName = tableName.isEmpty() ? io->tableName() : tableName;
-    int res = eiof->insertEIOList (oeList, cat, tabName, pImportD);
+    int res = eiof->insertEIOList (oeList, cat, tabName, pImportD, true);
     pImportD->hide ();
     if (res == ERROR_CODE)
     {
@@ -4868,9 +4985,33 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // целевой CSV файл
             switch (pc.key())
             {
                 case 1: oeStream << oeList[i]->id (); break;
-                case 2: oeStream << tDelim << oeList[i]->name() << tDelim; break;
-                case 3: oeStream << tDelim << oeList[i]->desc() << tDelim; break;
-                case 6: oeStream << tDelim << oeList[i]->code() << tDelim; break;
+                case 2: 
+                       {
+                           QString av_str = oeList[i]->name();
+                           av_str.replace (QChar('\n'), QString("\\n"), Qt::CaseInsensitive);
+                           av_str.replace (QChar('\''), QString("\\'"), Qt::CaseInsensitive);
+                           av_str.replace (tDelim, QString("\\%1").arg (tDelim), Qt::CaseInsensitive);
+                           oeStream << tDelim << av_str << tDelim; 
+                       }
+                    break;
+                case 3: 
+                       {
+                           QString av_str = oeList[i]->desc();
+                           av_str.replace (QChar('\n'), QString("\\n"), Qt::CaseInsensitive);
+                           av_str.replace (QChar('\''), QString("\\'"), Qt::CaseInsensitive);
+                           av_str.replace (tDelim, QString("\\%1").arg (tDelim), Qt::CaseInsensitive);
+                           oeStream << tDelim << av_str << tDelim; 
+                       }
+                    break;
+                case 6: 
+                       {
+                           QString av_str = oeList[i]->code();
+                           av_str.replace (QChar('\n'), QString("\\n"), Qt::CaseInsensitive);
+                           av_str.replace (QChar('\''), QString("\\'"), Qt::CaseInsensitive);
+                           av_str.replace (tDelim, QString("\\%1").arg (tDelim), Qt::CaseInsensitive);
+                           oeStream << tDelim << av_str << tDelim; 
+                       }
+                    break;
                 default:
                         {
                             KKSAttrValue * av = oeList[i]->attrValueIndex (j);//pc.key());
@@ -4893,10 +5034,11 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // целевой CSV файл
                                     oeStream << QString();
                                     continue;
                                 }
-                                QMap<int, QString> values;
-                                QMap<int, QString> refColumnValues;
+                                //KSA QMap<int, QString> values;
+                                //KSA QMap<int, QString> refColumnValues;
                                 if (pc.value()->type()->attrType() != KKSAttrType::atParent)
                                 {
+                                    /*KSA
                                     QString tName = av->attribute()->tableName ();
                                     KKSObject * refObj = loader->loadIO (tName, true);
                                     if (!refObj)
@@ -4920,21 +5062,27 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // целевой CSV файл
                                                                         !isXml, 
                                                                         QString::null, 
                                                                         KKSList<const KKSFilterGroup*>());
+                                    KSA*/
 
                                 }
                                 else
                                 {
+                                    /*KSA
                                     values = loader->loadAttributeValues (av->attribute(), 
                                                                         refColumnValues,
                                                                         true, 
                                                                         true, 
                                                                         tableName.isEmpty() ? av->attribute()->tableName() : tableName,
                                                                         KKSList<const KKSFilterGroup*>());
+                                    KSA*/
                                 }
-                                int iVal = 0;
+                                //KSA int iVal = 0;
+                                /*KSA
                                 QVariant cV = av->value().valueVariant();
+                                KSA*/
                                 
                                 //qDebug () << __PRETTY_FUNCTION__ << cV;
+                                /*KSA
                                 if (av->attribute()->refColumnName().isEmpty() || 
                                     av->attribute()->refColumnName() == "id")
                                 {
@@ -4951,8 +5099,10 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // целевой CSV файл
                                     if (id > 0)
                                         iVal = id;
                                 }
+                                KSA*/
 
                                 //qDebug () << __PRETTY_FUNCTION__ << iVal << values;
+                                /*KSA
                                 QMap<int, QString>::const_iterator pv = values.constFind (iVal);
                                 if (pv != values.constEnd())
                                 {
@@ -4967,6 +5117,15 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // целевой CSV файл
                                 }
                                 else
                                     oeStream << tDelim << QString() << tDelim;
+                                KSA*/
+                                QString av_str (av->value().columnValue());
+                                if (!av_str.isEmpty ())
+                                {
+                                    av_str.replace (QChar('\n'), QString("\\n"), Qt::CaseInsensitive);
+                                    av_str.replace (QChar('\''), QString("\\'"), Qt::CaseInsensitive);
+                                    av_str.replace (tDelim, QString("\\%1").arg (tDelim), Qt::CaseInsensitive);
+                                }
+                                oeStream << tDelim << av_str << tDelim;
 
                             }
                             else if (pc.value()->type()->attrType() == KKSAttrType::atCheckList ||
@@ -5010,7 +5169,7 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // целевой CSV файл
                                 if (av->attribute()->refColumnName().isEmpty() || 
                                     av->attribute()->refColumnName() == "id")
                                 {
-                                    bool ok = false;
+                                    //bool ok = false;
                                     sVals = cV.toStringList();//toInt(&ok);
                                     for (int ii=0; ii<sVals.count(); ii++)
                                         iVals.append (sVals[ii].toInt());
@@ -5312,7 +5471,7 @@ void KKSObjEditorFactory :: sendIO (KKSObject *wObj, KKSObjectExemplar *wObjE, K
     if (wObj || wObjE)
     {
         KKSList<const KKSFilter *> filters;
-        KKSFilter * filter = c->createFilter (1, QString::number (idObj)/*(wObj ? wObj->id() : wObjE->id()))*/, KKSFilter::foEq);
+        KKSFilter * filter = c->createFilter (ATTR_ID, QString::number (idObj)/*(wObj ? wObj->id() : wObjE->id()))*/, KKSFilter::foEq);
         filters.append (filter);
         filter->release ();
         
@@ -5406,7 +5565,7 @@ void KKSObjEditorFactory :: addSendIO (void)
 
     for (int i=0; i<idIOs.count(); i++)
     {
-        KKSFilter * f = c->createFilter (1, QString::number (idIOs[i]), KKSFilter::foNotEq);
+        KKSFilter * f = c->createFilter (ATTR_ID, QString::number (idIOs[i]), KKSFilter::foNotEq);
         filters.append (f);
     }
    
@@ -5551,7 +5710,7 @@ void KKSObjEditorFactory :: loadAttributeFilters (KKSAttribute * attr, QComboBox
         //
         // исключаем системные категории
         //
-        const KKSFilter * f = c->createFilter(1, value, KKSFilter::foInSQL);
+        const KKSFilter * f = c->createFilter(ATTR_ID, value, KKSFilter::foInSQL);
         if(!f){
             qWarning() << __PRETTY_FUNCTION__ << "Cannon create system filter!!";
             refObj->release ();
@@ -5565,7 +5724,7 @@ void KKSObjEditorFactory :: loadAttributeFilters (KKSAttribute * attr, QComboBox
         //
         // исключаем системные подчиненные категории
         //
-        f = c->createFilter(1, value, KKSFilter::foInSQL);
+        f = c->createFilter(ATTR_ID, value, KKSFilter::foInSQL);
         if(!f){
             qWarning() << __PRETTY_FUNCTION__ << "Cannon create system filter!!";
             refObj->release ();
@@ -5587,7 +5746,7 @@ void KKSObjEditorFactory :: loadAttributeFilters (KKSAttribute * attr, QComboBox
         //
         // исключаем системных пользователей
         //
-        const KKSFilter * f = c->createFilter(1, value, KKSFilter::foInSQL);
+        const KKSFilter * f = c->createFilter(ATTR_ID, value, KKSFilter::foInSQL);
         if(!f){
             qWarning() << __PRETTY_FUNCTION__ << "Cannon create system filter!!";
             refObj->release ();
@@ -5602,9 +5761,14 @@ void KKSObjEditorFactory :: loadAttributeFilters (KKSAttribute * attr, QComboBox
         filters.append(fg);
         fg->release();
     }
+
     KKSMap<qint64, KKSEIOData *> refRec = loader->loadEIOList (refObj, filters);
     KKSMap<qint64, KKSEIOData *>::const_iterator p;
     cbList->clear ();
+    
+    //если атрибут типа ссылка ссылается на поле, отличное от id (например, в случае справочников "погруженных" в среду DynamicDocs из внешней схемы БД)
+    //В качестве userData в комбобоксе надо использовать именно его
+
     for (p = refRec.constBegin(); p != refRec.constEnd(); p++)
     {
         
@@ -5614,7 +5778,10 @@ void KKSObjEditorFactory :: loadAttributeFilters (KKSAttribute * attr, QComboBox
 //        else{
 //            title = p.value()->fields
 //        }
-        cbList->addItem (title, p.key());
+        
+        QString key = p.value()->fields().value(attr->refColumnName());
+        cbList->addItem (title, key);
+        //cbList->addItem (title, p.key());
     }
 
     refObj->release ();
@@ -6109,7 +6276,7 @@ void KKSObjEditorFactory :: addIOTable (KKSObject * wObj, KKSObjEditor * editor)
     //
     // только справочники
     //
-    const KKSFilter * f = ct->createFilter(1, value, KKSFilter::foInSQL);
+    const KKSFilter * f = ct->createFilter(ATTR_ID, value, KKSFilter::foInSQL);
     if (!f)
     {
         c->release ();
@@ -6193,7 +6360,7 @@ void KKSObjEditorFactory :: addIOTable (KKSObject * wObj, KKSObjEditor * editor)
  * isSystem -- не используется
  * sMod -- модель значений атрибутов
  */
-void KKSObjEditorFactory :: loadObjAttrRef (KKSObject * wObj, const KKSAttrValue* avE, bool isSystem, QAbstractItemModel * sMod)
+void KKSObjEditorFactory :: loadObjAttrRef (KKSObject * wObj, const KKSAttrValue* avE, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sMod)
 {
     if (!wObj || !avE || !sMod)
         return;
@@ -6223,7 +6390,7 @@ void KKSObjEditorFactory :: loadObjAttrRef (KKSObject * wObj, const KKSAttrValue
         sl << QString::number (sMod->data (sMod->index (i, 0), Qt::UserRole).toInt());
 
     QString value = sl.isEmpty() ? QString ("select id from %1").arg (tableName) : QString ("select id from %1 where id not in (%2)").arg (tableName).arg (sl.join (","));
-    const KKSFilter * f = ct->createFilter (1, value, KKSFilter::foInSQL);
+    const KKSFilter * f = ct->createFilter (ATTR_ID, value, KKSFilter::foInSQL);
     if (!f){
         refObj->release();
         return;
@@ -6256,7 +6423,8 @@ void KKSObjEditorFactory :: loadObjAttrRef (KKSObject * wObj, const KKSAttrValue
     {
         QStringList sl;
         KKSAttrValue * av = wObj->attrValueId (avE->attribute()->id());
-        if (!av && wObj->id() <= 0)
+        
+        if (!av /*&& wObj->id() <= 0*/) //новый ИО создаем
         {
             QString s;
             KKSValue val (s, KKSAttrType::atCheckListEx);
@@ -6276,9 +6444,10 @@ void KKSObjEditorFactory :: loadObjAttrRef (KKSObject * wObj, const KKSAttrValue
             wObj->addAttrValue (av);
             wEditor->setObjChanged (true);
         }
-        qDebug () << __PRETTY_FUNCTION__ << (av ? av->value().value() : QString());
+        
         if (av)
             sl = av->value().value().split (",");
+        
         if (!sl.contains (QString::number (recEditor->getID())))
         {
             sl += QString::number (recEditor->getID());
@@ -6305,11 +6474,13 @@ void KKSObjEditorFactory :: loadObjAttrRef (KKSObject * wObj, const KKSAttrValue
  * isSystem -- не используется
  * sMod -- модель значений атрибутов
  */
-void KKSObjEditorFactory :: loadObjCAttrRef (KKSObjectExemplar * wObjE, const KKSAttrValue* avE, bool isSystem, QAbstractItemModel * sMod)
+void KKSObjEditorFactory :: loadObjCAttrRef (KKSObjectExemplar * wObjE, const KKSAttrValue* avE, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sMod)
 {
     if (!wObjE || !avE || !sMod)
         return;
+    
     qDebug () << __PRETTY_FUNCTION__ << wObjE->id() << avE->attribute()->id() << avE->attribute()->type()->id() << isSystem;
+    
     QString tableName = avE->attribute()->tableName ();
     KKSObject *refObj = loader->loadIO (tableName, true);
     if (!refObj)
@@ -6333,7 +6504,8 @@ void KKSObjEditorFactory :: loadObjCAttrRef (KKSObjectExemplar * wObjE, const KK
         sl << QString::number (sMod->data (sMod->index (i, 0), Qt::UserRole).toInt());
 
     QString value = sl.isEmpty() ? QString ("select id from %1").arg (tableName) : QString ("select id from %1 where id not in (%2)").arg (tableName).arg (sl.join (","));
-    const KKSFilter * f = ct->createFilter (1, value, KKSFilter::foInSQL);
+    
+    const KKSFilter * f = ct->createFilter (ATTR_ID, value, KKSFilter::foInSQL);
     if (!f){
         refObj->release();
         return;
@@ -6398,10 +6570,10 @@ void KKSObjEditorFactory :: loadObjCAttrRef (KKSObjectExemplar * wObjE, const KK
             wObjE->addAttrValue (av);
             wEditor->setObjChanged (true);
         }
-        //qDebug () << __PRETTY_FUNCTION__ << (av ? av->value().value() : QString());
+        
         if (!av)
         {
-            QMessageBox::critical (wEditor, av->attribute()->title(), tr("Cannot set value"), QMessageBox::Ok, QMessageBox::NoButton);
+            QMessageBox::critical (wEditor, avE->attribute()->title(), tr("Cannot set value"), QMessageBox::Ok, QMessageBox::NoButton);
         }
         else
         {
@@ -6445,7 +6617,7 @@ void KKSObjEditorFactory :: updateAttrModel (const QModelIndex & wIndex, QAbstra
     KKSCategory * ct = c->tableCategory ();
     if (!ct)
         return;
-    const KKSFilter * f = ct->createFilter (1, value, KKSFilter::foInSQL);
+    const KKSFilter * f = ct->createFilter (ATTR_ID, value, KKSFilter::foInSQL);
     KKSList <const KKSFilter *> fl;
     fl.append (f);
     f->release ();
@@ -6453,20 +6625,32 @@ void KKSObjEditorFactory :: updateAttrModel (const QModelIndex & wIndex, QAbstra
     fg->setFilters (fl);
     filters.append (fg);
     fg->release ();
+    
     KKSMap<qint64, KKSEIOData *> eioList = loader->loadEIOList (refIO, filters);
+    
     KKSMap<int, KKSCategoryAttr *> attrs = ct->attributes ();
     int ii=0;
+    
     for (KKSMap<qint64, KKSEIOData *>::const_iterator pv = eioList.constBegin(); pv!=eioList.constEnd(); pv++)
     {
+        /*
         KKSObjectExemplar * wObjC = loader->loadEIO (pv.key(), refIO);
         if (!wObjC)
             continue;
+        */
+
         int ic=0;
+        
+        KKSEIOData * eData = pv.value();
         for (KKSMap<int, KKSCategoryAttr *>::const_iterator pa = attrs.constBegin(); \
                                                             pa != attrs.constEnd(); \
                                                             pa++)
         {
+            QString fValue = eData->fieldValue(pa.value()->code());
+
+            
             QModelIndex saInd = sMod->index (row, ic);
+            /*
             KKSAttrValue * av = wObjC->attrValue (pa.value()->id());
             QVariant val = av ? av->value().valueVariant () : QVariant();
             if (av->attribute()->type()->attrType() == KKSAttrType::atJPG)
@@ -6486,11 +6670,14 @@ void KKSObjEditorFactory :: updateAttrModel (const QModelIndex & wIndex, QAbstra
                 QString cV = avals.value (tVal.toInt());
                 val = cV;
             }
+            */
+
             sMod->setData (saInd, pv.key(), Qt::UserRole);
-            sMod->setData (saInd, val, Qt::DisplayRole);
+            sMod->setData (saInd, fValue, Qt::DisplayRole);
+            //sMod->setData (saInd, val, Qt::DisplayRole);
             ic++;
         }
-        wObjC->release ();
+        //wObjC->release ();
         ii++;
     }
 }
@@ -6502,12 +6689,13 @@ void KKSObjEditorFactory :: updateAttrModel (const QModelIndex & wIndex, QAbstra
  * isSystem -- не используется
  * sMod -- модель значений атрибутов
  */
-void KKSObjEditorFactory :: loadObjDelAttrRef (KKSObject * wObj, const KKSAttrValue* avE, bool isSystem, QAbstractItemModel * sourceModel, const QModelIndex& wInd)
+void KKSObjEditorFactory :: loadObjDelAttrRef (KKSObject * wObj, const KKSAttrValue* avE, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel, const QModelIndex& wInd)
 {
     Q_UNUSED (isSystem);
+
     if (!wObj || !avE || !sourceModel || !wInd.isValid())
         return;
-    //qDebug () << __PRETTY_FUNCTION__ << wObj->id () << attribute->id() << wInd << isSystem;
+    
     QString tableName = avE->attribute()->tableName ();
     KKSObject *refObj = loader->loadIO (tableName, true);
     if (!refObj)
@@ -6553,12 +6741,13 @@ void KKSObjEditorFactory :: loadObjDelAttrRef (KKSObject * wObj, const KKSAttrVa
     refObj->release();
 }
 
-void KKSObjEditorFactory :: loadObjCDelAttrRef (KKSObjectExemplar * wObjE, const KKSAttrValue* avE, bool isSystem, QAbstractItemModel * sourceModel, const QModelIndex& wInd)
+void KKSObjEditorFactory :: loadObjCDelAttrRef (KKSObjectExemplar * wObjE, const KKSAttrValue* avE, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel, const QModelIndex& wInd)
 {
     if (!wObjE || !avE || !sourceModel || !wInd.isValid())
         return;
-    //qDebug () << __PRETTY_FUNCTION__ << wObjE->id () << attribute->id() << wInd << isSystem;
+    
     Q_UNUSED (isSystem);
+    
     QString tableName = avE->attribute()->tableName ();
     KKSObject *refObj = loader->loadIO (tableName, true);
     if (!refObj)
@@ -6572,7 +6761,10 @@ void KKSObjEditorFactory :: loadObjCDelAttrRef (KKSObjectExemplar * wObjE, const
 
     QWidget * wEditor = qobject_cast<QWidget *>(this->sender());
 
-    int res = QMessageBox::question (wEditor, tr("Delete value from %1").arg (avE->attribute()->title()), tr("Do you really want to delete ?"), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Cancel);
+    int res = QMessageBox::question (wEditor, 
+                                     tr("Delete value from %1").arg (avE->attribute()->title()), 
+                                     tr("Do you really want to delete ?"), 
+                                     QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
 
     if (res == QMessageBox::Yes)
     {
@@ -6763,7 +6955,7 @@ int KKSObjEditorFactory :: putAttrsGroupsOnWidget ( KKSObject * obj,
         if (!a->isVisible() || (obj->id () == IO_IO_ID && (a->id () == ATTR_NAME || a->id () == ATTR_MACLABEL)) )
             continue;
 
-        int id = a->id();
+        //int id = a->id();
         
         KKSAttrValue * av = NULL;
         //bool isAvalsSet = false;
@@ -6808,11 +7000,24 @@ int KKSObjEditorFactory :: putAttrsGroupsOnWidget ( KKSObject * obj,
         if (av && av->id() < 0)
             qDebug () << __PRETTY_FUNCTION__ << av->id();
         if (isGrouped)
-            m_awf->putAttrWidget (av, editor, gbLay, n_str, 0, (tableName.isEmpty () ? obj->tableName() : tableName), (c ? c->id():-1));
+            m_awf->putAttrWidget (av, 
+                                  editor, 
+                                  gbLay, 
+                                  n_str, 
+                                  KKSIndAttr::KKSIndAttrClass::iacTableAttr, 
+                                  (tableName.isEmpty () ? obj->tableName() : tableName), 
+                                  (c ? c->id():-1));
         else
         {
             gAttrLayout->setVerticalSpacing (10);
-            m_awf->putAttrWidget (av, editor, gAttrLayout, nc, 0, obj->tableName(), (c ? c->id():-1));
+            m_awf->putAttrWidget (av, 
+                                  editor, 
+                                  gAttrLayout, 
+                                  nc, 
+                                  KKSIndAttr::KKSIndAttrClass::iacTableAttr, 
+                                  obj->tableName(), 
+                                  (c ? c->id():-1));
+
             if (a->type()->attrType() != KKSAttrType::atCheckListEx)
                 nc++;
         }
@@ -6875,7 +7080,7 @@ int KKSObjEditorFactory :: putRecAttrsGroupsOnWidget ( KKSObject * obj,
         if (!a->isVisible() || (obj->id () == IO_IO_ID && (a->id () == ATTR_NAME || a->id () == ATTR_MACLABEL)) )
             continue;
 
-        int id = a->id();
+        //int id = a->id();
         
         KKSAttrValue * av = NULL;
         //bool isAvalsSet = false;
@@ -6920,11 +7125,24 @@ int KKSObjEditorFactory :: putRecAttrsGroupsOnWidget ( KKSObject * obj,
         if (av && av->id() < 0)
             qDebug () << __PRETTY_FUNCTION__ << av->id();
         if (isGrouped)
-            m_awf->putAttrWidget (av, editor, gbLay, n_str, 2, (tableName.isEmpty () ? obj->tableName() : tableName), (c ? c->id():-1));
+            m_awf->putAttrWidget (av, 
+                                  editor, 
+                                  gbLay, 
+                                  n_str, 
+                                  KKSIndAttr::KKSIndAttrClass::iacEIOUserAttr, 
+                                  (tableName.isEmpty () ? obj->tableName() : tableName), 
+                                  (c ? c->id():-1));
         else
         {
             gAttrLayout->setVerticalSpacing (10);
-            m_awf->putAttrWidget (av, editor, gAttrLayout, nc, 2, obj->tableName(), (c ? c->id():-1));
+            m_awf->putAttrWidget (av, 
+                                  editor, 
+                                  gAttrLayout, 
+                                  nc, 
+                                  KKSIndAttr::KKSIndAttrClass::iacEIOUserAttr, 
+                                  obj->tableName(), 
+                                  (c ? c->id():-1));
+
             if (a->type()->attrType() != KKSAttrType::atCheckListEx)
                 nc++;
         }
@@ -6983,7 +7201,7 @@ void KKSObjEditorFactory :: putAttrsGroupsOnWidget (KKSObject * obj, KKSObjEdito
             continue;
 
         //QString code = a->code();
-        int id = a->id();
+        //int id = a->id();
         
         KKSAttrValue * av = NULL;
         //bool isAvalsSet = false;
@@ -7025,11 +7243,24 @@ void KKSObjEditorFactory :: putAttrsGroupsOnWidget (KKSObject * obj, KKSObjEdito
             n_str++;
 
         if (isGrouped)
-            m_awf->putAttrWidget (av, editor, gbLay, n_str, 1, obj->tableName(), (c ? c->id():-1));
+            m_awf->putAttrWidget (av, 
+                                  editor, 
+                                  gbLay, 
+                                  n_str, 
+                                  KKSIndAttr::KKSIndAttrClass::iacIOUserAttr, 
+                                  obj->tableName(), 
+                                  (c ? c->id():-1));
         else
         {
             gAttrLayout->setVerticalSpacing (10);
-            m_awf->putAttrWidget (av, editor, gAttrLayout, nc, 1, obj->tableName(), (c ? c->id():-1));
+            m_awf->putAttrWidget (av, 
+                                  editor, 
+                                  gAttrLayout, 
+                                  nc, 
+                                  KKSIndAttr::KKSIndAttrClass::iacIOUserAttr, 
+                                  obj->tableName(), 
+                                  (c ? c->id():-1));
+
             nc++;
         }
         av->release ();

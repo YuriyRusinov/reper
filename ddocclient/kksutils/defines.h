@@ -1,6 +1,7 @@
 #ifndef _DEFINES_H_INCLUDED
 #define _DEFINES_H_INCLUDED
 
+#define _MAX_INT32_ 2147483647 //максимально допустимое значение для int32
 
 #define PRIVILEGE_ERROR -2 //возникает если недостаточно дискреционных прав доступа
 #define PRIVILEGE_ERROR1 -3 //возникает если была попытка изменить характеристики ИО, владельцем которого является не текущий КСА

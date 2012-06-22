@@ -21,14 +21,14 @@ class KKSAttrValue;
 class _GUI_EXPORT KKSListWidget : public QListWidget, public KKSAttrWidget
 {
 public:
-    KKSListWidget(const KKSAttrValue* attr, int isSys, QWidget *parent=NULL);
+    KKSListWidget(const KKSAttrValue* attr, KKSIndAttr::KKSIndAttrClass isSys, QWidget *parent=NULL);
     virtual ~KKSListWidget(void);
 
     //void addItem(const QString & value, int itemData);
     //void setItemData(int index);
 
 signals:
-    void valueChanged (int id, int sys, QVariant val);
+    void valueChanged (int id, KKSIndAttr::KKSIndAttrClass sys, QVariant val);
 
 protected:
 

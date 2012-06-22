@@ -240,6 +240,7 @@ bool KKSEIODataModel :: setData (const QModelIndex& index, const QVariant& value
 /*
 bool KKSEIODataModel :: insertRows (int row, int count, const QModelIndex& parent)
 {
+    return false;
 }
 
 bool KKSEIODataModel :: removeRows (int row, int count, const QModelIndex& parent)

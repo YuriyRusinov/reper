@@ -63,6 +63,8 @@ class _GUI_EXPORT KKSCategoryTemplateWidget : public KKSDialog
         void delTemplate (void);
 
         void currIndexChanged (const QModelIndex& current, const QModelIndex& previous);
+        void tvDoubleClicked(const QModelIndex & index);
+
         void addCatRec (KKSCategory * c);
         void uploadCatT (KKSTemplate *t);
 

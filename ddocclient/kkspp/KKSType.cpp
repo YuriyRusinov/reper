@@ -46,6 +46,13 @@ KKSType * KKSType::defType1()
 
     return type;
 }
+KKSType * KKSType::createType10()
+{
+    KKSType * type = new KKSType(10,  QString::fromLocal8Bit("Подчиненная категория"));
+    type->setAsQualifier(true);
+
+    return type;
+}
 
 bool KKSType::isQualifier() const
 {
