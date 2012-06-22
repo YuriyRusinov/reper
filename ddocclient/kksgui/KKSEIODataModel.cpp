@@ -69,18 +69,14 @@ QModelIndex KKSEIODataModel :: index (int row, int column, const QModelIndex& pa
 {
     if (!hasIndex (row, column, parent))
         return QModelIndex ();
-    if (parent.internalId() >= 5 && parent.internalId() <= 9)
-        qDebug () << __PRETTY_FUNCTION__ << row << column << parent << parent.internalId();
+//    if (parent.internalId() >= 5 && parent.internalId() <= 9)
+//        qDebug () << __PRETTY_FUNCTION__ << row << column << parent << parent.internalId();
 
     if (cAttrP)
     {
         qint64 idp = parent.isValid() ? parent.internalId() : -1;
         KKSMap<qint64, KKSEIOData*>::const_iterator par = objRecords.constFind (idp);
-        if (par == objRecords.constEnd())
-            return QModelIndex ();
-        QString valStr = par.value()->fieldValue(cAttrP->columnName(false));
-        if (valStr.isEmpty())
-            return QModelIndex ();
+        QString valStr = (par == objRecords.constEnd() ? QString() : par.value()->fieldValue(cAttrP->columnName(false)));
         QList<qint64> vals;
         for (KKSMap<qint64, KKSEIOData*>::const_iterator p=objRecords.constBegin();
                 p != objRecords.constEnd();
@@ -95,7 +91,10 @@ QModelIndex KKSEIODataModel :: index (int row, int column, const QModelIndex& pa
             return createIndex (row, column, (quint32)vals[row]);
         }
         else
+        {
+            //qDebug () << __PRETTY_FUNCTION__ << row << vals;
             return QModelIndex ();
+        }
  
     }
     else
@@ -113,8 +112,8 @@ QModelIndex KKSEIODataModel :: index (int row, int column, const QModelIndex& pa
 
 QModelIndex KKSEIODataModel :: parent (const QModelIndex& index) const
 {
-    Q_UNUSED (index);
-    return QModelIndex ();
+//    Q_UNUSED (index);
+//    return QModelIndex ();
     if (!index.isValid())
         return QModelIndex();
     qint64 idw = index.internalId();
@@ -124,7 +123,7 @@ QModelIndex KKSEIODataModel :: parent (const QModelIndex& index) const
     if (par == objRecords.constEnd())
         return QModelIndex ();
     QString valStr = par.value()->fieldValue(cAttrP->code(false));
-    qDebug () << __PRETTY_FUNCTION__ << index << idw << valStr << par.key() << par.value()->fields();
+    //qDebug () << __PRETTY_FUNCTION__ << index << idw << valStr << par.key() << par.value()->fields();
     if (valStr.isEmpty())
         return QModelIndex ();
     qint64 ival (-1);
@@ -133,11 +132,11 @@ QModelIndex KKSEIODataModel :: parent (const QModelIndex& index) const
             p++)
         if (QString::compare (p.value()->fieldValue(cAttrP->columnName(false)), valStr)==0)
             ival = p.key();
-    qDebug () << __PRETTY_FUNCTION__ << ival;
+    //qDebug () << __PRETTY_FUNCTION__ << ival;
     KKSMap<qint64, KKSEIOData*>::const_iterator par1 = objRecords.constFind (ival);
     if (par1 == objRecords.constEnd())
         return QModelIndex ();
-    QString valStr1 = par.value()->fieldValue(cAttrP->columnName(false));
+    QString valStr1 = par1.value()->fieldValue(cAttrP->columnName(false));
     if (valStr1.isEmpty())
         return QModelIndex ();
     QList<qint64> vals;
@@ -151,7 +150,7 @@ QModelIndex KKSEIODataModel :: parent (const QModelIndex& index) const
     
     int prow = vals.indexOf(idw);
     QModelIndex pIndex = createIndex (prow, 0, (quint32)ival);
-    qDebug () << __PRETTY_FUNCTION__ << pIndex << ival << index;
+    //qDebug () << __PRETTY_FUNCTION__ << pIndex << ival << index;
     return pIndex;
 /*    KKSMap<qint64, KKSEIOData*>::const_iterator p;
     int irow (-1);
@@ -193,6 +192,8 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
         return QVariant();
 
     qint64 idw = index.internalId();
+    if (!index.parent().isValid())
+        qDebug () << __PRETTY_FUNCTION__ << index << idw;
     //if (index.parent().isValid())
     //    qDebug () << __PRETTY_FUNCTION__ << idw << index.parent().internalId();
     KKSMap<qint64, KKSEIOData*>::const_iterator p=objRecords.constFind(idw);

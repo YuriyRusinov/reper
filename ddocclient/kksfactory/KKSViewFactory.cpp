@@ -300,6 +300,7 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
         if (pgDial)
             pgDial->setValue (c);
         KKSEIOData * d = p.value();
+/*        
         if (idPAttr > 0)
         {
             const KKSCategoryAttr * cAttr = cat ? cat->attribute(idPAttr) : cobjCat->attribute (idPAttr);
@@ -384,7 +385,7 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
             if (ii == 0 && isCheckable)
                 objModel->setData (wcIndex, false, Qt::CheckStateRole);
         }
-
+*/
 
         i++;
         //qDebug () << __PRETTY_FUNCTION__ << QString ("Iteration %1. Time elapsed %2 ms").arg (i).arg (t.elapsed());
