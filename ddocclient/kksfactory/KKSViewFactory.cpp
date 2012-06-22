@@ -221,7 +221,7 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
     
     QAbstractItemModel *objModel = sortModel->sourceModel();//new QStandardItemModel ();
     if (!objModel)
-        objModel = isCheckable ? new KKSCheckableModel (0, ncols) : new QStandardItemModel (0, ncols);
+        objModel = new KKSEIODataModel (t, objEx);//isCheckable ? new KKSCheckableModel (0, ncols) : new QStandardItemModel (0, ncols);
     // new KKSEIODataModel (t, objEx);
     else
         sortModel->setSourceModel (0);
