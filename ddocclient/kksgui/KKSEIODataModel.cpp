@@ -192,8 +192,8 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
         return QVariant();
 
     qint64 idw = index.internalId();
-    if (!index.parent().isValid())
-        qDebug () << __PRETTY_FUNCTION__ << index << idw;
+    //if (!index.parent().isValid())
+    //    qDebug () << __PRETTY_FUNCTION__ << index << idw;
     //if (index.parent().isValid())
     //    qDebug () << __PRETTY_FUNCTION__ << idw << index.parent().internalId();
     KKSMap<qint64, KKSEIOData*>::const_iterator p=objRecords.constFind(idw);
