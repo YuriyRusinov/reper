@@ -5,7 +5,7 @@ declare
 begin
     if(TG_OP = 'UPDATE') then
         if(old.id <> new.id) then
-            raise exception E'Change if primary keys on DynamicDocs\'s tables is unsupported!';
+            raise exception E'Change of primary keys on DynamicDocs\'s tables is unsupported!';
             return NULL;
         end if;
         return new;
@@ -15,6 +15,7 @@ begin
     delete from rubric_records where id_record = old.id;
     delete from rubric_records where id_rubric in (select id from recGetRubrics(old.id) where type in (0, 1));
     delete from record_rubricator where id in (select id from recGetRubrics(old.id) where type in (0, 1));
+    delete from urls_records where id_record = old.id;
 
     return old;
 end

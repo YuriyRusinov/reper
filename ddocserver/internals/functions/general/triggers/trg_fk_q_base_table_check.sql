@@ -34,3 +34,6 @@ select f_create_trigger('trg_fk_q_base_table_check', 'before', 'insert or update
 select f_safe_drop_trigger('trg_fk_q_base_table_check', 'rubric_records');
 select f_create_trigger('trg_fk_q_base_table_check', 'before', 'insert or update', 'rubric_records', 'fkqbasetablecheck()');
 
+select f_safe_drop_trigger('trg_fk_q_base_table_check', 'urls_records');
+select f_create_trigger('trg_fk_q_base_table_check', 'before', 'insert or update', 'urls_records', 'fkqbasetablecheck()');
+

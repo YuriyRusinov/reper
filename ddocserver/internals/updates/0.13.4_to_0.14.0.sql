@@ -70,6 +70,23 @@ alter table rubric_records
       on delete restrict on update restrict;
 
 
+create table urls_records (
+   id_record            INT8                 not null,
+   id_url               INT4                 not null,
+   name                 VARCHAR              null,
+   constraint PK_URLS_RECORDS primary key (id_record, id_url)
+);
+
+comment on table urls_records is
+'Взаимосвязи записей справочников с прикрепленными к ним файлами.
+Сущемствует возможность прикреплять к записям справочников DynamicDocs различные файлы';
+
+alter table urls_records
+   add constraint FK_URLS_REC_REFERENCE_IO_URLS foreign key (id_url)
+      references io_urls (id)
+      on delete restrict on update restrict;
+
+
 drop function rGetFileSizeByUrl(varchar);
 create or replace function rGetFileSizeByUrl(varchar) returns int8
     as '$libdir/libfloader.so', 'rgetfilesizebyurl'  language 'c' strict security definer;

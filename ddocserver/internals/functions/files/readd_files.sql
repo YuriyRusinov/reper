@@ -3,6 +3,7 @@
 \i ./functions/files/rseturl.sql
 \i ./functions/files/rremoveurl.sql
 \i ./functions/files/rremoveobjurl.sql
+\i ./functions/files/rremoverecurl.sql
 \i ./functions/files/rinserturl.sql
 \i ./functions/files/rupdateurl.sql
 \i ./functions/files/setfilearchivepath.sql

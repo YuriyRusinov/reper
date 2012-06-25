@@ -10,7 +10,8 @@
 \i ./functions/general/geteio.sql
 \i ./functions/general/recupdate.sql
 \i ./functions/general/gettablebyuid.sql
-
+\i ./functions/general/recgetfiles.sql
+\i ./functions/general/recinserturl.sql
 \i ./functions/general/generateuuid.sql
 
 \i ./functions/general/eiogetindicators.sql

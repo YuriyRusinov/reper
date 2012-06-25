@@ -1,19 +1,19 @@
-create or replace function rRemoveObjUrl(int4, int4, boolean) returns int4 as
+create or replace function rRemoveRecUrl(int8, int4, boolean) returns int4 as
 $BODY$
 declare
-    idObject alias for $1;
+    idRecord alias for $1;
     idUrl alias for $2;
     bFile alias for $3;
 
     cnt int4;
 begin
 
-    select count(*) into cnt from urls_objects where id_io_object = idObject and id_url = idUrl;
+    select count(*) into cnt from urls_records where id_record = idRecord and id_url = idUrl;
     if(cnt = 0) then
         return 1;
     end if;
 
-    delete from urls_objects where id_io_object = idObject and id_url = idUrl;
+    delete from urls_records where id_record = idRecord and id_url = idUrl;
 
     if(cnt = 1 and bFile = true) then
         select rDeleteFile(idUrl) into cnt;
@@ -27,10 +27,10 @@ end
 $BODY$
 language 'plpgsql' security definer;
 
-create or replace function rRemoveObjUrl(int4, boolean) returns int4 as
+create or replace function rRemoveRecUrl(int8, boolean) returns int4 as
 $BODY$
 declare
-    idObject alias for $1;
+    idRecord alias for $1;
     bFile alias for $2;
 
     cnt int4;
@@ -39,9 +39,9 @@ begin
 
     if(bFile = true) then
         for r in 
-            select id_url from urls_objects where id_io_object = idObject
+            select id_url from urls_records where id_records = idRecord
         loop
-            select count(*) into cnt from urls_objects where id_io_object = idObject and id_url = r.id_url;
+            select count(*) into cnt from urls_records where id_record = idRecord and id_url = r.id_url;
             if(cnt <= 1) then
                 select rDeleteFile(r.id_url) into cnt;
                 if(cnt = 0) then
@@ -51,7 +51,7 @@ begin
         end loop;
     end if;
 
-    delete from urls_objects where id_io_object = idObject;
+    delete from urls_records where id_record = idRecord;
 
     return 1;
 
@@ -60,10 +60,10 @@ end
 $BODY$
 language 'plpgsql' security definer;
 
-create or replace function rRemoveObjUrl(int4, boolean, int4[]) returns int4 as
+create or replace function rRemoveRecUrl(int8, boolean, int4[]) returns int4 as
 $BODY$
 declare
-    idObject alias for $1;
+    idRecord alias for $1;
     bFile alias for $2;
     excludes alias for $3;
 
@@ -74,12 +74,12 @@ begin
     if(bFile = true) then
         for r in 
             select id_url 
-            from urls_objects 
+            from urls_records 
             where 
-                id_io_object = idObject 
+                id_record = idRecord 
                 and id_url not in (select id from io_urls where id = ANY(excludes))
         loop
-            select count(*) into cnt from urls_objects where id_io_object = idObject and id_url = r.id_url;
+            select count(*) into cnt from urls_records where id_record = idRecord and id_url = r.id_url;
             if(cnt <= 1) then
                 select rDeleteFile(r.id_url) into cnt;
                 if(cnt = 0) then
@@ -89,9 +89,9 @@ begin
         end loop;
     end if;
 
-    delete from urls_objects 
+    delete from urls_records 
     where 
-        id_io_object = idObject 
+        id_record = idRecord 
         and id_url not in (select id from io_urls where id = ANY(excludes));
 
     return 1;
