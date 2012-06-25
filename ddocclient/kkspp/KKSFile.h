@@ -70,6 +70,7 @@ class _PP_EXPORT KKSFile : public KKSRecord
 {
     friend class KKSPPFactory;
     friend class KKSLoader;
+    friend class KKSEIOFactory;
 
 public:
     KKSFile(int id, const QString & name);

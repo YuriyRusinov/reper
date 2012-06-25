@@ -795,7 +795,11 @@ KKSObject * KKSLoader::loadIO(const QString & tableName, bool simplify) const
     return io;
 }
 
-KKSObjectExemplar * KKSLoader::loadEIO(qint64 id, KKSObject * io, const KKSCategory *c0, const QString& table) const
+KKSObjectExemplar * KKSLoader::loadEIO(qint64 id, 
+									   KKSObject * io, 
+									   const KKSCategory *c0, 
+									   const QString& table,
+									   bool simplify) const
 {
     KKSObjectExemplar * eio = NULL;
     
@@ -930,10 +934,16 @@ KKSObjectExemplar * KKSLoader::loadEIO(qint64 id, KKSObject * io, const KKSCateg
     eio->setAttrValues(attrValues);
     
     eio->setId(id);
+
+	if(simplify)
+		return eio;
     
     eio->setIndValues(loadIndValues(eio));
     
     loadRecRubrics (eio);
+	
+	eio->setFiles(loadFiles(eio));
+
 
     delete res;
 
@@ -2504,6 +2514,52 @@ KKSList<KKSFile *> KKSLoader::loadFiles(KKSObject * io) const
 
     return files;
 }
+
+KKSList<KKSFile *> KKSLoader::loadFiles(const KKSObjectExemplar * eio) const
+{
+    KKSList<KKSFile *> files;
+
+    if(!eio || !eio->id())
+        return files;
+
+    QString sql = QString("select * from recGetFiles(%1::int8);").arg(eio->id());
+
+    KKSResult * res = db->execute(sql);
+    if(!res)
+        return files;
+
+    int count = res->getRowCount();
+    if(count == 0){
+        delete res;
+        return files;
+    }
+
+    for(int row=0; row<count; row++){
+        
+        int idFile = res->getCellAsInt(row, 1);
+        QString name = res->getCellAsString(row, 2);
+        KKSFile * file = new KKSFile(idFile, name);
+        file->setUploaded();
+        
+        int idFileType = res->getCellAsInt(row, 4);
+        QString typeName = res->getCellAsString(row, 5);
+        QString appWin = res->getCellAsString(row, 6);
+        QString appLin = res->getCellAsString(row, 7);
+        KKSFileType type(idFileType, typeName, appWin, appLin);
+
+        file->setType(type);
+
+        file->setSrcExt(res->getCellAsString(row, 8));
+
+        files.append(file);
+        file->release();
+    }
+    
+    delete res;
+
+    return files;
+}
+
 
 KKSList<KKSFileExtention*> KKSLoader::loadFileExtentions(int idFileType) const
 {

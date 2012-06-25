@@ -302,7 +302,7 @@ int KKSFileLoader::rGetFile(int idUrl, QString toUrl, int blockSize, const QWidg
         pImportD->setParent (0);
         delete pImportD;
 
-        return ERROR_CODE;
+        //return ERROR_CODE;
     }
 
     return OK_CODE;

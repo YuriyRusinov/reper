@@ -98,7 +98,7 @@ QSize KKSRecWidget::sizeHint() const
 }
 
 
-int KKSRecWidget :: getID (void) const
+qint64 KKSRecWidget :: getID (void) const
 {
     if (!tv || !tv->model() || !tv->selectionModel())
         return -1;
@@ -111,7 +111,7 @@ int KKSRecWidget :: getID (void) const
     if (!wIndex.isValid())
         return -1;
 
-    return wIndex.data (Qt::UserRole).toInt ();
+    return wIndex.data (Qt::UserRole).toLongLong ();
 }
 
 void KKSRecWidget :: tvDoubleClicked(const QModelIndex & index)

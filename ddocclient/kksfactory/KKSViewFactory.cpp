@@ -701,7 +701,7 @@ void KKSViewFactory :: loadEIOEx (QWidget *editor,
  */
 void KKSViewFactory :: updateEIOEx (KKSLoader *l,
                                     KKSObject *pObj,
-                                    int idObjEx,
+                                    qint64 idObjEx,
                                     const KKSTemplate *t,
                                     QAbstractItemModel *sourceModel,
                                     int row,

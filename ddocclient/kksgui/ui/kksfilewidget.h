@@ -12,6 +12,7 @@ namespace Ui
     class kksfile_widget;
 }
 
+class QModelIndex;
 
 class _GUI_EXPORT KKSFileWidget: public QWidget
 {
@@ -41,6 +42,7 @@ private slots:
     void on_tbAddFile_clicked();
     void on_tbOpenFile_clicked();
     void on_pbAddFromServer_clicked();
+    void twFilesDoubleClicked(const QModelIndex &);
 
     void init();
     

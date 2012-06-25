@@ -203,19 +203,25 @@ void KKSCatEditor :: apply (void)
 
     if (rubrW && rubrW->rootRubric ())
         pCategory->setRootRubric (rubrW->rootRubric ());
-    if ( pCategory->tableCategory() && pTableCategory && !pTableCategory->attributes().contains(1) )
+    
+	
+	if ( pCategory->tableCategory() && pTableCategory && !pTableCategory->attributes().contains(1) )
     {
-        int resID = QMessageBox::question (this, tr ("Save child category"), tr ("Creation category for table without system attribute ID does not allow. Do you want to add it ?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-        if (resID != QMessageBox::Yes)
-        {
-            isCloseIgnored = true;
-            return;
-        }
-        else
-        {
-            emit setAttribute (1, pTableCategory, recTableW->getSourceModel(), this);
-            isCloseIgnored = false;
-        }
+		if(pCategory->tableCategory()->id() <= 0){
+		    int resID = QMessageBox::question (this, tr ("Save child category"), tr ("Creation category for table without system attribute ID does not allow. Do you want to add it ?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+		    if (resID != QMessageBox::Yes)
+            {
+                isCloseIgnored = true;
+                return;
+            }
+            else
+            {
+                emit setAttribute (1, pTableCategory, recTableW->getSourceModel(), this);
+                isCloseIgnored = false;
+            }
+		}
+		else
+			isCloseIgnored = false;
     }
     else
         isCloseIgnored = false;

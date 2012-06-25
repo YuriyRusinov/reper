@@ -25,6 +25,7 @@ KKSObjectExemplar::KKSObjectExemplar() : KKSRecord(),
         m_rootRubric (0)
 {
    m_io = NULL;
+   m_filesModified = false;
 }
 
 KKSObjectExemplar::KKSObjectExemplar(const KKSObjectExemplar & eio) : KKSRecord(eio),
@@ -39,6 +40,9 @@ KKSObjectExemplar::KKSObjectExemplar(const KKSObjectExemplar & eio) : KKSRecord(
 
     m_attrValues = eio.attrValues();
     m_indValues = eio.indValues();
+    m_files = eio.files();
+	m_filesModified = eio.m_filesModified;
+
 }
 
 KKSObjectExemplar::KKSObjectExemplar(qint64 id, const QString & name, KKSObject * io) : KKSRecord(id, name),
@@ -46,6 +50,7 @@ KKSObjectExemplar::KKSObjectExemplar(qint64 id, const QString & name, KKSObject 
 {
     m_io = NULL;
     setIo(io);
+    m_filesModified = false;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -377,4 +382,78 @@ void KKSObjectExemplar::setRootRubric(KKSRubric * r)
 KKSRubric * KKSObjectExemplar::rootRubric() const
 {
     return m_rootRubric;
+}
+
+
+const KKSList<KKSFile *> & KKSObjectExemplar::files() const
+{
+    return m_files;
+}
+
+KKSList<KKSFile *> & KKSObjectExemplar::files()
+{
+    return m_files;
+}
+
+void KKSObjectExemplar::setFiles(const KKSList<KKSFile *> & _files)
+{
+    m_files = _files;
+    m_filesModified = true;
+}
+
+void KKSObjectExemplar::addFile(KKSFile * f)
+{
+    if(!f)
+        return;
+
+    m_filesModified = true;
+    m_files.append(f);
+}
+
+//удаляет из списка файлов указанный файл
+int KKSObjectExemplar::removeFile(KKSFile * f)
+{
+    if(!f)
+        return ERROR_CODE;
+    
+    int cnt = m_files.removeAll(f);
+    
+    if(cnt == 0)
+        return ERROR_CODE;
+
+    m_filesModified = true;
+    
+    return OK_CODE;
+}
+
+//удаляет из списка файлов файл с указанным порядковым индексом
+int KKSObjectExemplar::removeFile(int index)
+{
+    int ok = m_files.removeAt(index);
+    if(ok == 0)
+        return ERROR_CODE;
+
+    m_filesModified = true;
+    return OK_CODE;
+}
+
+KKSFile * KKSObjectExemplar::file(int index)
+{
+    KKSFile * f = NULL;
+    if(index >= m_files.count())
+        return f;
+
+    f = m_files[index];
+    return f;
+}
+
+const KKSFile * KKSObjectExemplar::file(int index) const
+{
+    const KKSFile * f = NULL;
+    if(index >= m_files.count())
+        return f;
+
+    f = m_files.at(index);
+
+    return f;
 }

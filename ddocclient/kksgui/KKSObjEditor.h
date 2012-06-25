@@ -140,7 +140,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void setView (void);
 
         void saveChildObjE (KKSObjectExemplar *childObjE);
-        void updateEIOEx (const QList<int>& idL, const KKSCategory * c, QString tableName, int nTab);
+        void updateEIOEx (const QList<qint64>& idL, const KKSCategory * c, QString tableName, int nTab);
 
         void setEnableO (int state);
 
@@ -188,12 +188,12 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void filterObjectEx(KKSObjEditor*, int idObject, const KKSCategory * c, QString tableName);
         void filterObjectTemplateEx(KKSObjEditor*, int idObject, const KKSCategory * c, QString tableName);
         void newObjectEx (QWidget*, int idObject, const KKSCategory * c, QString tableName, int nTab, bool isModal);
-        void editObjectEx (QWidget*, int idObject, int idObjE, const KKSCategory * c, QString tableName, int nTab, bool isModal);
-        void delObjectEx (QWidget*,int idObject, int idObjE, QString tableName, int row);
+        void editObjectEx (QWidget*, int idObject, qint64 idObjE, const KKSCategory * c, QString tableName, int nTab, bool isModal);
+        void delObjectEx (QWidget*,int idObject, qint64 idObjE, QString tableName, int row);
         void saveObjE (KKSObjEditor*, KKSObjectExemplar * wObjE, const KKSCategory * cat, QString tableName, int num);
         void loadObjE (int id, QString tableName);
-        void eioChanged (const QList<int>& idL, const KKSCategory * c, QString tableName, int nTab);
-        void updateEIO(KKSObjEditor * editor, int idObject, const QList<int>& idObjEx, const QList<int>& row, const KKSCategory *c, const QString& tableName, int nTab);
+        void eioChanged (const QList<qint64>& idL, const KKSCategory * c, QString tableName, int nTab);
+        void updateEIO(KKSObjEditor * editor, int idObject, const QList<qint64>& idObjEx, const QList<int>& row, const KKSCategory *c, const QString& tableName, int nTab);
         
         void saveObj (KKSObjEditor*, KKSObject* wObj, KKSObjectExemplar * wObjEx, int num);
         void saveObjAsCommandResult(KKSObjEditor*, KKSObject* wObj, KKSObjectExemplar * wObjEx, int num);
@@ -308,7 +308,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void setTabWidget (QTabWidget *tObj);
 
         void clearAdditionalCopies (void);
-        void addAdditionalCopy (int id);
+        void addAdditionalCopy (qint64 id);
         int constructObject (void);
         void saveToDb (int num=1);
 
@@ -403,7 +403,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
 
         bool isChanged;
         QMap<int, int> editRows;
-        QList<int> additionalCopies;
+        QList<qint64> additionalCopies;
 
     private:
         Q_OBJECT

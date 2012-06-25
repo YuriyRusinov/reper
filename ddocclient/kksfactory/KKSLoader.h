@@ -90,7 +90,11 @@ class _F_EXPORT KKSLoader
         //то возвращается NULL
         KKSObject * loadIO(const QString & tableName, bool simplify = false) const;
 
-        KKSObjectExemplar * loadEIO(qint64 id, KKSObject * io, const KKSCategory *c0=0, const QString& table=QString()) const;
+        KKSObjectExemplar * loadEIO(qint64 id, 
+									KKSObject * io, 
+									const KKSCategory *c0=0, 
+									const QString& table=QString(),
+									bool simplify = true) const;
         //метод производит загрузку всех ЭИО данного ИО (в соответствии с фильтрами. 
         //Фильтры применимы только к таблице, содержащей экземпляры ИО).
         //Возвращается KKSMap, который в качестве ключа содержит идентификатор ЭИО
@@ -232,8 +236,11 @@ class _F_EXPORT KKSLoader
         void loadRubrics(KKSObject * io) const;
         void loadRubrics(KKSCategory * c) const;
         void loadRecRubrics (KKSObjectExemplar * eio) const;
+
         KKSList<KKSFile *> loadFiles(KKSObject * io) const;
-        KKSLifeCycle * loadLifeCycle(int idCategory) const;
+		KKSList<KKSFile *> loadFiles(const KKSObjectExemplar * io) const;
+        
+		KKSLifeCycle * loadLifeCycle(int idCategory) const;
         /*
         QString loadColumnValue(const QString & tName,
                                 const QString & cName, 

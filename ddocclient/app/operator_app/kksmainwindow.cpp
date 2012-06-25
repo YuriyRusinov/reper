@@ -1141,7 +1141,7 @@ void KKSMainWindow::slotViewCat()
 
     KKSList<const KKSFilterGroup *> filterGroups;
     KKSList<const KKSFilter*> filters;
-    KKSObject * refCatTypeObj = kksSito->loader()->loadIO (IO_CAT_TYPE_ID, true);//IO_CAT_ID);
+    KKSObject * refCatTypeObj = kksSito->loader()->loadIO (IO_CAT_TYPE_ID, true);
     if (!refCatTypeObj || !refCatTypeObj->category() || !refCatTypeObj->category()->tableCategory())
         return;
 
@@ -1151,13 +1151,14 @@ void KKSMainWindow::slotViewCat()
 
     filters.append(filter);
     filter->release();
+    
+    refCatTypeObj->release();
 
-    refCatTypeObj->release ();
-
-    ////
+    /*
     KKSObject * refCatObj = kksSito->loader()->loadIO (IO_CAT_ID, true);
     if (!refCatObj || !refCatObj->category() || !refCatObj->category()->tableCategory())
         return;
+    
 
     filter = refCatObj->category()->tableCategory()->createFilter(ATTR_IS_ARCHIVED, QString("FALSE"), KKSFilter::foEq);
     if(!filter)
@@ -1166,9 +1167,9 @@ void KKSMainWindow::slotViewCat()
     filters.append(filter);
     filter->release();
     refCatObj->release ();
+    */
 
 ////
-
     KKSFilterGroup * group = new KKSFilterGroup(true);
     group->setFilters(filters);
     filterGroups.append(group);

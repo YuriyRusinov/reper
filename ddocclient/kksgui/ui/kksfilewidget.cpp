@@ -55,6 +55,8 @@ void KKSFileWidget::init()
         QVariant v(t->id());
         ui->cbTypes->addItem(t->name(), v);
     }
+
+    connect(ui->twFiles, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(twFilesDoubleClicked(const QModelIndex &)));
 }
 
 void KKSFileWidget::appendFileRow(KKSFile * f)
@@ -158,6 +160,13 @@ void KKSFileWidget::on_pbDownload_clicked()
     }
     
 
+}
+
+void KKSFileWidget::twFilesDoubleClicked(const QModelIndex & index)
+{
+    Q_UNUSED(index);
+
+    on_pbOpen_clicked();
 }
 
 void KKSFileWidget::on_pbOpen_clicked()

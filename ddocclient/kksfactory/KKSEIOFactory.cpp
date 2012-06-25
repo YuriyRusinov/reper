@@ -17,6 +17,8 @@
 #include "KKSCategory.h"
 #include "KKSAttrType.h"
 #include "KKSRubric.h"
+#include "KKSFileLoader.h"
+#include "KKSFile.h"
 
 ////////////////////////////////////////////////////////////////////////
 // Name:       KKSEIOFactory::KKSEIOFactory()
@@ -45,13 +47,29 @@ void KKSEIOFactory::setDb(KKSDatabase * _db)
     db = _db;
 }
 
+
+void KKSEIOFactory::setParams( 
+                             KKSFileLoader * _fileLoader, 
+                              
+                             KKSDatabase * _db)
+{
+    db = _db;
+    //loader = _loader;
+    fileLoader = _fileLoader;
+    //eiof = _eiof;
+}
+
 KKSDatabase * KKSEIOFactory::getDb() const
 {
     return db;
 }
 
 
-int KKSEIOFactory::insertEIO(KKSObjectExemplar* eio, const KKSCategory* cat, const QString& table, bool bImported) const
+int KKSEIOFactory::insertEIO(KKSObjectExemplar* eio, 
+                             const KKSCategory* cat, 
+                             const QString& table, 
+                             bool bImported,
+                             const QWidget * parent) const
 {
     if(!eio || !eio->io())
         return ERROR_CODE;
@@ -66,12 +84,15 @@ int KKSEIOFactory::insertEIO(KKSObjectExemplar* eio, const KKSCategory* cat, con
     return res;
 }
 
-int KKSEIOFactory::updateEIO(const KKSObjectExemplar* eio, const KKSCategory* cat, const QString& table) const
+int KKSEIOFactory::updateEIO(const KKSObjectExemplar* eio, 
+                             const KKSCategory* cat, 
+                             const QString& table,
+                             const QWidget * parent) const
 {
     if(!eio || !eio->io())
         return ERROR_CODE;
 
-    int res = updateRecord(eio, cat, table);
+    int res = updateRecord(eio, cat, table, parent);
     if (res <= 0)
         return ERROR_CODE;
     int rres = updateIncludes (eio);
@@ -104,7 +125,8 @@ int KKSEIOFactory::deleteEIO(KKSObjectExemplar* eio, const QString& table) const
 int KKSEIOFactory::insertRecord(KKSObjectExemplar* eio, 
                                 const KKSCategory * cat, 
                                 const QString & table, 
-                                bool bImported) const
+                                bool bImported,
+                                const QWidget * parent) const
 {
     if(!db || !eio)
         return ERROR_CODE;
@@ -195,6 +217,18 @@ int KKSEIOFactory::insertRecord(KKSObjectExemplar* eio,
         return ERROR_CODE;
     }
 
+    //добавляем прикрепленные файлы
+    //setInTransaction();
+    ok = insertFiles(eio, parent);
+    //restoreInTransaction();
+    if(ok != OK_CODE){
+        //if(!inTransaction())
+            //db->rollback();
+        eio->setId(-1);
+        return ERROR_CODE;
+    }
+
+
     return OK_CODE;
 }
 
@@ -208,7 +242,8 @@ int KKSEIOFactory::insertRecord(KKSObjectExemplar* eio,
 
 int KKSEIOFactory::updateRecord(const KKSObjectExemplar* eio, 
                                 const KKSCategory* cat, 
-                                const QString & table) const
+                                const QString & table,
+                                const QWidget * parent) const
 {
     if(!db || !eio)
         return ERROR_CODE;
@@ -284,6 +319,15 @@ int KKSEIOFactory::updateRecord(const KKSObjectExemplar* eio,
         return ERROR_CODE;
     }
 
+    if(eio->m_filesModified){
+        //изменяем прикрепленные файлы
+        ok = updateFiles(eio, parent);
+        if(ok != OK_CODE){
+            //if(!inTransaction())
+                //db->rollback();
+            return ERROR_CODE;
+        }
+    }
 
     return OK_CODE;
 }
@@ -1561,4 +1605,182 @@ int KKSEIOFactory::deleteRubric(int idRubric) const
 {
     Q_UNUSED(idRubric);
     return 0;
+}
+
+int KKSEIOFactory::insertFile(qint64 idRecord, KKSFile * f, const QWidget * parent) const
+{
+    if(!f)
+        return ERROR_CODE;
+
+    int ok = uploadFile(f, parent);
+    if(ok != OK_CODE)
+        return ERROR_CODE;
+
+    QString sql = QString("select recInsertUrl(%1, %2, '%3')")
+                          .arg(idRecord)
+                          .arg(f->id())
+                          .arg(f->name());
+
+    KKSResult * res = db->execute(sql);
+    ok = res ? res->getCellAsInt(0,0) : ERROR_CODE;
+    if(res)
+        delete res;
+
+    if(ok != OK_CODE){
+        return ERROR_CODE;
+    }
+
+    return OK_CODE;
+}
+
+int KKSEIOFactory::insertFiles(const KKSObjectExemplar * eio, const QWidget * parent) const
+{
+    if(!eio)
+        return ERROR_CODE;
+
+    KKSList<KKSFile * > files = eio->files();
+    int ok = OK_CODE;
+
+    for (int i=0; i<files.count(); i++)
+    {
+        KKSFile * f = files[i];
+        if(!f)
+            continue;
+
+        ok = insertFile(eio->id(), f, parent);
+
+        if(ok != OK_CODE){
+            return ERROR_CODE;
+        }
+    }
+
+    return OK_CODE;
+}
+
+int KKSEIOFactory::updateFiles(const KKSObjectExemplar * eio, const QWidget * parent) const
+{
+    if(!eio)
+        return ERROR_CODE;
+
+    qint64 idRecord = eio->id();
+    if(idRecord <= 0)
+        return ERROR_CODE;
+
+    KKSList<KKSFile*> files = eio->files();
+    for(int i=0; i<files.count(); i++){
+        KKSFile * f = files.at(i);
+        int idUrl = f->id();
+        int ok;
+        if(idUrl <= 0){
+            ok = insertFile(eio->id(), f, parent);
+        }
+        else{
+            ok = updateFileInfo(f);
+        }
+        if(ok != OK_CODE)
+            return ERROR_CODE;
+    }
+
+    QString ids;
+    if(files.count() > 0)
+        ids = QString::number(files.at(0)->id());
+
+    for(int i=1; i<files.count(); i++){
+        const KKSFile * f = files.at(i); 
+        if(f)
+            ids += ", " + QString::number(f->id());
+    }
+    
+    //удаляем все оставшиеся связки с файлами и при этом удаляем при необходимости сами файлы
+    QString sql;
+    if(ids.isEmpty())
+        sql = QString("select rRemoveRecUrl(%1, TRUE, ARRAY[-1])").arg(idRecord);
+    else
+        sql = QString("select rRemoveRecUrl(%1, TRUE, ARRAY[%2])").arg(idRecord).arg(ids);
+    
+	KKSResult * res = db->execute(sql);
+    if(!res || res->getRowCount() == 0){
+        if(res)
+            delete res;
+        return ERROR_CODE;
+    }
+    int ok = res->getCellAsInt(0, 0);
+    delete res;
+    if(ok != 1){
+        return ERROR_CODE;
+    }
+
+    return OK_CODE;
+}
+
+int KKSEIOFactory::updateFileInfo(KKSFile * f) const
+{
+    if(!f || f->id() <= 0)
+        return ERROR_CODE;
+
+    QString sql = QString("select rUpdateRecUrl(%1, '%2', %3, '%4')")
+                     .arg(f->id())
+                     .arg(f->name())
+                     .arg(f->type().id())
+                     .arg(f->srcExt());
+
+    KKSResult * res = db->execute(sql);
+    int ok = ERROR_CODE;
+    if(res)
+        ok = res->getCellAsInt(0, 0);
+
+    delete res;
+    if(ok <= 0)
+        return ERROR_CODE;
+
+    return OK_CODE;
+}
+
+int KKSEIOFactory::uploadFile(KKSFile * f, const QWidget * parent) const
+{
+    if(!f)
+        return ERROR_CODE;
+
+    if(!fileLoader)
+        return ERROR_CODE;
+
+    if(f->localUrl().isEmpty()){
+        qWarning() << "upload file. URL is empty!";
+        return ERROR_CODE;
+    }
+
+    if(f->id() <= 0){
+        QString sql = QString("select rInsertUrl('%1', 'not assigned', %2, '%3')")
+                                     .arg(f->name())
+                                     .arg(f->type().id())
+                                     .arg(f->srcExt());
+        qDebug () << __PRETTY_FUNCTION__ << sql;
+        KKSResult * res = db->execute(sql);
+        if(!res)
+            return ERROR_CODE;
+        if(res->getRowCount() == 0){
+            delete res;
+            return ERROR_CODE;
+        }
+
+        int idUrl = res->getCellAsInt(0, 0);
+        
+        delete res;
+        
+        if(idUrl <= 0)
+            return ERROR_CODE;
+        
+        f->setId(idUrl);
+    }
+
+    int ok = fileLoader->rWriteFile(f->id(), f->localUrl(), true, -1, parent);
+    if(ok != OK_CODE){
+        f->setId(-1);
+        return ERROR_CODE;
+    }
+
+    f->setUploaded(true);
+    f->setLoaded(true);
+
+    return OK_CODE;
 }

@@ -831,7 +831,8 @@ int KKSPPFactory::updateFiles(const KKSObject * io, const QWidget * parent) cons
         sql = QString("select rRemoveObjUrl(%1, TRUE, ARRAY[-1])").arg(idObject);
     else
         sql = QString("select rRemoveObjUrl(%1, TRUE, ARRAY[%2])").arg(idObject).arg(ids);
-    KKSResult * res = db->execute(sql);
+    
+	KKSResult * res = db->execute(sql);
     if(!res || res->getRowCount() == 0){
         if(res)
             delete res;

@@ -580,6 +580,8 @@ int KKSObjEditor :: constructObject()
         avalIndList.append (av);
     }
     pObjectEx->setIndValues (avalIndList);
+    if(fileWidget)
+        pObjectEx->setFiles(fileWidget->files());
     //
     // добавляем вложения
     //
@@ -774,7 +776,7 @@ void KKSObjEditor :: saveToDb (int num)
     //
     // Это надо вызывать всегда
     //
-    QList<int> idL;
+    QList<qint64> idL;
     if (!additionalCopies.contains (pObjectEx->id()))
         idL.append (pObjectEx->id());
     idL += additionalCopies;
@@ -802,7 +804,7 @@ void KKSObjEditor :: saveAsCommandResult()
     //
     // Это надо вызывать всегда
     //
-    QList<int> idL;
+    QList<qint64> idL;
     if (!additionalCopies.contains (pObjectEx->id()))
         idL.append (pObjectEx->id());
     idL += additionalCopies;
@@ -1024,7 +1026,7 @@ void KKSObjEditor :: setObjectEx (KKSObjectExemplar *newObj)
         pObjectEx->addRef ();
 }
 
-void KKSObjEditor :: updateEIOEx (const QList<int>& idL, const KKSCategory * c, QString tableName, int nTab)
+void KKSObjEditor :: updateEIOEx (const QList<qint64>& idL, const KKSCategory * c, QString tableName, int nTab)
 {
     this->clearW ();
     //для ЭИО, которые имеют подчиненную таблицу, 
@@ -1042,7 +1044,7 @@ void KKSObjEditor :: updateEIOEx (const QList<int>& idL, const KKSCategory * c, 
 
     for (int i=0; i<idL.count(); i++)
     {
-        int id = idL[i];
+        qint64 id = idL[i];
         int wrow = editRows.value (id, -1);
         if (wrow < 0)
         {
@@ -1086,7 +1088,7 @@ void KKSObjEditor :: clearAdditionalCopies (void)
     additionalCopies.clear ();
 }
 
-void KKSObjEditor :: addAdditionalCopy (int id)
+void KKSObjEditor :: addAdditionalCopy (qint64 id)
 {
     additionalCopies.append (id);
 }

@@ -300,8 +300,8 @@ KKSObjectExemplar * KKSConverter::categoryToExemplar(const KKSLoader * loader, c
     appendAttrValue(tc, attrValues, 6, c->code(), KKSAttrType::atString);//code
     //description
     appendAttrValue(tc, attrValues, 3, c->desc(), KKSAttrType::atString);
-    //is_system
-    //appendAttrValue(tc, attrValues, "is_system",  c->isSystem() ? "true" : "false", KKSAttrType::atBool);
+    //is_archived
+    appendAttrValue(tc, attrValues, ATTR_IS_ARCHIVED,  "false", KKSAttrType::atBool);
     //io_objects_organization
     //appendAttrValue(tc, attrValues, "io_categories_organization",  c->replicatedOrgsV());
     //id_io_state

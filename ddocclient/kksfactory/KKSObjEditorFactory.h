@@ -63,7 +63,7 @@ class _F_EXPORT KKSObjEditorFactory : public KKSEntityFactory
 {
 public:
     KKSObjEditor* createObjEditor (int idObject,// идентификатор ИО, который будет содержать создаваемый (редактируемый) ЭИО (для ЭИО, которые являются ИО этот идентификатор должен быть равен IO_IO_ID)
-                                   int idObjE, // идентификатор создаваемого (редактируемого) ЭИО. Если ЭИО создается, должно быть равно -1
+                                   qint64 idObjE, // идентификатор создаваемого (редактируемого) ЭИО. Если ЭИО создается, должно быть равно -1
                                    const KKSList<const KKSFilterGroup *> & filters,// Применяется для ЭИО, которые являются контейнерными ИО. Содержит набор фильтров их таблицы
                                    const QString & extraTitle,
                                    const KKSCategory* wCat=0, // категория информационных объектов
@@ -75,7 +75,7 @@ public:
                                    Qt::WindowFlags f=0);
 
     KKSObjEditor* createObjRecEditor (int idObject,// идентификатор ИО, который будет содержать создаваемый (редактируемый) ЭИО (для ЭИО, которые являются ИО этот идентификатор должен быть равен IO_IO_ID)
-                                      int idObjE, // идентификатор создаваемого (редактируемого) ЭИО. Если ЭИО создается, должно быть равно -1
+                                      qint64 idObjE, // идентификатор создаваемого (редактируемого) ЭИО. Если ЭИО создается, должно быть равно -1
                                       const KKSList<const KKSFilterGroup *> & filters,// Применяется для ЭИО, которые являются контейнерными ИО. Содержит набор фильтров их таблицы
                                       const QString & extraTitle,
                                       const KKSCategory* wCat=0, // категория информационных объектов
@@ -85,7 +85,7 @@ public:
                                       QWidget *parent=0,
                                       Qt::WindowFlags f=0);
 
-    void insertReport (int idObjE, QWidget *parent=0, Qt::WindowFlags f=0);
+    void insertReport (qint64 idObjE, QWidget *parent=0, Qt::WindowFlags f=0);
 
     void importCopies (KKSObject *io, // ИО, который будет содержать импортируемые ЭИО
                        const QStringList& attrCodeList,
@@ -114,7 +114,7 @@ public:
 
     int exportCopies (QIODevice *csvDev, // целевой CSV файл
                       const KKSCategory *c,
-                      const KKSMap<int, KKSEIOData *>& oeData,
+                      const KKSMap<qint64, KKSEIOData *>& oeData,
                       QString codeName, // кодировка выходных данных
                       QString fDelim, // разделитель полей
                       QString tDelim, // разделитель текста
@@ -123,7 +123,7 @@ public:
 
     KKSSearchTemplate * loadSearchTemplate (void) const;
     KKSObjEditor* createObjEditorParam (int idObject,// идентификатор ИО, который будет содержать создаваемый (редактируемый) ЭИО (для ЭИО, которые являются ИО этот идентификатор должен быть равен IO_IO_ID)
-                                        int idObjE, // идентификатор создаваемого (редактируемого) ЭИО. Если ЭИО создается, должно быть равно -1
+                                        qint64 idObjE, // идентификатор создаваемого (редактируемого) ЭИО. Если ЭИО создается, должно быть равно -1
                                         const KKSList<const KKSFilterGroup *> & filters,// Применяется для ЭИО, которые являются контейнерными ИО. Содержит набор фильтров их таблицы
                                         const QString & extraTitle,
                                         const KKSCategory* wCat, // категория информационных объектов
@@ -243,8 +243,9 @@ public slots:
     void filterTemplateEIO (KKSObjEditor * editor, int idObject, const KKSCategory * cat=0, QString tableName=QString());
     void createNewEditor (QWidget * editor, int idObject, const KKSCategory * c, QString tableName, int nTab, bool isModal);
     void createNewEditorParam (QWidget * editor, int idObject, const KKSCategory * c, QString tableName, int nTab, bool isModal, const KKSMap<int, KKSAttrValue *>& ioAvals, const KKSMap<int, KKSAttrValue *>& aVals);
-    void editExistOE (QWidget * editor, int idObject, int idObjEx, const KKSCategory * c, QString tableName, int nTab, bool isModal);
-    int deleteOE (QWidget * editor, int idObject, int idObjEx, QString tableName, int drow);
+    
+    void editExistOE (QWidget * editor, int idObject, qint64 idObjEx, const KKSCategory * c, QString tableName, int nTab, bool isModal);
+    int deleteOE (QWidget * editor, int idObject, qint64 idObjEx, QString tableName, int drow);
     
     void addAttrSearchTemplate (void);
     void editAttrSearchTemplate (void);
@@ -255,12 +256,29 @@ private slots:
 
     void importEIO (KKSObjEditor * editor, int idObject, const KKSCategory * c, QString tableName);
     void importCatAttrs (KKSCategory * c, const QStringList& catAttrs);
-    void importCSV (QIODevice *csvDev, QString codeName, QString fDelim, QString tDelim, QAbstractItemModel *dataModel, KKSXMLForm *xmlForm);
+    void importCSV (QIODevice *csvDev, 
+                    QString codeName, 
+                    QString fDelim, 
+                    QString tDelim, 
+                    QAbstractItemModel *dataModel, 
+                    KKSXMLForm *xmlForm);
 
     void exportEIO (KKSObjEditor * editor, int idObject, const KKSCategory * c, QString tableName);
-    void updateEIOView (KKSObjEditor * editor, int idObject, const QList<int>& idObjEx, const QList<int>& row, const KKSCategory *c, const QString& tableName, int nTab);
+    void updateEIOView (KKSObjEditor * editor, 
+                        int idObject, 
+                        const QList<qint64>& idObjEx, 
+                        const QList<int>& row, 
+                        const KKSCategory *c, 
+                        const QString& tableName, 
+                        int nTab);
 
-    void regroupAttrs (QWidget *wIOAttr, QScrollArea *scIOattr, QWidget *ioAttrs, int idObj, const KKSCategory *c, KKSIndAttr::KKSIndAttrClass isSystem, KKSObjEditor *editor);
+    void regroupAttrs (QWidget *wIOAttr, 
+                       QScrollArea *scIOattr, 
+                       QWidget *ioAttrs, 
+                       int idObj, 
+                       const KKSCategory *c, 
+                       KKSIndAttr::KKSIndAttrClass isSystem, 
+                       KKSObjEditor *editor);
 
     void loadAttributeReference (QString tableName, QWidget *awAttr, int attrId);
     void loadExecReference (QAbstractItemModel *exModel);
@@ -293,10 +311,24 @@ private slots:
 
     void addIOTable (KKSObject * wObj, KKSObjEditor * editor);
 
-    void loadObjAttrRef (KKSObject * wObj, const KKSAttrValue* attr, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sMod);
-    void loadObjCAttrRef (KKSObjectExemplar * wObjE, const KKSAttrValue* attr, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sMod);
-    void loadObjDelAttrRef (KKSObject * wObj, const KKSAttrValue* attribute, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel, const QModelIndex& wInd);
-    void loadObjCDelAttrRef (KKSObjectExemplar * wObjE, const KKSAttrValue* attribute, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel, const QModelIndex& wInd);
+    void loadObjAttrRef (KKSObject * wObj, 
+                         const KKSAttrValue* attr, 
+                         KKSIndAttr::KKSIndAttrClass isSystem, 
+                         QAbstractItemModel * sMod);
+    void loadObjCAttrRef (KKSObjectExemplar * wObjE, 
+                          const KKSAttrValue* attr, 
+                          KKSIndAttr::KKSIndAttrClass isSystem, 
+                          QAbstractItemModel * sMod);
+    void loadObjDelAttrRef (KKSObject * wObj, 
+                            const KKSAttrValue* attribute, 
+                            KKSIndAttr::KKSIndAttrClass isSystem, 
+                            QAbstractItemModel * sourceModel, 
+                            const QModelIndex& wInd);
+    void loadObjCDelAttrRef (KKSObjectExemplar * wObjE, 
+                             const KKSAttrValue* attribute, 
+                             KKSIndAttr::KKSIndAttrClass isSystem, 
+                             QAbstractItemModel * sourceModel, 
+                             const QModelIndex& wInd);
     void loadRefIO (QString tableName);
 
 private:
@@ -305,23 +337,105 @@ private:
     //
     void initTemplateConnections (KKSTemplateEditor *tEditor);
     //KKSList<const KKSFilterGroup *> viewMainCategories (void);
-    void updateAttrModel (const QModelIndex & wIndex, QAbstractItemModel * sMod, int id, QString tableName, KKSObject * refIO);
-    int putAttrsGroupsOnWidget (KKSObject * obj, KKSObjectExemplar * wObjE, KKSObjEditor * editor, int& nc, const KKSCategory *c, QString tableName, KKSAttrGroup * aGroup, QGridLayout *gbLay, QGridLayout * gAttrLayout, bool isGrouped);
-    int putRecAttrsGroupsOnWidget (KKSObject * obj, KKSObjectExemplar * wObjE, KKSObjEditor * editor, int& nc, const KKSCategory *c, QString tableName, KKSAttrGroup * aGroup, QGridLayout *gbLay, QGridLayout * gAttrLayout, bool isGrouped);
-    void putAttrsGroupsOnWidget (KKSObject * obj, KKSObjEditor * editor, int& nc, const KKSCategory *c, KKSAttrGroup * aGroup, QGridLayout *gbLay, QGridLayout * gAttrLayout, bool isGrouped, bool updateView);
-    void putIndicatorsGroupsOnToWidget (KKSObject * obj, KKSObjEditor * editor, int& nc, const KKSMap<int, KKSIndicatorValue*>& indMap, QGridLayout *gbLay, QGridLayout * gAttrLayout, bool isGrouped, bool updateView);
-    void putRubricator (KKSObject * obj, KKSObjEditor * editor, QTabWidget * tabObj);
-    void putRubricator (KKSObjectExemplar * eio, KKSObjEditor * editor, QTabWidget * tabObj);    void putSyncWidget (KKSObjEditor * editor, KKSObjectExemplar * wObjE, int idObjE, QTabWidget * tabObj);
-    void setIONameSecret (KKSObjEditor * editor, KKSObjectExemplar * wObjE, KKSObject * io, int& nWR, QGridLayout * mainLayout);
-    void loadEntities (KKSObject *& obj, KKSObjectExemplar *& wObjE, const KKSCategory* wCat, int idObject, int idObjE, const QString& tableName, const KKSTemplate *& tSystem, bool defTemplateOnly = false, QWidget * parent=0);
-    void loadRecEntities (KKSObject * obj, KKSObjectExemplar * wObjE, const KKSCategory* wCat, int idObject, int idObjE, const QString& tableName, const KKSTemplate *& tRecAttr, bool defTemplateOnly = false, QWidget * parent=0);
-    void loadEIOasIO (const KKSTemplate *& ioTemplate, KKSObject *& io, int idObject, int idObjE, KKSObjectExemplar * wObjE, const KKSCategory* wCat);
-    KKSTemplate * getRecordTemplate (KKSObject * io, const KKSCategory* wCat);
-    void initIOAttrs (KKSObject * io, KKSObjectExemplar * wObjE, const KKSCategory* wCat, KKSObjEditor * editor, QWidget * ioAttrWidget, QGridLayout * gIOLay);
-    void setPreliminaryAttrs (KKSObject * io, const KKSMap<int, KKSAttrValue *>& aVals) const;
-    void setPreliminaryAttrs (KKSObjectExemplar * cio, const KKSMap<int, KKSAttrValue *>& aVals) const;
+    void updateAttrModel (const QModelIndex & wIndex, 
+                          QAbstractItemModel * sMod, 
+                          int id, 
+                          QString tableName, 
+                          KKSObject * refIO);
+    int putAttrsGroupsOnWidget (KKSObject * obj, 
+                                KKSObjectExemplar * wObjE, 
+                                KKSObjEditor * editor, 
+                                int& nc, 
+                                const KKSCategory *c, 
+                                QString tableName, 
+                                KKSAttrGroup * aGroup, 
+                                QGridLayout *gbLay, 
+                                QGridLayout * gAttrLayout, 
+                                bool isGrouped);
+    int putRecAttrsGroupsOnWidget (KKSObject * obj, 
+                                   KKSObjectExemplar * wObjE, 
+                                   KKSObjEditor * editor, 
+                                   int& nc, 
+                                   const KKSCategory *c, 
+                                   QString tableName, 
+                                   KKSAttrGroup * aGroup, 
+                                   QGridLayout *gbLay, 
+                                   QGridLayout * gAttrLayout, 
+                                   bool isGrouped);
+    void putAttrsGroupsOnWidget (KKSObject * obj, 
+                                 KKSObjEditor * editor, 
+                                 int& nc, 
+                                 const KKSCategory *c, 
+                                 KKSAttrGroup * aGroup, 
+                                 QGridLayout *gbLay, 
+                                 QGridLayout * gAttrLayout, 
+                                 bool isGrouped, 
+                                 bool updateView);
+    void putIndicatorsGroupsOnToWidget (KKSObject * obj, 
+                                        KKSObjEditor * editor, 
+                                        int& nc, 
+                                        const KKSMap<int, KKSIndicatorValue*>& indMap, 
+                                        QGridLayout *gbLay, 
+                                        QGridLayout * gAttrLayout, 
+                                        bool isGrouped, 
+                                        bool updateView);
+    void putRubricator (KKSObject * obj, 
+                        KKSObjEditor * editor, 
+                        QTabWidget * tabObj);
+    void putRubricator (KKSObjectExemplar * eio, 
+                        KKSObjEditor * editor, 
+                        QTabWidget * tabObj);    
+    void putSyncWidget (KKSObjEditor * editor, 
+                        KKSObjectExemplar * wObjE, 
+                        qint64 idObjE, 
+                        QTabWidget * tabObj);
+    void setIONameSecret (KKSObjEditor * editor, 
+                          KKSObjectExemplar * wObjE, 
+                          KKSObject * io, 
+                          int& nWR, 
+                          QGridLayout * mainLayout);
+    
+    void loadEntities (KKSObject *& obj, 
+                       KKSObjectExemplar *& wObjE, 
+                       const KKSCategory* wCat, 
+                       int idObject, 
+                       qint64 idObjE, 
+                       const QString& tableName, 
+                       const KKSTemplate *& tSystem, 
+                       bool defTemplateOnly = false, 
+                       QWidget * parent=0,
+                       bool simplify = true);
+    void loadRecEntities (KKSObject * obj, 
+                          KKSObjectExemplar * wObjE, 
+                          const KKSCategory* wCat, 
+                          int idObject, 
+                          qint64 idObjE, 
+                          const QString& tableName, 
+                          const KKSTemplate *& tRecAttr, 
+                          bool defTemplateOnly = false, 
+                          QWidget * parent=0);
+    void loadEIOasIO (const KKSTemplate *& ioTemplate, 
+                      KKSObject *& io, 
+                      int idObject, 
+                      qint64 idObjE, 
+                      KKSObjectExemplar * wObjE, 
+                      const KKSCategory* wCat);
+    KKSTemplate * getRecordTemplate (KKSObject * io, 
+                                     const KKSCategory* wCat);
+    void initIOAttrs (KKSObject * io, 
+                      KKSObjectExemplar * wObjE, 
+                      const KKSCategory* wCat, 
+                      KKSObjEditor * editor, 
+                      QWidget * ioAttrWidget, 
+                      QGridLayout * gIOLay);
+    void setPreliminaryAttrs (KKSObject * io, 
+                              const KKSMap<int, KKSAttrValue *>& aVals) const;
+    void setPreliminaryAttrs (KKSObjectExemplar * cio, 
+                              const KKSMap<int, KKSAttrValue *>& aVals) const;
     void getModelIds (QAbstractItemModel * mod, const QModelIndex& wIndex, QList<int>& ids) const;
-    int searchParents (const KKSList<KKSObjectExemplar *>& oeList, const KKSCategoryAttr *cAttr, const KKSValue& refVal);
+    int searchParents (const KKSList<KKSObjectExemplar *>& oeList, 
+                       const KKSCategoryAttr *cAttr, 
+                       const KKSValue& refVal);
 
 private:
     //

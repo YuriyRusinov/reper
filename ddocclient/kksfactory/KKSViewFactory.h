@@ -67,7 +67,7 @@ class _F_EXPORT KKSViewFactory
 
         static void updateEIOEx (KKSLoader *l,
                                  KKSObject *pObj,
-                                 int idObjEx,
+                                 qint64 idObjEx,
                                  const KKSTemplate *t,
                                  QAbstractItemModel *sourceModel,
                                  int row,

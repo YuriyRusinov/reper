@@ -965,7 +965,7 @@ void KKSSito::initFactories()
     if(!m_eiof)
         m_eiof = new KKSEIOFactory();
 
-    m_eiof->setDb(db());
+    m_eiof->setParams( m_fileLoader, db());
 
     if(!m_ppf)
         m_ppf = new KKSPPFactory();

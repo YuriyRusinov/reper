@@ -33,7 +33,7 @@ public:
     //KKSRecWidget (const QString& filterTitle, const QString& addTitle, const QString& editTitle, const QString& delTitle, const QString& importTitle, const QString& exportTitle, QTreeView *tView, bool mode=false, QWidget *parent=0, Qt::WindowFlags f=0);
     ~KKSRecWidget (void);
 
-    int getID (void) const;
+    qint64 getID (void) const;
 
     void setEIOModel (QAbstractItemModel *model);
     QAbstractItemModel *getModel (void) const;

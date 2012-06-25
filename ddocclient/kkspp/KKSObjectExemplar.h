@@ -17,6 +17,7 @@ class KKSRubric;
 #include <KKSRecord.h>
 #include "kkspp_config.h"
 #include "KKSList.h"
+#include "KKSFile.h"
 
 class _PP_EXPORT KKSObjectExemplar : public KKSRecord
 {
@@ -79,12 +80,29 @@ public:
     void setRootRubric(KKSRubric * r);
     KKSRubric * rootRubric() const;
 
+    const KKSList<KKSFile *> & files() const;
+    KKSList<KKSFile *> & files();
+    void setFiles(const KKSList<KKSFile *> & _files);
+    void addFile(KKSFile * f);
+
+    //удаляет из списка файлов указанный файл
+    int removeFile(KKSFile * f);
+    //удаляет из списка файлов файл с указанным порядковым индексом
+    int removeFile(int index);
+
+    KKSFile * file(int index);
+    const KKSFile * file(int index) const;
 
 protected:
 private:
+    friend class KKSEIOFactory;
+
     KKSObject* m_io;
     KKSList<KKSAttrValue*> m_attrValues;
     KKSList<KKSAttrValue*> m_indValues;//показатели записей справочников
+    
+	KKSList<KKSFile *> m_files;
+    bool m_filesModified;
 
     KKSRubric * m_rootRubric;
 
