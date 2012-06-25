@@ -3,6 +3,8 @@
 
 #include <QAbstractItemModel>
 #include <QModelIndex>
+#include <QMap>
+#include <QList>
 
 #include "KKSMap.h"
 #include "kksgui_config.h"
@@ -45,6 +47,8 @@ private:
     const KKSTemplate * tRef;
     const KKSCategoryAttr * cAttrP;
     KKSMap<qint64, KKSEIOData *> objRecords;
+    mutable QMap<qint64, QModelIndex> parIndexList;
+    mutable QMap<qint64, QList<qint64> > indList;
 
 private:
     Q_OBJECT

@@ -12,7 +12,9 @@ KKSEIODataModel :: KKSEIODataModel (const KKSTemplate * t, const KKSMap<qint64, 
     : QAbstractItemModel (parent),
     tRef (t),
     cAttrP (0),
-    objRecords (objRecs)
+    objRecords (objRecs),
+    parIndexList (QMap<qint64, QModelIndex>()),
+    indList (QMap<qint64, QList<qint64> >())
 {
     if (tRef)
         tRef->addRef();
@@ -75,6 +77,16 @@ QModelIndex KKSEIODataModel :: index (int row, int column, const QModelIndex& pa
     if (cAttrP)
     {
         qint64 idp = parent.isValid() ? parent.internalId() : -1;
+        if (indList.contains(idp))
+        {
+            QList<qint64> vals = indList.value (idp);
+            if (row >= 0 && row<vals.count())
+            {
+                //qDebug () << __PRETTY_FUNCTION__ << row << column << vals[row];
+                QModelIndex ind = createIndex (row, column, (quint32)vals[row]);
+                return ind;
+            }
+        }
         KKSMap<qint64, KKSEIOData*>::const_iterator par = objRecords.constFind (idp);
         QString valStr = (par == objRecords.constEnd() ? QString() : par.value()->fieldValue(cAttrP->columnName(false)));
         QList<qint64> vals;
@@ -84,11 +96,13 @@ QModelIndex KKSEIODataModel :: index (int row, int column, const QModelIndex& pa
             if (QString::compare (p.value()->fieldValue(cAttrP->code(false)), valStr)==0)
                 vals += p.key();
         //qDebug () << __PRETTY_FUNCTION__ << idp << valStr << vals << row;
+        indList.insert (idp, vals);
         
         if (row >= 0 && row<vals.count())
         {
             //qDebug () << __PRETTY_FUNCTION__ << row << column << vals[row];
-            return createIndex (row, column, (quint32)vals[row]);
+            QModelIndex ind = createIndex (row, column, (quint32)vals[row]);
+            return ind;
         }
         else
         {
@@ -119,6 +133,8 @@ QModelIndex KKSEIODataModel :: parent (const QModelIndex& index) const
     qint64 idw = index.internalId();
     if (!cAttrP)
         return QModelIndex ();
+    if (parIndexList.contains(idw))
+        return parIndexList.value (idw);
     KKSMap<qint64, KKSEIOData*>::const_iterator par = objRecords.constFind (idw);
     if (par == objRecords.constEnd())
         return QModelIndex ();
@@ -150,28 +166,9 @@ QModelIndex KKSEIODataModel :: parent (const QModelIndex& index) const
     
     int prow = vals.indexOf(idw);
     QModelIndex pIndex = createIndex (prow, 0, (quint32)ival);
+    parIndexList.insert (idw, pIndex);
     //qDebug () << __PRETTY_FUNCTION__ << pIndex << ival << index;
     return pIndex;
-/*    KKSMap<qint64, KKSEIOData*>::const_iterator p;
-    int irow (-1);
-    int i (0);
-    for (p = objRecords.constBegin();
-            p != objRecords.constEnd() && irow < 0;
-            p++)
-    {
-        if (QString::compare (p.value()->fieldValue(cAttrP->code(false)), valStr)==0)
-            irow = i;
-        i++;
-    }
-    if (irow < 0 || p == objRecords.constEnd())
-        return QModelIndex ();
-    else
-    {
-        QModelIndex pIndex = createIndex (irow, 0, (quint32)p.key());
-        qDebug () << __PRETTY_FUNCTION__ << pIndex << p.key() << index;
-        return pIndex;
-    }
- */
 }
 
 Qt::ItemFlags KKSEIODataModel :: flags (const QModelIndex& index) const
@@ -224,7 +221,7 @@ QVariant KKSEIODataModel :: headerData (int section, Qt::Orientation orientation
     KKSList<KKSAttrView*> avList = tRef ? tRef->sortedAttrs() : KKSList<KKSAttrView*>();
     if (orientation == Qt::Horizontal && section >= 0 && section < avList.count() && role == Qt::DisplayRole)
     {
-        QVariant v = avList[section]->code(false);
+        QVariant v = avList[section]->title();
         return v;
     }
     else
