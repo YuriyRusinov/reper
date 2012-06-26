@@ -143,24 +143,33 @@ QModelIndex KKSEIODataModel :: parent (const QModelIndex& index) const
     if (valStr.isEmpty())
         return QModelIndex ();
     qint64 ival (-1);
-    for (KKSMap<qint64, KKSEIOData*>::const_iterator p=objRecords.constBegin();
-            p != objRecords.constEnd() && ival < 0;
-            p++)
-        if (QString::compare (p.value()->fieldValue(cAttrP->columnName(false)), valStr)==0)
-            ival = p.key();
-    //qDebug () << __PRETTY_FUNCTION__ << ival;
-    KKSMap<qint64, KKSEIOData*>::const_iterator par1 = objRecords.constFind (ival);
-    if (par1 == objRecords.constEnd())
-        return QModelIndex ();
-    QString valStr1 = par1.value()->fieldValue(cAttrP->columnName(false));
-    if (valStr1.isEmpty())
-        return QModelIndex ();
     QList<qint64> vals;
+    QString valStr1;
+    QMultiMap<QString, qint64> pVals;
     for (KKSMap<qint64, KKSEIOData*>::const_iterator p=objRecords.constBegin();
+            p != objRecords.constEnd();
+            p++)
+    {
+        pVals.insert(p.value()->fieldValue(cAttrP->code(false)), p.key());
+        if (QString::compare (p.value()->fieldValue(cAttrP->columnName(false)), valStr)==0)
+        {
+            ival = p.key();
+            //qDebug () << __PRETTY_FUNCTION__ << ival;
+            KKSMap<qint64, KKSEIOData*>::const_iterator par1 = objRecords.constFind (ival);
+            if (par1 == objRecords.constEnd())
+                return QModelIndex ();
+            valStr1 = par1.value()->fieldValue(cAttrP->columnName(false));
+            if (valStr1.isEmpty())
+                return QModelIndex ();
+        }
+    }
+    vals = pVals.values(valStr1);
+/*    for (KKSMap<qint64, KKSEIOData*>::const_iterator p=objRecords.constBegin();
             p != objRecords.constEnd();
             p++)
         if (QString::compare (p.value()->fieldValue(cAttrP->code(false)), valStr1)==0)
             vals += p.key();
+ */
     if (!vals.contains(idw))
         return QModelIndex ();
     
