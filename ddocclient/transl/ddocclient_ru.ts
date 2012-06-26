@@ -2332,6 +2332,10 @@ Do you want to save the changes before closing?</source>
         <source>Cannot load source category</source>
         <translation>Не могу загрузить категорию</translation>
     </message>
+    <message>
+        <source>Creation new category on %1</source>
+        <translation>Создание новой категории по %1</translation>
+    </message>
 </context>
 <context>
     <name>KKSCategoryTemplateWidget</name>
@@ -2381,7 +2385,7 @@ Do you want to save the changes before closing?</source>
     </message>
     <message>
         <source>Add copy of selected category</source>
-        <translation>Добавить копию выбранной категории</translation>
+        <translation type="obsolete">Добавить копию выбранной категории</translation>
     </message>
     <message>
         <source>Add template</source>
@@ -2427,6 +2431,10 @@ Category cannot been created.</source>
     <message>
         <source>Base template cannot be deleted</source>
         <translation>Невозможно удалить базовый шаблон категории</translation>
+    </message>
+    <message>
+        <source>Add new category on exists</source>
+        <translation>Добавить новую категорию по существующей</translation>
     </message>
 </context>
 <context>
@@ -2644,6 +2652,77 @@ Press YES to clear the color value or NO to remains current value</source>
         <translation>Вы отменили выбор цвета в диалоге
 Вы хотите очистить цвет и задать цвет принятый по умолчанию или сохранить текущую величину?
 Нажмите YES для очистки или NO для оставления текущего цвета</translation>
+    </message>
+</context>
+<context>
+    <name>KKSFileLoader</name>
+    <message>
+        <source>Download file, please wait...</source>
+        <translation>Файл загружается с сервера, подождите...</translation>
+    </message>
+    <message>
+        <source>Cancel download</source>
+        <translation>Отметить загрузку</translation>
+    </message>
+    <message>
+        <source>Downloading file</source>
+        <translation>Загрузка файла</translation>
+    </message>
+    <message>
+        <source>Downloading file, please wait... 
+
+Time elapsed: %1
+Time estimated: %2
+Avg speed: %3 Kb/sec</source>
+        <translation>Осуществляется загрузка файла, подождите...
+
+Прошло времени: %1
+Осталось времени: %2
+Средняя скорость: %3 Кб/сек</translation>
+    </message>
+    <message>
+        <source>Download was cancelled by user. Delete downloaded part of the file?</source>
+        <translation>Загрузка была отменена пользователем. Удалить загруженную часть файла?</translation>
+    </message>
+    <message>
+        <source>Uploading file, please wait...</source>
+        <translation>Файл загружается на сервер, подождите...</translation>
+    </message>
+    <message>
+        <source>Cancel upload</source>
+        <translation>Отменить загрузку на сервер</translation>
+    </message>
+    <message>
+        <source>Uploading file</source>
+        <translation>Загрузка файла на сервер</translation>
+    </message>
+    <message>
+        <source>Uploading file, please wait... 
+
+Time elapsed: %1
+Time estimated: %2
+Avg speed: %3 Kb/sec</source>
+        <translation>Файл загружается на сервер, подождите...
+
+Времени прошло: %1
+Времени осталось: %2
+Средняя скорость: %3 Кб/сек</translation>
+    </message>
+    <message>
+        <source>Cancel uploading</source>
+        <translation>Отменить загрузку на сервер</translation>
+    </message>
+    <message>
+        <source>Uploading was cancelled by user. Delete uploaded part of the file on server?</source>
+        <translation>Загрузка на сервер была отменена пользователем. Удалить загруженную часть файла с сервера?</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Ошибка</translation>
+    </message>
+    <message>
+        <source>Cannot delete uploaded part of file</source>
+        <translation>Не могу удалить загруженную часть файла</translation>
     </message>
 </context>
 <context>
@@ -4040,11 +4119,11 @@ try to rename it with extention. Example: filename.vsd</source>
     </message>
     <message>
         <source>Import copies</source>
-        <translation type="obsolete">Импорт записей справочника</translation>
+        <translation>Импорт записей справочника</translation>
     </message>
     <message>
         <source>Cannot insert into table</source>
-        <translation type="obsolete">Не могу сохранить записи в справочнике</translation>
+        <translation>Не могу сохранить записи в справочнике</translation>
     </message>
     <message>
         <source>Export IO %1</source>
@@ -4180,31 +4259,31 @@ try to rename it with extention. Example: filename.vsd</source>
     </message>
     <message>
         <source>Generate Records</source>
-        <translation type="obsolete">Формирование экземпляров ИО</translation>
+        <translation>Формирование экземпляров ИО</translation>
     </message>
     <message>
         <source>Abort generate</source>
-        <translation type="obsolete">Отменить операцию</translation>
+        <translation>Отменить операцию</translation>
     </message>
     <message>
         <source>Import copies into %1</source>
-        <translation type="obsolete">Импорт экземпляров в %1</translation>
+        <translation>Импорт экземпляров в %1</translation>
     </message>
     <message>
         <source>Write copies into database. Please wait...</source>
-        <translation type="obsolete">Запись данных в БД. Пожалуйста подождите...</translation>
+        <translation>Запись данных в БД. Пожалуйста подождите...</translation>
     </message>
     <message>
         <source>Save into DB</source>
-        <translation type="obsolete">Сохранение в БД</translation>
+        <translation>Сохранение в БД</translation>
     </message>
     <message>
         <source>Create view. Please wait...</source>
-        <translation type="obsolete">Отображение новых данных. Пожалуйста подождите...</translation>
+        <translation>Отображение новых данных. Пожалуйста подождите...</translation>
     </message>
     <message>
         <source>Update IO</source>
-        <translation type="obsolete">Обновить ИО</translation>
+        <translation>Обновить ИО</translation>
     </message>
     <message>
         <source>In control journal you can insert ONLY one copy of IO!</source>
@@ -4388,15 +4467,15 @@ Press OK to continue or Cancel to cancel the operation</source>
     </message>
     <message>
         <source>Search</source>
-        <translation>Фильтры</translation>
+        <translation type="obsolete">Фильтры</translation>
     </message>
     <message>
         <source>Add Indicator value</source>
-        <translation>Добавить новое значение показателя</translation>
+        <translation type="obsolete">Добавить новое значение показателя</translation>
     </message>
     <message>
         <source>&amp;Refresh</source>
-        <translation>&amp;Обновить</translation>
+        <translation type="obsolete">&amp;Обновить</translation>
     </message>
     <message>
         <source>Cannot find selected attribute!</source>
@@ -4409,6 +4488,18 @@ Press OK to continue or Cancel to cancel the operation</source>
     <message>
         <source>Assotiated IO</source>
         <translation>Ассоциированные ИО</translation>
+    </message>
+    <message>
+        <source>Record Attributes</source>
+        <translation>Табличные атрибуты</translation>
+    </message>
+    <message>
+        <source>Save IO copy. Only current copy will be updated</source>
+        <translation>Сохранение копии ИО. Только текущая копия будет обновлена</translation>
+    </message>
+    <message>
+        <source>Assotiated Records</source>
+        <translation>Рубрикатор</translation>
     </message>
 </context>
 <context>
@@ -6855,6 +6946,10 @@ Please contact your Systems Administrator and report this issue.</source>
         <source>An unknown error was encountered while processing your request.
 Please contact your Systems Administrator and report this issue.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time elapsed </source>
+        <translation>Времени осталось</translation>
     </message>
 </context>
 <context>
