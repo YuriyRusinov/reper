@@ -17,6 +17,7 @@
 #include <QAbstractItemModel>
 #include <QSortFilterProxyModel>
 #include <QItemSelectionModel>
+#include <QItemSelection>
 #include <QHeaderView>
 #include <QFileDialog>
 #include <QtDebug>
@@ -676,13 +677,16 @@ void KKSIncludesWidget::slotAddRubricItem(int idObject, QString name)
 
     QItemSelectionModel * sm = twIncludes->selectionModel();
     QModelIndex index;
-    if(!sm || !(index = sm->currentIndex()).isValid()){
+    QItemSelection sel = sm ? sm->selection() : QItemSelection();
+    if(!sm || sel.indexes().isEmpty())
+    {
         QMessageBox::warning(this, 
                              tr("Warning"), 
                              tr("You should select rubric to add item"), 
                              QMessageBox::Ok);
         return;
     }
+    index = sel.indexes().at(0);
     
     KKSRubric * r = currentRubric();
     if (!r)
