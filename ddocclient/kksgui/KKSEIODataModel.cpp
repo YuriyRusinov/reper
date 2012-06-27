@@ -167,12 +167,7 @@ QModelIndex KKSEIODataModel :: parent (const QModelIndex& index) const
         }
     }
     vals = pVals.values(valStr1);
-/*    for (KKSMap<qint64, KKSEIOData*>::const_iterator p=objRecords.constBegin();
-            p != objRecords.constEnd();
-            p++)
-        if (QString::compare (p.value()->fieldValue(cAttrP->code(false)), valStr1)==0)
-            vals += p.key();
- */
+
     if (!vals.contains(idw))
         return QModelIndex ();
     
@@ -298,6 +293,7 @@ void KKSEIODataModel :: setupData (KKSTreeItem * parent)
             p++)
     {
         KKSTreeItem * t = new KKSTreeItem (p.key(), p.value());
+        qDebug () << __PRETTY_FUNCTION__ << p.key();
         QString valStr = p.value()->fieldValue(cAttrP->code(false));
         if (valStr.isEmpty())
             rootItem->appendChild (t);
@@ -307,7 +303,10 @@ void KKSEIODataModel :: setupData (KKSTreeItem * parent)
             if (!parent)
                 rootItem->appendChild (t);
             else
+            {
                 parent->appendChild (t);
+                qDebug () << __PRETTY_FUNCTION__ << QString ("parent id is") << parent->id();
+            }
         }
     }
 
@@ -315,10 +314,10 @@ void KKSEIODataModel :: setupData (KKSTreeItem * parent)
 
 KKSTreeItem * KKSEIODataModel :: getModelItem (QString valStr, KKSTreeItem * parent)
 {
-    if (!parent || valStr.isEmpty() || !parent->getData())
+    if (!parent || valStr.isEmpty())
         return rootItem;
 
-    if (QString::compare (parent->getData()->fieldValue(cAttrP->columnName(false)), valStr) == 0)
+    if (parent->getData() && QString::compare (parent->getData()->fieldValue(cAttrP->columnName(false)), valStr) == 0)
         return parent;
     for (int i=0; i<parent->childCount(); i++)
     {
