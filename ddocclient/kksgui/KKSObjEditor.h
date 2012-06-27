@@ -204,6 +204,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void exportObjectEx (KKSObjEditor * editor, int idObject, const KKSCategory * c, QString tableName);
 
         void rubricItemSelected(int idObject, QString name);
+        void rubricItemRecSelected(int idObjectRec, QString name);
         void includeRequested(KKSObjEditor * editor);
         void includeRecRequested(KKSObjEditor * editor);
         void openRubricItemRequested(int idObject, KKSObjEditor * editor);

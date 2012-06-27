@@ -1578,7 +1578,7 @@ void KKSObjEditor :: addIncludesRecWidget (KKSIncludesWidget *iw)
     connect (includesRecWidget, SIGNAL(rubricItemRequested()), this, SLOT(slotIncludeRecRequested()));
     connect (includesRecWidget, SIGNAL(openRubricItemRequested(int)), this, SLOT(slotOpenRubricItemRecRequested(int)));
     connect (includesRecWidget, SIGNAL (rubricsChanged()), this, SLOT (rubricsChanged()) );
-    connect (this, SIGNAL(rubricItemSelected(int, QString)), includesRecWidget, SLOT(slotAddRubricItem(int, QString)));
+    connect (this, SIGNAL(rubricItemRecSelected(int, QString)), includesRecWidget, SLOT(slotAddRubricItem(int, QString)));
 }
 
 void KKSObjEditor::slotIncludeSelected(int idObject, QString name)
@@ -1599,7 +1599,7 @@ void KKSObjEditor::slotOpenRubricItemRequested(int idObject)
 void KKSObjEditor::slotIncludeRecSelected(int idObjectE, int idObject, QString name)
 {
     qDebug () << __PRETTY_FUNCTION__ << idObjectE << idObject << name; 
-    emit rubricItemSelected (idObjectE, name);
+    emit rubricItemRecSelected (idObjectE, name);
     Q_UNUSED (idObject);
 }
 

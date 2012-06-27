@@ -298,10 +298,12 @@ void KKSIncludesWidget::delRubric (void)
 {
     QItemSelectionModel * sm = twIncludes->selectionModel();
     QModelIndex index;
-    if(!sm || !(index = sm->currentIndex()).isValid()){
+    QItemSelection sel = sm ? sm->selection() : QItemSelection();
+    if(!sm || sel.indexes().isEmpty()){
         return;
     }
     else{
+        index = sel.indexes().at(0);
         index = index.sibling(index.row(), 0);
         if(index.data(Qt::UserRole).toInt() == 2){ //item selected
             return;
@@ -339,10 +341,13 @@ void KKSIncludesWidget :: addRubric (void)
 //    }
 
     QModelIndex index;
-    if(!sm || !(index = sm->currentIndex()).isValid()){
+    QItemSelection sel = sm ? sm->selection() : QItemSelection();
+
+    if(!sm || sel.indexes().isEmpty()){
         index = QModelIndex();
     }
     else{
+        index = sel.indexes().at (0);
         index = index.sibling(index.row(), 0);
         if(index.data(Qt::UserRole).toInt() == 2){ //item selected
             index = index.parent();
@@ -409,11 +414,13 @@ void KKSIncludesWidget :: copyFromRubric (void)
 {
     QItemSelectionModel * sm = twIncludes->selectionModel();
 
+    QItemSelection sel = sm ? sm->selection() : QItemSelection();
     QModelIndex index;
-    if(!sm || !(index = sm->currentIndex()).isValid()){
+    if(!sm || sel.indexes().isEmpty()){
         index = QModelIndex();
     }
     else{
+        index = sel.indexes().at(0);
         index = index.sibling(index.row(), 0);
         if(index.data(Qt::UserRole).toInt() == 2){ //item selected
             index = index.parent();
@@ -434,11 +441,13 @@ void KKSIncludesWidget :: copyFromRubric (void)
 void KKSIncludesWidget :: editRubric (void)
 {
     QItemSelectionModel * sm = twIncludes->selectionModel();
+    QItemSelection sel = sm ? sm->selection() : QItemSelection();
     QModelIndex index;
-    if(!sm || !(index = sm->currentIndex()).isValid()){
+    if(!sm || sel.indexes().isEmpty()){
         index = QModelIndex();
     }
     else{
+        index = sel.indexes().at (0);
         index = index.sibling(index.row(), 0);
         if(index.data(Qt::UserRole).toInt() == 2){ //item selected
             index = index.parent();
@@ -600,14 +609,17 @@ void KKSIncludesWidget :: delRubricItem (void)
     }
     else
         sm = twIncludes->selectionModel();
+    
+    QItemSelection sel = sm ? sm->selection() : QItemSelection();
 
-    QModelIndex index = sm ? sm->currentIndex() : QModelIndex ();
-    if (!sm || !index.isValid())
+    QModelIndex index;// = sm ? sm->currentIndex() : QModelIndex ();
+    if (!sm || sel.indexes().isEmpty())
     {
         return;
     }
     else
     {
+        index = sel.indexes().at (0);
         index = index.sibling(index.row(), 0);
         if (!isRubr || index.data(Qt::UserRole).toInt() == 2)
         {
@@ -646,8 +658,9 @@ void KKSIncludesWidget :: addRubricItem (void)
     QItemSelectionModel * sm (twIncludes->selectionModel());
 
 //    sm = twIncludes->selectionModel();
+    QItemSelection sel = sm ? sm->selection() : QItemSelection();
 
-    QModelIndex index = sm ? sm->currentIndex() : QModelIndex();
+    QModelIndex index = sel.indexes().isEmpty() ? QModelIndex() : sel.indexes().at(0);
     if (!sm || !index.isValid())
     {
         QMessageBox::warning(this, 
@@ -763,7 +776,8 @@ void KKSIncludesWidget :: editRubricItem (void)
     else
         sm = twIncludes->selectionModel();
 
-    QModelIndex index = sm ? sm->currentIndex() : QModelIndex();
+    QItemSelection sel = sm ? sm->selection() : QItemSelection();
+    QModelIndex index = sel.indexes().isEmpty() ? QModelIndex() : sel.indexes().at (0);
     if(!sm || !index.isValid())
     {
         return;
@@ -847,11 +861,13 @@ KKSRubric * KKSIncludesWidget::currentRubric()
 {
 
     QItemSelectionModel * sm = twIncludes->selectionModel();
+    QItemSelection sel = sm ? sm->selection() : QItemSelection();
     QModelIndex index;
-    if(!sm || !(index = sm->currentIndex()).isValid()){
+    if(!sm || sel.indexes().isEmpty()){
         return NULL;
     }
-    
+
+    index = sel.indexes().at (0);
     return getRubric(index);
 }
 

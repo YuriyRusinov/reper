@@ -7437,22 +7437,22 @@ void KKSObjEditorFactory :: putRubricator (KKSObjectExemplar * eio, KKSObjEditor
     //includesW->setSizePolicy (iwSizePolicy);
     //qDebug () << __PRETTY_FUNCTION__ << includesW->sizePolicy ();
     //QGridLayout *gIncludesLay = new QGridLayout (includesW);
-    KKSIncludesWidget * iW = new KKSIncludesWidget (eio->rootRubric());//, true, false, false, includesW);
-    iW->setSizePolicy (iwSizePolicy);
-    if (iW && m_rf)
+    KKSIncludesWidget * eiW = new KKSIncludesWidget (eio->rootRubric());//, true, false, false, includesW);
+    eiW->setSizePolicy (iwSizePolicy);
+    if (eiW && m_rf)
     {
-        connect (iW, SIGNAL (loadStuffModel(RubricForm *)), m_rf, SLOT (loadRubricPrivilegies(RubricForm *)) );
-        connect (iW, SIGNAL (loadSearchtemplate (RubricForm *)), m_rf, SLOT (loadSearchTemplate (RubricForm *)) );
-        connect (iW, SIGNAL (loadCategory (RubricForm *)), m_rf, SLOT (loadCategory (RubricForm *)) );
-        connect (iW, SIGNAL (rubricAttachmentsView (QAbstractItemModel *, const KKSRubric *)), m_rf, SLOT (viewAttachments (QAbstractItemModel *, const KKSRubric *)) );
+        connect (eiW, SIGNAL (loadStuffModel(RubricForm *)), m_rf, SLOT (loadRubricPrivilegies(RubricForm *)) );
+        connect (eiW, SIGNAL (loadSearchtemplate (RubricForm *)), m_rf, SLOT (loadSearchTemplate (RubricForm *)) );
+        connect (eiW, SIGNAL (loadCategory (RubricForm *)), m_rf, SLOT (loadCategory (RubricForm *)) );
+        connect (eiW, SIGNAL (rubricAttachmentsView (QAbstractItemModel *, const KKSRubric *)), m_rf, SLOT (viewAttachments (QAbstractItemModel *, const KKSRubric *)) );
     }
-    QTreeView *tv = iW->tvRubr();
-    KKSEventFilter *ef = new KKSEventFilter (iW);
+    QTreeView *tv = eiW->tvRubr();
+    KKSEventFilter *ef = new KKSEventFilter (eiW);
     tv->viewport()->installEventFilter (ef);
 
     //connect(this, SIGNAL(includeSelected(int, QString)), objEditorWidget, SLOT(slotIncludeSelected(int, QString)));
-    editor->addIncludesRecWidget (iW);
-    tabObj->addTab (iW/*includesW*/, tr("Assotiated Records"));
+    editor->addIncludesRecWidget (eiW);
+    tabObj->addTab (eiW/*includesW*/, tr("Assotiated Records"));
     //gIncludesLay->addWidget (iW, 0, 0, 1, 1);
 }
 
