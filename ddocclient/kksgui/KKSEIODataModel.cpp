@@ -143,16 +143,23 @@ bool KKSEIODataModel :: setData (const QModelIndex& index, const QVariant& value
     Q_UNUSED (role);
     return false;
 }
-/*
+
 bool KKSEIODataModel :: insertRows (int row, int count, const QModelIndex& parent)
 {
+    Q_UNUSED (row);
+    Q_UNUSED (count);
+    Q_UNUSED (parent);
     return false;
 }
 
 bool KKSEIODataModel :: removeRows (int row, int count, const QModelIndex& parent)
 {
+    Q_UNUSED (row);
+    Q_UNUSED (count);
+    Q_UNUSED (parent);
+    return false;
 }
- */
+
 
 const KKSCategoryAttr * KKSEIODataModel :: getFirstAttribute (KKSAttrType::KKSAttrTypes aType)
 {
@@ -184,7 +191,7 @@ void KKSEIODataModel :: setupData (KKSTreeItem * parent)
                 p++)
         {
             KKSTreeItem * t = new KKSTreeItem (p.key(), p.value());
-            rootItem->appendChild (t);
+            parent->appendChild (t);
         }
         return;
     }
@@ -197,15 +204,15 @@ void KKSEIODataModel :: setupData (KKSTreeItem * parent)
         qDebug () << __PRETTY_FUNCTION__ << p.key();
         QString valStr = p.value()->fieldValue(cAttrP->code(false));
         if (valStr.isEmpty())
-            rootItem->appendChild (t);
+            parent->appendChild (t);
         else
         {
-            KKSTreeItem * parent = getModelItem (valStr, rootItem);
-            if (!parent)
-                rootItem->appendChild (t);
+            KKSTreeItem * parent1 = getModelItem (valStr, rootItem);
+            if (!parent1)
+                parent->appendChild (t);
             else
             {
-                parent->appendChild (t);
+                parent1->appendChild (t);
                 qDebug () << __PRETTY_FUNCTION__ << QString ("parent id is") << parent->id();
             }
         }
