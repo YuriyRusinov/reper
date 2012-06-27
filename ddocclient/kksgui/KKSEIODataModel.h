@@ -44,6 +44,8 @@ private:
     const KKSCategoryAttr * getFirstAttribute (KKSAttrType::KKSAttrTypes aType);
     void setupData (KKSTreeItem * parent);
     KKSTreeItem * getModelItem (QString valStr, KKSTreeItem * parent);
+    KKSTreeItem * getItem(const QModelIndex &index) const;
+    
 private:
     //
     // Variables

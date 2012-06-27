@@ -40,142 +40,40 @@ int KKSEIODataModel :: columnCount (const QModelIndex& parent) const
 
 int KKSEIODataModel :: rowCount (const QModelIndex& parent) const
 {
-    if (!cAttrP)
-        return parent.isValid() ? 0 : objRecords.count();
+    KKSTreeItem * parentItem = getItem (parent);
 
-    if (!parent.isValid() )
-    {
-        int ncount = 0;
-        for (KKSMap<qint64, KKSEIOData*>::const_iterator p=objRecords.constBegin();
-                p != objRecords.constEnd();
-                p++)
-            if (p.value()->fieldValue(cAttrP->code(false)).isEmpty())
-                ncount++;
-        return ncount;
-    }
-    else //if (parent.isValid() )
-    {
-        qint64 val = parent.internalId();//data (Qt::UserRole).toInt();
-        QString valStr = objRecords.constFind (val).value()->fieldValue(cAttrP->columnName(false));
-        int ncount = 0;
-        for (KKSMap<qint64, KKSEIOData*>::const_iterator p=objRecords.constBegin();
-                p != objRecords.constEnd();
-                p++)
-        {
-            if (QString::compare (p.value()->fieldValue(cAttrP->code(false)), valStr)==0)
-                ncount++;
-        }
-        return ncount;
-    }
+    return parentItem->childCount();
 }
  
 
 QModelIndex KKSEIODataModel :: index (int row, int column, const QModelIndex& parent) const
 {
-    if (!hasIndex (row, column, parent))
-        return QModelIndex ();
-//    if (parent.internalId() >= 5 && parent.internalId() <= 9)
-//        qDebug () << __PRETTY_FUNCTION__ << row << column << parent << parent.internalId();
 
-    if (cAttrP)
-    {
-        qint64 idp = parent.isValid() ? parent.internalId() : -1;
-        if (indList.contains(idp))
-        {
-            QList<qint64> vals = indList.value (idp);
-            if (row >= 0 && row<vals.count())
-            {
-                //qDebug () << __PRETTY_FUNCTION__ << row << column << vals[row];
-                QModelIndex ind = createIndex (row, column, (quint32)vals[row]);
-                return ind;
-            }
-        }
-        KKSMap<qint64, KKSEIOData*>::const_iterator par = objRecords.constFind (idp);
-        QString valStr = (par == objRecords.constEnd() ? QString() : par.value()->fieldValue(cAttrP->columnName(false)));
-        QList<qint64> vals;
-        for (KKSMap<qint64, KKSEIOData*>::const_iterator p=objRecords.constBegin();
-                p != objRecords.constEnd();
-                p++)
-            if (QString::compare (p.value()->fieldValue(cAttrP->code(false)), valStr)==0)
-                vals += p.key();
-        //qDebug () << __PRETTY_FUNCTION__ << idp << valStr << vals << row;
-        indList.insert (idp, vals);
-        
-        if (row >= 0 && row<vals.count())
-        {
-            //qDebug () << __PRETTY_FUNCTION__ << row << column << vals[row];
-            QModelIndex ind = createIndex (row, column, (quint32)vals[row]);
-            return ind;
-        }
-        else
-        {
-            //qDebug () << __PRETTY_FUNCTION__ << row << vals;
-            return QModelIndex ();
-        }
- 
-    }
+    if (parent.isValid() && parent.column() != 0)
+        return QModelIndex();
+
+    KKSTreeItem *parentItem = getItem(parent);
+
+    KKSTreeItem *childItem = parentItem->child(row);
+    if (childItem)
+        return createIndex(row, column, childItem);
     else
-    {
-        KKSMap<qint64, KKSEIOData*>::const_iterator p=objRecords.constBegin();
-        for (int i=0; i<row && p != objRecords.constEnd(); i++ )
-            p++;
-        //p += row;
-        if (p != objRecords.constEnd())
-            return createIndex (row, column, (quint32)p.key());
-        else
-            return QModelIndex ();
-    }
+        return QModelIndex();
 }
 
 QModelIndex KKSEIODataModel :: parent (const QModelIndex& index) const
 {
-//    Q_UNUSED (index);
-//    return QModelIndex ();
+
     if (!index.isValid())
         return QModelIndex();
-    qint64 idw = index.internalId();
-    if (!cAttrP)
-        return QModelIndex ();
-    if (parIndexList.contains(idw))
-        return parIndexList.value (idw);
-    KKSMap<qint64, KKSEIOData*>::const_iterator par = objRecords.constFind (idw);
-    if (par == objRecords.constEnd())
-        return QModelIndex ();
-    QString valStr = par.value()->fieldValue(cAttrP->code(false));
-    //qDebug () << __PRETTY_FUNCTION__ << index << idw << valStr << par.key() << par.value()->fields();
-    if (valStr.isEmpty())
-        return QModelIndex ();
-    qint64 ival (-1);
-    QList<qint64> vals;
-    QString valStr1;
-    QMultiMap<QString, qint64> pVals;
-    for (KKSMap<qint64, KKSEIOData*>::const_iterator p=objRecords.constBegin();
-            p != objRecords.constEnd();
-            p++)
-    {
-        pVals.insert(p.value()->fieldValue(cAttrP->code(false)), p.key());
-        if (QString::compare (p.value()->fieldValue(cAttrP->columnName(false)), valStr)==0)
-        {
-            ival = p.key();
-            //qDebug () << __PRETTY_FUNCTION__ << ival;
-            KKSMap<qint64, KKSEIOData*>::const_iterator par1 = objRecords.constFind (ival);
-            if (par1 == objRecords.constEnd())
-                return QModelIndex ();
-            valStr1 = par1.value()->fieldValue(cAttrP->columnName(false));
-            if (valStr1.isEmpty())
-                return QModelIndex ();
-        }
-    }
-    vals = pVals.values(valStr1);
 
-    if (!vals.contains(idw))
-        return QModelIndex ();
-    
-    int prow = vals.indexOf(idw);
-    QModelIndex pIndex = createIndex (prow, 0, (quint32)ival);
-    parIndexList.insert (idw, pIndex);
-    //qDebug () << __PRETTY_FUNCTION__ << pIndex << ival << index;
-    return pIndex;
+    KKSTreeItem *childItem = getItem(index);
+    KKSTreeItem *parentItem = childItem->parent();
+
+    if (parentItem == rootItem)
+        return QModelIndex();
+
+    return createIndex(parentItem->childNumber(), 0, parentItem);
 }
 
 Qt::ItemFlags KKSEIODataModel :: flags (const QModelIndex& index) const
@@ -195,7 +93,10 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
     if (!index.isValid())
         return QVariant();
 
-    qint64 idw = index.internalId();
+    KKSTreeItem * item = static_cast<KKSTreeItem*>(index.internalPointer());
+    if (!item)
+        return QVariant ();
+    qint64 idw = item->id();//index.internalId();
     //if (!index.parent().isValid())
     //    qDebug () << __PRETTY_FUNCTION__ << index << idw;
     //if (index.parent().isValid())
@@ -317,8 +218,8 @@ KKSTreeItem * KKSEIODataModel :: getModelItem (QString valStr, KKSTreeItem * par
     if (!parent || valStr.isEmpty())
         return rootItem;
 
-    if (parent->getData() && QString::compare (parent->getData()->fieldValue(cAttrP->columnName(false)), valStr) == 0)
-        return parent;
+    //if (parent->getData() && QString::compare (parent->getData()->fieldValue(cAttrP->columnName(false)), valStr) == 0)
+    //    return parent;
     for (int i=0; i<parent->childCount(); i++)
     {
         KKSTreeItem * item = parent->child(i);
@@ -335,4 +236,15 @@ KKSTreeItem * KKSEIODataModel :: getModelItem (QString valStr, KKSTreeItem * par
     }
     
     return 0;
+}
+
+KKSTreeItem * KKSEIODataModel :: getItem(const QModelIndex &index) const
+{
+    if (index.isValid())
+    {
+        KKSTreeItem *item = static_cast<KKSTreeItem*>(index.internalPointer());
+        if (item)
+            return item;
+    }
+    return rootItem;   
 }
