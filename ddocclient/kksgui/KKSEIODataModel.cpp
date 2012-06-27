@@ -6,6 +6,7 @@
 #include "KKSCategoryAttr.h"
 #include "KKSAttrView.h"
 #include "KKSEIOData.h"
+#include "KKSTreeItem.h"
 #include "KKSEIODataModel.h"
 
 KKSEIODataModel :: KKSEIODataModel (const KKSTemplate * t, const KKSMap<qint64, KKSEIOData *>& objRecs, QObject *parent)
@@ -14,11 +15,13 @@ KKSEIODataModel :: KKSEIODataModel (const KKSTemplate * t, const KKSMap<qint64, 
     cAttrP (0),
     objRecords (objRecs),
     parIndexList (QMap<qint64, QModelIndex>()),
-    indList (QMap<qint64, QList<qint64> >())
+    indList (QMap<qint64, QList<qint64> >()),
+    rootItem (new KKSTreeItem(-1, 0))
 {
     if (tRef)
         tRef->addRef();
-    cAttrP = getFirstAttribute ();
+    cAttrP = getFirstAttribute (KKSAttrType::atParent);
+    setupData (rootItem);
 }
 
 KKSEIODataModel :: ~KKSEIODataModel ()
@@ -255,7 +258,7 @@ bool KKSEIODataModel :: removeRows (int row, int count, const QModelIndex& paren
 }
  */
 
-const KKSCategoryAttr * KKSEIODataModel :: getFirstAttribute (void)
+const KKSCategoryAttr * KKSEIODataModel :: getFirstAttribute (KKSAttrType::KKSAttrTypes aType)
 {
     if (!tRef)
         return 0;
@@ -263,15 +266,74 @@ const KKSCategoryAttr * KKSEIODataModel :: getFirstAttribute (void)
     int idAttr (-1);
     for (int i=0; i<tAttrs.count() && idAttr < 0; i++)
     {
-        if (tAttrs[i]->type()->attrType() == KKSAttrType::atParent)
+        if (tAttrs[i]->type()->attrType() == aType)
             idAttr = tAttrs[i]->id();
     }
     if (idAttr < 0)
     {
-        QList<int> pList = tRef->category()->searchAttributesByType(KKSAttrType::atParent);
+        QList<int> pList = tRef->category()->searchAttributesByType(aType);
         if (!pList.empty())
             idAttr = pList[0];
     }
     const KKSCategoryAttr * cAttr = idAttr >= 0 ? tRef->category()->attribute(idAttr) : 0;
     return cAttr;
+}
+
+void KKSEIODataModel :: setupData (KKSTreeItem * parent)
+{
+    if (!cAttrP)
+    {
+        for (KKSMap<qint64, KKSEIOData* >::const_iterator p = objRecords.constBegin();
+                p != objRecords.constEnd();
+                p++)
+        {
+            KKSTreeItem * t = new KKSTreeItem (p.key(), p.value());
+            rootItem->appendChild (t);
+        }
+        return;
+    }
+
+    for (KKSMap<qint64, KKSEIOData* >::const_iterator p = objRecords.constBegin();
+            p != objRecords.constEnd();
+            p++)
+    {
+        KKSTreeItem * t = new KKSTreeItem (p.key(), p.value());
+        QString valStr = p.value()->fieldValue(cAttrP->code(false));
+        if (valStr.isEmpty())
+            rootItem->appendChild (t);
+        else
+        {
+            KKSTreeItem * parent = getModelItem (valStr, rootItem);
+            if (!parent)
+                rootItem->appendChild (t);
+            else
+                parent->appendChild (t);
+        }
+    }
+
+}
+
+KKSTreeItem * KKSEIODataModel :: getModelItem (QString valStr, KKSTreeItem * parent)
+{
+    if (!parent || valStr.isEmpty() || !parent->getData())
+        return rootItem;
+
+    if (QString::compare (parent->getData()->fieldValue(cAttrP->columnName(false)), valStr) == 0)
+        return parent;
+    for (int i=0; i<parent->childCount(); i++)
+    {
+        KKSTreeItem * item = parent->child(i);
+        if (QString::compare (item->getData()->fieldValue(cAttrP->columnName(false)), valStr) == 0)
+            return item;
+        else if (item->childCount() > 0)
+        {
+            KKSTreeItem * chItem = getModelItem (valStr, item);
+            if (chItem)
+                return chItem;
+        }
+        else
+            continue;
+    }
+    
+    return 0;
 }

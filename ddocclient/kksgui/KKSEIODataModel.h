@@ -7,11 +7,13 @@
 #include <QList>
 
 #include "KKSMap.h"
+#include "KKSAttrType.h"
 #include "kksgui_config.h"
 
 class KKSTemplate;
 class KKSEIOData;
 class KKSCategoryAttr;
+class KKSTreeItem;
 
 class _GUI_EXPORT KKSEIODataModel : public QAbstractItemModel
 {
@@ -39,7 +41,9 @@ private:
     //
     // Functions
     //
-    const KKSCategoryAttr * getFirstAttribute (void);
+    const KKSCategoryAttr * getFirstAttribute (KKSAttrType::KKSAttrTypes aType);
+    void setupData (KKSTreeItem * parent);
+    KKSTreeItem * getModelItem (QString valStr, KKSTreeItem * parent);
 private:
     //
     // Variables
@@ -49,6 +53,7 @@ private:
     KKSMap<qint64, KKSEIOData *> objRecords;
     mutable QMap<qint64, QModelIndex> parIndexList;
     mutable QMap<qint64, QList<qint64> > indList;
+    KKSTreeItem * rootItem;
 
 private:
     Q_OBJECT

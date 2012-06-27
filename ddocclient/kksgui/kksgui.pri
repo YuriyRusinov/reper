@@ -71,6 +71,7 @@ HEADERS += \
 		kksmsgjournallv.h \
 		kksmsgjournalitem.h \
                 KKSJournalWidget.h \
+                KKSTreeItem.h \
 	   	kksgui_config.h
 
 SOURCES += \
@@ -144,7 +145,8 @@ SOURCES += \
 		kkscmdjournalitem.cpp \
 		kksmsgjournallv.cpp \
 		kksmsgjournalitem.cpp \
-                KKSJournalWidget.cpp 
+                KKSJournalWidget.cpp \
+                KKSTreeItem.cpp
 
 FORMS   += \
                 ui/cmd_journal_form.ui \
@@ -239,4 +241,5 @@ headers.files += \
 		kksmsgjournalitem.h \
                 KKSJournalWidget.h \
                 KKSOrganizationAddrForm.h \
+                KKSTreeItem.h \
                 kksgui_config.h 
