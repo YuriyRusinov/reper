@@ -178,6 +178,7 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
     //
     // сортируем будущие колонки таблицы по порядку (KKSAttrView::order())
     //
+    Q_UNUSED (isCheckable);
     QList<KKSAttrView*> attrs_list = t->sortedAttrs();
     int ncols = 0;
     QStringList headers;
@@ -300,6 +301,7 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
         if (pgDial)
             pgDial->setValue (c);
         KKSEIOData * d = p.value();
+        Q_UNUSED (d);
 /*        
         if (idPAttr > 0)
         {
