@@ -67,7 +67,8 @@ bool KKSTreeItem :: removeChildren(int position, int count)
     for (int row = 0; row < count; ++row)
     {
         KKSTreeItem * t = p.value();
-        delete t;
+        if (t)
+            delete t;
         childItems.erase (p);
     }
     return true;
@@ -130,4 +131,11 @@ void KKSTreeItem :: setData (KKSEIOData * d)
 
     if (data)
         data->addRef ();
+}
+
+void KKSTreeItem :: clearChildren (void)
+{
+    qDeleteAll (childItems);
+    childItems.clear ();
+//    removeChildren (0, childItems.count());
 }

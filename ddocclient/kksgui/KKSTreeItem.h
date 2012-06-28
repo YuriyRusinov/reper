@@ -34,6 +34,7 @@ public:
     void setParent (KKSTreeItem * p);
     qint64 id () const;
     void setId (qint64 newId);
+    void clearChildren (void);
     
 private:
     qint64 idItem;

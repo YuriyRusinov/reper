@@ -194,7 +194,7 @@ bool KKSEIODataModel :: setData (const QModelIndex& index, const QVariant& value
     else if (role == Qt::UserRole+1)
     {
         QMap<QString, QVariant> objData = value.toMap ();
-        //delete rootItem;
+        //rootItem->clearChildren();
         //rootItem = new KKSTreeItem(-1, 0);
 /*        for (KKSMap<qint64, KKSEIOData *>::iterator p = objRecords.begin();
              p != objRecords.end();
@@ -281,20 +281,32 @@ const KKSCategoryAttr * KKSEIODataModel :: getFirstAttribute (KKSAttrType::KKSAt
 
 void KKSEIODataModel :: setupData (KKSTreeItem * parent)
 {
+    int nr = rowCount();
+    parent->clearChildren ();
     if (!cAttrP)
     {
-        int nr = rowCount();
         for (KKSMap<qint64, KKSEIOData* >::const_iterator p = objRecords.constBegin();
                 p != objRecords.constEnd();
                 p++)
         {
             KKSTreeItem * t = new KKSTreeItem (p.key(), p.value());
             parent->appendChild (t);
-            qDebug () << __PRETTY_FUNCTION__ << nr << parent->childCount();
+            //qDebug () << __PRETTY_FUNCTION__ << nr << parent->childCount();
+        }
+        if (nr > 0 && parent->childCount() > nr)
+        {
+            beginInsertRows (QModelIndex(), nr, parent->childCount()-1);
+            endInsertRows ();
+        }
+        else if (nr > 0 && parent->childCount() < nr )
+        {
+            beginRemoveRows (QModelIndex(), parent->childCount(), nr-1);
+            endRemoveRows ();
         }
         return;
     }
 
+    QModelIndex pIndex = QModelIndex ();
     for (KKSMap<qint64, KKSEIOData* >::const_iterator p = objRecords.constBegin();
             p != objRecords.constEnd();
             p++)
@@ -306,7 +318,7 @@ void KKSEIODataModel :: setupData (KKSTreeItem * parent)
             parent->appendChild (t);
         else
         {
-            KKSTreeItem * parent1 = getModelItem (valStr, rootItem);
+            KKSTreeItem * parent1 = getModelItem (valStr, rootItem, pIndex);
             if (!parent1)
                 parent->appendChild (t);
             else
@@ -319,7 +331,7 @@ void KKSEIODataModel :: setupData (KKSTreeItem * parent)
 
 }
 
-KKSTreeItem * KKSEIODataModel :: getModelItem (QString valStr, KKSTreeItem * parent)
+KKSTreeItem * KKSEIODataModel :: getModelItem (QString valStr, KKSTreeItem * parent, QModelIndex & pIndex)
 {
     if (!parent || valStr.isEmpty())
         return rootItem;
@@ -330,10 +342,13 @@ KKSTreeItem * KKSEIODataModel :: getModelItem (QString valStr, KKSTreeItem * par
     {
         KKSTreeItem * item = parent->child(i);
         if (QString::compare (item->getData()->fieldValue(cAttrP->columnName(false)), valStr) == 0)
+        {
+            pIndex = this->index (i, 0, pIndex);
             return item;
+        }
         else if (item->childCount() > 0)
         {
-            KKSTreeItem * chItem = getModelItem (valStr, item);
+            KKSTreeItem * chItem = getModelItem (valStr, item, pIndex);
             if (chItem)
                 return chItem;
         }
