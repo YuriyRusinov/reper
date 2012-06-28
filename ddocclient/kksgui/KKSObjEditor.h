@@ -138,6 +138,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void importObjectE (void);
         void exportObjectE (void);
         void setView (void);
+        void refreshRecModel (QAbstractItemModel * sourceMod);
 
         void saveChildObjE (KKSObjectExemplar *childObjE);
         void updateEIOEx (const QList<qint64>& idL, const KKSCategory * c, QString tableName, int nTab);
@@ -186,6 +187,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
 
     signals:
         void filterObjectEx(KKSObjEditor*, int idObject, const KKSCategory * c, QString tableName);
+        void refreshObjectEx(KKSObjEditor*, int idObject, const KKSCategory * c, QString tableName, QAbstractItemModel * sourceMod);
         void filterObjectTemplateEx(KKSObjEditor*, int idObject, const KKSCategory * c, QString tableName);
         void newObjectEx (QWidget*, int idObject, const KKSCategory * c, QString tableName, int nTab, bool isModal);
         void editObjectEx (QWidget*, int idObject, qint64 idObjE, const KKSCategory * c, QString tableName, int nTab, bool isModal);

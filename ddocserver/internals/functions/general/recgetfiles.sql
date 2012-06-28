@@ -1,4 +1,4 @@
-﻿select f_safe_drop_type('h_rec_get_files');
+select f_safe_drop_type('h_rec_get_files');
 create type h_rec_get_files as(id_record int8, 
                               id_url int4,
                               uo_name varchar, 

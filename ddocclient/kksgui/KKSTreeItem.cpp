@@ -8,11 +8,15 @@ KKSTreeItem :: KKSTreeItem (qint64 id, KKSEIOData * d, KKSTreeItem * parent)
       parentItem (parent),
       childItems (QMap<qint64, KKSTreeItem*>())
 {
+    if (d)
+        data->addRef ();
 }
 
 KKSTreeItem :: ~KKSTreeItem (void)
 {
     qDeleteAll (childItems);
+    if (data)
+        data->release ();
 }
 
 KKSTreeItem * KKSTreeItem :: child(int number)
@@ -108,4 +112,22 @@ void KKSTreeItem :: setParent (KKSTreeItem * p)
 qint64 KKSTreeItem :: id () const
 {
     return idItem;
+}
+
+void KKSTreeItem :: setId (qint64 newId)
+{
+    idItem = newId;
+}
+
+void KKSTreeItem :: setData (KKSEIOData * d)
+{
+    if (data == d)
+        return;
+    if (data)
+        data->release ();
+
+    data = d;
+
+    if (data)
+        data->addRef ();
 }

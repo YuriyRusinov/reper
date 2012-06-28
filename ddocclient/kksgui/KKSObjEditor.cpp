@@ -858,6 +858,33 @@ void KKSObjEditor :: filterObjectE (void)
     emit filterObjectEx (this, idObject, c, tabName);
 }
 
+void KKSObjEditor :: refreshRecModel (QAbstractItemModel * sourceMod)
+{
+    //для ЭИО, которые имеют подчиненную таблицу, 
+    //и соответственно для которых доступна данная операция
+    //идентификатор ЭИО является идентификатором ИО
+    if(!pObjectEx || !sourceMod)
+        return;
+
+    int idObject = pObjectEx->id();
+    const KKSCategory * c = 0;
+    int i = tabEnclosures ? tabEnclosures->currentIndex () : 0;
+    QString tabName = QString ();
+    qDebug () << __PRETTY_FUNCTION__ << i;
+    if (i == 0)
+    {
+        c = 0;//pObjectEx->io()->category()->tableCategory ();
+        tabName = pObj->tableName ();
+    }
+    else if (i <= addCats.count())
+    {
+        c = addCats [i-1];
+        KKSMap<int, KKSAddTable*>::const_iterator p = addTables.constBegin()+i-1;
+        tabName = p.value()->getTableName();
+    }
+    emit refreshObjectEx (this, idObject, c, tabName, sourceMod);
+}
+
 void KKSObjEditor :: filterObjectT (void)
 {
     //для ЭИО, которые имеют подчиненную таблицу,

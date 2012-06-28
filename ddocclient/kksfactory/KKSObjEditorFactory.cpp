@@ -470,13 +470,14 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
         tbAddTable->setVisible (isVisible);
         connect (tbAddTable, SIGNAL (clicked()), objEditorWidget, SLOT (addAnotherTable()) );
         connect (objEditorWidget, SIGNAL (addAnotherTable (KKSObject *, KKSObjEditor *)), this, SLOT (addIOTable (KKSObject *, KKSObjEditor *)) );
+        KKSRecWidget * recW (0);
         if (io->category() && io->category()->tableCategory())
         {
             KKSTemplate * tChild = NULL;
             tChild = new KKSTemplate (io->tableTemplate() != 0 ? *(io->tableTemplate()) : io->category()->tableCategory()->defTemplate());
             QWidget * copiesW = new QWidget ();
             QGridLayout *gRecLay = new QGridLayout (copiesW);
-            KKSRecWidget * recW = KKSViewFactory::createView (tChild, objEditorWidget, io, loader, filters, 0);//copiesW);
+            recW = KKSViewFactory::createView (tChild, objEditorWidget, io, loader, filters, 0);//copiesW);
             KKSList<KKSTemplate*> lTempls = loader->loadCategoryTemplates (io->category()->tableCategory()->id());
             int nTemplC = lTempls.count();
             recW->actSetView->setEnabled ( nTemplC > 0 );
@@ -494,7 +495,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
             QWidget * copiesW = new QWidget ();
             QGridLayout *gRecLay = new QGridLayout ();
             copiesW->setLayout (gRecLay);
-            KKSRecWidget * recW = KKSViewFactory::createView (tChild, objEditorWidget, io, loader, filters, 0);//copiesW);
+            recW = KKSViewFactory::createView (tChild, objEditorWidget, io, loader, filters, 0);//copiesW);
             recW->actSetView->setEnabled ( nTemplC > 0 );
             objEditorWidget->setRecordsWidget (recW);
             tabEnc->insertTab (0, copiesW, wCat->tableCategory()->name() );
@@ -1549,6 +1550,7 @@ void KKSObjEditorFactory :: setObjConnect (KKSObjEditor *editor)
     connect (editor, SIGNAL (editObjectEx (QWidget*, int, qint64, const KKSCategory *, QString, int, bool)), this, SLOT (editExistOE (QWidget*, int, qint64, const KKSCategory *, QString, int, bool)) );
     connect (editor, SIGNAL (delObjectEx (QWidget*, int, qint64, QString, int)), this, SLOT (deleteOE (QWidget*, int, qint64, QString, int)) );
     connect (editor, SIGNAL (filterObjectEx (KKSObjEditor*, int, const KKSCategory *, QString)), this, SLOT (filterEIO (KKSObjEditor*, int, const KKSCategory *, QString)) );
+    connect (editor, SIGNAL (refreshObjectEx (KKSObjEditor*, int, const KKSCategory *, QString, QAbstractItemModel *)), this, SLOT (refreshEIO (KKSObjEditor*, int, const KKSCategory *, QString, QAbstractItemModel *)) );
     connect (editor, SIGNAL (filterObjectTemplateEx (KKSObjEditor*, int, const KKSCategory *, QString)), this, SLOT (filterTemplateEIO (KKSObjEditor*, int, const KKSCategory *, QString)) );
     connect (editor, SIGNAL (updateEIO (KKSObjEditor*, int, const QList<qint64>&, const QList<int>&, const KKSCategory *, const QString&, int)), this, SLOT (updateEIOView (KKSObjEditor*, int, const QList<qint64>&, const QList<int>&, const KKSCategory *, const QString&, int)) );
     connect (editor, SIGNAL (loadAttrRef (QString, QWidget*, int)), this, SLOT (loadAttributeReference (QString, QWidget *, int)) );
@@ -2046,6 +2048,56 @@ void KKSObjEditorFactory::filterEIO(KKSObjEditor * editor, int idObject, const K
     }
     delete f;
 
+    c->release ();
+    o->release();
+}
+
+/* слот обновления списка записей в таблице (основной или дополнительной).
+ * editor -- редактор-отправитель сигнала ИО (ЭИО)
+ * idObject -- идентификатор ИО-справочника
+ * cat -- категория соответствующей таблицы
+ * tableName -- название таблицы
+ * sourceMod -- обновляемая модель
+ */
+void KKSObjEditorFactory :: refreshEIO (KKSObjEditor * editor, int idObject, const KKSCategory * cat, QString tableName, QAbstractItemModel * sourceMod)
+{
+    if(!editor || !sourceMod)
+        return;
+
+    KKSObject * o = loader->loadIO(idObject, true);
+    if(!o)
+        return;
+    KKSCategory * c = 0;
+    if (cat)
+        c = new KKSCategory (*cat);
+    else
+        c = new KKSCategory (*(o->category()->tableCategory()));
+    if(!c){
+        o->release();
+        return;
+    }
+    KKSList<const KKSFilterGroup *> filters = editor->filters();
+    KKSMap<qint64, KKSEIOData *> recList = loader->loadEIOList(c, tableName, filters);
+    QMap<QString, QVariant> val;
+    for (KKSMap<qint64, KKSEIOData *>::const_iterator p=recList.constBegin();
+            p != recList.constEnd();
+            p++)
+    {
+        QString idStr = QString::number (p.key());
+        QVariant v = QVariant::fromValue (*p.value());
+        val.insert (idStr, v);
+    }
+    sourceMod->setData (QModelIndex(), val, Qt::UserRole+1);
+    recList.clear ();
+    
+    QTreeView * tv=0;
+    int i = editor->tabEnclosures ? editor->tabEnclosures->currentIndex () : 0;
+    if (i==0)
+        tv = editor->recWidget->getView();
+    else if (i <= editor->addRecWidgets.count())
+        tv = editor->addRecWidgets[i-1]->getView();
+    if (tv)
+        tv->repaint();
     c->release ();
     o->release();
 }

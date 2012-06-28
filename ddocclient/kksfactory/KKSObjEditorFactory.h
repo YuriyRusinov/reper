@@ -239,7 +239,8 @@ private slots:
     void loadObject (KKSObjEditor * editor, int idObjectEx, int idObject);
 
 public slots:
-    void filterEIO(KKSObjEditor * editor, int idObject, const KKSCategory * cat=0, QString tableName=QString());
+    void filterEIO (KKSObjEditor * editor, int idObject, const KKSCategory * cat=0, QString tableName=QString());
+    void refreshEIO (KKSObjEditor * editor, int idObject, const KKSCategory * cat, QString tableName, QAbstractItemModel * sourceMod);
     void filterTemplateEIO (KKSObjEditor * editor, int idObject, const KKSCategory * cat=0, QString tableName=QString());
     void createNewEditor (QWidget * editor, int idObject, const KKSCategory * c, QString tableName, int nTab, bool isModal);
     void createNewEditorParam (QWidget * editor, int idObject, const KKSCategory * c, QString tableName, int nTab, bool isModal, const KKSMap<int, KKSAttrValue *>& ioAvals, const KKSMap<int, KKSAttrValue *>& aVals);

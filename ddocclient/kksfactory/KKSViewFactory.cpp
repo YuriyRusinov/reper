@@ -117,6 +117,7 @@ KKSRecWidget * KKSViewFactory :: createView (KKSTemplate* theTemplate,
         QObject::connect (resWidget->actExport, SIGNAL (triggered()), objEditor, SLOT (exportObjectE()) );
     if (resWidget->actSetView)
         QObject::connect (resWidget->actSetView, SIGNAL (triggered()), objEditor, SLOT (setView()) );
+    QObject::connect (resWidget, SIGNAL (refreshMod (QAbstractItemModel *)), objEditor, SLOT (refreshRecModel(QAbstractItemModel *)) );
 
     QObject::connect (tv, SIGNAL (doubleClicked(const QModelIndex&)), objEditor, SLOT (editCurrentRec(const QModelIndex&)) );
     
@@ -225,7 +226,11 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
         objModel = new KKSEIODataModel (t, objEx);//isCheckable ? new KKSCheckableModel (0, ncols) : new QStandardItemModel (0, ncols);
     // new KKSEIODataModel (t, objEx);
     else
+    {
         sortModel->setSourceModel (0);
+        delete objModel;
+        objModel = new KKSEIODataModel (t, objEx);
+    }
     QItemSelectionModel *selModel = tv->selectionModel ();
     if (editor)
     {
@@ -236,6 +241,7 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
     int i=0;
 
     bool isSetH ( objModel->rowCount () == 0);
+/*
     if (objModel->rowCount () > 0)
     {
         objModel->removeRows (0, objModel->rowCount());
@@ -244,7 +250,7 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
     }
     if (objModel->columnCount () == 0)
         objModel->insertColumns (0, ncols);
-
+*/
     if (editor)
         editor->clearW ();
 

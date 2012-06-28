@@ -28,6 +28,7 @@ KKSEIODataModel :: ~KKSEIODataModel ()
 {
     if (tRef)
         tRef->release();
+    delete rootItem;
 }
 
 int KKSEIODataModel :: columnCount (const QModelIndex& parent) const
@@ -113,12 +114,42 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
         KKSList<KKSAttrView*> avList = tRef ? tRef->sortedAttrs() : KKSList<KKSAttrView*>();
         if (index.column() >= avList.count())
             return QVariant ();
+        KKSAttrView * v = avList[index.column()];
         QString aCode = avList[index.column()]->code(false);
-        QString attrValue = p.value()->fieldValue (aCode);
-        if (attrValue.isEmpty())
-            attrValue = p.value()->fields().value (aCode.toLower());
-        else if (attrValue.contains ("\n"))
-            attrValue = attrValue.mid (0, attrValue.indexOf("\n")) + "...";
+        int i = index.row();
+        QString attrValue;
+        if( v->type()->attrType() == KKSAttrType::atJPG || 
+            (v->refType() && v->refType()->attrType() == KKSAttrType::atJPG)
+            )
+        {
+            attrValue = QObject::tr("<Image data %1>").arg (i);
+        }
+        else if( v->type()->attrType() == KKSAttrType::atSVG || 
+                (v->refType() && v->refType()->attrType() == KKSAttrType::atSVG)
+                )
+        {
+            attrValue = QObject::tr("<SVG data %1>").arg (i);
+        }
+        else if( v->type()->attrType() == KKSAttrType::atXMLDoc || 
+                (v->refType() && v->refType()->attrType() == KKSAttrType::atXMLDoc)
+                )
+        {
+            attrValue = QObject::tr("<XML document %1>").arg (i);
+        }
+        else if( v->type()->attrType() == KKSAttrType::atVideo || 
+                (v->refType() && v->refType()->attrType() == KKSAttrType::atVideo)
+                )
+        {
+            attrValue = QObject::tr("<Video data %1>").arg (i);
+        }
+        else
+        {
+            attrValue = p.value()->fieldValue (aCode);
+            if (attrValue.isEmpty())
+                attrValue = p.value()->fields().value (aCode.toLower());
+            else if (attrValue.contains ("\n"))
+                attrValue = attrValue.mid (0, attrValue.indexOf("\n")) + "...";
+        }
         return attrValue;
     }
     return QVariant();
@@ -138,26 +169,92 @@ QVariant KKSEIODataModel :: headerData (int section, Qt::Orientation orientation
 
 bool KKSEIODataModel :: setData (const QModelIndex& index, const QVariant& value, int role)
 {
-    Q_UNUSED (index);
-    Q_UNUSED (value);
-    Q_UNUSED (role);
-    return false;
+    KKSTreeItem * wItem = getItem (index);
+    if (!wItem || role != Qt::UserRole+1)
+        return false;
+    
+    int irow = index.row ();
+    QModelIndex pIndex = index.parent();
+    QModelIndex topL = this->index (irow, 0, pIndex);
+    QModelIndex bottomR = this->index (irow, columnCount()-1, pIndex);
+    if (role == Qt::UserRole)
+    {
+        qint64 id = value.value<qint64>();
+        wItem->setId (id);
+        emit dataChanged (topL, bottomR);
+    }
+    else if (role == Qt::DisplayRole || role == Qt::EditRole)
+    {
+        KKSEIOData d = value.value<KKSEIOData>();
+        KKSEIOData * dVal = new KKSEIOData (d);
+        wItem->setData (dVal);
+        dVal->release ();
+        emit dataChanged (topL, bottomR);
+    }
+    else if (role == Qt::UserRole+1)
+    {
+        QMap<QString, QVariant> objData = value.toMap ();
+        delete rootItem;
+        rootItem = new KKSTreeItem(-1, 0);
+/*        for (KKSMap<qint64, KKSEIOData *>::iterator p = objRecords.begin();
+             p != objRecords.end();
+             p++
+        )
+        {
+            KKSEIOData * d = p.value();
+            if (d)
+                d->release ();
+        }*/
+        objRecords.clear();
+
+        for (QMap<QString, QVariant>::const_iterator pv = objData.constBegin();
+             pv != objData.constEnd();
+             pv++)
+        {
+            bool ok;
+            qint64 id = pv.key().toLongLong(&ok);
+            if (!ok)
+                continue;
+            KKSEIOData * d = new KKSEIOData (pv.value().value<KKSEIOData>());
+            objRecords.insert (id, d);
+        }
+        setupData (rootItem);
+        int nr = rowCount();
+        int nc = columnCount();
+        QModelIndex topL = this->index(0, 0);
+        QModelIndex botR = this->index(nr-1, nc-1);
+        qDebug () << __PRETTY_FUNCTION__ << topL << botR;
+        emit dataChanged (topL, botR);
+    }
+    else
+        return false;
+    
+    return true;
 }
 
 bool KKSEIODataModel :: insertRows (int row, int count, const QModelIndex& parent)
 {
-    Q_UNUSED (row);
-    Q_UNUSED (count);
-    Q_UNUSED (parent);
-    return false;
+    qDebug () << __PRETTY_FUNCTION__ << row << count << parent;
+    KKSTreeItem * pItem = getItem (parent);
+    bool ok (true);
+    beginInsertRows (parent, row, row+count-1);
+    QList<qint64> ids;
+    for (int i=1; i<=count; i++)
+        ids.append(-i);
+    ok = pItem->insertChildren(ids);
+    endInsertRows ();
+    return ok;
 }
 
 bool KKSEIODataModel :: removeRows (int row, int count, const QModelIndex& parent)
 {
-    Q_UNUSED (row);
-    Q_UNUSED (count);
-    Q_UNUSED (parent);
-    return false;
+    qDebug () << __PRETTY_FUNCTION__ << row << count << parent;
+    KKSTreeItem * pItem = getItem (parent);
+    bool ok (true);
+    beginRemoveRows (parent, row, row+count-1);
+    ok = pItem->removeChildren (row, count);
+    endRemoveRows ();
+    return ok;
 }
 
 
@@ -186,12 +283,14 @@ void KKSEIODataModel :: setupData (KKSTreeItem * parent)
 {
     if (!cAttrP)
     {
+        int nr = rowCount();
         for (KKSMap<qint64, KKSEIOData* >::const_iterator p = objRecords.constBegin();
                 p != objRecords.constEnd();
                 p++)
         {
             KKSTreeItem * t = new KKSTreeItem (p.key(), p.value());
             parent->appendChild (t);
+            qDebug () << __PRETTY_FUNCTION__ << nr << parent->childCount();
         }
         return;
     }

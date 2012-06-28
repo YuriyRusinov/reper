@@ -25,6 +25,7 @@ public:
     KKSTreeItem *child(int number);
     int childCount() const;
     KKSEIOData * getData() const;
+    void setData (KKSEIOData * d);
     bool insertChildren(const QList<qint64>& ids);
     KKSTreeItem *parent();
     bool removeChildren(int position, int count);
@@ -32,6 +33,7 @@ public:
     void appendChild (KKSTreeItem * ch);
     void setParent (KKSTreeItem * p);
     qint64 id () const;
+    void setId (qint64 newId);
     
 private:
     qint64 idItem;
