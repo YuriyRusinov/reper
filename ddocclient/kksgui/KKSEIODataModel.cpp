@@ -194,8 +194,8 @@ bool KKSEIODataModel :: setData (const QModelIndex& index, const QVariant& value
     else if (role == Qt::UserRole+1)
     {
         QMap<QString, QVariant> objData = value.toMap ();
-        delete rootItem;
-        rootItem = new KKSTreeItem(-1, 0);
+        //delete rootItem;
+        //rootItem = new KKSTreeItem(-1, 0);
 /*        for (KKSMap<qint64, KKSEIOData *>::iterator p = objRecords.begin();
              p != objRecords.end();
              p++
