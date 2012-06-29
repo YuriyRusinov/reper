@@ -152,6 +152,10 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
         }
         return attrValue;
     }
+    else if (role == Qt::UserRole+2)
+    {
+        return QVariant::fromValue<KKSTemplate>(*tRef);
+    }
     return QVariant();
 }
 

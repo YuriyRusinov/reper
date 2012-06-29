@@ -2087,7 +2087,14 @@ void KKSObjEditorFactory :: refreshEIO (KKSObjEditor * editor, int idObject, con
         QVariant v = QVariant::fromValue (*p.value());
         val.insert (idStr, v);
     }
-    sourceMod->setData (QModelIndex(), val, Qt::UserRole+1);
+    KKSTemplate * t = new KKSTemplate (sourceMod->data(sourceMod->index(0,0), Qt::UserRole+2).value<KKSTemplate>());
+    if (!t)
+    {
+        c->release ();
+        o->release ();
+        return;
+    }
+    //sourceMod->setData (QModelIndex(), val, Qt::UserRole+1);
     recList.clear ();
     
     QTreeView * tv=0;
@@ -2096,8 +2103,16 @@ void KKSObjEditorFactory :: refreshEIO (KKSObjEditor * editor, int idObject, con
         tv = editor->recWidget->getView();
     else if (i <= editor->addRecWidgets.count())
         tv = editor->addRecWidgets[i-1]->getView();
-    if (tv)
-        tv->repaint();
+    KKSViewFactory::loadEIOEx (editor,
+                                o, 
+                                loader, 
+                                t, 
+                                tv /*View()*/, 
+                                filters,
+                                false,
+                                c,
+                                tableName);
+    t->release ();
     c->release ();
     o->release();
 }
