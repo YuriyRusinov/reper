@@ -14,8 +14,8 @@ KKSEIODataModel :: KKSEIODataModel (const KKSTemplate * t, const KKSMap<qint64, 
     tRef (t),
     cAttrP (0),
     objRecords (objRecs),
-    parIndexList (QMap<qint64, QModelIndex>()),
-    indList (QMap<qint64, QList<qint64> >()),
+    //parIndexList (QMap<qint64, QModelIndex>()),
+    //indList (QMap<qint64, QList<qint64> >()),
     rootItem (new KKSTreeItem(-1, 0))
 {
     if (tRef)

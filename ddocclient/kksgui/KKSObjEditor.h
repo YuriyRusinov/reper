@@ -189,16 +189,16 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void filterObjectEx(KKSObjEditor*, int idObject, const KKSCategory * c, QString tableName);
         void refreshObjectEx(KKSObjEditor*, int idObject, const KKSCategory * c, QString tableName, QAbstractItemModel * sourceMod);
         void filterObjectTemplateEx(KKSObjEditor*, int idObject, const KKSCategory * c, QString tableName);
-        void newObjectEx (QWidget*, int idObject, const KKSCategory * c, QString tableName, int nTab, bool isModal);
-        void editObjectEx (QWidget*, int idObject, qint64 idObjE, const KKSCategory * c, QString tableName, int nTab, bool isModal);
+        void newObjectEx (QWidget*, int idObject, const KKSCategory * c, QString tableName, int nTab, bool isModal, QAbstractItemModel * sRecMod);
+        void editObjectEx (QWidget*, int idObject, qint64 idObjE, const KKSCategory * c, QString tableName, int nTab, bool isModal, QAbstractItemModel * sRecMod);
         void delObjectEx (QWidget*,int idObject, qint64 idObjE, QString tableName, int row);
-        void saveObjE (KKSObjEditor*, KKSObjectExemplar * wObjE, const KKSCategory * cat, QString tableName, int num);
+        void saveObjE (KKSObjEditor*, KKSObjectExemplar * wObjE, const KKSCategory * cat, QString tableName, int num, QAbstractItemModel * recModel);
         void loadObjE (int id, QString tableName);
         void eioChanged (const QList<qint64>& idL, const KKSCategory * c, QString tableName, int nTab);
         void updateEIO(KKSObjEditor * editor, int idObject, const QList<qint64>& idObjEx, const QList<int>& row, const KKSCategory *c, const QString& tableName, int nTab);
         
-        void saveObj (KKSObjEditor*, KKSObject* wObj, KKSObjectExemplar * wObjEx, int num);
-        void saveObjAsCommandResult(KKSObjEditor*, KKSObject* wObj, KKSObjectExemplar * wObjEx, int num);
+        void saveObj (KKSObjEditor*, KKSObject* wObj, KKSObjectExemplar * wObjEx, int num, QAbstractItemModel * recModel);
+        void saveObjAsCommandResult(KKSObjEditor*, KKSObject* wObj, KKSObjectExemplar * wObjEx, int num, QAbstractItemModel * recModel);
         
         void loadAttrRef (QString tableName, QWidget * awAttr, int attrId);//посылаем сигнал всегда с ИД атрибута. Поскольку используется в соответствующем слоте именно он
         void setTemplate (KKSObjEditor* editor, KKSObject* wObj);
@@ -291,6 +291,8 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void addListAttrWidget (QToolButton *tb, QWidget *aw, const KKSAttrValue* av);
         void setOpt (int id, KKSIndAttr::KKSIndAttrClass isSystem, QCheckBox* ch);
         void addOptWidget (int id, KKSIndAttr::KKSIndAttrClass isSystem, QWidget *w);
+        
+        void setRecordsModel (QAbstractItemModel * recMod);
 /*
         void addTbQList (QToolButton * tbView, int idIndicator);
         void addTbEditList (QToolButton * tbView, int idIndicator);
@@ -407,6 +409,8 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         bool isChanged;
         QMap<int, int> editRows;
         QList<qint64> additionalCopies;
+        
+        QAbstractItemModel * pRecModel;
 
     private:
         Q_OBJECT

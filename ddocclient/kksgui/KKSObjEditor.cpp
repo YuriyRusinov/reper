@@ -110,7 +110,8 @@ KKSObjEditor :: KKSObjEditor (const KKSTemplate *t,
     fileWidget(0),
     includesWidget(0),
     includesRecWidget (0),
-    isChanged (false)
+    isChanged (false),
+    pRecModel (0)
 {
     if (m_sysTemplate)
         m_sysTemplate->addRef ();
@@ -734,7 +735,7 @@ int KKSObjEditor :: constructObject()
         if (includesWidget)
             pObj->setRootRubric(includesWidget->rootRubric());
 
-        //emit saveObj (this, pObj, pObjectEx, num);
+        //emit saveObj (this, pObj, pObjectEx, num, pRecModel);
         //emit ioChanged();
     }
     return OK_CODE;
@@ -759,7 +760,7 @@ void KKSObjEditor :: saveToDb (int num)
         //qDebug () << __PRETTY_FUNCTION__ << (pCat ? pCat->id () : -1) << pObjectEx->io()->category()->id () << currTablename << pObjectEx->io()->tableName() << nTable;
         if (pCat && pCat->id () == pObjectEx->io()->category()->id ())
             isMain = true;
-        emit saveObjE (this, pObjectEx, (isMain ? 0 : pCat), (isMain ? QString() : currTablename), num);
+        emit saveObjE (this, pObjectEx, (isMain ? 0 : pCat), (isMain ? QString() : currTablename), num, pRecModel);
     }
 
     //
@@ -769,7 +770,7 @@ void KKSObjEditor :: saveToDb (int num)
     // а также сохранить прикрепленные файлы
     if (pObj)
     {
-        emit saveObj (this, pObj, pObjectEx, num);
+        emit saveObj (this, pObj, pObjectEx, num, pRecModel);
         //emit ioChanged();
     }
 
@@ -800,7 +801,7 @@ void KKSObjEditor :: saveAsCommandResult()
     if (res == ERROR_CODE)
         return;
 
-    emit saveObjAsCommandResult(this, pObj, pObjectEx, 1);
+    emit saveObjAsCommandResult(this, pObj, pObjectEx, 1, pRecModel);
     //
     // Это надо вызывать всегда
     //
@@ -941,7 +942,13 @@ void KKSObjEditor :: addObjectE (void)
         tabName = (p != addTables.constEnd() && p.value ()) ? p.value()->getTableName() : QString();
     }
     qDebug () << __PRETTY_FUNCTION__ << (c ? c->id () : -1) << (pCat ? pCat->id () : -1) << tabName;
-    emit newObjectEx (this, idObject, c , tabName, i, false);
+    KKSRecWidget * rw = qobject_cast<KKSRecWidget *>(this->sender()->parent());
+    QAbstractItemModel * sRecModel (0);
+    if (rw)
+        sRecModel = rw->getSourceModel ();
+            //(tabEnclosures->currentWidget());
+    //Q_UNUSED (rw);
+    emit newObjectEx (this, idObject, c , tabName, i, false, sRecModel);
 }
 
 void KKSObjEditor :: editObjectE (void)
@@ -1002,7 +1009,11 @@ void KKSObjEditor :: editObjectE (void)
         tabName = p.value()->getTableName();
     }
     qDebug () << __PRETTY_FUNCTION__ << c->id () << pCat->id () << tabName;
-    emit editObjectEx (this, idObject, idObjectE, c, tabName, i, false);
+    KKSRecWidget * rw = qobject_cast<KKSRecWidget *>(this->sender()->parent());
+    QAbstractItemModel * sRecModel (0);
+    if (rw)
+        sRecModel = rw->getSourceModel ();
+    emit editObjectEx (this, idObject, idObjectE, c, tabName, i, false, sRecModel);
 }
 
 void KKSObjEditor :: delObjectE (void)
@@ -1043,7 +1054,7 @@ void KKSObjEditor :: delObjectE (void)
 void KKSObjEditor :: saveChildObjE (KKSObjectExemplar *childObjE)
 {
     this->clearW ();
-    emit saveObjE (this, childObjE, pCat, currTablename, 1);
+    emit saveObjE (this, childObjE, pCat, currTablename, 1, pRecModel);
 }
 
 void KKSObjEditor :: setObjectEx (KKSObjectExemplar *newObj)
@@ -1092,20 +1103,6 @@ void KKSObjEditor :: updateEIOEx (const QList<qint64>& idL, const KKSCategory * 
         rows.append (wrow);
     }
     QString tabName = tableName;//QString ();
-/*
-    const KKSCategory * c = 0;
-    if (i == 0)
-    {
-        c = pCat;//pObjectEx->io()->category()->tableCategory ();
-        tabName = pObj->tableName ();
-    }
-    else if (i <= addCats.count())
-    {
-        c = addCats [i-1];
-        KKSMap<int, KKSAddTable*>::const_iterator p = addTables.constBegin()+i-1;
-        tabName = p.value()->getTableName();
-    }
-*/
     qDebug () << __PRETTY_FUNCTION__ << i << tabName << nTab;
     emit updateEIO (this, idObject, idL, rows, c, tabName, nTab);
 }
@@ -2231,4 +2228,12 @@ void KKSObjEditor :: addIndicator (void)
 void KKSObjEditor :: setNumCopies (int n)
 {
     numCopies = n;
+}
+
+void KKSObjEditor :: setRecordsModel (QAbstractItemModel * recMod)
+{
+    if (pRecModel && pRecModel != recMod)
+        delete pRecModel;
+    
+    pRecModel = recMod;
 }

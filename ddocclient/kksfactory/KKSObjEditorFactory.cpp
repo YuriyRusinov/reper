@@ -1543,11 +1543,11 @@ void KKSObjEditorFactory :: setObjConnect (KKSObjEditor *editor)
     connect (editor, SIGNAL(openRubricItemRequested(int, KKSObjEditor*)), this, SLOT(slotOpenRubricItemRequested(int, KKSObjEditor*)));
     connect (editor, SIGNAL(openRubricItemRecRequested(int, KKSObjEditor*)), this, SLOT(slotOpenRubricItemRecRequested(int, KKSObjEditor*)));
     connect (editor, SIGNAL (updateAttributes (QWidget *, QScrollArea *, QWidget *, int, const KKSCategory *, KKSIndAttr::KKSIndAttrClass, KKSObjEditor*)), this, SLOT (regroupAttrs (QWidget *, QScrollArea *, QWidget *, int, const KKSCategory*, KKSIndAttr::KKSIndAttrClass, KKSObjEditor*)) );
-    connect (editor, SIGNAL (saveObj(KKSObjEditor*, KKSObject*, KKSObjectExemplar*, int)), this, SLOT (saveObject(KKSObjEditor*, KKSObject*, KKSObjectExemplar*, int)) );
-    connect (editor, SIGNAL (saveObjAsCommandResult(KKSObjEditor*, KKSObject*, KKSObjectExemplar*, int)), this, SLOT (saveObjectAsCommandResult(KKSObjEditor*, KKSObject*, KKSObjectExemplar*, int)) );
-    connect (editor, SIGNAL (saveObjE(KKSObjEditor*, KKSObjectExemplar *, const KKSCategory*, QString, int)), this, SLOT (saveObjectEx(KKSObjEditor*, KKSObjectExemplar *, const KKSCategory*, QString, int)) );
-    connect (editor, SIGNAL (newObjectEx (QWidget*, int, const KKSCategory *, QString, int, bool)), this, SLOT (createNewEditor(QWidget*, int, const KKSCategory *, QString, int, bool)) );
-    connect (editor, SIGNAL (editObjectEx (QWidget*, int, qint64, const KKSCategory *, QString, int, bool)), this, SLOT (editExistOE (QWidget*, int, qint64, const KKSCategory *, QString, int, bool)) );
+    connect (editor, SIGNAL (saveObj(KKSObjEditor*, KKSObject*, KKSObjectExemplar*, int, QAbstractItemModel *)), this, SLOT (saveObject(KKSObjEditor*, KKSObject*, KKSObjectExemplar*, int, QAbstractItemModel *)) );
+    connect (editor, SIGNAL (saveObjAsCommandResult(KKSObjEditor*, KKSObject*, KKSObjectExemplar*, int, QAbstractItemModel *)), this, SLOT (saveObjectAsCommandResult(KKSObjEditor*, KKSObject*, KKSObjectExemplar*, int, QAbstractItemModel *)) );
+    connect (editor, SIGNAL (saveObjE(KKSObjEditor*, KKSObjectExemplar *, const KKSCategory*, QString, int, QAbstractItemModel *)), this, SLOT (saveObjectEx(KKSObjEditor*, KKSObjectExemplar *, const KKSCategory*, QString, int, QAbstractItemModel *)) );
+    connect (editor, SIGNAL (newObjectEx (QWidget*, int, const KKSCategory *, QString, int, bool, QAbstractItemModel *)), this, SLOT (createNewEditor(QWidget*, int, const KKSCategory *, QString, int, bool, QAbstractItemModel *)) );
+    connect (editor, SIGNAL (editObjectEx (QWidget*, int, qint64, const KKSCategory *, QString, int, bool, QAbstractItemModel *)), this, SLOT (editExistOE (QWidget*, int, qint64, const KKSCategory *, QString, int, bool, QAbstractItemModel *)) );
     connect (editor, SIGNAL (delObjectEx (QWidget*, int, qint64, QString, int)), this, SLOT (deleteOE (QWidget*, int, qint64, QString, int)) );
     connect (editor, SIGNAL (filterObjectEx (KKSObjEditor*, int, const KKSCategory *, QString)), this, SLOT (filterEIO (KKSObjEditor*, int, const KKSCategory *, QString)) );
     connect (editor, SIGNAL (refreshObjectEx (KKSObjEditor*, int, const KKSCategory *, QString, QAbstractItemModel *)), this, SLOT (refreshEIO (KKSObjEditor*, int, const KKSCategory *, QString, QAbstractItemModel *)) );
@@ -1634,10 +1634,12 @@ KKSTemplate * KKSObjEditorFactory :: getTemplate (const KKSCategory * c, bool wi
  * wObjE -- сохраняемый ЭИО
  * cat -- категория таблицы, куда сохраняется ЭИО
  * tableName -- название таблицы, содержащей ЭИО
- * num -- количество копий сохраняемых ЭИО (по умолчанию 1).
+ * num -- количество копий сохраняемых ЭИО (по умолчанию 1)
+ * recModel --  -- модель, в которую производится запись для отображения в таблице
+ *  в случае успешного завершения.
  */
 
-void KKSObjEditorFactory :: saveObjectEx (KKSObjEditor * editor, KKSObjectExemplar *wObjE, const KKSCategory* cat, QString tableName, int num)
+void KKSObjEditorFactory :: saveObjectEx (KKSObjEditor * editor, KKSObjectExemplar *wObjE, const KKSCategory* cat, QString tableName, int num, QAbstractItemModel * recModel)
 {
     if (!editor->isObjChanged())
     {
@@ -1702,11 +1704,13 @@ void KKSObjEditorFactory :: saveObjectEx (KKSObjEditor * editor, KKSObjectExempl
  * wObj -- сохраняемый ИО,
  * pObjectEx -- соответствующий ЭИО справочника ИО
  * num -- количество копий сохраняемых ЭИО (по умолчанию 1).
+ * recModel -- модель, в которую производится запись в случае успешного завершения
  */
 void KKSObjEditorFactory :: saveObjectAsCommandResult (KKSObjEditor* editor, 
                                                        KKSObject* wObj, 
                                                        KKSObjectExemplar* pObjectEx, 
-                                                       int num)
+                                                       int num,
+                                                       QAbstractItemModel * recModel)
 {
     if(!editor)
         return;
@@ -1741,12 +1745,16 @@ void KKSObjEditorFactory :: saveObjectAsCommandResult (KKSObjEditor* editor,
  * editor -- виджет редактора ЭИО
  * wObj -- сохраняемый ИО,
  * pObjectEx -- соответствующий ЭИО справочника ИО
- * num -- количество копий сохраняемых ЭИО (по умолчанию 1).
+ * num -- количество копий сохраняемых ЭИО (по умолчанию 1)
+ * recModel -- модель, в которую производится запись для отображения в таблице
+ *  в случае успешного завершения.
  */
 void KKSObjEditorFactory :: saveObject (KKSObjEditor* editor, 
                                         KKSObject* wObj, 
                                         KKSObjectExemplar* pObjectEx, 
-                                        int num)
+                                        int num,
+                                        QAbstractItemModel * recModel
+)
 {
     if (!editor->isObjChanged())
     {
@@ -2266,9 +2274,10 @@ void KKSObjEditorFactory :: filterTemplateEIO (KKSObjEditor * editor, int idObje
  * tableName -- название таблицы
  * nTab -- номер вкладки в редакторе, где произошел вызов
  * isModal -- флаг модальности
+ * recModel -- модель записей
  */
 
-void KKSObjEditorFactory :: createNewEditor (QWidget * editor, int idObject, const KKSCategory * c, QString tableName, int nTab, bool isModal)
+void KKSObjEditorFactory :: createNewEditor (QWidget * editor, int idObject, const KKSCategory * c, QString tableName, int nTab, bool isModal, QAbstractItemModel * recModel)
 {
     KKSObjEditor * oEditor = qobject_cast <KKSObjEditor *>(editor);
     if (qobject_cast <KKSObjEditor *>(editor))
@@ -2298,6 +2307,10 @@ void KKSObjEditorFactory :: createNewEditor (QWidget * editor, int idObject, con
                               QMessageBox::Ok);
         return;
     }
+    connect (newObjEditor, 
+             SIGNAL(eioChanged(const QList<qint64>&, const KKSCategory*, QString, int)), 
+             editor, 
+             SLOT(updateEIOEx(const QList<qint64>&, const KKSCategory*, QString, int)));
 
     cSelection = oEditor ? oEditor->recWidget->tv->selectionModel()->selection() : QItemSelection();
 
@@ -2329,8 +2342,9 @@ void KKSObjEditorFactory :: createNewEditor (QWidget * editor, int idObject, con
  * isModal -- флаг модальности
  * ioAvals -- параметры создаваемого ИО
  * aVals  -- параметры создаваемого ЭИО
+ * recModel -- модель для записи
  */
-void KKSObjEditorFactory :: createNewEditorParam (QWidget * editor, int idObject, const KKSCategory * c, QString tableName, int nTab, bool isModal, const KKSMap<int, KKSAttrValue *>& ioAvals, const KKSMap<int, KKSAttrValue *>& aVals)
+void KKSObjEditorFactory :: createNewEditorParam (QWidget * editor, int idObject, const KKSCategory * c, QString tableName, int nTab, bool isModal, const KKSMap<int, KKSAttrValue *>& ioAvals, const KKSMap<int, KKSAttrValue *>& aVals, QAbstractItemModel * recModel)
 {
     if (ioAvals.isEmpty () && aVals.isEmpty ())
     {
@@ -2393,7 +2407,7 @@ void KKSObjEditorFactory :: createNewEditorParam (QWidget * editor, int idObject
  * nTab -- номер вкладки в редакторе, где произошел вызов
  * isModal -- флаг модальности
  */
-void KKSObjEditorFactory :: editExistOE (QWidget * editor, int idObject, qint64 idObjEx, const KKSCategory * c0, QString tableName, int nTab, bool isModal)
+void KKSObjEditorFactory :: editExistOE (QWidget * editor, int idObject, qint64 idObjEx, const KKSCategory * c0, QString tableName, int nTab, bool isModal, QAbstractItemModel * recModel)
 {
     const KKSCategory *c = 0;//t ? t->category() : 0;
     KKSObject * io = NULL;
