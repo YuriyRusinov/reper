@@ -57,4 +57,7 @@ private:
 
 };
 
+Q_DECLARE_METATYPE (KKSCategoryAttr);
+Q_DECLARE_METATYPE (KKSCategoryAttr *);
+
 #endif
