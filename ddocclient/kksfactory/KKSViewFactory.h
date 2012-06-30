@@ -138,6 +138,7 @@ class _F_EXPORT KKSViewFactory
         static QVariant drawViewCells (const KKSCategory * cat, KKSEIOData * d, int type, KKSLoader *l, QAbstractItemModel * objModel, const QModelIndex& wIndex, int icolor=0);
         
         static QModelIndex searchModelIndex (QAbstractItemModel * sourceMod, int iData, const QModelIndex& parent = QModelIndex(), int role=Qt::DisplayRole);
+        static QModelIndex searchModelRowsIndex (QAbstractItemModel * sourceMod, int iData, const QModelIndex& parent = QModelIndex(), int role=Qt::DisplayRole);
 
     protected:
     private:

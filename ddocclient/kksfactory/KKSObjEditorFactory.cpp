@@ -1648,15 +1648,14 @@ void KKSObjEditorFactory :: saveObjectEx (KKSObjEditor * editor, KKSObjectExempl
         //
         return;
     }
-    
-    int nc = (wObjE->id() < 0 ? num : 1);
+    bool isNew (wObjE->id() < 0);
+    int nc = (isNew ? num : 1);
     bool transactionOk = true;
 
     if (wObjE->id() >=0 && num > 1)
     {
         QMessageBox::warning (editor, tr ("Warning"), tr ("Save IO copy. Only current copy will be updated"), QMessageBox::Ok);
     }
-    bool isNew (wObjE->id() < 0);
 
     editor->clearAdditionalCopies ();
     for (int i=0; i<nc; i++)
@@ -1691,6 +1690,35 @@ void KKSObjEditorFactory :: saveObjectEx (KKSObjEditor * editor, KKSObjectExempl
         wObjCopy->release ();
     }
     editor->setObjChanged (!transactionOk);
+    if (recModel)
+    {
+        const KKSCategoryAttr * cAttrP = new KKSCategoryAttr (recModel->data(QModelIndex(), Qt::UserRole+3).value<KKSCategoryAttr>());
+        QModelIndex rIndex = (isNew ? QModelIndex() : KKSViewFactory::searchModelRowsIndex (recModel, wObjE->id(), QModelIndex(), Qt::UserRole));
+        qDebug () << __PRETTY_FUNCTION__ << (cAttrP ? cAttrP->id() : -1) << rIndex;
+        if (rIndex.isValid() && (!cAttrP || cAttrP->id() <=0) && nc == 1)
+        {
+            writeRecords (recModel, wObjE, rIndex);
+        }
+        else if (rIndex.isValid() && cAttrP && cAttrP->id() > 0)
+        {
+            int idP = wObjE->attrValue(cAttrP->id())->value().value().toInt();
+            qDebug () << __PRETTY_FUNCTION__ << idP;
+            if ((idP < 0 && !rIndex.parent().isValid())
+                    || (idP > 0 && rIndex.parent().data (Qt::UserRole).toInt() == idP))
+            {
+                writeRecords (recModel, wObjE, rIndex);
+            }
+            else if (idP < 0 && rIndex.parent().isValid())
+            {
+                int irow = rIndex.row ();
+                QModelIndex pIndex = rIndex.parent();
+                recModel->removeRows(irow, 1, pIndex);
+                recModel->insertRows(recModel->rowCount()-1, 1);
+                rIndex = recModel->index (recModel->rowCount()-1, 0);
+                writeRecords (recModel, wObjE, rIndex);
+            }
+        }
+    }
 /*    if (wObjE->io()->id () == IO_ORG_ID || \
         wObjE->io()->id () == IO_UNITS_ID || \
         wObjE->io()->id () == IO_POS_ID || \
@@ -1698,6 +1726,36 @@ void KKSObjEditorFactory :: saveObjectEx (KKSObjEditor * editor, KKSObjectExempl
     emit cioSaved (wObjE);
 }
 
+int KKSObjEditorFactory :: writeRecords (QAbstractItemModel * recModel, KKSObjectExemplar * wObjE, const QModelIndex& rIndex) const
+{
+    if (!recModel)
+        return ERROR_CODE;
+    recModel->setData (rIndex, wObjE->id(), Qt::UserRole);
+    KKSCategory * c = wObjE->io()->category()->tableCategory ();
+    KKSList<const KKSFilterGroup *> filters;
+    KKSList<const KKSFilter *> fl;
+    const KKSFilter * f = c->createFilter(1, QString::number (wObjE->id()), KKSFilter::foEq);
+    if(!f){
+        qWarning() << __PRETTY_FUNCTION__ << "Cannon create system filter!!";
+        return ERROR_CODE;
+    }
+    fl.append(f);
+    f->release();
+
+    KKSFilterGroup * fg = new KKSFilterGroup(true);
+    fg->setFilters(fl);
+    filters.append(fg);
+    fg->release();
+    KKSMap<qint64, KKSEIOData *> recs = loader->loadEIOList(wObjE->io(), filters);
+    KKSMap<qint64, KKSEIOData *>::const_iterator p = recs.constFind (wObjE->id());
+    if (p == recs.constEnd())
+        return ERROR_CODE;
+    KKSEIOData * d = p.value ();
+    if (!recModel->setData (rIndex, QVariant::fromValue<KKSEIOData>(*d), Qt::DisplayRole))
+        return ERROR_CODE;
+    
+    return wObjE->id ();
+}
 /*
  * слот сохранения ИО в БД в ответ на команду или распоряжение, параметры
  * editor -- виджет редактора ЭИО
@@ -2311,6 +2369,7 @@ void KKSObjEditorFactory :: createNewEditor (QWidget * editor, int idObject, con
              SIGNAL(eioChanged(const QList<qint64>&, const KKSCategory*, QString, int)), 
              editor, 
              SLOT(updateEIOEx(const QList<qint64>&, const KKSCategory*, QString, int)));
+    newObjEditor->setRecordsModel (recModel);
 
     cSelection = oEditor ? oEditor->recWidget->tv->selectionModel()->selection() : QItemSelection();
 
@@ -2467,7 +2526,8 @@ void KKSObjEditorFactory :: editExistOE (QWidget * editor, int idObject, qint64 
              SIGNAL(eioChanged(const QList<qint64>&, const KKSCategory*, QString, int)), 
              editor, 
              SLOT(updateEIOEx(const QList<qint64>&, const KKSCategory*, QString, int)));
-    
+
+    newObjEditor->setRecordsModel (recModel);
     newObjEditor->setCurrentTable (tableName);
     newObjEditor->setParentTab (nTab);
     newObjEditor->setAttribute (Qt::WA_DeleteOnClose);

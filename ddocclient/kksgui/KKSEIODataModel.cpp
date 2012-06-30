@@ -91,9 +91,13 @@ Qt::ItemFlags KKSEIODataModel :: flags (const QModelIndex& index) const
 
 QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
 {
-    if (!index.isValid())
+    if (!index.isValid() && role <= Qt::UserRole+1)
         return QVariant();
 
+    if (role == Qt::UserRole+2)
+        return QVariant::fromValue<KKSTemplate>(*tRef);
+    else if (role == Qt::UserRole+3)
+        return QVariant::fromValue<KKSCategoryAttr>(*cAttrP);
     KKSTreeItem * item = static_cast<KKSTreeItem*>(index.internalPointer());
     if (!item)
         return QVariant ();
@@ -144,17 +148,13 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
         }
         else
         {
-            attrValue = p.value()->fieldValue (aCode);
+            attrValue = item->getData()->fieldValue (aCode);
             if (attrValue.isEmpty())
-                attrValue = p.value()->fields().value (aCode.toLower());
+                attrValue = item->getData()->fields().value (aCode.toLower());
             else if (attrValue.contains ("\n"))
                 attrValue = attrValue.mid (0, attrValue.indexOf("\n")) + "...";
         }
         return attrValue;
-    }
-    else if (role == Qt::UserRole+2)
-    {
-        return QVariant::fromValue<KKSTemplate>(*tRef);
     }
     return QVariant();
 }
@@ -174,7 +174,7 @@ QVariant KKSEIODataModel :: headerData (int section, Qt::Orientation orientation
 bool KKSEIODataModel :: setData (const QModelIndex& index, const QVariant& value, int role)
 {
     KKSTreeItem * wItem = getItem (index);
-    if (!wItem || role != Qt::UserRole+1)
+    if (!wItem && role != Qt::UserRole+1)
         return false;
     
     int irow = index.row ();

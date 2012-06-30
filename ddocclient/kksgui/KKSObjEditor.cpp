@@ -1074,7 +1074,7 @@ void KKSObjEditor :: updateEIOEx (const QList<qint64>& idL, const KKSCategory * 
     if (idObject < 0)
         return;
     QList<int> rows;
-
+/*
     int i = tabEnclosures->currentIndex ();
     QAbstractItemModel *mod = (i==0 ? recWidget->getModel () : addRecWidgets[i-1]->getModel ());
     while (qobject_cast <QSortFilterProxyModel *>(mod))
@@ -1105,6 +1105,7 @@ void KKSObjEditor :: updateEIOEx (const QList<qint64>& idL, const KKSCategory * 
     QString tabName = tableName;//QString ();
     qDebug () << __PRETTY_FUNCTION__ << i << tabName << nTab;
     emit updateEIO (this, idObject, idL, rows, c, tabName, nTab);
+ */
 }
 
 void KKSObjEditor :: clearAdditionalCopies (void)

@@ -437,6 +437,8 @@ private:
     int searchParents (const KKSList<KKSObjectExemplar *>& oeList, 
                        const KKSCategoryAttr *cAttr, 
                        const KKSValue& refVal);
+    
+    int writeRecords (QAbstractItemModel * recModel, KKSObjectExemplar * wObjE, const QModelIndex& rIndex) const;
 
 private:
     //

@@ -1907,9 +1907,10 @@ QModelIndex KKSViewFactory :: searchModelIndex (QAbstractItemModel * sourceMod, 
         for (int j=0; j<nc; j++)
         {
             QModelIndex wIndex = sourceMod->index (i, j, pIndex);
-            if (wIndex.data (role).toInt() == iData)
+            int vData (wIndex.data (role).toInt());
+            if (vData == iData)
                 return wIndex;
-            else if (sourceMod->rowCount (wIndex) > 0)
+            else if (sourceMod->rowCount (wIndex) > 0 && j == 0)
             {
                 QModelIndex childIndex = searchModelIndex (sourceMod, iData, wIndex, role);
                 if (childIndex.isValid())
@@ -1918,5 +1919,31 @@ QModelIndex KKSViewFactory :: searchModelIndex (QAbstractItemModel * sourceMod, 
             else
                 continue;
         }
+    return QModelIndex();
+}
+
+QModelIndex KKSViewFactory :: searchModelRowsIndex (QAbstractItemModel * sourceMod, int iData, const QModelIndex& parent, int role)
+{
+    if (!sourceMod)
+        return QModelIndex ();
+
+    QModelIndex pIndex = parent;
+    int nr = sourceMod->rowCount (pIndex);
+    
+    for (int i=0; i<nr; i++)
+    {
+        QModelIndex wIndex = sourceMod->index (i, 0, pIndex);
+        int vData (wIndex.data (role).toInt());
+        if (vData == iData)
+            return wIndex;
+        else if (sourceMod->rowCount (wIndex) > 0)
+        {
+            QModelIndex childIndex = searchModelRowsIndex (sourceMod, iData, wIndex, role);
+            if (childIndex.isValid())
+                return childIndex;
+        }
+        else
+            continue;
+    }
     return QModelIndex();
 }
