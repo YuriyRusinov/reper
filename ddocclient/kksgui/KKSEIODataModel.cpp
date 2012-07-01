@@ -98,20 +98,20 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
         return QVariant::fromValue<KKSTemplate>(*tRef);
     else if (role == Qt::UserRole+3)
         return QVariant::fromValue<KKSCategoryAttr>(*cAttrP);
-    KKSTreeItem * item = static_cast<KKSTreeItem*>(index.internalPointer());
-    if (!item)
+    KKSTreeItem * wItem = static_cast<KKSTreeItem*>(index.internalPointer());
+    if (!wItem)
         return QVariant ();
-    qint64 idw = item->id();//index.internalId();
+    qint64 idw = wItem->id();//index.internalId();
     //if (!index.parent().isValid())
     //    qDebug () << __PRETTY_FUNCTION__ << index << idw;
     //if (index.parent().isValid())
     //    qDebug () << __PRETTY_FUNCTION__ << idw << index.parent().internalId();
-    KKSMap<qint64, KKSEIOData*>::const_iterator p=objRecords.constFind(idw);
-    if (p == objRecords.constEnd())
-        return QVariant ();
+    //KKSMap<qint64, KKSEIOData*>::const_iterator p=objRecords.constFind(idw);
+    //if (p == objRecords.constEnd())
+    //    return QVariant ();
     if (role == Qt::UserRole)
     {
-        return p.key();
+        return idw;//wItem->id();//p.key();
     }
     else if (role == Qt::DisplayRole)
     {
@@ -148,11 +148,16 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
         }
         else
         {
-            attrValue = item->getData()->fieldValue (aCode);
-            if (attrValue.isEmpty())
-                attrValue = item->getData()->fields().value (aCode.toLower());
-            else if (attrValue.contains ("\n"))
-                attrValue = attrValue.mid (0, attrValue.indexOf("\n")) + "...";
+            if (!wItem->getData())
+                attrValue = QString();
+            else
+            {
+                attrValue = wItem->getData()->fieldValue (aCode);
+                if (attrValue.isEmpty())
+                    attrValue = wItem->getData()->fields().value (aCode.toLower());
+                else if (attrValue.contains ("\n"))
+                    attrValue = attrValue.mid (0, attrValue.indexOf("\n")) + "...";
+            }
         }
         return attrValue;
     }
@@ -180,17 +185,23 @@ bool KKSEIODataModel :: setData (const QModelIndex& index, const QVariant& value
     int irow = index.row ();
     QModelIndex pIndex = index.parent();
     QModelIndex topL = this->index (irow, 0, pIndex);
-    QModelIndex bottomR = this->index (irow, columnCount()-1, pIndex);
+    QModelIndex bottomR = this->index (irow, columnCount(pIndex), pIndex);
+    qDebug () << __PRETTY_FUNCTION__ << topL << bottomR;
     if (role == Qt::UserRole)
     {
         qint64 id = value.value<qint64>();
         wItem->setId (id);
+        if (!objRecords.contains(id))
+            objRecords.insert(id, 0);
         emit dataChanged (topL, bottomR);
     }
     else if (role == Qt::DisplayRole || role == Qt::EditRole)
     {
         KKSEIOData d = value.value<KKSEIOData>();
         KKSEIOData * dVal = new KKSEIOData (d);
+        QString aCode = QString("name");//avList[1]->code(false);
+        qDebug () << __PRETTY_FUNCTION__ << dVal->fieldValue(aCode);
+        objRecords.insert(wItem->id(), dVal);
         wItem->setData (dVal);
         dVal->release ();
         emit dataChanged (topL, bottomR);
@@ -242,10 +253,10 @@ bool KKSEIODataModel :: insertRows (int row, int count, const QModelIndex& paren
     KKSTreeItem * pItem = getItem (parent);
     bool ok (true);
     beginInsertRows (parent, row, row+count-1);
-    QList<qint64> ids;
+/*    QList<qint64> ids;
     for (int i=1; i<=count; i++)
-        ids.append(-i);
-    ok = pItem->insertChildren(ids);
+        ids.append(pItem->id()+i);*/
+    ok = pItem->insertChildren(row, count);
     endInsertRows ();
     return ok;
 }

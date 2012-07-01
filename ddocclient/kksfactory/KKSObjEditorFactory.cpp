@@ -1689,6 +1689,8 @@ void KKSObjEditorFactory :: saveObjectEx (KKSObjEditor * editor, KKSObjectExempl
             wObjE->setId (wObjCopy->id());
         wObjCopy->release ();
     }
+    if (!transactionOk)
+        return;
     editor->setObjChanged (!transactionOk);
     if (recModel)
     {
@@ -1703,20 +1705,50 @@ void KKSObjEditorFactory :: saveObjectEx (KKSObjEditor * editor, KKSObjectExempl
         {
             int idP = wObjE->attrValue(cAttrP->id())->value().value().toInt();
             qDebug () << __PRETTY_FUNCTION__ << idP;
-            if ((idP < 0 && !rIndex.parent().isValid())
-                    || (idP > 0 && rIndex.parent().data (Qt::UserRole).toInt() == idP))
+            if ((idP <= 0 && !rIndex.parent().isValid())
+                    || (idP > 0 && rIndex.parent().isValid() && rIndex.parent().data (Qt::UserRole).toInt() == idP))
             {
                 writeRecords (recModel, wObjE, rIndex);
             }
-            else if (idP < 0 && rIndex.parent().isValid())
+            else if (idP <= 0 && rIndex.parent().isValid())
             {
-                int irow = rIndex.row ();
+                int iRow = rIndex.row ();
                 QModelIndex pIndex = rIndex.parent();
-                recModel->removeRows(irow, 1, pIndex);
-                recModel->insertRows(recModel->rowCount()-1, 1);
+                recModel->removeRows(iRow, 1, pIndex);
+                int nr = recModel->rowCount ();
+                recModel->insertRows(nr, 1);
                 rIndex = recModel->index (recModel->rowCount()-1, 0);
                 writeRecords (recModel, wObjE, rIndex);
             }
+            else if (idP > 0 && rIndex.parent().isValid())
+            {
+                int iRow = rIndex.row ();
+                QModelIndex pIndex = rIndex.parent();
+                recModel->removeRows(iRow, 1, pIndex);
+                pIndex = KKSViewFactory::searchModelRowsIndex(recModel, idP, QModelIndex(), Qt::UserRole);
+                int nr = recModel->rowCount (pIndex);
+                recModel->insertRows (nr, 1, pIndex);
+                rIndex = recModel->index (nr, 0, pIndex);
+                writeRecords (recModel, wObjE, rIndex);
+            }
+        }
+        else if (!rIndex.isValid() && (!cAttrP || cAttrP->id() <=0))
+        {
+            int nr = recModel->rowCount();
+            recModel->insertRows (nr, 1);
+            rIndex = recModel->index (nr, 0);
+            qDebug () << __PRETTY_FUNCTION__ << rIndex;
+            writeRecords (recModel, wObjE, rIndex);
+        }
+        else if (!rIndex.isValid () && cAttrP && cAttrP->id() > 0)
+        {
+            int idP = wObjE->attrValue(cAttrP->id())->value().value().toInt();
+            QModelIndex pIndex = KKSViewFactory::searchModelRowsIndex(recModel, idP, QModelIndex(), Qt::UserRole);
+            int nr = recModel->rowCount (pIndex);
+            bool isInserted = recModel->insertRows (nr, 1, pIndex);
+            rIndex = recModel->index (nr, 0, pIndex);
+            qDebug () << __PRETTY_FUNCTION__ << isInserted << rIndex;
+            writeRecords (recModel, wObjE, rIndex);
         }
     }
 /*    if (wObjE->io()->id () == IO_ORG_ID || \
@@ -1728,9 +1760,10 @@ void KKSObjEditorFactory :: saveObjectEx (KKSObjEditor * editor, KKSObjectExempl
 
 int KKSObjEditorFactory :: writeRecords (QAbstractItemModel * recModel, KKSObjectExemplar * wObjE, const QModelIndex& rIndex) const
 {
-    if (!recModel)
+    if (!recModel || !rIndex.isValid())
         return ERROR_CODE;
-    recModel->setData (rIndex, wObjE->id(), Qt::UserRole);
+    if (!recModel->setData (rIndex, wObjE->id(), Qt::UserRole))
+        return ERROR_CODE;
     KKSCategory * c = wObjE->io()->category()->tableCategory ();
     KKSList<const KKSFilterGroup *> filters;
     KKSList<const KKSFilter *> fl;
@@ -1753,7 +1786,7 @@ int KKSObjEditorFactory :: writeRecords (QAbstractItemModel * recModel, KKSObjec
     KKSEIOData * d = p.value ();
     if (!recModel->setData (rIndex, QVariant::fromValue<KKSEIOData>(*d), Qt::DisplayRole))
         return ERROR_CODE;
-    
+
     return wObjE->id ();
 }
 /*
