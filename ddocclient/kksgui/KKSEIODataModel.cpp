@@ -362,7 +362,7 @@ KKSTreeItem * KKSEIODataModel :: getModelItem (qint64 val, KKSTreeItem * parent,
         if (refCol.isEmpty())
             refCol = QString ("id");
         QString pStr = item->getData()->sysFieldValue(refCol);
-        qDebug () << __PRETTY_FUNCTION__ << pStr << refCol << cAttrP->code(false) << item->getData()->fields();
+        //qDebug () << __PRETTY_FUNCTION__ << pStr << refCol << cAttrP->code(false) << item->getData()->fields();
         bool ok (true);
         qint64 iVal (-1);
         if (QString::compare(refCol, QString("id")) == 0)
