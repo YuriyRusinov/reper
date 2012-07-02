@@ -1704,7 +1704,7 @@ void KKSObjEditorFactory :: saveObjectEx (KKSObjEditor * editor, KKSObjectExempl
         else if (rIndex.isValid() && cAttrP && cAttrP->id() > 0)
         {
             int idP = wObjE->attrValue(cAttrP->id())->value().value().toInt();
-            qDebug () << __PRETTY_FUNCTION__ << idP;
+            qDebug () << __PRETTY_FUNCTION__ << idP << rIndex.parent().data (Qt::UserRole).toInt();
             if ((idP <= 0 && !rIndex.parent().isValid())
                     || (idP > 0 && rIndex.parent().isValid() && rIndex.parent().data (Qt::UserRole).toInt() == idP))
             {
