@@ -35,22 +35,39 @@ public:
     
    
     int fieldsCount() const;
+
     QString fieldValue(const QString & code) const;
     QString & fieldValue(const QString & code);
+
     const QMap<QString, QString> & fields() const;
     QMap<QString, QString> & fields();
-    //const QString & fieldCode(int index) const;
 
     int addField(const QString & code, const QString & value);
     void setFields(const QMap<QString, QString> & fields);
     int removeField(const QString & code);
     int updateField(const QString & code, const QString & value);
+
+    int sysFieldsCount() const;
+
+    QString sysFieldValue(const QString & code) const;
+    QString & sysFieldValue(const QString & code);
+
+    const QMap<QString, QString> & sysFields() const;
+    QMap<QString, QString> & sysFields();
+
+    int addSysField(const QString & code, const QString & value);
+    void setSysFields(const QMap<QString, QString> & fields);
+    int removeSysField(const QString & code);
+    int updateSysField(const QString & code, const QString & value);
+
     void clear();
 
 protected:
 private:
     
     QMap<QString, QString> m_fields;
+    QMap<QString, QString> m_sysFields;
+
     QString m_null;
 };
 

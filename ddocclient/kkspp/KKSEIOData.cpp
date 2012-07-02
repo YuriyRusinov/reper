@@ -18,8 +18,9 @@ KKSEIOData::KKSEIOData(const KKSEIOData & copy) : KKSData()
     m_null = QString::null;
     
     m_fields.clear();
+    m_sysFields.clear();
     
-    m_fields = copy.fields();
+    m_sysFields = copy.sysFields();
 }
 
 KKSEIOData::~KKSEIOData()
@@ -39,6 +40,7 @@ QMap<QString, QString> & KKSEIOData::fields()
 void KKSEIOData::clear()
 {
     m_fields.clear();
+    m_sysFields.clear();
 }
 
 int KKSEIOData::fieldsCount() const
@@ -62,12 +64,6 @@ QString & KKSEIOData::fieldValue(const QString & code)
     return m_fields[code];
 }
 
-/*
-const QString & KKSEIOData::fieldCode(int index) const
-{
-    
-}
-*/
 
 int KKSEIOData::addField(const QString & code, const QString & value)
 {
@@ -104,3 +100,71 @@ int KKSEIOData::updateField(const QString & code, const QString & value)
     return cnt;
 }
 
+/************************************/
+const QMap<QString, QString> & KKSEIOData::sysFields() const
+{
+    return m_sysFields;
+}
+
+QMap<QString, QString> & KKSEIOData::sysFields()
+{
+    return m_sysFields;
+}
+
+
+int KKSEIOData::sysFieldsCount() const
+{
+    return m_sysFields.count();
+}
+
+QString KKSEIOData::sysFieldValue(const QString & code) const
+{
+    if(!m_sysFields.contains(code))
+        return QString::null;
+
+    return m_sysFields[code];
+}
+
+QString & KKSEIOData::sysFieldValue(const QString & code) 
+{
+    if(!m_sysFields.contains(code))
+        return m_null;
+
+    return m_sysFields[code];
+}
+
+
+int KKSEIOData::addSysField(const QString & code, const QString & value)
+{
+    if(code.isEmpty())
+        return ERROR_CODE;
+    
+    if(m_sysFields.contains(code))
+        return ERROR_CODE;
+
+    m_sysFields.insert(code, value);
+    return OK_CODE;
+}
+
+void KKSEIOData::setSysFields(const QMap<QString, QString> & fields)
+{
+    m_sysFields = fields;
+}
+
+int KKSEIOData::removeSysField(const QString & code)
+{
+    int cnt = m_sysFields.remove(code);
+
+    return cnt;
+}
+
+int KKSEIOData::updateSysField(const QString & code, const QString & value)
+{
+    int cnt = removeSysField(code);
+    if(cnt == 0)
+        return ERROR_CODE;
+
+    cnt = addSysField(code, value);
+
+    return cnt;
+}

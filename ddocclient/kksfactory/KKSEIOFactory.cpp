@@ -285,6 +285,8 @@ int KKSEIOFactory::updateRecord(const KKSObjectExemplar* eio,
     if(id == ERROR_CODE || (query.isEmpty() && exQuery.isEmpty()))
         return ERROR_CODE;
 
+    qWarning() << __PRETTY_FUNCTION__ << query;
+
     if(!query.isEmpty()){
         KKSResult * res = db->execute(query);
         if(!res || (res->resultStatus() != KKSResult::CommandOk && res->resultStatus() != KKSResult::TuplesOk)){
@@ -1616,7 +1618,7 @@ int KKSEIOFactory::insertFile(qint64 idRecord, KKSFile * f, const QWidget * pare
     if(ok != OK_CODE)
         return ERROR_CODE;
 
-    QString sql = QString("select recInsertUrl(%1, %2, '%3')")
+    QString sql = QString("select recInsertUrl(%1::int8, %2, '%3')")
                           .arg(idRecord)
                           .arg(f->id())
                           .arg(f->name());

@@ -1271,6 +1271,7 @@ int KKSPPFactory::insertAttrView(int idCategory, int idTemplate, int idGroup, KK
             return ERROR_CODE;
         }
         idAttr = av->id();
+        idCategoryAttr = av->idCategoryAttr();
     }
 
 

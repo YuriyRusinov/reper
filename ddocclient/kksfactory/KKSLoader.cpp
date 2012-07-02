@@ -1764,8 +1764,12 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
             refColumnName = "id";
 
         QString code = a->code(true); //quoted code
+        QString codeFK = code.insert(code.size()-1, "_fk");
+        code = a->code(true);
+
         if(a->type()->attrType() == KKSAttrType::atList ||
-            a->type()->attrType() == KKSAttrType::atParent){
+            a->type()->attrType() == KKSAttrType::atParent)
+        {
             QString tName = a->tableName();
             QString cName = a->columnName(true); //quoted columnName
             if(a->type()->attrType() == KKSAttrType::atParent)
@@ -1803,11 +1807,13 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
                     whereWord += QString(" and (%1.%2 isnull or %1.%2 = %3%4.%5) ").arg(tableName).arg(code).arg(tName).arg(cnt).arg(refColumnName);
                     joinWord += QString(" left join %1 %1%2 on %3.%4 = %1%2.%5").arg(tName).arg(cnt).arg(tableName).arg(code).arg(refColumnName);
                     attrs += QString(", case when %1.%3 isnull then NULL else %4%5.%2 end as %3").arg(tableName).arg(cName).arg(code).arg(tName).arg(cnt);
+                    attrs += QString(", %1.%2 as %3").arg(tableName).arg(code).arg(codeFK);
                 }
                 else{
                     whereWord += QString(" and %1.%2 = %3%4.%5 ").arg(tableName).arg(code).arg(tName).arg(cnt).arg(refColumnName);
                     joinWord += QString(" left join %1 %1%2 on %3.%4 = %1%2.%5").arg(tName).arg(cnt).arg(tableName).arg(code).arg(refColumnName);
                     attrs += QString(", %1%4.%2 as %3").arg(tName).arg(cName).arg(code).arg(cnt);
+                    attrs += QString(", %1.%2 as %3").arg(tableName).arg(code).arg(codeFK);
                 }
             }
             else{
@@ -1816,11 +1822,13 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
                     whereWord += QString(" and (%1.%2 isnull or %1.%2 = %3.%4) ").arg(tableName).arg(code).arg(tName).arg(refColumnName);
                     joinWord += QString(" left join %1 on %2.%3 = %1.%4").arg(tName).arg(tableName).arg(code).arg(refColumnName);
                     attrs += QString(", case when %1.%3 isnull then NULL else %4.%2 end as %3").arg(tableName).arg(cName).arg(code).arg(tName);
+                    attrs += QString(", %1.%2 as %3").arg(tableName).arg(code).arg(codeFK);
                 }
                 else{
                     whereWord += QString(" and %1.%2 = %3.%4 ").arg(tableName).arg(code).arg(tName).arg(refColumnName);
                     joinWord += QString(" left join %1 on %2.%3 = %1.%4").arg(tName).arg(tableName).arg(code).arg(refColumnName);
                     attrs += QString(", %1.%2 as %3").arg(tName).arg(cName).arg(code);
+                    attrs += QString(", %1.%2 as %3").arg(tableName).arg(code).arg(codeFK);
                 }
             }
 
@@ -1840,16 +1848,30 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
     }
     
     //обходной маневр для ТСД если делаем выборку из таблицы tsd, то надо вызывать специальную функцию
+    QStringList exTables;
     if(tableName.toLower() == "tsd"){
-        QString filterWhere = generateFilterSQL(filters, tableName);
+        QString filterWhere = generateFilterSQL(filters, tableName, exTables);
         if(!filterWhere.isEmpty())
             sql = QString("select * from jGetTsd('%1');").arg(filterWhere);
         else
             sql = QString("select * from jGetTsd(NULL);");
     }
     else{
-        sql = QString("select %4 %1.id %2 from %1 %3 where 1=1 ").arg(tableName).arg(attrs).arg(joinWord).arg (isXml ? QString() : QString("distinct"));//.arg(fromWord).arg(joinWord);//.arg(whereWord);
-        QString filterWhere = generateFilterSQL(filters, tableName);
+        QString filterWhere = generateFilterSQL(filters, tableName, exTables);
+        QString exTablesStr;
+        int cnt = exTables.count();
+        if(cnt > 0){
+            for(int i=0; i<cnt; i++){
+                exTablesStr += ", " + exTables.at(i);
+            }
+        }
+
+        sql = QString("select %4 %1.id %2 from %1 %3 %5 where 1=1 ")
+                            .arg(tableName)
+                            .arg(attrs)
+                            .arg(joinWord)
+                            .arg (isXml ? QString() : QString("distinct"))
+                            .arg(exTablesStr);//.arg(fromWord).arg(joinWord);//.arg(whereWord);
         if(!filterWhere.isEmpty())
             sql += filterWhere;
     }
@@ -1885,7 +1907,7 @@ KKSMap<qint64, KKSEIOData *> KKSLoader::loadEIOList(const KKSCategory * c0,
     KKSMap<qint64, KKSEIOData *> eioList;
 
     QString sql = generateSelectEIOQuery(c0, tableName, filters);
-    //qDebug () << __PRETTY_FUNCTION__ << sql;
+    qDebug () << __PRETTY_FUNCTION__ << sql;
     if(sql.isEmpty())
         return eioList;
 
@@ -1916,17 +1938,25 @@ KKSMap<qint64, KKSEIOData *> KKSLoader::loadEIOList(const KKSCategory * c0,
     }
 
     int columns = res->getColumnCount();
+
     for(int row=0; row<count; row++){
+        
         KKSEIOData * eio = new KKSEIOData();
+        
         for(int column=0; column<columns; column++){
             QString code = QString(res->getColumnName(column));//использование названия колонки для ключа QMap в классе KKSEIOData допустимо
             QString value = res->getCellAsString(row, column);
+            
+            //в данном случае получение атрибута по его коду (хотя он и не является уникальным) 
+            //допустимо, поскольку категория описывает таблицу, а в таблице не может быть 
+            //двух колонок (атрибутов) с одинаковым названием                    
+            const KKSCategoryAttr* a = c->attribute(code);
+            if(!a)
+                continue;
+            
             //проверим на тип ИНТЕРВАЛ
             if(hasInterval){
                 if(res->getColumnDataType(column) == KKSResult::dtInt4Array){
-                    //в данном случае получение атрибута по его коду (хотя он и не является уникальным) 
-                    //допустимо, поскольку категория описывает таблицу, а в таблице не может быть 
-                    //двух колонок (атрибутов) с одинаковым названием                    
                     const KKSCategoryAttr* a = c->attribute(code);
                     if(a && a->type()->attrType() == KKSAttrType::atInterval){
                         KKSValue v;
@@ -1954,15 +1984,19 @@ KKSMap<qint64, KKSEIOData *> KKSLoader::loadEIOList(const KKSCategory * c0,
                 QDateTime dt = v.valueVariant().toDateTime();
                 value = dt.toString("dd.MM.yyyy hh:mm:ss");
             }
-            
-            //в качестве кода используется код атрибута, 
-            //который является глобально уникальным (в таблице attributes).
-            //поэтому в KKSMap запись должна добавиться всегда.
-            //далее ее можно находить путем поиска по коду имеющегося атрибута
-            //и таким образом заполнять таблицу, где колонками будут названия (title) атрибутов
-            //подчиненной категории (таблицы), а значениями - значения из соответствующих
-            //записей KKSEIOData.
-            int ier = eio->addField(code, value);
+
+            int ier = 0;
+            if(a->type()->attrType() == KKSAttrType::atList ||
+                a->type()->attrType() == KKSAttrType::atParent
+                )
+            {
+                QString sysValue = res->getCellAsString(row, column++);
+                ier = eio->addField(code, value);
+                ier = eio->addSysField(code, sysValue);
+            }
+            else            
+                ier = eio->addField(code, value);
+
             if (ier != OK_CODE)
             {
                 qDebug () << __PRETTY_FUNCTION__ << QObject::tr ("Error");
@@ -1970,6 +2004,7 @@ KKSMap<qint64, KKSEIOData *> KKSLoader::loadEIOList(const KKSCategory * c0,
                 return eioList;
             }
         }
+
         //ID всегда идет первым в списке
         qint64 id = res->getCellAsInt64(row, 0);
         eioList.insert(id, eio);
@@ -1982,7 +2017,7 @@ KKSMap<qint64, KKSEIOData *> KKSLoader::loadEIOList(const KKSCategory * c0,
 }
 // /*
 QString KKSLoader::generateFilterSQL(const KKSList<const KKSFilterGroup *> & filterGroups, 
-                                     const QString & tableName) const
+                                     const QString & tableName, QStringList & exTables) const
 {
     QString sql;
     QString tmp;
@@ -2000,7 +2035,7 @@ QString KKSLoader::generateFilterSQL(const KKSList<const KKSFilterGroup *> & fil
         if(!group)
             continue;
 
-        tmp = parseGroup(group, tableName);
+        tmp = parseGroup(group, tableName, exTables);
         if(tmp.isEmpty())
             continue;
 
@@ -2018,7 +2053,7 @@ QString KKSLoader::generateFilterSQL(const KKSList<const KKSFilterGroup *> & fil
     return sql; //ui->teSQLView->setText(sql);
 }
 
-QString KKSLoader::parseGroup(const KKSFilterGroup * g, const QString & tableName) const
+QString KKSLoader::parseGroup(const KKSFilterGroup * g, const QString & tableName, QStringList & exTables) const
 {
     QString sql;
     QString tmp;
@@ -2047,7 +2082,7 @@ QString KKSLoader::parseGroup(const KKSFilterGroup * g, const QString & tableNam
                 continue;
 
             //if(grCount == 0)
-            tmp += parseGroup(group, tableName);
+            tmp += parseGroup(group, tableName, exTables);
             //else 
             //    tmp += groupOper + " " + parseGroup(group, tableName);
             
@@ -2093,9 +2128,9 @@ QString KKSLoader::parseGroup(const KKSFilterGroup * g, const QString & tableNam
         }
 
         if(fCount==0)
-            tmp += parseFilter(f, tableName);
+            tmp += parseFilter(f, tableName, exTables);
         else 
-            tmp += groupOper + parseFilter(f, tableName);
+            tmp += groupOper + parseFilter(f, tableName, exTables);
 
     }
     
@@ -2112,7 +2147,7 @@ QString KKSLoader::parseGroup(const KKSFilterGroup * g, const QString & tableNam
     return sql;
 }
 
-QString KKSLoader::parseFilter(const KKSFilter * f, const QString & tableName) const
+QString KKSLoader::parseFilter(const KKSFilter * f, const QString & tableName, QStringList & exTables) const
 {
     QString sql;
     
@@ -2143,11 +2178,41 @@ QString KKSLoader::parseFilter(const KKSFilter * f, const QString & tableName) c
         sql += QString(" %1 ").arg(code);
     else if (a->type()->attrType() == KKSAttrType::atCheckListEx)
     {
+        QString refTable = QString("%1_%2_ref_%3")                
+                .arg (tableName)
+                .arg (a->tableName())
+                .arg (a->id());
+        
+        QString attrTable = a->tableName();
+
+        if(!exTables.contains(refTable))
+            exTables.append(refTable);
+
+        if(!exTables.contains(attrTable))
+            exTables.append(attrTable);
+
+        sql += QString(" %1.id=%1_%2_ref_%3.id_%1 and %1_%2_ref_%3.id_%2=%2.id and %2.id in(%4) ")
+                .arg (tableName)
+                .arg (a->tableName())
+                .arg (a->id())
+                .arg (values.at(0)->valueForInsert().mid (2, values.at(0)->valueForInsert().length()-4));
+
+/*
+        sqlEx += QString (" inner join %1_%2_ref_%3 on (%1.id=%1_%2_ref_%3.id_%1) inner join %2 on (%1_%2_ref_%3.id_%2=%2.id and %2.id in(%4))")
+                .arg (tableName)
+                .arg (a->tableName())
+                .arg (a->id())
+                .arg (values.at(0)->valueForInsert().mid (2, values.at(0)->valueForInsert().length()-4));
+*/
+        /*        
         sql += QString (" %1 inner join %1_%2_ref_%3 on (%1.id=%1_%2_ref_%3.id_%1) inner join %2 on (%1_%2_ref_%3.id_%2=%2.id and %2.id in(%4))")
                 .arg (tableName)
                 .arg (a->tableName())
                 .arg (a->id())
                 .arg (values.at(0)->valueForInsert().mid (2, values.at(0)->valueForInsert().length()-4));
+*/
+
+
         sql += endUpper;
         qDebug () << __PRETTY_FUNCTION__ << sql;
         return sql;

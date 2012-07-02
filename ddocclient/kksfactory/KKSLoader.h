@@ -268,9 +268,14 @@ class _F_EXPORT KKSLoader
                                        const KKSList<const KKSFilterGroup *> & filters) const;
         
         QString generateFilterSQL(const KKSList<const KKSFilterGroup *> & filters, 
-                                  const QString & tableName) const;
-        QString parseGroup(const KKSFilterGroup * g, const QString & tableName) const; 
-        QString parseFilter(const KKSFilter * f, const QString & tableName) const;
+                                  const QString & tableName, 
+                                  QStringList & exTables) const;
+        QString parseGroup(const KKSFilterGroup * g, 
+                           const QString & tableName, 
+                           QStringList & exTables) const; 
+        QString parseFilter(const KKSFilter * f, 
+                            const QString & tableName, 
+                            QStringList & exTables) const;
 
         KKSFilterGroup * loadSearchGroup (int idGroup) const;
         KKSList<const KKSFilter *> loadCriteriaFromGroup (int idGroup) const;

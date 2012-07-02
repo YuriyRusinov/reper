@@ -6015,7 +6015,10 @@ void KKSObjEditorFactory :: loadAttributeFilters (KKSAttribute * attr, QComboBox
 //            title = p.value()->fields
 //        }
         
-        QString key = p.value()->fields().value(attr->refColumnName());
+        QString refColumnName = attr->refColumnName();
+        if(refColumnName.isEmpty())
+            refColumnName = "id";
+        QString key = p.value()->fields().value(refColumnName);
         cbList->addItem (title, key);
         //cbList->addItem (title, p.key());
     }

@@ -261,7 +261,7 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
         sortModel->addAttrView (v);
 //        itemDeleg->addAttrView (v);
 
-        if ((isSetH || resize) && v )
+        if ((isSetH ||  resize) && v )
         {
             int w = v->defWidth();
             if (editor)
