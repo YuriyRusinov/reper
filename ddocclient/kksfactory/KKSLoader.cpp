@@ -1990,7 +1990,7 @@ KKSMap<qint64, KKSEIOData *> KKSLoader::loadEIOList(const KKSCategory * c0,
                 a->type()->attrType() == KKSAttrType::atParent
                 )
             {
-                QString sysValue = res->getCellAsString(row, column++);
+                QString sysValue = res->getCellAsString(row, ++column);
                 ier = eio->addField(code, value);
                 ier = eio->addSysField(code, sysValue);
             }
