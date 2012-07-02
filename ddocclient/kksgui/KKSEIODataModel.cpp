@@ -327,28 +327,30 @@ void KKSEIODataModel :: setupData (KKSTreeItem * parent)
             p++)
     {
         KKSTreeItem * t = new KKSTreeItem (p.key(), p.value());
-        qDebug () << __PRETTY_FUNCTION__ << p.key();
-        QString valStr = p.value()->fieldValue(cAttrP->code(false));
+        QString valStr = p.value()->sysFieldValue(cAttrP->code(false));
+        //qDebug () << __PRETTY_FUNCTION__ << p.key() << valStr << p.value()->sysFields();
         if (valStr.isEmpty())
             parent->appendChild (t);
         else
         {
-            KKSTreeItem * parent1 = getModelItem (valStr, rootItem, pIndex);
-            if (!parent1)
+            bool ok;
+            qint64 iVal = valStr.toLongLong(&ok);
+            KKSTreeItem * parent1 = getModelItem (iVal, rootItem, pIndex);
+            if (!ok || !parent1)
                 parent->appendChild (t);
             else
             {
                 parent1->appendChild (t);
-                qDebug () << __PRETTY_FUNCTION__ << QString ("parent id is") << parent->id();
+                //qDebug () << __PRETTY_FUNCTION__ << QString ("parent id is") << parent->id();
             }
         }
     }
 
 }
 
-KKSTreeItem * KKSEIODataModel :: getModelItem (QString valStr, KKSTreeItem * parent, QModelIndex & pIndex)
+KKSTreeItem * KKSEIODataModel :: getModelItem (qint64 val, KKSTreeItem * parent, QModelIndex & pIndex)
 {
-    if (!parent || valStr.isEmpty())
+    if (!parent)
         return rootItem;
 
     //if (parent->getData() && QString::compare (parent->getData()->fieldValue(cAttrP->columnName(false)), valStr) == 0)
@@ -356,14 +358,27 @@ KKSTreeItem * KKSEIODataModel :: getModelItem (QString valStr, KKSTreeItem * par
     for (int i=0; i<parent->childCount(); i++)
     {
         KKSTreeItem * item = parent->child(i);
-        if (QString::compare (item->getData()->fieldValue(cAttrP->columnName(false)), valStr) == 0)
+        QString refCol = cAttrP->refColumnName(false);
+        if (refCol.isEmpty())
+            refCol = QString ("id");
+        QString pStr = item->getData()->sysFieldValue(refCol);
+        qDebug () << __PRETTY_FUNCTION__ << pStr << refCol << cAttrP->code(false) << item->getData()->fields();
+        bool ok (true);
+        qint64 iVal (-1);
+        if (QString::compare(refCol, QString("id")) == 0)
+            iVal = item->id();
+        else
+            pStr.toLongLong(&ok);// cAttrP->columnName(false)
+        if (!ok)
+            continue;
+        if (iVal == val)
         {
             pIndex = this->index (i, 0, pIndex);
             return item;
         }
         else if (item->childCount() > 0)
         {
-            KKSTreeItem * chItem = getModelItem (valStr, item, pIndex);
+            KKSTreeItem * chItem = getModelItem (val, item, pIndex);
             if (chItem)
                 return chItem;
         }
