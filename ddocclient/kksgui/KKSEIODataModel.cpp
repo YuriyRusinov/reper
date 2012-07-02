@@ -185,7 +185,7 @@ bool KKSEIODataModel :: setData (const QModelIndex& index, const QVariant& value
     int irow = index.row ();
     QModelIndex pIndex = index.parent();
     QModelIndex topL = this->index (irow, 0, pIndex);
-    QModelIndex bottomR = this->index (irow, columnCount(pIndex), pIndex);
+    QModelIndex bottomR = this->index (irow, columnCount(pIndex)-1, pIndex);
     qDebug () << __PRETTY_FUNCTION__ << topL << bottomR;
     if (role == Qt::UserRole)
     {
