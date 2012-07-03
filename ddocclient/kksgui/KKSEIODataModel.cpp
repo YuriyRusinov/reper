@@ -152,9 +152,13 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
                 attrValue = QString();
             else
             {
-                attrValue = wItem->getData()->fieldValue (aCode);
+                attrValue = wItem->getData()->fieldValue (aCode).isEmpty() ? wItem->getData()->sysFieldValue (aCode) : wItem->getData()->fieldValue (aCode);
                 if (attrValue.isEmpty())
+                {
                     attrValue = wItem->getData()->fields().value (aCode.toLower());
+                    if (attrValue.isEmpty())
+                        attrValue = wItem->getData()->sysFields().value (aCode.toLower());
+                }
                 else if (attrValue.contains ("\n"))
                     attrValue = attrValue.mid (0, attrValue.indexOf("\n")) + "...";
             }
@@ -199,9 +203,11 @@ bool KKSEIODataModel :: setData (const QModelIndex& index, const QVariant& value
     {
         KKSEIOData d = value.value<KKSEIOData>();
         KKSEIOData * dVal = new KKSEIOData (d);
-        QString aCode = QString("name");//avList[1]->code(false);
-        qDebug () << __PRETTY_FUNCTION__ << dVal->fieldValue(aCode);
-        objRecords.insert(wItem->id(), dVal);
+        if (objRecords.contains(wItem->id()))
+        {
+            objRecords.remove (wItem->id());
+            objRecords.insert (wItem->id(), dVal);
+        }
         wItem->setData (dVal);
         dVal->release ();
         emit dataChanged (topL, bottomR);

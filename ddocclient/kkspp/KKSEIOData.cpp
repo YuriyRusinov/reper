@@ -13,14 +13,18 @@ KKSEIOData::KKSEIOData() : KKSData()
     m_null = QString::null;
 }
 
-KKSEIOData::KKSEIOData(const KKSEIOData & copy) : KKSData()
+KKSEIOData::KKSEIOData(const KKSEIOData & copy) : KKSData(),
+    m_null (QString()),
+    m_fields (copy.m_fields),
+    m_sysFields (copy.m_sysFields)
 {
-    m_null = QString::null;
-    
+/*
     m_fields.clear();
     m_sysFields.clear();
-    
+
+    m_fields = copy.fields();
     m_sysFields = copy.sysFields();
+ */
 }
 
 KKSEIOData::~KKSEIOData()
