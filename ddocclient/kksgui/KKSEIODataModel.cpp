@@ -190,7 +190,7 @@ bool KKSEIODataModel :: setData (const QModelIndex& index, const QVariant& value
     QModelIndex pIndex = index.parent();
     QModelIndex topL = this->index (irow, 0, pIndex);
     QModelIndex bottomR = this->index (irow, columnCount(pIndex)-1, pIndex);
-    qDebug () << __PRETTY_FUNCTION__ << topL << bottomR;
+    //qDebug () << __PRETTY_FUNCTION__ << topL << bottomR;
     if (role == Qt::UserRole)
     {
         qint64 id = value.value<qint64>();
@@ -244,7 +244,7 @@ bool KKSEIODataModel :: setData (const QModelIndex& index, const QVariant& value
         int nc = columnCount();
         QModelIndex topL = this->index(0, 0);
         QModelIndex botR = this->index(nr-1, nc-1);
-        qDebug () << __PRETTY_FUNCTION__ << topL << botR;
+        //qDebug () << __PRETTY_FUNCTION__ << topL << botR;
         emit dataChanged (topL, botR);
     }
     else
@@ -255,13 +255,11 @@ bool KKSEIODataModel :: setData (const QModelIndex& index, const QVariant& value
 
 bool KKSEIODataModel :: insertRows (int row, int count, const QModelIndex& parent)
 {
-    qDebug () << __PRETTY_FUNCTION__ << row << count << parent;
+    //qDebug () << __PRETTY_FUNCTION__ << row << count << parent;
     KKSTreeItem * pItem = getItem (parent);
     bool ok (true);
     beginInsertRows (parent, row, row+count-1);
-/*    QList<qint64> ids;
-    for (int i=1; i<=count; i++)
-        ids.append(pItem->id()+i);*/
+
     ok = pItem->insertChildren(row, count);
     endInsertRows ();
     return ok;
@@ -269,7 +267,7 @@ bool KKSEIODataModel :: insertRows (int row, int count, const QModelIndex& paren
 
 bool KKSEIODataModel :: removeRows (int row, int count, const QModelIndex& parent)
 {
-    qDebug () << __PRETTY_FUNCTION__ << row << count << parent;
+    //qDebug () << __PRETTY_FUNCTION__ << row << count << parent;
     KKSTreeItem * pItem = getItem (parent);
     bool ok (true);
     beginRemoveRows (parent, row, row+count-1);

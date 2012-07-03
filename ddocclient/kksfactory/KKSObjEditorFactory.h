@@ -439,6 +439,8 @@ private:
                        const KKSValue& refVal);
     
     int writeRecords (QAbstractItemModel * recModel, KKSObjectExemplar * wObjE, const QModelIndex& rIndex) const;
+    
+    int writeRecIntoModel (QAbstractItemModel * recModel, KKSObjectExemplar * wObjE) const;
 
 private:
     //

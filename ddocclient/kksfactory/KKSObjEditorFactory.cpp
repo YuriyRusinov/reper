@@ -1658,6 +1658,7 @@ void KKSObjEditorFactory :: saveObjectEx (KKSObjEditor * editor, KKSObjectExempl
     }
 
     editor->clearAdditionalCopies ();
+    KKSList<KKSObjectExemplar *> recList;
     for (int i=0; i<nc; i++)
     {
         int res;
@@ -1669,9 +1670,13 @@ void KKSObjEditorFactory :: saveObjectEx (KKSObjEditor * editor, KKSObjectExempl
             qDebug () << __PRETTY_FUNCTION__ << tableName << wObjCopy->io()->tableName();
             res = eiof->insertEIO (wObjCopy, cat, tableName, false, editor);
             if (res == OK_CODE)
+            {
                 editor->addAdditionalCopy (wObjCopy->id());
+                recList.append (wObjCopy);
+            }
             else
                 transactionOk = false;
+
         }
         else
             res = eiof->updateEIO (wObjE, cat, tableName, editor);
@@ -1685,6 +1690,8 @@ void KKSObjEditorFactory :: saveObjectEx (KKSObjEditor * editor, KKSObjectExempl
             transactionOk = false;
             break;
         }
+        else
+            recList.append(wObjE);
         if (isNew && i==0)
             wObjE->setId (wObjCopy->id());
         wObjCopy->release ();
@@ -1692,70 +1699,104 @@ void KKSObjEditorFactory :: saveObjectEx (KKSObjEditor * editor, KKSObjectExempl
     if (!transactionOk)
         return;
     editor->setObjChanged (!transactionOk);
-    if (recModel)
-    {
-        const KKSCategoryAttr * cAttrP = new KKSCategoryAttr (recModel->data(QModelIndex(), Qt::UserRole+3).value<KKSCategoryAttr>());
-        QModelIndex rIndex = (isNew ? QModelIndex() : KKSViewFactory::searchModelRowsIndex (recModel, wObjE->id(), QModelIndex(), Qt::UserRole));
-        qDebug () << __PRETTY_FUNCTION__ << (cAttrP ? cAttrP->id() : -1) << rIndex;
-        if (rIndex.isValid() && (!cAttrP || cAttrP->id() <=0) && nc == 1)
-        {
-            writeRecords (recModel, wObjE, rIndex);
-        }
-        else if (rIndex.isValid() && cAttrP && cAttrP->id() > 0)
-        {
-            int idP = wObjE->attrValue(cAttrP->id())->value().value().toInt();
-            qDebug () << __PRETTY_FUNCTION__ << idP << rIndex.parent().data (Qt::UserRole).toInt();
-            if ((idP <= 0 && !rIndex.parent().isValid())
-                    || (idP > 0 && rIndex.parent().isValid() && rIndex.parent().data (Qt::UserRole).toInt() == idP))
-            {
-                writeRecords (recModel, wObjE, rIndex);
-            }
-            else if (idP <= 0 && rIndex.parent().isValid())
-            {
-                int iRow = rIndex.row ();
-                QModelIndex pIndex = rIndex.parent();
-                recModel->removeRows(iRow, 1, pIndex);
-                int nr = recModel->rowCount ();
-                recModel->insertRows(nr, 1);
-                rIndex = recModel->index (recModel->rowCount()-1, 0);
-                writeRecords (recModel, wObjE, rIndex);
-            }
-            else if (idP > 0 && rIndex.parent().isValid())
-            {
-                int iRow = rIndex.row ();
-                QModelIndex pIndex = rIndex.parent();
-                recModel->removeRows(iRow, 1, pIndex);
-                pIndex = KKSViewFactory::searchModelRowsIndex(recModel, idP, QModelIndex(), Qt::UserRole);
-                int nr = recModel->rowCount (pIndex);
-                recModel->insertRows (nr, 1, pIndex);
-                rIndex = recModel->index (nr, 0, pIndex);
-                writeRecords (recModel, wObjE, rIndex);
-            }
-        }
-        else if (!rIndex.isValid() && (!cAttrP || cAttrP->id() <=0))
-        {
-            int nr = recModel->rowCount();
-            recModel->insertRows (nr, 1);
-            rIndex = recModel->index (nr, 0);
-            qDebug () << __PRETTY_FUNCTION__ << rIndex;
-            writeRecords (recModel, wObjE, rIndex);
-        }
-        else if (!rIndex.isValid () && cAttrP && cAttrP->id() > 0)
-        {
-            int idP = wObjE->attrValue(cAttrP->id())->value().value().toInt();
-            QModelIndex pIndex = KKSViewFactory::searchModelRowsIndex(recModel, idP, QModelIndex(), Qt::UserRole);
-            int nr = recModel->rowCount (pIndex);
-            bool isInserted = recModel->insertRows (nr, 1, pIndex);
-            rIndex = recModel->index (nr, 0, pIndex);
-            qDebug () << __PRETTY_FUNCTION__ << isInserted << rIndex;
-            writeRecords (recModel, wObjE, rIndex);
-        }
-    }
+    if (!recModel)
+        return;
+    int ier = 0;
+    for (int i=0; i<recList.count() && ier >=0; i++)
+        ier = writeRecIntoModel (recModel, recList[i]);
 /*    if (wObjE->io()->id () == IO_ORG_ID || \
         wObjE->io()->id () == IO_UNITS_ID || \
         wObjE->io()->id () == IO_POS_ID || \
         wObjE->io()->id () == IO_USERS_ID)*/
     emit cioSaved (wObjE);
+}
+
+int KKSObjEditorFactory :: writeRecIntoModel (QAbstractItemModel * recModel, KKSObjectExemplar * wObjE) const
+{
+    if (!recModel)
+        return ERROR_CODE;
+    const KKSCategoryAttr * cAttrP = new KKSCategoryAttr (recModel->data(QModelIndex(), Qt::UserRole+3).value<KKSCategoryAttr>());
+    QModelIndex rIndex = KKSViewFactory::searchModelRowsIndex (recModel, wObjE->id(), QModelIndex(), Qt::UserRole);
+    //qDebug () << __PRETTY_FUNCTION__ << (cAttrP ? cAttrP->id() : -1) << rIndex;
+    int ier = OK_CODE;
+    if (rIndex.isValid() && (!cAttrP || cAttrP->id() <=0))
+    {
+        ier = writeRecords (recModel, wObjE, rIndex);
+        if (ier < 0)
+            return ier;
+    }
+    else if (rIndex.isValid() && cAttrP && cAttrP->id() > 0)
+    {
+        int idP = wObjE->attrValue(cAttrP->id())->value().value().toInt();
+        //qDebug () << __PRETTY_FUNCTION__ << idP << rIndex.parent().data (Qt::UserRole).toInt();
+        if ((idP <= 0 && !rIndex.parent().isValid())
+                || (idP > 0 && rIndex.parent().isValid() && rIndex.parent().data (Qt::UserRole).toInt() == idP))
+        {
+            ier = writeRecords (recModel, wObjE, rIndex);
+            if (ier < 0)
+                return ier;
+        }
+        else if (idP <= 0 && rIndex.parent().isValid())
+        {
+            int iRow = rIndex.row ();
+            QModelIndex pIndex = rIndex.parent();
+            recModel->removeRows(iRow, 1, pIndex);
+            int nr = recModel->rowCount ();
+            recModel->insertRows(nr, 1);
+            rIndex = recModel->index (recModel->rowCount()-1, 0);
+            ier = writeRecords (recModel, wObjE, rIndex);
+            if (ier < 0)
+                return ier;
+        }
+        else if (idP > 0 && rIndex.parent().isValid())
+        {
+            int iRow = rIndex.row ();
+            QModelIndex pIndex = rIndex.parent();
+            recModel->removeRows(iRow, 1, pIndex);
+            pIndex = KKSViewFactory::searchModelRowsIndex(recModel, idP, QModelIndex(), Qt::UserRole);
+            int nr = recModel->rowCount (pIndex);
+            recModel->insertRows (nr, 1, pIndex);
+            rIndex = recModel->index (nr, 0, pIndex);
+            ier = writeRecords (recModel, wObjE, rIndex);
+            if (ier < 0)
+                return ier;
+        }
+        else if (idP > 0 && !rIndex.parent().isValid())
+        {
+            QModelIndex pIndex = KKSViewFactory::searchModelRowsIndex(recModel, idP, QModelIndex(), Qt::UserRole);
+            int iRow = rIndex.row ();
+            recModel->removeRows (iRow, 1);
+            int nr = recModel->rowCount (pIndex);
+            recModel->insertRows (nr, 1, pIndex);
+            rIndex = recModel->index (nr, 0, pIndex);
+            ier = writeRecords (recModel, wObjE, rIndex);
+            if (ier < 0)
+                return ier;
+        }
+    }
+    else if (!rIndex.isValid() && (!cAttrP || cAttrP->id() <=0))
+    {
+        int nr = recModel->rowCount();
+        recModel->insertRows (nr, 1);
+        rIndex = recModel->index (nr, 0);
+        qDebug () << __PRETTY_FUNCTION__ << rIndex;
+        ier = writeRecords (recModel, wObjE, rIndex);
+        if (ier < 0)
+            return ier;
+    }
+    else if (!rIndex.isValid () && cAttrP && cAttrP->id() > 0)
+    {
+        int idP = wObjE->attrValue(cAttrP->id())->value().value().toInt();
+        QModelIndex pIndex = KKSViewFactory::searchModelRowsIndex(recModel, idP, QModelIndex(), Qt::UserRole);
+        int nr = recModel->rowCount (pIndex);
+        bool isInserted = recModel->insertRows (nr, 1, pIndex);
+        rIndex = recModel->index (nr, 0, pIndex);
+        qDebug () << __PRETTY_FUNCTION__ << isInserted << rIndex;
+        ier = writeRecords (recModel, wObjE, rIndex);
+        if (ier < 0)
+            return ier;
+    }
+    return OK_CODE;
 }
 
 int KKSObjEditorFactory :: writeRecords (QAbstractItemModel * recModel, KKSObjectExemplar * wObjE, const QModelIndex& rIndex) const
@@ -1808,7 +1849,7 @@ void KKSObjEditorFactory :: saveObjectAsCommandResult (KKSObjEditor* editor,
     
     //editor->setObjChanged(true);
     
-    saveObject(editor, wObj, pObjectEx, num);
+    saveObject(editor, wObj, pObjectEx, num, recModel);
     if(editor->isObjChanged())//Значит на предыдущем шаге произошла ошибка
         return; 
 
@@ -1866,6 +1907,7 @@ void KKSObjEditorFactory :: saveObject (KKSObjEditor* editor,
     bool isNew (pObjectEx->id() < 0);
 
     editor->clearAdditionalCopies ();
+    KKSList<KKSObjectExemplar *> recList;
     for (int i=0; i<nc; i++)
     {
         int res;
@@ -1929,7 +1971,10 @@ void KKSObjEditorFactory :: saveObject (KKSObjEditor* editor,
                 //pObjectEx->attrValue("code")->setValue(v);
             }
             if (res == OK_CODE)
+            {
                 editor->addAdditionalCopy (i==0 ? wObj->id() : io->id());
+                recList.append (i==0 ? pObjectEx : wObjCopy);
+            }
             else
             {
                 QMessageBox::warning (editor, tr ("Insert document"), tr ("Cannot insert IO to DB"), QMessageBox::Ok, QMessageBox::Ok);
@@ -1990,6 +2035,11 @@ void KKSObjEditorFactory :: saveObject (KKSObjEditor* editor,
         editor->setObjChanged (false);
     else
         editor->setObjChanged (true);
+    if (!recModel || !transactionOk)
+        return;
+    int ier = 0;
+    for (int i=0; i<recList.count() && ier >=0; i++)
+        ier = writeRecIntoModel (recModel, recList[i]);
 
 }
 
