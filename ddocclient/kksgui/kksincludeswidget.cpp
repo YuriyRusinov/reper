@@ -361,7 +361,7 @@ void KKSIncludesWidget :: addRubric (void)
     bool ok = false;
     Q_UNUSED (ok);
     QString rName;
-    RubricForm * rForm = new RubricForm (tr("New rubric %1").arg(twIncludes->model()->rowCount(index)+1), this);
+    RubricForm * rForm = new RubricForm (tr("New rubric %1").arg(twIncludes->model()->rowCount(index)+1), QString(), this);
     if (!rForm)
         return;
 
@@ -371,12 +371,14 @@ void KKSIncludesWidget :: addRubric (void)
     KKSSearchTemplate * rst = 0;
     KKSCategory * rc = 0;
     KKSAccessEntity * ac = 0;
+    QString rDesc;
     if (rForm && rForm->exec() == QDialog::Accepted)
     {
         rName = rForm->getRubricName ();
         rst = rForm->getSearchTemplate ();
         rc = rForm->getCategory ();
         ac = rForm->getAccessEntity ();
+        rDesc = rForm->getRubricDesc ();
         if (rName.trimmed().isEmpty())
             return;
     }
@@ -388,6 +390,7 @@ void KKSIncludesWidget :: addRubric (void)
     }
 
     KKSRubric * r = new KKSRubric(-1, rName, rst, rc, ac);
+    r->setDesc (rDesc);
     rForm->setParent (0);
     delete rForm;
 
@@ -467,7 +470,7 @@ void KKSIncludesWidget :: editRubric (void)
     if (!r)
         return;
 
-    RubricForm * rForm = new RubricForm (index.data (Qt::DisplayRole).toString(), this);
+    RubricForm * rForm = new RubricForm (index.data (Qt::DisplayRole).toString(), r->desc(), this);
     rForm->setSearchTemplate (r->getSearchTemplate());
     rForm->setCategory (r->getCategory());
     rForm->setAccessEntity (r->getAccessRules());
@@ -480,12 +483,14 @@ void KKSIncludesWidget :: editRubric (void)
     KKSSearchTemplate * rst = 0;
     KKSCategory * rc = 0;
     KKSAccessEntity * ac =0;
+    QString rDesc;
     if (rForm && rForm->exec() == QDialog::Accepted)
     {
         rName = rForm->getRubricName ();
         rst = rForm->getSearchTemplate ();
         rc = rForm->getCategory ();
         ac = rForm->getAccessEntity();
+        rDesc = rForm->getRubricDesc ();
         if (rName.trimmed().isEmpty())
             return;
     }
@@ -500,6 +505,7 @@ void KKSIncludesWidget :: editRubric (void)
     r->setSearchTemplate (rst);
     r->setCategory (rc);
     r->setAccessRules (ac);
+    r->setDesc (rDesc);
     rForm->setParent (0);
     delete rForm;
 

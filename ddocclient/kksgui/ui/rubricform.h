@@ -21,7 +21,7 @@ class KKSStuffForm;
 class _GUI_EXPORT RubricForm : public QDialog
 {
 public:
-    RubricForm (QString defaultRubricName=QString(), QWidget* parent=0, Qt::WFlags f=0);
+    RubricForm (QString defaultRubricName=QString(), QString defaultRubricDesc=QString(), QWidget* parent=0, Qt::WFlags f=0);
     ~RubricForm (void);
 
     QString getRubricName (void) const;
@@ -37,6 +37,9 @@ public:
 
     KKSCategory * getCategory (void) const;
     void setCategory (KKSCategory * c);
+    
+    QString getRubricDesc (void) const;
+    void setRubricDesc (QString rDesc);
 
     KKSAccessEntity * getAccessEntity (void) const;
 

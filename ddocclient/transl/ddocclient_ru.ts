@@ -1895,15 +1895,15 @@ Do you want to save the changes before closing?</source>
     <name>IntEdit</name>
     <message>
         <source>Name:</source>
-        <translation type="unfinished">Название:</translation>
+        <translation>Название:</translation>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation type="unfinished">&amp;OK</translation>
+        <translation>&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
+        <translation>&amp;Отмена</translation>
     </message>
     <message>
         <source>Int</source>
@@ -2030,7 +2030,7 @@ Do you want to save the changes before closing?</source>
     <name>KKSAttrValueLabel</name>
     <message>
         <source>&lt;font color=&apos;blue&apos;&gt;%2&lt;/font&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Click on label to show extended attribute properties</source>
@@ -10171,7 +10171,7 @@ System Error &apos;%1&apos;
     <name>rubric_form</name>
     <message>
         <source>Add rubric</source>
-        <translation>Добавить рубрику</translation>
+        <translation type="obsolete">Добавить рубрику</translation>
     </message>
     <message>
         <source>Rubric name :</source>
@@ -10200,6 +10200,14 @@ System Error &apos;%1&apos;
     <message>
         <source>Rubric category :</source>
         <translation>Категория рубрики:</translation>
+    </message>
+    <message>
+        <source>Add/Edit rubric</source>
+        <translation>Добавить/редактировать рубрику</translation>
+    </message>
+    <message>
+        <source>Rubric description :</source>
+        <translation>Описание рубрики:</translation>
     </message>
 </context>
 <context>
