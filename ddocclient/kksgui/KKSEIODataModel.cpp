@@ -1,3 +1,5 @@
+#include <QColor>
+#include <QBrush>
 #include <QtDebug>
 
 #include "KKSTemplate.h"
@@ -16,11 +18,19 @@ KKSEIODataModel :: KKSEIODataModel (const KKSTemplate * t, const KKSMap<qint64, 
     objRecords (objRecs),
     //parIndexList (QMap<qint64, QModelIndex>()),
     //indList (QMap<qint64, QList<qint64> >()),
-    rootItem (new KKSTreeItem(-1, 0))
+    rootItem (new KKSTreeItem(-1, 0)),
+    cAttrBackground (0),
+    cAttrForeground (0)
 {
     if (tRef)
         tRef->addRef();
     cAttrP = getFirstAttribute (KKSAttrType::atParent);
+    cAttrBackground = getFirstAttribute (KKSAttrType::atRecordColor);
+    if (!cAttrBackground)
+        cAttrBackground = getFirstAttribute (KKSAttrType::atRecordColorRef);
+    cAttrForeground = getFirstAttribute (KKSAttrType::atRecordTextColor);
+    if (!cAttrForeground)
+        cAttrForeground = getFirstAttribute (KKSAttrType::atRecordTextColorRef);
     setupData (rootItem);
 }
 
@@ -164,6 +174,32 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
             }
         }
         return attrValue;
+    }
+    else if (cAttrBackground && (role == Qt::BackgroundRole || role == Qt::BackgroundColorRole))
+    {
+        if (!wItem->getData())
+            return QVariant();
+        KKSEIOData * d = wItem->getData ();
+        bool ok;
+        //qDebug () << __PRETTY_FUNCTION__ << d->fields().value (cAttrBackground->code(false).toLower());
+        quint64 vl = d->fields().value (cAttrBackground->code(false)).toULongLong (&ok);
+        if (!ok)
+            return QVariant ();
+        QVariant vc = QColor::fromRgba (vl);
+        return vc;
+    }
+    else if (cAttrForeground && role == Qt::ForegroundRole )
+    {
+        if (!wItem->getData())
+            return QVariant();
+        KKSEIOData * d = wItem->getData ();
+        bool ok;
+        //qDebug () << __PRETTY_FUNCTION__ << d->fields().value (cAttrBackground->code(false).toLower());
+        quint64 vl = d->fields().value (cAttrForeground->code(false)).toULongLong (&ok);
+        if (!ok)
+            return QVariant ();
+        QVariant vc = QColor::fromRgba (vl);
+        return vc;
     }
     return QVariant();
 }

@@ -49,9 +49,9 @@ void KKSColorWidget :: setColor (void)
         if(u == QMessageBox::No)
             return;
     }
-    //qDebug () << __PRETTY_FUNCTION__ << QColor (rgb_col);
+    qDebug () << __PRETTY_FUNCTION__ << QVariant(rgb_col.rgba());
     
-    emit valueChanged (m_av->id(), m_isSystem, QVariant (rgb_col));
+    emit valueChanged (m_av->id(), m_isSystem, QVariant (rgb_col.rgba()));
     setColor (rgb_col);
 }
 

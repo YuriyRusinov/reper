@@ -56,6 +56,8 @@ private:
     //mutable QMap<qint64, QModelIndex> parIndexList;
     //mutable QMap<qint64, QList<qint64> > indList;
     KKSTreeItem * rootItem;
+    const KKSCategoryAttr * cAttrBackground;
+    const KKSCategoryAttr * cAttrForeground;
 
 private:
     Q_OBJECT
