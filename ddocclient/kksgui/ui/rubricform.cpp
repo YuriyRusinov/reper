@@ -30,6 +30,8 @@ RubricForm :: RubricForm (QString defaultRubricName, QString defaultRubricDesc, 
     UI->tbCategory->setVisible (!forRecords);
 
     UI->gbAccessRules->setVisible (!forRecords);
+    if (forRecords)
+        this->adjustSize ();
     //this->initPrivilegiesModel ();
 
     connect (UI->tbSearchTemplate, SIGNAL (clicked()), this, SLOT (loadSearchTemplate()) );
