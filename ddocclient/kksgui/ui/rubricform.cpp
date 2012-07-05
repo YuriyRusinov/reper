@@ -10,7 +10,7 @@
 #include "kksstuffform.h"
 //#include "KKSCheckableModel.h"
 
-RubricForm :: RubricForm (QString defaultRubricName, QString defaultRubricDesc, QWidget* parent, Qt::WFlags f)
+RubricForm :: RubricForm (QString defaultRubricName, QString defaultRubricDesc, bool forRecords, QWidget* parent, Qt::WFlags f)
     : QDialog (parent, f),
     UI (new Ui::rubric_form),
     searchTemplate (0),
@@ -21,6 +21,15 @@ RubricForm :: RubricForm (QString defaultRubricName, QString defaultRubricDesc, 
     UI->lERubricName->setText (defaultRubricName);
     UI->lERubricDescription->setText (defaultRubricDesc);
 
+    UI->lSearchTemplate->setVisible (!forRecords);
+    UI->lESearchTemplate->setVisible (!forRecords);
+    UI->tbSearchTemplate->setVisible (!forRecords);
+
+    UI->lCategory->setVisible (!forRecords);
+    UI->lECategory->setVisible (!forRecords);
+    UI->tbCategory->setVisible (!forRecords);
+
+    UI->gbAccessRules->setVisible (!forRecords);
     //this->initPrivilegiesModel ();
 
     connect (UI->tbSearchTemplate, SIGNAL (clicked()), this, SLOT (loadSearchTemplate()) );

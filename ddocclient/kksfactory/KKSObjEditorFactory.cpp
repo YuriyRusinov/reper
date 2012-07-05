@@ -357,7 +357,8 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
         tabObj->addTab (sysAttrTabWidget, tr ("Attributes"));
     }
 
-    this->putRubricator(wObjE, objEditorWidget, tabObj);
+    if (wObjE->io()->id() >= 300)
+        this->putRubricator(wObjE, objEditorWidget, tabObj);
     QScrollArea *scSysAttrs = new QScrollArea (sysAttrTabWidget);
     scSysAttrs->setWidgetResizable (true);
     QWidget *attrWidget = new QWidget ();
@@ -7633,7 +7634,7 @@ void KKSObjEditorFactory :: putRubricator (KKSObject * obj, KKSObjEditor * edito
     //includesW->setSizePolicy (iwSizePolicy);
     //qDebug () << __PRETTY_FUNCTION__ << includesW->sizePolicy ();
     //QGridLayout *gIncludesLay = new QGridLayout (includesW);
-    KKSIncludesWidget * iW = new KKSIncludesWidget (obj->rootRubric());//, true, false, false, includesW);
+    KKSIncludesWidget * iW = new KKSIncludesWidget (obj->rootRubric(), true, false, false, false);//includesW);
     iW->setSizePolicy (iwSizePolicy);
     if (iW && m_rf)
     {
@@ -7664,7 +7665,7 @@ void KKSObjEditorFactory :: putRubricator (KKSObjectExemplar * eio, KKSObjEditor
     //includesW->setSizePolicy (iwSizePolicy);
     //qDebug () << __PRETTY_FUNCTION__ << includesW->sizePolicy ();
     //QGridLayout *gIncludesLay = new QGridLayout (includesW);
-    KKSIncludesWidget * eiW = new KKSIncludesWidget (eio->rootRubric());//, true, false, false, includesW);
+    KKSIncludesWidget * eiW = new KKSIncludesWidget (eio->rootRubric(), true, false, false, true);// includesW);
     eiW->setSizePolicy (iwSizePolicy);
     if (eiW && m_rf)
     {

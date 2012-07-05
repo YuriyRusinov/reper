@@ -39,12 +39,14 @@ KKSIncludesWidget::KKSIncludesWidget(KKSRubric * rootRubric,
                                      bool isAttach,
                                      bool isDocs,
                                      bool forCategory,
+                                     bool forRecord,
                                      QWidget *parent,
                                      Qt::WindowFlags flags)
     : QWidget (parent, flags),
     m_rootRubric (rootRubric),
     isMyDoc (isDocs),
     isChanged (false),
+    isRec (forRecord),
     tBRubrActions (new QToolBar (this)),
     spRubrics (new QSplitter (Qt::Vertical, this)),
     twIncludes (new QTreeView (spRubrics)),
@@ -129,7 +131,7 @@ void KKSIncludesWidget :: initActions (void)
 {
     QStringList icons;
     icons << ":/ddoc/rubric_add.png" 
-          << ":/ddoc/rubric_add.png"
+          //<< ":/ddoc/rubric_add.png"
           << ":/ddoc/rubric_edit.png" 
           << ":/ddoc/rubric_delete.png"
           << ":/ddoc/rubric_item_add.png" 
@@ -138,7 +140,7 @@ void KKSIncludesWidget :: initActions (void)
 
     QStringList slotList;
     slotList << SLOT (addRubric())
-             << SLOT (copyFromRubric())
+             //<< SLOT (copyFromRubric())
              << SLOT (editRubric()) 
              << SLOT (delRubric()) 
              << SLOT (addRubricItem()) 
@@ -147,19 +149,19 @@ void KKSIncludesWidget :: initActions (void)
 
     QStringList titlesList;
     titlesList << tr ("&Add new rubric")
-               << tr ("&Copy from rubric")
+               //<< tr ("&Copy from rubric")
                << tr ("&Edit rubric") 
                << tr ("&Delete rubric") 
                << tr ("Add rubric item") 
                << tr ("&Open rubric item") 
                << tr ("&Delete rubric item");
 
-    for (int i=0; i<=6; i++)
+    for (int i=0; i<=5; i++)
     {
         QAction * aRubricA = new QAction (QIcon(icons[i]), titlesList[i], this);
         tBRubrActions->addAction (aRubricA);
         connect (aRubricA, SIGNAL (triggered()), this, slotList[i].toAscii().constData() );
-        if (i==3)
+        if (i==2)
             tBRubrActions->addSeparator ();
     }
 }
@@ -361,7 +363,7 @@ void KKSIncludesWidget :: addRubric (void)
     bool ok = false;
     Q_UNUSED (ok);
     QString rName;
-    RubricForm * rForm = new RubricForm (tr("New rubric %1").arg(twIncludes->model()->rowCount(index)+1), QString(), this);
+    RubricForm * rForm = new RubricForm (tr("New rubric %1").arg(twIncludes->model()->rowCount(index)+1), QString(), isRec, this);
     if (!rForm)
         return;
 
@@ -470,7 +472,7 @@ void KKSIncludesWidget :: editRubric (void)
     if (!r)
         return;
 
-    RubricForm * rForm = new RubricForm (index.data (Qt::DisplayRole).toString(), r->desc(), this);
+    RubricForm * rForm = new RubricForm (index.data (Qt::DisplayRole).toString(), r->desc(), isRec, this);
     rForm->setSearchTemplate (r->getSearchTemplate());
     rForm->setCategory (r->getCategory());
     rForm->setAccessEntity (r->getAccessRules());

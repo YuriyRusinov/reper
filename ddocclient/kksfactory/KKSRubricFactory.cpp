@@ -82,7 +82,7 @@ KKSIncludesWidget * KKSRubricFactory :: createRubricEditor (int mode, const KKSL
             }
     }
 
-    KKSIncludesWidget *iW = new KKSIncludesWidget (rootR, false, isDocs, false, parent);
+    KKSIncludesWidget *iW = new KKSIncludesWidget (rootR, false, isDocs, false, false, parent);
     QTreeView *tv = iW->tvRubr();
     KKSEventFilter *ef = new KKSEventFilter (iW);
     iW->setWindowTitle (title);

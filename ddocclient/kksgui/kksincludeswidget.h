@@ -30,6 +30,7 @@ public:
                        bool isAttach=true,
                        bool isDocs=false,
                        bool forCategory=false,
+                       bool forRecord=true,
                        QWidget *parent = 0,
                        Qt::WindowFlags flags = 0);
 
@@ -96,6 +97,7 @@ private:
     KKSRubric * m_rootRubric;
     bool isMyDoc;
     bool isChanged;
+    bool isRec;
     QToolBar * tBRubrActions;
     QSplitter * spRubrics;
     QTreeView * twIncludes;

@@ -409,7 +409,7 @@ void KKSCatEditor :: init_templates (void)
 void KKSCatEditor :: init_rubrics (void)
 {
     if (!rubrW)
-        rubrW = new KKSIncludesWidget (pCategory->rootRubric(), true, false, true);
+        rubrW = new KKSIncludesWidget (pCategory->rootRubric(), true, false, true, false);
 
     QWidget * catRubrW = new QWidget (this);
     rubrW->setParent (catRubrW);
