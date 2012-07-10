@@ -59,6 +59,8 @@ int KKSEIODataModel :: rowCount (const QModelIndex& parent) const
 
 QModelIndex KKSEIODataModel :: index (int row, int column, const QModelIndex& parent) const
 {
+    if (!hasIndex (row, column, parent))
+        return QModelIndex ();
 
     if (parent.isValid() && parent.column() != 0)
         return QModelIndex();
