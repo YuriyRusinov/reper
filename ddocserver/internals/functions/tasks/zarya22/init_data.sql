@@ -5,7 +5,7 @@ select setCurrentDl(4);
 select setAsNotLogging(1);
 
 
-select f_safe_drop_trigger('trgcheckcatforglobal', 'io_categories');
+--select f_safe_drop_trigger('trgcheckcatforglobal', 'io_categories');
 select f_safe_drop_trigger('trgioinsert', 'io_objects');
 select f_safe_drop_trigger('zz_trgzioinserttableafter', 'io_objects');
 select f_safe_drop_trigger('trg_acl_ioctrl', 'tbl_io_objects');
@@ -484,7 +484,7 @@ drop function aaa();
 drop function bbb(int4, int4);
 
 select f_create_trigger('trg_acl_ioctrl', 'before', 'insert or update or delete', 'io_objects', 'acl_ioctrl()');
-select f_create_trigger('trgcheckcatforglobal', 'before', 'insert or update', 'io_categories', 'checkcatforglobal()');
+--select f_create_trigger('trgcheckcatforglobal', 'before', 'insert or update', 'io_categories', 'checkcatforglobal()');
 select f_create_trigger('trgioinsert', 'before', 'insert or update', 'io_objects', 'ioinsertcheck()');
 select f_create_trigger('zz_trgzioinserttableafter', 'after', 'insert', 'io_objects', 'ioinsertchecktableafter()');
 
