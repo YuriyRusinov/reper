@@ -7,6 +7,6 @@ begin;
 
 \i ./functions/inf_exchange/createtriggers.sql
 
-\i ./functions/inf_exchange/checkcatforglobal.sql
+--\i ./functions/inf_exchange/checkcatforglobal.sql
 
 commit;
