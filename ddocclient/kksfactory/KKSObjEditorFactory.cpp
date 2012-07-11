@@ -2113,9 +2113,10 @@ void KKSObjEditorFactory::filterEIO(KKSObjEditor * editor, int idObject, const K
 
     }
 
-    KKSFiltersEditorForm * f = new KKSFiltersEditorForm(c, attrs, forIO, editor);
-    connect (f, SIGNAL (loadAttributeRefValues (KKSAttribute *, QComboBox *)), this, SLOT (loadAttributeFilters (KKSAttribute *, QComboBox *)) );
-    connect (f, SIGNAL (loadAttributeRefValues (KKSAttribute *, QAbstractItemModel *)), this, SLOT (loadAttributeFilters (KKSAttribute *, QAbstractItemModel *)) );
+    KKSFiltersEditorForm * f = new KKSFiltersEditorForm(c, o->tableName(), attrs, forIO, editor);
+
+    connect (f, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QComboBox *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QComboBox *)) );
+    connect (f, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QAbstractItemModel *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QAbstractItemModel *)) );
     connect (f, SIGNAL (saveSearchCriteria (KKSFilterGroup *)), this, SLOT (saveSearchCriteria (KKSFilterGroup *)) );
     connect (f, SIGNAL (loadSearchCriteria (void)), this, SLOT (loadSearchCriteria (void)) );
     if(f->exec() == QDialog::Accepted){
@@ -5966,14 +5967,14 @@ void KKSObjEditorFactory :: insertReport (qint64 idObjE, QWidget *parent, Qt::Wi
     return;
 }
 
-void KKSObjEditorFactory :: loadAttributeFilters (KKSAttribute * attr, QComboBox * cbList)
+void KKSObjEditorFactory :: loadAttributeFilters (const QString & tableName, const KKSAttribute * attr, QComboBox * cbList)
 {
-    if (!attr || !cbList)
+    if (tableName.isEmpty() || !attr || !cbList)
         return;
 
-    QString tableName = attr->tableName ();
-    if (tableName.isEmpty())
-        return;
+    //QString tableName = attr->tableName ();
+    //if (tableName.isEmpty())
+    //    return;
 
     KKSObject * refObj = loader->loadIO (tableName, true);
     if (!refObj)
@@ -6066,10 +6067,10 @@ void KKSObjEditorFactory :: loadAttributeFilters (KKSAttribute * attr, QComboBox
 //            title = p.value()->fields
 //        }
         
-        QString refColumnName = attr->refColumnName();
-        if(refColumnName.isEmpty())
-            refColumnName = "id";
-        QString key = p.value()->fields().value(refColumnName);
+        QString refColName = attr->refColumnName();
+        if(refColName.isEmpty())
+            refColName = "id";
+        QString key = p.value()->fields().value(refColName);
         cbList->addItem (title, key);
         //cbList->addItem (title, p.key());
     }
@@ -6077,20 +6078,23 @@ void KKSObjEditorFactory :: loadAttributeFilters (KKSAttribute * attr, QComboBox
     refObj->release ();
 }
 
-void KKSObjEditorFactory :: loadAttributeFilters (KKSAttribute * attr, QAbstractItemModel * mod)
+void KKSObjEditorFactory :: loadAttributeFilters (const QString & tableName, const KKSAttribute * attr, QAbstractItemModel * mod)
 {
-    if (!attr || !mod)
+    if (tableName.isEmpty() || !attr || !mod)
         return;
 
-    if (attr->tableName().isEmpty() || attr->columnName().isEmpty())
+    
+    if (attr->columnName().isEmpty())
     {
         qWarning ("loadAttributeValues was invoked with corrupt KKSAttribute "
                  "(type is atList or atParent or atCheckList or atCheckListEx but tableName or columnName are empty)!");
         return;
     }
+    
 
     bool isXml (attr->refType()->id() == KKSAttrType::atSVG ||
                 attr->refType()->id() == KKSAttrType::atXMLDoc);
+    
     QMap<int, QString> refValues;
     QMap<int, QString> values = loader->loadAttributeValues (attr, refValues, isXml, !isXml);
     qDebug () << __PRETTY_FUNCTION__ << attr->tableName() << attr->columnName () << attr->id() << values;
@@ -6299,10 +6303,11 @@ void KKSObjEditorFactory :: addNewSearchTempl (QAbstractItemModel * searchMod)
 
     KKSMap<int, KKSAttribute *> attrsIO;
     attrsIO = loader->loadIOUsedAttrs ();
-    KKSFiltersEditorForm *filterForm = new KKSFiltersEditorForm (c, attrsIO, false, st, pWidget);
+    KKSFiltersEditorForm *filterForm = new KKSFiltersEditorForm (c, "io_objects", attrsIO, false, st, pWidget);
+    
     connect (filterForm, SIGNAL (saveSearchCriteria (KKSFilterGroup *)), this, SLOT (saveSearchCriteria (KKSFilterGroup *)) );
-    connect (filterForm, SIGNAL (loadAttributeRefValues (KKSAttribute *, QComboBox *)), this, SLOT (loadAttributeFilters (KKSAttribute *, QComboBox *)) );
-    connect (filterForm, SIGNAL (loadAttributeRefValues (KKSAttribute *, QAbstractItemModel *)), this, SLOT (loadAttributeFilters (KKSAttribute *, QAbstractItemModel *)) );
+    connect (filterForm, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QComboBox *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QComboBox *)) );
+    connect (filterForm, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QAbstractItemModel *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QAbstractItemModel *)) );
     
     if (filterForm->exec () == QDialog::Accepted)
     {
@@ -6430,9 +6435,12 @@ void KKSObjEditorFactory :: updateSearchTempl (const QModelIndex& wIndex, QAbstr
 
         KKSMap<int, KKSAttribute *> attrsIO;
         attrsIO = loader->loadIOUsedAttrs ();
-        KKSFiltersEditorForm *filterForm = new KKSFiltersEditorForm (c, attrsIO, false, st, pWidget);
-        connect (filterForm, SIGNAL (loadAttributeRefValues (KKSAttribute *, QComboBox *)), this, SLOT (loadAttributeFilters (KKSAttribute *, QComboBox *)) );
-        connect (filterForm, SIGNAL (loadAttributeRefValues (KKSAttribute *, QAbstractItemModel *)), this, SLOT (loadAttributeFilters (KKSAttribute *, QAbstractItemModel *)) );
+        
+        KKSFiltersEditorForm *filterForm = new KKSFiltersEditorForm (c, "io_objects", attrsIO, false, st, pWidget);
+        
+        connect (filterForm, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QComboBox *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QComboBox *)) );
+        connect (filterForm, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QAbstractItemModel *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QAbstractItemModel *)) );
+        
         if (stName.isEmpty())
             connect (filterForm, SIGNAL (saveSearchCriteria (KKSFilterGroup *)), this, SLOT (saveSearchCriteria (KKSFilterGroup *)) );
         if (filterForm->exec () == QDialog::Accepted)

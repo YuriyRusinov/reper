@@ -46,6 +46,7 @@
 #include <QtDebug>
 
 KKSFiltersEditorForm :: KKSFiltersEditorForm(KKSCategory * _c, 
+                                             const QString & tableName,
                                            KKSMap<int, KKSAttribute *> attrsIO,
                                            bool forIO, 
                                            QWidget *parent,
@@ -57,7 +58,8 @@ KKSFiltersEditorForm :: KKSFiltersEditorForm(KKSCategory * _c,
     m_bForIO (forIO),
     sTempl (0),
     delSearchEntity (new QAction (this)),
-    isDbSaved (false)
+    isDbSaved (false),
+    m_parentTable(tableName)
 {
     ui->setupUi(this);
     if (c)
@@ -79,6 +81,7 @@ KKSFiltersEditorForm :: KKSFiltersEditorForm(KKSCategory * _c,
 }
 
 KKSFiltersEditorForm :: KKSFiltersEditorForm (KKSCategory * _c, 
+                                              const QString & tableName,
                                               KKSMap<int, KKSAttribute *> attrsIO,
                                               bool forIO,
                                               KKSSearchTemplate * st,
@@ -91,7 +94,8 @@ KKSFiltersEditorForm :: KKSFiltersEditorForm (KKSCategory * _c,
     m_bForIO (forIO),
     sTempl (st),
     delSearchEntity (new QAction (this)),
-    isDbSaved (false)
+    isDbSaved (false),
+    m_parentTable(tableName)
 {
     ui->setupUi(this);
     if (c)
@@ -588,12 +592,17 @@ void KKSFiltersEditorForm :: addFilter ()
         //qDebug () << __PRETTY_FUNCTION__ << a->code () << id;
         f = c->createFilter (a->id(), sql, operMain);
     }
+    
     if(!f){
         QMessageBox::critical(this, 
                               tr("Error"), 
                               tr("Incorrect value for selected attribute and operation!"), 
                               QMessageBox::Ok);
         return;
+    }
+
+    if(a->type()->attrType() == KKSAttrType::atParent){
+        f->setRecursive(true);
     }
 
     if ((stLayValue->currentIndex () == 1 && chCaseSensitive->checkState () == Qt::Checked) ||
@@ -1073,8 +1082,16 @@ void KKSFiltersEditorForm :: attrChanged (int index)
         case KKSAttrType::atList: 
         case KKSAttrType::atParent: 
                                      {
+                                         QString tableName;
+                                         
+                                         if(pa.value()){
+                                             tableName = pa.value()->tableName();
+                                             if(tableName.isEmpty())
+                                                 tableName = m_parentTable;
+                                         }
+
                                          stLayValue->setCurrentIndex (2); 
-                                         emit loadAttributeRefValues (pa.value(), cbValue);
+                                         emit loadAttributeRefValues (tableName, pa.value(), cbValue);
                                          break;
                                      }
         case KKSAttrType::atText: {
@@ -1099,7 +1116,16 @@ void KKSFiltersEditorForm :: attrChanged (int index)
                                       lvCheckRef->resize (250, h);
                                       lvCheckRef->viewport ()->resize (250, h);
                                       lvCheckRef->parentWidget ()->resize (250, h);
-                                      emit loadAttributeRefValues (pa.value(), checkRefModel);
+                                      
+                                      QString tableName;
+                                      if(pa.value()){
+                                          tableName = pa.value()->tableName();
+                                          if(tableName.isEmpty())
+                                              tableName = m_parentTable;
+                                      }
+                                      
+                                      emit loadAttributeRefValues (tableName, pa.value(), checkRefModel);
+                                      
                                       break;
                                   }
         case KKSAttrType::atObjRef: break;

@@ -61,6 +61,9 @@ public:
     bool caseSensitive() const;
     void setCaseSensitive(bool cs);
 
+    bool recursive() const;
+    void setRecursive(bool r);
+
     bool isCorrect() const;
     QString constructForIn() const;
 
@@ -73,6 +76,7 @@ private:
     KKSList<const KKSValue *> m_values;
     FilterOper m_oper;
     bool m_caseSensitive;
+    bool m_recursive;
 };
 
 Q_DECLARE_METATYPE ( KKSFilter );

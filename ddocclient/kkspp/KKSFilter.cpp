@@ -15,6 +15,7 @@ KKSFilter::KKSFilter() : KKSRecord()//KKSData()
    m_attribute = NULL;
    m_oper = foEq;
    m_caseSensitive = false;
+   m_recursive = false;
 }
 
 KKSFilter::KKSFilter(const KKSFilter & other) : KKSRecord()// KKSData()
@@ -22,6 +23,7 @@ KKSFilter::KKSFilter(const KKSFilter & other) : KKSRecord()// KKSData()
     m_attribute = NULL;
     
     m_caseSensitive = other.caseSensitive();
+    m_recursive = other.recursive();
     
     setAttribute(other.attribute());
     setValues(other.values());
@@ -36,6 +38,7 @@ KKSFilter::KKSFilter(const KKSAttribute * a, const KKSValue * v, KKSFilter::Filt
     setValue(v);
     setOperation(op);
     m_caseSensitive = false;
+    m_recursive = false;
 }
 
 KKSFilter::~KKSFilter()
@@ -187,6 +190,16 @@ void KKSFilter::setCaseSensitive(bool cs)
     m_caseSensitive = cs;
 }
 
+bool KKSFilter::recursive() const
+{
+    return m_recursive;
+}
+
+void KKSFilter::setRecursive(bool r)
+{
+    m_recursive = r;
+}
+
 bool KKSFilter :: operator== (const KKSFilter& anotherFilter) const
 {
     bool wres = true;
@@ -197,6 +210,7 @@ bool KKSFilter :: operator== (const KKSFilter& anotherFilter) const
         return false;
     wres = wres && this->m_oper == anotherFilter.m_oper;
     wres = wres && this->m_caseSensitive == anotherFilter.m_caseSensitive;
+    wres = wres && this->m_recursive == anotherFilter.m_recursive;
     wres = wres && this->m_values.count() == anotherFilter.m_values.count();
     for (int i=0; i<this->m_values.count() && wres; i++)
         wres = wres && this->m_values[i]->value() == anotherFilter.m_values[i]->value();

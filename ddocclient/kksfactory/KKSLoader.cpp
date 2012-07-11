@@ -1738,10 +1738,19 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
         return sql;
 
     QStringList usedTableNames;
+    
+
     //предусматриваем, что в таблице tableName может быть ссылка на саму себя
     //в этом случае пересекаем ее со своей копией, используя алиас
     //такой случай возможен при использовании атрибута типа atParent
     usedTableNames << tableName;
+    
+    QString withTableName = tableName + "_rec"; //название подзапроса в предложении WITH
+    //QString withTableName1 = withTableName + "_1"; //псевдоним таблицы в подзапросе рекурсивной части предложения WITH
+    QString attrsWith = "id";
+    QString attrsWith1 = tableName + ".id"; //колонки в подзапросе нерекурсивной части предложения WITH
+    //QString attrsWith2 = tableName + ".id";//колонки в подзапросе рекурсивной
+    //QString 
     
     QString attrs;
     QString whereWord = " 1=1 ";
@@ -1831,6 +1840,8 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
                     attrs += QString(", %1.%2 as %3").arg(tableName).arg(code).arg(codeFK);
                 }
             }
+            attrsWith += QString(", %1").arg(code);
+            attrsWith1 += QString(", %1.%2").arg(tableName).arg(code);
 
         }
         else if(a->type()->attrType() == KKSAttrType::atJPG || 
@@ -1841,9 +1852,13 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
             //необходимо опустить содержимое атрибутов типа JPG и SVG, поскольку они сильно тормозят систему
             //и к тому же в список ЭИО не выводятся
             attrs += QString(", 'pixmap/svg/video/xml data type' as %1").arg(code);
+            attrsWith += QString(", 'pixmap/svg/video/xml data type' as %1").arg(code);
+            attrsWith1 += QString(", 'pixmap/svg/video/xml data type' as %1").arg(code);
         }
         else{
             attrs += QString(", %1.%2").arg(tableName).arg(code);
+            attrsWith += QString(", %1").arg(code);
+            attrsWith1 += QString(", %1.%2").arg(tableName).arg(code);
         }
     }
     
@@ -1857,7 +1872,14 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
             sql = QString("select * from jGetTsd(NULL);");
     }
     else{
-        QString filterWhere = generateFilterSQL(filters, tableName, exTables);
+        QString parentFilter;
+        bool withRecursive = false;
+        //for()
+        //if(!withRecursive){
+        //
+        //}
+
+        QString filterWhere = generateFilterSQL(filters, tableName, exTables);//exTables - таблицы с отношением M:N
         QString exTablesStr;
         int cnt = exTables.count();
         if(cnt > 0){
@@ -1865,15 +1887,37 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
                 exTablesStr += ", " + exTables.at(i);
             }
         }
-
-        sql = QString("select %4 %1.id %2 from %1 %3 %5 where 1=1 ")
-                            .arg(tableName)
-                            .arg(attrs)
-                            .arg(joinWord)
-                            .arg (isXml ? QString() : QString("distinct"))
-                            .arg(exTablesStr);//.arg(fromWord).arg(joinWord);//.arg(whereWord);
-        if(!filterWhere.isEmpty())
-            sql += filterWhere;
+        
+        if(!withRecursive){
+            sql = QString("select %4 %1.id %2 from %1 %3 %5 where 1=1 ")
+                                .arg(tableName)
+                                .arg(attrs)
+                                .arg(joinWord)
+                                .arg (isXml ? QString() : QString("distinct"))
+                                .arg(exTablesStr);//.arg(fromWord).arg(joinWord);//.arg(whereWord);
+            if(!filterWhere.isEmpty())
+                sql += filterWhere;
+        }
+        else{
+            QString attrPK;
+            QString attrFK;
+            sql = QString("with recursive %1 (%2) as (" 
+                          "select %3 %4 from %5 where %6 UNION ALL select %4 from %1, %5 where %1.%7 = %5.%8"
+                          ")"
+                          "select %3 %1.id %9 from %1 %10 %11 where 1=1 ").arg(withTableName)
+                              .arg(attrsWith)
+                              .arg (isXml ? QString() : QString("distinct"))
+                              .arg(attrsWith1)
+                              .arg(tableName)
+                              .arg(parentFilter)
+                              .arg(attrPK)
+                              .arg(attrFK)
+                              .arg(attrs)
+                              .arg(joinWord)
+                              .arg(exTablesStr);
+            if(!filterWhere.isEmpty())
+                sql += filterWhere;
+        }
     }
 
     qWarning()  << __PRETTY_FUNCTION__ << sql << "\n\n\n";

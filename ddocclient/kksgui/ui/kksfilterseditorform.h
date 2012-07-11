@@ -44,7 +44,8 @@ class _GUI_EXPORT KKSFiltersEditorForm : public QDialog
     Q_OBJECT
 
 public:
-    KKSFiltersEditorForm(KKSCategory * _c, 
+    KKSFiltersEditorForm(KKSCategory * _c,
+                         const QString & tableName,
 #ifdef Q_CC_MSVC
                          KKSMap<int, KKSAttribute *> attrsIO = KKSMap<int, KKSAttribute*>(),
 #else
@@ -55,6 +56,7 @@ public:
                          Qt::WFlags f=0);
 
     KKSFiltersEditorForm (KKSCategory * _c, 
+                         const QString & tableName,
 #ifdef Q_CC_MSVC
                          KKSMap<int, KKSAttribute *> attrsIO = KKSMap<int, KKSAttribute*>(),
 #else
@@ -90,8 +92,8 @@ private slots:
     void delFilter (void);
 
 signals:
-    void loadAttributeRefValues (KKSAttribute * attr, QComboBox * cbList);
-    void loadAttributeRefValues (KKSAttribute * attr, QAbstractItemModel * mod);
+    void loadAttributeRefValues (const QString & tableName, const KKSAttribute * attr, QComboBox * cbList);
+    void loadAttributeRefValues (const QString & tableName, const KKSAttribute * attr, QAbstractItemModel * mod);
     void saveSearchCriteria (KKSFilterGroup *);
     void loadSearchCriteria (void);//QAbstractItemModel *);
 
@@ -159,6 +161,10 @@ private:
     QString parseFilter(const KKSFilter * f, const QString & tableName);
     KKSFilterGroup * currentGroup();
     KKSFilterGroup * getGroup(QModelIndex index);
+
+    QString m_parentTable;//используется для атрибутов родитель/потомок. 
+                          //Поскольку мы через атрибут не можем узнать название таблицы, 
+                          //из которой делаем выборку, то это название необходимо передать в данную форму извне
 };
 
 #endif // KKSFILTERSEDITORFORM_H

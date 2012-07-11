@@ -163,7 +163,7 @@ void KKSAttributesFactory :: findAttributes (int idAttrs, QAbstractItemModel * a
     bool forIO = false;
     KKSMap<int, KKSAttribute*> attrs;
 
-    KKSFiltersEditorForm * f = new KKSFiltersEditorForm (c, attrs, forIO, attrsEditor);
+    KKSFiltersEditorForm * f = new KKSFiltersEditorForm (c, o->tableName(), attrs, forIO, attrsEditor);
     if (f->exec() == QDialog::Accepted)
     {
         KKSList<KKSTemplate*> tListDb = loader->loadCategoryTemplates (c);
