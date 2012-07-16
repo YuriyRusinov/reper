@@ -2,6 +2,7 @@
 #include <QBrush>
 #include <QPixmap>
 #include <QImage>
+#include <QIcon>
 #include <QSize>
 #include <QtDebug>
 
@@ -213,19 +214,14 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
             (v->refType() && v->refType()->attrType() == KKSAttrType::atJPG)
             )
         {
-            QString aCode = avList[index.column()]->code(false);
-            int i = index.row();
-            KKSEIOData * d = wItem->getData ();
-            QByteArray ba = d->fields().value(aCode).toLocal8Bit();
-            //qDebug () << __PRETTY_FUNCTION__ << ba << d->sysFields();
-            QPixmap px;
-            bool ok = px.loadFromData(ba, "XPM");
-            if (!ok)
-                return QVariant();
-            QImage pIm (px.toImage());
-            QSize sc (48, 48);
-            return pIm.scaled(sc, Qt::KeepAspectRatio, Qt::FastTransformation);
+            return QIcon (":/ddoc/jpg_icon.png");
         }
+        else if ( v->type()->attrType() == KKSAttrType::atSVG ||
+                  (v->refType() && v->refType()->attrType() == KKSAttrType::atSVG))
+            return QIcon (":/ddoc/svg_icon.png");
+        else if ( v->type()->attrType() == KKSAttrType::atVideo ||
+                  (v->refType() && v->refType()->attrType() == KKSAttrType::atVideo))
+            return QIcon (":/ddoc/movie_track.png");
         else
             return QVariant();
     }
