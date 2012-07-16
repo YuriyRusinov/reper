@@ -121,6 +121,7 @@ public:
     QAction *actExport;
     QAction *actImportExportSep;
 
+    QAction * actGroupBy;
     QAction * actRefresh;
 
     QPushButton *pbOk;

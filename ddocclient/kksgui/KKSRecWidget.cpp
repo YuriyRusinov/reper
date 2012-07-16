@@ -33,6 +33,7 @@ KKSRecWidget :: KKSRecWidget (QTreeView *tView, bool mode, QWidget *parent, Qt::
     actDel (new QAction (QIcon(":/ddoc/delete.png"), tr("&Delete"), this)),
     actImport (new QAction (QIcon(":/ddoc/import_qualifier.png"), tr("&Import"), this)),
     actExport (new QAction (QIcon(":/ddoc/export_qualifier.png"), tr("E&xport"), this)),
+    actGroupBy (new QAction (QIcon(), tr("&Group by"), this)),
     actRefresh (new QAction (QIcon(":/ddoc/refreshIcon.png"), tr ("&Refresh"), this)),
     pbOk (new QPushButton (tr("&OK"), this)),
     pbCancel (new QPushButton (tr("&Cancel"), this)),
@@ -180,6 +181,7 @@ void KKSRecWidget :: init_widgets (bool mode)
 
     tBActions->addAction (actSetView);
     pMenu->addAction (actSetView);
+    pMenu->addAction (actGroupBy);
     tBActions->addAction (actRefresh);
     pMenu->addAction (actRefresh);
     pbOk->setVisible (mode);
