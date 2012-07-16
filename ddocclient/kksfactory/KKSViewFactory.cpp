@@ -95,12 +95,8 @@ KKSRecWidget * KKSViewFactory :: createView (KKSTemplate* theTemplate,
 
     if (resWidget->actFilter)
         QObject::connect (resWidget->actFilter, SIGNAL (triggered()), objEditor, SLOT (filterObjectE()) );
-    if (resWidget->actFilterSep)
-    {
-        QAction * actSearchT = new QAction (QIcon(":/ddoc/search_template.png"), QObject::tr("Search by template"), resWidget);
-        resWidget->insertToolBarAction(resWidget->actFilterSep, actSearchT);
-        QObject::connect (actSearchT, SIGNAL (triggered()), objEditor, SLOT (filterObjectT()) );
-    }
+    if (resWidget->actSearchT)
+        QObject::connect (resWidget->actSearchT, SIGNAL (triggered()), objEditor, SLOT (filterObjectT()) );
     if (resWidget->actAdd)
         QObject::connect (resWidget->actAdd, SIGNAL (triggered()), objEditor, SLOT (addObjectE()) );
     if (resWidget->actEdit)

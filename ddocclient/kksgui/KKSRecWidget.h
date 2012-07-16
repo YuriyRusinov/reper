@@ -25,6 +25,8 @@ class QGridLayout;
 class QGroupBox;
 class QAction;
 class QToolBar;
+class QMenu;
+class QContextMenuEvent;
 
 class _GUI_EXPORT KKSRecWidget : public QWidget
 {
@@ -62,6 +64,13 @@ public:
     void removeToolBarAction (QAction * action);
 
     QSize sizeHint() const;
+    void setRecContextMenuPolicy (Qt::ContextMenuPolicy policy);
+    
+protected:
+    //
+    // Widget reimplementation
+    //
+    virtual void contextMenuEvent (QContextMenuEvent * event);
 
 signals:
     void addEntity (QAbstractItemModel * sourceMod, const QModelIndex& pIndex);
@@ -95,10 +104,12 @@ private:
 
     QTreeView *tv;
     QToolBar *tBActions;
+    QMenu * pMenu;
 
 public:
 
     QAction *actFilter;
+    QAction * actSearchT;
     QAction *actFilterSep;
 
     QAction *actAdd;

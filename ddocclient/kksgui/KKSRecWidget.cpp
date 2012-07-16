@@ -15,6 +15,8 @@
 #include <QtDebug>
 #include <QMdiArea>
 #include <QMdiSubWindow>
+#include <QContextMenuEvent>
+#include <QMenu>
 
 #include "KKSSortFilterProxyModel.h"
 #include "KKSRecWidget.h"
@@ -23,7 +25,9 @@ KKSRecWidget :: KKSRecWidget (QTreeView *tView, bool mode, QWidget *parent, Qt::
     : QWidget (parent, f),
     tv (tView),
     tBActions (new QToolBar(this)),
+    pMenu (new QMenu(this)),
     actFilter (new QAction (QIcon(":/ddoc/search.png"), tr("&Filter"), this)),
+    actSearchT (new QAction (QIcon(":/ddoc/search_template.png"), tr("Search by template"), this)),
     actAdd (new QAction (QIcon(":/ddoc/add.png"), tr("&Add"), this)),
     actEdit (new QAction (QIcon(":/ddoc/edit.png"), tr("&Edit"), this)),
     actDel (new QAction (QIcon(":/ddoc/delete.png"), tr("&Delete"), this)),
@@ -150,20 +154,34 @@ void KKSRecWidget :: init_widgets (bool mode)
 
     QSize iconSize (24, 24);
     tBActions->setIconSize (iconSize);
+    pMenu->addAction (actFilter);
     tBActions->addAction (actFilter);
+    pMenu->addAction (actSearchT);
+    tBActions->addAction (actSearchT);
+
     actFilterSep = tBActions->addSeparator ();
+    pMenu->addSeparator ();
 
     tBActions->addAction (actAdd);
+    pMenu->addAction (actAdd);
     tBActions->addAction (actEdit);
+    pMenu->addAction (actEdit);
     tBActions->addAction (actDel);
+    pMenu->addAction (actDel);
     actEditSep = tBActions->addSeparator ();
+    pMenu->addSeparator ();
 
     tBActions->addAction (actImport);
     tBActions->addAction (actExport);
+    pMenu->addAction (actImport);
+    pMenu->addAction (actExport);
     actImportExportSep = tBActions->addSeparator ();
+    pMenu->addSeparator ();
 
     tBActions->addAction (actSetView);
+    pMenu->addAction (actSetView);
     tBActions->addAction (actRefresh);
+    pMenu->addAction (actRefresh);
     pbOk->setVisible (mode);
     pbCancel->setVisible (mode);
     pbApply->setVisible (mode);
@@ -402,4 +420,21 @@ void KKSRecWidget :: refreshRec (void)
     if (!sourceMod)
         return;
     emit refreshMod (sourceMod);
+}
+
+void KKSRecWidget :: setRecContextMenuPolicy (Qt::ContextMenuPolicy policy)
+{
+    tv->setContextMenuPolicy (policy);
+}
+
+void KKSRecWidget :: contextMenuEvent (QContextMenuEvent * event)
+{
+    //qDebug () << __PRETTY_FUNCTION__ << event->pos() << event->globalPos();
+    if (this->tBActions->isVisible())
+    {
+        pMenu->exec (event->globalPos());
+        event->accept();
+    }
+    else
+        QWidget::contextMenuEvent (event);
 }
