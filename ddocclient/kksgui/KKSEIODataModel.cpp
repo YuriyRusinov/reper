@@ -1,5 +1,8 @@
 #include <QColor>
 #include <QBrush>
+#include <QPixmap>
+#include <QImage>
+#include <QSize>
 #include <QtDebug>
 
 #include "KKSTemplate.h"
@@ -114,6 +117,7 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
     if (!wItem)
         return QVariant ();
     qint64 idw = wItem->id();//index.internalId();
+    KKSList<KKSAttrView*> avList = tRef ? tRef->sortedAttrs() : KKSList<KKSAttrView*>();
     //if (!index.parent().isValid())
     //    qDebug () << __PRETTY_FUNCTION__ << index << idw;
     //if (index.parent().isValid())
@@ -127,7 +131,6 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
     }
     else if (role == Qt::DisplayRole)
     {
-        KKSList<KKSAttrView*> avList = tRef ? tRef->sortedAttrs() : KKSList<KKSAttrView*>();
         if (index.column() >= avList.count())
             return QVariant ();
         KKSAttrView * v = avList[index.column()];
@@ -202,6 +205,29 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
             return QVariant ();
         QVariant vc = QColor::fromRgba (vl);
         return vc;
+    }
+    else if (role == Qt::DecorationRole)
+    {
+        KKSAttrView * v = avList[index.column()];
+        if( v->type()->attrType() == KKSAttrType::atJPG ||
+            (v->refType() && v->refType()->attrType() == KKSAttrType::atJPG)
+            )
+        {
+            QString aCode = avList[index.column()]->code(false);
+            int i = index.row();
+            KKSEIOData * d = wItem->getData ();
+            QByteArray ba = d->fields().value(aCode).toLocal8Bit();
+            //qDebug () << __PRETTY_FUNCTION__ << ba << d->sysFields();
+            QPixmap px;
+            bool ok = px.loadFromData(ba, "XPM");
+            if (!ok)
+                return QVariant();
+            QImage pIm (px.toImage());
+            QSize sc (48, 48);
+            return pIm.scaled(sc, Qt::KeepAspectRatio, Qt::FastTransformation);
+        }
+        else
+            return QVariant();
     }
     return QVariant();
 }
