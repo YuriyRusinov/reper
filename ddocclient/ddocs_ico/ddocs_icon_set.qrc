@@ -63,5 +63,8 @@
     <file>refreshIcon.png</file>
     <file>add_index.png</file>
     <file>category_copy.png</file>
+    <file>jpg_icon.png</file>
+    <file>svg_icon.png</file>
+    <file>movie_track.png</file>
   </qresource>
 </RCC>
