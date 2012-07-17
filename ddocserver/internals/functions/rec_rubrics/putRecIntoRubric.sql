@@ -1,4 +1,4 @@
-create or replace function putRecIntoRubric (int4, int4) returns int4 as
+create or replace function putRecIntoRubric (int8, int4) returns int4 as
 $BODY$
 declare
     idRecord alias for $1;
