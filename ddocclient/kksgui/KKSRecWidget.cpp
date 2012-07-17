@@ -125,6 +125,7 @@ void KKSRecWidget :: tvDoubleClicked(const QModelIndex & index)
         return;
 
     int id = index.data (Qt::UserRole).toInt ();
+    Q_UNUSED (id);
 
     emit entityDoubleClicked();//id будем получать через getID()
 }
@@ -431,8 +432,8 @@ void KKSRecWidget :: setRecContextMenuPolicy (Qt::ContextMenuPolicy policy)
 
 void KKSRecWidget :: contextMenuEvent (QContextMenuEvent * event)
 {
-    //qDebug () << __PRETTY_FUNCTION__ << event->pos() << event->globalPos();
-    if (this->tBActions->isVisible())
+    //qDebug () << __PRETTY_FUNCTION__ << event->pos() << event->globalPos() << childAt (event->pos()) << tv;
+    if (this->tBActions->isVisible() && this->childAt(event->pos()) == tv->viewport())
     {
         pMenu->exec (event->globalPos());
         event->accept();

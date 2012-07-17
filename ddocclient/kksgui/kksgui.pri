@@ -44,6 +44,7 @@ HEADERS += \
                 kksstuffform.h \
                 KKSVideoPlayer.h \
                 KKSEIODataModel.h \
+                KKSRecProxyModel.h \
                 KKSOrganizationAddrForm.h \
 		ui/cmdjournalsettingsform.h \
 		ui/cmdjournalform.h \
@@ -119,6 +120,7 @@ SOURCES += \
                 KKSOrganizationAddrForm.cpp \
                 KKSVideoPlayer.cpp \
                 KKSEIODataModel.cpp \
+                KKSRecProxyModel.cpp \
                 ui/choosetemplateform.cpp \
                 ui/cmdjournalform.cpp \
                 ui/cmdjournalsettingsform.cpp \
@@ -214,6 +216,7 @@ headers.files += \
                 KKSSyncWidget.h \
                 KKSVideoPlayer.h \
                 KKSEIODataModel.h \
+                KKSRecProxyModel.h \
                 ui/choosetemplateform.h \
                 ui/cmdjournalform.h \
                 ui/cmdjournalsettingsform.h \
