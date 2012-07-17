@@ -1,10 +1,9 @@
-create or replace function getIDByUID(varchar, varchar) returns int4 as
+create or replace function getIDByUID(varchar, varchar) returns int8 as
 $BODY$
 declare
     tableName alias for $1;
     uid alias for $2;
 
-    id int4;
     q varchar;
     r record;
     uidColumn varchar;
@@ -19,7 +18,7 @@ begin
         uidColumn = 'unique_id';
     end if;
     
-    q = 'select id from ' || tableName || ' where ' || uidColumn || ' = ' || quote_literal(uid);
+    q = 'select id::int8 from ' || tableName || ' where ' || uidColumn || ' = ' || quote_literal(uid);
     for r in execute q
     loop
         return r.id;
