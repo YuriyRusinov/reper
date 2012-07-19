@@ -61,6 +61,8 @@ public:
     int updateSysField(const QString & code, const QString & value);
 
     void clear();
+    bool isVisible (void) const;
+    bool setVisible (bool v);
 
 protected:
 private:
@@ -69,11 +71,14 @@ private:
     QMap<QString, QString> m_sysFields;
 
     QString m_null;
+    bool visible;
 };
 
 typedef KKSMap<qint64, KKSEIOData *> KKSEIODataMap;
+typedef KKSEIOData * pKKSEIOData;
 
 Q_DECLARE_METATYPE (KKSEIOData);
+Q_DECLARE_METATYPE (pKKSEIOData);
 Q_DECLARE_METATYPE (KKSEIODataMap);
 
 #endif

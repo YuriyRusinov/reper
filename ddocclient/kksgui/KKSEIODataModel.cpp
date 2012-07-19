@@ -130,6 +130,8 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
     {
         return idw;//wItem->id();//p.key();
     }
+    else if (role == Qt::UserRole+1)
+        return QVariant::fromValue<KKSEIOData *>(wItem->getData());
     else if (role == Qt::DisplayRole)
     {
         if (index.column() >= avList.count())
@@ -274,10 +276,18 @@ bool KKSEIODataModel :: setData (const QModelIndex& index, const QVariant& value
     }
     else if (role == Qt::UserRole+1)
     {
-        QMap<QString, QVariant> objData = value.toMap ();
+        KKSEIOData * dVal = value.value<KKSEIOData *>();
+        if (objRecords.contains(wItem->id()))
+        {
+            objRecords.remove (wItem->id());
+            objRecords.insert (wItem->id(), dVal);
+        }
+        wItem->setData (dVal);
+        emit dataChanged (topL, bottomR);
+/*        QMap<QString, QVariant> objData = value.toMap ();
         //rootItem->clearChildren();
         //rootItem = new KKSTreeItem(-1, 0);
-/*        for (KKSMap<qint64, KKSEIOData *>::iterator p = objRecords.begin();
+        for (KKSMap<qint64, KKSEIOData *>::iterator p = objRecords.begin();
              p != objRecords.end();
              p++
         )
@@ -285,7 +295,7 @@ bool KKSEIODataModel :: setData (const QModelIndex& index, const QVariant& value
             KKSEIOData * d = p.value();
             if (d)
                 d->release ();
-        }*/
+        }
         objRecords.clear();
 
         for (QMap<QString, QVariant>::const_iterator pv = objData.constBegin();
@@ -306,6 +316,7 @@ bool KKSEIODataModel :: setData (const QModelIndex& index, const QVariant& value
         QModelIndex botR = this->index(nr-1, nc-1);
         //qDebug () << __PRETTY_FUNCTION__ << topL << botR;
         emit dataChanged (topL, botR);
+ */
     }
     else
         return false;

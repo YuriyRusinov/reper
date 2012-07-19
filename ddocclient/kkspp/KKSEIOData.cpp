@@ -8,15 +8,17 @@
 #include "KKSEIOData.h"
 #include "defines.h"
 
-KKSEIOData::KKSEIOData() : KKSData()
+KKSEIOData::KKSEIOData() : KKSData(),
+    visible (true)
 {
     m_null = QString::null;
 }
 
 KKSEIOData::KKSEIOData(const KKSEIOData & copy) : KKSData(),
-    m_null (QString()),
     m_fields (copy.m_fields),
-    m_sysFields (copy.m_sysFields)
+    m_sysFields (copy.m_sysFields),
+    m_null (QString()),
+    visible (copy.visible)
 {
 /*
     m_fields.clear();
@@ -171,4 +173,14 @@ int KKSEIOData::updateSysField(const QString & code, const QString & value)
     cnt = addSysField(code, value);
 
     return cnt;
+}
+
+bool KKSEIOData::isVisible (void) const
+{
+    return visible;
+}
+
+bool KKSEIOData::setVisible (bool v)
+{
+    visible = v;
 }

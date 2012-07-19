@@ -5,6 +5,7 @@
  * Created on 17 Èþëü 2012 ã., 22:20
  */
 
+#include <KKSEIOData.h>
 #include "KKSRecProxyModel.h"
 
 KKSRecProxyModel :: KKSRecProxyModel(QObject * parent) : QAbstractProxyModel (parent)
@@ -56,11 +57,33 @@ int KKSRecProxyModel :: columnCount (const QModelIndex& parent) const
 
 QModelIndex KKSRecProxyModel::mapFromSource (const QModelIndex& sourceIndex) const
 {
-    return sourceIndex;
+    if (!sourceModel() || !sourceIndex.isValid())
+        return QModelIndex();
+    KKSEIOData * d = sourceIndex.data(Qt::UserRole+1).value<KKSEIOData *>();
+    if (!d || !d->isVisible())
+        return QModelIndex();
+    bool v = d->isVisible();
+    QModelIndex wIndex (sourceIndex.parent());
+    while (v && wIndex.isValid())
+    {
+        KKSEIOData * dw = wIndex.data(Qt::UserRole+1).value<KKSEIOData *>();
+        if (!dw)
+            v = false;
+        v = v && dw->isVisible();
+        wIndex = wIndex.parent();
+    }
+    if (!v)
+        return QModelIndex();
+    return sourceIndex;//createIndex (sourceIndex.row(), sourceIndex.column(), sourceIndex.internalPointer());
 }
 
 QModelIndex KKSRecProxyModel::mapToSource (const QModelIndex& proxyIndex) const
 {
+/*    QAbstractItemModel * sModel = sourceModel ();
+    if ( !sModel || !proxyIndex.isValid())
+        return QModelIndex();
+    return sModel->index(proxyIndex.row(), proxyIndex.column(), mapToSource(proxyIndex.parent()));
+ */
     return proxyIndex;
 }
 
