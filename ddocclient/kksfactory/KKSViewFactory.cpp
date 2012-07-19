@@ -44,6 +44,7 @@
 #include <KKSCategory.h>
 #include <KKSEIOData.h>
 #include <KKSEIODataModel.h>
+#include <KKSRecProxyModel.h>
 #include <KKSCategory.h>
 #include <KKSCategoryAttr.h>
 #include <KKSSortFilterProxyModel.h>
@@ -399,7 +400,9 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
         for (int j=0; j<qMin (objModel->columnCount(), headers.count()); j++)
             objModel->setHeaderData (j, Qt::Horizontal, headers[j], Qt::DisplayRole);
 
-    sortModel->setSourceModel (objModel);
+    KKSRecProxyModel * proxyModel = new KKSRecProxyModel ();
+    proxyModel->setSourceModel (objModel);
+    sortModel->setSourceModel (proxyModel);
     int sortCol = tv->header()->sortIndicatorSection ();
     Qt::SortOrder sOrder = tv->header()->sortIndicatorOrder ();
     sortModel->sort (sortCol, sOrder);

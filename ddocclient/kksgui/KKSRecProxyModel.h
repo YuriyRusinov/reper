@@ -18,7 +18,12 @@ class _GUI_EXPORT KKSRecProxyModel : public QAbstractProxyModel
 public:
     KKSRecProxyModel(QObject * parent=0);
     virtual ~KKSRecProxyModel();
-    
+
+    virtual QModelIndex index (int row, int column, const QModelIndex& parent) const;
+    virtual QModelIndex parent (const QModelIndex& index) const;
+    virtual int rowCount (const QModelIndex& parent) const;
+    virtual int columnCount (const QModelIndex& parent) const;
+
     virtual QModelIndex mapFromSource (const QModelIndex& sourceIndex) const;
     virtual QModelIndex mapToSource (const QModelIndex& proxyIndex) const;
 private:
