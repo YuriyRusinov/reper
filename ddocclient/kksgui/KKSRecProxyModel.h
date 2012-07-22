@@ -10,6 +10,8 @@
 
 #include <QAbstractProxyModel>
 #include <QModelIndex>
+#include <QPersistentModelIndex>
+#include <QMap>
 
 #include "kksgui_config.h"
 
@@ -26,6 +28,12 @@ public:
 
     virtual QModelIndex mapFromSource (const QModelIndex& sourceIndex) const;
     virtual QModelIndex mapToSource (const QModelIndex& proxyIndex) const;
+
+private:
+    //
+    // Variables
+    //
+    mutable QMap<QPersistentModelIndex, QPersistentModelIndex> mapping;
 private:
     Q_OBJECT
 

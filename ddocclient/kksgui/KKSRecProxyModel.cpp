@@ -74,16 +74,24 @@ QModelIndex KKSRecProxyModel::mapFromSource (const QModelIndex& sourceIndex) con
     }
     if (!v)
         return QModelIndex();
-    return sourceIndex;//createIndex (sourceIndex.row(), sourceIndex.column(), sourceIndex.internalPointer());
+    QModelIndex resIndex = createIndex (sourceIndex.row(), sourceIndex.column(), sourceIndex.internalPointer());
+    qDebug () << __PRETTY_FUNCTION__ << sourceIndex << resIndex;
+    if (!mapping.contains(QPersistentModelIndex (sourceIndex)))
+        mapping.insert (QPersistentModelIndex (sourceIndex), QPersistentModelIndex (resIndex));
+    return resIndex;//createIndex (sourceIndex.row(), sourceIndex.column(), sourceIndex.internalPointer());
 }
 
 QModelIndex KKSRecProxyModel::mapToSource (const QModelIndex& proxyIndex) const
 {
-/*    QAbstractItemModel * sModel = sourceModel ();
+    QAbstractItemModel * sModel = sourceModel ();
+    qDebug () << __PRETTY_FUNCTION__ << proxyIndex;
     if ( !sModel || !proxyIndex.isValid())
         return QModelIndex();
-    return sModel->index(proxyIndex.row(), proxyIndex.column(), mapToSource(proxyIndex.parent()));
- */
-    return proxyIndex;
+    QModelIndex sInd (mapping.key(proxyIndex));
+    return sInd;
+/*    if (!proxyIndex.parent().isValid())
+        return sModel->index (proxyIndex.row(), proxyIndex.column());
+    else
+        return sModel->index(proxyIndex.row(), proxyIndex.column(), mapToSource(proxyIndex.parent()));*/
 }
 
