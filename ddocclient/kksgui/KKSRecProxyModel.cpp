@@ -74,10 +74,12 @@ QModelIndex KKSRecProxyModel::mapFromSource (const QModelIndex& sourceIndex) con
     }
     if (!v)
         return QModelIndex();
+    QPersistentModelIndex spIndex (sourceIndex);
+    if (mapping.contains(spIndex))
+        return mapping.value(spIndex);
     QModelIndex resIndex = createIndex (sourceIndex.row(), sourceIndex.column(), sourceIndex.internalPointer());
     //qDebug () << __PRETTY_FUNCTION__ << sourceIndex << resIndex;
-    if (!mapping.contains(QPersistentModelIndex (sourceIndex)))
-        mapping.insert (QPersistentModelIndex (sourceIndex), QPersistentModelIndex (resIndex));
+    mapping.insert (QPersistentModelIndex (sourceIndex), QPersistentModelIndex (resIndex));
     return resIndex;//createIndex (sourceIndex.row(), sourceIndex.column(), sourceIndex.internalPointer());
 }
 
