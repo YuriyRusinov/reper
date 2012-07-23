@@ -102,33 +102,34 @@ private:
     friend class KKSViewFactory;
     friend class KKSObjEditorFactory;
 
-    QTreeView *tv;
-    QToolBar *tBActions;
+    QTreeView * tv;
+    QToolBar * tBActions;
     QMenu * pMenu;
 
 public:
 
-    QAction *actFilter;
+    QAction * actFilter;
     QAction * actSearchT;
-    QAction *actFilterSep;
+    QAction * actFilterSep;
 
-    QAction *actAdd;
-    QAction *actEdit;
-    QAction *actDel;
-    QAction *actEditSep;
+    QAction * actAdd;
+    QAction * actEdit;
+    QAction * actDel;
+    QAction * actEditSep;
 
-    QAction *actImport;
-    QAction *actExport;
-    QAction *actImportExportSep;
+    QAction * actImport;
+    QAction * actExport;
+    QAction * actImportExportSep;
 
     QAction * actGroupBy;
+    QAction * actHideRec;
     QAction * actRefresh;
 
-    QPushButton *pbOk;
-    QPushButton *pbCancel;
-    QPushButton *pbApply;
+    QPushButton * pbOk;
+    QPushButton * pbCancel;
+    QPushButton * pbApply;
 
-    QAction *actSetView;
+    QAction * actSetView;
 
 private:
     QGridLayout * gLay;

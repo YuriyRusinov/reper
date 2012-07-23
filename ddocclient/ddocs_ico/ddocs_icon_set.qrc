@@ -66,5 +66,6 @@
     <file>jpg_icon.png</file>
     <file>svg_icon.png</file>
     <file>movie_track.png</file>
+    <file>hide.png</file>
   </qresource>
 </RCC>
