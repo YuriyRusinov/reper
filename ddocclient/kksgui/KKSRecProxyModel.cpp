@@ -75,7 +75,7 @@ QModelIndex KKSRecProxyModel::mapFromSource (const QModelIndex& sourceIndex) con
     if (!v)
         return QModelIndex();
     QModelIndex resIndex = createIndex (sourceIndex.row(), sourceIndex.column(), sourceIndex.internalPointer());
-    qDebug () << __PRETTY_FUNCTION__ << sourceIndex << resIndex;
+    //qDebug () << __PRETTY_FUNCTION__ << sourceIndex << resIndex;
     if (!mapping.contains(QPersistentModelIndex (sourceIndex)))
         mapping.insert (QPersistentModelIndex (sourceIndex), QPersistentModelIndex (resIndex));
     return resIndex;//createIndex (sourceIndex.row(), sourceIndex.column(), sourceIndex.internalPointer());
@@ -84,7 +84,7 @@ QModelIndex KKSRecProxyModel::mapFromSource (const QModelIndex& sourceIndex) con
 QModelIndex KKSRecProxyModel::mapToSource (const QModelIndex& proxyIndex) const
 {
     QAbstractItemModel * sModel = sourceModel ();
-    qDebug () << __PRETTY_FUNCTION__ << proxyIndex;
+    //qDebug () << __PRETTY_FUNCTION__ << proxyIndex;
     if ( !sModel || !proxyIndex.isValid())
         return QModelIndex();
     QModelIndex sInd (mapping.key(proxyIndex));
