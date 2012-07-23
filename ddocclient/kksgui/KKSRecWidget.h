@@ -85,6 +85,7 @@ private slots:
     void editRec (void);
     void delRec (void);
     void refreshRec (void);
+    void hideRecord (void);
 
     void tvDoubleClicked(const QModelIndex & index);
 

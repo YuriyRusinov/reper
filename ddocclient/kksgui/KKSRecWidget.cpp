@@ -8,6 +8,7 @@
 #include <QGridLayout>
 #include <QVBoxLayout>
 #include <QItemSelectionModel>
+#include <QItemSelection>
 #include <QHeaderView>
 #include <QGroupBox>
 #include <QAbstractItemDelegate>
@@ -19,6 +20,7 @@
 #include <QMenu>
 
 #include "KKSSortFilterProxyModel.h"
+#include "KKSEIOData.h"
 #include "KKSRecWidget.h"
 
 KKSRecWidget :: KKSRecWidget (QTreeView *tView, bool mode, QWidget *parent, Qt::WindowFlags f)
@@ -49,6 +51,7 @@ KKSRecWidget :: KKSRecWidget (QTreeView *tView, bool mode, QWidget *parent, Qt::
     connect (actEdit, SIGNAL(triggered()), this, SLOT (editRec()) );
     connect (actDel, SIGNAL(triggered()), this, SLOT (delRec()) );
     connect (actRefresh, SIGNAL(triggered()), this, SLOT (refreshRec()) );
+    connect (actHideRec, SIGNAL (triggered()), this, SLOT (hideRecord()) );
 
     connect (tView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(tvDoubleClicked(const QModelIndex &)));
 }
@@ -442,4 +445,17 @@ void KKSRecWidget :: contextMenuEvent (QContextMenuEvent * event)
     }
     else
         QWidget::contextMenuEvent (event);
+}
+
+void KKSRecWidget :: hideRecord (void)
+{
+    QItemSelection sel = tv->selectionModel()->selection();
+    if (sel.indexes().isEmpty())
+        return;
+    qDebug () << __PRETTY_FUNCTION__;
+    QModelIndex wIndex = getSourceIndex ();
+    KKSEIOData * d = wIndex.data (Qt::UserRole+1).value<KKSEIOData *>();
+    if (!d)
+        return;
+    d->setVisible (false);
 }
