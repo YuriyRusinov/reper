@@ -86,7 +86,8 @@ KKSRecWidget * KKSViewFactory :: createView (KKSTemplate* theTemplate,
     tv->header()->setSortIndicator (0, Qt::AscendingOrder);
     tv->setSortingEnabled (true);
     KKSItemDelegate *itemDeleg = new KKSItemDelegate (objEditor);
-    itemDeleg->setCategory (theTemplate->category());
+    itemDeleg->setTemplate (theTemplate);
+    //setCategory (theTemplate->category());
     tv->setItemDelegate (itemDeleg);
     KKSRecWidget *resWidget = new KKSRecWidget (tv, false, parent, f);
     KKSEventFilter *ef = new KKSEventFilter (resWidget);
@@ -251,23 +252,6 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
     if (editor)
         editor->clearW ();
 
-    for (int ii=0; ii<ncols; ii++)
-    {
-        KKSAttrView * v = attrs_list [visible_attrs[ii]];
-        QString attrCode = v->code();
-        sortModel->addAttrView (v);
-//        itemDeleg->addAttrView (v);
-
-        if ((isSetH ||  resize) && v )
-        {
-            int w = v->defWidth();
-            if (editor)
-                editor->addWidth (w);
-            else
-                tv->header()->resizeSection (i, w);
-        }
-    }
-
     KKSMap<qint64, KKSEIOData *>::const_iterator p;
     int nObjC = objEx.count ();
     //qDebug () << __PRETTY_FUNCTION__ << nObjC;
@@ -399,6 +383,23 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
     if (isSetH || resize)
         for (int j=0; j<qMin (objModel->columnCount(), headers.count()); j++)
             objModel->setHeaderData (j, Qt::Horizontal, headers[j], Qt::DisplayRole);
+
+    for (int ii=0; ii<ncols; ii++)
+    {
+        KKSAttrView * v = attrs_list [visible_attrs[ii]];
+        QString attrCode = v->code();
+        sortModel->addAttrView (v);
+//        itemDeleg->addAttrView (v);
+
+        if ((isSetH || resize) && v )
+        {
+            int w = v->defWidth();
+            if (editor)
+                editor->addWidth (w);
+            else
+                tv->header()->resizeSection (i, w);
+        }
+    }
 
     KKSRecProxyModel * proxyModel = new KKSRecProxyModel ();
     proxyModel->setSourceModel (objModel);

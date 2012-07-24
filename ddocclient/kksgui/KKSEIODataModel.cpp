@@ -420,7 +420,7 @@ void KKSEIODataModel :: setupData (KKSTreeItem * parent)
             }
         }
     }
-
+    return;
 }
 
 KKSTreeItem * KKSEIODataModel :: getModelItem (qint64 val, KKSTreeItem * parent, QModelIndex & pIndex)
