@@ -7,7 +7,8 @@ create type h_rec_get_files as(id_record int8,
                               ut_name varchar,
                               win_app varchar,
                               lin_app varchar,
-                              src_ext varchar);
+                              src_ext varchar,
+                              record_uid varchar);
 
 
 create or replace function recGetFiles(int8) returns setof h_rec_get_files as
@@ -27,7 +28,8 @@ begin
             ut.name, 
             ut.win_app, 
             ut.lin_app,
-            iu.src_ext
+            iu.src_ext,
+            iu.unique_id
         from 
             urls_records uo,
             io_urls iu,

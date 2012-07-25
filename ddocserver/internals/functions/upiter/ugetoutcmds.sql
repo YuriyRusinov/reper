@@ -26,7 +26,8 @@ create type h_get_out_cmds as (full_address varchar,
                                dl_to_uid varchar,
                                receive_datetime timestamp,
                                accepted_datetime timestamp,
-                               urgency_level_code varchar
+                               urgency_level_code varchar,
+                               id_organization int4
                                );
 
 create or replace function uGetOutCmds() returns setof h_get_out_cmds as
@@ -76,7 +77,11 @@ begin
             p3.unique_id,
             cmd.receive_datetime,
             cmd.accepted_datetime,
-            ul.code
+            ul.code,
+            (case 
+                 when cmd.id_jr_state = 7 then u1.id_organization
+                 else u2.id_organization 
+            end) as id_organization
             
         from
             command_journal cmd,
@@ -84,7 +89,9 @@ begin
             "position" p2,
             "position" p3,
             io_categories c,
-            urgency_levels ul
+            urgency_levels ul,
+            units u1,
+            units u2
 --            units u,
 --            organization o
         where
@@ -98,6 +105,8 @@ begin
                 --or (cmd.id_jr_state = 1 and isLocalDl(cmd.id_dl_to) = FALSE)
                 or (cmd.id_jr_state = 7 and isLocalDl(cmd.id_dl_executor) = TRUE) --virtual also transferred
                 )            
+            and p1.id_unit = u1.id
+            and p2.id_unit = u2.id
 
     loop
         if(r.full_address is not null) then
@@ -157,7 +166,11 @@ begin
             p3.unique_id,
             cmd.receive_datetime,
             cmd.accepted_datetime,
-            ul.code
+            ul.code,
+            (case 
+                 when cmd.id_jr_state = 7 then u1.id_organization
+                 else u3.id_organization 
+            end) as id_organization
             
         from
             command_journal cmd,
@@ -165,7 +178,10 @@ begin
             "position" p2,
             "position" p3,
             io_categories c,
-            urgency_levels ul
+            urgency_levels ul,
+            units u1,
+            units u3
+
 --            units u,
 --            organization o
         where
@@ -179,6 +195,8 @@ begin
                 (cmd.id_jr_state = 1 and isLocalDl(cmd.id_dl_to) = FALSE)
                 or (cmd.id_jr_state = 7 and isLocalDl(cmd.id_dl_executor) = TRUE) --virtual also transferred
                 )            
+            and p1.id_unit = u1.id
+            and p3.id_unit = u2.id
 
     loop
         if(r.full_address is not null) then
@@ -235,13 +253,20 @@ begin
             cmd.receive_datetime,
             cmd.accepted_datetime,
             ul.code
+            (case 
+                 when cmd.id_jr_state = 7 then u1.id_organization
+                 else u2.id_organization 
+            end) as id_organization
         from
             command_journal cmd,
             "position" p1,
             "position" p2,
             "position" p3,
             io_categories c,
-            urgency_levels ul
+            urgency_levels ul,
+            units u1,
+            units u2
+
 --            units u,
 --            organization o
         where
@@ -254,6 +279,8 @@ begin
                 (cmd.id_jr_state = 1 and isLocalDl(cmd.id_dl_executor) = FALSE)
                 or (cmd.id_jr_state = 7 and isLocalDl(cmd.id_dl_executor) = TRUE) --virtual also transferred
                 )
+            and p1.id_unit = u1.id
+            and p2.id_unit = u2.id
         limit 1
     loop
         if(r.full_address is not null) then

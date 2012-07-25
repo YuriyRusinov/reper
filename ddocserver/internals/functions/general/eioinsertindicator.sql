@@ -1,4 +1,4 @@
-create or replace function eioInsertIndicator(int4, int4, varchar, timestamp, timestamp, timestamp, int4, int4, varchar) returns int4 as
+create or replace function eioInsertIndicator(int8, int4, varchar, timestamp, timestamp, timestamp, int4, int4, varchar) returns int4 as
 $BODY$
 declare
     idRec alias for $1;

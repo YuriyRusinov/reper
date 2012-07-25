@@ -7,7 +7,8 @@ create type h_get_out_objects as( full_address varchar,
                                   command_id int4,
                                   command_extra_id int4,
                                   id_dl_executor int4,
-                                  control_journal_id int4  
+                                  control_journal_id int4,
+                                  id_organization int4  
                                   );
 
 create or replace function uGetOutObjects() returns setof h_get_out_objects as
@@ -33,18 +34,21 @@ begin
             cmd.id,
             cmd.extra_id,
             cmd.id_dl_executor,
-            tcj.id
+            tcj.id,
+            u.id_organization
         from 
             command_journal cmd,
-            tsd_control_journal tcj
+            tsd_control_journal tcj,
 --            organization o,
---            "position" p1,
---            units u
+            "position" p1,
+            units u
         where
             tcj.id_journal = cmd.id
             and tcj.is_outed = false
             and cmd.id_jr_state <> 6 --filter for documents saved as draft
             and isLocalDl(cmd.id_dl_to) = FALSE
+            and cmd.id_dl_to = p1.id
+            and p1.id_unit = u.id
     loop
         if(r.full_address is not null) then
             return next r;

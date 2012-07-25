@@ -211,7 +211,7 @@ begin
                 ---r.def_value;
                 ---TODO : need working.
 
-            elsif (r.atypeid = 12) then -- INT4[]
+            elsif (r.atypeid = 12) then -- INT8[]
                 if(substr(r.def_value, 1, 1) <> '{') then
                     create_query := create_query || quote_literal ('{' || r.def_value || '}');
                 else

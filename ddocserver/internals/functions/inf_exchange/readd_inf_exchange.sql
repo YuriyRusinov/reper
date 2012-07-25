@@ -1,7 +1,10 @@
 \i ./functions/inf_exchange/processsync.sql
 \i ./functions/inf_exchange/addsyncrecord.sql
 \i ./functions/inf_exchange/processfirstsync.sql
+
 \i ./functions/inf_exchange/uqueryoutqueue.sql
+\i ./functions/inf_exchange/getoutfileparts.sql
+
 \i ./functions/inf_exchange/ugetqueueresults.sql
 \i ./functions/inf_exchange/getsyncorganizations.sql
 \i ./functions/inf_exchange/existwithuid.sql

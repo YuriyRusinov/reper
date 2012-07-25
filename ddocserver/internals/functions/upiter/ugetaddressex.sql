@@ -82,7 +82,8 @@ begin
     return addr;
 
 end
-$BODY$language 'plpgsql';
+$BODY$
+language 'plpgsql';
 
 create or replace function uGetAddressExOrg(int4, int4) returns varchar as
 $BODY$

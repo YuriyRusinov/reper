@@ -145,8 +145,10 @@ begin
             else
                 idAttrType = 2;
             end if;
-        elsif(r.att_type = 'int2' or r.att_type = 'int4' or r.att_type = 'int8') then
+        elsif(r.att_type = 'int2' or r.att_type = 'int4') then
             idAttrType = 8;
+        elsif(r.att_type = 'int8') then
+            idAttrType = 30;
         elsif(r.att_type = 'bool') then
             idAttrType = 1;
         elsif(r.att_type = 'time') then

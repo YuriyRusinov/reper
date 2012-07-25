@@ -28,7 +28,7 @@ declare
     attrs_key varchar;
     attrs_vals_key varchar;
     rattr record;
-    idAttrRec int4;
+    idAttrRec int8;
     rattrrec record;
 
     uniqueId varchar;
@@ -161,7 +161,7 @@ begin
                     query := query || '"' || attr_code || '"';
                     if (attrs_values[i] is null or length (trim (attrs_values[i])) =0
                         or position ('null' in lower (attrs_values[i])) != 0) then
-                        values_query := values_query || 'NULL::int4[]';
+                        values_query := values_query || 'NULL::int8[]';
                     else
                         values_query := values_query || quote_literal('{' || attrs_values[i] || '}');
                     end if;
@@ -203,7 +203,7 @@ begin
                                rTable = 'units'
                             ) then
                             idAttrRec := attrs_values[i];
-                            raise warning 'attr code is % value % int4 %', attr_code, attrs_values[i], idAttrRec;
+                            raise warning 'attr code is % value % int8 %', attr_code, attrs_values[i], idAttrRec;
                         elsif (ref_table_name = 'organization' or rTable = 'organization') then
                             idAttrRec := NULL::int4;
                             aexQuery := 'select id from organization where email_prefix= ' || quote_literal (attrs_values[i]);
@@ -215,13 +215,14 @@ begin
                             raise warning 'id organization is %, value is %', idAttrRec, attrs_values[i];
                         else
                             aexQuery := 'select id from ' || rTable || ' where unique_id = ' || quote_literal (attrs_values[i]);
-                            idAttrRec := NULL::int4;
-                            raise warning 'attr code is % table name is % query is %', attr_code, rTable, aexQuery;
+                            idAttrRec := NULL::int8;
+                            
                             for rattrrec in
                                 execute aexQuery
                             loop
                                 idAttrRec := rattrrec.id;
                             end loop;
+
                             if (idAttrRec is not null) then
                                 raise warning 'ref is not null value is %', idAttrRec;
                             end if;
@@ -258,7 +259,7 @@ begin
                         values_query := values_query || quote_literal (attrs_values[i]);
                     elsif (at_type = 'MACLABEL') then
                         values_query := values_query || quote_literal (attrs_values[i]);
-                    elsif (at_type = 'INT4[]') then
+                    elsif (at_type = 'INT8[]' or at_type = 'INT4[]') then
                         values_query := values_query || quote_literal('{' || attrs_values[i] || '}');
                     elsif (at_type = 'XML') then
                         values_query := values_query || 'xmlparse (document(' || quote_literal (attrs_values[i]) || '))';

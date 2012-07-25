@@ -27,7 +27,7 @@ begin
         return null;
     end if;
 
-    isNumeric := type_code = 'INT4' or type_code = 'FLOAT8';
+    isNumeric := type_code = 'INT4' or type_code = 'INT8' or type_code = 'FLOAT8';
 
     if (not isNumeric and is_float8 (ioValue) or isNumeric and not is_float8 (ioValue)) then
         return null;
@@ -39,38 +39,38 @@ begin
     query := query || ioAttrId || ' )';
     query := query || ' inner join attrs_values av on (';
 
-    if (is_int4 (ioValue)) then
-        query := query || ' is_int4 (av.value) and to_int4 (av.value) ' || oper || ' ';
-        query := query || int4 (ioValue);
+    if (is_int8 (ioValue)) then
+        query := query || ' is_int8 (av.value) and to_int8 (av.value) ' || oper || ' ';
+        query := query || int8 (ioValue);
     elsif (is_float8 (ioValue)) then
         query := query || ' is_float8 (av.value) and to_float8 (av.value) ' || oper || ' ' ;
         query := query || float8 (ioValue);
     elsif (is_int4 (ioValue)) then
         query := query || ' is_int4 (av.value) and to_int4 (av.value) ' || oper || ' ';
         query := query || int4 (ioValue);
-    elsif (is_array_int4 (ioValue)) then
-        query := query || ' is_array_int4 (av.value) and ';
+    elsif (is_array_int8 (ioValue)) then
+        query := query || ' is_array_int8 (av.value) and ';
         if (oper = '=' or oper = '!=' or oper = '<>') then
-            query := query || 'string_to_array (substring (av.value, 2, char_length (av.value)-2),' || quote_literal(',') || ')::int4[] ' || oper || ' ';
+            query := query || 'string_to_array (substring (av.value, 2, char_length (av.value)-2),' || quote_literal(',') || ')::int8[] ' || oper || ' ';
             p_str := substring (ioValue, 2, char_length (ioValue)-2);
             --RAISE NOTICE '%', p_str;
-            select into val_arr string_to_array (p_str, '')::int4[];
+            select into val_arr string_to_array (p_str, '')::int8[];
 
             RAISE WARNING '% %', val_arr, query;
             query := query || ' ARRAY[' || array_to_string (val_arr, '') || ' ]';
         else
             p_str := substring (ioValue, 2, char_length (ioValue)-2);
-            select into val_arr string_to_array (p_str, '')::int4[];
+            select into val_arr string_to_array (p_str, '')::int8[];
             for i in 1..array_upper (val_arr, 1)
             loop
                 query := query || ' ' || val_arr[i];
                 if (oper = 'in') then
-                    query := query || ' = any (' || 'string_to_array (substring (av.value, 2, char_length (av.value)-2),' || quote_literal(',') || ')::int4[]) ';
+                    query := query || ' = any (' || 'string_to_array (substring (av.value, 2, char_length (av.value)-2),' || quote_literal(',') || ')::int8[]) ';
                     if (i <= array_upper (val_arr, 1)-1) then
                         query := query || ' and';
                     end if;
                 elsif (oper = 'not in') then
-                    query := query || ' <> all (' || 'string_to_array (substring (av.value, 2, char_length (av.value)-2),' || quote_literal(',') || ')::int4[]) ';
+                    query := query || ' <> all (' || 'string_to_array (substring (av.value, 2, char_length (av.value)-2),' || quote_literal(',') || ')::int8[]) ';
                     if (i <= array_upper (val_arr, 1)-1) then
                         query := query || ' and';
                     end if;
@@ -124,9 +124,8 @@ begin
         return;
     end if;
 
-    isNumeric := type_code = 'INT4' or type_code = 'FLOAT8';
+    isNumeric := type_code = 'INT4' or type_code = 'INT8' or type_code = 'FLOAT8';
 
-raise warning 'asasas';
     --if (not isNumeric and is_float8 (ioValue) or isNumeric and not is_float8 (ioValue)) then
     if (isNumeric and not is_float8 (ioValue)) then
         return;
@@ -141,35 +140,35 @@ raise warning 'asasas';
     if (is_int4 (ioValue)) then
         query := query || ' is_int4 (av.value) and to_int4 (av.value) ' || oper || ' ';
         query := query || int4 (ioValue);
+    elsif (is_int8 (ioValue)) then
+        query := query || ' is_int8 (av.value) and to_int8 (av.value) ' || oper || ' ';
+        query := query || int8 (ioValue);
     elsif (is_float8 (ioValue)) then
         query := query || ' is_float8 (av.value) and to_float8 (av.value) ' || oper || ' ' ;
         query := query || float8 (ioValue);
-    elsif (is_int4 (ioValue)) then
-        query := query || ' is_int4 (av.value) and to_int4 (av.value) ' || oper || ' ';
-        query := query || int4 (ioValue);
-    elsif (is_array_int4 (ioValue)) then
-        query := query || ' is_array_int4 (av.value) and ';
+    elsif (is_array_int8 (ioValue)) then
+        query := query || ' is_array_int8 (av.value) and ';
         if (oper = '=' or oper = '!=' or oper = '<>') then
-            query := query || 'string_to_array (substring (av.value, 2, char_length (av.value)-2),' || quote_literal(',') || ')::int4[] ' || oper || ' ';
+            query := query || 'string_to_array (substring (av.value, 2, char_length (av.value)-2),' || quote_literal(',') || ')::int8[] ' || oper || ' ';
             p_str := substring (ioValue, 2, char_length (ioValue)-2);
             RAISE WARNING '%', p_str;
-            select into val_arr string_to_array (p_str, '')::int4[];
+            select into val_arr string_to_array (p_str, '')::int8[];
 
             RAISE WARNING '% %', val_arr, query;
             query := query || ' ARRAY[' || array_to_string (val_arr, '') || ' ]';
         else
             p_str := substring (ioValue, 2, char_length (ioValue)-2);
-            select into val_arr string_to_array (p_str, '')::int4[];
+            select into val_arr string_to_array (p_str, '')::int8[];
             for i in 1..array_upper (val_arr, 1)
             loop
                 query := query || ' ' || val_arr[i];
                 if (oper = 'in') then
-                    query := query || ' = any (' || 'string_to_array (substring (av.value, 2, char_length (av.value)-2),' || quote_literal(',') || ')::int4[]) ';
+                    query := query || ' = any (' || 'string_to_array (substring (av.value, 2, char_length (av.value)-2),' || quote_literal(',') || ')::int8[]) ';
                     if (i <= array_upper (val_arr, 1)-1) then
                         query := query || ' and';
                     end if;
                 elsif (oper = 'not in') then
-                    query := query || ' <> all (' || 'string_to_array (substring (av.value, 2, char_length (av.value)-2),' || quote_literal(',') || ')::int4[]) ';
+                    query := query || ' <> all (' || 'string_to_array (substring (av.value, 2, char_length (av.value)-2),' || quote_literal(',') || ')::int8[]) ';
                     if (i <= array_upper (val_arr, 1)-1) then
                         query := query || ' and';
                     end if;

@@ -15,15 +15,17 @@ begin
         select uSetObjAsSended(id) into res;
     elsif (itype = 2) then --message
         select uSetMsgAsSended(id) into res;
-    elsif (itype = 3) then
+    elsif (itype = 3) then --mail confirmation
         select uSetMsgAsConfirmed(id) into res;
-    elsif (itype = 4) then
+    elsif (itype = 4) then --cmd confirmation
         select uSetCmdAsConfirmed(id) into res;
-    elsif (itype = 5 or itype=11) then
+    elsif (itype = 5 or itype=11) then --record or org package (in out_sync_queue)
         select uSetRecordAsSended(id) into res;
-    elsif (itype = 6) then
+    elsif (itype = 6) then --record confirmation
         select uSetReceptionAsSended (id) into res;
-    elsif (itype = 8) then
+    elsif (itype = 8) then --organization (in out_sync_queue)
+        select uSetRecordAsSended(id) into res;
+    elsif (itype = 12) then --file (transferred in blocks)  (in out_sync_queue)
         select uSetRecordAsSended(id) into res;
     else
         res := 0;

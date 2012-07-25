@@ -46,6 +46,30 @@ end
 $BODY$
 language 'plpgsql';
 
+create or replace function is_int8 (varchar) returns boolean as
+$BODY$
+declare
+    value alias for $1;
+
+    query varchar;
+    intRegExp varchar;
+    isValInt boolean;
+    r RECORD;
+begin
+    intRegExp := E'\^(-?(\[0-9\]+))\$';
+    query := 'select substring (' || quote_literal(value) || ',' || quote_literal (intRegExp) || ') is not null as isintval;';
+    isValInt := false;
+    for r in execute query
+    loop
+        isValInt := r.isintval;
+    end loop;
+
+    return isValInt;
+
+end
+$BODY$
+language 'plpgsql';
+
 create or replace function is_array_int4 (varchar) returns boolean as
 $BODY$
 declare
@@ -115,6 +139,78 @@ begin
 end
 $BODY$
 language 'plpgsql';
+
+create or replace function is_array_int8 (varchar) returns boolean as
+$BODY$
+declare
+    value alias for $1;
+
+    query varchar;
+    b_str varchar;
+    e_str varchar;
+    isArr boolean;
+    reg_exp varchar;
+    p_arr varchar[];
+    p_str varchar;
+    w varchar;
+    i int4;
+    r RECORD;
+begin
+    reg_exp := E'\^(\{+)';
+    query := 'select substring (' || quote_literal (value) || ',' || quote_literal (reg_exp) || ') as bstr;';
+    for r in execute query
+    loop
+        b_str := r.bstr;
+    end loop;
+    RAISE NOTICE '%', b_str;
+    isArr := b_str is not null and char_length (b_str) = 1;
+    if (not isArr) then
+        return isArr;
+    end if;
+
+    reg_exp := E'(\}+\$)';
+    query:= 'select substring (' || quote_literal (value) || ',' || quote_literal (reg_exp) || ') as estr;';
+    for r in execute query
+    loop
+        e_str := r.estr;
+    end loop;
+    RAISE NOTICE '%', e_str;
+    isArr := isArr and e_str is not null and char_length (e_str) = 1;
+    if (not isArr) then
+        return isArr;
+    end if;
+    query := 'select substring (' || quote_literal (value) || ' from position (' || quote_literal (b_str) || 'in' || quote_literal (value) || ')+1 for position (' || quote_literal (e_str) || ' in ' ||  quote_literal (value) || ')-2 ) as str';
+    RAISE NOTICE '%', query;
+    for r in execute query
+    loop
+        p_str := r.str;
+    end loop;
+    isArr := isArr and p_str is not null;
+    if (not isArr) then
+        return isArr;
+    end if;
+    query := 'select string_to_array (' || quote_literal (p_str) || ', '''') as arr';
+    RAISE NOTICE '%', query;
+    for r in execute query
+    loop
+        p_arr := r.arr;
+    end loop;
+
+    RAISE NOTICE '%', p_arr;
+
+    isArr := isArr and p_arr is not null and array_upper (p_arr, 1) > 0;
+    i:= 1;
+    while (isArr and i <= array_upper (p_arr, 1)) loop
+        w := p_arr[i];
+        isArr := isArr and is_int8 (p_arr[i]);
+        i := i+1;
+    end loop;
+
+    return isArr;
+end
+$BODY$
+language 'plpgsql';
+
 
 create or replace function is_boolean (varchar) returns boolean as
 $BODY$

@@ -1,21 +1,19 @@
-select f_safe_drop_type('h_out_queue');
+select f_safe_drop_type('h_out_file_parts');
 
-create type h_out_queue as(full_address varchar, 
+create type h_out_file_parts as(full_address varchar, 
                            id_queue int4, 
                            id_org int4, 
-                           id_entity int4, 
-                           entityUID varchar,
-                           entity_io_UID varchar,
-                           entity_table varchar, 
+                           id_io_url int4, 
+                           io_url_uid varchar,
+                           abs_url varchar,
                            entity_type int4, 
                            sync_type int4, 
-                           sync_result int4,
                            receiver_uid varchar);--receiver organization email_prefix
 
-create or replace function uQueryOutQueue() returns setof h_out_queue as
+create or replace function getOutFileParts() returns setof h_out_file_parts as
 $BODY$
 declare
-    r h_out_queue%rowtype;
+    r h_out_file_parts%rowtype;
     idTransport int4;
 begin
 
@@ -31,18 +29,16 @@ begin
             q.id_organization,
             q.id_entity,
             q.entity_uid,
-            q.entity_io_uid,
-            q.entity_table,
+            (rGetAbsUrl(q.id_entity) ) as abs_url,
             q.entity_type,
             q.sync_type,
-            q.sync_result,
             o.email_prefix
         from
             out_sync_queue q,
             organization o
         where
             q.sync_result = 1 --new records
-            and q.entity_type not in (12, 13) --files (transferred by parts)
+            and q.entity_type in (12, 13) --files (transferred by parts)
             and q.id_organization = o.id
         order by 2
     loop

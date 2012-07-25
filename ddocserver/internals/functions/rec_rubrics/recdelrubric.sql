@@ -30,7 +30,7 @@ end
 $BODY$
 language 'plpgsql' security definer;
 
-create or replace function recDeleteRubrics(int4) returns int4 as
+create or replace function recDeleteRubrics(int8) returns int4 as
 $BODY$
 declare
     idRecord alias for $1;
@@ -63,7 +63,7 @@ end
 $BODY$
 language 'plpgsql' security definer;
 
-create or replace function recDeleteIncludes(int4, int4[]) returns int4 as
+create or replace function recDeleteIncludes(int8, int4[]) returns int4 as
 $BODY$
 declare
     idRecord alias for $1;

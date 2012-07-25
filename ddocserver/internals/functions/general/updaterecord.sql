@@ -69,7 +69,7 @@ begin
                 end loop;
                 if (lower (attr_type) = 'varchar' or lower (attr_type) = 'text') then
                     query := query || quote_literal (values[i]);
-                elsif (lower (attr_type) = 'int4' or lower (attr_type) = 'float8') then
+                elsif (lower (attr_type) = 'int4' or lower (attr_type) = 'int8' or lower (attr_type) = 'float8') then
                     query := query || values[i];
                 elsif (lower (attr_type) = lower ('DATE') or lower (attr_type) = 'timestamp') then
                     query := query || values[i] || '::timestamp';

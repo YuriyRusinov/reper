@@ -81,6 +81,8 @@ begin
     readTables[38] = 'object_ref_tables';
     readTables[39] = 'position_types';
     readTables[40] = 'mimetypes';
+    readTables[41] = 'attrs_groups';
+    readTables[42] = 'attrs_attrs';
 --(1)
 
 --(2)
@@ -197,6 +199,16 @@ begin
     insTablesSeq[21] = 'io_types_id_seq';
     insTables[35] = 'search_template_types';
     insTablesSeq[22] = 'search_template_types_id_seq';
+    insTables[36] = 'attrs_attrs_values';
+    insTablesSeq[23] = 'attrs_attrs_values_id_seq';
+    insTables[37] = 'rec_attrs_values';
+    insTablesSeq[24] = 'rec_attrs_values_id_seq';
+    insTables[38] = 'urls_records';
+    insTablesSeq[25] = 'urls_records_id_seq';
+    insTables[39] = 'record_rubricator';
+    insTablesSeq[26] = 'record_rubricator_id_seq';
+    insTables[40] = 'rubric_records';
+    insTablesSeq[27] = 'rubric_records_id_seq';
 
     
 

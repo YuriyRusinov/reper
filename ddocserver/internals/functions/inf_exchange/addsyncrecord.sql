@@ -15,6 +15,10 @@ declare
                               -- 4 - records in addition tables of IO
                               -- 5 - addition tables of IO
                               -- 6,7,8,9 - system values (sync for organizations ONLY!)
+                              -- 10 - public DL (creation, updating)
+                              -- 11 - public DL (deleting)
+                              -- 12 - files (transferred by parts) (creation, updating)
+                              -- 13 - files (transferred by parts) (deleting)
 
     idRecord int4;
 begin

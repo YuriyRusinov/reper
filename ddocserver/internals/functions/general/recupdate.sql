@@ -27,7 +27,7 @@ declare
     aexQuery varchar;
     rattr record;
     rattrrec record;
-    idAttrRec int4;
+    idAttrRec int8;
     ii int4;
 begin
     ref_table_name := iogettablenamebyuid (table_uid);
@@ -111,7 +111,7 @@ begin
             r_query := r_query || '"' || attr_code || '"';
             if (attrs_values[i] is null or length (trim (attrs_values[i])) =0
                 or position ('null' in lower (attrs_values[i])) != 0) then
-                r_query := r_query || '=' || 'NULL::int4[]';
+                r_query := r_query || '=' || 'NULL::int8[]';
             else
                 r_query := r_query || '=' || quote_literal('{' || attrs_values[i] || '}');
             end if;
@@ -130,7 +130,7 @@ begin
                 end if;
             end loop;
             if (position ('null' in lower (attrs_values[i])) != 0) then
-                r_query := r_query || '=NULL';
+                r_query := r_query || '= NULL';
             else
                 if (rTable = 'work_mode' or
                        rTable = 'organization_type' or
@@ -140,9 +140,9 @@ begin
                        rTable = 'unit'
                     ) then
                     idAttrRec := attrs_values[i];
-                    raise warning 'attr code is % value % int4 %', attr_code, attrs_values[i], idAttrRec;
+                    raise warning 'attr code is % value % int8 %', attr_code, attrs_values[i], idAttrRec;
                 elsif (ref_table_name = 'organization' or rTable = 'organization') then
-                    idAttrRec := NULL::int4;
+                    idAttrRec := NULL::int8;
                     aexQuery := 'select id from organization where email_prefix= ' || quote_literal (attrs_values[i]);
                     for rattrrec in
                         execute aexQuery
@@ -151,8 +151,8 @@ begin
                     end loop;
                     raise warning 'id organization is %, value is %', idAttrRec, attrs_values[i];
                 else
-                    idAttrRec := NULL::int4;
-                    aexQuery := 'select id from ' || rTable || ' where unique_id = ' || quote_literal (attrs_values[i]);
+                    idAttrRec := NULL::int8;
+                    aexQuery := 'select id::int8 from ' || rTable || ' where unique_id = ' || quote_literal (attrs_values[i]);
                     raise warning 'attr code is % table name is %', attr_code, rTable;
                     for rattrrec in
                         execute aexQuery
@@ -175,7 +175,7 @@ begin
                 r_query := r_query || '=' || quote_literal (attrs_values[i]);
             elsif (a_type_code = 'TIMESTAMP' or a_type_code = 'DATE' or a_type_code = 'TIME') then
                 if (length (trim (attrs_values[i])) = 0) then
-                    r_query := r_query || '=NULL::timestamp';
+                    r_query := r_query || '= NULL::timestamp';
                 else
                     r_query := r_query || '=' || quote_literal (attrs_values[i]) || '::timestamp';
                 end if;

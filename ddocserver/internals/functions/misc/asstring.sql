@@ -58,6 +58,26 @@ end
 $BODY$
 language 'plpgsql';
 
+create or replace function asString(int8[], boolean) returns varchar as
+$BODY$
+declare
+    nums alias for $1;
+    need_quote alias for $2;
+begin
+    if(nums isnull) then
+	return 'NULL';
+    end if;
+    
+    if(need_quote = true) then
+        return quote_literal('{' || array_to_string(nums, ',') || '}');
+    end if;
+
+    return '{' || array_to_string(nums, ',') || '}';
+    
+end
+$BODY$
+language 'plpgsql';
+
 create or replace function asString(float8[], boolean) returns varchar as
 $BODY$
 declare

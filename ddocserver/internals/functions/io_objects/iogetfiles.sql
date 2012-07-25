@@ -7,7 +7,8 @@ create type h_io_get_files as(id_io_object int4,
                               ut_name varchar,
                               win_app varchar,
                               lin_app varchar,
-                              src_ext varchar);
+                              src_ext varchar,
+                              url_uid varchar);
 
 
 create or replace function ioGetFiles(int4) returns setof h_io_get_files as
@@ -27,7 +28,8 @@ begin
             ut.name, 
             ut.win_app, 
             ut.lin_app,
-            iu.src_ext
+            iu.src_ext,
+            iu.unique_id
         from 
             urls_objects uo,
             io_urls iu,

@@ -16,7 +16,8 @@ create type h_get_out_msgs as (full_address varchar,
                                id_urgency_level int4,
                                dl_sender_uid varchar,
                                dl_receiver_uid varchar,
-                               urgency_level_code varchar
+                               urgency_level_code varchar,
+                               id_organization int4
                                );
 
 create or replace function uGetOutMsgs() returns setof h_get_out_msgs as
@@ -34,7 +35,7 @@ begin
     for r in
         select 
 --            (uGetAddress(o.address, 0) || uGetAddress(p2.address, 1)) as full_address,
-            (uGetAddressEx(msg.id_dl_receiver, idTransport)) as full_address,
+            (uGetAddressExOrg(u.id_organization, idTransport)) as full_address,
             msg.id,
             msg.id_dl_sender,
             p1.name,
@@ -51,18 +52,20 @@ begin
             msg.id_urgency_level,
             p1.unique_id,
             p2.unique_id,
-            ul.code
+            ul.code,
+            u.id_organization --ИД организации, на которую отправляется сообщение (нужно для механизма пересылки больших файлов блоками)
         from
             message_journal msg,
             "position" p1,
             "position" p2,
-            urgency_levels ul
---            units u,
+            urgency_levels ul,
+            units u
 --            organization o
         where
             p1.id = msg.id_dl_sender
             and msg.id_urgency_level = ul.id
             and p2.id = msg.id_dl_receiver
+            and p2.id_unit = u.id
             and msg.is_outed = false
             and isLocalDl(msg.id_dl_receiver) = FALSE
     loop
@@ -91,7 +94,7 @@ begin
     for r in
         select 
 --            (uGetAddress(o.address, 0) || uGetAddress(p2.address, 1)) as full_address,
-            (uGetAddressEx(msg.id_dl_receiver, idTransport)) as full_address,
+            (uGetAddressExOrg(u.id_organization, idTransport)) as full_address,
             msg.id,
             msg.id_dl_sender,
             p1.name,
@@ -113,13 +116,14 @@ begin
             message_journal msg,
             urgency_levels ul,
             "position" p1,
-            "position" p2
---            units u,
+            "position" p2,
+            units u
 --            organization o
         where
             p1.id = msg.id_dl_sender
             and msg.id_urgency_level = ul.id
             and p2.id = msg.id_dl_receiver
+            and p2.id_unit = u.id
             and msg.is_outed = false
             and isLocalDl(msg.id_dl_receiver) = FALSE
         limit 1

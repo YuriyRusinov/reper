@@ -46,6 +46,26 @@ end;
 $BODY$
 language 'plpgsql' immutable strict;
 
+create or replace function to_int8(varchar) returns int8 as 
+$BODY$
+declare
+       i int8;
+begin
+       i := $1::int8;
+       return i;
+
+       EXCEPTION WHEN 
+                    invalid_text_representation or 
+                    numeric_value_out_of_range 
+                 then
+                    return NULL;
+                 when OTHERS
+                 then 
+                    return NULL;
+end;
+$BODY$
+language 'plpgsql' immutable strict;
+
 create or replace function to_float8(varchar) returns float8 as 
 $BODY$
 declare

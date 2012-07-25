@@ -14,10 +14,11 @@ declare
     idAttrType int4;
     attrTypeCode varchar;
     refAttrTypeCode varchar;
-    idArr int4[];
+    idArr int8[];
     i int4;
     r RECORD;
     isValInt boolean;
+    isValInt8 boolean;
     isValDouble boolean;
 begin
 
@@ -44,9 +45,11 @@ begin
     end if;
 
     isValInt := is_int4 (attrValueId);
-    if (not isValInt and not isArray) then
+    isValInt8 := is_int8 (attrValueId);
+    if (not isValInt and not isValInt8 and not isArray) then
         return false;
     end if;
+
     raise notice 'attrValueId is % refAttrTypeCode is %', attrValueId, refAttrTypeCode;
     --if (isValInt and (refAttrTypeCode <> 'INT' or refAttrTypeCode <> 'FLOAT8')) then
     --    return false;
@@ -55,7 +58,7 @@ begin
     if (isArray) then
         query := query || ' in (';
         RAISE NOTICE E'query is %\n attr value id is %', query, attrValueId;
-        select cast (string_to_array (trim (attrValueId, '{}'), ',') as int4[]) into idArr;
+        select cast (string_to_array (trim (attrValueId, '{}'), ',') as int8[]) into idArr;
         for i in 1..array_upper (idArr, 1)
         loop
             query := query || idArr[i];
@@ -65,16 +68,24 @@ begin
         end loop;
         query := query || ' )';
     else
-        query := query || ' = ' || attrValueId ||'::int4';
+        query := query || ' = ' || attrValueId ||'::int8';
     end if;
     RAISE NOTICE '%', query;
 
     query := query || ' and ' || asString(columnName, false);
+
     isValDouble := is_float8 (matchingValue);
-    RAISE NOTICE '%', isValDouble;
     isValInt := is_int4 (matchingValue);
-    RAISE NOTICE '%', isValInt;
-    if ((attrTypeCode = 'FLOAT8' and not isValDouble) or (attrTypeCode = 'INT4' and not isValInt and not isValDouble) or (refAttrTypeCode  = 'FLOAT8' and not isValDouble) or (refAttrTypeCode = 'INT4' and not isValInt and not isValDouble) or (isValDouble and refAttrTypeCode <> 'FLOAT8' or refAttrTypeCode <> 'INT4' )) then
+    isValInt8 := is_int8 (matchingValue);
+
+    if ((attrTypeCode = 'FLOAT8' and not isValDouble) or 
+        (attrTypeCode = 'INT4' and not isValInt and not isValDouble) or 
+        (attrTypeCode = 'INT8' and not isValInt8 and not isValDouble) or
+        (refAttrTypeCode  = 'FLOAT8' and not isValDouble) or 
+        (refAttrTypeCode = 'INT4' and not isValInt and not isValDouble) or 
+        (refAttrTypeCode = 'INT8' and not isValInt8 and not isValDouble) or 
+        (isValDouble and refAttrTypeCode <> 'FLOAT8' or refAttrTypeCode <> 'INT4' or refAttrTypeCode <> 'INT8')
+       ) then
         return false;
     end if;
 
@@ -89,8 +100,11 @@ begin
         elsif ((attrTypeCode = 'INT4' or attrTypeCode = 'INT4[]') and is_int4 (matchingValue)) then
             RAISE NOTICE 'int4 int4';
             query := query || int4 (matchingValue);
-        elsif ((attrTypeCode = 'INT4'or attrTypeCode = 'INT4[]' ) and is_float8 (matchingValue)) then
-            RAISE NOTICE 'int4 float8';
+        elsif ((attrTypeCode = 'INT8' or attrTypeCode = 'INT8[]') and is_int8 (matchingValue)) then
+            RAISE NOTICE 'int8 int8';
+            query := query || int8 (matchingValue);
+        elsif ((attrTypeCode = 'INT4' or attrTypeCode = 'INT8' or attrTypeCode = 'INT4[]' or attrTypeCode = 'INT8[]') and is_float8 (matchingValue)) then
+            RAISE NOTICE 'int4(8) float8';
             query := query || float8 (matchingValue);
         elsif (is_float8 (matchingValue)) then
             RAISE NOTICE 'not numeric float8';
