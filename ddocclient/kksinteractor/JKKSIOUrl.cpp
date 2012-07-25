@@ -1,5 +1,7 @@
 #include <QDataStream>
+#include <QBuffer>
 #include "JKKSIOUrl.h"
+#include <defines.h>
 
 JKKSIOUrl :: JKKSIOUrl (int id, int id_url, const QString& name1, const QString& name2, int type, const QString& Src_ext, int l, const char * d)
     : idObject (id),
@@ -135,4 +137,167 @@ QDataStream& operator>> (QDataStream& in, JKKSIOUrl& URL)
     in >> URL.URLdata;
 
     return in;
+}
+
+
+/*
+------------------------------------------
+------------------------------------------
+------------------------------------------
+*/
+
+JKKSFilePart::JKKSFilePart()
+{
+    m_isLast = true;
+    m_idUrl = -1;
+    m_idQueue = -1;
+}
+
+JKKSFilePart::JKKSFilePart(const JKKSFilePart & part)
+{
+    m_isLast = part.m_isLast;
+    m_idUrl = part.m_idUrl;
+    m_uid = part.m_uid;
+    m_data = part.m_data;
+    m_idQueue = part.m_idQueue;
+    m_addr = part.m_addr;
+    m_absUrl = part.m_absUrl;
+}
+
+JKKSFilePart::JKKSFilePart(QString uid, bool isLast)
+{
+    m_uid = uid;
+    m_isLast = isLast;
+    m_idUrl = -1;
+    m_idQueue = -1;
+}
+
+JKKSFilePart::~JKKSFilePart()
+{
+
+}
+
+void JKKSFilePart::setData(const QByteArray & data)
+{
+    m_data = data;
+}
+
+const QByteArray & JKKSFilePart::getData() const
+{
+    return m_data;
+}
+
+void JKKSFilePart::setAbsUrl(const QString & url)
+{
+    m_absUrl = url;
+}
+
+const QString & JKKSFilePart::getAbsUrl() const
+{
+    return m_absUrl;
+}
+
+void JKKSFilePart::setIdUrl(int idUrl)
+{
+    m_idUrl = idUrl;
+}
+
+int JKKSFilePart::getIdUrl() const
+{
+    return m_idUrl;
+}
+
+void JKKSFilePart::setIdQueue(int idQueue)
+{
+    m_idQueue = idQueue;
+}
+
+int JKKSFilePart::getIdQueue() const
+{
+    return m_idQueue;
+}
+
+void JKKSFilePart::setIsLast(bool isLast)
+{
+    m_isLast = isLast;
+}
+
+bool JKKSFilePart::isLast() const
+{
+    return m_isLast;
+}
+
+const QString & JKKSFilePart::getAddr() const
+{
+    return m_addr;
+}
+
+void JKKSFilePart::setAddr(const QString & addr)
+{
+    m_addr = addr;
+}
+
+
+QDataStream& operator<< (QDataStream& out, const JKKSFilePart& part)
+{
+    out << part.m_idUrl;
+    out << part.m_uid;
+    out << part.m_data;
+    out << part.m_isLast;
+    out << part.m_absUrl;
+    out << part.m_addr;
+    out << part.m_idQueue;
+
+    return out;
+}
+
+QDataStream& operator>> (QDataStream& in, JKKSFilePart& part)
+{
+    in >> part.m_idUrl;
+    in >> part.m_uid;
+    in >> part.m_data;
+    in >> part.m_isLast;
+    in >> part.m_absUrl;
+    in >> part.m_addr;
+    in >> part.m_idQueue;
+
+    return in;
+}
+
+QByteArray JKKSFilePart :: serialize (void) const
+{
+    QBuffer qBuffer;
+    qBuffer.open(QIODevice::WriteOnly);
+    QDataStream out(&qBuffer);
+
+    out << m_addr;
+
+    out << m_idUrl;
+    out << m_uid;
+    out << m_data;
+    out << m_isLast;
+    out << m_absUrl;
+    out << m_idQueue;
+
+    return qBuffer.buffer();
+}
+
+int JKKSFilePart :: unserialize (const QByteArray& mess)
+{
+    
+    QBuffer buffer;
+    buffer.setData (mess);
+    buffer.open(QIODevice::ReadOnly);
+    QDataStream in(&buffer);
+
+    in >> m_addr;
+    
+    in >> m_idUrl;
+    in >> m_uid;
+    in >> m_data;
+    in >> m_isLast;
+    in >> m_absUrl;
+    in >> m_idQueue;
+
+    return OK_CODE;
 }

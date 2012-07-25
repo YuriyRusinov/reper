@@ -180,7 +180,7 @@ bool KKSEIOData::isVisible (void) const
     return visible;
 }
 
-bool KKSEIOData::setVisible (bool v)
+void KKSEIOData::setVisible (bool v)
 {
     visible = v;
 }

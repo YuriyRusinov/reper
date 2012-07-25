@@ -28,6 +28,9 @@
 #include <kksresult.h>
 #include <kksdatabase.h>
 #include <defines.h>
+#include <KKSList.h>
+#include <JKKSIOUrl.h>
+#include <JKKSMessage.h>
 
 //#define _HTTP_DEBUG
 
@@ -267,7 +270,6 @@ void HttpWindow::startProc()
         for (QList<JKKSPMessWithAddr *>::const_iterator iterator = messageList.constBegin();iterator != messageList.constEnd();++iterator)
         {
             bool stat = sendOutMessage((*iterator), path) ;
-            //qDebug () << __PRETTY_FUNCTION__ << stat;
         }
 
         while(!messageList.isEmpty())
@@ -283,6 +285,51 @@ void HttpWindow::startProc()
 #endif
         }
     }
+
+    QList<JKKSFilePart *> files = loader->readFileParts();
+    qint64 position = 0;
+    int block = _MAX_FILE_BLOCK2;
+    
+    for(int i=0; i<files.count(); i++){
+        do
+        {
+            JKKSPMessWithAddr * pMes = NULL;
+            qint64 readed = 0;
+            QByteArray data = loader->readFilePartData(files.at(i)->getAbsUrl(), block, position, & readed);
+            JKKSFilePart part(files.at(i)->uid(), false);
+        
+            if(readed == -1)//при ошибке чтения выходим на следующий файл, текущий не передаем
+                break;
+
+            bool eof = false;
+            if(readed == 0 || readed < block){//конец файла достигнут
+                part.setIsLast(true);
+                eof = true;
+            }
+        
+            if(readed > 0)
+                part.setData(data);
+
+            JKKSPMessage pM(part.serialize(), JKKSMessage::atFilePart);
+            pM.verifyReceiver = false;
+            
+            JKKSPMessWithAddr * pMessWithAddr(new JKKSPMessWithAddr(pM, part.getAddr(), part.getIdQueue()));
+            
+            bool stat = sendOutMessage(pMessWithAddr, path) ;
+            
+            delete pMessWithAddr;
+
+            if(eof){
+                httpMessages.insert(httpGetId, qMakePair(pMessWithAddr->id, pMessWithAddr->pMess.getType()) );
+                break;
+            }
+        }
+        while(1);
+    }
+
+    while(!files.isEmpty())
+        delete files.takeFirst();
+
 }
 
 void HttpWindow::cancelDownload()
@@ -428,7 +475,7 @@ void HttpWindow::enableDownloadButton()
     startButton->setEnabled(!urlLineEdit->text().isEmpty());
 }
 
-bool    HttpWindow::setMessageAsSended(const int & id, const int & type)
+bool HttpWindow::setMessageAsSended(const int & id, const int & type)
 {
     //qDebug() << __PRETTY_FUNCTION__ << id << type;
     bool result = false;
@@ -476,7 +523,11 @@ bool HttpWindow::sendOutMessage(const JKKSPMessWithAddr * message, QByteArray pa
     //if(responseHeader.statusCode() != 401 && //packet was ignored by receiver organization
     //   responseHeader.statusCode() != 400 ) //ERROR
     //{ 
-        httpMessages.insert(httpGetId, qMakePair(message->id,message->pMess.getType()) );
+    
+    
+    if(message->pMess.getType() != JKKSMessage::atFilePart)//для файлов, передаваемых частями информация в этот список заносится отдельно
+        httpMessages.insert(httpGetId, qMakePair(message->id, message->pMess.getType()) );
+    
     //}
         
 

@@ -2,6 +2,7 @@
 #define KKSFILELOADER_H
 
 #include "kksfactory_config.h"
+#include <defines.h>
 
 #include <QString>
 
@@ -31,13 +32,13 @@ class _F_EXPORT KKSFileLoader
         //
         int     rGetFile  ( int idUrl, 
                             QString toUrl, 
-                            int blockSize = 100000,
+                            int blockSize = _MAX_FILE_BLOCK,
                             const QWidget * parent = NULL
                             ) const;
 
         int     rGetFile  ( QString fromUrl, 
                             QString toUrl, 
-                            int blockSize = 100000,
+                            int blockSize = _MAX_FILE_BLOCK,
                             const QWidget * parent = NULL
                             ) const;
 
@@ -50,7 +51,7 @@ class _F_EXPORT KKSFileLoader
         int     rWriteFile(int idUrl, 
                              QString fromUrl, 
                              bool safe, 
-                             int blockSize = 100000,
+                             int blockSize = _MAX_FILE_BLOCK,
                              const QWidget * parent = NULL) const;
 
         int     rDeleteFile( int idUrl ) const;

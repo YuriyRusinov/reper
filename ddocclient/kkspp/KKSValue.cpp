@@ -271,12 +271,12 @@ void KKSValue::verify(void) const
         return;
     }
 
-    //ссылочные типы могут быть не только целочисленными
+    //ссылочные типы могут быть не только целочисленными (64)
     if(a_type == KKSAttrType::atList ||
        a_type == KKSAttrType::atParent)
     {
         bool ok (true);
-        int nv = m_value.toString().toInt (&ok);        
+        int nv = m_value.toString().toLongLong (&ok);        
         Q_UNUSED (nv);
 
         /*if(ok){
@@ -289,13 +289,27 @@ void KKSValue::verify(void) const
         return;
     }
 
-    //для типов int, ссылка на информационный объект, ссылки на цвета
-    //значение атрибута ВСЕГДА должно быть целочисленным!
-    if( a_type == KKSAttrType::atInt ||
+    //для типов int64, ссылка на информационный объект, ссылки на цвета
+    //значение атрибута ВСЕГДА должно быть целочисленным (64)!
+    if( a_type == KKSAttrType::atInt64 ||
         a_type == KKSAttrType::atObjRef ||
         a_type == KKSAttrType::atRecordColorRef ||
         a_type == KKSAttrType::atRecordTextColorRef
        )
+    {
+        bool ok (true);
+        int nv = m_value.toString().toLongLong (&ok);        
+        Q_UNUSED (nv);        
+        if(ok){
+            m_isValid = true;
+        }
+
+        m_isLiteral = false;
+        return;
+    }
+    //для типа int
+    //значение атрибута ВСЕГДА должно быть целочисленным (32)!
+    if( a_type == KKSAttrType::atInt )
     {
         bool ok (true);
         int nv = m_value.toString().toInt (&ok);        
@@ -615,8 +629,16 @@ QString KKSValue::valueForInsert() const
             return "'{}'";
         }
         else if (a_type == KKSAttrType::atRecordColor ||
-                 a_type == KKSAttrType::atRecordTextColor)
+                 a_type == KKSAttrType::atRecordTextColor ||
+                 a_type == KKSAttrType::atInt64 || 
+                 a_type == KKSAttrType::atList ||
+                 a_type == KKSAttrType::atParent ||
+                 a_type == KKSAttrType::atRecordColorRef ||
+                 a_type == KKSAttrType::atRecordTextColorRef
+                 )
+        {
             return "NULL::bigint";
+        }
 
         return "NULL";
     }
@@ -711,6 +733,11 @@ QString KKSValue::valueForInsert() const
     }
 
     if(a_type == KKSAttrType::atInt){
+        val += QString("'%1'").arg(value());
+        return val;
+    }
+
+    if(a_type == KKSAttrType::atInt64){
         val += QString("'%1'").arg(value());
         return val;
     }

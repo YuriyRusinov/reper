@@ -49,7 +49,10 @@ public:
        atRecordTextColor = 25,    //Цветовая гамма текста записи справочника (при отображении в списке)
        atRecordTextColorRef = 26, //Ссылка на цвет текста записи (при отображении в списке)
        atTime = 27,               //время
-       atUserDef = 28             //пользовательский (for future use)
+       atGeometry = 28,           //ГИС-объект (базовый)
+       atGeometryPoly = 29,       //ГИС-объект (стандартный полигон)
+       atInt64 = 30,              //целочисленное (64 бита)
+       atUserDef = 31             //пользовательский (for future use)
    };
 
    KKSAttrTypes attrType() const;

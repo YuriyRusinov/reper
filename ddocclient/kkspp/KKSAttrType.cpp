@@ -75,6 +75,9 @@ void KKSAttrType::setAttrType()
         case 25: m_attrType = atRecordTextColor; break;   //Цветовая гамма текста записи справочника (при отображении в списке)
         case 26: m_attrType = atRecordTextColorRef;break; //Ссылка на цвет текста записи (при отображении в списке)
         case 27: m_attrType = atTime; break;              //время
+        case 28: m_attrType = atGeometry; break;          //ГИС-объект (базовый)
+        case 29: m_attrType = atGeometryPoly; break;      //ГИС-объект (стандартный полигон)
+        case 30: m_attrType = atInt64; break;             //целочисленное (64 бита)
 
         default: m_attrType = atUserDef; break;           //пользовательский (for future use)
     }

@@ -108,7 +108,7 @@ qint64 KKSFileLoader::rGetFileSize(int idUrl) const
 
 int KKSFileLoader::getDefaultBlockSize() const
 {
-    return 1000000;
+    return _MAX_FILE_BLOCK;
 }
 
 /*!\brief Метод возвращает и сохраняет в файле локальной файловой системы заданный файл.

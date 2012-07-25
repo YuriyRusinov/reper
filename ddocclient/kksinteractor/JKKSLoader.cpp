@@ -354,7 +354,8 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readCommands (void) const
                                 );
             if (command.idObject() > 0)
             {
-                JKKSDocument ioDoc = readDocument (command.idObject());
+                int idOrganization = res->getCellAsInt(i, 28);
+                JKKSDocument ioDoc = readDocument (command.idObject(), idOrganization);
                 command.setAttachment (ioDoc);
             }
             command.setCategory(readCategories(idCat));
@@ -385,7 +386,8 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readDocuments (void) const
             int idCommand = res->getCellAsInt (i, 6);
             int idJournal = res->getCellAsInt (i, 8);
             QDateTime rt = res->getCellAsDateTime (i, 4);
-            JKKSDocument doc = readDocument (idObject);
+            int idOrganization = res->getCellAsInt(i, 9);
+            JKKSDocument doc = readDocument (idObject, idOrganization);
             doc.setCommandId (idCommand);
             doc.setJournal (idJournal);
             doc.setRealTime (rt);
@@ -441,7 +443,8 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readMails (void) const
             
             if (idObject > 0)
             {
-                JKKSDocument doc (readDocument (idObject));
+                int idOrganization = res->getCellAsInt(i, 18);
+                JKKSDocument doc (readDocument (idObject, idOrganization));
                 doc.setCommandId (-1);//idCommand);
                 doc.setJournal (-1);//idJournal);
                 doc.setRealTime (sentTime);
@@ -463,7 +466,7 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readMails (void) const
     return result;
 }
 
-JKKSDocument JKKSLoader :: readDocument (int idObject) const
+JKKSDocument JKKSLoader :: readDocument (int idObject, int idOrganization) const
 {
     QString docSql = QString ("select * from ioGetObject(%1)").arg (idObject);
     KKSResult * dRes = dbRead->execute (docSql);
@@ -582,7 +585,7 @@ JKKSDocument JKKSLoader :: readDocument (int idObject) const
         rubrs.insert (rubrRes->getCellAsInt (ii, 0), wRubr);
     }
     doc.setRubrics (rubrs);
-    QMap<int, JKKSIOUrl> files = readDocumentFiles (doc.id());
+    QMap<int, JKKSIOUrl> files = readDocumentFiles (doc.id(), idOrganization);
     doc.setUrls (files);
 
     QMap<int, JKKSIOTable> tables = readDocumentTables (doc.id());
@@ -1888,7 +1891,105 @@ int JKKSLoader :: setAsSended (int id, int idType) const
     return ier;
 }
 
-QMap<int, JKKSIOUrl> JKKSLoader :: readDocumentFiles (int idObject) const
+//В данном методе мы не вычитываем содержимое блока файла, поскольку файл передается поблочно и все его части передаются отдельно путем вызова метода readFilePartData()
+//Здесь мы просто получаем необходимую информацию о том, какие файлы требуют поблочной передачи 
+//ВАЖНО: файлы размером менее _MAX_FILE_BLOCK2 передаются полностью в методе readDocumentFiles() 
+QList<JKKSFilePart*> JKKSLoader :: readFileParts() const
+{
+    QList<JKKSFilePart *> parts;
+    
+    QString sql = QString ("select * from getOutFileParts ();");
+    KKSResult *res = dbRead->execute (sql);
+
+    if (res)
+    {
+        for (int i=0; i<res->getRowCount (); i++)
+        {
+            JKKSFilePart * part = new JKKSFilePart();
+            part->setAddr(res->getCellAsString(i, 0));//full_addres of receiver
+            part->setIdQueue(res->getCellAsInt64(i, 1));//id_queue
+            
+            part->setIdUrl(res->getCellAsInt (i, 3));
+            part->setAbsUrl(res->getCellAsString(i, 5));
+            part->setIsLast(false);
+            part->setUid(res->getCellAsString(i, 4));
+            
+            parts.append(part);
+        }
+        delete res;
+    }
+
+    return parts;
+}
+
+QByteArray JKKSLoader :: readFilePartData(const QString & absUrl, qint64 blockSize, qint64 position, qint64 * readed) const
+{
+    QByteArray bytea;
+
+    QByteArray fPath = absUrl.toUtf8();
+    const char * filePath = fPath.constData();
+
+    char * command = new char[120 + strlen(filePath)];
+
+    sprintf (command, "select rGetFileByUrl('%s', %lld, $1::int8);", filePath, blockSize);
+
+    int  paramTypes[1];
+    int  paramLengths[1]; 
+    int  paramFormats[1];
+    char ** paramValues = new char * [1];
+    paramValues[0] = new char[40];
+
+    sprintf (paramValues[0], "%lld", position);
+    paramTypes[0]   = KKSResult::dtInt8;
+    paramFormats[0] = 0; //text
+    paramLengths[0]  = 0;
+
+    KKSResult * res = dbRead->execParams (command, 
+                                          1, 
+                                          paramTypes, 
+                                          paramValues, 
+                                          paramLengths, 
+                                          paramFormats, 
+                                          1);
+
+    if (!res || res->getRowCount() < 1)
+    {
+        if(res) 
+            delete res;
+        delete[] paramValues[0];
+        delete[] paramValues;
+        delete[] command;
+        if(readed)
+            *readed = -1;
+        
+        return bytea;
+    }
+
+/*
+    if (res->isEmpty(0, 0))
+    {
+        delete res;
+        break;
+    }
+*/
+    
+    bytea = res->getCellAsByteArray(0, 0);
+    qint64 size = bytea.size();
+
+    if(res)
+        delete res;
+
+    delete[] paramValues[0];
+    delete[] paramValues;
+    delete[] command;
+    
+    if(readed)
+        *readed = size;
+    
+    return bytea;
+}
+
+QMap<int, JKKSIOUrl> JKKSLoader :: readDocumentFiles (int idObject, int idOrganization) const
 {
     QMap<int, JKKSIOUrl> urls;
     QString sql = QString ("select * from iogetfiles (%1);").arg (idObject);
@@ -1906,15 +2007,51 @@ QMap<int, JKKSIOUrl> JKKSLoader :: readDocumentFiles (int idObject) const
                                res->getCellAsInt (i, 4),
                                res->getCellAsString (i, 8)
                                );
-            QByteArray b = getFileData (idUrl);
-            //qDebug () << __PRETTY_FUNCTION__ << b;
-            res_url.setData (b);
+            res_url.setUid(res->getCellAsString (i, 9));
+            
+            qint64 size = getFileDataSize(idUrl);
+            
+            //если размер файла больше данного значения, то содержимое файла передается отдельно блоками (readFileParts())
+            //в таблицу out_sync_queue записывается информация о файле, который надо поблочно передать
+            //в этом случае res_url.m_data имеет пустое значение. На приемном конце этот факт должен анализироваться, и сам файл не записываться в ФС сервера
+            //если же размер файла меньше данного значения, то содержимое файла передается вместе с пакетом (традиционный вариант), поблочной передачи не происходит
+            if(size < _MAX_FILE_BLOCK2){
+                QByteArray b = getFileData (idUrl);
+                res_url.setData (b);
+            }
+            else{
+                QString sql = QString("select addSyncRecord(%1, %2, %3, %4, %5, %6, %7)")
+                                .arg(idOrganization)
+                                .arg(idUrl)
+                                .arg(res_url.uid())
+                                .arg("localorg-io_objects-7")//в настоящее время справочника прикрепленных файлов в системе не существует. 
+                                                              //Тем не менее в любом случае это значение использоваться не будет, 
+                                                              //поэтому задаем любое, например, UID справочника ИО
+                                .arg("io_urls")//название таблицы, содержащей пересылаемую сущность (для нас io_urls)
+                                .arg(2)//тип синхронизации (обновляем, или создаем новый, если не существует)
+                                .arg(12);//тип пересылаемой сущности (для нас - прикрепленные файлы (частями))
+            }
+            
             urls.insert (idUrl, res_url);
         }
         delete res;
     }
 
     return urls;
+}
+qint64 JKKSLoader::getFileDataSize(int idUrl) const
+{
+    QString sql = QString ("select * from rGetFileSize(%1);").arg (idUrl);
+
+    KKSResult * res = dbRead->execute (sql);
+    if (!res)
+        return 0;
+
+    qint64 size = res->getCellAsInt64 (0, 0);
+    if(size <= 0)
+        return 0;
+
+    return size;
 }
 
 int JKKSLoader :: writeDocumentFile (JKKSIOUrl& url) const
@@ -2578,7 +2715,11 @@ int JKKSLoader :: writeMessage (JKKSRefRecord *refRec, const QString& sender_uid
         
         generateQueueResponse (recResp);
 
-    }//end of refRec->getEntityType()
+    }
+    else if(refRec->getEntityType() == 12 || refRec->getEntityType() == 13)
+    {
+        ; //файлы, передаваемые блоками. Такого быть здесь не может, поскольку стоит в хранимой процедуре фильтр. Данные типы обрабатываются отдельно
+    } //end of refRec->getEntityType()
 
 
     return OK_CODE;
@@ -2619,6 +2760,7 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readTableRecords (void) const
             QString uid = res->getCellAsString (i, 4);
             QString addr = res->getCellAsString (i, 0);
             int sync_type = res->getCellAsInt (i, 8);
+            int idOrganization = res->getCellAsInt(i, 2);
             JKKSRefRecord rec (res->getCellAsInt (i, 1), // idQueue
                                id, // idRec
                                entity_type, // entity_type
@@ -2641,7 +2783,7 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readTableRecords (void) const
             }
             else if (entity_type == 2)
             {
-                JKKSDocument doc (readDocument (id));
+                JKKSDocument doc (readDocument (id, idOrganization));
                 doc.setCommandId (-1);//idCommand);
                 doc.setJournal (-1);//idJournal);
                 QDateTime sentTime = QDateTime::currentDateTime();
@@ -2661,7 +2803,7 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readTableRecords (void) const
                 int idObject;
                 JKKSIOTable table = this->readIOTable (rec.uid(), idObject);
                 
-                JKKSDocument doc (readDocument (idObject));
+                JKKSDocument doc (readDocument (idObject, idOrganization));
                 doc.setCommandId (-1);//idCommand);
                 doc.setJournal (-1);//idJournal);
                 QDateTime sentTime = QDateTime::currentDateTime();
@@ -2710,6 +2852,10 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readTableRecords (void) const
                 int ier = readRecordFromTable (tableName, rec);
                 if (ier < 0)
                     continue;
+            }
+            else if(entity_type == 12 || entity_type == 13)
+            {
+                ; //файлы, передаваемые блоками. Такого быть здесь не может, поскольку стоит в хранимой процедуре фильтр. Данные типы обрабатываются отдельно
             }
             
             QString orgReceiverUID = res->getCellAsString(i, 10);

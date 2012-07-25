@@ -9,8 +9,10 @@
 #define __KKSSITOOOM_JKKSLoader_h
 
 #include "kksinteractor_config.h"
+#include <defines.h>
 
 #include <QList>
+//#include <KKSList.h>
 #include <QPair>
 #include <QMap>
 
@@ -28,6 +30,7 @@ class JKKSMailConfirmation;
 class JKKSRubric;
 class JKKSGlobalRubric;
 class JKKSIOUrl;
+class JKKSFilePart;
 class JKKSIOTable;
 class JKKSRefRecord;
 class JKKSQueueResponse;
@@ -114,6 +117,9 @@ class _I_EXPORT JKKSLoader
         //QString getLocalAddr (void) const;
         //void setLocalAddr (const QString& localAddr);
 
+        QList<JKKSFilePart*> readFileParts() const;
+        QByteArray readFilePartData(const QString & absUrl, qint64 blockSize, qint64 position, qint64 * readed) const;
+
     private:
         //
         // Functions
@@ -121,7 +127,7 @@ class _I_EXPORT JKKSLoader
         QPair<int,JKKSCategory> readCategory(int) const;
         QMap<int, JKKSCategory> readCategories (int idCat) const;
         QMap<int, JKKSCategory> readPCategories (int idCatChild) const;
-        JKKSDocument readDocument (int idObject) const;
+        JKKSDocument readDocument (int idObject, int idOrganization) const; //второй параметр используется в случае когда требуется передача прикрепленых файлов блоками
 
         QMap<int, JKKSCategoryAttr> readCategoryAttrs (int idCat) const;
         JKKSCategoryAttr readAttribute (int id) const;
@@ -129,11 +135,12 @@ class _I_EXPORT JKKSLoader
         QMap<int, JKKSRubric> readCategoryRubrics (int idCat) const;
         void writeCategoryRubrics (const JKKSCategory& cat) const;
 
-        QMap<int, JKKSIOUrl> readDocumentFiles (int idObject) const;
+        QMap<int, JKKSIOUrl> readDocumentFiles (int idObject, int idOrganization) const;//второй параметр используется в случае когда требуется передача прикрепленых файлов блоками
         int writeDocumentFile (JKKSIOUrl& url) const;
 
-        QByteArray getFileData (int idUrl, int blockSize=100000) const;
-        int writeFileData (const JKKSIOUrl& url, int blockSize=100000) const;
+        qint64 getFileDataSize(int idUrl) const;
+        QByteArray getFileData (int idUrl, int blockSize=_MAX_FILE_BLOCK) const;
+        int writeFileData (const JKKSIOUrl& url, int blockSize=_MAX_FILE_BLOCK) const;
 
         QMap<int, JKKSIOTable> readDocumentTables (int idObject) const;
         int writeAddTable (int idObject, JKKSIOTable& table) const;

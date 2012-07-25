@@ -404,6 +404,7 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
     KKSRecProxyModel * proxyModel = new KKSRecProxyModel ();
     proxyModel->setSourceModel (objModel);
     sortModel->setSourceModel (proxyModel);
+    //--ksa sortModel->setSourceModel (objModel);
     int sortCol = tv->header()->sortIndicatorSection ();
     Qt::SortOrder sOrder = tv->header()->sortIndicatorOrder ();
     sortModel->sort (sortCol, sOrder);

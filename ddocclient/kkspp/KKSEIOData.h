@@ -62,7 +62,7 @@ public:
 
     void clear();
     bool isVisible (void) const;
-    bool setVisible (bool v);
+    void setVisible (bool v);
 
 protected:
 private:

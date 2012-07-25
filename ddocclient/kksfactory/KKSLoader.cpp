@@ -1099,6 +1099,9 @@ KKSAttrType * KKSLoader::loadAttrType(KKSAttrType::KKSAttrTypes type) const
         case KKSAttrType::atRecordTextColor: id = 25; break;    //Цветовая гамма текста записи справочника (при отображении в списке)
         case KKSAttrType::atRecordTextColorRef: id = 26; break; //Ссылка на цвет текста записи (при отображении в списке)
         case KKSAttrType::atTime: id = 27;  break;              //время
+        case KKSAttrType::atGeometry: id = 28; break;           //ГИС-объект (базовый)
+        case KKSAttrType::atGeometryPoly: id = 29; break;       //ГИС-объект (стандартный полигон)
+        case KKSAttrType::atInt64: id = 30; break;              //целочисленное (64 бита)
     }
 
     KKSAttrType * aType = loadAttrType(id);

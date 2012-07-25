@@ -1019,6 +1019,28 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                 attrWidget->setSizePolicy (hPw);
             }
             break;
+        case KKSAttrType::atInt64:
+            {
+                if (!isRef)
+                {
+                    lTitle = this->createAttrTitle (av, isSystem, objEditor);//, av->attribute()->title(), is_mandatory);
+                    gLayout->addWidget (lTitle, n_str, 0, 1, 2, Qt::AlignRight);
+                }
+                qint64 vi = V.toLongLong ();
+                QString val;
+                if (!V.toString().isEmpty())
+                    val = QString::number (vi);
+
+                attrWidget = new KKSEdit (av, isSystem, val);//(pCatType->attrType() == KKSAttrType::atDouble ? QString::number (v) : QString::number (vi)));
+                qobject_cast<QLineEdit *>(attrWidget)->setReadOnly (isRef);
+                QValidator * dval = new QIntValidator (0);
+                qobject_cast <QLineEdit *>(attrWidget)->setValidator (dval);
+                attrWidget->setMinimumHeight (20);
+                if (!isRef)
+                    gLayout->addWidget (attrWidget, n_str, 2, 1, 1);
+                attrWidget->setSizePolicy (hPw);
+            }
+            break;
         case KKSAttrType::atString: 
         case KKSAttrType::atFixString: 
         case KKSAttrType::atUrl:
@@ -1130,6 +1152,26 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
             break;
         case KKSAttrType::atText:
         case KKSAttrType::atXMLDoc:
+            {
+                if (!isRef)
+                {
+                    lTitle = this->createAttrTitle (av, isSystem, objEditor);//, av->attribute()->title(), is_mandatory);
+                    gLayout->addWidget (lTitle, n_str, 0, 2, 2, Qt::AlignRight | Qt::AlignTop);
+                }
+                QString v = V.toString ();
+                if (v.isNull())
+                    v = QString("");
+                attrWidget = new KKSText (av, isSystem, v);
+                qobject_cast<KKSText *>(attrWidget)->setFixedSymCount (av->attribute()->defWidth());
+                qobject_cast<QTextEdit *>(attrWidget)->setReadOnly (isRef);
+                if (!isRef)
+                    gLayout->addWidget (attrWidget, n_str, 2, 1, 1);
+                attrWidget->setSizePolicy (hPw);
+                attrWidget->setMinimumHeight (20);
+            }
+            break;
+        case KKSAttrType::atGeometry:
+        case KKSAttrType::atGeometryPoly:
             {
                 if (!isRef)
                 {

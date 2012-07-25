@@ -10,8 +10,55 @@
 
 #include "kksinteractor_config.h"
 #include <QString>
+#include "jkksuid.h"
 
-class _I_EXPORT JKKSIOUrl
+class _I_EXPORT JKKSFilePart : public JKKSUID
+{
+public:
+    JKKSFilePart();
+    JKKSFilePart(const JKKSFilePart & part);
+    JKKSFilePart(QString uid, bool isLast = false);
+    ~JKKSFilePart();
+
+    void setData(const QByteArray & data);
+    const QByteArray & getData() const;
+
+    //void setUid(const QString & uid);
+    //const QString & getUid() const;
+
+    void setAbsUrl(const QString & url);
+    const QString & getAbsUrl() const;
+
+    void setIdUrl(int idUrl);
+    int getIdUrl() const;
+
+    void setIdQueue(int idQueue);
+    int getIdQueue() const;
+
+    void setIsLast(bool isLast = true);
+    bool isLast() const;
+
+    const QString & getAddr() const;
+    void setAddr(const QString & addr);
+
+    virtual QByteArray serialize (void) const;
+    virtual int unserialize (const QByteArray& mess);
+
+
+private:
+    friend QDataStream& operator<< (QDataStream& out, const JKKSFilePart& part);
+    friend QDataStream& operator>> (QDataStream& in, JKKSFilePart& part);
+
+    QByteArray m_data;
+    //QString m_uid;
+    QString m_addr;
+    int m_idUrl;
+    bool m_isLast;
+    QString m_absUrl;
+    qint64 m_idQueue;
+};
+
+class _I_EXPORT JKKSIOUrl : public JKKSUID
 {
 public:
     JKKSIOUrl (int id=-1, 
