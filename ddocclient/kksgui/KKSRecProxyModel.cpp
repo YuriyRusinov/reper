@@ -64,19 +64,21 @@ QModelIndex KKSRecProxyModel::mapFromSource (const QModelIndex& sourceIndex) con
         return QModelIndex();
     bool v = d->isVisible();
     QModelIndex wIndex (sourceIndex.parent());
-    while (v && wIndex.isValid())
-    {
-        KKSEIOData * dw = wIndex.data(Qt::UserRole+1).value<KKSEIOData *>();
-        if (!dw)
-            v = false;
-        v = v && dw->isVisible();
-        wIndex = wIndex.parent();
-    }
-    if (!v)
-        return QModelIndex();
     QPersistentModelIndex spIndex (sourceIndex);
     if (mapping.contains(spIndex))
         return mapping.value(spIndex);
+    if (!wIndex.isValid())
+    {
+        QModelIndex resIndex = createIndex (sourceIndex.row(), sourceIndex.column(), sourceIndex.internalPointer());
+        //qDebug () << __PRETTY_FUNCTION__ << sourceIndex << resIndex;
+        mapping.insert (QPersistentModelIndex (sourceIndex), QPersistentModelIndex (resIndex));
+        return resIndex;//createIndex (sourceIndex.row(), sourceIndex.column(), sourceIndex.internalPointer());
+    }
+    KKSEIOData * dw = wIndex.data(Qt::UserRole+1).value<KKSEIOData *>();
+    if (!dw || !dw->isVisible())
+        v = false;
+    if (!v)
+        return QModelIndex();
     QModelIndex resIndex = createIndex (sourceIndex.row(), sourceIndex.column(), sourceIndex.internalPointer());
     //qDebug () << __PRETTY_FUNCTION__ << sourceIndex << resIndex;
     mapping.insert (QPersistentModelIndex (sourceIndex), QPersistentModelIndex (resIndex));
