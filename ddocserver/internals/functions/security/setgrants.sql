@@ -77,12 +77,13 @@ begin
 --    readTables[35] = 'urls_objects';
     readTables[35] = 'tbl_io_objects';--нельзя делать прямые запросы к данной таблице, только через функции
     readTables[36] = 'tbl_attrs_values'; --нельзя делать прямые запросы к данной таблице, только через функции
-    readTables[37] = 'io_life_cycle';
-    readTables[38] = 'object_ref_tables';
-    readTables[39] = 'position_types';
-    readTables[40] = 'mimetypes';
-    readTables[41] = 'attrs_groups';
-    readTables[42] = 'attrs_attrs';
+    readTables[37] = 'tbl_rec_attrs_values'; --нельзя делать прямые запросы к данной таблице, только через функции
+    readTables[38] = 'io_life_cycle';
+    readTables[39] = 'object_ref_tables';
+    readTables[40] = 'position_types';
+    readTables[41] = 'mimetypes';
+    readTables[42] = 'attrs_groups';
+    readTables[43] = 'attrs_attrs';
 --(1)
 
 --(2)
@@ -201,14 +202,14 @@ begin
     insTablesSeq[22] = 'search_template_types_id_seq';
     insTables[36] = 'attrs_attrs_values';
     insTablesSeq[23] = 'attrs_attrs_values_id_seq';
-    insTables[37] = 'rec_attrs_values';
-    insTablesSeq[24] = 'rec_attrs_values_id_seq';
-    insTables[38] = 'urls_records';
-    insTablesSeq[25] = 'urls_records_id_seq';
-    insTables[39] = 'record_rubricator';
-    insTablesSeq[26] = 'record_rubricator_id_seq';
-    insTables[40] = 'rubric_records';
-    insTablesSeq[27] = 'rubric_records_id_seq';
+--    insTables[37] = 'rec_attrs_values';
+--    insTablesSeq[24] = 'rec_attrs_values_id_seq';
+    insTables[37] = 'urls_records';
+--    insTablesSeq[24] = 'urls_records_id_seq';
+    insTables[38] = 'record_rubricator';
+    insTablesSeq[24] = 'record_rubricator_id_seq';
+    insTables[39] = 'rubric_records';
+--    insTablesSeq[25] = 'rubric_records_id_seq';
 
     
 

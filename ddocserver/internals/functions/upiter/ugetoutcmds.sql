@@ -196,7 +196,7 @@ begin
                 or (cmd.id_jr_state = 7 and isLocalDl(cmd.id_dl_executor) = TRUE) --virtual also transferred
                 )            
             and p1.id_unit = u1.id
-            and p3.id_unit = u2.id
+            and p3.id_unit = u3.id
 
     loop
         if(r.full_address is not null) then

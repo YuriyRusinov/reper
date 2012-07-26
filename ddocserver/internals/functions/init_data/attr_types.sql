@@ -32,14 +32,14 @@ insert into a_types (id, id_a_view, name, code) values (12, 7, 'Набор элементов 
 insert into a_types (id, id_a_view, name, code) values (13, 8, 'Текст', 'TEXT');
 insert into a_types (id, id_a_view, name, code) values (14, 9, 'Строка фиксированной длины', 'VARCHAR');
 insert into a_types (id, id_a_view, name, code) values (15, 10, 'Изображение', 'VARCHAR');
---insert into a_types (id, id_a_view, name, code) values (16, 5, 'Мандатная метка', 'MACLABEL');
+insert into a_types (id, id_a_view, name, code) values (16, 5, 'Мандатная метка', 'MACLABEL');
 
 insert into a_types (id, id_a_view, name, code) values (17, 7, 'Набор элементов справочника', 'INT8[]');
 insert into a_types (id, id_a_view, name, code) values (18, 11, 'Цвет записи в справочнике (фон)', 'INT8');
 insert into a_types (id, id_a_view, name, code) values (19, 11, 'Ссылка на цвет записи (фон)', 'INT8');
 insert into a_types (id, id_a_view, name, code) values (20, 8, 'XML-документ', 'XML');
 insert into a_types (id, id_a_view, name, code) values (21, 6, 'Временной интервал (часы)', 'INT4[3]');
---insert into a_types (id, id_a_view, name, code) values (22, 12, 'Набор пространственных точек', 'POINT[]');
+insert into a_types (id, id_a_view, name, code) values (22, 12, 'Набор пространственных точек (устаревшее)', 'POINT[]');
 insert into a_types (id, id_a_view, name, code) values (23, 13, 'Объект SVG', 'XML');
 insert into a_types (id, id_a_view, name, code) values (24, 14, 'Видео-ролик', 'BYTEA');
 insert into a_types (id, id_a_view, name, code) values (25, 11, 'Цвет записи в справочнике (текст)', 'INT8');
