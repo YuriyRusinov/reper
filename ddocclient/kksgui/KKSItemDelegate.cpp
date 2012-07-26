@@ -62,6 +62,8 @@ void KKSItemDelegate :: paint (QPainter * painter, const QStyleOptionViewItem& o
     }
 
     QVariant decVal = index.data(Qt::DecorationRole);
+    if (decVal.isValid())
+        qDebug () << __PRETTY_FUNCTION__ << decVal;
     QPixmap pMap;
     QRect decRect;
     switch (decVal.type())
@@ -85,7 +87,7 @@ void KKSItemDelegate :: paint (QPainter * painter, const QStyleOptionViewItem& o
         default: break;
     }
     painter->save ();
-    qDebug () << __PRETTY_FUNCTION__ << pMap.size() << decRect << index << decVal;
+    qDebug () << __PRETTY_FUNCTION__ << decVal << pMap.size() << decRect << index << pMap.isNull() << decRect.isValid();
     if (!pMap.isNull() && decRect.isValid())
     {
         QPoint p = QStyle::alignedRect(option.direction, option.decorationAlignment,
