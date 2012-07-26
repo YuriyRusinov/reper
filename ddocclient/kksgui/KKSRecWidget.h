@@ -28,6 +28,8 @@ class QToolBar;
 class QMenu;
 class QContextMenuEvent;
 
+class KKSAttribute;
+
 class _GUI_EXPORT KKSRecWidget : public QWidget
 {
 public:
@@ -65,6 +67,11 @@ public:
 
     QSize sizeHint() const;
     void setRecContextMenuPolicy (Qt::ContextMenuPolicy policy);
+    
+    void enableGroupMenu (bool enable);
+    void enableFilterMenu (bool enable);
+    void clearGroupMenu (void);
+    QAction * addGroupAttribute (KKSAttribute * attr);
     
 protected:
     //
@@ -106,6 +113,8 @@ private:
     QTreeView * tv;
     QToolBar * tBActions;
     QMenu * pMenu;
+    QMenu * pGroupBy;
+    QMenu * pFilter;
 
 public:
 
@@ -123,6 +132,9 @@ public:
     QAction * actImportExportSep;
 
     QAction * actGroupBy;
+    QAction * actViewAll;
+    QAction * actViewOnlyFromHere;
+    QAction * actViewCurentRec;
     QAction * actHideRec;
     QAction * actRefresh;
 

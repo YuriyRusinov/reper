@@ -85,7 +85,7 @@ void KKSItemDelegate :: paint (QPainter * painter, const QStyleOptionViewItem& o
         default: break;
     }
     painter->save ();
-    qDebug () << __PRETTY_FUNCTION__ << pMap.size() << decRect << index;
+    qDebug () << __PRETTY_FUNCTION__ << pMap.size() << decRect << index << decVal;
     if (!pMap.isNull() && decRect.isValid())
     {
         QPoint p = QStyle::alignedRect(option.direction, option.decorationAlignment,

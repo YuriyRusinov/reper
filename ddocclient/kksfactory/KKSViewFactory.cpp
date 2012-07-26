@@ -120,6 +120,11 @@ KKSRecWidget * KKSViewFactory :: createView (KKSTemplate* theTemplate,
     QObject::connect (tv, SIGNAL (doubleClicked(const QModelIndex&)), objEditor, SLOT (editCurrentRec(const QModelIndex&)) );
     
     loadEIOEx (objEditor, obj, l, theTemplate, tv, filters, true);
+    const KKSCategory * cat = theTemplate->category();
+    QList<int> idP = cat->searchAttributesByType(KKSAttrType::atParent);
+    bool isHier (!idP.isEmpty());
+    resWidget->enableGroupMenu (!isHier);
+    resWidget->enableFilterMenu (isHier);
     return resWidget;
    // TODO : implement
 }

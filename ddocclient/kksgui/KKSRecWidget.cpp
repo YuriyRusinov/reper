@@ -20,7 +20,8 @@
 #include <QMenu>
 
 #include "KKSSortFilterProxyModel.h"
-#include "KKSEIOData.h"
+#include <KKSEIOData.h>
+#include <KKSAttribute.h>
 #include "KKSRecWidget.h"
 
 KKSRecWidget :: KKSRecWidget (QTreeView *tView, bool mode, QWidget *parent, Qt::WindowFlags f)
@@ -28,14 +29,18 @@ KKSRecWidget :: KKSRecWidget (QTreeView *tView, bool mode, QWidget *parent, Qt::
     tv (tView),
     tBActions (new QToolBar(this)),
     pMenu (new QMenu(this)),
-    actFilter (new QAction (QIcon(":/ddoc/search.png"), tr("&Filter"), this)),
+    pGroupBy (new QMenu (tr("Group &By ..."), this)),
+    actFilter (new QAction (QIcon(":/ddoc/search.png"), tr("&Create search query"), this)),
     actSearchT (new QAction (QIcon(":/ddoc/search_template.png"), tr("Search by template"), this)),
     actAdd (new QAction (QIcon(":/ddoc/add.png"), tr("&Add"), this)),
     actEdit (new QAction (QIcon(":/ddoc/edit.png"), tr("&Edit"), this)),
     actDel (new QAction (QIcon(":/ddoc/delete.png"), tr("&Delete"), this)),
     actImport (new QAction (QIcon(":/ddoc/import_qualifier.png"), tr("&Import"), this)),
     actExport (new QAction (QIcon(":/ddoc/export_qualifier.png"), tr("E&xport"), this)),
-    actGroupBy (new QAction (QIcon(), tr("&Group by"), this)),
+    actGroupBy (new QAction (QIcon(), tr("&Group by..."), this)),
+    actViewAll (new QAction (QIcon(":/ddoc/view_all.png"), tr ("View &All"), this)),
+    actViewOnlyFromHere (new QAction (QIcon(":/ddoc/view_current.png"), tr ("View only from &here"), this)),
+    actViewCurentRec (new QAction (QIcon(":/ddoc/view_current_rec.png"), tr ("View current &record"), this)),
     actHideRec (new QAction (QIcon(":/ddoc/hide.png"), tr ("&Hide record"), this)),
     actRefresh (new QAction (QIcon(":/ddoc/refreshIcon.png"), tr ("&Refresh"), this)),
     pbOk (new QPushButton (tr("&OK"), this)),
@@ -160,9 +165,12 @@ void KKSRecWidget :: init_widgets (bool mode)
 
     QSize iconSize (24, 24);
     tBActions->setIconSize (iconSize);
-    pMenu->addAction (actFilter);
+    QMenu * searchMenu = new QMenu (this);
+    QAction * actSearchMenu = pMenu->addMenu (searchMenu);
+    actSearchMenu->setText (tr("Search ..."));
+    searchMenu->addAction (actFilter);
     tBActions->addAction (actFilter);
-    pMenu->addAction (actSearchT);
+    searchMenu->addAction (actSearchT);
     tBActions->addAction (actSearchT);
 
     actFilterSep = tBActions->addSeparator ();
@@ -179,15 +187,24 @@ void KKSRecWidget :: init_widgets (bool mode)
 
     tBActions->addAction (actImport);
     tBActions->addAction (actExport);
-    pMenu->addAction (actImport);
-    pMenu->addAction (actExport);
+    //pMenu->addAction (actImport);
+    //pMenu->addAction (actExport);
     actImportExportSep = tBActions->addSeparator ();
-    pMenu->addSeparator ();
+    //pMenu->addSeparator ();
 
     tBActions->addAction (actSetView);
     pMenu->addAction (actSetView);
     pMenu->addAction (actGroupBy);
-    pMenu->addAction (actHideRec);
+    actGroupBy->setMenu (pGroupBy);
+    QAction * actFilterRec = new QAction (QIcon(), tr("&Filter ..."), this);
+    pMenu->addAction (actFilterRec);
+    pFilter = new QMenu (this);
+    actFilterRec->setMenu (pFilter);
+    pFilter->addAction (actViewAll);
+    pFilter->addSeparator ();
+    pFilter->addAction (actViewOnlyFromHere);
+    pFilter->addAction (actViewCurentRec);
+    pFilter->addAction (actHideRec);
     tBActions->addAction (actRefresh);
     pMenu->addAction (actRefresh);
     pbOk->setVisible (mode);
@@ -458,4 +475,27 @@ void KKSRecWidget :: hideRecord (void)
     if (!d)
         return;
     d->setVisible (false);
+}
+
+void KKSRecWidget :: clearGroupMenu (void)
+{
+    pGroupBy->clear ();
+}
+
+QAction * KKSRecWidget :: addGroupAttribute (KKSAttribute * attr)
+{
+    if (!attr)
+        return 0;
+    QAction * aGroupAttr = pGroupBy->addAction (attr->title());
+    return aGroupAttr;
+}
+
+void KKSRecWidget :: enableGroupMenu (bool enable)
+{
+    this->pGroupBy->setEnabled (enable);
+}
+
+void KKSRecWidget :: enableFilterMenu (bool enable)
+{
+    this->pFilter->setEnabled (enable);
 }

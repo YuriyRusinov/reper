@@ -67,5 +67,8 @@
     <file>svg_icon.png</file>
     <file>movie_track.png</file>
     <file>hide.png</file>
+    <file>view_all.png</file>
+    <file>view_current.png</file>
+    <file>view_current_rec.png</file>
   </qresource>
 </RCC>
