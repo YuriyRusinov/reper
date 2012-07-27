@@ -47,8 +47,8 @@ insert into a_types (id, id_a_view, name, code) values (26, 11, 'Ссылка на цвет 
 insert into a_types (id, id_a_view, name, code) values (27, 15, 'Время', 'TIME');
 insert into a_types (id, id_a_view, name, code) values (28, 16, 'ГИС-объект (базовый)', 'GEOMETRY');
 insert into a_types (id, id_a_view, name, code) values (29, 17, 'ГИС-объект (стандартный полигон)', 'GEOMETRY');
-insert into a_types (id, id_a_view, name, code) values (30, 17, 'Целочисленное значение (64 бита)', 'INT8');
-
+insert into a_types (id, id_a_view, name, code) values (30, 5, 'Целочисленное значение (64 бита)', 'INT8');
+insert into a_types (id, id_a_view, name, code) values (31, 5, 'Уникальный идентификатор (UUID)', 'UUID');
 
 SELECT pg_catalog.setval('a_views_id_seq', 17, true);
-SELECT pg_catalog.setval('a_types_id_seq', 30, true);
+SELECT pg_catalog.setval('a_types_id_seq', 31, true);

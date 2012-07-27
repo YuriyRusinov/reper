@@ -125,7 +125,7 @@ Datum rwritefile(PG_FUNCTION_ARGS)
             PG_RETURN_INT32(-4);
         }
         
-        fFile = fopen(url, "wb");
+        fFile = fopen(url, "ab");
     }
     else{
         pfree(url);
@@ -137,20 +137,12 @@ Datum rwritefile(PG_FUNCTION_ARGS)
     if (fFile == NULL){
         SPI_finish();
         elog(ERROR, "FOPEN: %s, URL=%s", strerror(errno), url);
-        //pfree(url);
-        
-        //PG_RETURN_INT32(-5);
     }
 
-    elog(NOTICE, "aaaaaa");
 
     pfree(url);
     SPI_finish();
     
-    elog(NOTICE, "bbbb");
-
-    //PG_RETURN_INT32(0);
-
     size = fwrite(VARDATA(data), VARSIZE(data)-VARHDRSZ, 1, fFile);
     if(size == 0){
         fclose(fFile);

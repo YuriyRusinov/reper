@@ -21,3 +21,27 @@ begin
 end
 $BODY$
 language 'plpgsql';
+
+create or replace function rGetAbsUrl(varchar) returns varchar as
+$BODY$
+declare
+    uid alias for $1;
+	
+    url varchar;     
+    raPath varchar;
+    rPath varchar;
+begin
+	
+    select rGetUrl(uid) into url;
+    if(url isnull) then
+        return NULL;
+    end if;
+	
+    select raGetPath() into raPath;
+	
+    rPath := raPath || url;
+	
+    return rPath;
+end
+$BODY$
+language 'plpgsql';

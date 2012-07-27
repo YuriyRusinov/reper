@@ -10,6 +10,6 @@
 \i ./functions/files/rgeturl.sql
 \i ./functions/files/rgetabsurl.sql
 \i ./functions/files/rgetfilesize.sql
-
+\i ./functions/files/rsetuploaded.sql
 
 \i ./functions/files/readd_files_c.sql

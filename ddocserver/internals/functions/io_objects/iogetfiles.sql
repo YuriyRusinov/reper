@@ -38,6 +38,7 @@ begin
             uo.id_io_object= idObject
             and uo.id_url = iu.id
             and iu.id_url_type = ut.id
+            and iu.uploaded = true
     loop
         return next r;
     end loop;
