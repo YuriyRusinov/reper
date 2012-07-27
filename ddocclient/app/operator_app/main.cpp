@@ -20,14 +20,15 @@ int main(int argc, char *argv[])
     KKSMainWindow * mainWindow = NULL;
 
     if(argc == 2 && strcmp(argv[1], "admin") == 0){
-        sito = KKSSito::init (false);//, QString("admin"));
+        //sito = KKSSito::init (false);//, QString("admin"));
+        sito = KKSSito::init (false, QString("admin"));
         mainWindow = new KKSMainWindow();
-        mainWindow->setWindowTitle(QObject::tr("DynamicDocs ") + QObject::tr("administrator") + " " + KKS_VERSION);
+        mainWindow->setWindowTitle(QObject::tr("DynamicDocs ") + QObject::tr("Administrator") + " " + KKS_VERSION);
     }
     else{
         sito = KKSSito::init (false);
         mainWindow = new KKSMainWindow();
-        mainWindow->setWindowTitle(QObject::tr("DynamicDocs ") + QObject::tr("operator") + " " + KKS_VERSION);
+        mainWindow->setWindowTitle(QObject::tr("DynamicDocs ") + QObject::tr("Operator") + " " + KKS_VERSION);
     }
 
     if(!sito){

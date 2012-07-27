@@ -11,8 +11,9 @@
 #include "kksinteractor_config.h"
 #include <QString>
 #include "jkksuid.h"
+#include "JKKSMessage.h"
 
-class _I_EXPORT JKKSFilePart : public JKKSUID
+class _I_EXPORT JKKSFilePart : public JKKSMessage, public JKKSUID
 {
 public:
     JKKSFilePart();
@@ -32,17 +33,19 @@ public:
     void setIdUrl(int idUrl);
     int getIdUrl() const;
 
-    void setIdQueue(int idQueue);
-    int getIdQueue() const;
+    int id() const;//id in out_sync_queue
+    void setId(int _id);
 
     void setIsLast(bool isLast = true);
     bool isLast() const;
 
-    const QString & getAddr() const;
-    void setAddr(const QString & addr);
+    const QString & getSenderAddr (void) const;
+    void setSenderAddr (const QString & addr);
 
     virtual QByteArray serialize (void) const;
     virtual int unserialize (const QByteArray& mess);
+
+    virtual int writeToDB (const JKKSLoader * loader, const QString& senderUID, const QString& receiverUID);
 
 
 private:
@@ -51,7 +54,7 @@ private:
 
     QByteArray m_data;
     //QString m_uid;
-    QString m_addr;
+    QString m_senderAddr;
     int m_idUrl;
     bool m_isLast;
     QString m_absUrl;

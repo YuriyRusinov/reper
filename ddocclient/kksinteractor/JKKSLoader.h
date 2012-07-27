@@ -88,6 +88,7 @@ class _I_EXPORT JKKSLoader
         int writeMessage (JKKSQueueResponse *response) const;
         int writeMessage (JKKSOrganization * org, const QString& receiverUID) const;
         int writeMessage (JKKSOrgPackage * OrgPack, const QString& senderUID, const QString& receiverUID) const;
+        int writeMessage (JKKSFilePart * filePart, const QString& senderUID) const;
         //
         // Category has to be syncronized without other entities.
         //
@@ -119,6 +120,7 @@ class _I_EXPORT JKKSLoader
 
         QList<JKKSFilePart*> readFileParts() const;
         QByteArray readFilePartData(const QString & absUrl, qint64 blockSize, qint64 position, qint64 * readed) const;
+        int writeFilePartData(JKKSFilePart * part) const;
 
     private:
         //

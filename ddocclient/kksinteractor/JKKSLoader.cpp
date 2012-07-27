@@ -1345,6 +1345,7 @@ JKKSMessage * JKKSLoader::unpackMessage (const JKKSPMessage & pMessage) const
         case JKKSMessage::atOrganization: message = new JKKSOrganization (); break;
         case JKKSMessage::atPosition: message = new JKKSRefRecord(); break;
         case JKKSMessage::atOrgPackage: message = new JKKSOrgPackage(); break;
+        case JKKSMessage::atFilePart: message = new JKKSFilePart(); break;
         default: qDebug("Error: unknown message type");
     }
 
@@ -1907,7 +1908,8 @@ QList<JKKSFilePart*> JKKSLoader :: readFileParts() const
         {
             JKKSFilePart * part = new JKKSFilePart();
             part->setAddr(res->getCellAsString(i, 0));//full_addres of receiver
-            part->setIdQueue(res->getCellAsInt64(i, 1));//id_queue
+            part->setSenderAddr (getLocalAddress());//address of local org (sender)
+            part->setId(res->getCellAsInt64(i, 1));//id_queue
             
             part->setIdUrl(res->getCellAsInt (i, 3));
             part->setAbsUrl(res->getCellAsString(i, 5));
@@ -2020,7 +2022,7 @@ QMap<int, JKKSIOUrl> JKKSLoader :: readDocumentFiles (int idObject, int idOrgani
                 res_url.setData (b);
             }
             else{
-                QString sql = QString("select addSyncRecord(%1, %2, %3, %4, %5, %6, %7)")
+                QString sql = QString("select addSyncRecord(%1, %2, '%3', '%4', '%5', %6, %7)")
                                 .arg(idOrganization)
                                 .arg(idUrl)
                                 .arg(res_url.uid())
@@ -2030,6 +2032,16 @@ QMap<int, JKKSIOUrl> JKKSLoader :: readDocumentFiles (int idObject, int idOrgani
                                 .arg("io_urls")//название таблицы, содержащей пересылаемую сущность (для нас io_urls)
                                 .arg(2)//тип синхронизации (обновляем, или создаем новый, если не существует)
                                 .arg(12);//тип пересылаемой сущности (для нас - прикрепленные файлы (частями))
+
+                KKSResult * res = dbRead->execute(sql);
+                if(!res || res->getRowCount() <= 0){
+                    qWarning() << __PRETTY_FUNCTION__ << "addSyncRecord() error! " << (res ? res->errorMessage() : "");
+                    if(res)
+                        delete res;
+                    //return 
+                }
+
+                delete res;
             }
             
             urls.insert (idUrl, res_url);
@@ -2056,7 +2068,8 @@ qint64 JKKSLoader::getFileDataSize(int idUrl) const
 
 int JKKSLoader :: writeDocumentFile (JKKSIOUrl& url) const
 {
-    QString url_ins_sql = QString ("select * from rinserturl ('%1', 'not assigned', %2, '%3');")
+    QString url_ins_sql = QString ("select * from rinserturl ('%1', '%2', 'not assigned', %3, '%4');")
+                                  .arg (url.uid())
                                   .arg (url.getIOURL())
                                   //.arg (url.getURL())
                                   .arg (url.getType())
@@ -2266,6 +2279,14 @@ int JKKSLoader :: writeFileData (const JKKSIOUrl& url, int blockSize) const
 
     file.seek(0);
     file.close();
+
+    QString sql = QString("select rSetUploaded(%1, true)").arg(idUrl);
+    KKSResult * res = dbWrite->execute(sql);
+    if(!res || res->getRowCount() < 1){
+        qWarning() << __PRETTY_FUNCTION__ << "Error! Cannot set file as uploaded! ID = " << idUrl;
+    }
+    if(res)
+        delete res;
 
     return OK_CODE;
 }
@@ -2721,6 +2742,197 @@ int JKKSLoader :: writeMessage (JKKSRefRecord *refRec, const QString& sender_uid
         ; //файлы, передаваемые блоками. Такого быть здесь не может, поскольку стоит в хранимой процедуре фильтр. Данные типы обрабатываются отдельно
     } //end of refRec->getEntityType()
 
+
+    return OK_CODE;
+}
+
+
+int JKKSLoader :: writeMessage (JKKSFilePart *filePart, const QString& sender_uid) const
+{
+    if (!filePart){
+        qWarning() << __PRETTY_FUNCTION__ << "ERROR! filePart is NULL!";
+        return ERROR_CODE;
+    }
+
+    qWarning() << "JKKSFilePart->getSenderAddr() = " << filePart->getSenderAddr();
+    
+    
+    JKKSQueueResponse recResp (-1, filePart->id(), 2, filePart->getSenderAddr());
+
+    int ok = writeFilePartData(filePart);
+
+    if(filePart->isLast()){
+        if(ok != OK_CODE) //все плохо
+            recResp.setResult(4);
+        else{//все хорошо
+            QString sql = QString("select rSetUploaded(%1, true)").arg(filePart->id());
+            KKSResult * res = dbWrite->execute(sql);
+            if(!res || res->getRowCount() < 1){
+                qWarning() << __PRETTY_FUNCTION__ << "Error! Cannot set file as uploaded! ID = " << filePart->id();
+            }
+            if(res)
+                delete res;
+
+            recResp.setResult(3);
+        }
+
+        generateQueueResponse (recResp);
+    }
+
+    return OK_CODE;
+}
+
+int JKKSLoader::writeFilePartData(JKKSFilePart * part) const
+{
+    if(!part)
+        return ERROR_CODE;
+
+    QByteArray bytea = part->getData();
+
+    if (bytea.isEmpty ()){
+        //возможно надо выставить флаг "файл записан"
+        return OK_CODE;
+    }
+
+    QString uid = part->uid();
+    QString sql = QString("select rGetAbsUrl('%1')").arg(uid);
+    KKSResult * res = dbWrite->execute(sql);
+    if(!res || res->getRowCount() < 1){
+        if(res)
+            delete res;
+
+        qWarning() << __PRETTY_FUNCTION__ << "ERROR! Cannot get abs_url for the file! UID = " << uid;
+        return ERROR_CODE;
+    }
+
+    QString absUrl = res->getCellAsString(0, 0);
+    if(absUrl.isEmpty()){
+        absUrl = "not assigned";
+    }
+    
+    delete res;
+
+    sql = QString("select getIdByUID('io_urls', '%1')").arg(uid);
+    res = dbWrite->execute(sql);
+    if(!res || res->getRowCount() < 1){
+        if(res)
+            delete res;
+
+        qWarning() << __PRETTY_FUNCTION__ << "ERROR! Cannot get ID by UNIQUE_ID for the io_urls record! UID = " << uid;
+        return ERROR_CODE;
+    }
+
+    qint64 idUrl = res->getCellAsInt64(0, 0);
+    part->setId((int)idUrl);
+    delete res;
+
+    if(idUrl <= 0){
+        qWarning() << __PRETTY_FUNCTION__ << "ERROR! Cannot get ID by UNIQUE_ID for the io_urls record! UID = " << uid;
+        return ERROR_CODE;
+    }
+    
+    QByteArray fPath = absUrl.toUtf8();
+    const char * filePath = fPath.constData();
+
+    
+    
+    char * command = new char[100 + strlen(filePath)];
+    int nParams = 2;
+    sprintf(command, "select rWriteFile(%d, $1, $2);", (int)idUrl);
+    
+    //int mode = 2; //это означает, что сначала будет осуществлена попытка чтения файла, и если онабудет успешной (файл существует) будет возврат с ошибкой (т.н. safe-mode)
+                    //Однако этот вариант нам не подходит!! Поскольку мы получаем данные порциями. Поэтому:
+    int mode = 1;
+
+    int  * paramTypes = new int[nParams];
+    int  * paramLengths = new int[nParams]; 
+    int  * paramFormats = new int[nParams];
+    char ** paramValues = new char * [nParams];
+    paramValues[0] = new char[_MAX_FILE_BLOCK2];
+
+    QBuffer file (&bytea);
+    bool ok = file.open (QIODevice::ReadOnly);
+    if (!ok)
+        return ERROR_CODE;
+
+    while (!file.atEnd() )
+    {
+        qint64 size = file.read (paramValues[0], _MAX_FILE_BLOCK2);//в этом случае цикл будет отрабатывать не более одного раза, 
+                                                                   //поскольку на конце-отправителе также читается по _MAX_FILE_BLOCK2 байт
+        if(size < 1){
+            delete[] paramValues[0];
+            delete[] paramTypes;
+            delete[] paramLengths;
+            delete[] paramFormats;
+            delete[] paramValues;
+            delete[] command;
+            file.seek(0);
+            file.close();
+
+            return ERROR_CODE;
+        }
+
+        paramTypes[0]   = KKSResult::dtBytea;
+        paramFormats[0] = 1; //binary
+        paramLengths[0]  = size;
+
+        paramTypes[1]   = KKSResult::dtInt4;
+        paramFormats[1] = 0; //non binary
+        paramLengths[1]  = 0;
+        if(mode == 0)
+            paramValues[1] = ((char *)"0");
+        else if(mode == 1) //всегда работает этот вариант
+            paramValues[1] = ((char *)"1");
+        else 
+            paramValues[1] = ((char *)"2");
+
+        KKSResult * res = dbWrite->execParams (command, 
+                                          nParams, 
+                                          paramTypes, 
+                                          paramValues, 
+                                          paramLengths, 
+                                          paramFormats, 
+                                          0);
+
+        if (!res)
+        {
+            file.seek(0);
+            file.close();
+            delete[] paramValues[0];
+            delete[] paramTypes;
+            delete[] paramLengths;
+            delete[] paramFormats;
+            delete[] paramValues;
+            delete[] command;
+
+            return ERROR_CODE;
+        }
+        int status = res->getCellAsInt(0, 0);
+        if (status <= 0 )
+        {
+            file.seek(0);
+            file.close();
+            delete[] paramValues[0];
+            delete[] paramTypes;
+            delete[] paramLengths;
+            delete[] paramFormats;
+            delete[] paramValues;
+            delete[] command;
+
+            return ERROR_CODE;
+        }
+        mode = 1;
+        delete res;
+    }
+    delete[] paramValues[0];
+    delete[] paramTypes;
+    delete[] paramLengths;
+    delete[] paramFormats;
+    delete[] paramValues;
+    delete[] command;
+
+    file.seek(0);
+    file.close();
 
     return OK_CODE;
 }

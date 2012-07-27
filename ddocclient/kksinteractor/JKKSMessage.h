@@ -26,15 +26,17 @@ class _I_EXPORT JKKSMessage
         virtual ~JKKSMessage (void);
 
         QString getAddr (void) const;
-        QString getCode (void) const;
-
         void setAddr (const QString& addr);
+
+        QString getCode (void) const;
         void setCode (const QString& code);
 
         virtual QByteArray serialize (void) const;
         virtual int unserialize (const QByteArray& mess)=0;
+
         virtual const QMap<int, JKKSCategory>& getCategory (void) const;
         virtual void setCategory (const QMap<int, JKKSCategory>& catMap);
+        
         virtual int id (void) const=0;
         virtual int writeToDB (const JKKSLoader * loader, const QString& senderUID, const QString& receiverUID) = 0;
 

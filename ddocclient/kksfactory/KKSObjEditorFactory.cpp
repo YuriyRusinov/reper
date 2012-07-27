@@ -1962,7 +1962,7 @@ void KKSObjEditorFactory :: saveObject (KKSObjEditor* editor,
             
             //создание нового ИО
             //операция INSERT всегда разрешена
-            res = (i == 0 ? ppf->insertIO (wObj, editor) : ppf->insertIO (io, editor));
+            res = (i == 0 ? ppf->insertIO (wObj, true, editor) : ppf->insertIO (io, true, editor));
             
             if (wObj->id () > 0 && i==0){
                 pObjectEx->setId (wObj->id());

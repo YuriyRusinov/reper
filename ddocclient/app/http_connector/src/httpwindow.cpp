@@ -289,14 +289,21 @@ void HttpWindow::startProc()
     QList<JKKSFilePart *> files = loader->readFileParts();
     qint64 position = 0;
     int block = _MAX_FILE_BLOCK2;
+    int cnt = files.count();
     
-    for(int i=0; i<files.count(); i++){
+    for(int i=0; i<cnt; i++){
         do
         {
             JKKSPMessWithAddr * pMes = NULL;
             qint64 readed = 0;
             QByteArray data = loader->readFilePartData(files.at(i)->getAbsUrl(), block, position, & readed);
-            JKKSFilePart part(files.at(i)->uid(), false);
+            position += readed;
+            
+            JKKSFilePart part(*(files.at(i)));
+            part.setAbsUrl(files.at(i)->getAbsUrl());
+            part.setAddr(files.at(i)->getAddr());
+            part.setId(files.at(i)->id());
+            part.setIdUrl(files.at(i)->getIdUrl());
         
             if(readed == -1)//при ошибке чтения выходим на следующий файл, текущий не передаем
                 break;
@@ -312,17 +319,19 @@ void HttpWindow::startProc()
 
             JKKSPMessage pM(part.serialize(), JKKSMessage::atFilePart);
             pM.verifyReceiver = false;
+            //pM.receiverUID = part.getAddr();
+            //pM.senderUID = part.getSenderAddr();
             
-            JKKSPMessWithAddr * pMessWithAddr(new JKKSPMessWithAddr(pM, part.getAddr(), part.getIdQueue()));
+            JKKSPMessWithAddr * pMessWithAddr = new JKKSPMessWithAddr(pM, part.getAddr(), part.id());
             
             bool stat = sendOutMessage(pMessWithAddr, path) ;
             
-            delete pMessWithAddr;
-
             if(eof){
                 httpMessages.insert(httpGetId, qMakePair(pMessWithAddr->id, pMessWithAddr->pMess.getType()) );
                 break;
             }
+            
+            delete pMessWithAddr;
         }
         while(1);
     }

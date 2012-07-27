@@ -636,6 +636,14 @@ int KKSFileLoader::rWriteFile( int idUrl,
         delete pImportD;
     }
 
+    QString sql = QString("select rSetUploaded(%1, true)").arg(idUrl);
+    KKSResult * res = m_db->execute(sql);
+    if(!res || res->getRowCount() < 1){
+        qWarning() << __PRETTY_FUNCTION__ << "Error! Cannot set file as uploaded! ID = " << idUrl;
+    }
+    if(res)
+        delete res;
+
     return OK_CODE;
 }
 
