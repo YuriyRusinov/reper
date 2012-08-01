@@ -381,7 +381,6 @@ void KKSEIODataModel :: setupData (KKSTreeItem * parent)
         {
             KKSTreeItem * t = new KKSTreeItem (p.key(), p.value());
             parent->appendChild (t);
-            //qDebug () << __PRETTY_FUNCTION__ << nr << parent->childCount();
         }
         if (nr > 0 && parent->childCount() > nr)
         {
@@ -397,13 +396,21 @@ void KKSEIODataModel :: setupData (KKSTreeItem * parent)
     }
 
     QModelIndex pIndex = QModelIndex ();
-    for (KKSMap<qint64, KKSEIOData* >::const_iterator p = objRecords.constBegin();
+
+    KKSMap<qint64, KKSEIOData*> sortedData;
+    for(KKSMap<qint64, KKSEIOData* >::const_iterator p = objRecords.constBegin();
             p != objRecords.constEnd();
             p++)
     {
-        KKSTreeItem * t = new KKSTreeItem (p.key(), p.value());
+        sortedData.insertMulti(p.value()->sysFieldValue("ii_rec_order").toLongLong(), p.value());
+    }
+
+    for (KKSMap<qint64, KKSEIOData* >::const_iterator p = sortedData.constBegin();
+            p != sortedData.constEnd();
+            p++)
+    {
+        KKSTreeItem * t = new KKSTreeItem (p.value()->sysFieldValue("id").toLongLong(), p.value());
         QString valStr = p.value()->sysFieldValue(cAttrP->code(false));
-        //qDebug () << __PRETTY_FUNCTION__ << p.key() << valStr << p.value()->sysFields();
         if (valStr.isEmpty())
             parent->appendChild (t);
         else
@@ -416,10 +423,10 @@ void KKSEIODataModel :: setupData (KKSTreeItem * parent)
             else
             {
                 parent1->appendChild (t);
-                //qDebug () << __PRETTY_FUNCTION__ << QString ("parent id is") << parent->id();
             }
         }
     }
+
     return;
 }
 

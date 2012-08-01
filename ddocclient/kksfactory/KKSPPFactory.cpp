@@ -1285,7 +1285,7 @@ int KKSPPFactory::insertAttrView(int idCategory, int idTemplate, int idGroup, KK
                             .arg(idGroup)
                             .arg(isReadOnly ? "true" : "false")
                             .arg(order)
-                            .arg(defVal.isEmpty() || av->defValue().isNull() ? QString("NULL") : QString ("asString(%1, true)").arg (defVal));
+                            .arg(defVal.isEmpty() || av->defValue().isNull() ? QString("NULL") : QString ("asString(%1, false)").arg (defVal));
     //qDebug () << __PRETTY_FUNCTION__ << sql;
 
     
@@ -1427,6 +1427,7 @@ int KKSPPFactory::insertTemplate(KKSTemplate * t) const
         if(ok != OK_CODE){
             if(!inTransaction())
                 db->rollback();
+            t->setId(-1);
             return ERROR_CODE;
         }
         tNGroups.insert (g->id(), g);

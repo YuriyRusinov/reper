@@ -21,11 +21,14 @@ QModelIndex KKSRecProxyModel :: index (int row, int column, const QModelIndex& p
 {
     if (!hasIndex (row, column, parent))
         return QModelIndex ();
+    
     QModelIndex sparent = mapToSource (parent);
     QAbstractItemModel * sModel = sourceModel ();
     if (!sModel)
         return QModelIndex ();
+    
     QModelIndex sindex = sModel->index (row, column, sparent);
+    
     return mapFromSource (sindex);
 }
 
@@ -59,14 +62,18 @@ QModelIndex KKSRecProxyModel::mapFromSource (const QModelIndex& sourceIndex) con
 {
     if (!sourceModel() || !sourceIndex.isValid())
         return QModelIndex();
+    
     KKSEIOData * d = sourceIndex.data(Qt::UserRole+1).value<KKSEIOData *>();
     if (!d || !d->isVisible())
         return QModelIndex();
+    
     bool v = d->isVisible();
     QModelIndex wIndex (sourceIndex.parent());
+    
     QPersistentModelIndex spIndex (sourceIndex);
     if (mapping.contains(spIndex))
         return mapping.value(spIndex);
+    
     if (!wIndex.isValid())
     {
         QModelIndex resIndex = createIndex (sourceIndex.row(), sourceIndex.column(), sourceIndex.internalPointer());
@@ -74,11 +81,13 @@ QModelIndex KKSRecProxyModel::mapFromSource (const QModelIndex& sourceIndex) con
         mapping.insert (QPersistentModelIndex (sourceIndex), QPersistentModelIndex (resIndex));
         return resIndex;//createIndex (sourceIndex.row(), sourceIndex.column(), sourceIndex.internalPointer());
     }
+    
     KKSEIOData * dw = wIndex.data(Qt::UserRole+1).value<KKSEIOData *>();
     if (!dw || !dw->isVisible())
         v = false;
     if (!v)
         return QModelIndex();
+    
     QModelIndex resIndex = createIndex (sourceIndex.row(), sourceIndex.column(), sourceIndex.internalPointer());
     //qDebug () << __PRETTY_FUNCTION__ << sourceIndex << resIndex;
     mapping.insert (QPersistentModelIndex (sourceIndex), QPersistentModelIndex (resIndex));

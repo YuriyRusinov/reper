@@ -34,7 +34,11 @@ KKSItemDelegate :: ~KKSItemDelegate (void)
 void KKSItemDelegate :: paint (QPainter * painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
     //qDebug () << __PRETTY_FUNCTION__ << index << option.rect << option.decorationSize;
-    //QItemDelegate::paint (painter, option, index);
+    
+    QItemDelegate::paint (painter, option, index);
+    
+    return;
+    
     if (!templ)
     {
         QItemDelegate::paint (painter, option, index);

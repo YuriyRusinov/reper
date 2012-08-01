@@ -1742,18 +1742,25 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
 
     QStringList usedTableNames;
     
-
+    QString defParentFilter; //≈сли визуализируема€ таблица €вл€етс€ иерархической,
+                             //необходимо указывать исходный фильтр дл€ предложени€ WITH
+                             //этот фильтр будет задаватьс€ при разборе имеющихс€ фильтров.
+                             //однако если фильтров с атрибутом родитель-потомок нет, то надо иметь
+                             //исходный фильтр. таковым €вл€етс€ id_parent isnull
+                             //но нам при этом надо знать название ссылочной колонки
     //предусматриваем, что в таблице tableName может быть ссылка на саму себ€
     //в этом случае пересекаем ее со своей копией, использу€ алиас
     //такой случай возможен при использовании атрибута типа atParent
     usedTableNames << tableName;
     
+    QString withAttrPK; //название колонки, €вл€ющейс€ первичным ключом в атрибуте родитель-потомок (например id)
+    QString withAttrFK; //название колонки, €вл€ющейс€ внешним ключом в атрибуте родитель-потомок (например id_parent)
     QString withTableName = tableName + "_rec"; //название подзапроса в предложении WITH
     //QString withTableName1 = withTableName + "_1"; //псевдоним таблицы в подзапросе рекурсивной части предложени€ WITH
     QString attrsWith = "id";
     QString attrsWith1 = tableName + ".id"; //колонки в подзапросе нерекурсивной части предложени€ WITH
-    //QString attrsWith2 = tableName + ".id";//колонки в подзапросе рекурсивной
-    //QString 
+    QString withAttrs;//колонки в самой нижней части запроса с предложением WITH
+    QString withJoinWord;//предложение left join в запросе с предложением WITH
     
     QString attrs;
     QString whereWord = " 1=1 ";
@@ -1784,8 +1791,13 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
         {
             QString tName = a->tableName();
             QString cName = a->columnName(true); //quoted columnName
-            if(a->type()->attrType() == KKSAttrType::atParent)
+            
+            if(a->type()->attrType() == KKSAttrType::atParent){
                 tName = tableName;
+                defParentFilter = QString("%1.%2 isnull").arg(tName).arg(code);
+                withAttrPK = refColumnName;
+                withAttrFK = code;
+            }
 
             KKSObject * refObj = this->loadIO (tName, true);
             if (!refObj)
@@ -1818,14 +1830,20 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
                 if(!a->isMandatory()){
                     whereWord += QString(" and (%1.%2 isnull or %1.%2 = %3%4.%5) ").arg(tableName).arg(code).arg(tName).arg(cnt).arg(refColumnName);
                     joinWord += QString(" left join %1 %1%2 on %3.%4 = %1%2.%5").arg(tName).arg(cnt).arg(tableName).arg(code).arg(refColumnName);
+                    withJoinWord += QString(" left join %1 %1%2 on %3.%4 = %1%2.%5").arg(tName).arg(cnt).arg(withTableName).arg(code).arg(refColumnName);
                     attrs += QString(", case when %1.%3 isnull then NULL else %4%5.%2 end as %3").arg(tableName).arg(cName).arg(code).arg(tName).arg(cnt);
                     attrs += QString(", %1.%2 as %3").arg(tableName).arg(code).arg(codeFK);
+                    withAttrs += QString(", case when %1.%3 isnull then NULL else %4%5.%2 end as %3").arg(withTableName).arg(cName).arg(code).arg(tName).arg(cnt);
+                    withAttrs += QString(", %1.%2 as %3").arg(withTableName).arg(code).arg(codeFK);
                 }
                 else{
                     whereWord += QString(" and %1.%2 = %3%4.%5 ").arg(tableName).arg(code).arg(tName).arg(cnt).arg(refColumnName);
                     joinWord += QString(" left join %1 %1%2 on %3.%4 = %1%2.%5").arg(tName).arg(cnt).arg(tableName).arg(code).arg(refColumnName);
+                    withJoinWord += QString(" left join %1 %1%2 on %3.%4 = %1%2.%5").arg(tName).arg(cnt).arg(withTableName).arg(code).arg(refColumnName);
                     attrs += QString(", %1%4.%2 as %3").arg(tName).arg(cName).arg(code).arg(cnt);
                     attrs += QString(", %1.%2 as %3").arg(tableName).arg(code).arg(codeFK);
+                    withAttrs += QString(", %1%4.%2 as %3").arg(tName).arg(cName).arg(code).arg(cnt);
+                    withAttrs += QString(", %1.%2 as %3").arg(withTableName).arg(code).arg(codeFK);
                 }
             }
             else{
@@ -1833,14 +1851,20 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
                 if(!a->isMandatory()){
                     whereWord += QString(" and (%1.%2 isnull or %1.%2 = %3.%4) ").arg(tableName).arg(code).arg(tName).arg(refColumnName);
                     joinWord += QString(" left join %1 on %2.%3 = %1.%4").arg(tName).arg(tableName).arg(code).arg(refColumnName);
+                    withJoinWord += QString(" left join %1 on %2.%3 = %1.%4").arg(tName).arg(withTableName).arg(code).arg(refColumnName);
                     attrs += QString(", case when %1.%3 isnull then NULL else %4.%2 end as %3").arg(tableName).arg(cName).arg(code).arg(tName);
                     attrs += QString(", %1.%2 as %3").arg(tableName).arg(code).arg(codeFK);
+                    withAttrs += QString(", case when %1.%3 isnull then NULL else %4.%2 end as %3").arg(withTableName).arg(cName).arg(code).arg(tName);
+                    withAttrs += QString(", %1.%2 as %3").arg(withTableName).arg(code).arg(codeFK);
                 }
                 else{
                     whereWord += QString(" and %1.%2 = %3.%4 ").arg(tableName).arg(code).arg(tName).arg(refColumnName);
                     joinWord += QString(" left join %1 on %2.%3 = %1.%4").arg(tName).arg(tableName).arg(code).arg(refColumnName);
+                    withJoinWord += QString(" left join %1 on %2.%3 = %1.%4").arg(tName).arg(withTableName).arg(code).arg(refColumnName);
                     attrs += QString(", %1.%2 as %3").arg(tName).arg(cName).arg(code);
                     attrs += QString(", %1.%2 as %3").arg(tableName).arg(code).arg(codeFK);
+                    withAttrs += QString(", %1.%2 as %3").arg(tName).arg(cName).arg(code);
+                    withAttrs += QString(", %1.%2 as %3").arg(withTableName).arg(code).arg(codeFK);
                 }
             }
             attrsWith += QString(", %1").arg(code);
@@ -1855,11 +1879,13 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
             //необходимо опустить содержимое атрибутов типа JPG и SVG, поскольку они сильно тормоз€т систему
             //и к тому же в список Ё»ќ не вывод€тс€
             attrs += QString(", 'pixmap/svg/video/xml data type' as %1").arg(code);
+            withAttrs += QString(", 'pixmap/svg/video/xml data type' as %1").arg(code);
             attrsWith += QString(", 'pixmap/svg/video/xml data type' as %1").arg(code);
             attrsWith1 += QString(", 'pixmap/svg/video/xml data type' as %1").arg(code);
         }
         else{
             attrs += QString(", %1.%2").arg(tableName).arg(code);
+            withAttrs += QString(", %1.%2").arg(withTableName).arg(code);
             attrsWith += QString(", %1").arg(code);
             attrsWith1 += QString(", %1.%2").arg(tableName).arg(code);
         }
@@ -1876,7 +1902,13 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
     }
     else{
         QString parentFilter;
+        
         bool withRecursive = false;
+        if(cat->id() == CAT_CATEGORY_ID || cat->id() == CAT_TABLE_CATEGORY_ID)
+            withRecursive = false;
+        else
+            withRecursive = cat->isAttrTypeContains(KKSAttrType::atParent);
+        
         //for()
         //if(!withRecursive){
         //
@@ -1902,24 +1934,31 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
                 sql += filterWhere;
         }
         else{
-            QString attrPK;
-            QString attrFK;
-            sql = QString("with recursive %1 (%2) as (" 
-                          "select %3 %4 from %5 where %6 UNION ALL select %4 from %1, %5 where %1.%7 = %5.%8"
+            //QString attrPK;
+            //QString attrFK;
+            
+            if(parentFilter.isEmpty())
+                parentFilter = defParentFilter;
+
+            sql = QString("with recursive %1 (%2, ii_rec_order) as (" 
+                          "select %3 %4, 0 from %5 where %6 UNION ALL select %4, %1.ii_rec_order+1 from %1, %5 where %1.%7 = %5.%8"
                           ")"
-                          "select %3 %1.id %9 from %1 %10 %11 where 1=1 ").arg(withTableName)
+                          "select %3 %1.id %9, %1.ii_rec_order from %1 %10 %11 where 1=1 ")
+                              .arg(withTableName)
                               .arg(attrsWith)
                               .arg (isXml ? QString() : QString("distinct"))
                               .arg(attrsWith1)
                               .arg(tableName)
                               .arg(parentFilter)
-                              .arg(attrPK)
-                              .arg(attrFK)
-                              .arg(attrs)
-                              .arg(joinWord)
+                              .arg(withAttrPK)
+                              .arg(withAttrFK)
+                              .arg(withAttrs)
+                              .arg(withJoinWord)
                               .arg(exTablesStr);
             if(!filterWhere.isEmpty())
                 sql += filterWhere;
+            
+            sql += QString(" order by %1.ii_rec_order").arg(withTableName);
         }
     }
 
@@ -1994,6 +2033,10 @@ KKSMap<qint64, KKSEIOData *> KKSLoader::loadEIOList(const KKSCategory * c0,
             QString code = QString(res->getColumnName(column));//использование названи€ колонки дл€ ключа QMap в классе KKSEIOData допустимо
             QString value = res->getCellAsString(row, column);
             
+            if(code == "ii_rec_order" || code == "id"){
+                eio->addSysField(code, value);
+            }
+
             //в данном случае получение атрибута по его коду (хот€ он и не €вл€етс€ уникальным) 
             //допустимо, поскольку категори€ описывает таблицу, а в таблице не может быть 
             //двух колонок (атрибутов) с одинаковым названием                    
@@ -2001,6 +2044,7 @@ KKSMap<qint64, KKSEIOData *> KKSLoader::loadEIOList(const KKSCategory * c0,
             if(!a)
                 continue;
             
+
             //проверим на тип »Ќ“≈–¬јЋ
             if(hasInterval){
                 if(res->getColumnDataType(column) == KKSResult::dtInt4Array){
