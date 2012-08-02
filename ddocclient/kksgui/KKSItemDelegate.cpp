@@ -70,6 +70,7 @@ void KKSItemDelegate :: paint (QPainter * painter, const QStyleOptionViewItem& o
         qDebug () << __PRETTY_FUNCTION__ << decVal;
     QPixmap pMap;
     QRect decRect;
+    qDebug () << __PRETTY_FUNCTION__ << decVal << decVal.type ();
     switch (decVal.type())
     {
         case QVariant::Icon:
