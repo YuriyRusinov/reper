@@ -405,6 +405,7 @@ void KKSEIODataModel :: setupData (KKSTreeItem * parent)
         sortedData.insertMulti(p.value()->sysFieldValue("ii_rec_order").toLongLong(), p.value());
     }
 
+    KKSTreeItem * prevItem (0);
     for (KKSMap<qint64, KKSEIOData* >::const_iterator p = sortedData.constBegin();
             p != sortedData.constEnd();
             p++)
@@ -417,12 +418,21 @@ void KKSEIODataModel :: setupData (KKSTreeItem * parent)
         {
             bool ok;
             qint64 iVal = valStr.toLongLong(&ok);
-            KKSTreeItem * parent1 = getModelItem (iVal, rootItem, pIndex);
-            if (!ok || !parent1)
-                parent->appendChild (t);
+            if (ok && iVal > 0)
+            {
+                if (prevItem->id() == iVal)
+                    prevItem->appendChild (t);
+                else
+                {
+                    KKSTreeItem * parent1 = getModelItem (iVal, rootItem, pIndex);
+                    parent1->appendChild (t);
+                    prevItem = parent1;
+                }
+            }
             else
             {
-                parent1->appendChild (t);
+                parent->appendChild (t);
+                prevItem = 0;
             }
         }
     }
