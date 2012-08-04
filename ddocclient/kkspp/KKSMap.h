@@ -49,7 +49,17 @@ class /*_PP_EXPORT*/ KKSMap : public QMap<Key, T>
             p->addRef();
             return 1;
         }
-    
+        
+        int insertMulti(const Key & key, const T & p)
+        {
+            if(!p)
+                return 0;
+
+            QMap<Key, T>::insertMulti(key, p);
+            p->addRef();
+            return 1;
+        }
+
         void remove(const Key & key)
         {
             QMap<Key, T> l = *this;

@@ -1880,7 +1880,7 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
             //и к тому же в список Ё»ќ не вывод€тс€
             attrs += QString(", 'pixmap/svg/video/xml data type' as %1").arg(code);
             withAttrs += QString(", 'pixmap/svg/video/xml data type' as %1").arg(code);
-            attrsWith += QString(", 'pixmap/svg/video/xml data type' as %1").arg(code);
+            attrsWith += QString(", xml_data_type_%1").arg(a->idCategoryAttr());
             attrsWith1 += QString(", 'pixmap/svg/video/xml data type' as %1").arg(code);
         }
         else{
@@ -1914,7 +1914,12 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
         //
         //}
 
-        QString filterWhere = generateFilterSQL(filters, tableName, exTables);//exTables - таблицы с отношением M:N
+        QString filterWhere;
+        if(withRecursive)
+            filterWhere = generateFilterSQL(filters, withTableName, exTables);//exTables - таблицы с отношением M:N
+        else
+            filterWhere = generateFilterSQL(filters, tableName, exTables);//exTables - таблицы с отношением M:N
+
         QString exTablesStr;
         int cnt = exTables.count();
         if(cnt > 0){

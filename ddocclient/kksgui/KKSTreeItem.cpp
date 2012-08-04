@@ -4,12 +4,11 @@
 
 KKSTreeItem :: KKSTreeItem (qint64 id, KKSEIOData * d, KKSTreeItem * parent)
     : idItem (id),
-      data (d),
+      data (NULL),
       parentItem (parent),
       childItems (QList<KKSTreeItem*>())
 {
-    if (d)
-        data->addRef ();
+    setData(d);
 }
 
 KKSTreeItem :: ~KKSTreeItem (void)
@@ -143,6 +142,7 @@ void KKSTreeItem :: setData (KKSEIOData * d)
 {
     if (data == d)
         return;
+
     if (data)
         data->release ();
 

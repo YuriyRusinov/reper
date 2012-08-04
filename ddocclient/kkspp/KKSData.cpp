@@ -47,8 +47,11 @@ void KKSData::release(void) const
     //qWarning("release() invoked!");
     int cnt = --m_refCount;
 
-    if(cnt <= 0)
+    if(cnt <= 0){
         delete this;
+        //this = 0;
+    }
+
 }
 
 ////////////////////////////////////////////////////////////////////////

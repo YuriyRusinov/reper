@@ -53,6 +53,7 @@ private:
     const KKSTemplate * tRef;
     const KKSCategoryAttr * cAttrP;
     KKSMap<qint64, KKSEIOData *> objRecords;
+    
     //mutable QMap<qint64, QModelIndex> parIndexList;
     //mutable QMap<qint64, QList<qint64> > indList;
     KKSTreeItem * rootItem;
