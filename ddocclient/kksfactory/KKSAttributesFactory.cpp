@@ -864,6 +864,60 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                 attrWidget->setSizePolicy (hPw);
             }
             break;
+
+        case KKSAttrType::atUUID:
+            {
+                const KKSCategoryAttr * pCategAttr = av->attribute();
+                if (!isRef)
+                {
+                    lTitle = this->createAttrTitle (av, isSystem, objEditor);//, pCategAttr->title(), is_mandatory);
+                    Qt::Alignment align=Qt::AlignRight;
+                    if (pCategAttr->refType()->attrType() == KKSAttrType::atText )
+                        align |= Qt::AlignTop;
+                    gLayout->addWidget (lTitle, n_str, 0, 1, 2, align);//Qt::AlignRight);
+                }
+                hPw.setHorizontalStretch (10);
+                attrWidget = new KKSAttrRefWidget ();
+                QLabel *l=0;
+                QToolButton *tb = 0;
+                QCheckBox *chr = 0;
+                QVariant vr = QVariant ();
+
+                KKSAttribute * cAttr = 0;
+                QWidget *arw = createAttrWidget (av, 
+                                                 objEditor, 
+                                                 is_mandatory, 
+                                                 cAttr ? cAttr->refType() : pCategAttr->refType(), 
+                                                 isSystem, 
+                                                 qobject_cast<QGridLayout *>(attrWidget->layout ()), 
+                                                 0, 
+                                                 vr, 
+                                                 l, 
+                                                 tb,
+                                                 chr, 
+                                                 true);
+                
+                qDebug () << __PRETTY_FUNCTION__ << "Widget has created" << pCategAttr->refType()->attrType();
+                if (!arw)
+                    break;
+                if (cAttr)
+                    cAttr->release ();
+                qobject_cast<KKSAttrRefWidget *>(attrWidget)->setAttrWidget (arw);
+                attrWidget->setMinimumHeight (20);
+               
+                tbRef = new QToolButton ();
+                tbRef->setMinimumHeight (20);
+                tbRef->setText ("...");
+                tbRef->setToolTip(tr("Generate automatically"));
+                QGridLayout *gLay = new QGridLayout ();
+                int ng = 1;
+                gLay->addWidget (attrWidget, 0, 0, ng, 1);
+                gLay->addWidget (tbRef, 0, 1, ng, 1, Qt::AlignTop);
+                gLayout->addLayout (gLay, n_str, 2, 1, 1);
+                
+                attrWidget->setSizePolicy (hPw);
+            }
+            break;
         case KKSAttrType::atCheckList:
             {
                 if (!isRef)

@@ -78,6 +78,7 @@ void KKSAttrType::setAttrType()
         case 28: m_attrType = atGeometry; break;          //ГИС-объект (базовый)
         case 29: m_attrType = atGeometryPoly; break;      //ГИС-объект (стандартный полигон)
         case 30: m_attrType = atInt64; break;             //целочисленное (64 бита)
+        case 31: m_attrType = atUUID; break;              //уникальный идентификатор (UUID)
 
         default: m_attrType = atUserDef; break;           //пользовательский (for future use)
     }

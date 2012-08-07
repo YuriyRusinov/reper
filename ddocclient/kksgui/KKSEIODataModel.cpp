@@ -420,7 +420,7 @@ void KKSEIODataModel :: setupData (KKSTreeItem * parent)
             qint64 iVal = valStr.toLongLong(&ok);
             if (ok && iVal > 0)
             {
-                if (prevItem->id() == iVal)
+                if (prevItem && prevItem->id() == iVal)
                     prevItem->appendChild (t);
                 else
                 {

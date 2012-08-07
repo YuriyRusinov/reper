@@ -1102,6 +1102,7 @@ KKSAttrType * KKSLoader::loadAttrType(KKSAttrType::KKSAttrTypes type) const
         case KKSAttrType::atGeometry: id = 28; break;           //ГИС-объект (базовый)
         case KKSAttrType::atGeometryPoly: id = 29; break;       //ГИС-объект (стандартный полигон)
         case KKSAttrType::atInt64: id = 30; break;              //целочисленное (64 бита)
+        case KKSAttrType::atUUID: id = 31; break;               //уникальный идентификатор (UUID)
     }
 
     KKSAttrType * aType = loadAttrType(id);
