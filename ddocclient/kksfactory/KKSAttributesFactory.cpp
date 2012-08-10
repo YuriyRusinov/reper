@@ -33,6 +33,7 @@
 #include <kksattreditor.h>
 #include <KKSCheckBox.h>
 #include <KKSAttrRefWidget.h>
+#include <KKSAttrUUIDWidget.h>
 #include <KKSListWidget.h>
 #include <KKSDateEdit.h>
 #include <KKSDateTimeEdit.h>
@@ -791,7 +792,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                     lTitle = this->createAttrTitle (av, isSystem, objEditor);//pCategAttr->title(), is_mandatory);
                     gLayout->addWidget (lTitle, n_str, 0, 1, 2, Qt::AlignRight);
                 }
-				attrWidget = new KKSCheckBox (av, isSystem);
+                attrWidget = new KKSCheckBox (av, isSystem);
                 attrWidget->setMinimumHeight (20);
                 attrWidget->setSizePolicy (hPw);
 
@@ -870,21 +871,19 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                 const KKSCategoryAttr * pCategAttr = av->attribute();
                 if (!isRef)
                 {
-                    lTitle = this->createAttrTitle (av, isSystem, objEditor);//, pCategAttr->title(), is_mandatory);
-                    Qt::Alignment align=Qt::AlignRight;
-                    if (pCategAttr->refType()->attrType() == KKSAttrType::atText )
-                        align |= Qt::AlignTop;
-                    gLayout->addWidget (lTitle, n_str, 0, 1, 2, align);//Qt::AlignRight);
+                    lTitle = this->createAttrTitle (av, isSystem, objEditor);//pCategAttr->title(), is_mandatory);
+                    gLayout->addWidget (lTitle, n_str, 0, 1, 2, Qt::AlignRight | Qt::AlignTop);
                 }
                 hPw.setHorizontalStretch (10);
-                attrWidget = new KKSAttrRefWidget ();
-                QLabel *l=0;
+                attrWidget = new KKSAttrUUIDWidget ();
+/*                QLabel *l=0;
                 QToolButton *tb = 0;
                 QCheckBox *chr = 0;
                 QVariant vr = QVariant ();
 
                 KKSAttribute * cAttr = 0;
-                QWidget *arw = createAttrWidget (av, 
+                QWidget *arw = new QLineEdit();
+                createAttrWidget (av, 
                                                  objEditor, 
                                                  is_mandatory, 
                                                  cAttr ? cAttr->refType() : pCategAttr->refType(), 
@@ -895,27 +894,13 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                                                  l, 
                                                  tb,
                                                  chr, 
-                                                 true);
+                                                 true);*/
                 
-                qDebug () << __PRETTY_FUNCTION__ << "Widget has created" << pCategAttr->refType()->attrType();
-                if (!arw)
-                    break;
-                if (cAttr)
-                    cAttr->release ();
-                qobject_cast<KKSAttrRefWidget *>(attrWidget)->setAttrWidget (arw);
+                qDebug () << __PRETTY_FUNCTION__ << "Widget has created" << pCategAttr->type()->attrType();
                 attrWidget->setMinimumHeight (20);
-               
-                tbRef = new QToolButton ();
-                tbRef->setMinimumHeight (20);
-                tbRef->setText ("...");
-                tbRef->setToolTip(tr("Generate automatically"));
-                QGridLayout *gLay = new QGridLayout ();
-                int ng = 1;
-                gLay->addWidget (attrWidget, 0, 0, ng, 1);
-                gLay->addWidget (tbRef, 0, 1, ng, 1, Qt::AlignTop);
-                gLayout->addLayout (gLay, n_str, 2, 1, 1);
-                
                 attrWidget->setSizePolicy (hPw);
+                if (!isRef)
+                    gLayout->addWidget (attrWidget, n_str, 2, 1, 1);
             }
             break;
         case KKSAttrType::atCheckList:
@@ -1922,6 +1907,21 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
                 }
                 else
                     lEdit->setText (v);
+            }
+            break;
+        case KKSAttrType::atUUID:
+            {
+                QString v = V.toString();
+                if (v.isNull())
+                    v = QString("");
+                qDebug () << __PRETTY_FUNCTION__ << v;
+                KKSAttrUUIDWidget * uuidWidget = qobject_cast <KKSAttrUUIDWidget *>(aw);
+                uuidWidget->setUUID (v);
+                if (!isRef)
+                {
+                    connectToSlots (aw, wEditor);
+                    uuidWidget->setEnabled (!isObjExist || !av->attribute()->isReadOnly());
+                }
             }
             break;
         case KKSAttrType::atInterval:

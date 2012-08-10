@@ -29,6 +29,7 @@ HEADERS += \
                 KKSEventFilter.h \
                 KKSMessageWidget.h \
                 KKSAttrRefWidget.h \
+                KKSAttrUUIDWidget.h \
                 KKSCheckableModel.h \
                 KKSOrgModel.h \
                 KKSOrgItemDelegate.h \
@@ -105,6 +106,7 @@ SOURCES += \
                 KKSEventFilter.cpp \
                 KKSMessageWidget.cpp \
                 KKSAttrRefWidget.cpp \
+                KKSAttrUUIDWidget.cpp \
                 KKSCheckableModel.cpp \
                 KKSOrgModel.cpp \
                 KKSOrgItemDelegate.cpp \
@@ -202,6 +204,7 @@ headers.files += \
                 KKSEventFilter.h \
                 KKSMessageWidget.h \
                 KKSAttrRefWidget.h \
+                KKSAttrUUIDWidget.h \
                 KKSCheckableModel.h \
                 KKSOrgModel.h \
                 KKSOrgItemDelegate.h \

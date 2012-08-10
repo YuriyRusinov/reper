@@ -2466,7 +2466,7 @@ void KKSObjEditorFactory :: createNewEditor (QWidget * editor, int idObject, con
         connect(newObjEditor, 
                 SIGNAL(eioChanged(const QList<qint64>&, const KKSCategory*, QString, int)), 
                 editor, 
-                SLOT(updateEIOEx(const QList<1int64>&, const KKSCategory *, QString, int)));
+                SLOT(updateEIOEx(const QList<qint64>&, const KKSCategory *, QString, int)));
     
     newObjEditor->setAttribute (Qt::WA_DeleteOnClose);
     //newObjEditor->showNormal ();
