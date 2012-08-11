@@ -230,6 +230,7 @@ signals:
     void templateEditorCreatedModal (KKSTemplateEditor *tEditor);
     void templateAdded (KKSTemplate *templ);
     void cioSaved (KKSObjectExemplar * cio);
+    void setuuid (QString uuid);
 
 private slots:
     void saveObject (KKSObjEditor * editor, KKSObject * wObj, KKSObjectExemplar * wObjEx, int num=1, QAbstractItemModel * recModel=0);
@@ -331,6 +332,7 @@ private slots:
                              QAbstractItemModel * sourceModel, 
                              const QModelIndex& wInd);
     void loadRefIO (QString tableName);
+    void genUUID (int idAttr, const KKSAttrValue * av);
 
 private:
     //

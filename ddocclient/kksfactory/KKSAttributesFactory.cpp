@@ -1916,10 +1916,15 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
                     v = QString("");
                 qDebug () << __PRETTY_FUNCTION__ << v;
                 KKSAttrUUIDWidget * uuidWidget = qobject_cast <KKSAttrUUIDWidget *>(aw);
+                QToolButton * tbRef = uuidWidget->getButton ();
+                if (objEditor && !isRef)
+                    objEditor->addListAttrWidget (tbRef, uuidWidget, av);
                 uuidWidget->setUUID (v);
                 if (!isRef)
                 {
                     connectToSlots (aw, wEditor);
+                    connect (uuidWidget, SIGNAL (generateUUID (int)), wEditor, SLOT (generateIOUUID (int)) );
+                    connect (wEditor, SIGNAL (setUUID (QString)), uuidWidget, SLOT (setUUID (QString)) );
                     uuidWidget->setEnabled (!isObjExist || !av->attribute()->isReadOnly());
                 }
             }

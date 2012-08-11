@@ -62,6 +62,7 @@
 #include <KKSIndAttr.h>
 #include <KKSAttrValue.h>
 #include <KKSIndicator.h>
+#include "KKSAttrUUIDWidget.h"
 #include "defines.h"
 
 
@@ -393,6 +394,16 @@ int KKSObjEditor :: constructObject()
             else
                 value = val.toString(); 
 
+            if (type == KKSAttrType::atUUID && (val.isNull() || value.isEmpty()) && qobject_cast<KKSAttrUUIDWidget *>(awAttrs.value(cAttrValue->id())) && qobject_cast<KKSAttrUUIDWidget *>(awAttrs.value(cAttrValue->id()))->checkState() != Qt::Checked)
+            {
+                int res = QMessageBox::question(this, tr ("Set UUID"), tr ("Unique identificator does not set. Generate automatically (Yes) or set manually (No) ?"), QMessageBox::Yes | QMessageBox::No);
+                if (res == QMessageBox::No)
+                    return ERROR_CODE;
+                else
+                    emit generateUUID (cAttrValue->attribute()->id(), cAttrValue);
+            }
+            else if (type == KKSAttrType::atUUID && (val.isNull() || value.isEmpty()) && qobject_cast<KKSAttrUUIDWidget *>(awAttrs.value(cAttrValue->id())) && qobject_cast<KKSAttrUUIDWidget *>(awAttrs.value(cAttrValue->id()))->checkState() == Qt::Checked)
+                emit generateUUID (cAttrValue->attribute()->id(), cAttrValue);
             if (cAttrValue->attribute()->isMandatory() && cAttrValue->attribute()->defValue().value().isEmpty() && (val.isNull() || value.isEmpty()))
             {
                 QMessageBox::warning (this, tr ("Save document"), tr ("Mandatory attribute %1 has to be set").arg (cAttrValue->attribute()->name()), QMessageBox::Ok);
@@ -544,6 +555,16 @@ int KKSObjEditor :: constructObject()
                 value = val.toString(); 
 
             qDebug () << __PRETTY_FUNCTION__ << val << value;
+            if (type == KKSAttrType::atUUID && (val.isNull() || value.isEmpty()) && qobject_cast<KKSAttrUUIDWidget *>(awAttrs.value(cAttrValue->id())) && qobject_cast<KKSAttrUUIDWidget *>(awAttrs.value(cAttrValue->id()))->checkState() != Qt::Checked)
+            {
+                int res = QMessageBox::question(this, tr ("Set UUID"), tr ("Unique identificator does not set. Generate automatically (Yes) or set manually (No) ?"), QMessageBox::Yes | QMessageBox::No);
+                if (res == QMessageBox::No)
+                    return ERROR_CODE;
+                else
+                    emit generateUUID (cAttrValue->attribute()->id(), cAttrValue);
+            }
+            else if (type == KKSAttrType::atUUID && (val.isNull() || value.isEmpty()) && qobject_cast<KKSAttrUUIDWidget *>(awAttrs.value(cAttrValue->id())) && qobject_cast<KKSAttrUUIDWidget *>(awAttrs.value(cAttrValue->id()))->checkState() == Qt::Checked)
+                emit generateUUID (cAttrValue->attribute()->id(), cAttrValue);
             if (cAttrValue->attribute()->isMandatory() && cAttrValue->attribute()->defValue().value().isEmpty() && (val.isNull() || value.isEmpty()))
             {
                 QMessageBox::warning (this, tr ("Save document"), tr ("Mandatory attribute %1 has to be set").arg (cAttrValue->attribute()->name()), QMessageBox::Ok);
@@ -670,6 +691,16 @@ int KKSObjEditor :: constructObject()
             else
                 value = val.toString(); 
             
+            if (type == KKSAttrType::atUUID && (val.isNull() || value.isEmpty()) && qobject_cast<KKSAttrUUIDWidget *>(awAttrs.value(cAttrValue->id())) && qobject_cast<KKSAttrUUIDWidget *>(awAttrs.value(cAttrValue->id()))->checkState() != Qt::Checked)
+            {
+                int res = QMessageBox::question(this, tr ("Set UUID"), tr ("Unique identificator does not set. Generate automatically (Yes) or set manually (No) ?"), QMessageBox::Yes | QMessageBox::No);
+                if (res == QMessageBox::No)
+                    return ERROR_CODE;
+                else
+                    emit generateUUID (cAttrValue->attribute()->id(), cAttrValue);
+            }
+            else if (type == KKSAttrType::atUUID && (val.isNull() || value.isEmpty()) && qobject_cast<KKSAttrUUIDWidget *>(awAttrs.value(cAttrValue->id())) && qobject_cast<KKSAttrUUIDWidget *>(awAttrs.value(cAttrValue->id()))->checkState() == Qt::Checked)
+                emit generateUUID (cAttrValue->attribute()->id(), cAttrValue);
             if (cAttrValue->attribute()->isMandatory() && cAttrValue->attribute()->defValue().value().isEmpty() && (val.isNull() || value.isEmpty()))
             {
                 QMessageBox::warning (this, tr ("Save document"), tr ("Mandatory attribute %1 has to be set").arg (cAttrValue->attribute()->name()), QMessageBox::Ok);
@@ -1235,6 +1266,28 @@ void KKSObjEditor :: setValue (int idAttrValue, KKSIndAttr::KKSIndAttrClass sys,
     }
 }
 
+void KKSObjEditor :: generateIOUUID (int idAttrVal)
+{
+    qDebug () << __PRETTY_FUNCTION__ << idAttrVal;
+    QToolButton *tb = qobject_cast<KKSAttrUUIDWidget *>(this->sender())->getButton();
+    if (!tb)
+        return;
+    int id = tbMaps.value (tb);
+    if (!listAttrValues.value (id))
+        return;
+
+    const KKSAttrValue * av = listAttrValues.value(id);
+    if(!av)
+        return;
+    
+    int idAttr = av->attribute()->id();
+    emit generateUUID (idAttr, av);
+}
+
+void KKSObjEditor :: setIOUUID (QString uuid)
+{
+    emit setUUID (uuid);
+}
 /*
 void KKSObjEditor :: addTbQList (QToolButton * tbView, int idIndicator)
 {

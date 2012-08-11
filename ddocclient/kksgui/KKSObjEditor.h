@@ -181,6 +181,8 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void refreshIndices (QAbstractItemModel * sourceMod);
 
         void viewIndicator (void);
+        void generateIOUUID (int idAttrVal);
+        void setIOUUID (QString uuid);
 //        void editIndicator (void);
 //        void delIndicator (void);
 //        void addIndicator (void);
@@ -233,6 +235,9 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void viewIOIndicator (KKSObject *, int);
         void editIOIndicator (KKSObject *, int, QWidget *);
         void addIOIndicator (KKSObject *, QWidget *);
+        
+        void generateUUID (int idAttr, const KKSAttrValue * av);
+        void setUUID (QString uuid);
 
     public slots:
         //void slotRubricItemRequested();

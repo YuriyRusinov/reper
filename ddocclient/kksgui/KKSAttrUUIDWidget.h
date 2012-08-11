@@ -28,6 +28,8 @@ public:
     int getIdAttrValue (void) const;
     KKSIndAttr::KKSIndAttrClass isSysAttr (void) const;
     const QVariant& getValue (void) const;
+    QToolButton * getButton (void) const;
+    Qt::CheckState checkState (void) const;
 
 public slots:
     void setVal (int id, KKSIndAttr::KKSIndAttrClass sys, QVariant val);

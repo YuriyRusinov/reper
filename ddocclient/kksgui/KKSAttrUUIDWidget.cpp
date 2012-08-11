@@ -31,6 +31,7 @@ KKSAttrUUIDWidget :: KKSAttrUUIDWidget (QWidget *parent, Qt::WindowFlags f)
     gAttrLay->setAlignment (Qt::AlignRight | Qt::AlignVCenter);
     
     tbGen->setToolTip(tr("Generate automatically"));
+    tbGen->setText ("...");
     QRegExp uuidRegExp ("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}");
     QValidator * uuidVal = new QRegExpValidator (uuidRegExp, this);
     uuidWidget->setValidator (uuidVal);
@@ -78,4 +79,14 @@ void KKSAttrUUIDWidget :: setUUID (QString uuid)
 void KKSAttrUUIDWidget :: generate_uuid (void)
 {
     emit generateUUID (idAttrValue);
+}
+
+QToolButton * KKSAttrUUIDWidget :: getButton (void) const
+{
+    return tbGen;
+}
+
+Qt::CheckState KKSAttrUUIDWidget :: checkState (void) const
+{
+    return chAuto->checkState ();
 }

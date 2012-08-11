@@ -1575,6 +1575,9 @@ void KKSObjEditorFactory :: setObjConnect (KKSObjEditor *editor)
     connect (editor, SIGNAL (viewIOIndicator (KKSObject *, int)), m_indf, SLOT (viewIOIndicator (KKSObject *, int)) );
     connect (editor, SIGNAL (editIOIndicator (KKSObject *, int, QWidget *)), m_indf, SLOT (editIOIndicator (KKSObject *, int, QWidget *)) );
     connect (editor, SIGNAL (addIOIndicator (KKSObject *, QWidget *)), m_indf, SLOT (addNewIOIndicator (KKSObject *, QWidget *)) );
+    
+    connect (editor, SIGNAL (generateUUID (int, const KKSAttrValue *)), this, SLOT (genUUID (int, const KKSAttrValue *)) );
+    connect (this, SIGNAL (setuuid (QString)), editor, SLOT (setIOUUID (QString)) );
 }
 
 /*
@@ -7850,4 +7853,22 @@ void KKSObjEditorFactory :: delAttrSearchTemplate (void)
     QModelIndex wIndex = rw->getSourceIndex();
     wIndex = wIndex.sibling (wIndex.row(), 0);
     deleleSearchTempl (wIndex, sModel);
+}
+
+void KKSObjEditorFactory :: genUUID (int idAttr, const KKSAttrValue * av)
+{
+    if (idAttr < 0 || !av)
+        return;
+    KKSDatabase * db = loader->getDb();
+    QString sql = QString("select generateUUID()::varchar;");
+    KKSResult * res = db->execute (sql);
+    if (!res || res->getRowCount () != 1)
+    {
+        if (res)
+            delete res;
+        return;
+    }
+    QString uuid = res->getCellAsString (0, 0);
+    delete res;
+    emit setuuid (uuid);
 }
