@@ -47,7 +47,15 @@ int KKSRecProxyModel :: rowCount (const QModelIndex& parent) const
     if (!sourceModel())
         return 0;
     QAbstractItemModel * sModel = sourceModel ();
-    return sModel->rowCount(mapToSource(parent));
+    int nr = sModel->rowCount(mapToSource(parent));
+    int nRes (nr);
+//    for (int i=0; i<nr; i++)
+//    {
+//        KKSEIOData * d = sModel->data(sModel->index(i, 0, mapToSource(parent)), Qt::UserRole+1).value<KKSEIOData *> ();
+//        if (!d->isVisible())
+//            nRes--;
+//    }
+    return nRes;
 }
 
 int KKSRecProxyModel :: columnCount (const QModelIndex& parent) const
