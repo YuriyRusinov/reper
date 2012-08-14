@@ -28,6 +28,9 @@ QModelIndex KKSRecProxyModel :: index (int row, int column, const QModelIndex& p
         return QModelIndex ();
     
     QModelIndex sindex = sModel->index (row, column, sparent);
+    KKSEIOData * dw = sindex.data(Qt::UserRole+1).value<KKSEIOData *>();
+    if (!dw || !dw->isVisible())
+        return QModelIndex ();
     
     return mapFromSource (sindex);
 }
@@ -37,8 +40,14 @@ QModelIndex KKSRecProxyModel :: parent (const QModelIndex& index) const
     if (!sourceModel())
         return QModelIndex();
     const QModelIndex sourceIndex = mapToSource(index);
+    KKSEIOData * dw = sourceIndex.data(Qt::UserRole+1).value<KKSEIOData *>();
+    if (!dw || !dw->isVisible())
+        return QModelIndex ();
 	
     const QModelIndex sourceParent = sourceIndex.parent();
+    KKSEIOData * dwp = sourceParent.isValid() ? sourceParent.data(Qt::UserRole+1).value<KKSEIOData *>() : 0;
+    if (!dwp || !dwp->isVisible())
+        return QModelIndex ();
     return mapFromSource(sourceParent);
 }
 
@@ -49,12 +58,12 @@ int KKSRecProxyModel :: rowCount (const QModelIndex& parent) const
     QAbstractItemModel * sModel = sourceModel ();
     int nr = sModel->rowCount(mapToSource(parent));
     int nRes (nr);
-//    for (int i=0; i<nr; i++)
-//    {
-//        KKSEIOData * d = sModel->data(sModel->index(i, 0, mapToSource(parent)), Qt::UserRole+1).value<KKSEIOData *> ();
-//        if (!d->isVisible())
-//            nRes--;
-//    }
+/*    for (int i=0; i<nr; i++)
+    {
+        KKSEIOData * d = sModel->data(sModel->index(i, 0, mapToSource(parent)), Qt::UserRole+1).value<KKSEIOData *> ();
+        if (!d->isVisible())
+            nRes--;
+    }*/
     return nRes;
 }
 
@@ -63,7 +72,11 @@ int KKSRecProxyModel :: columnCount (const QModelIndex& parent) const
     if (!sourceModel())
         return 0;
     QAbstractItemModel * sModel = sourceModel ();
-    return sModel->columnCount(mapToSource(parent));
+    QModelIndex sParent = mapToSource(parent);
+/*    KKSEIOData * dwp = sParent.isValid() ? sParent.data(Qt::UserRole+1).value<KKSEIOData *>() : 0;
+    if (!dwp || !dwp->isVisible())
+        return 0;*/
+    return sModel->columnCount(sParent);
 }
 
 QModelIndex KKSRecProxyModel::mapFromSource (const QModelIndex& sourceIndex) const
@@ -73,7 +86,11 @@ QModelIndex KKSRecProxyModel::mapFromSource (const QModelIndex& sourceIndex) con
     
     KKSEIOData * d = sourceIndex.data(Qt::UserRole+1).value<KKSEIOData *>();
     if (!d || !d->isVisible())
+    {
+        if (d)
+            qDebug () << __PRETTY_FUNCTION__ << "Record is not visible";
         return QModelIndex();
+    }
     
     bool v = d->isVisible();
     QModelIndex wIndex (sourceIndex.parent());
@@ -92,7 +109,11 @@ QModelIndex KKSRecProxyModel::mapFromSource (const QModelIndex& sourceIndex) con
     
     KKSEIOData * dw = wIndex.data(Qt::UserRole+1).value<KKSEIOData *>();
     if (!dw || !dw->isVisible())
+    {
+        if (dw)
+            qDebug () << __PRETTY_FUNCTION__ << "Record is not visible";
         v = false;
+    }
     if (!v)
         return QModelIndex();
     

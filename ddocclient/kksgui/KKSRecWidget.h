@@ -93,6 +93,8 @@ private slots:
     void delRec (void);
     void refreshRec (void);
     void hideRecord (void);
+    void viewAllRecs (void);
+    void viewRecsFromHere (void);
 
     void tvDoubleClicked(const QModelIndex & index);
 
@@ -102,6 +104,7 @@ private:
     //
     void setTreeView (QTreeView *_tv);
     void init_widgets (bool mode);
+    void setVisibleFrom (const QModelIndex & sParent=QModelIndex(), bool v=true);
 
 private:
     //

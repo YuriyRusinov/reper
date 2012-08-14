@@ -57,6 +57,8 @@ KKSRecWidget :: KKSRecWidget (QTreeView *tView, bool mode, QWidget *parent, Qt::
     connect (actDel, SIGNAL(triggered()), this, SLOT (delRec()) );
     connect (actRefresh, SIGNAL(triggered()), this, SLOT (refreshRec()) );
     connect (actHideRec, SIGNAL (triggered()), this, SLOT (hideRecord()) );
+    connect (actViewAll, SIGNAL (triggered()), this, SLOT (viewAllRecs()) );
+    connect (actViewOnlyFromHere, SIGNAL (triggered()), this, SLOT (viewRecsFromHere()) );
 
     connect (tView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(tvDoubleClicked(const QModelIndex &)));
 }
@@ -471,10 +473,63 @@ void KKSRecWidget :: hideRecord (void)
         return;
     qDebug () << __PRETTY_FUNCTION__;
     QModelIndex wIndex = getSourceIndex ();
+    QAbstractItemModel * sModel = getSourceModel ();
     KKSEIOData * d = wIndex.data (Qt::UserRole+1).value<KKSEIOData *>();
     if (!d)
         return;
     d->setVisible (false);
+    sModel->setData (wIndex, QVariant::fromValue<KKSEIOData *>(d), Qt::UserRole+1);
+ 
+    setVisibleFrom (wIndex, false);
+}
+
+void KKSRecWidget :: viewAllRecs (void)
+{
+    qDebug () << __PRETTY_FUNCTION__;
+    setVisibleFrom ();
+}
+
+void KKSRecWidget :: viewRecsFromHere (void)
+{
+    setVisibleFrom (QModelIndex(), false);
+    QItemSelection sel = tv->selectionModel()->selection();
+    if (sel.indexes().isEmpty())
+        return;
+    qDebug () << __PRETTY_FUNCTION__;
+    QModelIndex wIndex = getSourceIndex ();
+    QAbstractItemModel * sModel = getSourceModel ();
+    KKSEIOData * d = wIndex.data (Qt::UserRole+1).value<KKSEIOData *>();
+    if (!d)
+        return;
+    d->setVisible (true);
+    sModel->setData (wIndex, QVariant::fromValue<KKSEIOData *>(d), Qt::UserRole+1);
+
+    setVisibleFrom (wIndex, true);
+}
+
+void KKSRecWidget :: setVisibleFrom (const QModelIndex & sParent, bool v)
+{
+    QAbstractItemModel * sModel = getSourceModel ();
+    if (!sModel)
+        return;
+    KKSEIOData * dp = sParent.isValid() ? sModel->data (sParent, Qt::UserRole+1).value<KKSEIOData *>() : 0;
+    if (dp)
+        dp->setVisible (v);
+    int nr = sModel->rowCount (sParent);
+    for (int i=0; i<nr; i++)
+    {
+        QModelIndex wIndex = sModel->index (i, 0, sParent);
+        if (!wIndex.isValid ())
+            continue;
+        KKSEIOData * d = sModel->data(wIndex, Qt::UserRole+1).value<KKSEIOData *>();
+        if (d)
+        {
+            d->setVisible (v);
+            sModel->setData (wIndex, QVariant::fromValue<KKSEIOData *>(d), Qt::UserRole+1);
+        }
+        if (sModel->hasChildren (wIndex))
+            setVisibleFrom (wIndex, v);
+    }
 }
 
 void KKSRecWidget :: clearGroupMenu (void)
