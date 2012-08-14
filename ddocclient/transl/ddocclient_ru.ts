@@ -2150,6 +2150,10 @@ Do you want to save the changes before closing?</source>
         <source>Select attribute</source>
         <translation>Выберите атрибут</translation>
     </message>
+    <message>
+        <source>Generate automatically</source>
+        <translation>Генерировать автоматически</translation>
+    </message>
 </context>
 <context>
     <name>KKSCatEditor</name>
@@ -2929,6 +2933,62 @@ try to rename it with extention. Example: filename.vsd</source>
         <source>Cannot load %1.</source>
         <translation>Не могу загрузить %1.</translation>
     </message>
+    <message>
+        <source>Equal</source>
+        <translation>Равно</translation>
+    </message>
+    <message>
+        <source>Not equal</source>
+        <translation>Не равно</translation>
+    </message>
+    <message>
+        <source>Greather</source>
+        <translation>Больше</translation>
+    </message>
+    <message>
+        <source>Not fewer</source>
+        <translation>Не меньше</translation>
+    </message>
+    <message>
+        <source>Fewer</source>
+        <translation>Меньше</translation>
+    </message>
+    <message>
+        <source>Not greather</source>
+        <translation>Не больше</translation>
+    </message>
+    <message>
+        <source>Involve</source>
+        <translation>Включает в себя</translation>
+    </message>
+    <message>
+        <source>Not involve</source>
+        <translation>Не включает в себя</translation>
+    </message>
+    <message>
+        <source>Is null (NULL)</source>
+        <translation>Не имеет значения (NULL)</translation>
+    </message>
+    <message>
+        <source>Is not null (NOT NULL)</source>
+        <translation>Имеет значение (NOT NULL)</translation>
+    </message>
+    <message>
+        <source>Contain (LIKE &apos;%AAA%&apos;)</source>
+        <translation>Содержит (LIKE &apos;%AAA%&apos;)</translation>
+    </message>
+    <message>
+        <source>Start with (LIKE &apos;AAA%&apos;)</source>
+        <translation>Начинается с (LIKE &apos;AAA%&apos;)</translation>
+    </message>
+    <message>
+        <source>End with (LIKE &apos;%AAA&apos;)</source>
+        <translation>Оканчивается на (LIKE &apos;%AAA&apos;)</translation>
+    </message>
+    <message>
+        <source>Correspond to template (LIKE &apos;AAA&apos;)</source>
+        <translation>Соответствует шаблону (LIKE &apos;AAA&apos;)</translation>
+    </message>
 </context>
 <context>
     <name>KKSIncludesWidget</name>
@@ -3015,7 +3075,7 @@ try to rename it with extention. Example: filename.vsd</source>
     </message>
     <message>
         <source>&amp;Copy from rubric</source>
-        <translation>&amp;Копировать из рубрики</translation>
+        <translation type="obsolete">&amp;Копировать из рубрики</translation>
     </message>
 </context>
 <context>
@@ -4563,7 +4623,7 @@ Press OK to continue or Cancel to cancel the operation</source>
     <name>KKSRecWidget</name>
     <message>
         <source>&amp;Filter</source>
-        <translation>&amp;Поиск</translation>
+        <translation type="obsolete">&amp;Поиск</translation>
     </message>
     <message>
         <source>&amp;Add</source>
@@ -4604,6 +4664,46 @@ Press OK to continue or Cancel to cancel the operation</source>
     <message>
         <source>&amp;Refresh</source>
         <translation>&amp;Обновить</translation>
+    </message>
+    <message>
+        <source>Group &amp;By ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Create search query</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search by template</source>
+        <translation type="unfinished">Поиск по шаблону</translation>
+    </message>
+    <message>
+        <source>&amp;Group by...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View &amp;All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View only from &amp;here</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View current &amp;record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Hide record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Filter ...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6815,11 +6915,11 @@ Attributes:</source>
     </message>
     <message>
         <source>administrator</source>
-        <translation>Администратор</translation>
+        <translation type="obsolete">Администратор</translation>
     </message>
     <message>
         <source>operator</source>
-        <translation>Оператор</translation>
+        <translation type="obsolete">Оператор</translation>
     </message>
     <message>
         <source>Attribute reference</source>
@@ -6950,6 +7050,14 @@ Please contact your Systems Administrator and report this issue.</source>
     <message>
         <source>Time elapsed </source>
         <translation>Времени осталось</translation>
+    </message>
+    <message>
+        <source>Administrator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Operator</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

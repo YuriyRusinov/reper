@@ -425,8 +425,15 @@ void KKSEIODataModel :: setupData (KKSTreeItem * parent)
                 else
                 {
                     KKSTreeItem * parent1 = getModelItem (iVal, rootItem, pIndex);
-                    parent1->appendChild (t);
-                    prevItem = parent1;
+                    if(!parent1){ //такая ситуация вообще-то является странной, признак того, что что-то не так
+                        parent->appendChild(t);
+                        prevItem = 0;
+                    }
+                    else{
+                        parent1->appendChild (t);
+                        prevItem = parent1;
+                    }    
+                    
                 }
             }
             else

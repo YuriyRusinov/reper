@@ -569,6 +569,29 @@ void KKSRubricFactory :: viewAttachments (QAbstractItemModel * attachModel, cons
                     objModel->setData (wIndex, QDateTime::fromString(av->value().value(), Qt::ISODate).toString("dd.MM.yyyy hh:mm:ss"), Qt::DisplayRole);
                 else if (av->attribute()->type()->attrType() == KKSAttrType::atTime)
                     objModel->setData (wIndex, QDateTime::fromString(av->value().value(), Qt::ISODate).toString("hh:mm:ss"), Qt::DisplayRole);
+                else if (av->attribute()->type()->attrType() == KKSAttrType::atText ||
+                         av->attribute()->type()->attrType() == KKSAttrType::atString)
+                {
+                    //убираем спец. символы \n \r
+                    QString text;
+                    text = av->value().value();
+                    int index1 = text.indexOf('\n');
+                    int index2 = text.indexOf('\r');
+                    int index = -1;
+                    if(index1 > -1 || index2 > -1){
+                        if(index1 == -1)
+                            index = index2;
+                        if(index2 == -1)
+                            index = index1;
+                        if(index1 > -1 && index2 > -1)
+                            index = (index1 > index2) ? index2 : index1;
+                    }
+                    if(index > -1){
+                        text = text.left(index);
+                        text += " ...";
+                    }
+                    objModel->setData (wIndex, text, Qt::DisplayRole);
+                }
                 else
                     objModel->setData (wIndex, av->value().value(), Qt::DisplayRole);
             }

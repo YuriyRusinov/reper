@@ -207,11 +207,11 @@ void KKSFiltersEditorForm :: initFilterTypes (KKSAttrType::KKSAttrTypes type)
     if (type == KKSAttrType::atUndef)
         return;
 
-    oper = "=";
+    oper = tr("Equal");
     data = QVariant((int)KKSFilter::foEq);
     cbOper->addItem(oper, data);
 
-    oper = "<>";
+    oper = tr("Not equal");;
     data = QVariant((int)KKSFilter::foNotEq);
     cbOper->addItem(oper, data);
 
@@ -225,19 +225,19 @@ void KKSFiltersEditorForm :: initFilterTypes (KKSAttrType::KKSAttrTypes type)
         type == KKSAttrType::atText ||
         type == KKSAttrType::atFixString)
     {
-        oper = ">";
+        oper = tr("Greather");;
         data = QVariant((int)KKSFilter::foGr);
         cbOper->addItem(oper, data);
 
-        oper = ">=";
+        oper = tr("Not fewer");;
         data = QVariant((int)KKSFilter::foGrEq);
         cbOper->addItem(oper, data);
 
-        oper = "<";
+        oper = tr("Fewer");;
         data = QVariant((int)KKSFilter::foLess);
         cbOper->addItem(oper, data);
 
-        oper = "<=";
+        oper = tr("Not greather");;
         data = QVariant((int)KKSFilter::foLessEq);
         cbOper->addItem(oper, data);
     }
@@ -247,7 +247,16 @@ void KKSFiltersEditorForm :: initFilterTypes (KKSAttrType::KKSAttrTypes type)
         type == KKSAttrType::atFixString ||
         type == KKSAttrType::atXMLDoc)
     {
-        oper = "LIKE";
+        oper = tr("Contain (LIKE '%AAA%')");
+        data = QVariant((int)KKSFilter::foLikeIn);
+        cbOper->addItem(oper, data);
+        oper = tr("Start with (LIKE 'AAA%')");
+        data = QVariant((int)KKSFilter::foLikeStart);
+        cbOper->addItem(oper, data);
+        oper = tr("End with (LIKE '%AAA')");
+        data = QVariant((int)KKSFilter::foLikeEnd);
+        cbOper->addItem(oper, data);
+        oper = tr("Correspond to template (LIKE 'AAA')");
         data = QVariant((int)KKSFilter::foLike);
         cbOper->addItem(oper, data);
     }
@@ -255,20 +264,20 @@ void KKSFiltersEditorForm :: initFilterTypes (KKSAttrType::KKSAttrTypes type)
     if (type == KKSAttrType::atCheckList ||
         type == KKSAttrType::atCheckListEx)
     {
-        oper = "in";//tr ("Contains");
+        oper = tr("Involve");//tr ("Contains");
         data = QVariant ((int)KKSFilter::foIn);
         cbOper->addItem (oper, data);
 
-        oper = "not in";//tr ("Not Contains");
+        oper = tr("Not involve");//tr ("Not Contains");
         data = QVariant ((int)KKSFilter::foNotIn);
         cbOper->addItem (oper, data);
     }
 
-    oper = "IS NULL";
+    oper = tr("Is null (NULL)");
     data = QVariant((int)KKSFilter::foIsNull);
     cbOper->addItem(oper, data);
     
-    oper = "NOT NULL";
+    oper = tr("Is not null (NOT NULL)");
     data = QVariant((int)KKSFilter::foIsNotNull);
     cbOper->addItem(oper, data);
 
@@ -340,11 +349,8 @@ void KKSFiltersEditorForm :: initValuesWidgets (void)
     lEStrValue->setAlignment (Qt::AlignLeft | Qt::AlignTop);
     vLay2->addWidget (lEStrValue);
     chCaseSensitive = new QCheckBox (tr ("Case sensitive"), cWStr);
-    //
-    // In Linter 6.0 Search with russian text can be CaseSensitive only
-    //
-    chCaseSensitive->setCheckState (Qt::Checked);
-    chCaseSensitive->setEnabled (false);
+    //chCaseSensitive->setCheckState (Qt::Checked);
+    chCaseSensitive->setEnabled (true);
     vLay2->addWidget (chCaseSensitive);
     vLay2->addStretch ();
     stLayValue->insertWidget (1, cWStr);
@@ -375,11 +381,8 @@ void KKSFiltersEditorForm :: initValuesWidgets (void)
     teValue->setVerticalScrollBarPolicy (Qt::ScrollBarAsNeeded);
     chTextCaseSensitive = new QCheckBox (tr ("Case sensitive"), cWText);
     //chTextCaseSensitive->setSizePolicy (stp);
-    //
-    // In Linter 6.0 Search with russian text can be CaseSensitive only
-    //
-    chTextCaseSensitive->setCheckState (Qt::Checked);
-    chTextCaseSensitive->setEnabled (false);
+    //chTextCaseSensitive->setCheckState (Qt::Checked);
+    chTextCaseSensitive->setEnabled (true);
     vLay4->addWidget (teValue);
     vLay4->addWidget (chTextCaseSensitive);//, 0, Qt::AlignTop);
     vLay4->addStretch ();
@@ -577,9 +580,9 @@ void KKSFiltersEditorForm :: addFilter ()
         f = c->createFilter (a->id(), value, oper); // lEValue->text()
     else
     {
-        bool isLike = false;
-        if (oper == KKSFilter::foLike)
-            isLike = true;
+        //bool isLike = false;
+        //if (oper == KKSFilter::foLike)
+        //    isLike = true;
     
         KKSFilter::FilterOper operMain = KKSFilter::foInSQL;
 
@@ -820,47 +823,53 @@ QString KKSFiltersEditorForm :: parseFilter(const KKSFilter * f, const QString &
     KKSFilter::FilterOper oper = f->operation();
     bool cs = f->caseSensitive();
     
-    QString upper = QString(" upper(");
-    QString endUpper = QString(")");
+    //QString upper = QString(" upper(");
+    //QString endUpper = QString(")");
     
-    if(a->type()->attrType() != KKSAttrType::atString)
+    if(a->type()->attrType() != KKSAttrType::atString && 
+        a->type()->attrType() != KKSAttrType::atFixString && 
+        a->type()->attrType() != KKSAttrType::atText)
+    {
         cs = true;
-
-    QString code = a->code();
-    
-    if(cs){
-        upper = "";
-        endUpper = "";
     }
 
-    sql = upper;
+    //Для случая если используется оператор LIKE
+    QString sLike;
+    QString aVal; //сюда потом будем добавлять символ %, если необходимо
+    if(cs == true)
+        sLike = "LIKE";
+    else
+        sLike = "ILIKE";
+
+
+    QString code = a->code();
+
 
     if(tableName.isEmpty())
         sql += QString(" %1 ").arg(code);
     else
         sql += QString(" %1.%2 ").arg(tableName).arg(code);
     
-    sql += endUpper;
 
     QString str;
     switch (oper){
         case KKSFilter::foEq:
-            str += QString(" = %1%2%3").arg(upper).arg(values.at(0)->valueForInsert()).arg(endUpper);
+            str += QString(" = %1").arg(values.at(0)->valueForInsert());
             break;
         case KKSFilter::foGr:
-            str += QString(" > %1%2%3").arg(upper).arg(values.at(0)->valueForInsert()).arg(endUpper);
+            str += QString(" > %1").arg(values.at(0)->valueForInsert());
             break;
         case KKSFilter::foLess:
-            str += QString(" < %1%2%3").arg(upper).arg(values.at(0)->valueForInsert()).arg(endUpper);
+            str += QString(" < %1").arg(values.at(0)->valueForInsert());
             break;
         case KKSFilter::foGrEq:
-            str += QString(" >= %1%2%3").arg(upper).arg(values.at(0)->valueForInsert()).arg(endUpper);
+            str += QString(" >= %1").arg(values.at(0)->valueForInsert());
             break;
         case KKSFilter::foLessEq:
-            str += QString(" <= %1%2%3").arg(upper).arg(values.at(0)->valueForInsert()).arg(endUpper);
+            str += QString(" <= %1").arg(values.at(0)->valueForInsert());
             break;
         case KKSFilter::foNotEq:
-            str += QString(" <> %1%2%3").arg(upper).arg(values.at(0)->valueForInsert()).arg(endUpper);
+            str += QString(" <> %1").arg(values.at(0)->valueForInsert());
             break;
         case KKSFilter::foIsNull:
             str += QString(" is null");
@@ -883,7 +892,16 @@ QString KKSFiltersEditorForm :: parseFilter(const KKSFilter * f, const QString &
                         .arg(values.at(1)->valueForInsert());
             break;
         case KKSFilter::foLike:
-            str += QString(" like %1%2%3").arg(upper).arg(values.at(0)->valueForInsert()).arg(endUpper);
+            str += QString(" %1 %2").arg(sLike).arg(values.at(0)->valueForInsert());
+            break;
+        case KKSFilter::foLikeIn:
+            str += QString(" %1 %2").arg(sLike).arg("'%" + values.at(0)->value() + "%'");
+            break;
+        case KKSFilter::foLikeStart:
+            str += QString(" %1 %2").arg(sLike).arg("'" + values.at(0)->value() + "%'");
+            break;
+        case KKSFilter::foLikeEnd:
+            str += QString(" %1 %2").arg(sLike).arg("'%" + values.at(0)->value() + "'");
             break;
         default:
             break;
@@ -922,7 +940,7 @@ void KKSFiltersEditorForm :: setFilters (const KKSList<const KKSFilterGroup*> & 
     QModelIndex pIndex = mod->index (0, 0);
     QItemSelectionModel * sm = ui->twFilters->selectionModel ();
     sm->setCurrentIndex (pIndex, QItemSelectionModel::Select);
-    qDebug () << __PRETTY_FUNCTION__ << pIndex;
+    //qDebug () << __PRETTY_FUNCTION__ << pIndex;
     setFiltersModel (mod, pIndex, mainGroup);
     updateSQL ();
 }
@@ -1052,7 +1070,7 @@ void KKSFiltersEditorForm :: attrChanged (int index)
     int idAttrType;
     if (pa !=  m_attrsAll.constEnd())
     {
-        qDebug () << __PRETTY_FUNCTION__ << index << pa.key() << pa.value()->name() << pa.value()->code() << (pa.value()->type()==0 ? -1 :  pa.value()->type() ->attrType());
+        //qDebug () << __PRETTY_FUNCTION__ << index << pa.key() << pa.value()->name() << pa.value()->code() << (pa.value()->type()==0 ? -1 :  pa.value()->type() ->attrType());
 
         if (pa.value()->type()==0)
             return;
@@ -1205,7 +1223,7 @@ void KKSFiltersEditorForm :: setFiltersModel (QAbstractItemModel * mod, const QM
 
     int ngroups = parentGroup->groups().count ();
     int nfilt = parentGroup->filters().count ();
-    qDebug () << __PRETTY_FUNCTION__ << ngroups << nfilt;
+    //qDebug () << __PRETTY_FUNCTION__ << ngroups << nfilt;
     int nr = mod->rowCount (parent);
     int nc = mod->columnCount (parent);
     if (nr)
@@ -1244,7 +1262,11 @@ void KKSFiltersEditorForm :: setFiltersModel (QAbstractItemModel * mod, const QM
             case KKSFilter::foLess: operType = "<"; break;
             case KKSFilter::foGrEq: operType = ">="; break;
             case KKSFilter::foLessEq: operType = "<="; break;
-            case KKSFilter::foLike: operType = "like"; break;
+            case KKSFilter::foLike: 
+            case KKSFilter::foLikeIn:
+            case KKSFilter::foLikeStart:
+            case KKSFilter::foLikeEnd:
+                operType = "like"; break;
             case KKSFilter::foNotEq: operType = "<>"; break;
             case KKSFilter::foIsNull: operType = "is null"; break;
             case KKSFilter::foIsNotNull: operType = "is not null"; break;

@@ -134,7 +134,11 @@ bool KKSFilter::isCorrect() const
         case foLess:
         case foGrEq:
         case foLessEq:
+        
         case foLike:
+        case foLikeIn:
+        case foLikeStart:
+        case foLikeEnd:
             if(m_values.count() != 1)
                 bCorrect = false;
             break;

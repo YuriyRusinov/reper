@@ -2256,20 +2256,25 @@ QString KKSLoader::parseFilter(const KKSFilter * f, const QString & tableName, Q
     KKSFilter::FilterOper oper = f->operation();
     bool cs = f->caseSensitive();
     
-    QString upper = QString(" upper(");
-    QString endUpper = QString(")");
+    //QString upper = QString(" upper(");
+    //QString endUpper = QString(")");
     
-    if(a->type()->attrType() != KKSAttrType::atString)
+    if(a->type()->attrType() != KKSAttrType::atString && 
+        a->type()->attrType() != KKSAttrType::atFixString && 
+        a->type()->attrType() != KKSAttrType::atText)
+    {
         cs = true;
-
-    QString code = a->code(true);
-    
-    if(cs){
-        upper = "";
-        endUpper = "";
     }
 
-    sql = upper;
+    //Для случая если используется оператор LIKE
+    QString sLike;
+    QString aVal; //сюда потом будем добавлять символ %, если необходимо
+    if(cs == true)
+        sLike = "LIKE";
+    else
+        sLike = "ILIKE";
+
+    QString code = a->code(true);
 
     if(tableName.isEmpty())
         sql += QString(" %1 ").arg(code);
@@ -2310,41 +2315,39 @@ QString KKSLoader::parseFilter(const KKSFilter * f, const QString & tableName, Q
 */
 
 
-        sql += endUpper;
+        //sql += endUpper;
         qDebug () << __PRETTY_FUNCTION__ << sql;
         return sql;
     }
     else if (a->type()->attrType() == KKSAttrType::atCheckList)
     {
         sql += QString (" %1.%2 @> %3").arg(tableName).arg(code).arg (values.at(0)->valueForInsert());
-        sql += endUpper;
+        //sql += endUpper;
         qDebug () << __PRETTY_FUNCTION__ << sql;
         return sql;
     }
     else
         sql += QString(" %1.%2 ").arg(tableName).arg(code);
-    
-    sql += endUpper;
 
     QString str;
     switch (oper){
         case KKSFilter::foEq:
-            str += QString(" = %1%2%3").arg(upper).arg(values.at(0)->valueForInsert()).arg(endUpper);
+            str += QString(" = %1").arg(values.at(0)->valueForInsert());
             break;
         case KKSFilter::foGr:
-            str += QString(" > %1%2%3").arg(upper).arg(values.at(0)->valueForInsert()).arg(endUpper);
+            str += QString(" > %1").arg(values.at(0)->valueForInsert());
             break;
         case KKSFilter::foLess:
-            str += QString(" < %1%2%3").arg(upper).arg(values.at(0)->valueForInsert()).arg(endUpper);
+            str += QString(" < %1").arg(values.at(0)->valueForInsert());
             break;
         case KKSFilter::foGrEq:
-            str += QString(" >= %1%2%3").arg(upper).arg(values.at(0)->valueForInsert()).arg(endUpper);
+            str += QString(" >= %1").arg(values.at(0)->valueForInsert());
             break;
         case KKSFilter::foLessEq:
-            str += QString(" <= %1%2%3").arg(upper).arg(values.at(0)->valueForInsert()).arg(endUpper);
+            str += QString(" <= %1").arg(values.at(0)->valueForInsert());
             break;
         case KKSFilter::foNotEq:
-            str += QString(" <> %1%2%3").arg(upper).arg(values.at(0)->valueForInsert()).arg(endUpper);
+            str += QString(" <> %1").arg(values.at(0)->valueForInsert());
             break;
         case KKSFilter::foIsNull:
             str += QString(" is null");
@@ -2355,6 +2358,9 @@ QString KKSLoader::parseFilter(const KKSFilter * f, const QString & tableName, Q
         case KKSFilter::foIn:
             str += QString(" in (%1)").arg(f->constructForIn());
             break;
+        case KKSFilter::foNotIn:
+            str += QString(" not in (%1)").arg(f->constructForIn());
+            break;
         case KKSFilter::foInSQL:
             str += QString(" in (%1)").arg(values.at(0)->value());
             break;
@@ -2364,7 +2370,16 @@ QString KKSLoader::parseFilter(const KKSFilter * f, const QString & tableName, Q
                         .arg(values.at(1)->valueForInsert());
             break;
         case KKSFilter::foLike:
-            str += QString(" like %1%2%3").arg(upper).arg(values.at(0)->valueForInsert()).arg(endUpper);
+            str += QString(" %1 %2").arg(sLike).arg(values.at(0)->valueForInsert());
+            break;
+        case KKSFilter::foLikeIn:
+            str += QString(" %1 %2").arg(sLike).arg("'%" + values.at(0)->value() + "%'");
+            break;
+        case KKSFilter::foLikeStart:
+            str += QString(" %1 %2").arg(sLike).arg("'" + values.at(0)->value() + "%'");
+            break;
+        case KKSFilter::foLikeEnd:
+            str += QString(" %1 %2").arg(sLike).arg("'%" + values.at(0)->value() + "'");
             break;
         default:
             break;
@@ -3832,7 +3847,7 @@ KKSFilter * KKSLoader::loadCriterium (int idCriteria) const
     }
     KKSFilter::FilterOper op = (KKSFilter::FilterOper)res->getCellAsInt (0, 4);
     fc = new KKSFilter (attr, val, op);
-    fc->setCaseSensitive (true);
+    fc->setCaseSensitive (res->getCellAsBool(0, 5));
 
     val->release ();
     attr->release ();
