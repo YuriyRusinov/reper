@@ -15,13 +15,16 @@ insert into operations (id, name, the_value) values (5, 'Не больше', '<=');
 insert into operations (id, name, the_value) values (6, 'Включает в себя', 'in');
 insert into operations (id, name, the_value) values (7, 'Не включает в себя', 'not in');
 insert into operations (id, name, the_value) values (8, 'Между', 'between');
-insert into operations (id, name, the_value) values (9, 'Подобно (like)', 'like');
+insert into operations (id, name, the_value) values (9, 'Подобие по шаблону (LIKE)', 'like');
 insert into operations (id, name, the_value) values (10, 'Не равно', '<>');
 insert into operations (id, name, the_value) values (11, 'Не имеет значения', 'is null');
 insert into operations (id, name, the_value) values (12, 'Имеет значение', 'is not null');
 insert into operations (id, name, the_value) values (13, 'Включает результат выборки', 'in (select ...)');
+insert into operations (id, name, the_value) values (14, 'Содержит (LIKE)', 'like');
+insert into operations (id, name, the_value) values (15, 'Начинается на (LIKE)', 'like');
+insert into operations (id, name, the_value) values (16, 'Заканчивается на (LIKE)', 'like');
 
-SELECT pg_catalog.setval('public.operations_id_seq', 13, true);
+SELECT pg_catalog.setval('public.operations_id_seq', 16, true);
 
 
 insert into search_template_types (id, name, description) values(1, 'Общие поисковые запросы', NULL);

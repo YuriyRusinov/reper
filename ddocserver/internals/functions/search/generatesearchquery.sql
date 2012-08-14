@@ -340,8 +340,6 @@ declare
     code varchar;
     values varchar[];
     case_sensitive boolean;
-    upper_str varchar;
-    endupper_str varchar;
     search_pos int4;
     search_query varchar;
     rs record;
@@ -370,42 +368,59 @@ begin
             inner join attributes a on (f.attr_id = a.id) 
             inner join a_types at on (a.id_a_type=at.id) 
     loop
-        if (upper (r.atype) != 'VARCHAR') then
+        if (upper (r.atype) <> 'VARCHAR' and upper (r.atype) <> 'TEXT') then
             case_sensitive := true;
         else
             case_sensitive := r.case_sensitive;
         end if;
 
-        if (case_sensitive) then
-            upper_str := '';
-            endupper_str := '';
-        else
-            upper_str := ' upper(';
-            endupper_str := ' )';
-        end if;
         values := string_to_array (r.value, ',');
-        --raise notice 'parse filter parameters are % operation name % values %', r.id, quote_literal (r.operation_name), values;
+
+        --«адаем сравниваемый атрибут
         if (table_name is null or length (table_name)=0) then
             res_query := '"' || r.attr_code || '"';
         else
             res_query := table_name || '."' || r.attr_code || '"';
         end if;
 
-        if (r.id_operation < 13) then
+        --«адаем оператор сравнени€
+        if (r.id_operation <> 13 and 
+            r.id_operation <> 9 and 
+            r.id_operation <> 14 and 
+            r.id_operation <> 15 and 
+            r.id_operation <> 16
+           ) then
             res_query := res_query || ' ' || r.operation_name;
         elsif (r.id_operation = 13) then --in (select ...)
             res_query := res_query || ' in';
+        elsif ( r.id_operation = 9 or --это все операции LIKE («десь мы провер€ем на case_sensitive 
+                r.id_operation = 14 or -- и принимаем решение об использовании оператора LIKE или ILIKE)
+                r.id_operation = 15 or 
+                r.id_operation = 16
+              ) then
+            if(case_sensitive = true) then
+                res_query := res_query || ' LIKE ';
+            else
+                res_query := res_query || ' ILIKE ';
+            end if;
         end if;
 
+        --«адаем сравниваемое значение
         if (r.id_operation = 6 or --in
             r.id_operation = 7) then --not in
             res_query := res_query || ' (' || r.value || ')';
 
         elsif ( (r.id_operation >= 1 and r.id_operation <= 5) or r.id_operation = 10) then -- =  >  <  >=  <=  <> 
-            res_query := res_query || upper_str || ' ' || quote_literal(r.value) || endupper_str;
+            res_query := res_query || ' ' || quote_literal(r.value) || '';
             
-        elsif (r.id_operation = 9) then --like
-            res_query := res_query || upper_str || ' ' || quote_literal (r.value) || endupper_str;
+        elsif (r.id_operation = 9) then --like(value)
+            res_query := res_query || ' ' || quote_literal (r.value) || ' ';
+        elsif (r.id_operation = 14) then --like(%value%)
+            res_query := res_query || ' ' || quote_literal ('%' || r.value || '%') || ' ';
+        elsif (r.id_operation = 15) then --like(value%)
+            res_query := res_query || ' ' || quote_literal (r.value || '%') || ' ';
+        elsif (r.id_operation = 16) then --like(%value)
+            res_query := res_query || ' ' || quote_literal ('%' || r.value) || ' ';
             
         elsif (r.id_operation = 8) then --between
             if (array_upper (values, 1) < 2) then
