@@ -84,17 +84,19 @@ QModelIndex KKSRecProxyModel::mapFromSource (const QModelIndex& sourceIndex) con
     if (!sourceModel() || !sourceIndex.isValid())
         return QModelIndex();
     
-    KKSEIOData * d = sourceIndex.data(Qt::UserRole+1).value<KKSEIOData *>();
+    KKSEIOData * d = sourceModel()->data(sourceIndex, Qt::UserRole+1).value<KKSEIOData *>();
     if (!d || !d->isVisible())
     {
-        if (d)
+        //if (d)
             qDebug () << __PRETTY_FUNCTION__ << "Record is not visible";
         return QModelIndex();
     }
     
     bool v = d->isVisible();
+    if (!v)
+        qDebug () << __PRETTY_FUNCTION__ << sourceIndex << v;
     QModelIndex wIndex (sourceIndex.parent());
-    
+
     QPersistentModelIndex spIndex (sourceIndex);
     if (mapping.contains(spIndex))
         return mapping.value(spIndex);
@@ -107,11 +109,10 @@ QModelIndex KKSRecProxyModel::mapFromSource (const QModelIndex& sourceIndex) con
         return resIndex;//createIndex (sourceIndex.row(), sourceIndex.column(), sourceIndex.internalPointer());
     }
     
-    KKSEIOData * dw = wIndex.data(Qt::UserRole+1).value<KKSEIOData *>();
+    KKSEIOData * dw = sourceModel()->data(wIndex, Qt::UserRole+1).value<KKSEIOData *>();
     if (!dw || !dw->isVisible())
     {
-        if (dw)
-            qDebug () << __PRETTY_FUNCTION__ << "Record is not visible";
+        qDebug () << __PRETTY_FUNCTION__ << "Record is not visible";
         v = false;
     }
     if (!v)

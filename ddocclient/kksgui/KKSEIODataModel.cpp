@@ -245,7 +245,7 @@ QVariant KKSEIODataModel :: headerData (int section, Qt::Orientation orientation
 bool KKSEIODataModel :: setData (const QModelIndex& index, const QVariant& value, int role)
 {
     KKSTreeItem * wItem = getItem (index);
-    if (!wItem && role != Qt::UserRole+1)
+    if (!wItem )//&& role != Qt::UserRole+1)
         return false;
     
     int irow = index.row ();
@@ -422,6 +422,22 @@ void KKSEIODataModel :: setupData (KKSTreeItem * parent)
             {
                 if (prevItem && prevItem->id() == iVal)
                     prevItem->appendChild (t);
+                else if (prevItem)
+                {
+                    KKSTreeItem * p1 (0);
+                    while (prevItem && prevItem->id() != iVal && !p1)
+                    {
+                        prevItem = prevItem->parent();
+                        p1 = getModelItem (iVal, prevItem, pIndex);
+                    }
+                    if (!p1)
+                        parent->appendChild (t);
+                    else
+                    {
+                        prevItem = p1;
+                        prevItem->appendChild (t);
+                    }
+                }
                 else
                 {
                     KKSTreeItem * parent1 = getModelItem (iVal, rootItem, pIndex);
