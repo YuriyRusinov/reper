@@ -29,11 +29,22 @@ public:
     virtual QModelIndex mapFromSource (const QModelIndex& sourceIndex) const;
     virtual QModelIndex mapToSource (const QModelIndex& proxyIndex) const;
 
+    void setSourceModel (QAbstractItemModel * sourceMod);
+
+private slots:
+    void sourceDataChanged (const QModelIndex& topLeft, const QModelIndex& bottomRight);
+
+private:
+    //
+    // Functions
+    //
+    void fixModel (void);
 private:
     //
     // Variables
     //
     mutable QMap<QPersistentModelIndex, QPersistentModelIndex> mapping;
+    mutable QMap<QPersistentModelIndex, QPersistentModelIndex> mapParents;
 private:
     Q_OBJECT
 

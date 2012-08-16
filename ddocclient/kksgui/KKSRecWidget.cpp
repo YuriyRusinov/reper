@@ -481,6 +481,13 @@ void KKSRecWidget :: hideRecord (void)
     sModel->setData (wIndex, QVariant::fromValue<KKSEIOData *>(d), Qt::UserRole+1);
  
     setVisibleFrom (wIndex, false);
+    tv->update ();
+    QHeaderView * h = tv->header();
+    int sortSection = h->sortIndicatorSection();
+    Qt::SortOrder sOrder = h->sortIndicatorOrder();
+    QSortFilterProxyModel * mod = qobject_cast<QSortFilterProxyModel *> (tv->model ());
+    if (mod)
+        mod->sort (sortSection, sOrder);
 }
 
 void KKSRecWidget :: viewAllRecs (void)

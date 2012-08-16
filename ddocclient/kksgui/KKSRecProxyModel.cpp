@@ -83,8 +83,10 @@ QModelIndex KKSRecProxyModel::mapFromSource (const QModelIndex& sourceIndex) con
 {
     if (!sourceModel() || !sourceIndex.isValid())
         return QModelIndex();
-    
-    KKSEIOData * d = sourceModel()->data(sourceIndex, Qt::UserRole+1).value<KKSEIOData *>();
+
+    QAbstractItemModel * sModel = sourceModel ();
+    qDebug () << __PRETTY_FUNCTION__ << sourceIndex;
+    KKSEIOData * d = sModel->data(sourceIndex, Qt::UserRole+1).value<KKSEIOData *>();
     if (!d || !d->isVisible())
     {
         //if (d)
@@ -98,8 +100,11 @@ QModelIndex KKSRecProxyModel::mapFromSource (const QModelIndex& sourceIndex) con
     QModelIndex wIndex (sourceIndex.parent());
 
     QPersistentModelIndex spIndex (sourceIndex);
-    if (mapping.contains(spIndex))
+    if (mapping.contains(spIndex) && spIndex.data(Qt::UserRole+1).value<KKSEIOData *>()->isVisible())
+    {
+        qDebug () << __PRETTY_FUNCTION__ << "Mapping";
         return mapping.value(spIndex);
+    }
     
     if (!wIndex.isValid())
     {
@@ -109,7 +114,7 @@ QModelIndex KKSRecProxyModel::mapFromSource (const QModelIndex& sourceIndex) con
         return resIndex;//createIndex (sourceIndex.row(), sourceIndex.column(), sourceIndex.internalPointer());
     }
     
-    KKSEIOData * dw = sourceModel()->data(wIndex, Qt::UserRole+1).value<KKSEIOData *>();
+    KKSEIOData * dw = sModel->data(wIndex, Qt::UserRole+1).value<KKSEIOData *>();
     if (!dw || !dw->isVisible())
     {
         qDebug () << __PRETTY_FUNCTION__ << "Record is not visible";
@@ -138,3 +143,23 @@ QModelIndex KKSRecProxyModel::mapToSource (const QModelIndex& proxyIndex) const
         return sModel->index(proxyIndex.row(), proxyIndex.column(), mapToSource(proxyIndex.parent()));*/
 }
 
+void KKSRecProxyModel::setSourceModel (QAbstractItemModel * sourceMod)
+{
+    QAbstractProxyModel::setSourceModel (sourceMod);
+    fixModel ();
+    if (sourceMod)
+        connect (sourceMod, SIGNAL (dataChanged(const QModelIndex&, const QModelIndex&)),
+                 this,
+                 SLOT (sourceDataChanged(const QModelIndex&, const QModelIndex&)) );
+}
+
+void KKSRecProxyModel::sourceDataChanged (const QModelIndex& topLeft, const QModelIndex& bottomRight)
+{
+    qDebug () << __PRETTY_FUNCTION__ << topLeft << bottomRight;
+    mapping.clear ();
+}
+
+void KKSRecProxyModel::fixModel (void)
+{
+    qDebug () << __PRETTY_FUNCTION__;
+}
