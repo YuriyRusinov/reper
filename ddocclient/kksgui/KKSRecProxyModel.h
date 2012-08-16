@@ -38,13 +38,13 @@ private:
     //
     // Functions
     //
-    void fixModel (void);
+    void fixModel (const QModelIndex& psIndex= QModelIndex(), bool withClear=true);
 private:
     //
     // Variables
     //
     mutable QMap<QPersistentModelIndex, QPersistentModelIndex> mapping;
-    mutable QMap<QPersistentModelIndex, QPersistentModelIndex> mapParents;
+    mutable QMap<QPersistentModelIndex, QPersistentModelIndex> proxySourceParent;
 private:
     Q_OBJECT
 
