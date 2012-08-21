@@ -30,10 +30,11 @@ public:
     virtual QModelIndex mapToSource (const QModelIndex& proxyIndex) const;
 
     void setSourceModel (QAbstractItemModel * sourceMod);
+    virtual QVariant headerData (int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
-private slots:
-    void sourceDataChanged (const QModelIndex& topLeft, const QModelIndex& bottomRight);
-
+public slots:
+    void setVisibleItems (bool v=false);
+    
 private:
     //
     // Functions
@@ -45,6 +46,7 @@ private:
     //
     mutable QMap<QPersistentModelIndex, QPersistentModelIndex> mapping;
     mutable QMap<QPersistentModelIndex, QPersistentModelIndex> proxySourceParent;
+    bool hideItems;
 private:
     Q_OBJECT
 

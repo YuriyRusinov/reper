@@ -6,9 +6,11 @@
  */
 
 #include <KKSEIOData.h>
+#include <KKSTreeItem.h>
 #include "KKSRecProxyModel.h"
 
-KKSRecProxyModel :: KKSRecProxyModel(QObject * parent) : QAbstractProxyModel (parent)
+KKSRecProxyModel :: KKSRecProxyModel(QObject * parent) : QAbstractProxyModel (parent),
+        hideItems (false)
 {
     fixModel ();
 }
@@ -76,20 +78,27 @@ int KKSRecProxyModel :: rowCount (const QModelIndex& parent) const
     if (!sourceModel())
         return 0;
     QModelIndex sourceParent;
-    if (parent.isValid())
-        sourceParent = mapToSource(parent);
+//    if (parent.isValid())
+    sourceParent = mapToSource(parent);
+    if (parent.isValid() && !sourceParent.isValid())
+        return 0;
     int count = 0;
-    QMapIterator<QPersistentModelIndex, QPersistentModelIndex> it(proxySourceParent);
-    while (it.hasNext()) {
-        it.next();
-        KKSEIOData * d = it.value().data (Qt::UserRole+1).value<KKSEIOData *>();
+    QMap<QPersistentModelIndex, QPersistentModelIndex>::const_iterator it = proxySourceParent.constBegin();
+    for (; it != proxySourceParent.constEnd(); it++)
+    {
+        KKSTreeItem * wItem = static_cast<KKSTreeItem *>(it.value().internalPointer());
+        KKSEIOData * d = wItem ? wItem->getData() : 0;//.data (Qt::UserRole+1).value<KKSEIOData *>();
         if (it.value() == sourceParent && (!d || (d && d->isVisible())) )
             count++;
+        //else if (!d || !d->isVisible() )
+        //{
+        //    qDebug () << __PRETTY_FUNCTION__ << count;
+        //}
     }
     if (parent.isValid())
         qDebug () << __PRETTY_FUNCTION__ << count << parent;
-    else
-        qDebug () << __PRETTY_FUNCTION__ << count;
+    //else
+    //    qDebug () << __PRETTY_FUNCTION__ << count;
         
     return count;
  
@@ -105,6 +114,11 @@ int KKSRecProxyModel :: columnCount (const QModelIndex& parent) const
         return 0;
     QAbstractItemModel * sModel = sourceModel ();
     QModelIndex sParent = mapToSource(parent);
+    if (parent.isValid() && !sParent.isValid())
+    {
+        qDebug () << __PRETTY_FUNCTION__ << "Invalid indices";
+        return 0;
+    }
 /*    KKSEIOData * dwp = sParent.isValid() ? sParent.data(Qt::UserRole+1).value<KKSEIOData *>() : 0;
     if (!dwp || !dwp->isVisible())
         return 0;*/
@@ -116,7 +130,9 @@ QModelIndex KKSRecProxyModel::mapFromSource (const QModelIndex& sourceIndex) con
     if (!sourceModel() || !sourceIndex.isValid())
         return QModelIndex();
 
-    return mapping.value(sourceIndex);
+    QModelIndex pInd = mapping.value(sourceIndex, QModelIndex());
+    //qDebug () << __PRETTY_FUNCTION__ << pInd << sourceIndex;
+    return pInd;
 /*    QAbstractItemModel * sModel = sourceModel ();
     qDebug () << __PRETTY_FUNCTION__ << sourceIndex;
     KKSEIOData * d = sModel->data(sourceIndex, Qt::UserRole+1).value<KKSEIOData *>();
@@ -165,9 +181,13 @@ QModelIndex KKSRecProxyModel::mapFromSource (const QModelIndex& sourceIndex) con
 
 QModelIndex KKSRecProxyModel::mapToSource (const QModelIndex& proxyIndex) const
 {
-    if (!proxyIndex.isValid())
-        return QModelIndex();
-    return mapping.key(proxyIndex);
+//    if (!proxyIndex.isValid())
+//        return QModelIndex();
+    QList<QPersistentModelIndex> sInds = mapping.keys(proxyIndex);
+    QModelIndex sInd = mapping.key(proxyIndex, QModelIndex());
+    if (sInds.count() > 1 )
+        qDebug () << __PRETTY_FUNCTION__ << proxyIndex << sInds;// << mapping.keys();
+    return sInd;
 /*    QAbstractItemModel * sModel = sourceModel ();
     //qDebug () << __PRETTY_FUNCTION__ << proxyIndex;
     if ( !sModel || !proxyIndex.isValid())
@@ -184,17 +204,14 @@ void KKSRecProxyModel::setSourceModel (QAbstractItemModel * sourceMod)
 {
     QAbstractProxyModel::setSourceModel (sourceMod);
     fixModel ();
-    if (sourceMod)
-        connect (sourceMod, SIGNAL (dataChanged(const QModelIndex&, const QModelIndex&)),
-                 this,
-                 SLOT (sourceDataChanged(const QModelIndex&, const QModelIndex&)) );
 }
 
-void KKSRecProxyModel::sourceDataChanged (const QModelIndex& topLeft, const QModelIndex& bottomRight)
+void KKSRecProxyModel::setVisibleItems (bool v)
 {
-    qDebug () << __PRETTY_FUNCTION__ << topLeft << bottomRight;
-    fixModel ();//topLeft, true);
+    hideItems = v;
+    fixModel ();
 }
+
 
 void KKSRecProxyModel::fixModel (const QModelIndex& psIndex, bool withClear)
 {
@@ -214,23 +231,42 @@ void KKSRecProxyModel::fixModel (const QModelIndex& psIndex, bool withClear)
     {
         QModelIndex wIndex = sModel->index (i, 0, psIndex);
         KKSEIOData * d = sModel->data (wIndex, Qt::UserRole+1).value<KKSEIOData *>();
-        if (!d || !d->isVisible())
+        //Q_UNUSED (d);
+/*        if (!d || !d->isVisible())
         {
             qDebug () << __PRETTY_FUNCTION__ << "Data is invisible" << i << wIndex << psIndex;
+            QModelIndex proxy = createIndex (ir, 0, wIndex.internalPointer());
+            proxySourceParent.insert (proxy, psIndex);
+            ir++;
+            //mapping.insert (QPersistentModelIndex (wIndex), proxy);
             continue;
-        }
+        }*/
         for (int j=0; j<nc; j++)
         {
             QModelIndex proxy = createIndex (ir, j, wIndex.internalPointer());
-            mapping.insert (QPersistentModelIndex (wIndex.sibling(i, j)), proxy);
-            //QModelIndex sourceParent;
-            //if (psIndex.isValid())
-            //    sourceParent = psIndex;
+            if (d && d->isVisible())
+                mapping.insert (QPersistentModelIndex (wIndex.sibling(i, j)), proxy);
+            QModelIndex sourceParent;
+            if (psIndex.parent().isValid() && hideItems)
+                sourceParent = psIndex.parent();
+            else if (!hideItems)
+                sourceParent = psIndex;
             if (j==0)
-                proxySourceParent.insert (proxy, psIndex);//sourceParent);
+                proxySourceParent.insert (proxy, sourceParent);
         }
         if (sModel->rowCount (wIndex) > 0)
             fixModel (wIndex, false);
         ir++;
     }
+}
+
+QVariant KKSRecProxyModel::headerData (int section, Qt::Orientation orientation, int role) const
+{
+    if (!sourceModel() || section < 0)
+        return QVariant ();
+    QAbstractItemModel * sModel = sourceModel ();
+    QVariant hData = sModel->headerData (section, orientation, role);
+    if (hData.isNull() && role == Qt::DisplayRole)
+        qDebug () << __PRETTY_FUNCTION__ << section << orientation << role;
+    return hData;
 }

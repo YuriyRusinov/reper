@@ -22,6 +22,7 @@
 #include "KKSSortFilterProxyModel.h"
 #include <KKSEIOData.h>
 #include <KKSAttribute.h>
+#include "KKSRecProxyModel.h"
 #include "KKSRecWidget.h"
 
 KKSRecWidget :: KKSRecWidget (QTreeView *tView, bool mode, QWidget *parent, Qt::WindowFlags f)
@@ -49,6 +50,7 @@ KKSRecWidget :: KKSRecWidget (QTreeView *tView, bool mode, QWidget *parent, Qt::
     actSetView (new QAction (QIcon(":/ddoc/apply_template.png"), tr("Apply template"), this))
 {
     tView->setParent (this);
+    tView->setSelectionBehavior (QAbstractItemView::SelectRows);
     //Q_INIT_RESOURCE (kksgui_icon_set);
     this->init_widgets (mode);
 
@@ -488,17 +490,29 @@ void KKSRecWidget :: hideRecord (void)
     QSortFilterProxyModel * mod = qobject_cast<QSortFilterProxyModel *> (tv->model ());
     if (mod)
         mod->sort (sortSection, sOrder);
+    QAbstractProxyModel * sortSourceModel = qobject_cast<QAbstractProxyModel *>(getModel());
+    if (!sortSourceModel)
+        return;
+    KKSRecProxyModel * prModel = qobject_cast<KKSRecProxyModel *>(sortSourceModel->sourceModel());
+    if (prModel)
+        prModel->setVisibleItems (true);
 }
 
 void KKSRecWidget :: viewAllRecs (void)
 {
     qDebug () << __PRETTY_FUNCTION__;
     setVisibleFrom ();
+    QAbstractProxyModel * sortSourceModel = qobject_cast<QAbstractProxyModel *>(getModel());
+    if (!sortSourceModel)
+        return;
+    KKSRecProxyModel * prModel = qobject_cast<KKSRecProxyModel *>(sortSourceModel->sourceModel());
+    if (prModel)
+        prModel->setVisibleItems (false);
 }
 
 void KKSRecWidget :: viewRecsFromHere (void)
 {
-    setVisibleFrom (QModelIndex(), false);
+//    setVisibleFrom (QModelIndex(), false);
     QItemSelection sel = tv->selectionModel()->selection();
     if (sel.indexes().isEmpty())
         return;
@@ -511,7 +525,20 @@ void KKSRecWidget :: viewRecsFromHere (void)
     d->setVisible (true);
     sModel->setData (wIndex, QVariant::fromValue<KKSEIOData *>(d), Qt::UserRole+1);
 
-    setVisibleFrom (wIndex, true);
+    for (int i=0; i<sModel->rowCount(wIndex.parent()); i++)
+    {
+        bool isV (i == wIndex.row());
+        QModelIndex wpInd = sModel->index (i, 0, wIndex.parent());
+        setVisibleFrom (wpInd, isV);
+    }
+    QAbstractProxyModel * sortSourceModel = qobject_cast<QAbstractProxyModel *>(getModel());
+    if (!sortSourceModel)
+        return;
+    KKSRecProxyModel * prModel = qobject_cast<KKSRecProxyModel *>(sortSourceModel->sourceModel());
+    if (prModel)
+        prModel->setVisibleItems (true);
+    //setVisibleFrom (wIndex, false);
+    //setVisibleFrom (wIndex, true);
 }
 
 void KKSRecWidget :: setVisibleFrom (const QModelIndex & sParent, bool v)

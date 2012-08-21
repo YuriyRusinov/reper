@@ -233,7 +233,7 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
 QVariant KKSEIODataModel :: headerData (int section, Qt::Orientation orientation, int role) const
 {
     KKSList<KKSAttrView*> avList = tRef ? tRef->sortedAttrs() : KKSList<KKSAttrView*>();
-    if (orientation == Qt::Horizontal && section >= 0 && section < avList.count() && role == Qt::DisplayRole)
+    if (orientation == Qt::Horizontal && section >= 0 && section < avList.count() && ((role == Qt::DisplayRole) || (role == Qt::EditRole)) )
     {
         QVariant v = avList[section]->title();
         return v;
