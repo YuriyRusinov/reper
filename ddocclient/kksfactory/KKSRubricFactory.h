@@ -46,6 +46,7 @@ class _F_EXPORT KKSRubricFactory : public KKSEntityFactory
     private slots:
         void saveRubric (KKSRubric * rootR, bool isMyDocs);
         void rubricItemUpload (void);
+		void rubricItemCreate (const KKSRubric * r);
         void openRubricItem (int idObject);
         void loadRubricPrivilegies (RubricForm * rForm);
         void loadSearchTemplate (RubricForm * rForm);

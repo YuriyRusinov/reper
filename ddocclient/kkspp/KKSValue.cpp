@@ -349,15 +349,32 @@ QDateTime KKSValue::stringToDateTime(const QString & s)
 {
     QDateTime dt;
 
+    //проверим, содержит ли значение время
+	if(!s.contains(" ") && !s.contains("T")){
+		//т.е. у нас есть только дата
+		QDate d = stringToDate(s);
+		if(!d.isValid())
+			return dt;
+
+		dt.setDate(d);
+		dt.setTime(QTime::fromString("00:00:00"));
+		return dt;
+	}
     //сначала пробуем взять из указанного формата
-    dt = QDateTime::fromString(s, "dd.MM.yyyy HH:mm:ss");
+	if(s.contains("T"))
+		dt = QDateTime::fromString(s, "dd.MM.yyyyTHH:mm:ss");
+	else
+        dt = QDateTime::fromString(s, "dd.MM.yyyy HH:mm:ss");
     
     if(!dt.isValid()){
         //потом попробуем взять из текущей локали
         QLocale l = QLocale::system();
         QString formatDate = l.dateFormat(QLocale::ShortFormat);
         QString formatTime = l.timeFormat(QLocale::ShortFormat);
-        dt = QDateTime::fromString(s, formatDate + " " + formatTime);
+        if(s.contains("T"))
+		    dt = QDateTime::fromString(s, formatDate + "T" + formatTime);
+		else
+			dt = QDateTime::fromString(s, formatDate + " " + formatTime);
     }
     else
         return dt;
@@ -408,14 +425,70 @@ QDateTime KKSValue::stringToDateTime(const QString & s)
     return dt;
 }
 
+QDate KKSValue::stringToDate(const QString & s)
+{
+    QDate dt;
+
+    //сначала пробуем взять из указанного формата
+    dt = QDate::fromString(s, "dd.MM.yyyy");
+    
+    if(!dt.isValid()){
+        //потом попробуем взять из текущей локали
+        QLocale l = QLocale::system();
+        QString formatDate = l.dateFormat(QLocale::ShortFormat);
+        dt = QDate::fromString(s, formatDate);
+    }
+    else
+        return dt;
+    
+    //потом из ISODate
+    if(!dt.isValid()){
+        dt = QDate::fromString(s, Qt::ISODate);
+    }    
+    else
+        return dt;
+
+    //потом из TextDate
+    if(!dt.isValid()){
+        dt = QDate::fromString(s, Qt::TextDate);
+    }
+    else
+        return dt;
+
+    //if(!dt.isValid())
+    //      qWarning() << "Datetime cannot be parsed! String = " << s;
+
+    return dt;
+}
+
+QTime KKSValue::stringToTime(const QString & s)
+{
+
+    QTime _t;
+    _t = QTime::fromString (s, "HH:mm:ss");
+
+    if(!_t.isValid()){
+        //потом попробуем взять из текущей локали
+        QLocale l = QLocale::system();
+        QString formatTime = l.timeFormat(QLocale::ShortFormat);
+        _t = QTime::fromString(s, formatTime);
+    }
+
+    if (!_t.isValid())
+        _t = QTime::fromString(s, Qt::ISODate);
+
+    if (!_t.isValid())
+        _t = QTime::fromString(s, Qt::TextDate);
+
+    return _t;
+}
+
 int KKSValue::setValue(const QString & _value, int _type)
 {
     m_type = _type;
 
     KKSAttrType::KKSAttrTypes a_type = (KKSAttrType::KKSAttrTypes) m_type;
-    if((a_type == KKSAttrType::atDateTime ||
-       a_type == KKSAttrType::atDate ||
-       a_type == KKSAttrType::atTime ) &&
+    if(a_type == KKSAttrType::atDateTime &&
        _value != "current_timestamp")
     {
         if(_value.isEmpty()){
@@ -429,7 +502,37 @@ int KKSValue::setValue(const QString & _value, int _type)
         //qDebug () << __PRETTY_FUNCTION__ << dt << _value;
         m_value = dt;
     }
-    else if(a_type == KKSAttrType::atBool){
+    else if(a_type == KKSAttrType::atDate  &&
+       _value != "current_timestamp" &&
+	   _value != "current_date")
+    {
+        if(_value.isEmpty()){
+            m_value = _value;
+            m_columnValue = m_value.toString();
+            verify();
+            return OK_CODE;
+        }
+        
+        QDate dt = stringToDate(_value);
+        //qDebug () << __PRETTY_FUNCTION__ << dt << _value;
+        m_value = dt;
+    }
+    else if(a_type == KKSAttrType::atTime  &&
+       _value != "current_timestamp" &&
+	   _value != "current_time")
+    {
+        if(_value.isEmpty()){
+            m_value = _value;
+            m_columnValue = m_value.toString();
+            verify();
+            return OK_CODE;
+        }
+        
+        QTime dt = stringToTime(_value);
+        //qDebug () << __PRETTY_FUNCTION__ << dt << _value;
+        m_value = dt;
+    }
+	else if(a_type == KKSAttrType::atBool){
         QString s = _value.toLower();
         if(s == "t" || s == "true" || s == "1"){
             m_value = QVariant(true);

@@ -688,6 +688,864 @@ Please specify a UNIQUE name for this color.</source>
     </message>
 </context>
 <context>
+    <name>DBSynchronizer</name>
+    <message>
+        <source>Warning</source>
+        <translation>Внимание</translation>
+    </message>
+    <message>
+        <source>You are already successfully connected to SIU database!</source>
+        <translation>Вы успешно подключились к БД СИУ!</translation>
+    </message>
+    <message>
+        <source>Start downloading file %1 ...
+</source>
+        <translation>Начинаю скачивание файла %1 ...
+</translation>
+    </message>
+    <message>
+        <source>File %1 was successfully downloaded!
+</source>
+        <translation>Файл %1 успешно скачан!
+</translation>
+    </message>
+    <message>
+        <source>Connecting to SIU database...
+</source>
+        <translation>Соединяемся с БД СИУ ...
+</translation>
+    </message>
+    <message>
+        <source>Successfull connecting to SIU database!
+</source>
+        <translation>Успешно соединились с БД СИУ!
+</translation>
+    </message>
+    <message>
+        <source>An ERROR was occured while connecting to SIU database!
+</source>
+        <translation>Произошла ОШИБКА в процессе соединения с БД СИУ!
+</translation>
+    </message>
+    <message>
+        <source>
+ ========================
+</source>
+        <translation>
+ ========================
+</translation>
+    </message>
+    <message>
+        <source>
+Start querying SIU database...
+</source>
+        <translation>
+Начинаю опрос БД СИУ...
+</translation>
+    </message>
+    <message>
+        <source>
+ ++++++++++++++++++++++ 
+</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>
+End of querying SIU database.
+</source>
+        <translation>
+Опрос БД СИУ закончен.
+</translation>
+    </message>
+    <message>
+        <source>An ERROR was occured while updating start date filter in DynamicDocs database! 
+</source>
+        <translation>Произошла ОШИБКА в процессе обновления начальной даты в фильтре опроса БД СИУ (в таблице DynamicDocs Server)!
+</translation>
+    </message>
+    <message>
+        <source>An ERROR was occured while inserting IO in DynamicDocs database!
+</source>
+        <translation>Произошла ОШИБКА в процессе создания ИО в DynamicDocs Server!
+</translation>
+    </message>
+    <message>
+        <source>An ERROR was occured while inserting metadata values for IO in DynamicDocs database!
+</source>
+        <translation>Произошла ОШИБКА в процессе создания значений атрибутов ИО в DynamicDocs Server!
+</translation>
+    </message>
+    <message>
+        <source>An ERROR was occured while uploading file in DynamicDocs database!
+</source>
+        <translation>Произошла ОШИБКА в процессе загрузки файла в DynamicDocs Server!
+</translation>
+    </message>
+    <message>
+        <source>An ERROR was occured while inserting file in DynamicDocs database!
+</source>
+        <translation>Произошла ОШИБКА в процессе создания метаданных файла в DynamicDocs Server!
+</translation>
+    </message>
+    <message>
+        <source>An ERROR was occured while assigning file to IO in DynamicDocs database!
+</source>
+        <translation>Произошла ОШИБКА в процессе создания связи между ИО и файлом в DynamicDocs Server!
+</translation>
+    </message>
+    <message>
+        <source>An ERROR was occured while creating IO from ETK in DynamicDocs database!
+</source>
+        <translation>Произошла ОШИБКА в процессе создания ИО из ЭТК в DynamicDocs Server!
+</translation>
+    </message>
+    <message>
+        <source>ETK UID = %1</source>
+        <translation type="obsolete">ЭТК UID = %1
+</translation>
+    </message>
+    <message>
+        <source>An ERROR was occured while creating IO from GMO in DynamicDocs database!
+</source>
+        <translation>Произошла ОШИБКА в процессе создания ИО из ГМО в DynamicDocs Server!
+</translation>
+    </message>
+    <message>
+        <source>GMO UID = %1 
+</source>
+        <translation>ГМО UID = %1
+</translation>
+    </message>
+    <message>
+        <source>An ERROR was occured while creating IO from NVO in DynamicDocs database!
+</source>
+        <translation>Произошла ОШИБКА в процессе создания ИО из НВО в DynamicDocs Server!
+</translation>
+    </message>
+    <message>
+        <source>NVO UID = %1</source>
+        <translation type="obsolete">НВО UID = %1
+</translation>
+    </message>
+    <message>
+        <source>An ERROR was occured while creating IO from EOIRD in DynamicDocs database!
+</source>
+        <translation>Произошла ОШИБКА в процессе создания ИО из ЭОИРД в DynamicDocs Server!
+</translation>
+    </message>
+    <message>
+        <source>EOIRD UID = %1</source>
+        <translation type="obsolete">ЭОИРД UID = %1
+</translation>
+    </message>
+    <message>
+        <source>An ERROR was occured while creating IO from EFO in DynamicDocs database!
+</source>
+        <translation>Произошла ОШИБКА в процессе создания ИО из ЭФО в DynamicDocs Server!
+</translation>
+    </message>
+    <message>
+        <source>EFO UID = %1</source>
+        <translation type="obsolete">ЭФО UID = %1
+</translation>
+    </message>
+    <message>
+        <source>An ERROR was occured while creating IO from UGSH in DynamicDocs database!
+</source>
+        <translation>Произошла ОШИБКА в процессе создания ИО из Ук.ГШ в DynamicDocs Server!
+</translation>
+    </message>
+    <message>
+        <source>UGSH UID = %1</source>
+        <translation type="obsolete">Ук. ГШ UID = %1
+</translation>
+    </message>
+    <message>
+        <source>An ERROR was occured while creating IO from TTX in DynamicDocs database!
+</source>
+        <translation>Произошла ОШИБКА в процессе создания ИО из ТТХ в DynamicDocs Server!
+</translation>
+    </message>
+    <message>
+        <source>TTX UID = %1</source>
+        <translation type="obsolete">ТТХ UID = %1
+</translation>
+    </message>
+    <message>
+        <source>An ERROR was occured while creating IO from PG in DynamicDocs database!
+</source>
+        <translation>Произошла ОШИБКА в процессе создания ИО из План-графика в DynamicDocs Server!
+</translation>
+    </message>
+    <message>
+        <source>PG UID = %1</source>
+        <translation type="obsolete">План-график UID = %1
+</translation>
+    </message>
+    <message>
+        <source>An ERROR was occured while creating IO from POR in DynamicDocs database!
+</source>
+        <translation>Произошла ОШИБКА в процессе создания ИО из ПОР в DynamicDocs Server!
+</translation>
+    </message>
+    <message>
+        <source>POR UID = %1</source>
+        <translation type="obsolete">ПОР UID = %1
+</translation>
+    </message>
+    <message>
+        <source>An ERROR was occured while creating IO from RBP in DynamicDocs database!
+</source>
+        <translation>Произошла ОШИБКА в процессе создания ИО из РБП в DynamicDocs Server!
+</translation>
+    </message>
+    <message>
+        <source>RBP UID = %1</source>
+        <translation type="obsolete">РБП UID = %1
+</translation>
+    </message>
+    <message>
+        <source>An ERROR was occured while creating IO from REQ in DynamicDocs database!
+</source>
+        <translation>Произошла ОШИБКА в процессе создания ИО из Заявки на ИО ВТО в DynamicDocs Server!
+</translation>
+    </message>
+    <message>
+        <source>REQ UID = %1</source>
+        <translation type="obsolete">Заявка UID = %1
+</translation>
+    </message>
+    <message>
+        <source>An ERROR was occured while creating IO from OP VTO in DynamicDocs database!
+</source>
+        <translation>Произошла ОШИБКА в процессе создания ИО из Выписки ОП ВТО в DynamicDocs Server!
+</translation>
+    </message>
+    <message>
+        <source>OP VTO UID = %1</source>
+        <translation type="obsolete">Выписка ОП ВТО UID = %1
+</translation>
+    </message>
+    <message>
+        <source>Querying ETK...
+</source>
+        <translation>Опрашиваем имеющиеся ЭТК...
+</translation>
+    </message>
+    <message>
+        <source>ETK was not found in SUI database!
+</source>
+        <translation>ЭТК не найдены в БД СИУ!
+</translation>
+    </message>
+    <message>
+        <source>Found %1 ETK in SUI database!
+</source>
+        <translation>Найдено %1 ЭТК в БД СИУ!
+</translation>
+    </message>
+    <message>
+        <source>Start inserting ETK in DynamicDocs database...
+</source>
+        <translation>Начинаю создание ЭТК в БД DynamicDocs Server...
+</translation>
+    </message>
+    <message>
+        <source>An ERROR was occured while inserting ETK in DynamicDocs database!
+</source>
+        <translation>Произошла ОШИБКА в процессе создания ЭТК в DynamicDocs Server!
+</translation>
+    </message>
+    <message>
+        <source>Successfull inserting ETK in DynamicDocs database!
+</source>
+        <translation>ЭТК успешно создана в БД DynamicDocs!
+</translation>
+    </message>
+    <message>
+        <source>Querying GMO...
+</source>
+        <translation>Опрашиваем имеющиеся ГМО...
+</translation>
+    </message>
+    <message>
+        <source>GMO was not found in SUI database!
+</source>
+        <translation>ГМО не найдены в БД СИУ!
+</translation>
+    </message>
+    <message>
+        <source>Found %1 GMO in SUI database!
+</source>
+        <translation>Найдено %1 ГМО в БД СИУ!
+</translation>
+    </message>
+    <message>
+        <source>Start inserting GMO in DynamicDocs database...
+</source>
+        <translation>Начинаю создание ГМО в БД DynamicDocs Server...
+</translation>
+    </message>
+    <message>
+        <source>An ERROR was occured while inserting GMO in DynamicDocs database!
+</source>
+        <translation>Произошла ОШИБКА в процессе создания ГМО в DynamicDocs Server!
+</translation>
+    </message>
+    <message>
+        <source>Successfull inserting GMO in DynamicDocs database!
+</source>
+        <translation>ГМО успешно создана в БД DynamicDocs!
+</translation>
+    </message>
+    <message>
+        <source>Querying NVO...
+</source>
+        <translation>Опрашиваем имеющиеся НВО...
+</translation>
+    </message>
+    <message>
+        <source>NVO was not found in SUI database!
+</source>
+        <translation>НВО не найдены в БД СИУ!
+</translation>
+    </message>
+    <message>
+        <source>Found %1 NVO in SUI database!
+</source>
+        <translation>Найдено %1 НВО в БД СИУ!
+</translation>
+    </message>
+    <message>
+        <source>Start inserting NVO in DynamicDocs database...
+</source>
+        <translation>Начинаю создание НВО в БД DynamicDocs Server...
+</translation>
+    </message>
+    <message>
+        <source>An ERROR was occured while inserting NVO in DynamicDocs database!
+</source>
+        <translation>Произошла ОШИБКА в процессе создания НВО в DynamicDocs Server!
+</translation>
+    </message>
+    <message>
+        <source>Successfull inserting NVO in DynamicDocs database!
+</source>
+        <translation>НВО успешно создана в БД DynamicDocs!
+</translation>
+    </message>
+    <message>
+        <source>Querying EOIRD...
+</source>
+        <translation>Опрашиваем имеющиеся ЭОИРД...
+</translation>
+    </message>
+    <message>
+        <source>EOIRD was not found in SUI database!
+</source>
+        <translation>ЭОИРД не найдены в БД СИУ!
+</translation>
+    </message>
+    <message>
+        <source>Found %1 EOIRD in SUI database!
+</source>
+        <translation>Найдено %1 ЭОИРД в БД СИУ!
+</translation>
+    </message>
+    <message>
+        <source>Start inserting EOIRD in DynamicDocs database...
+</source>
+        <translation>Начинаю создание ЭОИРД в БД DynamicDocs Server...
+</translation>
+    </message>
+    <message>
+        <source>An ERROR was occured while inserting EOIRD in DynamicDocs database!
+</source>
+        <translation>Произошла ОШИБКА в процессе создания ЭОИРД в DynamicDocs Server!
+</translation>
+    </message>
+    <message>
+        <source>Successfull inserting EOIRD in DynamicDocs database!
+</source>
+        <translation>ЭОИРД успешно создан в БД DynamicDocs!
+</translation>
+    </message>
+    <message>
+        <source>Querying EFO...
+</source>
+        <translation>Опрашиваем имеющиеся ЭФО...
+</translation>
+    </message>
+    <message>
+        <source>EFO was not found in SUI database!
+</source>
+        <translation>ЭФО не найдены в БД СИУ!
+</translation>
+    </message>
+    <message>
+        <source>Found %1 EFO in SUI database!
+</source>
+        <translation>Найдено %1 ЭФО в БД СИУ!
+</translation>
+    </message>
+    <message>
+        <source>Start inserting EFO in DynamicDocs database...
+</source>
+        <translation>Начинаю создание ЭФО в БД DynamicDocs Server...
+</translation>
+    </message>
+    <message>
+        <source>An ERROR was occured while inserting EFO in DynamicDocs database!
+</source>
+        <translation>Произошла ОШИБКА в процессе создания ЭФО в DynamicDocs Server!
+</translation>
+    </message>
+    <message>
+        <source>Successfull inserting EFO in DynamicDocs database!
+</source>
+        <translation>ЭФО успешно создан в БД DynamicDocs!
+</translation>
+    </message>
+    <message>
+        <source>Querying UGSH...
+</source>
+        <translation>Опрашиваем имеющиеся Ук. ГШ...
+</translation>
+    </message>
+    <message>
+        <source>UGSH was not found in SUI database!
+</source>
+        <translation>Ук. ГШ не найдены в БД СИУ!
+</translation>
+    </message>
+    <message>
+        <source>Found %1 UGSH in SUI database!
+</source>
+        <translation>Найдено %1 Ук. ГШ в БД СИУ!
+</translation>
+    </message>
+    <message>
+        <source>Start inserting UGSH in DynamicDocs database...
+</source>
+        <translation>Начинаю создание Ук. ГШ в БД DynamicDocs Server...
+</translation>
+    </message>
+    <message>
+        <source>An ERROR was occured while inserting UGSH in DynamicDocs database!
+</source>
+        <translation>Произошла ОШИБКА в процессе создания Ук. ГШ в DynamicDocs Server!
+</translation>
+    </message>
+    <message>
+        <source>Successfull inserting UGSH in DynamicDocs database!
+</source>
+        <translation>Ук. ГШ успешно создана в БД DynamicDocs!
+</translation>
+    </message>
+    <message>
+        <source>Querying TTX...
+</source>
+        <translation>Опрашиваем имеющиеся ТТХ...
+</translation>
+    </message>
+    <message>
+        <source>TTX was not found in SUI database!
+</source>
+        <translation>ТТХ не найдены в БД СИУ!
+</translation>
+    </message>
+    <message>
+        <source>Found %1 TTX in SUI database!
+</source>
+        <translation>Найдено %1 ТТХ в БД СИУ!
+</translation>
+    </message>
+    <message>
+        <source>Start inserting TTX in DynamicDocs database...
+</source>
+        <translation>Начинаю создание ТТХ в БД DynamicDocs Server...
+</translation>
+    </message>
+    <message>
+        <source>An ERROR was occured while inserting TTX in DynamicDocs database!
+</source>
+        <translation>Произошла ОШИБКА в процессе создания ТТХ в DynamicDocs Server!
+</translation>
+    </message>
+    <message>
+        <source>Successfull inserting TTX in DynamicDocs database!
+</source>
+        <translation>ТТХ успешно созданы в БД DynamicDocs!
+</translation>
+    </message>
+    <message>
+        <source>Querying PG...
+</source>
+        <translation>Опрашиваем имеющиеся План-графики...
+</translation>
+    </message>
+    <message>
+        <source>PG was not found in SUI database!
+</source>
+        <translation>План-графики не найдены в БД СИУ!
+</translation>
+    </message>
+    <message>
+        <source>Found %1 PG in SUI database!
+</source>
+        <translation>Найдено %1 План-графиков в БД СИУ!
+</translation>
+    </message>
+    <message>
+        <source>Start inserting PG in DynamicDocs database...
+</source>
+        <translation>Начинаю создание План-графиков в БД DynamicDocs Server...
+</translation>
+    </message>
+    <message>
+        <source>An ERROR was occured while inserting PG in DynamicDocs database!
+</source>
+        <translation>Произошла ОШИБКА в процессе создания План-графика в DynamicDocs Server!
+</translation>
+    </message>
+    <message>
+        <source>Successfull inserting PG in DynamicDocs database!
+</source>
+        <translation>План-график успешно создан в БД DynamicDocs!
+</translation>
+    </message>
+    <message>
+        <source>Querying POR...
+</source>
+        <translation>Опрашиваем имеющиеся ПОР...
+</translation>
+    </message>
+    <message>
+        <source>POR was not found in SUI database!
+</source>
+        <translation>ПОР не найдены в БД СИУ!
+</translation>
+    </message>
+    <message>
+        <source>Found %1 POR in SUI database!
+</source>
+        <translation>Найдено %1 ПОР в БД СИУ!
+</translation>
+    </message>
+    <message>
+        <source>Start inserting POR in DynamicDocs database...
+</source>
+        <translation>Начинаю создание ПОР в БД DynamicDocs Server...
+</translation>
+    </message>
+    <message>
+        <source>An ERROR was occured while inserting POR in DynamicDocs database!
+</source>
+        <translation>Произошла ОШИБКА в процессе создания ПОР в DynamicDocs Server!
+</translation>
+    </message>
+    <message>
+        <source>Querying RBP...
+</source>
+        <translation>Опрашиваем имеющиеся РБП...
+</translation>
+    </message>
+    <message>
+        <source>RBP was not found in SUI database!
+</source>
+        <translation>РБП не найдены в БД СИУ!
+</translation>
+    </message>
+    <message>
+        <source>Found %1 RBP in SUI database!
+</source>
+        <translation>Найдено %1 РБП в БД СИУ!
+</translation>
+    </message>
+    <message>
+        <source>Start inserting RBP in DynamicDocs database...
+</source>
+        <translation>Начинаю создание РБП в БД DynamicDocs Server...
+</translation>
+    </message>
+    <message>
+        <source>An ERROR was occured while inserting RBP in DynamicDocs database!
+</source>
+        <translation>Произошла ОШИБКА в процессе создания РБП в DynamicDocs Server!
+</translation>
+    </message>
+    <message>
+        <source>Successfull inserting RBP in DynamicDocs database!
+</source>
+        <translation>РБП успешно создан в БД DynamicDocs!
+</translation>
+    </message>
+    <message>
+        <source>Querying REQ...
+</source>
+        <translation>Опрашиваем имеющиеся Заявки на ИО ВТО...
+</translation>
+    </message>
+    <message>
+        <source>REQ was not found in SUI database!
+</source>
+        <translation>Заявки не найдены в БД СИУ!
+</translation>
+    </message>
+    <message>
+        <source>Found %1 REQ in SUI database!
+</source>
+        <translation>Найдено %1 заявок в БД СИУ!
+</translation>
+    </message>
+    <message>
+        <source>Start inserting REQ in DynamicDocs database...
+</source>
+        <translation>Начинаю создание Заявок в БД DynamicDocs Server...
+</translation>
+    </message>
+    <message>
+        <source>An ERROR was occured while inserting REQ in DynamicDocs database!
+</source>
+        <translation>Произошла ОШИБКА в процессе создания заявки в DynamicDocs Server!
+</translation>
+    </message>
+    <message>
+        <source>Successfull inserting REQ in DynamicDocs database!
+</source>
+        <translation>Заявка успешно создана в БД DynamicDocs!
+</translation>
+    </message>
+    <message>
+        <source>Querying OP VTO...
+</source>
+        <translation>Опрашиваем имеющиеся Выписки ОП ВТО...
+</translation>
+    </message>
+    <message>
+        <source>OP VTO was not found in SUI database!
+</source>
+        <translation>Выписки не найдены в БД СИУ!
+</translation>
+    </message>
+    <message>
+        <source>Found %1 OP VTO in SUI database!
+</source>
+        <translation>Найдено %1 выписок в БД СИУ!
+</translation>
+    </message>
+    <message>
+        <source>Start inserting OP VTO in DynamicDocs database...
+</source>
+        <translation>Начинаю создание выписок в БД DynamicDocs Server...
+</translation>
+    </message>
+    <message>
+        <source>An ERROR was occured while inserting OP VTO in DynamicDocs database!
+</source>
+        <translation>Произошла ОШИБКА в процессе создания выписки в DynamicDocs Server!
+</translation>
+    </message>
+    <message>
+        <source>Successfull inserting OP VTO in DynamicDocs database!
+</source>
+        <translation>Выписка успешно создана в БД DynamicDocs!
+</translation>
+    </message>
+    <message>
+        <source>Start timer from %1 %2 (%3 milliseconds)
+</source>
+        <translation>Задан интервал опроса БД СИУ %1 %2 (%3 миллисекунд)
+</translation>
+    </message>
+    <message>
+        <source>Stop timer
+</source>
+        <translation>Остановлен таймер опроса БД СИУ
+</translation>
+    </message>
+    <message>
+        <source>Using filter date. Start from %1
+</source>
+        <translation>Использую фильтр по дате. Начальная дата %1
+</translation>
+    </message>
+    <message>
+        <source>Using sys filter date. Start from %1
+</source>
+        <translation>Использую фильтр по дате из системы (с момента последнего запуска конвертера). Начальная дата %1
+</translation>
+    </message>
+    <message>
+        <source>Filter date not used! Get all available IO.
+</source>
+        <translation>Фильр по дате не используется. Получаем все доступные ИО.
+</translation>
+    </message>
+    <message>
+        <source>ETK with equal UID was found in DynamicDocs database!
+</source>
+        <translation>ЭТК с таким же UID существует в БД DynamicDocs!
+</translation>
+    </message>
+    <message>
+        <source>Skipped!
+</source>
+        <translation>Пропускаем!
+</translation>
+    </message>
+    <message>
+        <source>ETK UID = %1
+</source>
+        <translation>ЭТК UID = %1
+</translation>
+    </message>
+    <message>
+        <source>GMO with equal UID was found in DynamicDocs database!
+</source>
+        <translation>ГМО с таким же UID существует в БД DynamicDocs!
+</translation>
+    </message>
+    <message>
+        <source>GMO UID = %1
+</source>
+        <translation>ГМО UID = %1
+</translation>
+    </message>
+    <message>
+        <source>NVO with equal UID was found in DynamicDocs database!
+</source>
+        <translation>НВО с таким же UID существует в БД DynamicDocs!
+</translation>
+    </message>
+    <message>
+        <source>NVO UID = %1
+</source>
+        <translation>НВО UID = %1
+</translation>
+    </message>
+    <message>
+        <source>EOIRD with equal UID was found in DynamicDocs database!
+</source>
+        <translation>ЭОИРД с таким же UID существует в БД DynamicDocs!
+</translation>
+    </message>
+    <message>
+        <source>EOIRD UID = %1
+</source>
+        <translation>ЭОИРД UID = %1
+</translation>
+    </message>
+    <message>
+        <source>EFO with equal UID was found in DynamicDocs database!
+</source>
+        <translation>ЭФО с таким же UID существует в БД DynamicDocs!
+</translation>
+    </message>
+    <message>
+        <source>EFO UID = %1
+</source>
+        <translation>ЭФО UID = %1
+</translation>
+    </message>
+    <message>
+        <source>UGSH with equal UID was found in DynamicDocs database!
+</source>
+        <translation>Ук. ГШ с таким же UID существует в БД DynamicDocs!
+</translation>
+    </message>
+    <message>
+        <source>UGSH UID = %1
+</source>
+        <translation>Ук. ГШ UID = %1
+</translation>
+    </message>
+    <message>
+        <source>TTX with equal UID was found in DynamicDocs database!
+</source>
+        <translation>ТТХ с таким же UID существует в БД DynamicDocs!
+</translation>
+    </message>
+    <message>
+        <source>TTX UID = %1
+</source>
+        <translation>ТТХ UID = %1
+</translation>
+    </message>
+    <message>
+        <source>PG with equal UID was found in DynamicDocs database!
+</source>
+        <translation>План-график с таким же UID существует в БД DynamicDocs!
+</translation>
+    </message>
+    <message>
+        <source>PG UID = %1
+</source>
+        <translation>План-график UID = %1
+</translation>
+    </message>
+    <message>
+        <source>POR with equal UID was found in DynamicDocs database!
+</source>
+        <translation>ПОР с таким же UID существует в БД DynamicDocs!
+</translation>
+    </message>
+    <message>
+        <source>POR UID = %1
+</source>
+        <translation>ПОР UID = %1
+</translation>
+    </message>
+    <message>
+        <source>RBP with equal UID was found in DynamicDocs database!
+</source>
+        <translation>РБП с таким же UID существует в БД DynamicDocs!
+</translation>
+    </message>
+    <message>
+        <source>RBP UID = %1
+</source>
+        <translation>РБП UID = %1
+</translation>
+    </message>
+    <message>
+        <source>REQ with equal UID was found in DynamicDocs database!
+</source>
+        <translation>Заявка с таким же UID существует в БД DynamicDocs!
+</translation>
+    </message>
+    <message>
+        <source>REQ UID = %1
+</source>
+        <translation>Заявка UID = %1
+</translation>
+    </message>
+    <message>
+        <source>VTO with equal UID was found in DynamicDocs database!
+</source>
+        <translation>Выписка ИО ВТО с таким же UID существует в БД DynamicDocs!
+</translation>
+    </message>
+    <message>
+        <source>VTO UID = %1
+</source>
+        <translation>Выписка ИО ВТО UID = %1
+</translation>
+    </message>
+    <message>
+        <source>OP VTO UID = %1
+</source>
+        <translation>Выписка ОП ВТО UID = %1
+</translation>
+    </message>
+    <message>
+        <source>Successfull inserting POR in DynamicDocs database!
+</source>
+        <translation>ПОР успешно создан в БД DynamicDocs!
+</translation>
+    </message>
+</context>
+<context>
     <name>DetailGroupSectionDialog</name>
     <message>
         <source>&amp;OK</source>
@@ -2027,6 +2885,13 @@ Do you want to save the changes before closing?</source>
     </message>
 </context>
 <context>
+    <name>KKSAttrUUIDWidget</name>
+    <message>
+        <source>Generate automatically</source>
+        <translation>Генерировать автоматически</translation>
+    </message>
+</context>
+<context>
     <name>KKSAttrValueLabel</name>
     <message>
         <source>&lt;font color=&apos;blue&apos;&gt;%2&lt;/font&gt;</source>
@@ -2152,7 +3017,7 @@ Do you want to save the changes before closing?</source>
     </message>
     <message>
         <source>Generate automatically</source>
-        <translation>Генерировать автоматически</translation>
+        <translation type="obsolete">Генерировать автоматически</translation>
     </message>
 </context>
 <context>
@@ -2662,15 +3527,15 @@ Press YES to clear the color value or NO to remains current value</source>
     <name>KKSFileLoader</name>
     <message>
         <source>Download file, please wait...</source>
-        <translation>Файл загружается с сервера, подождите...</translation>
+        <translation type="obsolete">Файл загружается с сервера, подождите...</translation>
     </message>
     <message>
         <source>Cancel download</source>
-        <translation>Отметить загрузку</translation>
+        <translation type="obsolete">Отметить загрузку</translation>
     </message>
     <message>
         <source>Downloading file</source>
-        <translation>Загрузка файла</translation>
+        <translation type="obsolete">Загрузка файла</translation>
     </message>
     <message>
         <source>Downloading file, please wait... 
@@ -2678,7 +3543,7 @@ Press YES to clear the color value or NO to remains current value</source>
 Time elapsed: %1
 Time estimated: %2
 Avg speed: %3 Kb/sec</source>
-        <translation>Осуществляется загрузка файла, подождите...
+        <translation type="obsolete">Осуществляется загрузка файла, подождите...
 
 Прошло времени: %1
 Осталось времени: %2
@@ -2686,19 +3551,19 @@ Avg speed: %3 Kb/sec</source>
     </message>
     <message>
         <source>Download was cancelled by user. Delete downloaded part of the file?</source>
-        <translation>Загрузка была отменена пользователем. Удалить загруженную часть файла?</translation>
+        <translation type="obsolete">Загрузка была отменена пользователем. Удалить загруженную часть файла?</translation>
     </message>
     <message>
         <source>Uploading file, please wait...</source>
-        <translation>Файл загружается на сервер, подождите...</translation>
+        <translation type="obsolete">Файл загружается на сервер, подождите...</translation>
     </message>
     <message>
         <source>Cancel upload</source>
-        <translation>Отменить загрузку на сервер</translation>
+        <translation type="obsolete">Отменить загрузку на сервер</translation>
     </message>
     <message>
         <source>Uploading file</source>
-        <translation>Загрузка файла на сервер</translation>
+        <translation type="obsolete">Загрузка файла на сервер</translation>
     </message>
     <message>
         <source>Uploading file, please wait... 
@@ -2706,7 +3571,7 @@ Avg speed: %3 Kb/sec</source>
 Time elapsed: %1
 Time estimated: %2
 Avg speed: %3 Kb/sec</source>
-        <translation>Файл загружается на сервер, подождите...
+        <translation type="obsolete">Файл загружается на сервер, подождите...
 
 Времени прошло: %1
 Времени осталось: %2
@@ -2714,19 +3579,19 @@ Avg speed: %3 Kb/sec</source>
     </message>
     <message>
         <source>Cancel uploading</source>
-        <translation>Отменить загрузку на сервер</translation>
+        <translation type="obsolete">Отменить загрузку на сервер</translation>
     </message>
     <message>
         <source>Uploading was cancelled by user. Delete uploaded part of the file on server?</source>
-        <translation>Загрузка на сервер была отменена пользователем. Удалить загруженную часть файла с сервера?</translation>
+        <translation type="obsolete">Загрузка на сервер была отменена пользователем. Удалить загруженную часть файла с сервера?</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>Ошибка</translation>
+        <translation type="obsolete">Ошибка</translation>
     </message>
     <message>
         <source>Cannot delete uploaded part of file</source>
-        <translation>Не могу удалить загруженную часть файла</translation>
+        <translation type="obsolete">Не могу удалить загруженную часть файла</translation>
     </message>
 </context>
 <context>
@@ -3076,6 +3941,10 @@ try to rename it with extention. Example: filename.vsd</source>
     <message>
         <source>&amp;Copy from rubric</source>
         <translation type="obsolete">&amp;Копировать из рубрики</translation>
+    </message>
+    <message>
+        <source>Creation of new IO allowed only for rubrics with accigned category!</source>
+        <translation>Создание новых информационных объектов доступно только для рубрик с ассоциированной категорией!</translation>
     </message>
 </context>
 <context>
@@ -4098,6 +4967,14 @@ try to rename it with extention. Example: filename.vsd</source>
         <source>Object was changed. Do you want to save it before ?</source>
         <translation>Информационный объект изменен. Сохранить?</translation>
     </message>
+    <message>
+        <source>Set UUID</source>
+        <translation>Задать UUID</translation>
+    </message>
+    <message>
+        <source>Unique identificator does not set. Generate automatically (Yes) or set manually (No) ?</source>
+        <translation>Уникальный идентификуатор не задан. Генерировать автоматически (Да) или задать вручную (Нет) ?</translation>
+    </message>
 </context>
 <context>
     <name>KKSObjEditorFactory</name>
@@ -4667,43 +5544,43 @@ Press OK to continue or Cancel to cancel the operation</source>
     </message>
     <message>
         <source>Group &amp;By ...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Группировать по ...</translation>
     </message>
     <message>
         <source>&amp;Create search query</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Создать поисковый запрос</translation>
     </message>
     <message>
         <source>Search by template</source>
-        <translation type="unfinished">Поиск по шаблону</translation>
+        <translation>Поиск по шаблону</translation>
     </message>
     <message>
         <source>&amp;Group by...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Группировать по ...</translation>
     </message>
     <message>
         <source>View &amp;All</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать &amp;все</translation>
     </message>
     <message>
         <source>View only from &amp;here</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать только &amp;отсюда</translation>
     </message>
     <message>
         <source>View current &amp;record</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать текущую &amp;запись</translation>
     </message>
     <message>
         <source>&amp;Hide record</source>
-        <translation type="unfinished"></translation>
+        <translation>Скрыть &amp;запись</translation>
     </message>
     <message>
         <source>Search ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Поиск ...</translation>
     </message>
     <message>
         <source>&amp;Filter ...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Фильтры ...</translation>
     </message>
 </context>
 <context>
@@ -6931,15 +7808,11 @@ Attributes:</source>
     </message>
     <message>
         <source>Search by template</source>
-        <translation>Поиск по шаблону</translation>
-    </message>
-    <message>
-        <source>DynamicDocs </source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Поиск по шаблону</translation>
     </message>
     <message>
         <source>DynamicDocs Client</source>
-        <translation type="unfinished"></translation>
+        <translation>DynamicDocs клиент</translation>
     </message>
     <message>
         <source>Line width</source>
@@ -7053,11 +7926,83 @@ Please contact your Systems Administrator and report this issue.</source>
     </message>
     <message>
         <source>Administrator</source>
-        <translation type="unfinished"></translation>
+        <translation>Администратор</translation>
     </message>
     <message>
         <source>Operator</source>
-        <translation type="unfinished"></translation>
+        <translation>Оператор</translation>
+    </message>
+    <message>
+        <source>PK IR </source>
+        <translation>ПК ИР </translation>
+    </message>
+    <message>
+        <source>PK IP </source>
+        <translation type="obsolete">ПК ИР</translation>
+    </message>
+    <message>
+        <source>Download file, please wait...</source>
+        <translation>Файл загружается с сервера, подождите...</translation>
+    </message>
+    <message>
+        <source>Cancel download</source>
+        <translation>Отметить загрузку</translation>
+    </message>
+    <message>
+        <source>Downloading file</source>
+        <translation>Загрузка файла</translation>
+    </message>
+    <message>
+        <source>Downloading file, please wait... 
+
+Time elapsed: %1
+Time estimated: %2
+Avg speed: %3 Kb/sec</source>
+        <translation>Осуществляется загрузка файла, подождите...
+
+Прошло времени: %1
+Осталось времени: %2
+Средняя скорость: %3 Кб/сек</translation>
+    </message>
+    <message>
+        <source>Download was cancelled by user. Delete downloaded part of the file?</source>
+        <translation>Загрузка была отменена пользователем. Удалить загруженную часть файла?</translation>
+    </message>
+    <message>
+        <source>Uploading file, please wait...</source>
+        <translation>Файл загружается на сервер, подождите...</translation>
+    </message>
+    <message>
+        <source>Cancel upload</source>
+        <translation>Отменить загрузку на сервер</translation>
+    </message>
+    <message>
+        <source>Uploading file</source>
+        <translation>Загрузка файла на сервер</translation>
+    </message>
+    <message>
+        <source>Uploading file, please wait... 
+
+Time elapsed: %1
+Time estimated: %2
+Avg speed: %3 Kb/sec</source>
+        <translation>Файл загружается на сервер, подождите...
+
+Времени прошло: %1
+Времени осталось: %2
+Средняя скорость: %3 Кб/сек</translation>
+    </message>
+    <message>
+        <source>Cancel uploading</source>
+        <translation>Отменить загрузку на сервер</translation>
+    </message>
+    <message>
+        <source>Uploading was cancelled by user. Delete uploaded part of the file on server?</source>
+        <translation>Загрузка на сервер была отменена пользователем. Удалить загруженную часть файла с сервера?</translation>
+    </message>
+    <message>
+        <source>Cannot delete uploaded part of file</source>
+        <translation>Не могу удалить загруженную часть файла</translation>
     </message>
 </context>
 <context>
@@ -9085,6 +10030,73 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>db_synchronizer_form</name>
+    <message utf8="true">
+        <source>БД СИУ ---&gt; DynamicDocs Server (версия 0.1 beta)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Опрос каждые</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>минут</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Задать</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Остановить</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Опросить сейчас</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Журнал обработки метаданных</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Журнал обработки файлов</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Соединиться с БД СИУ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Закрыть</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>часов</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>дней</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Фильтры</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Начиная с указанной даты</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Начиная с даты из системы (с даты последнего запуска конвертера)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Не фильтровать по дате</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>edit_discipline_form</name>
     <message>
         <source>Disciplines</source>
@@ -10331,6 +11343,69 @@ System Error &apos;%1&apos;
     <message>
         <source>Cancel</source>
         <translation>Отмена</translation>
+    </message>
+</context>
+<context>
+    <name>siu_connect_form</name>
+    <message>
+        <source>Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Соединение с БД СИУ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>IP-адрес:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Порт:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Пользователь:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Пароль:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>СОП:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message utf8="true">
+        <source>Отмена</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>8080</source>
+        <translation type="unfinished">8080</translation>
+    </message>
+    <message>
+        <source>pavlov</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>12345678</source>
+        <translation type="unfinished">12345678</translation>
+    </message>
+    <message utf8="true">
+        <source>ИБД ГВЦ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Уровень доступа:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0</source>
+        <translation type="unfinished">0</translation>
     </message>
 </context>
 <context>

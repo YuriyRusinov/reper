@@ -38,6 +38,8 @@ class _PP_EXPORT KKSValue : public KKSData
        KKSValue & operator = (const KKSValue & v);
 
        static QDateTime stringToDateTime(const QString & s);
+	   static QDate stringToDate(const QString & s);
+	   static QTime stringToTime(const QString & s);
 #ifdef Q_WS_WIN
        //for web
 

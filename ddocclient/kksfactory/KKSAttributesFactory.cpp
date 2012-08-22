@@ -941,10 +941,14 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                 if (V.isNull() || V.toString() == "current_timestamp")
                 {
                     v = QDate::currentDate();
-                    QVariant var(v);
+                    //QVariant var(v);
                 }
-                else
-                    v = V.toDate ();
+				else{
+                    QString s = V.toString();
+					v = V.toDate ();
+					QString ss = v.toString("dd.MM.yyyy");
+					int a = 0;
+				}
 
                 attrWidget = new KKSDateEdit (av, isSystem, v);
                 qobject_cast<QDateEdit *>(attrWidget)->setReadOnly (isRef);

@@ -23,12 +23,14 @@ int main(int argc, char *argv[])
         //sito = KKSSito::init (false);//, QString("admin"));
         sito = KKSSito::init (false, QString("admin"));
         mainWindow = new KKSMainWindow();
-        mainWindow->setWindowTitle(QObject::tr("DynamicDocs ") + QObject::tr("Administrator") + " " + KKS_VERSION);
+		//mainWindow->setWindowTitle(QObject::tr("DynamicDocs ") + QObject::tr("Administrator") + " " + KKS_VERSION);
+        mainWindow->setWindowTitle(QObject::tr("PK IR ") + QObject::tr("Administrator") + " " + KKS_VERSION);
     }
     else{
         sito = KKSSito::init (false);
         mainWindow = new KKSMainWindow();
-        mainWindow->setWindowTitle(QObject::tr("DynamicDocs ") + QObject::tr("Operator") + " " + KKS_VERSION);
+		//mainWindow->setWindowTitle(QObject::tr("DynamicDocs ") + QObject::tr("Operator") + " " + KKS_VERSION);
+        mainWindow->setWindowTitle(QObject::tr("PK IR ") + QObject::tr("Operator") + " " + KKS_VERSION);
     }
 
     if(!sito){

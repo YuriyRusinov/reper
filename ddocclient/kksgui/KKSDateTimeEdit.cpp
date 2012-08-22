@@ -21,21 +21,37 @@ KKSDateTimeEdit :: KKSDateTimeEdit (const KKSAttrValue *attr, KKSIndAttr::KKSInd
 }
 
 KKSDateTimeEdit :: KKSDateTimeEdit (const KKSAttrValue *attr, KKSIndAttr::KKSIndAttrClass isSys, const QDateTime& datetime, QWidget *parent)
-    : QDateTimeEdit (datetime, parent), KKSAttrWidget(attr, isSys)
+    : QDateTimeEdit (parent), KKSAttrWidget(attr, isSys)
 {
-    connect (this, SIGNAL (dateTimeChanged (const QDateTime&)), this, SLOT (setDateTime (const QDateTime&)) );
+
+	if(datetime.isValid())
+		QDateTimeEdit::setDateTime(datetime);
+	else
+		QDateTimeEdit::setDateTime(QDateTime::fromString("01.01.0001 00:00:00"));
+
+
+	connect (this, SIGNAL (dateTimeChanged (const QDateTime&)), this, SLOT (setDateTime (const QDateTime&)) );
+
 }
 
 KKSDateTimeEdit :: KKSDateTimeEdit (const KKSAttrValue *attr, KKSIndAttr::KKSIndAttrClass isSys, const QDate& date, QWidget *parent)
-    : QDateTimeEdit (date, parent), KKSAttrWidget(attr, isSys)
+    : QDateTimeEdit (parent), KKSAttrWidget(attr, isSys)
 {
-    connect (this, SIGNAL (dateTimeChanged (const QDateTime&)), this, SLOT (setDateTime (const QDateTime&)) );
+
+    if(date.isValid())
+		QDateTimeEdit::setDate(date);
+
+	connect (this, SIGNAL (dateTimeChanged (const QDateTime&)), this, SLOT (setDateTime (const QDateTime&)) );
 }
 
 KKSDateTimeEdit :: KKSDateTimeEdit (const KKSAttrValue *attr, KKSIndAttr::KKSIndAttrClass isSys, const QTime& time, QWidget * parent)
-    : QDateTimeEdit (time, parent), KKSAttrWidget(attr, isSys)
+    : QDateTimeEdit (parent), KKSAttrWidget(attr, isSys)
 {
-    connect (this, SIGNAL (dateTimeChanged (const QDateTime&)), this, SLOT (setDateTime (const QDateTime&)) );
+	if(time.isValid())
+		QDateTimeEdit::setTime(time);
+
+	connect (this, SIGNAL (dateTimeChanged (const QDateTime&)), this, SLOT (setDateTime (const QDateTime&)) );
+
 }
 
 ////////////////////////////////////////////////////////////////////////

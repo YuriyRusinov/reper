@@ -21,8 +21,11 @@ KKSTimeEdit :: KKSTimeEdit (const KKSAttrValue *attr, KKSIndAttr::KKSIndAttrClas
 }
 
 KKSTimeEdit :: KKSTimeEdit (const KKSAttrValue *attr, KKSIndAttr::KKSIndAttrClass isSys, const QTime& time, QWidget * parent)
-    : QTimeEdit (time, parent), KKSAttrWidget(attr, isSys)
+    : QTimeEdit (parent), KKSAttrWidget(attr, isSys)
 {
+	if(time.isValid())
+		QTimeEdit::setTime(time);
+
     connect (this, SIGNAL (timeChanged (const QTime&)), this, SLOT (setTime (const QTime&)) );
 }
 

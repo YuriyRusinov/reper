@@ -1859,7 +1859,10 @@ void KKSObjEditor :: currentRecSelChanged (const QItemSelection& selected, const
 
 int KKSObjEditor :: getID (void) const
 {
-    return recWidget->getID ();
+    if(recWidget)
+	    return recWidget->getID ();
+
+	return -1;
 }
 
 void KKSObjEditor :: rubricsChanged (void)

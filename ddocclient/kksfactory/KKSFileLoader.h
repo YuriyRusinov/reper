@@ -5,14 +5,16 @@
 #include <defines.h>
 
 #include <QString>
+#include <QObject>
 
 class KKSResult;
 class KKSDatabase;
 class QWidget;
 
-class _F_EXPORT KKSFileLoader
+class _F_EXPORT KKSFileLoader : public QObject
 {
-    protected:
+    Q_OBJECT   
+protected:
         friend class KKSSito;
         friend class KKSSitoWeb;
 

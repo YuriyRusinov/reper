@@ -165,9 +165,9 @@ int KKSFileLoader::rGetFile(int idUrl, QString toUrl, int blockSize, const QWidg
 
     if(parent){
         pImportD = new QProgressDialog ();
-        lImport = new QLabel (parent->tr("Download file, please wait..."), pImportD);
+		lImport = new QLabel (QObject::tr("Download file, please wait..."), pImportD);
         pImportD->setLabel (lImport);
-        QPushButton *pbCancelButton = new QPushButton (parent->tr("Cancel download"), pImportD);
+		QPushButton *pbCancelButton = new QPushButton (QObject::tr("Cancel download"), pImportD);
         pImportD->setCancelButton (pbCancelButton);
         QProgressBar *pBar = new QProgressBar (pImportD);
         pImportD->setBar (pBar);
@@ -184,7 +184,7 @@ int KKSFileLoader::rGetFile(int idUrl, QString toUrl, int blockSize, const QWidg
         else
             pBar->setMaximum (estimatedFileSize);
 
-        pImportD->setWindowTitle (parent->tr("Downloading file"));
+		pImportD->setWindowTitle (QObject::tr("Downloading file"));
         pImportD->setWindowModality (Qt::WindowModal);
         QObject::connect (pbCancelButton, SIGNAL (clicked()), pImportD, SLOT (cancel()) );
 
@@ -215,7 +215,7 @@ int KKSFileLoader::rGetFile(int idUrl, QString toUrl, int blockSize, const QWidg
             double E = (V - (double)timeElapsed) / 1000; //оталось времени дозавершения процесса копирования в секундах
             QTime tt(0, 0, 0);
 
-            lImport->setText (parent->tr("Downloading file, please wait... \n\n"
+			lImport->setText (QObject::tr("Downloading file, please wait... \n\n"
                                          "Time elapsed: %1\n"
                                          "Time estimated: %2\n"
                                          "Avg speed: %3 Kb/sec").arg(tt.addSecs((int)timeElapsed/1000).toString("hh:mm:ss"))
@@ -290,8 +290,8 @@ int KKSFileLoader::rGetFile(int idUrl, QString toUrl, int blockSize, const QWidg
     if(pImportD){
         if(pImportD->wasCanceled()){
             int yes = QMessageBox::question(pImportD, 
-                                            parent->tr("Cancel download"), 
-                                            parent->tr("Download was cancelled by user. Delete downloaded part of the file?"), 
+				                            QObject::tr("Cancel download"), 
+                                            QObject::tr("Download was cancelled by user. Delete downloaded part of the file?"), 
                                             QMessageBox::Yes | QMessageBox::No, 
                                             QMessageBox::Yes);
             if(yes == QMessageBox::Yes){
@@ -464,9 +464,9 @@ int KKSFileLoader::rWriteFile( int idUrl,
     
     if(parent){
         pImportD = new QProgressDialog ();
-        lImport = new QLabel (parent->tr("Uploading file, please wait..."), pImportD);
+        lImport = new QLabel (QObject::tr("Uploading file, please wait..."), pImportD);
         pImportD->setLabel (lImport);
-        QPushButton *pbCancelButton = new QPushButton (parent->tr("Cancel upload"), pImportD);
+        QPushButton *pbCancelButton = new QPushButton (QObject::tr("Cancel upload"), pImportD);
         pImportD->setCancelButton (pbCancelButton);
         QProgressBar *pBar = new QProgressBar (pImportD);
         pImportD->setBar (pBar);
@@ -487,7 +487,7 @@ int KKSFileLoader::rWriteFile( int idUrl,
         
         
 
-        pImportD->setWindowTitle (parent->tr("Uploading file"));
+        pImportD->setWindowTitle (QObject::tr("Uploading file"));
         pImportD->setWindowModality (Qt::WindowModal);
         QObject::connect (pbCancelButton, SIGNAL (clicked()), pImportD, SLOT (cancel()) );
 
@@ -525,7 +525,7 @@ int KKSFileLoader::rWriteFile( int idUrl,
             
             QTime tt(0, 0, 0); 
             
-            lImport->setText (parent->tr("Uploading file, please wait... \n\n"
+            lImport->setText (QObject::tr("Uploading file, please wait... \n\n"
                                          "Time elapsed: %1\n"
                                          "Time estimated: %2\n"
                                          "Avg speed: %3 Kb/sec").arg(tt.addSecs((int)timeElapsed/1000).toString("hh:mm:ss"))
@@ -613,14 +613,14 @@ int KKSFileLoader::rWriteFile( int idUrl,
     if(pImportD){
         if(pImportD->wasCanceled()){
             int yes = QMessageBox::question(pImportD, 
-                                            parent->tr("Cancel uploading"), 
-                                            parent->tr("Uploading was cancelled by user. Delete uploaded part of the file on server?"), 
+                                            QObject::tr("Cancel uploading"), 
+                                            QObject::tr("Uploading was cancelled by user. Delete uploaded part of the file on server?"), 
                                             QMessageBox::Yes | QMessageBox::No, 
                                             QMessageBox::Yes);
             if(yes == QMessageBox::Yes){
                 int ok = rRemoveUrl(idUrl);
                 if(ok <= 0)
-                    QMessageBox::warning(pImportD, parent->tr("Error"), parent->tr("Cannot delete uploaded part of file"));
+                    QMessageBox::warning(pImportD, QObject::tr("Error"), QObject::tr("Cannot delete uploaded part of file"));
             }
 
             pImportD->hide ();
