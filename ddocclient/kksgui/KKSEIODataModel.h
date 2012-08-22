@@ -42,6 +42,7 @@ private:
     // Functions
     //
     const KKSCategoryAttr * getFirstAttribute (KKSAttrType::KKSAttrTypes aType);
+public:
     void setupData (KKSTreeItem * parent);
     KKSTreeItem * getModelItem (qint64 val, KKSTreeItem * parent, QModelIndex & pIndex);
     KKSTreeItem * getItem(const QModelIndex &index) const;

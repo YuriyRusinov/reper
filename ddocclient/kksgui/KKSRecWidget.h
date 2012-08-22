@@ -27,6 +27,7 @@ class QAction;
 class QToolBar;
 class QMenu;
 class QContextMenuEvent;
+class QLineEdit;
 
 class KKSAttribute;
 
@@ -97,6 +98,7 @@ private slots:
     void viewRecsFromHere (void);
 
     void tvDoubleClicked(const QModelIndex & index);
+    void filterRecs (const QString& text);
 
 private:
     //
@@ -118,6 +120,7 @@ private:
     QMenu * pMenu;
     QMenu * pGroupBy;
     QMenu * pFilter;
+    QLineEdit * filterLE;
 
 public:
 

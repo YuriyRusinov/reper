@@ -56,8 +56,18 @@ int KKSEIODataModel :: columnCount (const QModelIndex& parent) const
 int KKSEIODataModel :: rowCount (const QModelIndex& parent) const
 {
     KKSTreeItem * parentItem = getItem (parent);
+    int nr = parentItem->childCount();
+    /*bool v (false);
+    for (int i=0; i<parentItem->childCount(); i++)
+        if (!parentItem->child(i) || !parentItem->child(i)->getData() || !parentItem->child(i)->getData()->isVisible())
+        {
+            v = true;
+            nr--;
+        }
+    if (v)
+        qDebug () << __PRETTY_FUNCTION__ << parent << nr;*/
 
-    return parentItem->childCount();
+    return nr;
 }
  
 
@@ -72,7 +82,7 @@ QModelIndex KKSEIODataModel :: index (int row, int column, const QModelIndex& pa
     KKSTreeItem *parentItem = getItem(parent);
 
     KKSTreeItem *childItem = parentItem->child(row);
-    if (childItem)
+    if (childItem && childItem->getData() && childItem->getData()->isVisible())
         return createIndex(row, column, childItem);
     else
         return QModelIndex();
@@ -80,14 +90,13 @@ QModelIndex KKSEIODataModel :: index (int row, int column, const QModelIndex& pa
 
 QModelIndex KKSEIODataModel :: parent (const QModelIndex& index) const
 {
-
     if (!index.isValid())
         return QModelIndex();
 
     KKSTreeItem *childItem = getItem(index);
     KKSTreeItem *parentItem = childItem->parent();
 
-    if (parentItem == rootItem)
+    if (!parentItem || parentItem == rootItem )//|| !parentItem->getData() || !parentItem->getData()->isVisible())
         return QModelIndex();
 
     return createIndex(parentItem->childNumber(), 0, parentItem);
@@ -107,7 +116,7 @@ Qt::ItemFlags KKSEIODataModel :: flags (const QModelIndex& index) const
 
 QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
 {
-    if (!index.isValid() && role <= Qt::UserRole+1)
+    if (!index.isValid() )//&& role <= Qt::UserRole+1)
         return QVariant();
 
     if (role == Qt::UserRole+2)
@@ -411,6 +420,8 @@ void KKSEIODataModel :: setupData (KKSTreeItem * parent)
             p++)
     {
         KKSTreeItem * t = new KKSTreeItem (p.value()->sysFieldValue("id").toLongLong(), p.value());
+        if (!t->getData() || !t->getData()->isVisible())
+            continue;
         QString valStr = p.value()->sysFieldValue(cAttrP->code(false));
         if (valStr.isEmpty())
             parent->appendChild (t);

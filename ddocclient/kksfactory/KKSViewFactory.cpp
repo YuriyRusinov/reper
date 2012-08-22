@@ -124,7 +124,12 @@ KKSRecWidget * KKSViewFactory :: createView (KKSTemplate* theTemplate,
     QList<int> idP = cat->searchAttributesByType(KKSAttrType::atParent);
     bool isHier (!idP.isEmpty());
     resWidget->enableGroupMenu (!isHier);
-    resWidget->enableFilterMenu (isHier);
+    resWidget->enableFilterMenu (false);//isHier);
+    //
+    // пока с проксевыми модел€ми имеютс€ проблемы, обсуждаемые в Qt
+    // разумнее сделать пока фильтрацию по регул€рному выражению, отложив
+    // более правильное вычленение записей до лучших времен.
+    //
     return resWidget;
    // TODO : implement
 }
@@ -407,9 +412,11 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
     }
 
     KKSRecProxyModel * proxyModel = new KKSRecProxyModel ();
-    proxyModel->setSourceModel (objModel);
-    sortModel->setSourceModel (proxyModel);
-    //--ksa sortModel->setSourceModel (objModel);
+    Q_UNUSED (proxyModel);
+    //proxyModel->setSourceModel (objModel);
+    //sortModel->setSourceModel (proxyModel);
+    //--ksa
+    sortModel->setSourceModel (objModel);
     int sortCol = tv->header()->sortIndicatorSection ();
     Qt::SortOrder sOrder = tv->header()->sortIndicatorOrder ();
     sortModel->sort (sortCol, sOrder);

@@ -7,6 +7,7 @@
 #include <QTreeView>
 #include <QGridLayout>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
 #include <QItemSelectionModel>
 #include <QItemSelection>
 #include <QHeaderView>
@@ -18,11 +19,16 @@
 #include <QMdiSubWindow>
 #include <QContextMenuEvent>
 #include <QMenu>
+#include <QLineEdit>
+#include <QGroupBox>
+#include <QLabel>
 
 #include "KKSSortFilterProxyModel.h"
 #include <KKSEIOData.h>
 #include <KKSAttribute.h>
 #include "KKSRecProxyModel.h"
+#include "KKSTreeItem.h"
+#include "KKSEIODataModel.h"
 #include "KKSRecWidget.h"
 
 KKSRecWidget :: KKSRecWidget (QTreeView *tView, bool mode, QWidget *parent, Qt::WindowFlags f)
@@ -31,6 +37,7 @@ KKSRecWidget :: KKSRecWidget (QTreeView *tView, bool mode, QWidget *parent, Qt::
     tBActions (new QToolBar(this)),
     pMenu (new QMenu(this)),
     pGroupBy (new QMenu (tr("Group &By ..."), this)),
+    filterLE (new QLineEdit (this)),
     actFilter (new QAction (QIcon(":/ddoc/search.png"), tr("&Create search query"), this)),
     actSearchT (new QAction (QIcon(":/ddoc/search_template.png"), tr("Search by template"), this)),
     actAdd (new QAction (QIcon(":/ddoc/add.png"), tr("&Add"), this)),
@@ -63,6 +70,7 @@ KKSRecWidget :: KKSRecWidget (QTreeView *tView, bool mode, QWidget *parent, Qt::
     connect (actViewOnlyFromHere, SIGNAL (triggered()), this, SLOT (viewRecsFromHere()) );
 
     connect (tView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(tvDoubleClicked(const QModelIndex &)));
+    connect (filterLE, SIGNAL (textEdited ( const QString &)), this, SLOT (filterRecs (const QString&)) );
 }
 /*
 KKSRecWidget :: KKSRecWidget (const QString& filterTitle, const QString& addTitle, const QString& editTitle, const QString& delTitle, const QString& importTitle, const QString& exportTitle, QTreeView *tView, bool mode, QWidget *parent, Qt::WindowFlags f)
@@ -157,7 +165,7 @@ void KKSRecWidget :: init_widgets (bool mode)
     if (!tv)
         return;
     gLay->addWidget (tBActions, 0, 0, 1, 1);
-    gLay->addWidget (tv, 1, 0, 1, 1);
+    gLay->addWidget (tv, 2, 0, 1, 1);
 
     QVBoxLayout * vButtonsLayout = new QVBoxLayout();
     vButtonsLayout->addStretch ();
@@ -165,7 +173,7 @@ void KKSRecWidget :: init_widgets (bool mode)
     vButtonsLayout->addWidget (pbCancel);
     vButtonsLayout->addWidget (pbApply);
 
-    gLay->addLayout (vButtonsLayout, 1, 1, 1, 1);
+    gLay->addLayout (vButtonsLayout, 2, 1, 1, 1);
 
     QSize iconSize (24, 24);
     tBActions->setIconSize (iconSize);
@@ -204,6 +212,17 @@ void KKSRecWidget :: init_widgets (bool mode)
     pMenu->addAction (actFilterRec);
     pFilter = new QMenu (this);
     actFilterRec->setMenu (pFilter);
+    pFilter->setEnabled (false);
+    actFilterRec->setEnabled (false);
+    QGroupBox * gbFilter = new QGroupBox (this);
+    QHBoxLayout * hFilterLay = new QHBoxLayout ();
+    hFilterLay->addWidget (gbFilter);
+    hFilterLay->addStretch ();
+    gLay->addLayout (hFilterLay, 1, 0, 1, 1);
+    QGridLayout * gFLay = new QGridLayout (gbFilter);
+    QLabel * lFilter = new QLabel (tr("Filter"), gbFilter);
+    gFLay->addWidget (lFilter, 0, 0, 1, 1);
+    gFLay->addWidget (filterLE, 1, 0, 1, 1);
     pFilter->addAction (actViewAll);
     pFilter->addSeparator ();
     pFilter->addAction (actViewOnlyFromHere);
@@ -214,6 +233,15 @@ void KKSRecWidget :: init_widgets (bool mode)
     pbOk->setVisible (mode);
     pbCancel->setVisible (mode);
     pbApply->setVisible (mode);
+}
+
+void KKSRecWidget :: filterRecs (const QString& text)
+{
+    QSortFilterProxyModel * sortMod = qobject_cast<QSortFilterProxyModel *>(getModel ());
+    if (!sortMod)
+        return;
+    sortMod->setFilterRegExp (text);
+    sortMod->setFilterKeyColumn (-1);
 }
 
 void KKSRecWidget :: hideAllButtons (void)
@@ -481,7 +509,9 @@ void KKSRecWidget :: hideRecord (void)
         return;
     d->setVisible (false);
     sModel->setData (wIndex, QVariant::fromValue<KKSEIOData *>(d), Qt::UserRole+1);
- 
+    KKSTreeItem * rItem = qobject_cast<KKSEIODataModel *>(sModel)->getItem (QModelIndex());
+    qobject_cast<KKSEIODataModel *>(sModel)->setupData(rItem);
+/* 
     setVisibleFrom (wIndex, false);
     tv->update ();
     QHeaderView * h = tv->header();
@@ -495,19 +525,22 @@ void KKSRecWidget :: hideRecord (void)
         return;
     KKSRecProxyModel * prModel = qobject_cast<KKSRecProxyModel *>(sortSourceModel->sourceModel());
     if (prModel)
-        prModel->setVisibleItems (true);
+        prModel->setVisibleItems (true);*/
 }
 
 void KKSRecWidget :: viewAllRecs (void)
 {
     qDebug () << __PRETTY_FUNCTION__;
     setVisibleFrom ();
-    QAbstractProxyModel * sortSourceModel = qobject_cast<QAbstractProxyModel *>(getModel());
+    QAbstractItemModel * sModel = getSourceModel ();
+    KKSTreeItem * rItem = qobject_cast<KKSEIODataModel *>(sModel)->getItem (QModelIndex());
+    qobject_cast<KKSEIODataModel *>(sModel)->setupData(rItem);
+    /*QAbstractProxyModel * sortSourceModel = qobject_cast<QAbstractProxyModel *>(getModel());
     if (!sortSourceModel)
         return;
     KKSRecProxyModel * prModel = qobject_cast<KKSRecProxyModel *>(sortSourceModel->sourceModel());
     if (prModel)
-        prModel->setVisibleItems (false);
+        prModel->setVisibleItems (false);*/
 }
 
 void KKSRecWidget :: viewRecsFromHere (void)
@@ -531,12 +564,14 @@ void KKSRecWidget :: viewRecsFromHere (void)
         QModelIndex wpInd = sModel->index (i, 0, wIndex.parent());
         setVisibleFrom (wpInd, isV);
     }
-    QAbstractProxyModel * sortSourceModel = qobject_cast<QAbstractProxyModel *>(getModel());
+    KKSTreeItem * rItem = qobject_cast<KKSEIODataModel *>(sModel)->getItem (QModelIndex());
+    qobject_cast<KKSEIODataModel *>(sModel)->setupData(rItem);
+/*    QAbstractProxyModel * sortSourceModel = qobject_cast<QAbstractProxyModel *>(getModel());
     if (!sortSourceModel)
         return;
     KKSRecProxyModel * prModel = qobject_cast<KKSRecProxyModel *>(sortSourceModel->sourceModel());
     if (prModel)
-        prModel->setVisibleItems (true);
+        prModel->setVisibleItems (true);*/
     //setVisibleFrom (wIndex, false);
     //setVisibleFrom (wIndex, true);
 }
