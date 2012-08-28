@@ -22,7 +22,7 @@ KKSEIODataModel :: KKSEIODataModel (const KKSTemplate * t, const KKSMap<qint64, 
     objRecords (objRecs),
     //parIndexList (QMap<qint64, QModelIndex>()),
     //indList (QMap<qint64, QList<qint64> >()),
-    rootItem (new KKSTreeItem(-1, 0)),
+    rootItem (new KKSTreeItem(-1, 0, t)),
     cAttrBackground (0),
     cAttrForeground (0)
 {
@@ -135,13 +135,15 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
     //KKSMap<qint64, KKSEIOData*>::const_iterator p=objRecords.constFind(idw);
     //if (p == objRecords.constEnd())
     //    return QVariant ();
-    if (role == Qt::UserRole)
+    if (role == Qt::DisplayRole)
+        return wItem->columnData(index.column());
+    else if (role == Qt::UserRole)
     {
         return idw;//wItem->id();//p.key();
     }
     else if (role == Qt::UserRole+1)
         return QVariant::fromValue<KKSEIOData *>(wItem->getData());
-    else if (role == Qt::DisplayRole)
+/*    else if (role == Qt::DisplayRole)
     {
         if (index.column() >= avList.count())
             return QVariant ();
@@ -191,7 +193,7 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
             }
         }
         return attrValue;
-    }
+    }*/
     else if (cAttrBackground && (role == Qt::BackgroundRole || role == Qt::BackgroundColorRole))
     {
         if (!wItem->getData())
@@ -279,7 +281,7 @@ bool KKSEIODataModel :: setData (const QModelIndex& index, const QVariant& value
             objRecords.remove (wItem->id());
             objRecords.insert (wItem->id(), dVal);
         }
-        wItem->setData (dVal);
+        wItem->setData (dVal, tRef);
         dVal->release ();
         emit dataChanged (topL, bottomR);
     }
@@ -291,7 +293,7 @@ bool KKSEIODataModel :: setData (const QModelIndex& index, const QVariant& value
             objRecords.remove (wItem->id());
             objRecords.insert (wItem->id(), dVal);
         }
-        wItem->setData (dVal);
+        wItem->setData (dVal, tRef);
         emit dataChanged (topL, bottomR);
 /*        QMap<QString, QVariant> objData = value.toMap ();
         //rootItem->clearChildren();
@@ -388,7 +390,7 @@ void KKSEIODataModel :: setupData (KKSTreeItem * parent)
                 p != objRecords.constEnd();
                 p++)
         {
-            KKSTreeItem * t = new KKSTreeItem (p.key(), p.value());
+            KKSTreeItem * t = new KKSTreeItem (p.key(), p.value(), tRef);
             parent->appendChild (t);
         }
         if (nr > 0 && parent->childCount() > nr)
@@ -419,7 +421,7 @@ void KKSEIODataModel :: setupData (KKSTreeItem * parent)
             p != sortedData.constEnd();
             p++)
     {
-        KKSTreeItem * t = new KKSTreeItem (p.value()->sysFieldValue("id").toLongLong(), p.value());
+        KKSTreeItem * t = new KKSTreeItem (p.value()->sysFieldValue("id").toLongLong(), p.value(), tRef);
         if (!t->getData() || !t->getData()->isVisible())
             continue;
         QString valStr = p.value()->sysFieldValue(cAttrP->code(false));

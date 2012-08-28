@@ -1,14 +1,19 @@
 #include "KKSTreeItem.h"
 #include "KKSTemplate.h"
+#include "KKSAttribute.h"
+#include "KKSAttrView.h"
+#include "KKSList.h"
+#include "KKSCategoryAttr.h"
+#include "KKSAttrType.h"
 #include "KKSEIOData.h"
 
-KKSTreeItem :: KKSTreeItem (qint64 id, KKSEIOData * d, KKSTreeItem * parent)
+KKSTreeItem :: KKSTreeItem (qint64 id, KKSEIOData * d, const KKSTemplate * t, KKSTreeItem * parent)
     : idItem (id),
       data (NULL),
       parentItem (parent),
       childItems (QList<KKSTreeItem*>())
 {
-    setData(d);
+    setData(d, t);
 }
 
 KKSTreeItem :: ~KKSTreeItem (void)
@@ -49,7 +54,8 @@ bool KKSTreeItem :: insertChildren(int position, int count)
     for (int row = 0; row < count; ++row)
     {
          KKSEIOData * d = 0;//data;
-         KKSTreeItem *item = new KKSTreeItem(-1-row, d, this);
+         const KKSTemplate * t (0);
+         KKSTreeItem *item = new KKSTreeItem(-1-row, d, t, this);
          childItems.insert(position, item);
      }
 
@@ -138,9 +144,9 @@ void KKSTreeItem :: setId (qint64 newId)
     idItem = newId;
 }
 
-void KKSTreeItem :: setData (KKSEIOData * d)
+void KKSTreeItem :: setData (KKSEIOData * d, const KKSTemplate * t)
 {
-    if (data == d)
+    if (!t || data == d)
         return;
 
     if (data)
@@ -150,6 +156,56 @@ void KKSTreeItem :: setData (KKSEIOData * d)
 
     if (data)
         data->addRef ();
+    itemData.clear ();
+    
+    if (!data)
+        return;
+
+    KKSList<KKSAttrView *> sAttrs = t->sortedAttrs();
+    for (int i=0; i<sAttrs.size(); i++)
+    {
+        KKSAttrView * v = sAttrs[i];
+        QString attrValue;
+        if( v->type()->attrType() == KKSAttrType::atJPG || 
+            (v->refType() && v->refType()->attrType() == KKSAttrType::atJPG)
+            )
+        {
+            attrValue = QObject::tr("<Image data %1>").arg (i);
+        }
+        else if( v->type()->attrType() == KKSAttrType::atSVG || 
+                (v->refType() && v->refType()->attrType() == KKSAttrType::atSVG)
+                )
+        {
+            attrValue = QObject::tr("<SVG data %1>").arg (i);
+        }
+        else if( v->type()->attrType() == KKSAttrType::atXMLDoc || 
+                (v->refType() && v->refType()->attrType() == KKSAttrType::atXMLDoc)
+                )
+        {
+            attrValue = QObject::tr("<XML document %1>").arg (i);
+        }
+        else if( v->type()->attrType() == KKSAttrType::atVideo || 
+                (v->refType() && v->refType()->attrType() == KKSAttrType::atVideo)
+                )
+        {
+            attrValue = QObject::tr("<Video data %1>").arg (i);
+        }
+        else
+        {
+            QString aCode = v->code(false);
+            attrValue = d->fieldValue (aCode).isEmpty() ? d->sysFieldValue (aCode) : d->fieldValue (aCode);
+            if (attrValue.isEmpty())
+            {
+                attrValue = d->fields().value (aCode.toLower());
+                if (attrValue.isEmpty())
+                    attrValue = d->sysFields().value (aCode.toLower());
+            }
+            else if (attrValue.contains ("\n"))
+                attrValue = attrValue.mid (0, attrValue.indexOf("\n")) + "...";
+        }
+        
+        itemData.append(QVariant(attrValue));
+    }
 }
 
 void KKSTreeItem :: clearChildren (void)
@@ -157,4 +213,26 @@ void KKSTreeItem :: clearChildren (void)
     qDeleteAll (childItems);
     childItems.clear ();
 //    removeChildren (0, childItems.count());
+}
+
+QVariant KKSTreeItem :: columnData (int column)
+{
+    if (column >=0 && column < itemData.count())
+        return itemData[column];
+    return QVariant ();
+}
+
+bool KKSTreeItem :: setData (int column, const QVariant& value)
+{
+    if (column < 0 || column >= itemData.size())
+        return false;
+
+     itemData[column] = value;
+     return true;
+}
+
+void KKSTreeItem :: appendColumns (int ncols)
+{
+    for (int i=0; i<ncols; i++)
+        itemData.append(QVariant());
 }

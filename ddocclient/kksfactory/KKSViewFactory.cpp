@@ -406,8 +406,8 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
             int w = v->defWidth();
             if (editor)
                 editor->addWidth (w);
-            else
-                tv->header()->resizeSection (i, w);
+            //else
+            tv->header()->resizeSection (ii, w);
         }
     }
 

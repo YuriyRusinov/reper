@@ -2263,7 +2263,7 @@ void KKSObjEditorFactory :: refreshEIO (KKSObjEditor * editor, int idObject, con
                                 t, 
                                 tv /*View()*/, 
                                 filters,
-                                false,
+                                true,
                                 c,
                                 tableName);
     t->release ();

@@ -10,6 +10,8 @@
 
 #include <QMap>
 #include <QList>
+#include <QVector>
+#include <QVariant>
 
 #include "kksgui_config.h"
 
@@ -19,13 +21,16 @@ class KKSTemplate;
 class _GUI_EXPORT KKSTreeItem
 {
 public:
-    KKSTreeItem (qint64 id, KKSEIOData * d, KKSTreeItem * parent=0);
+    KKSTreeItem (qint64 id, KKSEIOData * d, const KKSTemplate * t, KKSTreeItem * parent=0);
     ~KKSTreeItem (void);
 
     KKSTreeItem *child(int number);
     int childCount() const;
     KKSEIOData * getData() const;
-    void setData (KKSEIOData * d);
+    QVariant columnData (int column);
+    void setData (KKSEIOData * d, const KKSTemplate * t);
+    bool setData (int column, const QVariant& value);
+    void appendColumns (int ncols);
     bool insertChildren(int position, int count);
     KKSTreeItem *parent();
     bool removeChildren(int position, int count);
@@ -39,6 +44,7 @@ public:
 private:
     qint64 idItem;
     KKSEIOData * data;
+    QVector<QVariant> itemData;
     KKSTreeItem *parentItem;
     QList<KKSTreeItem*> childItems;
 };
