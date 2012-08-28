@@ -120,7 +120,7 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
         return QVariant();
 
     if (role == Qt::UserRole+2)
-        return QVariant::fromValue<KKSTemplate>(*tRef);
+        return QVariant::fromValue<const KKSTemplate *>(tRef);
     else if (role == Qt::UserRole+3)
         return QVariant::fromValue<KKSCategoryAttr>(*cAttrP);
     KKSTreeItem * wItem = static_cast<KKSTreeItem*>(index.internalPointer());
@@ -128,13 +128,6 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
         return QVariant ();
     qint64 idw = wItem->id();//index.internalId();
     KKSList<KKSAttrView*> avList = tRef ? tRef->sortedAttrs() : KKSList<KKSAttrView*>();
-    //if (!index.parent().isValid())
-    //    qDebug () << __PRETTY_FUNCTION__ << index << idw;
-    //if (index.parent().isValid())
-    //    qDebug () << __PRETTY_FUNCTION__ << idw << index.parent().internalId();
-    //KKSMap<qint64, KKSEIOData*>::const_iterator p=objRecords.constFind(idw);
-    //if (p == objRecords.constEnd())
-    //    return QVariant ();
     if (role == Qt::DisplayRole)
         return wItem->columnData(index.column());
     else if (role == Qt::UserRole)
@@ -143,57 +136,6 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
     }
     else if (role == Qt::UserRole+1)
         return QVariant::fromValue<KKSEIOData *>(wItem->getData());
-/*    else if (role == Qt::DisplayRole)
-    {
-        if (index.column() >= avList.count())
-            return QVariant ();
-        KKSAttrView * v = avList[index.column()];
-        QString aCode = avList[index.column()]->code(false);
-        int i = index.row();
-        QString attrValue;
-        if( v->type()->attrType() == KKSAttrType::atJPG || 
-            (v->refType() && v->refType()->attrType() == KKSAttrType::atJPG)
-            )
-        {
-            attrValue = QObject::tr("<Image data %1>").arg (i);
-        }
-        else if( v->type()->attrType() == KKSAttrType::atSVG || 
-                (v->refType() && v->refType()->attrType() == KKSAttrType::atSVG)
-                )
-        {
-            attrValue = QObject::tr("<SVG data %1>").arg (i);
-        }
-        else if( v->type()->attrType() == KKSAttrType::atXMLDoc || 
-                (v->refType() && v->refType()->attrType() == KKSAttrType::atXMLDoc)
-                )
-        {
-            attrValue = QObject::tr("<XML document %1>").arg (i);
-        }
-        else if( v->type()->attrType() == KKSAttrType::atVideo || 
-                (v->refType() && v->refType()->attrType() == KKSAttrType::atVideo)
-                )
-        {
-            attrValue = QObject::tr("<Video data %1>").arg (i);
-        }
-        else
-        {
-            if (!wItem->getData())
-                attrValue = QString();
-            else
-            {
-                attrValue = wItem->getData()->fieldValue (aCode).isEmpty() ? wItem->getData()->sysFieldValue (aCode) : wItem->getData()->fieldValue (aCode);
-                if (attrValue.isEmpty())
-                {
-                    attrValue = wItem->getData()->fields().value (aCode.toLower());
-                    if (attrValue.isEmpty())
-                        attrValue = wItem->getData()->sysFields().value (aCode.toLower());
-                }
-                else if (attrValue.contains ("\n"))
-                    attrValue = attrValue.mid (0, attrValue.indexOf("\n")) + "...";
-            }
-        }
-        return attrValue;
-    }*/
     else if (cAttrBackground && (role == Qt::BackgroundRole || role == Qt::BackgroundColorRole))
     {
         if (!wItem->getData())
@@ -295,39 +237,20 @@ bool KKSEIODataModel :: setData (const QModelIndex& index, const QVariant& value
         }
         wItem->setData (dVal, tRef);
         emit dataChanged (topL, bottomR);
-/*        QMap<QString, QVariant> objData = value.toMap ();
-        //rootItem->clearChildren();
-        //rootItem = new KKSTreeItem(-1, 0);
-        for (KKSMap<qint64, KKSEIOData *>::iterator p = objRecords.begin();
-             p != objRecords.end();
-             p++
-        )
-        {
-            KKSEIOData * d = p.value();
-            if (d)
-                d->release ();
-        }
-        objRecords.clear();
-
-        for (QMap<QString, QVariant>::const_iterator pv = objData.constBegin();
-             pv != objData.constEnd();
-             pv++)
-        {
-            bool ok;
-            qint64 id = pv.key().toLongLong(&ok);
-            if (!ok)
-                continue;
-            KKSEIOData * d = new KKSEIOData (pv.value().value<KKSEIOData>());
-            objRecords.insert (id, d);
-        }
-        setupData (rootItem);
-        int nr = rowCount();
-        int nc = columnCount();
-        QModelIndex topL = this->index(0, 0);
-        QModelIndex botR = this->index(nr-1, nc-1);
-        //qDebug () << __PRETTY_FUNCTION__ << topL << botR;
-        emit dataChanged (topL, botR);
- */
+    }
+    else if (role == Qt::UserRole+2)
+    {
+        const KKSTemplate * t = value.value<const KKSTemplate *>();
+        if (!t || t == tRef)
+            return false;
+        if (tRef)
+            tRef->release ();
+        
+        tRef = t;
+        tRef->addRef();
+        KKSEIOData * dVal = wItem->getData();;
+        wItem->setData (dVal, tRef);
+        emit dataChanged (topL, bottomR);
     }
     else
         return false;

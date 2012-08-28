@@ -6,6 +6,7 @@
 #include <QColor>
 #include <QRect>
 #include <QPixmap>
+#include <QTime>
 #include <QtDebug>
 
 #include <KKSCategory.h>
@@ -34,11 +35,14 @@ KKSItemDelegate :: ~KKSItemDelegate (void)
 void KKSItemDelegate :: paint (QPainter * painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
     //qDebug () << __PRETTY_FUNCTION__ << index << option.rect << option.decorationSize;
-    
+
+    QTime tPaint;
+    tPaint.start();
     QItemDelegate::paint (painter, option, index);
-    
+    qDebug () << __PRETTY_FUNCTION__ << index << option.rect << option.decorationSize << tPaint.elapsed() << QString(" msecs");
+
     return;
-    
+/*
     if (!templ)
     {
         QItemDelegate::paint (painter, option, index);
@@ -124,7 +128,7 @@ void KKSItemDelegate :: paint (QPainter * painter, const QStyleOptionViewItem& o
     painter->setPen (pen);
     painter->drawText (option.rect, index.data (Qt::DisplayRole).toString());
     painter->restore ();
-
+*/
 }
 
 QSize KKSItemDelegate :: sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const

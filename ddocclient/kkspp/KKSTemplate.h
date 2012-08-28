@@ -78,5 +78,6 @@ class _PP_EXPORT KKSTemplate : public KKSRecord
 };
 
 Q_DECLARE_METATYPE (KKSTemplate);
+Q_DECLARE_METATYPE (const KKSTemplate *);
 
 #endif
