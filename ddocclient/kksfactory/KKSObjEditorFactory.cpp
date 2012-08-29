@@ -2266,9 +2266,8 @@ void KKSObjEditorFactory :: refreshEIO (KKSObjEditor * editor, int idObject, con
                                 true,
                                 c,
                                 tableName);
-    t->release ();
     c->release ();
-    o->release();
+    o->release ();
 }
 
 /* слот поиска Ё»ќ в таблице (основной или дополнительной).
@@ -2537,6 +2536,7 @@ void KKSObjEditorFactory :: createNewEditorParam (QWidget * editor, int idObject
                  SLOT(updateEIOEx(const QList<qint64>&, const KKSCategory *, QString, int, QAbstractItemModel *)));
     
     newObjEditor->setAttribute (Qt::WA_DeleteOnClose);
+    newObjEditor->setRecordsModel (recModel);
     //newObjEditor->showNormal ();
 //    newObjEditor->setObjChanged (false);
     qDebug () << __PRETTY_FUNCTION__ << newObjEditor->isObjChanged();
@@ -2638,6 +2638,7 @@ void KKSObjEditorFactory :: editExistOE (QWidget * editor, int idObject, qint64 
  */
 int KKSObjEditorFactory :: deleteOE (QWidget * editor, int idObject, qint64 idObjEx, QString tableName, int drow)
 {
+    Q_UNUSED (drow);
     if (!editor)
         return ERROR_CODE;
 
@@ -2758,6 +2759,7 @@ void KKSObjEditorFactory :: updateEIOView (int idObject, const QList<qint64>& id
     {
         QModelIndex cInd = cSelection.indexes().isEmpty() ? QModelIndex() : cSelection.indexes().at(0);
         int row = cInd.row();//cSelection.isEmpty() ? -1 : cSelection.indexes().at(0).row();
+        Q_UNUSED (row);
         const KKSTemplate * t = 0;
         int nt = nTab;//editor->tabEnclosures->currentIndex ();
         if (nt==0)
@@ -5226,6 +5228,7 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // целевой CSV файл
                                          QString tableName
                                          )
 {
+    Q_UNUSED (tableName);
     if (!csvDev)
     {
         QMessageBox::warning (oEditor, tr("CSV file"), tr ("Invalid device"), QMessageBox::Ok);
