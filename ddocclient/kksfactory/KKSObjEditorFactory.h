@@ -266,13 +266,13 @@ private slots:
                     KKSXMLForm *xmlForm);
 
     void exportEIO (KKSObjEditor * editor, int idObject, const KKSCategory * c, QString tableName);
-    void updateEIOView (KKSObjEditor * editor, 
-                        int idObject, 
+    void updateEIOView (int idObject, 
                         const QList<qint64>& idObjEx, 
-                        const QList<int>& row, 
                         const KKSCategory *c, 
                         const QString& tableName, 
-                        int nTab);
+                        int nTab,
+                        QAbstractItemModel * recModel,
+                        const QItemSelection& cSelection);
 
     void regroupAttrs (QWidget *wIOAttr, 
                        QScrollArea *scIOattr, 
@@ -453,7 +453,7 @@ private:
     KKSLoader * loader;
     KKSFileLoader * fileLoader;
     KKSEIOFactory * eiof;
-    QItemSelection cSelection;
+    //QItemSelection cSelection;
     KKSStuffFactory * m_sf;
     KKSRubricFactory * m_rf;
     KKSIndFactory * m_indf;

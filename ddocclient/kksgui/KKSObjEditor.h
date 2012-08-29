@@ -141,7 +141,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void refreshRecModel (QAbstractItemModel * sourceMod);
 
         void saveChildObjE (KKSObjectExemplar *childObjE);
-        void updateEIOEx (const QList<qint64>& idL, const KKSCategory * c, QString tableName, int nTab);
+        void updateEIOEx (const QList<qint64>& idL, const KKSCategory * c, QString tableName, int nTab, QAbstractItemModel * recModel);
 
         void setEnableO (int state);
 
@@ -196,8 +196,8 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void delObjectEx (QWidget*,int idObject, qint64 idObjE, QString tableName, int row);
         void saveObjE (KKSObjEditor*, KKSObjectExemplar * wObjE, const KKSCategory * cat, QString tableName, int num, QAbstractItemModel * recModel);
         void loadObjE (int id, QString tableName);
-        void eioChanged (const QList<qint64>& idL, const KKSCategory * c, QString tableName, int nTab);
-        void updateEIO(KKSObjEditor * editor, int idObject, const QList<qint64>& idObjEx, const QList<int>& row, const KKSCategory *c, const QString& tableName, int nTab);
+        void eioChanged (const QList<qint64>& idL, const KKSCategory * c, QString tableName, int nTab, QAbstractItemModel * recMod);
+        void updateEIO(int idObject, const QList<qint64>& idObjRecs, const KKSCategory *c, const QString& tableName, int nTab, QAbstractItemModel * recModel, const QItemSelection& sel);
         
         void saveObj (KKSObjEditor*, KKSObject* wObj, KKSObjectExemplar * wObjEx, int num, QAbstractItemModel * recModel);
         void saveObjAsCommandResult(KKSObjEditor*, KKSObject* wObj, KKSObjectExemplar * wObjEx, int num, QAbstractItemModel * recModel);
