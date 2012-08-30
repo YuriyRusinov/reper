@@ -808,11 +808,15 @@ void KKSObjEditor :: saveToDb (int num)
     //
     // Ёто надо вызывать всегда
     //
-    QList<qint64> idL;
+    KKSMap<qint64, KKSObjectExemplar *> idL;
     if (!additionalCopies.contains (pObjectEx->id()))
-        idL.append (pObjectEx->id());
-    idL += additionalCopies;
-    emit eioChanged (idL, (isMain ? 0 : pCat), (isMain ? QString() : currTablename), nTable, pRecModel);//pObjectEx->id());
+        idL.insert (pObjectEx->id(), pObjectEx);
+    for (KKSMap<qint64, KKSObjectExemplar *>::const_iterator p=additionalCopies.constBegin();
+            p != additionalCopies.constEnd();
+            p++)
+        idL.insert (p.key(), p.value());
+    //idL += additionalCopies;
+    emit eioChanged (pObjectEx->io(), idL, pRecModel);//pObjectEx->id());
 }
 
 void KKSObjEditor :: save (int num)
@@ -836,11 +840,20 @@ void KKSObjEditor :: saveAsCommandResult()
     //
     // Ёто надо вызывать всегда
     //
-    QList<qint64> idL;
+    KKSMap<qint64, KKSObjectExemplar *> idL;
+    if (!additionalCopies.contains (pObjectEx->id()))
+        idL.insert (pObjectEx->id(), pObjectEx);
+    for (KKSMap<qint64, KKSObjectExemplar *>::const_iterator p=additionalCopies.constBegin();
+            p != additionalCopies.constEnd();
+            p++)
+        idL.insert (p.key(), p.value());
+    //idL += additionalCopies;
+    emit eioChanged (pObjectEx->io(), idL, pRecModel);//pObjectEx->id());
+/*    QList<qint64> idL;
     if (!additionalCopies.contains (pObjectEx->id()))
         idL.append (pObjectEx->id());
     idL += additionalCopies;
-    emit eioChanged (idL, 0, QString(), 0, pRecModel);//pObjectEx->id());
+    emit eioChanged (idL, 0, QString(), 0, pRecModel);//pObjectEx->id());*/
 }
 
 void KKSObjEditor::print()
@@ -1095,7 +1108,7 @@ void KKSObjEditor :: setObjectEx (KKSObjectExemplar *newObj)
         pObjectEx->addRef ();
 }
 
-void KKSObjEditor :: updateEIOEx (const QList<qint64>& idL, const KKSCategory * c, QString tableName, int nTab, QAbstractItemModel * recModel)
+void KKSObjEditor :: updateEIOEx (KKSObject * refObj, const KKSMap<qint64, KKSObjectExemplar *>& recs, QAbstractItemModel * recModel)
 {
     //this->clearW ();
     //дл€ Ё»ќ, которые имеют подчиненную таблицу, 
@@ -1130,13 +1143,25 @@ void KKSObjEditor :: updateEIOEx (const QList<qint64>& idL, const KKSCategory * 
         qDebug () << __PRETTY_FUNCTION__ << id << pObjectEx->id() << wrow;
     }
  */
-    QString tabName = tableName;//QString ();
-    qDebug () << __PRETTY_FUNCTION__ << tabName << nTab;
-    QModelIndexList selIndexes = (nTab == 0 ? recWidget->getSourceIndexes() : addRecWidgets[nTab-1]->getSourceIndexes());
+//    QString tabName = tableName;//QString ();
+//    qDebug () << __PRETTY_FUNCTION__ << tabName << nTab;
+    int nTab (-1);
+    QModelIndexList selIndexes;// = (nTab == 0 ? recWidget->getSourceIndexes() : addRecWidgets[nTab-1]->getSourceIndexes());
+    if (recModel == recWidget->getSourceModel())
+    {
+        nTab = 0;
+        selIndexes = recWidget->getSourceIndexes();
+    }
+    for (int i=0; i<addRecWidgets.count() && nTab < 0; i++)
+        if (recModel == addRecWidgets[i]->getSourceModel())
+        {
+            nTab = i+1;
+            selIndexes = addRecWidgets[i]->getSourceIndexes();
+        }
     QItemSelection sel;
     if (selIndexes.size() > 0)
         sel = QItemSelection (selIndexes[0], selIndexes[selIndexes.size()-1]);
-    emit updateEIO (idObject, idL, c, tabName, nTab, recModel, sel);
+    emit updateEIO (refObj, recs, recModel, sel);
  
 }
 
@@ -1145,9 +1170,9 @@ void KKSObjEditor :: clearAdditionalCopies (void)
     additionalCopies.clear ();
 }
 
-void KKSObjEditor :: addAdditionalCopy (qint64 id)
+void KKSObjEditor :: addAdditionalCopy (KKSObjectExemplar * rec)
 {
-    additionalCopies.append (id);
+    additionalCopies.insert (rec->id(), rec);
 }
 
 void KKSObjEditor :: paintEvent (QPaintEvent * event)

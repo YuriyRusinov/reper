@@ -716,25 +716,23 @@ void KKSViewFactory :: loadEIOEx (QWidget *editor,
  * idObjEx -- идентификатор ЭИО в ИО-справочнике
  * t -- шаблон табличной категории
  * sourceModel -- модель с ЭИО
- * row -- номер строки в модели
+ * recIndex -- индекс записи в модели
  * cat -- категория справочника
  * tableName -- название таблицы
  */
 void KKSViewFactory :: updateEIOEx (KKSLoader *l,
                                     KKSObject *pObj,
-                                    qint64 idObjEx,
+                                    const KKSMap<qint64, KKSObjectExemplar*>& objRecs,
                                     const KKSTemplate *t,
-                                    QAbstractItemModel *sourceModel,
-                                    int row,
-                                    const KKSCategory * cat,
-                                    const QString& tableName
-                                   )
+                                    QAbstractItemModel *sourceModel
+                                    )
 {
-    if (row < 0 || !pObj || !t || !sourceModel)
+    if (!pObj || !t || !sourceModel)
         return;
+    
 
     qDebug () << __PRETTY_FUNCTION__ << sourceModel->rowCount () << sourceModel->columnCount ();
-    KKSCategory * cobjCat (0);//= pObj->category()->tableCategory();
+/*    KKSCategory * cobjCat (0);//= pObj->category()->tableCategory();
     int idPAttr (-1);
     QList<int> pattrs;
     if (cat && cat->isAttrTypeContains(KKSAttrType::atParent) )
@@ -748,7 +746,7 @@ void KKSViewFactory :: updateEIOEx (KKSLoader *l,
         idPAttr = pattrs[0];
     QModelIndex wIndex;
     if (idPAttr < 0)
-        wIndex = sourceModel->index (row, 0);
+        wIndex = sourceModel->index (recIndex.row(), 0);
     else
     {
         KKSObjectExemplar * ioc = l->loadEIO(idObjEx, pObj);
@@ -767,7 +765,7 @@ void KKSViewFactory :: updateEIOEx (KKSLoader *l,
             wIndex = sourceModel->index (nr, 0, pIndex);
         }
         else
-            wIndex = sourceModel->index (row, 0);
+            wIndex = sourceModel->index (recIndex.row(), 0);
     }
     if (!wIndex.isValid())
         return;
@@ -850,6 +848,7 @@ void KKSViewFactory :: updateEIOEx (KKSLoader *l,
             ii++;
         }
     }
+ */
 }
 
 /* Метод загружает категории верхнего уровня в соответствующий виджет.
@@ -1907,7 +1906,7 @@ KKSRecWidget * KKSViewFactory :: createAdditionalView (KKSTemplate *t,
 
 /* Метод осуществляет поиск целочисленных данных iData внутри модели sourceMod, начиная с родительского индекса parent в роли role.
  */
-QModelIndex KKSViewFactory :: searchModelIndex (QAbstractItemModel * sourceMod, int iData, const QModelIndex& parent, int role)
+QModelIndex KKSViewFactory :: searchModelIndex (QAbstractItemModel * sourceMod, qint64 iData, const QModelIndex& parent, int role)
 {
     if (!sourceMod)
         return QModelIndex ();
@@ -1935,7 +1934,7 @@ QModelIndex KKSViewFactory :: searchModelIndex (QAbstractItemModel * sourceMod, 
     return QModelIndex();
 }
 
-QModelIndex KKSViewFactory :: searchModelRowsIndex (QAbstractItemModel * sourceMod, int iData, const QModelIndex& parent, int role)
+QModelIndex KKSViewFactory :: searchModelRowsIndex (QAbstractItemModel * sourceMod, qint64 iData, const QModelIndex& parent, int role)
 {
     if (!sourceMod)
         return QModelIndex ();

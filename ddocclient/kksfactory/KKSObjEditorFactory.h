@@ -266,11 +266,8 @@ private slots:
                     KKSXMLForm *xmlForm);
 
     void exportEIO (KKSObjEditor * editor, int idObject, const KKSCategory * c, QString tableName);
-    void updateEIOView (int idObject, 
-                        const QList<qint64>& idObjEx, 
-                        const KKSCategory *c, 
-                        const QString& tableName, 
-                        int nTab,
+    void updateEIOView (KKSObject * refObj, 
+                        const KKSMap<qint64, KKSObjectExemplar *>& idObjEx, 
                         QAbstractItemModel * recModel,
                         const QItemSelection& cSelection);
 

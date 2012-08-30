@@ -7,6 +7,7 @@
 #include <QList>
 
 #include "KKSMap.h"
+#include "KKSList.h"
 #include "KKSAttrType.h"
 #include "kksgui_config.h"
 
@@ -14,6 +15,7 @@ class KKSTemplate;
 class KKSEIOData;
 class KKSCategoryAttr;
 class KKSTreeItem;
+class KKSAttrView;
 
 class _GUI_EXPORT KKSEIODataModel : public QAbstractItemModel
 {
@@ -42,6 +44,8 @@ private:
     // Functions
     //
     const KKSCategoryAttr * getFirstAttribute (KKSAttrType::KKSAttrTypes aType);
+    void setVisibleAttrs (void);
+
 public:
     void setupData (KKSTreeItem * parent);
     KKSTreeItem * getModelItem (qint64 val, KKSTreeItem * parent, QModelIndex & pIndex);
@@ -60,6 +64,7 @@ private:
     KKSTreeItem * rootItem;
     const KKSCategoryAttr * cAttrBackground;
     const KKSCategoryAttr * cAttrForeground;
+    KKSList<KKSAttrView*> visibleAttrs;
 
 private:
     Q_OBJECT

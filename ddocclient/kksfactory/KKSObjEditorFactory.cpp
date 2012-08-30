@@ -1553,7 +1553,7 @@ void KKSObjEditorFactory :: setObjConnect (KKSObjEditor *editor)
     connect (editor, SIGNAL (filterObjectEx (KKSObjEditor*, int, const KKSCategory *, QString)), this, SLOT (filterEIO (KKSObjEditor*, int, const KKSCategory *, QString)) );
     connect (editor, SIGNAL (refreshObjectEx (KKSObjEditor*, int, const KKSCategory *, QString, QAbstractItemModel *)), this, SLOT (refreshEIO (KKSObjEditor*, int, const KKSCategory *, QString, QAbstractItemModel *)) );
     connect (editor, SIGNAL (filterObjectTemplateEx (KKSObjEditor*, int, const KKSCategory *, QString)), this, SLOT (filterTemplateEIO (KKSObjEditor*, int, const KKSCategory *, QString)) );
-    connect (editor, SIGNAL (updateEIO (int, const QList<qint64>&, const KKSCategory *, const QString&, int, QAbstractItemModel *, const QItemSelection& )), this, SLOT (updateEIOView (int, const QList<qint64>&, const KKSCategory *, const QString&, int, QAbstractItemModel *, const QItemSelection& )) );
+    connect (editor, SIGNAL (updateEIO (KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *, const QItemSelection& )), this, SLOT (updateEIOView (KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *, const QItemSelection& )) );
     connect (editor, SIGNAL (loadAttrRef (QString, QWidget*, int)), this, SLOT (loadAttributeReference (QString, QWidget *, int)) );
     connect (editor, SIGNAL (setTemplate (KKSObjEditor*, KKSObject*)), this, SLOT (setEIOTemplates (KKSObjEditor*, KKSObject*)) );
     connect (editor, SIGNAL (importObjectEx (KKSObjEditor *, int, const KKSCategory *, QString)), this, SLOT (importEIO (KKSObjEditor *, int, const KKSCategory *, QString)) );
@@ -1675,7 +1675,7 @@ void KKSObjEditorFactory :: saveObjectEx (KKSObjEditor * editor, KKSObjectExempl
             res = eiof->insertEIO (wObjCopy, cat, tableName, false, editor);
             if (res == OK_CODE)
             {
-                editor->addAdditionalCopy (wObjCopy->id());
+                editor->addAdditionalCopy (wObjCopy);
                 recList.append (wObjCopy);
             }
             else
@@ -1976,7 +1976,7 @@ void KKSObjEditorFactory :: saveObject (KKSObjEditor* editor,
             }
             if (res == OK_CODE)
             {
-                editor->addAdditionalCopy (i==0 ? wObj->id() : io->id());
+                editor->addAdditionalCopy (i==0 ? pObjectEx : wObjCopy);
                 recList.append (i==0 ? pObjectEx : wObjCopy);
             }
             else
@@ -2452,10 +2452,10 @@ void KKSObjEditorFactory :: createNewEditor (QWidget * editor, int idObject, con
                               QMessageBox::Ok);
         return;
     }
-    connect (newObjEditor, 
-             SIGNAL(eioChanged(const QList<qint64>&, const KKSCategory*, QString, int, QAbstractItemModel *)), 
-             editor, 
-             SLOT(updateEIOEx(const QList<qint64>&, const KKSCategory*, QString, int, QAbstractItemModel *)));
+    connect(newObjEditor, 
+            SIGNAL(eioChanged(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *)), 
+            editor, 
+            SLOT(updateEIOEx(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *)));
     newObjEditor->setRecordsModel (recModel);
 
     //cSelection = oEditor ? oEditor->recWidget->tv->selectionModel()->selection() : QItemSelection();
@@ -2465,10 +2465,10 @@ void KKSObjEditorFactory :: createNewEditor (QWidget * editor, int idObject, con
     newObjEditor->setParentTab (nTab);
     
     if (qobject_cast <KKSObjEditor *>(editor))
-        connect(newObjEditor, 
-                SIGNAL(eioChanged(const QList<qint64>&, const KKSCategory*, QString, int, QAbstractItemModel *)), 
-                editor, 
-                SLOT(updateEIOEx(const QList<qint64>&, const KKSCategory *, QString, int, QAbstractItemModel *)));
+    connect(newObjEditor, 
+            SIGNAL(eioChanged(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *)), 
+            editor, 
+            SLOT(updateEIOEx(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *)));
     
     newObjEditor->setAttribute (Qt::WA_DeleteOnClose);
     //newObjEditor->showNormal ();
@@ -2530,10 +2530,10 @@ void KKSObjEditorFactory :: createNewEditorParam (QWidget * editor, int idObject
     }
 
     if (qobject_cast <KKSObjEditor *>(editor))
-        connect (newObjEditor, 
-                 SIGNAL(eioChanged(const QList<qint64>&, const KKSCategory*, QString, int, QAbstractItemModel *)), 
-                 editor, 
-                 SLOT(updateEIOEx(const QList<qint64>&, const KKSCategory *, QString, int, QAbstractItemModel *)));
+        connect(newObjEditor, 
+                SIGNAL(eioChanged(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *)), 
+                editor, 
+                SLOT(updateEIOEx(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *)));
     
     newObjEditor->setAttribute (Qt::WA_DeleteOnClose);
     newObjEditor->setRecordsModel (recModel);
@@ -2611,9 +2611,9 @@ void KKSObjEditorFactory :: editExistOE (QWidget * editor, int idObject, qint64 
     //qDebug () << __PRETTY_FUNCTION__ << cSelection << nTab;
 
     connect (newObjEditor, 
-             SIGNAL(eioChanged(const QList<qint64>&, const KKSCategory*, QString, int, QAbstractItemModel *)), 
+             SIGNAL(eioChanged(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *)), 
              editor, 
-             SLOT(updateEIOEx(const QList<qint64>&, const KKSCategory*, QString, int, QAbstractItemModel *)));
+             SLOT(updateEIOEx(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *)));
 
     newObjEditor->setRecordsModel (recModel);
     newObjEditor->setCurrentTable (tableName);
@@ -2735,39 +2735,33 @@ int KKSObjEditorFactory :: deleteOE (QWidget * editor, int idObject, qint64 idOb
 
 /* Слот обновляет вид таблицы ИО-справочника.
  * Параметры:
- * idObject -- идентификатор ИО
+ * wObj -- ИО-справочник
  * idObjEx -- список экземпляров
- * с -- категория таблицы
- * tableName -- название таблицы
- * nTab -- номер вкладки
  * recModel -- обновляемая модель
  * cSelection -- выделенные индексы
  */
-void KKSObjEditorFactory :: updateEIOView (int idObject, const QList<qint64>& idObjEx, const KKSCategory *c, const QString& tableName, int nTab, QAbstractItemModel * recModel, const QItemSelection& cSelection)
+void KKSObjEditorFactory :: updateEIOView (KKSObject * wObj, const KKSMap<qint64, KKSObjectExemplar *>& idObjEx, QAbstractItemModel * recModel, const QItemSelection& cSelection)
 {
     KKSObjEditor * editor = qobject_cast<KKSObjEditor *>(this->sender());
     if (!editor || !recModel)
         return;
 
     //editor->clearW ();
-    KKSObject *wObj = loader->loadIO (idObject, false);//ибо потом используются шаблоны ИО
     if(!wObj)
         return;
 
-    qDebug () << __PRETTY_FUNCTION__ << c << tableName << idObjEx << nTab;
-    if (c || (wObj->category() && wObj->category()->tableCategory()))
+    qDebug () << __PRETTY_FUNCTION__ <<  wObj->id() << idObjEx.keys();
+    if (wObj->category() && wObj->category()->tableCategory())
     {
-        QModelIndex cInd = cSelection.indexes().isEmpty() ? QModelIndex() : cSelection.indexes().at(0);
-        int row = cInd.row();//cSelection.isEmpty() ? -1 : cSelection.indexes().at(0).row();
-        Q_UNUSED (row);
-        const KKSTemplate * t = 0;
-        int nt = nTab;//editor->tabEnclosures->currentIndex ();
-        if (nt==0)
-            t = new KKSTemplate (wObj->tableTemplate() ? *(wObj->tableTemplate()) : wObj->category()->tableCategory()->defTemplate());
-        else if (c)
-            t = new KKSTemplate (c->defTemplate());
-        else //if (wObj->tableName() != tableName)
-            t = new KKSTemplate ( wObj->category()->tableCategory()->defTemplate() );
+        QModelIndex cInd = QModelIndex();//KKSViewFactory::searchModelRowsIndex(recModel,);
+        const KKSTemplate * t = recModel->data(cInd, Qt::UserRole+2).value<const KKSTemplate *>();
+        if (!t)
+        {
+            wObj->release ();
+            return;
+        }
+        else
+            t->addRef ();
 
 /*        QAbstractItemModel * mod = (nt==0 ? editor->recWidget->getModel() : editor->addRecWidgets[nt-1]->getModel ());
         while (qobject_cast<QAbstractProxyModel *>(mod))
@@ -2775,12 +2769,11 @@ void KKSObjEditorFactory :: updateEIOView (int idObject, const QList<qint64>& id
         qDebug () << __PRETTY_FUNCTION__ << nt << erow << mod->rowCount () << mod->columnCount ();// << mod->data (mod->index ;
         if (mod->rowCount() <= erow[0])
             mod->insertRows (erow[0], 1);
-        for (int ii=0; ii<idObjEx.count(); ii++)
-            KKSViewFactory::updateEIOEx (loader, wObj, idObjEx[ii], t, mod, erow[ii], t->category(), tableName);
+ */
+        KKSViewFactory::updateEIOEx (loader, wObj, idObjEx, t, recModel);
 
-        if (t)
-            t->release ();
-
+        t->release ();
+/*
         QTreeView * tv = (nt==0 ? editor->recWidget->tv :  editor->addRecWidgets[nt-1]->tv);
         if (row >=0)
             tv->selectionModel()->setCurrentIndex (tv->model()->index (row, 0), QItemSelectionModel::ClearAndSelect);
@@ -2789,7 +2782,6 @@ void KKSObjEditorFactory :: updateEIOView (int idObject, const QList<qint64>& id
  */
     }
 
-    wObj->release();
 }
 
 /* Метод производит первоначальную установку атрибутов и их значений в соответствии с шаблоном.
@@ -4159,9 +4151,9 @@ void KKSObjEditorFactory :: slotOpenRubricItemRequested(int idObject, KKSObjEdit
     }
 
     connect(newObjEditor, 
-            SIGNAL(eioChanged(const QList<qint64>&, const KKSCategory*, QString, int, QAbstractItemModel *)), 
+            SIGNAL(eioChanged(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *)), 
             editor, 
-            SLOT(updateEIOEx(const QList<qint64>, const KKSCategory *, QString, int, QAbstractItemModel *)));
+            SLOT(updateEIOEx(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *)));
     
     newObjEditor->setAttribute (Qt::WA_DeleteOnClose);
 
@@ -4207,9 +4199,9 @@ void KKSObjEditorFactory :: slotOpenRubricItemRecRequested(int idObjectE, KKSObj
     }
 
     connect(newObjEditor, 
-            SIGNAL(eioChanged(const QList<qint64>&, const KKSCategory*, QString, int, QAbstractItemModel *)), 
+            SIGNAL(eioChanged(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *)), 
             editor, 
-            SLOT(updateEIOEx(const QList<qint64>, const KKSCategory *, QString, int, QAbstractItemModel *)));
+            SLOT(updateEIOEx(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *)));
     
     newObjEditor->setAttribute (Qt::WA_DeleteOnClose);
 
@@ -5883,10 +5875,13 @@ void KKSObjEditorFactory :: addSendIO (void)
         qDebug () << __PRETTY_FUNCTION__ << editor->getID();
         QAbstractItemModel *sAttModel = messDial->getAttachmentsModel ();
         sAttModel->insertRows (sAttModel->rowCount(), 1);
+        QModelIndex cInd = sAttModel->index (sAttModel->rowCount()-1, 0);
         KKSTemplate * t = new KKSTemplate (c->defTemplate());
         if (t)
         {
-            KKSViewFactory::updateEIOEx (loader, io, editor->getID (), t, sAttModel, sAttModel->rowCount()-1);
+            KKSMap<qint64, KKSObjectExemplar *> recs;
+            recs.insert(editor->getID(), editor->getObjectEx());
+            KKSViewFactory::updateEIOEx (loader, io, recs, t, sAttModel);
             t->release ();
         }
     }

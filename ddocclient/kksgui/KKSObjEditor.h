@@ -141,7 +141,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void refreshRecModel (QAbstractItemModel * sourceMod);
 
         void saveChildObjE (KKSObjectExemplar *childObjE);
-        void updateEIOEx (const QList<qint64>& idL, const KKSCategory * c, QString tableName, int nTab, QAbstractItemModel * recModel);
+        void updateEIOEx (KKSObject * refObj, const KKSMap<qint64, KKSObjectExemplar *>& recs, QAbstractItemModel * recModel);
 
         void setEnableO (int state);
 
@@ -196,8 +196,8 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void delObjectEx (QWidget*,int idObject, qint64 idObjE, QString tableName, int row);
         void saveObjE (KKSObjEditor*, KKSObjectExemplar * wObjE, const KKSCategory * cat, QString tableName, int num, QAbstractItemModel * recModel);
         void loadObjE (int id, QString tableName);
-        void eioChanged (const QList<qint64>& idL, const KKSCategory * c, QString tableName, int nTab, QAbstractItemModel * recMod);
-        void updateEIO(int idObject, const QList<qint64>& idObjRecs, const KKSCategory *c, const QString& tableName, int nTab, QAbstractItemModel * recModel, const QItemSelection& sel);
+        void eioChanged (KKSObject * refObj, const KKSMap<qint64, KKSObjectExemplar *>& recs, QAbstractItemModel * recMod);
+        void updateEIO(KKSObject * refObj, const KKSMap<qint64, KKSObjectExemplar *>& objRecs, QAbstractItemModel * recModel, const QItemSelection& sel);
         
         void saveObj (KKSObjEditor*, KKSObject* wObj, KKSObjectExemplar * wObjEx, int num, QAbstractItemModel * recModel);
         void saveObjAsCommandResult(KKSObjEditor*, KKSObject* wObj, KKSObjectExemplar * wObjEx, int num, QAbstractItemModel * recModel);
@@ -318,7 +318,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void setTabWidget (QTabWidget *tObj);
 
         void clearAdditionalCopies (void);
-        void addAdditionalCopy (qint64 id);
+        void addAdditionalCopy (KKSObjectExemplar * rec);
         int constructObject (void);
         void saveToDb (int num=1);
 
@@ -413,7 +413,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
 
         bool isChanged;
         QMap<int, int> editRows;
-        QList<qint64> additionalCopies;
+        KKSMap<qint64, KKSObjectExemplar *> additionalCopies;
         
         QAbstractItemModel * pRecModel;
 

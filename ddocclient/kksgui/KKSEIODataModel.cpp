@@ -36,6 +36,7 @@ KKSEIODataModel :: KKSEIODataModel (const KKSTemplate * t, const KKSMap<qint64, 
     if (!cAttrForeground)
         cAttrForeground = getFirstAttribute (KKSAttrType::atRecordTextColorRef);
     setupData (rootItem);
+    setVisibleAttrs ();
 }
 
 KKSEIODataModel :: ~KKSEIODataModel ()
@@ -50,7 +51,7 @@ int KKSEIODataModel :: columnCount (const QModelIndex& parent) const
     Q_UNUSED (parent);
     if (!tRef)
         return 0;
-    return tRef->attrsCount();
+    return visibleAttrs.count();
 }
 
 int KKSEIODataModel :: rowCount (const QModelIndex& parent) const
@@ -116,13 +117,14 @@ Qt::ItemFlags KKSEIODataModel :: flags (const QModelIndex& index) const
 
 QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
 {
-    if (!index.isValid() )//&& role <= Qt::UserRole+1)
-        return QVariant();
-
     if (role == Qt::UserRole+2)
         return QVariant::fromValue<const KKSTemplate *>(tRef);
     else if (role == Qt::UserRole+3)
-        return QVariant::fromValue<KKSCategoryAttr>(*cAttrP);
+        return QVariant::fromValue<const KKSCategoryAttr *>(cAttrP);
+
+    if (!index.isValid() )//&& role <= Qt::UserRole+1)
+        return QVariant();
+
     KKSTreeItem * wItem = static_cast<KKSTreeItem*>(index.internalPointer());
     if (!wItem)
         return QVariant ();
@@ -185,7 +187,7 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
 
 QVariant KKSEIODataModel :: headerData (int section, Qt::Orientation orientation, int role) const
 {
-    KKSList<KKSAttrView*> avList = tRef ? tRef->sortedAttrs() : KKSList<KKSAttrView*>();
+    KKSList<KKSAttrView*> avList(visibleAttrs);// = tRef ? tRef->sortedAttrs() : KKSList<KKSAttrView*>();
     if (orientation == Qt::Horizontal && section >= 0 && section < avList.count() && ((role == Qt::DisplayRole) || (role == Qt::EditRole)) )
     {
         QVariant v = avList[section]->title();
@@ -449,4 +451,22 @@ KKSTreeItem * KKSEIODataModel :: getItem(const QModelIndex &index) const
             return item;
     }
     return rootItem;   
+}
+
+void KKSEIODataModel :: setVisibleAttrs (void)
+{
+    if (!tRef)
+        visibleAttrs.clear ();
+    QList<KKSAttrView*> attrs_list = tRef->sortedAttrs();
+    for (int i=0; i<attrs_list.count(); i++)
+        if (attrs_list[i]->isVisible() && \
+                (attrs_list[i]->type ()->attrType () != KKSAttrType::atRecordColor) && \
+                (attrs_list[i]->type ()->attrType () != KKSAttrType::atRecordColorRef) && \
+                (attrs_list[i]->type ()->attrType () != KKSAttrType::atRecordTextColor) && \
+                (attrs_list[i]->type ()->attrType () != KKSAttrType::atRecordTextColorRef)
+           )
+        {
+            visibleAttrs.append (attrs_list[i]);
+        }
+    
 }

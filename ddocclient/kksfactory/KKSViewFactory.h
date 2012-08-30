@@ -33,6 +33,7 @@ class KKSAttrGroup;
 class KKSAGroup;
 class KKSCategoryAttr;
 class KKSEIOData;
+class KKSObjectExemplar;
 
 class _F_EXPORT KKSViewFactory
 {
@@ -67,12 +68,9 @@ class _F_EXPORT KKSViewFactory
 
         static void updateEIOEx (KKSLoader *l,
                                  KKSObject *pObj,
-                                 qint64 idObjEx,
+                                 const KKSMap<qint64, KKSObjectExemplar *>& idObjEx,
                                  const KKSTemplate *t,
-                                 QAbstractItemModel *sourceModel,
-                                 int row,
-                                 const KKSCategory * cat = 0,
-                                 const QString& tableName = QString()
+                                 QAbstractItemModel *sourceModel
                                  );
 
         static void loadCategories (KKSCategoryTemplateWidget* catTemplW,
@@ -137,8 +135,8 @@ class _F_EXPORT KKSViewFactory
 
         static QVariant drawViewCells (const KKSCategory * cat, KKSEIOData * d, int type, KKSLoader *l, QAbstractItemModel * objModel, const QModelIndex& wIndex, int icolor=0);
         
-        static QModelIndex searchModelIndex (QAbstractItemModel * sourceMod, int iData, const QModelIndex& parent = QModelIndex(), int role=Qt::DisplayRole);
-        static QModelIndex searchModelRowsIndex (QAbstractItemModel * sourceMod, int iData, const QModelIndex& parent = QModelIndex(), int role=Qt::DisplayRole);
+        static QModelIndex searchModelIndex (QAbstractItemModel * sourceMod, qint64 iData, const QModelIndex& parent = QModelIndex(), int role=Qt::UserRole);
+        static QModelIndex searchModelRowsIndex (QAbstractItemModel * sourceMod, qint64 iData, const QModelIndex& parent = QModelIndex(), int role=Qt::UserRole);
 
     protected:
     private:
