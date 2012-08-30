@@ -222,7 +222,7 @@ void KKSRecWidget :: init_widgets (bool mode)
     QGridLayout * gFLay = new QGridLayout (gbFilter);
     QLabel * lFilter = new QLabel (tr("Filter"), gbFilter);
     gFLay->addWidget (lFilter, 0, 0, 1, 1);
-    gFLay->addWidget (filterLE, 1, 0, 1, 1);
+    gFLay->addWidget (filterLE, 0, 1, 1, 1);
     pFilter->addAction (actViewAll);
     pFilter->addSeparator ();
     pFilter->addAction (actViewOnlyFromHere);
