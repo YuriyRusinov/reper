@@ -101,7 +101,7 @@ private:
     KKSList<KKSAttrValue*> m_attrValues;
     KKSList<KKSAttrValue*> m_indValues;//показатели записей справочников
     
-	KKSList<KKSFile *> m_files;
+    KKSList<KKSFile *> m_files;
     bool m_filesModified;
 
     KKSRubric * m_rootRubric;

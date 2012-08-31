@@ -55,6 +55,7 @@
 #include <KKSEventFilter.h>
 #include <KKSCheckableModel.h>
 #include <KKSAttrGroup.h>
+#include <kksresult.h>
 #include <defines.h>
 
 ////////////////////////////////////////////////////////////////////////
@@ -727,11 +728,56 @@ void KKSViewFactory :: updateEIOEx (KKSLoader *l,
                                     QAbstractItemModel *sourceModel
                                     )
 {
+    Q_UNUSED (l);
     if (!pObj || !t || !sourceModel)
         return;
     
 
-    qDebug () << __PRETTY_FUNCTION__ << sourceModel->rowCount () << sourceModel->columnCount ();
+    const KKSCategoryAttr * cAttrP = sourceModel->data(QModelIndex(), Qt::UserRole+3).value<const KKSCategoryAttr*>();
+    for (KKSMap<qint64, KKSObjectExemplar*>::const_iterator pr = objRecs.constBegin();
+            pr != objRecs.constEnd(); 
+            pr++)
+    {
+        QModelIndex recIndex = searchModelRowsIndex (sourceModel, pr.key());
+        KKSObjectExemplar * rec = pr.value();
+        if (cAttrP)
+        {
+            //
+            // Если запись не содержится в модели иерархического справочника,
+            // то мы находим подходящий родительский индекс, и добавляем запись в конец ветки.
+            //
+            if (recIndex.isValid())
+            {
+                QModelIndex pOldInd = recIndex.parent();
+                sourceModel->removeRows(recIndex.row(), 1, pOldInd);
+            }
+            int idParent = rec->attrValue(cAttrP->id())->value().value().toInt();
+            QModelIndex pIndex = searchModelRowsIndex (sourceModel, idParent);
+            int nr = sourceModel->rowCount(pIndex);
+            bool isInserted = sourceModel->insertRows(nr, 1, pIndex);
+            KKSEIOData * d = getRecordData (rec);
+            recIndex = sourceModel->index(nr, 0, pIndex);
+            sourceModel->setData (recIndex, rec->id(), Qt::UserRole);
+            bool isTempl = sourceModel->setData (recIndex, QVariant::fromValue<const KKSTemplate *>(t), Qt::UserRole+2);
+            bool isData = sourceModel->setData (recIndex, QVariant::fromValue<KKSEIOData *>(d), Qt::UserRole+1);
+            qDebug () << __PRETTY_FUNCTION__ << idParent << pIndex << recIndex << isInserted << isData << isTempl;
+        }
+        else
+        {
+            bool isInserted (false);
+            if (!recIndex.isValid())
+            {
+                int nr = sourceModel->rowCount();
+                isInserted = sourceModel->insertRows(nr, 1);
+                recIndex = sourceModel->index(nr, 0);
+            }
+            KKSEIOData * d = getRecordData (rec);
+            sourceModel->setData (recIndex, rec->id(), Qt::UserRole);
+            bool isTempl = sourceModel->setData (recIndex, QVariant::fromValue<const KKSTemplate *>(t), Qt::UserRole+2);
+            bool isData = sourceModel->setData (recIndex, QVariant::fromValue<KKSEIOData *>(d), Qt::UserRole+1);
+            qDebug () << __PRETTY_FUNCTION__ << recIndex << isInserted << isData << isTempl;
+        }
+    }
 /*    KKSCategory * cobjCat (0);//= pObj->category()->tableCategory();
     int idPAttr (-1);
     QList<int> pattrs;
@@ -849,6 +895,103 @@ void KKSViewFactory :: updateEIOEx (KKSLoader *l,
         }
     }
  */
+}
+
+KKSEIOData * KKSViewFactory :: getRecordData (const KKSObjectExemplar * rec)
+{
+    KKSEIOData * dRec = new KKSEIOData;
+    bool hasInterval = false;
+    KKSCategoryAttr * a = NULL;
+    const KKSCategory * c = rec->io()->category()->tableCategory();
+    KKSMap<int, KKSCategoryAttr *>::const_iterator pca;
+    for (pca = c->attributes().constBegin(); pca != c->attributes().constEnd() && !hasInterval; pca++)
+    {
+        a = pca.value();
+        hasInterval = (a && 
+            (a->type()->attrType() == KKSAttrType::atInterval ||
+             a->type()->attrType() == KKSAttrType::atIntervalH) 
+           );
+    }
+    int columns = rec->attrValues().count();
+    
+    for (int col=0; col<columns; col++)
+    {
+        QString code = QString(rec->attrValueIndex(col)->attribute()->code(false));//использование названия колонки для ключа QMap в классе KKSEIOData допустимо
+        QString value = QString(rec->attrValueIndex(col)->value().value());
+
+        if(code == "ii_rec_order" || code == "id"){
+            dRec->addSysField(code, value);
+        }
+        //в данном случае получение атрибута по его коду (хотя он и не является уникальным) 
+        //допустимо, поскольку категория описывает таблицу, а в таблице не может быть 
+        //двух колонок (атрибутов) с одинаковым названием                    
+        const KKSCategoryAttr* a = c->attribute(code);
+        if (!a)
+            continue;
+
+
+        //
+        // проверим на тип ИНТЕРВАЛ
+        //
+        if (hasInterval)
+        {
+            if (rec->attrValueIndex(col)->attribute()->type()->attrType() == KKSAttrType::atInterval ||
+                rec->attrValueIndex(col)->attribute()->type()->attrType() == KKSAttrType::atIntervalH)
+            {
+                const KKSCategoryAttr* a = c->attribute(code);
+                if (a && a->type()->attrType() == KKSAttrType::atInterval)
+                {
+                    KKSValue v;
+                    v.setValue(value, KKSAttrType::atInterval);
+                    value = v.value();
+                }
+                if (a && a->type()->attrType() == KKSAttrType::atIntervalH)
+                {
+                    KKSValue v;
+                    v.setValue(value, KKSAttrType::atIntervalH);
+                    value = v.value();
+                }
+            }
+        }
+
+        if(rec->attrValueIndex(col)->attribute()->type()->attrType() == KKSAttrType::atBool)
+        {
+            QString s = value.toLower();
+            if(s == "t" || s == "true" || s == "1")
+                value = QObject::tr("Yes");
+            else
+                value = QObject::tr("No");
+        }
+
+        if (rec->attrValueIndex(col)->attribute()->type()->attrType() == KKSAttrType::atDateTime)
+        {
+            KKSValue v(value, KKSAttrType::atDateTime);
+            QDateTime dt = v.valueVariant().toDateTime();
+            value = dt.toString("dd.MM.yyyy hh:mm:ss");
+        }
+
+        int ier = 0;
+        if(a->type()->attrType() == KKSAttrType::atList ||
+            a->type()->attrType() == KKSAttrType::atParent
+            )
+        {
+            value = rec->attrValueIndex(col)->value().columnValue();
+            QString sysValue = rec->attrValueIndex(col)->value().value();
+            ier = dRec->addField(code, value);
+            ier = dRec->addSysField(code, sysValue);
+        }
+        else            
+            ier = dRec->addField(code, value);
+
+        if (ier != OK_CODE)
+        {
+            qDebug () << __PRETTY_FUNCTION__ << QObject::tr ("Error");
+            dRec->release ();
+            return 0;
+        }
+        
+    }
+    return dRec;
 }
 
 /* Метод загружает категории верхнего уровня в соответствующий виджет.

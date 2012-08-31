@@ -39,7 +39,10 @@ void KKSItemDelegate :: paint (QPainter * painter, const QStyleOptionViewItem& o
     QTime tPaint;
     tPaint.start();
     QItemDelegate::paint (painter, option, index);
-    qDebug () << __PRETTY_FUNCTION__ << index << option.rect << option.decorationSize << tPaint.elapsed() << QString(" msecs");
+    int mps = tPaint.elapsed();
+    Q_UNUSED (mps);
+//    if (mps > 0)
+//        qDebug () << __PRETTY_FUNCTION__ << index << option.rect << option.decorationSize << mps;// << QString(" msecs");
 
     return;
 /*

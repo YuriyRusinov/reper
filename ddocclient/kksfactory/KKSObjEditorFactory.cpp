@@ -1703,15 +1703,12 @@ void KKSObjEditorFactory :: saveObjectEx (KKSObjEditor * editor, KKSObjectExempl
     if (!transactionOk)
         return;
     editor->setObjChanged (!transactionOk);
-    if (!recModel)
+    Q_UNUSED (recModel);
+/*    if (!recModel)
         return;
     int ier = 0;
     for (int i=0; i<recList.count() && ier >=0; i++)
-        ier = writeRecIntoModel (recModel, recList[i]);
-/*    if (wObjE->io()->id () == IO_ORG_ID || \
-        wObjE->io()->id () == IO_UNITS_ID || \
-        wObjE->io()->id () == IO_POS_ID || \
-        wObjE->io()->id () == IO_USERS_ID)*/
+        ier = writeRecIntoModel (recModel, recList[i]);*/
     emit cioSaved (wObjE);
 }
 
@@ -1719,7 +1716,7 @@ int KKSObjEditorFactory :: writeRecIntoModel (QAbstractItemModel * recModel, KKS
 {
     if (!recModel)
         return ERROR_CODE;
-    const KKSCategoryAttr * cAttrP = new KKSCategoryAttr (recModel->data(QModelIndex(), Qt::UserRole+3).value<KKSCategoryAttr>());
+    const KKSCategoryAttr * cAttrP = recModel->data(QModelIndex(), Qt::UserRole+3).value<const KKSCategoryAttr *>();
     QModelIndex rIndex = KKSViewFactory::searchModelRowsIndex (recModel, wObjE->id(), QModelIndex(), Qt::UserRole);
     //qDebug () << __PRETTY_FUNCTION__ << (cAttrP ? cAttrP->id() : -1) << rIndex;
     int ier = OK_CODE;
@@ -1829,7 +1826,7 @@ int KKSObjEditorFactory :: writeRecords (QAbstractItemModel * recModel, KKSObjec
     if (p == recs.constEnd())
         return ERROR_CODE;
     KKSEIOData * d = p.value ();
-    if (!recModel->setData (rIndex, QVariant::fromValue<KKSEIOData>(*d), Qt::DisplayRole))
+    if (!recModel->setData (rIndex, QVariant::fromValue<KKSEIOData>(*d), Qt::UserRole+1))
         return ERROR_CODE;
 
     return wObjE->id ();
@@ -2452,10 +2449,10 @@ void KKSObjEditorFactory :: createNewEditor (QWidget * editor, int idObject, con
                               QMessageBox::Ok);
         return;
     }
-    connect(newObjEditor, 
-            SIGNAL(eioChanged(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *)), 
-            editor, 
-            SLOT(updateEIOEx(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *)));
+//    connect(newObjEditor, 
+//            SIGNAL(eioChanged(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *)), 
+//            editor, 
+//            SLOT(updateEIOEx(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *)));
     newObjEditor->setRecordsModel (recModel);
 
     //cSelection = oEditor ? oEditor->recWidget->tv->selectionModel()->selection() : QItemSelection();
@@ -2465,10 +2462,10 @@ void KKSObjEditorFactory :: createNewEditor (QWidget * editor, int idObject, con
     newObjEditor->setParentTab (nTab);
     
     if (qobject_cast <KKSObjEditor *>(editor))
-    connect(newObjEditor, 
-            SIGNAL(eioChanged(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *)), 
-            editor, 
-            SLOT(updateEIOEx(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *)));
+        connect(newObjEditor, 
+                SIGNAL(eioChanged(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *)), 
+                editor, 
+                SLOT(updateEIOEx(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *)));
     
     newObjEditor->setAttribute (Qt::WA_DeleteOnClose);
     //newObjEditor->showNormal ();
@@ -3400,7 +3397,8 @@ void KKSObjEditorFactory :: loadAttributeReference (QString tableName, QWidget *
         if (pv != values.constEnd())
             v_str = pv.value();
 
-        if(!refColumnValues.isEmpty()){
+        if(!refColumnValues.isEmpty())
+        {
             int id = recEditor->getID();
             if(id <= 0)
                 return;
@@ -3421,6 +3419,10 @@ void KKSObjEditorFactory :: loadAttributeReference (QString tableName, QWidget *
             av->attribute()->type()->attrType() == KKSAttrType::atParent )
         {
             vc = QVariant (v_str);
+            KKSValue v = av->value();
+            v.setColumnValue (v_str);
+            av->setValue (v);
+                
         }
         else if (av->attribute()->type()->attrType() == KKSAttrType::atRecordColorRef || 
                  av->attribute()->type()->attrType() == KKSAttrType::atRecordTextColorRef)

@@ -430,6 +430,14 @@ int KKSObjEditor :: constructObject()
             }
 
             v = KKSValue(value, type);
+            if (type == KKSAttrType::atList ||
+                type == KKSAttrType::atParent ||
+                type == KKSAttrType::atRecordColorRef ||
+                type == KKSAttrType::atRecordTextColorRef)
+            {
+                v.setColumnValue (cAttrValue->value().columnValue());
+                //qDebug () << __PRETTY_FUNCTION__ << v.value() << v.columnValue();
+            }
         }
         else
             v = cAttrValue->attribute()->defValue ();
@@ -591,6 +599,14 @@ int KKSObjEditor :: constructObject()
             }
 
             v = KKSValue(value, type);
+            if (type == KKSAttrType::atList ||
+                type == KKSAttrType::atParent ||
+                type == KKSAttrType::atRecordColorRef ||
+                type == KKSAttrType::atRecordTextColorRef)
+            {
+                v.setColumnValue (cAttrValue->value().columnValue());
+                //qDebug () << __PRETTY_FUNCTION__ << v.value() << v.columnValue();
+            }
         }
         else
             v = cAttrValue->attribute()->defValue ();
@@ -727,6 +743,14 @@ int KKSObjEditor :: constructObject()
             }
 
             KKSValue v (value, type);
+            if (type == KKSAttrType::atList ||
+                type == KKSAttrType::atParent ||
+                type == KKSAttrType::atRecordColorRef ||
+                type == KKSAttrType::atRecordTextColorRef)
+            {
+                v.setColumnValue (cAttrValue->value().columnValue());
+                //qDebug () << __PRETTY_FUNCTION__ << v.value() << v.columnValue();
+            }
             //qDebug () << __PRETTY_FUNCTION__ << type << v.valueForInsert() << value;
             
             KKSAttrValue * av = new KKSAttrValue (*cAttrValue); 

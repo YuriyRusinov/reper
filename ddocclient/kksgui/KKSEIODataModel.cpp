@@ -83,7 +83,8 @@ QModelIndex KKSEIODataModel :: index (int row, int column, const QModelIndex& pa
     KKSTreeItem *parentItem = getItem(parent);
 
     KKSTreeItem *childItem = parentItem->child(row);
-    if (childItem && childItem->getData() && childItem->getData()->isVisible())
+    if ((childItem && childItem->getData() && childItem->getData()->isVisible()) ||
+        (childItem && !childItem->getData()))
         return createIndex(row, column, childItem);
     else
         return QModelIndex();
@@ -243,13 +244,16 @@ bool KKSEIODataModel :: setData (const QModelIndex& index, const QVariant& value
     else if (role == Qt::UserRole+2)
     {
         const KKSTemplate * t = value.value<const KKSTemplate *>();
-        if (!t || t == tRef)
+        if (!t)
             return false;
-        if (tRef)
-            tRef->release ();
-        
-        tRef = t;
-        tRef->addRef();
+        if (t != tRef)
+        {
+            if (tRef)
+                tRef->release ();
+
+            tRef = t;
+            tRef->addRef();
+        }
         KKSEIOData * dVal = wItem->getData();;
         wItem->setData (dVal, tRef);
         emit dataChanged (topL, bottomR);

@@ -81,7 +81,7 @@ void TransportSettingsForm :: init (void)
     UI->lEHttpHost->setToolTip(tr("Host where client must connect"));
     UI->lEHttpPort->setToolTip(tr("Port where client must connect"));
     
-    UI->lEHttpTransport->setToolTip(tr("Identificator transport in system (for http-protocol must be 2)"));
+    UI->lEHttpTransport->setToolTip(tr("Identificator transport in system (for tcp/ip protocol has to be 1, for http-protocol has to be 2)"));
 
     UI->lEServerHost->setToolTip(tr("Server where other client must connect"));
     UI->lEServerPort->setToolTip(tr("Server port number"));
