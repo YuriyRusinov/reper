@@ -798,13 +798,14 @@ void KKSStuffFactory :: delStuffElement (const QModelIndex& index, int entity, Q
             break;
         }
     }
-    int ier = oef->deleteOE (editor, io->id(), index.data (Qt::UserRole).toInt(), io->tableName(), index.row());
-    if (ier == OK_CODE && stuffModel)
+    int idStuffEnt = index.data (Qt::UserRole).toInt();
+    int ier = oef->deleteOE (editor, io->id(), idStuffEnt, io->tableName(), stuffModel, index);
+/*    if (ier == OK_CODE && stuffModel)
     {
         int irow = index.row ();
         stuffModel->removeRows (irow, 1, index.parent());
     }
-
+*/
     io->release();
 
 }

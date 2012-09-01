@@ -247,7 +247,7 @@ public slots:
     void createNewEditorParam (QWidget * editor, int idObject, const KKSCategory * c, QString tableName, int nTab, bool isModal, const KKSMap<int, KKSAttrValue *>& ioAvals, const KKSMap<int, KKSAttrValue *>& aVals, QAbstractItemModel * recModel=0);
     
     void editExistOE (QWidget * editor, int idObject, qint64 idObjEx, const KKSCategory * c, QString tableName, int nTab, bool isModal, QAbstractItemModel * recModel=0);
-    int deleteOE (QWidget * editor, int idObject, qint64 idObjEx, QString tableName, int drow);
+    int deleteOE (QWidget * editor, int idObject, qint64 idObjEx, QString tableName, QAbstractItemModel * recModel, const QModelIndex& recIndex);
     
     void addAttrSearchTemplate (void);
     void editAttrSearchTemplate (void);

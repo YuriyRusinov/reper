@@ -1549,7 +1549,7 @@ void KKSObjEditorFactory :: setObjConnect (KKSObjEditor *editor)
     connect (editor, SIGNAL (saveObjE(KKSObjEditor*, KKSObjectExemplar *, const KKSCategory*, QString, int, QAbstractItemModel *)), this, SLOT (saveObjectEx(KKSObjEditor*, KKSObjectExemplar *, const KKSCategory*, QString, int, QAbstractItemModel *)) );
     connect (editor, SIGNAL (newObjectEx (QWidget*, int, const KKSCategory *, QString, int, bool, QAbstractItemModel *)), this, SLOT (createNewEditor(QWidget*, int, const KKSCategory *, QString, int, bool, QAbstractItemModel *)) );
     connect (editor, SIGNAL (editObjectEx (QWidget*, int, qint64, const KKSCategory *, QString, int, bool, QAbstractItemModel *)), this, SLOT (editExistOE (QWidget*, int, qint64, const KKSCategory *, QString, int, bool, QAbstractItemModel *)) );
-    connect (editor, SIGNAL (delObjectEx (QWidget*, int, qint64, QString, int)), this, SLOT (deleteOE (QWidget*, int, qint64, QString, int)) );
+    connect (editor, SIGNAL (delObjectEx (QWidget*, int, qint64, QString, QAbstractItemModel *, const QModelIndex& )), this, SLOT (deleteOE (QWidget*, int, qint64, QString, QAbstractItemModel *, const QModelIndex&)) );
     connect (editor, SIGNAL (filterObjectEx (KKSObjEditor*, int, const KKSCategory *, QString)), this, SLOT (filterEIO (KKSObjEditor*, int, const KKSCategory *, QString)) );
     connect (editor, SIGNAL (refreshObjectEx (KKSObjEditor*, int, const KKSCategory *, QString, QAbstractItemModel *)), this, SLOT (refreshEIO (KKSObjEditor*, int, const KKSCategory *, QString, QAbstractItemModel *)) );
     connect (editor, SIGNAL (filterObjectTemplateEx (KKSObjEditor*, int, const KKSCategory *, QString)), this, SLOT (filterTemplateEIO (KKSObjEditor*, int, const KKSCategory *, QString)) );
@@ -2633,9 +2633,8 @@ void KKSObjEditorFactory :: editExistOE (QWidget * editor, int idObject, qint64 
  * tableName -- название таблицы
  * drow -- номер удаляемой строки (для сохранения выделения)
  */
-int KKSObjEditorFactory :: deleteOE (QWidget * editor, int idObject, qint64 idObjEx, QString tableName, int drow)
+int KKSObjEditorFactory :: deleteOE (QWidget * editor, int idObject, qint64 idObjEx, QString tableName, QAbstractItemModel * recModel, const QModelIndex& recIndex)
 {
-    Q_UNUSED (drow);
     if (!editor)
         return ERROR_CODE;
 
@@ -2702,6 +2701,12 @@ int KKSObjEditorFactory :: deleteOE (QWidget * editor, int idObject, qint64 idOb
         wObj->release();
         wObjEx->release();
         return -2;
+    }
+    if (recModel && recIndex.isValid())
+    {
+        QModelIndex pIndex = recIndex.parent();
+        int ir = recIndex.row();
+        recModel->removeRows (ir, 1, pIndex);
     }
 /*
     KKSObjEditor * oEditor = qobject_cast <KKSObjEditor *>(editor);

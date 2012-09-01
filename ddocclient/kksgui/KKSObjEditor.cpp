@@ -1091,14 +1091,18 @@ void KKSObjEditor :: delObjectE (void)
         return;
 
     int idObjE = -1;//recWidget->getID();//wIndex.data (Qt::UserRole).toInt ();
+
+    QAbstractItemModel * recModel (0);
     int i = tabEnclosures ? tabEnclosures->currentIndex () : 0;
     if (i == 0 && recWidget && recWidget->getID() > 0)
     {
         idObjE = recWidget->getID();//index.data(Qt::UserRole).toInt();
+        recModel = recWidget->getSourceModel ();
     }
     else if (i <= addCats.count())
     {
         idObjE = addRecWidgets[i-1]->getID ();
+        recModel = addRecWidgets[i-1]->getSourceModel ();
     }
 
     //дл€ Ё»ќ, которые имеют подчиненную таблицу, 
@@ -1116,7 +1120,7 @@ void KKSObjEditor :: delObjectE (void)
         tabName = p.value()->getTableName();
     }
     qDebug () << __PRETTY_FUNCTION__ << tabName;
-    emit delObjectEx (this, idObject, idObjE, tabName, dIndex.row());
+    emit delObjectEx (this, idObject, idObjE, tabName, recModel, dIndex);
 }
 
 void KKSObjEditor :: saveChildObjE (KKSObjectExemplar *childObjE)
