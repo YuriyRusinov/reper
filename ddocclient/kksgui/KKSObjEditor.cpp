@@ -837,14 +837,14 @@ void KKSObjEditor :: recSaved (KKSObjectExemplar * rec)
     // Это надо вызывать всегда после сохранения в БД
     //
     KKSMap<qint64, KKSObjectExemplar *> idL;
-    if (!additionalCopies.contains (pObjectEx->id()))
-        idL.insert (pObjectEx->id(), pObjectEx);
+    if (!additionalCopies.contains (rec->id()))
+        idL.insert (rec->id(), rec);
     for (KKSMap<qint64, KKSObjectExemplar *>::const_iterator p=additionalCopies.constBegin();
             p != additionalCopies.constEnd();
             p++)
         idL.insert (p.key(), p.value());
     //idL += additionalCopies;
-    emit eioChanged (pObjectEx->io(), idL, pRecModel);//pObjectEx->id());
+    emit eioChanged (rec->io(), idL, pRecModel);//pObjectEx->id());
 }
 
 void KKSObjEditor :: save (int num)
@@ -865,6 +865,7 @@ void KKSObjEditor :: saveAsCommandResult()
         return;
 
     emit saveObjAsCommandResult(this, pObj, pObjectEx, 1, pRecModel);
+/*
     //
     // Это надо вызывать всегда
     //
@@ -877,6 +878,7 @@ void KKSObjEditor :: saveAsCommandResult()
         idL.insert (p.key(), p.value());
     //idL += additionalCopies;
     emit eioChanged (pObjectEx->io(), idL, pRecModel);//pObjectEx->id());
+ */
 /*    QList<qint64> idL;
     if (!additionalCopies.contains (pObjectEx->id()))
         idL.append (pObjectEx->id());
