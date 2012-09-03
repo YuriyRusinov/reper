@@ -109,7 +109,11 @@ KKSRecWidget * KKSViewFactory :: createView (KKSTemplate* theTemplate,
         QObject::connect (resWidget->actEdit, SIGNAL (triggered()), objEditor, SLOT (editObjectE()) );
     }
     if (resWidget->actDel)
+    {
+        QKeySequence kDel (Qt::Key_Delete);
+        resWidget->actDel->setShortcut (kDel);
         QObject::connect (resWidget->actDel, SIGNAL (triggered()), objEditor, SLOT (delObjectE()) );
+    }
     if (resWidget->actImport)
         QObject::connect (resWidget->actImport, SIGNAL (triggered()), objEditor, SLOT (importObjectE()) );
     if (resWidget->actExport)

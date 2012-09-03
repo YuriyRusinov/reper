@@ -836,6 +836,8 @@ void KKSObjEditor :: recSaved (KKSObjectExemplar * rec)
     //
     // Это надо вызывать всегда после сохранения в БД
     //
+    if (rec->id() != pObjectEx->id())
+        return;
     KKSMap<qint64, KKSObjectExemplar *> idL;
     if (!additionalCopies.contains (rec->id()))
         idL.insert (rec->id(), rec);
@@ -1116,6 +1118,11 @@ void KKSObjEditor :: delObjectE (void)
     //идентификатор ЭИО является идентификатором ИО
     int idObject = pObjectEx->id();
     QModelIndex dIndex = (i == 0 ? recWidget->getSourceIndex () : addRecWidgets[i-1]->getSourceIndex ()) ;
+    if (recModel->rowCount(dIndex) > 0)
+    {
+        QMessageBox::warning (this, tr ("Delete record"), tr("Error ! Record contains children. Removing is impossible."), QMessageBox::Ok, QMessageBox::NoButton);
+        return;
+    }
     QString tabName = QString ();
     qDebug () << __PRETTY_FUNCTION__ << i;
     if (i == 0)
