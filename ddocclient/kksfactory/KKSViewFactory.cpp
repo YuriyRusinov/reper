@@ -746,21 +746,23 @@ void KKSViewFactory :: updateEIOEx (KKSLoader *l,
             // Если запись не содержится в модели иерархического справочника,
             // то мы находим подходящий родительский индекс, и добавляем запись в конец ветки.
             //
-            if (recIndex.isValid())
-            {
-                QModelIndex pOldInd = recIndex.parent();
-                sourceModel->removeRows(recIndex.row(), 1, pOldInd);
-            }
             int idParent = rec->attrValue(cAttrP->id())->value().value().toInt();
             QModelIndex pIndex = searchModelRowsIndex (sourceModel, idParent);
-            int nr = sourceModel->rowCount(pIndex);
-            bool isInserted = sourceModel->insertRows(nr, 1, pIndex);
+            QModelIndex pOldInd = recIndex.parent();
+            if (recIndex.isValid() && pOldInd != pIndex)
+            {
+                sourceModel->removeRows(recIndex.row(), 1, pOldInd);
+                int nr = sourceModel->rowCount(pIndex);
+                bool isInserted = sourceModel->insertRows(nr, 1, pIndex);
+                if (!isInserted)
+                    return;
+                recIndex = sourceModel->index(nr, 0, pIndex);
+            }
             KKSEIOData * d = getRecordData (rec);
-            recIndex = sourceModel->index(nr, 0, pIndex);
             sourceModel->setData (recIndex, rec->id(), Qt::UserRole);
             bool isTempl = sourceModel->setData (recIndex, QVariant::fromValue<const KKSTemplate *>(t), Qt::UserRole+2);
             bool isData = sourceModel->setData (recIndex, QVariant::fromValue<KKSEIOData *>(d), Qt::UserRole+1);
-            qDebug () << __PRETTY_FUNCTION__ << idParent << pIndex << recIndex << isInserted << isData << isTempl;
+            qDebug () << __PRETTY_FUNCTION__ << idParent << pIndex << recIndex << isData << isTempl;
         }
         else
         {
