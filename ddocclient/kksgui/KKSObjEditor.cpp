@@ -829,8 +829,12 @@ void KKSObjEditor :: saveToDb (int num)
         //emit ioChanged();
     }
 
+}
+
+void KKSObjEditor :: recSaved (KKSObjectExemplar * rec)
+{
     //
-    // Это надо вызывать всегда
+    // Это надо вызывать всегда после сохранения в БД
     //
     KKSMap<qint64, KKSObjectExemplar *> idL;
     if (!additionalCopies.contains (pObjectEx->id()))

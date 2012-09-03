@@ -1578,6 +1578,7 @@ void KKSObjEditorFactory :: setObjConnect (KKSObjEditor *editor)
     
     connect (editor, SIGNAL (generateUUID (int, const KKSAttrValue *)), this, SLOT (genUUID (int, const KKSAttrValue *)) );
     connect (this, SIGNAL (setuuid (QString)), editor, SLOT (setIOUUID (QString)) );
+    connect (this, SIGNAL (cioSaved(KKSObjectExemplar *)), editor, SLOT (recSaved(KKSObjectExemplar *)) );
 }
 
 /*
@@ -2033,15 +2034,19 @@ void KKSObjEditorFactory :: saveObject (KKSObjEditor* editor,
            io->release ();
     }
     if (transactionOk)
+    {
         editor->setObjChanged (false);
+        emit cioSaved (pObjectEx);
+    }
     else
         editor->setObjChanged (true);
+/*
     if (!recModel || !transactionOk)
         return;
     int ier = 0;
     for (int i=0; i<recList.count() && ier >=0; i++)
         ier = writeRecIntoModel (recModel, recList[i]);
-
+*/
 }
 
 void KKSObjEditorFactory :: loadObject (KKSObjEditor * editor, int idObjectE, int idObject)

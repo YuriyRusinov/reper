@@ -183,6 +183,8 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void viewIndicator (void);
         void generateIOUUID (int idAttrVal);
         void setIOUUID (QString uuid);
+        
+        void recSaved (KKSObjectExemplar * rec);
 //        void editIndicator (void);
 //        void delIndicator (void);
 //        void addIndicator (void);
