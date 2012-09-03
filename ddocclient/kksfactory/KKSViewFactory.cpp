@@ -758,6 +758,14 @@ void KKSViewFactory :: updateEIOEx (KKSLoader *l,
                     return;
                 recIndex = sourceModel->index(nr, 0, pIndex);
             }
+            else if (!recIndex.isValid())
+            {
+                int nr = sourceModel->rowCount(pIndex);
+                bool isInserted = sourceModel->insertRows(nr, 1, pIndex);
+                if (!isInserted)
+                    return;
+                recIndex = sourceModel->index(nr, 0, pIndex);
+            }
             KKSEIOData * d = getRecordData (rec);
             sourceModel->setData (recIndex, rec->id(), Qt::UserRole);
             bool isTempl = sourceModel->setData (recIndex, QVariant::fromValue<const KKSTemplate *>(t), Qt::UserRole+2);
