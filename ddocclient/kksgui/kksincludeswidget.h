@@ -61,7 +61,7 @@ private slots:
     void copyFromRubric (void);
 
     void addRubricItem (void);
-	void createRubricItem (void);
+    void createRubricItem (void);
     void editRubricItem (void);
     void slotRubricItemDblClicked(const QModelIndex & index);
     void delRubricItem (void);
@@ -69,6 +69,7 @@ private slots:
     void addSearchTemplateIntoRubric (void);
     void addCategoryIntoRubric (void);
     void rubricSelectionChanged (const QItemSelection& selected, const QItemSelection& deselected);
+    void turnRubricSplitter (void);
 
 public slots:
     void slotAddRubricItem(int idRubricItem, QString name);
@@ -78,7 +79,7 @@ private slots:
 
 signals:
     void rubricItemRequested();
-	void rubricItemCreationRequested(const KKSRubric * r);
+    void rubricItemCreationRequested(const KKSRubric * r);
     void openRubricItemRequested(int idRubricItem);
     void saveRubric (KKSRubric * r, bool isMyDocs);
     void rubricsChanged (void);

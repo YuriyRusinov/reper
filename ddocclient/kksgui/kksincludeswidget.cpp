@@ -164,6 +164,10 @@ void KKSIncludesWidget :: initActions (void)
         if (i==2)
             tBRubrActions->addSeparator ();
     }
+    tBRubrActions->addSeparator();
+    QAction * aRubrWidgetRotate = new QAction(QIcon(":/ddoc/orientation_icon.png"), tr ("Rotate widget"), this);
+    connect (aRubrWidgetRotate, SIGNAL (triggered()), this, SLOT (turnRubricSplitter()) );
+    tBRubrActions->addAction (aRubrWidgetRotate);
 }
 
 void KKSIncludesWidget::initTwIncludes()
@@ -1016,6 +1020,16 @@ void KKSIncludesWidget::rubricSelectionChanged (const QItemSelection& selected, 
     }
     else
         recWItems->setVisible (false);
+}
+
+void KKSIncludesWidget :: turnRubricSplitter (void)
+{
+    Qt::Orientation rorient = this->spRubrics->orientation();
+    /*if (rorient == Qt::Horizontal)
+        spRubrics->setOrientation (Qt::Vertical);
+    else
+        spRubrics->setOrientation (Qt::Horizontal);*/
+    this->spRubrics->setOrientation ((Qt::Orientation)(0x3-rorient));
 }
 
 /*=================*/
