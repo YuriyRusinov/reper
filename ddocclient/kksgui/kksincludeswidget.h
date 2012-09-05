@@ -66,6 +66,7 @@ private slots:
     void createRubricItem (void);
     void editRubricItem (void);
     void slotRubricItemDblClicked(const QModelIndex & index);
+    void slotRubricItemEdit(const QModelIndex & index);
     void delRubricItem (void);
 
     void addSearchTemplateIntoRubric (void);

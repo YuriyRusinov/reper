@@ -109,7 +109,7 @@ KKSIncludesWidget::KKSIncludesWidget(KKSRubric * rootRubric,
     connect (recWItems->actAdd, SIGNAL (triggered()), this, SLOT (createRubricItem()) );
     connect (recWItems->actEdit, SIGNAL (triggered()), this, SLOT (editRubricItem()) );
     connect (twIncludes, SIGNAL (doubleClicked(const QModelIndex &)), this, SLOT (slotRubricItemDblClicked(const QModelIndex &)) );
-    // recWItems->getView()
+    connect (recWItems->getView(), SIGNAL (doubleClicked(const QModelIndex &)), this, SLOT (slotRubricItemEdit(const QModelIndex &)) );
     connect (recWItems->actDel, SIGNAL (triggered()), this, SLOT (delRubricItem()) );
 }
 
@@ -879,6 +879,10 @@ void KKSIncludesWidget::slotRubricItemDblClicked(const QModelIndex & index)
         editRubric();
 }
 
+void KKSIncludesWidget::slotRubricItemEdit(const QModelIndex & /*index*/)
+{
+    editRubricItem();
+}
 /*
 void KKSIncludesWidget::on_cbUseIncludes_stateChanged(int state)
 {
