@@ -456,6 +456,14 @@ int KKSXMLForm :: initExportData (const KKSMap<qint64, KKSEIOData *>& ioData, co
     return OK_CODE;
 }
 
+void KKSXMLForm :: setExportModel (QAbstractItemModel * recModel)
+{
+    QAbstractItemModel * oldModel = ui->tVPreview->model ();
+    ui->tVPreview->setModel (recModel);
+    if (oldModel && oldModel != recModel)
+        delete oldModel;
+}
+
 void KKSXMLForm :: viewParameters (void)
 {
     bool isPars = !ui->gbPars->isVisible();

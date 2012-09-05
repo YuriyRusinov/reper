@@ -1556,8 +1556,8 @@ void KKSObjEditorFactory :: setObjConnect (KKSObjEditor *editor)
     connect (editor, SIGNAL (updateEIO (KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *, const QItemSelection& )), this, SLOT (updateEIOView (KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *, const QItemSelection& )) );
     connect (editor, SIGNAL (loadAttrRef (QString, QWidget*, int)), this, SLOT (loadAttributeReference (QString, QWidget *, int)) );
     connect (editor, SIGNAL (setTemplate (KKSObjEditor*, KKSObject*)), this, SLOT (setEIOTemplates (KKSObjEditor*, KKSObject*)) );
-    connect (editor, SIGNAL (importObjectEx (KKSObjEditor *, int, const KKSCategory *, QString)), this, SLOT (importEIO (KKSObjEditor *, int, const KKSCategory *, QString)) );
-    connect (editor, SIGNAL (exportObjectEx (KKSObjEditor *, int, const KKSCategory *, QString)), this, SLOT (exportEIO (KKSObjEditor *, int, const KKSCategory *, QString)) );
+    connect (editor, SIGNAL (importObjectEx (KKSObjEditor *, int, const KKSCategory *, QString, QAbstractItemModel *)), this, SLOT (importEIO (KKSObjEditor *, int, const KKSCategory *, QString, QAbstractItemModel *)) );
+    connect (editor, SIGNAL (exportObjectEx (KKSObjEditor *, int, const KKSCategory *, QString, QAbstractItemModel *)), this, SLOT (exportEIO (KKSObjEditor *, int, const KKSCategory *, QString, QAbstractItemModel *)) );
     connect (editor, SIGNAL (prepareIO (KKSObject*, KKSObjectExemplar *, KKSObjEditor*)), this, SLOT (sendIO (KKSObject *, KKSObjectExemplar *, KKSObjEditor *)) );
     
     connect (editor, SIGNAL (editObjAttrRef (KKSObject *, const KKSAttrValue*, KKSIndAttr::KKSIndAttrClass, QAbstractItemModel *)), this, SLOT (loadObjAttrRef (KKSObject *, const KKSAttrValue*, KKSIndAttr::KKSIndAttrClass, QAbstractItemModel *)) );
@@ -4401,8 +4401,9 @@ void KKSObjEditorFactory :: regroupAttrs (QWidget *wIOAttr, QScrollArea *scIOatt
  * cat -- табличная категория
  * tableName -- название таблицы.
  */
-void KKSObjEditorFactory :: importEIO (KKSObjEditor * editor, int idObject, const KKSCategory * cat, QString tableName)
+void KKSObjEditorFactory :: importEIO (KKSObjEditor * editor, int idObject, const KKSCategory * cat, QString tableName, QAbstractItemModel * recModel)
 {
+    Q_UNUSED (recModel);
     KKSCategory *c0 = 0;//t ? t->category() : 0;
 
     KKSObject *io = loader->loadIO (idObject, true);
@@ -5007,7 +5008,7 @@ int KKSObjEditorFactory :: searchParents (const KKSList<KKSObjectExemplar *>& oe
  * cat -- табличная категория
  * tableName -- название таблицы
  */
-void KKSObjEditorFactory :: exportEIO (KKSObjEditor * editor, int idObject, const KKSCategory * cat, QString tableName)
+void KKSObjEditorFactory :: exportEIO (KKSObjEditor * editor, int idObject, const KKSCategory * cat, QString tableName, QAbstractItemModel * recModel)
 {
     KKSObject *io = loader->loadIO (idObject, true);
     if (!io)
@@ -5021,16 +5022,17 @@ void KKSObjEditorFactory :: exportEIO (KKSObjEditor * editor, int idObject, cons
     else
         c0 = new KKSCategory (*(io->category()->tableCategory()));
 
-    int i = editor->tabEnclosures->currentIndex ();
+/*    int i = editor->tabEnclosures->currentIndex ();
     QTreeView * tv=0;
     if (i==0)
         tv = editor->recWidget->getView();
     else if (i <= editor->addRecWidgets.count())
         tv = editor->addRecWidgets[i-1]->getView();
+ */
 
     KKSList<KKSObjectExemplar*> oeList;
     QList<int> idOe;
-    this->getModelIds (tv->model(), QModelIndex(), idOe);
+    this->getModelIds (recModel, QModelIndex(), idOe);
     for (int i=0; i<idOe.count(); i++)
     {
         int id = idOe[i];//wIndex.data (Qt::UserRole).toInt();
@@ -5053,7 +5055,7 @@ void KKSObjEditorFactory :: exportEIO (KKSObjEditor * editor, int idObject, cons
             io->release ();
         return;
     }
-    int res = xmlForm->initExportData (objEx, c0);//io->category()->tableCategory());
+    /*int res = xmlForm->initExportData (objEx, c0);//io->category()->tableCategory());
     if (res == ERROR_CODE)
     {
         if (io)
@@ -5061,7 +5063,8 @@ void KKSObjEditorFactory :: exportEIO (KKSObjEditor * editor, int idObject, cons
         xmlForm->setParent (0);
         delete xmlForm;
         return;
-    }
+    }*/
+    xmlForm->setExportModel (recModel);
 
     if (xmlForm->exec () == QDialog::Accepted)
     {

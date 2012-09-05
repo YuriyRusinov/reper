@@ -71,6 +71,7 @@ class _GUI_EXPORT KKSXMLForm : public QDialog
         QAbstractItemModel *getPreliminaryData (void) const;
 
         int initExportData (const KKSMap<qint64, KKSEIOData *>& ioData, const KKSCategory *c);
+        void setExportModel (QAbstractItemModel * recModel);
 
     signals:
         void loadAttributes (KKSCategory * c, const QStringList& attrCodeList);

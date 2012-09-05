@@ -1957,6 +1957,8 @@ void KKSObjEditor :: importObjectE (void)
     int idObject = pObjectEx->id();
     QString tabName = QString ();
     qDebug () << __PRETTY_FUNCTION__ << i;
+    KKSRecWidget * recW = qobject_cast<KKSRecWidget *>(this->sender()->parent());
+    QAbstractItemModel * mod = recW ? recW->getSourceModel () : 0;
     if (i == 0)
     {
         c = pCat;//pObjectEx->io()->category()->tableCategory ();
@@ -1969,7 +1971,7 @@ void KKSObjEditor :: importObjectE (void)
         tabName = p.value()->getTableName();
         qDebug () << __PRETTY_FUNCTION__ << c->id() << tabName;
     }
-    emit importObjectEx (this, idObject, c, tabName);
+    emit importObjectEx (this, idObject, c, tabName, mod);
 }
 
 void KKSObjEditor :: exportObjectE (void)
@@ -1979,6 +1981,8 @@ void KKSObjEditor :: exportObjectE (void)
     int idObject = pObjectEx->id();
     QString tabName = QString ();
     qDebug () << __PRETTY_FUNCTION__ << i;
+    KKSRecWidget * recW = qobject_cast<KKSRecWidget *>(this->sender()->parent());
+    QAbstractItemModel * mod = recW ? recW->getSourceModel () : 0;
     if (i == 0)
     {
         c = pCat;//pObjectEx->io()->category()->tableCategory ();
@@ -1990,7 +1994,7 @@ void KKSObjEditor :: exportObjectE (void)
         KKSMap<int, KKSAddTable*>::const_iterator p = addTables.constBegin()+i-1;
         tabName = p.value()->getTableName();
     }
-    emit exportObjectEx (this, idObject, c, tabName);
+    emit exportObjectEx (this, idObject, c, tabName, mod);
 }
 
 bool KKSObjEditor :: isObjChanged (void) const

@@ -256,7 +256,7 @@ public slots:
 private slots:
     void setEIOTemplates (KKSObjEditor* editor, KKSObject* wObj);
 
-    void importEIO (KKSObjEditor * editor, int idObject, const KKSCategory * c, QString tableName);
+    void importEIO (KKSObjEditor * editor, int idObject, const KKSCategory * c, QString tableName, QAbstractItemModel * recModel);
     void importCatAttrs (KKSCategory * c, const QStringList& catAttrs);
     void importCSV (QIODevice *csvDev, 
                     QString codeName, 
@@ -265,7 +265,7 @@ private slots:
                     QAbstractItemModel *dataModel, 
                     KKSXMLForm *xmlForm);
 
-    void exportEIO (KKSObjEditor * editor, int idObject, const KKSCategory * c, QString tableName);
+    void exportEIO (KKSObjEditor * editor, int idObject, const KKSCategory * c, QString tableName, QAbstractItemModel * recModel);
     void updateEIOView (KKSObject * refObj, 
                         const KKSMap<qint64, KKSObjectExemplar *>& idObjEx, 
                         QAbstractItemModel * recModel,

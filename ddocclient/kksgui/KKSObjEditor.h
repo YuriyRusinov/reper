@@ -206,8 +206,8 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         
         void loadAttrRef (QString tableName, QWidget * awAttr, int attrId);//посылаем сигнал всегда с ИД атрибута. Поскольку используется в соответствующем слоте именно он
         void setTemplate (KKSObjEditor* editor, KKSObject* wObj);
-        void importObjectEx (KKSObjEditor * editor, int idObject, const KKSCategory * c, QString tableName);
-        void exportObjectEx (KKSObjEditor * editor, int idObject, const KKSCategory * c, QString tableName);
+        void importObjectEx (KKSObjEditor * editor, int idObject, const KKSCategory * c, QString tableName, QAbstractItemModel * recModel);
+        void exportObjectEx (KKSObjEditor * editor, int idObject, const KKSCategory * c, QString tableName, QAbstractItemModel * recModel);
 
         void rubricItemSelected(int idObject, QString name);
         void rubricItemRecSelected(int idObjectRec, QString name);
