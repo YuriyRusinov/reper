@@ -103,7 +103,8 @@ KKSIncludesWidget::KKSIncludesWidget(KKSRubric * rootRubric,
                 );
     connect (recWItems->actAdd, SIGNAL (triggered()), this, SLOT (createRubricItem()) );
     connect (recWItems->actEdit, SIGNAL (triggered()), this, SLOT (editRubricItem()) );
-    connect (recWItems->getView(), SIGNAL (doubleClicked(const QModelIndex &)), this, SLOT (slotRubricItemDblClicked(const QModelIndex &)) );
+    connect (twIncludes, SIGNAL (doubleClicked(const QModelIndex &)), this, SLOT (slotRubricItemDblClicked(const QModelIndex &)) );
+    // recWItems->getView()
     connect (recWItems->actDel, SIGNAL (triggered()), this, SLOT (delRubricItem()) );
 }
 
@@ -192,6 +193,8 @@ void KKSIncludesWidget::parseRubric(KKSRubric * rubric, QModelIndex index)
     for(int i=0; i<cnt; i++){
         KKSRubric * r = rubric->rubric(i);
         QModelIndex cIndex = appendRubricRow(r, index);
+        QAbstractItemModel * model = twIncludes->model();
+        model->setData(cIndex, r->name(), Qt::ToolTipRole);
         parseRubric(r, cIndex);
         parseItems(r, cIndex);
     }
@@ -709,11 +712,13 @@ void KKSIncludesWidget :: createRubricItem (void)
     KKSRubric * r = currentRubric();
     if(!r)
         return;
-	if(!r->getCategory()){
-		QMessageBox::warning(this, tr("Warning"), tr("Creation of new IO allowed only for rubrics with accigned category!"), QMessageBox::Ok);
-		
-		return;
-	}
+
+    if(!r->getCategory())
+    {
+            QMessageBox::warning(this, tr("Warning"), tr("Creation of new IO allowed only for rubrics with accigned category!"), QMessageBox::Ok);
+
+            return;
+    }
 
     emit rubricItemCreationRequested(r);
 }
@@ -849,9 +854,11 @@ void KKSIncludesWidget :: editRubricItem (void)
 
 void KKSIncludesWidget::slotRubricItemDblClicked(const QModelIndex & index)
 {
-    Q_UNUSED(index);
-
-    editRubricItem();
+    qDebug () << __PRETTY_FUNCTION__ << index.data(Qt::UserRole).toInt();
+    if (index.data(Qt::UserRole).toInt() == 2)
+        editRubricItem();
+    else
+        this->editRubric();
 }
 
 /*

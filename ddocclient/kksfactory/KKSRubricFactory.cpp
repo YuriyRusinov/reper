@@ -95,7 +95,7 @@ KKSIncludesWidget * KKSRubricFactory :: createRubricEditor (int mode, const KKSL
 
     connect (iW, SIGNAL (saveRubric (KKSRubric *, bool)), this, SLOT (saveRubric (KKSRubric *, bool)) );
     connect (iW, SIGNAL (rubricItemRequested ()), this, SLOT (rubricItemUpload()) );
-	connect (iW, SIGNAL (rubricItemCreationRequested (const KKSRubric *)), this, SLOT (rubricItemCreate(const KKSRubric *)) );
+    connect (iW, SIGNAL (rubricItemCreationRequested (const KKSRubric *)), this, SLOT (rubricItemCreate(const KKSRubric *)) );
     connect (iW, SIGNAL (openRubricItemRequested (int)), this, SLOT (openRubricItem (int)) );
     connect (iW, SIGNAL (loadStuffModel (RubricForm *)), this, SLOT (loadRubricPrivilegies(RubricForm *)) );
     connect (iW, SIGNAL (loadSearchtemplate (RubricForm *)), this, SLOT (loadSearchTemplate (RubricForm *)) );
@@ -123,15 +123,15 @@ void KKSRubricFactory :: saveRubric (KKSRubric * rootR, bool isMyDocs)
 void KKSRubricFactory :: rubricItemCreate (const KKSRubric * r)
 {
     KKSIncludesWidget *editor = qobject_cast<KKSIncludesWidget *>(this->sender());
-    if(!editor)
+    if (!editor)
         return;
 
-    if(!r)
-		return;
+    if (!r)
+        return;
 
-	KKSCategory * c = r->getCategory();
-	if(!c)
-		return;
+    KKSCategory * c = r->getCategory();
+    if (!c)
+        return;
 	
     KKSObjEditor *objEditor = oef->createObjEditor(IO_IO_ID, 
                                                    -1, 
@@ -151,17 +151,17 @@ void KKSRubricFactory :: rubricItemCreate (const KKSRubric * r)
     QString name;
 
 
-	KKSObject * o = objEditor->getObj();
+    KKSObject * o = objEditor->getObj();
     if(!o){
         delete objEditor;
         return;
     }
 	
-	idObject = o->id();
+    idObject = o->id();
     name = o->name();
-	
-	if(idObject < 0)
-		return;
+
+    if(idObject < 0)
+        return;
 
     editor->slotAddRubricItem (idObject, name);
     
