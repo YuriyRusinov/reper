@@ -17,27 +17,30 @@
 QPixmap * pxRubric = NULL;
 QPixmap * pxRubricItem = NULL;
 
-KKSRubricItem::KKSRubricItem() : KKSData()
+KKSRubricItem::KKSRubricItem() : KKSData(),
+    m_idItem (-1),
+    m_isAutomated (false),
+    m_isUpdated (false),
+    m_rubrItemIcon (QIcon())
 {
-    m_idItem = -1;
-	m_isAutomated = false;
-    m_isUpdated = false;
 }
 
-KKSRubricItem::KKSRubricItem(int idItem, const QString & name, bool b) : KKSData()
+KKSRubricItem::KKSRubricItem(int idItem, const QString & name, bool b) : KKSData(),
+    m_idItem (idItem),
+    m_name (name),
+    m_isAutomated (b),
+    m_isUpdated (false),
+    m_rubrItemIcon (QIcon())
 {
-    setId(idItem);
-    setName(name);
-	setAutomated(b);
-    setUpdated(false);
 }
 
-KKSRubricItem::KKSRubricItem(const KKSRubricItem & other) : KKSData()
+KKSRubricItem::KKSRubricItem(const KKSRubricItem & other) : KKSData(),
+    m_idItem (other.m_idItem),
+    m_name (other.m_name),
+    m_isAutomated (other.m_isAutomated),
+    m_isUpdated (other.m_isUpdated),
+    m_rubrItemIcon (other.m_rubrItemIcon)
 {
-    setId(other.id());
-    setName(other.name());
-	setAutomated(other.isAutomated());
-    setUpdated(other.isUpdated());
 }
 
 KKSRubricItem::~KKSRubricItem()
@@ -83,6 +86,16 @@ QPixmap KKSRubricItem::icon()
     return px;
 }
 
+QIcon KKSRubricItem::getIcon (void) const
+{
+    return m_rubrItemIcon;
+}
+
+void KKSRubricItem::setIcon (const QIcon& icon)
+{
+    m_rubrItemIcon = icon;
+}
+
 /*===========================================*/
 KKSRubric::KKSRubric() : KKSRecord()
 {
@@ -97,7 +110,8 @@ KKSRubric::KKSRubric(const KKSRubric & other) : KKSRecord(other),
     m_bossPrivileges(other.m_bossPrivileges),
     m_unitPrivileges(other.m_unitPrivileges),
     m_othersPrivilege(NULL),*/
-    m_intId(other.m_intId)
+    m_intId(other.m_intId),
+    m_rubricIcon (other.m_rubricIcon)
 {
     m_items = other.items();
     m_rubrics = other.rubrics();
@@ -121,7 +135,8 @@ KKSRubric::KKSRubric(int id, const QString & name, KKSSearchTemplate * st, KKSCa
     m_bossPrivileges (KKSMap<int, KKSPrivilege *>()),
     m_unitPrivileges (KKSMap<int, KKSPrivilege *>()),
     m_othersPrivilege (0),*/
-    m_intId (-1)
+    m_intId (-1),
+    m_rubricIcon (QIcon())
 {
     if (m_searchTemplate)
         m_searchTemplate->addRef ();
@@ -166,6 +181,8 @@ KKSRubric & KKSRubric::operator = (const KKSRubric & other)
     m_acl = other.m_acl;
     if (m_acl)
         m_acl->addRef();
+    
+    m_rubricIcon = other.m_rubricIcon;
     
     return *this;
 }
@@ -710,3 +727,14 @@ QString KKSRubric::getFullTreeOfDeletedIds() const
 
     return ids;
 }
+
+QIcon KKSRubric :: getIcon (void) const
+{
+    return m_rubricIcon;
+}
+
+void KKSRubric :: setIcon (const QIcon& icon)
+{
+    m_rubricIcon = icon;
+}
+

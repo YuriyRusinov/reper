@@ -34,6 +34,10 @@
 #include <QStringList>
 #include <QLayout>
 #include <QMessageBox>
+#include <QMenu>
+#include <QContextMenuEvent>
+#include <QFileDialog>
+#include <QDir>
 
 KKSIncludesWidget::KKSIncludesWidget(KKSRubric * rootRubric, 
                                      bool isAttach,
@@ -51,7 +55,8 @@ KKSIncludesWidget::KKSIncludesWidget(KKSRubric * rootRubric,
     spRubrics (new QSplitter (Qt::Vertical, this)),
     twIncludes (new QTreeView (spRubrics)),
     tvItems (new QTreeView ()),
-    recWItems (new KKSRecWidget (tvItems, false, spRubrics))
+    recWItems (new KKSRecWidget (tvItems, false, spRubrics)),
+    pMenu (new QMenu(this))
 {
     //Q_INIT_RESOURCE (kksgui_icon_set);
 
@@ -161,14 +166,25 @@ void KKSIncludesWidget :: initActions (void)
     {
         QAction * aRubricA = new QAction (QIcon(icons[i]), titlesList[i], this);
         tBRubrActions->addAction (aRubricA);
+        pMenu->addAction (aRubricA);
         connect (aRubricA, SIGNAL (triggered()), this, slotList[i].toAscii().constData() );
         if (i==2)
+        {
             tBRubrActions->addSeparator ();
+            pMenu->addSeparator();
+        }
     }
     tBRubrActions->addSeparator();
+    pMenu->addSeparator();
     QAction * aRubrWidgetRotate = new QAction(QIcon(":/ddoc/orientation_icon.png"), tr ("Rotate widget"), this);
     connect (aRubrWidgetRotate, SIGNAL (triggered()), this, SLOT (turnRubricSplitter()) );
     tBRubrActions->addAction (aRubrWidgetRotate);
+    pMenu->addAction (aRubrWidgetRotate);
+    
+    QAction * aRubrIconSet = new QAction (QIcon(":/ddoc/rubric_icon_set.png"), tr ("Set icon"), this);
+    pMenu->addAction (aRubrIconSet);
+    tBRubrActions->addAction (aRubrIconSet);
+    connect (aRubrIconSet, SIGNAL (triggered()), this, SLOT (setRubricIcon()) );
 }
 
 void KKSIncludesWidget::initTwIncludes()
@@ -207,7 +223,7 @@ void KKSIncludesWidget::parseItems(KKSRubric * r, QModelIndex index)
 
     if (r->getCategory ())
     {
-        QAbstractItemModel * model = twIncludes->model();
+/*        QAbstractItemModel * model = twIncludes->model();
         int cnt = model->rowCount(index);
         model->insertRows (cnt, 1, index);
         if (cnt == 0)
@@ -219,6 +235,7 @@ void KKSIncludesWidget::parseItems(KKSRubric * r, QModelIndex index)
         model->setData (cIndex, tr ("View attachments ..."), Qt::DisplayRole);
         model->setData (cIndex, 2, Qt::UserRole);//is item
         model->setData (cIndex, QIcon(":/ddoc/rubric.png"), Qt::DecorationRole);
+ */
         return;
     }
     int cnt = r->items().count();
@@ -775,7 +792,7 @@ void KKSIncludesWidget::slotAddRubricItem(int idObject, QString name)
         qDebug () << __PRETTY_FUNCTION__ << r->name() << rIsEmpty;
         if (rIsEmpty)
         {
-            QAbstractItemModel * rmodel = twIncludes->model();
+/*            QAbstractItemModel * rmodel = twIncludes->model();
 //            if ((index.data (Qt::UserRole).toInt() != 2 && rmodel->rowCount(index) == 0) || index.data (Qt::UserRole).toInt()==2)
             rmodel->insertRows (0, 1, index);
             if (rmodel->columnCount (index) == 0)
@@ -783,6 +800,7 @@ void KKSIncludesWidget::slotAddRubricItem(int idObject, QString name)
             QModelIndex wIndex = rmodel->index (0, 0, index);
             rmodel->setData (wIndex, tr ("View attachments ..."), Qt::DisplayRole);
             rmodel->setData (wIndex, 2, Qt::UserRole);//is item
+ */
         }
         recWItems->setVisible (!rIsEmpty);
         QAbstractItemModel * attachModel = recWItems->getSourceModel ();
@@ -858,7 +876,7 @@ void KKSIncludesWidget::slotRubricItemDblClicked(const QModelIndex & index)
     if (index.data(Qt::UserRole).toInt() == 2)
         editRubricItem();
     else
-        this->editRubric();
+        editRubric();
 }
 
 /*
@@ -1003,12 +1021,12 @@ void KKSIncludesWidget::rubricSelectionChanged (const QItemSelection& selected, 
         return;
 
     QModelIndex wIndex = wIndexList[0];
-    if (!wIndex.parent().isValid())
+    if (!wIndex.isValid())
     {
         recWItems->setVisible (false);
         return;
     }
-    KKSRubric * rubr = getRubric (wIndex.parent());
+    KKSRubric * rubr = getRubric (wIndex);
     if (rubr && rubr->getCategory())
     {
         recWItems->setVisible (true);
@@ -1039,6 +1057,57 @@ void KKSIncludesWidget :: turnRubricSplitter (void)
     this->spRubrics->setOrientation ((Qt::Orientation)(0x3-rorient));
 }
 
+void KKSIncludesWidget :: contextMenuEvent (QContextMenuEvent * event)
+{
+    if (this->childAt(event->pos()) == this->twIncludes->viewport())
+    {
+        pMenu->exec (event->globalPos());
+        event->accept();
+    }
+    else
+        QWidget::contextMenuEvent (event);
+
+}
+
+void KKSIncludesWidget :: setRubricIcon (void)
+{
+    QString iconFile = QFileDialog::getOpenFileName(this, tr("Open Image File"),
+                                                    QDir::currentPath(),
+                                                    tr("Image files (*.xpm *.png *.ico *.jpg *.jpeg *.bmp *.gif *.pbm *.pgm *xbm);;All files (*)")
+                                                    );
+    if (iconFile.isEmpty())
+        return;
+
+    QItemSelectionModel * sm = twIncludes->selectionModel();
+    QItemSelection sel = sm ? sm->selection() : QItemSelection();
+    QModelIndex index;
+    if(!sm || sel.indexes().isEmpty()){
+        return ;
+    }
+
+    index = sel.indexes().at (0);
+    QIcon rubrIcon (iconFile);
+    KKSRubric * rubr (0);
+    if (index.data(Qt::UserRole).toInt() == 2)
+    {
+        rubr = getRubric (index.parent());
+        if (!rubr)
+            return;
+        KKSRubricItem * rubrItem = const_cast<KKSRubricItem *>(rubr->item(index.row()));
+        rubrItem->setIcon (rubrIcon);
+    }
+    else
+    {
+        rubr = getRubric (index);
+        if (!rubr)
+            return;
+        rubr->setIcon (rubrIcon);
+    }
+    QAbstractItemModel * mod = twIncludes->model();
+    mod->setData (index, rubrIcon.pixmap(16, 16), Qt::DecorationRole);
+    isChanged = true;
+
+}
 /*=================*/
 KKSIncludesItemDelegate::KKSIncludesItemDelegate(QObject * parent) : QItemDelegate(parent)
 {

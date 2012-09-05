@@ -15,7 +15,7 @@
 #include "KKSRecord.h"
 #include "KKSPrivilege.h"
 #include "kkspp_config.h"
-#include <QPixmap>
+#include <QIcon>
 
 class KKSSearchTemplate;
 //class KKSPrivilege;
@@ -46,12 +46,17 @@ public:
     bool isUpdated() const {return m_isUpdated;}
     void setUpdated(bool b) {m_isUpdated = b;}
 
+    QIcon getIcon (void) const;
+    void setIcon (const QIcon& icon);
+
 private:
     
     int m_idItem;
     QString m_name;
     bool m_isAutomated;
     bool m_isUpdated;
+    
+    QIcon m_rubrItemIcon;
 };
 
 
@@ -108,6 +113,10 @@ public:
     //
     KKSAccessEntity * getAccessRules (void) const;
     void setAccessRules (KKSAccessEntity * _acl);
+
+    QIcon getIcon (void) const;
+    void setIcon (const QIcon& icon);
+
 private:
 
     KKSList<const KKSRubricItem *> m_items;
@@ -117,6 +126,8 @@ private:
     KKSCategory * m_category;
 
     bool m_isUpdated;
+    
+    QIcon m_rubricIcon;
 
     friend class KKSLoader;
     friend class KKSPPFactory;

@@ -9,12 +9,13 @@
 #include <QItemDelegate>
 #include <QItemSelection>
 
-
 class QTreeView;
 class QGroupBox;
 class QToolBar;
 class QSplitter;
 class QAction;
+class QContextMenuEvent;
+class QMenu;
 
 class KKSRubric;
 class KKSRubricItem;
@@ -51,6 +52,7 @@ protected:
     // Overrides
     //
     virtual void closeEvent (QCloseEvent * event);
+    virtual void contextMenuEvent (QContextMenuEvent * event);
 
 private slots:
     //void on_pbOK_clicked();
@@ -70,6 +72,7 @@ private slots:
     void addCategoryIntoRubric (void);
     void rubricSelectionChanged (const QItemSelection& selected, const QItemSelection& deselected);
     void turnRubricSplitter (void);
+    void setRubricIcon (void);
 
 public slots:
     void slotAddRubricItem(int idRubricItem, QString name);
@@ -106,6 +109,7 @@ private:
     QTreeView * twIncludes;
     QTreeView * tvItems;
     KKSRecWidget * recWItems;
+    QMenu * pMenu;
 
 private:
     //

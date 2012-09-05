@@ -1890,6 +1890,7 @@ void KKSObjEditorFactory :: saveObject (KKSObjEditor* editor,
                                         QAbstractItemModel * recModel
 )
 {
+    Q_UNUSED (recModel);
     if (!editor->isObjChanged())
     {
         //
@@ -2749,6 +2750,7 @@ int KKSObjEditorFactory :: deleteOE (QWidget * editor, int idObject, qint64 idOb
  */
 void KKSObjEditorFactory :: updateEIOView (KKSObject * wObj, const KKSMap<qint64, KKSObjectExemplar *>& idObjEx, QAbstractItemModel * recModel, const QItemSelection& cSelection)
 {
+    Q_UNUSED (cSelection);
     KKSObjEditor * editor = qobject_cast<KKSObjEditor *>(this->sender());
     if (!editor || !recModel)
         return;
