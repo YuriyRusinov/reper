@@ -726,7 +726,7 @@ int JKKSLoader :: updateDocument (JKKSDocument *doc) const
     //
     //запись в таблице io_objects
     //
-    sql = QString ("select * from ioUpdate (%1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11);")
+    sql = QString ("select * from ioUpdate (%1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, NULL);")
         .arg (doc->id())
         .arg (doc->getName().isEmpty() ? QString ("NULL") : QString ("'%1'").arg (doc->getName()))//name
         .arg (doc->getIdState () < 0 ? QString ("NULL") : QString::number (doc->getIdState()) )//id_state
@@ -818,7 +818,7 @@ int JKKSLoader :: updateDocument (JKKSDocument *doc) const
         {
             idSearchT = writeSearchTemplate (wRubr.getSearchTemplate());
         }
-        QString sql =  QString ("select * from ioUpdateInclude ('%1', '%2', '%3', '%4', NULL, %7, %5, %6 );")
+        QString sql =  QString ("select * from ioUpdateInclude ('%1', '%2', '%3', '%4', NULL, %7, %5, %6, NULL );")
                                 .arg (wRubr.getUid())
                                 .arg (wRubr.getName ())
                                 .arg (wRubr.getCode ())
@@ -953,7 +953,7 @@ int JKKSLoader :: insertDocument (JKKSDocument *doc) const
         idType = writeIOType(type);
     }
 
-    QString sql = QString ("select * from ioInsert (%1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, NULL, NULL, %13, %14, %15);")
+    QString sql = QString ("select * from ioInsert (%1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, NULL, NULL, %13, %14, %15, NULL);")
         .arg (doc->getName().isEmpty() ? QString ("NULL") : QString ("'%1'").arg (doc->getName()))//name
         .arg (doc->getIdIoCat())//id_io_category
         .arg (QString ("NULL"))// ибо в Ѕƒ-приемнике автора (пользовател€) может не быть (как правило не будет)
@@ -1055,7 +1055,7 @@ int JKKSLoader :: insertDocument (JKKSDocument *doc) const
         {
             idSearchT = writeSearchTemplate (wRubr.getSearchTemplate());
         }
-        QString sql =  QString ("select * from ioinsertinclude (%1, %2, '%3', '%4', '%5', %8, %7, '%6');")
+        QString sql =  QString ("select * from ioinsertinclude (%1, %2, '%3', '%4', '%5', %8, %7, '%6', NULL);")
                                 .arg (wRubr.getParent () <= 0 ? QString ("NULL") : QString::number (wRubr.getParent ()))
                                 .arg (pr == rubrs.constBegin () ? QString::number (doc->id()) : QString ("NULL"))
                                 .arg (wRubr.getName ())

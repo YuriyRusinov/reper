@@ -1,6 +1,5 @@
 /* qt */
 #include <QApplication>
-#include <QFile>
 #include <QTextStream>
 #include <Qt>
 #include <QObject>
@@ -8,8 +7,9 @@
 
 /* ui */
 #include "kksclient_name.h"
-#include "db_synchronizer.h"
+#include "kaps_manager_form.h"
 #include "kkssito.h"
+#include "kksdatabase.h"
 #include <QTextCodec>
 
 int main(int argc, char *argv[])
@@ -30,9 +30,17 @@ int main(int argc, char *argv[])
     if(!sito)
         return 1;
 
-    DBSynchronizer dbSync; // = NULL;
+    int ok = sito->GUIConnect();
+    if(ok != 1)
+        return 1;
+
+    KKSDatabase * db = sito->db();
+    if(!db || !db->connected())
+        return 1;
+
+    KapsManagerForm f (db); // = NULL;
 	
-    dbSync.show();
+    f.show();
 
     int r = app.exec();//qApp->exec();
 

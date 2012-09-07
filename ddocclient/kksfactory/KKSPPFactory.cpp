@@ -2773,7 +2773,7 @@ int KKSPPFactory::updateRubric(KKSRubric * r) const
 
     int idRubric = r->id();
     
-    QString sql = QString("select * from ioUpdateIncludeLocal (%1, '%2', '%3', '%4', %5, %6);")
+    QString sql = QString("select * from ioUpdateIncludeLocal (%1, '%2', '%3', '%4', %5, %6, NULL);")
                           .arg(r->id())
                           .arg (r->name())
                           .arg (r->code())

@@ -21,7 +21,8 @@ KKSRubricItem::KKSRubricItem() : KKSData(),
     m_idItem (-1),
     m_isAutomated (false),
     m_isUpdated (false),
-    m_rubrItemIcon (QIcon())
+    m_rubrItemIcon (QIcon()),
+    m_iconData(QString())
 {
 }
 
@@ -30,7 +31,8 @@ KKSRubricItem::KKSRubricItem(int idItem, const QString & name, bool b) : KKSData
     m_name (name),
     m_isAutomated (b),
     m_isUpdated (false),
-    m_rubrItemIcon (QIcon())
+    m_rubrItemIcon (QIcon()),
+    m_iconData(QString())
 {
 }
 
@@ -39,7 +41,8 @@ KKSRubricItem::KKSRubricItem(const KKSRubricItem & other) : KKSData(),
     m_name (other.m_name),
     m_isAutomated (other.m_isAutomated),
     m_isUpdated (other.m_isUpdated),
-    m_rubrItemIcon (other.m_rubrItemIcon)
+    m_rubrItemIcon (other.m_rubrItemIcon),
+    m_iconData(other.m_iconData)
 {
 }
 
@@ -91,9 +94,18 @@ QIcon KKSRubricItem::getIcon (void) const
     return m_rubrItemIcon;
 }
 
-void KKSRubricItem::setIcon (const QIcon& icon)
+void KKSRubricItem :: setIcon (const QString & s)
 {
-    m_rubrItemIcon = icon;
+    QPixmap px;
+    px.loadFromData(s.toUtf8());
+
+    m_rubrItemIcon = QIcon(px);
+    m_iconData = s;
+}
+
+const QString KKSRubricItem :: iconAsString () const
+{
+    return m_iconData;
 }
 
 /*===========================================*/
@@ -111,7 +123,8 @@ KKSRubric::KKSRubric(const KKSRubric & other) : KKSRecord(other),
     m_unitPrivileges(other.m_unitPrivileges),
     m_othersPrivilege(NULL),*/
     m_intId(other.m_intId),
-    m_rubricIcon (other.m_rubricIcon)
+    m_rubricIcon (other.m_rubricIcon),
+    m_iconData(other.m_iconData)
 {
     m_items = other.items();
     m_rubrics = other.rubrics();
@@ -136,7 +149,8 @@ KKSRubric::KKSRubric(int id, const QString & name, KKSSearchTemplate * st, KKSCa
     m_unitPrivileges (KKSMap<int, KKSPrivilege *>()),
     m_othersPrivilege (0),*/
     m_intId (-1),
-    m_rubricIcon (QIcon())
+    m_rubricIcon (QIcon()),
+    m_iconData(QString())
 {
     if (m_searchTemplate)
         m_searchTemplate->addRef ();
@@ -183,6 +197,7 @@ KKSRubric & KKSRubric::operator = (const KKSRubric & other)
         m_acl->addRef();
     
     m_rubricIcon = other.m_rubricIcon;
+    m_iconData = other.m_iconData;
     
     return *this;
 }
@@ -394,6 +409,7 @@ QPixmap KKSRubric::icon()
 KKSRubric * KKSRubric::deepCopy(bool dropIds) const
 {
     KKSRubric * copy = new KKSRubric(this->id(), this->name());
+    copy->setIcon(this->icon());
     if(dropIds)
         copy->setId(-1);
 
@@ -733,8 +749,16 @@ QIcon KKSRubric :: getIcon (void) const
     return m_rubricIcon;
 }
 
-void KKSRubric :: setIcon (const QIcon& icon)
+void KKSRubric :: setIcon (const QString & s)
 {
-    m_rubricIcon = icon;
+    QPixmap px;
+    px.loadFromData(s.toUtf8());
+
+    m_rubricIcon = QIcon(px);
+    m_iconData = s;
 }
 
+const QString KKSRubric :: iconAsString () const
+{
+    return m_iconData;
+}

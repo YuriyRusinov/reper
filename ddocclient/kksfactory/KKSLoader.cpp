@@ -2892,6 +2892,7 @@ void KKSLoader::loadRubrics(KKSObject * io) const
         QString name = res->getCellAsString(i, 5);
         QString code = res->getCellAsString(i, 6);
         QString desc = res->getCellAsString(i, 7);
+        QString icon = res->getCellAsString(i, 11);
 
         int type = res->getCellAsInt(i, 8);
 
@@ -2901,6 +2902,7 @@ void KKSLoader::loadRubrics(KKSObject * io) const
             rootRubric->setDesc(desc);
             rootRubric->setSearchTemplate (st);
             rootRubric->setCategory(c);
+            rootRubric->setIcon(icon);
             
             rootRubric->m_intId = id;//рубрика информационного объекта загружена из БД (используется в операции update класса KKSPPFactory)
 
@@ -2912,6 +2914,7 @@ void KKSLoader::loadRubrics(KKSObject * io) const
             subRubric->setDesc(desc);
             subRubric->setSearchTemplate (st);
             subRubric->setCategory(c);
+            subRubric->setIcon(icon);
             subRubric->m_intId = id;
 
             if(idParent <= 0){
@@ -2931,6 +2934,7 @@ void KKSLoader::loadRubrics(KKSObject * io) const
         else if(type == 2){//rubric items
 			bool isAutomated = res->getCellAsBool(i, 10);
             KKSRubricItem * item = new KKSRubricItem(id, name, isAutomated);
+            item->setIcon(icon);
 
             if(idParent <= 0){
                 qWarning() << "Bad subRubric!";
@@ -3069,6 +3073,7 @@ void KKSLoader::loadRecRubrics (KKSObjectExemplar * eio) const
             rootRubric->setDesc(desc);
             rootRubric->setSearchTemplate (st);
             rootRubric->setCategory(c);
+            rootRubric->setIcon(res->getCellAsString(i, 6));
             
             rootRubric->m_intId = id;//рубрика информационного объекта загружена из БД (используется в операции update класса KKSPPFactory)
 
@@ -3080,6 +3085,7 @@ void KKSLoader::loadRecRubrics (KKSObjectExemplar * eio) const
             subRubric->setDesc(desc);
             subRubric->setSearchTemplate (st);
             subRubric->setCategory(c);
+            subRubric->setIcon(res->getCellAsString(i, 6));
             subRubric->m_intId = id;
 
             if(idParent <= 0){
@@ -3099,6 +3105,7 @@ void KKSLoader::loadRecRubrics (KKSObjectExemplar * eio) const
         else if(type == 2){//rubric items
             bool isAutomated = false;//res->getCellAsBool(i, 10);
             KKSRubricItem * item = new KKSRubricItem(id, name, isAutomated);
+            item->setIcon(res->getCellAsString(i, 6));
 
             if(idParent <= 0){
                 qWarning() << "Bad subRubric!";
@@ -3163,6 +3170,7 @@ KKSRubric * KKSLoader::loadRubricators(bool bOnlyMyDocs) const
         QString name = res->getCellAsString(i, 5);
         QString code = res->getCellAsString(i, 6);
         QString desc = res->getCellAsString(i, 7);
+        QString icon = res->getCellAsString(i, 11);
 
         int type = res->getCellAsInt(i, 8);
 
@@ -3172,6 +3180,7 @@ KKSRubric * KKSLoader::loadRubricators(bool bOnlyMyDocs) const
             theRubric->setDesc(desc);
             theRubric->setSearchTemplate (st);
             theRubric->setCategory(c);
+            theRubric->setIcon(icon);
             loadPrivileges (theRubric);
             theRubric->m_intId = id;
 
@@ -3184,6 +3193,7 @@ KKSRubric * KKSLoader::loadRubricators(bool bOnlyMyDocs) const
             subRubric->setDesc(desc);
             subRubric->setSearchTemplate (st);
             subRubric->setCategory(c);
+            subRubric->setIcon(icon);
             loadPrivileges (subRubric);
             subRubric->m_intId = id;
 
@@ -3204,6 +3214,7 @@ KKSRubric * KKSLoader::loadRubricators(bool bOnlyMyDocs) const
         else if(type == 2){//rubric items
             bool b = res->getCellAsBool(i, 10);
             KKSRubricItem * item = new KKSRubricItem(id, name, b);
+            item->setIcon(icon);
 
             if(idParent <= 0){
                 qWarning() << "Bad subRubric!";
@@ -3264,6 +3275,7 @@ KKSRubric * KKSLoader::loadRubric (int idRubr) const
         QString name = res->getCellAsString(i, 5);
         QString code = res->getCellAsString(i, 6);
         QString desc = res->getCellAsString(i, 7);
+        QString icon = res->getCellAsString(i, 11);
 
         int type = res->getCellAsInt(i, 8);
 
@@ -3273,6 +3285,7 @@ KKSRubric * KKSLoader::loadRubric (int idRubr) const
             theRubric->setDesc(desc);
             theRubric->setSearchTemplate (st);
             theRubric->setCategory(c);
+            theRubric->setIcon(icon);
             loadPrivileges (theRubric);
             theRubric->m_intId = id;
 
@@ -3285,6 +3298,7 @@ KKSRubric * KKSLoader::loadRubric (int idRubr) const
             subRubric->setDesc(desc);
             subRubric->setSearchTemplate (st);
             subRubric->setCategory(c);
+            subRubric->setIcon(icon);
             loadPrivileges (subRubric);
             subRubric->m_intId = id;
 
@@ -3305,6 +3319,7 @@ KKSRubric * KKSLoader::loadRubric (int idRubr) const
         else if(type == 2){//rubric items
             bool b = res->getCellAsBool(i, 10);
             KKSRubricItem * item = new KKSRubricItem(id, name, b);
+            item->setIcon(icon);
 
             if(idParent <= 0){
                 qWarning() << "Bad subRubric!";
@@ -5310,7 +5325,7 @@ KKSList<KKSAttrValue *> KKSLoader::loadIndValues(KKSObjectExemplar * eio) const
         int idAttr = res->getCellAsInt(row, 2);
         KKSCategoryAttr * a = c->attribute(idAttr);
         if(!a){
-            qWarning("The object contain attr-value but category does not contain attribute! idAttr = %d, idObjectExemplar = %d, idCategory = %d", idAttr, eio->id(), c->id());
+            qWarning("The object contain attr-value but category does not contain attribute! idAttr = %d, idObjectExemplar = %lld, idCategory = %d", idAttr, eio->id(), c->id());
             continue;
         }
 

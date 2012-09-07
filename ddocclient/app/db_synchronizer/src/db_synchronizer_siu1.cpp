@@ -21,7 +21,7 @@ void DBSynchronizer::getETK()
 	Param_ETK etk;
 	QDate d = getFilterDate();
 	if(d.isValid())
-		etk.date_from = d;
+		etk.updated_from = QDateTime(d);
 	//etk.scale = 100000;
 	//etk.nomenclature = "0.K-37-060";
 	//etk.date_to = QDate::currentDate();
@@ -64,7 +64,7 @@ void DBSynchronizer::getGMO()
 	Param_GMO gmo;
 	QDate d = getFilterDate();
 	if(d.isValid())
-		gmo.date_from = d;
+		gmo.updated_from = QDateTime(d);
 
 	QList<Result_GMO> res = dbSIU.searchIO(gmo);
 	int cnt = res.count();
@@ -103,7 +103,7 @@ void DBSynchronizer::getNVO()
 	Param_NVO nvo;
 	QDate d = getFilterDate();
 	if(d.isValid())
-		nvo.date_from = d;
+		nvo.updated_from = QDateTime(d);
 
 	QList<Result_NVO> res = dbSIU.searchIO(nvo);
 	int cnt = res.count();
@@ -142,7 +142,7 @@ void DBSynchronizer::getEOIRD()
 	Param_EOIRD eoird;
 	QDate d = getFilterDate();
 	if(d.isValid())
-		eoird.date_from = d;
+		eoird.updated_from = QDateTime(d);
 
 	QList<Result_EOIRD> res = dbSIU.searchIO(eoird);
 	int cnt = res.count();
@@ -181,7 +181,7 @@ void DBSynchronizer::getEFO()
 	Param_EFO efo;
 	QDate d = getFilterDate();
 	if(d.isValid())
-		efo.date_from = d;
+		efo.updated_from = QDateTime(d);
 
 	QList<Result_EFO> res = dbSIU.searchIO(efo);
 	int cnt = res.count();
@@ -220,7 +220,7 @@ void DBSynchronizer::getUGSH()
 	Param_UGSH ugsh;
 	QDate d = getFilterDate();
 	if(d.isValid())
-		ugsh.date_from = d;
+		ugsh.updated_from = QDateTime(d);
 
 	QList<Result_UGSH> res = dbSIU.searchIO(ugsh);
 	int cnt = res.count();
@@ -259,7 +259,7 @@ void DBSynchronizer::getTTX()
 	Param_TTX ttx;
 	QDate d = getFilterDate();
 	if(d.isValid())
-		ttx.date_from = d;
+		ttx.updated_from = QDateTime(d);
 
 	QList<Result_TTX> res = dbSIU.searchIO(ttx);
 	int cnt = res.count();
@@ -298,7 +298,7 @@ void DBSynchronizer::getPG()
 	Param_PG pg;
 	QDate d = getFilterDate();
 	if(d.isValid())
-		pg.date_from = d;
+		pg.updated_from = QDateTime(d);
 
 	QList<Result_PG> res = dbSIU.searchIO(pg);
 	int cnt = res.count();
@@ -337,7 +337,7 @@ void DBSynchronizer::getPOR()
 	Param_POR por;
 	QDate d = getFilterDate();
 	if(d.isValid())
-		por.date_from = d;
+		por.updated_from = QDateTime(d);
 
 	QList<Result_POR> res = dbSIU.searchIO(por);
 	int cnt = res.count();
@@ -374,8 +374,9 @@ void DBSynchronizer::getRBP()
 	UI->teLog->moveCursor(QTextCursor::End);
 
 	Param_RBP rbp;
-	//if(lastDate.isValid())
-	//	rbp.date_from = lastDate;
+	QDate d = getFilterDate();
+	if(d.isValid())
+		rbp.updated_from = QDateTime(d);
 
 	QList<Result_RBP> res = dbSIU.searchIO(rbp);
 	int cnt = res.count();
@@ -414,7 +415,7 @@ void DBSynchronizer::getREQ()
 	Param_Request req;
 	QDate d = getFilterDate();
 	if(d.isValid())
-		req.date_from = d;
+		req.updated_from = QDateTime(d);
 
 	QList<Result_Request> res = dbSIU.searchIO(req);
 	int cnt = res.count();
@@ -451,8 +452,9 @@ void DBSynchronizer::getOPVTO()
 	UI->teLog->moveCursor(QTextCursor::End);
 
 	Param_VTO vto;
-	//if(lastDate.isValid())
-	//	vto.date_from = lastDate;
+	QDate d = getFilterDate();
+	if(d.isValid())
+        vto.updated_from = QDateTime(d);
 
 	QList<Result_VTO> res = dbSIU.searchIO(vto);
 	int cnt = res.count();

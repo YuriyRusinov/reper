@@ -4,6 +4,7 @@
 #include <QImage>
 #include <QIcon>
 #include <QSize>
+#include <QTimer>
 #include <QtDebug>
 
 #include "KKSTemplate.h"
@@ -77,6 +78,7 @@ QModelIndex KKSEIODataModel :: index (int row, int column, const QModelIndex& pa
     if (!hasIndex (row, column, parent))
         return QModelIndex ();
 
+    //qDebug () << __PRETTY_FUNCTION__ << row << parent;
     if (parent.isValid() && parent.column() != 0)
         return QModelIndex();
 

@@ -1180,3 +1180,22 @@ const KKSIndicatorValue * KKSObject::indicatorValueId(int indId) const
 
     return av;
 }
+
+QIcon KKSObject :: icon (void) const
+{
+    return m_icon;
+}
+
+void KKSObject :: setIcon (const QString & s)
+{
+    QPixmap px;
+    px.loadFromData(s.toUtf8());
+
+    m_icon = QIcon(px);
+    m_iconData = s;
+}
+
+const QString & KKSObject :: iconAsString () const
+{
+    return m_iconData;
+}

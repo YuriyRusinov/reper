@@ -402,6 +402,14 @@ KKSObjectExemplar * KKSConverter::objToExemplar(const KKSLoader * loader, const 
     //ref_table_name
     appendAttrValue(tc, attrValues, 216, io->refTableName(), KKSAttrType::atString);//ref_table_name
 
+    //r_icon
+    if(io->iconAsString().isEmpty())
+        appendAttrValue(tc, attrValues, 312, QString::null/*::number(-1)*/, KKSAttrType::atJPG);
+        
+    else
+        appendAttrValue(tc, attrValues, 312, io->iconAsString(), KKSAttrType::atJPG);//r_icon
+
+
     eio->setAttrValues(attrValues);
 
     eio->setId(io->id());
@@ -641,6 +649,11 @@ bool KKSConverter::objectFromExemplar(const KKSLoader * loader, KKSObject * io, 
         return false;
 
     io->setRecordTextColor (av->value().valueVariant().value<QColor>());
+
+    av = eio->attrValue(ATTR_R_ICON);
+    if(!av)
+        return false;
+    io->setIcon(av->value().value());
     //
     // Серега неправ
     //(av->value().value().toUInt());

@@ -198,7 +198,7 @@ int DBSynchronizer::createIO(int idCategory,
 	if(name.startsWith("C:\\fakepath\\"))
 		fName.remove("C:\\fakepath\\");	
 
-	QString sql = QString ("select * from ioInsert (%1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, NULL, NULL, %13, %14, %15);")
+	QString sql = QString ("select * from ioInsert (%1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, NULL, NULL, %13, %14, %15, NULL);")
 	    .arg (QString("'") + fName + QString("'"))//name
 		.arg (QString::number(idCategory))//id_io_category
         .arg (QString::number (1))// admin, ибо в БД-приемнике автора (пользователя) может не быть (как правило не будет)

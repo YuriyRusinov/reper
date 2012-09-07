@@ -10,6 +10,7 @@
 #include "ui/rubricform.h"
 
 #include <QInputDialog>
+#include <QBuffer>
 #include <QMessageBox>
 #include <QTreeView>
 #include <QHeaderView>
@@ -111,6 +112,9 @@ KKSIncludesWidget::KKSIncludesWidget(KKSRubric * rootRubric,
     connect (twIncludes, SIGNAL (doubleClicked(const QModelIndex &)), this, SLOT (slotRubricItemDblClicked(const QModelIndex &)) );
     connect (recWItems->getView(), SIGNAL (doubleClicked(const QModelIndex &)), this, SLOT (slotRubricItemEdit(const QModelIndex &)) );
     connect (recWItems->actDel, SIGNAL (triggered()), this, SLOT (delRubricItem()) );
+
+    QMessageBox::information(0, "", "", QMessageBox::Ok);
+    spRubrics->setOrientation(Qt::Horizontal);
 }
 
 KKSIncludesWidget::~KKSIncludesWidget()
@@ -398,6 +402,7 @@ void KKSIncludesWidget :: addRubric (void)
     KKSCategory * rc = 0;
     KKSAccessEntity * ac = 0;
     QString rDesc;
+    QPixmap icon;
     if (rForm && rForm->exec() == QDialog::Accepted)
     {
         rName = rForm->getRubricName ();
@@ -405,6 +410,7 @@ void KKSIncludesWidget :: addRubric (void)
         rc = rForm->getCategory ();
         ac = rForm->getAccessEntity ();
         rDesc = rForm->getRubricDesc ();
+        //icon = rForm->getIcon();
         if (rName.trimmed().isEmpty())
             return;
     }
@@ -416,6 +422,7 @@ void KKSIncludesWidget :: addRubric (void)
     }
 
     KKSRubric * r = new KKSRubric(-1, rName, rst, rc, ac);
+    r->setIcon(icon);
     r->setDesc (rDesc);
     rForm->setParent (0);
     delete rForm;
@@ -1077,7 +1084,7 @@ void KKSIncludesWidget :: setRubricIcon (void)
 {
     QString iconFile = QFileDialog::getOpenFileName(this, tr("Open Image File"),
                                                     QDir::currentPath(),
-                                                    tr("Image files (*.xpm *.png *.ico *.jpg *.jpeg *.bmp *.gif *.pbm *.pgm *xbm);;All files (*)")
+                                                    tr("Image files (*.xpm *.png *.ico *.jpg *.jpeg *.bmp *.gif *.pbm *.pgm *.xbm);;All files (*)")
                                                     );
     if (iconFile.isEmpty())
         return;
@@ -1090,25 +1097,44 @@ void KKSIncludesWidget :: setRubricIcon (void)
     }
 
     index = sel.indexes().at (0);
-    QIcon rubrIcon (iconFile);
+    QPixmap rubrPixmap (iconFile);
+    if(rubrPixmap.isNull()){
+        QMessageBox::critical(this, 
+                              tr("Error"), 
+                              tr(""), 
+                              QMessageBox::Ok);
+        return;
+    }
+
+    QByteArray bytes;
+    QBuffer buffer(&bytes);
+
+    buffer.open(QIODevice::WriteOnly);
+    rubrPixmap.save(&buffer, "XPM"); // writes pixmap into bytes in XPM format
+    buffer.close();
+
     KKSRubric * rubr (0);
+    QIcon icon;
     if (index.data(Qt::UserRole).toInt() == 2)
     {
         rubr = getRubric (index.parent());
         if (!rubr)
             return;
         KKSRubricItem * rubrItem = const_cast<KKSRubricItem *>(rubr->item(index.row()));
-        rubrItem->setIcon (rubrIcon);
+        rubrItem->setIcon (bytes);
+        icon = rubrItem->getIcon();
     }
     else
     {
         rubr = getRubric (index);
         if (!rubr)
             return;
-        rubr->setIcon (rubrIcon);
+        rubr->setIcon (bytes);
+        icon = rubr->getIcon();
     }
+
     QAbstractItemModel * mod = twIncludes->model();
-    mod->setData (index, rubrIcon.pixmap(16, 16), Qt::DecorationRole);
+    mod->setData (index, icon.pixmap(16, 16), Qt::DecorationRole);
     isChanged = true;
 
 }

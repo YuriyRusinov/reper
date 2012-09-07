@@ -47,7 +47,9 @@ public:
     void setUpdated(bool b) {m_isUpdated = b;}
 
     QIcon getIcon (void) const;
-    void setIcon (const QIcon& icon);
+    //void setIcon (const QIcon& icon);
+    const QString iconAsString() const;
+    void setIcon (const QString & s);
 
 private:
     
@@ -57,6 +59,7 @@ private:
     bool m_isUpdated;
     
     QIcon m_rubrItemIcon;
+    QString m_iconData;
 };
 
 
@@ -97,6 +100,7 @@ public:
 
     static void setIcon(const QPixmap & px);
     static QPixmap icon();
+
     KKSRubric * deepCopy(bool dropIds = false) const;
 
     KKSSearchTemplate * getSearchTemplate (void) const;
@@ -115,7 +119,10 @@ public:
     void setAccessRules (KKSAccessEntity * _acl);
 
     QIcon getIcon (void) const;
-    void setIcon (const QIcon& icon);
+    //void setIcon (const QIcon& icon);
+    const QString iconAsString() const;
+    void setIcon (const QString & s);
+
 
 private:
 
@@ -128,6 +135,7 @@ private:
     bool m_isUpdated;
     
     QIcon m_rubricIcon;
+    QString m_iconData;
 
     friend class KKSLoader;
     friend class KKSPPFactory;

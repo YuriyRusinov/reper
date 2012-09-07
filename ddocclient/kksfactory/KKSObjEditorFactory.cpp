@@ -4895,7 +4895,7 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io,
                     a.replace(QString("\\\n"), QChar('\n'), Qt::CaseInsensitive);
                     a.replace(QString("\\\'"), QChar('\''), Qt::CaseInsensitive);
                     a.replace(QString("\\\""), QChar('\"'), Qt::CaseInsensitive);
-                    a.replace(QString("\\\,"), QChar('\,'), Qt::CaseInsensitive);
+                    a.replace(QString("\\,"), QChar(','), Qt::CaseInsensitive);
                 
                     vArr += QString("'%1'%2").arg (rValues[ii])
                                            .arg (ii<rValues.count()-1 ? QString (",") : QString());

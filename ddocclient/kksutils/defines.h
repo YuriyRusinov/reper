@@ -180,6 +180,7 @@ const int IO_INDICATOR_ID = 87;
 #define ATTR_SHB 104
 #define ATTR_ID_UNIT 31
 #define ATTR_SHORT_NAME 19
+#define ATTR_R_ICON 312
 
 
 

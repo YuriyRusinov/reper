@@ -23,6 +23,7 @@
 
 #include <QString>
 #include <QDate>
+#include <QDateTime>
 #include <QList>
 #include <QPair>
 #include <QFile>
@@ -30,22 +31,19 @@
 #include <QDomElement>
 #include <QMutex>
 
-#define UGSH_TYPE tr("Указания ГШ ВС РФ по ИО")
+#define VTO_TYPE tr("Выписки объектов ВТО")
 #define TTX_TYPE tr("ТТХ средств ПВО противника")
-#define PG_TYPE tr("План–графики ИО ВТО")
+#define REQUEST_TYPE tr("Заявки на ИО ВТО")
 #define RBP_TYPE tr("Районы боевого применения ВТО")
 #define POR_TYPE tr("Перечни объектов разведки для ВТО БД")
-#define REQUEST_TYPE tr("Заявки на ИО ВТО")
-#define VTO_TYPE tr("Выписки объектов ВТО")
-//??
-#define CLASSIFICATOR_TYPE tr("Классификаторы векторных карт")
-
+#define PG_TYPE tr("План–графики ИО ВТО")
 #define ETK_TYPE tr("Электронные карты векторные")
+#define UGSH_TYPE tr("Указания ГШ ВС РФ по ИО")
 #define EOIRD_TYPE tr("ЭОИРД")
 #define EFO_TYPE tr("ЭФО")
 #define GMO_TYPE tr("Прогнозы погоды по РБП")
 #define NVO_TYPE tr("Навигационно-временная информация")
-
+#define CLASSIFICATOR_TYPE tr("Классификаторы векторных карт")
 
 #define DICT_ETK_TYPES tr("Типы ЭТК")
 #define DICT_ORGANIZATIONS tr("ОВУ и воинские формирования")
@@ -60,21 +58,38 @@
 class Siu_api2;
 
 /**
+* @brief Структура базовых параметров запроса
+*/
+struct API_BDFZ_SHARED_EXPORT Param_IO
+{
+	explicit Param_IO();
+    /**
+    * @brief Дата обновления ИО, с которой надо искать (с точностью до минуты)
+    */
+    QDateTime updated_from;
+
+    /**
+    * @brief Дата обновления ИО, по которую надо искать (с точностью до минуты)
+    */
+    QDateTime updated_to;
+};
+
+/**
 * @brief Структура параметров запроса Выписок объектов ВТО
 */
-struct API_BDFZ_SHARED_EXPORT Param_VTO
+struct API_BDFZ_SHARED_EXPORT Param_VTO:Param_IO
 {
     /**
     * @brief Конструктор по умолчанию, заполняет все поля значениями, указывающими на неиспользование данного параметра в запросе
     */
     explicit Param_VTO();
 
-	/**
+    /**
     * @brief UID вида или рода ВС (если задана пустая строка - не учитывается в поиске) (см метод listVSTypes класса ApiBdfz)
     */
     QString uid_vs_type;
 
-	/**
+    /**
     * @brief UID формы применения ВТО (если задана пустая строка - не учитывается в поиске) (см метод listVTOUsageForms класса ApiBdfz)
     */
     QString uid_vto_usage_form;
@@ -88,14 +103,14 @@ struct API_BDFZ_SHARED_EXPORT Param_VTO
 /**
 * @brief Структура параметров запроса ТТХ средств ПВО противника
 */
-struct API_BDFZ_SHARED_EXPORT Param_TTX
+struct API_BDFZ_SHARED_EXPORT Param_TTX:Param_IO
 {
     /**
     * @brief Конструктор по умолчанию, заполняет все поля значениями, указывающими на неиспользование данного параметра в запросе
     */
     explicit Param_TTX();
 
-	/**
+    /**
     * @brief Дата, с которой надо искать
     */
     QDate date_from;
@@ -119,7 +134,7 @@ struct API_BDFZ_SHARED_EXPORT Param_TTX
 /**
 * @brief Структура параметров запроса районов боевого применения ВТО
 */
-struct API_BDFZ_SHARED_EXPORT Param_RBP
+struct API_BDFZ_SHARED_EXPORT Param_RBP: Param_IO
 {
     /**
     * @brief Конструктор по умолчанию, заполняет все поля значениями, указывающими на неиспользование данного параметра в запросе
@@ -140,7 +155,7 @@ struct API_BDFZ_SHARED_EXPORT Param_RBP
 /**
 * @brief Структура параметров запроса Заявок на ИО ВТО
 */
-struct API_BDFZ_SHARED_EXPORT Param_Request
+struct API_BDFZ_SHARED_EXPORT Param_Request:Param_IO
 {
     /**
     * @brief Конструктор по умолчанию, заполняет все поля значениями, указывающими на неиспользование данного параметра в запросе
@@ -158,6 +173,11 @@ struct API_BDFZ_SHARED_EXPORT Param_Request
     QDate date_to;
 
     /**
+    * @brief Тип заявки ("РО" - 3.1.1, "ТГО" - 3.1.2, "ГМО" - 3.1.3, "НВО" - 3.1.4)
+    */
+    QString type;
+
+    /**
     * @brief Указывается обязательно! Уровень секретности (0-несекретно, 2-секретно, 3-совершенно секретно, 9-любой)
     */
     short constraints;
@@ -166,7 +186,7 @@ struct API_BDFZ_SHARED_EXPORT Param_Request
 /**
 * @brief Структура параметров запроса Перечней объектов разведки
 */
-struct API_BDFZ_SHARED_EXPORT Param_POR
+struct API_BDFZ_SHARED_EXPORT Param_POR:Param_IO
 {
     /**
     * @brief Конструктор по умолчанию, заполняет все поля значениями, указывающими на неиспользование данного параметра в запросе
@@ -192,7 +212,7 @@ struct API_BDFZ_SHARED_EXPORT Param_POR
 /**
 * @brief Структура параметров запроса План–графиков ИО ВТО
 */
-struct API_BDFZ_SHARED_EXPORT Param_PG
+struct API_BDFZ_SHARED_EXPORT Param_PG:Param_IO
 {
     /**
     * @brief Конструктор по умолчанию, заполняет все поля значениями, указывающими на неиспользование данного параметра в запросе
@@ -218,7 +238,7 @@ struct API_BDFZ_SHARED_EXPORT Param_PG
 /**
 * @brief Структура параметров запроса Указаний ГШ ВС РФ по ИО
 */
-struct API_BDFZ_SHARED_EXPORT Param_UGSH
+struct API_BDFZ_SHARED_EXPORT Param_UGSH:Param_IO
 {
     /**
     * @brief Конструктор по умолчанию, заполняет все поля значениями, указывающими на неиспользование данного параметра в запросе
@@ -244,7 +264,7 @@ struct API_BDFZ_SHARED_EXPORT Param_UGSH
 /**
 * @brief Структура параметров запроса карт
 */
-struct API_BDFZ_SHARED_EXPORT Param_ETK
+struct API_BDFZ_SHARED_EXPORT Param_ETK:Param_IO
 {
     /**
     * @brief Конструктор по умолчанию, заполняет все поля значениями, указывающими на неиспользование данного параметра в запросе
@@ -285,7 +305,7 @@ struct API_BDFZ_SHARED_EXPORT Param_ETK
 /**
 * @brief Структура параметров запроса ЭОИРД
 */
-struct API_BDFZ_SHARED_EXPORT Param_EOIRD
+struct API_BDFZ_SHARED_EXPORT Param_EOIRD:Param_IO
 {
     /**
     * @brief Конструктор по умолчанию, заполняет все поля значениями, указывающими на неиспользование данного параметра в запросе
@@ -331,7 +351,7 @@ struct API_BDFZ_SHARED_EXPORT Param_EOIRD
 /**
 * @brief Структура параметров запроса ЭФО
 */
-struct API_BDFZ_SHARED_EXPORT Param_EFO
+struct API_BDFZ_SHARED_EXPORT Param_EFO:Param_IO
 {
     /**
     * @brief Конструктор по умолчанию, заполняет все поля значениями, указывающими на неиспользование данного параметра в запросе
@@ -378,7 +398,7 @@ struct API_BDFZ_SHARED_EXPORT Param_EFO
 /**
 * @brief Структура параметров запроса гидрометеорологического обеспечения
 */
-struct API_BDFZ_SHARED_EXPORT Param_GMO
+struct API_BDFZ_SHARED_EXPORT Param_GMO:Param_IO
 {
     /**
     * @brief Конструктор по умолчанию, заполняет все поля значениями, указывающими на неиспользование данного параметра в запросе
@@ -414,7 +434,7 @@ struct API_BDFZ_SHARED_EXPORT Param_GMO
 /**
 * @brief Структура параметров запроса навигационно-временного обеспечения
 */
-struct API_BDFZ_SHARED_EXPORT Param_NVO
+struct API_BDFZ_SHARED_EXPORT Param_NVO:Param_IO
 {
     /**
     * @brief Конструктор по умолчанию, заполняет все поля значениями, указывающими на неиспользование данного параметра в запросе
@@ -442,9 +462,14 @@ struct API_BDFZ_SHARED_EXPORT Param_NVO
 */
 struct API_BDFZ_SHARED_EXPORT Result_IO
 {
-	Result_IO();
+    Result_IO();
 
-	/**
+    /**
+    * @brief Дата и время обновления ИО (с точностью до минуты)
+    */
+    QDateTime updated;
+
+    /**
     * @brief Уникальный идентификатор ИО
     */
     QString uid;
@@ -454,7 +479,7 @@ struct API_BDFZ_SHARED_EXPORT Result_IO
     */
     QString author;
 
-	/**
+    /**
     * @brief Имя файла
     */
     QString file_name;
@@ -469,12 +494,12 @@ struct API_BDFZ_SHARED_EXPORT Result_IO
     */
     QString file_uid;
 
-	/**
+    /**
     * @brief Организация, создавшая информационный объект
     */
     QString organization;  
 
-	/**
+    /**
     * @brief Уровень секретности
     */
     int constraint;  
@@ -548,10 +573,15 @@ struct API_BDFZ_SHARED_EXPORT Result_Request:Result_IO
     */
     QDate date;
 
-	/**
+    /**
     * @brief Номер заявки
     */
-	QString number;
+    QString number;
+
+    /**
+    * @brief Тип заявки ("РО" - 3.1.1, "ТГО" - 3.1.2, "ГМО" - 3.1.3, "НВО" - 3.1.4)
+    */
+    QString type;
 };
 
 /**
@@ -907,8 +937,8 @@ struct API_BDFZ_SHARED_EXPORT Result_NVO:Result_IO
 */
 struct API_BDFZ_SHARED_EXPORT Create_IO
 {
-	Create_IO();
-	/**
+    Create_IO();
+    /**
     * @brief Имя ИО
     */
     QString IOname;
@@ -918,7 +948,7 @@ struct API_BDFZ_SHARED_EXPORT Create_IO
     */
     QString IODescription;
 
-	/**
+    /**
     * @brief Указывается обязательно! Уровень секретности (0-несекретно, 2-секретно, 3-совершенно секретно) По умолчанию = 0
     */
     short constraints;
@@ -928,22 +958,22 @@ struct API_BDFZ_SHARED_EXPORT Create_IO
     */
     QString code_skki;
 
-	/**
+    /**
     * @brief Имя файла
     */
     QString file_name;
 
-	/**
-	* @brief Уникальный идентификатор документа, в соответствии с которым создан данный документ
-	*/
-	QString base_doc;
+    /**
+    * @brief Уникальный идентификатор документа, в соответствии с которым создан данный документ
+    */
+    QString base_doc;
 
-	/**
-	* @brief Уникальный номер задания в документе, в соответствии с которым создан данный документ
-	*/
-	QString base_doc_task_number;
+    /**
+    * @brief Уникальный номер задания в документе, в соответствии с которым создан данный документ
+    */
+    QString base_doc_task_number;
 
-	/**
+    /**
     * @brief Идентификатор организации, создавшей ИО (идентификатор значения в словаре "ОВУ и воинские формирования" см listOrganizations)
     */
     QString uid_organization;
@@ -957,27 +987,27 @@ struct API_BDFZ_SHARED_EXPORT Create_VTO:Create_IO
 {
     Create_VTO();
 
-	/**
+    /**
     * @brief UID вида или рода ВС (если задана пустая строка - не учитывается в поиске) (см метод listVSTypes класса ApiBdfz)
     */
     QString uid_vs_type;
 
-	/**
+    /**
     * @brief UID формы применения ВТО (если задана пустая строка - не учитывается в поиске) (см метод listVTOUsageForms класса ApiBdfz)
     */
     QString uid_vto_usage_form;
 
-	/**
+    /**
     * @brief Условный номер плана операции
     */
 	QString plan_number;
 
-	/**
+    /**
     * @brief Условный номер варианта плана
     */
 	QString variant_number;
 
-	/**
+    /**
     * @brief Номер РБП
     */
 	QString rbp_number;
@@ -995,7 +1025,7 @@ struct API_BDFZ_SHARED_EXPORT Create_TTX:Create_IO
     */
     QDate date;    
 
-	/**
+    /**
     * @brief Идентификатор типа образца ВВТ (идентификатор значения в словаре "Типы вооружения и военной техники" см listWeapons)
     */
     QString uid_weapon_type;  
@@ -1013,10 +1043,15 @@ struct API_BDFZ_SHARED_EXPORT Create_Request:Create_IO
     */
     QDate date;    
 
-	/**
+    /**
     * @brief Номер заявки
     */
-    QString number;    
+    QString number;
+
+    /**
+    * @brief Тип заявки ("РО" - 3.1.1, "ТГО" - 3.1.2, "ГМО" - 3.1.3, "НВО" - 3.1.4)
+    */
+    QString type;
 };
 
 /**
@@ -1620,12 +1655,26 @@ signals:
     */
     void downloadFileProgress(QString uid, QString filename, qint64 done, qint64 full);
 
-    /**
+	/**
+    * @brief Сигнал, оповещающий об ошибке загрузки файла
+    * @param file_path Путь к загружаемому файлу
+    */
+    void downloadError(QString file_path);
+
+	/**
     * @brief Сигнал, оповещающий об окончании загрузки файла
+    * @param file_path Путь к загруженному файлу
+    */
+    void downloadFinished(QString file_path);
+
+    /**
+    * @brief Сигнал, оповещающий об окончании загрузки файла (не работает)
     * @param file Указатель на загруженный файл
     */
     void downloadFileFinished(QFile* file);
 private slots:
+	//void handleFinished(QString);
+	//void handleError(QString);
     void handleDownloadFile(QFile*);
     void handleResponse(QDomElement *);
 private:    
@@ -1775,7 +1824,7 @@ private:
 	*/
     QString formMetaString(const Create_EFO& param);
  
-	/**
+    /**
     * @brief Возвращает корневые каталоги СОПа
     * @return Первый параметр в каждой паре - идентификатор каталога, второй - название каталога
     */
@@ -1802,7 +1851,7 @@ private:
 	*/
 	QPair<QString,QString> getClassificatorParams(const QString& name);
 
-	/**
+    /**
     * @brief Получение расширенных метаданных по идентификатору типа ИО
     */
     QDomElement* getMetadatabyTypeId(const QString& id_type);

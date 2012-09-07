@@ -32,6 +32,9 @@ int DBSynchronizer::createETKInDD(const QList<Result_ETK> & etkList)
 		if(!etk.file_link.isEmpty()){
 			prepareDownloadFile(etk.uid, i, etk.file_link, etk.file_name, files);
 		}
+        if(!etk.classificator_link.isEmpty()){
+            prepareDownloadFile(etk.uid + "_RSC", i, etk.classificator_link, etk.classificator_name, files);
+        }
 
 		int ok = createIOFromETK(etk, files);
 		if(ok != OK_CODE){
@@ -42,8 +45,12 @@ int DBSynchronizer::createETKInDD(const QList<Result_ETK> & etkList)
 			continue;
 		}
 
-		if(files.count() > 0)
-		    dbSIU.downloadFile(etk.uid, etk.file_link, files.last().second);
+        if(files.count() > 0){
+		    dbSIU.downloadFile(etk.uid, etk.file_link, files.at(0).second);
+            if(files.count() > 1)
+                dbSIU.downloadFile(etk.uid, etk.classificator_link, files.at(1).second);
+        }
+        
 	}
 	
 	return OK_CODE;

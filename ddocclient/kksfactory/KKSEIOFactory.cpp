@@ -1436,10 +1436,12 @@ int KKSEIOFactory::updateRubric(KKSRubric * r) const
 
     int idRubric = r->id();
     
-    QString sql = QString("select * from recUpdateRubricLocal (%1, '%2', '%3');")
+    QString icon = r->iconAsString();
+    QString sql = QString("select * from recUpdateRubricLocal (%1, '%2', '%3', %4);")
                           .arg(r->id())
                           .arg (r->name())
-                          .arg (r->desc());
+                          .arg (r->desc())
+                          .arg (icon.isEmpty() ? QString("NULL") : QString("'%1'").arg(icon));
 
     KKSResult * res = db->execute (sql);
     if (!res)
@@ -1492,11 +1494,13 @@ int KKSEIOFactory::insertRubric(KKSRubric * r, int idParent, int idRec, bool roo
 
     int idRubric = ERROR_CODE;//eiof->getNextSeq("rubricator", "id");
     
-    QString sql = QString("select * from recInsertRubric(%1, %2, '%3', '%4');")
+    QString icon = r->iconAsString();
+    QString sql = QString("select * from recInsertRubric(%1, %2, '%3', '%4', %5);")
                           .arg ( (root || idParent <= 0) ? QString("NULL") : QString::number(idParent))
                           .arg (root ? QString::number(idRec) : QString("NULL"))
                           .arg (r->name())
-                          .arg (r->desc());
+                          .arg (r->desc())
+                          .arg (icon.isEmpty() ? QString("NULL") : QString("'%1'").arg(icon));
 
     qDebug () << __PRETTY_FUNCTION__ << sql;
 

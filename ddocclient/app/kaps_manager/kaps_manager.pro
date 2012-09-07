@@ -2,12 +2,12 @@
 # author ksa
 
 TEMPLATE = app
-TARGET = db_synchronizer
+TARGET = kaps_manager
 include(../../ddocclient.conf)
 
 DESTDIR = ../../build
 
-QT += xml
+#QT += xml
 
 INCLUDEPATH += 	. \
 		../../dataaccess \
@@ -26,33 +26,23 @@ DEPENDPATH += 	\
 		../../kksutils \
 		../../kkspp
 
-INCLUDEPATH += ./ext_libs/include \
-               ./src 
+INCLUDEPATH += . 
 
-LIBS +=  -L./ext_libs/release/ \
-         -L../../build/ \
+LIBS +=  -L../../build/ \
          -ldataaccess \
          -lkksfactory \
          -lkksutils\
          -lkkscore \
          -lkkspp \
-         -lkksgui \
-         -lapi_bdfz \
-         -lsiu_api2
+         -lkksgui 
 
 # Input
-HEADERS += src/db_synchronizer.h \
-           src/siu_connect_form.h
+HEADERS += kaps_manager_form.h 
 
-SOURCES += src/main.cpp \
-           src/db_synchronizer.cpp \
-           src/db_synchronizer_dd1.cpp \
-           src/db_synchronizer_dd2.cpp \
-           src/db_synchronizer_siu1.cpp \
-           src/siu_connect_form.cpp 
+SOURCES += main.cpp \
+           kaps_manager_form.cpp 
 
-FORMS += src/db_synchronizer_form.ui \
-         src/siu_connect_form.ui
+FORMS += kaps_manager_form.ui 
 
 target.files *= $${DISTFILES}
 target.path = $$KKS_EXEC_DIR
