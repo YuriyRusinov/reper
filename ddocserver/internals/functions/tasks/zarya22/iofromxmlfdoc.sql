@@ -482,7 +482,7 @@ tappendixemer := '/msg/body/formalized_document_data/Information/EmergencySituat
 
     select into idOrg id_organization from getlocalorg();
 
-    select into idObject ioinsert (ioName, idCat, 2/*jupiter*/, 1, null::varchar, null::varchar, NULL::varchar, 1,  NULL::varchar, 1, idOrg, false, null::int4, null::varchar, null::int8, null::int8, 1);
+    select into idObject ioinsert (ioName, idCat, 2/*jupiter*/, 1, null::varchar, null::varchar, NULL::varchar, 1,  NULL::varchar, 1, idOrg, false, null::int4, null::varchar, null::int8, null::int8, 1, NULL::VARCHAR);
     if (idObject is null or idObject <= 0) then
         return false;
     end if;

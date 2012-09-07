@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     22.06.2012 21:32:27                          */
+/* Created on:     07.09.2012 11:44:17                          */
 /*==============================================================*/
 
 
@@ -1616,6 +1616,7 @@ create table io_objects (
    record_text_color    INT8                 null,
    id_search_template   INT4                 null,
    ref_table_name       VARCHAR              null,
+   r_icon               VARCHAR              null,
    constraint PK_IO_OBJECTS primary key (id)
 )
 inherits (root_table);
@@ -1668,6 +1669,9 @@ comment on column io_objects.is_completed is
 comment on column io_objects.ref_table_name is
 'Если таблица информационного объекта унаследована от другой таблицы, то в этом поле указывается название последней';
 
+comment on column io_objects.r_icon is
+'иконка при отображении информационного объекта в списке или в рубрикаторе. Если не задана, то используется значение по умолчанию (определяется клиентским приложением). При отображении в рубрикаторе используется, если не задана иконка в соответствующей записи io_rubricator';
+
 select createTriggerUID('io_objects');
 
 /*==============================================================*/
@@ -1719,6 +1723,7 @@ create table io_rubricator (
    id_io_object         INT4                 not null,
    id_rubric            INT4                 not null,
    is_automated         BOOL                 null default FALSE,
+   r_icon               VARCHAR              null,
    constraint PK_IO_RUBRICATOR primary key (id_io_object, id_rubric)
 );
 
@@ -1727,6 +1732,9 @@ comment on column io_rubricator.is_automated is
 TRUE - при помощи вызова поискового запроса
 FALSE - вручную.
 Используется при работе механизма автоматической рубрикации. При отработке поискового запроса на помещение ИО в данную рубрику те ИО, которые помещены автоматически будут предварительно удалены.';
+
+comment on column io_rubricator.r_icon is
+'Иконка при отображении элемента в дереве рубрик. Если не задана, то используется иконка по умолчанию (определяется клиентским приложением)';
 
 select setMacToNULL('io_rubricator');
 
@@ -1847,18 +1855,25 @@ create table io_urls (
    url                  VARCHAR              not null default 'not assigned',
    name                 VARCHAR              not null,
    src_ext              VARCHAR              null,
+   uploaded             BOOL                 not null default FALSE,
    constraint PK_IO_URLS primary key (id)
 )
 inherits (root_table);
 
 comment on table io_urls is
 'Если ИО является документом и к нему прикреплены файлы, то данная таблица содержит список урлов для данного ИО
-УРЛ задается относительно файловой системы сервера БД';
+URL задается относительно файловой системы сервера БД
+Для поля url создан PARTIAL UNIQUE индекс (не разрешаем иметь записи с одинаковым URL, однако может существовать много записей с еще не заданным URL, который определяется значением ''not assigned'')';
 
 comment on column io_urls.src_ext is
 'Исходное расширение файла, которое у него было перед тем, как он был импортирован на сервер.
 Например. Если импортировался файл file.doc, то на сервере он будет записан в хранилище с новым названием (kks_file_1, например, т.е. без расширения), а в это поле запишется значение ''doc''
 Это нужно для того, чтобы выгружать файлы на клиент с расширением.';
+
+comment on column io_urls.uploaded is
+'Данный флаг определяет, загружен ли файл на сервер или нет.
+Его необходимость вызвана тем, что файлы на сервер загружаются блоками (особенно это критично при информационном обмене). А поскольку размеры файлов могут быть очень большими, то процесс их загрузки на сервер может занимать длительное время, в течение которого файл, фактически, еще не готов к использованию (в нем еще не все данные). В это же время возможен факт обращения к данному файлу, и нам надо иметь атрибут, определяющий, можно ли файл уже использовать или нет.
+Файлы, которые использовать еще нельзя, в перечне файлов информационного объекта выводиться не должны.';
 
 select setMacToNULL('io_urls');
 select createTriggerUID('io_urls');
@@ -1868,7 +1883,8 @@ select createTriggerUID('io_urls');
 /*==============================================================*/
 create unique index i_url on io_urls using BTREE (
 url
-);
+)
+where url <> '' and url <> 'not assigned';
 
 /*==============================================================*/
 /* Table: io_views                                              */
@@ -2482,7 +2498,11 @@ comment on column out_sync_queue.entity_type is
 7 - Зарезервировано
 8 - передача полного справочника организаций на новый объект
 9 - передача записи справочника организаций на все участвующие в инфю обмене объекты
-10 - публичное ДЛ';
+10 - публичное ДЛ (создание, обновление)
+11 - публичное ДЛ (удаление)
+12 - файл, передаваемый блоками (создание, обновление)
+13 - файл, передаваемый блоками (удаление)
+';
 
 comment on column out_sync_queue.sync_type is
 'Тип синхронизации
@@ -2817,6 +2837,7 @@ create table record_rubricator (
    id_record            INT8                 null,
    name                 VARCHAR              not null,
    description          VARCHAR              null,
+   r_icon               VARCHAR              null,
    constraint PK_RECORD_RUBRICATOR primary key (id)
 );
 
@@ -2827,6 +2848,9 @@ comment on table record_rubricator is
 В НАСТОЯЩЕЕ ВРЕМЯ POSTGRESQL  НЕ ПОДДЕРЖИВАЕТ ВНЕШНИЕ КЛЮЧИ НА ИЕРАРХИЮ НАСЛЕДОВАНИЯ ТАБЛИЦ. ПО ЭТОЙ ПРИЧИНЕ ДЕЛАТЬ ВНЕШНИЙ КЛЮЧ ИЗ record_rubricator НА Q_BASE_TABLE НЕЛЬЗЯ. В ИНТЕРНЕТЕ СУЩЕСТВУЮТ РАЗЛИЧНЫЕ РЕШЕНИЯ ДАННОЙ ПРОБЛЕМЫ, ОДНАКО ИХ РАБОТОСПОСОБНОСТЬ, А ОСОБЕННО БЫСТРОДЕЙСТВИЕ ВЫЗЫВАЮТ СОМНЕНИЕ. ПО ЭТОЙ ПРИЧИНЕ РАССМАТРИВАЕМЫЙ ВНЕШНИЙ КЛЮЧ НЕ ГЕНЕРИРУЕТСЯ СКРИПТОМ СОЗДАНИЯ БД.
 ДЛЯ ПОДДЕРЖАНИЯ ССЫЛОЧНОЙ ЦЕЛОСТНОСТИ НАПИСАН ТРИГГЕР, КОТОРЫЙ ПРОВЕРЯЕТ ФАКТ СУЩЕСТВОВАНИЯ ЗАПИСИ, НА КОТОРУЮ ССЫЛАЕТСЯ СОЗДАВАЕМАЯ (ИЗМЕНЯЕМАЯ) ЗАПИСЬ В record_rubricator. 
 ';
+
+comment on column record_rubricator.r_icon is
+'Иконка, используемая при отображении элемента в дереве рубрик. Если не задана, то используется значение по умолчанию (определяется клиентским приложением)';
 
 /*==============================================================*/
 /* Table: report                                                */
@@ -2921,6 +2945,7 @@ select setMacToNULL('roles_actions');
 create table rubric_records (
    id_rubric            INT8                 not null,
    id_record            INT8                 not null,
+   r_icon               VARCHAR              null,
    constraint PK_RUBRIC_RECORDS primary key (id_rubric, id_record)
 );
 
@@ -2930,6 +2955,9 @@ comment on table rubric_records is
 ВАЖНО!!!
 В НАСТОЯЩЕЕ ВРЕМЯ POSTGRESQL  НЕ ПОДДЕРЖИВАЕТ ВНЕШНИЕ КЛЮЧИ НА ИЕРАРХИЮ НАСЛЕДОВАНИЯ ТАБЛИЦ. ПО ЭТОЙ ПРИЧИНЕ ДЕЛАТЬ ВНЕШНИЙ КЛЮЧ ИЗ rubric_records НА Q_BASE_TABLE НЕЛЬЗЯ. В ИНТЕРНЕТЕ СУЩЕСТВУЮТ РАЗЛИЧНЫЕ РЕШЕНИЯ ДАННОЙ ПРОБЛЕМЫ, ОДНАКО ИХ РАБОТОСПОСОБНОСТЬ, А ОСОБЕННО БЫСТРОДЕЙСТВИЕ ВЫЗЫВАЮТ СОМНЕНИЕ. ПО ЭТОЙ ПРИЧИНЕ РАССМАТРИВАЕМЫЙ ВНЕШНИЙ КЛЮЧ НЕ ГЕНЕРИРУЕТСЯ СКРИПТОМ СОЗДАНИЯ БД.
 ДЛЯ ПОДДЕРЖАНИЯ ССЫЛОЧНОЙ ЦЕЛОСТНОСТИ НАПИСАН ТРИГГЕР, КОТОРЫЙ ПРОВЕРЯЕТ ФАКТ СУЩЕСТВОВАНИЯ ЗАПИСИ, НА КОТОРУЮ ССЫЛАЕТСЯ СОЗДАВАЕМАЯ (ИЗМЕНЯЕМАЯ) ЗАПИСЬ В rubric_records. ';
+
+comment on column rubric_records.r_icon is
+'Иконка, используемая при отображении элемента в дереве рубрик. Если не задана, то используется значение по умолчанию (определяется клиентским приложением)';
 
 /*==============================================================*/
 /* Table: rubricator                                            */
@@ -2943,6 +2971,7 @@ create table rubricator (
    name                 VARCHAR              not null,
    code                 VARCHAR              null,
    description          VARCHAR              null,
+   r_icon               VARCHAR              null,
    constraint PK_RUBRICATOR primary key (id)
 )
 inherits (root_table);
@@ -2961,6 +2990,9 @@ comment on column rubricator.id_search_template is
 comment on column rubricator.id_io_category is
 'Допустимая категория вкладываемых в рубрику информационных объектов
 Если задана, то это означает, что только ИО заданной категории могут включаться в данную рубрику.';
+
+comment on column rubricator.r_icon is
+'Иконка при отображении элемента в дереве рубрик. Если не задана, то используется иконка по умолчанию (определяется клиентским приложением)';
 
 select setMacToNULL('rubricator');
 select createTriggerUID('rubricator');

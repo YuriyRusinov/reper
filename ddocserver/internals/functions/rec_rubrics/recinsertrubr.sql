@@ -1,10 +1,11 @@
-create or replace function recInsertRubric(int4, int8, varchar, varchar) returns int4 as
+create or replace function recInsertRubric(int4, int8, varchar, varchar, varchar) returns int4 as
 $BODY$
 declare
     idParent alias for $1;
     idRecord alias for $2;
     rName alias for $3;
     rDesc alias for $4;
+    rIcon alias for $5;
 
     idRubric int4;
     cnt int4;
@@ -29,25 +30,35 @@ begin
 
     raise warning 'cnt is %', cnt;
 
-    query := E'insert into record_rubricator (id, id_parent, id_record, name, description) values (';
+    query := E'insert into record_rubricator (id, id_parent, id_record, name, description, r_icon) values (';
     query := query || idRubric || E',';
+
     if (idParent is null) then
         query := query || E'NULL,';
     else
         query := query || idParent || E',';
     end if;
+
     if (idRecord is null) then
         query := query || E'NULL,';
     else
         query := query || idRecord || E',';
     end if;
+
     query := query || quote_literal (rName) || E',';
+
     if (rDesc is null) then
+        query := query || E'NULL,';
+    else
+        query := query || quote_literal (rDesc) || E',';
+    end if;
+
+    if (rIcon is null) then
         query := query || E'NULL)';
     else
-        query := query || quote_literal (rDesc) || E')';
+        query := query || quote_literal (rIcon) || E')';
     end if;
-    raise warning '%', query;
+
     execute query;
     if (not FOUND) then
         return -1;

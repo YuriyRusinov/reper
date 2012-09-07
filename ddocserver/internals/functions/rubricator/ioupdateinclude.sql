@@ -1,4 +1,4 @@
-create or replace function ioUpdateInclude(varchar, varchar, varchar, varchar, int4, int4, int4, int4) returns int4 as
+create or replace function ioUpdateInclude(varchar, varchar, varchar, varchar, int4, int4, int4, int4, varchar) returns int4 as
 $BODY$
 declare
     uid alias for $1;
@@ -9,13 +9,14 @@ declare
     idObject alias for $6;
     idCategory alias for $7;
     idSearchTemplate alias for $8;
+    rIcon alias for $9;
 
     idRubric int4;
 begin
 
     select id into idRubric from rubricator where unique_id = uid;
     if(idRubric is null) then
-        idRubric = ioInsertInclude(idParent, idObject, rName, rCode, rDesc, idSearchTemplate, idCategory, uid);
+        idRubric = ioInsertInclude(idParent, idObject, rName, rCode, rDesc, idSearchTemplate, idCategory, uid, rIcon);
         if(idRubric <= 0) then
            return -1;
         end if;
@@ -23,14 +24,14 @@ begin
     end if;
 
 
-    idRubric = ioUpdateIncludeLocal(idRubric, rName, rCode, rDesc, idCategory, idSearchTemplate);
+    idRubric = ioUpdateIncludeLocal(idRubric, rName, rCode, rDesc, idCategory, idSearchTemplate, rIcon);
 
     return idRubric;
 end
 $BODY$
 language 'plpgsql';
 
-create or replace function ioUpdateIncludeLocal(int4, varchar, varchar, varchar, int4, int4) returns int4 as
+create or replace function ioUpdateIncludeLocal(int4, varchar, varchar, varchar, int4, int4, varchar) returns int4 as
 $BODY$
 declare
     idRubric alias for $1;
@@ -39,6 +40,7 @@ declare
     rDesc alias for $4;
     idCategory alias for $5;
     idSearchTemplate alias for $6;
+    rIcon alias for $7;
 
 begin
 
@@ -51,7 +53,8 @@ begin
         code = rCode,
         description = rDesc,
         id_io_category = idCategory,
-        id_search_template = idSearchTemplate
+        id_search_template = idSearchTemplate,
+        r_icon = rIcon
     where id = idRubric;
 
     if (not FOUND) then

@@ -1,4 +1,4 @@
-create or replace function ioUpdate(int4, varchar, int4, varchar, varchar, int4, int4, boolean, int8, int8, int4) returns int4 as
+create or replace function ioUpdate(int4, varchar, int4, varchar, varchar, int4, int4, boolean, int8, int8, int4, varchar) returns int4 as
 $BODY$
 declare
 
@@ -13,6 +13,7 @@ declare
     recordFillColor alias for $9;
     recordTextColor alias for $10;
     idType alias for $11;
+    rIcon alias for $12;
 
 
 begin
@@ -38,7 +39,8 @@ begin
                             --id_owner_org,
                             is_global = isGlobal,
                             record_fill_color = recordFillColor,
-                            record_text_color = recordTextColor
+                            record_text_color = recordTextColor,
+                            r_icon = rIcon
     where id=idObject;
 
 

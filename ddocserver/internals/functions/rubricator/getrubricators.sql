@@ -10,7 +10,7 @@ begin
 
     if(bOnlyMyDocs <> TRUE) then 
         for rec in
-            select r.id, r.id_parent, r.id_io_object, r.id_search_template, r.id_io_category, r.name, r.code, r.description, 0, r.unique_id
+            select r.id, r.id_parent, r.id_io_object, r.id_search_template, r.id_io_category, r.name, r.code, r.description, 0, r.unique_id, NULL, r.r_icon
             from rubricator r
             where 
                 r.id_io_object is null 
@@ -33,7 +33,7 @@ begin
         end loop;
     else
         for rec in
-            select r.id, r.id_parent, r.id_io_object, r.id_search_template, r.id_io_category, r.name, r.code, r.description, 0, r.unique_id
+            select r.id, r.id_parent, r.id_io_object, r.id_search_template, r.id_io_category, r.name, r.code, r.description, 0, r.unique_id, NULL, r.r_icon
             from rubricator r
             where 
                 r.id_io_object is null 
@@ -72,7 +72,7 @@ declare
 begin
 
     for rec in
-        select r.id, r.id_parent, r.id_io_object, r.id_search_template, r.id_io_category, r.name, r.code, r.description, 0, r.unique_id
+        select r.id, r.id_parent, r.id_io_object, r.id_search_template, r.id_io_category, r.name, r.code, r.description, 0, r.unique_id, NULL, r.r_icon
         from rubricator r
         where 
             r.id = idRubr

@@ -4,7 +4,8 @@ create type h_get_rec_rubrics as (id int4,
                                   id_record int8, 
                                   name varchar, 
                                   description varchar, 
-                                  type int4);
+                                  type int4,
+                                  r_icon varchar);
 
 create or replace function recGetRubrics(int8) returns setof h_get_rec_rubrics as
 $BODY$
@@ -21,7 +22,8 @@ begin
             r.id_record, 
             r.name, 
             r.description, 
-            0
+            0,
+            r.r_icon
         from record_rubricator r
         where r.id_record = idRecord
         order by r.id
@@ -49,7 +51,7 @@ declare
 begin
 
     for rec in 
-        select r.id, r.id_parent, NULL, r.name, r.description, 1
+        select r.id, r.id_parent, NULL, r.name, r.description, 1, r.r_icon
         from record_rubricator r
         where r.id_parent = idRubric
         order by r.id
@@ -93,7 +95,8 @@ begin
     for r in
         select
             rrs.id_record,
-            rrs.id_rubric
+            rrs.id_rubric,
+            rrs.r_icon
         from
             rubric_records rrs inner join
             record_rubricator rec
@@ -115,7 +118,7 @@ begin
         if (column_desc is not null) then
             query := query || E't.description, 2';
         else
-            query := query || E'NULL, 2';
+            query := query || E'NULL, 2, ' || asString(r.r_icon, true);
         end if;
         query := query || ' from ' || tname || ' as t where t.id=' || r.id_record;
         raise warning 'query is %', query;

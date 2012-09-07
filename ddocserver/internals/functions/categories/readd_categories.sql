@@ -1,4 +1,5 @@
 \i ./functions/categories/cgetcategory.sql
+\i ./functions/categories/cgetcategoriesforrubricator.sql
 \i ./functions/categories/cinsert.sql
 \i ./functions/categories/cfindequal.sql
 

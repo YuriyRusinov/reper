@@ -1,4 +1,4 @@
-create or replace function ioInsertInclude(int4, int4, varchar, varchar, varchar, int4, int4, varchar) returns int4 as
+create or replace function ioInsertInclude(int4, int4, varchar, varchar, varchar, int4, int4, varchar, varchar) returns int4 as
 $BODY$
 declare
     idParent alias for $1;
@@ -9,6 +9,7 @@ declare
     idSearchTemplate alias for $6;
     idIOCategory alias for $7;
     uid alias for $8;
+    rIcon alias for $9;
 
     idRubric int4;
     cnt int4;
@@ -33,8 +34,8 @@ begin
         
     end if;
 
-    insert into rubricator (id, id_parent, id_io_object, name, code, description, id_search_template, id_io_category, unique_id) 
-    values (idRubric, idParent, idObject, rName, rCode, rDesc, idSearchTemplate, idIOCategory, uid);
+    insert into rubricator (id, id_parent, id_io_object, name, code, description, id_search_template, id_io_category, unique_id, r_icon) 
+    values (idRubric, idParent, idObject, rName, rCode, rDesc, idSearchTemplate, idIOCategory, uid, rIcon);
     if (not FOUND) then
         return -1;
     end if;

@@ -96,7 +96,7 @@ $BODY$
 language 'plpgsql' security definer;
 
 
-create or replace function "f_ins_io_objects"(varchar, timestamp, int4, int4, int4, int4, int4, int4, int4, varchar, varchar, varchar, text, bool, timestamp, int4, bool, int8, int8, int4, varchar, int4) returns int4 as 
+create or replace function "f_ins_io_objects"(varchar, timestamp, int4, int4, int4, int4, int4, int4, int4, varchar, varchar, varchar, text, bool, timestamp, int4, bool, int8, int8, int4, varchar, int4, varchar) returns int4 as 
 $BODY$
 declare 
     "ii_unique_id" alias for $1;
@@ -121,6 +121,7 @@ declare
     "ii_id_search_template" alias for $20;
     "ii_ref_table_name" alias for $21;
     "ii_id_io_type" alias for $22;
+    "ii_r_icon" alias for $23;
  
 begin 
     if(getPrivilege(getCurrentUser(), 7, 4, true) = false) then raise exception 'You have insufficient permissions to do the operation!'; return 0; end if;
@@ -145,7 +146,8 @@ begin
                                   "record_text_color", 
                                   "id_search_template", 
                                   "ref_table_name",
-                                  "id_io_type") 
+                                  "id_io_type",
+                                  "r_icon") 
     values ("ii_unique_id", 
             "ii_id", 
             "ii_id_io_category", 
@@ -166,7 +168,8 @@ begin
             "ii_record_text_color", 
             "ii_id_search_template", 
             "ii_ref_table_name",
-            "ii_id_io_type");
+            "ii_id_io_type",
+            "ii_r_icon");
 return 1; 
 end 
 $BODY$ 
@@ -187,7 +190,7 @@ $BODY$
 language 'plpgsql' security definer;
 
 
-create or replace function "f_upd_io_objects"(varchar, timestamp, int4, int4, int4, int4, int4, int4, int4, varchar, varchar, varchar, text, bool, timestamp, int4, bool, int8, int8, int4, varchar, int4) returns int4 as 
+create or replace function "f_upd_io_objects"(varchar, timestamp, int4, int4, int4, int4, int4, int4, int4, varchar, varchar, varchar, text, bool, timestamp, int4, bool, int8, int8, int4, varchar, int4, varchar) returns int4 as 
 $BODY$ 
 declare 
 "ii_unique_id" alias for $1;
@@ -212,6 +215,7 @@ declare
 "ii_id_search_template" alias for $20;
 "ii_ref_table_name" alias for $21;
 "ii_id_io_type" alias for $22;
+"ii_r_icon" alias for $23;
  
 begin 
     if(getPrivilege(getCurrentUser(), 7, 4, true) = false) then raise exception 'You have insufficient permissions to do the operation!'; return 0; end if;
@@ -234,7 +238,8 @@ update "tbl_io_objects" set
  "record_text_color" = "ii_record_text_color",
  "id_search_template" = "ii_id_search_template",
  "ref_table_name" = "ii_ref_table_name",
- "id_io_type" = "ii_id_io_type"
+ "id_io_type" = "ii_id_io_type",
+ "r_icon" = "ii_r_icon"
  where id = ii_id;
 return 1; 
 end 

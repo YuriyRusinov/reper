@@ -9,7 +9,8 @@ create type h_io_get_rubrics as(id int4,
                                 description varchar, 
                                 type int4,
                                 unique_id varchar,
-                                is_automated bool); 
+                                is_automated bool,
+                                r_icon varchar); 
 
 create or replace function ioGetRubrics(int4) returns setof h_io_get_rubrics as
 $BODY$
@@ -31,7 +32,8 @@ begin
             r.description, 
             0,
             r.unique_id,
-            NULL
+            NULL,
+            r.r_icon
         from rubricator r
         where r.id_io_object = idObject
         order by r.id
@@ -59,7 +61,7 @@ declare
 begin
 
     for rec in 
-        select r.id, r.id_parent, NULL, r.id_search_template, r.id_io_category, r.name, r.code, r.description, 1, r.unique_id
+        select r.id, r.id_parent, NULL, r.id_search_template, r.id_io_category, r.name, r.code, r.description, 1, r.unique_id, NULL, r.r_icon
         from rubricator r
         where r.id_parent = idRubric
         order by r.id
@@ -105,7 +107,8 @@ begin
             o.description, 
             2, 
             rubr.unique_id,
-            ior.is_automated
+            ior.is_automated,
+            ior.r_icon
         from io_rubricator ior 
              inner join tbl_io_objects o on (ior.id_rubric = idRubric and ior.id_io_object = o.id)
              inner join rubricator rubr on (ior.id_rubric = rubr.id)

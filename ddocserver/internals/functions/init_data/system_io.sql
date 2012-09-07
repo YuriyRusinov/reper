@@ -1576,6 +1576,7 @@ insert into attributes (unique_id, id, id_a_type, code, name, title, table_name,
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-310', 310, 1, 'is_qualifier', 'Является справочником', 'Является справочником', NULL, NULL, 50, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-311', 311, 3, 'id_child2', 'Подчиненная категория показателей', 'Подчиненная категория показателей', 'io_categories', 'name', 300, TRUE);
 
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-312', 312, 15, 'r_icon', 'Условный знак элемента', 'Условный знак элемента', NULL, NULL, 150, TRUE);
 
 SELECT pg_catalog.setval('attributes_id_seq', 1000, true); --все пользовательские атрибуты будут начинаться с номера 1001
                                                           --это сделано для того, чтобы оставить резерв для системных атрибутов
@@ -1682,6 +1683,8 @@ insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (55, 13, 207, NULL, false, false);--record_text_color
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (56, 13, 110, NULL, false, false);--id_search_template
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (57, 13, 216, NULL, false, false);--ref_table_name
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (534, 13, 312, NULL, false, false);--r_icon
+
 
 
 
@@ -1866,7 +1869,7 @@ insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (195, 55, 19, NULL, true, false);--short_name
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (196, 55, 77, NULL, true, false);--code_name
 --insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (197, 55, 28, NULL, true, false);--address
-insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (198, 55, 78, NULL, true, false);--tree_symbol
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (198, 55, 78, NULL, false, false);--tree_symbol
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (199, 55, 79, 'false', true, false);--is_fgroup
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (200, 55, 96, NULL, false, false);--time_start
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (201, 55, 80, NULL, false, false);--time_elapsed
@@ -1941,6 +1944,7 @@ insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (250, 77, 48, NULL, false, true);--id_io_object
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (251, 77, 110, NULL, false, false);--id_search_template
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (252, 77, 12, NULL, false, false);--id_io_category
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (533, 77, 312, NULL, false, false);--r_icon
 
 --
 --синхронизация информационных объектов
@@ -2524,7 +2528,8 @@ insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is
 --530 занят для атрибута is_qualifier в справочнике типов категорий
 --531 занят для атрибута id_child2 в справочнике  категорий
 --532 занят для атрибута is_archived в справочнике категорий
-
+--533 занят для атрибута r_icon в справочнике рубрикатора
+--534 занят для атрибута r_icon в справочнике информационных объектов
 
 
 
@@ -3021,6 +3026,7 @@ insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only
 
 insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(54, 1, 4, true, 0, NULL);--colors
 insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(55, 1, 4, true, 1, NULL);
+insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(534, 1, 4, false, 2, NULL);
 
 insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(56, 1, 5, true, 0, NULL);--id_search_template
 insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(57, 1, 5, true, 1, NULL);--ref_table_name
