@@ -178,6 +178,7 @@ class _F_EXPORT KKSLoader
         //метод загружает рубрикаторы, доступные текущему пользователю.
         //Если параметр задан как TRUE, то озвращается только рубрикатор "Мои документы" для текущего пользователя
         KKSRubric * loadRubricators(bool bOnlyMyDocs) const;
+        KKSRubric * loadCatRubricators(void) const;
         KKSRubric * loadRubric (int idRubr) const;
 
         //метод загружает перечень атрибутов, которые заданы (используются) хотя бы одному информационному объекту

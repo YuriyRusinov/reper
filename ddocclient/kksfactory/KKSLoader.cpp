@@ -3235,6 +3235,98 @@ KKSRubric * KKSLoader::loadRubricators(bool bOnlyMyDocs) const
     return rootRubric;
 }
 
+KKSRubric * KKSLoader::loadCatRubricators(void) const
+{
+    QString sql = QString("select * from cgetcategoriesforrubricator() order by id;");
+    KKSResult * res = db->execute(sql);
+    if(!res || res->getRowCount() == 0){
+        if(res)
+            delete res;
+        return NULL;
+    }
+    
+    KKSRubric * rootRubric = new KKSRubric(-1, "Categories rubric for all tree");
+
+    int cnt = res->getRowCount();
+    for(int i=0; i<cnt; i++){
+        int id = res->getCellAsInt(i, 0);
+        
+        int idParent = -1;
+        
+        KKSSearchTemplate * st = 0;
+        
+        KKSCategory * c = 0;
+
+        QString name = res->getCellAsString(i, 3);
+        QString code = res->getCellAsString(i, 8);
+        QString desc = res->getCellAsString(i, 4);
+        QString icon = QString();//res->getCellAsString(i, 11);
+
+        int type = 0;//res->getCellAsInt(i, 8);
+
+        if(type == 0){//rubricator
+            KKSRubric * theRubric = new KKSRubric(id, name);
+            theRubric->setCode(code);
+            theRubric->setDesc(desc);
+            theRubric->setSearchTemplate (st);
+            theRubric->setCategory(c);
+            theRubric->setIcon(icon);
+            //loadPrivileges (theRubric);
+            theRubric->m_intId = id;
+
+            rootRubric->addRubric(theRubric);
+            theRubric->release();
+        }
+        else if(type == 1){//rubrics
+            KKSRubric * subRubric = new KKSRubric(id, name);
+            subRubric->setCode(code);
+            subRubric->setDesc(desc);
+            subRubric->setSearchTemplate (st);
+            subRubric->setCategory(c);
+            subRubric->setIcon(icon);
+            loadPrivileges (subRubric);
+            subRubric->m_intId = id;
+
+            if(idParent <= 0){
+                qWarning() << "Bad rubric!";
+                subRubric->release();
+                continue;
+            }
+            KKSRubric * parent = rootRubric->rubricForId(idParent);
+            if(!parent){
+                qWarning() << "Bad rubric! Parent is NULL!";
+                subRubric->release();
+                continue;
+            }
+            parent->addRubric(subRubric);
+            subRubric->release();
+        }
+/*
+        else if(type == 2){//rubric items
+            bool b = res->getCellAsBool(i, 10);
+            KKSRubricItem * item = new KKSRubricItem(id, name, b);
+            item->setIcon(icon);
+
+            if(idParent <= 0){
+                qWarning() << "Bad subRubric!";
+                item->release();
+                continue;
+            }
+            KKSRubric * parent = rootRubric->rubricForId(idParent);
+            if(!parent){
+                qWarning() << "Bad subRubric! Parent is NULL!";
+                item->release();
+                continue;
+            }
+            parent->addItem(item);
+            item->release();
+        }
+ */
+    }
+    
+    return rootRubric;
+}
+
 KKSRubric * KKSLoader::loadRubric (int idRubr) const
 {
     QString sql = QString("select * from getRubric(%1) order by id,type").arg(idRubr);

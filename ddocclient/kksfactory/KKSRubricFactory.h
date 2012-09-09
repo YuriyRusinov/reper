@@ -36,7 +36,8 @@ class _F_EXPORT KKSRubricFactory : public KKSEntityFactory
         enum RubricMode
         {
             atRootRubric = 0,
-            atMyDocsRubric = 1
+            atMyDocsRubric = 1,
+            atOthers = 2
         };
 
     signals:
@@ -46,7 +47,7 @@ class _F_EXPORT KKSRubricFactory : public KKSEntityFactory
     private slots:
         void saveRubric (KKSRubric * rootR, bool isMyDocs);
         void rubricItemUpload (void);
-		void rubricItemCreate (const KKSRubric * r);
+        void rubricItemCreate (const KKSRubric * r);
         void openRubricItem (int idObject);
         void loadRubricPrivilegies (RubricForm * rForm);
         void loadSearchTemplate (RubricForm * rForm);

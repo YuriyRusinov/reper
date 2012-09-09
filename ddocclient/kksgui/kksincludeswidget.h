@@ -16,6 +16,7 @@ class QSplitter;
 class QAction;
 class QContextMenuEvent;
 class QMenu;
+class QAbstractItemModel;
 
 class KKSRubric;
 class KKSRubricItem;
@@ -43,6 +44,11 @@ public:
     void showIncludes (void);
 
     QTreeView *tvRubr (void);
+    
+    QAbstractItemModel * rubrModel () const;
+    void setRubrModel (QAbstractItemModel * rModel);
+    
+    void addRubricIntoModel (KKSRubric * cRubr, const QModelIndex& pIndex=QModelIndex());
 
     void save (void);
     void setSaved (bool isSaved);

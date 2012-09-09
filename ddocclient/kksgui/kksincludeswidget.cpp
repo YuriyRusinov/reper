@@ -112,9 +112,6 @@ KKSIncludesWidget::KKSIncludesWidget(KKSRubric * rootRubric,
     connect (twIncludes, SIGNAL (doubleClicked(const QModelIndex &)), this, SLOT (slotRubricItemDblClicked(const QModelIndex &)) );
     connect (recWItems->getView(), SIGNAL (doubleClicked(const QModelIndex &)), this, SLOT (slotRubricItemEdit(const QModelIndex &)) );
     connect (recWItems->actDel, SIGNAL (triggered()), this, SLOT (delRubricItem()) );
-
-    QMessageBox::information(0, "", "", QMessageBox::Ok);
-    spRubrics->setOrientation(Qt::Horizontal);
 }
 
 KKSIncludesWidget::~KKSIncludesWidget()
@@ -1037,6 +1034,7 @@ void KKSIncludesWidget::rubricSelectionChanged (const QItemSelection& selected, 
         recWItems->setVisible (false);
         return;
     }
+    
     KKSRubric * rubr = getRubric (wIndex);
     if (rubr && rubr->getCategory())
     {
@@ -1138,6 +1136,36 @@ void KKSIncludesWidget :: setRubricIcon (void)
     isChanged = true;
 
 }
+
+QAbstractItemModel * KKSIncludesWidget :: rubrModel () const
+{
+    return twIncludes->model();
+}
+
+void KKSIncludesWidget :: setRubrModel (QAbstractItemModel * rModel)
+{
+    QAbstractItemModel * oldModel = twIncludes->model();
+    twIncludes->setModel(rModel);
+    if (oldModel && oldModel != rModel)
+        delete oldModel;
+}
+
+void KKSIncludesWidget :: addRubricIntoModel (KKSRubric * cRubr, const QModelIndex& pIndex)
+{
+    if (!cRubr)
+        return;
+
+    m_rootRubric->addRubric (cRubr);
+    parseRubric (cRubr, pIndex);
+/*    QAbstractItemModel * mod = rubrModel ();
+    int nr = rubrMod->rowCount();
+    rubrMod->insertRows (nr, 1);
+    QModelIndex wIndex = rubrMod->index (nr, 0);
+    rubrMod->setData (wIndex, tr("Others"), Qt::DisplayRole);
+    rubrMod->setData (wIndex, atOthers, Qt::UserRole);
+    rubrMod->setData (wIndex, KKSRubric::icon().scaled(16, 16), Qt::DecorationRole);*/
+}
+
 /*=================*/
 KKSIncludesItemDelegate::KKSIncludesItemDelegate(QObject * parent) : QItemDelegate(parent)
 {
