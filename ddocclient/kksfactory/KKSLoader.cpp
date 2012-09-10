@@ -3266,6 +3266,7 @@ KKSRubric * KKSLoader::loadCatRubricators(void) const
 
         if(type == 0){//rubricator
             KKSRubric * theRubric = new KKSRubric(id, name);
+            theRubric->setCategorized (true);
             theRubric->setCode(code);
             theRubric->setDesc(desc);
             theRubric->setSearchTemplate (st);

@@ -124,6 +124,8 @@ public:
     void setIcon (const QString & s);
 
 
+    bool isCategorized (void) const;
+    void setCategorized (bool c);
 private:
 
     KKSList<const KKSRubricItem *> m_items;
@@ -136,6 +138,8 @@ private:
     
     QIcon m_rubricIcon;
     QString m_iconData;
+    
+    bool m_isCategorized;
 
     friend class KKSLoader;
     friend class KKSPPFactory;

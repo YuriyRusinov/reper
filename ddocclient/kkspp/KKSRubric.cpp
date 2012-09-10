@@ -124,7 +124,8 @@ KKSRubric::KKSRubric(const KKSRubric & other) : KKSRecord(other),
     m_othersPrivilege(NULL),*/
     m_intId(other.m_intId),
     m_rubricIcon (other.m_rubricIcon),
-    m_iconData(other.m_iconData)
+    m_iconData(other.m_iconData),
+    m_isCategorized (other.m_isCategorized)
 {
     m_items = other.items();
     m_rubrics = other.rubrics();
@@ -150,7 +151,8 @@ KKSRubric::KKSRubric(int id, const QString & name, KKSSearchTemplate * st, KKSCa
     m_othersPrivilege (0),*/
     m_intId (-1),
     m_rubricIcon (QIcon()),
-    m_iconData(QString())
+    m_iconData(QString()),
+    m_isCategorized (false)
 {
     if (m_searchTemplate)
         m_searchTemplate->addRef ();
@@ -198,6 +200,7 @@ KKSRubric & KKSRubric::operator = (const KKSRubric & other)
     
     m_rubricIcon = other.m_rubricIcon;
     m_iconData = other.m_iconData;
+    m_isCategorized = other.m_isCategorized;
     
     return *this;
 }
@@ -761,4 +764,14 @@ void KKSRubric :: setIcon (const QString & s)
 const QString KKSRubric :: iconAsString () const
 {
     return m_iconData;
+}
+
+bool KKSRubric :: isCategorized (void) const
+{
+    return m_isCategorized;
+}
+
+void KKSRubric :: setCategorized (bool c)
+{
+    m_isCategorized = c;
 }
