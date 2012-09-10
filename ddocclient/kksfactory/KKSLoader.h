@@ -37,6 +37,7 @@ class KKSState;
 class KKSTemplate;
 class KKSEIOData;
 class KKSRubric;
+class KKSRubricItem;
 class KKSPrivilege;
 class KKSSearchTemplate;
 class KKSAclTemplate;
@@ -239,9 +240,9 @@ class _F_EXPORT KKSLoader
         void loadRecRubrics (KKSObjectExemplar * eio) const;
 
         KKSList<KKSFile *> loadFiles(KKSObject * io) const;
-		KKSList<KKSFile *> loadFiles(const KKSObjectExemplar * io) const;
-        
-		KKSLifeCycle * loadLifeCycle(int idCategory) const;
+        KKSList<KKSFile *> loadFiles(const KKSObjectExemplar * io) const;
+
+        KKSLifeCycle * loadLifeCycle(int idCategory) const;
         /*
         QString loadColumnValue(const QString & tName,
                                 const QString & cName, 
@@ -282,6 +283,7 @@ class _F_EXPORT KKSLoader
         KKSList<const KKSFilter *> loadCriteriaFromGroup (int idGroup) const;
         KKSFilter * loadCriterium (int idCriteria) const;
         KKSAccessEntity * loadAccessCat (KKSCategory * cat) const;
+        KKSList<const KKSRubricItem *> loadCatRubricItems (const KKSCategory* cat) const;
 };
 
 #endif

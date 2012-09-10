@@ -3255,7 +3255,7 @@ KKSRubric * KKSLoader::loadCatRubricators(void) const
         
         KKSSearchTemplate * st = 0;
         
-        KKSCategory * c = 0;
+        KKSCategory * c = this->loadCategory (id);
 
         QString name = res->getCellAsString(i, 3);
         QString code = res->getCellAsString(i, 8);
@@ -3273,6 +3273,8 @@ KKSRubric * KKSLoader::loadCatRubricators(void) const
             theRubric->setIcon(icon);
             //loadPrivileges (theRubric);
             theRubric->m_intId = id;
+            KKSList<const KKSRubricItem*> rItems = loadCatRubricItems (c);
+            theRubric->setItems (rItems);
 
             rootRubric->addRubric(theRubric);
             theRubric->release();
@@ -3325,6 +3327,32 @@ KKSRubric * KKSLoader::loadCatRubricators(void) const
     }
     
     return rootRubric;
+}
+
+KKSList<const KKSRubricItem *> KKSLoader::loadCatRubricItems (const KKSCategory* cat) const
+{
+    KKSList<const KKSRubricItem *> rItems;
+    if (!cat)
+        return rItems;
+
+    QString sql = QString("select id,name from io_objects io where io.id_io_category=%1;").arg (cat->id());
+    KKSResult * res = db->execute (sql);
+    if (!res || res->getRowCount() == 0)
+    {
+        if (res)
+            delete res;
+        return rItems;
+    }
+
+    int nr = res->getRowCount();
+    for (int i=0; i<nr; i++)
+    {
+        const KKSRubricItem * r = new KKSRubricItem (res->getCellAsInt (i, 0), res->getCellAsString(i, 1), true);
+        if (r)
+            rItems.append (r);
+    }
+    delete res;
+    return rItems;
 }
 
 KKSRubric * KKSLoader::loadRubric (int idRubr) const
