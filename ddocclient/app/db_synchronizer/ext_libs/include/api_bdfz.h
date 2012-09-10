@@ -43,6 +43,7 @@
 #define EFO_TYPE tr("ЭФО")
 #define GMO_TYPE tr("Прогнозы погоды по РБП")
 #define NVO_TYPE tr("Навигационно-временная информация")
+#define SKI_TYPE tr("Сезонная климатическая информация")
 #define CLASSIFICATOR_TYPE tr("Классификаторы векторных карт")
 
 #define DICT_ETK_TYPES tr("Типы ЭТК")
@@ -134,7 +135,7 @@ struct API_BDFZ_SHARED_EXPORT Param_TTX:Param_IO
 /**
 * @brief Структура параметров запроса районов боевого применения ВТО
 */
-struct API_BDFZ_SHARED_EXPORT Param_RBP: Param_IO
+struct API_BDFZ_SHARED_EXPORT Param_RBP:Param_IO
 {
     /**
     * @brief Конструктор по умолчанию, заполняет все поля значениями, указывающими на неиспользование данного параметра в запросе
@@ -254,6 +255,37 @@ struct API_BDFZ_SHARED_EXPORT Param_UGSH:Param_IO
     * @brief Дата, по которую надо искать
     */
     QDate date_to;
+
+    /**
+    * @brief Указывается обязательно! Уровень секретности (0-несекретно, 2-секретно, 3-совершенно секретно, 9-любой)
+    */
+    short constraints;
+};
+
+/**
+* @brief Структура параметров запроса Сезонной климатической информации
+*/
+struct API_BDFZ_SHARED_EXPORT Param_SKI:Param_IO
+{
+    /**
+    * @brief Конструктор по умолчанию, заполняет все поля значениями, указывающими на неиспользование данного параметра в запросе
+    */
+    explicit Param_SKI();
+
+    /**
+    * @brief Дата, с которой надо искать
+    */
+    QDate date_from;
+
+    /**
+    * @brief Дата, по которую надо искать
+    */
+    QDate date_to;
+
+    /**
+    * @brief WKT-строка, содержащая в себе описание полигона, который должен включать в себя территорию прогноза (если строка пустая - в поиске не учитывается)
+    */
+    QString polygon;
 
     /**
     * @brief Указывается обязательно! Уровень секретности (0-несекретно, 2-секретно, 3-совершенно секретно, 9-любой)
@@ -468,6 +500,11 @@ struct API_BDFZ_SHARED_EXPORT Result_IO
     * @brief Дата и время обновления ИО (с точностью до минуты)
     */
     QDateTime updated;
+
+	/**
+    * @brief Наименование ИО
+    */
+    QString io_name;
 
     /**
     * @brief Уникальный идентификатор ИО
@@ -689,6 +726,44 @@ struct API_BDFZ_SHARED_EXPORT Result_RBP:Result_IO
     * @brief Максимальная долгота
     */
     double lon_max;
+};
+
+/**
+* @brief Структура с результатом поиска ИО с Сезонной климатической информацией
+*/
+struct API_BDFZ_SHARED_EXPORT Result_SKI:Result_IO
+{
+    Result_SKI();
+
+    /**
+    * @brief Дата начала сезона
+    */
+    QDate season_begin;
+
+	/**
+    * @brief Дата окончания сезона
+    */
+    QDate season_end;
+
+    /**
+    * @brief Минимальная широта
+    */
+    double lat_min;
+
+    /**
+    * @brief Максимальная широта
+    */
+    double lat_max;
+
+    /**
+    * @brief Минимальная долгота
+    */
+    double lon_min;
+
+    /**
+    * @brief Максимальная долгота
+    */
+    double lon_max;    
 };
 
 /**
@@ -1222,6 +1297,44 @@ struct API_BDFZ_SHARED_EXPORT Create_ETK:Create_IO
 };
 
 /**
+* @brief Структура с данными для создания ИО Сезонной климатической информации
+*/
+struct API_BDFZ_SHARED_EXPORT Create_SKI:Create_IO
+{
+    Create_SKI();
+
+     /**
+    * @brief Дата начала сезона
+    */
+    QDate season_begin;
+
+	/**
+    * @brief Дата окончания сезона
+    */
+    QDate season_end;
+
+    /**
+    * @brief Минимальная широта
+    */
+    double lat_min;
+
+    /**
+    * @brief Максимальная широта
+    */
+    double lat_max;
+
+    /**
+    * @brief Минимальная долгота
+    */
+    double lon_min;
+
+    /**
+    * @brief Максимальная долгота
+    */
+    double lon_max;    
+};
+
+/**
 * @brief Структура с данными для создания ИО ЭОИРД 33
 */
 struct API_BDFZ_SHARED_EXPORT Create_EOIRD:Create_IO
@@ -1456,6 +1569,13 @@ public:
 	* @return Возвращает список результатов поиска (см описание структуры Result_PG)
     */
     QList<Result_PG> searchIO(const Param_PG& param);
+	
+	/**
+    * @brief Поиск Сезонной климатической информации (См список параметров в описании структуры Param_SKI)
+	* @param Параметры поиска (см описание структуры Param_SKI)
+	* @return Возвращает список результатов поиска (см описание структуры Result_SKI)
+    */
+    QList<Result_SKI> searchIO(const Param_SKI& param);
 
 	/**
     * @brief Поиск Указаний ГШ ВС РФ по ИО (См список параметров в описании структуры Param_UGSH)
@@ -1519,6 +1639,13 @@ public:
 	* @return True в случае успеха и false в случае неудачи (возможно возвращение false, если процесс загрузки файла будет длительным)
     */
     bool createIO(const Create_Request& param);
+
+    /**
+    * @brief Создаёт ИО типа "Сезонная климатическая информация" на сервере (См список параметров в описании структуры Create_SKI)
+	* @param param Параметры создаваемого ИО (см описание структуры Create_SKI)
+	* @return True в случае успеха и false в случае неудачи (возможно возвращение false, если процесс загрузки файла будет длительным)
+    */
+    bool createIO(const Create_SKI& param);
 
     /**
     * @brief Создаёт ИО типа "ЭТК векторные" на сервере (См список параметров в описании структуры Create_ETK)
@@ -1705,6 +1832,11 @@ private:
 	QString getIOTypeUID(const QString& type_name);
 
 	/**
+	* @brief Формирует строку метаданных для поисковых параметров для Сезонной климатической информации
+	*/
+    QString formMetaString(const Param_SKI& param);
+
+	/**
 	* @brief Формирует строку метаданных для поисковых параметров для Выписок объектов ВТО
 	*/
     QString formMetaString(const Param_VTO& param);
@@ -1768,6 +1900,11 @@ private:
 	* @brief Формирует строку метаданных для параметров создания Выписок объектов ВТО
 	*/
     QString formMetaString(const Create_VTO& param);
+
+	/**
+	* @brief Формирует строку метаданных для параметров создания ИО Сезонной климатической информации
+	*/
+    QString formMetaString(const Create_SKI& param);
 
 	/**
 	* @brief Формирует строку метаданных для параметров создания ИО ТТХ ПВО ИГ
