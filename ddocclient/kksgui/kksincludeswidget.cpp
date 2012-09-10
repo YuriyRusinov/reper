@@ -212,6 +212,8 @@ void KKSIncludesWidget::parseRubric(KKSRubric * rubric, QModelIndex index)
         QModelIndex cIndex = appendRubricRow(r, index);
         QAbstractItemModel * model = twIncludes->model();
         model->setData(cIndex, r->name(), Qt::ToolTipRole);
+        if (!r->getIcon().isNull())
+            model->setData(cIndex, r->getIcon(), Qt::DecorationRole);
         parseRubric(r, cIndex);
         parseItems(r, cIndex);
     }
@@ -266,7 +268,7 @@ QModelIndex KKSIncludesWidget::appendItemRow(const KKSRubricItem * item, QModelI
     model->setData (model->index(cnt, 0, index), item->name(), Qt::DisplayRole);
     model->setData (model->index(cnt, 0, index), 2, Qt::UserRole);//is item
     model->setData (model->index(cnt, 0, index), item->id(), Qt::UserRole+1);// idObject
-    model->setData (model->index(cnt, 0, index), QIcon(":/ddoc/rubric_item.png"), Qt::DecorationRole);
+    model->setData (model->index(cnt, 0, index), item->getIcon().isNull() ? QIcon(":/ddoc/rubric_item.png") : item->getIcon(), Qt::DecorationRole);
     
     QModelIndex cIndex = model->index(cnt, 0, index);
     twIncludes->setExpanded(index, true);

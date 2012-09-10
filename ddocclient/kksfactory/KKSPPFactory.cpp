@@ -7,6 +7,10 @@
 #include <QRegExp>
 #include <QtDebug>
 #include <QHash>
+#include <QByteArray>
+#include <QIcon>
+#include <QPixmap>
+#include <QBuffer>
 
 #include "KKSPPFactory.h"
 #include "KKSEIOFactory.h"
@@ -2779,14 +2783,19 @@ int KKSPPFactory::updateRubric(KKSRubric * r) const
         return OK_CODE;
 
     int idRubric = r->id();
-    
-    QString sql = QString("select * from ioUpdateIncludeLocal (%1, '%2', '%3', '%4', %5, %6, NULL);")
+    QByteArray rIconB;
+    QBuffer rIconBuff (&rIconB);
+    rIconBuff.open(QIODevice::WriteOnly);
+    r->getIcon().pixmap(QSize(22, 22)).save(&rIconBuff, "XPM");
+
+    QString sql = QString("select * from ioUpdateIncludeLocal (%1, '%2', '%3', '%4', %5, %6, %7);")
                           .arg(r->id())
                           .arg (r->name())
                           .arg (r->code())
                           .arg (r->desc())
                           .arg (r->getCategory() ? QString::number (r->getCategory()->id()) : QString ("NULL::int4"))
-                          .arg (r->getSearchTemplate() ? QString::number (r->getSearchTemplate()->id()) : QString("NULL::int4"));
+                          .arg (r->getSearchTemplate() ? QString::number (r->getSearchTemplate()->id()) : QString("NULL::int4"))
+                          .arg (r->getIcon().isNull() ? QString("NULL") : QString("'%1'").arg (QString(rIconB)));
 
     KKSResult * res = db->execute (sql);
     if (!res)
@@ -2815,15 +2824,20 @@ int KKSPPFactory::insertRubric(KKSRubric * r, int idParent, int idObject, bool r
         return OK_CODE;
 
     int idRubric = ERROR_CODE;//eiof->getNextSeq("rubricator", "id");
+    QByteArray rIconB;
+    QBuffer rIconBuff (&rIconB);
+    rIconBuff.open(QIODevice::WriteOnly);
+    r->getIcon().pixmap(QSize(22, 22)).save(&rIconBuff, "XPM");
     
-    QString sql = QString("select * from ioinsertinclude (%1, %2, '%3', '%4', '%5', %6, %7, NULL);")
+    QString sql = QString("select * from ioinsertinclude (%1, %2, '%3', '%4', '%5', %6, %7, NULL, %8);")
                           .arg ( (root || idParent <= 0) ? QString("NULL") : QString::number(idParent))
                           .arg (root ? QString::number(idObject) : QString("NULL"))
                           .arg (r->name())
                           .arg (r->code())
                           .arg (r->desc())
                           .arg (r->getSearchTemplate() ? QString::number (r->getSearchTemplate()->id()) : QString("NULL::int4"))
-                          .arg (r->getCategory() ? QString::number (r->getCategory()->id()) : QString ("NULL::int4"));
+                          .arg (r->getCategory() ? QString::number (r->getCategory()->id()) : QString ("NULL::int4"))
+                          .arg (r->getIcon().isNull() ? QString("NULL") : QString("'%1'").arg (QString(rIconB)));
 
     qDebug () << __PRETTY_FUNCTION__ << sql;
 

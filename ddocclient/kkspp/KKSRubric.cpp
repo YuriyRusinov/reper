@@ -755,7 +755,9 @@ QIcon KKSRubric :: getIcon (void) const
 void KKSRubric :: setIcon (const QString & s)
 {
     QPixmap px;
-    px.loadFromData(s.toUtf8());
+    bool isOk = px.loadFromData(s.toUtf8(), "XPM");
+    if (!isOk)
+        return;
 
     m_rubricIcon = QIcon(px);
     m_iconData = s;
