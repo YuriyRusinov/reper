@@ -22,6 +22,38 @@ class KKSSearchTemplate;
 class KKSCategory;
 class KKSAccessEntity;
 
+class _PP_EXPORT KKSRubricBase : public KKSRecord
+{
+public:
+    KKSRubricBase (void);
+    KKSRubricBase (int id, const QString& name);
+    virtual ~KKSRubricBase (void);
+
+    void setId(int id);
+    int id() const;
+
+    void setName(const QString & name);
+    const QString & name() const;
+
+    static void setIcon(const QPixmap & px);
+
+    static QPixmap icon();
+    QIcon getIcon (void) const;
+    //void setIcon (const QIcon& icon);
+    const QString& iconAsString() const;
+    void setIcon (const QString & s);
+    
+    enum RubricBaseType
+    {
+        atRubric = 0,
+        atRubricItem = 2,
+        atRubricCategory = 3
+    };
+    
+    virtual int rubricType (void) const=0;
+private:
+};
+
 class _PP_EXPORT KKSRubricItem : public KKSData
 {
 public:

@@ -17,6 +17,56 @@
 QPixmap * pxRubric = NULL;
 QPixmap * pxRubricItem = NULL;
 
+KKSRubricBase :: KKSRubricBase (void) : KKSRecord ()
+{
+}
+
+KKSRubricBase :: KKSRubricBase (int id, const QString& name) : KKSRecord (id, name)
+{
+}
+
+KKSRubricBase :: ~KKSRubricBase (void)
+{
+}
+
+void KKSRubricBase :: setId(int id)
+{
+    
+}
+
+int KKSRubricBase :: id() const
+{
+}
+
+void KKSRubricBase :: setName(const QString & name)
+{
+}
+
+const QString & KKSRubricBase :: name() const
+{
+}
+
+void KKSRubricBase :: setIcon(const QPixmap & px)
+{
+}
+
+QPixmap KKSRubricBase :: icon()
+{
+}
+
+QIcon KKSRubricBase :: getIcon (void) const
+{
+}
+
+const QString& KKSRubricBase :: iconAsString() const
+{
+}
+
+void KKSRubricBase :: setIcon (const QString & s)
+{
+
+}
+
 KKSRubricItem::KKSRubricItem() : KKSData(),
     m_idItem (-1),
     m_isAutomated (false),
