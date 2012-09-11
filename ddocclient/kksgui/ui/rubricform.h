@@ -11,6 +11,7 @@ namespace Ui
 
 class QAbstractItemModel;
 class QModelIndex;
+class QPixmap;
 
 class KKSSearchTemplate;
 class KKSCategory;
@@ -42,6 +43,9 @@ public:
     void setRubricDesc (QString rDesc);
 
     KKSAccessEntity * getAccessEntity (void) const;
+    
+    QString getIconAsString (void) const;
+    void setIcon (const QPixmap& rubrIcon);
 
 public slots:
     void setAccessEntity (KKSAccessEntity * _acl);
@@ -49,6 +53,7 @@ public slots:
 private slots:
     void loadSearchTemplate (void);
     void loadCategory (void);
+    void loadRubricImage (void);
     //void currentPrivilegiesChanged (const QModelIndex& ind);
 
 signals:

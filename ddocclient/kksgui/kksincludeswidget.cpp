@@ -401,7 +401,7 @@ void KKSIncludesWidget :: addRubric (void)
     KKSCategory * rc = 0;
     KKSAccessEntity * ac = 0;
     QString rDesc;
-    QPixmap icon;
+    QString icon;
     if (rForm && rForm->exec() == QDialog::Accepted)
     {
         rName = rForm->getRubricName ();
@@ -409,7 +409,7 @@ void KKSIncludesWidget :: addRubric (void)
         rc = rForm->getCategory ();
         ac = rForm->getAccessEntity ();
         rDesc = rForm->getRubricDesc ();
-        //icon = rForm->getIcon();
+        icon = rForm->getIconAsString();
         if (rName.trimmed().isEmpty())
             return;
     }
@@ -439,6 +439,7 @@ void KKSIncludesWidget :: addRubric (void)
     QModelIndex cIndex = appendRubricRow(r, index);
     
     twIncludes->setCurrentIndex(cIndex);
+    twIncludes->model()->setData (cIndex, r->getIcon(), Qt::DecorationRole);
 
     r->release();
     isChanged = true;
@@ -506,6 +507,7 @@ void KKSIncludesWidget :: editRubric (void)
     rForm->setSearchTemplate (r->getSearchTemplate());
     rForm->setCategory (r->getCategory());
     rForm->setAccessEntity (r->getAccessRules());
+    rForm->setIcon (r->getIcon().pixmap(22, 22));
     if (!rForm)
         return;
 
@@ -516,6 +518,7 @@ void KKSIncludesWidget :: editRubric (void)
     KKSCategory * rc = 0;
     KKSAccessEntity * ac =0;
     QString rDesc;
+    QString rIcon;
     if (rForm && rForm->exec() == QDialog::Accepted)
     {
         rName = rForm->getRubricName ();
@@ -523,6 +526,7 @@ void KKSIncludesWidget :: editRubric (void)
         rc = rForm->getCategory ();
         ac = rForm->getAccessEntity();
         rDesc = rForm->getRubricDesc ();
+        rIcon = rForm->getIconAsString();
         if (rName.trimmed().isEmpty())
             return;
     }
@@ -538,10 +542,12 @@ void KKSIncludesWidget :: editRubric (void)
     r->setCategory (rc);
     r->setAccessRules (ac);
     r->setDesc (rDesc);
+    r->setIcon (rIcon);
     rForm->setParent (0);
     delete rForm;
 
     twIncludes->model()->setData (index, rName, Qt::DisplayRole);
+    twIncludes->model()->setData (index, r->getIcon(), Qt::DecorationRole);
     isChanged = true;
     emit rubricsChanged ();
 }

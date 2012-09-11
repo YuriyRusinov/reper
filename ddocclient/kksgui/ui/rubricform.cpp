@@ -1,4 +1,9 @@
 #include <QModelIndex>
+#include <QFileDialog>
+#include <QPixmap>
+#include <QByteArray>
+#include <QBuffer>
+#include <QMessageBox>
 #include <QtDebug>
 
 #include "rubricform.h"
@@ -36,6 +41,7 @@ RubricForm :: RubricForm (QString defaultRubricName, QString defaultRubricDesc, 
 
     connect (UI->tbSearchTemplate, SIGNAL (clicked()), this, SLOT (loadSearchTemplate()) );
     connect (UI->tbCategory, SIGNAL (clicked()), this, SLOT (loadCategory ()) );
+    connect (UI->tbRubricIcon, SIGNAL (clicked()), this, SLOT (loadRubricImage()) );
 
     connect (UI->pbOk, SIGNAL (clicked()), this, SLOT (accept()) );
     connect (UI->pbCancel, SIGNAL (clicked()), this, SLOT (reject()) );
@@ -192,4 +198,44 @@ QString RubricForm :: getRubricDesc (void) const
 void RubricForm :: setRubricDesc (QString rDesc)
 {
     UI->lERubricDescription->setText (rDesc);
+}
+
+void RubricForm :: loadRubricImage (void)
+{
+    QString iconFile = QFileDialog::getOpenFileName(this, tr("Open Image File"),
+                                                    QDir::currentPath(),
+                                                    tr("Image files (*.xpm *.png *.ico *.jpg *.jpeg *.bmp *.gif *.pbm *.pgm *.xbm);;All files (*)")
+                                                    );
+    if (iconFile.isEmpty())
+        return;
+
+    QPixmap rubrPixmap (iconFile);
+    if(rubrPixmap.isNull())
+    {
+        QMessageBox::critical(this, 
+                              tr("Error"), 
+                              tr(""), 
+                              QMessageBox::Ok);
+        return;
+    }
+    UI->lRubricIconImage->setPixmap(rubrPixmap);
+
+}
+
+QString RubricForm :: getIconAsString (void) const
+{
+    const QPixmap * rubrPixmap = UI->lRubricIconImage->pixmap();
+    QByteArray bytes;
+    QBuffer buffer(&bytes);
+
+    buffer.open(QIODevice::WriteOnly);
+    rubrPixmap->save(&buffer, "XPM"); // writes pixmap into bytes in XPM format
+    buffer.close();
+    
+    return QString (bytes);
+}
+
+void RubricForm :: setIcon (const QPixmap& rubrIcon)
+{
+    UI->lRubricIconImage->setPixmap (rubrIcon);
 }
