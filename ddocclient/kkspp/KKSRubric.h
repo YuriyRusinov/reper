@@ -2,7 +2,7 @@
  * Module:  KKSRubric.h
  * Author:  sergey
  * Modified: 25 декабря 2008 г. 17:22:35
- * Purpose: Declaration of the class KKSFilter
+ * Purpose: Declaration of the class KKSRubric
  * Comment: рубрики рубрикатора и элементы рубрик
  *    используется при работе с рубрикатором.
  ***********************************************************************/
@@ -26,18 +26,13 @@ class _PP_EXPORT KKSRubricBase : public KKSRecord
 {
 public:
     KKSRubricBase (void);
-    KKSRubricBase (int id, const QString& name);
+    KKSRubricBase (qint64 id, const QString& name, const QString& desc=QString());
+    KKSRubricBase (const KKSRubricBase& RB);
     virtual ~KKSRubricBase (void);
 
-    void setId(int id);
-    int id() const;
+    virtual void setDefaultIcon (const QPixmap& px)=0;
+    virtual QPixmap getDefaultIcon (void)=0;
 
-    void setName(const QString & name);
-    const QString & name() const;
-
-    static void setIcon(const QPixmap & px);
-
-    static QPixmap icon();
     QIcon getIcon (void) const;
     //void setIcon (const QIcon& icon);
     const QString& iconAsString() const;
@@ -45,48 +40,57 @@ public:
     
     enum RubricBaseType
     {
-        atRubric = 0,
+        atRootRubric = 0,
+        atRubric = 1,
         atRubricItem = 2,
         atRubricCategory = 3
     };
     
     virtual int rubricType (void) const=0;
 private:
+    
+    QIcon m_rubrIcon;
+    QString m_iconData;
 };
 
-class _PP_EXPORT KKSRubricItem : public KKSData
+class _PP_EXPORT KKSRubricItem : public KKSRubricBase//public KKSData
 {
 public:
 
     KKSRubricItem();
-    KKSRubricItem(int idItem, const QString & name, bool b = false);
+    KKSRubricItem(qint64 idItem, const QString & name, bool b = false);
     KKSRubricItem(const KKSRubricItem & other);
     ~KKSRubricItem();
     
-    void setId(int id);
+/*    void setId(int id);
     int id() const;
 
     void setName(const QString & name);
     const QString & name() const;
-
+*/
     static void setIcon(const QPixmap & px);
     static QPixmap icon();
-
+ 
     bool isAutomated() const {return m_isAutomated;}
     void setAutomated(bool b) {m_isAutomated = b;}
 
     bool isUpdated() const {return m_isUpdated;}
     void setUpdated(bool b) {m_isUpdated = b;}
 
-    QIcon getIcon (void) const;
+    virtual void setDefaultIcon (const QPixmap& px);
+    virtual QPixmap getDefaultIcon (void);
+
+/*    QIcon getIcon (void) const;
     //void setIcon (const QIcon& icon);
     const QString iconAsString() const;
     void setIcon (const QString & s);
+ */
+    virtual int rubricType (void) const;
 
 private:
     
-    int m_idItem;
-    QString m_name;
+//    int m_idItem;
+//    QString m_name;
     bool m_isAutomated;
     bool m_isUpdated;
     

@@ -31,9 +31,9 @@ KKSCategory::KKSCategory() : KKSRecord(),
     m_tableCategory (NULL),
     m_recAttrCategory(NULL),
     m_lifeCycle (KKSLifeCycle::defLifeCycle()),
+    m_rootRubric(NULL),
     m_isSystem(false),
     m_isGlobal(false),
-    m_rootRubric(NULL),
     m_state (KKSState::defState1()),
     m_acl (new KKSAccessEntity())
 {
@@ -45,11 +45,11 @@ KKSCategory::KKSCategory() : KKSRecord(),
 
 KKSCategory::KKSCategory(const KKSCategory & c) : KKSRecord(c),
     m_isMain (c.m_isMain),
-    m_attributes (c.m_attributes),
     m_attrsModified(c.m_attrsModified),
+    m_attributes (c.m_attributes),
+    m_rootRubric(NULL),
     m_isSystem(c.isSystem()),
     m_isGlobal(c.isGlobal()),
-    m_rootRubric(NULL),
     m_state (NULL),
     m_acl (c.m_acl)
 {
@@ -78,9 +78,9 @@ KKSCategory::KKSCategory(int id, const QString & name, KKSType * type) : KKSReco
     m_tableCategory (NULL),
     m_recAttrCategory(NULL),
     m_lifeCycle (KKSLifeCycle::defLifeCycle()),
+    m_rootRubric(NULL),
     m_isSystem(false),
     m_isGlobal(false),
-    m_rootRubric(NULL),
     m_state (KKSState::defState1()),
     m_acl ((type->id() != 10 ? new KKSAccessEntity() : 0))
 {

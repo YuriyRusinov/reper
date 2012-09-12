@@ -1,10 +1,9 @@
 /***********************************************************************
- * Module:  KKSFilter.cpp
+ * Module:  KKSRubric.cpp
  * Author:  sergey
  * Modified: 25 декабря 2008 г. 17:22:35
- * Purpose: Implementation of the class KKSFilter
- * Comment: фильтр по атрибуту
- *    используется при фильтрации справочников, табелей, журналов и прочих  ИО, которые являются контейнерными.
+ * Purpose: Implementation of the classes KKSRubric
+ * Comment: используется для рубрикации
  ***********************************************************************/
 
 #include "KKSRubric.h"
@@ -17,11 +16,22 @@
 QPixmap * pxRubric = NULL;
 QPixmap * pxRubricItem = NULL;
 
-KKSRubricBase :: KKSRubricBase (void) : KKSRecord ()
+KKSRubricBase :: KKSRubricBase (void) : KKSRecord (),
+    m_rubrIcon (QIcon()),
+    m_iconData (QString())
 {
 }
 
-KKSRubricBase :: KKSRubricBase (int id, const QString& name) : KKSRecord (id, name)
+KKSRubricBase :: KKSRubricBase (qint64 id, const QString& name, const QString& desc) : KKSRecord (id, name, desc),
+    m_rubrIcon (QIcon()),
+    m_iconData (QString())
+{
+}
+
+KKSRubricBase :: KKSRubricBase (const KKSRubricBase& RB)
+    : KKSRecord (RB),
+      m_rubrIcon (RB.m_rubrIcon),
+      m_iconData (RB.m_iconData)
 {
 }
 
@@ -29,56 +39,35 @@ KKSRubricBase :: ~KKSRubricBase (void)
 {
 }
 
-void KKSRubricBase :: setId(int id)
-{
-    
-}
-
-int KKSRubricBase :: id() const
-{
-}
-
-void KKSRubricBase :: setName(const QString & name)
-{
-}
-
-const QString & KKSRubricBase :: name() const
-{
-}
-
-void KKSRubricBase :: setIcon(const QPixmap & px)
-{
-}
-
-QPixmap KKSRubricBase :: icon()
-{
-}
-
 QIcon KKSRubricBase :: getIcon (void) const
 {
+    return m_rubrIcon;
 }
 
 const QString& KKSRubricBase :: iconAsString() const
 {
+    return m_iconData;
 }
 
 void KKSRubricBase :: setIcon (const QString & s)
 {
+    QPixmap px;
+    bool isOk = px.loadFromData(s.toUtf8(), "XPM");
+    if (!isOk)
+        return;
 
+    m_rubrIcon = QIcon(px);
+    m_iconData = s;
 }
 
-KKSRubricItem::KKSRubricItem() : KKSData(),
-    m_idItem (-1),
+/*============*/
+KKSRubricItem::KKSRubricItem() : KKSRubricBase(),
     m_isAutomated (false),
-    m_isUpdated (false),
-    m_rubrItemIcon (QIcon()),
-    m_iconData(QString())
+    m_isUpdated (false)
 {
 }
 
-KKSRubricItem::KKSRubricItem(int idItem, const QString & name, bool b) : KKSData(),
-    m_idItem (idItem),
-    m_name (name),
+KKSRubricItem::KKSRubricItem(qint64 idItem, const QString & name, bool b) : KKSRubricBase(idItem, name),
     m_isAutomated (b),
     m_isUpdated (false),
     m_rubrItemIcon (QIcon()),
@@ -86,9 +75,7 @@ KKSRubricItem::KKSRubricItem(int idItem, const QString & name, bool b) : KKSData
 {
 }
 
-KKSRubricItem::KKSRubricItem(const KKSRubricItem & other) : KKSData(),
-    m_idItem (other.m_idItem),
-    m_name (other.m_name),
+KKSRubricItem::KKSRubricItem(const KKSRubricItem & other) : KKSRubricBase (other),
     m_isAutomated (other.m_isAutomated),
     m_isUpdated (other.m_isUpdated),
     m_rubrItemIcon (other.m_rubrItemIcon),
@@ -101,6 +88,7 @@ KKSRubricItem::~KKSRubricItem()
 
 }
 
+/*
 void KKSRubricItem::setId(int id)
 {
     m_idItem = id;
@@ -120,13 +108,32 @@ const QString & KKSRubricItem::name() const
 {
     return m_name;
 }
+*/
 
-void KKSRubricItem::setIcon(const QPixmap & px)
+void KKSRubricItem::setIcon(const QPixmap& px)
 {
     if(pxRubricItem)
         delete pxRubricItem;
 
     pxRubricItem = new QPixmap(px);
+}
+
+void KKSRubricItem::setDefaultIcon(const QPixmap & px)
+{
+    if(pxRubricItem)
+        delete pxRubricItem;
+
+    pxRubricItem = new QPixmap(px);
+}
+
+QPixmap KKSRubricItem::getDefaultIcon()
+{
+    QPixmap px;
+    
+    if(pxRubricItem)
+        px = QPixmap(*pxRubricItem);
+
+    return px;
 }
 
 QPixmap KKSRubricItem::icon()
@@ -137,8 +144,9 @@ QPixmap KKSRubricItem::icon()
         px = QPixmap(*pxRubricItem);
 
     return px;
+    
 }
-
+/*
 QIcon KKSRubricItem::getIcon (void) const
 {
     return m_rubrItemIcon;
@@ -156,6 +164,12 @@ void KKSRubricItem :: setIcon (const QString & s)
 const QString KKSRubricItem :: iconAsString () const
 {
     return m_iconData;
+}
+*/
+
+int KKSRubricItem::rubricType (void) const
+{
+    return KKSRubricBase::atRubricItem;
 }
 
 /*===========================================*/

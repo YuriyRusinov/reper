@@ -1127,7 +1127,7 @@ void KKSIncludesWidget :: setRubricIcon (void)
         if (!rubr)
             return;
         KKSRubricItem * rubrItem = const_cast<KKSRubricItem *>(rubr->item(index.row()));
-        rubrItem->setIcon (bytes);
+        rubrItem->setIcon (QString(bytes));
         icon = rubrItem->getIcon();
     }
     else
