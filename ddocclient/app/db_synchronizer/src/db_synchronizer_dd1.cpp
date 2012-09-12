@@ -55,11 +55,11 @@ int DBSynchronizer::createIOFromGMO(const Result_GMO & gmo, const QList<QPair<QS
 		return 0;
   
 	int idCat;
-	if(gmo.forecast_type == "Краткосрочный")
+	if(gmo.forecast_type == tr("Краткосрочный"))
 		idCat = ID_CAT_GMO1;
-	else if(gmo.forecast_type == "Среднесрочный")
+	else if(gmo.forecast_type == tr("Среднесрочный"))
 		idCat = ID_CAT_GMO2;
-	else if(gmo.forecast_type == "Долгосрочный")
+	else if(gmo.forecast_type == tr("Долгосрочный"))
 		idCat = ID_CAT_GMO3;
 	else
 		return 0;
@@ -229,17 +229,17 @@ int DBSynchronizer::createIOFromTTX(const Result_TTX & ttx, const QList<QPair<QS
 		return 0;
   
 	int idCat;
-	if(ttx.weapon_type == "Самолеты ДРЛО")
+	if(ttx.weapon_type == tr("Самолеты ДРЛО"))
 		idCat = ID_CAT_TTX_DLRO;
-	else if(ttx.weapon_type == "ЗРК средней и большой дальности")
+	else if(ttx.weapon_type == tr("ЗРК средней и большой дальности"))
 		idCat = ID_CAT_TTX_ZRK;
-	else if(ttx.weapon_type == "Ракеты «воздух-воздух»")
+	else if(ttx.weapon_type == tr("Ракеты «воздух-воздух»"))
 		idCat = ID_CAT_TTX_RVV;
-	else if(ttx.weapon_type == "РЛС обнаружения")
+	else if(ttx.weapon_type == tr("РЛС обнаружения"))
 		idCat = ID_CAT_TTX_RLS;	
-	else if(ttx.weapon_type == "Самолеты истребительной авиации")
+	else if(ttx.weapon_type == tr("Самолеты истребительной авиации"))
 		idCat = ID_CAT_TTX_IA_PVO;	
-	else if(ttx.weapon_type == "Средства ПВО боевых кораблей ИГ")
+	else if(ttx.weapon_type == tr("Средства ПВО боевых кораблей ИГ"))
 		idCat = ID_CAT_TTX_PVO;	
 	else
 		return 0;
@@ -384,11 +384,11 @@ int DBSynchronizer::createIOFromOPVTO(const Result_VTO & vto, const QList<QPair<
 		return 0;
   
 	int idCat;
-	if(vto.vs_type == "ВВС")
+	if(vto.vs_type == tr("ВВС"))
 		idCat = ID_CAT_VVS;
-	else if(vto.vs_type == "ВМФ")
+	else if(vto.vs_type == tr("ВМФ"))
 		idCat = ID_CAT_VMF;
-	else if(vto.vs_type == "СВ")
+	else if(vto.vs_type == tr("СВ"))
 		idCat = ID_CAT_SV;
 	else
 		return 0;

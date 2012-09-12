@@ -147,19 +147,31 @@ void DBSynchronizer::analyzeSIU()
 					        tr("\nStart querying SIU database...\n"));
 	UI->teLog->moveCursor(QTextCursor::End);
 
-	getETK();
-	getGMO();
-	getNVO();
-	getEOIRD();
-	getEFO();
+    if(UI->lwIRTypes->item(0)->checkState() == Qt::Checked)
+        getETK();
+	if(UI->lwIRTypes->item(1)->checkState() == Qt::Checked)
+        getGMO();
+	if(UI->lwIRTypes->item(2)->checkState() == Qt::Checked)
+        getNVO();
+	if(UI->lwIRTypes->item(3)->checkState() == Qt::Checked)
+        getEOIRD();
+	if(UI->lwIRTypes->item(4)->checkState() == Qt::Checked)
+        getEFO();
 
-	getUGSH();
-	getTTX();
-    getPG();
-	getPOR();
-	getRBP();
-	getREQ();
-	getOPVTO();
+    if(UI->lwIRTypes->item(5)->checkState() == Qt::Checked)
+        getUGSH();
+	if(UI->lwIRTypes->item(6)->checkState() == Qt::Checked)
+        getTTX();
+    if(UI->lwIRTypes->item(7)->checkState() == Qt::Checked)
+        getPG();
+	if(UI->lwIRTypes->item(8)->checkState() == Qt::Checked)
+        getPOR();
+	if(UI->lwIRTypes->item(9)->checkState() == Qt::Checked)
+        getRBP();
+	if(UI->lwIRTypes->item(10)->checkState() == Qt::Checked)
+        getREQ();
+	if(UI->lwIRTypes->item(11)->checkState() == Qt::Checked)
+        getOPVTO();
 
 	UI->teLog->setPlainText(UI->teLog->toPlainText() + 
 		                    tr("\n ++++++++++++++++++++++ \n") + 

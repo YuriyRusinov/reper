@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("Windows-1251"));
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("Windows-1251"));
 #else
-    QTextCodec::setCodecForTr(QTextCodec::codecForName("KOI8-R"));
+    QTextCodec::setCodecForTr(QTextCodec::codecForName("Windows-1251"));
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("KOI8-R"));
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("KOI8-R"));
 #endif
