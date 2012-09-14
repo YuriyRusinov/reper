@@ -1135,7 +1135,7 @@ void KKSIncludesWidget :: setRubricIcon (void)
         rubr = getRubric (index);
         if (!rubr)
             return;
-        rubr->setIcon (bytes);
+        rubr->setIcon (QString(bytes));
         icon = rubr->getIcon();
     }
 

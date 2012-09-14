@@ -173,12 +173,12 @@ int KKSRubricItem::rubricType (void) const
 }
 
 /*===========================================*/
-KKSRubric::KKSRubric() : KKSRecord()
+KKSRubric::KKSRubric() : KKSRubricBase()
 {
 
 }
 
-KKSRubric::KKSRubric(const KKSRubric & other) : KKSRecord(other),
+KKSRubric::KKSRubric(const KKSRubric & other) : KKSRubricBase(other),
     m_searchTemplate (other.m_searchTemplate),
     m_category (other.m_category),
     m_acl (other.m_acl),
@@ -205,7 +205,7 @@ KKSRubric::KKSRubric(const KKSRubric & other) : KKSRecord(other),
     //setOthersPrivilege(other.othersPrivilege());
 }
 
-KKSRubric::KKSRubric(int id, const QString & name, KKSSearchTemplate * st, KKSCategory * c, KKSAccessEntity * ac) : KKSRecord(id, name),
+KKSRubric::KKSRubric(int id, const QString & name, KKSSearchTemplate * st, KKSCategory * c, KKSAccessEntity * ac) : KKSRubricBase(id, name),
     m_searchTemplate (st),
     m_category (c),
     m_acl (ac),
@@ -544,224 +544,7 @@ void KKSRubric::setAccessRules (KKSAccessEntity * _acl)
     if (m_acl)
         m_acl->addRef ();
 }
-/*
-const KKSMap<int, KKSPrivilege *> & KKSRubric::privileges() const
-{
-    return m_privileges;
-}
 
-KKSMap<int, KKSPrivilege *> & KKSRubric::privileges()
-{
-        return m_privileges;
-}
-
-void KKSRubric::setPrivileges(const KKSMap<int, KKSPrivilege *> & _privileges)
-{
-    m_privileges = _privileges;
-}
-
-int KKSRubric::addPrivilege(int idRole, KKSPrivilege * p)
-{
-    int cnt = m_privileges.insert(idRole, p);
-    if(!cnt)
-        return ERROR_CODE;
-
-    return OK_CODE;
-}
-
-int KKSRubric::removePrivilege(int idRole)
-{
-    m_privileges.remove(idRole);
-    return OK_CODE;
-}
-
-int KKSRubric::replacePrivilege(int idRole, KKSPrivilege * p)
-{
-    removePrivilege(idRole);
-    int cnt = addPrivilege(idRole, p);
-
-    return cnt == 0 ? ERROR_CODE : OK_CODE;
-}
-
-const KKSPrivilege * KKSRubric::privilege(int idRole) const
-{
-    KKSPrivilege * p = NULL;
-
-    QMap<int, KKSPrivilege*>::const_iterator i = m_privileges.find(idRole);
-    while (i != m_privileges.end() && i.key() == idRole) {
-        p = i.value();
-        //берем всегда первый элемент
-        break;
-    }
-
-    return p;
-}
-
-KKSPrivilege * KKSRubric::privilege(int idRole)
-{
-    KKSPrivilege * p = NULL;
-
-     QMap<int, KKSPrivilege *>::iterator i = m_privileges.find(idRole);
-     while (i != m_privileges.end() && i.key() == idRole) {
-         p = i.value();
-         //берем всегда первый элемент
-         break;
-     }
-
-    return p;
-}
-
-KKSMap<int, KKSPrivilege*> & KKSRubric::bossPrivileges()
-{
-    return m_bossPrivileges;
-}
-
-const KKSMap<int, KKSPrivilege *> & KKSRubric::bossPrivileges() const
-{
-    return m_bossPrivileges;
-}
-
-KKSPrivilege * KKSRubric::bossPrivilege(int idRole)
-{
-    KKSPrivilege * p = NULL;
-
-     QMap<int, KKSPrivilege*>::const_iterator i = m_bossPrivileges.find(idRole);
-     while (i != m_bossPrivileges.end() && i.key() == idRole) {
-         p = i.value();
-         //берем всегда первый элемент
-         break;
-     }
-
-    return p;
-}
-
-const KKSPrivilege * KKSRubric::bossPrivilege(int idRole) const
-{
-    KKSPrivilege * p = NULL;
-
-     QMap<int, KKSPrivilege*>::const_iterator i = m_bossPrivileges.find(idRole);
-     while (i != m_bossPrivileges.end() && i.key() == idRole) {
-         p = i.value();
-         //берем всегда первый элемент
-         break;
-     }
-
-    return p;
-}
-
-KKSMap<int, KKSPrivilege *> & KKSRubric::unitPrivileges()
-{
-    return m_unitPrivileges;
-}
-
-const KKSMap<int, KKSPrivilege *> & KKSRubric::unitPrivileges() const
-{
-        return m_unitPrivileges;
-}
-
-KKSPrivilege * KKSRubric::unitPrivilege(int idRole)
-{
-    KKSPrivilege * p = NULL;
-
-     QMap<int, KKSPrivilege*>::const_iterator i = m_unitPrivileges.find(idRole);
-     while (i != m_unitPrivileges.end() && i.key() == idRole) {
-         p = i.value();
-         //берем всегда первый элемент
-         break;
-     }
-
-    return p;
-}
-
-const KKSPrivilege * KKSRubric::unitPrivilege(int idRole) const
-{
-    KKSPrivilege * p = NULL;
-
-     QMap<int, KKSPrivilege*>::const_iterator i = m_unitPrivileges.find(idRole);
-     while (i != m_unitPrivileges.end() && i.key() == idRole) {
-         p = i.value();
-         //берем всегда первый элемент
-         break;
-     }
-
-    return p;
-}
-
-KKSPrivilege * KKSRubric::othersPrivilege()
-{
-    return m_othersPrivilege;
-}
-
-KKSPrivilege * KKSRubric::othersPrivilege() const
-{
-    return m_othersPrivilege;
-}
-
-int KKSRubric::setBossPrivilege(int idRole, KKSPrivilege * p)
-{
-    if(!p)
-        return ERROR_CODE;
-
-    KKSPrivilege * pr = bossPrivilege(idRole);
-    if(!pr)
-        return ERROR_CODE;
-
-    m_bossPrivileges.remove(idRole);
-    int cnt = m_bossPrivileges.insert(idRole, p);
-    if(!cnt)
-        return ERROR_CODE;
-
-
-    return OK_CODE;
-}
-
-int KKSRubric::setUnitPrivilege(int idRole, KKSPrivilege * p)
-{
-    if(!p)
-        return ERROR_CODE;
-
-    KKSPrivilege * pr = unitPrivilege(idRole);
-    if(!pr)
-        return ERROR_CODE;
-
-    m_unitPrivileges.remove(idRole);
-    int cnt = m_unitPrivileges.insert(idRole, p);
-    if(!cnt)
-        return ERROR_CODE;
-
-
-    return OK_CODE;
-}
-
-int KKSRubric::addBossPrivilege(int idRole, KKSPrivilege * p)
-{
-    int cnt = m_bossPrivileges.insert(idRole, p);
-    if(!cnt)
-        return ERROR_CODE;
-
-    return OK_CODE;
-}
-
-int KKSRubric::addUnitPrivilege(int idRole, KKSPrivilege * p)
-{
-    int cnt = m_unitPrivileges.insert(idRole, p);
-    if(!cnt)
-        return ERROR_CODE;
-
-    return OK_CODE;
-}
-
-void KKSRubric::setOthersPrivilege(KKSPrivilege * p)
-{
-    if(m_othersPrivilege)
-        m_othersPrivilege->release();
-
-    m_othersPrivilege = p;
-
-    if(m_othersPrivilege)
-        m_othersPrivilege->addRef();
-}
-*/
 QString KKSRubric::getFullTreeOfIdsString() const
 {
     QString ids;
@@ -811,6 +594,7 @@ QString KKSRubric::getFullTreeOfDeletedIds() const
     return ids;
 }
 
+/*
 QIcon KKSRubric :: getIcon (void) const
 {
     return m_rubricIcon;
@@ -830,6 +614,34 @@ void KKSRubric :: setIcon (const QString & s)
 const QString KKSRubric :: iconAsString () const
 {
     return m_iconData;
+}
+ */
+
+void KKSRubric :: setDefaultIcon (const QPixmap& px)
+{
+    if(pxRubric)
+        delete pxRubric;
+
+    pxRubric = new QPixmap(px);
+}
+
+QPixmap KKSRubric :: getDefaultIcon (void)
+{
+    QPixmap px;
+    
+    if(pxRubric)
+        px = QPixmap(*pxRubric);
+
+    return px;
+}
+
+int KKSRubric :: rubricType (void) const
+{
+    if (m_isCategorized)
+        return KKSRubricBase::atRubricCategory;
+    else
+        return KKSRubricBase::atRubric;
+
 }
 
 bool KKSRubric :: isCategorized (void) const

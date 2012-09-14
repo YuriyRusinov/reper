@@ -99,7 +99,7 @@ private:
 };
 
 
-class _PP_EXPORT KKSRubric : public KKSRecord
+class _PP_EXPORT KKSRubric : public KKSRubricBase
 {
 public:
     KKSRubric();
@@ -154,14 +154,19 @@ public:
     KKSAccessEntity * getAccessRules (void) const;
     void setAccessRules (KKSAccessEntity * _acl);
 
-    QIcon getIcon (void) const;
+/*    QIcon getIcon (void) const;
     //void setIcon (const QIcon& icon);
     const QString iconAsString() const;
     void setIcon (const QString & s);
-
+*/
 
     bool isCategorized (void) const;
     void setCategorized (bool c);
+
+    virtual void setDefaultIcon (const QPixmap& px);
+    virtual QPixmap getDefaultIcon (void);
+    virtual int rubricType (void) const;
+
 private:
 
     KKSList<const KKSRubricItem *> m_items;
