@@ -3184,6 +3184,7 @@ KKSRubric * KKSLoader::loadRubricators(bool bOnlyMyDocs) const
             loadPrivileges (theRubric);
             theRubric->m_intId = id;
 
+            theRubric->setParent(rootRubric);
             rootRubric->addRubric(theRubric);
             theRubric->release();
         }
@@ -3208,6 +3209,7 @@ KKSRubric * KKSLoader::loadRubricators(bool bOnlyMyDocs) const
                 subRubric->release();
                 continue;
             }
+            subRubric->setParent (parent);
             parent->addRubric(subRubric);
             subRubric->release();
         }
@@ -3227,6 +3229,7 @@ KKSRubric * KKSLoader::loadRubricators(bool bOnlyMyDocs) const
                 item->release();
                 continue;
             }
+            item->setParent (parent);
             parent->addItem(item);
             item->release();
         }

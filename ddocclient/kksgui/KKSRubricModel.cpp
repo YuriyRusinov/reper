@@ -83,7 +83,7 @@ QModelIndex KKSRubricModel :: index (int row, int column, const QModelIndex& par
      const KKSRubricBase *childItem (0);
      if  (row >= pRubr->rubrics().count() && row < pRubr->rubrics().count()+pRubr->items().count()) 
          childItem = static_cast <const KKSRubricBase *>(pRubr->item(row-pRubr->rubrics().count()));
-     else
+     else if (row >= 0 && row < pRubr->rubrics().count())
          childItem = static_cast <const KKSRubricBase *> (pRubr->rubric(row));
      if (childItem)
          return createIndex(row, column, (void *)childItem);
@@ -104,6 +104,8 @@ QModelIndex KKSRubricModel :: parent (const QModelIndex &index) const
 
      int idc = parentItem->childNumber();
      qDebug () << __PRETTY_FUNCTION__ << idc;
+     if (idc < 0)
+         return QModelIndex();
      return createIndex(idc, 0, (void *)parentItem);
 }
 
