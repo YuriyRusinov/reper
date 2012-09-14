@@ -10,6 +10,8 @@
 #if !defined(__KKSSITOOOM_KKSRubric_h)
 #define __KKSSITOOOM_KKSRubric_h
 
+#include <QMetaType>
+
 #include "KKSList.h"
 #include "KKSMap.h"
 #include "KKSRecord.h"
@@ -47,6 +49,8 @@ public:
     };
     
     virtual int rubricType (void) const=0;
+    
+    int childNumber (void) const;
 private:
     
     QIcon m_rubrIcon;
@@ -208,7 +212,7 @@ private:
     QString getFullTreeOfDeletedIds() const;//возвращает список удаленных подрубрик
 };
 
-//Q_DECLARE_METATYPE( KKSRubric );
+Q_DECLARE_METATYPE(const KKSRubricBase *);
 
 #endif
 

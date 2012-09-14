@@ -3,6 +3,7 @@
 #include "KKSItemDelegate.h"
 #include "KKSEventFilter.h"
 #include "KKSSortFilterProxyModel.h"
+#include "KKSRubricModel.h"
 
 #include "KKSRubric.h"
 #include <KKSCategory.h>

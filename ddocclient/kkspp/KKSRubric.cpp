@@ -60,6 +60,36 @@ void KKSRubricBase :: setIcon (const QString & s)
     m_iconData = s;
 }
 
+int KKSRubricBase :: childNumber (void) const
+{
+    if (parent() && static_cast<const KKSRubric *>(parent()))
+    {
+        int idc = -1;
+        const KKSRubric * prubr = static_cast<const KKSRubric *>(parent());
+        int rCount;
+        if (this->rubricType() == atRubricItem)
+            rCount = prubr->items().count();
+        else
+            rCount = prubr->rubrics().count();
+        for (int i=0; i<rCount && idc<0; i++)
+        {
+            const KKSRubricBase * rw (0);
+            if (this->rubricType() == atRubricItem)
+                rw = prubr->item(i);
+            else
+                rw = prubr->rubric(i);
+            
+            if (rw->id() == id())
+                idc = i;
+        }
+        if (this->rubricType() == atRubricItem && idc > 0)
+            idc += prubr->rubrics().count();
+        return idc;
+    }
+    else
+        return -1;
+}
+
 /*============*/
 KKSRubricItem::KKSRubricItem() : KKSRubricBase(),
     m_isAutomated (false),
@@ -181,15 +211,15 @@ KKSRubric::KKSRubric() : KKSRubricBase()
 KKSRubric::KKSRubric(const KKSRubric & other) : KKSRubricBase(other),
     m_searchTemplate (other.m_searchTemplate),
     m_category (other.m_category),
+    m_rubricIcon (other.m_rubricIcon),
+    m_iconData(other.m_iconData),
+    m_isCategorized (other.m_isCategorized),
     m_acl (other.m_acl),
 /*    m_privileges(other.m_privileges),
     m_bossPrivileges(other.m_bossPrivileges),
     m_unitPrivileges(other.m_unitPrivileges),
     m_othersPrivilege(NULL),*/
-    m_intId(other.m_intId),
-    m_rubricIcon (other.m_rubricIcon),
-    m_iconData(other.m_iconData),
-    m_isCategorized (other.m_isCategorized)
+    m_intId(other.m_intId)
 {
     m_items = other.items();
     m_rubrics = other.rubrics();
@@ -208,15 +238,15 @@ KKSRubric::KKSRubric(const KKSRubric & other) : KKSRubricBase(other),
 KKSRubric::KKSRubric(int id, const QString & name, KKSSearchTemplate * st, KKSCategory * c, KKSAccessEntity * ac) : KKSRubricBase(id, name),
     m_searchTemplate (st),
     m_category (c),
+    m_rubricIcon (QIcon()),
+    m_iconData(QString()),
+    m_isCategorized (false),
     m_acl (ac),
 /*    m_privileges (KKSMap<int, KKSPrivilege *>()),
     m_bossPrivileges (KKSMap<int, KKSPrivilege *>()),
     m_unitPrivileges (KKSMap<int, KKSPrivilege *>()),
     m_othersPrivilege (0),*/
-    m_intId (-1),
-    m_rubricIcon (QIcon()),
-    m_iconData(QString()),
-    m_isCategorized (false)
+    m_intId (-1)
 {
     if (m_searchTemplate)
         m_searchTemplate->addRef ();
