@@ -33,7 +33,7 @@ public:
     virtual ~KKSRubricBase (void);
 
     virtual void setDefaultIcon (const QPixmap& px)=0;
-    virtual QPixmap getDefaultIcon (void)=0;
+    virtual QPixmap getDefaultIcon (void) const=0;
 
     QIcon getIcon (void) const;
     //void setIcon (const QIcon& icon);
@@ -82,7 +82,7 @@ public:
     void setUpdated(bool b) {m_isUpdated = b;}
 
     virtual void setDefaultIcon (const QPixmap& px);
-    virtual QPixmap getDefaultIcon (void);
+    virtual QPixmap getDefaultIcon (void) const;
 
 /*    QIcon getIcon (void) const;
     //void setIcon (const QIcon& icon);
@@ -168,7 +168,7 @@ public:
     void setCategorized (bool c);
 
     virtual void setDefaultIcon (const QPixmap& px);
-    virtual QPixmap getDefaultIcon (void);
+    virtual QPixmap getDefaultIcon (void) const;
     virtual int rubricType (void) const;
 
 private:

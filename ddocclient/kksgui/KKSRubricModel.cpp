@@ -6,11 +6,12 @@
  */
 #include <QIcon>
 #include <QPixmap>
+#include <QtDebug>
 
 #include "KKSRubric.h"
 #include "KKSRubricModel.h"
 
-KKSRubricModel::KKSRubricModel(KKSRubricBase * rootRubr, QObject * parent)
+KKSRubricModel::KKSRubricModel(const KKSRubricBase * rootRubr, QObject * parent)
     : QAbstractItemModel (parent),
       rootRubric (rootRubr)
 {
@@ -32,7 +33,7 @@ QVariant KKSRubricModel :: data (const QModelIndex &index, int role) const
     if (role != Qt::DisplayRole && role != Qt::EditRole && role != Qt::UserRole && role != Qt::UserRole+1 && role != Qt::DecorationRole)
         return QVariant ();
     
-    KKSRubricBase * rubr = getRubricEntity (index);
+    const KKSRubricBase * rubr = getRubricEntity (index);
     
     switch (role)
     {
@@ -61,8 +62,10 @@ QVariant KKSRubricModel :: data (const QModelIndex &index, int role) const
 
 QVariant KKSRubricModel :: headerData (int section, Qt::Orientation orientation, int role ) const
 {
-    if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
+    if (section == 0 && orientation == Qt::Horizontal && role == Qt::DisplayRole)
         return tr("Name");
+    
+    return QVariant();
 }
 
 QModelIndex KKSRubricModel :: index (int row, int column, const QModelIndex& parent) const
@@ -70,11 +73,11 @@ QModelIndex KKSRubricModel :: index (int row, int column, const QModelIndex& par
      if (parent.isValid() && parent.column() != 0)
          return QModelIndex();
 
-     KKSRubricBase *parentItem = getRubricEntity(parent);
+     const KKSRubricBase *parentItem = getRubricEntity(parent);
      if (parentItem->rubricType() == KKSRubricBase::atRubricItem)
          return QModelIndex();
 
-     KKSRubric * pRubr = static_cast<KKSRubric *>(parentItem);
+     const KKSRubric * pRubr = static_cast<const KKSRubric *>(parentItem);
      if (!pRubr)
          return QModelIndex();
      const KKSRubricBase *childItem (0);
@@ -93,18 +96,20 @@ QModelIndex KKSRubricModel :: parent (const QModelIndex &index) const
      if (!index.isValid())
          return QModelIndex();
 
-     KKSRubricBase *childItem = this->getRubricEntity(index);
-     KKSRubricBase *parentItem = static_cast<KKSRubricBase *>(childItem->parent());
+     const KKSRubricBase *childItem = this->getRubricEntity(index);
+     const KKSRubricBase *parentItem = static_cast<const KKSRubricBase *>(childItem->parent());
 
      if (!parentItem || parentItem == rootRubric)
          return QModelIndex();
 
-     return createIndex(parentItem->childNumber(), 0, parentItem);
+     int idc = parentItem->childNumber();
+     qDebug () << __PRETTY_FUNCTION__ << idc;
+     return createIndex(idc, 0, (void *)parentItem);
 }
 
 int KKSRubricModel :: rowCount (const QModelIndex& parent) const
 {
-     KKSRubric *parentItem = static_cast<const KKSRubric *>(getRubricEntity (parent));
+     const KKSRubric *parentItem = static_cast<const KKSRubric *>(getRubricEntity (parent));
      if (!parentItem)
          return 0;
 
@@ -126,21 +131,33 @@ Qt::ItemFlags KKSRubricModel :: flags (const QModelIndex& index) const
 
 bool KKSRubricModel :: setData (const QModelIndex& index, const QVariant& value, int role)
 {
+    Q_UNUSED (index);
+    Q_UNUSED (value);
+    Q_UNUSED (role);
+    return false;
 }
 
 bool KKSRubricModel :: insertRows (int row, int count, const QModelIndex& parent)
 {
+    Q_UNUSED (row);
+    Q_UNUSED (count);
+    Q_UNUSED (parent);
+    return false;
 }
 
 bool KKSRubricModel :: removeRows (int row, int count, const QModelIndex& parent)
 {
+    Q_UNUSED (row);
+    Q_UNUSED (count);
+    Q_UNUSED (parent);
+    return false;
 }
 
-KKSRubricBase * KKSRubricModel :: getRubricEntity (const QModelIndex& index) const
+const KKSRubricBase * KKSRubricModel :: getRubricEntity (const QModelIndex& index) const
 {
      if (index.isValid())
      {
-         KKSRubricBase *item = static_cast<KKSRubricBase*>(index.internalPointer());
+         const KKSRubricBase *item = static_cast<const KKSRubricBase*>(index.internalPointer());
          if (item) return item;
      }
      return rootRubric;

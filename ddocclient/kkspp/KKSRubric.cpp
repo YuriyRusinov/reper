@@ -156,7 +156,7 @@ void KKSRubricItem::setDefaultIcon(const QPixmap & px)
     pxRubricItem = new QPixmap(px);
 }
 
-QPixmap KKSRubricItem::getDefaultIcon()
+QPixmap KKSRubricItem::getDefaultIcon() const
 {
     QPixmap px;
     
@@ -655,7 +655,7 @@ void KKSRubric :: setDefaultIcon (const QPixmap& px)
     pxRubric = new QPixmap(px);
 }
 
-QPixmap KKSRubric :: getDefaultIcon (void)
+QPixmap KKSRubric :: getDefaultIcon (void) const
 {
     QPixmap px;
     

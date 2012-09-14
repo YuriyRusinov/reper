@@ -90,28 +90,20 @@ KKSIncludesWidget * KKSRubricFactory :: createRubricEditor (int mode, const KKSL
     KKSIncludesWidget *iW = new KKSIncludesWidget (rootR, false, isDocs, false, false, parent);
     QTreeView *tv = iW->tvRubr();
     QAbstractItemModel * rubrMod = iW->rubrModel();
-    int nr = rubrMod->rowCount();
-    rubrMod->insertRows (nr, 1);
-    QModelIndex wIndex = rubrMod->index (nr, 0);
-    rubrMod->setData (wIndex, tr("Others"), Qt::DisplayRole);
-    rubrMod->setData (wIndex, atOthers, Qt::UserRole);
-    rubrMod->setData (wIndex, KKSRubric::icon().scaled(16, 16), Qt::DecorationRole);
-    KKSRubric * cRubric = loader->loadCatRubricators ();
-    iW->addRubricIntoModel (cRubric, wIndex);
-/*    if (cRubric)
+    if (rubrMod)
     {
-        KKSList<const KKSRubric*> catRs = cRubric->rubrics();
-        rubrMod->insertRows (0, catRs.count(), wIndex);
-        if (rubrMod->columnCount (wIndex) == 0)
-            rubrMod->insertColumns (0, 1, wIndex);
-        for (int i=0; i<catRs.count(); i++)
+        int nr = rubrMod->rowCount();
+        bool isIns = rubrMod->insertRows (nr, 1);
+        if (isIns)
         {
-            QModelIndex cInd = rubrMod->index (i, 0, wIndex);
-            rubrMod->setData (cInd, catRs[i]->name(), Qt::DisplayRole);
-            rubrMod->setData (cInd, 3, Qt::UserRole);
-            rubrMod->setData (cInd, catRs[i]->id(), Qt::UserRole+1);
+            QModelIndex wIndex = rubrMod->index (nr, 0);
+            rubrMod->setData (wIndex, tr("Others"), Qt::DisplayRole);
+            rubrMod->setData (wIndex, atOthers, Qt::UserRole);
+            rubrMod->setData (wIndex, KKSRubric::icon().scaled(24, 24), Qt::DecorationRole);
+            KKSRubric * cRubric = loader->loadCatRubricators ();
+            iW->addRubricIntoModel (cRubric, wIndex);
         }
-    }*/
+    }
     KKSEventFilter *ef = new KKSEventFilter (iW);
     iW->setWindowTitle (title);
     tv->viewport()->installEventFilter (ef);
