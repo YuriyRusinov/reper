@@ -63,7 +63,7 @@ QVariant KKSRubricModel :: data (const QModelIndex &index, int role) const
                 //return rubr->getDefaultIcon();
             }
             else
-                return rubr->getIcon();
+                return QIcon (rubr->getIcon());
             break;
         }
     }
@@ -151,10 +151,15 @@ bool KKSRubricModel :: setData (const QModelIndex& index, const QVariant& value,
 
 bool KKSRubricModel :: insertRows (int row, int count, const QModelIndex& parent)
 {
-    Q_UNUSED (row);
-    Q_UNUSED (count);
-    Q_UNUSED (parent);
-    return false;
+    const KKSRubricBase * parentItem = getRubricEntity(parent);
+    if (!parentItem || parentItem->rubricType() == KKSRubricBase::atRubricItem)
+        return false;
+    const KKSRubric * pRubric = static_cast<const KKSRubric *>(parentItem);
+    if (!pRubric)
+        return false;
+    beginInsertRows (parent, row, row+count-1);
+    endInsertRows ();
+    return true;
 }
 
 bool KKSRubricModel :: removeRows (int row, int count, const QModelIndex& parent)
