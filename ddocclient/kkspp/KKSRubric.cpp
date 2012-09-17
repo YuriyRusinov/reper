@@ -150,20 +150,21 @@ void KKSRubricItem::setIcon(const QPixmap& px)
 
 void KKSRubricItem::setDefaultIcon(const QPixmap & px)
 {
-    if(pxRubricItem)
+    KKSRubricItem::setIcon(px);
+/*    if(pxRubricItem)
         delete pxRubricItem;
 
-    pxRubricItem = new QPixmap(px);
+    pxRubricItem = new QPixmap(px);*/
 }
 
 QPixmap KKSRubricItem::getDefaultIcon() const
 {
-    QPixmap px;
+/*    QPixmap px;
     
     if(pxRubricItem)
         px = QPixmap(*pxRubricItem);
-
-    return px;
+*/
+    return KKSRubricItem::icon();
 }
 
 QPixmap KKSRubricItem::icon()
@@ -649,20 +650,24 @@ const QString KKSRubric :: iconAsString () const
 
 void KKSRubric :: setDefaultIcon (const QPixmap& px)
 {
-    if(pxRubric)
+    KKSRubric::setIcon (px);
+/*    if(pxRubric)
         delete pxRubric;
 
     pxRubric = new QPixmap(px);
+ */
 }
 
 QPixmap KKSRubric :: getDefaultIcon (void) const
 {
-    QPixmap px;
+    return KKSRubric::icon();
+/*    QPixmap px;
     
     if(pxRubric)
         px = QPixmap(*pxRubric);
 
     return px;
+ */
 }
 
 int KKSRubric :: rubricType (void) const

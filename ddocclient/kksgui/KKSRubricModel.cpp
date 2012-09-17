@@ -13,7 +13,7 @@
 
 KKSRubricModel::KKSRubricModel(const KKSRubric * rootRubr, QObject * parent)
     : QAbstractItemModel (parent),
-      rootRubric (rootRubr->deepCopy())
+      rootRubric (rootRubr)
 {
 //    if (rootRubric && static_cast<const KKSRubric *>(rootRubric))
 //        rootRubric->addRef();
@@ -54,7 +54,16 @@ QVariant KKSRubricModel :: data (const QModelIndex &index, int role) const
         }
         case Qt::DecorationRole:
         {
-            return rubr->getIcon().isNull() ? rubr->getDefaultIcon() : rubr->getIcon();
+            if (rubr->getIcon().isNull())
+            {
+                if (rubr->rubricType() == KKSRubricBase::atRubricItem)
+                    return KKSRubricItem::icon();
+                else
+                    return KKSRubric::icon();
+                //return rubr->getDefaultIcon();
+            }
+            else
+                return rubr->getIcon();
             break;
         }
     }
@@ -74,7 +83,7 @@ QModelIndex KKSRubricModel :: index (int row, int column, const QModelIndex& par
          return QModelIndex();
 
      const KKSRubricBase *parentItem = getRubricEntity(parent);
-     if (parentItem->rubricType() == KKSRubricBase::atRubricItem)
+     if (!parentItem || parentItem->rubricType() == KKSRubricBase::atRubricItem)
          return QModelIndex();
 
      const KKSRubric * pRubr = static_cast<const KKSRubric *>(parentItem);
@@ -111,11 +120,12 @@ QModelIndex KKSRubricModel :: parent (const QModelIndex &index) const
 
 int KKSRubricModel :: rowCount (const QModelIndex& parent) const
 {
-     const KKSRubric *parentItem = static_cast<const KKSRubric *>(getRubricEntity (parent));
-     if (!parentItem)
+     const KKSRubricBase *parentItem = getRubricEntity (parent);
+     if (!parentItem || parentItem->rubricType() == KKSRubricBase::atRubricItem)
          return 0;
 
-     return parentItem->items().count() + parentItem->rubrics().count();
+     const KKSRubric* pRubric = static_cast<const KKSRubric *>(parentItem);
+     return pRubric->items().count() + pRubric->rubrics().count();
 }
 
 int KKSRubricModel :: columnCount (const QModelIndex& /*parent*/) const
