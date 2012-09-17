@@ -15,11 +15,12 @@
 #include "kksgui_config.h"
 
 class KKSRubricBase;
+class KKSRubric;
 
 class _GUI_EXPORT KKSRubricModel : public QAbstractItemModel
 {
 public:
-    KKSRubricModel(const KKSRubricBase * rootRubr, QObject * parent=0);
+    KKSRubricModel(const KKSRubric * rootRubr, QObject * parent=0);
     virtual ~KKSRubricModel();
 
     QVariant data (const QModelIndex &index, int role) const;
@@ -48,7 +49,7 @@ private:
     //
     // Variables
     //
-    const KKSRubricBase * rootRubric;
+    const KKSRubric * rootRubric;
 
 private:
     Q_OBJECT

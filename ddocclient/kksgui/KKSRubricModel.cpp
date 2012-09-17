@@ -11,18 +11,18 @@
 #include "KKSRubric.h"
 #include "KKSRubricModel.h"
 
-KKSRubricModel::KKSRubricModel(const KKSRubricBase * rootRubr, QObject * parent)
+KKSRubricModel::KKSRubricModel(const KKSRubric * rootRubr, QObject * parent)
     : QAbstractItemModel (parent),
-      rootRubric (rootRubr)
+      rootRubric (rootRubr->deepCopy())
 {
-    if (rootRubric)
-        rootRubric->addRef();
+//    if (rootRubric && static_cast<const KKSRubric *>(rootRubric))
+//        rootRubric->addRef();
 }
 
 KKSRubricModel::~KKSRubricModel()
 {
-    if (rootRubric)
-        rootRubric->release();
+//    if (rootRubric)
+//        rootRubric->release();
 }
 
 QVariant KKSRubricModel :: data (const QModelIndex &index, int role) const
