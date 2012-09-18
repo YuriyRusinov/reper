@@ -45,7 +45,8 @@ public:
         atRootRubric = 0,
         atRubric = 1,
         atRubricItem = 2,
-        atRubricCategory = 3
+        atRubricCategory = 3,
+        atOthers = 4
     };
     
     virtual int rubricType (void) const=0;
@@ -55,6 +56,19 @@ private:
     
     QIcon m_rubrIcon;
     QString m_iconData;
+};
+
+class _PP_EXPORT KKSRubricOthers : public KKSRubricBase
+{
+public:
+    KKSRubricOthers (void);
+    KKSRubricOthers (const KKSRubricOthers& RO);
+    virtual ~KKSRubricOthers (void);
+    
+    virtual void setDefaultIcon (const QPixmap& px);
+    virtual QPixmap getDefaultIcon (void) const;
+    virtual int rubricType (void) const;
+
 };
 
 class _PP_EXPORT KKSRubricItem : public KKSRubricBase//public KKSData
@@ -114,11 +128,13 @@ public:
     KKSRubric & operator = (const KKSRubric & other);
 
     void addItem(const KKSRubricItem * item);
+    void insertItem (int i, const KKSRubricItem * item);
     void addItems(const KKSList<const KKSRubricItem *> & items);
     void setItems(const KKSList<const KKSRubricItem *> & items);
     void removeItem(int index);
 
     void addRubric(const KKSRubric * r);
+    void insertRubric (int i, const KKSRubric * r);
     void addRubrics(const KKSList<const KKSRubric *> & rubrics);
     void setRubrics(const KKSList<const KKSRubric *> & rubrics);
     void removeRubric(int index);
@@ -157,12 +173,6 @@ public:
     //
     KKSAccessEntity * getAccessRules (void) const;
     void setAccessRules (KKSAccessEntity * _acl);
-
-/*    QIcon getIcon (void) const;
-    //void setIcon (const QIcon& icon);
-    const QString iconAsString() const;
-    void setIcon (const QString & s);
-*/
 
     bool isCategorized (void) const;
     void setCategorized (bool c);

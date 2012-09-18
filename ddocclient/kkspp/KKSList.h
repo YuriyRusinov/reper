@@ -40,6 +40,15 @@ class /*_PP_EXPORT*/ KKSList : public QList<T>
             QList<T>::append(p);
             p->addRef();
         }
+        
+        void insert(int i, const T & p)
+        {
+            if(!p)
+                return;
+
+            QList<T>::insert(i, p);
+            p->addRef();
+        }
     
         int removeAt(int i)
         {

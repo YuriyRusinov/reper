@@ -89,6 +89,34 @@ int KKSRubricBase :: childNumber (void) const
     else
         return -1;
 }
+/*=============*/
+
+KKSRubricOthers :: KKSRubricOthers (void) : KKSRubricBase ()
+{
+}
+
+KKSRubricOthers :: KKSRubricOthers (const KKSRubricOthers& RO) : KKSRubricBase (RO)
+{
+}
+
+KKSRubricOthers :: ~KKSRubricOthers (void)
+{
+}
+
+void KKSRubricOthers :: setDefaultIcon (const QPixmap& px)
+{
+    Q_UNUSED (px);
+}
+
+QPixmap KKSRubricOthers :: getDefaultIcon (void) const
+{
+    return QPixmap ();
+}
+
+int KKSRubricOthers :: rubricType (void) const
+{
+    return KKSRubricBase::atOthers;
+}
 
 /*============*/
 KKSRubricItem::KKSRubricItem() : KKSRubricBase(),
@@ -308,6 +336,14 @@ void KKSRubric::addItem(const KKSRubricItem * item)
     m_items.append(item);
 }
 
+void KKSRubric::insertItem (int i, const KKSRubricItem * item)
+{
+    if(!item || i<0 || i>m_items.size())
+        return;
+
+    m_items.insert (i, item);
+}
+
 void KKSRubric::addItems(const KKSList<const KKSRubricItem*> & items)
 {
     for (int i=0; i<items.count(); i++)
@@ -361,6 +397,14 @@ void KKSRubric::addRubric(const KKSRubric * r)
         return;
     
     m_rubrics.append(r);
+}
+
+void KKSRubric::insertRubric (int i, const KKSRubric * r)
+{
+    if(!r || i<0 || i>m_rubrics.size())
+        return;
+
+    m_rubrics.insert(i, r);
 }
 
 void KKSRubric::addRubrics(const KKSList<const KKSRubric *> & rubrics)

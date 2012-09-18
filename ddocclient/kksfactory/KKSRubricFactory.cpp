@@ -97,11 +97,12 @@ KKSIncludesWidget * KKSRubricFactory :: createRubricEditor (int mode, const KKSL
         if (isIns)
         {
             QModelIndex wIndex = rubrMod->index (nr, 0);
-            rubrMod->setData (wIndex, tr("Others"), Qt::DisplayRole);
-            rubrMod->setData (wIndex, atOthers, Qt::UserRole);
-            rubrMod->setData (wIndex, KKSRubric::icon().scaled(24, 24), Qt::DecorationRole);
+            bool isDataSet = rubrMod->setData (wIndex, tr("Others"), Qt::DisplayRole);
+            bool isTypeSet = rubrMod->setData (wIndex, atOthers, Qt::UserRole);
+            bool isIconSet = rubrMod->setData (wIndex, KKSRubric::icon().scaled(24, 24), Qt::DecorationRole);
             KKSRubric * cRubric = loader->loadCatRubricators ();
-            iW->addRubricIntoModel (cRubric, wIndex);
+            if (isDataSet && isTypeSet && isIconSet)
+                iW->addRubricIntoModel (cRubric, wIndex);
         }
     }
     KKSEventFilter *ef = new KKSEventFilter (iW);
