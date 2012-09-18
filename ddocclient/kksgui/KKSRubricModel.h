@@ -20,7 +20,7 @@ class KKSRubric;
 class _GUI_EXPORT KKSRubricModel : public QAbstractItemModel
 {
 public:
-    KKSRubricModel(const KKSRubric * rootRubr, QObject * parent=0);
+    KKSRubricModel(KKSRubric * rootRubr, QObject * parent=0);
     virtual ~KKSRubricModel();
 
     QVariant data (const QModelIndex &index, int role) const;
@@ -43,13 +43,13 @@ private:
     //
     // Functions
     //
-    const KKSRubricBase * getRubricEntity (const QModelIndex& index) const;
+    KKSRubricBase * getRubricEntity (const QModelIndex& index) const;
 
 private:
     //
     // Variables
     //
-    const KKSRubric * rootRubric;
+    KKSRubric * rootRubric;
 
 private:
     Q_OBJECT

@@ -95,6 +95,10 @@ KKSRubricOthers :: KKSRubricOthers (void) : KKSRubricBase ()
 {
 }
 
+KKSRubricOthers :: KKSRubricOthers (qint64 id, const QString& name, const QString& desc) : KKSRubricBase (id, name, desc)
+{
+}
+
 KKSRubricOthers :: KKSRubricOthers (const KKSRubricOthers& RO) : KKSRubricBase (RO)
 {
 }

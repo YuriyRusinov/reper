@@ -4,6 +4,7 @@
 #include <QAbstractItemModel>
 #include <QAbstractProxyModel>
 #include <QModelIndex>
+#include <QVariant>
 #include <QtDebug>
 
 #include <kksincludeswidget.h>
@@ -97,11 +98,13 @@ KKSIncludesWidget * KKSRubricFactory :: createRubricEditor (int mode, const KKSL
         if (isIns)
         {
             QModelIndex wIndex = rubrMod->index (nr, 0);
+            const KKSRubricBase * rOthers = new KKSRubricOthers (-1, tr("Others"));
+            bool isRubrDataSet = rubrMod->setData (wIndex, QVariant::fromValue<const KKSRubricBase *>(rOthers), Qt::UserRole+1);
             bool isDataSet = rubrMod->setData (wIndex, tr("Others"), Qt::DisplayRole);
             bool isTypeSet = rubrMod->setData (wIndex, atOthers, Qt::UserRole);
             bool isIconSet = rubrMod->setData (wIndex, KKSRubric::icon().scaled(24, 24), Qt::DecorationRole);
             KKSRubric * cRubric = loader->loadCatRubricators ();
-            if (isDataSet && isTypeSet && isIconSet)
+            if (isRubrDataSet && isDataSet && isTypeSet && isIconSet)
                 iW->addRubricIntoModel (cRubric, wIndex);
         }
     }

@@ -62,6 +62,7 @@ class _PP_EXPORT KKSRubricOthers : public KKSRubricBase
 {
 public:
     KKSRubricOthers (void);
+    KKSRubricOthers (qint64 id, const QString& name, const QString& desc=QString());
     KKSRubricOthers (const KKSRubricOthers& RO);
     virtual ~KKSRubricOthers (void);
     
@@ -223,6 +224,7 @@ private:
 };
 
 Q_DECLARE_METATYPE(const KKSRubricBase *);
+Q_DECLARE_METATYPE(KKSRubricBase *);
 
 #endif
 
