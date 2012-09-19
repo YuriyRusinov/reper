@@ -225,6 +225,8 @@ void RubricForm :: loadRubricImage (void)
 QString RubricForm :: getIconAsString (void) const
 {
     const QPixmap * rubrPixmap = UI->lRubricIconImage->pixmap();
+    if (!rubrPixmap)
+        return QByteArray();
     QByteArray bytes;
     QBuffer buffer(&bytes);
 

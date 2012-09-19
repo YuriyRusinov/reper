@@ -39,6 +39,13 @@ KKSRubricBase :: ~KKSRubricBase (void)
 {
 }
 
+KKSRubricBase& KKSRubricBase :: operator= (const KKSRubricBase& rb)
+{
+    m_rubrIcon = rb.m_rubrIcon;
+    m_iconData = rb.m_iconData;
+    return *this;
+}
+
 QIcon KKSRubricBase :: getIcon (void) const
 {
     return m_rubrIcon;
@@ -107,6 +114,12 @@ KKSRubricOthers :: ~KKSRubricOthers (void)
 {
 }
 
+KKSRubricOthers& KKSRubricOthers :: operator= (const KKSRubricOthers& others)
+{
+    setNodes (others.m_subNodes);
+    return *this;
+}
+
 void KKSRubricOthers :: setDefaultIcon (const QPixmap& px)
 {
     Q_UNUSED (px);
@@ -122,6 +135,42 @@ int KKSRubricOthers :: rubricType (void) const
     return KKSRubricBase::atOthers;
 }
 
+void KKSRubricOthers :: addNode (const KKSRubricBase * node)
+{
+    if (!node)
+        return;
+
+    m_subNodes.append(node);
+}
+
+void KKSRubricOthers :: insertNode (int i, const KKSRubricBase * node)
+{
+    if (!node)
+        return;
+
+    m_subNodes.insert(i, node);
+}
+
+void KKSRubricOthers :: clearNodes (void)
+{
+    m_subNodes.clear();
+}
+
+const KKSList<const KKSRubricBase *>& KKSRubricOthers :: subnodes (void) const
+{
+    return m_subNodes;
+}
+
+KKSList<const KKSRubricBase *>& KKSRubricOthers :: subnodes (void)
+{
+    return m_subNodes;
+}
+
+void KKSRubricOthers :: setNodes (const KKSList<const KKSRubricBase *>& nodes)
+{
+    m_subNodes = nodes;
+}
+
 /*============*/
 KKSRubricItem::KKSRubricItem() : KKSRubricBase(),
     m_isAutomated (false),
@@ -131,17 +180,13 @@ KKSRubricItem::KKSRubricItem() : KKSRubricBase(),
 
 KKSRubricItem::KKSRubricItem(qint64 idItem, const QString & name, bool b) : KKSRubricBase(idItem, name),
     m_isAutomated (b),
-    m_isUpdated (false),
-    m_rubrItemIcon (QIcon()),
-    m_iconData(QString())
+    m_isUpdated (false)
 {
 }
 
 KKSRubricItem::KKSRubricItem(const KKSRubricItem & other) : KKSRubricBase (other),
     m_isAutomated (other.m_isAutomated),
-    m_isUpdated (other.m_isUpdated),
-    m_rubrItemIcon (other.m_rubrItemIcon),
-    m_iconData(other.m_iconData)
+    m_isUpdated (other.m_isUpdated)
 {
 }
 
@@ -150,6 +195,12 @@ KKSRubricItem::~KKSRubricItem()
 
 }
 
+KKSRubricItem& KKSRubricItem :: operator= (const KKSRubricItem& other)
+{
+    m_isAutomated = other.m_isAutomated;
+    m_isUpdated = other.m_isUpdated;
+    return *this;
+}
 /*
 void KKSRubricItem::setId(int id)
 {
@@ -244,8 +295,6 @@ KKSRubric::KKSRubric() : KKSRubricBase()
 KKSRubric::KKSRubric(const KKSRubric & other) : KKSRubricBase(other),
     m_searchTemplate (other.m_searchTemplate),
     m_category (other.m_category),
-    m_rubricIcon (other.m_rubricIcon),
-    m_iconData(other.m_iconData),
     m_isCategorized (other.m_isCategorized),
     m_acl (other.m_acl),
 /*    m_privileges(other.m_privileges),
@@ -271,8 +320,6 @@ KKSRubric::KKSRubric(const KKSRubric & other) : KKSRubricBase(other),
 KKSRubric::KKSRubric(int id, const QString & name, KKSSearchTemplate * st, KKSCategory * c, KKSAccessEntity * ac) : KKSRubricBase(id, name),
     m_searchTemplate (st),
     m_category (c),
-    m_rubricIcon (QIcon()),
-    m_iconData(QString()),
     m_isCategorized (false),
     m_acl (ac),
 /*    m_privileges (KKSMap<int, KKSPrivilege *>()),
@@ -325,8 +372,8 @@ KKSRubric & KKSRubric::operator = (const KKSRubric & other)
     if (m_acl)
         m_acl->addRef();
     
-    m_rubricIcon = other.m_rubricIcon;
-    m_iconData = other.m_iconData;
+//    m_rubricIcon = other.m_rubricIcon;
+//    m_iconData = other.m_iconData;
     m_isCategorized = other.m_isCategorized;
     
     return *this;

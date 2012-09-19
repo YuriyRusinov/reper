@@ -32,6 +32,8 @@ public:
     KKSRubricBase (const KKSRubricBase& RB);
     virtual ~KKSRubricBase (void);
 
+    KKSRubricBase& operator= (const KKSRubricBase& rb);
+
     virtual void setDefaultIcon (const QPixmap& px)=0;
     virtual QPixmap getDefaultIcon (void) const=0;
 
@@ -52,7 +54,7 @@ public:
     virtual int rubricType (void) const=0;
     
     int childNumber (void) const;
-private:
+protected:
     
     QIcon m_rubrIcon;
     QString m_iconData;
@@ -66,10 +68,22 @@ public:
     KKSRubricOthers (const KKSRubricOthers& RO);
     virtual ~KKSRubricOthers (void);
     
+    KKSRubricOthers& operator= (const KKSRubricOthers& others);
+
     virtual void setDefaultIcon (const QPixmap& px);
     virtual QPixmap getDefaultIcon (void) const;
     virtual int rubricType (void) const;
 
+    void addNode (const KKSRubricBase * node);
+    void insertNode (int i, const KKSRubricBase * node);
+    void clearNodes (void);
+    
+    const KKSList<const KKSRubricBase *>& subnodes (void) const;
+    KKSList<const KKSRubricBase *>& subnodes (void);
+    void setNodes (const KKSList<const KKSRubricBase *>& nodes);
+
+private:
+    KKSList<const KKSRubricBase *> m_subNodes;
 };
 
 class _PP_EXPORT KKSRubricItem : public KKSRubricBase//public KKSData
@@ -80,6 +94,8 @@ public:
     KKSRubricItem(qint64 idItem, const QString & name, bool b = false);
     KKSRubricItem(const KKSRubricItem & other);
     ~KKSRubricItem();
+    
+    KKSRubricItem& operator= (const KKSRubricItem& other);
     
 /*    void setId(int id);
     int id() const;
@@ -113,8 +129,8 @@ private:
     bool m_isAutomated;
     bool m_isUpdated;
     
-    QIcon m_rubrItemIcon;
-    QString m_iconData;
+    //QIcon m_rubrItemIcon;
+    //QString m_iconData;
 };
 
 
@@ -192,8 +208,8 @@ private:
 
     bool m_isUpdated;
     
-    QIcon m_rubricIcon;
-    QString m_iconData;
+    //QIcon m_rubricIcon;
+    //QString m_iconData;
     
     bool m_isCategorized;
 
