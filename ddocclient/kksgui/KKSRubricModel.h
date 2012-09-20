@@ -16,6 +16,7 @@
 
 class KKSRubricBase;
 class KKSRubric;
+class KKSRubricTreeItem;
 
 class _GUI_EXPORT KKSRubricModel : public QAbstractItemModel
 {
