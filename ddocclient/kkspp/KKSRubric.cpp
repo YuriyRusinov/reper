@@ -72,6 +72,11 @@ void KKSRubricBase :: setIcon (const QString & s)
     m_iconData = s;
 }
 
+void KKSRubricBase :: setIcon (const QIcon& icon)
+{
+    m_rubrIcon = icon;
+}
+
 int KKSRubricBase :: childNumber (void) const
 {
     if (parent() && static_cast<const KKSRubric *>(parent()))
@@ -228,7 +233,7 @@ const QString & KKSRubricItem::name() const
 }
 */
 
-void KKSRubricItem::setIcon(const QPixmap& px)
+void KKSRubricItem::setGeneralIcon(const QPixmap& px)
 {
     if(pxRubricItem)
         delete pxRubricItem;
@@ -238,7 +243,7 @@ void KKSRubricItem::setIcon(const QPixmap& px)
 
 void KKSRubricItem::setDefaultIcon(const QPixmap & px)
 {
-    KKSRubricItem::setIcon(px);
+    KKSRubricItem::setGeneralIcon(px);
 /*    if(pxRubricItem)
         delete pxRubricItem;
 
@@ -586,7 +591,7 @@ KKSRubricItem * KKSRubric::itemForId(int id)
     return NULL;
 }
 
-void KKSRubric::setIcon(const QPixmap & px)
+void KKSRubric::setGeneralIcon(const QPixmap & px)
 {
     if(pxRubric)
         delete pxRubric;
@@ -750,7 +755,7 @@ const QString KKSRubric :: iconAsString () const
 
 void KKSRubric :: setDefaultIcon (const QPixmap& px)
 {
-    KKSRubric::setIcon (px);
+    KKSRubric::setGeneralIcon (px);
 /*    if(pxRubric)
         delete pxRubric;
 

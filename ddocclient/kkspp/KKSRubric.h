@@ -38,7 +38,7 @@ public:
     virtual QPixmap getDefaultIcon (void) const=0;
 
     QIcon getIcon (void) const;
-    //void setIcon (const QIcon& icon);
+    void setIcon (const QIcon& icon);
     const QString& iconAsString() const;
     void setIcon (const QString & s);
     
@@ -103,7 +103,7 @@ public:
     void setName(const QString & name);
     const QString & name() const;
 */
-    static void setIcon(const QPixmap & px);
+    static void setGeneralIcon(const QPixmap & px);
     static QPixmap icon();
  
     bool isAutomated() const {return m_isAutomated;}
@@ -171,7 +171,7 @@ public:
     KKSRubric * rubricForId(int id, bool recursivelly = true);
     KKSRubric * rubric(int index);
 
-    static void setIcon(const QPixmap & px);
+    static void setGeneralIcon(const QPixmap & px);
     static QPixmap icon();
 
     KKSRubric * deepCopy(bool dropIds = false) const;

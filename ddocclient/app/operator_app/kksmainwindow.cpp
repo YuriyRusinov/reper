@@ -425,8 +425,8 @@ void KKSMainWindow::initIcons()
 
     QIcon rubricIcon (":/ddoc/rubric.png");
     QIcon rubricItemIcon (":/ddoc/rubric_item.png");
-    KKSRubric::setIcon(rubricIcon.pixmap (QSize(24,24)));
-    KKSRubricItem::setIcon(rubricItemIcon.pixmap (QSize(24,24)));
+    KKSRubric::setGeneralIcon(rubricIcon.pixmap (QSize(24,24)));
+    KKSRubricItem::setGeneralIcon(rubricItemIcon.pixmap (QSize(24,24)));
 
     /*
     KKSMessage::setPxIn(QPixmap(":/ico/myInput.xpm"));
