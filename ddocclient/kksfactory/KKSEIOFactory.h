@@ -38,12 +38,12 @@ public:
                   const KKSCategory* cat=0, 
                   const QString& table=QString(), 
                   bool bImported = false,
-                  const QWidget * parent = NULL) const; 
+                  QWidget * parent = NULL) const; 
 
     int updateEIO(const KKSObjectExemplar* eio, 
                   const KKSCategory* cat=0, 
                   const QString& table=QString(),
-                  const QWidget * parent = NULL) const;
+                  QWidget * parent = NULL) const;
     int deleteEIO(KKSObjectExemplar* eio, const QString& table=QString()) const;
     int deleteRecord(qint64 id, const QString & table) const;
     int deleteAllRecords(const QString & table) const;
@@ -77,11 +77,11 @@ private:
                      const KKSCategory* cat=0, 
                      const QString& table=QString(), 
                      bool bImported = false,
-                     const QWidget * parent = NULL) const;
+                     QWidget * parent = NULL) const;
     int updateRecord(const KKSObjectExemplar* eio, 
                      const KKSCategory* cat=0, 
                      const QString& table=QString(),
-                     const QWidget * parent = NULL) const;
+                     QWidget * parent = NULL) const;
     int deleteRecord(KKSObjectExemplar* eio, const QString& table=QString()) const;
 
     qint64 generateInsertQuery(const QString & tableName, 
@@ -117,11 +117,11 @@ private:
     int deleteRubricators(bool bMyDocs = false) const;
     int deleteRubric(int idRubric) const;
 
-    int insertFile(qint64 idRecord, KKSFile * f, const QWidget * parent = NULL) const;
-    int insertFiles(const KKSObjectExemplar * eio, const QWidget * parent = NULL) const;
-    int updateFiles(const KKSObjectExemplar * eio, const QWidget * parent = NULL) const;
+    int insertFile(qint64 idRecord, KKSFile * f, QWidget * parent = NULL) const;
+    int insertFiles(const KKSObjectExemplar * eio, QWidget * parent = NULL) const;
+    int updateFiles(const KKSObjectExemplar * eio, QWidget * parent = NULL) const;
     int updateFileInfo(KKSFile * f) const;
-    int uploadFile(KKSFile * f, const QWidget * parent) const;
+    int uploadFile(KKSFile * f, QWidget * parent) const;
 
     
 };

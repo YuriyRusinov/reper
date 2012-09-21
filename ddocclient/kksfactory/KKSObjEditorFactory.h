@@ -288,7 +288,7 @@ private slots:
     //
     // используется для загрузки файлов с сервера в локальную ФС
     //
-    void slotDownloadFile (KKSFile *, const QWidget * parent);
+    void slotDownloadFile (KKSFile *, QWidget * parent);
 
     void slotIncludeRequested (KKSObjEditor * editor);//используется при редактировании вложений ИО. Вызывает в режиме диалога редактор справочника ИО
     void slotIncludeRecRequested (KKSObjEditor * editor);//используется при редактировании вложений ИО. Вызывает в режиме диалога редактор справочника ИО

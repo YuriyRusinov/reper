@@ -46,8 +46,8 @@ class KKSAccessEntity;
 class _F_EXPORT KKSPPFactory
 {
     public:
-        int insertIO(KKSObject * io, bool useDefaultTable = true, const QWidget * parent = NULL);
-        int updateIO(KKSObject * io, const QWidget * parent = NULL);
+        int insertIO(KKSObject * io, bool useDefaultTable = true, QWidget * parent = NULL);
+        int updateIO(KKSObject * io, QWidget * parent = NULL);
         int deleteIO(KKSObject * io) const;
         int insertAddTable (KKSObject * io, 
                             const QString& tableName, 
@@ -146,12 +146,12 @@ class _F_EXPORT KKSPPFactory
 
         int updateUserTemplates(const KKSObject * io) const;
 
-        int insertFile(int idObject, KKSFile * f, const QWidget * parent = NULL) const;
-        int insertFiles(const KKSObject * io, const QWidget * parent = NULL) const;
+        int insertFile(int idObject, KKSFile * f, QWidget * parent = NULL) const;
+        int insertFiles(const KKSObject * io, QWidget * parent = NULL) const;
         //int deleteFiles(const KKSObject * io, bool bRemoveFiles = true) const;
-        int updateFiles(const KKSObject * io, const QWidget * parent = NULL) const;
+        int updateFiles(const KKSObject * io, QWidget * parent = NULL) const;
         int updateFileInfo(KKSFile * f) const;
-        int uploadFile(KKSFile * f, const QWidget * parent) const;
+        int uploadFile(KKSFile * f, QWidget * parent) const;
 
         int updateIncludes(const KKSObject * io) const;
         int insertIncludes(const KKSObject * io) const;

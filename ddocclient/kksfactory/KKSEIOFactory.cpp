@@ -69,7 +69,7 @@ int KKSEIOFactory::insertEIO(KKSObjectExemplar* eio,
                              const KKSCategory* cat, 
                              const QString& table, 
                              bool bImported,
-                             const QWidget * parent) const
+                             QWidget * parent) const
 {
     if(!eio || !eio->io())
         return ERROR_CODE;
@@ -87,7 +87,7 @@ int KKSEIOFactory::insertEIO(KKSObjectExemplar* eio,
 int KKSEIOFactory::updateEIO(const KKSObjectExemplar* eio, 
                              const KKSCategory* cat, 
                              const QString& table,
-                             const QWidget * parent) const
+                             QWidget * parent) const
 {
     if(!eio || !eio->io())
         return ERROR_CODE;
@@ -126,7 +126,7 @@ int KKSEIOFactory::insertRecord(KKSObjectExemplar* eio,
                                 const KKSCategory * cat, 
                                 const QString & table, 
                                 bool bImported,
-                                const QWidget * parent) const
+                                QWidget * parent) const
 {
     if(!db || !eio)
         return ERROR_CODE;
@@ -243,7 +243,7 @@ int KKSEIOFactory::insertRecord(KKSObjectExemplar* eio,
 int KKSEIOFactory::updateRecord(const KKSObjectExemplar* eio, 
                                 const KKSCategory* cat, 
                                 const QString & table,
-                                const QWidget * parent) const
+                                QWidget * parent) const
 {
     if(!db || !eio)
         return ERROR_CODE;
@@ -1613,7 +1613,7 @@ int KKSEIOFactory::deleteRubric(int idRubric) const
     return 0;
 }
 
-int KKSEIOFactory::insertFile(qint64 idRecord, KKSFile * f, const QWidget * parent) const
+int KKSEIOFactory::insertFile(qint64 idRecord, KKSFile * f, QWidget * parent) const
 {
     if(!f)
         return ERROR_CODE;
@@ -1639,7 +1639,7 @@ int KKSEIOFactory::insertFile(qint64 idRecord, KKSFile * f, const QWidget * pare
     return OK_CODE;
 }
 
-int KKSEIOFactory::insertFiles(const KKSObjectExemplar * eio, const QWidget * parent) const
+int KKSEIOFactory::insertFiles(const KKSObjectExemplar * eio, QWidget * parent) const
 {
     if(!eio)
         return ERROR_CODE;
@@ -1663,7 +1663,7 @@ int KKSEIOFactory::insertFiles(const KKSObjectExemplar * eio, const QWidget * pa
     return OK_CODE;
 }
 
-int KKSEIOFactory::updateFiles(const KKSObjectExemplar * eio, const QWidget * parent) const
+int KKSEIOFactory::updateFiles(const KKSObjectExemplar * eio, QWidget * parent) const
 {
     if(!eio)
         return ERROR_CODE;
@@ -1742,7 +1742,7 @@ int KKSEIOFactory::updateFileInfo(KKSFile * f) const
     return OK_CODE;
 }
 
-int KKSEIOFactory::uploadFile(KKSFile * f, const QWidget * parent) const
+int KKSEIOFactory::uploadFile(KKSFile * f, QWidget * parent) const
 {
     if(!f)
         return ERROR_CODE;

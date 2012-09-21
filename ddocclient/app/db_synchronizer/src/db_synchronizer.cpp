@@ -131,7 +131,9 @@ void DBSynchronizer::analyzeSIU()
     if(!connected)
 		return;
 
-	bool b1 = UI->pbSetTimer->isEnabled();
+    iTimeout = UI->sbTimeout->value() * 1000;//in seconds
+
+    bool b1 = UI->pbSetTimer->isEnabled();
 	bool b2 = UI->pbStopTimer->isEnabled();
 	UI->pbQueryNow->setEnabled(false);
 	UI->pbSetTimer->setEnabled(false);
@@ -210,14 +212,15 @@ int DBSynchronizer::createIO(int idCategory,
 	if(name.startsWith("C:\\fakepath\\"))
 		fName.remove("C:\\fakepath\\");	
 
-	QString sql = QString ("select * from ioInsert (%1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, NULL, NULL, %13, %14, %15, NULL);")
+	//!!!!!ДЛЯ НОВОЙ ВЕРСИИ ДОБАВИТЬ ЕЩЕ ОДИН ПАРАМЕТР В ФУНКЦИЮ! R_COLOR = NULL
+    QString sql = QString ("select * from ioInsert (%1::varchar, %2, %3, %4, %5, %6, %7, %8, %9::varchar, %10, %11, %12, NULL, NULL, %13, %14, %15);")
 	    .arg (QString("'") + fName + QString("'"))//name
 		.arg (QString::number(idCategory))//id_io_category
         .arg (QString::number (1))// admin, ибо в БД-приемнике автора (пользователя) может не быть (как правило не будет)
 		.arg (QString::number (1))//id_state
-        .arg (QString ("NULL"))//table_name
-        .arg (QString ("NULL")) //desc
-        .arg (QString ("NULL"))//info
+        .arg (QString ("NULL::varchar"))//table_name
+        .arg (QString ("NULL::varchar")) //desc
+        .arg (QString ("NULL::varchar"))//info
 		.arg (QString::number (idMaclabel == 0 ? 1 : idMaclabel))//id_maclabel
 		.arg (QString("'") + uid + QString("'"))//unique_id
         .arg (QString::number (1)) //id_sync_type

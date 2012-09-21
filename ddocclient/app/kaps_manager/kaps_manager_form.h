@@ -4,6 +4,8 @@
 #include <QDialog>
 
 class QFile;
+class QDate;
+class QDateTime;
 class QLabel;
 class QLineEdit;
 class QProgressDialog;
@@ -34,6 +36,17 @@ private slots:
     void slotTaskVarChanged(QTreeWidgetItem * current, QTreeWidgetItem * previous);
     void slotFileChanged(QTreeWidgetItem * current, QTreeWidgetItem * previous);
 
+    void addTask();
+    void editTask();
+    void delTask();
+
+    void addTaskVar();
+    void editTaskVar();
+    void delTaskVar();
+
+    void addFile();
+    void editFile();
+    void delFile();
 
 private:
 	
@@ -54,6 +67,13 @@ private:
     int getCurrentTask();
     int getCurrentTaskVar();
     int getCurrentFile();
+
+    int updateTaskInDB(int id, int idKaps, const QString & name, const QString & desc, const QString & folder);
+    int updateTaskVarInDB(int id, int idTask, const QString & name, const QString & desc, const QString & folder, const QString & author, const QString & region, const QDate & date);
+    int updateFileInDB(int id, int idTaskVar, int idType, const QString & name, const QString & url, const QString & ka, const QString & region, const QDateTime & timeShoot);
+    int deleteTaskInDB(int idTask);
+    int deleteTaskVarInDB(int idTaskVar);
+    int deleteFileInDB(int idFile);
 
     void initKapsData();
 

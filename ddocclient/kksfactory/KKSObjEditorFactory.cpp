@@ -3870,7 +3870,7 @@ void KKSObjEditorFactory :: addExecReference (QString tableName, QAbstractItemMo
 
 /* слот осуществляет скачивание файла из БД в локальную файловую систему.
  */
-void KKSObjEditorFactory :: slotDownloadFile(KKSFile * f, const QWidget * parent)
+void KKSObjEditorFactory :: slotDownloadFile(KKSFile * f, QWidget * parent)
 {
     if(!f)
         return;

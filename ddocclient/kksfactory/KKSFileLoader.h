@@ -35,13 +35,13 @@ protected:
         int     rGetFile  ( int idUrl, 
                             QString toUrl, 
                             int blockSize = _MAX_FILE_BLOCK,
-                            const QWidget * parent = NULL
+                            QWidget * parent = NULL
                             ) const;
 
         int     rGetFile  ( QString fromUrl, 
                             QString toUrl, 
                             int blockSize = _MAX_FILE_BLOCK,
-                            const QWidget * parent = NULL
+                            QWidget * parent = NULL
                             ) const;
 
         QString rGetAbsUrl( int idUrl ) const;
@@ -54,7 +54,7 @@ protected:
                              QString fromUrl, 
                              bool safe, 
                              int blockSize = _MAX_FILE_BLOCK,
-                             const QWidget * parent = NULL) const;
+                             QWidget * parent = NULL) const;
 
         int     rDeleteFile( int idUrl ) const;
         

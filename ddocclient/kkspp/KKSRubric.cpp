@@ -38,6 +38,11 @@ KKSRubricBase :: KKSRubricBase (const KKSRubricBase& RB)
 KKSRubricBase :: ~KKSRubricBase (void)
 {
 }
+/*
+int KKSRubricBase :: id() const
+{
+    return 0;
+}
 
 KKSRubricBase& KKSRubricBase :: operator= (const KKSRubricBase& rb)
 {

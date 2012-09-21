@@ -27,7 +27,10 @@ void DBSynchronizer::getETK()
 	//etk.date_to = QDate::currentDate();
 	//etk.constraints = 9;//любой
 
+    dbSIU.setTimeout( iTimeout); //устанавливаем время таймаута, равное значению, введенному в форме
 	QList<Result_ETK> res = dbSIU.searchIO(etk);
+    dbSIU.setTimeout(3000); //восстанавливаем значение по-умолчанию (3 сек)
+
 	int cnt = res.count();
 	if(cnt == 0) {
 	    UI->teLog->setPlainText(UI->teLog->toPlainText() + tr("ETK was not found in SUI database!\n"));
@@ -66,8 +69,11 @@ void DBSynchronizer::getGMO()
 	if(d.isValid())
 		gmo.updated_from = QDateTime(d);
 
+    dbSIU.setTimeout( iTimeout); //устанавливаем время таймаута, равное значению, введенному в форме
 	QList<Result_GMO> res = dbSIU.searchIO(gmo);
-	int cnt = res.count();
+    dbSIU.setTimeout(3000); //восстанавливаем значение по-умолчанию (3 сек)
+
+    int cnt = res.count();
 	if(cnt == 0) {
 	    UI->teLog->setPlainText(UI->teLog->toPlainText() + tr("GMO was not found in SUI database!\n"));
 		UI->teLog->moveCursor(QTextCursor::End);
@@ -105,8 +111,11 @@ void DBSynchronizer::getNVO()
 	if(d.isValid())
 		nvo.updated_from = QDateTime(d);
 
+    dbSIU.setTimeout( iTimeout); //устанавливаем время таймаута, равное значению, введенному в форме
 	QList<Result_NVO> res = dbSIU.searchIO(nvo);
-	int cnt = res.count();
+    dbSIU.setTimeout(3000); //восстанавливаем значение по-умолчанию (3 сек)
+
+    int cnt = res.count();
 	if(cnt == 0) {
 	    UI->teLog->setPlainText(UI->teLog->toPlainText() + tr("NVO was not found in SUI database!\n"));
 		UI->teLog->moveCursor(QTextCursor::End);
@@ -144,8 +153,11 @@ void DBSynchronizer::getEOIRD()
 	if(d.isValid())
 		eoird.updated_from = QDateTime(d);
 
+    dbSIU.setTimeout( iTimeout); //устанавливаем время таймаута, равное значению, введенному в форме
 	QList<Result_EOIRD> res = dbSIU.searchIO(eoird);
-	int cnt = res.count();
+    dbSIU.setTimeout(3000); //восстанавливаем значение по-умолчанию (3 сек)
+
+    int cnt = res.count();
 	if(cnt == 0) {
 	    UI->teLog->setPlainText(UI->teLog->toPlainText() + tr("EOIRD was not found in SUI database!\n"));
 		UI->teLog->moveCursor(QTextCursor::End);
@@ -183,8 +195,11 @@ void DBSynchronizer::getEFO()
 	if(d.isValid())
 		efo.updated_from = QDateTime(d);
 
+    dbSIU.setTimeout( iTimeout); //устанавливаем время таймаута, равное значению, введенному в форме
 	QList<Result_EFO> res = dbSIU.searchIO(efo);
-	int cnt = res.count();
+    dbSIU.setTimeout(3000); //восстанавливаем значение по-умолчанию (3 сек)
+
+    int cnt = res.count();
 	if(cnt == 0) {
 	    UI->teLog->setPlainText(UI->teLog->toPlainText() + tr("EFO was not found in SUI database!\n"));
 		UI->teLog->moveCursor(QTextCursor::End);
@@ -222,8 +237,11 @@ void DBSynchronizer::getUGSH()
 	if(d.isValid())
 		ugsh.updated_from = QDateTime(d);
 
+    dbSIU.setTimeout( iTimeout); //устанавливаем время таймаута, равное значению, введенному в форме
 	QList<Result_UGSH> res = dbSIU.searchIO(ugsh);
-	int cnt = res.count();
+    dbSIU.setTimeout(3000); //восстанавливаем значение по-умолчанию (3 сек)
+
+    int cnt = res.count();
 	if(cnt == 0) {
 	    UI->teLog->setPlainText(UI->teLog->toPlainText() + tr("UGSH was not found in SUI database!\n"));
 		UI->teLog->moveCursor(QTextCursor::End);
@@ -261,8 +279,11 @@ void DBSynchronizer::getTTX()
 	if(d.isValid())
 		ttx.updated_from = QDateTime(d);
 
+    dbSIU.setTimeout( iTimeout); //устанавливаем время таймаута, равное значению, введенному в форме
 	QList<Result_TTX> res = dbSIU.searchIO(ttx);
-	int cnt = res.count();
+    dbSIU.setTimeout(3000); //восстанавливаем значение по-умолчанию (3 сек)
+
+    int cnt = res.count();
 	if(cnt == 0) {
 	    UI->teLog->setPlainText(UI->teLog->toPlainText() + tr("TTX was not found in SUI database!\n"));
 		UI->teLog->moveCursor(QTextCursor::End);
@@ -300,8 +321,11 @@ void DBSynchronizer::getPG()
 	if(d.isValid())
 		pg.updated_from = QDateTime(d);
 
+    dbSIU.setTimeout( iTimeout); //устанавливаем время таймаута, равное значению, введенному в форме
 	QList<Result_PG> res = dbSIU.searchIO(pg);
-	int cnt = res.count();
+    dbSIU.setTimeout(3000); //восстанавливаем значение по-умолчанию (3 сек)
+
+    int cnt = res.count();
 	if(cnt == 0) {
 	    UI->teLog->setPlainText(UI->teLog->toPlainText() + tr("PG was not found in SUI database!\n"));
 		UI->teLog->moveCursor(QTextCursor::End);
@@ -339,8 +363,11 @@ void DBSynchronizer::getPOR()
 	if(d.isValid())
 		por.updated_from = QDateTime(d);
 
+    dbSIU.setTimeout( iTimeout); //устанавливаем время таймаута, равное значению, введенному в форме
 	QList<Result_POR> res = dbSIU.searchIO(por);
-	int cnt = res.count();
+    dbSIU.setTimeout(3000); //восстанавливаем значение по-умолчанию (3 сек)
+
+    int cnt = res.count();
 	if(cnt == 0) {
 	    UI->teLog->setPlainText(UI->teLog->toPlainText() + tr("POR was not found in SUI database!\n"));
 		UI->teLog->moveCursor(QTextCursor::End);
@@ -378,8 +405,11 @@ void DBSynchronizer::getRBP()
 	if(d.isValid())
 		rbp.updated_from = QDateTime(d);
 
+    dbSIU.setTimeout( iTimeout); //устанавливаем время таймаута, равное значению, введенному в форме
 	QList<Result_RBP> res = dbSIU.searchIO(rbp);
-	int cnt = res.count();
+    dbSIU.setTimeout(3000); //восстанавливаем значение по-умолчанию (3 сек)
+
+    int cnt = res.count();
 	if(cnt == 0) {
 	    UI->teLog->setPlainText(UI->teLog->toPlainText() + tr("RBP was not found in SUI database!\n"));
 		UI->teLog->moveCursor(QTextCursor::End);
@@ -417,8 +447,11 @@ void DBSynchronizer::getREQ()
 	if(d.isValid())
 		req.updated_from = QDateTime(d);
 
+    dbSIU.setTimeout( iTimeout); //устанавливаем время таймаута, равное значению, введенному в форме
 	QList<Result_Request> res = dbSIU.searchIO(req);
-	int cnt = res.count();
+    dbSIU.setTimeout(3000); //восстанавливаем значение по-умолчанию (3 сек)
+
+    int cnt = res.count();
 	if(cnt == 0) {
 	    UI->teLog->setPlainText(UI->teLog->toPlainText() + tr("REQ was not found in SUI database!\n"));
 		UI->teLog->moveCursor(QTextCursor::End);
@@ -456,8 +489,11 @@ void DBSynchronizer::getOPVTO()
 	if(d.isValid())
         vto.updated_from = QDateTime(d);
 
+    dbSIU.setTimeout( iTimeout); //устанавливаем время таймаута, равное значению, введенному в форме
 	QList<Result_VTO> res = dbSIU.searchIO(vto);
-	int cnt = res.count();
+    dbSIU.setTimeout(3000); //восстанавливаем значение по-умолчанию (3 сек)
+
+    int cnt = res.count();
 	if(cnt == 0) {
 	    UI->teLog->setPlainText(UI->teLog->toPlainText() + tr("OP VTO was not found in SUI database!\n"));
 		UI->teLog->moveCursor(QTextCursor::End);

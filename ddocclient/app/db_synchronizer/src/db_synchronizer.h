@@ -170,6 +170,8 @@ private:
 	Ui::db_synchronizer_form *UI;
 	QTimer timer;
 	KKSDatabase * db;
+    
+    int iTimeout;//таймаут для каджого метода опроса БД СИУ
 
 	QList<QPair<int, QString> > idUrls_files;//ассоциации между idUrl, созданных в БД ДД, и файлами в файловой системе, которые находятся в процессе скачивания.
 

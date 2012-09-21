@@ -644,7 +644,7 @@ void KKSIncludesWidget::on_pbDelRubricator_clicked ()
 */
 void KKSIncludesWidget :: delRubricItem (void)
 {
-    QItemSelectionModel * sm;
+    QItemSelectionModel * sm = NULL;
 
     bool isRubr = true;
     if (recWItems->isVisible ())
@@ -671,7 +671,7 @@ void KKSIncludesWidget :: delRubricItem (void)
             //
             // item selected
             //
-            int res = QMessageBox::question (this, tr ("Delete rubric"), tr ("Do you really want to delete ?"), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+            int res = QMessageBox::question (this, tr ("Delete rubric item"), tr ("Do you really want to delete ?"), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
             if (res != QMessageBox::Yes)
                 return;
         }
@@ -685,11 +685,17 @@ void KKSIncludesWidget :: delRubricItem (void)
     }
 
     QModelIndex wIndex = twIncludes->selectionModel()->currentIndex ();
-    KKSRubric * r = getRubric(wIndex.parent());
+    KKSRubric * r = NULL;
+    if(isRubr)
+        r = getRubric(wIndex.parent());
+    else
+        r = getRubric(wIndex);
+
     if(!r)
         return;
     
     r->removeItem (index.row());
+
     if (isRubr)
         twIncludes->model()->removeRow(wIndex.row(), wIndex.parent());
     else
@@ -1136,7 +1142,8 @@ void KKSIncludesWidget :: setRubricIcon (void)
         rubr = getRubric (index);
         if (!rubr)
             return;
-        rubr->setIcon (QString(bytes));
+
+        ((KKSRubricBase*)rubr)->setIcon (QString(bytes));
         icon = rubr->getIcon();
     }
 

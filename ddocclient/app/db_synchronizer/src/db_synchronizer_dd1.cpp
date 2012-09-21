@@ -19,7 +19,7 @@ int DBSynchronizer::createIOFromETK(const Result_ETK & etk, const QList<QPair<QS
     if(!db)
 		return 0;
   
-	int idObject = createIO(ID_CAT_ETK, etk.uid, etk.file_name, etk.constraint, files);
+	int idObject = createIO(ID_CAT_ETK, etk.uid, etk.io_name, etk.constraint, files);
 	if(idObject < 0)
 		return 0;
 
@@ -64,7 +64,7 @@ int DBSynchronizer::createIOFromGMO(const Result_GMO & gmo, const QList<QPair<QS
 	else
 		return 0;
 
-	int idObject = createIO(idCat, gmo.uid, gmo.file_name, gmo.constraint, files);
+	int idObject = createIO(idCat, gmo.uid, gmo.io_name, gmo.constraint, files);
 	if(idObject < 0)
 		return 0;
 
@@ -97,7 +97,7 @@ int DBSynchronizer::createIOFromNVO(const Result_NVO & nvo, const QList<QPair<QS
     if(!db)
 		return 0;
   
-	int idObject = createIO(ID_CAT_NVO, nvo.uid, nvo.file_name, nvo.constraint, files);
+    int idObject = createIO(ID_CAT_NVO, nvo.uid, nvo.io_name, nvo.constraint, files);
 	if(idObject < 0)
 		return 0;
 
@@ -122,7 +122,7 @@ int DBSynchronizer::createIOFromEOIRD(const Result_EOIRD & eoird, const QList<QP
     if(!db)
 		return 0;
   
-	int idObject = createIO(ID_CAT_EOIRD, eoird.uid, eoird.file_name, eoird.constraint, files);
+	int idObject = createIO(ID_CAT_EOIRD, eoird.uid, eoird.io_name, eoird.constraint, files);
 	if(idObject < 0)
 		return 0;
 
@@ -161,7 +161,7 @@ int DBSynchronizer::createIOFromEFO(const Result_EFO & efo, const QList<QPair<QS
     if(!db)
 		return 0;
   
-	int idObject = createIO(ID_CAT_EFO, efo.uid, efo.file_name, efo.constraint, files);
+	int idObject = createIO(ID_CAT_EFO, efo.uid, efo.io_name, efo.constraint, files);
 	if(idObject < 0)
 		return 0;
 
@@ -202,7 +202,7 @@ int DBSynchronizer::createIOFromUGSH(const Result_UGSH & ugsh, const QList<QPair
 	int idCat = ID_CAT_UGSH;
 
 
-	int idObject = createIO(idCat, ugsh.uid, ugsh.file_name, ugsh.constraint, files);
+	int idObject = createIO(idCat, ugsh.uid, ugsh.io_name, ugsh.constraint, files);
 	if(idObject < 0)
 		return 0;
 
@@ -244,7 +244,7 @@ int DBSynchronizer::createIOFromTTX(const Result_TTX & ttx, const QList<QPair<QS
 	else
 		return 0;
 
-	int idObject = createIO(idCat, ttx.uid, ttx.file_name, ttx.constraint, files);
+	int idObject = createIO(idCat, ttx.uid, ttx.io_name, ttx.constraint, files);
 	if(idObject < 0)
 		return 0;
 
@@ -269,7 +269,7 @@ int DBSynchronizer::createIOFromPG(const Result_PG & pg, const QList<QPair<QStri
   
 	int idCat = ID_CAT_PG;
 
-	int idObject = createIO(idCat, pg.uid, pg.file_name, pg.constraint, files);
+	int idObject = createIO(idCat, pg.uid, pg.io_name, pg.constraint, files);
 	if(idObject < 0)
 		return 0;
 
@@ -300,7 +300,7 @@ int DBSynchronizer::createIOFromPOR(const Result_POR & por, const QList<QPair<QS
   
 	int idCat = ID_CAT_POR;
 
-	int idObject = createIO(idCat, por.uid, por.file_name, por.constraint, files);
+	int idObject = createIO(idCat, por.uid, por.io_name, por.constraint, files);
 	if(idObject < 0)
 		return 0;
 
@@ -328,7 +328,7 @@ int DBSynchronizer::createIOFromRBP(const Result_RBP & rbp, const QList<QPair<QS
   
 	int idCat = ID_CAT_RBP;
 
-	int idObject = createIO(idCat, rbp.uid, rbp.file_name, rbp.constraint, files);
+	int idObject = createIO(idCat, rbp.uid, rbp.io_name, rbp.constraint, files);
 	if(idObject < 0)
 		return 0;
 
@@ -358,7 +358,7 @@ int DBSynchronizer::createIOFromREQ(const Result_Request & req, const QList<QPai
   
 	int idCat = ID_CAT_REQ;
 
-	int idObject = createIO(idCat, req.uid, req.file_name, req.constraint, files);
+	int idObject = createIO(idCat, req.uid, req.io_name, req.constraint, files);
 	if(idObject < 0)
 		return 0;
 
@@ -393,7 +393,7 @@ int DBSynchronizer::createIOFromOPVTO(const Result_VTO & vto, const QList<QPair<
 	else
 		return 0;
 
-	int idObject = createIO(idCat, vto.uid, vto.file_name, vto.constraint, files);
+	int idObject = createIO(idCat, vto.uid, vto.io_name, vto.constraint, files);
 	if(idObject < 0)
 		return 0;
 

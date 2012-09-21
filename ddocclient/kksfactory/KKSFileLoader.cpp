@@ -124,7 +124,7 @@ int KKSFileLoader::getDefaultBlockSize() const
 \return 1, при успехе
 \return -1 при ошибке
 */
-int KKSFileLoader::rGetFile(int idUrl, QString toUrl, int blockSize, const QWidget * parent) const
+int KKSFileLoader::rGetFile(int idUrl, QString toUrl, int blockSize, QWidget * parent) const
 {
     if(blockSize <= 0)
         blockSize = getDefaultBlockSize();
@@ -164,7 +164,7 @@ int KKSFileLoader::rGetFile(int idUrl, QString toUrl, int blockSize, const QWidg
     double k = 1.0;//используется для масштабирования шкалы прогрессбара при условии, что размер файла больше _MAX_INT32_
 
     if(parent){
-        pImportD = new QProgressDialog ();
+        pImportD = new QProgressDialog (parent);
 		lImport = new QLabel (QObject::tr("Download file, please wait..."), pImportD);
         pImportD->setLabel (lImport);
 		QPushButton *pbCancelButton = new QPushButton (QObject::tr("Cancel download"), pImportD);
@@ -310,7 +310,7 @@ int KKSFileLoader::rGetFile(int idUrl, QString toUrl, int blockSize, const QWidg
 
 
 
-int KKSFileLoader::rGetFile(QString fromUrl, QString toUrl, int blockSize, const QWidget * parent) const
+int KKSFileLoader::rGetFile(QString fromUrl, QString toUrl, int blockSize, QWidget * parent) const
 {
     if(blockSize <= 0)
         blockSize = getDefaultBlockSize();
@@ -424,7 +424,7 @@ int KKSFileLoader::rWriteFile( int idUrl,
                               QString fromUrl,
                               bool safe, 
                               int blockSize,
-                              const QWidget * parent) const
+                              QWidget * parent) const
 {
     if(blockSize <= 0)
         blockSize = getDefaultBlockSize();
@@ -463,7 +463,7 @@ int KKSFileLoader::rWriteFile( int idUrl,
     qint64 estimatedFileSize = 0;
     
     if(parent){
-        pImportD = new QProgressDialog ();
+        pImportD = new QProgressDialog (parent);
         lImport = new QLabel (QObject::tr("Uploading file, please wait..."), pImportD);
         pImportD->setLabel (lImport);
         QPushButton *pbCancelButton = new QPushButton (QObject::tr("Cancel upload"), pImportD);

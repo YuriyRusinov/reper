@@ -127,7 +127,7 @@ eio_table_<ID_IO_OBJECT>
 использовать автоматическое создание кода вида
 IO_OBJ_<ID_IO_OBJECT>, где ID_IO_OBJECT - присвоенный идентификатор ИО
 */
-int KKSPPFactory::insertIO(KKSObject * io, bool useDefaultTable, const QWidget * parent) 
+int KKSPPFactory::insertIO(KKSObject * io, bool useDefaultTable, QWidget * parent) 
 {
     Q_UNUSED(useDefaultTable);
 
@@ -340,7 +340,7 @@ int KKSPPFactory::insertIO(KKSObject * io, bool useDefaultTable, const QWidget *
 /*
 Категорию ИО менять запрещается!
 */
-int KKSPPFactory::updateIO(KKSObject * io, const QWidget * parent)
+int KKSPPFactory::updateIO(KKSObject * io, QWidget * parent)
 {
     if(!db || !io)
         return ERROR_CODE;
@@ -685,7 +685,7 @@ int KKSPPFactory::deleteIO(KKSObject * io) const
     return OK_CODE;
 }
 
-int KKSPPFactory::insertFile(int idObject, KKSFile * f, const QWidget * parent) const
+int KKSPPFactory::insertFile(int idObject, KKSFile * f, QWidget * parent) const
 {
     if(!f)
         return ERROR_CODE;
@@ -711,7 +711,7 @@ int KKSPPFactory::insertFile(int idObject, KKSFile * f, const QWidget * parent) 
     return OK_CODE;
 }
 
-int KKSPPFactory::insertFiles(const KKSObject * io, const QWidget * parent) const
+int KKSPPFactory::insertFiles(const KKSObject * io, QWidget * parent) const
 {
     if(!io)
         return ERROR_CODE;
@@ -795,7 +795,7 @@ int KKSPPFactory::deleteFiles(const KKSObject * io, bool bRemoveFiles) const
 }
 */
 
-int KKSPPFactory::updateFiles(const KKSObject * io, const QWidget * parent) const
+int KKSPPFactory::updateFiles(const KKSObject * io, QWidget * parent) const
 {
     if(!io)
         return ERROR_CODE;
@@ -874,7 +874,7 @@ int KKSPPFactory::updateFileInfo(KKSFile * f) const
     return OK_CODE;
 }
 
-int KKSPPFactory::uploadFile(KKSFile * f, const QWidget * parent) const
+int KKSPPFactory::uploadFile(KKSFile * f, QWidget * parent) const
 {
     if(!f)
         return ERROR_CODE;
