@@ -6,7 +6,7 @@ Datum rwritefile(PG_FUNCTION_ARGS)
 {
     text * data;    
     FILE * fFile;
-    long size;
+    size_t size;
     char * url;
     char * raPath;
     char * absFilePath;
@@ -16,6 +16,7 @@ Datum rwritefile(PG_FUNCTION_ARGS)
     SPITupleTable * tuptable;
     int mode;
 
+    fFile = NULL;
     idUrl = PG_GETARG_INT32(0);
     data = PG_GETARG_TEXT_P(1);
     mode = PG_GETARG_INT32(2);
@@ -31,7 +32,6 @@ Datum rwritefile(PG_FUNCTION_ARGS)
         //PG_RETURN_INT32(-1);
     }
 
-	
     sql = (char *) palloc(70*sizeof(char));
     snprintf(sql, 70*sizeof(char), "select rGetAbsUrlEx(%d);", idUrl);
 
@@ -49,7 +49,7 @@ Datum rwritefile(PG_FUNCTION_ARGS)
     }
     tuptable = SPI_tuptable;
     absFilePath = SPI_getvalue(tuptable->vals[0], tuptable->tupdesc, 1);
-    
+
     if(absFilePath == NULL || 
        strcmp(absFilePath, "") || 
        strcmp(absFilePath, "not assigned") )
@@ -76,7 +76,7 @@ Datum rwritefile(PG_FUNCTION_ARGS)
             PG_RETURN_INT32(-2);
         }
 
-        url = (char *)palloc(strlen(raPath) + 30*sizeof(char));
+        url = (char *)palloc(strlen(raPath) + 130*sizeof(char));
         sprintf(url, "kks_file_%d", idUrl);
           
         sql = (char *) palloc(strlen(url) + 30*sizeof(char));
@@ -101,22 +101,28 @@ Datum rwritefile(PG_FUNCTION_ARGS)
             PG_RETURN_INT32(-2);
         }
         sprintf(url, "%skks_file_%d", raPath, idUrl);
+        
     }
     else{
-        url = (char *)palloc(strlen(absFilePath)+1);
+        url = (char *)palloc(strlen(absFilePath)+30);
         strcpy(url, absFilePath);
     }
-    
-    elog(NOTICE, url);
+
+    //elog(WARNING, url);
+
+
+    //url = (char *)palloc(strlen("C:\\Program Files (x86)\\PostgreSQL9\\9.2\\data\\io_files\\1.txt")+30);
+    //strcpy(url, "C:\\Program Files (x86)\\PostgreSQL9\\9.2\\data\\io_files\\1.txt");
+
     
     if(mode == 0){
-        fFile = fopen(url, "wb");
+        fFile = openFile(fFile, url, "wb");
     }
     else if(mode == 1){
-        fFile = fopen(url, "ab");
+        fFile = openFile(fFile, url, "ab");
     }
     else if(mode == 2){
-        fFile = fopen(url, "rb");
+        fFile = openFile(fFile, url, "rb");
         if(fFile != NULL){
             pfree(url);
             SPI_finish();
@@ -124,8 +130,7 @@ Datum rwritefile(PG_FUNCTION_ARGS)
             fclose(fFile);
             PG_RETURN_INT32(-4);
         }
-        
-        fFile = fopen(url, "ab");
+        fFile = openFile(fFile, url, "ab");
     }
     else{
         pfree(url);
@@ -134,24 +139,32 @@ Datum rwritefile(PG_FUNCTION_ARGS)
         PG_RETURN_INT32(-3);
     }
 
+    
     if (fFile == NULL){
         SPI_finish();
         elog(ERROR, "FOPEN: %s, URL=%s", strerror(errno), url);
     }
-
-
-    pfree(url);
-    SPI_finish();
-    
+        
     size = fwrite(VARDATA(data), VARSIZE(data)-VARHDRSZ, 1, fFile);
+    
     if(size == 0){
         fclose(fFile);
+        pfree(url);
+        SPI_finish();
         elog(ERROR, "Data not writed!");
         //PG_RETURN_INT32(-6);
     }
+    
     if(fclose(fFile) != 0){
+
+        pfree(url);
+        SPI_finish();
         elog(ERROR, "FCLOSE: %s", strerror(errno));
     }
+    
+
+    pfree(url);
+    SPI_finish();
 
     PG_RETURN_INT32(size);
 }

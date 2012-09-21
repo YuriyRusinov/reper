@@ -22,8 +22,8 @@ Datum rgetfilebyurl(PG_FUNCTION_ARGS)
         blockSize = BUFSIZE;
 
 
-
-    fFile = fopen(url, "rb");
+    fFile = NULL;
+    fFile = openFile(fFile, url, "rb");
 
     if (fFile == NULL){
 	  //pfree(url);

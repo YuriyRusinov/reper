@@ -20,7 +20,7 @@ Datum rdeletefile(PG_FUNCTION_ARGS)
 
     if(idUrl <= 0){
       elog(ERROR, "id_url cannot be zero or negative. Please enter valid value.");
-      PG_RETURN_NULL();
+      PG_RETURN_INT32(-1);
     }
 
 
@@ -36,30 +36,31 @@ Datum rdeletefile(PG_FUNCTION_ARGS)
     
     datum = DirectFunctionCall2(exec_spi, PointerGetDatum(sql1), BoolGetDatum(true));
     if(!DatumGetCString(datum)){
-        elog(NOTICE, "URL is NULL!");
+        elog(WARNING, "URL is NULL!");
         SPI_finish();
-        PG_RETURN_NULL();
+        PG_RETURN_INT32(-1);
     }
 
     url = (char *)SPI_palloc(strlen(DatumGetCString(datum))+1);
     strcpy(url, DatumGetCString(datum));
 
-    fFile = fopen(url, "rb");
+    fFile = NULL;
+    fFile = openFile(fFile, url, "rb");
 
     if (fFile == NULL){
         SPI_finish();
-        elog(ERROR, "Cannot open file with given URL. File does not exist or permission denied. URL='%s'", url);
+        elog(WARNING, "Cannot open file with given URL. File does not exist or permission denied. URL='%s'", url);
+        PG_RETURN_INT32(-1);
     }
 
     fclose(fFile);
 
-    SPI_finish();
-
     rmResult = remove(url);
 
-    elog(NOTICE, "File %s removed!", url);
+    //elog(NOTICE, "File %s removed!", url);
    
     pfree(url);
+    SPI_finish();
     
 
     PG_RETURN_INT32(1);

@@ -44,14 +44,16 @@ Datum rgetabsurlex(PG_FUNCTION_ARGS)
     url = (char *)SPI_palloc(strlen(DatumGetCString(datum))+1);
     strcpy(url, DatumGetCString(datum));
 
-    
-    SPI_finish();
-    
-    fFile = fopen(url, "rb");
-    if(fFile == NULL)
+        
+    fFile = NULL;
+    fFile = openFile(fFile, url, "rb");
+    if(fFile == NULL){
+        SPI_finish();
         PG_RETURN_NULL();
+    }
     
     fclose(fFile);
+    SPI_finish();
 
     PG_RETURN_TEXT_P(cstring_to_text_ex(url));
 }

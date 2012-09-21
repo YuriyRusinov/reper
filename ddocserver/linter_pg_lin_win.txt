@@ -1,0 +1,11 @@
+Адаптация инсталлятора для установки сервера в средах Windows, Unix. В среде СУБД ЛинтерВС 7.0, PostgreSQL 8.4, 9
+Изначально исходники анаптированы для работы в среде Linux+Линтер
+
+Адаптация для PostgreSQL:
+1) поправить файл ./functions/misc/macmabels.sql
+2) поправить файл ./functions/security/getcurrentmaclabel.sql (раскомментировать блок EXCEPTION в первой функции)
+3) Для pg9 закомментировать в ./internals/initdb.sql создание языка plpgsql
+
+Адаптация для Windows:
+1) Собрать библиотеку libfloader в среде MS VC2008. Скопировать dll в каталог с библиотеками постгреса
+2) Поправить вызов f_create_lang.sql на f_create_lang_win.sql в ./internals/initdb.sql (для PG9 создавать язык не надо вообще)

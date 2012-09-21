@@ -11,7 +11,8 @@ Datum rgetfilesizebyurl(PG_FUNCTION_ARGS)
 
     url = text_to_cstring_ex(PG_GETARG_TEXT_P(0));
 
-    fFile = fopen(url, "rb");
+    fFile = NULL;
+    fFile = openFile(fFile, url, "rb");
 
     if (fFile == NULL){
 	  elog(NOTICE, "Cannot open file with given URL. \

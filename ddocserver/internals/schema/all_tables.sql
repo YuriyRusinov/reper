@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     07.09.2012 11:44:17                          */
+/* Created on:     21.09.2012 17:06:55                          */
 /*==============================================================*/
 
 
@@ -23,7 +23,6 @@ select setMacToNULL('root_table');
 create unique index Index_1 on root_table using BTREE (
 unique_id
 );
-
 
 /*==============================================================*/
 /* User: public                                                 */
@@ -1267,6 +1266,30 @@ select setMacToNULL('fault_devices_q');
 select createTriggerUID('fault_devices_q');
 
 /*==============================================================*/
+/* Table: file_types                                            */
+/*==============================================================*/
+create table file_types (
+   id                   SERIAL               not null,
+   name                 VARCHAR              not null,
+   constraint PK_FILE_TYPES primary key (id)
+);
+
+/*==============================================================*/
+/* Table: files                                                 */
+/*==============================================================*/
+create table files (
+   id                   SERIAL               not null,
+   id_type              INT4                 not null,
+   id_task_var          INT4                 not null,
+   name                 VARCHAR              not null,
+   url                  VARCHAR              not null,
+   ka_type              VARCHAR              null,
+   shooting_time        TIMESTAMP            null,
+   region               VARCHAR              null,
+   constraint PK_FILES primary key (id)
+);
+
+/*==============================================================*/
 /* Table: graph_plans                                           */
 /*==============================================================*/
 create table graph_plans (
@@ -1949,6 +1972,20 @@ comment on table jr_states is
 ';
 
 select setMacToNULL('jr_states');
+
+/*==============================================================*/
+/* Table: kaps                                                  */
+/*==============================================================*/
+create table kaps (
+   id                   SERIAL               not null,
+   name                 VARCHAR              not null,
+   folder_name          VARCHAR              not null,
+   description          VARCHAR              null,
+   constraint PK_KAPS primary key (id)
+);
+
+comment on table kaps is
+'Перечень доступных КАПС';
 
 /*==============================================================*/
 /* Table: kks_roles                                             */
@@ -2939,6 +2976,7 @@ create table roles_actions (
 
 select setMacToNULL('roles_actions');
 
+
 /*==============================================================*/
 /* Table: rubric_records                                        */
 /*==============================================================*/
@@ -3107,6 +3145,39 @@ create table system_table (
 );
 
 select setMacToNULL('system_table');
+
+/*==============================================================*/
+/* Table: task_vars                                             */
+/*==============================================================*/
+create table task_vars (
+   id                   SERIAL               not null,
+   id_task              INT4                 not null,
+   name                 VARCHAR              not null,
+   folder_name          VARCHAR              not null,
+   description          VARCHAR              null,
+   creation_date        DATE                 not null,
+   region               VARCHAR              null,
+   author               VARCHAR              null,
+   constraint PK_TASK_VARS primary key (id)
+);
+
+comment on table task_vars is
+'Варианты решения тематических задач КАПС';
+
+/*==============================================================*/
+/* Table: tasks                                                 */
+/*==============================================================*/
+create table tasks (
+   id                   SERIAL               not null,
+   id_kaps              INT4                 not null,
+   name                 VARCHAR              not null,
+   filder_name          VARCHAR              not null,
+   description          VARCHAR              null,
+   constraint PK_TASKS primary key (id)
+);
+
+comment on table tasks is
+'Тематические задачи КАПС';
 
 /*==============================================================*/
 /* Table: transport                                             */
@@ -4058,6 +4129,16 @@ alter table fault_devices
       references devices (id)
       on delete restrict on update restrict;
 
+alter table files
+   add constraint FK_FILES_REFERENCE_FILE_TYP foreign key (id_type)
+      references file_types (id)
+      on delete restrict on update restrict;
+
+alter table files
+   add constraint FK_FILES_REFERENCE_TASK_VAR foreign key (id_task_var)
+      references task_vars (id)
+      on delete restrict on update restrict;
+
 alter table graph_plans
    add constraint FK_GRAPH_PL_REFERENCE_GRAPH_PL foreign key (id_parent)
       references graph_plans (id)
@@ -4536,6 +4617,16 @@ alter table shape_segments
 alter table shape_segments
    add constraint FK_SHAPE_SE_REFERENCE_ELEMENT_ foreign key (id_element_shape)
       references element_shapes (id)
+      on delete restrict on update restrict;
+
+alter table task_vars
+   add constraint FK_TASK_VAR_REFERENCE_TASKS foreign key (id_task)
+      references tasks (id)
+      on delete restrict on update restrict;
+
+alter table tasks
+   add constraint FK_TASKS_REFERENCE_KAPS foreign key (id_kaps)
+      references kaps (id)
       on delete restrict on update restrict;
 
 alter table tsd

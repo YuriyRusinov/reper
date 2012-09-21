@@ -12,14 +12,21 @@ CONFIG += warn_on dll release
 
 DESTDIR = ./bld
 
-PGSERVER_HOME="C:/Program Files/XGIS Lab/XGIS Server 0.9.3.7"
-EXT_HOME="C:/Program Files/GnuWin32"
+PGSERVER_HOME="C:/Program Files (x86)/PostgreSQL9/9.2"
+#LIBJPEG_DIR="C:/libjpeg-turbo"
 
+#EXT_HOME="C:/Program Files/GnuWin32"
+
+INCLUDEPATH += $${PGSERVER_HOME}/include
 INCLUDEPATH += $${PGSERVER_HOME}/include/server
 INCLUDEPATH += $${PGSERVER_HOME}/include/server/port/win32
-INCLUDEPATH += $${EXT_HOME}/include
+INCLUDEPATH += $${PGSERVER_HOME}/include/server/port/win32_msvc
 LIBS *= -L$${PGSERVER_HOME}/lib
 LIBS *= -L$${PGSERVER_HOME}/bin
+
+#INCLUDEPATH += $${LIBJPEG_DIR}/include
+#LIBS *= -L$${LIBJPEG_DIR}/lib
+#LIBS *= -L$${LIBJPEG_DIR}/bin -ljpeg
 
 LIBS *= postgres.lib
 LIBS *= -L. -lmsvcrt
@@ -42,4 +49,7 @@ SOURCES += exec_spi.c \
            rgetfilebyurl.c \
            rgetfilesizebyurl.c \
            rwritefile.c \
-           text_to_cstring.c 
+           text_to_cstring.c \
+           openfile.c
+#           rxpm2jpeg.c \
+#           xpm2jpeg.c

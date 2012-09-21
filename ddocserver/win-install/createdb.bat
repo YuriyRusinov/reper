@@ -1,6 +1,7 @@
 @echo off
 
-set VERSION=0.11.0
+set HOST=127.0.0.1
+set VERSION=0.14.3
 
 set OUTPUT=./error.log
 
@@ -11,8 +12,8 @@ if "%STDOUT_REDIRECTED%" == "" (
 )
 
 
-rem Читаем настройки из файла settings.txt, который должен располагаться в
-rem том же каталоге, что и bat-файл. Если не удалось распарсить настройки -
+rem Читаем настройки из файла user.config
+rem Если не удалось распарсить настройки -
 rem выходим с ненулевым кодом возврата.
 
 call :read_settings ..\user.config || exit /b 1
@@ -23,23 +24,28 @@ call :read_settings ..\user.config || exit /b 1
 
 cd ../internals 
 
-copy /Y functions\files\readd_files_c_lin.sql functions\files\readd_files_c.sql
+copy /Y functions\files\readd_files_c_win.sql functions\files\readd_files_c.sql
 
 %LINTER_ROOT%\bin\psql.exe -h %HOST% -p %LINTER_PORT% -d %BASE% -f ./initdb.sql %USER%
 
 %LINTER_ROOT%\bin\psql.exe -h %HOST% -p %LINTER_PORT% -d %BASE% -c "select setkkssitoversion('DynamicDocs Server version %VERSION%', '%VERSION%')" -t %USER%
-%LINTER_ROOT%\bin\psql.exe -h %HOST% -p %LINTER_PORT% -d %BASE% -c "select setfilearchivepath('%PGDATA_DIR%/%FILE_ARCH%')" -t %USER%
+rem %LINTER_ROOT%\bin\psql.exe -h %HOST% -p %LINTER_PORT% -d %BASE% -c "select setfilearchivepath('%PGDATA_DIR%/%FILE_ARCH%')" -t %USER%
 %LINTER_ROOT%\bin\psql.exe -h %HOST% -p %LINTER_PORT% -d %BASE% -c "select usetlocaladdress('%LOCAL_ADDRESS%')" -t %USER% 
 %LINTER_ROOT%\bin\psql.exe -h %HOST% -p %LINTER_PORT% -d %BASE% -c "select startsync()" -t %USER%
 %LINTER_ROOT%\bin\psql.exe -h %HOST% -p %LINTER_PORT% -d %BASE% -c "select setorgasmain(%IS_MAIN_ORG%)" -t %USER%
 
+%LINTER_ROOT%\bin\psql.exe -h %HOST% -p %LINTER_PORT% -d %BASE% -f ./initprivs.sql %USER%
 %LINTER_ROOT%\bin\psql.exe -h %HOST% -p %LINTER_PORT% -d %BASE% -f ./initdata.sql %USER%
 %LINTER_ROOT%\bin\psql.exe -h %HOST% -p %LINTER_PORT% -d %BASE% -f ./initiotriggers.sql %USER%
-%LINTER_ROOT%\bin\psql.exe -h %HOST% -p %LINTER_PORT% -d %BASE% -f ./initprivs.sql %USER%
+
+if "%USE_MODULES%" == "1" (
+    %LINTER_ROOT%\bin\psql.exe -h %HOST% -p %LINTER_PORT% -d %BASE% -f ./initmodules.sql %USER%
+    exit 0;
+)
 
 
 rem Выход из сценария. Дальше - только функции.
-exit 0
+rem exit 0
 
 
 
@@ -75,6 +81,8 @@ for /f "eol=# delims== tokens=1,2" %%i in (%SETTINGSFILE%) do (
     rem В переменной j - значение
     rem Мы транслируем это в переменные окружения
     set %%i=%%j
+    rem echo %%i
+    rem echo %%j
 )
 
-exit /b 0
+rem exit /b 0

@@ -96,7 +96,7 @@ begin
 
        EXCEPTION WHEN 
                     invalid_text_representation or 
-                    datetime_value_out_of_range or
+--                    datetime_value_out_of_range or
                     invalid_datetime_format
                  then
                     return NULL;

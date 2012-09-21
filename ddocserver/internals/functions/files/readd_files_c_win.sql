@@ -20,6 +20,6 @@ create or replace function rGetAbsUrlEx(int4) returns text
 create or replace function rDeleteFile(int4) returns int4
     as 'libfloader.dll', 'rdeletefile'  language 'c' strict security definer;
 
-create or replace function rXPM2JPEG(bytea) returns bytea 
-    as 'libfloader.dll', 'rxpm2jpeg'  language 'c' strict security definer;
+--create or replace function rXPM2JPEG(bytea) returns bytea 
+--    as 'libfloader.dll', 'rxpm2jpeg'  language 'c' strict security definer;
 

@@ -53,7 +53,8 @@ Datum rgetfile(PG_FUNCTION_ARGS)
     url = (char *)SPI_palloc(strlen(DatumGetCString(datum))+1);
     strcpy(url, DatumGetCString(datum));
 
-    fFile = fopen(url, "rb");
+    fFile = NULL;
+    fFile = openFile(fFile, url, "rb");
 
     if (fFile == NULL){
         elog(NOTICE, "Cannot open file with given URL. File does not exist or permission denied. URL='%s'", url);
@@ -88,7 +89,7 @@ Datum rgetfile(PG_FUNCTION_ARGS)
         readed = fread(VARDATA(data), 1, blockSize, fFile);
         if ( readed != blockSize ){
             SET_VARSIZE(data, (VARHDRSZ + readed));
-            elog(ERROR,"Read from file less then requested");
+            elog(NOTICE,"Read from file less then requested");
         }
         
 

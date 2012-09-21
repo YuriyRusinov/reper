@@ -1,0 +1,55 @@
+# user defined parameters
+
+# new database name
+BASE=main_db
+
+# user that will be superuser of database server
+USER=postgres
+
+# group 
+GROUP=postgres
+
+#root path to LINTER 7.0
+#if that was installed by default, the path typically is /usr/
+LINTER_ROOT="C:/Program Files (x86)/PostgreSQL/8.4"
+
+# port of database server (5432 is the defaults)
+LINTER_PORT=5432
+
+#encoding of the DynamicDocs Server and all its databases
+#UTF8 recomended
+ENCODING=UTF8
+
+#path to active cluster data directory
+#defaults for LINTER 7.0 is /var/lib/pgsql/data
+#Just execute 'ps afx' command and find output record '.../postmaster ... -D {PGDATA_DIR}'.
+#PGDATA_DIR is active cluster data directory
+#Example:
+#ps afx 
+#...
+# 964 ?        S      0:02 /usr/bin/postmaster -D /var/lib/pgsql/data
+PGDATA_DIR="C:/Program Files (x86)/PostgreSQL/8.4/data"
+
+#file archive path
+FILE_ARCH=io_files
+#if this parameter is set to 1 and file archive path (FILE_ARCH) is exist
+#then will be created auto generated path
+#default is set to 1
+AUTO_CREATE=1
+
+#Unique database address
+#For admins only! You should get that from your boss
+LOCAL_ADDRESS=o1
+
+#set this parameter to 1 if your organization is main
+#ONLY main organization have full access to organization table
+#and can send its records to another objects
+IS_MAIN_ORG=1
+
+#ORG_NAME="The Organization"
+
+#set to 0 if you do not want install any extended modules
+#currently there are only LessonScheduler module (ESSR Server)
+#on default the module will be installed
+USE_MODULES=1
+#end of user defined parameters
