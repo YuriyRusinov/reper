@@ -18,20 +18,23 @@ QPixmap * pxRubricItem = NULL;
 
 KKSRubricBase :: KKSRubricBase (void) : KKSRecord (),
     m_rubrIcon (QIcon()),
-    m_iconData (QString())
+    m_iconData (QString()),
+    m_subNodes (KKSList<const KKSRubricBase *>())
 {
 }
 
 KKSRubricBase :: KKSRubricBase (qint64 id, const QString& name, const QString& desc) : KKSRecord (id, name, desc),
     m_rubrIcon (QIcon()),
-    m_iconData (QString())
+    m_iconData (QString()),
+    m_subNodes (KKSList<const KKSRubricBase *>())
 {
 }
 
 KKSRubricBase :: KKSRubricBase (const KKSRubricBase& RB)
     : KKSRecord (RB),
       m_rubrIcon (RB.m_rubrIcon),
-      m_iconData (RB.m_iconData)
+      m_iconData (RB.m_iconData),
+      m_subNodes (RB.m_subNodes)
 {
 }
 
@@ -48,6 +51,7 @@ KKSRubricBase& KKSRubricBase :: operator= (const KKSRubricBase& rb)
 {
     m_rubrIcon = rb.m_rubrIcon;
     m_iconData = rb.m_iconData;
+    m_subNodes = rb.m_subNodes;
     return *this;
 }
 
@@ -104,7 +108,43 @@ int KKSRubricBase :: childNumber (void) const
         return idc;
     }
     else
-        return -1;
+        return m_subNodes.count();
+}
+
+void KKSRubricBase :: addNode (const KKSRubricBase * node)
+{
+    if (!node)
+        return;
+
+    m_subNodes.append(node);
+}
+
+void KKSRubricBase :: insertNode (int i, const KKSRubricBase * node)
+{
+    if (!node)
+        return;
+
+    m_subNodes.insert(i, node);
+}
+
+void KKSRubricBase :: clearNodes (void)
+{
+    m_subNodes.clear();
+}
+
+const KKSList<const KKSRubricBase *>& KKSRubricBase :: subnodes (void) const
+{
+    return m_subNodes;
+}
+
+KKSList<const KKSRubricBase *>& KKSRubricBase :: subnodes (void)
+{
+    return m_subNodes;
+}
+
+void KKSRubricBase :: setNodes (const KKSList<const KKSRubricBase *>& nodes)
+{
+    m_subNodes = nodes;
 }
 /*=============*/
 
@@ -124,9 +164,8 @@ KKSRubricOthers :: ~KKSRubricOthers (void)
 {
 }
 
-KKSRubricOthers& KKSRubricOthers :: operator= (const KKSRubricOthers& others)
+KKSRubricOthers& KKSRubricOthers :: operator= (const KKSRubricOthers& /*others*/)
 {
-    setNodes (others.m_subNodes);
     return *this;
 }
 
@@ -143,42 +182,6 @@ QPixmap KKSRubricOthers :: getDefaultIcon (void) const
 int KKSRubricOthers :: rubricType (void) const
 {
     return KKSRubricBase::atOthers;
-}
-
-void KKSRubricOthers :: addNode (const KKSRubricBase * node)
-{
-    if (!node)
-        return;
-
-    m_subNodes.append(node);
-}
-
-void KKSRubricOthers :: insertNode (int i, const KKSRubricBase * node)
-{
-    if (!node)
-        return;
-
-    m_subNodes.insert(i, node);
-}
-
-void KKSRubricOthers :: clearNodes (void)
-{
-    m_subNodes.clear();
-}
-
-const KKSList<const KKSRubricBase *>& KKSRubricOthers :: subnodes (void) const
-{
-    return m_subNodes;
-}
-
-KKSList<const KKSRubricBase *>& KKSRubricOthers :: subnodes (void)
-{
-    return m_subNodes;
-}
-
-void KKSRubricOthers :: setNodes (const KKSList<const KKSRubricBase *>& nodes)
-{
-    m_subNodes = nodes;
 }
 
 /*============*/
@@ -395,6 +398,7 @@ void KKSRubric::addItem(const KKSRubricItem * item)
         return;
     
     m_items.append(item);
+    addNode (item);
 }
 
 void KKSRubric::insertItem (int i, const KKSRubricItem * item)
@@ -403,6 +407,7 @@ void KKSRubric::insertItem (int i, const KKSRubricItem * item)
         return;
 
     m_items.insert (i, item);
+    insertNode (i, item);
 }
 
 void KKSRubric::addItems(const KKSList<const KKSRubricItem*> & items)
@@ -411,6 +416,7 @@ void KKSRubric::addItems(const KKSList<const KKSRubricItem*> & items)
     {
         const KKSRubricItem * item = items[i];
         m_items.append(item);
+        addNode (item);
     }
 }
 
@@ -418,6 +424,15 @@ void KKSRubric::setItems(const KKSList<const KKSRubricItem *> & items)
 {
     m_items.clear();
     m_items = items;
+    KKSList<const KKSRubricBase *> subNodes = subnodes();
+    for (int i=0; i<subNodes.count(); )
+    {
+        if (subNodes[i]->rubricType() == KKSRubricBase::atRubricItem)
+            subNodes.removeAt(i);
+        else
+            i++;
+    }
+    setNodes (subNodes);
 }
 
 void KKSRubric::removeItem(int index)
@@ -429,16 +444,35 @@ void KKSRubric::clear()
 {
     clearItems();
     clearRubrics();
+    clearNodes ();
 }
 
 void KKSRubric::clearItems()
 {
     m_items.clear();
+    KKSList<const KKSRubricBase *> subNodes = subnodes();
+    for (int i=0; i<subNodes.count(); )
+    {
+        if (subNodes[i]->rubricType() == KKSRubricBase::atRubricItem)
+            subNodes.removeAt(i);
+        else
+            i++;
+    }
+    setNodes (subNodes);
 }
 
 void KKSRubric::clearRubrics()
 {
     m_rubrics.clear();
+    KKSList<const KKSRubricBase *> subNodes = subnodes();
+    for (int i=0; i<subNodes.count(); )
+    {
+        if (subNodes[i]->rubricType() != KKSRubricBase::atRubricItem)
+            subNodes.removeAt(i);
+        else
+            i++;
+    }
+    setNodes (subNodes);
 }
 
 const KKSRubricItem * KKSRubric::item(int index) const
@@ -458,6 +492,7 @@ void KKSRubric::addRubric(const KKSRubric * r)
         return;
     
     m_rubrics.append(r);
+    addNode (r);
 }
 
 void KKSRubric::insertRubric (int i, const KKSRubric * r)
@@ -466,6 +501,7 @@ void KKSRubric::insertRubric (int i, const KKSRubric * r)
         return;
 
     m_rubrics.insert(i, r);
+    insertNode (i, r);
 }
 
 void KKSRubric::addRubrics(const KKSList<const KKSRubric *> & rubrics)
@@ -474,12 +510,25 @@ void KKSRubric::addRubrics(const KKSList<const KKSRubric *> & rubrics)
     {
         const KKSRubric * r = rubrics[i];
         m_rubrics.append(r);
+        addNode (r);
     }
 }
 
 void KKSRubric::setRubrics(const KKSList<const KKSRubric*> & rubrics)
 {
     m_rubrics.clear();
+    KKSList<const KKSRubricBase *> subNodes = subnodes();
+    for (int i=0; i<subNodes.count(); )
+    {
+        if (subNodes[i]->rubricType() == KKSRubricBase::atRootRubric ||
+            subNodes[i]->rubricType() == KKSRubricBase::atRubric ||
+            subNodes[i]->rubricType() == KKSRubricBase::atRubricCategory
+            )
+            subNodes.removeAt(i);
+        else
+            i++;
+    }
+    setNodes (subNodes);
     m_rubrics = rubrics;
 }
 
@@ -489,6 +538,9 @@ void KKSRubric::removeRubric(int index)
     if(!rr)
         return;
 
+    KKSList<const KKSRubricBase *> subNodes = subnodes();
+    subNodes.removeAll (rr);
+    setNodes (subNodes);
     m_deletedRubrics.append(rr);
     m_rubrics.removeAt(index);
 }

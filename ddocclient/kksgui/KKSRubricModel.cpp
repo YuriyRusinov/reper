@@ -10,18 +10,19 @@
 
 #include "KKSRubric.h"
 #include "KKSList.h"
+#include "KKSRubricTreeItem.h"
 #include "KKSRubricModel.h"
 
-KKSRubricModel::KKSRubricModel(KKSRubric * rootRubr, QObject * parent)
+KKSRubricModel::KKSRubricModel(const KKSRubric * rootRubr, QObject * parent)
     : QAbstractItemModel (parent),
-      rootRubric (rootRubr)
+      rootItem (new KKSRubricTreeItem (-1, rootRubr))
 {
-//    if (rootRubric && static_cast<const KKSRubric *>(rootRubric))
-//        rootRubric->addRef();
+    setupData (rootItem);
 }
 
 KKSRubricModel::~KKSRubricModel()
 {
+    delete rootItem;
 //    if (rootRubric)
 //        rootRubric->release();
 }
@@ -34,7 +35,12 @@ QVariant KKSRubricModel :: data (const QModelIndex &index, int role) const
     if (role != Qt::DisplayRole && role != Qt::EditRole && role != Qt::UserRole && role != Qt::UserRole+1 && role != Qt::DecorationRole)
         return QVariant ();
     
-    const KKSRubricBase * rubr = getRubricEntity (index);
+    KKSRubricTreeItem * rItem = getRubricEntity (index);
+    if (!rItem)
+        return QVariant ();
+    const KKSRubricBase * rubr = rItem->getData();
+    if (!rubr)
+        return QVariant ();
     
     switch (role)
     {
@@ -86,18 +92,22 @@ QModelIndex KKSRubricModel :: index (int row, int column, const QModelIndex& par
     if (parent.isValid() && parent.column() != 0)
         return QModelIndex();
 
-    const KKSRubricBase *parentItem = getRubricEntity(parent);
+    KKSRubricTreeItem * rItem = getRubricEntity (parent);
+    if (!rItem)
+        return QModelIndex ();
+    const KKSRubricBase *parentItem = rItem->getData();
     if (!parentItem || parentItem->rubricType() == KKSRubricBase::atRubricItem)
         return QModelIndex();
 
-    const KKSRubric * pRubr = static_cast<const KKSRubric *>(parentItem);
-    if (!pRubr)
-        return QModelIndex();
-    const KKSRubricBase *childItem (0);
-    if (row >= 0 && row < pRubr->rubrics().count())
+//    const KKSRubric * pRubr = static_cast<const KKSRubric *>(parentItem);
+//    if (!pRubr)
+//        return QModelIndex();
+    const KKSRubricTreeItem *childItem (rItem->child(row));
+/*    if (row >= 0 && row < pRubr->rubrics().count())
         childItem = static_cast <const KKSRubricBase *> (pRubr->rubric(row));
     else if  (row >= pRubr->rubrics().count() && row < pRubr->rubrics().count()+pRubr->items().count()) 
         childItem = static_cast <const KKSRubricBase *>(pRubr->item(row-pRubr->rubrics().count()));
+ */
     if (childItem)
         return createIndex(row, column, (void *)childItem);
     else
@@ -109,26 +119,24 @@ QModelIndex KKSRubricModel :: parent (const QModelIndex &index) const
      if (!index.isValid())
          return QModelIndex();
 
-     const KKSRubricBase *childItem = this->getRubricEntity(index);
-     const KKSRubricBase *parentItem = static_cast<const KKSRubricBase *>(childItem->parent());
+     const KKSRubricTreeItem *childItem = this->getRubricEntity(index);
+     const KKSRubricTreeItem *parentItem = childItem->parent();
 
-     if (!parentItem || parentItem == rootRubric)
+     if (!parentItem || parentItem == rootItem)
          return QModelIndex();
 
      int idc = parentItem->childNumber();
-     qDebug () << __PRETTY_FUNCTION__ << idc;
-     if (idc < 0)
-         return QModelIndex();
      return createIndex(idc, 0, (void *)parentItem);
 }
 
 int KKSRubricModel :: rowCount (const QModelIndex& parent) const
 {
-     const KKSRubricBase *parentItem = getRubricEntity (parent);
-     if (!parentItem || parentItem->rubricType() == KKSRubricBase::atRubricItem)
+     const KKSRubricTreeItem *parentItem = getRubricEntity (parent);
+     if (!parentItem || !parentItem->getData() || parentItem->getData()->rubricType() == KKSRubricBase::atRubricItem)
          return 0;
 
-     const KKSRubric* pRubric(0);
+     return parentItem->childCount();
+/*     const KKSRubric* pRubric(0);
      int nrows (0);
      if (parentItem->rubricType() != KKSRubricBase::atOthers)
      {
@@ -140,6 +148,7 @@ int KKSRubricModel :: rowCount (const QModelIndex& parent) const
      else
          nrows = 1;
      return nrows;
+ */
 }
 
 int KKSRubricModel :: columnCount (const QModelIndex& /*parent*/) const
@@ -157,18 +166,19 @@ Qt::ItemFlags KKSRubricModel :: flags (const QModelIndex& index) const
 
 bool KKSRubricModel :: setData (const QModelIndex& index, const QVariant& value, int role)
 {
-    KKSRubricBase * wRubr = getRubricEntity (index);
-    KKSRubric * pRubr = dynamic_cast<KKSRubric *>(getRubricEntity (index.parent()));
-    if (!wRubr || !pRubr)
+    KKSRubricTreeItem * wRubr = getRubricEntity (index);
+    if (!wRubr)
         return false;
     
     if (role == Qt::UserRole+1)
     {
         const KKSRubricBase * wNewRubr = value.value<const KKSRubricBase *>();
-        if (!wNewRubr || wRubr->rubricType() != wNewRubr->rubricType())
+        if (!wNewRubr)
             return false;
         
-        switch (wRubr->rubricType())
+        wRubr->setData(wNewRubr);
+        
+/*        switch (wRubr->rubricType())
         {
             case KKSRubricBase::atOthers:
             {
@@ -196,6 +206,7 @@ bool KKSRubricModel :: setData (const QModelIndex& index, const QVariant& value,
             default:
                 return false;
         }
+ */
         //*wRubr = *wNewRubr;
 /*        if (wRubr->rubricType() == KKSRubricBase::atRubricItem)
         {
@@ -222,14 +233,15 @@ bool KKSRubricModel :: setData (const QModelIndex& index, const QVariant& value,
 
 bool KKSRubricModel :: insertRows (int row, int count, const QModelIndex& parent)
 {
-    const KKSRubricBase * parentItem = getRubricEntity(parent);
-    if (!parentItem || parentItem->rubricType() == KKSRubricBase::atRubricItem)
+    KKSRubricTreeItem * parentItem = getRubricEntity(parent);//->getData();
+    if (!parentItem || !parentItem->getData())
         return false;
-    KKSRubric * pRubric = const_cast<KKSRubric *>(static_cast<const KKSRubric *>(parentItem));
-    if (!pRubric)
-        return false;
+//    KKSRubric * pRubric = const_cast<KKSRubric *>(static_cast<const KKSRubric *>(parentItem));
+//    if (!pRubric)
+//        return false;
     beginInsertRows (parent, row, row+count-1);
-    if (row>=0 && row<=pRubric->rubrics().size())
+    bool isok = parentItem->insertChildren(row, row+count-1);
+/*    if (row>=0 && row<=pRubric->rubrics().size())
     {
         for (int i=0; i<count; i++)
         {
@@ -248,8 +260,9 @@ bool KKSRubricModel :: insertRows (int row, int count, const QModelIndex& parent
         }
         
     }
+ */
     endInsertRows ();
-    return true;
+    return isok;
 }
 
 bool KKSRubricModel :: removeRows (int row, int count, const QModelIndex& parent)
@@ -260,13 +273,33 @@ bool KKSRubricModel :: removeRows (int row, int count, const QModelIndex& parent
     return false;
 }
 
-KKSRubricBase * KKSRubricModel :: getRubricEntity (const QModelIndex& index) const
+KKSRubricTreeItem * KKSRubricModel :: getRubricEntity (const QModelIndex& index) const
 {
      if (index.isValid())
      {
-         KKSRubricBase *item = static_cast<KKSRubricBase*>(index.internalPointer());
+         KKSRubricTreeItem *item = static_cast<KKSRubricTreeItem*>(index.internalPointer());
          if (item) return item;
      }
-     return rootRubric;
+     return rootItem;
 }
 
+void KKSRubricModel :: setupData (KKSRubricTreeItem * parent)
+{
+    if (!parent || !parent->getData() || parent->getData()->rubricType()==KKSRubricBase::atRubricItem)
+        return;
+    
+    const KKSRubricBase * wRubr = parent->getData ();
+    if (wRubr->rubricType() != KKSRubricBase::atOthers)
+    {
+        //
+        // это рубрика (или категорированная рубрика)
+        //
+        const KKSRubric * wRubric = static_cast<const KKSRubric *>(wRubr);
+        for (int i=0; i<wRubric->rubrics().count(); i++)
+        {
+            KKSRubricTreeItem * wrItem = new KKSRubricTreeItem (wRubric->id(), wRubric->rubric(i), parent);
+            parent->appendChild (wrItem);
+            setupData (wrItem);
+        }
+    }
+}

@@ -53,11 +53,24 @@ public:
     
     virtual int rubricType (void) const=0;
     
-    int childNumber (void) const;
+    virtual int childNumber (void) const;
+
+    void addNode (const KKSRubricBase * node);
+    void insertNode (int i, const KKSRubricBase * node);
+    void clearNodes (void);
+    
+    const KKSList<const KKSRubricBase *>& subnodes (void) const;
+    KKSList<const KKSRubricBase *>& subnodes (void);
+    void setNodes (const KKSList<const KKSRubricBase *>& nodes);
+
 protected:
     
     QIcon m_rubrIcon;
     QString m_iconData;
+
+private:
+    KKSList<const KKSRubricBase *> m_subNodes;
+    
 };
 
 class _PP_EXPORT KKSRubricOthers : public KKSRubricBase
@@ -74,16 +87,6 @@ public:
     virtual QPixmap getDefaultIcon (void) const;
     virtual int rubricType (void) const;
 
-    void addNode (const KKSRubricBase * node);
-    void insertNode (int i, const KKSRubricBase * node);
-    void clearNodes (void);
-    
-    const KKSList<const KKSRubricBase *>& subnodes (void) const;
-    KKSList<const KKSRubricBase *>& subnodes (void);
-    void setNodes (const KKSList<const KKSRubricBase *>& nodes);
-
-private:
-    KKSList<const KKSRubricBase *> m_subNodes;
 };
 
 class _PP_EXPORT KKSRubricItem : public KKSRubricBase//public KKSData
@@ -121,7 +124,7 @@ public:
     void setIcon (const QString & s);
  */
     virtual int rubricType (void) const;
-
+   
 private:
     
 //    int m_idItem;

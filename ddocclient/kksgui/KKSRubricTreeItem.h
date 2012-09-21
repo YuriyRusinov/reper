@@ -20,16 +20,16 @@ class KKSRubricBase;
 class _GUI_EXPORT KKSRubricTreeItem
 {
 public:
-    KKSRubricTreeItem (qint64 id, KKSRubricBase * d, KKSRubricTreeItem * parent=0);
+    KKSRubricTreeItem (qint64 id=-1, const KKSRubricBase * d=0, const KKSRubricTreeItem * parent=0);
     ~KKSRubricTreeItem (void);
 
     KKSRubricTreeItem *child(int number);
     int childCount() const;
-    KKSRubricBase * getData() const;
+    const KKSRubricBase * getData() const;
     QVariant columnData (int column);
-    void setData (KKSRubricBase * d);
+    void setData (const KKSRubricBase * d);
     bool insertChildren(int position, int count);
-    KKSRubricTreeItem *parent();
+    const KKSRubricTreeItem *parent() const;
     bool removeChildren(int position, int count);
     int childNumber() const;
     void appendChild (KKSRubricTreeItem * ch);
@@ -40,8 +40,8 @@ public:
     
 private:
     qint64 idItem;
-    KKSRubricBase * data;
-    KKSRubricTreeItem *parentItem;
+    const KKSRubricBase * data;
+    const KKSRubricTreeItem *parentItem;
     QList<KKSRubricTreeItem*> childItems;
 };
 
