@@ -46,6 +46,7 @@ int KKSRubricBase :: id() const
 {
     return 0;
 }
+*/
 
 KKSRubricBase& KKSRubricBase :: operator= (const KKSRubricBase& rb)
 {
