@@ -297,14 +297,21 @@ void KKSRubricModel :: setupData (KKSRubricTreeItem * parent)
         const KKSRubric * wRubric = static_cast<const KKSRubric *>(wRubr);
         for (int i=0; i<wRubric->rubrics().count(); i++)
         {
-            KKSRubricTreeItem * wrItem = new KKSRubricTreeItem (wRubric->rubric(i)->id(), wRubric->rubric(i), parent);
+            KKSRubricTreeItem * wrItem = new KKSRubricTreeItem (wRubric->id(), wRubric->rubric(i), parent);
             parent->appendChild (wrItem);
             setupData (wrItem);
         }
-        for (int i=0; i<wRubric->items().count(); i++)
+    }
+    else
+    {
+        for (int i=0; i<wRubr->subnodes().count(); i++)
         {
-            KKSRubricTreeItem * wrItem = new KKSRubricTreeItem (wRubric->item(i)->id(), wRubric->item(i), parent);
-            parent->appendChild (wrItem);
+            const KKSRubricBase * wr = wRubr->subnodes().at (i);
+            if (!wr)
+                continue;
+            KKSRubricTreeItem * wItem = new KKSRubricTreeItem (wr->id(), wr, parent);
+            parent->appendChild (wItem);
+            setupData (wItem);
         }
     }
 }
