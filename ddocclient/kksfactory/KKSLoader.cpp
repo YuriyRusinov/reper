@@ -3238,7 +3238,7 @@ KKSRubric * KKSLoader::loadRubricators(bool bOnlyMyDocs) const
     return rootRubric;
 }
 
-KKSRubric * KKSLoader::loadCatRubricators(void) const
+KKSRubricBase * KKSLoader::loadCatRubricators(void) const
 {
     QString sql = QString("select * from cgetcategoriesforrubricator() order by id;");
     KKSResult * res = db->execute(sql);
@@ -3248,7 +3248,7 @@ KKSRubric * KKSLoader::loadCatRubricators(void) const
         return NULL;
     }
     
-    KKSRubric * rootRubric = new KKSRubric(-1, "Categories rubric for all tree");
+    KKSRubricBase * rootRubric = new KKSRubricOthers (-1, QObject::tr("Others"));//KKSRubric(-1, "Categories rubric for all tree");
 
     int cnt = res->getRowCount();
     for(int i=0; i<cnt; i++){
@@ -3267,23 +3267,22 @@ KKSRubric * KKSLoader::loadCatRubricators(void) const
 
         int type = 0;//res->getCellAsInt(i, 8);
 
-        if(type == 0){//rubricator
-            KKSRubric * theRubric = new KKSRubric(id, name);
-            theRubric->setCategorized (true);
-            theRubric->setCode(code);
-            theRubric->setDesc(desc);
-            theRubric->setSearchTemplate (st);
-            theRubric->setCategory(c);
-            theRubric->setIcon(icon);
-            //loadPrivileges (theRubric);
-            theRubric->m_intId = id;
-            KKSList<const KKSRubricItem*> rItems = loadCatRubricItems (c);
-            theRubric->setItems (rItems);
+        KKSRubric * theRubric = new KKSRubric(id, name);
+        theRubric->setCategorized (true);
+        theRubric->setCode(code);
+        theRubric->setDesc(desc);
+        theRubric->setSearchTemplate (st);
+        theRubric->setCategory(c);
+        theRubric->setIcon(icon);
+        //loadPrivileges (theRubric);
+        theRubric->m_intId = id;
+        KKSList<const KKSRubricItem*> rItems = loadCatRubricItems (c);
+        theRubric->setItems (rItems);
+        theRubric->setParent (rootRubric);
 
-            rootRubric->addRubric(theRubric);
-            theRubric->release();
-        }
-        else if(type == 1){//rubrics
+        rootRubric->addNode(theRubric);//>addRubric(theRubric);
+        theRubric->release();
+/*        else if(type == 1){//rubrics
             KKSRubric * subRubric = new KKSRubric(id, name);
             subRubric->setCode(code);
             subRubric->setDesc(desc);
@@ -3307,7 +3306,6 @@ KKSRubric * KKSLoader::loadCatRubricators(void) const
             parent->addRubric(subRubric);
             subRubric->release();
         }
-/*
         else if(type == 2){//rubric items
             bool b = res->getCellAsBool(i, 10);
             KKSRubricItem * item = new KKSRubricItem(id, name, b);

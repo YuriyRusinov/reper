@@ -98,14 +98,17 @@ KKSIncludesWidget * KKSRubricFactory :: createRubricEditor (int mode, const KKSL
         if (isIns)
         {
             QModelIndex wIndex = rubrMod->index (nr, 0);
-            const KKSRubricBase * rOthers = new KKSRubricOthers (-1, tr("Others"));
+            const KKSRubricBase * rOthers = loader->loadCatRubricators ();//new KKSRubricOthers (-1, tr("Others"));
             bool isRubrDataSet = rubrMod->setData (wIndex, QVariant::fromValue<const KKSRubricBase *>(rOthers), Qt::UserRole+1);
-            bool isDataSet = rubrMod->setData (wIndex, tr("Others"), Qt::DisplayRole);
-            bool isTypeSet = rubrMod->setData (wIndex, atOthers, Qt::UserRole);
-            bool isIconSet = rubrMod->setData (wIndex, KKSRubric::icon().scaled(24, 24), Qt::DecorationRole);
-            KKSRubric * cRubric = loader->loadCatRubricators ();
-            if (isRubrDataSet && isDataSet && isTypeSet && isIconSet)
-                iW->addRubricIntoModel (cRubric, wIndex);
+//            bool isDataSet = rubrMod->setData (wIndex, tr("Others"), Qt::DisplayRole);
+//            bool isTypeSet = rubrMod->setData (wIndex, atOthers, Qt::UserRole);
+//            bool isIconSet = rubrMod->setData (wIndex, KKSRubric::icon().scaled(24, 24), Qt::DecorationRole);
+//            int nrc = rubrMod->rowCount (wIndex);
+//            const KKSRubric * cRubric = loader->loadCatRubricators ();
+//            rubrMod->insertRows (nrc, 1, wIndex);
+//            rubrMod->setData (rubrMod->index (nrc, 0, wIndex), QVariant::fromValue<const KKSRubricBase *>(cRubric), Qt::UserRole+1);
+//            if (isRubrDataSet && isDataSet && isTypeSet && isIconSet)
+//                iW->addRubricIntoModel (cRubric, wIndex);
         }
     }
     KKSEventFilter *ef = new KKSEventFilter (iW);

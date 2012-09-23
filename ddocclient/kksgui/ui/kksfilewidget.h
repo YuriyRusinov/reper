@@ -29,7 +29,7 @@ public:
     const KKSList<KKSFileType*> & fileTypes() const;
 
 signals:
-    void downloadFile(KKSFile *f, const QWidget* parent);
+    void downloadFile(KKSFile *f, QWidget* parent);
     void fileListChanged();
 
 private slots:

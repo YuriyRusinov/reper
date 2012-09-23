@@ -43,5 +43,5 @@ int main(int argc, char *argv[])
     int r = app.exec();//qApp->exec();
 
     delete mainWindow;
-	return r;
+    return r;
 }

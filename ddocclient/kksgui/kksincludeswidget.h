@@ -20,6 +20,7 @@ class QAbstractItemModel;
 
 class KKSRubric;
 class KKSRubricItem;
+class KKSRubricBase;
 class RubricForm;
 class KKSRecWidget;
 
@@ -123,14 +124,15 @@ private:
     // Functions
     //
     void initActions (void);
-    KKSRubric * currentRubric();
-    KKSRubric * getRubric(QModelIndex index);
+    const KKSRubric * currentRubric();
+    const KKSRubric * getRubric(QModelIndex index);
 
     QModelIndex appendRubricRow(const KKSRubric * r, QModelIndex index);
     QModelIndex appendItemRow(const KKSRubricItem * item, QModelIndex index);
     void initTwIncludes();
     void parseRubric(KKSRubric * r, QModelIndex index);
     void parseItems(KKSRubric * r, QModelIndex index);
+    void expandAllIndexes (const QModelIndex& parent) const;
 };
 
 
