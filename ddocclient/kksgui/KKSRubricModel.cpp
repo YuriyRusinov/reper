@@ -1,6 +1,6 @@
 /* 
  * File:   KKSRubricModel.cpp
- * Author: rusinov
+ * Author: yuriyrusinov
  * 
  * Created on 14 Сентябрь 2012 г., 11:44
  */
@@ -239,7 +239,7 @@ void KKSRubricModel :: setupData (KKSRubricTreeItem * parent)
         }
         for (int i=0; i<wRubric->items().count(); i++)
         {
-            KKSRubricTreeItem * wrItem = new KKSRubricTreeItem (wRubric->rubric(i)->id(), wRubric->rubric(i), parent);
+            KKSRubricTreeItem * wrItem = new KKSRubricTreeItem (wRubric->item(i)->id(), wRubric->item(i), parent);
             parent->appendChild (wrItem);
         }
     }
