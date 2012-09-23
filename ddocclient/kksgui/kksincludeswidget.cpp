@@ -123,7 +123,8 @@ KKSIncludesWidget::~KKSIncludesWidget()
 
 void KKSIncludesWidget::init()
 {
-    QStandardItemModel * model = new QStandardItemModel (0, 1);
+    QAbstractItemModel * model = new KKSRubricModel (m_rootRubric);
+    //new KKSRubricModel (m_rootRubric);new QStandardItemModel (0, 1);
     model->setHeaderData(0, Qt::Horizontal, tr("Name"), Qt::DisplayRole);
 
     QItemDelegate * includesDelegate = new KKSItemDelegate ();//this);
@@ -132,7 +133,7 @@ void KKSIncludesWidget::init()
     twIncludes->header()->resizeSection(0, 550);
     twIncludes->setModel (model);
 
-    initTwIncludes();
+    //initTwIncludes();
 }
 
 void KKSIncludesWidget :: initActions (void)
