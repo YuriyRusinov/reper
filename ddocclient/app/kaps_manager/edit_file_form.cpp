@@ -87,6 +87,16 @@ QDateTime EditFileForm::timeShoot()
 void EditFileForm::on_tbAddFile_clicked()
 {
     QString url = QFileDialog::getOpenFileName(this, tr("Добавление файла в проект"), projectDir);
+    m_fileUrl = url;
+    QFileInfo f(url);
+    url = f.fileName();
+    
     UI->leFilePath->setText(url);
 
 }
+
+QString EditFileForm::fileUrl()
+{
+    return m_fileUrl;
+}
+

@@ -38,6 +38,8 @@ public:
     void setRegion(const QString & region);
     QString region();
 
+    QString fileUrl();
+
 private slots:
 
     void on_pbOK_clicked();
@@ -51,6 +53,7 @@ public:
     
     Ui::edit_file_form *UI;
     QString projectDir;
+    QString m_fileUrl;
 
 };
 

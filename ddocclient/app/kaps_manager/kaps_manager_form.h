@@ -48,6 +48,8 @@ private slots:
     void editFile();
     void delFile();
 
+    void getFileFromDD();
+
 private:
 	
     void initConnections();
@@ -70,10 +72,32 @@ private:
 
     int updateTaskInDB(int id, int idKaps, const QString & name, const QString & desc, const QString & folder);
     int updateTaskVarInDB(int id, int idTask, const QString & name, const QString & desc, const QString & folder, const QString & author, const QString & region, const QDate & date);
-    int updateFileInDB(int id, int idTaskVar, int idType, const QString & name, const QString & url, const QString & ka, const QString & region, const QDateTime & timeShoot);
+    int updateFileInDB(int id, 
+                       int idTaskVar, 
+                       int idType, 
+                       const QString & name,
+                       const QString & fileName,
+                       const QString & url, 
+                       const QString & ka, 
+                       const QString & region, 
+                       const QDateTime & timeShoot,
+                       int * idF); //11111
     int deleteTaskInDB(int idTask);
     int deleteTaskVarInDB(int idTaskVar);
     int deleteFileInDB(int idFile);
+
+    int addFileToDD(const QString & url, const QString & name, int idFile);
+    int rInsertUrl(const QString & fileName, int fileType, const QString & fileExt);
+    int createFileInDD(int idUrl, const QString & localUrl);
+
+    int downloadFile(int idF, const QString & localUrl);
+    int getFileForItem(QTreeWidgetItem * item);//22222
+    QString getFileFolder(int idType);
+    QString getCurrentKapsFolder();
+    QString getCurrentTaskFolder();
+    QString getCurrentTaskVarFolder();
+    QString getRootFolder();
+
 
     void initKapsData();
 
