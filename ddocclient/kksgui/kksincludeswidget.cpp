@@ -297,8 +297,7 @@ QModelIndex KKSIncludesWidget::appendRubricRow(const KKSRubric * r, QModelIndex 
     {
         int pType = model->data(model->index(i, 0, index), Qt::UserRole+2).toInt();
         int cType = model->data(model->index(i+1, 0, index), Qt::UserRole+2).toInt();
-        if (pType != KKSRubricBase::atRubricItem &&
-            cType == KKSRubricBase::atRubricItem )
+        if (pType != cType )
         {
             rpos = i+1;
         }
