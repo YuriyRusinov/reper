@@ -994,8 +994,10 @@ const KKSRubric * KKSIncludesWidget::getRubric(QModelIndex index)
             return 0;
         return static_cast<const KKSRubric *>(wrp);
     }
-    else
+    else if (wr->rubricType() != KKSRubricBase::atOthers)
         return static_cast<const KKSRubric *>(wr);
+    else
+        return 0;
 /*    if (index.parent().isValid())
     {
         KKSRubric * r = getRubric(index.parent());
