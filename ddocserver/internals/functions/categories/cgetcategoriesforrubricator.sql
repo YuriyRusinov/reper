@@ -24,14 +24,9 @@ begin
             t.is_qualifier,
             c.id_child2
         from 
-            io_categories c,
-            io_category_types t,
-            io_states st
-        where 
-            c.is_main = true
-            and c.id_io_category_type not in (8, 9, 10)
-            and c.id_io_category_type = t.id
-            and st.id = c.id_io_state
+            io_categories c inner join
+            io_category_types t on (c.is_main = true and c.id_io_category_type not in (8, 9, 10) and c.id_io_category_type = t.id) inner join
+            io_states st on (st.id = c.id_io_state)
     loop
         return next r;
     end loop;
