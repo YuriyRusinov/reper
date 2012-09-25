@@ -120,7 +120,7 @@ public:
                       QString tDelim, // разделитель текста
                       KKSObjEditor *oEditor // родительский редактор ИО и ЭИО
                       );
-
+    
     KKSSearchTemplate * loadSearchTemplate (void) const;
     KKSObjEditor* createObjEditorParam (int idObject,// идентификатор ИО, который будет содержать создаваемый (редактируемый) ЭИО (для ЭИО, которые являются ИО этот идентификатор должен быть равен IO_IO_ID)
                                         qint64 idObjE, // идентификатор создаваемого (редактируемого) ЭИО. Если ЭИО создается, должно быть равно -1

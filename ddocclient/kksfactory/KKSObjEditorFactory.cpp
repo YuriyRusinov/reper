@@ -5075,7 +5075,7 @@ void KKSObjEditorFactory :: exportEIO (KKSObjEditor * editor, int idObject, cons
         QString tDelim = xmlForm->getTextDelimiter ();
         QFile *fXml = new QFile (xmlFileName);
         fXml->open (QIODevice::WriteOnly);
-        int res = this->exportHeader (fXml, c0/*io->category()->tableCategory()*/, charSet, fDelim, tDelim, editor);
+        int res = this->exportHeader (fXml, c0, charSet, fDelim, tDelim, editor);
         fXml->close ();
         delete fXml;
         if (res == ERROR_CODE)
@@ -5088,7 +5088,8 @@ void KKSObjEditorFactory :: exportEIO (KKSObjEditor * editor, int idObject, cons
             return;
         }
         QFile fCSV (csvFileName);
-        res = this->exportCopies (&fCSV, c0 /*io->category()->tableCategory()*/, oeList, charSet, fDelim, tDelim, editor, tableName);
+        //res = this->exportCopies (&fCSV, c0, oeList, charSet, fDelim, tDelim, editor, tableName);
+        res = this->exportCopies (&fCSV, c0, objEx, charSet, fDelim, tDelim, editor);//, tableName);
         if (res == ERROR_CODE)
         {
             if (io)
@@ -5598,10 +5599,30 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // צוכוגמי CSV פאיכ
             KKSAttrView * v = attrs_list [ii];
             QString attrCode = v->code();
             QString attrValue = d->fields().value(attrCode);
-            if (v->type()->attrType() == KKSAttrType::atDouble || v->type()->attrType() == KKSAttrType::atInt)
-                oeStream << attrValue;
-            else
-                oeStream << tDelim << attrValue << tDelim;
+            KKSAttrType::KKSAttrTypes aType = v->type()->attrType();
+            switch (aType)
+            {
+                case KKSAttrType::atDouble:
+                case KKSAttrType::atInt:
+                {
+                    oeStream << attrValue;
+                    break;
+                }
+                case KKSAttrType::atList:
+                case KKSAttrType::atRecordColorRef:
+                case KKSAttrType::atRecordTextColorRef:
+                {
+                    oeStream << tDelim << attrValue << tDelim << tDelim << d->sysFields().value (attrCode) << tDelim;
+                    break;
+                }
+                case KKSAttrType::atParent:
+                {
+                    oeStream << tDelim << d->fields().value ("id") << tDelim << tDelim << d->sysFields().value ("id") << tDelim;
+                    break;
+                }
+                default:
+                    oeStream << tDelim << attrValue << tDelim;
+            }
 
             if (ii < attrs_list.count()-1)
                 oeStream << fDelim;
