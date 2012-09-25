@@ -5033,7 +5033,7 @@ void KKSObjEditorFactory :: exportEIO (KKSObjEditor * editor, int idObject, cons
     KKSList<KKSObjectExemplar*> oeList;
     QList<int> idOe;
     this->getModelIds (recModel, QModelIndex(), idOe);
-    for (int i=0; i<idOe.count(); i++)
+/*    for (int i=0; i<idOe.count(); i++)
     {
         int id = idOe[i];//wIndex.data (Qt::UserRole).toInt();
         KKSObjectExemplar * oe = loader->loadEIO (id, io, c0, tableName);
@@ -5046,6 +5046,8 @@ void KKSObjEditorFactory :: exportEIO (KKSObjEditor * editor, int idObject, cons
         oeList.append (oe);
         oe->release ();
     }
+ */
+    Q_UNUSED (idOe);
 
     KKSMap<qint64, KKSEIOData *> objEx = loader->loadEIOList (c0, tableName, editor->filters());
     KKSXMLForm *xmlForm = new KKSXMLForm (io, tr("Export IO %1").arg (io->name()), true, editor);
@@ -5617,6 +5619,7 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // צוכוגמי CSV פאיכ
                 }
                 case KKSAttrType::atParent:
                 {
+                    qDebug () << __PRETTY_FUNCTION__ << d->fields() << d->sysFields();
                     oeStream << tDelim << d->fields().value ("id") << tDelim << tDelim << d->sysFields().value ("id") << tDelim;
                     break;
                 }
