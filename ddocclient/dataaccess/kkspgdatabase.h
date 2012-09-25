@@ -44,7 +44,7 @@ class __DA_EXPORT KKSPGDatabase : public KKSDatabase
 
 #ifdef USE_NOTIFY
         void addListener( IListener* listener, const char* notify_name );
-        void removeListener( IListener* listener, const char* notify_name );
+        void  removeListener( IListener* listener, const char* notify_name );
         void startListen();
         void stopListen();
         void checkNotifies();
