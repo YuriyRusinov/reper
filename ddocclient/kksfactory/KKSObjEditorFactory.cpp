@@ -5614,6 +5614,7 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // צוכוגמי CSV פאיכ
                 case KKSAttrType::atRecordColorRef:
                 case KKSAttrType::atRecordTextColorRef:
                 {
+                    qDebug () << __PRETTY_FUNCTION__ << d->fields() << d->sysFields();
                     oeStream << tDelim << attrValue << tDelim << tDelim << d->sysFields().value (attrCode) << tDelim;
                     break;
                 }
