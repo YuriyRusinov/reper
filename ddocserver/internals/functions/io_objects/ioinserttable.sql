@@ -272,7 +272,7 @@ begin
 
     execute create_query;
     if (not FOUND) then
-        raise exception 'Cannot create table %', table_name;
+        raise exception E'Cannot create table % \n The  query is %', table_name, create_query;
         return NULL;
     end if;
 
