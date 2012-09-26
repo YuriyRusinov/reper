@@ -5615,13 +5615,13 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // צוכוגמי CSV פאיכ
                 case KKSAttrType::atRecordTextColorRef:
                 {
                     qDebug () << __PRETTY_FUNCTION__ << d->fields() << d->sysFields();
-                    oeStream << tDelim << attrValue << tDelim << tDelim << d->sysFields().value (attrCode) << tDelim;
+                    oeStream << tDelim << d->sysFields().value (attrCode+"_uid") << tDelim;
                     break;
                 }
                 case KKSAttrType::atParent:
                 {
                     qDebug () << __PRETTY_FUNCTION__ << d->fields() << d->sysFields();
-                    oeStream << tDelim << d->fields().value ("id") << tDelim << tDelim << d->sysFields().value ("id") << tDelim;
+                    oeStream << tDelim << d->sysFields().value (attrCode+"_uid") << tDelim;
                     break;
                 }
                 default:
