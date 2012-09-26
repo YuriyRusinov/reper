@@ -933,7 +933,7 @@ KKSEIOData * KKSViewFactory :: getRecordData (const KKSObjectExemplar * rec)
         QString code = QString(rec->attrValueIndex(col)->attribute()->code(false));//использование названия колонки для ключа QMap в классе KKSEIOData допустимо
         QString value = QString(rec->attrValueIndex(col)->value().value());
 
-        if(code == "ii_rec_order" || code == "id"){
+        if(code == "ii_rec_order" || code == "id" || code == "unique_id"){
             dRec->addSysField(code, value);
         }
         //в данном случае получение атрибута по его коду (хотя он и не является уникальным) 

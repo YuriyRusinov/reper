@@ -48,6 +48,9 @@ private slots:
     void editFile();
     void delFile();
 
+    void downloadAllFiles();
+    void uploadAllFiles();
+
     void getFileFromDD();
 
 private:
@@ -91,6 +94,8 @@ private:
     int createFileInDD(int idUrl, const QString & localUrl);
 
     int downloadFile(int idF, const QString & localUrl);
+    void uploadFile(const QString & file, const QString & fUrl, int idType);
+
     int getFileForItem(QTreeWidgetItem * item);//22222
     QString getFileFolder(int idType);
     QString getCurrentKapsFolder();
@@ -100,10 +105,12 @@ private:
 
 
     void initKapsData();
+    void initSettingsFile();
 
     
     Ui::kaps_manager_form *UI;
 	KKSDatabase * db;
+    QString currentAppPath;
 
 };
 

@@ -14,7 +14,7 @@
 #include <KKSLoader.h>
 #include <KKSFileLoader.h>
 #include <QFile>
-
+#include <QSettings>
 
 
 KapsManagerForm::KapsManagerForm(KKSDatabase * db, QWidget *parent, Qt::WFlags f)
@@ -25,6 +25,9 @@ KapsManagerForm::KapsManagerForm(KKSDatabase * db, QWidget *parent, Qt::WFlags f
 
     this->db = db;
 
+    currentAppPath = QDir::currentPath();
+
+    initSettingsFile();
     initConnections();
     initKapsData();
 	
@@ -64,6 +67,8 @@ void KapsManagerForm::initConnections()
     connect(UI->tbEditFile, SIGNAL(clicked()), this, SLOT(editFile()));
     connect(UI->tbDelFile, SIGNAL(clicked()), this, SLOT(delFile()));
     connect(UI->tbDownloadFile, SIGNAL(clicked()), this, SLOT(getFileFromDD()));
+    connect(UI->tbDownloadAll, SIGNAL(clicked()), this, SLOT(downloadAllFiles()));
+    connect(UI->tbUploadAll, SIGNAL(clicked()), this, SLOT(uploadAllFiles()));
 }
 
 void KapsManagerForm::initKapsData()
@@ -361,6 +366,9 @@ int KapsManagerForm::getCurrentFile()
 
 void KapsManagerForm::addTask()
 {
+    if(!UI->tvKaps->currentItem())
+        return;
+
     int idKaps = UI->tvKaps->currentItem()->data(0, Qt::UserRole+1).toInt();
     if(idKaps <= 0)
         return;
@@ -394,6 +402,9 @@ void KapsManagerForm::addTask()
 
 void KapsManagerForm::editTask()
 {
+    if(!UI->tvKaps->currentItem())
+        return;
+
     int idKaps = UI->tvKaps->currentItem()->data(0, Qt::UserRole+1).toInt();
     if(idKaps <= 0)
         return;
@@ -463,6 +474,9 @@ void KapsManagerForm::delTask()
 
 void KapsManagerForm::addTaskVar()
 {
+    if(!UI->tvTasks->currentItem())
+        return;
+
     int idTask = UI->tvTasks->currentItem()->data(0, Qt::UserRole+1).toInt();
     if(idTask <= 0)
         return;
@@ -584,7 +598,10 @@ void KapsManagerForm::delTaskVar()
 
 void KapsManagerForm::addFile()
 {
-    QString projectDir;
+    if(!UI->tvTaskVars->currentItem())
+        return;
+
+    //QString projectDir;
     int idTaskVar = UI->tvTaskVars->currentItem()->data(0, Qt::UserRole+1).toInt();
     if(idTaskVar <= 0)
         return;
@@ -606,7 +623,13 @@ void KapsManagerForm::addFile()
     }
     int idType = index + 1;
 
-    EditFileForm * f = new EditFileForm(projectDir, this);
+    QString rootFolder = getRootFolder();
+    QString kapsFolder = getCurrentKapsFolder();
+    QString taskFolder = getCurrentTaskFolder();
+    QString taskVarFolder = getCurrentTaskVarFolder();
+    QString dir = rootFolder + "/" + kapsFolder + "/" + taskFolder + "/" + taskVarFolder;
+
+    EditFileForm * f = new EditFileForm(dir, this);
     if(f->exec() != QDialog::Accepted){
         delete f;
         return;
@@ -622,7 +645,9 @@ void KapsManagerForm::addFile()
     int idF = 0;
     int id = updateFileInDB(-1, idTaskVar, idType, name, fileName, url, ka, region, timeShoot, &idF);
     if(id <= 0){
-        QMessageBox::critical(this, tr("Ошибка"), tr("Произошла ошибка при создании нового файла в БД!"));
+        if(id != -100)//ошибки нет, просто пользователь решил не заменять сущемствующий в БД файл на новый
+            QMessageBox::critical(this, tr("Ошибка"), tr("Произошла ошибка при создании нового файла в БД!"));
+        delete f;
         return;
     }
     
@@ -646,6 +671,9 @@ void KapsManagerForm::addFile()
 
 void KapsManagerForm::editFile()
 {
+    if(!UI->tvTaskVars->currentItem())
+        return;
+
     QString projectDir;
     int idTaskVar = UI->tvTaskVars->currentItem()->data(0, Qt::UserRole+1).toInt();
     if(idTaskVar <= 0)
@@ -677,7 +705,13 @@ void KapsManagerForm::editFile()
     int idFile = item->data(0, Qt::UserRole+3).toInt();
     
 
-    EditFileForm* f = new EditFileForm(projectDir, this);
+    QString rootFolder = getRootFolder();
+    QString kapsFolder = getCurrentKapsFolder();
+    QString taskFolder = getCurrentTaskFolder();
+    QString taskVarFolder = getCurrentTaskVarFolder();
+    QString dir = rootFolder + "/" + kapsFolder + "/" + taskFolder + "/" + taskVarFolder;
+
+    EditFileForm* f = new EditFileForm(dir, this);
     f->setName(name);
     f->setKA(ka);
     f->setFilePath(fileName);
@@ -696,13 +730,16 @@ void KapsManagerForm::editFile()
     ka = f->KA();
     region = f->region();
     timeShoot = f->timeShoot();
+    QString url = f->fileUrl();
 
     int id = item->data(0, Qt::UserRole+1).toInt();
     
     int idF = item->data(0, Qt::UserRole+3).toInt();
-    id = updateFileInDB(id, idTaskVar, idType, name, fileName, QString::null, ka, region, timeShoot, &idF);
+    id = updateFileInDB(id, idTaskVar, idType, name, fileName, url, ka, region, timeShoot, &idF);
     if(id <= 0){
-        QMessageBox::critical(this, tr("Ошибка"), tr("Произошла ошибка при изменении нового проекта в БД!"));
+        if(id != -100)//ошибки нет, просто пользователь решил не заменять сущемствующий в БД файл на новый
+            QMessageBox::critical(this, tr("Ошибка"), tr("Произошла ошибка при изменении нового проекта в БД!"));
+        delete f;
         return;
     }
     
@@ -839,27 +876,93 @@ int KapsManagerForm::updateFileInDB(int id,
     int idFile = id;
 
     QString sql;
+    bool bFileExist = true;//используется при обновлении файла. Если пользователь выбрал на форме с метаданными файла новый файл, то мы тогда спросим, заменить ли существующий на сервере на данный
     
     if(idFile < 0){
-        sql = QString("select nextval('files_id_seq')");
-        KKSResult * res = db->execute(sql);
-        if(!res || res->getRowCount() != 1){
-            if(res)
-                delete res;
+        sql = QString("select id, id_file from files where id_type = %1 and id_task_var = %2 and url = '%3' limit 1")
+                                     .arg(QString::number(idType))
+                                     .arg(QString::number(idTaskVar))
+                                     .arg(fileName);
+        KKSResult * r = db->execute(sql);
+        if(!r)
             return -1;
+
+        bool bUpdate = false;//если данный флаг будет выставлен в TRUE, то пользователь выбрал операцию обновления существующего файла
+
+        if(r->getRowCount() != 0){
+            int idFile = r->getCellAsInt(0, 0);
+            int idF = r->getCellAsInt(0, 1);
+
+            int ok = QMessageBox::warning(this, tr("Внимание!"), tr("В текущем проекте уже присутствует файл с названием:\n%1\nБудет осуществлена замена его новым. Обновить при этом записанные в БД метаданные?\nОтвет Да - будет произведена замена файла и метаданных\nОтвет Нет - будет произведена только замена файла\nОтвет Отмена - файл и его метаданные в БД останутся без изменений.").arg(fileName), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+            if(ok == QMessageBox::Yes){
+                int yes = deleteFileInDB(idFile);
+                if(yes <= 0){
+                    //QMessageBox::critical(this, tr("Ошибка"), tr("Произошла ошибка при замене файла на новый. Операция с данным файлом прервана"), QMessageBox::Ok);
+                    return -1;
+                }
+            }
+            else if(ok == QMessageBox::Cancel){
+                return -100;//ошибки нет, просто пользователь решил не заменять сущемствующий в БД файл на новый
+            }
+            else{
+                bUpdate = true;
+                //удалим файл из ФС сервера
+                QString s = QString("select rDeleteFile(id_file) from files where id = %1 and id_file is not null").arg(QString::number(idFile));
+                KKSResult * res = db->execute(s);
+                if(!res || res->getRowCount() != 1){
+                    if(res)
+                        delete res;
+
+                    return -1;
+                }
+                delete res;
+
+                //удалим запись из таблицы io_urls
+                s = QString("update files set id_file = NULL where id = %1; delete from io_urls where id = %2")
+                                    .arg(QString::number(idFile))
+                                    .arg(QString::number(idF));
+                res = db->execute(s);
+                if(!res || res->resultStatus() != KKSResult::CommandOk){
+                    if(res)
+                        delete res;
+
+                    return -1;
+                }
+                delete res;
+
+                sql = QString("update files set name = '%1', url = '%2' where id = %3")
+                                    .arg(name)
+                                    .arg(fileName)
+                                    .arg(QString::number(idFile));
+
+
+                
+            }
         }
-        idFile = res->getCellAsInt(0, 0);
-        sql = QString("insert into files (id, id_task_var, id_type, name, url, ka_type, shooting_time, region) values (%1, %2, %3, '%4', '%5', '%6', '%7'::timestamp, '%8')")
-                            .arg(QString::number(idFile))
-                            .arg(QString::number(idTaskVar))
-                            .arg(idType)
-                            .arg(name)
-                            .arg(fileName)
-                            .arg(ka)
-                            .arg(timeShoot.toString("dd.MM.yyyy hh:mm"))
-                            .arg(region);
+
+        delete r;
+
+        if(!bUpdate){
+            sql = QString("select nextval('files_id_seq')");
+            KKSResult * res = db->execute(sql);
+            if(!res || res->getRowCount() != 1){
+                if(res)
+                    delete res;
+                return -1;
+            }
+            idFile = res->getCellAsInt(0, 0);
+            sql = QString("insert into files (id, id_task_var, id_type, name, url, ka_type, shooting_time, region) values (%1, %2, %3, '%4', '%5', '%6', '%7'::timestamp, '%8')")
+                                .arg(QString::number(idFile))
+                                .arg(QString::number(idTaskVar))
+                                .arg(idType)
+                                .arg(name)
+                                .arg(fileName)
+                                .arg(ka)
+                                .arg(timeShoot.toString("dd.MM.yyyy hh:mm"))
+                                .arg(region);
+        }
     }
-    else
+    else{
         sql = QString("update files set name = '%1', url = '%2', ka_type = '%3', shooting_time = '%5'::timestamp, region = '%6' where id = %4")
                             .arg(name)
                             .arg(fileName)
@@ -867,6 +970,50 @@ int KapsManagerForm::updateFileInDB(int id,
                             .arg(QString::number(idFile))
                             .arg(timeShoot.toString("dd.MM.yyyy hh:mm"))
                             .arg(region);
+
+        if(QFile::exists(url)){
+            int ok = QMessageBox::question(this, tr("Внимание!"), tr("Заменить также файл новым?"), QMessageBox::Yes | QMessageBox::No);
+            if(ok == QMessageBox::No)
+                bFileExist = false;//просто заменять файл не будем
+            else{
+                QString s = QString("select id_file from files where id = %1")
+                                             .arg(QString::number(idFile));
+                KKSResult * r = db->execute(s);
+                if(!r || r->getRowCount() == 0){
+                    if(r)
+                        delete r;
+                    return -1;
+                }
+                int idF = r->getCellAsInt(0, 0);
+                //удалим файл из ФС сервера
+                s = QString("select rDeleteFile(id_file) from files where id = %1 and id_file is not null").arg(QString::number(idFile));
+                KKSResult * res = db->execute(s);
+                if(!res || res->getRowCount() != 1){
+                    if(res)
+                        delete res;
+
+                    return -1;
+                }
+                delete res;
+
+                //удалим запись из таблицы io_urls
+                s = QString("update files set id_file = NULL where id = %1; delete from io_urls where id = %2")
+                                    .arg(QString::number(idFile))
+                                    .arg(QString::number(idF));
+                res = db->execute(s);
+                if(!res || res->resultStatus() != KKSResult::CommandOk){
+                    if(res)
+                        delete res;
+
+                    return -1;
+                }
+                delete res;            }
+        }
+        else{
+            bFileExist = false;
+        }
+
+    }
 
     KKSResult * res = db->execute(sql);
     if(!res || res->resultStatus() != KKSResult::CommandOk){
@@ -876,9 +1023,11 @@ int KapsManagerForm::updateFileInDB(int id,
         return -1;
     }
 
-    int idF1 = addFileToDD(url, name, idFile);
-    if(idF)
-        *idF = idF1;
+    if(bFileExist){
+        int idF1 = addFileToDD(url, name, idFile);
+        if(idF)
+            *idF = idF1;
+    }
 
     return idFile;
 }
@@ -1058,18 +1207,42 @@ void KapsManagerForm::getFileFromDD()
 
 }
 
+void KapsManagerForm::initSettingsFile()
+{
+    if(!QFile::exists(currentAppPath + "./settings.ini")){
+        QFile f(currentAppPath + "./settings.ini");
+        f.open(QIODevice::WriteOnly);
+        f.close();
+        QSettings s(currentAppPath + "./settings.ini", QSettings::IniFormat, this);
+        s.setValue("root_folder", "C:\\R_KT");
+        s.setValue("snimki", "snimki");
+        s.setValue("src_data", "src_data");
+        s.setValue("med_data", "med_data");
+        s.setValue("result_data", "result_data");
+    }
+}
+
 QString KapsManagerForm::getFileFolder(int idType)
 {
+    initSettingsFile();
+
+    QSettings s(currentAppPath + "./settings.ini", QSettings::IniFormat, this);
+    QString snimki = s.value("snimki", "snimki").toString();
+    QString src_data = s.value("src_data", "src_data").toString();
+    QString med_data = s.value("med_data", "med_data").toString();
+    QString result_data = s.value("result_data", "result_data").toString();
+
+
     QString rootFolder = getRootFolder();
     QString kapsFolder = getCurrentKapsFolder();
     QString taskFolder = getCurrentTaskFolder();
     QString taskVarFolder = getCurrentTaskVarFolder();
     QString fFolder;
     switch(idType){
-        case 1: fFolder = "snimki"; break;
-        case 2: fFolder = "src_data"; break;
-        case 3: fFolder = "med_data"; break;
-        case 4: fFolder = "result_data"; break;
+        case 1: fFolder = snimki; break;
+        case 2: fFolder = src_data; break;
+        case 3: fFolder = med_data; break;
+        case 4: fFolder = result_data; break;
         default: return QString::null; break;
     }
 
@@ -1084,5 +1257,124 @@ QString KapsManagerForm::getFileFolder(int idType)
 
 QString KapsManagerForm::getRootFolder()
 {
-    return "C:\\R_KT";
+    initSettingsFile();
+
+    QSettings s(currentAppPath + "./settings.ini", QSettings::IniFormat, this);
+    QString rootFolder = s.value("root_folder", "C:\\R_KT2").toString();
+    return rootFolder;
+}
+
+void KapsManagerForm::downloadAllFiles()
+{
+    if(!UI->tvTaskVars->currentItem())
+        return;
+
+    int cnt = UI->tvFiles->topLevelItemCount();
+    for(int i=0; i<cnt; i++){
+        QTreeWidgetItem * item = UI->tvFiles->topLevelItem(i);
+        if(!item)
+            continue;
+
+        int childsCount = item->childCount();
+        if(childsCount <= 0)
+            continue;
+        for(int j=0; j<childsCount; j++){
+            QTreeWidgetItem *child = item->child(j);
+            int res = getFileForItem(child);
+            if(res <= 0){
+                qWarning() << "ERROR was occured while downloading file to local file system!";
+            }
+        }
+    }
+    
+}
+
+void KapsManagerForm::uploadAllFiles()
+{
+    if(!UI->tvTaskVars->currentItem())
+        return;
+
+    QString rootFolder = getRootFolder();
+    QString kapsFolder = getCurrentKapsFolder();
+    QString taskFolder = getCurrentTaskFolder();
+    QString taskVarFolder = getCurrentTaskVarFolder();
+    QString dir = rootFolder + "/" + kapsFolder + "/" + taskFolder + "/" + taskVarFolder;
+
+    QSettings s(currentAppPath + "./settings.ini", QSettings::IniFormat, this);
+    //снимки
+    QString snimki = s.value("snimki", "snimki").toString();
+    QDir d(dir + "/" + snimki);
+    QStringList files = d.entryList(QDir::Files | QDir::NoDotAndDotDot);
+    for(int i=0; i<files.count(); i++){
+        QString file = files.at(i);
+        uploadFile(file, dir + "/" + snimki, 1);
+    }
+    
+    //исходные данные
+    QString src_data = s.value("src_data", "src_data").toString();
+    d = QDir(dir + "/" + src_data);
+    files = d.entryList(QDir::Files | QDir::NoDotAndDotDot);
+    for(int i=0; i<files.count(); i++){
+        QString file = files.at(i);
+        uploadFile(file, dir + "/" + src_data, 2);
+    }
+    
+    //промежуточные результаты
+    QString med_data = s.value("med_data", "med_data").toString();
+    d = QDir(dir + "/" + med_data);
+    files = d.entryList(QDir::Files | QDir::NoDotAndDotDot);
+    for(int i=0; i<files.count(); i++){
+        QString file = files.at(i);
+        uploadFile(file, dir + "/" + med_data, 3);
+    }
+
+    //итоговые результаты
+    QString result_data = s.value("result_data", "result_data").toString();
+    d = QDir(dir + "/" + result_data);
+    files = d.entryList(QDir::Files | QDir::NoDotAndDotDot);
+    for(int i=0; i<files.count(); i++){
+        QString file = files.at(i);
+        uploadFile(file, dir + "/" + result_data, 4);
+    }
+}
+
+void KapsManagerForm::uploadFile(const QString & file, const QString & fUrl, int idType)
+{
+    if(!UI->tvTaskVars->currentItem())
+        return;
+
+    int idTaskVar = getCurrentTaskVar();
+    if(idTaskVar <= 0)
+        return;
+    
+    QString name = file;
+    QString desc;
+    QString fileName = file;
+    QString url = fUrl + "/" + file;
+    QString ka = tr("Не задано");
+    QString region = tr("Не задано");
+    QDateTime timeShoot = QDateTime::currentDateTime();
+    
+    int idF = 0;
+    int id = updateFileInDB(-1, idTaskVar, idType, name, fileName, url, ka, region, timeShoot, &idF);
+    if(id <= 0){
+        if(id != -100)//ошибки нет, просто пользователь решил не заменять сущемствующий в БД файл на новый
+            QMessageBox::critical(this, tr("Ошибка"), tr("Произошла ошибка при создании нового файла в БД!"));
+        return;
+    }
+    
+    QStringList strings;
+    strings << name
+            << ka
+            << timeShoot.toString("dd.MM.yyyy hh:mm")
+            << region
+            << fileName;
+    
+    QTreeWidgetItem * item = new QTreeWidgetItem(strings);
+    item->setData(0, Qt::UserRole+1, id);
+    item->setData(0, Qt::UserRole+2, idType);
+    item->setData(0, Qt::UserRole+3, idF);
+    
+    QTreeWidgetItem * parent = UI->tvFiles->topLevelItem(idType-1);//idType-1 - это фактически индекс родителя
+    parent->addChild(item);
 }

@@ -255,6 +255,34 @@
            </widget>
           </item>
           <item>
+           <widget class="QToolButton" name="tbUploadAll">
+            <property name="toolTip">
+             <string>Загрузить все файлы проекта из локальной ФЗ в БД</string>
+            </property>
+            <property name="text">
+             <string>...</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../../ddocs_ico/ddocs_icon_set.qrc">
+              <normaloff>:/ddoc/add_copy.png</normaloff>:/ddoc/add_copy.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="tbDownloadAll">
+            <property name="toolTip">
+             <string>Выгрузить все файлы проекта из БД</string>
+            </property>
+            <property name="text">
+             <string>...</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../../ddocs_ico/ddocs_icon_set.qrc">
+              <normaloff>:/ddoc/reload.png</normaloff>:/ddoc/reload.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
            <spacer name="horizontalSpacer_3">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>

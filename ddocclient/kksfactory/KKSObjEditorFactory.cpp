@@ -576,7 +576,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
         KKSList<KKSFileType*> fileTypes = loader->loadFileTypes();
         KKSList<KKSFile*> files = wObjE->files();
         KKSFileWidget * W = new KKSFileWidget(files, fileTypes, false);
-        connect(W, SIGNAL(downloadFile(KKSFile*, const QWidget *)), this, SLOT(slotDownloadFile(KKSFile*, const QWidget*)));
+        connect(W, SIGNAL(downloadFile(KKSFile*, QWidget *)), this, SLOT(slotDownloadFile(KKSFile*, QWidget*)));
         objEditorWidget->addFileWidget (W);
         tabObj->addTab (filesW, tr("Files"));
         gFilesLay->addWidget (W, 0, 0, 1, 1);
@@ -921,7 +921,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditorParam (int idObject,// идент
         filesW->setLayout (gFilesLay);
         KKSList<KKSFileType*> fileTypes = loader->loadFileTypes();
         KKSFileWidget * W = new KKSFileWidget(io->files(), fileTypes, false);
-        connect(W, SIGNAL(downloadFile(KKSFile*, const QWidget*)), this, SLOT(slotDownloadFile(KKSFile*, const QWidget *)));
+        connect(W, SIGNAL(downloadFile(KKSFile*, QWidget*)), this, SLOT(slotDownloadFile(KKSFile*, QWidget *)));
         objEditorWidget->addFileWidget (W);
         tabObj->addTab (filesW, tr("Files"));
         gFilesLay->addWidget (W, 0, 0, 1, 1);

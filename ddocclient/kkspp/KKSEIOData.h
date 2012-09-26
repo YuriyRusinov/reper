@@ -69,6 +69,7 @@ private:
     
     QMap<QString, QString> m_fields;
     QMap<QString, QString> m_sysFields;
+    //QMap<QString, QString> m_sysFieldsUID;
 
     QString m_null;
     bool visible;

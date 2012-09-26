@@ -534,7 +534,7 @@ void KKSJMonitor::init()
     // добавлено 20.11.2010 ёрой в св€зи с необходимостью просматривать присоединенные файлы
     //
     connect (journalW, SIGNAL (loadMsgFiles(int)), this, SLOT (slotLoadFiles(int)));
-    connect (journalW, SIGNAL (downloadFile(KKSFile *, const QWidget *)), m_oef, SLOT (slotDownloadFile (KKSFile *, const QWidget *)) );
+    connect (journalW, SIGNAL (downloadFile(KKSFile *, QWidget *)), m_oef, SLOT (slotDownloadFile (KKSFile *, QWidget *)) );
     connect (this, SIGNAL (filesAreLoaded (const KKSList<KKSFile *>&)), journalW, SLOT (isFilesEnabled (const KKSList<KKSFile *>&)) );
     connect(this, SIGNAL(signalMsgError(QString)), journalW, SLOT(slotShowMsgError(QString)));
 }

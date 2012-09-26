@@ -1786,6 +1786,8 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
         QString code = a->code(true); //quoted code
         QString codeFK = code.insert(code.size()-1, "_fk");
         code = a->code(true);
+        QString codeUID = code.insert(code.size()-1, "_uid");
+        code = a->code(true);
 
         if(a->type()->attrType() == KKSAttrType::atList ||
             a->type()->attrType() == KKSAttrType::atParent)
@@ -1833,9 +1835,11 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
                     joinWord += QString(" left join %1 %1%2 on %3.%4 = %1%2.%5").arg(tName).arg(cnt).arg(tableName).arg(code).arg(refColumnName);
                     withJoinWord += QString(" left join %1 %1%2 on %3.%4 = %1%2.%5").arg(tName).arg(cnt).arg(withTableName).arg(code).arg(refColumnName);
                     attrs += QString(", case when %1.%3 isnull then NULL else %4%5.%2 end as %3").arg(tableName).arg(cName).arg(code).arg(tName).arg(cnt);
-                    attrs += QString(", %1.%2 as %3").arg(tableName).arg(code).arg(codeFK);
+                    attrs += QString(", %1.%2 as %3").arg(tableName).arg(code).arg(codeFK);//добавляем служебное поле ИД
+                    attrs += QString(", case when %1.%3 isnull then NULL else %4%5.%2 end as %6").arg(tableName).arg("unique_id").arg(code).arg(tName).arg(cnt).arg(codeUID);//добавляем служебное поле unique_id
                     withAttrs += QString(", case when %1.%3 isnull then NULL else %4%5.%2 end as %3").arg(withTableName).arg(cName).arg(code).arg(tName).arg(cnt);
-                    withAttrs += QString(", %1.%2 as %3").arg(withTableName).arg(code).arg(codeFK);
+                    withAttrs += QString(", %1.%2 as %3").arg(withTableName).arg(code).arg(codeFK);//добавляем служебное поле ИД
+                    withAttrs += QString(", case when %1.%3 isnull then NULL else %4%5.%2 end as %6").arg(withTableName).arg("unique_id").arg(code).arg(tName).arg(cnt).arg(codeUID);//добавляем служебное поле unique_id
                 }
                 else{
                     whereWord += QString(" and %1.%2 = %3%4.%5 ").arg(tableName).arg(code).arg(tName).arg(cnt).arg(refColumnName);
@@ -1843,8 +1847,10 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
                     withJoinWord += QString(" left join %1 %1%2 on %3.%4 = %1%2.%5").arg(tName).arg(cnt).arg(withTableName).arg(code).arg(refColumnName);
                     attrs += QString(", %1%4.%2 as %3").arg(tName).arg(cName).arg(code).arg(cnt);
                     attrs += QString(", %1.%2 as %3").arg(tableName).arg(code).arg(codeFK);
+                    attrs += QString(", %1%4.%2 as %3").arg(tName).arg("unique_id").arg(codeUID).arg(cnt);
                     withAttrs += QString(", %1%4.%2 as %3").arg(tName).arg(cName).arg(code).arg(cnt);
                     withAttrs += QString(", %1.%2 as %3").arg(withTableName).arg(code).arg(codeFK);
+                    withAttrs += QString(", %1%4.%2 as %3").arg(tName).arg("unique_id").arg(codeUID).arg(cnt);
                 }
             }
             else{
@@ -1855,8 +1861,10 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
                     withJoinWord += QString(" left join %1 on %2.%3 = %1.%4").arg(tName).arg(withTableName).arg(code).arg(refColumnName);
                     attrs += QString(", case when %1.%3 isnull then NULL else %4.%2 end as %3").arg(tableName).arg(cName).arg(code).arg(tName);
                     attrs += QString(", %1.%2 as %3").arg(tableName).arg(code).arg(codeFK);
+                    attrs += QString(", case when %1.%3 isnull then NULL else %4.%2 end as %5").arg(tableName).arg("unique_id").arg(code).arg(tName).arg(codeUID);
                     withAttrs += QString(", case when %1.%3 isnull then NULL else %4.%2 end as %3").arg(withTableName).arg(cName).arg(code).arg(tName);
                     withAttrs += QString(", %1.%2 as %3").arg(withTableName).arg(code).arg(codeFK);
+                    withAttrs += QString(", case when %1.%3 isnull then NULL else %4.%2 end as %5").arg(withTableName).arg("unique_id").arg(code).arg(tName).arg(codeUID);
                 }
                 else{
                     whereWord += QString(" and %1.%2 = %3.%4 ").arg(tableName).arg(code).arg(tName).arg(refColumnName);
@@ -1864,8 +1872,10 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
                     withJoinWord += QString(" left join %1 on %2.%3 = %1.%4").arg(tName).arg(withTableName).arg(code).arg(refColumnName);
                     attrs += QString(", %1.%2 as %3").arg(tName).arg(cName).arg(code);
                     attrs += QString(", %1.%2 as %3").arg(tableName).arg(code).arg(codeFK);
+                    attrs += QString(", %1.%2 as %3").arg(tName).arg("unique_id").arg(codeUID);
                     withAttrs += QString(", %1.%2 as %3").arg(tName).arg(cName).arg(code);
                     withAttrs += QString(", %1.%2 as %3").arg(withTableName).arg(code).arg(codeFK);
+                    withAttrs += QString(", %1.%2 as %3").arg(tName).arg("unique_id").arg(codeUID);
                 }
             }
             attrsWith += QString(", %1").arg(code);
@@ -2039,7 +2049,7 @@ KKSMap<qint64, KKSEIOData *> KKSLoader::loadEIOList(const KKSCategory * c0,
             QString code = QString(res->getColumnName(column));//использование названия колонки для ключа QMap в классе KKSEIOData допустимо
             QString value = res->getCellAsString(row, column);
             
-            if(code == "ii_rec_order" || code == "id"){
+            if(code == "ii_rec_order" || code == "id" || code == "unique_id"){
                 eio->addSysField(code, value);
             }
 
@@ -2088,8 +2098,10 @@ KKSMap<qint64, KKSEIOData *> KKSLoader::loadEIOList(const KKSCategory * c0,
                 )
             {
                 QString sysValue = res->getCellAsString(row, ++column);
+                QString sysValue1 = res->getCellAsString(row, ++column);
                 ier = eio->addField(code, value);
                 ier = eio->addSysField(code, sysValue);
+                ier = eio->addSysField(code+"_uid", sysValue1);
             }
             else            
                 ier = eio->addField(code, value);
