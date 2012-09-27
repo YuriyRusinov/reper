@@ -91,6 +91,7 @@ KKSRecWidget * KKSViewFactory :: createView (KKSTemplate* theTemplate,
     //setCategory (theTemplate->category());
     tv->setItemDelegate (itemDeleg);
     KKSRecWidget *resWidget = new KKSRecWidget (tv, false, parent, f);
+    resWidget->showFilter ();
     KKSEventFilter *ef = new KKSEventFilter (resWidget);
     tv->viewport()->installEventFilter (ef);
     if (tv->selectionModel())

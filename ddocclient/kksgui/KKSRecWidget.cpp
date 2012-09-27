@@ -38,6 +38,7 @@ KKSRecWidget :: KKSRecWidget (QTreeView *tView, bool mode, QWidget *parent, Qt::
     pMenu (new QMenu(this)),
     pGroupBy (new QMenu (tr("Group &By ..."), this)),
     filterLE (new QLineEdit (this)),
+    gbFilter (new QGroupBox (this)),
     actFilter (new QAction (QIcon(":/ddoc/search.png"), tr("&Create search query"), this)),
     actSearchT (new QAction (QIcon(":/ddoc/search_template.png"), tr("Search by template"), this)),
     actAdd (new QAction (QIcon(":/ddoc/add.png"), tr("&Add"), this)),
@@ -60,6 +61,7 @@ KKSRecWidget :: KKSRecWidget (QTreeView *tView, bool mode, QWidget *parent, Qt::
     tView->setSelectionBehavior (QAbstractItemView::SelectRows);
     //Q_INIT_RESOURCE (kksgui_icon_set);
     this->init_widgets (mode);
+    hideFilter ();
 
     connect (actAdd, SIGNAL(triggered()), this, SLOT (addRec()) );
     connect (actEdit, SIGNAL(triggered()), this, SLOT (editRec()) );
@@ -123,6 +125,15 @@ QSize KKSRecWidget::sizeHint() const
     return parent->size();
 }
 
+void KKSRecWidget :: hideFilter (void)
+{
+    gbFilter->setVisible (false);
+}
+
+void KKSRecWidget :: showFilter (void)
+{
+    gbFilter->setVisible (true);
+}
 
 qint64 KKSRecWidget :: getID (void) const
 {
@@ -214,11 +225,10 @@ void KKSRecWidget :: init_widgets (bool mode)
     actFilterRec->setMenu (pFilter);
     pFilter->setEnabled (false);
     actFilterRec->setEnabled (false);
-    QGroupBox * gbFilter = new QGroupBox (this);
-    QHBoxLayout * hFilterLay = new QHBoxLayout ();
-    hFilterLay->addWidget (gbFilter);
-    hFilterLay->addStretch ();
-    gLay->addLayout (hFilterLay, 1, 0, 1, 1);
+//    QHBoxLayout * hFilterLay = new QHBoxLayout ();
+//    hFilterLay->addWidget (gbFilter);
+//    hFilterLay->addStretch ();
+//    gLay->addLayout (hFilterLay, 1, 0, 1, 1);
     QGridLayout * gFLay = new QGridLayout (gbFilter);
     QLabel * lFilter = new QLabel (tr("Filter"), gbFilter);
     gFLay->addWidget (lFilter, 0, 0, 1, 1);
@@ -229,6 +239,7 @@ void KKSRecWidget :: init_widgets (bool mode)
     pFilter->addAction (actViewCurentRec);
     pFilter->addAction (actHideRec);
     tBActions->addAction (actRefresh);
+    tBActions->insertWidget (actFilter, gbFilter);
     pMenu->addAction (actRefresh);
     pbOk->setVisible (mode);
     pbCancel->setVisible (mode);

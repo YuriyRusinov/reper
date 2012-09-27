@@ -60,6 +60,9 @@ public:
 
     void hideToolBar (void);
     void showToolBar (void);
+    
+    void hideFilter (void);
+    void showFilter (void);
 
     void addToolBarAction (QAction * act);
     QAction * addToolBarSeparator (void);
@@ -121,6 +124,7 @@ private:
     QMenu * pGroupBy;
     QMenu * pFilter;
     QLineEdit * filterLE;
+    QGroupBox * gbFilter;
 
 public:
 
