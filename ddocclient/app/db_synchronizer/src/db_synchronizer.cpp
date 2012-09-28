@@ -30,6 +30,8 @@ DBSynchronizer::DBSynchronizer(QWidget *parent, Qt::WFlags f)
 
 	db = kksSito->db();
 
+    m_fileTypes = kksSito->loader()->loadFileTypes();
+
 	ok = initCacheTable();//в том числе установили дату с которой надо загружать данные
 	if(ok != OK_CODE)
 		return;
@@ -456,7 +458,35 @@ void DBSynchronizer::createIOUrls(int idObject, const QList<QPair<QString, QStri
 {
     
 	for(int i=0; i<files.count(); i++){
-		int idUrl = rInsertUrl(files.at(i).first, 1, "qq");
+        int idFileType = 1;
+        QString ext = "qq";
+        QString fileName = files.at(i).first;
+
+        ext = fileName.section(".", -1);
+        if(!ext.isEmpty()){
+            bool bFound = false;
+            for(int j=0; j<m_fileTypes.count(); j++){
+                KKSFileType * type = m_fileTypes.at(j);
+                bFound = type->assotiated(ext.toLower());
+                if(bFound){
+                    idFileType = type->id();
+                    break;
+                }
+                else{
+                    bFound = type->assotiated(ext.toUpper());
+                    if(bFound){
+                        idFileType = type->id();
+                        break;
+                    }
+                }
+            }
+        }
+        else{
+            ext = "qq";
+        }
+        
+        
+        int idUrl = rInsertUrl(fileName, idFileType, ext);
 		if(idUrl < 0){
             UI->teLogFile->setPlainText(UI->teLog->toPlainText() + 
 				                    tr("An ERROR was occured while inserting file in DynamicDocs database!\n") + 

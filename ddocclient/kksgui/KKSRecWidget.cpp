@@ -239,7 +239,8 @@ void KKSRecWidget :: init_widgets (bool mode)
     pFilter->addAction (actViewCurentRec);
     pFilter->addAction (actHideRec);
     tBActions->addAction (actRefresh);
-    tBActions->insertWidget (actFilter, gbFilter);
+    tBActions->addSeparator ();
+    tBActions->addWidget (gbFilter);
     pMenu->addAction (actRefresh);
     pbOk->setVisible (mode);
     pbCancel->setVisible (mode);

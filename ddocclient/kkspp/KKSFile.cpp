@@ -69,7 +69,12 @@ void KKSFile::setLocalUrl(const QString & url)
     ext = m_localUrl.section('/', -1); 
 #endif    
     
-    ext = ext.section('.', -1);
+    if(ext.contains(".")){
+        ext = ext.section('.', -1);
+    }
+    else
+        ext = "";
+
     setSrcExt(ext);
 }
 

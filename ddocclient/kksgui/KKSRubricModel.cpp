@@ -86,11 +86,11 @@ QVariant KKSRubricModel :: data (const QModelIndex &index, int role) const
             return rubr->name();
             break;
         }
-        case Qt::SizeHintRole:
-        {
-            return rubr->getDefaultIcon().size();
-            break;
-        }
+//        case Qt::SizeHintRole:
+//        {
+//            return rubr->getDefaultIcon().size();
+//            break;
+//        }
         default:
         {
             return QVariant();

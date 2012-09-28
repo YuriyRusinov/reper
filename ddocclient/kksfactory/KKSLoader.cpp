@@ -1790,7 +1790,9 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
         code = a->code(true);
 
         if(a->type()->attrType() == KKSAttrType::atList ||
-            a->type()->attrType() == KKSAttrType::atParent)
+           a->type()->attrType() == KKSAttrType::atParent ||
+           a->type()->attrType() == KKSAttrType::atRecordColorRef ||
+           a->type()->attrType() == KKSAttrType::atRecordTextColorRef)
         {
             QString tName = a->tableName();
             QString cName = a->columnName(true); //quoted columnName

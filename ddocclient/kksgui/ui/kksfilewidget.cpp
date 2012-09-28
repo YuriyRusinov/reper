@@ -134,7 +134,11 @@ void KKSFileWidget::on_pbDownload_clicked()
             return;
     }
     
-    QString filter = QString("(*.") + f->srcExt() + ")";
+    QString filter;
+    if(f->srcExt().isEmpty())
+        filter = QString("(*)");
+    else
+        filter = QString("(*.") + f->srcExt() + ")";
     QString selectedFilter;
     QString fileName = f->name();
     QString localFile = QFileDialog::getSaveFileName(this, 

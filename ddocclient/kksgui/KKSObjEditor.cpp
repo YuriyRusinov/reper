@@ -605,7 +605,6 @@ int KKSObjEditor :: constructObject()
                 type == KKSAttrType::atRecordTextColorRef)
             {
                 v.setColumnValue (cAttrValue->value().columnValue());
-                //qDebug () << __PRETTY_FUNCTION__ << v.value() << v.columnValue();
             }
         }
         else

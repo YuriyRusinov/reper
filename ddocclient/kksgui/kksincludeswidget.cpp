@@ -953,8 +953,8 @@ void KKSIncludesWidget :: editRubricItem (void)
 
 void KKSIncludesWidget::slotRubricItemDblClicked(const QModelIndex & index)
 {
-    qDebug () << __PRETTY_FUNCTION__ << index.data(Qt::UserRole).toInt();
-    if (index.data(Qt::UserRole).toInt() == 2)
+    qDebug () << __PRETTY_FUNCTION__ << index.data(Qt::UserRole+2).toInt();
+    if (index.data(Qt::UserRole+2).toInt() == KKSRubricBase::atRubricItem)
         editRubricItem();
     else
         editRubric();

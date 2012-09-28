@@ -14,6 +14,8 @@ class QPushButton;
 class KKSDatabase;
 
 #include <api_bdfz.h>
+#include <KKSList.h>
+#include <KKSFile.h>
 
 namespace Ui
 {
@@ -179,6 +181,8 @@ private:
 	QDate lastDateSys;//дата, начиная с которой загружаем данные (считаем, что данные с датой ранее заданной уже загружены.)
 
 	QString rootFileStore;//путь к локальному каталогу со скачиваемыми файлами
+
+    KKSList<KKSFileType *> m_fileTypes;//зарегистрированные в БД ДД типы файлов
 
 	//KKSLoader *
 };

@@ -3336,6 +3336,10 @@ void KKSObjEditorFactory :: loadAttributeReference (QString tableName, QWidget *
         if(!av){
             KKSMap<int, KKSAttrValue *> ioAttrValues = editor->getIOAttrValues();
             av = ioAttrValues.value(aRefW->getIdAttrValue(), NULL);
+            if(!av){
+                KKSMap<int, KKSAttrValue *> recAttrValues = editor->getRecAttrValues();
+                av = recAttrValues.value(aRefW->getIdAttrValue(), NULL);
+            }
         }
         
         if(!av){
