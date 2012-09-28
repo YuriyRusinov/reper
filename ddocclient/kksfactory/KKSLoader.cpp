@@ -1758,8 +1758,8 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
     QString withAttrFK; //название колонки, являющейся внешним ключом в атрибуте родитель-потомок (например id_parent)
     QString withTableName = tableName + "_rec"; //название подзапроса в предложении WITH
     //QString withTableName1 = withTableName + "_1"; //псевдоним таблицы в подзапросе рекурсивной части предложения WITH
-    QString attrsWith = "id";
-    QString attrsWith1 = tableName + ".id"; //колонки в подзапросе нерекурсивной части предложения WITH
+    QString attrsWith = "id, unique_id ";
+    QString attrsWith1 = tableName + ".id, " + tableName + ".unique_id"; //колонки в подзапросе нерекурсивной части предложения WITH
     QString withAttrs;//колонки в самой нижней части запроса с предложением WITH
     QString withJoinWord;//предложение left join в запросе с предложением WITH
     
@@ -1774,6 +1774,8 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
     {
         KKSCategoryAttr *a = pca.value();
         if(a->code() == "id")
+            continue;
+        if(a->code() == "unique_id")
             continue;
         
         if(a->type()->attrType() == KKSAttrType::atCheckListEx)
@@ -1942,7 +1944,7 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
         }
         
         if(!withRecursive){
-            sql = QString("select %4 %1.id %2 from %1 %3 %5 where 1=1 ")
+            sql = QString("select %4 %1.id, %1.unique_id %2 from %1 %3 %5 where 1=1 ")
                                 .arg(tableName)
                                 .arg(attrs)
                                 .arg(joinWord)
@@ -1961,7 +1963,7 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
             sql = QString("with recursive %1 (%2, ii_rec_order) as (" 
                           "select %3 %4, 0 from %5 where %6 UNION ALL select %4, %1.ii_rec_order+1 from %1, %5 where %1.%7 = %5.%8"
                           ")"
-                          "select %3 %1.id %9, %1.ii_rec_order from %1 %10 %11 where 1=1 ")
+                          "select %3 %1.id, %1.unique_id %9, %1.ii_rec_order from %1 %10 %11 where 1=1 ")
                               .arg(withTableName)
                               .arg(attrsWith)
                               .arg (isXml ? QString() : QString("distinct"))
