@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     21.09.2012 17:06:55                          */
+/* Created on:     27.09.2012 15:15:32                          */
 /*==============================================================*/
 
 
@@ -23,6 +23,7 @@ select setMacToNULL('root_table');
 create unique index Index_1 on root_table using BTREE (
 unique_id
 );
+
 
 /*==============================================================*/
 /* User: public                                                 */
@@ -60,7 +61,8 @@ create table a_groups (
    name                 VARCHAR              not null,
    "order"              INT4                 not null default 0,
    constraint PK_A_GROUPS primary key (id)
-);
+)
+inherits (root_table);
 
 comment on table a_groups is
 'Группы атрибутов.
@@ -70,6 +72,7 @@ comment on column a_groups."order" is
 'Порядок следования группы в шаблоне при отображении';
 
 select setMacToNULL('a_groups');
+select createTriggerUID('a_groups');
 
 /*==============================================================*/
 /* Index: g_opt_index                                           */
@@ -866,7 +869,8 @@ create table categories_rubrics (
    id_category          INT4                 null,
    name                 VARCHAR              not null,
    constraint PK_CATEGORIES_RUBRICS primary key (id)
-);
+)
+inherits (root_table);
 
 comment on table categories_rubrics is
 'Содержит рубрики категории
@@ -874,6 +878,7 @@ comment on table categories_rubrics is
 Данные из этой таблицы затем копируются в таблицу rubricator';
 
 select setMacToNULL('categories_rubrics');
+select createTriggerUID('categories_rubrics');
 
 /*==============================================================*/
 /* Table: cmd_confirmations                                     */
@@ -1038,7 +1043,8 @@ create table criteria (
    case_sensitive       BOOL                 not null default TRUE,
    is_not               BOOL                 not null default FALSE,
    constraint PK_CRITERIA primary key (id)
-);
+)
+inherits (root_table);
 
 comment on column criteria.attr_id is
 'ID  атрибута, если описываемый критерий имеет типы 5 или 6 (заданный атрибут с произвольным или заданным значением)';
@@ -1061,7 +1067,8 @@ create table criteria_types (
    id                   SERIAL not null,
    name                 VARCHAR              not null,
    constraint PK_CRITERIA_TYPES primary key (id)
-);
+)
+inherits (root_table);
 
 comment on table criteria_types is
 'Типы критериев автоматической разводки по рубрикам
@@ -1073,6 +1080,7 @@ comment on table criteria_types is
 6 - наличие заданного атрибута с заданным значением';
 
 select setMacToNULL('criteria_types');
+select createTriggerUID('criteria_types');
 
 /*==============================================================*/
 /* Table: dev_object_q                                          */
@@ -1266,30 +1274,6 @@ select setMacToNULL('fault_devices_q');
 select createTriggerUID('fault_devices_q');
 
 /*==============================================================*/
-/* Table: file_types                                            */
-/*==============================================================*/
-create table file_types (
-   id                   SERIAL               not null,
-   name                 VARCHAR              not null,
-   constraint PK_FILE_TYPES primary key (id)
-);
-
-/*==============================================================*/
-/* Table: files                                                 */
-/*==============================================================*/
-create table files (
-   id                   SERIAL               not null,
-   id_type              INT4                 not null,
-   id_task_var          INT4                 not null,
-   name                 VARCHAR              not null,
-   url                  VARCHAR              not null,
-   ka_type              VARCHAR              null,
-   shooting_time        TIMESTAMP            null,
-   region               VARCHAR              null,
-   constraint PK_FILES primary key (id)
-);
-
-/*==============================================================*/
 /* Table: graph_plans                                           */
 /*==============================================================*/
 create table graph_plans (
@@ -1335,7 +1319,8 @@ create table groups (
    operation            INT4                 not null,
    is_not               BOOL                 not null default FALSE,
    constraint PK_GROUPS primary key (id)
-);
+)
+inherits (root_table);
 
 comment on column groups.operation is
 '0 - ИЛИ
@@ -1347,6 +1332,7 @@ comment on column groups.is_not is
 'Данный флаг задает, применяется ли унарная операция отрицания к данной группе критериев';
 
 select setMacToNULL('groups');
+select createTriggerUID('groups');
 
 /*==============================================================*/
 /* Table: groups_criteria                                       */
@@ -1579,7 +1565,8 @@ create table io_last_sync (
    min_period           INT4[2]              not null,
    last_sync            TIMESTAMP            not null,
    constraint PK_IO_LAST_SYNC primary key (id)
-);
+)
+inherits (root_table);
 
 comment on table io_last_sync is
 'Системный справочник с информацией о дате и времени последней синхронизации и минимальном периоде синхронизации';
@@ -1591,6 +1578,7 @@ comment on column io_last_sync.last_sync is
 'дата и время последней синхронизации';
 
 select setMacToNULL('io_last_sync');
+select createTriggerUID('io_last_sync');
 
 /*==============================================================*/
 /* Table: io_life_cycle                                         */
@@ -1793,7 +1781,8 @@ create table io_sync_archive (
    sync_datetime        TIMESTAMP            not null,
    sync_result          INT4                 not null,
    constraint PK_IO_SYNC_ARCHIVE primary key (id)
-);
+)
+inherits (root_table);
 
 comment on table io_sync_archive is
 'Системная таблица результатов синхронизации информационных объектов';
@@ -1805,6 +1794,7 @@ comment on column io_sync_archive.sync_result is
 'результат синхронизации';
 
 select setMacToNULL('io_sync_archive');
+select createTriggerUID('io_sync_archive');
 
 /*==============================================================*/
 /* Table: io_sync_types                                         */
@@ -1814,7 +1804,8 @@ create table io_sync_types (
    name                 VARCHAR              not null,
    description          VARCHAR              null,
    constraint PK_IO_SYNC_TYPES primary key (id)
-);
+)
+inherits (root_table);
 
 comment on table io_sync_types is
 'Типы информационных объектов с точки зрения синхронизации
@@ -1825,6 +1816,7 @@ comment on table io_sync_types is
 - глобальные объектового ведения, автономные';
 
 select setMacToNULL('io_sync_types');
+select createTriggerUID('io_sync_types');
 
 /*==============================================================*/
 /* Table: io_templates                                          */
@@ -1836,7 +1828,8 @@ create table io_templates (
    code                 VARCHAR              not null,
    description          VARCHAR              null,
    constraint PK_IO_TEMPLATES primary key (id)
-);
+)
+inherits (root_table);
 
 comment on table io_templates is
 'Таблица шаблонов, которые заданы для той или иной категории. 
@@ -1844,6 +1837,7 @@ comment on table io_templates is
 В терминах "документ-представление" категория - это документ, а шаблон - это представление';
 
 select setMacToNULL('io_templates');
+select createTriggerUID('io_templates');
 
 /*==============================================================*/
 /* Index: i_templ_code                                          */
@@ -1958,7 +1952,8 @@ create table jr_states (
    name                 VARCHAR              not null,
    description          VARCHAR              null,
    constraint PK_JR_STATES primary key (id)
-);
+)
+inherits (root_table);
 
 comment on table jr_states is
 'Таблица возможных состояний записей в табелях срочных донечений, а также журналов распоряжений
@@ -1972,20 +1967,7 @@ comment on table jr_states is
 ';
 
 select setMacToNULL('jr_states');
-
-/*==============================================================*/
-/* Table: kaps                                                  */
-/*==============================================================*/
-create table kaps (
-   id                   SERIAL               not null,
-   name                 VARCHAR              not null,
-   folder_name          VARCHAR              not null,
-   description          VARCHAR              null,
-   constraint PK_KAPS primary key (id)
-);
-
-comment on table kaps is
-'Перечень доступных КАПС';
+select createTriggerUID('jr_states');
 
 /*==============================================================*/
 /* Table: kks_roles                                             */
@@ -2084,12 +2066,16 @@ create table mail_lists (
    name                 VARCHAR              not null,
    description          VARCHAR              null,
    constraint PK_MAIL_LISTS primary key (id)
-);
+)
+inherits (root_table);
 
 comment on table mail_lists is
 'Списки рассылки должностным лицам сообщений и распоряжений.
 В том числе данные списки используются для упрощения задания прав доступа к ИО. 
 Данный системный справочник используется только в целях упрощения работы пользователей';
+
+select setMacToNULL('mail_lists');
+select createTriggerUID('mail_lists');
 
 /*==============================================================*/
 /* Table: mail_lists_position                                   */
@@ -2370,7 +2356,8 @@ create table organization (
       constraint CKC_IS_CREATED_ORGANIZA check (is_created in (0,1,2)),
    is_main              bool                 not null default false,
    constraint PK_ORGANIZATION primary key (id)
-);
+)
+inherits (root_table);
 
 comment on table organization is
 'Организации';
@@ -2422,6 +2409,7 @@ comment on column organization.is_created is
 Работать можно только с организациями, которые имеют 1 в качестве значения данного поля';
 
 select setMacToNULL('organization');
+select createTriggerUID('organization');
 
 /*==============================================================*/
 /* Index: i_email_prefix                                        */
@@ -2505,7 +2493,8 @@ create table out_sync_queue (
    entity_uid           varchar              not null,
    entity_io_uid        varchar              not null,
    constraint PK_OUT_SYNC_QUEUE primary key (id)
-);
+)
+inherits (root_table);
 
 comment on table out_sync_queue is
 'Очередь системных исходящих сообщений для синхронизации.
@@ -2564,6 +2553,7 @@ comment on column out_sync_queue.entity_io_uid is
 Для ИО - это unique_id информационного объекта (при пересылке особого смысла не имеет, но задается для унификации)';
 
 select setMacToNULL('out_sync_queue');
+select createTriggerUID('out_sync_queue');
 
 /*==============================================================*/
 /* Index: i_sync_result                                         */
@@ -2876,7 +2866,8 @@ create table record_rubricator (
    description          VARCHAR              null,
    r_icon               VARCHAR              null,
    constraint PK_RECORD_RUBRICATOR primary key (id)
-);
+)
+inherits (root_table);
 
 comment on table record_rubricator is
 'рубрикатор для записей справочников
@@ -2888,6 +2879,9 @@ comment on table record_rubricator is
 
 comment on column record_rubricator.r_icon is
 'Иконка, используемая при отображении элемента в дереве рубрик. Если не задана, то используется значение по умолчанию (определяется клиентским приложением)';
+
+select setMacToNULL('record_rubricator');
+select createTriggerUID('record_rubricator');
 
 /*==============================================================*/
 /* Table: report                                                */
@@ -2975,7 +2969,6 @@ create table roles_actions (
 );
 
 select setMacToNULL('roles_actions');
-
 
 /*==============================================================*/
 /* Table: rubric_records                                        */
@@ -3072,12 +3065,14 @@ create table search_templates (
    name                 VARCHAR              not null,
    description          VARCHAR              null,
    constraint PK_SEARCH_TEMPLATES primary key (id)
-);
+)
+inherits (root_table);
 
 comment on table search_templates is
 'Шаблоны поиска, применяемые при осуществлении поиска информационных объектов и в справочниках. ';
 
 select setMacToNULL('search_templates');
+select createTriggerUID('search_templates');
 
 /*==============================================================*/
 /* Table: segment_types                                         */
@@ -3145,39 +3140,6 @@ create table system_table (
 );
 
 select setMacToNULL('system_table');
-
-/*==============================================================*/
-/* Table: task_vars                                             */
-/*==============================================================*/
-create table task_vars (
-   id                   SERIAL               not null,
-   id_task              INT4                 not null,
-   name                 VARCHAR              not null,
-   folder_name          VARCHAR              not null,
-   description          VARCHAR              null,
-   creation_date        DATE                 not null,
-   region               VARCHAR              null,
-   author               VARCHAR              null,
-   constraint PK_TASK_VARS primary key (id)
-);
-
-comment on table task_vars is
-'Варианты решения тематических задач КАПС';
-
-/*==============================================================*/
-/* Table: tasks                                                 */
-/*==============================================================*/
-create table tasks (
-   id                   SERIAL               not null,
-   id_kaps              INT4                 not null,
-   name                 VARCHAR              not null,
-   filder_name          VARCHAR              not null,
-   description          VARCHAR              null,
-   constraint PK_TASKS primary key (id)
-);
-
-comment on table tasks is
-'Тематические задачи КАПС';
 
 /*==============================================================*/
 /* Table: transport                                             */
@@ -3265,7 +3227,8 @@ create table tsd_control_journal (
    is_archived          BOOL                 not null default false,
    is_outed             BOOL                 not null default true,
    constraint PK_TSD_CONTROL_JOURNAL primary key (id)
-);
+)
+inherits (root_table);
 
 comment on table tsd_control_journal is
 'журнал учета и контроля исполнения  исходящих, входящих  распоряжений и табеля срочных донесений';
@@ -3296,6 +3259,7 @@ comment on column tsd_control_journal.is_outed is
 Для локальных распоряжений данное поле всегда выставляется как TRUE';
 
 select setMacToNULL('tsd_control_journal');
+select createTriggerUID('tsd_control_journal');
 
 /*==============================================================*/
 /* Table: tso_params                                            */
@@ -3558,7 +3522,8 @@ create table user_handlers_data (
    table_name           VARCHAR              not null,
    rec_type             INT4                 not null,
    constraint PK_USER_HANDLERS_DATA primary key (id, id_io_category, table_name, rec_type)
-);
+)
+inherits (root_table);
 
 comment on table user_handlers_data is
 'Системная таблица, в которую помещается информация об измененных, добавленных, удаленных записях справочников, которые обрабатываются пользовательскими обработчиками';
@@ -3567,6 +3532,9 @@ comment on column user_handlers_data.rec_type is
 'тип события
 1 - запись была создана
 2 - запись была изменена';
+
+select setMacToNULL('user_handlers_data');
+select createTriggerUID('user_handlers_data');
 
 /*==============================================================*/
 /* Table: user_rubricator                                       */
@@ -4129,16 +4097,6 @@ alter table fault_devices
       references devices (id)
       on delete restrict on update restrict;
 
-alter table files
-   add constraint FK_FILES_REFERENCE_FILE_TYP foreign key (id_type)
-      references file_types (id)
-      on delete restrict on update restrict;
-
-alter table files
-   add constraint FK_FILES_REFERENCE_TASK_VAR foreign key (id_task_var)
-      references task_vars (id)
-      on delete restrict on update restrict;
-
 alter table graph_plans
    add constraint FK_GRAPH_PL_REFERENCE_GRAPH_PL foreign key (id_parent)
       references graph_plans (id)
@@ -4617,16 +4575,6 @@ alter table shape_segments
 alter table shape_segments
    add constraint FK_SHAPE_SE_REFERENCE_ELEMENT_ foreign key (id_element_shape)
       references element_shapes (id)
-      on delete restrict on update restrict;
-
-alter table task_vars
-   add constraint FK_TASK_VAR_REFERENCE_TASKS foreign key (id_task)
-      references tasks (id)
-      on delete restrict on update restrict;
-
-alter table tasks
-   add constraint FK_TASKS_REFERENCE_KAPS foreign key (id_kaps)
-      references kaps (id)
       on delete restrict on update restrict;
 
 alter table tsd
