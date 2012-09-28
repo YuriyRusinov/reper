@@ -72,12 +72,23 @@ QVariant KKSRubricModel :: data (const QModelIndex &index, int role) const
                 //return rubr->getDefaultIcon();
             }
             else
-                return QIcon (rubr->getIcon());
+            {
+                //qDebug () << __PRETTY_FUNCTION__ << rubr->getIcon().availableSizes();
+                QPixmap px = rubr->getDefaultIcon(); 
+                //QByteArray bytes (rubr->iconAsString().toUtf8());
+                //px.loadFromData (bytes);
+                return QVariant (rubr->getIcon().pixmap (px.size()));
+            }
             break;
         }
         case Qt::ToolTipRole:
         {
             return rubr->name();
+            break;
+        }
+        case Qt::SizeHintRole:
+        {
+            return rubr->getDefaultIcon().size();
             break;
         }
         default:
@@ -108,9 +119,11 @@ QModelIndex KKSRubricModel :: index (int row, int column, const QModelIndex& par
     if (!rItem)
         return QModelIndex ();
     const KKSRubricBase *parentItem = rItem->getData();
-    if (!parentItem || parentItem->rubricType() == KKSRubricBase::atRubricItem)
+    if (!parentItem ||
+        parentItem->rubricType() == KKSRubricBase::atRubricItem ||
+        (parentItem->rubricType() != KKSRubricBase::atOthers && ((const KKSRubric *)parentItem) && ((const KKSRubric *)parentItem)->getCategory ()))
         return QModelIndex();
-
+    
 //    const KKSRubric * pRubr = static_cast<const KKSRubric *>(parentItem);
 //    if (!pRubr)
 //        return QModelIndex();
@@ -147,6 +160,10 @@ int KKSRubricModel :: rowCount (const QModelIndex& parent) const
      if (!parentItem || !parentItem->getData() || parentItem->getData()->rubricType() == KKSRubricBase::atRubricItem)
          return 0;
 
+     const KKSRubricBase * parentRubr = parentItem->getData ();
+     const KKSRubric * pRubr = (const KKSRubric *)parentRubr;
+     if (parentRubr && parentRubr->rubricType() != KKSRubricBase::atOthers && pRubr && pRubr->getCategory ())
+         return 0;
      return parentItem->childCount();
 }
 
@@ -178,6 +195,15 @@ bool KKSRubricModel :: setData (const QModelIndex& index, const QVariant& value,
         wRubr->setData(wNewRubr);
         setupData (wRubr);
 
+        emit dataChanged (index, index);
+        return true;
+    }
+    else if (role == Qt::DecorationRole)
+    {
+        QIcon rIcon = value.value<QIcon>();
+        const KKSRubricBase * wRubrE = wRubr->getData ();
+        (const_cast<KKSRubricBase *>(wRubrE))->setIcon (rIcon);
+        wRubr->setData (wRubrE);
         emit dataChanged (index, index);
         return true;
     }

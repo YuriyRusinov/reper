@@ -54,7 +54,7 @@ KKSIncludesWidget::KKSIncludesWidget(KKSRubric * rootRubric,
     isChanged (false),
     isRec (forRecord),
     tBRubrActions (new QToolBar (this)),
-    spRubrics (new QSplitter (Qt::Vertical, this)),
+    spRubrics (new QSplitter (Qt::Horizontal, this)),
     twIncludes (new QTreeView (spRubrics)),
     tvItems (new QTreeView ()),
     recWItems (new KKSRecWidget (tvItems, false, spRubrics)),
@@ -70,7 +70,7 @@ KKSIncludesWidget::KKSIncludesWidget(KKSRubric * rootRubric,
     hItems->setSortIndicatorShown (true);
     hItems->setStretchLastSection (true);
     hItems->setClickable (true);
-    KKSItemDelegate * iDeleg = new KKSItemDelegate ();
+    QAbstractItemDelegate * iDeleg = new KKSItemDelegate ();
     tvItems->setItemDelegate (iDeleg);
     KKSEventFilter * ef = new KKSEventFilter ();
     tvItems->viewport()->installEventFilter (ef);
@@ -1174,6 +1174,30 @@ void KKSIncludesWidget :: contextMenuEvent (QContextMenuEvent * event)
 
 void KKSIncludesWidget :: setRubricIcon (void)
 {
+    QItemSelectionModel * sm = twIncludes->selectionModel();
+    QItemSelection sel = sm ? sm->selection() : QItemSelection();
+    QModelIndex index;
+    if(!sm || sel.indexes().isEmpty()){
+        index = QModelIndex();
+    }
+    else{
+        index = sel.indexes().at (0);
+        index = index.sibling(index.row(), 0);
+        int rType = index.data(Qt::UserRole+2).toInt();
+        if(rType == KKSRubricBase::atRubricItem){ //item selected
+            index = index.parent();
+            index = index.sibling(index.row(), 0);
+        }
+        else if (rType == KKSRubricBase::atOthers ||
+                 rType == KKSRubricBase::atRubricCategory)
+        {
+            QMessageBox::warning(this, tr("Edit rubric"), tr ("Category or others rubric cannot been edited"), QMessageBox::Ok);
+            return;
+        }
+        else{//rubric selected
+            ;
+        }
+    }
     QString iconFile = QFileDialog::getOpenFileName(this, tr("Open Image File"),
                                                     QDir::currentPath(),
                                                     tr("Image files (*.xpm *.png *.ico *.jpg *.jpeg *.bmp *.gif *.pbm *.pgm *.xbm);;All files (*)")
@@ -1181,14 +1205,6 @@ void KKSIncludesWidget :: setRubricIcon (void)
     if (iconFile.isEmpty())
         return;
 
-    QItemSelectionModel * sm = twIncludes->selectionModel();
-    QItemSelection sel = sm ? sm->selection() : QItemSelection();
-    QModelIndex index;
-    if(!sm || sel.indexes().isEmpty()){
-        return ;
-    }
-
-    index = sel.indexes().at (0);
     QPixmap rubrPixmap (iconFile);
     if(rubrPixmap.isNull()){
         QMessageBox::critical(this, 
@@ -1204,6 +1220,7 @@ void KKSIncludesWidget :: setRubricIcon (void)
     buffer.open(QIODevice::WriteOnly);
     rubrPixmap.save(&buffer, "XPM"); // writes pixmap into bytes in XPM format
     buffer.close();
+    //qDebug () << __PRETTY_FUNCTION__ << rubrPixmap.size();
 
     const KKSRubric * rubr (0);
     QIcon icon;
@@ -1227,7 +1244,8 @@ void KKSIncludesWidget :: setRubricIcon (void)
     }
 
     QAbstractItemModel * mod = twIncludes->model();
-    mod->setData (index, icon.pixmap(16, 16), Qt::DecorationRole);
+    //qDebug () << __PRETTY_FUNCTION__ << icon.availableSizes();
+    mod->setData (index, icon, Qt::DecorationRole);
     isChanged = true;
 
 }
