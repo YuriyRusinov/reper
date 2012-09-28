@@ -1,7 +1,7 @@
 @echo off
 
 set HOST=127.0.0.1
-set VERSION=0.14.3
+set VERSION=0.14.4
 
 set OUTPUT=./error.log
 
