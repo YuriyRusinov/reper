@@ -5599,10 +5599,16 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // צוכוגמי CSV פאיכ
         KKSEIOData * d = pio.value();
         QString fstr;
         QTextStream oeStream (&fstr, QIODevice::WriteOnly);
+        oeStream << tDelim << d->sysFieldValue("unique_id") << tDelim;
 
         for (int ii=0; ii<attrs_list.count(); ii++)
         {
             KKSAttrView * v = attrs_list [ii];
+            if (v->id() == 1)
+            {
+                oeStream << fDelim << pio.key() << (attrs_list.count() > 1 ? fDelim : QString());
+                continue;
+            }
             QString attrCode = v->code();
             QString attrValue = d->fields().value(attrCode);
             KKSAttrType::KKSAttrTypes aType = v->type()->attrType();
@@ -5615,14 +5621,9 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // צוכוגמי CSV פאיכ
                     break;
                 }
                 case KKSAttrType::atList:
+                case KKSAttrType::atParent:
                 case KKSAttrType::atRecordColorRef:
                 case KKSAttrType::atRecordTextColorRef:
-                {
-                    qDebug () << __PRETTY_FUNCTION__ << d->fields() << d->sysFields();
-                    oeStream << tDelim << d->sysFields().value (attrCode+"_uid") << tDelim;
-                    break;
-                }
-                case KKSAttrType::atParent:
                 {
                     qDebug () << __PRETTY_FUNCTION__ << d->fields() << d->sysFields();
                     oeStream << tDelim << d->sysFields().value (attrCode+"_uid") << tDelim;
