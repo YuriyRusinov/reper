@@ -1347,13 +1347,32 @@ void KapsManagerForm::uploadFile(const QString & file, const QString & fUrl, int
     if(idTaskVar <= 0)
         return;
     
-    QString name = file;
+    QString name;
     QString desc;
-    QString fileName = file;
+    QString fileName;
     QString url = fUrl + "/" + file;
-    QString ka = tr("Не задано");
-    QString region = tr("Не задано");
-    QDateTime timeShoot = QDateTime::currentDateTime();
+    QString ka;
+    QString region;
+    QDateTime timeShoot;
+ 
+    QString mdF = fUrl + "/.md_" + file;
+    if(QFile::exists(mdF)){
+        QSettings s(mdF, QSettings::IniFormat, this);
+        name = s.value("name", file).toString();
+        //desc = desc;
+        fileName = file;
+        ka = s.value("ka", tr("Не задано")).toString();
+        region = s.value("region", tr("Не задано")).toString();
+        timeShoot = s.value("timeShoot", QDateTime::currentDateTime()).toDateTime();
+    }
+    else{
+        name = file;
+        //desc = desc;
+        fileName = file;
+        ka = tr("Не задано");
+        region = tr("Не задано");
+        timeShoot = QDateTime::currentDateTime();
+    }
     
     int idF = 0;
     int id = updateFileInDB(-1, idTaskVar, idType, name, fileName, url, ka, region, timeShoot, &idF);
