@@ -3630,6 +3630,22 @@ void KKSLoader::loadPrivileges(KKSObject * io) const
     //io->setPrivileges(privs);
 }
 
+qint64 KKSLoader::getIdByUID (const QString& tableName, const QString& uid) const
+{
+    qint64 id (-1);
+    QString sql (QString("select getidbyuid ('%1', '%2');"));
+    KKSResult * res = db->execute (sql);
+    if (!res || res->getRowCount() != 1)
+    {
+        if(res)
+            delete res;
+        return id;
+    }
+    id = res->getCellAsInt64 (0, 0);
+    delete res;
+    return id;
+}
+
 void KKSLoader::loadPrivileges(KKSRubric * rubr) const
 {
     KKSMap<int, KKSPrivilege*> privs;

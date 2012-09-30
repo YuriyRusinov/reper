@@ -210,6 +210,8 @@ class _F_EXPORT KKSLoader
         QList<int> getForbiddenTypes (void) const;
 
         int getRefIO (int idObjectE) const;
+        
+        qint64 getIdByUID (const QString& tableName, const QString& uid) const;
 
         KKSLoader();
         ~KKSLoader();

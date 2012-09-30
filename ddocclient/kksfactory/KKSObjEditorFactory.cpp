@@ -4505,7 +4505,7 @@ void KKSObjEditorFactory :: importCatAttrs (KKSCategory *c, const QStringList& c
     if (!c || catAttrs.isEmpty())
         return;
 
-    /*
+/*    
     for (int i=0; i<catAttrs.count(); i++)
     {
         QString code = catAttrs[i];
@@ -4519,7 +4519,7 @@ void KKSObjEditorFactory :: importCatAttrs (KKSCategory *c, const QStringList& c
         cAttr->release ();
         attr->release ();
     }
-    */
+ */
 }
 
 /* Импорт данных из файла и сохранение их в БД.
@@ -4720,6 +4720,7 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io,
     
     int m1 = attrList.count();
 
+    QMap<QString, qint64> refIds;
     for (int i=0; i<n; i++)
     {
         KKSObjectExemplar *oe = new KKSObjectExemplar ();
@@ -4763,12 +4764,20 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io,
             {
                 
                 QString av_str (oesList[i][j]);
-                av_str.replace(QString("\\\n"), QChar('\n'), Qt::CaseInsensitive);
-                av_str.replace(QString("\\\'"), QChar('\''), Qt::CaseInsensitive);
-                av_str.replace(QString("\\\""), QChar('\"'), Qt::CaseInsensitive);
+                //av_str.replace(QString("\\\n"), QChar('\n'), Qt::CaseInsensitive);
+                //av_str.replace(QString("\\\'"), QChar('\''), Qt::CaseInsensitive);
+                //av_str.replace(QString("\\\""), QChar('\"'), Qt::CaseInsensitive);
                 
                 //KKSValue refVal (av_str, cAttr->refType()->attrType());
-                val = KKSValue(av_str, cAttr->refType()->attrType());
+                qint64 rid (-1);
+                if (refIds.contains(av_str))
+                    rid = refIds.value (av_str);
+                else
+                {
+                    QString tName = (iType == KKSAttrType::atParent ? io->tableName() : cAttr->tableName());
+                    rid = loader->getIdByUID (tName, av_str);
+                }
+                val = KKSValue(QString::number (rid), cAttr->refType()->attrType());
                 
                 /*KSA
                 QMap<int, QString> values;
@@ -4912,6 +4921,13 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io,
                 val = KKSValue (vArr, iType);
                 //KSA rattr->release ();
                 //KSA refObj->release ();
+            }
+            else if (iType == KKSAttrType::atJPG ||
+                     iType == KKSAttrType::atSVG ||
+                     iType == KKSAttrType::atVideo ||
+                     iType == KKSAttrType::atXMLDoc)
+            {
+                val = KKSValue (QString("''"), iType);
             }
             else{
                 QString av_str = oesList[i][j];
@@ -5169,7 +5185,7 @@ int KKSObjEditorFactory :: exportHeader (QIODevice *xmlDev, // XML-файл, содержа
 #endif
 */
     xmlWriter->writeStartDocument ();
-    QString dtd = QString ("\n <!DOCTYPE Attributes [ \n <!ENTITY Charset '%1'> \n <!ENTITY field_delimiter '%2'> \n <!ENTITY text_delimiter '%3'> \n <!ELEMENT field (code, name, type)> \n <!ELEMENT code (#PCDATA)> \n <!ELEMENT name (#PCDATA)> \n <!ELEMENT type (#PCDATA)> \n ]>\n").arg (codeName).arg (fDelim).arg (tDelim);
+    QString dtd = QString ("\n<!DOCTYPE Attributes [ \n <!ENTITY Charset '%1'> \n <!ENTITY field_delimiter '%2'> \n <!ENTITY text_delimiter '%3'> \n <!ELEMENT field (code, name, type, mandatory, read_only, table_name*, column_name*, ref_column_name*)> \n <!ELEMENT code (#PCDATA)> \n <!ELEMENT name (#PCDATA)> \n <!ELEMENT type (#PCDATA)> \n <!ELEMENT mandatory (#PCDATA)> \n <!ELEMENT read_only (#PCDATA)>\n <!ELEMENT table_name (#PCDATA)> \n <!ELEMENT column_name (#PCDATA)> \n <!ELEMENT ref_column_name (#PCDATA)> \n]>\n").arg (codeName).arg (fDelim).arg (tDelim);
     xmlWriter->writeDTD (dtd);
     QString namespaceUri;
     QString attrsName = QString ("Attributes");
@@ -5180,12 +5196,19 @@ int KKSObjEditorFactory :: exportHeader (QIODevice *xmlDev, // XML-файл, содержа
     int i=0;
     for (pc = c->attributes().constBegin(); pc != c->attributes().constEnd(); pc++)
     {
-        QString fieldName = QString ("field");
+        QString fieldName = QString ("attribute");
         QString acode = QString ("code");
         QString atitle = QString ("name");
         QString atype = QString ("type");
+        QString aMandatory = QString ("mandatory");
+        QString aReadOnly = QString ("read_only");
+        QString attrId = QString ("id");
+        QString attrTableName = QString ("table_name");
+        QString attrColumnName = QString ("column_name");
+        QString attrRefColumnName = QString ("ref_column_name");
 
         xmlWriter->writeStartElement (fieldName);
+        xmlWriter->writeAttribute (attrId, QString::number(pc.key()));
         xmlWriter->writeCharacters ("\n        ");
 
         xmlWriter->writeStartElement (acode);
@@ -5201,8 +5224,41 @@ int KKSObjEditorFactory :: exportHeader (QIODevice *xmlDev, // XML-файл, содержа
         xmlWriter->writeStartElement (atype);
         xmlWriter->writeCharacters (QString::number (pc.value()->type()->attrType()));
         xmlWriter->writeEndElement ();
-        xmlWriter->writeCharacters ("\n    ");
+        xmlWriter->writeCharacters ("\n        ");
+        
+        xmlWriter->writeStartElement (aMandatory);
+        xmlWriter->writeCharacters(pc.value()->isMandatory() ? QString("true") : QString("false"));
+        xmlWriter->writeEndElement ();
+        xmlWriter->writeCharacters ("\n        ");
 
+        xmlWriter->writeStartElement (aReadOnly);
+        xmlWriter->writeCharacters(pc.value()->isReadOnly() ? QString("true") : QString("false"));
+        xmlWriter->writeEndElement ();
+        
+        if (pc.value()->type()->attrType() == KKSAttrType::atCheckList ||
+            pc.value()->type()->attrType() == KKSAttrType::atCheckListEx ||
+            pc.value()->type()->attrType() == KKSAttrType::atList ||
+            pc.value()->type()->attrType() == KKSAttrType::atParent ||
+            pc.value()->type()->attrType() == KKSAttrType::atRecordColorRef ||
+            pc.value()->type()->attrType() == KKSAttrType::atRecordTextColorRef)
+        {
+            xmlWriter->writeCharacters ("\n        ");
+            xmlWriter->writeStartElement (attrTableName);
+            xmlWriter->writeCharacters (pc.value()->tableName());
+            xmlWriter->writeEndElement ();
+            xmlWriter->writeCharacters ("\n        ");
+            xmlWriter->writeStartElement (attrColumnName);
+            xmlWriter->writeCharacters (pc.value()->columnName());
+            xmlWriter->writeEndElement ();
+            xmlWriter->writeCharacters ("\n        ");
+            xmlWriter->writeStartElement (attrRefColumnName);
+            xmlWriter->writeCharacters (pc.value()->refColumnName(false));
+            xmlWriter->writeEndElement ();
+            xmlWriter->writeCharacters ("\n    ");
+        }
+        else
+            xmlWriter->writeCharacters ("\n    ");
+        
         xmlWriter->writeEndElement ();
         //
         // Field
