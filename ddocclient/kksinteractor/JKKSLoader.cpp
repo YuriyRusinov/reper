@@ -1413,11 +1413,10 @@ JKKSCategoryPair JKKSLoader::parseCategories(const QMap<int, JKKSCategory> & old
     JKKSCategoryPair cCats;
     JKKSCategoryPair cNull;
 
-	int cnt = oldCats.count();
+    int cnt = oldCats.count();
 
-	if(cnt < 1 || cnt > 2)
-		return cNull;
-	
+    if(cnt < 1 || cnt > 2)
+        return cNull;
 
     QMap<int, JKKSCategory>::const_iterator pc = oldCats.constBegin();
     for (; pc != oldCats.constEnd(); ++pc )
@@ -1473,8 +1472,9 @@ JKKSCategoryPair JKKSLoader::parseCategories(const QMap<int, JKKSCategory> & old
     else
         return cNull;
     
-	return cCats;
+    return cCats;
 }
+
 QMap<int, JKKSCategory> JKKSLoader::pairToMap(const JKKSCategoryPair & pair) const
 {
     QMap<int, JKKSCategory> newCats;
