@@ -58,6 +58,7 @@ class QIODevice;
 class QComboBox;
 class QToolBar;
 class QTabWidget;
+class QXmlStreamWriter;
 
 class _F_EXPORT KKSObjEditorFactory : public KKSEntityFactory
 {
@@ -218,6 +219,8 @@ private:
     bool isIO (int idObjEx) const;
 
     void setObjConnect (KKSObjEditor *editor);
+    
+    int exportCategory (QXmlStreamWriter * xmlWriter, const KKSCategory *c);
 
 signals:
     void editorCreated (KKSObjEditor * editor);
