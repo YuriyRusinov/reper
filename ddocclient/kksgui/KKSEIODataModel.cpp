@@ -12,7 +12,6 @@
 #include "KKSAttrType.h"
 #include "KKSCategoryAttr.h"
 #include "KKSAttrView.h"
-#include "KKSEIOData.h"
 #include "KKSTreeItem.h"
 #include "KKSEIODataModel.h"
 

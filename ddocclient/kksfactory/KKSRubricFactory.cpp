@@ -421,17 +421,18 @@ void KKSRubricFactory :: viewAttachments (QAbstractItemModel * attachModel, cons
 
     //QString aNameCode ("name");
     //KKSCategoryAttr * cAName = c->attribute (aNameCode);
-    KKSMap<int, KKSCategoryAttr *> cAttrs = c->attributes();
+    const KKSCategory * ct = c && c->tableCategory() ? c->tableCategory() : c;
+    KKSMap<int, KKSCategoryAttr *> cAttrs = ct->attributes();
     int nCols = cAttrs.count ()+1;
 
-    QList<int> bkColors = c ? c->searchAttributesByType (KKSAttrType::atRecordColor) : QList<int>();
-    if (bkColors.isEmpty() && c)
-        bkColors += c->searchAttributesByType (KKSAttrType::atRecordColorRef);
+    QList<int> bkColors = ct ? ct->searchAttributesByType (KKSAttrType::atRecordColor) : QList<int>();
+    if (bkColors.isEmpty() && ct)
+        bkColors += ct->searchAttributesByType (KKSAttrType::atRecordColorRef);
     if (!bkColors.isEmpty())
         nCols--;
-    QList<int> fgColors = c ? c->searchAttributesByType (KKSAttrType::atRecordTextColor) : QList<int>();
-    if (fgColors.isEmpty() && c)
-        fgColors += c->searchAttributesByType (KKSAttrType::atRecordTextColorRef);
+    QList<int> fgColors = ct ? ct->searchAttributesByType (KKSAttrType::atRecordTextColor) : QList<int>();
+    if (fgColors.isEmpty() && ct)
+        fgColors += ct->searchAttributesByType (KKSAttrType::atRecordTextColorRef);
 
     if (!fgColors.isEmpty())
         nCols--;
