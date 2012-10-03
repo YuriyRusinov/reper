@@ -2639,7 +2639,7 @@ void KKSObjEditorFactory :: editExistOE (QWidget * editor, int idObject, qint64 
  * tableName -- название таблицы
  * drow -- номер удаляемой строки (для сохранения выделения)
  */
-int KKSObjEditorFactory :: deleteOE (QWidget * editor, int idObject, qint64 idObjEx, QString tableName, QAbstractItemModel * recModel, const QModelIndex& recIndex)
+int KKSObjEditorFactory :: deleteOE (QWidget * editor, int idObject, qint64 idObjEx, QString tableName, QAbstractItemModel * recModel, const QModelIndex& pRecIndex)
 {
     if (!editor)
         return ERROR_CODE;
@@ -2655,89 +2655,51 @@ int KKSObjEditorFactory :: deleteOE (QWidget * editor, int idObject, qint64 idOb
     if(!wObjEx)
         return ERROR_CODE;
 
-    QMessageBox::StandardButton res = QMessageBox::question (editor, 
-                                                             tr ("Delete"), 
-                                                             tr ("Do you really want to delete ?"), 
-                                                             QMessageBox::Yes | 
-                                                             QMessageBox::No,
-                                                             QMessageBox::No);
-
+    int resCode;
     //cSelection = qobject_cast <KKSObjEditor *>(editor) && qobject_cast <KKSObjEditor *>(editor)->recWidget ? qobject_cast <KKSObjEditor *>(editor)->recWidget->tv->selectionModel()->selection() : QItemSelection();
     //int row = cSelection.isEmpty() ? -1 : cSelection.indexes().at(0).row();
 
-    if (res == QMessageBox::Yes)
+    if (idObject == IO_IO_ID)
     {
-        int resCode;
-        if (idObject == IO_IO_ID)
-        {
-            KKSObject *wObjCh = loader->loadIO (idObjEx, true);
-            if(wObjCh){
-                resCode = ppf->deleteIO (wObjCh);
-                wObjCh->release ();
-            }
-            else{
-                resCode = PRIVILEGE_ERROR; //недостаточно прав доступа
-            }
+        KKSObject *wObjCh = loader->loadIO (idObjEx, true);
+        if(wObjCh){
+            resCode = ppf->deleteIO (wObjCh);
+            wObjCh->release ();
         }
-        else
-            resCode = eiof->deleteEIO (wObjEx, tableName);
-
-        if (resCode != OK_CODE)
-        {
-            if(res == ERROR_CODE){    
-                QMessageBox::critical(editor, 
-                                      tr("Error"), 
-                                      tr("An error was occured while deleting record!"), 
-                                      QMessageBox::Ok );
-            }
-            else if(res == PRIVILEGE_ERROR){
-                QMessageBox::critical(editor, 
-                                      tr("Error"), 
-                                      tr("You cannot delete this IO because of insufficient privileges!"), 
-                                      QMessageBox::Ok);
-            }
-
-            wObj->release();
-            wObjEx->release();
-            return resCode;
+        else{
+            resCode = PRIVILEGE_ERROR; //недостаточно прав доступа
         }
     }
     else
+        resCode = eiof->deleteEIO (wObjEx, tableName);
+
+    if (resCode != OK_CODE)
     {
-        wObj->release();
+        if(resCode == ERROR_CODE){    
+            QMessageBox::critical(editor, 
+                                  tr("Error"), 
+                                  tr("An error was occured while deleting record!"), 
+                                  QMessageBox::Ok );
+        }
+        else if(resCode == PRIVILEGE_ERROR){
+            QMessageBox::critical(editor, 
+                                  tr("Error"), 
+                                  tr("You cannot delete this IO because of insufficient privileges!"), 
+                                  QMessageBox::Ok);
+        }
+
         wObjEx->release();
-        return -2;
+        return resCode;
     }
-    if (recModel && recIndex.isValid())
+    wObjEx->release();
+
+    if (recModel && pRecIndex.isValid())
     {
-        QModelIndex pIndex = recIndex.parent();
-        int ir = recIndex.row();
+        QModelIndex pIndex = pRecIndex.parent();
+        int ir = pRecIndex.row();
         recModel->removeRows (ir, 1, pIndex);
     }
-/*
-    KKSObjEditor * oEditor = qobject_cast <KKSObjEditor *>(editor);
-    if (oEditor && wObj->category() && wObj->category()->tableCategory())
-    {
-        if (row >= 0 && row >= oEditor->recWidget->tv->model()->rowCount()-1)
-            row = oEditor->recWidget->tv->model()->rowCount()-2;
-
-        const KKSTemplate * t = new KKSTemplate (wObj->tableTemplate () ? *(wObj->tableTemplate()) : wObj->category()->tableCategory()->defTemplate());
-
-        QAbstractItemModel * mod = oEditor->recWidget->getSourceModel();
-
-        mod->removeRows (drow, 1);
-
-        if (t)
-            t->release ();
-
-        if (row >= 0)
-            oEditor->recWidget->tv->selectionModel()->setCurrentIndex (oEditor->recWidget->tv->model()->index (row, 0), QItemSelectionModel::ClearAndSelect);
-        for (int i=0; i<oEditor->recWidget->tv->model()->columnCount () && row>=0; i++)
-            oEditor->recWidget->tv->selectionModel()->select (oEditor->recWidget->tv->model()->index (row, i), QItemSelectionModel::Select);
-    }
-*/
     wObj->release();
-    wObjEx->release();
     return OK_CODE;
 }
 

@@ -798,7 +798,7 @@ void KKSStuffFactory :: delStuffElement (const QModelIndex& index, int entity, Q
             break;
         }
     }
-    int idStuffEnt = index.data (Qt::UserRole).toInt();
+    qint64 idStuffEnt = index.data (Qt::UserRole).toInt();
     int ier = oef->deleteOE (editor, io->id(), idStuffEnt, io->tableName(), stuffModel, index);
 /*    if (ier == OK_CODE && stuffModel)
     {

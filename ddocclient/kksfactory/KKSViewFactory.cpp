@@ -122,6 +122,8 @@ KKSRecWidget * KKSViewFactory :: createView (KKSTemplate* theTemplate,
     if (resWidget->actSetView)
         QObject::connect (resWidget->actSetView, SIGNAL (triggered()), objEditor, SLOT (setView()) );
     QObject::connect (resWidget, SIGNAL (refreshMod (QAbstractItemModel *)), objEditor, SLOT (refreshRecModel(QAbstractItemModel *)) );
+    tv->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    tv->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     QObject::connect (tv, SIGNAL (doubleClicked(const QModelIndex&)), objEditor, SLOT (editCurrentRec(const QModelIndex&)) );
     

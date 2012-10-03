@@ -1093,35 +1093,52 @@ void KKSObjEditor :: editObjectE (void)
 
 void KKSObjEditor :: delObjectE (void)
 {
+    QMessageBox::StandardButton res = QMessageBox::question (this, 
+                                                             tr ("Delete"), 
+                                                             tr ("Do you really want to delete ?"), 
+                                                             QMessageBox::Yes | 
+                                                             QMessageBox::No,
+                                                             QMessageBox::No);
+    if (res != QMessageBox::Yes)
+        return;
     this->clearW ();
     if (!recWidget || recWidget->getID() <= 0)
         return;
 
-    int idObjE = -1;//recWidget->getID();//wIndex.data (Qt::UserRole).toInt ();
+    QList<qint64> idObjRecs;//recWidget->getID();//wIndex.data (Qt::UserRole).toInt ();
 
+    QModelIndexList delInds;
     QAbstractItemModel * recModel (0);
     int i = tabEnclosures ? tabEnclosures->currentIndex () : 0;
-    if (i == 0 && recWidget && recWidget->getID() > 0)
+    if (i == 0 && recWidget)
     {
-        idObjE = recWidget->getID();//index.data(Qt::UserRole).toInt();
         recModel = recWidget->getSourceModel ();
+        delInds = recWidget->getSourceIndexes();
     }
     else if (i <= addCats.count())
     {
-        idObjE = addRecWidgets[i-1]->getID ();
         recModel = addRecWidgets[i-1]->getSourceModel ();
+        delInds = addRecWidgets[i-1]->getSourceIndexes();
+    }
+
+    for (int ii=0; ii<delInds.count(); ii++)
+    {
+        int idObjE = delInds[ii].data (Qt::UserRole).toInt ();
+        if (idObjE > 0 && !idObjRecs.contains (idObjE))
+            idObjRecs.append (idObjE);
     }
 
     //для ЭИО, которые имеют подчиненную таблицу, 
     //и соответственно для которых доступна данная операция
     //идентификатор ЭИО является идентификатором ИО
     int idObject = pObjectEx->id();
-    QModelIndex dIndex = (i == 0 ? recWidget->getSourceIndex () : addRecWidgets[i-1]->getSourceIndex ()) ;
-    if (recModel->rowCount(dIndex) > 0)
+    QModelIndex dIndex;// = (i == 0 ? recWidget->getSourceIndex () : addRecWidgets[i-1]->getSourceIndex ()) ;
+/*    if (recModel->rowCount(dIndex) > 0)
     {
         QMessageBox::warning (this, tr ("Delete record"), tr("Error ! Record contains children. Removing is impossible."), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
+ */
     QString tabName = QString ();
     qDebug () << __PRETTY_FUNCTION__ << i;
     if (i == 0)
@@ -1132,7 +1149,14 @@ void KKSObjEditor :: delObjectE (void)
         tabName = p.value()->getTableName();
     }
     qDebug () << __PRETTY_FUNCTION__ << tabName;
-    emit delObjectEx (this, idObject, idObjE, tabName, recModel, dIndex);
+    for (int ii=0; ii<idObjRecs.count(); ii++)
+    {
+        QModelIndexList dInds = (i == 0 ? recWidget->getSourceIndexes () : addRecWidgets[i-1]->getSourceIndexes ());
+        dIndex = dInds.at(0);
+        dIndex = dIndex.sibling (dIndex.row(), 0);
+        qDebug () << __PRETTY_FUNCTION__ << dIndex;
+        emit delObjectEx (this, idObject, idObjRecs[ii], tabName, recModel, dIndex);
+    }
 }
 
 void KKSObjEditor :: saveChildObjE (KKSObjectExemplar *childObjE)
