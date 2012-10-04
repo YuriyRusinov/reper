@@ -1,7 +1,7 @@
 /***********************************************************************
  * Module:  KKSConverter.cpp
  * Author:  sergey
- * Modified: 16 ¤¥ª ¡àï 2008 £. 12:09:29
+ * Modified: 16 äåêàáðÿ 2008 ã. 12:09:29
  * Purpose: Implementation of the class KKSConverter
  ***********************************************************************/
 
@@ -84,9 +84,9 @@ KKSObjectExemplar * KKSConverter::attributeToExemplar(const KKSLoader * loader, 
     appendAttrValue(tc, attrValues, 15,  a->isSystem() ? "true" : "false", KKSAttrType::atBool);//is_system
     //id_attr_group
     if(a->group())
-	    appendAttrValue(tc, attrValues, 284,  QString::number(a->group()->id()), KKSAttrType::atInt);//id_attr_group
-	else
-		appendAttrValue(tc, attrValues, 284,  QString::number(2), KKSAttrType::atInt);//"others attributes" group
+        appendAttrValue(tc, attrValues, 284,  QString::number(a->group()->id()), KKSAttrType::atInt);//id_attr_group
+    else
+        appendAttrValue(tc, attrValues, 284,  QString::number(2), KKSAttrType::atInt);//"others attributes" group
 
     //id_search_template
     if(a->searchTemplate())
