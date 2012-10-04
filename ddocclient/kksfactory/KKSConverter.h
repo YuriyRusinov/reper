@@ -24,6 +24,9 @@ class KKSType;
 class KKSSyncType;
 class KKSState;
 class KKSTemplate;
+class KKSRubricBase;
+class KKSRubricItem;
+class KKSEIOData;
 
 class _F_EXPORT KKSConverter
 {
@@ -40,7 +43,7 @@ public:
 
     static bool objectFromExemplar(const KKSLoader * loader, KKSObject * io, const KKSObjectExemplar * eio);
 
-
+    static KKSEIOData * rubricEntityToData (const KKSLoader * loader, const KKSRubricBase * rubricB);
 protected:
 private:
     KKSConverter();

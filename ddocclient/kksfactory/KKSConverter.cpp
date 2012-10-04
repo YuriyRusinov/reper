@@ -673,3 +673,11 @@ bool KKSConverter::objectFromExemplar(const KKSLoader * loader, KKSObject * io, 
 
     return true;
 }
+
+KKSEIOData * KKSConverter :: rubricEntityToData (const KKSLoader * loader, const KKSRubricBase * rubricB)
+{
+    Q_UNUSED (loader);
+    Q_UNUSED (rubricB);
+
+    return 0;
+}
