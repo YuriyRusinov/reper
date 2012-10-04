@@ -17,6 +17,7 @@
 #include <QHeaderView>
 #include <QStandardItemModel>
 #include <QAbstractItemModel>
+#include <QAbstractProxyModel>
 #include <QSortFilterProxyModel>
 #include <QItemSelectionModel>
 #include <QItemSelection>
@@ -905,6 +906,25 @@ void KKSIncludesWidget::slotAddRubricItem(int idObject, QString name)
     emit rubricsChanged ();
 }
 
+void KKSIncludesWidget :: slotInitAttachmentsModel (QAbstractItemModel * attachModel)
+{
+    if (!attachModel)
+        return;
+    
+    if (qobject_cast<QAbstractProxyModel*>(recWItems->getModel()))
+    {
+        QAbstractProxyModel * proxyModel = qobject_cast<QAbstractProxyModel*>(recWItems->getModel());
+        proxyModel->setSourceModel (attachModel);
+    }
+    else
+    {
+        QSortFilterProxyModel * sortModel = new KKSSortFilterProxyModel();
+        sortModel->setSourceModel (attachModel);
+        recWItems->setEIOModel (sortModel);
+    }
+    recWItems->setVisible (true);
+}
+
 void KKSIncludesWidget :: editRubricItem (void)
 {
     int idObject = -1;
@@ -1130,6 +1150,9 @@ void KKSIncludesWidget::rubricSelectionChanged (const QItemSelection& selected, 
     }
     
     const KKSRubric * rubr = getRubric (wIndex);
+    if (rubr)
+        emit initAttachmentsModel (rubr);
+/*
     if (rubr && rubr->getCategory())
     {
         recWItems->setVisible (true);
@@ -1141,13 +1164,11 @@ void KKSIncludesWidget::rubricSelectionChanged (const QItemSelection& selected, 
             sortModel->setSourceModel (attachModel);
             recWItems->setEIOModel (sortModel);
         }
-//        KKSItemDelegate * iDeleg = qobject_cast<KKSItemDelegate *>(recWItems->getView()->itemDelegate());
-//        if (iDeleg)
-//            iDeleg->setCategory (rubr->getCategory ());
         emit rubricAttachmentsView (attachModel, rubr);
     }
     else
         recWItems->setVisible (false);
+ */
 }
 
 void KKSIncludesWidget :: turnRubricSplitter (void)

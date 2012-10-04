@@ -84,6 +84,7 @@ private slots:
 
 public slots:
     void slotAddRubricItem(int idRubricItem, QString name);
+    void slotInitAttachmentsModel (QAbstractItemModel * attachModel);
 
 private slots:
     void init();
@@ -102,6 +103,8 @@ signals:
     void loadSearchtemplate (RubricForm * rForm);
     void loadCategory (RubricForm * rForm);
     void rubricAttachmentsView (QAbstractItemModel * attachModel, const KKSRubric * r);
+    
+    void initAttachmentsModel (const KKSRubric * r);
 
 private:
     //

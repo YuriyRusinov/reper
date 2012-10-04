@@ -3,6 +3,7 @@
 #include <QItemDelegate>
 #include <QAbstractItemModel>
 #include <QAbstractProxyModel>
+#include <QStandardItemModel>
 #include <QModelIndex>
 #include <QVariant>
 #include <QtDebug>
@@ -100,6 +101,7 @@ KKSIncludesWidget * KKSRubricFactory :: createRubricEditor (int mode, const KKSL
             QModelIndex wIndex = rubrMod->index (nr, 0);
             const KKSRubricBase * rOthers = loader->loadCatRubricators ();//new KKSRubricOthers (-1, tr("Others"));
             bool isRubrDataSet = rubrMod->setData (wIndex, QVariant::fromValue<const KKSRubricBase *>(rOthers), Qt::UserRole+1);
+            Q_UNUSED (isRubrDataSet);
 //            bool isDataSet = rubrMod->setData (wIndex, tr("Others"), Qt::DisplayRole);
 //            bool isTypeSet = rubrMod->setData (wIndex, atOthers, Qt::UserRole);
 //            bool isIconSet = rubrMod->setData (wIndex, KKSRubric::icon().scaled(24, 24), Qt::DecorationRole);
@@ -129,6 +131,9 @@ KKSIncludesWidget * KKSRubricFactory :: createRubricEditor (int mode, const KKSL
     connect (iW, SIGNAL (loadCategory (RubricForm *)), this, SLOT (loadCategory (RubricForm *)) );
     connect (iW, SIGNAL (rubricAttachmentsView (QAbstractItemModel *, const KKSRubric *)), this, SLOT (viewAttachments (QAbstractItemModel *, const KKSRubric *)) );
     connect (iW, SIGNAL (copyFromRubr(KKSRubric *, QAbstractItemModel *, const QModelIndex&)), this, SLOT (copyFromRubric (KKSRubric *, QAbstractItemModel *, const QModelIndex&)) );
+    connect (iW, SIGNAL (initAttachmentsModel (const KKSRubric *)), this, SLOT (initRubricAttachments (const KKSRubric *)) );
+    
+    connect (this, SIGNAL (rubricAttachments (QAbstractItemModel *)), iW, SLOT (slotInitAttachmentsModel (QAbstractItemModel *)) );
     emit rubricEditorCreated (iW);
 
     return iW;
@@ -716,4 +721,14 @@ void KKSRubricFactory :: copyFromRubric (KKSRubric * rDest, QAbstractItemModel *
         if (oEditor)
             delete oEditor;
     refIO->release();
+}
+
+void KKSRubricFactory :: initRubricAttachments (const KKSRubric * r)
+{
+    if (!r)
+        return;
+    
+    QAbstractItemModel * attachModel = new QStandardItemModel (0, 0);
+    
+    emit rubricAttachments (attachModel);
 }
