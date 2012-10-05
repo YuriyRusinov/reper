@@ -11,6 +11,7 @@
 #include <kksincludeswidget.h>
 #include <rubricform.h>
 #include "KKSLoader.h"
+#include "KKSConverter.h"
 #include <KKSRubric.h>
 #include <KKSEventFilter.h>
 #include "KKSPPFactory.h"
@@ -25,6 +26,8 @@
 #include <KKSSearchTemplate.h>
 #include "kksstuffform.h"
 #include "KKSAccessEntity.h"
+#include <KKSEIOData.h>
+#include <KKSEIODataModel.h>
 
 #include "KKSRubricFactory.h"
 
@@ -728,7 +731,19 @@ void KKSRubricFactory :: initRubricAttachments (const KKSRubric * r)
     if (!r)
         return;
     
-    QAbstractItemModel * attachModel = new QStandardItemModel (0, 0);
+    KKSMap<qint64, KKSEIOData *> rData = KKSConverter::rubricEntityToData(loader, r);
+    KKSObject * refIO = loader->loadIO(IO_IO_ID);
+    const KKSCategory * cat (0);
+    
+    if (r->getCategory() && r->getCategory()->attributes().count() > 0)
+        cat = r->getCategory();
+    else
+        cat = refIO->category()->tableCategory();
+    const KKSTemplate * t = new KKSTemplate (cat->defTemplate ());
+    QAbstractItemModel * attachModel = new KKSEIODataModel (t, rData);//new QStandardItemModel (0, 0);
+    qDebug () << __PRETTY_FUNCTION__ << attachModel->rowCount() << attachModel->columnCount();
+    t->release ();
+    refIO->release ();
     
     emit rubricAttachments (attachModel);
 }

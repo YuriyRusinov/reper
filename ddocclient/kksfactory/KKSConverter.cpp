@@ -678,12 +678,39 @@ bool KKSConverter::objectFromExemplar(const KKSLoader * loader, KKSObject * io, 
 
 KKSMap<qint64, KKSEIOData *> KKSConverter :: rubricEntityToData (const KKSLoader * loader, const KKSRubric * rubricB)
 {
-    Q_UNUSED (loader);
     KKSMap<qint64, KKSEIOData *> rubricData;
-    for (int i=0; i<rubricB->items().count(); i++)
+    KKSObject * refIO = loader->loadIO(IO_IO_ID);
+    const KKSCategory * cat = rubricB->getCategory() && rubricB->getCategory()->attributes().count() > 0 ? rubricB->getCategory() : refIO->category()->tableCategory();
+    KKSObject * refRubr = loader->loadIO(IO_RUBR_ID);
+    const KKSCategory * ct = refRubr->category();
+    
+    if (!ct || !ct->tableCategory())
     {
-        
+        refIO->release ();
+        refRubr->release ();
+        return rubricData;
     }
+    ct = ct->tableCategory();
+    KKSAttribute * aid = loader->loadAttribute (1);
+    if (!aid)
+    {
+        refIO->release ();
+        refRubr->release ();
+        return rubricData;
+    }
+    QString sql = QString ("select id_io_object from io_rubricator ior where ior.id_rubric=%1").arg (rubricB->id());
+    KKSValue * val = new KKSValue (sql, KKSAttrType::atInt64);
+    const KKSFilter * f = new KKSFilter (aid, val, KKSFilter::foInSQL);
+    KKSFilterGroup * fg = new KKSFilterGroup (false);
+    fg->addFilter (f);
+    KKSList<const KKSFilterGroup *> filters;
+    filters.append (fg);
+    fg->release ();
+    f->release ();
+    rubricData = loader->loadEIOList (cat, refIO->tableName(), filters);
+    qDebug () << __PRETTY_FUNCTION__ << rubricData.count();
+    refRubr->release();
+    refIO->release();
 
     return rubricData;
 }
