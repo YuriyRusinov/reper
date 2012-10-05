@@ -20,6 +20,8 @@
 #include "KKSAttrType.h"
 #include "KKSState.h"
 #include "KKSSearchTemplate.h"
+#include "KKSRubric.h"
+#include <KKSEIOData.h>
 
 
 
@@ -674,10 +676,14 @@ bool KKSConverter::objectFromExemplar(const KKSLoader * loader, KKSObject * io, 
     return true;
 }
 
-KKSEIOData * KKSConverter :: rubricEntityToData (const KKSLoader * loader, const KKSRubricBase * rubricB)
+KKSMap<qint64, KKSEIOData *> KKSConverter :: rubricEntityToData (const KKSLoader * loader, const KKSRubric * rubricB)
 {
     Q_UNUSED (loader);
-    Q_UNUSED (rubricB);
+    KKSMap<qint64, KKSEIOData *> rubricData;
+    for (int i=0; i<rubricB->items().count(); i++)
+    {
+        
+    }
 
-    return 0;
+    return rubricData;
 }

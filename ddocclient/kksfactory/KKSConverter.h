@@ -10,7 +10,7 @@
 
 #include "kksfactory_config.h"
 #include "KKSList.h"
-//#include "KKSMap.h"
+#include "KKSMap.h"
 #include "KKSAttrType.h"
 #include "KKSAttrValue.h"
 #include "KKSValue.h"
@@ -25,6 +25,7 @@ class KKSSyncType;
 class KKSState;
 class KKSTemplate;
 class KKSRubricBase;
+class KKSRubric;
 class KKSRubricItem;
 class KKSEIOData;
 
@@ -43,7 +44,7 @@ public:
 
     static bool objectFromExemplar(const KKSLoader * loader, KKSObject * io, const KKSObjectExemplar * eio);
 
-    static KKSEIOData * rubricEntityToData (const KKSLoader * loader, const KKSRubricBase * rubricB);
+    static KKSMap<qint64, KKSEIOData *> rubricEntityToData (const KKSLoader * loader, const KKSRubric * rubricB);
 protected:
 private:
     KKSConverter();
