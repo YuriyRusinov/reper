@@ -680,7 +680,7 @@ KKSMap<qint64, KKSEIOData *> KKSConverter :: rubricEntityToData (const KKSLoader
 {
     KKSMap<qint64, KKSEIOData *> rubricData;
     KKSObject * refIO = loader->loadIO(IO_IO_ID);
-    const KKSCategory * cat = rubricB->getCategory() && rubricB->getCategory()->attributes().count() > 0 ? rubricB->getCategory() : refIO->category()->tableCategory();
+    const KKSCategory * cat = /*rubricB->getCategory() && rubricB->getCategory()->attributes().count() > 0 ? rubricB->getCategory() :*/ refIO->category()->tableCategory();
     KKSObject * refRubr = loader->loadIO(IO_RUBR_ID);
     const KKSCategory * ct = refRubr->category();
     
@@ -698,7 +698,11 @@ KKSMap<qint64, KKSEIOData *> KKSConverter :: rubricEntityToData (const KKSLoader
         refRubr->release ();
         return rubricData;
     }
-    QString sql = QString ("select id_io_object from io_rubricator ior where ior.id_rubric=%1").arg (rubricB->id());
+    QString sql;
+    if (rubricB->rubricType () != KKSRubricBase::atRubricCategory)
+        sql = QString ("select id_io_object from io_rubricator ior where ior.id_rubric=%1").arg (rubricB->id());
+    else
+        sql = QString ("select id from io_objects io where io.id_io_category=%1").arg (rubricB->id());
     KKSValue * val = new KKSValue (sql, KKSAttrType::atInt64);
     const KKSFilter * f = new KKSFilter (aid, val, KKSFilter::foInSQL);
     KKSFilterGroup * fg = new KKSFilterGroup (false);

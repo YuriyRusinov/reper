@@ -735,10 +735,10 @@ void KKSRubricFactory :: initRubricAttachments (const KKSRubric * r)
     KKSObject * refIO = loader->loadIO(IO_IO_ID);
     const KKSCategory * cat (0);
     
-    if (r->getCategory() && r->getCategory()->attributes().count() > 0)
-        cat = r->getCategory();
-    else
-        cat = refIO->category()->tableCategory();
+    //if (r->getCategory() && r->getCategory()->attributes().count() > 0)
+    //    cat = r->getCategory();
+    //else
+    cat = refIO->category()->tableCategory();
     const KKSTemplate * t = new KKSTemplate (cat->defTemplate ());
     QAbstractItemModel * attachModel = new KKSEIODataModel (t, rData);//new QStandardItemModel (0, 0);
     qDebug () << __PRETTY_FUNCTION__ << attachModel->rowCount() << attachModel->columnCount();
