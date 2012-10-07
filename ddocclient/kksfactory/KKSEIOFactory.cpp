@@ -953,7 +953,7 @@ int KKSEIOFactory::insertMessage(KKSObjectExemplar* eio) const
     if(!eio)
         return ERROR_CODE;
 
-    QString sql = QString("select msgInsertOut(%1, %2, %3, %4)")
+    QString sql = QString("select msgInsertOut(%1::int4, %2, %3, %4)")
         .arg(eio->attrValue(ATTR_ID_IO_OBJECT)->value().valueForInsert())
         .arg(eio->attrValue(ATTR_MESSAGE_BODY)->value().valueForInsert())
         .arg(eio->attrValue(ATTR_ID_DL_RECEIVER)->value().valueForInsert())
