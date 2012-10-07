@@ -690,21 +690,16 @@ void KKSIncludesWidget::on_pbDelRubricator_clicked ()
 */
 void KKSIncludesWidget :: delRubricItem (void)
 {
-    QItemSelectionModel * sm = NULL;
+    QItemSelectionModel * sm = tvItems->selectionModel ();
 
-    bool isRubr = true;
-    if (recWItems->isVisible ())
-    {
-        sm = tvItems->selectionModel ();
-        isRubr = false;
-    }
-    else
-        sm = twIncludes->selectionModel();
+    QItemSelectionModel * smInc = twIncludes->selectionModel();
     
-    QItemSelection sel = sm ? sm->selection() : QItemSelection();
+    QItemSelection sel = sm->selection();
+    QItemSelection selInc = smInc->selection();
 
     QModelIndex index;// = sm ? sm->currentIndex() : QModelIndex ();
-    if (!sm || sel.indexes().isEmpty())
+    QModelIndex indexInc;
+    if (!sm || sel.indexes().isEmpty() || !smInc || selInc.indexes().isEmpty())
     {
         return;
     }
@@ -712,12 +707,13 @@ void KKSIncludesWidget :: delRubricItem (void)
     {
         index = sel.indexes().at (0);
         index = index.sibling(index.row(), 0);
-        int pType = index.parent().data(Qt::UserRole+2).toInt();
-        if (!isRubr || 
-                (index.data(Qt::UserRole+2).toInt() == KKSRubricBase::atRubricItem && 
-                 index.parent().isValid() &&
-                 pType != KKSRubricBase::atRubricCategory)
-                )
+        QModelIndex pIndex = selInc.indexes().at(0);
+        pIndex = pIndex.sibling (pIndex.row(), 0);
+        int pType = pIndex.data(Qt::UserRole+2).toInt();
+        if ( pType == KKSRubricBase::atRubric || pType == KKSRubricBase::atRootRubric)
+                //(index.data(Qt::UserRole+2).toInt() == KKSRubricBase::atRubricItem && 
+                 //pType != KKSRubricBase::atRubricCategory)
+                //)
         {
             //
             // item selected
@@ -737,22 +733,22 @@ void KKSIncludesWidget :: delRubricItem (void)
         }
     }
 
-    QModelIndex wIndex = twIncludes->selectionModel()->currentIndex ();
+    QModelIndex wIndex = smInc->currentIndex ();
     KKSRubric * r = NULL;
-    if(isRubr)
-        r = const_cast<KKSRubric *>(getRubric(wIndex.parent()));
-    else
-        r = const_cast<KKSRubric *>(getRubric(wIndex));
+//    if(isRubr)
+//        r = const_cast<KKSRubric *>(getRubric(wIndex.parent()));
+//    else
+    r = const_cast<KKSRubric *>(getRubric(wIndex));
 
     if(!r)
         return;
     
     r->removeItem (index.row());
 
-    if (isRubr)
-        twIncludes->model()->removeRow(wIndex.row(), wIndex.parent());
-    else
-        tvItems->model ()->removeRow (index.row(), index.parent());
+//    if (isRubr)
+//        twIncludes->model()->removeRow(wIndex.row(), wIndex.parent());
+//    else
+    tvItems->model ()->removeRow (index.row(), index.parent());
     isChanged = true;
     emit rubricsChanged ();
 }
