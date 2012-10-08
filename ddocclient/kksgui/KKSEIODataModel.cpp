@@ -15,7 +15,7 @@
 #include "KKSTreeItem.h"
 #include "KKSEIODataModel.h"
 
-KKSEIODataModel :: KKSEIODataModel (const KKSTemplate * t, const KKSMap<qint64, KKSEIOData *>& objRecs, QObject *parent)
+KKSEIODataModel :: KKSEIODataModel (const KKSTemplate * t, const KKSMap< qint64, KKSEIOData * > & objRecs, QObject *parent)
     : QAbstractItemModel (parent),
     tRef (t),
     cAttrP (0),

@@ -6,10 +6,10 @@
 #include <QMap>
 #include <QList>
 
+#include "KKSEIOData.h"
 #include "KKSMap.h"
 #include "KKSList.h"
 #include "KKSAttrType.h"
-#include "KKSEIOData.h"
 #include "kksgui_config.h"
 
 class KKSTemplate;
@@ -21,7 +21,9 @@ class KKSAttrView;
 class _GUI_EXPORT KKSEIODataModel : public QAbstractItemModel
 {
 public:
-    KKSEIODataModel (const KKSTemplate * t, const KKSMap<qint64, KKSEIOData *>& objRecs=KKSMap<qint64, KKSEIOData *>(), QObject *parent = 0);
+    KKSEIODataModel (const KKSTemplate * t, 
+                     const KKSMap< qint64, KKSEIOData * > & objRecs, //=KKSMap<qint64, KKSEIOData *>(), 
+                     QObject *parent = 0);
     virtual ~KKSEIODataModel ();
 
     virtual int columnCount (const QModelIndex& parent = QModelIndex()) const;
