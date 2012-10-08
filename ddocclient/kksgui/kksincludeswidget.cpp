@@ -278,7 +278,7 @@ QModelIndex KKSIncludesWidget::appendItemRow(const KKSRubricItem * item, QModelI
 //    model->setData (model->index(cnt, 0, index), item->id(), Qt::UserRole);// idObject
 //    model->setData (model->index(cnt, 0, index), item->getIcon().isNull() ? QIcon(":/ddoc/rubric_item.png") : item->getIcon(), Qt::DecorationRole);
     
-    twIncludes->setExpanded(index, true);
+//    twIncludes->setExpanded(index, true);
     
     return cIndex;
 }
@@ -860,39 +860,25 @@ void KKSIncludesWidget::slotAddRubricItem(int idObject, QString name)
 
     r->addItem(item);
 
-    //is rubric item
-    while (index.data(Qt::UserRole) == 2)
+    //
+    // rubric item is selected
+    //
+    while (index.data(Qt::UserRole+2) == KKSRubricBase::atRubricItem)
         index = index.parent();
 
     if (r->getCategory())
     {
         qDebug () << __PRETTY_FUNCTION__ << r->name() << rIsEmpty;
-        if (rIsEmpty)
-        {
-/*            QAbstractItemModel * rmodel = twIncludes->model();
-//            if ((index.data (Qt::UserRole).toInt() != 2 && rmodel->rowCount(index) == 0) || index.data (Qt::UserRole).toInt()==2)
-            rmodel->insertRows (0, 1, index);
-            if (rmodel->columnCount (index) == 0)
-                rmodel->insertColumns (0, 1, index);
-            QModelIndex wIndex = rmodel->index (0, 0, index);
-            rmodel->setData (wIndex, tr ("View attachments ..."), Qt::DisplayRole);
-            rmodel->setData (wIndex, 2, Qt::UserRole);//is item
- */
-        }
-        recWItems->setVisible (!rIsEmpty);
         QAbstractItemModel * attachModel = recWItems->getSourceModel ();
         if (!attachModel)
-        {
-            QSortFilterProxyModel * sortModel = new KKSSortFilterProxyModel();
-            attachModel = new QStandardItemModel (0, 0);
-            sortModel->setSourceModel (attachModel);
-            recWItems->setEIOModel (sortModel);
-        }
-//        KKSItemDelegate * iDeleg = qobject_cast<KKSItemDelegate *>(recWItems->getView()->itemDelegate());
-//        if (iDeleg)
-//            iDeleg->setCategory (rubr->getCategory ());
+            emit initAttachmentsModel (r);
+//            QSortFilterProxyModel * sortModel = new KKSSortFilterProxyModel();
+//            attachModel = new QStandardItemModel (0, 0);
+//            sortModel->setSourceModel (attachModel);
+//            recWItems->setEIOModel (sortModel);
+//        }
         emit rubricAttachmentsView (attachModel, r);
-        return;
+        //return;
     }
     QModelIndex cIndex = appendItemRow(item, index);
     twIncludes->setCurrentIndex(cIndex);
