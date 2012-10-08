@@ -168,6 +168,8 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
     }
     else if (role == Qt::DecorationRole)
     {
+        if (index.column() == 0)
+            return wItem->getIcon();
         KKSAttrView * v = avList[index.column()];
         if( v->type()->attrType() == KKSAttrType::atJPG ||
             (v->refType() && v->refType()->attrType() == KKSAttrType::atJPG)
@@ -258,6 +260,12 @@ bool KKSEIODataModel :: setData (const QModelIndex& index, const QVariant& value
         KKSEIOData * dVal = wItem->getData();;
         wItem->setData (dVal, tRef);
         emit dataChanged (topL, bottomR);
+    }
+    else if (role == Qt::DecorationRole && index.column() == 0)
+    {
+        QIcon icon = value.value<QIcon>();
+        wItem->setIcon (icon);
+        emit dataChanged (topL, topL);
     }
     else
         return false;

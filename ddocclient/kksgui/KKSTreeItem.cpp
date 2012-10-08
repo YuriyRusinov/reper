@@ -7,9 +7,10 @@
 #include "KKSAttrType.h"
 #include "KKSEIOData.h"
 
-KKSTreeItem :: KKSTreeItem (qint64 id, KKSEIOData * d, const KKSTemplate * t, KKSTreeItem * parent)
+KKSTreeItem :: KKSTreeItem (qint64 id, KKSEIOData * d, const KKSTemplate * t, const QIcon& itIcon, KKSTreeItem * parent)
     : idItem (id),
       data (NULL),
+      itemIcon (itIcon),
       parentItem (parent),
       childItems (QList<KKSTreeItem*>())
 {
@@ -55,7 +56,8 @@ bool KKSTreeItem :: insertChildren(int position, int count)
     {
          KKSEIOData * d = 0;//data;
          const KKSTemplate * t (0);
-         KKSTreeItem *item = new KKSTreeItem(-1-row, d, t, this);
+         QIcon ic;
+         KKSTreeItem *item = new KKSTreeItem(-1-row, d, t, ic, this);
          childItems.insert(position, item);
      }
 
@@ -235,4 +237,14 @@ void KKSTreeItem :: appendColumns (int ncols)
 {
     for (int i=0; i<ncols; i++)
         itemData.append(QVariant());
+}
+
+QIcon KKSTreeItem :: getIcon (void) const
+{
+    return itemIcon;
+}
+
+void KKSTreeItem :: setIcon (const QIcon& icon)
+{
+    itemIcon = icon;
 }

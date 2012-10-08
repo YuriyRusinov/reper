@@ -11,6 +11,7 @@
 #include <QMap>
 #include <QList>
 #include <QVector>
+#include <QIcon>
 #include <QVariant>
 
 #include "kksgui_config.h"
@@ -21,7 +22,7 @@ class KKSTemplate;
 class _GUI_EXPORT KKSTreeItem
 {
 public:
-    KKSTreeItem (qint64 id, KKSEIOData * d, const KKSTemplate * t, KKSTreeItem * parent=0);
+    KKSTreeItem (qint64 id, KKSEIOData * d, const KKSTemplate * t, const QIcon& itIcon=QIcon(), KKSTreeItem * parent=0);
     ~KKSTreeItem (void);
 
     KKSTreeItem *child(int number);
@@ -40,10 +41,13 @@ public:
     qint64 id () const;
     void setId (qint64 newId);
     void clearChildren (void);
+    QIcon getIcon (void) const;
+    void setIcon (const QIcon& icon);
     
 private:
     qint64 idItem;
     KKSEIOData * data;
+    QIcon itemIcon;
     QVector<QVariant> itemData;
     KKSTreeItem *parentItem;
     QList<KKSTreeItem*> childItems;
