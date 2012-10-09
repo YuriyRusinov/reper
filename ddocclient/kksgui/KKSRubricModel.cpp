@@ -118,21 +118,14 @@ QModelIndex KKSRubricModel :: index (int row, int column, const QModelIndex& par
     KKSRubricTreeItem * rItem = getRubricEntity (parent);
     if (!rItem)
         return QModelIndex ();
-    const KKSRubricBase *parentItem = rItem->getData();
+/*    const KKSRubricBase *parentItem = rItem->getData();
     if (!parentItem ||
         parentItem->rubricType() == KKSRubricBase::atRubricItem ||
         (parentItem->rubricType() != KKSRubricBase::atOthers && ((const KKSRubric *)parentItem) && ((const KKSRubric *)parentItem)->getCategory ()))
         return QModelIndex();
-    
-//    const KKSRubric * pRubr = static_cast<const KKSRubric *>(parentItem);
-//    if (!pRubr)
-//        return QModelIndex();
+*/
     const KKSRubricTreeItem *childItem (rItem->child(row));
-/*    if (row >= 0 && row < pRubr->rubrics().count())
-        childItem = static_cast <const KKSRubricBase *> (pRubr->rubric(row));
-    else if  (row >= pRubr->rubrics().count() && row < pRubr->rubrics().count()+pRubr->items().count()) 
-        childItem = static_cast <const KKSRubricBase *>(pRubr->item(row-pRubr->rubrics().count()));
- */
+
     if (childItem)
         return createIndex(row, column, (void *)childItem);
     else
@@ -162,9 +155,16 @@ int KKSRubricModel :: rowCount (const QModelIndex& parent) const
 
      const KKSRubricBase * parentRubr = parentItem->getData ();
      const KKSRubric * pRubr = (const KKSRubric *)parentRubr;
-     if (parentRubr && parentRubr->rubricType() != KKSRubricBase::atOthers && pRubr && pRubr->getCategory ())
+     Q_UNUSED (pRubr);
+     if (parentRubr && parentRubr->rubricType() != KKSRubricBase::atOthers && parentRubr->rubricType() == KKSRubricBase::atRubricCategory)//&& pRubr && pRubr->getCategory ())
          return 0;
-     return parentItem->childCount();
+     //else if (pRubr && pRubr->rubricType() != KKSRubricBase::atRubricCategory && pRubr->rubricType() != KKSRubricBase::atRootRubric)
+     //{
+     //    qDebug () << __PRETTY_FUNCTION__ << pRubr->rubricType();
+     //    return pRubr->rubrics().count();
+     //}
+     else
+         return parentItem->childCount();
 }
 
 int KKSRubricModel :: columnCount (const QModelIndex& /*parent*/) const
@@ -263,11 +263,11 @@ void KKSRubricModel :: setupData (KKSRubricTreeItem * parent)
             parent->appendChild (wrItem);
             setupData (wrItem);
         }
-        for (int i=0; i<wRubric->items().count(); i++)
-        {
-            KKSRubricTreeItem * wrItem = new KKSRubricTreeItem (wRubric->item(i)->id(), wRubric->item(i), parent);
-            parent->appendChild (wrItem);
-        }
+        //for (int i=0; i<wRubric->items().count(); i++)
+        //{
+        //    KKSRubricTreeItem * wrItem = new KKSRubricTreeItem (wRubric->item(i)->id(), wRubric->item(i), parent);
+        //    parent->appendChild (wrItem);
+        //}
     }
     else
     {
