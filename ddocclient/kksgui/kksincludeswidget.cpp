@@ -905,6 +905,15 @@ void KKSIncludesWidget :: slotInitAttachmentsModel (QAbstractItemModel * attachM
         recWItems->setEIOModel (sortModel);
     }
     recWItems->setVisible (true);
+    const KKSTemplate * t = attachModel->data(attachModel->index (0, 0), Qt::UserRole+2).value<const KKSTemplate *>();
+    if (!t)
+        return;
+    QHeaderView * hItems = recWItems->getView()->header();
+    for (int i=0; i<attachModel->columnCount(); i++)
+    {
+        QSize hSize = attachModel->headerData(i, Qt::Horizontal, Qt::SizeHintRole).toSize();
+        hItems->resizeSection(i, hSize.width());
+    }
 }
 
 void KKSIncludesWidget :: editRubricItem (void)

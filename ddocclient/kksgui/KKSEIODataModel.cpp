@@ -186,6 +186,11 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
         else
             return QVariant();
     }
+    else if (role == Qt::SizeHintRole)
+    {
+        KKSAttrView * v = avList[index.column()];
+        return QSize (v->defWidth(),24);
+    }
     return QVariant();
 }
 
@@ -196,6 +201,11 @@ QVariant KKSEIODataModel :: headerData (int section, Qt::Orientation orientation
     {
         QVariant v = avList[section]->title();
         return v;
+    }
+    else if (orientation == Qt::Horizontal && section >= 0 && section < avList.count() && role == Qt::SizeHintRole)
+    {
+        QSize hSize (avList[section]->defWidth(), 24);
+        return hSize;
     }
     else
         return QVariant ();
