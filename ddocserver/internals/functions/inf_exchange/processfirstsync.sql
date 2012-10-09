@@ -156,7 +156,7 @@ begin
     end loop;
     
     if(isGlobal <> TRUE) then
-        raise exception 'we cannot sync nonglobal objects. Aborted';
+        raise exception 'We cannot sync nonglobal objects. Aborted. IO_UID = %.', ioUID;
         return -1;--we cannot sync nonglobal objects
     end if;
 

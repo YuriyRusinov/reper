@@ -65,26 +65,26 @@ begin
 
     select id into tmp from "position" where id = dl_from_id and name = dl_from_name;
     if(tmp isnull) then
-        raise notice 'DL_FROM is incorrect! id=%, name=%', dl_from_id, dl_from_name;
-        return -1;
+        raise warning 'DL_FROM is incorrect! id=%, name=%', dl_from_id, dl_from_name;
+        return -11;
     end if;
 
     select id into tmp from "position" where id = dl_executor_id and name = dl_executor_name;
     if(tmp isnull) then
-        raise notice 'DL_EXECUTOR is incorrect! id=%, name=%', dl_executor_id, dl_executor_name;
-        return -1;
+        raise warning 'DL_EXECUTOR is incorrect! id=%, name=%', dl_executor_id, dl_executor_name;
+        return -12;
     end if;
 
     select id into tmp from "position" where id = dl_to_id and name = dl_to_name;
     if(tmp isnull) then
-        raise notice 'DL_TO is incorrect! id=%, name=%', dl_to_id, dl_to_name;
-        return -1;
+        raise warning 'DL_TO is incorrect! id=%, name=%', dl_to_id, dl_to_name;
+        return -13;
     end if;
 
     select id into tmp from io_categories where id = id_category;
     if(tmp isnull) then
-        raise notice 'CATEGORY is incorrect! id=%, code=%', id_category, category_code;
-        return -1;
+        raise warning 'CATEGORY is incorrect! id=%, code=%', id_category, category_code;
+        return -14;
     end if;
 
     select getNextSeq('command_journal', 'id') into tmp;
@@ -126,11 +126,9 @@ begin
                                 );
 
     if(FOUND = FALSE) then
-        raise notice 'Command does not inserted in command_journal!';
-        return -1;
+        raise warning 'Command does not inserted in command_journal!';
+        return -15;
     end if;
-
-    raise notice 'The command inserted OK!';
     
     return tmp;
 
