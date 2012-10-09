@@ -59,6 +59,7 @@ void KapsManagerForm::initConnections()
     connect(UI->tbEditTask, SIGNAL(clicked()), this, SLOT(editTask()));
     connect(UI->tbDelTask, SIGNAL(clicked()), this, SLOT(delTask()));
 
+    //connect(UI->tbAddTaskVarFromFolder, SIGNAL(clicked()), this, SLOT(addTaskVarFromFolder()));
     connect(UI->tbAddTaskVar, SIGNAL(clicked()), this, SLOT(addTaskVar()));
     connect(UI->tbEditTaskVar, SIGNAL(clicked()), this, SLOT(editTaskVar()));
     connect(UI->tbDelTaskVar, SIGNAL(clicked()), this, SLOT(delTaskVar()));
@@ -512,6 +513,84 @@ void KapsManagerForm::addTaskVar()
     UI->tvTaskVars->addTopLevelItem(item);
 
     delete f;
+}
+
+void KapsManagerForm::addTaskVarFromFolder()
+{
+    if(!UI->tvTasks->currentItem())
+        return;
+
+    int idTask = UI->tvTasks->currentItem()->data(0, Qt::UserRole+1).toInt();
+    if(idTask <= 0)
+        return;
+
+    QString rootFolder = getRootFolder();
+    QString kapsFolder = getCurrentKapsFolder();
+    QString taskFolder = getCurrentTaskFolder();
+    QString dir = rootFolder + "/" + kapsFolder + "/" + taskFolder;
+
+    QString s = QFileDialog::getExistingDirectory(this, tr("Откройте существующий каталог внутри каталога тем. задачи"), dir);
+    QDir d(dir);
+    dir = d.absolutePath();
+    d = QDir(s);
+    s = d.absolutePath();
+
+    if(!s.contains(dir)){
+        QMessageBox::critical(this, tr("Ошибка"), tr("Выбранный каталог не является подкаталогом для тематической задачи!"));
+        return;
+    }
+
+    QString name;
+    QString desc;
+    QString folder = d.dirName();
+    QString author;
+    QString region;
+    QDate date;
+
+    QString mdF = s + "/.metadata";
+    if(QFile::exists(mdF)){
+        QSettings s(mdF, QSettings::IniFormat, this);
+        s.setIniCodec(QTextCodec::codecForLocale());
+        
+        name = s.value("name", "Не задано").toString();
+        desc = s.value("description", "Не задано").toString();;
+        date = QDate::fromString(s.value("creation_date", QDate::currentDate()).toString(), "dd.MM.yyyy");
+        region = s.value("region", tr("Не задано")).toString();
+        author = s.value("author", tr("Не задано")).toString();
+    }
+    else{
+        QMessageBox::critical(this, tr("Ошибка"), tr("Выбранный каталог не содержит файла с метаданными для проекта!"));
+        return;
+    }
+
+
+
+    /*
+    EditTaskVarForm * f = new EditTaskVarForm(this);
+    if(f->exec() != QDialog::Accepted){
+        delete f;
+        return;
+    }
+    */
+    
+    int id = updateTaskVarInDB(-1, idTask, name, desc, folder, author, region, date);
+    if(id <= 0){
+        QMessageBox::critical(this, tr("Ошибка"), tr("Произошла ошибка при создании нового проекта в БД!"));
+        return;
+    }
+    
+    QStringList strings;
+    strings << name
+            << desc
+            << date.toString("dd.MM.yyyy")
+            << region
+            << author
+            << folder;
+    
+    QTreeWidgetItem * item = new QTreeWidgetItem(strings);
+    item->setData(0, Qt::UserRole+1, id);
+    UI->tvTaskVars->addTopLevelItem(item);
+
 }
 
 void KapsManagerForm::editTaskVar()
@@ -1141,6 +1220,10 @@ int KapsManagerForm::addFileToDD(const QString & url, const QString & name, int 
         return idF;
 
     int r = createFileInDD(idF, url);
+    if(r <= 0){
+        QMessageBox::critical(this, tr("Ошибка"), tr("Произошла ошибка при загрузке файла на сервер!"));
+        return -1;
+    }
 
     QString sql = QString("update files set id_file = %1 where id = %2")
                    .arg(QString::number(idF))
@@ -1307,6 +1390,8 @@ void KapsManagerForm::uploadAllFiles()
     QStringList files = d.entryList(QDir::Files | QDir::NoDotAndDotDot);
     for(int i=0; i<files.count(); i++){
         QString file = files.at(i);
+        if(file.endsWith(".metadata"))
+            continue;
         uploadFile(file, dir + "/" + snimki, 1);
     }
     
@@ -1316,6 +1401,8 @@ void KapsManagerForm::uploadAllFiles()
     files = d.entryList(QDir::Files | QDir::NoDotAndDotDot);
     for(int i=0; i<files.count(); i++){
         QString file = files.at(i);
+        if(file.endsWith(".metadata"))
+            continue;
         uploadFile(file, dir + "/" + src_data, 2);
     }
     
@@ -1325,6 +1412,8 @@ void KapsManagerForm::uploadAllFiles()
     files = d.entryList(QDir::Files | QDir::NoDotAndDotDot);
     for(int i=0; i<files.count(); i++){
         QString file = files.at(i);
+        if(file.endsWith(".metadata"))
+            continue;
         uploadFile(file, dir + "/" + med_data, 3);
     }
 
@@ -1334,6 +1423,8 @@ void KapsManagerForm::uploadAllFiles()
     files = d.entryList(QDir::Files | QDir::NoDotAndDotDot);
     for(int i=0; i<files.count(); i++){
         QString file = files.at(i);
+        if(file.endsWith(".metadata"))
+            continue;
         uploadFile(file, dir + "/" + result_data, 4);
     }
 }
@@ -1355,15 +1446,16 @@ void KapsManagerForm::uploadFile(const QString & file, const QString & fUrl, int
     QString region;
     QDateTime timeShoot;
  
-    QString mdF = fUrl + "/.md_" + file;
+    QString mdF = fUrl + "/" + file + ".metadata";
     if(QFile::exists(mdF)){
         QSettings s(mdF, QSettings::IniFormat, this);
+        s.setIniCodec(QTextCodec::codecForLocale());
         name = s.value("name", file).toString();
         //desc = desc;
         fileName = file;
         ka = s.value("ka", tr("Не задано")).toString();
         region = s.value("region", tr("Не задано")).toString();
-        timeShoot = s.value("timeShoot", QDateTime::currentDateTime()).toDateTime();
+        timeShoot = QDateTime::fromString(s.value("timeShoot", QDateTime::currentDateTime()).toString(), "dd.MM.yyyy hh:mm");
     }
     else{
         name = file;

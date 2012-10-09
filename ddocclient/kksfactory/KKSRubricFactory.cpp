@@ -758,13 +758,21 @@ void KKSRubricFactory :: initRubricAttachments (const KKSRubric * r)
             attachModel->setData (iconInd, ioIcon, Qt::DecorationRole);
         else if (r->rubricType() == KKSRubricBase::atRubricCategory)
         {
-            if (ioIcon.isNull())
-                attachModel->setData (iconInd, (rItem->getIcon().isNull() ? rItem->getDefaultIcon() : rItem->getIcon()), Qt::DecorationRole);
+            if (ioIcon.isNull()){
+                if(rItem)
+                    attachModel->setData (iconInd, (rItem->getIcon().isNull() ? rItem->getDefaultIcon() : rItem->getIcon()), Qt::DecorationRole);
+                else
+                    attachModel->setData (iconInd, KKSRubricItem::icon(), Qt::DecorationRole);
+            }
             else
                 attachModel->setData (iconInd, ioIcon, Qt::DecorationRole);
         }
-        else
-            attachModel->setData (iconInd, rItem->getDefaultIcon(), Qt::DecorationRole);
+        else{
+            if(rItem)
+                attachModel->setData (iconInd, rItem->getDefaultIcon(), Qt::DecorationRole);
+            else
+                attachModel->setData (iconInd, KKSRubricItem::icon(), Qt::DecorationRole);
+        }
         io->release ();
     }
     t->release ();

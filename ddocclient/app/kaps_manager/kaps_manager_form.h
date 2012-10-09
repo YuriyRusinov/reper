@@ -41,6 +41,7 @@ private slots:
     void delTask();
 
     void addTaskVar();
+    void addTaskVarFromFolder();
     void editTaskVar();
     void delTaskVar();
 

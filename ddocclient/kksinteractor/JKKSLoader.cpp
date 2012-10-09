@@ -327,7 +327,7 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readCommands (void) const
 
             QString s;//empty string
             JKKSCommand command(res->getCellAsInt (i, 1),//id
-                                res->getCellAsString (i, 23),//dl_from_uid
+                                res->getCellAsString (i, 22),//dl_from_uid
                                 res->getCellAsString (i, 3),//dl_from_name
                                 res->getCellAsString (i, 23),//dl_executor_uid
                                 res->getCellAsString (i, 5),//dl_executor_name
@@ -1557,7 +1557,7 @@ int JKKSLoader::writeMessage (JKKSCommand *command) const
                             .arg (command->idObject() > 0 ? QString::number (command->idObject()) : QString("NULL")); //id_io_object_att
         }
 
-        //qDebug() << sql;
+        qDebug() << sql;
 
         KKSResult * res = dbWrite->execute (sql);
         
