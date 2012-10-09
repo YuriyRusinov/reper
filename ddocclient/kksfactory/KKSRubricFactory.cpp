@@ -741,7 +741,32 @@ void KKSRubricFactory :: initRubricAttachments (const KKSRubric * r)
     cat = refIO->category()->tableCategory();
     const KKSTemplate * t = new KKSTemplate (cat->defTemplate ());
     QAbstractItemModel * attachModel = new KKSEIODataModel (t, rData);//new QStandardItemModel (0, 0);
-    qDebug () << __PRETTY_FUNCTION__ << attachModel->rowCount() << attachModel->columnCount();
+    //qDebug () << __PRETTY_FUNCTION__ << attachModel->rowCount() << attachModel->columnCount();
+    for (int i=0; i<attachModel->rowCount(); i++)
+    {
+        QModelIndex iconInd = attachModel->index (i, 0);
+        //
+        // поскольку справочник неиерархический, то достаточно пройтись только по индексам верхнего уровня
+        //
+        int id = iconInd.data (Qt::UserRole).toInt();
+        KKSObject * io = loader->loadIO (id);
+        if (!io)
+            continue;
+        const KKSRubricItem * rItem = r->itemForId (id);
+        QIcon ioIcon = io->icon();
+        if (!ioIcon.isNull())
+            attachModel->setData (iconInd, ioIcon, Qt::DecorationRole);
+        else if (r->rubricType() == KKSRubricBase::atRubricCategory)
+        {
+            if (ioIcon.isNull())
+                attachModel->setData (iconInd, (rItem->getIcon().isNull() ? rItem->getDefaultIcon() : rItem->getIcon()), Qt::DecorationRole);
+            else
+                attachModel->setData (iconInd, ioIcon, Qt::DecorationRole);
+        }
+        else
+            attachModel->setData (iconInd, rItem->getDefaultIcon(), Qt::DecorationRole);
+        io->release ();
+    }
     t->release ();
     refIO->release ();
     

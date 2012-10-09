@@ -751,6 +751,9 @@ KKSObject * KKSLoader::loadIO(int id, bool simplify) const
     st->setDesc(res->getCellAsString(0, 17));
     io->setSyncType(st);
     st->release();
+    
+    QString iconStr = res->getCellAsString(0, 29);
+    io->setIcon(iconStr);
 
     delete res;
 
