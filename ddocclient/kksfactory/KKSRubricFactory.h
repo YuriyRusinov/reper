@@ -24,6 +24,7 @@ class KKSIncludesWidget;
 class KKSFilterGroup;
 class KKSPPFactory;
 class KKSRubric;
+class KKSRubricItem;
 class KKSObjEditorFactory;
 class KKSObjEditor;
 class KKSStuffFactory;
@@ -56,6 +57,7 @@ class _F_EXPORT KKSRubricFactory : public KKSEntityFactory
         void copyFromRubric (KKSRubric * rDest, QAbstractItemModel * attachModel, const QModelIndex& wIndex);
         void viewAttachments (QAbstractItemModel * attachModel, const KKSRubric * r);
         void initRubricAttachments (const KKSRubric * r);
+        void appendRubricItem (QAbstractItemModel * attachModel, const KKSRubricItem * rItem);
 
     private:
         //

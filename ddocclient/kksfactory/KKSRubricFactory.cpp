@@ -135,6 +135,7 @@ KKSIncludesWidget * KKSRubricFactory :: createRubricEditor (int mode, const KKSL
     connect (iW, SIGNAL (rubricAttachmentsView (QAbstractItemModel *, const KKSRubric *)), this, SLOT (viewAttachments (QAbstractItemModel *, const KKSRubric *)) );
     connect (iW, SIGNAL (copyFromRubr(KKSRubric *, QAbstractItemModel *, const QModelIndex&)), this, SLOT (copyFromRubric (KKSRubric *, QAbstractItemModel *, const QModelIndex&)) );
     connect (iW, SIGNAL (initAttachmentsModel (const KKSRubric *)), this, SLOT (initRubricAttachments (const KKSRubric *)) );
+    connect (iW, SIGNAL (appendRubricItemIntoModel (QAbstractItemModel *, const KKSRubricItem * )), this, SLOT (appendRubricItem (QAbstractItemModel *, const KKSRubricItem *)) );
     
     connect (this, SIGNAL (rubricAttachments (QAbstractItemModel *)), iW, SLOT (slotInitAttachmentsModel (QAbstractItemModel *)) );
     emit rubricEditorCreated (iW);
@@ -779,4 +780,46 @@ void KKSRubricFactory :: initRubricAttachments (const KKSRubric * r)
     refIO->release ();
     
     emit rubricAttachments (attachModel);
+}
+
+void KKSRubricFactory :: appendRubricItem (QAbstractItemModel * attachModel, const KKSRubricItem * rItem)
+{
+    if (!attachModel || !rItem)
+        return;
+
+    KKSObject * refIO = loader->loadIO(IO_IO_ID);
+    if (!refIO)
+        return;
+
+    KKSCategory * c = refIO->category();
+    if (!c || !c->tableCategory())
+    {
+        refIO->release ();
+        return;
+    }
+    c = c->tableCategory();
+    const KKSFilter * f = c->createFilter(1, QString::number(rItem->id()), KKSFilter::foEq);
+    KKSFilterGroup * fg = new KKSFilterGroup (false);
+    fg->addFilter (f);
+    KKSList<const KKSFilterGroup *> filters;
+    filters.append (fg);
+    fg->release ();
+    f->release ();
+    KKSMap<qint64, KKSEIOData *> itemData = loader->loadEIOList (refIO, filters);
+    int cnt = attachModel->rowCount();
+    if (!attachModel->insertRows (cnt, itemData.count()))
+    {
+        refIO->release ();
+        return;
+    }
+    int i=0;
+    for (KKSMap<qint64, KKSEIOData *>::const_iterator p = itemData.constBegin();
+         p != itemData.constEnd();
+         p++)
+    {
+        QModelIndex wIndex = attachModel->index (cnt+i, 0);
+        attachModel->setData (wIndex, QVariant::fromValue<KKSEIOData *>(p.value()), Qt::UserRole+1);
+        i++;
+    }
+    refIO->release ();
 }

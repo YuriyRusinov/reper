@@ -105,6 +105,7 @@ signals:
     void rubricAttachmentsView (QAbstractItemModel * attachModel, const KKSRubric * r);
     
     void initAttachmentsModel (const KKSRubric * r);
+    void appendRubricItemIntoModel (QAbstractItemModel * attachModel, const KKSRubricItem * rItem);
 
 private:
     //

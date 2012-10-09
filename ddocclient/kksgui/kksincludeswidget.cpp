@@ -256,22 +256,23 @@ void KKSIncludesWidget::parseItems(KKSRubric * r, QModelIndex index)
 
 QModelIndex KKSIncludesWidget::appendItemRow(const KKSRubricItem * item, QModelIndex index)
 {
+    Q_UNUSED (index);
     if(!item)
         return QModelIndex();
 
-    QAbstractItemModel * model = twIncludes->model();
+    QAbstractItemModel * model = recWItems->getSourceModel();//twIncludes->model();
     if(!model)
         return QModelIndex();
 
-    int cnt = model->rowCount(index);
+    int cnt = model->rowCount();//index);
     
-    model->insertRow(cnt, index);
-    if(cnt == 0){
-        if(model->columnCount(index) == 0)
-            model->insertColumns(0, 1, index);
-    }
+    model->insertRows(cnt, 1, QModelIndex());//, index);
+//    if(cnt == 0){
+//        if(model->columnCount(index) == 0)
+//            model->insertColumns(0, 1, index);
+//    }
 
-    QModelIndex cIndex = model->index(cnt, 0, index);
+    QModelIndex cIndex = model->index(cnt, 0);
     model->setData (cIndex, QVariant::fromValue<const KKSRubricBase *>(item), Qt::UserRole+1);
 //    model->setData (model->index(cnt, 0, index), item->name(), Qt::DisplayRole);
 //    model->setData (model->index(cnt, 0, index), 2, Qt::UserRole+2);//is item
@@ -856,7 +857,7 @@ void KKSIncludesWidget::slotAddRubricItem(int idObject, QString name)
 
     KKSRubricItem * item = new KKSRubricItem(idObject, name, false);
 
-    bool rIsEmpty = r->items().isEmpty();
+//    bool rIsEmpty = r->items().isEmpty();
 
     r->addItem(item);
 
@@ -866,22 +867,24 @@ void KKSIncludesWidget::slotAddRubricItem(int idObject, QString name)
     while (index.data(Qt::UserRole+2) == KKSRubricBase::atRubricItem)
         index = index.parent();
 
-    if (r->getCategory())
-    {
-        qDebug () << __PRETTY_FUNCTION__ << r->name() << rIsEmpty;
-        QAbstractItemModel * attachModel = recWItems->getSourceModel ();
-        if (!attachModel)
-            emit initAttachmentsModel (r);
+//    if (r->getCategory())
+//    {
+//        qDebug () << __PRETTY_FUNCTION__ << r->name() << rIsEmpty;
+    QAbstractItemModel * attachModel = recWItems->getSourceModel ();
+    if (!attachModel)
+        emit initAttachmentsModel (r);
+    else
+        emit appendRubricItemIntoModel (attachModel, item);
 //            QSortFilterProxyModel * sortModel = new KKSSortFilterProxyModel();
 //            attachModel = new QStandardItemModel (0, 0);
 //            sortModel->setSourceModel (attachModel);
 //            recWItems->setEIOModel (sortModel);
 //        }
-        emit rubricAttachmentsView (attachModel, r);
+        //emit rubricAttachmentsView (attachModel, r);
         //return;
-    }
-    QModelIndex cIndex = appendItemRow(item, index);
-    twIncludes->setCurrentIndex(cIndex);
+//    }
+    //QModelIndex cIndex = appendItemRow(item, index);
+    //twIncludes->setCurrentIndex(cIndex);
     
     item->release();
     isChanged = true;
@@ -1134,7 +1137,10 @@ void KKSIncludesWidget::rubricSelectionChanged (const QItemSelection& selected, 
         return;
 
     QModelIndex wIndex = wIndexList[0];
-    if (!wIndex.isValid())
+    int rType = wIndex.data (Qt::UserRole+2).toInt();
+    int idr = wIndex.data (Qt::UserRole).toInt();
+    if (!wIndex.isValid() || idr == 1 || rType == KKSRubricBase::atRootRubric 
+                                      || rType == KKSRubricBase::atOthers)
     {
         recWItems->setVisible (false);
         return;
