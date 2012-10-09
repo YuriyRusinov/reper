@@ -2196,7 +2196,7 @@ void KKSObjEditorFactory::filterEIO(KKSObjEditor * editor, int idObject, const K
                                    t, 
                                    tv /*View()*/, 
                                    filters,
-                                   false,
+                                   true,
                                    c,
                                    tableName);
         editor->setFilters (filters);

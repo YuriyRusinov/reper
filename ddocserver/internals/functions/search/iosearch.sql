@@ -137,10 +137,10 @@ begin
     query := query || ioAttrId || ' )';
     query := query || ' inner join attrs_values av on (';
 
-    if (is_int4 (ioValue)) then
+    if (is_int4 (ioValue) and type_code = 'INT4' ) then
         query := query || ' is_int4 (av.value) and to_int4 (av.value) ' || oper || ' ';
         query := query || int4 (ioValue);
-    elsif (is_int8 (ioValue)) then
+    elsif (is_int8 (ioValue) and (type_code = 'INT4' or type_code = 'INT8' )) then
         query := query || ' is_int8 (av.value) and to_int8 (av.value) ' || oper || ' ';
         query := query || int8 (ioValue);
     elsif (is_float8 (ioValue)) then

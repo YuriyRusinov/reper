@@ -210,10 +210,12 @@ void KKSFiltersEditorForm :: initFilterTypes (KKSAttrType::KKSAttrTypes type)
     oper = tr("Equal");
     data = QVariant((int)KKSFilter::foEq);
     cbOper->addItem(oper, data);
+    cbOper->setItemData(0, "=", Qt::UserRole+1);
 
     oper = tr("Not equal");;
     data = QVariant((int)KKSFilter::foNotEq);
     cbOper->addItem(oper, data);
+    cbOper->setItemData(1, "!=", Qt::UserRole+1);
 
     if (type == KKSAttrType::atDate ||
         type == KKSAttrType::atDateTime ||
@@ -228,18 +230,22 @@ void KKSFiltersEditorForm :: initFilterTypes (KKSAttrType::KKSAttrTypes type)
         oper = tr("Greather");;
         data = QVariant((int)KKSFilter::foGr);
         cbOper->addItem(oper, data);
+        cbOper->setItemData(cbOper->count()-1, ">", Qt::UserRole+1);
 
         oper = tr("Not fewer");;
         data = QVariant((int)KKSFilter::foGrEq);
         cbOper->addItem(oper, data);
+        cbOper->setItemData(cbOper->count()-1, ">=", Qt::UserRole+1);
 
         oper = tr("Fewer");;
         data = QVariant((int)KKSFilter::foLess);
         cbOper->addItem(oper, data);
+        cbOper->setItemData(cbOper->count()-1, "<", Qt::UserRole+1);
 
         oper = tr("Not greather");;
         data = QVariant((int)KKSFilter::foLessEq);
         cbOper->addItem(oper, data);
+        cbOper->setItemData(cbOper->count()-1, "<=", Qt::UserRole+1);
     }
 
     if (type == KKSAttrType::atString || 
@@ -250,15 +256,19 @@ void KKSFiltersEditorForm :: initFilterTypes (KKSAttrType::KKSAttrTypes type)
         oper = tr("Contain (LIKE '%AAA%')");
         data = QVariant((int)KKSFilter::foLikeIn);
         cbOper->addItem(oper, data);
+        cbOper->setItemData(cbOper->count()-1, "like", Qt::UserRole+1);
         oper = tr("Start with (LIKE 'AAA%')");
         data = QVariant((int)KKSFilter::foLikeStart);
         cbOper->addItem(oper, data);
+        cbOper->setItemData(cbOper->count()-1, "like", Qt::UserRole+1);
         oper = tr("End with (LIKE '%AAA')");
         data = QVariant((int)KKSFilter::foLikeEnd);
         cbOper->addItem(oper, data);
+        cbOper->setItemData(cbOper->count()-1, "like", Qt::UserRole+1);
         oper = tr("Correspond to template (LIKE 'AAA')");
         data = QVariant((int)KKSFilter::foLike);
         cbOper->addItem(oper, data);
+        cbOper->setItemData(cbOper->count()-1, "like", Qt::UserRole+1);
     }
 
     if (type == KKSAttrType::atCheckList ||
@@ -267,19 +277,23 @@ void KKSFiltersEditorForm :: initFilterTypes (KKSAttrType::KKSAttrTypes type)
         oper = tr("Involve");//tr ("Contains");
         data = QVariant ((int)KKSFilter::foIn);
         cbOper->addItem (oper, data);
+        cbOper->setItemData(cbOper->count()-1, "in", Qt::UserRole+1);
 
         oper = tr("Not involve");//tr ("Not Contains");
         data = QVariant ((int)KKSFilter::foNotIn);
         cbOper->addItem (oper, data);
+        cbOper->setItemData(cbOper->count()-1, "not in", Qt::UserRole+1);
     }
 
     oper = tr("Is null (NULL)");
     data = QVariant((int)KKSFilter::foIsNull);
     cbOper->addItem(oper, data);
+    cbOper->setItemData(cbOper->count()-1, "is null", Qt::UserRole+1);
     
     oper = tr("Is not null (NOT NULL)");
     data = QVariant((int)KKSFilter::foIsNotNull);
     cbOper->addItem(oper, data);
+    cbOper->setItemData(cbOper->count()-1, "is not null", Qt::UserRole+1);
 
     cbOper->setCurrentIndex (0);
 }
@@ -589,9 +603,9 @@ void KKSFiltersEditorForm :: addFilter ()
         QString sql;
         
         if (id>0)
-            sql = QString("select * from ioSearch('%1', %2, '%3')").arg(value).arg(id).arg (cbOper->currentText ());//isLike ? "TRUE" : "FALSE");
+            sql = QString("select * from ioSearch('%1', %2, '%3')").arg(value).arg(id).arg (cbOper->itemData (cbOper->currentIndex(), Qt::UserRole+1).toString());//isLike ? "TRUE" : "FALSE");
         else//выбрана опция "поиск по всем атрибутам"
-            sql = QString("select * from ioSearch('%1', '%2')").arg(value).arg (cbOper->currentText ());//isLike ? "TRUE" : "FALSE");
+            sql = QString("select * from ioSearch('%1', '%2')").arg(value).arg (cbOper->itemData (cbOper->currentIndex(), Qt::UserRole+1).toString());//isLike ? "TRUE" : "FALSE");
         //qDebug () << __PRETTY_FUNCTION__ << a->code () << id;
         f = c->createFilter (a->id(), sql, operMain);
     }
