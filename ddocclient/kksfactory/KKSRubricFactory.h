@@ -9,6 +9,8 @@
 #if !defined(__KKSSITOOOM_KKSRubricFactory_h)
 #define __KKSSITOOOM_KKSRubricFactory_h
 
+#include <QHash>
+
 #include "kksfactory_config.h"
 
 #include "KKSEntityFactory.h"
@@ -29,6 +31,7 @@ class KKSObjEditorFactory;
 class KKSObjEditor;
 class KKSStuffFactory;
 class RubricForm;
+class KKSObjectExemplar;
 
 class _F_EXPORT KKSRubricFactory : public KKSEntityFactory
 {
@@ -49,7 +52,7 @@ class _F_EXPORT KKSRubricFactory : public KKSEntityFactory
     private slots:
         void saveRubric (KKSRubric * rootR, bool isMyDocs);
         void rubricItemUpload (void);
-        void rubricItemCreate (const KKSRubric * r);
+        void rubricItemCreate (const KKSRubric * r, QAbstractItemModel * itemModel, const QModelIndex& parent);
         void openRubricItem (int idObject);
         void loadRubricPrivilegies (RubricForm * rForm);
         void loadSearchTemplate (RubricForm * rForm);
@@ -75,6 +78,8 @@ class _F_EXPORT KKSRubricFactory : public KKSEntityFactory
         KKSPPFactory *ppf;
         KKSObjEditorFactory *oef;
         KKSStuffFactory * stf;
+        
+        QHash<KKSObjectExemplar *, KKSRubric *> ioRubr;
 
     private:
         Q_OBJECT

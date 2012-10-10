@@ -127,7 +127,7 @@ KKSIncludesWidget * KKSRubricFactory :: createRubricEditor (int mode, const KKSL
 
     connect (iW, SIGNAL (saveRubric (KKSRubric *, bool)), this, SLOT (saveRubric (KKSRubric *, bool)) );
     connect (iW, SIGNAL (rubricItemRequested ()), this, SLOT (rubricItemUpload()) );
-    connect (iW, SIGNAL (rubricItemCreationRequested (const KKSRubric *)), this, SLOT (rubricItemCreate(const KKSRubric *)) );
+    connect (iW, SIGNAL (rubricItemCreationRequested (const KKSRubric *, QAbstractItemModel*, const QModelIndex&)), this, SLOT (rubricItemCreate(const KKSRubric *, QAbstractItemModel *, const QModelIndex&)) );
     connect (iW, SIGNAL (openRubricItemRequested (int)), this, SLOT (openRubricItem (int)) );
     connect (iW, SIGNAL (loadStuffModel (RubricForm *)), this, SLOT (loadRubricPrivilegies(RubricForm *)) );
     connect (iW, SIGNAL (loadSearchtemplate (RubricForm *)), this, SLOT (loadSearchTemplate (RubricForm *)) );
@@ -156,7 +156,7 @@ void KKSRubricFactory :: saveRubric (KKSRubric * rootR, bool isMyDocs)
         wParent->setSaved (true);
 }
 
-void KKSRubricFactory :: rubricItemCreate (const KKSRubric * r)
+void KKSRubricFactory :: rubricItemCreate (const KKSRubric * r, QAbstractItemModel * itemModel, const QModelIndex& parent)
 {
     KKSIncludesWidget *editor = qobject_cast<KKSIncludesWidget *>(this->sender());
     if (!editor)
@@ -168,7 +168,7 @@ void KKSRubricFactory :: rubricItemCreate (const KKSRubric * r)
     KKSCategory * c = r->getCategory();
     if (!c)
         return;
-	
+
     KKSObjEditor *objEditor = oef->createObjEditor(IO_IO_ID, 
                                                    -1, 
                                                    KKSList<const KKSFilterGroup*>(), 
@@ -177,12 +177,13 @@ void KKSRubricFactory :: rubricItemCreate (const KKSRubric * r)
                                                    false,
                                                    QString(),
                                                    false,
-                                                   Qt::WindowModal,
+                                                   Qt::NonModal,
                                                    editor,
                                                    Qt::Dialog);
 
-    int res = objEditor->exec();
-    Q_UNUSED (res);
+    //int res = objEditor->exec();
+    //Q_UNUSED (res);
+    oef->sendEditor (objEditor);
     
     int idObject = -1;
     QString name;
@@ -202,8 +203,8 @@ void KKSRubricFactory :: rubricItemCreate (const KKSRubric * r)
 
     editor->slotAddRubricItem (idObject, name);
     
-    delete objEditor;
-    
+    objEditor->setAttribute(Qt::WA_DeleteOnClose);
+
 }
 
 void KKSRubricFactory :: rubricItemUpload (void)

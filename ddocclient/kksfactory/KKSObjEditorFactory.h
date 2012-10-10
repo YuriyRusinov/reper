@@ -143,6 +143,7 @@ public:
 public slots:
     void sendIO (KKSObject *wObj, KKSObjectExemplar *wObjE, KKSObjEditor *editor);
     void printReport (KKSObject* io);
+    void sendEditor (KKSObjEditor * editor);
 
 private:
     //

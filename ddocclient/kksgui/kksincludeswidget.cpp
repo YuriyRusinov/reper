@@ -109,7 +109,7 @@ KKSIncludesWidget::KKSIncludesWidget(KKSRubric * rootRubric,
                  this, \
                  SLOT (rubricSelectionChanged (const QItemSelection&, const QItemSelection&))
                 );
-    connect (recWItems->actAdd, SIGNAL (triggered()), this, SLOT (createRubricItem()) );
+    connect (recWItems, SIGNAL (addEntity(QAbstractItemModel *, const QModelIndex&)), this, SLOT (createRubricItem(QAbstractItemModel *, const QModelIndex&)) );
     connect (recWItems->actEdit, SIGNAL (triggered()), this, SLOT (editRubricItem()) );
     connect (twIncludes, SIGNAL (doubleClicked(const QModelIndex &)), this, SLOT (slotRubricItemDblClicked(const QModelIndex &)) );
     connect (recWItems->getView(), SIGNAL (doubleClicked(const QModelIndex &)), this, SLOT (slotRubricItemEdit(const QModelIndex &)) );
@@ -787,8 +787,9 @@ void KKSIncludesWidget :: addRubricItem (void)
     emit rubricItemRequested();
 }
 
-void KKSIncludesWidget :: createRubricItem (void)
+void KKSIncludesWidget :: createRubricItem (QAbstractItemModel * itemModel, const QModelIndex& parent)
 {
+    qDebug () << __PRETTY_FUNCTION__ << itemModel << parent;
     QItemSelectionModel * sm (twIncludes->selectionModel());
 
 //    sm = twIncludes->selectionModel();
@@ -805,17 +806,16 @@ void KKSIncludesWidget :: createRubricItem (void)
     }
     
     const KKSRubric * r = currentRubric();
-    if(!r)
+    if (!r)
         return;
 
-    if(!r->getCategory())
+    if (!r->getCategory())
     {
-            QMessageBox::warning(this, tr("Warning"), tr("Creation of new IO allowed only for rubrics with accigned category!"), QMessageBox::Ok);
-
-            return;
+        QMessageBox::warning(this, tr("Warning"), tr("Creation of new IO allowed only for rubrics with accigned category!"), QMessageBox::Ok);
+        return;
     }
 
-    emit rubricItemCreationRequested(r);
+    emit rubricItemCreationRequested(r, itemModel, parent);
 }
 
 void KKSIncludesWidget::slotAddRubricItem(int idObject, QString name)

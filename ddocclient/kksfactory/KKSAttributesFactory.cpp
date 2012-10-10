@@ -943,12 +943,14 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                     v = QDate::currentDate();
                     //QVariant var(v);
                 }
-				else{
+                else
+                {
                     QString s = V.toString();
-					v = V.toDate ();
-					QString ss = v.toString("dd.MM.yyyy");
-					int a = 0;
-				}
+                    v = V.toDate ();
+                    QString ss = v.toString("dd.MM.yyyy");
+                    int a = 0;
+                    Q_UNUSED (a);
+                }
 
                 attrWidget = new KKSDateEdit (av, isSystem, v);
                 qobject_cast<QDateEdit *>(attrWidget)->setReadOnly (isRef);

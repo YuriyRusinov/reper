@@ -8009,3 +8009,10 @@ void KKSObjEditorFactory :: genUUID (int idAttr, const KKSAttrValue * av)
     delete res;
     emit setuuid (uuid);
 }
+
+void KKSObjEditorFactory :: sendEditor (KKSObjEditor * editor)
+{
+    if (!editor)
+        return;
+    emit editorCreated (editor);
+}
