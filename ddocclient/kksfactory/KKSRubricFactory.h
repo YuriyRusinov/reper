@@ -20,6 +20,7 @@
 
 class QAbstractItemModel;
 class QModelIndex;
+class QObject;
 
 class KKSLoader;
 class KKSIncludesWidget;
@@ -61,6 +62,8 @@ class _F_EXPORT KKSRubricFactory : public KKSEntityFactory
         void viewAttachments (QAbstractItemModel * attachModel, const KKSRubric * r);
         void initRubricAttachments (const KKSRubric * r);
         void appendRubricItem (QAbstractItemModel * attachModel, const KKSRubricItem * rItem);
+        void rubricItemCreated(KKSObjectExemplar * rec);
+        void objEditorClosed ();
 
     private:
         //
@@ -79,7 +82,10 @@ class _F_EXPORT KKSRubricFactory : public KKSEntityFactory
         KKSObjEditorFactory *oef;
         KKSStuffFactory * stf;
         
-        QHash<KKSObjectExemplar *, KKSRubric *> ioRubr;
+        QHash<KKSObjectExemplar *, KKSRubric *> ioRubrs;
+        QHash<KKSObjectExemplar *, QAbstractItemModel *> ioModels;
+        QHash<KKSObjectExemplar *, QModelIndex > ioParents;
+        QHash<KKSObjectExemplar *, KKSIncludesWidget*> includesW;
 
     private:
         Q_OBJECT

@@ -38,6 +38,8 @@ KKSRubricFactory :: KKSRubricFactory (KKSLoader *l, KKSPPFactory *_ppf, KKSObjEd
     oef (_oef),
     stf (_stf)
 {
+    if (oef)
+        connect (oef, SIGNAL (cioSaved(KKSObjectExemplar *)), this, SLOT (rubricItemCreated(KKSObjectExemplar *)) );
 }
 
 KKSRubricFactory :: ~KKSRubricFactory (void)
@@ -183,8 +185,14 @@ void KKSRubricFactory :: rubricItemCreate (const KKSRubric * r, QAbstractItemMod
 
     //int res = objEditor->exec();
     //Q_UNUSED (res);
+    connect (objEditor, SIGNAL (closeEditor()), this, SLOT (objEditorClosed ()) );
+    KKSObjectExemplar * pObjectRec = objEditor->getObjectEx();
+    ioRubrs.insert(pObjectRec, const_cast<KKSRubric *>(r));
+    ioModels.insert(pObjectRec, itemModel);
+    ioParents.insert(pObjectRec, parent);
+    includesW.insert(pObjectRec, editor);
     oef->sendEditor (objEditor);
-    
+/*
     int idObject = -1;
     QString name;
 
@@ -202,7 +210,7 @@ void KKSRubricFactory :: rubricItemCreate (const KKSRubric * r, QAbstractItemMod
         return;
 
     editor->slotAddRubricItem (idObject, name);
-    
+*/
     objEditor->setAttribute(Qt::WA_DeleteOnClose);
 
 }
@@ -771,7 +779,7 @@ void KKSRubricFactory :: initRubricAttachments (const KKSRubric * r)
         }
         else{
             if(rItem)
-                attachModel->setData (iconInd, rItem->getDefaultIcon(), Qt::DecorationRole);
+                attachModel->setData (iconInd, (rItem->getIcon().isNull() ? rItem->getDefaultIcon() : rItem->getIcon()), Qt::DecorationRole); // rItem->getDefaultIcon()
             else
                 attachModel->setData (iconInd, KKSRubricItem::icon(), Qt::DecorationRole);
         }
@@ -783,6 +791,8 @@ void KKSRubricFactory :: initRubricAttachments (const KKSRubric * r)
     emit rubricAttachments (attachModel);
 }
 
+/* Слот добавляет существующий ИО в рубрику с последующим отображением в визуальной модели
+ */
 void KKSRubricFactory :: appendRubricItem (QAbstractItemModel * attachModel, const KKSRubricItem * rItem)
 {
     if (!attachModel || !rItem)
@@ -819,8 +829,48 @@ void KKSRubricFactory :: appendRubricItem (QAbstractItemModel * attachModel, con
          p++)
     {
         QModelIndex wIndex = attachModel->index (cnt+i, 0);
+        KKSObject * io = loader->loadIO (p.key());
         attachModel->setData (wIndex, QVariant::fromValue<KKSEIOData *>(p.value()), Qt::UserRole+1);
+        if (io && !io->icon().isNull())
+            attachModel->setData (wIndex, io->icon(), Qt::DecorationRole);
+        else
+            attachModel->setData (wIndex, KKSRubricItem::icon(), Qt::DecorationRole);
         i++;
     }
     refIO->release ();
+}
+
+void KKSRubricFactory :: rubricItemCreated(KKSObjectExemplar * rec)
+{
+    KKSRubric * r = ioRubrs.value (rec);
+    QAbstractItemModel * attachModel = ioModels.value (rec);
+    QModelIndex pInd = ioParents.value (rec);
+    KKSIncludesWidget * iW = includesW.value (rec);
+    
+    if (!r || !attachModel)
+        return;
+    
+    KKSObject * wObj = loader->loadIO (rec->id());
+    if (iW && wObj)
+        iW->slotAddRubricItem(rec->id(), wObj->name());
+    
+    if (wObj)
+        wObj->release ();
+}
+
+void KKSRubricFactory :: objEditorClosed ()
+{
+    KKSObjEditor * objEditor = qobject_cast<KKSObjEditor *>(this->sender());
+    if (!objEditor)
+        return;
+    
+    KKSObjectExemplar * rec = objEditor->getObjectEx();
+    if (!rec)
+        return;
+    
+    int rubrres = ioRubrs.remove (rec);
+    int modres = ioModels.remove (rec);
+    int pres = ioParents.remove (rec);
+    int wres = includesW.remove (rec);
+    qDebug () << __PRETTY_FUNCTION__ << rubrres << modres << pres << wres;
 }
