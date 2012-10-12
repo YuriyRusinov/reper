@@ -49,7 +49,7 @@ class HttpWindow : public QDialog
 
 public:
     HttpWindow(QWidget *parent = 0);
-    bool sendOutMessage( const JKKSPMessWithAddr * message, QByteArray path);
+    bool sendOutMessage( const JKKSPMessWithAddr * message, QByteArray path, bool filePartsFlag = true);//filePartsFlag - флаг передачи файла по частям
     bool setMessageAsSended(const int & id, const int & type);
     
 private slots:
@@ -68,6 +68,7 @@ private slots:
     void sslErrors(const QList<QSslError> &errors);
 #endif
     */
+
 signals:
     void httpMessageRemoved(int progress);
 
