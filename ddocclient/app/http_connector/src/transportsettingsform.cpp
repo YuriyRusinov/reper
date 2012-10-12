@@ -61,7 +61,7 @@ void TransportSettingsForm :: setConnectionSettings (void)
     settings->setValue ("port", UI->lEHttpPort->text ());
    
 
-    settings->setValue ("server_host", UI->lEServerHost->text ());
+    settings->setValue ("server_host", serverIp.toString());
     settings->setValue ("server_port", UI->lEServerPort->text ());
     settings->endGroup ();
     accept ();
@@ -83,7 +83,7 @@ void TransportSettingsForm :: init (void)
     
     UI->lEHttpTransport->setToolTip(tr("Identificator transport in system (for tcp/ip protocol has to be 1, for http-protocol has to be 2)"));
 
-    UI->lEServerHost->setToolTip(tr("Server where other client must connect"));
+//    UI->lEServerHost->setToolTip(tr("Server where other client must connect"));
     UI->lEServerPort->setToolTip(tr("Server port number"));
 
     UI->lEDBName->setText (settings->value ("database").toString());
@@ -102,7 +102,14 @@ void TransportSettingsForm :: init (void)
   
     //, UI->lEAddress->text ());
 
-    UI->lEServerHost->setText (settings->value ("server_host").toString ());//, UI->lEServerHost->text ());
+	//Получение адреса локального хоста
+	QList<QHostAddress> serverIpList = QHostInfo::fromName(QHostInfo::localHostName()).addresses();
+	serverIp = serverIpList.first();
+
+	//QString string;
+	//string = serverIp.toString();
+
+    //UI->lEServerHost->setText (settings->value ("server_host").toString ());//, UI->lEServerHost->text ());
     UI->lEServerPort->setText (settings->value ("server_port").toString ());
     //, UI->lEServerPort->text ());
     settings->endGroup ();

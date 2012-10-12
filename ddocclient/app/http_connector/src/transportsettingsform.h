@@ -2,7 +2,9 @@
 #define _TRANSPORT_SETTINGS_FORM_H
 
 #include <QDialog>
+#include <QHostInfo>
 class QSettings;
+class QHostInfo;
 
 namespace Ui
 {
@@ -32,6 +34,7 @@ private:
     //
     Ui::transport_settings_form *UI;
     QSettings * settings;
+	QHostAddress   serverIp;//IP адрес сервера
 
 private:
     Q_OBJECT
