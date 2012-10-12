@@ -494,7 +494,7 @@ bool HttpWindow::setMessageAsSended(const int & id, const int & type)
     return result;
 }
 
-bool HttpWindow::sendOutMessage(const JKKSPMessWithAddr * message, QByteArray path)
+bool HttpWindow::sendOutMessage(const JKKSPMessWithAddr * message, QByteArray path, bool filePartsFlag)
 {
     
     if(message == NULL)
@@ -524,22 +524,29 @@ bool HttpWindow::sendOutMessage(const JKKSPMessWithAddr * message, QByteArray pa
 	
 #endif
 */
-    //!!!!!!!!!
+	if(filePartsFlag)
+	{
+		QEventLoop eventLoop;
+		connect(http,SIGNAL(requestFinished(int,bool)),&eventLoop,SLOT(quit()));
+	//!!!!!!!!!
 	//error
-	httpGetId = http->post ( path + addr, byteArray ) ;
+		httpGetId = http->post ( path + addr, byteArray ) ;
+
+		eventLoop.exec();
+	}
+	else
+		httpGetId = http->post ( path + addr, byteArray ) ;
 
     //QHttpResponseHeader responseHeader = http->lastResponse();
     //if(responseHeader.statusCode() != 401 && //packet was ignored by receiver organization
     //   responseHeader.statusCode() != 400 ) //ERROR
     //{ 
-    
-    
+
     if(message->pMess.getType() != JKKSMessage::atFilePart)//для файлов, передаваемых частями информация в этот список заносится отдельно
         httpMessages.insert(httpGetId, qMakePair(message->id, message->pMess.getType()) );
     
     //}
         
-
     /* JKKSPMessage pMessage(byteArray);//byteArray);
      qDebug() << "Message type: " << pMessage.getType();*/
   
@@ -750,3 +757,4 @@ void HttpWindow::sslErrors(const QList<QSslError> &errors)
     }
 }
 #endif*/
+
