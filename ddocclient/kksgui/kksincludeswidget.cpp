@@ -97,6 +97,7 @@ KKSIncludesWidget::KKSIncludesWidget(KKSRubric * rootRubric,
     recWItems->setVisible (false);
     recWItems->actAdd->setToolTip (tr("Create new document and put it into rubric"));
     recWItems->actEdit->setToolTip (tr("Edit document in rubric"));
+    recWItems->actDel->setToolTip (tr("Delete document both from rubric and database"));
     recWItems->hideGroup (0);
     recWItems->hideGroup (2);//hideToolBar();//hideGroup (2);
     recWItems->hideGroup (3);
@@ -297,15 +298,16 @@ QModelIndex KKSIncludesWidget::appendRubricRow(const KKSRubric * r, QModelIndex 
 
     int cnt = model->rowCount(index);
     int rpos = 0;
-    for (int i=0; i<cnt-1 && rpos==0; i++)
-    {
-        int pType = model->data(model->index(i, 0, index), Qt::UserRole+2).toInt();
-        int cType = model->data(model->index(i+1, 0, index), Qt::UserRole+2).toInt();
-        if (pType != cType )
+    if (cnt > 0)
+        for (int i=0; i<cnt-1 && rpos==0; i++)
         {
-            rpos = i+1;
+            int pType = model->data(model->index(i, 0, index), Qt::UserRole+2).toInt();
+            int cType = model->data(model->index(i+1, 0, index), Qt::UserRole+2).toInt();
+            if (pType != cType )
+            {
+                rpos = i+1;
+            }
         }
-    }
     
     bool isInserted = model->insertRows(rpos, 1, index);
     if (!isInserted)
@@ -480,6 +482,7 @@ void KKSIncludesWidget :: addRubric (void)
     }
 
     QModelIndex cIndex = appendRubricRow(r, index);
+    qDebug () << __PRETTY_FUNCTION__ << cIndex;
     
     twIncludes->setCurrentIndex(cIndex);
     twIncludes->model()->setData (cIndex, r->getIcon(), Qt::DecorationRole);

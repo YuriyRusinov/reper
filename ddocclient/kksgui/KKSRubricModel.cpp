@@ -109,8 +109,8 @@ QVariant KKSRubricModel :: headerData (int section, Qt::Orientation orientation,
 
 QModelIndex KKSRubricModel :: index (int row, int column, const QModelIndex& parent) const
 {
-    if (!hasIndex (row, column, parent))
-        return QModelIndex ();
+//    if (!hasIndex (row, column, parent))
+//        return QModelIndex ();
 
     if (parent.isValid() && parent.column() != 0)
         return QModelIndex();
@@ -202,6 +202,8 @@ bool KKSRubricModel :: setData (const QModelIndex& index, const QVariant& value,
     {
         QIcon rIcon = value.value<QIcon>();
         const KKSRubricBase * wRubrE = wRubr->getData ();
+        if (!wRubrE)
+            return false;
         (const_cast<KKSRubricBase *>(wRubrE))->setIcon (rIcon);
         wRubr->setData (wRubrE);
         emit dataChanged (index, index);
@@ -213,7 +215,7 @@ bool KKSRubricModel :: setData (const QModelIndex& index, const QVariant& value,
 bool KKSRubricModel :: insertRows (int row, int count, const QModelIndex& parent)
 {
     KKSRubricTreeItem * parentItem = getRubricEntity(parent);//->getData();
-    if (!parentItem || !parentItem->getData())
+    if (!parentItem || (parent.isValid() && !parentItem->getData()))
         return false;
 //    KKSRubric * pRubric = const_cast<KKSRubric *>(static_cast<const KKSRubric *>(parentItem));
 //    if (!pRubric)
