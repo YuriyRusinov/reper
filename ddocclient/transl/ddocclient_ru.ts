@@ -1544,6 +1544,54 @@ End of querying SIU database.
         <translation>ПОР успешно создан в БД DynamicDocs!
 </translation>
     </message>
+    <message>
+        <source>Êðàòêîñðî÷íûé</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ñðåäíåñðî÷íûé</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Äîëãîñðî÷íûé</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ñàìîëåòû ÄÐËÎ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ÇÐÊ ñðåäíåé è áîëüøîé äàëüíîñòè</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ðàêåòû «âîçäóõ-âîçäóõ»</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ÐËÑ îáíàðóæåíèÿ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ñàìîëåòû èñòðåáèòåëüíîé àâèàöèè</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ñðåäñòâà ÏÂÎ áîåâûõ êîðàáëåé ÈÃ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ÂÂÑ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ÂÌÔ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ÑÂ</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DetailGroupSectionDialog</name>
@@ -1885,6 +1933,13 @@ Do you want to save the changes before closing?</source>
     <message>
         <source>OK</source>
         <translation type="obsolete">OK</translation>
+    </message>
+</context>
+<context>
+    <name>EditFileForm</name>
+    <message>
+        <source>Äîáàâëåíèå ôàéëà â ïðîåêò</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3928,7 +3983,7 @@ try to rename it with extention. Example: filename.vsd</source>
     </message>
     <message>
         <source>View attachments ...</source>
-        <translation>Просмотреть вложения...</translation>
+        <translation type="obsolete">Просмотреть вложения...</translation>
     </message>
     <message>
         <source>Delete rubric</source>
@@ -3945,6 +4000,54 @@ try to rename it with extention. Example: filename.vsd</source>
     <message>
         <source>Creation of new IO allowed only for rubrics with accigned category!</source>
         <translation>Создание новых информационных объектов доступно только для рубрик с ассоциированной категорией!</translation>
+    </message>
+    <message>
+        <source>Rotate widget</source>
+        <translation>Расположить таблицу с ИО иначе</translation>
+    </message>
+    <message>
+        <source>Set icon</source>
+        <translation>Задать иконку</translation>
+    </message>
+    <message>
+        <source>Cannot remove category rubric/item</source>
+        <translation>Не поддерживается удаление категорий, визуализированных в дереве рубрик</translation>
+    </message>
+    <message>
+        <source>Add rubric</source>
+        <translation>Добавить рубрику</translation>
+    </message>
+    <message>
+        <source>Cannot add subrubric into categorized rubric or another</source>
+        <translation>Не могу добавить подрубрику в категорию. Не поддерживается</translation>
+    </message>
+    <message>
+        <source>Edit rubric</source>
+        <translation>Редактировать рубрику</translation>
+    </message>
+    <message>
+        <source>Category or others rubric cannot been edited</source>
+        <translation>Категории, визуализированные в дереве рубрик нельзя редактировать</translation>
+    </message>
+    <message>
+        <source>Delete rubric item</source>
+        <translation>Удалить элемент рубрики</translation>
+    </message>
+    <message>
+        <source>Cannot delete item from categorized rubric.</source>
+        <translation>Не поддерживается удаление информационных объектов из категорий, визуализированных в дереве рубрик.</translation>
+    </message>
+    <message>
+        <source>Cannot add document into categorized rubric or another</source>
+        <translation>Не поддерживается добавление информационных объектов в категории, визуализированных в дереве рубрик</translation>
+    </message>
+    <message>
+        <source>Open Image File</source>
+        <translation>Открыть файл рисунка</translation>
+    </message>
+    <message>
+        <source>Image files (*.xpm *.png *.ico *.jpg *.jpeg *.bmp *.gif *.pbm *.pgm *.xbm);;All files (*)</source>
+        <translation>Файлы рисунков (*.xpm *.png *.ico *.jpg *.jpeg *.bmp *.gif *.pbm *.pgm *.xbm);;Все файлы (*)</translation>
     </message>
 </context>
 <context>
@@ -4975,12 +5078,20 @@ try to rename it with extention. Example: filename.vsd</source>
         <source>Unique identificator does not set. Generate automatically (Yes) or set manually (No) ?</source>
         <translation>Уникальный идентификуатор не задан. Генерировать автоматически (Да) или задать вручную (Нет) ?</translation>
     </message>
+    <message>
+        <source>Delete</source>
+        <translation>Удалить</translation>
+    </message>
+    <message>
+        <source>Do you really want to delete ?</source>
+        <translation>Действительно удалить ?</translation>
+    </message>
 </context>
 <context>
     <name>KKSObjEditorFactory</name>
     <message>
         <source>Delete</source>
-        <translation>Удалить</translation>
+        <translation type="obsolete">Удалить</translation>
     </message>
     <message>
         <source>Error</source>
@@ -5168,11 +5279,11 @@ try to rename it with extention. Example: filename.vsd</source>
     </message>
     <message>
         <source>Export IO</source>
-        <translation>Экспорт записей справочника</translation>
+        <translation type="obsolete">Экспорт записей справочника</translation>
     </message>
     <message>
         <source>Cannot load copy %1</source>
-        <translation>Не могу загрузить экземпляр  ИО № %1</translation>
+        <translation type="obsolete">Не могу загрузить экземпляр  ИО № %1</translation>
     </message>
     <message>
         <source>Xml writer</source>
@@ -5582,6 +5693,10 @@ Press OK to continue or Cancel to cancel the operation</source>
         <source>&amp;Filter ...</source>
         <translation>&amp;Фильтры ...</translation>
     </message>
+    <message>
+        <source>Filter</source>
+        <translation>Фильтры</translation>
+    </message>
 </context>
 <context>
     <name>KKSRubricFactory</name>
@@ -5632,6 +5747,17 @@ Press OK to continue or Cancel to cancel the operation</source>
     <message>
         <source>Select source rubric</source>
         <translation>Выберите исходную рубрику</translation>
+    </message>
+    <message>
+        <source>Others</source>
+        <translation>Остальные</translation>
+    </message>
+</context>
+<context>
+    <name>KKSRubricModel</name>
+    <message>
+        <source>Name</source>
+        <translation>Название</translation>
     </message>
 </context>
 <context>
@@ -6476,6 +6602,90 @@ Further work is impossible. You should use equal versions of client and server s
     <message>
         <source>XML files (*.xml)</source>
         <translation>XML-файлы (*.xml)</translation>
+    </message>
+</context>
+<context>
+    <name>KapsManagerForm</name>
+    <message>
+        <source>Îøèáêà</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ïðîèçîøëà îøèáêà ïðè ñîçäàíèè íîâîé òåìàòè÷åñêîé çàäà÷è â ÁÄ!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Óäàëåíèå òåìàòè÷åñêîé çàäà÷è</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Âû äåéñòâèòåëüíî õîòèòå óäàëèòü òåìàòè÷åñêóþ çàäà÷ó è âñå åå ïðîåêòû?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ïðîèçîøëà îøèáêà ïðè ñîçäàíèè íîâîãî ïðîåêòà â ÁÄ!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Îòêðîéòå ñóùåñòâóþùèé êàòàëîã âíóòðè êàòàëîãà òåì. çàäà÷è</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Âûáðàííûé êàòàëîã íå ÿâëÿåòñÿ ïîäêàòàëîãîì äëÿ òåìàòè÷åñêîé çàäà÷è!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Íå çàäàíî</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Âûáðàííûé êàòàëîã íå ñîäåðæèò ôàéëà ñ ìåòàäàííûìè äëÿ ïðîåêòà!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ïðîèçîøëà îøèáêà ïðè èçìåíåíèè íîâîãî ïðîåêòà â ÁÄ!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Óäàëåíèå ïðîåêòà</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Âû äåéñòâèòåëüíî õîòèòå óäàëèòü ïðîåêò è âñå åãî ôàéëû?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ïðîèçîøëà îøèáêà ïðè ñîçäàíèè íîâîãî ôàéëà â ÁÄ!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Óäàëåíèå ôàéëà</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Âû äåéñòâèòåëüíî õîòèòå óäàëèòü ôàéë èç ïðîåêòà?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Âíèìàíèå!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Â òåêóùåì ïðîåêòå óæå ïðèñóòñòâóåò ôàéë ñ íàçâàíèåì:
+%1
+Áóäåò îñóùåñòâëåíà çàìåíà åãî íîâûì. Îáíîâèòü ïðè ýòîì çàïèñàííûå â ÁÄ ìåòàäàííûå?
+Îòâåò Äà - áóäåò ïðîèçâåäåíà çàìåíà ôàéëà è ìåòàäàííûõ
+Îòâåò Íåò - áóäåò ïðîèçâåäåíà òîëüêî çàìåíà ôàéëà
+Îòâåò Îòìåíà - ôàéë è åãî ìåòàäàííûå â ÁÄ îñòàíóòñÿ áåç èçìåíåíèé.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Çàìåíèòü òàêæå ôàéë íîâûì?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ïðîèçîøëà îøèáêà ïðè çàãðóçêå ôàéëà íà ñåðâåð!</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7808,7 +8018,7 @@ Attributes:</source>
     </message>
     <message>
         <source>Search by template</source>
-        <translation type="obsolete">Поиск по шаблону</translation>
+        <translation type="unfinished">Поиск по шаблону</translation>
     </message>
     <message>
         <source>DynamicDocs Client</source>
@@ -8003,6 +8213,10 @@ Avg speed: %3 Kb/sec</source>
     <message>
         <source>Cannot delete uploaded part of file</source>
         <translation>Не могу удалить загруженную часть файла</translation>
+    </message>
+    <message>
+        <source>Others</source>
+        <translation>Остальные</translation>
     </message>
 </context>
 <context>
@@ -8842,6 +9056,21 @@ Avg speed: %3 Kb/sec</source>
     </message>
 </context>
 <context>
+    <name>RubricForm</name>
+    <message>
+        <source>Open Image File</source>
+        <translation>Открыть файл рисунка</translation>
+    </message>
+    <message>
+        <source>Image files (*.xpm *.png *.ico *.jpg *.jpeg *.bmp *.gif *.pbm *.pgm *.xbm);;All files (*)</source>
+        <translation>Файлы рисунков (*.xpm *.png *.ico *.jpg *.jpeg *.bmp *.gif *.pbm *.pgm *.xbm);;Все файлы (*)</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Ошибка</translation>
+    </message>
+</context>
+<context>
     <name>SaveSettingsForm</name>
     <message>
         <source>Key</source>
@@ -9292,7 +9521,7 @@ Avg speed: %3 Kb/sec</source>
     </message>
     <message>
         <source>Identificator transport in system (for http-protocol must be 2)</source>
-        <translation>Идентификатор используемого транспорта в справочнике транспортов межобъектового обмена</translation>
+        <translation type="obsolete">Идентификатор используемого транспорта в справочнике транспортов межобъектового обмена</translation>
     </message>
     <message>
         <source>Server where other client must connect</source>
@@ -9301,6 +9530,10 @@ Avg speed: %3 Kb/sec</source>
     <message>
         <source>Server port number</source>
         <translation>Порт этого сервера</translation>
+    </message>
+    <message>
+        <source>Identificator transport in system (for tcp/ip protocol has to be 1, for http-protocol has to be 2)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10032,10 +10265,6 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>db_synchronizer_form</name>
     <message utf8="true">
-        <source>БД СИУ ---&gt; DynamicDocs Server (версия 0.1 beta)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
         <source>Опрос каждые</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10093,6 +10322,62 @@ p, li { white-space: pre-wrap; }
     </message>
     <message utf8="true">
         <source>Не фильтровать по дате</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>БД СИУ ---&gt; DynamicDocs Server (версия 0.3)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>ЭТК</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>ГМО</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>НВО</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>ЭОИРД</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>ЭФО</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Ук.ГШ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>ТТХ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>План-графики</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>ПОР</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>РБП</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Заявки ВТО</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>ОП ВТО</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Установить таймаут (сек.):</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -10156,6 +10441,49 @@ p, li { white-space: pre-wrap; }
     <message>
         <source>...</source>
         <translation type="obsolete">...</translation>
+    </message>
+</context>
+<context>
+    <name>edit_file_form</name>
+    <message utf8="true">
+        <source>Создание / редактирование метаданных файла</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Название:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Описание:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Дата и время съемки:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Регион</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Тип КА:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Файл:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>...</source>
+        <translation type="unfinished">...</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message utf8="true">
+        <source>Отмена</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10326,6 +10654,72 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>edit_task_form</name>
+    <message utf8="true">
+        <source>Создание / Редактирование тематической задачи</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Название:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Описание:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Название каталога:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message utf8="true">
+        <source>Отмена</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>edit_task_var_form</name>
+    <message utf8="true">
+        <source>Создание / редактирование проекта</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Название:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Описание:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Дата создания:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Регион</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Автор</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Название каталога:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message utf8="true">
+        <source>Отмена</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>error_form</name>
     <message>
         <source>Error</source>
@@ -10487,6 +10881,185 @@ p, li { white-space: pre-wrap; }
     <message>
         <source>Indicator Add/Edit</source>
         <translation>Просмотр / редактирование характеристик значения показателя</translation>
+    </message>
+</context>
+<context>
+    <name>kaps_manager_form</name>
+    <message utf8="true">
+        <source>База данных вариантов решения тематических задач КАПС</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>КАПС</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Название КАПС</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Описание</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Название каталога</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Природопользование</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>ВХ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>VX</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>ДХ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DX</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>НГК</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NG</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>ЭЭ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>EE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>ТРК</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TR</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Тематические задачи КАПС</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Добавить новую тематическую задачу</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>...</source>
+        <translation type="unfinished">...</translation>
+    </message>
+    <message utf8="true">
+        <source>Редактировать параметры тематической задачи</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Удалить тематическую задачу</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Название</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Проекты (варианты решения тематических задач)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Создать новый проект (вариант решения)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Изменить параметры проекта</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Удалить проект</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Загрузить все файлы проекта из локальной ФЗ в БД</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Выгрузить все файлы проекта из БД</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Дата создания</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Регион</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Автор</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Файлы с данными для проектов</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Добавить новый файл в проект</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Редактировать метаданные файла</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Удалить файл из проекта</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Выгрузить файл проекта в локальную ФС</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Тип КА</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Дата и время съемки</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Снимки</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Исходные данные</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Промежуточные результаты</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Результаты решения задачи</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -11329,6 +11902,10 @@ System Error &apos;%1&apos;
         <source>Rubric description :</source>
         <translation>Описание рубрики:</translation>
     </message>
+    <message>
+        <source>Rubric icon :</source>
+        <translation>Иконка рубрики:</translation>
+    </message>
 </context>
 <context>
     <name>save_settings_form</name>
@@ -11396,16 +11973,20 @@ System Error &apos;%1&apos;
         <translation type="unfinished">12345678</translation>
     </message>
     <message utf8="true">
-        <source>ИБД ГВЦ</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
         <source>Уровень доступа:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>0</source>
         <translation type="unfinished">0</translation>
+    </message>
+    <message>
+        <source>10.3.3.121</source>
+        <translation type="unfinished">10.3.3.121</translation>
+    </message>
+    <message utf8="true">
+        <source>Информационные ресурсы ВТО БД</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
