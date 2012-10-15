@@ -95,6 +95,8 @@ KKSIncludesWidget::KKSIncludesWidget(KKSRubric * rootRubric,
     QSizePolicy rSizeP (QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
     tvItems->setSizePolicy (rSizeP);
     recWItems->setVisible (false);
+    recWItems->actAdd->setToolTip (tr("Create new document and put it into rubric"));
+    recWItems->actEdit->setToolTip (tr("Edit document in rubric"));
     recWItems->hideGroup (0);
     recWItems->hideGroup (2);//hideToolBar();//hideGroup (2);
     recWItems->hideGroup (3);
@@ -110,7 +112,7 @@ KKSIncludesWidget::KKSIncludesWidget(KKSRubric * rootRubric,
                  SLOT (rubricSelectionChanged (const QItemSelection&, const QItemSelection&))
                 );
     connect (recWItems, SIGNAL (addEntity(QAbstractItemModel *, const QModelIndex&)), this, SLOT (createRubricItem(QAbstractItemModel *, const QModelIndex&)) );
-    connect (recWItems->actEdit, SIGNAL (triggered()), this, SLOT (editRubricItem()) );
+    connect (recWItems, SIGNAL (editEntity(QAbstractItemModel *, const QModelIndex& )), this, SLOT (editRubricDoc(QAbstractItemModel *, const QModelIndex&)) );
     connect (twIncludes, SIGNAL (doubleClicked(const QModelIndex &)), this, SLOT (slotRubricItemDblClicked(const QModelIndex &)) );
     connect (recWItems->getView(), SIGNAL (doubleClicked(const QModelIndex &)), this, SLOT (slotRubricItemEdit(const QModelIndex &)) );
     connect (recWItems->actDel, SIGNAL (triggered()), this, SLOT (delRubricItem()) );
@@ -921,8 +923,6 @@ void KKSIncludesWidget :: slotInitAttachmentsModel (QAbstractItemModel * attachM
 
 void KKSIncludesWidget :: editRubricItem (void)
 {
-    int idObject = -1;
-
     QItemSelectionModel * sm;
 
     bool isRubr = true;
@@ -950,7 +950,16 @@ void KKSIncludesWidget :: editRubricItem (void)
             return;
         }
     }
-    
+    editRubricDoc (tvItems->model(), index);
+
+}
+
+void KKSIncludesWidget :: editRubricDoc (QAbstractItemModel * itemModel, const QModelIndex& index)
+{
+    if (!itemModel)
+        return;
+    int idObject = -1;
+
     idObject = index.data(Qt::UserRole).toInt();//idObject
     
     if(idObject > 0){
