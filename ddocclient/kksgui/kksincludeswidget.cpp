@@ -65,6 +65,8 @@ KKSIncludesWidget::KKSIncludesWidget(KKSRubric * rootRubric,
 
     if (m_rootRubric)
         m_rootRubric->addRef();
+    else
+        m_rootRubric = new KKSRubric ();
 
     tBRubrActions->setIconSize (QSize (24, 24));
     QHeaderView * hItems = tvItems->header();
@@ -700,8 +702,8 @@ void KKSIncludesWidget :: delRubricItem (void)
 
     QItemSelectionModel * smInc = twIncludes->selectionModel();
     
-    QItemSelection sel = sm->selection();
-    QItemSelection selInc = smInc->selection();
+    QItemSelection sel = sm ? sm->selection() : QItemSelection();
+    QItemSelection selInc = smInc ? smInc->selection() : QItemSelection();
 
     QModelIndex index;// = sm ? sm->currentIndex() : QModelIndex ();
     QModelIndex indexInc;
@@ -1160,7 +1162,10 @@ void KKSIncludesWidget::rubricSelectionChanged (const QItemSelection& selected, 
     
     const KKSRubric * rubr = getRubric (wIndex);
     if (rubr)
+    {
         emit initAttachmentsModel (rubr);
+        recWItems->setVisible (true);
+    }
 /*
     if (rubr && rubr->getCategory())
     {
