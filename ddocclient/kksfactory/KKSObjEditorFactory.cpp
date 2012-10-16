@@ -7786,10 +7786,19 @@ void KKSObjEditorFactory :: putRubricator (KKSObject * obj, KKSObjEditor * edito
     iW->setSizePolicy (iwSizePolicy);
     if (iW && m_rf)
     {
-        connect (iW, SIGNAL (loadStuffModel(RubricForm *)), m_rf, SLOT (loadRubricPrivilegies(RubricForm *)) );
+        connect (iW, SIGNAL (saveRubric (KKSRubric *, bool)), m_rf, SLOT (saveRubric (KKSRubric *, bool)) );
+        connect (iW, SIGNAL (rubricItemRequested ()), m_rf, SLOT (rubricItemUpload()) );
+        connect (iW, SIGNAL (rubricItemCreationRequested (const KKSRubric *, QAbstractItemModel*, const QModelIndex&)), m_rf, SLOT (rubricItemCreate(const KKSRubric *, QAbstractItemModel *, const QModelIndex&)) );
+        connect (iW, SIGNAL (openRubricItemRequested (int)), m_rf, SLOT (openRubricItem (int)) );
+        connect (iW, SIGNAL (loadStuffModel (RubricForm *)), m_rf, SLOT (loadRubricPrivilegies(RubricForm *)) );
         connect (iW, SIGNAL (loadSearchtemplate (RubricForm *)), m_rf, SLOT (loadSearchTemplate (RubricForm *)) );
         connect (iW, SIGNAL (loadCategory (RubricForm *)), m_rf, SLOT (loadCategory (RubricForm *)) );
         connect (iW, SIGNAL (rubricAttachmentsView (QAbstractItemModel *, const KKSRubric *)), m_rf, SLOT (viewAttachments (QAbstractItemModel *, const KKSRubric *)) );
+        connect (iW, SIGNAL (copyFromRubr(KKSRubric *, QAbstractItemModel *, const QModelIndex&)), m_rf, SLOT (copyFromRubric (KKSRubric *, QAbstractItemModel *, const QModelIndex&)) );
+        connect (iW, SIGNAL (initAttachmentsModel (const KKSRubric *)), m_rf, SLOT (initRubricAttachments (const KKSRubric *)) );
+        connect (iW, SIGNAL (appendRubricItemIntoModel (QAbstractItemModel *, const KKSRubricItem * )), m_rf, SLOT (appendRubricItem (QAbstractItemModel *, const KKSRubricItem *)) );
+
+        connect (m_rf, SIGNAL (rubricAttachments (QAbstractItemModel *)), iW, SLOT (slotInitAttachmentsModel (QAbstractItemModel *)) );
     }
     QTreeView *tv = iW->tvRubr();
     KKSEventFilter *ef = new KKSEventFilter (iW);
