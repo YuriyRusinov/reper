@@ -1728,8 +1728,8 @@ void KKSObjEditor :: addIncludesWidget (KKSIncludesWidget *iw)
     }
     includesWidget = iw;
     includesWidget->setParent(this);
-    connect (includesWidget, SIGNAL(rubricItemRequested()), this, SLOT(slotIncludeRequested()));
-    connect (includesWidget, SIGNAL(openRubricItemRequested(int)), this, SLOT(slotOpenRubricItemRequested(int)));
+    //connect (includesWidget, SIGNAL(rubricItemRequested()), this, SLOT(slotIncludeRequested()));
+    //connect (includesWidget, SIGNAL(openRubricItemRequested(int)), this, SLOT(slotOpenRubricItemRequested(int)));
     connect (includesWidget, SIGNAL (rubricsChanged()), this, SLOT (rubricsChanged()) );
     connect (this, SIGNAL(rubricItemSelected(int, QString)), includesWidget, SLOT(slotAddRubricItem(int, QString)));
 }
