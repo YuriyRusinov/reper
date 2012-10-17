@@ -1744,7 +1744,7 @@ void KKSObjEditor :: addIncludesRecWidget (KKSIncludesWidget *iw)
     includesRecWidget = iw;
     includesRecWidget->setParent(this);
     //connect (includesRecWidget, SIGNAL(rubricItemRequested()), this, SLOT(slotIncludeRecRequested()));
-    //connect (includesRecWidget, SIGNAL(openRubricItemRequested(int)), this, SLOT(slotOpenRubricItemRecRequested(int)));
+    connect (includesRecWidget, SIGNAL(openRubricItemRequested(int)), this, SLOT(slotOpenRubricItemRecRequested(int)));
     connect (includesRecWidget, SIGNAL (rubricsChanged()), this, SLOT (rubricsChanged()) );
     //connect (this, SIGNAL(rubricItemRecSelected(int, QString)), includesRecWidget, SLOT(slotAddRubricItem(int, QString)));
 }

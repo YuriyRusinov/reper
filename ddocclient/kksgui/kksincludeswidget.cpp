@@ -707,9 +707,23 @@ void KKSIncludesWidget :: delRubricItem (void)
 
     QModelIndex index;// = sm ? sm->currentIndex() : QModelIndex ();
     QModelIndex indexInc;
-    if (!sm || sel.indexes().isEmpty() || !smInc || selInc.indexes().isEmpty())
+    if (((!sm || sel.indexes().isEmpty()) && !isRec) || ((!smInc || selInc.indexes().isEmpty()) && isRec))
     {
         return;
+    }
+    else if (isRec && smInc && !selInc.indexes().isEmpty())
+    {
+        index = selInc.indexes().at (0);
+        index = index.sibling(index.row(), 0);
+        int pType = index.data (Qt::UserRole+2).toInt();
+        if (pType == KKSRubricBase::atRubricItem)
+        {
+            int res = QMessageBox::question (this, tr ("Delete rubric item"), tr ("Do you really want to delete ?"), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+            if (res != QMessageBox::Yes)
+                return;
+        }
+        else
+            return;
     }
     else
     {
@@ -742,6 +756,8 @@ void KKSIncludesWidget :: delRubricItem (void)
     }
 
     QModelIndex wIndex = smInc->currentIndex ();
+    if (isRec)
+        wIndex = wIndex.parent ();
     KKSRubric * r = NULL;
 //    if(isRubr)
 //        r = const_cast<KKSRubric *>(getRubric(wIndex.parent()));
@@ -756,7 +772,10 @@ void KKSIncludesWidget :: delRubricItem (void)
 //    if (isRubr)
 //        twIncludes->model()->removeRow(wIndex.row(), wIndex.parent());
 //    else
-    tvItems->model ()->removeRow (index.row(), index.parent());
+    if (isRec)
+        twIncludes->model()->removeRows (index.row(), 1, index.parent());
+    else
+        tvItems->model ()->removeRow (index.row(), index.parent());
     isChanged = true;
     emit rubricsChanged ();
 }
@@ -966,6 +985,11 @@ void KKSIncludesWidget :: editRubricItem (void)
         else{//rubric selected
             return;
         }
+    }
+    if (isRec)
+    {
+        emit openRubricItemRequested (index.data (Qt::UserRole).toInt());
+        return;
     }
     editRubricDoc (tvItems->model(), index);
 
