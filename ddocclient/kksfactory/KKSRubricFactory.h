@@ -52,7 +52,7 @@ class _F_EXPORT KKSRubricFactory : public KKSEntityFactory
 
     private slots:
         void saveRubric (KKSRubric * rootR, bool isMyDocs);
-        void rubricItemUpload (void);
+        void rubricItemUpload (bool forRecords);
         void rubricItemCreate (const KKSRubric * r, QAbstractItemModel * itemModel, const QModelIndex& parent);
         void openRubricItem (int idObject);
         void loadRubricPrivilegies (RubricForm * rForm);
@@ -64,6 +64,7 @@ class _F_EXPORT KKSRubricFactory : public KKSEntityFactory
         void appendRubricItem (QAbstractItemModel * attachModel, const KKSRubricItem * rItem);
         void rubricItemCreated(KKSObjectExemplar * rec);
         void objEditorClosed ();
+        void appendRecord (int idObject, const KKSRubric* r, QAbstractItemModel * attachModel, const QModelIndex& parent);
 
     private:
         //

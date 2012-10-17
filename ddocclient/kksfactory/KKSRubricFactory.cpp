@@ -128,7 +128,7 @@ KKSIncludesWidget * KKSRubricFactory :: createRubricEditor (int mode, const KKSL
     //qDebug () << __PRETTY_FUNCTION__ << iDeleg;
 
     connect (iW, SIGNAL (saveRubric (KKSRubric *, bool)), this, SLOT (saveRubric (KKSRubric *, bool)) );
-    connect (iW, SIGNAL (rubricItemRequested ()), this, SLOT (rubricItemUpload()) );
+    connect (iW, SIGNAL (rubricItemRequested (bool)), this, SLOT (rubricItemUpload(bool)) );
     connect (iW, SIGNAL (rubricItemCreationRequested (const KKSRubric *, QAbstractItemModel*, const QModelIndex&)), this, SLOT (rubricItemCreate(const KKSRubric *, QAbstractItemModel *, const QModelIndex&)) );
     connect (iW, SIGNAL (openRubricItemRequested (int)), this, SLOT (openRubricItem (int)) );
     connect (iW, SIGNAL (loadStuffModel (RubricForm *)), this, SLOT (loadRubricPrivilegies(RubricForm *)) );
@@ -215,7 +215,7 @@ void KKSRubricFactory :: rubricItemCreate (const KKSRubric * r, QAbstractItemMod
 
 }
 
-void KKSRubricFactory :: rubricItemUpload (void)
+void KKSRubricFactory :: rubricItemUpload (bool forRecords)
 {
     KKSIncludesWidget *editor = qobject_cast<KKSIncludesWidget *>(this->sender());
     if(!editor)
@@ -235,7 +235,7 @@ void KKSRubricFactory :: rubricItemUpload (void)
     //KKSObjEditorFactory * oef = kksSito->oef();
 
     int idUser = loader->getUserId();
-    KKSFilter * filter = c->createFilter(ATTR_ID, QString::number(idUser), KKSFilter::foEq);
+    KKSFilter * filter = forRecords ? c->createFilter(8, QString("is not null"), KKSFilter::foIsNotNull) : c->createFilter(ATTR_ID, QString::number(idUser), KKSFilter::foEq);
     if(!filter){
         o->release();
         return;
@@ -277,7 +277,10 @@ void KKSRubricFactory :: rubricItemUpload (void)
         o->release();
     }
     else
+    {
+        o->release ();
         return;
+    }
 
     editor->slotAddRubricItem (idObject, name);
     
@@ -285,6 +288,55 @@ void KKSRubricFactory :: rubricItemUpload (void)
     o->release();
 }
 
+
+void KKSRubricFactory :: appendRecord (int idObject, const KKSRubric* r, QAbstractItemModel * attachModel, const QModelIndex& parent)
+{
+    if (idObject <=0 || !r || !attachModel)
+        return;
+    
+    const KKSRubricItem * rItem (0);
+    KKSObject * o = loader->loadIO(idObject, true);
+    if(!o){
+        return;
+    }
+    QWidget * objEditor = qobject_cast<QWidget *>(this->sender());
+    KKSList<const KKSFilterGroup *> recFilterGroups;
+    KKSObjEditor * refObjEditor = oef->createObjRecEditor (IO_IO_ID,
+                                                           idObject,
+                                                           recFilterGroups,
+                                                           "",
+                                                           o->category()->tableCategory(),
+                                                           true,
+                                                           false,
+                                                           Qt::WindowModal,
+                                                           objEditor,
+                                                           Qt::Dialog);
+    if (refObjEditor->exec() == QDialog::Accepted)
+    {
+        int idObjRec = refObjEditor->getID();//recWidget->getID();
+        KKSObjectExemplar * rec = loader->loadEIO(idObjRec, o);
+        if (!rec)
+        {
+            o->release ();
+            return;
+        }
+        rItem = new KKSRubricItem (idObjRec, rec->name());
+        (const_cast<KKSRubric *>(r))->addItem (rItem);
+        int nr = attachModel->rowCount (parent);
+        attachModel->insertRows (nr, 1, parent);
+        bool isRubrSet = attachModel->setData (attachModel->index (nr, 0, parent), QVariant::fromValue<const KKSRubricBase *>(rItem), Qt::UserRole+1);
+        if (!isRubrSet)
+        {
+            o->release ();
+            rec->release ();
+            return;
+        }
+        rec->release ();
+    }
+    qDebug () << __PRETTY_FUNCTION__ << r->items().count();
+    o->release();
+    
+}
 void KKSRubricFactory :: openRubricItem (int idObject)
 {
     KKSIncludesWidget *editor = qobject_cast<KKSIncludesWidget *>(this->sender());

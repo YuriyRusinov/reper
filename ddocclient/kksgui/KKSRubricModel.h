@@ -21,7 +21,7 @@ class KKSRubricTreeItem;
 class _GUI_EXPORT KKSRubricModel : public QAbstractItemModel
 {
 public:
-    KKSRubricModel(const KKSRubric * rootRubr, QObject * parent=0);
+    KKSRubricModel(const KKSRubric * rootRubr, bool forRecs=false, QObject * parent=0);
     virtual ~KKSRubricModel();
 
     QVariant data (const QModelIndex &index, int role) const;
@@ -45,13 +45,14 @@ private:
     // Functions
     //
     KKSRubricTreeItem * getRubricEntity (const QModelIndex& index) const;
-    void setupData (KKSRubricTreeItem * parent);
+    void setupData (KKSRubricTreeItem * parent, bool forRecs=false);
 
 private:
     //
     // Variables
     //
     KKSRubricTreeItem * rootItem;
+    bool forRecords;
 
 private:
     Q_OBJECT

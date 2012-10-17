@@ -129,7 +129,7 @@ KKSIncludesWidget::~KKSIncludesWidget()
 
 void KKSIncludesWidget::init()
 {
-    QAbstractItemModel * model = new KKSRubricModel (m_rootRubric);
+    QAbstractItemModel * model = new KKSRubricModel (m_rootRubric, isRec);
     //new KKSRubricModel (m_rootRubric);new QStandardItemModel (0, 1);
     model->setHeaderData(0, Qt::Horizontal, tr("Name"), Qt::DisplayRole);
 
@@ -791,7 +791,7 @@ void KKSIncludesWidget :: addRubricItem (void)
     if(!r)
         return;
 
-    emit rubricItemRequested();
+    emit rubricItemRequested(isRec);
 }
 
 void KKSIncludesWidget :: createRubricItem (QAbstractItemModel * itemModel, const QModelIndex& parent)
@@ -852,6 +852,14 @@ void KKSIncludesWidget::slotAddRubricItem(int idObject, QString name)
     KKSRubric * r = const_cast<KKSRubric *>(currentRubric());
     if (!r)
         return;
+    
+    if (isRec)
+    {
+        emit appendRubricRecord (idObject, r, twIncludes->model(), index);
+        isChanged = true;
+        emit rubricsChanged ();
+        return;
+    }
 
     const KKSRubricItem * equalItem = r->itemForId(idObject);
     if(equalItem){
@@ -877,9 +885,13 @@ void KKSIncludesWidget::slotAddRubricItem(int idObject, QString name)
 //    if (r->getCategory())
 //    {
 //        qDebug () << __PRETTY_FUNCTION__ << r->name() << rIsEmpty;
-    QAbstractItemModel * attachModel = recWItems->getSourceModel ();
-    if (!attachModel)
+    QAbstractItemModel * attachModel = isRec ? twIncludes->model() : recWItems->getSourceModel ();
+    if (!attachModel && !this->isRec)
         emit initAttachmentsModel (r);
+    else if (isRec)
+    {
+        qDebug () << __PRETTY_FUNCTION__ ;
+    }
     else
         emit appendRubricItemIntoModel (attachModel, item);
 //            QSortFilterProxyModel * sortModel = new KKSSortFilterProxyModel();
@@ -1142,7 +1154,7 @@ void KKSIncludesWidget::rubricSelectionChanged (const QItemSelection& selected, 
     QModelIndexList wIndexList (selected.indexes());
     QModelIndexList oldIndexList (deselected.indexes());
 
-    if (wIndexList.isEmpty() && oldIndexList.isEmpty())
+    if (isRec || (wIndexList.isEmpty() && oldIndexList.isEmpty()))
     {
         recWItems->setVisible (false);
         return;

@@ -13,11 +13,12 @@
 #include "KKSRubricTreeItem.h"
 #include "KKSRubricModel.h"
 
-KKSRubricModel::KKSRubricModel(const KKSRubric * rootRubr, QObject * parent)
+KKSRubricModel::KKSRubricModel(const KKSRubric * rootRubr, bool forRecs, QObject * parent)
     : QAbstractItemModel (parent),
-      rootItem (new KKSRubricTreeItem (-1, rootRubr))
+      rootItem (new KKSRubricTreeItem (-1, rootRubr)),
+      forRecords (forRecs)
 {
-    setupData (rootItem);
+    setupData (rootItem, forRecs);
 }
 
 KKSRubricModel::~KKSRubricModel()
@@ -44,6 +45,11 @@ QVariant KKSRubricModel :: data (const QModelIndex &index, int role) const
         case Qt::DisplayRole:case Qt::EditRole:
         {
             return rubr->name();
+            break;
+        }
+        case Qt::UserRole+3:
+        {
+            return forRecords;
             break;
         }
         case Qt::UserRole+2:
@@ -193,7 +199,7 @@ bool KKSRubricModel :: setData (const QModelIndex& index, const QVariant& value,
             return false;
         
         wRubr->setData(wNewRubr);
-        setupData (wRubr);
+        setupData (wRubr, forRecords);
 
         emit dataChanged (index, index);
         return true;
@@ -247,7 +253,7 @@ KKSRubricTreeItem * KKSRubricModel :: getRubricEntity (const QModelIndex& index)
      return rootItem;
 }
 
-void KKSRubricModel :: setupData (KKSRubricTreeItem * parent)
+void KKSRubricModel :: setupData (KKSRubricTreeItem * parent, bool forRecs)
 {
     if (!parent || !parent->getData() || parent->getData()->rubricType()==KKSRubricBase::atRubricItem)
         return;
@@ -263,13 +269,17 @@ void KKSRubricModel :: setupData (KKSRubricTreeItem * parent)
         {
             KKSRubricTreeItem * wrItem = new KKSRubricTreeItem (wRubric->rubric(i)->id(), wRubric->rubric(i), parent);
             parent->appendChild (wrItem);
-            setupData (wrItem);
+            setupData (wrItem, forRecs);
         }
-        //for (int i=0; i<wRubric->items().count(); i++)
-        //{
-        //    KKSRubricTreeItem * wrItem = new KKSRubricTreeItem (wRubric->item(i)->id(), wRubric->item(i), parent);
-        //    parent->appendChild (wrItem);
-        //}
+        if (forRecs)
+        {
+            int nItems = wRubric->items().count();
+            for (int i=0; i<nItems; i++)
+            {
+                KKSRubricTreeItem * wrItem = new KKSRubricTreeItem (wRubric->item(i)->id(), wRubric->item(i), parent);
+                parent->appendChild (wrItem);
+            }
+        }
     }
     else
     {

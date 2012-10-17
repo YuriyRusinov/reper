@@ -91,7 +91,7 @@ private slots:
     void init();
 
 signals:
-    void rubricItemRequested();
+    void rubricItemRequested(bool isRec);
     void rubricItemCreationRequested(const KKSRubric * r, QAbstractItemModel * itemModel, const QModelIndex& parent);
     void openRubricItemRequested(int idRubricItem);
     void saveRubric (KKSRubric * r, bool isMyDocs);
@@ -107,6 +107,7 @@ signals:
     
     void initAttachmentsModel (const KKSRubric * r);
     void appendRubricItemIntoModel (QAbstractItemModel * attachModel, const KKSRubricItem * rItem);
+    void appendRubricRecord (int idObject, const KKSRubric * r, QAbstractItemModel * attachModel, const QModelIndex& parent);
 
 private:
     //

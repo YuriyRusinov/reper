@@ -2951,7 +2951,7 @@ void KKSLoader::loadRubrics(KKSObject * io) const
             subRubric->release();
         }
         else if(type == 2){//rubric items
-			bool isAutomated = res->getCellAsBool(i, 10);
+            bool isAutomated = res->getCellAsBool(i, 10);
             KKSRubricItem * item = new KKSRubricItem(id, name, isAutomated);
             item->setIcon(icon);
 
