@@ -235,14 +235,20 @@ void KKSRubricFactory :: rubricItemUpload (bool forRecords)
     //KKSObjEditorFactory * oef = kksSito->oef();
 
     int idUser = loader->getUserId();
-    KKSFilter * filter = forRecords ? c->createFilter(8, QString("is not null"), KKSFilter::foIsNotNull) : c->createFilter(ATTR_ID, QString::number(idUser), KKSFilter::foEq);
+    KKSFilter * filter = c->createFilter(ATTR_AUTHOR, QString::number(idUser), KKSFilter::foEq);
+                        //: c->createFilter(ATTR_ID, QString::number(idUser), KKSFilter::foEq); // 
     if(!filter){
         o->release();
         return;
     }
-
     filters.append(filter);
     filter->release();
+    if (forRecords)
+    {
+        KKSFilter * filterTab = c->createFilter (8, QString ("is not null"), KKSFilter::foIsNotNull);
+        filters.append (filterTab);
+        filterTab->release ();
+    }
     KKSList<const KKSFilterGroup *> filterGroups;
     KKSFilterGroup * group = new KKSFilterGroup(true);
     group->setFilters(filters);

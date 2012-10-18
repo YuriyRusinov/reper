@@ -294,7 +294,7 @@ void KKSRecWidget :: resizeSections (const QList<int>& hAttrWidths)
 
 QAbstractItemModel *KKSRecWidget :: getModel (void) const
 {
-    return this->tv->model ();
+    return (tv ? this->tv->model () : 0);
 }
 
 QAbstractItemModel * KKSRecWidget :: getSourceModel (void) const
