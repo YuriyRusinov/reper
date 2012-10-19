@@ -1211,13 +1211,13 @@ void KKSObjEditor :: updateEIOEx (KKSObject * refObj, const KKSMap<qint64, KKSOb
 //    qDebug () << __PRETTY_FUNCTION__ << tabName << nTab;
     int nTab (-1);
     QModelIndexList selIndexes;// = (nTab == 0 ? recWidget->getSourceIndexes() : addRecWidgets[nTab-1]->getSourceIndexes());
-    if (recModel == recWidget->getSourceModel())
+    if (recWidget && recModel == recWidget->getSourceModel())
     {
         nTab = 0;
         selIndexes = recWidget->getSourceIndexes();
     }
     for (int i=0; i<addRecWidgets.count() && nTab < 0; i++)
-        if (recModel == addRecWidgets[i]->getSourceModel())
+        if (addRecWidgets[i] && recModel == addRecWidgets[i]->getSourceModel())
         {
             nTab = i+1;
             selIndexes = addRecWidgets[i]->getSourceIndexes();
