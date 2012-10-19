@@ -289,7 +289,7 @@ QModelIndex KKSIncludesWidget::appendItemRow(const KKSRubricItem * item, QModelI
     return cIndex;
 }
 
-QModelIndex KKSIncludesWidget::appendRubricRow(const KKSRubric * r, QModelIndex index)
+QModelIndex KKSIncludesWidget::appendRubricRow(const KKSRubric * r, QModelIndex pindex)
 {
     if(!r)
         return QModelIndex();
@@ -298,35 +298,39 @@ QModelIndex KKSIncludesWidget::appendRubricRow(const KKSRubric * r, QModelIndex 
     if(!model)
         return QModelIndex();
 
-    int cnt = model->rowCount(index);
+    int cnt = model->rowCount(pindex);
     int rpos = 0;
     if (cnt > 0)
         for (int i=0; i<cnt-1 && rpos==0; i++)
         {
-            int pType = model->data(model->index(i, 0, index), Qt::UserRole+2).toInt();
-            int cType = model->data(model->index(i+1, 0, index), Qt::UserRole+2).toInt();
+            int pType = model->data(model->index(i, 0, pindex), Qt::UserRole+2).toInt();
+            int cType = model->data(model->index(i+1, 0, pindex), Qt::UserRole+2).toInt();
             if (pType != cType )
             {
                 rpos = i+1;
             }
         }
+
+    if (cnt > 0 && rpos == 0)
+        rpos = cnt;
     
-    bool isInserted = model->insertRows(rpos, 1, index);
+    bool isInserted = model->insertRows(rpos, 1, pindex);
     if (!isInserted)
         return QModelIndex ();
     if(cnt == 0){
-        if(model->columnCount(index) == 0)
-            model->insertColumns(0, 1, index);
+        if(model->columnCount(pindex) == 0)
+            model->insertColumns(0, 1, pindex);
     }
 
 //    model->setData (model->index(cnt, 0, index), r->name(), Qt::DisplayRole);
 //    model->setData (model->index(cnt, 0, index), 1, Qt::UserRole);//is rubric
 //    model->setData (model->index(cnt, 0, index), r->id(), Qt::UserRole+1);// idRubric
 //    model->setData (model->index(cnt, 0, index), QIcon(":/ddoc/rubric.png"), Qt::DecorationRole);
-    QModelIndex cIndex = model->index(rpos, 0, index);
-    model->setData (cIndex, QVariant::fromValue<const KKSRubricBase *>(r), Qt::UserRole+1);
+    QModelIndex cIndex = model->index(rpos, 0, pindex);
+    bool isRubrSet = model->setData (cIndex, QVariant::fromValue<const KKSRubricBase *>(r), Qt::UserRole+1);
+    qDebug () << __PRETTY_FUNCTION__ << cIndex << model->rowCount (pindex) << isRubrSet;
 
-    twIncludes->setExpanded(index, true);
+    twIncludes->setExpanded(pindex, true);
     
     return cIndex;
 }

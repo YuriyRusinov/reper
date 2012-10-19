@@ -156,13 +156,13 @@ QModelIndex KKSRubricModel :: parent (const QModelIndex &index) const
 int KKSRubricModel :: rowCount (const QModelIndex& parent) const
 {
      const KKSRubricTreeItem *parentItem = getRubricEntity (parent);
-     if (!parentItem || !parentItem->getData() || parentItem->getData()->rubricType() == KKSRubricBase::atRubricItem)
+     if (!parentItem || (parentItem->getData() && !forRecords && parentItem->getData()->rubricType() == KKSRubricBase::atRubricItem))
          return 0;
 
      const KKSRubricBase * parentRubr = parentItem->getData ();
      const KKSRubric * pRubr = (const KKSRubric *)parentRubr;
      Q_UNUSED (pRubr);
-     if (parentRubr && parentRubr->rubricType() != KKSRubricBase::atOthers && parentRubr->rubricType() == KKSRubricBase::atRubricCategory)//&& pRubr && pRubr->getCategory ())
+     if (parentRubr && parentRubr->rubricType() != KKSRubricBase::atOthers && parentRubr->rubricType() == KKSRubricBase::atRubricCategory && !forRecords)//&& pRubr && pRubr->getCategory ())
          return 0;
      //else if (pRubr && pRubr->rubricType() != KKSRubricBase::atRubricCategory && pRubr->rubricType() != KKSRubricBase::atRootRubric)
      //{
