@@ -50,6 +50,28 @@ int DBSynchronizer::createETKInDD(const QList<Result_ETK> & etkList)
             if(files.count() > 1)
                 dbSIU.downloadFile(etk.uid, etk.classificator_link, files.at(1).second);
         }
+
+        if(i > 0 && i%iReconnect == 0){
+
+            QEventLoop eventLoop;
+            connect(this,SIGNAL(allFilesDownloaded()),&eventLoop,SLOT(quit()));
+		    eventLoop.exec();
+
+            //QMessageBox::critical(this, tr(""), tr(""));
+
+            bool ok = dbSIU.logout();
+            if(ok != true){
+                QMessageBox::critical(this, tr("Ошибка"), tr("Не удалось отсоединиться от БД СИУ!"));
+                return ERROR_CODE;
+            }
+
+            ok = dbSIU.authorize(siuIP, siuPort, siuUser, siuPasswd, siuConstraint, siuSOP);
+            if(!ok){
+                QMessageBox::critical(this, tr("Ошибка"), tr("Не удалось переподключиться к БД СИУ!"));
+                return ERROR_CODE;
+            }
+
+        }
         
 	}
 	

@@ -88,6 +88,8 @@ private slots:
 	void saveFileInDD(const QString & fileName);
     void downloadFileProgress(QString uid, QString filename, qint64 done, qint64 full);
 
+signals:
+    void allFilesDownloaded();
 
 private:
 
@@ -172,6 +174,15 @@ private:
 	Ui::db_synchronizer_form *UI;
 	QTimer timer;
 	KKSDatabase * db;
+
+    QString siuIP;
+    QString siuPort;
+    QString siuUser;
+    QString siuPasswd;
+    int siuConstraint;
+    QString siuSOP;
+
+    int iReconnect;//каждые указанные количество скачанных ИО осуществляется переподключение к БД СИУ
     
     int iTimeout;//таймаут для каджого метода опроса БД СИУ
 

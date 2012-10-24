@@ -110,7 +110,7 @@
         </item>
        </layout>
       </item>
-      <item row="0" column="1" rowspan="4">
+      <item row="0" column="1" rowspan="5">
        <widget class="QListWidget" name="lwIRTypes">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Ignored">
@@ -249,6 +249,33 @@
          <widget class="QSpinBox" name="sbTimeout">
           <property name="minimum">
            <number>3</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="4" column="0">
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <item>
+         <widget class="QLabel" name="lReconnect">
+          <property name="text">
+           <string>Установить период переподключения к СИУ):</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="sbReconnect">
+          <property name="toolTip">
+           <string>При обработке очередной партии ИО будет происходить переподключение к БД СИУ (поставьте 0 для отмены такого поведения)</string>
+          </property>
+          <property name="minimum">
+           <number>0</number>
+          </property>
+          <property name="maximum">
+           <number>9999</number>
+          </property>
+          <property name="value">
+           <number>50</number>
           </property>
          </widget>
         </item>

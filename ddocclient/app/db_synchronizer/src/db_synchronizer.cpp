@@ -99,11 +99,19 @@ void DBSynchronizer::SIUConnect()
 	    return;
 	}
 
+    siuIP = f->getIP();
+    siuPort = f->getPort();
+    siuUser = f->getUser();
+    siuPasswd = f->getPasswd();
+    siuConstraint = f->getConstraint().toInt();
+    siuSOP = f->getSOP();
+
+
 	UI->teLog->setPlainText(UI->teLog->toPlainText() + tr("Connecting to SIU database...\n"));
 	UI->teLog->moveCursor(QTextCursor::End);
 
 	dbSIU.setTimeout(3000);
-	bool ok = dbSIU.authorize(f->getIP(), f->getPort(), f->getUser(), f->getPasswd(), f->getConstraint().toInt(), f->getSOP());
+    bool ok = dbSIU.authorize(siuIP, siuPort, siuUser, siuPasswd, siuConstraint, siuSOP);
 	if(ok){
 		connected = true;
 	    UI->teLog->setPlainText(UI->teLog->toPlainText() + tr("Successfull connecting to SIU database!\n")); 
@@ -134,6 +142,7 @@ void DBSynchronizer::analyzeSIU()
 		return;
 
     iTimeout = UI->sbTimeout->value() * 1000;//in seconds
+    iReconnect = UI->sbReconnect->value();
 
     bool b1 = UI->pbSetTimer->isEnabled();
 	bool b2 = UI->pbStopTimer->isEnabled();
@@ -419,6 +428,11 @@ void DBSynchronizer::downloadFileProgress(QString uid, QString filename, qint64 
 		    UI->teLogFile->setPlainText(UI->teLogFile->toPlainText() + tr("File %1 was successfully downloaded!\n").arg(filename));
 			UI->teLogFile->moveCursor(QTextCursor::End);
 			downloadingFiles.removeAll(filename);
+            if(downloadingFiles.count() == 0){
+                emit allFilesDownloaded();
+                //qWarning() << "All files downloaded!";
+                //QMessageBox::critical(this, tr("..."), tr("..."));
+            }
             /*
 			if(downloadingFiles.count() == 0){
 			    //это означает, что все файлы, которые реально загружаись из БД СИУ, загружены на сервер БД ДД
