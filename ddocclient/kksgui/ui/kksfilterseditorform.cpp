@@ -594,19 +594,52 @@ void KKSFiltersEditorForm :: addFilter ()
         f = c->createFilter (a->id(), value, oper); // lEValue->text()
     else
     {
-        //bool isLike = false;
-        //if (oper == KKSFilter::foLike)
-        //    isLike = true;
-    
         KKSFilter::FilterOper operMain = KKSFilter::foInSQL;
 
         QString sql;
+        bool cs = false;
         
-        if (id>0)
-            sql = QString("select * from ioSearch('%1', %2, '%3')").arg(value).arg(id).arg (cbOper->itemData (cbOper->currentIndex(), Qt::UserRole+1).toString());//isLike ? "TRUE" : "FALSE");
-        else//выбрана опция "поиск по всем атрибутам"
-            sql = QString("select * from ioSearch('%1', '%2')").arg(value).arg (cbOper->itemData (cbOper->currentIndex(), Qt::UserRole+1).toString());//isLike ? "TRUE" : "FALSE");
-        //qDebug () << __PRETTY_FUNCTION__ << a->code () << id;
+        if ((stLayValue->currentIndex () == 1 && chCaseSensitive->checkState () == Qt::Checked) ||
+            (stLayValue->currentIndex () == 3 && chTextCaseSensitive->checkState () == Qt::Checked))
+        {
+            cs = true;
+        }
+        else{
+            cs = false;
+        }
+
+        QString operStr = cbOper->itemData (cbOper->currentIndex(), Qt::UserRole+1).toString();
+        if(oper == KKSFilter::foLike || oper == KKSFilter::foLikeStart || oper == KKSFilter::foLikeIn || oper == KKSFilter::foLikeEnd){
+            if(cs)
+                operStr = "LIKE"; 
+            else
+                operStr = "ILIKE"; 
+        }
+        
+        if(oper == KKSFilter::foLikeStart){
+            value += "%";
+        }
+        else if(oper == KKSFilter::foLikeIn){
+            value = "%" + value + "%";
+        }
+        else if(oper == KKSFilter::foLikeEnd){
+            value = "%" + value;
+        }
+
+        if (id>0){
+            
+            sql = QString("select * from ioSearch('%1', %2, '%3')")
+                            .arg(value)
+                            .arg(id)
+                            .arg (operStr);
+        }
+        else{//выбрана опция "поиск по всем атрибутам"
+            
+            sql = QString("select * from ioSearch('%1', '%2')")
+                            .arg(value)
+                            .arg (operStr);
+        }
+        
         f = c->createFilter (a->id(), sql, operMain);
     }
     
