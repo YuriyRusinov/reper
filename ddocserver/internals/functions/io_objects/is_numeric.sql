@@ -249,3 +249,52 @@ begin
 end
 $BODY$
 language 'plpgsql';
+
+create or replace function is_date (varchar) returns boolean as
+$BODY$
+declare
+    val alias for $1;
+    ret date;
+begin
+    ret = to_date(val);
+    if(ret isnull) then
+        return false;
+    end if;
+
+    return true;
+end
+$BODY$
+language 'plpgsql';
+
+create or replace function is_time (varchar) returns boolean as
+$BODY$
+declare
+    val alias for $1;
+    ret time;
+begin
+    ret = to_time(val);
+    if(ret isnull) then
+        return false;
+    end if;
+
+    return true;
+end
+$BODY$
+language 'plpgsql';
+
+create or replace function is_timestamp (varchar) returns boolean as
+$BODY$
+declare
+    val alias for $1;
+    ret timestamp;
+begin
+    ret = to_timestamp(val);
+    if(ret isnull) then
+        return false;
+    end if;
+
+    return true;
+end
+$BODY$
+language 'plpgsql';
+

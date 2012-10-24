@@ -178,6 +178,12 @@ begin
     elsif(is_boolean(ioValue)) then
         query := query || 'upper(av.value) ' || oper || ' ';
         query := query || 'upper(' || quote_literal(ioValue) || ')';
+    elsif(type_code = 'TIMESTAMP') then
+        query := query || E' is_timestamp(av.value) and to_timestamp(av.value)::timestamp ' || oper || ' to_timestamp(' || quote_literal(ioValue) || E')::timestamp ';
+    elsif(type_code = 'DATE') then
+        query := query || E' is_date(av.value) and to_date(av.value)::date ' || oper || ' to_date(' || quote_literal(ioValue) || E')::date ';
+    elsif(type_code = 'TIME') then
+        query := query || E' is_time(av.value) and to_time(av.value)::time ' || oper || ' to_time(' || quote_literal(ioValue) || E')::time ';
     else
         query := query || ' av.value ' || oper || ' ';
         query := query || quote_literal (ioValue);

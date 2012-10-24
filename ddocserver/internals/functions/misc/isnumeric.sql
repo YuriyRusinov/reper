@@ -106,3 +106,45 @@ begin
 end;
 $BODY$
 language 'plpgsql' immutable strict;
+
+create or replace function to_time(varchar) returns time as
+$BODY$
+declare
+       i time;
+begin
+       i := $1::time;
+       return i;
+
+       EXCEPTION WHEN 
+                    invalid_text_representation or 
+--                    datetime_value_out_of_range or
+                    invalid_datetime_format
+                 then
+                    return NULL;
+                 when OTHERS
+                 then 
+                    return NULL;
+end;
+$BODY$
+language 'plpgsql' immutable strict;
+
+create or replace function to_date(varchar) returns date as
+$BODY$
+declare
+       i date;
+begin
+       i := $1::date;
+       return i;
+
+       EXCEPTION WHEN 
+                    invalid_text_representation or 
+--                    datetime_value_out_of_range or
+                    invalid_datetime_format
+                 then
+                    return NULL;
+                 when OTHERS
+                 then 
+                    return NULL;
+end;
+$BODY$
+language 'plpgsql' immutable strict;
