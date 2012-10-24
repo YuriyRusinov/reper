@@ -133,7 +133,7 @@ begin
 
     isLike := (lower (oper) = 'like');
 
-    query := 'select av.id_io_object from attributes a inner join attrs_categories ac on (ac.id_io_attribute = a.id and a.id = ';
+    query := 'select io.id as id_io_object from attributes a inner join attrs_categories ac on (ac.id_io_attribute = a.id and a.id = ';
     query := query || ioAttrId || ' )';
     query := query || ' inner join attrs_values av on (';
 
@@ -189,7 +189,7 @@ begin
         query := query || quote_literal (ioValue);
     end if;
 
-    query := query || ' and av.id_attr_category = ac.id and av.is_actual = true);';
+    query := query || ' and av.id_attr_category = ac.id and av.is_actual = true) inner join io_objects io on (av.id_io_object=io.id) order by 1;';
     RAISE WARNING '%', query;
 
     for r in 
@@ -257,7 +257,7 @@ begin
 
     RAISE NOTICE '%', isDouble;
 
-    query := 'select distinct io.id from io_objects io inner join (attrs_values av inner join attributes a on (av.id_io_attribute = a.id )) on (';
+    query := 'select distinct io.id from io_objects io inner join (attrs_values av inner join attrs_categories ac on (av.id_attr_category=ac.id) inner join attributes a on (ac.id_io_attribute = a.id )) on (';
     if (isDouble and not isLike) then
         query := query || 'io.id ' || oper || ioValue || ' or ';
     end if;
@@ -278,7 +278,7 @@ begin
         query := query || quote_literal (ioValue) || ' )';
     end if;
 
-    query := query || ' or a.table_name is not null and a.column_name is not null and av.value in (select av1.value from attrs_values av1 inner join attributes a1 on (a1.id=av1.id_io_attribute and a1.table_name is not null and a1.column_name is not null and matchAttrValue (a1.id, av1.value, ' || asString (ioValue, true) || ' ,' || asString (oper, true) || ' )))))';
+    query := query || ' or a.table_name is not null and a.column_name is not null and av.value in (select av1.value from attrs_values av1 inner join attrs_categories ac1 on (av1.id_attr_category=ac1.id) inner join attributes a1 on (a1.id=ac1.id_io_attribute and a1.table_name is not null and a1.column_name is not null and matchAttrValue (a1.id, av1.value, ' || asString (ioValue, true) || ' ,' || asString (oper, true) || ' )))))';
 
     RAISE NOTICE '%', query;
 
