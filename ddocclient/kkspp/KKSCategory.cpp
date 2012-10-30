@@ -226,6 +226,11 @@ void KKSCategory::setType(KKSType * _type)
 
 void KKSCategory::setAttributes(const KKSMap<int, KKSCategoryAttr *> & _attributes)
 {
+    if(m_templates.count() > 0){
+        qWarning() << QObject::tr("The category contains references on some associated KKSTemplate objects. The list will be destroyed because of changing all attributes!");
+        clearTemplates();
+    }
+    
     m_attributes = _attributes;
     m_attrsModified = true;
 }
@@ -320,9 +325,22 @@ int KKSCategory::addAttribute(int id, KKSCategoryAttr * a)
     return OK_CODE;
 }
 
-int KKSCategory::removeAttribute(int id)
+int KKSCategory::removeAttribute(int idAttribute)
 {
-    m_attributes.remove(id);
+    if(m_templates.count() > 0){
+        qWarning() << QObject::tr("Will also remove all occurrence of the attribute in assotiated KKSTemplate objects!");
+
+        KKSMap<int, KKSTemplate *>::iterator pt;
+        for (pt = m_templates.begin(); pt != m_templates.end(); pt++)
+        {
+            KKSTemplate* t = pt.value();
+            KKSMap<int, KKSAttrView *> attrs = t->attributes();
+            t->removeAttribute(idAttribute);
+        }
+
+    }
+
+    m_attributes.remove(idAttribute);
     m_attrsModified = true;
     return OK_CODE;
 }
@@ -388,6 +406,76 @@ const KKSTemplate & KKSCategory::defTemplate() const
 
     return m_defTemplate;
 }
+
+const KKSMap<int, KKSTemplate *> & KKSCategory::getTemplates() const
+{
+    return m_templates;
+}
+
+KKSMap<int, KKSTemplate *> & KKSCategory::getTemplates()
+{
+    return m_templates;
+}
+
+const KKSTemplate * KKSCategory::getTemplate(int idTemplate) const
+{
+    KKSMap<int, KKSTemplate *>::const_iterator pt;
+    for (pt = m_templates.constBegin(); pt != m_templates.constEnd(); pt++)
+    {
+        const KKSTemplate* t = pt.value();
+        if(t->id() == idTemplate)
+            return t;
+    }
+
+    return NULL;
+}
+
+KKSTemplate * KKSCategory::getTemplate(int idTemplate) 
+{
+    KKSMap<int, KKSTemplate *>::iterator pt;
+    for (pt = m_templates.begin(); pt != m_templates.end(); pt++)
+    {
+        KKSTemplate* t = pt.value();
+        if(t->id() == idTemplate)
+            return t;
+    }
+
+    return NULL;
+}
+
+int KKSCategory::addTemplate(KKSTemplate * t)
+{
+    if(!t)
+        return ERROR_CODE;
+
+    if(getTemplate(t->id()) != NULL){
+        qWarning() << QObject::tr("The template already present in given KKSCategory!") << QObject::tr("Cannot add it twise.");
+        return ERROR_CODE;
+    }
+
+    if(t->category() != this){
+        qWarning() << QObject::tr("The template cannot be assigned with given category because of KKSTemplate::category() method does not return THIS");
+        return ERROR_CODE;
+    }
+
+    m_templates.insert(t->id(), t);
+
+    return OK_CODE;
+}
+
+int KKSCategory::removeTemplate(int idTemplate)
+{
+    m_templates.remove(idTemplate);
+
+    return OK_CODE;
+}
+
+int KKSCategory::clearTemplates()
+{
+    m_templates.clear();
+    return OK_CODE;
+}
+
 
 KKSFilter * KKSCategory::createFilter(int attrId, 
                                       const QString & value, 

@@ -34,10 +34,13 @@ class _PP_EXPORT KKSTemplate : public KKSRecord
 
         int attrsCount() const;
 
-        const KKSMap<int, KKSCategoryAttr *> availableAttrs() const;
+        const KKSMap<int, KKSCategoryAttr *> availableAttrs() const;     //В качестве ключа используется idAttribute! //НЕ idAttrView или idCategoryAttr !!
         const KKSList<KKSAttrView*> sortedAttrs() const;
 
         const KKSMap<int, KKSAttrView *> attributes() const;  //возвращает перечень атрибутов, используемых шаблонов. Возвращаются только используемые
+                                                              //В качестве ключа используется idAttribute! //НЕ idAttrView или idCategoryAttr !!
+
+        int removeAttribute(int idAttribute);
 
         const KKSMap<int, KKSAttrGroup *> & groups() const;
         void setGroups(const KKSMap<int, KKSAttrGroup *> & g);

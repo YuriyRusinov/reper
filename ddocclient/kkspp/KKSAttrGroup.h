@@ -40,17 +40,18 @@ public:
     int order(void) const;
     void setOrder(int newOrder);
 
+    //В качестве ключа используется idAttribute! //НЕ idAttrView или idCategoryAttr !!
     void setAttrViews(const KKSMap<int, KKSAttrView *> & a);
     const KKSMap<int, KKSAttrView *> & attrViews() const;
     const KKSList<KKSAttrView*> sortedViews() const;
 
-    int addAttrView(int id, KKSAttrView * a);
-    int removeAttrView(int id);
+    int addAttrView(int idAttribute, KKSAttrView * a);//НЕ idAttrView или idCategoryAttr !!
+    int removeAttrView(int idAttribute, bool withRecursive = false); //НЕ idAttrView или idCategoryAttr !! Второй параметр - удаление рекурсивное, просматриваем также все вложенные подгруппы
     //int removeAttrView(const QString & code);
-    int replaceAttrView(int id, KKSAttrView * a);
+    int replaceAttrView(int idAttribute, KKSAttrView * a); //НЕ idAttrView или idCategoryAttr !!
 
-    const KKSAttrView * attrView(int id) const;
-    KKSAttrView * attrView(int id);
+    const KKSAttrView * attrView(int idAttribute) const; //НЕ idAttrView или idCategoryAttr !!
+    KKSAttrView * attrView(int idAttribute); //НЕ idAttrView или idCategoryAttr !!
     //KKSAttrView * attrView(const QString & code);
     //const KKSAttrView * attrView(const QString & code) const;
 

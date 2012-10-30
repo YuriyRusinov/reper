@@ -234,6 +234,16 @@ const KKSMap<int, KKSAttrView *> KKSTemplate::attributes() const
 
 }
 
+int KKSTemplate::removeAttribute(int idAttribute)
+{
+    KKSMap<int, KKSAttrGroup *>::iterator pg = m_groups.begin();
+    for (; pg != m_groups.end(); pg++){
+        KKSAttrGroup * g = pg.value();
+        g->removeAttrView(idAttribute, true);
+    }
+
+    return OK_CODE;
+}
 
 const KKSMap<int, KKSCategoryAttr *> KKSTemplate::availableAttrs() const
 {

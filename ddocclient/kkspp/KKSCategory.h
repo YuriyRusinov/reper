@@ -74,10 +74,10 @@ class _PP_EXPORT KKSCategory : public KKSRecord
         //рекомендуется использовать отрицательные идентификаторы
         //другой рекомендацией является не добавлять не сохраненные в БД атрибуты
         //а при создании нового - сначала сохранять его в БД
-        int addAttribute(int id, KKSCategoryAttr * a);
-        int removeAttribute(int id);
+        int addAttribute(int idAttribute, KKSCategoryAttr * a); //НЕ idCategoryAttr !!
+        int removeAttribute(int idAttribute);//НЕ idCategoryAttr !!
         //////int removeAttribute(const QString & code);
-        int replaceAttribute(int id, KKSCategoryAttr * a);
+        int replaceAttribute(int idAttribute, KKSCategoryAttr * a); //НЕ idCategoryAttr !!
 
         const KKSLifeCycle * lifeCycle() const;
         KKSLifeCycle * lifeCycle();
@@ -93,6 +93,26 @@ class _PP_EXPORT KKSCategory : public KKSRecord
         //и набор атрибутов в этой группе идентичен набору атрибутов в категории
         //(включая параметры атрибутов)
         const KKSTemplate & defTemplate() const;
+
+        //Шаблоны для категории
+        //!!!Не являются собственностью данной категории, поэтому методов для создания шаблонов нет
+        //только методы для ведения списка шаблонов, 
+        //за исключением случая удаления атрибута из категории, 
+        //когда требуется удалить также атрибут из всех соответмствующих шаблонов
+        
+        //ВАЖНО!! Если шаблон еще не создан в БД следует использовать отрицательную нумерацию для идентификаторов шаблонов
+        
+        //ВАЖНО!! Добавить шаблон в категорию можно только в том случае, 
+        //если метод шаблона category() указывает на категорию, в которую добавляется шаблон. 
+        const KKSMap<int, KKSTemplate *> & getTemplates() const;
+        KKSMap<int, KKSTemplate *> & getTemplates();
+        const KKSTemplate * getTemplate(int idTemplate) const;
+        KKSTemplate * getTemplate(int idTemplate);
+
+        int addTemplate(KKSTemplate * t);
+        int removeTemplate(int idTemplate);
+        int clearTemplates();
+
 
         bool isSystem() const;
         void setAsSystem(bool yes = true);
@@ -145,12 +165,13 @@ class _PP_EXPORT KKSCategory : public KKSRecord
         KKSType* m_type;
         KKSCategory* m_tableCategory; //категория описывает набор атрибутов, которые соответствуют колонкам в подчиненной таблице
         KKSCategory* m_recAttrCategory;//категория описывает набор пользовательских атрибутов (показателей), которыми могут обладать записи справочников
-        KKSMap<int, KKSCategoryAttr *> m_attributes;
+        KKSMap<int, KKSCategoryAttr *> m_attributes;//атрибуты категории. ВАЖНО!! В качестве ключа используется idAttribute, не idCategoryAttr !!!
         KKSLifeCycle* m_lifeCycle;
 
         KKSRubric * m_rootRubric;
 
         mutable KKSTemplate m_defTemplate;
+        KKSMap<int, KKSTemplate *> m_templates;//шаблоны категории.
 
         bool m_isSystem;
         bool m_isGlobal;

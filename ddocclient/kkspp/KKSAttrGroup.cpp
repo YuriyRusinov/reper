@@ -180,9 +180,19 @@ int KKSAttrGroup::addAttrView(int id, KKSAttrView * a)
     return OK_CODE;
 }
 
-int KKSAttrGroup::removeAttrView(int id)
+int KKSAttrGroup::removeAttrView(int id, bool withRecursive)
 {
     m_attributes.remove(id);
+    
+    if(!withRecursive)
+        return OK_CODE;
+
+    KKSMap<int, KKSAttrGroup*>::iterator pa;
+    for (pa = m_childGroups.begin(); pa != m_childGroups.end(); pa++){
+        KKSAttrGroup * g = pa.value();
+        g->removeAttrView(id, withRecursive);
+    }
+    
     return OK_CODE;
 }
 
