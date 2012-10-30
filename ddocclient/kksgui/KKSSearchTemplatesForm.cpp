@@ -10,6 +10,7 @@
 #include <QModelIndex>
 #include <QStandardItemModel>
 #include <QMessageBox>
+#include <QHeaderView>
 #include <QAction>
 #include <QToolBar>
 #include <QtDebug>
@@ -36,6 +37,12 @@ KKSSearchTemplatesForm :: KKSSearchTemplatesForm (QWidget * parent, Qt::WFlags f
     this->init ();
 
     QItemSelectionModel * selModel = searchView->selectionModel ();
+    QHeaderView * hv = searchView->header();
+    hv->setClickable (true);
+    hv->setSortIndicatorShown (true);
+    hv->setSortIndicator (0, Qt::AscendingOrder);
+    hv->setStretchLastSection (true);
+    searchView->setSortingEnabled (true);
     connect (selModel, SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), \
              this, \
              SLOT (searchTemplatesSelectionChanged (const QItemSelection &, const QItemSelection &)) );

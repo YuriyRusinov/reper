@@ -2319,6 +2319,7 @@ void KKSObjEditorFactory :: filterTemplateEIO (KKSObjEditor * editor, int idObje
     connect (stForm, SIGNAL (updateSearchTemplate (const QModelIndex&, QAbstractItemModel *)), this, SLOT (updateSearchTempl (const QModelIndex&, QAbstractItemModel *)) );
     connect (stForm, SIGNAL (deleteSearchTemplate (const QModelIndex&, QAbstractItemModel *)), this,  SLOT (deleleSearchTempl (const QModelIndex&, QAbstractItemModel *)) );
 
+    QSortFilterProxyModel * sortTModel = new QSortFilterProxyModel;
     QStandardItemModel * searchTModel = new QStandardItemModel (ncount, 1);
     searchTModel->setHeaderData (0, Qt::Horizontal, tr ("Search criteria"), Qt::DisplayRole);
     for (int i=0; i<ncount; i++)
@@ -2328,14 +2329,18 @@ void KKSObjEditorFactory :: filterTemplateEIO (KKSObjEditor * editor, int idObje
         searchTModel->setData (wIndex, stList[i]->id (), Qt::UserRole);
         searchTModel->setData (wIndex, stList[i]->getAuthor (), Qt::UserRole+1);
     }
-    stForm->setDataModel (searchTModel);
+    sortTModel->setSourceModel (searchTModel);
+    sortTModel->setSortCaseSensitivity(Qt::CaseInsensitive);
+    sortTModel->sort(0);
+    stForm->setDataModel (sortTModel);
     QItemSelectionModel * selTModel = stForm->selectionModel ();
 
     if (selTModel && stForm->exec () == QDialog::Accepted)
     {
         if (selTModel->selection().indexes ().isEmpty())
             return;
-        QModelIndex stIndex = selTModel->selection().indexes ().at (0);
+        QModelIndex stProxyIndex = selTModel->selection().indexes ().at (0);
+        QModelIndex stIndex = sortTModel->mapToSource (stProxyIndex);
         int idSearchTemplate = stIndex.data (Qt::UserRole).toInt();
         searchT = loader->loadSearchTemplate (idSearchTemplate);
         if (!searchT)
