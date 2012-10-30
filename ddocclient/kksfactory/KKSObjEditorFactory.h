@@ -301,7 +301,7 @@ private slots:
 
     void addSendIO (void);
 
-    void loadAttributeFilters (const QString & tableName, const KKSAttribute * attr, QComboBox * cbList);
+    void loadAttributeSingleFilters (const QString & tableName, const KKSAttribute * attr, QAbstractItemModel * mod);
     void loadAttributeFilters (const QString & tableName, const KKSAttribute * attr, QAbstractItemModel * mod);
     void saveSearchCriteria (KKSFilterGroup * group);
 

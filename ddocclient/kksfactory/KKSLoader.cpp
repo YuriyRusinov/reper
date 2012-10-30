@@ -115,6 +115,8 @@ QMap<int, QString> KKSLoader::loadAttributeValues(const KKSAttribute * a,
         order = QString("order by \"%1\"").arg(columnName);
 
     KKSAttribute * refAttr = loadAttribute (columnName, tableName);
+    if (!refAttr)
+        return values;
 
     QString sql;
 	//Т.е. проверяем ситуацию "ссылка на ссылку"

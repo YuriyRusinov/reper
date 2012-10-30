@@ -30,6 +30,7 @@ class QDateEdit;
 class QDateTimeEdit;
 class QListView;
 class QAbstractItemModel;
+class QSortFilterProxyModel;
 class QStackedLayout;
 class QToolButton;
 class QAction;
@@ -92,7 +93,7 @@ private slots:
     void delFilter (void);
 
 signals:
-    void loadAttributeRefValues (const QString & tableName, const KKSAttribute * attr, QComboBox * cbList);
+    //void loadAttributeRefValues (const QString & tableName, const KKSAttribute * attr, QComboBox * cbList);
     void loadAttributeRefValues (const QString & tableName, const KKSAttribute * attr, QAbstractItemModel * mod);
     void saveSearchCriteria (KKSFilterGroup *);
     void loadSearchCriteria (void);//QAbstractItemModel *);
@@ -127,7 +128,7 @@ private:
     QLineEdit * lEValue;
     QLineEdit * lEStrValue;
     QCheckBox * chCaseSensitive;
-    QComboBox * cbValue;
+    //QComboBox * cbValue;
     QTextEdit * teValue;
     QCheckBox * chTextCaseSensitive;
     QCheckBox * chValue;
@@ -136,6 +137,7 @@ private:
     QLineEdit * lEIntervalValue;
     QComboBox * cbUnits;
     QListView * lvCheckRef;
+    QSortFilterProxyModel * sortRefModel;
     QAbstractItemModel * checkRefModel;
     KKSImage * wImage;
     QToolButton * tbImage;

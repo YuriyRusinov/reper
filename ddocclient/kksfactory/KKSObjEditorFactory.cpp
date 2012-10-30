@@ -6112,9 +6112,9 @@ void KKSObjEditorFactory :: insertReport (qint64 idObjE, QWidget *parent, Qt::Wi
     return;
 }
 
-void KKSObjEditorFactory :: loadAttributeFilters (const QString & tableName, const KKSAttribute * attr, QComboBox * cbList)
+void KKSObjEditorFactory :: loadAttributeSingleFilters (const QString & tableName, const KKSAttribute * attr, QAbstractItemModel * mod)
 {
-    if (tableName.isEmpty() || !attr || !cbList)
+    if (tableName.isEmpty() || !attr || !mod)
         return;
 
     //QString tableName = attr->tableName ();
@@ -6197,14 +6197,15 @@ void KKSObjEditorFactory :: loadAttributeFilters (const QString & tableName, con
 
     KKSMap<qint64, KKSEIOData *> refRec = loader->loadEIOList (refObj, filters);
     KKSMap<qint64, KKSEIOData *>::const_iterator p;
-    cbList->clear ();
     
     //если атрибут типа ссылка ссылаетс€ на поле, отличное от id (например, в случае справочников "погруженных" в среду DynamicDocs из внешней схемы Ѕƒ)
     //¬ качестве userData в комбобоксе надо использовать именно его
 
+    mod->insertRows (0, refRec.count());
+    int i (0);
     for (p = refRec.constBegin(); p != refRec.constEnd(); p++)
     {
-        
+        QModelIndex wIndex = mod->index (i, 0);
         QString title = p.value()->fields().value (attr->columnName());
         if (title.isEmpty() && refObj->id () == IO_USERS_ID)
             title = p.value()->fields().value ("fio");
@@ -6216,12 +6217,32 @@ void KKSObjEditorFactory :: loadAttributeFilters (const QString & tableName, con
         if(refColName.isEmpty())
             refColName = "id";
         QString key = p.value()->fields().value(refColName);
-        cbList->addItem (title, key);
+        if (attr->refType()->id() == KKSAttrType::atJPG)
+        {
+            QPixmap pjpg;
+            pjpg.loadFromData (p.value()->fields().value(attr->columnName()).toLocal8Bit(), "XPM");
+            QSize iconSize (24, 24);
+            QPixmap icon (pjpg.scaled (iconSize, Qt::KeepAspectRatio));
+            mod->setData (wIndex, icon, Qt::DecorationRole);
+        }
+        else if (attr->refType()->id() == KKSAttrType::atSVG)
+        {
+            QPixmap pic;
+            pic.loadFromData (p.value()->fields().value(attr->columnName()).toLocal8Bit(), "SVG");
+            QSize iconSize (24, 24);
+            QPixmap icon (pic.scaled (iconSize, Qt::KeepAspectRatio));
+            mod->setData (wIndex, icon, Qt::DecorationRole);
+        }
+        else
+            mod->setData (wIndex, title, Qt::DisplayRole);
+        mod->setData (wIndex, p.key(), Qt::UserRole);
+        i++;
         //cbList->addItem (title, p.key());
     }
 
     refObj->release ();
 }
+ 
 
 void KKSObjEditorFactory :: loadAttributeFilters (const QString & tableName, const KKSAttribute * attr, QAbstractItemModel * mod)
 {
@@ -6259,12 +6280,20 @@ void KKSObjEditorFactory :: loadAttributeFilters (const QString & tableName, con
     if (!mod->columnCount())
         mod->insertColumns (0, 1);
 
+    if (attr->type()->attrType() == KKSAttrType::atList ||
+        attr->type()->attrType() == KKSAttrType::atParent)
+    {
+        loadAttributeSingleFilters (tableName, attr, mod);
+        return;
+    }
     mod->insertRows (0, values.count());
     int i=0;
     for (QMap<int, QString>::const_iterator p = values.constBegin(); p != values.constEnd(); p++)
     {
         QModelIndex wIndex = mod->index (i, 0);
-        mod->setData (wIndex, Qt::Unchecked, Qt::CheckStateRole);
+        if (attr->type()->attrType() == KKSAttrType::atCheckList ||
+             attr->type()->attrType() == KKSAttrType::atCheckListEx )
+            mod->setData (wIndex, Qt::Unchecked, Qt::CheckStateRole);
         if (attr->refType()->id() == KKSAttrType::atJPG)
         {
             QPixmap pjpg;

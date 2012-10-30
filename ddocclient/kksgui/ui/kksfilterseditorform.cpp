@@ -41,6 +41,7 @@
 #include <QInputDialog>
 #include <QItemSelection>
 #include <QItemSelectionModel>
+#include <QSortFilterProxyModel>
 #include <QKeySequence>
 #include <QAction>
 #include <QtDebug>
@@ -53,6 +54,7 @@ KKSFiltersEditorForm :: KKSFiltersEditorForm(KKSCategory * _c,
                                            Qt::WFlags f)
     : QDialog (parent, f),
     ui (new Ui::filters_editor_form),
+    sortRefModel (new QSortFilterProxyModel (this)),
     c (_c),
     m_attrsIO (attrsIO),
     m_bForIO (forIO),
@@ -373,11 +375,11 @@ void KKSFiltersEditorForm :: initValuesWidgets (void)
     // List or parent attributes
     //
     QWidget * cWRef = new QWidget (wValue);
-    QVBoxLayout * vLay3 = new QVBoxLayout (cWRef);
+/*    QVBoxLayout * vLay3 = new QVBoxLayout (cWRef);
     vLay3->setContentsMargins (0, 0, 0, 0);
     cbValue = new QComboBox (cWRef);
     vLay3->addWidget (cbValue);
-    vLay3->addStretch ();
+    vLay3->addStretch ();*/
     stLayValue->addWidget (cWRef);//insertWidget (2, cWRef);
 
     //
@@ -463,8 +465,9 @@ void KKSFiltersEditorForm :: initValuesWidgets (void)
     // Reference set
     //
     lvCheckRef = new QListView (wValue);
-    checkRefModel = new KKSCheckableModel (0, 1, this);
-    lvCheckRef->setModel (checkRefModel);
+    checkRefModel = 0;//new KKSCheckableModel (0, 1, this);
+    lvCheckRef->setModel (sortRefModel);//checkRefModel);
+    sortRefModel->setSortCaseSensitivity(Qt::CaseInsensitive);
     stLayValue->insertWidget (8, lvCheckRef);
 
     //
@@ -547,10 +550,11 @@ void KKSFiltersEditorForm :: addFilter ()
     {
         case 0: value = lEValue->text(); break;
         case 1: value = lEStrValue->text(); break;
-        case 2: {
+/*        case 2: {
                     int index = cbValue->currentIndex();
                     value = cbValue->itemData (index).toString(); break;
                 }
+ */
         case 3: value = teValue->toPlainText(); break;
         case 4: value = QString ("%1").arg (chValue->checkState() == Qt::Checked ? QString("TRUE") : QString ("FALSE")); break;
         case 5: value = dValue->date().toString (Qt::ISODate); break;
@@ -559,20 +563,36 @@ void KKSFiltersEditorForm :: addFilter ()
         case 8: 
                 {
                     QAbstractItemModel * mod = lvCheckRef->model ();
-                    value = QString("{");
-                    int num = 0;
-                    for (int i=0; i < mod->rowCount(); i++)
+                    if (a->type()->attrType() == KKSAttrType::atCheckList ||
+                        a->type()->attrType() == KKSAttrType::atCheckListEx)
                     {
-                        QModelIndex wIndex = mod->index (i, 0);
-                        if (mod->data (wIndex, Qt::CheckStateRole).toInt () == Qt::Checked)
+                        value = QString("{");
+                        int num = 0;
+                        for (int i=0; i < mod->rowCount(); i++)
                         {
-                            if (num > 0 )//&& i < mod->rowCount()-1)
-                                value += ",";
-                            value += QString::number (mod->data (wIndex, Qt::UserRole).toInt ());
-                            num++;
+                            QModelIndex wIndex = mod->index (i, 0);
+                            if (mod->data (wIndex, Qt::CheckStateRole).toInt () == Qt::Checked)
+                            {
+                                if (num > 0 )//&& i < mod->rowCount()-1)
+                                    value += ",";
+                                value += QString::number (mod->data (wIndex, Qt::UserRole).toInt ());
+                                num++;
+                            }
                         }
+                        value += "}";
                     }
-                    value += "}";
+                    else
+                    {
+                        QItemSelectionModel * selModel = lvCheckRef->selectionModel();
+                        QModelIndexList selInds = selModel ? selModel->selectedIndexes() : QModelIndexList();
+                        if (selInds.isEmpty())
+                        {
+                            value = QString();
+                            break;
+                        }
+                        QModelIndex wIndex = selInds.at (0);
+                        value = QString::number (wIndex.data(Qt::UserRole).toInt());
+                    }
                     break;
                 }
         case 9: 
@@ -1144,7 +1164,7 @@ void KKSFiltersEditorForm :: attrChanged (int index)
                                          stLayValue->setCurrentIndex (0); 
                                          break;
                                      }
-        case KKSAttrType::atList: 
+/*        case KKSAttrType::atList: 
         case KKSAttrType::atParent: 
                                      {
                                          QString tableName;
@@ -1159,6 +1179,7 @@ void KKSFiltersEditorForm :: attrChanged (int index)
                                          emit loadAttributeRefValues (tableName, pa.value(), cbValue);
                                          break;
                                      }
+ */
         case KKSAttrType::atText: {
                                       int h = teValue->height ();
                                       stLayValue->setCurrentIndex (3);
@@ -1172,6 +1193,8 @@ void KKSFiltersEditorForm :: attrChanged (int index)
         case KKSAttrType::atDate: stLayValue->setCurrentIndex (5); break;
         case KKSAttrType::atDateTime: stLayValue->setCurrentIndex (6); break;
         case KKSAttrType::atInterval: stLayValue->setCurrentIndex (7); break;
+        case KKSAttrType::atList: 
+        case KKSAttrType::atParent: 
         case KKSAttrType::atCheckList: 
         case KKSAttrType::atCheckListEx: 
                                   {
@@ -1188,8 +1211,18 @@ void KKSFiltersEditorForm :: attrChanged (int index)
                                           if(tableName.isEmpty())
                                               tableName = m_parentTable;
                                       }
-                                      
+                                      if (!checkRefModel)
+                                          checkRefModel = (idAttrType == KKSAttrType::atList || idAttrType == KKSAttrType::atParent) ? new QStandardItemModel (0, 1) : new KKSCheckableModel (0, 1);
+                                      else
+                                      {
+                                          QAbstractItemModel * oldModel = checkRefModel;
+                                          checkRefModel = (idAttrType == KKSAttrType::atList || idAttrType == KKSAttrType::atParent) ? new QStandardItemModel (0, 1) : new KKSCheckableModel (0, 1);
+                                          delete oldModel;
+                                      }
+                                      sortRefModel->setSourceModel (checkRefModel);
+                                          
                                       emit loadAttributeRefValues (tableName, pa.value(), checkRefModel);
+                                      sortRefModel->sort(0);
                                       
                                       break;
                                   }
