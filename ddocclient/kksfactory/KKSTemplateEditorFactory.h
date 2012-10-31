@@ -45,8 +45,9 @@ class _F_EXPORT KKSTemplateEditorFactory : public KKSEntityFactory
         void saveSuccess ();
 
     private slots:
-        void addTemplate (QWidget *ctw, int idCat, QAbstractItemModel * templMod);
+        void addTemplate (QWidget *ctw, KKSCategory *c, QAbstractItemModel * templMod);
         void editTemplate (QWidget *ctw, int idTempl, QAbstractItemModel * templMod, const QModelIndex& tIndex);
+        void editCatTemplate (QWidget *ctw, KKSTemplate *t, QAbstractItemModel * templMod, const QModelIndex& tIndex);
         void delTemplate (QWidget *ctw, int idTempl, QAbstractItemModel * templMod, const QModelIndex& tIndex);
 
         void addAGroupToTemplate (KKSTemplate *t, const QModelIndex& parent, KKSTemplateEditor *tEditor);

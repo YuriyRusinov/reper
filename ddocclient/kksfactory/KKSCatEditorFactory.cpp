@@ -536,8 +536,8 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (int idCategory, // ид
     connect (cEditor, SIGNAL (addChildCat (QWidget *, int, bool)), this, SLOT (addCategory (QWidget *, int, bool)) );
     connect (cEditor, SIGNAL (editChildCat (QWidget *, int, bool)), this, SLOT (editCategory (QWidget *, int, bool)) );
     
-    connect (cEditor, SIGNAL (addNewCategoryTemplate (QWidget *, int, QAbstractItemModel *)), tf, SLOT (addTemplate (QWidget *, int, QAbstractItemModel *)) );
-    connect (cEditor, SIGNAL (editCategoryTemplate (QWidget *, int, QAbstractItemModel *, const QModelIndex& )), tf, SLOT (editTemplate (QWidget *, int, QAbstractItemModel *, const QModelIndex&)) );
+    connect (cEditor, SIGNAL (addNewCategoryTemplate (QWidget *, KKSCategory *, QAbstractItemModel *)), tf, SLOT (addTemplate (QWidget *, KKSCategory *, QAbstractItemModel *)) );
+    connect (cEditor, SIGNAL (editCategoryTemplate (QWidget *, KKSTemplate *, QAbstractItemModel *, const QModelIndex& )), tf, SLOT (editCatTemplate (QWidget *, KKSTemplate *, QAbstractItemModel *, const QModelIndex&)) );
     connect (cEditor, SIGNAL (delCategoryTemplate (QWidget *, int, QAbstractItemModel *, const QModelIndex& )), tf, SLOT (delTemplate (QWidget *, int, QAbstractItemModel *, const QModelIndex&)) );
     
     connect (this, SIGNAL (categoryDbError ()), cEditor, SLOT (catDbError()) );
@@ -634,7 +634,7 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (KKSCategory *cat, // 
     connect (cEditor, SIGNAL (addChildCat (QWidget *, int, bool)), this, SLOT (addCategory (QWidget *, int, bool)) );
     connect (cEditor, SIGNAL (editChildCat (QWidget *, int, bool)), this, SLOT (editCategory (QWidget *, int, bool)) );
     
-    connect (cEditor, SIGNAL (addNewCategoryTemplate (QWidget *, int, QAbstractItemModel *)), tf, SLOT (addTemplate (QWidget *, int, QAbstractItemModel *)) );
+    connect (cEditor, SIGNAL (addNewCategoryTemplate (QWidget *, KKSCategory *, QAbstractItemModel *)), tf, SLOT (addTemplate (QWidget *, KKSCategory *, QAbstractItemModel *)) );
     connect (cEditor, SIGNAL (editCategoryTemplate (QWidget *, int, QAbstractItemModel *, const QModelIndex& )), tf, SLOT (editTemplate (QWidget *, int, QAbstractItemModel *, const QModelIndex&)) );
     connect (cEditor, SIGNAL (delCategoryTemplate (QWidget *, int, QAbstractItemModel *, const QModelIndex& )), tf, SLOT (delTemplate (QWidget *, int, QAbstractItemModel *, const QModelIndex&)) );
     

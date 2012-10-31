@@ -41,6 +41,7 @@ class KKSIncludesWidget;
 class KKSAccessEntity;
 class KKSStuffForm;
 class KKSType;
+class KKSTemplate;
 
 class _GUI_EXPORT KKSCatEditor : public KKSDialog
 {
@@ -122,8 +123,8 @@ class _GUI_EXPORT KKSCatEditor : public KKSDialog
         void saveCategory (KKSCategory *cat, int idTableCat, int idType, KKSCatEditor *editor);
         void addChildCat (QWidget *catW, int idCatType, bool isChild);
         void editChildCat (QWidget *catW, int idCat, bool isChild);
-        void addNewCategoryTemplate (QWidget *catW, int idCat, QAbstractItemModel * templModel);
-        void editCategoryTemplate (QWidget *catW, int idTempl, QAbstractItemModel * templModel, const QModelIndex& tIndex);
+        void addNewCategoryTemplate (QWidget *catW, KKSCategory * , QAbstractItemModel * templModel);
+        void editCategoryTemplate (QWidget *catW, KKSTemplate * t, QAbstractItemModel * templModel, const QModelIndex& tIndex);
         void delCategoryTemplate (QWidget *catW, int idTempl, QAbstractItemModel * templModel, const QModelIndex& tIndex);
 
     private:

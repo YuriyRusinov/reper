@@ -585,14 +585,22 @@ KKSCategory * KKSLoader::loadCategory(int id, bool simplify) const
             c2->release();
     }
 
-    //is_main
+    //
+    // is_main
+    //
     c->setMain(res->getCellAsBool(0, 7));
-    //is_system
+    //
+    // is_system
+    //
     c->setAsSystem(res->getCellAsBool(0, 10));
-    //is_global
+    //
+    // is_global
+    //
     c->setAsGlobal(res->getCellAsBool(0, 14));
 
-    //атрибуты
+    //
+    // атрибуты
+    //
     KKSMap<int, KKSCategoryAttr *> attrs = loadCategoryAttrs(c->id());
     c->setAttributes(attrs);
     
@@ -600,7 +608,9 @@ KKSCategory * KKSLoader::loadCategory(int id, bool simplify) const
         delete res;
         return c;
     }
-    //ЖЦ
+    //
+    // ЖЦ
+    //
     KKSLifeCycle * lc = loadLifeCycle(c->id());
     c->setLifeCycle(lc);
     if(lc)
@@ -608,10 +618,19 @@ KKSCategory * KKSLoader::loadCategory(int id, bool simplify) const
 
     delete res;
 
+    //
     //рубрики
+    //
     loadRubrics(c);
     //KKSAccessEntity * acl = 
+    //
+    // права доступа
+    //
     this->loadAccessCat (c);
+    //
+    // шаблоны
+    //
+    loadCategoryTemplates (c);
 
     //TODO!!!
     //c->addRef();
@@ -1457,7 +1476,7 @@ KKSList<KKSTemplate*> KKSLoader::loadCategoryTemplates(int idCategory, bool bWit
 
     return tList;
 }
-
+ 
 KKSList<KKSTemplate*> KKSLoader::loadCategoryTemplates (KKSCategory * c, bool bWithAllMandatories) const
 {
     KKSList<KKSTemplate*> tList;
@@ -1488,6 +1507,7 @@ KKSList<KKSTemplate*> KKSLoader::loadCategoryTemplates (KKSCategory * c, bool bW
 
         t->setCategory(c);
         tList.append(t);
+        c->addTemplate (t);
         t->release();
     }
 

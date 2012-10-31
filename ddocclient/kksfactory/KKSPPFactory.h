@@ -196,6 +196,8 @@ private:
 
         int setAsLogging(int idOper, bool yes) const;
         int addLogAttrs(int idObject, int idOper) const;
+        
+        int saveCatTemplates (KKSCategory * c) const;
 
 };
 

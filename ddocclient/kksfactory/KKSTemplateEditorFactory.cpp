@@ -188,15 +188,18 @@ KKSTemplate * KKSTemplateEditorFactory :: initTemplate (int idTemplate, QString 
     return t;
 }
 
-void KKSTemplateEditorFactory :: addTemplate (QWidget *ctw, int idCat, QAbstractItemModel *templMod)
+void KKSTemplateEditorFactory :: addTemplate (QWidget *ctw, KKSCategory *c, QAbstractItemModel *templMod)
 {
-    KKSCategory *c = loader->loadCategory (idCat);
+    //KKSCategory *c = loader->loadCategory (idCat);
     if (!c)
         return;
 
-    int id = -1;
+    KKSMap<int, KKSTemplate *> tc = c->getTemplates();
+    KKSMap<int, KKSTemplate *>::const_iterator p = tc.constBegin();
+    int id = p.key() < 0 ? p.key()-1 : -1;
     QString name = QString();
     KKSTemplate * t = this->initTemplate (id, name, c);
+    c->addTemplate (t);
     QWidget *parent = ctw;
     bool mode = (ctw->windowModality () != Qt::NonModal);
     Qt::WindowModality cwModal = ctw->windowModality();
@@ -216,17 +219,8 @@ void KKSTemplateEditorFactory :: addTemplate (QWidget *ctw, int idCat, QAbstract
         if (t)
             t->release ();
 
-        if (c)
-            c->release ();
-
         QMessageBox::warning (ctw, tr ("Template editor"), tr ("Cannot create template editor"), QMessageBox::Ok);
     }
-
-    if (t)
-        t->release ();
-
-    if (c)
-        c->release ();
 
     if (isCat && mode && tEditor->exec () == QDialog::Accepted)
     {
@@ -236,17 +230,56 @@ void KKSTemplateEditorFactory :: addTemplate (QWidget *ctw, int idCat, QAbstract
             templMod->insertRows (templMod->rowCount(), 1);
             tIndex = templMod->index (templMod->rowCount()-1, 0);
         }
-        KKSTemplate * t = loader->loadTemplate (tEditor->getTemplateID());
+        //KKSTemplate * t = loader->loadTemplate (tEditor->getTemplateID());
         templMod->setData (tIndex, t->id(), Qt::UserRole);
         templMod->setData (tIndex, t->name(), Qt::DisplayRole);
     }
     else if (!isCat && mode)
         tEditor->show ();
+    if (t)
+        t->release ();
 }
 
 void KKSTemplateEditorFactory :: editTemplate (QWidget *ctw, int idTempl, QAbstractItemModel * templMod, const QModelIndex& tIndex)
 {
     KKSTemplate * t = this->initTemplate (idTempl);
+    QWidget *parent = ctw;
+    bool mode = (ctw->windowModality () != Qt::NonModal);
+    Qt::WindowModality cwModal = ctw->windowModality();
+    if (qobject_cast<KKSCatEditor *>(this->sender()))
+    {
+        //
+        // Вызов пришел от редактора категорий
+        //
+        parent = qobject_cast<KKSCatEditor *>(this->sender());
+        mode = true;
+        cwModal = Qt::WindowModal;
+    }
+    KKSTemplateEditor *tEditor = this->createTemplateEditor (t, mode, cwModal, parent, Qt::Dialog);
+    if (!tEditor)
+    {
+        if (t)
+            t->release ();
+
+        QMessageBox::warning (ctw, tr ("Template editor"), tr ("Cannot create template editor"), QMessageBox::Ok);
+        return;
+    }
+
+    if (t)
+        t->release ();
+
+    if (qobject_cast<KKSCatEditor *>(this->sender()) && mode && tEditor->exec() == QDialog::Accepted)
+    {
+        KKSTemplate * t = loader->loadTemplate (tEditor->getTemplateID());
+        templMod->setData (tIndex, t->id(), Qt::UserRole);
+        templMod->setData (tIndex, t->name(), Qt::DisplayRole);
+    }
+    else if (!qobject_cast<KKSCatEditor *>(this->sender()) && mode)
+        tEditor->show ();
+}
+
+void KKSTemplateEditorFactory :: editCatTemplate (QWidget *ctw, KKSTemplate *t, QAbstractItemModel * templMod, const QModelIndex& tIndex)
+{
     QWidget *parent = ctw;
     bool mode = (ctw->windowModality () != Qt::NonModal);
     Qt::WindowModality cwModal = ctw->windowModality();
@@ -660,6 +693,7 @@ void KKSTemplateEditorFactory :: saveTemplate (KKSTemplate *t, KKSTemplateEditor
         while (qobject_cast<QAbstractProxyModel *>(tModel))
             tModel = (qobject_cast<QAbstractProxyModel *>(tModel))->sourceModel ();
     }
+    KKSCategory * c = t->category();
 
     qDebug () << __PRETTY_FUNCTION__ << t->groups().count();
     for (KKSMap<int, KKSAttrGroup *>::const_iterator pg=t->groups().constBegin(); \
@@ -678,22 +712,24 @@ void KKSTemplateEditorFactory :: saveTemplate (KKSTemplate *t, KKSTemplateEditor
             qDebug () << __PRETTY_FUNCTION__ << av->defValue().valueForInsert() << av->defValue().valueVariant();
         }
     }
-    if (t->id() < 0)
+    if (!c->getTemplates().contains (t->id()))
     {
-        res = ppf->insertTemplate (t);
+        res = c->addTemplate(t);//ppf->insertTemplate (t);
         if (res != ERROR_CODE && cEditor)
         {
             tModel->insertRows (0, 1);
             wIndex = tModel->index (0, 0);
         }
     }
-    else
+/*    else
     {
-        res = ppf->updateTemplate (t);
+        c->removeTemplate (t->id());
+        res = c->addTemplate(t);//ppf->insertTemplate (t);
+//        res = ppf->updateTemplate (t);
         if (res != ERROR_CODE && cEditor)
             wIndex = qobject_cast<QAbstractProxyModel *>(sortTemplModel) ? qobject_cast<QAbstractProxyModel *>(sortTemplModel)->mapToSource (cEditor->getSelectedTemplateIndex ()) : cEditor->getSelectedTemplateIndex ();
     }
-
+*/
     qDebug () << __PRETTY_FUNCTION__ << wIndex << t->name() << t->id();
     if (res == ERROR_CODE)
     {

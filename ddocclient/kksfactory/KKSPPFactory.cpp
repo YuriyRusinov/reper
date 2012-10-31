@@ -1632,7 +1632,9 @@ int KKSPPFactory::insertCategory(KKSCategory* c) const
         }
     }
 
+    //
     //если у категории не сохранен тип - сохраним его
+    //
     if(c->type()->id() <= 0){
         setInTransaction();
         int ok = insertType(c->type());
@@ -1713,7 +1715,19 @@ int KKSPPFactory::insertCategory(KKSCategory* c) const
             return ERROR_CODE;
         }
     }
-
+    
+    if (!c->getTemplates().isEmpty())
+    {
+        setInTransaction();
+        int ok = this->saveCatTemplates (c);
+        restoreInTransaction();
+        if(ok != OK_CODE){
+            if(!inTransaction())
+                db->rollback();
+            c->setId(-1);
+            return ERROR_CODE;
+        }
+    }
     //помечаем категорию как завершенную
     //(она создана и ей назначены все атрибуты)
     QString sql = QString("select cSetCompleted(%1, 1)").arg(c->id());
@@ -1759,6 +1773,33 @@ int KKSPPFactory::insertCategory(KKSCategory* c) const
     return OK_CODE;
 }
 
+int KKSPPFactory :: saveCatTemplates (KKSCategory * c) const
+{
+    if (!c)
+        return ERROR_CODE;
+    
+    KKSMap<int, KKSTemplate *> tList = c->getTemplates();
+    for (KKSMap<int, KKSTemplate *>::const_iterator pt = tList.constBegin();
+            pt != tList.constEnd();
+            pt++)
+    {
+        KKSTemplate * t = pt.value();
+        int res = pt.key() < 0 ? this->insertTemplate (t) : this->updateTemplate (t);
+        if (res < 0)
+        {
+            if(!inTransaction())
+                db->rollback();
+            c->setId(-1);
+            return ERROR_CODE;
+        }
+        if (pt.key() < 0)
+        {
+            c->removeTemplate (pt.key());
+            c->addTemplate (t);
+        }
+    }
+    return OK_CODE;
+}
 
 //если категория используется в ИО, то ее изменение запрещено
 //соответственно, производится проверка на это.
@@ -1866,7 +1907,9 @@ int KKSPPFactory::updateCategory(const KKSCategory* c) const
     }
     
 
-    //теперь обновим жизненный цикл
+    //
+    // теперь обновим жизненный цикл
+    //
     ok = deleteLifeCycle(c->id());
     if(ok != OK_CODE){
         if(!inTransaction())
@@ -1894,6 +1937,18 @@ int KKSPPFactory::updateCategory(const KKSCategory* c) const
             return ERROR_CODE;
         }
     }
+    if (!c->getTemplates().isEmpty())
+    {
+        setInTransaction();
+        int ok = this->saveCatTemplates (const_cast<KKSCategory*>(c));
+        restoreInTransaction();
+        if(ok != OK_CODE){
+            if(!inTransaction())
+                db->rollback();
+            return ERROR_CODE;
+        }
+    }
+
     int accOk = this->writeCatAccessRules (c->getAccessRules(), c->id());
     if (accOk < 0)
     {

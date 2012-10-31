@@ -100,7 +100,7 @@ KKSCatEditor :: KKSCatEditor (KKSCategory *c,
         connect (recCatTemplatesW->actAdd, SIGNAL (triggered()), this, SLOT (addTemplate()) );
         connect (recCatTemplatesW->actEdit, SIGNAL (triggered()), this, SLOT (editTemplate()) );
         connect (recCatTemplatesW->actDel, SIGNAL (triggered()), this, SLOT (delTemplate()) );
-        recCatTemplatesW->setEnabled (pCategory->id() >0);
+        recCatTemplatesW->setEnabled (true);//pCategory->id() >0);
     }
 
     if (recTableCatTemplatesW)
@@ -108,7 +108,7 @@ KKSCatEditor :: KKSCatEditor (KKSCategory *c,
         connect (recTableCatTemplatesW->actAdd, SIGNAL (triggered()), this, SLOT (addTableTemplate()) );
         connect (recTableCatTemplatesW->actEdit, SIGNAL (triggered()), this, SLOT (editTableTemplate()) );
         connect (recTableCatTemplatesW->actDel, SIGNAL (triggered()), this, SLOT (delTableTemplate()) );
-        recTableCatTemplatesW->setEnabled (pCategory->id() >0);
+        recTableCatTemplatesW->setEnabled (true);//pCategory->id() >0);
     }
     
     if (recAttrCatTemplatesW)
@@ -554,20 +554,20 @@ void KKSCatEditor :: setAttrTypes (const KKSMap<int, KKSAttrType*>& aTypes)
 
 void KKSCatEditor :: addTemplate (void)
 {
-    if (pCategory && pCategory->id () > 0)
-        emit addNewCategoryTemplate (this, pCategory->id (), recCatTemplatesW->getSourceModel());
+    if (pCategory)// && pCategory->id () > 0)
+        emit addNewCategoryTemplate (this, pCategory, recCatTemplatesW->getSourceModel());
 }
 
 void KKSCatEditor :: addTableTemplate (void)
 {
-    if (pTableCategory && pTableCategory->id () > 0)
-        emit addNewCategoryTemplate (this, pTableCategory->id (), recTableCatTemplatesW->getSourceModel());
+    if (pTableCategory)// && pTableCategory->id () > 0)
+        emit addNewCategoryTemplate (this, pTableCategory, recTableCatTemplatesW->getSourceModel());
 }
 
 void KKSCatEditor :: addIndTemplate (void)
 {
-    if (this->pRecAttrCategory && pRecAttrCategory->id() > 0)
-        emit addNewCategoryTemplate (this, pRecAttrCategory->id(), recAttrCatTemplatesW->getSourceModel());
+    if (this->pRecAttrCategory)// && pRecAttrCategory->id() > 0)
+        emit addNewCategoryTemplate (this, pRecAttrCategory, recAttrCatTemplatesW->getSourceModel());
 }
 
 void KKSCatEditor :: editTemplate (void)
@@ -575,7 +575,8 @@ void KKSCatEditor :: editTemplate (void)
     if (!recCatTemplatesW || !recCatTemplatesW->getSelectionModel()->currentIndex().isValid())
         return;
     int idTemplate = recCatTemplatesW->getID ();
-    emit editCategoryTemplate (this, idTemplate, recCatTemplatesW->getSourceModel(), recCatTemplatesW->getSourceIndex());
+    KKSTemplate * t = pCategory->getTemplate (idTemplate);
+    emit editCategoryTemplate (this, t, recCatTemplatesW->getSourceModel(), recCatTemplatesW->getSourceIndex());
 }
 
 void KKSCatEditor :: editTableTemplate (void)
@@ -583,7 +584,8 @@ void KKSCatEditor :: editTableTemplate (void)
     if (!recTableCatTemplatesW || !recTableCatTemplatesW->getSelectionModel()->currentIndex().isValid())
         return;
     int idTemplate = recTableCatTemplatesW->getID ();
-    emit editCategoryTemplate (this, idTemplate, recTableCatTemplatesW->getSourceModel(), recTableCatTemplatesW->getSourceIndex());
+    KKSTemplate * t = pTableCategory->getTemplate (idTemplate);
+    emit editCategoryTemplate (this, t, recTableCatTemplatesW->getSourceModel(), recTableCatTemplatesW->getSourceIndex());
 }
 
 void KKSCatEditor :: editIndTemplate (void)
@@ -591,7 +593,8 @@ void KKSCatEditor :: editIndTemplate (void)
     if (!recAttrCatTemplatesW || !recAttrCatTemplatesW->getSelectionModel())
         return;
     int idTemplate = recAttrCatTemplatesW->getID ();
-    emit editCategoryTemplate (this, idTemplate, recAttrCatTemplatesW->getSourceModel (), recAttrCatTemplatesW->getSourceIndex() );
+    KKSTemplate * t = pRecAttrCategory->getTemplate (idTemplate);
+    emit editCategoryTemplate (this, t, recAttrCatTemplatesW->getSourceModel (), recAttrCatTemplatesW->getSourceIndex() );
 }
 
 void KKSCatEditor :: delTemplate (void)
