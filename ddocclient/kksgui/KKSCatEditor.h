@@ -113,6 +113,8 @@ class _GUI_EXPORT KKSCatEditor : public KKSDialog
 
         void setTableCategoryName (const QString& tName);
         void catDbError (void);
+        
+        void catDbOk (KKSCategory * c);
 
     signals:
         void addAttrsIntoCat (KKSCategory *c, QAbstractItemModel * attrModel, KKSCatEditor *editor);
@@ -126,6 +128,7 @@ class _GUI_EXPORT KKSCatEditor : public KKSDialog
         void addNewCategoryTemplate (QWidget *catW, KKSCategory * , QAbstractItemModel * templModel);
         void editCategoryTemplate (QWidget *catW, KKSTemplate * t, QAbstractItemModel * templModel, const QModelIndex& tIndex);
         void delCategoryTemplate (QWidget *catW, int idTempl, QAbstractItemModel * templModel, const QModelIndex& tIndex);
+        void refreshTemplates (KKSCategory * c, QAbstractItemModel * mod);
 
     private:
         //

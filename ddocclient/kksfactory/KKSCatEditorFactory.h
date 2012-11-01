@@ -88,6 +88,7 @@ class _F_EXPORT KKSCatEditorFactory : public KKSEntityFactory
         void saveCategory (KKSCategory *cat, int idTableCat, int idType, KKSCatEditor *cEditor);
         void addAttributeIntoCategory (KKSCategory *c, QAbstractItemModel * attrModel, KKSCatEditor *editor);
         void copyAttributesIntoCategory (KKSCategory *c, QAbstractItemModel * attrModel, KKSCatEditor *cEditor);
+        void refreshCategoryTemplates (KKSCategory * c, QAbstractItemModel * templModel);
 //        void saveAttribute (KKSAttribute * cAttr, int idType, KKSAttributesEditor *aEditor);
 //        void loadAttribute (int idAttr, KKSAttributesEditor *aEditor);
 //        void delAttribute (int idAttr, KKSAttributesEditor *aEditor);

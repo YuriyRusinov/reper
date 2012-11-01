@@ -541,6 +541,9 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (int idCategory, // ид
     connect (cEditor, SIGNAL (delCategoryTemplate (QWidget *, int, QAbstractItemModel *, const QModelIndex& )), tf, SLOT (delTemplate (QWidget *, int, QAbstractItemModel *, const QModelIndex&)) );
     
     connect (this, SIGNAL (categoryDbError ()), cEditor, SLOT (catDbError()) );
+    connect (this, SIGNAL (categoryAdded(KKSCategory *)), cEditor, SLOT (catDbOk(KKSCategory *)) );
+    
+    connect (cEditor, SIGNAL (refreshTemplates (KKSCategory *, QAbstractItemModel *)), this, SLOT (refreshCategoryTemplates (KKSCategory *, QAbstractItemModel *)) );
 
     cEditor->setWindowModality (windowModality);
     if (windowModality != Qt::NonModal)
@@ -639,6 +642,9 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (KKSCategory *cat, // 
     connect (cEditor, SIGNAL (delCategoryTemplate (QWidget *, int, QAbstractItemModel *, const QModelIndex& )), tf, SLOT (delTemplate (QWidget *, int, QAbstractItemModel *, const QModelIndex&)) );
     
     connect (this, SIGNAL (categoryDbError ()), cEditor, SLOT (catDbError()) );
+    connect (this, SIGNAL (categoryAdded(KKSCategory *)), cEditor, SLOT (catDbOk(KKSCategory *)) );
+    
+    connect (cEditor, SIGNAL (refreshTemplates (KKSCategory *, QAbstractItemModel *)), this, SLOT (refreshCategoryTemplates (KKSCategory *, QAbstractItemModel *)) );
 
     cEditor->setWindowModality (windowModality);
     if (windowModality != Qt::NonModal)
@@ -933,6 +939,15 @@ KKSList<const KKSFilterGroup *> KKSCatEditorFactory :: viewMainCategories (void)
     return filterGroups;
 }
 
+void KKSCatEditorFactory :: refreshCategoryTemplates (KKSCategory * c, QAbstractItemModel * templModel)
+{
+    if (!c || !templModel)
+        return;
+
+    KKSList<KKSTemplate *> lTempls = loader->loadCategoryTemplates (c->id());
+    KKSViewFactory::loadCategoryDbTemplates (lTempls, templModel, QModelIndex());
+}
+
 /*
 void KKSCatEditorFactory :: loadAttrsRefs (KKSAttribute * attr, KKSAttrEditor * aEditor)
 {
@@ -1031,3 +1046,4 @@ void KKSCatEditorFactory :: findAttributes (int idAttrs, KKSAttributesEditor * a
 
 }
 */
+

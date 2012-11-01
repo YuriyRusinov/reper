@@ -820,3 +820,15 @@ void KKSCatEditor :: catDbError (void)
 {
     this->isCloseIgnored = true;
 }
+
+void KKSCatEditor :: catDbOk (KKSCategory * c)
+{
+    if (c != pCategory)
+        return;
+    qDebug () << __PRETTY_FUNCTION__;
+    emit refreshTemplates (pCategory, recCatTemplatesW->getSourceModel());
+    if (pTableCategory)
+        emit refreshTemplates (pTableCategory, recTableCatTemplatesW->getSourceModel());
+    if (pRecAttrCategory)
+        emit refreshTemplates (pRecAttrCategory, recAttrCatTemplatesW->getSourceModel());
+}
