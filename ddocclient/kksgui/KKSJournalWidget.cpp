@@ -847,10 +847,10 @@ void KKSJournalWidget :: contextMenuEvent (QContextMenuEvent *e)
 void KKSJournalWidget :: cmdMsgSelectionChanged (const QItemSelection& selected, const QItemSelection& deselected)
 {
     Q_UNUSED (deselected);
-	if(selected.indexes().count() == 0)
-		return;
+    if(selected.indexes().count() == 0)
+        return;
 
-	QModelIndex wIndex = selected.indexes().at (0);
+    QModelIndex wIndex = selected.indexes().at (0);
     wIndex = wIndex.sibling (wIndex.row(), 0);
     QModelIndex rootIndex (wIndex);
     while (rootIndex.parent().isValid())
@@ -873,7 +873,7 @@ void KKSJournalWidget :: updateCmdMenuItems (const QModelIndex& wIndex)
         bool isVisible = canExecuteCmd(cmd);
         aExecuteInCmd->setVisible (isVisible);
         aExecuteExInCmd->setVisible (isVisible);
-        isVisible = canSetAsExecuting(cmd);
+        isVisible = canSetAsExecuting(cmd) && wIndex.parent().row() != 3;
         aSetExecuting->setVisible (isVisible);
         isVisible = canEditOutCmd(cmd);
         aEditOutCmd->setVisible (isVisible);
@@ -1300,7 +1300,7 @@ bool KKSJournalWidget :: canExecuteCmd(const KKSCommand & cmd)
         return false;
     }
 
-	if(cmd.cmdState() == KKSCommand::csExecuting || cmd.cmdState() == KKSCommand::csTimeElapsed){
+    if(cmd.cmdState() == KKSCommand::csExecuting || cmd.cmdState() == KKSCommand::csTimeElapsed){
         return true;
     }
 
@@ -1364,7 +1364,7 @@ bool KKSJournalWidget :: canSetAsExecuting(const KKSCommand & cmd)
     if(cmd.cmdState() == KKSCommand::csExecuted ||
         cmd.cmdState() == KKSCommand::csExecuting ||
         cmd.cmdState() == KKSCommand::csSavedAsDraft ||
-		cmd.cmdState() == KKSCommand::csTimeElapsed)
+        cmd.cmdState() == KKSCommand::csTimeElapsed)
     {
         return false;
     }
