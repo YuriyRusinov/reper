@@ -307,7 +307,7 @@ void KKSTemplateEditorFactory :: editCatTemplate (QWidget *ctw, KKSTemplate *t, 
 
     if (qobject_cast<KKSCatEditor *>(this->sender()) && mode && tEditor->exec() == QDialog::Accepted)
     {
-        KKSTemplate * t = loader->loadTemplate (tEditor->getTemplateID());
+        //KKSTemplate * t = loader->loadTemplate (tEditor->getTemplateID());
         templMod->setData (tIndex, t->id(), Qt::UserRole);
         templMod->setData (tIndex, t->name(), Qt::DisplayRole);
     }

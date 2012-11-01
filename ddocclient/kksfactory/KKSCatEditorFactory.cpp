@@ -638,7 +638,7 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (KKSCategory *cat, // 
     connect (cEditor, SIGNAL (editChildCat (QWidget *, int, bool)), this, SLOT (editCategory (QWidget *, int, bool)) );
     
     connect (cEditor, SIGNAL (addNewCategoryTemplate (QWidget *, KKSCategory *, QAbstractItemModel *)), tf, SLOT (addTemplate (QWidget *, KKSCategory *, QAbstractItemModel *)) );
-    connect (cEditor, SIGNAL (editCategoryTemplate (QWidget *, int, QAbstractItemModel *, const QModelIndex& )), tf, SLOT (editTemplate (QWidget *, int, QAbstractItemModel *, const QModelIndex&)) );
+    connect (cEditor, SIGNAL (editCategoryTemplate (QWidget *, KKSTemplate *, QAbstractItemModel *, const QModelIndex& )), tf, SLOT (editCatTemplate (QWidget *, KKSTemplate *, QAbstractItemModel *, const QModelIndex&)) );
     connect (cEditor, SIGNAL (delCategoryTemplate (QWidget *, int, QAbstractItemModel *, const QModelIndex& )), tf, SLOT (delTemplate (QWidget *, int, QAbstractItemModel *, const QModelIndex&)) );
     
     connect (this, SIGNAL (categoryDbError ()), cEditor, SLOT (catDbError()) );
@@ -857,6 +857,15 @@ void KKSCatEditorFactory :: delCatAttribute (int id, KKSCategory *c, QAbstractIt
     c->removeAttribute (id);
 //     = editor->recWidget->getModel ();
     KKSViewFactory::updateAttrModel (c, attrModel);
+    KKSMap<int, KKSTemplate *> cTempls = c->getTemplates();
+    for (KKSMap<int, KKSTemplate *>::const_iterator p = cTempls.constBegin();
+            p != cTempls.constEnd();
+            p++)
+    {
+        KKSTemplate * t = p.value();
+        if (t)
+            t->removeAttribute (id);
+    }
 }
 
 void KKSCatEditorFactory :: saveCategory (KKSCategory *cat, int idTableCat, int idType, KKSCatEditor *cEditor)
