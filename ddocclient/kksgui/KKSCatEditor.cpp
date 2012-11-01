@@ -603,13 +603,23 @@ void KKSCatEditor :: delTemplate (void)
         return;
     int idTemplate = recCatTemplatesW->getID ();
     
-    int yes = QMessageBox::question (this, 
+    int res = QMessageBox::question (this, 
                                      tr("Delete template from category"), 
                                      tr("Do you really want to delete selected template?"), 
                                      QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
     
-    if (idTemplate >= 0 && ( yes == QMessageBox::Yes))
+    if (idTemplate >= 0 && ( res == QMessageBox::Yes))
+    {
+        pCategory->removeTemplate (idTemplate);
         emit delCategoryTemplate (this, idTemplate, recCatTemplatesW->getSourceModel(), recCatTemplatesW->getSourceIndex());
+    }
+    else if (idTemplate < 0 && ( res == QMessageBox::Yes))
+    {
+        pCategory->removeTemplate (idTemplate);
+        int irow = recCatTemplatesW->getSourceIndex().row();
+        QAbstractItemModel * tMod = recCatTemplatesW->getSourceModel();
+        tMod->removeRows(irow, 1);
+    }
 }
 
 void KKSCatEditor :: delTableTemplate (void)
@@ -618,13 +628,23 @@ void KKSCatEditor :: delTableTemplate (void)
         return;
     
     int idTemplate = recTableCatTemplatesW->getID ();
-    int yes = QMessageBox::question (this, 
+    int res = QMessageBox::question (this, 
                                      tr("Delete template from category"), 
                                      tr("Do you really want to delete selected template?"), 
                                      QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
     
-    if (idTemplate >= 0 && (yes == QMessageBox::Yes) )
+    if (idTemplate >= 0 && (res == QMessageBox::Yes) )
+    {
+        pTableCategory->removeTemplate (idTemplate);
         emit delCategoryTemplate (this, idTemplate, recTableCatTemplatesW->getSourceModel(), recTableCatTemplatesW->getSourceIndex());
+    }
+    else if (idTemplate < 0 && ( res == QMessageBox::Yes))
+    {
+        pTableCategory->removeTemplate (idTemplate);
+        int irow = recTableCatTemplatesW->getSourceIndex().row();
+        QAbstractItemModel * tMod = recTableCatTemplatesW->getSourceModel();
+        tMod->removeRows(irow, 1);
+    }
 }
 
 void KKSCatEditor :: delIndTemplate (void)
@@ -632,8 +652,19 @@ void KKSCatEditor :: delIndTemplate (void)
     if (!recAttrCatTemplatesW)
         return;
     int idTemplate = recAttrCatTemplatesW->getID ();
-    if (idTemplate >= 0 && (QMessageBox::question (this, tr("Delete template from category"), tr("Do you really want to delete template %1 ?").arg (idTemplate), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Cancel) == QMessageBox::Yes) )
+    int res = QMessageBox::question (this, tr("Delete template from category"), tr("Do you really want to delete template %1 ?").arg (idTemplate), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Cancel);
+    if (idTemplate >= 0 && (res == QMessageBox::Yes) )
+    {
+        pRecAttrCategory->removeTemplate (idTemplate);
         emit delCategoryTemplate (this, idTemplate, recAttrCatTemplatesW->getSourceModel(), recTableCatTemplatesW->getSourceIndex());
+    }
+    else if (idTemplate < 0 && ( res == QMessageBox::Yes))
+    {
+        pRecAttrCategory->removeTemplate (idTemplate);
+        int irow = recAttrCatTemplatesW->getSourceIndex().row();
+        QAbstractItemModel * tMod = recAttrCatTemplatesW->getSourceModel();
+        tMod->removeRows(irow, 1);
+    }
 }
 
 void KKSCatEditor :: setIsChildCat (bool isChild)

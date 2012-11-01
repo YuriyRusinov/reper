@@ -1779,6 +1779,15 @@ int KKSPPFactory :: saveCatTemplates (KKSCategory * c) const
         return ERROR_CODE;
     
     KKSMap<int, KKSTemplate *> tList = c->getTemplates();
+    KKSList<KKSTemplate *> allTemplates = loader->loadCategoryTemplates (c);
+    //
+    // сначала удаляем из бд шаблоны, подлежащие удалению.
+    //
+    for (int i = 0; i < allTemplates.count(); i++)
+    {
+        if (allTemplates[i] && !tList.contains (allTemplates[i]->id()))
+            this->deleteTemplate (allTemplates[i]->id());
+    }
     for (KKSMap<int, KKSTemplate *>::const_iterator pt = tList.constBegin();
             pt != tList.constEnd();
             pt++)

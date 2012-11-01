@@ -321,30 +321,25 @@ void KKSTemplateEditorFactory :: delTemplate (QWidget *ctw, int idTempl, QAbstra
     if (!t)
         return;
 
-    int res = ppf->deleteTemplate (t);
-    if (res == ERROR_CODE)
-    {
-        QMessageBox::warning (ctw, tr ("Template editor"), tr ("Cannot remove selected template"), QMessageBox::Ok);
-        return;
-    }
     if (qobject_cast<KKSCatEditor *>(this->sender()))
     {
         //
         // Вызов пришел от редактора категорий
         //
+        qDebug () << __PRETTY_FUNCTION__ ;
         int trow (tIndex.row());
         QModelIndex pInd (tIndex.parent());
         templMod->removeRows (trow, 1, pInd);
-/*        KKSCatEditor *cEditor = qobject_cast<KKSCatEditor *>(this->sender());
-        QAbstractItemModel * sortTemplModel = 0;
-        QAbstractItemModel * tModel = 0;
-        QModelIndex wIndex = QModelIndex ();
-        sortTemplModel = cEditor->getTemplateModel ();
-        tModel = sortTemplModel;
-        if (qobject_cast<QAbstractProxyModel *>(sortTemplModel))
-            tModel = (qobject_cast<QAbstractProxyModel *>(sortTemplModel))->sourceModel ();
-        wIndex = qobject_cast<QAbstractProxyModel *>(sortTemplModel) ? qobject_cast<QAbstractProxyModel *>(sortTemplModel)->mapToSource (cEditor->getSelectedTemplateIndex ()) : cEditor->getSelectedTemplateIndex ();
-        tModel->removeRows (wIndex.row(), 1);*/
+        emit templateDeleted (t);
+    }
+    else
+    {
+        int res = ppf->deleteTemplate (t);
+        if (res == ERROR_CODE)
+        {
+            QMessageBox::warning (ctw, tr ("Template editor"), tr ("Cannot remove selected template"), QMessageBox::Ok);
+            return;
+        }
     }
 //    QModelIndex tInd = ctw->tvCatTemplate->selectionModel()->currentIndex ();
 //    ctw->tvCatTemplate->model()->removeRows (tInd.row(), 1, tInd.parent());
