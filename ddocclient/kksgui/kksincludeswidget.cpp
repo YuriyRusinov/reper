@@ -172,13 +172,14 @@ void KKSIncludesWidget :: initActions (void)
                << tr ("&Delete rubric") 
                << tr ("Add rubric item") 
                << tr ("&Open rubric item") 
-               << tr ("&Delete rubric item");
+               << tr ("&Delete item from rubric only");
 
     for (int i=0; i<=5; i++)
     {
         QAction * aRubricA = new QAction (QIcon(icons[i]), titlesList[i], this);
         tBRubrActions->addAction (aRubricA);
-        pMenu->addAction (aRubricA);
+        if (!isRec && i != 4 && i != 5)
+            pMenu->addAction (aRubricA);
         connect (aRubricA, SIGNAL (triggered()), this, slotList[i].toAscii().constData() );
         if (i==2)
         {
