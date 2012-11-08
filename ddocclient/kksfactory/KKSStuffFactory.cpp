@@ -1029,9 +1029,15 @@ void KKSStuffFactory :: refreshEntity (KKSObjectExemplar * wObjE)
     {
         if (!p.key())
             continue;
-        KKSStuffForm * sForm = qobject_cast <KKSStuffForm *>(p.key());
-        if (sForm && level <= sForm->getDetailLevel())
-            sForm->refreshStruct ();
+
+        try{
+            KKSStuffForm * sForm = qobject_cast <KKSStuffForm *>(p.key());
+            if (sForm && level <= sForm->getDetailLevel())
+                sForm->refreshStruct ();
+        }
+        catch(...){
+            QMessageBox::critical(0, tr("Error"), tr("An internal error was occured during form refresh"));
+        }
     }
 }
 

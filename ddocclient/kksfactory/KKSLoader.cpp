@@ -1918,10 +1918,22 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
         {
             //необходимо опустить содержимое атрибутов типа JPG и SVG, поскольку они сильно тормоз€т систему
             //и к тому же в список Ё»ќ не вывод€тс€
-            attrs += QString(", 'pixmap/svg/video/xml data type' as %1").arg(code);
-            withAttrs += QString(", 'pixmap/svg/video/xml data type' as %1").arg(code);
-            attrsWith += QString(", xml_data_type_%1").arg(a->idCategoryAttr());
-            attrsWith1 += QString(", 'pixmap/svg/video/xml data type' as %1").arg(code);
+            if(tableName.toLower() != "io_objects"){
+                attrs += QString(", 'pixmap/svg/video/xml data type' as %1").arg(code);
+                withAttrs += QString(", 'pixmap/svg/video/xml data type' as %1").arg(code);
+                attrsWith += QString(", xml_data_type_%1").arg(a->idCategoryAttr());
+                attrsWith1 += QString(", 'pixmap/svg/video/xml data type' as %1").arg(code);
+            }
+            else{
+                if(a->type()->attrType() == KKSAttrType::atJPG){
+                    attrs += QString(", %1.%2").arg(tableName).arg(code);
+                    withAttrs += QString(", %1.%2").arg(withTableName).arg(code);
+                    attrsWith += QString(", %1").arg(code);
+                    attrsWith1 += QString(", %1.%2").arg(tableName).arg(code);
+                }
+            }
+
+            
         }
         else{
             attrs += QString(", %1.%2").arg(tableName).arg(code);

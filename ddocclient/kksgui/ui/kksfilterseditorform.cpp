@@ -97,7 +97,8 @@ KKSFiltersEditorForm :: KKSFiltersEditorForm (KKSCategory * _c,
     sTempl (st),
     delSearchEntity (new QAction (this)),
     isDbSaved (false),
-    m_parentTable(tableName)
+    m_parentTable(tableName),
+    sortRefModel (new QSortFilterProxyModel (this))
 {
     ui->setupUi(this);
     if (c)
