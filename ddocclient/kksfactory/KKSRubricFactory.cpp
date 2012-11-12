@@ -817,11 +817,11 @@ void KKSRubricFactory :: initRubricAttachments (const KKSRubric * r)
         // поскольку справочник неиерархический, то достаточно пройтись только по индексам верхнего уровня
         //
         int id = iconInd.data (Qt::UserRole).toInt();
-        KKSObject * io = loader->loadIO (id);
-        if (!io)
-            continue;
+        //KKSObject * io = loader->loadIO (id);
+        //if (!io)
+        //    continue;
         const KKSRubricItem * rItem = r->itemForId (id);
-        QIcon ioIcon = io->icon();
+        QIcon ioIcon;// = io->icon();
         if (!ioIcon.isNull())
             attachModel->setData (iconInd, ioIcon, Qt::DecorationRole);
         else if (r->rubricType() == KKSRubricBase::atRubricCategory)
@@ -841,7 +841,7 @@ void KKSRubricFactory :: initRubricAttachments (const KKSRubric * r)
             else
                 attachModel->setData (iconInd, KKSRubricItem::icon(), Qt::DecorationRole);
         }
-        io->release ();
+        //io->release ();
     }
     t->release ();
     refIO->release ();

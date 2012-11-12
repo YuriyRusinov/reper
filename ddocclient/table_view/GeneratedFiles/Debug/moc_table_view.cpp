@@ -1,8 +1,8 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'table_view.h'
 **
-** Created: Sun 11. Nov 17:27:32 2012
-**      by: The Qt Meta Object Compiler version 62 (Qt 4.6.4)
+** Created: Mon 12. Nov 15:57:36 2012
+**      by: The Qt Meta Object Compiler version 62 (Qt 4.7.3)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -11,7 +11,7 @@
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'table_view.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 62
-#error "This file was generated using the moc from 4.6.4. It"
+#error "This file was generated using the moc from 4.7.3. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -20,7 +20,7 @@ QT_BEGIN_MOC_NAMESPACE
 static const uint qt_meta_data_table_view[] = {
 
  // content:
-       4,       // revision
+       5,       // revision
        0,       // classname
        0,    0, // classinfo
        1,   14, // methods

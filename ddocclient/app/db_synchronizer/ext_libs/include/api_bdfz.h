@@ -476,12 +476,12 @@ struct API_BDFZ_SHARED_EXPORT Param_NVO:Param_IO
     /**
     * @brief Дата, с которой надо искать
     */
-    QDate date_from;
+    QDateTime date_from;
 
     /**
     * @brief Дата, по которую надо искать
     */
-    QDate date_to;
+    QDateTime date_to;
 
     /**
     * @brief Указывается обязательно! Уровень секретности (0-несекретно, 2-секретно, 3-совершенно секретно, 9-любой)
@@ -517,19 +517,19 @@ struct API_BDFZ_SHARED_EXPORT Result_IO
     QString author;
 
     /**
-    * @brief Имя файла
+    * @brief Список имён файлов
     */
-    QString file_name;
+    QList<QString> file_name;
 
     /**
-    * @brief Ссылка на файл (нужна для скачаивания файла)
+    * @brief Список ссылок на файлы (нужны для скачаивания файлов)
     */
-    QString file_link;
+    QList<QString> file_link;
 
     /**
-    * @brief Уникальный идентификатор файла (?)
+    * @brief Список уникальных идентификаторов файлов (?)
     */
-    QString file_uid;
+    QList<QString> file_uid;
 
     /**
     * @brief Организация, создавшая информационный объект
@@ -1004,7 +1004,7 @@ struct API_BDFZ_SHARED_EXPORT Result_NVO:Result_IO
     /**
     * @brief Дата привязки данных
     */
-    QDate date;    
+    QDateTime date;    
 };
 
 /**
@@ -1477,7 +1477,7 @@ struct API_BDFZ_SHARED_EXPORT Create_NVO:Create_IO
 	/**
 	* @brief Дата прогноза
 	*/
-	QDate prognosis;
+	QDateTime prognosis;
 };
 
 /**

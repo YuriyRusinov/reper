@@ -29,8 +29,9 @@ int DBSynchronizer::createETKInDD(const QList<Result_ETK> & etkList)
 		}
 		
 		QList<QPair<QString, QString> > files;
-		if(!etk.file_link.isEmpty()){
-			prepareDownloadFile(etk.uid, i, etk.file_link, etk.file_name, files);
+        if(etk.file_link.count() > 0){
+            for(int j=0; j<etk.file_link.count(); j++)
+                prepareDownloadFile(etk.file_uid.at(j), i, etk.file_link.at(j), etk.file_name.at(j), files);
 		}
         if(!etk.classificator_link.isEmpty()){
             prepareDownloadFile(etk.uid + "_RSC", i, etk.classificator_link, etk.classificator_name, files);
@@ -46,9 +47,17 @@ int DBSynchronizer::createETKInDD(const QList<Result_ETK> & etkList)
 		}
 
         if(files.count() > 0){
-		    dbSIU.downloadFile(etk.uid, etk.file_link, files.at(0).second);
-            if(files.count() > 1)
-                dbSIU.downloadFile(etk.uid, etk.classificator_link, files.at(1).second);
+            if(etk.file_link.count() == 0){
+                dbSIU.downloadFile(etk.uid, etk.classificator_link, files.at(0).second);
+            }
+            else{
+                for(int j=0; j<etk.file_link.count(); j++){
+                    dbSIU.downloadFile(etk.uid, etk.file_link.at(j), files.at(j).second);
+                }
+                if(files.count() > etk.file_link.count())
+                    dbSIU.downloadFile(etk.uid, etk.classificator_link, files.at(files.count()-1).second);
+            }
+                
         }
 
         if(i > 0 && i%iReconnect == 0){
@@ -96,8 +105,9 @@ int DBSynchronizer::createGMOInDD(const QList<Result_GMO> & gmoList)
 		}
 		
 		QList<QPair<QString, QString> > files;
-		if(!gmo.file_link.isEmpty()){
-			prepareDownloadFile(gmo.uid, i, gmo.file_link, gmo.file_name, files);
+        if(gmo.file_link.count() > 0){
+            for(int j=0; j<gmo.file_link.count(); j++)
+                prepareDownloadFile(gmo.file_uid.at(j), i, gmo.file_link.at(j), gmo.file_name.at(j), files);
 		}
 
 		int ok = createIOFromGMO(gmo, files);
@@ -110,9 +120,33 @@ int DBSynchronizer::createGMOInDD(const QList<Result_GMO> & gmoList)
 			continue;
 		}
 
-		if(files.count() > 0)
-		    dbSIU.downloadFile(gmo.uid, gmo.file_link, files.last().second);
-	}
+        if(files.count() > 0){
+		    for(int j=0; j<gmo.file_link.count(); j++)
+                dbSIU.downloadFile(gmo.uid, gmo.file_link.at(j), files.at(j).second);
+        }
+
+        if(i > 0 && i%iReconnect == 0){
+
+            QEventLoop eventLoop;
+            connect(this,SIGNAL(allFilesDownloaded()),&eventLoop,SLOT(quit()));
+		    eventLoop.exec();
+
+            //QMessageBox::critical(this, tr(""), tr(""));
+
+            bool ok = dbSIU.logout();
+            if(ok != true){
+                QMessageBox::critical(this, tr("Ошибка"), tr("Не удалось отсоединиться от БД СИУ!"));
+                return ERROR_CODE;
+            }
+
+            ok = dbSIU.authorize(siuIP, siuPort, siuUser, siuPasswd, siuConstraint, siuSOP);
+            if(!ok){
+                QMessageBox::critical(this, tr("Ошибка"), tr("Не удалось переподключиться к БД СИУ!"));
+                return ERROR_CODE;
+            }
+
+        }
+    }
 	
 	return OK_CODE;
 }
@@ -132,8 +166,9 @@ int DBSynchronizer::createNVOInDD(const QList<Result_NVO> & nvoList)
 		}
 		
 		QList<QPair<QString, QString> > files;
-		if(!nvo.file_link.isEmpty()){
-			prepareDownloadFile(nvo.uid, i, nvo.file_link, nvo.file_name, files);
+        if(nvo.file_link.count() > 0){
+            for(int j=0; j<nvo.file_link.count(); j++)
+                prepareDownloadFile(nvo.file_uid.at(j), i, nvo.file_link.at(j), nvo.file_name.at(j), files);
 		}
 
 		int ok = createIOFromNVO(nvo, files);
@@ -145,8 +180,33 @@ int DBSynchronizer::createNVOInDD(const QList<Result_NVO> & nvoList)
 			continue;
 		}
 
-		if(files.count() > 0)
-			dbSIU.downloadFile(nvo.uid, nvo.file_link, files.last().second);
+        if(files.count() > 0){
+		    for(int j=0; j<nvo.file_link.count(); j++)
+                dbSIU.downloadFile(nvo.uid, nvo.file_link.at(j), files.at(j).second);
+        }
+
+        if(i > 0 && i%iReconnect == 0){
+
+            QEventLoop eventLoop;
+            connect(this,SIGNAL(allFilesDownloaded()),&eventLoop,SLOT(quit()));
+		    eventLoop.exec();
+
+            //QMessageBox::critical(this, tr(""), tr(""));
+
+            bool ok = dbSIU.logout();
+            if(ok != true){
+                QMessageBox::critical(this, tr("Ошибка"), tr("Не удалось отсоединиться от БД СИУ!"));
+                return ERROR_CODE;
+            }
+
+            ok = dbSIU.authorize(siuIP, siuPort, siuUser, siuPasswd, siuConstraint, siuSOP);
+            if(!ok){
+                QMessageBox::critical(this, tr("Ошибка"), tr("Не удалось переподключиться к БД СИУ!"));
+                return ERROR_CODE;
+            }
+
+        }
+
 	}
 	
 	return OK_CODE;
@@ -167,8 +227,9 @@ int DBSynchronizer::createEOIRDInDD(const QList<Result_EOIRD> & eoirdList)
 		}
 		
 		QList<QPair<QString, QString> > files;
-		if(!eoird.file_link.isEmpty()){
-			prepareDownloadFile(eoird.uid, i, eoird.file_link, eoird.file_name, files);
+        if(eoird.file_link.count() > 0){
+            for(int j=0; j<eoird.file_link.count(); j++)
+                prepareDownloadFile(eoird.file_uid.at(j), i, eoird.file_link.at(j), eoird.file_name.at(j), files);
 		}
 
 		int ok = createIOFromEOIRD(eoird, files);
@@ -180,8 +241,32 @@ int DBSynchronizer::createEOIRDInDD(const QList<Result_EOIRD> & eoirdList)
 			continue;
 		}
 		
-		if(files.count() > 0)
-			dbSIU.downloadFile(eoird.uid, eoird.file_link, files.last().second);
+        if(files.count() > 0){
+		    for(int j=0; j<eoird.file_link.count(); j++)
+                dbSIU.downloadFile(eoird.uid, eoird.file_link.at(j), files.at(j).second);
+        }
+
+        if(i > 0 && i%iReconnect == 0){
+
+            QEventLoop eventLoop;
+            connect(this,SIGNAL(allFilesDownloaded()),&eventLoop,SLOT(quit()));
+		    eventLoop.exec();
+
+            //QMessageBox::critical(this, tr(""), tr(""));
+
+            bool ok = dbSIU.logout();
+            if(ok != true){
+                QMessageBox::critical(this, tr("Ошибка"), tr("Не удалось отсоединиться от БД СИУ!"));
+                return ERROR_CODE;
+            }
+
+            ok = dbSIU.authorize(siuIP, siuPort, siuUser, siuPasswd, siuConstraint, siuSOP);
+            if(!ok){
+                QMessageBox::critical(this, tr("Ошибка"), tr("Не удалось переподключиться к БД СИУ!"));
+                return ERROR_CODE;
+            }
+
+        }
 
 	}
 	
@@ -203,8 +288,9 @@ int DBSynchronizer::createEFOInDD(const QList<Result_EFO> & efoList)
 		}
 		
 		QList<QPair<QString, QString> > files;
-		if(!efo.file_link.isEmpty()){
-			prepareDownloadFile(efo.uid, i, efo.file_link, efo.file_name, files);
+        if(efo.file_link.count() > 0){
+            for(int j=0; j<efo.file_link.count(); j++)
+                prepareDownloadFile(efo.file_uid.at(j), i, efo.file_link.at(j), efo.file_name.at(j), files);
 		}
 
 		int ok = createIOFromEFO(efo, files);
@@ -216,8 +302,32 @@ int DBSynchronizer::createEFOInDD(const QList<Result_EFO> & efoList)
 			continue;
 		}
 		
-		if(files.count() > 0)
-			dbSIU.downloadFile(efo.uid, efo.file_link, files.last().second);
+        if(files.count() > 0){
+		    for(int j=0; j<efo.file_link.count(); j++)
+                dbSIU.downloadFile(efo.uid, efo.file_link.at(j), files.at(j).second);
+        }
+
+        if(i > 0 && i%iReconnect == 0){
+
+            QEventLoop eventLoop;
+            connect(this,SIGNAL(allFilesDownloaded()),&eventLoop,SLOT(quit()));
+		    eventLoop.exec();
+
+            //QMessageBox::critical(this, tr(""), tr(""));
+
+            bool ok = dbSIU.logout();
+            if(ok != true){
+                QMessageBox::critical(this, tr("Ошибка"), tr("Не удалось отсоединиться от БД СИУ!"));
+                return ERROR_CODE;
+            }
+
+            ok = dbSIU.authorize(siuIP, siuPort, siuUser, siuPasswd, siuConstraint, siuSOP);
+            if(!ok){
+                QMessageBox::critical(this, tr("Ошибка"), tr("Не удалось переподключиться к БД СИУ!"));
+                return ERROR_CODE;
+            }
+
+        }
 
 	}
 	
@@ -240,8 +350,9 @@ int DBSynchronizer::createUGSHInDD(const QList<Result_UGSH> & ugshList)
 		}
 		
 		QList<QPair<QString, QString> > files;
-		if(!ugsh.file_link.isEmpty()){
-			prepareDownloadFile(ugsh.uid, i, ugsh.file_link, ugsh.file_name, files);
+        if(ugsh.file_link.count() > 0){
+            for(int j=0; j<ugsh.file_link.count(); j++)
+                prepareDownloadFile(ugsh.file_uid.at(j), i, ugsh.file_link.at(j), ugsh.file_name.at(j), files);
 		}
 
 		int ok = createIOFromUGSH(ugsh, files);
@@ -253,9 +364,32 @@ int DBSynchronizer::createUGSHInDD(const QList<Result_UGSH> & ugshList)
 			continue;
 		}
 		
-		if(files.count() > 0)
-			dbSIU.downloadFile(ugsh.uid, ugsh.file_link, files.last().second);
+        if(files.count() > 0){
+		    for(int j=0; j<ugsh.file_link.count(); j++)
+                dbSIU.downloadFile(ugsh.uid, ugsh.file_link.at(j), files.at(j).second);
+        }
 
+        if(i > 0 && i%iReconnect == 0){
+
+            QEventLoop eventLoop;
+            connect(this,SIGNAL(allFilesDownloaded()),&eventLoop,SLOT(quit()));
+		    eventLoop.exec();
+
+            //QMessageBox::critical(this, tr(""), tr(""));
+
+            bool ok = dbSIU.logout();
+            if(ok != true){
+                QMessageBox::critical(this, tr("Ошибка"), tr("Не удалось отсоединиться от БД СИУ!"));
+                return ERROR_CODE;
+            }
+
+            ok = dbSIU.authorize(siuIP, siuPort, siuUser, siuPasswd, siuConstraint, siuSOP);
+            if(!ok){
+                QMessageBox::critical(this, tr("Ошибка"), tr("Не удалось переподключиться к БД СИУ!"));
+                return ERROR_CODE;
+            }
+
+        }
 	}
 	
 	return OK_CODE;
@@ -276,8 +410,9 @@ int DBSynchronizer::createTTXInDD(const QList<Result_TTX> & ttxList)
 		}
 		
 		QList<QPair<QString, QString> > files;
-		if(!ttx.file_link.isEmpty()){
-			prepareDownloadFile(ttx.uid, i, ttx.file_link, ttx.file_name, files);
+        if(ttx.file_link.count() > 0){
+            for(int j=0; j<ttx.file_link.count(); j++)
+                prepareDownloadFile(ttx.file_uid.at(j), i, ttx.file_link.at(j), ttx.file_name.at(j), files);
 		}
 
 		int ok = createIOFromTTX(ttx, files);
@@ -289,9 +424,32 @@ int DBSynchronizer::createTTXInDD(const QList<Result_TTX> & ttxList)
 			continue;
 		}
 		
-		if(files.count() > 0)
-			dbSIU.downloadFile(ttx.uid, ttx.file_link, files.last().second);
+        if(files.count() > 0){
+		    for(int j=0; j<ttx.file_link.count(); j++)
+                dbSIU.downloadFile(ttx.uid, ttx.file_link.at(j), files.at(j).second);
+        }
 
+        if(i > 0 && i%iReconnect == 0){
+
+            QEventLoop eventLoop;
+            connect(this,SIGNAL(allFilesDownloaded()),&eventLoop,SLOT(quit()));
+		    eventLoop.exec();
+
+            //QMessageBox::critical(this, tr(""), tr(""));
+
+            bool ok = dbSIU.logout();
+            if(ok != true){
+                QMessageBox::critical(this, tr("Ошибка"), tr("Не удалось отсоединиться от БД СИУ!"));
+                return ERROR_CODE;
+            }
+
+            ok = dbSIU.authorize(siuIP, siuPort, siuUser, siuPasswd, siuConstraint, siuSOP);
+            if(!ok){
+                QMessageBox::critical(this, tr("Ошибка"), tr("Не удалось переподключиться к БД СИУ!"));
+                return ERROR_CODE;
+            }
+
+        }
 	}
 	
 	return OK_CODE;
@@ -312,8 +470,9 @@ int DBSynchronizer::createPGInDD(const QList<Result_PG> & pgList)
 		}
 		
 		QList<QPair<QString, QString> > files;
-		if(!pg.file_link.isEmpty()){
-			prepareDownloadFile(pg.uid, i, pg.file_link, pg.file_name, files);
+        if(pg.file_link.count() > 0){
+            for(int j=0; j<pg.file_link.count(); j++)
+                prepareDownloadFile(pg.file_uid.at(j), i, pg.file_link.at(j), pg.file_name.at(j), files);
 		}
 
 		int ok = createIOFromPG(pg, files);
@@ -325,9 +484,32 @@ int DBSynchronizer::createPGInDD(const QList<Result_PG> & pgList)
 			continue;
 		}
 		
-		if(files.count() > 0)
-			dbSIU.downloadFile(pg.uid, pg.file_link, files.last().second);
+        if(files.count() > 0){
+		    for(int j=0; j<pg.file_link.count(); j++)
+                dbSIU.downloadFile(pg.uid, pg.file_link.at(j), files.at(j).second);
+        }
 
+        if(i > 0 && i%iReconnect == 0){
+
+            QEventLoop eventLoop;
+            connect(this,SIGNAL(allFilesDownloaded()),&eventLoop,SLOT(quit()));
+		    eventLoop.exec();
+
+            //QMessageBox::critical(this, tr(""), tr(""));
+
+            bool ok = dbSIU.logout();
+            if(ok != true){
+                QMessageBox::critical(this, tr("Ошибка"), tr("Не удалось отсоединиться от БД СИУ!"));
+                return ERROR_CODE;
+            }
+
+            ok = dbSIU.authorize(siuIP, siuPort, siuUser, siuPasswd, siuConstraint, siuSOP);
+            if(!ok){
+                QMessageBox::critical(this, tr("Ошибка"), tr("Не удалось переподключиться к БД СИУ!"));
+                return ERROR_CODE;
+            }
+
+        }
 	}
 	
 	return OK_CODE;
@@ -348,8 +530,9 @@ int DBSynchronizer::createPORInDD(const QList<Result_POR> & porList)
 		}
 		
 		QList<QPair<QString, QString> > files;
-		if(!por.file_link.isEmpty()){
-			prepareDownloadFile(por.uid, i, por.file_link, por.file_name, files);
+        if(por.file_link.count() > 0){
+            for(int j=0; j<por.file_link.count(); j++)
+                prepareDownloadFile(por.file_uid.at(j), i, por.file_link.at(j), por.file_name.at(j), files);
 		}
 
 		int ok = createIOFromPOR(por, files);
@@ -361,9 +544,32 @@ int DBSynchronizer::createPORInDD(const QList<Result_POR> & porList)
 			continue;
 		}
 		
-		if(files.count() > 0)
-			dbSIU.downloadFile(por.uid, por.file_link, files.last().second);
+        if(files.count() > 0){
+		    for(int j=0; j<por.file_link.count(); j++)
+                dbSIU.downloadFile(por.uid, por.file_link.at(j), files.at(j).second);
+        }
 
+        if(i > 0 && i%iReconnect == 0){
+
+            QEventLoop eventLoop;
+            connect(this,SIGNAL(allFilesDownloaded()),&eventLoop,SLOT(quit()));
+		    eventLoop.exec();
+
+            //QMessageBox::critical(this, tr(""), tr(""));
+
+            bool ok = dbSIU.logout();
+            if(ok != true){
+                QMessageBox::critical(this, tr("Ошибка"), tr("Не удалось отсоединиться от БД СИУ!"));
+                return ERROR_CODE;
+            }
+
+            ok = dbSIU.authorize(siuIP, siuPort, siuUser, siuPasswd, siuConstraint, siuSOP);
+            if(!ok){
+                QMessageBox::critical(this, tr("Ошибка"), tr("Не удалось переподключиться к БД СИУ!"));
+                return ERROR_CODE;
+            }
+
+        }
 	}
 	
 	return OK_CODE;
@@ -384,8 +590,9 @@ int DBSynchronizer::createRBPInDD(const QList<Result_RBP> & rbpList)
 		}
 		
 		QList<QPair<QString, QString> > files;
-		if(!rbp.file_link.isEmpty()){
-			prepareDownloadFile(rbp.uid, i, rbp.file_link, rbp.file_name, files);
+        if(rbp.file_link.count() > 0){
+            for(int j=0; j<rbp.file_link.count(); j++)
+                prepareDownloadFile(rbp.file_uid.at(j), i, rbp.file_link.at(j), rbp.file_name.at(j), files);
 		}
 
 		int ok = createIOFromRBP(rbp, files);
@@ -397,9 +604,32 @@ int DBSynchronizer::createRBPInDD(const QList<Result_RBP> & rbpList)
 			continue;
 		}
 		
-		if(files.count() > 0)
-			dbSIU.downloadFile(rbp.uid, rbp.file_link, files.last().second);
+        if(files.count() > 0){
+		    for(int j=0; j<rbp.file_link.count(); j++)
+                dbSIU.downloadFile(rbp.uid, rbp.file_link.at(j), files.at(j).second);
+        }
 
+        if(i > 0 && i%iReconnect == 0){
+
+            QEventLoop eventLoop;
+            connect(this,SIGNAL(allFilesDownloaded()),&eventLoop,SLOT(quit()));
+		    eventLoop.exec();
+
+            //QMessageBox::critical(this, tr(""), tr(""));
+
+            bool ok = dbSIU.logout();
+            if(ok != true){
+                QMessageBox::critical(this, tr("Ошибка"), tr("Не удалось отсоединиться от БД СИУ!"));
+                return ERROR_CODE;
+            }
+
+            ok = dbSIU.authorize(siuIP, siuPort, siuUser, siuPasswd, siuConstraint, siuSOP);
+            if(!ok){
+                QMessageBox::critical(this, tr("Ошибка"), tr("Не удалось переподключиться к БД СИУ!"));
+                return ERROR_CODE;
+            }
+
+        }
 	}
 	
 	return OK_CODE;
@@ -420,8 +650,9 @@ int DBSynchronizer::createREQInDD(const QList<Result_Request> & reqList)
 		}
 		
 		QList<QPair<QString, QString> > files;
-		if(!req.file_link.isEmpty()){
-			prepareDownloadFile(req.uid, i, req.file_link, req.file_name, files);
+        if(req.file_link.count() > 0){
+            for(int j=0; j<req.file_link.count(); j++)
+                prepareDownloadFile(req.file_uid.at(j), i, req.file_link.at(j), req.file_name.at(j), files);
 		}
 
 		int ok = createIOFromREQ(req, files);
@@ -433,9 +664,32 @@ int DBSynchronizer::createREQInDD(const QList<Result_Request> & reqList)
 			continue;
 		}
 		
-		if(files.count() > 0)
-			dbSIU.downloadFile(req.uid, req.file_link, files.last().second);
+        if(files.count() > 0){
+		    for(int j=0; j<req.file_link.count(); j++)
+                dbSIU.downloadFile(req.uid, req.file_link.at(j), files.at(j).second);
+        }
 
+        if(i > 0 && i%iReconnect == 0){
+
+            QEventLoop eventLoop;
+            connect(this,SIGNAL(allFilesDownloaded()),&eventLoop,SLOT(quit()));
+		    eventLoop.exec();
+
+            //QMessageBox::critical(this, tr(""), tr(""));
+
+            bool ok = dbSIU.logout();
+            if(ok != true){
+                QMessageBox::critical(this, tr("Ошибка"), tr("Не удалось отсоединиться от БД СИУ!"));
+                return ERROR_CODE;
+            }
+
+            ok = dbSIU.authorize(siuIP, siuPort, siuUser, siuPasswd, siuConstraint, siuSOP);
+            if(!ok){
+                QMessageBox::critical(this, tr("Ошибка"), tr("Не удалось переподключиться к БД СИУ!"));
+                return ERROR_CODE;
+            }
+
+        }
 	}
 	
 	return OK_CODE;
@@ -456,8 +710,9 @@ int DBSynchronizer::createOPVTOInDD(const QList<Result_VTO> & vtoList)
 		}
 		
 		QList<QPair<QString, QString> > files;
-		if(!vto.file_link.isEmpty()){
-			prepareDownloadFile(vto.uid, i, vto.file_link, vto.file_name, files);
+        if(vto.file_link.count() > 0){
+            for(int j=0; j<vto.file_link.count(); j++)
+                prepareDownloadFile(vto.file_uid.at(j), i, vto.file_link.at(j), vto.file_name.at(j), files);
 		}
 
 		int ok = createIOFromOPVTO(vto, files);
@@ -469,9 +724,32 @@ int DBSynchronizer::createOPVTOInDD(const QList<Result_VTO> & vtoList)
 			continue;
 		}
 		
-		if(files.count() > 0)
-			dbSIU.downloadFile(vto.uid, vto.file_link, files.last().second);
+        if(files.count() > 0){
+		    for(int j=0; j<vto.file_link.count(); j++)
+                dbSIU.downloadFile(vto.uid, vto.file_link.at(j), files.at(j).second);
+        }
 
+        if(i > 0 && i%iReconnect == 0){
+
+            QEventLoop eventLoop;
+            connect(this,SIGNAL(allFilesDownloaded()),&eventLoop,SLOT(quit()));
+		    eventLoop.exec();
+
+            //QMessageBox::critical(this, tr(""), tr(""));
+
+            bool ok = dbSIU.logout();
+            if(ok != true){
+                QMessageBox::critical(this, tr("Ошибка"), tr("Не удалось отсоединиться от БД СИУ!"));
+                return ERROR_CODE;
+            }
+
+            ok = dbSIU.authorize(siuIP, siuPort, siuUser, siuPasswd, siuConstraint, siuSOP);
+            if(!ok){
+                QMessageBox::critical(this, tr("Ошибка"), tr("Не удалось переподключиться к БД СИУ!"));
+                return ERROR_CODE;
+            }
+
+        }
 	}
 	
 	return OK_CODE;

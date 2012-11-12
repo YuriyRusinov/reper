@@ -1,8 +1,8 @@
 /********************************************************************************
 ** Form generated from reading UI file 'table_view.ui'
 **
-** Created: Sun 11. Nov 17:27:29 2012
-**      by: Qt User Interface Compiler version 4.6.4
+** Created: Mon 12. Nov 15:57:35 2012
+**      by: Qt User Interface Compiler version 4.7.3
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
