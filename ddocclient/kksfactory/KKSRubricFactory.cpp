@@ -821,7 +821,7 @@ void KKSRubricFactory :: initRubricAttachments (const KKSRubric * r)
         //if (!io)
         //    continue;
         const KKSRubricItem * rItem = r->itemForId (id);
-        QIcon ioIcon;// = io->icon();
+//        QIcon ioIcon;// = io->icon();
 //        qDebug () << __PRETTY_FUNCTION__ << rData.value(id)->fields().keys();
         QPixmap rIconP;
         rIconP.loadFromData (rItem->iconAsString().toUtf8());//rData.value(id)->fields().value("r_icon").toUtf8());
