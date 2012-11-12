@@ -822,8 +822,15 @@ void KKSRubricFactory :: initRubricAttachments (const KKSRubric * r)
         //    continue;
         const KKSRubricItem * rItem = r->itemForId (id);
         QIcon ioIcon;// = io->icon();
+//        qDebug () << __PRETTY_FUNCTION__ << rData.value(id)->fields().keys();
+        QPixmap rIconP;
+        rIconP.loadFromData (rItem->iconAsString().toUtf8());//rData.value(id)->fields().value("r_icon").toUtf8());
+        QIcon ioIcon (rIconP);//io->icon();
         if (!ioIcon.isNull())
+        {
+            //qDebug () << __PRETTY_FUNCTION__ << QString::compare (rItem->iconAsString(), io->iconAsString());
             attachModel->setData (iconInd, ioIcon, Qt::DecorationRole);
+        }
         else if (r->rubricType() == KKSRubricBase::atRubricCategory)
         {
             if (ioIcon.isNull()){

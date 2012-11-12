@@ -94,7 +94,7 @@ class _PP_EXPORT KKSRubricItem : public KKSRubricBase//public KKSData
 public:
 
     KKSRubricItem();
-    KKSRubricItem(qint64 idItem, const QString & name, bool b = false);
+    KKSRubricItem(qint64 idItem, const QString & name, bool b = false, const QString& rIconStr=QString());
     KKSRubricItem(const KKSRubricItem & other);
     ~KKSRubricItem();
     

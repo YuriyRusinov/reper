@@ -3390,7 +3390,7 @@ KKSList<const KKSRubricItem *> KKSLoader::loadCatRubricItems (const KKSCategory*
     if (!cat)
         return rItems;
 
-    QString sql = QString("select id,name from io_objects io where io.id_io_category=%1;").arg (cat->id());
+    QString sql = QString("select id,name,r_icon from io_objects io where io.id_io_category=%1;").arg (cat->id());
     KKSResult * res = db->execute (sql);
     if (!res || res->getRowCount() == 0)
     {
@@ -3402,7 +3402,10 @@ KKSList<const KKSRubricItem *> KKSLoader::loadCatRubricItems (const KKSCategory*
     int nr = res->getRowCount();
     for (int i=0; i<nr; i++)
     {
-        const KKSRubricItem * r = new KKSRubricItem (res->getCellAsInt (i, 0), res->getCellAsString(i, 1), true);
+        QString rIconData = res->getCellAsString (i, 2);
+        const KKSRubricItem * r = new KKSRubricItem (res->getCellAsInt (i, 0), res->getCellAsString(i, 1), true, rIconData);
+//        if (!rIconData.isEmpty())
+//            (const_cast<KKSRubricItem *>(r))->setIcon (rIconData);
         if (r)
             rItems.append (r);
     }

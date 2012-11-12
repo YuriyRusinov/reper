@@ -192,10 +192,11 @@ KKSRubricItem::KKSRubricItem() : KKSRubricBase(),
 {
 }
 
-KKSRubricItem::KKSRubricItem(qint64 idItem, const QString & name, bool b) : KKSRubricBase(idItem, name),
+KKSRubricItem::KKSRubricItem(qint64 idItem, const QString & name, bool b, const QString& rIconStr) : KKSRubricBase(idItem, name),
     m_isAutomated (b),
     m_isUpdated (false)
 {
+    setIcon (rIconStr);
 }
 
 KKSRubricItem::KKSRubricItem(const KKSRubricItem & other) : KKSRubricBase (other),
