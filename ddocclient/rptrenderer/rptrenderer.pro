@@ -34,6 +34,10 @@ DEFINES += MAKELIB
 INCLUDEPATH += ./src \
                ./
 
+unix{
+    QMAKE_CXXFLAGS += -fpermissive
+}
+
 include (rptrenderer.pri)
 
 # install targets
