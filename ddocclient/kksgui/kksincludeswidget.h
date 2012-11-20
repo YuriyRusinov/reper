@@ -73,6 +73,8 @@ private slots:
     void createRubricItem (QAbstractItemModel * itemModel, const QModelIndex& parent);
     void editRubricItem ();
     void editRubricDoc (QAbstractItemModel * itemModel, const QModelIndex& index);
+    void editSelectedDocs (QAbstractItemModel * itemModel, const QItemSelection& selDocs);
+    void delSelectedDocs (QAbstractItemModel * itemModel, const QItemSelection& selDocs);
     void slotRubricItemDblClicked(const QModelIndex & index);
     void slotRubricItemEdit(const QModelIndex & index);
     void delRubricItem (void);

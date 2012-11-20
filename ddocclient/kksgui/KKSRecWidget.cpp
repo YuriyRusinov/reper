@@ -9,7 +9,6 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QItemSelectionModel>
-#include <QItemSelection>
 #include <QHeaderView>
 #include <QGroupBox>
 #include <QAbstractItemDelegate>
@@ -342,6 +341,19 @@ QModelIndexList KKSRecWidget :: getSourceIndexes (void) const
     return selSourceIndexes;
 }
 
+QItemSelection KKSRecWidget :: getSourceSelection (void) const
+{
+    QItemSelection sel = this->tv->selectionModel()->selection ();
+    QItemSelection sourceSel (sel);
+    QAbstractItemModel * mod = getModel ();
+    while (qobject_cast<QAbstractProxyModel *>(mod))
+    {
+        sourceSel = (qobject_cast<QAbstractProxyModel *>(mod))->mapSelectionToSource (sourceSel);
+        mod = (qobject_cast<QAbstractProxyModel *>(mod))->sourceModel ();
+    }
+    return sourceSel;
+}
+
 QItemSelectionModel *KKSRecWidget :: getSelectionModel (void) const
 {
     return this->tv->selectionModel ();
@@ -470,6 +482,8 @@ void KKSRecWidget :: editRec (void)
         return;
     QModelIndex wIndex = getSourceIndex ();
     emit editEntity (sourceMod, wIndex);
+    QItemSelection sel = getSourceSelection ();
+    emit editEntitiesList (sourceMod, sel);
 }
 
 void KKSRecWidget :: delRec (void)
@@ -480,6 +494,8 @@ void KKSRecWidget :: delRec (void)
         return;
     QModelIndex wIndex = getSourceIndex ();
     emit delEntity (sourceMod, wIndex);
+    QItemSelection sel = getSourceSelection ();
+    emit delEntitiesList (sourceMod, sel);
 }
 
 void KKSRecWidget :: refreshRec (void)

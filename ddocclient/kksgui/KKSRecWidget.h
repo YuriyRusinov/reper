@@ -12,6 +12,7 @@
 
 #include <QWidget>
 #include <QModelIndex>
+#include <QItemSelection>
 
 #include "kksgui_config.h"
 
@@ -47,6 +48,7 @@ public:
     QModelIndex getCurrentIndex (void) const;
     QModelIndex getSourceIndex (void) const;
     QModelIndexList getSourceIndexes (void) const;
+    QItemSelection getSourceSelection (void) const;
     QTreeView * getView (void) const;
     QAbstractItemDelegate * getItemDelegate () const;
     void setItemDelegate (QAbstractItemDelegate * deleg);
@@ -90,6 +92,9 @@ signals:
     void refreshMod (QAbstractItemModel * sourceMod);
     
     void entityDoubleClicked();
+    
+    void editEntitiesList (QAbstractItemModel * sourceMod, const QItemSelection& sel);
+    void delEntitiesList (QAbstractItemModel * sourceMod, const QItemSelection& sel);
 
 private slots:
     void addRec (void);

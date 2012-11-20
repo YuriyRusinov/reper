@@ -4,6 +4,7 @@
 #include "KKSEventFilter.h"
 #include "KKSSortFilterProxyModel.h"
 #include "KKSRubricModel.h"
+#include "KKSRubricMessageBox.h"
 
 #include "KKSRubric.h"
 #include <KKSCategory.h>
@@ -67,6 +68,11 @@ KKSIncludesWidget::KKSIncludesWidget(KKSRubric * rootRubric,
         m_rootRubric->addRef();
     else
         m_rootRubric = new KKSRubric ();
+    
+    if (isRec)
+        twIncludes->setSelectionMode (QAbstractItemView::ExtendedSelection);
+    else
+        tvItems->setSelectionMode (QAbstractItemView::ExtendedSelection);
 
     tBRubrActions->setIconSize (QSize (24, 24));
     QHeaderView * hItems = tvItems->header();
@@ -115,10 +121,12 @@ KKSIncludesWidget::KKSIncludesWidget(KKSRubric * rootRubric,
                  SLOT (rubricSelectionChanged (const QItemSelection&, const QItemSelection&))
                 );
     connect (recWItems, SIGNAL (addEntity(QAbstractItemModel *, const QModelIndex&)), this, SLOT (createRubricItem(QAbstractItemModel *, const QModelIndex&)) );
-    connect (recWItems, SIGNAL (editEntity(QAbstractItemModel *, const QModelIndex& )), this, SLOT (editRubricDoc(QAbstractItemModel *, const QModelIndex&)) );
+    connect (recWItems, SIGNAL (editEntitiesList (QAbstractItemModel *, const QItemSelection&)), this, SLOT (editSelectedDocs (QAbstractItemModel *, const QItemSelection&)) );
+//    connect (recWItems, SIGNAL (editEntity(QAbstractItemModel *, const QModelIndex& )), this, SLOT (editRubricDoc(QAbstractItemModel *, const QModelIndex&)) );
     connect (twIncludes, SIGNAL (doubleClicked(const QModelIndex &)), this, SLOT (slotRubricItemDblClicked(const QModelIndex &)) );
     connect (recWItems->getView(), SIGNAL (doubleClicked(const QModelIndex &)), this, SLOT (slotRubricItemEdit(const QModelIndex &)) );
-    connect (recWItems->actDel, SIGNAL (triggered()), this, SLOT (delRubricItem()) );
+    connect (recWItems, SIGNAL (delEntitiesList (QAbstractItemModel *, const QItemSelection&)), this, SLOT (delSelectedDocs (QAbstractItemModel *, const QItemSelection&)) );
+//    connect (recWItems->actDel, SIGNAL (triggered()), this, SLOT (delRubricItem()) );
 }
 
 KKSIncludesWidget::~KKSIncludesWidget()
@@ -701,6 +709,30 @@ void KKSIncludesWidget::on_pbDelRubricator_clicked ()
     emit rubricsChanged ();
 }
 */
+
+void KKSIncludesWidget :: delSelectedDocs (QAbstractItemModel * itemModel, const QItemSelection& selDocs)
+{
+    if (!itemModel || selDocs.indexes().isEmpty())
+        return;
+    
+    KKSRubricMessageBox * rW = new KKSRubricMessageBox ();
+    if (rW->exec() != QDialog::Accepted)
+    {
+        delete rW;
+        return;
+    }
+    Qt::CheckState dbState = rW->getDbState();
+    bool isDbDel (dbState == Qt::Checked);
+    for (int i=0; i<selDocs.indexes().count(); i++)
+    {
+        QModelIndex index = selDocs.indexes().at(i);
+        if (index.column() > 0 || index.data (Qt::UserRole+2).toInt() != KKSRubricBase::atRubricItem)
+            continue;
+    }
+    qDebug () << __PRETTY_FUNCTION__ << isDbDel;
+    delete rW;
+}
+
 void KKSIncludesWidget :: delRubricItem (void)
 {
     QItemSelectionModel * sm = tvItems->selectionModel ();
@@ -998,6 +1030,16 @@ void KKSIncludesWidget :: editRubricItem (void)
     }
     editRubricDoc (tvItems->model(), index);
 
+}
+
+void KKSIncludesWidget :: editSelectedDocs (QAbstractItemModel * itemModel, const QItemSelection& selDocs)
+{
+    QModelIndexList sInds = selDocs.indexes();
+    for (int i=0; i<sInds.count(); i++)
+    {
+        if (sInds[i].column() == 0)
+            editRubricDoc (itemModel, sInds[i]);
+    }
 }
 
 void KKSIncludesWidget :: editRubricDoc (QAbstractItemModel * itemModel, const QModelIndex& index)
