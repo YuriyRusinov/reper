@@ -723,12 +723,35 @@ void KKSIncludesWidget :: delSelectedDocs (QAbstractItemModel * itemModel, const
     }
     Qt::CheckState dbState = rW->getDbState();
     bool isDbDel (dbState == Qt::Checked);
+    QItemSelectionModel * smInc = twIncludes->selectionModel();
     for (int i=0; i<selDocs.indexes().count(); i++)
     {
         QModelIndex index = selDocs.indexes().at(i);
-        if (index.column() > 0 || index.data (Qt::UserRole+2).toInt() != KKSRubricBase::atRubricItem)
+        index = index.sibling (index.row(), 0);
+        int pType = index.data (Qt::UserRole+2).toInt();
+        if ((isRec && pType != KKSRubricBase::atRubricItem))
             continue;
+        QModelIndex wIndex (smInc->currentIndex());
+        if (isRec)
+            wIndex = wIndex.parent ();
+        KKSRubric * r = NULL;
+    //    if(isRubr)
+    //        r = const_cast<KKSRubric *>(getRubric(wIndex.parent()));
+    //    else
+        r = const_cast<KKSRubric *>(getRubric(wIndex));
+
+        if(!r)
+            continue;
+
+        r->removeItem (index.row());
+
+    //    if (isRubr)
+    //        twIncludes->model()->removeRow(wIndex.row(), wIndex.parent());
+    //    else
+        itemModel->removeRows (index.row(), 1, index.parent());
     }
+    isChanged = true;
+    emit rubricsChanged ();
     qDebug () << __PRETTY_FUNCTION__ << isDbDel;
     delete rW;
 }
