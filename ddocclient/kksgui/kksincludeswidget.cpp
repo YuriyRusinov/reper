@@ -1439,6 +1439,17 @@ void KKSIncludesWidget :: expandAllIndexes (const QModelIndex& parent) const
 
 void KKSIncludesWidget :: setSyncSettings (void)
 {
+    QItemSelection sel = recWItems->getSourceSelection();
+    QList<int> idIOList;
+    for (int i=0; i<sel.indexes().count(); i++)
+    {
+        QModelIndex wIndex = sel.indexes().at(i);
+        wIndex = wIndex.sibling (wIndex.row(), 0);
+        int id = wIndex.data (Qt::UserRole).toInt();
+        if (id > 0 && !idIOList.contains (id))
+            idIOList.append (id);
+    }
+    emit setSyncIO (idIOList);
 }
 
 /*=================*/

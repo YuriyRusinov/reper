@@ -112,6 +112,8 @@ signals:
     void initAttachmentsModel (const KKSRubric * r);
     void appendRubricItemIntoModel (QAbstractItemModel * attachModel, const KKSRubricItem * rItem);
     void appendRubricRecord (int idObject, const KKSRubric * r, QAbstractItemModel * attachModel, const QModelIndex& parent);
+    
+    void setSyncIO (const QList<int>& ioIDList);
 
 private:
     //
