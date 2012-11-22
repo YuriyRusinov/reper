@@ -56,10 +56,12 @@ alter table search_templates add column id_io_category int4;
 update search_templates set id_io_category = 13;
 alter table search_templates alter column id_io_category set not null;
 
+select f_safe_drop_trigger('trgdlinsert', 'position');
 alter table "position" add column is_archived bool;
 update "position" set is_archived = false;
 alter table "position" alter column is_archived set default false;
 alter table "position" alter column is_archived set not null;
+select f_create_trigger('trgdlinsert', 'after', 'insert or update', 'position', 'dlinsertcheck()');
 
 alter table "units" add column is_archived bool;
 update "units" set is_archived = false;

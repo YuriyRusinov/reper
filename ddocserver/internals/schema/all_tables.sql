@@ -2635,7 +2635,7 @@ create table "position" (
    email_prefix         VARCHAR              not null,
    phone                VARCHAR              null,
    is_public            BOOL                 not null default FALSE,
-   is_archived          CHAR(10)             not null,
+   is_archived          BOOL                 not null default false,
    constraint PK_POSITION primary key (id)
 )
 inherits

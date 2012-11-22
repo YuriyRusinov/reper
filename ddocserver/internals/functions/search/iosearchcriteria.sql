@@ -13,7 +13,8 @@ begin
 
     insert into search_template_types (id,
                                        name,
-                                       description)
+                                       description,
+                                       id_parent)
                               values (
                                        idType,
                                        iName,
