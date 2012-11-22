@@ -39,6 +39,7 @@ class KKSRubric;
 class KKSFilterGroup;
 class KKSFilter;
 class KKSSearchTemplate;
+class KKSSearchTemplateType;
 class KKSAclTemplate;
 class KKSPrivilege;
 class KKSAccessEntity;
@@ -113,6 +114,8 @@ class _F_EXPORT KKSPPFactory
         int insertSearchTemplate (KKSSearchTemplate * st) const;
         int updateSearchTemplate (KKSSearchTemplate * st) const;
         int deleteSearchTemplate (int idSearchTemplate) const;
+        
+        int insertSearchTemplateType (KKSSearchTemplateType * t) const;
 
         int insertSearchCriterion (KKSFilter * f) const;
         int insertSearchCriterionIntoGroup (int idCriterion, int idGroup) const;

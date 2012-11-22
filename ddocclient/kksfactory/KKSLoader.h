@@ -41,6 +41,7 @@ class KKSRubric;
 class KKSRubricItem;
 class KKSPrivilege;
 class KKSSearchTemplate;
+class KKSSearchTemplateType;
 class KKSAclTemplate;
 class KKSAccessEntity;
 class KKSAttrGroup;
@@ -189,6 +190,7 @@ class _F_EXPORT KKSLoader
 
         KKSList<KKSSearchTemplate *> loadSearchTemplates (void) const;
         KKSSearchTemplate * loadSearchTemplate (int idSearchTemplate) const;
+        KKSMap<int, KKSSearchTemplateType *> loadSearchTemplateTypes() const;
 
         QMap<int, QStringList> getSyncOrg (int idObject) const;
 

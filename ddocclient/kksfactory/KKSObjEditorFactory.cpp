@@ -2327,7 +2327,7 @@ void KKSObjEditorFactory :: filterTemplateEIO (KKSObjEditor * editor, int idObje
         QModelIndex wIndex = searchTModel->index (i, 0);
         searchTModel->setData (wIndex, stList[i]->name(), Qt::DisplayRole);
         searchTModel->setData (wIndex, stList[i]->id (), Qt::UserRole);
-        searchTModel->setData (wIndex, stList[i]->getAuthor (), Qt::UserRole+1);
+        searchTModel->setData (wIndex, stList[i]->idAuthor (), Qt::UserRole+1);
     }
     sortTModel->setSourceModel (searchTModel);
     sortTModel->setSortCaseSensitivity(Qt::CaseInsensitive);
@@ -6426,7 +6426,7 @@ KKSSearchTemplate * KKSObjEditorFactory :: loadSearchTemplate (void) const
         QModelIndex wIndex = searchTModel->index (i, 0);
         searchTModel->setData (wIndex, stList[i]->name(), Qt::DisplayRole);
         searchTModel->setData (wIndex, stList[i]->id (), Qt::UserRole);
-        searchTModel->setData (wIndex, stList[i]->getAuthor (), Qt::UserRole+1);
+        searchTModel->setData (wIndex, stList[i]->idAuthor (), Qt::UserRole+1);
     }
     stForm->setDataModel (searchTModel);
     QItemSelectionModel * selTModel = stForm->selectionModel ();
@@ -6538,7 +6538,7 @@ void KKSObjEditorFactory :: addCopySearchTempl (const QModelIndex& wIndex, QAbst
     st->setId (-1);
     QString stName = st->name ();
     stName += tr (" copy");
-    st->setAuthor (loader->getUserId());
+    st->setAuthor (loader->getUserId(), loader->getUserName());
     st->setName (stName);
     int res = ppf->insertSearchTemplate (st);
     if (res < 0)
@@ -6551,7 +6551,7 @@ void KKSObjEditorFactory :: addCopySearchTempl (const QModelIndex& wIndex, QAbst
     QModelIndex stIndex = searchMod->index (nr, 0);
     searchMod->setData (stIndex, stName, Qt::DisplayRole);
     searchMod->setData (stIndex, res, Qt::UserRole);
-    searchMod->setData (stIndex, st->getAuthor (), Qt::UserRole+1);
+    searchMod->setData (stIndex, st->idAuthor (), Qt::UserRole+1);
     st->release ();
 }
 
@@ -6576,7 +6576,7 @@ void KKSObjEditorFactory :: updateSearchTempl (const QModelIndex& wIndex, QAbstr
         return;
     int oldIdGroup = m_group->id();
     int idUser = loader->getUserId ();
-    int idAuthor = st->getAuthor ();
+    int idAuthor = st->idAuthor ();
     if (idUser != 1 && idAuthor != idUser)
     {
         st->release ();
@@ -6685,7 +6685,7 @@ void KKSObjEditorFactory :: deleleSearchTempl (const QModelIndex& wIndex, QAbstr
         return;
     }
     int idUser = loader->getUserId ();
-    int idAuthor = st->getAuthor ();
+    int idAuthor = st->idAuthor ();
     if (idUser != 1 && idAuthor != idUser)
     {
         st->release ();

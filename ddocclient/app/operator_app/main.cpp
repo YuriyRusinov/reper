@@ -19,6 +19,8 @@ int main(int argc, char *argv[])
 	
     KKSMainWindow * mainWindow = NULL;
 
+    QTextCodec::setCodecForTr(QTextCodec::codecForName("Windows-1251"));
+
     if(argc == 2 && strcmp(argv[1], "admin") == 0){
         //sito = KKSSito::init (false);//, QString("admin"));
         sito = KKSSito::init (false, QString("admin"));

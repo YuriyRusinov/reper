@@ -3590,6 +3590,49 @@ int KKSPPFactory :: clearCriteriaGroup (int idGroup) const
     return ok;
 }
 
+int KKSPPFactory :: insertSearchTemplateType (KKSSearchTemplateType * t) const
+{
+    if(!t)
+        return OK_CODE;
+
+    if (!inTransaction())
+        db->begin();
+
+    KKSSearchTemplateType * parent = t->parent();
+    if(parent){
+        if(parent->id() <= 0){
+            int ok = insertSearchTemplateType(parent);
+            if(!inTransaction())
+                db->rollback();
+            return ERROR_CODE;
+        }
+    }
+
+    QString sql = QString("select insertSearchTemplateType('%1', %2, %3)")
+                           .arg(t->name())
+                           .arg(t->desc().isEmpty() ? QString("NULL") : QString("'") + t->desc() + QString("'") )
+                           .arg(t->parent() ? QString::number(t->parent()->id()) : QString("NULL"));
+    KKSResult * res = db->execute(sql);
+    if(!res || res->getRowCount() <= 0){
+        if(res)
+            delete res;
+        
+        if(!inTransaction())
+            db->rollback();
+
+        return ERROR_CODE;
+    }
+
+    t->setId(res->getCellAsInt(0, 0));
+
+    delete res;
+
+    if (!inTransaction())
+        db->commit();
+    
+    return OK_CODE;
+}
+
 int KKSPPFactory :: insertSearchTemplate (KKSSearchTemplate * st) const
 {
     if (!st)
@@ -3607,9 +3650,25 @@ int KKSPPFactory :: insertSearchTemplate (KKSSearchTemplate * st) const
         return ERROR_CODE;
     }
 
-    QString sql = QString("select ioInsertSearchTemplate('%1', %2);")
+    if(st->type()){
+        if(st->type()->id() <= 0){
+            setInTransaction();
+            int ok = insertSearchTemplateType(st->type());//идентификатор сохраним в него прямо
+            restoreInTransaction();
+            if(ok != OK_CODE){
+                if(!inTransaction())
+                    db->rollback();
+                return ERROR_CODE;
+            }
+        }
+    }
+
+    QString sql = QString("select ioInsertSearchTemplate('%1', %2, %3, %4, %5);")
                         .arg (st->name())
-                        .arg (idMainGroup);
+                        .arg (QString::number(idMainGroup))
+                        .arg (st->idCategory() <= 0 ? QString::number( IO_TABLE_CATEGORY_ID) : QString::number(st->idCategory()))
+                        .arg (st->type() ? QString::number(st->type()->id()) : QString::number(1))
+                        .arg (st->desc().isEmpty() ? QString("NULL") : QString("'") + st->desc() + QString("'"));
 
     KKSResult * res = db->execute (sql);
     if (!res || res->getRowCount() == 0)
@@ -3646,11 +3705,28 @@ int KKSPPFactory :: updateSearchTemplate (KKSSearchTemplate * st) const
     if (!inTransaction())
         db->begin();
 
+
+    if(st->type()){
+        if(st->type()->id() <= 0){
+            setInTransaction();
+            int ok = insertSearchTemplateType(st->type());//идентификатор сохраним в него прямо
+            restoreInTransaction();
+            if(ok != OK_CODE){
+                if(!inTransaction())
+                    db->rollback();
+                return ERROR_CODE;
+            }
+        }
+    }
+
     int idSearchTemplate = st->id ();
-    QString sql = QString("select ioUpdateSearchTemplate(%1, '%2', %3);")
+    QString sql = QString("select ioUpdateSearchTemplate(%1, '%2', %3, %4, %5, %6);")
                         .arg (idSearchTemplate)
                         .arg (st->name())
-                        .arg (st->getMainGroup()->id());
+                        .arg (st->getMainGroup()->id())
+                        .arg (st->idCategory() <= 0 ? QString::number( IO_TABLE_CATEGORY_ID) : QString::number(st->idCategory()))
+                        .arg (st->type() ? QString::number(st->type()->id()) : QString::number(1))
+                        .arg (st->desc().isEmpty() ? QString("NULL") : QString("'") + st->desc() + QString("'"));
 
     KKSResult * res = db->execute (sql);
     if (!res || res->getRowCount() == 0)

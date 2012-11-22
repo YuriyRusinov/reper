@@ -3928,8 +3928,38 @@ bool KKSLoader::getPrivilege(int idRole, int idObject, int whatPrivilege, bool w
     return ok;
 }
 
+KKSMap<int, KKSSearchTemplateType *> KKSLoader::loadSearchTemplateTypes() const
+{
+    KKSMap<int, KKSSearchTemplateType *> sTypes;
+    
+    QString sql = QString("select * from getSearchTemplateTypes()");//фирма гарантирует, что данные вернутся отсортированными по критерию "родители раньше потомков"
+    KKSResult * res = db->execute(sql);
+    if(!res || res->getRowCount() <= 0){
+        if(res)
+            delete res;
+
+        return sTypes;
+    }
+
+    for (int i=0; i<res->getRowCount(); i++){
+        KKSSearchTemplateType * t = new KKSSearchTemplateType(res->getCellAsInt(i, 0), res->getCellAsString(i, 1), res->getCellAsString(i, 2));
+        if(!res->isEmpty(i, 3)){
+            KKSSearchTemplateType * parent = sTypes.value(res->getCellAsInt(i, 3), NULL);
+            if(parent)
+                t->setParent(parent);
+        }
+
+        sTypes.insert(res->getCellAsInt(i, 0), t);
+    }
+
+    
+    return sTypes;
+}
+
 KKSList<KKSSearchTemplate *> KKSLoader::loadSearchTemplates (void) const
 {
+    KKSMap<int, KKSSearchTemplateType *> sTypes = loadSearchTemplateTypes();//набор типов не будет очень большим, поэтому так можно делать
+
     KKSList<KKSSearchTemplate *> stList;
     QString sql ("select * from ioGetSearchTemplate();");
     KKSResult * res = db->execute (sql);
@@ -3942,7 +3972,25 @@ KKSList<KKSSearchTemplate *> KKSLoader::loadSearchTemplates (void) const
 
     for (int i=0; i<res->getRowCount(); i++)
     {
-        KKSSearchTemplate * st = this->loadSearchTemplate (res->getCellAsInt (i, 0));
+
+        KKSFilterGroup * gr = this->loadSearchGroup (res->getCellAsInt (i, 1));
+        if (!gr)
+            continue;
+
+        KKSSearchTemplate * st = new KKSSearchTemplate (res->getCellAsInt (i, 0),  //id
+                                                        gr, 
+                                                        res->getCellAsString (i, 2),  //name
+                                                        res->getCellAsInt (i, 3), //idAuthor
+                                                        res->getCellAsString(i, 9), //description
+                                                        res->getCellAsString(i, 6)); //authorName
+
+        st->setCategory(res->getCellAsInt(i, 5), res->getCellAsString(i, 7));//idCategory, categoryName
+        st->setCreationDatetime(res->getCellAsDateTime(i, 8));//creation_datetime
+        KKSSearchTemplateType * t = sTypes.value(res->getCellAsInt(i, 4), NULL);
+        st->setType(t);
+
+        gr->release ();
+
         if (st)
             stList.append (st);
     }
@@ -3952,6 +4000,8 @@ KKSList<KKSSearchTemplate *> KKSLoader::loadSearchTemplates (void) const
 
 KKSSearchTemplate * KKSLoader::loadSearchTemplate (int idSearchTemplate) const
 {
+    KKSMap<int, KKSSearchTemplateType *> sTypes = loadSearchTemplateTypes();//набор типов не будет очень большим, поэтому так можно делать
+
     QString sql (QString("select * from ioGetSearchTemplate(%1);").arg (idSearchTemplate));
     KKSResult * res = db->execute (sql);
     if (!res || res->getRowCount() == 0)
@@ -3966,12 +4016,22 @@ KKSSearchTemplate * KKSLoader::loadSearchTemplate (int idSearchTemplate) const
         delete res;
         return 0;
     }
-    KKSSearchTemplate * st = new KKSSearchTemplate (res->getCellAsInt (0, 0), \
-                                                    gr, \
-                                                    res->getCellAsString (0, 2), \
-                                                    res->getCellAsInt (0, 3));
+    KKSSearchTemplate * st = new KKSSearchTemplate (res->getCellAsInt (0, 0),  //id
+                                                    gr, 
+                                                    res->getCellAsString (0, 2),  //name
+                                                    res->getCellAsInt (0, 3), //idAuthor
+                                                    res->getCellAsString(0, 9), //description
+                                                    res->getCellAsString(0, 6)); //authorName
+
+    st->setCategory(res->getCellAsInt(0, 5), res->getCellAsString(0, 7));//idCategory, categoryName
+    st->setCreationDatetime(res->getCellAsDateTime(0, 8));//creation_datetime
+    KKSSearchTemplateType * t = sTypes.value(res->getCellAsInt(0, 4), NULL);
+    st->setType(t);
+
     gr->release ();
+    
     delete res;
+    
     return st;
 }
 
