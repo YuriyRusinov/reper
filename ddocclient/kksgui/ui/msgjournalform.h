@@ -63,7 +63,7 @@ private slots:
     void on_aCreateOutMsg_triggered();
     void on_aViewOutMsgResult_triggered();
     void on_aViewMsg_triggered();
-    void viewMsgFiles (void);
+    void viewMsgFiles ();
 
     void init();
     void initSysMenu();

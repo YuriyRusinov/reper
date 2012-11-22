@@ -412,7 +412,7 @@ void KKSMsgJournal::on_aViewOutMsgResult_triggered()
         emit viewResultMsg(idObject);
 }
 
-void KKSMsgJournal :: viewMsgFiles (void)
+void KKSMsgJournal :: viewMsgFiles ()
 {
     int nFiles = msgFiles.count();
     qDebug () << __PRETTY_FUNCTION__ << nFiles;

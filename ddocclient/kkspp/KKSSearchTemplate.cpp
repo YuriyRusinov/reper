@@ -45,11 +45,7 @@ void KKSSearchTemplateType::setParent(KKSSearchTemplateType * p)
 
 KKSSearchTemplateType * KKSSearchTemplateType::defaultType() 
 {
-    //KKSSearchTemplateType * t = new KKSSearchTemplateType(1, QObject::tr("Общие поисковые запросы")); //сделано в main.cpp QTextCodec::setCodecForTr(QTextCodec::codecForName("Windows-1251"));
-    KKSSearchTemplateType * t = new KKSSearchTemplateType(-1, QObject::tr("child")); //сделано в main.cpp QTextCodec::setCodecForTr(QTextCodec::codecForName("Windows-1251"));
-    KKSSearchTemplateType * t1 = new KKSSearchTemplateType(-1, QObject::tr("parent")); //сделано в main.cpp QTextCodec::setCodecForTr(QTextCodec::codecForName("Windows-1251"));
-    t->setParent(t1);
-    t1->release();
+    KKSSearchTemplateType * t = new KKSSearchTemplateType(1, QObject::tr("Общие поисковые запросы")); //сделано в main.cpp QTextCodec::setCodecForTr(QTextCodec::codecForName("Windows-1251"));
     return t;
 }
 
