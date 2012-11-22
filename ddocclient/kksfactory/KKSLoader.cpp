@@ -3932,7 +3932,7 @@ KKSMap<int, KKSSearchTemplateType *> KKSLoader::loadSearchTemplateTypes() const
 {
     KKSMap<int, KKSSearchTemplateType *> sTypes;
     
-    QString sql = QString("select * from getSearchTemplateTypes()");//фирма гарантирует, что данные вернутся отсортированными по критерию "родители раньше потомков"
+    QString sql = QString("select * from ioGetSearchTemplateTypes()");//фирма гарантирует, что данные вернутся отсортированными по критерию "родители раньше потомков"
     KKSResult * res = db->execute(sql);
     if(!res || res->getRowCount() <= 0){
         if(res)

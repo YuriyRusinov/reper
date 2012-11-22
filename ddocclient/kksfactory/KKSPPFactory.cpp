@@ -3602,9 +3602,11 @@ int KKSPPFactory :: insertSearchTemplateType (KKSSearchTemplateType * t) const
     if(parent){
         if(parent->id() <= 0){
             int ok = insertSearchTemplateType(parent);
-            if(!inTransaction())
-                db->rollback();
-            return ERROR_CODE;
+            if(ok != OK_CODE){
+                if(!inTransaction())
+                    db->rollback();
+                return ERROR_CODE;
+            }
         }
     }
 
