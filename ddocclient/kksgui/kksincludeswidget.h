@@ -84,6 +84,8 @@ private slots:
     void rubricSelectionChanged (const QItemSelection& selected, const QItemSelection& deselected);
     void turnRubricSplitter (void);
     void setRubricIcon (void);
+    
+    void setSyncSettings (void);
 
 public slots:
     void slotAddRubricItem(int idRubricItem, QString name);

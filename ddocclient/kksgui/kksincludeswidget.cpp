@@ -180,7 +180,7 @@ void KKSIncludesWidget :: initActions (void)
                << tr ("&Delete rubric") 
                << tr ("Add rubric item") 
                << tr ("&Open rubric item") 
-               << tr ("&Delete item from rubric only");
+               << tr ("&Remove item(s) from selected rubric only");
 
     for (int i=0; i<=5; i++)
     {
@@ -201,6 +201,12 @@ void KKSIncludesWidget :: initActions (void)
     connect (aRubrWidgetRotate, SIGNAL (triggered()), this, SLOT (turnRubricSplitter()) );
     tBRubrActions->addAction (aRubrWidgetRotate);
     pMenu->addAction (aRubrWidgetRotate);
+    QAction * actSyncSep = new QAction (this);
+    actSyncSep->setSeparator (true);
+    this->recWItems->insertToolBarAction (recWItems->actRefresh, actSyncSep);
+    QAction * actSyncSet = new QAction (QIcon(":/ddoc/synchronization.png"), tr ("Set synchronization parameters"), this);
+    recWItems->insertToolBarAction (actSyncSep, actSyncSet);
+    connect (actSyncSet, SIGNAL (triggered()), this, SLOT (setSyncSettings ()) );
     
     QAction * aRubrIconSet = new QAction (QIcon(":/ddoc/rubric_icon_set.png"), tr ("Set icon"), this);
     pMenu->addAction (aRubrIconSet);
@@ -1429,6 +1435,10 @@ void KKSIncludesWidget :: expandAllIndexes (const QModelIndex& parent) const
         QModelIndex ind = mod->index (i, 0, parent);
         expandAllIndexes (ind);
     }
+}
+
+void KKSIncludesWidget :: setSyncSettings (void)
+{
 }
 
 /*=================*/

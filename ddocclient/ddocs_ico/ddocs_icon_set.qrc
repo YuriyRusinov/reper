@@ -72,5 +72,6 @@
     <file>view_current_rec.png</file>
     <file>orientation_icon.png</file>
     <file>rubric_icon_set.png</file>
+    <file>synchronization.png</file>
   </qresource>
 </RCC>
