@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     27.09.2012 15:15:32                          */
+/* Created on:     22.11.2012 16:11:53                          */
 /*==============================================================*/
 
 
@@ -2635,6 +2635,7 @@ create table "position" (
    email_prefix         VARCHAR              not null,
    phone                VARCHAR              null,
    is_public            BOOL                 not null default FALSE,
+   is_archived          CHAR(10)             not null,
    constraint PK_POSITION primary key (id)
 )
 inherits
@@ -2656,6 +2657,10 @@ comment on column "position".email_prefix is
 
 comment on column "position".is_public is
 'Является ли ДЛ публичным';
+
+comment on column "position".is_archived is
+'Флаг нахождения должности в архиве.
+Нахождение в архиве фактически означает, что должность удалена';
 
 select setMacToNULL('"position"');
 select createTriggerUID('"position"');
@@ -3062,7 +3067,9 @@ create table search_templates (
    id_group             INT4                 not null,
    id_search_template_type INT4                 not null default 1,
    author               INT4                 null,
+   id_io_category       INT4                 not null default 13,
    name                 VARCHAR              not null,
+   creation_datetime    TIMESTAMP            not null default CURRENT_TIMESTAMP,
    description          VARCHAR              null,
    constraint PK_SEARCH_TEMPLATES primary key (id)
 )
@@ -3070,6 +3077,15 @@ inherits (root_table);
 
 comment on table search_templates is
 'Шаблоны поиска, применяемые при осуществлении поиска информационных объектов и в справочниках. ';
+
+comment on column search_templates.id_io_category is
+'Определяет категорию, к экземплярам которой применим данный поисковый запрос.
+Большинство поисковых запросов создается для информационных объектов, т.е. для экземпляров категории "справочник информационных объектов". Тем не менее будут поисковые запросы, относящиеся к отдельным справочникам. 
+
+В дальнейшем необходимо учесть ситуацию, что поисковый запрос может быть применим для нескольких категорий (если они содержат среди атрибутов те, которые указаны в поисковом запросе)';
+
+comment on column search_templates.creation_datetime is
+'Дата и время создания поискового запроса';
 
 select setMacToNULL('search_templates');
 select createTriggerUID('search_templates');
@@ -3332,6 +3348,7 @@ create table units (
    is_fgroup            bool                 not null default FALSE,
    time_start           TIMESTAMP            null,
    time_elapsed         TIMESTAMP            null,
+   is_archived          BOOL                 not null default FALSE,
    constraint PK_UNITS primary key (id)
 )
 inherits
@@ -3358,6 +3375,11 @@ comment on column units.tree_symbol is
 
 comment on column units.time_elapsed is
 'Временной период, на который создается ФГ, если данное подразделение является функциональной группой';
+
+comment on column units.is_archived is
+'Флаг нахождения подразделения в архиве.
+Нахождение в архиве фактически означает, что подразделение удалено.
+Если подразделение находится в архиве, то все должности его также находятся в архиве и создавать новые в нем нельзя';
 
 select setMacToNULL('units');
 select createTriggerUID('units');
@@ -4560,6 +4582,11 @@ alter table search_templates
 alter table search_templates
    add constraint FK_SEARCH_T_REFERENCE_SEARCH_T foreign key (id_search_template_type)
       references search_template_types (id)
+      on delete restrict on update restrict;
+
+alter table search_templates
+   add constraint FK_SEARCH_T_REFERENCE_IO_CATEG foreign key (id_io_category)
+      references io_categories (id)
       on delete restrict on update restrict;
 
 alter table search_templates

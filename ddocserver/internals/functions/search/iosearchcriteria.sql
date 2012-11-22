@@ -1,3 +1,36 @@
+create or replace function insertSearchTemplateType (varchar, varchar, int4) returns int4 as
+$BODY$
+declare
+    iName alias for $1;
+    iDesc alias for $2;
+    idParent alias for $3;
+
+    idType int4;
+begin
+
+
+    select getNextSeq('search_template_types', 'id') into idType;
+
+    insert into search_template_types (id,
+                                       name,
+                                       description)
+                              values (
+                                       idType,
+                                       iName,
+                                       iDesc,
+                                       idParent);
+
+    if (FOUND = false) then
+        raise notice 'The search_template_type does not inserted!';
+        return -1;
+    end if;
+
+    return idType;
+end
+$BODY$
+language 'plpgsql';
+
+
 create or replace function ioInsertSearchTemplate (varchar, int4) returns int4 as
 $BODY$
 declare
@@ -38,12 +71,105 @@ end
 $BODY$
 language 'plpgsql';
 
+create or replace function ioInsertSearchTemplate (varchar, int4, int4, int4, varchar) returns int4 as
+$BODY$
+declare
+    searchTemplateName alias for $1;
+    idMainGroup alias for $2;
+    --idAuthor alias for $3;
+    idCategory alias for $3;
+    idType alias for $4;
+    iDescription alias for $5;
+
+    idSearchTemplate int4;
+    idUser int4;
+    idParentGroup int4;
+begin
+
+    select into idParentGroup id_parent from groups where id=idMainGroup;
+    if (idParentGroup is not null) then
+        raise notice 'The child group cannot be main template group!';
+        return -1;
+    end if;
+
+    select getNextSeq('search_templates', 'id') into idSearchTemplate;
+    select getCurrentUser() into idUser;
+
+    insert into search_templates (id,
+                                  id_group,
+                                  name,
+                                  author,
+                                  id_io_category,
+                                  id_search_template_type,
+                                  creation_datetime,
+                                  description)
+                          values (
+                                  idSearchTemplate,
+                                  idMainGroup,
+                                  searchTemplateName,
+                                  idUser,
+                                  idCategory,
+                                  idType,
+                                  current_timestamp,
+                                  iDescription);
+
+    if (FOUND = false) then
+        raise notice 'The search_template does not inserted!';
+        return -1;
+    end if;
+
+    return idSearchTemplate;
+end
+$BODY$
+language 'plpgsql';
+
+create or replace function ioUpdateSearchTemplate (int4, varchar, int4, int4, int4, varchar) returns int4 as
+$BODY$
+declare
+    idSearchTemplate alias for $1;
+    stname alias for $2;
+    idMainGroup alias for $3;
+    idCategory alias for $4;
+    idType alias for $5;
+    iDescription alias for $6;
+
+    idUser int4;
+    idAuthor int4;
+begin
+    select getCurrentUser() into idUser;
+    select into idAuthor author from search_templates where id=idSearchTemplate;
+    if (idUser <> 1 and idAuthor <> idUser) then
+        raise notice 'only author or db admin can change search template!';
+        return -1;
+    end if;
+
+    update search_templates 
+    set 
+        name = stname, 
+        id_group = idMainGroup,
+        id_io_category = idCategory,
+        id_search_template_type = idType,
+--        creation_datetime = creationDatetime,
+        description = iDescription
+    where id=idSearchTemplate;
+
+    if (not FOUND ) then
+        raise notice 'The search_template does not updated!';
+        return -1;
+    end if;
+
+    return idSearchTemplate;
+end
+$BODY$
+language 'plpgsql';
+
 create or replace function ioUpdateSearchTemplate (int4, varchar, int4) returns int4 as
 $BODY$
 declare
     idSearchTemplate alias for $1;
     stname alias for $2;
     idMainGroup alias for $3;
+    
 
     idUser int4;
     idAuthor int4;
