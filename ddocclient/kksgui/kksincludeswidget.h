@@ -86,6 +86,9 @@ private slots:
     void setRubricIcon (void);
     
     void setSyncSettings (void);
+    void putIntoAnotherRubric (void);
+    void sendIOS (void);
+    void setAccessRules (void);
 
 public slots:
     void slotAddRubricItem(int idRubricItem, QString name);
@@ -145,6 +148,8 @@ private:
     void parseRubric(KKSRubric * r, QModelIndex index);
     void parseItems(KKSRubric * r, QModelIndex index);
     void expandAllIndexes (const QModelIndex& parent) const;
+    
+    QList<int> getSelectedIOS (void) const;
 };
 
 

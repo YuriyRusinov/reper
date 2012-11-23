@@ -204,10 +204,23 @@ void KKSIncludesWidget :: initActions (void)
     QAction * actSyncSep = new QAction (this);
     actSyncSep->setSeparator (true);
     this->recWItems->insertToolBarAction (recWItems->actRefresh, actSyncSep);
-    QAction * actSyncSet = new QAction (QIcon(":/ddoc/synchronization.png"), tr ("Set synchronization parameters"), this);
+
+    QAction * actSyncSet = new QAction (QIcon(":/ddoc/sync.png"), tr ("Set synchronization parameters"), this);
     recWItems->insertToolBarAction (actSyncSep, actSyncSet);
     connect (actSyncSet, SIGNAL (triggered()), this, SLOT (setSyncSettings ()) );
-    
+
+    QAction * actPutIntoAnotherRubr = new QAction (QIcon(":/ddoc/copy_to_rubric.png"), tr ("Put into another rubric"), this);
+    recWItems->insertToolBarAction (actSyncSep, actPutIntoAnotherRubr);
+    connect (actPutIntoAnotherRubr, SIGNAL (triggered()), this, SLOT (putIntoAnotherRubric()) );
+
+    QAction * actSendIO = new QAction (QIcon(":/ddoc/send_as_mail.png"), tr("Send as email"), this);
+    recWItems->insertToolBarAction (actSyncSep, actSendIO);
+    connect (actSendIO, SIGNAL (triggered()), this, SLOT (sendIOS()) );
+
+    QAction * actAccess = new QAction (QIcon(":/ddoc/access_icon.png"), tr("Set access rules"), this);
+    recWItems->insertToolBarAction (actSyncSep, actAccess);
+    connect (actAccess, SIGNAL (triggered()), this, SLOT (setAccessRules()) );
+
     QAction * aRubrIconSet = new QAction (QIcon(":/ddoc/rubric_icon_set.png"), tr ("Set icon"), this);
     pMenu->addAction (aRubrIconSet);
     tBRubrActions->addAction (aRubrIconSet);
@@ -1437,7 +1450,7 @@ void KKSIncludesWidget :: expandAllIndexes (const QModelIndex& parent) const
     }
 }
 
-void KKSIncludesWidget :: setSyncSettings (void)
+QList<int> KKSIncludesWidget :: getSelectedIOS (void) const
 {
     QItemSelection sel = recWItems->getSourceSelection();
     QList<int> idIOList;
@@ -1449,7 +1462,51 @@ void KKSIncludesWidget :: setSyncSettings (void)
         if (id > 0 && !idIOList.contains (id))
             idIOList.append (id);
     }
-    emit setSyncIO (idIOList);
+    qDebug () << __PRETTY_FUNCTION__ << idIOList;
+    return idIOList;
+}
+
+void KKSIncludesWidget :: setSyncSettings (void)
+{
+    QList<int> selectedIO = getSelectedIOS ();
+    if (selectedIO.isEmpty())
+    {
+        QMessageBox::warning (this, tr ("Set synchronization parameters"), tr("Select documents for set"), QMessageBox::Ok);
+        return;
+    }
+    emit setSyncIO (selectedIO);
+}
+
+void KKSIncludesWidget :: putIntoAnotherRubric (void)
+{
+    QList<int> selectedIO = getSelectedIOS ();
+    if (selectedIO.isEmpty())
+    {
+        QMessageBox::warning (this, tr ("Put selected documents"), tr("Select documents for copy"), QMessageBox::Ok);
+        return;
+    }
+    
+}
+
+void KKSIncludesWidget :: sendIOS (void)
+{
+    QList<int> selectedIO = getSelectedIOS ();
+    if (selectedIO.isEmpty())
+    {
+        QMessageBox::warning (this, tr ("Send selected documents"), tr("Select documents for send"), QMessageBox::Ok);
+        return;
+    }
+}
+
+void KKSIncludesWidget :: setAccessRules (void)
+{
+    QList<int> selectedIO = getSelectedIOS ();
+    if (selectedIO.isEmpty())
+    {
+        QMessageBox::warning (this, tr ("Set access rules"), tr("Select documents for set"), QMessageBox::Ok);
+        return;
+    }
+    
 }
 
 /*=================*/

@@ -73,5 +73,8 @@
     <file>orientation_icon.png</file>
     <file>rubric_icon_set.png</file>
     <file>synchronization.png</file>
+    <file>sync.png</file>
+    <file>copy_to_rubric.png</file>
+    <file>access_icon.png</file>
   </qresource>
 </RCC>
