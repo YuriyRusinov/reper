@@ -42,6 +42,7 @@ HEADERS += \
                 KKSPointTable.h \
                 KKSPointsItemDelegate.h \
                 KKSSyncWidget.h \
+                KKSSyncDialog.h \
                 kksstuffform.h \
                 KKSVideoPlayer.h \
                 KKSEIODataModel.h \
@@ -122,6 +123,7 @@ SOURCES += \
                 KKSPointTable.cpp \
                 KKSPointsItemDelegate.cpp \
                 KKSSyncWidget.cpp \
+                KKSSyncDialog.cpp \
                 KKSOrganizationAddrForm.cpp \
                 KKSVideoPlayer.cpp \
                 KKSEIODataModel.cpp \
@@ -223,6 +225,7 @@ headers.files += \
                 KKSPointTable.h \
                 KKSPointsItemDelegate.h \
                 KKSSyncWidget.h \
+                KKSSyncDialog.h \
                 KKSVideoPlayer.h \
                 KKSEIODataModel.h \
                 KKSRecProxyModel.h \
