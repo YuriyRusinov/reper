@@ -28,6 +28,7 @@
 #include "KKSAccessEntity.h"
 #include <KKSEIOData.h>
 #include <KKSEIODataModel.h>
+#include <KKSSyncDialog.h>
 
 #include "KKSRubricFactory.h"
 
@@ -138,6 +139,7 @@ KKSIncludesWidget * KKSRubricFactory :: createRubricEditor (int mode, const KKSL
     connect (iW, SIGNAL (copyFromRubr(KKSRubric *, QAbstractItemModel *, const QModelIndex&)), this, SLOT (copyFromRubric (KKSRubric *, QAbstractItemModel *, const QModelIndex&)) );
     connect (iW, SIGNAL (initAttachmentsModel (const KKSRubric *)), this, SLOT (initRubricAttachments (const KKSRubric *)) );
     connect (iW, SIGNAL (appendRubricItemIntoModel (QAbstractItemModel *, const KKSRubricItem * )), this, SLOT (appendRubricItem (QAbstractItemModel *, const KKSRubricItem *)) );
+    connect (iW, SIGNAL (setSyncIO(const QList<int>&)), this, SLOT (setSyncSettings (const QList<int>&)) );
     
     connect (this, SIGNAL (rubricAttachments (QAbstractItemModel *)), iW, SLOT (slotInitAttachmentsModel (QAbstractItemModel *)) );
     emit rubricEditorCreated (iW);
@@ -938,4 +940,15 @@ void KKSRubricFactory :: objEditorClosed ()
     int pres = ioParents.remove (rec);
     int wres = includesW.remove (rec);
     qDebug () << __PRETTY_FUNCTION__ << rubrres << modres << pres << wres;
+}
+
+void KKSRubricFactory :: setSyncSettings (const QList<int>& ioIDList)
+{
+    if (ioIDList.isEmpty())
+        return;
+
+    KKSSyncDialog * syncD = new KKSSyncDialog ();
+    if (syncD->exec() == QDialog::Accepted)
+    {
+    }
 }
