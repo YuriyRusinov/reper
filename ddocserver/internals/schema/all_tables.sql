@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     22.11.2012 16:11:53                          */
+/* Created on:     26.11.2012 12:19:50                          */
 /*==============================================================*/
 
 
@@ -23,7 +23,6 @@ select setMacToNULL('root_table');
 create unique index Index_1 on root_table using BTREE (
 unique_id
 );
-
 
 /*==============================================================*/
 /* User: public                                                 */
@@ -2635,7 +2634,7 @@ create table "position" (
    email_prefix         VARCHAR              not null,
    phone                VARCHAR              null,
    is_public            BOOL                 not null default FALSE,
-   is_archived          BOOL                 not null default false,
+   is_archived          BOOL                 not null default FALSE,
    constraint PK_POSITION primary key (id)
 )
 inherits
