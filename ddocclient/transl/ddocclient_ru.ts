@@ -4049,6 +4049,18 @@ try to rename it with extention. Example: filename.vsd</source>
         <source>Image files (*.xpm *.png *.ico *.jpg *.jpeg *.bmp *.gif *.pbm *.pgm *.xbm);;All files (*)</source>
         <translation>Файлы рисунков (*.xpm *.png *.ico *.jpg *.jpeg *.bmp *.gif *.pbm *.pgm *.xbm);;Все файлы (*)</translation>
     </message>
+    <message>
+        <source>Create new document and put it into rubric</source>
+        <translation>Создать новый документ и поместить его в рубрику</translation>
+    </message>
+    <message>
+        <source>Edit document in rubric</source>
+        <translation>Редактировать документ в рубрике</translation>
+    </message>
+    <message>
+        <source>Delete document both from rubric and database</source>
+        <translation>Удалить документ из рубрики и из БД в целом</translation>
+    </message>
 </context>
 <context>
     <name>KKSIndFactory</name>
@@ -9525,7 +9537,7 @@ Avg speed: %3 Kb/sec</source>
     </message>
     <message>
         <source>Server where other client must connect</source>
-        <translation>IP-адрес сервера, который получает данные, входящие для текущего объекта</translation>
+        <translation type="obsolete">IP-адрес сервера, который получает данные, входящие для текущего объекта</translation>
     </message>
     <message>
         <source>Server port number</source>

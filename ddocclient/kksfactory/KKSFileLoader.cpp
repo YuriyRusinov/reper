@@ -440,6 +440,7 @@ int KKSFileLoader::rWriteFile( int idUrl,
 
     if (file.atEnd())
     {
+        file.close();
         qDebug () << __PRETTY_FUNCTION__ << "End of file";
         return ERROR_CODE;
     }
