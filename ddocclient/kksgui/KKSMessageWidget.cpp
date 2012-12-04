@@ -11,6 +11,7 @@
 #include <QMessageBox>
 #include <QAbstractItemModel>
 #include <QItemSelectionModel>
+#include <QItemSelection>
 #include <QtDebug>
 
 #include "KKSMessageWidget.h"
@@ -82,13 +83,16 @@ QList<int> KKSMessageWidget :: getIDList (KKSRecWidget *rw) const
     QAbstractItemModel * dlModel = rw->getSourceModel();
     if (!dlModel)
         return idList;
+    
+    QItemSelection sel = rw->getSourceSelection();
 
-    int nr = dlModel->rowCount();
+    int nr = sel.indexes().count();//dlModel->rowCount();
     for (int i=0; i<nr; i++)
     {
-        QModelIndex wIndex = dlModel->index (i, 0);
+        QModelIndex wIndex = sel.indexes().at(i);//dlModel->index (i, 0);
+        wIndex = wIndex.sibling(wIndex.row(), 0);
         int id = wIndex.data (Qt::UserRole).toInt();
-        if (wIndex.data (Qt::CheckStateRole).toBool() && !idList.contains (id))
+        if (/*wIndex.data (Qt::CheckStateRole).toBool() &&*/ !idList.contains (id))
             idList.append (id);
     }
 

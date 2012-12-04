@@ -1055,7 +1055,7 @@ void KKSRubricFactory :: sendDocs (const QList<int>& ioIDList)
 {
     if (ioIDList.isEmpty())
         return;
-
+    oef->sendIOList (ioIDList);
 }
 
 void KKSRubricFactory :: setAccessDocs (const QList<int>& ioIDList)

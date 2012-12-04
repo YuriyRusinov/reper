@@ -5936,7 +5936,7 @@ void KKSObjEditorFactory :: sendIO (KKSObject *wObj, KKSObjectExemplar *wObjE, K
                                             .arg (QString ("'%1'").arg (messText))
                                             .arg (idDls[i]);
                     KKSResult *res = loader->getDb()->execute (ioSql);
-					if (!res || res->getRowCount () != 1 || res->getCellAsInt(0, 0) <= 0)
+                    if (!res || res->getRowCount () != 1 || res->getCellAsInt(0, 0) <= 0)
                     {
                         QMessageBox::warning (messDial, tr("Send message"), tr ("Cannot send message to %1").arg (idDls[i]), QMessageBox::Ok);
                         continue;
@@ -5967,6 +5967,156 @@ void KKSObjEditorFactory :: sendIO (KKSObject *wObj, KKSObjectExemplar *wObjE, K
     io->release ();
     tDls->release ();
     ioDls->release ();
+}
+
+/* Метод осуществляет рассылку документов должностному (ым) лицу (ам).
+ */
+void KKSObjEditorFactory :: sendIOList (const QList<int>& idIOList)
+{
+    int idUser = loader->getUserId();
+
+    QTreeView *tvPos = new QTreeView ();
+    tvPos->setSelectionMode (QAbstractItemView::ExtendedSelection);
+    KKSRecWidget *rwDls = new KKSRecWidget (tvPos, false);
+    rwDls->hideToolBar (); 
+//    rwDls->hideAllButtons ();
+    KKSObject * ioDls = loader->loadIO (IO_POS_ID, true);
+    if (!ioDls)
+    {
+        delete tvPos;
+        delete rwDls;
+        return;
+    }
+
+    KKSTemplate *tDls = new KKSTemplate (ioDls->category()->tableCategory()->defTemplate());
+    if (!tDls)
+    {
+        ioDls->release ();
+        delete tvPos;
+        delete rwDls;
+        return;
+    }
+    KKSList<const KKSFilterGroup *>  filterGroups;
+    tvPos->header()->setClickable (true);
+    tvPos->header()->setSortIndicatorShown (true);
+    tvPos->header()->setSortIndicator (0, Qt::AscendingOrder);
+    tvPos->setSortingEnabled (true);
+    KKSItemDelegate *itemDelegD = new KKSItemDelegate ();
+    tvPos->setItemDelegate (itemDelegD);
+    KKSViewFactory::loadEIOEx (0, ioDls, loader, tDls, tvPos, filterGroups, true, 0, QString(), 0, true);
+
+    QTreeView *tvIOs = new QTreeView ();
+    tvIOs->setSelectionMode (QAbstractItemView::SingleSelection);
+    tvIOs->header()->setClickable (true);
+    tvIOs->header()->setSortIndicatorShown (true);
+    tvIOs->header()->setSortIndicator (0, Qt::AscendingOrder);
+    tvIOs->setSortingEnabled (true);
+    KKSItemDelegate *itemDelegIO = new KKSItemDelegate ();
+    tvIOs->setItemDelegate (itemDelegIO);
+    KKSRecWidget *rwIOs = new KKSRecWidget (tvIOs, false);
+    for (int i=0; i<idIOList.count(); i++)
+    {
+        KKSObject * wObj = loader->loadIO (idIOList[i]);
+        if (!wObj)
+            continue;
+        int idObj (idIOList[i]);
+        int idAuthor (-1);
+        if (wObj && wObj->id() != IO_IO_ID)
+        {
+            idAuthor = wObj->author();
+        }
+        if (idUser != idAuthor && !loader->getPrivilege(idUser, idObj, 5, true))
+        {
+            QMessageBox::critical(0, tr("Access error!"), tr("You does not have permissions for send document %1 !").arg (idObj), QMessageBox::Ok);
+            return;
+        }
+        wObj->release ();
+    }
+    KKSObject * io = loader->loadIO (IO_IO_ID, true);
+    if (!io)
+    {
+        tDls->release ();
+        ioDls->release ();
+        delete rwIOs;
+        delete rwDls;
+    }
+
+    KKSCategory * c = io->category()->tableCategory();
+    KKSTemplate *tio = c ? new KKSTemplate (c->defTemplate()) : 0;
+    if (!tio || !c)
+    {
+        if (c)
+            c->release ();
+        io->release ();
+        tDls->release ();
+        ioDls->release ();
+        delete rwIOs;
+        delete rwDls;
+    }
+
+    KKSList<const KKSFilter *> filters;
+    for (int i=0; i<idIOList.count(); i++)
+    {
+        KKSFilter * filter = c->createFilter (ATTR_ID, QString::number (idIOList[i]), KKSFilter::foEq);
+        filters.append (filter);
+        filter->release ();
+    }
+
+    KKSFilterGroup * fg = new KKSFilterGroup(false);
+    fg->setFilters(filters);
+    filterGroups.append (fg);
+    fg->release();
+
+    KKSViewFactory::loadEIOEx (0, io, loader, tio, tvIOs, filterGroups, true);
+
+    rwIOs->hideAllButtons ();
+    rwIOs->showEditGroup ();
+    KKSMessageWidget * messDial = new KKSMessageWidget (rwDls, rwIOs, 0);
+    connect (messDial, SIGNAL (addDocument()), this, SLOT (addSendIO()) );
+
+    if (messDial->exec() == QDialog::Accepted)
+    {
+        QList<int> idDls = messDial->getDlsList ();
+        QList<int> idIOs = messDial->getAttachments ();
+        QString messText = messDial->message ();
+        qDebug () << __PRETTY_FUNCTION__ << idDls << idIOs << messText;
+        for (int i=0; i<idDls.count(); i++)
+        {
+            if (!idIOs.isEmpty())
+            {
+                for (int j=0; j<idIOs.count(); j++)
+                {
+                    QString ioSql = QString ("select * from msginsertout (%1, %2, %3, 1)")
+                                            .arg (idIOs[j])
+                                            .arg (QString ("'%1'").arg (messText))
+                                            .arg (idDls[i]);
+                    KKSResult *res = loader->getDb()->execute (ioSql);
+                    if (!res || res->getRowCount () != 1 || res->getCellAsInt(0, 0) <= 0)
+                    {
+                        QMessageBox::warning (messDial, tr("Send message"), tr ("Cannot send message to %1").arg (idDls[i]), QMessageBox::Ok);
+                        continue;
+                    }
+                    if (res)
+                        delete res;
+                }
+            }
+            else
+            {
+                QString messSql = QString ("select * from msginsertout (NULL::integer, %1, %2, 1)")
+                                          .arg (QString ("'%1'").arg (messText))
+                                          .arg (idDls[i]);
+                KKSResult * res = loader->getDb()->execute (messSql);
+                if (!res || res->getRowCount () != 1 || res->getCellAsInt(0, 0) <= 0)
+                {
+                    QMessageBox::warning (messDial, tr("Send message"), tr ("Cannot send message to %1").arg (idDls[i]), QMessageBox::Ok);
+                    continue;
+                }
+                if (res)
+                    delete res;
+            }
+        }
+    }
+    delete messDial;
 }
 
 /* Метод добавляет новые ИО к сообщению(ям).
