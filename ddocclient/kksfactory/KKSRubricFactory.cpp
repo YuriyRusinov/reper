@@ -1062,4 +1062,23 @@ void KKSRubricFactory :: setAccessDocs (const QList<int>& ioIDList)
 {
     if (ioIDList.isEmpty())
         return;
+    QWidget * parentW = qobject_cast<QWidget *>(sender());
+    KKSAccessEntity * acl = new KKSAccessEntity ();
+    int idUser = loader->getUserId();
+    KKSStuffForm * sForm = stf->createStuffEditorForm (acl, idUser, parentW, Qt::Dialog);
+    if (sForm->exec() == QDialog::Accepted)
+    {
+        KKSAccessEntity * acw = sForm->getAccessEntity();
+        for (int i=0; i<ioIDList.count(); i++)
+        {
+            KKSObject * wObj = loader->loadIO (ioIDList[i]);
+            if (!wObj)
+                continue;
+            wObj->setAccessRules(acw);
+            ppf->updateIO (wObj);
+            wObj->release ();
+        }
+    }
+    sForm->setParent (0);
+    delete sForm;
 }
