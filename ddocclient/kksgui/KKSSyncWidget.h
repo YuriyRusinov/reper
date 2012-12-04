@@ -35,6 +35,10 @@ public:
 
     void setSyncOrgModel (QAbstractItemModel * sMod);
     void setSyncAttrVal (KKSAttrValue * attrVal);
+    KKSAttrValue * getSyncAttrVal (void) const;
+    
+    KKSAttrValue * getSyncAttrType (void) const;
+    void setSyncAttrType (KKSAttrValue * sAType);
 
     KKSSortFilterProxyModel * getSortModel (void) const;
 
@@ -75,6 +79,7 @@ private:
     bool m_accessOk;
 
     KKSAttrValue * syncAttrVal;
+    KKSAttrValue * syncAttrType;
     KKSSortFilterProxyModel * sortModel;
 
 private:

@@ -602,6 +602,7 @@ int KKSPPFactory::updateIO(KKSObject * io, QWidget * parent)
     //информация о синхронизируемых организациях всегда добавляется самая последняя, 
     //чтобы не было дублирования записей в таблице out_sync_queue
     QString ids = io->replicatedOrgsV().valueForInsert();
+    qDebug () << __PRETTY_FUNCTION__ << ids;
     sql = QString("select ioInsertOrgs(%1, %2);")
                                 .arg(io->id())
                                 .arg(ids);

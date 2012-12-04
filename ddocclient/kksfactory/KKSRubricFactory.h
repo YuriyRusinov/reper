@@ -33,6 +33,7 @@ class KKSObjEditor;
 class KKSStuffFactory;
 class RubricForm;
 class KKSObjectExemplar;
+class KKSEIOFactory;
 
 class _F_EXPORT KKSRubricFactory : public KKSEntityFactory
 {
@@ -72,7 +73,7 @@ class _F_EXPORT KKSRubricFactory : public KKSEntityFactory
         // Functions
         //
         friend class KKSSito;
-        KKSRubricFactory (KKSLoader *l, KKSPPFactory *_ppf, KKSObjEditorFactory *_oef, KKSStuffFactory * _stf, QObject* parent=0);
+        KKSRubricFactory (KKSLoader *l, KKSPPFactory *_ppf, KKSEIOFactory * _eiof, KKSObjEditorFactory *_oef, KKSStuffFactory * _stf, QObject* parent=0);
         ~KKSRubricFactory (void);
 
     private:
@@ -81,6 +82,7 @@ class _F_EXPORT KKSRubricFactory : public KKSEntityFactory
         //
         KKSLoader *loader;
         KKSPPFactory *ppf;
+        KKSEIOFactory *eiof;
         KKSObjEditorFactory *oef;
         KKSStuffFactory * stf;
         

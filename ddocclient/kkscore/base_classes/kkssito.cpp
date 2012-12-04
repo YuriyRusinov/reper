@@ -984,7 +984,7 @@ void KKSSito::initFactories()
         m_sf = new KKSStuffFactory (m_loader, m_ppf, m_objf, db());
 
     if (!m_rf)
-        m_rf = new KKSRubricFactory (m_loader, m_ppf, m_objf, m_sf);
+        m_rf = new KKSRubricFactory (m_loader, m_ppf, m_eiof, m_objf, m_sf);
 
     if (m_objf && m_rf)
         m_objf->setRubrFactory (m_rf);

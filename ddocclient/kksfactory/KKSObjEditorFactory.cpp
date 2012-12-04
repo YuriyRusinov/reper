@@ -104,6 +104,7 @@
 #include "KKSAddTable.h"
 #include "KKSAttrType.h"
 #include "KKSSyncWidget.h"
+#include "KKSSyncDialog.h"
 #include <KKSAccessEntity.h>
 #include "defines.h"
 
@@ -7072,6 +7073,266 @@ void KKSObjEditorFactory :: loadObjCAttrRef (KKSObjectExemplar * wObjE, const KK
             qDebug () << __PRETTY_FUNCTION__ << avals[i]->attribute()->id() << avals[i]->attribute()->id() << avals[i]->value().value();
 */
     refObj->release ();
+}
+
+/* слот загружает возможные виды синхронизации из таблицы tableName в виджет attrW дл€ атрибута с attrId
+ */
+void KKSObjEditorFactory :: loadSyncType (QString tableName, QWidget * attrW, qint64 attrId)
+{
+//    KKSAttrRefWidget *aRefW = qobject_cast<KKSAttrRefWidget *>(attrW);
+    QWidget * wEditor = qobject_cast<QWidget *>(this->sender());
+//    connect (this, SIGNAL (editorCreatedModal (KKSObjEditor *)), editor, SLOT (childWidget(KKSObjEditor *)) );
+    KKSObject *refObj = loader->loadIO (tableName, true);
+    if (!refObj)
+    {
+        qDebug () << __PRETTY_FUNCTION__ << tableName;
+        return;
+    }
+    KKSCategory *c = refObj->category ();
+    if (!c){
+        refObj->release();
+        return;
+    }
+
+    //qDebug () << __PRETTY_FUNCTION__ << editor << refObj->id();
+
+    //aRefW->
+
+    KKSList<const KKSFilterGroup*> filters;
+    KKSAttribute * a = loader->loadAttribute(attrId);
+    if(!a){
+        refObj->release();
+        return;
+    }
+
+    KKSSearchTemplate * st = NULL;
+    st = a->searchTemplate();
+    if(st){
+        KKSFilterGroup * fg = st->getMainGroup();
+        if(fg){
+            filters.append(fg);
+        }
+    }
+
+    KKSObjEditor * recEditor = this->createObjRecEditor (IO_IO_ID, 
+                                                         refObj->id (), 
+                                                         //editor->m_filters, 
+                                                         filters,//KKSList<const KKSFilterGroup*>(), 
+                                                         "",
+                                                         c,
+                                                         true,
+                                                         false,
+                                                         wEditor ? wEditor->windowModality () : Qt::ApplicationModal,
+                                                         wEditor, 
+                                                         Qt::Dialog);
+    if (!recEditor){
+        refObj->release();
+        return;
+    }
+
+    if (recEditor->exec () == QDialog::Accepted)
+    {
+        int idVal = recEditor->getID();
+        qDebug () << __PRETTY_FUNCTION__ << idVal;
+        QLineEdit * lE = qobject_cast<QLineEdit *> (attrW);
+        KKSAttribute * attr = loader->loadAttribute (attrId);
+        KKSSyncDialog * sDial = qobject_cast<KKSSyncDialog *>(this->sender());
+        //KKSObjEditor * editor = qobject_cast<KKSObjEditor *>(this->sender());
+        if (!attr){
+            refObj->release();
+            return;
+        }
+
+        //int idAttr = attr->id ();
+        QMap<int, QString> refValues;
+        QMap<int, QString> values = loader->loadAttributeValues (attr, refValues, false, true, attr->tableName());
+        QMap<int, QString>::const_iterator pv = values.constFind (idVal);
+        QString v_str;
+        if (pv != values.constEnd())
+            v_str = pv.value();
+        lE->setText (v_str);
+        KKSAttrValue * av(0);// = sDial->getSyncWidget();//pObjEx->attrValue (attrId);
+        KKSValue val (QString::number (idVal), KKSAttrType::atList);
+        KKSCategoryAttr * cAttr = KKSCategoryAttr::create (attr, true, false);
+        av = new KKSAttrValue (val, cAttr);
+        sDial->getSyncWidget()->setSyncAttrType (av);//setSyncAttrVal (av);
+        cAttr->release ();
+        av->release();
+        
+        attr->release ();
+    }
+    
+    refObj->release ();
+}
+
+void KKSObjEditorFactory :: loadSyncAddAttrRef (KKSAttrValue * avE, QAbstractItemModel * sMod)
+{
+    if (!avE || !sMod)
+        return;
+
+    QString tableName = avE->attribute()->tableName ();
+    qDebug () << __PRETTY_FUNCTION__ << tableName;
+    KKSObject *refObj = loader->loadIO (tableName, true);
+    if (!refObj)
+        return;
+    KKSCategory *c = refObj->category ();
+    if (!c){
+        refObj->release();
+        return;
+    }
+
+    KKSSyncDialog * wEditor = qobject_cast<KKSSyncDialog *>(this->sender());
+    KKSList<const KKSFilterGroup*> filters;
+    KKSCategory * ct = c->tableCategory ();
+    if (!ct){
+        refObj->release();
+        return;
+    }
+
+    QStringList sl;
+    for (int i=0; i<sMod->rowCount(); i++)
+        sl << QString::number (sMod->data (sMod->index (i, 0), Qt::UserRole).toInt());
+
+    QString value = sl.isEmpty() ? QString ("select id from %1").arg (tableName) : QString ("select id from %1 where id not in (%2)").arg (tableName).arg (sl.join (","));
+    
+    const KKSFilter * f = ct->createFilter (ATTR_ID, value, KKSFilter::foInSQL);
+    if (!f){
+        refObj->release();
+        return;
+    }
+
+    KKSList<const KKSFilter*> fl;
+    fl.append (f);
+    f->release ();
+    KKSFilterGroup * fg = new KKSFilterGroup (true);
+    fg->setFilters (fl);
+    filters.append (fg);
+    fg->release ();
+
+    KKSObjEditor * recEditor = this->createObjRecEditor (IO_IO_ID, 
+                                                         refObj->id (), 
+                                                         //editor->m_filters, 
+                                                         filters, 
+                                                         "",
+                                                         c,
+                                                         true, false,
+                                                         wEditor ? wEditor->windowModality () : Qt::ApplicationModal,
+                                                         wEditor, 
+                                                         Qt::Dialog);
+    if (!recEditor){
+        refObj->release();
+        return;
+    }
+
+    if (recEditor->exec () == QDialog::Accepted)
+    {
+        QStringList sl;
+        KKSAttrValue * av = wEditor->getSyncWidget()->getSyncAttrVal();//wObjE->attrValue (avE->attribute()->id());
+        if (!av)
+        {
+            QString s;
+            KKSValue val (s, KKSAttrType::atCheckListEx);
+            KKSObject * io = loader->loadIO (IO_IO_ID);
+            if (!io){
+                refObj->release();
+                return;
+            }
+
+            KKSCategory * c = io->category ();
+            if (!c){
+                refObj->release();
+                return;
+            }
+
+            c = c->tableCategory();
+            if (!c){
+                refObj->release();
+                return;
+            }
+
+            KKSCategoryAttr * cAttr = c->attribute (av->attribute()->id());
+            if (!cAttr){
+                refObj->release();
+                return;
+            }
+
+            av = new KKSAttrValue (val, cAttr);
+        }
+        
+        if (!av)
+        {
+            QMessageBox::critical (wEditor, av->attribute()->title(), tr("Cannot set value"), QMessageBox::Ok, QMessageBox::NoButton);
+        }
+        else
+        {
+            sl = av->value().value().split (",");
+            if (!sl.contains (QString::number (recEditor->getID())))
+            {
+                sl += QString::number (recEditor->getID());
+                int n = sMod->rowCount();
+                sMod->insertRows (n, 1);
+                QModelIndex wIndex = sMod->index (n, 0);
+                sMod->setData (wIndex, recEditor->getID(), Qt::UserRole);
+                updateAttrModel (wIndex, sMod, recEditor->getID(), tableName, refObj);
+                QString s = QString ("{%1}").arg (sl.join (","));
+                KKSValue val (s, KKSAttrType::atCheckListEx);
+                //qDebug () << __PRETTY_FUNCTION__ << sl << av->attribute()->id();
+                av->setValue (val);
+                const_cast<KKSAttrValue *>(avE)->setValue (val);
+//                wEditor->setObjChanged (true);
+            }
+        }
+    }
+}
+
+void KKSObjEditorFactory :: loadSyncDelAttrRef (KKSAttrValue * avE, const QModelIndex& oInd, QAbstractItemModel * sMod)
+{
+    if (!avE || !sMod || !oInd.isValid())
+        return;
+    
+    QString tableName = avE->attribute()->tableName ();
+    KKSObject *refObj = loader->loadIO (tableName, true);
+    if (!refObj)
+        return;
+    
+    KKSCategory *c = refObj->category ();
+    if (!c){
+        refObj->release();
+        return;
+    }
+
+    KKSSyncDialog * wEditor = qobject_cast<KKSSyncDialog *>(this->sender());
+
+    int res = QMessageBox::question (wEditor, 
+                                     tr("Delete value from %1").arg (avE->attribute()->title()), 
+                                     tr("Do you really want to delete ?"), 
+                                     QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
+
+    if (res == QMessageBox::Yes)
+    {
+        QStringList sl;
+        KKSAttrValue * av = wEditor->getSyncWidget()->getSyncAttrVal();// wObjE->attrValue (avE->attribute()->id());
+        qDebug () << __PRETTY_FUNCTION__ << (av ? av->value().value() : QString());
+        if (av)
+            sl = av->value().value().split (",");
+        if (sl.contains (QString::number (oInd.data (Qt::UserRole).toInt())))
+        {
+            int ipos = sl.indexOf (QString::number (oInd.data (Qt::UserRole).toInt()));
+            sl.removeAt (ipos);
+            qDebug () << __PRETTY_FUNCTION__ << sl;
+            int row = oInd.row();
+            QModelIndex par = oInd.parent();
+            sMod->removeRows (row, 1, par);
+            int nr = sMod->rowCount (par);
+            KKSValue val (sl.join (","), KKSAttrType::atCheckListEx);
+            av->setValue (val);
+            const_cast<KKSAttrValue *>(avE)->setValue (val);
+            for (int i=0; i<nr; i++)
+                sMod->setData (sMod->index (i, 0, par), sl[i].toInt(), Qt::UserRole);
+        }
+    }
+    
+    refObj->release();
 }
 
 /* ћетод обновл€ет модель значений атрибута типа многие-ко-многим.

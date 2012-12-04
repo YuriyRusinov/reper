@@ -15,6 +15,7 @@
 #include <KKSRubric.h>
 #include <KKSEventFilter.h>
 #include "KKSPPFactory.h"
+#include "KKSEIOFactory.h"
 #include "KKSObjEditorFactory.h"
 #include "KKSStuffFactory.h"
 #include <KKSObjEditor.h>
@@ -29,13 +30,16 @@
 #include <KKSEIOData.h>
 #include <KKSEIODataModel.h>
 #include <KKSSyncDialog.h>
+#include <KKSSyncWidget.h>
+#include <KKSSortFilterProxyModel.h>
 
 #include "KKSRubricFactory.h"
 
-KKSRubricFactory :: KKSRubricFactory (KKSLoader *l, KKSPPFactory *_ppf, KKSObjEditorFactory *_oef, KKSStuffFactory * _stf, QObject* parent)
+KKSRubricFactory :: KKSRubricFactory (KKSLoader *l, KKSPPFactory *_ppf, KKSEIOFactory *_eiof, KKSObjEditorFactory *_oef, KKSStuffFactory * _stf, QObject* parent)
     : KKSEntityFactory(parent),
     loader (l),
     ppf (_ppf),
+    eiof (_eiof),
     oef (_oef),
     stf (_stf)
 {
@@ -948,7 +952,92 @@ void KKSRubricFactory :: setSyncSettings (const QList<int>& ioIDList)
         return;
 
     KKSSyncDialog * syncD = new KKSSyncDialog ();
+    KKSSyncWidget * syncW = syncD->getSyncWidget ();
+    int idUser = loader->getUserId();
+    KKSObject * refObj = loader->loadIO (IO_IO_ID);
+    KKSObjectExemplar * wObjE = loader->loadEIO (ioIDList.at(0), refObj);
+    int attrId = ATTR_ID_SYNC_TYPE;
+    KKSAttribute * attr = loader->loadAttribute (attrId);
+    KKSAttrValue * av = wObjE->attrValue (attrId);
+    if (av)
+    {
+        QMap<int, QString> refValues;
+        QMap<int, QString> values = loader->loadAttributeValues (attr, refValues, false, true, attr->tableName());
+        QMap<int, QString>::const_iterator pv = values.constFind (av->value().value().toInt());
+        QString v_str = QString();
+        if (pv != values.constEnd())
+            v_str = pv.value();
+        syncW->setSyncType (v_str);
+    }
+    attr->release ();
+    qint64 idObjE = wObjE->id();
+    KKSCategory * c = wObjE->io()->category();
+    if (!c)
+        return;
+    KKSCategory * ct = c->tableCategory ();
+    if (!ct)
+        return;
+    QMap<int, QStringList> syncOrgs = loader->getSyncOrg (idObjE);
+    KKSCategoryAttr * syncAttr = ct->attribute (ATTR_IO_OBJECTS_ORGANIZATION);
+    KKSCategoryAttr * syncAttrType = ct->attribute (ATTR_ID_SYNC_TYPE);
+    KKSAttrValue * syncAttrVal (0);//= new KKSAttrValue (sVal, syncAttr);
+    KKSValue val (QString ("{}"), KKSAttrType::atCheckListEx);
+    syncAttrVal = new KKSAttrValue (val, syncAttr);
+    KKSAttrValue * syncAttrTypeV (0);
+    KKSValue valt (QString (""), KKSAttrType::atList);
+    syncAttrTypeV = new KKSAttrValue (valt, syncAttrType);
+    syncW->setSyncAttrVal (syncAttrVal);
+    syncW->setSyncAttrType (syncAttrVal);
+    if (syncAttrVal)
+        syncAttrVal->release ();
+    connect (syncD, SIGNAL (loadSyncRef (QString, QWidget *, qint64)),
+             oef, 
+             SLOT (loadSyncType (QString, QWidget *, qint64))
+            );
+    connect (syncD, SIGNAL (loadAddSyncOrg (KKSAttrValue *, QAbstractItemModel *)), 
+             oef,
+             SLOT (loadSyncAddAttrRef (KKSAttrValue *, QAbstractItemModel *)) 
+            );
+    connect (syncD, SIGNAL (loadDelSyncOrg (KKSAttrValue *, const QModelIndex&, QAbstractItemModel *)),
+             oef,
+             SLOT (loadSyncDelAttrRef (KKSAttrValue *, const QModelIndex&, QAbstractItemModel *))
+            );
     if (syncD->exec() == QDialog::Accepted)
     {
+        KKSAttrValue * syncVal = syncW->getSyncAttrVal();
+        KKSAttrValue * syncType = syncW->getSyncAttrType ();
+        KKSObject * ioRef = loader->loadIO (IO_IO_ID);
+        qDebug () << __PRETTY_FUNCTION__ << syncVal->value().value();
+        for (int i=0; i<ioIDList.count(); i++)
+        {
+            KKSObjectExemplar * rio = loader->loadEIO (ioIDList[i], ioRef);
+            if (!rio)
+                continue;
+            KKSAttrValue * av = rio->attrValue(syncVal->attribute()->id());
+            if (!av)
+                rio->addAttrValue (syncVal);
+            else
+            {
+                rio->removeAttrValue (av);
+                rio->addAttrValue (syncVal);
+            }
+            KKSAttrValue * avT = rio->attrValue (syncType->attribute()->id());
+            if (!avT)
+                rio->addAttrValue (syncType);
+            else
+            {
+                rio->removeAttrValue (avT);
+                rio->addAttrValue (syncType);
+            }
+            KKSObject * wObj = loader->loadIO (ioIDList[i]);
+            bool ok = KKSConverter::objectFromExemplar(loader, wObj, rio);
+            wObj->setIsGlobal (syncW->isCheckGlobal());
+            qDebug () << __PRETTY_FUNCTION__ << wObj->isGlobal();
+            int ier = ppf->updateIO (wObj);//eiof->updateEIO (rio);
+            wObj->release ();
+            qDebug () << __PRETTY_FUNCTION__ << ok << ier;
+            rio->release ();
+        }
+        ioRef->release ();
     }
 }

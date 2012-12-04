@@ -37,6 +37,7 @@ KKSSyncWidget :: KKSSyncWidget (QWidget * parent, bool accessOk, Qt::WFlags f)
     tvSync (new QTreeView (this)),
     gLay (new QGridLayout (this)),
     syncAttrVal (0),
+    syncAttrType (0),
     sortModel (new KKSSortFilterProxyModel())
 {
     //Q_INIT_RESOURCE (kksgui_icon_set);
@@ -65,6 +66,8 @@ KKSSyncWidget :: ~KKSSyncWidget (void)
 {
     if (syncAttrVal)
         syncAttrVal->release ();
+    if (syncAttrType)
+        syncAttrType->release ();
 }
 
 bool KKSSyncWidget :: isCheckGlobal (void) const
@@ -110,6 +113,27 @@ void KKSSyncWidget :: setSyncAttrVal (KKSAttrValue * attrVal)
 
     if (syncAttrVal)
         syncAttrVal->addRef ();
+}
+
+KKSAttrValue * KKSSyncWidget :: getSyncAttrVal (void) const
+{
+    return syncAttrVal;
+}
+
+KKSAttrValue * KKSSyncWidget :: getSyncAttrType (void) const
+{
+    return syncAttrType;
+}
+
+void KKSSyncWidget :: setSyncAttrType (KKSAttrValue * sAType)
+{
+    if (syncAttrType)
+        syncAttrType->release ();
+    
+    syncAttrType = sAType;
+
+    if (syncAttrType)
+        syncAttrType->addRef ();
 }
 
 void KKSSyncWidget :: setGlobal (int state)

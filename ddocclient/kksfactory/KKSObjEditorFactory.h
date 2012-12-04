@@ -332,6 +332,12 @@ private slots:
                              KKSIndAttr::KKSIndAttrClass isSystem, 
                              QAbstractItemModel * sourceModel, 
                              const QModelIndex& wInd);
+public slots:
+    void loadSyncType (QString tableName, QWidget * attrW, qint64 attrId);
+    void loadSyncAddAttrRef (KKSAttrValue * av, QAbstractItemModel * sMod);
+    void loadSyncDelAttrRef (KKSAttrValue * av, const QModelIndex& oInd, QAbstractItemModel * sMod);
+
+private slots:    
     void loadRefIO (QString tableName);
     void genUUID (int idAttr, const KKSAttrValue * av);
 
