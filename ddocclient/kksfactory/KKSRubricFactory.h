@@ -67,6 +67,9 @@ class _F_EXPORT KKSRubricFactory : public KKSEntityFactory
         void objEditorClosed ();
         void appendRecord (int idObject, const KKSRubric* r, QAbstractItemModel * attachModel, const QModelIndex& parent);
         void setSyncSettings (const QList<int>& ioIDList);
+        void putIntoRubr (const QList<int>& ioIDList);
+        void sendDocs (const QList<int>& ioIDList);
+        void setAccessDocs (const QList<int>& ioIDList);
 
     private:
         //

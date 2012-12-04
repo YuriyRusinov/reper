@@ -1485,7 +1485,7 @@ void KKSIncludesWidget :: putIntoAnotherRubric (void)
         QMessageBox::warning (this, tr ("Put selected documents"), tr("Select documents for copy"), QMessageBox::Ok);
         return;
     }
-    
+    emit putIOSIntoRubr (selectedIO);
 }
 
 void KKSIncludesWidget :: sendIOS (void)
@@ -1496,6 +1496,7 @@ void KKSIncludesWidget :: sendIOS (void)
         QMessageBox::warning (this, tr ("Send selected documents"), tr("Select documents for send"), QMessageBox::Ok);
         return;
     }
+    emit sendIOS (selectedIO);
 }
 
 void KKSIncludesWidget :: setAccessRules (void)
@@ -1506,7 +1507,7 @@ void KKSIncludesWidget :: setAccessRules (void)
         QMessageBox::warning (this, tr ("Set access rules"), tr("Select documents for set"), QMessageBox::Ok);
         return;
     }
-    
+    emit setAccessIOS (selectedIO);
 }
 
 /*=================*/
