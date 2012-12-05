@@ -31,6 +31,7 @@
 #include <KKSEIODataModel.h>
 #include <KKSSyncDialog.h>
 #include <KKSSyncWidget.h>
+#include <KKSStuffDialog.h>
 #include <KKSSortFilterProxyModel.h>
 
 #include "KKSRubricFactory.h"
@@ -1066,7 +1067,8 @@ void KKSRubricFactory :: setAccessDocs (const QList<int>& ioIDList)
     KKSAccessEntity * acl = new KKSAccessEntity ();
     int idUser = loader->getUserId();
     KKSStuffForm * sForm = stf->createStuffEditorForm (acl, idUser, parentW, Qt::Dialog);
-    if (sForm->exec() == QDialog::Accepted)
+    KKSStuffDialog * sDial = new KKSStuffDialog (sForm);
+    if (sDial->exec() == QDialog::Accepted)
     {
         KKSAccessEntity * acw = sForm->getAccessEntity();
         for (int i=0; i<ioIDList.count(); i++)

@@ -44,6 +44,7 @@ HEADERS += \
                 KKSSyncWidget.h \
                 KKSSyncDialog.h \
                 kksstuffform.h \
+                KKSStuffDialog.h \
                 KKSVideoPlayer.h \
                 KKSEIODataModel.h \
                 KKSRecProxyModel.h \
@@ -143,6 +144,7 @@ SOURCES += \
 		ui/kksstatisticview.cpp \
                 ui/kksxmlform.cpp \
                 kksstuffform.cpp \
+                KKSStuffDialog.cpp \
                 ui/messageform.cpp \
                 ui/periodicreportform.cpp \
                 ui/rubricform.cpp \
@@ -244,6 +246,7 @@ headers.files += \
                 ui/kkscatattreditor.h \
                 ui/kksattrattreditor.h \
                 kksstuffform.h \
+                KKSStuffDialog.h \
                 ui/messageform.h \
                 ui/periodicreportform.h \
                 ui/rubricform.h \
