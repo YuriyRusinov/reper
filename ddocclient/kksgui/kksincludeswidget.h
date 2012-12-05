@@ -117,7 +117,7 @@ signals:
     void appendRubricRecord (int idObject, const KKSRubric * r, QAbstractItemModel * attachModel, const QModelIndex& parent);
     
     void setSyncIO (const QList<int>& ioIDList);
-    void putIOSIntoRubr (const QList<int>& ioIDList);
+    void putIOSIntoRubr (const QList<int>& ioIDList, const KKSRubric* cRubric);
     void sendIOS (const QList<int>& ioIDList);
     void setAccessIOS (const QList<int>& ioIDList);
 

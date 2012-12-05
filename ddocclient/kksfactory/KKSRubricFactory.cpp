@@ -145,7 +145,7 @@ KKSIncludesWidget * KKSRubricFactory :: createRubricEditor (int mode, const KKSL
     connect (iW, SIGNAL (initAttachmentsModel (const KKSRubric *)), this, SLOT (initRubricAttachments (const KKSRubric *)) );
     connect (iW, SIGNAL (appendRubricItemIntoModel (QAbstractItemModel *, const KKSRubricItem * )), this, SLOT (appendRubricItem (QAbstractItemModel *, const KKSRubricItem *)) );
     connect (iW, SIGNAL (setSyncIO(const QList<int>&)), this, SLOT (setSyncSettings (const QList<int>&)) );
-    connect (iW, SIGNAL (putIOSIntoRubr (const QList<int>&)), this, SLOT (putIntoRubr (const QList<int>&)) );
+    connect (iW, SIGNAL (putIOSIntoRubr (const QList<int>&, const KKSRubric*)), this, SLOT (putIntoRubr (const QList<int>&, const KKSRubric*)) );
     connect (iW, SIGNAL (sendIOS (const QList<int>&)), this, SLOT (sendDocs (const QList<int>&)) );
     connect (iW, SIGNAL (setAccessIOS (const QList<int>&)), this, SLOT (setAccessDocs (const QList<int>&)) );
     
@@ -1046,9 +1046,9 @@ void KKSRubricFactory :: setSyncSettings (const QList<int>& ioIDList)
     }
 }
 
-void KKSRubricFactory :: putIntoRubr (const QList<int>& ioIDList)
+void KKSRubricFactory :: putIntoRubr (const QList<int>& ioIDList, const KKSRubric * oldRubric)
 {
-    if (ioIDList.isEmpty())
+    if (ioIDList.isEmpty() || !oldRubric)
         return;
 }
 

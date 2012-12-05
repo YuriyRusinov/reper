@@ -1485,7 +1485,8 @@ void KKSIncludesWidget :: putIntoAnotherRubric (void)
         QMessageBox::warning (this, tr ("Put selected documents"), tr("Select documents for copy"), QMessageBox::Ok);
         return;
     }
-    emit putIOSIntoRubr (selectedIO);
+    const KKSRubric * r = currentRubric();
+    emit putIOSIntoRubr (selectedIO, r);
 }
 
 void KKSIncludesWidget :: sendIOS (void)
