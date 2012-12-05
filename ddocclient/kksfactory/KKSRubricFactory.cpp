@@ -52,7 +52,7 @@ KKSRubricFactory :: ~KKSRubricFactory (void)
 {
 }
 
-KKSIncludesWidget * KKSRubricFactory :: createRubricEditor (int mode, const KKSList<const KKSFilterGroup *> & filters, QWidget* parent)
+KKSIncludesWidget * KKSRubricFactory :: createRubricEditor (int mode, const KKSList<const KKSFilterGroup *> & filters, bool withCategories, QWidget* parent)
 {
     Q_UNUSED (filters);
     bool isDocs (mode==atMyDocsRubric);
@@ -107,7 +107,7 @@ KKSIncludesWidget * KKSRubricFactory :: createRubricEditor (int mode, const KKSL
     {
         int nr = rubrMod->rowCount();
         bool isIns = rubrMod->insertRows (nr, 1);
-        if (isIns)
+        if (withCategories && isIns)
         {
             QModelIndex wIndex = rubrMod->index (nr, 0);
             const KKSRubricBase * rOthers = loader->loadCatRubricators ();//new KKSRubricOthers (-1, tr("Others"));

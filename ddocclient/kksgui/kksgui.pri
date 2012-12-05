@@ -58,6 +58,7 @@ HEADERS += \
 		ui/kksfilterseditorform.h \
 		ui/kksfilewidget.h \
 		kksincludeswidget.h \
+		KKSIncludesDialog.h \
                 ui/kksxmlform.h \
 		ui/kksstatisticview.h \
                 ui/kksattreditor.h \
@@ -141,6 +142,7 @@ SOURCES += \
 		ui/kksfilterseditorform.cpp \
 		ui/kksfilewidget.cpp \
 		kksincludeswidget.cpp \
+		KKSIncludesDialog.cpp \
 		ui/kksstatisticview.cpp \
                 ui/kksxmlform.cpp \
                 kksstuffform.cpp \
@@ -241,6 +243,7 @@ headers.files += \
 		ui/kksfilewidget.h \
 		ui/kksstatisticview.h \
 		kksincludeswidget.h \
+		KKSIncludesDialog.h \
                 ui/kksxmlform.h \
                 ui/kksattreditor.h \
                 ui/kkscatattreditor.h \

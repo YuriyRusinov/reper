@@ -38,7 +38,7 @@ class KKSEIOFactory;
 class _F_EXPORT KKSRubricFactory : public KKSEntityFactory
 {
     public:
-        KKSIncludesWidget * createRubricEditor (int mode, const KKSList<const KKSFilterGroup *>& filters, QWidget* parent=0);
+        KKSIncludesWidget * createRubricEditor (int mode, const KKSList<const KKSFilterGroup *>& filters, bool withCategories=true, QWidget* parent=0);
         enum RubricMode
         {
             atRootRubric = 0,
