@@ -903,7 +903,8 @@ void KKSRubricFactory :: initRubricAttachments (const KKSRubric * r)
 {
     if (!r)
         return;
-    
+
+    qDebug () << __PRETTY_FUNCTION__ << r->name() << r->items().count();
     KKSMap<qint64, KKSEIOData *> rData = KKSConverter::rubricEntityToData(loader, r);
     KKSObject * refIO = loader->loadIO(IO_IO_ID);
     const KKSCategory * cat (0);
@@ -1178,7 +1179,8 @@ void KKSRubricFactory :: putIntoRubr (const QList<int>& ioIDList, const KKSRubri
             wObj->release ();
         }
         qDebug () << __PRETTY_FUNCTION__ << r->items().count();
-        saveRubric (iW->rootRubric(), false);
+        ppf->updateRubrics (const_cast<KKSRubric *>(r));
+        //saveRubric (iW->rootRubric(), false);
         initRubricAttachments (r);
         
     }

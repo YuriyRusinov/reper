@@ -159,7 +159,9 @@ class _F_EXPORT KKSPPFactory
         int updateIncludes(const KKSObject * io) const;
         int insertIncludes(const KKSObject * io) const;
         int deleteIncludes(int idObject) const;
+public:
         int updateRubrics(KKSRubric * parent, int idMyDocsRubricator = -1) const;
+private:
         int updateRubric(KKSRubric * r) const;
         int insertRubrics(KKSRubric * parent, int idMyDocsRubricator = -1) const;
         int insertRubric(KKSRubric * r, int idParent, int idObject, bool root = false, int idMyDocsRubricator = -1) const;
