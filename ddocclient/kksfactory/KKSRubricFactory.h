@@ -45,6 +45,7 @@ class _F_EXPORT KKSRubricFactory : public KKSEntityFactory
             atMyDocsRubric = 1,
             atOthers = 2
         };
+        KKSIncludesWidget * createModalRubricEditor (int mode, const KKSList<const KKSFilterGroup *>& filters, bool withCategories=true, QWidget* parent=0);
 
     signals:
         void rubricEditorCreated (KKSIncludesWidget *rEditor);

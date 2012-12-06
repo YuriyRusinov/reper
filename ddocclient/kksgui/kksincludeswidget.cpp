@@ -317,6 +317,11 @@ QModelIndex KKSIncludesWidget::appendItemRow(const KKSRubricItem * item, QModelI
     return cIndex;
 }
 
+QAbstractItemModel * KKSIncludesWidget::rubrItemsModel (void) const
+{
+    return recWItems->getSourceModel();
+}
+
 QModelIndex KKSIncludesWidget::appendRubricRow(const KKSRubric * r, QModelIndex pindex)
 {
     if(!r)
@@ -1267,7 +1272,7 @@ void KKSIncludesWidget::rubricSelectionChanged (const QItemSelection& selected, 
     QModelIndexList wIndexList (selected.indexes());
     QModelIndexList oldIndexList (deselected.indexes());
 
-    if (isRec || (wIndexList.isEmpty() && oldIndexList.isEmpty()))
+    if (rubricsOnly || isRec || (wIndexList.isEmpty() && oldIndexList.isEmpty()))
     {
         recWItems->setVisible (false);
         return;
@@ -1511,6 +1516,25 @@ void KKSIncludesWidget :: setAccessRules (void)
     emit setAccessIOS (selectedIO);
 }
 
+const KKSRubric * KKSIncludesWidget :: getSelectedRubric (void)
+{
+    return this->currentRubric();
+}
+
+bool KKSIncludesWidget :: isRubrics (void) const
+{
+    return rubricsOnly;
+}
+
+void KKSIncludesWidget :: setForRubrics (bool isr)
+{
+    rubricsOnly = isr;
+    if (isr)
+    {
+        recWItems->setVisible (false);
+        tBRubrActions->setVisible (false);
+    }
+}
 /*=================*/
 KKSIncludesItemDelegate::KKSIncludesItemDelegate(QObject * parent) : QItemDelegate(parent)
 {

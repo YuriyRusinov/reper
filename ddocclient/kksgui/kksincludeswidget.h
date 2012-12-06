@@ -49,10 +49,16 @@ public:
     QAbstractItemModel * rubrModel () const;
     void setRubrModel (QAbstractItemModel * rModel);
     
+    QAbstractItemModel * rubrItemsModel (void) const;
+    
     void addRubricIntoModel (KKSRubric * cRubr, const QModelIndex& pIndex=QModelIndex());
 
     void save (void);
     void setSaved (bool isSaved);
+
+    const KKSRubric * getSelectedRubric (void);
+    bool isRubrics (void) const;
+    void setForRubrics (bool isr);
 
 protected:
     //
@@ -130,6 +136,8 @@ private:
     bool isMyDoc;
     bool isChanged;
     bool isRec;
+    bool rubricsOnly;
+
     QToolBar * tBRubrActions;
     QSplitter * spRubrics;
     QTreeView * twIncludes;

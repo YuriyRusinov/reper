@@ -9,6 +9,7 @@
 #include <QtDebug>
 
 #include <kksincludeswidget.h>
+#include <KKSIncludesDialog.h>
 #include <rubricform.h>
 #include "KKSLoader.h"
 #include "KKSConverter.h"
@@ -103,11 +104,11 @@ KKSIncludesWidget * KKSRubricFactory :: createRubricEditor (int mode, const KKSL
     KKSIncludesWidget *iW = new KKSIncludesWidget (rootR, false, isDocs, false, false, parent);
     QTreeView *tv = iW->tvRubr();
     QAbstractItemModel * rubrMod = iW->rubrModel();
-    if (rubrMod)
+    if (rubrMod && withCategories)
     {
         int nr = rubrMod->rowCount();
         bool isIns = rubrMod->insertRows (nr, 1);
-        if (withCategories && isIns)
+        if (isIns)
         {
             QModelIndex wIndex = rubrMod->index (nr, 0);
             const KKSRubricBase * rOthers = loader->loadCatRubricators ();//new KKSRubricOthers (-1, tr("Others"));
@@ -152,6 +153,100 @@ KKSIncludesWidget * KKSRubricFactory :: createRubricEditor (int mode, const KKSL
     connect (this, SIGNAL (rubricAttachments (QAbstractItemModel *)), iW, SLOT (slotInitAttachmentsModel (QAbstractItemModel *)) );
     emit rubricEditorCreated (iW);
 
+    return iW;
+}
+
+KKSIncludesWidget * KKSRubricFactory :: createModalRubricEditor (int mode, const KKSList<const KKSFilterGroup *> & filters, bool withCategories, QWidget* parent)
+{
+    Q_UNUSED (filters);
+    bool isDocs (mode==atMyDocsRubric);
+
+    KKSRubric * rootR = loader->loadRubricators ( isDocs );
+    if (!rootR){
+        rootR = new KKSRubric(-1, "root rubric for all tree");
+        KKSRubric * rubrMyDocs = new KKSRubric (-1, tr("My Documents"));
+        if (!rubrMyDocs)
+            return 0;
+        rootR->addRubric (rubrMyDocs);
+        int res = ppf->updateRubricators (rootR, isDocs);
+        if (res != OK_CODE)
+        {
+            QMessageBox::warning (parent, tr("Rubricator"), tr ("Cannot load My documents"), QMessageBox::Ok);
+            return 0;
+        }
+
+        ppf->createMyDocsRubricator (rubrMyDocs->id());
+    }
+
+    QString title;
+    switch (mode)
+    {
+        case atRootRubric:
+            {
+                title = tr ("All rubrics");
+                break;
+            }
+        case atMyDocsRubric:
+            {
+                title = tr ("My Documents");
+                break;
+            }
+        case atOthers:
+            {
+                title = tr ("Others");
+                break;
+            }
+        default:
+            {
+                rootR->release();
+                return 0;
+                break;
+            }
+    }
+
+    KKSIncludesWidget *iW = new KKSIncludesWidget (rootR, false, isDocs, false, false, parent);
+    iW->setForRubrics (true);
+    QTreeView *tv = iW->tvRubr();
+    QAbstractItemModel * rubrMod = iW->rubrModel();
+    if (rubrMod && withCategories)
+    {
+        int nr = rubrMod->rowCount();
+        bool isIns = rubrMod->insertRows (nr, 1);
+        if (isIns)
+        {
+            QModelIndex wIndex = rubrMod->index (nr, 0);
+            const KKSRubricBase * rOthers = loader->loadCatRubricators ();//new KKSRubricOthers (-1, tr("Others"));
+            bool isRubrDataSet = rubrMod->setData (wIndex, QVariant::fromValue<const KKSRubricBase *>(rOthers), Qt::UserRole+1);
+            Q_UNUSED (isRubrDataSet);
+        }
+    }
+    KKSEventFilter *ef = new KKSEventFilter (iW);
+    iW->setWindowTitle (title);
+    tv->viewport()->installEventFilter (ef);
+    if (rootR)
+        rootR->release ();
+
+    //QAbstractItemDelegate *iDeleg = tv->itemDelegate ();
+    //qDebug () << __PRETTY_FUNCTION__ << iDeleg;
+/*
+    connect (iW, SIGNAL (saveRubric (KKSRubric *, bool)), this, SLOT (saveRubric (KKSRubric *, bool)) );
+    connect (iW, SIGNAL (rubricItemRequested (bool)), this, SLOT (rubricItemUpload(bool)) );
+    connect (iW, SIGNAL (rubricItemCreationRequested (const KKSRubric *, QAbstractItemModel*, const QModelIndex&)), this, SLOT (rubricItemCreate(const KKSRubric *, QAbstractItemModel *, const QModelIndex&)) );
+    connect (iW, SIGNAL (openRubricItemRequested (int)), this, SLOT (openRubricItem (int)) );
+    connect (iW, SIGNAL (loadStuffModel (RubricForm *)), this, SLOT (loadRubricPrivilegies(RubricForm *)) );
+    connect (iW, SIGNAL (loadSearchtemplate (RubricForm *)), this, SLOT (loadSearchTemplate (RubricForm *)) );
+    connect (iW, SIGNAL (loadCategory (RubricForm *)), this, SLOT (loadCategory (RubricForm *)) );
+    connect (iW, SIGNAL (rubricAttachmentsView (QAbstractItemModel *, const KKSRubric *)), this, SLOT (viewAttachments (QAbstractItemModel *, const KKSRubric *)) );
+    connect (iW, SIGNAL (copyFromRubr(KKSRubric *, QAbstractItemModel *, const QModelIndex&)), this, SLOT (copyFromRubric (KKSRubric *, QAbstractItemModel *, const QModelIndex&)) );
+    connect (iW, SIGNAL (initAttachmentsModel (const KKSRubric *)), this, SLOT (initRubricAttachments (const KKSRubric *)) );
+    connect (iW, SIGNAL (appendRubricItemIntoModel (QAbstractItemModel *, const KKSRubricItem * )), this, SLOT (appendRubricItem (QAbstractItemModel *, const KKSRubricItem *)) );
+    connect (iW, SIGNAL (setSyncIO(const QList<int>&)), this, SLOT (setSyncSettings (const QList<int>&)) );
+    connect (iW, SIGNAL (putIOSIntoRubr (const QList<int>&, const KKSRubric*)), this, SLOT (putIntoRubr (const QList<int>&, const KKSRubric*)) );
+    connect (iW, SIGNAL (sendIOS (const QList<int>&)), this, SLOT (sendDocs (const QList<int>&)) );
+    connect (iW, SIGNAL (setAccessIOS (const QList<int>&)), this, SLOT (setAccessDocs (const QList<int>&)) );
+    
+    connect (this, SIGNAL (rubricAttachments (QAbstractItemModel *)), iW, SLOT (slotInitAttachmentsModel (QAbstractItemModel *)) );
+*/
     return iW;
 }
 
@@ -819,8 +914,9 @@ void KKSRubricFactory :: initRubricAttachments (const KKSRubric * r)
     cat = refIO->category()->tableCategory();
     const KKSTemplate * t = new KKSTemplate (cat->defTemplate ());
     QAbstractItemModel * attachModel = new KKSEIODataModel (t, rData);//new QStandardItemModel (0, 0);
+    int nr = attachModel->rowCount();
     //qDebug () << __PRETTY_FUNCTION__ << attachModel->rowCount() << attachModel->columnCount();
-    for (int i=0; i<attachModel->rowCount(); i++)
+    for (int i=0; i<nr; i++)
     {
         QModelIndex iconInd = attachModel->index (i, 0);
         //
@@ -1048,8 +1144,45 @@ void KKSRubricFactory :: setSyncSettings (const QList<int>& ioIDList)
 
 void KKSRubricFactory :: putIntoRubr (const QList<int>& ioIDList, const KKSRubric * oldRubric)
 {
-    if (ioIDList.isEmpty() || !oldRubric)
+    if (ioIDList.isEmpty())
         return;
+    KKSList<const KKSFilterGroup*> filters;
+    KKSIncludesWidget * anotherW = this->createModalRubricEditor(atRootRubric, filters, false);
+    KKSIncludesDialog * rubrDial = new KKSIncludesDialog (anotherW);
+    anotherW->hideIncludes();
+    QWidget * pWidget = qobject_cast<QWidget *>(this->sender());
+    KKSIncludesWidget * iW = qobject_cast<KKSIncludesWidget *>(this->sender());
+    QAbstractItemModel * attachModel = iW->rubrItemsModel();
+    if (rubrDial->exec() == QDialog::Accepted)
+    {
+        const KKSRubric * r = anotherW->getSelectedRubric ();
+        if (!r)
+        {
+            QMessageBox::warning (pWidget, tr("Copy documents"), tr ("Select destignation"), QMessageBox::Ok);
+            return;
+        }
+        if (oldRubric && (oldRubric == r || oldRubric->id() == r->id() ) )
+        {
+            QMessageBox::warning (pWidget, tr("Copy documents"), tr ("You put documents into same rubric"), QMessageBox::Ok);
+            return;
+        }
+        for (int i=0; i<ioIDList.count(); i++)
+        {
+            KKSObject * wObj = loader->loadIO (ioIDList[i]);
+            if (!wObj)
+                continue;
+            KKSRubricItem * rItem = new KKSRubricItem (ioIDList[i], wObj->name());
+            (const_cast<KKSRubric *>(r))->addItem (rItem);
+            //appendRubricItem (attachModel, rItem);
+            rItem->release ();
+            wObj->release ();
+        }
+        qDebug () << __PRETTY_FUNCTION__ << r->items().count();
+        saveRubric (iW->rootRubric(), false);
+        initRubricAttachments (r);
+        
+    }
+    delete rubrDial;
 }
 
 void KKSRubricFactory :: sendDocs (const QList<int>& ioIDList)

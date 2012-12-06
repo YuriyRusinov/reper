@@ -19,6 +19,7 @@ KKSIncludesDialog::KKSIncludesDialog(KKSIncludesWidget * iW, QWidget * parent, Q
     pbCancel (new QPushButton (tr("&Cancel"), this))
 {
     QGridLayout * gLay = new QGridLayout (this);
+    incWidget->setParent(this);
     gLay->addWidget (incWidget, 0, 0, 1, 1);
 
     QHBoxLayout * hButtonsLay = new QHBoxLayout ();
@@ -34,7 +35,10 @@ KKSIncludesDialog::KKSIncludesDialog(KKSIncludesWidget * iW, QWidget * parent, Q
 KKSIncludesDialog::~KKSIncludesDialog()
 {
     if (incWidget)
+    {
+        incWidget->setParent (0);
         delete incWidget;
+    }
 }
 
 KKSIncludesWidget * KKSIncludesDialog :: getIncWidget (void) const
