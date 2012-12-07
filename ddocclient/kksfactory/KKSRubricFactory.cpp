@@ -931,7 +931,8 @@ void KKSRubricFactory :: initRubricAttachments (const KKSRubric * r)
 //        QIcon ioIcon;// = io->icon();
 //        qDebug () << __PRETTY_FUNCTION__ << rData.value(id)->fields().keys();
         QPixmap rIconP;
-        rIconP.loadFromData (rItem->iconAsString().toUtf8());//rData.value(id)->fields().value("r_icon").toUtf8());
+        if (rItem)
+            rIconP.loadFromData (rItem->iconAsString().toUtf8());//rData.value(id)->fields().value("r_icon").toUtf8());
         QIcon ioIcon (rIconP);//io->icon();
         if (!ioIcon.isNull())
         {
@@ -1181,7 +1182,7 @@ void KKSRubricFactory :: putIntoRubr (const QList<int>& ioIDList, const KKSRubri
         qDebug () << __PRETTY_FUNCTION__ << r->items().count();
         ppf->updateRubrics (const_cast<KKSRubric *>(r));
         //saveRubric (iW->rootRubric(), false);
-        initRubricAttachments (r);
+        //initRubricAttachments (r);
         
     }
     delete rubrDial;
