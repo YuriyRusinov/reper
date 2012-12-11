@@ -2321,12 +2321,36 @@ void KKSObjEditorFactory :: filterTemplateEIO (KKSObjEditor * editor, int idObje
     connect (stForm, SIGNAL (deleteSearchTemplate (const QModelIndex&, QAbstractItemModel *)), this,  SLOT (deleleSearchTempl (const QModelIndex&, QAbstractItemModel *)) );
 
     QSortFilterProxyModel * sortTModel = new QSortFilterProxyModel;
-    QStandardItemModel * searchTModel = new QStandardItemModel (ncount, 1);
+    QStandardItemModel * searchTModel = new QStandardItemModel (ncount, 5);
     searchTModel->setHeaderData (0, Qt::Horizontal, tr ("Search criteria"), Qt::DisplayRole);
+    searchTModel->setHeaderData (1, Qt::Horizontal, tr ("Author"), Qt::DisplayRole);
+    searchTModel->setHeaderData (2, Qt::Horizontal, tr ("Creation date/time"), Qt::DisplayRole);
+    searchTModel->setHeaderData (3, Qt::Horizontal, tr ("Category"), Qt::DisplayRole);
+    searchTModel->setHeaderData (4, Qt::Horizontal, tr ("Type"), Qt::DisplayRole);
     for (int i=0; i<ncount; i++)
     {
         QModelIndex wIndex = searchTModel->index (i, 0);
         searchTModel->setData (wIndex, stList[i]->name(), Qt::DisplayRole);
+        searchTModel->setData (wIndex, stList[i]->id (), Qt::UserRole);
+        searchTModel->setData (wIndex, stList[i]->idAuthor (), Qt::UserRole+1);
+
+        wIndex = searchTModel->index (i, 1);
+        searchTModel->setData (wIndex, stList[i]->authorName(), Qt::DisplayRole);
+        searchTModel->setData (wIndex, stList[i]->id (), Qt::UserRole);
+        searchTModel->setData (wIndex, stList[i]->idAuthor (), Qt::UserRole+1);
+
+        wIndex = searchTModel->index (i, 2);
+        searchTModel->setData (wIndex, stList[i]->creationDatetime().toString("dd.MMM.yyyy"), Qt::DisplayRole);
+        searchTModel->setData (wIndex, stList[i]->id (), Qt::UserRole);
+        searchTModel->setData (wIndex, stList[i]->idAuthor (), Qt::UserRole+1);
+
+        wIndex = searchTModel->index (i, 3);
+        searchTModel->setData (wIndex, stList[i]->categoryName(), Qt::DisplayRole);
+        searchTModel->setData (wIndex, stList[i]->id (), Qt::UserRole);
+        searchTModel->setData (wIndex, stList[i]->idAuthor (), Qt::UserRole+1);
+
+        wIndex = searchTModel->index (i, 4);
+        searchTModel->setData (wIndex, stList[i]->type()->name(), Qt::DisplayRole);
         searchTModel->setData (wIndex, stList[i]->id (), Qt::UserRole);
         searchTModel->setData (wIndex, stList[i]->idAuthor (), Qt::UserRole+1);
     }
