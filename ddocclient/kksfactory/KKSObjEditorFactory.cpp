@@ -100,6 +100,7 @@
 #include "kksstuffform.h"
 #include "KKSRubric.h"
 #include "KKSSearchTemplate.h"
+#include "KKSSearchTemplateType.h"
 #include "KKSSearchTemplatesForm.h"
 #include "KKSAddTable.h"
 #include "KKSAttrType.h"

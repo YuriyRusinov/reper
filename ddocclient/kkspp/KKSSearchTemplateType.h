@@ -17,15 +17,21 @@
 class _PP_EXPORT KKSSearchTemplateType : public KKSRecord
 {
 public:
-    KKSSearchTemplateType();
-    KKSSearchTemplateType(const KKSSearchTemplateType& stt);
-    virtual ~KKSSearchTemplateType();
-private:
+    KKSSearchTemplateType(int id=-1, const QString & name=QString(), const QString & desc=QString());
+    KKSSearchTemplateType (const KKSSearchTemplateType & stt);
+    ~KKSSearchTemplateType (void);
 
+    const KKSSearchTemplateType * parent() const;
+    KKSSearchTemplateType * parent();
+    void setParent( KKSSearchTemplateType * p);
+
+    static KKSSearchTemplateType * defaultType();
+
+private:
+    KKSSearchTemplateType * m_parent;
 };
 
 Q_DECLARE_METATYPE (KKSSearchTemplateType *);
 Q_DECLARE_METATYPE (const KKSSearchTemplateType *);
 
-#endif	/* KKSSEARCHTEMPLATETYPE_H */
-
+#endif	/* KKSSEARCHTEMPLATE_TYPE_H */

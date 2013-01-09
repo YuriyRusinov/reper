@@ -7,23 +7,7 @@
 #include "kkspp_config.h"
 
 class KKSFilterGroup;
-
-class _PP_EXPORT KKSSearchTemplateType : public KKSRecord
-{
-public:
-    KKSSearchTemplateType(int id=-1, const QString & name=QString(), const QString & desc=QString());
-    KKSSearchTemplateType (const KKSSearchTemplateType & stt);
-    ~KKSSearchTemplateType (void);
-
-    const KKSSearchTemplateType * parent() const;
-    KKSSearchTemplateType * parent();
-    void setParent( KKSSearchTemplateType * p);
-
-    static KKSSearchTemplateType * defaultType();
-
-private:
-    KKSSearchTemplateType * m_parent;
-};
+class KKSSearchTemplateType;
 
 class _PP_EXPORT KKSSearchTemplate : public KKSRecord//KKSData
 {

@@ -27,6 +27,7 @@
 #include "KKSTemplate.h"
 #include "KKSRubric.h"
 #include "KKSSearchTemplate.h"
+#include "KKSSearchTemplateType.h"
 #include "KKSAclTemplate.h"
 #include "KKSPrivilege.h"
 #include <KKSAccessEntity.h>

@@ -36,6 +36,7 @@
 #include "KKSAttrGroup.h"
 #include "KKSRubric.h"
 #include "KKSSearchTemplate.h"
+#include "KKSSearchTemplateType.h"
 #include "KKSAclTemplate.h"
 #include "KKSAccessEntity.h"
 #include "kkssito.h"
