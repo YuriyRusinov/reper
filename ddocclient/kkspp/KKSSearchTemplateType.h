@@ -5,8 +5,8 @@
  * Created on 28 Декабрь 2012 г., 15:01
  */
 
-#ifndef KKSSEARCHTEMPLATETYPE_H
-#define	KKSSEARCHTEMPLATETYPE_H
+#ifndef KKSSEARCHTEMPLATE_TYPE_H
+#define	KKSSEARCHTEMPLATE_TYPE_H
 
 #include <QMetaType>
 #include <QVariant>
@@ -14,7 +14,7 @@
 #include "kkspp_config.h"
 #include "KKSRecord.h"
 
-class _PP_EXPORT KKSSearchTemplateType
+class _PP_EXPORT KKSSearchTemplateType : public KKSRecord
 {
 public:
     KKSSearchTemplateType();
@@ -25,7 +25,7 @@ private:
 };
 
 Q_DECLARE_METATYPE (KKSSearchTemplateType *);
-Q_DECLARE_METATYPE (const KKSSearchTemplateType *)
+Q_DECLARE_METATYPE (const KKSSearchTemplateType *);
 
 #endif	/* KKSSEARCHTEMPLATETYPE_H */
 

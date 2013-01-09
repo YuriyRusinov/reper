@@ -6,13 +6,14 @@
  */
 
 #include "KKSSearchTemplateType.h"
-
+/*
 KKSSearchTemplateType::KKSSearchTemplateType() {
 }
 
-KKSSearchTemplateType::KKSSearchTemplateType(const KKSSearchTemplateType& orig) {
+KKSSearchTemplateType::KKSSearchTemplateType(const KKSSearchTemplateType& stt) {
 }
 
 KKSSearchTemplateType::~KKSSearchTemplateType() {
 }
 
+*/
