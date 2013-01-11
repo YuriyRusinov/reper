@@ -50,4 +50,8 @@ private:
     KKSSearchTemplateType * m_type;//тип поискового шаблона
     QDateTime m_creationDatetime;//дата и время создания поискового шаблона
 };
+
+Q_DECLARE_METATYPE (KKSSearchTemplate *);
+Q_DECLARE_METATYPE (const KKSSearchTemplate *);
+
 #endif
