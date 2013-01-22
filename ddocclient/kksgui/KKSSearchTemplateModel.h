@@ -12,6 +12,7 @@
 #include <QModelIndex>
 #include <QVariant>
 
+#include "KKSMap.h"
 #include "kksgui_config.h"
 
 class _GUI_EXPORT KKSSearchTemplateModel : public QAbstractItemModel
@@ -37,6 +38,16 @@ public:
     bool removeRows (int row, int count, const QModelIndex& parent = QModelIndex() );
 
 private:
+    //
+    // Functions
+    //
+    void setupData (const KKSMap<int, KKSSearchTemplateType *> sTemplateTypes, const KKSList<KKSSearchTemplate *>& sTemplates);
+private:
+    //
+    // Variables
+    //
+    KKSMap<int, KKSSearchTemplateType *> searchTemplateTypes;
+    KKSList<KKSSearchTemplate *> searchTemplates;
 
 };
 
