@@ -13,12 +13,16 @@
 #include <QVariant>
 
 #include "KKSMap.h"
+#include "KKSList.h"
 #include "kksgui_config.h"
+
+class KKSSearchTemplateType;
+class KKSSearchTemplate;
 
 class _GUI_EXPORT KKSSearchTemplateModel : public QAbstractItemModel
 {
 public:
-    KKSSearchTemplateModel(const KKSMap<int, KKSSearchTemplateType *>& sTypes, QObject * parent=0);
+    KKSSearchTemplateModel(const KKSMap<int, KKSSearchTemplateType *>& sTypes, const KKSList<KKSSearchTemplate *>& sTemplates, QObject * parent=0);
     virtual ~KKSSearchTemplateModel();
 
     QVariant data (const QModelIndex &index, int role) const;
