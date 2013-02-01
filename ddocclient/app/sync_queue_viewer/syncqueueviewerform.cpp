@@ -86,7 +86,7 @@ int SyncQueueViewerForm::countInCursor()
 
     //QString newSql = "select count(*) " + sqlCursor.right(sqlCursor.length() - cur);
     //QString newSql = "select count(*) " + sqlCursor.right(sqlCursor.length() - cur - 8);
-    QString newSql = QString("select count(*) from out_sync_queue");
+    QString newSql = QString("select count(*) from out_sync_queue where 1=1 ");
     res = db->execute(newSql);
 
     int i;
@@ -113,10 +113,11 @@ void SyncQueueViewerForm::on_pbExit_clicked()
 
 void SyncQueueViewerForm::on_pbView_clicked()
 {
-    QString curUser = ui->comboBoxUsers->currentText();
+    /*QString curUser = ui->comboBoxUsers->currentText();
     QString groupUser = ui->comboBoxGroups->currentText();
     QString curGroupOperation = ui->comboBoxGroupOperations->currentText();
     QString curOperation = ui->comboBoxOperations->currentText();
+    */
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
@@ -127,16 +128,53 @@ void SyncQueueViewerForm::on_pbView_clicked()
         db->close("init_cursor");
     }
 
-    QString start;
-    QString end;
+    //QString start;
+    //QString end;
     sqlCursor.clear();
 
-    start = ui->dateTimeEditTimeStart->dateTime().toString("yyyy-MM-dd:hh:mm:ss");
-    end = ui->dateTimeEditTimeEnd->dateTime().toString("yyyy-MM-dd:hh:mm:ss");
+
+    sqlCursor = QString(" \
+                            select \
+                                t.id, --ID транспортной задачи \
+                                t.name, --(*) Транспортная задача \
+                                t.local_address, -- локальный адрес транспорта \
+                                ot.address,-- адрес целевой организации \
+                                q.unique_id, --уникальный идентификатор записи очереди  \
+                                q.last_update, -- (*) дата и время отправки \
+                                q.id, -- идентификатор записи очереди \
+                                q.id_organization, --идентификатор целевой организации \
+                                o.name, -- (*) Целевая организация \
+                                q.id_entity, -- (*) ИД пересылаемой записи \
+                                q.entity_table, -- название таблицы в которой содержится пересылаемая запись \
+                                io.name, --(*) название ИО \
+                                q.entity_type, --(*) тип ИО (!!!!!) \
+                                q.sync_type,  --(*) тип синхронизации (!!!!) \
+                                q.sync_result,  --(*) результат синхронизации (!!!!!) \
+                                q.entity_uid,  --уникальный идентификатор пересылаемой записи справочника \
+                                q.entity_io_uid  -- уникальный идентификатор справочника \
+                            from  \
+                                out_sync_queue q \
+                                inner join organization o on (o.id = q.id_organization) \
+                                inner join organization_transport ot on (o.id = ot.id_organization) \
+                                inner join transport t on (ot.id_transport = t.id) \
+                                inner join io_objects io on (q.entity_table = io.table_name) \
+                            where \
+                                1=1 \
+                        ");
 
 
     //!!!Здесь надо добавить код, который будет формировать запрос в соответствии с фильтрами!!!
+    /**************************
+    if(   ){
+        sqlCursor += QString(" and last_update > %1").arg();
+    }
 
+    if(....){
+        sqlCursor += QString(" and t.id = %1").arg(ksfhf);
+    }
+    ******************/
+
+    sqlCursor += QString(" order by 1");
 
     /*
     if(curUser == tr("All") && curOperation == tr("All") && groupUser == tr("All") && curGroupOperation == tr("All"))
@@ -176,9 +214,12 @@ void SyncQueueViewerForm::on_pbView_clicked()
 
     //sqlCursor = QString("select o.id, o.last_update, org.name, o.id_entity, o.entity_table, o.entity_type, o.sync_type, o.sync_result, o.entity_uid, o.entity_io_uid, o.id_organization, o.unique_id from out_sync_queue o inner join organization org on (o.id_organization = org.id)");
     
-    
-    
-    sqlCursor = QString("select * from out_sync_queue");
+        
+
+
+
+
+    //sqlCursor = QString("select * from out_sync_queue");
 
     cursor_open = true;
 

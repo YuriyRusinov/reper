@@ -103,7 +103,7 @@ QVariant SyncQueueItemModel::data(const QModelIndex & index, int role) const
 
         if(res)
         {
-            v = res->getCellAsString(0, 0);
+            v = res->getCellAsString(0, 1);
         }
 
         if(res)
@@ -120,7 +120,7 @@ QVariant SyncQueueItemModel::data(const QModelIndex & index, int role) const
         if(res)
         {
             //время в формате 2007-01-15 13:33:32.403797
-            dt = res->getCellAsDateTime(0, 1);
+            dt = res->getCellAsDateTime(0, 5);
             v = dt.toString("hh:mm::ss dd-MM-yyyy");
             delete res;
         }
@@ -129,6 +129,7 @@ QVariant SyncQueueItemModel::data(const QModelIndex & index, int role) const
     }
     
 
+    /*
     pos = index.row() + 1;
 
     res = db->fetch("sync_cursor", 4, pos);
@@ -142,6 +143,7 @@ QVariant SyncQueueItemModel::data(const QModelIndex & index, int role) const
         delete res;
 
     return v;
+    */
 
     /*  потом может пригодиться, чтобы более правильно визуализировать данные. Например, дату и время и т.п.
     if(index.column() == 0)
@@ -215,7 +217,7 @@ QVariant SyncQueueItemModel::headerData(int section,
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
         switch (section) {
             case 0:
-                return tr("recordID");
+                return tr("Transport task");
             case 1:
                 return tr("Date and time");
             case 2:
