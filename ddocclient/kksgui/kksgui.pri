@@ -50,6 +50,7 @@ HEADERS += \
                 KKSRecProxyModel.h \
                 KKSOrganizationAddrForm.h \
                 KKSSearchTemplateModel.h \
+                KKSSearchTreeItem.h \
 		ui/cmdjournalsettingsform.h \
 		ui/cmdjournalform.h \
 		ui/msgjournalsettingsform.h \
@@ -132,6 +133,7 @@ SOURCES += \
                 KKSEIODataModel.cpp \
                 KKSRecProxyModel.cpp \
                 KKSSearchTemplateModel.cpp \
+                KKSSearchTreeItem.cpp \
                 ui/choosetemplateform.cpp \
                 ui/cmdjournalform.cpp \
                 ui/cmdjournalsettingsform.cpp \
@@ -236,6 +238,7 @@ headers.files += \
                 KKSEIODataModel.h \
                 KKSRecProxyModel.h \
                 KKSSearchTemplateModel.h \
+                KKSSearchTreeItem.h \
                 ui/choosetemplateform.h \
                 ui/cmdjournalform.h \
                 ui/cmdjournalsettingsform.h \
