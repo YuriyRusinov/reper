@@ -10,14 +10,16 @@
 
 #include <QList>
 
+#include "kksgui_config.h"
+
 class KKSSearchTemplate;
 class KKSSearchTemplateType;
 
-class KKSSearchTreeItem
+class _GUI_EXPORT KKSSearchTreeItem
 {
 public:
-    KKSSearchTreeItem(qint64 id=-1, KKSSearchTemplateType * sType=0, KKSSearchTreeItem * parent=0);
-    KKSSearchTreeItem(qint64 id=-1, KKSSearchTemplate * sTemplate=0, KKSSearchTreeItem * parent=0);
+    KKSSearchTreeItem(qint64 id=-1, const KKSSearchTemplateType * sType=0, KKSSearchTreeItem * parent=0);
+    KKSSearchTreeItem(qint64 id=-1, const KKSSearchTemplate * sTemplate=0, KKSSearchTreeItem * parent=0);
     virtual ~KKSSearchTreeItem();
     
     KKSSearchTreeItem * child (int number);
@@ -28,7 +30,7 @@ public:
     void setData (const KKSSearchTemplateType * d);
     void setData (const KKSSearchTemplate * d);
     bool insertChildren(int position, int count);
-    const KKSSearchTemplateType *parent() const;
+    const KKSSearchTreeItem *parent() const;
     bool removeChildren(int position, int count);
     int childNumber() const;
     void appendChild (KKSSearchTreeItem * ch);
@@ -41,8 +43,8 @@ private:
     qint64 idItem;
     const KKSSearchTreeItem * sParentItem;
     QList<KKSSearchTreeItem *> sChildItems;
-    KKSSearchTemplateType * searchType;
-    KKSSearchTemplate * searchTemplate;
+    const KKSSearchTemplateType * searchType;
+    const KKSSearchTemplate * searchTemplate;
 
 };
 

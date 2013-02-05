@@ -18,6 +18,7 @@
 
 class KKSSearchTemplateType;
 class KKSSearchTemplate;
+class KKSSearchTreeItem;
 
 class _GUI_EXPORT KKSSearchTemplateModel : public QAbstractItemModel
 {
@@ -52,6 +53,7 @@ private:
     //
     KKSMap<int, KKSSearchTemplateType *> searchTemplateTypes;
     KKSList<KKSSearchTemplate *> searchTemplates;
+    KKSSearchTreeItem * rootItem;
 
 };
 

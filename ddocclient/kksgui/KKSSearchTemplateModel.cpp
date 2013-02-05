@@ -7,16 +7,21 @@
 
 #include <KKSSearchTemplateType.h>
 #include <KKSSearchTemplate.h>
+#include "KKSSearchTreeItem.h"
 #include "KKSSearchTemplateModel.h"
 
 KKSSearchTemplateModel::KKSSearchTemplateModel(const KKSMap<int, KKSSearchTemplateType *>& sTypes, const KKSList<KKSSearchTemplate *>& sTemplates, QObject * parent)
     : QAbstractItemModel (parent),
       searchTemplateTypes (sTypes),
-      searchTemplates (sTemplates)
+      searchTemplates (sTemplates),
+      rootItem (new KKSSearchTreeItem (-1, (const KKSSearchTemplateType *)(0), 0))
 {
+    setupData (sTypes, sTemplates);
 }
 
-KKSSearchTemplateModel::~KKSSearchTemplateModel() {
+KKSSearchTemplateModel::~KKSSearchTemplateModel()
+{
+    delete rootItem;
 }
 
 QVariant KKSSearchTemplateModel :: data (const QModelIndex &index, int role) const
