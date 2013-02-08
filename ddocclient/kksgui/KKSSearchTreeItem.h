@@ -18,7 +18,7 @@ class KKSSearchTemplateType;
 class _GUI_EXPORT KKSSearchTreeItem
 {
 public:
-    KKSSearchTreeItem(qint64 id=-1, const KKSSearchTemplateType * sType=0, KKSSearchTreeItem * parent=0);
+    KKSSearchTreeItem(qint64 id, const KKSSearchTemplateType * sType=0, KKSSearchTreeItem * parent=0);
     KKSSearchTreeItem(qint64 id=-1, const KKSSearchTemplate * sTemplate=0, KKSSearchTreeItem * parent=0);
     virtual ~KKSSearchTreeItem();
     
