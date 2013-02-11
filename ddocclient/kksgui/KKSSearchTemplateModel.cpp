@@ -26,43 +26,103 @@ KKSSearchTemplateModel::~KKSSearchTemplateModel()
 
 QVariant KKSSearchTemplateModel :: data (const QModelIndex &index, int role) const
 {
-    Q_UNUSED (index);
-    Q_UNUSED (role);
-    return QVariant ();
+    if (!index.isValid())
+        return QVariant();
+
+    if (role != Qt::DisplayRole && role != Qt::UserRole)
+        return QVariant();
+    
+    KKSSearchTreeItem *item = static_cast<KKSSearchTreeItem*>(index.internalPointer());
+    if (role == Qt::UserRole)
+        return item->id();
+
+    if (item->getSearchTemplateType() && index.column() == 0)
+        return item->getSearchTemplateType ()->name();
+    else if (item->getSearchTemplate())
+    {
+        switch (index.column())
+        {
+            case 0: return item->getSearchTemplate()->name(); break;
+            case 1: return item->getSearchTemplate()->authorName(); break;
+            case 2: return item->getSearchTemplate()->creationDatetime(); break;
+            case 3: return item->getSearchTemplate()->categoryName(); break;
+            case 4: return item->getSearchTemplate()->type()->name(); break;
+            default: return QVariant();
+        }
+    }
+    else
+        return QVariant ();
 }
 
 QVariant KKSSearchTemplateModel :: headerData (int section, Qt::Orientation orientation, int role) const
 {
-    Q_UNUSED (section);
-    Q_UNUSED (orientation);
-    Q_UNUSED (role);
-    return QVariant ();
+    if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
+    {
+        switch (section)
+        {
+            case 0: return tr ("Search criteria"); break;
+            case 1: return tr ("Author"); break;
+            case 2: return tr ("Date of creation"); break;
+            case 3: return tr ("Category"); break;
+            case 4: return tr ("Type"); break;
+            default: return QVariant (); break;
+        }
+    }
+    else
+        return QVariant ();
 }
 
 QModelIndex KKSSearchTemplateModel :: index (int row, int column, const QModelIndex& parent) const
 {
-    Q_UNUSED (row);
-    Q_UNUSED (column);
-    Q_UNUSED (parent);
-    return QModelIndex ();
+    if (!hasIndex(row, column, parent))
+        return QModelIndex();
+
+    KKSSearchTreeItem *parentItem;
+
+    if (!parent.isValid())
+        parentItem = rootItem;
+    else
+        parentItem = static_cast<KKSSearchTreeItem*>(parent.internalPointer());
+
+    KKSSearchTreeItem *childItem = parentItem->child(row);
+    if (childItem)
+        return createIndex(row, column, childItem);
+    else
+        return QModelIndex();    
 }
 
 QModelIndex KKSSearchTemplateModel :: parent (const QModelIndex &index) const
 {
-    Q_UNUSED (index);
-    return QModelIndex ();
+    if (!index.isValid())
+        return QModelIndex();
+
+     KKSSearchTreeItem *childItem = static_cast<KKSSearchTreeItem*>(index.internalPointer());
+     const KKSSearchTreeItem *parentItem = childItem->parent();
+
+     if (parentItem == rootItem)
+         return QModelIndex();
+
+     return createIndex(parentItem->row(), 0, (void *)parentItem);
 }
 
 int KKSSearchTemplateModel :: rowCount (const QModelIndex& parent) const
 {
-    Q_UNUSED (parent);
-    return 0;
+     KKSSearchTreeItem *parentItem;
+     if (parent.column() > 0)
+         return 0;
+
+     if (!parent.isValid())
+         parentItem = rootItem;
+     else
+         parentItem = static_cast<KKSSearchTreeItem*>(parent.internalPointer());
+
+     return parentItem->childCount();
 }
 
 int KKSSearchTemplateModel :: columnCount (const QModelIndex& parent) const
 {
     Q_UNUSED (parent);
-    return 3;
+    return 5;
 }
 
 Qt::ItemFlags KKSSearchTemplateModel :: flags (const QModelIndex& index) const

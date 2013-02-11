@@ -38,6 +38,7 @@ public:
     qint64 id () const;
     void setId (qint64 newId);
     void clearChildren (void);
+    int row (void) const;
 
 private:
     qint64 idItem;

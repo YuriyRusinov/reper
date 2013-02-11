@@ -177,3 +177,11 @@ void KKSSearchTreeItem::clearChildren (void)
     sChildItems.clear ();
     
 }
+
+int KKSSearchTreeItem::row (void) const
+{
+    if (sParentItem)
+        return sParentItem->sChildItems.indexOf (const_cast<KKSSearchTreeItem*>(this));
+    
+    return 0;
+}
