@@ -16,7 +16,7 @@ KKSSearchTemplateModel::KKSSearchTemplateModel(const KKSMap<int, KKSSearchTempla
       searchTemplates (sTemplates),
       rootItem (new KKSSearchTreeItem (-1, (const KKSSearchTemplateType *)(0), 0))
 {
-    setupData (sTypes, sTemplates);
+    setupData (rootItem);
 }
 
 KKSSearchTemplateModel::~KKSSearchTemplateModel()
@@ -158,10 +158,17 @@ bool KKSSearchTemplateModel :: removeRows (int row, int count, const QModelIndex
     
 }
 
-void KKSSearchTemplateModel :: setupData (const KKSMap<int, KKSSearchTemplateType *> sTemplateTypes, const KKSList<KKSSearchTemplate *>& sTemplates)
+void KKSSearchTemplateModel :: setupData (KKSSearchTreeItem *parent)
 {
-    Q_UNUSED (sTemplateTypes);
-    Q_UNUSED (sTemplates);
+    if (!parent)
+        return;
 
+    if (parent->getSearchTemplate())
+    {
+        //
+        // Ошибка: подитемы есть только у типов шаблонов
+        //
+        return;
+    }
 
 }

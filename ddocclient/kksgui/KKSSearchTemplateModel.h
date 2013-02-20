@@ -46,7 +46,7 @@ private:
     //
     // Functions
     //
-    void setupData (const KKSMap<int, KKSSearchTemplateType *> sTemplateTypes, const KKSList<KKSSearchTemplate *>& sTemplates);
+    void setupData (KKSSearchTreeItem *parent);
 private:
     //
     // Variables
