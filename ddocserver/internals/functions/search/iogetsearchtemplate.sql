@@ -138,3 +138,39 @@ begin
 end
 $BODY$
 language 'plpgsql';
+
+create or replace function ioGetSearchTemplateByType (int4) returns setof h_get_search_template as
+$BODY$
+declare
+    idSearchTemplateType alias for $1;
+    r h_get_search_template%rowtype;
+begin
+
+    for r in
+        select
+            st.id,
+            st.id_group,
+            st.name,
+            st.author,
+            st.id_search_template_type,
+            st.id_io_category,
+            case when st.author isnull then null else u.name end as authorName,
+            case when st.id_io_category isnull then null else c.name end as categoryName,
+            st.creation_datetime,
+            st.description
+        from
+            search_templates st
+            left join users u on st.author = u.id
+            left join io_categories c on st.id_io_category = c.id
+        where
+            st.id_search_template_type = idSearchTemplateType
+        order by 1            
+    loop
+        return next r;
+    end loop;
+
+    return;
+
+end
+$BODY$
+language 'plpgsql';

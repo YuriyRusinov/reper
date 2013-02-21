@@ -191,6 +191,7 @@ class _F_EXPORT KKSLoader
         KKSList<KKSSearchTemplate *> loadSearchTemplates (void) const;
         KKSSearchTemplate * loadSearchTemplate (int idSearchTemplate) const;
         KKSMap<int, KKSSearchTemplateType *> loadSearchTemplateTypes() const;
+        KKSMap<qint64, KKSSearchTemplate *> loadSearchTemplatesByType (KKSSearchTemplateType * stt) const;
 
         QMap<int, QStringList> getSyncOrg (int idObject) const;
 

@@ -4036,6 +4036,34 @@ KKSSearchTemplate * KKSLoader::loadSearchTemplate (int idSearchTemplate) const
     return st;
 }
 
+KKSMap<qint64, KKSSearchTemplate *> KKSLoader::loadSearchTemplatesByType (KKSSearchTemplateType * stt) const
+{
+    if (!stt || stt->id() <= 0)
+        return KKSMap<qint64, KKSSearchTemplate *>();
+    QString sql = QString ("select * from ioGetSearchTemplateByType(%1);").arg (stt->id());
+    KKSResult * res = db->execute (sql);
+    if (!res || res->getRowCount() == 0)
+    {
+        if (res)
+            delete res;
+        return KKSMap<qint64, KKSSearchTemplate *>();
+    }
+    
+    KKSMap<qint64, KKSSearchTemplate *> resTemplates;
+    for (int i=0; i<res->getRowCount(); i++)
+    {
+        qint64 ids = res->getCellAsInt64(i, 0);
+        KKSSearchTemplate * st = loadSearchTemplate (ids);
+        if (!st)
+            continue;
+        resTemplates.insert (ids, st);
+        st->release ();
+    }
+    delete res;
+    
+    return resTemplates;
+}
+
 KKSFilterGroup * KKSLoader::loadSearchGroup (int idGroup) const
 {
     KKSFilterGroup * group = 0;
