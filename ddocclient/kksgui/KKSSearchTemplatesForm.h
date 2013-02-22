@@ -30,6 +30,10 @@ private slots:
     void addCopySearchTemplate (void);
     void editSearchTemplate (void);
     void delSearchTemplate (void);
+    
+    void addSearchTemplateType (void);
+    void editSearchTemplateType (void);
+    void delSearchTemplateType (void);
 
     void searchTemplatesSelectionChanged (const QItemSelection & selected, const QItemSelection & deselected);
 
@@ -54,13 +58,13 @@ private:
     QTreeView * searchView;
     QToolBar * tbActions;
     QAction * actAddNew;
-    //QPushButton * pbAddNew;
     QAction * actAddCopy;
-    //QPushButton * pbAddCopy;
     QAction * actEdit;
-    //QPushButton * pbEdit;
     QAction * actDel;
-    //QPushButton * pbDel;
+    
+    QAction * actAddNewType;
+    QAction * actEditType;
+    QAction * actDelType;
 
     QPushButton * pbOk;
     QPushButton * pbCancel;

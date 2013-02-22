@@ -27,10 +27,9 @@ KKSSearchTemplatesForm :: KKSSearchTemplatesForm (QWidget * parent, Qt::WFlags f
     actAddCopy (new QAction (tr("Add copy template"), this)),
     actEdit (new QAction (tr("&Edit template"), this)),
     actDel (new QAction (tr("&Delete template"), this)),
-    //pbAddNew (new QPushButton (tr("&Add empty template"), this)),
-    //pbAddCopy (new QPushButton (tr("Add copy template"), this)),
-    //pbEdit (new QPushButton (tr("&Edit template"), this)),
-    //pbDel (new QPushButton (tr("&Delete template"), this)),
+    actAddNewType (new QAction (tr("Add new search template type"), this)),
+    actEditType (new QAction (tr("Edit search template type"), this)),
+    actDelType (new QAction (tr("Delete search template type"), this)),
     pbOk (new QPushButton (tr("&OK"), this)),
     pbCancel (new QPushButton (tr("&Cancel"), this))
 {
@@ -51,6 +50,10 @@ KKSSearchTemplatesForm :: KKSSearchTemplatesForm (QWidget * parent, Qt::WFlags f
     connect (actAddCopy, SIGNAL (triggered()), this, SLOT (addCopySearchTemplate()) );
     connect (actEdit, SIGNAL (triggered()), this, SLOT (editSearchTemplate()) );
     connect (actDel, SIGNAL (triggered()), this, SLOT (delSearchTemplate()) );
+    
+    connect (actAddNewType, SIGNAL (triggered()), this, SLOT (addSearchTemplateType()) );
+    connect (actEditType, SIGNAL (triggered()), this, SLOT (editSearchTemplateType()) );
+    connect (actDelType, SIGNAL (triggered()), this, SLOT (delSearchTemplateType()) );
 
     connect (pbOk, SIGNAL (clicked()), this, SLOT (accept()) );
     connect (pbCancel, SIGNAL (clicked()), this, SLOT (reject()) );
@@ -144,6 +147,13 @@ void KKSSearchTemplatesForm :: init (void)
     this->setWindowTitle (tr("Search templates"));
     QGridLayout * gLayout = new QGridLayout (this);
     gLayout->addWidget (tbActions, 0, 0, 1, 1);
+    actAddNewType->setToolTip (tr("Add new search template type"));
+    actAddNewType->setIcon (QIcon (":/ddoc/folder_add.png"));
+    actEditType->setToolTip (tr("Edit search template type"));
+    actEditType->setIcon (QIcon (":/ddoc/folder_edit.png"));
+    actDelType->setToolTip (tr("Delete search template type"));
+    actDelType->setIcon (QIcon (":/ddoc/folder_del.png"));
+
     actAddNew->setToolTip (tr("Add new search template"));
     actAddNew->setIcon (QIcon (":/ddoc/add.png"));
     actAddCopy->setToolTip (tr("Copy selected search template"));
@@ -152,6 +162,12 @@ void KKSSearchTemplatesForm :: init (void)
     actEdit->setIcon (QIcon (":/ddoc/edit.png"));
     actDel->setToolTip (tr("Delete search template"));
     actDel->setIcon (QIcon (":/ddoc/delete.png"));
+
+    tbActions->addAction (actAddNewType);
+    tbActions->addAction (actEditType);
+    tbActions->addAction (actDelType);
+    tbActions->addSeparator ();
+
     tbActions->addAction (actAddNew);
     tbActions->addAction (actAddCopy);
     tbActions->addAction (actEdit);
@@ -195,4 +211,19 @@ QModelIndex KKSSearchTemplatesForm :: getCurrentIndex (void) const
 QItemSelectionModel * KKSSearchTemplatesForm :: selectionModel (void) const
 {
     return searchView->selectionModel ();
+}
+
+void KKSSearchTemplatesForm :: addSearchTemplateType (void)
+{
+    qDebug () << __PRETTY_FUNCTION__;
+}
+
+void KKSSearchTemplatesForm :: editSearchTemplateType (void)
+{
+    qDebug () << __PRETTY_FUNCTION__;
+}
+
+void KKSSearchTemplatesForm :: delSearchTemplateType (void)
+{
+    qDebug () << __PRETTY_FUNCTION__;
 }
