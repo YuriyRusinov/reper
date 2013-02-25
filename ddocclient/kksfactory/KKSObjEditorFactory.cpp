@@ -2320,6 +2320,10 @@ void KKSObjEditorFactory :: filterTemplateEIO (KKSObjEditor * editor, int idObje
     connect (stForm, SIGNAL (addNewCopySearchTemplate (const QModelIndex&, QAbstractItemModel *)), this, SLOT (addCopySearchTempl (const QModelIndex&, QAbstractItemModel *)) );
     connect (stForm, SIGNAL (updateSearchTemplate (const QModelIndex&, QAbstractItemModel *)), this, SLOT (updateSearchTempl (const QModelIndex&, QAbstractItemModel *)) );
     connect (stForm, SIGNAL (deleteSearchTemplate (const QModelIndex&, QAbstractItemModel *)), this,  SLOT (deleleSearchTempl (const QModelIndex&, QAbstractItemModel *)) );
+    
+    connect (stForm, SIGNAL (addSearchTemplateType (const QModelIndex&, QAbstractItemModel * )), this, SLOT (addSearchTemplateType (const QModelIndex&, QAbstractItemModel *)) );
+    connect (stForm, SIGNAL (updateSearchTemplateType (const QModelIndex&, QAbstractItemModel * )), this, SLOT (editSearchTemplateType (const QModelIndex&, QAbstractItemModel *)) );
+    connect (stForm, SIGNAL (delSearchTemplateType (const QModelIndex&, QAbstractItemModel * )), this, SLOT (delSearchTemplateType (const QModelIndex&, QAbstractItemModel *)) );
 
     QSortFilterProxyModel * sortTModel = new QSortFilterProxyModel;
     QStandardItemModel * searchTModel = new QStandardItemModel (ncount, 5);
@@ -6600,6 +6604,10 @@ KKSSearchTemplate * KKSObjEditorFactory :: loadSearchTemplate (void) const
     connect (stForm, SIGNAL (updateSearchTemplate (const QModelIndex&, QAbstractItemModel *)), this, SLOT (updateSearchTempl (const QModelIndex&, QAbstractItemModel *)) );
     connect (stForm, SIGNAL (deleteSearchTemplate (const QModelIndex&, QAbstractItemModel *)), this,  SLOT (deleleSearchTempl (const QModelIndex&, QAbstractItemModel *)) );
 
+    connect (stForm, SIGNAL (addSearchTemplateType (const QModelIndex&, QAbstractItemModel * )), this, SLOT (addSearchTemplateType (const QModelIndex&, QAbstractItemModel *)) );
+    connect (stForm, SIGNAL (updateSearchTemplateType (const QModelIndex&, QAbstractItemModel * )), this, SLOT (editSearchTemplateType (const QModelIndex&, QAbstractItemModel *)) );
+    connect (stForm, SIGNAL (delSearchTemplateType (const QModelIndex&, QAbstractItemModel * )), this, SLOT (delSearchTemplateType (const QModelIndex&, QAbstractItemModel *)) );
+
     QStandardItemModel * searchTModel = new QStandardItemModel (ncount, 1);
     searchTModel->setHeaderData (0, Qt::Horizontal, tr ("Search criteria"), Qt::DisplayRole);
     for (int i=0; i<ncount; i++)
@@ -6884,6 +6892,35 @@ void KKSObjEditorFactory :: deleleSearchTempl (const QModelIndex& wIndex, QAbstr
         return;
     }
     searchMod->removeRows (wIndex.row(), 1);
+}
+
+/* —лот создает новый тип шаблонов поиска и добавл€ет его к существующему типу в качестве дочернего.
+ * ѕараметры :
+ * parent -- индекс родительского типа
+ * sourceMod -- модель типов и шаблонов.
+ */
+void KKSObjEditorFactory :: addSearchTemplateType (const QModelIndex& parent, QAbstractItemModel * searchMod)
+{
+    
+}
+
+/* —лот редактирует тип шаблонов поиска.
+ * ѕараметры :
+ * wIndex -- индекс редактируемого типа
+ * sourceMod -- модель типов и шаблонов.
+ */
+void KKSObjEditorFactory :: editSearchTemplateType (const QModelIndex& wIndex, QAbstractItemModel * searchMod)
+{
+    
+}
+
+/* —лот удал€ет тип шаблонов поиска.
+ * ѕараметры :
+ * wIndex -- индекс удал€емого типа
+ * sourceMod -- модель типов и шаблонов.
+ */
+void KKSObjEditorFactory :: delSearchTemplateType (const QModelIndex& wIndex, QAbstractItemModel * searchMod)
+{
 }
 
 /* ћетод добавл€ет к »ќ wObj дополнительную таблицу и соответствующую вкладку на editor.
