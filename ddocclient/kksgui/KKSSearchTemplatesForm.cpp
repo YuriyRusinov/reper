@@ -17,6 +17,7 @@
 
 #include "KKSSearchTemplatesForm.h"
 #include "KKSHIntervalW.h"
+#include "defines.h"
 
 KKSSearchTemplatesForm :: KKSSearchTemplatesForm (QWidget * parent, Qt::WFlags f)
     : QDialog (parent, f),
@@ -100,7 +101,11 @@ void KKSSearchTemplatesForm :: setUserId (int iduser)
 void KKSSearchTemplatesForm :: addEmptySearchTemplate (void)
 {
     QAbstractItemModel * mod = searchView->model ();
-    emit addNewEmptySearchTemplate (mod);
+    QModelIndex wIndex = getCurrentIndex ();
+    if (wIndex.data (Qt::UserRole+USER_ENTITY).toInt() == 0)
+        emit addNewEmptySearchTemplate (wIndex, mod);
+    else
+        emit addNewEmptySearchTemplate (QModelIndex(), mod);
 }
 
 void KKSSearchTemplatesForm :: addCopySearchTemplate (void)

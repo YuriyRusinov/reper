@@ -38,10 +38,14 @@ private slots:
     void searchTemplatesSelectionChanged (const QItemSelection & selected, const QItemSelection & deselected);
 
 signals:
-    void addNewEmptySearchTemplate (QAbstractItemModel * searchMod);
+    void addNewEmptySearchTemplate (const QModelIndex& parent, QAbstractItemModel * searchMod);
     void addNewCopySearchTemplate (const QModelIndex& wIndex, QAbstractItemModel * searchMod);
     void updateSearchTemplate (const QModelIndex& wIndex, QAbstractItemModel * searchMod);
     void deleteSearchTemplate (const QModelIndex& wIndex, QAbstractItemModel * searchMod);
+    
+    void addSearchTemplateType (const QModelIndex& parent, QAbstractItemModel * searchMod);
+    void updateSearchTemplateType (const QModelIndex& wIndex, QAbstractItemModel * searchMod);
+    void delSearchTemplateType (const QModelIndex& wIndex, QAbstractItemModel * searchMod);
 
 private:
     //

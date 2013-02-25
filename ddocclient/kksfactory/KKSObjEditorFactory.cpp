@@ -2316,7 +2316,7 @@ void KKSObjEditorFactory :: filterTemplateEIO (KKSObjEditor * editor, int idObje
     */
 
     KKSSearchTemplatesForm *stForm = new KKSSearchTemplatesForm (editor);
-    connect (stForm, SIGNAL (addNewEmptySearchTemplate (QAbstractItemModel *)), this, SLOT (addNewSearchTempl (QAbstractItemModel *)) );
+    connect (stForm, SIGNAL (addNewEmptySearchTemplate (const QModelIndex&, QAbstractItemModel *)), this, SLOT (addNewSearchTempl (const QModelIndex&, QAbstractItemModel *)) );
     connect (stForm, SIGNAL (addNewCopySearchTemplate (const QModelIndex&, QAbstractItemModel *)), this, SLOT (addCopySearchTempl (const QModelIndex&, QAbstractItemModel *)) );
     connect (stForm, SIGNAL (updateSearchTemplate (const QModelIndex&, QAbstractItemModel *)), this, SLOT (updateSearchTempl (const QModelIndex&, QAbstractItemModel *)) );
     connect (stForm, SIGNAL (deleteSearchTemplate (const QModelIndex&, QAbstractItemModel *)), this,  SLOT (deleleSearchTempl (const QModelIndex&, QAbstractItemModel *)) );
@@ -2334,26 +2334,31 @@ void KKSObjEditorFactory :: filterTemplateEIO (KKSObjEditor * editor, int idObje
         searchTModel->setData (wIndex, stList[i]->name(), Qt::DisplayRole);
         searchTModel->setData (wIndex, stList[i]->id (), Qt::UserRole);
         searchTModel->setData (wIndex, stList[i]->idAuthor (), Qt::UserRole+1);
+        searchTModel->setData (wIndex, 1, Qt::UserRole+USER_ENTITY);
 
         wIndex = searchTModel->index (i, 1);
         searchTModel->setData (wIndex, stList[i]->authorName(), Qt::DisplayRole);
         searchTModel->setData (wIndex, stList[i]->id (), Qt::UserRole);
         searchTModel->setData (wIndex, stList[i]->idAuthor (), Qt::UserRole+1);
+        searchTModel->setData (wIndex, 1, Qt::UserRole+USER_ENTITY);
 
         wIndex = searchTModel->index (i, 2);
         searchTModel->setData (wIndex, stList[i]->creationDatetime().toString("dd.MMM.yyyy"), Qt::DisplayRole);
         searchTModel->setData (wIndex, stList[i]->id (), Qt::UserRole);
         searchTModel->setData (wIndex, stList[i]->idAuthor (), Qt::UserRole+1);
+        searchTModel->setData (wIndex, 1, Qt::UserRole+USER_ENTITY);
 
         wIndex = searchTModel->index (i, 3);
         searchTModel->setData (wIndex, stList[i]->categoryName(), Qt::DisplayRole);
         searchTModel->setData (wIndex, stList[i]->id (), Qt::UserRole);
         searchTModel->setData (wIndex, stList[i]->idAuthor (), Qt::UserRole+1);
+        searchTModel->setData (wIndex, 1, Qt::UserRole+USER_ENTITY);
 
         wIndex = searchTModel->index (i, 4);
         searchTModel->setData (wIndex, stList[i]->type()->name(), Qt::DisplayRole);
         searchTModel->setData (wIndex, stList[i]->id (), Qt::UserRole);
         searchTModel->setData (wIndex, stList[i]->idAuthor (), Qt::UserRole+1);
+        searchTModel->setData (wIndex, 1, Qt::UserRole+USER_ENTITY);
     }
     sortTModel->setSourceModel (searchTModel);
     sortTModel->setSortCaseSensitivity(Qt::CaseInsensitive);
@@ -6623,13 +6628,15 @@ KKSSearchTemplate * KKSObjEditorFactory :: loadSearchTemplate (void) const
 
 void KKSObjEditorFactory::createSearchTemplate()
 {
-    addNewSearchTempl(NULL);
+    QModelIndex parent= QModelIndex();
+    addNewSearchTempl(parent, NULL);
 }
 
 /* Метод создает новый шаблон поиска и добавляет соответствующую запись в модель searchMod.
  */
-void KKSObjEditorFactory :: addNewSearchTempl (QAbstractItemModel * searchMod)
+void KKSObjEditorFactory :: addNewSearchTempl (const QModelIndex& parent, QAbstractItemModel * searchMod)
 {
+    Q_UNUSED (parent);
     QWidget * pWidget = qobject_cast <QWidget *>(this->sender());
     QString stName;
     KKSSearchTemplate * st = new KKSSearchTemplate (-1, 0, stName, loader->getUserId());
@@ -8458,7 +8465,8 @@ void KKSObjEditorFactory :: addAttrSearchTemplate (void)
     if (!rw)
         return;
     QAbstractItemModel * sModel = rw->getSourceModel ();
-    addNewSearchTempl (sModel);
+    QModelIndex parent = QModelIndex ();
+    addNewSearchTempl (parent, sModel);
 }
 
 void KKSObjEditorFactory :: editAttrSearchTemplate (void)

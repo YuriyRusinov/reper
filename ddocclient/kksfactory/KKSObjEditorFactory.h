@@ -308,7 +308,7 @@ private slots:
 
     void loadSearchCriteria (void);//QAbstractItemModel * mod);
 
-    void addNewSearchTempl (QAbstractItemModel * searchMod);
+    void addNewSearchTempl (const QModelIndex& parent, QAbstractItemModel * searchMod);
     void addCopySearchTempl (const QModelIndex& wIndex, QAbstractItemModel * searchMod);
     void updateSearchTempl (const QModelIndex& wIndex, QAbstractItemModel * searchMod);
     void deleleSearchTempl (const QModelIndex& wIndex, QAbstractItemModel * searchMod);
