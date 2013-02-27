@@ -42,15 +42,15 @@ void SyncQueueViewForm::InitView()
 
 void SyncQueueViewForm::FillView()
 {
-    QString strTemp = "";
-    QDateTime dtTemp;
+//    QString strTemp = "";
+//    QDateTime dtTemp;
 
-    SyncQueueView *syncQueueTreeWnd = syncQueueViewerForm->GetTreeView();
-    QItemSelectionModel *selModel = syncQueueTreeWnd->selectionModel();
-    SyncQueueItemModel *model = syncQueueTreeWnd->GetModel();
+//    SyncQueueView *syncQueueTreeWnd = syncQueueViewerForm->GetTreeView();
+//    QItemSelectionModel *selModel = syncQueueTreeWnd->selectionModel();
+//    SyncQueueItemModel *model = syncQueueTreeWnd->GetModel();
 
-    QModelIndexList list = selModel->selectedIndexes();
-    QModelIndex index = list.at(0);
+//    QModelIndexList list = selModel->selectedIndexes();
+//    QModelIndex index = list.at(0);
  
     /*   
     strTemp = model->data(index, Qt::UserRole + 100).toString();
@@ -82,56 +82,56 @@ void SyncQueueViewForm::FillView()
 
 void SyncQueueViewForm::on_pbUp_clicked()
 {
-    SyncQueueView *syncQueueTreeWnd = syncQueueViewerForm->GetTreeView();
-    QItemSelectionModel *selModel = syncQueueTreeWnd->selectionModel();
-    SyncQueueItemModel *model = syncQueueTreeWnd->GetModel();
+//    SyncQueueView *syncQueueTreeWnd = syncQueueViewerForm->GetTreeView();
+//    QItemSelectionModel *selModel = syncQueueTreeWnd->selectionModel();
+//    SyncQueueItemModel *model = syncQueueTreeWnd->GetModel();
 
-    QModelIndexList list = selModel->selectedIndexes();
-    QModelIndex index = list.at(0);
+//   QModelIndexList list = selModel->selectedIndexes();
+//    QModelIndex index = list.at(0);
 
-    if(index.row() == 0)
-        return;
+//    if(index.row() == 0)
+//        return;
 
-    QItemSelection selection(
-            model->index(index.row() - 1, 0, syncQueueTreeWnd->rootIndex()),
-            model->index(index.row() - 1, 2, syncQueueTreeWnd->rootIndex()));
+//    QItemSelection selection(
+//            model->index(index.row() - 1, 0, syncQueueTreeWnd->rootIndex()),
+//            model->index(index.row() - 1, 2, syncQueueTreeWnd->rootIndex()));
 
-    QScrollBar *scroll = syncQueueTreeWnd->verticalScrollBar();
+//    QScrollBar *scroll = syncQueueTreeWnd->verticalScrollBar();
 
-    scroll->setValue(scroll->value() - scroll->singleStep());
+//    scroll->setValue(scroll->value() - scroll->singleStep());
 
-    selModel->select(selection, QItemSelectionModel::ClearAndSelect);
+//    selModel->select(selection, QItemSelectionModel::ClearAndSelect);
 
-    FillView();
+//    FillView();
 }
 
 void SyncQueueViewForm::on_pbDown_clicked()
 {
-    SyncQueueView *syncQueueTreeWnd = syncQueueViewerForm->GetTreeView();
-    QItemSelectionModel *selModel = syncQueueTreeWnd->selectionModel();
-    SyncQueueItemModel *model = syncQueueTreeWnd->GetModel();
+//    SyncQueueView *syncQueueTreeWnd = syncQueueViewerForm->GetTreeView();
+//    QItemSelectionModel *selModel = syncQueueTreeWnd->selectionModel();
+//    SyncQueueItemModel *model = syncQueueTreeWnd->GetModel();
 
-    QModelIndexList list = selModel->selectedIndexes();
-    QModelIndex index = list.at(0);
+//    QModelIndexList list = selModel->selectedIndexes();
+//    QModelIndex index = list.at(0);
 
-    int i = index.row() + 1;
-    int j = model->rowCount(); 
-    if( i == j)
-        return;
+//    int i = index.row() + 1;
+//    int j = model->rowCount(); 
+//    if( i == j)
+//        return;
 
-    QItemSelection selection(
-            model->index(index.row() + 1 , 0, syncQueueTreeWnd->rootIndex()),
-            model->index(index.row() + 1, 2, syncQueueTreeWnd->rootIndex()));
+//    QItemSelection selection(
+//            model->index(index.row() + 1 , 0, syncQueueTreeWnd->rootIndex()),
+//            model->index(index.row() + 1, 2, syncQueueTreeWnd->rootIndex()));
 
-    i = index.row();
+//    i = index.row();
 
-    QScrollBar *scroll = syncQueueTreeWnd->verticalScrollBar();
+//    QScrollBar *scroll = syncQueueTreeWnd->verticalScrollBar();
 
-    scroll->setValue(scroll->value() + scroll->singleStep());
+//    scroll->setValue(scroll->value() + scroll->singleStep());
 
-    selModel->select(selection, QItemSelectionModel::ClearAndSelect);
+//    selModel->select(selection, QItemSelectionModel::ClearAndSelect);
     
-    FillView();
+//    FillView();
 }
 /*
 void LogViewForm::ParserQString(QTreeWidget *treewidget, QString fullString)

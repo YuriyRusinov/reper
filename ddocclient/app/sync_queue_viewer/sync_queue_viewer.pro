@@ -43,14 +43,16 @@ HEADERS += \
            ./syncqueueviewerform.h \
            ./syncqueueviewform.h \
            ./syncqueueview.h \
-           ./syncqueueitemmodel.h 
+           ./syncqueueitemmodel.h \
+		   ./filtersform.h
 
 SOURCES += \
            ./syncqueueviewerform.cpp \
            ./syncqueueviewform.cpp \
            ./syncqueueview.cpp \
            ./syncqueueitemmodel.cpp \
-           ./main.cpp 
+           ./main.cpp \
+		   ./filtersform.cpp
 
 FORMS += \
            ./sync_queue_view_form.ui \

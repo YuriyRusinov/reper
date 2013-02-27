@@ -5,17 +5,14 @@
 #include <QDialog>
 #include <QModelIndex>
 #include <QProgressDialog>
+#include <QHBoxLayout>
+#include <QSplitter>
 
 class KKSDatabase;
 class SyncQueueView;
 class SyncQueueViewForm;
 
 #define _TABLE_COLUMN_COUNT_ 12
-
-namespace Ui 
-{
-    class sync_queue_viewer_form;
-}
 
 class SyncQueueViewerForm : public QDialog
 {
@@ -25,20 +22,26 @@ class SyncQueueViewerForm : public QDialog
         SyncQueueViewerForm(KKSDatabase * adb, QWidget * parent=NULL);
         ~SyncQueueViewerForm ();
 
-        void InitSyncQueueViewerForm();
-        //void InsertOperationAll(); 
+		//Возвращение строки запроса курсора
         QString GetCursorString(){return sqlCursor;}
+		//Возвращение числа колонок в курсоре
         int countInCursor();
 
         int GetColumnCount(){return countColumn;}
         int GetRowCount(){return countRow;}
         SyncQueueView* GetTreeView(){ return syncQueueTreeWnd;}
-            
-        SyncQueueViewForm *syncQueueView;
-    private:
-        Ui::sync_queue_viewer_form *ui;
 
-        SyncQueueView *syncQueueTreeWnd ;
+    private:
+		//Кнопки управления
+		QPushButton* qpb_filters;
+		QPushButton* qpb_delete;
+		QPushButton* qpb_restart;
+		QPushButton* qpb_cancel;
+		QPushButton* qpb_save;
+		QPushButton* qpb_exit;
+		QPushButton* qpb_view;
+
+        SyncQueueView *syncQueueTreeWnd ;// а это тогда что?
 
         QString sqlCursor;
 
@@ -52,25 +55,11 @@ class SyncQueueViewerForm : public QDialog
         int count_colomn_logfile;
         QProgressDialog * progress;
 
-        //bool changeUser;
-        //bool changeOperation;
-
-        void connectSlots();
-
     private slots:
-        //void on_pbEditLogSettings_clicked();
-        //void on_pbSaveToFile_clicked();
-        void on_pbClear_clicked();
+		//Слот вызова диалога для установки фильтров
+		void slot_filters_setup();
+		//Слот обращения к базе данных
         void on_pbView_clicked();
-        void on_pbExit_clicked();
-        void doubleClicked ( const QModelIndex & index );
-        //QString SelectUserOperation();
-        //QString SelectAll();
-        //QString SelectUser();
-        //QString SelectGroupOperation();
-        //QString SelectGroupUser();
-        //QString SelectOperation();
-        //QString SelectGroupUserOperation();
 };
 
 #endif

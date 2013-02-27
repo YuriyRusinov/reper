@@ -19,83 +19,43 @@ SyncQueueItemModel::SyncQueueItemModel(int iCountRow,
     move = false;
 }
 
+//***** *****
 QVariant SyncQueueItemModel::data(const QModelIndex & index, int role) const
 {
     if(move)
         return QVariant();
     
-    KKSResult * res = NULL;
-    QString v = "";
-    QDateTime dt = dt.currentDateTime();
-    int pos = 0;
-    int roleIndex = 0;
+    KKSResult * res = NULL;             //Результат запроса базы данных
+    QString v = "";                     //Строка данных
+    QDateTime dt = dt.currentDateTime();//Текущее время
+    int pos = 0;                        //Позиция в базе данных
+    int roleIndex = 0;                  //
+  
+	//Если индекс неверен или роль не имеет значения "выбранные данные отображаются как текст", вернуть ошибку
+    if (!index.isValid() || role != Qt::DisplayRole)
+        return QVariant();
+	//Если индекс неверен вернуть ошибку
+    if(index.column() < 0 || index.column() > _TABLE_COLUMN_COUNT_)
+        return QVariant();
 
-    if(role > Qt::UserRole)
+    //Если столбец 0
+    if(index.column() == 0)
     {
-        switch(role)
-        {
-            case Qt::UserRole + 100:
-                roleIndex = 0;
-                break;
-            case Qt::UserRole + 101:
-                roleIndex = 1;
-                break;
-            case Qt::UserRole + 102:
-                roleIndex = 2;
-                break;
-            case Qt::UserRole + 103:
-                roleIndex = 3;
-                break;
-            case Qt::UserRole + 104:
-                roleIndex = 4;
-                break;
-            case Qt::UserRole + 105:
-                roleIndex = 5;
-                break;
-            case Qt::UserRole + 106:
-                roleIndex = 6;
-                break;
-            case Qt::UserRole + 107:
-                roleIndex = 7;
-                break;
-            case Qt::UserRole + 108:
-                roleIndex = 8;
-                break;
-            case Qt::UserRole + 109:
-                roleIndex = 9;
-                break;
-            case Qt::UserRole + 110:
-                roleIndex = 10;
-                break;
-            case Qt::UserRole + 111:
-                roleIndex = 11;
-                break;
-        }
-
+		//Позиция строки в базе данных +1 от индекса
         pos = index.row() + 1;
 
         res = db->fetch("sync_cursor", 4, pos);
 
         if(res)
         {
-            v = res->getCellAsString(0, roleIndex);
+            v = res->getCellAsString(0, 0);
+            delete res;
         }
 
-        if(res)
-            delete res;
-
-        return v;
+        return v;  
     }
-    
-    if (!index.isValid() || role != Qt::DisplayRole)
-        return QVariant();
-
-    
-    if(index.column() < 0 || index.column() > _TABLE_COLUMN_COUNT_)
-        return QVariant();
-
-    
-    if(index.column() == 0)
+	//Если столбец 1
+    if(index.column() == 1)
     {
         pos = index.row() + 1;
 
@@ -104,49 +64,13 @@ QVariant SyncQueueItemModel::data(const QModelIndex & index, int role) const
         if(res)
         {
             v = res->getCellAsString(0, 1);
-        }
-
-        if(res)
-            delete res;
-
-        return v;  
-    }
-
-    if(index.column() == 1)
-    {
-        pos = index.row() + 1;
-        res = db->fetch("sync_cursor", 4, pos);
-
-        if(res)
-        {
-            //время в формате 2007-01-15 13:33:32.403797
-            dt = res->getCellAsDateTime(0, 5);
-            v = dt.toString("hh:mm::ss dd-MM-yyyy");
             delete res;
         }
 
         return v;
     }
-    
-
-    /*
-    pos = index.row() + 1;
-
-    res = db->fetch("sync_cursor", 4, pos);
-
-    if(res)
-    {
-        v = res->getCellAsString(0, index.column());
-    }
-
-    if(res)
-        delete res;
-
-    return v;
-    */
-
-    /*  потом может пригодиться, чтобы более правильно визуализировать данные. Например, дату и время и т.п.
-    if(index.column() == 0)
+	//Если столбец 2
+    if(index.column() == 2)
     {
         pos = index.row() + 1;
 
@@ -155,48 +79,135 @@ QVariant SyncQueueItemModel::data(const QModelIndex & index, int role) const
         if(res)
         {
             v = res->getCellAsString(0, 2);
-        }
-
-        if(res)
             delete res;
+        }
 
         return v;
     }
-
-    if(index.column() == 1)
+	//Если столбец 3
+    if(index.column() == 3)
     {
         pos = index.row() + 1;
+
+        res = db->fetch("sync_cursor", 4, pos);
+
+        if(res)
+        {
+            v = res->getCellAsString(0, 3);
+            delete res;
+        }
+
+        return v;
+    }   
+	//Если столбец 4
+    if(index.column() == 4)
+    {
+        pos = index.row() + 1;
+
         res = db->fetch("sync_cursor", 4, pos);
 
         if(res)
         {
             v = res->getCellAsString(0, 4);
+            delete res;
         }
 
-        if(res)
-            delete res;
         return v;
-    }
-
-    if(index.column() == 2)
+    }    
+	//Если столбец 5
+    if(index.column() == 5)
     {
         pos = index.row() + 1;
+
         res = db->fetch("sync_cursor", 4, pos);
 
         if(res)
         {
-            //время в формате 2007-01-15 13:33:32.403797
-            dt = res->getCellAsDateTime(0, 7);
-            v = dt.toString("hh:mm::ss dd-MM-yyyy");
+            v = res->getCellAsString(0, 5);
             delete res;
         }
 
         return v;
-    }
-    */
+    }    
+	//Если столбец 6
+    if(index.column() == 6)
+    {
+        pos = index.row() + 1;
+
+        res = db->fetch("sync_cursor", 4, pos);
+
+        if(res)
+        {
+            v = res->getCellAsString(0, 6);
+            delete res;
+        }
+
+        return v;
+    }    
+	//Если столбец 7
+    if(index.column() == 7)
+    {
+        pos = index.row() + 1;
+
+        res = db->fetch("sync_cursor", 4, pos);
+
+        if(res)
+        {
+            v = res->getCellAsString(0, 7);
+            delete res;
+        }
+
+        return v;
+    }    
+	//Если столбец 8
+    if(index.column() == 8)
+    {
+        pos = index.row() + 1;
+
+        res = db->fetch("sync_cursor", 4, pos);
+
+        if(res)
+        {
+            v = res->getCellAsString(0, 8);
+            delete res;
+        }
+
+        return v;
+    }    
+	//Если столбец 9
+    if(index.column() == 9)
+    {
+        pos = index.row() + 1;
+
+        res = db->fetch("sync_cursor", 4, pos);
+
+        if(res)
+        {
+            v = res->getCellAsString(0, 9);
+            delete res;
+        }
+
+        return v;
+    }    
+	//Если столбец 10
+    if(index.column() == 10)
+    {
+        pos = index.row() + 1;
+
+        res = db->fetch("sync_cursor", 4, pos);
+
+        if(res)
+        {
+            v = res->getCellAsString(0, 10);
+            delete res;
+        }
+
+        return v;
+    }    
 
     return QVariant();
 }
+//**********
 
 int SyncQueueItemModel::columnCount ( const QModelIndex & parent ) const
 {
@@ -210,11 +221,13 @@ int SyncQueueItemModel::rowCount ( const QModelIndex & parent ) const
     return countRow;
 }
 
+
+//*****Установка заголовков столбцов*****
 QVariant SyncQueueItemModel::headerData(int section, 
                                         Qt::Orientation orientation,
                                         int role) const
 {
-    if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
+    /*if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
         switch (section) {
             case 0:
                 return tr("Transport task");
@@ -243,7 +256,71 @@ QVariant SyncQueueItemModel::headerData(int section,
             default:
                 return QVariant();
         }
-    }
+    }*/
+
+	if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
+	{
+        switch (section) 
+		{
+            case 0:
+                return tr("Id integer");
+            case 1:
+                return tr("Id organization");
+            case 2:
+                return tr("Id entity integer");
+            case 3:
+                return tr("Entity table");
+            case 4:
+                return tr("Entity type");
+            case 5:
+                return tr("Sync type");
+            case 6:
+                return tr("Sync result");
+            case 7:
+                return tr("Entity UID");
+            case 8:
+                return tr("Entity IO UID");
+            case 9:
+                return tr("UNIQUE_ID");
+            case 10:
+                return tr("Last update");
+            case 11:
+                return tr(" ");
+            default:
+                return QVariant();			
+		}
+	}
 
     return QVariant();
 }
+//**********
+/* Ошибка в запросе?
+    sqlCursor = QString(" \
+                            select \
+                                t.id, --ID транспортной задачи \
+                                t.name, --(*) Транспортная задача \
+                                t.local_address, -- локальный адрес транспорта \
+                                ot.address,-- адрес целевой организации \
+                                q.unique_id, --уникальный идентификатор записи очереди  \
+                                q.last_update, -- (*) дата и время отправки \
+                                q.id, -- идентификатор записи очереди \
+                                q.id_organization, --идентификатор целевой организации \
+                                o.name, -- (*) Целевая организация \
+                                q.id_entity, -- (*) ИД пересылаемой записи \
+                                q.entity_table, -- название таблицы в которой содержится пересылаемая запись \
+                                io.name, --(*) название ИО \
+                                q.entity_type, --(*) тип ИО (!!!!!) \
+                                q.sync_type,  --(*) тип синхронизации (!!!!) \
+                                q.sync_result,  --(*) результат синхронизации (!!!!!) \
+                                q.entity_uid,  --уникальный идентификатор пересылаемой записи справочника \
+                                q.entity_io_uid  -- уникальный идентификатор справочника \
+                            from  \
+                                out_sync_queue q \
+                                inner join organization o on (o.id = q.id_organization) \
+                                inner join organization_transport ot on (o.id = ot.id_organization) \
+                                inner join transport t on (ot.id_transport = t.id) \
+                                inner join io_objects io on (q.entity_table = io.table_name) \
+                            where \
+                                1=1 \
+                        ");
+*/
