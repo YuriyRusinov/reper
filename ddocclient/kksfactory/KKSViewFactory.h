@@ -139,6 +139,8 @@ class _F_EXPORT KKSViewFactory
         static QModelIndex searchModelRowsIndex (QAbstractItemModel * sourceMod, qint64 iData, const QModelIndex& parent = QModelIndex(), int role=Qt::UserRole);
         
         static KKSEIOData * getRecordData (const KKSObjectExemplar * rec);
+        
+        static void getSearchTemplates (KKSLoader * loader, QAbstractItemModel * searchTModel, const QModelIndex& pIndex);
 
     protected:
     private:

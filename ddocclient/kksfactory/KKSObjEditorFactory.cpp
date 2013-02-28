@@ -2306,7 +2306,7 @@ void KKSObjEditorFactory :: filterTemplateEIO (KKSObjEditor * editor, int idObje
     }
     KKSSearchTemplate * searchT = 0;
     KKSList<KKSSearchTemplate *> stList = loader->loadSearchTemplates ();
-    int ncount = stList.count();
+    int ncount (0);//= stList.count();
     /*
     if (!ncount)
     {

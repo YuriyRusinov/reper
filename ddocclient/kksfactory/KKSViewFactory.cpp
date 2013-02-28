@@ -55,6 +55,8 @@
 #include <KKSEventFilter.h>
 #include <KKSCheckableModel.h>
 #include <KKSAttrGroup.h>
+#include <KKSSearchTemplate.h>
+#include <KKSSearchTemplateType.h>
 #include <kksresult.h>
 #include <defines.h>
 
@@ -2118,4 +2120,53 @@ QModelIndex KKSViewFactory :: searchModelRowsIndex (QAbstractItemModel * sourceM
             continue;
     }
     return QModelIndex();
+}
+
+void KKSViewFactory::getSearchTemplates (KKSLoader * loader, QAbstractItemModel * searchTModel, const QModelIndex& pIndex)
+{
+    if (!searchTModel || !loader)
+        return;
+
+    int ncount (0);
+    KKSMap<int, KKSSearchTemplateType *> stt = loader->loadSearchTemplateTypes();
+    QModelIndex prevIndex (pIndex);
+    for (KKSMap<int, KKSSearchTemplateType *>::const_iterator ps = stt.constBegin();
+            ps != stt.constEnd();
+            ++ps)
+    {
+        KKSSearchTemplateType * st = ps.value();
+        if (!st)
+            continue;
+
+        QModelIndex wIndex;
+        if ((prevIndex.isValid() && st->parent() && st->parent()->id() == prevIndex.data(Qt::UserRole).toInt())
+            || (!prevIndex.isValid() && !st->parent()))
+        {
+            searchTModel->insertRows(ncount, 1, prevIndex);
+            wIndex = searchTModel->index (ncount, 0, prevIndex);
+            ncount++;
+        }
+        else if (st->parent() && prevIndex.isValid())
+        {
+            while (prevIndex.isValid() && st->parent()->id() != prevIndex.data(Qt::UserRole).toInt())
+            {
+                prevIndex = prevIndex.parent();
+                ncount = searchTModel->rowCount (prevIndex);
+            }
+            searchTModel->insertRows(ncount, 1, prevIndex);
+            wIndex = searchTModel->index (ncount, 0, prevIndex);
+            ncount++;
+        }
+        else
+        {
+            prevIndex = pIndex;
+            ncount = searchTModel->rowCount (prevIndex);
+            searchTModel->insertRows(ncount, 1, prevIndex);
+            wIndex = searchTModel->index (ncount, 0, prevIndex);
+            ncount++;
+        }
+        searchTModel->setData (wIndex, st->name(), Qt::DisplayRole);
+        searchTModel->setData (wIndex, st->id (), Qt::UserRole);
+        searchTModel->setData (wIndex, 0, Qt::UserRole+USER_ENTITY);
+    }
 }
