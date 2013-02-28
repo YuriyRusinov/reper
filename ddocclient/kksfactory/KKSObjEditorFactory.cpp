@@ -2332,7 +2332,7 @@ void KKSObjEditorFactory :: filterTemplateEIO (KKSObjEditor * editor, int idObje
     searchTModel->setHeaderData (2, Qt::Horizontal, tr ("Creation date/time"), Qt::DisplayRole);
     searchTModel->setHeaderData (3, Qt::Horizontal, tr ("Category"), Qt::DisplayRole);
     searchTModel->setHeaderData (4, Qt::Horizontal, tr ("Type"), Qt::DisplayRole);
-    for (int i=0; i<ncount; i++)
+/*    for (int i=0; i<ncount; i++)
     {
         QModelIndex wIndex = searchTModel->index (i, 0);
         searchTModel->setData (wIndex, stList[i]->name(), Qt::DisplayRole);
@@ -2364,6 +2364,8 @@ void KKSObjEditorFactory :: filterTemplateEIO (KKSObjEditor * editor, int idObje
         searchTModel->setData (wIndex, stList[i]->idAuthor (), Qt::UserRole+1);
         searchTModel->setData (wIndex, 1, Qt::UserRole+USER_ENTITY);
     }
+*/
+    KKSViewFactory::getSearchTemplates (loader, searchTModel);
     sortTModel->setSourceModel (searchTModel);
     sortTModel->setSortCaseSensitivity(Qt::CaseInsensitive);
     sortTModel->sort(0);
