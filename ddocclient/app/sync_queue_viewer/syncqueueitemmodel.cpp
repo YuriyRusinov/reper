@@ -111,12 +111,12 @@ QVariant SyncQueueItemModel::data(const QModelIndex & index, int role) const
             v = res->getCellAsString(0, 4);
             delete res;
         }
-
+/*
 		if(v=6)
 		{
 			setData();
 		}
-
+*/
         return v;
     }    
 	//Если столбец 6
