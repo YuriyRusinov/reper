@@ -1,8 +1,7 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     26.11.2012 12:19:50                          */
+/* Created on:     28.02.2013 16:12:37                          */
 /*==============================================================*/
-
 
 /*==============================================================*/
 /* Table: root_table                                            */
@@ -23,6 +22,8 @@ select setMacToNULL('root_table');
 create unique index Index_1 on root_table using BTREE (
 unique_id
 );
+
+
 
 /*==============================================================*/
 /* User: public                                                 */
@@ -2157,6 +2158,60 @@ select setMacToNULL('message_journal');
 select createTriggerUID('message_journal');
 
 /*==============================================================*/
+/* Table: message_streams                                       */
+/*==============================================================*/
+create table message_streams (
+   id                   SERIAL               not null,
+   id_partition_low     INT4                 not null,
+   id_io_object         INT4                 not null,
+   id_dl_receiver       INT4                 not null,
+   name                 VARCHAR              not null,
+   lambda               FLOAT8               null default 0,
+   sigma                FLOAT8               null default 0,
+   moda                 FLOAT8               null default 0,
+   min_p                FLOAT8               null default 0,
+   max_p                FLOAT8               null default 0,
+   start_time           TIMESTAMP            not null,
+   end_time             TIMESTAMP            not null,
+   constraint PK_MESSAGE_STREAMS primary key (id)
+)
+inherits (root_table);
+
+comment on table message_streams is
+'Пядь
+Справочник генерации потоков сообщений (информационых объектов)';
+
+comment on column message_streams.id_io_object is
+'ссылка на информационный объект типа справочник, на основании  которого <генерятся> сообщения потока путем последовательной выборки записей справочника, при достижении конечной записи справочника производится переключение на первую запись и т.д.';
+
+comment on column message_streams.id_dl_receiver is
+'Должностное лицо-адресат  потока';
+
+comment on column message_streams.lambda is
+'Входит в группу задания параметров закона распределения';
+
+comment on column message_streams.sigma is
+'Входит в группу задания параметров закона распределения';
+
+comment on column message_streams.moda is
+'Входит в группу задания параметров закона распределения';
+
+comment on column message_streams.min_p is
+'Входит в группу задания параметров закона распределения';
+
+comment on column message_streams.max_p is
+'Входит в группу задания параметров закона распределения';
+
+comment on column message_streams.start_time is
+'Дата и время начала интервала генерации потока';
+
+comment on column message_streams.end_time is
+'Дата и время завершения генерации потока';
+
+select setMacToNULL('message_streams');
+select createTriggerUID('message_streams');
+
+/*==============================================================*/
 /* Table: mimetypes                                             */
 /*==============================================================*/
 create table mimetypes (
@@ -2497,7 +2552,9 @@ inherits (root_table);
 
 comment on table out_sync_queue is
 'Очередь системных исходящих сообщений для синхронизации.
-Доступна для пользователя jupiter';
+Доступна для пользователя jupiter
+
+Таблица унаследована от root_table. При этом поле last_update используется как дата и время помещения записи в очередь. Фактически речь идет о дате и времени отправки адресату.';
 
 comment on column out_sync_queue.id_organization is
 'Организация, с которой осуществляется синхронизация';
@@ -2568,6 +2625,24 @@ create  index i_io_uid_sync_res on out_sync_queue using BTREE (
 sync_result,
 entity_io_uid
 );
+
+/*==============================================================*/
+/* Table: partition_lows                                        */
+/*==============================================================*/
+create table partition_lows (
+   id                   SERIAL               not null,
+   name                 VARCHAR              not null,
+   description          VARCHAR              null,
+   constraint PK_PARTITION_LOWS primary key (id)
+)
+inherits (root_table);
+
+comment on table partition_lows is
+'Пядь
+Справочник законов распределения';
+
+select setMacToNULL('partition_lows');
+select createTriggerUID('partition_lows');
 
 /*==============================================================*/
 /* Table: personal_q                                            */
@@ -3335,7 +3410,7 @@ select createTriggerUID('tso_units');
 /* Table: units                                                 */
 /*==============================================================*/
 create table units (
---   id                   SERIAL not null,
+ --  id                   SERIAL not null,
    id_organization      INT4                 null,
    id_parent            INT4                 null,
    id_curr_mode         INT4                 not null,
@@ -4366,6 +4441,21 @@ alter table message_journal
 alter table message_journal
    add constraint FK_MESSAGE__REFERENCE_IO_OBJEC foreign key (id_io_object)
       references io_objects (id)
+      on delete restrict on update restrict;
+
+alter table message_streams
+   add constraint FK_MESSAGE_STREAMS__REF_PARTITION foreign key (id_partition_low)
+      references partition_lows (id)
+      on delete restrict on update restrict;
+
+alter table message_streams
+   add constraint FK_MESSAGE_STREAMS__REF_IO_OBJEC foreign key (id_io_object)
+      references io_objects (id)
+      on delete restrict on update restrict;
+
+alter table message_streams
+   add constraint FK_MESSAGE_STREAMS__REF_POSITION foreign key (id_dl_receiver)
+      references "position" (id)
       on delete restrict on update restrict;
 
 alter table object_ref_tables

@@ -644,6 +644,20 @@ insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main
 insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
 values(190, -10, true, true, false, false, true);
 
+insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values ('localorg-categories-191', 191, 10, NULL, false, 'Законы распределения', 'SYSCATEGORY_191', NULL::varchar, true, true, 1);
+insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
+values(191, -10, true, true, false, false, true);
+insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values ('localorg-categories-192', 192, 8, 191, true, 'Справочник законов распределения', 'SYSCATEGORY_192', NULL::varchar, true, true, 1);
+insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
+values(192, -10, true, true, false, false, true);
+
+insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values ('localorg-categories-193', 193, 10, NULL, false, 'Потоки сообщений', 'SYSCATEGORY_193', NULL::varchar, true, true, 1);
+insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
+values(193, -10, true, true, false, false, true);
+insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values ('localorg-categories-194', 194, 8, 193, true, 'Справочник потоков сообщений', 'SYSCATEGORY_194', NULL::varchar, true, true, 1);
+insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
+values(194, -10, true, true, false, false, true);
+
 SELECT pg_catalog.setval('io_categories_id_seq', 300, true); --все пользовательские категории будут начинаться с номера 301
                                                              --это сделано для того, чтобы оставить резерв для системных категорий 
 
@@ -1195,6 +1209,19 @@ insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (
 insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (190, 1, 2);
 insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (190, 2, 1);
 
+insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (191, 1, 2);
+insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (191, 2, 1);
+
+insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (192, 1, 2);
+insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (192, 2, 1);
+
+insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (193, 1, 2);
+insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (193, 2, 1);
+
+insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (194, 1, 2);
+insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (194, 2, 1);
+
+
 --атрибуты "дочерних категорий"
 --ВАЖНО!!! Для атрибутов ссылочных здесь не устанавливается тип атрибута, на который они ссылаются. Это делается отдельной операцией в конце данного скрипта
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-1', 1, 8, 'id', 'Идентификатор', 'ИД', NULL, NULL, 50, TRUE);
@@ -1577,6 +1604,16 @@ insert into attributes (unique_id, id, id_a_type, code, name, title, table_name,
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-311', 311, 3, 'id_child2', 'Подчиненная категория показателей', 'Подчиненная категория показателей', 'io_categories', 'name', 300, TRUE);
 
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-312', 312, 15, 'r_icon', 'Условный знак элемента', 'Условный знак элемента', NULL, NULL, 150, TRUE);
+
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-313', 313, 5, 'start_time', 'Начало потока', 'Начало потока', NULL, NULL, 120, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-314', 314, 5, 'stop_time', 'Окончание потока', 'Окончание потока', NULL, NULL, 120, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-315', 315, 2, 'id_partition_low', 'Закон распределения', 'Закон распределения', 'partition_lows', 'name', 150, TRUE);
+
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-316', 316, 6, 'lambda', 'Лямбда', 'Лямбда', NULL, NULL, 120, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-317', 317, 6, 'sigma', 'Сигма', 'Сигма', NULL, NULL, 120, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-318', 318, 6, 'moda', 'Мода', 'Мода', NULL, NULL, 120, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-319', 319, 6, 'min_p', 'Мин.', 'Мин.', NULL, NULL, 120, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-320', 320, 6, 'max_p', 'Макс.', 'Макс.', NULL, NULL, 120, TRUE);
 
 SELECT pg_catalog.setval('attributes_id_seq', 1000, true); --все пользовательские атрибуты будут начинаться с номера 1001
                                                           --это сделано для того, чтобы оставить резерв для системных атрибутов
@@ -2531,8 +2568,24 @@ insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is
 --533 занят для атрибута r_icon в справочнике рубрикатора
 --534 занят для атрибута r_icon в справочнике информационных объектов
 
+--таблица законов распределения
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (535, 191, 1, NULL, true, true); --id
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (536, 191, 2, NULL, true, false); --name
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (537, 191, 3, NULL, false, false);  --description
 
-
+--таблица потоков сообщений
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (538, 193, 1, NULL, true, true); --id
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (539, 193, 2, NULL, true, false); --name
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (540, 193, 315, NULL, true, false); --id_partition_low
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (541, 193, 52, NULL, true, false); --id_dl_receiver
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (542, 193, 48, NULL, true, false); --id_io_object
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (543, 193, 316, '0', false, false); --lambda
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (544, 193, 317, '0', false, false); --sigma
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (545, 193, 318, '0', false, false); --moda
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (546, 193, 319, '0', false, false); --min_p
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (547, 193, 320, '0', false, false); --max_p
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (548, 193, 313, NULL, true, false); --start_time
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (549, 193, 314, NULL, true, false); --end_time
 
 
 SELECT pg_catalog.setval('attrs_categories_id_seq', 2000, true); --все пользовательские атрибуты в категориях будут начинаться с номера 2001
@@ -2993,6 +3046,16 @@ values ('localorg-io_objects-92', 92, 190, 1, 1, 'Справочник атрибутов в атрибут
 insert into access_table (id_io_object, id_role, allow_readlist, allow_read, allow_delete, allow_update)
 values (92, -10, TRUE, TRUE, FALSE, FALSE);
 
+insert into tbl_io_objects (unique_id, id, id_io_category, author, id_io_state, name, table_name, description, information, is_system, is_global, id_sync_type, insert_time, id_maclabel, id_owner_org, id_io_type)
+values ('localorg-io_objects-93', 93, 192, 1, 1, 'Справочник законов распределения', 'partition_lows', NULL, 'Системный объект', true, true, 5, current_timestamp, 1, NULL, 3);
+insert into access_table (id_io_object, id_role, allow_readlist, allow_read, allow_delete, allow_update)
+values (93, -10, TRUE, TRUE, FALSE, FALSE);
+
+insert into tbl_io_objects (unique_id, id, id_io_category, author, id_io_state, name, table_name, description, information, is_system, is_global, id_sync_type, insert_time, id_maclabel, id_owner_org, id_io_type)
+values ('localorg-io_objects-94', 94, 194, 1, 1, 'Справочник потоков сообщений', 'message_streams', NULL, 'Системный объект', true, true, 5, current_timestamp, 1, NULL, 3);
+insert into access_table (id_io_object, id_role, allow_readlist, allow_read, allow_delete, allow_update)
+values (94, -10, TRUE, TRUE, FALSE, FALSE);
+
 SELECT pg_catalog.setval('tbl_io_objects_id_seq', 300, true); --все пользовательские информационные объекты будут начинаться с номера 301
                                                           --это сделано для того, чтобы оставить резерв для системных ИО
 
@@ -3068,6 +3131,37 @@ insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only
 insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(185, 3, 12, false, 3, NULL);--tree_symbol
 insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(184, 3, 12, false, 4, NULL);--map_symbol
 insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(188, 3, 12, false, 5, NULL);--work_modes (separate table)
+
+--создание специального шаблона для справочника потоков сообщений
+insert into io_templates (id_io_category, name, code) values(193, 'Специальный шаблон для справочника потоков сообщений', 'SYSTEMPLATE_4');
+insert into a_groups (id_io_template, id_parent, name, "order") values(4, NULL, 'Основные атрибуты', 0); --13
+insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(538, 4, 13, false, 0, NULL); --id
+insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(539, 4, 13, false, 1, NULL); --name
+insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(541, 4, 13, false, 2, NULL); --id_dl_receiver
+insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(542, 4, 13, false, 3, NULL); --id_io_object
+
+insert into a_groups (id_io_template, id_parent, name, "order") values(4, NULL, 'Параметры закона распределения', 1); --14
+insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(540, 4, 14, false, 0, NULL); --id_partition_low
+insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(543, 4, 14, false, 1, '0'); --lambda
+insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(544, 4, 14, false, 2, '0'); --sigma
+insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(545, 4, 14, false, 3, '0'); --moda
+insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(546, 4, 14, false, 4, '0'); --min_p
+insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(547, 4, 14, false, 5, '0'); --max_p
+
+insert into a_groups (id_io_template, id_parent, name, "order") values(4, NULL, 'Диапазон генерации потока', 2); --15
+insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(548, 4, 15, false, 0, NULL);--start_time
+insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(549, 4, 15, false, 1, NULL);--end_time
+
+SELECT pg_catalog.setval('io_templates_id_seq', 50, true); --все пользовательские шаблоны будут начинаться с номера 51
+                                                           --это сделано для того, чтобы оставить резерв для системных 
+                                                           --шаблоны для зари22 создаются в спец. функции, которая определяет очередной доступный ИД
+                                                           --поэтому на тот код данный вызов не влияет    
+
+SELECT pg_catalog.setval('a_groups_id_seq', 100, true);    --шаблоны для зари22 создаются в спец. функции, которая определяет очередной доступный ИД
+                                                           --поэтому на тот код данный вызов не влияет    
+
+SELECT pg_catalog.setval('io_views_id_seq', 300, true);    --шаблоны для зари22 создаются в спец. функции, которая определяет очередной доступный ИД
+                                                           --поэтому на тот код данный вызов не влияет    
 
 update attributes set id_ref_attr_type = 9 where column_name is not null;
 
