@@ -47,14 +47,14 @@ select f_create_trigger('zz_trgzioinserttableafter', 'after', 'insert', 'io_obje
 
 --ÂÑÅ ÎÑÒÀËÜÍÎÅ ÇÄÅÑÜ
 
+alter table search_templates add column id_io_category int4;
+update search_templates set id_io_category = 13;
+alter table search_templates alter column id_io_category set not null;
+
 alter table search_templates add column creation_datetime timestamp;
 update search_templates set creation_datetime = last_update;
 alter table search_templates alter column creation_datetime set default current_timestamp;
 alter table search_templates alter column creation_datetime set not null;
-
-alter table search_templates add column id_io_category int4;
-update search_templates set id_io_category = 13;
-alter table search_templates alter column id_io_category set not null;
 
 select f_safe_drop_trigger('trgdlinsert', 'position');
 alter table "position" add column is_archived bool;
