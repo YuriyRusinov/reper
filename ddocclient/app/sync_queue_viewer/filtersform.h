@@ -7,7 +7,7 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QSplitter>
-#include <QCheckbox>
+#include <QCheckBox>
 #include <QDateTimeEdit>
 #include <QLabel>
 #include <QGridLayout>
