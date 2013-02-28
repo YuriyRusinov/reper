@@ -128,8 +128,8 @@ void SyncQueueViewerForm::on_pbView_clicked()
 
     sqlCursor.clear();
 
-/* Ошибка в запросе?
-    sqlCursor = QString(" \
+
+    /*
                             select \
                                 t.id, --ID транспортной задачи \
                                 t.name, --(*) Транспортная задача \
@@ -156,11 +156,41 @@ void SyncQueueViewerForm::on_pbView_clicked()
                                 inner join io_objects io on (q.entity_table = io.table_name) \
                             where \
                                 1=1 \
+    
+    */
+
+    sqlCursor = QString(" \
+                            select \
+                                t.id,  \
+                                t.name,  \
+                                t.local_address,  \
+                                ot.address, \
+                                q.unique_id,   \
+                                q.last_update,  \
+                                q.id,  \
+                                q.id_organization,  \
+                                o.name,  \
+                                q.id_entity,  \
+                                q.entity_table,  \
+                                io.name,  \
+                                q.entity_type,  \
+                                q.sync_type,   \
+                                q.sync_result,   \
+                                q.entity_uid,   \
+                                q.entity_io_uid   \
+                            from  \
+                                out_sync_queue q \
+                                inner join organization o on (o.id = q.id_organization) \
+                                inner join organization_transport ot on (o.id = ot.id_organization) \
+                                inner join transport t on (ot.id_transport = t.id) \
+                                inner join io_objects io on (q.entity_table = io.table_name) \
+                            where \
+                                1=1 \
                         ");
-*/
+// */
 
 	//Выбрать все данные из таблицы и упорядочить по первому столбцу
-	sqlCursor = QString("select * from out_sync_queue where 1=1");
+	//sqlCursor = QString("select * from out_sync_queue where 1=1");
     sqlCursor += QString(" order by 1");
 	//Курсор открыт
     cursor_open = true;
