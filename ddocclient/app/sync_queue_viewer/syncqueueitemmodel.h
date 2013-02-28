@@ -18,16 +18,16 @@ class SyncQueueItemModel:public QAbstractTableModel
 
 		//Возврат количества столбцов
         int columnCount(const QModelIndex& parent = QModelIndex()) const;
-		//Возврат количества строк
+		//Возврат количества строк потомков для узла
         int rowCount(const QModelIndex& parent = QModelIndex()) const;
 		//Установка флага перемещения
         void SetMove(bool amove){move = amove;}
 
-		//***** *****
+		//*****Установка данных*****
         QVariant data(const QModelIndex& index, int role = Qt::DisplayRole ) const;
 		//**********
 
-		//***** *****
+		//*****Установка заголовков таблицы*****
         QVariant headerData(int section, Qt::Orientation orientation, int role) const;
 		//**********
 
@@ -35,6 +35,13 @@ class SyncQueueItemModel:public QAbstractTableModel
         void SetCursor(KKSResult* ares, int apos_cursor = 0 ){res = ares;pos_cursor = apos_cursor;}
 		//**********
 
+		//*****Поскольку потомков у узлов нет функция возвращает всегда false*****
+		bool hasChildren ( const QModelIndex & parent = QModelIndex() ) {return false;}
+		//**********
+		
+		//*****Переопределение функции установки данных*****
+		//bool setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole );
+		//**********
     private:
         KKSResult *res;    //Результат запроса
 

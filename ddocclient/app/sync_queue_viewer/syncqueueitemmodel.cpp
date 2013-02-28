@@ -38,7 +38,7 @@ QVariant SyncQueueItemModel::data(const QModelIndex & index, int role) const
     if(index.column() < 0 || index.column() > _TABLE_COLUMN_COUNT_)
         return QVariant();
 
-    //Если столбец 0
+    //Если столбец 1
     if(index.column() == 0)
     {
 		//Позиция строки в базе данных +1 от индекса
@@ -54,7 +54,7 @@ QVariant SyncQueueItemModel::data(const QModelIndex & index, int role) const
 
         return v;  
     }
-	//Если столбец 1
+	//Если столбец 2
     if(index.column() == 1)
     {
         pos = index.row() + 1;
@@ -69,7 +69,7 @@ QVariant SyncQueueItemModel::data(const QModelIndex & index, int role) const
 
         return v;
     }
-	//Если столбец 2
+	//Если столбец 3
     if(index.column() == 2)
     {
         pos = index.row() + 1;
@@ -84,7 +84,7 @@ QVariant SyncQueueItemModel::data(const QModelIndex & index, int role) const
 
         return v;
     }
-	//Если столбец 3
+	//Если столбец 4
     if(index.column() == 3)
     {
         pos = index.row() + 1;
@@ -99,7 +99,7 @@ QVariant SyncQueueItemModel::data(const QModelIndex & index, int role) const
 
         return v;
     }   
-	//Если столбец 4
+	//Если столбец 5
     if(index.column() == 4)
     {
         pos = index.row() + 1;
@@ -112,9 +112,14 @@ QVariant SyncQueueItemModel::data(const QModelIndex & index, int role) const
             delete res;
         }
 
+		if(v=6)
+		{
+			setData();
+		}
+
         return v;
     }    
-	//Если столбец 5
+	//Если столбец 6
     if(index.column() == 5)
     {
         pos = index.row() + 1;
@@ -129,7 +134,7 @@ QVariant SyncQueueItemModel::data(const QModelIndex & index, int role) const
 
         return v;
     }    
-	//Если столбец 6
+	//Если столбец 7
     if(index.column() == 6)
     {
         pos = index.row() + 1;
@@ -144,7 +149,7 @@ QVariant SyncQueueItemModel::data(const QModelIndex & index, int role) const
 
         return v;
     }    
-	//Если столбец 7
+	//Если столбец 8
     if(index.column() == 7)
     {
         pos = index.row() + 1;
@@ -159,7 +164,7 @@ QVariant SyncQueueItemModel::data(const QModelIndex & index, int role) const
 
         return v;
     }    
-	//Если столбец 8
+	//Если столбец 9
     if(index.column() == 8)
     {
         pos = index.row() + 1;
@@ -174,7 +179,7 @@ QVariant SyncQueueItemModel::data(const QModelIndex & index, int role) const
 
         return v;
     }    
-	//Если столбец 9
+	//Если столбец 10
     if(index.column() == 9)
     {
         pos = index.row() + 1;
@@ -189,7 +194,7 @@ QVariant SyncQueueItemModel::data(const QModelIndex & index, int role) const
 
         return v;
     }    
-	//Если столбец 10
+	//Если столбец 11
     if(index.column() == 10)
     {
         pos = index.row() + 1;
@@ -217,8 +222,11 @@ int SyncQueueItemModel::columnCount ( const QModelIndex & parent ) const
 
 int SyncQueueItemModel::rowCount ( const QModelIndex & parent ) const
 {
-    Q_UNUSED ( parent );
-    return countRow;
+    //Q_UNUSED ( parent );
+	if(parent.isValid())
+		return 0;
+	else
+		return countRow;
 }
 
 
@@ -293,6 +301,12 @@ QVariant SyncQueueItemModel::headerData(int section,
 
     return QVariant();
 }
+
+//bool SyncQueueItemModel::setData ( const QModelIndex & index, const QVariant & value, int role)
+//{
+	
+//}
+
 //**********
 /* Ошибка в запросе?
     sqlCursor = QString(" \
