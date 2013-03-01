@@ -2181,5 +2181,47 @@ void KKSViewFactory::getSearchTemplates (KKSLoader * loader, QAbstractItemModel 
         searchTModel->setData (wIndex, st->name(), Qt::DisplayRole);
         searchTModel->setData (wIndex, st->id (), Qt::UserRole);
         searchTModel->setData (wIndex, 0, Qt::UserRole+USER_ENTITY);
+        
+        KKSMap<qint64, KKSSearchTemplate *> searchTemplates = loader->loadSearchTemplatesByType(st);
+        searchTModel->insertRows (0, searchTemplates.count(), wIndex);
+        if (searchTModel->columnCount (wIndex) == 0)
+            searchTModel->insertColumns (0, nCols, wIndex);
+        int ii (0);
+        for (KKSMap<qint64, KKSSearchTemplate *>::const_iterator p=searchTemplates.constBegin();
+                p != searchTemplates.constEnd(); p++)
+        {
+            QModelIndex wsIndex = searchTModel->index (ii, 0, wIndex);
+            searchTModel->setData (wsIndex, p.value()->name(), Qt::DisplayRole);
+            searchTModel->setData (wsIndex, p.value()->id (), Qt::UserRole);
+            searchTModel->setData (wsIndex, p.value()->idAuthor (), Qt::UserRole+1);
+            searchTModel->setData (wsIndex, 1, Qt::UserRole+USER_ENTITY);
+
+            wsIndex = searchTModel->index (ii, 1, wIndex);
+            searchTModel->setData (wsIndex, p.value()->authorName(), Qt::DisplayRole);
+            searchTModel->setData (wsIndex, p.value()->id (), Qt::UserRole);
+            searchTModel->setData (wsIndex, p.value()->idAuthor (), Qt::UserRole+1);
+            searchTModel->setData (wsIndex, 1, Qt::UserRole+USER_ENTITY);
+
+            wsIndex = searchTModel->index (ii, 2, wIndex);
+            searchTModel->setData (wsIndex, p.value()->creationDatetime().toString("dd.MMM.yyyy"), Qt::DisplayRole);
+            searchTModel->setData (wsIndex, p.value()->id (), Qt::UserRole);
+            searchTModel->setData (wsIndex, p.value()->idAuthor (), Qt::UserRole+1);
+            searchTModel->setData (wsIndex, 1, Qt::UserRole+USER_ENTITY);
+
+            wsIndex = searchTModel->index (ii, 3, wIndex);
+            searchTModel->setData (wsIndex, p.value()->categoryName(), Qt::DisplayRole);
+            searchTModel->setData (wsIndex, p.value()->id (), Qt::UserRole);
+            searchTModel->setData (wsIndex, p.value()->idAuthor (), Qt::UserRole+1);
+            searchTModel->setData (wsIndex, 1, Qt::UserRole+USER_ENTITY);
+
+            wsIndex = searchTModel->index (ii, 4, wIndex);
+            searchTModel->setData (wsIndex, p.value()->type()->name(), Qt::DisplayRole);
+            searchTModel->setData (wsIndex, p.value()->id (), Qt::UserRole);
+            searchTModel->setData (wsIndex, p.value()->idAuthor (), Qt::UserRole+1);
+            searchTModel->setData (wsIndex, 1, Qt::UserRole+USER_ENTITY);
+            ii++;
+        }
+        
+        searchTemplates.clear ();
     }
 }
