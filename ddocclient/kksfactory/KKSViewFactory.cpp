@@ -2155,11 +2155,12 @@ void KKSViewFactory::getSearchTemplates (KKSLoader * loader, QAbstractItemModel 
         }
         else if (st->parent() && prevIndex.isValid())
         {
-            while (prevIndex.isValid() && st->parent()->id() != prevIndex.data(Qt::UserRole).toInt())
+            prevIndex = searchModelRowsIndex (searchTModel, st->parent()->id(), QModelIndex(), Qt::UserRole);
+/*            while (prevIndex.isValid() && st->parent()->id() != prevIndex.data(Qt::UserRole).toInt())
             {
                 prevIndex = prevIndex.parent();
                 ncount = searchTModel->rowCount (prevIndex);
-            }
+            }*/
             searchTModel->insertRows(ncount, 1, prevIndex);
             if (searchTModel->columnCount (prevIndex) == 0)
                 searchTModel->insertColumns (0, nCols, prevIndex);
@@ -2183,10 +2184,10 @@ void KKSViewFactory::getSearchTemplates (KKSLoader * loader, QAbstractItemModel 
         searchTModel->setData (wIndex, 0, Qt::UserRole+USER_ENTITY);
         
         KKSMap<qint64, KKSSearchTemplate *> searchTemplates = loader->loadSearchTemplatesByType(st);
-        searchTModel->insertRows (0, searchTemplates.count(), wIndex);
+        int ii (searchTModel->rowCount (wIndex));
+        searchTModel->insertRows (ii == 0 ? ii : ii-1, searchTemplates.count(), wIndex);
         if (searchTModel->columnCount (wIndex) == 0)
             searchTModel->insertColumns (0, nCols, wIndex);
-        int ii (0);
         for (KKSMap<qint64, KKSSearchTemplate *>::const_iterator p=searchTemplates.constBegin();
                 p != searchTemplates.constEnd(); p++)
         {

@@ -2378,6 +2378,8 @@ void KKSObjEditorFactory :: filterTemplateEIO (KKSObjEditor * editor, int idObje
             return;
         QModelIndex stProxyIndex = selTModel->selection().indexes ().at (0);
         QModelIndex stIndex = sortTModel->mapToSource (stProxyIndex);
+        if (stIndex.data (Qt::UserRole+USER_ENTITY).toInt() == 0)
+            return;
         int idSearchTemplate = stIndex.data (Qt::UserRole).toInt();
         searchT = loader->loadSearchTemplate (idSearchTemplate);
         if (!searchT)
@@ -2891,6 +2893,7 @@ int KKSObjEditorFactory :: setAttributes (const KKSTemplate *t,
     KKSMap<int, KKSAttrGroup *> attrGroups = t->groups();
     int nattrg = attrGroups.count();
     bool isWid = false;
+    Q_UNUSED (isWid);
     if (nattrg == 0)
         return 0;
 
@@ -3017,6 +3020,7 @@ int KKSObjEditorFactory :: setAttributes (const KKSTemplate *t,
     int nattrg = attrGroups.count();
     qDebug () <<  __PRETTY_FUNCTION__ << t->groups().keys() << attrGroups.keys() << nattrg;
     bool isWid = false;
+    Q_UNUSED (isWid);
 
     if (nattrg == 0)
         return 0;
@@ -3186,6 +3190,7 @@ int KKSObjEditorFactory :: setIndicators (const KKSTemplate *t,
     KKSMap<int, KKSAttrGroup *> attrGroups = t->groups();
     int nattrg = attrGroups.count();
     bool isWid = false;
+    Q_UNUSED (isWid);
     if (nattrg == 0)
         return 0;
 
@@ -3496,6 +3501,7 @@ void KKSObjEditorFactory :: loadAttributeReference (QString tableName, QWidget *
                             iattr = 5;
                         else
                             iattr = 6;
+                        Q_UNUSED (iattr);
                         KKSObjectExemplar * command = cForm->getCommand();
                         command->attrValue (attrId)->setValue (KKSValue (QString::number (recEditor->getID ()), KKSAttrType::atList));
                         //KKSList<KKSAttrValue *> avals = cForm->attrValues();
@@ -6273,6 +6279,7 @@ void KKSObjEditorFactory :: insertReport (qint64 idObjE, QWidget *parent, Qt::Wi
     }
     {
         KKSList<KKSAttrValue *>::const_iterator pcAttrs = reportEIO->attrValues().constBegin ();
+        Q_UNUSED (pcAttrs);
         //for (; pcAttrs != reportEIO->attrValues().constEnd(); pcAttrs++)
         //    qDebug () << __PRETTY_FUNCTION__ << (*pcAttrs)->attribute()->code () << (*pcAttrs)->value().value ();
     }
@@ -6514,7 +6521,8 @@ void KKSObjEditorFactory :: saveSearchCriteria (KKSFilterGroup * group)
         return;
     KKSList<KKSSearchTemplate *> stList = loader->loadSearchTemplates ();
     bool isContains = false;
-    int numc = -1;
+    int numc (-1);
+    Q_UNUSED (numc);
     QString stName;
     do
     {
@@ -6627,6 +6635,8 @@ KKSSearchTemplate * KKSObjEditorFactory :: loadSearchTemplate (void) const
         if (selTModel->selection().indexes ().isEmpty())
             return 0;
         QModelIndex stIndex = selTModel->selection().indexes ().at (0);
+        if (searchTModel->data (stIndex, Qt::UserRole+USER_ENTITY).toInt() == 0)
+            return 0;
         int idSearchTemplate = stIndex.data (Qt::UserRole).toInt();
         searchT = loader->loadSearchTemplate (idSearchTemplate);
     }
@@ -7046,6 +7056,26 @@ void KKSObjEditorFactory :: editSearchTemplateType (const QModelIndex& wIndex, Q
  */
 void KKSObjEditorFactory :: delSearchTemplateType (const QModelIndex& wIndex, QAbstractItemModel * searchMod)
 {
+    if (!searchMod || !wIndex.isValid())
+        return;
+    KKSObject * refObj = loader->loadIO (IO_SEARCH_TYPE_ID);
+    if (!refObj)
+        return;
+    KKSObjectExemplar * eio = loader->loadEIO (wIndex.data (Qt::UserRole).toInt(), refObj);
+    if (!eio)
+    {
+        refObj->release ();
+        return;
+    }
+    int ier = eiof->deleteEIO (eio);
+    if (ier < 0)
+    {
+        eio->release ();
+        refObj->release ();
+        return;
+    }
+    QModelIndex parent = wIndex.parent ();
+    searchMod->removeRows (wIndex.row(), 1, parent);
 }
 
 /* Метод добавляет к ИО wObj дополнительную таблицу и соответствующую вкладку на editor.
