@@ -221,14 +221,36 @@ QItemSelectionModel * KKSSearchTemplatesForm :: selectionModel (void) const
 void KKSSearchTemplatesForm :: addSearchTemplateType (void)
 {
     qDebug () << __PRETTY_FUNCTION__;
+    QModelIndex pIndex = getCurrentIndex ();
+    QAbstractItemModel * mod = dataModel ();
+    if (pIndex.data (Qt::UserRole+USER_ENTITY) == 1)
+        pIndex = pIndex.parent();
+    emit addSearchTemplateType (pIndex, mod);
 }
 
 void KKSSearchTemplatesForm :: editSearchTemplateType (void)
 {
     qDebug () << __PRETTY_FUNCTION__;
+    QModelIndex wIndex = getCurrentIndex ();
+    QAbstractItemModel * mod = dataModel ();
+    if (wIndex.data (Qt::UserRole+USER_ENTITY) == 1)
+        return;
+    emit updateSearchTemplateType (wIndex, mod);
 }
 
 void KKSSearchTemplatesForm :: delSearchTemplateType (void)
 {
     qDebug () << __PRETTY_FUNCTION__;
+    QModelIndex wIndex = getCurrentIndex ();
+    QAbstractItemModel * mod = dataModel ();
+    if (wIndex.data (Qt::UserRole+USER_ENTITY) == 1)
+        return;
+    if (mod->rowCount (wIndex) > 0)
+    {
+        QMessageBox::warning (this, tr ("Delete search template type"), tr ("Cannot delete type %1, it is not empty").arg (wIndex.data(Qt::DisplayRole).toString(), QMessageBox::Ok));
+        return;
+    }
+    int res = QMessageBox::question (this, tr ("Delete search template type"), tr("Do you really want to delete ?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+    if (res == QMessageBox::Yes)
+        emit delSearchTemplateType (wIndex, mod);
 }

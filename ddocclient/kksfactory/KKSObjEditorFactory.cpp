@@ -6903,7 +6903,69 @@ void KKSObjEditorFactory :: deleleSearchTempl (const QModelIndex& wIndex, QAbstr
  */
 void KKSObjEditorFactory :: addSearchTemplateType (const QModelIndex& parent, QAbstractItemModel * searchMod)
 {
+    if (!searchMod)
+        return;
+    KKSList<const KKSFilterGroup *> filters;
+    KKSObject * refObj = loader->loadIO (IO_SEARCH_TYPE_ID);
+    if (!refObj)
+        return;
     
+    const KKSCategory * c = refObj->category();
+    if (!c)
+    {
+        refObj->release ();
+        return;
+    }
+    
+    c = c->tableCategory();
+    KKSMap<int, KKSAttrValue *> io_aVals;
+    KKSMap<int, KKSAttrValue *> aVals;
+    if (parent.isValid())
+    {
+        int idp = parent.data (Qt::UserRole).toInt();
+        KKSAttribute * pAttr = loader->loadAttribute (ATTR_ID_PARENT);
+        KKSValue val (QString::number (idp), KKSAttrType::atParent);
+        if (pAttr)
+        {
+            KKSCategoryAttr * cAttr = KKSCategoryAttr::create (pAttr, false, true);
+            if (cAttr)
+            {
+                KKSAttrValue * aVal = new KKSAttrValue ( val, cAttr);
+                if (aVal)
+                {
+                    aVals.insert (ATTR_ID_PARENT, aVal);
+                    aVal->release ();
+                }
+                cAttr->release ();
+            }
+            pAttr->release ();
+        }
+    }
+    KKSObjEditor * editor = createObjEditorParam (IO_SEARCH_TYPE_ID, 
+                                                  -1,
+                                                  filters,
+                                                  tr("Add search template type"),
+                                                  c,
+                                                  io_aVals,
+                                                  aVals,
+                                                  true,
+                                                  QString("search_template_types"),
+                                                  false,
+                                                  Qt::WindowModal);
+    editor->tbActions->setVisible (false);
+    if (editor && editor->exec() == QDialog::Accepted)
+    {
+        KKSObjectExemplar * pObj = editor->getObjectEx();
+        KKSMap<int, KKSSearchTemplateType *> stt = loader->loadSearchTemplateTypes();
+        KKSMap<int, KKSSearchTemplateType *>::const_iterator p = stt.constFind (pObj->id());
+        searchMod->insertRows (0, 1, parent);
+        QModelIndex wIndex = searchMod->index (0, 0, parent);
+        searchMod->setData (wIndex, p.value()->name(), Qt::DisplayRole);
+        searchMod->setData (wIndex, p.value()->id (), Qt::UserRole);
+        searchMod->setData (wIndex, 0, Qt::UserRole+USER_ENTITY);
+    }
+    
+    refObj->release ();
 }
 
 /* Слот редактирует тип шаблонов поиска.
@@ -6913,7 +6975,68 @@ void KKSObjEditorFactory :: addSearchTemplateType (const QModelIndex& parent, QA
  */
 void KKSObjEditorFactory :: editSearchTemplateType (const QModelIndex& wIndex, QAbstractItemModel * searchMod)
 {
+    if (!searchMod)
+        return;
+    KKSList<const KKSFilterGroup *> filters;
+    KKSObject * refObj = loader->loadIO (IO_SEARCH_TYPE_ID);
+    if (!refObj)
+        return;
     
+    const KKSCategory * c = refObj->category();
+    if (!c)
+    {
+        refObj->release ();
+        return;
+    }
+    
+    c = c->tableCategory();
+    KKSMap<int, KKSAttrValue *> io_aVals;
+    KKSMap<int, KKSAttrValue *> aVals;
+    QModelIndex parent = wIndex.parent();
+    if (parent.isValid())
+    {
+        int idp = parent.data (Qt::UserRole).toInt();
+        KKSAttribute * pAttr = loader->loadAttribute (ATTR_ID_PARENT);
+        KKSValue val (QString::number (idp), KKSAttrType::atParent);
+        if (pAttr)
+        {
+            KKSCategoryAttr * cAttr = KKSCategoryAttr::create (pAttr, false, true);
+            if (cAttr)
+            {
+                KKSAttrValue * aVal = new KKSAttrValue ( val, cAttr);
+                if (aVal)
+                {
+                    aVals.insert (ATTR_ID_PARENT, aVal);
+                    aVal->release ();
+                }
+                cAttr->release ();
+            }
+            pAttr->release ();
+        }
+    }
+    KKSObjEditor * editor = createObjEditorParam (IO_SEARCH_TYPE_ID, 
+                                                  wIndex.data (Qt::UserRole).toInt(),
+                                                  filters,
+                                                  tr("Edit search template type"),
+                                                  c,
+                                                  io_aVals,
+                                                  aVals,
+                                                  true,
+                                                  QString("search_template_types"),
+                                                  false,
+                                                  Qt::WindowModal);
+    editor->tbActions->setVisible (false);
+    if (editor && editor->exec() == QDialog::Accepted)
+    {
+        KKSObjectExemplar * pObj = editor->getObjectEx();
+        KKSMap<int, KKSSearchTemplateType *> stt = loader->loadSearchTemplateTypes();
+        KKSMap<int, KKSSearchTemplateType *>::const_iterator p = stt.constFind (pObj->id());
+        searchMod->setData (wIndex, p.value()->name(), Qt::DisplayRole);
+        searchMod->setData (wIndex, p.value()->id (), Qt::UserRole);
+        searchMod->setData (wIndex, 0, Qt::UserRole+USER_ENTITY);
+    }
+    
+    refObj->release ();
 }
 
 /* Слот удаляет тип шаблонов поиска.
