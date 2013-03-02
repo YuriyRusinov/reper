@@ -2182,6 +2182,7 @@ void KKSViewFactory::getSearchTemplates (KKSLoader * loader, QAbstractItemModel 
         searchTModel->setData (wIndex, st->name(), Qt::DisplayRole);
         searchTModel->setData (wIndex, st->id (), Qt::UserRole);
         searchTModel->setData (wIndex, 0, Qt::UserRole+USER_ENTITY);
+        searchTModel->setData (wIndex, QIcon(":/ddoc/rubric.png"), Qt::DecorationRole);
         
         KKSMap<qint64, KKSSearchTemplate *> searchTemplates = loader->loadSearchTemplatesByType(st);
         int ii (searchTModel->rowCount (wIndex));
@@ -2196,7 +2197,8 @@ void KKSViewFactory::getSearchTemplates (KKSLoader * loader, QAbstractItemModel 
             searchTModel->setData (wsIndex, p.value()->id (), Qt::UserRole);
             searchTModel->setData (wsIndex, p.value()->idAuthor (), Qt::UserRole+1);
             searchTModel->setData (wsIndex, 1, Qt::UserRole+USER_ENTITY);
-
+            searchTModel->setData (wsIndex, QIcon(":/ddoc/rubric_item.png"), Qt::DecorationRole);
+ 
             wsIndex = searchTModel->index (ii, 1, wIndex);
             searchTModel->setData (wsIndex, p.value()->authorName(), Qt::DisplayRole);
             searchTModel->setData (wsIndex, p.value()->id (), Qt::UserRole);
