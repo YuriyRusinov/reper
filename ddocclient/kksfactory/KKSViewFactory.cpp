@@ -2123,6 +2123,34 @@ QModelIndex KKSViewFactory :: searchModelRowsIndex (QAbstractItemModel * sourceM
     return QModelIndex();
 }
 
+QModelIndex KKSViewFactory :: searchModelRowsIndexMultiType (QAbstractItemModel * sourceMod, qint64 iData, qint64 typeVal, const QModelIndex& parent, int role)
+{
+    if (!sourceMod)
+        return QModelIndex ();
+
+    QModelIndex pIndex = parent;
+    int nr = sourceMod->rowCount (pIndex);
+    
+    for (int i=0; i<nr; i++)
+    {
+        QModelIndex wIndex = sourceMod->index (i, 0, pIndex);
+        int vData (wIndex.data (role).toInt());
+        int typeData (wIndex.data (Qt::UserRole+USER_ENTITY).toInt());
+        //qDebug () << __PRETTY_FUNCTION__ << typeData << typeVal;
+        if (vData == iData && typeData == typeVal)
+            return wIndex;
+        else if (sourceMod->rowCount (wIndex) > 0)
+        {
+            QModelIndex childIndex = searchModelRowsIndexMultiType (sourceMod, iData, typeVal, wIndex, role);
+            if (childIndex.isValid())
+                return childIndex;
+        }
+        else
+            continue;
+    }
+    return QModelIndex();
+}
+
 void KKSViewFactory::getSearchTemplates (KKSLoader * loader, QAbstractItemModel * searchTModel, const QModelIndex& pIndex)
 {
     if (!searchTModel || !loader)
@@ -2141,8 +2169,8 @@ void KKSViewFactory::getSearchTemplates (KKSLoader * loader, QAbstractItemModel 
             continue;
 
         QModelIndex wIndex;
-        qDebug () << __PRETTY_FUNCTION__ << st->id() << st->name();
-        if ((prevIndex.isValid() && st->parent() && st->parent()->id() == prevIndex.data(Qt::UserRole).toInt())
+//        qDebug () << __PRETTY_FUNCTION__ << st->id() << st->name();
+/*        if ((prevIndex.isValid() && st->parent() && st->parent()->id() == prevIndex.data(Qt::UserRole).toInt())
             || (!prevIndex.isValid() && !st->parent()))
         {
             ncount = searchTModel->rowCount (prevIndex);
@@ -2153,18 +2181,16 @@ void KKSViewFactory::getSearchTemplates (KKSLoader * loader, QAbstractItemModel 
             prevIndex = wIndex;
             ncount++;
         }
-        else if (st->parent() && prevIndex.isValid())
+        else */
+        if (st->parent() )//&& prevIndex.isValid())
         {
-            prevIndex = searchModelRowsIndex (searchTModel, st->parent()->id(), QModelIndex(), Qt::UserRole);
-/*            while (prevIndex.isValid() && st->parent()->id() != prevIndex.data(Qt::UserRole).toInt())
-            {
-                prevIndex = prevIndex.parent();
-                ncount = searchTModel->rowCount (prevIndex);
-            }*/
-            searchTModel->insertRows(ncount, 1, prevIndex);
+            prevIndex = searchModelRowsIndexMultiType (searchTModel, st->parent()->id(), 0, QModelIndex(), Qt::UserRole);
+            ncount = searchTModel->rowCount (prevIndex);
+            bool isIns = searchTModel->insertRows(ncount, 1, prevIndex);
             if (searchTModel->columnCount (prevIndex) == 0)
                 searchTModel->insertColumns (0, nCols, prevIndex);
             wIndex = searchTModel->index (ncount, 0, prevIndex);
+//            qDebug () << __PRETTY_FUNCTION__ << st->id() << st->parent()->id() << prevIndex << ncount << isIns << wIndex;
             prevIndex = wIndex;
             ncount++;
         }
