@@ -6973,6 +6973,7 @@ void KKSObjEditorFactory :: addSearchTemplateType (const QModelIndex& parent, QA
         searchMod->setData (wIndex, p.value()->name(), Qt::DisplayRole);
         searchMod->setData (wIndex, p.value()->id (), Qt::UserRole);
         searchMod->setData (wIndex, 0, Qt::UserRole+USER_ENTITY);
+        searchMod->setData (wIndex, QIcon(":/ddoc/rubric.png"), Qt::DecorationRole);
     }
     
     refObj->release ();
