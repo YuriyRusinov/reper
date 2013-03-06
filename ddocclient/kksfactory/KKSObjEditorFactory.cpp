@@ -80,6 +80,7 @@
 #include <KKSMessageWidget.h>
 #include <KKSEventFilter.h>
 #include <KKSSortFilterProxyModel.h>
+#include <KKSSearchTemplateFilterProxyModel.h>
 #include <KKSAttrRefWidget.h>
 #include <KKSPrivilege.h>
 #include <KKSEdit.h>
@@ -6571,7 +6572,7 @@ KKSSearchTemplate * KKSObjEditorFactory :: loadSearchTemplate (void) const
     return searchT;
 }
 
-void KKSObjEditorFactory::initSearchTemplateModel (KKSSearchTemplatesForm *stForm) const
+void KKSObjEditorFactory :: initSearchTemplateModel (KKSSearchTemplatesForm *stForm) const
 {
     if (!stForm)
         return;
@@ -6585,7 +6586,8 @@ void KKSObjEditorFactory::initSearchTemplateModel (KKSSearchTemplatesForm *stFor
     connect (stForm, SIGNAL (updateSearchTemplateType (const QModelIndex&, QAbstractItemModel * )), this, SLOT (editSearchTemplateType (const QModelIndex&, QAbstractItemModel *)) );
     connect (stForm, SIGNAL (delSearchTemplateType (const QModelIndex&, QAbstractItemModel * )), this, SLOT (delSearchTemplateType (const QModelIndex&, QAbstractItemModel *)) );
 
-    QSortFilterProxyModel * sortTModel = new QSortFilterProxyModel;
+    QSortFilterProxyModel * sortTModel = new KKSSearchTemplateFilterProxyModel;//QSortFilterProxyModel;
+    sortTModel->setFilterCaseSensitivity (Qt::CaseInsensitive);
     int ncount (0);
     QStandardItemModel * searchTModel = new QStandardItemModel (ncount, 5);
     searchTModel->setHeaderData (0, Qt::Horizontal, tr ("Search criteria"), Qt::DisplayRole);

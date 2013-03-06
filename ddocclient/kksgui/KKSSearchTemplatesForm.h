@@ -12,6 +12,7 @@ class QItemSelectionModel;
 class QModelIndex;
 class QAction;
 class QToolBar;
+class QLineEdit;
 
 class _GUI_EXPORT KKSSearchTemplatesForm : public QDialog
 {
@@ -36,6 +37,8 @@ private slots:
     void delSearchTemplateType (void);
 
     void searchTemplatesSelectionChanged (const QItemSelection & selected, const QItemSelection & deselected);
+
+    void setFilterSt (const QString& text);
 
 signals:
     void addNewEmptySearchTemplate (const QModelIndex& parent, QAbstractItemModel * searchMod);
@@ -69,6 +72,8 @@ private:
     QAction * actAddNewType;
     QAction * actEditType;
     QAction * actDelType;
+
+    QLineEdit * lEFilter;
 
     QPushButton * pbOk;
     QPushButton * pbCancel;

@@ -9,10 +9,13 @@
 #include <QSizePolicy>
 #include <QModelIndex>
 #include <QStandardItemModel>
+#include <QSortFilterProxyModel>
+#include <QRegExp>
 #include <QMessageBox>
 #include <QHeaderView>
 #include <QAction>
 #include <QToolBar>
+#include <QLineEdit>
 #include <QtDebug>
 
 #include "KKSSearchTemplatesForm.h"
@@ -31,6 +34,7 @@ KKSSearchTemplatesForm :: KKSSearchTemplatesForm (QWidget * parent, Qt::WFlags f
     actAddNewType (new QAction (tr("Add new search template type"), this)),
     actEditType (new QAction (tr("Edit search template type"), this)),
     actDelType (new QAction (tr("Delete search template type"), this)),
+    lEFilter (new QLineEdit (this)),
     pbOk (new QPushButton (tr("&OK"), this)),
     pbCancel (new QPushButton (tr("&Cancel"), this))
 {
@@ -55,6 +59,8 @@ KKSSearchTemplatesForm :: KKSSearchTemplatesForm (QWidget * parent, Qt::WFlags f
     connect (actAddNewType, SIGNAL (triggered()), this, SLOT (addSearchTemplateType()) );
     connect (actEditType, SIGNAL (triggered()), this, SLOT (editSearchTemplateType()) );
     connect (actDelType, SIGNAL (triggered()), this, SLOT (delSearchTemplateType()) );
+
+    connect (lEFilter, SIGNAL (textEdited(const QString&)), this, SLOT (setFilterSt (const QString&)) );
 
     connect (pbOk, SIGNAL (clicked()), this, SLOT (accept()) );
     connect (pbCancel, SIGNAL (clicked()), this, SLOT (reject()) );
@@ -177,6 +183,8 @@ void KKSSearchTemplatesForm :: init (void)
     tbActions->addAction (actAddCopy);
     tbActions->addAction (actEdit);
     tbActions->addAction (actDel);
+    tbActions->addSeparator ();
+    tbActions->addWidget (lEFilter);
     gLayout->addWidget (searchView, 1, 0, 1, 1);
     QSizePolicy twSizePol (QSizePolicy::Expanding, QSizePolicy::MinimumExpanding);
     twSizePol.setHorizontalStretch (5);
@@ -253,4 +261,13 @@ void KKSSearchTemplatesForm :: delSearchTemplateType (void)
     int res = QMessageBox::question (this, tr ("Delete search template type"), tr("Do you really want to delete ?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
     if (res == QMessageBox::Yes)
         emit delSearchTemplateType (wIndex, mod);
+}
+
+void KKSSearchTemplatesForm :: setFilterSt (const QString& text)
+{
+    QSortFilterProxyModel * sortTMod = qobject_cast<QSortFilterProxyModel *>(searchView->model());
+    if (!sortTMod)
+        return;
+    sortTMod->setFilterRegExp (text);
+//    sortTMod->setFilterKeyColumn (-1);
 }

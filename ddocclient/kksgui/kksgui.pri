@@ -25,6 +25,7 @@ HEADERS += \
                 KKSAttributesEditor.h \
                 KKSTemplateEditor.h \
                 KKSSortFilterProxyModel.h \
+                KKSSearchTemplateFilterProxyModel.h \
                 KKSItemDelegate.h \
                 KKSEventFilter.h \
                 KKSMessageWidget.h \
@@ -110,6 +111,7 @@ SOURCES += \
                 KKSAttributesEditor.cpp \
                 KKSTemplateEditor.cpp \
                 KKSSortFilterProxyModel.cpp \
+                KKSSearchTemplateFilterProxyModel.cpp \
                 KKSItemDelegate.cpp \
                 KKSEventFilter.cpp \
                 KKSMessageWidget.cpp \
@@ -216,6 +218,7 @@ headers.files += \
                 KKSAttributesEditor.h \
                 KKSTemplateEditor.h \
                 KKSSortFilterProxyModel.h \
+                KKSSearchTemplateFilterProxyModel.h \
                 KKSItemDelegate.h \
                 KKSEventFilter.h \
                 KKSMessageWidget.h \
