@@ -50,6 +50,7 @@ class KKSAttrValue;
 class KKSIndFactory;
 class KKSIndicator;
 class KKSIndicatorValue;
+class KKSSearchTemplatesForm;
 
 class QScrollArea;
 class QGridLayout;
@@ -455,6 +456,8 @@ private:
     int writeRecords (QAbstractItemModel * recModel, KKSObjectExemplar * wObjE, const QModelIndex& rIndex) const;
     
     int writeRecIntoModel (QAbstractItemModel * recModel, KKSObjectExemplar * wObjE) const;
+    
+    void initSearchTemplateModel (KKSSearchTemplatesForm *stForm) const;
 
 private:
     //

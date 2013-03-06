@@ -2306,71 +2306,11 @@ void KKSObjEditorFactory :: filterTemplateEIO (KKSObjEditor * editor, int idObje
     }
     KKSSearchTemplate * searchT = 0;
     KKSList<KKSSearchTemplate *> stList = loader->loadSearchTemplates ();
-    int ncount (0);//= stList.count();
-    /*
-    if (!ncount)
-    {
-        QMessageBox::warning (parent, tr ("Search templates"), tr("There are no available search templates in database"), QMessageBox::Ok, QMessageBox::NoButton);
-        return 0;
-    }
-    */
 
     KKSSearchTemplatesForm *stForm = new KKSSearchTemplatesForm (editor);
-    connect (stForm, SIGNAL (addNewEmptySearchTemplate (const QModelIndex&, QAbstractItemModel *)), this, SLOT (addNewSearchTempl (const QModelIndex&, QAbstractItemModel *)) );
-    connect (stForm, SIGNAL (addNewCopySearchTemplate (const QModelIndex&, QAbstractItemModel *)), this, SLOT (addCopySearchTempl (const QModelIndex&, QAbstractItemModel *)) );
-    connect (stForm, SIGNAL (updateSearchTemplate (const QModelIndex&, QAbstractItemModel *)), this, SLOT (updateSearchTempl (const QModelIndex&, QAbstractItemModel *)) );
-    connect (stForm, SIGNAL (deleteSearchTemplate (const QModelIndex&, QAbstractItemModel *)), this,  SLOT (deleleSearchTempl (const QModelIndex&, QAbstractItemModel *)) );
-    
-    connect (stForm, SIGNAL (addSearchTemplateType (const QModelIndex&, QAbstractItemModel * )), this, SLOT (addSearchTemplateType (const QModelIndex&, QAbstractItemModel *)) );
-    connect (stForm, SIGNAL (updateSearchTemplateType (const QModelIndex&, QAbstractItemModel * )), this, SLOT (editSearchTemplateType (const QModelIndex&, QAbstractItemModel *)) );
-    connect (stForm, SIGNAL (delSearchTemplateType (const QModelIndex&, QAbstractItemModel * )), this, SLOT (delSearchTemplateType (const QModelIndex&, QAbstractItemModel *)) );
-
-    QSortFilterProxyModel * sortTModel = new QSortFilterProxyModel;
-    QStandardItemModel * searchTModel = new QStandardItemModel (ncount, 5);
-    searchTModel->setHeaderData (0, Qt::Horizontal, tr ("Search criteria"), Qt::DisplayRole);
-    searchTModel->setHeaderData (1, Qt::Horizontal, tr ("Author"), Qt::DisplayRole);
-    searchTModel->setHeaderData (2, Qt::Horizontal, tr ("Creation date/time"), Qt::DisplayRole);
-    searchTModel->setHeaderData (3, Qt::Horizontal, tr ("Category"), Qt::DisplayRole);
-    searchTModel->setHeaderData (4, Qt::Horizontal, tr ("Type"), Qt::DisplayRole);
-/*    for (int i=0; i<ncount; i++)
-    {
-        QModelIndex wIndex = searchTModel->index (i, 0);
-        searchTModel->setData (wIndex, stList[i]->name(), Qt::DisplayRole);
-        searchTModel->setData (wIndex, stList[i]->id (), Qt::UserRole);
-        searchTModel->setData (wIndex, stList[i]->idAuthor (), Qt::UserRole+1);
-        searchTModel->setData (wIndex, 1, Qt::UserRole+USER_ENTITY);
-
-        wIndex = searchTModel->index (i, 1);
-        searchTModel->setData (wIndex, stList[i]->authorName(), Qt::DisplayRole);
-        searchTModel->setData (wIndex, stList[i]->id (), Qt::UserRole);
-        searchTModel->setData (wIndex, stList[i]->idAuthor (), Qt::UserRole+1);
-        searchTModel->setData (wIndex, 1, Qt::UserRole+USER_ENTITY);
-
-        wIndex = searchTModel->index (i, 2);
-        searchTModel->setData (wIndex, stList[i]->creationDatetime().toString("dd.MMM.yyyy"), Qt::DisplayRole);
-        searchTModel->setData (wIndex, stList[i]->id (), Qt::UserRole);
-        searchTModel->setData (wIndex, stList[i]->idAuthor (), Qt::UserRole+1);
-        searchTModel->setData (wIndex, 1, Qt::UserRole+USER_ENTITY);
-
-        wIndex = searchTModel->index (i, 3);
-        searchTModel->setData (wIndex, stList[i]->categoryName(), Qt::DisplayRole);
-        searchTModel->setData (wIndex, stList[i]->id (), Qt::UserRole);
-        searchTModel->setData (wIndex, stList[i]->idAuthor (), Qt::UserRole+1);
-        searchTModel->setData (wIndex, 1, Qt::UserRole+USER_ENTITY);
-
-        wIndex = searchTModel->index (i, 4);
-        searchTModel->setData (wIndex, stList[i]->type()->name(), Qt::DisplayRole);
-        searchTModel->setData (wIndex, stList[i]->id (), Qt::UserRole);
-        searchTModel->setData (wIndex, stList[i]->idAuthor (), Qt::UserRole+1);
-        searchTModel->setData (wIndex, 1, Qt::UserRole+USER_ENTITY);
-    }
-*/
-    KKSViewFactory::getSearchTemplates (loader, searchTModel);
-    sortTModel->setSourceModel (searchTModel);
-    sortTModel->setSortCaseSensitivity(Qt::CaseInsensitive);
-    sortTModel->sort(0);
-    stForm->setDataModel (sortTModel);
+    initSearchTemplateModel (stForm);
     QItemSelectionModel * selTModel = stForm->selectionModel ();
+    QAbstractProxyModel * sortTModel = qobject_cast<QAbstractProxyModel *>(stForm->dataModel());
 
     if (selTModel && stForm->exec () == QDialog::Accepted)
     {
@@ -6598,8 +6538,8 @@ KKSSearchTemplate * KKSObjEditorFactory :: loadSearchTemplate (void) const
 {
     KKSSearchTemplate * searchT = 0;
     QWidget * parent = qobject_cast<QWidget *>(this->sender());
-    KKSList<KKSSearchTemplate *> stList = loader->loadSearchTemplates ();
-    int ncount = stList.count();
+//    KKSList<KKSSearchTemplate *> stList = loader->loadSearchTemplates ();
+//    int ncount = stList.count();
     /*
     if (!ncount)
     {
@@ -6609,25 +6549,10 @@ KKSSearchTemplate * KKSObjEditorFactory :: loadSearchTemplate (void) const
     */
 
     KKSSearchTemplatesForm *stForm = new KKSSearchTemplatesForm (parent);
-    connect (stForm, SIGNAL (addNewEmptySearchTemplate (QAbstractItemModel *)), this, SLOT (addNewSearchTempl (QAbstractItemModel *)) );
-    connect (stForm, SIGNAL (addNewCopySearchTemplate (const QModelIndex&, QAbstractItemModel *)), this, SLOT (addCopySearchTempl (const QModelIndex&, QAbstractItemModel *)) );
-    connect (stForm, SIGNAL (updateSearchTemplate (const QModelIndex&, QAbstractItemModel *)), this, SLOT (updateSearchTempl (const QModelIndex&, QAbstractItemModel *)) );
-    connect (stForm, SIGNAL (deleteSearchTemplate (const QModelIndex&, QAbstractItemModel *)), this,  SLOT (deleleSearchTempl (const QModelIndex&, QAbstractItemModel *)) );
-
-    connect (stForm, SIGNAL (addSearchTemplateType (const QModelIndex&, QAbstractItemModel * )), this, SLOT (addSearchTemplateType (const QModelIndex&, QAbstractItemModel *)) );
-    connect (stForm, SIGNAL (updateSearchTemplateType (const QModelIndex&, QAbstractItemModel * )), this, SLOT (editSearchTemplateType (const QModelIndex&, QAbstractItemModel *)) );
-    connect (stForm, SIGNAL (delSearchTemplateType (const QModelIndex&, QAbstractItemModel * )), this, SLOT (delSearchTemplateType (const QModelIndex&, QAbstractItemModel *)) );
-
-    QStandardItemModel * searchTModel = new QStandardItemModel (ncount, 1);
-    searchTModel->setHeaderData (0, Qt::Horizontal, tr ("Search criteria"), Qt::DisplayRole);
-    for (int i=0; i<ncount; i++)
-    {
-        QModelIndex wIndex = searchTModel->index (i, 0);
-        searchTModel->setData (wIndex, stList[i]->name(), Qt::DisplayRole);
-        searchTModel->setData (wIndex, stList[i]->id (), Qt::UserRole);
-        searchTModel->setData (wIndex, stList[i]->idAuthor (), Qt::UserRole+1);
-    }
-    stForm->setDataModel (searchTModel);
+    this->initSearchTemplateModel (stForm);
+    QAbstractItemModel * searchTModel = stForm->dataModel();
+    while (qobject_cast<QAbstractProxyModel *>(searchTModel))
+        searchTModel = (qobject_cast<QAbstractProxyModel *>(searchTModel))->sourceModel();
     QItemSelectionModel * selTModel = stForm->selectionModel ();
 
     if (selTModel && stForm->exec () == QDialog::Accepted)
@@ -6644,6 +6569,68 @@ KKSSearchTemplate * KKSObjEditorFactory :: loadSearchTemplate (void) const
     stForm->setParent (0);
     delete stForm;
     return searchT;
+}
+
+void KKSObjEditorFactory::initSearchTemplateModel (KKSSearchTemplatesForm *stForm) const
+{
+    if (!stForm)
+        return;
+
+    connect (stForm, SIGNAL (addNewEmptySearchTemplate (const QModelIndex&, QAbstractItemModel *)), this, SLOT (addNewSearchTempl (const QModelIndex&, QAbstractItemModel *)) );
+    connect (stForm, SIGNAL (addNewCopySearchTemplate (const QModelIndex&, QAbstractItemModel *)), this, SLOT (addCopySearchTempl (const QModelIndex&, QAbstractItemModel *)) );
+    connect (stForm, SIGNAL (updateSearchTemplate (const QModelIndex&, QAbstractItemModel *)), this, SLOT (updateSearchTempl (const QModelIndex&, QAbstractItemModel *)) );
+    connect (stForm, SIGNAL (deleteSearchTemplate (const QModelIndex&, QAbstractItemModel *)), this,  SLOT (deleleSearchTempl (const QModelIndex&, QAbstractItemModel *)) );
+    
+    connect (stForm, SIGNAL (addSearchTemplateType (const QModelIndex&, QAbstractItemModel * )), this, SLOT (addSearchTemplateType (const QModelIndex&, QAbstractItemModel *)) );
+    connect (stForm, SIGNAL (updateSearchTemplateType (const QModelIndex&, QAbstractItemModel * )), this, SLOT (editSearchTemplateType (const QModelIndex&, QAbstractItemModel *)) );
+    connect (stForm, SIGNAL (delSearchTemplateType (const QModelIndex&, QAbstractItemModel * )), this, SLOT (delSearchTemplateType (const QModelIndex&, QAbstractItemModel *)) );
+
+    QSortFilterProxyModel * sortTModel = new QSortFilterProxyModel;
+    int ncount (0);
+    QStandardItemModel * searchTModel = new QStandardItemModel (ncount, 5);
+    searchTModel->setHeaderData (0, Qt::Horizontal, tr ("Search criteria"), Qt::DisplayRole);
+    searchTModel->setHeaderData (1, Qt::Horizontal, tr ("Author"), Qt::DisplayRole);
+    searchTModel->setHeaderData (2, Qt::Horizontal, tr ("Creation date/time"), Qt::DisplayRole);
+    searchTModel->setHeaderData (3, Qt::Horizontal, tr ("Category"), Qt::DisplayRole);
+    searchTModel->setHeaderData (4, Qt::Horizontal, tr ("Type"), Qt::DisplayRole);
+/*    for (int i=0; i<ncount; i++)
+    {
+        QModelIndex wIndex = searchTModel->index (i, 0);
+        searchTModel->setData (wIndex, stList[i]->name(), Qt::DisplayRole);
+        searchTModel->setData (wIndex, stList[i]->id (), Qt::UserRole);
+        searchTModel->setData (wIndex, stList[i]->idAuthor (), Qt::UserRole+1);
+        searchTModel->setData (wIndex, 1, Qt::UserRole+USER_ENTITY);
+
+        wIndex = searchTModel->index (i, 1);
+        searchTModel->setData (wIndex, stList[i]->authorName(), Qt::DisplayRole);
+        searchTModel->setData (wIndex, stList[i]->id (), Qt::UserRole);
+        searchTModel->setData (wIndex, stList[i]->idAuthor (), Qt::UserRole+1);
+        searchTModel->setData (wIndex, 1, Qt::UserRole+USER_ENTITY);
+
+        wIndex = searchTModel->index (i, 2);
+        searchTModel->setData (wIndex, stList[i]->creationDatetime().toString("dd.MMM.yyyy"), Qt::DisplayRole);
+        searchTModel->setData (wIndex, stList[i]->id (), Qt::UserRole);
+        searchTModel->setData (wIndex, stList[i]->idAuthor (), Qt::UserRole+1);
+        searchTModel->setData (wIndex, 1, Qt::UserRole+USER_ENTITY);
+
+        wIndex = searchTModel->index (i, 3);
+        searchTModel->setData (wIndex, stList[i]->categoryName(), Qt::DisplayRole);
+        searchTModel->setData (wIndex, stList[i]->id (), Qt::UserRole);
+        searchTModel->setData (wIndex, stList[i]->idAuthor (), Qt::UserRole+1);
+        searchTModel->setData (wIndex, 1, Qt::UserRole+USER_ENTITY);
+
+        wIndex = searchTModel->index (i, 4);
+        searchTModel->setData (wIndex, stList[i]->type()->name(), Qt::DisplayRole);
+        searchTModel->setData (wIndex, stList[i]->id (), Qt::UserRole);
+        searchTModel->setData (wIndex, stList[i]->idAuthor (), Qt::UserRole+1);
+        searchTModel->setData (wIndex, 1, Qt::UserRole+USER_ENTITY);
+    }
+*/
+    KKSViewFactory::getSearchTemplates (loader, searchTModel);
+    sortTModel->setSourceModel (searchTModel);
+    sortTModel->setSortCaseSensitivity(Qt::CaseInsensitive);
+    sortTModel->sort(0);
+    stForm->setDataModel (sortTModel);
 }
 
 void KKSObjEditorFactory::createSearchTemplate()
