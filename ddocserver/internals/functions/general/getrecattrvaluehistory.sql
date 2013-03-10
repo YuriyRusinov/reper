@@ -76,7 +76,7 @@ begin
             av.is_actual,
             av.description
         from 
-            (f_sel_rec_attrs_values(idRecord) av inner join attrs_categories ac on (av.id_attr_category = ac.id) inner join attributes a on (ac.id_io_attribute=a.id and av.id_record = idRecord))
+            (f_sel_rec_attrs_values(idRecord::int8) av inner join attrs_categories ac on (av.id_attr_category = ac.id) inner join attributes a on (ac.id_io_attribute=a.id and av.id_record = idRecord))
         where 
             av.start_time >= iStartTime 
             and (av.stop_time isnull or av.stop_time <= iStopTime)

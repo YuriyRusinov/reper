@@ -249,13 +249,17 @@ begin
         --i := i+1;
         end if;
     end loop; --main loop
-
+    
     create_query := create_query || ' constraint PK_' || table_name || ' primary key (id)) ';
     if (bInheritRootTable = TRUE) then
         create_query := create_query || ' inherits (root_table, q_base_table); ';
+
+        create_query := create_query || 'alter table ' || table_name || ' add constraint FK_Q_BASE_T_REF_IO_STATE_' || table_name || ' foreign key (id_io_state)
+                                         references io_states (id) on delete restrict on update restrict;';
         
         create_query := create_query || ' create trigger trgSetUID before insert or update on ' || table_name || ' for each row execute procedure uidCheck(); ';
         create_query := create_query || ' create trigger trgSyncRecords before insert or update or delete on ' || table_name || ' for each row execute procedure syncRecords(); ';
+        create_query := create_query || ' create trigger trgAddToChain after insert or update on ' || table_name || ' for each row execute procedure recordAddToChain(); ';
         create_query := create_query || ' create trigger trgCheckTableForOwner before insert or update or delete on ' || table_name || ' for each row execute procedure checkTableForOwner(); ';
         create_query := create_query || ' create trigger trgSetUUID before insert or update on ' || table_name || ' for each row execute procedure uuidCheck(); ';
         create_query := create_query || ' create trigger trg_fk_q_base_table_check1 before update or delete on ' || table_name || ' for each row execute procedure fkQBaseTableCheck1(); ';
@@ -321,8 +325,10 @@ declare
 
     res int4;
     wherePart varchar;
+    whatPart1 varchar;
     whatPart varchar;
     columnsPart varchar;
+    columnsPart1 varchar;
     q varchar;
 
 begin
@@ -339,7 +345,12 @@ begin
         return NULL;
     end if;
 
-    wherePart = generateFilterQuery(refTableName, idSearchTemplate);
+    wherePart := generateFilterQuery(refTableName, idSearchTemplate);
+
+    whatPart1 := refTableName || asString('."unique_id", ', false); 
+    whatPart1 := whatPart1 || refTableName || asString('."last_update", ', false); 
+    whatPart1 := whatPart1 || refTableName || asString('."uuid_t", ', false); 
+    whatPart1 := whatPart1 || refTableName || asString('."id_io_state", ', false); 
 
     select 
         array_to_string(array_agg(refTableName || asString('."', false) || a.code || asString('"', false) ),  ',') into whatPart 
@@ -355,6 +366,8 @@ begin
         return NULL;
     end if;
 
+    whatPart := whatPart1 || whatPart;
+
     q = 'create view ' || viewName || ' as select ' || whatPart || ' from ' || refTableName || ' where 1=1 ' || wherePart;
 
     raise notice '%', q;
@@ -366,6 +379,11 @@ begin
     end if;
 
 
+    whatPart1 := asString('new."unique_id", ', false); 
+    whatPart1 := whatPart1 || asString('new."last_update", ', false); 
+    whatPart1 := whatPart1 || asString('new."uuid_t", ', false); 
+    whatPart1 := whatPart1 || asString('new."id_io_state", ', false); 
+
     select 
         array_to_string(array_agg(asString('new."', false) || a.code || asString('"', false)), ',') into whatPart 
     from 
@@ -375,6 +393,8 @@ begin
         a.id = ac.id_io_attribute 
         and ac.id_io_category = idCategory;
 
+    whatPart := whatPart1 || whatPart;
+
     select 
         array_to_string(array_agg(asString('"', false) || a.code || asString('"', false)), ',') into columnsPart 
     from 
@@ -383,6 +403,13 @@ begin
     where 
         a.id = ac.id_io_attribute 
         and ac.id_io_category = idCategory;
+
+    columnsPart1 := asString('"unique_id", ', false); 
+    columnsPart1 := columnsPart1 || asString('"last_update", ', false); 
+    columnsPart1 := columnsPart1 || asString('"uuid_t", ', false); 
+    columnsPart1 := columnsPart1 || asString('"id_io_state", ', false); 
+
+    columnsPart := columnsPart1 ||columnsPart;
 
     q = 'create rule i_rule_' || viewName || ' as on INSERT TO ' || viewName || 
           ' do instead insert into ' || refTableName || '(' || columnsPart || ') values (' || whatPart || ');';

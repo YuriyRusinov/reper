@@ -2,7 +2,7 @@
 --alter table rec_attrs_values rename to tbl_rec_attrs_values;
 
 
-create or replace view rec_attrs_values as select * from f_sel_rec_attrs_values(NULL);
+create or replace view rec_attrs_values as select * from f_sel_rec_attrs_values(NULL::int8);
 
 revoke all on tbl_rec_attrs_values from public;
 

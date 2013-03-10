@@ -9,7 +9,6 @@ begin
     update rubricator set id_io_category = NULL where id_io_category = idCategory;--рубрики, которые используют категорию перестанут ее использовать
     delete from access_categories_table where id_io_category = idCategory;
 
-    delete from io_life_cycle where id_io_category = idCategory;
     delete from object_ref_tables where id_io_category = idCategory;    --также будут удаляться таблицы (реализован соответствующий триггер)
 
     --необходимо продумать вопрос с удалением пользовательских очередей и обработчиков

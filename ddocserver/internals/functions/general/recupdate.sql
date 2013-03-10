@@ -72,7 +72,8 @@ begin
                     rTable = 'report_organization' or
                     rTable = 'guard_objects_devices' or
                     rTable = 'access_cards_access_plan' or
-                    rTable = 'mail_lists_position'
+                    rTable = 'mail_lists_position' or 
+                    rTable = 'life_cycle_io_states'
                   ) then
                     refTable := rTable;
                 else
@@ -101,9 +102,9 @@ begin
                     ids := ids || '}';
                 end if;
                 if (exQuery is null) then
-                    exQuery := 'select aInsertExValues(' || quote_literal (refTable) || ',' || idRec || ',' || quote_literal (ids) || ',' || quote_literal (mainAttr) || ',' || quote_literal (childAttr) ||')';
+                    exQuery := 'select aUpdateExValues(' || quote_literal (refTable) || ',' || idRec || ',' || quote_literal (ids) || ',' || quote_literal (mainAttr) || ',' || quote_literal (childAttr) ||')';
                 else
-                    exQuery := exQuery || 'select aInsertExValues(' || quote_literal (refTable) || ',' || idRec || ',' || quote_literal (ids) || ',' || quote_literal (mainAttr) || ',' || quote_literal (childAttr) ||')';
+                    exQuery := exQuery || 'select aUpdateExValues(' || quote_literal (refTable) || ',' || idRec || ',' || quote_literal (ids) || ',' || quote_literal (mainAttr) || ',' || quote_literal (childAttr) ||')';
                 end if;
                 continue;
             end loop;

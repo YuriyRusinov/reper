@@ -16,6 +16,18 @@
 \i ./functions/categories/cgetcategoryattrs.sql
 \i ./functions/categories/agetattrattrs.sql
 
+\i ./functions/categories/cgetlifecycleinfo.sql
+\i ./functions/categories/lcgetstates.sql
+\i ./functions/categories/cgetstatecrosses.sql
+\i ./functions/categories/cinsertlifecycle.sql
+\i ./functions/categories/cinsertstate.sql
+\i ./functions/categories/cinsertstatecross.sql
+\i ./functions/categories/lcinsertstate.sql
+\i ./functions/categories/cdeletelifecycle.sql
+\i ./functions/categories/cupdatelifecycle.sql
+\i ./functions/categories/lcremovestates.sql
+\i ./functions/categories/lcremovestatecrosses.sql
+
 
 \i ./functions/categories/adeleteattrattrs.sql
 \i ./functions/categories/cgetrubrics.sql

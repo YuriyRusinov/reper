@@ -121,7 +121,8 @@ begin
                         rTable = 'report_organization' or
                         rTable = 'guard_objects_devices' or
                         rTable = 'access_cards_access_plan' or
-                        rTable = 'mail_lists_position'
+                        rTable = 'mail_lists_position' or
+                        rTable = 'life_cycle_io_states'
                       ) then
                         refTable := rTable;
                     else

@@ -134,11 +134,11 @@ declare
     
     capChmac varchar;
     cnt int4;
+    idChain int4;
+    idChainsData int4;
+    whatHappens int2;
 begin
 
-    if(new.id_maclabel isnull) then
-        return new;
-    end if;
 /*    
     m := getCurrentMacLabel();
     select mac_value into m1 from maclabels where id = new.id_maclabel;
@@ -170,6 +170,25 @@ begin
         end if;
     end if;
 
+    --chains
+    if(TG_OP = 'UPDATE') then
+        if(old.id_io_state = new.id_io_state) then
+            return new;
+        end if;
+        whatHappens := 3;--change of state of IO
+    else
+        whatHappens := 1; --insert new IO
+    end if;
+
+
+    select id into idChain from chains where id_io_category = new.id_io_category and id_io_state = new.id_io_state;
+    if(idChain isnull) then
+        return new;
+    end if;
+
+    select getNextSeq('chains_data', 'id') into idChainsData;
+    insert into chains_data (id, id_chain, id_io_object, insert_time, what_happens) 
+    values (idChainsData, idChain, new.id, current_timestamp, whatHappens);
     
     return new;
 end

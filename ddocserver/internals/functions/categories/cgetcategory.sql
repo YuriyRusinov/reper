@@ -15,7 +15,8 @@ create type h_get_category as(id int4,
                               st_desc varchar,
                               is_global boolean,
                               is_qualifier boolean,
-                              id_child2 int4);
+                              id_child2 int4,
+                              id_life_cycle int4);
 
 create or replace function cGetCategory(int4) returns setof h_get_category as
 $BODY$
@@ -42,7 +43,8 @@ begin
             st.description,
             c.is_global,
             t.is_qualifier,
-            c.id_child2
+            c.id_child2,
+            c.id_life_cycle
         from 
             io_categories c,
             io_category_types t,
@@ -85,7 +87,8 @@ begin
             st.description,
             c.is_global,
             t.is_qualifier,
-            c.id_child2
+            c.id_child2,
+            c.id_life_cycle
         from 
             io_categories c inner join
             io_category_types t on (c.id_io_category_type = t.id)
@@ -125,7 +128,8 @@ begin
             st.description,
             c.is_global,
             t.is_qualifier,
-            c.id_child2
+            c.id_child2,
+            c.id_life_cycle
         from 
             io_categories c,
             io_category_types t,

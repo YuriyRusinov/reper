@@ -110,11 +110,3 @@ language 'plpgsql';
 select f_safe_drop_trigger('trgioinsertattr', 'attrs_values');
 
 select f_create_trigger('trgioinsertattr', 'before', 'insert or update', 'attrs_values', 'ioinsertattrcheck()');
-
-/*
-create trigger trgIOInsertAttr 
-before insert or update
-on tbl_attrs_values 
-for each row 
-execute procedure ioInsertAttrCheck();
-*/

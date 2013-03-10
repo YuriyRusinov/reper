@@ -658,569 +658,46 @@ insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main
 insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
 values(194, -10, true, true, false, false, true);
 
+insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values ('localorg-categories-195', 195, 10, NULL, false, 'Жизненные циклы категорий', 'SYSCATEGORY_195', NULL::varchar, true, true, 1);
+insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
+values(195, -10, true, true, false, false, true);
+insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values ('localorg-categories-196', 196, 8, 195, true, 'Справочник жизненных циклов категорий', 'SYSCATEGORY_196', NULL::varchar, true, true, 1);
+insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
+values(196, -10, true, true, false, false, true);
+
+insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values ('localorg-categories-197', 197, 10, NULL, false, 'Переходы состояний в жизненных циклах', 'SYSCATEGORY_197', NULL::varchar, true, true, 1);
+insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
+values(197, -10, true, true, false, false, true);
+insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values ('localorg-categories-198', 198, 8, 197, true, 'Справочник переходов состояний в жизненных циклах', 'SYSCATEGORY_198', NULL::varchar, true, true, 1);
+insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
+values(198, -10, true, true, false, false, true);
+
+insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values ('localorg-categories-199', 199, 10, NULL, false, 'Сервисы-обработчики очередей', 'SYSCATEGORY_199', NULL::varchar, true, true, 1);
+insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
+values(199, -10, true, true, false, false, true);
+insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values ('localorg-categories-200', 200, 8, 199, true, 'Справочник сервисов-обработчиков очередей', 'SYSCATEGORY_200', NULL::varchar, true, true, 1);
+insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
+values(200, -10, true, true, false, false, true);
+
+insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values ('localorg-categories-201', 201, 10, NULL, false, 'Описания очередей обработки', 'SYSCATEGORY_201', NULL::varchar, true, true, 1);
+insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
+values(201, -10, true, true, false, false, true);
+insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values ('localorg-categories-202', 202, 8, 201, true, 'Справочник описаний очередей обработки', 'SYSCATEGORY_202', NULL::varchar, true, true, 1);
+insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
+values(202, -10, true, true, false, false, true);
+
+insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values ('localorg-categories-203', 203, 10, NULL, false, 'Очереди обработки (данные для обработки)', 'SYSCATEGORY_203', NULL::varchar, true, true, 1);
+insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
+values(203, -10, true, true, false, false, true);
+insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values ('localorg-categories-204', 204, 8, 203, true, 'Справочник очередей обработки (данные для обработки)', 'SYSCATEGORY_204', NULL::varchar, true, true, 1);
+insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
+values(204, -10, true, true, false, false, true);
+
+
 SELECT pg_catalog.setval('io_categories_id_seq', 300, true); --все пользовательские категории будут начинаться с номера 301
                                                              --это сделано для того, чтобы оставить резерв для системных категорий 
 
 update io_categories set is_completed = 1;
-
-
---дефолтный жизненный цикл категорий
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (1, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (1, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (2, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (2, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (3, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (3, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (4, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (4, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (5, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (5, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (6, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (6, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (7, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (7, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (8, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (8, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (9, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (9, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (10, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (10, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (11, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (11, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (12, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (12, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (13, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (13, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (14, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (14, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (15, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (15, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (16, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (16, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (17, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (17, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (18, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (18, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (19, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (19, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (20, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (20, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (29, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (29, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (30, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (30, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (31, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (31, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (32, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (32, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (33, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (33, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (34, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (34, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (37, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (37, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (38, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (38, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (39, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (39, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (40, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (40, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (41, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (41, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (42, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (42, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (43, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (43, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (44, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (44, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (45, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (45, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (46, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (46, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (47, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (47, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (48, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (48, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (49, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (49, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (50, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (50, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (51, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (51, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (52, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (52, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (53, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (53, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (54, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (54, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (55, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (55, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (56, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (56, 2, 1);
-
---insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (57, 1, 2);
---insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (57, 2, 1);
-
---insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (58, 1, 2);
---insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (58, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (59, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (59, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (60, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (60, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (61, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (61, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (62, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (62, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (63, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (63, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (64, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (64, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (65, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (65, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (66, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (66, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (67, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (67, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (68, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (68, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (69, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (69, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (70, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (70, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (71, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (71, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (72, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (72, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (73, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (73, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (74, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (74, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (75, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (75, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (76, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (76, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (77, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (77, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (78, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (78, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (79, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (79, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (80, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (80, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (81, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (81, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (82, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (82, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (83, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (83, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (84, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (84, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (85, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (85, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (86, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (86, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (87, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (87, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (88, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (88, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (89, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (89, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (90, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (90, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (91, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (91, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (92, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (92, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (93, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (93, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (94, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (94, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (95, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (95, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (96, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (96, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (97, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (97, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (98, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (98, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (99, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (99, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (100, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (100, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (101, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (101, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (102, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (102, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (103, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (103, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (104, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (104, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (105, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (105, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (106, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (106, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (107, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (107, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (108, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (108, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (109, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (109, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (110, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (110, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (111, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (111, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (112, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (112, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (113, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (113, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (114, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (114, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (115, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (115, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (116, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (116, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (117, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (117, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (118, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (118, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (119, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (119, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (120, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (120, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (121, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (121, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (122, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (122, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (123, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (123, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (124, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (124, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (125, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (125, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (126, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (126, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (127, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (127, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (128, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (128, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (129, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (129, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (130, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (130, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (131, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (131, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (132, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (132, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (133, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (133, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (134, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (134, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (135, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (135, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (136, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (136, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (137, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (137, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (138, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (138, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (139, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (139, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (140, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (140, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (141, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (141, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (142, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (142, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (143, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (143, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (144, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (144, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (145, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (145, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (146, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (146, 2, 1);
-
---insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (147, 1, 2);
---insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (147, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (148, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (148, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (149, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (149, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (150, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (150, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (151, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (151, 2, 1);
-
---
--- ZARYA22
---
---insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (152, 1, 2);
---insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (152, 2, 1);
-
---insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (153, 1, 2);
---insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (153, 2, 1);
-/*
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (154, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (154, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (155, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (155, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (156, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (156, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (157, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (157, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (158, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (158, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (159, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (159, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (160, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (160, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (161, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (161, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (162, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (162, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (163, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (163, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (164, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (164, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (165, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (165, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (166, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (166, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (167, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (167, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (168, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (168, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (169, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (169, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (170, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (170, 2, 1);
-*/
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (171, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (171, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (172, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (172, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (173, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (173, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (174, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (174, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (175, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (175, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (176, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (176, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (177, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (177, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (178, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (178, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (179, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (179, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (180, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (180, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (181, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (181, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (182, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (182, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (183, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (183, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (184, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (184, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (185, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (185, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (186, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (186, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (187, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (187, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (188, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (188, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (189, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (189, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (190, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (190, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (191, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (191, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (192, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (192, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (193, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (193, 2, 1);
-
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (194, 1, 2);
-insert into io_life_cycle (id_io_category, id_state_src, id_state_dest) values (194, 2, 1);
-
 
 --атрибуты "дочерних категорий"
 --ВАЖНО!!! Для атрибутов ссылочных здесь не устанавливается тип атрибута, на который они ссылаются. Это делается отдельной операцией в конце данного скрипта
@@ -1615,6 +1092,25 @@ insert into attributes (unique_id, id, id_a_type, code, name, title, table_name,
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-319', 319, 6, 'min_p', 'Мин.', 'Мин.', NULL, NULL, 120, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-320', 320, 6, 'max_p', 'Макс.', 'Макс.', NULL, NULL, 120, TRUE);
 
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-321', 321, 2, 'id_start_state', 'Начальное состояние', 'Начальное состояние', 'io_states', 'name', 150, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-322', 322, 17, 'life_cycle_io_states', 'Перечень состояний жизненного цикла', 'Перечень состояний жизненного цикла', 'io_states', 'name', 200, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-323', 323, 2, 'id_life_cycle', 'Жизненный цикл', 'Жизненный цикл', 'life_cycle', 'name', 150, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-324', 324, 2, 'id_state_src', 'Исходное состояние', 'Исходное состояние', 'io_states', 'name', 150, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-325', 325, 2, 'id_state_dest', 'Следующее состояние', 'Следующее состояние', 'io_states', 'name', 150, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-326', 326, 9, 'service', 'Параметры (сигнатура) сервиса', 'Параметры (сигнатура) сервиса', NULL, NULL, 150, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-327', 327, 9, 'extra_params', 'Доп. параметры для запуска', 'Доп. параметры для запуска', NULL, NULL, 150, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-328', 328, 2, 'id_handler', 'Сервис-обработчик', 'Сервис-обработчик', 'handlers', 'name', 150, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-329', 329, 2, 'id_chain', 'Очередь обработки', 'Очередь обработки', 'chains', 'name', 150, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-330', 330, 30, 'id_record', 'Идентификатор записи справочника', 'Идентификатор записи справочника', NULL, NULL, 100, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-331', 331, 8, 'is_handled', 'Признак обработки', 'Признак обработки', NULL, NULL, 100, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-332', 332, 5, 'handled_time', 'Момент обработки записи триггером', 'Момент обработки записи триггером', NULL, NULL, 120, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-333', 333, 5, 'start_service_time', 'Начало обработки записи сервисом', 'Начало обработки записи сервисом', NULL, NULL, 120, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-334', 334, 5, 'end_service_time', 'Конец обработки записи сервисом', 'Конец обработки записи сервисом', NULL, NULL, 120, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-335', 335, 8, 'return_code', 'Код возврата сервиса', 'Код возврата сервиса', NULL, NULL, 100, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-336', 336, 1, 'is_external', 'Признак внешнего запуска', 'Признак внешнего запуска', NULL, NULL, 100, TRUE);
+
+
+
 SELECT pg_catalog.setval('attributes_id_seq', 1000, true); --все пользовательские атрибуты будут начинаться с номера 1001
                                                           --это сделано для того, чтобы оставить резерв для системных атрибутов
 
@@ -1647,6 +1143,7 @@ select f_create_trigger('trgacinsert', 'before', 'insert or update', 'attrs_cate
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (1, 1, 1, NULL, true, true);
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (2, 1, 2, NULL, true, false);
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (3, 1, 3, NULL, false, false);
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (581, 1, 15, 'false', true, false);
 
 --таблица типов категорий ИО
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (4, 3, 1, NULL, true, true);--id
@@ -1686,15 +1183,16 @@ insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (28, 9, 29, NULL, false, false);--ref_column_name
 
 --таблица категорий
-insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (29, 11, 1, NULL, true, true);
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (29, 11, 1, NULL, true, true); --id
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (30, 11, 10, NULL, true, false); --id_io_category_type
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (31, 11, 11, NULL, false, false);--id_child
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (531, 11, 311, NULL, false, false);--id_child2
-insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (32, 11, 2, NULL, true, false);
-insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (33, 11, 3, NULL, false, false);
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (32, 11, 2, NULL, true, false);--name
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (33, 11, 3, NULL, false, false); --description
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (34, 11, 6, NULL, true, false);
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (35, 11, 17, 'true', true, true);
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (36, 11, 18, '1', true, false);--id_io_state
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (582, 11, 323, NULL, false, false);--id_life_cycle
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (37, 11, 111, 'false', true, false);--is_global
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (532, 11, 40, 'false', true, true);--is_archived (редактировать нельзя)
 
@@ -2587,6 +2085,53 @@ insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (548, 193, 313, NULL, true, false); --start_time
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (549, 193, 314, NULL, true, false); --end_time
 
+--таблица жизненных циклов
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (550, 195, 1, NULL, true, true); --id
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (551, 195, 2, NULL, true, false); --name
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (552, 195, 321, NULL, false, false);  --id_start_state
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (553, 195, 322, NULL, false, false);  --life_cycle_io_states
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (554, 195, 3, NULL, false, false);  --description
+
+--таблица переходов состояний в жизненных циклах
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (555, 197, 1, NULL, true, true); --id
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (556, 197, 2, NULL, true, false); --name
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (557, 197, 323, NULL, true, false);  --id_life_cycle
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (558, 197, 324, NULL, true, false);  --id_state_src
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (559, 197, 325, NULL, true, false);  --id_state_dest
+
+
+--таблица сервисов-обработчиков
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (560, 199, 1, NULL, true, true); --id
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (561, 199, 2, NULL, true, false); --name
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (562, 199, 3, NULL, false, false);  --description
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (563, 199, 326, NULL, true, false);  --service
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (564, 199, 327, NULL, false, false);  --extra_params
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (583, 199, 336, 'FALSE', true, false);  --is_external
+
+
+--таблица описаний очередей
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (565, 201, 1, NULL, true, true); --id
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (566, 201, 2, NULL, true, false); --name
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (567, 201, 3, NULL, false, false);  --description
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (568, 201, 328, NULL, true, false);  --id_handler
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (569, 201, 18, NULL, true, false);  --id_io_state
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (570, 201, 12, NULL, true, false);  --id_io_category
+
+
+--таблица очередей
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (571, 203, 1, NULL, true, true); --id
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (572, 203, 329, NULL, true, false); --id_chain
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (573, 203, 330, NULL, false, false);  --id_record
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (574, 203, 48, NULL, false, false);  --id_io_object
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (575, 203, 16, NULL, true, true);  --insert_time
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (576, 203, 331, '0', true, false);  --is_handled
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (577, 203, 332, NULL, false, false);  --handled_time
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (578, 203, 333, NULL, false, false);  --start_service_time
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (579, 203, 334, NULL, false, false);  --end_service_time
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (580, 203, 335, NULL, false, false);  --return_code
+--581 используется в справочнике состояний ИО
+--582 используется в справочнике категорий ИО
+--583 используется в справочнике сервисов
 
 SELECT pg_catalog.setval('attrs_categories_id_seq', 2000, true); --все пользовательские атрибуты в категориях будут начинаться с номера 2001
                                                                  --это сделано для того, чтобы оставить резерв для системных атрибутов
@@ -3055,6 +2600,32 @@ insert into tbl_io_objects (unique_id, id, id_io_category, author, id_io_state, 
 values ('localorg-io_objects-94', 94, 194, 1, 1, 'Справочник потоков сообщений', 'message_streams', NULL, 'Системный объект', true, true, 5, current_timestamp, 1, NULL, 3);
 insert into access_table (id_io_object, id_role, allow_readlist, allow_read, allow_delete, allow_update)
 values (94, -10, TRUE, TRUE, FALSE, FALSE);
+
+insert into tbl_io_objects (unique_id, id, id_io_category, author, id_io_state, name, table_name, description, information, is_system, is_global, id_sync_type, insert_time, id_maclabel, id_owner_org, id_io_type)
+values ('localorg-io_objects-95', 95, 196, 1, 1, 'Справочник жизненных циклов', 'life_cycle', NULL, 'Системный объект', true, true, 5, current_timestamp, 1, NULL, 3);
+insert into access_table (id_io_object, id_role, allow_readlist, allow_read, allow_delete, allow_update)
+values (95, -10, TRUE, TRUE, FALSE, FALSE);
+
+insert into tbl_io_objects (unique_id, id, id_io_category, author, id_io_state, name, table_name, description, information, is_system, is_global, id_sync_type, insert_time, id_maclabel, id_owner_org, id_io_type)
+values ('localorg-io_objects-96', 96, 198, 1, 1, 'Справочник переходов состояний в жизненных циклах', 'state_crosses', NULL, 'Системный объект', true, true, 5, current_timestamp, 1, NULL, 3);
+insert into access_table (id_io_object, id_role, allow_readlist, allow_read, allow_delete, allow_update)
+values (96, -10, TRUE, TRUE, FALSE, FALSE);
+
+insert into tbl_io_objects (unique_id, id, id_io_category, author, id_io_state, name, table_name, description, information, is_system, is_global, id_sync_type, insert_time, id_maclabel, id_owner_org, id_io_type)
+values ('localorg-io_objects-97', 97, 200, 1, 1, 'Справочник сервисов-обработчиков очередей', 'handlers', NULL, 'Системный объект', true, true, 5, current_timestamp, 1, NULL, 3);
+insert into access_table (id_io_object, id_role, allow_readlist, allow_read, allow_delete, allow_update)
+values (97, -10, TRUE, TRUE, FALSE, FALSE);
+
+insert into tbl_io_objects (unique_id, id, id_io_category, author, id_io_state, name, table_name, description, information, is_system, is_global, id_sync_type, insert_time, id_maclabel, id_owner_org, id_io_type)
+values ('localorg-io_objects-98', 98, 202, 1, 1, 'Справочник описаний очередей обработки', 'chains', NULL, 'Системный объект', true, true, 5, current_timestamp, 1, NULL, 3);
+insert into access_table (id_io_object, id_role, allow_readlist, allow_read, allow_delete, allow_update)
+values (98, -10, TRUE, TRUE, FALSE, FALSE);
+
+insert into tbl_io_objects (unique_id, id, id_io_category, author, id_io_state, name, table_name, description, information, is_system, is_global, id_sync_type, insert_time, id_maclabel, id_owner_org, id_io_type)
+values ('localorg-io_objects-99', 99, 204, 1, 1, 'Справочник очередей обработки (данные для обработки)', 'chains_data', NULL, 'Системный объект', true, true, 5, current_timestamp, 1, NULL, 3);
+insert into access_table (id_io_object, id_role, allow_readlist, allow_read, allow_delete, allow_update)
+values (99, -10, TRUE, TRUE, FALSE, FALSE);
+
 
 SELECT pg_catalog.setval('tbl_io_objects_id_seq', 300, true); --все пользовательские информационные объекты будут начинаться с номера 301
                                                           --это сделано для того, чтобы оставить резерв для системных ИО

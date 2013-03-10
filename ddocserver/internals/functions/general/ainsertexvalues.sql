@@ -15,24 +15,10 @@ declare
     insertQuery varchar;
 begin
 
-
-    deleteQuery := ' delete from ' || tableName || ' where ' || mainAttr || ' = ' || id;
-    execute deleteQuery;
-    
-
-    count := array_upper(valuesArray, 1);
-
-    if(count isnull or count = 0) then
-        return 1;
-    end if;
-    
-    insertQuery := ' ';
-    for i in 1..count
-    loop
-        v := valuesArray[i];
-
-        insertQuery := insertQuery || ' insert into ' || tableName || ' (' || mainAttr || ', ' || childAttr || ') values(' || id || ', ' || v || ');';
-    end loop;
+    insertQuery = 'insert into ' || tableName || ' (' || mainAttr || ', ' || childAttr || ')
+                   select ' || id || ', t.' || childAttr || '
+                   from
+                       (select ' || id || ' as ' || mainAttr || ', unnest(' || asString(valuesArray, true) || '::int8[]) as ' || childAttr || ' ) as t';
 
     execute insertQuery;
 

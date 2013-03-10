@@ -1,7 +1,8 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     28.02.2013 16:12:37                          */
+/* Created on:     10.03.2013 14:53:43                          */
 /*==============================================================*/
+
 
 /*==============================================================*/
 /* Table: root_table                                            */
@@ -881,6 +882,104 @@ select setMacToNULL('categories_rubrics');
 select createTriggerUID('categories_rubrics');
 
 /*==============================================================*/
+/* Table: chains                                                */
+/*==============================================================*/
+create table chains (
+   id                   SERIAL               not null,
+   id_handler           INT4                 not null,
+   id_io_state          INT4                 not null,
+   id_io_category       INT4                 not null,
+   name                 VARCHAR              not null,
+   description          VARCHAR              null,
+   constraint PK_CHAINS primary key (id)
+)
+inherits (root_table);
+
+comment on table chains is
+'Таблица описаний очередей,  в которые направляются ИО заданной категории и в заданном состоянии для обработки (ссылка на таблицу состояний и категорий).
+Сами очереди (ИО в них попавшие) содержатся в таблице очередей (chains_data).
+Для обработки ИО заданной категории и находящихся в заданном состоянии допустима только одна очередь.
+Поэтому поля "категория"  и "состояние" объявлены уникальным индексом.
+В итоге мы добиваемся независимости группы понятий "жизненный цикл" + "состояние" от группы понятий "очередь" + "сервис обработки очереди".
+';
+
+comment on column chains.id_handler is
+'обработчик очереди (ссылка на таблицу сервисов-обработчиков)
+Каждая очередь может иметь только один обработчик
+';
+
+comment on column chains.id_io_state is
+'Состояние ИО, в котором информационные объекты поступают в данную очередь для обработки.';
+
+comment on column chains.id_io_category is
+'Категория, информационные объекты которой обрабатываются данной очередью';
+
+comment on column chains.name is
+'название очереди';
+
+select setMacToNULL('chains');
+select createTriggerUID('chains');
+
+/*==============================================================*/
+/* Index: i_ch_cat_state                                        */
+/*==============================================================*/
+create unique index i_ch_cat_state on chains (
+id_io_state,
+id_io_category
+);
+
+/*==============================================================*/
+/* Table: chains_data                                           */
+/*==============================================================*/
+create table chains_data (
+   id                   SERIAL               not null,
+   id_chain             INT4                 not null,
+   id_io_object         INT4                 null,
+   id_record            INT8                 null,
+   insert_time          TIMESTAMP            not null default CURRENT_TIMESTAMP,
+   is_handled           INT2                 not null default 0
+      constraint CKC_IS_HANDLED_CHAINS_D check (is_handled in (0,1)),
+   handled_time         TIMESTAMP            null,
+   start_service_time   TIMESTAMP            null,
+   end_service_time     TIMESTAMP            null,
+   return_code          INT4                 null,
+   constraint PK_CHAINS_DATA primary key (id)
+)
+inherits (root_table);
+
+comment on table chains_data is
+'Таблица очередей.
+Содержит ссылки на ИО или ЭИО, которые попали в очередь обработки.
+Одновременно должен быть задан только ИО или ЭИО';
+
+comment on column chains_data.id_chain is
+'Ссылка на описание очереди обработки';
+
+comment on column chains_data.id_io_object is
+'ссылка на ИО, записанный в очередь (тип-документ)';
+
+comment on column chains_data.insert_time is
+'дата, время создания записи в таблице очередей (формируется автоматически при создании записи)';
+
+comment on column chains_data.is_handled is
+'признак обработки записи хранимой процедурой (в исходном состоянии=0, после обработки=1). Состояние=1 свидетельствует о том, что хранимая процедура обработки данной таблицы вызвала необходимый сервис обработки и передала ему исходные данные для обработки(номер записи в таблице очередей)';
+
+comment on column chains_data.handled_time is
+'дата, время обработки данной записи хранимой процедурой (триггером)';
+
+comment on column chains_data.start_service_time is
+'дата, время начала работы сервиса обработки очереди (формируется сервисом)';
+
+comment on column chains_data.end_service_time is
+'дата, время завершения  работы сервиса обработки очереди (формируется сервисом)';
+
+comment on column chains_data.return_code is
+'код возврата сервиса обработки';
+
+select setMacToNULL('chains_data');
+select createTriggerUID('chains_data');
+
+/*==============================================================*/
 /* Table: cmd_confirmations                                     */
 /*==============================================================*/
 create table cmd_confirmations (
@@ -1379,6 +1478,44 @@ comment on table guard_objects_devices is
 select setMacToNULL('guard_objects_devices');
 
 /*==============================================================*/
+/* Table: handlers                                              */
+/*==============================================================*/
+create table handlers (
+   id                   SERIAL               not null,
+   name                 VARCHAR              not null,
+   description          VARCHAR              null,
+   service              VARCHAR              not null,
+   extra_params         VARCHAR              null,
+   is_external          BOOL                 not null default FALSE,
+   constraint PK_HANDLERS primary key (id)
+)
+inherits (root_table);
+
+comment on table handlers is
+'Сервисы-обработчики ИО, которые попали в определенную очередь обработки.
+Для каждой очереди может быть определен только один сервис-обработчик.
+Сервис-обработчик представляет собой автономную подпрограмму, которая получает на вход идентификатор записи в таблице очередей и приступает к ообработке ИО, определяемого данным идентификатором.';
+
+comment on column handlers.service is
+'параметры сервиса (сигнатура сервиса)
+Каждый сервис должен иметь следующие вх. параметры:
+-Идентификатор записи таблицы очередей, инициировавшей обработчик
+Каждый сервис при его вызове обязан:
+-произвести отметку записи в таблице очередей, когда он начал обработку
+-произвести отметку записи в таблице очередей, когда он завершил обработку
+-выдать результат обработки в выходную очередь (в общем случае- в очереди)
+';
+
+comment on column handlers.extra_params is
+'Дополнительные параметры для запуска (если требуются)';
+
+comment on column handlers.is_external is
+'Поле определяет, является ли сервис-обработчик очереди внешней по отношению к БД программой или же явлется хранимой процедурой БД. ';
+
+select setMacToNULL('handlers');
+select createTriggerUID('handlers');
+
+/*==============================================================*/
 /* Table: indicator                                             */
 /*==============================================================*/
 create table indicator (
@@ -1479,6 +1616,7 @@ create table io_categories (
    id_child             INT4                 null,
    id_child2            INT4                 null,
    id_io_state          INT4                 not null default 1,
+   id_life_cycle        INT4                 null,
    is_main              BOOL                 not null default true,
    name                 VARCHAR              not null,
    code                 VARCHAR              not null,
@@ -1494,7 +1632,8 @@ inherits (root_table);
 
 comment on table io_categories is
 'таблица категорий информационных объектов. Каждая категория обладает набором атрибутов, которые должны иметь объекты данной категории. Кроме того, категория может иметь дочернюю категорию, которая определяет структуру таблицы, которая будет содержать записи объекта данной категории, если объект является контейнерным (т.е. содержит экземпляры информационного объекта). Примером такого объекта являются журналы и справочники.
-Если ИО не является конткйнерным, то данное поле (id_child) должно быть пусто (точнее если данное поле пусто, то объекты данной категории не являются контейнерными)';
+Если ИО не является конткйнерным, то данное поле (id_child) должно быть пусто (точнее если данное поле пусто, то объекты данной категории не являются контейнерными)
+Кроме того категория может иметь вторую дочернюю категорию, которая описывает набор показателей контейнерного информационного объекта. Показатели отличаются от атрибутов наличием темпоральной модели и расширенным набором параметров';
 
 comment on column io_categories.id_child is
 'У категории, описывающей справочник может быть 2 подчиненных категории, первая описывает таблицу (набор колонок), вторая - допустимый набор пользовательских атрибутов (показателей), которыми могут обладать записи справочников.
@@ -1506,6 +1645,9 @@ comment on column io_categories.id_child2 is
 
 comment on column io_categories.id_io_state is
 'состояние категории с точки зрения синхронизации';
+
+comment on column io_categories.id_life_cycle is
+'Жизненный цикл информационных объектов данной категории';
 
 comment on column io_categories.is_global is
 'признак глобальности категории';
@@ -1579,28 +1721,6 @@ comment on column io_last_sync.last_sync is
 
 select setMacToNULL('io_last_sync');
 select createTriggerUID('io_last_sync');
-
-/*==============================================================*/
-/* Table: io_life_cycle                                         */
-/*==============================================================*/
-create table io_life_cycle (
-   id_io_category       INT4                 not null,
-   id_state_src         INT4                 not null,
-   id_state_dest        INT4                 not null,
-   constraint PK_IO_LIFE_CYCLE primary key (id_io_category, id_state_src, id_state_dest)
-);
-
-comment on table io_life_cycle is
-'таблица содержит возможные переходы состояний ИО данной категории';
-
-select setMacToNULL('io_life_cycle');
-
-/*==============================================================*/
-/* Index: i_lc_category                                         */
-/*==============================================================*/
-create  index i_lc_category on io_life_cycle using BTREE (
-id_io_category
-);
 
 /*==============================================================*/
 /* Table: io_objects                                            */
@@ -1756,17 +1876,20 @@ create table io_states (
    id                   SERIAL not null,
    name                 VARCHAR              not null,
    description          VARCHAR              null,
+   is_system            BOOL                 not null default FALSE,
    constraint PK_IO_STATES primary key (id)
 )
 inherits (root_table);
 
 comment on table io_states is
 'состояния информационных объектов (категорий)
-- активный 
-- архивный
-- осуществляется первоначальная синхронизация
-- осуществляется синхронизация
-';
+ИО в заданном состоянии и заданной категории могут поступать на обработку в некоторую очередь.
+Описание данной очереди задается в таблице chains
+При этом есть некоторые системные состояния, которые служат лишь для внутренних целей.
+-активный
+-архивный
+-осуществляется первоначальная синхронизация
+-осуществляется синхронизация';
 
 select setMacToNULL('io_states');
 select createTriggerUID('io_states');
@@ -1993,6 +2116,67 @@ comment on column kks_roles.with_inheritance is
 Или должностное лицо наследует права подразделения, в которое оно входит.';
 
 select setMacToNULL('kks_roles');
+
+/*==============================================================*/
+/* Table: life_cycle                                            */
+/*==============================================================*/
+create table life_cycle (
+   id                   SERIAL               not null,
+   id_start_state       INT4                 null,
+   name                 VARCHAR              not null,
+   description          VARCHAR              null,
+   constraint PK_LIFE_CYCLE primary key (id)
+)
+inherits (root_table);
+
+comment on table life_cycle is
+'Жизненный цикл
+определяет набор состояний ИО, а также последовательность переходов между ними
+ЖЦ является характеристикой категории. Соответственно ИО может иметь только те состояния, которые определены в ЖЦ его категории.';
+
+comment on column life_cycle.id_start_state is
+'Начальное состояние, в котором создаются ИО заданной категории, имеющей данный жизненный цикл';
+
+select setMacToNULL('life_cycle');
+select createTriggerUID('life_cycle');
+
+/*==============================================================*/
+/* Index: i_lc_start_state                                      */
+/*==============================================================*/
+create  index i_lc_start_state on life_cycle (
+id_start_state
+);
+
+/*==============================================================*/
+/* Table: life_cycle_io_states                                  */
+/*==============================================================*/
+create table life_cycle_io_states (
+   id_life_cycle        INT4                 not null,
+   id_io_states         INT4                 not null,
+   constraint PK_LIFE_CYCLE_IO_STATES primary key (id_life_cycle, id_io_states)
+);
+
+comment on table life_cycle_io_states is
+'Набор допустимых состояний в данном жизненном цикле.
+Важно учитывать, что состояние id_start_state в таблице жизненных циклов также неявно добавляется в набор допустимых состояний, если оно не присутствует в этой таблице. При этом при удалении или смене id_start_state из данной таблицы он не удаляется.
+Данная таблица определяет лишь набор допустимых состояний.
+Последовательность переходов между состояниями определяется таблицей переходов';
+
+comment on column life_cycle_io_states.id_life_cycle is
+'Жизненный цикл';
+
+comment on column life_cycle_io_states.id_io_states is
+'состояние, в него входящее';
+
+select setMacToNULL('life_cycle_io_states');
+
+/*==============================================================*/
+/* Index: i_lc_s_key                                            */
+/*==============================================================*/
+create unique index i_lc_s_key on life_cycle_io_states (
+id_life_cycle,
+id_io_states
+);
 
 /*==============================================================*/
 /* Table: log                                                   */
@@ -2784,6 +2968,7 @@ select setMacToNULL('position_work_mode');
 /*==============================================================*/
 create table q_base_table (
    id                   BIGSERIAL            not null,
+   id_io_state          INT4                 not null default 1,
    uuid_t               UUID                 not null,
    constraint PK_Q_BASE_TABLE primary key (id)
 )
@@ -3217,6 +3402,52 @@ comment on table shape_types is
 
 select setMacToNULL('shape_types');
 select createTriggerUID('shape_types');
+
+/*==============================================================*/
+/* Table: state_crosses                                         */
+/*==============================================================*/
+create table state_crosses (
+   id                   SERIAL               not null,
+   name                 VARCHAR              not null,
+   id_life_cycle        INT4                 not null,
+   id_state_src         INT4                 not null,
+   id_state_dest        INT4                 not null,
+   constraint PK_STATE_CROSSES primary key (id)
+)
+inherits (root_table);
+
+comment on table state_crosses is
+'таблица содержит возможные переходы состояний ИО в данном жизненном цикле
+Состояния должны входить в жизненный цикл категории! Это отслеживает триггер.
+ИО могут переходить из любого состояния в любое. Наличие соответствующей записи в данной таблице означает лишь то, что после обработки в исходном состоянии ИО должен перейти в заданное состояние (и соответственно поставлен в очередь обработки, если таковая назначена для целевого состояния)';
+
+comment on column state_crosses.id_life_cycle is
+'в каком жизненном цикле переход допустим';
+
+comment on column state_crosses.id_state_src is
+'Исходное состояние';
+
+comment on column state_crosses.id_state_dest is
+'Состояние, в которое можно перейти из исходного';
+
+select setMacToNULL('state_crosses');
+select createTriggerUID('state_crosses');
+
+/*==============================================================*/
+/* Index: i_lc_states                                           */
+/*==============================================================*/
+create unique index i_lc_states on state_crosses (
+id_life_cycle,
+id_state_src,
+id_state_dest
+);
+
+/*==============================================================*/
+/* Index: i_lc_life_cycle                                       */
+/*==============================================================*/
+create  index i_lc_life_cycle on state_crosses (
+id_life_cycle
+);
 
 /*==============================================================*/
 /* Table: system_table                                          */
@@ -4103,6 +4334,31 @@ alter table categories_rubrics
       references io_categories (id)
       on delete restrict on update restrict;
 
+alter table chains
+   add constraint FK_CHAINS_REFERENCE_HANDLERS foreign key (id_handler)
+      references handlers (id)
+      on delete restrict on update restrict;
+
+alter table chains
+   add constraint FK_CHAINS_REFERENCE_IO_STATE foreign key (id_io_state)
+      references io_states (id)
+      on delete restrict on update restrict;
+
+alter table chains
+   add constraint FK_CHAINS_REFERENCE_IO_CATEG foreign key (id_io_category)
+      references io_categories (id)
+      on delete restrict on update restrict;
+
+alter table chains_data
+   add constraint FK_CHAINS_D_REFERENCE_CHAINS foreign key (id_chain)
+      references chains (id)
+      on delete restrict on update restrict;
+
+alter table chains_data
+   add constraint FK_CHAINS_D_REFERENCE_IO_OBJEC foreign key (id_io_object)
+      references io_objects (id)
+      on delete restrict on update restrict;
+
 alter table cmd_confirmations
    add constraint FK_CMD_CONF_REFERENCE_COMMAND_ foreign key (id_cmd)
       references command_journal (id)
@@ -4283,6 +4539,11 @@ alter table io_categories
       references io_categories (id)
       on delete restrict on update restrict;
 
+alter table io_categories
+   add constraint FK_IO_CATEG_REFERENCE_LIFE_CYC foreign key (id_life_cycle)
+      references life_cycle (id)
+      on delete restrict on update restrict;
+
 alter table io_last_sync
    add constraint FK_IO_LAST__REFERENCE_IO_OBJEC foreign key (id_io_object)
       references io_objects (id)
@@ -4291,21 +4552,6 @@ alter table io_last_sync
 alter table io_last_sync
    add constraint FK_IO_LAST__REFERENCE_ORGANIZA foreign key (id_organization)
       references organization (id)
-      on delete restrict on update restrict;
-
-alter table io_life_cycle
-   add constraint FK_IO_LIFE__REF_IO_STATE_SRC foreign key (id_state_src)
-      references io_states (id)
-      on delete restrict on update restrict;
-
-alter table io_life_cycle
-   add constraint FK_IO_LIFE__REFERENCE_IO_CATEG foreign key (id_io_category)
-      references io_categories (id)
-      on delete restrict on update restrict;
-
-alter table io_life_cycle
-   add constraint FK_IO_LIFE__REF_IO_STATE_DST foreign key (id_state_dest)
-      references io_states (id)
       on delete restrict on update restrict;
 
 alter table io_objects
@@ -4401,6 +4647,21 @@ alter table io_views
 alter table io_views
    add constraint FK_IO_VIEWS_REFERENCE_A_GROUPS foreign key (id_a_group)
       references a_groups (id)
+      on delete restrict on update restrict;
+
+alter table life_cycle
+   add constraint FK_LIFE_CYC_REFERENCE_IO_STATE foreign key (id_start_state)
+      references io_states (id)
+      on delete restrict on update restrict;
+
+alter table life_cycle_io_states
+   add constraint FK_LIFE_CYC_REFERENCE_LIFE_CYC foreign key (id_life_cycle)
+      references life_cycle (id)
+      on delete restrict on update restrict;
+
+alter table life_cycle_io_states
+   add constraint FK_LIFE_CYC_REFERENCE_IO_STATE foreign key (id_io_states)
+      references io_states (id)
       on delete restrict on update restrict;
 
 alter table log
@@ -4578,6 +4839,11 @@ alter table position_work_mode
       references "position" (id)
       on delete cascade on update cascade;
 
+alter table q_base_table
+   add constraint FK_Q_BASE_T_REFERENCE_IO_STATE foreign key (id_io_state)
+      references io_states (id)
+      on delete restrict on update restrict;
+
 alter table queue_results
    add constraint FK_QUEUE_RE_REFERENCE_TRANSPOR foreign key (id_transport)
       references transport (id)
@@ -4691,6 +4957,21 @@ alter table shape_segments
 alter table shape_segments
    add constraint FK_SHAPE_SE_REFERENCE_ELEMENT_ foreign key (id_element_shape)
       references element_shapes (id)
+      on delete restrict on update restrict;
+
+alter table state_crosses
+   add constraint FK_IO_LIFE__REF_IO_STATE_SRC foreign key (id_state_src)
+      references io_states (id)
+      on delete restrict on update restrict;
+
+alter table state_crosses
+   add constraint FK_IO_LIFE__REF_IO_STATE_DST foreign key (id_state_dest)
+      references io_states (id)
+      on delete restrict on update restrict;
+
+alter table state_crosses
+   add constraint FK_STATE_CR_REFERENCE_LIFE_CYC foreign key (id_life_cycle)
+      references life_cycle (id)
       on delete restrict on update restrict;
 
 alter table tsd

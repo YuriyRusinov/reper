@@ -3,6 +3,7 @@
 \i ./functions/general/deleterecord.sql
 
 \i ./functions/general/ainsertexvalues.sql
+\i ./functions/general/aupdateexvalues.sql
 \i ./functions/general/getexvaluesid.sql
 \i ./functions/general/recfindequal.sql
 \i ./functions/general/generatedlemailprefix.sql

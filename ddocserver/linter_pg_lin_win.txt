@@ -2,7 +2,7 @@
 Изначально исходники анаптированы для работы в среде Linux+Линтер
 
 Адаптация для PostgreSQL:
-1) поправить файл ./functions/misc/macmabels.sql
+1) поправить файл ./functions/init_data/macmabels.sql
 2) поправить файл ./functions/security/getcurrentmaclabel.sql (раскомментировать блок EXCEPTION в первой функции)
 3) Для pg9 закомментировать в ./internals/initdb.sql создание языка plpgsql
 

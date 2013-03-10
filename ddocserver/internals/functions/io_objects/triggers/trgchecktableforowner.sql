@@ -10,6 +10,13 @@ begin
         theTable = substr(theTable, 5);
     end if;
 
+    --hack for id_io_state
+    if(TG_OP = 'INSERT' or TG_OP = 'UPDATE') then
+        if(new.id_io_state is null) then
+            new.id_io_state = 1; --active
+        end if;
+    end if;
+
     select id into idObject from f_sel_io_objects_tbl(theTable) where table_name = theTable;
     if(idObject isnull) then
         select id_io_object into idObject from object_ref_tables where table_name = theTable;

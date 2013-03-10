@@ -11,6 +11,7 @@
 \i ./functions/io_objects/triggers/trgupdateio.sql
 
 \i ./functions/io_objects/triggers/trginsertioattr.sql
+\i ./functions/io_objects/triggers/trgioinsertattrafter.sql
 \i ./functions/io_objects/triggers/trgdeleteioattr.sql
 
 --\i ./functions/io_objects/triggers/trgrubric_acc.sql

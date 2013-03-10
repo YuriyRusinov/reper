@@ -78,12 +78,19 @@ begin
     readTables[35] = 'tbl_io_objects';--нельзя делать прямые запросы к данной таблице, только через функции
     readTables[36] = 'tbl_attrs_values'; --нельзя делать прямые запросы к данной таблице, только через функции
     readTables[37] = 'tbl_rec_attrs_values'; --нельзя делать прямые запросы к данной таблице, только через функции
-    readTables[38] = 'io_life_cycle';
+    readTables[38] = 'state_crosses'; --переходы между состояниями
     readTables[39] = 'object_ref_tables';
     readTables[40] = 'position_types';
     readTables[41] = 'mimetypes';
     readTables[42] = 'attrs_groups';
     readTables[43] = 'attrs_attrs';
+
+    readTables[44] = 'life_cycle';
+    readTables[45] = 'chains';
+    readTables[46] = 'handlers';
+    readTables[47] = 'life_cycle_io_states';
+    readTables[48] = 'chains_data';
+
 --(1)
 
 --(2)

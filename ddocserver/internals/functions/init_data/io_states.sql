@@ -1,11 +1,10 @@
-insert into io_states (id, name, description) values (1, 'Активный', NULL);
-insert into io_states (id, name, description) values (2, 'Архивный', NULL);
-insert into io_states (id, name, description) values (3, 'Осуществляется первоначальная синхронизация', NULL);
-insert into io_states (id, name, description) values (4, 'Осуществляется синхронизация', NULL);
---insert into io_states (id, name, description) values (5, 'На исполнении', NULL);
---insert into io_states (id, name, description) values (6, 'Исполнен', NULL);
---insert into io_states (id, name, description) values (7, 'Отправлен', NULL);
+insert into io_states (id, name, description, is_system) values (1, 'Активный', NULL, true);
+insert into io_states (id, name, description, is_system) values (2, 'Архивный', NULL, true);
+insert into io_states (id, name, description, is_system) values (3, 'Осуществляется первоначальная синхронизация', NULL, true);
+insert into io_states (id, name, description, is_system) values (4, 'Осуществляется синхронизация', NULL, true);
+insert into io_states (id, name, description, is_system) values (5, 'Произошло изменение значений атрибутов', NULL, true);
 
-SELECT pg_catalog.setval('io_states_id_seq', 4, true);
+--предусматриваем возможность в дальнейшем безболезненно добавлять новые системные состояния
+SELECT pg_catalog.setval('io_states_id_seq', 40, true);
 
 
