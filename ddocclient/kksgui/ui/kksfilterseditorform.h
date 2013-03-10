@@ -45,7 +45,7 @@ class _GUI_EXPORT KKSFiltersEditorForm : public QDialog
     Q_OBJECT
 
 public:
-    KKSFiltersEditorForm(KKSCategory * _c,
+    KKSFiltersEditorForm(const KKSCategory * _c,
                          const QString & tableName,
 #ifdef Q_CC_MSVC
                          KKSMap<int, KKSAttribute *> attrsIO = KKSMap<int, KKSAttribute*>(),
@@ -56,7 +56,7 @@ public:
                          QWidget *parent = 0,
                          Qt::WFlags f=0);
 
-    KKSFiltersEditorForm (KKSCategory * _c, 
+    KKSFiltersEditorForm (const KKSCategory * _c, 
                          const QString & tableName,
 #ifdef Q_CC_MSVC
                          KKSMap<int, KKSAttribute *> attrsIO = KKSMap<int, KKSAttribute*>(),
@@ -95,7 +95,7 @@ private slots:
 signals:
     //void loadAttributeRefValues (const QString & tableName, const KKSAttribute * attr, QComboBox * cbList);
     void loadAttributeRefValues (const QString & tableName, const KKSAttribute * attr, QAbstractItemModel * mod);
-    void saveSearchCriteria (KKSFilterGroup *);
+    void saveSearchCriteria (KKSFilterGroup *, const KKSCategory * c); //c - категория для которой можно применить поисковы запрос
     void loadSearchCriteria (void);//QAbstractItemModel *);
 
 private:
@@ -144,7 +144,7 @@ private:
 
     QPushButton * pbAddFilter;
 
-    KKSCategory * c;
+    const KKSCategory * c;
     KKSList<const KKSFilterGroup*> m_filters;
     
     KKSMap<int, KKSAttribute *> m_attrsIO;

@@ -46,12 +46,12 @@
 #include <QAction>
 #include <QtDebug>
 
-KKSFiltersEditorForm :: KKSFiltersEditorForm(KKSCategory * _c, 
-                                             const QString & tableName,
-                                           KKSMap<int, KKSAttribute *> attrsIO,
-                                           bool forIO, 
-                                           QWidget *parent,
-                                           Qt::WFlags f)
+KKSFiltersEditorForm :: KKSFiltersEditorForm(const KKSCategory * _c, 
+                                             const QString & tableName, //используется только при обработке атрибутов типа atCheckListEx
+                                             KKSMap<int, KKSAttribute *> attrsIO,
+                                             bool forIO, 
+                                             QWidget *parent,
+                                             Qt::WFlags f)
     : QDialog (parent, f),
     ui (new Ui::filters_editor_form),
     sortRefModel (new QSortFilterProxyModel (this)),
@@ -82,7 +82,7 @@ KKSFiltersEditorForm :: KKSFiltersEditorForm(KKSCategory * _c,
     connect (delSearchEntity, SIGNAL (triggered()), this, SLOT (delFilter()) );
 }
 
-KKSFiltersEditorForm :: KKSFiltersEditorForm (KKSCategory * _c, 
+KKSFiltersEditorForm :: KKSFiltersEditorForm (const KKSCategory * _c, 
                                               const QString & tableName,
                                               KKSMap<int, KKSAttribute *> attrsIO,
                                               bool forIO,
@@ -524,7 +524,7 @@ void KKSFiltersEditorForm :: addFilter ()
         return;
 
     int id = cbAttribute->itemData (cbIndex).toInt();
-    KKSAttribute * a = 0;
+    const KKSAttribute * a = 0;
     bool isSys;
     if (c->attributes().contains (id))
     {
@@ -1286,9 +1286,9 @@ void KKSFiltersEditorForm :: loadImage (void)
 void KKSFiltersEditorForm :: saveSQLQuery (void)
 {
     if (sTempl)
-        emit saveSearchCriteria (sTempl->getMainGroup());
+        emit saveSearchCriteria (sTempl->getMainGroup(), c);
     else if (!m_filters.isEmpty ())
-        emit saveSearchCriteria (const_cast<KKSFilterGroup *>(m_filters[0]));//ui->twFilters->model ());
+        emit saveSearchCriteria (const_cast<KKSFilterGroup *>(m_filters[0]), c);
     isDbSaved = true;
 }
 

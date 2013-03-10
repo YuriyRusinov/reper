@@ -29,7 +29,7 @@ class KKSCategoryAttr;
 class KKSAttrValue;
 class KKSCategory;
 class KKSObject;
-class KKSLifeCycle;
+class KKSLifeCycleEx;
 class KKSAttribute;
 class KKSType;
 class KKSSyncType;
@@ -120,8 +120,13 @@ class _F_EXPORT KKSLoader
         KKSAttribute * loadAttribute(const QString & code, const QString & tableName) const;
         KKSAttrType * loadAttrType(int id) const;
         KKSAttrType * loadAttrType(KKSAttrType::KKSAttrTypes type) const;
-        KKSState * loadState(int id) const;
         KKSSyncType * loadSyncType(int id) const;
+
+        //работа с жизненным циклом
+        KKSLifeCycleEx * loadLifeCycle(int idLifeCycle) const;
+        KKSState * loadState(int id) const;
+        KKSList<KKSState * > loadStates() const;
+        KKSList<KKSState * > loadStates(int idLifeCycle) const;
 
         KKSMap<int, KKSAddTable *> loadIOTables (KKSObject * io) const;
 
@@ -248,7 +253,7 @@ class _F_EXPORT KKSLoader
         KKSList<KKSFile *> loadFiles(KKSObject * io) const;
         KKSList<KKSFile *> loadFiles(const KKSObjectExemplar * io) const;
 
-        KKSLifeCycle * loadLifeCycle(int idCategory) const;
+
         /*
         QString loadColumnValue(const QString & tName,
                                 const QString & cName, 

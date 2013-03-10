@@ -5,32 +5,34 @@
 #include <list>
 #include <string>
 
+#include "config_dataaccess.h"
+
 using namespace std;
 /* использовать нотификацию*/
-//#define USE_NOTIFY
+#define USE_NOTIFICATION 1
 
 //------------------------------------------------------------------------------
 //
 // Interface IListener
 //
-class IListener
+class __DA_EXPORT IKKSListener
 {
 public:
-    virtual void notify( char* notify_name ) = 0;
-    virtual ~IListener();
+    virtual void notify( char* notify_name, char * payload ) = 0;
+    virtual ~IKKSListener(){}
 };
 
 //------------------------------------------------------------------------------
 //
 // Class Notify
 //
-class PQnotify
+class __DA_EXPORT KKSNotify
 {
 public:
-  PQnotify();
-  ~PQnotify();
+  KKSNotify();
+  ~KKSNotify();
   string name;
-  list<IListener*> listeners;
+  list<IKKSListener*> listeners;
 };
 
 #endif

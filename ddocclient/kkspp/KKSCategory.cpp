@@ -30,7 +30,7 @@ KKSCategory::KKSCategory() : KKSRecord(),
     m_type (NULL),
     m_tableCategory (NULL),
     m_recAttrCategory(NULL),
-    m_lifeCycle (KKSLifeCycle::defLifeCycle()),
+    m_lifeCycle (NULL),
     m_rootRubric(NULL),
     m_isSystem(false),
     m_isGlobal(false),
@@ -67,7 +67,7 @@ KKSCategory::KKSCategory(const KKSCategory & c) : KKSRecord(c),
     setTableCategory(const_cast<KKSCategory *>(c.tableCategory()));
     setRecAttrCategory(const_cast<KKSCategory *>(c.recAttrCategory()));
 
-    setLifeCycle(const_cast<KKSLifeCycle*>(c.lifeCycle()));
+    setLifeCycle(const_cast<KKSLifeCycleEx*>(c.lifeCycle()));
 
     setRootRubric(c.rootRubric());
 }
@@ -77,7 +77,7 @@ KKSCategory::KKSCategory(int id, const QString & name, KKSType * type) : KKSReco
     m_type (NULL),
     m_tableCategory (NULL),
     m_recAttrCategory(NULL),
-    m_lifeCycle (KKSLifeCycle::defLifeCycle()),
+    m_lifeCycle (NULL),
     m_rootRubric(NULL),
     m_isSystem(false),
     m_isGlobal(false),
@@ -183,12 +183,12 @@ KKSMap<int, KKSCategoryAttr *> & KKSCategory::attributes()
     return m_attributes;
 }
 
-const KKSLifeCycle * KKSCategory::lifeCycle() const
+const KKSLifeCycleEx * KKSCategory::lifeCycle() const
 {
     return m_lifeCycle;
 }
 
-KKSLifeCycle * KKSCategory::lifeCycle()
+KKSLifeCycleEx * KKSCategory::lifeCycle()
 {
     return m_lifeCycle;
 }
@@ -235,7 +235,7 @@ void KKSCategory::setAttributes(const KKSMap<int, KKSCategoryAttr *> & _attribut
     m_attrsModified = true;
 }
 
-void KKSCategory::setLifeCycle(KKSLifeCycle * _lifeCycle)
+void KKSCategory::setLifeCycle(KKSLifeCycleEx * _lifeCycle)
 {
     if(m_lifeCycle)
         m_lifeCycle->release();
@@ -479,10 +479,11 @@ int KKSCategory::clearTemplates()
 
 KKSFilter * KKSCategory::createFilter(int attrId, 
                                       const QString & value, 
-                                      KKSFilter::FilterOper operation)
+                                      KKSFilter::FilterOper operation) const
 {
     KKSFilter * f = NULL;
-    KKSAttribute * a = attribute(attrId);
+    const KKSAttribute * aa = attribute(attrId);
+    KKSAttribute *a = const_cast<KKSAttribute *> (aa);
     bool bNeedRelease = false;
     //в общем случае в категории может отсутствовать атрибут id. 
     //Тем не менее в таблицах DynamicDocs он всегда присутствует, 
@@ -545,10 +546,11 @@ KKSFilter * KKSCategory::createFilter(int attrId,
 
 KKSFilter * KKSCategory::createFilter(int attrId, 
                                       const QStringList & values, 
-                                      KKSFilter::FilterOper operation)
+                                      KKSFilter::FilterOper operation) const
 {
     KKSFilter * f = NULL;
-    KKSAttribute * a = attribute(attrId);
+    const KKSAttribute * aa = attribute(attrId);
+    KKSAttribute * a = const_cast<KKSAttribute *> (aa);
     bool bNeedRelease = false;
     //в общем случае в категории может отсутствовать атрибут id. 
     //Тем не менее в таблицах DynamicDocs он всегда присутствует, 

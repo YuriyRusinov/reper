@@ -10,6 +10,7 @@
 #define __KKSSITOOOM_KKSState_h
 
 #include <KKSRecord.h>
+#include "KKSMap.h"
 #include "kkspp_config.h"
 
 class _PP_EXPORT KKSState : public KKSRecord
@@ -23,8 +24,13 @@ public:
    static KKSState * defState1();
    static KKSState * defState2();
 
+   bool isSystem() const;
+   void setIsSystem(bool yes = true);
+
 protected:
 private:
+
+    bool m_isSystem;
 
 };
 

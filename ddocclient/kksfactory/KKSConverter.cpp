@@ -21,6 +21,7 @@
 #include "KKSState.h"
 #include "KKSSearchTemplate.h"
 #include "KKSRubric.h"
+#include "KKSLifeCycle.h"
 #include <KKSEIOData.h>
 
 
@@ -135,6 +136,8 @@ KKSObjectExemplar * KKSConverter::stateToExemplar(const KKSLoader * loader, cons
     appendAttrValue(tc, attrValues, 2, s->name(), KKSAttrType::atString);
     //description
     appendAttrValue(tc, attrValues, 3, s->desc(), KKSAttrType::atString);
+    //is_system
+    appendAttrValue(tc, attrValues, 15, s->isSystem() ? "TRUE" : "FALSE", KKSAttrType::atBool);
 
     eio->setAttrValues(attrValues);
 
@@ -310,7 +313,11 @@ KKSObjectExemplar * KKSConverter::categoryToExemplar(const KKSLoader * loader, c
     appendAttrValue(tc, attrValues, 18, QString::number(c->state()->id()), KKSAttrType::atInt);//id_io_state
     //is_global
     appendAttrValue(tc, attrValues, 111,  c->isGlobal() ? "true" : "false", KKSAttrType::atBool);//is_global
-
+    //id_life_cycle
+    if(c->lifeCycle())
+        appendAttrValue(tc, attrValues, 323, QString::number(c->lifeCycle()->id()), KKSAttrType::atInt);//id_life_cycle
+    else
+        appendAttrValue(tc, attrValues, 323, QString::null, KKSAttrType::atInt);//id_life_cycle
 
     eio->setAttrValues(attrValues);
 

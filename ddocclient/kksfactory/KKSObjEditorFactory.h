@@ -305,11 +305,14 @@ private slots:
 
     void loadAttributeSingleFilters (const QString & tableName, const KKSAttribute * attr, QAbstractItemModel * mod);
     void loadAttributeFilters (const QString & tableName, const KKSAttribute * attr, QAbstractItemModel * mod);
-    void saveSearchCriteria (KKSFilterGroup * group);
+    void saveSearchCriteria (KKSFilterGroup * group, const KKSCategory * c);//c - категория для которой можно применить поисковы запрос
 
     void loadSearchCriteria (void);//QAbstractItemModel * mod);
 
-    void addNewSearchTempl (const QModelIndex& parent, QAbstractItemModel * searchMod);
+    void addNewSearchTempl (const QModelIndex& parent, 
+                            QAbstractItemModel * searchMod, 
+                            const KKSCategory * c, //c - категория, к которой можно применить создаваемый поисковый запрос
+                            const QString & tableName); 
     void addCopySearchTempl (const QModelIndex& wIndex, QAbstractItemModel * searchMod);
     void updateSearchTempl (const QModelIndex& wIndex, QAbstractItemModel * searchMod);
     void deleleSearchTempl (const QModelIndex& wIndex, QAbstractItemModel * searchMod);

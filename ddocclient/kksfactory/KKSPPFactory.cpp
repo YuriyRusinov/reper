@@ -976,6 +976,7 @@ int KKSPPFactory::insertAttrValues(const KKSObject * io) const
                rTable == GUARD_OBJ_DEVICES_TSO ||
                rTable == ACCESS_CARDS_ACCESS_PLAN_TSO ||
 			   rTable == MAIL_LISTS_POSITION ||
+               rTable == LIFE_CYCLE_IO_STATES ||
                rTable == SHU_DLS_POSITION
                )
             {
@@ -1108,6 +1109,7 @@ int KKSPPFactory::updateAttrValues(const KKSObject * io) const
                rTable == GUARD_OBJ_DEVICES_TSO ||
                rTable == ACCESS_CARDS_ACCESS_PLAN_TSO ||
 			   rTable == MAIL_LISTS_POSITION ||
+               rTable == LIFE_CYCLE_IO_STATES ||
                rTable == SHU_DLS_POSITION
                )
             {
@@ -1119,7 +1121,7 @@ int KKSPPFactory::updateAttrValues(const KKSObject * io) const
             QString ids = av->value().valueForInsert();
             QString mainAttr = QString("id_io_object");
             QString childAttr = QString("id_%1").arg(a->tableName());
-            sqlEx += QString("select aInsertExValues('%1', %2, %3, '%4', '%5');")
+            sqlEx += QString("select aUpdateExValues('%1', %2, %3, '%4', '%5');")
                                 .arg(refTable)
                                 .arg(io->id())
                                 .arg(ids)
@@ -1648,6 +1650,25 @@ int KKSPPFactory::insertCategory(KKSCategory* c) const
         }
     }
 
+    //
+    // теперь сохраним жизненный цикл
+    //
+
+    if(c->lifeCycle() && c->lifeCycle()->id() <= 0){
+        setInTransaction();
+        int ok = insertLifeCycle(c->lifeCycle());
+        restoreInTransaction();
+        if(ok != OK_CODE){
+            if(!inTransaction())
+                db->rollback();
+            c->setId(-1);
+            return ERROR_CODE;
+        }
+    }
+
+
+
+    
     //сначала сохраним в Ѕƒ саму запись о категории в таблицу категорий
     //создаем запись в таблице io_categories
     c->setId(-1);
@@ -1662,8 +1683,6 @@ int KKSPPFactory::insertCategory(KKSCategory* c) const
     }
 
     KKSObjectExemplar * eio = KKSConverter::categoryToExemplar(loader, c);
-    //QString str = KKSDumper::dump(eio);
-    //qWarning("%s", str.toLocal8Bit().constData());
     int ok = eiof->insertEIO(eio);
     if(ok == ERROR_CODE){
         if(!inTransaction())
@@ -1691,20 +1710,6 @@ int KKSPPFactory::insertCategory(KKSCategory* c) const
         }
     }
 
-    //
-    // теперь сохраним жизненный цикл
-    //
-    if(c->lifeCycle()){
-        setInTransaction();
-        int ok = insertLifeCycle(c->id(), c->lifeCycle());
-        restoreInTransaction();
-        if(ok != OK_CODE){
-            if(!inTransaction())
-                db->rollback();
-            c->setId(-1);
-            return ERROR_CODE;
-        }
-    }
 
     if(c->rootRubric()){
         setInTransaction();
@@ -1917,27 +1922,9 @@ int KKSPPFactory::updateCategory(const KKSCategory* c) const
         }
     }
     
-
     //
-    // теперь обновим жизненный цикл
+    //рубрики
     //
-    ok = deleteLifeCycle(c->id());
-    if(ok != OK_CODE){
-        if(!inTransaction())
-            db->rollback();
-        return ERROR_CODE;
-    }
-    if(c->lifeCycle()){
-        setInTransaction();
-        int ok = insertLifeCycle(c->id(), const_cast<KKSLifeCycle*>(c->lifeCycle()));
-        restoreInTransaction();
-        if(ok != OK_CODE){
-            if(!inTransaction())
-                db->rollback();
-            return ERROR_CODE;
-        }
-    }
-    
     if(c->rootRubric()){
         setInTransaction();
         int ok = cUpdateRubrics(c);
@@ -1974,6 +1961,7 @@ int KKSPPFactory::updateCategory(const KKSCategory* c) const
     return OK_CODE;
 }
 
+
 int KKSPPFactory::deleteCategoryAttrs(int idCategory) const
 {
     if(idCategory <= 0)
@@ -1988,19 +1976,6 @@ int KKSPPFactory::deleteCategoryAttrs(int idCategory) const
     return OK_CODE;
 }
 
-int KKSPPFactory::deleteLifeCycle(int idCategory) const
-{
-    if(idCategory <= 0)
-        return ERROR_CODE;
-
-    QString sql = QString("delete from io_life_cycle where id_io_category = %1").arg(idCategory);
-    int ok = db->executeCmd(sql);
-    if(ok != OK_CODE){
-        return ERROR_CODE;
-    }
-
-    return OK_CODE;
-}
 
 int KKSPPFactory::deleteCategory(KKSCategory* c) const
 {
@@ -2158,7 +2133,202 @@ int KKSPPFactory::updateCategoryAttr(int idCategory, KKSCategoryAttr * a) const
     return OK_CODE;
 }
 
-int KKSPPFactory::insertLifeCycle(int idCategory, KKSLifeCycle * lc) const
+int KKSPPFactory::updateLifeCycle(KKSLifeCycleEx * lc) const
+{
+    if(!lc)
+        return ERROR_CODE;
+
+    if(!inTransaction())
+        db->begin();
+    
+    //
+    //считаем, что состо€ни€ в Ѕƒ сохранены ранее тем или иным образом
+    //
+
+    QString sql = QString("select cUpdateLifeCycle(%1, '%2', %3, %4);")
+                     .arg(lc->id())
+                     .arg(lc->name())
+                     .arg(lc->desc().isEmpty() ? QString("NULL") : QString("'") + lc->desc() + QString("'"))
+                     .arg(lc->startState() ? QString::number(lc->startState()->id()) : QString("NULL"));
+
+    KKSResult * res = db->execute(sql);
+    if(!res){
+        if(!inTransaction())
+            db->rollback();
+        return ERROR_CODE;
+    }
+
+    int ok = res->getCellAsInt(0, 0);
+    delete res;
+    if(ok <= 0){
+        if(!inTransaction())
+            db->rollback();
+        return ERROR_CODE;
+    }
+
+    KKSMap<int, KKSState *> ss = lc->states();
+    KKSMap<int, KKSState *>::const_iterator i;
+    QString ids;
+    if(ss.count() > 0){
+        ids = QString::number(-1);//чтобы удобнее было потом обрабатывать зап€тую
+
+        for (i=ss.constBegin(); i != ss.constEnd(); i++){
+            const KKSState * s = i.value();
+            if(s)
+                ids += ", " + QString::number(s->id());
+
+            QString sql = QString("select lcUpdateState(%1, %2);")
+                               .arg(lc->id())
+                               .arg(s->id());
+
+            KKSResult * res = db->execute(sql);
+            if(!res){
+                if(!inTransaction())
+                    db->rollback();
+                return ERROR_CODE;
+            }
+            int ok = res->getCellAsInt(0, 0);
+            delete res;
+            if(ok != OK_CODE){
+                if(!inTransaction())
+                    db->rollback();
+                return ERROR_CODE;
+            }
+        }
+    }
+    
+    //удал€ем все оставшиес€ св€зки с состо€ни€ми
+    if(ids.isEmpty())
+        sql = QString("select lcRemoveStates(%1, ARRAY[-1])").arg(lc->id());
+    else
+        sql = QString("select lcRemoveStates(%1, ARRAY[%2])").arg(lc->id()).arg(ids);
+    
+	res = db->execute(sql);
+    if(!res || res->getRowCount() == 0){
+        if(res)
+            delete res;
+        if(!inTransaction())
+            db->rollback();
+        return ERROR_CODE;
+    }
+
+    ok = res->getCellAsInt(0, 0);
+    delete res;
+    if(ok != 1){
+        if(!inTransaction())
+            db->rollback();
+        return ERROR_CODE;
+    }
+
+/*****/
+
+    ids = QString::number(-1);//чтобы удобнее было потом обрабатывать зап€тую
+    for (int i=0; i<lc->stateCrosses().count(); i++)
+    {
+        KKSStateCross * sc = lc->stateCrosses().at (i);
+        if(sc->stateSrc()->id() <= 0){
+            if(!inTransaction())
+                db->rollback();
+            qWarning() << "Incorrect KKSState in KKSStateCross. Not present in states of lifeCycle.";
+            return ERROR_CODE;
+        }
+        if(sc->stateDst()->id() <= 0){
+            if(!inTransaction())
+                db->rollback();
+            qWarning() << "Incorrect KKSState in KKSStateCross. Not present in states of lifeCycle.";
+            return ERROR_CODE;
+        }
+        
+        int idSrc = sc->stateSrc()->id();
+        int idDst = sc->stateDst()->id();
+
+
+        QString sql = QString("select lcUpdateStateCross(%1, %2, %3, %4)")
+                                .arg(QString("' '"))
+                                .arg(lc->id())
+                                .arg(idSrc)
+                                .arg(idDst);
+
+        KKSResult * res = db->execute(sql);
+        if(!res){
+            if(!inTransaction())
+                db->rollback();
+            return ERROR_CODE;
+        }
+        int idCross = res->getCellAsInt(0, 0);
+        ids += ", " + QString::number(idCross);//запоминаем идентификатор в справочнике переходов, который должен остатьс€ в Ѕƒ
+
+        delete res;
+        if(ok != OK_CODE){
+            if(!inTransaction())
+                db->rollback();
+            return ERROR_CODE;
+        }
+    
+    }
+
+    //удал€ем все оставшиес€ св€зки с переходами
+    sql;
+    if(ids.isEmpty())
+        sql = QString("select lcRemoveStateCrosses(%1, ARRAY[-1])").arg(lc->id());
+    else
+        sql = QString("select lcRemoveStateCrosses(%1, ARRAY[%2])").arg(lc->id()).arg(ids);
+    
+	res = db->execute(sql);
+    if(!res || res->getRowCount() == 0){
+        if(res)
+            delete res;
+        if(!inTransaction())
+            db->rollback();
+        return ERROR_CODE;
+    }
+
+    ok = res->getCellAsInt(0, 0);
+    delete res;
+    if(ok != 1){
+        if(!inTransaction())
+            db->rollback();
+        return ERROR_CODE;
+    }
+
+/*****/
+
+    if(!inTransaction())
+        db->commit();
+
+    return OK_CODE;
+}
+
+int KKSPPFactory::deleteLifeCycle(int idLifeCycle) const
+{
+    if(idLifeCycle <= 0)
+        return ERROR_CODE;
+
+    if(!inTransaction())
+        db->begin();
+
+    QString sql = QString("select cDeleteLifeCycle(%1);").arg(idLifeCycle);
+    KKSResult * res = db->execute(sql);
+    if(!res || res->getRowCount() != 1 || res->getCellAsInt(0, 0) != 1){
+        if(!inTransaction())
+            db->rollback();
+        
+        if(res)
+            delete res;
+
+        return ERROR_CODE;
+    }
+
+    delete res;
+    
+    if(!inTransaction())
+        db->commit();
+
+    return OK_CODE;
+}
+
+
+int KKSPPFactory::insertLifeCycle(KKSLifeCycleEx * lc) const
 {
     
     if(!lc)
@@ -2167,41 +2337,115 @@ int KKSPPFactory::insertLifeCycle(int idCategory, KKSLifeCycle * lc) const
     if(!inTransaction())
         db->begin();
 
+    if(lc->startState() && lc->startState()->id() <= 0){
+        int ok = insertState(lc->startState());
+        if(ok != OK_CODE){
+            if(!inTransaction())
+                db->rollback();
+            return ERROR_CODE;
+        }
+    }
+
+    QString sql = QString("select cInsertLifeCycle('%1', %2, %3)")
+                     .arg(lc->name())
+                     .arg(lc->desc().isEmpty() ? QString("NULL") : QString("'") + lc->desc() + QString("'"))
+                     .arg(lc->startState() ? QString::number(lc->startState()->id()) : QString("NULL"));
+    
+    KKSResult * res = db->execute(sql);
+    if(!res){
+        if(!inTransaction())
+            db->rollback();
+        return ERROR_CODE;
+    }
+
+    int idLifeCycle = res->getCellAsInt(0, 0);
+    delete res;
+
+    if(idLifeCycle <= 0){
+        if(!inTransaction())
+            db->rollback();
+        return ERROR_CODE;
+    }
+
+    lc->setId(idLifeCycle);
+        
+    KKSMap<int, KKSState *> ss = lc->states();
+    KKSMap<int, KKSState *>::iterator i;
+    if(ss.count() > 0){
+        KKSState * s=0;
+        for (i=ss.begin(); i != ss.end(); i++)
+        {
+            s = i.value();
+
+            if(s && s->id() <= 0){
+                int ok = insertState(s);
+                if(ok != OK_CODE){
+                    if(!inTransaction())
+                        db->rollback();
+                    return ERROR_CODE;
+                }
+            }
+
+            QString sql = QString("select lcInsertState(%1, %2);")
+                               .arg(lc->id())
+                               .arg(s->id());
+
+            KKSResult * res = db->execute(sql);
+            if(!res){
+                if(!inTransaction())
+                    db->rollback();
+                return ERROR_CODE;
+            }
+            int ok = res->getCellAsInt(0, 0);
+            delete res;
+            if(ok != OK_CODE){
+                if(!inTransaction())
+                    db->rollback();
+                return ERROR_CODE;
+            }
+        }
+        
+    }
+    
+    //считаем, что переходы между состо€ни€ми возможны только сренди состо€ний, наход€щихс€ в списке состо€ний ∆÷
+    //поэтому здесь все состо€ни€ должны уже быть сохранены в Ѕƒ.
+    //если встретитс€ состо€ние с »ƒ <= 0,  то считаем это ошибкой
+    //(кроме прочего, система триггеров в Ѕƒ не позволит сохранить состо€ни€, отсутствующие в списке)
     for (int i=0; i<lc->stateCrosses().count(); i++)
     {
         KKSStateCross * sc = lc->stateCrosses().at (i);
         if(sc->stateSrc()->id() <= 0){
-            int ok = insertState(sc->stateSrc());
-            if(ok != OK_CODE){
-                if(!inTransaction())
-                    db->rollback();
-                return ERROR_CODE;
-            }
+            if(!inTransaction())
+                db->rollback();
+            qWarning() << "Incorrect KKSState in KKSStateCross. Not present in states of lifeCycle.";
+            return ERROR_CODE;
         }
         if(sc->stateDst()->id() <= 0){
-            int ok = insertState(sc->stateDst());
-            if(ok != OK_CODE){
-                if(!inTransaction())
-                    db->rollback();
-                return ERROR_CODE;
-            }
+            if(!inTransaction())
+                db->rollback();
+            qWarning() << "Incorrect KKSState in KKSStateCross. Not present in states of lifeCycle.";
+            return ERROR_CODE;
         }
-
-
         
         int idSrc = sc->stateSrc()->id();
         int idDst = sc->stateDst()->id();
 
 
-        QString sql = QString("insert into io_life_cycle "
-                              "(id_io_category, id_state_src, id_state_dest) "
-                              "values(%1, %2, %3)")
-                                .arg(idCategory)
+        QString sql = QString("select cInsertStateCross(%1, %2, %3, %4)")
+                                .arg(QString("' '"))
+                                .arg(lc->id())
                                 .arg(idSrc)
                                 .arg(idDst);
 
-        int ok = db->executeCmd(sql);
-        if(ok != OK_CODE){
+        KKSResult * res = db->execute(sql);
+        if(!res){
+            if(!inTransaction())
+                db->rollback();
+            return ERROR_CODE;
+        }
+        int ok = res->getCellAsInt(0, 0);
+        delete res;
+        if(ok <= 0){
             if(!inTransaction())
                 db->rollback();
             return ERROR_CODE;
@@ -2263,16 +2507,66 @@ int KKSPPFactory::insertState(KKSState * s) const
         return ERROR_CODE;
 
     s->setId(-1);
-    KKSObjectExemplar * eio = KKSConverter::stateToExemplar(loader, s);
-    int ok = eiof->insertEIO(eio);
-    if(ok == ERROR_CODE){
+    QString sql = QString("select cInsertState('%1', %2)")
+                     .arg(s->name())
+                     .arg(s->desc().isEmpty() ? QString("NULL") : QString("'") + s->desc() + QString("'"));
+    KKSResult * res = db->execute(sql);
+    if(!res)
+        return ERROR_CODE;
+
+    int id = 0;
+    id = res->getCellAsInt(0, 0);
+    delete res;
+    if(id<=0){
         return ERROR_CODE;
     }
-    s->setId(eio->id());
-    eio->release();
+
+    s->setId(id);
     
     return OK_CODE;
 }
+
+int KKSPPFactory::updateState(KKSState * s) const
+{
+    if(!db || !s)
+        return ERROR_CODE;
+
+    QString sql = QString("select cUpdateState(%1, '%2', %3)")
+                     .arg(s->id())
+                     .arg(s->name())
+                     .arg(s->desc().isEmpty() ? QString("NULL") : QString("'") + s->desc() + QString("'"));
+    KKSResult * res = db->execute(sql);
+    if(!res)
+        return ERROR_CODE;
+
+    int ok = res->getCellAsInt(0, 0);
+    delete res;
+    if(ok <= 0){
+        return ERROR_CODE;
+    }
+    
+    return OK_CODE;
+}
+
+int KKSPPFactory::deleteState(int idState) const
+{
+    if(!db)
+        return ERROR_CODE;
+
+    QString sql = QString("select cDeleteState(%1)").arg(idState);
+    KKSResult * res = db->execute(sql);
+    if(!res)
+        return ERROR_CODE;
+
+    int ok = res->getCellAsInt(0, 0);
+    delete res;
+    if(ok <= 0){
+        return ERROR_CODE;
+    }
+    
+    return OK_CODE;
+}
+
 
 KKSAttribute * KKSPPFactory::createAttribute(int id, 
                                              const QString & code, 

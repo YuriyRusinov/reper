@@ -14,10 +14,12 @@ class QAction;
 class QToolBar;
 class QLineEdit;
 
+class KKSCategory;
+
 class _GUI_EXPORT KKSSearchTemplatesForm : public QDialog
 {
 public:
-    KKSSearchTemplatesForm (QWidget * parent=0, Qt::WFlags f=0);
+    KKSSearchTemplatesForm (const KKSCategory * c, const QString & tableName, QWidget * parent=0, Qt::WFlags f=0);
     ~KKSSearchTemplatesForm (void);
 
     int getIdSearchTemplate (void) const;
@@ -41,8 +43,11 @@ private slots:
     void setFilterSt (const QString& text);
 
 signals:
-    void addNewEmptySearchTemplate (const QModelIndex& parent, QAbstractItemModel * searchMod);
-    void addNewCopySearchTemplate (const QModelIndex& wIndex, QAbstractItemModel * searchMod);
+    void addNewEmptySearchTemplate (const QModelIndex& parent, 
+                                    QAbstractItemModel * searchMod, 
+                                    const KKSCategory * c,//c - категория, для которой можно приемнить данный поисковый запрос
+                                    const QString & tableName);
+    void addNewCopySearchTemplate (const QModelIndex& wIndex, QAbstractItemModel * searchMod); 
     void updateSearchTemplate (const QModelIndex& wIndex, QAbstractItemModel * searchMod);
     void deleteSearchTemplate (const QModelIndex& wIndex, QAbstractItemModel * searchMod);
     
@@ -62,6 +67,12 @@ private:
     // Variables
     //
     int idUser;
+
+    const KKSCategory * c; //категория к которой должен быть применен 
+                           //выбираемый или создаваемый в данной форме поисковый запрос
+    QString m_tableName; //используется только для передачи в форму создания поискового запроса
+                         //нужно для обработки атрибутов типа atCheckListEx
+                           
     QTreeView * searchView;
     QToolBar * tbActions;
     QAction * actAddNew;

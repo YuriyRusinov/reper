@@ -10,7 +10,7 @@
 
 class KKSType;
 class KKSState;
-class KKSLifeCycle;
+class KKSLifeCycleEx;
 class KKSRubric;
 class KKSAttrType;
 class KKSAccessEntity;
@@ -61,11 +61,11 @@ class _PP_EXPORT KKSCategory : public KKSRecord
 
         KKSFilter * createFilter(int attrId, 
                                  const QString & value, 
-                                 KKSFilter::FilterOper operation);
+                                 KKSFilter::FilterOper operation) const;
    
         KKSFilter * createFilter(int attrId, 
                                  const QStringList & values, 
-                                 KKSFilter::FilterOper operation);
+                                 KKSFilter::FilterOper operation) const;
 
         void setAttributes(const KKSMap<int, KKSCategoryAttr *> & _attributes);
         //добавить более одного атрибута с одинаковым ключом (ИД) нельзя
@@ -79,13 +79,13 @@ class _PP_EXPORT KKSCategory : public KKSRecord
         //////int removeAttribute(const QString & code);
         int replaceAttribute(int idAttribute, KKSCategoryAttr * a); //НЕ idCategoryAttr !!
 
-        const KKSLifeCycle * lifeCycle() const;
-        KKSLifeCycle * lifeCycle();
+        const KKSLifeCycleEx * lifeCycle() const;
+        KKSLifeCycleEx * lifeCycle();
 
         void setTableCategory(KKSCategory * _tableCategory);
         void setRecAttrCategory(KKSCategory * _recAttrCategory);
         void setType(KKSType * _type);
-        void setLifeCycle(KKSLifeCycle * _lifeCycle);
+        void setLifeCycle(KKSLifeCycleEx * _lifeCycle);
 
         //возвращает шаблон по умолчанию для данной категории
         //т.е. когда категория не имеет ни одного шаблона
@@ -166,7 +166,7 @@ class _PP_EXPORT KKSCategory : public KKSRecord
         KKSCategory* m_tableCategory; //категория описывает набор атрибутов, которые соответствуют колонкам в подчиненной таблице
         KKSCategory* m_recAttrCategory;//категория описывает набор пользовательских атрибутов (показателей), которыми могут обладать записи справочников
         KKSMap<int, KKSCategoryAttr *> m_attributes;//атрибуты категории. ВАЖНО!! В качестве ключа используется idAttribute, не idCategoryAttr !!!
-        KKSLifeCycle* m_lifeCycle;
+        KKSLifeCycleEx * m_lifeCycle;
 
         KKSRubric * m_rootRubric;
 

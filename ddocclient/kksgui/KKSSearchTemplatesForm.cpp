@@ -21,10 +21,13 @@
 #include "KKSSearchTemplatesForm.h"
 #include "KKSHIntervalW.h"
 #include "defines.h"
+#include "KKSCategory.h"
 
-KKSSearchTemplatesForm :: KKSSearchTemplatesForm (QWidget * parent, Qt::WFlags f)
+KKSSearchTemplatesForm :: KKSSearchTemplatesForm (const KKSCategory * c1, const QString & tableName, QWidget * parent, Qt::WFlags f)
     : QDialog (parent, f),
     idUser (-1),
+    c(c1),
+    m_tableName(tableName),
     searchView (new QTreeView (this)),
     tbActions (new QToolBar (this)),
     actAddNew (new QAction (tr("&Add empty template"), this)),
@@ -38,6 +41,9 @@ KKSSearchTemplatesForm :: KKSSearchTemplatesForm (QWidget * parent, Qt::WFlags f
     pbOk (new QPushButton (tr("&OK"), this)),
     pbCancel (new QPushButton (tr("&Cancel"), this))
 {
+    if(c)
+        c->addRef();
+
     this->init ();
 
     QItemSelectionModel * selModel = searchView->selectionModel ();
@@ -68,6 +74,8 @@ KKSSearchTemplatesForm :: KKSSearchTemplatesForm (QWidget * parent, Qt::WFlags f
 
 KKSSearchTemplatesForm :: ~KKSSearchTemplatesForm (void)
 {
+    if(c)
+        c->release();
 }
 
 int KKSSearchTemplatesForm :: getIdSearchTemplate (void) const
@@ -109,9 +117,9 @@ void KKSSearchTemplatesForm :: addEmptySearchTemplate (void)
     QAbstractItemModel * mod = searchView->model ();
     QModelIndex wIndex = getCurrentIndex ();
     if (wIndex.data (Qt::UserRole+USER_ENTITY).toInt() == 0)
-        emit addNewEmptySearchTemplate (wIndex, mod);
+        emit addNewEmptySearchTemplate (wIndex, mod, c, m_tableName);
     else
-        emit addNewEmptySearchTemplate (QModelIndex(), mod);
+        emit addNewEmptySearchTemplate (QModelIndex(), mod, c, m_tableName);
 }
 
 void KKSSearchTemplatesForm :: addCopySearchTemplate (void)

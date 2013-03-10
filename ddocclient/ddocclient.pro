@@ -13,6 +13,7 @@ SUBDIRS += \
     kksfactory \
     kksinteractor \
     kkscore \
+    kksrunservice \
     app 
 
 include(./ddocclient.conf)

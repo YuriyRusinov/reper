@@ -1,12 +1,12 @@
 
 #include "pqnotify.h"
 
-PQnotify::PQnotify()
+KKSNotify::KKSNotify()
 {
 
 }
 
-PQnotify::~PQnotify()
+KKSNotify::~KKSNotify()
 {
   listeners.clear();
 }

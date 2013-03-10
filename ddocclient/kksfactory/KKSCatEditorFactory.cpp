@@ -890,11 +890,6 @@ void KKSCatEditorFactory :: saveCategory (KKSCategory *cat, int idTableCat, int 
     cEditor->category()->setType (cType);
     cType->release ();
 
-    KKSLifeCycle * ls = KKSLifeCycle :: defLifeCycle();
-    if (!ls)
-        return;
-    cat->setLifeCycle (ls);
-    ls->release ();
 */
     int res;
     if (cat->id() <= 0)

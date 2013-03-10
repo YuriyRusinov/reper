@@ -164,7 +164,7 @@ KKSSito::~KKSSito( )
         delete lastError;
     
     if(poSettings)
-    delete poSettings;
+        delete poSettings;
 
     //if(m_rf) 
     //    delete m_rf;

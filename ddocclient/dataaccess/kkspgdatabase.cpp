@@ -3,6 +3,7 @@
 
 #include "kkspgdatabase.h"
 #include "kkspgresult.h"
+#include "pqnotify.h"
 
 #define SEC_TO_SLEEP 10
 #define _REPEAT_COUNT_ 5
@@ -19,7 +20,7 @@
 //
 // KKSPGDatabase::KKSPGDatabase
 //
-#ifdef USE_NOTIFY
+#ifdef USE_NOTIFICATION
 KKSPGDatabase::KKSPGDatabase( bool _tolisten ) : notify_conn(NULL), to_listen(_tolisten)
 #else
 KKSPGDatabase::KKSPGDatabase() : KKSDatabase()
@@ -45,8 +46,8 @@ KKSPGDatabase::KKSPGDatabase( PGconn * _conn ) : KKSDatabase()
 //
 KKSPGDatabase::~KKSPGDatabase()
 {
-#ifdef USE_NOTIFY
-    for( list<PQnotify*>::iterator ii = notifies.begin(); ii != notifies.end(); ii = notifies.erase(ii) )
+#ifdef USE_NOTIFICATION
+    for( list<KKSNotify*>::iterator ii = notifies.begin(); ii != notifies.end(); ii = notifies.erase(ii) )
         delete *ii;
     stopListen();
 #endif
@@ -94,7 +95,8 @@ bool KKSPGDatabase::connect( QString _ipServer,
         return connected();
     }
 
-#ifdef USE_NOTIFY
+#ifdef USE_NOTIFICATION
+
     if (to_listen)
     {
         notify_conn = PQsetdbLogin( ipServer.toAscii().constData(), 
@@ -166,7 +168,7 @@ void KKSPGDatabase::disconnect() const
         conn = NULL;
     }
 
-#ifdef USE_NOTIFY
+#ifdef USE_NOTIFICATION
     if (!to_listen)
         return;
 
@@ -187,7 +189,8 @@ void KKSPGDatabase::disconnect() const
 bool KKSPGDatabase::connected() const
 {
     bool s_conn;
-#ifdef USE_NOTIFY
+#ifdef USE_NOTIFICATION
+
     bool  s_notify_conn;
 
     if (to_listen)
@@ -196,28 +199,28 @@ bool KKSPGDatabase::connected() const
 
     s_conn = (PQstatus( conn ) == CONNECTION_OK);
 
-#ifdef USE_NOTIFY
+#ifdef USE_NOTIFICATION
     return ((to_listen) ? (s_conn && s_notify_conn) : s_conn);
 #else
     return s_conn;
 #endif
 }
 
-#ifdef USE_NOTIFY
+#ifdef USE_NOTIFICATION
 //------------------------------------------------------------------------------
 //
 // KKSPGDatabase::addListener
 //
-void KKSPGDatabase::addListener( IListener* listener, const char* notify_name )
+void KKSPGDatabase::addListener( IKKSListener* listener, const char* notify_name )
 {
 
     // Try to find it in the notifies
-    for( list<PQnotify*>::iterator ii = notifies.begin(); ii != notifies.end(); ii++ )
-        if ( strcmp( (*ii)->name.toAscii().constData(), notify_name ) == 0 )
+    for( list<KKSNotify*>::iterator ii = notifies.begin(); ii != notifies.end(); ii++ )
+        if ( strcmp( (*ii)->name.c_str(), notify_name ) == 0 )
         {
             // We are listening it, so add only the listener
             bool isFound = false;
-            for( list<IListener*>::iterator jj = (*ii)->listeners.begin(); jj != (*ii)->listeners.end(); jj++ )
+            for( list<IKKSListener*>::iterator jj = (*ii)->listeners.begin(); jj != (*ii)->listeners.end(); jj++ )
             {
                 if ( (*jj) == listener )
                 {
@@ -232,7 +235,7 @@ void KKSPGDatabase::addListener( IListener* listener, const char* notify_name )
         }
 
     // Start listen
-    char sql[50 + strlen(notify_name)];
+    char * sql = new char[50 + strlen(notify_name)];
     PGresult* result = NULL;
     sprintf( sql,"LISTEN %s;", notify_name );
 
@@ -248,10 +251,13 @@ void KKSPGDatabase::addListener( IListener* listener, const char* notify_name )
     PQclear( result );
 
     // Add notify
-    PQnotify* notify = new PQnotify();
+    KKSNotify* notify = new KKSNotify();
     notify->name = notify_name;
     notify->listeners.push_back( listener );
     notifies.push_back( notify );
+
+    delete[] sql;
+
     return;
 }
 
@@ -259,45 +265,48 @@ void KKSPGDatabase::addListener( IListener* listener, const char* notify_name )
 //
 // KKSPGDatabase::removeListener
 //
-void KKSPGDatabase::removeListener( IListener* listener, const char* notify_name )
+void KKSPGDatabase::removeListener( IKKSListener* listener, const char* notify_name )
+{
+    for( list<KKSNotify*>::iterator ii = notifies.begin(); ii != notifies.end(); ii++ ){
+        if ( strcmp( (*ii)->name.c_str(), notify_name ) == 0 )
+        {
+            // Remove notify for the listener
+            for( list<IKKSListener*>::iterator jj = (*ii)->listeners.begin(); jj != (*ii)->listeners.end(); jj++ )
+                if ( (*jj) == listener )
+                {
+                    (*ii)->listeners.erase( jj );
+                    break;
+                }
 
-for( list<PQnotify*>::iterator ii = notifies.begin(); ii != notifies.end(); ii++ )
-    if ( strcmp( (*ii)->name.toAscii().constData(), notify_name ) == 0 )
-    {
-        // Remove notify for the listener
-        for( list<IListener*>::iterator jj = (*ii)->listeners.begin(); jj != (*ii)->listeners.end(); jj++ )
-            if ( (*jj) == listener )
-            {
-                (*ii)->listeners.erase( jj );
-                break;
-            }
+            if ( (*ii)->listeners.size() > 0) 
+                return;
 
-        if ( (*ii)->listeners.size() > 0) return;
+            // If there are no listeners for notify,
+            // Stop listen it
+            char sql[50];
+            PGresult* result = NULL;
+            sprintf( sql,"UNLISTEN %s;", notify_name );
 
-        // If there are no listeners for notify,
-        // Stop listen it
-        char sql[50];
-        PGresult* result = NULL;
-        sprintf( sql,"UNLISTEN %s;", notify_name );
+            //      if ( PQstatus( notify_conn ) == CONNECTION_BAD )
+            //        throw PQexception( "Not Connected" );
 
-        //      if ( PQstatus( notify_conn ) == CONNECTION_BAD )
-        //        throw PQexception( "Not Connected" );
+            result = PQexec( notify_conn, sql );
 
-        result = PQexec( notify_conn, sql );
+            //      if ( PGresultStatus( result ) != PGRES_COMMAND_OK &&
+            //           PGresultStatus( result ) != PGRES_TUPLES_OK )
+            //        throw PQexception( PQerrorMessage( notify_conn ) );
 
-        //      if ( PGresultStatus( result ) != PGRES_COMMAND_OK &&
-        //           PGresultStatus( result ) != PGRES_TUPLES_OK )
-        //        throw PQexception( PQerrorMessage( notify_conn ) );
+            PQclear( result );
 
-        PQclear( result );
-
-        // Remove from notifies
-        delete *ii;
-        notifies.erase( ii );
-        if ( notifies.size() == 0) stopListen();
-        return;
+            // Remove from notifies
+            delete *ii;
+            notifies.erase( ii );
+            if ( notifies.size() == 0) 
+                stopListen();
+            return;
+        }
     }
-return;
+    return;
 }
 
 //------------------------------------------------------------------------------
@@ -305,7 +314,26 @@ return;
 // KKSPGDatabase::startListen
 //
 void KKSPGDatabase::startListen()
-{}
+{
+    if(!notify_conn){
+        notify_conn = PQsetdbLogin( ipServer.toAscii().constData(), 
+                                    port.toAscii().constData(), 
+                                    NULL, 
+                                    NULL,
+                                    database.toAscii().constData(), 
+                                    user.toAscii().constData(), 
+                                    password.toAscii().constData() );
+
+        switch( PQstatus( notify_conn ) )
+        {
+                case CONNECTION_OK:
+                break;
+
+                case CONNECTION_BAD:
+                default:
+                break;
+        }    }
+}
 
 //------------------------------------------------------------------------------
 //
@@ -327,16 +355,24 @@ void KKSPGDatabase::checkNotifies()
     PQconsumeInput( notify_conn );
     while ( ( notify = PQnotifies( notify_conn ) ) != NULL )
     {
-        for( list<PQnotify*>::iterator ii = notifies.begin(); ii != notifies.end(); ii++ )
-            if ( strcmp( (*ii)->name.toAscii().constData(), notify->relname + 8 ) == 0 )
+        for( list<KKSNotify*>::iterator ii = notifies.begin(); ii != notifies.end(); ii++ ){
+            KKSNotify * n = (*ii);
+            if(!n)
+                continue;
+
+            if ( strcmp( n->name.c_str(), notify->relname ) == 0 )
             {
-                for( list<IListener*>::iterator jj = (*ii)->listeners.begin(); jj != (*ii)->listeners.end(); jj++ )
-                    (*jj)->notify( notify->relname + 8 );
+                for( list<IKKSListener*>::iterator jj = (*ii)->listeners.begin(); jj != (*ii)->listeners.end(); jj++ ){
+                    IKKSListener * l = (*jj);
+                    if(l)
+                        l->notify( notify->relname, notify->extra );
+                }
             }
-        free( notify );
+        }
+        PQfreemem( notify );
     }
 }
-#endif /* USE_NOTIFY */
+#endif /* USE_NOTIFICATION */
 
 //------------------------------------------------------------------------------
 //
@@ -350,6 +386,16 @@ KKSResult* KKSPGDatabase::execute(const char* query ) const
         return NULL;
 
     return (KKSResult*)_res;
+}
+
+int KKSPGDatabase::sendQuery(const char* query) const
+{
+    int res = 0;
+    res = _sendQuery(query);
+    if ( res != 1)
+        return 0;
+
+    return res;
 }
 
 //------------------------------------------------------------------------------
@@ -415,7 +461,7 @@ KKSResult* KKSPGDatabase::execParams(const char* command,
  * under MCBC, где стоит Postgresql 7.4 функции PQprepare нет
  * поэтому метод закомментирован
  */
-/*
+
 KKSResult * KKSPGDatabase::prepare(
                                 const char* stmtName, 
                                 const char * query,
@@ -466,7 +512,7 @@ KKSResult * KKSPGDatabase::prepare(
     return (KKSResult*)_res;
 
 }
-*/
+
 
 KKSResult * KKSPGDatabase::execPrepared(
                                         const char* stmtName, 
@@ -693,6 +739,14 @@ bool KKSPGDatabase::_exec( const char * sql, KKSPGResult ** _res ) const
     }
 
     return TRUE;
+}
+
+
+int KKSPGDatabase::_sendQuery( const char * sql ) const
+{
+    int _res = PQsendQuery( conn, sql );
+    return _res;
+
 }
 
 bool KKSPGDatabase::connect( bool reconnect ) const

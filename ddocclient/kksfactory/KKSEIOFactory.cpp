@@ -486,6 +486,7 @@ qint64 KKSEIOFactory::generateInsertQuery(const QString & tableName,
                rTable == GUARD_OBJ_DEVICES_TSO ||
                rTable == ACCESS_CARDS_ACCESS_PLAN_TSO ||
 			   rTable == MAIL_LISTS_POSITION  ||
+               rTable == LIFE_CYCLE_IO_STATES ||
                rTable == SHU_DLS_POSITION
                )
             {
@@ -758,6 +759,7 @@ qint64 KKSEIOFactory::generateUpdateQuery(const QString & tableName,
                rTable == GUARD_OBJ_DEVICES_TSO ||
                rTable == ACCESS_CARDS_ACCESS_PLAN_TSO ||
 			   rTable == MAIL_LISTS_POSITION ||
+               rTable == LIFE_CYCLE_IO_STATES ||
                rTable == SHU_DLS_POSITION
                )
             {
@@ -772,7 +774,7 @@ qint64 KKSEIOFactory::generateUpdateQuery(const QString & tableName,
             QString ids = attrValue->value().valueForInsert();
             QString mainAttr = QString("id_%1").arg(tableName);
             QString childAttr = QString("id_%1").arg(attr->tableName());
-            exQuery += QString("select aInsertExValues('%1', %2, %3, '%4', '%5');")
+            exQuery += QString("select aUpdateExValues('%1', %2, %3, '%4', '%5');")
                                 .arg(refTable)
                                 .arg(idEIO)
                                 .arg(ids)
@@ -1049,6 +1051,7 @@ int KKSEIOFactory::insertIndValues(const KKSObjectExemplar * eio) const
                rTable == GUARD_OBJ_DEVICES_TSO ||
                rTable == ACCESS_CARDS_ACCESS_PLAN_TSO ||
 			   rTable == MAIL_LISTS_POSITION ||
+               rTable == LIFE_CYCLE_IO_STATES ||
                rTable == SHU_DLS_POSITION
                )
             {
@@ -1183,6 +1186,7 @@ int KKSEIOFactory::updateIndValues(const KKSObjectExemplar * eio) const
                rTable == GUARD_OBJ_DEVICES_TSO ||
                rTable == ACCESS_CARDS_ACCESS_PLAN_TSO ||
 			   rTable == MAIL_LISTS_POSITION ||
+               rTable == LIFE_CYCLE_IO_STATES ||
                rTable == SHU_DLS_POSITION
                )
             {
@@ -1194,7 +1198,7 @@ int KKSEIOFactory::updateIndValues(const KKSObjectExemplar * eio) const
             QString ids = av->value().valueForInsert();
             QString mainAttr = QString("id_io_object");
             QString childAttr = QString("id_%1").arg(a->tableName());
-            sqlEx += QString("select aInsertExValues('%1', %2, %3, '%4', '%5');")
+            sqlEx += QString("select aUpdateExValues('%1', %2, %3, '%4', '%5');")
                                 .arg(refTable)
                                 .arg(eio->id())
                                 .arg(ids)

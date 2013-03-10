@@ -15,17 +15,29 @@
 ////////////////////////////////////////////////////////////////////////
 
 KKSState::KKSState() : KKSRecord()
+,m_isSystem(false)
 {
 }
 
 KKSState::KKSState(const KKSState & s) : KKSRecord(s)
 {
-
+    m_isSystem = s.m_isSystem;
 }
 
 KKSState::KKSState(int id, const QString & name, const QString & desc) : KKSRecord(id, name, desc)
+, m_isSystem(false)
 {
 
+}
+
+bool KKSState::isSystem() const
+{
+    return m_isSystem;
+}
+
+void KKSState::setIsSystem(bool yes)
+{
+    m_isSystem = yes;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -42,6 +54,7 @@ KKSState::~KKSState()
 KKSState * KKSState::defState1()
 {
     KKSState * state = new KKSState(1, QString::fromLocal8Bit("Активный"));
+    state->m_isSystem = true;
 
     return state;
 }
@@ -49,6 +62,7 @@ KKSState * KKSState::defState1()
 KKSState * KKSState::defState2()
 {
     KKSState * state = new KKSState(2, QString::fromLocal8Bit("Архивный"));
+    state->m_isSystem = true;
 
     return state;
 }

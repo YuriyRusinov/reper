@@ -23,7 +23,7 @@ class KKSCategoryAttr;
 class KKSAttrValue;
 class KKSCategory;
 class KKSObject;
-class KKSLifeCycle;
+class KKSLifeCycleEx;
 class KKSAttribute;
 class KKSAttrAttr;
 class KKSType;
@@ -62,9 +62,15 @@ class _F_EXPORT KKSPPFactory
         int insertCategory(KKSCategory* c) const;
         int insertType(KKSType * t) const;
         int insertIOType(KKSType * t) const;
-        int insertState(KKSState * s) const;
         int insertCategoryAttr(int idCategory, KKSCategoryAttr * a) const;
-        int insertLifeCycle(int idCategory, KKSLifeCycle * lc) const;
+        
+        //работа с жизненным циклом
+        int insertState(KKSState * s) const;
+        int updateState(KKSState * s) const;
+        int deleteState(int idState) const;
+        int insertLifeCycle(KKSLifeCycleEx * lc) const;
+        int updateLifeCycle(KKSLifeCycleEx * lc) const;
+        int deleteLifeCycle(int idLifeCycle) const;
 
         int insertAttrAttr(int idParentAttr, KKSAttrAttr * aa) const;
         int insertAttrAttrs(const KKSAttribute * a) const;
@@ -182,7 +188,6 @@ private:
         int insertAttrView(int idCategory, int idTemplate, int idGroup, KKSAttrView * av) const;
 
         int deleteCategoryAttrs(int idCategory) const;
-        int deleteLifeCycle(int idCategory) const;
         
         int cDeleteRubrics(int idCategory) const;
         int cInsertRubrics(const KKSCategory * c) const;

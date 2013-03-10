@@ -190,6 +190,7 @@ const int IO_INDICATOR_ID = 87;
 //названия для переходных таблиц некоторых системных справочников
 //имеющих атрибут типа atCheckListEx
 #define ORGANIZATION_WORK_MODE "organization_work_mode"
+#define LIFE_CYCLE_IO_STATES "life_cycle_io_states"
 #define UNITS_WORK_MODE "units_work_mode"
 #define POSITION_WORK_MODE "position_work_mode"
 #define IO_OBJECTS_ORGANIZATION "io_objects_organization"

@@ -12,18 +12,19 @@
 
 #include <QList>
 #include "kkspp_config.h"
-#include "KKSData.h"
+#include "KKSRecord.h"
 #include "KKSStateCross.h"
 #include "KKSList.h"
+#include "KKSMap.h"
 
 
 
-class _PP_EXPORT KKSLifeCycle : public KKSData
+class _PP_EXPORT KKSLifeCycleEx : public KKSRecord
 {
 public:
-    KKSLifeCycle();
-    KKSLifeCycle(const KKSLifeCycle & lc);
-    virtual ~KKSLifeCycle();
+    KKSLifeCycleEx(int id, const QString & name, const QString & desc = QString::null);
+    KKSLifeCycleEx(const KKSLifeCycleEx & lc);
+    virtual ~KKSLifeCycleEx();
 
     const KKSList<KKSStateCross *> & stateCrosses() const;
     void setStateCrosses(const KKSList<KKSStateCross *> & sc);
@@ -35,11 +36,24 @@ public:
     KKSStateCross * stateCross(int index);
     const KKSStateCross * stateCross(int index) const;
 
-    static KKSLifeCycle * defLifeCycle();
+    const KKSState * startState() const;
+    KKSState * startState();
+    void setStartState(KKSState * s);
+
+
+    const KKSMap<int, KKSState * > & states() const;
+    int addState(KKSState * s);
+    int removeState(int id);
+    void setStates(const KKSMap<int, KKSState* > & ss);
+    //static KKSLifeCycleEx * defLifeCycle();
 
 protected:
 private:
-    KKSList<KKSStateCross*> m_stateCrosses;
+    KKSList<KKSStateCross*> m_stateCrosses;//?
+    
+    
+    KKSMap<int, KKSState *> m_states;
+    KKSState * m_startState;
 
 
 };

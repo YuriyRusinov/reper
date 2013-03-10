@@ -17,7 +17,7 @@ class KKSObjectExemplar;
 class KKSValue;
 class KKSCategoryAttr;
 class KKSAttrValue;
-class KKSLifeCycle;
+//class KKSLifeCycle;
 class KKSState;
 class KKSEIOData;
 class KKSTemplate;
@@ -38,7 +38,7 @@ private:
     static QString dump(const KKSValue & v, const QString & prefix = "");
     static QString dump(const KKSAttrValue * av, const QString & prefix = "");
     static QString dump(const KKSCategoryAttr * ca, const QString & prefix = "");
-    static QString dump(const KKSLifeCycle * lc, const QString & prefix = "");
+    //static QString dump(const KKSLifeCycle * lc, const QString & prefix = "");
     static QString dump(const KKSState * s, const QString & prefix = "");
     static QString dump(const KKSAttrGroup * g, const QString & prefix = "");
     static QString dump(const KKSAttrView * av, const QString & prefix = "");

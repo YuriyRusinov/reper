@@ -74,7 +74,6 @@
 #include "KKSRubricFactory.h"
 #include "KKSIndFactory.h"
 #include <KKSCategoryAttr.h>
-#include <KKSLifeCycle.h>
 #include <KKSType.h>
 #include <KKSItemDelegate.h>
 #include <KKSMessageWidget.h>
@@ -212,6 +211,11 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
                                                       QWidget *parent, //родительское окно
                                                       Qt::WindowFlags f)//оконные флаги (Qt)
 {
+    if(idObject <= 0){
+        QMessageBox::warning(parent, tr("Record creation does not allowed"), tr("Current qualifier does not saved in database!\nPlease save it before creating new records in it."));
+        return NULL;
+    }
+    
     KKSObject *obj = 0;
     KKSObjectExemplar * wObjE = 0;
     const KKSTemplate * tSystem = 0;
@@ -2126,7 +2130,7 @@ void KKSObjEditorFactory::filterEIO(KKSObjEditor * editor, int idObject, const K
 
     connect (f, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QComboBox *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QComboBox *)) );
     connect (f, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QAbstractItemModel *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QAbstractItemModel *)) );
-    connect (f, SIGNAL (saveSearchCriteria (KKSFilterGroup *)), this, SLOT (saveSearchCriteria (KKSFilterGroup *)) );
+    connect (f, SIGNAL (saveSearchCriteria (KKSFilterGroup *, const KKSCategory *)), this, SLOT (saveSearchCriteria (KKSFilterGroup *, const KKSCategory *)) );
     connect (f, SIGNAL (loadSearchCriteria (void)), this, SLOT (loadSearchCriteria (void)) );
     if(f->exec() == QDialog::Accepted){
         const KKSTemplate * t = new KKSTemplate (c->defTemplate());
@@ -2282,7 +2286,10 @@ void KKSObjEditorFactory :: refreshEIO (KKSObjEditor * editor, int idObject, con
  * cat -- категория соответствующей таблицы
  * tableName -- название таблицы
  */
-void KKSObjEditorFactory :: filterTemplateEIO (KKSObjEditor * editor, int idObject, const KKSCategory * cat, QString tableName)
+void KKSObjEditorFactory :: filterTemplateEIO (KKSObjEditor * editor, 
+                                               int idObject, 
+                                               const KKSCategory * cat, 
+                                               QString tableName)
 {
     KKSObject * o = loader->loadIO(idObject, true);
     if(!o)
@@ -2308,7 +2315,7 @@ void KKSObjEditorFactory :: filterTemplateEIO (KKSObjEditor * editor, int idObje
     KKSSearchTemplate * searchT = 0;
     KKSList<KKSSearchTemplate *> stList = loader->loadSearchTemplates ();
 
-    KKSSearchTemplatesForm *stForm = new KKSSearchTemplatesForm (editor);
+    KKSSearchTemplatesForm *stForm = new KKSSearchTemplatesForm (c, tableName, editor);
     initSearchTemplateModel (stForm);
     QItemSelectionModel * selTModel = stForm->selectionModel ();
     QAbstractProxyModel * sortTModel = qobject_cast<QAbstractProxyModel *>(stForm->dataModel());
@@ -6456,7 +6463,7 @@ void KKSObjEditorFactory :: loadAttributeFilters (const QString & tableName, con
  * Параметры:
  * group -- группа критериев поиска.
  */
-void KKSObjEditorFactory :: saveSearchCriteria (KKSFilterGroup * group)
+void KKSObjEditorFactory :: saveSearchCriteria (KKSFilterGroup * group, const KKSCategory * c)
 {
     if (!group)
         return;
@@ -6474,6 +6481,9 @@ void KKSObjEditorFactory :: saveSearchCriteria (KKSFilterGroup * group)
             return;
 
         isContains = false;
+        
+
+        
         for (int i=0; i<stList.size() && !isContains; i++)
         {
             if (stList[i]->name() == stName)
@@ -6498,8 +6508,11 @@ void KKSObjEditorFactory :: saveSearchCriteria (KKSFilterGroup * group)
     KKSSearchTemplate * st = new KKSSearchTemplate (-1, group, stName, loader->getUserId());
     if (st)
     {
+        if(c)
+            st->setCategory(c->id(), c->name());
+
         int idSearchTemplate = ppf->insertSearchTemplate (st);
-        qDebug () << __PRETTY_FUNCTION__ << idSearchTemplate;
+
         st->setId (idSearchTemplate);
         if (qobject_cast<KKSFiltersEditorForm *>(this->sender ()))
         {
@@ -6549,11 +6562,25 @@ KKSSearchTemplate * KKSObjEditorFactory :: loadSearchTemplate (void) const
     }
     */
 
-    KKSSearchTemplatesForm *stForm = new KKSSearchTemplatesForm (parent);
+    KKSObject * io = loader->loadIO (IO_IO_ID, true);
+    if (!io)
+        return NULL;
+
+    KKSCategory *c = io->category ()->tableCategory ();
+    if (!c)
+    {
+        io->release();
+        return NULL;
+    }
+    io->release();
+
+    KKSSearchTemplatesForm *stForm = new KKSSearchTemplatesForm (c, "io_objects", parent);
     this->initSearchTemplateModel (stForm);
+    
     QAbstractItemModel * searchTModel = stForm->dataModel();
     while (qobject_cast<QAbstractProxyModel *>(searchTModel))
         searchTModel = (qobject_cast<QAbstractProxyModel *>(searchTModel))->sourceModel();
+    
     QItemSelectionModel * selTModel = stForm->selectionModel ();
 
     if (selTModel && stForm->exec () == QDialog::Accepted)
@@ -6577,7 +6604,15 @@ void KKSObjEditorFactory :: initSearchTemplateModel (KKSSearchTemplatesForm *stF
     if (!stForm)
         return;
 
-    connect (stForm, SIGNAL (addNewEmptySearchTemplate (const QModelIndex&, QAbstractItemModel *)), this, SLOT (addNewSearchTempl (const QModelIndex&, QAbstractItemModel *)) );
+    connect (stForm, SIGNAL (addNewEmptySearchTemplate (const QModelIndex&, 
+                                                        QAbstractItemModel *, 
+                                                        const KKSCategory *, 
+                                                        const QString &)), 
+             this, SLOT (addNewSearchTempl (const QModelIndex&, 
+                                            QAbstractItemModel *, 
+                                            const KKSCategory *,
+                                            const QString &)) );
+
     connect (stForm, SIGNAL (addNewCopySearchTemplate (const QModelIndex&, QAbstractItemModel *)), this, SLOT (addCopySearchTempl (const QModelIndex&, QAbstractItemModel *)) );
     connect (stForm, SIGNAL (updateSearchTemplate (const QModelIndex&, QAbstractItemModel *)), this, SLOT (updateSearchTempl (const QModelIndex&, QAbstractItemModel *)) );
     connect (stForm, SIGNAL (deleteSearchTemplate (const QModelIndex&, QAbstractItemModel *)), this,  SLOT (deleleSearchTempl (const QModelIndex&, QAbstractItemModel *)) );
@@ -6638,12 +6673,15 @@ void KKSObjEditorFactory :: initSearchTemplateModel (KKSSearchTemplatesForm *stF
 void KKSObjEditorFactory::createSearchTemplate()
 {
     QModelIndex parent= QModelIndex();
-    addNewSearchTempl(parent, NULL);
+    addNewSearchTempl(parent, NULL, NULL, "io_objects");
 }
 
 /* Метод создает новый шаблон поиска и добавляет соответствующую запись в модель searchMod.
  */
-void KKSObjEditorFactory :: addNewSearchTempl (const QModelIndex& parent, QAbstractItemModel * searchMod)
+void KKSObjEditorFactory :: addNewSearchTempl (const QModelIndex& parent, 
+                                               QAbstractItemModel * searchMod, 
+                                               const KKSCategory * cat,
+                                               const QString & tableName)
 {
     Q_UNUSED (parent);
     QWidget * pWidget = qobject_cast <QWidget *>(this->sender());
@@ -6652,26 +6690,35 @@ void KKSObjEditorFactory :: addNewSearchTempl (const QModelIndex& parent, QAbstr
     if (!st)
         return;
 
-    KKSObject * o = loader->loadIO (IO_IO_ID, true);
-    if (!o)
-    {
-        st->release ();
-        return;
+    const KKSCategory * c = cat;
+
+    if(!c){
+        KKSObject * o = loader->loadIO (IO_IO_ID, true);
+        if (!o)
+        {
+            st->release ();
+            return;
+        }
+
+        c = o->category()->tableCategory();
+        if (!c)
+        {
+            o->release();
+            st->release ();
+            return;
+        }
+        o->release();
     }
 
-    KKSCategory * c = o->category()->tableCategory();
-    if (!c)
-    {
-        o->release();
-        st->release ();
-        return;
-    }
+    st->setCategory(c->id(), c->name());
 
     KKSMap<int, KKSAttribute *> attrsIO;
-    attrsIO = loader->loadIOUsedAttrs ();
-    KKSFiltersEditorForm *filterForm = new KKSFiltersEditorForm (c, "io_objects", attrsIO, false, st, pWidget);
+    if(!c || (c && c->id() == IO_TABLE_CATEGORY_ID))
+        attrsIO = loader->loadIOUsedAttrs ();//атрибуты информационных объектов грузим только если обрабатываем справоник ИО
     
-    connect (filterForm, SIGNAL (saveSearchCriteria (KKSFilterGroup *)), this, SLOT (saveSearchCriteria (KKSFilterGroup *)) );
+    KKSFiltersEditorForm *filterForm = new KKSFiltersEditorForm (c, tableName, attrsIO, false, st, pWidget);
+    
+    connect (filterForm, SIGNAL (saveSearchCriteria (KKSFilterGroup *, const KKSCategory *)), this, SLOT (saveSearchCriteria (KKSFilterGroup *, const KKSCategory *)) );
     connect (filterForm, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QComboBox *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QComboBox *)) );
     connect (filterForm, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QAbstractItemModel *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QAbstractItemModel *)) );
     
@@ -6709,7 +6756,6 @@ void KKSObjEditorFactory :: addNewSearchTempl (const QModelIndex& parent, QAbstr
     filterForm->setParent (0);
     delete filterForm;
 
-    o->release ();
     st->release ();
 }
 
@@ -6808,7 +6854,7 @@ void KKSObjEditorFactory :: updateSearchTempl (const QModelIndex& wIndex, QAbstr
         connect (filterForm, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QAbstractItemModel *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QAbstractItemModel *)) );
         
         if (stName.isEmpty())
-            connect (filterForm, SIGNAL (saveSearchCriteria (KKSFilterGroup *)), this, SLOT (saveSearchCriteria (KKSFilterGroup *)) );
+            connect (filterForm, SIGNAL (saveSearchCriteria (KKSFilterGroup *, const KKSCategory *)), this, SLOT (saveSearchCriteria (KKSFilterGroup *, const KKSCategory *)) );
         if (filterForm->exec () == QDialog::Accepted)
         {
             int res = filterForm->searchT()->id ();
@@ -6824,7 +6870,7 @@ void KKSObjEditorFactory :: updateSearchTempl (const QModelIndex& wIndex, QAbstr
                     qDebug () << __PRETTY_FUNCTION__ << stres << m_group->filters().count();
                     stdb->setMainGroup (m_group);
                 }
-                //saveSearchCriteria (stdb->getMainGroup());
+                //saveSearchCriteria (stdb->getMainGroup(), c);
                 int stres = ppf->updateSearchTemplate (stdb);
                 if (stres > 0)
                 {
@@ -8648,7 +8694,7 @@ void KKSObjEditorFactory :: addAttrSearchTemplate (void)
         return;
     QAbstractItemModel * sModel = rw->getSourceModel ();
     QModelIndex parent = QModelIndex ();
-    addNewSearchTempl (parent, sModel);
+    addNewSearchTempl (parent, sModel, NULL, "io_objects");
 }
 
 void KKSObjEditorFactory :: editAttrSearchTemplate (void)

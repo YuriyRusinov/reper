@@ -129,9 +129,9 @@ QString KKSDumper::dump(const KKSCategory* c, const QString & prefix)
         str += dump(attr, prefix+"\t");
         i++;
     }
-    str += "\n";
-    str += prefix + "==== Life Cycle ====\n";
-    str += dump(c->lifeCycle(), prefix + "\t");
+    //str += "\n";
+    //str += prefix + "==== Life Cycle ====\n";
+    //str += dump(c->lifeCycle(), prefix + "\t");
     
     str += "\n";
     str += prefix + "====Child category====\n";
@@ -253,7 +253,7 @@ QString KKSDumper::dump(const KKSCategoryAttr * attr, const QString & prefix)
 
     return str;
 }
-
+/*
 QString KKSDumper::dump(const KKSLifeCycle * lc, const QString & prefix)
 {
     QString str;
@@ -266,7 +266,7 @@ QString KKSDumper::dump(const KKSLifeCycle * lc, const QString & prefix)
 
     return str;
 }
-
+*/
 QString KKSDumper::dump(const KKSState * s, const QString & prefix)
 {
     QString str;

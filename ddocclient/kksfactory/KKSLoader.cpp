@@ -429,25 +429,13 @@ KKSMap<int, KKSCategoryAttr *> KKSLoader::loadCategoryAttrs(int idCategory) cons
     return attrs;
 }
 
-KKSLifeCycle * KKSLoader::loadLifeCycle(int idCategory) const
+KKSLifeCycleEx * KKSLoader::loadLifeCycle(int idLifeCycle) const
 {
-    KKSLifeCycle * lc = NULL;
+    KKSLifeCycleEx * lc = NULL;
 
-    QString tableNames = QString(VIEW_PREFIX) + "io_life_cycle lc, " +
-                                 VIEW_PREFIX + "io_states s1, " +
-                                 VIEW_PREFIX + "io_states s2 ";
-
-
-    QString sql = QString("select "
-                          "s1.id as src_id, s1.name as src_name, s1.description as src_desc, "
-                          "s2.id as dst_id, s2.name as dst_name, s2.description as dst_desc "
-                          "from %1 "
-                          "where "
-                          "lc.id_io_category = %2 "
-                          "and lc.id_state_src = s1.id "
-                          "and lc.id_state_dest = s2.id;")
-                                .arg(tableNames)
-                                .arg(idCategory);
+    QString sql  = QString("select * from cGetLifeCycleInfo(%1)").arg(idLifeCycle);
+    QString sql1 = QString("select * from cGetStateCrosses(%1);").arg(idLifeCycle);
+    QString sql2 = QString("select * from lcGetStates(%1)").arg(idLifeCycle);
 
 
     KKSResult * res = db->execute(sql);
@@ -456,30 +444,70 @@ KKSLifeCycle * KKSLoader::loadLifeCycle(int idCategory) const
 
     int count = res->getRowCount();
     if(count == 0){
-        qWarning("The category does not contain life cycle! Creating default life cycle...");
         delete res;
-        lc = KKSLifeCycle::defLifeCycle();
         return lc;
     }
     
-    lc = new KKSLifeCycle();
+    lc = new KKSLifeCycleEx(res->getCellAsInt(0, 0), res->getCellAsString(0, 1), res->getCellAsString(0, 2));
+    KKSState * startState = NULL;
+    if(!res->isEmpty(0, 3)){
+        startState = new KKSState(res->getCellAsInt(0, 3), res->getCellAsString(0, 4), res->getCellAsString(0, 5));
+        startState->setIsSystem(res->getCellAsBool(0, 6));
+    }
+    lc->setStartState(startState);
+
+    delete res;
+
+    res = db->execute(sql2);//states
+    if(!res)
+        return lc;
+
+    count = res->getRowCount();
+    if(count == 0){
+        delete res;
+        return lc;
+    }
+
+    for(int i=0; i<count; i++){
+        KKSState * s = new KKSState(res->getCellAsInt(i, 0), res->getCellAsString(i, 1), res->getCellAsString(i, 2));
+        s->setIsSystem(res->getCellAsBool(i, 3));
+        lc->addState(s);
+        s->release();
+    }
+
+    delete res;
+
+    res = db->execute(sql1);//state_crosses
+    if(!res)
+        return lc;
+
+    count = res->getRowCount();
+    if(count == 0){
+        delete res;
+        return lc;
+    }
+
     KKSState * s1 = NULL;
     KKSState * s2 = NULL;
     for(int row=0; row<count; row++){
         s1 = new KKSState();
-        s1->setId(res->getCellAsInt(row, 0));
-        s1->setName(res->getCellAsString(row, 1));
-        s1->setDesc(res->getCellAsString(row, 2));
+        s1->setId(res->getCellAsInt(row, 2));
+        s1->setName(res->getCellAsString(row, 3));
+        s1->setDesc(res->getCellAsString(row, 4));
+        s1->setIsSystem(res->getCellAsBool(row, 5));
 
         s2 = new KKSState();
-        s2->setId(res->getCellAsInt(row, 3));
-        s2->setName(res->getCellAsString(row, 4));
-        s2->setDesc(res->getCellAsString(row, 5));
+        s2->setId(res->getCellAsInt(row, 6));
+        s2->setName(res->getCellAsString(row, 7));
+        s2->setDesc(res->getCellAsString(row, 8));
+        s2->setIsSystem(res->getCellAsBool(row, 9));
 
         lc->addStateCross(s1, s2);
         s1->release();
         s2->release();
     }
+
+    delete res;
 
     return lc;
 }
@@ -612,10 +640,13 @@ KKSCategory * KKSLoader::loadCategory(int id, bool simplify) const
     //
     // ÆÖ
     //
-    KKSLifeCycle * lc = loadLifeCycle(c->id());
-    c->setLifeCycle(lc);
-    if(lc)
-        lc->release();
+    if(!res->isEmpty(0, 17)){
+        int idLifeCycle = res->getCellAsInt(0, 17); 
+        KKSLifeCycleEx * lc = loadLifeCycle(idLifeCycle);
+        c->setLifeCycle(lc);
+        if(lc)
+            lc->release();
+    }
 
     delete res;
 
@@ -872,6 +903,7 @@ KKSObjectExemplar * KKSLoader::loadEIO(qint64 id,
                rTable == GUARD_OBJ_DEVICES_TSO ||
                rTable == ACCESS_CARDS_ACCESS_PLAN_TSO ||
                rTable == MAIL_LISTS_POSITION ||
+               rTable == LIFE_CYCLE_IO_STATES ||
                rTable == SHU_DLS_POSITION
                )
             {
@@ -1331,11 +1363,7 @@ KKSAttribute * KKSLoader::loadAttribute(int id) const
 
 KKSState * KKSLoader::loadState(int id) const
 {
-    QString tableNames = QString(VIEW_PREFIX) + "io_states s ";
-
-    QString sql = QString("select s.id, s.name, s.description "
-                          "from %1 "
-                          "where s.id = %2 ").arg(tableNames).arg(id);
+    QString sql = QString("select * from cGetState(%1);").arg(id);
 
     KKSResult * res = db->execute(sql);
     if(!res)
@@ -1351,11 +1379,75 @@ KKSState * KKSLoader::loadState(int id) const
     s->setId(res->getCellAsInt(0, 0));
     s->setName(res->getCellAsString(0, 1));
     s->setDesc(res->getCellAsString(0, 2));
+    s->setIsSystem(res->getCellAsBool(0, 3));
     
     delete res;
 
     return s;
 }
+
+KKSList<KKSState * > KKSLoader::loadStates() const
+{
+    KKSList<KKSState * > ss;
+
+    QString sql = QString("select * from cGetStates();");
+
+    KKSResult * res = db->execute(sql);
+    if(!res)
+        return ss;
+
+    int count = res->getRowCount();
+    if(count == 0){
+        delete res;
+        return ss;
+    }
+    
+    for(int i=0; i<count; i++){
+        KKSState * s = new KKSState();
+        s->setId(res->getCellAsInt(i, 0));
+        s->setName(res->getCellAsString(i, 1));
+        s->setDesc(res->getCellAsString(i, 2));
+        s->setIsSystem(res->getCellAsBool(i, 3));
+        ss.append(s);
+        s->release();
+    }
+
+    delete res;
+
+    return ss;
+}
+
+KKSList<KKSState * > KKSLoader::loadStates(int idLifeCycle) const
+{
+    KKSList<KKSState * > ss;
+
+    QString sql = QString("select * from lcGetStates(%1);").arg(idLifeCycle);
+
+    KKSResult * res = db->execute(sql);
+    if(!res)
+        return ss;
+
+    int count = res->getRowCount();
+    if(count == 0){
+        delete res;
+        return ss;
+    }
+    
+    for(int i=0; i<count; i++){
+        KKSState * s = new KKSState();
+        s->setId(res->getCellAsInt(i, 0));
+        s->setName(res->getCellAsString(i, 1));
+        s->setDesc(res->getCellAsString(i, 2));
+        s->setIsSystem(res->getCellAsBool(i, 3));
+        ss.append(s);
+        s->release();
+    }
+
+    delete res;
+
+    return ss;
+}
+
 
 KKSSyncType * KKSLoader::loadSyncType(int id) const
 {

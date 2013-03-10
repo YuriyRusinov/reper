@@ -9,6 +9,9 @@
 //#include <libpq-fs.h>
 #include "kksdatabase.h"
 #include "config_dataaccess.h"
+#include "pqnotify.h"
+
+
 using namespace std;
 class KKSPGResult;
 
@@ -18,11 +21,12 @@ class KKSPGResult;
 class __DA_EXPORT KKSPGDatabase : public KKSDatabase
 {
     public:
-#ifdef USE_NOTIFY
+#ifdef USE_NOTIFICATION
         KKSPGDatabase(bool _tolisten = false);
 #else
         KKSPGDatabase();
 #endif
+
         KKSPGDatabase(PGconn * conn);
 
         virtual ~KKSPGDatabase();
@@ -42,9 +46,9 @@ class __DA_EXPORT KKSPGDatabase : public KKSDatabase
         void disconnect() const;
         bool connected() const;
 
-#ifdef USE_NOTIFY
-        void addListener( IListener* listener, const char* notify_name );
-        void  removeListener( IListener* listener, const char* notify_name );
+#ifdef USE_NOTIFICATION
+        void addListener( IKKSListener* listener, const char* notify_name );
+        void  removeListener( IKKSListener* listener, const char* notify_name );
         void startListen();
         void stopListen();
         void checkNotifies();
@@ -62,13 +66,16 @@ class __DA_EXPORT KKSPGDatabase : public KKSDatabase
                                     int resultFormat
                                    ) const;
 
-/*        KKSResult * prepare(
+        int             sendQuery(const char* query) const;
+
+
+        KKSResult * prepare(
                                 const char* stmtName, 
                                 const char * query,
                                 int nParams, 
                                 const int * paramTypes
                                 ) const;
-*/
+
         KKSResult * execPrepared(
                                 const char* stmtName, 
                                 int nParams, 
@@ -122,13 +129,15 @@ class __DA_EXPORT KKSPGDatabase : public KKSDatabase
         friend class KKSSito;
         mutable PGconn* conn;
 
-#ifdef USE_NOTIFY
-        PGconn* notify_conn;
-        list<PQnotify*> notifies;
+#ifdef USE_NOTIFICATION
+        mutable PGconn* notify_conn;
+        list<KKSNotify*> notifies;
         bool to_listen;
 #endif
 
         bool _exec( const char * sql, KKSPGResult ** res) const;
+        int _sendQuery( const char * sql ) const;
+
 
         PGresult * _PQexecParams(const char *command,
 			                     int nParams,

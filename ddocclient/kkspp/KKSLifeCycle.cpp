@@ -9,6 +9,8 @@
 #include "KKSStateCross.h"
 #include "KKSLifeCycle.h"
 #include "KKSState.h"
+#include "defines.h"
+#include <QObject>
 
 ////////////////////////////////////////////////////////////////////////
 // Name:       KKSLifeCycle::KKSLifeCycle()
@@ -16,13 +18,17 @@
 // Return:     
 ////////////////////////////////////////////////////////////////////////
 
-KKSLifeCycle::KKSLifeCycle()
+KKSLifeCycleEx::KKSLifeCycleEx(int id, const QString & name, const QString & desc)
+:KKSRecord(id, name, desc), m_startState(NULL)
 {
 }
 
-KKSLifeCycle::KKSLifeCycle(const KKSLifeCycle & lc)
+KKSLifeCycleEx::KKSLifeCycleEx(const KKSLifeCycleEx & lc) : KKSRecord(lc), m_startState(NULL)
 {
     m_stateCrosses = lc.stateCrosses();
+
+    setStartState(const_cast<KKSState * > (lc.startState()));
+    setStates(lc.states());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -31,21 +37,23 @@ KKSLifeCycle::KKSLifeCycle(const KKSLifeCycle & lc)
 // Return:     
 ////////////////////////////////////////////////////////////////////////
 
-KKSLifeCycle::~KKSLifeCycle()
+KKSLifeCycleEx::~KKSLifeCycleEx()
 {
+    if(m_startState)
+        m_startState->release();
 }
 
-const KKSList<KKSStateCross *> & KKSLifeCycle::stateCrosses() const
+const KKSList<KKSStateCross *> & KKSLifeCycleEx::stateCrosses() const
 {
     return m_stateCrosses;
 }
 
-void KKSLifeCycle::setStateCrosses(const KKSList<KKSStateCross *> & sc)
+void KKSLifeCycleEx::setStateCrosses(const KKSList<KKSStateCross *> & sc)
 {
     m_stateCrosses = sc;
 }
 
-void KKSLifeCycle::addStateCross(KKSStateCross * s)
+void KKSLifeCycleEx::addStateCross(KKSStateCross * s)
 {
     if(!s)
         return;
@@ -53,7 +61,7 @@ void KKSLifeCycle::addStateCross(KKSStateCross * s)
     m_stateCrosses.append(s);
 }
 
-void KKSLifeCycle::addStateCross(KKSState * s1, KKSState * s2)
+void KKSLifeCycleEx::addStateCross(KKSState * s1, KKSState * s2)
 {
     if(!s1 || !s2)
         return;
@@ -66,7 +74,7 @@ void KKSLifeCycle::addStateCross(KKSState * s1, KKSState * s2)
     sc->release();
 }
 
-void KKSLifeCycle::removeStateCross(KKSStateCross * s)
+void KKSLifeCycleEx::removeStateCross(KKSStateCross * s)
 {
     if(!s)
         return;
@@ -74,12 +82,12 @@ void KKSLifeCycle::removeStateCross(KKSStateCross * s)
     m_stateCrosses.removeAll(s);
 }
 
-void KKSLifeCycle::removeStateCross(int index)
+void KKSLifeCycleEx::removeStateCross(int index)
 {
     m_stateCrosses.removeAt(index);
 }
 
-KKSStateCross * KKSLifeCycle::stateCross(int index)
+KKSStateCross * KKSLifeCycleEx::stateCross(int index)
 {
     KKSStateCross * sc = NULL;
     if(index >= m_stateCrosses.count())
@@ -89,7 +97,7 @@ KKSStateCross * KKSLifeCycle::stateCross(int index)
     return sc;
 }
 
-const KKSStateCross * KKSLifeCycle::stateCross(int index) const
+const KKSStateCross * KKSLifeCycleEx::stateCross(int index) const
 {
     const KKSStateCross * sc = NULL;
     if(index >= m_stateCrosses.count())
@@ -99,9 +107,56 @@ const KKSStateCross * KKSLifeCycle::stateCross(int index) const
     return sc;
 }
 
-KKSLifeCycle * KKSLifeCycle::defLifeCycle()
+const KKSState * KKSLifeCycleEx::startState() const
 {
-    KKSLifeCycle * lc = new KKSLifeCycle();
+    return m_startState;
+}
+
+KKSState * KKSLifeCycleEx::startState()
+{
+    return m_startState;
+}
+
+void KKSLifeCycleEx::setStartState(KKSState * s)
+{
+    if(m_startState)
+        m_startState->release();
+
+    m_startState = s;
+
+    if(m_startState)
+        m_startState->addRef();
+}
+
+const KKSMap<int, KKSState * > & KKSLifeCycleEx::states() const
+{
+    return m_states;
+}
+
+int KKSLifeCycleEx::addState(KKSState * s)
+{
+    int cnt = m_states.insert(s->id(), s);
+    if(!cnt)
+        return ERROR_CODE;
+
+    return OK_CODE;
+}
+
+int KKSLifeCycleEx::removeState(int id)
+{
+    m_states.remove(id);
+    return OK_CODE;
+}
+
+void KKSLifeCycleEx::setStates(const KKSMap<int, KKSState* > & ss)
+{
+    m_states = ss;
+}
+
+/*
+KKSLifeCycleEx * KKSLifeCycleEx::defLifeCycle()
+{
+    KKSLifeCycleEx * lc = new KKSLifeCycleEx(1, QObject::tr("Default life cycle"));
 
     KKSStateCross * sc = new KKSStateCross();
     
@@ -118,3 +173,4 @@ KKSLifeCycle * KKSLifeCycle::defLifeCycle()
     
     return lc;
 }
+*/
