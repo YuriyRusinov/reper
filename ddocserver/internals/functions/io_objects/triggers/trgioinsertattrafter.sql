@@ -1,4 +1,4 @@
-﻿create or replace function ioInsertAttrCheckAfter() returns trigger as
+create or replace function ioInsertAttrCheckAfter() returns trigger as
 $BODY$
 declare
     idChainsData int4;

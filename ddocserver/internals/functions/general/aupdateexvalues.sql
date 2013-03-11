@@ -1,4 +1,4 @@
-﻿create or replace function aUpdateExValues(varchar, int8, int8[], varchar, varchar) returns int4 as
+create or replace function aUpdateExValues(varchar, int8, int8[], varchar, varchar) returns int4 as
 $BODY$
 declare
     tableName alias for $1;

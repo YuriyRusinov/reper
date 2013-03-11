@@ -1,4 +1,4 @@
-﻿create or replace function recordAddToChain() returns trigger as
+create or replace function recordAddToChain() returns trigger as
 $BODY$
 declare
     tableName varchar;
