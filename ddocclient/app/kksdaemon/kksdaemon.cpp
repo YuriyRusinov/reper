@@ -183,6 +183,10 @@ void DDocServerListener::notify( char* notify_name, char * payload )
         }
     }
     else{
+        /*
+        QProcess * p = new QProcess();
+        QProcessEnv
+        
         QStringList arguments;
         QString argument = QString("-h %1 -p %2 -U %3 -c \"select hStartHandler('%4', %5)\" %6")
                                .arg(m_parent->ipServer)
@@ -194,7 +198,8 @@ void DDocServerListener::notify( char* notify_name, char * payload )
         arguments << argument;
 
         qint64 pid = 0;
-        QProcess::startDetached ( QString("%1 PGPASSFILE=./%2 & psql").arg(m_parent->sExport).arg(m_parent->sPgPass), 
+        QString PSQL = "psql";
+        QProcess::startDetached ( QString("%1 PGPASSFILE=./%2 & %3").arg(m_parent->sExport).arg(m_parent->sPgPass).arg(PSQL), 
                                   arguments, 
                                   ".", 
                                   &pid );
@@ -203,6 +208,7 @@ void DDocServerListener::notify( char* notify_name, char * payload )
         }
         QString sql = QString("select hStartHandler('%1', %2)").arg(service).arg(id);
         m_db->execute(sql.toLocal8Bit().constData());
+        */
     }
 
    

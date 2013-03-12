@@ -197,7 +197,12 @@ void SyncQueueViewerForm::on_pbView_clicked()
 
     db->begin();
 	//Объявление курсора
-    db->declare("sync_cursor", sqlCursor);
+    KKSResult * res = db->declare("sync_cursor", sqlCursor);
+    if(!res){
+        db->rollback();
+        return;
+    }
+    
     db->declare("sync_cursor_file", sqlCursor);
     db->declare("init_cursor", sqlCursor);
 	//Задание количества столбцов
@@ -207,11 +212,14 @@ void SyncQueueViewerForm::on_pbView_clicked()
 
 	//*****Настройка элемента отображения в соответствии с курсором*****
     syncQueueTreeWnd->SetCountCursor(countRow);
+
     syncQueueTreeWnd->SetSQLCursor(sqlCursor);
     syncQueueTreeWnd->InitSyncQueueView();
 	//**********
 
     QApplication::restoreOverrideCursor();
+
+    db->commit();
 }
 
 //Слот вызова диалога для установки фильтров
