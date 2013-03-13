@@ -221,35 +221,62 @@ void SyncQueueViewerForm::on_pbView_clicked()
     sqlCursor += QString(" order by 1");
 	//**********
 
-	//***** *****
 	//
 	//Установка флага курсора в положение открыт
     //
 	cursor_open = true;
 
-    db->begin();
+	KKSResult * res = 0;
+
+	//
+	//Открытие базы данных
+	//
+	db->begin();
+	
+	//
 	//Объявление курсора
-    db->declare("sync_cursor", sqlCursor);
-    db->declare("sync_cursor_file", sqlCursor);
-    db->declare("init_cursor", sqlCursor);
+	//
+	res = db->declare("sync_cursor", sqlCursor);
+    
+	if(!res)
+	{
+		db->commit();
+		QMessageBox::information(0,tr("Information"),tr("Can't declare cursor!"));
+	}
+
+	res = db->declare("sync_cursor_file", sqlCursor);
+    
+	if(!res)
+	{
+		db->commit();
+		QMessageBox::information(0,tr("Information"),tr("Can't declare cursor!"));
+	}
+	
+	res = db->declare("init_cursor", sqlCursor);
+
+	if(!res)
+	{
+		db->commit();
+		QMessageBox::information(0,tr("Information"),tr("Can't declare cursor!"));
+	}
+
 	//Задание количества столбцов
-	countColumn = TableView::TABLE_COLUMN_COUNT;
+	countColumn = TableView::TABLE_COLUMN_COUNT_VIEW;
 	//Получение количества строк в курсоре
     countRow = countInCursor();
-	//**********
 
 	syncQueueTreeWnd->setRowCount(countRow);
 	model = new SyncQueueItemModel(countRow,countColumn,this);
 	
 	//*****Настройка элемента отображения в соответствии с курсором*****
 	syncQueueTreeWnd->setModel(model);
-	//**********
 
 	syncQueueTreeWnd->slot_resizeEvent();
 
 	model->setEmptyData(false);
 
 	syncQueueTreeWnd->UpdateData();
+	//**********
 
     QApplication::restoreOverrideCursor();
 }
@@ -273,7 +300,6 @@ void SyncQueueViewerForm::slot_filters_setup()
 void SyncQueueViewerForm::slot_updateModelData(int input_topRow,int input_bottomRow)
 {
 	DBdata(input_topRow,input_bottomRow);
-	model->setWindowIndex(input_topRow,input_bottomRow);
 }
 		
 void SyncQueueViewerForm::DBdata(int input_topRow,int input_bottomRow)
@@ -290,11 +316,37 @@ void SyncQueueViewerForm::DBdata(int input_topRow,int input_bottomRow)
 		
 		res = db->fetch("sync_cursor", 4, pos+1);
 
+		if(!res)
+		{
+			db->commit();
+			QMessageBox::information(0,tr("fetch break"),tr("Cursor can't return data!"));
+			return;
+		}
+
 		for(int j = 0; j < TableView::TABLE_COLUMN_COUNT ; j++)
 		{
-			v_DBData->append(res->getCellAsString(0,j));
+			switch(j)
+			{
+				case 1:
+					v_DBData->append(res->getCellAsString(0,j));break;
+				case 5:
+					v_DBData->append(res->getCellAsString(0,j));break;
+				case 8:
+					v_DBData->append(res->getCellAsString(0,j));break;
+				case 9:
+					v_DBData->append(res->getCellAsString(0,j));break;
+				case 11:
+					v_DBData->append(res->getCellAsString(0,j));break;
+				case 12:
+					v_DBData->append(res->getCellAsString(0,j));break;
+				case 13:
+					v_DBData->append(res->getCellAsString(0,j));break;
+				case 14:
+					v_DBData->append(res->getCellAsString(0,j));break;
+			}
 		}
 	}
-	
+
+	model->setWindowIndex(input_topRow,input_bottomRow);	
 	model->setDataVector(v_DBData);
 }

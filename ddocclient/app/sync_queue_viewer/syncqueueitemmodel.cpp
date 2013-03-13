@@ -11,7 +11,7 @@ SyncQueueItemModel::SyncQueueItemModel(int iCountRow,
                                        int iCountColumn, 
                                        QObject * parent) : QAbstractTableModel(parent)
 {
-    modelData = new QVector< QString >();
+    modelData = 0;
 	
 	countRow = iCountRow;
     countColumn = iCountColumn;
@@ -29,21 +29,20 @@ QVariant SyncQueueItemModel::data(const QModelIndex & index, int role) const
     if (!index.isValid() || (role != Qt::DisplayRole && role != Qt::BackgroundRole))
         return QVariant();
 	//Если индекс неверен вернуть ошибку
-    if(index.column() < 0 || index.column() > TableView::TABLE_COLUMN_COUNT)
+	if(index.column() < 0 || index.column() > TableView::TABLE_COLUMN_COUNT_VIEW)
         return QVariant();
 
 	if(index.row() >= topRowIndex && index.row() <= bottomRowIndex && role == Qt::BackgroundRole && !emptyData)
 	{
-		if(modelData->value(TableView::TABLE_COLUMN_COUNT*(index.row()-topRowIndex)+index.column()) == "1")
+		if(modelData->value(TableView::TABLE_COLUMN_COUNT_VIEW*(index.row()-topRowIndex)+index.column()) == "1")
 		{
-			//QBrush* r_brush = new QBrush();
 			return Qt::red;
 		}
 	}
 
 	if(index.row() >= topRowIndex && index.row() <= bottomRowIndex && role == Qt::DisplayRole && !emptyData)
 	{
-		int k = TableView::TABLE_COLUMN_COUNT*(index.row()-topRowIndex)+index.column();
+		int k = TableView::TABLE_COLUMN_COUNT_VIEW*(index.row()-topRowIndex)+index.column();
 		return modelData->value(k);
 	}
 
@@ -80,23 +79,15 @@ QVariant SyncQueueItemModel::headerData(int section,
             case 2:
                 return tr("Organization");
             case 3:
-                return tr("Entity");
+                return tr("Entity UID");
             case 4:
-                return tr("Entity table");
+                return tr("Entity name");
             case 5:
                 return tr("Entity type");
             case 6:
                 return tr("Sync type");
             case 7:
                 return tr("Sync result");
-            case 8:
-                return tr("Entity UID");
-            case 9:
-                return tr("Entity IO UID");
-            case 10:
-                return tr("ID Organization");
-            case 11:
-                return tr("UNIQUE_ID");
             default:
                 return QVariant();
         }
@@ -110,9 +101,6 @@ void SyncQueueItemModel::setWindowIndex(int input_topRowIndex,int input_bottomRo
 {
 	topRowIndex = input_topRowIndex; 
 	bottomRowIndex = input_bottomRowIndex;
-
-	//modelData->clear();
-	//modelData->resize((bottomRowIndex-topRowIndex)*16);
 }
 
 bool SyncQueueItemModel::setEmptyData(bool newFlag)
@@ -120,4 +108,15 @@ bool SyncQueueItemModel::setEmptyData(bool newFlag)
 	bool oldEmptyData = emptyData;
 	emptyData = newFlag;
 	return oldEmptyData;
+}
+
+//
+//Функция передачи данных в модель
+//
+void SyncQueueItemModel::setDataVector(QVector< QString >* i_modelData)
+{
+	if(modelData)
+		delete modelData;
+		
+	modelData = i_modelData;
 }

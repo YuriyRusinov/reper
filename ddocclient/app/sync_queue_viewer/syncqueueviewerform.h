@@ -10,7 +10,8 @@ class SyncQueueView;
 
 namespace TableView
 {
-	const int TABLE_COLUMN_COUNT = 16; //Количество столбцов в таблице
+	const int TABLE_COLUMN_COUNT      = 17; //Количество столбцов в таблице находящейся в базе данных
+	const int TABLE_COLUMN_COUNT_VIEW = 8;  //Количество столбцов в отображаемой таблице
 }
 
 class SyncQueueViewerForm : public QDialog

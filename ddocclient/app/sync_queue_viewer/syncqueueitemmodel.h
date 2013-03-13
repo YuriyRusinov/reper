@@ -37,7 +37,7 @@ class SyncQueueItemModel:public QAbstractTableModel
 		//
 		//Функция передачи данных в модель
 		//
-		void setDataVector(QVector< QString >* i_modelData){modelData = i_modelData;};
+		void setDataVector(QVector< QString >* i_modelData);
 		//
 		//Функция установки видимой области виджета отображения
 		//
