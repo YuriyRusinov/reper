@@ -4,8 +4,6 @@
 #include <QTreeView>
 
 class SyncQueueViewerForm;
-class SyncQueueItemModel;
-class KKSDatabase;
 
 class SyncQueueView : public QTreeView
 {
@@ -16,29 +14,26 @@ class SyncQueueView : public QTreeView
         SyncQueueView(QWidget * parent);
         ~SyncQueueView();
 
-		//Установка базы данных
-        void SetDB(KKSDatabase *adb){db =adb;}
-        void SetCountCursor(bool change);
-        SyncQueueItemModel* GetModel(){return modelItem;}
-        void SetCurrentPos(int apos_cursor){pos_cursor= apos_cursor;}
-        void SetSQLCursor(QString asqlCursor){sqlCursor = asqlCursor;}
-        void SetCountCursor(int acount){count_cursor = acount;}
+		//
+		//Функция установки полного количества строк в виджете
+		//
+		void setRowCount(int iRowCount){totalRowCount = iRowCount;};
 
         void UpdateData();
 
+    signals:
+		void signal_updateModelData(int output_topRow,int output_bottomRow);
+		void signal_viewRows(int top,int bottom);
+
     public slots:
+		void slot_sliderValueChanged(int value);
 
-        void sliderRealised();
-        void sliderPressed();
+		void slot_resizeEvent();
 
-        void InitSyncQueueView();
     private:
-        KKSDatabase *db;		                 //База данных
-        SyncQueueItemModel *model;               //Модель данных
-
 		//Позиция курсора
         int pos_cursor;
-		//
+		
         int pg_count;
 		//Количество строк в курсоре
         int count_cursor;
@@ -46,17 +41,7 @@ class SyncQueueView : public QTreeView
         QScrollBar *scroll_view;                 //Линеечка:)
         SyncQueueViewerForm *syncQueueViewerForm;//Указатель на основную форму
 
-        int move_value;
-        bool mousePress;
-        QString sqlCursor;						 //Строка курсора
-
-        QItemSelection itemSelection;
-        SyncQueueItemModel *modelItem;           //Указатель на модель данных
-
-	private slots:
-		void slot_clicked(){};
-		void slot_doublec_licked(){};
-		void slot_expanded(){};
+		int totalRowCount;
 };
 
 #endif

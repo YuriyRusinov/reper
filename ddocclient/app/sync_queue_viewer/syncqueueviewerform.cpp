@@ -1,16 +1,12 @@
-#include <QProgressDialog>
 #include <QMessageBox>
-#include <QFile>
-#include <QWidget>
 #include <QApplication>
+#include <QStandardItem>
 
-//#include "debug.h"
 #include "kksdatabase.h"
 
 #include "syncqueueviewerform.h"
 #include "syncqueueview.h"
 #include "syncqueueviewform.h"
-//#include "logeditsettings.h"
 #include "filtersform.h"
 
 SyncQueueViewerForm :: SyncQueueViewerForm(KKSDatabase * adb, QWidget * parent) :
@@ -44,30 +40,38 @@ SyncQueueViewerForm :: SyncQueueViewerForm(KKSDatabase * adb, QWidget * parent) 
 	setLayout(qvbl_main);
 	//********
 
-	//**** ****
+	//*****Инициализация указателя на базу данных*****
     db = adb;
+	//**********
 
-	//Создание поля вывода запроса
+	//*****Виджеты предназначенные для вывода данных*****
+	//
+	//Создание виджета вывода результатов запроса
+	//
 	syncQueueTreeWnd = new SyncQueueView(this);
     syncQueueTreeWnd->setObjectName(QString::fromUtf8("syncQueueTreeWnd"));
 
+	//
 	//Размещение поля вывода запроса в главной форме
-    qvbl_main->addWidget(syncQueueTreeWnd);
-
-	//Установка базы данных
-    syncQueueTreeWnd->SetDB(db);
-
+    //
+	qvbl_main->addWidget(syncQueueTreeWnd);
+	//**********
+	
+	//
+	//Флаги открытия курсора устанавливаются в false
+	//
     cursor_open = false;
     cursor_open_file = false;
     count_colomn_logfile = 8;
 
-    progress = NULL;
-	//********
-
+	//
 	//Подключение элементов интерфейса
+	//
 	QObject::connect(qpb_exit,SIGNAL(clicked()),this,SLOT(close()));
 	QObject::connect(qpb_filters,SIGNAL(clicked()),this,SLOT(slot_filters_setup()));
 	QObject::connect(qpb_view,SIGNAL(clicked()),this,SLOT(on_pbView_clicked()));
+
+	QObject::connect(syncQueueTreeWnd,SIGNAL(signal_viewRows(int,int)),this,SLOT(slot_updateModelData(int,int)));
 }
 
 SyncQueueViewerForm:: ~SyncQueueViewerForm(void)
@@ -81,22 +85,34 @@ SyncQueueViewerForm:: ~SyncQueueViewerForm(void)
 
 int SyncQueueViewerForm::countInCursor()
 {
-	//Инициализация указателя на результат запроса
+	//
+	//Инициализация указателя на результат запроса значением NULL
+	//
 	KKSResult* res = NULL;
 
-	//Инициализация переменной cur  с целью определения количества опрашиваемых таблиц
-    int cur = sqlCursor.indexOf(" from ");
+	//
+	//Инициализация переменной cur с целью определения количества опрашиваемых таблиц
+    //
+	int cur = sqlCursor.indexOf(" from ");
+	//
 	//Если таблиц нет вернуть 0
-    if(cur == -1)
+    //
+	if(cur == -1)
         return 0;
+	//
 	//Запрос по количеству записей в таблице from out_sync_queue
+	//
 	QString newSql = QString("select count(*) from out_sync_queue");//where 1=1
     res = db->execute(newSql);
 
+	//
 	//Возвращаемое значение
-    int i;
+    //
+	int i;
+	//
 	//Если количество столбцов не 0 то возвращаем его
-    if(res)
+    //
+	if(res)
     {
         i = res->getCellAsInt(0, 0);
         countRow = i;
@@ -104,8 +120,10 @@ int SyncQueueViewerForm::countInCursor()
         delete res;
         return i;
     }
+	//
 	//Иначе возвращаем 0
-    else
+    //
+	else
     {
         countRow = 0;
         return 0;
@@ -118,8 +136,10 @@ void SyncQueueViewerForm::on_pbView_clicked()
 {
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
+	//
 	//Проверка существования курсора, в случае если истина - закрытие
-    if(cursor_open)
+    //
+	if(cursor_open)
     {
         db->close("sync_cursor");
         db->close("sync_cursor_file");
@@ -157,9 +177,13 @@ void SyncQueueViewerForm::on_pbView_clicked()
                             where \
                                 1=1 \
     
-    */
+    //*/
 
-    sqlCursor = QString(" \
+	//***** *****
+	//
+	//Запрос к базе данных в формате QString
+	//
+	sqlCursor = QString(" \
                             select \
                                 t.id,  \
                                 t.name,  \
@@ -172,7 +196,7 @@ void SyncQueueViewerForm::on_pbView_clicked()
                                 o.name,  \
                                 q.id_entity,  \
                                 q.entity_table,  \
-                                io.name,  \
+								io.name, \
                                 q.entity_type,  \
                                 q.sync_type,   \
                                 q.sync_result,   \
@@ -183,43 +207,51 @@ void SyncQueueViewerForm::on_pbView_clicked()
                                 inner join organization o on (o.id = q.id_organization) \
                                 inner join organization_transport ot on (o.id = ot.id_organization) \
                                 inner join transport t on (ot.id_transport = t.id) \
-                                inner join io_objects io on (q.entity_table = io.table_name) \
+								inner join io_objects io on (q.entity_table = io.table_name) \
                             where \
                                 1=1 \
                         ");
-// */
 
 	//Выбрать все данные из таблицы и упорядочить по первому столбцу
 	//sqlCursor = QString("select * from out_sync_queue where 1=1");
+
+	//
+	//Упорядочивание таблицы по первому столбцу
+	//
     sqlCursor += QString(" order by 1");
-	//Курсор открыт
-    cursor_open = true;
+	//**********
+
+	//***** *****
+	//
+	//Установка флага курсора в положение открыт
+    //
+	cursor_open = true;
 
     db->begin();
 	//Объявление курсора
-    KKSResult * res = db->declare("sync_cursor", sqlCursor);
-    if(!res){
-        db->rollback();
-        return;
-    }
-    
+    db->declare("sync_cursor", sqlCursor);
     db->declare("sync_cursor_file", sqlCursor);
     db->declare("init_cursor", sqlCursor);
 	//Задание количества столбцов
-    countColumn = _TABLE_COLUMN_COUNT_;
+	countColumn = TableView::TABLE_COLUMN_COUNT;
 	//Получение количества строк в курсоре
     countRow = countInCursor();
-
-	//*****Настройка элемента отображения в соответствии с курсором*****
-    syncQueueTreeWnd->SetCountCursor(countRow);
-
-    syncQueueTreeWnd->SetSQLCursor(sqlCursor);
-    syncQueueTreeWnd->InitSyncQueueView();
 	//**********
 
-    QApplication::restoreOverrideCursor();
+	syncQueueTreeWnd->setRowCount(countRow);
+	model = new SyncQueueItemModel(countRow,countColumn,this);
+	
+	//*****Настройка элемента отображения в соответствии с курсором*****
+	syncQueueTreeWnd->setModel(model);
+	//**********
 
-    db->commit();
+	syncQueueTreeWnd->slot_resizeEvent();
+
+	model->setEmptyData(false);
+
+	syncQueueTreeWnd->UpdateData();
+
+    QApplication::restoreOverrideCursor();
 }
 
 //Слот вызова диалога для установки фильтров
@@ -233,4 +265,36 @@ void SyncQueueViewerForm::slot_filters_setup()
 	}
 
 	delete filtersDialog;
+}
+
+//
+//Слот обновления данных модели
+//
+void SyncQueueViewerForm::slot_updateModelData(int input_topRow,int input_bottomRow)
+{
+	DBdata(input_topRow,input_bottomRow);
+	model->setWindowIndex(input_topRow,input_bottomRow);
+}
+		
+void SyncQueueViewerForm::DBdata(int input_topRow,int input_bottomRow)
+{
+	QVector<QString>* v_DBData = new QVector<QString>();
+
+	int pos = input_topRow;
+    KKSResult * res = NULL;             //Результат запроса базы данных
+	QString dd;
+	
+	for(int i = 0 ; i < (input_bottomRow-input_topRow); i++)
+	{
+		pos = input_topRow+i;
+		
+		res = db->fetch("sync_cursor", 4, pos+1);
+
+		for(int j = 0; j < TableView::TABLE_COLUMN_COUNT ; j++)
+		{
+			v_DBData->append(res->getCellAsString(0,j));
+		}
+	}
+	
+	model->setDataVector(v_DBData);
 }

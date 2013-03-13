@@ -9,12 +9,7 @@ SyncQueueView::SyncQueueView(QWidget * parent):QTreeView(parent)
     scroll_view = verticalScrollBar();
     syncQueueViewerForm = (SyncQueueViewerForm *)(this->parent());
 
-    connect((const QObject*)scroll_view, SIGNAL(sliderReleased()), this, SLOT(sliderRealised()));
-    connect((const QObject*)scroll_view, SIGNAL(sliderPressed()),this, SLOT(sliderPressed()));
-
-	//connect(this, SIGNAL(clicked()), this, SLOT(slot_clicked()));
-    connect(this, SIGNAL(expanded()), this, SLOT(slot_expanded()));
-
+	connect((const QObject*)scroll_view, SIGNAL(valueChanged(int)), this, SLOT(slot_sliderValueChanged(int)));
 
 	//Начальная позиция курсора
     pos_cursor = 0;
@@ -26,25 +21,28 @@ SyncQueueView::~SyncQueueView()
 
 void SyncQueueView::UpdateData()
 {
-    modelItem->SetMove(false);
     setDirtyRegion(viewport()->rect());    
 }
 
-void SyncQueueView::sliderRealised()
+void SyncQueueView::slot_resizeEvent()
 {
-    UpdateData();
+	int top = 0;
+	int bottom = 0;
+
+	top = indexAt(QPoint(0,0)).row();
+
+	QWidget * rect = viewport();
+
+	bottom = indexAt(QPoint(0,rect->height())).row();
+
+	if(bottom == -1)
+		bottom = totalRowCount;
+
+	emit signal_viewRows(top,bottom);
 }
 
-void SyncQueueView::sliderPressed()
+void SyncQueueView::slot_sliderValueChanged(int value)
 {
-    modelItem->SetMove(true);
-}
-
-void SyncQueueView::InitSyncQueueView()
-{   
-    modelItem = new SyncQueueItemModel(count_cursor, _TABLE_COLUMN_COUNT_, db, sqlCursor);
-    setModel(modelItem);
-
-    for(int i=0; i < _TABLE_COLUMN_COUNT_; i++)
-        resizeColumnToContents(i);
+	slot_resizeEvent();
+	UpdateData();
 }
