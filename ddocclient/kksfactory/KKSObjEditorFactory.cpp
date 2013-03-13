@@ -107,6 +107,7 @@
 #include "KKSSyncWidget.h"
 #include "KKSSyncDialog.h"
 #include <KKSAccessEntity.h>
+#include <savesearchtemplateform.h>
 #include "defines.h"
 
 /*
@@ -6472,7 +6473,7 @@ void KKSObjEditorFactory :: saveSearchCriteria (KKSFilterGroup * group, const KK
     int numc (-1);
     Q_UNUSED (numc);
     QString stName;
-    do
+/*    do
     {
         bool ok;
         stName = QInputDialog::getText (qobject_cast<QWidget *>(this->sender()), tr ("Save search template"), tr ("Name :"), QLineEdit::Normal, QString(), &ok);
@@ -6505,8 +6506,10 @@ void KKSObjEditorFactory :: saveSearchCriteria (KKSFilterGroup * group, const KK
     } while (isContains);
 
     qDebug () << __PRETTY_FUNCTION__ << isContains;
+ */
     KKSSearchTemplate * st = new KKSSearchTemplate (-1, group, stName, loader->getUserId());
-    if (st)
+    SaveSearchTemplateForm * stForm = new SaveSearchTemplateForm (st);
+    if (st && stForm->exec () == QDialog::Accepted)
     {
         if(c)
             st->setCategory(c->id(), c->name());

@@ -19,7 +19,7 @@ SaveSearchTemplateForm :: SaveSearchTemplateForm (KKSSearchTemplate * st,QWidget
     catChStateChanged (Qt::Unchecked);
     connect (UI->chCategory, SIGNAL (stateChanged (int)), this, SLOT (catChStateChanged (int)) );
 
-    connect (UI->pbOk, SIGNAL (clicked()), this, SLOT (accept()) );
+    connect (UI->pbOk, SIGNAL (clicked()), this, SLOT (staccept()) );
     connect (UI->pbCancel, SIGNAL (clicked()), this, SLOT (reject()) );
 }
 
@@ -86,4 +86,11 @@ void SaveSearchTemplateForm :: init (void)
 KKSSearchTemplate * SaveSearchTemplateForm :: getSearchTemplate (void) const
 {
     return searchTemplate;
+}
+
+void SaveSearchTemplateForm :: staccept (void)
+{
+    qDebug () << __PRETTY_FUNCTION__;
+    searchTemplate->setName (UI->lEName->text());
+    QDialog::accept();
 }

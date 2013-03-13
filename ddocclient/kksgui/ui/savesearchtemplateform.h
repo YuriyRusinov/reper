@@ -13,7 +13,7 @@ class QAbstractItemModel;
 
 class KKSSearchTemplate;
 
-class SaveSearchTemplateForm : public QDialog
+class _GUI_EXPORT SaveSearchTemplateForm : public QDialog
 {
 public:
     SaveSearchTemplateForm (KKSSearchTemplate * st, QWidget * parent=0, Qt::WindowFlags flags=0);
@@ -29,6 +29,7 @@ public:
 
 private slots:
     void catChStateChanged (int state);
+    void staccept (void);
 
 private:
     //
