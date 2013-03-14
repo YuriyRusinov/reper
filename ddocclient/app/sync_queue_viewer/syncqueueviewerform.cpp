@@ -214,7 +214,38 @@ void SyncQueueViewerForm::on_pbView_clicked()
 
 	//Выбрать все данные из таблицы и упорядочить по первому столбцу
 	//sqlCursor = QString("select * from out_sync_queue where 1=1");
+/*
 
+    QString aa = filterF->getOrg();
+    if(!aa.isEmpty()){
+        sqlCursor += QString(" and q.id_organization in (%1) ").arg(aa);
+    }
+
+    aa = filterF->getObjectT();
+    if(!aa.isEmpty()){
+        sqlCursor += QString(" and q.entity_type in (%1) ").arg(aa);
+    }
+
+    aa = filterF->getRes();
+    if(!aa.isEmpty()){
+        sqlCursor += QString(" and q.sync_result in (%1) ").arg(aa);
+    }
+
+    if(filterF->useStartDate()){
+        QString tVal = filterF->getStartDateTime().toString("dd.MM.yyyy hh:mm:ss");
+        QString dtStart = QString("to_timestamp('%1', 'DD.MM.YYYY HH24:MI:SS')::timestamp").arg(tVal);
+
+        sqlCursor += QString(" and q.last_update >= %1 ").arg(tVal);
+    }
+
+    if(filterF->useEndDate()){
+        QString tVal = filterF->getEndDateTime().toString("dd.MM.yyyy hh:mm:ss");
+        QString dtEnd = QString("to_timestamp('%1', 'DD.MM.YYYY HH24:MI:SS')::timestamp").arg(tVal);
+
+        sqlCursor += QString(" and q.last_update <= %1 ").arg(tVal);
+    }
+
+*/
 	//
 	//Упорядочивание таблицы по первому столбцу
 	//

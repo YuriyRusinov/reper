@@ -193,14 +193,6 @@ void DDocServerListener::notify( char* notify_name, char * payload )
         e.insert("PGPASSFILE", m_parent->sPgPass); 
         p->setProcessEnvironment(e);
         
-/*
-        QStringList arguments;
-        arguments << "-h" << m_parent->ipServer 
-                  << "-p" << m_parent->port
-                  << "-U" << m_parent->user
-                  << "-c" << QString("\"select hStartHandler('%1', %2)\"").arg(service).arg(id)
-                  << m_parent->database;
-*/
         
         QString psql = QString("\"C:\\Program Files (x86)\\PostgreSQL9\\9.2\\bin\\psql.exe\"");
         QString sql = QString("\"select hStartHandler('%1', %2)\"").arg(service).arg(id);
@@ -213,7 +205,6 @@ void DDocServerListener::notify( char* notify_name, char * payload )
                            .arg(sql)
                            .arg(m_parent->database);
 
-        //p->start(program, arguments);
         p->start(program);
         bool ok = p->waitForStarted();
         if(!ok){

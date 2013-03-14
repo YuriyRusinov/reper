@@ -1592,6 +1592,18 @@ End of querying SIU database.
         <source>ÑÂ</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Îøèáêà</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Íå óäàëîñü îòñîåäèíèòüñÿ îò ÁÄ ÑÈÓ!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Íå óäàëîñü ïåðåïîäêëþ÷èòüñÿ ê ÁÄ ÑÈÓ!</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DetailGroupSectionDialog</name>
@@ -2321,6 +2333,101 @@ Do you want to save the changes before closing?</source>
     </message>
     <message>
         <source>&amp;Font...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FiltersForm</name>
+    <message>
+        <source>Organization</source>
+        <translation>Организация</translation>
+    </message>
+    <message>
+        <source>Object type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Result</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OD 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OD 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Category (system)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO (system)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>EIO (directory record)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>EIO (record additional table directory)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional table directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transfer request to the ping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reserved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transfer complete directory of organizations to the new object</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transferring directory entries for all organizations involved in the exchange of information objects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Public DL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expected timing (standing in the transmission)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Synchronized (exchange of information is not yet complete)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Synchronization is successful</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation type="unfinished">Да</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Отмена</translation>
+    </message>
+    <message>
+        <source>From:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3911,6 +4018,17 @@ try to rename it with extention. Example: filename.vsd</source>
     </message>
 </context>
 <context>
+    <name>KKSIncludesDialog</name>
+    <message>
+        <source>&amp;OK</source>
+        <translation type="unfinished">&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
+</context>
+<context>
     <name>KKSIncludesWidget</name>
     <message>
         <source>Name</source>
@@ -3979,7 +4097,7 @@ try to rename it with extention. Example: filename.vsd</source>
     </message>
     <message>
         <source>&amp;Delete rubric item</source>
-        <translation>У&amp;далить документ из рубрики</translation>
+        <translation type="obsolete">У&amp;далить документ из рубрики</translation>
     </message>
     <message>
         <source>View attachments ...</source>
@@ -4060,6 +4178,46 @@ try to rename it with extention. Example: filename.vsd</source>
     <message>
         <source>Delete document both from rubric and database</source>
         <translation>Удалить документ из рубрики и из БД в целом</translation>
+    </message>
+    <message>
+        <source>&amp;Remove item(s) from selected rubric only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set synchronization parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Put into another rubric</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send as email</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set access rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select documents for set</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Put selected documents</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select documents for copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send selected documents</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select documents for send</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5231,7 +5389,7 @@ try to rename it with extention. Example: filename.vsd</source>
     </message>
     <message>
         <source>Save search template</source>
-        <translation>Сохранить шаблон поиска</translation>
+        <translation type="obsolete">Сохранить шаблон поиска</translation>
     </message>
     <message>
         <source>Name :</source>
@@ -5473,7 +5631,7 @@ try to rename it with extention. Example: filename.vsd</source>
         <source>Search template with equal name is already exist in database.
 Input another name to save your search template.
 Press OK to continue or Cancel to cancel the operation</source>
-        <translation>Поисковый запрос с данным названием уже существует в БД.
+        <translation type="obsolete">Поисковый запрос с данным названием уже существует в БД.
 Укажите другое название вашего поискового запроса.
 Нажмите OK для продолжения или Отмена для прерывания операции</translation>
     </message>
@@ -5560,6 +5718,43 @@ Press OK to continue or Cancel to cancel the operation</source>
     <message>
         <source>Assotiated Records</source>
         <translation>Рубрикатор</translation>
+    </message>
+    <message>
+        <source>Record creation does not allowed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current qualifier does not saved in database!
+Please save it before creating new records in it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You does not have permissions for send document %1 !</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Author</source>
+        <translation type="unfinished">Автор</translation>
+    </message>
+    <message>
+        <source>Creation date/time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Category</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation type="unfinished">Тип</translation>
+    </message>
+    <message>
+        <source>Add search template type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit search template type</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5764,12 +5959,70 @@ Press OK to continue or Cancel to cancel the operation</source>
         <source>Others</source>
         <translation>Остальные</translation>
     </message>
+    <message>
+        <source>Copy documents</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select destignation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You put documents into same rubric</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>KKSRubricMessageBox</name>
+    <message>
+        <source>Do you really want to delete documents from rubric ?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Yes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;No</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete from DB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete documents from rubric</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>KKSRubricModel</name>
     <message>
         <source>Name</source>
         <translation>Название</translation>
+    </message>
+</context>
+<context>
+    <name>KKSSearchTemplateModel</name>
+    <message>
+        <source>Search criteria</source>
+        <translation type="unfinished">Критерии поиска</translation>
+    </message>
+    <message>
+        <source>Author</source>
+        <translation type="unfinished">Автор</translation>
+    </message>
+    <message>
+        <source>Date of creation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Category</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation type="unfinished">Тип</translation>
     </message>
 </context>
 <context>
@@ -5829,6 +6082,22 @@ Press OK to continue or Cancel to cancel the operation</source>
     <message>
         <source>Delete search template</source>
         <translation>Удалить шаблон поиска</translation>
+    </message>
+    <message>
+        <source>Add new search template type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit search template type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete search template type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot delete type %1, it is not empty</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6005,6 +6274,17 @@ Further work is impossible. You should use equal versions of client and server s
     </message>
 </context>
 <context>
+    <name>KKSStuffDialog</name>
+    <message>
+        <source>&amp;OK</source>
+        <translation type="unfinished">&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
+</context>
+<context>
     <name>KKSStuffFactory</name>
     <message>
         <source>Stuff privilegies</source>
@@ -6089,6 +6369,14 @@ Further work is impossible. You should use equal versions of client and server s
     <message>
         <source>Error, cannot set address</source>
         <translation>Ошибка, не могу задать адрес</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished">Ошибка</translation>
+    </message>
+    <message>
+        <source>An internal error was occured during form refresh</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6335,6 +6623,29 @@ Further work is impossible. You should use equal versions of client and server s
     <message>
         <source>Cannot load %1.</source>
         <translation>Не могу загрузить %1.</translation>
+    </message>
+</context>
+<context>
+    <name>KKSSyncDialog</name>
+    <message>
+        <source>&amp;OK</source>
+        <translation type="unfinished">&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
+    <message>
+        <source>ID</source>
+        <translation type="unfinished">ID</translation>
+    </message>
+    <message>
+        <source>Short name</source>
+        <translation type="unfinished">Короткое название</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8230,6 +8541,30 @@ Avg speed: %3 Kb/sec</source>
         <source>Others</source>
         <translation>Остальные</translation>
     </message>
+    <message>
+        <source>The category contains references on some associated KKSTemplate objects. The list will be destroyed because of changing all attributes!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Will also remove all occurrence of the attribute in assotiated KKSTemplate objects!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The template already present in given KKSCategory!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot add it twise.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The template cannot be assigned with given category because of KKSTemplate::category() method does not return THIS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Â¿Â¿Â¿Â¿Â¿ Â¿Â¿Â¿Â¿Â¿Â¿Â¿Â¿Â¿ Â¿Â¿Â¿Â¿Â¿Â¿Â¿</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QXPdfWidget</name>
@@ -9352,6 +9687,88 @@ Avg speed: %3 Kb/sec</source>
     </message>
 </context>
 <context>
+    <name>SyncQueueItemModel</name>
+    <message>
+        <source>Transport task</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Date and time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Organization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Entity UID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Entity name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Entity type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sync type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sync result</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SyncQueueViewerForm</name>
+    <message>
+        <source>Filters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">Удалить</translation>
+    </message>
+    <message>
+        <source>Restart</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Отмена</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished">Сохранить</translation>
+    </message>
+    <message>
+        <source>Exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation type="unfinished">Вид</translation>
+    </message>
+    <message>
+        <source>Information</source>
+        <translation type="unfinished">Информация о документе</translation>
+    </message>
+    <message>
+        <source>Can&apos;t declare cursor!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>fetch break</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cursor can&apos;t return data!</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>TextEditor</name>
     <message>
         <source>0.01</source>
@@ -10390,6 +10807,14 @@ p, li { white-space: pre-wrap; }
     </message>
     <message utf8="true">
         <source>Установить таймаут (сек.):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Установить период переподключения к СИУ):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>При обработке очередной партии ИО будет происходить переподключение к БД СИУ (поставьте 0 для отмены такого поведения)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -11920,6 +12345,29 @@ System Error &apos;%1&apos;
     </message>
 </context>
 <context>
+    <name>save_search_template_form</name>
+    <message>
+        <source>Save search template</source>
+        <translation type="unfinished">Сохранить шаблон поиска</translation>
+    </message>
+    <message>
+        <source>Search template name :</source>
+        <translation type="unfinished">Название шаблона поиска :</translation>
+    </message>
+    <message>
+        <source>Category</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation type="unfinished">&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
+</context>
+<context>
     <name>save_settings_form</name>
     <message>
         <source>Save settings</source>
@@ -12031,6 +12479,143 @@ System Error &apos;%1&apos;
     </message>
 </context>
 <context>
+    <name>sync_queue_view_form</name>
+    <message>
+        <source>More information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Information</source>
+        <translation type="unfinished">Информация о документе</translation>
+    </message>
+    <message>
+        <source>Group operation</source>
+        <translation type="unfinished">Групповая операция</translation>
+    </message>
+    <message>
+        <source>Type operation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>processed entity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Id 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Id 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Old value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Отмена</translation>
+    </message>
+    <message>
+        <source>Up</source>
+        <translation type="unfinished">Вверх</translation>
+    </message>
+    <message>
+        <source>Down</source>
+        <translation type="unfinished">Вниз</translation>
+    </message>
+</context>
+<context>
+    <name>sync_queue_viewer_form</name>
+    <message>
+        <source>Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>From:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User</source>
+        <translation type="unfinished">Пользователь</translation>
+    </message>
+    <message>
+        <source>Group:</source>
+        <translation type="unfinished">Группа:</translation>
+    </message>
+    <message>
+        <source>:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User:</source>
+        <translation type="unfinished">Пользователь:</translation>
+    </message>
+    <message>
+        <source>Operation</source>
+        <translation type="unfinished">Операция</translation>
+    </message>
+    <message>
+        <source>Operation:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit log settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation type="unfinished">Вид</translation>
+    </message>
+    <message>
+        <source>Save to file</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>table_viewClass</name>
+    <message>
+        <source>table_view</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>timer_form</name>
     <message>
         <source>Start task</source>
@@ -12125,7 +12710,7 @@ System Error &apos;%1&apos;
     </message>
     <message>
         <source>Parameter set server-host address when other clients must connected</source>
-        <translation>IP-адрес сервера, который принимает входящие данные</translation>
+        <translation type="obsolete">IP-адрес сервера, который принимает входящие данные</translation>
     </message>
     <message>
         <source>Parameter set post number when other client must connected</source>
