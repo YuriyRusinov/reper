@@ -402,6 +402,7 @@ void KKSTemplateEditorFactory :: addAGroupToTemplate (KKSTemplate *t, const QMod
         tAttrG->setId (id);
         t->addGroup (tAttrG);
     }
+    Q_UNUSED (ires);
 
     qDebug () << __PRETTY_FUNCTION__ << t->groups().keys() << id << idList << tAttrG->id();
     KKSViewFactory::insertTemplateGroup (tAttrG, parent, tGroupsModel->rowCount (parent)/*t->groups().count()-1*/, tGroupsModel);

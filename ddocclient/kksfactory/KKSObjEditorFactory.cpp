@@ -2129,7 +2129,7 @@ void KKSObjEditorFactory::filterEIO(KKSObjEditor * editor, int idObject, const K
 
     KKSFiltersEditorForm * f = new KKSFiltersEditorForm(c, o->tableName(), attrs, forIO, editor);
 
-    connect (f, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QComboBox *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QComboBox *)) );
+//    connect (f, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QComboBox *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QComboBox *)) );
     connect (f, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QAbstractItemModel *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QAbstractItemModel *)) );
     connect (f, SIGNAL (saveSearchCriteria (KKSFilterGroup *, const KKSCategory *)), this, SLOT (saveSearchCriteria (KKSFilterGroup *, const KKSCategory *)) );
     connect (f, SIGNAL (loadSearchCriteria (void)), this, SLOT (loadSearchCriteria (void)) );
@@ -6472,6 +6472,7 @@ void KKSObjEditorFactory :: saveSearchCriteria (KKSFilterGroup * group, const KK
     bool isContains = false;
     int numc (-1);
     Q_UNUSED (numc);
+    Q_UNUSED (isContains);
     QString stName;
 /*    do
     {
@@ -6508,22 +6509,37 @@ void KKSObjEditorFactory :: saveSearchCriteria (KKSFilterGroup * group, const KK
     qDebug () << __PRETTY_FUNCTION__ << isContains;
  */
     KKSSearchTemplate * st = new KKSSearchTemplate (-1, group, stName, loader->getUserId());
+    QAbstractItemModel * searchTModel = new QStandardItemModel (0, 5);
+    searchTModel->setHeaderData (0, Qt::Horizontal, tr ("Search criteria"), Qt::DisplayRole);
+    searchTModel->setHeaderData (1, Qt::Horizontal, tr ("Author"), Qt::DisplayRole);
+    searchTModel->setHeaderData (2, Qt::Horizontal, tr ("Creation date/time"), Qt::DisplayRole);
+    searchTModel->setHeaderData (3, Qt::Horizontal, tr ("Category"), Qt::DisplayRole);
+    searchTModel->setHeaderData (4, Qt::Horizontal, tr ("Type"), Qt::DisplayRole);
+    KKSViewFactory::getSearchTemplates (loader, searchTModel, QModelIndex(), false);
     SaveSearchTemplateForm * stForm = new SaveSearchTemplateForm (st);
+    stForm->setTypesModel (searchTModel);
     if (st && stForm->exec () == QDialog::Accepted)
     {
+        KKSSearchTemplate * stt = stForm->getSearchTemplate ();
         if(c)
             st->setCategory(c->id(), c->name());
 
-        int idSearchTemplate = ppf->insertSearchTemplate (st);
+        int idSearchTemplateType = stForm->getIdType ();
+        KKSMap<int, KKSSearchTemplateType *> sTypes = loader->loadSearchTemplateTypes ();
+        KKSSearchTemplateType * sType = sTypes.value (idSearchTemplateType);
+        stt->setType (sType);
 
-        st->setId (idSearchTemplate);
+        int idSearchTemplate = ppf->insertSearchTemplate (stt);
+
+        stt->setId (idSearchTemplate);
         if (qobject_cast<KKSFiltersEditorForm *>(this->sender ()))
         {
             KKSFiltersEditorForm * feForm = qobject_cast<KKSFiltersEditorForm *>(this->sender ());
-            feForm->setSearchTemplate (st);
+            feForm->setSearchTemplate (stt);
         }
         st->release ();
     }
+    delete stForm;
 }
 
 /* Метод загружает критерий поиска из БД.
@@ -6853,7 +6869,7 @@ void KKSObjEditorFactory :: updateSearchTempl (const QModelIndex& wIndex, QAbstr
         
         KKSFiltersEditorForm *filterForm = new KKSFiltersEditorForm (c, "io_objects", attrsIO, false, st, pWidget);
         
-        connect (filterForm, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QComboBox *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QComboBox *)) );
+//        connect (filterForm, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QComboBox *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QComboBox *)) );
         connect (filterForm, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QAbstractItemModel *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QAbstractItemModel *)) );
         
         if (stName.isEmpty())

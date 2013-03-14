@@ -391,6 +391,7 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (int idCategory, // ид
     KKSCategory *cat (0);
     KKSCategory * tableCat (0);//= new KKSCategory(-1, QString(), cTableT);
     KKSCategory * indCat (0);
+    Q_UNUSED (indCat);
     
     if (idCategory <= 0 && isChildCat)
     {
@@ -567,6 +568,7 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (KKSCategory *cat, // 
                                                            QWidget *parent,
                                                            Qt::WindowFlags f)
 {
+    Q_UNUSED (filters);
     if (!cat)
         return 0;
 
@@ -661,7 +663,7 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (KKSCategory *cat, // 
 
 KKSRecWidget * KKSCatEditorFactory :: getAttrsWidget (const KKSCategory *cat, bool mode, QWidget *parent) const
 {
-    //Q_UNUSED (mode);
+    Q_UNUSED (mode);
     KKSRecWidget * rw (0);
 
     if (cat)//cat->type()->id() != 10)

@@ -2134,6 +2134,8 @@ QModelIndex KKSViewFactory :: searchModelRowsIndexMultiType (QAbstractItemModel 
     for (int i=0; i<nr; i++)
     {
         QModelIndex wIndex = sourceMod->index (i, 0, pIndex);
+        if (!wIndex.isValid())
+            continue;
         int vData (wIndex.data (role).toInt());
         int typeData (wIndex.data (Qt::UserRole+USER_ENTITY).toInt());
         //qDebug () << __PRETTY_FUNCTION__ << typeData << typeVal;
@@ -2151,7 +2153,7 @@ QModelIndex KKSViewFactory :: searchModelRowsIndexMultiType (QAbstractItemModel 
     return QModelIndex();
 }
 
-void KKSViewFactory::getSearchTemplates (KKSLoader * loader, QAbstractItemModel * searchTModel, const QModelIndex& pIndex)
+void KKSViewFactory::getSearchTemplates (KKSLoader * loader, QAbstractItemModel * searchTModel, const QModelIndex& pIndex, bool withSearchTemplates)
 {
     if (!searchTModel || !loader)
         return;
@@ -2187,6 +2189,7 @@ void KKSViewFactory::getSearchTemplates (KKSLoader * loader, QAbstractItemModel 
             prevIndex = searchModelRowsIndexMultiType (searchTModel, st->parent()->id(), 0, QModelIndex(), Qt::UserRole);
             ncount = searchTModel->rowCount (prevIndex);
             bool isIns = searchTModel->insertRows(ncount, 1, prevIndex);
+            Q_UNUSED (isIns);
             if (searchTModel->columnCount (prevIndex) == 0)
                 searchTModel->insertColumns (0, nCols, prevIndex);
             wIndex = searchTModel->index (ncount, 0, prevIndex);
@@ -2210,6 +2213,8 @@ void KKSViewFactory::getSearchTemplates (KKSLoader * loader, QAbstractItemModel 
         searchTModel->setData (wIndex, 0, Qt::UserRole+USER_ENTITY);
         searchTModel->setData (wIndex, QIcon(":/ddoc/rubric.png"), Qt::DecorationRole);
         
+        if (!withSearchTemplates)
+            continue;
         KKSMap<qint64, KKSSearchTemplate *> searchTemplates = loader->loadSearchTemplatesByType(st);
         int ii (searchTModel->rowCount (wIndex));
         searchTModel->insertRows (ii == 0 ? ii : ii-1, searchTemplates.count(), wIndex);

@@ -141,7 +141,7 @@ class _F_EXPORT KKSViewFactory
         
         static KKSEIOData * getRecordData (const KKSObjectExemplar * rec);
         
-        static void getSearchTemplates (KKSLoader * loader, QAbstractItemModel * searchTModel, const QModelIndex& pIndex=QModelIndex());
+        static void getSearchTemplates (KKSLoader * loader, QAbstractItemModel * searchTModel, const QModelIndex& pIndex=QModelIndex(), bool withSearchTemplates=true);
 
     protected:
     private:
