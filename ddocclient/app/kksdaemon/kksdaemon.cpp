@@ -6,6 +6,7 @@
 #include <QtDebug>
 #include <QFile>
 #include <QProcess>
+#include <QProcessEnvironment>
 
 KKSDaemon::KKSDaemon(int argc, char **argv)
     : QtService<QCoreApplication>(argc, argv, "KKSDaemon Service")
@@ -19,11 +20,11 @@ KKSDaemon::KKSDaemon(int argc, char **argv)
     listener = NULL;
 
 #ifdef WIN32
-    sPgPass = QString(".pgpass");
-    sExport = QString("export");
+    sPgPass = QString("D:\\!!!From_F\\work\\dynamicsoft\\dynamicdocs\\src\\ddocclient\\build\\pgpass.conf");
+    //sExport = QString("set");
 #else
-    sPgPass = QString("pgpass.conf");
-    sExport = QString("set");
+    sPgPass = QString(".pgpass");
+    //sExport = QString("set");
 #endif
 }
 
@@ -53,7 +54,7 @@ void KKSDaemon::start()
 
 
 
-     QFile file(QString("./%1").arg(sPgPass));
+     QFile file(QString("%1").arg(sPgPass));
      if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
          return;
 
@@ -104,7 +105,7 @@ void KKSDaemon::readSettings()
 
 
     if(ipServer.isEmpty()){
-        ipServer = "192.168.0.3";
+        ipServer = "10.3.3.12";
         s->setValue("ip", ipServer);
     }
     if(database.isEmpty()){
@@ -147,16 +148,19 @@ void DDocServerListener::run()
 
 void DDocServerListener::notify( char* notify_name, char * payload )
 {
-    if(!m_db || !payload)
+    if(!m_db)
         return;
+    
+    //if( !payload)
 
     if(strcmp(notify_name, "chains_data") != 0)
         return;
 
     QString p = QString("%1").arg(payload);
     int id = p.toInt();
+    id = 1;
 
-    QString sql = QString("hGetHandlerInfo(%1)").arg(id); //также эта функция щсуществляет изменение соответствующего поля handled_time
+    QString sql = QString("select * from hGetHandlerInfo(%1)").arg(id); //также эта функция щсуществляет изменение соответствующего поля handled_time
     KKSResult * res = m_db->execute(sql.toLocal8Bit().constData());
     if(!res)
         return;
@@ -183,32 +187,46 @@ void DDocServerListener::notify( char* notify_name, char * payload )
         }
     }
     else{
-        /*
-        QProcess * p = new QProcess();
-        QProcessEnv
         
+        QProcess * p = new QProcess();
+        QProcessEnvironment e = QProcessEnvironment::systemEnvironment();
+        e.insert("PGPASSFILE", m_parent->sPgPass); 
+        p->setProcessEnvironment(e);
+        
+/*
         QStringList arguments;
-        QString argument = QString("-h %1 -p %2 -U %3 -c \"select hStartHandler('%4', %5)\" %6")
-                               .arg(m_parent->ipServer)
-                               .arg(m_parent->port)
-                               .arg(m_parent->user)
-                               .arg(service)
-                               .arg(id)
-                               .arg(m_parent->database);
-        arguments << argument;
+        arguments << "-h" << m_parent->ipServer 
+                  << "-p" << m_parent->port
+                  << "-U" << m_parent->user
+                  << "-c" << QString("\"select hStartHandler('%1', %2)\"").arg(service).arg(id)
+                  << m_parent->database;
+*/
+        
+        QString psql = QString("\"C:\\Program Files (x86)\\PostgreSQL9\\9.2\\bin\\psql.exe\"");
+        QString sql = QString("\"select hStartHandler('%1', %2)\"").arg(service).arg(id);
+        
+        QString program = QString("%1 -h %2 -p %3 -U %4 -c %5 %6")
+                           .arg(psql)
+                           .arg(m_parent->ipServer)
+                           .arg(m_parent->port)
+                           .arg(m_parent->user)
+                           .arg(sql)
+                           .arg(m_parent->database);
 
-        qint64 pid = 0;
-        QString PSQL = "psql";
-        QProcess::startDetached ( QString("%1 PGPASSFILE=./%2 & %3").arg(m_parent->sExport).arg(m_parent->sPgPass).arg(PSQL), 
-                                  arguments, 
-                                  ".", 
-                                  &pid );
-        if(pid <= 0){
+        //p->start(program, arguments);
+        p->start(program);
+        bool ok = p->waitForStarted();
+        if(!ok){
             qWarning() << "Program " << service << " cannot start!";
+            delete p;
+            return;
         }
-        QString sql = QString("select hStartHandler('%1', %2)").arg(service).arg(id);
-        m_db->execute(sql.toLocal8Bit().constData());
-        */
+        Q_PID pid = p->pid();
+        if(pid == 0){
+            qWarning() << "Program " << service << " cannot start!";
+            delete p;
+            return;
+        }
     }
 
    
