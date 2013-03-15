@@ -29,6 +29,7 @@ begin
             and cd.id_chain = c.id
             and c.id_handler = h.id
     loop
+        update chains_data set handled_time = current_timestamp where id = idChainData;
         return next r;
     end loop;
 

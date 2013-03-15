@@ -3,15 +3,12 @@ $BODY$
 declare
     iService alias for $1;
     iId alias for $2;
-    a int4;
+
+    q varchar;
 begin
 
-    select f_is_table_exist('aaaaa', 'public') into a;
-    if(a = 0) then
-        create table aaaaa (service varchar, id int4);
-    end if;
-
-    insert into aaaaa (service, id) values (iService, iId);
+    q = 'select ' || iService || '(' || iId || ')';
+    execute q;
 
     return 1;
 
