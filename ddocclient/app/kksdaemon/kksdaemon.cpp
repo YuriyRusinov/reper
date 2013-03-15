@@ -5,8 +5,6 @@
 
 #include <QtDebug>
 #include <QFile>
-#include <QProcess>
-#include <QProcessEnvironment>
 
 KKSDaemon::KKSDaemon(int argc, char **argv)
     : QtService<QCoreApplication>(argc, argv, "KKSDaemon Service")
@@ -20,11 +18,9 @@ KKSDaemon::KKSDaemon(int argc, char **argv)
     listener = NULL;
 
 #ifdef WIN32
-    sPgPass = QString("D:\\!!!From_F\\work\\dynamicsoft\\dynamicdocs\\src\\ddocclient\\build\\pgpass.conf");
-    //sExport = QString("set");
+    sPgPass = QString("pgpass.conf");
 #else
-    sPgPass = QString(".pgpass");
-    //sExport = QString("set");
+    sPgPass = QString("./.pgpass");
 #endif
 }
 
@@ -102,10 +98,11 @@ void KKSDaemon::readSettings()
     port = s->value("port").toString();
     user = s->value("user").toString();
     passwd = s->value("passwd").toString();
+    sPsqlPath = s->value("psqlPath").toString();
 
 
     if(ipServer.isEmpty()){
-        ipServer = "10.3.3.12";
+        ipServer = "127.0.0.1";
         s->setValue("ip", ipServer);
     }
     if(database.isEmpty()){
@@ -113,7 +110,7 @@ void KKSDaemon::readSettings()
         s->setValue("database", database);
     }
     if(port.isEmpty()){
-        port = "5432";
+        port = "5433";
         s->setValue("port", port);
     }
     if(user.isEmpty()){
@@ -123,6 +120,15 @@ void KKSDaemon::readSettings()
     if(passwd.isEmpty()){
         passwd = "111";
         s->setValue("passwd", passwd);
+    }
+
+    if(sPsqlPath.isEmpty()){
+#ifdef WIN32
+        sPsqlPath = QString("\"C:\\Program Files (x86)\\PostgreSQL9\\9.2\\bin\\psql.exe\"");
+#else
+        sPsqlPath = QString("/opt/postgresql/bin/psql");
+#endif
+        s->setValue("psqlPath", sPsqlPath);
     }
 
     s->endGroup (); // Database
@@ -151,16 +157,17 @@ void DDocServerListener::notify( char* notify_name, char * payload )
     if(!m_db)
         return;
     
-    //if( !payload)
+    if( !payload)
+        return;
 
     if(strcmp(notify_name, "chains_data") != 0)
         return;
 
     QString p = QString("%1").arg(payload);
     int id = p.toInt();
-    id = 1;
+    //id = 1;
 
-    QString sql = QString("select * from hGetHandlerInfo(%1)").arg(id); //также эта функция щсуществляет изменение соответствующего поля handled_time
+    QString sql = QString("select * from hGetHandlerInfo(%1)").arg(id); //также эта функция осуществляет изменение соответствующего поля handled_time
     KKSResult * res = m_db->execute(sql.toLocal8Bit().constData());
     if(!res)
         return;
@@ -188,25 +195,32 @@ void DDocServerListener::notify( char* notify_name, char * payload )
     }
     else{
         
-        QProcess * p = new QProcess();
-        QProcessEnvironment e = QProcessEnvironment::systemEnvironment();
-        e.insert("PGPASSFILE", m_parent->sPgPass); 
-        p->setProcessEnvironment(e);
         
-        
-        QString psql = QString("\"C:\\Program Files (x86)\\PostgreSQL9\\9.2\\bin\\psql.exe\"");
+        //QProcess * p = new QProcess();
+
+        //--connect(p, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processFinished1(int, QProcess::ExitStatus)));
+        //--connect(p, SIGNAL(error(QProcess::ProcessError)), this, SLOT(processError(QProcess::ProcessError)));
+        //--qRegisterMetaType<QProcess::ProcessState>("QProcess::ProcessState");
+        //--connect(p, SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(processStateChanged(QProcess::ProcessState)));
+
+        //QStringList e = QProcess::systemEnvironment();
+        //e.append(QString("PGPASSFILE=%1").arg(m_parent->sPgPass) );
+        //p->setEnvironment(e);
+
         QString sql = QString("\"select hStartHandler('%1', %2)\"").arg(service).arg(id);
         
         QString program = QString("%1 -h %2 -p %3 -U %4 -c %5 %6")
-                           .arg(psql)
+                           .arg(m_parent->sPsqlPath)
                            .arg(m_parent->ipServer)
                            .arg(m_parent->port)
                            .arg(m_parent->user)
                            .arg(sql)
                            .arg(m_parent->database);
 
-        p->start(program);
-        bool ok = p->waitForStarted();
+        //p->start(program);
+        QProcess::startDetached(program);
+
+        /*bool ok = p->waitForStarted();
         if(!ok){
             qWarning() << "Program " << service << " cannot start!";
             delete p;
@@ -218,7 +232,32 @@ void DDocServerListener::notify( char* notify_name, char * payload )
             delete p;
             return;
         }
+        */
     }
-
-   
 }
+
+/*
+void DDocServerListener::processFinished1(int code, QProcess::ExitStatus status)
+{
+    QProcess * p = qobject_cast<QProcess *>(this->sender());
+    if(!p)
+        return;
+
+    p->kill();
+}
+
+void DDocServerListener::processError(QProcess::ProcessError err)
+{
+    QProcess * p = qobject_cast<QProcess *>(this->sender());
+    if(!p)
+        return;
+}
+
+void DDocServerListener::processStateChanged(QProcess::ProcessState state)
+{
+    QProcess * p = qobject_cast<QProcess *>(this->sender());
+    if(!p)
+        return;
+}
+
+*/

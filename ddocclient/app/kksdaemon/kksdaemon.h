@@ -7,14 +7,18 @@
 #include <QtCore/QDir>
 #include <QThread>
 #include <QtCore/QSettings>
+#include <QProcess>
+
 #include "qtservice.h"
 #include "pqnotify.h"
 #include "kkspgdatabase.h"
+
 
 class KKSDaemon;
 
 class DDocServerListener : public QThread, public IKKSListener
 {
+    Q_OBJECT
 public:
     DDocServerListener(KKSPGDatabase * db, QObject * parent):QThread(parent), m_db(NULL), m_parent(NULL){m_db = db;}
     ~DDocServerListener(){}
@@ -24,6 +28,10 @@ public:
     void setDaemon(KKSDaemon * d){m_parent = d;}
 
 
+//private slots:
+//    void processFinished1(int code, QProcess::ExitStatus status);
+//    void processError(QProcess::ProcessError);
+//    void processStateChanged(QProcess::ProcessState);
 private:
     KKSPGDatabase * m_db;
     KKSDaemon * m_parent;
@@ -47,6 +55,7 @@ protected:
     void processCommand(int code);
 
 
+
 private:
 
     friend class DDocServerListener;
@@ -64,7 +73,7 @@ private:
     QString passwd;
 
     QString sPgPass;
-    QString sExport;
+    QString sPsqlPath;
 };
 
 
