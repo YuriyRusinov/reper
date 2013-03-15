@@ -1,5 +1,7 @@
 SetOutPath "$INSTDIR\"
 SetOutPath "$INSTDIR\bin"
 File "${OPERATOR_DIR}\bin\ddocclient_app.exe"
+File "${OPERATOR_DIR}\bin\sync_queue_viwer.exe"
+File "${OPERATOR_DIR}\bin\kksdaemon.exe"
 SetOutPath "$INSTDIR\"
 File "${OPERATOR_DIR}\operator.ini"
