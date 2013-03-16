@@ -4,6 +4,7 @@
 #include <QtDebug>
 
 #include <KKSSearchTemplate.h>
+#include <KKSSearchTemplateType.h>
 #include "savesearchtemplateform.h"
 #include "ui_save_search_template_form.h"
 
@@ -44,6 +45,15 @@ void SaveSearchTemplateForm :: setTypesModel (QAbstractItemModel * typeMod)
     UI->tvSearchTemplateType->setModel (typeMod);
     if (oldMod && oldMod != typeMod)
         delete oldMod;
+    if (searchTemplate && searchTemplate->type())
+    {
+        QModelIndex sttInd = getCurrentType (searchTemplate->type()->id());
+        if (sttInd.isValid())
+        {
+            QItemSelectionModel * selModel = UI->tvSearchTemplateType->selectionModel ();
+            selModel->select (sttInd, QItemSelectionModel::ClearAndSelect);
+        }
+    }
 }
 
 int SaveSearchTemplateForm :: getIdCat (void) const
@@ -93,4 +103,28 @@ void SaveSearchTemplateForm :: staccept (void)
     qDebug () << __PRETTY_FUNCTION__;
     searchTemplate->setName (UI->lEName->text());
     QDialog::accept();
+}
+
+const QModelIndex& SaveSearchTemplateForm :: getCurrentType (int idType, const QModelIndex& pIndex) const
+{
+    if (!UI->tvSearchTemplateType->model())
+        return QModelIndex();
+    QAbstractItemModel * sTypeMod = UI->tvSearchTemplateType->model();
+    int nr = sTypeMod->rowCount (pIndex);
+    for (int i=0; i<nr; i++)
+    {
+        QModelIndex wIndex = sTypeMod->index (i, 0, pIndex);
+        if (wIndex.isValid() && idType == wIndex.data (Qt::UserRole).toInt())
+            return wIndex;
+        else if (sTypeMod->rowCount (wIndex) > 0)
+        {
+            QModelIndex chIndex;
+            chIndex = getCurrentType (idType, wIndex);
+            if (chIndex.isValid())
+                return chIndex;
+        }
+        else
+            continue;
+    }
+    return QModelIndex ();
 }

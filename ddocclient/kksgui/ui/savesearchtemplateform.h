@@ -10,6 +10,7 @@ namespace Ui
 };
 
 class QAbstractItemModel;
+class QModelIndex;
 
 class KKSSearchTemplate;
 
@@ -36,6 +37,7 @@ private:
     // Functions
     //
     void init (void);
+    const QModelIndex& getCurrentType (int idType, const QModelIndex& pIndex=QModelIndex()) const;
 
 private:
     //
