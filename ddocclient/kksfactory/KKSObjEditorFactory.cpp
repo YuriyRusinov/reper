@@ -6473,6 +6473,7 @@ void KKSObjEditorFactory :: saveSearchCriteria (KKSFilterGroup * group, const KK
     int numc (-1);
     Q_UNUSED (numc);
     Q_UNUSED (isContains);
+    Q_UNUSED (c);
     QString stName;
 /*    do
     {
@@ -6518,11 +6519,21 @@ void KKSObjEditorFactory :: saveSearchCriteria (KKSFilterGroup * group, const KK
     KKSViewFactory::getSearchTemplates (loader, searchTModel, QModelIndex(), false);
     SaveSearchTemplateForm * stForm = new SaveSearchTemplateForm (st);
     stForm->setTypesModel (searchTModel);
+    KKSList<const KKSFilterGroup *> filters;
+    QAbstractItemModel * catModel = KKSViewFactory::initCategoriesModel (loader, filters);
+    stForm->setCategoryModel (catModel);
     if (st && stForm->exec () == QDialog::Accepted)
     {
         KKSSearchTemplate * stt = stForm->getSearchTemplate ();
-        if(c)
-            st->setCategory(c->id(), c->name());
+//        if(c)
+//            st->setCategory(c->id(), c->name());
+        int idCat = stForm->getIdCat ();
+        KKSCategory * cat = loader->loadCategory (idCat);
+        if (cat)
+        {
+            st->setCategory (cat->id(), cat->name());
+            cat->release ();
+        }
 
         int idSearchTemplateType = stForm->getIdType ();
         KKSMap<int, KKSSearchTemplateType *> sTypes = loader->loadSearchTemplateTypes ();
@@ -6702,12 +6713,21 @@ void KKSObjEditorFactory :: addNewSearchTempl (const QModelIndex& parent,
                                                const KKSCategory * cat,
                                                const QString & tableName)
 {
-    Q_UNUSED (parent);
     QWidget * pWidget = qobject_cast <QWidget *>(this->sender());
+    QModelIndex pIndex = QModelIndex();
+    if (parent.isValid() && parent.data (Qt::UserRole+USER_ENTITY).toInt() != 0)
+        pIndex = parent.parent();
+    else if (parent.isValid() && parent.data (Qt::UserRole+USER_ENTITY).toInt() == 0)
+        pIndex = parent;
+
+    int idSearchType = pIndex.data (Qt::UserRole).toInt ();
     QString stName;
     KKSSearchTemplate * st = new KKSSearchTemplate (-1, 0, stName, loader->getUserId());
     if (!st)
         return;
+    KKSMap<int, KKSSearchTemplateType*> sTemplates = loader->loadSearchTemplateTypes ();
+    KKSSearchTemplateType * stt = sTemplates.value (idSearchType);
+    st->setType (stt);
 
     const KKSCategory * c = cat;
 
@@ -6750,21 +6770,21 @@ void KKSObjEditorFactory :: addNewSearchTempl (const QModelIndex& parent,
             stName = stdb->name ();
             stdb->release ();
             if(searchMod){
-                int nr = searchMod->rowCount();
-                searchMod->insertRows (nr, 1);
-                if (searchMod->columnCount() == 1)
+                int nr = searchMod->rowCount(pIndex);
+                searchMod->insertRows (nr, 1, pIndex);
+                if (searchMod->columnCount(pIndex) >= 1)
                 {
-                    QModelIndex wIndex = searchMod->index (nr, 0);
+                    QModelIndex wIndex = searchMod->index (nr, 0, pIndex);
                     searchMod->setData (wIndex, stName, Qt::DisplayRole);
                     searchMod->setData (wIndex, res, Qt::UserRole);
                 }
                 else
                 {
-                    QModelIndex wIndex = searchMod->index (nr, 0);
+                    QModelIndex wIndex = searchMod->index (nr, 0, pIndex);
                     searchMod->setData (wIndex, res, Qt::DisplayRole);
                     searchMod->setData (wIndex, res, Qt::UserRole);
                     
-                    wIndex = searchMod->index (nr, 1);
+                    wIndex = searchMod->index (nr, 1, pIndex);
                     searchMod->setData (wIndex, stName, Qt::DisplayRole);
                     searchMod->setData (wIndex, res, Qt::UserRole);
                 }
@@ -6803,9 +6823,9 @@ void KKSObjEditorFactory :: addCopySearchTempl (const QModelIndex& wIndex, QAbst
         QMessageBox::warning (qobject_cast<QWidget *>(this->sender()), tr ("Search templates"), tr ("Cannot insert copy of search template into db."), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
-    int nr = searchMod->rowCount ();
-    searchMod->insertRows (nr, 1);
-    QModelIndex stIndex = searchMod->index (nr, 0);
+    int nr = searchMod->rowCount (wIndex.parent());
+    searchMod->insertRows (nr, 1, wIndex.parent());
+    QModelIndex stIndex = searchMod->index (nr, 0, wIndex.parent());
     searchMod->setData (stIndex, stName, Qt::DisplayRole);
     searchMod->setData (stIndex, res, Qt::UserRole);
     searchMod->setData (stIndex, st->idAuthor (), Qt::UserRole+1);

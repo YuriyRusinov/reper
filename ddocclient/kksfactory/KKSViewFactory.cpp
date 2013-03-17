@@ -1024,9 +1024,15 @@ void KKSViewFactory :: loadCategories (KKSCategoryTemplateWidget* catTemplW,
                                        KKSLoader* l, 
                                        const KKSList<const KKSFilterGroup *> & filters)
 {
+    QAbstractItemModel * catTypeTemplModel = initCategoriesModel (l, filters);
+    catTemplW->uploadModel (catTypeTemplModel);
+}
+
+QAbstractItemModel* KKSViewFactory :: initCategoriesModel (KKSLoader* l, const KKSList<const KKSFilterGroup *> & filters)
+{
     KKSObject *catTypeObj = l->loadIO (IO_CAT_TYPE_ID, true);
     if(!catTypeObj)
-        return;
+        return 0;
 
     KKSMap<qint64, KKSEIOData *> categTypeMap = l->loadEIOList (catTypeObj, filters);
     
@@ -1037,15 +1043,26 @@ void KKSViewFactory :: loadCategories (KKSCategoryTemplateWidget* catTemplW,
 
     KKSObject * refCatObj = l->loadIO (IO_CAT_ID, true);
     if (!refCatObj)
-        return;
+    {
+        delete catTypeTemplModel;
+        return 0;
+    }
 
     KKSFilter * cMainFilter = refCatObj->category()->tableCategory()->createFilter (ATTR_IS_MAIN, QString("true"), KKSFilter::foEq);
     if (!cMainFilter)
-        return;
+    {
+        delete catTypeTemplModel;
+        refCatObj->release ();
+        return 0;
+    }
 
     KKSFilter * cArchFilter = refCatObj->category()->tableCategory()->createFilter (ATTR_IS_ARCHIVED, QString("FALSE"), KKSFilter::foEq);
     if (!cArchFilter)
-        return;
+    {
+        delete catTypeTemplModel;
+        refCatObj->release ();
+        return 0;
+    }
 
     int itype=0;
     for (pCatTypes=categTypeMap.constBegin(); pCatTypes != categTypeMap.constEnd(); ++pCatTypes)
@@ -1114,8 +1131,8 @@ void KKSViewFactory :: loadCategories (KKSCategoryTemplateWidget* catTemplW,
 
     refCatObj->release ();
     catTypeObj->release ();
-    
-    catTemplW->uploadModel (catTypeTemplModel);
+
+    return catTypeTemplModel;
 }
 
 /* Метод создает виджет с записями шаблонов категорий.

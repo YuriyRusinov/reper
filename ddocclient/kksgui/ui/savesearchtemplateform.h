@@ -2,6 +2,8 @@
 #define _SaveSearchTemplateForm_H
 
 #include <QDialog>
+#include <QModelIndex>
+
 #include <kksgui_config.h>
 
 namespace Ui
@@ -10,7 +12,6 @@ namespace Ui
 };
 
 class QAbstractItemModel;
-class QModelIndex;
 
 class KKSSearchTemplate;
 

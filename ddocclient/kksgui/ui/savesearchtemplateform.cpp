@@ -1,10 +1,10 @@
 #include <QAbstractItemModel>
 #include <QItemSelectionModel>
-#include <QModelIndex>
 #include <QtDebug>
 
 #include <KKSSearchTemplate.h>
 #include <KKSSearchTemplateType.h>
+#include <defines.h>
 #include "savesearchtemplateform.h"
 #include "ui_save_search_template_form.h"
 
@@ -64,7 +64,9 @@ int SaveSearchTemplateForm :: getIdCat (void) const
     QItemSelectionModel * selMod = UI->tvCategory->selectionModel ();
     QModelIndex wIndex = selMod->currentIndex ();
     wIndex = wIndex.sibling (wIndex.row(), 0);
-    return wIndex.isValid() ? wIndex.data (Qt::UserRole).toInt() : -1;
+    if (!wIndex.isValid() || wIndex.data (Qt::UserRole+USER_ENTITY).toInt() != 1)
+        return -1;
+    return wIndex.data (Qt::UserRole).toInt();
 }
 
 int SaveSearchTemplateForm :: getIdType (void) const
