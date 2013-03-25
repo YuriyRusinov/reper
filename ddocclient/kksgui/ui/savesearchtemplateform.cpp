@@ -1,9 +1,13 @@
 #include <QAbstractItemModel>
 #include <QItemSelectionModel>
+#include <QAbstractItemDelegate>
+#include <QMessageBox>
 #include <QtDebug>
 
 #include <KKSSearchTemplate.h>
 #include <KKSSearchTemplateType.h>
+#include <KKSEventFilter.h>
+#include <KKSItemDelegate.h>
 #include <defines.h>
 #include "savesearchtemplateform.h"
 #include "ui_save_search_template_form.h"
@@ -16,9 +20,16 @@ SaveSearchTemplateForm :: SaveSearchTemplateForm (KKSSearchTemplate * st,QWidget
     UI->setupUi (this);
     if (searchTemplate)
         searchTemplate->addRef ();
-
-    catChStateChanged (Qt::Unchecked);
-    connect (UI->chCategory, SIGNAL (stateChanged (int)), this, SLOT (catChStateChanged (int)) );
+    
+    QAbstractItemDelegate * sttDeleg = new KKSItemDelegate (this);
+    UI->tvSearchTemplateType->setItemDelegate (sttDeleg);
+    KKSEventFilter * sttEf = new KKSEventFilter (this);
+    UI->tvSearchTemplateType->viewport()->installEventFilter (sttEf);
+    
+    QAbstractItemDelegate * catDeleg = new KKSItemDelegate (this);
+    UI->tvCategory->setItemDelegate (catDeleg);
+    KKSEventFilter * catEf = new KKSEventFilter (this);
+    UI->tvCategory->viewport()->installEventFilter (catEf);
 
     connect (UI->pbOk, SIGNAL (clicked()), this, SLOT (staccept()) );
     connect (UI->pbCancel, SIGNAL (clicked()), this, SLOT (reject()) );
@@ -77,12 +88,6 @@ int SaveSearchTemplateForm :: getIdType (void) const
     return wIndex.isValid() ? wIndex.data (Qt::UserRole).toInt() : -1;
 }
 
-void SaveSearchTemplateForm :: catChStateChanged (int state)
-{
-    bool isEn (state == Qt::Checked);
-    UI->tvCategory->setEnabled (isEn);
-}
-
 QString SaveSearchTemplateForm :: getName (void) const
 {
     return UI->lEName->text();
@@ -103,6 +108,11 @@ KKSSearchTemplate * SaveSearchTemplateForm :: getSearchTemplate (void) const
 void SaveSearchTemplateForm :: staccept (void)
 {
     qDebug () << __PRETTY_FUNCTION__;
+    if (UI->lEName->text().isEmpty())
+    {
+        QMessageBox::warning (this, tr ("Search template"), tr ("Set search template name"), QMessageBox::Ok);
+        return;
+    }
     searchTemplate->setName (UI->lEName->text());
     QDialog::accept();
 }

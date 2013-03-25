@@ -16,12 +16,16 @@
 #include <QAction>
 #include <QToolBar>
 #include <QLineEdit>
+#include <QAbstractItemDelegate>
+#include <QMessageBox>
 #include <QtDebug>
 
 #include "KKSSearchTemplatesForm.h"
 #include "KKSHIntervalW.h"
 #include "defines.h"
 #include "KKSCategory.h"
+#include <KKSEventFilter.h>
+#include <KKSItemDelegate.h>
 
 KKSSearchTemplatesForm :: KKSSearchTemplatesForm (const KKSCategory * c1, const QString & tableName, QWidget * parent, Qt::WFlags f)
     : QDialog (parent, f),
@@ -48,6 +52,12 @@ KKSSearchTemplatesForm :: KKSSearchTemplatesForm (const KKSCategory * c1, const 
 
     QItemSelectionModel * selModel = searchView->selectionModel ();
     QHeaderView * hv = searchView->header();
+
+    QAbstractItemDelegate * sDeleg = new KKSItemDelegate (this);
+    searchView->setItemDelegate (sDeleg);
+    
+    KKSEventFilter * ef = new KKSEventFilter (this);
+    searchView->viewport()->installEventFilter (ef);
     hv->setClickable (true);
     hv->setSortIndicatorShown (true);
     hv->setSortIndicator (0, Qt::AscendingOrder);
@@ -202,7 +212,7 @@ void KKSSearchTemplatesForm :: init (void)
     pbSizePol.setHorizontalStretch (0);
 
     QHBoxLayout * hButtonsLay = new QHBoxLayout ();
-    hButtonsLay->addStretch (0);
+    hButtonsLay->addStretch (1);
     //QSpacerItem *sp = new QSpacerItem (40, 20, QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
     //gLayout->addItem (sp, 2, 0, 1, 1, Qt::AlignLeft | Qt::AlignTop);
 

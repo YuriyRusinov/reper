@@ -30,7 +30,6 @@ public:
     KKSSearchTemplate * getSearchTemplate (void) const;
 
 private slots:
-    void catChStateChanged (int state);
     void staccept (void);
 
 private:

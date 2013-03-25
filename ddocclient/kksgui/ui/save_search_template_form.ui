@@ -39,13 +39,6 @@
       <item row="0" column="0">
        <widget class="QTreeView" name="tvCategory"/>
       </item>
-      <item row="1" column="0">
-       <widget class="QCheckBox" name="chCategory">
-        <property name="text">
-         <string>Category</string>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
    </item>
@@ -81,14 +74,6 @@
     </layout>
    </item>
   </layout>
-  <zorder>lName</zorder>
-  <zorder>lEName</zorder>
-  <zorder>tvSearchTemplateType</zorder>
-  <zorder>pbOk</zorder>
-  <zorder>pbCancel</zorder>
-  <zorder>horizontalSpacer</zorder>
-  <zorder>gbCategory</zorder>
-  <zorder>pbOk</zorder>
  </widget>
  <resources/>
  <connections/>
