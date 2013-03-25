@@ -6923,17 +6923,24 @@ void KKSObjEditorFactory :: updateSearchTempl (const QModelIndex& wIndex, QAbstr
                     else
                     {
                         QModelIndex wcIndex = wIndex.sibling (wIndex.row(), 0);
-                        searchMod->setData (wcIndex, res, Qt::DisplayRole);
-                        searchMod->setData (wcIndex, res, Qt::UserRole);
-
-                        wcIndex = wIndex.sibling (wIndex.row(), 1);
                         searchMod->setData (wcIndex, stName, Qt::DisplayRole);
                         searchMod->setData (wcIndex, res, Qt::UserRole);
+
+                        wcIndex = wIndex.sibling (wIndex.row(), 2);
+                        searchMod->setData (wcIndex, stdb->creationDatetime().toString("dd.MM.yyyy"), Qt::DisplayRole);
+                        searchMod->setData (wcIndex, res, Qt::UserRole);
                         
+                        wcIndex = wIndex.sibling (wIndex.row(), 3);
+                        searchMod->setData (wcIndex, stdb->categoryName(), Qt::DisplayRole);
+                        searchMod->setData (wcIndex, res, Qt::UserRole);
+
+                        wcIndex = wIndex.sibling (wIndex.row(), 4);
+                        searchMod->setData (wcIndex, stdb->type()->name(), Qt::DisplayRole);
+                        searchMod->setData (wcIndex, res, Qt::UserRole);
                     }
                 }
-                int dres = ppf->deleteSearchGroup (oldIdGroup);//m_group->id());
-                qDebug () << __PRETTY_FUNCTION__ << dres;
+                //int dres = ppf->deleteSearchGroup (oldIdGroup);//m_group->id());
+                //qDebug () << __PRETTY_FUNCTION__ << dres;
             }
         }
 
