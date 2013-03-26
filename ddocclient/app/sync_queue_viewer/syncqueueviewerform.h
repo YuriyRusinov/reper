@@ -2,6 +2,7 @@
 #define _SYNCQUEUEVIEWRFORM_H
 
 #include<QDialog>
+#include <QMouseEvent>
 
 #include "syncqueueitemmodel.h"
 
@@ -19,23 +20,60 @@ class SyncQueueViewerForm : public QDialog
     Q_OBJECT
 
     public:
+		//*****Создание и уничтожение экземпляра класса*****
         SyncQueueViewerForm(KKSDatabase * adb, QWidget * parent=NULL);
         ~SyncQueueViewerForm ();
+		//**********
 
+	protected:
 		//
-		//Возвращение строки запроса курсора
+		//Обработчик события изменения размера
+		//
+		virtual void resizeEvent(QResizeEvent * pe);
+		void mousePressEvent ( QMouseEvent * event );
+		void mouseReleaseEvent ( QMouseEvent * event );
+
+    private slots:
+		//
+		//Слот вызова диалога для установки фильтров
+		//
+		void slot_filters_setup();
+		//
+		//Слот обращения к базе данных
         //
-		QString GetCursorString(){return sqlCursor;}
+		void slot_viewClicked();
+		//
+		//Слот обновления данных модели
+		//
+		void slot_updateModelData(int i_topRow,int i_bottomRow);
+
+	private:
 		//
 		//Возвращение числа колонок в курсоре
         //
 		int countInCursor();
+		//
+		//Функция открытия курсора
+		//
+		bool openCursor();
+		//
+		//Функция получения данных из базы данных
+		//
+		int DBdata(int i_topRow,int i_bottomRow);
+		//
+		//Установка значения полосы прокрутки
+		//
+		void setScrollValue(int i_value);
+		//
+		//Функция закрытия курсора
+		//
+		void closeCursor();
+		//
+		//Функция инициализации виджета
+		//
+		void initWidget();
 
-        int GetColumnCount(){return countColumn;}
-        int GetRowCount(){return countRow;}
-
-        SyncQueueView* GetTreeView(){ return syncQueueTreeWnd;}
-    private:
+	private:
 		//
 		//Кнопки управления
 		//
@@ -55,37 +93,27 @@ class SyncQueueViewerForm : public QDialog
 		//Модель отображения данных
 		//
 		SyncQueueItemModel * model;
-
-        QString sqlCursor;	  //Переменная для хранения запроса
-
-        KKSDatabase * db;	  //Указатель на базу данных
-
-        bool cursor_open_file;//Флаг открытия файла курсора
-        bool cursor_open;     //Флаг открытия курсора
-
-        int countColumn;	  //Количество столбцов
-        int countRow;		  //Количество строк
-        int count_colomn_logfile;
-
-    private slots:
 		//
-		//Слот вызова диалога для установки фильтров
+		//Переменная для хранения запроса
 		//
-		void slot_filters_setup();
+        QString sqlCursor;	
 		//
-		//Слот обращения к базе данных
+		//Указатель на базу данных
         //
-		void on_pbView_clicked();
-		//
-		//Слот обновления данных модели
-		//
-		void slot_updateModelData(int input_topRow,int input_bottomRow);
+		KKSDatabase * db;	  
 
-	private:
-		//
-		//Функция получения данных из базы данных
-		//
-		void DBdata(int input_topRow,int input_bottomRow);
+		//*****Флаги*****
+        bool cursor_open; //Флаг открытия курсора
+
+		bool flag_clicked;//Флаг нажатой кнопки
+		bool flag_error;  //Флаг ошибки
+		//**********
+
+        int countColumn;  //Общее количество столбцов
+        int countRow;	  //Общее количество строк
+
+		int t_dataRow;
+		int b_dataRow;
 };
 
 #endif

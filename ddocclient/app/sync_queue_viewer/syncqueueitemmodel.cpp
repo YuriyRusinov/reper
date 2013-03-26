@@ -9,53 +9,23 @@
 
 SyncQueueItemModel::SyncQueueItemModel(int iCountRow, 
                                        int iCountColumn, 
-                                       QObject * parent) : QAbstractTableModel(parent)
+                                       QObject * parent) : QAbstractTableModel(parent), modelData(0), countRow(iCountRow),
+														   countColumn(iCountColumn), topRowIndex(-1), bottomRowIndex(-1), emptyData(true)
 {
-    modelData = 0;
-	
-	countRow = iCountRow;
-    countColumn = iCountColumn;
-
-	topRowIndex = 0;
-	bottomRowIndex = 0;
-
-	emptyData = true;
 }
 
-//***** *****
-QVariant SyncQueueItemModel::data(const QModelIndex & index, int role) const
-{
-	//Если индекс неверен или роль не имеет значения "выбранные данные отображаются как текст", вернуть ошибку
-    if (!index.isValid() || (role != Qt::DisplayRole && role != Qt::BackgroundRole))
-        return QVariant();
-	//Если индекс неверен вернуть ошибку
-	if(index.column() < 0 || index.column() > TableView::TABLE_COLUMN_COUNT_VIEW)
-        return QVariant();
-
-	if(index.row() >= topRowIndex && index.row() <= bottomRowIndex && role == Qt::BackgroundRole && !emptyData)
-	{
-		if(modelData->value(TableView::TABLE_COLUMN_COUNT_VIEW*(index.row()-topRowIndex)+index.column()) == "1")
-		{
-			return Qt::red;
-		}
-	}
-
-	if(index.row() >= topRowIndex && index.row() <= bottomRowIndex && role == Qt::DisplayRole && !emptyData)
-	{
-		int k = TableView::TABLE_COLUMN_COUNT_VIEW*(index.row()-topRowIndex)+index.column();
-		return modelData->value(k);
-	}
-
-    return QVariant();
-}
-//**********
-
+//*****Функции для работы с параметрами строк и столбцов таблицы*****
+//
+//Возврат количества столбцов
+//
 int SyncQueueItemModel::columnCount ( const QModelIndex & parent ) const
 {
     Q_UNUSED ( parent );
     return countColumn;
 }
-
+//
+//Возврат количества строк потомков для узла
+//
 int SyncQueueItemModel::rowCount ( const QModelIndex & parent ) const
 {
 	if(parent.isValid())
@@ -63,9 +33,263 @@ int SyncQueueItemModel::rowCount ( const QModelIndex & parent ) const
 	else
 		return countRow;
 }
+//
+//Возврат индекса верхней видимой строки
+//
+int SyncQueueItemModel::getTopViewRow() const
+{
+	return topRowIndex;
+}
+//
+//Возврат индекса нижней видимой строки
+//
+int SyncQueueItemModel::getBottomViewRow() const
+{
+	return bottomRowIndex;
+}
+//
+//Функция установки видимой области виджета отображения
+//В случае если полученные индексы ошибочны возвращает false
+//
+bool SyncQueueItemModel::setWindowIndex(int i_topRowIndex,int i_bottomRowIndex)
+{
+	//*****Проверки на непротиворечивость индексов видимых строк*****
+	if(i_topRowIndex < 0 || i_bottomRowIndex < 0)
+		return false;
+	if(i_topRowIndex > i_bottomRowIndex)
+		return false;
+	//**********
 
+	//*****Проверки на общую непротиворечивость индексов*****
+	if(i_bottomRowIndex >= countRow)
+		return false;
+	//**********
 
-//*****Установка заголовков столбцов*****
+	topRowIndex = i_topRowIndex; 
+	bottomRowIndex = i_bottomRowIndex;
+
+	return true;
+}
+//
+//Функция установки количества столбцов в таблице
+//В случае если количество столбцов неверно возвращает false
+//
+bool SyncQueueItemModel::setColumn(int i_totalColumn)
+{
+	if(i_totalColumn <= 0)
+		return false;
+	
+	countColumn = i_totalColumn;
+
+	return true;
+}
+//
+//Функция установки количества строк в таблице
+//В случае если количество столбцов неверно возвращает false
+//
+bool SyncQueueItemModel::setRow(int i_totalRow)
+{
+	if(i_totalRow <= 0)
+		return false;
+	
+	countRow = i_totalRow;
+
+	return true;
+}
+//
+//Добавление строки в позицию i_index
+//
+bool SyncQueueItemModel::insertDataRow(int i_index,const QVector<QString>* i_dataRow)
+{
+	//*****Проверка на правильное значение индекса строки*****
+	if(i_index <= 0 || i_index > getViewRowsCount() || countColumn <= 0)
+		return false;
+	//**********
+	
+	//*****Проверка на наличие данных в модели и их соответствие параметрам хранимых данных*****
+	if(!modelData || i_dataRow->size() != countColumn)
+		return false;
+	//**********
+
+	for(int i = 0; i < countColumn ; i++)
+	{
+		modelData->insert((i_index-2)*(countColumn),i_dataRow->value(countColumn - 1 - i));
+	}
+
+	return true;
+}
+//
+//Удаление строки из позиции i_index
+//
+bool SyncQueueItemModel::deleteDataRow(int i_index)
+{
+	//*****Проверка на правильное значение индекса строки*****
+	if(i_index <= 0 || i_index > getViewRowsCount() || countColumn <= 0)
+		return false;
+	//**********
+	
+	//*****Проверка на наличие данных в модели и их соответствие параметрам хранимых данных*****
+	if(!modelData || (i_index-1)*countColumn+(countColumn-1) >= modelData->size())
+		return false;
+	//**********
+
+	for(int i = 0; i < countColumn ; i++)
+	{
+		modelData->remove((i_index-1)*countColumn);
+	}
+
+	return true;
+}
+//
+//Возврат отображаемого количества строк
+//
+int SyncQueueItemModel::getViewRowsCount() const
+{
+	return bottomRowIndex - topRowIndex + 1;
+}
+//**********
+
+//*****Функция для получения и обработки данных*****
+//
+//Возврат указателя на данные модели
+//
+const QVector< QString >* const SyncQueueItemModel::getDataVector() const
+{
+	return modelData;
+}
+//
+//Функция передачи данных в модель
+//
+bool SyncQueueItemModel::setDataVector(QVector< QString >* i_modelData)
+{
+	//
+	//Если данные отсутствуют вернуть false
+	//
+	if(!i_modelData)
+		return false;
+	//
+	//Если в модели уже есть данные, удалить их
+	//
+	if(modelData)
+	{
+		delete modelData;
+		modelData = 0;
+	}
+		
+	modelData = i_modelData;
+
+	emptyData = false;
+}
+//
+//Переопределенный метод data()
+//
+QVariant SyncQueueItemModel::data(const QModelIndex & index, int role) const
+{
+	//Если индекс неверен или роль не имеет значения "выбранные данные отображаются как текст", вернуть ошибку
+    if (!index.isValid() || (role != Qt::DisplayRole && role != Qt::BackgroundRole))
+        return QVariant();
+	//Если индекс неверен вернуть ошибку
+	if(index.column() < 0 || index.column() > countColumn)
+        return QVariant();
+
+	if(index.row() >= topRowIndex && index.row() <= bottomRowIndex && role == Qt::BackgroundRole && !emptyData)
+	{
+		if(modelData->value(countColumn*(index.row()-topRowIndex)+countColumn-1) == "4")
+		{
+			return Qt::red;
+		}
+		if(modelData->value(countColumn*(index.row()-topRowIndex)+countColumn-1) == "3")
+		{
+			return Qt::green;
+		}
+		if(modelData->value(countColumn*(index.row()-topRowIndex)+countColumn-1) == "2")
+		{
+			return Qt::yellow;
+		}
+	}
+
+	if(index.row() >= topRowIndex && index.row() <= bottomRowIndex && role == Qt::DisplayRole && !emptyData)
+	{
+		int k = countColumn*(index.row()-topRowIndex)+index.column();
+
+		QString res = modelData->value(k);
+
+		switch(index.column())
+		{
+			case 5:
+			{
+				if(res == "1")
+					res = tr("category(system)");
+				if(res == "2")
+					res = tr("IO(system)");
+				if(res == "3")
+					res = tr("IOR(directory record)");
+				if(res == "4")
+					res = tr("IOR(record additional table directory)");
+				if(res == "5")
+					res = tr("additional table directory");
+				if(res == "6")
+					res = tr("transfer request to the ping");
+				if(res == "8")
+					res = tr("transfer complete directory of organizations to the new object");
+				if(res == "9")
+					res = tr("transfer directory entries for all organizations involved in the exchange of information objects");
+				if(res == "10")
+					res = tr("public DL");
+
+				break;
+			}
+			case 6:
+			{
+				if(res == "1")
+					res = tr("create a new entity on the target");
+				if(res == "2")
+					res = tr("replace the entity for this on the target");
+				if(res == "3")
+					res = tr("delete entity on the target");
+
+				break;
+			}
+			case 7:
+			{
+				if(res == "1")
+					res = tr("expected timing");
+				if(res == "2")
+					res = tr("synchronized");
+				if(res == "3")
+					res = tr("synchronization is successful");
+				if(res == "4")
+					res = tr("there was an error");
+
+				break;
+			}
+		}
+
+		return res;
+	}
+
+    return QVariant();
+}
+//
+//Функция установки флага пустой модели
+//Предыдущее значение флага возвращается
+//
+bool SyncQueueItemModel::setEmptyData(bool newFlag)
+{
+	bool oldEmptyData = emptyData;
+	emptyData = newFlag;
+	return oldEmptyData;
+}
+//
+//Возврат значения флага пустой модели
+//
+bool SyncQueueItemModel::getEmptyData() const
+{
+	return emptyData;
+}
+//**********
+
+//*****Установка заголовков таблицы*****
 QVariant SyncQueueItemModel::headerData(int section, 
                                         Qt::Orientation orientation,
                                         int role) const
@@ -95,28 +319,33 @@ QVariant SyncQueueItemModel::headerData(int section,
 
     return QVariant();
 }
+//**********
 
-//Установка размеров видимого окна
-void SyncQueueItemModel::setWindowIndex(int input_topRowIndex,int input_bottomRowIndex)
+//*****Поскольку потомков у узлов нет функция возвращает всегда false*****
+bool SyncQueueItemModel::hasChildren ( const QModelIndex & parent ) 
 {
-	topRowIndex = input_topRowIndex; 
-	bottomRowIndex = input_bottomRowIndex;
+	return false;
 }
+//**********
 
-bool SyncQueueItemModel::setEmptyData(bool newFlag)
+//*****Вспомогательные функции*****
+//
+//Функция сброса модели в начальное состояние
+//
+void SyncQueueItemModel::clear()
 {
-	bool oldEmptyData = emptyData;
-	emptyData = newFlag;
-	return oldEmptyData;
-}
+	countColumn = 0;
+	countRow = 0;
 
-//
-//Функция передачи данных в модель
-//
-void SyncQueueItemModel::setDataVector(QVector< QString >* i_modelData)
-{
+	bottomRowIndex = -1;
+	topRowIndex = -1;
+
 	if(modelData)
+	{
 		delete modelData;
-		
-	modelData = i_modelData;
+		modelData = 0;
+	}
+
+	emptyData = true;
 }
+//**********

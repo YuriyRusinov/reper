@@ -8,10 +8,11 @@
 #include "syncqueueview.h"
 #include "syncqueueviewform.h"
 #include "filtersform.h"
-
+	
+//*****Создание и уничтожение экземпляра класса*****
 SyncQueueViewerForm :: SyncQueueViewerForm(KKSDatabase * adb, QWidget * parent) :
-    QDialog (parent)
-{
+    QDialog (parent), model(0), flag_clicked(false),t_dataRow(-1),b_dataRow(-1),flag_error(false)
+{	
 	//****Создание элементов интерфейса и их группировка****
 	qpb_filters = new QPushButton(tr("Filters"),this);//Кнопка вызова диалога фильтров
 	qpb_delete  = new QPushButton(tr("Delete"),this); //Кнопка удаления
@@ -21,12 +22,10 @@ SyncQueueViewerForm :: SyncQueueViewerForm(KKSDatabase * adb, QWidget * parent) 
 	qpb_exit    = new QPushButton(tr("Exit"),this);   //Кнопка выхода
 	qpb_view    = new QPushButton(tr("View"),this);   //Кнопка выполнения запроса и отображения данных
 
-	QSplitter* qsh_fcB_splitter = new QSplitter(Qt::Horizontal,this);
 	QSplitter* qsh_cBe_splitter = new QSplitter(Qt::Horizontal,this);
 
 	QHBoxLayout* qhbl_topButtons = new QHBoxLayout();
 	qhbl_topButtons->addWidget(qpb_filters);
-	qhbl_topButtons->addWidget(qsh_fcB_splitter);
 	qhbl_topButtons->addWidget(qpb_view);
 	qhbl_topButtons->addWidget(qpb_delete);
 	qhbl_topButtons->addWidget(qpb_restart);
@@ -51,6 +50,10 @@ SyncQueueViewerForm :: SyncQueueViewerForm(KKSDatabase * adb, QWidget * parent) 
 	syncQueueTreeWnd = new SyncQueueView(this);
     syncQueueTreeWnd->setObjectName(QString::fromUtf8("syncQueueTreeWnd"));
 
+	setWindowTitle(tr("Data base view"));
+
+	model = new SyncQueueItemModel(countRow,countColumn,this);
+
 	//
 	//Размещение поля вывода запроса в главной форме
     //
@@ -61,34 +64,156 @@ SyncQueueViewerForm :: SyncQueueViewerForm(KKSDatabase * adb, QWidget * parent) 
 	//Флаги открытия курсора устанавливаются в false
 	//
     cursor_open = false;
-    cursor_open_file = false;
-    count_colomn_logfile = 8;
 
 	//
 	//Подключение элементов интерфейса
 	//
 	QObject::connect(qpb_exit,SIGNAL(clicked()),this,SLOT(close()));
 	QObject::connect(qpb_filters,SIGNAL(clicked()),this,SLOT(slot_filters_setup()));
-	QObject::connect(qpb_view,SIGNAL(clicked()),this,SLOT(on_pbView_clicked()));
+	QObject::connect(qpb_view,SIGNAL(clicked()),this,SLOT(slot_viewClicked()));
 
 	QObject::connect(syncQueueTreeWnd,SIGNAL(signal_viewRows(int,int)),this,SLOT(slot_updateModelData(int,int)));
 }
 
-SyncQueueViewerForm:: ~SyncQueueViewerForm(void)
+SyncQueueViewerForm::~SyncQueueViewerForm(void)
 {
     db->close("sync_cursor_file");
     db->close("sync_cursor");
     db->close("init_cursor");
 
     db->commit();
+
+	releaseMouse();
+}
+//**********
+
+//
+//Обработчик события изменения размера
+//
+void SyncQueueViewerForm::resizeEvent(QResizeEvent * pe)
+{
+	if(!cursor_open)
+		return;
+	if(flag_clicked)
+		return;
+
+	if(openCursor())
+	{
+		syncQueueTreeWnd->clear();
+		model->clear();
+		
+		countRow = countInCursor();
+		syncQueueTreeWnd->setRowCount(countRow);
+		model->setColumn(countColumn);
+		model->setRow(countRow);
+		model->setEmptyData(true);
+
+		t_dataRow = -1;
+		b_dataRow = -1;
+
+		//*****Настройка элемента отображения в соответствии с курсором*****
+		syncQueueTreeWnd->setModel(model);
+
+		syncQueueTreeWnd->slot_viewRows();
+
+		model->setEmptyData(false);
+	
+		syncQueueTreeWnd->updateData();
+		//**********
+	}
+}
+//
+//Слот вызова диалога для установки фильтров
+//
+void SyncQueueViewerForm::slot_filters_setup()
+{
+	FiltersForm* filtersDialog = new FiltersForm(this);
+
+	if(filtersDialog->exec() == QDialog::Accepted)
+	{
+		QMessageBox::information(0,"Information","Yes");
+	}
+
+	delete filtersDialog;
+}
+//
+//Слот обращения к базе данных
+//
+void SyncQueueViewerForm::slot_viewClicked()
+{
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+	
+	if(!openCursor())
+	{
+		return;
+	}
+
+	syncQueueTreeWnd->clear();
+	model->clear();
+
+	//Задание количества столбцов
+	countColumn = TableView::TABLE_COLUMN_COUNT_VIEW;
+	//Получение количества строк в курсоре
+    countRow = countInCursor();
+
+	if(countRow == -1)
+	{
+		QMessageBox::information(0,tr("countRow"),tr("countRow = -1!"));
+		return;
+	}
+	if(!syncQueueTreeWnd->setRowCount(countRow))
+	{
+		QMessageBox::information(0,tr("syncQueueTreeWnd->setRowCount(countRow)"),tr("!countRow"));
+		return;
+	}
+
+	if(!model->setColumn(countColumn))
+	{	
+		QMessageBox::information(0,tr("!model->setColumn(countColumn)"),tr("!countColumn"));
+		return;
+	}
+	if(!model->setRow(countRow))
+	{
+		QMessageBox::information(0,tr("!model->setRow(countRow)"),tr("!countRow"));
+		return;
+	}
+
+	//*****Настройка элемента отображения в соответствии с курсором*****
+	syncQueueTreeWnd->setModel(model);
+
+	syncQueueTreeWnd->slot_viewRows();
+
+	model->setEmptyData(false);
+	
+	syncQueueTreeWnd->updateData();
+	//**********
+
+    QApplication::restoreOverrideCursor();
+}
+//
+//Слот обновления данных модели
+//
+void SyncQueueViewerForm::slot_updateModelData(int i_topRow,int i_bottomRow)
+{
+	DBdata(i_topRow,i_bottomRow);
 }
 
+//*****Закрытые функции*****
+//
+//Возвращение числа колонок в курсоре
+//
 int SyncQueueViewerForm::countInCursor()
 {
 	//
-	//Инициализация указателя на результат запроса значением NULL
+	//Если курсор закрыт вернуть -1
 	//
-	KKSResult* res = NULL;
+	if(!cursor_open)
+		return -1;
+
+	//
+	//Инициализация указателя на результат запроса значением 0
+	//
+	KKSResult* res = 0;
 
 	//
 	//Инициализация переменной cur с целью определения количества опрашиваемых таблиц
@@ -125,29 +250,30 @@ int SyncQueueViewerForm::countInCursor()
     //
 	else
     {
-        countRow = 0;
+		db->commit();
+		countRow = 0;
         return 0;
     }
 }
-
-
-
-void SyncQueueViewerForm::on_pbView_clicked()
+//
+//Функция открытия курсора
+//
+bool SyncQueueViewerForm::openCursor()
 {
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-
 	//
 	//Проверка существования курсора, в случае если истина - закрытие
     //
 	if(cursor_open)
-    {
-        db->close("sync_cursor");
-        db->close("sync_cursor_file");
-        db->close("init_cursor");
+    {       
+		closeCursor();
     }
 
-    sqlCursor.clear();
+	//
+	//Установка флага открытия курсора в false
+	//
+	cursor_open = false;
 
+    sqlCursor.clear();
 
     /*
                             select \
@@ -177,9 +303,8 @@ void SyncQueueViewerForm::on_pbView_clicked()
                             where \
                                 1=1 \
     
-    //*/
+    */
 
-	//***** *****
 	//
 	//Запрос к базе данных в формате QString
 	//
@@ -212,8 +337,6 @@ void SyncQueueViewerForm::on_pbView_clicked()
                                 1=1 \
                         ");
 
-	//Выбрать все данные из таблицы и упорядочить по первому столбцу
-	//sqlCursor = QString("select * from out_sync_queue where 1=1");
 /*
 
     QString aa = filterF->getOrg();
@@ -250,20 +373,16 @@ void SyncQueueViewerForm::on_pbView_clicked()
 	//Упорядочивание таблицы по первому столбцу
 	//
     sqlCursor += QString(" order by 1");
-	//**********
 
 	//
-	//Установка флага курсора в положение открыт
-    //
-	cursor_open = true;
-
+	//
+	//
 	KKSResult * res = 0;
 
 	//
 	//Открытие базы данных
 	//
 	db->begin();
-	
 	//
 	//Объявление курсора
 	//
@@ -272,112 +391,344 @@ void SyncQueueViewerForm::on_pbView_clicked()
 	if(!res)
 	{
 		db->commit();
-		QMessageBox::information(0,tr("Information"),tr("Can't declare cursor!"));
+		return false;
 	}
 
-	res = db->declare("sync_cursor_file", sqlCursor);
+	//res = db->declare("sync_cursor_file", sqlCursor);
     
-	if(!res)
-	{
-		db->commit();
-		QMessageBox::information(0,tr("Information"),tr("Can't declare cursor!"));
-	}
+	//if(!res)
+	//{
+		//db->commit();
+		//return false;
+	//}
 	
-	res = db->declare("init_cursor", sqlCursor);
+	//res = db->declare("init_cursor", sqlCursor);
 
-	if(!res)
-	{
-		db->commit();
-		QMessageBox::information(0,tr("Information"),tr("Can't declare cursor!"));
-	}
+	//if(!res)
+	//{
+		//db->commit();
+		//return false;
+	//}
 
-	//Задание количества столбцов
-	countColumn = TableView::TABLE_COLUMN_COUNT_VIEW;
-	//Получение количества строк в курсоре
-    countRow = countInCursor();
+	//
+	//Установка флага курсора в положение открыт
+    //
+	cursor_open = true;
 
-	syncQueueTreeWnd->setRowCount(countRow);
-	model = new SyncQueueItemModel(countRow,countColumn,this);
-	
-	//*****Настройка элемента отображения в соответствии с курсором*****
-	syncQueueTreeWnd->setModel(model);
-
-	syncQueueTreeWnd->slot_resizeEvent();
-
-	model->setEmptyData(false);
-
-	syncQueueTreeWnd->UpdateData();
-	//**********
-
-    QApplication::restoreOverrideCursor();
+	return true;
 }
-
-//Слот вызова диалога для установки фильтров
-void SyncQueueViewerForm::slot_filters_setup()
-{
-	FiltersForm* filtersDialog = new FiltersForm(this);
-
-	if(filtersDialog->exec() == QDialog::Accepted)
-	{
-		QMessageBox::information(0,"Information","Yes");
-	}
-
-	delete filtersDialog;
-}
-
 //
-//Слот обновления данных модели
+//Функция получения данных из базы данных
 //
-void SyncQueueViewerForm::slot_updateModelData(int input_topRow,int input_bottomRow)
+int SyncQueueViewerForm::DBdata(int i_topRow,int i_bottomRow)
 {
-	DBdata(input_topRow,input_bottomRow);
-}
-		
-void SyncQueueViewerForm::DBdata(int input_topRow,int input_bottomRow)
-{
-	QVector<QString>* v_DBData = new QVector<QString>();
+	QVector<QString>* v_DBData = 0;
+	int pos = -1;
+	KKSResult* res = 0;
+	int col = -1;
 
-	int pos = input_topRow;
-    KKSResult * res = NULL;             //Результат запроса базы данных
-	QString dd;
-	
-	for(int i = 0 ; i < (input_bottomRow-input_topRow); i++)
+	if(t_dataRow == -1 && b_dataRow == -1)
 	{
-		pos = input_topRow+i;
+		t_dataRow = i_topRow;
+		b_dataRow = i_bottomRow;
+
+		if(syncQueueTreeWnd->model())
+		{
+			v_DBData = new QVector<QString>;
+			
+			for(int i = 0; i < (i_bottomRow - i_topRow); i++)
+			{			
+				pos = t_dataRow+i;
+
+				res = db->fetch("sync_cursor", 4, pos+1);
 		
-		res = db->fetch("sync_cursor", 4, pos+1);
+				if(!res)
+				{
+					db->commit();
+					QMessageBox::information(0,tr("fetch break"),tr("Cursor can't return data!"));
+					return -1;
+				}
 
-		if(!res)
-		{
-			db->commit();
-			QMessageBox::information(0,tr("fetch break"),tr("Cursor can't return data!"));
-			return;
-		}
-
-		for(int j = 0; j < TableView::TABLE_COLUMN_COUNT ; j++)
-		{
-			switch(j)
-			{
-				case 1:
-					v_DBData->append(res->getCellAsString(0,j));break;
-				case 5:
-					v_DBData->append(res->getCellAsString(0,j));break;
-				case 8:
-					v_DBData->append(res->getCellAsString(0,j));break;
-				case 9:
-					v_DBData->append(res->getCellAsString(0,j));break;
-				case 11:
-					v_DBData->append(res->getCellAsString(0,j));break;
-				case 12:
-					v_DBData->append(res->getCellAsString(0,j));break;
-				case 13:
-					v_DBData->append(res->getCellAsString(0,j));break;
-				case 14:
-					v_DBData->append(res->getCellAsString(0,j));break;
+				for(int j = 0; j < TableView::TABLE_COLUMN_COUNT ; j++)
+				{
+					switch(j)
+					{
+						case 1:
+							v_DBData->append(res->getCellAsString(0,j));break;
+						case 5:
+							v_DBData->append(res->getCellAsString(0,j));break;
+						case 8:
+							v_DBData->append(res->getCellAsString(0,j));break;
+						case 9:
+							v_DBData->append(res->getCellAsString(0,j));break;
+						case 11:
+							v_DBData->append(res->getCellAsString(0,j));break;
+						case 12:
+							v_DBData->append(res->getCellAsString(0,j));break;
+						case 13:
+							v_DBData->append(res->getCellAsString(0,j));break;
+						case 14:
+							v_DBData->append(res->getCellAsString(0,j));break;
+					}			
+				}
 			}
 		}
+
+		model->setDataVector(v_DBData);
+		model->setWindowIndex(i_topRow,i_bottomRow);
+
+		v_DBData = 0;
+
+		return 0;
 	}
 
-	model->setWindowIndex(input_topRow,input_bottomRow);	
-	model->setDataVector(v_DBData);
+	if( (i_topRow - t_dataRow) > 1 || (t_dataRow - i_topRow) > 1)
+	{
+		if(!openCursor())
+		{
+			return -1;
+		}
+
+		if(!syncQueueTreeWnd->setRowCount(countRow))
+		{
+			QMessageBox::information(0,tr("syncQueueTreeWnd->setRowCount(countRow)"),tr("!countRow"));
+			return -1;
+		}
+
+		if(!model->setColumn(countColumn))
+		{	
+			QMessageBox::information(0,tr("!model->setColumn(countColumn)"),tr("!countColumn"));
+			return -1;
+		}
+		if(!model->setRow(countRow))
+		{
+			QMessageBox::information(0,tr("!model->setRow(countRow)"),tr("!countRow"));
+			return -1;
+		}
+
+		t_dataRow = i_topRow;
+		b_dataRow = i_bottomRow;
+
+		v_DBData = new QVector<QString>;
+
+		model->setWindowIndex(i_topRow,i_bottomRow);
+			
+		for(int i = 0; i < (i_bottomRow - i_topRow); i++)
+		{			
+			pos = t_dataRow+i;
+
+			res = db->fetch("sync_cursor", 4, pos+1);
+		
+			if(!res)
+			{
+				db->commit();
+				QMessageBox::information(0,tr("fetch break"),tr("Cursor can't return data!"));
+				return -1;
+			}
+
+			for(int j = 0; j < TableView::TABLE_COLUMN_COUNT ; j++)
+			{
+				switch(j)
+				{
+					case 1:
+						v_DBData->append(res->getCellAsString(0,j));break;
+					case 5:
+						v_DBData->append(res->getCellAsString(0,j));break;
+					case 8:
+						v_DBData->append(res->getCellAsString(0,j));break;
+					case 9:
+						v_DBData->append(res->getCellAsString(0,j));break;
+					case 11:
+						v_DBData->append(res->getCellAsString(0,j));break;
+					case 12:
+						v_DBData->append(res->getCellAsString(0,j));break;
+					case 13:
+						v_DBData->append(res->getCellAsString(0,j));break;
+					case 14:
+						v_DBData->append(res->getCellAsString(0,j));break;
+				}			
+			}
+		}
+
+		model->setDataVector(v_DBData);
+		syncQueueTreeWnd->updateData();
+
+		v_DBData = 0;	
+	}
+
+	if(syncQueueTreeWnd->model() && (i_topRow - t_dataRow) < 0)
+	{
+		if(!openCursor())
+		{
+			return -1;
+		}
+
+		if(!syncQueueTreeWnd->setRowCount(countRow))
+		{
+			QMessageBox::information(0,tr("syncQueueTreeWnd->setRowCount(countRow)"),tr("!countRow"));
+			return -1;
+		}
+
+		if(!model->setColumn(countColumn))
+		{	
+			QMessageBox::information(0,tr("!model->setColumn(countColumn)"),tr("!countColumn"));
+			return -1;
+		}
+		if(!model->setRow(countRow))
+		{
+			QMessageBox::information(0,tr("!model->setRow(countRow)"),tr("!countRow"));
+			return -1;
+		}
+
+		t_dataRow = i_topRow;
+		b_dataRow = i_bottomRow;
+
+		v_DBData = new QVector<QString>;
+
+		model->setWindowIndex(i_topRow,i_bottomRow);
+			
+		for(int i = 0; i < (i_bottomRow - i_topRow); i++)
+		{			
+			pos = t_dataRow+i;
+
+			res = db->fetch("sync_cursor", 4, pos+1);
+		
+			if(!res)
+			{
+				db->commit();
+				QMessageBox::information(0,tr("fetch break"),tr("Cursor can't return data!"));
+				return -1;
+			}
+
+			for(int j = 0; j < TableView::TABLE_COLUMN_COUNT ; j++)
+			{
+				switch(j)
+				{
+					case 1:
+						v_DBData->append(res->getCellAsString(0,j));break;
+					case 5:
+						v_DBData->append(res->getCellAsString(0,j));break;
+					case 8:
+						v_DBData->append(res->getCellAsString(0,j));break;
+					case 9:
+						v_DBData->append(res->getCellAsString(0,j));break;
+					case 11:
+						v_DBData->append(res->getCellAsString(0,j));break;
+					case 12:
+						v_DBData->append(res->getCellAsString(0,j));break;
+					case 13:
+						v_DBData->append(res->getCellAsString(0,j));break;
+					case 14:
+						v_DBData->append(res->getCellAsString(0,j));break;
+				}			
+			}
+		}
+
+		model->setDataVector(v_DBData);
+		syncQueueTreeWnd->updateData();
+
+		v_DBData = 0;
+	}
+	else
+	{
+		col = i_topRow - t_dataRow;
+
+		if((t_dataRow + col-1) < b_dataRow)
+		{
+			for(int i = 0; i < col ; i++)
+			{
+				model->deleteDataRow(1);
+			}
+
+			for(int i = 0; i < col ; i++)
+			{
+				v_DBData = new QVector<QString>;
+				
+				pos = b_dataRow +  i;
+
+				res = db->fetch("sync_cursor", 4, pos+1);
+		
+				if(!res)
+				{
+					db->commit();
+					QMessageBox::information(0,tr("fetch break"),tr("Cursor can't return data!"));
+					//openCursor();
+					return -1;
+				}
+
+				for(int j = 0; j < TableView::TABLE_COLUMN_COUNT ; j++)
+				{
+					switch(j)
+					{
+						case 1:
+							v_DBData->append(res->getCellAsString(0,j));break;
+						case 5:
+							v_DBData->append(res->getCellAsString(0,j));break;
+						case 8:
+							v_DBData->append(res->getCellAsString(0,j));break;
+						case 9:
+							v_DBData->append(res->getCellAsString(0,j));break;
+						case 11:
+							v_DBData->append(res->getCellAsString(0,j));break;
+						case 12:
+							v_DBData->append(res->getCellAsString(0,j));break;
+						case 13:
+							v_DBData->append(res->getCellAsString(0,j));break;
+						case 14:
+							v_DBData->append(res->getCellAsString(0,j));break;
+					}			
+				}
+
+				model->insertDataRow(b_dataRow - t_dataRow + col + i,v_DBData);
+				delete v_DBData;
+			}
+		}		
+	}
+
+	model->setWindowIndex(i_topRow,i_bottomRow);
+
+	t_dataRow = i_topRow;
+	b_dataRow = i_bottomRow;
+
+	return 0;
+}
+//
+//Установка значения полосы прокрутки
+//
+void SyncQueueViewerForm::setScrollValue(int i_value)
+{
+	this->syncQueueTreeWnd->setScrollValue(i_value);
+}
+//
+//Функция закрытия курсора
+//
+void SyncQueueViewerForm::closeCursor()
+{
+	db->close("sync_cursor_file");
+    //db->close("sync_cursor");
+    //db->close("init_cursor");
+}
+//
+//Функция инициализации виджета
+//
+void SyncQueueViewerForm::initWidget()
+{
+
+}
+//**********
+
+void SyncQueueViewerForm::mousePressEvent ( QMouseEvent * event )
+{
+     if (event->button() == Qt::LeftButton) 
+	 {
+         flag_clicked = true;
+	 }
+}
+
+void SyncQueueViewerForm::mouseReleaseEvent ( QMouseEvent * event )
+{
+     if (event->button() == Qt::LeftButton) 
+	 {
+         flag_clicked = false;
+	 }
 }

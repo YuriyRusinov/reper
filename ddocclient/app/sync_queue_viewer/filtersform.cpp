@@ -57,11 +57,16 @@ FiltersForm::FiltersForm(QWidget *parent)
 	qpb_ok     = new QPushButton(tr("Ok"),this);
 	qpb_cancel = new QPushButton(tr("Cancel"),this);
 
-	qlb_from = new QLabel(tr("From:"));
-	qlb_to   = new QLabel(tr("To:"));
+	qlb_from = new QLabel(tr("From:"),this);
+	qlb_to   = new QLabel(tr("To:"),this);
 
-	qdte_from = new QDateTimeEdit;
-	qdte_to   = new QDateTimeEdit;
+	qdte_from = new QDateTimeEdit(this);
+	qdte_to   = new QDateTimeEdit(this);
+
+	qdte_from->setDisplayFormat("dd.MM.yyyy");
+	qdte_to->setDisplayFormat("dd.MM.yyyy");
+
+	qdte_to->setDate(QDate().currentDate());
 
 	QGridLayout* qgl_date = new QGridLayout;
 	qgl_date->addWidget(qlb_from,0,0,Qt::AlignRight);
