@@ -777,7 +777,7 @@ KKSResult* KKSPGDatabase::declare(QString cursor_name, QString sql_string) const
     KKSResult* tempres;
 
     QString str = "";
-    str = "DECLARE " + cursor_name + " CURSOR FOR " + sql_string;
+    str = "DECLARE " + cursor_name + " SCROLL CURSOR FOR " + sql_string;
 
     tempres = execute( str.toAscii().constData() );
 

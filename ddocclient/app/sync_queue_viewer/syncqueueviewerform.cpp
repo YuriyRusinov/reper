@@ -329,10 +329,10 @@ bool SyncQueueViewerForm::openCursor()
                                 q.entity_io_uid   \
                             from  \
                                 out_sync_queue q \
-                                inner join organization o on (o.id = q.id_organization) \
-                                inner join organization_transport ot on (o.id = ot.id_organization) \
-                                inner join transport t on (ot.id_transport = t.id) \
 								inner join io_objects io on (q.entity_table = io.table_name) \
+                                left join organization o on (o.id = q.id_organization) \
+                                left join organization_transport ot on (o.id = ot.id_organization) \
+                                left join transport t on (ot.id_transport = t.id) \
                             where \
                                 1=1 \
                         ");
