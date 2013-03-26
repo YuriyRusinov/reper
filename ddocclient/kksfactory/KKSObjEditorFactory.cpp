@@ -6720,6 +6720,7 @@ void KKSObjEditorFactory :: addNewSearchTempl (const QModelIndex& parent,
     else if (parent.isValid() && parent.data (Qt::UserRole+USER_ENTITY).toInt() == 0)
         pIndex = parent;
 
+    qDebug () << __PRETTY_FUNCTION__ << pIndex;
     int idSearchType = pIndex.data (Qt::UserRole).toInt ();
     QString stName;
     KKSSearchTemplate * st = new KKSSearchTemplate (-1, 0, stName, loader->getUserId());
@@ -6861,10 +6862,20 @@ void KKSObjEditorFactory :: updateSearchTempl (const QModelIndex& wIndex, QAbstr
         return;
     }
 
-    bool ok;
     QString oldName = st->name();
-    QString stName = QInputDialog::getText (pWidget, tr ("Search template"), tr ("Search template name :"), QLineEdit::Normal, oldName, &ok);
-    if (ok && !stName.isEmpty() )//&& oldName != stName)
+    SaveSearchTemplateForm * stForm = new SaveSearchTemplateForm (st);
+    QAbstractItemModel * searchTModel = new QStandardItemModel (0, 5);
+    searchTModel->setHeaderData (0, Qt::Horizontal, tr ("Search criteria"), Qt::DisplayRole);
+    searchTModel->setHeaderData (1, Qt::Horizontal, tr ("Author"), Qt::DisplayRole);
+    searchTModel->setHeaderData (2, Qt::Horizontal, tr ("Creation date/time"), Qt::DisplayRole);
+    searchTModel->setHeaderData (3, Qt::Horizontal, tr ("Category"), Qt::DisplayRole);
+    searchTModel->setHeaderData (4, Qt::Horizontal, tr ("Type"), Qt::DisplayRole);
+    KKSViewFactory::getSearchTemplates (loader, searchTModel, QModelIndex(), false);
+    stForm->setTypesModel (searchTModel);
+    if (!stForm || stForm->exec() != QDialog::Accepted)
+        return;
+    QString stName = stForm->getName();//QInputDialog::getText (pWidget, tr ("Search template"), tr ("Search template name :"), QLineEdit::Normal, oldName, &ok);
+    if (!stName.isEmpty() )//&& oldName != stName)
     {
         if (oldName != stName)
             st->setName (stName);

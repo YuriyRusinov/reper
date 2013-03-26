@@ -12,6 +12,7 @@ namespace Ui
 };
 
 class QAbstractItemModel;
+class QSortFilterProxyModel;
 
 class KKSSearchTemplate;
 
@@ -37,7 +38,7 @@ private:
     // Functions
     //
     void init (void);
-    const QModelIndex& getCurrentType (int idType, const QModelIndex& pIndex=QModelIndex()) const;
+    QModelIndex getCurrentType (int idType, const QModelIndex& pIndex=QModelIndex()) const;
 
 private:
     //
@@ -45,6 +46,7 @@ private:
     //
     Ui::save_search_template_form * UI;
     KKSSearchTemplate * searchTemplate;
+    QSortFilterProxyModel * sortTModel;
 
 private:
     Q_OBJECT
