@@ -1,4 +1,4 @@
-﻿select f_safe_drop_type('h_c_get_state');
+select f_safe_drop_type('h_c_get_state');
 create type h_c_get_state as(id int4, 
                              name varchar, 
                              description varchar,
