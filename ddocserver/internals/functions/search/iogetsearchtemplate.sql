@@ -85,7 +85,7 @@ begin
             st.author,
             st.id_search_template_type,
             st.id_io_category,
-            case when st.author isnull then null else u.name end as authorName,
+            case when st.author isnull then null else u.fio end as authorName,
             case when st.id_io_category isnull then null else c.name end as categoryName,
             st.creation_datetime,
             st.description
@@ -119,7 +119,7 @@ begin
             st.author,
             st.id_search_template_type,
             st.id_io_category,
-            case when st.author isnull then null else u.name end as authorName,
+            case when st.author isnull then null else u.fio end as authorName,
             case when st.id_io_category isnull then null else c.name end as categoryName,
             st.creation_datetime,
             st.description
@@ -154,7 +154,7 @@ begin
             st.author,
             st.id_search_template_type,
             st.id_io_category,
-            case when st.author isnull then null else u.name end as authorName,
+            case when st.author isnull then null else u.fio end as authorName,
             case when st.id_io_category isnull then null else c.name end as categoryName,
             st.creation_datetime,
             st.description

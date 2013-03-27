@@ -6,6 +6,14 @@ begin
         new.author = getCurrentUser();
     end if;
 
+    if(new.id_search_template_type isnull) then
+        new.id_search_template_type = 1;
+    end if;
+
+    if(new.id_io_category isnull) then
+        new.id_io_category = 13;
+    end if;
+
     return new;
 end
 $BODY$

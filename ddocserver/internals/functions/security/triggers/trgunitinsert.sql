@@ -30,7 +30,7 @@ BEGIN
     
     if(new.id_parent is not null) then
         select name into parentName from units where id = new.id_parent;
-        if(name = 'Публичные должностные лица') then
+        if(parentName = 'Публичные должностные лица') then
             raise exception 'You cannot create units with parent as Public!';
             return NULL;
         end if;
