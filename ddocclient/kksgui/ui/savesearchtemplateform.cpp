@@ -15,7 +15,7 @@
 #include "savesearchtemplateform.h"
 #include "ui_save_search_template_form.h"
 
-SaveSearchTemplateForm :: SaveSearchTemplateForm (KKSSearchTemplate * st, QWidget * parent, Qt::WindowFlags flags)
+SaveSearchTemplateForm :: SaveSearchTemplateForm (KKSSearchTemplate * st, bool mode, QWidget * parent, Qt::WindowFlags flags)
     : QDialog (parent, flags),
     UI (new Ui::save_search_template_form),
     searchTemplate (st),
@@ -24,7 +24,8 @@ SaveSearchTemplateForm :: SaveSearchTemplateForm (KKSSearchTemplate * st, QWidge
     UI->setupUi (this);
     if (searchTemplate)
     {
-        searchTemplate->addRef ();
+        if (mode)
+            searchTemplate->addRef ();
         UI->lEName->setText (st->name());
     }
     
@@ -45,6 +46,9 @@ SaveSearchTemplateForm :: SaveSearchTemplateForm (KKSSearchTemplate * st, QWidge
     UI->tvCategory->setItemDelegate (catDeleg);
     KKSEventFilter * catEf = new KKSEventFilter (this);
     UI->tvCategory->viewport()->installEventFilter (catEf);
+    
+    UI->pbOk->setVisible (mode);
+    UI->pbCancel->setVisible (mode);
 
     connect (UI->pbOk, SIGNAL (clicked()), this, SLOT (staccept()) );
     connect (UI->pbCancel, SIGNAL (clicked()), this, SLOT (reject()) );
@@ -53,7 +57,7 @@ SaveSearchTemplateForm :: SaveSearchTemplateForm (KKSSearchTemplate * st, QWidge
 SaveSearchTemplateForm :: ~SaveSearchTemplateForm (void)
 {
     delete UI;
-    if (searchTemplate)
+    if (searchTemplate && UI->pbOk->isVisible())
         searchTemplate->release ();
 }
 

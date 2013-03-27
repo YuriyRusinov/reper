@@ -87,6 +87,7 @@ KKSFiltersEditorForm :: KKSFiltersEditorForm (const KKSCategory * _c,
                                               KKSMap<int, KKSAttribute *> attrsIO,
                                               bool forIO,
                                               KKSSearchTemplate * st,
+                                              bool mode,
                                               QWidget *parent,
                                               Qt::WFlags f)
     : QDialog (parent, f),
@@ -110,7 +111,8 @@ KKSFiltersEditorForm :: KKSFiltersEditorForm (const KKSCategory * _c,
     init ();
     if (sTempl)
     {
-        sTempl->addRef ();
+        if (mode)
+            sTempl->addRef ();
         KKSList<const KKSFilterGroup*> groups;
         groups.append (sTempl->getMainGroup());
         setFilters (groups);
@@ -118,6 +120,9 @@ KKSFiltersEditorForm :: KKSFiltersEditorForm (const KKSCategory * _c,
 
     ui->pbSaveToDb->setVisible (m_bForIO);
     ui->pbLoadFromDb->setVisible (m_bForIO);
+    
+    ui->pbOK->setVisible (mode);
+    ui->pbCancel->setVisible (mode);
     connect (ui->pbOK, SIGNAL (clicked()), this, SLOT (saveSQLAccept()) );
     connect (ui->pbCancel, SIGNAL (clicked()), this, SLOT (reject()) );
     connect (ui->pbAddGroup, SIGNAL (clicked()), this, SLOT (addGroup()) );
@@ -133,7 +138,7 @@ KKSFiltersEditorForm :: ~KKSFiltersEditorForm (void)
 {
     if (c)
         c->release ();
-    if (sTempl)
+    if (sTempl && ui->pbOK->isVisible())
         sTempl->release ();
 }
 

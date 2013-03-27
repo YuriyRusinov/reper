@@ -19,7 +19,7 @@ class KKSSearchTemplate;
 class _GUI_EXPORT SaveSearchTemplateForm : public QDialog
 {
 public:
-    SaveSearchTemplateForm (KKSSearchTemplate * st, QWidget * parent=0, Qt::WindowFlags flags=0);
+    SaveSearchTemplateForm (KKSSearchTemplate * st, bool mode=true, QWidget * parent=0, Qt::WindowFlags flags=0);
     virtual ~SaveSearchTemplateForm (void);
 
     void setCategoryModel (QAbstractItemModel * catMod);

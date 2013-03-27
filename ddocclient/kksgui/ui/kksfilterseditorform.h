@@ -65,6 +65,7 @@ public:
 #endif
                          bool forIO = false,
                          KKSSearchTemplate * st=0,
+                         bool mode = true,
                          QWidget *parent = 0,
                          Qt::WFlags f=0);
     ~KKSFiltersEditorForm();
