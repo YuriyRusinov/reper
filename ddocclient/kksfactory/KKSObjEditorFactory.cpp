@@ -4361,7 +4361,7 @@ void KKSObjEditorFactory :: regroupAttrs (QWidget *wIOAttr, QScrollArea *scIOatt
  * Параметры:
  * editor -- редактор ИО
  * idObject -- идентификатор ИО-справочника
- * cat -- табличная категория
+ * cat -- главная категория справочника, в который импортируем записи
  * tableName -- название таблицы.
  */
 void KKSObjEditorFactory :: importEIO (KKSObjEditor * editor, int idObject, const KKSCategory * cat, QString tableName, QAbstractItemModel * recModel)
@@ -4409,23 +4409,31 @@ void KKSObjEditorFactory :: importEIO (KKSObjEditor * editor, int idObject, cons
     if (xmlForm->exec () == QDialog::Accepted)
     {
         xmlForm->hide ();
-        KKSCategory * c1 = xmlForm->getCategory ();
-        if (!c1 || xmlForm->getCSVFile().isEmpty() || xmlForm->getXMLFile().isEmpty() || xmlForm->getCharset().isEmpty() || xmlForm->getFieldDelimiter().isEmpty() )
+        KKSCategory * c1 = xmlForm->getCategory ();//подчиненная категория, полученная из xml-файла
+        if (!c1 || 
+            xmlForm->getCSVFile().isEmpty() || 
+            xmlForm->getXMLFile().isEmpty() || 
+            xmlForm->getCharset().isEmpty() || 
+            xmlForm->getFieldDelimiter().isEmpty()
+           )
         {
             QMessageBox::warning (editor, tr ("Error"), tr("Invalid data"), QMessageBox::Ok);
             io->release();
             return;
         }
+
         if (!c1->attributes().contains (cAttrId->id()))
             c1->addAttribute (cAttrId->id(), cAttrId);
-        if (c0->attributes().count() != c1->attributes().count())
+        
+        if (c0->attributes().count() != c1->attributes().count())//категория, в которую импортируем, не соответствует той, которая получена из xml-файла
         {
             QMessageBox::warning (editor, tr ("Error"), tr("Inconsistent categories"), QMessageBox::Ok);
             io->release();
             return;
         }
-        KKSMap<int, KKSCategoryAttr*>::const_iterator pc0 = c0->attributes ().constBegin();
-        KKSMap<int, KKSCategoryAttr*>::const_iterator pc  = c1->attributes ().constBegin();
+
+        KKSMap<int, KKSCategoryAttr*>::const_iterator pc0 = c0->attributes ().constBegin();//подчиненная
+        KKSMap<int, KKSCategoryAttr*>::const_iterator pc  = c1->attributes ().constBegin();//подчиненная
         for (; pc0 != c0->attributes().constEnd(); pc0++)
         {
             if (pc0.key() != pc.key() )
@@ -4436,6 +4444,7 @@ void KKSObjEditorFactory :: importEIO (KKSObjEditor * editor, int idObject, cons
             }
             pc++;
         }
+
         QStringList attrCodes;
         for (KKSMap<int, KKSCategoryAttr*>::const_iterator pa = c0->attributes().constBegin(); \
              pa != c0->attributes().constEnd(); \
@@ -4993,13 +5002,30 @@ void KKSObjEditorFactory :: exportEIO (KKSObjEditor * editor, int idObject, cons
     if (!io)
         return;
 
-    const KKSCategory * c0 = 0;
+
+    const KKSCategory * cMain = 0; //потом надо не забыть очистить под нее память
+    //данная категория в дальнейшем передается в метод loadEIOList, в который должна передаваться подчиненная категория.
+    //в настоящий момент времени cat - категория главная. поэтому используем ее подчиненную
+    const KKSCategory * cChild = 0;
+    
     if (cat && cat->tableCategory())
-        c0 = new KKSCategory (*cat);
-    else if (cat && cat->type()->id() == 10)
+        cMain = new KKSCategory (*cat);
+    else if (cat && cat->type()->id() == 10)//подчиненная категория
+        return; //требуется в данном методе как информация о главной, так и о подчиненной
+    else{
+        if(!io->category()->tableCategory()) //если это даже не справочник то экспортировать нечего вообще
+            return;
+
+        cMain = new KKSCategory (*(io->category()));
+    }
+
+    if(!cMain || !cMain->tableCategory()){
+        if(cMain)
+            cMain->release();
         return;
-    else
-        c0 = new KKSCategory (*(io->category()));
+    }
+
+    cChild = cMain->tableCategory();
 
 /*    int i = editor->tabEnclosures->currentIndex ();
     QTreeView * tv=0;
@@ -5028,12 +5054,15 @@ void KKSObjEditorFactory :: exportEIO (KKSObjEditor * editor, int idObject, cons
  */
     Q_UNUSED (idOe);
 
-    KKSMap<qint64, KKSEIOData *> objEx = loader->loadEIOList (c0, tableName, editor->filters());
+    KKSMap<qint64, KKSEIOData *> objEx = loader->loadEIOList (cChild, tableName, editor->filters());//сюда передаем табличную (подчиненную) категорию
     KKSXMLForm *xmlForm = new KKSXMLForm (io, tr("Export IO %1").arg (io->name()), true, editor);
     if (!xmlForm)
     {
         if (io)
             io->release ();
+        if(cMain)
+            cMain->release();
+
         return;
     }
     /*int res = xmlForm->initExportData (objEx, c0);//io->category()->tableCategory());
@@ -5056,25 +5085,30 @@ void KKSObjEditorFactory :: exportEIO (KKSObjEditor * editor, int idObject, cons
         QString tDelim = xmlForm->getTextDelimiter ();
         QFile *fXml = new QFile (xmlFileName);
         fXml->open (QIODevice::WriteOnly);
-        int res = this->exportHeader (fXml, c0, charSet, fDelim, tDelim, editor);
+        int res = this->exportHeader (fXml, cMain, charSet, fDelim, tDelim, editor);//Сюда передаем главную категорию
         fXml->close ();
         delete fXml;
         if (res == ERROR_CODE)
         {
             if (io)
                 io->release ();
+
+            if(cMain)
+                cMain->release();
             xmlForm->setParent (0);
             delete xmlForm;
 
             return;
         }
         QFile fCSV (csvFileName);
-        //res = this->exportCopies (&fCSV, c0, oeList, charSet, fDelim, tDelim, editor, tableName);
-        res = this->exportCopies (&fCSV, c0, objEx, charSet, fDelim, tDelim, editor);//, tableName);
+        //res = this->exportCopies (&fCSV, cChild, oeList, charSet, fDelim, tDelim, editor, tableName);
+        res = this->exportCopies (&fCSV, cChild, objEx, charSet, fDelim, tDelim, editor);//сюда передаем табличную (подчиненную) категорию
         if (res == ERROR_CODE)
         {
             if (io)
                 io->release ();
+            if(cMain)
+                cMain->release();
             xmlForm->setParent (0);
             delete xmlForm;
 
@@ -5087,6 +5121,9 @@ void KKSObjEditorFactory :: exportEIO (KKSObjEditor * editor, int idObject, cons
 
     if (io)
         io->release ();
+
+    if(cMain)
+        cMain->release();
 }
 
 void KKSObjEditorFactory :: getModelIds (QAbstractItemModel * mod, const QModelIndex& wIndex, QList<int>& ids) const
@@ -5146,7 +5183,7 @@ int KKSObjEditorFactory :: exportHeader (QIODevice *xmlDev, // XML-файл, содержа
     xmlWriter->writeStartDocument ();
     QString dtd = QString ("\n<!DOCTYPE Categories [");
     dtd += QString("\n <!ENTITY Charset '%1'> \n <!ENTITY field_delimiter '%2'> \n <!ENTITY text_delimiter '%3'> \n ").arg (codeName).arg (fDelim).arg (tDelim);
-    dtd += QString("\n <!ELEMENT category (cname, ccode, ctype, cdescription, cis_main, id_child*, attributes)");
+    dtd += QString("\n <!ELEMENT category (cname, ccode, ctype, cdescription, cis_main, id_child*, attributes)>");
     dtd += QString("\n <!ATTLIST category id ID #REQUIRED>");
     dtd += QString("\n <!ELEMENT cname (#PCDATA)>");
     dtd += QString("\n <!ELEMENT ccode (#PCDATA)>");
@@ -5324,7 +5361,7 @@ int KKSObjEditorFactory :: exportCategory (QXmlStreamWriter * xmlWriter, const K
  * oEditor -- родительский редактор
  */
 int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // целевой CSV файл
-                                         const KKSCategory *c,
+                                         const KKSCategory *c,//подчиненная категория
                                          const KKSList<KKSObjectExemplar *>& oeList,
                                          QString codeName, // кодировка выходных данных
                                          QString fDelim, // разделитель полей
@@ -5641,7 +5678,7 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // целевой CSV файл
  * oEditor -- родительский редактор
  */
 int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // целевой CSV файл
-                                         const KKSCategory *c,
+                                         const KKSCategory *c, //подчиненная категория
                                          const KKSMap<qint64, KKSEIOData *>& oeData,
                                          QString codeName, // кодировка выходных данных
                                          QString fDelim, // разделитель полей
