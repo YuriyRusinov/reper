@@ -14,6 +14,7 @@ DESTDIR = ./bld
 
 PGSERVER_HOME="C:/Program Files (x86)/PostgreSQL9/9.2"
 #LIBJPEG_DIR="C:/libjpeg-turbo"
+LIBGSL_DIR="C:/libgsl"
 
 #EXT_HOME="C:/Program Files/GnuWin32"
 
@@ -27,6 +28,10 @@ LIBS *= -L$${PGSERVER_HOME}/bin
 #INCLUDEPATH += $${LIBJPEG_DIR}/include
 #LIBS *= -L$${LIBJPEG_DIR}/lib
 #LIBS *= -L$${LIBJPEG_DIR}/bin -ljpeg
+
+INCLUDEPATH += $${LIBGSL_DIR}/include
+LIBS *= -L$${LIBGSL_DIR}/lib
+LIBS *= -L$${LIBGSL_DIR}/bin -ljpeg
 
 LIBS *= postgres.lib
 LIBS *= -L. -lmsvcrt

@@ -23,3 +23,18 @@ create or replace function rDeleteFile(int4) returns int4
 --create or replace function rXPM2JPEG(bytea) returns bytea 
 --    as 'libfloader.dll', 'rxpm2jpeg'  language 'c' strict security definer;
 
+create or replace function initrand () returns int4
+    as '$libdir/libfloader.so', 'initrand' language 'c' strict security definer;
+
+create or replace function droprand () returns int4
+    as '$libdir/libfloader.so', 'initrand' language 'c' strict security definer;
+
+create or replace function unirand () returns float8
+    as '$libdir/libfloader.so', 'unirand' language 'c' strict security definer;
+
+create or replace function gaussrand () returns float8
+    as '$libdir/libfloader.so', 'gaussrand' language 'c' strict security definer;
+
+create or replace function exprand () returns float8
+    as '$libdir/libfloader.so', 'exprand' language 'c' strict security definer;
+
