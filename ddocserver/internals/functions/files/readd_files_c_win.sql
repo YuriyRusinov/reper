@@ -32,9 +32,9 @@ create or replace function droprand () returns int4
 create or replace function unirand () returns float8
     as '$libdir/libfloader.so', 'unirand' language 'c' strict security definer;
 
-create or replace function gaussrand () returns float8
+create or replace function gaussrand (float8) returns float8
     as '$libdir/libfloader.so', 'gaussrand' language 'c' strict security definer;
 
-create or replace function exprand () returns float8
+create or replace function exprand (float8) returns float8
     as '$libdir/libfloader.so', 'exprand' language 'c' strict security definer;
 
