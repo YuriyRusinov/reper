@@ -39,3 +39,5 @@
 \i ./functions/init_data/urgency_levels.sql
 
 \i ./functions/init_data/org_symbol.sql
+
+\i ./functions/init_data/distribution_f.sql

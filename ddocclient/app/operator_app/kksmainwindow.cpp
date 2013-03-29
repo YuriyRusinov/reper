@@ -237,6 +237,7 @@ void KKSMainWindow::setActionsEnabled(bool enabled)
     ui->aViewAttrs->setEnabled(false);
     ui->aEditOSS->setEnabled(false);
     ui->aSysQualifiers->setEnabled(false);
+    aGenerateMess->setEnabled(false);
 
     if(enabled){
         QString uName = kksSito->loader()->getDb()->getUser();
@@ -246,6 +247,7 @@ void KKSMainWindow::setActionsEnabled(bool enabled)
             ui->aViewAttrs->setEnabled(enabled);
             ui->aEditOSS->setEnabled(enabled);
             ui->aSysQualifiers->setEnabled(enabled);
+            this->aGenerateMess->setEnabled(enabled);
         }
     }
        
@@ -292,6 +294,11 @@ void KKSMainWindow::initActions()
 
     aSeparator = new QAction(this);
     aSeparator->setSeparator(true);
+    
+    aGenerateMess = new QAction (QIcon(":/ddoc/message_stream.png"), tr("Message streams"), this);
+    aGenerateMess->setToolTip (tr("Generate message streams"));
+    connect (aGenerateMess, SIGNAL(triggered()),
+             this, SLOT (slotMess()));
 
     updateWindowMenu();
 
@@ -337,6 +344,7 @@ void KKSMainWindow::initToolBars()
     tbPost->addSeparator();
     tbPost->addAction(ui->aCreateTSDRecord);
     tbPost->addAction(ui->aShowTSD);
+    tbPost->addAction(aGenerateMess);
 
     QToolBar * tbQuery = new QToolBar(tr("Search query toolbar"), this);
     //tbQuery->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -1245,4 +1253,10 @@ void KKSMainWindow::slotIndicatorEdit (IndicatorForm * iForm)
     QMdiSubWindow * m_IndW = m_mdiArea->addSubWindow (iForm);
     m_IndW->setAttribute (Qt::WA_DeleteOnClose);
     iForm->show ();
+}
+
+void KKSMainWindow::slotMess()
+{
+    qDebug () << __PRETTY_FUNCTION__;
+    slotCreateNewObjEditor(IO_IO_ID, IO_MESSAGE_STREAM_ID, KKSList<const KKSFilterGroup*>(), "");
 }

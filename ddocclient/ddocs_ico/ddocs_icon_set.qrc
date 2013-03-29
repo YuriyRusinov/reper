@@ -79,5 +79,6 @@
     <file>folder_add.png</file>
     <file>folder_edit.png</file>
     <file>folder_del.png</file>
+    <file>message_stream.png</file>
   </qresource>
 </RCC>

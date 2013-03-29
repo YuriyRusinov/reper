@@ -98,6 +98,7 @@ Q_OBJECT
         void slotSettings();
 
         void slotAbout();
+        void slotMess();
     
     private:
         Ui::KKSMainWindowDlg *ui;
@@ -138,7 +139,7 @@ Q_OBJECT
         QAction *aNextWindow;
         QAction *aPreviousWindow;
         QAction *aSeparator;
-
+        QAction *aGenerateMess;
 
 
         QAction *aSaveIO;
