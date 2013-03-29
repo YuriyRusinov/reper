@@ -30,8 +30,8 @@ class SyncQueueViewerForm : public QDialog
 		//Обработчик события изменения размера
 		//
 		virtual void resizeEvent(QResizeEvent * pe);
-		void mousePressEvent ( QMouseEvent * event );
-		void mouseReleaseEvent ( QMouseEvent * event );
+		virtual void mousePressEvent ( QMouseEvent * i_event );
+		virtual void mouseReleaseEvent ( QMouseEvent * i_event );
 
     private slots:
 		//

@@ -11,6 +11,9 @@
 #include <QDateTimeEdit>
 #include <QLabel>
 #include <QGridLayout>
+#include <QListView>
+#include <QItemSelectionModel>
+#include <QStringListModel>
 
 class FiltersForm : public QDialog
 {
@@ -20,29 +23,29 @@ public:
 	FiltersForm(QWidget *parent);
 	~FiltersForm();
 
+private slots:
+	void slot_timeCheck();
+
 private:
-	QGroupBox* qgb_organizations;
-	QGroupBox* qgb_objectType;
-	QGroupBox* qgb_result;
+	QLabel* qlb_organizations;
+	QLabel* qlb_objectType;
+	QLabel* qlb_result;
 
-	QCheckBox* qcb_org1;
-	QCheckBox* qcb_org2;
+	QListView* qgb_organizations;
+	QListView* qgb_objectType;
+	QListView* qgb_result;
 
-	QCheckBox* qcb_type1;
-	QCheckBox* qcb_type2;
-	QCheckBox* qcb_type3;
-	QCheckBox* qcb_type4;
-	QCheckBox* qcb_type5;
-	QCheckBox* qcb_type6;
-	QCheckBox* qcb_type7;
-	QCheckBox* qcb_type8;
-	QCheckBox* qcb_type9;
-	QCheckBox* qcb_type10;
+	QStringListModel* model_org;
+	QItemSelectionModel* select_org;
 
-	QCheckBox* qcb_resultType1;
-	QCheckBox* qcb_resultType2;
-	QCheckBox* qcb_resultType3;
-	QCheckBox* qcb_resultType4;
+	QStringListModel* model_obj;
+	QItemSelectionModel* select_obj;
+
+	QStringListModel* model_res;
+	QItemSelectionModel* select_res;
+
+	QCheckBox* qcb_timeTo;
+	QCheckBox* qcb_timeFrom;
 
 	QPushButton* qpb_ok;
 	QPushButton* qpb_cancel;

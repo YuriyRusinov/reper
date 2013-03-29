@@ -18,7 +18,7 @@ class SyncQueueItemModel:public QAbstractTableModel
 		//
 		//Конструктор. В качестве параметров принимает два числа типа int - количество строк и столбцов в таблице
 		//
-        explicit SyncQueueItemModel(int iCountRow, int iCountColumn,QObject *parent = 0);
+        explicit SyncQueueItemModel(int iCountRow,int iCountColumn,QObject *parent = 0);
 		~SyncQueueItemModel(){delete modelData;}
 		//**********
 
@@ -56,6 +56,7 @@ class SyncQueueItemModel:public QAbstractTableModel
 		bool setRow(int i_totalRow);
 		//
 		//Добавление строки в позицию i_index
+		//Первая строка имеет индекс 0
 		//
 		bool insertDataRow(int i_index,const QVector<QString>* i_dataRow);
 		//
@@ -86,7 +87,7 @@ class SyncQueueItemModel:public QAbstractTableModel
 		//Функция установки флага пустой модели
 		//Предыдущее значение флага возвращается
 		//
-		bool setEmptyData(bool newFlag);
+		void setEmptyData(bool newFlag);
 		//
 		//Возврат значения флага пустой модели
 		//

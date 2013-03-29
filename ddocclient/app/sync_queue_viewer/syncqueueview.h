@@ -29,10 +29,6 @@ class SyncQueueView : public QTreeView
 		//Функция возврата количества видимых строк
 		//
 		int getViewRowCounts() const;
-		//
-		//Получение старого значения value
-		//
-		int getOldValue() const;
 		//**********
 
 		//*****Функции установки данных*****
@@ -89,14 +85,17 @@ class SyncQueueView : public QTreeView
 		//
 		void slot_sliderValueChanged(int value);
 
+	protected:
+		void keyPressEvent(QKeyEvent * i_event);//void keyPressEvent(QKeyEvent * i_event) virtual;
+
     private:
 		QScrollBar *scroll_view;//Линеечка:)
 		bool flag_scroll;       //Флаг нажатой полосы прокрутки
 
 		int totalRowCount;      //Количество строк в виджете
+
 		int viewRowCount;       //Количество отображаемых строк
 
-		int oldValue;           //Старое значение value
 		bool flag_clearAll;     //Флаг полной очистки
 };
 
