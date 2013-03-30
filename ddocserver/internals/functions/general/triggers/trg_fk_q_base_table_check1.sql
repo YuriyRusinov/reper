@@ -22,7 +22,7 @@ end
 $BODY$
 language 'plpgsql';
 
---триггер создается каждый раз при создании очередного справочника (тиблицы справочника)
+--триггер создается каждый раз при создании очередного справочника (таблицы справочника)
 
 create or replace function createTriggerQBaseTableCheck1(varchar) returns int4 as
 $BODY$

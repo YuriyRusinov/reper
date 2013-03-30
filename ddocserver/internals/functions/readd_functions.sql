@@ -26,6 +26,8 @@
 \i ./functions/rec_rubrics/readd_rec_rubrics.sql
 \i ./functions/indicators/readd_indicators.sql
 
+\i ./functions/jms_messages/readd_jms_messages.sql
+
 --\i ./functions/commands/readd_commands.sql
 
 --invoked in initmodules
