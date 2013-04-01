@@ -25,7 +25,6 @@ begin
             from
                 message_streams
         loop
-            select into ctime current_timestamp;
             if (r.start_time > ctime or ctime > r.stop_time) then
                 continue;
             end if;
@@ -36,7 +35,7 @@ begin
             elsif (id_distrib = 2) then
                 select into time_step exprand (r.lambda);
             elsif (id_distrib = 3) then
-                select into time_step new.min_p + (r.max_p-r.min_p)*unirand ();
+                select into time_step r.min_p + (r.max_p-r.min_p)*unirand ();
             else
                 raise warning 'Does not have any another distributions';
                 select droprand();
@@ -50,18 +49,22 @@ begin
             end if;
 
             select into tunit name from time_units tu where tu.id=r.id_time_unit;
-            select into last_time time from message_series mser where mser.id_message_stream=new.id and mser.time = (select max(time) from message_series where id_message_stream=r.id);
+            select into last_time time from message_series mser where mser.id_message_stream=r.id and mser.time = (select max(time) from message_series where id_message_stream=r.id);
             if (last_time is null) then
-                last_time := new.start_time;
+                last_time := r.start_time;
             end if;
             tquery := E'select ';
             tquery := tquery || E'interval \''|| time_step || E' ' || tunit || E'\'';
             execute tquery into tinterv;
-            last_time := last_time + tinterv;
-            raise warning 'last time is %', last_time;
-            insert into message_series (id_message_stream, time) values (r.id, last_time);
+            --last_time := last_time + tinterv;
+            raise warning 'last time is %, interval is %', last_time, tinterv;
+            select into ctime current_timestamp;
+            if (ctime >= last_time+tinterv) then
+                insert into message_series (id_message_stream, time) values (r.id, ctime);
+            end if;
 
         end loop;
+        return 1;
 end
 $BODY$
 language 'plpgsql';
