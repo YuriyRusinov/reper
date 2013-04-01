@@ -4,12 +4,13 @@ declare
     id_distrib int4;
 
     ctime timestamp;
-    time_step float8;
+    new_time_step float8;
     tunit varchar;
     last_time timestamp;
     r record;
     tquery varchar;
     tinterv interval;
+    cnt int4;
 begin
 
     id_distrib := new.id_partition_low;
@@ -18,14 +19,13 @@ begin
         return NULL;
     end if;
 
-    select into ctime current_timestamp;
     perform initrand();
     if (id_distrib = 1) then
-        select into time_step new.moda+gaussrand(new.sigma);
+        select into new_time_step new.moda+gaussrand(new.sigma);
     elsif (id_distrib = 2) then
-        select into time_step exprand (new.lambda);
+        select into new_time_step exprand (new.lambda);
     elsif (id_distrib = 3) then
-        select into time_step new.min_p + (new.max_p-new.min_p)*unirand ();
+        select into new_time_step new.min_p + (new.max_p-new.min_p)*unirand ();
     else
         raise warning 'Does not have any another distributions';
         select droprand();
@@ -34,7 +34,7 @@ begin
 
     perform droprand();
 
-    if (time_step is null) then
+    if (new_time_step is null) then
         raise warning 'Incorrect parameters';
         return NULL;
     end if;
@@ -45,11 +45,16 @@ begin
         last_time := new.start_time;
     end if;
     tquery := E'select ';
-    tquery := tquery || E'interval \''|| time_step || E' ' || tunit || E'\'';
+    tquery := tquery || E'interval \''|| new_time_step || E' ' || tunit || E'\'';
     execute tquery into tinterv;
-    last_time := last_time + tinterv;
+    --last_time := last_time + tinterv;
     raise warning 'last time is %', last_time;
-    insert into message_series (id_message_stream, time) values (new.id, last_time);
+    select into ctime current_timestamp;
+    select into cnt count(*) from message_series mser where mser.id_message_stream=new.id;
+    if (ctime >= new.start_time and cnt = 0 or
+        ctime >= last_time-tinterv/2 and ctime <= last_time+tinterv/2) then
+        insert into message_series (id_message_stream, time, time_step) values (new.id, new.start_time, new_time_step);
+    end if;
 
     return new;
 end

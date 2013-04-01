@@ -29,7 +29,7 @@ begin
     for r in
         execute query
     loop
-        id_recs := id_recs || r.id;
+        id_recs := id_recs || r.id::bigint;
     end loop;
 
     id_record := id_recs[(cnt_mess+2) % cnt_rec];

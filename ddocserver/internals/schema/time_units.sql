@@ -19,6 +19,7 @@ create table message_series (
     id serial not null,
     id_message_stream int4 not null,
     time timestamp not null,
+    time_step float8 not null default 1.0,
     constraint PK_MESSAGE_SERIES primary key (id)
 )
 inherits (root_table);
