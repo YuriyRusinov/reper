@@ -69,7 +69,7 @@ begin
             --last_time := last_time + tinterv;
             raise warning 'last time is %, interval is %', last_time, tinterv;
             select into ctime current_timestamp;
-            if (ctime >= last_time+tinterv) then
+            if (ctime >= last_time+tinterv and ctime <= r.stop_time) then
                 insert into message_series (id_message_stream, time, time_step) values (r.id, ctime, time_step);
             end if;
 
