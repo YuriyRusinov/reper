@@ -5,6 +5,7 @@
 #include <QMouseEvent>
 
 #include "syncqueueitemmodel.h"
+#include "filtersform.h"
 
 class KKSDatabase;
 class SyncQueueView;
@@ -30,8 +31,10 @@ class SyncQueueViewerForm : public QDialog
 		//Обработчик события изменения размера
 		//
 		virtual void resizeEvent(QResizeEvent * pe);
-		virtual void mousePressEvent ( QMouseEvent * i_event );
-		virtual void mouseReleaseEvent ( QMouseEvent * i_event );
+		//virtual void mousePressEvent ( QMouseEvent * i_event );
+		//virtual void mouseReleaseEvent ( QMouseEvent * i_event );
+		//virtual void leaveEvent(QEvent * i_event);
+		//virtual void enterEvent (QEvent * i_event);
 
     private slots:
 		//
@@ -46,6 +49,9 @@ class SyncQueueViewerForm : public QDialog
 		//Слот обновления данных модели
 		//
 		void slot_updateModelData(int i_topRow,int i_bottomRow);
+
+		void slot_accepted();
+		void slot_rejected();
 
 	private:
 		//
@@ -72,6 +78,10 @@ class SyncQueueViewerForm : public QDialog
 		//Функция инициализации виджета
 		//
 		void initWidget();
+		//
+		//Функция обновления данных в виджете
+		//
+		void refreshData();
 
 	private:
 		//
@@ -96,7 +106,9 @@ class SyncQueueViewerForm : public QDialog
 		//
 		//Переменная для хранения запроса
 		//
-        QString sqlCursor;	
+        QString sqlCursorColumns;
+		QString sqlCursorTF;
+		QString sqlCursorFilters;
 		//
 		//Указатель на базу данных
         //
@@ -114,6 +126,15 @@ class SyncQueueViewerForm : public QDialog
 
 		int t_dataRow;
 		int b_dataRow;
+
+		FiltersForm* filtersDialog;
+
+		QStringList org_list;
+		QStringList obj_list;
+		QStringList res_list;
+
+		QString dateFrom;
+		QString dateTo;
 };
 
 #endif

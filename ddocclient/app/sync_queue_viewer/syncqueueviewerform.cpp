@@ -2,6 +2,7 @@
 #include <QApplication>
 #include <QStandardItem>
 #include <QDateTime>
+#include <QHeaderView>
 
 #include "kksdatabase.h"
 
@@ -74,12 +75,18 @@ SyncQueueViewerForm :: SyncQueueViewerForm(KKSDatabase * adb, QWidget * parent) 
 	//
     cursor_open = false;
 
+	filtersDialog = new FiltersForm(this);
+	filtersDialog->setVisible(false);
+	
 	//
 	//Подключение элементов интерфейса
 	//
 	QObject::connect(qpb_exit,SIGNAL(clicked()),this,SLOT(close()));
 	QObject::connect(qpb_filters,SIGNAL(clicked()),this,SLOT(slot_filters_setup()));
 	QObject::connect(qpb_view,SIGNAL(clicked()),this,SLOT(slot_viewClicked()));
+
+	QObject::connect(filtersDialog,SIGNAL(accepted()),this,SLOT(slot_accepted()));
+	QObject::connect(filtersDialog,SIGNAL(rejected()),this,SLOT(slot_rejected()));
 
 	QObject::connect(syncQueueTreeWnd,SIGNAL(signal_viewRows(int,int)),this,SLOT(slot_updateModelData(int,int)));
 }
@@ -92,7 +99,7 @@ SyncQueueViewerForm::~SyncQueueViewerForm(void)
 
     db->commit();
 
-	releaseMouse();
+	delete filtersDialog;
 }
 //**********
 
@@ -101,46 +108,14 @@ SyncQueueViewerForm::~SyncQueueViewerForm(void)
 //
 void SyncQueueViewerForm::resizeEvent(QResizeEvent * pe)
 {
-	if(!cursor_open)
-		return;
-	if(flag_clicked)
-		return;
-
-	syncQueueTreeWnd->clear();
-	model->clear();
-		
-	syncQueueTreeWnd->setRowCount(countRow);
-
-	model->setColumn(countColumn);
-	model->setRow(countRow);
-	model->setEmptyData(true);
-
-	t_dataRow = -1;
-	b_dataRow = -1;
-
-	//*****Настройка элемента отображения в соответствии с курсором*****
-	syncQueueTreeWnd->setModel(model);
-
-	syncQueueTreeWnd->slot_viewRows();
-
-	model->setEmptyData(false);
-	
-	syncQueueTreeWnd->updateData();
-	//**********
+	refreshData();
 }
 //
 //Слот вызова диалога для установки фильтров
 //
 void SyncQueueViewerForm::slot_filters_setup()
 {
-	FiltersForm* filtersDialog = new FiltersForm(this);
-
-	if(filtersDialog->exec() == QDialog::Accepted)
-	{
-		QMessageBox::information(0,"Information","Yes");
-	}
-
-	delete filtersDialog;
+	filtersDialog->setVisible(true);
 }
 //
 //Слот обращения к базе данных
@@ -171,8 +146,16 @@ void SyncQueueViewerForm::slot_viewClicked()
 	if(countRow == -1)
 	{
 		QMessageBox::information(0,tr("countRow"),tr("countRow = -1!"));
+		QApplication::restoreOverrideCursor();
 		return;
 	}
+	if(!countRow)
+	{
+		QMessageBox::information(0,tr("Data error!"),tr("No data in cursor!"));
+		QApplication::restoreOverrideCursor();
+		return;
+	}
+
 	if(!syncQueueTreeWnd->setRowCount(countRow))
 	{
 		QMessageBox::information(0,tr("syncQueueTreeWnd->setRowCount(countRow)"),tr("!countRow"));
@@ -196,6 +179,8 @@ void SyncQueueViewerForm::slot_viewClicked()
 
 	model->setEmptyData(false);
 	
+	syncQueueTreeWnd->header()->setResizeMode(QHeaderView::ResizeToContents);
+
 	syncQueueTreeWnd->updateData();
 	//**********
 
@@ -232,7 +217,7 @@ int SyncQueueViewerForm::countInCursor()
 	//
 	//Инициализация переменной cur с целью определения количества опрашиваемых таблиц
     //
-	int cur = sqlCursor.indexOf(" from ");
+	int cur = sqlCursorTF.indexOf(" from ");
 	//
 	//Если таблиц нет вернуть 0
     //
@@ -241,8 +226,9 @@ int SyncQueueViewerForm::countInCursor()
 	//
 	//Запрос по количеству записей в таблице from out_sync_queue
 	//
-	QString newSql = QString("select count(*) from out_sync_queue");//where 1=1
-    res = db->execute(newSql);
+	QString newSql = QString("select count(*) from out_sync_queue q where 1=1 ");// from out_sync_queue");//where 1=1
+    newSql += sqlCursorFilters;
+	res = db->execute(newSql);
 
 	//
 	//Возвращаемое значение
@@ -287,7 +273,8 @@ bool SyncQueueViewerForm::openCursor()
 	//
 	cursor_open = false;
 
-    sqlCursor.clear();
+    sqlCursorColumns.clear();
+	sqlCursorTF.clear();
 
     /*
                             select \
@@ -322,7 +309,7 @@ bool SyncQueueViewerForm::openCursor()
 	//
 	//Запрос к базе данных в формате QString
 	//
-	sqlCursor = QString(" \
+	sqlCursorColumns = QString(" \
                             select \
                                 t.id,  \
                                 t.name,  \
@@ -341,6 +328,8 @@ bool SyncQueueViewerForm::openCursor()
                                 q.sync_result,   \
                                 q.entity_uid,   \
                                 q.entity_io_uid   \
+						");
+	sqlCursorTF = QString(" \
                             from  \
                                 out_sync_queue q \
 								inner join io_objects io on (q.entity_table = io.table_name) \
@@ -356,33 +345,53 @@ bool SyncQueueViewerForm::openCursor()
     QString aa = filterF->getOrg();
     if(!aa.isEmpty()){
         sqlCursor += QString(" and q.id_organization in (%1) ").arg(aa);
+    }*/
+
+    if(!obj_list.isEmpty() && obj_list.size() != 10)
+	{
+		sqlCursorFilters = sqlCursorFilters + QString(" and q.entity_type in ( ");
+
+		for(int i=0; i < obj_list.size() ; i++)
+		{
+			sqlCursorFilters = sqlCursorFilters+ obj_list.value(i);
+
+			if(i != obj_list.size() - 1)
+				sqlCursorFilters += QString(", ");
+		}
+
+		sqlCursorFilters += QString(" )");
     }
 
-    aa = filterF->getObjectT();
-    if(!aa.isEmpty()){
-        sqlCursor += QString(" and q.entity_type in (%1) ").arg(aa);
+    if(!res_list.isEmpty() && res_list.size() != 4)
+	{
+		sqlCursorFilters = sqlCursorFilters + QString(" and q.sync_result in ( ");
+
+		for(int i=0; i < res_list.size() ; i++)
+		{
+			sqlCursorFilters = sqlCursorFilters+ res_list.value(i);
+
+			if(i != res_list.size() - 1)
+				sqlCursorFilters += QString(", ");
+		}
+
+		sqlCursorFilters += QString(" )");
     }
 
-    aa = filterF->getRes();
-    if(!aa.isEmpty()){
-        sqlCursor += QString(" and q.sync_result in (%1) ").arg(aa);
-    }
+	if(!dateFrom.isEmpty())
+	{
+		dateFrom = QString("to_timestamp('") + dateFrom + QString("', 'DD.MM.YYYY HH24:MI:SS')::timestamp");
+		sqlCursorFilters = sqlCursorFilters + QString(" and q.last_update >= ") + dateFrom + QString(" ");
+	}
 
-    if(filterF->useStartDate()){
-        QString tVal = filterF->getStartDateTime().toString("dd.MM.yyyy hh:mm:ss");
-        QString dtStart = QString("to_timestamp('%1', 'DD.MM.YYYY HH24:MI:SS')::timestamp").arg(tVal);
+	if(!dateTo.isEmpty())
+	{
+		dateTo = QString("to_timestamp('") + dateTo + QString("', 'DD.MM.YYYY HH24:MI:SS')::timestamp");
+		sqlCursorFilters = sqlCursorFilters + QString(" and q.last_update <= ") + dateTo + QString(" ");		
+	}
 
-        sqlCursor += QString(" and q.last_update >= %1 ").arg(tVal);
-    }
+	QString sqlCursor;
 
-    if(filterF->useEndDate()){
-        QString tVal = filterF->getEndDateTime().toString("dd.MM.yyyy hh:mm:ss");
-        QString dtEnd = QString("to_timestamp('%1', 'DD.MM.YYYY HH24:MI:SS')::timestamp").arg(tVal);
-
-        sqlCursor += QString(" and q.last_update <= %1 ").arg(tVal);
-    }
-
-*/
+	sqlCursor = sqlCursorColumns + sqlCursorTF + sqlCursorFilters;
 	//
 	//Упорядочивание таблицы по первому столбцу
 	//
@@ -697,22 +706,78 @@ void SyncQueueViewerForm::initWidget()
 }
 //**********
 
-void SyncQueueViewerForm::mousePressEvent ( QMouseEvent * i_event )
+/*void SyncQueueViewerForm::leaveEvent(QEvent * i_event)
 {
-     if (i_event->button() == Qt::LeftButton) 
-	 {
-         flag_clicked = true;
-	 }
+	if (!flag_clicked) 
+	{
+        flag_clicked = true;
+	}
 
-	 QDialog::mousePressEvent(i_event);
+	QDialog::leaveEvent(i_event);
 }
 
-void SyncQueueViewerForm::mouseReleaseEvent ( QMouseEvent * i_event )
+void SyncQueueViewerForm::enterEvent (QEvent * i_event)
 {
-     if (i_event->button() == Qt::LeftButton) 
-	 {
-         flag_clicked = false;
-	 }
+	if(flag_clicked)
+	{
+		flag_clicked = false;
+	}
 
-	 QDialog::mousePressEvent(i_event);
+	QDialog::enterEvent(i_event);
+}*/
+
+void SyncQueueViewerForm::refreshData()
+{
+	if(!cursor_open)
+		return;
+	if(flag_clicked)
+		return;
+
+	syncQueueTreeWnd->clear();
+	model->clear();
+		
+	syncQueueTreeWnd->setRowCount(countRow);
+
+	model->setColumn(countColumn);
+	model->setRow(countRow);
+	model->setEmptyData(true);
+
+	t_dataRow = -1;
+	b_dataRow = -1;
+
+	//*****Настройка элемента отображения в соответствии с курсором*****
+	syncQueueTreeWnd->setModel(model);
+
+	syncQueueTreeWnd->slot_viewRows();
+
+	model->setEmptyData(false);
+	
+	syncQueueTreeWnd->header()->setResizeMode(QHeaderView::ResizeToContents);	
+	
+	syncQueueTreeWnd->updateData();
+	//**********
+}
+
+void SyncQueueViewerForm::slot_accepted()
+{
+	org_list.clear();
+	obj_list.clear();
+	res_list.clear();
+	
+	dateFrom.clear();
+	dateTo.clear();
+
+	org_list = filtersDialog->getOrganization();
+	obj_list = filtersDialog->getObjectType();
+	res_list = filtersDialog->getResult();
+
+	dateFrom = filtersDialog->getDateFrom();
+	dateTo   = filtersDialog->getDateTo();
+
+	sqlCursorFilters.clear();
+}
+
+void SyncQueueViewerForm::slot_rejected()
+{
+
 }

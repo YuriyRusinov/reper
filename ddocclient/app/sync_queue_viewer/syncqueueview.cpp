@@ -1,5 +1,7 @@
 #include "syncqueueview.h"
 
+#include <QHeaderView>
+
 #include "kksdatabase.h"
 #include "syncqueueitemmodel.h"
 #include "syncqueueviewerform.h"
@@ -111,6 +113,8 @@ void SyncQueueView::clear()
 	totalRowCount = -1;
 	viewRowCount  = -1;
 	setModel(0);
+
+	header()->setResizeMode(QHeaderView::Interactive);
 }
 //**********
 

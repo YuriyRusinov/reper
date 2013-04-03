@@ -60,10 +60,11 @@ FiltersForm::FiltersForm(QWidget *parent)
 	qdte_from = new QDateTimeEdit(this);
 	qdte_to   = new QDateTimeEdit(this);
 
-	qdte_from->setDisplayFormat("dd.MM.yyyy");
-	qdte_to->setDisplayFormat("dd.MM.yyyy");
+	qdte_from->setDisplayFormat("dd.MM.yyyy hh:mm:ss");
+	qdte_to->setDisplayFormat("dd.MM.yyyy hh:mm:ss");
 
 	qdte_to->setDate(QDate().currentDate());
+	qdte_to->setTime(QTime().currentTime());
 
 	QGridLayout* qgl_date = new QGridLayout;
 	qgl_date->addWidget(qcb_timeFrom,0,0,Qt::AlignRight);
@@ -126,4 +127,70 @@ void FiltersForm::slot_timeCheck()
 	{
 		qdte_to->setEnabled(false);
 	}
+}
+
+QStringList FiltersForm::getOrganization()
+{
+	QStringList resList;
+
+	QModelIndexList resSel = select_org->selectedRows();
+
+	for(int i=0; i < resSel.size() ; i++)
+	{
+		resList << QString().setNum(resSel.value(i).row()+1);
+	}
+
+	return resList;
+}
+
+QStringList FiltersForm::getObjectType()
+{
+	QStringList resList;
+
+	QModelIndexList resSel = select_obj->selectedRows();
+
+	for(int i=0; i < resSel.size() ; i++)
+	{
+		resList << QString().setNum(resSel.value(i).row()+1);
+	}
+
+	return resList;
+}
+
+QStringList FiltersForm::getResult()
+{
+	QStringList resList;
+
+	QModelIndexList resSel = select_res->selectedRows();
+
+	for(int i=0; i < resSel.size() ; i++)
+	{
+		resList << QString().setNum(resSel.value(i).row()+1);
+	}
+
+	return resList;
+}
+
+QString FiltersForm::getDateFrom()
+{
+	QString res;
+
+	if(!qcb_timeFrom->checkState())
+	{
+		res = qdte_from->dateTime().toString("dd.MM.yyyy hh:mm:ss");
+	}
+
+	return res;
+}
+
+QString FiltersForm::getDateTo()
+{
+	QString res;
+
+	if(!qcb_timeTo->checkState())
+	{
+		res = qdte_to->dateTime().toString("dd.MM.yyyy hh:mm:ss");
+	}
+
+	return res;
 }

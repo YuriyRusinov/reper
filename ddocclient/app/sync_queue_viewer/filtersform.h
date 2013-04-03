@@ -23,6 +23,13 @@ public:
 	FiltersForm(QWidget *parent);
 	~FiltersForm();
 
+	QStringList getOrganization();
+	QStringList getObjectType();
+	QStringList getResult();
+
+	QString getDateFrom();
+	QString getDateTo();
+
 private slots:
 	void slot_timeCheck();
 
