@@ -196,15 +196,15 @@ QVariant SyncQueueItemModel::data(const QModelIndex & index, int role) const
 	{
 		if(modelData->value(countColumn*(index.row()-topRowIndex)+countColumn-1) == "4")
 		{
-			return QVariant(QPixmap("E:\\ddocclient\\ddocclient\\ddocs_ico\\qtreeview_icons\\cancel_qtree.png"));
+            return QVariant(QPixmap(":/ddoc/cancel.png"));
 		}
 		if(modelData->value(countColumn*(index.row()-topRowIndex)+countColumn-1) == "3")
 		{
-			return QVariant(QPixmap("E:\\ddocclient\\ddocclient\\ddocs_ico\\qtreeview_icons\\accept_qtree.png"));;
+            return QVariant(QPixmap(":/ddoc/accept.png"));;
 		}
 		if(modelData->value(countColumn*(index.row()-topRowIndex)+countColumn-1) == "2")
 		{
-			return QVariant(QPixmap("E:\\ddocclient\\ddocclient\\ddocs_ico\\qtreeview_icons\\category_copy_qtree.png"));;
+            return QVariant(QPixmap(":/ddoc/category_copy.png"));;
 		}
 	}
 

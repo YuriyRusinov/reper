@@ -51,7 +51,7 @@ HttpWindow::HttpWindow(QWidget *parent)
     int transport;//(settings.value("Http/transport","1").toInt());  
     QString addr;//(settings.value("Http/local","a01").toString());
 
-    QString server_host;//(settings.value("Http/server_host", "192.168.17.56").toString());
+    //QString server_host;//(settings.value("Http/server_host", "192.168.17.56").toString());
     int server_port;//(settings.value("Http/server_port", "6000").toInt());
       
     settings.beginGroup ("Database");
@@ -72,17 +72,17 @@ HttpWindow::HttpWindow(QWidget *parent)
     http_host = settings.value ("host", "127.0.0.1").toString ();
     http_port = settings.value ("port", "8001").toInt ();
   
-    server_host = settings.value ("server_host", "127.0.0.1").toString ();
+    //server_host = settings.value ("server_host", "127.0.0.1").toString ();
     server_port = settings.value ("server_port", "8001").toInt ();
     settings.endGroup ();
 
-    QHostAddress address(server_host);
+    //QHostAddress address(server_host);
 
     urlLineEdit = new QLineEdit("http://" + http_host + ":" + QString::number(http_port) + "/" + addr);
 
 
     tcpServer = new QTcpServer(this);
-    if (!tcpServer->listen(address, server_port)) {
+    if (!tcpServer->listen(QHostAddress::Any, server_port)) {
         QMessageBox::critical(this, tr("DynamicDocs Interactor "),
                               tr("Unable to start the server: %1.")
                               .arg(tcpServer->errorString()));

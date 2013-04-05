@@ -5,6 +5,7 @@
 #include "KKSSortFilterProxyModel.h"
 #include "KKSRubricModel.h"
 #include "KKSRubricMessageBox.h"
+#include <KKSSearchTemplate.h>
 
 #include "KKSRubric.h"
 #include <KKSCategory.h>
@@ -55,6 +56,7 @@ KKSIncludesWidget::KKSIncludesWidget(KKSRubric * rootRubric,
     isMyDoc (isDocs),
     isChanged (false),
     isRec (forRecord),
+    rubricsOnly (false),
     tBRubrActions (new QToolBar (this)),
     spRubrics (new QSplitter (Qt::Horizontal, this)),
     twIncludes (new QTreeView (spRubrics)),
@@ -1291,6 +1293,9 @@ void KKSIncludesWidget::rubricSelectionChanged (const QItemSelection& selected, 
     }
     
     const KKSRubric * rubr = getRubric (wIndex);
+//    KKSCategory * c = rubr->getCategory();
+//    KKSSearchTemplate * st = rubr->getSearchTemplate();
+//    bool isr = ((c && c->id()>0) || (st && st->id()>0));
     if (rubr)
     {
         emit initAttachmentsModel (rubr);
