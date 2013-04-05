@@ -43,7 +43,7 @@ begin
                s1.description,
                s1.is_system
         from io_states s1
-        where is_system = false --Р·Р°РїСЂРµС‰Р°РµРј СЂР°Р±РѕС‚Сѓ СЃ СЃРёСЃС‚РµРјРЅС‹РјРё СЃРѕСЃС‚РѕСЏРЅРёСЏРјРё      
+        where is_system = false --запрещаем работу с системными состояниями
     loop
         return next r;
     end loop;

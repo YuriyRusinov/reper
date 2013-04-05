@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     10.03.2013 14:53:43                          */
+/* Created on:     05.04.2013 17:04:51                          */
 /*==============================================================*/
 
 
@@ -23,8 +23,6 @@ select setMacToNULL('root_table');
 create unique index Index_1 on root_table using BTREE (
 unique_id
 );
-
-
 
 /*==============================================================*/
 /* User: public                                                 */
@@ -2342,6 +2340,21 @@ select setMacToNULL('message_journal');
 select createTriggerUID('message_journal');
 
 /*==============================================================*/
+/* Table: message_series                                        */
+/*==============================================================*/
+create table message_series (
+   id                   SERIAL               not null,
+   id_message_stream    INT4                 not null,
+   "time"               TIMESTAMP            not null,
+   time_step            FLOAT8               not null default 1.0,
+   constraint PK_MESSAGE_SERIES primary key (id)
+)
+inherits (root_table);
+
+select setMacToNULL('message_series');
+select createTriggerUID('message_series');
+
+/*==============================================================*/
 /* Table: message_streams                                       */
 /*==============================================================*/
 create table message_streams (
@@ -2349,6 +2362,7 @@ create table message_streams (
    id_partition_low     INT4                 not null,
    id_io_object         INT4                 not null,
    id_dl_receiver       INT4                 not null,
+   id_time_unit         INT4                 not null default 1,
    name                 VARCHAR              not null,
    lambda               FLOAT8               null default 0,
    sigma                FLOAT8               null default 0,
@@ -2356,7 +2370,7 @@ create table message_streams (
    min_p                FLOAT8               null default 0,
    max_p                FLOAT8               null default 0,
    start_time           TIMESTAMP            not null,
-   end_time             TIMESTAMP            not null,
+   stop_time            TIMESTAMP            not null,
    constraint PK_MESSAGE_STREAMS primary key (id)
 )
 inherits (root_table);
@@ -2389,7 +2403,7 @@ comment on column message_streams.max_p is
 comment on column message_streams.start_time is
 'Дата и время начала интервала генерации потока';
 
-comment on column message_streams.end_time is
+comment on column message_streams.stop_time is
 'Дата и время завершения генерации потока';
 
 select setMacToNULL('message_streams');
@@ -3234,6 +3248,7 @@ create table roles_actions (
 
 select setMacToNULL('roles_actions');
 
+
 /*==============================================================*/
 /* Table: rubric_records                                        */
 /*==============================================================*/
@@ -3463,6 +3478,23 @@ create table system_table (
 select setMacToNULL('system_table');
 
 /*==============================================================*/
+/* Table: time_units                                            */
+/*==============================================================*/
+create table time_units (
+   id                   SERIAL               not null,
+   name                 VARCHAR              not null,
+   short_name           VARCHAR              not null,
+   constraint PK_TIME_UNITS primary key (id)
+)
+inherits (root_table);
+
+comment on table time_units is
+'Единицы измерения времени';
+
+select setMacToNULL('time_units');
+select createTriggerUID('time_units');
+
+/*==============================================================*/
 /* Table: transport                                             */
 /*==============================================================*/
 create table transport (
@@ -3641,7 +3673,7 @@ select createTriggerUID('tso_units');
 /* Table: units                                                 */
 /*==============================================================*/
 create table units (
- --  id                   SERIAL not null,
+--   id                   SERIAL not null,
    id_organization      INT4                 null,
    id_parent            INT4                 null,
    id_curr_mode         INT4                 not null,
@@ -4704,6 +4736,11 @@ alter table message_journal
       references io_objects (id)
       on delete restrict on update restrict;
 
+alter table message_series
+   add constraint FK_MESSAGE__REFERENCE_MESSAGE_ foreign key (id_message_stream)
+      references message_streams (id)
+      on delete restrict on update restrict;
+
 alter table message_streams
    add constraint FK_MESSAGE_STREAMS__REF_PARTITION foreign key (id_partition_low)
       references partition_lows (id)
@@ -4717,6 +4754,11 @@ alter table message_streams
 alter table message_streams
    add constraint FK_MESSAGE_STREAMS__REF_POSITION foreign key (id_dl_receiver)
       references "position" (id)
+      on delete restrict on update restrict;
+
+alter table message_streams
+   add constraint FK_MESSAGE__REFERENCE_TIME_UNI foreign key (id_time_unit)
+      references time_units (id)
       on delete restrict on update restrict;
 
 alter table object_ref_tables

@@ -34,6 +34,17 @@ FLOADER_EXPORT Datum rdeletefile(PG_FUNCTION_ARGS);
 FLOADER_EXPORT Datum kkssitoversion(PG_FUNCTION_ARGS);
 //FLOADER_EXPORT Datum rxpm2jpeg(PG_FUNCTION_ARGS);
 
+FLOADER_EXPORT Datum initrand(PG_FUNCTION_ARGS);
+FLOADER_EXPORT Datum droprand(PG_FUNCTION_ARGS);
+FLOADER_EXPORT Datum unirand(PG_FUNCTION_ARGS);
+FLOADER_EXPORT Datum gaussrand(PG_FUNCTION_ARGS);
+FLOADER_EXPORT Datum exprand(PG_FUNCTION_ARGS);
+FLOADER_EXPORT Datum saveRand(PG_FUNCTION_ARGS);
+
+
+
+
+
 
 text* cstring_to_text_ex(const char *);
 char* text_to_cstring_ex(text *);

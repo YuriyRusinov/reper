@@ -693,6 +693,19 @@ insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main
 insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
 values(204, -10, true, true, false, false, true);
 
+insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values ('localorg-categories-205', 205, 10, NULL, false, '≈диницы измерени€ времени', 'SYSCATEGORY_205', NULL::varchar, true, true, 1);
+insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
+values(205, -10, true, true, false, false, true);
+insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values ('localorg-categories-206', 206, 8, 205, true, '—правочник единиц измерени€ времени', 'SYSCATEGORY_206', NULL::varchar, true, true, 1);
+insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
+values(206, -10, true, true, false, false, true);
+
+insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values ('localorg-categories-207', 207, 10, NULL, false, '—ерии потоков сообщений', 'SYSCATEGORY_207', NULL::varchar, true, true, 1);
+insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
+values(207, -10, true, true, false, false, true);
+insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values ('localorg-categories-208', 208, 8, 207, true, '—правочник серий потоков сообщений', 'SYSCATEGORY_208', NULL::varchar, true, true, 1);
+insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
+values(208, -10, true, true, false, false, true);
 
 SELECT pg_catalog.setval('io_categories_id_seq', 300, true); --все пользовательские категории будут начинатьс€ с номера 301
                                                              --это сделано дл€ того, чтобы оставить резерв дл€ системных категорий 
@@ -1109,6 +1122,10 @@ insert into attributes (unique_id, id, id_a_type, code, name, title, table_name,
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-335', 335, 8, 'return_code', ' од возврата сервиса', ' од возврата сервиса', NULL, NULL, 100, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-336', 336, 1, 'is_external', 'ѕризнак внешнего запуска', 'ѕризнак внешнего запуска', NULL, NULL, 100, TRUE);
 
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-337', 337, 2, 'id_time_unit', '≈диницы измерени€ времени', '≈диницы измерени€ времени', 'time_units', 'name', 150, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-338', 338, 5, 'time', 'ћомент времени', 'ћомент времени', NULL, NULL, 120, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-339', 339, 6, 'time_step', '¬ременной шаг', '¬ременной шаг', NULL, NULL, 120, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-340', 340, 2, 'id_message_stream', 'ѕоток сообщений', 'ѕоток сообщений', 'message_streams', 'name', 150, TRUE);
 
 
 SELECT pg_catalog.setval('attributes_id_seq', 1000, true); --все пользовательские атрибуты будут начинатьс€ с номера 1001
@@ -2083,7 +2100,8 @@ insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (546, 193, 319, '0', false, false); --min_p
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (547, 193, 320, '0', false, false); --max_p
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (548, 193, 313, NULL, true, false); --start_time
-insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (549, 193, 314, NULL, true, false); --end_time
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (549, 193, 314, NULL, true, false); --stop_time
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (584, 193, 337, '1', true, false); --id_time_unit
 
 --таблица жизненных циклов
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (550, 195, 1, NULL, true, true); --id
@@ -2132,6 +2150,19 @@ insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is
 --581 используетс€ в справочнике состо€ний »ќ
 --582 используетс€ в справочнике категорий »ќ
 --583 используетс€ в справочнике сервисов
+--584 используетс€ в справочнике потоков сообщений
+
+--таблица единиц измерени€ времени
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (585, 205, 1, NULL, true, true); --id
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (586, 205, 2, NULL, true, false); --name
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (587, 205, 19, NULL, true, false); --short_name
+
+--таблица серий потоков сообщений
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (588, 207, 1, NULL, true, true); --id
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (589, 207, 340, NULL, true, false); --id_message_stream
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (590, 207, 338, NULL, true, false); --time
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (591, 207, 339, NULL, true, false); --time_step
+
 
 SELECT pg_catalog.setval('attrs_categories_id_seq', 2000, true); --все пользовательские атрибуты в категори€х будут начинатьс€ с номера 2001
                                                                  --это сделано дл€ того, чтобы оставить резерв дл€ системных атрибутов
@@ -2626,6 +2657,15 @@ values ('localorg-io_objects-99', 99, 204, 1, 1, '—правочник очередей обработки 
 insert into access_table (id_io_object, id_role, allow_readlist, allow_read, allow_delete, allow_update)
 values (99, -10, TRUE, TRUE, FALSE, FALSE);
 
+insert into tbl_io_objects (unique_id, id, id_io_category, author, id_io_state, name, table_name, description, information, is_system, is_global, id_sync_type, insert_time, id_maclabel, id_owner_org, id_io_type)
+values ('localorg-io_objects-100', 100, 206, 1, 1, '—правочник единиц измерени€ времени', 'time_units', NULL, '—истемный объект', true, true, 5, current_timestamp, 1, NULL, 3);
+insert into access_table (id_io_object, id_role, allow_readlist, allow_read, allow_delete, allow_update)
+values (100, -10, TRUE, TRUE, FALSE, FALSE);
+
+insert into tbl_io_objects (unique_id, id, id_io_category, author, id_io_state, name, table_name, description, information, is_system, is_global, id_sync_type, insert_time, id_maclabel, id_owner_org, id_io_type)
+values ('localorg-io_objects-101', 101, 208, 1, 1, '—правочник серий потоков сообщений', 'message_series', NULL, '—истемный объект', true, true, 5, current_timestamp, 1, NULL, 3);
+insert into access_table (id_io_object, id_role, allow_readlist, allow_read, allow_delete, allow_update)
+values (101, -10, TRUE, TRUE, FALSE, FALSE);
 
 SELECT pg_catalog.setval('tbl_io_objects_id_seq', 300, true); --все пользовательские информационные объекты будут начинатьс€ с номера 301
                                                           --это сделано дл€ того, чтобы оставить резерв дл€ системных »ќ
