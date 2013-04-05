@@ -65,4 +65,8 @@ Datum exprand(PG_FUNCTION_ARGS)
     PG_RETURN_FLOAT8(res);
 }
 
-
+Datum saveRand(PG_FUNCTION_ARGS)
+{
+    if (!r)
+        PG_RETURN_INT32(-1);
+}
