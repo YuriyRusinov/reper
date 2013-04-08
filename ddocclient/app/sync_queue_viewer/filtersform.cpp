@@ -8,9 +8,9 @@ FiltersForm::FiltersForm(QWidget *parent)
 	setWindowTitle(tr("Data base view: filters"));
 
 	//Создание интерфейса
-	qgb_organizations = new QListView(this);//();
-	qgb_objectType    = new QListView(this);//(tr("Object type"),this);
-	qgb_result        = new QListView(this);//(tr("Result"),this);
+	qgb_organizations = new QListView(this);
+	qgb_objectType    = new QListView(this);
+	qgb_result        = new QListView(this);
 
 	QStringList sl = QStringList();
 
@@ -22,11 +22,11 @@ FiltersForm::FiltersForm(QWidget *parent)
 	select_org = qgb_organizations->selectionModel();
 
 	sl.clear();
-	sl << tr("Category (system)") << tr("IO (system)") << tr("EIO (directory record)")
-	   << tr("EIO (record additional table directory)") << tr("Additional table directory")
+	sl << tr("Category(system)") << tr("IO(system)") << tr("IOR(directory record)")
+	   << tr("IOR(record additional table directory)") << tr("Additional table directory")
 	   << tr("Transfer request to the ping") << tr("Reserved")
 	   << tr("Transfer complete directory of organizations to the new object")
-	   << tr("Transferring directory entries for all organizations involved in the exchange of information objects") << tr("Public DL");
+	   << tr("Transfer directory entries for all organizations involved in the exchange of information objects") << tr("Public DL");
 
 	model_obj = new QStringListModel(sl,this);
 	qgb_objectType->setModel(model_obj);
@@ -51,8 +51,10 @@ FiltersForm::FiltersForm(QWidget *parent)
 	qpb_ok     = new QPushButton(tr("Ok"),this);
 	qpb_cancel = new QPushButton(tr("Cancel"),this);
 
-	qcb_timeTo = new QCheckBox();
+	qcb_timeTo   = new QCheckBox();
+	qcb_timeTo->setCheckState(Qt::Checked);
 	qcb_timeFrom = new QCheckBox();
+	qcb_timeFrom->setCheckState(Qt::Checked);
 
 	qlb_from = new QLabel(tr("From:"),this);
 	qlb_to   = new QLabel(tr("To:"),this);
@@ -85,7 +87,7 @@ FiltersForm::FiltersForm(QWidget *parent)
 	qgl_groopbox->addWidget(qgb_objectType,1,1,Qt::AlignHCenter);
 	qgl_groopbox->addWidget(qgb_result,1,2,Qt::AlignHCenter);
 
-	QSplitter* qsh_datebutton = new QSplitter(Qt::Horizontal);
+	QSplitter* qsh_datebutton = new QSplitter(Qt::Horizontal,this);
 
 	qhbl_buttons->addLayout(qgl_date);
 	qhbl_buttons->addWidget(qsh_datebutton);
@@ -105,30 +107,40 @@ FiltersForm::FiltersForm(QWidget *parent)
 
 FiltersForm::~FiltersForm()
 {
-	//delete select_org;
+	delete qlb_organizations;
+	delete qlb_objectType;
+	delete qlb_result;
+
+	delete qgb_organizations;
+	delete qgb_objectType;
+	delete qgb_result;
+
+	delete model_org;
+	select_org = 0;
+
+	delete model_obj;
+	select_obj = 0;
+
+	delete model_res;
+	select_res = 0;
+
+	delete qcb_timeTo;
+	delete qcb_timeFrom;
+
+	delete qpb_ok;
+	delete qpb_cancel;
+
+	delete qlb_from;
+	delete qlb_to;
+
+	delete qdte_from;
+	delete qdte_to;
 }
 
-void FiltersForm::slot_timeCheck()
-{
-	if(!qcb_timeFrom->checkState())
-	{
-		qdte_from->setEnabled(true);
-	}
-	else
-	{
-		qdte_from->setEnabled(false);
-	}
-
-	if(!qcb_timeTo->checkState())
-	{
-		qdte_to->setEnabled(true);
-	}
-	else
-	{
-		qdte_to->setEnabled(false);
-	}
-}
-
+//*****Функции получения значения фильтров*****
+//
+//Получение списка организаций
+//
 QStringList FiltersForm::getOrganization()
 {
 	QStringList resList;
@@ -142,7 +154,9 @@ QStringList FiltersForm::getOrganization()
 
 	return resList;
 }
-
+//
+//Получение списка объектов
+//
 QStringList FiltersForm::getObjectType()
 {
 	QStringList resList;
@@ -156,7 +170,9 @@ QStringList FiltersForm::getObjectType()
 
 	return resList;
 }
-
+//
+//Получение списка результатов синхронизации
+//
 QStringList FiltersForm::getResult()
 {
 	QStringList resList;
@@ -170,27 +186,53 @@ QStringList FiltersForm::getResult()
 
 	return resList;
 }
-
+//
+//Получение даты формирования записи с которой следует отбирать результаты
+//
 QString FiltersForm::getDateFrom()
 {
 	QString res;
 
-	if(!qcb_timeFrom->checkState())
+	if(qdte_from->isEnabled())
 	{
 		res = qdte_from->dateTime().toString("dd.MM.yyyy hh:mm:ss");
 	}
 
 	return res;
 }
-
+//
+//Получение даты формирования записи до которой следует отбирать результаты 
+//
 QString FiltersForm::getDateTo()
 {
 	QString res;
 
-	if(!qcb_timeTo->checkState())
+	if(qdte_to->isEnabled())
 	{
 		res = qdte_to->dateTime().toString("dd.MM.yyyy hh:mm:ss");
 	}
 
 	return res;
+}
+//**********
+
+void FiltersForm::slot_timeCheck()
+{
+	if(!qcb_timeFrom->checkState())
+	{
+		qdte_from->setEnabled(false);
+	}
+	else
+	{
+		qdte_from->setEnabled(true);
+	}
+
+	if(!qcb_timeTo->checkState())
+	{
+		qdte_to->setEnabled(false);
+	}
+	else
+	{
+		qdte_to->setEnabled(true);
+	}
 }

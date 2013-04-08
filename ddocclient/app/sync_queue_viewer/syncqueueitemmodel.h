@@ -1,13 +1,9 @@
 #ifndef SYNCQUEUEITEMMODEL_H
 #define SYNCQUEUEITEMMODEL_H
 
-#include "kksresult.h"
-
 #include <QAbstractItemModel>
 #include <QVector>
-#include <QStandardItem>
-
-class KKSDatabase;
+#include <QBrush>
 
 class SyncQueueItemModel:public QAbstractTableModel
 {
@@ -43,26 +39,26 @@ class SyncQueueItemModel:public QAbstractTableModel
 		//Функция установки видимой области виджета отображения.
 		//В случае если полученные индексы ошибочны возвращает false
 		//
-		bool setWindowIndex(int i_topRowIndex,int i_bottomRowIndex);
+		bool setWindowIndex(const int i_topRowIndex,const int i_bottomRowIndex);
 		//
 		//Функция установки количества столбцов в таблице
 		//В случае если количество столбцов неверно возвращает false
 		//
-		bool setColumn(int i_totalColumn);
+		bool setColumn(const int i_totalColumn);
 		//
 		//Функция установки количества строк в таблице
 		//В случае если количество столбцов неверно возвращает false
 		//
-		bool setRow(int i_totalRow);
+		bool setRow(const int i_totalRow);
 		//
 		//Добавление строки в позицию i_index
 		//Первая строка имеет индекс 0
 		//
-		bool insertDataRow(int i_index,const QVector<QString>* i_dataRow);
+		int insertDataRow(const int i_index,const QVector<QString>& i_dataRow);
 		//
 		//Удаление строки из позиции i_index
 		//
-		bool deleteDataRow(int i_index);
+		int deleteDataRow(const int i_index);
 		//
 		//Возврат отображаемого количества строк
 		//
@@ -71,14 +67,10 @@ class SyncQueueItemModel:public QAbstractTableModel
 
 		//*****Функция для получения и обработки данных*****
 		//
-		//Возврат указателя на данные модели
-		//
-		const QVector< QString >* const getDataVector() const;
-		//
 		//Функция передачи данных в модель
 		//В случае если указатель на данные 0, возвращает false
 		//
-		bool setDataVector(QVector< QString >* i_modelData);
+		int setDataVector(const QVector< QString >& i_modelData);
 		//
 		//Переопределенный метод data()
 		//
@@ -108,8 +100,8 @@ class SyncQueueItemModel:public QAbstractTableModel
 		//
 		void clear();
 		//**********
-
-private:
+	
+	private:
 		//*****Параметры строк и столбцов таблицы*****
         int countRow;      //Общее количество строк
         int countColumn;   //Общее количество столбцов
@@ -124,8 +116,29 @@ private:
 		//**********
 
 		//*****Данные хранимые в модели*****
-		QVector< QString > * modelData;//Контейнер для храения данных полученных по запросу
+		QVector<QString> * modelData;//Контейнер для храения данных полученных по запросу
 		//**********
+
+		//
+		//Функция инициализации
+		//
+		inline void init(int i_row = 0,int i_column = 0);
+		//
+		//Функция проверки попадания строки в видимое окно
+		//
+		inline int visualIndex(int i_index) const;
+		//
+		//Функция обработки Qt::DecorationRole
+		//
+		inline QVariant dataDecoration(int i_index) const;
+		//
+		//Функция обработки Qt::BackgroundRole
+		//
+		inline QVariant dataBackground(int i_index) const;
+		//
+		//Функция обработки Qt::DisplayRole
+		//
+		inline QVariant dataDisplay(int i_index,int i_indexColumn) const;
 };
 
 #endif

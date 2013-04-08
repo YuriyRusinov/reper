@@ -1,17 +1,13 @@
-#include <kksdatabase.h>
-#include <QtGlobal>
-#include <QtDebug>
-#include <QBrush>
-
-#include "kksresult.h"
 #include "syncqueueitemmodel.h"
-#include "syncqueueviewerform.h"
+
 
 SyncQueueItemModel::SyncQueueItemModel(int iCountRow, 
                                        int iCountColumn, 
-                                       QObject * parent) : QAbstractTableModel(parent), modelData(0), countRow(iCountRow),
-														   countColumn(iCountColumn), topRowIndex(-1), bottomRowIndex(-1), emptyData(true)
+                                       QObject * parent) : QAbstractTableModel(parent)
 {
+	init(iCountRow,iCountColumn);
+
+	modelData = new QVector<QString>();
 }
 
 //*****Функции для работы с параметрами строк и столбцов таблицы*****
@@ -51,7 +47,7 @@ int SyncQueueItemModel::getBottomViewRow() const
 //Функция установки видимой области виджета отображения
 //В случае если полученные индексы ошибочны возвращает false
 //
-bool SyncQueueItemModel::setWindowIndex(int i_topRowIndex,int i_bottomRowIndex)
+bool SyncQueueItemModel::setWindowIndex(const int i_topRowIndex,const int i_bottomRowIndex)
 {
 	//*****Проверки на непротиворечивость индексов видимых строк*****
 	if(i_topRowIndex > i_bottomRowIndex || i_topRowIndex < 0 || i_bottomRowIndex < 0  )
@@ -72,7 +68,7 @@ bool SyncQueueItemModel::setWindowIndex(int i_topRowIndex,int i_bottomRowIndex)
 //Функция установки количества столбцов в таблице
 //В случае если количество столбцов неверно возвращает false
 //
-bool SyncQueueItemModel::setColumn(int i_totalColumn)
+bool SyncQueueItemModel::setColumn(const int i_totalColumn)
 {
 	if(i_totalColumn <= 0)
 		return false;
@@ -85,7 +81,7 @@ bool SyncQueueItemModel::setColumn(int i_totalColumn)
 //Функция установки количества строк в таблице
 //В случае если количество столбцов неверно возвращает false
 //
-bool SyncQueueItemModel::setRow(int i_totalRow)
+bool SyncQueueItemModel::setRow(const int i_totalRow)
 {
 	if(i_totalRow <= 0)
 		return false;
@@ -98,39 +94,39 @@ bool SyncQueueItemModel::setRow(int i_totalRow)
 //Добавление строки в позицию i_index
 //Первая строка имеет индекс 0
 //
-bool SyncQueueItemModel::insertDataRow(int i_index,const QVector<QString>* i_dataRow)
+int SyncQueueItemModel::insertDataRow(const int i_index,const QVector<QString>& i_dataRow)
 {
 	//*****Проверка на наличие данных в модели и их соответствие параметрам хранимых данных*****
-	if(modelData->isEmpty() || i_dataRow->size() != countColumn)
-		return false;
+	if(modelData->isEmpty() || i_dataRow.size() != countColumn)
+		return 1;
 	//**********
 
 	//*****Проверка на правильное значение индекса строки*****
 	if(i_index < 0 || i_index >= getViewRowsCount())
-		return false;
+		return 2;
 	//**********
 	
 	for(int i = 0; i < countColumn ; i++)
 	{
-		modelData->insert(i_index*countColumn,i_dataRow->value(countColumn - 1 - i));
+		modelData->insert(i_index*countColumn,i_dataRow.value(countColumn - 1 - i));
 	}
 
-	return true;
+	return 0;
 }
 //
 //Удаление строки из позиции i_index
 //Первая строка имеет индекс 0
 //
-bool SyncQueueItemModel::deleteDataRow(int i_index)
+int SyncQueueItemModel::deleteDataRow(const int i_index)
 {
 	//*****Проверка на наличие данных в модели и их соответствие параметрам хранимых данных*****
 	if(modelData->isEmpty() || i_index*countColumn+countColumn-1 >= modelData->size())
-		return false;
+		return 1;
 	//**********
 
 	//*****Проверка на правильное значение индекса строки*****
 	if(i_index < 0 || i_index > getViewRowsCount())
-		return false;
+		return 2;
 	//**********
 	
 	for(int i = 0; i < countColumn ; i++)
@@ -138,7 +134,7 @@ bool SyncQueueItemModel::deleteDataRow(int i_index)
 		modelData->remove(i_index*countColumn);
 	}
 
-	return true;
+	return 0;
 }
 //
 //Возврат отображаемого количества строк
@@ -151,137 +147,69 @@ int SyncQueueItemModel::getViewRowsCount() const
 
 //*****Функция для получения и обработки данных*****
 //
-//Возврат указателя на данные модели
-//
-const QVector< QString >* const SyncQueueItemModel::getDataVector() const
-{
-	return modelData;
-}
-//
 //Функция передачи данных в модель
 //
-bool SyncQueueItemModel::setDataVector(QVector< QString >* i_modelData)
+int SyncQueueItemModel::setDataVector(const QVector<QString>& i_modelData)
 {
 	//
 	//Если данные отсутствуют вернуть false
 	//
-	if(!i_modelData || i_modelData->isEmpty())
-		return false;
+	if(i_modelData.isEmpty())
+		return 1;
 	//
 	//Если в модели уже есть данные, удалить их
 	//
-	if(modelData)
+	if(!modelData->isEmpty())
 	{
-		delete modelData;
-		modelData = 0;
+		modelData->clear();
 	}
 		
-	modelData = i_modelData;
+	for(int i = 0; i < i_modelData.size(); i++)
+		modelData->append(i_modelData.value(i));
 
 	emptyData = false;
+
+	return 0;
 }
 //
 //Переопределенный метод data()
 //
 QVariant SyncQueueItemModel::data(const QModelIndex & index, int role) const
 {
-	//Если индекс неверен или роль не имеет значения "выбранные данные отображаются как текст", вернуть ошибку
-    if (!index.isValid() || (role != Qt::DisplayRole && role != Qt::BackgroundRole && role != Qt::DecorationRole))
-        return QVariant();
-	//Если индекс неверен вернуть ошибку
-	if(index.column() < 0 || index.column() > countColumn)
-        return QVariant();
-
-	if(index.row() >= topRowIndex && index.row() <= bottomRowIndex && role == Qt::DecorationRole && !emptyData && !index.column())
+	if(emptyData)
+		return QVariant();	
+	
+	if(visualIndex(index.row()))
 	{
-		if(modelData->value(countColumn*(index.row()-topRowIndex)+countColumn-1) == "4")
+		switch(role)
 		{
-            return QVariant(QPixmap(":/ddoc/cancel.png"));
-		}
-		if(modelData->value(countColumn*(index.row()-topRowIndex)+countColumn-1) == "3")
-		{
-            return QVariant(QPixmap(":/ddoc/accept.png"));;
-		}
-		if(modelData->value(countColumn*(index.row()-topRowIndex)+countColumn-1) == "2")
-		{
-            return QVariant(QPixmap(":/ddoc/category_copy.png"));;
-		}
-	}
-
-	if(index.row() >= topRowIndex && index.row() <= bottomRowIndex && role == Qt::BackgroundRole && !emptyData)
-	{
-		if(modelData->value(countColumn*(index.row()-topRowIndex)+countColumn-1) == "4")
-		{
-			return Qt::red;
-		}
-		if(modelData->value(countColumn*(index.row()-topRowIndex)+countColumn-1) == "3")
-		{
-			return Qt::green;
-		}
-		if(modelData->value(countColumn*(index.row()-topRowIndex)+countColumn-1) == "2")
-		{
-			return Qt::yellow;
-		}
-	}
-
-	if(index.row() >= topRowIndex && index.row() <= bottomRowIndex && role == Qt::DisplayRole && !emptyData)
-	{
-		int k = countColumn*(index.row()-topRowIndex)+index.column();
-
-		QString res = modelData->value(k);
-
-		switch(index.column())
-		{
-			case 5:
+			case Qt::SizeHintRole:
 			{
-				if(res == "1")
-					res = tr("category(system)");
-				if(res == "2")
-					res = tr("IO(system)");
-				if(res == "3")
-					res = tr("IOR(directory record)");
-				if(res == "4")
-					res = tr("IOR(record additional table directory)");
-				if(res == "5")
-					res = tr("additional table directory");
-				if(res == "6")
-					res = tr("transfer request to the ping");
-				if(res == "8")
-					res = tr("transfer complete directory of organizations to the new object");
-				if(res == "9")
-					res = tr("transfer directory entries for all organizations involved in the exchange of information objects");
-				if(res == "10")
-					res = tr("public DL");
+				QSize res;
+				res.setWidth(24);
+				res.setHeight(24);
+				return res;
+			}
+			case Qt::DecorationRole:
+			{
+				if(!index.column())	
+					return dataDecoration(index.row());
 
 				break;
 			}
-			case 6:
+			case Qt::BackgroundRole:
 			{
-				if(res == "1")
-					res = tr("create a new entity on the target");
-				if(res == "2")
-					res = tr("replace the entity for this on the target");
-				if(res == "3")
-					res = tr("delete entity on the target");
-
-				break;
+				return dataBackground(index.row());
 			}
-			case 7:
+			case Qt::DisplayRole:
 			{
-				if(res == "1")
-					res = tr("expected timing");
-				if(res == "2")
-					res = tr("synchronized");
-				if(res == "3")
-					res = tr("synchronization is successful");
-				if(res == "4")
-					res = tr("there was an error");
-
-				break;
+				return dataDisplay(index.row(),index.column());
+			}
+			default:
+			{
+				return QVariant();
 			}
 		}
-
-		return res;
 	}
 
     return QVariant();
@@ -348,18 +276,138 @@ bool SyncQueueItemModel::hasChildren ( const QModelIndex & parent )
 //
 void SyncQueueItemModel::clear()
 {
-	countColumn = 0;
-	countRow = 0;
+	init();
+
+	modelData->clear();
+}
+//**********
+
+//
+//Функция инициализации
+//
+inline void SyncQueueItemModel::init(int i_row,int i_column)
+{
+	countColumn = i_row;
+	countRow = i_column;
 
 	bottomRowIndex = -1;
 	topRowIndex = -1;
-
-	if(modelData)
-	{
-		delete modelData;
-		modelData = 0;
-	}
-
+	
 	emptyData = true;
 }
-//**********
+//
+//Функция проверки попадания строки в видимое окно
+//
+inline int SyncQueueItemModel::visualIndex(int i_index) const
+{
+	if(i_index >= topRowIndex && i_index <= bottomRowIndex)
+		return 1;
+
+	return 0;
+}
+//
+//Функция обработки Qt::DecorationRole
+//
+inline QVariant SyncQueueItemModel::dataDecoration(int i_index) const
+{
+	int k = countColumn*(i_index-topRowIndex)+countColumn-1;
+	
+	if(modelData->value(k) == "4")
+	{
+		return QVariant(QPixmap(":/ddoc/cancel.png").scaled(QSize(24,24)));
+	}
+	if(modelData->value(k) == "3")
+	{
+		return QVariant(QPixmap(":/ddoc/accept.png").scaled(QSize(24,24)));
+	}
+	if(modelData->value(k) == "2")
+	{
+		return QVariant(QPixmap(":/ddoc/category_copy.png").scaled(QSize(24,24)));
+	}
+
+	return QVariant();
+}
+//
+//Функция обработки Qt::BackgroundRole
+//
+inline QVariant SyncQueueItemModel::dataBackground(int i_index) const
+{
+	int k = countColumn*(i_index-topRowIndex)+countColumn-1;
+	
+	if(modelData->value(k) == "4")
+	{
+		return Qt::red;
+	}
+	if(modelData->value(k) == "3")
+	{
+		return Qt::green;
+	}
+	if(modelData->value(k) == "2")
+	{
+		return Qt::yellow;
+	}
+
+	return QVariant();
+}
+//
+//Функция обработки Qt::DisplayRole
+//
+inline QVariant SyncQueueItemModel::dataDisplay(int i_indexRow,int i_indexColumn) const
+{
+	int k = countColumn*(i_indexRow - topRowIndex) + i_indexColumn;
+
+	QString res = modelData->value(k);
+
+	switch(i_indexColumn)
+	{
+		case 5:
+		{
+			if(res == "1")
+				res = tr("category(system)");
+			if(res == "2")
+				res = tr("IO(system)");
+			if(res == "3")
+				res = tr("IOR(directory record)");
+			if(res == "4")
+				res = tr("IOR(record additional table directory)");
+			if(res == "5")
+				res = tr("additional table directory");
+			if(res == "6")
+				res = tr("transfer request to the ping");
+			if(res == "8")
+				res = tr("transfer complete directory of organizations to the new object");
+			if(res == "9")
+				res = tr("transfer directory entries for all organizations involved in the exchange of information objects");
+			if(res == "10")
+				res = tr("public DL");
+
+			break;
+		}
+		case 6:
+		{
+			if(res == "1")
+				res = tr("create a new entity on the target");
+			if(res == "2")
+				res = tr("replace the entity for this on the target");
+			if(res == "3")
+				res = tr("delete entity on the target");
+
+			break;
+		}
+		case 7:
+		{
+			if(res == "1")
+				res = tr("expected timing");
+			if(res == "2")
+				res = tr("synchronized");
+			if(res == "3")
+				res = tr("synchronization is successful");
+			if(res == "4")
+				res = tr("there was an error");
+
+			break;
+		}
+	}
+
+	return res;
+}

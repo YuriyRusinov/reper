@@ -41,22 +41,20 @@ unix: LIBS *= -lpq
 # Input
 HEADERS += \
            ./syncqueueviewerform.h \
-           ./syncqueueviewform.h \
            ./syncqueueview.h \
            ./syncqueueitemmodel.h \
-		   ./filtersform.h
+		   ./filtersform.h \
+		   ./sqv_delegate.h
 
 SOURCES += \
            ./syncqueueviewerform.cpp \
-           ./syncqueueviewform.cpp \
            ./syncqueueview.cpp \
            ./syncqueueitemmodel.cpp \
            ./main.cpp \
-		   ./filtersform.cpp
+		   ./filtersform.cpp \
+		   ./sqv_delegate.cpp
 
-FORMS += \
-           ./sync_queue_view_form.ui \
-           ./sync_queue_viewer_form.ui 
+#FORMS += 
 
 target.files *= $${DISTFILES}
 target.path = $$KKS_EXEC_DIR

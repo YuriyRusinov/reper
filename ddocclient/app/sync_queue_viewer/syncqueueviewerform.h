@@ -1,14 +1,14 @@
 #ifndef _SYNCQUEUEVIEWRFORM_H
 #define _SYNCQUEUEVIEWRFORM_H
 
-#include<QDialog>
-#include <QMouseEvent>
+#include <QMessageBox>
+#include <QApplication>
+#include <QDialog>
 
+#include "kksdatabase.h"
 #include "syncqueueitemmodel.h"
+#include "syncqueueview.h"
 #include "filtersform.h"
-
-class KKSDatabase;
-class SyncQueueView;
 
 namespace TableView
 {

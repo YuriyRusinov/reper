@@ -1,11 +1,5 @@
 #include "syncqueueview.h"
 
-#include <QHeaderView>
-
-#include "kksdatabase.h"
-#include "syncqueueitemmodel.h"
-#include "syncqueueviewerform.h"
-
 //*****Создание и уничтожение экземпляра класса*****
 SyncQueueView::SyncQueueView(QWidget * parent):QTreeView(parent), totalRowCount(-1), viewRowCount(-1), flag_scroll(false), flag_clearAll(false)
 {
@@ -15,6 +9,9 @@ SyncQueueView::SyncQueueView(QWidget * parent):QTreeView(parent), totalRowCount(
 
 	scroll_view->setSingleStep(1);
 	scroll_view->setPageStep(3);
+
+	sqv_delegate* qid_height = new sqv_delegate(this); 
+	setItemDelegate(qid_height);
 
 	connect((const QObject*)scroll_view, SIGNAL(sliderReleased()), this, SLOT(slot_sliderRealised()));
     connect((const QObject*)scroll_view, SIGNAL(sliderPressed()),this, SLOT(slot_sliderPressed()));
@@ -215,4 +212,18 @@ void SyncQueueView::keyPressEvent(QKeyEvent * i_event)
 		return;
 
 	QTreeView::keyPressEvent(i_event);
+}
+
+void SyncQueueView::resizeEvent(QResizeEvent * i_event)
+{
+	QTreeView::resizeEvent(i_event);
+
+	setColumnWidth(0,150);
+	setColumnWidth(1,115);
+	setColumnWidth(2,70);
+	setColumnWidth(3,60);
+	setColumnWidth(4,150);
+	setColumnWidth(5,150);
+	setColumnWidth(6,150);
+	setColumnWidth(7,150);
 }

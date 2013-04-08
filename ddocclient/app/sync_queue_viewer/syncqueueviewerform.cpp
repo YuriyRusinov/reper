@@ -1,15 +1,4 @@
-#include <QMessageBox>
-#include <QApplication>
-#include <QStandardItem>
-#include <QDateTime>
-#include <QHeaderView>
-
-#include "kksdatabase.h"
-
 #include "syncqueueviewerform.h"
-#include "syncqueueview.h"
-#include "syncqueueviewform.h"
-#include "filtersform.h"
 
 //*****—оздание и уничтожение экземпл€ра класса*****
 SyncQueueViewerForm :: SyncQueueViewerForm(KKSDatabase * adb, QWidget * parent) :
@@ -24,13 +13,13 @@ SyncQueueViewerForm :: SyncQueueViewerForm(KKSDatabase * adb, QWidget * parent) 
 	qpb_exit    = new QPushButton(tr("Exit"),this);   // нопка выхода
 	qpb_view    = new QPushButton(tr("View"),this);   // нопка выполнени€ запроса и отображени€ данных
 
-	qpb_filters->setIcon(QIcon("E:\\ddocclient\\ddocclient\\ddocs_ico\\show_search_queries.png"));
-	qpb_delete->setIcon(QIcon("E:\\ddocclient\\ddocclient\\ddocs_ico\\delete.png"));
-	qpb_restart->setIcon(QIcon("E:\\ddocclient\\ddocclient\\ddocs_ico\\reload.png"));
-	qpb_cancel->setIcon(QIcon("E:\\ddocclient\\ddocclient\\ddocs_ico\\cancel.png"));
-	qpb_save->setIcon(QIcon("E:\\ddocclient\\ddocclient\\ddocs_ico\\folder_edit.png"));
-	qpb_exit->setIcon(QIcon("E:\\ddocclient\\ddocclient\\ddocs_ico\\io_close.png"));
-	qpb_view->setIcon(QIcon("E:\\ddocclient\\ddocclient\\ddocs_ico\\view_all.png"));
+	qpb_filters->setIcon(QIcon(":/ddoc/show_search_queries.png"));
+	qpb_delete->setIcon(QIcon(":/ddoc/delete.png"));
+	qpb_restart->setIcon(QIcon(":/ddoc/reload.png"));
+	qpb_cancel->setIcon(QIcon(":/ddoc/cancel.png"));
+	qpb_save->setIcon(QIcon(":/ddoc/folder_edit.png"));
+	qpb_exit->setIcon(QIcon(":/ddoc/io_close.png"));
+	qpb_view->setIcon(QIcon(":/ddoc/view_all.png"));
 
 	QSplitter* qsh_cBe_splitter = new QSplitter(Qt::Horizontal,this);
 
@@ -179,8 +168,6 @@ void SyncQueueViewerForm::slot_viewClicked()
 
 	model->setEmptyData(false);
 	
-	syncQueueTreeWnd->header()->setResizeMode(QHeaderView::ResizeToContents);
-
 	syncQueueTreeWnd->updateData();
 	//**********
 
@@ -275,6 +262,7 @@ bool SyncQueueViewerForm::openCursor()
 
     sqlCursorColumns.clear();
 	sqlCursorTF.clear();
+	sqlCursorFilters.clear();
 
     /*
                             select \
@@ -340,13 +328,6 @@ bool SyncQueueViewerForm::openCursor()
                                 1=1 \
                         ");
 
-/*
-
-    QString aa = filterF->getOrg();
-    if(!aa.isEmpty()){
-        sqlCursor += QString(" and q.id_organization in (%1) ").arg(aa);
-    }*/
-
     if(!obj_list.isEmpty() && obj_list.size() != 10)
 	{
 		sqlCursorFilters = sqlCursorFilters + QString(" and q.entity_type in ( ");
@@ -379,14 +360,20 @@ bool SyncQueueViewerForm::openCursor()
 
 	if(!dateFrom.isEmpty())
 	{
-		dateFrom = QString("to_timestamp('") + dateFrom + QString("', 'DD.MM.YYYY HH24:MI:SS')::timestamp");
-		sqlCursorFilters = sqlCursorFilters + QString(" and q.last_update >= ") + dateFrom + QString(" ");
+		if(!dateFrom.startsWith("to_timestamp"))
+		{
+			dateFrom = QString("to_timestamp('") + dateFrom + QString("', 'DD.MM.YYYY HH24:MI:SS')::timestamp");
+			sqlCursorFilters = sqlCursorFilters + QString(" and q.last_update >= ") + dateFrom + QString(" ");
+		}
 	}
 
 	if(!dateTo.isEmpty())
 	{
-		dateTo = QString("to_timestamp('") + dateTo + QString("', 'DD.MM.YYYY HH24:MI:SS')::timestamp");
-		sqlCursorFilters = sqlCursorFilters + QString(" and q.last_update <= ") + dateTo + QString(" ");		
+		if(!dateTo.startsWith("to_timestamp"))
+		{
+			dateTo = QString("to_timestamp('") + dateTo + QString("', 'DD.MM.YYYY HH24:MI:SS')::timestamp");
+			sqlCursorFilters = sqlCursorFilters + QString(" and q.last_update <= ") + dateTo + QString(" ");		
+		}
 	}
 
 	QString sqlCursor;
@@ -486,10 +473,10 @@ int SyncQueueViewerForm::DBdata(int i_topRow,int i_bottomRow)
 			}
 		}
 
-		model->setDataVector(v_DBData);
+		model->setDataVector(*v_DBData);
 		model->setWindowIndex(i_topRow,i_bottomRow);
 
-		v_DBData = 0;
+		delete v_DBData;
 
 		return 0;
 	}
@@ -547,10 +534,10 @@ int SyncQueueViewerForm::DBdata(int i_topRow,int i_bottomRow)
 			}
 		}
 
-		model->setDataVector(v_DBData);
+		model->setDataVector(*v_DBData);
 		syncQueueTreeWnd->updateData();
 
-		v_DBData = 0;	
+		delete v_DBData;	
 
 		return 0;
 	}
@@ -611,7 +598,7 @@ int SyncQueueViewerForm::DBdata(int i_topRow,int i_bottomRow)
 					}			
 				}
 
-				model->insertDataRow(0,v_DBData);
+				model->insertDataRow(0,*v_DBData);
 				delete v_DBData;
 			}
 		}		
@@ -670,7 +657,7 @@ int SyncQueueViewerForm::DBdata(int i_topRow,int i_bottomRow)
 					}			
 				}
 
-				model->insertDataRow(b_dataRow - (t_dataRow + col) + i,v_DBData);
+				model->insertDataRow(b_dataRow - (t_dataRow + col) + i,*v_DBData);
 				delete v_DBData;
 			}
 		}		
@@ -680,6 +667,8 @@ int SyncQueueViewerForm::DBdata(int i_topRow,int i_bottomRow)
 
 	t_dataRow = i_topRow;
 	b_dataRow = i_bottomRow;
+
+	syncQueueTreeWnd->updateData();
 
 	return 0;
 }
@@ -751,8 +740,6 @@ void SyncQueueViewerForm::refreshData()
 	syncQueueTreeWnd->slot_viewRows();
 
 	model->setEmptyData(false);
-	
-	syncQueueTreeWnd->header()->setResizeMode(QHeaderView::ResizeToContents);	
 	
 	syncQueueTreeWnd->updateData();
 	//**********

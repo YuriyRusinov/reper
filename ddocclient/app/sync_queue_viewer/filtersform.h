@@ -2,9 +2,6 @@
 #define FILTERSFORM_H
 
 #include <QDialog>
-#include <QGroupBox>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
 #include <QPushButton>
 #include <QSplitter>
 #include <QCheckBox>
@@ -12,8 +9,9 @@
 #include <QLabel>
 #include <QGridLayout>
 #include <QListView>
-#include <QItemSelectionModel>
 #include <QStringListModel>
+
+class QItemSelectionModel;
 
 class FiltersForm : public QDialog
 {
@@ -23,12 +21,28 @@ public:
 	FiltersForm(QWidget *parent);
 	~FiltersForm();
 
+	//*****Функции получения значения фильтров*****
+	//
+	//Получение списка организаций
+	//
 	QStringList getOrganization();
+	//
+	//Получение списка объектов
+	//
 	QStringList getObjectType();
+	//
+	//Получение списка результатов синхронизации
+	//
 	QStringList getResult();
-
+	//
+	//Получение даты формирования записи с которой следует отбирать результаты
+	//
 	QString getDateFrom();
+	//
+	//Получение даты формирования записи до которой следует отбирать результаты 
+	//
 	QString getDateTo();
+	//**********
 
 private slots:
 	void slot_timeCheck();

@@ -3,6 +3,10 @@
 
 #include <QTreeView>
 #include <QScrollBar>
+#include <QHeaderView>
+#include <QKeyEvent>
+
+#include "sqv_delegate.h"
 
 class SyncQueueViewerForm;
 
@@ -86,14 +90,14 @@ class SyncQueueView : public QTreeView
 		void slot_sliderValueChanged(int value);
 
 	protected:
-		void keyPressEvent(QKeyEvent * i_event);//void keyPressEvent(QKeyEvent * i_event) virtual;
+		virtual void keyPressEvent(QKeyEvent * i_event);//void keyPressEvent(QKeyEvent * i_event) virtual;
+		virtual void resizeEvent (QResizeEvent * i_event);
 
     private:
 		QScrollBar *scroll_view;//Линеечка:)
 		bool flag_scroll;       //Флаг нажатой полосы прокрутки
 
 		int totalRowCount;      //Количество строк в виджете
-
 		int viewRowCount;       //Количество отображаемых строк
 
 		bool flag_clearAll;     //Флаг полной очистки
