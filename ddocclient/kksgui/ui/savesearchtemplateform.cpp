@@ -59,6 +59,7 @@ SaveSearchTemplateForm :: ~SaveSearchTemplateForm (void)
    
     if (searchTemplate && UI->pbOk->isVisible())
         searchTemplate->release ();
+
     delete UI;
 }
 
