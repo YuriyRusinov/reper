@@ -302,7 +302,12 @@ int KKSRubricItem::rubricType (void) const
 }
 
 /*===========================================*/
-KKSRubric::KKSRubric() : KKSRubricBase()
+KKSRubric::KKSRubric() : KKSRubricBase(),
+    m_searchTemplate (0),
+    m_category (0),
+    m_isCategorized (false),
+    m_acl (0),
+    m_intId (-1)
 {
 
 }

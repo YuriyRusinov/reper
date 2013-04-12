@@ -2807,11 +2807,11 @@ int KKSObjEditorFactory :: setAttributes (const KKSTemplate *t,
         else
             v = KKSValue();
         
-        if (c && ((av && av->attribute()->tableName () == "io_categories") || ca->id () == ATTR_ID_IO_CATEGORY))
+        if (wObjE && wObjE->id()<0 && c && ((av && av->attribute()->tableName () == "io_categories") || ca->id () == ATTR_ID_IO_CATEGORY))
         {
             v = KKSValue(QString::number (c->id()), KKSAttrType::atList);
         }
-        else if (wObjE->io()->id() == IO_IO_ID && ca->id () == ATTR_AUTHOR && wObjE->id() <= 0)
+        else if (wObjE && wObjE->id()<0 && wObjE->io()->id() == IO_IO_ID && ca->id () == ATTR_AUTHOR && wObjE->id() <= 0)
         {
             v = KKSValue(QString::number (loader->getUserId()), KKSAttrType::atList);
         }
@@ -6649,13 +6649,17 @@ KKSSearchTemplate * KKSObjEditorFactory :: loadSearchTemplate (void) const
         searchTModel = (qobject_cast<QAbstractProxyModel *>(searchTModel))->sourceModel();
     
     QItemSelectionModel * selTModel = stForm->selectionModel ();
+	QAbstractProxyModel * sortTModel = qobject_cast<QAbstractProxyModel *>(stForm->dataModel());
 
     if (selTModel && stForm->exec () == QDialog::Accepted)
     {
         if (selTModel->selection().indexes ().isEmpty())
             return 0;
-        QModelIndex stIndex = selTModel->selection().indexes ().at (0);
-        if (searchTModel->data (stIndex, Qt::UserRole+USER_ENTITY).toInt() == 0)
+        QModelIndex stProxyIndex = selTModel->selection().indexes ().at (0);
+        QModelIndex stIndex = sortTModel->mapToSource (stProxyIndex);
+
+        QVariant v = searchTModel->data (stIndex, Qt::UserRole+USER_ENTITY);
+		if (v.toInt() == 0)
             return 0;
         int idSearchTemplate = stIndex.data (Qt::UserRole).toInt();
         searchT = loader->loadSearchTemplate (idSearchTemplate);
@@ -7020,9 +7024,14 @@ void KKSObjEditorFactory :: deleleSearchTempl (const QModelIndex& wIndex, QAbstr
     int idAuthor = st->idAuthor ();
     if (idUser != 1 && idAuthor != idUser)
     {
+        
+        QMessageBox::warning (pWidget, 
+							  tr ("Search templates"), 
+							  tr ("Only admin and author can delete search template %1").arg (st->name ()), 
+							  QMessageBox::Ok, 
+							  QMessageBox::NoButton);
         st->release ();
-        QMessageBox::warning (pWidget, tr ("Search templates"), tr ("Only admin and author can delete search template %1").arg (st->name ()), QMessageBox::Ok, QMessageBox::NoButton);
-        return;
+		return;
     }
     st->release ();
 

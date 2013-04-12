@@ -330,6 +330,9 @@ QModelIndex KKSIncludesWidget::appendRubricRow(const KKSRubric * r, QModelIndex 
         return QModelIndex();
 
     QAbstractItemModel * model = twIncludes->model();
+    QAbstractItemModel * rModel = twIncludes->model();
+    while (qobject_cast<QAbstractProxyModel *>(rModel))
+        rModel = (qobject_cast<QAbstractProxyModel *>(rModel))->sourceModel();
     if(!model)
         return QModelIndex();
 
@@ -357,13 +360,16 @@ QModelIndex KKSIncludesWidget::appendRubricRow(const KKSRubric * r, QModelIndex 
             model->insertColumns(0, 1, pindex);
     }
 
-//    model->setData (model->index(cnt, 0, index), r->name(), Qt::DisplayRole);
-//    model->setData (model->index(cnt, 0, index), 1, Qt::UserRole);//is rubric
-//    model->setData (model->index(cnt, 0, index), r->id(), Qt::UserRole+1);// idRubric
-//    model->setData (model->index(cnt, 0, index), QIcon(":/ddoc/rubric.png"), Qt::DecorationRole);
+//    if (isRec)
+//    {
+//        model->setData (model->index(cnt, 0, pindex), r->name(), Qt::DisplayRole);
+//        model->setData (model->index(cnt, 0, pindex), 1, Qt::UserRole);//is rubric
+//        model->setData (model->index(cnt, 0, pindex), r->id(), Qt::UserRole+1);// idRubric
+//        model->setData (model->index(cnt, 0, pindex), QIcon(":/ddoc/rubric.png"), Qt::DecorationRole);
+//    }
     QModelIndex cIndex = model->index(rpos, 0, pindex);
     bool isRubrSet = model->setData (cIndex, QVariant::fromValue<const KKSRubricBase *>(r), Qt::UserRole+1);
-    qDebug () << __PRETTY_FUNCTION__ << cIndex << model->rowCount (pindex) << isRubrSet;
+    qDebug () << __PRETTY_FUNCTION__ << pindex << model->rowCount (pindex) << isRubrSet;
 
     twIncludes->setExpanded(pindex, true);
     
@@ -523,10 +529,11 @@ void KKSIncludesWidget :: addRubric (void)
     }
 
     QModelIndex cIndex = appendRubricRow(r, index);
-    qDebug () << __PRETTY_FUNCTION__ << cIndex;
+    QAbstractItemModel * rModel = twIncludes->model();
     
     twIncludes->setCurrentIndex(cIndex);
-    twIncludes->model()->setData (cIndex, r->getIcon(), Qt::DecorationRole);
+    bool isSet = rModel->setData (cIndex, r->getIcon(), Qt::DecorationRole);
+    qDebug () << __PRETTY_FUNCTION__ << cIndex << rModel->rowCount() << isSet;
 
     r->release();
     isChanged = true;

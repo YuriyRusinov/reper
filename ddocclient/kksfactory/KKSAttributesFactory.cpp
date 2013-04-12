@@ -1461,6 +1461,7 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
                 //
                 // Когда создается новый ИО, 
                 //
+//                qDebug () << __PRETTY_FUNCTION__ << tableName << V;
                 if ((tableName == "io_objects" && av->attribute()->tableName() == "users" ) && V.toInt() <= 0)
                     cV = QString::number (idUser);
                 else if ((tableName == "io_objects" && av->attribute()->tableName() == "io_categories") && V.toInt() <= 0)
@@ -1875,11 +1876,20 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
             {
                 double v = V.toDouble ();
                 int vi = V.toInt ();
+                if (!isObjExist && av->attribute()->id() == 1)
+                {
+                    vi = -1;
+                    KKSValue val (QString::number(-1), KKSAttrType::atInt);
+                    (const_cast<KKSAttrValue *>(av))->setValue (val);
+                }
                 KKSEdit *lEdit = qobject_cast<KKSEdit *>(aw);
                 if (pCatType->attrType() == KKSAttrType::atDouble && !V.toString().isEmpty())
                     lEdit->setVal (QString::number (v));
-                else if (pCatType->attrType() == KKSAttrType::atInt && !V.toString().isEmpty())
+                else if (pCatType->attrType() == KKSAttrType::atInt && (!V.toString().isEmpty() || vi < 0))
+                {
                     lEdit->setVal (QString::number (vi));
+                    lEdit->QLineEdit::setText (QString::number (vi));
+                }
 
                 if (!isRef)
                     connectToSlots (aw, wEditor);

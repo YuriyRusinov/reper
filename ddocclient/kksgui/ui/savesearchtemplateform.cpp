@@ -56,9 +56,10 @@ SaveSearchTemplateForm :: SaveSearchTemplateForm (KKSSearchTemplate * st, bool m
 
 SaveSearchTemplateForm :: ~SaveSearchTemplateForm (void)
 {
-    delete UI;
+   
     if (searchTemplate && UI->pbOk->isVisible())
         searchTemplate->release ();
+    delete UI;
 }
 
 void SaveSearchTemplateForm :: setCategoryModel (QAbstractItemModel * catMod)

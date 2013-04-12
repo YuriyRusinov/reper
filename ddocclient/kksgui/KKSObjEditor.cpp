@@ -62,6 +62,7 @@
 #include <KKSIndAttr.h>
 #include <KKSAttrValue.h>
 #include <KKSIndicator.h>
+#include <KKSRubric.h>
 #include "KKSAttrUUIDWidget.h"
 #include "defines.h"
 
@@ -1958,6 +1959,11 @@ int KKSObjEditor :: getID (void) const
 void KKSObjEditor :: rubricsChanged (void)
 {
     isChanged = true;
+    qDebug () << __PRETTY_FUNCTION__ << this->pObj->rootRubric();//->rubrics().count();
+    KKSIncludesWidget * iW = qobject_cast<KKSIncludesWidget *>(this->sender());
+    if (!iW)
+        return;
+    pObj->setRootRubric (iW->rootRubric());
 }
 
 void KKSObjEditor :: attrValueChanged (void)

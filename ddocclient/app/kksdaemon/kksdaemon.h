@@ -6,8 +6,11 @@
 //#include <QtGui/QLabel>
 #include <QtCore/QDir>
 #include <QThread>
+#include <QTimer>
 #include <QtCore/QSettings>
 #include <QProcess>
+#include <QFile>
+#include <QTextStream>
 
 #include "qtservice.h"
 #include "pqnotify.h"
@@ -37,8 +40,9 @@ private:
     KKSDaemon * m_parent;
 };
 
-class KKSDaemon : public QtService<QCoreApplication>
+class KKSDaemon : public QObject, public QtService<QCoreApplication>
 {
+	Q_OBJECT
 public:
     KKSDaemon(int argc, char **argv);
     ~KKSDaemon();
@@ -54,7 +58,8 @@ protected:
     void resume();
     void processCommand(int code);
 
-
+private slots:
+	void analyzeDb();
 
 private:
 
@@ -64,13 +69,21 @@ private:
     bool bNeedExit;
     bool bPause;
     KKSPGDatabase * db;
+	KKSPGDatabase * dbTimer;
     DDocServerListener * listener;
+
+	QTimer m_timer;
+
+    QFile * fLog;
+    QTextStream * fLogOut;
 
     QString ipServer;
     QString database;
     QString port;
     QString user;
     QString passwd;
+
+	int m_timerInterval;
 
     QString sPgPass;
     QString sPsqlPath;

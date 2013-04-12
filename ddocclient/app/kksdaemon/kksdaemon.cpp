@@ -4,18 +4,28 @@
 #include <QSettings>
 
 #include <QtDebug>
-#include <QFile>
 
-KKSDaemon::KKSDaemon(int argc, char **argv)
-    : QtService<QCoreApplication>(argc, argv, "KKSDaemon Service")
+
+KKSDaemon::KKSDaemon(int argc, char **argv) : 
+    QObject(),
+    QtService<QCoreApplication>(argc, argv, "KKSDaemon Service")
 {
     setServiceDescription("KKSDaemon service for DynamicDocs Server");
     setServiceFlags(QtServiceBase::CanBeSuspended);
 
+    fLog = new QFile("kksdaemon.log");
+    if(!fLog->open(QIODevice::WriteOnly | QIODevice::Text))
+        return;
+
+    fLogOut = new QTextStream(fLog);
+    //fLogOut.setDevice(fLog);
+
     bNeedExit = false;
     bPause = false;
     db = NULL;
+	dbTimer = NULL;
     listener = NULL;
+	m_timerInterval = 60000;//1 min
 
 #ifdef WIN32
     sPgPass = QString("pgpass.conf");
@@ -26,12 +36,25 @@ KKSDaemon::KKSDaemon(int argc, char **argv)
 
 KKSDaemon::~KKSDaemon()
 {
+    if(fLogOut){
+        delete fLogOut;
+    }
+    if(fLog){
+        fLog->close();
+        delete fLog;
+    }
+
     if(db){
         db->disconnect();
         delete db;
     }
 
-    if(listener){
+    if(dbTimer){
+		dbTimer->disconnect();
+		delete dbTimer;
+    }
+
+	if(listener){
         listener->quit();
         delete listener;
     }
@@ -39,16 +62,21 @@ KKSDaemon::~KKSDaemon()
 
 void KKSDaemon::start()
 {
+    (*fLogOut) << QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm.ss") << " --- " << "KKSDaemon started\n";
+    fLogOut->flush();
     //QCoreApplication * app = application();
     db = new KKSPGDatabase(); 
-    
+    dbTimer = new KKSPGDatabase();
+
     readSettings();
 
     bool ok = db->connect(ipServer, database, user, passwd, port);
     if(!ok)
         return;
 
-
+    ok = dbTimer->connect(ipServer, database, user, passwd, port);
+    if(!ok)
+        return;
 
      QFile file(QString("%1").arg(sPgPass));
      if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
@@ -63,7 +91,50 @@ void KKSDaemon::start()
     listener = new DDocServerListener(db, 0);
     listener->setDaemon(this);
     listener->start();
+
+	//m_timer.setInterval(m_timerInterval);
+	//connect(&m_timer, SIGNAL(timeout()), this, SLOT(analyzeDb()));
+	//m_timer.start();
     
+}
+
+void KKSDaemon::analyzeDb()
+{
+	(*fLogOut) << QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm.ss") << " --- " << "Start analyzing database...\n";
+    fLogOut->flush();
+
+    QString sql = QString("select cmdanalyzejournal()");
+	KKSResult * res = dbTimer->execute(sql.toLocal8Bit().constData());
+	if(!res)
+		return;
+
+	if(res->getRowCount() != 1){
+		delete res;
+		return;
+	}
+
+	int r = res->getCellAsInt(0, 0);
+	delete res;
+	if(r != 1)
+		return;
+
+	sql = QString("select putIOIntoRubric()");
+	res = dbTimer->execute(sql.toLocal8Bit().constData());
+	if(!res)
+		return;
+
+	if(res->getRowCount() != 1){
+		delete res;
+		return;
+	}
+
+	r = res->getCellAsInt(0, 0);
+	delete res;
+	if(r != 1)
+		return;
+
+    (*fLogOut) << QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm.ss") << " --- " << "Successfully analyzed\n";
+    fLogOut->flush();
 }
 
 void KKSDaemon::stop()
@@ -100,17 +171,19 @@ void KKSDaemon::readSettings()
     passwd = s->value("passwd").toString();
     sPsqlPath = s->value("psqlPath").toString();
 
+	m_timerInterval = s->value("timerInterval").toInt();
+
 
     if(ipServer.isEmpty()){
         ipServer = "127.0.0.1";
         s->setValue("ip", ipServer);
     }
     if(database.isEmpty()){
-        database = "t83_6";
+        database = "main_db";
         s->setValue("database", database);
     }
     if(port.isEmpty()){
-        port = "5433";
+        port = "5432";
         s->setValue("port", port);
     }
     if(user.isEmpty()){
@@ -124,12 +197,17 @@ void KKSDaemon::readSettings()
 
     if(sPsqlPath.isEmpty()){
 #ifdef WIN32
-        sPsqlPath = QString("\"C:\\Program Files (x86)\\PostgreSQL9\\9.2\\bin\\psql.exe\"");
+        sPsqlPath = QString("\"C:\\Program Files\\PostgreSQL\\9.2\\bin\\psql.exe\"");
 #else
         sPsqlPath = QString("/opt/postgresql/bin/psql");
 #endif
         s->setValue("psqlPath", sPsqlPath);
     }
+
+	if(m_timerInterval <= 0){
+		m_timerInterval = 60000;
+		s->setValue("timerInterval", m_timerInterval);
+	}
 
     s->endGroup (); // Database
 
