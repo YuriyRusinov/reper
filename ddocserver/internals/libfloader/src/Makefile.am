@@ -1,7 +1,7 @@
 CC = gcc
 LD = gcc
 CFLAGS  = -fPIC -Wall $(PG_CFLAGS) $(DEFINES)
-LDFLAGS = -shared -ljpeg -lgsl
+LDFLAGS = -shared -ljpeg -lgsl -lgslcblas -lm -lpq
 RM      = rm -f
 MV	= mv
 CP      = cp -f
