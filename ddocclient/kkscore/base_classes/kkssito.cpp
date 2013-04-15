@@ -727,6 +727,8 @@ int KKSSito::GUIConnect(QWidget * parent)
                                       "databasePort", 
                                       lf->port());
         */
+        
+        //закомментировано, чтобы порт всегда обновлялся
         if(lf->level() != currentLevel)
             poSettings->writeSettings("Database",
                                       "currentLevel",
