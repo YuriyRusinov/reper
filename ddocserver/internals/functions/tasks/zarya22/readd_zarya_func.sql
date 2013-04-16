@@ -33,7 +33,7 @@ set search_path = public, pg_catalog;
 \i ./functions/tasks/zarya22/getxmlattrtype.sql
 \i ./functions/tasks/zarya22/xmltext.sql
 \i ./functions/tasks/zarya22/utilsfunc.sql
+\i ./functions/tasks/zarya22/rectoxml.sql
 
 
 commit;
-

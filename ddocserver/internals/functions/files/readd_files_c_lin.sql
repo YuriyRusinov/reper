@@ -27,7 +27,7 @@ create or replace function initrand () returns int4
     as '$libdir/libfloader.so', 'initrand' language 'c' strict security definer;
 
 create or replace function droprand () returns int4
-    as '$libdir/libfloader.so', 'initrand' language 'c' strict security definer;
+    as '$libdir/libfloader.so', 'droprand' language 'c' strict security definer;
 
 create or replace function unirand () returns float8
     as '$libdir/libfloader.so', 'unirand' language 'c' strict security definer;
