@@ -10,7 +10,9 @@ set search_path = public, pg_catalog;
 \i ./functions/tasks/zarya22/getwurltype.sql
 \i ./functions/tasks/zarya22/fdoctoxml.sql
 \i ./functions/tasks/zarya22/ufdoctoxml.sql
+\i ./functions/tasks/zarya22/ufrectoxml.sql
 \i ./functions/tasks/zarya22/createpassport.sql
+\i ./functions/tasks/zarya22/createrecpassport.sql
 \i ./functions/tasks/zarya22/iotoxml.sql
 \i ./functions/tasks/zarya22/readiofiles.sql
 
@@ -34,6 +36,7 @@ set search_path = public, pg_catalog;
 \i ./functions/tasks/zarya22/xmltext.sql
 \i ./functions/tasks/zarya22/utilsfunc.sql
 \i ./functions/tasks/zarya22/rectoxml.sql
+\i ./functions/tasks/zarya22/readrecfiles.sql
 
 
 commit;

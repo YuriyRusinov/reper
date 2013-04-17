@@ -2,8 +2,8 @@ CREATE OR REPLACE FUNCTION createrecpassport(integer, integer, integer, integer[
   RETURNS xml AS
 $BODY$
 declare
-    idRec alias for $1;
-    idObject alias for $2;
+    idObject alias for $1;
+    idRec alias for $2;
     idMsg alias for $3;
     idAddrList alias for $4;
     msgKind alias for $5;
@@ -56,7 +56,7 @@ begin
         --
         -- Reading table name from io_objects
         --
-        select into tableName table_name from tbl_io_objects io where io.id=idObject;
+        select table_name into tableName from tbl_io_objects io where io.id=idObject;
         if (tableName is null) then
             raise warning 'Invalid reference';
             return null;
@@ -247,13 +247,13 @@ begin
         xml_str := xml_str || recName;
     end if;
     xml_str := xml_str || E']]></doc_name>\n';
-
+/*
     xml_str := xml_str || E'\t\t\t\t\t<doc_referat><![CDATA[';
     if(msgKind = 2 and docRef is not null) then
         xml_str := xml_str || docRef;
     end if;
     xml_str := xml_str || E']]></doc_referat>\n';
-
+*/
     xml_str := xml_str || E'\t\t\t\t</formalized_document_specific_data_where>\n';
 
     xml_str := xml_str || E'\t\t\t\t<unformalized_document_specific_data_where>\n';
