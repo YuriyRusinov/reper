@@ -7,5 +7,8 @@
 \i ./functions/rubricator/ioupdateinclude.sql
 \i ./functions/rubricator/putIOIntoRubric.sql
 \i ./functions/rubricator/getioforrubric.sql
+\i ./functions/rubricator/ioaddtorubric.sql
+\i ./functions/rubricator/setrubriccategory.sql
+\i ./functions/rubricator/setrubricsearchtemplate.sql
 
 \i ./functions/rubricator/triggers/readd_triggers.sql

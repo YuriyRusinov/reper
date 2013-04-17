@@ -1,3 +1,4 @@
+п»ї--create rubric both for global rubricator or io rubricator
 create or replace function ioInsertInclude(int4, int4, varchar, varchar, varchar, int4, int4, varchar, varchar) returns int4 as
 $BODY$
 declare
@@ -28,7 +29,7 @@ begin
     if(idParent isnull and idObject isnull) then
         select count(*) into cnt from user_rubricator where id_user = getCurrentUser();
         --raise notice '%', cnt;
-        if(cnt > 0 and rName = 'Мои документы') then
+        if(cnt > 0 and rName = 'РњРѕРё РґРѕРєСѓРјРµРЅС‚С‹') then
             return -1;
         end if;
         

@@ -15,6 +15,7 @@
 
 \i ./functions/misc/f_set_all_schemas_visible.sql
 
+\i ./functions/misc/conn_key.sql
 \i ./functions/misc/asstring.sql
 \i ./functions/misc/isnumeric.sql
 \i ./functions/misc/lasterror.sql

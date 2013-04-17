@@ -21,6 +21,7 @@
 \i ./functions/security/rgetprivileges.sql
 
 \i ./functions/security/getuser.sql
+\i ./functions/security/getuserinfo.sql
 \i ./functions/security/getuserdls.sql
 \i ./functions/security/safecreategroup.sql
 \i ./functions/security/safecreateuser.sql
