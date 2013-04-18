@@ -4,7 +4,9 @@ create type h_get_handler_info as (id_handler int4,
                                    description varchar,
                                    service varchar,
                                    extra_params varchar,
-                                   is_external boolean);
+                                   is_external boolean,
+                                   h_host varchar,
+                                   h_port int4);
 
 create or replace function hGetHandlerInfo(int4) returns setof h_get_handler_info as
 $BODY$
@@ -19,7 +21,9 @@ begin
                h.description,
                h.service,
                h.extra_params,
-               h.is_external
+               h.is_external,
+               h.h_host,
+               h.h_port
         from
             handlers h,
             chains c,

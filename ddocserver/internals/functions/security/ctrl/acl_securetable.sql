@@ -1,4 +1,4 @@
-create or replace function acl_secureTable(varchar) returns int4 as
+п»їcreate or replace function acl_secureTable(varchar) returns int4 as
 $BODY$
 declare
     tableName alias for $1;
@@ -27,10 +27,7 @@ declare
     
 begin
 
-    select f_is_view_exist(tableName) into isExist; --если мы применяем разграничение доступа к таблице, 
-                                                    --которая на самом деле является представлением 
-                                                    --(это возможно в случае наследования справочников друг от друга), 
-                                                    --то не надо будет переименовывать на одном из шагов sequence
+    select f_is_view_exist(tableName) into isExist; 
 
     q = 'alter table "' || tableName || '" rename to "tbl_' || tableName || '"';
     execute q;
@@ -153,8 +150,6 @@ begin
     --raise warning E'%\n\n', qRuleUpdate;
     execute qRuleUpdate;
 
-    --данная функция будет при необходимости удалять функции, создаваемые в данной процедуре
-    --функция должна создаваться как выполняемая не с правами администратора
     dropFuncsQuery := 'create or replace function "f_drop_funcs_' || tableName || E'"() returns int4 as \n\$BODY\$\n';
     dropFuncsQuery := dropFuncsQuery || E'begin \n';
     dropFuncsQuery := dropFuncsQuery || ' drop function f_sel_' || tableName || E'();\n';

@@ -1,8 +1,7 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     05.04.2013 17:04:51                          */
+/* Created on:     17.04.2013 16:20:25                          */
 /*==============================================================*/
-
 
 /*==============================================================*/
 /* Table: root_table                                            */
@@ -23,6 +22,7 @@ select setMacToNULL('root_table');
 create unique index Index_1 on root_table using BTREE (
 unique_id
 );
+
 
 /*==============================================================*/
 /* User: public                                                 */
@@ -1482,6 +1482,8 @@ create table handlers (
    id                   SERIAL               not null,
    name                 VARCHAR              not null,
    description          VARCHAR              null,
+   h_host               VARCHAR              null,
+   h_port               int4                 null,
    service              VARCHAR              not null,
    extra_params         VARCHAR              null,
    is_external          BOOL                 not null default FALSE,

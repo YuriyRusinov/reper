@@ -18,7 +18,7 @@ begin
         return -1;
     end if;
 
-    return idRubric;
+    return 1;
 end
 $BODY$
 language 'plpgsql';

@@ -1127,6 +1127,8 @@ insert into attributes (unique_id, id, id_a_type, code, name, title, table_name,
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-339', 339, 6, 'time_step', '¬ременной шаг', '¬ременной шаг', NULL, NULL, 120, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-340', 340, 2, 'id_message_stream', 'ѕоток сообщений', 'ѕоток сообщений', 'message_streams', 'name', 150, TRUE);
 
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-341', 341, 9, 'h_host', '’ост сервиса', '’ост сервиса', NULL, NULL, 150, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-342', 342, 8, 'h_port', 'ѕорт сервиса', 'ѕорт сервиса', NULL, NULL, 150, TRUE);
 
 SELECT pg_catalog.setval('attributes_id_seq', 1000, true); --все пользовательские атрибуты будут начинатьс€ с номера 1001
                                                           --это сделано дл€ того, чтобы оставить резерв дл€ системных атрибутов
@@ -2125,6 +2127,9 @@ insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (563, 199, 326, NULL, true, false);  --service
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (564, 199, 327, NULL, false, false);  --extra_params
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (583, 199, 336, 'FALSE', true, false);  --is_external
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (592, 199, 341, NULL, false, false);  --h_host
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (593, 199, 342, NULL, false, false);  --h_port
+
 
 
 --таблица описаний очередей
@@ -2162,7 +2167,8 @@ insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (589, 207, 340, NULL, true, false); --id_message_stream
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (590, 207, 338, NULL, true, false); --time
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (591, 207, 339, NULL, true, false); --time_step
-
+--592 »спользуетс€ в справочнике обработчиков очередей
+--593 »спользуетс€ в справочнике обработчиков очередей
 
 SELECT pg_catalog.setval('attrs_categories_id_seq', 2000, true); --все пользовательские атрибуты в категори€х будут начинатьс€ с номера 2001
                                                                  --это сделано дл€ того, чтобы оставить резерв дл€ системных атрибутов
