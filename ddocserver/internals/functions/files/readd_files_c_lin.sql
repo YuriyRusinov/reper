@@ -38,4 +38,5 @@ create or replace function gaussrand (float8) returns float8
 create or replace function exprand (float8) returns float8
     as '$libdir/libfloader.so', 'exprand' language 'c' strict security definer;
 
-
+create or replace function saverand(varchar) returns int4
+    as '$libdir/libfloader.so', 'saverand' language 'c' strict security definer;

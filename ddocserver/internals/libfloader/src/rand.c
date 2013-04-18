@@ -65,8 +65,14 @@ Datum exprand(PG_FUNCTION_ARGS)
     PG_RETURN_FLOAT8(res);
 }
 
-Datum saveRand(PG_FUNCTION_ARGS)
+Datum saverand(PG_FUNCTION_ARGS)
 {
     if (!r)
-        PG_RETURN_INT32(-1);
+        PG_RETURN_NULL();
+    char * fileName = PG_GETARG_CSTRING(0);
+    FILE * fRand = fopen (fileName, "w");
+    if (!fRand)
+        PG_RETURN_NULL();
+    int res = gsl_rng_fwrite (fRand, r);
+    PG_RETURN_INT32(res);
 }
