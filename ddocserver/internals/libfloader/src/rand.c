@@ -68,11 +68,24 @@ Datum exprand(PG_FUNCTION_ARGS)
 Datum saverand(PG_FUNCTION_ARGS)
 {
     if (!r)
-        PG_RETURN_NULL();
-    char * fileName = PG_GETARG_CSTRING(0);
-    FILE * fRand = fopen (fileName, "w");
+        PG_RETURN_INT32(-1);
+    void * randBuf = malloc (sizeof (gsl_rng));
+    elog(WARNING, "size of is %lu\n", sizeof (gsl_rng));
+    FILE * fRand = fmemopen (randBuf, sizeof(gsl_rng), "w");
     if (!fRand)
-        PG_RETURN_NULL();
+        PG_RETURN_INT32(-1);
     int res = gsl_rng_fwrite (fRand, r);
+    int spi_res = SPI_connect();
+    if(spi_res != SPI_OK_CONNECT)
+    {
+        elog(ERROR, "Cannot connect via SPI");
+        PG_RETURN_INT32(-1);
+    }
+
+    char* r_sql = (char *) palloc (strlen ("insert into rand_state (state) values (") + sizeof (gsl_rng) + 2);
+    sprintf (r_sql, "insert into rand_state (state_rand) values ('%s');", (char *)(randBuf));
+    SPI_execute (r_sql, false, 1);
+    SPI_finish();
+
     PG_RETURN_INT32(res);
 }
