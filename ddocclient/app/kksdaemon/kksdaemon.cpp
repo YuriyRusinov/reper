@@ -2,6 +2,7 @@
 
 #include <kksdatabase.h>
 #include <QSettings>
+#include <QUrl>
 
 #include <QtDebug>
 
@@ -259,32 +260,27 @@ void DDocServerListener::notify( char* notify_name, char * payload )
     QString service = res->getCellAsString(0, 3);
     QString extraParams = res->getCellAsString(0, 4);
     bool isExternal = res->getCellAsBool(0, 5);
+    QString hHost = res->getCellAsString(0, 6);
+    int hPort = res->getCellAsInt(0, 7);
 
     delete res;
 
     if(isExternal){
-        qint64 pid = 0;
-        QStringList arguments;
-        arguments << QString("%1").arg(id);
-        QProcess::startDetached ( service, arguments, ".", &pid );
-        if(pid <= 0){
-            qWarning() << "Program " << service << " cannot start!";
-        }
+        
+        QString uri = QString("http://") + hHost + QString(":") + QString::number(hPort) + QString("/") + service + QString("?") + QString::number(id); // + extraParams;
+        m_parent->http.setHost(hHost, hPort);
+        int uid = m_parent->http.get(QUrl::toPercentEncoding(uri));
+        
+        //qint64 pid = 0;
+        //QStringList arguments;
+        //arguments << QString("%1").arg(id);
+        //QProcess::startDetached ( service, arguments, ".", &pid );
+        //if(pid <= 0){
+        //    qWarning() << "Program " << service << " cannot start!";
+        //}
     }
     else{
         
-        
-        //QProcess * p = new QProcess();
-
-        //--connect(p, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processFinished1(int, QProcess::ExitStatus)));
-        //--connect(p, SIGNAL(error(QProcess::ProcessError)), this, SLOT(processError(QProcess::ProcessError)));
-        //--qRegisterMetaType<QProcess::ProcessState>("QProcess::ProcessState");
-        //--connect(p, SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(processStateChanged(QProcess::ProcessState)));
-
-        //QStringList e = QProcess::systemEnvironment();
-        //e.append(QString("PGPASSFILE=%1").arg(m_parent->sPgPass) );
-        //p->setEnvironment(e);
-
         QString sql = QString("\"select hStartHandler('%1', %2)\"").arg(service).arg(id);
         
         QString program = QString("%1 -h %2 -p %3 -U %4 -c %5 %6")
@@ -295,47 +291,7 @@ void DDocServerListener::notify( char* notify_name, char * payload )
                            .arg(sql)
                            .arg(m_parent->database);
 
-        //p->start(program);
         QProcess::startDetached(program);
-
-        /*bool ok = p->waitForStarted();
-        if(!ok){
-            qWarning() << "Program " << service << " cannot start!";
-            delete p;
-            return;
-        }
-        Q_PID pid = p->pid();
-        if(pid == 0){
-            qWarning() << "Program " << service << " cannot start!";
-            delete p;
-            return;
-        }
-        */
     }
 }
 
-/*
-void DDocServerListener::processFinished1(int code, QProcess::ExitStatus status)
-{
-    QProcess * p = qobject_cast<QProcess *>(this->sender());
-    if(!p)
-        return;
-
-    p->kill();
-}
-
-void DDocServerListener::processError(QProcess::ProcessError err)
-{
-    QProcess * p = qobject_cast<QProcess *>(this->sender());
-    if(!p)
-        return;
-}
-
-void DDocServerListener::processStateChanged(QProcess::ProcessState state)
-{
-    QProcess * p = qobject_cast<QProcess *>(this->sender());
-    if(!p)
-        return;
-}
-
-*/

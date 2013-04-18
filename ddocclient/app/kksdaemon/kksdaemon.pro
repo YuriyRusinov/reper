@@ -1,6 +1,7 @@
 TEMPLATE = app
 
 include(../../ddocclient.conf)
+QT += network
 
 TARGET = kksdaemon
 

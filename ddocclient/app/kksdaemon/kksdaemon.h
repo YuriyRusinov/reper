@@ -7,6 +7,7 @@
 #include <QtCore/QDir>
 #include <QThread>
 #include <QTimer>
+#include <QHttp>
 #include <QtCore/QSettings>
 #include <QProcess>
 #include <QFile>
@@ -71,6 +72,8 @@ private:
     KKSPGDatabase * db;
 	KKSPGDatabase * dbTimer;
     DDocServerListener * listener;
+
+    QHttp http;
 
 	QTimer m_timer;
 
