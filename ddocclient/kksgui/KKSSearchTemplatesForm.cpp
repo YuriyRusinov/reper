@@ -112,6 +112,11 @@ void KKSSearchTemplatesForm :: setDataModel (QAbstractItemModel * mod)
         return;
     QAbstractItemModel * oldModel = searchView->model ();
     searchView->setModel (mod);
+    searchView->setColumnWidth (0, 250);
+    searchView->setColumnWidth (1, 150);
+    searchView->setColumnWidth (2, 110);
+    searchView->setColumnWidth (3, 200);
+    searchView->setColumnWidth (4, 200);
 
     if (oldModel && oldModel != mod)
         delete oldModel;
@@ -226,6 +231,8 @@ void KKSSearchTemplatesForm :: init (void)
     QStandardItemModel *searchModel = new QStandardItemModel (0, 1);
     searchModel->setHeaderData (0, Qt::Horizontal, tr ("Search templates"));
     searchView->setModel (searchModel);
+    QSize rs = this->sizeHint();
+    this->resize (rs.width()*2, rs.height()*2);
 }
 
 QModelIndex KKSSearchTemplatesForm :: getCurrentIndex (void) const

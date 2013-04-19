@@ -134,6 +134,23 @@ void KKSDaemon::analyzeDb()
 	if(r != 1)
 		return;
 
+
+	sql = QString("select getMessageStreams()");
+	res = dbTimer->execute(sql.toLocal8Bit().constData());
+	if(!res)
+		return;
+
+	if(res->getRowCount() != 1){
+		delete res;
+		return;
+	}
+
+	r = res->getCellAsInt(0, 0);
+	delete res;
+	if(r != 1)
+		return;
+
+
     (*fLogOut) << QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm.ss") << " --- " << "Successfully analyzed\n";
     fLogOut->flush();
 }

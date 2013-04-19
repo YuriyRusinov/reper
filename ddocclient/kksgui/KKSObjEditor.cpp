@@ -1959,11 +1959,20 @@ int KKSObjEditor :: getID (void) const
 void KKSObjEditor :: rubricsChanged (void)
 {
     isChanged = true;
-    qDebug () << __PRETTY_FUNCTION__ << this->pObj->rootRubric();//->rubrics().count();
+    
+    //qDebug () << __PRETTY_FUNCTION__ << this->pObj->rootRubric();//->rubrics().count();
     KKSIncludesWidget * iW = qobject_cast<KKSIncludesWidget *>(this->sender());
     if (!iW)
         return;
-    pObj->setRootRubric (iW->rootRubric());
+
+    if(pObj)
+        pObj->setRootRubric (iW->rootRubric());
+    else{
+        if(pObjectEx)
+            pObjectEx->setRootRubric (iW->rootRubric());
+        else
+            return;
+    }
 }
 
 void KKSObjEditor :: attrValueChanged (void)

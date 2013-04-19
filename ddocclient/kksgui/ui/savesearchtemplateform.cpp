@@ -4,6 +4,7 @@
 #include <QSortFilterProxyModel>
 #include <QHeaderView>
 #include <QMessageBox>
+#include <QSize>
 #include <QtDebug>
 
 #include <KKSSearchTemplate.h>
@@ -71,6 +72,12 @@ void SaveSearchTemplateForm :: setCategoryModel (QAbstractItemModel * catMod)
         delete oldMod;
 }
 
+void SaveSearchTemplateForm :: selectCategory (const QModelIndex& catIndex)
+{
+    QItemSelectionModel * cSelMod = UI->tvCategory->selectionModel();
+    cSelMod->select (catIndex, QItemSelectionModel::ClearAndSelect);
+}
+
 void SaveSearchTemplateForm :: setTypesModel (QAbstractItemModel * typeMod)
 {
     QAbstractItemModel * oldMod = sortTModel->sourceModel();//UI->tvSearchTemplateType->model ();
@@ -88,6 +95,12 @@ void SaveSearchTemplateForm :: setTypesModel (QAbstractItemModel * typeMod)
             selModel->select (sIndex, QItemSelectionModel::ClearAndSelect);
         }
     }
+    QTreeView * searchView = UI->tvSearchTemplateType;
+    searchView->setColumnWidth (0, 250);
+    searchView->setColumnWidth (1, 150);
+    searchView->setColumnWidth (2, 110);
+    searchView->setColumnWidth (3, 200);
+    searchView->setColumnWidth (4, 200);
 }
 
 int SaveSearchTemplateForm :: getIdCat (void) const

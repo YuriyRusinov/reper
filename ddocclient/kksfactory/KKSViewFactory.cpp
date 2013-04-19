@@ -2254,7 +2254,7 @@ void KKSViewFactory::getSearchTemplates (KKSLoader * loader, QAbstractItemModel 
             searchTModel->setData (wsIndex, 1, Qt::UserRole+USER_ENTITY);
 
             wsIndex = searchTModel->index (ii, 2, wIndex);
-            searchTModel->setData (wsIndex, p.value()->creationDatetime().toString("dd.MM.yyyy"), Qt::DisplayRole);
+            searchTModel->setData (wsIndex, p.value()->creationDatetime().toString("dd.MM.yyyy hh:mm:ss"), Qt::DisplayRole);
             searchTModel->setData (wsIndex, p.value()->id (), Qt::UserRole);
             searchTModel->setData (wsIndex, p.value()->idAuthor (), Qt::UserRole+1);
             searchTModel->setData (wsIndex, 1, Qt::UserRole+USER_ENTITY);

@@ -30,6 +30,8 @@ public:
     
     KKSSearchTemplate * getSearchTemplate (void) const;
 
+    void selectCategory (const QModelIndex& catIndex);
+
 private slots:
     void staccept (void);
 

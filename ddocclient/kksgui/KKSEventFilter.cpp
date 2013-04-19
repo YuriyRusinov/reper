@@ -33,7 +33,10 @@ bool KKSEventFilter :: eventFilter (QObject *obj, QEvent *event)
             return false;
         else
         {
-            treeObj->selectionModel ()->setCurrentIndex (index, QItemSelectionModel::Clear);
+            if(treeObj)
+                if(treeObj->selectionModel()) 
+                    treeObj->selectionModel ()->setCurrentIndex (index, QItemSelectionModel::Clear);
+            
             return true;
         }
     }
