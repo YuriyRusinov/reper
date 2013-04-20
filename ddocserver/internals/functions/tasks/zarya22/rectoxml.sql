@@ -13,10 +13,19 @@ declare
 
     xml_msg_passport xml;
     xml_form_pars xml;
+    r record;
+    query varchar;
+    tableName varchar;
     --regNumber varchar;
 begin
 
     if ((idObject is null or idRecord is null) and idMsg is null) then
+        raise warning 'Invalid parameters';
+        return null;
+    end if;
+    select into tableName table_name from io_objects io where io.id=idObject;
+    if (tableName is null) then
+        raise warning 'Reference is invalid';
         return null;
     end if;
 
@@ -64,9 +73,22 @@ begin
             return null;
         end if;
         xml_str := xml_str || E'\t\t\t\t\t' || io_name;
+    else
+        for r in
+            select a.id, a.code from attrs_categories ac inner join attributes a on (ac.id_io_attribute=a.id) inner join io_categories c on (ac.id_io_category=c.id_child) inner join tbl_io_objects io on (io.id_io_category=c.id and io.id=idObject and a.code=E'name')
+        loop
+            if (r.code is not null) then
+                query := E'select name from ' || tableName || E' where id=' || idRecord;
+                execute query into io_name;
+                if (io_name is not null) then
+                    xml_str := xml_str || E'\t\t\t\t\t' || io_name;
+                end if;
+            end if;
+        end loop;
 
     end if;
     xml_str := xml_str || E'\n\t\t\t\t]]>\n';
+    raise warning '%', xml_str;
 
     xml_str := xml_str || E'\t\t\t</human_readable_text>\n';
     

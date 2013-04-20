@@ -172,11 +172,11 @@ begin
     end if;
 
     xml_str := xml_str || E'\t\t\t\t<creation_date>';
-    select into xml_val_str now()::date;
+    select into xml_val_str to_char(now()::date, 'DD.MM.YYYY');
     xml_str := xml_str || xml_val_str;
     xml_str := xml_str || E'</creation_date>\n';
     xml_str := xml_str || E'\t\t\t\t<creation_time>';
-    select into xml_val_str now()::time;
+    select into xml_val_str to_char(now()::time, 'HH12:MI:SS');
     xml_str := xml_str || xml_val_str;
     xml_str := xml_str || E'</creation_time>\n';
 

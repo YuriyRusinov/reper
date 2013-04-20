@@ -110,7 +110,8 @@ begin
                     attr_value := rval.aval;
                 end if;
                 raise warning 'value is % %', rval.aval, attr_value;
-                xml_val_str := xml_val_str || E'\t\t<' || attCodeToTag(rattr.a_code) || E'><![CDATA[' || rval.unique_id || E' ' || rval.id || E' ' || attr_value || E']]></' || attCodeToTag(rattr.a_code) || E'>\n';
+                --xml_val_str := xml_val_str || E'\t\t<' || attCodeToTag(rattr.a_code) || E'><![CDATA[' || rval.unique_id || E' ' || rval.id || E' ' || attr_value || E']]></' || attCodeToTag(rattr.a_code) || E'>\n';
+                xml_val_str := xml_val_str || E'\t\t<' || attCodeToTag(rattr.a_code) || E' unique_id="' || rval.unique_id || E'" id="' || rval.id || E'"><![CDATA[' || E' ' || attr_value || E']]></' || attCodeToTag(rattr.a_code) || E'>\n';
             end if;
 
          else
