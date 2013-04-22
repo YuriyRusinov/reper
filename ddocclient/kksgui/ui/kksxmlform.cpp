@@ -4,6 +4,8 @@
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 #include <QXmlStreamNotationDeclaration>
+#include <QXmlStreamAttributes>
+#include <QXmlStreamAttribute>
 #include <QIODevice>
 #include <QMessageBox>
 #include <QStringRef>
@@ -18,10 +20,13 @@
 #include <KKSCategory.h>
 #include <KKSObject.h>
 #include <KKSAttribute.h>
+#include <KKSAttrType.h>
+#include <KKSCategoryAttr.h>
 #include <KKSAttrValue.h>
 #include <KKSObjectExemplar.h>
 #include <KKSEIOData.h>
 #include <KKSTemplate.h>
+#include <KKSType.h>
 #include "KKSItemDelegate.h"
 #include "defines.h"
 
@@ -197,8 +202,28 @@ void KKSXMLForm :: xmlParse (void)
             qDebug () << __PRETTY_FUNCTION__ << tType;// << xmlStreamR.name().toString() << xmlStreamR.text ().toString();
             if (xmlStreamR->isDTD())
                 readNotation (xmlStreamR->entityDeclarations ());
-            else if (xmlStreamR->isStartElement () && xmlStreamR->name ().toString().compare ("Attributes", Qt::CaseInsensitive) == 0)
-                readAttributes (xmlStreamR, attrFields);
+            else if (xmlStreamR->isStartElement () && xmlStreamR->name ().toString().compare ("Categories", Qt::CaseInsensitive) == 0)
+                continue;
+            else if (xmlStreamR->isStartElement () && xmlStreamR->name ().toString().compare ("category",  Qt::CaseInsensitive) == 0)
+            {
+                KKSCategory * pCat = readCategory (xmlStreamR);
+                if (pCat && pCat->type()->id() != 10)
+                {
+                    if (c)
+                        c->release ();
+                    c = new KKSCategory (*pCat);
+                    c->setAttributes (pCat->attributes());
+                }
+                else if (pCat)
+                {
+                    c->setTableCategory (pCat);
+                    qDebug () << __PRETTY_FUNCTION__ << pCat->attributes().count();
+                }
+                if (pCat)
+                    pCat->release ();
+            }
+//            else if (xmlStreamR->isStartElement () && xmlStreamR->name ().toString().compare ("Attributes", Qt::CaseInsensitive) == 0)
+//                readAttributes (xmlStreamR, attrFields);
         }
         else
         {
@@ -210,32 +235,195 @@ void KKSXMLForm :: xmlParse (void)
         }
     }
 
-    int nAttrs = attrFields.count();
+    if (!c || !c->tableCategory())
+        return;
+
+    int nAttrs = c->tableCategory()->attributes().count();
     QStandardItemModel *pModel = new QStandardItemModel (0, nAttrs);
     QAbstractItemModel *oldModel = ui->tVPreview->model ();
     ui->tVPreview->setModel (pModel);
     if (oldModel)
         delete oldModel;
 
-    if (c)
-        c->release ();
-
+//    if (c)
+//        c->release ();
+/*
     if (io && io->category() && io->category()->tableCategory())
         c = new KKSCategory (*io->category()->tableCategory());
     else
         c = new KKSCategory ();
     QStringList codeList;
     attrCodes.clear ();
-    for (int i=0; i<nAttrs; i++)
+*/
+    int i(0);
+    for (KKSMap<int, KKSCategoryAttr*>::const_iterator p=c->tableCategory()->attributes().constBegin(); 
+            p != c->tableCategory()->attributes().constEnd(); 
+            p++)
     {
-        codeList.append (attrFields[i].code);
-        attrCodes.append (attrFields[i].code);
-        pModel->setHeaderData (i, Qt::Horizontal, (attrFields[i].name.isEmpty() ? attrFields[i].code : attrFields[i].name), Qt::DisplayRole);
-        pModel->setHeaderData (i, Qt::Horizontal, attrFields[i].code, Qt::UserRole);
+//        codeList.append (attrFields[i].code);
+//        attrCodes.append (attrFields[i].code);
+        KKSCategoryAttr * ca = p.value();
+        pModel->setHeaderData (i, Qt::Horizontal, (ca->name().isEmpty() ? ca->code() : ca->name()), Qt::DisplayRole);
+        pModel->setHeaderData (i, Qt::Horizontal, ca->code(), Qt::UserRole);
+        ++i;
     }
 
     xmlFile->close ();
-    emit loadAttributes (c, codeList);
+}
+
+KKSCategory * KKSXMLForm :: readCategory (QXmlStreamReader* reader)
+{
+    if (!reader->isStartElement () || reader->name ().toString().compare ("Category", Qt::CaseInsensitive) != 0)
+        return 0;
+
+    QXmlStreamAttributes cXmlAttrs = reader->attributes();
+    if (cXmlAttrs.isEmpty())
+        return 0;
+
+    QString cIdStr (cXmlAttrs[0].value().toString());
+    int idCat = cIdStr.toInt();
+    qDebug () << __PRETTY_FUNCTION__ << cIdStr << idCat;
+
+    KKSCategory * cat = new KKSCategory ();
+    QXmlStreamReader::TokenType tType;// = reader->readNext ();
+    for (tType = reader->readNext(); tType != QXmlStreamReader::EndElement && reader->name ().toString().compare ("Category", Qt::CaseInsensitive) != 0 && !reader->atEnd(); tType = reader->readNext())
+    {
+        if (tType == QXmlStreamReader::StartElement && reader->name ().toString().compare ("cname", Qt::CaseInsensitive) == 0)
+        {
+            QString cName = reader->readElementText();
+            cat->setName (cName);
+        }
+        else if (tType == QXmlStreamReader::StartElement && reader->name ().toString().compare ("ccode", Qt::CaseInsensitive) == 0)
+        {
+            QString cCode = reader->readElementText();
+            cat->setCode (cCode);
+        }
+        else if (tType == QXmlStreamReader::StartElement && reader->name ().toString().compare ("ctype", Qt::CaseInsensitive) == 0)
+        {
+            int idType = reader->readElementText().toInt();
+            qDebug () << __PRETTY_FUNCTION__ << idType;
+            if (idType != 10)
+                cat->setType (KKSType::defType1());
+            else
+                cat->setType (KKSType::createType10());
+        }
+        else if (tType == QXmlStreamReader::StartElement && reader->name ().toString().compare ("cdescription", Qt::CaseInsensitive) == 0)
+        {
+            QString cDesc = reader->readElementText();
+            cat->setDesc (cDesc);
+        }
+        else if (tType == QXmlStreamReader::StartElement && reader->name ().toString().compare ("cis_main", Qt::CaseInsensitive) == 0)
+        {
+            QString cMain = reader->readElementText();
+            if (QString::compare (cMain, QString("true"), Qt::CaseInsensitive)==0)
+                cat->setMain (true);
+            else
+                cat->setMain (false);
+        }
+        else if (tType == QXmlStreamReader::StartElement && reader->name ().toString().compare ("attributes", Qt::CaseInsensitive) == 0)
+        {
+            QXmlStreamAttributes cXmlNumAttrs = reader->attributes();
+            int nAttrs = cXmlNumAttrs.isEmpty() ? 0 : cXmlNumAttrs[0].value().toString().toInt();
+            if (nAttrs > 0)
+            {
+                qDebug () << __PRETTY_FUNCTION__ << nAttrs;
+                for (tType = reader->readNext (); tType != QXmlStreamReader::StartElement && reader->name ().toString().compare ("attribute", Qt::CaseInsensitive) != 0;tType = reader->readNext ())
+                    ;
+                for (int i=0; i<nAttrs; i++)
+                {
+                    qDebug () << __PRETTY_FUNCTION__ << reader->name ().toString() << tType;
+                    readAttribute (reader, cat);
+                    for (tType = reader->readNext (); tType != QXmlStreamReader::StartElement && reader->name ().toString().compare ("attribute", Qt::CaseInsensitive) != 0; tType = reader->readNext ())
+                        ;
+//                    codeList.append (attrFields[i].code);
+                }
+                for (tType = reader->readNext (); tType != QXmlStreamReader::EndElement && reader->name ().toString().compare ("attributes", Qt::CaseInsensitive) != 0; tType = reader->readNext ())
+                    ;
+                qDebug () << __PRETTY_FUNCTION__ << cat->attributes().count();
+                //emit loadAttributes (cat, codeList);
+            }
+        }
+    }
+    return cat;
+}
+
+void KKSXMLForm :: readAttribute (QXmlStreamReader* reader, KKSCategory * cat)
+{
+    if (!cat || !reader->isStartElement () || reader->name ().toString().compare ("attribute", Qt::CaseInsensitive) != 0)
+    {
+        qDebug () << __PRETTY_FUNCTION__ << reader->tokenString () << reader->name ().toString() << (reader->name ().toString().compare ("attribute", Qt::CaseInsensitive) );
+        return;
+    }
+
+    QXmlStreamAttributes aXmlAttrs = reader->attributes();
+    if (aXmlAttrs.isEmpty())
+        return;
+
+    QString aIdStr (aXmlAttrs[0].value().toString());
+    int idAttr = aIdStr.toInt();
+    qDebug () << __PRETTY_FUNCTION__ << aIdStr << idAttr;
+    KKSCategoryAttr * cAttr = new KKSCategoryAttr;
+    cAttr->setId (idAttr);
+    QXmlStreamReader::TokenType tType;// = reader->readNext ();
+    //qDebug () << __PRETTY_FUNCTION__ << tType << reader->name().toString();
+    for (tType = reader->readNext (); tType != QXmlStreamReader::EndElement && reader->name ().toString().compare ("attribute", Qt::CaseInsensitive) != 0; tType=reader->readNext ())
+    {
+        if (tType == QXmlStreamReader::StartElement && reader->name ().toString().compare ("code", Qt::CaseInsensitive) == 0)
+        {
+            QString acCode = reader->readElementText();
+            cAttr->setCode (acCode);
+        }
+        else if (tType == QXmlStreamReader::StartElement && reader->name ().toString().compare ("name", Qt::CaseInsensitive) == 0)
+        {
+            QString acName = reader->readElementText();
+            cAttr->setName (acName);
+        }
+        else if (tType == QXmlStreamReader::StartElement && reader->name ().toString().compare ("type", Qt::CaseInsensitive) == 0)
+        {
+            QString acType = reader->readElementText();
+            int idAType = acType.toInt();
+            KKSAttrType * aType = new KKSAttrType (idAType);
+            cAttr->setType (aType);
+            aType->release ();
+        }
+        else if (tType == QXmlStreamReader::StartElement && reader->name ().toString().compare ("mandatory", Qt::CaseInsensitive) == 0)
+        {
+            QString isMandStr = reader->readElementText();
+            bool isM = (QString::compare (isMandStr, QString("true"), Qt::CaseInsensitive)==0);
+            cAttr->setMandatory (isM);
+        }
+        else if (tType == QXmlStreamReader::StartElement && reader->name ().toString().compare ("read_only", Qt::CaseInsensitive) == 0)
+        {
+            QString isROStr = reader->readElementText();
+            bool isRO = (QString::compare (isROStr, QString("true"), Qt::CaseInsensitive)==0);
+            cAttr->setReadOnly (isRO);
+        }
+        else if (tType == QXmlStreamReader::StartElement && reader->name ().toString().compare ("def_width", Qt::CaseInsensitive) == 0)
+        {
+            QString defWStr = reader->readElementText();
+            int aDefW = defWStr.toInt();
+            cAttr->setDefWidth (aDefW);
+        }
+        else if (tType == QXmlStreamReader::StartElement && reader->name ().toString().compare ("table_name", Qt::CaseInsensitive) == 0)
+        {
+            QString tName = reader->readElementText();
+            cAttr->setTableName (tName);
+        }
+        else if (tType == QXmlStreamReader::StartElement && reader->name ().toString().compare ("column_name", Qt::CaseInsensitive) == 0)
+        {
+            QString cName = reader->readElementText();
+            cAttr->setColumnName (cName);
+        }
+        else if (tType == QXmlStreamReader::StartElement && reader->name ().toString().compare ("ref_column_name", Qt::CaseInsensitive) == 0)
+        {
+            QString crName = reader->readElementText();
+            cAttr->setRefColumnName (crName);
+        }
+        //tType = reader->readNext ();
+    }
+    //reader->readNext ();
+    cat->addAttribute (idAttr, cAttr);
+    qDebug () << __PRETTY_FUNCTION__ << idAttr << cat->attributes().count();
 }
 
 QString KKSXMLForm :: getCSVFile (void) const
@@ -316,7 +504,7 @@ void KKSXMLForm :: readAttributes (QXmlStreamReader* reader, QList<AttrField>& a
 
         if (reader->isStartElement())
         {
-            if (reader->name ().toString().compare ("field", Qt::CaseInsensitive) == 0)
+            if (reader->name ().toString().compare ("attribute", Qt::CaseInsensitive) == 0)
                 readField (reader, af);
             else
                 return;
@@ -328,7 +516,7 @@ void KKSXMLForm :: readAttributes (QXmlStreamReader* reader, QList<AttrField>& a
 
 void KKSXMLForm :: readField (QXmlStreamReader* reader, AttrField& af)
 {
-    if (!reader->isStartElement () || reader->name ().toString().compare ("field", Qt::CaseInsensitive) != 0)
+    if (!reader->isStartElement () || reader->name ().toString().compare ("attribute", Qt::CaseInsensitive) != 0)
         return;
 
     while (!reader->atEnd())
