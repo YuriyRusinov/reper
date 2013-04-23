@@ -478,14 +478,14 @@ qint64 KKSEIOFactory::generateInsertQuery(const QString & tableName,
             QString rTable = tableName + "_" + attr->tableName();
             QString refTable;
             if(rTable == ORGANIZATION_WORK_MODE || 
-                rTable == POSITION_WORK_MODE || 
+               rTable == POSITION_WORK_MODE || 
                rTable == UNITS_WORK_MODE ||
                rTable == IO_OBJECTS_ORGANIZATION ||
                rTable == USER_CHAINS_ORGANIZATION ||
                rTable == REPORT_ORGANIZATION ||
                rTable == GUARD_OBJ_DEVICES_TSO ||
                rTable == ACCESS_CARDS_ACCESS_PLAN_TSO ||
-			   rTable == MAIL_LISTS_POSITION  ||
+               rTable == MAIL_LISTS_POSITION  ||
                rTable == LIFE_CYCLE_IO_STATES ||
                rTable == SHU_DLS_POSITION
                )
@@ -577,6 +577,8 @@ qint64 KKSEIOFactory::generateInsertQuery(const QString & tableName,
         */
         
         KKSValue value = attrValue->value();
+        if (iType == KKSAttrType::atParent && bImported)
+            qDebug () << __PRETTY_FUNCTION__ << value.value();
         
         if ((iType == KKSAttrType::atList || iType == KKSAttrType::atParent) && 
             bImported && //в этом случае надо обязательно делать запрос за значением идентификатора записи.
@@ -586,9 +588,10 @@ qint64 KKSEIOFactory::generateInsertQuery(const QString & tableName,
         {
             QString aQuery = QString ("SELECT %4 from %1 where %2='%3' limit 1;")
                                              .arg ((iType == KKSAttrType::atParent ? tableName : attr->tableName ()))
-                                             .arg (attr->columnName ())
+                                             .arg (iType == KKSAttrType::atList && !bImported ? attr->columnName () : QString("id"))
                                              .arg (value.value())
                                              .arg(attr->refColumnName().isEmpty() ? "id" : attr->refColumnName());
+            qDebug () << __PRETTY_FUNCTION__ << aQuery;
             KKSResult * aRes = db->execute (aQuery);
 
             if (!aRes || aRes->getRowCount () == 0)
@@ -858,13 +861,14 @@ int KKSEIOFactory::deleteAllRecords(const QString & table) const
     return OK_CODE;
 }
 
-int KKSEIOFactory::insertEIOList(KKSList<KKSObjectExemplar*> eioList, 
+int KKSEIOFactory::insertEIOList(KKSList<KKSObjectExemplar*> eioList,
+                                 QHash<QString, qint64>& uids,
                                  const KKSCategory* cat, 
                                  const QString & table, 
                                  QProgressDialog *pgDial, 
                                  bool bImported) const
 {
-    if(table.isEmpty())
+    if(table.isEmpty() || eioList.count() != uids.count())
         return ERROR_CODE;
 
     int count = eioList.count();
@@ -877,6 +881,7 @@ int KKSEIOFactory::insertEIOList(KKSList<KKSObjectExemplar*> eioList,
         pgDial->setMaximum (count);
     }
 
+    QHash<QString, qint64>::iterator pu = uids.begin();
     for(int i=0; i<count; i++)
     {
         if (pgDial)
@@ -891,12 +896,14 @@ int KKSEIOFactory::insertEIOList(KKSList<KKSObjectExemplar*> eioList,
             if (av && 
                 av->attribute() &&
                 av->attribute()->type()->attrType() == KKSAttrType::atParent &&
-                av->value().value().toInt() > 0 &&
-                av->value().value().toInt() <= i)
+                !av->value().value().isEmpty())
+                //av->value().value().toInt() > 0 &&
+                //av->value().value().toInt() <= i)
             {
-                
-                int pKey = av->value().value().toInt();
-                int pId = eioList.at (pKey-1)->id();
+                QString puid = uids.find (av->value().value()).key();
+                //int pKey = av->value().value().toInt();
+                int pId = uids.value (puid);//eioList.at (pKey-1)->id();
+                qDebug () << __PRETTY_FUNCTION__ << puid << av->value().value();
                 KKSValue val = KKSValue (QString::number(pId), KKSAttrType::atParent);
                 av->setValue(val);
             }
@@ -911,8 +918,10 @@ int KKSEIOFactory::insertEIOList(KKSList<KKSObjectExemplar*> eioList,
             db->rollback();
             continue;
         }
+        pu.value() = res;
 
         db->commit();
+        pu++;
     }
     
     

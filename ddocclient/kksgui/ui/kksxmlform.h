@@ -74,7 +74,7 @@ public:
     void setExportModel (QAbstractItemModel * recModel);
 
 signals:
-    void loadAttributes (KKSCategory * c, const QStringList& attrCodeList);
+    //void loadAttributes (KKSCategory * c, const QStringList& attrCodeList);
     void loadCSV (QIODevice *csvDev, QString codeName, QString fDelim, QString tDelim, QAbstractItemModel *dataModel, KKSXMLForm * xForm);
 
 private slots:

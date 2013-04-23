@@ -3766,7 +3766,7 @@ void KKSLoader::loadPrivileges(KKSObject * io) const
 qint64 KKSLoader::getIdByUID (const QString& tableName, const QString& uid) const
 {
     qint64 id (-1);
-    QString sql (QString("select getidbyuid ('%1', '%2');"));
+    QString sql (QString("select getidbyuid ('%1', '%2');").arg (tableName).arg (uid));
     KKSResult * res = db->execute (sql);
     if (!res || res->getRowCount() != 1)
     {

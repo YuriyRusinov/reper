@@ -239,7 +239,7 @@ void KKSXMLForm :: xmlParse (void)
         return;
 
     int nAttrs = c->tableCategory()->attributes().count();
-    QStandardItemModel *pModel = new QStandardItemModel (0, nAttrs);
+    QStandardItemModel *pModel = new QStandardItemModel (0, nAttrs+1);
     QAbstractItemModel *oldModel = ui->tVPreview->model ();
     ui->tVPreview->setModel (pModel);
     if (oldModel)
@@ -255,7 +255,9 @@ void KKSXMLForm :: xmlParse (void)
     QStringList codeList;
     attrCodes.clear ();
 */
-    int i(0);
+    int i(1);
+    pModel->setHeaderData (0, Qt::Horizontal, tr("Unique id"), Qt::DisplayRole);
+    pModel->setHeaderData (0, Qt::Horizontal, QString("unique_id"), Qt::UserRole);
     for (KKSMap<int, KKSCategoryAttr*>::const_iterator p=c->tableCategory()->attributes().constBegin(); 
             p != c->tableCategory()->attributes().constEnd(); 
             p++)
@@ -301,7 +303,7 @@ KKSCategory * KKSXMLForm :: readCategory (QXmlStreamReader* reader)
         else if (tType == QXmlStreamReader::StartElement && reader->name ().toString().compare ("ctype", Qt::CaseInsensitive) == 0)
         {
             int idType = reader->readElementText().toInt();
-            qDebug () << __PRETTY_FUNCTION__ << idType;
+            //qDebug () << __PRETTY_FUNCTION__ << idType;
             if (idType != 10)
                 cat->setType (KKSType::defType1());
             else
@@ -326,21 +328,20 @@ KKSCategory * KKSXMLForm :: readCategory (QXmlStreamReader* reader)
             int nAttrs = cXmlNumAttrs.isEmpty() ? 0 : cXmlNumAttrs[0].value().toString().toInt();
             if (nAttrs > 0)
             {
-                qDebug () << __PRETTY_FUNCTION__ << nAttrs;
-                for (tType = reader->readNext (); tType != QXmlStreamReader::StartElement && reader->name ().toString().compare ("attribute", Qt::CaseInsensitive) != 0;tType = reader->readNext ())
+                //qDebug () << __PRETTY_FUNCTION__ << nAttrs;
+                QXmlStreamReader::TokenType tTypeA;
+                for (tTypeA = reader->readNext (); tTypeA != QXmlStreamReader::StartElement && reader->name ().toString().compare ("attribute", Qt::CaseInsensitive) != 0;tTypeA = reader->readNext ())
                     ;
                 for (int i=0; i<nAttrs; i++)
                 {
-                    qDebug () << __PRETTY_FUNCTION__ << reader->name ().toString() << tType;
+                    //qDebug () << __PRETTY_FUNCTION__ << reader->name ().toString() << tType;
+                    QXmlStreamReader::TokenType tTypeA;
                     readAttribute (reader, cat);
-                    for (tType = reader->readNext (); tType != QXmlStreamReader::StartElement && reader->name ().toString().compare ("attribute", Qt::CaseInsensitive) != 0; tType = reader->readNext ())
-                        ;
-//                    codeList.append (attrFields[i].code);
+                    for (tTypeA = reader->readNext (); tTypeA != QXmlStreamReader::StartElement && reader->name ().toString().compare ("attribute", Qt::CaseInsensitive) != 0 && !reader->atEnd(); tTypeA = reader->readNext ())
+                        ;//qDebug () << __PRETTY_FUNCTION__ << reader->name ().toString() << tType;
                 }
-                for (tType = reader->readNext (); tType != QXmlStreamReader::EndElement && reader->name ().toString().compare ("attributes", Qt::CaseInsensitive) != 0; tType = reader->readNext ())
+                for (tTypeA = reader->readNext (); tTypeA != QXmlStreamReader::EndElement && reader->name ().toString().compare ("attributes", Qt::CaseInsensitive) != 0 && !reader->atEnd(); tTypeA = reader->readNext ())
                     ;
-                qDebug () << __PRETTY_FUNCTION__ << cat->attributes().count();
-                //emit loadAttributes (cat, codeList);
             }
         }
     }

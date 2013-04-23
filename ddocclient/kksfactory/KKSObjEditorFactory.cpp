@@ -3536,12 +3536,14 @@ void KKSObjEditorFactory :: loadAttributeReference (QString tableName, QWidget *
         KKSMap<int, KKSCategoryAttr*>::const_iterator pa = messForm->getMessage()->io()->category()->tableCategory()->attributes().constFind (idAttr);
         if (pa != messForm->getMessage()->io()->category()->tableCategory()->attributes().constEnd())
         {
-            int iattr;
+            int iattr (-1);
             int c_pos = loader->getDlId ();
             if (attrId == ATTR_ID_IO_OBJECT)
                 iattr = 5;
             else if (attrId == ATTR_ID_DL_RECEIVER)
                 iattr = 7;
+            else
+                return;
             KKSList<KKSAttrValue *> avals = messForm->attrValues ();
             avals[iattr]->setValue (KKSValue (QString::number (recEditor->getID ()), KKSAttrType::atList));
             messForm->setValues (avals);
@@ -4409,8 +4411,11 @@ void KKSObjEditorFactory :: importEIO (KKSObjEditor * editor, int idObject, cons
     if (xmlForm->exec () == QDialog::Accepted)
     {
         xmlForm->hide ();
-        KKSCategory * c1 = xmlForm->getCategory ();//подчиненная категория, полученная из xml-файла
-        if (!c1 || 
+        KKSCategory * c1 = xmlForm->getCategory ();
+        //
+        // категория справочника, полученная из xml-файла
+        //
+        if (!c1 || !c1->tableCategory() ||
             xmlForm->getCSVFile().isEmpty() || 
             xmlForm->getXMLFile().isEmpty() || 
             xmlForm->getCharset().isEmpty() || 
@@ -4422,10 +4427,10 @@ void KKSObjEditorFactory :: importEIO (KKSObjEditor * editor, int idObject, cons
             return;
         }
 
-        if (!c1->attributes().contains (cAttrId->id()))
-            c1->addAttribute (cAttrId->id(), cAttrId);
+        if (!c1->tableCategory()->attributes().contains (cAttrId->id()))
+            c1->tableCategory()->addAttribute (cAttrId->id(), cAttrId);
         
-        if (c0->attributes().count() != c1->attributes().count())//категория, в которую импортируем, не соответствует той, которая получена из xml-файла
+        if (c0->attributes().count() != c1->tableCategory()->attributes().count())//категория, в которую импортируем, не соответствует той, которая получена из xml-файла
         {
             QMessageBox::warning (editor, tr ("Error"), tr("Inconsistent categories"), QMessageBox::Ok);
             io->release();
@@ -4433,7 +4438,7 @@ void KKSObjEditorFactory :: importEIO (KKSObjEditor * editor, int idObject, cons
         }
 
         KKSMap<int, KKSCategoryAttr*>::const_iterator pc0 = c0->attributes ().constBegin();//подчиненная
-        KKSMap<int, KKSCategoryAttr*>::const_iterator pc  = c1->attributes ().constBegin();//подчиненная
+        KKSMap<int, KKSCategoryAttr*>::const_iterator pc  = c1->tableCategory()->attributes ().constBegin();//подчиненная
         for (; pc0 != c0->attributes().constEnd(); pc0++)
         {
             if (pc0.key() != pc.key() )
@@ -4530,9 +4535,9 @@ void KKSObjEditorFactory :: importCSV (QIODevice *csvDev, QString codeName, QStr
         //escFDelim += QString("(({(.)*}))*");//[\^(\{%1*\})]").arg (QRegExp::escape (fDelim));
         QRegExp fRegExp(escFDelim);
         lineData = fstr.split (fRegExp);
-        qDebug () << __PRETTY_FUNCTION__ << lineData.size() << escFDelim << fstr;
-        for (int ii=0; ii<lineData.size(); ii++)
-            qDebug () << __PRETTY_FUNCTION__ << lineData[ii];// << escFDelim << fRegExp;
+        //qDebug () << __PRETTY_FUNCTION__ << lineData.size() << escFDelim << fstr;
+        //for (int ii=0; ii<lineData.size(); ii++)
+        //    qDebug () << __PRETTY_FUNCTION__ << lineData[ii];// << escFDelim << fRegExp;
         if (fstr.contains (tDelim))
         {
             for (int i=0; i<lineData.count(); )
@@ -4548,7 +4553,7 @@ void KKSObjEditorFactory :: importCSV (QIODevice *csvDev, QString codeName, QStr
                             lineData.removeAt (i + 1);
                     }
                     lineData[i] = lineData[i].mid (1, lineData[i].count()-2);
-                    qDebug () << __PRETTY_FUNCTION__ << lineData[i];
+                    //qDebug () << __PRETTY_FUNCTION__ << lineData[i];
                 }
                 while (lineData[i].startsWith (tDelim) && (!lineData[i].endsWith (tDelim) ||
                                                             lineData[i].endsWith (QString("\\%1").arg (tDelim)) ))
@@ -4562,9 +4567,9 @@ void KKSObjEditorFactory :: importCSV (QIODevice *csvDev, QString codeName, QStr
             }
         }
 
-        if (lineData.count() != dataModel->columnCount())
+        if (lineData.count() - dataModel->columnCount() > 0)
         {
-            qDebug () << __PRETTY_FUNCTION__ << lineData.count() << dataModel->columnCount() << lineData;
+            //qDebug () << __PRETTY_FUNCTION__ << lineData.count() << dataModel->columnCount() << lineData;
             if (dataModel->rowCount())
                 dataModel->removeRows (0, dataModel->rowCount());
             QMessageBox::warning (xmlForm, tr("Import data"), tr ("Inconsistence data on row %1").arg (i0));
@@ -4590,6 +4595,7 @@ void KKSObjEditorFactory :: importCSV (QIODevice *csvDev, QString codeName, QStr
                 dataModel->setData (wIndex, lineData[i], Qt::DisplayRole);
             }
         }
+        qDebug () << __PRETTY_FUNCTION__ << oeStr;
         xmlForm->addCopy (oeStr);
     }
 }
@@ -4621,6 +4627,10 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io,
     KKSList<KKSObjectExemplar *> oeList;
     int n = oesList.count();
     int m = attrCodeList.count();
+    QHash<QString, qint64> oldUids;
+    for (int i=0; i<n; i++)
+        oldUids.insert(oesList[i][0], 0);
+    qDebug () << __PRETTY_FUNCTION__ << oldUids;
     
     QProgressDialog *pImportD = new QProgressDialog ();//tr("Import Copies"), tr("Abort import"), 0, n*m);
     QLabel *lImport = new QLabel (tr("Generate Records"), pImportD);
@@ -4731,7 +4741,8 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io,
                 iType == KKSAttrType::atRecordTextColorRef)
             {
                 
-                QString av_str (oesList[i][j]);
+                QString av_str (oesList[i][(iType == KKSAttrType::atParent ? 0 : j)]);
+                //qDebug () << __PRETTY_FUNCTION__ << av_str;
                 //av_str.replace(QString("\\\n"), QChar('\n'), Qt::CaseInsensitive);
                 //av_str.replace(QString("\\\'"), QChar('\''), Qt::CaseInsensitive);
                 //av_str.replace(QString("\\\""), QChar('\"'), Qt::CaseInsensitive);
@@ -4744,8 +4755,15 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io,
                 {
                     QString tName = (iType == KKSAttrType::atParent ? io->tableName() : cAttr->tableName());
                     rid = loader->getIdByUID (tName, av_str);
+                    if (iType == KKSAttrType::atParent)
+                        qDebug () << __PRETTY_FUNCTION__ << rid << av_str;
                 }
-                val = KKSValue(QString::number (rid), cAttr->refType()->attrType());
+                if (rid > 0 && iType != KKSAttrType::atParent)
+                    val = KKSValue(QString::number (rid), cAttr->refType()->attrType());
+                else if (iType == KKSAttrType::atParent && !av_str.isEmpty())
+                    val = KKSValue (av_str, cAttr->refType()->attrType());
+                else
+                    val = KKSValue(QString (), cAttr->refType()->attrType());
                 
                 /*KSA
                 QMap<int, QString> values;
@@ -4931,7 +4949,7 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io,
     pImportD->setWindowTitle (tr("Save into DB"));
     pImportD->show ();
     QString tabName = tableName.isEmpty() ? io->tableName() : tableName;
-    int res = eiof->insertEIOList (oeList, cat, tabName, pImportD, true);
+    int res = eiof->insertEIOList (oeList, oldUids, cat, tabName, pImportD, true);
     pImportD->hide ();
     if (res == ERROR_CODE)
     {

@@ -8,6 +8,8 @@
 #if !defined(__KKSSITOOOM_KKSEIOFactory_h)
 #define __KKSSITOOOM_KKSEIOFactory_h
 
+#include <QHash>
+
 #include "kksfactory_config.h"
 #include "KKSMap.h"
 #include "KKSList.h"
@@ -47,10 +49,11 @@ public:
     int deleteEIO(KKSObjectExemplar* eio, const QString& table=QString()) const;
     int deleteRecord(qint64 id, const QString & table) const;
     int deleteAllRecords(const QString & table) const;
-    int insertEIOList(KKSList<KKSObjectExemplar*> eioList,  
-                      const KKSCategory* cat=0, 
-                      const QString & table=QString(), 
-                      QProgressDialog *pgDial=0, 
+    int insertEIOList(KKSList<KKSObjectExemplar*> eioList,
+                      QHash<QString, qint64>& uids,
+                      const KKSCategory* cat=0,
+                      const QString & table=QString(),
+                      QProgressDialog *pgDial=0,
                       bool bImported = false) const;
 
     int insertCommand(KKSObjectExemplar* eio) const;
