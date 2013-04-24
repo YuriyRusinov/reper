@@ -51,6 +51,7 @@ class KKSIndFactory;
 class KKSIndicator;
 class KKSIndicatorValue;
 class KKSSearchTemplatesForm;
+class SaveSearchTemplateForm;
 
 class QScrollArea;
 class QGridLayout;
@@ -305,7 +306,7 @@ private slots:
 
     void loadAttributeSingleFilters (const QString & tableName, const KKSAttribute * attr, QAbstractItemModel * mod);
     void loadAttributeFilters (const QString & tableName, const KKSAttribute * attr, QAbstractItemModel * mod);
-    void saveSearchCriteria (KKSFilterGroup * group, const KKSCategory * c);//c - категория для которой можно применить поисковы запрос
+    void saveSearchCriteria (KKSSearchTemplate * st, KKSFilterGroup * group, const KKSCategory * c);//c - категория для которой можно применить поисковы запрос
 
     void loadSearchCriteria (void);//QAbstractItemModel * mod);
 
@@ -461,6 +462,8 @@ private:
     int writeRecIntoModel (QAbstractItemModel * recModel, KKSObjectExemplar * wObjE) const;
     
     void initSearchTemplateModel (KKSSearchTemplatesForm *stForm) const;
+    
+    SaveSearchTemplateForm * GUISearchTemplate (KKSSearchTemplate * st, bool mode=true, QWidget *parent = 0, Qt::WindowFlags f=0) const;
 
 private:
     //

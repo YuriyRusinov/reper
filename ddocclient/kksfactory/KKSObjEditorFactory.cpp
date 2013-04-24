@@ -2131,7 +2131,7 @@ void KKSObjEditorFactory::filterEIO(KKSObjEditor * editor, int idObject, const K
 
 //    connect (f, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QComboBox *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QComboBox *)) );
     connect (f, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QAbstractItemModel *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QAbstractItemModel *)) );
-    connect (f, SIGNAL (saveSearchCriteria (KKSFilterGroup *, const KKSCategory *)), this, SLOT (saveSearchCriteria (KKSFilterGroup *, const KKSCategory *)) );
+    connect (f, SIGNAL (saveSearchCriteria (KKSSearchTemplate *, KKSFilterGroup *, const KKSCategory *)), this, SLOT (saveSearchCriteria (KKSSearchTemplate *, KKSFilterGroup *, const KKSCategory *)) );
     connect (f, SIGNAL (loadSearchCriteria (void)), this, SLOT (loadSearchCriteria (void)) );
     if(f->exec() == QDialog::Accepted){
         const KKSTemplate * t = new KKSTemplate (c->defTemplate());
@@ -4595,7 +4595,7 @@ void KKSObjEditorFactory :: importCSV (QIODevice *csvDev, QString codeName, QStr
                 dataModel->setData (wIndex, lineData[i], Qt::DisplayRole);
             }
         }
-        qDebug () << __PRETTY_FUNCTION__ << oeStr;
+        //qDebug () << __PRETTY_FUNCTION__ << oeStr;
         xmlForm->addCopy (oeStr);
     }
 }
@@ -4627,10 +4627,10 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io,
     KKSList<KKSObjectExemplar *> oeList;
     int n = oesList.count();
     int m = attrCodeList.count();
-    QHash<QString, qint64> oldUids;
+    QMap<QString, qint64> oldUids;
     for (int i=0; i<n; i++)
         oldUids.insert(oesList[i][0], 0);
-    qDebug () << __PRETTY_FUNCTION__ << oldUids;
+    //qDebug () << __PRETTY_FUNCTION__ << oldUids;
     
     QProgressDialog *pImportD = new QProgressDialog ();//tr("Import Copies"), tr("Abort import"), 0, n*m);
     QLabel *lImport = new QLabel (tr("Generate Records"), pImportD);
@@ -4650,7 +4650,7 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io,
     int v = 0;
     pImportD->setMinimumDuration (0);
     pImportD->show ();
-    qDebug () << __PRETTY_FUNCTION__ << pImportD->isVisible () << pImportD->labelText();// << pbCancelButton->isVisible () << pBar->isVisible ();
+    //qDebug () << __PRETTY_FUNCTION__ << pImportD->isVisible () << pImportD->labelText();// << pbCancelButton->isVisible () << pBar->isVisible ();
     
     KKSList<KKSAttribute *> attrList;
     KKSList<const KKSCategoryAttr*> cAttrList;
@@ -4669,27 +4669,6 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io,
 
         cAttrList.append(cAttr);
 
-        /*KKSObject * obj = NULL;
-        if(cAttr->id() > 0){
-            KKSAttrType :: KKSAttrTypes iType = cAttr->type()->attrType();
-            if(iType == KKSAttrType::atList || 
-               iType == KKSAttrType::atRecordColorRef ||
-               iType == KKSAttrType::atRecordTextColorRef
-               )
-            {
-                QString tName = cAttr->tableName ();
-                obj = loader->loadIO (tName, true);
-            }
-        }
-        
-        if(!obj)
-            obj = new KKSObject();
-
-        refObjList.append(obj);
-        obj->release();
-        */
-        
-            
         cAttr->release();
 
         if(attr)
@@ -4741,13 +4720,8 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io,
                 iType == KKSAttrType::atRecordTextColorRef)
             {
                 
-                QString av_str (oesList[i][(iType == KKSAttrType::atParent ? 0 : j)]);
+                QString av_str (oesList[i][j+1]);//(iType == KKSAttrType::atParent ? 0 : j+1)]);
                 //qDebug () << __PRETTY_FUNCTION__ << av_str;
-                //av_str.replace(QString("\\\n"), QChar('\n'), Qt::CaseInsensitive);
-                //av_str.replace(QString("\\\'"), QChar('\''), Qt::CaseInsensitive);
-                //av_str.replace(QString("\\\""), QChar('\"'), Qt::CaseInsensitive);
-                
-                //KKSValue refVal (av_str, cAttr->refType()->attrType());
                 qint64 rid (-1);
                 if (refIds.contains(av_str))
                     rid = refIds.value (av_str);
@@ -4755,8 +4729,8 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io,
                 {
                     QString tName = (iType == KKSAttrType::atParent ? io->tableName() : cAttr->tableName());
                     rid = loader->getIdByUID (tName, av_str);
-                    if (iType == KKSAttrType::atParent)
-                        qDebug () << __PRETTY_FUNCTION__ << rid << av_str;
+                    //if (iType == KKSAttrType::atParent)
+                    //    qDebug () << __PRETTY_FUNCTION__ << tName << rid << av_str;
                 }
                 if (rid > 0 && iType != KKSAttrType::atParent)
                     val = KKSValue(QString::number (rid), cAttr->refType()->attrType());
@@ -4764,75 +4738,11 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io,
                     val = KKSValue (av_str, cAttr->refType()->attrType());
                 else
                     val = KKSValue(QString (), cAttr->refType()->attrType());
-                
-                /*KSA
-                QMap<int, QString> values;
-                QMap<int, QString> refColumnValues;
-                
-                if (iType != KKSAttrType::atParent)
-                {
-                    KKSObject * refObj = refObjList[j];
-                    if (!refObj || refObj->id() <= 0)
-                        continue;
-
-                    KKSCategory * cRef = refObj->category();
-                    if (!cRef)
-                        continue;
-                    
-                    bool isXml = false;
-                    cRef = cRef->tableCategory();
-                    if (cRef)
-                        isXml = isXml || cRef->isAttrTypeContains(KKSAttrType::atXMLDoc) || cRef->isAttrTypeContains (KKSAttrType::atSVG);
-                    
-                    //KKSAttribute * rattr = loader->loadAttribute (cAttr->columnName(), tName);
-                    //if (!rattr)
-                    //    continue;
-                    
-                    
-                    values = loader->loadAttributeValues (cAttr, refColumnValues, isXml, !isXml, QString(), KKSList<const KKSFilterGroup*>());
-                    for (QMap<int, QString>::iterator pv=values.begin(); pv!= values.end(); pv++)
-                    {
-                        pv.value().replace (QChar('\n'), QString("\\n"), Qt::CaseInsensitive);
-                        pv.value().replace (QChar('\''), QString("\\'"), Qt::CaseInsensitive);
-                        pv.value().replace (QChar('\"'), QString("\\\""), Qt::CaseInsensitive);
-                    }
-                    
-                    int pkey = values.key (refVal.value(), -1);
-                    QMap<int, QString>::const_iterator pv = values.constFind (pkey);
-                    if (pv != values.constEnd())
-                        val = KKSValue (QString::number (pv.key()), iType);
-                    else
-                        val = KKSValue (QString(), iType);
-
-                    
-                    //rattr->release ();
-                    //refObj->release ();
-
-                }
-                else
-                {
-                    QString tName = tableName.isEmpty() ? cAttr->tableName() : tableName;
-                    //values loader->loadAttributeValues (cAttr, refColumnValues, true, true, tName, KKSList<const KKSFilterGroup*>());
-                    qDebug () << __PRETTY_FUNCTION__ << values << tName;
-                    for (QMap<int, QString>::iterator pv=values.begin(); pv!= values.end(); pv++)
-                    {
-                        pv.value().replace (QChar('\n'), QString("\\n"), Qt::CaseInsensitive);
-                        pv.value().replace (QChar('\''), QString("\\'"), Qt::CaseInsensitive);
-                        pv.value().replace (QChar('\"'), QString("\\\""), Qt::CaseInsensitive);
-                    }
-                    //qDebug () << __PRETTY_FUNCTION__ << QString::compare (values.begin().value().mid (0, 100), refVal.value().mid (0, 100), Qt::CaseInsensitive) << values.begin().value().mid (1, 100) << refVal.value().mid(1, 100) << oesList[i][j].size();
-                    int pkey = this->searchParents(oeList, cAttr, refVal);//values.key (refVal.value(), -1);
-                    if (pkey > 0)
-                        val = KKSValue (QString::number (pkey), iType);
-                    else
-                        val = KKSValue (QString(), iType);
-                }
-                KSA*/
             }
             else if (iType == KKSAttrType::atCheckList ||
                         iType == KKSAttrType::atCheckListEx)
             {
-                QString av_str (oesList[i][j].mid(oesList[i][j].indexOf("{")+1, oesList[i][j].lastIndexOf("}")-1));
+                QString av_str (oesList[i][j+1].mid(oesList[i][j+1].indexOf("{")+1, oesList[i][j+1].lastIndexOf("}")-1));
                 QStringList rValues = av_str.split (",");
                 for (int ii=0; ii<rValues.count(); ii++)
                 {
@@ -4916,7 +4826,7 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io,
                 val = KKSValue (QString("''"), iType);
             }
             else{
-                QString av_str = oesList[i][j];
+                QString av_str = oesList[i][j+1];
                 
                 av_str.replace(QString("\\\n"), QChar('\n'), Qt::CaseInsensitive);
                 av_str.replace(QString("\\\'"), QChar('\''), Qt::CaseInsensitive);
@@ -6525,7 +6435,7 @@ void KKSObjEditorFactory :: loadAttributeFilters (const QString & tableName, con
  * Параметры:
  * group -- группа критериев поиска.
  */
-void KKSObjEditorFactory :: saveSearchCriteria (KKSFilterGroup * group, const KKSCategory * c)
+void KKSObjEditorFactory :: saveSearchCriteria (KKSSearchTemplate * st, KKSFilterGroup * group, const KKSCategory * c)
 {
     if (!group)
         return;
@@ -6570,19 +6480,9 @@ void KKSObjEditorFactory :: saveSearchCriteria (KKSFilterGroup * group, const KK
 
     qDebug () << __PRETTY_FUNCTION__ << isContains;
  */
-    KKSSearchTemplate * st = new KKSSearchTemplate (-1, group, stName, loader->getUserId());
-    QAbstractItemModel * searchTModel = new QStandardItemModel (0, 5);
-    searchTModel->setHeaderData (0, Qt::Horizontal, tr ("Search criteria"), Qt::DisplayRole);
-    searchTModel->setHeaderData (1, Qt::Horizontal, tr ("Author"), Qt::DisplayRole);
-    searchTModel->setHeaderData (2, Qt::Horizontal, tr ("Creation date/time"), Qt::DisplayRole);
-    searchTModel->setHeaderData (3, Qt::Horizontal, tr ("Category"), Qt::DisplayRole);
-    searchTModel->setHeaderData (4, Qt::Horizontal, tr ("Type"), Qt::DisplayRole);
-    KKSViewFactory::getSearchTemplates (loader, searchTModel, QModelIndex(), false);
-    SaveSearchTemplateForm * stForm = new SaveSearchTemplateForm (st);
-    stForm->setTypesModel (searchTModel);
-    KKSList<const KKSFilterGroup *> filters;
-    QAbstractItemModel * catModel = KKSViewFactory::initCategoriesModel (loader, filters);
-    stForm->setCategoryModel (catModel);
+    if (!st)
+        st = new KKSSearchTemplate (-1, group, stName, loader->getUserId());
+    SaveSearchTemplateForm * stForm = GUISearchTemplate (st);
     if (st && stForm->exec () == QDialog::Accepted)
     {
         KKSSearchTemplate * stt = stForm->getSearchTemplate ();
@@ -6612,6 +6512,28 @@ void KKSObjEditorFactory :: saveSearchCriteria (KKSFilterGroup * group, const KK
         st->release ();
     }
     delete stForm;
+}
+
+SaveSearchTemplateForm * KKSObjEditorFactory :: GUISearchTemplate (KKSSearchTemplate * st, bool mode, QWidget *parent, Qt::WindowFlags f) const
+{
+    QAbstractItemModel * searchTModel = new QStandardItemModel (0, 1);
+    searchTModel->setHeaderData (0, Qt::Horizontal, tr ("Search group"), Qt::DisplayRole);
+    //searchTModel->setHeaderData (1, Qt::Horizontal, tr ("Author"), Qt::DisplayRole);
+    //searchTModel->setHeaderData (2, Qt::Horizontal, tr ("Creation date/time"), Qt::DisplayRole);
+    //searchTModel->setHeaderData (3, Qt::Horizontal, tr ("Category"), Qt::DisplayRole);
+    //searchTModel->setHeaderData (4, Qt::Horizontal, tr ("Type"), Qt::DisplayRole);
+    KKSViewFactory::getSearchTemplates (loader, searchTModel, QModelIndex(), false);
+    SaveSearchTemplateForm * stForm = new SaveSearchTemplateForm (st, mode, parent, f);
+    QModelIndex stCInd = KKSViewFactory::searchModelRowsIndex(searchTModel, st->type()->id(), QModelIndex(), Qt::UserRole);
+    stForm->setTypesModel (searchTModel);
+    stForm->selectType (stCInd);
+    KKSList<const KKSFilterGroup *> filters;
+    QAbstractItemModel * catModel = KKSViewFactory::initCategoriesModel (loader, filters);
+    QModelIndex catInd = KKSViewFactory::searchModelRowsIndexMultiType(catModel, st->idCategory(), 1);
+    qDebug () << __PRETTY_FUNCTION__ << catInd;
+    stForm->setCategoryModel (catModel);
+    stForm->selectCategory (catInd);
+    return stForm;
 }
 
 /* Метод загружает критерий поиска из БД.
@@ -6673,7 +6595,7 @@ KKSSearchTemplate * KKSObjEditorFactory :: loadSearchTemplate (void) const
         searchTModel = (qobject_cast<QAbstractProxyModel *>(searchTModel))->sourceModel();
     
     QItemSelectionModel * selTModel = stForm->selectionModel ();
-	QAbstractProxyModel * sortTModel = qobject_cast<QAbstractProxyModel *>(stForm->dataModel());
+    QAbstractProxyModel * sortTModel = qobject_cast<QAbstractProxyModel *>(stForm->dataModel());
 
     if (selTModel && stForm->exec () == QDialog::Accepted)
     {
@@ -6725,39 +6647,6 @@ void KKSObjEditorFactory :: initSearchTemplateModel (KKSSearchTemplatesForm *stF
     searchTModel->setHeaderData (2, Qt::Horizontal, tr ("Creation date/time"), Qt::DisplayRole);
     searchTModel->setHeaderData (3, Qt::Horizontal, tr ("Category"), Qt::DisplayRole);
     searchTModel->setHeaderData (4, Qt::Horizontal, tr ("Type"), Qt::DisplayRole);
-/*    for (int i=0; i<ncount; i++)
-    {
-        QModelIndex wIndex = searchTModel->index (i, 0);
-        searchTModel->setData (wIndex, stList[i]->name(), Qt::DisplayRole);
-        searchTModel->setData (wIndex, stList[i]->id (), Qt::UserRole);
-        searchTModel->setData (wIndex, stList[i]->idAuthor (), Qt::UserRole+1);
-        searchTModel->setData (wIndex, 1, Qt::UserRole+USER_ENTITY);
-
-        wIndex = searchTModel->index (i, 1);
-        searchTModel->setData (wIndex, stList[i]->authorName(), Qt::DisplayRole);
-        searchTModel->setData (wIndex, stList[i]->id (), Qt::UserRole);
-        searchTModel->setData (wIndex, stList[i]->idAuthor (), Qt::UserRole+1);
-        searchTModel->setData (wIndex, 1, Qt::UserRole+USER_ENTITY);
-
-        wIndex = searchTModel->index (i, 2);
-        searchTModel->setData (wIndex, stList[i]->creationDatetime().toString("dd.MMM.yyyy"), Qt::DisplayRole);
-        searchTModel->setData (wIndex, stList[i]->id (), Qt::UserRole);
-        searchTModel->setData (wIndex, stList[i]->idAuthor (), Qt::UserRole+1);
-        searchTModel->setData (wIndex, 1, Qt::UserRole+USER_ENTITY);
-
-        wIndex = searchTModel->index (i, 3);
-        searchTModel->setData (wIndex, stList[i]->categoryName(), Qt::DisplayRole);
-        searchTModel->setData (wIndex, stList[i]->id (), Qt::UserRole);
-        searchTModel->setData (wIndex, stList[i]->idAuthor (), Qt::UserRole+1);
-        searchTModel->setData (wIndex, 1, Qt::UserRole+USER_ENTITY);
-
-        wIndex = searchTModel->index (i, 4);
-        searchTModel->setData (wIndex, stList[i]->type()->name(), Qt::DisplayRole);
-        searchTModel->setData (wIndex, stList[i]->id (), Qt::UserRole);
-        searchTModel->setData (wIndex, stList[i]->idAuthor (), Qt::UserRole+1);
-        searchTModel->setData (wIndex, 1, Qt::UserRole+USER_ENTITY);
-    }
-*/
     KKSViewFactory::getSearchTemplates (loader, searchTModel);
     sortTModel->setSourceModel (searchTModel);
     sortTModel->setSortCaseSensitivity(Qt::CaseInsensitive);
@@ -6823,7 +6712,7 @@ void KKSObjEditorFactory :: addNewSearchTempl (const QModelIndex& parent,
     
     KKSFiltersEditorForm *filterForm = new KKSFiltersEditorForm (c, tableName, attrsIO, false, st, pWidget);
     
-    connect (filterForm, SIGNAL (saveSearchCriteria (KKSFilterGroup *, const KKSCategory *)), this, SLOT (saveSearchCriteria (KKSFilterGroup *, const KKSCategory *)) );
+    connect (filterForm, SIGNAL (saveSearchCriteria (KKSSearchTemplate *, KKSFilterGroup *, const KKSCategory *)), this, SLOT (saveSearchCriteria (KKSSearchTemplate *, KKSFilterGroup *, const KKSCategory *)) );
     //connect (filterForm, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QComboBox *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QComboBox *)) );
     connect (filterForm, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QAbstractItemModel *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QAbstractItemModel *)) );
     
@@ -6928,8 +6817,8 @@ void KKSObjEditorFactory :: updateSearchTempl (const QModelIndex& wIndex, QAbstr
     }
 
     QString oldName = st->name();
-    SaveSearchTemplateForm * stForm = new SaveSearchTemplateForm (st);
-    QAbstractItemModel * searchTModel = new QStandardItemModel (0, 5);
+    SaveSearchTemplateForm * stForm = GUISearchTemplate (st);
+/*    QAbstractItemModel * searchTModel = new QStandardItemModel (0, 5);
     searchTModel->setHeaderData (0, Qt::Horizontal, tr ("Search criteria"), Qt::DisplayRole);
     searchTModel->setHeaderData (1, Qt::Horizontal, tr ("Author"), Qt::DisplayRole);
     searchTModel->setHeaderData (2, Qt::Horizontal, tr ("Creation date/time"), Qt::DisplayRole);
@@ -6943,6 +6832,7 @@ void KKSObjEditorFactory :: updateSearchTempl (const QModelIndex& wIndex, QAbstr
     QModelIndex catIndex = KKSViewFactory::searchModelRowsIndexMultiType(catModel,idCat,1);
     qDebug () << __PRETTY_FUNCTION__ << catIndex;
     stForm->setCategoryModel (catModel);
+ */
     if (!stForm || stForm->exec() != QDialog::Accepted)
         return;
     QString stName = stForm->getName();//QInputDialog::getText (pWidget, tr ("Search template"), tr ("Search template name :"), QLineEdit::Normal, oldName, &ok);
@@ -6975,7 +6865,7 @@ void KKSObjEditorFactory :: updateSearchTempl (const QModelIndex& wIndex, QAbstr
         connect (filterForm, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QAbstractItemModel *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QAbstractItemModel *)) );
         
         if (stName.isEmpty())
-            connect (filterForm, SIGNAL (saveSearchCriteria (KKSFilterGroup *, const KKSCategory *)), this, SLOT (saveSearchCriteria (KKSFilterGroup *, const KKSCategory *)) );
+            connect (filterForm, SIGNAL (saveSearchCriteria (KKSSearchTemplate *, KKSFilterGroup *, const KKSCategory *)), this, SLOT (saveSearchCriteria (KKSSearchTemplate *, KKSFilterGroup *, const KKSCategory *)) );
         if (filterForm->exec () == QDialog::Accepted)
         {
             int res = filterForm->searchT()->id ();

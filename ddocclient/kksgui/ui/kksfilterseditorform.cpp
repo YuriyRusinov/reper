@@ -1291,9 +1291,9 @@ void KKSFiltersEditorForm :: loadImage (void)
 void KKSFiltersEditorForm :: saveSQLQuery (void)
 {
     if (sTempl)
-        emit saveSearchCriteria (sTempl->getMainGroup(), c);
+        emit saveSearchCriteria (sTempl, sTempl->getMainGroup(), c);
     else if (!m_filters.isEmpty ())
-        emit saveSearchCriteria (const_cast<KKSFilterGroup *>(m_filters[0]), c);
+        emit saveSearchCriteria (sTempl, const_cast<KKSFilterGroup *>(m_filters[0]), c);
     isDbSaved = true;
 }
 

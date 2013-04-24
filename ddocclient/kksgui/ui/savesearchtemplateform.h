@@ -13,6 +13,7 @@ namespace Ui
 
 class QAbstractItemModel;
 class QSortFilterProxyModel;
+class QModelIndex;
 
 class KKSSearchTemplate;
 
@@ -29,8 +30,8 @@ public:
     QString getName (void) const;
     
     KKSSearchTemplate * getSearchTemplate (void) const;
-
-    void selectCategory (const QModelIndex& catIndex);
+    void selectType (const QModelIndex& tInd) const;
+    void selectCategory (const QModelIndex& cInd) const;
 
 private slots:
     void staccept (void);

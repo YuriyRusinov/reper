@@ -96,7 +96,7 @@ private slots:
 signals:
     //void loadAttributeRefValues (const QString & tableName, const KKSAttribute * attr, QComboBox * cbList);
     void loadAttributeRefValues (const QString & tableName, const KKSAttribute * attr, QAbstractItemModel * mod);
-    void saveSearchCriteria (KKSFilterGroup *, const KKSCategory * c); //c - категория для которой можно применить поисковы запрос
+    void saveSearchCriteria (KKSSearchTemplate *, KKSFilterGroup *, const KKSCategory * c); //c - категория для которой можно применить поисковы запрос
     void loadSearchCriteria (void);//QAbstractItemModel *);
 
 private:

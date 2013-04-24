@@ -29,6 +29,7 @@
 #include <QProgressDialog>
 #include <QKeySequence>
 #include <QColor>
+#include <QSize>
 #include <QtDebug>
 
 #include "KKSViewFactory.h"
@@ -1071,6 +1072,9 @@ QAbstractItemModel* KKSViewFactory :: initCategoriesModel (KKSLoader* l, const K
         catTypeTemplModel->setData (ctIndex, pCatTypes.value()->fields().value("name"), Qt::DisplayRole);
         catTypeTemplModel->setData (ctIndex, pCatTypes.key(), Qt::UserRole);
         catTypeTemplModel->setData (ctIndex, 2, Qt::UserRole+USER_ENTITY);
+        QSize catRow = catTypeTemplModel->data (ctIndex, Qt::SizeHintRole).toSize();
+        catRow.rheight() = 24;
+        catTypeTemplModel->setData (ctIndex, catRow, Qt::SizeHintRole);
         
         KKSList<const KKSFilterGroup *> cFilterGroups;
         KKSList<const KKSFilter*> catFilters;
@@ -1108,22 +1112,11 @@ QAbstractItemModel* KKSViewFactory :: initCategoriesModel (KKSLoader* l, const K
             catTypeTemplModel->setData (cIndex, cat->fieldValue("name"), Qt::DisplayRole);
             catTypeTemplModel->setData (cIndex, cat->fieldValue("id"), Qt::UserRole);
             catTypeTemplModel->setData (cIndex, 1, Qt::UserRole+USER_ENTITY);
+            QSize catRow = catTypeTemplModel->data (cIndex, Qt::SizeHintRole).toSize();
+            catRow.rheight() = 24;
+            catTypeTemplModel->setData (cIndex, catRow, Qt::SizeHintRole);
             i++;
         }
-        /*
-        for (pCat=categMap.constBegin(); pCat != categMap.constEnd(); pCat++)
-        {
-            KKSCategory * cat = l->loadCategory (pCat.key());
-            if (!cat)
-                continue;
-            QModelIndex cIndex = catTypeTemplModel->index (i, 0, ctIndex);
-            catTypeTemplModel->setData (cIndex, cat->name(), Qt::DisplayRole);
-            catTypeTemplModel->setData (cIndex, cat->id(), Qt::UserRole);
-            catTypeTemplModel->setData (cIndex, 1, Qt::UserRole+USER_ENTITY);
-            i++;
-            cat->release();
-        }
-        */
     }
 
     cMainFilter->release ();
@@ -2229,6 +2222,9 @@ void KKSViewFactory::getSearchTemplates (KKSLoader * loader, QAbstractItemModel 
         searchTModel->setData (wIndex, st->id (), Qt::UserRole);
         searchTModel->setData (wIndex, 0, Qt::UserRole+USER_ENTITY);
         searchTModel->setData (wIndex, QIcon(":/ddoc/rubric.png"), Qt::DecorationRole);
+        QSize searchRow = searchTModel->data (wIndex, Qt::SizeHintRole).toSize();
+        searchRow.rheight() = 24;
+        searchTModel->setData (wIndex, searchRow, Qt::SizeHintRole);
         
         if (!withSearchTemplates)
             continue;
@@ -2246,6 +2242,9 @@ void KKSViewFactory::getSearchTemplates (KKSLoader * loader, QAbstractItemModel 
             searchTModel->setData (wsIndex, p.value()->idAuthor (), Qt::UserRole+1);
             searchTModel->setData (wsIndex, 1, Qt::UserRole+USER_ENTITY);
             searchTModel->setData (wsIndex, QIcon(":/ddoc/rubric_item.png"), Qt::DecorationRole);
+            QSize searchRow = searchTModel->data (wsIndex, Qt::SizeHintRole).toSize();
+            searchRow.rheight() = 24;
+            searchTModel->setData (wsIndex, searchRow, Qt::SizeHintRole);
  
             wsIndex = searchTModel->index (ii, 1, wIndex);
             searchTModel->setData (wsIndex, p.value()->authorName(), Qt::DisplayRole);
@@ -2254,7 +2253,7 @@ void KKSViewFactory::getSearchTemplates (KKSLoader * loader, QAbstractItemModel 
             searchTModel->setData (wsIndex, 1, Qt::UserRole+USER_ENTITY);
 
             wsIndex = searchTModel->index (ii, 2, wIndex);
-            searchTModel->setData (wsIndex, p.value()->creationDatetime().toString("dd.MM.yyyy hh:mm:ss"), Qt::DisplayRole);
+            searchTModel->setData (wsIndex, p.value()->creationDatetime().toString("dd.MM.yyyy"), Qt::DisplayRole);
             searchTModel->setData (wsIndex, p.value()->id (), Qt::UserRole);
             searchTModel->setData (wsIndex, p.value()->idAuthor (), Qt::UserRole+1);
             searchTModel->setData (wsIndex, 1, Qt::UserRole+USER_ENTITY);

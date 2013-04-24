@@ -862,7 +862,7 @@ int KKSEIOFactory::deleteAllRecords(const QString & table) const
 }
 
 int KKSEIOFactory::insertEIOList(KKSList<KKSObjectExemplar*> eioList,
-                                 QHash<QString, qint64>& uids,
+                                 QMap<QString, qint64>& uids,
                                  const KKSCategory* cat, 
                                  const QString & table, 
                                  QProgressDialog *pgDial, 
@@ -881,7 +881,7 @@ int KKSEIOFactory::insertEIOList(KKSList<KKSObjectExemplar*> eioList,
         pgDial->setMaximum (count);
     }
 
-    QHash<QString, qint64>::iterator pu = uids.begin();
+    QMap<QString, qint64>::const_iterator pu = uids.constBegin();
     for(int i=0; i<count; i++)
     {
         if (pgDial)
@@ -890,6 +890,7 @@ int KKSEIOFactory::insertEIOList(KKSList<KKSObjectExemplar*> eioList,
         db->begin();
         
         KKSObjectExemplar * eio = eioList.at(i);
+        QString puid;
         for (int ii=0; ii<eio->attrValues().count(); ii++)
         {
             KKSAttrValue * av = eio->attrValueIndex(ii);
@@ -900,11 +901,11 @@ int KKSEIOFactory::insertEIOList(KKSList<KKSObjectExemplar*> eioList,
                 //av->value().value().toInt() > 0 &&
                 //av->value().value().toInt() <= i)
             {
-                QString puid = uids.find (av->value().value()).key();
+                puid = uids.find (av->value().value()).key();
                 //int pKey = av->value().value().toInt();
                 int pId = uids.value (puid);//eioList.at (pKey-1)->id();
-                qDebug () << __PRETTY_FUNCTION__ << puid << av->value().value();
-                KKSValue val = KKSValue (QString::number(pId), KKSAttrType::atParent);
+                qDebug () << __PRETTY_FUNCTION__ << puid << av->value().value() << pId;
+                KKSValue val = KKSValue ((pId > 0 ? QString::number(pId) : QString()), KKSAttrType::atParent);
                 av->setValue(val);
             }
         }
@@ -918,9 +919,11 @@ int KKSEIOFactory::insertEIOList(KKSList<KKSObjectExemplar*> eioList,
             db->rollback();
             continue;
         }
-        pu.value() = res;
+        //pu.value() = eio->id();
+        uids[pu.key()] = eio->id();
 
         db->commit();
+        qDebug () << __PRETTY_FUNCTION__ << uids;
         pu++;
     }
     

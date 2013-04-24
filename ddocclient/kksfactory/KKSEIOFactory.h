@@ -8,7 +8,7 @@
 #if !defined(__KKSSITOOOM_KKSEIOFactory_h)
 #define __KKSSITOOOM_KKSEIOFactory_h
 
-#include <QHash>
+#include <QMap>
 
 #include "kksfactory_config.h"
 #include "KKSMap.h"
@@ -50,7 +50,7 @@ public:
     int deleteRecord(qint64 id, const QString & table) const;
     int deleteAllRecords(const QString & table) const;
     int insertEIOList(KKSList<KKSObjectExemplar*> eioList,
-                      QHash<QString, qint64>& uids,
+                      QMap<QString, qint64>& uids,
                       const KKSCategory* cat=0,
                       const QString & table=QString(),
                       QProgressDialog *pgDial=0,

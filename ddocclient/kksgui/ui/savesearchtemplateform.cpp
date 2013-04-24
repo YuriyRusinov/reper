@@ -4,7 +4,6 @@
 #include <QSortFilterProxyModel>
 #include <QHeaderView>
 #include <QMessageBox>
-#include <QSize>
 #include <QtDebug>
 
 #include <KKSSearchTemplate.h>
@@ -57,11 +56,9 @@ SaveSearchTemplateForm :: SaveSearchTemplateForm (KKSSearchTemplate * st, bool m
 
 SaveSearchTemplateForm :: ~SaveSearchTemplateForm (void)
 {
-   
+    delete UI;
     if (searchTemplate && UI->pbOk->isVisible())
         searchTemplate->release ();
-
-    delete UI;
 }
 
 void SaveSearchTemplateForm :: setCategoryModel (QAbstractItemModel * catMod)
@@ -72,19 +69,13 @@ void SaveSearchTemplateForm :: setCategoryModel (QAbstractItemModel * catMod)
         delete oldMod;
 }
 
-void SaveSearchTemplateForm :: selectCategory (const QModelIndex& catIndex)
-{
-    QItemSelectionModel * cSelMod = UI->tvCategory->selectionModel();
-    cSelMod->select (catIndex, QItemSelectionModel::ClearAndSelect);
-}
-
 void SaveSearchTemplateForm :: setTypesModel (QAbstractItemModel * typeMod)
 {
     QAbstractItemModel * oldMod = sortTModel->sourceModel();//UI->tvSearchTemplateType->model ();
     sortTModel->setSourceModel (typeMod);
     if (oldMod && oldMod != typeMod)
         delete oldMod;
-    if (searchTemplate && searchTemplate->type())
+/*    if (searchTemplate && searchTemplate->type())
     {
         QModelIndex sttInd = getCurrentType (searchTemplate->type()->id());
         qDebug () << __PRETTY_FUNCTION__ << searchTemplate->type()->id() << searchTemplate->type()->name() << sttInd;
@@ -95,12 +86,25 @@ void SaveSearchTemplateForm :: setTypesModel (QAbstractItemModel * typeMod)
             selModel->select (sIndex, QItemSelectionModel::ClearAndSelect);
         }
     }
-    QTreeView * searchView = UI->tvSearchTemplateType;
-    searchView->setColumnWidth (0, 250);
-    searchView->setColumnWidth (1, 150);
-    searchView->setColumnWidth (2, 110);
-    searchView->setColumnWidth (3, 200);
-    searchView->setColumnWidth (4, 200);
+ */
+}
+
+void SaveSearchTemplateForm :: selectType (const QModelIndex& tInd) const
+{
+    QItemSelectionModel * selModel = UI->tvSearchTemplateType->selectionModel ();
+    QModelIndex sIndex = sortTModel->mapFromSource (tInd);
+    selModel->select (sIndex, QItemSelectionModel::ClearAndSelect);
+    for (;sIndex.parent().isValid(); sIndex=sIndex.parent())
+        UI->tvSearchTemplateType->expand(sIndex.parent());
+}
+
+void SaveSearchTemplateForm :: selectCategory (const QModelIndex& cInd) const
+{
+    QItemSelectionModel *cSelModel = UI->tvCategory->selectionModel ();
+    cSelModel->select (cInd, QItemSelectionModel::ClearAndSelect);
+    QModelIndex catInd(cInd);
+    for (;catInd.parent().isValid(); catInd=catInd.parent())
+        UI->tvCategory->expand (catInd.parent());
 }
 
 int SaveSearchTemplateForm :: getIdCat (void) const
