@@ -4752,51 +4752,6 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io,
                         rValues[ii] = rValues[ii].mid (0, rValues[ii].size()-1);
                 }
 
-                /*KSA
-                QMap<int, QString> values;
-                QMap<int, QString> refColumnValues;
-                QString tName = cAttr->tableName ();
-                KKSObject * refObj = loader->loadIO (tName, true);
-                if (!refObj)
-                    continue;
-
-                KKSCategory * cRef = refObj->category();
-                if (!cRef)
-                {
-                    refObj->release ();
-                    continue;
-                }
-                bool isXml = false;
-                cRef = cRef->tableCategory();
-                if (cRef)
-                    isXml = isXml || cRef->isAttrTypeContains(KKSAttrType::atXMLDoc) || cRef->isAttrTypeContains (KKSAttrType::atSVG);
-                //int iVal (-1);
-                KKSAttribute * rattr = loader->loadAttribute (cAttr->columnName(), tName);
-                if (!rattr)
-                {
-                    refObj->release ();
-                    continue;
-                }
-                //KKSCategoryAttr * refAttr = cRef->attribute(rattr->id());
-
-                values = loader->loadAttributeValues (cAttr, refColumnValues, isXml, !isXml, QString(), KKSList<const KKSFilterGroup*>());
-                for (QMap<int, QString>::iterator pv=values.begin(); pv!= values.end(); pv++)
-                {
-                    pv.value().replace(QString("\\\n"), QChar('\n'), Qt::CaseInsensitive);
-                    pv.value().replace(QString("\\\'"), QChar('\''), Qt::CaseInsensitive);
-                    pv.value().replace(QString("\\\""), QChar('\"'), Qt::CaseInsensitive);
-                }
-                qDebug () << __PRETTY_FUNCTION__ << rValues << values;
-                QList<int> pKeys;
-                for (int ii=0; ii<rValues.count(); ii++)
-                {
-                    qDebug () << __PRETTY_FUNCTION__ << QString::compare (rValues[ii], values.constBegin().value(), Qt::CaseInsensitive) << rValues[ii] << values.constBegin().value();
-                    int pkey = values.key (rValues[ii], -1);
-                    if (pkey > 0)
-                        pKeys.append (pkey);
-                }
-                KSA*/
-                
                 QString vArr ("{");
                 for (int ii=0; ii<rValues.count(); ii++){
                     QString a = rValues[ii];
