@@ -220,6 +220,8 @@ class _F_EXPORT KKSLoader
         int getRefIO (int idObjectE) const;
         
         qint64 getIdByUID (const QString& tableName, const QString& uid) const;
+        
+        bool isApplicable (KKSSearchTemplate * st, int idCategory) const;
 
         KKSLoader();
         ~KKSLoader();

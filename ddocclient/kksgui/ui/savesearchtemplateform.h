@@ -14,6 +14,7 @@ namespace Ui
 class QAbstractItemModel;
 class QSortFilterProxyModel;
 class QModelIndex;
+class QItemSelection;
 
 class KKSSearchTemplate;
 
@@ -35,13 +36,17 @@ public:
 
 private slots:
     void staccept (void);
+    void catChanged (const QModelIndex& current, const QModelIndex& previous);
+    void selCatChanged (const QItemSelection& selected, const QItemSelection& deselected);
+    
+signals:
+    void categoryChanged (KKSSearchTemplate * st, int idCat);
 
 private:
     //
     // Functions
     //
     void init (void);
-    QModelIndex getCurrentType (int idType, const QModelIndex& pIndex=QModelIndex()) const;
 
 private:
     //

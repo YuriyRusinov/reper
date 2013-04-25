@@ -5781,3 +5781,20 @@ int KKSLoader :: getRefIO (int idObjectE) const
     delete iores;
     return idObject;
 }
+
+bool KKSLoader :: isApplicable (KKSSearchTemplate * st, int idCategory) const
+{
+    if (!st || st->id() < 0)
+        return true;
+    QString sql = QString("select isApplicable (%1, %2)").arg (st->id()).arg (idCategory);
+    KKSResult * res = db->execute (sql);
+    if (!res || res->getRowCount() != 1)
+    {
+        if (res)
+            delete res;
+        return false;
+    }
+    bool isa = res->getCellAsBool (0, 0);
+    delete res;
+    return isa;
+}

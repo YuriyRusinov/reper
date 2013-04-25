@@ -6488,7 +6488,21 @@ SaveSearchTemplateForm * KKSObjEditorFactory :: GUISearchTemplate (KKSSearchTemp
     qDebug () << __PRETTY_FUNCTION__ << catInd;
     stForm->setCategoryModel (catModel);
     stForm->selectCategory (catInd);
+    connect (stForm, SIGNAL (categoryChanged(KKSSearchTemplate *, int)), this, SLOT (searchTemplateCategoryChanged(KKSSearchTemplate *, int)));
     return stForm;
+}
+
+void KKSObjEditorFactory :: searchTemplateCategoryChanged (KKSSearchTemplate * st, int idCategory)
+{
+    if (!st || st->id() < 0)
+        return;
+    bool isApp = loader->isApplicable (st, idCategory);
+    if (!isApp)
+    {
+        QWidget * pWidget = qobject_cast<QWidget *>(this->sender());
+        QMessageBox::warning (pWidget, tr("Set category into search template"), tr("Category %1 is not applicable into search template %2").arg (idCategory).arg(st->id()), QMessageBox::Ok);
+        return;
+    }
 }
 
 /* Метод загружает критерий поиска из БД.
