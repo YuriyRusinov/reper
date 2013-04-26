@@ -150,7 +150,7 @@ void IndicatorForm :: initForm (bool mode)
         UI->lESource->setText (indicatorVal->ioSrc()->name());
     if (indicatorVal->ioSrc1())
         UI->lETransfer->setText (indicatorVal->ioSrc1()->name());
-    UI->dTEMeasured->setDateTime (indicatorVal->measDateTime());
+    //UI->dTEMeasured->setDateTime (indicatorVal->measDateTime());
     UI->dTEInserted->setDateTime (indicatorVal->insertDateTime());
     UI->tEDescription->setPlainText (indicatorVal->indicator()->desc());
 }

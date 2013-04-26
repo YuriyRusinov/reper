@@ -35,6 +35,18 @@ bool KKSSortFilterProxyModel :: filterAcceptColumns (int source_column, const QM
     return isAccepted;
 }
 
+bool KKSSortFilterProxyModel :: filterAcceptsRow (int source_row, const QModelIndex& source_parent) const
+{
+    if (!sourceModel())
+        return false;
+    QModelIndex wIndex = sourceModel()->index (source_row, 0, source_parent);
+    //QModelIndex pIndex = mapFromSource (wIndex);
+    //if (rowCount (pIndex) > 0)
+    //    return true;
+    //else
+        return QSortFilterProxyModel::filterAcceptsRow (source_row, source_parent);
+}
+
 bool KKSSortFilterProxyModel :: lessThan (const QModelIndex & left, const QModelIndex & right) const
 {
     int leftDataEn = this->sourceModel()->data (left, Qt::UserRole+USER_ENTITY).toInt();

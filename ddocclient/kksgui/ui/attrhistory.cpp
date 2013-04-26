@@ -18,10 +18,10 @@
 #define c_start 1
 #define c_stop 2
 #define c_value 3
-#define c_measured 4
-#define c_source 5
-#define c_transfer 6
-#define c_description 7
+//#define c_measured 4
+#define c_source 4
+#define c_transfer 5
+#define c_description 6
 
 AttrHistory::AttrHistory (const KKSList<KKSAttrValue*> & histlist, QWidget *parent, Qt::WFlags f)
     : QDialog (parent, f),
@@ -66,7 +66,7 @@ void AttrHistory::view(const KKSList<KKSAttrValue*> & histlist)
     UI->leName->setText(attr->name());
 
     QStringList listHeader;
-    listHeader <<tr("Id")<<tr("Start")<<tr("Stop")<<tr("Value")<<tr("Measured")<<tr("Source")<<tr("Transfer")<<tr("Description");
+    listHeader <<tr("Id")<<tr("Start")<<tr("Stop")<<tr("Value")<<tr("Source")<<tr("Transfer")<<tr("Description");
     model->setHorizontalHeaderLabels(listHeader);
 
     QHeaderView *headerView = UI->tabHistory->header();
@@ -113,9 +113,9 @@ void AttrHistory::view(const KKSList<KKSAttrValue*> & histlist)
             model->setItem(i,c_transfer,item);
         }
 
-            item = new QStandardItem(av->measDateTime().toString());
-            item->setTextAlignment(Qt::AlignCenter);
-            model->setItem(i,c_measured,item);
+        //item = new QStandardItem(av->measDateTime().toString());
+        //item->setTextAlignment(Qt::AlignCenter);
+        //model->setItem(i,c_measured,item);
 
 
         if (av->desc() != NULL)

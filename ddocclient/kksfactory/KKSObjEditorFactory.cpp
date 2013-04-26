@@ -4628,8 +4628,12 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io,
     int n = oesList.count();
     int m = attrCodeList.count();
     QMap<QString, qint64> oldUids;
+    QStringList uidsSorted;
     for (int i=0; i<n; i++)
+    {
         oldUids.insert(oesList[i][0], 0);
+        uidsSorted.append (oesList[i][0]);
+    }
     //qDebug () << __PRETTY_FUNCTION__ << oldUids;
     
     QProgressDialog *pImportD = new QProgressDialog ();//tr("Import Copies"), tr("Abort import"), 0, n*m);
@@ -4814,7 +4818,7 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io,
     pImportD->setWindowTitle (tr("Save into DB"));
     pImportD->show ();
     QString tabName = tableName.isEmpty() ? io->tableName() : tableName;
-    int res = eiof->insertEIOList (oeList, oldUids, cat, tabName, pImportD, true);
+    int res = eiof->insertEIOList (oeList, uidsSorted, oldUids, cat, tabName, pImportD, true);
     pImportD->hide ();
     if (res == ERROR_CODE)
     {
@@ -4937,7 +4941,7 @@ void KKSObjEditorFactory :: exportEIO (KKSObjEditor * editor, int idObject, cons
  */
     Q_UNUSED (idOe);
 
-    KKSMap<qint64, KKSEIOData *> objEx = loader->loadEIOList (cChild, tableName, editor->filters());//сюда передаем табличную (подчиненную) категорию
+    KKSList<KKSEIOData *> objEx = loader->loadEIOList1 (cChild, tableName, editor->filters());//сюда передаем табличную (подчиненную) категорию
     KKSXMLForm *xmlForm = new KKSXMLForm (io, tr("Export IO %1").arg (io->name()), true, editor);
     if (!xmlForm)
     {
@@ -5568,7 +5572,7 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // целевой CSV файл
  */
 int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // целевой CSV файл
                                          const KKSCategory *c, //подчиненная категория
-                                         const KKSMap<qint64, KKSEIOData *>& oeData,
+                                         const KKSList<KKSEIOData *>& oeData,
                                          QString codeName, // кодировка выходных данных
                                          QString fDelim, // разделитель полей
                                          QString tDelim, // разделитель текста
@@ -5609,9 +5613,10 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // целевой CSV файл
     QList<KKSAttrView*> attrs_list = t->sortedAttrs();
     t->release ();
 
-    for (KKSMap<qint64, KKSEIOData *>::const_iterator pio = oeData.constBegin(); pio != oeData.constEnd(); pio++)
+    int noe = oeData.size();
+    for (int i = 0; i < noe; i++)
     {
-        KKSEIOData * d = pio.value();
+        KKSEIOData * d = oeData[i];
         QString fstr;
         QTextStream oeStream (&fstr, QIODevice::WriteOnly);
         oeStream << tDelim << d->sysFieldValue("unique_id") << tDelim;
@@ -5621,7 +5626,7 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // целевой CSV файл
             KKSAttrView * v = attrs_list [ii];
             if (v->id() == 1)
             {
-                oeStream << fDelim << pio.key() << (attrs_list.count() > 1 ? fDelim : QString());
+                oeStream << fDelim << d->sysFieldValue("id").toInt() << (attrs_list.count() > 1 ? fDelim : QString());
                 continue;
             }
             QString attrCode = v->code();

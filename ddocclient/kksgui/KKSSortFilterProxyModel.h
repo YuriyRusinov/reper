@@ -33,6 +33,7 @@ class _GUI_EXPORT KKSSortFilterProxyModel : public QSortFilterProxyModel
         //
         virtual bool filterAcceptColumns (int source_column, const QModelIndex & source_parent) const;
         virtual bool lessThan (const QModelIndex & left, const QModelIndex & right) const;
+        virtual bool filterAcceptsRow (int source_row, const QModelIndex& source_parent) const;
 
     private:
         //

@@ -44,7 +44,7 @@ m_isActual(true)
 
     setId(av.id());
 
-    setMeasDateTime(av.measDateTime());
+    //setMeasDateTime(av.measDateTime());
     setInsertDateTime(av.insertDateTime());
     setStartDateTime(av.startDateTime());
     setStopDateTime(av.stopDateTime());
@@ -197,17 +197,21 @@ void KKSAttrValue::setIOSrc1(KKSObject * io)
         m_ioSrc1->addRef ();
 }
 
+/*
 const QDateTime & KKSAttrValue::measDateTime() const
 {
     return m_measDateTime;
 }
+*/
 
+/*
 void KKSAttrValue::setMeasDateTime(const QDateTime & dt)
 {
     m_measDateTime = dt;
 
     verify();
 }
+*/
 
 const QDateTime & KKSAttrValue::insertDateTime() const
 {

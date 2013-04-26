@@ -277,7 +277,7 @@ int DBSynchronizer::insertAttrs(int idObject, const QList<QPair<int, QString> > 
     {
         QPair<int, QString> attr = attrs.at(i);
 
-		QString attrSql = QString ("select * from ioInsertAttr (%1, %2, %3, NULL::timestamp, NULL::timestamp, NULL::timestamp, NULL::int4, NULL::int4, NULL::varchar);")
+		QString attrSql = QString ("select * from ioInsertAttr (%1, %2, %3, NULL::timestamp, NULL::timestamp, NULL::int4, NULL::int4, NULL::varchar);")
             .arg (idObject)
 			.arg (QString::number(attr.first)) //здесь в качестве ключа используется id_io_attribute
 			.arg (attr.second.isEmpty() ? QString ("NULL") : QString("'")+attr.second+QString("'"));

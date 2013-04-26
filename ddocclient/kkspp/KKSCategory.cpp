@@ -797,7 +797,7 @@ QList<int> KKSCategory :: searchAttributesByType (int aType) const
     QList<int> results;
     KKSMap<int, KKSCategoryAttr *>::const_iterator pa = m_attributes.constBegin();
     for (; pa != m_attributes.constEnd(); pa++)
-        if (pa.value()->type()->attrType() == (KKSAttrType::KKSAttrTypes)aType)
+        if (pa.value() && pa.value()->type() && pa.value()->type()->attrType() == (KKSAttrType::KKSAttrTypes)aType)
             results.append (pa.key());
 
     return results;

@@ -110,6 +110,12 @@ class _F_EXPORT KKSLoader
                                               const QString& tableName,
                                               const KKSList<const KKSFilterGroup *> filters = KKSList<const KKSFilterGroup*>()) const;
         
+        KKSList<KKSEIOData *> loadEIOList1(const KKSObject * io, 
+                                           const KKSList<const KKSFilterGroup *> filters = KKSList<const KKSFilterGroup*>()) const;
+
+        KKSList<KKSEIOData *> loadEIOList1(const KKSCategory * c0,
+                                           const QString& tableName,
+                                           const KKSList<const KKSFilterGroup *> filters = KKSList<const KKSFilterGroup*>()) const;
         
         KKSList<KKSFileType *> loadFileTypes() const;
         KKSList<KKSFileExtention*> loadFileExtentions(int idFileType) const;

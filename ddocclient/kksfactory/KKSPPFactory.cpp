@@ -1018,6 +1018,7 @@ int KKSPPFactory::insertAttrValues(const KKSObject * io) const
         else
             dtStop = QString("NULL::timestamp");
 
+        /*
         dt = av->measDateTime();
         if(dt.isValid()){
             tVal = dt.toString("dd.MM.yyyy hh:mm:ss");
@@ -1025,14 +1026,15 @@ int KKSPPFactory::insertAttrValues(const KKSObject * io) const
         }
         else
             dtMeas = QString("current_timestamp::timestamp");
+        */
 
-        sql += QString("select ioInsertAttr(%1, %2, %3::varchar, %4, %5, %6, %7, %8, %9);")
+        sql += QString("select ioInsertAttr(%1, %2, %3::varchar, %4, %5, %6, %7, %8);")
                               .arg(io->id())
                               .arg(a->id())
                               .arg(v.valueForInsert())
                               .arg(dtStart)
                               .arg(dtStop)
-                              .arg(dtMeas)
+                              //.arg(dtMeas)
                               .arg(av->ioSrc() ? QString::number (av->ioSrc()->id()) : QString ("NULL::int4"))
                               .arg(av->ioSrc1() ? QString::number (av->ioSrc1()->id()) : QString ("NULL::int4"))
                               .arg(av->desc().isEmpty() ? QString("NULL") : QString("'") + av->desc() + QString("'"));
@@ -1151,6 +1153,7 @@ int KKSPPFactory::updateAttrValues(const KKSObject * io) const
         else
             dtStop = QString("NULL::timestamp");
 
+        /*
         dt = av->measDateTime();
         qDebug() << dt;
         if(dt.isValid()){
@@ -1159,15 +1162,16 @@ int KKSPPFactory::updateAttrValues(const KKSObject * io) const
         }
         else
             dtMeas = QString("current_timestamp::timestamp");
+        */
 
         
-        QString s = QString("select ioUpdateAttr(%1, %2, %3::varchar, NULL, NULL, %4, %5, %6, %7);")
+        QString s = QString("select ioUpdateAttr(%1, %2, %3::varchar, NULL, NULL, %4, %5, %6);")
                               .arg(io->id())
                               .arg(a->id())
                               .arg(v.valueForInsert())
                               //.arg(dtStart)
                               //.arg(dtStop)
-                              .arg(dtMeas)
+                              //.arg(dtMeas)
                               .arg(av->ioSrc() ? QString::number (av->ioSrc()->id()) : QString ("NULL"))
                               .arg(av->ioSrc1() ? QString::number (av->ioSrc1()->id()) : QString ("NULL"))
                               .arg(av->desc().isEmpty() ? QString("NULL") : QString("'") + av->desc() + QString("'"));

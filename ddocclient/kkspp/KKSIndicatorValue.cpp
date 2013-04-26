@@ -35,7 +35,7 @@ m_indicator(0)
 {
     setId(Ind.id());
 
-    setMeasDateTime(Ind.measDateTime());
+    //setMeasDateTime(Ind.measDateTime());
     setInsertDateTime(Ind.insertDateTime());
     setStartDateTime(Ind.startDateTime());
     setStopDateTime(Ind.stopDateTime());
@@ -161,17 +161,21 @@ void KKSIndicatorValue::setIOSrc1(KKSObject * io)
         m_ioSrc1->addRef ();
 }
 
+/*
 const QDateTime & KKSIndicatorValue::measDateTime() const
 {
     return m_measDateTime;
 }
+*/
 
+/*
 void KKSIndicatorValue::setMeasDateTime(const QDateTime & dt)
 {
     m_measDateTime = dt;
 
     verify();
 }
+*/
 
 const QDateTime & KKSIndicatorValue::insertDateTime() const
 {

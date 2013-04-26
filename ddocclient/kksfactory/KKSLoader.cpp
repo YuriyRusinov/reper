@@ -220,7 +220,7 @@ KKSList<KKSAttrValue *> KKSLoader::loadAttrValues(KKSObject * io) const
         attr->setId(res->getCellAsInt(row, 7));
         attr->setStartDateTime(res->getCellAsDateTime(row, 8));
         attr->setStopDateTime(res->getCellAsDateTime(row, 9));
-        attr->setMeasDateTime(res->getCellAsDateTime(row, 10));
+        //attr->setMeasDateTime(res->getCellAsDateTime(row, 10));
         attr->setInsertDateTime(res->getCellAsDateTime(row, 11));
         attr->setDesc(res->getCellAsString(row, 15));
 
@@ -2136,6 +2136,26 @@ KKSMap<qint64, KKSEIOData *> KKSLoader::loadEIOList(const KKSObject * io,
     return eioList;
 }
 
+KKSList<KKSEIOData *> KKSLoader::loadEIOList1(const KKSObject * io, 
+                                              const KKSList<const KKSFilterGroup *> filters) const
+{
+    KKSList<KKSEIOData *> eioList;
+    if(!io || 
+       !io->id() || 
+       !io->category() || 
+       !io->category()->id() || 
+       !io->category()->tableCategory() ||
+       !io->category()->tableCategory()->id()
+       )
+    {
+        return eioList;
+    }
+    eioList = loadEIOList1 (io->category()->tableCategory(), io->tableName(), filters);
+    
+    return eioList;
+}
+
+
 KKSMap<qint64, KKSEIOData *> KKSLoader::loadEIOList(const KKSCategory * c0, 
                                                  const QString& tableName,
                                                  const KKSList<const KKSFilterGroup *> filters) const
@@ -2258,6 +2278,130 @@ KKSMap<qint64, KKSEIOData *> KKSLoader::loadEIOList(const KKSCategory * c0,
     
     return eioList;
 }
+
+KKSList<KKSEIOData *> KKSLoader::loadEIOList1(const KKSCategory * c0, 
+                                              const QString& tableName,
+                                              const KKSList<const KKSFilterGroup *> filters) const
+{
+    KKSList<KKSEIOData *> eioList;
+
+    QString sql = generateSelectEIOQuery(c0, tableName, filters);
+    qDebug () << __PRETTY_FUNCTION__ << sql;
+    if(sql.isEmpty())
+        return eioList;
+
+    KKSResult * res = db->execute(sql);
+    int count = 0;
+    if(!res || (count = res->getRowCount()) == 0){
+        if(res)
+            delete res;
+        return eioList;
+    }
+    
+    //проверяем, содержит ли категория ИО атрибут с типом интервал или интервал (часы, мин., сек.)
+    bool hasInterval = false;
+    KKSCategoryAttr * a = NULL;
+    const KKSCategory * c = c0;//io->category()->tableCategory();
+    KKSMap<int, KKSCategoryAttr *>::const_iterator pca;
+    for (pca = c->attributes().constBegin(); pca != c->attributes().constEnd(); pca++)
+    {
+        a = pca.value();
+        if(a && 
+            (a->type()->attrType() == KKSAttrType::atInterval ||
+             a->type()->attrType() == KKSAttrType::atIntervalH) 
+           )
+        {
+            hasInterval = true;
+            break;
+        }
+    }
+
+    int columns = res->getColumnCount();
+
+    for(int row=0; row<count; row++){
+        
+        KKSEIOData * eio = new KKSEIOData();
+        
+        for(int column=0; column<columns; column++){
+            QString code = QString(res->getColumnName(column));//использование названия колонки для ключа QMap в классе KKSEIOData допустимо
+            QString value = res->getCellAsString(row, column);
+            
+            if(code == "ii_rec_order" || code == "id" || code == "unique_id"){
+                eio->addSysField(code, value);
+            }
+
+            //в данном случае получение атрибута по его коду (хотя он и не является уникальным) 
+            //допустимо, поскольку категория описывает таблицу, а в таблице не может быть 
+            //двух колонок (атрибутов) с одинаковым названием                    
+            const KKSCategoryAttr* a = c->attribute(code);
+            if(!a)
+                continue;
+            
+
+            //проверим на тип ИНТЕРВАЛ
+            if(hasInterval){
+                if(res->getColumnDataType(column) == KKSResult::dtInt4Array){
+                    const KKSCategoryAttr* a = c->attribute(code);
+                    if(a && a->type()->attrType() == KKSAttrType::atInterval){
+                        KKSValue v;
+                        v.setValue(value, KKSAttrType::atInterval);
+                        value = v.value();
+                    }
+                    if(a && a->type()->attrType() == KKSAttrType::atIntervalH){
+                        KKSValue v;
+                        v.setValue(value, KKSAttrType::atIntervalH);
+                        value = v.value();
+                    }
+                }
+            }
+
+            if(res->getColumnDataType(column) == KKSResult::dtBool){
+                QString s = value.toLower();
+                if(s == "t" || s == "true" || s == "1")
+                    value = QObject::tr("Yes");
+                else
+                    value = QObject::tr("No");
+            }
+
+            if(res->getColumnDataType(column) == KKSResult::dtTimestamp){
+                KKSValue v(value, KKSAttrType::atDateTime);
+                QDateTime dt = v.valueVariant().toDateTime();
+                value = dt.toString("dd.MM.yyyy hh:mm:ss");
+            }
+
+            int ier = 0;
+            if(a->type()->attrType() == KKSAttrType::atList ||
+                a->type()->attrType() == KKSAttrType::atParent
+                )
+            {
+                QString sysValue = res->getCellAsString(row, ++column);
+                QString sysValue1 = res->getCellAsString(row, ++column);
+                ier = eio->addField(code, value);
+                ier = eio->addSysField(code, sysValue);
+                ier = eio->addSysField(code+"_uid", sysValue1);
+            }
+            else            
+                ier = eio->addField(code, value);
+
+            if (ier != OK_CODE)
+            {
+                qDebug () << __PRETTY_FUNCTION__ << QObject::tr ("Error");
+                eio->release ();
+                return eioList;
+            }
+        }
+
+        //ID всегда идет первым в списке
+        //qint64 id = res->getCellAsInt64(row, 0);
+        eioList.append(eio);
+        eio->release();
+    }
+    
+    delete res;
+    
+    return eioList;
+}
+
 // /*
 QString KKSLoader::generateFilterSQL(const KKSList<const KKSFilterGroup *> & filterGroups, 
                                      const QString & tableName, QStringList & exTables) const
@@ -5318,7 +5462,7 @@ KKSList<KKSIndicatorValue *> KKSLoader::loadIndicatorValues(KKSObject * io) cons
         if(usedIO)
             usedIO->release();
 
-        iv->setMeasDateTime(res->getCellAsDateTime(row, 13));
+        //iv->setMeasDateTime(res->getCellAsDateTime(row, 13));
         iv->setInsertDateTime(res->getCellAsDateTime(row, 14));
         iv->setStartDateTime(res->getCellAsDateTime(row, 16));
         iv->setStopDateTime(res->getCellAsDateTime(row, 17));
@@ -5485,7 +5629,7 @@ KKSList<KKSAttrValue *> KKSLoader::loadIOAttrValueHistory(const KKSAttrValue * a
         attr->setId(res->getCellAsInt(row, 7));
         attr->setStartDateTime(res->getCellAsDateTime(row, 8));
         attr->setStopDateTime(res->getCellAsDateTime(row, 9));
-        attr->setMeasDateTime(res->getCellAsDateTime(row, 10));
+        //attr->setMeasDateTime(res->getCellAsDateTime(row, 10));
         attr->setInsertDateTime(res->getCellAsDateTime(row, 11));
         attr->setDesc(res->getCellAsString(row, 15));
 
@@ -5723,7 +5867,7 @@ KKSList<KKSAttrValue *> KKSLoader::loadIndValues(KKSObjectExemplar * eio) const
         attr->setId(res->getCellAsInt(row, 7));
         attr->setStartDateTime(res->getCellAsDateTime(row, 8));
         attr->setStopDateTime(res->getCellAsDateTime(row, 9));
-        attr->setMeasDateTime(res->getCellAsDateTime(row, 10));
+        //attr->setMeasDateTime(res->getCellAsDateTime(row, 10));
         attr->setInsertDateTime(res->getCellAsDateTime(row, 11));
         attr->setDesc(res->getCellAsString(row, 15));
 

@@ -862,6 +862,7 @@ int KKSEIOFactory::deleteAllRecords(const QString & table) const
 }
 
 int KKSEIOFactory::insertEIOList(KKSList<KKSObjectExemplar*> eioList,
+                                 const QStringList& uidsSorted,
                                  QMap<QString, qint64>& uids,
                                  const KKSCategory* cat, 
                                  const QString & table, 
@@ -920,7 +921,8 @@ int KKSEIOFactory::insertEIOList(KKSList<KKSObjectExemplar*> eioList,
             continue;
         }
         //pu.value() = eio->id();
-        uids[pu.key()] = eio->id();
+        QString skey = uidsSorted[i];
+        uids[skey] = eio->id();
 
         db->commit();
         qDebug () << __PRETTY_FUNCTION__ << uids;
@@ -1105,6 +1107,7 @@ int KKSEIOFactory::insertIndValues(const KKSObjectExemplar * eio) const
         else
             dtStop = QString("NULL::timestamp");
 
+        /*
         dt = av->measDateTime();
         if(dt.isValid()){
             tVal = dt.toString("dd.MM.yyyy hh:mm:ss");
@@ -1112,15 +1115,16 @@ int KKSEIOFactory::insertIndValues(const KKSObjectExemplar * eio) const
         }
         else
             dtMeas = QString("current_timestamp::timestamp");
+        */
 
         //eio->indValue(1)->attribute()->idCategoryAttr
-        sql += QString("select eioInsertIndicator(%1, %2, %3::varchar, %4, %5, %6, %7, %8, %9);")
+        sql += QString("select eioInsertIndicator(%1, %2, %3::varchar, %4, %5, %6, %7, %8);")
                               .arg(eio->id())
                               .arg(a->idCategoryAttr())
                               .arg(v.valueForInsert())
                               .arg(dtStart)
                               .arg(dtStop)
-                              .arg(dtMeas)
+                              //.arg(dtMeas)
                               .arg(av->ioSrc() ? QString::number (av->ioSrc()->id()) : QString ("NULL::int4"))
                               .arg(av->ioSrc1() ? QString::number (av->ioSrc1()->id()) : QString ("NULL::int4"))
                               .arg(av->desc().isEmpty() ? QString("NULL") : QString("'") + av->desc() + QString("'"));
@@ -1240,6 +1244,7 @@ int KKSEIOFactory::updateIndValues(const KKSObjectExemplar * eio) const
         else
             dtStop = QString("NULL::timestamp");
 
+        /*
         dt = av->measDateTime();
         qDebug() << dt;
         if(dt.isValid()){
@@ -1248,15 +1253,16 @@ int KKSEIOFactory::updateIndValues(const KKSObjectExemplar * eio) const
         }
         else
             dtMeas = QString("current_timestamp::timestamp");
+        */
 
         
-        QString s = QString("select eioUpdateIndicator(%1, %2, %3::varchar, NULL, NULL, %4, %5, %6, %7);")
+        QString s = QString("select eioUpdateIndicator(%1, %2, %3::varchar, NULL, NULL, %4, %5, %6);")
                               .arg(eio->id())
                               .arg(a->idCategoryAttr())
                               .arg(v.valueForInsert())
                               //.arg(dtStart)
                               //.arg(dtStop)
-                              .arg(dtMeas)
+                              //.arg(dtMeas)
                               .arg(av->ioSrc() ? QString::number (av->ioSrc()->id()) : QString ("NULL"))
                               .arg(av->ioSrc1() ? QString::number (av->ioSrc1()->id()) : QString ("NULL"))
                               .arg(av->desc().isEmpty() ? QString("NULL") : QString("'") + av->desc() + QString("'"));

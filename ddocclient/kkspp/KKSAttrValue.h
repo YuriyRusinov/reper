@@ -48,8 +48,8 @@ class _PP_EXPORT KKSAttrValue : public KKSData
         const KKSObject * ioSrc1() const;
         void setIOSrc1(KKSObject * io);
 
-        const QDateTime & measDateTime() const;
-        void setMeasDateTime(const QDateTime & dt);
+        //const QDateTime & measDateTime() const;
+        //void setMeasDateTime(const QDateTime & dt);
 
         const QDateTime & insertDateTime() const;
         void setInsertDateTime(const QDateTime & dt);
@@ -78,7 +78,7 @@ class _PP_EXPORT KKSAttrValue : public KKSData
         KKSCategoryAttr* m_attribute;
         KKSObject * m_ioSrc;
         KKSObject * m_ioSrc1;
-        QDateTime m_measDateTime;
+        //QDateTime m_measDateTime;
         QDateTime m_insertDateTime;
         QDateTime m_startDateTime;
         QDateTime m_stopDateTime;

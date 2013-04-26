@@ -35,6 +35,8 @@ KKSAttrValuePropsForm::KKSAttrValuePropsForm(KKSAttrValue * av, bool mode, bool 
     UI->pbOk->setVisible (mode);
     UI->pbCancel->setVisible (mode);
     UI->pbApply->setVisible (mode);
+
+    
     
     UI->lEName->setReadOnly (!mode);
 
@@ -164,8 +166,8 @@ void KKSAttrValuePropsForm :: saveAttrValue (void)
     m_av->setIOSrc(ioSrc);
     m_av->setIOSrc1(ioSrc1);
 
-    if (UI->dTEMeasured->dateTime().isValid())
-        m_av->setMeasDateTime(UI->dTEMeasured->dateTime());
+    //if (UI->dTEMeasured->dateTime().isValid())
+    //    m_av->setMeasDateTime(UI->dTEMeasured->dateTime());
 
     m_av->setDesc(UI->tEDescription->toPlainText());
 
@@ -238,11 +240,11 @@ void KKSAttrValuePropsForm :: initForm (bool mode)
     if (m_av->ioSrc1())
         UI->lETransfer->setText (m_av->ioSrc1()->name());
     
-    QDateTime dtMeas = m_av->measDateTime();
-    if(dtMeas.isValid())
-        UI->dTEMeasured->setDateTime (dtMeas);
-    else
-        UI->dTEMeasured->setDateTime (QDateTime::currentDateTime());
+    //QDateTime dtMeas = m_av->measDateTime();
+    //if(dtMeas.isValid())
+    //    UI->dTEMeasured->setDateTime (dtMeas);
+    //else
+    //    UI->dTEMeasured->setDateTime (QDateTime::currentDateTime());
 
     QDateTime dtInsert = m_av->insertDateTime();
     if(dtInsert.isValid()){

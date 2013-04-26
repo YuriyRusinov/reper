@@ -117,7 +117,7 @@ public:
 
     int exportCopies (QIODevice *csvDev, // целевой CSV файл
                       const KKSCategory *c,
-                      const KKSMap<qint64, KKSEIOData *>& oeData,
+                      const KKSList<KKSEIOData *>& oeData,
                       QString codeName, // кодировка выходных данных
                       QString fDelim, // разделитель полей
                       QString tDelim, // разделитель текста
