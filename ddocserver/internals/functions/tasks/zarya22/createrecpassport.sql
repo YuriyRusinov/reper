@@ -183,13 +183,7 @@ begin
     xml_str := xml_str || E'\t\t\t</by_post_unit>\n';
 
     xml_str := xml_str || E'\t\t\t<as_having>\n';
-    if(msgKind = 1) then
-        xml_str := xml_str || E'\t\t\t\t<kind>ufdoc</kind>\n';
-    elsif(msgKind = 3) then
-        xml_str := xml_str || E'\t\t\t\t<kind>cmd</kind>\n';
-    else
-        xml_str := xml_str || E'\t\t\t\t<kind>fdoc</kind>\n';
-    end if;
+    xml_str := xml_str || E'\t\t\t\t<kind>ufrec</kind>\n';
 
     xml_str := xml_str || E'\t\t\t\t<creation_date>';
     select into xml_val_str to_char(now()::date, 'DD.MM.YYYY');

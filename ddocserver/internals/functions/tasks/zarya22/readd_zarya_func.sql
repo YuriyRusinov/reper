@@ -20,6 +20,7 @@ set search_path = public, pg_catalog;
 \i ./functions/tasks/zarya22/iofromxmlcmd.sql
 \i ./functions/tasks/zarya22/iofromxmlfdoc.sql
 \i ./functions/tasks/zarya22/iofromxmlufdoc.sql
+\i ./functions/tasks/zarya22/iofromrecxml.sql
 \i ./functions/tasks/zarya22/writeiofiles.sql
 
 --\i ./functions/tasks/zarya22/msc_xml.sql

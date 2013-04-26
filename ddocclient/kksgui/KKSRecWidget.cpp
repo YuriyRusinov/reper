@@ -252,6 +252,7 @@ void KKSRecWidget :: filterRecs (const QString& text)
     if (!sortMod)
         return;
     sortMod->setFilterRegExp (text);
+    sortMod->setFilterCaseSensitivity (Qt::CaseInsensitive);
     sortMod->setFilterKeyColumn (-1);
 }
 

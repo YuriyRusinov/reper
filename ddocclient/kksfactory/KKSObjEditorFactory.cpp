@@ -5363,90 +5363,13 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // צוכוגמי CSV פאיכ
                                     oeStream << QString();
                                     continue;
                                 }
-                                //KSA QMap<int, QString> values;
-                                //KSA QMap<int, QString> refColumnValues;
                                 if (pc.value()->type()->attrType() != KKSAttrType::atParent)
                                 {
-                                    /*KSA
-                                    QString tName = av->attribute()->tableName ();
-                                    KKSObject * refObj = loader->loadIO (tName, true);
-                                    if (!refObj)
-                                        continue;
-
-                                    KKSCategory * cRef = refObj->category();
-                                    if (!cRef)
-                                    {
-                                        refObj->release ();
-                                        continue;
-                                    }
-                                    bool isXml = false;
-                                    cRef = cRef->tableCategory();
-                                    if (cRef)
-                                        isXml = isXml || cRef->isAttrTypeContains(KKSAttrType::atXMLDoc) || cRef->isAttrTypeContains (KKSAttrType::atSVG);
-                                    refObj->release ();
-
-                                    values = loader->loadAttributeValues (av->attribute(), 
-                                                                        refColumnValues,
-                                                                        isXml, 
-                                                                        !isXml, 
-                                                                        QString::null, 
-                                                                        KKSList<const KKSFilterGroup*>());
-                                    KSA*/
 
                                 }
                                 else
                                 {
-                                    /*KSA
-                                    values = loader->loadAttributeValues (av->attribute(), 
-                                                                        refColumnValues,
-                                                                        true, 
-                                                                        true, 
-                                                                        tableName.isEmpty() ? av->attribute()->tableName() : tableName,
-                                                                        KKSList<const KKSFilterGroup*>());
-                                    KSA*/
                                 }
-                                //KSA int iVal = 0;
-                                /*KSA
-                                QVariant cV = av->value().valueVariant();
-                                KSA*/
-                                
-                                //qDebug () << __PRETTY_FUNCTION__ << cV;
-                                /*KSA
-                                if (av->attribute()->refColumnName().isEmpty() || 
-                                    av->attribute()->refColumnName() == "id")
-                                {
-                                    bool ok = false;
-                                    iVal = cV.toString().toInt(&ok);
-                                    if(!ok){
-                                        int id = refColumnValues.key(cV.toString());
-                                        if (id > 0)
-                                            iVal = id;
-                                    }
-                                }
-                                else{
-                                    int id = refColumnValues.key(cV.toString());
-                                    if (id > 0)
-                                        iVal = id;
-                                }
-                                KSA*/
-
-                                //qDebug () << __PRETTY_FUNCTION__ << iVal << values;
-                                /*KSA
-                                QMap<int, QString>::const_iterator pv = values.constFind (iVal);
-                                if (pv != values.constEnd())
-                                {
-                                    QString av_str (pv.value());
-                                    if (!av_str.isEmpty ())
-                                    {
-                                        av_str.replace (QChar('\n'), QString("\\n"), Qt::CaseInsensitive);
-                                        av_str.replace (QChar('\''), QString("\\'"), Qt::CaseInsensitive);
-                                        av_str.replace (tDelim, QString("\\%1").arg (tDelim), Qt::CaseInsensitive);
-                                    }
-                                    oeStream << tDelim << av_str << tDelim;
-                                }
-                                else
-                                    oeStream << tDelim << QString() << tDelim;
-                                KSA*/
                                 QString av_str (av->value().columnValue());
                                 if (!av_str.isEmpty ())
                                 {
