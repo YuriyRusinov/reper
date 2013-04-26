@@ -3,8 +3,8 @@ $BODY$
 begin
 
     
-    --perform pg_notify('chains_data', asString(new.id, true));
-    NOTIFY chains_data;--, new.id;
+    perform pg_notify('chains_data', asString(new.id, true));
+    --NOTIFY chains_data;--, new.id;
 
     return new;
 end

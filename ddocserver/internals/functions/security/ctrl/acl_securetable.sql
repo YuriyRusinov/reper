@@ -1,4 +1,4 @@
-﻿create or replace function acl_secureTable(varchar) returns int4 as
+create or replace function acl_secureTable(varchar) returns int4 as
 $BODY$
 declare
     tableName alias for $1;

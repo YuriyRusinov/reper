@@ -181,7 +181,26 @@ begin
     end if;
 
 
-    select id into idChain from chains where id_io_category = new.id_io_category and id_io_state = new.id_io_state;
+    if(TG_OP = 'INSERT') then
+        select c.id into idChain 
+        from chains c, io_processing_order p
+        where 
+            c.id = p.id_chain
+            and p.id_io_category = new.id_io_category 
+            and p.id_state_dest = new.id_io_state
+            and p.id_state_src = NULL;
+    end if;
+
+    if(TG_OP = 'UPDATE') then
+        select c.id into idChain 
+        from chains c, io_processing_order p
+        where 
+            c.id = p.id_chain
+            and p.id_io_category = new.id_io_category 
+            and p.id_state_dest = new.id_io_state
+            and p.id_state_src = old.id_io_state;
+    end if;
+
     if(idChain isnull) then
         return new;
     end if;

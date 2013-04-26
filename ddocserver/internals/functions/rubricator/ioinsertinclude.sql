@@ -1,4 +1,4 @@
-﻿--create rubric both for global rubricator or io rubricator
+--create rubric both for global rubricator or io rubricator
 create or replace function ioInsertInclude(int4, int4, varchar, varchar, varchar, int4, int4, varchar, varchar) returns int4 as
 $BODY$
 declare

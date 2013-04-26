@@ -48,6 +48,10 @@ begin
         query := 'select ioFromXMLUfdocSimple('||quote_literal(value)||')';
         execute query INTO isMakeIO;
         --return isMakeIO;  
+    ELSEIF (xml_type  = 'ufrec') THEN
+        query := 'select ioFromRecXML('||quote_literal(value)||')';
+        execute query INTO isMakeIO;
+        --return isMakeIO;  
     ELSEIF (xml_type = 'fdoc') THEN
         query := 'select ioFromXMLFdoc('||quote_literal(value)||')';
         execute query INTO isMakeIO;

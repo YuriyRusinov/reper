@@ -90,6 +90,7 @@ begin
     readTables[46] = 'handlers';
     readTables[47] = 'life_cycle_io_states';
     readTables[48] = 'chains_data';
+    readTables[49] = 'io_processing_order';
 
 --(1)
 

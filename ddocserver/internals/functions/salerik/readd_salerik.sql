@@ -1,1 +1,1 @@
-\i ./functions/salerik/salerik.sql
+--\i ./functions/salerik/salerik.sql

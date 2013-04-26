@@ -33,7 +33,6 @@ begin
     xml_str := xml_str || E'\n';
 
     --
-    --в паспорт передается идентификатор ИО, чтобы заполнить тэг doc_name
     --
     select into xml_msg_passport createRecPassport (idObject, idRecord, idMsg, idAddrList, 1);--, regNumber, 1);
     if (xml_msg_passport is null) then
@@ -56,18 +55,15 @@ begin
     xml_str := xml_str || E'\t\t\t<human_readable_text>\n\t\t\t\t<![CDATA[\n';
 
     --
-    -- если idMsg задан, то в данный тэг записываем message_body
     --
     if(idMsg is not null) then
         select message_body into io_name from message_journal where id = idMsg;
         if(io_name isnull) then
             --
-            --если тело сообщения пустое, то пытаемся его получить из названия передаваемого ИО
             --
             select into io_name io.name from io_objects io where io.id = idObject;
         end if;
         --
-        --если нет ничего, то наверное нет смысла и передавать сообщение
         --
         if (io_name is null) then
             return null;

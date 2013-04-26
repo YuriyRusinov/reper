@@ -1,7 +1,8 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     17.04.2013 16:20:25                          */
+/* Created on:     26.04.2013 8:04:25                           */
 /*==============================================================*/
+
 
 /*==============================================================*/
 /* Table: root_table                                            */
@@ -698,7 +699,6 @@ create table attrs_values (
    value                VARCHAR              not null,
    start_time           TIMESTAMP            not null default CURRENT_TIMESTAMP,
    stop_time            TIMESTAMP            null,
-   meas_time            TIMESTAMP            not null default CURRENT_TIMESTAMP,
    insert_time          TIMESTAMP            not null default CURRENT_TIMESTAMP,
    id_io_object_src     INT4                 null,
    id_io_object_src1    INT4                 null,
@@ -738,9 +738,6 @@ comment on column attrs_values.start_time is
 
 comment on column attrs_values.stop_time is
 'Момент утери актуальности значения атрибута (показателя)';
-
-comment on column attrs_values.meas_time is
-'Дата и время измерения значения атрибута (показателя)';
 
 comment on column attrs_values.insert_time is
 'Дата и время доведения значения атрибут (показателя) а в систему';
@@ -885,8 +882,6 @@ select createTriggerUID('categories_rubrics');
 create table chains (
    id                   SERIAL               not null,
    id_handler           INT4                 not null,
-   id_io_state          INT4                 not null,
-   id_io_category       INT4                 not null,
    name                 VARCHAR              not null,
    description          VARCHAR              null,
    constraint PK_CHAINS primary key (id)
@@ -906,25 +901,11 @@ comment on column chains.id_handler is
 Каждая очередь может иметь только один обработчик
 ';
 
-comment on column chains.id_io_state is
-'Состояние ИО, в котором информационные объекты поступают в данную очередь для обработки.';
-
-comment on column chains.id_io_category is
-'Категория, информационные объекты которой обрабатываются данной очередью';
-
 comment on column chains.name is
 'название очереди';
 
 select setMacToNULL('chains');
 select createTriggerUID('chains');
-
-/*==============================================================*/
-/* Index: i_ch_cat_state                                        */
-/*==============================================================*/
-create unique index i_ch_cat_state on chains (
-id_io_state,
-id_io_category
-);
 
 /*==============================================================*/
 /* Table: chains_data                                           */
@@ -1848,6 +1829,38 @@ id_io_objects
 );
 
 /*==============================================================*/
+/* Table: io_processing_order                                   */
+/*==============================================================*/
+create table io_processing_order (
+   id                   SERIAL               not null,
+   name                 VARCHAR              not null,
+   id_chain             INT4                 not null,
+   id_state_src         INT4                 null,
+   id_state_dest        INT4                 not null,
+   id_io_category       INT4                 not null,
+   constraint PK_IO_PROCESSING_ORDER primary key (id)
+)
+inherits (root_table);
+
+comment on table io_processing_order is
+'Справочник подярка обработки информационных объектов в различных состояниях жизненного цикла';
+
+comment on column io_processing_order.id_chain is
+'Очередь обработки';
+
+comment on column io_processing_order.id_state_src is
+'Из какого (id_io_state_from) состояния в какое (id_io_state_to) переходит ИО, которые должны обрабатываться данной очередью';
+
+comment on column io_processing_order.id_state_dest is
+'Из какого (id_io_state_from) состояния в какое (id_io_state_to) переходит ИО, которые должны обрабатываться данной очередью';
+
+comment on column io_processing_order.id_io_category is
+'ИО какой категории обрабатываются данной очередью';
+
+select setMacToNULL('io_processing_order');
+select createTriggerUID('io_processing_order');
+
+/*==============================================================*/
 /* Table: io_rubricator                                         */
 /*==============================================================*/
 create table io_rubricator (
@@ -2123,6 +2136,8 @@ select setMacToNULL('kks_roles');
 create table life_cycle (
    id                   SERIAL               not null,
    id_start_state       INT4                 null,
+   id_auto_state_attr   INT4                 null,
+   id_auto_state_ind    INT4                 null,
    name                 VARCHAR              not null,
    description          VARCHAR              null,
    constraint PK_LIFE_CYCLE primary key (id)
@@ -2136,6 +2151,12 @@ comment on table life_cycle is
 
 comment on column life_cycle.id_start_state is
 'Начальное состояние, в котором создаются ИО заданной категории, имеющей данный жизненный цикл';
+
+comment on column life_cycle.id_auto_state_attr is
+'Автовозврат состояния при изменении атрибутов';
+
+comment on column life_cycle.id_auto_state_ind is
+'Автовозврат состояния при изменении показателей';
 
 select setMacToNULL('life_cycle');
 select createTriggerUID('life_cycle');
@@ -3036,7 +3057,6 @@ create table rec_attrs_values (
    value                VARCHAR              not null,
    start_time           TIMESTAMP            not null default CURRENT_TIMESTAMP,
    stop_time            TIMESTAMP            null,
-   meas_time            TIMESTAMP            not null default CURRENT_TIMESTAMP,
    insert_time          TIMESTAMP            not null default CURRENT_TIMESTAMP,
    id_io_object_src     INT4                 null,
    id_io_object_src1    INT4                 null,
@@ -3071,9 +3091,6 @@ comment on column rec_attrs_values.start_time is
 
 comment on column rec_attrs_values.stop_time is
 'Момент утери актуальности значения атрибута';
-
-comment on column rec_attrs_values.meas_time is
-'Дата и время измерения значения атрибута';
 
 comment on column rec_attrs_values.insert_time is
 'Дата и время доведения значения атрибута в систему';
@@ -3249,7 +3266,6 @@ create table roles_actions (
 );
 
 select setMacToNULL('roles_actions');
-
 
 /*==============================================================*/
 /* Table: rubric_records                                        */
@@ -4373,16 +4389,6 @@ alter table chains
       references handlers (id)
       on delete restrict on update restrict;
 
-alter table chains
-   add constraint FK_CHAINS_REFERENCE_IO_STATE foreign key (id_io_state)
-      references io_states (id)
-      on delete restrict on update restrict;
-
-alter table chains
-   add constraint FK_CHAINS_REFERENCE_IO_CATEG foreign key (id_io_category)
-      references io_categories (id)
-      on delete restrict on update restrict;
-
 alter table chains_data
    add constraint FK_CHAINS_D_REFERENCE_CHAINS foreign key (id_chain)
       references chains (id)
@@ -4638,6 +4644,26 @@ alter table io_objects_organization
       references io_objects (id)
       on delete restrict on update restrict;
 
+alter table io_processing_order
+   add constraint FK_IO_PROCE_REFERENCE_CHAINS foreign key (id_chain)
+      references chains (id)
+      on delete restrict on update restrict;
+
+alter table io_processing_order
+   add constraint FK_IO_PROC_REF_IO_STATE_DEST foreign key (id_state_dest)
+      references io_states (id)
+      on delete restrict on update restrict;
+
+alter table io_processing_order
+   add constraint FK_IO_PROC_REF_IO_STATE_SRC foreign key (id_state_src)
+      references io_states (id)
+      on delete restrict on update restrict;
+
+alter table io_processing_order
+   add constraint FK_IO_PROCE_REFERENCE_IO_CATEG foreign key (id_io_category)
+      references io_categories (id)
+      on delete restrict on update restrict;
+
 alter table io_rubricator
    add constraint FK_IO_RUBRI_REFERENCE_IO_OBJEC foreign key (id_io_object)
       references io_objects (id)
@@ -4684,7 +4710,17 @@ alter table io_views
       on delete restrict on update restrict;
 
 alter table life_cycle
+   add constraint FK_LIFE_CYC_REF_IO_STATE_ATTR foreign key (id_auto_state_attr)
+      references io_states (id)
+      on delete restrict on update restrict;
+
+alter table life_cycle
    add constraint FK_LIFE_CYC_REFERENCE_IO_STATE foreign key (id_start_state)
+      references io_states (id)
+      on delete restrict on update restrict;
+
+alter table life_cycle
+   add constraint FK_LIFE_CYC_REF_IO_STATE_IND foreign key (id_auto_state_ind)
       references io_states (id)
       on delete restrict on update restrict;
 

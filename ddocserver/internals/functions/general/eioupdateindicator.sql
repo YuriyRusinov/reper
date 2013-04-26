@@ -1,4 +1,4 @@
-create or replace function eioUpdateIndicator(int8, int4, varchar, timestamp, timestamp, timestamp, int4, int4, varchar) returns int4 as
+create or replace function eioUpdateIndicator(int8, int4, varchar, timestamp, timestamp, int4, int4, varchar) returns int4 as
 $BODY$
 declare
     idRec alias for $1;
@@ -6,10 +6,9 @@ declare
     ioValue alias for $3;
     iStartTime alias for $4;
     iStopTime alias for $5;
-    iMeasTime alias for $6;
-    iIdObjectSrc alias for $7;
-    iIdObjectSrc1 alias for $8;
-    iDesc alias for $9;
+    iIdObjectSrc alias for $6;
+    iIdObjectSrc1 alias for $7;
+    iDesc alias for $8;
 
     ok int4;
 begin
@@ -23,7 +22,6 @@ begin
     if(eioCatIndExist(idRec, idCategoryAttr) = true) then
         update rec_attrs_values set 
             value = ioValue, 
-            meas_time = iMeasTime, 
             id_io_object_src = iIdObjectSrc, 
             id_io_object_src1 = iIdObjectSrc1, 
             description = iDesc 
@@ -31,7 +29,7 @@ begin
             id_record = idRec
             and id_attr_category = idCategoryAttr;
     else
-        select eioInsertIndicator(idRec, idCategoryAttr, ioValue, iStartTime, iStopTime, iMeasTime, iIdObjectSrc, iIdObjectSrc1, iDesc) into ok;
+        select eioInsertIndicator(idRec, idCategoryAttr, ioValue, iStartTime, iStopTime, iIdObjectSrc, iIdObjectSrc1, iDesc) into ok;
         return ok;
     end if;
 

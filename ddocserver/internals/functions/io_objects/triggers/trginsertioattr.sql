@@ -55,10 +55,6 @@ begin
     end if;
 
 
-    if(new.meas_time isnull) then
-        new.meas_time = current_timestamp;
-    end if;
-
 
     if(TG_OP = 'INSERT') then
         for r in 

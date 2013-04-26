@@ -17,10 +17,11 @@ begin
     end if;
 
     select c.id into idChain 
-    from chains c, tbl_io_objects io
+    from chains c, io_processing_order p, tbl_io_objects io
     where 
-        c.id_io_category = io.id_io_category 
-        and c.id_io_state = 5 --system state Attr_changed
+        p.id_io_category = io.id_io_category 
+        and p.id_chain = c.id
+        and p.id_state_dest = 5 --system state Attr_changed
         and io.id = new.id_io_object;
 
     if(idChain isnull) then

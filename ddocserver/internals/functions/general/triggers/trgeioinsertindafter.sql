@@ -20,12 +20,13 @@ begin
     SELECT p.relname into tableName
     FROM q_base_table q, pg_class p
     WHERE q.id = new.id_record AND q.tableoid = p.oid;
-
+    
     select c.id into idChain 
-    from chains c, tbl_io_objects io
+    from chains c, io_processing_order p, tbl_io_objects io
     where 
-        c.id_io_category = io.id_io_category 
-        and c.id_io_state = 5 --system state attr_changed
+        p.id_io_category = io.id_io_category 
+        and p.id_chain = c.id
+        and p.id_state_dest = 5 --system state attr_changed
         and io.table_name = tableName;
 
     if(idChain isnull) then

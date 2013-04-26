@@ -29,17 +29,37 @@ begin
         end if;
     end if;
                                
-    for r in 
-        select c.id as id_c, io.id as id_o
-        from chains c, tbl_io_objects io
-        where 
-            c.id_io_category = io.id_io_category 
-            and c.id_io_state = idState 
-            and io.table_name = tableName
-    loop
-        idChain := r.id_c;
-        idObject := r.id_o;
-    end loop;
+    if(TG_OP = 'INSERT' or idState = 5) then
+        for r in 
+            select c.id as id_c, io.id as id_o
+            from chains c, io_processing_order p, tbl_io_objects io
+            where 
+                p.id_io_category = io.id_io_category 
+                and p.id_state_dest = idState 
+                and p.id_chain = c.id
+                and io.table_name = tableName
+        loop
+            idChain := r.id_c;
+            idObject := r.id_o;
+        end loop;
+    end if;
+
+
+    if(TG_OP = 'UPDATE' and idState <> 5) then
+        for r in 
+            select c.id as id_c, io.id as id_o
+            from chains c, io_processing_order p, tbl_io_objects io
+            where 
+                p.id_io_category = io.id_io_category 
+                and p.id_state_dest = new.id_io_state 
+                and p.id_state_src = old.id_io_state
+                and p.id_chain = c.id
+                and io.table_name = tableName
+        loop
+            idChain := r.id_c;
+            idObject := r.id_o;
+        end loop;
+    end if;
 
     if(idChain isnull) then
         return new;

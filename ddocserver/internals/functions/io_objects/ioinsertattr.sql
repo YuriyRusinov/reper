@@ -1,4 +1,4 @@
-create or replace function ioInsertAttr(int4, int4, varchar, timestamp, timestamp, timestamp, int4, int4, varchar) returns int4 as
+create or replace function ioInsertAttr(int4, int4, varchar, timestamp, timestamp, int4, int4, varchar) returns int4 as
 $BODY$
 declare
     idObject alias for $1;
@@ -6,10 +6,9 @@ declare
     ioValue alias for $3;
     iStartTime alias for $4;
     iStopTime alias for $5;
-    iMeasTime alias for $6;
-    iIdObjectSrc alias for $7;
-    iIdObjectSrc1 alias for $8;
-    iDesc alias for $9;
+    iIdObjectSrc alias for $6;
+    iIdObjectSrc1 alias for $7;
+    iDesc alias for $8;
    
 
     idCategory int4;
@@ -28,8 +27,8 @@ begin
 
     idCatAttr = acGetAttrCategoryId(idCategory, idAttr);
 
-    insert into attrs_values(id_io_object, id_attr_category, value, start_time, stop_time, meas_time, id_io_object_src, id_io_object_src1, description)
-    values (idObject, idCatAttr, ioValue, iStartTime, iStopTime, iMeasTime, iIdObjectSrc, iIdObjectSrc1, iDesc);
+    insert into attrs_values(id_io_object, id_attr_category, value, start_time, stop_time, id_io_object_src, id_io_object_src1, description)
+    values (idObject, idCatAttr, ioValue, iStartTime, iStopTime, iIdObjectSrc, iIdObjectSrc1, iDesc);
 --    if(FOUND = FALSE) then
 --        return -1;
 --    end if;
@@ -40,7 +39,7 @@ end
 $BODY$
 language 'plpgsql';
 
-create or replace function ioInsertAttr(int4, varchar, varchar, timestamp, timestamp, timestamp, int4, int4, varchar) returns int4 as
+create or replace function ioInsertAttr(int4, varchar, varchar, timestamp, timestamp, int4, int4, varchar) returns int4 as
 $BODY$
 declare
     idObject alias for $1;
@@ -48,17 +47,16 @@ declare
     ioValue alias for $3;
     iStartTime alias for $4;
     iStopTime alias for $5;
-    iMeasTime alias for $6;
-    iIdObjectSrc alias for $7;
-    iIdObjectSrc1 alias for $8;
-    iDesc alias for $9;
+    iIdObjectSrc alias for $6;
+    iIdObjectSrc1 alias for $7;
+    iDesc alias for $8;
 
     idAttr int4;
     ok int4;
 begin
 
     if(session_user = 'jupiter') then
-        return ioInsertAttrEx(idObject, uniqueId, ioValue, iStartTime, iStopTime, iMeasTime, iIdObjectSrc, iIdObjectSrc1, iDesc);
+        return ioInsertAttrEx(idObject, uniqueId, ioValue, iStartTime, iStopTime, iIdObjectSrc, iIdObjectSrc1, iDesc);
     end if;
 
     return -1;
@@ -67,7 +65,7 @@ $BODY$
 language 'plpgsql';
 
 --используется при информационном обмене
-create or replace function ioInsertAttrEx(int4, varchar, varchar, timestamp, timestamp, timestamp, int4, int4, varchar) returns int4 as
+create or replace function ioInsertAttrEx(int4, varchar, varchar, timestamp, timestamp, int4, int4, varchar) returns int4 as
 $BODY$
 declare
     idObject alias for $1;
@@ -75,10 +73,9 @@ declare
     ioValue alias for $3;
     iStartTime alias for $4;
     iStopTime alias for $5;
-    iMeasTime alias for $6;
-    iIdObjectSrc alias for $7;
-    iIdObjectSrc1 alias for $8;
-    iDesc alias for $9;
+    iIdObjectSrc alias for $6;
+    iIdObjectSrc1 alias for $7;
+    iDesc alias for $8;
 
     idAttr int4;
     idType int4;
@@ -111,13 +108,13 @@ begin
 
     if(idType <> 2 and idType <> 3 and idType <> 7 and idType <> 12 and idType <> 17 and idType <> 19 and idType <> 26)  then
         
-        select ioInsertAttr(idObject, idAttr, ioValue, iStartTime, iStopTime, iMeasTime, iIdObjectSrc, iIdObjectSrc1, iDesc) into ok;
+        select ioInsertAttr(idObject, idAttr, ioValue, iStartTime, iStopTime, iIdObjectSrc, iIdObjectSrc1, iDesc) into ok;
         return ok;
     end if;
 
     if(ioValue = '{}')  then
         
-        select ioInsertAttr(idObject, idAttr, ioValue, iStartTime, iStopTime, iMeasTime, iIdObjectSrc, iIdObjectSrc1, iDesc) into ok;
+        select ioInsertAttr(idObject, idAttr, ioValue, iStartTime, iStopTime, iIdObjectSrc, iIdObjectSrc1, iDesc) into ok;
         return ok;
     end if;
 
@@ -125,7 +122,7 @@ begin
         theValue = getIDByUID(tableName, ioValue);
 
         if(theValue is not null) then
-            select ioInsertAttr(idObject, idAttr, theValue, iStartTime, iStopTime, iMeasTime, iIdObjectSrc, iIdObjectSrc1, iDesc) into ok;
+            select ioInsertAttr(idObject, idAttr, theValue, iStartTime, iStopTime, iIdObjectSrc, iIdObjectSrc1, iDesc) into ok;
         end if;
 
         return ok;
@@ -154,7 +151,7 @@ begin
 
     theValue = theValue || '}';
 
-    select ioInsertAttr(idObject, idAttr, theValue, iStartTime, iStopTime, iMeasTime, iIdObjectSrc, iIdObjectSrc1, iDesc) into ok;
+    select ioInsertAttr(idObject, idAttr, theValue, iStartTime, iStopTime, iIdObjectSrc, iIdObjectSrc1, iDesc) into ok;
     
     return ok;
 

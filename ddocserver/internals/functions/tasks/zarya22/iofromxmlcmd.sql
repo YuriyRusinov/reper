@@ -270,7 +270,7 @@ begin
         select id_attr, a_val from XXX
     loop
 	--raise warning '____ % % % ', idObject, r.id_attr, r.a_val;
-        select into idAttrRes ioInsertAttr (idObject, r.id_attr, quote_literal (r.a_val)::varchar, current_timestamp::timestamp without time zone, null::timestamp without time zone, current_timestamp::timestamp without time zone, null::int4, null::int4, null::varchar);
+        select into idAttrRes ioInsertAttr (idObject, r.id_attr, quote_literal (r.a_val)::varchar, current_timestamp::timestamp without time zone, null::timestamp without time zone, null::int4, null::int4, null::varchar);
         if (idAttrRes is null or idAttrRes <0) then
             return null;
         end if;
