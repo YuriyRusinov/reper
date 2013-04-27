@@ -23,9 +23,15 @@ KKSDaemon::KKSDaemon(int argc, char **argv) :
 
     bNeedExit = false;
     bPause = false;
+    bNeedGenerateStreams = false;
+    
     db = NULL;
 	dbTimer = NULL;
+    dbStreams = NULL;
+
     listener = NULL;
+    streamsGenerator = NULL;
+
 	m_timerInterval = 60000;//1 min
 
 #ifdef WIN32
@@ -55,10 +61,21 @@ KKSDaemon::~KKSDaemon()
 		delete dbTimer;
     }
 
-	if(listener){
+    if(dbStreams){
+		dbStreams->disconnect();
+		delete dbStreams;
+    }
+
+    if(listener){
         listener->quit();
         delete listener;
     }
+
+    if(streamsGenerator){
+        streamsGenerator->quit();
+        delete streamsGenerator;
+    }
+
 }
 
 void KKSDaemon::start()
@@ -66,8 +83,10 @@ void KKSDaemon::start()
     (*fLogOut) << QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm.ss") << " --- " << "KKSDaemon started\n";
     fLogOut->flush();
     //QCoreApplication * app = application();
+    
     db = new KKSPGDatabase(); 
     dbTimer = new KKSPGDatabase();
+    dbStreams = new KKSPGDatabase();
 
     readSettings();
 
@@ -75,11 +94,19 @@ void KKSDaemon::start()
     if(!ok)
         return;
 
-    ok = dbTimer->connect(ipServer, database, user, passwd, port);
-    if(!ok)
-        return;
+    if(bNeedAnalyzeDb){
+        ok = dbTimer->connect(ipServer, database, user, passwd, port);
+        if(!ok)
+            return;
+    }
 
-     QFile file(QString("%1").arg(sPgPass));
+    if(bNeedGenerateStreams){
+        ok = dbStreams->connect(ipServer, database, user, passwd, port);
+        if(!ok)
+            return;
+    }
+
+    QFile file(QString("%1").arg(sPgPass));
      if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
          return;
 
@@ -93,9 +120,17 @@ void KKSDaemon::start()
     listener->setDaemon(this);
     listener->start();
 
-	//m_timer.setInterval(m_timerInterval);
-	//connect(&m_timer, SIGNAL(timeout()), this, SLOT(analyzeDb()));
-	//m_timer.start();
+    if(bNeedGenerateStreams){
+        streamsGenerator = new DDocStreamsGenerator(dbStreams, 0);
+        streamsGenerator->setDaemon(this);
+        streamsGenerator->start();
+    }
+
+    if(bNeedAnalyzeDb){
+	    m_timer.setInterval(m_timerInterval);
+	    connect(&m_timer, SIGNAL(timeout()), this, SLOT(analyzeDb()));
+	    m_timer.start();
+    }
     
 }
 
@@ -120,22 +155,6 @@ void KKSDaemon::analyzeDb()
 		return;
 
 	sql = QString("select putIOIntoRubric()");
-	res = dbTimer->execute(sql.toLocal8Bit().constData());
-	if(!res)
-		return;
-
-	if(res->getRowCount() != 1){
-		delete res;
-		return;
-	}
-
-	r = res->getCellAsInt(0, 0);
-	delete res;
-	if(r != 1)
-		return;
-
-
-	sql = QString("select getMessageStreams()");
 	res = dbTimer->execute(sql.toLocal8Bit().constData());
 	if(!res)
 		return;
@@ -190,6 +209,9 @@ void KKSDaemon::readSettings()
     sPsqlPath = s->value("psqlPath").toString();
 
 	m_timerInterval = s->value("timerInterval").toInt();
+    
+    bNeedGenerateStreams = s->value("generateStreams").toBool();
+    bNeedAnalyzeDb = s->value("autoRubrication").toBool();
 
 
     if(ipServer.isEmpty()){
@@ -227,9 +249,53 @@ void KKSDaemon::readSettings()
 		s->setValue("timerInterval", m_timerInterval);
 	}
 
+    if(s->value("generateStreams").isNull()){
+        bNeedGenerateStreams = true;
+        s->setValue("generateStreams", true);
+    }
+
+    if(s->value("autoRubrication").isNull()){
+        bNeedAnalyzeDb = true;
+        s->setValue("autoRubrication", true);
+    }
+
+
     s->endGroup (); // Database
 
 }
+
+void DDocStreamsGenerator::run()
+{
+    if(!m_db)
+        return;
+
+    
+    while(1){
+
+        if(m_parent && m_parent->stopped())
+            break;
+        if(m_parent && m_parent->paused())
+            continue;
+
+        QString sql = QString("select getMessageStreams()");
+        KKSResult * res = m_db->execute(sql.toLocal8Bit().constData());
+        if(!res)
+            return;
+
+        if(res->getRowCount() != 1){
+            delete res;
+            return;
+        }
+
+        int r = res->getCellAsInt(0, 0);
+        delete res;
+        if(r != 1)
+		    return;
+
+    }
+    
+}
+
 
 void DDocServerListener::run()
 {

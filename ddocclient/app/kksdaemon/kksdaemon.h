@@ -20,6 +20,21 @@
 
 class KKSDaemon;
 
+class DDocStreamsGenerator : public QThread
+{
+    Q_OBJECT
+public:
+    DDocStreamsGenerator(KKSPGDatabase * db, QObject * parent):QThread(parent), m_db(NULL), m_parent(NULL){m_db = db;}
+    ~DDocStreamsGenerator(){}
+
+    void run();
+    void setDaemon(KKSDaemon * d){m_parent = d;}
+
+private:
+    KKSPGDatabase * m_db;
+    KKSDaemon * m_parent;
+};
+
 class DDocServerListener : public QThread, public IKKSListener
 {
     Q_OBJECT
@@ -65,13 +80,21 @@ private slots:
 private:
 
     friend class DDocServerListener;
+    friend class DDocStreamsGenerator;
+
     void readSettings();
 
     bool bNeedExit;
     bool bPause;
+    bool bNeedAnalyzeDb; //флаг определяет необходимость работы механизма автоматической разводки документов по рубрикам
+    bool bNeedGenerateStreams; //флаг определяет необходимость запуска механизма генерации потоков
+    
     KKSPGDatabase * db;
-	KKSPGDatabase * dbTimer;
+	KKSPGDatabase * dbTimer;//для автоматической разводки документов по рубрикам
+    KKSPGDatabase * dbStreams; //для генерации потоков сообщений
+    
     DDocServerListener * listener;
+    DDocStreamsGenerator * streamsGenerator;
 
     QHttp http;
 
