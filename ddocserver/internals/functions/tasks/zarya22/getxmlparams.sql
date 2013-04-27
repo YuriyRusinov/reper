@@ -56,6 +56,8 @@ begin
         sectionName = 'command_data';
     elsif (msgType = 'ufdoc') then
         sectionName = 'unformalized_document_data';
+    elsif (msgType = 'ufrec') then
+        sectionName = 'unformalized_document_data';
     else
         return;
     end if;

@@ -1,10 +1,11 @@
-create or replace function recToXML (int4, int4, int4, int4[]) returns xml as
+create or replace function recToXML (int4, int4, int4, int4, int4[]) returns xml as
 $BODY$
 declare
     idMsg alias for $1;
     idObject alias for $2;
     idRecord alias for $3;
-    idAddrList alias for $4;
+    idDlSender alias for $4;
+    idAddrList alias for $5;
 
     idCategory int4;
     result xml;
@@ -23,6 +24,7 @@ begin
         raise warning 'Invalid parameters';
         return null;
     end if;
+
     select into tableName table_name from io_objects io where io.id=idObject;
     if (tableName is null) then
         raise warning 'Reference is invalid';
@@ -34,7 +36,7 @@ begin
 
     --
     --
-    select into xml_msg_passport createRecPassport (idObject, idRecord, idMsg, idAddrList, 1);--, regNumber, 1);
+    select into xml_msg_passport createRecPassport (idObject, idRecord, idMsg, idDlSender, idAddrList, 1);--, regNumber, 1);
     if (xml_msg_passport is null) then
         raise warning 'Invalid passport';
         return null;

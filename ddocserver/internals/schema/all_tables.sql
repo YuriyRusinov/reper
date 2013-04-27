@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     26.04.2013 8:04:25                           */
+/* Created on:     27.04.2013 10:12:08                          */
 /*==============================================================*/
 
 
@@ -23,7 +23,6 @@ select setMacToNULL('root_table');
 create unique index Index_1 on root_table using BTREE (
 unique_id
 );
-
 
 /*==============================================================*/
 /* User: public                                                 */
@@ -2384,6 +2383,7 @@ create table message_streams (
    id                   SERIAL               not null,
    id_partition_low     INT4                 not null,
    id_io_object         INT4                 not null,
+   id_dl_sender         INT4                 not null,
    id_dl_receiver       INT4                 not null,
    id_time_unit         INT4                 not null default 1,
    name                 VARCHAR              not null,
@@ -2404,6 +2404,9 @@ comment on table message_streams is
 
 comment on column message_streams.id_io_object is
 'ссылка на информационный объект типа справочник, на основании  которого <генерятся> сообщения потока путем последовательной выборки записей справочника, при достижении конечной записи справочника производится переключение на первую запись и т.д.';
+
+comment on column message_streams.id_dl_sender is
+'НЕ НАДО ЭТО ПОЛЕ ДЕЛАТЬ SERIAL! Оно наследуется от kks_roles. После создания данной таблицы отрабатывает скрипт, который задает ему значение по умолчанию в nextval(''kks_roles_id_seq'');';
 
 comment on column message_streams.id_dl_receiver is
 'Должностное лицо-адресат  потока';
@@ -3267,6 +3270,7 @@ create table roles_actions (
 
 select setMacToNULL('roles_actions');
 
+
 /*==============================================================*/
 /* Table: rubric_records                                        */
 /*==============================================================*/
@@ -3435,6 +3439,118 @@ comment on table shape_types is
 
 select setMacToNULL('shape_types');
 select createTriggerUID('shape_types');
+
+/*==============================================================*/
+/* Table: shu_acs                                               */
+/*==============================================================*/
+create table shu_acs (
+   id                   SERIAL               not null,
+   code                 VARCHAR              not null,
+   name                 VARCHAR              not null,
+   uri                  VARCHAR              not null,
+   constraint PK_SHU_ACS primary key (id)
+);
+
+comment on table shu_acs is
+'Реестр цнии эису АСУ';
+
+/*==============================================================*/
+/* Table: shu_addressee                                         */
+/*==============================================================*/
+create table shu_addressee (
+   id                   SERIAL               not null,
+   id_acs               INT4                 not null,
+   code                 VARCHAR              not null,
+   name                 VARCHAR              not null,
+   type                 VARCHAR              not null,
+   value                VARCHAR              not null,
+   uri                  VARCHAR              not null,
+   constraint PK_SHU_ADDRESSEE primary key (id)
+);
+
+comment on table shu_addressee is
+'реестр цнии эису адресов сопрягаемых систем';
+
+/*==============================================================*/
+/* Table: shu_chksum                                            */
+/*==============================================================*/
+create table shu_chksum (
+   id                   SERIAL               not null,
+   code                 VARCHAR              not null,
+   name                 VARCHAR              not null,
+   constraint PK_SHU_CHKSUM primary key (id)
+);
+
+comment on table shu_chksum is
+'реестр цнии эису методов подсчета контрольной суммы файла';
+
+/*==============================================================*/
+/* Table: shu_dls                                               */
+/*==============================================================*/
+create table shu_dls (
+   id                   SERIAL               not null,
+   name                 VARCHAR              not null,
+   uri                  VARCHAR              not null,
+   id_acs               INT4                 not null,
+   id_org               INT4                 not null,
+   id_pos               INT4                 not null,
+   constraint PK_SHU_DLS primary key (id)
+);
+
+comment on table shu_dls is
+'реестр цнии эису должностных лиц';
+
+/*==============================================================*/
+/* Table: shu_dls_position                                      */
+/*==============================================================*/
+create table shu_dls_position (
+   id_shu_dls           INT4                 not null,
+   id_position          INT4                 not null,
+   constraint PK_SHU_DLS_POSITION primary key (id_shu_dls, id_position)
+);
+
+comment on table shu_dls_position is
+'Соответствие должностных лиц в системе DynamicDocs и должностных лиц в системе Заря22';
+
+/*==============================================================*/
+/* Table: shu_domains                                           */
+/*==============================================================*/
+create table shu_domains (
+   id                   SERIAL               not null,
+   code                 VARCHAR              not null,
+   name                 VARCHAR              not null,
+   constraint PK_SHU_DOMAINS primary key (id)
+);
+
+comment on table shu_domains is
+'Реестр ЦНИИ ЭИСУ предметных областей';
+
+/*==============================================================*/
+/* Table: shu_orgs                                              */
+/*==============================================================*/
+create table shu_orgs (
+   id                   SERIAL               not null,
+   code                 VARCHAR              not null,
+   name                 VARCHAR              not null,
+   uri                  VARCHAR              not null,
+   constraint PK_SHU_ORGS primary key (id)
+);
+
+comment on table shu_orgs is
+'реестр цнии эису организационных единиц';
+
+/*==============================================================*/
+/* Table: shu_positions                                         */
+/*==============================================================*/
+create table shu_positions (
+   id                   SERIAL               not null,
+   code                 VARCHAR              not null,
+   name                 VARCHAR              not null,
+   constraint PK_SHU_POSITIONS primary key (id)
+);
+
+comment on table shu_positions is
+'реестр цнии эису должностных  единиц';
 
 /*==============================================================*/
 /* Table: state_crosses                                         */
@@ -4799,6 +4915,11 @@ alter table message_streams
       references time_units (id)
       on delete restrict on update restrict;
 
+alter table message_streams
+   add constraint FK_MESSAGE__REFERENCE_POSITION foreign key (id_dl_sender)
+      references "position" (id)
+      on delete restrict on update restrict;
+
 alter table object_ref_tables
    add constraint FK_OBJECT_R_REFERENCE_IO_OBJEC foreign key (id_io_object)
       references io_objects (id)
@@ -5037,6 +5158,36 @@ alter table shape_segments
 alter table shape_segments
    add constraint FK_SHAPE_SE_REFERENCE_ELEMENT_ foreign key (id_element_shape)
       references element_shapes (id)
+      on delete restrict on update restrict;
+
+alter table shu_addressee
+   add constraint FK_SHU_ADDR_REFERENCE_SHU_ACS foreign key (id_acs)
+      references shu_acs (id)
+      on delete restrict on update restrict;
+
+alter table shu_dls
+   add constraint FK_SHU_DLS_REFERENCE_SHU_ACS foreign key (id_acs)
+      references shu_acs (id)
+      on delete restrict on update restrict;
+
+alter table shu_dls
+   add constraint FK_SHU_DLS_REFERENCE_SHU_ORGS foreign key (id_org)
+      references shu_orgs (id)
+      on delete restrict on update restrict;
+
+alter table shu_dls
+   add constraint FK_SHU_DLS_REFERENCE_SHU_POSI foreign key (id_pos)
+      references shu_positions (id)
+      on delete restrict on update restrict;
+
+alter table shu_dls_position
+   add constraint FK_SHU_DLS__REFERENCE_SHU_DLS foreign key (id_shu_dls)
+      references shu_dls (id)
+      on delete restrict on update restrict;
+
+alter table shu_dls_position
+   add constraint FK_SHU_DLS__REFERENCE_POSITION foreign key (id_position)
+      references "position" (id)
       on delete restrict on update restrict;
 
 alter table state_crosses

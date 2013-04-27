@@ -31,7 +31,9 @@ begin
                 continue;
             end if;
             id_distrib := r.id_partition_low;
+
             perform initrand();
+
             if (id_distrib = 1) then
                 select into time_step r.moda+gaussrand(r.sigma);
             elsif (id_distrib = 2) then
@@ -45,6 +47,7 @@ begin
             end if;
 
             perform droprand();
+
             if (time_step is null) then
                 raise warning 'Incorrect parameters';
                 return NULL;
@@ -57,23 +60,29 @@ begin
                 last_time := rr.time;
                 prev_time_step := rr.time_step;
             end loop;
+
             if (last_time is null) then
                 last_time := r.start_time;
             end if;
+
             if (prev_time_step is null) then
                 prev_time_step := time_step;
             end if;
+
             tquery := E'select ';
             tquery := tquery || E'interval \''|| prev_time_step || E' ' || tunit || E'\'';
+
             execute tquery into tinterv;
             --last_time := last_time + tinterv;
             raise warning 'last time is %, interval is %', last_time, tinterv;
             select into ctime current_timestamp;
+
             if (ctime >= last_time+tinterv and ctime <= r.stop_time) then
                 insert into message_series (id_message_stream, time, time_step) values (r.id, ctime, time_step);
             end if;
 
         end loop;
+
         return 1;
 end
 $BODY$

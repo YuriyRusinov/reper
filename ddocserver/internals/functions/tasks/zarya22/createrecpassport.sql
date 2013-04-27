@@ -1,12 +1,13 @@
-CREATE OR REPLACE FUNCTION createrecpassport(integer, integer, integer, integer[], integer)
+CREATE OR REPLACE FUNCTION createrecpassport(integer, integer, integer, integer, integer[], integer)
   RETURNS xml AS
 $BODY$
 declare
     idObject alias for $1;
     idRec alias for $2;
     idMsg alias for $3;
-    idAddrList alias for $4;
-    msgKind alias for $5;
+    idDlSender alias for $4;
+    idAddrList alias for $5;
+    msgKind alias for $6;
     
     regNumber varchar;
     --msgKind int4; --1 - ufdoc, 2 - fdoc, 3 - cmd
@@ -34,15 +35,23 @@ declare
 
     fileSize int8;
     limitFileSize int8;
+
 begin
+
     limitFileSize := 2048;
     limitFileSize := limitFileSize*1024;
     limitFileSize := limitFileSize*1024;
-    select into idPos getcurrentdl();
-    if (idPos is null or idPos < 0) then
-        raise warning 'Invalid position';
-        return null;
+
+    idPos = idDlSender;
+    if(idPos isnull) then
+        select into idPos getcurrentdl();
+
+        if (idPos is null or idPos < 0) then
+            raise warning 'Invalid position';
+            return null;
+        end if;
     end if;
+
 
     query := 'select shu.id from shu_dls as shu inner join shu_dls_position p on (shu.id = p.id_shu_dls and p.id_position=' || idPos || ')';
     execute query into idShuPos;
@@ -94,23 +103,27 @@ begin
 
     xml_str := xml_str || E'\t\t\t<by_automated_control_system>\n';
     xml_str := xml_str || E'\t\t\t\t<with_uri>';
+
     query = 'select a.uri from shu_acs a inner join shu_dls p on (p.id_acs=a.id and p.id = ' || idShuPos || ');';
     execute query into xml_val_str;
-    --raise warning 'acs uri is %', xml_val_str;
+
     if (xml_val_str is null) then
         raise warning 'Invalid ACS URL';
         return null;
     end if;
+
     xml_str := xml_str || xml_val_str;
     xml_str := xml_str || E'</with_uri>\n';
 
     xml_str := xml_str || E'\t\t\t\t<with_working_mode>';
+
     select wm.id_mode_type into wmType from work_mode wm, organization o where o.id = (select id_organization from getMyOrganization()) and o.id_curr_mode = wm.id;
     if(wmType isnull or wmType <> 2) then
         wmType = 0;
     else
         wmType = 1;
     end if;
+
     xml_str := xml_str || wmType;
     xml_str := xml_str || E'</with_working_mode>\n';
     xml_str := xml_str || E'\t\t\t\t<on_address> <![CDATA[';
@@ -129,12 +142,14 @@ begin
 
     xml_str := xml_str || E'\t\t\t<by_organization_unit>\n';
     xml_str := xml_str || E'\t\t\t\t<with_uri>';
+
     select into xml_val_str o.uri from shu_orgs o inner join shu_dls p on (p.id_org=o.id and p.id=idShuPos);
-    --raise warning 'org uri is %', xml_val_str;
+
     if (xml_val_str is null) then
         raise warning 'Invalid org URL';
         return null;
     end if;
+
     xml_str := xml_str || xml_val_str;
 
     xml_str := xml_str || E'</with_uri>\n';

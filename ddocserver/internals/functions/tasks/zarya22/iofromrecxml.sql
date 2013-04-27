@@ -62,130 +62,6 @@ begin
     
     create temp table AAA(id_attr int4, a_val varchar);
 
--- get date creating message
-    tbody :=  '/msg/passport/msg_created/as_having/creation_date/text()';
-    --query := 'SELECT (xpath('||quote_literal(tbody) ||', '||quote_literal(value) ||'::xml))[1] As date';
-    select getXMLValue(tBody, value) into msgCreationDate;
-    --execute query INTO msgCreationDate;
-    insert into AAA (id_attr, a_val) values (233, msgCreationDate);
-
--- get time creating message
-    tbody :=  '/msg/passport/msg_created/as_having/creation_time/text()';
---    query := 'SELECT (xpath('||quote_literal(tbody) ||', '||quote_literal(value) ||'::xml))[1] As time';
---    execute query INTO msgCreationTime;
-    select getXMLValue(tBody, value) into msgCreationTime;
-    insert into AAA (id_attr, a_val) values (234, msgCreationTime);
-
--- get sending_acs_registration_number
-    tbody :=  '/msg/passport/msg_created/as_having/sending_acs_registration_number/text()';
-    --query := 'SELECT (xpath('||quote_literal(tbody) ||', '||quote_literal(value) ||'::xml))[1] As reg';
-    --execute query INTO msgSenderUID;
-    select getXMLValue(tBody, value) into msgSenderUID;
-
--- get redirecting_acs_registration_number
-    tbody :=  '/msg/passport/msg_created/as_having/redirecting_acs_registration_number/text()';
---    query := 'SELECT (xpath('||quote_literal(tbody) ||', '||quote_literal(value) ||'::xml))[1] As reg';
---    execute query INTO msgRedirectingNumber;
-    select getXMLValue(tBody, value) into msgRedirectingNumber;
-    --insert into XXX (id_attr, a_val) values (233, tdate);
-
--- get mac level message
-    tbody :=  '/msg/passport/msg_created/as_having/mac_level/text()';
---    query := 'SELECT (xpath('||quote_literal(tbody) ||', '||quote_literal(value) ||'::xml))[1] As mac_level';
---    execute query INTO tmac;
-    select getXMLValue(tBody, value) into tmac;
-    insert into AAA (id_attr, a_val) values (235, tmac);
-
-    tbody :=  '/msg/passport/msg_created/by_automated_control_system/with_uri/text()';
---    query := 'SELECT (xpath('||quote_literal(tbody) ||', '||quote_literal(value) ||'::xml))[1] As uri_acs';
---    execute query INTO torg;
-    select getXMLValue(tBody, value) into torg;
-
-    query =  'select id from shu_acs where uri = trim(' || asString(torg, true) ||')';
-    execute query into torg;
-    insert into AAA (id_attr, a_val) values (225, torg);
-
-
-    tbody :=  '/msg/passport/msg_created/by_automated_control_system/with_working_mode/text()';
---    query := 'SELECT (xpath('||quote_literal(tbody) ||', '||quote_literal(value) ||'::xml))[1] As mode';
---    execute query INTO torg;
-    select getXMLValue(tBody, value) into torg;    
-    insert into AAA (id_attr, a_val) values (231, torg);
-
-
-
--- get organization uri
-    tbody :=  '/msg/passport/msg_created/by_organization_unit/with_uri/text()';
---    query := 'SELECT (xpath('||quote_literal(tbody) ||', '||quote_literal(value) ||'::xml))[1] As uri_org';
---    execute query INTO torg;
-    select getXMLValue(tBody, value) into torg;
-    query =  'select id from shu_orgs where uri = trim(' || asString(torg, true)||')';
-    execute query into torg;
-    insert into AAA (id_attr, a_val) values (226, torg);
-
--- get post uri
-    tbody :=  '/msg/passport/msg_created/by_post_unit/with_uri/text()';
---    query := 'SELECT (xpath('||quote_literal(tbody) ||', '||quote_literal(value) ||'::xml))[1] As uri_post';
---    execute query INTO tpost;
-    select getXMLValue(tBody, value) into tpost;
-    query =  'select id from shu_dls where uri = trim(' || asString(tpost, true)||')';
-    execute query into tpost;
-    insert into AAA (id_attr, a_val) values (228, tpost);
-
-
--- get rank id
-    tbody :=  '/msg/passport/msg_created/by_post_unit/with_rank_id/text()';
---    query := 'SELECT (xpath('||quote_literal(tbody) ||', '||quote_literal(value) ||'::xml))[1] As rank_id';
---    execute query INTO trank;
-    select getXMLValue(tBody, value) into trank;
-    query =  'select id from ranks where code = trim(' || asString(trank, true)||')';
-    execute query into trank;
-    insert into AAA (id_attr, a_val) values (20, trank);
-
--- get domain
-    tbody :=  '/msg/passport/msg_created/as_having/community_domain_membership/text()';
- --   query := 'SELECT (xpath('||quote_literal(tbody) ||', '||quote_literal(value) ||'::xml))[1] As domain';
- --   execute query INTO trank;
-    select getXMLValue(tBody, value) into trank;
-    query =  'select id from shu_domains where code = trim(' || asString(trank, true)||')';
-    execute query into trank;
-    insert into AAA (id_attr, a_val) values (230, trank);
-
-
--- priority
-
-    tbody :=  '/msg/passport/msg_created/as_having/delivery_priority/text()';
---    query := 'SELECT (xpath('||quote_literal(tbody) ||', '||quote_literal(value) ||'::xml))[1] As prior';
---    execute query INTO deliveryPriority;
-    select getXMLValue(tBody, value) into deliveryPriority;
-    insert into AAA (id_attr, a_val) values (236, deliveryPriority);
-
-
--- name and text 
-    tbody :=  '/msg/passport/msg_created/as_having/unformalized_document_specific_data_where/doc_name/text()';
---    query := 'SELECT trim((xpath('||quote_literal(tbody) ||', '||quote_literal(value) ||'::xml))[1]::varchar)';
---    execute query INTO tcode;
-    select getXMLValue(tBody, value) into tcode;
-    insert into AAA (id_attr, a_val) values (2, tcode);
-
-    tbody :=  '/msg/body/unformalized_document_data/human_readable_text/text()';
---    query := 'SELECT trim((xpath('||quote_literal(tbody) ||', '||quote_literal(value) ||'::xml))[1]::varchar)';
---    execute query INTO trank;
-    select getXMLValue(tBody, value) into trank;
-    insert into AAA (id_attr, a_val) values (237, trank);
-
-
--- get name post
-    tbody :=  '/msg/passport/msg_created/by_post_unit/with_name/text()';
---    query := 'SELECT trim((xpath('||quote_literal(tbody) ||', ' || quote_literal(value) ||'::xml))[1]::varchar)';
---    execute query INTO tpostname;
-    select getXMLValue(tBody, value) into tpostName;
-    insert into AAA (id_attr, a_val) values (25, tpostname);
-
-
-    insert into AAA (id_attr, a_val) values (232,'ufdoc');
-
-
     isFound = false;
 
     create temp table XXXX (tag_name varchar, the_name varchar, the_type varchar, the_value varchar);
@@ -210,7 +86,9 @@ begin
     drop table XXXX;
 
     if(isFound = false) then
-        idCat = 168;
+        raise exception 'Income message does not have any attributes! Cannot create from it new IO!';
+        drop table AAA;
+        return false;
     else
         select ac.id_io_category into idCat
         from 
@@ -220,12 +98,13 @@ begin
             ac.arr = (select array_agg(id_attr) from AAA);
        
         if(idCat isnull) then
-            select cInsert('Новый входящий документ от 7т1 ' || tcode, NULL, NULL, 3, NULL, true, NULL, false, 1) into idCat;
+            select cInsert('New income message from JMS', NULL, NULL, 3, NULL, true, NULL, false, 1) into idCat;
             if(idCat isnull or idCat <= 0) then
                 drop table AAA;
                 raise exception 'Error! Cannot create category for new IO!';
                 return false;
             end if;
+            update io_categories set name = name || ' - ' || id where id = idCat;
 
             insert into attrs_categories (id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) select idCat, id_attr, NULL, false, false from AAA;
             --perform cSetGlobal(idCat);
@@ -234,7 +113,7 @@ begin
 
 
     if (tcode is null) then
-        tcode := 'Новый входящий документ';
+        tcode := 'New income message from JMS';
     end if;
 
     ioName := tcode;
@@ -250,7 +129,8 @@ begin
     for r in
         select id_attr, a_val from AAA
     loop
-        select into idAttrRes ioInsertAttr (idObject, r.id_attr, quote_literal (r.a_val)::varchar, current_timestamp::timestamp without time zone, null::timestamp without time zone, null::int4, null::int4, null::varchar);
+        --select into idAttrRes ioInsertAttr (idObject, r.id_attr, quote_literal (r.a_val)::varchar, current_timestamp::timestamp without time zone, null::timestamp without time zone, null::int4, null::int4, null::varchar);
+        select into idAttrRes ioInsertAttr (idObject, r.id_attr, r.a_val, current_timestamp::timestamp without time zone, null::timestamp without time zone, null::int4, null::int4, null::varchar);        
         if (idAttrRes is null or idAttrRes < 0) then
             drop table AAA;
             return null;
@@ -260,38 +140,14 @@ begin
     drop table AAA;
 
 --
---Здесь необходимо вставить код, создающий прикрепленные файлы при их наличии
+--Attached files added here
 --
 
     select writeIOFiles (idObject, value) into idUrl;
-/*    tbody := '/msg/passport/msg_created/as_having/attached_files_set/attached_file[@number=0]/text()';
-    query := 'SELECT (xpath('|| quote_literal(tbody) ||', '|| quote_literal(value) ||'::xml))[1] As attachments_count';
-    execute query into attCnt;
-    raise warning 'number of attachments is %', attCnt;
-    if (attCnt is not null and attCnt > 0) then
-        for i in 1..attCnt
-        loop
-            tbody := '/msg/body/attached_files_set where_files_amnt="' || attCnt || '"/attached_file[@number=' || i || ']/![CDATA[/text()';
-            query := 'SELECT (xpath('|| quote_literal(tbody) ||', '|| quote_literal(value) ||'::xml))[' || i || '] As attachments_body';
-            execute query into attachments;
-            fData_enc := attachments;
-            select into fData decode (fData_enc, 'base64');
-            select into idUrl rinserturl ('file_' || idObject || '_' || i, 'not assigned', 9, NULL::varchar);
-            if (idUrl is not null and idUrl>0) then
-                select into ioUrl ioinserturl (idObject, idUrl, 'file_' || idObject || '_' || i);
-                if (ioUrl is not null and ioUrl > 0) then
-                    select rWriteFile (idUrl, fData, 0);
-                end if;
-            end if;
-        end loop;
 
-
-    end if;
-*/
 --
---Далее идет код, добавляющий запись в журнал сообщений
+--insert into message_journal
 --
-
 
     tbody :=  '/msg/passport/msg_created/to_be_delivered_to_addressees_where/addressee[@number=1]/has_uri/text()';
     select getXMLValue(tBody, value) into addresseeURI;
@@ -329,6 +185,9 @@ begin
 --    end if;
 --    execute query INTO msgBody;
     select getXMLValue(tBody, value) into msgBody;
+    if(msgBody isnull) then
+        msgBody := 'new income message';
+    end if;
 
 
     if(idDlSender isnull or idDlReceiver isnull) then
