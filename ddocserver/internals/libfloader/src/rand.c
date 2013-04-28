@@ -83,9 +83,26 @@ Datum saverand(PG_FUNCTION_ARGS)
     }
 
     char* r_sql = (char *) palloc (strlen ("insert into rand_state (state) values (") + sizeof (gsl_rng) + 2);
-    sprintf (r_sql, "insert into rand_state (state_rand) values ('%s');", (char *)(randBuf));
+    sprintf (r_sql, "insert into rand_state (state_rand) values ('%p');", randBuf);
     SPI_execute (r_sql, false, 1);
     SPI_finish();
 
     PG_RETURN_INT32(res);
+}
+
+Datum loadrand(PG_FUNCTION_ARGS)
+{
+    if (!r)
+        r = gsl_rng_alloc (gsl_rng_default);
+    int spi_res = SPI_connect();
+    if(spi_res != SPI_OK_CONNECT)
+    {
+        elog(ERROR, "Cannot connect via SPI");
+        PG_RETURN_INT32(-1);
+    }
+    char * r_sql = (char *) palloc(strlen ("select state_rand from rand_state rs where rs.id=(select max(id) from rand_state);"));
+    sprintf (r_sql, "select state_rand from rand_state rs where rs.id=(select max(id) from rand_state);");
+    SPI_execute (r_sql, false, 1);
+    SPI_finish();
+    PG_RETURN_INT32(0);
 }

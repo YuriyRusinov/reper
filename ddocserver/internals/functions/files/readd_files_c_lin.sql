@@ -40,3 +40,6 @@ create or replace function exprand (float8) returns float8
 
 create or replace function saverand() returns int4
     as '$libdir/libfloader.so', 'saverand' language 'c' strict security definer;
+
+create or replace function loadrand() returns int4
+    as '$libdir/libfloader.so', 'saverand' language 'c' strict security definer;
