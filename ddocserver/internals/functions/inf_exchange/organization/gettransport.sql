@@ -4,7 +4,8 @@ create type h_transports as (unique_id varchar,
                              id_transport int4,
                              transport_name varchar,
                              local_address varchar,
-                             is_active boolean);
+                             is_active boolean,
+                             local_port int4);
 
 create or replace function getTransportAddresses (varchar) returns setof h_transports as
 $BODY$
@@ -24,7 +25,8 @@ begin
                t.id,
                t.name,
                otr.address,
-               (t.is_active and otr.is_active) as tis_active
+               (t.is_active and otr.is_active) as tis_active,
+               otr.port
         from
             transport t left join (organization_transport otr
             inner join organization o on 

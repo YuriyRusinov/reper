@@ -27,7 +27,8 @@ create type h_get_out_cmds as (full_address varchar,
                                receive_datetime timestamp,
                                accepted_datetime timestamp,
                                urgency_level_code varchar,
-                               id_organization int4
+                               id_organization int4,
+                               port int4
                                );
 
 create or replace function uGetOutCmds() returns setof h_get_out_cmds as
@@ -46,10 +47,10 @@ begin
         select 
 --            (uGetAddress(o.address, 0) || uGetAddress(p2.address, 1)) as full_address,
             (case 
-                  when cmd.id_jr_state = 7 then uGetAddressEx(cmd.id_dl_from, idTransport) 
+                  when cmd.id_jr_state = 7 then (select address from uGetAddressEx(cmd.id_dl_from, idTransport))
                   --when cmd.id_jr_state = 1 and isLocalDl(cmd.id_dl_executor) = FALSE then (uGetAddressEx(cmd.id_dl_executor, idTransport) )
                   --when cmd.id_jr_state = 1 and isLocalDl(cmd.id_dl_to) = FALSE then (uGetAddressEx(cmd.id_dl_to, idTransport) )
-                  else (uGetAddressEx(cmd.id_dl_executor, idTransport) ) 
+                  else (select address from uGetAddressEx(cmd.id_dl_executor, idTransport) ) 
             end ) as full_address,
             cmd.id,
             cmd.id_dl_from,
@@ -81,7 +82,13 @@ begin
             (case 
                  when cmd.id_jr_state = 7 then u1.id_organization
                  else u2.id_organization 
-            end) as id_organization
+            end) as id_organization,
+            (case 
+                  when cmd.id_jr_state = 7 then (select port from uGetAddressEx(cmd.id_dl_from, idTransport))
+                  --when cmd.id_jr_state = 1 and isLocalDl(cmd.id_dl_executor) = FALSE then (uGetAddressEx(cmd.id_dl_executor, idTransport) )
+                  --when cmd.id_jr_state = 1 and isLocalDl(cmd.id_dl_to) = FALSE then (uGetAddressEx(cmd.id_dl_to, idTransport) )
+                  else (select port from uGetAddressEx(cmd.id_dl_executor, idTransport) ) 
+            end ) as port
             
         from
             command_journal cmd,
@@ -135,10 +142,10 @@ begin
         select 
 --            (uGetAddress(o.address, 0) || uGetAddress(p2.address, 1)) as full_address,
             (case 
-                  when cmd.id_jr_state = 7 then uGetAddressEx(cmd.id_dl_from, idTransport) 
+                  when cmd.id_jr_state = 7 then (select address from uGetAddressEx(cmd.id_dl_from, idTransport))
                   --when cmd.id_jr_state = 1 and isLocalDl(cmd.id_dl_executor) = FALSE then (uGetAddressEx(cmd.id_dl_executor, idTransport) )
                   --when cmd.id_jr_state = 1 and isLocalDl(cmd.id_dl_to) = FALSE then (uGetAddressEx(cmd.id_dl_to, idTransport) )
-                  else (uGetAddressEx(cmd.id_dl_to, idTransport) ) 
+                  else (select address from uGetAddressEx(cmd.id_dl_to, idTransport) ) 
             end ) as full_address,
             cmd.id,
             cmd.id_dl_from,
@@ -170,7 +177,13 @@ begin
             (case 
                  when cmd.id_jr_state = 7 then u1.id_organization
                  else u3.id_organization 
-            end) as id_organization
+            end) as id_organization,
+            (case 
+                  when cmd.id_jr_state = 7 then (select port from uGetAddressEx(cmd.id_dl_from, idTransport))
+                  --when cmd.id_jr_state = 1 and isLocalDl(cmd.id_dl_executor) = FALSE then (uGetAddressEx(cmd.id_dl_executor, idTransport) )
+                  --when cmd.id_jr_state = 1 and isLocalDl(cmd.id_dl_to) = FALSE then (uGetAddressEx(cmd.id_dl_to, idTransport) )
+                  else (select port from uGetAddressEx(cmd.id_dl_to, idTransport) ) 
+            end ) as port
             
         from
             command_journal cmd,
@@ -225,7 +238,7 @@ begin
         select 
 --            (uGetAddress(o.address, 0) || uGetAddress(p2.address, 1)) as full_address,
             --(uGetAddressEx(cmd.id_dl_executor, idTransport)) as full_address,
-            (case when id_jr_state = 7 then uGetAddressEx(cmd.id_dl_from, idTransport) else uGetAddressEx(cmd.id_dl_executor, idTransport) end) as full_address,
+            (case when id_jr_state = 7 then (select address from uGetAddressEx(cmd.id_dl_from, idTransport)) else (select address from uGetAddressEx(cmd.id_dl_executor, idTransport)) end) as full_address,
             cmd.id,
             cmd.id_dl_from,
             p1.name,
@@ -256,7 +269,9 @@ begin
             (case 
                  when cmd.id_jr_state = 7 then u1.id_organization
                  else u2.id_organization 
-            end) as id_organization
+            end) as id_organization,
+            (case when id_jr_state = 7 then (select port from uGetAddressEx(cmd.id_dl_from, idTransport)) else (select port from uGetAddressEx(cmd.id_dl_executor, idTransport)) end) as port
+
         from
             command_journal cmd,
             "position" p1,

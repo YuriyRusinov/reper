@@ -8,7 +8,8 @@ create type h_get_out_objects as( full_address varchar,
                                   command_extra_id int4,
                                   id_dl_executor int4,
                                   control_journal_id int4,
-                                  id_organization int4  
+                                  id_organization int4,
+                                  port int4  
                                   );
 
 create or replace function uGetOutObjects() returns setof h_get_out_objects as
@@ -26,7 +27,7 @@ begin
     for r in
         select 
 --            (uGetAddress(o.address, 0) || uGetAddress(p1.address, 1))::varchar as full_address,
-            (uGetAddressEx(cmd.id_dl_to, idTransport)) as full_address,
+            (select address from uGetAddressEx(cmd.id_dl_to, idTransport)) as full_address,
             tcj.id_io_object,
             tcj.insert_time,
             tcj.planned_exec,
@@ -35,7 +36,9 @@ begin
             cmd.extra_id,
             cmd.id_dl_executor,
             tcj.id,
-            u.id_organization
+            u.id_organization,
+            (select port from uGetAddressEx(cmd.id_dl_to, idTransport)) as port
+
         from 
             command_journal cmd,
             tsd_control_journal tcj,

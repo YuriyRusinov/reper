@@ -1140,6 +1140,9 @@ insert into attributes (unique_id, id, id_a_type, code, name, title, table_name,
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-343', 343, 2, 'id_auto_state_attr', 'јвтовозврат состо€ни€ при изменении атрибутов', 'јвтовозврат состо€ни€ при изменении атрибутов', 'io_states', 'name', 150, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-344', 344, 2, 'id_auto_state_ind', 'јвтовозврат состо€ни€ при изменении показателей', 'јвтовозврат состо€ни€ при изменении показателей', 'io_states', 'name', 150, TRUE);
 
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-345', 345, 8, 'local_port', 'Ћокальный порт', 'Ћокальный порт транспорта', NULL, NULL, 150, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-346', 346, 8, 'port', 'ѕорт транспорта', 'ѕорт транспорта', NULL, NULL, 150, TRUE);
+
 SELECT pg_catalog.setval('attributes_id_seq', 1000, true); --все пользовательские атрибуты будут начинатьс€ с номера 1001
                                                           --это сделано дл€ того, чтобы оставить резерв дл€ системных атрибутов
 
@@ -1467,6 +1470,7 @@ insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (219, 67, 1, NULL, true, true); --id
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (220, 67, 2, NULL, true, false); --name
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (221, 67, 95, NULL, true, false); --local_address
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (603, 67, 345, NULL, false, false); --local_port
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (222, 67, 93, 'true', true, false); --is_active
 
 --таблица адресов организаций
@@ -1474,6 +1478,7 @@ insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (224, 69, 74, NULL, true, false); --id_organization
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (225, 69, 94, NULL, true, false); --id_transport
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (226, 69, 28, NULL, true, false); --address
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (604, 69, 346, NULL, false, false); --port
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (227, 69, 93, 'true', true, false); --is_active
 
 --таблица шаблонов отчетов
@@ -2194,7 +2199,8 @@ insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is
 --600 используетс€ в справочнике ∆÷
 --601 используетс€ в справочнике ∆÷
 --602 используетс€ в справочнике потоков сообщений
-
+--603 используетс€ в справочнике транспортов межобъектового обмена
+--604 используетс€ в справочнике адресов организаций
 
 
 

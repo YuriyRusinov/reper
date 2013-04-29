@@ -2,7 +2,10 @@ create or replace function setOrgAsCompleted() returns trigger as
 $BODY$
 declare
    lAddress varchar;
+   lPort int4;
    isMain int4;
+
+   r record;
 begin
 
     --if syncronization is stopped
@@ -15,8 +18,13 @@ begin
         return new;
     end if;
     
-    select t.local_address into lAddress from transport t where t.id = new.id_transport;
-    if(lAddress is not null and lAddress = new.address) then
+    for r in select t.local_address, t.local_port from transport t where t.id = new.id_transport
+    loop
+        lAddress = r.local_address;
+        lPort = r.local_port;
+    end loop;
+    
+    if(lAddress is not null and lAddress = new.address and ( ( lPort isnull and new.port isnull) or (lPort = new.port) ) ) then
         select f_is_table_exist('local_org_table', NULL) into isMain;
         if(isMain <> 1) then
             create table local_org_table (id int4, unique_name varchar);

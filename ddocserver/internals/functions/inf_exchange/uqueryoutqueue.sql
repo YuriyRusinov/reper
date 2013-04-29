@@ -10,7 +10,8 @@ create type h_out_queue as(full_address varchar,
                            entity_type int4, 
                            sync_type int4, 
                            sync_result int4,
-                           receiver_uid varchar);--receiver organization email_prefix
+                           receiver_uid varchar, --receiver organization email_prefix
+                           port int4); --port of the transport (for IP-transports)
 
 create or replace function uQueryOutQueue() returns setof h_out_queue as
 $BODY$
@@ -26,7 +27,7 @@ begin
 
     for r in 
         select             
-            (uGetAddressExOrg(q.id_organization, idTransport)) as full_address,
+            (select address from uGetAddressExOrg(q.id_organization, idTransport)) as full_address,
             q.id,
             q.id_organization,
             q.id_entity,
@@ -36,7 +37,9 @@ begin
             q.entity_type,
             q.sync_type,
             q.sync_result,
-            o.email_prefix
+            o.email_prefix,
+            (select port from uGetAddressExOrg(q.id_organization, idTransport)) as port
+
         from
             out_sync_queue q,
             organization o

@@ -6,7 +6,8 @@ create type h_organization_desc_ext as(id_organization int4,
                            the_uid varchar,
                            map_symbol varchar,
                            tree_symbol varchar,
-                           mode_name varchar
+                           mode_name varchar,
+                           port int4
                            );
 
 create or replace function getMyOrganizationExt() returns setof h_organization_desc_ext as
@@ -29,11 +30,12 @@ begin
                 o.email_prefix, 
                 o.map_symbol, 
                 o.tree_symbol, 
-                wm.name
+                wm.name,
+                ot.port
             from
                 organization o inner join
                 organization_transport ot on (o.id = ot.id_organization) inner join
-                transport t on (ot.id_transport = t.id and t.local_address = ot.address) inner join
+                transport t on (ot.id_transport = t.id and t.local_address = ot.address   and ( (ot.port isnull and t.local_port isnull) or (ot.port = t.local_port) ) ) inner join
                 work_mode wm on (wm.id = o.id_curr_mode)
         loop
             return next r;
@@ -51,7 +53,8 @@ begin
             o.email_prefix, 
             o.map_symbol, 
             o.tree_symbol, 
-            wm.name
+            wm.name,
+            ot.port
         from 
             organization o inner join  
             organization_transport ot on (o.id = ot.id_organization) inner join

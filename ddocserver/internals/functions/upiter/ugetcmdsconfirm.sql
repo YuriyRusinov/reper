@@ -5,7 +5,8 @@ create type h_get_cmd_conf as(full_address varchar,
                               uid varchar, 
                               id_jr_state int4, 
                               accepted_datetime timestamp, 
-                              receive_datetime timestamp);
+                              receive_datetime timestamp,
+                              port int4);
 
 create or replace function uGetCmdsConfirm() returns setof h_get_cmd_conf as
 $BODY$
@@ -22,17 +23,16 @@ begin
     for r in
         select 
             --(uGetAddress(o.address, 0) || uGetAddress(p1.address, 1)) as full_address,
-            (uGetAddressEx(cmd.id_dl_from, idTransport)) as full_address,
+            (select address from uGetAddressEx(cmd.id_dl_from, idTransport)) as full_address,
             cmd.id,
             cmd.unique_id,
             cmd.id_jr_state,
             cmd.accepted_datetime,
-            cmd.receive_datetime
+            cmd.receive_datetime,
+            (select port from uGetAddressEx(cmd.id_dl_from, idTransport)) as port
+
         from
             command_journal cmd,
-            --"position" p1,
-            --units u,
-            --organization o,
             cmd_confirmations cfm
         where
             cfm.id_cmd = cmd.id
@@ -64,17 +64,16 @@ begin
     for r in
         select 
             --(uGetAddress(o.address, 0) || uGetAddress(p1.address, 1)) as full_address,
-            (uGetAddressEx(cmd.id_dl_to, idTransport)) as full_address,
+            (select address from uGetAddressEx(cmd.id_dl_to, idTransport)) as full_address,
             cmd.id,
             cmd.unique_id,
             cmd.id_jr_state,
             cmd.accepted_datetime,
-            cmd.receive_datetime
+            cmd.receive_datetime,
+            (select port from uGetAddressEx(cmd.id_dl_to, idTransport)) as port
+
         from
             command_journal cmd,
---            "position" p1,
---            units u,
---            organization o,
             cmd_confirmations cfm
         where
             cfm.id_cmd = cmd.id

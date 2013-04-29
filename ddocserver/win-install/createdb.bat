@@ -30,7 +30,7 @@ copy /Y functions\files\readd_files_c_win.sql functions\files\readd_files_c.sql
 
 %LINTER_ROOT%\bin\psql.exe -h %HOST% -p %LINTER_PORT% -d %BASE% -c "select setkkssitoversion('DynamicDocs Server version %VERSION%', '%VERSION%')" -t %USER%
 rem %LINTER_ROOT%\bin\psql.exe -h %HOST% -p %LINTER_PORT% -d %BASE% -c "select setfilearchivepath('%PGDATA_DIR%/%FILE_ARCH%')" -t %USER%
-%LINTER_ROOT%\bin\psql.exe -h %HOST% -p %LINTER_PORT% -d %BASE% -c "select usetlocaladdress('%LOCAL_ADDRESS%')" -t %USER% 
+%LINTER_ROOT%\bin\psql.exe -h %HOST% -p %LINTER_PORT% -d %BASE% -c "select usetlocaladdress('%LOCAL_ADDRESS%', 0)" -t %USER% 
 %LINTER_ROOT%\bin\psql.exe -h %HOST% -p %LINTER_PORT% -d %BASE% -c "select startsync()" -t %USER%
 %LINTER_ROOT%\bin\psql.exe -h %HOST% -p %LINTER_PORT% -d %BASE% -c "select setorgasmain(%IS_MAIN_ORG%)" -t %USER%
 

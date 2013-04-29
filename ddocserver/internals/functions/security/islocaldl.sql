@@ -28,7 +28,11 @@ begin
             and ot.id_transport = t.id
             and ot.is_active = TRUE
             and (t.local_address = ot.address
-                 or ot.address = 'local');
+                 or ot.address = 'local')
+            and (
+                  (ot.port isnull and t.local_port isnull)
+                  or (ot.port = t.local_port)
+                );
 
         
     if(cnt > 0) then

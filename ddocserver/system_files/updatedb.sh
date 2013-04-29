@@ -49,7 +49,7 @@ COMMAND_OK=1
 
 $LINTER_PREFIX/bin/psql -h $DB_HOST -p $DB_PORT -d $BASE -c "select setkkssitoversion('DynamicDocs Server version $VERSION', '$VERSION')" -t $USER > /dev/null &&
 #$LINTER_PREFIX/bin/psql -h $DB_HOST -p $DB_PORT -d $BASE -c "select setfilearchivepath('$IO_FILES')" -t $USER > /dev/null &&
-#$LINTER_PREFIX/bin/psql -h $DB_HOST -p $DB_PORT -d $BASE -c "select usetlocaladdress('$LOCAL_ADDRESS')" -t $USER > /dev/null &&
+#$LINTER_PREFIX/bin/psql -h $DB_HOST -p $DB_PORT -d $BASE -c "select usetlocaladdress('$LOCAL_ADDRESS', 0)" -t $USER > /dev/null &&
 #$LINTER_PREFIX/bin/psql -h $DB_HOST -p $DB_PORT -d $BASE -c "select startsync()" -t $USER > /dev/null &&
 
 cd ../

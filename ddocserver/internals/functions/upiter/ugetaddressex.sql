@@ -1,28 +1,35 @@
-create or replace function uGetAddressEx() returns varchar as 
+select f_safe_drop_type('h_get_address_ex');
+create type h_get_address_ex as (address varchar, port int4);
+
+create or replace function uGetAddressEx() returns setof h_get_address_ex as 
 $BODY$
 declare
-    addr varchar;
+    r h_get_address_ex%rowtype;
 begin
 
-    addr := uGetAddressEx(getCurrentDl());
+    for r in select * from uGetAddressEx(getCurrentDl())
+    loop
+        return next r;
+    end loop;
 
-    return addr;
+    return;
 end
 $BODY$
 language 'plpgsql';
 
-create or replace function uGetAddressEx(int4) returns varchar as
+
+create or replace function uGetAddressEx(int4) returns setof h_get_address_ex as
 $BODY$
 declare
+    r h_get_address_ex%rowtype;
     idDl alias for $1;
 
-    addr varchar;
-    r record;
 begin
 
     for r in
        select 
-            ot.address 
+            ot.address,
+            ot.port
         from 
             transport t,
             organization_transport ot,
@@ -38,74 +45,76 @@ begin
             and ot.id_transport = t.id
             and t.is_active = TRUE
     loop
-        return r.address;
+        return next r;
     end loop;
 
-    return addr;
+    return;
 
 end
 $BODY$
 language 'plpgsql';
 
-create or replace function uGetAddressEx(int4, int4) returns varchar as 
+
+create or replace function uGetAddressEx(int4, int4) returns setof h_get_address_ex as 
 $BODY$
 declare
     idDl alias for $1;
     idTransport alias for $2;
 
-    addr varchar;
-    r record;
+    r h_get_address_ex%rowtype;
 begin
 
-    select 
-        ot.address into addr
-    from 
-        transport t,
-        organization_transport ot,
-        organization o,
-        units u,
-        position p
-    where 
-        p.id = idDl 
-        and p.id_unit = u.id
-        and u.id_organization = o.id
-        and o.id = ot.id_organization
-        and ot.id_transport = idTransport
-        and ot.is_active = TRUE
-        and ot.id_transport = t.id
-        and t.is_active = TRUE;
+    for r  in
+        select 
+            ot.address,
+            ot.port
+        from 
+            transport t,
+            organization_transport ot,
+            organization o,
+            units u,
+            position p
+        where 
+            p.id = idDl 
+            and p.id_unit = u.id
+            and u.id_organization = o.id
+            and o.id = ot.id_organization
+            and ot.id_transport = idTransport
+            and ot.is_active = TRUE
+            and ot.id_transport = t.id
+            and t.is_active = TRUE
+    loop
+        return next r;
+    end loop;
 
-    if(addr is not null) then
-        return addr;
-    end if;
-
-    return addr;
+    return;
 
 end
 $BODY$
 language 'plpgsql';
 
-create or replace function uGetAddressExOrg(int4, int4) returns varchar as
+
+create or replace function uGetAddressExOrg(int4, int4) returns setof h_get_address_ex as
 $BODY$
 declare
     idOrg alias for $1;
     idTransport alias for $2;
 
-    addr varchar;
-    r record;
+    r h_get_address_ex%rowtype;
 begin
 
-    select 
-        ot.address into addr
-    from 
-        transport t inner join
-        organization_transport ot on (ot.id_transport = t.id and ot.is_active and t.is_active and ot.id_transport = idTransport) inner join organization o on (ot.id_organization=o.id and o.id = idOrg);
+    for r in 
+        select 
+            ot.address,
+            ot.port
+        from 
+            transport t inner join
+            organization_transport ot on (ot.id_transport = t.id and ot.is_active and t.is_active and ot.id_transport = idTransport) inner join organization o on (ot.id_organization=o.id and o.id = idOrg)
+    loop
+        return next r;
+    end loop;
 
-    if(addr is not null) then
-        return addr;
-    end if;
-
-    return addr;
+    return;
 
 end
 $BODY$

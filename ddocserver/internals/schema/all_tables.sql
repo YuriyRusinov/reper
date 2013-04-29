@@ -1,8 +1,7 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     27.04.2013 10:12:08                          */
+/* Created on:     29.04.2013 18:55:58                          */
 /*==============================================================*/
-
 
 /*==============================================================*/
 /* Table: root_table                                            */
@@ -23,6 +22,7 @@ select setMacToNULL('root_table');
 create unique index Index_1 on root_table using BTREE (
 unique_id
 );
+
 
 /*==============================================================*/
 /* User: public                                                 */
@@ -2704,6 +2704,7 @@ create table organization_transport (
    id_organization      INT4                 not null,
    id_transport         INT4                 not null,
    address              VARCHAR              not null,
+   port                 INT4                 null,
    is_active            bool                 not null default TRUE,
    constraint PK_ORGANIZATION_TRANSPORT primary key (id)
 )
@@ -2714,6 +2715,10 @@ comment on table organization_transport is
 
 comment on column organization_transport.address is
 'адрес организации в данном транспорте';
+
+comment on column organization_transport.port is
+'Порт транспортной задачи, которая обрабатывает БД данной организации.
+Порт используется только в IP-сетях, если используется транспорт http_connector';
 
 select setMacToNULL('organization_transport');
 select createTriggerUID('organization_transport');
@@ -3026,8 +3031,13 @@ create table queue_results (
    sync_result          INT4                 not null default 4,
    address              varchar              not null,
    is_read              INT4                 not null default 1,
+   port                 INT4                 null,
    constraint PK_QUEUE_RESULTS primary key (id)
-);
+)
+inherits (root_table);
+
+select setMacToNULL('queue_results');
+select createTriggerUID('queue_results');
 
 /*==============================================================*/
 /* Table: ranks                                                 */
@@ -3441,118 +3451,6 @@ select setMacToNULL('shape_types');
 select createTriggerUID('shape_types');
 
 /*==============================================================*/
-/* Table: shu_acs                                               */
-/*==============================================================*/
-create table shu_acs (
-   id                   SERIAL               not null,
-   code                 VARCHAR              not null,
-   name                 VARCHAR              not null,
-   uri                  VARCHAR              not null,
-   constraint PK_SHU_ACS primary key (id)
-);
-
-comment on table shu_acs is
-'Реестр цнии эису АСУ';
-
-/*==============================================================*/
-/* Table: shu_addressee                                         */
-/*==============================================================*/
-create table shu_addressee (
-   id                   SERIAL               not null,
-   id_acs               INT4                 not null,
-   code                 VARCHAR              not null,
-   name                 VARCHAR              not null,
-   type                 VARCHAR              not null,
-   value                VARCHAR              not null,
-   uri                  VARCHAR              not null,
-   constraint PK_SHU_ADDRESSEE primary key (id)
-);
-
-comment on table shu_addressee is
-'реестр цнии эису адресов сопрягаемых систем';
-
-/*==============================================================*/
-/* Table: shu_chksum                                            */
-/*==============================================================*/
-create table shu_chksum (
-   id                   SERIAL               not null,
-   code                 VARCHAR              not null,
-   name                 VARCHAR              not null,
-   constraint PK_SHU_CHKSUM primary key (id)
-);
-
-comment on table shu_chksum is
-'реестр цнии эису методов подсчета контрольной суммы файла';
-
-/*==============================================================*/
-/* Table: shu_dls                                               */
-/*==============================================================*/
-create table shu_dls (
-   id                   SERIAL               not null,
-   name                 VARCHAR              not null,
-   uri                  VARCHAR              not null,
-   id_acs               INT4                 not null,
-   id_org               INT4                 not null,
-   id_pos               INT4                 not null,
-   constraint PK_SHU_DLS primary key (id)
-);
-
-comment on table shu_dls is
-'реестр цнии эису должностных лиц';
-
-/*==============================================================*/
-/* Table: shu_dls_position                                      */
-/*==============================================================*/
-create table shu_dls_position (
-   id_shu_dls           INT4                 not null,
-   id_position          INT4                 not null,
-   constraint PK_SHU_DLS_POSITION primary key (id_shu_dls, id_position)
-);
-
-comment on table shu_dls_position is
-'Соответствие должностных лиц в системе DynamicDocs и должностных лиц в системе Заря22';
-
-/*==============================================================*/
-/* Table: shu_domains                                           */
-/*==============================================================*/
-create table shu_domains (
-   id                   SERIAL               not null,
-   code                 VARCHAR              not null,
-   name                 VARCHAR              not null,
-   constraint PK_SHU_DOMAINS primary key (id)
-);
-
-comment on table shu_domains is
-'Реестр ЦНИИ ЭИСУ предметных областей';
-
-/*==============================================================*/
-/* Table: shu_orgs                                              */
-/*==============================================================*/
-create table shu_orgs (
-   id                   SERIAL               not null,
-   code                 VARCHAR              not null,
-   name                 VARCHAR              not null,
-   uri                  VARCHAR              not null,
-   constraint PK_SHU_ORGS primary key (id)
-);
-
-comment on table shu_orgs is
-'реестр цнии эису организационных единиц';
-
-/*==============================================================*/
-/* Table: shu_positions                                         */
-/*==============================================================*/
-create table shu_positions (
-   id                   SERIAL               not null,
-   code                 VARCHAR              not null,
-   name                 VARCHAR              not null,
-   constraint PK_SHU_POSITIONS primary key (id)
-);
-
-comment on table shu_positions is
-'реестр цнии эису должностных  единиц';
-
-/*==============================================================*/
 /* Table: state_crosses                                         */
 /*==============================================================*/
 create table state_crosses (
@@ -3635,6 +3533,7 @@ create table transport (
    id                   SERIAL not null,
    name                 VARCHAR              not null,
    local_address        VARCHAR              not null,
+   local_port           INT4                 null,
    is_active            bool                 not null default TRUE,
    constraint PK_TRANSPORT primary key (id)
 )
@@ -3645,6 +3544,10 @@ comment on table transport is
 
 comment on column transport.local_address is
 'Локальный адрес данного транспорта';
+
+comment on column transport.local_port is
+'Порт транспортной задачи, которая обрабатывает БД локальной  организации.
+Порт используется только в IP-сетях, если используется транспорт http_connector';
 
 select setMacToNULL('transport');
 select createTriggerUID('transport');
@@ -4916,7 +4819,7 @@ alter table message_streams
       on delete restrict on update restrict;
 
 alter table message_streams
-   add constraint FK_MESSAGE__REFERENCE_POSITION foreign key (id_dl_sender)
+   add constraint FK_MESSAGE__REF_POS_SENDER foreign key (id_dl_sender)
       references "position" (id)
       on delete restrict on update restrict;
 
@@ -5158,36 +5061,6 @@ alter table shape_segments
 alter table shape_segments
    add constraint FK_SHAPE_SE_REFERENCE_ELEMENT_ foreign key (id_element_shape)
       references element_shapes (id)
-      on delete restrict on update restrict;
-
-alter table shu_addressee
-   add constraint FK_SHU_ADDR_REFERENCE_SHU_ACS foreign key (id_acs)
-      references shu_acs (id)
-      on delete restrict on update restrict;
-
-alter table shu_dls
-   add constraint FK_SHU_DLS_REFERENCE_SHU_ACS foreign key (id_acs)
-      references shu_acs (id)
-      on delete restrict on update restrict;
-
-alter table shu_dls
-   add constraint FK_SHU_DLS_REFERENCE_SHU_ORGS foreign key (id_org)
-      references shu_orgs (id)
-      on delete restrict on update restrict;
-
-alter table shu_dls
-   add constraint FK_SHU_DLS_REFERENCE_SHU_POSI foreign key (id_pos)
-      references shu_positions (id)
-      on delete restrict on update restrict;
-
-alter table shu_dls_position
-   add constraint FK_SHU_DLS__REFERENCE_SHU_DLS foreign key (id_shu_dls)
-      references shu_dls (id)
-      on delete restrict on update restrict;
-
-alter table shu_dls_position
-   add constraint FK_SHU_DLS__REFERENCE_POSITION foreign key (id_position)
-      references "position" (id)
       on delete restrict on update restrict;
 
 alter table state_crosses

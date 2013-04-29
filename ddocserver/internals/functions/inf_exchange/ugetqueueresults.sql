@@ -4,7 +4,8 @@ create type h_out_queue_result as (full_address varchar,
                                    id_reception int4,
                                    id_transport int4,
                                    id_external_queue int4,
-                                   sync_result int4);
+                                   sync_result int4,
+                                   port int4);
 
 create or replace function uGetQueueResults() returns setof h_out_queue_result as
 $BODY$
@@ -23,7 +24,8 @@ begin
             qr.id,
             qr.id_transport,
             qr.id_external_queue,
-            qr.sync_result
+            qr.sync_result,
+            qr.port
         from
             queue_results as qr
         where

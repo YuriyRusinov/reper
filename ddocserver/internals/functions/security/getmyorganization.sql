@@ -3,7 +3,8 @@ select f_safe_drop_type('h_organization_desc');
 create type h_organization_desc as(id_organization int4,
                                    org_name varchar,
                                    address varchar,
-                                   the_uid varchar
+                                   the_uid varchar,
+                                   port int4
                                   );
 
 create or replace function getMyOrganization() returns setof h_organization_desc as
@@ -31,7 +32,8 @@ begin
                 o.id, 
                 o.name, 
                 ot.address, 
-                o.email_prefix
+                o.email_prefix,
+                ot.port
             from
                 organization o,
                 organization_transport ot,
@@ -40,6 +42,11 @@ begin
                 o.id = ot.id_organization
                 and ot.id_transport = t.id
                 and t.local_address = ot.address
+                and (
+                      (ot.port isnull and t.local_port isnull)
+                      or (ot.port = t.local_port)
+                    )
+
         loop
             return next r;
             return;
@@ -54,7 +61,8 @@ begin
             o.id, 
             o.name, 
             ot.address, 
-            o.email_prefix
+            o.email_prefix,
+            ot.port
         from 
             organization o, 
             organization_transport ot,

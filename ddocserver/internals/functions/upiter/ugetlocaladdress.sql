@@ -1,42 +1,44 @@
 --get local address for first active transport
-create or replace function uGetLocalAddress() returns varchar as
+select f_safe_drop_type('h_get_local_address');
+create type h_get_local_address as(address varchar, port int4);
+
+create or replace function uGetLocalAddress() returns setof h_get_local_address as
 $BODY$
 declare
-    addr varchar;
+    r h_get_local_address%rowtype;
     cnt int4;
 begin
 
-    select local_address into addr from transport where is_active = TRUE limit 1;
+    for r in 
+        select local_address, local_port from transport where is_active = TRUE limit 1
+    loop
+        return next r;
+    end loop;
     
-    if(addr isnull) then
-        raise notice 'Cannot get local address from table transport!';
-        return NULL;
-    end if;
-
-    return addr;
+    return;
 
 end
 $BODY$
 language 'plpgsql';
 
 --get local address for given transport
-create or replace function uGetLocalAddress(int4) returns varchar as
+
+create or replace function uGetLocalAddress(int4) returns setof h_get_local_address as
 $BODY$
 declare
     idTransport alias for $1;
 
-    addr varchar;
+    r h_get_local_address%rowtype;
     cnt int4;
 begin
 
-    select local_address into addr from transport where id = idTransport;
+    for r in 
+        select local_address, local_port from transport where id = idTransport
+    loop
+        return next r;
+    end loop;
     
-    if(addr isnull) then
-        raise notice 'Cannot get local address for given transport from table transport!';
-        return NULL;
-    end if;
-
-    return addr;
+    return;
 
 end
 $BODY$

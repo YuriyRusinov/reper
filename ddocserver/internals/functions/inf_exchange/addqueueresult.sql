@@ -1,9 +1,10 @@
-create or replace function addQueueResult (int4, int4, varchar) returns int4 as
+create or replace function addQueueResult (int4, int4, varchar, int4) returns int4 as
 $BODY$
 declare
     idQueue alias for $1;
     syncResult alias for $2;
     sentAddr alias for $3;
+    sentPort alias for $4;
 
     id int4;
     idTransport int4;
@@ -18,13 +19,18 @@ begin
         raise notice 'Current transport is not set';
         return -1;
     end if;
+
     query := 'select id from queue_results where id_external_queue = ' || idQueue || 'and address = ' || quote_literal (sentAddr);
+    if(sentPort is not null) then
+        query := ' and port = ' || sentPort;
+    end if;
 
     for r in
         execute query
     loop
         id = r.id;
     end loop;
+
     if (id is not null) then
         uquery := 'update queue_results set sync_result = ' || syncResult || 'where id = ' || r.id;
         execute uquery;
@@ -32,8 +38,9 @@ begin
     end if;
 
     select into id getNextSeq('queue_results', 'id');
-    query := 'insert into queue_results (id, id_transport, id_external_queue, sync_result, address) values (';
-    query := query || id || ',' || idTransport || ',' || idQueue || ',' || syncResult || ',' || quote_literal (sentAddr) || ');';
+
+    query := 'insert into queue_results (id, id_transport, id_external_queue, sync_result, address, port) values (';
+    query := query || id || ',' || idTransport || ',' || idQueue || ',' || syncResult || ',' || quote_literal (sentAddr) || ',' || sentPort || ');';
 
 --    raise notice 'query is %', query;
     execute query;

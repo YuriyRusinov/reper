@@ -17,7 +17,8 @@ create type h_get_out_msgs as (full_address varchar,
                                dl_sender_uid varchar,
                                dl_receiver_uid varchar,
                                urgency_level_code varchar,
-                               id_organization int4
+                               id_organization int4,
+                               port int4
                                );
 
 create or replace function uGetOutMsgs() returns setof h_get_out_msgs as
@@ -35,7 +36,7 @@ begin
     for r in
         select 
 --            (uGetAddress(o.address, 0) || uGetAddress(p2.address, 1)) as full_address,
-            (uGetAddressExOrg(u.id_organization, idTransport)) as full_address,
+            (select address from uGetAddressExOrg(u.id_organization, idTransport)) as full_address,
             msg.id,
             msg.id_dl_sender,
             p1.name,
@@ -53,7 +54,9 @@ begin
             p1.unique_id,
             p2.unique_id,
             ul.code,
-            u.id_organization --ИД организации, на которую отправляется сообщение (нужно для механизма пересылки больших файлов блоками)
+            u.id_organization, --ИД организации, на которую отправляется сообщение (нужно для механизма пересылки больших файлов блоками)
+            (select port from uGetAddressExOrg(u.id_organization, idTransport)) as port
+
         from
             message_journal msg,
             "position" p1,
@@ -94,7 +97,7 @@ begin
     for r in
         select 
 --            (uGetAddress(o.address, 0) || uGetAddress(p2.address, 1)) as full_address,
-            (uGetAddressExOrg(u.id_organization, idTransport)) as full_address,
+            (select address from uGetAddressExOrg(u.id_organization, idTransport)) as full_address,
             msg.id,
             msg.id_dl_sender,
             p1.name,
@@ -111,7 +114,10 @@ begin
             msg.id_urgency_level,
             p1.unique_id,
             p2.unique_id,
-            ul.code
+            ul.code,
+            u.id_organization,
+            (select port from uGetAddressExOrg(u.id_organization, idTransport)) as port
+
         from
             message_journal msg,
             urgency_levels ul,
