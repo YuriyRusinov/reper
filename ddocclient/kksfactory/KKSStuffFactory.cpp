@@ -826,31 +826,40 @@ void KKSStuffFactory :: setOrgAddress (const QModelIndex& orgIndex, QAbstractIte
     }
     QString orgName = res->getCellAsString(0, 8);
     QString recvUID = res->getCellAsString(0, 11);
+    
     QString trSql = QString ("select * from gettransportaddresses ('%1');").arg (recvUID);
     KKSResult * tRes = db->execute (trSql);
-    QMap<int, QString> transps;
-    QMap<int, QString> addrs;
-    QMap<int, bool> actives;
+    
     if (!tRes)
     {
         delete res;
         return;
     }
 
-    KKSOrgModel * orgTrModel = new KKSOrgModel (tRes->getRowCount(), 4);
+    QMap<int, QString> transps;
+    QMap<int, QString> addrs;
+    QMap<int, bool> actives;
+    QMap<int, int> ports;
+
+    KKSOrgModel * orgTrModel = new KKSOrgModel (tRes->getRowCount(), 5);
     QStringList headers;
     headers << tr ("Transport set is enabled")
             << tr ("Transport name")
             << tr ("Transport address")
+            << tr ("Transport port")
             << tr ("Transport is active");
-    for (int i=0; i<4; i++)
+    
+    for (int i=0; i<5; i++)
         orgTrModel->setHeaderData (i, Qt::Horizontal, headers[i], Qt::DisplayRole);
+    
     for (int i=0; i<tRes->getRowCount(); i++)
     {
         int idTr = tRes->getCellAsInt (i, 1);
         transps.insert (idTr, tRes->getCellAsString(i, 2));
         addrs.insert (idTr, tRes->getCellAsString(i, 3));
         actives.insert (idTr, tRes->getCellAsBool (i, 4));
+        ports.insert (idTr, tRes->getCellAsInt (i, 5));
+
         QModelIndex orgIndex = orgTrModel->index (i, 0);
         orgTrModel->setData (orgIndex, idTr, Qt::UserRole);
         orgTrModel->setData (orgIndex, true, Qt::CheckStateRole);
@@ -859,51 +868,71 @@ void KKSStuffFactory :: setOrgAddress (const QModelIndex& orgIndex, QAbstractIte
         orgIndex = orgTrModel->index (i, 2);
         orgTrModel->setData (orgIndex, tRes->getCellAsString(i, 3), Qt::DisplayRole);
         orgIndex = orgTrModel->index (i, 3);
+        orgTrModel->setData (orgIndex, tRes->getCellAsInt (i, 5), Qt::DisplayRole);
+        orgIndex = orgTrModel->index (i, 4);
         orgTrModel->setData (orgIndex, tRes->getCellAsBool (i, 4), Qt::CheckStateRole);
     }
 
 
     delete tRes;
     delete res;
-    KKSOrganizationAddrForm * orgAForm = new KKSOrganizationAddrForm (idOrg, orgName, transps, addrs, actives);
+
+    KKSOrganizationAddrForm * orgAForm = new KKSOrganizationAddrForm (idOrg, orgName, transps, addrs, actives, ports);
+    
     QAbstractItemDelegate * orgIDeleg = new KKSOrgItemDelegate;
     orgAForm->setModel (orgTrModel);
     orgAForm->setItemDelegate (orgIDeleg);
+    
     if (orgAForm->exec () == QDialog::Accepted)
     {
         QMap<int, QString> addresses = orgAForm->getAddrs();
         QMap<int, bool> actives = orgAForm->getActiveList();
+        QMap<int, int> ports = orgAForm->getPortList();
+        
         QString transpStr = QString ("ARRAY[");
         QString addrs = QString ("ARRAY[");
         QString actStr = QString ("ARRAY[");
+        QString portStr = QString ("ARRAY[");
+        
         int i=0;
         QMap<int, bool>::const_iterator pact = actives.constBegin();
+        QMap<int, int>::const_iterator pport = ports.constBegin();
+        
         for (QMap<int, QString>::const_iterator pa = addresses.constBegin();
                 pa != addresses.constEnd();
                 pa++)
         {
 
             transpStr += QString::number (pa.key());
+
             addrs += QString ("'%1'").arg (pa.value());
             actStr += QString ("%1").arg (pact != actives.constEnd() && pact.value() ? QString("true") : QString ("false"));
+            portStr += QString ("%1").arg ((pport != ports.constEnd() && pport.value() <= 0) ? QString("NULL::int4") : QString::number (pport.value()));
+
             if (i < addresses.size()-1)
             {
                 transpStr += QString(",");
                 addrs += QString(",");
                 actStr += QString (",");
+                portStr += QString (",");
             }
             i++;
             pact++;
+            pport++;
         }
+
         transpStr += QString("]");
         addrs += QString("]");
         actStr += QString("]");
+        portStr += QString("]");
 
-        QString orgAddrSql = QString ("select setOrganizationAddress (%1, %2, %3, %4)")
+        QString orgAddrSql = QString ("select setOrganizationAddress (%1, %2, %3, %4, %5)")
                 .arg (idOrg)
                 .arg (transpStr)
                 .arg (addrs)
+                .arg (portStr)
                 .arg (actStr);
+
         KKSResult * orgAddrRes = db->execute (orgAddrSql);
         if (!orgAddrRes || orgAddrRes->getRowCount() != 1)
         {

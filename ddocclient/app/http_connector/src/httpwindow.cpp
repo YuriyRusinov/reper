@@ -234,11 +234,11 @@ void HttpWindow::startProc()
 #endif
     }
     
-    QUrl url(urlLineEdit->text());
+    //QUrl url(urlLineEdit->text());
  
 
-    QHttp::ConnectionMode mode = url.scheme().toLower() == "https" ? QHttp::ConnectionModeHttps : QHttp::ConnectionModeHttp;
-    http->setHost(url.host(), mode, url.port() == -1 ? 0 : url.port());
+    //QHttp::ConnectionMode mode = url.scheme().toLower() == "https" ? QHttp::ConnectionModeHttps : QHttp::ConnectionModeHttp;
+    //http->setHost(url.host(), mode, url.port() == -1 ? 0 : url.port());
     
     /*if (!url.userName().isEmpty())
         http->setUser(url.userName(), url.password());*/
@@ -246,9 +246,9 @@ void HttpWindow::startProc()
     httpRequestAborted = false;
     httpTransferComplete = false;
 
-    QByteArray path = QUrl::toPercentEncoding(url.path(), "!$&'()*+,;=:@/");
-    if (path.isEmpty())
-        path = "/";
+    //QByteArray path = QUrl::toPercentEncoding(url.path(), "!$&'()*+,;=:@/");
+    //if (path.isEmpty())
+    //    path = "/";
 
 
     
@@ -269,7 +269,7 @@ void HttpWindow::startProc()
 
         for (QList<JKKSPMessWithAddr *>::const_iterator iterator = messageList.constBegin();iterator != messageList.constEnd();++iterator)
         {
-            bool stat = sendOutMessage((*iterator), path) ;
+            bool stat = sendOutMessage((*iterator)) ;
         }
 
         while(!messageList.isEmpty())
@@ -324,7 +324,7 @@ void HttpWindow::startProc()
             
             JKKSPMessWithAddr * pMessWithAddr = new JKKSPMessWithAddr(pM, part.getAddr(), part.id());
             
-            bool stat = sendOutMessage(pMessWithAddr, path) ;
+            bool stat = sendOutMessage(pMessWithAddr) ;
             
             if(eof){
                 httpMessages.insert(httpGetId, qMakePair(pMessWithAddr->id, pMessWithAddr->pMess.getType()) );
@@ -494,7 +494,7 @@ bool HttpWindow::setMessageAsSended(const int & id, const int & type)
     return result;
 }
 
-bool HttpWindow::sendOutMessage(const JKKSPMessWithAddr * message, QByteArray path, bool filePartsFlag)
+bool HttpWindow::sendOutMessage(const JKKSPMessWithAddr * message, bool filePartsFlag)
 {
     
     if(message == NULL)
@@ -510,7 +510,21 @@ bool HttpWindow::sendOutMessage(const JKKSPMessWithAddr * message, QByteArray pa
     if(byteArray.size() == 0)
         return false;
 
-    QString addr = message->addr;
+    JKKSAddress addr = message->addr;
+    
+    QString sUrl = QString("http://" + addr.address() + ":" + QString::number(addr.port()) + "/");
+    QUrl url(sUrl);
+    QHttp::ConnectionMode mode = url.scheme().toLower() == "https" ? QHttp::ConnectionModeHttps : QHttp::ConnectionModeHttp;
+    http->setHost(url.host(), mode, url.port() == -1 ? 0 : url.port());
+    
+    /*if (!url.userName().isEmpty())
+        http->setUser(url.userName(), url.password());*/
+
+    QByteArray path = QUrl::toPercentEncoding(url.path(), "!$&'()*+,;=:@/");
+    if (path.isEmpty())
+        path = "/";
+
+
 
     // encrypt
 /*
@@ -530,12 +544,12 @@ bool HttpWindow::sendOutMessage(const JKKSPMessWithAddr * message, QByteArray pa
 		connect(http,SIGNAL(requestFinished(int,bool)),&eventLoop,SLOT(quit()));
 	//!!!!!!!!!
 	//error
-		httpGetId = http->post ( path + addr, byteArray ) ;
+        httpGetId = http->post ( path, byteArray ) ;
 
 		eventLoop.exec();
 	}
 	else
-		httpGetId = http->post ( path + addr, byteArray ) ;
+        httpGetId = http->post ( path, byteArray ) ;
 
     //QHttpResponseHeader responseHeader = http->lastResponse();
     //if(responseHeader.statusCode() != 401 && //packet was ignored by receiver organization

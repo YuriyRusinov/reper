@@ -21,7 +21,7 @@ JKKSOrganization :: JKKSOrganization (int idOrg,
                                       const QString& treeSymbol,
                                       const QDateTime& dtPrevMode,
                                       const QDateTime& dtCurrMode,
-                                      const QString& addr,
+                                      const JKKSAddress & addr,
                                       const QString& mess_code,
                                       const QString& uid)
     : JKKSMessage (addr, mess_code),
@@ -325,7 +325,7 @@ QDataStream& operator<< (QDataStream& out, const JKKSOrganization& OO)
 
 QDataStream& operator>> (QDataStream& in, JKKSOrganization& OO)
 {
-    QString addr;
+    JKKSAddress addr;
     QString code;
 
     in >> addr;

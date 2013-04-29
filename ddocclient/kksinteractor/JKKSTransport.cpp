@@ -1,7 +1,11 @@
 #include <QDataStream>
 #include "JKKSTransport.h"
 
-JKKSTransport :: JKKSTransport (int id_transport, const QString& trName, const QString& lAddr, bool isActive, const QString& uid)
+JKKSTransport :: JKKSTransport (int id_transport, 
+                                const QString& trName, 
+                                const JKKSAddress & lAddr, 
+                                bool isActive, 
+                                const QString& uid)
     : JKKSUID (uid),
     idTransport (id_transport),
     transportName (trName),
@@ -43,12 +47,12 @@ void JKKSTransport :: setTransportName (const QString& name)
     transportName = name;
 }
 
-QString JKKSTransport :: getAddr (void) const
+const JKKSAddress & JKKSTransport :: getAddress() const
 {
     return localAddr;
 }
 
-void JKKSTransport :: setAddr (const QString& addr)
+void JKKSTransport :: setAddress (const JKKSAddress & addr)
 {
     localAddr = addr;
 }
@@ -70,6 +74,7 @@ QDataStream& operator<< (QDataStream& out, const JKKSTransport& T)
     out << T.localAddr;
     out << T.m_isActive;
     out << T.uid();
+
     return out;
 }
 
@@ -79,8 +84,10 @@ QDataStream& operator>> (QDataStream& in, JKKSTransport& T)
     in >> T.transportName;
     in >> T.localAddr;
     in >> T.m_isActive;
+    
     QString uid;
     in >> uid;
     T.setUid (uid);
+    
     return in;
 }

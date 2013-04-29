@@ -6,7 +6,17 @@
 #include "JKKSLoader.h"
 #include "JKKSRefRecord.h"
 
-JKKSRefRecord :: JKKSRefRecord (int id_queue, int id_rec, int id_entity_type, const QString& tName, const QString& t_uid, int sync_type, const JKKSCategory& aCat, const QStringList& attrsVals, const QString& addr, const QString& mess_code, const QString& uid)
+JKKSRefRecord :: JKKSRefRecord (int id_queue, 
+                                int id_rec, 
+                                int id_entity_type, 
+                                const QString& tName, 
+                                const QString& t_uid, 
+                                int sync_type, 
+                                const JKKSCategory& aCat, 
+                                const QStringList& attrsVals, 
+                                const JKKSAddress & addr, 
+                                const QString& mess_code, 
+                                const QString& uid)
     : JKKSMessage (addr, mess_code),
       JKKSUID (uid),
       idQueue (id_queue),
@@ -18,7 +28,7 @@ JKKSRefRecord :: JKKSRefRecord (int id_queue, int id_rec, int id_entity_type, co
       aVals (attrsVals),
       ioDoc (JKKSDocument()),
       ioTable (JKKSIOTable()),
-      senderAddr (QString())
+      senderAddr (JKKSAddress())
 {
     cat.clear ();
     cat.insert (aCat.id(), aCat);
@@ -182,12 +192,12 @@ void JKKSRefRecord :: setAddTable (const JKKSIOTable& table)
     ioTable = table;
 }
 
-QString JKKSRefRecord :: getSenderAddr (void) const
+const JKKSAddress & JKKSRefRecord :: getSenderAddr (void) const
 {
     return senderAddr;
 }
 
-void JKKSRefRecord :: setSenderAddr (QString addr)
+void JKKSRefRecord :: setSenderAddr (const JKKSAddress & addr)
 {
     senderAddr = addr;
 }
@@ -216,7 +226,7 @@ QDataStream& operator<< (QDataStream& out, const JKKSRefRecord& RR)
 
 QDataStream& operator>> (QDataStream& in, JKKSRefRecord& RR)
 {
-    QString addr;
+    JKKSAddress addr;
     QString code;
 
     in >> addr;
@@ -247,7 +257,11 @@ QDataStream& operator>> (QDataStream& in, JKKSRefRecord& RR)
     return in;
 }
 
-JKKSQueueResponse :: JKKSQueueResponse (int local_id, int id_queue, int sync_result, const QString& addr, const QString& type)
+JKKSQueueResponse :: JKKSQueueResponse (int local_id, 
+                                        int id_queue, 
+                                        int sync_result, 
+                                        const JKKSAddress & addr, 
+                                        const QString& type)
     : JKKSMessage (addr, type),
     localId (local_id),
     idQueue (id_queue),
@@ -347,7 +361,7 @@ QDataStream& operator<< (QDataStream& out, const JKKSQueueResponse& RR)
 
 QDataStream& operator>> (QDataStream& in, JKKSQueueResponse& RR)
 {
-    QString addr;
+    JKKSAddress addr;
     QString code;
 
     in >> addr;

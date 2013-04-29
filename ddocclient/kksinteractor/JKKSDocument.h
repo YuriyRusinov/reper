@@ -42,7 +42,7 @@ class _I_EXPORT JKKSDocument : public JKKSMessage, public JKKSUID
                       const QString& desc = QString(), 
                       const QString& info = QString(), 
                       int idmaclabel = 1, 
-                      const QString& addr = QString(), 
+                      const JKKSAddress & addr = JKKSAddress(), 
                       const QString& mess_code = QString(),
                       const QString& uid = QString(),
                       int idsynctype = -1,

@@ -39,8 +39,8 @@ public:
     void setIsLast(bool isLast = true);
     bool isLast() const;
 
-    const QString & getSenderAddr (void) const;
-    void setSenderAddr (const QString & addr);
+    const JKKSAddress & getSenderAddr (void) const;
+    void setSenderAddr (const JKKSAddress & addr);
 
     virtual QByteArray serialize (void) const;
     virtual int unserialize (const QByteArray& mess);
@@ -54,7 +54,7 @@ private:
 
     QByteArray m_data;
     //QString m_uid;
-    QString m_senderAddr;
+    JKKSAddress m_senderAddr;
     int m_idUrl;
     bool m_isLast;
     QString m_absUrl;

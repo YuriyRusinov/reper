@@ -11,13 +11,21 @@
 #include "KKSEventFilter.h"
 #include "KKSOrganizationAddrForm.h"
 
-KKSOrganizationAddrForm :: KKSOrganizationAddrForm (int idOrg, QString orgName, const QMap<int, QString>& transporters, const QMap<int, QString>& aList, const QMap<int, bool>& actList, QWidget * parent, Qt::WindowFlags flags)
+KKSOrganizationAddrForm :: KKSOrganizationAddrForm (int idOrg, 
+                                                    QString orgName, 
+                                                    const QMap<int, QString>& transporters, 
+                                                    const QMap<int, QString>& aList, 
+                                                    const QMap<int, bool>& actList, 
+                                                    const QMap<int, int>& pList, 
+                                                    QWidget * parent, 
+                                                    Qt::WindowFlags flags)
         : QDialog (parent, flags),
         idOrganization (idOrg),
         organizationName (orgName),
         transp (transporters),
         addrs (aList),
         activeList (actList),
+        portList (pList),
         tvTransporters (new QTreeView(this)),
         pbOk (new QPushButton (tr("&OK"), this)),
         pbCancel (new QPushButton (tr("&Cancel"), this))
@@ -40,6 +48,11 @@ const QMap<int, QString>& KKSOrganizationAddrForm :: getAddrs (void) const
 const QMap<int, bool>& KKSOrganizationAddrForm :: getActiveList (void) const
 {
     return activeList;
+}
+
+const QMap<int, int>& KKSOrganizationAddrForm :: getPortList (void) const
+{
+    return portList;
 }
 
 void KKSOrganizationAddrForm :: setItemDelegate (QAbstractItemDelegate * deleg)
@@ -82,6 +95,11 @@ void KKSOrganizationAddrForm :: addrChanged (const QModelIndex& topLeft, const Q
         addrs.insert (idTr, QString());
     }
     else if (wIndex.column () == 3)
+    {
+        int port = wIndex.data (Qt::DisplayRole).toInt();
+        portList.insert (idTr, port);
+    }
+    else if (wIndex.column () == 4)
     {
         bool isActive = (wIndex.data (Qt::CheckStateRole).toInt() == Qt::Checked);
         activeList.insert (idTr, isActive);

@@ -6,7 +6,68 @@
 
 #include "JKKSMessage.h"
 
-JKKSMessage :: JKKSMessage (const QString& address, const QString& code)
+JKKSAddress :: JKKSAddress(const QString & addr, int port) : m_address(addr), m_port(port)
+{
+
+}
+
+JKKSAddress :: JKKSAddress() : m_address(QString()), m_port(0)
+{
+
+}
+
+JKKSAddress::JKKSAddress(const JKKSAddress & a) : m_address(a.m_address), m_port(a.m_port)
+{
+
+}
+
+JKKSAddress::~JKKSAddress()
+{
+
+}
+
+
+const QString & JKKSAddress::address() const
+{
+    return m_address;
+}
+
+int JKKSAddress::port() const
+{
+    if(m_port <= 0)
+        return 0;
+
+    return m_port;
+}
+
+void JKKSAddress::setAddress(const QString & addr)
+{
+    m_address = addr;
+}
+
+void JKKSAddress::setPort(int p)
+{
+    m_port = p;
+}
+
+QDataStream& operator<< (QDataStream& out, const JKKSAddress& T)
+{
+    out << T.m_address;
+    out << T.m_port;
+
+    return out;
+}
+
+QDataStream& operator>> (QDataStream& in, JKKSAddress& T)
+{
+    in >> T.m_address;
+    in >> T.m_port;
+
+    return in;
+}
+
+
+JKKSMessage :: JKKSMessage (const JKKSAddress & address, const QString& code)
     : m_addr (address),
     m_kvs (code),
     c (QMap<int, JKKSCategory>())
@@ -24,7 +85,7 @@ JKKSMessage :: ~JKKSMessage (void)
 {
 }
 
-QString JKKSMessage :: getAddr (void) const
+const JKKSAddress & JKKSMessage :: getAddr (void) const
 {
     return m_addr;
 }
@@ -34,7 +95,7 @@ QString JKKSMessage :: getCode (void) const
     return m_kvs;
 }
 
-void JKKSMessage :: setAddr (const QString& addr)
+void JKKSMessage :: setAddr (const JKKSAddress & addr)
 {
     m_addr = addr;
 }

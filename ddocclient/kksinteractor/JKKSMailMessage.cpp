@@ -12,7 +12,7 @@ JKKSMailMessage :: JKKSMailMessage (int idMess,
                                     const QString& u_idDlReceiver,
                                     const QString& u_idDlSender,
                                     const QDateTime& dt,
-                                    const QString& addr,
+                                    const JKKSAddress & addr,
                                     const QString& mess_code,
                                     const QString& uid,
                                     const QString& inputNumber,
@@ -87,7 +87,7 @@ int JKKSMailMessage :: unserialize (const QByteArray& mess)
     buffer.open(QIODevice::ReadOnly);
     QDataStream in(&buffer);
 
-    QString addr;
+    JKKSAddress addr;
     QString code;
     in >> idMessage;
     in >> addr;
@@ -207,7 +207,7 @@ JKKSMailConfirmation::JKKSMailConfirmation(int idMess,
                                            int extraId,
                                            const QDateTime & readDatetime,
                                            const QDateTime & receiveDatetime,
-                                           const QString & addr,
+                                           const JKKSAddress & addr,
                                            const QString & kvs)
 : JKKSMessage (addr, kvs),
 m_id(idMess),
@@ -255,7 +255,7 @@ int JKKSMailConfirmation::unserialize (const QByteArray& mess)
     buffer.open(QIODevice::ReadOnly);
     QDataStream in(&buffer);
 
-    QString addr;
+    JKKSAddress addr;
     QString code;
     in >> addr;
     in >> code;

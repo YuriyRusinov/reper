@@ -20,8 +20,8 @@ JKKSCommand :: JKKSCommand (int id,
                             const QString& dl_from_name,
                             const QString& u_idExec,
                             const QString& dl_executor_name,
-                            const QString& eAddr,
-                            const QString& eOrgAddr,
+                            const JKKSAddress & eAddr,
+                            const JKKSAddress& eOrgAddr,
                             const QString& u_idTo,
                             const QString& dl_to_name,
                             int idIoCat,
@@ -32,7 +32,7 @@ JKKSCommand :: JKKSCommand (int id,
                             int e_t_interval,
                             int t_unit,
                             const QString& mess_body,
-                            const QString& address,
+                            const JKKSAddress & address,
                             const QString& code,
                             const QString & uid,
                             const QString & inputNumber,
@@ -145,7 +145,7 @@ int JKKSCommand :: unserialize (const QByteArray& mess)
     buffer.open(QIODevice::ReadOnly);
     QDataStream in(&buffer);
 
-    QString addr;
+    JKKSAddress addr;
     QString code;
     in >> addr;
     in >> code;
@@ -266,22 +266,22 @@ void JKKSCommand::setDlExecutorName (const QString& dl_executor_name)
     dlExecutorName = dl_executor_name;
 }
 
-QString JKKSCommand :: getEAddr (void) const
+const JKKSAddress & JKKSCommand :: getEAddr (void) const
 {
     return executorAddress;
 }
 
-void JKKSCommand :: setEAddr (const QString& eAddr)
+void JKKSCommand :: setEAddr (const JKKSAddress & eAddr)
 {
     executorAddress = eAddr;
 }
 
-QString JKKSCommand :: getEOrg (void) const
+const JKKSAddress & JKKSCommand :: getEOrg (void) const
 {
     return execOrgAddress;
 }
 
-void JKKSCommand :: setEOrg (const QString& eOrg)
+void JKKSCommand :: setEOrg (const JKKSAddress & eOrg)
 {
     execOrgAddress = eOrg;
 }
@@ -401,7 +401,7 @@ JKKSCmdConfirmation::JKKSCmdConfirmation(int idCmd,
                                          int idState,
                                          const QDateTime & acceptedDatetime,
                                          const QDateTime & receiveDatetime,
-                                         const QString & addr,
+                                         const JKKSAddress & addr,
                                          const QString & kvs)
 : JKKSMessage (addr, kvs),
 m_id(idCmd),
@@ -452,7 +452,7 @@ int JKKSCmdConfirmation::unserialize (const QByteArray& mess)
     buffer.open(QIODevice::ReadOnly);
     QDataStream in(&buffer);
 
-    QString addr;
+    JKKSAddress addr;
     QString code;
     in >> addr;
     in >> code;

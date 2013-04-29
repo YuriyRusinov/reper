@@ -120,18 +120,18 @@ void JKKSPMessage :: setMacLabel(const QString & mac)
 
 JKKSPMessWithAddr :: JKKSPMessWithAddr (void)
     : pMess (JKKSPMessage()),
-      addr (QString())
+      addr (JKKSAddress())
 {
 }
 
-JKKSPMessWithAddr :: JKKSPMessWithAddr (const JKKSPMessage& pm, const QString& a, const int& _id)
+JKKSPMessWithAddr :: JKKSPMessWithAddr (const JKKSPMessage& pm, const JKKSAddress & a, const int& _id)
     : pMess (pm),
     addr (a),
     id (_id)
 {
 }
 
-JKKSPMessWithAddr::JKKSPMessWithAddr (JKKSPMessage * message, const QString& a, const int& c) :
+JKKSPMessWithAddr::JKKSPMessWithAddr (JKKSPMessage * message, const JKKSAddress & a, const int& c) :
     pMess(*message),
     addr(a),
     id(c)

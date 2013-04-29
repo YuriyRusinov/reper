@@ -22,11 +22,19 @@ class QModelIndex;
 class _GUI_EXPORT KKSOrganizationAddrForm : public QDialog
 {
 public:
-    KKSOrganizationAddrForm (int idOrg, QString orgName, const QMap<int, QString>& transporters, const QMap<int, QString>& aList, const QMap<int, bool>& actList, QWidget * parent=0, Qt::WindowFlags flags=0);
+    KKSOrganizationAddrForm (int idOrg, 
+                                 QString orgName, 
+                                 const QMap<int, QString>& transporters, 
+                                 const QMap<int, QString>& aList, 
+                                 const QMap<int, bool>& actList, 
+                                 const QMap<int, int>& pList, 
+                                 QWidget * parent=0, 
+                                 Qt::WindowFlags flags=0);
     ~KKSOrganizationAddrForm (void);
 
     const QMap<int, QString>& getAddrs (void) const;
     const QMap<int, bool>& getActiveList (void) const;
+    const QMap<int, int>& getPortList (void) const;
 
     void setItemDelegate (QAbstractItemDelegate * deleg);
     void setModel (QAbstractItemModel * mod);
@@ -48,6 +56,7 @@ private:
     QMap<int, QString> transp;
     QMap<int, QString> addrs;
     QMap<int, bool> activeList;
+    QMap<int, int> portList;
 
     QTreeView * tvTransporters;
     QPushButton * pbOk;

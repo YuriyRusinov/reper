@@ -233,12 +233,12 @@ bool JKKSFilePart::isLast() const
     return m_isLast;
 }
 
-const QString & JKKSFilePart::getSenderAddr() const
+const JKKSAddress & JKKSFilePart::getSenderAddr() const
 {
     return m_senderAddr;
 }
 
-void JKKSFilePart::setSenderAddr(const QString & addr)
+void JKKSFilePart::setSenderAddr(const JKKSAddress & addr)
 {
     m_senderAddr = addr;
 }
@@ -265,7 +265,8 @@ QDataStream& operator>> (QDataStream& in, JKKSFilePart& part)
     in >> part.m_data;
     in >> part.m_isLast;
     in >> part.m_absUrl;
-    QString addr;
+    
+    JKKSAddress addr;
     in >> addr;
     part.setAddr(addr);
 
@@ -304,7 +305,7 @@ int JKKSFilePart :: unserialize (const QByteArray& mess)
     buffer.open(QIODevice::ReadOnly);
     QDataStream in(&buffer);
 
-    QString addr;
+    JKKSAddress addr;
     in >> addr;
     setAddr(addr);
 

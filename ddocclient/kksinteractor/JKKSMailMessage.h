@@ -26,7 +26,7 @@ class _I_EXPORT JKKSMailConfirmation: public JKKSMessage
                              int extraId=-1,
                              const QDateTime & readDatetime = QDateTime::currentDateTime(),
                              const QDateTime & receiveDatetime = QDateTime::currentDateTime(),
-                             const QString & addr=QString(),
+                             const JKKSAddress & addr=JKKSAddress(),
                              const QString & kvs=QString());
         JKKSMailConfirmation(const JKKSMailConfirmation & cfm);
         virtual ~JKKSMailConfirmation();
@@ -65,7 +65,7 @@ class _I_EXPORT JKKSMailMessage : public JKKSMessage, public JKKSUID
                          const QString& u_idDlReceiver=QString(),
                          const QString& u_idDlSender=QString(), 
                          const QDateTime& dt = QDateTime::currentDateTime(), 
-                         const QString& addr=QString(), 
+                         const JKKSAddress & addr=JKKSAddress(), 
                          const QString& mess_code=QString(),
                          const QString & uid=QString(),
                          const QString & inputNumber=QString(),

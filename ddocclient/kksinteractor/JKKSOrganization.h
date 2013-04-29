@@ -32,7 +32,7 @@ public:
                       const QString& treeSymbol=QString(),
                       const QDateTime& dtPrevMode=QDateTime(),
                       const QDateTime& dtCurrMode=QDateTime(),
-                      const QString& addr=QString(),
+                      const JKKSAddress & addr=JKKSAddress(),
                       const QString& mess_code=QString(),
                       const QString& uid = QString());
     JKKSOrganization (const JKKSOrganization& Org);

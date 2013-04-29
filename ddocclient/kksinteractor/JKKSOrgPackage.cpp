@@ -6,7 +6,7 @@
 #include "JKKSOrgPackage.h"
 #include "defines.h"
 
-JKKSOrgPackage :: JKKSOrgPackage (int id, const QString& addr, const QString& code, const QString& uid)
+JKKSOrgPackage :: JKKSOrgPackage (int id, const JKKSAddress & addr, const QString& code, const QString& uid)
     : JKKSMessage (addr, code),
       JKKSUID (uid),
       m_id (id)
@@ -102,7 +102,7 @@ QDataStream& operator<< (QDataStream& out, const JKKSOrgPackage& OP)
 
 QDataStream& operator>> (QDataStream& in, JKKSOrgPackage& OP)
 {
-    QString addr;
+    JKKSAddress addr;
     QString code;
 
     in >> addr;

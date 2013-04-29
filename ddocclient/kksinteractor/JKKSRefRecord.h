@@ -37,7 +37,7 @@ public:
                    int sync_type=-1, 
                    const JKKSCategory& aCat=JKKSCategory(), 
                    const QStringList& attrsVals=QStringList(), 
-                   const QString& addr=QString(),
+                   const JKKSAddress & addr = JKKSAddress (),
                    const QString& mess_code=QString(), 
                    const QString& uid = QString());
     
@@ -83,8 +83,8 @@ public:
     const JKKSIOTable& getAddTable (void) const;
     void setAddTable (const JKKSIOTable& table);
 
-    QString getSenderAddr (void) const;
-    void setSenderAddr (QString addr);
+    const JKKSAddress & getSenderAddr (void) const;
+    void setSenderAddr (const JKKSAddress & addr);
 
 private:
     //
@@ -108,13 +108,17 @@ private:
 
     JKKSDocument ioDoc;
     JKKSIOTable ioTable;
-    QString senderAddr;
+    JKKSAddress senderAddr;
 };
 
 class _I_EXPORT JKKSQueueResponse : public JKKSMessage 
 {
 public:
-    JKKSQueueResponse (int local_id=-1, int id_queue=-1, int sync_result=-1, const QString& addr=QString(), const QString& type=QString());
+    JKKSQueueResponse (int local_id=-1, 
+                       int id_queue=-1, 
+                       int sync_result=-1, 
+                       const JKKSAddress & addr = JKKSAddress(), 
+                       const QString& type=QString());
     JKKSQueueResponse (const JKKSQueueResponse& QR);
     ~JKKSQueueResponse (void);
 

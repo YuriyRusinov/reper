@@ -16,6 +16,8 @@
 #include <QPair>
 #include <QMap>
 
+#include "JKKSMessage.h"
+
 class KKSDatabase;
 class JKKSMessage;
 class JKKSCategory;
@@ -62,8 +64,8 @@ class _I_EXPORT JKKSLoader
                     int idTransport = 1);
 
         ~JKKSLoader (void);
-        int setLocalAddress(const QString & address) const;
-	const QString & getLocalAddress() const;
+        int setLocalAddress(const JKKSAddress & address) const;
+        const JKKSAddress & getLocalAddress() const;
 
         QList<JKKSPMessWithAddr *> readMessages (void) const;
         int writeMessage(const JKKSPMessage & message) const;
@@ -157,7 +159,7 @@ class _I_EXPORT JKKSLoader
         QPair<int, int> getIDMap (const QString& table_name, const JKKSRefRecord& RR) const;
         int readRecordFromTable (const QString& tableName, JKKSRefRecord& rec) const;
         QMap<int, JKKSOrganization> readOrganizations (int idOrg) const;
-        int writeTransport (JKKSTransport& T, const QString& locAddr) const;
+        int writeTransport (JKKSTransport& T) const;
         int writeOrgType (JKKSOrgType& OT) const;
         int writeOrgWM (JKKSWorkMode& wm) const;
         int writeWMType (JKKSWorkModeType& wmt) const;
@@ -214,7 +216,7 @@ class _I_EXPORT JKKSLoader
         mutable int idCurrentDl;//текущее должностное лицо
         mutable int idCurrentUser;//текущий пользователь
 
-        mutable QString local_address;
+        mutable JKKSAddress local_address;
 
         //email_prefix организации-отправителя
         mutable QString senderUID;

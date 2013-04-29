@@ -17,7 +17,7 @@ JKKSDocument :: JKKSDocument (const QString& name,
                               const QString& desc, 
                               const QString& info, 
                               int idmaclabel, 
-                              const QString& addr, 
+                              const JKKSAddress & addr, 
                               const QString& mess_code,
                               const QString& uid,
                               int idsynctype,
@@ -140,7 +140,7 @@ int JKKSDocument :: unserialize (const QByteArray& mess)
     buffer.open(QIODevice::ReadOnly);
     QDataStream in(&buffer);
 
-    QString addr;
+    JKKSAddress addr;
     QString code;
     in >> addr;
     in >> code;

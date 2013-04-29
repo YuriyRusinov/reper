@@ -18,15 +18,42 @@
 class JKKSCategory;
 class JKKSLoader;
 
+class _I_EXPORT JKKSAddress
+{
+public:
+    JKKSAddress(const QString & addr, int port = 0);
+    JKKSAddress();
+    JKKSAddress(const JKKSAddress & a);
+
+    virtual ~JKKSAddress();
+
+    const QString & address() const;
+    int port() const;
+
+    void setAddress(const QString & addr);
+    void setPort(int p);
+
+private:
+    //
+    // Functions
+    //
+    friend QDataStream& operator<< (QDataStream& out, const JKKSAddress& T);
+    friend QDataStream& operator>> (QDataStream& in, JKKSAddress& T);
+
+private:
+    QString m_address;
+    int m_port;
+};
+
 class _I_EXPORT JKKSMessage
 {
     public:
-        JKKSMessage (const QString& address=QString(), const QString& code=QString());
+        JKKSMessage (const JKKSAddress & address=JKKSAddress(), const QString& code=QString());
         JKKSMessage (const JKKSMessage& mess);
         virtual ~JKKSMessage (void);
 
-        QString getAddr (void) const;
-        void setAddr (const QString& addr);
+        const JKKSAddress & getAddr (void) const;
+        void setAddr (const JKKSAddress & addr);
 
         QString getCode (void) const;
         void setCode (const QString& code);
@@ -60,7 +87,7 @@ class _I_EXPORT JKKSMessage
         virtual JKKSMessageType getMessageType (void) const;
 
     private:
-        QString m_addr;
+        JKKSAddress m_addr;
         QString m_kvs;
         QMap<int, JKKSCategory> c;
 };

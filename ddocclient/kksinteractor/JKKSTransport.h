@@ -5,11 +5,17 @@
 #include "jkksuid.h"
 
 class QDataStream;
+#include "JKKSMessage.h"
 
 class _I_EXPORT JKKSTransport : public JKKSUID
 {
 public:
-    JKKSTransport (int id_transport=-1, const QString& trName=QString(), const QString& lAddr=QString(), bool isActive=false, const QString& uid=QString());
+    JKKSTransport (int id_transport=-1, 
+                   const QString& trName=QString(), 
+                   const JKKSAddress & lAddr = JKKSAddress(), 
+                   bool isActive=false, 
+                   const QString& uid=QString());
+    
     JKKSTransport (const JKKSTransport& T);
     ~JKKSTransport (void);
 
@@ -19,8 +25,8 @@ public:
     QString getTransportName (void) const;
     void setTransportName (const QString& name);
 
-    QString getAddr (void) const;
-    void setAddr (const QString& addr);
+    const JKKSAddress & getAddress(void) const;
+    void setAddress (const JKKSAddress & addr);
 
     bool isTransportActive (void) const;
     void setTransportActive (bool isActive);
@@ -37,7 +43,7 @@ private:
     //
     int idTransport;
     QString transportName;
-    QString localAddr;
+    JKKSAddress localAddr;
     bool m_isActive;
 };
 

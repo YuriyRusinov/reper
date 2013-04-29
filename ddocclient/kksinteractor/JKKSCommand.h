@@ -33,7 +33,7 @@ class _I_EXPORT JKKSCmdConfirmation: public JKKSMessage
                             int idState = 3,
                             const QDateTime & acceptedDatetime = QDateTime::currentDateTime(),
                             const QDateTime & receiveDatetime = QDateTime::currentDateTime(),
-                            const QString & addr=QString(),
+                            const JKKSAddress & addr=JKKSAddress(),
                             const QString & kvs=QString());
         JKKSCmdConfirmation(const JKKSCmdConfirmation & cfm);
         virtual ~JKKSCmdConfirmation();
@@ -75,8 +75,8 @@ class _I_EXPORT JKKSCommand : public JKKSMessage, public JKKSUID
                      const QString& dl_from_name=QString(), 
                      const QString& u_idExec=QString(), 
                      const QString& dl_executor_name=QString(), 
-                     const QString& eAddr=QString(), 
-                     const QString& eOrgAddr=QString(), 
+                     const JKKSAddress & eAddr = JKKSAddress(), 
+                     const JKKSAddress & eOrgAddr = JKKSAddress(), 
                      const QString& u_idTo=QString(), 
                      const QString& dl_to_name=QString(), 
                      int idIoCat=-1, 
@@ -87,7 +87,7 @@ class _I_EXPORT JKKSCommand : public JKKSMessage, public JKKSUID
                      int e_t_interval=1, 
                      int t_unit=6, //days
                      const QString& mess_body=QString(), 
-                     const QString& address=QString(), 
+                     const JKKSAddress & address = JKKSAddress(), 
                      const QString& code=QString(),
                      const QString& uid=QString(),
                      const QString & inputNumber=QString(),
@@ -121,11 +121,11 @@ class _I_EXPORT JKKSCommand : public JKKSMessage, public JKKSUID
         QString getDlExecutorName (void) const;
         void setDlExecutorName (const QString& dl_executor_name);
 
-        QString getEAddr (void) const;
-        void setEAddr (const QString& eAddr);
+        const JKKSAddress & getEAddr (void) const;
+        void setEAddr (const JKKSAddress & eAddr);
 
-        QString getEOrg (void) const;
-        void setEOrg (const QString& eOrg);
+        const JKKSAddress & getEOrg (void) const;
+        void setEOrg (const JKKSAddress & eOrg);
 
         QString getDlTo (void) const;
         void setDlTo (const QString& u_idTo);
@@ -181,8 +181,8 @@ private:
         QString dlFromName;
         QString u_idDlExecutor;
         QString dlExecutorName;
-        QString executorAddress;
-        QString execOrgAddress;
+        JKKSAddress executorAddress; //not used
+        JKKSAddress execOrgAddress; //not used
         QString u_idDlTo;
         QString dlToName;
         int idIOCategory;

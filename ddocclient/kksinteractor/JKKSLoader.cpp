@@ -57,7 +57,7 @@ JKKSLoader :: JKKSLoader (const QString& host,
       dbWrite (new KKSPGDatabase()),
       idCurrentDl(-1),
       idCurrentUser(-1),
-      local_address (QString()),
+      local_address (JKKSAddress()),
       senderUID(QString()),
       receiverUID(QString())
 {
@@ -67,27 +67,41 @@ JKKSLoader :: ~JKKSLoader (void)
 {
 }
 
-int JKKSLoader::setLocalAddress(const QString & address) const
+int JKKSLoader::setLocalAddress(const JKKSAddress & address) const
 {
     int result = ERROR_CODE;
     if(dbRead){
-        KKSResult * res = dbRead->execute(QString("SELECT usetlocaladdress('%1');").arg(address));
+        QString sql = QString("SELECT usetlocaladdress('%1', %2);")
+                              .arg(address.address())
+                              .arg(address.port() <= 0 ? QString("NULL") : QString::number(address.port()));
+        
+        KKSResult * res = dbRead->execute(sql);
+
         if(res && res->getRowCount() == 1)
             result = res->getCellAsInt(0, 0);
+
         delete res;
     }
     return result;
 }
 
-const QString & JKKSLoader::getLocalAddress() const
+const JKKSAddress & JKKSLoader::getLocalAddress() const
 {
-    if(!local_address.isEmpty())
+    if(!local_address.address().isEmpty())
         return local_address;
 	
     if(dbRead){
-        KKSResult * res = dbRead->execute(QString("SELECT uGetLocalAddress(%1);").arg(m_idTransport));
-        if(res && res->getRowCount() == 1)
-            local_address = res->getCellAsString(0, 0);
+        KKSResult * res = dbRead->execute(QString("SELECT * from uGetLocalAddress(%1);").arg(m_idTransport));
+        if(res && res->getRowCount() == 1){
+            QString addr = res->getCellAsString(0, 0);
+            
+            int port = 0;
+            if(!res->isEmpty(0, 1)){
+                res->getCellAsInt(0, 1);
+            }
+            
+            local_address = JKKSAddress(addr, port);
+        }
         delete res;
     }
 
@@ -261,12 +275,16 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readCmdConfirmations(void) const
     if (res && res->getRowCount() > 0 && res->getColumnCount() >= 4)
     {
         for (int i=0; i<res->getRowCount(); i++) {
+            JKKSAddress addr;
+            addr.setAddress(res->getCellAsString (i, 0));
+            addr.setPort(res->getCellAsInt(i, 6));
+
             JKKSCmdConfirmation cfm(res->getCellAsInt (i, 1),//src_id
                                     res->getCellAsString (i, 2),//extra_id
                                     res->getCellAsInt (i, 3),//idJrState
                                     res->getCellAsDateTime(i, 4),//accepted_datetime
                                     res->getCellAsDateTime(i, 5),//receive_datetime
-                                    res->getCellAsString (i, 0)//address
+                                    addr//address
                                     );
             
             JKKSPMessage pM(cfm.serialize(), cfm.getMessageType());
@@ -288,11 +306,15 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readMailConfirmations(void) const
     if (res && res->getRowCount() > 0 && res->getColumnCount() >= 4)
     {
         for (int i=0; i<res->getRowCount(); i++) {
+            JKKSAddress addr;
+            addr.setAddress(res->getCellAsString (i, 0));
+            addr.setPort(res->getCellAsInt(i, 5));
+
             JKKSMailConfirmation cfm(res->getCellAsInt(i, 1),//src_id
                                      res->getCellAsInt (i, 2),//extra_id
                                      res->getCellAsDateTime (i, 3),//read_datetime,
                                      res->getCellAsDateTime(i, 4),//receive_datetime
-                                     res->getCellAsString (i, 0)//address
+                                     addr//address
                                      );
             
             JKKSPMessage pM(cfm.serialize(), cfm.getMessageType());
@@ -325,14 +347,16 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readCommands (void) const
 
             int idCat = res->getCellAsInt (i, 10);
 
+            JKKSAddress addr(res->getCellAsString (i, 0), res->getCellAsInt(i, 29));
+
             QString s;//empty string
             JKKSCommand command(res->getCellAsInt (i, 1),//id
                                 res->getCellAsString (i, 22),//dl_from_uid
                                 res->getCellAsString (i, 3),//dl_from_name
                                 res->getCellAsString (i, 23),//dl_executor_uid
                                 res->getCellAsString (i, 5),//dl_executor_name
-                                res->getCellAsString (i, 6),//dl_executor_address
-                                res->getCellAsString (i, 7),//exec_org_address
+                                JKKSAddress(),//dl_executor_address
+                                JKKSAddress(),//exec_org_address
                                 res->getCellAsString (i, 24),//dl_to_uid
                                 res->getCellAsString (i, 9),//dl_to_name
                                 idCat,
@@ -343,7 +367,7 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readCommands (void) const
                                 amount,
                                 unit,
                                 res->getCellAsString (i, 16),//message_body
-                                res->getCellAsString (i, 0),//full_address
+                                addr,//full_address
                                 s,
                                 res->getCellAsString(i, 17),//uniqueID
                                 res->getCellAsString(i, 18),//inputNumber
@@ -381,12 +405,14 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readDocuments (void) const
     {
         for (int i=0; i<res->getRowCount(); i++)
         {
-            QString fullAddr = res->getCellAsString (i, 0);
+            JKKSAddress fullAddr = JKKSAddress (res->getCellAsString (i, 0), res->getCellAsInt(i, 10));
+            
             int idObject = res->getCellAsInt (i, 1);
             int idCommand = res->getCellAsInt (i, 6);
             int idJournal = res->getCellAsInt (i, 8);
             QDateTime rt = res->getCellAsDateTime (i, 4);
             int idOrganization = res->getCellAsInt(i, 9);
+            
             JKKSDocument doc = readDocument (idObject, idOrganization);
             doc.setCommandId (idCommand);
             doc.setJournal (idJournal);
@@ -415,7 +441,8 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readMails (void) const
     {
         for (int i=0; i<res->getRowCount(); i++)
         {
-            QString fullAddr = res->getCellAsString (i, 0);
+            JKKSAddress fullAddr = JKKSAddress (res->getCellAsString (i, 0), res->getCellAsInt(i, 19));
+
             int idMessage = res->getCellAsInt (i, 1);
             QString u_idDlFrom = res->getCellAsString (i, 15);
             QString u_idDlTo = res->getCellAsString (i, 16);
@@ -1906,8 +1933,10 @@ QList<JKKSFilePart*> JKKSLoader :: readFileParts() const
     {
         for (int i=0; i<res->getRowCount (); i++)
         {
+            JKKSAddress addr (res->getCellAsString(i, 0), res->getCellAsInt(i, 9));
+
             JKKSFilePart * part = new JKKSFilePart();
-            part->setAddr(res->getCellAsString(i, 0));//full_addres of receiver
+            part->setAddr(addr);//full_addres of receiver
             part->setSenderAddr (getLocalAddress());//address of local org (sender)
             part->setId(res->getCellAsInt64(i, 1));//id_queue
             
@@ -2343,7 +2372,7 @@ int JKKSLoader :: writeMessage (JKKSRefRecord *refRec, const QString& sender_uid
         return ERROR_CODE;
     }
 
-    qWarning() << "JKKSRefRecord->getSenderAddr() = " << refRec->getSenderAddr();
+    qWarning() << "JKKSRefRecord->getSenderAddr() = " << refRec->getSenderAddr().address() << " port = " << refRec->getSenderAddr().port();
     qWarning() << "JKKSRefRecord->getEntityType() = " << refRec->getEntityType();
     
     JKKSQueueResponse recResp (-1, refRec->getIDQueue(), 2, refRec->getSenderAddr());
@@ -2754,7 +2783,7 @@ int JKKSLoader :: writeMessage (JKKSFilePart *filePart, const QString& sender_ui
         return ERROR_CODE;
     }
 
-    qWarning() << "JKKSFilePart->getSenderAddr() = " << filePart->getSenderAddr();
+    qWarning() << "JKKSFilePart->getSenderAddr() = " << filePart->getSenderAddr().address() << " port = " << filePart->getSenderAddr().port();
     
     
     JKKSQueueResponse recResp (-1, filePart->id(), 2, filePart->getSenderAddr());
@@ -2970,7 +2999,11 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readTableRecords (void) const
             int entity_type = res->getCellAsInt (i, 7);
             int id = res->getCellAsInt (i, 3);
             QString uid = res->getCellAsString (i, 4);
-            QString addr = res->getCellAsString (i, 0);
+            
+            QString a = res->getCellAsString (i, 0);
+            int port = res->getCellAsInt(i, 11);
+            JKKSAddress addr(a, port);
+            
             int sync_type = res->getCellAsInt (i, 8);
             int idOrganization = res->getCellAsInt(i, 2);
             JKKSRefRecord rec (res->getCellAsInt (i, 1), // idQueue
@@ -2986,7 +3019,7 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readTableRecords (void) const
             rec.setUid (uid);
             rec.setAddr (addr);
 	    
-	    qWarning() << __PRETTY_FUNCTION__ << "senderAddress = " << rec.getSenderAddr();
+            qWarning() << __PRETTY_FUNCTION__ << "senderAddress = " << rec.getSenderAddr().address() << " senderPort = " << rec.getSenderAddr().port();
 
             if (entity_type == 1)
             {
@@ -3273,15 +3306,18 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readQueueResults (void) const
         return result;
     for (int i=0; i<res->getRowCount(); i++)
     {
+        JKKSAddress addr(res->getCellAsString (i, 0), 
+                         res->getCellAsInt (i, 5));
+
         JKKSQueueResponse * resp = new JKKSQueueResponse (res->getCellAsInt (i, 1),
                                                           res->getCellAsInt (i, 3),
                                                           res->getCellAsInt (i, 4),
-                                                          res->getCellAsString (i, 0));
+                                                          addr);
 
         JKKSPMessage pM(resp->serialize(), resp->getMessageType());
         pM.verifyReceiver = false;
 
-        qWarning() << "Response Address = " << resp->getAddr();
+        qWarning() << "Response Address = " << resp->getAddr().address() << "Response port = " << resp->getAddr().port();
 
         JKKSPMessWithAddr * pMessWithAddr = new JKKSPMessWithAddr (pM, resp->getAddr(), resp->id());
         if (pMessWithAddr)
@@ -3327,7 +3363,12 @@ int JKKSLoader :: writeReceipt (JKKSQueueResponse& response) const
     if (response.getExternalId() < 0)
         return ERROR_CODE;
 
-    QString sql (QString("select addQueueResult (%1, %2, '%3');").arg (response.getExternalId()).arg (response.getResult()).arg (response.getAddr()));
+    QString sql (QString("select addQueueResult (%1, %2, '%3', %4);")
+                         .arg (response.getExternalId())
+                         .arg (response.getResult())
+                         .arg (response.getAddr().address())
+                         .arg (response.getAddr().port())
+                 );
     KKSResult * res = dbWrite->execute (sql);
     if (!res){
         qWarning() << "ERROR! " << __PRETTY_FUNCTION__ << " Cannot execute query " << sql << " Function error";
@@ -3552,7 +3593,7 @@ int JKKSLoader :: writeMessage (JKKSOrgPackage * OrgPack, const QString& senderU
 {
     Q_UNUSED (receiverUID);
     JKKSQueueResponse recResp (-1, OrgPack->id(), 2, OrgPack->getAddr());
-    qDebug () << __PRETTY_FUNCTION__ << senderUID << OrgPack->getAddr ();
+    qDebug () << __PRETTY_FUNCTION__ << senderUID << OrgPack->getAddr ().address() << OrgPack->getAddr ().port();
 
     QMap<int, JKKSTransport> T = OrgPack->getTransports();
     for (QMap<int, JKKSTransport>::const_iterator pt = T.constBegin();
@@ -3560,7 +3601,7 @@ int JKKSLoader :: writeMessage (JKKSOrgPackage * OrgPack, const QString& senderU
          pt++)
     {
         JKKSTransport TR = pt.value();
-        int iert = writeTransport (TR, TR.getAddr());
+        int iert = writeTransport (TR);
         if (iert < 0)
         {
             recResp.setResult (4);
@@ -3713,8 +3754,8 @@ int JKKSLoader :: writeMessage (JKKSOrganization * org, const QString& receiverU
     JKKSTransport T = org->getTransport ();
     if (!receiverUID.isEmpty())
     {
-        qDebug () << __PRETTY_FUNCTION__ << T.id() << T.uid() << T.getAddr() << org->id() << receiverUID;
-        int idTr = writeTransport (T, T.getAddr ());
+        qDebug () << __PRETTY_FUNCTION__ << T.id() << T.uid() << T.getAddress().address() << org->id() << receiverUID;
+        int idTr = writeTransport (T);
         if (idTr < 0){
             qWarning() << __PRETTY_FUNCTION__ << "ERROR! writeTransport Error!";
             return ERROR_CODE;
@@ -3728,7 +3769,7 @@ int JKKSLoader :: writeMessage (JKKSOrganization * org, const QString& receiverU
         QString trOrgSql = QString ("select recInsert ('localorg-io_objects-34', ARRAY['localorg-attributes-1', 'localorg-attributes-74', 'localorg-attributes-94', 'localorg-attributes-28'], ARRAY['1','%1', '%2', '%3']);")
                                       .arg (org->getEMail())
                                       .arg (T.uid())
-                                      .arg (T.getAddr());
+                                      .arg (T.getAddress().address());
 
         KKSResult * otRes = dbWrite->execute (trOrgSql);
         if (!otRes || otRes->getRowCount () <= 0)
@@ -3758,13 +3799,14 @@ int JKKSLoader :: writeMessage (JKKSOrganization * org, const QString& receiverU
     return idOrg;
 }
 
-int JKKSLoader :: writeTransport (JKKSTransport& T, const QString& locAddr) const
+int JKKSLoader :: writeTransport (JKKSTransport& T) const
 {
-    QString sql = QString ("select uInsertTransport('%1', '%2', '%3', %4);")
+    QString sql = QString ("select uInsertTransport('%1', '%2', '%3', %4, %5);")
                     .arg (T.uid())
                     .arg (T.getTransportName ())
-                    .arg (locAddr.isEmpty() ? QString("NULL") : locAddr)
-                    .arg (T.isTransportActive() ? QString ("TRUE") : QString ("FALSE"));
+                    .arg (T.getAddress().address().isEmpty() ? QString("NULL") : T.getAddress().address())
+                    .arg (T.isTransportActive() ? QString ("TRUE") : QString ("FALSE"))
+                    .arg (T.getAddress().port() <= 0 ? QString("NULL") : QString::number(T.getAddress().port()));
 
     KKSResult * tRes = dbWrite->execute (sql);
     if (!tRes || tRes->getRowCount() != 1)
@@ -3947,11 +3989,15 @@ QMap<int, JKKSOrganization> JKKSLoader :: readOrganizations (int idOrg) const
         QMap<int, JKKSWorkMode> wmList = this->readOrgWM (org.id());
         org.setWorkModes (wmList);
 
+        JKKSAddress addr(orgRes->getCellAsString (i, 25),//address 
+                         orgRes->getCellAsInt(i, 28));//port
+
         JKKSTransport T (orgRes->getCellAsInt (i, 23), // id
                          orgRes->getCellAsString (i, 24), // name
-                         orgRes->getCellAsString (i, 25), // address
+                         addr, // address
                          orgRes->getCellAsBool (i, 27), // active
-                         orgRes->getCellAsString (i, 26)); // unique_id
+                         orgRes->getCellAsString (i, 26)// unique_id
+                         ); 
 
         org.setTransport (T);
         if (orgs.contains (org.id()))
@@ -4179,8 +4225,10 @@ JKKSOrgPackage JKKSLoader :: readOrgs (int id, const QString& receiverUID) const
 QMap<int, JKKSTransport> JKKSLoader :: readTransports (const QString& receiverUID) const
 {
     QMap<int, JKKSTransport> TResult;
+
     QString sql = QString ("select * from getTransportAddresses ('%1');").arg (receiverUID);
     KKSResult * res = dbRead->execute (sql);
+    
     if (!res || res->getRowCount() == 0)
     {
         if (res)
@@ -4191,12 +4239,16 @@ QMap<int, JKKSTransport> JKKSLoader :: readTransports (const QString& receiverUI
 
     for (int i=0; i<res->getRowCount(); i++)
     {
+        JKKSAddress addr(res->getCellAsString (i, 3),
+                         res->getCellAsInt (i, 5));
+
         JKKSTransport T (res->getCellAsInt (i, 1), // id
                         res->getCellAsString (i, 2), // name
-                        res->getCellAsString (i, 3), // address
+                        addr, // address
                         res->getCellAsBool (i, 4), // active
                         res->getCellAsString (i, 0) // unique_id
                        );
+
         TResult.insert (T.id(), T);
     }
     delete res;

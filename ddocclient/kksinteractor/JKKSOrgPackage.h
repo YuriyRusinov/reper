@@ -21,7 +21,10 @@ class JKKSLoader;
 class _I_EXPORT JKKSOrgPackage : public JKKSMessage, public JKKSUID
 {
 public:
-    JKKSOrgPackage (int id=-1, const QString& addr=QString(), const QString& code=QString(), const QString& uid=QString());
+    JKKSOrgPackage (int id=-1, 
+                    const JKKSAddress & addr = JKKSAddress(), 
+                    const QString& code=QString(), 
+                    const QString& uid=QString());
     JKKSOrgPackage (const JKKSOrgPackage& OP);
 
     virtual QByteArray serialize (void) const;

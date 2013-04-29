@@ -17,6 +17,8 @@
 #include <QStringList>
 #include <QDebug>
 
+#include "JKKSMessage.h"
+
 class _I_EXPORT JKKSPMessage
 {
     public:
@@ -44,7 +46,7 @@ class _I_EXPORT JKKSPMessage
 private:
         QByteArray data;
         int messType;
-        QStringList urlList;
+        QStringList urlList;//פאיכû
 
     public:
         QString senderUID;
@@ -59,12 +61,12 @@ class _I_EXPORT JKKSPMessWithAddr
 {
     public:
         JKKSPMessage pMess;
-        QString addr;
+        JKKSAddress addr;
         int id;
 
         JKKSPMessWithAddr (void);
-        JKKSPMessWithAddr (const JKKSPMessage& pm, const QString& a, const int& c);
-        JKKSPMessWithAddr (JKKSPMessage *, const QString& a, const int& c);
+        JKKSPMessWithAddr (const JKKSPMessage& pm, const JKKSAddress & a, const int& c);
+        JKKSPMessWithAddr (JKKSPMessage *, const JKKSAddress & a, const int& c);
         ~JKKSPMessWithAddr (void);
 };
 
