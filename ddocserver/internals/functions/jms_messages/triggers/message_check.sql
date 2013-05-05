@@ -19,7 +19,7 @@ begin
         return NULL;
     end if;
 
-    perform initrand();
+    perform loadrand();
 
     if (id_distrib = 1) then
         select into new_time_step new.moda+gaussrand(new.sigma);

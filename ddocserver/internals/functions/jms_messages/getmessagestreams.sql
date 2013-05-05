@@ -32,7 +32,7 @@ begin
             end if;
             id_distrib := r.id_partition_low;
 
-            perform initrand();
+            perform loadrand();
 
             if (id_distrib = 1) then
                 select into time_step r.moda+gaussrand(r.sigma);
