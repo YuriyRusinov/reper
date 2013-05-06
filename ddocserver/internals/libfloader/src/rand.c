@@ -1,6 +1,7 @@
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
 #include <stdio.h>
+#include <postgres.h>
 #include "floader.h"
 
 gsl_rng * r = 0;
@@ -72,8 +73,8 @@ Datum saverand(PG_FUNCTION_ARGS)
     if (!r)
         PG_RETURN_INT32(-1);
     size_t nr = gsl_rng_size (r);
-    void * randBuf = malloc (nr);
-//    elog(WARNING, "size of is %u\n", nr);
+    bytea * randBuf = (bytea *) palloc(nr*sizeof (bytea));
+    elog(INFO, "size of gsl_rng_size = %zu\n", nr);
     FILE * fRand = fmemopen (randBuf, nr, "wb");
     if (!fRand)
         PG_RETURN_INT32(-2);
@@ -86,39 +87,99 @@ Datum saverand(PG_FUNCTION_ARGS)
     }
     fclose (fRand);
 
-    size_t nr_ins = strlen ("insert into rand_state (state_rand) values ($1);");
-    char* r_sql = (char *) palloc (nr_ins + 1);
-    FILE * srSql = fmemopen (r_sql, nr_ins, "wb");
-    fwrite ("insert into rand_state (state_rand) values ($1);\0", 1, nr_ins, srSql);
-    elog (INFO, "insert query is '%s'\n", r_sql);
+//    size_t nr_ins = strlen ("insert into rand_state (id) values ($1);");
+    const char* r_sql = "insert into rand_state (id, state_rand) values ($1, $2)";//(char *) palloc (nr_ins + 1);
 
-    fclose (srSql);
-    elog (INFO, "insert query is '%s'\n", r_sql);
-    Oid * oids = (Oid *)palloc (sizeof (Oid));
-    Datum * val = (Datum *)palloc (sizeof (Datum));
-    char * sval = (char *)palloc (nr);
-    FILE * frStr = fmemopen (sval, nr, "wb");
-    fwrite (randBuf, nr, 1, frStr);
-    fclose (frStr);
-    *val = PointerGetDatum (sval);//randBuf);
-    elog (INFO, "value=%p randbuf=%p\n cvalue=%s\n", val[0], randBuf, sval);
-    *oids = BYTEAOID;
-    char nulls[1];//= (char *)(palloc (1));
-    nulls[0] = '\0';
-    int rins = SPI_execute_with_args (r_sql, 1, oids, val, nulls, false, 1);
+/*    const char* test_sql = "insert into ttt (id, name) values ($1, $2);";
+    const char* tSeqSql = "select getnextseq(\'ttt\', \'id\');";
+    int rtseq = SPI_execute (tSeqSql, true, 1);
+    int idtproc = SPI_processed;
+    if (rtseq != SPI_OK_SELECT || idtproc != 1)
+    {
+        SPI_finish ();
+        pfree (randBuf);
+        PG_RETURN_INT32 (-4);
+    }
+    int8 tid;
+    TupleDesc ttupdesc = SPI_tuptable->tupdesc;
+    SPITupleTable *ttuptable = SPI_tuptable;
+    HeapTuple ttuple = ttuptable->vals[0];
+    char * tid_str = SPI_getvalue (ttuple, ttupdesc, 1);
+    tid = atol (tid_str);
+    const int ntargs = 2;
+    char * tnulls = "";
+    Oid * toids = (Oid *)palloc (ntargs*sizeof (Oid));
+    toids[0] = INT8OID;
+    toids[1] = VARCHAROID;
+    Datum * tvals = (Datum *)palloc (ntargs*sizeof (Datum));
+    tvals[0] = Int32GetDatum (tid);
+    char * name_str = (char *)palloc (25*sizeof(char));
+    strcpy (name_str, "aagadfgadf");
+    elog (INFO, "%s\n", name_str);
+    tvals[1] = CStringGetDatum (name_str);
+    int rtins = SPI_execute_with_args (test_sql, ntargs, toids, tvals, tnulls, false, 1L);
+    SPI_finish ();
+    if (rtins != SPI_OK_INSERT)
+    {
+        pfree (randBuf);
+        PG_RETURN_INT32 (-4);
+    }
+    pfree (toids);
+    pfree (tvals);
+    PG_RETURN_INT32 (tid);
+*/
+
+    const int nargs = 2;
+    char *nulls = '\0';//(char *)(palloc (nargs*sizeof(char)));
+    Oid * oids = (Oid *)palloc (nargs*sizeof (Oid));
+    oids[0] = INT8OID;
+    oids[1] = BYTEAOID;
+    Datum * vals = (Datum *)palloc (nargs*sizeof (Datum));
+    vals[0] = Int32GetDatum(-1);
+    const char* seqSql = "select getnextseq(\'rand_state\', \'id\');";
+    int rseq = SPI_execute (seqSql, true, 1);
+    int idproc = SPI_processed;
+    if (rseq != SPI_OK_SELECT || idproc != 1)
+    {
+        SPI_finish ();
+        //pfree (r_sql);
+        pfree (randBuf);
+        PG_RETURN_INT32 (-4);
+    }
+    int8 id;
+    TupleDesc tupdesc = SPI_tuptable->tupdesc;
+    SPITupleTable *tuptable = SPI_tuptable;
+    HeapTuple tuple = tuptable->vals[0];
+    char * id_str = SPI_getvalue (tuple, tupdesc, 1);
+    id = atol (id_str);
+    elog (INFO, "id=%d\n", id);
+    vals[0] = Int32GetDatum(id);
+//    char * tst ="abc";
+    vals[1] = PointerGetDatum (randBuf);
+    elog (INFO, "value=%d id=%d\n", DatumGetInt32 (vals[0]), id);
+//    oids[1] = BYTEAOID;
+//    snprintf (r_sql, nr_ins+1, "insert into rand_state (id, state_rand) values ($1, $2);");
+    elog (INFO, "%s\n", r_sql);
+    int rins = SPI_execute_with_args (r_sql, nargs, oids, vals, nulls, false, 1L);
     if (rins != SPI_OK_INSERT)
     {
         SPI_finish ();
         elog(ERROR, "Cannot insert random numbers generation via SPI");
         pfree (oids);
-        pfree (r_sql);
+//        pfree (nulls);
+        pfree (vals);
+//        pfree (r_sql);
         PG_RETURN_INT32 (rins);
     }
-    SPI_finish();
     pfree (oids);
-    pfree (r_sql);
+//    pfree (nulls);
+    pfree (vals);
+//    pfree (r_sql);
+
+    SPI_finish();
 
     PG_RETURN_INT32(res);
+
 }
 
 Datum loadrand(PG_FUNCTION_ARGS)
@@ -138,7 +199,7 @@ Datum loadrand(PG_FUNCTION_ARGS)
     if (retVal != SPI_OK_SELECT)
     {
         elog (ERROR, "Cannot load random generator state");
-        PG_RETURN_INT32(-1);
+        PG_RETURN_INT32(-2);
     }
     int proc = SPI_processed;
     if (proc==0)
@@ -160,12 +221,12 @@ Datum loadrand(PG_FUNCTION_ARGS)
         if (*isNull || !randBuf)
         {
             elog (ERROR, "Incorrect data");
-            PG_RETURN_INT32(-1);
+            PG_RETURN_INT32(-3);
         }
         pfree (isNull);
         FILE * fRand = fmemopen (randBuf, nr, "r");
         if (!fRand)
-            PG_RETURN_INT32(-1);
+            PG_RETURN_INT32(-4);
         res = gsl_rng_fread (fRand, r);
     }
     SPI_finish();
