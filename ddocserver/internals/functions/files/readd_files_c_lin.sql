@@ -43,3 +43,9 @@ create or replace function saverand() returns int4
 
 create or replace function loadrand() returns int4
     as '$libdir/libfloader.so', 'loadrand' language 'c' strict security definer;
+
+create or replace function testargs(varchar) returns int4
+    as '$libdir/libfloader.so', 'testargs' language 'c' strict security definer;
+
+create or replace function testspi(text,boolean,int) returns int4
+    as '$libdir/libfloader.so','testspi' language 'c' strict;
