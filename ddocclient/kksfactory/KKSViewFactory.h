@@ -77,7 +77,7 @@ class _F_EXPORT KKSViewFactory
                                     KKSLoader* l,
                                     const KKSList<const KKSFilterGroup *> & filters);
 
-        static QAbstractItemModel* initCategoriesModel (KKSLoader* l, const KKSList<const KKSFilterGroup *> & filters);
+        static QAbstractItemModel* initCategoriesModel (KKSLoader* l, const KKSList<const KKSFilterGroup *>& catTypeFilters, const KKSList<const KKSFilterGroup *>& catFilters);
 
         static KKSRecWidget * createCategoryTemplates (int idCat,
                                                        KKSLoader *l,

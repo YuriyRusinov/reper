@@ -1025,11 +1025,33 @@ void KKSViewFactory :: loadCategories (KKSCategoryTemplateWidget* catTemplW,
                                        KKSLoader* l, 
                                        const KKSList<const KKSFilterGroup *> & filters)
 {
-    QAbstractItemModel * catTypeTemplModel = initCategoriesModel (l, filters);
+    KKSObject * refCatObj = l->loadIO (IO_CAT_ID, true);
+    if (!refCatObj)
+        return;
+
+    KKSFilter * cMainFilter = refCatObj->category()->tableCategory()->createFilter (ATTR_IS_MAIN, QString("true"), KKSFilter::foEq);
+    if (!cMainFilter)
+        return;
+
+    KKSFilter * cArchFilter = refCatObj->category()->tableCategory()->createFilter (ATTR_IS_ARCHIVED, QString("FALSE"), KKSFilter::foEq);
+    if (!cArchFilter)
+        return;
+    KKSList<const KKSFilterGroup *> cFilterGroups;
+    KKSList<const KKSFilter*> catFilters;
+    
+    catFilters.append (cMainFilter);
+    catFilters.append (cArchFilter);
+    
+    KKSFilterGroup * cGroup = new KKSFilterGroup (true);
+    
+    cGroup->setFilters (catFilters);
+    cFilterGroups.append (cGroup);
+    cGroup->release ();
+    QAbstractItemModel * catTypeTemplModel = initCategoriesModel (l, filters, cFilterGroups);
     catTemplW->uploadModel (catTypeTemplModel);
 }
 
-QAbstractItemModel* KKSViewFactory :: initCategoriesModel (KKSLoader* l, const KKSList<const KKSFilterGroup *> & filters)
+QAbstractItemModel* KKSViewFactory :: initCategoriesModel (KKSLoader* l, const KKSList<const KKSFilterGroup *> & filters, const KKSList<const KKSFilterGroup *>& catFilters)
 {
     KKSObject *catTypeObj = l->loadIO (IO_CAT_TYPE_ID, true);
     if(!catTypeObj)
@@ -1038,33 +1060,15 @@ QAbstractItemModel* KKSViewFactory :: initCategoriesModel (KKSLoader* l, const K
     KKSMap<qint64, KKSEIOData *> categTypeMap = l->loadEIOList (catTypeObj, filters);
     
     int n = categTypeMap.count ();
+    KKSObject * refCatObj = l->loadIO (IO_CAT_ID, true);
+    if (!refCatObj)
+        return 0;
     QStandardItemModel *catTypeTemplModel = new QStandardItemModel (n, 1);
     catTypeTemplModel->setHeaderData (0, Qt::Horizontal, QObject::tr("Select category and template"), Qt::DisplayRole);
     KKSMap<qint64, KKSEIOData *>::const_iterator pCatTypes;
 
-    KKSObject * refCatObj = l->loadIO (IO_CAT_ID, true);
-    if (!refCatObj)
-    {
-        delete catTypeTemplModel;
-        return 0;
-    }
 
-    KKSFilter * cMainFilter = refCatObj->category()->tableCategory()->createFilter (ATTR_IS_MAIN, QString("true"), KKSFilter::foEq);
-    if (!cMainFilter)
-    {
-        delete catTypeTemplModel;
-        refCatObj->release ();
-        return 0;
-    }
-
-    KKSFilter * cArchFilter = refCatObj->category()->tableCategory()->createFilter (ATTR_IS_ARCHIVED, QString("FALSE"), KKSFilter::foEq);
-    if (!cArchFilter)
-    {
-        delete catTypeTemplModel;
-        refCatObj->release ();
-        return 0;
-    }
-
+    KKSList<const KKSFilterGroup *> catByTypeFilters (catFilters);
     int itype=0;
     for (pCatTypes=categTypeMap.constBegin(); pCatTypes != categTypeMap.constEnd(); ++pCatTypes)
     {
@@ -1076,25 +1080,18 @@ QAbstractItemModel* KKSViewFactory :: initCategoriesModel (KKSLoader* l, const K
         catRow.rheight() = 24;
         catTypeTemplModel->setData (ctIndex, catRow, Qt::SizeHintRole);
         
-        KKSList<const KKSFilterGroup *> cFilterGroups;
-        KKSList<const KKSFilter*> catFilters;
-        
-        catFilters.append (cMainFilter);
-        catFilters.append (cArchFilter);
-        
-        KKSFilterGroup * cGroup = new KKSFilterGroup (true);
+
+        KKSFilterGroup * cGroup = new KKSFilterGroup(true);
         KKSFilter * cTypeFilter = refCatObj->category()->tableCategory()->createFilter (ATTR_ID_IO_CAT_TYPE, QString::number (pCatTypes.key()), KKSFilter::foEq);
         if (!cTypeFilter)
             continue;
 
-        catFilters.append (cTypeFilter);
-        
+        cGroup->addFilter (cTypeFilter);
+        catByTypeFilters.append (cGroup);
         cTypeFilter->release ();
-        cGroup->setFilters (catFilters);
-        cFilterGroups.append (cGroup);
         cGroup->release ();
-
-        KKSMap<qint64, KKSEIOData *> categMap = l->loadEIOList (refCatObj, cFilterGroups);
+        KKSMap<qint64, KKSEIOData *> categMap = l->loadEIOList (refCatObj, catByTypeFilters);
+        catByTypeFilters.removeAt(catByTypeFilters.count()-1);
 
         catTypeTemplModel->insertRows (0, categMap.count(), ctIndex);
         catTypeTemplModel->insertColumns (0, 1, ctIndex);
@@ -1119,8 +1116,8 @@ QAbstractItemModel* KKSViewFactory :: initCategoriesModel (KKSLoader* l, const K
         }
     }
 
-    cMainFilter->release ();
-    cArchFilter->release ();
+//    cMainFilter->release ();
+//    cArchFilter->release ();
 
     refCatObj->release ();
     catTypeObj->release ();

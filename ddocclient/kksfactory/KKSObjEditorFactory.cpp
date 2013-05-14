@@ -6411,7 +6411,29 @@ SaveSearchTemplateForm * KKSObjEditorFactory :: GUISearchTemplate (KKSSearchTemp
     stForm->setTypesModel (searchTModel);
     stForm->selectType (stCInd);
     KKSList<const KKSFilterGroup *> filters;
-    QAbstractItemModel * catModel = KKSViewFactory::initCategoriesModel (loader, filters);
+    KKSObject * refCatObj = loader->loadIO (IO_CAT_ID, true);
+    if (!refCatObj)
+        return 0;
+    KKSFilter * cMainFilter = refCatObj->category()->tableCategory()->createFilter (ATTR_IS_MAIN, QString("false"), KKSFilter::foEq);
+    if (!cMainFilter)
+        return 0;
+
+    KKSFilter * cArchFilter = refCatObj->category()->tableCategory()->createFilter (ATTR_IS_ARCHIVED, QString("FALSE"), KKSFilter::foEq);
+    if (!cArchFilter)
+        return 0;
+    KKSList<const KKSFilterGroup *> cFilterGroups;
+    KKSList<const KKSFilter*> catFilters;
+    
+    catFilters.append (cMainFilter);
+    catFilters.append (cArchFilter);
+    
+    KKSFilterGroup * cGroup = new KKSFilterGroup (true);
+    
+    cGroup->setFilters (catFilters);
+    cFilterGroups.append (cGroup);
+    cGroup->release ();
+
+    QAbstractItemModel * catModel = KKSViewFactory::initCategoriesModel (loader, filters, cFilterGroups);
     QModelIndex catInd = KKSViewFactory::searchModelRowsIndexMultiType(catModel, st->idCategory(), 1);
     qDebug () << __PRETTY_FUNCTION__ << catInd;
     stForm->setCategoryModel (catModel);
