@@ -26,7 +26,7 @@ Datum testspi(PG_FUNCTION_ARGS)
         int proc = SPI_processed;
         elog (INFO, "row processed %d\n", proc);
         elog (INFO, "columns processed %d\n", tuptable->tupdesc->natts );
-        elog (INFO, "table name %s\n", tuptable->tuptabcxt->name);
+//        elog (INFO, "table name %s\n", tuptable->tuptabcxt->name);
         int i, j;
         for (i=0; i<proc; i++)
         {

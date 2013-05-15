@@ -2,63 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="ru_RU">
 <context>
-    <name>AcademicDegreeForm</name>
-    <message>
-        <source>DB not connected ! Check server status and try again</source>
-        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
-    </message>
-    <message>
-        <source>Academic Degree Table</source>
-        <translation type="obsolete">Таблица ученых степеней</translation>
-    </message>
-    <message>
-        <source>Name of Academic Degree</source>
-        <translation type="obsolete">Ученая степень</translation>
-    </message>
-    <message>
-        <source>Code</source>
-        <translation type="obsolete">Сокращение</translation>
-    </message>
-</context>
-<context>
-    <name>AcademicRankForm</name>
-    <message>
-        <source>DB not connected ! Check server status and try again</source>
-        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
-    </message>
-    <message>
-        <source>Academic Ranks Table</source>
-        <translation type="obsolete">Таблица ученых званий</translation>
-    </message>
-    <message>
-        <source>Name of Academic Rank</source>
-        <translation type="obsolete">Ученое звание</translation>
-    </message>
-    <message>
-        <source>Code</source>
-        <translation type="obsolete">Сокращение</translation>
-    </message>
-</context>
-<context>
-    <name>AccMandatoryForm</name>
-    <message>
-        <source>DB not connected ! Check server status and try again</source>
-        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
-    </message>
-    <message>
-        <source>Acc Mandatory&apos;s Table</source>
-        <translation type="obsolete">Таблица ограничений</translation>
-    </message>
-    <message>
-        <source>Name of Mandatory</source>
-        <translation type="obsolete">Ограничение</translation>
-    </message>
-    <message>
-        <source>Description</source>
-        <translation type="obsolete">Описание</translation>
-    </message>
-</context>
-<context>
     <name>AttrHistory</name>
     <message>
         <source>Id</source>
@@ -77,10 +20,6 @@
         <translation>Значение</translation>
     </message>
     <message>
-        <source>Measured</source>
-        <translation>Измерено к</translation>
-    </message>
-    <message>
         <source>Source</source>
         <translation>Источник</translation>
     </message>
@@ -94,138 +33,173 @@
     </message>
 </context>
 <context>
-    <name>AuditoryForm</name>
-    <message>
-        <source>DB not connected ! Check server status and try again</source>
-        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
-    </message>
-    <message>
-        <source>Kafedra</source>
-        <translation type="obsolete">Кафедра</translation>
-    </message>
-    <message>
-        <source>Auditory Type</source>
-        <translation type="obsolete">Тип аудитории</translation>
-    </message>
-    <message>
-        <source>Education Building</source>
-        <translation type="obsolete">Учебный корпус</translation>
-    </message>
-    <message>
-        <source>Auditory Table</source>
-        <translation type="obsolete">Таблица аудиторий</translation>
-    </message>
-    <message>
-        <source>Auditory Name</source>
-        <translation type="obsolete">Название аудитории</translation>
-    </message>
-    <message>
-        <source>Code</source>
-        <translation type="obsolete">Код (номер) аудитроии</translation>
-    </message>
-    <message>
-        <source>Capacity</source>
-        <translation type="obsolete">Вместимость</translation>
-    </message>
-    <message>
-        <source>Mac Label</source>
-        <translation type="obsolete">Метка</translation>
-    </message>
-</context>
-<context>
-    <name>AuditoryTypeForm</name>
-    <message>
-        <source>DB not connected ! Check server status and try again</source>
-        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
-    </message>
-    <message>
-        <source>Auditory Type Table</source>
-        <translation type="obsolete">Таблица типов аудиторий</translation>
-    </message>
-    <message>
-        <source>Auditory Type</source>
-        <translation type="obsolete">Тип аудитории</translation>
-    </message>
-</context>
-<context>
     <name>BarcodeEditor</name>
     <message>
         <source>128</source>
-        <translation type="obsolete">128</translation>
+        <translation type="unfinished">128</translation>
     </message>
     <message>
         <source>5</source>
-        <translation type="obsolete">5</translation>
+        <translation type="unfinished">5</translation>
     </message>
     <message>
         <source>0.00</source>
-        <translation type="obsolete">0.00</translation>
+        <translation type="unfinished">0.00</translation>
     </message>
     <message>
         <source>0.01</source>
-        <translation type="obsolete">0.01</translation>
+        <translation type="unfinished">0.01</translation>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation type="obsolete">&amp;OK</translation>
+        <translation type="unfinished">&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Отмена</translation>
-    </message>
-</context>
-<context>
-    <name>Base_Simple_Form</name>
-    <message>
-        <source>Form</source>
-        <translation type="obsolete">Форма</translation>
+        <translation type="unfinished">&amp;Отмена</translation>
     </message>
     <message>
-        <source>Name</source>
-        <translation type="obsolete">Название</translation>
+        <source>Bar Code Properties</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Add</source>
-        <translation type="obsolete">Добавить</translation>
+        <source>Format:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Remove</source>
-        <translation type="obsolete">Удалить
-</translation>
+        <source>Column:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Edit</source>
-        <translation type="obsolete">Редактировать</translation>
+        <source>Query Source:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Reload</source>
-        <translation type="obsolete">Отмена</translation>
+        <source>3of9</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>DB Update </source>
-        <translation type="obsolete">Подтвердить</translation>
+        <source>3of9+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ean13</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ean8</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>upc-a</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>upc-e</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum Length of Value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alignment</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Center</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Position/Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>X:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Width:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Y:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Height:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Narrow bar width:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>in inches</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+O</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+C</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>BoolEdit</name>
     <message>
         <source>Name:</source>
-        <translation type="obsolete">Название:</translation>
+        <translation type="unfinished">Название:</translation>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation type="obsolete">&amp;OK</translation>
+        <translation type="unfinished">&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Отмена</translation>
+        <translation type="unfinished">&amp;Отмена</translation>
     </message>
-</context>
-<context>
-    <name>Builder</name>
     <message>
-        <source>No</source>
-        <translation type="obsolete">Нет</translation>
+        <source>Bool</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Value:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>True</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>False</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+O</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+C</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -243,46 +217,88 @@
     <name>ColorEditor</name>
     <message>
         <source>Name:</source>
-        <translation type="obsolete">Название:</translation>
+        <translation type="unfinished">Название:</translation>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation type="obsolete">&amp;OK</translation>
+        <translation type="unfinished">&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Отмена</translation>
+        <translation type="unfinished">&amp;Отмена</translation>
     </message>
     <message>
         <source>0</source>
-        <translation type="obsolete">0</translation>
+        <translation type="unfinished">0</translation>
+    </message>
+    <message>
+        <source>Color Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Components</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Green</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Red</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Blue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Color...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>ColorList</name>
     <message>
         <source>&amp;Close</source>
-        <translation type="obsolete">&amp;Закрыть</translation>
+        <translation type="unfinished">&amp;Закрыть</translation>
     </message>
     <message>
         <source>&amp;Add</source>
-        <translation type="obsolete">&amp;Добавить</translation>
+        <translation type="unfinished">&amp;Добавить</translation>
     </message>
     <message>
         <source>&amp;Edit</source>
-        <translation type="obsolete">&amp;Редактировать</translation>
+        <translation type="unfinished">&amp;Редактировать</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="obsolete">Удалить</translation>
+        <translation type="unfinished">Удалить</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="obsolete">Ошибка</translation>
+        <translation type="unfinished">Ошибка</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation type="obsolete">Внимание</translation>
+        <translation type="unfinished">Внимание</translation>
+    </message>
+    <message>
+        <source>Color Definitions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This dialog was not properly setup and cannot perform the requested action!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No color name was specified!
+Please specify a name for this color.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The color name you specified is already in use!
+Please specify a UNIQUE name for this color.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -332,41 +348,170 @@
     <name>CrossTabEditor</name>
     <message>
         <source>&amp;OK</source>
-        <translation type="obsolete">&amp;OK</translation>
+        <translation type="unfinished">&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Отмена</translation>
-    </message>
-</context>
-<context>
-    <name>CycleForm</name>
-    <message>
-        <source>DB not connected ! Check server status and try again</source>
-        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <translation type="unfinished">&amp;Отмена</translation>
     </message>
     <message>
-        <source>Disciplines Cycle Table</source>
-        <translation type="obsolete">Таблица циклов дисциплин</translation>
+        <source>Properties (Field)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cycle&apos;s name</source>
-        <translation type="obsolete">Название цикла</translation>
+        <source>Query Source:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cycle&apos;s code</source>
-        <translation type="obsolete">Код цикла</translation>
+        <source>Table properties</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Table cell margins (inches)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Left:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Right:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Top:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bottom:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wrapping policy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First display all rows</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First display all columns</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display header</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display column header on each part</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display row header on each part</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Font...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Column query source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Column query column:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Horizontal alignment:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Center</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vertical alignment:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Top</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bottom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Row query source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Row query column:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Value query source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Value query column:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+O</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+C</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>DBFileDialog</name>
     <message>
         <source>&amp;OK</source>
-        <translation type="obsolete">&amp;OK</translation>
+        <translation type="unfinished">&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Отмена</translation>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
+    <message>
+        <source>Database File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Grade</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Report Name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Grade:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>##</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -482,11 +627,6 @@ End of querying SIU database.
 </translation>
     </message>
     <message>
-        <source>ETK UID = %1</source>
-        <translation type="obsolete">ЭТК UID = %1
-</translation>
-    </message>
-    <message>
         <source>An ERROR was occured while creating IO from GMO in DynamicDocs database!
 </source>
         <translation>Произошла ОШИБКА в процессе создания ИО из ГМО в DynamicDocs Server!
@@ -505,19 +645,9 @@ End of querying SIU database.
 </translation>
     </message>
     <message>
-        <source>NVO UID = %1</source>
-        <translation type="obsolete">НВО UID = %1
-</translation>
-    </message>
-    <message>
         <source>An ERROR was occured while creating IO from EOIRD in DynamicDocs database!
 </source>
         <translation>Произошла ОШИБКА в процессе создания ИО из ЭОИРД в DynamicDocs Server!
-</translation>
-    </message>
-    <message>
-        <source>EOIRD UID = %1</source>
-        <translation type="obsolete">ЭОИРД UID = %1
 </translation>
     </message>
     <message>
@@ -527,19 +657,9 @@ End of querying SIU database.
 </translation>
     </message>
     <message>
-        <source>EFO UID = %1</source>
-        <translation type="obsolete">ЭФО UID = %1
-</translation>
-    </message>
-    <message>
         <source>An ERROR was occured while creating IO from UGSH in DynamicDocs database!
 </source>
         <translation>Произошла ОШИБКА в процессе создания ИО из Ук.ГШ в DynamicDocs Server!
-</translation>
-    </message>
-    <message>
-        <source>UGSH UID = %1</source>
-        <translation type="obsolete">Ук. ГШ UID = %1
 </translation>
     </message>
     <message>
@@ -549,19 +669,9 @@ End of querying SIU database.
 </translation>
     </message>
     <message>
-        <source>TTX UID = %1</source>
-        <translation type="obsolete">ТТХ UID = %1
-</translation>
-    </message>
-    <message>
         <source>An ERROR was occured while creating IO from PG in DynamicDocs database!
 </source>
         <translation>Произошла ОШИБКА в процессе создания ИО из План-графика в DynamicDocs Server!
-</translation>
-    </message>
-    <message>
-        <source>PG UID = %1</source>
-        <translation type="obsolete">План-график UID = %1
 </translation>
     </message>
     <message>
@@ -571,19 +681,9 @@ End of querying SIU database.
 </translation>
     </message>
     <message>
-        <source>POR UID = %1</source>
-        <translation type="obsolete">ПОР UID = %1
-</translation>
-    </message>
-    <message>
         <source>An ERROR was occured while creating IO from RBP in DynamicDocs database!
 </source>
         <translation>Произошла ОШИБКА в процессе создания ИО из РБП в DynamicDocs Server!
-</translation>
-    </message>
-    <message>
-        <source>RBP UID = %1</source>
-        <translation type="obsolete">РБП UID = %1
 </translation>
     </message>
     <message>
@@ -593,19 +693,9 @@ End of querying SIU database.
 </translation>
     </message>
     <message>
-        <source>REQ UID = %1</source>
-        <translation type="obsolete">Заявка UID = %1
-</translation>
-    </message>
-    <message>
         <source>An ERROR was occured while creating IO from OP VTO in DynamicDocs database!
 </source>
         <translation>Произошла ОШИБКА в процессе создания ИО из Выписки ОП ВТО в DynamicDocs Server!
-</translation>
-    </message>
-    <message>
-        <source>OP VTO UID = %1</source>
-        <translation type="obsolete">Выписка ОП ВТО UID = %1
 </translation>
     </message>
     <message>
@@ -1291,30 +1381,106 @@ End of querying SIU database.
     <name>DetailGroupSectionDialog</name>
     <message>
         <source>&amp;OK</source>
-        <translation type="obsolete">&amp;OK</translation>
+        <translation type="unfinished">&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Отмена</translation>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
+    <message>
+        <source>Group Section Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Column:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group Name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Group Header</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Group Footer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Insert Page Break After this Footer</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>DetailSectionDialog</name>
     <message>
         <source>&amp;Add</source>
-        <translation type="obsolete">&amp;Добавить</translation>
+        <translation type="unfinished">&amp;Добавить</translation>
     </message>
     <message>
         <source>&amp;Edit</source>
-        <translation type="obsolete">&amp;Редактировать</translation>
+        <translation type="unfinished">&amp;Редактировать</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="obsolete">Удалить</translation>
+        <translation type="unfinished">Удалить</translation>
     </message>
     <message>
         <source>&amp;Close</source>
-        <translation type="obsolete">&amp;Закрыть</translation>
+        <translation type="unfinished">&amp;Закрыть</translation>
+    </message>
+    <message>
+        <source>Detail Section Properties</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Section Name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Query Source:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Insert Page Break At End of Last Section</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group Sections</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move &amp;Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move &amp;Down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+C</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>unnamed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error Encountered</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to add a new group because a non-unique name could be generated.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No document specified.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tried to add a new Group section with a non-unique name.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1345,96 +1511,225 @@ End of querying SIU database.
     </message>
 </context>
 <context>
-    <name>DisciplineGroupForm</name>
-    <message>
-        <source>DB not connected ! Check server status and try again</source>
-        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
-    </message>
-    <message>
-        <source>Discipline group Table</source>
-        <translation type="obsolete">Таблица групп дисциплин</translation>
-    </message>
-</context>
-<context>
-    <name>DisciplineThemeForm</name>
-    <message>
-        <source>DB not connected ! Check server status and try again</source>
-        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
-    </message>
-    <message>
-        <source>Discipline</source>
-        <translation type="obsolete">Дисциплина</translation>
-    </message>
-    <message>
-        <source>Lesson Type</source>
-        <translation type="obsolete">Вид занятия</translation>
-    </message>
-    <message>
-        <source>Discipline Themes Table</source>
-        <translation type="obsolete">Таблица тем дисциплин</translation>
-    </message>
-    <message>
-        <source>Theme</source>
-        <translation type="obsolete">Тема</translation>
-    </message>
-    <message>
-        <source>Code</source>
-        <translation type="obsolete">Код</translation>
-    </message>
-    <message>
-        <source>Total Hours</source>
-        <translation type="obsolete">Всего часов</translation>
-    </message>
-</context>
-<context>
     <name>DocumentScene</name>
     <message>
         <source>Ok</source>
-        <translation type="obsolete">Да</translation>
+        <translation type="unfinished">Да</translation>
+    </message>
+    <message>
+        <source>No Section</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You must place an object inside a section on the report.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Report Header</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Report Footer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Page Header (First)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Page Header (Odd)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Page Header (Even)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Page Header (Last)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Page Header (Any)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Page Footer (First)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Page Footer (Odd)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Page Footer (Even)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Page Footer (Last)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Page Footer (Any)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Report Writer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to open/create file for writing!
+Save Failed! Check to make sure that you have
+permissions to the file you are trying to save to.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose filename to save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>XML (*.xml)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Report to Database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error saving to database</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>DocumentWindow</name>
     <message>
         <source>Save</source>
-        <translation type="obsolete">Сохранить</translation>
+        <translation type="unfinished">Сохранить</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="obsolete">Отмена</translation>
+        <translation type="unfinished">Отмена</translation>
+    </message>
+    <message>
+        <source>Untitled Document</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> *</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Report Writer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The document &apos;%1&apos; contains unsaved changes.
+Do you want to save the changes before closing?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Discard</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>DoubleEdit</name>
     <message>
         <source>Name:</source>
-        <translation type="obsolete">Название:</translation>
+        <translation type="unfinished">Название:</translation>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation type="obsolete">&amp;OK</translation>
+        <translation type="unfinished">&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Отмена</translation>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
+    <message>
+        <source>Double</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Value:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+O</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+C</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>EditDoc</name>
+    <name>EditFileForm</name>
     <message>
-        <source>OK</source>
-        <translation type="obsolete">OK</translation>
+        <source>Äîáàâëåíèå ôàéëà â ïðîåêò</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>EditPreferences</name>
     <message>
         <source>&amp;OK</source>
-        <translation type="obsolete">&amp;OK</translation>
+        <translation type="unfinished">&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Отмена</translation>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
+    <message>
+        <source>Preferences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Language :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default Font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Font...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Grid Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show grid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Snap to grid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Grid Size Interval</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>X Interval:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Y Interval:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Symetrical values</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1453,203 +1748,146 @@ End of querying SIU database.
     </message>
 </context>
 <context>
-    <name>Edit_Theme_Lessons</name>
-    <message utf8="true">
-        <source>Всего часов</source>
-        <translation type="obsolete">Всего часов</translation>
-    </message>
-</context>
-<context>
-    <name>EduKtpEntry</name>
-    <message>
-        <source>No</source>
-        <translation type="obsolete">Нет</translation>
-    </message>
-</context>
-<context>
-    <name>EducBuildingForm</name>
-    <message>
-        <source>DB not connected ! Check server status and try again</source>
-        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
-    </message>
-    <message>
-        <source>Education Buildings Table</source>
-        <translation type="obsolete">Таблица учебных корпусов</translation>
-    </message>
-    <message>
-        <source>Building Name</source>
-        <translation type="obsolete">Название учебного корпуса</translation>
-    </message>
-    <message>
-        <source>Address</source>
-        <translation type="obsolete">Обозначение</translation>
-    </message>
-    <message>
-        <source>Weight</source>
-        <translation type="obsolete">Удаленность</translation>
-    </message>
-</context>
-<context>
-    <name>EducGroupForm</name>
-    <message>
-        <source>DB not connected ! Check server status and try again</source>
-        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
-    </message>
-    <message>
-        <source>Specialization</source>
-        <translation type="obsolete">Военная специальность</translation>
-    </message>
-    <message>
-        <source>Kurator</source>
-        <translation type="obsolete">Наставник</translation>
-    </message>
-    <message>
-        <source>Kafedra</source>
-        <translation type="obsolete">Кафедра</translation>
-    </message>
-    <message>
-        <source>Kurs</source>
-        <translation type="obsolete">Курс по принадлежности</translation>
-    </message>
-    <message>
-        <source>Education Group Table</source>
-        <translation type="obsolete">Таблица учебных групп</translation>
-    </message>
-    <message>
-        <source>Group Leader</source>
-        <translation type="obsolete">Командир группы</translation>
-    </message>
-    <message>
-        <source>Member Count</source>
-        <translation type="obsolete">количество людей</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation type="obsolete">Название группы</translation>
-    </message>
-    <message>
-        <source>Code</source>
-        <translation type="obsolete">Обозначение</translation>
-    </message>
-    <message>
-        <source>Mac Label</source>
-        <translation type="obsolete">Метка</translation>
-    </message>
-    <message>
-        <source>Start Date</source>
-        <translation type="obsolete">Дата начала обучения</translation>
-    </message>
-</context>
-<context>
-    <name>EducMandatoryForm</name>
-    <message>
-        <source>DB not connected ! Check server status and try again</source>
-        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
-    </message>
-    <message>
-        <source>educmandatory Table</source>
-        <translation type="obsolete">Таблица ограничений</translation>
-    </message>
-</context>
-<context>
-    <name>EducationDurationForm</name>
-    <message>
-        <source>DB not connected ! Check server status and try again</source>
-        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
-    </message>
-    <message>
-        <source>Education Duration Table</source>
-        <translation type="obsolete">Таблица сроков обучения</translation>
-    </message>
-</context>
-<context>
-    <name>EducationKursForm</name>
-    <message>
-        <source>DB not connected ! Check server status and try again</source>
-        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
-    </message>
-    <message>
-        <source>Education Kurs Table</source>
-        <translation type="obsolete">Таблица годов обучения</translation>
-    </message>
-</context>
-<context>
-    <name>EntireScheduleFormClass</name>
-    <message>
-        <source>Filter</source>
-        <translation type="obsolete">Поиск</translation>
-    </message>
-    <message>
-        <source>View</source>
-        <translation type="obsolete">Вид</translation>
-    </message>
-</context>
-<context>
-    <name>EventFilterFormClass</name>
-    <message>
-        <source>Filter</source>
-        <translation type="obsolete">Поиск</translation>
-    </message>
-</context>
-<context>
-    <name>EventFormClass</name>
-    <message>
-        <source>Discipline</source>
-        <translation type="obsolete">Дисциплина</translation>
-    </message>
-    <message>
-        <source>Theme</source>
-        <translation type="obsolete">Тема</translation>
-    </message>
-    <message>
-        <source>Apply</source>
-        <translation type="obsolete">Применить</translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation type="obsolete">Добавить</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation type="obsolete">Удалить</translation>
-    </message>
-</context>
-<context>
-    <name>FacultetForm</name>
-    <message>
-        <source>DB not connected ! Check server status and try again</source>
-        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
-    </message>
-    <message>
-        <source>Facultet Table</source>
-        <translation type="obsolete">Таблица факультетов</translation>
-    </message>
-</context>
-<context>
     <name>FieldEditor</name>
     <message>
         <source>0.01</source>
-        <translation type="obsolete">0.01</translation>
+        <translation type="unfinished">0.01</translation>
     </message>
     <message>
         <source>0.00</source>
-        <translation type="obsolete">0.00</translation>
+        <translation type="unfinished">0.00</translation>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation type="obsolete">&amp;OK</translation>
+        <translation type="unfinished">&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Отмена</translation>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
+    <message>
+        <source>Properties (Field)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Query Source:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Column:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display as Running Total</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Subtotal Value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Format</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>String Format </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Example: %0.2f</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Built-in Locale Format</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HAlign</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Center</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>VAlign</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Top</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Middle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bottom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Word wrap</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Position/Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Y:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Height:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>X:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Width:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>in inches</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preview:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preview Area</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+O</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+C</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Font...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>FiltersForm</name>
-    <message>
-        <source>Organization</source>
-        <translation type="obsolete">Организация</translation>
-    </message>
     <message>
         <source>Object type</source>
         <translation>Тип объекта</translation>
@@ -1748,158 +1986,190 @@ End of querying SIU database.
     </message>
 </context>
 <context>
-    <name>Five_Lists_Form</name>
-    <message>
-        <source>Form</source>
-        <translation type="obsolete">Форма</translation>
-    </message>
-    <message>
-        <source>Others</source>
-        <translation type="obsolete">Остальные</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation type="obsolete">Название</translation>
-    </message>
-    <message>
-        <source>Reload</source>
-        <translation type="obsolete">Отменить</translation>
-    </message>
-    <message>
-        <source>DB Update </source>
-        <translation type="obsolete">Подтвердить</translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation type="obsolete">Добавить</translation>
-    </message>
-    <message>
-        <source>Remove</source>
-        <translation type="obsolete">Удалить</translation>
-    </message>
-    <message>
-        <source>Edit</source>
-        <translation type="obsolete">Редактировать</translation>
-    </message>
-</context>
-<context>
-    <name>Five_Lists_Form_Dialog</name>
-    <message>
-        <source>Others</source>
-        <translation type="obsolete">Остальные</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation type="obsolete">Название</translation>
-    </message>
-    <message>
-        <source>Reload</source>
-        <translation type="obsolete">Отменить</translation>
-    </message>
-    <message>
-        <source>DB Update </source>
-        <translation type="obsolete">Подтвердить</translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation type="obsolete">Добавить</translation>
-    </message>
-    <message>
-        <source>Remove</source>
-        <translation type="obsolete">Удалить</translation>
-    </message>
-    <message>
-        <source>Edit</source>
-        <translation type="obsolete">Редактировать</translation>
-    </message>
-</context>
-<context>
-    <name>Four_Lists_Form</name>
-    <message>
-        <source>Form</source>
-        <translation type="obsolete">Форма</translation>
-    </message>
-    <message>
-        <source>Others</source>
-        <translation type="obsolete">Остальные</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation type="obsolete">Название</translation>
-    </message>
-    <message>
-        <source>Reload</source>
-        <translation type="obsolete">Отменить</translation>
-    </message>
-    <message>
-        <source>DB Update </source>
-        <translation type="obsolete">Подтвердить</translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation type="obsolete">Добавить</translation>
-    </message>
-    <message>
-        <source>Remove</source>
-        <translation type="obsolete">Удалить</translation>
-    </message>
-    <message>
-        <source>Edit</source>
-        <translation type="obsolete">Редактировать</translation>
-    </message>
-</context>
-<context>
-    <name>Four_Lists_Form_Dialog</name>
-    <message>
-        <source>Others</source>
-        <translation type="obsolete">Остальные</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation type="obsolete">Название</translation>
-    </message>
-    <message>
-        <source>Reload</source>
-        <translation type="obsolete">Отменить</translation>
-    </message>
-    <message>
-        <source>DB Update </source>
-        <translation type="obsolete">Подтвердить</translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation type="obsolete">Добавить</translation>
-    </message>
-    <message>
-        <source>Remove</source>
-        <translation type="obsolete">Удалить</translation>
-    </message>
-    <message>
-        <source>Edit</source>
-        <translation type="obsolete">Редактировать</translation>
-    </message>
-</context>
-<context>
     <name>GraphEditor</name>
     <message>
         <source>0.01</source>
-        <translation type="obsolete">0.01</translation>
+        <translation type="unfinished">0.01</translation>
     </message>
     <message>
         <source>0.00</source>
-        <translation type="obsolete">0.00</translation>
+        <translation type="unfinished">0.00</translation>
     </message>
     <message>
         <source>Name:</source>
-        <translation type="obsolete">Название:</translation>
+        <translation type="unfinished">Название:</translation>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation type="obsolete">&amp;OK</translation>
+        <translation type="unfinished">&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Отмена</translation>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
+    <message>
+        <source>Graph Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Query Source:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Position/Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Y:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Height:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>X:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Width:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>in inches</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Base Font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Font...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Base Font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title Font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Data Axis</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Data Axis Labels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Column:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Data Axis Font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Data Axis Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Data Axis Title Font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Value Axis</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Min:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expand Min/Max if needed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Value Axis Font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Value Axis Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Value Axis Title Font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Series</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Series:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Series Properties</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Color:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Style</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bars</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lines</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Points</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+O</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+C</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1957,49 +2227,138 @@ End of querying SIU database.
     <name>ImageEditor</name>
     <message>
         <source>Database</source>
-        <translation type="obsolete">Локальная база данных</translation>
+        <translation>База данных</translation>
     </message>
     <message>
         <source>0.01</source>
-        <translation type="obsolete">0.01</translation>
+        <translation>0.01</translation>
     </message>
     <message>
         <source>0.00</source>
-        <translation type="obsolete">0.00</translation>
+        <translation>0.00</translation>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation type="obsolete">&amp;OK</translation>
+        <translation>&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Отмена</translation>
-    </message>
-</context>
-<context>
-    <name>InputForm</name>
-    <message>
-        <source>User</source>
-        <translation type="obsolete">Пользователь</translation>
+        <translation>&amp;Отмена</translation>
     </message>
     <message>
-        <source>OK</source>
-        <translation type="obsolete">OK</translation>
+        <source>Image Editor</source>
+        <translation>Редактор изображений</translation>
+    </message>
+    <message>
+        <source>Resize Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stretch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Static Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Static</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Load...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Column:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Query Source:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Position/Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Y:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Height:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>X:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Width:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>in inches</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+O</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+C</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose a file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Images(*.png *.jpg *.xpm)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>IntEdit</name>
     <message>
         <source>Name:</source>
-        <translation type="obsolete">Название:</translation>
+        <translation type="unfinished">Название:</translation>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation type="obsolete">&amp;OK</translation>
+        <translation type="unfinished">&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Отмена</translation>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
+    <message>
+        <source>Int</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Value:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+O</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+C</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2018,10 +2377,6 @@ End of querying SIU database.
     <message>
         <source>OK</source>
         <translation>OK</translation>
-    </message>
-    <message>
-        <source>EDS Operator</source>
-        <translation type="obsolete">EDS Оператор</translation>
     </message>
     <message>
         <source>DynamicDocs Operator</source>
@@ -2228,10 +2583,6 @@ End of querying SIU database.
     <message>
         <source>Select attribute</source>
         <translation>Выберите атрибут</translation>
-    </message>
-    <message>
-        <source>Generate automatically</source>
-        <translation type="obsolete">Генерировать автоматически</translation>
     </message>
 </context>
 <context>
@@ -2467,10 +2818,6 @@ End of querying SIU database.
         <translation>Категории и шаблоны</translation>
     </message>
     <message>
-        <source>Add copy of selected category</source>
-        <translation type="obsolete">Добавить копию выбранной категории</translation>
-    </message>
-    <message>
         <source>Add template</source>
         <translation>Добавить шаблон</translation>
     </message>
@@ -2509,7 +2856,7 @@ Category cannot been created.</source>
     </message>
     <message>
         <source>Select category for delete</source>
-        <translation>Выберите катигорию для удаления</translation>
+        <translation>Выберите категорию для удаления</translation>
     </message>
     <message>
         <source>Base template cannot be deleted</source>
@@ -2738,77 +3085,6 @@ Press YES to clear the color value or NO to remains current value</source>
     </message>
 </context>
 <context>
-    <name>KKSFileLoader</name>
-    <message>
-        <source>Download file, please wait...</source>
-        <translation type="obsolete">Файл загружается с сервера, подождите...</translation>
-    </message>
-    <message>
-        <source>Cancel download</source>
-        <translation type="obsolete">Отметить загрузку</translation>
-    </message>
-    <message>
-        <source>Downloading file</source>
-        <translation type="obsolete">Загрузка файла</translation>
-    </message>
-    <message>
-        <source>Downloading file, please wait... 
-
-Time elapsed: %1
-Time estimated: %2
-Avg speed: %3 Kb/sec</source>
-        <translation type="obsolete">Осуществляется загрузка файла, подождите...
-
-Прошло времени: %1
-Осталось времени: %2
-Средняя скорость: %3 Кб/сек</translation>
-    </message>
-    <message>
-        <source>Download was cancelled by user. Delete downloaded part of the file?</source>
-        <translation type="obsolete">Загрузка была отменена пользователем. Удалить загруженную часть файла?</translation>
-    </message>
-    <message>
-        <source>Uploading file, please wait...</source>
-        <translation type="obsolete">Файл загружается на сервер, подождите...</translation>
-    </message>
-    <message>
-        <source>Cancel upload</source>
-        <translation type="obsolete">Отменить загрузку на сервер</translation>
-    </message>
-    <message>
-        <source>Uploading file</source>
-        <translation type="obsolete">Загрузка файла на сервер</translation>
-    </message>
-    <message>
-        <source>Uploading file, please wait... 
-
-Time elapsed: %1
-Time estimated: %2
-Avg speed: %3 Kb/sec</source>
-        <translation type="obsolete">Файл загружается на сервер, подождите...
-
-Времени прошло: %1
-Времени осталось: %2
-Средняя скорость: %3 Кб/сек</translation>
-    </message>
-    <message>
-        <source>Cancel uploading</source>
-        <translation type="obsolete">Отменить загрузку на сервер</translation>
-    </message>
-    <message>
-        <source>Uploading was cancelled by user. Delete uploaded part of the file on server?</source>
-        <translation type="obsolete">Загрузка на сервер была отменена пользователем. Удалить загруженную часть файла с сервера?</translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation type="obsolete">Ошибка</translation>
-    </message>
-    <message>
-        <source>Cannot delete uploaded part of file</source>
-        <translation type="obsolete">Не могу удалить загруженную часть файла</translation>
-    </message>
-</context>
-<context>
     <name>KKSFileWidget</name>
     <message>
         <source>Yes</source>
@@ -2961,14 +3237,6 @@ try to rename it with extention. Example: filename.vsd</source>
         <translation>Скрыть SQL</translation>
     </message>
     <message>
-        <source>Warning</source>
-        <translation type="obsolete">Внимание</translation>
-    </message>
-    <message>
-        <source>You should select group to add filter</source>
-        <translation type="obsolete">Необходимо выбрать группу для добавления фильтра</translation>
-    </message>
-    <message>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
@@ -3073,11 +3341,11 @@ try to rename it with extention. Example: filename.vsd</source>
     <name>KKSIncludesDialog</name>
     <message>
         <source>&amp;OK</source>
-        <translation type="unfinished">&amp;OK</translation>
+        <translation>&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
+        <translation>&amp;Отмена</translation>
     </message>
 </context>
 <context>
@@ -3148,24 +3416,12 @@ try to rename it with extention. Example: filename.vsd</source>
         <translation>&amp;Открыть документ</translation>
     </message>
     <message>
-        <source>&amp;Delete rubric item</source>
-        <translation type="obsolete">У&amp;далить документ из рубрики</translation>
-    </message>
-    <message>
-        <source>View attachments ...</source>
-        <translation type="obsolete">Просмотреть вложения...</translation>
-    </message>
-    <message>
         <source>Delete rubric</source>
         <translation>Удалить рубрику</translation>
     </message>
     <message>
         <source>Do you really want to delete ?</source>
         <translation>Действительно удалить?</translation>
-    </message>
-    <message>
-        <source>&amp;Copy from rubric</source>
-        <translation type="obsolete">&amp;Копировать из рубрики</translation>
     </message>
     <message>
         <source>Creation of new IO allowed only for rubrics with accigned category!</source>
@@ -3233,43 +3489,43 @@ try to rename it with extention. Example: filename.vsd</source>
     </message>
     <message>
         <source>&amp;Remove item(s) from selected rubric only</source>
-        <translation type="unfinished"></translation>
+        <translation>У&amp;далить документ(ы) только из выбранной рубрики</translation>
     </message>
     <message>
         <source>Set synchronization parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>Установить параметры синхронизации</translation>
     </message>
     <message>
         <source>Put into another rubric</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить в другую рубрику</translation>
     </message>
     <message>
         <source>Send as email</source>
-        <translation type="unfinished"></translation>
+        <translation>Отправить сообщение по email</translation>
     </message>
     <message>
         <source>Set access rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Задать права доступа</translation>
     </message>
     <message>
         <source>Select documents for set</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите информационный(е) объект(ы)</translation>
     </message>
     <message>
         <source>Put selected documents</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить выделенные документы</translation>
     </message>
     <message>
         <source>Select documents for copy</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите документы для копирования</translation>
     </message>
     <message>
         <source>Send selected documents</source>
-        <translation type="unfinished"></translation>
+        <translation>Отправить выделенные документы</translation>
     </message>
     <message>
         <source>Select documents for send</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите документы для отправки</translation>
     </message>
 </context>
 <context>
@@ -3281,14 +3537,6 @@ try to rename it with extention. Example: filename.vsd</source>
     <message>
         <source>Indices</source>
         <translation>Показатели</translation>
-    </message>
-    <message>
-        <source>Edit</source>
-        <translation type="obsolete">Редактировать</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation type="obsolete">Удалить</translation>
     </message>
     <message>
         <source>Select indicator type</source>
@@ -3713,128 +3961,16 @@ Proceed?</source>
         <translation>Активизировать предыдущее окно</translation>
     </message>
     <message>
-        <source>User-defined qualifiers</source>
-        <translation type="obsolete">Пользовательские словари</translation>
-    </message>
-    <message>
         <source>System qualifiers</source>
         <translation>Системные классификаторы</translation>
-    </message>
-    <message>
-        <source>Save toolbar</source>
-        <translation type="obsolete">Панель сохранения</translation>
     </message>
     <message>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <source>Current version of KKS SITO Operator does not print this window</source>
-        <translation type="obsolete">Текущая версия ККС СИТО Оператор не поддерживает печать содержимого данного окна</translation>
-    </message>
-    <message>
         <source>Insufficient privileges!</source>
         <translation>Недостаточно прав!</translation>
-    </message>
-    <message>
-        <source>Output forms</source>
-        <translation type="obsolete">Формы вывода</translation>
-    </message>
-    <message>
-        <source>Academic Degrees</source>
-        <translation type="obsolete">Ученые степени</translation>
-    </message>
-    <message>
-        <source>Academic Ranks</source>
-        <translation type="obsolete">Ученые звания</translation>
-    </message>
-    <message>
-        <source>Accumulate Mandatory</source>
-        <translation type="obsolete">Ограничения</translation>
-    </message>
-    <message>
-        <source>Auditory Types</source>
-        <translation type="obsolete">Типы аудиторий</translation>
-    </message>
-    <message>
-        <source>Auditory</source>
-        <translation type="obsolete">Список аудиторий</translation>
-    </message>
-    <message>
-        <source>Education Duration</source>
-        <translation type="obsolete">Сроки обучения</translation>
-    </message>
-    <message>
-        <source>Education Kurses</source>
-        <translation type="obsolete">Учебные курсы </translation>
-    </message>
-    <message>
-        <source>Education Mandatory</source>
-        <translation type="obsolete">Ограничения по обучаемым</translation>
-    </message>
-    <message>
-        <source>Education Buildings</source>
-        <translation type="obsolete">Список учебных корпусов</translation>
-    </message>
-    <message>
-        <source>Kurses</source>
-        <translation type="obsolete">Годы обучения</translation>
-    </message>
-    <message>
-        <source>Lector Mandatory Reasons</source>
-        <translation type="obsolete">Причины ограничений преподавателей</translation>
-    </message>
-    <message>
-        <source>Lesson Types</source>
-        <translation type="obsolete">Виды занятий</translation>
-    </message>
-    <message>
-        <source>Military Ranks</source>
-        <translation type="obsolete">Воинские звания</translation>
-    </message>
-    <message>
-        <source>Positions</source>
-        <translation type="obsolete">Должности</translation>
-    </message>
-    <message>
-        <source>Qualifications</source>
-        <translation type="obsolete">Квалификации выпускников</translation>
-    </message>
-    <message>
-        <source>Reporting Types</source>
-        <translation type="obsolete">Виды отчетности</translation>
-    </message>
-    <message>
-        <source>Streams</source>
-        <translation type="obsolete">Потоки</translation>
-    </message>
-    <message>
-        <source>Auditory stock</source>
-        <translation type="obsolete">Аудиторный фонд</translation>
-    </message>
-    <message>
-        <source>Academics</source>
-        <translation type="obsolete">Справочники атрибутов личного состава</translation>
-    </message>
-    <message>
-        <source>Mandatories</source>
-        <translation type="obsolete">Ограничения</translation>
-    </message>
-    <message>
-        <source>Lecture Plans and Programs</source>
-        <translation type="obsolete">Учебные планы и программы</translation>
-    </message>
-    <message>
-        <source>KTP</source>
-        <translation type="obsolete">Комплексно-тематические планы</translation>
-    </message>
-    <message>
-        <source>KTP Tree</source>
-        <translation type="obsolete">Комплексно-тематические планы</translation>
-    </message>
-    <message>
-        <source>Units</source>
-        <translation type="obsolete">Подразделения</translation>
     </message>
     <message>
         <source>Organization toolbar</source>
@@ -3870,11 +4006,11 @@ Please connect to your system administrator.</source>
     </message>
     <message>
         <source>Message streams</source>
-        <translation type="unfinished"></translation>
+        <translation>Информационные потоки</translation>
     </message>
     <message>
         <source>Generate message streams</source>
-        <translation type="unfinished"></translation>
+        <translation>Генерация информационных потоков</translation>
     </message>
 </context>
 <context>
@@ -3947,14 +4083,6 @@ Please connect to your system administrator.</source>
         <source>Вид</source>
         <translation></translation>
     </message>
-    <message>
-        <source>&amp;Add periodic report</source>
-        <translation type="obsolete">&amp;Добавить донесение</translation>
-    </message>
-    <message>
-        <source>&amp;View reports</source>
-        <translation type="obsolete">&amp;Табель срочных донесений</translation>
-    </message>
     <message utf8="true">
         <source>Окно</source>
         <translation></translation>
@@ -3988,60 +4116,52 @@ Please connect to your system administrator.</source>
         <translation></translation>
     </message>
     <message utf8="true">
-        <source>КТП</source>
-        <translation type="obsolete">КТП</translation>
-    </message>
-    <message utf8="true">
-        <source>Учебный план</source>
-        <translation type="obsolete">Учебный план</translation>
-    </message>
-    <message utf8="true">
         <source>Атрибуты...</source>
         <translation></translation>
     </message>
     <message utf8="true">
         <source>Поиск</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message utf8="true">
         <source>Администрирование</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message utf8="true">
         <source>Создать почтовое сообщение...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message utf8="true">
         <source>Создать запись табеля срочных донесений...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message utf8="true">
         <source>Информация о подключении...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message utf8="true">
         <source>Создать распоряжение...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message utf8="true">
         <source>Открыть табель срочных донесений...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message utf8="true">
         <source>Создать поисковый запрос...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message utf8="true">
         <source>Открыть список поисковых запросов...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message utf8="true">
         <source>Редактирование ОШС...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message utf8="true">
         <source>Системные справочники...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -4320,10 +4440,6 @@ try to rename it with extention. Example: filename.vsd</source>
 <context>
     <name>KKSObjEditorFactory</name>
     <message>
-        <source>Delete</source>
-        <translation type="obsolete">Удалить</translation>
-    </message>
-    <message>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
@@ -4448,10 +4564,6 @@ try to rename it with extention. Example: filename.vsd</source>
         <translation>Неверная кодировка %1</translation>
     </message>
     <message>
-        <source>Save search template</source>
-        <translation type="obsolete">Сохранить шаблон поиска</translation>
-    </message>
-    <message>
         <source>Name :</source>
         <translation>Название:</translation>
     </message>
@@ -4488,14 +4600,6 @@ try to rename it with extention. Example: filename.vsd</source>
         <translation>Только Администратор и автор могут изменять шаблон поиска</translation>
     </message>
     <message>
-        <source>Search template</source>
-        <translation type="obsolete">Шаблон поиска</translation>
-    </message>
-    <message>
-        <source>Search template name :</source>
-        <translation type="obsolete">Название шаблона поиска :</translation>
-    </message>
-    <message>
         <source>Only admin and author can delete search template %1</source>
         <translation>Только Администратор и автор могут удалить шаблон поиска %1</translation>
     </message>
@@ -4506,14 +4610,6 @@ try to rename it with extention. Example: filename.vsd</source>
     <message>
         <source>History of changing</source>
         <translation>История изменений</translation>
-    </message>
-    <message>
-        <source>Export IO</source>
-        <translation type="obsolete">Экспорт записей справочника</translation>
-    </message>
-    <message>
-        <source>Cannot load copy %1</source>
-        <translation type="obsolete">Не могу загрузить экземпляр  ИО № %1</translation>
     </message>
     <message>
         <source>Xml writer</source>
@@ -4632,14 +4728,6 @@ try to rename it with extention. Example: filename.vsd</source>
         <translation>Свойства</translation>
     </message>
     <message>
-        <source>Headings</source>
-        <translation type="obsolete">Рубрикатор</translation>
-    </message>
-    <message>
-        <source>Enclosures</source>
-        <translation type="obsolete">Вложения</translation>
-    </message>
-    <message>
         <source>Add additional table</source>
         <translation>Добавление таблицы</translation>
     </message>
@@ -4658,10 +4746,6 @@ try to rename it with extention. Example: filename.vsd</source>
     <message>
         <source>Current version of KKS SITO Operator does not print this window</source>
         <translation>Текущая версия ККС СИТО Оператор не поддерживает печать содержимого данного окна</translation>
-    </message>
-    <message>
-        <source>Cannot create system filter</source>
-        <translation type="obsolete">Не могу создать системный фильтр</translation>
     </message>
     <message>
         <source>Set executor</source>
@@ -4686,14 +4770,6 @@ try to rename it with extention. Example: filename.vsd</source>
     <message>
         <source>Select executor</source>
         <translation>Выбрать исполнителя</translation>
-    </message>
-    <message>
-        <source>Search template with equal name is already exist in database.
-Input another name to save your search template.
-Press OK to continue or Cancel to cancel the operation</source>
-        <translation type="obsolete">Поисковый запрос с данным названием уже существует в БД.
-Укажите другое название вашего поискового запроса.
-Нажмите OK для продолжения или Отмена для прерывания операции</translation>
     </message>
     <message>
         <source>ID</source>
@@ -4744,18 +4820,6 @@ Press OK to continue or Cancel to cancel the operation</source>
         <translation>Показатели</translation>
     </message>
     <message>
-        <source>Search</source>
-        <translation type="obsolete">Фильтры</translation>
-    </message>
-    <message>
-        <source>Add Indicator value</source>
-        <translation type="obsolete">Добавить новое значение показателя</translation>
-    </message>
-    <message>
-        <source>&amp;Refresh</source>
-        <translation type="obsolete">&amp;Обновить</translation>
-    </message>
-    <message>
         <source>Cannot find selected attribute!</source>
         <translation>Не могу найти выбранный атрибут!</translation>
     </message>
@@ -4781,40 +4845,53 @@ Press OK to continue or Cancel to cancel the operation</source>
     </message>
     <message>
         <source>Record creation does not allowed</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможо создание записи </translation>
     </message>
     <message>
         <source>Current qualifier does not saved in database!
 Please save it before creating new records in it.</source>
-        <translation type="unfinished"></translation>
+        <translation>Текущий квалификатор не сохранен в БД!
+Сохраните его перед созданием в нем новых записей.</translation>
     </message>
     <message>
         <source>You does not have permissions for send document %1 !</source>
-        <translation type="unfinished"></translation>
+        <translation>Недостаточно прав доступа для отправки документа %1 !</translation>
     </message>
     <message>
         <source>Author</source>
-        <translation type="unfinished">Автор</translation>
+        <translation>Автор</translation>
     </message>
     <message>
         <source>Creation date/time</source>
-        <translation type="unfinished"></translation>
+        <translation>Дата-время создания</translation>
     </message>
     <message>
         <source>Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Категория</translation>
     </message>
     <message>
         <source>Type</source>
-        <translation type="unfinished">Тип</translation>
+        <translation>Тип</translation>
     </message>
     <message>
         <source>Add search template type</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить тип поискового шаблона</translation>
     </message>
     <message>
         <source>Edit search template type</source>
-        <translation type="unfinished"></translation>
+        <translation>Редактировать тип поискового шаблона</translation>
+    </message>
+    <message>
+        <source>Search group</source>
+        <translation>Группа критериев поиска</translation>
+    </message>
+    <message>
+        <source>Set category into search template</source>
+        <translation>Установить категорию шаблона поиска</translation>
+    </message>
+    <message>
+        <source>Category %1 is not applicable into search template %2</source>
+        <translation>Категория %1 несовместима с шаблоном поиска %2</translation>
     </message>
 </context>
 <context>
@@ -4876,10 +4953,6 @@ Please save it before creating new records in it.</source>
 </context>
 <context>
     <name>KKSRecWidget</name>
-    <message>
-        <source>&amp;Filter</source>
-        <translation type="obsolete">&amp;Поиск</translation>
-    </message>
     <message>
         <source>&amp;Add</source>
         <translation>&amp;Добавить</translation>
@@ -5021,38 +5094,38 @@ Please save it before creating new records in it.</source>
     </message>
     <message>
         <source>Copy documents</source>
-        <translation type="unfinished"></translation>
+        <translation>Копировать документы</translation>
     </message>
     <message>
         <source>Select destignation</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбор назначения</translation>
     </message>
     <message>
         <source>You put documents into same rubric</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы добавляете документы в первоначальную рубрику</translation>
     </message>
 </context>
 <context>
     <name>KKSRubricMessageBox</name>
     <message>
         <source>Do you really want to delete documents from rubric ?</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы действительно хотите удалить документы из рубрики ?</translation>
     </message>
     <message>
         <source>&amp;Yes</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Да</translation>
     </message>
     <message>
         <source>&amp;No</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Нет</translation>
     </message>
     <message>
         <source>Delete from DB</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить из БД</translation>
     </message>
     <message>
         <source>Delete documents from rubric</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить документы из рубрики</translation>
     </message>
 </context>
 <context>
@@ -5066,34 +5139,34 @@ Please save it before creating new records in it.</source>
     <name>KKSSearchTemplateDialog</name>
     <message>
         <source>&amp;OK</source>
-        <translation type="unfinished">&amp;OK</translation>
+        <translation>&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
+        <translation>&amp;Отмена</translation>
     </message>
 </context>
 <context>
     <name>KKSSearchTemplateModel</name>
     <message>
         <source>Search criteria</source>
-        <translation type="unfinished">Критерии поиска</translation>
+        <translation>Критерии поиска</translation>
     </message>
     <message>
         <source>Author</source>
-        <translation type="unfinished">Автор</translation>
+        <translation>Автор</translation>
     </message>
     <message>
         <source>Date of creation</source>
-        <translation type="unfinished"></translation>
+        <translation>Дата создания</translation>
     </message>
     <message>
         <source>Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Категория</translation>
     </message>
     <message>
         <source>Type</source>
-        <translation type="unfinished">Тип</translation>
+        <translation>Тип</translation>
     </message>
 </context>
 <context>
@@ -5156,19 +5229,19 @@ Please save it before creating new records in it.</source>
     </message>
     <message>
         <source>Add new search template type</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить тип поискового шаблона</translation>
     </message>
     <message>
         <source>Edit search template type</source>
-        <translation type="unfinished"></translation>
+        <translation>Редактировать тип поискового шаблона</translation>
     </message>
     <message>
         <source>Delete search template type</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить тип поискового шаблона</translation>
     </message>
     <message>
         <source>Cannot delete type %1, it is not empty</source>
-        <translation type="unfinished"></translation>
+        <translation>Запрещено удалять непустой тип %1</translation>
     </message>
 </context>
 <context>
@@ -5320,22 +5393,6 @@ Further work is impossible. You should use equal versions of client and server s
         <translation>Необходимо установить соединение с БД!</translation>
     </message>
     <message>
-        <source>Input commands</source>
-        <translation type="obsolete">Входящие распоряжения</translation>
-    </message>
-    <message>
-        <source>Input messages</source>
-        <translation type="obsolete">Входящие сообщения</translation>
-    </message>
-    <message>
-        <source>Welcome, %1!. You are connected as %2. Access level: %3</source>
-        <translation type="obsolete">Добро пожаловать %1! Вы подключились как %2. Уровень доступа %3</translation>
-    </message>
-    <message>
-        <source>Welcome, %1! You are connected as %2.Access level: %3</source>
-        <translation type="obsolete">Добро пожаловать %1! Вы подключились как %2. Уровень доступа %3</translation>
-    </message>
-    <message>
         <source>Welcome, %1! (%2)</source>
         <translation>Добро пожаловать, %1! (%2)</translation>
     </message>
@@ -5348,11 +5405,11 @@ Further work is impossible. You should use equal versions of client and server s
     <name>KKSStuffDialog</name>
     <message>
         <source>&amp;OK</source>
-        <translation type="unfinished">&amp;OK</translation>
+        <translation>&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
+        <translation>&amp;Отмена</translation>
     </message>
 </context>
 <context>
@@ -5443,11 +5500,15 @@ Further work is impossible. You should use equal versions of client and server s
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished">Ошибка</translation>
+        <translation>Ошибка</translation>
     </message>
     <message>
         <source>An internal error was occured during form refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>Произошла ошибка при обновлении </translation>
+    </message>
+    <message>
+        <source>Transport port</source>
+        <translation>Порт транспорта</translation>
     </message>
 </context>
 <context>
@@ -5700,23 +5761,23 @@ Further work is impossible. You should use equal versions of client and server s
     <name>KKSSyncDialog</name>
     <message>
         <source>&amp;OK</source>
-        <translation type="unfinished">&amp;OK</translation>
+        <translation>&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
+        <translation>&amp;Отмена</translation>
     </message>
     <message>
         <source>ID</source>
-        <translation type="unfinished">ID</translation>
+        <translation>ID</translation>
     </message>
     <message>
         <source>Short name</source>
-        <translation type="unfinished">Короткое название</translation>
+        <translation>Короткое название</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Название</translation>
     </message>
 </context>
 <context>
@@ -5997,126 +6058,321 @@ Further work is impossible. You should use equal versions of client and server s
         <source>XML files (*.xml)</source>
         <translation>XML-файлы (*.xml)</translation>
     </message>
+    <message>
+        <source>Unique id</source>
+        <translation>Уникальный идентификатор</translation>
+    </message>
+</context>
+<context>
+    <name>KapsManagerForm</name>
+    <message>
+        <source>Îøèáêà</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ïðîèçîøëà îøèáêà ïðè ñîçäàíèè íîâîé òåìàòè÷åñêîé çàäà÷è â ÁÄ!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Óäàëåíèå òåìàòè÷åñêîé çàäà÷è</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Âû äåéñòâèòåëüíî õîòèòå óäàëèòü òåìàòè÷åñêóþ çàäà÷ó è âñå åå ïðîåêòû?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ïðîèçîøëà îøèáêà ïðè ñîçäàíèè íîâîãî ïðîåêòà â ÁÄ!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Îòêðîéòå ñóùåñòâóþùèé êàòàëîã âíóòðè êàòàëîãà òåì. çàäà÷è</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Âûáðàííûé êàòàëîã íå ÿâëÿåòñÿ ïîäêàòàëîãîì äëÿ òåìàòè÷åñêîé çàäà÷è!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Íå çàäàíî</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Âûáðàííûé êàòàëîã íå ñîäåðæèò ôàéëà ñ ìåòàäàííûìè äëÿ ïðîåêòà!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ïðîèçîøëà îøèáêà ïðè èçìåíåíèè íîâîãî ïðîåêòà â ÁÄ!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Óäàëåíèå ïðîåêòà</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Âû äåéñòâèòåëüíî õîòèòå óäàëèòü ïðîåêò è âñå åãî ôàéëû?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ïðîèçîøëà îøèáêà ïðè ñîçäàíèè íîâîãî ôàéëà â ÁÄ!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Óäàëåíèå ôàéëà</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Âû äåéñòâèòåëüíî õîòèòå óäàëèòü ôàéë èç ïðîåêòà?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Âíèìàíèå!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Â òåêóùåì ïðîåêòå óæå ïðèñóòñòâóåò ôàéë ñ íàçâàíèåì:
+%1
+Áóäåò îñóùåñòâëåíà çàìåíà åãî íîâûì. Îáíîâèòü ïðè ýòîì çàïèñàííûå â ÁÄ ìåòàäàííûå?
+Îòâåò Äà - áóäåò ïðîèçâåäåíà çàìåíà ôàéëà è ìåòàäàííûõ
+Îòâåò Íåò - áóäåò ïðîèçâåäåíà òîëüêî çàìåíà ôàéëà
+Îòâåò Îòìåíà - ôàéë è åãî ìåòàäàííûå â ÁÄ îñòàíóòñÿ áåç èçìåíåíèé.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Çàìåíèòü òàêæå ôàéë íîâûì?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ïðîèçîøëà îøèáêà ïðè çàãðóçêå ôàéëà íà ñåðâåð!</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>KtpForm</name>
-    <message>
-        <source>Check KTP started</source>
-        <translation type="obsolete">Проверка начата</translation>
-    </message>
-    <message>
-        <source>In education plan </source>
-        <translation type="obsolete">По учебному плану</translation>
-    </message>
-    <message>
-        <source> in KTP </source>
-        <translation type="obsolete">в КТП</translation>
-    </message>
-    <message>
-        <source>Check KTP complete succesfull!!!</source>
-        <translation type="obsolete">Проверка завершена успешно!</translation>
-    </message>
-    <message>
-        <source>Check KTP complete with errors!!!</source>
-        <translation type="obsolete">Присутствуют ошибки!</translation>
-    </message>
     <message>
         <source></source>
         <translation></translation>
     </message>
 </context>
 <context>
-    <name>KursForm</name>
-    <message>
-        <source>DB not connected ! Check server status and try again</source>
-        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
-    </message>
-    <message>
-        <source>Kurs Table</source>
-        <translation type="obsolete">Таблица курсов</translation>
-    </message>
-</context>
-<context>
     <name>LabelEditor</name>
     <message>
         <source>0.01</source>
-        <translation type="obsolete">0.01</translation>
+        <translation type="unfinished">0.01</translation>
     </message>
     <message>
         <source>0.00</source>
-        <translation type="obsolete">0.00</translation>
+        <translation type="unfinished">0.00</translation>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation type="obsolete">&amp;OK</translation>
+        <translation type="unfinished">&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Отмена</translation>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
+    <message>
+        <source>Properties (Label)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Text:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HAlign</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Center</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>VAlign</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Top</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Middle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bottom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Position/Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Y:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Height:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>X:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Width:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>in inches</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preview:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preview Area</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+O</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+C</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Font...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>LecMandatoryReasonForm</name>
+    <name>LanguageOptions</name>
     <message>
-        <source>DB not connected ! Check server status and try again</source>
-        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
-    </message>
-    <message>
-        <source>Lec Mandatory Reason Table</source>
-        <translation type="obsolete">Таблица причин ограничений преподавателей</translation>
-    </message>
-</context>
-<context>
-    <name>LessonTypeForm</name>
-    <message>
-        <source>DB not connected ! Check server status and try again</source>
-        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
-    </message>
-    <message>
-        <source>Lessons Types</source>
-        <translation type="obsolete">Виды занятий</translation>
-    </message>
-    <message>
-        <source>Lesson Type Name</source>
-        <translation type="obsolete">Вид занятий</translation>
-    </message>
-    <message>
-        <source>Short Name</source>
-        <translation type="obsolete">Сокращение</translation>
+        <source>Default</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>ListEdit</name>
     <message>
         <source>Name:</source>
-        <translation type="obsolete">Название:</translation>
+        <translation type="unfinished">Название:</translation>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation type="obsolete">&amp;OK</translation>
+        <translation type="unfinished">&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Отмена</translation>
+        <translation type="unfinished">&amp;Отмена</translation>
     </message>
     <message>
         <source>&amp;Edit</source>
-        <translation type="obsolete">&amp;Редактировать</translation>
+        <translation type="unfinished">&amp;Редактировать</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="obsolete">Удалить</translation>
+        <translation type="unfinished">Удалить</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation type="obsolete">Внимание</translation>
+        <translation type="unfinished">Внимание</translation>
     </message>
-</context>
-<context>
-    <name>Main_Window</name>
     <message>
-        <source>Connect</source>
-        <translation type="obsolete">Соединить</translation>
+        <source>List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Values:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+O</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+C</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;New</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+N</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move &amp;Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+U</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+E</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move &amp;Down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+D</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>String</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Int</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Double</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bool</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I do not understand the type %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I do not know how to edit QVariant type %1.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6166,180 +6422,319 @@ Further work is impossible. You should use equal versions of client and server s
     </message>
 </context>
 <context>
-    <name>MilitaryRankForm</name>
-    <message>
-        <source>DB not connected ! Check server status and try again</source>
-        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
-    </message>
-    <message>
-        <source>Military Rank Table</source>
-        <translation type="obsolete">Списов воинских званий</translation>
-    </message>
-</context>
-<context>
-    <name>MilitaryRankForm1</name>
-    <message>
-        <source>DB not connected ! Check server status and try again</source>
-        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
-    </message>
-    <message>
-        <source>Military Rank Table</source>
-        <translation type="obsolete">Список воинских званий</translation>
-    </message>
-</context>
-<context>
-    <name>NagruzKafForm</name>
-    <message>
-        <source>spring</source>
-        <translation type="obsolete">весенний</translation>
-    </message>
-    <message>
-        <source>autumn</source>
-        <translation type="obsolete">осенний</translation>
-    </message>
-</context>
-<context>
-    <name>NagruzKafPrepForm</name>
-    <message>
-        <source>autumn</source>
-        <translation type="obsolete">осенний</translation>
-    </message>
-    <message>
-        <source>spring</source>
-        <translation type="obsolete">весенний</translation>
-    </message>
-    <message>
-        <source>Total</source>
-        <translation type="obsolete">Всего</translation>
-    </message>
-</context>
-<context>
-    <name>NagruzPrepForm</name>
-    <message>
-        <source>spring</source>
-        <translation type="obsolete">весенний</translation>
-    </message>
-    <message>
-        <source>autumn</source>
-        <translation type="obsolete">осенний</translation>
-    </message>
-</context>
-<context>
     <name>NewVariant</name>
     <message>
         <source>Name:</source>
-        <translation type="obsolete">Название:</translation>
+        <translation type="unfinished">Название:</translation>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation type="obsolete">&amp;OK</translation>
+        <translation type="unfinished">&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Отмена</translation>
+        <translation type="unfinished">&amp;Отмена</translation>
     </message>
     <message>
         <source>Type:</source>
-        <translation type="obsolete">Тип:</translation>
+        <translation type="unfinished">Тип:</translation>
+    </message>
+    <message>
+        <source>New Variant</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>String</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Int</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Double</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bool</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+O</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+C</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>One_List_Form</name>
+    <name>ORGraphicsSectionDetail</name>
     <message>
-        <source>Others</source>
-        <translation type="obsolete">Остальные</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation type="obsolete">Название</translation>
-    </message>
-    <message>
-        <source>Reload</source>
-        <translation type="obsolete">Отменить</translation>
-    </message>
-    <message>
-        <source>DB Update </source>
-        <translation type="obsolete">Подтвердить</translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation type="obsolete">Добавить</translation>
-    </message>
-    <message>
-        <source>Remove</source>
-        <translation type="obsolete">Удалить</translation>
-    </message>
-    <message>
-        <source>Edit</source>
-        <translation type="obsolete">Изменить</translation>
+        <source>unnamed</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>OutputForm</name>
+    <name>ORGraphicsSectionDetailGroup</name>
     <message>
-        <source>ERROR</source>
-        <translation type="obsolete">Ошибка</translation>
+        <source> Group Header</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>KTP is apsent in database</source>
-        <translation type="obsolete">КТП отсутствует в базе данных</translation>
-    </message>
-    <message>
-        <source>User</source>
-        <translation type="obsolete">Пользователь</translation>
+        <source> Group Footer</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>PageSetup</name>
     <message>
         <source>8.5</source>
-        <translation type="obsolete">8.5</translation>
+        <translation type="unfinished">8.5</translation>
     </message>
     <message>
         <source>11.0</source>
-        <translation type="obsolete">11.0</translation>
+        <translation type="unfinished">11.0</translation>
     </message>
     <message>
         <source>1.0</source>
-        <translation type="obsolete">1.0</translation>
+        <translation type="unfinished">1.0</translation>
+    </message>
+    <message>
+        <source>Edit page settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paper Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom dimensions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Width:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Height:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>in Inches</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Margins</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Top:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bottom:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Left:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Right:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Orientation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Portrait</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Landscape</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Labels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Type: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Letter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Legal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Avery 5263</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Avery 5264</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Avery 8460</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CILS ALP1-9200-1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>ParamListEdit</name>
     <message>
         <source>Cancel</source>
-        <translation type="obsolete">Отмена</translation>
+        <translation type="unfinished">Отмена</translation>
+    </message>
+    <message>
+        <source>List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>List:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>ParameterEdit</name>
     <message>
         <source>Type</source>
-        <translation type="obsolete">Тип</translation>
+        <translation type="unfinished">Тип</translation>
     </message>
     <message>
         <source>Value</source>
-        <translation type="obsolete">Значение</translation>
+        <translation type="unfinished">Значение</translation>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation type="obsolete">&amp;OK</translation>
+        <translation type="unfinished">&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Отмена</translation>
+        <translation type="unfinished">&amp;Отмена</translation>
     </message>
     <message>
         <source>&amp;Edit</source>
-        <translation type="obsolete">&amp;Редактировать</translation>
+        <translation type="unfinished">&amp;Редактировать</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="obsolete">Удалить</translation>
+        <translation type="unfinished">Удалить</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation type="obsolete">Внимание</translation>
+        <translation type="unfinished">Внимание</translation>
+    </message>
+    <message>
+        <source>Parameter List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+O</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+C</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;New</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+N</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+E</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not a Valid Report</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The report definition does not appear to be a valid report.
+
+The root node is not &apos;report&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name already exists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The name for the parameter you specified already exists in the list.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>String</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Int</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Double</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bool</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I do not understand the type %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I do not know how to edit QVariant type %1.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6370,21 +6765,26 @@ Further work is impossible. You should use equal versions of client and server s
     </message>
 </context>
 <context>
-    <name>PositionForm</name>
-    <message>
-        <source>DB not connected ! Check server status and try again</source>
-        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
-    </message>
-    <message>
-        <source>Position Table</source>
-        <translation type="obsolete">Список должностей</translation>
-    </message>
-</context>
-<context>
     <name>PreviewDialog</name>
     <message>
         <source>Cancel</source>
-        <translation type="obsolete">Отмена</translation>
+        <translation type="unfinished">Отмена</translation>
+    </message>
+    <message>
+        <source>Print Preview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Print</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6640,186 +7040,6 @@ Attributes:</source>
         <translation>час</translation>
     </message>
     <message>
-        <source>Add Facultet</source>
-        <translation type="obsolete">Добавить факультет</translation>
-    </message>
-    <message>
-        <source>Edit Facultet</source>
-        <translation type="obsolete">Изменить факультет</translation>
-    </message>
-    <message>
-        <source>Delete Facultet</source>
-        <translation type="obsolete">Удалить факультет</translation>
-    </message>
-    <message>
-        <source>Add Kafedra</source>
-        <translation type="obsolete">Добавить кафедру</translation>
-    </message>
-    <message>
-        <source>Edit Kafedra</source>
-        <translation type="obsolete">Изменить кафедру</translation>
-    </message>
-    <message>
-        <source>Delete Kafedra</source>
-        <translation type="obsolete">Удалить кафедру</translation>
-    </message>
-    <message>
-        <source>Edit Worker List</source>
-        <translation type="obsolete">Список личного состава</translation>
-    </message>
-    <message>
-        <source>Add Specialization</source>
-        <translation type="obsolete">Добавить военную специальность</translation>
-    </message>
-    <message>
-        <source>Edit Specialization</source>
-        <translation type="obsolete">Изменить военную специальность</translation>
-    </message>
-    <message>
-        <source>Edit Education Groups</source>
-        <translation type="obsolete">Изменить учебные группы</translation>
-    </message>
-    <message>
-        <source>Delete Specialization</source>
-        <translation type="obsolete">Удалить военную специальность</translation>
-    </message>
-    <message>
-        <source>Add Discipline</source>
-        <translation type="obsolete">Добавить дисциплину</translation>
-    </message>
-    <message>
-        <source>Paste Discipline</source>
-        <translation type="obsolete">Вставить дисциплину</translation>
-    </message>
-    <message>
-        <source>Edit Discipline</source>
-        <translation type="obsolete">Изменить дисциплину</translation>
-    </message>
-    <message>
-        <source>Delete Discipline</source>
-        <translation type="obsolete">Удалить дисциплину</translation>
-    </message>
-    <message>
-        <source>Copy Discipline</source>
-        <translation type="obsolete">Копировать дисциплину</translation>
-    </message>
-    <message>
-        <source>Add Theme</source>
-        <translation type="obsolete">Добавить тему</translation>
-    </message>
-    <message>
-        <source>Edit KTP</source>
-        <translation type="obsolete">Редактировать КТП</translation>
-    </message>
-    <message>
-        <source>Add Lesson Type</source>
-        <translation type="obsolete">Добавить вид занятий</translation>
-    </message>
-    <message>
-        <source>Edit Theme</source>
-        <translation type="obsolete">Изменить тему</translation>
-    </message>
-    <message>
-        <source>Delete Theme</source>
-        <translation type="obsolete">Удалить тему</translation>
-    </message>
-    <message>
-        <source>Edit Lesson Type</source>
-        <translation type="obsolete">Изменить вид занятий</translation>
-    </message>
-    <message>
-        <source>Delete Lesson Type</source>
-        <translation type="obsolete">Удалить вид занятий</translation>
-    </message>
-    <message>
-        <source>VKA im. A.F.Mogayskogo</source>
-        <translation type="obsolete">ВКА имени А.Ф.Можайского</translation>
-    </message>
-    <message>
-        <source>Lesson Type</source>
-        <translation type="obsolete">Вид занятия</translation>
-    </message>
-    <message>
-        <source>Hours</source>
-        <translation type="obsolete">Часов</translation>
-    </message>
-    <message>
-        <source>Header</source>
-        <translation type="obsolete">Руководитель</translation>
-    </message>
-    <message>
-        <source>Education Building</source>
-        <translation type="obsolete">Учебный корпус</translation>
-    </message>
-    <message>
-        <source>Short Name</source>
-        <translation type="obsolete">Сокращение</translation>
-    </message>
-    <message>
-        <source>Speciality</source>
-        <translation type="obsolete">Специальность</translation>
-    </message>
-    <message>
-        <source>Speciality Code</source>
-        <translation type="obsolete">Код специальности</translation>
-    </message>
-    <message>
-        <source>Qualification</source>
-        <translation type="obsolete">Квалификация</translation>
-    </message>
-    <message>
-        <source>Education Duration</source>
-        <translation type="obsolete">Срок обучения</translation>
-    </message>
-    <message>
-        <source>Purpose</source>
-        <translation type="obsolete">Предназначение выпускников</translation>
-    </message>
-    <message>
-        <source>Theme Name</source>
-        <translation type="obsolete">Название темы</translation>
-    </message>
-    <message>
-        <source>Code</source>
-        <translation type="obsolete">Сокращение</translation>
-    </message>
-    <message>
-        <source>Learning Unit</source>
-        <translation type="obsolete">Читающая кафедра</translation>
-    </message>
-    <message>
-        <source>Discipline Name</source>
-        <translation type="obsolete">Название дисциплины</translation>
-    </message>
-    <message>
-        <source>Index</source>
-        <translation type="obsolete">Индекс</translation>
-    </message>
-    <message>
-        <source>Total Hour</source>
-        <translation type="obsolete">Всего часов</translation>
-    </message>
-    <message>
-        <source>Facultets Name</source>
-        <translation type="obsolete">Название факультета</translation>
-    </message>
-    <message>
-        <source>KTP</source>
-        <translation type="obsolete">КТП</translation>
-    </message>
-    <message>
-        <source>Clear KTP</source>
-        <translation type="obsolete">Очистить КТП</translation>
-    </message>
-    <message>
-        <source>Ôàêóëüòåò / ×èòàþùàÿ êàôåäðà / Êîìó ÷èòàåò / Äèñöèïëèíà / Ñåìåñòð / Òåìà / Âèä çàíÿòèé </source>
-        <translation type="obsolete">Факультет / Читающая кафедра / Для кого / Дисциплина / Семестр / Тема / Вид занятия</translation>
-    </message>
-    <message>
-        <source>STORM_TSFZ1</source>
-        <translation type="obsolete">ШТОРМ_ТСФЗ1</translation>
-    </message>
-    <message>
         <source></source>
         <translation></translation>
     </message>
@@ -6856,44 +7076,12 @@ Attributes:</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <source>Can&apos;t find %1 district</source>
-        <translation type="obsolete">Не могу найти %1 подразделение</translation>
-    </message>
-    <message>
-        <source>Can&apos;t added user %1</source>
-        <translation type="obsolete">Не могу добавить пользователя %1</translation>
-    </message>
-    <message>
-        <source>Edit user</source>
-        <translation type="obsolete">Изменить пользователя</translation>
-    </message>
-    <message>
-        <source>Please select user</source>
-        <translation type="obsolete">Выберите пользователя</translation>
-    </message>
-    <message>
-        <source>Can&apos;t edit user with user_id %1</source>
-        <translation type="obsolete">Не могу редактировать пользователя с ИД = %1</translation>
-    </message>
-    <message>
-        <source>administrator</source>
-        <translation type="obsolete">Администратор</translation>
-    </message>
-    <message>
-        <source>operator</source>
-        <translation type="obsolete">Оператор</translation>
-    </message>
-    <message>
         <source>Attribute reference</source>
         <translation>Название справочника</translation>
     </message>
     <message>
         <source>New indicator</source>
         <translation>Новый показатель</translation>
-    </message>
-    <message>
-        <source>Search by template</source>
-        <translation type="obsolete">Поиск по шаблону</translation>
     </message>
     <message>
         <source>DynamicDocs Client</source>
@@ -6914,10 +7102,6 @@ Attributes:</source>
     <message>
         <source>PK IR </source>
         <translation>ПК ИР </translation>
-    </message>
-    <message>
-        <source>PK IP </source>
-        <translation type="obsolete">ПК ИР</translation>
     </message>
     <message>
         <source>Download file, please wait...</source>
@@ -7011,222 +7195,910 @@ Avg speed: %3 Kb/sec</source>
         <source>Â¿Â¿Â¿Â¿Â¿ Â¿Â¿Â¿Â¿Â¿Â¿Â¿Â¿Â¿ Â¿Â¿Â¿Â¿Â¿Â¿Â¿</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>QXPdfWidget</name>
     <message>
-        <source>&amp;Close</source>
-        <translation type="obsolete">&amp;Закрыть</translation>
+        <source>Line width</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Width</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> field total</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> field</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> textarea</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>3of9</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> barcode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> graph</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SECTION TITLE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Context Query</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parameter Query</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>-- Select Query --</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect to Database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disconnect from Database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OpenRPT Report Writer for Windows</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OpenRPT Report Writer for Linux</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OpenRPT Report Writer for OS X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OpenRPT Report Writer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copyright (c) 2002-2009, OpenMFG, LLC.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Report Definition Not Found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The report definition for this report, &quot;%1&quot; cannot be found.
+Please contact your Systems Administrator and report this issue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An unknown error was encountered while processing your request.
+Please contact your Systems Administrator and report this issue.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>QualificationForm</name>
+    <name>QueryComboBox</name>
     <message>
-        <source>DB not connected ! Check server status and try again</source>
-        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <source>-- Select Query --</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Qualification Table</source>
-        <translation type="obsolete">Список квалификаций выпускников</translation>
+        <source>Parameter Query</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Context Query</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QueryEditor</name>
     <message>
         <source>Name:</source>
-        <translation type="obsolete">Название:</translation>
+        <translation type="unfinished">Название:</translation>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation type="obsolete">&amp;OK</translation>
+        <translation type="unfinished">&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Отмена</translation>
+        <translation type="unfinished">&amp;Отмена</translation>
     </message>
     <message>
         <source>Group:</source>
-        <translation type="obsolete">Группа:</translation>
+        <translation type="unfinished">Группа:</translation>
+    </message>
+    <message>
+        <source>Query Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load MetaSQL from Database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Query:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change may be lost</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any changes you have made the the sql query may be lost by turning this option on. Are you sure you want to continue?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QueryList</name>
     <message>
         <source>&amp;Close</source>
-        <translation type="obsolete">&amp;Закрыть</translation>
+        <translation type="unfinished">&amp;Закрыть</translation>
     </message>
     <message>
         <source>&amp;Add</source>
-        <translation type="obsolete">&amp;Добавить</translation>
+        <translation type="unfinished">&amp;Добавить</translation>
     </message>
     <message>
         <source>&amp;Edit</source>
-        <translation type="obsolete">&amp;Редактировать</translation>
+        <translation type="unfinished">&amp;Редактировать</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="obsolete">Удалить</translation>
+        <translation type="unfinished">Удалить</translation>
+    </message>
+    <message>
+        <source>Query List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Querys:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duplicate Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The name you specified already exists in the list of query names.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>ReportHandler</name>
     <message>
         <source>Save &amp;As...</source>
-        <translation type="obsolete">Сохранить &amp;как...</translation>
+        <translation type="unfinished">Сохранить &amp;как...</translation>
     </message>
     <message>
         <source>&amp;Close</source>
-        <translation type="obsolete">&amp;Закрыть</translation>
+        <translation type="unfinished">&amp;Закрыть</translation>
     </message>
     <message>
         <source>Cu&amp;t</source>
-        <translation type="obsolete">Выр&amp;езать атрибут</translation>
+        <translation type="unfinished">Выр&amp;езать атрибут</translation>
     </message>
     <message>
         <source>&amp;Paste</source>
-        <translation type="obsolete">&amp;Вставить атрибут</translation>
+        <translation type="unfinished">&amp;Вставить атрибут</translation>
     </message>
     <message>
         <source>&amp;Delete</source>
-        <translation type="obsolete">&amp;Удалить</translation>
+        <translation type="unfinished">&amp;Удалить</translation>
     </message>
     <message>
         <source>Properties</source>
-        <translation type="obsolete">Свойства</translation>
+        <translation type="unfinished">Свойства</translation>
     </message>
     <message>
         <source>&amp;Edit</source>
-        <translation type="obsolete">&amp;Редактировать</translation>
+        <translation type="unfinished">&amp;Редактировать</translation>
+    </message>
+    <message>
+        <source>&amp;New File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Open File...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Save File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Print Preview...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Print...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Print to PDF...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>E&amp;xit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preferences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Grid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Snap to Grid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Insert Label</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Insert Field</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Insert Text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Insert Line</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Insert Rectangle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Insert CrossTab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Insert Bar Code</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Insert Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Insert Chart/Graph</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load from Database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save to Database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Properties...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Page Setup...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Query &amp;Sources...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Section Editor...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Color Definitions...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Defined Parameters...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Align Top</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Align V. Center</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Align Bottom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Align Left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Align H. Center</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Align Right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fill</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File Operations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Database Operations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Operations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Layout Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Report Elements</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>B</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>i</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Data&amp;base</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Insert</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Document</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Position [X: %s, Y: %s]    Size [W: %s, H: %s]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Point [X: %s, Y: %s]    End Point [X: %s, Y: %s]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown Entity Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group Selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>XML (*.xml)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed read on Open File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Encountered and error while parsing %s
+
+	%s (Line %d Column %d)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Section Found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Items must be pasted into a section.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Language: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The language change will take effect the next time the report writer will be run.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load Report from Database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error Loading Report</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Database Connection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There is no database connection that can be used to load a document.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There is no database connection that can be used to save this document.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose filename to save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>print.pdf</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pdf (*.pdf)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Angle (0-360) :</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>ReportParameter</name>
     <message>
         <source>Name:</source>
-        <translation type="obsolete">Название:</translation>
+        <translation type="unfinished">Название:</translation>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation type="obsolete">&amp;OK</translation>
+        <translation type="unfinished">&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Отмена</translation>
+        <translation type="unfinished">&amp;Отмена</translation>
     </message>
     <message>
         <source>Description</source>
-        <translation type="obsolete">Описание</translation>
+        <translation type="unfinished">Описание</translation>
     </message>
     <message>
         <source>Value</source>
-        <translation type="obsolete">Значение</translation>
+        <translation type="unfinished">Значение</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation type="obsolete">Добавить</translation>
+        <translation type="unfinished">Добавить</translation>
     </message>
     <message>
         <source>Type:</source>
-        <translation type="obsolete">Тип:</translation>
+        <translation type="unfinished">Тип:</translation>
+    </message>
+    <message>
+        <source>Parameter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>String</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Integer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Double</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bool</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Defined List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>List Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Static</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dynamic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Static List Values:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dynamic List Query:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>ReportParameterList</name>
     <message>
         <source>&amp;Close</source>
-        <translation type="obsolete">&amp;Закрыть</translation>
+        <translation type="unfinished">&amp;Закрыть</translation>
     </message>
     <message>
         <source>&amp;Add</source>
-        <translation type="obsolete">&amp;Добавить</translation>
+        <translation type="unfinished">&amp;Добавить</translation>
     </message>
     <message>
         <source>&amp;Edit</source>
-        <translation type="obsolete">&amp;Редактировать</translation>
+        <translation type="unfinished">&amp;Редактировать</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="obsolete">Удалить</translation>
+        <translation type="unfinished">Удалить</translation>
+    </message>
+    <message>
+        <source>Parameter List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parameters:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>ReportParameterListItem</name>
     <message>
         <source>&amp;OK</source>
-        <translation type="obsolete">&amp;OK</translation>
+        <translation type="unfinished">&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Отмена</translation>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
+    <message>
+        <source>List Item</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Label:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Value:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+O</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+C</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>ReportProperties</name>
     <message>
         <source>Name:</source>
-        <translation type="obsolete">Название:</translation>
+        <translation type="unfinished">Название:</translation>
     </message>
     <message>
         <source>Database</source>
-        <translation type="obsolete">Локальная база данных</translation>
+        <translation type="unfinished">Локальная база данных</translation>
     </message>
     <message>
         <source>10%</source>
-        <translation type="obsolete">10%</translation>
+        <translation type="unfinished">10%</translation>
     </message>
     <message>
         <source>11.0</source>
-        <translation type="obsolete">11.0</translation>
+        <translation type="unfinished">11.0</translation>
     </message>
     <message>
         <source>0.0</source>
-        <translation type="obsolete">0.0</translation>
+        <translation type="unfinished">0.0</translation>
     </message>
     <message>
         <source>8.5</source>
-        <translation type="obsolete">8.5</translation>
+        <translation type="unfinished">8.5</translation>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation type="obsolete">&amp;OK</translation>
+        <translation type="unfinished">&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Отмена</translation>
+        <translation type="unfinished">&amp;Отмена</translation>
     </message>
     <message>
         <source>Source</source>
-        <translation type="obsolete">Источник</translation>
+        <translation type="unfinished">Источник</translation>
+    </message>
+    <message>
+        <source>Report Properties</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Background</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable Background Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Static</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dynamic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Column:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Query Source:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Opacity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0%
+(transparent)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>100%
+(opaque)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resize Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stretch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HAlign</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Center</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>VAlign</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Top</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Middle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bottom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bounds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Y:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Width:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>X:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Height:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>in inches</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Static Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watermark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Static Text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use best font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Arial</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose a file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Images(*.png *.jpg *.xpm)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>ReportWriterWindow</name>
     <message>
         <source>&amp;Cascade</source>
-        <translation type="obsolete">&amp;Каскадом</translation>
+        <translation type="unfinished">&amp;Каскадом</translation>
     </message>
     <message>
         <source>&amp;Tile</source>
-        <translation type="obsolete">&amp;Мозайкой</translation>
-    </message>
-</context>
-<context>
-    <name>ReportingTypeForm</name>
-    <message>
-        <source>DB not connected ! Check server status and try again</source>
-        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <translation type="unfinished">&amp;Мозайкой</translation>
     </message>
     <message>
-        <source>Reporting Types</source>
-        <translation type="obsolete">Виды отчетности</translation>
+        <source>E&amp;xit</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Report Name</source>
-        <translation type="obsolete">Вид отчетности</translation>
+        <source>&amp;Windows</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Short Name</source>
-        <translation type="obsolete">Обозначение</translation>
+        <source>%1 - %2 on %3/%4 AS %5</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7248,11 +8120,19 @@ Avg speed: %3 Kb/sec</source>
     <name>SaveSearchTemplateForm</name>
     <message>
         <source>Search template</source>
-        <translation type="unfinished">Шаблон поиска</translation>
+        <translation>Шаблон поиска</translation>
     </message>
     <message>
         <source>Set search template name</source>
-        <translation type="unfinished"></translation>
+        <translation>Название шаблона поиска</translation>
+    </message>
+    <message>
+        <source>Select category</source>
+        <translation>Выбрать категорию</translation>
+    </message>
+    <message>
+        <source>You have to select category not type</source>
+        <translation>Вы должны выбрать категорию, а не тип</translation>
     </message>
 </context>
 <context>
@@ -7271,149 +8151,145 @@ Avg speed: %3 Kb/sec</source>
     </message>
 </context>
 <context>
-    <name>ScheduleCreateFormClass</name>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Отмена</translation>
-    </message>
-</context>
-<context>
-    <name>ScheduleEntryModel</name>
-    <message>
-        <source>Period</source>
-        <translation type="obsolete">Периодичность</translation>
-    </message>
-</context>
-<context>
-    <name>ScheduleIterationsFormClass</name>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Отмена</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation type="obsolete">Удалить</translation>
-    </message>
-</context>
-<context>
-    <name>ScheduleSelectFormClass</name>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Отмена</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation type="obsolete">Удалить</translation>
-    </message>
-</context>
-<context>
     <name>SectionEditor</name>
     <message>
         <source>&amp;Add</source>
-        <translation type="obsolete">&amp;Добавить</translation>
+        <translation type="unfinished">&amp;Добавить</translation>
     </message>
     <message>
         <source>&amp;Edit</source>
-        <translation type="obsolete">&amp;Редактировать</translation>
+        <translation type="unfinished">&amp;Редактировать</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="obsolete">Удалить</translation>
+        <translation type="unfinished">Удалить</translation>
     </message>
     <message>
         <source>&amp;Close</source>
-        <translation type="obsolete">&amp;Закрыть</translation>
-    </message>
-</context>
-<context>
-    <name>SemesterForm</name>
-    <message>
-        <source>DB not connected ! Check server status and try again</source>
-        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <translation type="unfinished">&amp;Закрыть</translation>
     </message>
     <message>
-        <source>Kurs</source>
-        <translation type="obsolete">Год обучения</translation>
+        <source>Section Editor</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Semesters Table</source>
-        <translation type="obsolete">Список семестров</translation>
+        <source>Report Header</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Semesters Name</source>
-        <translation type="obsolete">Название семестра</translation>
+        <source>Page Footer</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Order</source>
-        <translation type="obsolete">Порядок</translation>
-    </message>
-</context>
-<context>
-    <name>Speciality_VUS_Link</name>
-    <message>
-        <source>Disciplines</source>
-        <translation type="obsolete">Дисциплина</translation>
-    </message>
-    <message utf8="true">
-        <source>Обновить из базы</source>
-        <translation type="obsolete">отменить</translation>
-    </message>
-</context>
-<context>
-    <name>SpecializationForm</name>
-    <message>
-        <source>DB not connected ! Check server status and try again</source>
-        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <source>Even Page(s)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Duration</source>
-        <translation type="obsolete">Срок обучения</translation>
+        <source>First Page</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Qualification</source>
-        <translation type="obsolete">Квалификация</translation>
+        <source>Last Page</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Specialization Table</source>
-        <translation type="obsolete">Таблица военных специальностей</translation>
+        <source>Odd Page(s)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Specializations Name</source>
-        <translation type="obsolete">Военная специальность</translation>
+        <source>Any Page(s)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Short Name</source>
-        <translation type="obsolete">Сокращение</translation>
+        <source>Report Footer</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Purpose</source>
-        <translation type="obsolete">Предназначение выпускников</translation>
-    </message>
-</context>
-<context>
-    <name>StreamForm</name>
-    <message>
-        <source>DB not connected ! Check server status and try again</source>
-        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
+        <source>Page Header</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Stream Table</source>
-        <translation type="obsolete">Список потоков</translation>
+        <source>Even Pages(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Pages(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Detail Sections</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move &amp;Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move &amp;Down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+C</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>unnamed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error Encountered</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to add a new section because a non-unique name could be generated.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No document was set</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tried to add a new Detail section with a non-unique name.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>StringEdit</name>
     <message>
         <source>Name:</source>
-        <translation type="obsolete">Название:</translation>
+        <translation type="unfinished">Название:</translation>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation type="obsolete">&amp;OK</translation>
+        <translation type="unfinished">&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Отмена</translation>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
+    <message>
+        <source>String</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Value:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+O</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+C</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7546,10 +8422,6 @@ Avg speed: %3 Kb/sec</source>
         <translation>Отобразить</translation>
     </message>
     <message>
-        <source>Information</source>
-        <translation type="obsolete">Информация о документе</translation>
-    </message>
-    <message>
         <source>fetch break</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7602,54 +8474,115 @@ Avg speed: %3 Kb/sec</source>
     <name>TextEditor</name>
     <message>
         <source>0.01</source>
-        <translation type="obsolete">0.01</translation>
+        <translation type="unfinished">0.01</translation>
     </message>
     <message>
         <source>0.00</source>
-        <translation type="obsolete">0.00</translation>
+        <translation type="unfinished">0.00</translation>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation type="obsolete">&amp;OK</translation>
+        <translation type="unfinished">&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Отмена</translation>
-    </message>
-</context>
-<context>
-    <name>Three_Lists_Form</name>
-    <message>
-        <source>Form</source>
-        <translation type="obsolete">Форма</translation>
+        <translation type="unfinished">&amp;Отмена</translation>
     </message>
     <message>
-        <source>Others</source>
-        <translation type="obsolete">Остальные</translation>
+        <source>Properties (Text)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Name</source>
-        <translation type="obsolete">Название</translation>
+        <source>Bottom Padding:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Reload</source>
-        <translation type="obsolete">Отменить</translation>
+        <source>Query Source:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>DB Update </source>
-        <translation type="obsolete">Подтвердить</translation>
+        <source>Column:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Add</source>
-        <translation type="obsolete">Добавить</translation>
+        <source>HAlign</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Remove</source>
-        <translation type="obsolete">Удалить</translation>
+        <source>None</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Edit</source>
-        <translation type="obsolete">Редактировать</translation>
+        <source>Left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Center</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>VAlign</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Top</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Middle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bottom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Position/Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Y:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Height:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>X:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Width:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>in inches</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preview:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preview Area</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+O</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+C</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Font...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7683,183 +8616,12 @@ Avg speed: %3 Kb/sec</source>
         <translation>Порт на этом хосте</translation>
     </message>
     <message>
-        <source>Identificator transport in system (for http-protocol must be 2)</source>
-        <translation type="obsolete">Идентификатор используемого транспорта в справочнике транспортов межобъектового обмена</translation>
-    </message>
-    <message>
-        <source>Server where other client must connect</source>
-        <translation type="obsolete">IP-адрес сервера, который получает данные, входящие для текущего объекта</translation>
-    </message>
-    <message>
         <source>Server port number</source>
         <translation>Порт этого сервера</translation>
     </message>
     <message>
         <source>Identificator transport in system (for tcp/ip protocol has to be 1, for http-protocol has to be 2)</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>Two_Lists_Form</name>
-    <message>
-        <source>Form</source>
-        <translation type="obsolete">Форма</translation>
-    </message>
-    <message>
-        <source>Others</source>
-        <translation type="obsolete">Остальные</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation type="obsolete">Название</translation>
-    </message>
-    <message>
-        <source>Reload</source>
-        <translation type="obsolete">Отменить</translation>
-    </message>
-    <message>
-        <source>DB Update </source>
-        <translation type="obsolete">Подтвердить</translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation type="obsolete">Добавить</translation>
-    </message>
-    <message>
-        <source>Remove</source>
-        <translation type="obsolete">Удалить</translation>
-    </message>
-    <message>
-        <source>Edit</source>
-        <translation type="obsolete">Редактировать</translation>
-    </message>
-</context>
-<context>
-    <name>UiPlanningWidget</name>
-    <message>
-        <source>Up</source>
-        <translation type="obsolete">Вверх</translation>
-    </message>
-    <message>
-        <source>Down</source>
-        <translation type="obsolete">Вниз</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation type="obsolete">Название</translation>
-    </message>
-</context>
-<context>
-    <name>UnitForm</name>
-    <message>
-        <source>DB not connected ! Check server status and try again</source>
-        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
-    </message>
-    <message>
-        <source>Facultet</source>
-        <translation type="obsolete">Факультет</translation>
-    </message>
-    <message>
-        <source>Header of Unit</source>
-        <translation type="obsolete">Руководитель</translation>
-    </message>
-    <message>
-        <source>Education Building</source>
-        <translation type="obsolete">Учебный корпус</translation>
-    </message>
-    <message>
-        <source>Units Table</source>
-        <translation type="obsolete">Таблица кафедр</translation>
-    </message>
-    <message>
-        <source>Unit Name</source>
-        <translation type="obsolete">Название кафедры</translation>
-    </message>
-    <message>
-        <source>Short Name</source>
-        <translation type="obsolete">Короткое название</translation>
-    </message>
-    <message>
-        <source>Speciality</source>
-        <translation type="obsolete">Специальность</translation>
-    </message>
-    <message>
-        <source>Speciality Code</source>
-        <translation type="obsolete">Код специальности</translation>
-    </message>
-    <message>
-        <source>Unit Header</source>
-        <translation type="obsolete">Руководитель</translation>
-    </message>
-</context>
-<context>
-    <name>VusForm</name>
-    <message>
-        <source>DB not connected ! Check server status and try again</source>
-        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
-    </message>
-    <message>
-        <source>Vus Table</source>
-        <translation type="obsolete">ВУС</translation>
-    </message>
-</context>
-<context>
-    <name>WorkerForm</name>
-    <message>
-        <source>DB not connected ! Check server status and try again</source>
-        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
-    </message>
-    <message>
-        <source>Acad. Rank</source>
-        <translation type="obsolete">Ученое звание</translation>
-    </message>
-    <message>
-        <source>Acad. Degree</source>
-        <translation type="obsolete">Ученая степень</translation>
-    </message>
-    <message>
-        <source>Mil. Rank</source>
-        <translation type="obsolete">Воинское звание</translation>
-    </message>
-    <message>
-        <source>Position</source>
-        <translation type="obsolete">Должность</translation>
-    </message>
-    <message>
-        <source>Kafedra</source>
-        <translation type="obsolete">Кафедра</translation>
-    </message>
-    <message>
-        <source>Workers Table</source>
-        <translation type="obsolete">Таблица ППС</translation>
-    </message>
-    <message>
-        <source>LastName</source>
-        <translation type="obsolete">Фамилия</translation>
-    </message>
-    <message>
-        <source>FirstName</source>
-        <translation type="obsolete">Имя</translation>
-    </message>
-    <message>
-        <source>SirName</source>
-        <translation type="obsolete">Отчество</translation>
-    </message>
-    <message>
-        <source>FIO</source>
-        <translation type="obsolete">Фамилия, ИО</translation>
-    </message>
-    <message>
-        <source>Desc</source>
-        <translation type="obsolete">Описание</translation>
-    </message>
-    <message>
-        <source>Telephone</source>
-        <translation type="obsolete">Телефон</translation>
-    </message>
-    <message>
-        <source>Mac Label</source>
-        <translation type="obsolete">Метка</translation>
     </message>
 </context>
 <context>
@@ -7930,73 +8692,6 @@ Avg speed: %3 Kb/sec</source>
     </message>
 </context>
 <context>
-    <name>add_auditory_list_form</name>
-    <message>
-        <source>Form</source>
-        <translation type="obsolete">Форма</translation>
-    </message>
-    <message>
-        <source>1</source>
-        <translation type="obsolete">1</translation>
-    </message>
-    <message>
-        <source>2</source>
-        <translation type="obsolete">2</translation>
-    </message>
-    <message>
-        <source>3</source>
-        <translation type="obsolete">3</translation>
-    </message>
-    <message>
-        <source>4</source>
-        <translation type="obsolete">4</translation>
-    </message>
-    <message>
-        <source>5</source>
-        <translation type="obsolete">5</translation>
-    </message>
-    <message>
-        <source>6</source>
-        <translation type="obsolete">6</translation>
-    </message>
-    <message>
-        <source>61</source>
-        <translation type="obsolete">61</translation>
-    </message>
-    <message>
-        <source>62</source>
-        <translation type="obsolete">62</translation>
-    </message>
-    <message>
-        <source>63</source>
-        <translation type="obsolete">63</translation>
-    </message>
-    <message>
-        <source>64</source>
-        <translation type="obsolete">64</translation>
-    </message>
-    <message>
-        <source>65</source>
-        <translation type="obsolete">65</translation>
-    </message>
-    <message>
-        <source>306-6</source>
-        <translation type="obsolete">306-6</translation>
-    </message>
-    <message>
-        <source>240-6</source>
-        <translation type="obsolete">240-6</translation>
-    </message>
-    <message>
-        <source>Index</source>
-        <translation type="obsolete">Индекс</translation>
-    </message>
-    <message>
-        <source>FIO</source>
-        <translation type="obsolete">Фамилия, ИО</translation>
-    </message>
-</context>
-<context>
     <name>attr_history</name>
     <message>
         <source>Altered attribute history</source>
@@ -8021,45 +8716,6 @@ Avg speed: %3 Kb/sec</source>
     <message>
         <source>Group:</source>
         <translation>Группа:</translation>
-    </message>
-    <message>
-        <source>ID</source>
-        <translation type="obsolete">ID</translation>
-    </message>
-    <message>
-        <source>Start</source>
-        <translation type="obsolete">Актуален с</translation>
-    </message>
-    <message>
-        <source>Stop</source>
-        <translation type="obsolete">Актуален по</translation>
-    </message>
-    <message>
-        <source>Measured</source>
-        <translation type="obsolete">Измерено к</translation>
-    </message>
-    <message>
-        <source>Inserted in DB</source>
-        <translation type="obsolete">Добавлено в БД</translation>
-    </message>
-    <message>
-        <source>Source</source>
-        <translation type="obsolete">Источник</translation>
-    </message>
-    <message>
-        <source>Transfer</source>
-        <translation type="obsolete">Довел</translation>
-    </message>
-    <message>
-        <source>Description</source>
-        <translation type="obsolete">Описание</translation>
-    </message>
-</context>
-<context>
-    <name>calendar_form</name>
-    <message>
-        <source>Ok</source>
-        <translation type="obsolete">Да</translation>
     </message>
 </context>
 <context>
@@ -8553,272 +9209,112 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
-    <name>edit_discipline_form</name>
-    <message>
-        <source>Disciplines</source>
-        <translation type="obsolete">Дисциплина</translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation type="obsolete">Добавить</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation type="obsolete">Удалить</translation>
-    </message>
-    <message>
-        <source>Edit</source>
-        <translation type="obsolete">Редактировать</translation>
-    </message>
-    <message>
-        <source>Check KTP</source>
-        <translation type="obsolete">Пересчитать часы занятий по КТП</translation>
-    </message>
-    <message>
-        <source>Learning Plan</source>
-        <translation type="obsolete">Учебные планы и учебные программы</translation>
-    </message>
-    <message>
-        <source>Not Connected </source>
-        <translation type="obsolete">Отсутствует подключение к базе данных. Проверьте соединение с сервером</translation>
-    </message>
-    <message>
-        <source>Refresh All from DB</source>
-        <translation type="obsolete">Обновить все из базы данных</translation>
-    </message>
-    <message utf8="true">
-        <source>Факультет / Кафедра : Специальность / Специализация  /  Группа дисциплин  /  Компонент  /  Дисциплина / Семестр / Вид занятий                                                 </source>
-        <translation type="obsolete">Факультет / Кафедра / Военная специальность  /  Цикл дисциплин /  Группа дисциплин   /  Дисциплина / Семестр / Тема / Вид занятий</translation>
-    </message>
-    <message utf8="true">
-        <source>Отчетность</source>
-        <translation type="obsolete">Отчетность</translation>
-    </message>
-    <message>
-        <source>Recalculate                          Hours</source>
-        <translation type="obsolete">Проверить учебные программы</translation>
-    </message>
-    <message utf8="true">
-        <source>Всего часов</source>
-        <translation type="obsolete">Всего часов</translation>
-    </message>
-    <message utf8="true">
-        <source>Часов с преп.</source>
-        <translation type="obsolete">Часов с преп.</translation>
-    </message>
-</context>
-<context>
-    <name>edit_doc_form</name>
-    <message>
-        <source>...</source>
-        <translation type="obsolete">...</translation>
-    </message>
-</context>
-<context>
     <name>edit_file_form</name>
     <message>
         <source>...</source>
-        <translation type="obsolete">...</translation>
+        <translation type="unfinished">...</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-</context>
-<context>
-    <name>edit_ktp_form</name>
-    <message utf8="true">
-        <source>КТП</source>
-        <translation type="obsolete">КТП</translation>
-    </message>
-    <message>
-        <source>1</source>
-        <translation type="obsolete">1</translation>
-    </message>
-    <message>
-        <source>2</source>
-        <translation type="obsolete">2</translation>
-    </message>
-    <message>
-        <source>3</source>
-        <translation type="obsolete">3</translation>
-    </message>
-    <message>
-        <source>4</source>
-        <translation type="obsolete">4</translation>
-    </message>
-    <message>
-        <source>5</source>
-        <translation type="obsolete">5</translation>
-    </message>
-    <message>
-        <source>6</source>
-        <translation type="obsolete">6</translation>
-    </message>
-    <message>
-        <source>61</source>
-        <translation type="obsolete">61</translation>
-    </message>
-    <message>
-        <source>62</source>
-        <translation type="obsolete">62</translation>
-    </message>
-    <message>
-        <source>63</source>
-        <translation type="obsolete">63</translation>
-    </message>
-    <message>
-        <source>64</source>
-        <translation type="obsolete">64</translation>
-    </message>
-    <message>
-        <source>65</source>
-        <translation type="obsolete">65</translation>
-    </message>
-    <message>
-        <source>2010/2011</source>
-        <translation type="obsolete">2010/2011</translation>
-    </message>
-    <message>
-        <source>10</source>
-        <translation type="obsolete">10</translation>
+        <translation type="unfinished">OK</translation>
     </message>
     <message utf8="true">
-        <source>Отчетность</source>
-        <translation type="obsolete">Отчетность</translation>
+        <source>Создание / редактирование метаданных файла</source>
+        <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Lesson Type</source>
-        <translation type="obsolete">Вид занятия</translation>
+    <message utf8="true">
+        <source>Название:</source>
+        <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>12</source>
-        <translation type="obsolete">12</translation>
+    <message utf8="true">
+        <source>Описание:</source>
+        <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>8</source>
-        <translation type="obsolete">8</translation>
+    <message utf8="true">
+        <source>Дата и время съемки:</source>
+        <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>14</source>
-        <translation type="obsolete">14</translation>
+    <message utf8="true">
+        <source>Регион</source>
+        <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>7</source>
-        <translation type="obsolete">7</translation>
+    <message utf8="true">
+        <source>Тип КА:</source>
+        <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>9</source>
-        <translation type="obsolete">9</translation>
+    <message utf8="true">
+        <source>Файл:</source>
+        <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>13</source>
-        <translation type="obsolete">13</translation>
-    </message>
-    <message>
-        <source>10.11.2010</source>
-        <translation type="obsolete">10.11.2010</translation>
-    </message>
-    <message>
-        <source>20.12.2010</source>
-        <translation type="obsolete">20.12.2010</translation>
-    </message>
-    <message>
-        <source>22.03.2011</source>
-        <translation type="obsolete">22.03.2011</translation>
-    </message>
-    <message>
-        <source>27.03.2011</source>
-        <translation type="obsolete">27.03.2011</translation>
-    </message>
-    <message>
-        <source>124</source>
-        <translation type="obsolete">124</translation>
-    </message>
-    <message>
-        <source>128</source>
-        <translation type="obsolete">128</translation>
-    </message>
-    <message>
-        <source>131</source>
-        <translation type="obsolete">131</translation>
-    </message>
-    <message>
-        <source>167</source>
-        <translation type="obsolete">167</translation>
-    </message>
-    <message>
-        <source>203</source>
-        <translation type="obsolete">203</translation>
-    </message>
-    <message>
-        <source>208</source>
-        <translation type="obsolete">208</translation>
-    </message>
-    <message>
-        <source>221</source>
-        <translation type="obsolete">221</translation>
-    </message>
-    <message>
-        <source>222</source>
-        <translation type="obsolete">222</translation>
-    </message>
-    <message>
-        <source>224</source>
-        <translation type="obsolete">224</translation>
-    </message>
-    <message>
-        <source>236</source>
-        <translation type="obsolete">236</translation>
-    </message>
-    <message>
-        <source>241</source>
-        <translation type="obsolete">241</translation>
-    </message>
-    <message>
-        <source>305</source>
-        <translation type="obsolete">305</translation>
-    </message>
-    <message>
-        <source>306</source>
-        <translation type="obsolete">306</translation>
-    </message>
-    <message>
-        <source>308</source>
-        <translation type="obsolete">308</translation>
-    </message>
-    <message>
-        <source>311</source>
-        <translation type="obsolete">311</translation>
+    <message utf8="true">
+        <source>Отмена</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>edit_task_form</name>
     <message>
         <source>OK</source>
-        <translation type="obsolete">OK</translation>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message utf8="true">
+        <source>Создание / Редактирование тематической задачи</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Название:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Описание:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Название каталога:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Отмена</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>edit_task_var_form</name>
     <message>
         <source>OK</source>
-        <translation type="obsolete">OK</translation>
+        <translation type="unfinished">OK</translation>
     </message>
-</context>
-<context>
-    <name>error_form</name>
-    <message>
-        <source>Error</source>
-        <translation type="obsolete">Ошибка</translation>
+    <message utf8="true">
+        <source>Создание / редактирование проекта</source>
+        <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Ok</source>
-        <translation type="obsolete">Да</translation>
+    <message utf8="true">
+        <source>Название:</source>
+        <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Error text</source>
-        <translation type="obsolete">Ошибка</translation>
+    <message utf8="true">
+        <source>Описание:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Дата создания:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Регион</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Автор</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Название каталога:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Отмена</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8974,7 +9470,179 @@ p, li { white-space: pre-wrap; }
     <name>kaps_manager_form</name>
     <message>
         <source>...</source>
-        <translation type="obsolete">...</translation>
+        <translation type="unfinished">...</translation>
+    </message>
+    <message utf8="true">
+        <source>База данных вариантов решения тематических задач КАПС</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>КАПС</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Название КАПС</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Описание</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Название каталога</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Природопользование</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>ВХ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>VX</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>ДХ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DX</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>НГК</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NG</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>ЭЭ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>EE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>ТРК</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TR</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Тематические задачи КАПС</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Добавить новую тематическую задачу</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Редактировать параметры тематической задачи</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Удалить тематическую задачу</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Название</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Проекты (варианты решения тематических задач)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Создать новый проект (вариант решения)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Изменить параметры проекта</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Удалить проект</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Загрузить все файлы проекта из локальной ФЗ в БД</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Выгрузить все файлы проекта из БД</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Дата создания</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Регион</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Автор</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Файлы с данными для проектов</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Добавить новый файл в проект</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Редактировать метаданные файла</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Удалить файл из проекта</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Выгрузить файл проекта в локальную ФС</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Тип КА</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Дата и время съемки</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Снимки</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Исходные данные</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Промежуточные результаты</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Результаты решения задачи</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9113,10 +9781,6 @@ p, li { white-space: pre-wrap; }
     <message>
         <source>Set new transfer...</source>
         <translation>Выбрать новый из списка...</translation>
-    </message>
-    <message>
-        <source>Value measured :</source>
-        <translation>Момент измерения значения:</translation>
     </message>
     <message>
         <source>Inserted into DB :</source>
@@ -9325,32 +9989,124 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
-    <name>log_form</name>
-    <message>
-        <source>...</source>
-        <translation type="obsolete">...</translation>
-    </message>
-    <message>
-        <source>ID</source>
-        <translation type="obsolete">ID</translation>
-    </message>
-</context>
-<context>
     <name>login</name>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Отмена</translation>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
+    <message>
+        <source>Log In</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Build: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Password:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S&amp;erver:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Database:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Login</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Initializing the Database Connector</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Database Driver</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A connection could not be established with the specified
+Database as the Proper Database Drivers have not been installed.
+Contact your Systems Administrator.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connecting to the Database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot Connect to Database Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A connection to the specified Database Server cannot be made.  This may be due to an
+incorrect Username and/or Password or that the Database Server in question cannot
+support anymore connections.
+
+Please verify your Username and Password and try again or wait until the specified
+Database Server is less busy.
+
+System Error &apos;%1&apos;
+%2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Logging into the Database</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>loginOptions</name>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Отмена</translation>
+        <translation type="unfinished">&amp;Отмена</translation>
     </message>
     <message>
         <source>&amp;Save</source>
-        <translation type="obsolete">&amp;Сохранить</translation>
+        <translation type="unfinished">&amp;Сохранить</translation>
+    </message>
+    <message>
+        <source>Login Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Database:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S&amp;erver:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Port:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Driver:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PostgreSQL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ODBC</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9401,27 +10157,6 @@ p, li { white-space: pre-wrap; }
     <message>
         <source>Access level:</source>
         <translation>Уровень доступа:</translation>
-    </message>
-</context>
-<context>
-    <name>logunit</name>
-    <message>
-        <source>User</source>
-        <translation type="obsolete">Пользователь</translation>
-    </message>
-</context>
-<context>
-    <name>main_form</name>
-    <message>
-        <source>ID</source>
-        <translation type="obsolete">ID</translation>
-    </message>
-</context>
-<context>
-    <name>message_form</name>
-    <message>
-        <source>pbOk</source>
-        <translation type="obsolete">Готово</translation>
     </message>
 </context>
 <context>
@@ -9551,58 +10286,6 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
-    <name>nagruz_kaf_form</name>
-    <message utf8="true">
-        <source>Отчетность</source>
-        <translation type="obsolete">Отчетность</translation>
-    </message>
-</context>
-<context>
-    <name>nagruz_kaf_prep_form</name>
-    <message>
-        <source>2009/2010</source>
-        <translation type="obsolete">2009/2010</translation>
-    </message>
-</context>
-<context>
-    <name>nagruz_prep_form</name>
-    <message>
-        <source>2009/2010</source>
-        <translation type="obsolete">2009/2010</translation>
-    </message>
-</context>
-<context>
-    <name>output_form</name>
-    <message>
-        <source>1-2</source>
-        <translation type="obsolete">1-2</translation>
-    </message>
-    <message>
-        <source>3-4</source>
-        <translation type="obsolete">3-4</translation>
-    </message>
-    <message>
-        <source>5-6</source>
-        <translation type="obsolete">5-6</translation>
-    </message>
-    <message>
-        <source>7-8</source>
-        <translation type="obsolete">7-8</translation>
-    </message>
-    <message utf8="true">
-        <source>Учебный план</source>
-        <translation type="obsolete">Учебный план</translation>
-    </message>
-    <message>
-        <source>month</source>
-        <translation type="obsolete">месяц</translation>
-    </message>
-    <message>
-        <source>year</source>
-        <translation type="obsolete">год</translation>
-    </message>
-</context>
-<context>
     <name>periodic_report_form</name>
     <message>
         <source>Periodic reports</source>
@@ -9666,18 +10349,7 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
-    <name>print_form</name>
-    <message>
-        <source>Error</source>
-        <translation type="obsolete">Ошибка</translation>
-    </message>
-</context>
-<context>
     <name>rubric_form</name>
-    <message>
-        <source>Add rubric</source>
-        <translation type="obsolete">Добавить рубрику</translation>
-    </message>
     <message>
         <source>Rubric name :</source>
         <translation>Название рубрики:</translation>
@@ -9723,23 +10395,23 @@ p, li { white-space: pre-wrap; }
     <name>save_search_template_form</name>
     <message>
         <source>Save search template</source>
-        <translation type="unfinished">Сохранить шаблон поиска</translation>
+        <translation>Сохранить шаблон поиска</translation>
     </message>
     <message>
         <source>Search template name :</source>
-        <translation type="unfinished">Название шаблона поиска :</translation>
+        <translation>Название шаблона поиска :</translation>
     </message>
     <message>
         <source>Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Категория</translation>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation type="unfinished">&amp;OK</translation>
+        <translation>&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
+        <translation>&amp;Отмена</translation>
     </message>
 </context>
 <context>
@@ -9822,35 +10494,6 @@ p, li { white-space: pre-wrap; }
     <message utf8="true">
         <source>Информационные ресурсы ВТО БД</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>stream_form</name>
-    <message utf8="true">
-        <source>КТП</source>
-        <translation type="obsolete">КТП</translation>
-    </message>
-</context>
-<context>
-    <name>streamunit</name>
-    <message>
-        <source>Error</source>
-        <translation type="obsolete">Ошибка</translation>
-    </message>
-    <message>
-        <source>Information</source>
-        <translation type="obsolete">Информация о документе</translation>
-    </message>
-</context>
-<context>
-    <name>svodn_rasp</name>
-    <message>
-        <source>month</source>
-        <translation type="obsolete">месяц</translation>
-    </message>
-    <message>
-        <source>year</source>
-        <translation type="obsolete">год</translation>
     </message>
 </context>
 <context>
@@ -9984,6 +10627,13 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>table_viewClass</name>
+    <message>
+        <source>table_view</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>timer_form</name>
     <message>
         <source>Start task</source>
@@ -10075,10 +10725,6 @@ p, li { white-space: pre-wrap; }
     <message>
         <source>Parametr set port number when client must connected</source>
         <translation>Порт на удаленном хосте, на который передаются данные</translation>
-    </message>
-    <message>
-        <source>Parameter set server-host address when other clients must connected</source>
-        <translation type="obsolete">IP-адрес сервера, который принимает входящие данные</translation>
     </message>
     <message>
         <source>Parameter set post number when other client must connected</source>
