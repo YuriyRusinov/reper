@@ -42,19 +42,19 @@ begin
 
             query := query || E') values (' || id_org_tr || E',' || idOrg || E',' || idTransportList[i] || E',' || quote_literal (addressList[i]);
 
-            if (activeList is not null and i <= array_upper (activeList, 1)) then
-                if(activeList[i] is not null) then
-                    query := query || E',' || activeList[i];
-                else
-                    query := query || E', true ';
-                end if;
-            end if;
-
             if (portList is not null and i <= array_upper (portList, 1)) then
                 if(portList[i] is not null) then
                     query := query || E',' || portList[i];
                 else
                     query := query || E', NULL ';
+                end if;
+            end if;
+
+            if (activeList is not null and i <= array_upper (activeList, 1)) then
+                if(activeList[i] is not null) then
+                    query := query || E',' || activeList[i];
+                else
+                    query := query || E', true ';
                 end if;
             end if;
 
