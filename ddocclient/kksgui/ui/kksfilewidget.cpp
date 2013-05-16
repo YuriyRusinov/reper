@@ -55,6 +55,7 @@ void KKSFileWidget::init()
         QVariant v(t->id());
         ui->cbTypes->addItem(t->name(), v);
     }
+    ui->tbOpenFile->setToolTip(tr("Open local file"));
 
     connect(ui->twFiles, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(twFilesDoubleClicked(const QModelIndex &)));
 }

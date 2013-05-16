@@ -65,6 +65,7 @@ KKSIncludesWidget::KKSIncludesWidget(KKSRubric * rootRubric,
     pMenu (new QMenu(this))
 {
     //Q_INIT_RESOURCE (kksgui_icon_set);
+    tvItems->setRootIsDecorated(false);
 
     if (m_rootRubric)
         m_rootRubric->addRef();
@@ -903,7 +904,7 @@ void KKSIncludesWidget :: addRubricItem (void)
     if(!r)
         return;
 
-    emit rubricItemRequested(isRec);
+    emit rubricItemRequested(r, isRec);
 }
 
 void KKSIncludesWidget :: createRubricItem (QAbstractItemModel * itemModel, const QModelIndex& parent)

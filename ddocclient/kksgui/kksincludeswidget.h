@@ -104,7 +104,7 @@ private slots:
     void init();
 
 signals:
-    void rubricItemRequested(bool isRec);
+    void rubricItemRequested(const KKSRubric * r, bool isRec);
     void rubricItemCreationRequested(const KKSRubric * r, QAbstractItemModel * itemModel, const QModelIndex& parent);
     void openRubricItemRequested(int idRubricItem);
     void saveRubric (KKSRubric * r, bool isMyDocs);

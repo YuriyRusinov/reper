@@ -135,7 +135,7 @@ KKSIncludesWidget * KKSRubricFactory :: createRubricEditor (int mode, const KKSL
     //qDebug () << __PRETTY_FUNCTION__ << iDeleg;
 
     connect (iW, SIGNAL (saveRubric (KKSRubric *, bool)), this, SLOT (saveRubric (KKSRubric *, bool)) );
-    connect (iW, SIGNAL (rubricItemRequested (bool)), this, SLOT (rubricItemUpload(bool)) );
+    connect (iW, SIGNAL (rubricItemRequested (const KKSRubric*, bool)), this, SLOT (rubricItemUpload(const KKSRubric *,bool)) );
     connect (iW, SIGNAL (rubricItemCreationRequested (const KKSRubric *, QAbstractItemModel*, const QModelIndex&)), this, SLOT (rubricItemCreate(const KKSRubric *, QAbstractItemModel *, const QModelIndex&)) );
     connect (iW, SIGNAL (openRubricItemRequested (int)), this, SLOT (openRubricItem (int)) );
     connect (iW, SIGNAL (loadStuffModel (RubricForm *)), this, SLOT (loadRubricPrivilegies(RubricForm *)) );
@@ -320,10 +320,10 @@ void KKSRubricFactory :: rubricItemCreate (const KKSRubric * r, QAbstractItemMod
 
 }
 
-void KKSRubricFactory :: rubricItemUpload (bool forRecords)
+void KKSRubricFactory :: rubricItemUpload (const KKSRubric *r, bool forRecords)
 {
     KKSIncludesWidget *editor = qobject_cast<KKSIncludesWidget *>(this->sender());
-    if(!editor)
+    if(!editor || !r)
         return;
 
     KKSList<const KKSFilter*> filters;
@@ -385,6 +385,19 @@ void KKSRubricFactory :: rubricItemUpload (bool forRecords)
             return;
         }
         name = o->name();
+        if (r->getCategory())
+        {
+            const KKSCategory * c = o->category();
+            if (c->id() != r->getCategory()->id())
+            {
+                int res = QMessageBox::question(editor,tr("Add document into rubric"), tr("You are put document of category %1 to rubric with category %2.\n Do you want to proceed ?").arg (c->id()).arg(r->getCategory()->id()), QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+                if (res != QMessageBox::Yes)
+                {
+                    o->release ();
+                    return;
+                }
+            }
+        }
         o->release();
     }
     else

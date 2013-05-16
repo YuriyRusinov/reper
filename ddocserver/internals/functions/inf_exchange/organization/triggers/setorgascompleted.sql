@@ -10,7 +10,7 @@ begin
 
     --if syncronization is stopped
     if(processSync() = FALSE) then
-        update organization set is_completed = true, is_created = true where id = new.id_organization and is_completed = false;
+        update organization set is_completed = true, is_created = 1 where id = new.id_organization and is_completed = false;
         return new;
     end if;
 
