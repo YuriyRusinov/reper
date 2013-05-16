@@ -487,6 +487,7 @@ qint64 KKSEIOFactory::generateInsertQuery(const QString & tableName,
                rTable == ACCESS_CARDS_ACCESS_PLAN_TSO ||
                rTable == MAIL_LISTS_POSITION  ||
                rTable == LIFE_CYCLE_IO_STATES ||
+               rTable == IO_PROCESSING_ORDER_CHAINS ||
                rTable == SHU_DLS_POSITION
                )
             {
@@ -763,6 +764,7 @@ qint64 KKSEIOFactory::generateUpdateQuery(const QString & tableName,
                rTable == ACCESS_CARDS_ACCESS_PLAN_TSO ||
 			   rTable == MAIL_LISTS_POSITION ||
                rTable == LIFE_CYCLE_IO_STATES ||
+               rTable == IO_PROCESSING_ORDER_CHAINS ||
                rTable == SHU_DLS_POSITION
                )
             {
@@ -1066,6 +1068,7 @@ int KKSEIOFactory::insertIndValues(const KKSObjectExemplar * eio) const
                rTable == ACCESS_CARDS_ACCESS_PLAN_TSO ||
 			   rTable == MAIL_LISTS_POSITION ||
                rTable == LIFE_CYCLE_IO_STATES ||
+               rTable == IO_PROCESSING_ORDER_CHAINS || 
                rTable == SHU_DLS_POSITION
                )
             {
@@ -1203,6 +1206,7 @@ int KKSEIOFactory::updateIndValues(const KKSObjectExemplar * eio) const
                rTable == ACCESS_CARDS_ACCESS_PLAN_TSO ||
 			   rTable == MAIL_LISTS_POSITION ||
                rTable == LIFE_CYCLE_IO_STATES ||
+               rTable == IO_PROCESSING_ORDER_CHAINS || 
                rTable == SHU_DLS_POSITION
                )
             {

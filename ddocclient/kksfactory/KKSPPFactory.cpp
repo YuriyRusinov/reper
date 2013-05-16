@@ -977,6 +977,7 @@ int KKSPPFactory::insertAttrValues(const KKSObject * io) const
                rTable == ACCESS_CARDS_ACCESS_PLAN_TSO ||
 			   rTable == MAIL_LISTS_POSITION ||
                rTable == LIFE_CYCLE_IO_STATES ||
+               rTable == IO_PROCESSING_ORDER_CHAINS || 
                rTable == SHU_DLS_POSITION
                )
             {
@@ -1112,6 +1113,7 @@ int KKSPPFactory::updateAttrValues(const KKSObject * io) const
                rTable == ACCESS_CARDS_ACCESS_PLAN_TSO ||
 			   rTable == MAIL_LISTS_POSITION ||
                rTable == LIFE_CYCLE_IO_STATES ||
+               rTable == IO_PROCESSING_ORDER_CHAINS || 
                rTable == SHU_DLS_POSITION
                )
             {

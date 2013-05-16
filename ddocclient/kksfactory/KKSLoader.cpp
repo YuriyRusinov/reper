@@ -904,6 +904,7 @@ KKSObjectExemplar * KKSLoader::loadEIO(qint64 id,
                rTable == ACCESS_CARDS_ACCESS_PLAN_TSO ||
                rTable == MAIL_LISTS_POSITION ||
                rTable == LIFE_CYCLE_IO_STATES ||
+               rTable == IO_PROCESSING_ORDER_CHAINS ||
                rTable == SHU_DLS_POSITION
                )
             {
