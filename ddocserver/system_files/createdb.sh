@@ -14,6 +14,8 @@ LOCAL_ADDRESS=$9
 IO_FILES=${10}
 USE_MODULES=${11}
 IS_MAIN_ORG=${12}
+ORG_NAME=${13}
+LOCAL_PORT=${14}
 
 . ./io_files_name.conf
 
@@ -58,7 +60,7 @@ $LINTER_PREFIX/bin/psql -h $DB_HOST -p $DB_PORT -d $BASE -f ./initdb.sql $USER
 
 $LINTER_PREFIX/bin/psql -h $DB_HOST -p $DB_PORT -d $BASE -c "select setkkssitoversion('DynamicDocs Server version $VERSION', '$VERSION')" -t $USER > /dev/null &&
 $LINTER_PREFIX/bin/psql -h $DB_HOST -p $DB_PORT -d $BASE -c "select setfilearchivepath('$IO_FILES_DIR')" -t $USER > /dev/null &&
-$LINTER_PREFIX/bin/psql -h $DB_HOST -p $DB_PORT -d $BASE -c "select usetlocaladdress('$LOCAL_ADDRESS', 0)" -t $USER > /dev/null &&
+
 $LINTER_PREFIX/bin/psql -h $DB_HOST -p $DB_PORT -d $BASE -c "select startsync()" -t $USER > /dev/null &&
 $LINTER_PREFIX/bin/psql -h $DB_HOST -p $DB_PORT -d $BASE -c "select setorgasmain($IS_MAIN_ORG)" -t $USER > /dev/null
 
@@ -74,6 +76,9 @@ $LINTER_PREFIX/bin/psql -h $DB_HOST -p $DB_PORT -d $BASE -f ./initprivs.sql $USE
 $LINTER_PREFIX/bin/psql -h $DB_HOST -p $DB_PORT -d $BASE -f ./initdata.sql $USER
 
 $LINTER_PREFIX/bin/psql -h $DB_HOST -p $DB_PORT -d $BASE -f ./initiotriggers.sql $USER
+
+$LINTER_PREFIX/bin/psql -h $DB_HOST -p $DB_PORT -d $BASE -c "select usetlocaladdress('$LOCAL_ADDRESS', $LOCAL_PORT)" -t $USER > /dev/null &&
+$LINTER_PREFIX/bin/psql -h $DB_HOST -p $DB_PORT -d $BASE -c "select createTempTables(); select setCurrentDl(4); select insertlocalorg('$ORG_NAME', '$ORG_NAME', '$ORG_NAME', 'localorg_prefix', 1, NULL, 1, '$LOCAL_ADDRESS', $LOCAL_PORT)" -t $USER > /dev/null
 
 if [ "$USE_MODULES" != "1" ]; then
     exit 0;

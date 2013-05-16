@@ -2,7 +2,7 @@
 
 . ./user.config
 
-VERSION=1.0.3
+VERSION=1.1.0
 
 PROJECT_NAME=DynamicDocs
 
@@ -112,7 +112,7 @@ case $COMMAND in
 	chmod a+x ./build.sh &&
 	./build.sh "$VERSION" "$LINTER_PREFIX" "$PGDATA_DIR" "$FILE_ARCH" "0" "$AUTO_CREATE" "$PROJECT_NAME" &&
 	chmod a+x ./createdb.sh &&
-	./createdb.sh "$BASE" "$USER" "$LINTER_PORT" "$LINTER_PREFIX" "$ENCODING" "1" "$PASSWD" "$VERSION" "$LOCAL_ADDRESS" "$IO_FILES" "$USE_MODULES" "$IS_MAIN_ORG" 2>$PREV/createdb.log &&
+	./createdb.sh "$BASE" "$USER" "$LINTER_PORT" "$LINTER_PREFIX" "$ENCODING" "1" "$PASSWD" "$VERSION" "$LOCAL_ADDRESS" "$IO_FILES" "$USE_MODULES" "$IS_MAIN_ORG" "$ORG_NAME" "$LOCAL_PORT" 2>$PREV/createdb.log &&
 	chmod a+x ./createanalyzer.sh &&
 	./createanalyzer.sh "$BASE" "$USER" "$LINTER_PORT" "$LINTER_PREFIX" "$PGDATA_DIR" &&
 	chmod a+x ./createdumper.sh &&
@@ -126,7 +126,7 @@ case $COMMAND in
 	chmod a+x ./build.sh &&
 	./build.sh "$VERSION" "$LINTER_PREFIX" "$PGDATA_DIR" "$FILE_ARCH" "1" "$AUTO_CREATE" "$PROJECT_NAME" &&
 	chmod a+x ./updatedb.sh &&
-	./updatedb.sh "$BASE" "$USER" "$LINTER_PORT" "$LINTER_PREFIX" "$ENCODING" "$PASSWD" "$VERSION" "$LOCAL_ADDRESS" "$IO_FILES" "$USE_MODULES" 2>$PREV/updatedb.log &&
+	./updatedb.sh "$BASE" "$USER" "$LINTER_PORT" "$LINTER_PREFIX" "$ENCODING" "$PASSWD" "$VERSION" "$LOCAL_ADDRESS" "$IO_FILES" "$USE_MODULES" "$ORG_NAME" "$LOCAL_PORT" 2>$PREV/updatedb.log &&
 	INSTALL_OK=1
 	
 	deletePGPass

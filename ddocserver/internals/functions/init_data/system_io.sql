@@ -1115,8 +1115,8 @@ insert into attributes (unique_id, id, id_a_type, code, name, title, table_name,
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-321', 321, 2, 'id_start_state', 'Начальное состояние', 'Начальное состояние', 'io_states', 'name', 150, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-322', 322, 17, 'life_cycle_io_states', 'Перечень состояний жизненного цикла', 'Перечень состояний жизненного цикла', 'io_states', 'name', 200, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-323', 323, 2, 'id_life_cycle', 'Жизненный цикл', 'Жизненный цикл', 'life_cycle', 'name', 150, TRUE);
-insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-324', 324, 2, 'id_state_src', 'Исходное состояние', 'Исходное состояние', 'io_states', 'name', 150, TRUE);
-insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-325', 325, 2, 'id_state_dest', 'Следующее состояние', 'Следующее состояние', 'io_states', 'name', 150, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-324', 324, 2, 'id_state_src', 'Предыдущее состояние', 'Предыдущее состояние', 'io_states', 'name', 150, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-325', 325, 2, 'id_state_dest', 'Текущее состояние', 'Текущее состояние', 'io_states', 'name', 150, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-326', 326, 9, 'service', 'Параметры (сигнатура) сервиса', 'Параметры (сигнатура) сервиса', NULL, NULL, 150, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-327', 327, 9, 'extra_params', 'Доп. параметры для запуска', 'Доп. параметры для запуска', NULL, NULL, 150, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-328', 328, 2, 'id_handler', 'Сервис-обработчик', 'Сервис-обработчик', 'handlers', 'name', 150, TRUE);
@@ -1142,6 +1142,8 @@ insert into attributes (unique_id, id, id_a_type, code, name, title, table_name,
 
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-345', 345, 8, 'local_port', 'Локальный порт', 'Локальный порт транспорта', NULL, NULL, 150, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-346', 346, 8, 'port', 'Порт транспорта', 'Порт транспорта', NULL, NULL, 150, TRUE);
+
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-347', 347, 17, 'io_processing_order_chains', 'Перечень очередей обработки', 'Перечень очередей обработки', 'chains', 'name', 200, TRUE);
 
 SELECT pg_catalog.setval('attributes_id_seq', 1000, true); --все пользовательские атрибуты будут начинаться с номера 1001
                                                           --это сделано для того, чтобы оставить резерв для системных атрибутов
@@ -2195,12 +2197,15 @@ insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (596, 209, 12, NULL, true, false); --id_io_category
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (597, 209, 324, NULL, false, false); --id_state_src
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (598, 209, 325, NULL, true, false); --id_state_dest
-insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (599, 209, 329, NULL, true, false); --id_chain
+--insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (599, 209, 329, NULL, true, false); --id_chain
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (605, 209, 347, NULL, false, false);  --io_processing_order_chains
+
 --600 используется в справочнике ЖЦ
 --601 используется в справочнике ЖЦ
 --602 используется в справочнике потоков сообщений
 --603 используется в справочнике транспортов межобъектового обмена
 --604 используется в справочнике адресов организаций
+--605 используется в справочникепорядка обработки ИО в различных состояниях ЖЦ
 
 
 

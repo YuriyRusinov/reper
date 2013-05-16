@@ -137,6 +137,7 @@ declare
     idChain int4;
     idChainsData int4;
     whatHappens int2;
+    r record;
 begin
 
 /*    
@@ -182,32 +183,66 @@ begin
 
 
     if(TG_OP = 'INSERT') then
-        select c.id into idChain 
-        from chains c, io_processing_order p
-        where 
-            c.id = p.id_chain
-            and p.id_io_category = new.id_io_category 
-            and p.id_state_dest = new.id_io_state
-            and p.id_state_src = NULL;
+        for r in 
+            select 
+                c.id 
+            from 
+                chains c, 
+                io_processing_order p,
+                io_processing_order_chains cio
+            where 
+                c.id = cio.id_chains
+                and p.id = cio.id_io_processing_order
+                and p.id_io_category = new.id_io_category 
+                and p.id_state_dest = new.id_io_state
+                and p.id_state_src = NULL
+        loop
+
+            idChain = r.id;
+
+            if(idChain isnull) then
+                continue;
+            end if;
+
+            select getNextSeq('chains_data', 'id') into idChainsData;
+            insert into chains_data (id, id_chain, id_io_object, insert_time, what_happens) 
+            values (idChainsData, idChain, new.id, current_timestamp, whatHappens);
+
+        end loop;
+
     end if;
 
     if(TG_OP = 'UPDATE') then
-        select c.id into idChain 
-        from chains c, io_processing_order p
-        where 
-            c.id = p.id_chain
-            and p.id_io_category = new.id_io_category 
-            and p.id_state_dest = new.id_io_state
-            and p.id_state_src = old.id_io_state;
+        for r in 
+            select 
+                c.id
+            from 
+                chains c, 
+                io_processing_order p,
+                io_processing_order_chains cio
+            where 
+                c.id = cio.id_chains
+                and p.id = cio.id_io_processing_order
+                and p.id_io_category = new.id_io_category 
+                and p.id_state_dest = new.id_io_state
+                and p.id_state_src = old.id_io_state
+                and (new.is_completed = 1 or new.is_completed = 2) --changing or creation of IO is completed
+        loop
+
+            idChain = r.id;
+
+            if(idChain isnull) then
+                continue;
+            end if;
+
+            select getNextSeq('chains_data', 'id') into idChainsData;
+            insert into chains_data (id, id_chain, id_io_object, insert_time, what_happens) 
+            values (idChainsData, idChain, new.id, current_timestamp, whatHappens);
+
+        end loop;
+
     end if;
 
-    if(idChain isnull) then
-        return new;
-    end if;
-
-    select getNextSeq('chains_data', 'id') into idChainsData;
-    insert into chains_data (id, id_chain, id_io_object, insert_time, what_happens) 
-    values (idChainsData, idChain, new.id, current_timestamp, whatHappens);
     
     return new;
 end

@@ -12,9 +12,9 @@ USER=admin
 # group 
 GROUP=admin
 
-#root path to LINTER 7.0
-#if that was installed by default, the path typically is /usr/
-LINTER_ROOT=/usr/
+#root path to PostgreSQL 9.x
+#if that was installed by default, the path typically is /opt/postgres
+LINTER_ROOT=/opt/postgres
 
 # port of database server (5432 is the defaults)
 LINTER_PORT=5432
@@ -24,14 +24,14 @@ LINTER_PORT=5432
 ENCODING=UTF8
 
 #path to active cluster data directory
-#defaults for LINTER 7.0 is /var/lib/pgsql/data
+#defaults for PostgreSQL 9.x is /opt/postgres/data
 #Just execute 'ps afx' command and find output record '.../postmaster ... -D {PGDATA_DIR}'.
 #PGDATA_DIR is active cluster data directory
 #Example:
 #ps afx 
 #...
-# 964 ?        S      0:02 /usr/bin/postmaster -D /var/lib/pgsql/data
-PGDATA_DIR=/var/lib/postgresql/data
+# 964 ?        S      0:02 /opt/postgres/bin/postmaster -D /opt/postgres/data
+PGDATA_DIR=/opt/postgres/data
 
 #file archive path
 FILE_ARCH=io_files
@@ -40,9 +40,13 @@ FILE_ARCH=io_files
 #default is set to 1
 AUTO_CREATE=1
 
-#Unique database address
+#Unique database IP-address and port
 #For admins only! You should get that from your boss
-LOCAL_ADDRESS=o1
+LOCAL_ADDRESS=192.168.0.1
+LOCAL_PORT=9000
+
+#The name of database local organization
+ORG_NAME="New organization"
 
 #set this parameter to 1 if your organization is main
 #ONLY main organization have full access to organization table

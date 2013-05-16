@@ -1,7 +1,8 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     29.04.2013 18:55:58                          */
+/* Created on:     15.05.2013 11:39:31                          */
 /*==============================================================*/
+
 
 /*==============================================================*/
 /* Table: root_table                                            */
@@ -22,7 +23,6 @@ select setMacToNULL('root_table');
 create unique index Index_1 on root_table using BTREE (
 unique_id
 );
-
 
 /*==============================================================*/
 /* User: public                                                 */
@@ -1833,7 +1833,6 @@ id_io_objects
 create table io_processing_order (
    id                   SERIAL               not null,
    name                 VARCHAR              not null,
-   id_chain             INT4                 not null,
    id_state_src         INT4                 null,
    id_state_dest        INT4                 not null,
    id_io_category       INT4                 not null,
@@ -1844,20 +1843,31 @@ inherits (root_table);
 comment on table io_processing_order is
 'Справочник подярка обработки информационных объектов в различных состояниях жизненного цикла';
 
-comment on column io_processing_order.id_chain is
-'Очередь обработки';
-
 comment on column io_processing_order.id_state_src is
-'Из какого (id_io_state_from) состояния в какое (id_io_state_to) переходит ИО, которые должны обрабатываться данной очередью';
+'Из какого (id_state_src) состояния в какое (id_state_dest) переходит ИО, которые должны обрабатываться данной очередью';
 
 comment on column io_processing_order.id_state_dest is
-'Из какого (id_io_state_from) состояния в какое (id_io_state_to) переходит ИО, которые должны обрабатываться данной очередью';
+'Из какого (id_state_src) состояния в какое (id_state_dest) переходит ИО, которые должны обрабатываться данной очередью';
 
 comment on column io_processing_order.id_io_category is
 'ИО какой категории обрабатываются данной очередью';
 
 select setMacToNULL('io_processing_order');
 select createTriggerUID('io_processing_order');
+
+/*==============================================================*/
+/* Table: io_processing_order_chains                            */
+/*==============================================================*/
+create table io_processing_order_chains (
+   id_io_processing_order INT4                 not null,
+   id_chains            INT4                 not null,
+   constraint PK_IO_PROCESSING_ORDER_CHAINS primary key (id_io_processing_order, id_chains)
+);
+
+comment on table io_processing_order_chains is
+'Перечень очередей, в которые должны быть помещены ИО и ЭИО при изменении их состояния';
+
+select setMacToNULL('io_processing_order_chains');
 
 /*==============================================================*/
 /* Table: io_rubricator                                         */
@@ -2623,12 +2633,12 @@ create table organization (
    short_name           VARCHAR              not null,
    code_name            VARCHAR              not null,
    email_prefix         VARCHAR              not null,
-   latitude             FLOAT8               not null,
-   longitude            FLOAT8               not null,
+   latitude             FLOAT8               not null default 0,
+   longitude            FLOAT8               not null default 0,
    map_symbol           VARCHAR              not null,
    tree_symbol          VARCHAR              not null,
-   dt_prev_mode         TIMESTAMP            not null,
-   dt_curr_mode         TIMESTAMP            not null,
+   dt_prev_mode         TIMESTAMP            not null default CURRENT_TIMESTAMP,
+   dt_curr_mode         TIMESTAMP            not null default CURRENT_TIMESTAMP,
    is_completed         BOOL                 not null default FALSE,
    is_created           INT4                 not null default 0
       constraint CKC_IS_CREATED_ORGANIZA check (is_created in (0,1,2)),
@@ -3038,6 +3048,23 @@ inherits (root_table);
 
 select setMacToNULL('queue_results');
 select createTriggerUID('queue_results');
+
+/*==============================================================*/
+/* Table: rand_state                                            */
+/*==============================================================*/
+create table rand_state (
+   id                   SERIAL               not null,
+   state_rand           BYTEA                null,
+   rand_seed            INT8                 null,
+   constraint PK_RAND_STATE primary key (id)
+)
+inherits (root_table);
+
+comment on table rand_state is
+'Служебная таблица для хранения состояний датчика случайных чисел';
+
+select setMacToNULL('rand_state');
+select createTriggerUID('rand_state');
 
 /*==============================================================*/
 /* Table: ranks                                                 */
@@ -4664,11 +4691,6 @@ alter table io_objects_organization
       on delete restrict on update restrict;
 
 alter table io_processing_order
-   add constraint FK_IO_PROCE_REFERENCE_CHAINS foreign key (id_chain)
-      references chains (id)
-      on delete restrict on update restrict;
-
-alter table io_processing_order
    add constraint FK_IO_PROC_REF_IO_STATE_DEST foreign key (id_state_dest)
       references io_states (id)
       on delete restrict on update restrict;
@@ -4681,6 +4703,16 @@ alter table io_processing_order
 alter table io_processing_order
    add constraint FK_IO_PROCE_REFERENCE_IO_CATEG foreign key (id_io_category)
       references io_categories (id)
+      on delete restrict on update restrict;
+
+alter table io_processing_order_chains
+   add constraint FK_IO_PROCE_REFERENCE_IO_PROCE foreign key (id_io_processing_order)
+      references io_processing_order (id)
+      on delete restrict on update restrict;
+
+alter table io_processing_order_chains
+   add constraint FK_IO_PROCE_REFERENCE_CHAINS foreign key (id_chains)
+      references chains (id)
       on delete restrict on update restrict;
 
 alter table io_rubricator

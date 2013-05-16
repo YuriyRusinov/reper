@@ -7,4 +7,10 @@
 \i ./functions/inf_exchange/organization/gettransport.sql
 \i ./functions/inf_exchange/organization/setorgtransport.sql
 
+\i ./functions/inf_exchange/organization/insertorganization.sql
+\i ./functions/inf_exchange/organization/insertorgaddress.sql
+\i ./functions/inf_exchange/organization/insertlocalorg.sql
+
+
+
 \i ./functions/inf_exchange/organization/triggers/readd_triggers.sql

@@ -73,7 +73,8 @@ begin
                     rTable = 'guard_objects_devices' or
                     rTable = 'access_cards_access_plan' or
                     rTable = 'mail_lists_position' or 
-                    rTable = 'life_cycle_io_states'
+                    rTable = 'life_cycle_io_states' or
+                    rTable = 'io_processing_order_chains'
                   ) then
                     refTable := rTable;
                 else

@@ -3,6 +3,7 @@ $BODY$
 declare
     idChainsData int4;
     idChain int4;
+    r record;
 begin
 
     --chains
@@ -16,21 +17,32 @@ begin
         end if;
     end if;
 
-    select c.id into idChain 
-    from chains c, io_processing_order p, tbl_io_objects io
-    where 
-        p.id_io_category = io.id_io_category 
-        and p.id_chain = c.id
-        and p.id_state_dest = 5 --system state Attr_changed
-        and io.id = new.id_io_object;
+    for r in 
+        select 
+            c.id 
+        from 
+            chains c, 
+            io_processing_order p, 
+            io_processing_order_chains cio,
+            tbl_io_objects io
+        where 
+            p.id_io_category = io.id_io_category 
+            and cio.id_chains = c.id
+            and cio.id_io_processing_order = p.id
+            and p.id_state_dest = 5 --system state Attr_changed
+            and io.id = new.id_io_object
+--            and (io.is_completed = 1 or io.is_completed = 2)
+    loop
+        idChain = r.id;
+        if(idChain isnull) then
+            continue;
+        end if;
 
-    if(idChain isnull) then
-        return new;
-    end if;
+        select getNextSeq('chains_data', 'id') into idChainsData;
+        insert into chains_data (id, id_chain, id_io_object, insert_time, what_happens) 
+        values (idChainsData, idChain, new.id_io_object, current_timestamp, 2); -- 2 - change of attributes of IO
 
-    select getNextSeq('chains_data', 'id') into idChainsData;
-    insert into chains_data (id, id_chain, id_io_object, insert_time, what_happens) 
-    values (idChainsData, idChain, new.id_io_object, current_timestamp, 2); -- 2 - change of attributes of IO
+    end loop;
 
     return new;
 end
