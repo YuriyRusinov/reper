@@ -129,6 +129,7 @@ KKSIncludesWidget::KKSIncludesWidget(KKSRubric * rootRubric,
     connect (twIncludes, SIGNAL (doubleClicked(const QModelIndex &)), this, SLOT (slotRubricItemDblClicked(const QModelIndex &)) );
     connect (recWItems->getView(), SIGNAL (doubleClicked(const QModelIndex &)), this, SLOT (slotRubricItemEdit(const QModelIndex &)) );
     connect (recWItems, SIGNAL (delEntitiesList (QAbstractItemModel *, const QItemSelection&)), this, SLOT (delSelectedDocs (QAbstractItemModel *, const QItemSelection&)) );
+    connect (recWItems, SIGNAL (refreshMod(QAbstractItemModel *)), this, SLOT (refreshRubricItems(QAbstractItemModel *)) );
 //    connect (recWItems->actDel, SIGNAL (triggered()), this, SLOT (delRubricItem()) );
 }
 
@@ -903,8 +904,9 @@ void KKSIncludesWidget :: addRubricItem (void)
     const KKSRubric * r = currentRubric();
     if(!r)
         return;
+    QAbstractItemModel * itemModel = recWItems->getSourceModel ();
 
-    emit rubricItemRequested(r, isRec);
+    emit rubricItemRequested(r, isRec, itemModel);
 }
 
 void KKSIncludesWidget :: createRubricItem (QAbstractItemModel * itemModel, const QModelIndex& parent)
@@ -1547,6 +1549,16 @@ void KKSIncludesWidget :: setForRubrics (bool isr)
         recWItems->setVisible (false);
         tBRubrActions->setVisible (false);
     }
+}
+
+void KKSIncludesWidget :: refreshRubricItems (QAbstractItemModel * sourceMod)
+{
+    if (!sourceMod)
+        return;
+    const KKSRubric * r = currentRubric();
+    sourceMod->removeRows(0, sourceMod->rowCount());
+    //const_cast<KKSRubric *>(r)->clearItems();
+    emit initAttachmentsModel (r);
 }
 /*=================*/
 KKSIncludesItemDelegate::KKSIncludesItemDelegate(QObject * parent) : QItemDelegate(parent)

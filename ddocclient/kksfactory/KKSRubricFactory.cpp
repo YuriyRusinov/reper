@@ -135,7 +135,7 @@ KKSIncludesWidget * KKSRubricFactory :: createRubricEditor (int mode, const KKSL
     //qDebug () << __PRETTY_FUNCTION__ << iDeleg;
 
     connect (iW, SIGNAL (saveRubric (KKSRubric *, bool)), this, SLOT (saveRubric (KKSRubric *, bool)) );
-    connect (iW, SIGNAL (rubricItemRequested (const KKSRubric*, bool)), this, SLOT (rubricItemUpload(const KKSRubric *,bool)) );
+    connect (iW, SIGNAL (rubricItemRequested (const KKSRubric*, bool, QAbstractItemModel *)), this, SLOT (rubricItemUpload(const KKSRubric *,bool, QAbstractItemModel *)) );
     connect (iW, SIGNAL (rubricItemCreationRequested (const KKSRubric *, QAbstractItemModel*, const QModelIndex&)), this, SLOT (rubricItemCreate(const KKSRubric *, QAbstractItemModel *, const QModelIndex&)) );
     connect (iW, SIGNAL (openRubricItemRequested (int)), this, SLOT (openRubricItem (int)) );
     connect (iW, SIGNAL (loadStuffModel (RubricForm *)), this, SLOT (loadRubricPrivilegies(RubricForm *)) );
@@ -320,10 +320,10 @@ void KKSRubricFactory :: rubricItemCreate (const KKSRubric * r, QAbstractItemMod
 
 }
 
-void KKSRubricFactory :: rubricItemUpload (const KKSRubric *r, bool forRecords)
+void KKSRubricFactory :: rubricItemUpload (const KKSRubric *r, bool forRecords, QAbstractItemModel * itemModel)
 {
     KKSIncludesWidget *editor = qobject_cast<KKSIncludesWidget *>(this->sender());
-    if(!editor || !r)
+    if(!editor || !r || !itemModel)
         return;
 
     KKSList<const KKSFilter*> filters;
@@ -406,7 +406,20 @@ void KKSRubricFactory :: rubricItemUpload (const KKSRubric *r, bool forRecords)
         return;
     }
 
-    editor->slotAddRubricItem (idObject, name);
+    //editor->slotAddRubricItem (idObject, name);
+    const KKSRubricItem * equalItem = r->itemForId(idObject);
+    if(equalItem){
+        QMessageBox::critical(editor, 
+                             tr("Error"), 
+                             tr("You cannot add one item to rubric twise"), 
+                             QMessageBox::Ok);
+        return;
+    }
+
+    KKSRubricItem * item = new KKSRubricItem(idObject, name, false);
+    (const_cast<KKSRubric *>(r))->addItem(item);
+    this->appendRubricItem(itemModel, item);
+    editor->setSaved(false);
     
     delete objEditor;
     o->release();

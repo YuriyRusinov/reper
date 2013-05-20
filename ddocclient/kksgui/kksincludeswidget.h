@@ -95,6 +95,8 @@ private slots:
     void putIntoAnotherRubric (void);
     void sendIOS (void);
     void setAccessRules (void);
+    
+    void refreshRubricItems (QAbstractItemModel * sourceMod);
 
 public slots:
     void slotAddRubricItem(int idRubricItem, QString name);
@@ -104,7 +106,7 @@ private slots:
     void init();
 
 signals:
-    void rubricItemRequested(const KKSRubric * r, bool isRec);
+    void rubricItemRequested(const KKSRubric * r, bool isRec, QAbstractItemModel * itemModel);
     void rubricItemCreationRequested(const KKSRubric * r, QAbstractItemModel * itemModel, const QModelIndex& parent);
     void openRubricItemRequested(int idRubricItem);
     void saveRubric (KKSRubric * r, bool isMyDocs);

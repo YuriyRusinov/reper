@@ -273,7 +273,25 @@ bool KKSEIODataModel :: setData (const QModelIndex& index, const QVariant& value
     }
     else if (role == Qt::DecorationRole && index.column() == 0)
     {
-        QIcon icon = value.value<QIcon>();
+        QIcon icon;
+        switch (value.type())
+        {
+            case QVariant::Icon:default:
+            {
+                icon = value.value<QIcon>();
+                break;
+            }
+            case QVariant::Pixmap:
+            {
+                icon = QIcon (value.value<QPixmap>());
+                break;
+            }
+            case QVariant::Image:
+            {
+                icon = QIcon (QPixmap::fromImage (value.value<QImage>()));
+                break;
+            }
+        }
         wItem->setIcon (icon);
         emit dataChanged (topL, topL);
     }
