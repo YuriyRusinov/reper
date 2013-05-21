@@ -400,6 +400,10 @@ private:
                                         QGridLayout * gAttrLayout, 
                                         bool isGrouped, 
                                         bool updateView);
+    void putSystemParams (KKSObjectExemplar * recio,
+                          KKSObjEditor * editor,
+                          QTabWidget * tabObj,
+                          int pageNum);
     void putRubricator (KKSObject * obj, 
                         KKSObjEditor * editor, 
                         QTabWidget * tabObj);

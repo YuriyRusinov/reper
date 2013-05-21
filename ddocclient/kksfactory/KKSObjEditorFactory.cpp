@@ -412,7 +412,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
     nCount = setAttributes (tSystem, obj, attrWidget, gAttrLay, wCat, wObjE, tableName, objEditorWidget);
 
     objEditorWidget->setSysAttrWidgets (qobject_cast<QWidget *>(scSysAttrs->parent()), scSysAttrs, attrWidget);
-
+    
     if (ioAttrWidget)
         this->initIOAttrs(io, wObjE, wCat, objEditorWidget, ioAttrWidget, gIOLay);
 
@@ -590,6 +590,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
         gFilesLay->addWidget (W, 0, 0, 1, 1);
 
     }
+    this->putSystemParams(wObjE, objEditorWidget, tabObj, tabObj->count());
 
 
     if (mode)
@@ -8415,6 +8416,39 @@ void KKSObjEditorFactory :: putIndicatorsGroupsOnToWidget (KKSObject * obj, KKSO
 //    QSpacerItem * indLay = new QSpacerItem (20, 80, QSizePolicy::Minimum, QSizePolicy::Expanding);
 //    gIndLayout->addItem (indLay, n_str, 0, 1, 4);
     nc = n_str;
+}
+
+void KKSObjEditorFactory :: putSystemParams (KKSObjectExemplar * recio,
+                                             KKSObjEditor * editor,
+                                             QTabWidget * tabObj,
+                                             int pageNum)
+{
+    QWidget * pSysWidget = new QWidget (editor);
+    QGridLayout * gLay = new QGridLayout (pSysWidget);
+
+    QStringList lSysNames;
+    lSysNames << tr("Identificator :")
+              << tr("Unique Identificator :")
+              << tr("State Identificator :")
+              << tr("Name :")
+              << tr("Last update :")
+              << tr("unique_id :");
+    int n = lSysNames.count ();
+    for (int i=0; i<n; i++)
+    {
+        QLabel * l = new QLabel (lSysNames[i], pSysWidget);
+        gLay->addWidget(l, i, 0, 1, 1);//, Qt::AlignRight | Qt::AlignVCenter);
+        QLineEdit * lE = new QLineEdit (pSysWidget);
+        lE->setReadOnly(true);
+        switch (i)
+        {
+            case 0: lE->setText (QString::number(recio->id())); break;
+            default: break;
+        }
+        gLay->addWidget(lE, i, 1, 1, 1);//, Qt::AlignJustify | Qt::AlignVCenter);
+    }
+    gLay->setRowStretch(n, 1);
+    tabObj->insertTab(pageNum, pSysWidget, tr("System parameters"));
 }
 
 void KKSObjEditorFactory :: putRubricator (KKSObject * obj, KKSObjEditor * editor, QTabWidget * tabObj)
