@@ -48,6 +48,7 @@
 #include <QSvgRenderer>
 #include <QPicture>
 #include <QSpacerItem>
+#include <QDateTimeEdit>
 #include <QtDebug>
 
 #include "KKSObjEditorFactory.h"
@@ -8424,7 +8425,12 @@ void KKSObjEditorFactory :: putSystemParams (KKSObjectExemplar * recio,
                                              int pageNum)
 {
     QWidget * pSysWidget = new QWidget (editor);
-    QGridLayout * gLay = new QGridLayout (pSysWidget);
+    QScrollArea * scSysArea = new QScrollArea (pSysWidget);
+    QGridLayout * gLaySys = new QGridLayout (pSysWidget);
+    gLaySys->addWidget (scSysArea, 0, 0, 1, 1);
+    QWidget * pSysPW = new QWidget ();
+    scSysArea->setWidget (pSysPW);
+    QGridLayout * gLay = new QGridLayout (scSysArea);
 
     QStringList lSysNames;
     lSysNames << tr("Identificator :")
@@ -8436,16 +8442,32 @@ void KKSObjEditorFactory :: putSystemParams (KKSObjectExemplar * recio,
     int n = lSysNames.count ();
     for (int i=0; i<n; i++)
     {
-        QLabel * l = new QLabel (lSysNames[i], pSysWidget);
+        QLabel * l = new QLabel (lSysNames[i], pSysPW);
         gLay->addWidget(l, i, 0, 1, 1);//, Qt::AlignRight | Qt::AlignVCenter);
-        QLineEdit * lE = new QLineEdit (pSysWidget);
-        lE->setReadOnly(true);
+        QWidget * lE = 0;
+        if(i==4)
+            lE = new QDateTimeEdit (pSysPW);
+        else
+            lE = new QLineEdit (pSysPW);
+        QHBoxLayout * edLay = new QHBoxLayout;
+        if (qobject_cast<QLineEdit *>(lE))
+            (qobject_cast<QLineEdit *>(lE))->setReadOnly(true);
+        else if (qobject_cast<QDateTimeEdit *>(lE))
+            (qobject_cast<QDateTimeEdit *>(lE))->setReadOnly(true);
+                
+        edLay->addWidget (lE);
         switch (i)
         {
-            case 0: lE->setText (QString::number(recio->id())); break;
+            case 0: (qobject_cast<QLineEdit *>(lE))->setText (QString::number(recio->id())); break;
+            case 2:
+            {
+                QToolButton * tbState = new QToolButton (pSysPW);
+                edLay->addWidget (tbState);
+                break;
+            }
             default: break;
         }
-        gLay->addWidget(lE, i, 1, 1, 1);//, Qt::AlignJustify | Qt::AlignVCenter);
+        gLay->addLayout(edLay, i, 1, 1, 1);//, Qt::AlignJustify | Qt::AlignVCenter);
     }
     gLay->setRowStretch(n, 1);
     tabObj->insertTab(pageNum, pSysWidget, tr("System parameters"));
