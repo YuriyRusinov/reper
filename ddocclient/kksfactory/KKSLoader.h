@@ -108,14 +108,17 @@ class _F_EXPORT KKSLoader
 
         KKSMap<qint64, KKSEIOData *> loadEIOList(const KKSCategory * c0,
                                               const QString& tableName,
-                                              const KKSList<const KKSFilterGroup *> filters = KKSList<const KKSFilterGroup*>()) const;
+                                              const KKSList<const KKSFilterGroup *> filters = KKSList<const KKSFilterGroup*>(),
+                                              bool isSys = false) const;//если true, то загружаются данные из системного справлчника, а значит у них нет полей uuid_t, id_state
         
+        //просто данные в этих методах возвращаются в виде QList, а не QMap
         KKSList<KKSEIOData *> loadEIOList1(const KKSObject * io, 
                                            const KKSList<const KKSFilterGroup *> filters = KKSList<const KKSFilterGroup*>()) const;
 
         KKSList<KKSEIOData *> loadEIOList1(const KKSCategory * c0,
                                            const QString& tableName,
-                                           const KKSList<const KKSFilterGroup *> filters = KKSList<const KKSFilterGroup*>()) const;
+                                           const KKSList<const KKSFilterGroup *> filters = KKSList<const KKSFilterGroup*>(),
+                                           bool isSys = false) const;//если true, то загружаются данные из системного справлчника, а значит у них нет полей uuid_t, id_state
         
         KKSList<KKSFileType *> loadFileTypes() const;
         KKSList<KKSFileExtention*> loadFileExtentions(int idFileType) const;
@@ -286,7 +289,8 @@ class _F_EXPORT KKSLoader
 
         QString generateSelectEIOQuery(const KKSCategory * c0,
                                        const QString& tableName,
-                                       const KKSList<const KKSFilterGroup *> & filters) const;
+                                       const KKSList<const KKSFilterGroup *> & filters,
+                                       bool isSys) const;
         
         QString generateFilterSQL(const KKSList<const KKSFilterGroup *> & filters, 
                                   const QString & tableName, 

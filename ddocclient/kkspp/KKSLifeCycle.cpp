@@ -19,15 +19,18 @@
 ////////////////////////////////////////////////////////////////////////
 
 KKSLifeCycleEx::KKSLifeCycleEx(int id, const QString & name, const QString & desc)
-:KKSRecord(id, name, desc), m_startState(NULL)
+:KKSRecord(id, name, desc), m_startState(NULL), m_autoStateAttr(NULL), m_autoStateInd(NULL)
 {
 }
 
-KKSLifeCycleEx::KKSLifeCycleEx(const KKSLifeCycleEx & lc) : KKSRecord(lc), m_startState(NULL)
+KKSLifeCycleEx::KKSLifeCycleEx(const KKSLifeCycleEx & lc) : KKSRecord(lc), m_startState(NULL), m_autoStateAttr(NULL), m_autoStateInd(NULL)
 {
     m_stateCrosses = lc.stateCrosses();
 
     setStartState(const_cast<KKSState * > (lc.startState()));
+    setAutoStateAttr(const_cast<KKSState * > (lc.autoStateAttr()));
+    setAutoStateInd(const_cast<KKSState * > (lc.autoStateInd()));
+    
     setStates(lc.states());
 }
 
@@ -41,6 +44,10 @@ KKSLifeCycleEx::~KKSLifeCycleEx()
 {
     if(m_startState)
         m_startState->release();
+    if(m_autoStateAttr)
+        m_autoStateAttr->release();
+    if(m_autoStateInd)
+        m_autoStateInd->release();
 }
 
 const KKSList<KKSStateCross *> & KKSLifeCycleEx::stateCrosses() const
@@ -126,6 +133,48 @@ void KKSLifeCycleEx::setStartState(KKSState * s)
 
     if(m_startState)
         m_startState->addRef();
+}
+
+const KKSState * KKSLifeCycleEx::autoStateAttr() const
+{
+    return m_autoStateAttr;
+}
+
+KKSState * KKSLifeCycleEx::autoStateAttr()
+{
+    return m_autoStateAttr;
+}
+
+void KKSLifeCycleEx::setAutoStateAttr(KKSState * s)
+{
+    if(m_autoStateAttr)
+        m_autoStateAttr->release();
+
+    m_autoStateAttr = s;
+
+    if(m_autoStateAttr)
+        m_autoStateAttr->addRef();
+}
+
+const KKSState * KKSLifeCycleEx::autoStateInd() const
+{
+    return m_autoStateInd;
+}
+
+KKSState * KKSLifeCycleEx::autoStateInd()
+{
+    return m_autoStateInd;
+}
+
+void KKSLifeCycleEx::setAutoStateInd(KKSState * s)
+{
+    if(m_autoStateInd)
+        m_autoStateInd->release();
+
+    m_autoStateInd = s;
+
+    if(m_autoStateInd)
+        m_autoStateInd->addRef();
 }
 
 const KKSMap<int, KKSState * > & KKSLifeCycleEx::states() const

@@ -23,6 +23,7 @@ class KKSRubric;
 class KKSFile;
 class QWidget;
 class KKSFileLoader;
+class KKSPPFactory;
 
 class QProgressDialog;
 
@@ -32,7 +33,7 @@ public:
 
     void setParams( 
                    KKSFileLoader * _fileLoader, 
-                    
+                   KKSPPFactory * _ppF,
                    KKSDatabase * db);
 
     //bImported=true сигнализирует о том, что запись справочника импортируется из внешнего файла
@@ -42,7 +43,7 @@ public:
                   bool bImported = false,
                   QWidget * parent = NULL) const; 
 
-    int updateEIO(const KKSObjectExemplar* eio, 
+    int updateEIO(KKSObjectExemplar* eio, 
                   const KKSCategory* cat=0, 
                   const QString& table=QString(),
                   QWidget * parent = NULL) const;
@@ -76,30 +77,37 @@ private:
     
     KKSDatabase * db;
     KKSFileLoader * fileLoader;
+    KKSPPFactory * m_ppFactory;
 
     int insertRecord(KKSObjectExemplar* eio, 
                      const KKSCategory* cat=0, 
                      const QString& table=QString(), 
                      bool bImported = false,
                      QWidget * parent = NULL) const;
-    int updateRecord(const KKSObjectExemplar* eio, 
+    int updateRecord(KKSObjectExemplar* eio, 
                      const KKSCategory* cat=0, 
                      const QString& table=QString(),
                      QWidget * parent = NULL) const;
     int deleteRecord(KKSObjectExemplar* eio, const QString& table=QString()) const;
 
-    qint64 generateInsertQuery(const QString & tableName, 
-                            const KKSMap<int, KKSCategoryAttr *> & attrs, 
-                            const KKSList<KKSAttrValue *> & attrValues, 
-                            QString & query,
-                            QString & exQuery, 
-                            bool bImported = false) const;
-    qint64 generateUpdateQuery(const QString & tableName, 
-                            const KKSMap<int, KKSCategoryAttr *> & attrs, 
-                            const KKSList<KKSAttrValue *> & attrValues, 
-                            qint64 id,
-                            QString & query,
-                            QString & exQuery) const;
+    qint64 generateInsertQuery(int idState,
+                               const QString & tableName, 
+                               const KKSMap<int, KKSCategoryAttr *> & attrs, 
+                               const KKSList<KKSAttrValue *> & attrValues, 
+                               QString & query,
+                               QString & exQuery, 
+                               bool bImported = false,
+                               bool isSys = false) const; //если true, то заносятся данные в системный справлчник, а значит у них нет полей uuid_t, id_io_state
+    
+    qint64 generateUpdateQuery(int idState,
+                               const QString & tableName, 
+                               const KKSMap<int, KKSCategoryAttr *> & attrs, 
+                               const KKSList<KKSAttrValue *> & attrValues, 
+                               qint64 id,
+                               QString & query,
+                               QString & exQuery,
+                               bool isSys = false) const; //если true, то заносятся данные в системный справлчник, а значит у них нет полей uuid_t, id_io_state
+    
     qint64 getNextSeq(QString tableName, QString idColumn = QString("id")) const;
 
     int updateIndValues(const KKSObjectExemplar * eio) const;

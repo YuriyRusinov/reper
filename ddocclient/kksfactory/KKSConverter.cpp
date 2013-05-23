@@ -686,9 +686,9 @@ bool KKSConverter::objectFromExemplar(const KKSLoader * loader, KKSObject * io, 
 KKSMap<qint64, KKSEIOData *> KKSConverter :: rubricEntityToData (const KKSLoader * loader, const KKSRubric * rubricB)
 {
     KKSMap<qint64, KKSEIOData *> rubricData;
-    KKSObject * refIO = loader->loadIO(IO_IO_ID);
+    KKSObject * refIO = loader->loadIO(IO_IO_ID, true);
     const KKSCategory * cat = /*rubricB->getCategory() && rubricB->getCategory()->attributes().count() > 0 ? rubricB->getCategory() :*/ refIO->category()->tableCategory();
-    KKSObject * refRubr = loader->loadIO(IO_RUBR_ID);
+    KKSObject * refRubr = loader->loadIO(IO_RUBR_ID, true);
     const KKSCategory * ct = refRubr->category();
     
     if (!ct || !ct->tableCategory())
@@ -718,7 +718,7 @@ KKSMap<qint64, KKSEIOData *> KKSConverter :: rubricEntityToData (const KKSLoader
     filters.append (fg);
     fg->release ();
     f->release ();
-    rubricData = loader->loadEIOList (cat, refIO->tableName(), filters);
+    rubricData = loader->loadEIOList (cat, refIO->tableName(), filters, refIO->id() <= _MAX_SYS_IO_ID_ ? true : false);
     qDebug () << __PRETTY_FUNCTION__ << rubricData.count();
     refRubr->release();
     refIO->release();

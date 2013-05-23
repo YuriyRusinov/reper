@@ -2352,10 +2352,30 @@ int KKSPPFactory::insertLifeCycle(KKSLifeCycleEx * lc) const
         }
     }
 
-    QString sql = QString("select cInsertLifeCycle('%1', %2, %3)")
+    if(lc->autoStateAttr() && lc->autoStateAttr()->id() <= 0){
+        int ok = insertState(lc->autoStateAttr());
+        if(ok != OK_CODE){
+            if(!inTransaction())
+                db->rollback();
+            return ERROR_CODE;
+        }
+    }
+
+    if(lc->autoStateInd() && lc->autoStateInd()->id() <= 0){
+        int ok = insertState(lc->autoStateInd());
+        if(ok != OK_CODE){
+            if(!inTransaction())
+                db->rollback();
+            return ERROR_CODE;
+        }
+    }
+
+    QString sql = QString("select cInsertLifeCycle('%1', %2, %3, %4, %5)")
                      .arg(lc->name())
                      .arg(lc->desc().isEmpty() ? QString("NULL") : QString("'") + lc->desc() + QString("'"))
-                     .arg(lc->startState() ? QString::number(lc->startState()->id()) : QString("NULL"));
+                     .arg(lc->startState() ? QString::number(lc->startState()->id()) : QString("NULL"))
+                     .arg(lc->autoStateAttr() ? QString::number(lc->autoStateAttr()->id()) : QString("NULL"))
+                     .arg(lc->autoStateInd() ? QString::number(lc->autoStateInd()->id()) : QString("NULL"));
     
     KKSResult * res = db->execute(sql);
     if(!res){

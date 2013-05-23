@@ -18,7 +18,9 @@
 #include "KKSAttrType.h"
 #include "KKSRubric.h"
 #include "KKSFileLoader.h"
+#include "KKSPPFactory.h"
 #include "KKSFile.h"
+#include "KKSState.h"
 
 ////////////////////////////////////////////////////////////////////////
 // Name:       KKSEIOFactory::KKSEIOFactory()
@@ -29,6 +31,8 @@
 KKSEIOFactory::KKSEIOFactory()
 {
     db = NULL;
+    fileLoader = NULL;
+    m_ppFactory = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -50,11 +54,12 @@ void KKSEIOFactory::setDb(KKSDatabase * _db)
 
 void KKSEIOFactory::setParams( 
                              KKSFileLoader * _fileLoader, 
-                              
+                             KKSPPFactory * _ppF,
                              KKSDatabase * _db)
 {
     db = _db;
     //loader = _loader;
+    m_ppFactory = _ppF;
     fileLoader = _fileLoader;
     //eiof = _eiof;
 }
@@ -84,7 +89,7 @@ int KKSEIOFactory::insertEIO(KKSObjectExemplar* eio,
     return res;
 }
 
-int KKSEIOFactory::updateEIO(const KKSObjectExemplar* eio, 
+int KKSEIOFactory::updateEIO(KKSObjectExemplar* eio, 
                              const KKSCategory* cat, 
                              const QString& table,
                              QWidget * parent) const
@@ -176,8 +181,13 @@ int KKSEIOFactory::insertRecord(KKSObjectExemplar* eio,
     QString query;
     QString exQuery;//если таблица содержит атрибуты типа atCheckListEx (отношение многие-ко-многим)
 
+    //сохраняем в БД состояние ЭИО, если оно не создано в БД
+    if(eio->state()->id() <= 0){
+        m_ppFactory->insertState(eio->state());
+    }
+    
     //данный метод генерит реальный SQL-запрос в БД на инсерт в таблицу
-    qint64 id = generateInsertQuery(tableName, attrs, attrValues, query, exQuery, bImported);
+    qint64 id = generateInsertQuery(eio->state()->id(), tableName, attrs, attrValues, query, exQuery, bImported, io->id() <= _MAX_SYS_IO_ID_ ? true : false);
     if(id == ERROR_CODE || query.isEmpty())
         return ERROR_CODE;
 
@@ -240,7 +250,7 @@ int KKSEIOFactory::insertRecord(KKSObjectExemplar* eio,
 // Return:     int
 ////////////////////////////////////////////////////////////////////////
 
-int KKSEIOFactory::updateRecord(const KKSObjectExemplar* eio, 
+int KKSEIOFactory::updateRecord(KKSObjectExemplar* eio, 
                                 const KKSCategory* cat, 
                                 const QString & table,
                                 QWidget * parent) const
@@ -280,8 +290,15 @@ int KKSEIOFactory::updateRecord(const KKSObjectExemplar* eio,
 
     QString query;
     QString exQuery;
+    
+    
+    //сохраняем в БД состояние ЭИО, если оно не создано в БД
+    if(eio->state()->id() <= 0){
+        m_ppFactory->insertState(eio->state());
+    }
+
     //данный метод генерит реальный SQL-запрос в БД на апдейт в таблицу
-    qint64 id = generateUpdateQuery(tableName, attrs, attrValues, eio->id(), query, exQuery);
+    qint64 id = generateUpdateQuery(eio->state()->id(), tableName, attrs, attrValues, eio->id(), query, exQuery, io->id() <= _MAX_SYS_IO_ID_ ? true : false);
     if(id == ERROR_CODE || (query.isEmpty() && exQuery.isEmpty()))
         return ERROR_CODE;
 
@@ -402,12 +419,14 @@ int KKSEIOFactory::deleteRecord(KKSObjectExemplar* eio, const QString& table) co
 //INSERT INTO <tableName> (id, <attributes>) values (idValue, <attr_values>);
 //при этом делается запрос к БД с целью получения idValue
 //метод возвращает идентификатор записи, который получит новый ЭИО при выполнении сгенерированного запроса
-qint64 KKSEIOFactory::generateInsertQuery(const QString & tableName, 
-                                       const KKSMap<int, KKSCategoryAttr *> & attrs, 
-                                       const KKSList<KKSAttrValue *> & attrValues, 
-                                       QString & query,
-                                       QString & exQuery, /*для обработки атрибутов типа atCheckListEx*/
-                                       bool bImported) const
+qint64 KKSEIOFactory::generateInsertQuery(int idState,
+                                          const QString & tableName, 
+                                          const KKSMap<int, KKSCategoryAttr *> & attrs, 
+                                          const KKSList<KKSAttrValue *> & attrValues, 
+                                          QString & query,
+                                          QString & exQuery, /*для обработки атрибутов типа atCheckListEx*/
+                                          bool bImported,
+                                          bool isSys) const
 {
     if (tableName.isEmpty())
         return ERROR_CODE;
@@ -696,10 +715,23 @@ qint64 KKSEIOFactory::generateInsertQuery(const QString & tableName,
         valueArray.remove(valueArray.length()-2, 2);
     }
 
-    if(attrArray.trimmed().isEmpty())
-        query = QString("INSERT INTO %1 (id) VALUES (%2);").arg(tableName).arg(idValue);
-    else
-        query = QString("INSERT INTO %1 (id, %2) VALUES (%3, %4);").arg(tableName).arg(attrArray).arg(idValue).arg(valueArray);
+    //добавляем состояние, если надо
+    int idS = idState;
+    if(idS <= 0)
+        idS = 1;
+    
+    if(isSys){
+        if(attrArray.trimmed().isEmpty())
+            query = QString("INSERT INTO %1 (id) VALUES (%2);").arg(tableName).arg(idValue);
+        else
+            query = QString("INSERT INTO %1 (id, %2) VALUES (%3, %4);").arg(tableName).arg(attrArray).arg(idValue).arg(valueArray);
+    }
+    else{
+        if(attrArray.trimmed().isEmpty())
+            query = QString("INSERT INTO %1 (id, id_io_state) VALUES (%2, %3);").arg(tableName).arg(idValue).arg(idS);
+        else
+            query = QString("INSERT INTO %1 (id, id_io_state, %2) VALUES (%3, %5, %4);").arg(tableName).arg(attrArray).arg(idValue).arg(valueArray).arg(idS);
+    }
 
     return idValue;
 }
@@ -707,12 +739,14 @@ qint64 KKSEIOFactory::generateInsertQuery(const QString & tableName,
 //генерится SQL-запрос следующего вида:
 //UPDATE <tableName> SET (<attribute1=value1, ...>) where id = <id>;
 //метод возвращает OK_CODE при успехе
-qint64 KKSEIOFactory::generateUpdateQuery(const QString & tableName, 
-                                       const KKSMap<int, KKSCategoryAttr *> & attrs, 
-                                       const KKSList<KKSAttrValue *> & attrValues, 
-                                       qint64 idEIO,
-                                       QString & query,
-                                       QString & exQuery) const
+qint64 KKSEIOFactory::generateUpdateQuery(int idState, 
+                                          const QString & tableName, 
+                                          const KKSMap<int, KKSCategoryAttr *> & attrs, 
+                                          const KKSList<KKSAttrValue *> & attrValues, 
+                                          qint64 idEIO,
+                                          QString & query,
+                                          QString & exQuery,
+                                          bool isSys) const
 {
     query.clear();
     exQuery.clear();
@@ -813,8 +847,20 @@ qint64 KKSEIOFactory::generateUpdateQuery(const QString & tableName,
         attrArray.remove(attrArray.length()-2, 2);
     }
 
-    if(!attrArray.trimmed().isEmpty())
-        query = QString("UPDATE %1 SET %2 WHERE id = %3::int8;").arg(tableName).arg(attrArray).arg(idEIO);
+    
+    //добавляем состояние, если надо
+    int idS = idState;
+    if(idS <= 0)
+        idS = 1;
+
+    if(isSys){
+        if(!attrArray.trimmed().isEmpty())
+            query = QString("UPDATE %1 SET %2 WHERE id = %3::int8;").arg(tableName).arg(attrArray).arg(idEIO);
+    }
+    else{
+        if(!attrArray.trimmed().isEmpty())
+            query = QString("UPDATE %1 SET id_io_state = %2, %3 WHERE id = %4::int8;").arg(tableName).arg(idS).arg(attrArray).arg(idEIO);            
+    }
 
     return OK_CODE;
 }

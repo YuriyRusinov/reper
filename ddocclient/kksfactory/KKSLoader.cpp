@@ -455,6 +455,29 @@ KKSLifeCycleEx * KKSLoader::loadLifeCycle(int idLifeCycle) const
         startState->setIsSystem(res->getCellAsBool(0, 6));
     }
     lc->setStartState(startState);
+    
+    if(startState)
+        startState->release();
+
+    KKSState * autoStateAttr = NULL;
+    if(!res->isEmpty(0, 7)){
+        autoStateAttr = new KKSState(res->getCellAsInt(0, 7), res->getCellAsString(0, 8), res->getCellAsString(0, 9));
+        autoStateAttr->setIsSystem(res->getCellAsBool(0, 10));
+    }
+    lc->setAutoStateAttr(autoStateAttr);
+
+    if(autoStateAttr)
+        autoStateAttr->release();
+
+    KKSState * autoStateInd = NULL;
+    if(!res->isEmpty(0, 11)){
+        autoStateInd = new KKSState(res->getCellAsInt(0, 11), res->getCellAsString(0, 12), res->getCellAsString(0, 13));
+        autoStateInd->setIsSystem(res->getCellAsBool(0, 14));
+    }
+    lc->setAutoStateInd(autoStateInd);
+
+    if(autoStateInd)
+        autoStateInd->release();
 
     delete res;
 
@@ -940,7 +963,10 @@ KKSObjectExemplar * KKSLoader::loadEIO(qint64 id,
 		if(tableName == "io_objects"){
 			tableName = QString("f_sel_io_objects(%1)").arg(id);
 		}
-        sql = QString("select %1 from %2 where id = %3").arg(fields).arg(tableName).arg(id);
+        if(io->id() <= _MAX_SYS_IO_ID_)
+            sql = QString("select last_update, unique_id, %1 from %2 where id = %3").arg(fields).arg(tableName).arg(id);
+        else
+            sql = QString("select id_io_state, uuid_t, last_update, unique_id, %1 from %2 where id = %3").arg(fields).arg(tableName).arg(id);
     }
 
     qDebug() << __PRETTY_FUNCTION__ << sql;
@@ -960,7 +986,38 @@ KKSObjectExemplar * KKSLoader::loadEIO(qint64 id,
     eio->setIo(io);
 
     KKSList<KKSAttrValue *> attrValues;
-    i = 0;
+    
+    
+    KKSState * s = NULL;
+    if(io->id() <= _MAX_SYS_IO_ID_){
+        s = KKSState::defState1();
+    }
+    else{
+        if(res->getCellAsInt(0, 0) <= 1)
+            s = KKSState::defState1();
+        else{
+            s = loadState(res->getCellAsInt(0, 0));
+        }
+    }
+
+    eio->setState(s);
+    if(s)
+        s->release();
+
+    if(io->id() <= _MAX_SYS_IO_ID_){
+        eio->setLastUpdate(res->getCellAsDateTime(0, 0));
+        eio->setUniqueId(res->getCellAsString(0, 1));
+        i = 2;
+    }
+    else{
+        eio->setUuid(res->getCellAsString(0, 1));
+        eio->setLastUpdate(res->getCellAsDateTime(0, 2));
+        eio->setUniqueId(res->getCellAsString(0, 3));
+        i = 4;
+    }
+
+    
+    
     KKSMap<int, KKSCategoryAttr *>::const_iterator pa1;
     for (pa1=attrs.constBegin(); pa1 != attrs.constEnd(); pa1++)
     {
@@ -1850,7 +1907,8 @@ KKSMap<int, KKSAttrGroup *> KKSLoader::loadTemplateAttrsGroups(int idTemplate) c
 
 QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
                                           const QString& table,
-                                          const KKSList<const KKSFilterGroup *> & filters) const
+                                          const KKSList<const KKSFilterGroup *> & filters,
+                                          bool isSys) const
 {
     QString sql = QString::null;
 //    if(!io)
@@ -1877,8 +1935,20 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
     QString withAttrFK; //название колонки, являющейся внешним ключом в атрибуте родитель-потомок (например id_parent)
     QString withTableName = tableName + "_rec"; //название подзапроса в предложении WITH
     //QString withTableName1 = withTableName + "_1"; //псевдоним таблицы в подзапросе рекурсивной части предложения WITH
-    QString attrsWith = "id, unique_id ";
-    QString attrsWith1 = tableName + ".id, " + tableName + ".unique_id"; //колонки в подзапросе нерекурсивной части предложения WITH
+    
+    QString attrsWith;
+    QString attrsWith1;
+    if(isSys){
+        attrsWith = "id, unique_id, last_update ";
+        attrsWith1 = tableName + ".id, " + tableName + ".unique_id, " + tableName + ".last_update "; //колонки в подзапросе нерекурсивной части предложения WITH
+    }
+    else{
+        attrsWith = "id, unique_id, last_update, uuid_t, id_io_state ";
+        attrsWith1 = tableName + ".id, " + tableName + ".unique_id, " + tableName + ".last_update, " + tableName + ".uuid_t, " + tableName + ".id_io_state "; //колонки в подзапросе нерекурсивной части предложения WITH
+    }
+    
+    
+    
     QString withAttrs;//колонки в самой нижней части запроса с предложением WITH
     QString withJoinWord;//предложение left join в запросе с предложением WITH
     
@@ -1895,6 +1965,12 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
         if(a->code() == "id")
             continue;
         if(a->code() == "unique_id")
+            continue;
+        if(a->code() == "last_update")
+            continue;
+        if(a->code() == "id_io_state")
+            continue;
+        if(a->code() == "uuid_t")
             continue;
         
         if(a->type()->attrType() == KKSAttrType::atCheckListEx)
@@ -2075,12 +2151,14 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
         }
         
         if(!withRecursive){
-            sql = QString("select %4 %1.id, %1.unique_id %2 from %1 %3 %5 where 1=1 ")
+            sql = QString("select %4 %1.id, %1.unique_id, %1.last_update %6 %2 from %1 %3 %5 where 1=1 ")
                                 .arg(tableName)
                                 .arg(attrs)
                                 .arg(joinWord)
                                 .arg (isXml ? QString() : QString("distinct"))
-                                .arg(exTablesStr);//.arg(fromWord).arg(joinWord);//.arg(whereWord);
+                                .arg(exTablesStr)
+                                .arg(isSys ? QString("") : QString(", %1.uuid_t, %1.id_io_state").arg(tableName));//.arg(fromWord).arg(joinWord);//.arg(whereWord);
+            
             if(!filterWhere.isEmpty())
                 sql += filterWhere;
         }
@@ -2094,7 +2172,7 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
             sql = QString("with recursive %1 (%2, ii_rec_order) as (" 
                           "select %3 %4, 0 from %5 where %6 UNION ALL select %4, %1.ii_rec_order+1 from %1, %5 where %1.%7 = %5.%8"
                           ")"
-                          "select %3 %1.id, %1.unique_id %9, %1.ii_rec_order from %1 %10 %11 where 1=1 ")
+                          "select %3 %1.id, %1.unique_id, %1.last_update %12 %9, %1.ii_rec_order from %1 %10 %11 where 1=1 ")
                               .arg(withTableName)
                               .arg(attrsWith)
                               .arg (isXml ? QString() : QString("distinct"))
@@ -2105,7 +2183,8 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
                               .arg(withAttrFK)
                               .arg(withAttrs)
                               .arg(withJoinWord)
-                              .arg(exTablesStr);
+                              .arg(exTablesStr)
+                              .arg(isSys ? QString("") : QString(", %1.uuid_t, %1.id_io_state").arg(withTableName));
             if(!filterWhere.isEmpty())
                 sql += filterWhere;
             
@@ -2132,7 +2211,7 @@ KKSMap<qint64, KKSEIOData *> KKSLoader::loadEIOList(const KKSObject * io,
     {
         return eioList;
     }
-    eioList = loadEIOList (io->category()->tableCategory(), io->tableName(), filters);
+    eioList = loadEIOList (io->category()->tableCategory(), io->tableName(), filters, io->id() <= _MAX_SYS_IO_ID_ ? true : false);
     
     return eioList;
 }
@@ -2151,7 +2230,7 @@ KKSList<KKSEIOData *> KKSLoader::loadEIOList1(const KKSObject * io,
     {
         return eioList;
     }
-    eioList = loadEIOList1 (io->category()->tableCategory(), io->tableName(), filters);
+    eioList = loadEIOList1 (io->category()->tableCategory(), io->tableName(), filters, io->id() <= _MAX_SYS_IO_ID_ ? true : false);
     
     return eioList;
 }
@@ -2159,11 +2238,12 @@ KKSList<KKSEIOData *> KKSLoader::loadEIOList1(const KKSObject * io,
 
 KKSMap<qint64, KKSEIOData *> KKSLoader::loadEIOList(const KKSCategory * c0, 
                                                  const QString& tableName,
-                                                 const KKSList<const KKSFilterGroup *> filters) const
+                                                 const KKSList<const KKSFilterGroup *> filters,
+                                                 bool isSys) const
 {
     KKSMap<qint64, KKSEIOData *> eioList;
 
-    QString sql = generateSelectEIOQuery(c0, tableName, filters);
+    QString sql = generateSelectEIOQuery(c0, tableName, filters, isSys);
     qDebug () << __PRETTY_FUNCTION__ << sql;
     if(sql.isEmpty())
         return eioList;
@@ -2204,7 +2284,7 @@ KKSMap<qint64, KKSEIOData *> KKSLoader::loadEIOList(const KKSCategory * c0,
             QString code = QString(res->getColumnName(column));//использование названия колонки для ключа QMap в классе KKSEIOData допустимо
             QString value = res->getCellAsString(row, column);
             
-            if(code == "ii_rec_order" || code == "id" || code == "unique_id"){
+            if(code == "ii_rec_order" || code == "id" || code == "unique_id" || code == "last_update" || code == "uuid_t" || code == "id_io_state"){
                 eio->addSysField(code, value);
             }
 
@@ -2282,11 +2362,12 @@ KKSMap<qint64, KKSEIOData *> KKSLoader::loadEIOList(const KKSCategory * c0,
 
 KKSList<KKSEIOData *> KKSLoader::loadEIOList1(const KKSCategory * c0, 
                                               const QString& tableName,
-                                              const KKSList<const KKSFilterGroup *> filters) const
+                                              const KKSList<const KKSFilterGroup *> filters,
+                                              bool isSys) const
 {
     KKSList<KKSEIOData *> eioList;
 
-    QString sql = generateSelectEIOQuery(c0, tableName, filters);
+    QString sql = generateSelectEIOQuery(c0, tableName, filters, isSys);
     qDebug () << __PRETTY_FUNCTION__ << sql;
     if(sql.isEmpty())
         return eioList;
@@ -2327,7 +2408,7 @@ KKSList<KKSEIOData *> KKSLoader::loadEIOList1(const KKSCategory * c0,
             QString code = QString(res->getColumnName(column));//использование названия колонки для ключа QMap в классе KKSEIOData допустимо
             QString value = res->getCellAsString(row, column);
             
-            if(code == "ii_rec_order" || code == "id" || code == "unique_id"){
+            if(code == "ii_rec_order" || code == "id" || code == "unique_id" || code == "last_update" || code == "uuid_t" || code == "id_io_state"){
                 eio->addSysField(code, value);
             }
 

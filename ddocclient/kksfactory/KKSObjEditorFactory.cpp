@@ -2234,6 +2234,7 @@ void KKSObjEditorFactory :: refreshEIO (KKSObjEditor * editor, int idObject, con
     KKSObject * o = loader->loadIO(idObject, true);
     if(!o)
         return;
+    
     KKSCategory * c = 0;
     if (cat)
         c = new KKSCategory (*cat);
@@ -2243,8 +2244,10 @@ void KKSObjEditorFactory :: refreshEIO (KKSObjEditor * editor, int idObject, con
         o->release();
         return;
     }
+    
     KKSList<const KKSFilterGroup *> filters = editor->filters();
-    KKSMap<qint64, KKSEIOData *> recList = loader->loadEIOList(c, tableName, filters);
+    KKSMap<qint64, KKSEIOData *> recList = loader->loadEIOList(c, tableName, filters, o->id() <= _MAX_SYS_IO_ID_ ? true : false);
+    
     QMap<QString, QVariant> val;
     for (KKSMap<qint64, KKSEIOData *>::const_iterator p=recList.constBegin();
             p != recList.constEnd();
@@ -2254,6 +2257,7 @@ void KKSObjEditorFactory :: refreshEIO (KKSObjEditor * editor, int idObject, con
         QVariant v = QVariant::fromValue (*p.value());
         val.insert (idStr, v);
     }
+    
     const KKSTemplate * t = sourceMod->data(sourceMod->index(0,0), Qt::UserRole+2).value<const KKSTemplate *>();
     if (!t)
     {
@@ -4943,7 +4947,7 @@ void KKSObjEditorFactory :: exportEIO (KKSObjEditor * editor, int idObject, cons
  */
     Q_UNUSED (idOe);
 
-    KKSList<KKSEIOData *> objEx = loader->loadEIOList1 (cChild, tableName, editor->filters());//сюда передаем табличную (подчиненную) категорию
+    KKSList<KKSEIOData *> objEx = loader->loadEIOList1 (cChild, tableName, editor->filters(), io->id() <= _MAX_SYS_IO_ID_ ? true : false);//сюда передаем табличную (подчиненную) категорию
     KKSXMLForm *xmlForm = new KKSXMLForm (io, tr("Export IO %1").arg (io->name()), true, editor);
     if (!xmlForm)
     {

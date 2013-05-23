@@ -932,7 +932,7 @@ void KKSRubricFactory :: initRubricAttachments (const KKSRubric * r)
 
     qDebug () << __PRETTY_FUNCTION__ << r->name() << r->items().count();
     KKSMap<qint64, KKSEIOData *> rData = KKSConverter::rubricEntityToData(loader, r);
-    KKSObject * refIO = loader->loadIO(IO_IO_ID);
+    KKSObject * refIO = loader->loadIO(IO_IO_ID, true);
     const KKSCategory * cat (0);
     
     //if (r->getCategory() && r->getCategory()->attributes().count() > 0)

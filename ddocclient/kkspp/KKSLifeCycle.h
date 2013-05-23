@@ -40,6 +40,13 @@ public:
     KKSState * startState();
     void setStartState(KKSState * s);
 
+    const KKSState * autoStateAttr() const;
+    KKSState * autoStateAttr();
+    void setAutoStateAttr(KKSState * s);
+
+    const KKSState * autoStateInd() const;
+    KKSState * autoStateInd();
+    void setAutoStateInd(KKSState * s);
 
     const KKSMap<int, KKSState * > & states() const;
     int addState(KKSState * s);
@@ -54,6 +61,8 @@ private:
     
     KKSMap<int, KKSState *> m_states;
     KKSState * m_startState;
+    KKSState * m_autoStateAttr;
+    KKSState * m_autoStateInd;
 
 
 };

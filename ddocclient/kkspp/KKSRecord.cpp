@@ -6,6 +6,7 @@
  ***********************************************************************/
 
 #include "KKSRecord.h"
+#include "KKSState.h"
 
 ////////////////////////////////////////////////////////////////////////
 // Name:       KKSRecord::getName()
@@ -55,6 +56,62 @@ void KKSRecord::setId(qint64 newId)
 {
    m_id = newId;
 }
+
+const QDateTime & KKSRecord::lastUpdate() const
+{
+    return m_lastUpdate;
+}
+
+void KKSRecord::setLastUpdate(const QDateTime & l)
+{
+    m_lastUpdate = l;
+}
+
+const KKSState * KKSRecord::state () const
+{
+    return m_state;
+}
+
+KKSState * KKSRecord::state ()
+{
+    return m_state;
+}
+
+void KKSRecord::setState(KKSState * s)
+{
+    if(m_state)
+        m_state->release();
+
+    m_state = s;
+
+    if(m_state)
+        m_state->addRef();
+    else{
+        m_state = KKSState::defState1();
+    }
+
+}
+
+const QString & KKSRecord::uuid() const
+{
+    return m_uuid;
+}
+
+void KKSRecord::setUuid(const QString & u)
+{
+    m_uuid = u;
+}
+
+const QString & KKSRecord::uniqueId() const
+{
+    return m_uniqueId;
+}
+
+void KKSRecord::setUniqueId(const QString & u)
+{
+    m_uniqueId = u;
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 // Name:       KKSRecord::getDesc()
@@ -116,15 +173,28 @@ void KKSRecord::setCode(const QString & newCode)
 
 KKSRecord::KKSRecord()
 {
-   m_id = -1;
-   m_name = QString::null;
-   m_code = QString::null;
-   m_parent = NULL;
+    m_id = -1;
+    m_uuid = QString::null;
+    m_uniqueId = QString::null;
+    m_state = KKSState::defState1();
+
+    m_name = QString::null;
+    m_code = QString::null;
+    m_parent = NULL;
+    m_isKKSState = false;
 }
 
 KKSRecord::KKSRecord(const KKSRecord & r)
 {
     m_id = r.id();
+    m_lastUpdate = r.lastUpdate();
+    m_uuid = r.uuid();
+    m_uniqueId = r.uniqueId();
+    m_isKKSState = r.m_isKKSState;
+    
+    m_state = NULL;
+    setState(const_cast<KKSState *>(r.state()));
+
     m_name = r.name();
     setCode(r.code());
     //m_code = r.code();
@@ -133,9 +203,18 @@ KKSRecord::KKSRecord(const KKSRecord & r)
     setParent(const_cast<KKSRecord*>(r.parent()));
 }
 
-KKSRecord::KKSRecord(qint64 _id, const QString & _name, const QString & _desc, const QString & _code)
+KKSRecord::KKSRecord(qint64 _id, const QString & _name, const QString & _desc, const QString & _code, bool isKKSState)
 {
     m_id = _id;
+    m_uuid = QString::null;
+    m_uniqueId = QString::null;
+    
+    m_isKKSState = isKKSState;
+    if(m_isKKSState)
+        m_state = NULL;
+    else
+        m_state = KKSState::defState1();
+
     m_name = _name;
     setCode(_code);
     //m_code = _code;
@@ -154,6 +233,8 @@ KKSRecord::~KKSRecord()
 {
     if(m_parent)
         m_parent->release();
+    if(m_state)
+        m_state->release();
 }
 
 void KKSRecord::setParent(KKSRecord * p)
@@ -162,6 +243,7 @@ void KKSRecord::setParent(KKSRecord * p)
         m_parent->release();
 
     m_parent = p;
+
     if(m_parent)
         m_parent->addRef();
 }

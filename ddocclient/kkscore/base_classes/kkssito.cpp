@@ -967,11 +967,10 @@ void KKSSito::initFactories()
     if(!m_eiof)
         m_eiof = new KKSEIOFactory();
 
-    m_eiof->setParams( m_fileLoader, db());
-
     if(!m_ppf)
         m_ppf = new KKSPPFactory();
 
+    m_eiof->setParams( m_fileLoader, m_ppf, db());
     m_ppf->setParams(m_loader, m_fileLoader, m_eiof, db());
 
     if (!m_attrf)

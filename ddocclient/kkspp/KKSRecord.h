@@ -9,18 +9,39 @@
 #define __KKSSITOOOM_KKSRecord_h
 
 #include <QString>
+#include <QDateTime>
 
 #include "kkspp_config.h"
 #include "KKSData.h"
 #include <string>
+
+class KKSState;
+
 class _PP_EXPORT KKSRecord : public KKSData
 {
 public:
-   /* Возвращает название записи (ИО или экз. ИО) */
-   const QString & name(void) const;
-   virtual void setName(const QString & newName);
+
    qint64 id(void) const;
    virtual void setId(qint64 newId);
+
+   const QDateTime & lastUpdate() const;
+   virtual void setLastUpdate(const QDateTime & l);
+   
+   const KKSState * state () const;
+   KKSState * state ();
+   virtual void setState(KKSState * s);
+   
+   const QString & uuid() const;
+   virtual void setUuid(const QString & u);
+
+   const QString & uniqueId() const;
+   virtual void setUniqueId(const QString & u);
+    
+    
+    
+    /* Возвращает название записи (ИО или экз. ИО) */
+   const QString & name(void) const;
+   virtual void setName(const QString & newName);
    const QString & desc(void) const;
    virtual void setDesc(const QString & newDesc);
    const QString & code(bool quoted = false) const;
@@ -33,12 +54,21 @@ public:
    
    KKSRecord();
    KKSRecord(const KKSRecord & r);
-   KKSRecord(qint64 id, const QString & name, const QString & desc = QString::null, const QString & code = QString::null);
+   KKSRecord(qint64 id, const QString & name, const QString & desc = QString::null, const QString & code = QString::null, bool isKKSState = false);
    virtual ~KKSRecord();
 
 protected:
 private:
-   qint64 m_id;
+   qint64 m_id;//рабочий идентификатор записи, который используется в системе поддержания ссылочной целостности (первичный ключ)
+   QDateTime m_lastUpdate;//дата и время последнего изменения записи
+   KKSState * m_state; //состояние, в котором находится запись. По умолчанию = KKSState::defState1()
+   QString m_uuid; //уникальый идентификатор записи в системе генерации уникальных идентификаторов uuid-ossp
+   QString m_uniqueId; //уникальный идентификатор записи в системе генерации уникальных идентификаторов DynamicDocs
+
+   bool m_isKKSState;
+   
+   
+   
    QString m_name;
 
    //Атрибут может описывать поле таблицы. 
@@ -50,6 +80,8 @@ private:
    QString m_desc;
    
    KKSRecord* m_parent;
+
+
 
 
 };

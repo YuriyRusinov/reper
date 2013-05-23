@@ -238,7 +238,7 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
     if (!cat || tableName.isEmpty())
         objEx = l->loadEIOList (pObj, filters);
     else
-        objEx = l->loadEIOList (cat, tableName, filters);
+        objEx = l->loadEIOList (cat, tableName, filters, pObj->id() <= _MAX_SYS_IO_ID_ ? true : false);
     
     QAbstractItemModel *objModel = sortModel->sourceModel();//new QStandardItemModel ();
     if (!objModel)
