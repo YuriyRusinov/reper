@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     15.05.2013 11:39:31                          */
+/* Created on:     24.05.2013 8:56:44                           */
 /*==============================================================*/
 
 
@@ -23,6 +23,7 @@ select setMacToNULL('root_table');
 create unique index Index_1 on root_table using BTREE (
 unique_id
 );
+
 
 /*==============================================================*/
 /* User: public                                                 */
@@ -3306,7 +3307,6 @@ create table roles_actions (
 );
 
 select setMacToNULL('roles_actions');
-
 
 /*==============================================================*/
 /* Table: rubric_records                                        */

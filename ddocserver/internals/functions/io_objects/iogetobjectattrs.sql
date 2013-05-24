@@ -14,7 +14,8 @@ create type h_get_object_attrs as(
                                   id_io_object_src int4,
                                   id_io_object_src1 int4,
                                   is_actual boolean,
-                                  description varchar);
+                                  description varchar,
+                                  attr_name varchar);
 
 create or replace function ioGetObjectAttrs(int4, bool, timestamp, timestamp) returns setof h_get_object_attrs as
 $BODY$
@@ -65,7 +66,8 @@ begin
             av.id_io_object_src,
             av.id_io_object_src1,
             av.is_actual,
-            av.description
+            av.description,
+            a.name
         from 
             (f_sel_attrs_values(idObject) av inner join attrs_categories ac on (av.id_attr_category = ac.id) inner join attributes a on (ac.id_io_attribute=a.id and av.id_io_object = idObject))
         where 
@@ -103,7 +105,8 @@ begin
             av.id_io_object_src,
             av.id_io_object_src1,
             av.is_actual,
-            av.description
+            av.description,
+            a.name
         from 
             (f_sel_attrs_values(idObject) av inner join attrs_categories ac on (av.id_attr_category = ac.id) inner join attributes a on (ac.id_io_attribute=a.id and av.id_io_object = idObject))
         where 
@@ -220,7 +223,8 @@ for r in
         NULL,
         NULL,
         NULL,
-        NULL
+        NULL,
+        a.name
     from
         f_sel_io_objects(idObject) io,
         attrs_categories ac,
@@ -248,7 +252,8 @@ for r in
         av.id_io_object_src,
         av.id_io_object_src1,
         av.is_actual,
-        av.description
+        av.description,
+        a.name
     from
         f_sel_io_objects(idObject) io,
         attributes a,
