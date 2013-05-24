@@ -495,7 +495,7 @@ Please specify a UNIQUE name for this color.</source>
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Название</translation>
     </message>
     <message>
         <source>Grade</source>
@@ -2133,7 +2133,7 @@ Do you want to save the changes before closing?</source>
     </message>
     <message>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Удаление ИО</translation>
     </message>
     <message>
         <source>Series Properties</source>
@@ -2145,7 +2145,7 @@ Do you want to save the changes before closing?</source>
     </message>
     <message>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Редактировать</translation>
     </message>
     <message>
         <source>Style</source>
@@ -3165,6 +3165,10 @@ try to rename it with extention. Example: filename.vsd</source>
 
 Попробуйте назвать файл с использованием правильного расширения
 Например, filename.vsd</translation>
+    </message>
+    <message>
+        <source>Open local file</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4893,6 +4897,30 @@ Please save it before creating new records in it.</source>
         <source>Category %1 is not applicable into search template %2</source>
         <translation>Категория %1 несовместима с шаблоном поиска %2</translation>
     </message>
+    <message>
+        <source>Identificator :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unique Identificator :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>State Identificator :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last update :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>unique_id :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>KKSOrganizationAddrForm</name>
@@ -5103,6 +5131,24 @@ Please save it before creating new records in it.</source>
     <message>
         <source>You put documents into same rubric</source>
         <translation>Вы добавляете документы в первоначальную рубрику</translation>
+    </message>
+    <message>
+        <source>Add document into rubric</source>
+        <translation>Добавить документ в рубрику</translation>
+    </message>
+    <message>
+        <source>You are put document of category %1 to rubric with category %2.
+ Do you want to proceed ?</source>
+        <translation>Помещение документа категории %1 в рубрику с категорией %2
+Продолжить ? </translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Ошибка</translation>
+    </message>
+    <message>
+        <source>You cannot add one item to rubric twise</source>
+        <translation>Невозможно добавить один информационный объект в рубрику дважды</translation>
     </message>
 </context>
 <context>
@@ -6664,7 +6710,7 @@ Further work is impossible. You should use equal versions of client and server s
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Название</translation>
     </message>
     <message>
         <source>Alt+O</source>
@@ -7061,7 +7107,7 @@ Attributes:</source>
     </message>
     <message>
         <source>Mark as accepted!</source>
-        <translation>Пометьте как принятое</translation>
+        <translation>Пометьте как принятое!</translation>
     </message>
     <message>
         <source>Not accepted yet!</source>
@@ -7173,7 +7219,7 @@ Avg speed: %3 Kb/sec</source>
     </message>
     <message>
         <source>The category contains references on some associated KKSTemplate objects. The list will be destroyed because of changing all attributes!</source>
-        <translation type="unfinished"></translation>
+        <translation>Категория содержит ссылки на ассоциированные шаблоны. Они будут удалены в связи с изменением списка атрибутов! </translation>
     </message>
     <message>
         <source>Will also remove all occurrence of the attribute in assotiated KKSTemplate objects!</source>
@@ -7185,7 +7231,7 @@ Avg speed: %3 Kb/sec</source>
     </message>
     <message>
         <source>Cannot add it twise.</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы не можете добавить одну сущность дважды.</translation>
     </message>
     <message>
         <source>The template cannot be assigned with given category because of KKSTemplate::category() method does not return THIS</source>
@@ -7300,6 +7346,14 @@ Please contact your Systems Administrator and report this issue.</source>
         <source>An unknown error was encountered while processing your request.
 Please contact your Systems Administrator and report this issue.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Active</source>
+        <translation>Активный</translation>
+    </message>
+    <message>
+        <source>Archive</source>
+        <translation>Архивный</translation>
     </message>
 </context>
 <context>
@@ -7796,11 +7850,11 @@ Please contact your Systems Administrator and report this issue.</source>
     </message>
     <message>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Редактировать</translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Удаление ИО</translation>
     </message>
     <message>
         <source>Dynamic List Query:</source>

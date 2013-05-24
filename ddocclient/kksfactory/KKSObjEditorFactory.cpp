@@ -108,6 +108,7 @@
 #include "KKSSyncWidget.h"
 #include "KKSSyncDialog.h"
 #include <KKSAccessEntity.h>
+#include <KKSState.h>
 #include <savesearchtemplateform.h>
 #include "defines.h"
 
@@ -8463,12 +8464,17 @@ void KKSObjEditorFactory :: putSystemParams (KKSObjectExemplar * recio,
         switch (i)
         {
             case 0: (qobject_cast<QLineEdit *>(lE))->setText (QString::number(recio->id())); break;
+            case 1: (qobject_cast<QLineEdit *>(lE))->setText (recio->uuid()); break;
             case 2:
             {
                 QToolButton * tbState = new QToolButton (pSysPW);
                 edLay->addWidget (tbState);
+                const KKSState * st = recio->state();
+                (qobject_cast<QLineEdit *>(lE))->setText (st->name());
                 break;
             }
+            case 4: (qobject_cast<QDateTimeEdit *>(lE))->setDateTime (recio->lastUpdate()); break;
+            case 5: (qobject_cast<QLineEdit *>(lE))->setText (recio->uniqueId()); break;
             default: break;
         }
         gLay->addLayout(edLay, i, 1, 1, 1);//, Qt::AlignJustify | Qt::AlignVCenter);
