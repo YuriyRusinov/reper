@@ -61,6 +61,7 @@
 #include <KKSCategory.h>
 #include <KKSObjectExemplar.h>
 #include <KKSEIOData.h>
+#include <KKSEIODataModel.h>
 
 #include "KKSViewFactory.h"
 #include "KKSAttributesFactory.h"
@@ -1642,76 +1643,10 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
                     filters.append(fg);
                     fg->release();
                 }
-                //QMap<int, QString> values = loader->loadAttributeValues (pCategAttr, true, tableName, filters);
-                //qDebug () << __PRETTY_FUNCTION__ << values;
-                KKSMap<int, KKSCategoryAttr *> attrs = ct->attributes ();
-                QStandardItemModel * sAttrModel = new QStandardItemModel (0, attrs.count());
-                int ic = 0;
-                for (KKSMap<int, KKSCategoryAttr *>::const_iterator pa = attrs.constBegin(); \
-                                                                    pa != attrs.constEnd(); \
-                                                                    pa++)
-                {
-                    sAttrModel->setHeaderData (ic, Qt::Horizontal, pa.value()->title(), Qt::DisplayRole);
-                    ic++;
-                }
-                int ii=0;
-                if (!vals.isEmpty())
-                {
-                    KKSMap<qint64, KKSEIOData *> eioList = loader->loadEIOList (refIO, filters);
-                    //
-                    // заполняем матрицу
-                    //
-                    for (KKSMap<qint64, KKSEIOData *>::const_iterator pv = eioList.constBegin(); pv!=eioList.constEnd(); pv++)
-                    {
-                        sAttrModel->insertRows (ii, 1);
-                        QModelIndex saInd = sAttrModel->index (ii, 0);
-                        //QString v = pv.value();
-                        
-                        qint64 key = pv.key();
-                        KKSEIOData * eData = pv.value();
-                        ic = 0;
-                        
-                        //KKSObjectExemplar * wObjE = loader->loadEIO (pv.key(), refIO);
-
-                        for (KKSMap<int, KKSCategoryAttr *>::const_iterator pa = attrs.constBegin(); \
-                                                                            pa != attrs.constEnd(); \
-                                                                            pa++)
-                        {
-                            QString fValue = eData->fieldValue(pa.value()->code());
-
-                            QModelIndex saInd = sAttrModel->index (ii, ic);
-                            
-                            /*
-                            KKSAttrValue * av = wObjE->attrValue (pa.value()->id());
-                            QVariant val = av ? av->value().valueVariant () : QVariant();
-                            if (av->attribute()->type()->attrType() == KKSAttrType::atJPG)
-                                val = QObject::tr("<Image data %1>").arg (ii);
-                            else if (av->attribute()->type()->attrType() == KKSAttrType::atSVG)
-                                val = QObject::tr("<SVG data %1>").arg (ii);
-                            else if (av->attribute()->type()->attrType() == KKSAttrType::atXMLDoc)
-                                val = QObject::tr("<XML document %1>").arg (ii);
-                            else if (av->attribute()->type()->attrType() == KKSAttrType::atVideo)
-                                val = QObject::tr("<Video data %1>").arg (ii);
-                            else if (av->attribute()->type()->attrType() == KKSAttrType::atList ||
-                                     av->attribute()->type()->attrType() == KKSAttrType::atParent)
-                            {
-                                QVariant tVal(val);
-                                QMap<int, QString> refColumnValues;
-                                QMap<int, QString> avals = loader->loadAttributeValues(av->attribute(), refColumnValues, false, true, av->attribute()->tableName());
-                                QString cV = avals.value (tVal.toInt());
-                                val = cV;
-                            }
-                            */
-
-                            sAttrModel->setData (saInd, key, Qt::UserRole);
-                            sAttrModel->setData (saInd, fValue, Qt::DisplayRole);
-                            ic++;
-                        }
-                        //wObjE->release ();
-                        ii++;
-                    }
-                }
-                //c->release ();
+                KKSMap<qint64, KKSEIOData *> eioList = loader->loadEIOList (refIO, filters);
+                const KKSTemplate * ctempl = new KKSTemplate (ct->defTemplate());
+                QAbstractItemModel * sAttrModel = new KKSEIODataModel (ctempl, eioList);
+                ctempl->release();
                 refIO->release ();
                 QObject :: connect (arw, 
                                     SIGNAL (addAttrRef (const KKSAttrValue*,  KKSIndAttr::KKSIndAttrClass, QAbstractItemModel*)), 
