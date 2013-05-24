@@ -191,7 +191,7 @@
     </message>
     <message>
         <source>Active</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Активный</translation>
     </message>
     <message>
         <source>Alt+O</source>
@@ -1659,7 +1659,7 @@ Do you want to save the changes before closing?</source>
     </message>
     <message>
         <source>Active</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Активный</translation>
     </message>
     <message>
         <source>Alt+O</source>
@@ -2350,7 +2350,7 @@ Do you want to save the changes before closing?</source>
     </message>
     <message>
         <source>Active</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Активный</translation>
     </message>
     <message>
         <source>Alt+O</source>
@@ -2407,7 +2407,7 @@ Do you want to save the changes before closing?</source>
     </message>
     <message>
         <source>to &amp;IO</source>
-        <translation>Открыть &amp;справочник</translation>
+        <translation type="obsolete">Открыть &amp;справочник</translation>
     </message>
     <message>
         <source>Delete attribute value</source>
@@ -2416,6 +2416,18 @@ Do you want to save the changes before closing?</source>
     <message>
         <source>Please select value</source>
         <translation>Выберите значение</translation>
+    </message>
+    <message>
+        <source>Open base qualifier</source>
+        <translation>Открыть базовый справочник</translation>
+    </message>
+    <message>
+        <source>Open selected record</source>
+        <translation>Открыть выбранную запись</translation>
+    </message>
+    <message>
+        <source>Please select record</source>
+        <translation>Выберите запись</translation>
     </message>
 </context>
 <context>
@@ -3168,7 +3180,7 @@ try to rename it with extention. Example: filename.vsd</source>
     </message>
     <message>
         <source>Open local file</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть локальный файл</translation>
     </message>
 </context>
 <context>
@@ -4899,27 +4911,27 @@ Please save it before creating new records in it.</source>
     </message>
     <message>
         <source>Identificator :</source>
-        <translation type="unfinished"></translation>
+        <translation>ИД:</translation>
     </message>
     <message>
         <source>Unique Identificator :</source>
-        <translation type="unfinished"></translation>
+        <translation>Уникальный ИД (UUID-OSSP):</translation>
     </message>
     <message>
         <source>State Identificator :</source>
-        <translation type="unfinished"></translation>
+        <translation>Состояние:</translation>
     </message>
     <message>
         <source>Last update :</source>
-        <translation type="unfinished"></translation>
+        <translation>Дата и время последнего изменения:</translation>
     </message>
     <message>
         <source>unique_id :</source>
-        <translation type="unfinished"></translation>
+        <translation>Уникальный идентификатор (DynamicDocs):</translation>
     </message>
     <message>
         <source>System parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>Системные параметры</translation>
     </message>
 </context>
 <context>
@@ -6354,7 +6366,7 @@ Further work is impossible. You should use equal versions of client and server s
     </message>
     <message>
         <source>Active</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Активный</translation>
     </message>
     <message>
         <source>Alt+O</source>
@@ -6706,7 +6718,7 @@ Further work is impossible. You should use equal versions of client and server s
     </message>
     <message>
         <source>Active</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Активный</translation>
     </message>
     <message>
         <source>Name</source>
@@ -7355,6 +7367,10 @@ Please contact your Systems Administrator and report this issue.</source>
         <source>Archive</source>
         <translation>Архивный</translation>
     </message>
+    <message>
+        <source>Search by template</source>
+        <translation>Поиск по шаблону</translation>
+    </message>
 </context>
 <context>
     <name>QueryComboBox</name>
@@ -7818,7 +7834,7 @@ Please contact your Systems Administrator and report this issue.</source>
     </message>
     <message>
         <source>Active</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Активный</translation>
     </message>
     <message>
         <source>Default:</source>
@@ -8335,7 +8351,7 @@ Please contact your Systems Administrator and report this issue.</source>
     </message>
     <message>
         <source>Active</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Активный</translation>
     </message>
     <message>
         <source>Alt+O</source>

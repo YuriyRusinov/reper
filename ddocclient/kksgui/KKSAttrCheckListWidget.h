@@ -36,6 +36,7 @@ signals:
     void addAttrRef (const KKSAttrValue * attribute, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel);
     void delAttrRef (const KKSAttrValue * attribute, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel, const QModelIndex& wInd);
     void refIOOpen (QString tableName);
+    void refRecOpen (QString tableName, qint64 id);
     
     void valueChanged (int id, KKSIndAttr::KKSIndAttrClass sys, QVariant val);
 
@@ -43,6 +44,7 @@ private slots:
     void addAttrRef (void);
     void delAttrRef (void);
     void refIO (void);
+    void refRec (void);
     void updateModel (const QModelIndex & topLeft, const QModelIndex & bottomRight);
     void removeRows (const QModelIndex & parent, int start, int end);
 
@@ -61,7 +63,8 @@ private:
     QToolBar * tbActions;
     QAction * actAdd;
     QAction * actDel;
-    QAction * actRef;
+    QAction * actRefIO;
+    QAction * actRefRec;
 /*
     QPushButton *pbAdd;
     QPushButton *pbDel;

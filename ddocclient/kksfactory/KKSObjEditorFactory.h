@@ -349,6 +349,8 @@ public slots:
 
 private slots:    
     void loadRefIO (QString tableName);
+    void loadRefRec (QString tableName, qint64 id);
+
     void genUUID (int idAttr, const KKSAttrValue * av);
     void searchTemplateCategoryChanged (KKSSearchTemplate * st, int idCategory);
 

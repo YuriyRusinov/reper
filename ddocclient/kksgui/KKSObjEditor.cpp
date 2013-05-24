@@ -2171,6 +2171,13 @@ void KKSObjEditor :: openReferenceIO (QString tableName)
     emit openRefIO (tableName);
 }
 
+//открывается в редакторе запись справочника, которая выбрана в виджете атрибута "многие ко многим"
+void KKSObjEditor :: openReferenceRec (QString tableName, qint64 id)
+{
+    qDebug () << __PRETTY_FUNCTION__ << tableName;
+    emit openRefRec (tableName, id);
+}
+
 KKSRecWidget * KKSObjEditor :: getRecordsWidget (void) const
 {
     return recWidget;

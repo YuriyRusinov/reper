@@ -1577,6 +1577,8 @@ void KKSObjEditorFactory :: setObjConnect (KKSObjEditor *editor)
     connect (editor, SIGNAL (delObjCAttrRef (KKSObjectExemplar *, const KKSAttrValue*, KKSIndAttr::KKSIndAttrClass, QAbstractItemModel *, const QModelIndex&)), this, SLOT (loadObjCDelAttrRef (KKSObjectExemplar *, const KKSAttrValue*, KKSIndAttr::KKSIndAttrClass, QAbstractItemModel *, const QModelIndex&)) );
 
     connect (editor, SIGNAL (openRefIO (QString)), this, SLOT (loadRefIO (QString)) );
+    connect (editor, SIGNAL (openRefRec (QString, qint64)), this, SLOT (loadRefRec (QString, qint64)) );
+
     connect (editor, SIGNAL (printReport(KKSObject*)), this, SLOT (printReport(KKSObject*)));
 
     connect (editor, SIGNAL (addIOIndex (KKSObject *, const QModelIndex&, QAbstractItemModel*)), m_indf, SLOT(addIOIndex (KKSObject *, const QModelIndex&, QAbstractItemModel *)) );
@@ -7878,7 +7880,7 @@ void KKSObjEditorFactory :: loadObjCDelAttrRef (KKSObjectExemplar * wObjE, const
             av->setValue (val);
             const_cast<KKSAttrValue *>(avE)->setValue (val);
             for (int i=0; i<nr; i++)
-                sourceModel->setData (sourceModel->index (i, 0, par), sl[i].toInt(), Qt::UserRole);
+                sourceModel->setData (sourceModel->index (i, 0, par), sl[i].toLongLong(), Qt::UserRole);
         }
     }
     
@@ -7895,6 +7897,23 @@ void KKSObjEditorFactory :: loadRefIO (QString tableName)
     bool isModal = editor->isModal ();
     QString s;
     this->editExistOE (editor, IO_IO_ID, idObj, wObj->category(), s, 0, isModal);
+    wObj->release ();
+}
+
+void KKSObjEditorFactory :: loadRefRec (QString tableName, qint64 id)
+{
+    KKSObjEditor * editor = qobject_cast<KKSObjEditor *>(this->sender());
+    KKSObject * wObj = loader->loadIO (tableName, true);
+    if (!wObj)
+        return;
+    
+    int idObj = wObj->id ();
+    
+    bool isModal = editor->isModal ();
+    QString s;
+    
+    this->editExistOE (editor, idObj, id, wObj->category()->tableCategory(), s, 0, isModal);
+    
     wObj->release ();
 }
 

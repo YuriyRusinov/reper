@@ -165,7 +165,9 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
 
         void addAttributeCheckReference (const KKSAttrValue* av, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel);
         void delAttributeCheckReference (const KKSAttrValue* av, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel, const QModelIndex& wInd);
+        
         void openReferenceIO (QString tableName);
+        void openReferenceRec (QString tableName, qint64 id );
 
         void setIOGlobal (bool isGlobal);
         void setSyncType (QLineEdit * leType);
@@ -227,6 +229,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void delObjCAttrRef (KKSObjectExemplar * wObjE, const KKSAttrValue* av, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel, const QModelIndex& wInd);
         
         void openRefIO (QString tableName);
+        void openRefRec (QString tableName, qint64);
 
         void printReport(KKSObject * pObj); //сигнал ловится в классе KKSObjectFactory. Выводит на печать шаблон при помощи встроенного генератора шаблонов
 

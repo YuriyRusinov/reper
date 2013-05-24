@@ -1667,7 +1667,7 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
                         QModelIndex saInd = sAttrModel->index (ii, 0);
                         //QString v = pv.value();
                         
-                        int key = pv.key();
+                        qint64 key = pv.key();
                         KKSEIOData * eData = pv.value();
                         ic = 0;
                         
@@ -1713,21 +1713,30 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
                 }
                 //c->release ();
                 refIO->release ();
-                QObject :: connect (arw, \
-                         SIGNAL (addAttrRef (const KKSAttrValue*,  KKSIndAttr::KKSIndAttrClass, QAbstractItemModel*)), \
-                         wEditor, \
-                         SLOT (addAttributeCheckReference (const KKSAttrValue*, KKSIndAttr::KKSIndAttrClass, QAbstractItemModel *)) \
-                        );
-                QObject :: connect (arw, \
-                         SIGNAL (delAttrRef (const KKSAttrValue*, KKSIndAttr::KKSIndAttrClass, QAbstractItemModel*, const QModelIndex&)), \
-                         wEditor, \
-                         SLOT (delAttributeCheckReference (const KKSAttrValue*, KKSIndAttr::KKSIndAttrClass, QAbstractItemModel*, const QModelIndex&)) \
-                        );
-                QObject :: connect (arw, \
-                         SIGNAL (refIOOpen (QString)), \
-                         wEditor, \
-                         SLOT (openReferenceIO (QString))
-                        );
+                QObject :: connect (arw, 
+                                    SIGNAL (addAttrRef (const KKSAttrValue*,  KKSIndAttr::KKSIndAttrClass, QAbstractItemModel*)), 
+                                    wEditor, 
+                                    SLOT (addAttributeCheckReference (const KKSAttrValue*, KKSIndAttr::KKSIndAttrClass, QAbstractItemModel *)) 
+                                    );
+                
+                QObject :: connect (arw,
+                                    SIGNAL (delAttrRef (const KKSAttrValue*, KKSIndAttr::KKSIndAttrClass, QAbstractItemModel*, const QModelIndex&)), 
+                                    wEditor, 
+                                    SLOT (delAttributeCheckReference (const KKSAttrValue*, KKSIndAttr::KKSIndAttrClass, QAbstractItemModel*, const QModelIndex&)) 
+                                    );
+                
+                QObject :: connect (arw, 
+                                    SIGNAL (refIOOpen (QString)), 
+                                    wEditor, 
+                                    SLOT (openReferenceIO (QString))
+                                    );
+                
+                QObject :: connect (arw, 
+                                    SIGNAL (refRecOpen (QString, qint64)), 
+                                    wEditor, 
+                                    SLOT (openReferenceRec (QString, qint64))
+                                    );
+
                 arw->setModel (sAttrModel);
                 aw->setEnabled (!isObjExist || !av->attribute()->isReadOnly());
                 if (!isRef)

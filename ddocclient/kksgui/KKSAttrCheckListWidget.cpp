@@ -24,7 +24,8 @@ KKSAttrCheckWidget :: KKSAttrCheckWidget (const KKSAttrValue * attr, KKSIndAttr:
     tbActions (new QToolBar (this)),
     actAdd (new QAction (QIcon(":/ddoc/add.png"), tr("&Add"), this)),
     actDel (new QAction (QIcon(":/ddoc/delete.png"), tr("&Delete"), this)),
-    actRef (new QAction (QIcon(":/ddoc/edit.png"), tr ("to &IO"), this)),
+    actRefIO (new QAction (QIcon(":/ddoc/copy_to_rubric.png"), tr ("Open base qualifier"), this)),
+    actRefRec (new QAction (QIcon(":/ddoc/edit.png"), tr ("Open selected record"), this)),
     viewModel (new KKSSortFilterProxyModel (this))
 {
     this->setupWidget ();
@@ -35,7 +36,8 @@ KKSAttrCheckWidget :: KKSAttrCheckWidget (const KKSAttrValue * attr, KKSIndAttr:
 
     connect (actAdd, SIGNAL (triggered()), this, SLOT (addAttrRef()) );
     connect (actDel, SIGNAL (triggered()), this, SLOT (delAttrRef()) );
-    connect (actRef, SIGNAL (triggered()), this, SLOT (refIO()) );
+    connect (actRefIO, SIGNAL (triggered()), this, SLOT (refIO()) );
+    connect (actRefRec, SIGNAL (triggered()), this, SLOT (refRec()) );
 }
 
 KKSAttrCheckWidget :: ~KKSAttrCheckWidget (void)
@@ -67,7 +69,9 @@ void KKSAttrCheckWidget :: setupWidget (void)
     tbActions->addAction (actAdd);
     tbActions->addAction (actDel);
     tbActions->addSeparator ();
-    tbActions->addAction (actRef);
+    tbActions->addAction (actRefRec);
+    tbActions->addSeparator ();
+    tbActions->addAction (actRefIO);
  
     gLay->addWidget (tv, 1, 0, 1, 1);
     tv->header()->setClickable (true);
@@ -111,6 +115,7 @@ void KKSAttrCheckWidget :: delAttrRef (void)
         QMessageBox::warning (this, tr ("Delete attribute value"), tr ("Please select value"), QMessageBox::Ok, QMessageBox::Ok);
         return;
     }
+
     QModelIndex wVIndex = sIndexes.at (0).sibling (sIndexes.at (0).row(), 0);
     QModelIndex wIndex = viewModel->mapToSource (wVIndex);
     qDebug () << __PRETTY_FUNCTION__ << wIndex;
@@ -124,6 +129,27 @@ void KKSAttrCheckWidget :: refIO (void)
     emit refIOOpen (tableName);
 }
 
+void KKSAttrCheckWidget :: refRec (void)
+{
+    qDebug () << __PRETTY_FUNCTION__;
+
+    QItemSelectionModel * selModel = tv->selectionModel ();
+    QItemSelection sel = selModel->selection ();
+    QModelIndexList sIndexes = sel.indexes ();
+    if (sIndexes.isEmpty())
+    {
+        QMessageBox::warning (this, tr ("Open selected record"), tr ("Please select record"), QMessageBox::Ok, QMessageBox::Ok);
+        return;
+    }
+
+    QModelIndex wVIndex = sIndexes.at (0).sibling (sIndexes.at (0).row(), 0);
+    QModelIndex wIndex = viewModel->mapToSource (wVIndex);
+
+    QString tableName = m_av->attribute()->tableName();
+    qint64 id = wIndex.data(Qt::UserRole).toLongLong();
+    emit refRecOpen (tableName, id);
+}
+
 void KKSAttrCheckWidget :: updateModel (const QModelIndex & topLeft, const QModelIndex & bottomRight)
 {
 //    qDebug () << __PRETTY_FUNCTION__ << topLeft << bottomRight;
@@ -135,7 +161,7 @@ void KKSAttrCheckWidget :: updateModel (const QModelIndex & topLeft, const QMode
     for (int i=0; i<n; i++)
     {
         QModelIndex wIndex = mod->index (i, 0, topLeft.parent());
-        sl += QString::number (mod->data (wIndex, Qt::UserRole).toInt());
+        sl += QString::number (mod->data (wIndex, Qt::UserRole).toLongLong());
     }
     QVariant val (sl);
     emit valueChanged (m_av->id(), m_isSystem, val);
@@ -151,7 +177,7 @@ void KKSAttrCheckWidget :: removeRows (const QModelIndex& parent, int start, int
     for (int i=0; i<n; i++)
     {
         QModelIndex wIndex = mod->index (i, 0, parent);
-        sl += QString::number (mod->data (wIndex, Qt::UserRole).toInt());
+        sl += QString::number (mod->data (wIndex, Qt::UserRole).toLongLong());
     }
     QVariant val (sl);
     emit valueChanged (m_av->id(), m_isSystem, val);
