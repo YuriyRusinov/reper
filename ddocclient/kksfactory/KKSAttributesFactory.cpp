@@ -1630,19 +1630,24 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
                     if (i < vArray.count()-1)
                         vals += ",";
                 }
+                QString value;
                 if (!vals.isEmpty())
                 {
-                    QString value = QString ("select id from %1 where id in (%2) ").arg (tableName).arg (vals);
-                    //const KKSFilter * filter = ct->createFilter ("id", value, KKSFilter::foInSQL);
-                    const KKSFilter * filter = ct->createFilter (ATTR_ID, value, KKSFilter::foInSQL);
-                    KKSList <const KKSFilter *> fl;
-                    fl.append (filter);
-                    filter->release ();
-                    KKSFilterGroup * fg = new KKSFilterGroup(true);
-                    fg->setFilters(fl);
-                    filters.append(fg);
-                    fg->release();
+                    value = QString ("select id from %1 where id in (%2) ").arg (tableName).arg (vals);
                 }
+                else
+                {
+                    value = QString ("select id from %1 where id is null ").arg (tableName);
+                }
+                //const KKSFilter * filter = ct->createFilter ("id", value, KKSFilter::foInSQL);
+                const KKSFilter * filter = ct->createFilter (ATTR_ID, value, KKSFilter::foInSQL);
+                KKSList <const KKSFilter *> fl;
+                fl.append (filter);
+                filter->release ();
+                KKSFilterGroup * fg = new KKSFilterGroup(true);
+                fg->setFilters(fl);
+                filters.append(fg);
+                fg->release();
                 KKSMap<qint64, KKSEIOData *> eioList = loader->loadEIOList (refIO, filters);
                 const KKSTemplate * ctempl = new KKSTemplate (ct->defTemplate());
                 QAbstractItemModel * sAttrModel = new KKSEIODataModel (ctempl, eioList);

@@ -109,6 +109,7 @@
 #include "KKSSyncDialog.h"
 #include <KKSAccessEntity.h>
 #include <KKSState.h>
+#include <KKSEIODataModel.h>
 #include <savesearchtemplateform.h>
 #include "defines.h"
 
@@ -7727,15 +7728,14 @@ void KKSObjEditorFactory :: updateAttrModel (const QModelIndex & wIndex, QAbstra
     
     for (KKSMap<qint64, KKSEIOData *>::const_iterator pv = eioList.constBegin(); pv!=eioList.constEnd(); pv++)
     {
-        /*
-        KKSObjectExemplar * wObjC = loader->loadEIO (pv.key(), refIO);
-        if (!wObjC)
-            continue;
-        */
-
         int ic=0;
         
         KKSEIOData * eData = pv.value();
+        if (qobject_cast<KKSEIODataModel *>(sMod))
+        {
+            sMod->setData (wIndex, QVariant::fromValue (eData), Qt::UserRole+1);
+            continue;
+        }
         for (KKSMap<int, KKSCategoryAttr *>::const_iterator pa = attrs.constBegin(); \
                                                             pa != attrs.constEnd(); \
                                                             pa++)
