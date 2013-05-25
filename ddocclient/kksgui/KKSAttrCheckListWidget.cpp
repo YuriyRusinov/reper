@@ -34,6 +34,7 @@ KKSAttrCheckWidget :: KKSAttrCheckWidget (const KKSAttrValue * attr, KKSIndAttr:
     tv->setSelectionMode (QAbstractItemView::SingleSelection);
     viewModel->setDynamicSortFilter (true);
 
+    connect (tv, SIGNAL (doubleClicked (const QModelIndex&)), this, SLOT (refEdit (const QModelIndex&)) );
     connect (actAdd, SIGNAL (triggered()), this, SLOT (addAttrRef()) );
     connect (actDel, SIGNAL (triggered()), this, SLOT (delAttrRef()) );
     connect (actRefIO, SIGNAL (triggered()), this, SLOT (refIO()) );
@@ -80,24 +81,6 @@ void KKSAttrCheckWidget :: setupWidget (void)
     tv->setSortingEnabled (true);
     KKSItemDelegate *itemDeleg = new KKSItemDelegate (this);
     tv->setItemDelegate (itemDeleg);
-/*
-    QGroupBox * gbEdit = new QGroupBox (tr("Edit"), this);
-    QSizePolicy sp (QSizePolicy::Preferred, QSizePolicy::Preferred);
-    gbEdit->setSizePolicy (sp);
-    QGridLayout *gEditLay = new QGridLayout (gbEdit);
-    gEditLay->addWidget (pbAdd, 0, 0, 1, 1);
-    gEditLay->addWidget (pbDel, 1, 0, 1, 1);
-    gLay->addWidget (gbEdit, 0, 1, 1, 1);//, Qt::AlignJustify | Qt::AlignTop);
-
-    QGroupBox * gbIO = new QGroupBox (tr ("Reference"), this);
-    gbIO->setSizePolicy (sp);
-    QGridLayout * gRefLay = new QGridLayout (gbIO);
-    gRefLay->addWidget (pbRef, 0, 0, 1, 1);
-    gLay->addWidget (gbIO, 1, 1, 1, 1);//, Qt::AlignLeft | Qt::AlignTop);
-
-    QSpacerItem * verticalSpacer = new QSpacerItem(20, 94, QSizePolicy::Minimum, QSizePolicy::Expanding);
-    gLay->addItem (verticalSpacer, 2, 1, 1, 1);
-*/
 }
 
 void KKSAttrCheckWidget :: addAttrRef (void)
@@ -145,6 +128,14 @@ void KKSAttrCheckWidget :: refRec (void)
     QModelIndex wVIndex = sIndexes.at (0).sibling (sIndexes.at (0).row(), 0);
     QModelIndex wIndex = viewModel->mapToSource (wVIndex);
 
+    QString tableName = m_av->attribute()->tableName();
+    qint64 id = wIndex.data(Qt::UserRole).toLongLong();
+    emit refRecOpen (tableName, id);
+}
+
+void KKSAttrCheckWidget :: refEdit (const QModelIndex& wInd)
+{
+    QModelIndex wIndex = viewModel->mapToSource (wInd);
     QString tableName = m_av->attribute()->tableName();
     qint64 id = wIndex.data(Qt::UserRole).toLongLong();
     emit refRecOpen (tableName, id);

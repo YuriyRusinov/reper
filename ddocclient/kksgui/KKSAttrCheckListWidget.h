@@ -47,6 +47,7 @@ private slots:
     void refRec (void);
     void updateModel (const QModelIndex & topLeft, const QModelIndex & bottomRight);
     void removeRows (const QModelIndex & parent, int start, int end);
+    void refEdit (const QModelIndex& wInd);
 
 private:
     //
