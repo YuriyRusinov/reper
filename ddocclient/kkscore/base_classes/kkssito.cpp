@@ -645,6 +645,7 @@ int KKSSito::GUIConnect(QWidget * parent)
 
     QString currentLevel = poSettings->getParam("currentLevel");
     QString port;
+    int currentLevelIndex = 0; //используется для определения текущего выбранного индекса уровня доступа в комбобоксе
 
     if(currentLevel.isEmpty()){
         if(levels.count() == 0){
@@ -658,8 +659,10 @@ int KKSSito::GUIConnect(QWidget * parent)
     }
     else{
         for(int i=0; i<levels.count(); i++){
-            if(levels.at(i)->name() == currentLevel)
+            if(levels.at(i)->name() == currentLevel){
+                currentLevelIndex = i;
                 port = levels.at(i)->port();
+            }
         }
     }
 
@@ -701,40 +704,43 @@ int KKSSito::GUIConnect(QWidget * parent)
         }
     } while ( ! m_db->connected() );
 
-    poSettings->endGroup (); // Database
+    poSettings->endGroup (); // System settings/Database
+    //QString a = poSettings->group(); //a = ""
 
     if(result)
     {
-        poSettings->beginGroup("System settings");
-        qWarning() << "result = " << result;
+        //poSettings->beginGroup("System settings");
+        //qWarning() << "result = " << result;
         if(lf->host() != ip){
-        qWarning() << "HOST = " << lf->host() << ip;
-            poSettings->writeSettings("Database", 
+        //qWarning() << "HOST = " << lf->host() << ip;
+            poSettings->writeSettings("System settings/Database", 
                                       "hostName", 
                                       lf->host());
         }
         if(lf->name() != dbname)
-            poSettings->writeSettings("Database", 
+            poSettings->writeSettings("System settings/Database", 
                                       "databaseName", 
                                       lf->name());
         if(lf->user() != user)
-            poSettings->writeSettings("Database", 
+            poSettings->writeSettings("System settings/Database", 
                                       "userName", 
                                       lf->user());
-        /*
-        if(lf->port() != port)
-            poSettings->writeSettings("Database", 
-                                      "databasePort", 
-                                      lf->port());
-        */
         
-        //закомментировано, чтобы порт всегда обновлялся
-        if(lf->level() != currentLevel)
-            poSettings->writeSettings("Database",
-                                      "currentLevel",
-                                      lf->level());
+        //обновляем информацию о текущем уровне доступа и порте
+        currLevel.setName(lf->level());
+        currLevel.setPort(lf->port());
+        levels.at(lf->levelIndex())->setName(currLevel.name());
+        levels.at(lf->levelIndex())->setPort(currLevel.port());
+
+        saveAccLevels(levels);//poSetings->group() здесь должен быть равен ""
         
-        poSettings->endGroup();
+        poSettings->writeSettings("System settings/Database",
+                                  "currentLevel",
+                                  currLevel.name());
+        
+
+        
+        //poSettings->endGroup();
     }
 
     delete lf;
@@ -1380,6 +1386,10 @@ void KKSSito::loadAccLevels()
     if(!kksSettings)
         return;
     
+    //сохраняем текущую группу
+    QString currentGroup = kksSettings->group();
+    kksSettings->beginGroup("");
+
     int size = kksSettings->beginReadArray("System settings/Database/AccLevels");
     if(size == 0)
     {
@@ -1403,6 +1413,8 @@ void KKSSito::loadAccLevels()
     }
 
     kksSettings->endArray();
+
+    kksSettings->beginGroup(currentGroup);
 }
 
 void KKSSito::saveAccLevels(const KKSList<KKSAccLevel*> & levels)
@@ -1412,6 +1424,10 @@ void KKSSito::saveAccLevels(const KKSList<KKSAccLevel*> & levels)
         return;
 
     int cnt = levels.count();
+    
+    //сохраняем текущую группу
+    QString currentGroup = kksSettings->group();
+    kksSettings->beginGroup("");
 
      kksSettings->beginWriteArray("System settings/Database/AccLevels");
      for (int i=0; i<cnt; i++) {
@@ -1419,7 +1435,10 @@ void KKSSito::saveAccLevels(const KKSList<KKSAccLevel*> & levels)
          kksSettings->setValue("levelName", levels.at(i)->name());
          kksSettings->setValue("portName", levels.at(i)->port());
      }
+     
      kksSettings->endArray();
+
+     kksSettings->beginGroup(currentGroup);
 }
 
 void KKSSito::loadDefAccLevels()

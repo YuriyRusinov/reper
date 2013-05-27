@@ -224,7 +224,7 @@ private slots:
     
     void saveCmdJSettings(KKSCmdJSettings * settings);
     void saveMsgJSettings(KKSMsgJSettings * settings);
-    void saveAccLevels(const KKSList<KKSAccLevel*> & levels);
+    static void saveAccLevels(const KKSList<KKSAccLevel*> & levels);
     void clearLoader();
 
 };

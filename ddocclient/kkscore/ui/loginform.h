@@ -56,6 +56,7 @@ class LoginForm : public QDialog//, private Ui::login_form
     QString pass() const;
     QString port() const;
     QString level() const;
+    int levelIndex() const;
 
   private:
     bool moreShown;

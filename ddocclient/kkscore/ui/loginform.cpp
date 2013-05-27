@@ -139,3 +139,8 @@ QString LoginForm::level() const
 {
     return ui->cbLevel->currentText();
 }
+
+int LoginForm::levelIndex() const
+{
+    return ui->cbLevel->currentIndex();
+}
