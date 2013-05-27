@@ -18,6 +18,7 @@
 
 class QModelIndex;
 class QAbstractItemModel;
+class QLineEdit;
 
 class KKSLoader;
 class KKSObjEditorFactory;
@@ -89,6 +90,8 @@ class _F_EXPORT KKSCatEditorFactory : public KKSEntityFactory
         void addAttributeIntoCategory (KKSCategory *c, QAbstractItemModel * attrModel, KKSCatEditor *editor);
         void copyAttributesIntoCategory (KKSCategory *c, QAbstractItemModel * attrModel, KKSCatEditor *cEditor);
         void refreshCategoryTemplates (KKSCategory * c, QAbstractItemModel * templModel);
+
+        void setLifeCycleIntoCategory (KKSCategory * c, QLineEdit * lE);
 //        void saveAttribute (KKSAttribute * cAttr, int idType, KKSAttributesEditor *aEditor);
 //        void loadAttribute (int idAttr, KKSAttributesEditor *aEditor);
 //        void delAttribute (int idAttr, KKSAttributesEditor *aEditor);

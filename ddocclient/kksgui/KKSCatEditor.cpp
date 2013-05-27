@@ -313,8 +313,14 @@ void KKSCatEditor :: init_parameters (void)
     hLifeCycleLay->addWidget (lLifeCycle, 0, Qt::AlignRight);
     tbSetLifeCycle->setText(tr("Set"));
     tbSetLifeCycle->setToolTip(tr("Set life cycle onto category %1").arg(pCategory->name()));
+    
+    connect (tbSetLifeCycle, SIGNAL (clicked()), this, SLOT (setCatLifeCycle()) );
+
     tbClearLifeCycle->setText(tr("Clear"));
     tbClearLifeCycle->setToolTip(tr("Clear life cycle from category %1").arg(pCategory->name()));
+    
+    connect (tbClearLifeCycle, SIGNAL (clicked()), this, SLOT (clearCatLifeCycle()) );
+
     hLifeCycleLay->addWidget (lELifeCycle);
     hLifeCycleLay->addWidget (tbSetLifeCycle);
     hLifeCycleLay->addWidget (tbClearLifeCycle);
@@ -877,4 +883,14 @@ void KKSCatEditor :: catDbOk (KKSCategory * c)
         emit refreshTemplates (pTableCategory, recTableCatTemplatesW->getSourceModel());
     if (pRecAttrCategory)
         emit refreshTemplates (pRecAttrCategory, recAttrCatTemplatesW->getSourceModel());
+}
+
+void KKSCatEditor :: setCatLifeCycle (void)
+{
+    emit lifeCycle (pCategory, lELifeCycle);
+}
+
+void KKSCatEditor :: clearCatLifeCycle (void)
+{
+    pCategory->setLifeCycle (0);
 }

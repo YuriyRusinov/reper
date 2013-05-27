@@ -944,6 +944,12 @@ void KKSCatEditorFactory :: refreshCategoryTemplates (KKSCategory * c, QAbstract
     KKSViewFactory::loadCategoryDbTemplates (lTempls, templModel, QModelIndex());
 }
 
+void KKSCatEditorFactory :: setLifeCycleIntoCategory (KKSCategory * c, QLineEdit * lE)
+{
+    if (!c)
+        return;
+    qDebug () << __PRETTY_FUNCTION__ << c->id() << c->name();
+}
 /*
 void KKSCatEditorFactory :: loadAttrsRefs (KKSAttribute * attr, KKSAttrEditor * aEditor)
 {
