@@ -175,6 +175,9 @@ class _GUI_EXPORT KKSCatEditor : public KKSDialog
         QToolButton *tbChildCat;
         QComboBox *cbTypes;
         QCheckBox *cbGlobal;
+        QLineEdit *lELifeCycle;
+        QToolButton *tbSetLifeCycle;
+        QToolButton *tbClearLifeCycle;
 //        QToolButton *tbType;
 
         KKSRecWidget *recWidget;

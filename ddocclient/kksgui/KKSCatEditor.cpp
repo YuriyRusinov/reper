@@ -64,6 +64,9 @@ KKSCatEditor :: KKSCatEditor (KKSCategory *c,
     tbChildCat (new QToolButton ()),
     cbTypes (new QComboBox()),
     cbGlobal(0),
+    lELifeCycle (new QLineEdit()),
+    tbSetLifeCycle (new QToolButton()),
+    tbClearLifeCycle (new QToolButton()),
     recWidget (rw),
     recTableW (rtw),
     recAttrW (raw), 
@@ -303,10 +306,22 @@ void KKSCatEditor :: init_parameters (void)
     cbGlobal->setChecked(pCategory->id() <= 0 ? true : pCategory->isGlobal());
     cbGlobal->setEnabled (false);
     hGlobalLay->addWidget (cbGlobal);
-    gCatPLayout->addLayout (hGlobalLay, 3, 1, 1, 1);
+    gCatPLayout->addLayout (hGlobalLay, 4, 1, 1, 1);
+    
+    QHBoxLayout * hLifeCycleLay = new QHBoxLayout ();
+    QLabel * lLifeCycle = new QLabel (tr("Life cycle :"));
+    hLifeCycleLay->addWidget (lLifeCycle, 0, Qt::AlignRight);
+    tbSetLifeCycle->setText(tr("Set"));
+    tbSetLifeCycle->setToolTip(tr("Set life cycle onto category %1").arg(pCategory->name()));
+    tbClearLifeCycle->setText(tr("Clear"));
+    tbClearLifeCycle->setToolTip(tr("Clear life cycle from category %1").arg(pCategory->name()));
+    hLifeCycleLay->addWidget (lELifeCycle);
+    hLifeCycleLay->addWidget (tbSetLifeCycle);
+    hLifeCycleLay->addWidget (tbClearLifeCycle);
+    gCatPLayout->addLayout (hLifeCycleLay, 3, 0, 1, 2);
 
     QSpacerItem * sPar = new QSpacerItem (20, 0, QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
-    gCatPLayout->addItem (sPar, 4, 0, 1, 2);
+    gCatPLayout->addItem (sPar, 5, 0, 1, 2);
 
     QVBoxLayout * vModalButtonsLay = new QVBoxLayout ();
     vModalButtonsLay->addStretch ();

@@ -416,20 +416,6 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (int idCategory, // ид
     else if (idCategory > 0)
     {
         cat = loader->loadCategory (idCategory);
-        /*
-        if (!cat->recAttrCategory())
-        {
-            KKSType * cTableT = loader->loadType (10);
-            indCat = new KKSCategory (-1, QString(), cTableT);
-            KKSAccessEntity * acl = new KKSAccessEntity ();
-            indCat->setAccessRules (acl);
-            cat->setRecAttrCategory (indCat);
-            if (acl)
-                acl->release ();
-            if (indCat)
-                indCat->release ();
-        }
-        */
     }
     else
     {
@@ -470,6 +456,9 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (int idCategory, // ид
     if (!cat)
         return 0;
 
+    KKSCatEditor * cEditor = createCategoryEditor (cat, filters, isChildCat, idCatType, mode, windowModality, parent, f);
+    return cEditor;
+/*
     if (isChildCat && qobject_cast<KKSCatEditor *>(parent))
     {
         KKSCatEditor *pEditor = qobject_cast<KKSCatEditor *>(parent);
@@ -557,6 +546,7 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (int idCategory, // ид
 //    typeRef->release ();
 //    cat->release ();
     return cEditor;
+*/
 }
 
 KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (KKSCategory *cat, // категория
