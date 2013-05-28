@@ -356,7 +356,17 @@ void KKSEIODataModel :: setupData (KKSTreeItem * parent)
                 p != objRecords.constEnd();
                 p++)
         {
-            KKSTreeItem * t = new KKSTreeItem (p.key(), p.value(), tRef);
+            QIcon tIcon;
+            qDebug () << __PRETTY_FUNCTION__ << p.value()->sysFields();
+            if (p.value())
+            {
+                QString strIcon = p.value()->sysFieldValue("icon");
+                //qDebug () << __PRETTY_FUNCTION__ << strIcon;
+                QPixmap pIcon;
+                pIcon.loadFromData (strIcon.toUtf8());
+                tIcon = QIcon (pIcon);
+            }
+            KKSTreeItem * t = new KKSTreeItem (p.key(), p.value(), tRef, tIcon);
             parent->appendChild (t);
         }
         if (nr > 0 && parent->childCount() > nr)
@@ -387,7 +397,16 @@ void KKSEIODataModel :: setupData (KKSTreeItem * parent)
             p != sortedData.constEnd();
             p++)
     {
-        KKSTreeItem * t = new KKSTreeItem (p.value()->sysFieldValue("id").toLongLong(), p.value(), tRef);
+        QIcon tIcon;
+        if (p.value())
+        {
+            QString strIcon = p.value()->sysFieldValue("icon");
+            qDebug () << __PRETTY_FUNCTION__ << strIcon;
+            QPixmap pIcon;
+            pIcon.loadFromData (strIcon.toUtf8());
+            tIcon = QIcon (pIcon);
+        }
+        KKSTreeItem * t = new KKSTreeItem (p.value()->sysFieldValue("id").toLongLong(), p.value(), tRef, tIcon);
         if (!t->getData() || !t->getData()->isVisible())
             continue;
         QString valStr = p.value()->sysFieldValue(cAttrP->code(false));
