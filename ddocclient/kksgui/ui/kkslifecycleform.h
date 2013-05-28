@@ -24,7 +24,9 @@ class _GUI_EXPORT kkslifecycleform : public QDialog
 public:
     kkslifecycleform(KKSLifeCycleEx * lc, QWidget * parent=0, Qt::WindowFlags flags=0);
     virtual ~kkslifecycleform();
-    
+
+    KKSLifeCycleEx * getLC (void) const;
+
 private slots:
     void lcAccept (void);
     void setState (void);

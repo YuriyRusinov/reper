@@ -51,6 +51,7 @@
 #include <kksincludeswidget.h>
 #include <KKSCatAttrsModel.h>
 #include <KKSItemDelegate.h>
+#include <kkslifecycleform.h>
 #include <defines.h>
 
 ////////////////////////////////////////////////////////////////////////
@@ -998,6 +999,18 @@ void KKSCatEditorFactory :: addLifeCycle (QWidget * editor, int idObject, const 
     Q_UNUSED (tableName);
     Q_UNUSED (nTab);
     qDebug () << __PRETTY_FUNCTION__;
+    KKSLifeCycleEx * lc = new KKSLifeCycleEx (-1, QString(), QString());
+    
+    kkslifecycleform * lcForm = new kkslifecycleform (lc, editor);
+    if (!lc || !lcForm || lcForm->exec() != QDialog::Accepted)
+    {
+        if (lc)
+            lc->release ();
+    }
+    this->ppf->insertLifeCycle (lcForm->getLC());
+    lcForm->setParent (0);
+    delete lcForm;
+    lc->release ();
 }
 
 void KKSCatEditorFactory :: editLifeCycle (QWidget * editor, int idObject, qint64 idObjE, const KKSCategory * c, QString tableName, int nTab, bool isModal, QAbstractItemModel * sRecMod)
@@ -1005,7 +1018,20 @@ void KKSCatEditorFactory :: editLifeCycle (QWidget * editor, int idObject, qint6
     Q_UNUSED (c);
     Q_UNUSED (tableName);
     Q_UNUSED (nTab);
+    Q_UNUSED (idObject);
     qDebug () << __PRETTY_FUNCTION__;
+    KKSLifeCycleEx * lc = loader->loadLifeCycle(idObjE);
+    
+    kkslifecycleform * lcForm = new kkslifecycleform (lc, editor);
+    if (!lc || !lcForm || lcForm->exec() != QDialog::Accepted)
+    {
+        if (lc)
+            lc->release ();
+    }
+    this->ppf->updateLifeCycle (lcForm->getLC());
+    lcForm->setParent (0);
+    delete lcForm;
+    lc->release ();
 }
 
 void KKSCatEditorFactory :: delLifeCycle (QWidget * editor, int idObject, qint64 idObjE, QString tableName, QAbstractItemModel * recModel, const QModelIndex& recIndex)

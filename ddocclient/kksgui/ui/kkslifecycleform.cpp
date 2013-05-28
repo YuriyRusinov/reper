@@ -6,6 +6,7 @@
  */
 
 #include <KKSLifeCycle.h>
+#include <KKSState.h>
 #include "kkslifecycleform.h"
 #include "ui_kks_life_cycle_form.h"
 
@@ -15,6 +16,17 @@ kkslifecycleform::kkslifecycleform(KKSLifeCycleEx * lc, QWidget * parent, Qt::Wi
     lifeCycle (lc)
 {
     UI->setupUi (this);
+    if (lc)
+        lifeCycle->addRef();
+    
+    UI->lEId->setText (QString::number (lc->id()));
+    UI->lEName->setText (lifeCycle->name());
+    UI->lEDescription->setText (lifeCycle->desc());
+    if (lifeCycle->startState())
+    {
+        const KKSState * st = lifeCycle->startState();
+        UI->lEStartState->setText (st->name());
+    }
 
     connect (UI->tbStartState, SIGNAL(clicked()), this, SLOT (setState()) );
     connect (UI->tbClearStartState, SIGNAL (clicked()), this, SLOT (clearState()) );
@@ -24,10 +36,15 @@ kkslifecycleform::kkslifecycleform(KKSLifeCycleEx * lc, QWidget * parent, Qt::Wi
 
 kkslifecycleform::~kkslifecycleform()
 {
+    delete UI;
+    if (lifeCycle)
+        lifeCycle->release();
 }
 
 void kkslifecycleform::lcAccept (void)
 {
+    lifeCycle->setName (UI->lEName->text());
+    lifeCycle->setDesc (UI->lEDescription->text());
     QDialog::accept();
 }
 
@@ -38,4 +55,9 @@ void kkslifecycleform::setState (void)
 
 void kkslifecycleform::clearState (void)
 {
+}
+
+KKSLifeCycleEx * kkslifecycleform::getLC (void) const
+{
+    return lifeCycle;
 }
