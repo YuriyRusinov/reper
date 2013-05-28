@@ -637,6 +637,7 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (KKSCategory *cat, // 
     connect (this, SIGNAL (categoryAdded(KKSCategory *)), cEditor, SLOT (catDbOk(KKSCategory *)) );
     
     connect (cEditor, SIGNAL (refreshTemplates (KKSCategory *, QAbstractItemModel *)), this, SLOT (refreshCategoryTemplates (KKSCategory *, QAbstractItemModel *)) );
+    connect (cEditor, SIGNAL (lifeCycle (KKSCategory *, QLineEdit *)), this, SLOT (setLifeCycleIntoCategory(KKSCategory *, QLineEdit *)) );
 
     cEditor->setWindowModality (windowModality);
     if (windowModality != Qt::NonModal)
@@ -949,6 +950,68 @@ void KKSCatEditorFactory :: setLifeCycleIntoCategory (KKSCategory * c, QLineEdit
     if (!c)
         return;
     qDebug () << __PRETTY_FUNCTION__ << c->id() << c->name();
+    KKSObject * lcIO = loader->loadIO(IO_LIFE_CYCLE_ID, true);
+    const KKSCategory * wCat = lcIO ? lcIO->category() : 0;
+    if (wCat)
+        wCat = wCat->tableCategory();
+    if (lcIO)
+        lcIO->release();
+    KKSObjEditor * lcEditor = this->objf->createObjRecEditor(IO_IO_ID,
+                                                             IO_LIFE_CYCLE_ID,
+                                                             KKSList<const KKSFilterGroup *>(),
+                                                             tr("Set life cycle onto category %1").arg (c->name()),
+                                                             wCat,
+                                                             true,
+                                                             true,
+                                                             Qt::WindowModal);
+    
+    lcEditor->disconnect(objf);//disconnect (lcEditor);
+    connect (lcEditor,
+             SIGNAL (newObjectEx (QWidget*, int, const KKSCategory *, QString, int, bool, QAbstractItemModel *)),
+             this,
+             SLOT (addLifeCycle (QWidget *, int, const KKSCategory *, QString, int, bool, QAbstractItemModel *))
+            );
+    connect (lcEditor,
+             SIGNAL (editObjectEx (QWidget*, int, qint64, const KKSCategory *, QString, int, bool, QAbstractItemModel * )),
+             this,
+             SLOT (editLifeCycle (QWidget *, int, qint64, const KKSCategory *, QString, int, bool, QAbstractItemModel * ))
+            );
+    connect (lcEditor,
+             SIGNAL (delObjectEx (QWidget*, int, qint64, QString, QAbstractItemModel *, const QModelIndex&)),
+             this,
+             SLOT (delLifeCycle (QWidget *, int, qint64, QString, QAbstractItemModel *, const QModelIndex&))
+            );
+    
+    if (!lcEditor || lcEditor->exec() != QDialog::Accepted)
+        return;
+    int lcId = lcEditor->getID();
+    KKSLifeCycleEx * lc = loader->loadLifeCycle(lcId);
+    c->setLifeCycle (lc);
+    lE->setText(lc->name());
+    if (lc)
+        lc->release ();
+}
+
+void KKSCatEditorFactory :: addLifeCycle (QWidget * editor, int idObject, const KKSCategory * c, QString tableName, int nTab, bool isModal, QAbstractItemModel * sRecMod)
+{
+    Q_UNUSED (c);
+    Q_UNUSED (tableName);
+    Q_UNUSED (nTab);
+    qDebug () << __PRETTY_FUNCTION__;
+}
+
+void KKSCatEditorFactory :: editLifeCycle (QWidget * editor, int idObject, qint64 idObjE, const KKSCategory * c, QString tableName, int nTab, bool isModal, QAbstractItemModel * sRecMod)
+{
+    Q_UNUSED (c);
+    Q_UNUSED (tableName);
+    Q_UNUSED (nTab);
+    qDebug () << __PRETTY_FUNCTION__;
+}
+
+void KKSCatEditorFactory :: delLifeCycle (QWidget * editor, int idObject, qint64 idObjE, QString tableName, QAbstractItemModel * recModel, const QModelIndex& recIndex)
+{
+    Q_UNUSED (tableName);
+    qDebug () << __PRETTY_FUNCTION__;
 }
 /*
 void KKSCatEditorFactory :: loadAttrsRefs (KKSAttribute * attr, KKSAttrEditor * aEditor)

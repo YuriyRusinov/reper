@@ -38,6 +38,7 @@ class KKSAttrEditor;
 class KKSAttributesFactory;
 class KKSStuffFactory;
 class KKSRecWidget;
+class KKSObjEditor;
 
 class _F_EXPORT KKSCatEditorFactory : public KKSEntityFactory
 {
@@ -92,14 +93,10 @@ class _F_EXPORT KKSCatEditorFactory : public KKSEntityFactory
         void refreshCategoryTemplates (KKSCategory * c, QAbstractItemModel * templModel);
 
         void setLifeCycleIntoCategory (KKSCategory * c, QLineEdit * lE);
-//        void saveAttribute (KKSAttribute * cAttr, int idType, KKSAttributesEditor *aEditor);
-//        void loadAttribute (int idAttr, KKSAttributesEditor *aEditor);
-//        void delAttribute (int idAttr, KKSAttributesEditor *aEditor);
-
-//        void loadAttrsRefs (KKSAttribute * attr, KKSAttrEditor * aEditor);
-//        void loadAttrsRefFields (KKSAttribute * attr, int idRef, KKSAttrEditor * aEditor);
-
-//        void findAttributes (int idAttrs, KKSAttributesEditor * attrsEditor);
+        
+        void addLifeCycle (QWidget * editor, int idObject, const KKSCategory * c, QString tableName, int nTab, bool isModal, QAbstractItemModel * sRecMod);
+        void editLifeCycle (QWidget * editor, int idObject, qint64 idObjE, const KKSCategory * c, QString tableName, int nTab, bool isModal, QAbstractItemModel * sRecMod);
+        void delLifeCycle (QWidget * editor, int idObject, qint64 idObjE, QString tableName, QAbstractItemModel * recModel, const QModelIndex& recIndex);
 
     private:
         //

@@ -121,8 +121,12 @@ const int IO_INDICATOR_ID = 87;
 // который описывает справочник потоков информационных сообщений
 const int IO_MESSAGE_STREAM_ID = 94;
 
+//
 // данный дефайн задает данные разработчика, описывающие сущность в древовидной структуре
-#define USER_ENTITY 137
+//
+const int USER_ENTITY = 137;
+
+const int IO_LIFE_CYCLE_ID = 95;
 
 //данный дефайн описывает идентификатор роли "остальные" в БД
 #define OTHERS_ROLE -10

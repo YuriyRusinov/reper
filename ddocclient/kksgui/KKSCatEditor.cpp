@@ -26,6 +26,7 @@
 #include <KKSRubric.h>
 #include <KKSType.h>
 #include <KKSAccessEntity.h>
+#include <KKSLifeCycle.h>
 
 #include "KKSEventFilter.h"
 #include "KKSAttributesEditor.h"
@@ -311,6 +312,11 @@ void KKSCatEditor :: init_parameters (void)
     QHBoxLayout * hLifeCycleLay = new QHBoxLayout ();
     QLabel * lLifeCycle = new QLabel (tr("Life cycle :"));
     hLifeCycleLay->addWidget (lLifeCycle, 0, Qt::AlignRight);
+    if (pCategory && pCategory->lifeCycle())
+    {
+        KKSLifeCycleEx * lc = pCategory->lifeCycle();
+        lELifeCycle->setText (lc->name());
+    }
     tbSetLifeCycle->setText(tr("Set"));
     tbSetLifeCycle->setToolTip(tr("Set life cycle onto category %1").arg(pCategory->name()));
     
@@ -893,4 +899,5 @@ void KKSCatEditor :: setCatLifeCycle (void)
 void KKSCatEditor :: clearCatLifeCycle (void)
 {
     pCategory->setLifeCycle (0);
+    lELifeCycle->clear();
 }
