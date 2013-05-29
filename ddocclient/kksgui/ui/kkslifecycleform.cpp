@@ -50,12 +50,13 @@ void kkslifecycleform::lcAccept (void)
 
 void kkslifecycleform::setState (void)
 {
-    emit loadState (lifeCycle, UI->lEStartState);
+    emit loadStartState (lifeCycle, UI->lEStartState);
 }
 
 void kkslifecycleform::clearState (void)
 {
     UI->lEStartState->clear();
+    lifeCycle->setStartState (0);
 }
 
 KKSLifeCycleEx * kkslifecycleform::getLC (void) const

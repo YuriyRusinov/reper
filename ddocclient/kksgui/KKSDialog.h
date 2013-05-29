@@ -27,7 +27,7 @@ class _GUI_EXPORT KKSDialog : public QDialog
         QSize sizeHint() const;
 
     public slots:
-        int exec (void);
+        //int exec (void);
 
         void accept (void);
         void reject (void);

@@ -34,7 +34,7 @@ private slots:
     void clearState (void);
 
 signals:
-    void loadState (KKSLifeCycleEx * lc, QLineEdit * le);
+    void loadStartState (KKSLifeCycleEx * lc, QLineEdit * le);
 
 private:
     //

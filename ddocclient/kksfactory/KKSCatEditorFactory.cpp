@@ -983,14 +983,19 @@ void KKSCatEditorFactory :: setLifeCycleIntoCategory (KKSCategory * c, QLineEdit
              SLOT (delLifeCycle (QWidget *, int, qint64, QString, QAbstractItemModel *, const QModelIndex&))
             );
     
-    if (!lcEditor || lcEditor->exec() != QDialog::Accepted)
+    if (!lcEditor)
         return;
-    int lcId = lcEditor->getID();
-    KKSLifeCycleEx * lc = loader->loadLifeCycle(lcId);
-    c->setLifeCycle (lc);
-    lE->setText(lc->name());
-    if (lc)
-        lc->release ();
+    if (lcEditor->exec() == QDialog::Accepted)
+    {
+        int lcId = lcEditor->getID();
+        KKSLifeCycleEx * lc = loader->loadLifeCycle(lcId);
+        c->setLifeCycle (lc);
+        lE->setText(lc->name());
+        if (lc)
+            lc->release ();
+    }
+    lcEditor->setParent(0);
+    delete lcEditor;
 }
 
 void KKSCatEditorFactory :: addLifeCycle (QWidget * editor, int idObject, const KKSCategory * c, QString tableName, int nTab, bool isModal, QAbstractItemModel * sRecMod)
@@ -998,14 +1003,17 @@ void KKSCatEditorFactory :: addLifeCycle (QWidget * editor, int idObject, const 
     Q_UNUSED (c);
     Q_UNUSED (tableName);
     Q_UNUSED (nTab);
+    Q_UNUSED (editor);
     qDebug () << __PRETTY_FUNCTION__;
     KKSLifeCycleEx * lc = new KKSLifeCycleEx (-1, QString(), QString());
     
-    kkslifecycleform * lcForm = new kkslifecycleform (lc, editor);
+    kkslifecycleform * lcForm = new kkslifecycleform (lc);//, editor);
     if (!lc || !lcForm || lcForm->exec() != QDialog::Accepted)
     {
         if (lc)
             lc->release ();
+        if (lcForm)
+            delete lcForm;
     }
     this->ppf->insertLifeCycle (lcForm->getLC());
     lcForm->setParent (0);
@@ -1019,14 +1027,17 @@ void KKSCatEditorFactory :: editLifeCycle (QWidget * editor, int idObject, qint6
     Q_UNUSED (tableName);
     Q_UNUSED (nTab);
     Q_UNUSED (idObject);
+    Q_UNUSED (editor);
     qDebug () << __PRETTY_FUNCTION__;
     KKSLifeCycleEx * lc = loader->loadLifeCycle(idObjE);
     
-    kkslifecycleform * lcForm = new kkslifecycleform (lc, editor);
+    kkslifecycleform * lcForm = new kkslifecycleform (lc);//, editor);
     if (!lc || !lcForm || lcForm->exec() != QDialog::Accepted)
     {
         if (lc)
             lc->release ();
+        if (lcForm)
+            delete lcForm;
     }
     this->ppf->updateLifeCycle (lcForm->getLC());
     lcForm->setParent (0);
@@ -1038,103 +1049,9 @@ void KKSCatEditorFactory :: delLifeCycle (QWidget * editor, int idObject, qint64
 {
     Q_UNUSED (tableName);
     qDebug () << __PRETTY_FUNCTION__;
+    ppf->deleteLifeCycle(idObjE);
+    int row = recIndex.row();
+    QModelIndex pInd = recIndex.parent();
+    recModel->removeRows (row, 1, pInd);
 }
-/*
-void KKSCatEditorFactory :: loadAttrsRefs (KKSAttribute * attr, KKSAttrEditor * aEditor)
-{
-    QString val_ref = QString("select id from io_categories where id_io_category_type in (1,2,8,9)"); // ,2,8,9
-    QString attrCode = "id_io_category";
-
-    KKSList<const KKSFilterGroup *> filterGroupsRefs = KKSViewFactory::AttrRefsFilters (loader, attrCode, val_ref);
-    QMap<int, QString> io_refs = KKSViewFactory::loadAttrRefs (loader, filterGroupsRefs);
-    qDebug () << __PRETTY_FUNCTION__ << io_refs;
-
-    int ind = -1;
-    int i = 0;
-    int idRef = -1;
-    for (QMap<int, QString>::const_iterator pio = io_refs.constBegin(); pio != io_refs.constEnd() && ind < 0; pio++)
-    {
-        KKSObject *io = loader->loadIO (pio.key());
-        if(!io)
-            continue;
-
-        if (io->tableName() == attr->tableName())
-        {
-            qDebug () << __PRETTY_FUNCTION__ << attr->tableName() << io->id() << i << pio.value() << pio.key();
-            ind = i;
-            idRef = pio.key();//io->id ();
-            aEditor->setCurrentRef (pio.value());//ind);
-        }
-        i++;
-        io->release ();
-    }
-
-    if (ind >= 0)
-        loadAttrsRefFields (attr, idRef, aEditor);
-}
-
-void KKSCatEditorFactory :: loadAttrsRefFields (KKSAttribute * attr, int idRef, KKSAttrEditor * aEditor)
-{
-    if (!attr || !aEditor)
-        return;
-
-    KKSObject *io = loader->loadIO (idRef);
-    if (!io)
-        return;
-
-    KKSCategory *c = io->category()->tableCategory ();
-    if (!c)
-    {
-        io->release ();
-        return;
-    }
-
-    QMap<QString, QString> fields;
-    for (KKSMap<int, KKSCategoryAttr*>::const_iterator pc = c->attributes().constBegin(); pc != c->attributes().constEnd(); pc++)
-        fields.insert (pc.value()->code(), pc.value()->code ());//name ());
-
-    qDebug () << __PRETTY_FUNCTION__ << fields;
-    aEditor->setIO (io);
-    aEditor->uploadReferenceFields (fields);
-    io->release ();
-}
-
-void KKSCatEditorFactory :: findAttributes (int idAttrs, KKSAttributesEditor * attrsEditor)
-{
-    if (idAttrs < 0 || !attrsEditor)
-        return;
-
-    KKSObject * o = loader->loadIO (idAttrs);
-    if(!o)
-        return;
-
-    KKSCategory * c = o->category()->tableCategory();
-    if(!c){
-        o->release();
-        return;
-    }
-
-    bool forIO = false;
-    KKSMap<int, KKSAttribute*> attrs;
-
-    KKSFiltersEditorForm * f = new KKSFiltersEditorForm (c, attrs, forIO, attrsEditor);
-    if (f->exec() == QDialog::Accepted)
-    {
-        KKSList<KKSTemplate*> tListDb = loader->loadCategoryTemplates (c);
-        const KKSTemplate * t = (tListDb.empty() ? new KKSTemplate (c->defTemplate()) : tListDb[0]);
-        KKSList<const KKSFilterGroup *> filters;
-        filters = f->filters();
-        
-        //если используем фильтры для справочника ИО, то из него надо исключить системные справочники и журналы
-        //они доступны только администратору или из специальных точек доступа
-        KKSViewFactory::loadEIOEx (attrsEditor, o, loader, t, attrsEditor->getView (), filters);
-        if (tListDb.empty())
-            t->release();
-    }
-    delete f;
-
-    o->release();
-
-}
-*/
 
