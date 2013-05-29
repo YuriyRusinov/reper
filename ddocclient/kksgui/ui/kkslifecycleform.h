@@ -17,6 +17,7 @@ namespace Ui
     class kks_life_cycle_form;
 };
 
+class QLineEdit;
 class KKSLifeCycleEx;
 
 class _GUI_EXPORT kkslifecycleform : public QDialog
@@ -31,6 +32,9 @@ private slots:
     void lcAccept (void);
     void setState (void);
     void clearState (void);
+
+signals:
+    void loadState (KKSLifeCycleEx * lc, QLineEdit * le);
 
 private:
     //
