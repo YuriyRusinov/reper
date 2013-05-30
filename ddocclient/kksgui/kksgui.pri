@@ -76,6 +76,7 @@ HEADERS += \
                 ui/attrhistory.h \
                 ui/savesearchtemplateform.h \
                 ui/kkslifecycleform.h \
+                ui/kksstateform.h \
 		kkscmdjournallv.h \
 		kkscmdjournalitem.h \
 		kksmsgjournallv.h \
@@ -165,6 +166,7 @@ SOURCES += \
                 ui/attrhistory.cpp \
                 ui/savesearchtemplateform.cpp \
                 ui/kkslifecycleform.cpp \
+                ui/kksstateform.cpp \
 		kkscmdjournallv.cpp \
 		kkscmdjournalitem.cpp \
 		kksmsgjournallv.cpp \
@@ -198,7 +200,8 @@ FORMS   += \
                 ui/kksattr_value_props_form.ui \
                 ui/attr_history.ui \
                 ui/save_search_template_form.ui \
-                ui/kks_life_cycle_form.ui
+                ui/kks_life_cycle_form.ui \
+                ui/kks_state_form.ui
 
 headers.files += \
                 KKSAttrCheckListWidget.h \
@@ -275,6 +278,7 @@ headers.files += \
                 ui/IndicatorForm.h \
                 ui/savesearchtemplateform.h \
                 ui/kkslifecycleform.h \
+                ui/kksstateform.h \
 		kkscmdjournallv.h \
 		kkscmdjournalitem.h \
 		kksmsgjournallv.h \
