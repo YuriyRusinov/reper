@@ -966,7 +966,7 @@ KKSObjectExemplar * KKSLoader::loadEIO(qint64 id,
         if(io->id() <= _MAX_SYS_IO_ID_)
             sql = QString("select last_update, unique_id, %1 from %2 where id = %3").arg(fields).arg(tableName).arg(id);
         else
-            sql = QString("select id_io_state, uuid_t, last_update, unique_id, %1 from %2 where id = %3").arg(fields).arg(tableName).arg(id);
+            sql = QString("select id_io_state, uuid_t, last_update, unique_id, r_icon, record_fill_color, record_text_color, %1 from %2 where id = %3").arg(fields).arg(tableName).arg(id);
     }
 
     qDebug() << __PRETTY_FUNCTION__ << sql;
@@ -1004,16 +1004,37 @@ KKSObjectExemplar * KKSLoader::loadEIO(qint64 id,
     if(s)
         s->release();
 
+    QString rIcon; 
+
     if(io->id() <= _MAX_SYS_IO_ID_){
         eio->setLastUpdate(res->getCellAsDateTime(0, 0));
         eio->setUniqueId(res->getCellAsString(0, 1));
+        rIcon = KKSObjectExemplar::defIconAsString();
+        eio->setIcon(rIcon);
         i = 2;
     }
     else{
         eio->setUuid(res->getCellAsString(0, 1));
         eio->setLastUpdate(res->getCellAsDateTime(0, 2));
         eio->setUniqueId(res->getCellAsString(0, 3));
-        i = 4;
+        eio->setIcon(res->getCellAsString(0, 4));
+        QColor bkcolor = QColor();//res->getCell (0, 20).value<QColor>();//QColor::fromRgba ();
+        if (res->getCell (0, 5).isValid())
+        {
+            unsigned int vlc = res->getCellAsInt64(0, 5);
+            bkcolor = QColor::fromRgba (vlc);
+            eio->setRecordFillColor(bkcolor);
+        }
+
+        QColor fgcolor = QColor();//.value<QColor>();//QColor::;
+        if (res->getCell (0, 6).isValid())
+        {
+            unsigned int vltc = res->getCellAsInt64(0, 6);
+            fgcolor = QColor::fromRgba (vltc);
+            eio->setRecordTextColor(fgcolor);
+        }
+
+        i = 7;
     }
 
     
@@ -1943,8 +1964,15 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
         attrsWith1 = tableName + ".id, " + tableName + ".unique_id, " + tableName + ".last_update "; //колонки в подзапросе нерекурсивной части предложения WITH
     }
     else{
-        attrsWith = "id, unique_id, last_update, uuid_t, id_io_state ";
-        attrsWith1 = tableName + ".id, " + tableName + ".unique_id, " + tableName + ".last_update, " + tableName + ".uuid_t, " + tableName + ".id_io_state "; //колонки в подзапросе нерекурсивной части предложения WITH
+        attrsWith = "id, unique_id, last_update, uuid_t, id_io_state, r_icon, record_fill_color, record_text_color ";
+        attrsWith1 = tableName + ".id, " + 
+                     tableName + ".unique_id, " + 
+                     tableName + ".last_update, " + 
+                     tableName + ".uuid_t, " + 
+                     tableName + ".id_io_state ," + 
+                     tableName + ".r_icon, " + 
+                     tableName + ".record_fill_color, " + 
+                     tableName + ".record_text_color "; //колонки в подзапросе нерекурсивной части предложения WITH
     }
     
     
@@ -1971,6 +1999,12 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
         if(a->code() == "id_io_state")
             continue;
         if(a->code() == "uuid_t")
+            continue;
+        if(a->code() == "r_icon")
+            continue;
+        if(a->code() == "record_fill_color")
+            continue;
+        if(a->code() == "record_text_color")
             continue;
         
         if(a->type()->attrType() == KKSAttrType::atCheckListEx)
@@ -2157,7 +2191,7 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
                                 .arg(joinWord)
                                 .arg (isXml ? QString() : QString("distinct"))
                                 .arg(exTablesStr)
-                                .arg(isSys ? QString("") : QString(", %1.uuid_t, %1.id_io_state").arg(tableName));//.arg(fromWord).arg(joinWord);//.arg(whereWord);
+                                .arg(isSys ? QString("") : QString(", %1.uuid_t, %1.id_io_state, %1.r_icon, %1.record_fill_color, %1.record_text_color ").arg(tableName));//.arg(fromWord).arg(joinWord);//.arg(whereWord);
             
             if(!filterWhere.isEmpty())
                 sql += filterWhere;
@@ -2184,7 +2218,7 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
                               .arg(withAttrs)
                               .arg(withJoinWord)
                               .arg(exTablesStr)
-                              .arg(isSys ? QString("") : QString(", %1.uuid_t, %1.id_io_state").arg(withTableName));
+                              .arg(isSys ? QString("") : QString(", %1.uuid_t, %1.id_io_state, %1.r_icon, %1.record_fill_color, %1.record_text_color").arg(withTableName));
             if(!filterWhere.isEmpty())
                 sql += filterWhere;
             
@@ -2316,7 +2350,16 @@ KKSMap<qint64, KKSEIOData *> KKSLoader::loadEIOList(const KKSCategory * c0,
             QString code = QString(res->getColumnName(column));//использование названия колонки для ключа QMap в классе KKSEIOData допустимо
             QString value = res->getCellAsString(row, column);
             
-            if(code == "ii_rec_order" || code == "id" || code == "unique_id" || code == "last_update" || code == "uuid_t" || code == "id_io_state"){
+            if(code == "ii_rec_order" || 
+               code == "id" || 
+               code == "unique_id" || 
+               code == "last_update" || 
+               code == "uuid_t" || 
+               code == "id_io_state" || 
+               code == "r_icon" || 
+               code == "record_fill_color" || 
+               code == "record_text_color")
+            {
                 eio->addSysField(code, value);
             }
 
@@ -2440,7 +2483,16 @@ KKSList<KKSEIOData *> KKSLoader::loadEIOList1(const KKSCategory * c0,
             QString code = QString(res->getColumnName(column));//использование названия колонки для ключа QMap в классе KKSEIOData допустимо
             QString value = res->getCellAsString(row, column);
             
-            if(code == "ii_rec_order" || code == "id" || code == "unique_id" || code == "last_update" || code == "uuid_t" || code == "id_io_state"){
+            if(code == "ii_rec_order" || 
+               code == "id" || 
+               code == "unique_id" || 
+               code == "last_update" || 
+               code == "uuid_t" || 
+               code == "id_io_state" || 
+               code == "r_icon" || 
+               code == "record_fill_color" || 
+               code == "record_text_color")
+            {
                 eio->addSysField(code, value);
             }
 

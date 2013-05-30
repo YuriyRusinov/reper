@@ -90,23 +90,23 @@ private:
                      QWidget * parent = NULL) const;
     int deleteRecord(KKSObjectExemplar* eio, const QString& table=QString()) const;
 
-    qint64 generateInsertQuery(int idState,
-                               const QString & tableName, 
-                               const KKSMap<int, KKSCategoryAttr *> & attrs, 
-                               const KKSList<KKSAttrValue *> & attrValues, 
+    qint64 generateInsertQuery(const KKSRecord * rec,
+                               const QString & tableName,
+                               const KKSMap<int, KKSCategoryAttr *> & attrs,
+                               const KKSList<KKSAttrValue *> & attrValues,
                                QString & query,
                                QString & exQuery, 
                                bool bImported = false,
-                               bool isSys = false) const; //если true, то заносятся данные в системный справлчник, а значит у них нет полей uuid_t, id_io_state
+                               bool isSys = false) const; //если true, то заносятся данные в системный справлчник, а значит у них нет полей uuid_t, id_io_state, r_icon
     
-    qint64 generateUpdateQuery(int idState,
+    qint64 generateUpdateQuery(const KKSRecord * rec,
                                const QString & tableName, 
                                const KKSMap<int, KKSCategoryAttr *> & attrs, 
                                const KKSList<KKSAttrValue *> & attrValues, 
                                qint64 id,
                                QString & query,
                                QString & exQuery,
-                               bool isSys = false) const; //если true, то заносятся данные в системный справлчник, а значит у них нет полей uuid_t, id_io_state
+                               bool isSys = false) const; //если true, то заносятся данные в системный справлчник, а значит у них нет полей uuid_t, id_io_state, r_icon
     
     qint64 getNextSeq(QString tableName, QString idColumn = QString("id")) const;
 

@@ -187,7 +187,14 @@ int KKSEIOFactory::insertRecord(KKSObjectExemplar* eio,
     }
     
     //данный метод генерит реальный SQL-запрос в БД на инсерт в таблицу
-    qint64 id = generateInsertQuery(eio->state()->id(), tableName, attrs, attrValues, query, exQuery, bImported, io->id() <= _MAX_SYS_IO_ID_ ? true : false);
+    qint64 id = generateInsertQuery(eio, 
+                                    tableName, 
+                                    attrs, 
+                                    attrValues, 
+                                    query, 
+                                    exQuery, 
+                                    bImported, 
+                                    io->id() <= _MAX_SYS_IO_ID_ ? true : false);
     if(id == ERROR_CODE || query.isEmpty())
         return ERROR_CODE;
 
@@ -298,7 +305,14 @@ int KKSEIOFactory::updateRecord(KKSObjectExemplar* eio,
     }
 
     //данный метод генерит реальный SQL-запрос в БД на апдейт в таблицу
-    qint64 id = generateUpdateQuery(eio->state()->id(), tableName, attrs, attrValues, eio->id(), query, exQuery, io->id() <= _MAX_SYS_IO_ID_ ? true : false);
+    qint64 id = generateUpdateQuery(eio,
+                                    tableName, 
+                                    attrs, 
+                                    attrValues, 
+                                    eio->id(), 
+                                    query, 
+                                    exQuery, 
+                                    io->id() <= _MAX_SYS_IO_ID_ ? true : false);
     if(id == ERROR_CODE || (query.isEmpty() && exQuery.isEmpty()))
         return ERROR_CODE;
 
@@ -419,7 +433,7 @@ int KKSEIOFactory::deleteRecord(KKSObjectExemplar* eio, const QString& table) co
 //INSERT INTO <tableName> (id, <attributes>) values (idValue, <attr_values>);
 //при этом делается запрос к БД с целью получения idValue
 //метод возвращает идентификатор записи, который получит новый ЭИО при выполнении сгенерированного запроса
-qint64 KKSEIOFactory::generateInsertQuery(int idState,
+qint64 KKSEIOFactory::generateInsertQuery(const KKSRecord * rec,
                                           const QString & tableName, 
                                           const KKSMap<int, KKSCategoryAttr *> & attrs, 
                                           const KKSList<KKSAttrValue *> & attrValues, 
@@ -716,9 +730,22 @@ qint64 KKSEIOFactory::generateInsertQuery(int idState,
     }
 
     //добавляем состояние, если надо
-    int idS = idState;
-    if(idS <= 0)
-        idS = 1;
+    int idState = 1;
+    if(rec && rec->state()){
+        idState = rec->state()->id();
+    }
+    
+    QString rIcon = KKSRecord::defIconAsString();
+    if(rec){
+        rIcon = rec->iconAsString();
+    }
+    
+    qint64 fillColor = -1;
+    qint64 textColor = -1;
+    if(rec){
+        fillColor = rec->recordFillColor().rgba();
+        textColor = rec->recordTextColor().rgba();
+    }
     
     if(isSys){
         if(attrArray.trimmed().isEmpty())
@@ -727,10 +754,26 @@ qint64 KKSEIOFactory::generateInsertQuery(int idState,
             query = QString("INSERT INTO %1 (id, %2) VALUES (%3, %4);").arg(tableName).arg(attrArray).arg(idValue).arg(valueArray);
     }
     else{
-        if(attrArray.trimmed().isEmpty())
-            query = QString("INSERT INTO %1 (id, id_io_state) VALUES (%2, %3);").arg(tableName).arg(idValue).arg(idS);
-        else
-            query = QString("INSERT INTO %1 (id, id_io_state, %2) VALUES (%3, %5, %4);").arg(tableName).arg(attrArray).arg(idValue).arg(valueArray).arg(idS);
+        if(attrArray.trimmed().isEmpty()){
+            query = QString("INSERT INTO %1 (id, id_io_state, r_icon, record_fill_color, record_text_color) VALUES (%2, %3, %4, %5::int8, %6::int8);")
+                            .arg(tableName)
+                            .arg(idValue)
+                            .arg(idState)
+                            .arg(rIcon.isEmpty() ? QString("NULL") : QString("'") + rIcon + QString("'"))
+                            .arg(fillColor < 0 ? QString("NULL") : QString::number(fillColor))
+                            .arg(textColor < 0 ? QString("NULL") : QString::number(textColor));
+        }
+        else{
+            query = QString("INSERT INTO %1 (id, id_io_state, r_icon, record_fill_color, record_text_color, %2) VALUES (%3, %5, %6, %7::int8, %8::int8, %4);")
+                            .arg(tableName)
+                            .arg(attrArray)
+                            .arg(idValue)
+                            .arg(valueArray)
+                            .arg(idState)
+                            .arg(rIcon.isEmpty() ? QString("NULL") : QString("'") + rIcon + QString("'"))
+                            .arg(fillColor < 0 ? QString("NULL") : QString::number(fillColor))
+                            .arg(textColor < 0 ? QString("NULL") : QString::number(textColor));
+        }
     }
 
     return idValue;
@@ -739,7 +782,7 @@ qint64 KKSEIOFactory::generateInsertQuery(int idState,
 //генерится SQL-запрос следующего вида:
 //UPDATE <tableName> SET (<attribute1=value1, ...>) where id = <id>;
 //метод возвращает OK_CODE при успехе
-qint64 KKSEIOFactory::generateUpdateQuery(int idState, 
+qint64 KKSEIOFactory::generateUpdateQuery(const KKSRecord * rec,
                                           const QString & tableName, 
                                           const KKSMap<int, KKSCategoryAttr *> & attrs, 
                                           const KKSList<KKSAttrValue *> & attrValues, 
@@ -849,17 +892,41 @@ qint64 KKSEIOFactory::generateUpdateQuery(int idState,
 
     
     //добавляем состояние, если надо
-    int idS = idState;
-    if(idS <= 0)
-        idS = 1;
+    int idState = 1;
+    if(rec && rec->state()){
+        idState = rec->state()->id();
+    }
+    
+    QString rIcon = KKSRecord::defIconAsString();
+    if(rec){
+        rIcon = rec->iconAsString();
+    }
+
+    qint64 fillColor = -1;
+    qint64 textColor = -1;
+    if(rec){
+        fillColor = rec->recordFillColor().rgba();
+        textColor = rec->recordTextColor().rgba();
+    }
 
     if(isSys){
         if(!attrArray.trimmed().isEmpty())
-            query = QString("UPDATE %1 SET %2 WHERE id = %3::int8;").arg(tableName).arg(attrArray).arg(idEIO);
+            query = QString("UPDATE %1 SET %2 WHERE id = %3::int8;")
+                            .arg(tableName)
+                            .arg(attrArray)
+                            .arg(idEIO);
     }
     else{
-        if(!attrArray.trimmed().isEmpty())
-            query = QString("UPDATE %1 SET id_io_state = %2, %3 WHERE id = %4::int8;").arg(tableName).arg(idS).arg(attrArray).arg(idEIO);            
+        if(!attrArray.trimmed().isEmpty()){
+            query = QString("UPDATE %1 SET id_io_state = %2, r_icon = %5, record_fill_color = %6::int8, record_text_color = %7::int8, %3 WHERE id = %4::int8;")
+                            .arg(tableName)
+                            .arg(idState)
+                            .arg(attrArray)
+                            .arg(idEIO)
+                            .arg(rIcon.isEmpty() ? QString("NULL") : QString("'") + rIcon + QString("'"))
+                            .arg(fillColor < 0 ? QString("NULL") : QString::number(fillColor))
+                            .arg(textColor < 0 ? QString("NULL") : QString::number(textColor));
+        }
     }
 
     return OK_CODE;

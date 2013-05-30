@@ -44,8 +44,6 @@ KKSObject::KKSObject() : KKSRecord(),
     //m_othersPrivilege(NULL),
     m_aclE (0),
     m_addTables (KKSMap<QString, KKSCategory *>()),
-    m_recordFillColor(QColor()),
-    m_recordTextColor(QColor()),
     m_idSearchTemplate(-1),
     m_refTableName(QString())
 {
@@ -75,8 +73,6 @@ KKSObject::KKSObject(int id, KKSCategory * c, const QString & name, const QStrin
     //m_othersPrivilege(NULL),
     m_aclE (0),
     m_addTables (KKSMap<QString, KKSCategory *>()),
-    m_recordFillColor(QColor()),
-    m_recordTextColor(QColor()),
     m_idSearchTemplate(-1),
     m_refTableName(QString())
 {
@@ -118,8 +114,6 @@ KKSObject::KKSObject(const KKSObject & io) : KKSRecord(io),
     //m_othersPrivilege(NULL),
     m_aclE (io.m_aclE),
     m_addTables (KKSMap<QString, KKSCategory *>()),
-    m_recordFillColor(io.recordFillColor()),
-    m_recordTextColor(io.recordTextColor()),
     m_idSearchTemplate(io.m_idSearchTemplate),
     m_refTableName(io.m_refTableName)
 {
@@ -1007,25 +1001,6 @@ void KKSObject::setReplicatedOrgsV(const KKSValue & v)
     }
 }
 
-const QColor & KKSObject::recordFillColor() const
-{
-    return m_recordFillColor;
-}
-
-void KKSObject::setRecordFillColor(const QColor & color)
-{
-    m_recordFillColor = color;
-}
-
-const QColor & KKSObject::recordTextColor() const
-{
-    return m_recordTextColor;
-}
-
-void KKSObject::setRecordTextColor(const QColor & color)
-{
-    m_recordTextColor = color;
-}
 
 int KKSObject::idSearchTemplate() const
 {
@@ -1181,6 +1156,7 @@ const KKSIndicatorValue * KKSObject::indicatorValueId(int indId) const
     return av;
 }
 
+/*
 QIcon KKSObject :: icon (void) const
 {
     return m_icon;
@@ -1199,3 +1175,4 @@ const QString & KKSObject :: iconAsString () const
 {
     return m_iconData;
 }
+*/

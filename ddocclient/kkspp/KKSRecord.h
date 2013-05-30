@@ -10,6 +10,8 @@
 
 #include <QString>
 #include <QDateTime>
+#include <QIcon>
+#include <QColor>
 
 #include "kkspp_config.h"
 #include "KKSData.h"
@@ -21,65 +23,77 @@ class _PP_EXPORT KKSRecord : public KKSData
 {
 public:
 
-   qint64 id(void) const;
-   virtual void setId(qint64 newId);
+    qint64 id(void) const;
+    virtual void setId(qint64 newId); 
 
-   const QDateTime & lastUpdate() const;
-   virtual void setLastUpdate(const QDateTime & l);
+    const QDateTime & lastUpdate() const;
+    virtual void setLastUpdate(const QDateTime & l);
    
-   const KKSState * state () const;
-   KKSState * state ();
-   virtual void setState(KKSState * s);
+    const KKSState * state () const;
+    KKSState * state ();
+    virtual void setState(KKSState * s);
    
-   const QString & uuid() const;
-   virtual void setUuid(const QString & u);
+    const QString & uuid() const;
+    virtual void setUuid(const QString & u);
 
-   const QString & uniqueId() const;
-   virtual void setUniqueId(const QString & u);
+    const QString & uniqueId() const;
+    virtual void setUniqueId(const QString & u);
     
+    QIcon icon (void) const;
+    void setIcon (const QString & s);
+    const QString & iconAsString () const;    
+    static const QString defIconAsString();
     
-    
+    const QColor & recordFillColor() const;
+    void setRecordFillColor(const QColor & color);
+    const QColor & recordTextColor() const;
+    void setRecordTextColor(const QColor & color);
+
     /* Возвращает название записи (ИО или экз. ИО) */
-   const QString & name(void) const;
-   virtual void setName(const QString & newName);
-   const QString & desc(void) const;
-   virtual void setDesc(const QString & newDesc);
-   const QString & code(bool quoted = false) const;
-   virtual void setCode(const QString & newCode);
+    const QString & name(void) const;
+    virtual void setName(const QString & newName);
+    const QString & desc(void) const;
+    virtual void setDesc(const QString & newDesc);
+    const QString & code(bool quoted = false) const;
+    virtual void setCode(const QString & newCode);
 
 
-   virtual void setParent(KKSRecord * p);
-   const KKSRecord * parent() const;
-   KKSRecord * parent();
+    virtual void setParent(KKSRecord * p);
+    const KKSRecord * parent() const;
+    KKSRecord * parent();
    
-   KKSRecord();
-   KKSRecord(const KKSRecord & r);
-   KKSRecord(qint64 id, const QString & name, const QString & desc = QString::null, const QString & code = QString::null, bool isKKSState = false);
-   virtual ~KKSRecord();
+    KKSRecord();
+    KKSRecord(const KKSRecord & r);
+    KKSRecord(qint64 id, const QString & name, const QString & desc = QString::null, const QString & code = QString::null, bool isKKSState = false);
+    virtual ~KKSRecord();
 
 protected:
 private:
-   qint64 m_id;//рабочий идентификатор записи, который используется в системе поддержания ссылочной целостности (первичный ключ)
-   QDateTime m_lastUpdate;//дата и время последнего изменения записи
-   KKSState * m_state; //состояние, в котором находится запись. По умолчанию = KKSState::defState1()
-   QString m_uuid; //уникальый идентификатор записи в системе генерации уникальных идентификаторов uuid-ossp
-   QString m_uniqueId; //уникальный идентификатор записи в системе генерации уникальных идентификаторов DynamicDocs
+    qint64 m_id;//рабочий идентификатор записи, который используется в системе поддержания ссылочной целостности (первичный ключ)
+    QDateTime m_lastUpdate;//дата и время последнего изменения записи
+    KKSState * m_state; //состояние, в котором находится запись. По умолчанию = KKSState::defState1()
+    QString m_uuid; //уникальый идентификатор записи в системе генерации уникальных идентификаторов uuid-ossp
+    QString m_uniqueId; //уникальный идентификатор записи в системе генерации уникальных идентификаторов DynamicDocs
 
-   bool m_isKKSState;
+    bool m_isKKSState;
    
+    QIcon m_icon;//иконка для каждого ЭИО из несистемного справочника. Для системных справочников, а также для тех, где иконка не задана приобретает дефолтное значение KKSObjectExemplar::defIcon
+    QString m_iconData;//строковое представление иконки. Вся работа по обмену с БД происходит именно через эту переменную
    
+    QColor m_recordFillColor;//цвет фона при отображении записи в табличном виде
+    QColor m_recordTextColor;//цвет текста при отображении записи в табличном виде
    
-   QString m_name;
+    QString m_name;
 
-   //Атрибут может описывать поле таблицы. 
-   //В этом случае удобно разделить понятие "Название" и "Название Колонки Таблицы". 
-   //Данное поле хранит "Название Колонки Таблицы"
-   QString m_code;
-   QString m_quotedCode;
+    //Атрибут может описывать поле таблицы. 
+    //В этом случае удобно разделить понятие "Название" и "Название Колонки Таблицы". 
+    //Данное поле хранит "Название Колонки Таблицы"
+    QString m_code;
+    QString m_quotedCode;
 
-   QString m_desc;
+    QString m_desc;
    
-   KKSRecord* m_parent;
+    KKSRecord* m_parent;
 
 
 

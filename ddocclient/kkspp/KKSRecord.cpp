@@ -112,6 +112,49 @@ void KKSRecord::setUniqueId(const QString & u)
     m_uniqueId = u;
 }
 
+QIcon KKSRecord :: icon (void) const
+{
+    return m_icon;
+}
+
+void KKSRecord :: setIcon (const QString & s)
+{
+    QPixmap px;
+    px.loadFromData(s.toUtf8());
+
+    m_icon = QIcon(px);
+    m_iconData = s;
+}
+
+const QString & KKSRecord :: iconAsString () const
+{
+    return m_iconData;
+}
+
+const QString KKSRecord :: defIconAsString ()
+{
+    return QString::null;
+}
+
+const QColor & KKSRecord::recordFillColor() const
+{
+    return m_recordFillColor;
+}
+
+void KKSRecord::setRecordFillColor(const QColor & color)
+{
+    m_recordFillColor = color;
+}
+
+const QColor & KKSRecord::recordTextColor() const
+{
+    return m_recordTextColor;
+}
+
+void KKSRecord::setRecordTextColor(const QColor & color)
+{
+    m_recordTextColor = color;
+}
 
 ////////////////////////////////////////////////////////////////////////
 // Name:       KKSRecord::getDesc()
@@ -171,12 +214,16 @@ void KKSRecord::setCode(const QString & newCode)
 // Return:     
 ////////////////////////////////////////////////////////////////////////
 
-KKSRecord::KKSRecord()
+KKSRecord::KKSRecord():
+m_recordFillColor(QColor()),
+m_recordTextColor(QColor())
 {
     m_id = -1;
     m_uuid = QString::null;
     m_uniqueId = QString::null;
     m_state = KKSState::defState1();
+    
+    setIcon(KKSRecord::defIconAsString());
 
     m_name = QString::null;
     m_code = QString::null;
@@ -184,7 +231,9 @@ KKSRecord::KKSRecord()
     m_isKKSState = false;
 }
 
-KKSRecord::KKSRecord(const KKSRecord & r)
+KKSRecord::KKSRecord(const KKSRecord & r) :
+m_recordFillColor(r.recordFillColor()),
+m_recordTextColor(r.recordTextColor())
 {
     m_id = r.id();
     m_lastUpdate = r.lastUpdate();
@@ -195,6 +244,9 @@ KKSRecord::KKSRecord(const KKSRecord & r)
     m_state = NULL;
     setState(const_cast<KKSState *>(r.state()));
 
+    m_icon = r.m_icon;
+    m_iconData = r.m_iconData;
+
     m_name = r.name();
     setCode(r.code());
     //m_code = r.code();
@@ -203,7 +255,9 @@ KKSRecord::KKSRecord(const KKSRecord & r)
     setParent(const_cast<KKSRecord*>(r.parent()));
 }
 
-KKSRecord::KKSRecord(qint64 _id, const QString & _name, const QString & _desc, const QString & _code, bool isKKSState)
+KKSRecord::KKSRecord(qint64 _id, const QString & _name, const QString & _desc, const QString & _code, bool isKKSState) :
+m_recordFillColor(QColor()),
+m_recordTextColor(QColor())
 {
     m_id = _id;
     m_uuid = QString::null;
@@ -214,6 +268,8 @@ KKSRecord::KKSRecord(qint64 _id, const QString & _name, const QString & _desc, c
         m_state = NULL;
     else
         m_state = KKSState::defState1();
+
+    setIcon(KKSRecord::defIconAsString());
 
     m_name = _name;
     setCode(_code);

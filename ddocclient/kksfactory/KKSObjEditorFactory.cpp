@@ -8457,23 +8457,71 @@ void KKSObjEditorFactory :: putSystemParams (KKSObjectExemplar * recio,
     scSysArea->setWidget (pSysPW);
     QGridLayout * gLay = new QGridLayout (scSysArea);
 
+    QGroupBox * gb1 = new QGroupBox(tr("Name:"), pSysPW);
+    QGroupBox * gb2 = new QGroupBox(tr("Visualization:"), pSysPW);
+    QGroupBox * gb3 = new QGroupBox(tr("Identification:"), pSysPW);
+    QList<QGroupBox *> gbList;
+    gbList.append(gb1);
+    gbList.append(gb2);
+    gbList.append(gb3);
+    
+    QGridLayout * gbLay1 = new QGridLayout(gb1);
+    QGridLayout * gbLay2 = new QGridLayout(gb2);
+    QGridLayout * gbLay3 = new QGridLayout(gb3);
+    QList<QGridLayout *> gbLayList;
+    gbLayList.append(gbLay1);
+    gbLayList.append(gbLay2);
+    gbLayList.append(gbLay3);
+
+    gLay->addWidget(gb1, 0, 0, 1, 1);
+    gLay->addWidget(gb2, 1, 0, 1, 1);
+    gLay->addWidget(gb3, 2, 0, 1, 1);
+
+
     QStringList lSysNames;
-    lSysNames << tr("Identificator :")
-              << tr("Unique Identificator :")
-              << tr("State Identificator :")
-              << tr("Name :")
-              << tr("Last update :")
-              << tr("unique_id :");
+    lSysNames << tr("ID: ")
+              << tr("Name: ")
+              << tr("State: ")
+              << tr("Icon: ")
+              << tr("Fill color: ")
+              << tr("Text color: ")
+              << tr("Unique ID (UUID_OSSP): ")
+              << tr("DunamicDocs UID: ")
+              << tr("Last update: ");
+
     int n = lSysNames.count ();
     for (int i=0; i<n; i++)
     {
-        QLabel * l = new QLabel (lSysNames[i], pSysPW);
-        gLay->addWidget(l, i, 0, 1, 1);//, Qt::AlignRight | Qt::AlignVCenter);
+        QGroupBox *currentGroupBox = NULL;
+        QGridLayout * currentLayout = NULL;
+
+        int index = 0;
+        if(i <= 2){
+            currentGroupBox = gbList.at(0);
+            currentLayout = gbLayList.at(0);
+            index = i;
+        }
+        else if(i <= 5){
+            currentGroupBox = gbList.at(1);
+            currentLayout = gbLayList.at(1);
+            index = i-3;
+        }
+        else{
+            currentGroupBox = gbList.at(2);
+            currentLayout = gbLayList.at(2);
+            index = i-5;
+        }
+
+        QLabel * l = new QLabel (lSysNames[i], currentGroupBox);
+
+        currentLayout->addWidget(l, index, 0, 1, 1);//, Qt::AlignRight | Qt::AlignVCenter);
+
         QWidget * lE = 0;
-        if(i==4)
-            lE = new QDateTimeEdit (pSysPW);
+        if(i == 8)
+            lE = new QDateTimeEdit (currentGroupBox);
         else
-            lE = new QLineEdit (pSysPW);
+            lE = new QLineEdit (currentGroupBox);
+        
         QHBoxLayout * edLay = new QHBoxLayout;
         if (qobject_cast<QLineEdit *>(lE))
             (qobject_cast<QLineEdit *>(lE))->setReadOnly(true);
@@ -8484,21 +8532,27 @@ void KKSObjEditorFactory :: putSystemParams (KKSObjectExemplar * recio,
         switch (i)
         {
             case 0: (qobject_cast<QLineEdit *>(lE))->setText (QString::number(recio->id())); break;
-            case 1: (qobject_cast<QLineEdit *>(lE))->setText (recio->uuid()); break;
+            case 1: (qobject_cast<QLineEdit *>(lE))->setText (recio->name()); break;
             case 2:
             {
-                QToolButton * tbState = new QToolButton (pSysPW);
+                QToolButton * tbState = new QToolButton (currentGroupBox);
                 edLay->addWidget (tbState);
                 const KKSState * st = recio->state();
                 (qobject_cast<QLineEdit *>(lE))->setText (st->name());
                 break;
             }
-            case 4: (qobject_cast<QDateTimeEdit *>(lE))->setDateTime (recio->lastUpdate()); break;
-            case 5: (qobject_cast<QLineEdit *>(lE))->setText (recio->uniqueId()); break;
+            case 3: (qobject_cast<QLineEdit *>(lE))->setText (recio->iconAsString()); break;
+            case 4: (qobject_cast<QLineEdit *>(lE))->setText (QString::number((int)(recio->recordFillColor().rgba()))); break;
+            case 5: (qobject_cast<QLineEdit *>(lE))->setText (QString::number((int)(recio->recordTextColor().rgba()))); break;
+            case 6: (qobject_cast<QLineEdit *>(lE))->setText (recio->uuid()); break;
+            case 7: (qobject_cast<QLineEdit *>(lE))->setText (recio->uniqueId()); break;
+            case 8: (qobject_cast<QDateTimeEdit *>(lE))->setDateTime (recio->lastUpdate()); break;
             default: break;
         }
-        gLay->addLayout(edLay, i, 1, 1, 1);//, Qt::AlignJustify | Qt::AlignVCenter);
+
+        currentLayout->addLayout(edLay, index, 1, 1, 1);//, Qt::AlignJustify | Qt::AlignVCenter);
     }
+
     gLay->setRowStretch(n, 1);
     tabObj->insertTab(pageNum, pSysWidget, tr("System parameters"));
 }

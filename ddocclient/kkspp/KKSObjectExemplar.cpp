@@ -457,3 +457,4 @@ const KKSFile * KKSObjectExemplar::file(int index) const
 
     return f;
 }
+

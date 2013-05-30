@@ -93,6 +93,8 @@ public:
     KKSFile * file(int index);
     const KKSFile * file(int index) const;
 
+
+
 protected:
 private:
     friend class KKSEIOFactory;

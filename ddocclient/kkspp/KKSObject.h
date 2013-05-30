@@ -12,7 +12,6 @@
 #include <KKSRecord.h>
 #include <KKSList.h>
 #include <KKSMap.h>
-#include <QIcon>
 #include <QDateTime>
 #include <QColor>
 #include <string>
@@ -109,15 +108,6 @@ class _PP_EXPORT KKSObject : public KKSRecord
 
         int ownerOrg() const;
         void setOwnerOrg(int id);
-
-        const QColor & recordFillColor() const;
-        void setRecordFillColor(const QColor & color);
-        const QColor & recordTextColor() const;
-        void setRecordTextColor(const QColor & color);
-        
-        void setIcon(const QString & s);
-        QIcon icon() const;
-        const QString & iconAsString() const;
 
         int idSearchTemplate() const;
         void setIdSearchTemplate(int idSt);
@@ -246,9 +236,7 @@ class _PP_EXPORT KKSObject : public KKSRecord
          * (добавлять, удалять, изменять) их экземпляры ИО. */
         bool m_isSystem;
 
-        QIcon m_icon;//иконка информационного объекта
-        QString m_iconData;//строковое представление иконки. Вся работа по обмену с БД происходит именно через эту переменную
-        
+       
         bool m_isGlobal;//определяет глобальность ИО. В информационном обмене могут участвовать только глобальные ИО
         
         /* Задает название таблицы БД, в которой хранятся ЭИО данного ИО */
@@ -257,9 +245,6 @@ class _PP_EXPORT KKSObject : public KKSRecord
         int m_idOrganization; //организация-владелец данного ИО
         QString m_info;
         int m_idMaclabel;//идентификатор грифа секретности из справочника грифов секретности
-
-        QColor m_recordFillColor;//цвет фона при отображении ИО в табличном виде
-        QColor m_recordTextColor;//цвет текста при отображении ИО в табличном виде
 
         bool m_modified;//флаг используется при определении необходимости вызова сохранения ИО в БД
         bool m_attrsModified;
