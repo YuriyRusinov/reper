@@ -1035,15 +1035,18 @@ void KKSObjEditor :: editObjectE (void)
 
     int idObjectE=-1;
     int i = tabEnclosures ? tabEnclosures->currentIndex () : 0;
+    QModelIndex recIndex;
     if (i == 0 && recWidget && recWidget->getID() > 0)
     {
         idObjectE = recWidget->getID();//index.data(Qt::UserRole).toInt();
         editRows.insert (idObjectE, recWidget->getSourceIndex().row());
+        recIndex = recWidget->getSourceIndex();
     }
     else if (i > 0 && i <= addCats.count())
     {
         idObjectE = addRecWidgets[i-1]->getID ();
         editRows.insert (idObjectE, addRecWidgets[i-1]->getSourceIndex().row());
+        recIndex = addRecWidgets[i-1]->getSourceIndex();
     }
     else
         return;
@@ -1089,7 +1092,7 @@ void KKSObjEditor :: editObjectE (void)
     QAbstractItemModel * sRecModel (0);
     if (rw)
         sRecModel = rw->getSourceModel ();
-    emit editObjectEx (this, idObject, idObjectE, c, tabName, i, false, sRecModel);
+    emit editObjectEx (this, idObject, idObjectE, c, tabName, i, false, sRecModel, recIndex);
 }
 
 void KKSObjEditor :: delObjectE (void)

@@ -2235,6 +2235,38 @@ KKSList<KKSEIOData *> KKSLoader::loadEIOList1(const KKSObject * io,
     return eioList;
 }
 
+KKSEIOData * KKSLoader::loadEIOInfo (int idObject, int idRec) const
+{
+    KKSObject * io = loadIO (idObject, true);
+    if (!io ||
+        !io->id() || 
+        !io->category() || 
+        !io->category()->id() || 
+        !io->category()->tableCategory() ||
+        !io->category()->tableCategory()->id()
+    )
+    {
+        return 0;
+    }
+    
+    const KKSCategory * ct = io->category()->tableCategory();
+    const KKSFilter * f = ct->createFilter(1, QString("select id from %1 where id=%2").arg(io->tableName()).arg(idRec), KKSFilter::foInSQL);
+    KKSList<const KKSFilter*> filters;
+    filters.append(f);
+    f->release ();
+    KKSFilterGroup * fg = new KKSFilterGroup(true);
+    fg->setFilters (filters);
+    KKSList<const KKSFilterGroup *> fList;
+    fList.append(fg);
+    fg->release ();
+    KKSMap<qint64, KKSEIOData *> recInfoList = loadEIOList (io, fList);
+    KKSEIOData * recInfo = recInfoList.value(idRec);
+    if (recInfo)
+        recInfo->addRef ();
+    recInfoList.clear();
+    io->release ();
+    return recInfo;
+}
 
 KKSMap<qint64, KKSEIOData *> KKSLoader::loadEIOList(const KKSCategory * c0, 
                                                  const QString& tableName,

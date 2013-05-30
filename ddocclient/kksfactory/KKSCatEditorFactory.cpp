@@ -966,16 +966,18 @@ void KKSCatEditorFactory :: setLifeCycleIntoCategory (KKSCategory * c, QLineEdit
                                                              true,
                                                              Qt::WindowModal);
     
-    lcEditor->disconnect(objf);//disconnect (lcEditor);
+    lcEditor->disconnect(SIGNAL (newObjectEx (QWidget*, int, const KKSCategory *, QString, int, bool, QAbstractItemModel *)), objf, SLOT (createNewEditor(QWidget*, int, const KKSCategory *, QString, int, bool, QAbstractItemModel *)));//disconnect (lcEditor);
+    lcEditor->disconnect(SIGNAL (editObjectEx (QWidget*, int, qint64, const KKSCategory *, QString, int, bool, QAbstractItemModel *, const QModelIndex& )), objf, SLOT (editExistOE (QWidget*, int, qint64, const KKSCategory *, QString, int, bool, QAbstractItemModel *, const QModelIndex&)));
+    lcEditor->disconnect(SIGNAL (delObjectEx (QWidget*, int, qint64, QString, QAbstractItemModel *, const QModelIndex&)), objf, SLOT (deleteOE (QWidget*, int, qint64, QString, QAbstractItemModel *, const QModelIndex&)));
     connect (lcEditor,
              SIGNAL (newObjectEx (QWidget*, int, const KKSCategory *, QString, int, bool, QAbstractItemModel *)),
              this,
              SLOT (addLifeCycle (QWidget *, int, const KKSCategory *, QString, int, bool, QAbstractItemModel *))
             );
     connect (lcEditor,
-             SIGNAL (editObjectEx (QWidget*, int, qint64, const KKSCategory *, QString, int, bool, QAbstractItemModel * )),
+             SIGNAL (editObjectEx (QWidget*, int, qint64, const KKSCategory *, QString, int, bool, QAbstractItemModel *, const QModelIndex& )),
              this,
-             SLOT (editLifeCycle (QWidget *, int, qint64, const KKSCategory *, QString, int, bool, QAbstractItemModel * ))
+             SLOT (editLifeCycle (QWidget *, int, qint64, const KKSCategory *, QString, int, bool, QAbstractItemModel *, const QModelIndex& ))
             );
     connect (lcEditor,
              SIGNAL (delObjectEx (QWidget*, int, qint64, QString, QAbstractItemModel *, const QModelIndex&)),
@@ -989,8 +991,14 @@ void KKSCatEditorFactory :: setLifeCycleIntoCategory (KKSCategory * c, QLineEdit
     {
         int lcId = lcEditor->getID();
         KKSLifeCycleEx * lc = loader->loadLifeCycle(lcId);
+        if (!lc)
+        {
+            lcEditor->setParent(0);
+            delete lcEditor;
+        }
         c->setLifeCycle (lc);
-        lE->setText(lc->name());
+        if (lE)
+            lE->setText(lc->name());
         if (lc)
             lc->release ();
     }
@@ -1003,7 +1011,6 @@ void KKSCatEditorFactory :: addLifeCycle (QWidget * editor, int idObject, const 
     Q_UNUSED (c);
     Q_UNUSED (tableName);
     Q_UNUSED (nTab);
-    Q_UNUSED (editor);
     qDebug () << __PRETTY_FUNCTION__;
     KKSLifeCycleEx * lc = new KKSLifeCycleEx (-1, QString(), QString());
     
@@ -1016,19 +1023,31 @@ void KKSCatEditorFactory :: addLifeCycle (QWidget * editor, int idObject, const 
             delete lcForm;
         return;
     }
-    this->ppf->insertLifeCycle (lcForm->getLC());
+    int ier = this->ppf->insertLifeCycle (lcForm->getLC());
+    if (ier < 0)
+    {
+        QMessageBox::warning (editor, tr("Add new life cycle"), tr ("Cannot add new life cycle. Database error"), QMessageBox::Ok);
+        lcForm->setParent (0);
+        delete lcForm;
+        lc->release ();
+        return;
+    }
+    int nr = sRecMod->rowCount();
+    sRecMod->insertRows(nr, 1);
+    QModelIndex recIndex = sRecMod->index (nr, 0);
+    KKSEIOData * lcInfo = this->loader->loadEIOInfo (idObject, lcForm->getLC()->id());
+    sRecMod->setData (recIndex, QVariant::fromValue<KKSEIOData *>(lcInfo), Qt::UserRole+1);
+    
     lcForm->setParent (0);
     delete lcForm;
     lc->release ();
 }
 
-void KKSCatEditorFactory :: editLifeCycle (QWidget * editor, int idObject, qint64 idObjE, const KKSCategory * c, QString tableName, int nTab, bool isModal, QAbstractItemModel * sRecMod)
+void KKSCatEditorFactory :: editLifeCycle (QWidget * editor, int idObject, qint64 idObjE, const KKSCategory * c, QString tableName, int nTab, bool isModal, QAbstractItemModel * sRecMod, const QModelIndex& recIndex)
 {
     Q_UNUSED (c);
     Q_UNUSED (tableName);
     Q_UNUSED (nTab);
-    Q_UNUSED (idObject);
-    Q_UNUSED (editor);
     qDebug () << __PRETTY_FUNCTION__;
     KKSLifeCycleEx * lc = loader->loadLifeCycle(idObjE);
     
@@ -1041,7 +1060,17 @@ void KKSCatEditorFactory :: editLifeCycle (QWidget * editor, int idObject, qint6
             delete lcForm;
         return;
     }
-    this->ppf->updateLifeCycle (lcForm->getLC());
+    int ier = this->ppf->updateLifeCycle (lcForm->getLC());
+    if (ier < 0)
+    {
+        QMessageBox::warning (editor, tr("Edit life cycle"), tr ("Cannot update life cycle. Database error"), QMessageBox::Ok);
+        lcForm->setParent (0);
+        delete lcForm;
+        lc->release ();
+        return;
+    }
+    KKSEIOData * lcInfo = this->loader->loadEIOInfo (idObject, lcForm->getLC()->id());
+    sRecMod->setData (recIndex, QVariant::fromValue<KKSEIOData *>(lcInfo), Qt::UserRole+1);
     lcForm->setParent (0);
     delete lcForm;
     lc->release ();
@@ -1051,7 +1080,12 @@ void KKSCatEditorFactory :: delLifeCycle (QWidget * editor, int idObject, qint64
 {
     Q_UNUSED (tableName);
     qDebug () << __PRETTY_FUNCTION__;
-    ppf->deleteLifeCycle(idObjE);
+    int ier = ppf->deleteLifeCycle(idObjE);
+    if (ier < 0)
+    {
+        QMessageBox::warning (editor, tr("Remove life cycle"), tr ("Cannot delete life cycle. Database error"), QMessageBox::Ok);
+        return;
+    }
     int row = recIndex.row();
     QModelIndex pInd = recIndex.parent();
     recModel->removeRows (row, 1, pInd);

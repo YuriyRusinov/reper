@@ -1560,7 +1560,7 @@ void KKSObjEditorFactory :: setObjConnect (KKSObjEditor *editor)
     connect (editor, SIGNAL (saveObjAsCommandResult(KKSObjEditor*, KKSObject*, KKSObjectExemplar*, int, QAbstractItemModel *)), this, SLOT (saveObjectAsCommandResult(KKSObjEditor*, KKSObject*, KKSObjectExemplar*, int, QAbstractItemModel *)) );
     connect (editor, SIGNAL (saveObjE(KKSObjEditor*, KKSObjectExemplar *, const KKSCategory*, QString, int, QAbstractItemModel *)), this, SLOT (saveObjectEx(KKSObjEditor*, KKSObjectExemplar *, const KKSCategory*, QString, int, QAbstractItemModel *)) );
     connect (editor, SIGNAL (newObjectEx (QWidget*, int, const KKSCategory *, QString, int, bool, QAbstractItemModel *)), this, SLOT (createNewEditor(QWidget*, int, const KKSCategory *, QString, int, bool, QAbstractItemModel *)) );
-    connect (editor, SIGNAL (editObjectEx (QWidget*, int, qint64, const KKSCategory *, QString, int, bool, QAbstractItemModel *)), this, SLOT (editExistOE (QWidget*, int, qint64, const KKSCategory *, QString, int, bool, QAbstractItemModel *)) );
+    connect (editor, SIGNAL (editObjectEx (QWidget*, int, qint64, const KKSCategory *, QString, int, bool, QAbstractItemModel *, const QModelIndex&)), this, SLOT (editExistOE (QWidget*, int, qint64, const KKSCategory *, QString, int, bool, QAbstractItemModel *, const QModelIndex&)) );
     connect (editor, SIGNAL (delObjectEx (QWidget*, int, qint64, QString, QAbstractItemModel *, const QModelIndex& )), this, SLOT (deleteOE (QWidget*, int, qint64, QString, QAbstractItemModel *, const QModelIndex&)) );
     connect (editor, SIGNAL (filterObjectEx (KKSObjEditor*, int, const KKSCategory *, QString)), this, SLOT (filterEIO (KKSObjEditor*, int, const KKSCategory *, QString)) );
     connect (editor, SIGNAL (refreshObjectEx (KKSObjEditor*, int, const KKSCategory *, QString, QAbstractItemModel *)), this, SLOT (refreshEIO (KKSObjEditor*, int, const KKSCategory *, QString, QAbstractItemModel *)) );
@@ -2560,8 +2560,9 @@ void KKSObjEditorFactory :: createNewEditorParam (QWidget * editor, int idObject
  * nTab -- номер вкладки в редакторе, где произошел вызов
  * isModal -- флаг модальности
  */
-void KKSObjEditorFactory :: editExistOE (QWidget * editor, int idObject, qint64 idObjEx, const KKSCategory * c0, QString tableName, int nTab, bool isModal, QAbstractItemModel * recModel)
+void KKSObjEditorFactory :: editExistOE (QWidget * editor, int idObject, qint64 idObjEx, const KKSCategory * c0, QString tableName, int nTab, bool isModal, QAbstractItemModel * recModel, const QModelIndex& recIndex)
 {
+    Q_UNUSED (recIndex);
     const KKSCategory *c = 0;//t ? t->category() : 0;
     KKSObject * io = NULL;
 

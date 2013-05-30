@@ -111,6 +111,8 @@ class _F_EXPORT KKSLoader
                                               const KKSList<const KKSFilterGroup *> filters = KKSList<const KKSFilterGroup*>(),
                                               bool isSys = false) const;//если true, то загружаются данные из системного справлчника, а значит у них нет полей uuid_t, id_state
         
+        KKSEIOData * loadEIOInfo (int idObject, int idRec) const;
+        
         //просто данные в этих методах возвращаются в виде QList, а не QMap
         KKSList<KKSEIOData *> loadEIOList1(const KKSObject * io, 
                                            const KKSList<const KKSFilterGroup *> filters = KKSList<const KKSFilterGroup*>()) const;
