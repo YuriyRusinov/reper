@@ -49,7 +49,8 @@ KKSPixmap :: ~KKSPixmap (void)
 void KKSPixmap :: setVal (const QString & newXPM)
 {
     QVariant v (newXPM);
-    emit valueChanged (m_av->id(), m_isSystem, v);
+    if(m_av)
+        emit valueChanged (m_av->id(), m_isSystem, v);
 }
 
 //void KKSPixmap :: setValPrivate ()
@@ -103,7 +104,8 @@ void KKSPixmap::openFile()
     QVariant v;
     QByteArray ba = save();
     v = QVariant(ba);
-    emit valueChanged (m_av->id(), m_isSystem, v);
+    if(m_av)
+        emit valueChanged (m_av->id(), m_isSystem, v);
 }
 
 void KKSPixmap::setPixmapPrivate()

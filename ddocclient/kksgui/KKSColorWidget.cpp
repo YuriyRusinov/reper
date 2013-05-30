@@ -10,13 +10,19 @@
 
 #include <KKSAttrValue.h>
 #include <KKSCategoryAttr.h>
-#include <KKSAttrType.h>
 #include "KKSColorWidget.h"
 
-KKSColorWidget :: KKSColorWidget (const KKSAttrValue *attr, KKSIndAttr::KKSIndAttrClass isSys, QColor rgb_col, QWidget *parent, Qt::WindowFlags flags)
-    : QWidget (parent, flags), KKSAttrWidget(attr, isSys),
+KKSColorWidget :: KKSColorWidget (const KKSAttrValue *attr, 
+                                  KKSIndAttr::KKSIndAttrClass isSys, 
+                                  QColor rgb_col,
+                                  KKSAttrType::KKSAttrTypes type,
+                                  QWidget *parent, 
+                                  Qt::WindowFlags flags): 
+    QWidget (parent, flags), 
+    KKSAttrWidget(attr, isSys),
     lSampleText (new QLabel (tr("Sample text"), this)),
-    tbColor (new QToolButton (this))
+    tbColor (new QToolButton (this)),
+    m_type(type)
 {
     QHBoxLayout * hLay = new QHBoxLayout (this);
     hLay->addWidget (lSampleText);
@@ -51,7 +57,8 @@ void KKSColorWidget :: setColor (void)
     }
     qDebug () << __PRETTY_FUNCTION__ << QVariant(rgb_col.rgba());
     
-    emit valueChanged (m_av->id(), m_isSystem, QVariant (rgb_col.rgba()));
+    if(m_av)
+        emit valueChanged (m_av->id(), m_isSystem, QVariant (rgb_col.rgba()));
     setColor (rgb_col);
 }
 
@@ -63,8 +70,8 @@ void KKSColorWidget :: setColor (QColor rgb_col)
         return;
     }
 
-    if (m_av->attribute()->type()->attrType() == KKSAttrType::atRecordColor ||
-        m_av->attribute()->type()->attrType() == KKSAttrType::atRecordColorRef)
+    if (m_type == KKSAttrType::atRecordColor ||
+        m_type == KKSAttrType::atRecordColorRef)
     {
         QColor bkCol (rgb_col);
         QPalette pal (bkCol);//= lSampleText->palette ();
@@ -73,8 +80,8 @@ void KKSColorWidget :: setColor (QColor rgb_col)
         lSampleText->setPalette (pal);
         lSampleText->setAutoFillBackground (true);
     }
-    else if (m_av->attribute()->type()->attrType() == KKSAttrType::atRecordTextColor ||
-             m_av->attribute()->type()->attrType() == KKSAttrType::atRecordTextColorRef)
+    else if (m_type == KKSAttrType::atRecordTextColor ||
+             m_type == KKSAttrType::atRecordTextColorRef)
     {
         QColor fgCol (rgb_col);
         QPalette pal = lSampleText->palette ();

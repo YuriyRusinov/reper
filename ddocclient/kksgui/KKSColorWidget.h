@@ -12,6 +12,7 @@
 #include <QVariant>
 #include <QColor>
 #include "KKSAttrWidget.h"
+#include <KKSAttrType.h>
 #include "kksgui_config.h"
 
 class QLabel;
@@ -22,7 +23,12 @@ class KKSAttrValue;
 class _GUI_EXPORT KKSColorWidget : public QWidget, public KKSAttrWidget
 {
 public:
-    KKSColorWidget (const KKSAttrValue *attr, KKSIndAttr::KKSIndAttrClass isSys, QColor rgb_col, QWidget *parent=NULL, Qt::WindowFlags flags=0);
+    KKSColorWidget (const KKSAttrValue *attr, 
+                    KKSIndAttr::KKSIndAttrClass isSys, 
+                    QColor rgb_col, 
+                    KKSAttrType::KKSAttrTypes type,
+                    QWidget *parent=NULL, 
+                    Qt::WindowFlags flags=0);
     virtual ~KKSColorWidget (void);
 
     void hideToolButton (void);
@@ -41,6 +47,7 @@ private:
     //
     QLabel * lSampleText;
     QToolButton * tbColor;
+    KKSAttrType::KKSAttrTypes m_type;
 
 private:
     Q_OBJECT

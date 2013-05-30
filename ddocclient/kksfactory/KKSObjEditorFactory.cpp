@@ -84,6 +84,8 @@
 #include <KKSAttrRefWidget.h>
 #include <KKSPrivilege.h>
 #include <KKSEdit.h>
+#include <KKSPixmap.h>
+#include <KKSColorWidget.h>
 #include <rubricform.h>
 #include "KKSPrerender.h"
 #include "kksdatabase.h"
@@ -8516,19 +8518,57 @@ void KKSObjEditorFactory :: putSystemParams (KKSObjectExemplar * recio,
 
         currentLayout->addWidget(l, index, 0, 1, 1);//, Qt::AlignRight | Qt::AlignVCenter);
 
-        QWidget * lE = 0;
-        if(i == 8)
-            lE = new QDateTimeEdit (currentGroupBox);
-        else
-            lE = new QLineEdit (currentGroupBox);
-        
         QHBoxLayout * edLay = new QHBoxLayout;
+        QWidget * lE = 0;
+
+        if(i == 8){
+            lE = new QDateTimeEdit (currentGroupBox);
+            edLay->addWidget (lE);
+        }
+        else if(i == 3){
+            lE = new KKSPixmap(NULL, KKSIndAttr::iacEIOSysAttr, recio->iconAsString(), currentGroupBox);
+            edLay->addWidget(lE, Qt::AlignCenter | Qt::AlignVCenter);
+            l->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
+            ((KKSPixmap *)lE)->setAlignment( Qt::AlignCenter | Qt::AlignVCenter);
+            lE->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
+
+            QToolButton *tbRef = new QToolButton ();
+            tbRef->setMinimumHeight (20);
+            tbRef->setText ("...");
+            QObject::connect (tbRef, SIGNAL(pressed()), lE, SLOT(openFile()));
+            edLay->addWidget (tbRef);
+            lE->setMinimumHeight (20);
+        }
+        else if(i == 4 || i == 5){
+
+            QColor rgb_color;
+            if(i == 4){
+                rgb_color = recio->recordFillColor();
+                lE = new KKSColorWidget(NULL, KKSIndAttr::iacEIOSysAttr, rgb_color, KKSAttrType::atRecordColor, currentGroupBox);
+            }
+            else{
+                rgb_color = recio->recordTextColor();
+                lE = new KKSColorWidget(NULL, KKSIndAttr::iacEIOSysAttr, rgb_color, KKSAttrType::atRecordTextColor, currentGroupBox);
+
+            }
+
+            QSizePolicy hPwt (QSizePolicy::Expanding, QSizePolicy::Fixed);//Expanding);
+            lE->setSizePolicy (hPwt);
+            lE->setMinimumHeight (20);
+            edLay->addWidget (lE, Qt::AlignCenter);
+
+        }
+        else{
+            lE = new QLineEdit (currentGroupBox);
+            edLay->addWidget (lE);
+        }
+        
         if (qobject_cast<QLineEdit *>(lE))
             (qobject_cast<QLineEdit *>(lE))->setReadOnly(true);
         else if (qobject_cast<QDateTimeEdit *>(lE))
             (qobject_cast<QDateTimeEdit *>(lE))->setReadOnly(true);
                 
-        edLay->addWidget (lE);
+        
         switch (i)
         {
             case 0: (qobject_cast<QLineEdit *>(lE))->setText (QString::number(recio->id())); break;
@@ -8536,14 +8576,15 @@ void KKSObjEditorFactory :: putSystemParams (KKSObjectExemplar * recio,
             case 2:
             {
                 QToolButton * tbState = new QToolButton (currentGroupBox);
+                tbState->setText(tr("..."));
                 edLay->addWidget (tbState);
                 const KKSState * st = recio->state();
                 (qobject_cast<QLineEdit *>(lE))->setText (st->name());
                 break;
             }
-            case 3: (qobject_cast<QLineEdit *>(lE))->setText (recio->iconAsString()); break;
-            case 4: (qobject_cast<QLineEdit *>(lE))->setText (QString::number((int)(recio->recordFillColor().rgba()))); break;
-            case 5: (qobject_cast<QLineEdit *>(lE))->setText (QString::number((int)(recio->recordTextColor().rgba()))); break;
+            //case 3: (qobject_cast<QLineEdit *>(lE))->setText (recio->iconAsString()); break;
+            //case 4: (qobject_cast<QLineEdit *>(lE))->setText (QString::number((int)(recio->recordFillColor().rgba()))); break;
+            //case 5: (qobject_cast<QLineEdit *>(lE))->setText (QString::number((int)(recio->recordTextColor().rgba()))); break;
             case 6: (qobject_cast<QLineEdit *>(lE))->setText (recio->uuid()); break;
             case 7: (qobject_cast<QLineEdit *>(lE))->setText (recio->uniqueId()); break;
             case 8: (qobject_cast<QDateTimeEdit *>(lE))->setDateTime (recio->lastUpdate()); break;

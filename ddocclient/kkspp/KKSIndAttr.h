@@ -37,7 +37,8 @@ public:
     {
         iacTableAttr = 0,
         iacIOUserAttr = 1,
-        iacEIOUserAttr = 2
+        iacEIOUserAttr = 2,
+        iacEIOSysAttr = 3
     };
     
     const QString & refColumnName(bool quoted = false) const;

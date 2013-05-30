@@ -1328,7 +1328,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                 if (V.toString().isEmpty())
                     rgb_color =  QColor ();
                 qDebug () << __PRETTY_FUNCTION__ << rgb_color << vlc << V;
-                attrWidget = new KKSColorWidget (av, isSystem, rgb_color);
+                attrWidget = new KKSColorWidget (av, isSystem, rgb_color, av->attribute()->type()->attrType());
                 if (isRef)
                     qobject_cast<KKSColorWidget *>(attrWidget)->hideToolButton ();
                 QSizePolicy hPwt (QSizePolicy::Expanding, QSizePolicy::Fixed);//Expanding);
