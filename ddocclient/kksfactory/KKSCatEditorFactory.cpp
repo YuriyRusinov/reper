@@ -1014,6 +1014,7 @@ void KKSCatEditorFactory :: addLifeCycle (QWidget * editor, int idObject, const 
             lc->release ();
         if (lcForm)
             delete lcForm;
+        return;
     }
     this->ppf->insertLifeCycle (lcForm->getLC());
     lcForm->setParent (0);
@@ -1038,6 +1039,7 @@ void KKSCatEditorFactory :: editLifeCycle (QWidget * editor, int idObject, qint6
             lc->release ();
         if (lcForm)
             delete lcForm;
+        return;
     }
     this->ppf->updateLifeCycle (lcForm->getLC());
     lcForm->setParent (0);

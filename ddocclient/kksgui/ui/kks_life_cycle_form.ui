@@ -129,7 +129,11 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="lEAutoStateAttribute"/>
+         <widget class="QLineEdit" name="lEAutoStateAttribute">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QToolButton" name="tbAutoStateAttribute">
@@ -160,7 +164,11 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="lEAutoStateIndicator"/>
+         <widget class="QLineEdit" name="lEAutoStateIndicator">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QToolButton" name="tbStateInd">

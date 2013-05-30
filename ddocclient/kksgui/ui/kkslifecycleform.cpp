@@ -27,9 +27,23 @@ kkslifecycleform::kkslifecycleform(KKSLifeCycleEx * lc, QWidget * parent, Qt::Wi
         const KKSState * st = lifeCycle->startState();
         UI->lEStartState->setText (st->name());
     }
+    if (lifeCycle->autoStateAttr())
+    {
+        const KKSState * st = lifeCycle->autoStateAttr();
+        UI->lEAutoStateAttribute->setText (st->name());
+    }
+    if (lifeCycle->autoStateInd())
+    {
+        const KKSState * st = lifeCycle->autoStateInd();
+        UI->lEAutoStateIndicator->setText (st->name());
+    }
 
     connect (UI->tbStartState, SIGNAL(clicked()), this, SLOT (setState()) );
     connect (UI->tbClearStartState, SIGNAL (clicked()), this, SLOT (clearState()) );
+    connect (UI->tbAutoStateAttribute, SIGNAL (clicked()), this, SLOT (setStateAttr()) );
+    connect (UI->tbClearAutoStateAttribute, SIGNAL (clicked()), this, SLOT (clearStateAttr()) );
+    connect (UI->tbStateInd, SIGNAL (clicked()), this, SLOT (setStateInd()) );
+    connect (UI->tbClearStateInd, SIGNAL (clicked()), this, SLOT (clearStateInd()) );
     connect (UI->pbOk, SIGNAL(clicked()), this, SLOT (lcAccept()));
     connect (UI->pbCancel, SIGNAL (clicked()), this, SLOT (reject()) );
 }
@@ -57,6 +71,28 @@ void kkslifecycleform::clearState (void)
 {
     UI->lEStartState->clear();
     lifeCycle->setStartState (0);
+}
+
+void kkslifecycleform::setStateAttr (void)
+{
+    emit loadStateAttribute (lifeCycle, UI->lEStartState);
+}
+
+void kkslifecycleform::setStateInd (void)
+{
+    emit loadStateInd (lifeCycle, UI->lEStartState);
+}
+
+void kkslifecycleform::clearStateAttr (void)
+{
+    UI->lEAutoStateAttribute->clear();
+    lifeCycle->setAutoStateAttr(0);
+}
+
+void kkslifecycleform::clearStateInd (void)
+{
+    UI->lEAutoStateIndicator->clear ();
+    lifeCycle->setAutoStateInd(0);
 }
 
 KKSLifeCycleEx * kkslifecycleform::getLC (void) const

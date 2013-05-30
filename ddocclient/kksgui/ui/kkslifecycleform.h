@@ -31,10 +31,16 @@ public:
 private slots:
     void lcAccept (void);
     void setState (void);
+    void setStateAttr (void);
+    void setStateInd (void);
     void clearState (void);
+    void clearStateAttr (void);
+    void clearStateInd (void);
 
 signals:
     void loadStartState (KKSLifeCycleEx * lc, QLineEdit * le);
+    void loadStateAttribute (KKSLifeCycleEx * lc, QLineEdit * le);
+    void loadStateInd (KKSLifeCycleEx * lc, QLineEdit * le);
 
 private:
     //
