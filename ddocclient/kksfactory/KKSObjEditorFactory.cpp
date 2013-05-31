@@ -8595,6 +8595,8 @@ void KKSObjEditorFactory :: putSystemParams (KKSObjectExemplar * recio,
                 QFont f = l->font();
                 f.setBold(true);
                 l->setFont(f);
+                editor->addListAttrWidget(tbState, lE, recio->attrValue(ATTR_ID_IO_STATE));
+                connect (tbState, SIGNAL (clicked()), editor, SLOT (setList()) );
                 break;
             }
             //case 3: (qobject_cast<QLineEdit *>(lE))->setText (recio->iconAsString()); break;
