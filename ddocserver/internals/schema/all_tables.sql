@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     24.05.2013 8:56:44                           */
+/* Created on:     31.05.2013 13:49:37                          */
 /*==============================================================*/
 
 
@@ -3026,6 +3026,9 @@ create table q_base_table (
    id                   BIGSERIAL            not null,
    id_io_state          INT4                 not null default 1,
    uuid_t               UUID                 not null,
+   r_icon               VARCHAR              null,
+   record_fill_color    INT8                 null,
+   record_text_color    INT8                 null,
    constraint PK_Q_BASE_TABLE primary key (id)
 )
 inherits (root_table);
