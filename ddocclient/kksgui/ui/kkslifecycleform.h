@@ -9,6 +9,7 @@
 #define	KKSLIFECYCLEFORM_H
 
 #include <QDialog>
+#include <QModelIndex>
 
 #include "kksgui_config.h"
 
@@ -18,6 +19,7 @@ namespace Ui
 };
 
 class QLineEdit;
+class QAbstractItemModel;
 class KKSLifeCycleEx;
 
 class _GUI_EXPORT kkslifecycleform : public QDialog
@@ -33,6 +35,10 @@ private slots:
     void setState (void);
     void setStateAttr (void);
     void setStateInd (void);
+
+    void addState (void);
+    void delState (void);
+
     void clearState (void);
     void clearStateAttr (void);
     void clearStateInd (void);
@@ -41,7 +47,13 @@ signals:
     void loadStartState (KKSLifeCycleEx * lc, QLineEdit * le);
     void loadStateAttribute (KKSLifeCycleEx * lc, QLineEdit * le);
     void loadStateInd (KKSLifeCycleEx * lc, QLineEdit * le);
+    void loadState (KKSLifeCycleEx * lc, QAbstractItemModel * stateMod);
 
+private:
+    //
+    // Functions
+    //
+    void initStates (void);
 private:
     //
     // Variables

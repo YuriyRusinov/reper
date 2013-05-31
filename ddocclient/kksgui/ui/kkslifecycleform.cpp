@@ -5,8 +5,13 @@
  * Created on 28 Май 2013 г., 15:24
  */
 
+#include <QAbstractItemModel>
+#include <QStandardItemModel>
+
 #include <KKSLifeCycle.h>
 #include <KKSState.h>
+#include <KKSMap.h>
+#include <KKSStateCross.h>
 #include "kkslifecycleform.h"
 #include "ui_kks_life_cycle_form.h"
 
@@ -37,13 +42,20 @@ kkslifecycleform::kkslifecycleform(KKSLifeCycleEx * lc, QWidget * parent, Qt::Wi
         const KKSState * st = lifeCycle->autoStateInd();
         UI->lEAutoStateIndicator->setText (st->name());
     }
+    this->initStates();
 
     connect (UI->tbStartState, SIGNAL(clicked()), this, SLOT (setState()) );
     connect (UI->tbClearStartState, SIGNAL (clicked()), this, SLOT (clearState()) );
+
     connect (UI->tbAutoStateAttribute, SIGNAL (clicked()), this, SLOT (setStateAttr()) );
     connect (UI->tbClearAutoStateAttribute, SIGNAL (clicked()), this, SLOT (clearStateAttr()) );
+
     connect (UI->tbStateInd, SIGNAL (clicked()), this, SLOT (setStateInd()) );
     connect (UI->tbClearStateInd, SIGNAL (clicked()), this, SLOT (clearStateInd()) );
+
+    connect (UI->tbAddState, SIGNAL (clicked()), this, SLOT (addState()) );
+    connect (UI->tbDelState, SIGNAL (clicked()), this, SLOT (delState()) );
+
     connect (UI->pbOk, SIGNAL(clicked()), this, SLOT (lcAccept()));
     connect (UI->pbCancel, SIGNAL (clicked()), this, SLOT (reject()) );
 }
@@ -98,4 +110,33 @@ void kkslifecycleform::clearStateInd (void)
 KKSLifeCycleEx * kkslifecycleform::getLC (void) const
 {
     return lifeCycle;
+}
+
+void kkslifecycleform::addState (void)
+{
+    
+}
+
+void kkslifecycleform::delState (void)
+{
+}
+
+void kkslifecycleform::initStates (void)
+{
+    int nStates (lifeCycle->states().size());
+    QAbstractItemModel * stateModel = new QStandardItemModel (nStates, 1);
+    stateModel->setHeaderData(0, Qt::Horizontal, tr("Available states"), Qt::DisplayRole);
+
+    int i=0;
+    for (KKSMap<int, KKSState*>::const_iterator ps=lifeCycle->states().constBegin();
+            ps != lifeCycle->states().constEnd();
+            ps++)
+    {
+        QModelIndex stInd = stateModel->index (i, 0);
+        KKSState * st = ps.value();
+        stateModel->setData(stInd, st->id(), Qt::UserRole);
+        stateModel->setData(stInd, st->name(), Qt::DisplayRole);
+        i++;
+    }
+    UI->tvStates->setModel (stateModel);
 }
