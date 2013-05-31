@@ -1572,6 +1572,7 @@ void KKSObjEditorFactory :: setObjConnect (KKSObjEditor *editor)
     connect (editor, SIGNAL (filterObjectTemplateEx (KKSObjEditor*, int, const KKSCategory *, QString)), this, SLOT (filterTemplateEIO (KKSObjEditor*, int, const KKSCategory *, QString)) );
     connect (editor, SIGNAL (updateEIO (KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *, const QItemSelection& )), this, SLOT (updateEIOView (KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *, const QItemSelection& )) );
     connect (editor, SIGNAL (loadAttrRef (QString, QWidget*, int)), this, SLOT (loadAttributeReference (QString, QWidget *, int)) );
+    connect (editor, SIGNAL (loadStateRef (KKSObjEditor*, QWidget *, KKSObjectExemplar *)), this, SLOT (setRecState(KKSObjEditor*, QWidget *, KKSObjectExemplar *)) );
     connect (editor, SIGNAL (setTemplate (KKSObjEditor*, KKSObject*)), this, SLOT (setEIOTemplates (KKSObjEditor*, KKSObject*)) );
     connect (editor, SIGNAL (importObjectEx (KKSObjEditor *, int, const KKSCategory *, QString, QAbstractItemModel *)), this, SLOT (importEIO (KKSObjEditor *, int, const KKSCategory *, QString, QAbstractItemModel *)) );
     connect (editor, SIGNAL (exportObjectEx (KKSObjEditor *, int, const KKSCategory *, QString, QAbstractItemModel *)), this, SLOT (exportEIO (KKSObjEditor *, int, const KKSCategory *, QString, QAbstractItemModel *)) );
@@ -3685,6 +3686,58 @@ void KKSObjEditorFactory :: loadAttributeReference (QString tableName, QWidget *
     recEditor->setParent (0);
     delete recEditor;
     refObj->release();
+}
+
+void KKSObjEditorFactory :: setRecState (KKSObjEditor * editor, QWidget * stateW, KKSObjectExemplar * wObjE)
+{
+    KKSObject *refObj = loader->loadIO (IO_STATE_ID, true);
+    if (!refObj)
+    {
+        return;
+    }
+    KKSCategory *c = refObj->category ();
+    if (!c){
+        refObj->release();
+        return;
+    }
+
+    //qDebug () << __PRETTY_FUNCTION__ << editor << refObj->id();
+
+    //aRefW->
+
+    KKSList<const KKSFilterGroup*> filters;
+    KKSObjEditor * recEditor = this->createObjRecEditor (IO_IO_ID, 
+                                                         refObj->id (), 
+                                                         //editor->m_filters, 
+                                                         filters,//KKSList<const KKSFilterGroup*>(), 
+                                                         "",
+                                                         c,
+                                                         true,
+                                                         false,
+                                                         Qt::WindowModal,
+                                                         editor, 
+                                                         Qt::Dialog);
+    if (!recEditor){
+        refObj->release();
+        return;
+    }
+
+    emit editorCreatedModal (recEditor);
+    
+    if (editor && stateW && recEditor->exec () == QDialog::Accepted)
+    {
+        int idState = recEditor->getID();
+        KKSState * st = loader->loadState(idState);
+        wObjE->setState (st);
+        if (st && qobject_cast<QLineEdit *>(stateW))
+            (qobject_cast<QLineEdit *>(stateW))->setText(st->name());
+        if (st)
+            st->release();
+        editor->attrValueChanged();
+    }
+    recEditor->setParent(0);
+    delete recEditor;
+    refObj->release ();
 }
 
 void KKSObjEditorFactory :: loadExecReference (QAbstractItemModel *exModel)
@@ -8491,7 +8544,7 @@ void KKSObjEditorFactory :: putSystemParams (KKSObjectExemplar * recio,
               << tr("Fill color: ")
               << tr("Text color: ")
               << tr("Unique ID (UUID_OSSP)*: ")
-              << tr("DunamicDocs UID*: ")
+              << tr("DynamicDocs UID*: ")
               << tr("Last update*: ");
 
     int n = lSysNames.count ();
@@ -8595,8 +8648,8 @@ void KKSObjEditorFactory :: putSystemParams (KKSObjectExemplar * recio,
                 QFont f = l->font();
                 f.setBold(true);
                 l->setFont(f);
-                editor->addListAttrWidget(tbState, lE, recio->attrValue(ATTR_ID_IO_STATE));
-                connect (tbState, SIGNAL (clicked()), editor, SLOT (setList()) );
+                editor->setStateWidget (lE);
+                connect (tbState, SIGNAL (clicked()), editor, SLOT (setStateList()) );
                 break;
             }
             //case 3: (qobject_cast<QLineEdit *>(lE))->setText (recio->iconAsString()); break;

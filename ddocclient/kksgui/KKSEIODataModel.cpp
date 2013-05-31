@@ -360,7 +360,7 @@ void KKSEIODataModel :: setupData (KKSTreeItem * parent)
             qDebug () << __PRETTY_FUNCTION__ << p.value()->sysFields();
             if (p.value())
             {
-                QString strIcon = p.value()->sysFieldValue("icon");
+                QString strIcon = p.value()->sysFieldValue("r_icon");
                 //qDebug () << __PRETTY_FUNCTION__ << strIcon;
                 QPixmap pIcon;
                 pIcon.loadFromData (strIcon.toUtf8());
@@ -400,7 +400,7 @@ void KKSEIODataModel :: setupData (KKSTreeItem * parent)
         QIcon tIcon;
         if (p.value())
         {
-            QString strIcon = p.value()->sysFieldValue("icon");
+            QString strIcon = p.value()->sysFieldValue("r_icon");
             qDebug () << __PRETTY_FUNCTION__ << strIcon;
             QPixmap pIcon;
             pIcon.loadFromData (strIcon.toUtf8());

@@ -353,6 +353,8 @@ private slots:
 
     void genUUID (int idAttr, const KKSAttrValue * av);
     void searchTemplateCategoryChanged (KKSSearchTemplate * st, int idCategory);
+    
+    void setRecState (KKSObjEditor * editor, QWidget * stateW, KKSObjectExemplar * wObjE);
 
 private:
     //

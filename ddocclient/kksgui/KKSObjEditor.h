@@ -146,6 +146,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void setEnableO (int state);
 
         void setList (void);
+        void setStateList (void);
         void childWidget (KKSObjEditor *editor);
         void setAttrView (void);
 
@@ -207,6 +208,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void saveObjAsCommandResult(KKSObjEditor*, KKSObject* wObj, KKSObjectExemplar * wObjEx, int num, QAbstractItemModel * recModel);
         
         void loadAttrRef (QString tableName, QWidget * awAttr, int attrId);//посылаем сигнал всегда с ИД атрибута. Поскольку используется в соответствующем слоте именно он
+        void loadStateRef (KKSObjEditor* editor, QWidget * stateW, KKSObjectExemplar * wObjEx);
         void setTemplate (KKSObjEditor* editor, KKSObject* wObj);
         void importObjectEx (KKSObjEditor * editor, int idObject, const KKSCategory * c, QString tableName, QAbstractItemModel * recModel);
         void exportObjectEx (KKSObjEditor * editor, int idObject, const KKSCategory * c, QString tableName, QAbstractItemModel * recModel);
@@ -328,6 +330,8 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void saveToDb (int num=1);
 
         void setIndicatorNumber (int num);
+        
+        void setStateWidget (QWidget * w);
 
     private:
         friend class KKSObjEditorFactory;
@@ -409,6 +413,8 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         QWidget *recIndWidget;
         QScrollArea *scRecInd;
         QWidget *recIndW;
+
+        QWidget * stateWidget;
 
         KKSRecWidget * recWidget;
         QList <KKSRecWidget *> addRecWidgets;

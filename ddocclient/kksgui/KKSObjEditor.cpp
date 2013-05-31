@@ -108,6 +108,7 @@ KKSObjEditor :: KKSObjEditor (const KKSTemplate *t,
     ioAttrWidget (0),
     scIOAttrs (0),
     ioAttrsW (0),
+    stateWidget (0),
     recWidget (0),
     fileWidget(0),
     includesWidget(0),
@@ -1634,6 +1635,11 @@ void KKSObjEditor :: setList (void)
 //    emit newObjectEx (this, refObj->id(), 0, true);
 }
 
+void KKSObjEditor :: setStateList (void)
+{
+    emit loadStateRef (this, stateWidget, pObjectEx);
+}
+
 void KKSObjEditor :: childWidget (KKSObjEditor *editor)
 {
     QObject *sObj = this->sender ();
@@ -2412,4 +2418,19 @@ void KKSObjEditor :: setRecordsModel (QAbstractItemModel * recMod)
         delete pRecModel;
     
     pRecModel = recMod;
+}
+
+void KKSObjEditor :: setStateWidget (QWidget * w)
+{
+    if (stateWidget == w)
+        return;
+    
+    if (stateWidget)
+    {
+        stateWidget->setParent(0);
+        delete stateWidget;
+    }
+    
+    stateWidget = w;
+    stateWidget->setParent (this);
 }
