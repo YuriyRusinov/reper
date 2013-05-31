@@ -39,7 +39,7 @@ private slots:
     void on_pbOpen_clicked();
     void on_pbDelete_clicked();
     
-    void on_tbAddFile_clicked();
+    void on_pbAddFile_clicked();
     void on_tbOpenFile_clicked();
     void on_pbAddFromServer_clicked();
     void twFilesDoubleClicked(const QModelIndex &);

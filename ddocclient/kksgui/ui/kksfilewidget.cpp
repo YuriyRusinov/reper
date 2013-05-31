@@ -260,7 +260,7 @@ void KKSFileWidget::on_pbDelete_clicked()
     emit fileListChanged();
 }
 
-void KKSFileWidget::on_tbAddFile_clicked()
+void KKSFileWidget::on_pbAddFile_clicked()
 {
     if(ui->lePath->text().isEmpty() || 
        ui->leName->text().isEmpty())

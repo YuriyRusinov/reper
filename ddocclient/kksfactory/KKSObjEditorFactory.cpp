@@ -595,7 +595,10 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
         gFilesLay->addWidget (W, 0, 0, 1, 1);
 
     }
-    this->putSystemParams(wObjE, objEditorWidget, tabObj, tabObj->count());
+
+    if(!io && wObjE->io()->id() > _MAX_SYS_IO_ID_ ){
+        this->putSystemParams(wObjE, objEditorWidget, tabObj, tabObj->count());
+    }
 
 
     if (mode)
@@ -8481,15 +8484,15 @@ void KKSObjEditorFactory :: putSystemParams (KKSObjectExemplar * recio,
 
 
     QStringList lSysNames;
-    lSysNames << tr("ID: ")
+    lSysNames << tr("ID*: ")
               << tr("Name: ")
-              << tr("State: ")
+              << tr("State*: ")
               << tr("Icon: ")
               << tr("Fill color: ")
               << tr("Text color: ")
-              << tr("Unique ID (UUID_OSSP): ")
-              << tr("DunamicDocs UID: ")
-              << tr("Last update: ");
+              << tr("Unique ID (UUID_OSSP)*: ")
+              << tr("DunamicDocs UID*: ")
+              << tr("Last update*: ");
 
     int n = lSysNames.count ();
     for (int i=0; i<n; i++)
@@ -8524,6 +8527,9 @@ void KKSObjEditorFactory :: putSystemParams (KKSObjectExemplar * recio,
         if(i == 8){
             lE = new QDateTimeEdit (currentGroupBox);
             edLay->addWidget (lE);
+            QFont f  = l->font();
+            f.setBold(true);
+            l->setFont(f);
         }
         else if(i == 3){
             lE = new KKSPixmap(NULL, KKSIndAttr::iacEIOSysAttr, recio->iconAsString(), currentGroupBox);
@@ -8571,7 +8577,13 @@ void KKSObjEditorFactory :: putSystemParams (KKSObjectExemplar * recio,
         
         switch (i)
         {
-            case 0: (qobject_cast<QLineEdit *>(lE))->setText (QString::number(recio->id())); break;
+            case 0: {
+                        (qobject_cast<QLineEdit *>(lE))->setText (QString::number(recio->id())); 
+                        QFont f = l->font();
+                        f.setBold(true);
+                        l->setFont(f);
+                        break;
+                    }
             case 1: (qobject_cast<QLineEdit *>(lE))->setText (recio->name()); break;
             case 2:
             {
@@ -8580,14 +8592,38 @@ void KKSObjEditorFactory :: putSystemParams (KKSObjectExemplar * recio,
                 edLay->addWidget (tbState);
                 const KKSState * st = recio->state();
                 (qobject_cast<QLineEdit *>(lE))->setText (st->name());
+                QFont f = l->font();
+                f.setBold(true);
+                l->setFont(f);
                 break;
             }
             //case 3: (qobject_cast<QLineEdit *>(lE))->setText (recio->iconAsString()); break;
             //case 4: (qobject_cast<QLineEdit *>(lE))->setText (QString::number((int)(recio->recordFillColor().rgba()))); break;
             //case 5: (qobject_cast<QLineEdit *>(lE))->setText (QString::number((int)(recio->recordTextColor().rgba()))); break;
-            case 6: (qobject_cast<QLineEdit *>(lE))->setText (recio->uuid()); break;
-            case 7: (qobject_cast<QLineEdit *>(lE))->setText (recio->uniqueId()); break;
-            case 8: (qobject_cast<QDateTimeEdit *>(lE))->setDateTime (recio->lastUpdate()); break;
+            case 6: 
+            {
+                (qobject_cast<QLineEdit *>(lE))->setText (recio->uuid()); 
+                QFont f = l->font();
+                f.setBold(true);
+                l->setFont(f);
+                break;
+            }
+            case 7: 
+            {
+                (qobject_cast<QLineEdit *>(lE))->setText (recio->uniqueId()); 
+                QFont f = l->font();
+                f.setBold(true);
+                l->setFont(f);
+                break;
+            }
+            case 8: 
+            {
+                (qobject_cast<QDateTimeEdit *>(lE))->setDateTime (recio->lastUpdate()); 
+                QFont f = l->font();
+                f.setBold(true);
+                l->setFont(f);
+                break;
+            }
             default: break;
         }
 
