@@ -15,6 +15,7 @@
 #include <KKSState.h>
 #include <KKSMap.h>
 #include <KKSStateCross.h>
+#include "KKSItemDelegate.h"
 #include "kkslifecycleform.h"
 #include "ui_kks_life_cycle_form.h"
 
@@ -149,4 +150,6 @@ void kkslifecycleform::initStates (void)
         i++;
     }
     UI->tvStates->setModel (stateModel);
+    QAbstractItemDelegate * iDeleg = new KKSItemDelegate();
+    UI->tvStates->setItemDelegate (iDeleg);
 }
