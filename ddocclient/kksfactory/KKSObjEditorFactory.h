@@ -52,6 +52,9 @@ class KKSIndicator;
 class KKSIndicatorValue;
 class KKSSearchTemplatesForm;
 class SaveSearchTemplateForm;
+class KKSLifeCycleEx;
+class kkslifecycleform;
+class kksstateform;
 
 class QScrollArea;
 class QGridLayout;
@@ -61,6 +64,7 @@ class QComboBox;
 class QToolBar;
 class QTabWidget;
 class QXmlStreamWriter;
+class QLineEdit;
 
 class _F_EXPORT KKSObjEditorFactory : public KKSEntityFactory
 {
@@ -355,6 +359,12 @@ private slots:
     void searchTemplateCategoryChanged (KKSSearchTemplate * st, int idCategory);
     
     void setRecState (KKSObjEditor * editor, QWidget * stateW, KKSObjectExemplar * wObjE);
+    
+    void loadLifeCycleState (KKSLifeCycleEx * lc, QLineEdit * le, int lcSt);
+    void addLifeCycleState (KKSLifeCycleEx * lc, QAbstractItemModel * stateMod);
+    
+    void addNewState (QWidget* editor, int idObject, const KKSCategory * c, QString tableName, int nTab, bool isModal, QAbstractItemModel * stateModel);
+    void editState (QWidget * editor, int idObject, qint64 idObjEx, const KKSCategory * c, QString tableName, int nTab, bool isModal, QAbstractItemModel * recModel=0, const QModelIndex& recIndex=QModelIndex());
 
 private:
     //

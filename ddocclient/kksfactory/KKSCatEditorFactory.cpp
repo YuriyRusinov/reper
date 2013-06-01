@@ -964,7 +964,7 @@ void KKSCatEditorFactory :: setLifeCycleIntoCategory (KKSCategory * c, QLineEdit
                                                              wCat,
                                                              true,
                                                              true,
-                                                             Qt::WindowModal);
+                                                             Qt::ApplicationModal);
     
     lcEditor->disconnect(SIGNAL (newObjectEx (QWidget*, int, const KKSCategory *, QString, int, bool, QAbstractItemModel *)), objf, SLOT (createNewEditor(QWidget*, int, const KKSCategory *, QString, int, bool, QAbstractItemModel *)));//disconnect (lcEditor);
     lcEditor->disconnect(SIGNAL (editObjectEx (QWidget*, int, qint64, const KKSCategory *, QString, int, bool, QAbstractItemModel *, const QModelIndex& )), objf, SLOT (editExistOE (QWidget*, int, qint64, const KKSCategory *, QString, int, bool, QAbstractItemModel *, const QModelIndex&)));
@@ -1011,10 +1011,21 @@ void KKSCatEditorFactory :: addLifeCycle (QWidget * editor, int idObject, const 
     Q_UNUSED (c);
     Q_UNUSED (tableName);
     Q_UNUSED (nTab);
+    Q_UNUSED (isModal);
     qDebug () << __PRETTY_FUNCTION__;
     KKSLifeCycleEx * lc = new KKSLifeCycleEx (-1, QString(), QString());
     
     kkslifecycleform * lcForm = new kkslifecycleform (lc);//, editor);
+    connect (lcForm,
+             SIGNAL (loadState (KKSLifeCycleEx *, QLineEdit *, int)),
+             this->objf,
+             SLOT (loadLifeCycleState (KKSLifeCycleEx *, QLineEdit *, int))
+            );
+    connect (lcForm,
+             SIGNAL (addLCState (KKSLifeCycleEx *, QAbstractItemModel *)),
+             objf,
+             SLOT (addLifeCycleState(KKSLifeCycleEx *, QAbstractItemModel *))
+            );
     if (!lc || !lcForm || lcForm->exec() != QDialog::Accepted)
     {
         if (lc)
@@ -1023,7 +1034,8 @@ void KKSCatEditorFactory :: addLifeCycle (QWidget * editor, int idObject, const 
             delete lcForm;
         return;
     }
-    int ier = this->ppf->insertLifeCycle (lcForm->getLC());
+    KKSLifeCycleEx * lcf = lcForm->getLC();
+    int ier = this->ppf->insertLifeCycle (lcf);
     if (ier < 0)
     {
         QMessageBox::warning (editor, tr("Add new life cycle"), tr ("Cannot add new life cycle. Database error"), QMessageBox::Ok);
@@ -1035,8 +1047,9 @@ void KKSCatEditorFactory :: addLifeCycle (QWidget * editor, int idObject, const 
     int nr = sRecMod->rowCount();
     sRecMod->insertRows(nr, 1);
     QModelIndex recIndex = sRecMod->index (nr, 0);
-    KKSEIOData * lcInfo = this->loader->loadEIOInfo (idObject, lcForm->getLC()->id());
+    KKSEIOData * lcInfo = this->loader->loadEIOInfo (idObject, lcf->id());
     sRecMod->setData (recIndex, QVariant::fromValue<KKSEIOData *>(lcInfo), Qt::UserRole+1);
+    sRecMod->setData (recIndex, lcf->id(), Qt::UserRole);
     
     lcForm->setParent (0);
     delete lcForm;
@@ -1048,10 +1061,23 @@ void KKSCatEditorFactory :: editLifeCycle (QWidget * editor, int idObject, qint6
     Q_UNUSED (c);
     Q_UNUSED (tableName);
     Q_UNUSED (nTab);
+    Q_UNUSED (isModal);
+    if (idObject != IO_LIFE_CYCLE_ID)
+        return;
     qDebug () << __PRETTY_FUNCTION__;
     KKSLifeCycleEx * lc = loader->loadLifeCycle(idObjE);
     
     kkslifecycleform * lcForm = new kkslifecycleform (lc);//, editor);
+    connect (lcForm,
+             SIGNAL (loadState (KKSLifeCycleEx *, QLineEdit *, int)),
+             this->objf,
+             SLOT (loadLifeCycleState (KKSLifeCycleEx *, QLineEdit *, int))
+            );
+    connect (lcForm,
+             SIGNAL (addLCState (KKSLifeCycleEx *, QAbstractItemModel *)),
+             objf,
+             SLOT (addLifeCycleState(KKSLifeCycleEx *, QAbstractItemModel *))
+            );
     if (!lc || !lcForm || lcForm->exec() != QDialog::Accepted)
     {
         if (lc)
@@ -1060,7 +1086,8 @@ void KKSCatEditorFactory :: editLifeCycle (QWidget * editor, int idObject, qint6
             delete lcForm;
         return;
     }
-    int ier = this->ppf->updateLifeCycle (lcForm->getLC());
+    KKSLifeCycleEx * lcf = lcForm->getLC();
+    int ier = this->ppf->updateLifeCycle (lcf);
     if (ier < 0)
     {
         QMessageBox::warning (editor, tr("Edit life cycle"), tr ("Cannot update life cycle. Database error"), QMessageBox::Ok);
@@ -1069,7 +1096,7 @@ void KKSCatEditorFactory :: editLifeCycle (QWidget * editor, int idObject, qint6
         lc->release ();
         return;
     }
-    KKSEIOData * lcInfo = this->loader->loadEIOInfo (idObject, lcForm->getLC()->id());
+    KKSEIOData * lcInfo = this->loader->loadEIOInfo (idObject, lcf->id());
     sRecMod->setData (recIndex, QVariant::fromValue<KKSEIOData *>(lcInfo), Qt::UserRole+1);
     lcForm->setParent (0);
     delete lcForm;
@@ -1079,6 +1106,8 @@ void KKSCatEditorFactory :: editLifeCycle (QWidget * editor, int idObject, qint6
 void KKSCatEditorFactory :: delLifeCycle (QWidget * editor, int idObject, qint64 idObjE, QString tableName, QAbstractItemModel * recModel, const QModelIndex& recIndex)
 {
     Q_UNUSED (tableName);
+    if (idObject != IO_LIFE_CYCLE_ID)
+        return;
     qDebug () << __PRETTY_FUNCTION__;
     int ier = ppf->deleteLifeCycle(idObjE);
     if (ier < 0)

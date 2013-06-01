@@ -29,6 +29,13 @@ public:
     virtual ~kkslifecycleform();
 
     KKSLifeCycleEx * getLC (void) const;
+    
+    enum LCStates
+    {
+        lcStart = 1,
+        lcAttrChanged = 2,
+        lcIndChanged = 3
+    };
 
 private slots:
     void lcAccept (void);
@@ -44,10 +51,8 @@ private slots:
     void clearStateInd (void);
 
 signals:
-    void loadStartState (KKSLifeCycleEx * lc, QLineEdit * le);
-    void loadStateAttribute (KKSLifeCycleEx * lc, QLineEdit * le);
-    void loadStateInd (KKSLifeCycleEx * lc, QLineEdit * le);
-    void loadState (KKSLifeCycleEx * lc, QAbstractItemModel * stateMod);
+    void loadState (KKSLifeCycleEx * lc, QLineEdit * le, int lcst);
+    void addLCState (KKSLifeCycleEx * lc, QAbstractItemModel * stateMod);
 
 private:
     //

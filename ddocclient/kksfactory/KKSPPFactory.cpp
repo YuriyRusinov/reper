@@ -2151,11 +2151,13 @@ int KKSPPFactory::updateLifeCycle(KKSLifeCycleEx * lc) const
     //считаем, что состояния в БД сохранены ранее тем или иным образом
     //
 
-    QString sql = QString("select cUpdateLifeCycle(%1, '%2', %3, %4);")
+    QString sql = QString("select cUpdateLifeCycle(%1, '%2', %3, %4, %5, %6);")
                      .arg(lc->id())
                      .arg(lc->name())
                      .arg(lc->desc().isEmpty() ? QString("NULL") : QString("'") + lc->desc() + QString("'"))
-                     .arg(lc->startState() ? QString::number(lc->startState()->id()) : QString("NULL"));
+                     .arg(lc->startState() ? QString::number(lc->startState()->id()) : QString("NULL"))
+                     .arg(lc->autoStateAttr() ? QString::number (lc->autoStateAttr()->id()) : QString("NULL"))
+                     .arg(lc->autoStateInd() ? QString::number (lc->autoStateInd()->id()) : QString("NULL"));
 
     KKSResult * res = db->execute(sql);
     if(!res){

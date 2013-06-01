@@ -113,6 +113,9 @@
 #include <KKSState.h>
 #include <KKSEIODataModel.h>
 #include <savesearchtemplateform.h>
+#include <kkslifecycleform.h>
+#include <KKSLifeCycle.h>
+#include <kksstateform.h>
 #include "defines.h"
 
 /*
@@ -8958,4 +8961,195 @@ void KKSObjEditorFactory :: sendEditor (KKSObjEditor * editor)
     if (!editor)
         return;
     emit editorCreated (editor);
+}
+
+void KKSObjEditorFactory :: loadLifeCycleState (KKSLifeCycleEx * lc, QLineEdit * le, int lcSt)
+{
+    if (!lc)
+        return;
+
+    KKSObject * refObj = loader->loadIO (IO_STATE_ID);
+    if (!refObj)
+        return;
+
+    const KKSCategory * wCat = refObj->category();
+    if (!wCat)
+    {
+        refObj->release();
+        return;
+    }
+    wCat = wCat->tableCategory();
+    KKSList<const KKSFilterGroup *> filters;
+    KKSObjEditor * wEditor = this->createObjRecEditor (IO_IO_ID,
+                                                       IO_STATE_ID,
+                                                       filters,
+                                                       tr("Set state"),
+                                                       wCat,
+                                                       true,
+                                                       true,
+                                                       Qt::ApplicationModal
+                                                       );
+    
+    if (!wEditor)
+    {
+        refObj->release();
+        return;
+    }
+    wEditor->disconnect(SIGNAL (newObjectEx (QWidget*, int, const KKSCategory *, QString, int, bool, QAbstractItemModel *)), this, SLOT (createNewEditor(QWidget*, int, const KKSCategory *, QString, int, bool, QAbstractItemModel *)));//disconnect (lcEditor);
+    connect (wEditor, SIGNAL (newObjectEx (QWidget*, int, const KKSCategory *, QString, int, bool, QAbstractItemModel *)), this, SLOT (addNewState(QWidget*, int, const KKSCategory *, QString, int, bool, QAbstractItemModel *)) );
+    wEditor->disconnect(SIGNAL (editObjectEx (QWidget*, int, qint64, const KKSCategory *, QString, int, bool, QAbstractItemModel *, const QModelIndex& )), this, SLOT (editExistOE (QWidget*, int, qint64, const KKSCategory *, QString, int, bool, QAbstractItemModel *, const QModelIndex&)));
+    connect (wEditor, SIGNAL (editObjectEx (QWidget*, int, qint64, const KKSCategory *, QString, int, bool, QAbstractItemModel *, const QModelIndex& )), this, SLOT (editState (QWidget*, int, qint64, const KKSCategory *, QString, int, bool, QAbstractItemModel *, const QModelIndex&)) );
+    //wEditor->disconnect(SIGNAL (delObjectEx (QWidget*, int, qint64, QString, QAbstractItemModel *, const QModelIndex&)), objf, SLOT (deleteOE (QWidget*, int, qint64, QString, QAbstractItemModel *, const QModelIndex&)));
+    if (wEditor->exec() == QDialog::Accepted)
+    {
+        int idState = wEditor->getID ();
+        KKSState * st = loader->loadState (idState);
+        switch (lcSt)
+        {
+            case kkslifecycleform::lcStart: lc->setStartState (st); break;
+            case kkslifecycleform::lcAttrChanged: lc->setAutoStateAttr(st); break;
+            case kkslifecycleform::lcIndChanged: lc->setAutoStateInd(st); break;
+            default:break;
+        }
+ //       
+        if (le && st)
+            le->setText (st->name());
+        if (st)
+            st->release();
+    }
+    delete wEditor;
+    refObj->release();
+}
+
+void KKSObjEditorFactory :: addNewState (QWidget* editor, int idObject, const KKSCategory * c, QString tableName, int nTab, bool isModal, QAbstractItemModel * stateModel)
+{
+    Q_UNUSED (tableName);
+    Q_UNUSED (nTab);
+    Q_UNUSED (isModal);
+    Q_UNUSED (c);
+    if (idObject != IO_STATE_ID)
+        return;
+    KKSState * st = new KKSState ();
+    if (!st)
+        return;
+    kksstateform * stForm = new kksstateform (st);
+    if (stForm && stForm->exec() == QDialog::Accepted)
+    {
+        KKSState * stn = stForm->getState();
+        int ier = ppf->insertState (stn);
+        if (ier < 0)
+        {
+            QMessageBox::warning (editor, tr("Add state"), tr("Cannot insert new state into Db, error !"), QMessageBox::Ok);
+            st->release();
+            delete stForm;
+            return;
+        }
+        KKSEIOData * stInfo = loader->loadEIOInfo (idObject, stn->id());
+        int nr = stateModel->rowCount();
+        stateModel->insertRows (nr, 1);
+        QModelIndex recIndex = stateModel->index (nr, 0);
+        stateModel->setData (recIndex, QVariant::fromValue<KKSEIOData *>(stInfo), Qt::UserRole+1);
+        stateModel->setData (recIndex, stn->id(), Qt::UserRole);
+    }
+    st->release();
+    delete stForm;
+}
+
+void KKSObjEditorFactory :: editState (QWidget * editor, int idObject, qint64 idObjEx, const KKSCategory * c, QString tableName, int nTab, bool isModal, QAbstractItemModel * recModel, const QModelIndex& recIndex)
+{
+    Q_UNUSED (tableName);
+    Q_UNUSED (nTab);
+    Q_UNUSED (isModal);
+    Q_UNUSED (c);
+    if (idObject != IO_STATE_ID)
+        return;
+    KKSState * st = loader->loadState (idObjEx);
+    if (!st)
+        return;
+    kksstateform * stForm = new kksstateform (st);
+    if (stForm && stForm->exec() == QDialog::Accepted)
+    {
+        KKSState * stn = stForm->getState();
+        int ier = ppf->updateState (stn);
+        if (ier < 0)
+        {
+            QMessageBox::warning (editor, tr("Edit state"), tr("Cannot update state in Db, error !"), QMessageBox::Ok);
+            st->release();
+            delete stForm;
+            return;
+        }
+        KKSEIOData * stInfo = loader->loadEIOInfo (idObject, stn->id());
+        recModel->setData (recIndex, QVariant::fromValue<KKSEIOData *>(stInfo), Qt::UserRole+1);
+    }
+    st->release();
+    delete stForm;
+}
+
+void KKSObjEditorFactory :: addLifeCycleState (KKSLifeCycleEx * lc, QAbstractItemModel * stateMod)
+{
+    
+    if (!lc)
+        return;
+
+    KKSObject * refObj = loader->loadIO (IO_STATE_ID);
+    if (!refObj)
+        return;
+
+    const KKSCategory * wCat = refObj->category();
+    if (!wCat)
+    {
+        refObj->release();
+        return;
+    }
+    wCat = wCat->tableCategory();
+    KKSList<const KKSFilterGroup *> filters;
+    KKSObjEditor * wEditor = this->createObjRecEditor (IO_IO_ID,
+                                                       IO_STATE_ID,
+                                                       filters,
+                                                       tr("Set state"),
+                                                       wCat,
+                                                       true,
+                                                       true,
+                                                       Qt::ApplicationModal
+                                                       );
+    
+    if (!wEditor)
+    {
+        refObj->release();
+        return;
+    }
+    wEditor->disconnect(SIGNAL (newObjectEx (QWidget*, int, const KKSCategory *, QString, int, bool, QAbstractItemModel *)), this, SLOT (createNewEditor(QWidget*, int, const KKSCategory *, QString, int, bool, QAbstractItemModel *)));//disconnect (lcEditor);
+    connect (wEditor, SIGNAL (newObjectEx (QWidget*, int, const KKSCategory *, QString, int, bool, QAbstractItemModel *)), this, SLOT (addNewState(QWidget*, int, const KKSCategory *, QString, int, bool, QAbstractItemModel *)) );
+    wEditor->disconnect(SIGNAL (editObjectEx (QWidget*, int, qint64, const KKSCategory *, QString, int, bool, QAbstractItemModel *, const QModelIndex& )), this, SLOT (editExistOE (QWidget*, int, qint64, const KKSCategory *, QString, int, bool, QAbstractItemModel *, const QModelIndex&)));
+    connect (wEditor, SIGNAL (editObjectEx (QWidget*, int, qint64, const KKSCategory *, QString, int, bool, QAbstractItemModel *, const QModelIndex& )), this, SLOT (editState (QWidget*, int, qint64, const KKSCategory *, QString, int, bool, QAbstractItemModel *, const QModelIndex&)) );
+    //wEditor->disconnect(SIGNAL (delObjectEx (QWidget*, int, qint64, QString, QAbstractItemModel *, const QModelIndex&)), objf, SLOT (deleteOE (QWidget*, int, qint64, QString, QAbstractItemModel *, const QModelIndex&)));
+    if (wEditor->exec() == QDialog::Accepted)
+    {
+        int idState = wEditor->getID ();
+        KKSState * st = loader->loadState (idState);
+        if (!st)
+        {
+            QMessageBox::warning (wEditor, tr("Add state into life cycle"), tr("Cannot add state into life cycle %1, Db error").arg(lc->name()), QMessageBox::Ok);
+            delete wEditor;
+            refObj->release ();
+            return;
+        }
+        KKSMap<int, KKSState *> stList = lc->states();
+        if (stList.constFind (idState) != stList.constEnd())
+        {
+            delete wEditor;
+            refObj->release ();
+            st->release();
+            return;
+        }
+        lc->addState (st);
+        int nr = stateMod->rowCount();
+        stateMod->insertRows (nr, 1);
+        QModelIndex recIndex = stateMod->index (nr, 0);
+        stateMod->setData (recIndex, idState, Qt::UserRole);
+        stateMod->setData (recIndex, st->name(), Qt::DisplayRole);
+        st->release();
+    }
+    delete wEditor;
+    refObj->release();
 }

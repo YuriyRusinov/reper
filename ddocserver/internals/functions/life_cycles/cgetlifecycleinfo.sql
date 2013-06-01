@@ -33,13 +33,13 @@ select
             s.description as start_state_desc,
             s.is_system as start_state_is_system, 
             lc.id_auto_state_attr, 
-            s.name as auto_state_attr_name,
-            s.description as auto_state_attr_desc,
-            s.is_system as auto_state_attr_is_system, 
+            s1.name as auto_state_attr_name,
+            s1.description as auto_state_attr_desc,
+            s1.is_system as auto_state_attr_is_system, 
             lc.id_auto_state_ind, 
-            s.name as auto_state_ind_name,
-            s.description as auto_state_ind_desc,
-            s.is_system as auto_state_ind_is_system 
+            s2.name as auto_state_ind_name,
+            s2.description as auto_state_ind_desc,
+            s2.is_system as auto_state_ind_is_system 
         from life_cycle lc
              left join io_states s on (lc.id_start_state = s.id)
              left join io_states s1 on (lc.id_auto_state_attr = s1.id)

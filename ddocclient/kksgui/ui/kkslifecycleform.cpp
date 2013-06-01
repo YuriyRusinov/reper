@@ -7,6 +7,9 @@
 
 #include <QAbstractItemModel>
 #include <QStandardItemModel>
+#include <QItemSelectionModel>
+#include <QModelIndex>
+#include <QtDebug>
 
 #include <KKSLifeCycle.h>
 #include <KKSState.h>
@@ -76,7 +79,7 @@ void kkslifecycleform::lcAccept (void)
 
 void kkslifecycleform::setState (void)
 {
-    emit loadStartState (lifeCycle, UI->lEStartState);
+    emit loadState (lifeCycle, UI->lEStartState, lcStart);
 }
 
 void kkslifecycleform::clearState (void)
@@ -87,12 +90,12 @@ void kkslifecycleform::clearState (void)
 
 void kkslifecycleform::setStateAttr (void)
 {
-    emit loadStateAttribute (lifeCycle, UI->lEStartState);
+    emit loadState (lifeCycle, UI->lEAutoStateAttribute, lcAttrChanged);
 }
 
 void kkslifecycleform::setStateInd (void)
 {
-    emit loadStateInd (lifeCycle, UI->lEStartState);
+    emit loadState (lifeCycle, UI->lEAutoStateIndicator, lcIndChanged);
 }
 
 void kkslifecycleform::clearStateAttr (void)
@@ -114,11 +117,18 @@ KKSLifeCycleEx * kkslifecycleform::getLC (void) const
 
 void kkslifecycleform::addState (void)
 {
-    
+    emit addLCState (lifeCycle, UI->tvStates->model());
 }
 
 void kkslifecycleform::delState (void)
 {
+    QItemSelectionModel * selModel = UI->tvStates->selectionModel();
+    QModelIndex selInd = selModel->currentIndex();
+    int idState = selInd.data(Qt::UserRole).toInt();
+    lifeCycle->removeState (idState);
+    QAbstractItemModel * stMod = UI->tvStates->model ();
+    int iRow = selInd.row();
+    stMod->removeRows (iRow, 1);
 }
 
 void kkslifecycleform::initStates (void)
