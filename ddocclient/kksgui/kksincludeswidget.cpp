@@ -408,8 +408,7 @@ void KKSIncludesWidget::delRubric (void)
         index = index.sibling(index.row(), 0);
         int rType = twIncludes->model()->data(index, Qt::UserRole+2).toInt();
         qDebug () << __PRETTY_FUNCTION__ << rType;
-        if(rType == KKSRubricBase::atRubricItem ||
-           rType == KKSRubricBase::atRubricCategory ||
+        if(rType == KKSRubricBase::atRubricCategory ||
            rType == KKSRubricBase::atOthers)
         { 
             //
@@ -426,17 +425,18 @@ void KKSIncludesWidget::delRubric (void)
     }
     
     const KKSRubric * r = NULL;
-    if(index.parent().isValid())
-        r = getRubric(index.parent());
+    QModelIndex iPar = index.parent();
+    if(iPar.isValid())
+        r = getRubric(iPar);
     else
         r = m_rootRubric;
     
     if(!r)
         return;
     
-    const_cast<KKSRubric *>(r)->removeRubric(index.row());
-    
-    twIncludes->model()->removeRows(index.row(), 1, index.parent());
+    int irow = index.row();
+    const_cast<KKSRubric *>(r)->removeRubric(irow);
+    twIncludes->model()->removeRows(irow, 1, iPar);
     isChanged = true;
     emit rubricsChanged ();
 }
@@ -1164,34 +1164,13 @@ const KKSRubric * KKSIncludesWidget::getRubric(QModelIndex index)
         return static_cast<const KKSRubric *>(wrp);
     }
     else if (wr->rubricType() != KKSRubricBase::atOthers)
-        return static_cast<const KKSRubric *>(wr);
+    {
+        const KKSRubric * r = static_cast<const KKSRubric *>(wr);
+        emit rubricRequested(const_cast<KKSRubric *>(r), index.data(Qt::UserRole).toInt(), model, index);
+        return r;//static_cast<const KKSRubric *>(wr);
+    }
     else
         return 0;
-/*    if (index.parent().isValid())
-    {
-        KKSRubric * r = getRubric(index.parent());
-        if(index.data(Qt::UserRole+2).toInt() == 2)//item
-            return r;
-        
-        QAbstractItemModel * model = twIncludes->model();
-        int rowCount = model->rowCount(index.parent());
-        int row = 0;
-        int currentRow = index.row();
-        for(int i=0; i<rowCount; i++){
-            QModelIndex ind = model->index(i, 0, index.parent());
-            if(ind.data(Qt::UserRole+2).toInt() == 1)//rubric
-                row++;
-            if(ind.row() == currentRow){
-                row--;
-                break;
-            }
-        }
-        
-        return const_cast<KKSRubric*>(r->rubric(row));
-    }
-    
-    return const_cast<KKSRubric*>(m_rootRubric->rubric(index.row()));
- */
 }
 
 
@@ -1441,6 +1420,13 @@ void KKSIncludesWidget :: setRubrModel (QAbstractItemModel * rModel)
     twIncludes->setModel(rModel);
     if (oldModel && oldModel != rModel)
         delete oldModel;
+    QItemSelectionModel * selModel = twIncludes->selectionModel ();
+    if (selModel)
+        connect (selModel, \
+                 SIGNAL (selectionChanged (const QItemSelection&, const QItemSelection&)), \
+                 this, \
+                 SLOT (rubricSelectionChanged (const QItemSelection&, const QItemSelection&))
+                );
 }
 
 void KKSIncludesWidget :: addRubricIntoModel (KKSRubric * cRubr, const QModelIndex& pIndex)

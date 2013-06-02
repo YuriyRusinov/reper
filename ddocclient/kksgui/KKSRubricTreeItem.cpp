@@ -7,7 +7,7 @@
 #include "KKSAttrType.h"
 #include "KKSRubric.h"
 
-KKSRubricTreeItem :: KKSRubricTreeItem (qint64 id, const KKSRubricBase * d, const KKSRubricTreeItem * parent)
+KKSRubricTreeItem :: KKSRubricTreeItem (qint64 id, const KKSRubricBase * d, KKSRubricTreeItem * parent)
     : idItem (id),
       data (NULL),
       parentItem (parent),
@@ -59,7 +59,7 @@ bool KKSRubricTreeItem :: insertChildren(int position, int count)
      return true;
 }
 
-const KKSRubricTreeItem * KKSRubricTreeItem :: parent() const
+KKSRubricTreeItem * KKSRubricTreeItem :: parent() const
 {
     return parentItem;
 }

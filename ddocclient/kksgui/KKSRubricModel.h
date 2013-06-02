@@ -12,6 +12,9 @@
 #include <QModelIndex>
 #include <QVariant>
 
+#include <KKSMap.h>
+#include <KKSEIOData.h>
+
 #include "kksgui_config.h"
 
 class KKSRubricBase;
@@ -22,6 +25,7 @@ class _GUI_EXPORT KKSRubricModel : public QAbstractItemModel
 {
 public:
     KKSRubricModel(const KKSRubric * rootRubr, bool forRecs=false, QObject * parent=0);
+    KKSRubricModel(const KKSMap< qint64, KKSEIOData * >& rubrRecs, QObject * parent=0);
     virtual ~KKSRubricModel();
 
     QVariant data (const QModelIndex &index, int role) const;
@@ -45,7 +49,11 @@ private:
     // Functions
     //
     KKSRubricTreeItem * getRubricEntity (const QModelIndex& index) const;
-    void setupData (KKSRubricTreeItem * parent, bool forRecs=false);
+    void setupRubrData (KKSRubricTreeItem * parent, bool forRecs=false);
+    void setupData (const KKSMap< qint64, KKSEIOData * >& rubrRecs);
+    KKSRubricTreeItem * getModelItem (qint64 val, KKSRubricTreeItem * parent, QModelIndex & pIndex);
+    KKSRubricTreeItem * getItem(const QModelIndex &index) const;
+    
 
 private:
     //

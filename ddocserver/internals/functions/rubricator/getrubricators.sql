@@ -85,11 +85,11 @@ begin
             return next rr;
         end loop;
 
-        for rr in 
-            select * from ioGetRubricItems(rec.id)
-        loop
-            return next rr;
-        end loop;
+--        for rr in 
+--            select * from ioGetRubricItems(rec.id)
+--        loop
+--            return next rr;
+--        end loop;
     end loop;
 end
 $BODY$

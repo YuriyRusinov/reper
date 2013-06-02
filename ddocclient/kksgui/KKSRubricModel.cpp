@@ -8,8 +8,8 @@
 #include <QPixmap>
 #include <QtDebug>
 
-#include "KKSRubric.h"
-#include "KKSList.h"
+#include <KKSRubric.h>
+#include <KKSList.h>
 #include "KKSRubricTreeItem.h"
 #include "KKSRubricModel.h"
 
@@ -18,7 +18,17 @@ KKSRubricModel::KKSRubricModel(const KKSRubric * rootRubr, bool forRecs, QObject
       rootItem (new KKSRubricTreeItem (-1, rootRubr)),
       forRecords (forRecs)
 {
-    setupData (rootItem, forRecs);
+    setupRubrData (rootItem, forRecs);
+}
+
+KKSRubricModel::KKSRubricModel(const KKSMap< qint64, KKSEIOData * >& rubrRecs, QObject * parent)
+    : QAbstractItemModel (parent),
+      rootItem (new KKSRubricTreeItem (-1, 0)),
+      forRecords (false)
+{
+    KKSRubric * rootRubric = new KKSRubric(-1, "root rubric for all tree");
+    rootItem->setData(rootRubric);
+    setupData (rubrRecs);
 }
 
 KKSRubricModel::~KKSRubricModel()
@@ -199,7 +209,7 @@ bool KKSRubricModel :: setData (const QModelIndex& index, const QVariant& value,
             return false;
         
         wRubr->setData(wNewRubr);
-        setupData (wRubr, forRecords);
+        setupRubrData (wRubr, forRecords);
 
         emit dataChanged (index, index);
         return true;
@@ -253,7 +263,7 @@ KKSRubricTreeItem * KKSRubricModel :: getRubricEntity (const QModelIndex& index)
      return rootItem;
 }
 
-void KKSRubricModel :: setupData (KKSRubricTreeItem * parent, bool forRecs)
+void KKSRubricModel :: setupRubrData (KKSRubricTreeItem * parent, bool forRecs)
 {
     if (!parent || !parent->getData() || parent->getData()->rubricType()==KKSRubricBase::atRubricItem)
         return;
@@ -269,7 +279,7 @@ void KKSRubricModel :: setupData (KKSRubricTreeItem * parent, bool forRecs)
         {
             KKSRubricTreeItem * wrItem = new KKSRubricTreeItem (wRubric->rubric(i)->id(), wRubric->rubric(i), parent);
             parent->appendChild (wrItem);
-            setupData (wrItem, forRecs);
+            setupRubrData (wrItem, forRecs);
         }
         if (forRecs)
         {
@@ -290,7 +300,97 @@ void KKSRubricModel :: setupData (KKSRubricTreeItem * parent, bool forRecs)
                 continue;
             KKSRubricTreeItem * wItem = new KKSRubricTreeItem (wr->id(), wr, parent);
             parent->appendChild (wItem);
-            setupData (wItem);
+            setupRubrData (wItem);
         }
     }
+}
+
+void KKSRubricModel :: setupData (const KKSMap< qint64, KKSEIOData * >& rubrRecs)
+{
+    //int nr = rowCount();
+    //QModelIndex pIndex = QModelIndex ();
+
+    //KKSRubricTreeItem * prevItem (0);
+    KKSRubric * rootRubric = /*(const_cast<KKSRubricBase *>(parent->getData())) ? (const_cast<KKSRubricBase *>(parent->getData())) :*/ new KKSRubric(-1, "root rubric for all tree");
+        
+    for (KKSMap<qint64, KKSEIOData* >::const_iterator p = rubrRecs.constBegin();
+            p != rubrRecs.constEnd();
+            p++)
+    {
+        QIcon tIcon;
+        if (p.value())
+        {
+            QString strIcon = p.value()->sysFieldValue("r_icon");
+            //qDebug () << __PRETTY_FUNCTION__ << strIcon;
+            QPixmap pIcon;
+            pIcon.loadFromData (strIcon.toUtf8());
+            tIcon = QIcon (pIcon);
+        }
+        //qDebug () << __PRETTY_FUNCTION__ << p.value()->sysFieldValue("id") << p.key();
+        KKSRubric * r = new KKSRubric (p.key(), p.value()->fieldValue("name"));
+        r->setIcon(tIcon);
+        QString valStr = p.value()->sysFieldValue("id_parent");
+        bool ok;
+        int idParent = valStr.isEmpty() ? -1 : valStr.toLongLong(&ok);
+        KKSRubric * pRubr = rootRubric->rubricForId(idParent);
+        if (!pRubr)
+        {
+            rootRubric->addRubric(r);
+            r->setParent (rootRubric);
+        }
+        else
+        {
+            pRubr->addRubric (r);
+            r->setParent (pRubr);
+        }
+    }
+    rootItem->setData (rootRubric);
+    setupRubrData (rootItem, false);
+}
+
+KKSRubricTreeItem * KKSRubricModel :: getModelItem (qint64 val, KKSRubricTreeItem * parent, QModelIndex & pIndex)
+{
+    if (!parent)
+        return rootItem;
+
+    //if (parent->getData() && QString::compare (parent->getData()->fieldValue(cAttrP->columnName(false)), valStr) == 0)
+    //    return parent;
+    for (int i=0; i<parent->childCount(); i++)
+    {
+        KKSRubricTreeItem * item = parent->child(i);
+        //QString refCol = QString ("id");
+        QString pStr = QString::number (item->getData()->id());//sysFieldValue(refCol);
+        //qDebug () << __PRETTY_FUNCTION__ << pStr << refCol << cAttrP->code(false) << item->getData()->fields();
+        bool ok (true);
+        qint64 iVal (-1);
+        iVal = item->id();
+        if (iVal == val)
+        {
+            pIndex = this->index (i, 0, pIndex);
+            return item;
+        }
+        else if (item->childCount() > 0)
+        {
+            KKSRubricTreeItem * chItem = getModelItem (val, item, pIndex);
+            if (chItem)
+                return chItem;
+        }
+        else
+            continue;
+    }
+    
+    return 0;
+    
+}
+
+KKSRubricTreeItem * KKSRubricModel :: getItem(const QModelIndex &index) const
+{
+    if (index.isValid())
+    {
+        KKSRubricTreeItem *item = static_cast<KKSRubricTreeItem*>(index.internalPointer());
+        if (item)
+            return item;
+    }
+    return rootItem;   
+    
 }

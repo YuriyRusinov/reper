@@ -104,22 +104,22 @@ class _F_EXPORT KKSLoader
         //а в качестве значения - объект KKSEIOData, который содержит KKSMap<QString, QString>
         //где в качестве ключа выступает код атрибута (см. KKSAttribute::code() ), а в качестве значения - значение атрибута
         KKSMap<qint64, KKSEIOData *> loadEIOList(const KKSObject * io, 
-                                              const KKSList<const KKSFilterGroup *> filters = KKSList<const KKSFilterGroup*>()) const;
+                                              const KKSList<const KKSFilterGroup *>& filters = KKSList<const KKSFilterGroup*>()) const;
 
         KKSMap<qint64, KKSEIOData *> loadEIOList(const KKSCategory * c0,
                                               const QString& tableName,
-                                              const KKSList<const KKSFilterGroup *> filters = KKSList<const KKSFilterGroup*>(),
+                                              const KKSList<const KKSFilterGroup *>& filters = KKSList<const KKSFilterGroup*>(),
                                               bool isSys = false) const;//если true, то загружаются данные из системного справлчника, а значит у них нет полей uuid_t, id_state
         
         KKSEIOData * loadEIOInfo (int idObject, int idRec) const;
         
         //просто данные в этих методах возвращаются в виде QList, а не QMap
         KKSList<KKSEIOData *> loadEIOList1(const KKSObject * io, 
-                                           const KKSList<const KKSFilterGroup *> filters = KKSList<const KKSFilterGroup*>()) const;
+                                           const KKSList<const KKSFilterGroup *>& filters = KKSList<const KKSFilterGroup*>()) const;
 
         KKSList<KKSEIOData *> loadEIOList1(const KKSCategory * c0,
                                            const QString& tableName,
-                                           const KKSList<const KKSFilterGroup *> filters = KKSList<const KKSFilterGroup*>(),
+                                           const KKSList<const KKSFilterGroup *>& filters = KKSList<const KKSFilterGroup*>(),
                                            bool isSys = false) const;//если true, то загружаются данные из системного справлчника, а значит у них нет полей uuid_t, id_state
         
         KKSList<KKSFileType *> loadFileTypes() const;

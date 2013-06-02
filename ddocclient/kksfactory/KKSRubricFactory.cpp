@@ -24,12 +24,16 @@
 #include <KKSObjectExemplar.h>
 #include "KKSAttrType.h"
 #include <KKSCategory.h>
+#include <KKSTemplate.h>
+#include <KKSList.h>
+#include <KKSFilter.h>
 #include <defines.h>
 #include <KKSSearchTemplate.h>
 #include "kksstuffform.h"
 #include "KKSAccessEntity.h"
 #include <KKSEIOData.h>
 #include <KKSEIODataModel.h>
+#include <KKSRubricModel.h>
 #include <KKSSyncDialog.h>
 #include <KKSSyncWidget.h>
 #include <KKSStuffDialog.h>
@@ -58,7 +62,7 @@ KKSIncludesWidget * KKSRubricFactory :: createRubricEditor (int mode, const KKSL
     Q_UNUSED (filters);
     bool isDocs (mode==atMyDocsRubric);
 
-    KKSRubric * rootR = loader->loadRubricators ( isDocs );
+/*    KKSRubric * rootR = loader->loadRubricators ( isDocs );
     if (!rootR){
         rootR = new KKSRubric(-1, "root rubric for all tree");
         KKSRubric * rubrMyDocs = new KKSRubric (-1, tr("My Documents"));
@@ -74,7 +78,7 @@ KKSIncludesWidget * KKSRubricFactory :: createRubricEditor (int mode, const KKSL
 
         ppf->createMyDocsRubricator (rubrMyDocs->id());
     }
-
+*/
     QString title;
     switch (mode)
     {
@@ -95,13 +99,33 @@ KKSIncludesWidget * KKSRubricFactory :: createRubricEditor (int mode, const KKSL
             }
         default:
             {
-                rootR->release();
+                //rootR->release();
                 return 0;
                 break;
             }
     }
+    KKSObject * rubrIO = loader->loadIO (IO_RUBR_ID);
+    if (!rubrIO)
+        return 0;
+    KKSCategory * cr = rubrIO->category();
+    if (!cr)
+    {
+        rubrIO->release();
+        return 0;
+    }
+    cr = cr->tableCategory();
+    if (!cr)
+    {
+        rubrIO->release();
+        return 0;
+    }
+    KKSList<const KKSFilterGroup *> rfilters;
+    KKSMap<qint64, KKSEIOData *> rubrInfo = loader->loadEIOList(rubrIO, rfilters);
+    QAbstractItemModel * rModel = new KKSRubricModel (rubrInfo);
+    rubrIO->release();
 
-    KKSIncludesWidget *iW = new KKSIncludesWidget (rootR, false, isDocs, false, false, parent);
+    KKSIncludesWidget *iW = new KKSIncludesWidget (0, false, isDocs, false, false, parent);// rootR
+    iW->setRubrModel (rModel);
     QTreeView *tv = iW->tvRubr();
     QAbstractItemModel * rubrMod = iW->rubrModel();
     if (rubrMod && withCategories)
@@ -111,25 +135,39 @@ KKSIncludesWidget * KKSRubricFactory :: createRubricEditor (int mode, const KKSL
         if (isIns)
         {
             QModelIndex wIndex = rubrMod->index (nr, 0);
-            const KKSRubricBase * rOthers = loader->loadCatRubricators ();//new KKSRubricOthers (-1, tr("Others"));
+            const KKSRubricBase * rOthers = loader->loadCatRubricators ();// new KKSRubricOthers (-1, tr("Others"));
+/*            KKSObject * catIO = loader->loadIO (IO_CAT_ID);
+            if (!catIO)
+                return 0;
+            KKSMap<qint64, KKSEIOData *> catInfo = loader->loadEIOList(catIO, rfilters);
+            //int nrc = rubrMod->rowCount (wIndex);
+            for (KKSMap<qint64, KKSEIOData *>::const_iterator pc = catInfo.constBegin();
+                    pc != catInfo.constEnd();
+                    pc++)
+            {
+                //rubrMod->insertRows (nrc, 1, wIndex);
+                const KKSRubric * rCat = new KKSRubric (pc.key(), pc.value()->fieldValue("name"));
+                KKSCategory * c = loader->loadCategory (pc.key(), true);
+                (const_cast<KKSRubric *>(rCat))->setCategorized(true);
+                (const_cast<KKSRubric *>(rCat))->setCategory(c);
+                if (c)
+                    c->release();
+                (const_cast<KKSRubricBase *>(rOthers))->addNode (rCat);
+                //QModelIndex wcIndex = rubrMod->index (nrc, 0, wIndex);
+                //rubrMod->setData (wcIndex, QVariant::fromValue<const KKSRubricBase *>(rCat), Qt::UserRole+1);
+                rCat->release();
+                //nrc++;
+            }
+            catIO->release();*/
             bool isRubrDataSet = rubrMod->setData (wIndex, QVariant::fromValue<const KKSRubricBase *>(rOthers), Qt::UserRole+1);
             Q_UNUSED (isRubrDataSet);
-//            bool isDataSet = rubrMod->setData (wIndex, tr("Others"), Qt::DisplayRole);
-//            bool isTypeSet = rubrMod->setData (wIndex, atOthers, Qt::UserRole);
-//            bool isIconSet = rubrMod->setData (wIndex, KKSRubric::icon().scaled(24, 24), Qt::DecorationRole);
-//            int nrc = rubrMod->rowCount (wIndex);
-//            const KKSRubric * cRubric = loader->loadCatRubricators ();
-//            rubrMod->insertRows (nrc, 1, wIndex);
-//            rubrMod->setData (rubrMod->index (nrc, 0, wIndex), QVariant::fromValue<const KKSRubricBase *>(cRubric), Qt::UserRole+1);
-//            if (isRubrDataSet && isDataSet && isTypeSet && isIconSet)
-//                iW->addRubricIntoModel (cRubric, wIndex);
         }
     }
     KKSEventFilter *ef = new KKSEventFilter (iW);
     iW->setWindowTitle (title);
     tv->viewport()->installEventFilter (ef);
-    if (rootR)
-        rootR->release ();
+//    if (rootR)
+//        rootR->release ();
 
     //QAbstractItemDelegate *iDeleg = tv->itemDelegate ();
     //qDebug () << __PRETTY_FUNCTION__ << iDeleg;
@@ -149,6 +187,7 @@ KKSIncludesWidget * KKSRubricFactory :: createRubricEditor (int mode, const KKSL
     connect (iW, SIGNAL (putIOSIntoRubr (const QList<int>&, const KKSRubric*)), this, SLOT (putIntoRubr (const QList<int>&, const KKSRubric*)) );
     connect (iW, SIGNAL (sendIOS (const QList<int>&)), this, SLOT (sendDocs (const QList<int>&)) );
     connect (iW, SIGNAL (setAccessIOS (const QList<int>&)), this, SLOT (setAccessDocs (const QList<int>&)) );
+    connect (iW, SIGNAL (rubricRequested(KKSRubric *, int, QAbstractItemModel*, const QModelIndex& )), this, SLOT (loadRubric (KKSRubric *, int, QAbstractItemModel*, const QModelIndex&)) );
     
     connect (this, SIGNAL (rubricAttachments (QAbstractItemModel *)), iW, SLOT (slotInitAttachmentsModel (QAbstractItemModel *)) );
     emit rubricEditorCreated (iW);
@@ -1245,4 +1284,23 @@ void KKSRubricFactory :: setAccessDocs (const QList<int>& ioIDList)
     }
     sForm->setParent (0);
     delete sForm;
+}
+
+KKSRubric * KKSRubricFactory :: loadRubric (KKSRubric * r, int idRubr, QAbstractItemModel * rubrMod, const QModelIndex& recIndex)
+{
+    KKSRubric * rw  = loader->loadRubric(idRubr);
+    if (!rw)
+        return r;
+    KKSCategory * c = rw->getCategory();
+//    if (c)
+//        c->addRef();
+    r->setCategory(c);
+//    c->release();
+    KKSSearchTemplate * st = rw->getSearchTemplate();
+    r->setSearchTemplate (st);
+    KKSAccessEntity * acr = rw->getAccessRules();
+    r->setAccessRules (acr);
+    rubrMod->setData (recIndex, QVariant::fromValue<const KKSRubricBase *>(r), Qt::UserRole+1);
+    rw->release();
+    return r;
 }

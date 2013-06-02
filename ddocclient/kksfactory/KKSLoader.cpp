@@ -2232,7 +2232,7 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
 }
 
 KKSMap<qint64, KKSEIOData *> KKSLoader::loadEIOList(const KKSObject * io, 
-                                                 const KKSList<const KKSFilterGroup *> filters) const
+                                                 const KKSList<const KKSFilterGroup *>& filters) const
 {
     KKSMap<qint64, KKSEIOData *> eioList;
     if(!io || 
@@ -2251,7 +2251,7 @@ KKSMap<qint64, KKSEIOData *> KKSLoader::loadEIOList(const KKSObject * io,
 }
 
 KKSList<KKSEIOData *> KKSLoader::loadEIOList1(const KKSObject * io, 
-                                              const KKSList<const KKSFilterGroup *> filters) const
+                                              const KKSList<const KKSFilterGroup *>& filters) const
 {
     KKSList<KKSEIOData *> eioList;
     if(!io || 
@@ -2304,7 +2304,7 @@ KKSEIOData * KKSLoader::loadEIOInfo (int idObject, int idRec) const
 
 KKSMap<qint64, KKSEIOData *> KKSLoader::loadEIOList(const KKSCategory * c0, 
                                                  const QString& tableName,
-                                                 const KKSList<const KKSFilterGroup *> filters,
+                                                 const KKSList<const KKSFilterGroup *>& filters,
                                                  bool isSys) const
 {
     KKSMap<qint64, KKSEIOData *> eioList;
@@ -2437,7 +2437,7 @@ KKSMap<qint64, KKSEIOData *> KKSLoader::loadEIOList(const KKSCategory * c0,
 
 KKSList<KKSEIOData *> KKSLoader::loadEIOList1(const KKSCategory * c0, 
                                               const QString& tableName,
-                                              const KKSList<const KKSFilterGroup *> filters,
+                                              const KKSList<const KKSFilterGroup *>& filters,
                                               bool isSys) const
 {
     KKSList<KKSEIOData *> eioList;
@@ -3732,56 +3732,13 @@ KKSRubricBase * KKSLoader::loadCatRubricators(void) const
         theRubric->setIcon(icon);
         //loadPrivileges (theRubric);
         theRubric->m_intId = id;
-        KKSList<const KKSRubricItem*> rItems = loadCatRubricItems (c);
+/*        KKSList<const KKSRubricItem*> rItems = loadCatRubricItems (c);
         theRubric->setItems (rItems);
+ */
         theRubric->setParent (rootRubric);
 
         rootRubric->addNode(theRubric);//>addRubric(theRubric);
         theRubric->release();
-/*        else if(type == 1){//rubrics
-            KKSRubric * subRubric = new KKSRubric(id, name);
-            subRubric->setCode(code);
-            subRubric->setDesc(desc);
-            subRubric->setSearchTemplate (st);
-            subRubric->setCategory(c);
-            subRubric->setIcon(icon);
-            loadPrivileges (subRubric);
-            subRubric->m_intId = id;
-
-            if(idParent <= 0){
-                qWarning() << "Bad rubric!";
-                subRubric->release();
-                continue;
-            }
-            KKSRubric * parent = rootRubric->rubricForId(idParent);
-            if(!parent){
-                qWarning() << "Bad rubric! Parent is NULL!";
-                subRubric->release();
-                continue;
-            }
-            parent->addRubric(subRubric);
-            subRubric->release();
-        }
-        else if(type == 2){//rubric items
-            bool b = res->getCellAsBool(i, 10);
-            KKSRubricItem * item = new KKSRubricItem(id, name, b);
-            item->setIcon(icon);
-
-            if(idParent <= 0){
-                qWarning() << "Bad subRubric!";
-                item->release();
-                continue;
-            }
-            KKSRubric * parent = rootRubric->rubricForId(idParent);
-            if(!parent){
-                qWarning() << "Bad subRubric! Parent is NULL!";
-                item->release();
-                continue;
-            }
-            parent->addItem(item);
-            item->release();
-        }
- */
     }
     
     return rootRubric;
@@ -3828,6 +3785,22 @@ KKSRubric * KKSLoader::loadRubric (int idRubr) const
     }
 
     KKSRubric * rootRubric = new KKSRubric(res->getCellAsInt(0, 0), res->getCellAsString(0, 5));
+    KKSSearchTemplate * st = 0;
+    int idSearchTemplate (-1);
+    if (!res->isEmpty (0, 3))
+    {
+        idSearchTemplate = res->getCellAsInt (0, 3);
+        st = loadSearchTemplate (idSearchTemplate);
+    }
+    rootRubric->setSearchTemplate (st);
+    int idCategory = -1;
+    KKSCategory * c = 0;
+    if (!res->isEmpty (0, 4))
+    {
+        idCategory = res->getCellAsInt (0, 4);
+        c = loadCategory (idCategory);
+    }
+    rootRubric->setCategory (c);
 
     int cnt = res->getRowCount();
     for(int i=1; i<cnt; i++){

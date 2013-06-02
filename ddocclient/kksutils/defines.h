@@ -59,7 +59,7 @@ const int IO_RUBR_ID = 38;
 
 //данный дефайн задает идентификатор системного информационного объекта, 
 //который описывает справочник категорий
-#define IO_CAT_ID 6
+const int IO_CAT_ID = 6;
 
 //данный дефайн задает идентификатор системного информационного объекта, 
 //который описывает справочник типов информационных объектов
@@ -137,7 +137,7 @@ const int IO_LIFE_CYCLE_ID = 95;
 #define ADMIN_ROLE 1
 
 #define ATTR_ID 1
-#define ATTR_NAME 2
+const int ATTR_NAME = 2;
 #define ATTR_MACLABEL 63
 #define ATTR_INPUT_NUMBER 99
 #define ATTR_OUTPUT_NUMBER 100
