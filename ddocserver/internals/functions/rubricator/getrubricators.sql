@@ -62,10 +62,11 @@ end
 $BODY$
 language 'plpgsql';
 
-create or replace function getRubric(int4) returns setof h_io_get_rubrics as
+create or replace function getRubric(int4, boolean) returns setof h_io_get_rubrics as
 $BODY$
 declare 
     idRubr alias for $1;
+    withInherit alias for $2;
 
     rec h_io_get_rubrics%rowtype;
     rr h_io_get_rubrics%rowtype;
@@ -79,11 +80,13 @@ begin
         order by r.id
     loop
         return next rec;
-        for rr in 
-            select * from ioGetSubRubrics(rec.id)
-        loop
-            return next rr;
-        end loop;
+        if(withInherit = true) then
+            for rr in 
+                select * from ioGetSubRubrics(rec.id)
+            loop
+                return next rr;
+            end loop;
+        end if;
 
 --        for rr in 
 --            select * from ioGetRubricItems(rec.id)
