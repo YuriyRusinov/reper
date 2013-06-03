@@ -1169,6 +1169,16 @@ const KKSRubric * KKSIncludesWidget::getRubric(QModelIndex index)
         emit rubricRequested(const_cast<KKSRubric *>(r), index.data(Qt::UserRole).toInt(), model, index);
         return r;//static_cast<const KKSRubric *>(wr);
     }
+    else if (wr->rubricType() != KKSRubricBase::atRubricCategory)
+    {
+        const KKSRubric * r = static_cast<const KKSRubric *>(wr);
+        if(r->getCategory())
+            return r;
+        
+        //ÇÀÃĞÓÇÈÒÜ ÊÀÒÅÃÎĞÈŞ Ñ ÈÄ = r->id() è çàäàòü åå â êàòåãîğèş
+        //emit rubricRequested(const_cast<KKSRubric *>(r), index.data(Qt::UserRole).toInt(), model, index);
+        return r;//static_cast<const KKSRubric *>(wr);
+    }
     else
         return 0;
 }

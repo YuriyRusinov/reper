@@ -541,7 +541,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
             QWidget * copiesW = new QWidget ();
             QGridLayout *gRecLay = new QGridLayout ();
             copiesW->setLayout (gRecLay);
-            KKSRecWidget * recW = KKSViewFactory::createAdditionalView (tChild, objEditorWidget, cat, loader, tableName);
+            KKSRecWidget * recW = KKSViewFactory::createAdditionalView (tChild, objEditorWidget, io, cat, loader, tableName);
             //createView (tChild, objEditorWidget, io, loader, filters, 0);//copiesW);
             recW->actSetView->setEnabled ( nTemplC > 0 );
             objEditorWidget->addRecordsWidget (recW);
@@ -921,7 +921,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditorParam (int idObject,// идент
             QWidget * copiesW = new QWidget ();
             QGridLayout *gRecLay = new QGridLayout ();
             copiesW->setLayout (gRecLay);
-            KKSRecWidget * recW = KKSViewFactory::createAdditionalView (tChild, objEditorWidget, cat, loader, tableName);
+            KKSRecWidget * recW = KKSViewFactory::createAdditionalView (tChild, objEditorWidget, io, cat, loader, tableName);
             //createView (tChild, objEditorWidget, io, loader, filters, 0);//copiesW);
             recW->actSetView->setEnabled ( nTemplC > 0 );
             objEditorWidget->addRecordsWidget (recW);
@@ -7226,7 +7226,7 @@ void KKSObjEditorFactory :: addIOTable (KKSObject * wObj, KKSObjEditor * editor)
 
         QWidget * copiesW = new QWidget (editor);
         QGridLayout * gRecLay = new QGridLayout (copiesW);
-        KKSRecWidget * recW = KKSViewFactory::createAdditionalView (tChild, editor, wCat, loader, tableName);//, filters, 0);//copiesW);
+        KKSRecWidget * recW = KKSViewFactory::createAdditionalView (tChild, editor, wObj, wCat, loader, tableName);//, filters, 0);//copiesW);
         recW->actSetView->setEnabled ( nTemplC > 0 );
         gRecLay->addWidget (recW, 0, 0, 1, 1);
         editor->addRecordsWidget (recW);

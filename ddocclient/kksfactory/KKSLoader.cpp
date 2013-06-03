@@ -875,7 +875,7 @@ KKSObject * KKSLoader::loadIO(const QString & tableName, bool simplify) const
 }
 
 KKSObjectExemplar * KKSLoader::loadEIO(qint64 id, 
-									   KKSObject * io, 
+									   const KKSObject * io, 
 									   const KKSCategory *c0, 
 									   const QString& table,
 									   bool simplify) const
@@ -983,7 +983,7 @@ KKSObjectExemplar * KKSLoader::loadEIO(qint64 id,
     }
 
     eio = new KKSObjectExemplar();
-    eio->setIo(io);
+    eio->setIo(const_cast<KKSObject *> (io));
 
     KKSList<KKSAttrValue *> attrValues;
     
@@ -3714,7 +3714,7 @@ KKSRubricBase * KKSLoader::loadCatRubricators(void) const
         
         KKSSearchTemplate * st = 0;
         
-        KKSCategory * c = this->loadCategory (id);
+        KKSCategory * c = NULL;//this->loadCategory (id);
 
         QString name = res->getCellAsString(i, 3);
         QString code = res->getCellAsString(i, 8);
@@ -3727,9 +3727,9 @@ KKSRubricBase * KKSLoader::loadCatRubricators(void) const
         theRubric->setCategorized (true);
         theRubric->setCode(code);
         theRubric->setDesc(desc);
-        theRubric->setSearchTemplate (st);
+        //theRubric->setSearchTemplate (st);
         theRubric->setCategory(c);
-        theRubric->setIcon(icon);
+        //theRubric->setIcon(icon);
         //loadPrivileges (theRubric);
         theRubric->m_intId = id;
 /*        KKSList<const KKSRubricItem*> rItems = loadCatRubricItems (c);
@@ -3773,9 +3773,9 @@ KKSList<const KKSRubricItem *> KKSLoader::loadCatRubricItems (const KKSCategory*
     return rItems;
 }
 
-KKSRubric * KKSLoader::loadRubric (int idRubr) const
+KKSRubric * KKSLoader::loadRubric (int idRubr, bool withInherit) const
 {
-    QString sql = QString("select * from getRubric(%1) order by id,type").arg(idRubr);
+    QString sql = QString("select * from getRubric(%1, %2) order by id, type").arg(idRubr).arg(withInherit ? QString("TRUE") : QString("FALSE"));
 
     KKSResult * res = db->execute(sql);
     if(!res || res->getRowCount() == 0){
@@ -3792,6 +3792,7 @@ KKSRubric * KKSLoader::loadRubric (int idRubr) const
         idSearchTemplate = res->getCellAsInt (0, 3);
         st = loadSearchTemplate (idSearchTemplate);
     }
+
     rootRubric->setSearchTemplate (st);
     int idCategory = -1;
     KKSCategory * c = 0;
@@ -3803,6 +3804,7 @@ KKSRubric * KKSLoader::loadRubric (int idRubr) const
     rootRubric->setCategory (c);
 
     int cnt = res->getRowCount();
+    
     for(int i=1; i<cnt; i++){
         int id = res->getCellAsInt(i, 0);
 

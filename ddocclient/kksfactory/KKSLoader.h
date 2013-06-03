@@ -94,7 +94,7 @@ class _F_EXPORT KKSLoader
         KKSObject * loadIO(const QString & tableName, bool simplify = false) const;
 
         KKSObjectExemplar * loadEIO(qint64 id, 
-									KKSObject * io, 
+									const KKSObject * io, 
 									const KKSCategory *c0=0, 
 									const QString& table=QString(),
 									bool simplify = true) const;
@@ -198,7 +198,7 @@ class _F_EXPORT KKSLoader
         //≈сли параметр задан как TRUE, то озвращаетс€ только рубрикатор "ћои документы" дл€ текущего пользовател€
         KKSRubric * loadRubricators(bool bOnlyMyDocs) const;
         KKSRubricBase * loadCatRubricators(void) const;
-        KKSRubric * loadRubric (int idRubr) const;
+        KKSRubric * loadRubric (int idRubr, bool withInherit = false) const;
 
         //метод загружает перечень атрибутов, которые заданы (используютс€) хот€ бы одному информационному объекту
         //т.е. на них есть ссылки в таблице attrs_values

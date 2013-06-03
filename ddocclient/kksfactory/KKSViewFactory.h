@@ -47,7 +47,7 @@ class _F_EXPORT KKSViewFactory
                                      Qt::WindowFlags f=0);
 
         static void loadEIOEx (KKSObjEditor * editor, 
-                               KKSObject *pObj, 
+                               const KKSObject *pObj, 
                                KKSLoader *l, 
                                const KKSTemplate *t, 
                                QTreeView *tv,
@@ -59,7 +59,7 @@ class _F_EXPORT KKSViewFactory
                                bool isCheckable=false);
 
         static void loadEIOEx (QWidget *editor,
-                               KKSObject *pObj, 
+                               const KKSObject *pObj, 
                                KKSLoader *l, 
                                const KKSTemplate *t, 
                                QTreeView *tv,
@@ -128,6 +128,7 @@ class _F_EXPORT KKSViewFactory
 
         static KKSRecWidget * createAdditionalView (KKSTemplate *t,
                                                     KKSObjEditor *objEditor,
+                                                    const KKSObject * pObj,
                                                     const KKSCategory *cat,
                                                     KKSLoader *l,
                                                     QString tableName,

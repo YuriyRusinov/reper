@@ -180,7 +180,7 @@ KKSViewFactory::~KKSViewFactory()
  * isCheckable -- флаг наличия чекбоксов в 1й колонке
  */
 void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor, 
-                                  KKSObject *pObj, 
+                                  const KKSObject *pObj, 
                                   KKSLoader *l, 
                                   const KKSTemplate *t, 
                                   QTreeView *tv, 
@@ -288,7 +288,7 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
     QModelIndex wIndex;
     QModelIndex prevIndex (wIndex);
     QList<int> pattrs;
-    KKSCategory * cobjCat (0);//= pObj->category()->tableCategory();
+    const KKSCategory * cobjCat (0);//= pObj->category()->tableCategory();
     
     int idPAttr (-1);
     Q_UNUSED (idPAttr);
@@ -553,7 +553,7 @@ QVariant KKSViewFactory :: drawViewCells (const KKSCategory * cat,
  * isCheckable -- флаг наличия чекбоксов в 1й колонке
  */
 void KKSViewFactory :: loadEIOEx (QWidget *editor,
-                                  KKSObject *pObj, 
+                                  const KKSObject *pObj, 
                                   KKSLoader *l, 
                                   const KKSTemplate *t, 
                                   QTreeView *tv, 
@@ -614,7 +614,7 @@ void KKSViewFactory :: loadEIOEx (QWidget *editor,
     QModelIndex wIndex;
     QModelIndex prevIndex (wIndex);
     QList<int> pattrs;
-    KKSCategory * cobjCat (0);//= pObj->category()->tableCategory();
+    const KKSCategory * cobjCat (0);//= pObj->category()->tableCategory();
     int idPAttr (-1);
     if (pObj && pObj->category() && pObj->category()->tableCategory())
     {
@@ -2015,6 +2015,7 @@ KKSList<const KKSFilterGroup *> KKSViewFactory :: AttrRefsFilters (KKSLoader *l,
 // Parameters:
 // - t -- шаблон табличной категории
 // - objEditor -- редактор ИО
+// - pObj -- ИО, для которого добавляется в редактор доп. таблица
 // - cat -- категория доп. таблицы
 // - l -- загрузчик данных из БД
 // - tableName -- название доп. таблицы
@@ -2027,6 +2028,7 @@ KKSList<const KKSFilterGroup *> KKSViewFactory :: AttrRefsFilters (KKSLoader *l,
 
 KKSRecWidget * KKSViewFactory :: createAdditionalView (KKSTemplate *t,
                                                        KKSObjEditor *objEditor,
+                                                       const KKSObject * pObj,
                                                        const KKSCategory *cat,
                                                        KKSLoader *l,
                                                        QString tableName,
@@ -2070,7 +2072,7 @@ KKSRecWidget * KKSViewFactory :: createAdditionalView (KKSTemplate *t,
     if ( !t )
         return resWidget; 
 
-    loadEIOEx (objEditor, 0, l, t, tv, filters, true, cat, tableName);
+    loadEIOEx (objEditor, pObj, l, t, tv, filters, true, cat, tableName);
     return resWidget;
 }
 

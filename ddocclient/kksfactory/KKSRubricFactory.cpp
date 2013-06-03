@@ -954,7 +954,7 @@ void KKSRubricFactory :: copyFromRubric (KKSRubric * rDest, QAbstractItemModel *
     if (oEditor && oEditor->exec() == QDialog::Accepted)
     {
         int idRubr = oEditor->getID();
-        KKSRubric * rSource = loader->loadRubric(idRubr);
+        KKSRubric * rSource = loader->loadRubric(idRubr, true);
         if (rSource)
             rDest->addRubric (rSource);
     }
@@ -1291,16 +1291,20 @@ KKSRubric * KKSRubricFactory :: loadRubric (KKSRubric * r, int idRubr, QAbstract
     KKSRubric * rw  = loader->loadRubric(idRubr);
     if (!rw)
         return r;
+
     KKSCategory * c = rw->getCategory();
 //    if (c)
 //        c->addRef();
     r->setCategory(c);
 //    c->release();
+    
     KKSSearchTemplate * st = rw->getSearchTemplate();
     r->setSearchTemplate (st);
     KKSAccessEntity * acr = rw->getAccessRules();
     r->setAccessRules (acr);
     rubrMod->setData (recIndex, QVariant::fromValue<const KKSRubricBase *>(r), Qt::UserRole+1);
+    
     rw->release();
+
     return r;
 }
