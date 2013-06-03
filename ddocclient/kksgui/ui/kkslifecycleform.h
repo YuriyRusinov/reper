@@ -10,6 +10,7 @@
 
 #include <QDialog>
 #include <QModelIndex>
+#include <QVector>
 
 #include "kksgui_config.h"
 
@@ -19,6 +20,7 @@ namespace Ui
 };
 
 class QLineEdit;
+class QTextEdit;
 class QAbstractItemModel;
 class KKSLifeCycleEx;
 
@@ -51,7 +53,7 @@ private slots:
     void clearStateInd (void);
 
 signals:
-    void loadState (KKSLifeCycleEx * lc, QLineEdit * le, int lcst);
+    void loadState (KKSLifeCycleEx * lc, QLineEdit * le, int lcst, const QVector<qint64>& availableStates);
     void addLCState (KKSLifeCycleEx * lc, QAbstractItemModel * stateMod);
 
 private:
@@ -59,6 +61,7 @@ private:
     // Functions
     //
     void initStates (void);
+    QVector<qint64> loadAvStates (void) const;
 private:
     //
     // Variables

@@ -317,12 +317,17 @@ void KKSCatEditor :: init_parameters (void)
         KKSLifeCycleEx * lc = pCategory->lifeCycle();
         lELifeCycle->setText (lc->name());
     }
-    tbSetLifeCycle->setText(tr("Set"));
+    lELifeCycle->setReadOnly (true);
+    tbSetLifeCycle->setText(tr("..."));
+    QIcon lcIcon(":/ddoc/accept.png");
+    tbSetLifeCycle->setIcon(lcIcon);
     tbSetLifeCycle->setToolTip(tr("Set life cycle onto category %1").arg(pCategory->name()));
     
     connect (tbSetLifeCycle, SIGNAL (clicked()), this, SLOT (setCatLifeCycle()) );
 
-    tbClearLifeCycle->setText(tr("Clear"));
+    tbClearLifeCycle->setText(tr("..."));
+    QIcon lcClearIcon(":/ddoc/remove_icon.png");
+    tbClearLifeCycle->setIcon(lcClearIcon);
     tbClearLifeCycle->setToolTip(tr("Clear life cycle from category %1").arg(pCategory->name()));
     
     connect (tbClearLifeCycle, SIGNAL (clicked()), this, SLOT (clearCatLifeCycle()) );

@@ -1017,9 +1017,9 @@ void KKSCatEditorFactory :: addLifeCycle (QWidget * editor, int idObject, const 
     
     kkslifecycleform * lcForm = new kkslifecycleform (lc);//, editor);
     connect (lcForm,
-             SIGNAL (loadState (KKSLifeCycleEx *, QLineEdit *, int)),
+             SIGNAL (loadState (KKSLifeCycleEx *, QLineEdit *, int, const QVector<qint64>& )),
              this->objf,
-             SLOT (loadLifeCycleState (KKSLifeCycleEx *, QLineEdit *, int))
+             SLOT (loadLifeCycleState (KKSLifeCycleEx *, QLineEdit *, int, const QVector<qint64>& ))
             );
     connect (lcForm,
              SIGNAL (addLCState (KKSLifeCycleEx *, QAbstractItemModel *)),
@@ -1069,9 +1069,9 @@ void KKSCatEditorFactory :: editLifeCycle (QWidget * editor, int idObject, qint6
     
     kkslifecycleform * lcForm = new kkslifecycleform (lc);//, editor);
     connect (lcForm,
-             SIGNAL (loadState (KKSLifeCycleEx *, QLineEdit *, int)),
+             SIGNAL (loadState (KKSLifeCycleEx *, QLineEdit *, int, const QVector<qint64>& )),
              this->objf,
-             SLOT (loadLifeCycleState (KKSLifeCycleEx *, QLineEdit *, int))
+             SLOT (loadLifeCycleState (KKSLifeCycleEx *, QLineEdit *, int, const QVector<qint64>& ))
             );
     connect (lcForm,
              SIGNAL (addLCState (KKSLifeCycleEx *, QAbstractItemModel *)),

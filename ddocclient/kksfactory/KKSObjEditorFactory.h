@@ -360,7 +360,7 @@ private slots:
     
     void setRecState (KKSObjEditor * editor, QWidget * stateW, KKSObjectExemplar * wObjE);
     
-    void loadLifeCycleState (KKSLifeCycleEx * lc, QLineEdit * le, int lcSt);
+    void loadLifeCycleState (KKSLifeCycleEx * lc, QLineEdit * le, int lcSt, const QVector<qint64>& st);
     void addLifeCycleState (KKSLifeCycleEx * lc, QAbstractItemModel * stateMod);
     
     void addNewState (QWidget* editor, int idObject, const KKSCategory * c, QString tableName, int nTab, bool isModal, QAbstractItemModel * stateModel);

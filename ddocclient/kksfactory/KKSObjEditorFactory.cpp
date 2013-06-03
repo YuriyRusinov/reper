@@ -49,6 +49,7 @@
 #include <QPicture>
 #include <QSpacerItem>
 #include <QDateTimeEdit>
+#include <QVector>
 #include <QtDebug>
 
 #include "KKSObjEditorFactory.h"
@@ -8963,7 +8964,7 @@ void KKSObjEditorFactory :: sendEditor (KKSObjEditor * editor)
     emit editorCreated (editor);
 }
 
-void KKSObjEditorFactory :: loadLifeCycleState (KKSLifeCycleEx * lc, QLineEdit * le, int lcSt)
+void KKSObjEditorFactory :: loadLifeCycleState (KKSLifeCycleEx * lc, QLineEdit * le, int lcSt, const QVector<qint64>& st)
 {
     if (!lc)
         return;
@@ -8980,6 +8981,20 @@ void KKSObjEditorFactory :: loadLifeCycleState (KKSLifeCycleEx * lc, QLineEdit *
     }
     wCat = wCat->tableCategory();
     KKSList<const KKSFilterGroup *> filters;
+    QString values = QString();
+    int nrst = st.size();
+    for (int i=0; i<nrst; i++)
+    {
+        values += QString("%1%2").arg(st[i]).arg(i<nrst-1 ? QString(",") : QString());
+    }
+    const KKSFilter * f = wCat->createFilter(1, QString("select id from %1 where id in(%2) and not is_system").arg(refObj->tableName()).arg(values), KKSFilter::foInSQL);
+    KKSList<const KKSFilter *> stFilters;
+    stFilters.append(f);
+    f->release();
+    KKSFilterGroup * fg = new KKSFilterGroup (true);
+    fg->setFilters(stFilters);
+    filters.append(fg);
+    fg->release();
     KKSObjEditor * wEditor = this->createObjRecEditor (IO_IO_ID,
                                                        IO_STATE_ID,
                                                        filters,
@@ -9103,6 +9118,14 @@ void KKSObjEditorFactory :: addLifeCycleState (KKSLifeCycleEx * lc, QAbstractIte
     }
     wCat = wCat->tableCategory();
     KKSList<const KKSFilterGroup *> filters;
+    const KKSFilter * f = wCat->createFilter(1, QString("select id from %1 where not is_system").arg(refObj->tableName()), KKSFilter::foInSQL);
+    KKSList<const KKSFilter *> stFilters;
+    stFilters.append(f);
+    f->release();
+    KKSFilterGroup * fg = new KKSFilterGroup (true);
+    fg->setFilters(stFilters);
+    filters.append(fg);
+    fg->release();
     KKSObjEditor * wEditor = this->createObjRecEditor (IO_IO_ID,
                                                        IO_STATE_ID,
                                                        filters,

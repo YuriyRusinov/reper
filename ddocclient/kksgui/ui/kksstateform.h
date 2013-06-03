@@ -27,9 +27,11 @@ public:
     virtual ~kksstateform();
 
     KKSState * getState (void) const;
-
+    
 private slots:
     void stAccept (void);
+    void setParent (void);
+    void clearParent (void);
 
 private:
     //

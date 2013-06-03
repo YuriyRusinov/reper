@@ -21,9 +21,9 @@
      </property>
      <widget class="QWidget" name="tab_life_cycle">
       <attribute name="title">
-       <string>LIfe Cycle parameters</string>
+       <string>Parameters</string>
       </attribute>
-      <layout class="QGridLayout" name="gridLayout_4">
+      <layout class="QGridLayout" name="gridLayout_2">
        <item row="0" column="0">
         <layout class="QHBoxLayout" name="hIdLay">
          <item>
@@ -63,40 +63,27 @@
         </layout>
        </item>
        <item row="2" column="0">
-        <layout class="QHBoxLayout" name="hDesclLay">
+        <layout class="QHBoxLayout" name="hDescLay">
          <item>
           <widget class="QLabel" name="lDescription">
            <property name="text">
             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Description :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lEDescription"/>
+          <widget class="QTextEdit" name="tEDescription"/>
          </item>
         </layout>
-       </item>
-       <item row="3" column="0">
-        <spacer name="vLcSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>224</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </widget>
      <widget class="QWidget" name="tab_life_cycle_states">
       <attribute name="title">
-       <string>Life cycle states</string>
+       <string>States</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_3">
        <item row="0" column="0">
@@ -104,7 +91,7 @@
          <property name="title">
           <string>States</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout">
+         <layout class="QGridLayout" name="gStateLay">
           <item row="0" column="0">
            <layout class="QHBoxLayout" name="hStartStateLay">
             <item>
@@ -167,6 +154,9 @@
             </item>
             <item>
              <widget class="QToolButton" name="tbAutoStateAttribute">
+              <property name="toolTip">
+               <string>Set auto state after changes of attributes</string>
+              </property>
               <property name="text">
                <string>...</string>
               </property>
@@ -174,6 +164,9 @@
             </item>
             <item>
              <widget class="QToolButton" name="tbClearAutoStateAttribute">
+              <property name="toolTip">
+               <string>Remove auto state after changes of attributes</string>
+              </property>
               <property name="text">
                <string>...</string>
               </property>
@@ -186,7 +179,7 @@
             <item>
              <widget class="QLabel" name="lAutoStateInd">
               <property name="text">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Auto state indicator&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Auto state indicator :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -202,6 +195,9 @@
             </item>
             <item>
              <widget class="QToolButton" name="tbStateInd">
+              <property name="toolTip">
+               <string>Set auto state after changes of indices</string>
+              </property>
               <property name="text">
                <string>...</string>
               </property>
@@ -209,6 +205,9 @@
             </item>
             <item>
              <widget class="QToolButton" name="tbClearStateInd">
+              <property name="toolTip">
+               <string>Remove auto state after changes of indices</string>
+              </property>
               <property name="text">
                <string>...</string>
               </property>
@@ -260,6 +259,11 @@
         </layout>
        </item>
       </layout>
+     </widget>
+     <widget class="QWidget" name="tab_states_crosses">
+      <attribute name="title">
+       <string>State crosses</string>
+      </attribute>
      </widget>
     </widget>
    </item>

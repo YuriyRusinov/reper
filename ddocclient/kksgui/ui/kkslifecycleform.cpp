@@ -9,6 +9,9 @@
 #include <QStandardItemModel>
 #include <QItemSelectionModel>
 #include <QModelIndex>
+#include <QTextEdit>
+#include <QLineEdit>
+#include <QIcon>
 #include <QtDebug>
 
 #include <KKSLifeCycle.h>
@@ -30,7 +33,7 @@ kkslifecycleform::kkslifecycleform(KKSLifeCycleEx * lc, QWidget * parent, Qt::Wi
     
     UI->lEId->setText (QString::number (lc->id()));
     UI->lEName->setText (lifeCycle->name());
-    UI->lEDescription->setText (lifeCycle->desc());
+    UI->tEDescription->setPlainText (lifeCycle->desc());
     if (lifeCycle->startState())
     {
         const KKSState * st = lifeCycle->startState();
@@ -46,17 +49,29 @@ kkslifecycleform::kkslifecycleform(KKSLifeCycleEx * lc, QWidget * parent, Qt::Wi
         const KKSState * st = lifeCycle->autoStateInd();
         UI->lEAutoStateIndicator->setText (st->name());
     }
+    UI->lCTabW->setTabEnabled(2, false);
     this->initStates();
 
+    QIcon addIcon(":/ddoc/accept.png");
+    QIcon clearIcon(":/ddoc/remove_icon.png");
+
+    UI->tbStartState->setIcon(addIcon);
+    UI->tbClearStartState->setIcon (clearIcon);
     connect (UI->tbStartState, SIGNAL(clicked()), this, SLOT (setState()) );
     connect (UI->tbClearStartState, SIGNAL (clicked()), this, SLOT (clearState()) );
 
+    UI->tbAutoStateAttribute->setIcon(addIcon);
+    UI->tbClearAutoStateAttribute->setIcon (clearIcon);
     connect (UI->tbAutoStateAttribute, SIGNAL (clicked()), this, SLOT (setStateAttr()) );
     connect (UI->tbClearAutoStateAttribute, SIGNAL (clicked()), this, SLOT (clearStateAttr()) );
 
+    UI->tbStateInd->setIcon(addIcon);
+    UI->tbClearStateInd->setIcon (clearIcon);
     connect (UI->tbStateInd, SIGNAL (clicked()), this, SLOT (setStateInd()) );
     connect (UI->tbClearStateInd, SIGNAL (clicked()), this, SLOT (clearStateInd()) );
 
+    UI->tbAddState->setIcon(addIcon);
+    UI->tbDelState->setIcon (clearIcon);
     connect (UI->tbAddState, SIGNAL (clicked()), this, SLOT (addState()) );
     connect (UI->tbDelState, SIGNAL (clicked()), this, SLOT (delState()) );
 
@@ -74,13 +89,14 @@ kkslifecycleform::~kkslifecycleform()
 void kkslifecycleform::lcAccept (void)
 {
     lifeCycle->setName (UI->lEName->text());
-    lifeCycle->setDesc (UI->lEDescription->text());
+    lifeCycle->setDesc (UI->tEDescription->toPlainText());
     QDialog::accept();
 }
 
 void kkslifecycleform::setState (void)
 {
-    emit loadState (lifeCycle, UI->lEStartState, lcStart);
+    QVector<qint64> st = this->loadAvStates();
+    emit loadState (lifeCycle, UI->lEStartState, lcStart, st);
 }
 
 void kkslifecycleform::clearState (void)
@@ -91,12 +107,14 @@ void kkslifecycleform::clearState (void)
 
 void kkslifecycleform::setStateAttr (void)
 {
-    emit loadState (lifeCycle, UI->lEAutoStateAttribute, lcAttrChanged);
+    QVector<qint64> st = this->loadAvStates();
+    emit loadState (lifeCycle, UI->lEAutoStateAttribute, lcAttrChanged, st);
 }
 
 void kkslifecycleform::setStateInd (void)
 {
-    emit loadState (lifeCycle, UI->lEAutoStateIndicator, lcIndChanged);
+    QVector<qint64> st = this->loadAvStates();
+    emit loadState (lifeCycle, UI->lEAutoStateIndicator, lcIndChanged, st);
 }
 
 void kkslifecycleform::clearStateAttr (void)
@@ -152,4 +170,23 @@ void kkslifecycleform::initStates (void)
     UI->tvStates->setModel (stateModel);
     QAbstractItemDelegate * iDeleg = new KKSItemDelegate();
     UI->tvStates->setItemDelegate (iDeleg);
+}
+
+QVector<qint64> kkslifecycleform::loadAvStates (void) const
+{
+    QAbstractItemModel * stateModel = UI->tvStates->model();
+    int nr = stateModel->rowCount();
+    if (nr==0)
+        return QVector<qint64>();
+    
+    QVector<qint64> stVec;
+    for (int i=0; i<nr; i++)
+    {
+        QModelIndex wIndex = stateModel->index(i, 0);
+        bool ok;
+        qint64 idst = wIndex.data(Qt::UserRole).toLongLong(&ok);
+        if (ok)
+            stVec.push_back(idst);
+    }
+    return stVec;
 }
