@@ -72,6 +72,7 @@ class _F_EXPORT KKSRubricFactory : public KKSEntityFactory
         void sendDocs (const QList<int>& ioIDList);
         void setAccessDocs (const QList<int>& ioIDList);
         KKSRubric * loadRubric (KKSRubric * r, int idRubr, QAbstractItemModel * rubrModel, const QModelIndex& rubrIndex);
+        void loadCategoryIntoRubric (KKSRubric * r);
 
     private:
         //

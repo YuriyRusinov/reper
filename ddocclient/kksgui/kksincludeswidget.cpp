@@ -1163,20 +1163,23 @@ const KKSRubric * KKSIncludesWidget::getRubric(QModelIndex index)
             return 0;
         return static_cast<const KKSRubric *>(wrp);
     }
-    else if (wr->rubricType() != KKSRubricBase::atOthers)
-    {
-        const KKSRubric * r = static_cast<const KKSRubric *>(wr);
-        emit rubricRequested(const_cast<KKSRubric *>(r), index.data(Qt::UserRole).toInt(), model, index);
-        return r;//static_cast<const KKSRubric *>(wr);
-    }
-    else if (wr->rubricType() != KKSRubricBase::atRubricCategory)
+    else if (wr->rubricType() == KKSRubricBase::atRubricCategory)
     {
         const KKSRubric * r = static_cast<const KKSRubric *>(wr);
         if(r->getCategory())
             return r;
         
+        //
         //«¿√–”«»“‹  ¿“≈√Œ–»ﬁ — »ƒ = r->id() Ë Á‡‰‡Ú¸ ÂÂ ‚ Í‡ÚÂ„ÓË˛
         //emit rubricRequested(const_cast<KKSRubric *>(r), index.data(Qt::UserRole).toInt(), model, index);
+        //
+        emit rubricCategoryRequested (const_cast<KKSRubric *>(r));
+        return r;//static_cast<const KKSRubric *>(wr);
+    }
+    else if (wr->rubricType() != KKSRubricBase::atOthers)
+    {
+        const KKSRubric * r = static_cast<const KKSRubric *>(wr);
+        emit rubricRequested(const_cast<KKSRubric *>(r), index.data(Qt::UserRole).toInt(), model, index);
         return r;//static_cast<const KKSRubric *>(wr);
     }
     else
