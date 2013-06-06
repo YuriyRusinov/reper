@@ -1120,3 +1120,7 @@ void KKSCatEditorFactory :: delLifeCycle (QWidget * editor, int idObject, qint64
     recModel->removeRows (row, 1, pInd);
 }
 
+void KKSCatEditorFactory :: openLifeCycle ()
+{
+    
+}

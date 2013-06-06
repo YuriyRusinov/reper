@@ -33,7 +33,7 @@
      <x>0</x>
      <y>0</y>
      <width>770</width>
-     <height>21</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -111,6 +111,10 @@
     <addaction name="aEditOSS"/>
     <addaction name="separator"/>
     <addaction name="aSysQualifiers"/>
+    <addaction name="separator"/>
+    <addaction name="actLCCreate"/>
+    <addaction name="actLCOpen"/>
+    <addaction name="separator"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
@@ -252,6 +256,16 @@
   <action name="aSysQualifiers">
    <property name="text">
     <string>Системные справочники...</string>
+   </property>
+  </action>
+  <action name="actLCCreate">
+   <property name="text">
+    <string>Содать жизненный цикл...</string>
+   </property>
+  </action>
+  <action name="actLCOpen">
+   <property name="text">
+    <string>Открыть жизненный цикл...</string>
    </property>
   </action>
  </widget>

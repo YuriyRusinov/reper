@@ -94,6 +94,9 @@ class _F_EXPORT KKSCatEditorFactory : public KKSEntityFactory
 
         void setLifeCycleIntoCategory (KKSCategory * c, QLineEdit * lE);
         
+    public slots:
+        void openLifeCycle ();
+    private slots:
         void addLifeCycle (QWidget * editor, int idObject, const KKSCategory * c, QString tableName, int nTab, bool isModal, QAbstractItemModel * sRecMod);
         void editLifeCycle (QWidget * editor, int idObject, qint64 idObjE, const KKSCategory * c, QString tableName, int nTab, bool isModal, QAbstractItemModel * sRecMod, const QModelIndex& recIndex);
         void delLifeCycle (QWidget * editor, int idObject, qint64 idObjE, QString tableName, QAbstractItemModel * recModel, const QModelIndex& recIndex);
