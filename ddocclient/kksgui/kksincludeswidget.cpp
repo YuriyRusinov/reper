@@ -1276,7 +1276,7 @@ void KKSIncludesWidget::rubricSelectionChanged (const QItemSelection& selected, 
     QModelIndexList wIndexList (selected.indexes());
     QModelIndexList oldIndexList (deselected.indexes());
 
-    if (rubricsOnly || isRec || (wIndexList.isEmpty() && oldIndexList.isEmpty()))
+    if (rubricsOnly /*|| isRec*/ || (wIndexList.isEmpty() && oldIndexList.isEmpty()))
     {
         recWItems->setVisible (false);
         return;
