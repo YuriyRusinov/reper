@@ -146,7 +146,7 @@ void KKSMainWindow::init()
 void KKSMainWindow::closeEvent(QCloseEvent *event)
 {
     m_mdiArea->closeAllSubWindows();
-    if (activeObjEditor()) {
+    if (activeKKSSubWindow()) {
         event->ignore();
     } else {
         event->accept();
@@ -155,10 +155,9 @@ void KKSMainWindow::closeEvent(QCloseEvent *event)
 
 void KKSMainWindow::updateMenus()
 {
-    bool hasMdiChild = (activeObjEditor() != 0
-                        || activeCatEditor() != 0
-                        || activeTemplateEditor() != 0
-                        || activeRubricEditor() != 0);
+    qWarning() << "qqqqqqqqqqqqq";
+
+    bool hasMdiChild = (activeKKSSubWindow() != 0);
     
     aCloseWindow->setEnabled(hasMdiChild);
     aCloseAllWindows->setEnabled(hasMdiChild);
@@ -168,27 +167,110 @@ void KKSMainWindow::updateMenus()
     aPreviousWindow->setEnabled(hasMdiChild);
     aSaveIO->setEnabled(hasMdiChild);
     aSeparator->setVisible(hasMdiChild);
+
+    QList<QMdiSubWindow *> windows = m_mdiArea->subWindowList();
+    if(windows.isEmpty()){
+        aSeparator->setVisible(false);
+        return;
+    }
+
+    QList<QAction *> aList = ui->aWindowMenu->actions();
+    int aCount = aList.count();
+    for(int j=9; j<aCount; j++){
+        aList[j]->setChecked(false);
+    }
+    
+    for (int i = 0; i < windows.size(); i++) {
+        
+        KKSDialog *child = qobject_cast<KKSDialog*>(windows.at(i)->widget());
+
+        if(!child)
+            continue;
+
+        WId winId = child->winId();
+        QList<QAction *> aList = ui->aWindowMenu->actions();
+        int aCount = aList.count();
+        bool found = false;
+        int j=9;
+        for(j=9; j<aCount; j++){
+            if((int)winId == aList[j]->data().toInt()){
+                found = true;
+                break;
+            }
+        }
+        if(found){
+            aList[j]->setChecked(child == activeKKSSubWindow());
+            continue;
+        }
+
+        QString text;
+        if (i < 9) {
+            text = tr("&%1 %2").arg(i + 1)
+                               .arg(child->windowTitle());
+        } else {
+            text = tr("%1 %2").arg(i + 1)
+                              .arg(child->windowTitle());
+        }
+
+        QAction *action  = ui->aWindowMenu->addAction(text);
+        action->setCheckable(true);
+        action ->setChecked(child == activeKKSSubWindow());
+        action->setData((int)winId);
+        action->setIcon(child->icon());
+        tbSubWindows->addAction(action);
+        connect(action, SIGNAL(triggered()), m_windowMapper, SLOT(map()));
+        connect(child, SIGNAL(aboutToClose(KKSDialog *)), this, SLOT(closeSubWindow(KKSDialog *)));
+        m_windowMapper->setMapping(action, windows.at(i));
+    }
+
+
 }
 
-void KKSMainWindow::updateWindowMenu()
+void KKSMainWindow::closeSubWindow(KKSDialog * t)
 {
-    ui->aWindowMenu->clear();
-    ui->aWindowMenu->addAction(aCloseWindow);
-    ui->aWindowMenu->addAction(aCloseAllWindows);
-    ui->aWindowMenu->addSeparator();
-    ui->aWindowMenu->addAction(aTile);
-    ui->aWindowMenu->addAction(aCascade);
-    ui->aWindowMenu->addSeparator();
-    ui->aWindowMenu->addAction(aNextWindow);
-    ui->aWindowMenu->addAction(aPreviousWindow);
-    ui->aWindowMenu->addAction(aSeparator);
+    if(!t)
+        return;
 
+    WId winId = t->winId();
+
+    QList<QAction *> aList = ui->aWindowMenu->actions();
+    int aCount = aList.count();
+    bool found = false;
+    int j=9;
+    for(j=9; j<aCount; j++){
+        if((int)winId == aList[j]->data().toInt()){
+            found = true;
+            break;
+        }
+    }
+    if(!found)
+        return;
+
+    QAction * a = aList[j];
+    delete a;
+}
+
+void KKSMainWindow::updateWindowMenu(bool bFirstTime)
+{
+    if(bFirstTime){
+        ui->aWindowMenu->clear();
+        ui->aWindowMenu->addAction(aCloseWindow);
+        ui->aWindowMenu->addAction(aCloseAllWindows);
+        ui->aWindowMenu->addSeparator();
+        ui->aWindowMenu->addAction(aTile);
+        ui->aWindowMenu->addAction(aCascade);
+        ui->aWindowMenu->addSeparator();
+        ui->aWindowMenu->addAction(aNextWindow);
+        ui->aWindowMenu->addAction(aPreviousWindow);
+        ui->aWindowMenu->addAction(aSeparator);
+    }
+/*
     QList<QMdiSubWindow *> windows = m_mdiArea->subWindowList();
     aSeparator->setVisible(!windows.isEmpty());
 
     for (int i = 0; i < windows.size(); ++i) {
         
-        KKSObjEditor *child = qobject_cast<KKSObjEditor*>(windows.at(i)->widget());
+        KKSDialog *child = qobject_cast<KKSDialog*>(windows.at(i)->widget());
 
         if(!child)
             continue;
@@ -201,12 +283,14 @@ void KKSMainWindow::updateWindowMenu()
             text = tr("%1 %2").arg(i + 1)
                               .arg(child->windowTitle());
         }
+
         QAction *action  = ui->aWindowMenu->addAction(text);
         action->setCheckable(true);
-        action ->setChecked(child == activeObjEditor());
+        action ->setChecked(child == activeKKSSubWindow());
         connect(action, SIGNAL(triggered()), m_windowMapper, SLOT(map()));
         m_windowMapper->setMapping(action, windows.at(i));
     }
+*/
 }
 
 void KKSMainWindow::setActionsEnabled(bool enabled)
@@ -300,7 +384,7 @@ void KKSMainWindow::initActions()
     connect (aGenerateMess, SIGNAL(triggered()),
              this, SLOT (slotMess()));
 
-    updateWindowMenu();
+    updateWindowMenu(true);
 
     connect(ui->aWindowMenu, SIGNAL(aboutToShow()), this, SLOT(updateWindowMenu()));
 }
@@ -361,6 +445,11 @@ void KKSMainWindow::initToolBars()
     tbAdmin->addAction(ui->aEditOSS);
     tbAdmin->addAction(ui->aSysQualifiers);
 
+    tbSubWindows = new QToolBar(tr("Windows"), this);
+    tbSubWindows->setIconSize(QSize(32, 32));
+    tbSubWindows->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    //tbSubWindows->setVisible(false);
+
     QToolBar * tbOrg = new QToolBar (tr("Organization toolbar"), this);
     tbOrg->setIconSize (QSize (32, 32));
     QWidget * orgW = new QWidget (tbOrg);
@@ -382,12 +471,17 @@ void KKSMainWindow::initToolBars()
     //int tbArea = (Qt::RightToolBarArea | Qt::TopToolBarArea);
     this->addToolBar (/*(Qt::ToolBarArea)tbArea,*/ tbOrg);
 
+    this->addToolBarBreak();
+
+    this->addToolBar(tbSubWindows);
+
     QMenu * menuToolBars = new QMenu(tr("Toolbars"), this);
     ui->menuView->addMenu(menuToolBars);
     menuToolBars->addAction(tbActions->toggleViewAction());
     menuToolBars->addAction(tbPost->toggleViewAction());
     menuToolBars->addAction (tbQuery->toggleViewAction());
     menuToolBars->addAction (tbAdmin->toggleViewAction());
+    menuToolBars->addAction (tbSubWindows->toggleViewAction());
 }
 
 void KKSMainWindow::initIcons()
@@ -609,6 +703,14 @@ KKSStatusBar * KKSMainWindow::getStatusBar()
     return bar;
 }
 
+KKSDialog * KKSMainWindow::activeKKSSubWindow()
+{
+    if (QMdiSubWindow *activeSubWindow = m_mdiArea->activeSubWindow())
+        return qobject_cast<KKSDialog *>(activeSubWindow->widget());
+    return 0;
+}
+
+
 KKSObjEditor * KKSMainWindow::activeObjEditor()
 {
     if (QMdiSubWindow *activeSubWindow = m_mdiArea->activeSubWindow())
@@ -697,7 +799,12 @@ void KKSMainWindow::setActiveSubWindow(QWidget *window)
 {
     if (!window)
         return;
-    m_mdiArea->setActiveSubWindow(qobject_cast<QMdiSubWindow *>(window));
+
+    QMdiSubWindow * q_win = qobject_cast<QMdiSubWindow *>(window);
+    if(!q_win)
+        return;
+    
+    m_mdiArea->setActiveSubWindow(q_win);
 }
 
 void KKSMainWindow::slotCreateNewObjEditor(int idObject, 

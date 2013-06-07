@@ -13,6 +13,7 @@
 #include "kksgui_config.h"
 
 #include <QDialog>
+#include <QIcon>
 
 class QEventLoop;
 
@@ -26,6 +27,8 @@ class _GUI_EXPORT KKSDialog : public QDialog
 
         QSize sizeHint() const;
 
+        const QIcon & icon() const;
+
     public slots:
         //int exec (void);
 
@@ -38,12 +41,14 @@ class _GUI_EXPORT KKSDialog : public QDialog
         void rejected (void);
         void finished (int r);
 
-        void aboutToClose();
+        void aboutToClose(KKSDialog *);
 
    protected:
         virtual void closeEvent (QCloseEvent * event);
 
-    private:
+        QIcon m_icon; //иконка, которая отображается в меню и тулбаре главного окна, когда данное окно отображено как QMdiSubWindow
+
+   private:
         int res;
         QEventLoop *pEventL;
 

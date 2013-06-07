@@ -42,7 +42,7 @@
 #include <defines.h>
 
 KKSStuffForm :: KKSStuffForm (KKSAccessEntity * acl, int idCUser, QWidget *parent, Qt::WindowFlags flags)
-    : QWidget (parent, flags),
+    : KKSDialog (parent, flags),
     tvStuffStruct (new QTreeView (this)),
     lESearch (0),
     chRoles (0),//new QCheckBox(tr("View roles only with granted privilegies"), this)),
@@ -87,13 +87,15 @@ KKSStuffForm :: KKSStuffForm (KKSAccessEntity * acl, int idCUser, QWidget *paren
     connect (pbCancel, SIGNAL (clicked()), this, SLOT (reject()) );
 
     this->initPrivilegiesModel ();
+
+    m_icon = QIcon(":/ddoc/edit_oss.png");
 }
 
 KKSStuffForm :: KKSStuffForm (int idCUser,
                               int level,
                               QWidget * parent,
                               Qt::WindowFlags flags)
-    : QWidget (parent, flags),
+    : KKSDialog (parent, flags),
     tvStuffStruct (new QTreeView (this)),
     lESearch (0),
     chRoles (0),//new QCheckBox(tr("View roles only with granted privilegies"), this)),
@@ -147,6 +149,8 @@ KKSStuffForm :: KKSStuffForm (int idCUser,
     connect (pbOk, SIGNAL (clicked()), this, SLOT (accept()) );
     connect (pbCancel, SIGNAL (clicked()), this, SLOT (reject()) );
 
+    m_icon = QIcon(":/ddoc/edit_oss.png");
+
     this->initPrivilegiesModel ();
 /*    if (m_acl && idCUser != io->author() && idCUser != 1 )
     {
@@ -157,7 +161,7 @@ KKSStuffForm :: KKSStuffForm (int idCUser,
 }
 
 KKSStuffForm :: KKSStuffForm (KKSAclTemplate * at, int idCUser, QWidget *parent, Qt::WindowFlags flags)
-    : QWidget (parent, flags),
+    : KKSDialog (parent, flags),
     tvStuffStruct (new QTreeView (this)),
     lESearch (new QLineEdit(this)),
     chRoles (new QCheckBox(tr("View roles only with granted privilegies"), this)),
@@ -207,6 +211,8 @@ KKSStuffForm :: KKSStuffForm (KKSAclTemplate * at, int idCUser, QWidget *parent,
     connect (pbCancel, SIGNAL (clicked()), this, SLOT (reject()) );
 
     this->initPrivilegiesModel ();
+
+    m_icon = QIcon(":/ddoc/edit_oss.png");
 }
 
 KKSStuffForm :: ~KKSStuffForm (void)

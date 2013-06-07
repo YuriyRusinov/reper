@@ -20,7 +20,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 // Name:       KKSObject::KKSObject()
-// Purpose:    Implementation of KKSObject::KKSObject()
+// Purpose:    Implementation of KKSObject::KKS Object()
 // Return:     
 ////////////////////////////////////////////////////////////////////////
 
@@ -33,7 +33,6 @@ KKSObject::KKSObject() : KKSRecord(),
     m_idMaclabel (1),
     m_info (QString()),
     m_type (NULL),
-    m_state (KKSState::defState1()),
     m_syncType (KKSSyncType::defSyncType1()),
     m_category (NULL),
     m_tableTemplate(NULL),
@@ -47,6 +46,8 @@ KKSObject::KKSObject() : KKSRecord(),
     m_idSearchTemplate(-1),
     m_refTableName(QString())
 {
+    //m_state  = KKSState::defState1();
+    
     //в будущем наверное требуетс€ изменить параметр на FALSE
     //сейчас же при изменении »ќ всегда полагаетс€, 
     //что изменены все его характеристики
@@ -62,7 +63,6 @@ KKSObject::KKSObject(int id, KKSCategory * c, const QString & name, const QStrin
     m_idMaclabel (1),
     m_info (QString()),
     m_type (NULL),
-    m_state (KKSState::defState1()),
     m_syncType (KKSSyncType::defSyncType1()),
     m_category (NULL),
     m_tableTemplate(NULL),
@@ -76,6 +76,8 @@ KKSObject::KKSObject(int id, KKSCategory * c, const QString & name, const QStrin
     m_idSearchTemplate(-1),
     m_refTableName(QString())
 {
+    //m_state = KKSState::defState1();
+
     //данный метод в том числе задает рубрики объекту, если у категории таковые были заданы
     //производитс€ копирование рубрик категории в рубрики объекта
     setCategory(c);
@@ -93,7 +95,6 @@ KKSObject::KKSObject(const KKSObject & io) : KKSRecord(io),
     m_idOrganization(io.m_idOrganization),
     m_idMaclabel (io.m_idMaclabel),
     m_info (io.m_info),
-    m_state (NULL),
     m_type (NULL),
     m_syncType(NULL),
     m_category (NULL),
@@ -117,6 +118,7 @@ KKSObject::KKSObject(const KKSObject & io) : KKSRecord(io),
     m_idSearchTemplate(io.m_idSearchTemplate),
     m_refTableName(io.m_refTableName)
 {
+    //m_state = NULL;
     setCategory(const_cast<KKSCategory*>(io.category()));
     
     setTableTemplate(io.tableTemplate());
@@ -130,7 +132,7 @@ KKSObject::KKSObject(const KKSObject & io) : KKSRecord(io),
     if (m_aclE)
         m_aclE->addRef();
 
-    setState(const_cast<KKSState*>(io.state()));
+    //setState(const_cast<KKSState*>(io.state()));
     setType(const_cast<KKSType*>(io.type()));
     setSyncType(const_cast<KKSSyncType*>(io.syncType()));
 
@@ -159,8 +161,8 @@ KKSObject::~KKSObject()
     if(m_attrTemplate)
         m_attrTemplate->release();
 
-    if(m_state)
-        m_state->release();
+    //if(m_state)
+    //    m_state->release();
 
     if(m_type)
         m_type->release();
@@ -295,6 +297,7 @@ void KKSObject::setIdMaclabel(int id)
     m_idMaclabel = id;
 }
 
+/*
 const KKSState * KKSObject::state() const
 {
     return m_state;
@@ -314,6 +317,7 @@ void KKSObject::setState(KKSState * state)
     if(m_state)
         m_state->addRef();
 }
+*/
 
 const KKSType * KKSObject::type() const
 {

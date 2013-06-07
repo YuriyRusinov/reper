@@ -39,6 +39,8 @@ KKSAttributesEditor :: KKSAttributesEditor (const KKSMap<int, KKSAttrType*>& aTy
     connect (aGroupAdd, SIGNAL (triggered()), this, SLOT (addAGroup()) );
     connect (aGroupEdit, SIGNAL (triggered()), this, SLOT (editAGroup()) );
     connect (aGroupDel, SIGNAL (triggered()), this, SLOT (delAGroup()) );
+
+    m_icon = QIcon(":/ddoc/show_attrs.png");
 }
 
 KKSAttributesEditor :: KKSAttributesEditor (QWidget *parent, Qt::WindowFlags f)
@@ -55,6 +57,8 @@ KKSAttributesEditor :: KKSAttributesEditor (QWidget *parent, Qt::WindowFlags f)
     connect (aGroupAdd, SIGNAL (triggered()), this, SLOT (addAGroup()) );
     connect (aGroupEdit, SIGNAL (triggered()), this, SLOT (editAGroup()) );
     connect (aGroupDel, SIGNAL (triggered()), this, SLOT (delAGroup()) );
+
+    m_icon = QIcon(":/ddoc/show_attrs.png");
 }
 
 KKSAttributesEditor :: ~KKSAttributesEditor (void)

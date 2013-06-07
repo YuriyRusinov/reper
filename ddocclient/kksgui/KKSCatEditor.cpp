@@ -169,6 +169,11 @@ KKSCatEditor :: KKSCatEditor (KKSCategory *c,
 
     connect (pbOk, SIGNAL (clicked()), this, SLOT (accept()) );
     connect (pbCancel, SIGNAL (clicked()), this, SLOT (reject()) );
+
+    if(!pCategory || pCategory->id() <= 0)
+        m_icon = QIcon(":/ddoc/category_add.png");
+    else
+        m_icon = QIcon(":/ddoc/show_cat.png");
 }
 
 KKSCatEditor :: ~KKSCatEditor (void)

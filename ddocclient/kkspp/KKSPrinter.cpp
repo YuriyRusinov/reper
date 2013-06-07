@@ -124,7 +124,7 @@ int KKSPrinter::printSysAttributes(const KKSObject * io, int tabH)
     if(!value.trimmed().isEmpty())
         tabH = printAttribute(title, value, QPoint(0, tabH)).y();
 
-    value = io->state()->name();
+    value = io->state() ? io->state()->name() : QString::null;
     title = QObject::tr("State");
     if(!value.trimmed().isEmpty())
         tabH = printAttribute(title, value, QPoint(0, tabH)).y();

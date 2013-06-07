@@ -157,6 +157,8 @@ KKSObjEditor :: KKSObjEditor (const KKSTemplate *t,
                 title = QString("%1 (%2)").arg(pObj->name()).arg(tr("Filters applied"));
         }
         setWindowTitle(title);
+        if(!pObj->icon().isNull())
+            m_icon = pObj->icon();
     }
     else{
         QString title;
@@ -169,6 +171,8 @@ KKSObjEditor :: KKSObjEditor (const KKSTemplate *t,
                 title += " - (" + pObjectEx->io()->name() + ")";
         }
         setWindowTitle(title);
+        if(!pObjectEx->icon().isNull())
+            m_icon = pObjectEx->icon();
     }
 
     if (!m_sysTemplate)
@@ -1927,7 +1931,7 @@ void KKSObjEditor :: setAttrView (void)
 
 void KKSObjEditor :: closeEvent (QCloseEvent * event)
 {
-    emit aboutToClose();
+    emit aboutToClose(this);
 
     if (isChanged)
     {

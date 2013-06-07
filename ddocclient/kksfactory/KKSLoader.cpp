@@ -800,12 +800,6 @@ KKSObject * KKSLoader::loadIO(int id, bool simplify) const
         delete r;
     }
 
-    io->setAttrValues(loadAttrValues(io));
-
-    io->setIndicatorValues(loadIndicatorValues(io));
-
-    io->setFiles(loadFiles(io));
-
     KKSState * s = new KKSState();
     s->setId(res->getCellAsInt(0, 3));
     s->setName(res->getCellAsString(0, 11));
@@ -813,10 +807,20 @@ KKSObject * KKSLoader::loadIO(int id, bool simplify) const
     io->setState(s);
     s->release();
 
-    KKSType * type = new KKSType();//здесть экземпляр данного класса является типом ИО, поэтому метод KKSType::isQualifier() смысла не имеет
-    type->setId(res->getCellAsInt(0, 25));
-    type->setName(res->getCellAsString(0, 26));
-    type->setDesc(res->getCellAsString(0, 27));
+    io->setAttrValues(loadAttrValues(io));
+
+    io->setIndicatorValues(loadIndicatorValues(io));
+
+    KKSList<KKSFile *> files = loadFiles(io);
+    io->setFiles(files);
+
+
+    int id1 = res->getCellAsInt(0, 25);
+    QString name = res->getCellAsString(0, 26);
+    QString desc = res->getCellAsString(0, 27);
+
+    KKSType * type = new KKSType(id1, name, desc);//здесть экземпляр данного класса является типом ИО, поэтому метод KKSType::isQualifier() смысла не имеет
+
     io->setType(type);
     type->release();
 

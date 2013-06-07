@@ -117,9 +117,9 @@ class _PP_EXPORT KKSObject : public KKSRecord
         int idMaclabel() const;
         void setIdMaclabel(int id);
 
-        const KKSState * state() const;
-        KKSState * state();
-        void setState(KKSState * state);
+        //const KKSState * state() const;
+        //KKSState * state();
+        //void setState(KKSState * state);
 
 
         const KKSSyncType * syncType() const;
@@ -254,7 +254,7 @@ class _PP_EXPORT KKSObject : public KKSRecord
         void setModified(bool yes);
         
    
-        KKSState * m_state;
+        //KKSState * m_state;
         KKSType* m_type; //тип ИО
         KKSSyncType* m_syncType; //тип синхронизации ИО
 

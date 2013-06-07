@@ -19,6 +19,7 @@ class KKSMsgJournal;
 class KKSJournalWidget;
 class KKSObjEditor;
 class KKSCatEditor;
+class KKSDialog;
 class KKSCategoryTemplateWidget;
 class KKSTemplateEditor;
 class KKSIncludesWidget;
@@ -63,10 +64,11 @@ Q_OBJECT
 
 
         void updateMenus();
-        void updateWindowMenu();
+        void updateWindowMenu(bool bFirstTime = false);
         void setActiveSubWindow(QWidget *window);
         void saveActiveSubWindow();
         void printActiveSubWindow();
+        void closeSubWindow(KKSDialog * t);
 
 
         void slotConnect();
@@ -123,6 +125,8 @@ Q_OBJECT
         bool disconnectFromDb();
 
         KKSStatusBar * getStatusBar();
+        
+        KKSDialog * activeKKSSubWindow();
         KKSObjEditor * activeObjEditor();
         KKSCatEditor * activeCatEditor ();
         KKSTemplateEditor *activeTemplateEditor ();
@@ -144,6 +148,8 @@ Q_OBJECT
 
         QAction *aSaveIO;
         MassWidget *m_masscreateW;
+
+        QToolBar * tbSubWindows;
         
         QLabel * lModeName;
         QLabel * lOrgLogo;

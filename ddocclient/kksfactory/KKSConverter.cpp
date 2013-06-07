@@ -310,7 +310,10 @@ KKSObjectExemplar * KKSConverter::categoryToExemplar(const KKSLoader * loader, c
     //io_objects_organization
     //appendAttrValue(tc, attrValues, "io_categories_organization",  c->replicatedOrgsV());
     //id_io_state
-    appendAttrValue(tc, attrValues, 18, QString::number(c->state()->id()), KKSAttrType::atInt);//id_io_state
+    if(c->state())
+        appendAttrValue(tc, attrValues, 18, QString::number(c->state()->id()), KKSAttrType::atInt);//id_io_state
+    else
+        appendAttrValue(tc, attrValues, 18, QString::null, KKSAttrType::atInt);//id_io_state
     //is_global
     appendAttrValue(tc, attrValues, 111,  c->isGlobal() ? "true" : "false", KKSAttrType::atBool);//is_global
     //id_life_cycle
@@ -356,7 +359,10 @@ KKSObjectExemplar * KKSConverter::objToExemplar(const KKSLoader * loader, const 
     //author
     appendAttrValue(tc, attrValues, 13, QString::number(io->author()), KKSAttrType::atInt);//author
     //id_io_state
-    appendAttrValue(tc, attrValues, 18, QString::number(io->state()->id()), KKSAttrType::atInt);//id_io_state
+    if(io->state())
+        appendAttrValue(tc, attrValues, 18, QString::number(io->state()->id()), KKSAttrType::atInt);//id_io_state
+    else
+        appendAttrValue(tc, attrValues, 18, QString::null, KKSAttrType::atInt);//id_io_state
     //id_io_type
     appendAttrValue(tc, attrValues, 43, QString::number(io->type()->id()), KKSAttrType::atInt);//id_io_type
     //id_maclabel

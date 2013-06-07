@@ -165,7 +165,7 @@ KKSIncludesWidget * KKSRubricFactory :: createRubricEditor (int mode, const KKSL
                 iW->setParent (0);
                 delete iW;
             }
-            const KKSFilter * f = catCatIO->createFilter(1, "select id from cgetcategoriesforrubricator() order by id", KKSFilter::foInSQL);
+            const KKSFilter * f = catCatIO->createFilter(1, "select id from cGetCategoriesForRubricator() order by id", KKSFilter::foInSQL);
             //
             // io_categories where id_io_category_type != 10 and is_main and not is_archived
             //
@@ -384,14 +384,18 @@ void KKSRubricFactory::rubricItemCreate(const KKSRubric * r, QAbstractItemModel 
      */
     objEditor->setAttribute(Qt::WA_DeleteOnClose);
 
+    bool mode(editor->windowModality() == Qt::NonModal);
+    if (mode)
+        emit objEditorCreated(objEditor);
 }
 
-void KKSRubricFactory::rubricItemUpload(const KKSRubric *r, bool forRecords, QAbstractItemModel * itemModel) {
+void KKSRubricFactory::rubricItemUpload(const KKSRubric *r, bool forRecords, QAbstractItemModel * itemModel) 
+{
     KKSIncludesWidget *editor = qobject_cast<KKSIncludesWidget *>(this->sender());
     if (!editor || !r || !itemModel)
         return;
 
-    KKSList<const KKSFilter*> filters;
+    
 
     KKSObject * o = loader->loadIO(IO_IO_ID, true);
     if (!o)
@@ -404,25 +408,32 @@ void KKSRubricFactory::rubricItemUpload(const KKSRubric *r, bool forRecords, QAb
 
     //KKSObjEditorFactory * oef = kksSito->oef();
 
-    int idUser = loader->getUserId();
-    KKSFilter * filter = c->createFilter(ATTR_AUTHOR, QString::number(idUser), KKSFilter::foEq);
-    //: c->createFilter(ATTR_ID, QString::number(idUser), KKSFilter::foEq); // 
-    if (!filter) {
-        o->release();
-        return;
-    }
-    filters.append(filter);
-    filter->release();
-    if (forRecords) {
-        KKSFilter * filterTab = c->createFilter(8, QString("is not null"), KKSFilter::foIsNotNull);
-        filters.append(filterTab);
-        filterTab->release();
-    }
     KKSList<const KKSFilterGroup *> filterGroups;
-    KKSFilterGroup * group = new KKSFilterGroup(true);
-    group->setFilters(filters);
-    filterGroups.append(group);
-    group->release();
+    KKSList<const KKSFilter*> filters;
+
+    if (forRecords) {
+            KKSFilter * filterTab = c->createFilter(ATTR_TABLE_NAME, QString("is not null"), KKSFilter::foIsNotNull);
+            filters.append(filterTab);
+            filterTab->release();
+    }
+
+    if(r->getCategory()){
+        KKSFilter * filter = c->createFilter(ATTR_ID_IO_CATEGORY, QString::number(r->getCategory()->id()), KKSFilter::foEq);
+        if (!filter) {
+            o->release();
+            return;
+        }
+
+        filters.append(filter);
+        filter->release();
+    }
+
+    if(filters.count() > 0){
+        KKSFilterGroup * group = new KKSFilterGroup(true);
+        group->setFilters(filters);
+        filterGroups.append(group);
+        group->release();
+    }
 
     KKSObjEditor *objEditor = oef->createObjEditor(IO_IO_ID,
             IO_IO_ID,
@@ -435,6 +446,7 @@ void KKSRubricFactory::rubricItemUpload(const KKSRubric *r, bool forRecords, QAb
             Qt::WindowModal,
             editor,
             Qt::Dialog);
+
     int res = objEditor->exec();
 
     int idObject = -1;
@@ -451,11 +463,13 @@ void KKSRubricFactory::rubricItemUpload(const KKSRubric *r, bool forRecords, QAb
         if (r->getCategory()) {
             const KKSCategory * c = o->category();
             if (c->id() != r->getCategory()->id()) {
-                int res = QMessageBox::question(editor, tr("Add document into rubric"), tr("You are put document of category %1 to rubric with category %2.\n Do you want to proceed ?").arg(c->id()).arg(r->getCategory()->id()), QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-                if (res != QMessageBox::Yes) {
-                    o->release();
-                    return;
-                }
+                int res = QMessageBox::critical(editor, 
+                                                tr("Add document into rubric"), 
+                                                tr("You are put document of category\n\"%1\"\nto rubric with category:\n\"%2\".\nThis is not allowed!")
+                                                    .arg(c->name())
+                                                    .arg(r->getCategory()->name()));
+                o->release();
+                return;
             }
         }
         o->release();

@@ -29,8 +29,8 @@ public:
     const QDateTime & lastUpdate() const;
     virtual void setLastUpdate(const QDateTime & l);
    
-    const KKSState * state () const;
-    KKSState * state ();
+    virtual const KKSState * state () const;
+    virtual KKSState * state ();
     virtual void setState(KKSState * s);
    
     const QString & uuid() const;
@@ -68,14 +68,15 @@ public:
     virtual ~KKSRecord();
 
 protected:
+    KKSState * m_state; //состояние, в котором находится запись. По умолчанию = KKSState::defState1()
 private:
     qint64 m_id;//рабочий идентификатор записи, который используется в системе поддержания ссылочной целостности (первичный ключ)
     QDateTime m_lastUpdate;//дата и время последнего изменения записи
-    KKSState * m_state; //состояние, в котором находится запись. По умолчанию = KKSState::defState1()
+    
     QString m_uuid; //уникальый идентификатор записи в системе генерации уникальных идентификаторов uuid-ossp
     QString m_uniqueId; //уникальный идентификатор записи в системе генерации уникальных идентификаторов DynamicDocs
 
-    bool m_isKKSState;
+    //bool m_isKKSState;
    
     QIcon m_icon;//иконка для каждого ЭИО из несистемного справочника. Для системных справочников, а также для тех, где иконка не задана приобретает дефолтное значение KKSObjectExemplar::defIcon
     QString m_iconData;//строковое представление иконки. Вся работа по обмену с БД происходит именно через эту переменную

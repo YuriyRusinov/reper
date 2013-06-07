@@ -182,7 +182,7 @@ int KKSEIOFactory::insertRecord(KKSObjectExemplar* eio,
     QString exQuery;//åñëè òàáëèöà ñîäåğæèò àòğèáóòû òèïà atCheckListEx (îòíîøåíèå ìíîãèå-êî-ìíîãèì)
 
     //ñîõğàíÿåì â ÁÄ ñîñòîÿíèå İÈÎ, åñëè îíî íå ñîçäàíî â ÁÄ
-    if(eio->state()->id() <= 0){
+    if(eio->state() && eio->state()->id() <= 0){
         m_ppFactory->insertState(eio->state());
     }
     
@@ -300,7 +300,7 @@ int KKSEIOFactory::updateRecord(KKSObjectExemplar* eio,
     
     
     //ñîõğàíÿåì â ÁÄ ñîñòîÿíèå İÈÎ, åñëè îíî íå ñîçäàíî â ÁÄ
-    if(eio->state()->id() <= 0){
+    if(eio->state() && eio->state()->id() <= 0){
         m_ppFactory->insertState(eio->state());
     }
 

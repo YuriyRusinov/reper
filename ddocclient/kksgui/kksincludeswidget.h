@@ -1,7 +1,7 @@
 #ifndef KKSINCLUDESWIDGET_H
 #define KKSINCLUDESWIDGET_H
 
-#include <QWidget>
+#include <KKSDialog.h>
 #include <kksgui_config.h>
 
 #include <KKSList.h>
@@ -24,7 +24,7 @@ class KKSRubricBase;
 class RubricForm;
 class KKSRecWidget;
 
-class _GUI_EXPORT KKSIncludesWidget: public QWidget
+class _GUI_EXPORT KKSIncludesWidget: public KKSDialog
 {
     Q_OBJECT
 
@@ -115,7 +115,7 @@ signals:
     void rubricsChanged (void);
     void copyFromRubr (KKSRubric * rDest, QAbstractItemModel * attachModel, const QModelIndex& index);
 
-    void aboutToClose();
+    //void aboutToClose();
 
     void loadStuffModel (RubricForm * rForm);
     void loadSearchtemplate (RubricForm * rForm);

@@ -8648,7 +8648,11 @@ void KKSObjEditorFactory :: putSystemParams (KKSObjectExemplar * recio,
                 tbState->setText(tr("..."));
                 edLay->addWidget (tbState);
                 const KKSState * st = recio->state();
-                (qobject_cast<QLineEdit *>(lE))->setText (st->name());
+                if(st)
+                    (qobject_cast<QLineEdit *>(lE))->setText (st->name());
+                else
+                    (qobject_cast<QLineEdit *>(lE))->setText (tr("Active"));
+
                 QFont f = l->font();
                 f.setBold(true);
                 l->setFont(f);

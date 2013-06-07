@@ -51,7 +51,7 @@ KKSIncludesWidget::KKSIncludesWidget(KKSRubric * rootRubric,
                                      bool forRecord,
                                      QWidget *parent,
                                      Qt::WindowFlags flags)
-    : QWidget (parent, flags),
+    : KKSDialog (parent, flags),
     m_rootRubric (rootRubric),
     isMyDoc (isDocs),
     isChanged (false),
@@ -115,6 +115,8 @@ KKSIncludesWidget::KKSIncludesWidget(KKSRubric * rootRubric,
 
     if (forCategory)
         this->setWindowTitle (tr("Rubrics"));
+
+    m_icon = QIcon(":/ddoc/rubricators.png");
 
     QItemSelectionModel * selModel = twIncludes->selectionModel ();
     if (selModel)
@@ -1236,12 +1238,12 @@ void KKSIncludesWidget::closeEvent (QCloseEvent * event)
         else if (res == QMessageBox::Yes)
             save ();
         
-        emit aboutToClose();
+        emit aboutToClose(this);
         
         event->accept ();
     }
     else{
-        emit aboutToClose();
+        emit aboutToClose(this);
         QWidget::closeEvent (event);
     }
 }

@@ -9,6 +9,7 @@ KKSDialog :: KKSDialog (QWidget *parent, Qt::WindowFlags f)
     : QDialog (parent, f),
     pEventL (0)//new QEventLoop())
 {
+    m_icon = QIcon(":/ddoc/rubric_item.png");
 }
 
 KKSDialog :: ~KKSDialog (void)
@@ -43,7 +44,8 @@ QSize KKSDialog::sizeHint() const
         return a->size();
     }
 
-    return parent->size();
+    QSize s = parent->size();
+    return s;
 }
 
 /*
@@ -91,7 +93,12 @@ int KKSDialog :: result (void) const
 
 void KKSDialog::closeEvent (QCloseEvent * event)
 {
-    emit aboutToClose();
+    emit aboutToClose(this);
 
     QWidget::closeEvent (event);
+}
+
+const QIcon & KKSDialog::icon() const
+{
+    return m_icon;
 }

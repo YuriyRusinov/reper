@@ -68,6 +68,8 @@ KKSTemplateEditor :: KKSTemplateEditor (KKSTemplate *t, bool mode, QWidget *pare
     connect (pbOk, SIGNAL (clicked()), this, SLOT (saveClose()) );
     connect (pbCancel, SIGNAL (clicked()), this, SLOT (reject()) );
     connect (pbApply, SIGNAL (clicked()), this, SLOT (save()) );
+
+    m_icon = QIcon(":/ddoc/organize_1949.png");
 }
 
 KKSTemplateEditor :: ~KKSTemplateEditor ()

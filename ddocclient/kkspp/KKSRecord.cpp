@@ -86,9 +86,9 @@ void KKSRecord::setState(KKSState * s)
 
     if(m_state)
         m_state->addRef();
-    else{
-        m_state = KKSState::defState1();
-    }
+    //else{
+    //    m_state = KKSState::defState1();
+    //}
 
 }
 
@@ -221,14 +221,18 @@ m_recordTextColor(QColor())
     m_id = -1;
     m_uuid = QString::null;
     m_uniqueId = QString::null;
-    m_state = KKSState::defState1();
+    
+    m_state = NULL;
+   // KKSState * s = dynamic_cast<KKSState *>(this);
+   // if(!s)
+   //     m_state = KKSState::defState1();
     
     setIcon(KKSRecord::defIconAsString());
 
     m_name = QString::null;
     m_code = QString::null;
     m_parent = NULL;
-    m_isKKSState = false;
+    //m_isKKSState = false;
 }
 
 KKSRecord::KKSRecord(const KKSRecord & r) :
@@ -239,9 +243,11 @@ m_recordTextColor(r.recordTextColor())
     m_lastUpdate = r.lastUpdate();
     m_uuid = r.uuid();
     m_uniqueId = r.uniqueId();
-    m_isKKSState = r.m_isKKSState;
+    //m_isKKSState = r.m_isKKSState;
     
     m_state = NULL;
+    //KKSState * s = dynamic_cast<KKSState *>(this);
+    //if(!s)
     setState(const_cast<KKSState *>(r.state()));
 
     m_icon = r.m_icon;
@@ -263,11 +269,13 @@ m_recordTextColor(QColor())
     m_uuid = QString::null;
     m_uniqueId = QString::null;
     
-    m_isKKSState = isKKSState;
-    if(m_isKKSState)
-        m_state = NULL;
-    else
-        m_state = KKSState::defState1();
+    //m_isKKSState = isKKSState;
+    //if(m_isKKSState)
+
+    m_state = NULL;
+    //KKSState * s = dynamic_cast<KKSState *>(this);
+    //if(!s)
+    //    m_state = KKSState::defState1();
 
     setIcon(KKSRecord::defIconAsString());
 
@@ -287,10 +295,14 @@ m_recordTextColor(QColor())
 
 KKSRecord::~KKSRecord()
 {
-    if(m_parent)
+    if(m_parent){
         m_parent->release();
-    if(m_state)
+        m_parent = NULL;
+    }
+    if(m_state){
         m_state->release();
+        m_state = NULL;
+    }
 }
 
 void KKSRecord::setParent(KKSRecord * p)

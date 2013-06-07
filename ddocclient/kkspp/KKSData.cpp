@@ -45,6 +45,9 @@ void KKSData::addRef(void) const
 void KKSData::release(void) const
 {
     //qWarning("release() invoked!");
+    if(m_refCount < 0){
+        int a = 0;
+    }
     int cnt = --m_refCount;
 
     if(cnt <= 0){

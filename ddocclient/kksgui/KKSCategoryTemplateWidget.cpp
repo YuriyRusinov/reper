@@ -78,7 +78,7 @@ KKSCategoryTemplateWidget :: KKSCategoryTemplateWidget (bool mode, const QList<i
     
     connect (tvCatTemplate, SIGNAL (doubleClicked(const QModelIndex &)), this, SLOT(tvDoubleClicked(const QModelIndex & )) );
 
-    
+    m_icon = QIcon(":/ddoc/show_cat.png");
 }
 
 KKSCategoryTemplateWidget :: ~KKSCategoryTemplateWidget (void)

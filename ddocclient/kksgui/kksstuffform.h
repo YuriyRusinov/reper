@@ -1,7 +1,7 @@
 #ifndef _KKSSTUFF_FORM_H
 #define _KKSSTUFF_FORM_H
 
-#include <QWidget>
+#include <KKSDialog.h>
 #include <kksgui_config.h>
 
 class QModelIndex;
@@ -24,7 +24,7 @@ class KKSPrivilege;
 class KKSAccessEntity;
 class KKSAclTemplate;
 
-class _GUI_EXPORT KKSStuffForm : public QWidget
+class _GUI_EXPORT KKSStuffForm : public KKSDialog
 {
     public:
         KKSStuffForm (KKSAccessEntity * acl,
@@ -141,7 +141,7 @@ class _GUI_EXPORT KKSStuffForm : public QWidget
         void accepted ();
         void rejected ();
         void finished (int r);
-        void aboutToClose();
+        
 
     private:
         //
