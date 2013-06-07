@@ -62,7 +62,7 @@ begin
 
         query := query ||','|| 'description = ';
         if (iDesc is not null) then
-            query := query || iDesc;
+            query := query || quote_literal(iDesc);
         else
             query := query || 'NULL';
         end if;
