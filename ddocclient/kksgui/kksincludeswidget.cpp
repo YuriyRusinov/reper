@@ -620,6 +620,8 @@ void KKSIncludesWidget :: editRubric (void)
     KKSSearchTemplate * rst = 0;
     KKSCategory * rc = 0;
     KKSAccessEntity * ac =0;
+    bool isCatAvail = !r->getCategory() || recWItems->getSourceModel()->rowCount() == 0;
+    rForm->setCatEnabled(isCatAvail);
     QString rDesc;
     QString rIcon;
     if (rForm && rForm->exec() == QDialog::Accepted)

@@ -241,3 +241,10 @@ void RubricForm :: setIcon (const QPixmap& rubrIcon)
 {
     UI->lRubricIconImage->setPixmap (rubrIcon);
 }
+
+void RubricForm :: setCatEnabled (bool isEn)
+{
+    UI->lCategory->setEnabled (isEn);
+    UI->lECategory->setEnabled (isEn);
+    UI->tbCategory->setEnabled (isEn);
+}

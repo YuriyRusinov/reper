@@ -46,6 +46,8 @@ public:
     
     QString getIconAsString (void) const;
     void setIcon (const QPixmap& rubrIcon);
+    
+    void setCatEnabled (bool isEn);
 
 public slots:
     void setAccessEntity (KKSAccessEntity * _acl);
