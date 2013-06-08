@@ -38,6 +38,7 @@
 #include <KKSJournalWidget.h>
 #include <kksstuffform.h>
 #include <IndicatorForm.h>
+#include <kkslifecycleform.h>
 
 #include "cmdjournalsettingsform.h"
 #include "msgjournalsettingsform.h"
@@ -322,6 +323,8 @@ void KKSMainWindow::setActionsEnabled(bool enabled)
     ui->aEditOSS->setEnabled(false);
     ui->aSysQualifiers->setEnabled(false);
     aGenerateMess->setEnabled(false);
+    ui->actLCCreate->setEnabled(false);
+    ui->actLCOpen->setEnabled(false);
 
     if(enabled){
         QString uName = kksSito->loader()->getDb()->getUser();
@@ -332,6 +335,8 @@ void KKSMainWindow::setActionsEnabled(bool enabled)
             ui->aEditOSS->setEnabled(enabled);
             ui->aSysQualifiers->setEnabled(enabled);
             this->aGenerateMess->setEnabled(enabled);
+            ui->actLCCreate->setEnabled(enabled);
+            ui->actLCOpen->setEnabled(enabled);
         }
     }
        
@@ -564,6 +569,8 @@ void KKSMainWindow::initConnections()
     connect(ui->aViewAttrs, SIGNAL(triggered()), this, SLOT(slotViewAttrs()));
     connect(ui->aEditOSS, SIGNAL(triggered()), this, SLOT(slotEditOSS()));
     connect(ui->aSysQualifiers, SIGNAL(triggered()), this, SLOT(slotSysQualifiers()));
+    connect(ui->actLCCreate, SIGNAL (triggered()), this, SLOT(slotCreateLC()) );
+    connect(ui->actLCOpen, SIGNAL (triggered()), this, SLOT (slotOpenLC()) );
 
     connect(ui->aSettings, SIGNAL(triggered()), this, SLOT(slotSettings()));
 
@@ -703,10 +710,10 @@ KKSStatusBar * KKSMainWindow::getStatusBar()
     return bar;
 }
 
-KKSDialog * KKSMainWindow::activeKKSSubWindow()
+QWidget * KKSMainWindow::activeKKSSubWindow()
 {
     if (QMdiSubWindow *activeSubWindow = m_mdiArea->activeSubWindow())
-        return qobject_cast<KKSDialog *>(activeSubWindow->widget());
+        return qobject_cast<QWidget *>(activeSubWindow->widget());
     return 0;
 }
 
@@ -745,6 +752,15 @@ KKSIncludesWidget *KKSMainWindow::activeRubricEditor ()
 
     if (QMdiSubWindow *activeSubWindow = m_mdiArea->activeSubWindow())
         return qobject_cast<KKSIncludesWidget *>(activeSubWindow->widget());
+    return 0;
+}
+
+kkslifecycleform * KKSMainWindow::activeLCEditor ()
+{
+    if (activeObjEditor() || activeCatEditor() || activeTemplateEditor () || activeRubricEditor ())
+        return 0;
+    if (QMdiSubWindow *activeSubWindow = m_mdiArea->activeSubWindow())
+        return qobject_cast<kkslifecycleform *>(activeSubWindow->widget());
     return 0;
 }
 
@@ -791,6 +807,13 @@ void KKSMainWindow::saveActiveSubWindow()
     if (rEditor)
     {
         rEditor->save ();
+        return;
+    }
+    
+    kkslifecycleform * lcEditor = activeLCEditor ();
+    if (lcEditor)
+    {
+        lcEditor->save ();
         return;
     }
 }
@@ -1366,4 +1389,22 @@ void KKSMainWindow::slotMess()
 {
     qDebug () << __PRETTY_FUNCTION__;
     slotCreateNewObjEditor(IO_IO_ID, IO_MESSAGE_STREAM_ID, KKSList<const KKSFilterGroup*>(), "");
+}
+
+void KKSMainWindow::slotCreateLC()
+{
+    KKSCatEditorFactory * catF = kksSito->catf();
+    kkslifecycleform * lcForm = catF->createLifeCycle ();
+    QMdiSubWindow * m_LCW = m_mdiArea->addSubWindow (lcForm);
+    m_LCW->setAttribute (Qt::WA_DeleteOnClose);
+    lcForm->show();
+    this->setActiveSubWindow (m_LCW);
+}
+
+void KKSMainWindow::slotOpenLC()
+{
+    KKSCatEditorFactory * catF = kksSito->catf();
+    KKSObjEditor * lcEditor = catF->openLifeCycle();
+
+    slotCreateNewObjEditor (lcEditor);
 }

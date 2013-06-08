@@ -140,27 +140,27 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
     }
     else if (role == Qt::UserRole+1)
         return QVariant::fromValue<KKSEIOData *>(wItem->getData());
-    else if (cAttrBackground && (role == Qt::BackgroundRole || role == Qt::BackgroundColorRole))
+    else if (role == Qt::BackgroundRole || role == Qt::BackgroundColorRole)
     {
         if (!wItem->getData())
             return QVariant();
         KKSEIOData * d = wItem->getData ();
         bool ok;
         //qDebug () << __PRETTY_FUNCTION__ << d->fields().value (cAttrBackground->code(false).toLower());
-        quint64 vl = d->fields().value (cAttrBackground->code(false)).toULongLong (&ok);
+        quint64 vl = cAttrBackground ? d->fields().value (cAttrBackground->code(false)).toULongLong (&ok) : d->sysFields().value("record_fill_color").toULongLong (&ok);
         if (!ok)
             return QVariant ();
         QVariant vc = QColor::fromRgba (vl);
         return vc;
     }
-    else if (cAttrForeground && role == Qt::ForegroundRole )
+    else if (role == Qt::ForegroundRole )
     {
         if (!wItem->getData())
             return QVariant();
         KKSEIOData * d = wItem->getData ();
         bool ok;
         //qDebug () << __PRETTY_FUNCTION__ << d->fields().value (cAttrBackground->code(false).toLower());
-        quint64 vl = d->fields().value (cAttrForeground->code(false)).toULongLong (&ok);
+        quint64 vl = cAttrForeground ? d->fields().value (cAttrForeground->code(false)).toULongLong (&ok) : d->sysFields().value("record_text_color").toULongLong (&ok);
         if (!ok)
             return QVariant ();
         QVariant vc = QColor::fromRgba (vl);

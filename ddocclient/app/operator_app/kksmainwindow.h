@@ -24,6 +24,7 @@ class KKSCategoryTemplateWidget;
 class KKSTemplateEditor;
 class KKSIncludesWidget;
 class IndicatorForm;
+class kkslifecycleform;
 
 class MassWidget;
 //class FBFavourites;
@@ -96,6 +97,8 @@ Q_OBJECT
         void slotViewAttrs();
         void slotEditOSS();
         void slotSysQualifiers();
+        void slotCreateLC();
+        void slotOpenLC();
 
         void slotSettings();
 
@@ -126,11 +129,12 @@ Q_OBJECT
 
         KKSStatusBar * getStatusBar();
         
-        KKSDialog * activeKKSSubWindow();
+        QWidget * activeKKSSubWindow();
         KKSObjEditor * activeObjEditor();
         KKSCatEditor * activeCatEditor ();
         KKSTemplateEditor *activeTemplateEditor ();
         KKSIncludesWidget *activeRubricEditor ();
+        kkslifecycleform * activeLCEditor ();
 
         KKSJMonitor * m_jmonitor;
         //KKSMsgJournal * m_msgJ;

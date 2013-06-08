@@ -1512,11 +1512,12 @@ KKSObjEditor* KKSObjEditorFactory :: createObjRecEditor (int idObject,// идентиф
 //        recW->hideGroup (1);//gbEdit->setVisible (false);
 //        recW->hideGroup (2);//gbImportExport->setVisible (false);
 //        recW->tbSetView->setVisible (false);
-        recW->pbOk->setVisible (true);
-        recW->pbCancel->setVisible (true);
-        connect (recW->pbOk, SIGNAL (clicked()), objEditorWidget->pbOk, SIGNAL (clicked()) );
-        connect (recW->pbCancel, SIGNAL (clicked()), objEditorWidget->pbCancel, SIGNAL (clicked()) );
-        connect (recW->pbApply, SIGNAL (clicked()), objEditorWidget->pbApply, SIGNAL (clicked()) );
+        recW->pbOk->setVisible (windowModality != Qt::NonModal);
+        recW->pbCancel->setVisible (windowModality != Qt::NonModal);
+        connect (recW->pbOk, SIGNAL (clicked()), objEditorWidget, SLOT (accept()) );
+        connect (recW->pbCancel, SIGNAL (clicked()), objEditorWidget, SLOT (reject()) );
+        connect (recW->pbApply, SIGNAL (clicked()), objEditorWidget, SLOT (apply()) );
+
 
         io->release();
     }
@@ -8714,7 +8715,7 @@ void KKSObjEditorFactory :: putRubricator (KKSObject * obj, KKSObjEditor * edito
     if (iW && m_rf)
     {
         connect (iW, SIGNAL (saveRubric (KKSRubric *, bool)), m_rf, SLOT (saveRubric (KKSRubric *, bool)) );
-        connect (iW, SIGNAL (rubricItemRequested (bool)), m_rf, SLOT (rubricItemUpload(bool)) );
+        connect (iW, SIGNAL (rubricItemRequested (const KKSRubric*, bool, QAbstractItemModel *)), m_rf, SLOT (rubricItemUpload(const KKSRubric*, bool, QAbstractItemModel *)) );
         connect (iW, SIGNAL (rubricItemCreationRequested (const KKSRubric *, QAbstractItemModel*, const QModelIndex&)), m_rf, SLOT (rubricItemCreate(const KKSRubric *, QAbstractItemModel *, const QModelIndex&)) );
         connect (iW, SIGNAL (openRubricItemRequested (int)), m_rf, SLOT (openRubricItem (int)) );
         connect (iW, SIGNAL (loadStuffModel (RubricForm *)), m_rf, SLOT (loadRubricPrivilegies(RubricForm *)) );
@@ -8754,7 +8755,7 @@ void KKSObjEditorFactory :: putRubricator (KKSObjectExemplar * eio, KKSObjEditor
     if (iW && m_rf)
     {
         connect (iW, SIGNAL (saveRubric (KKSRubric *, bool)), m_rf, SLOT (saveRubric (KKSRubric *, bool)) );
-        connect (iW, SIGNAL (rubricItemRequested (bool)), m_rf, SLOT (rubricItemUpload(bool)) );
+        connect (iW, SIGNAL (rubricItemRequested (const KKSRubric*, bool, QAbstractItemModel *)), m_rf, SLOT (rubricItemUpload(const KKSRubric*, bool, QAbstractItemModel *)) );
         connect (iW, SIGNAL (rubricItemCreationRequested (const KKSRubric *, QAbstractItemModel*, const QModelIndex&)), m_rf, SLOT (rubricItemCreate(const KKSRubric *, QAbstractItemModel *, const QModelIndex&)) );
         //connect (iW, SIGNAL (openRubricItemRequested (int)), m_rf, SLOT (openRubricItem (int)) );
         connect (iW, SIGNAL (loadStuffModel (RubricForm *)), m_rf, SLOT (loadRubricPrivilegies(RubricForm *)) );
@@ -9005,7 +9006,7 @@ void KKSObjEditorFactory :: loadLifeCycleState (KKSLifeCycleEx * lc, QLineEdit *
                                                        tr("Set state"),
                                                        wCat,
                                                        true,
-                                                       true,
+                                                       false,
                                                        Qt::ApplicationModal
                                                        );
     
@@ -9135,7 +9136,7 @@ void KKSObjEditorFactory :: addLifeCycleState (KKSLifeCycleEx * lc, QAbstractIte
                                                        filters,
                                                        tr("Set state"),
                                                        wCat,
-                                                       true,
+                                                       false,
                                                        true,
                                                        Qt::ApplicationModal
                                                        );

@@ -27,7 +27,7 @@ class KKSLifeCycleEx;
 class _GUI_EXPORT kkslifecycleform : public QDialog
 {
 public:
-    kkslifecycleform(KKSLifeCycleEx * lc, QWidget * parent=0, Qt::WindowFlags flags=0);
+    kkslifecycleform(KKSLifeCycleEx * lc, bool mode=true, QWidget * parent=0, Qt::WindowFlags flags=0);
     virtual ~kkslifecycleform();
 
     KKSLifeCycleEx * getLC (void) const;
@@ -38,6 +38,11 @@ public:
         lcAttrChanged = 2,
         lcIndChanged = 3
     };
+    
+    void updateLC (KKSLifeCycleEx * lc);
+
+public slots:
+    void save (void);
 
 private slots:
     void lcAccept (void);
@@ -55,6 +60,7 @@ private slots:
 signals:
     void loadState (KKSLifeCycleEx * lc, QLineEdit * le, int lcst, const QVector<qint64>& availableStates);
     void addLCState (KKSLifeCycleEx * lc, QAbstractItemModel * stateMod);
+    void saveLifeCycle (KKSLifeCycleEx * lc);
 
 private:
     //

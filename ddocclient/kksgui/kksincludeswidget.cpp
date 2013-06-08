@@ -937,7 +937,7 @@ void KKSIncludesWidget :: createRubricItem (QAbstractItemModel * itemModel, cons
 
     if (!r->getCategory())
     {
-        QMessageBox::warning(this, tr("Warning"), tr("Creation of new IO allowed only for rubrics with accigned category!"), QMessageBox::Ok);
+        QMessageBox::warning(this, tr("Warning"), tr("Creation of new IO allowed only for rubrics with assigned category!"), QMessageBox::Ok);
         return;
     }
 

@@ -22,7 +22,7 @@
 #include "kkslifecycleform.h"
 #include "ui_kks_life_cycle_form.h"
 
-kkslifecycleform::kkslifecycleform(KKSLifeCycleEx * lc, QWidget * parent, Qt::WindowFlags flags)
+kkslifecycleform::kkslifecycleform(KKSLifeCycleEx * lc, bool mode, QWidget * parent, Qt::WindowFlags flags)
     : QDialog (parent, flags),
     UI (new Ui::kks_life_cycle_form),
     lifeCycle (lc)
@@ -74,6 +74,9 @@ kkslifecycleform::kkslifecycleform(KKSLifeCycleEx * lc, QWidget * parent, Qt::Wi
     UI->tbDelState->setIcon (clearIcon);
     connect (UI->tbAddState, SIGNAL (clicked()), this, SLOT (addState()) );
     connect (UI->tbDelState, SIGNAL (clicked()), this, SLOT (delState()) );
+
+    UI->pbOk->setVisible (mode);
+    UI->pbCancel->setVisible (mode);
 
     connect (UI->pbOk, SIGNAL(clicked()), this, SLOT (lcAccept()));
     connect (UI->pbCancel, SIGNAL (clicked()), this, SLOT (reject()) );
@@ -189,4 +192,18 @@ QVector<qint64> kkslifecycleform::loadAvStates (void) const
             stVec.push_back(idst);
     }
     return stVec;
+}
+
+void kkslifecycleform::save (void)
+{
+    lifeCycle->setName (UI->lEName->text());
+    lifeCycle->setDesc (UI->tEDescription->toPlainText());
+    emit saveLifeCycle (lifeCycle);
+}
+
+void kkslifecycleform::updateLC (KKSLifeCycleEx * lc)
+{
+    if (!lc)
+        return;
+    UI->lEId->setText (QString::number (lc->id()));
 }

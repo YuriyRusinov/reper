@@ -1120,7 +1120,83 @@ void KKSCatEditorFactory :: delLifeCycle (QWidget * editor, int idObject, qint64
     recModel->removeRows (row, 1, pInd);
 }
 
-void KKSCatEditorFactory :: openLifeCycle ()
+KKSObjEditor * KKSCatEditorFactory :: openLifeCycle ()
 {
+    KKSObject * lcIO = loader->loadIO(IO_LIFE_CYCLE_ID, true);
+    if (!lcIO)
+        return 0;
+    const KKSCategory * wCat = lcIO->category();
+    if (wCat)
+        wCat = wCat->tableCategory();
+    KKSObjEditor * lcEditor = this->objf->createObjRecEditor(IO_IO_ID,
+                                                             IO_LIFE_CYCLE_ID,
+                                                             KKSList<const KKSFilterGroup *>(),
+                                                             tr("View life cycles"),
+                                                             wCat,
+                                                             false,
+                                                             true,
+                                                             Qt::NonModal);
     
+    lcEditor->disconnect(SIGNAL (newObjectEx (QWidget*, int, const KKSCategory *, QString, int, bool, QAbstractItemModel *)), objf, SLOT (createNewEditor(QWidget*, int, const KKSCategory *, QString, int, bool, QAbstractItemModel *)));//disconnect (lcEditor);
+    lcEditor->disconnect(SIGNAL (editObjectEx (QWidget*, int, qint64, const KKSCategory *, QString, int, bool, QAbstractItemModel *, const QModelIndex& )), objf, SLOT (editExistOE (QWidget*, int, qint64, const KKSCategory *, QString, int, bool, QAbstractItemModel *, const QModelIndex&)));
+    lcEditor->disconnect(SIGNAL (delObjectEx (QWidget*, int, qint64, QString, QAbstractItemModel *, const QModelIndex&)), objf, SLOT (deleteOE (QWidget*, int, qint64, QString, QAbstractItemModel *, const QModelIndex&)));
+    connect (lcEditor,
+             SIGNAL (newObjectEx (QWidget*, int, const KKSCategory *, QString, int, bool, QAbstractItemModel *)),
+             this,
+             SLOT (addLifeCycle (QWidget *, int, const KKSCategory *, QString, int, bool, QAbstractItemModel *))
+            );
+    connect (lcEditor,
+             SIGNAL (editObjectEx (QWidget*, int, qint64, const KKSCategory *, QString, int, bool, QAbstractItemModel *, const QModelIndex& )),
+             this,
+             SLOT (editLifeCycle (QWidget *, int, qint64, const KKSCategory *, QString, int, bool, QAbstractItemModel *, const QModelIndex& ))
+            );
+    connect (lcEditor,
+             SIGNAL (delObjectEx (QWidget*, int, qint64, QString, QAbstractItemModel *, const QModelIndex&)),
+             this,
+             SLOT (delLifeCycle (QWidget *, int, qint64, QString, QAbstractItemModel *, const QModelIndex&))
+            );
+    
+    lcIO->release();
+    return lcEditor;
+}
+
+kkslifecycleform * KKSCatEditorFactory :: createLifeCycle ()
+{
+    KKSLifeCycleEx * lc = new KKSLifeCycleEx (-1, QString(), QString());
+    
+    kkslifecycleform * lcForm = new kkslifecycleform (lc, false);//, editor);
+    connect (lcForm,
+             SIGNAL (loadState (KKSLifeCycleEx *, QLineEdit *, int, const QVector<qint64>& )),
+             this->objf,
+             SLOT (loadLifeCycleState (KKSLifeCycleEx *, QLineEdit *, int, const QVector<qint64>& ))
+            );
+    connect (lcForm,
+             SIGNAL (addLCState (KKSLifeCycleEx *, QAbstractItemModel *)),
+             objf,
+             SLOT (addLifeCycleState(KKSLifeCycleEx *, QAbstractItemModel *))
+            );
+    connect (lcForm,
+             SIGNAL (saveLifeCycle(KKSLifeCycleEx *)),
+             this,
+             SLOT (saveLifeCycleToDb (KKSLifeCycleEx *))
+            );
+    emit lifeCycleEditorCreated (lcForm);
+    return lcForm;
+}
+
+void KKSCatEditorFactory :: saveLifeCycleToDb (KKSLifeCycleEx * lc)
+{
+    if (!lc)
+        return;
+    kkslifecycleform * parentWidget = qobject_cast<kkslifecycleform *>(this->sender());
+    bool isIns (lc->id() <= 0);
+    int ier = (lc->id() <= 0 ? ppf->insertLifeCycle (lc) : ppf->updateLifeCycle (lc));
+    if (ier < 0)
+    {
+        QMessageBox::warning (parentWidget, tr ("Save life cycle"), tr ("Error in life cycle save"), QMessageBox::Ok);
+        return;
+    }
+    if (isIns && parentWidget)
+        parentWidget->updateLC (lc);
+        
 }

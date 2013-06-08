@@ -39,6 +39,8 @@ class KKSAttributesFactory;
 class KKSStuffFactory;
 class KKSRecWidget;
 class KKSObjEditor;
+class kkslifecycleform;
+class KKSLifeCycleEx;
 
 class _F_EXPORT KKSCatEditorFactory : public KKSEntityFactory
 {
@@ -73,6 +75,8 @@ class _F_EXPORT KKSCatEditorFactory : public KKSEntityFactory
         void categoryEditorCreatedModal (KKSCatEditor *cEditor);
         void categoryAdded (KKSCategory *cat);
         void attributesListLoaded (KKSAttributesEditor *aEditor);
+        
+        void lifeCycleEditorCreated (kkslifecycleform * lcEditor);
         void categoryDbError ();
 
     private slots:
@@ -93,9 +97,12 @@ class _F_EXPORT KKSCatEditorFactory : public KKSEntityFactory
         void refreshCategoryTemplates (KKSCategory * c, QAbstractItemModel * templModel);
 
         void setLifeCycleIntoCategory (KKSCategory * c, QLineEdit * lE);
+        void saveLifeCycleToDb (KKSLifeCycleEx * lc);
         
     public slots:
-        void openLifeCycle ();
+        KKSObjEditor * openLifeCycle ();
+        kkslifecycleform * createLifeCycle ();
+
     private slots:
         void addLifeCycle (QWidget * editor, int idObject, const KKSCategory * c, QString tableName, int nTab, bool isModal, QAbstractItemModel * sRecMod);
         void editLifeCycle (QWidget * editor, int idObject, qint64 idObjE, const KKSCategory * c, QString tableName, int nTab, bool isModal, QAbstractItemModel * sRecMod, const QModelIndex& recIndex);
