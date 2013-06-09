@@ -8723,7 +8723,7 @@ void KKSObjEditorFactory :: putRubricator (KKSObject * obj, KKSObjEditor * edito
         connect (iW, SIGNAL (loadCategory (RubricForm *)), m_rf, SLOT (loadCategory (RubricForm *)) );
         connect (iW, SIGNAL (rubricAttachmentsView (QAbstractItemModel *, const KKSRubric *)), m_rf, SLOT (viewAttachments (QAbstractItemModel *, const KKSRubric *)) );
         connect (iW, SIGNAL (copyFromRubr(KKSRubric *, QAbstractItemModel *, const QModelIndex&)), m_rf, SLOT (copyFromRubric (KKSRubric *, QAbstractItemModel *, const QModelIndex&)) );
-        connect (iW, SIGNAL (initAttachmentsModel (const KKSRubric *)), m_rf, SLOT (initRubricAttachments (const KKSRubric *)) );
+        connect (iW, SIGNAL (initAttachmentsModel (const KKSRubric *, bool)), m_rf, SLOT (initRubricAttachments (const KKSRubric *, bool)) );
         connect (iW, SIGNAL (appendRubricItemIntoModel (QAbstractItemModel *, const KKSRubricItem * )), m_rf, SLOT (appendRubricItem (QAbstractItemModel *, const KKSRubricItem *)) );
 
         connect (m_rf, SIGNAL (rubricAttachments (QAbstractItemModel *)), iW, SLOT (slotInitAttachmentsModel (QAbstractItemModel *)) );
@@ -8763,9 +8763,9 @@ void KKSObjEditorFactory :: putRubricator (KKSObjectExemplar * eio, KKSObjEditor
         connect (iW, SIGNAL (loadCategory (RubricForm *)), m_rf, SLOT (loadCategory (RubricForm *)) );
         connect (iW, SIGNAL (rubricAttachmentsView (QAbstractItemModel *, const KKSRubric *)), m_rf, SLOT (viewAttachments (QAbstractItemModel *, const KKSRubric *)) );
         connect (iW, SIGNAL (copyFromRubr(KKSRubric *, QAbstractItemModel *, const QModelIndex&)), m_rf, SLOT (copyFromRubric (KKSRubric *, QAbstractItemModel *, const QModelIndex&)) );
-        connect (iW, SIGNAL (initAttachmentsModel (const KKSRubric *)), m_rf, SLOT (initRubricAttachments (const KKSRubric *)) );
+        connect (iW, SIGNAL (initAttachmentsModel (const KKSRubric *, bool)), m_rf, SLOT (initRubricAttachments (const KKSRubric *, bool)) );
         connect (iW, SIGNAL (appendRubricItemIntoModel (QAbstractItemModel *, const KKSRubricItem * )), m_rf, SLOT (appendRubricItem (QAbstractItemModel *, const KKSRubricItem *)) );
-        connect (iW, SIGNAL (appendRubricRecord (int, const KKSRubric *, QAbstractItemModel *, const QModelIndex& )), m_rf, SLOT (appendRecord (int, const KKSRubric *, QAbstractItemModel *, const QModelIndex& )) );
+        //connect (iW, SIGNAL (appendRubricRecord (int, const KKSRubric *, QAbstractItemModel *, const QModelIndex& )), m_rf, SLOT (appendRecord (int, const KKSRubric *, QAbstractItemModel *, const QModelIndex& )) );
 
         connect (m_rf, SIGNAL (rubricAttachments (QAbstractItemModel *)), iW, SLOT (slotInitAttachmentsModel (QAbstractItemModel *)) );
 //        connect (eiW, SIGNAL (loadStuffModel(RubricForm *)), m_rf, SLOT (loadRubricPrivilegies(RubricForm *)) );

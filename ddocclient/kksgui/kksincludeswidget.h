@@ -122,9 +122,9 @@ signals:
     void loadCategory (RubricForm * rForm);
     void rubricAttachmentsView (QAbstractItemModel * attachModel, const KKSRubric * r);
     
-    void initAttachmentsModel (const KKSRubric * r);
+    void initAttachmentsModel (const KKSRubric * r, bool forRecs);
     void appendRubricItemIntoModel (QAbstractItemModel * attachModel, const KKSRubricItem * rItem);
-    void appendRubricRecord (int idObject, const KKSRubric * r, QAbstractItemModel * attachModel, const QModelIndex& parent);
+    //void appendRubricRecord (int idObject, const KKSRubric * r, QAbstractItemModel * attachModel, const QModelIndex& parent);
     
     void setSyncIO (const QList<int>& ioIDList);
     void putIOSIntoRubr (const QList<int>& ioIDList, const KKSRubric* cRubric);

@@ -3589,6 +3589,53 @@ void KKSLoader::loadRecRubrics (KKSObjectExemplar * eio) const
 
 }
 
+QString KKSLoader::getRecTable (int idRec) const
+{
+    QString sql = QString ("select getRecordTable(%1);").arg (idRec);
+    KKSResult * res = db->execute(sql);
+    if(!res || res->getRowCount() != 1)
+    {
+        if(res)
+            delete res;
+        return NULL;
+    }
+    QString tName = res->getCellAsString (0, 0);
+    delete res;
+    return tName;
+}
+
+KKSMap<qint64, KKSEIOData *> KKSLoader::loadRecList (const KKSRubric * r) const
+{
+    if (!r)
+        return KKSMap<qint64, KKSEIOData *>();
+
+    QString sql = QString("select * from recGetRubricItems(%1) order by 5,1").arg(r->id());
+    KKSResult * res = db->execute(sql);
+    if(!res || res->getRowCount() == 0)
+    {
+        if(res)
+            delete res;
+        return KKSMap<qint64, KKSEIOData *>();
+    }
+
+    int count = res->getRowCount();
+    KKSMap<qint64, KKSEIOData *> results;
+    for (int i=0; i<count; i++)
+    {
+        qint64 idr = res->getCellAsInt (i, 0);
+        QString tableName = getRecTable (idr);
+        KKSObject * io = this->loadIO (tableName, true);
+        
+        if (!io)
+            continue;
+        KKSEIOData * d = this->loadEIOInfo(io->id(), idr);
+        results.insert(idr, d);
+        d->release();
+        io->release();
+    }
+    return results;
+}
+
 KKSRubric * KKSLoader::loadRubricators(bool bOnlyMyDocs) const
 {
 

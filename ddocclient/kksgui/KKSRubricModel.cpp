@@ -281,6 +281,7 @@ void KKSRubricModel :: setupRubrData (KKSRubricTreeItem * parent, bool forRecs)
             parent->appendChild (wrItem);
             setupRubrData (wrItem, forRecs);
         }
+/*        
         if (forRecs)
         {
             int nItems = wRubric->items().count();
@@ -290,6 +291,7 @@ void KKSRubricModel :: setupRubrData (KKSRubricTreeItem * parent, bool forRecs)
                 parent->appendChild (wrItem);
             }
         }
+ */
     }
     else
     {

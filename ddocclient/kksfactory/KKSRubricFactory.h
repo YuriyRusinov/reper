@@ -62,7 +62,7 @@ class _F_EXPORT KKSRubricFactory : public KKSEntityFactory
         void loadCategory (RubricForm * rForm);
         void copyFromRubric (KKSRubric * rDest, QAbstractItemModel * attachModel, const QModelIndex& wIndex);
         void viewAttachments (QAbstractItemModel * attachModel, const KKSRubric * r);
-        void initRubricAttachments (const KKSRubric * r);
+        void initRubricAttachments (const KKSRubric * r, bool isRec);
         void appendRubricItem (QAbstractItemModel * attachModel, const KKSRubricItem * rItem);
         void rubricItemCreated(KKSObjectExemplar * rec);
         void objEditorClosed ();

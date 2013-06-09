@@ -216,7 +216,7 @@ KKSIncludesWidget * KKSRubricFactory :: createRubricEditor (int mode, const KKSL
     connect(iW, SIGNAL(loadCategory(RubricForm *)), this, SLOT(loadCategory(RubricForm *)));
     connect(iW, SIGNAL(rubricAttachmentsView(QAbstractItemModel *, const KKSRubric *)), this, SLOT(viewAttachments(QAbstractItemModel *, const KKSRubric *)));
     connect(iW, SIGNAL(copyFromRubr(KKSRubric *, QAbstractItemModel *, const QModelIndex&)), this, SLOT(copyFromRubric(KKSRubric *, QAbstractItemModel *, const QModelIndex&)));
-    connect(iW, SIGNAL(initAttachmentsModel(const KKSRubric *)), this, SLOT(initRubricAttachments(const KKSRubric *)));
+    connect(iW, SIGNAL(initAttachmentsModel(const KKSRubric *, bool)), this, SLOT(initRubricAttachments(const KKSRubric *, bool)));
     connect(iW, SIGNAL(appendRubricItemIntoModel(QAbstractItemModel *, const KKSRubricItem *)), this, SLOT(appendRubricItem(QAbstractItemModel *, const KKSRubricItem *)));
     connect(iW, SIGNAL(setSyncIO(const QList<int>&)), this, SLOT(setSyncSettings(const QList<int>&)));
     connect(iW, SIGNAL(putIOSIntoRubr(const QList<int>&, const KKSRubric*)), this, SLOT(putIntoRubr(const QList<int>&, const KKSRubric*)));
@@ -435,13 +435,12 @@ void KKSRubricFactory::rubricItemUpload(const KKSRubric *r, bool forRecords, QAb
         group->release();
     }
 
-    KKSObjEditor *objEditor = oef->createObjEditor(IO_IO_ID,
+    KKSObjEditor *objEditor = oef->createObjRecEditor(IO_IO_ID,
             IO_IO_ID,
             filterGroups,
-            "",
+            tr("Select reference IO"),
             c,
             true,
-            QString(),
             false,
             Qt::WindowModal,
             editor,
@@ -452,28 +451,103 @@ void KKSRubricFactory::rubricItemUpload(const KKSRubric *r, bool forRecords, QAb
     int idObject = -1;
     QString name;
 
-    if (res == QDialog::Accepted) {
+    if (res == QDialog::Accepted)
+    {
         idObject = objEditor->getID();
         KKSObject * o = loader->loadIO(idObject, true);
         if (!o) {
+            objEditor->setParent (0);
             delete objEditor;
             return;
         }
         name = o->name();
-        if (r->getCategory()) {
+        if (r->getCategory())
+        {
             const KKSCategory * c = o->category();
-            if (c->id() != r->getCategory()->id()) {
+            if (c->id() != r->getCategory()->id())
+            {
                 int res = QMessageBox::critical(editor, 
                                                 tr("Add document into rubric"), 
                                                 tr("You are put document of category\n\"%1\"\nto rubric with category:\n\"%2\".\nThis is not allowed!")
                                                     .arg(c->name())
                                                     .arg(r->getCategory()->name()));
+                objEditor->setParent (0);
+                delete objEditor;
                 o->release();
                 return;
             }
         }
+        else if (forRecords)
+        {
+            filterGroups.clear();
+            const KKSCategory * c = o->category();
+            if (!c)
+            {
+                objEditor->setParent (0);
+                delete objEditor;
+                o->release();
+                return;
+            }
+            c = c->tableCategory();
+            KKSObjEditor *recEditor = oef->createObjRecEditor(IO_IO_ID,
+                    idObject,
+                    filterGroups,
+                    tr("Select record for rubric"),
+                    c,
+                    true,
+                    false,
+                    Qt::WindowModal,
+                    editor,
+                    Qt::Dialog);
+            if (!recEditor || recEditor->exec() != QDialog::Accepted)
+            {
+                if (recEditor)
+                {
+                    recEditor->setParent (0);
+                    delete recEditor;
+                }
+                objEditor->setParent (0);
+                delete objEditor;
+                o->release();
+                return;
+            }
+            int idRec = recEditor->getID();
+            KKSObjectExemplar * ioRec = loader->loadEIO(idRec, o);
+            if (!ioRec)
+            {
+                QMessageBox::warning (editor, tr("Add new item"), tr("Cannot load record %1").arg(idRec), QMessageBox::Ok);
+                recEditor->setParent (0);
+                delete recEditor;
+                objEditor->setParent (0);
+                delete objEditor;
+                o->release();
+                return;
+            }
+            QString rubrItemName = ioRec->name();
+            KKSRubricItem * item = new KKSRubricItem(idRec, rubrItemName, false);
+            (const_cast<KKSRubric *> (r))->addItem(item);
+            item->release();
+            int nr = itemModel->rowCount();
+            bool isIns = itemModel->insertRows (nr, 1);
+            QModelIndex rIndex = itemModel->index (nr, 0);
+            KKSEIOData * itemInfo = loader->loadEIOInfo(o->id(), idRec);
+            bool isRubrSet = itemModel->setData (rIndex, QVariant::fromValue<KKSEIOData*>(itemInfo), Qt::UserRole+1);
+            qDebug () << __PRETTY_FUNCTION__ << isIns << isRubrSet << r->items().count();
+            //this->appendRubricItem(itemModel, item);
+            editor->setSaved(false);
+            editor->slotAddRubricItem(idRec, o->name());
+            recEditor->setParent (0);
+            delete recEditor;
+            objEditor->setParent(0);
+            delete objEditor;
+            ioRec->release();
+            o->release();
+            return;
+        }
         o->release();
-    } else {
+    }
+    else
+    {
         o->release();
         return;
     }
@@ -592,7 +666,8 @@ void KKSRubricFactory::loadRubricPrivilegies(RubricForm * rForm) {
     //rForm->setStuffModel (sModel);
 }
 
-void KKSRubricFactory::loadSearchTemplate(RubricForm * rForm) {
+void KKSRubricFactory::loadSearchTemplate(RubricForm * rForm)
+{
     qDebug() << __PRETTY_FUNCTION__;
     if (!rForm)
         return;
@@ -604,7 +679,8 @@ void KKSRubricFactory::loadSearchTemplate(RubricForm * rForm) {
     //    QAbstractItemModel
 }
 
-void KKSRubricFactory::loadCategory(RubricForm * rForm) {
+void KKSRubricFactory::loadCategory(RubricForm * rForm)
+{
     qDebug() << __PRETTY_FUNCTION__;
     if (!rForm)
         return;
@@ -957,12 +1033,13 @@ void KKSRubricFactory::copyFromRubric(KKSRubric * rDest, QAbstractItemModel * aM
     refIO->release();
 }
 
-void KKSRubricFactory::initRubricAttachments(const KKSRubric * r) {
+void KKSRubricFactory::initRubricAttachments(const KKSRubric * r, bool isRec)
+{
     if (!r)
         return;
 
     qDebug() << __PRETTY_FUNCTION__ << r->name() << r->items().count();
-    KKSMap<qint64, KKSEIOData *> rData = KKSConverter::rubricEntityToData(loader, r);
+    KKSMap<qint64, KKSEIOData *> rData = isRec ? loader->loadRecList (r) : KKSConverter::rubricEntityToData(loader, r);
     KKSObject * refIO = loader->loadIO(IO_IO_ID, true);
     const KKSCategory * cat(0);
 
@@ -1017,7 +1094,8 @@ void KKSRubricFactory::initRubricAttachments(const KKSRubric * r) {
 
 /* Слот добавляет существующий ИО в рубрику с последующим отображением в визуальной модели
  */
-void KKSRubricFactory::appendRubricItem(QAbstractItemModel * attachModel, const KKSRubricItem * rItem) {
+void KKSRubricFactory::appendRubricItem(QAbstractItemModel * attachModel, const KKSRubricItem * rItem)
+{
     if (!attachModel || !rItem)
         return;
 
@@ -1040,7 +1118,8 @@ void KKSRubricFactory::appendRubricItem(QAbstractItemModel * attachModel, const 
     f->release();
     KKSMap<qint64, KKSEIOData *> itemData = loader->loadEIOList(refIO, filters);
     int cnt = attachModel->rowCount();
-    if (!attachModel->insertRows(cnt, itemData.count())) {
+    if (!attachModel->insertRows(cnt, itemData.count()))
+    {
         refIO->release();
         return;
     }

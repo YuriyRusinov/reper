@@ -211,21 +211,24 @@ void KKSIncludesWidget :: initActions (void)
     actSyncSep->setSeparator (true);
     this->recWItems->insertToolBarAction (recWItems->actRefresh, actSyncSep);
 
-    QAction * actSyncSet = new QAction (QIcon(":/ddoc/sync.png"), tr ("Set synchronization parameters"), this);
-    recWItems->insertToolBarAction (actSyncSep, actSyncSet);
-    connect (actSyncSet, SIGNAL (triggered()), this, SLOT (setSyncSettings ()) );
+    if (!isRec)
+    {
+        QAction * actSyncSet = new QAction (QIcon(":/ddoc/sync.png"), tr ("Set synchronization parameters"), this);
+        recWItems->insertToolBarAction (actSyncSep, actSyncSet);
+        connect (actSyncSet, SIGNAL (triggered()), this, SLOT (setSyncSettings ()) );
+
+        QAction * actSendIO = new QAction (QIcon(":/ddoc/send_as_mail.png"), tr("Send as email"), this);
+        recWItems->insertToolBarAction (actSyncSep, actSendIO);
+        connect (actSendIO, SIGNAL (triggered()), this, SLOT (sendIOS()) );
+
+        QAction * actAccess = new QAction (QIcon(":/ddoc/access_icon.png"), tr("Set access rules"), this);
+        recWItems->insertToolBarAction (actSyncSep, actAccess);
+        connect (actAccess, SIGNAL (triggered()), this, SLOT (setAccessRules()) );
+    }
 
     QAction * actPutIntoAnotherRubr = new QAction (QIcon(":/ddoc/copy_to_rubric.png"), tr ("Put into another rubric"), this);
     recWItems->insertToolBarAction (actSyncSep, actPutIntoAnotherRubr);
     connect (actPutIntoAnotherRubr, SIGNAL (triggered()), this, SLOT (putIntoAnotherRubric()) );
-
-    QAction * actSendIO = new QAction (QIcon(":/ddoc/send_as_mail.png"), tr("Send as email"), this);
-    recWItems->insertToolBarAction (actSyncSep, actSendIO);
-    connect (actSendIO, SIGNAL (triggered()), this, SLOT (sendIOS()) );
-
-    QAction * actAccess = new QAction (QIcon(":/ddoc/access_icon.png"), tr("Set access rules"), this);
-    recWItems->insertToolBarAction (actSyncSep, actAccess);
-    connect (actAccess, SIGNAL (triggered()), this, SLOT (setAccessRules()) );
 
     QAction * aRubrIconSet = new QAction (QIcon(":/ddoc/rubric_icon_set.png"), tr ("Set icon"), this);
     pMenu->addAction (aRubrIconSet);
@@ -915,6 +918,11 @@ void KKSIncludesWidget :: addRubricItem (void)
 
 void KKSIncludesWidget :: createRubricItem (QAbstractItemModel * itemModel, const QModelIndex& parent)
 {
+    if (isRec)
+    {
+        this->addRubricItem();
+        return;
+    }
     qDebug () << __PRETTY_FUNCTION__ << itemModel << parent;
     QItemSelectionModel * sm (twIncludes->selectionModel());
 
@@ -974,7 +982,7 @@ void KKSIncludesWidget::slotAddRubricItem(int idObject, QString name)
     
     if (isRec)
     {
-        emit appendRubricRecord (idObject, r, twIncludes->model(), index);
+        //emit appendRubricRecord (idObject, r, twIncludes->model(), index);
         isChanged = true;
         emit rubricsChanged ();
         return;
@@ -1004,9 +1012,9 @@ void KKSIncludesWidget::slotAddRubricItem(int idObject, QString name)
 //    if (r->getCategory())
 //    {
 //        qDebug () << __PRETTY_FUNCTION__ << r->name() << rIsEmpty;
-    QAbstractItemModel * attachModel = isRec ? twIncludes->model() : recWItems->getSourceModel ();
-    if (!attachModel && !this->isRec)
-        emit initAttachmentsModel (r);
+    QAbstractItemModel * attachModel = recWItems->getSourceModel ();
+    if (!attachModel)
+        emit initAttachmentsModel (r, this->isRec);
     else if (isRec)
     {
         qDebug () << __PRETTY_FUNCTION__ ;
@@ -1251,6 +1259,7 @@ void KKSIncludesWidget::closeEvent (QCloseEvent * event)
 void KKSIncludesWidget::setSaved (bool isSaved)
 {
     isChanged = !isSaved;
+    emit rubricsChanged();
 }
 
 void KKSIncludesWidget::addSearchTemplateIntoRubric (void)
@@ -1304,7 +1313,7 @@ void KKSIncludesWidget::rubricSelectionChanged (const QItemSelection& selected, 
 //    bool isr = ((c && c->id()>0) || (st && st->id()>0));
     if (rubr)
     {
-        emit initAttachmentsModel (rubr);
+        emit initAttachmentsModel (rubr, isRec);
         recWItems->setVisible (true);
     }
 /*
@@ -1561,7 +1570,7 @@ void KKSIncludesWidget :: refreshRubricItems (QAbstractItemModel * sourceMod)
     const KKSRubric * r = currentRubric();
     sourceMod->removeRows(0, sourceMod->rowCount());
     //const_cast<KKSRubric *>(r)->clearItems();
-    emit initAttachmentsModel (r);
+    emit initAttachmentsModel (r, isRec);
 }
 /*=================*/
 KKSIncludesItemDelegate::KKSIncludesItemDelegate(QObject * parent) : QItemDelegate(parent)
