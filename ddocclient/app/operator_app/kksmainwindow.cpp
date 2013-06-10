@@ -156,8 +156,6 @@ void KKSMainWindow::closeEvent(QCloseEvent *event)
 
 void KKSMainWindow::updateMenus()
 {
-    qWarning() << "qqqqqqqqqqqqq";
-
     bool hasMdiChild = (activeKKSSubWindow() != 0);
     
     aCloseWindow->setEnabled(hasMdiChild);
@@ -204,14 +202,7 @@ void KKSMainWindow::updateMenus()
             continue;
         }
 
-        QString text;
-        if (i < 9) {
-            text = tr("&%1 %2").arg(i + 1)
-                               .arg(child->windowTitle());
-        } else {
-            text = tr("%1 %2").arg(i + 1)
-                              .arg(child->windowTitle());
-        }
+        QString text = child->windowTitle();
 
         QAction *action  = ui->aWindowMenu->addAction(text);
         action->setCheckable(true);
