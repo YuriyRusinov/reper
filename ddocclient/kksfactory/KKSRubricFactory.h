@@ -34,6 +34,7 @@ class KKSStuffFactory;
 class RubricForm;
 class KKSObjectExemplar;
 class KKSEIOFactory;
+class KKSTemplate;
 
 class _F_EXPORT KKSRubricFactory : public KKSEntityFactory
 {
@@ -46,6 +47,7 @@ class _F_EXPORT KKSRubricFactory : public KKSEntityFactory
             atOthers = 2
         };
         KKSIncludesWidget * createModalRubricEditor (int mode, const KKSList<const KKSFilterGroup *>& filters, bool withCategories=true, QWidget* parent=0);
+        static KKSTemplate * rubrRecTemlate (void);
 
     signals:
         void rubricEditorCreated (KKSIncludesWidget *rEditor);

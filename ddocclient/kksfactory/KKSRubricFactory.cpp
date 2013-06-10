@@ -24,6 +24,8 @@
 #include <KKSObjectExemplar.h>
 #include "KKSAttrType.h"
 #include <KKSCategory.h>
+#include <KKSCategoryAttr.h>
+#include <KKSAttrView.h>
 #include <KKSTemplate.h>
 #include <KKSList.h>
 #include <KKSFilter.h>
@@ -1038,56 +1040,63 @@ void KKSRubricFactory::initRubricAttachments(const KKSRubric * r, bool isRec)
     if (!r)
         return;
 
-    qDebug() << __PRETTY_FUNCTION__ << r->name() << r->items().count();
+    const KKSTemplate * t = isRec ? rubrRecTemlate() : 0;
     KKSMap<qint64, KKSEIOData *> rData = isRec ? loader->loadRecList (r) : KKSConverter::rubricEntityToData(loader, r);
-    KKSObject * refIO = loader->loadIO(IO_IO_ID, true);
     const KKSCategory * cat(0);
+    KKSObject * refIO (0);
 
     //if (r->getCategory() && r->getCategory()->attributes().count() > 0)
     //    cat = r->getCategory();
     //else
-    cat = refIO->category()->tableCategory();
-    const KKSTemplate * t = new KKSTemplate(cat->defTemplate());
+    if (!isRec)
+    {
+        refIO = loader->loadIO(IO_IO_ID, true);
+        cat = refIO->category()->tableCategory();
+        t = new KKSTemplate(cat->defTemplate());
+    }
     QAbstractItemModel * attachModel = new KKSEIODataModel(t, rData); //new QStandardItemModel (0, 0);
-    int nr = attachModel->rowCount();
-    //qDebug () << __PRETTY_FUNCTION__ << attachModel->rowCount() << attachModel->columnCount();
-    for (int i = 0; i < nr; i++) {
-        QModelIndex iconInd = attachModel->index(i, 0);
-        //
-        // поскольку справочник неиерархический, то достаточно пройтись только по индексам верхнего уровня
-        //
-        int id = iconInd.data(Qt::UserRole).toInt();
-        //KKSObject * io = loader->loadIO (id);
-        //if (!io)
-        //    continue;
-        const KKSRubricItem * rItem = r->itemForId(id);
-        //        QIcon ioIcon;// = io->icon();
-        //        qDebug () << __PRETTY_FUNCTION__ << rData.value(id)->fields().keys();
-        QPixmap rIconP;
-        if (rItem)
-            rIconP.loadFromData(rItem->iconAsString().toUtf8()); //rData.value(id)->fields().value("r_icon").toUtf8());
-        QIcon ioIcon(rIconP); //io->icon();
-        if (!ioIcon.isNull()) {
-            //qDebug () << __PRETTY_FUNCTION__ << QString::compare (rItem->iconAsString(), io->iconAsString());
-            attachModel->setData(iconInd, ioIcon, Qt::DecorationRole);
-        } else if (r->rubricType() == KKSRubricBase::atRubricCategory) {
-            if (ioIcon.isNull()) {
+    if (!isRec)
+    {
+        int nr = attachModel->rowCount();
+        //qDebug () << __PRETTY_FUNCTION__ << attachModel->rowCount() << attachModel->columnCount();
+        for (int i = 0; i < nr; i++) {
+            QModelIndex iconInd = attachModel->index(i, 0);
+            //
+            // поскольку справочник неиерархический, то достаточно пройтись только по индексам верхнего уровня
+            //
+            int id = iconInd.data(Qt::UserRole).toInt();
+            //KKSObject * io = loader->loadIO (id);
+            //if (!io)
+            //    continue;
+            const KKSRubricItem * rItem = r->itemForId(id);
+            //        QIcon ioIcon;// = io->icon();
+            //        qDebug () << __PRETTY_FUNCTION__ << rData.value(id)->fields().keys();
+            QPixmap rIconP;
+            if (rItem)
+                rIconP.loadFromData(rItem->iconAsString().toUtf8()); //rData.value(id)->fields().value("r_icon").toUtf8());
+            QIcon ioIcon(rIconP); //io->icon();
+            if (!ioIcon.isNull()) {
+                //qDebug () << __PRETTY_FUNCTION__ << QString::compare (rItem->iconAsString(), io->iconAsString());
+                attachModel->setData(iconInd, ioIcon, Qt::DecorationRole);
+            } else if (r->rubricType() == KKSRubricBase::atRubricCategory) {
+                if (ioIcon.isNull()) {
+                    if (rItem)
+                        attachModel->setData(iconInd, (rItem->getIcon().isNull() ? rItem->getDefaultIcon() : rItem->getIcon()), Qt::DecorationRole);
+                    else
+                        attachModel->setData(iconInd, KKSRubricItem::icon(), Qt::DecorationRole);
+                } else
+                    attachModel->setData(iconInd, ioIcon, Qt::DecorationRole);
+            } else {
                 if (rItem)
-                    attachModel->setData(iconInd, (rItem->getIcon().isNull() ? rItem->getDefaultIcon() : rItem->getIcon()), Qt::DecorationRole);
+                    attachModel->setData(iconInd, (rItem->getIcon().isNull() ? rItem->getDefaultIcon() : rItem->getIcon()), Qt::DecorationRole); // rItem->getDefaultIcon()
                 else
                     attachModel->setData(iconInd, KKSRubricItem::icon(), Qt::DecorationRole);
-            } else
-                attachModel->setData(iconInd, ioIcon, Qt::DecorationRole);
-        } else {
-            if (rItem)
-                attachModel->setData(iconInd, (rItem->getIcon().isNull() ? rItem->getDefaultIcon() : rItem->getIcon()), Qt::DecorationRole); // rItem->getDefaultIcon()
-            else
-                attachModel->setData(iconInd, KKSRubricItem::icon(), Qt::DecorationRole);
+            }
+            //io->release ();
         }
-        //io->release ();
+        refIO->release();
     }
     t->release();
-    refIO->release();
 
     emit rubricAttachments(attachModel);
 }
@@ -1358,4 +1367,51 @@ void KKSRubricFactory::loadCategoryIntoRubric(KKSRubric * r) {
     int idCategory = r->id();
     KKSCategory * c = loader->loadCategory(idCategory, true);
     r->setCategory(c);
+}
+
+KKSTemplate * KKSRubricFactory::rubrRecTemlate (void)
+{
+    KKSCategory * ctRec = new KKSCategory;
+    KKSTemplate * tRec = new KKSTemplate;// (ctRec->defTemplate());
+    KKSAttrGroup * ag = new KKSAttrGroup;
+    tRec->addGroup(ag);
+    QStringList aNames;
+    aNames << tr("id")
+           << tr("name")
+           << tr("state")
+           << tr("uuid_t");
+    QStringList aCodes;
+    aCodes << tr("id")
+           << tr("name")
+           << tr("id_io_state")
+           << tr("uuid_t");
+    QList<int> aTypes;
+    aTypes << KKSAttrType::atInt64
+           << KKSAttrType::atString
+           << KKSAttrType::atString
+           << KKSAttrType::atString;
+    int na = aNames.count();
+    for (int i=0; i<na; i++)
+    {
+        KKSAttribute * attr = new KKSAttribute;
+        attr->setName(aNames[i]);
+        attr->setTitle(aNames[i]);
+        attr->setCode(aCodes[i]);
+        KKSAttrType * aType = new KKSAttrType (aTypes[i]);
+        attr->setType (aType);
+        aType->release();
+        KKSCategoryAttr * cAttrId = KKSCategoryAttr::create (attr, true, true);
+        attr->release();
+        ctRec->addAttribute(i+1, cAttrId);
+        KKSAttrView *av = new KKSAttrView (*cAttrId);
+        av->setVisible (true);
+        cAttrId->release();
+        av->setOrder (i);
+        ag->addAttrView(i+1, av);
+        av->release();
+    }
+    ag->release();
+    tRec->setCategory (ctRec);
+    ctRec->release();
+    return tRec;
 }
