@@ -1575,7 +1575,7 @@ void KKSObjEditorFactory :: setObjConnect (KKSObjEditor *editor)
     connect (editor, SIGNAL (filterObjectEx (KKSObjEditor*, int, const KKSCategory *, QString)), this, SLOT (filterEIO (KKSObjEditor*, int, const KKSCategory *, QString)) );
     connect (editor, SIGNAL (refreshObjectEx (KKSObjEditor*, int, const KKSCategory *, QString, QAbstractItemModel *)), this, SLOT (refreshEIO (KKSObjEditor*, int, const KKSCategory *, QString, QAbstractItemModel *)) );
     connect (editor, SIGNAL (filterObjectTemplateEx (KKSObjEditor*, int, const KKSCategory *, QString)), this, SLOT (filterTemplateEIO (KKSObjEditor*, int, const KKSCategory *, QString)) );
-    connect (editor, SIGNAL (updateEIO (KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *, const QItemSelection& )), this, SLOT (updateEIOView (KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *, const QItemSelection& )) );
+    connect (editor, SIGNAL (updateEIO (KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *, const QItemSelection&, const QModelIndex& )), this, SLOT (updateEIOView (KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *, const QItemSelection&, const QModelIndex& )) );
     connect (editor, SIGNAL (loadAttrRef (QString, QWidget*, int)), this, SLOT (loadAttributeReference (QString, QWidget *, int)) );
     connect (editor, SIGNAL (loadStateRef (KKSObjEditor*, QWidget *, KKSObjectExemplar *)), this, SLOT (setRecState(KKSObjEditor*, QWidget *, KKSObjectExemplar *)) );
     connect (editor, SIGNAL (setTemplate (KKSObjEditor*, KKSObject*)), this, SLOT (setEIOTemplates (KKSObjEditor*, KKSObject*)) );
@@ -2470,9 +2470,9 @@ void KKSObjEditorFactory :: createNewEditor (QWidget * editor, int idObject, con
         return;
     }
 //    connect(newObjEditor, 
-//            SIGNAL(eioChanged(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *)), 
+//            SIGNAL(eioChanged(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *, const QModelIndex& )), 
 //            editor, 
-//            SLOT(updateEIOEx(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *)));
+//            SLOT(updateEIOEx(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *, const QModelIndex& )));
     newObjEditor->setRecordsModel (recModel);
 
     //cSelection = oEditor ? oEditor->recWidget->tv->selectionModel()->selection() : QItemSelection();
@@ -2483,9 +2483,9 @@ void KKSObjEditorFactory :: createNewEditor (QWidget * editor, int idObject, con
     
     if (qobject_cast <KKSObjEditor *>(editor))
         connect(newObjEditor, 
-                SIGNAL(eioChanged(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *)), 
+                SIGNAL(eioChanged(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *, const QModelIndex& )), 
                 editor, 
-                SLOT(updateEIOEx(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *)));
+                SLOT(updateEIOEx(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *, const QModelIndex& )));
     
     newObjEditor->setAttribute (Qt::WA_DeleteOnClose);
     //newObjEditor->showNormal ();
@@ -2548,9 +2548,9 @@ void KKSObjEditorFactory :: createNewEditorParam (QWidget * editor, int idObject
 
     if (qobject_cast <KKSObjEditor *>(editor))
         connect(newObjEditor, 
-                SIGNAL(eioChanged(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *)), 
+                SIGNAL(eioChanged(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *, const QModelIndex& )), 
                 editor, 
-                SLOT(updateEIOEx(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *)));
+                SLOT(updateEIOEx(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *, const QModelIndex& )));
     
     newObjEditor->setAttribute (Qt::WA_DeleteOnClose);
     newObjEditor->setRecordsModel (recModel);
@@ -2573,7 +2573,7 @@ void KKSObjEditorFactory :: createNewEditorParam (QWidget * editor, int idObject
  */
 void KKSObjEditorFactory :: editExistOE (QWidget * editor, int idObject, qint64 idObjEx, const KKSCategory * c0, QString tableName, int nTab, bool isModal, QAbstractItemModel * recModel, const QModelIndex& recIndex)
 {
-    Q_UNUSED (recIndex);
+    //Q_UNUSED (recIndex);
     const KKSCategory *c = 0;//t ? t->category() : 0;
     KKSObject * io = NULL;
 
@@ -2629,14 +2629,15 @@ void KKSObjEditorFactory :: editExistOE (QWidget * editor, int idObject, qint64 
     //qDebug () << __PRETTY_FUNCTION__ << cSelection << nTab;
 
     connect (newObjEditor, 
-             SIGNAL(eioChanged(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *)), 
+             SIGNAL(eioChanged(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *, const QModelIndex& )), 
              editor, 
-             SLOT(updateEIOEx(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *)));
+             SLOT(updateEIOEx(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *, const QModelIndex& )));
 
     newObjEditor->setRecordsModel (recModel);
     newObjEditor->setCurrentTable (tableName);
     newObjEditor->setParentTab (nTab);
     newObjEditor->setAttribute (Qt::WA_DeleteOnClose);
+    newObjEditor->setRecordsIndex(recIndex);
     //qDebug () << __PRETTY_FUNCTION__ << newObjEditor->isObjChanged() << nTab;
     newObjEditor->setObjChanged (false);
     if(editor && editor->windowModality() != Qt::NonModal){
@@ -2725,7 +2726,7 @@ int KKSObjEditorFactory :: deleteOE (QWidget * editor, int idObject, qint64 idOb
  * recModel -- обновляемая модель
  * cSelection -- выделенные индексы
  */
-void KKSObjEditorFactory :: updateEIOView (KKSObject * wObj, const KKSMap<qint64, KKSObjectExemplar *>& idObjEx, QAbstractItemModel * recModel, const QItemSelection& cSelection)
+void KKSObjEditorFactory :: updateEIOView (KKSObject * wObj, const KKSMap<qint64, KKSObjectExemplar *>& idObjEx, QAbstractItemModel * recModel, const QItemSelection& cSelection, const QModelIndex& recIndex)
 {
     Q_UNUSED (cSelection);
     KKSObjEditor * editor = qobject_cast<KKSObjEditor *>(this->sender());
@@ -2749,23 +2750,25 @@ void KKSObjEditorFactory :: updateEIOView (KKSObject * wObj, const KKSMap<qint64
         else
             t->addRef ();
 
-/*        QAbstractItemModel * mod = (nt==0 ? editor->recWidget->getModel() : editor->addRecWidgets[nt-1]->getModel ());
-        while (qobject_cast<QAbstractProxyModel *>(mod))
-            mod = (qobject_cast<QAbstractProxyModel *>(mod))->sourceModel ();
-        qDebug () << __PRETTY_FUNCTION__ << nt << erow << mod->rowCount () << mod->columnCount ();// << mod->data (mod->index ;
-        if (mod->rowCount() <= erow[0])
-            mod->insertRows (erow[0], 1);
- */
         KKSViewFactory::updateEIOEx (loader, wObj, idObjEx, t, recModel);
 
         t->release ();
-/*
-        QTreeView * tv = (nt==0 ? editor->recWidget->tv :  editor->addRecWidgets[nt-1]->tv);
-        if (row >=0)
-            tv->selectionModel()->setCurrentIndex (tv->model()->index (row, 0), QItemSelectionModel::ClearAndSelect);
-        for (int i=0; i<tv->model()->columnCount () && row>=0; i++)
-            tv->selectionModel()->select (tv->model()->index (row, i), QItemSelectionModel::Select);
- */
+
+    }
+    if (recIndex.isValid())
+    {
+        KKSEIOData * d = loader->loadEIOInfo (wObj->id(), recIndex.data(Qt::UserRole).toInt());
+        recModel->setData (recIndex, QVariant::fromValue<KKSEIOData*>(d), Qt::UserRole+1);
+        QIcon tIcon;
+        if (d)
+        {
+            QString strIcon = d->sysFieldValue("r_icon");
+            QPixmap pIcon;
+            pIcon.loadFromData (strIcon.toUtf8());
+            tIcon = QIcon (pIcon);
+        }
+        recModel->setData (recIndex.sibling(recIndex.row(), 0), tIcon, Qt::DecorationRole);
+        d->release ();
     }
 
 }
@@ -4204,9 +4207,9 @@ void KKSObjEditorFactory :: slotOpenRubricItemRequested(int idObject, KKSObjEdit
     }
 
     connect(newObjEditor, 
-            SIGNAL(eioChanged(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *)), 
+            SIGNAL(eioChanged(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *, const QModelIndex& )), 
             editor, 
-            SLOT(updateEIOEx(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *)));
+            SLOT(updateEIOEx(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *, const QModelIndex& )));
     
     newObjEditor->setAttribute (Qt::WA_DeleteOnClose);
 
@@ -4252,9 +4255,9 @@ void KKSObjEditorFactory :: slotOpenRubricItemRecRequested(int idObjectE, KKSObj
     }
 
     connect(newObjEditor, 
-            SIGNAL(eioChanged(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *)), 
+            SIGNAL(eioChanged(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *, const QModelIndex& )), 
             editor, 
-            SLOT(updateEIOEx(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *)));
+            SLOT(updateEIOEx(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *, const QModelIndex& )));
     
     newObjEditor->setAttribute (Qt::WA_DeleteOnClose);
 
@@ -8590,7 +8593,15 @@ void KKSObjEditorFactory :: putSystemParams (KKSObjectExemplar * recio,
             l->setFont(f);
         }
         else if(i == 3){
-            lE = new KKSPixmap(NULL, KKSIndAttr::iacEIOSysAttr, recio->iconAsString(), currentGroupBox);
+            KKSAttribute * attr = new KKSAttribute();
+            attr->setId(ATTR_R_ICON);
+            KKSCategoryAttr * ca = new KKSCategoryAttr (*attr);
+            KKSAttrValue * av = new KKSAttrValue;//recio->attrValue(ATTR_RECORD_FILL_COLOR);
+            av->setAttribute(ca);
+            av->setId(attr->id());
+            attr->release();
+            ca->release();
+            lE = new KKSPixmap(av, KKSIndAttr::iacEIOSysAttr, recio->iconAsString(), currentGroupBox);
             edLay->addWidget(lE, Qt::AlignCenter | Qt::AlignVCenter);
             l->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
             ((KKSPixmap *)lE)->setAlignment( Qt::AlignCenter | Qt::AlignVCenter);
@@ -8602,19 +8613,34 @@ void KKSObjEditorFactory :: putSystemParams (KKSObjectExemplar * recio,
             QObject::connect (tbRef, SIGNAL(pressed()), lE, SLOT(openFile()));
             edLay->addWidget (tbRef);
             lE->setMinimumHeight (20);
+            QObject::connect (lE, SIGNAL (valueChanged(int, KKSIndAttr::KKSIndAttrClass, QVariant)), editor, SLOT (setValue (int, KKSIndAttr::KKSIndAttrClass, QVariant)) );
         }
-        else if(i == 4 || i == 5){
-
+        else if(i == 4 || i == 5)
+        {
             QColor rgb_color;
+            KKSAttribute * attr = new KKSAttribute();
+            attr->setId(i==4 ? ATTR_RECORD_FILL_COLOR : ATTR_RECORD_TEXT_COLOR);
+            KKSCategoryAttr * ca = new KKSCategoryAttr (*attr);
+            KKSAttrValue * av = new KKSAttrValue;//recio->attrValue(ATTR_RECORD_FILL_COLOR);
+            av->setAttribute(ca);
+            av->setId(attr->id());
+            attr->release();
+            ca->release();
             if(i == 4){
                 rgb_color = recio->recordFillColor();
-                lE = new KKSColorWidget(NULL, KKSIndAttr::iacEIOSysAttr, rgb_color, KKSAttrType::atRecordColor, currentGroupBox);
+                if (rgb_color.isValid())
+                    av->setValue (KKSValue(QString::number(rgb_color.rgba()), KKSAttrType::atRecordColor));
+                lE = new KKSColorWidget(av, KKSIndAttr::iacEIOSysAttr, rgb_color, KKSAttrType::atRecordColor, currentGroupBox);
             }
             else{
                 rgb_color = recio->recordTextColor();
-                lE = new KKSColorWidget(NULL, KKSIndAttr::iacEIOSysAttr, rgb_color, KKSAttrType::atRecordTextColor, currentGroupBox);
+                if (rgb_color.isValid())
+                    av->setValue (KKSValue(QString::number(rgb_color.rgba()), KKSAttrType::atRecordTextColor));
+                lE = new KKSColorWidget(av, KKSIndAttr::iacEIOSysAttr, rgb_color, KKSAttrType::atRecordTextColor, currentGroupBox);
 
             }
+            av->release();
+            QObject::connect (lE, SIGNAL (valueChanged(int, KKSIndAttr::KKSIndAttrClass, QVariant)), editor, SLOT (setValue (int, KKSIndAttr::KKSIndAttrClass, QVariant)) );
 
             QSizePolicy hPwt (QSizePolicy::Expanding, QSizePolicy::Fixed);//Expanding);
             lE->setSizePolicy (hPwt);

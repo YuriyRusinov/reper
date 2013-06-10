@@ -14,6 +14,7 @@
 #include <QWidget>
 #include <QMap>
 #include <QMultiMap>
+#include <QModelIndex>
 //#include "KKSWidget.h"
 
 #include "KKSCategoryAttr.h"
@@ -33,7 +34,6 @@ class QCheckBox;
 class QToolButton;
 class QScrollArea;
 class QItemSelection;
-class QModelIndex;
 class QToolBar;
 class QTabWidget;
 class QLineEdit;
@@ -141,7 +141,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void refreshRecModel (QAbstractItemModel * sourceMod);
 
         void saveChildObjE (KKSObjectExemplar *childObjE);
-        void updateEIOEx (KKSObject * refObj, const KKSMap<qint64, KKSObjectExemplar *>& recs, QAbstractItemModel * recModel);
+        void updateEIOEx (KKSObject * refObj, const KKSMap<qint64, KKSObjectExemplar *>& recs, QAbstractItemModel * recModel, const QModelIndex& recIndex);
 
         void setEnableO (int state);
 
@@ -201,8 +201,8 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void delObjectEx (QWidget*, int idObject, qint64 idObjE, QString tableName, QAbstractItemModel * recModel, const QModelIndex& recIndex);
         void saveObjE (KKSObjEditor*, KKSObjectExemplar * wObjE, const KKSCategory * cat, QString tableName, int num, QAbstractItemModel * recModel);
         void loadObjE (int id, QString tableName);
-        void eioChanged (KKSObject * refObj, const KKSMap<qint64, KKSObjectExemplar *>& recs, QAbstractItemModel * recMod);
-        void updateEIO(KKSObject * refObj, const KKSMap<qint64, KKSObjectExemplar *>& objRecs, QAbstractItemModel * recModel, const QItemSelection& sel);
+        void eioChanged (KKSObject * refObj, const KKSMap<qint64, KKSObjectExemplar *>& recs, QAbstractItemModel * recMod, const QModelIndex&);
+        void updateEIO(KKSObject * refObj, const KKSMap<qint64, KKSObjectExemplar *>& objRecs, QAbstractItemModel * recModel, const QItemSelection& sel, const QModelIndex& recInd);
         
         void saveObj (KKSObjEditor*, KKSObject* wObj, KKSObjectExemplar * wObjEx, int num, QAbstractItemModel * recModel);
         void saveObjAsCommandResult(KKSObjEditor*, KKSObject* wObj, KKSObjectExemplar * wObjEx, int num, QAbstractItemModel * recModel);
@@ -305,6 +305,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void addOptWidget (int id, KKSIndAttr::KKSIndAttrClass isSystem, QWidget *w);
         
         void setRecordsModel (QAbstractItemModel * recMod);
+        void setRecordsIndex (const QModelIndex& recInd);
 /*
         void addTbQList (QToolButton * tbView, int idIndicator);
         void addTbEditList (QToolButton * tbView, int idIndicator);
@@ -427,6 +428,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         KKSMap<qint64, KKSObjectExemplar *> additionalCopies;
         
         QAbstractItemModel * pRecModel;
+        QModelIndex pRecIndex;
 
     private:
         Q_OBJECT

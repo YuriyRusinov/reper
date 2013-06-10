@@ -280,7 +280,8 @@ private slots:
     void updateEIOView (KKSObject * refObj, 
                         const KKSMap<qint64, KKSObjectExemplar *>& idObjEx, 
                         QAbstractItemModel * recModel,
-                        const QItemSelection& cSelection);
+                        const QItemSelection& cSelection,
+                        const QModelIndex& recIndex);
 
     void regroupAttrs (QWidget *wIOAttr, 
                        QScrollArea *scIOattr, 

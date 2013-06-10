@@ -31,7 +31,6 @@
 #include <QScrollArea>
 #include <QMessageBox>
 #include <QCloseEvent>
-#include <QModelIndex>
 #include <QItemSelection>
 #include <QToolBar>
 #include <QTabWidget>
@@ -114,7 +113,8 @@ KKSObjEditor :: KKSObjEditor (const KKSTemplate *t,
     includesWidget(0),
     includesRecWidget (0),
     isChanged (false),
-    pRecModel (0)
+    pRecModel (0),
+    pRecIndex (QModelIndex())
 {
     if (m_sysTemplate)
         m_sysTemplate->addRef ();
@@ -851,7 +851,7 @@ void KKSObjEditor :: recSaved (KKSObjectExemplar * rec)
             p++)
         idL.insert (p.key(), p.value());
     //idL += additionalCopies;
-    emit eioChanged (rec->io(), idL, pRecModel);//pObjectEx->id());
+    emit eioChanged (rec->io(), idL, pRecModel, pRecIndex);//pObjectEx->id());
 }
 
 void KKSObjEditor :: save (int num)
@@ -1181,7 +1181,7 @@ void KKSObjEditor :: setObjectEx (KKSObjectExemplar *newObj)
         pObjectEx->addRef ();
 }
 
-void KKSObjEditor :: updateEIOEx (KKSObject * refObj, const KKSMap<qint64, KKSObjectExemplar *>& recs, QAbstractItemModel * recModel)
+void KKSObjEditor :: updateEIOEx (KKSObject * refObj, const KKSMap<qint64, KKSObjectExemplar *>& recs, QAbstractItemModel * recModel, const QModelIndex& recInd)
 {
     //this->clearW ();
     //дл€ Ё»ќ, которые имеют подчиненную таблицу, 
@@ -1234,7 +1234,7 @@ void KKSObjEditor :: updateEIOEx (KKSObject * refObj, const KKSMap<qint64, KKSOb
     QItemSelection sel;
     if (selIndexes.size() > 0)
         sel = QItemSelection (selIndexes[0], selIndexes[selIndexes.size()-1]);
-    emit updateEIO (refObj, recs, recModel, sel);
+    emit updateEIO (refObj, recs, recModel, sel, recInd);
  
 }
 
@@ -1359,6 +1359,40 @@ void KKSObjEditor :: setValue (int idAttrValue, KKSIndAttr::KKSIndAttrClass sys,
             if (av->attribute()->type()->attrType() == KKSAttrType::atCheckList)
                 v.setValue (QString("{%1}").arg (val.toStringList().join(",")), KKSAttrType::atCheckList);
             av->setValue(v);
+            isChanged = true;
+            break;
+        }
+#ifdef Q_CC_MSVC
+    case KKSIndAttr::KKSIndAttrClass::iacEIOSysAttr:
+#else
+    case KKSIndAttr::iacEIOSysAttr:
+#endif
+        {
+            //qDebug () << __PRETTY_FUNCTION__ << idAttrValue << val;
+            switch (idAttrValue)
+            {
+                case ATTR_RECORD_FILL_COLOR:
+                {
+                    QRgb v_rgb = val.toULongLong();
+                    pObjectEx->setRecordFillColor(QColor::fromRgba(v_rgb));
+                    break;
+                }
+                case ATTR_RECORD_TEXT_COLOR:
+                {
+                    QRgb v_rgb = val.toULongLong();
+                    pObjectEx->setRecordTextColor(QColor::fromRgba(v_rgb));
+                    break;
+                }
+                case ATTR_R_ICON:
+                {
+                    pObjectEx->setIcon(val.toString());
+                    break;
+                }
+                default: break;
+            }
+            //KKSAttrValue * av = pObjectEx->attrValue(idAttrValue);
+            //KKSValue v(val.toString(), av->attribute()->type()->attrType());
+            //av->setValue(v);
             isChanged = true;
             break;
         }
@@ -2422,6 +2456,11 @@ void KKSObjEditor :: setRecordsModel (QAbstractItemModel * recMod)
         delete pRecModel;
     
     pRecModel = recMod;
+}
+
+void KKSObjEditor :: setRecordsIndex (const QModelIndex& recInd)
+{
+    this->pRecIndex = recInd;
 }
 
 void KKSObjEditor :: setStateWidget (QWidget * w)

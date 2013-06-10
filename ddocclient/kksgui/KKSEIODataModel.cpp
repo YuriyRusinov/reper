@@ -147,7 +147,7 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
         KKSEIOData * d = wItem->getData ();
         bool ok;
         //qDebug () << __PRETTY_FUNCTION__ << d->fields().value (cAttrBackground->code(false).toLower());
-        quint64 vl = cAttrBackground ? d->fields().value (cAttrBackground->code(false)).toULongLong (&ok) : d->sysFields().value("record_fill_color").toULongLong (&ok);
+        quint64 vl = cAttrBackground ? d->fields().value (cAttrBackground->code(false)).toULongLong (&ok) : d->sysFieldValue("record_fill_color").toULongLong (&ok);
         if (!ok)
             return QVariant ();
         QVariant vc = QColor::fromRgba (vl);
