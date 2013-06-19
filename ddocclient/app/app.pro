@@ -4,10 +4,11 @@ TEMPLATE = subdirs
 SUBDIRS += \
 	operator_app \
 	http_connector \
-        sync_queue_viewer 
+        sync_queue_viewer \
+        kksdaemon
 
 win32{
-        SUBDIRS += kksdaemon \
+        SUBDIRS += \
                    db_synchronizer
 }
 
