@@ -1,7 +1,8 @@
 CC = gcc
 LD = gcc
-CFLAGS  = -fPIC -Wall $(PG_CFLAGS) $(DEFINES)
-LDFLAGS = -shared -ljpeg -lgsl -lgslcblas -lm -lpq
+CFLAGS  = -fpic -Wall $(PG_CFLAGS) $(DEFINES)
+LIBDIR = -L$(shell pg_config --libdir)
+LDFLAGS = -shared $(LIBDIR)  
 RM      = rm -f
 MV	= mv
 CP      = cp -f
@@ -22,7 +23,7 @@ all: $(TARGET)
 	$(MV) $< $(build_dir)
 
 $(TARGET): $(OBJ)
-	$(LD) $(LDFLAGS) -o $@ $^
+	$(LD) $(LDFLAGS) $^ $(LIBDIR) -lpq -lgsl -lgslcblas -lm -ljpeg -o $@
 
 $(tmp_dir)/%.o : %.c kksversion.h floader.h floader_config.h
 	$(MKDIR) $(tmp_dir)
