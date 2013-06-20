@@ -1,6 +1,6 @@
 HEADERS += \
-		kksdaemon.h 
+        kksdaemon.h 
 
 SOURCES += \
-		main.cpp \
-		kksdaemon.cpp 
+        main.cpp \
+        kksdaemon.cpp 

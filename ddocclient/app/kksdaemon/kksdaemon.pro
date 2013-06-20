@@ -7,16 +7,16 @@ TARGET = kksdaemon
 
 DESTDIR = ../../build
 
-INCLUDEPATH += 	. \
-		../../dataaccess \
-		../../kksutils \
+INCLUDEPATH +=  . \
+    	        ../../dataaccess \
+                ../../kksutils \
                 ../../kksrunservice
 
 
 DEPENDPATH += 	\
-		. \
-		../../dataaccess \
-		../../kksutils \
+                . \
+                ../../dataaccess \
+                ../../kksutils \
                 ../../kksrunservice
 
 LIBS += -L$$DESTDIR -ldataaccess -lkksutils -lkksrunservice 

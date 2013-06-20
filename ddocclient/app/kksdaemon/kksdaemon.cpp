@@ -26,13 +26,13 @@ KKSDaemon::KKSDaemon(int argc, char **argv) :
     bNeedGenerateStreams = false;
     
     db = NULL;
-	dbTimer = NULL;
+    dbTimer = NULL;
     dbStreams = NULL;
 
     listener = NULL;
     streamsGenerator = NULL;
 
-	m_timerInterval = 60000;//1 min
+    m_timerInterval = 60000;//1 min
 
 #ifdef WIN32
     sPgPass = QString("pgpass.conf");
@@ -57,13 +57,13 @@ KKSDaemon::~KKSDaemon()
     }
 
     if(dbTimer){
-		dbTimer->disconnect();
-		delete dbTimer;
+        dbTimer->disconnect();
+        delete dbTimer;
     }
 
     if(dbStreams){
-		dbStreams->disconnect();
-		delete dbStreams;
+        dbStreams->disconnect();
+        delete dbStreams;
     }
 
     if(listener){
@@ -127,47 +127,47 @@ void KKSDaemon::start()
     }
 
     if(bNeedAnalyzeDb){
-	    m_timer.setInterval(m_timerInterval);
-	    connect(&m_timer, SIGNAL(timeout()), this, SLOT(analyzeDb()));
-	    m_timer.start();
+        m_timer.setInterval(m_timerInterval);
+        connect(&m_timer, SIGNAL(timeout()), this, SLOT(analyzeDb()));
+        m_timer.start();
     }
     
 }
 
 void KKSDaemon::analyzeDb()
 {
-	(*fLogOut) << QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm.ss") << " --- " << "Start analyzing database...\n";
+    (*fLogOut) << QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm.ss") << " --- " << "Start analyzing database...\n";
     fLogOut->flush();
 
     QString sql = QString("select cmdanalyzejournal()");
-	KKSResult * res = dbTimer->execute(sql.toLocal8Bit().constData());
-	if(!res)
-		return;
+    KKSResult * res = dbTimer->execute(sql.toLocal8Bit().constData());
+    if(!res)
+        return;
 
-	if(res->getRowCount() != 1){
-		delete res;
-		return;
-	}
+    if(res->getRowCount() != 1){
+        delete res;
+        return;
+    }
 
-	int r = res->getCellAsInt(0, 0);
-	delete res;
-	if(r != 1)
-		return;
+    int r = res->getCellAsInt(0, 0);
+    delete res;
+    if(r != 1)
+        return;
 
-	sql = QString("select putIOIntoRubric()");
-	res = dbTimer->execute(sql.toLocal8Bit().constData());
-	if(!res)
-		return;
+    sql = QString("select putIOIntoRubric()");
+    res = dbTimer->execute(sql.toLocal8Bit().constData());
+    if(!res)
+        return;
 
-	if(res->getRowCount() != 1){
-		delete res;
-		return;
-	}
+    if(res->getRowCount() != 1){
+        delete res;
+        return;
+    }
 
-	r = res->getCellAsInt(0, 0);
-	delete res;
-	if(r != 1)
-		return;
+    r = res->getCellAsInt(0, 0);
+    delete res;
+    if(r != 1)
+        return;
 
 
     (*fLogOut) << QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm.ss") << " --- " << "Successfully analyzed\n";
@@ -208,7 +208,7 @@ void KKSDaemon::readSettings()
     passwd = s->value("passwd").toString();
     sPsqlPath = s->value("psqlPath").toString();
 
-	m_timerInterval = s->value("timerInterval").toInt();
+    m_timerInterval = s->value("timerInterval").toInt();
     
     bNeedGenerateStreams = s->value("generateStreams").toBool();
     bNeedAnalyzeDb = s->value("autoRubrication").toBool();
@@ -244,10 +244,10 @@ void KKSDaemon::readSettings()
         s->setValue("psqlPath", sPsqlPath);
     }
 
-	if(m_timerInterval <= 0){
-		m_timerInterval = 60000;
-		s->setValue("timerInterval", m_timerInterval);
-	}
+    if(m_timerInterval <= 0){
+        m_timerInterval = 60000;
+        s->setValue("timerInterval", m_timerInterval);
+    }
 
     if(s->value("generateStreams").isNull()){
         bNeedGenerateStreams = true;
@@ -290,7 +290,7 @@ void DDocStreamsGenerator::run()
         int r = res->getCellAsInt(0, 0);
         delete res;
         if(r != 1)
-		    return;
+            return;
 
     }
     

@@ -58,7 +58,7 @@ private:
 
 class KKSDaemon : public QObject, public QtService<QCoreApplication>
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
     KKSDaemon(int argc, char **argv);
     ~KKSDaemon();
@@ -75,7 +75,7 @@ protected:
     void processCommand(int code);
 
 private slots:
-	void analyzeDb();
+    void analyzeDb();
 
 private:
 
@@ -90,7 +90,7 @@ private:
     bool bNeedGenerateStreams; //флаг определяет необходимость запуска механизма генерации потоков
     
     KKSPGDatabase * db;
-	KKSPGDatabase * dbTimer;//для автоматической разводки документов по рубрикам
+    KKSPGDatabase * dbTimer;//для автоматической разводки документов по рубрикам
     KKSPGDatabase * dbStreams; //для генерации потоков сообщений
     
     DDocServerListener * listener;
@@ -98,7 +98,7 @@ private:
 
     QHttp http;
 
-	QTimer m_timer;
+    QTimer m_timer;
 
     QFile * fLog;
     QTextStream * fLogOut;
@@ -109,7 +109,7 @@ private:
     QString user;
     QString passwd;
 
-	int m_timerInterval;
+    int m_timerInterval;
 
     QString sPgPass;
     QString sPsqlPath;
