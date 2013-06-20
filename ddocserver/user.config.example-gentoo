@@ -14,7 +14,7 @@ GROUP=admin
 
 #root path to PostgreSQL 9.x
 #if that was installed by default, the path typically is /opt/postgres
-LINTER_ROOT=/opt/postgres
+LINTER_ROOT=/usr
 
 # port of database server (5432 is the defaults)
 LINTER_PORT=5432
@@ -31,7 +31,7 @@ ENCODING=UTF8
 #ps afx 
 #...
 # 964 ?        S      0:02 /opt/postgres/bin/postmaster -D /opt/postgres/data
-PGDATA_DIR=/opt/postgres/data
+PGDATA_DIR=/var/lib/postgresql/9.2/data
 
 #file archive path
 FILE_ARCH=io_files

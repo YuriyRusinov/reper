@@ -1512,8 +1512,8 @@ KKSObjEditor* KKSObjEditorFactory :: createObjRecEditor (int idObject,// идентиф
 //        recW->hideGroup (1);//gbEdit->setVisible (false);
 //        recW->hideGroup (2);//gbImportExport->setVisible (false);
 //        recW->tbSetView->setVisible (false);
-        recW->pbOk->setVisible (windowModality != Qt::NonModal);
-        recW->pbCancel->setVisible (windowModality != Qt::NonModal);
+        recW->pbOk->setVisible (mode || windowModality != Qt::NonModal);
+        recW->pbCancel->setVisible (mode || windowModality != Qt::NonModal);
         connect (recW->pbOk, SIGNAL (clicked()), objEditorWidget, SLOT (accept()) );
         connect (recW->pbCancel, SIGNAL (clicked()), objEditorWidget, SLOT (reject()) );
         connect (recW->pbApply, SIGNAL (clicked()), objEditorWidget, SLOT (apply()) );
