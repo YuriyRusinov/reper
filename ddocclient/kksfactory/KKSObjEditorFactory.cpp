@@ -331,9 +331,9 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
         //
         // Права доступа
         //
-        QWidget * stuffW = new QWidget ();
-        QGridLayout * gStuffLay = new QGridLayout ();
-        stuffW->setLayout (gStuffLay);
+        QWidget * stuffW = 0;//new QWidget ();
+//        QGridLayout * gStuffLay = new QGridLayout ();
+//        stuffW->setLayout (gStuffLay);
         KKSAccessEntity * acl = io->getAccessRules();
         if (!acl)
         {
@@ -341,8 +341,8 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
             io->setAccessRules (acl);
         }
         KKSStuffForm *sForm = m_sf->createStuffEditorForm (acl, io->author(), stuffW);
-        tabProp->addTab (stuffW, tr ("User privilegies"));
-        gStuffLay->addWidget (sForm, 0, 0, 1, 1);
+        tabProp->addTab (sForm/*stuffW*/, tr ("User privilegies"));
+        //gStuffLay->addWidget (sForm, 0, 0, 1, 1);
 /*        connect (sForm, SIGNAL (privilegiesChanged (KKSPrivilege *, KKSObject *)),
                  objEditorWidget,
                  SLOT (privChanged (KKSPrivilege *, KKSObject *))
