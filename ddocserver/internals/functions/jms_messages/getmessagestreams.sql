@@ -11,6 +11,7 @@ declare
     last_time timestamp;
     tquery varchar;
     tinterv interval;
+    rand_cnt int4;
 begin
     for r in
         select id,
@@ -32,6 +33,13 @@ begin
             end if;
             id_distrib := r.id_partition_low;
 
+            select count(*) into rand_cnt from rand_state;
+            if (rand_cnt = 0) then
+                perform initrand(0);
+                perform saverand();
+            end if;
+
+
             perform loadrand();
 
             if (id_distrib = 1) then
@@ -45,6 +53,8 @@ begin
                 select droprand();
                 continue;
             end if;
+
+            perform saverand();
 
             perform droprand();
 
