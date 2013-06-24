@@ -98,7 +98,7 @@ Datum saverand(PG_FUNCTION_ARGS)
     const int nargs = 3;
     //char *nulls = "2";//(char *)(palloc (nargs*sizeof(char)));
     Oid * oids = (Oid *)palloc (nargs*sizeof (Oid));
-    oids[0] = INT4OID;
+    oids[0] = INT8OID;
     oids[1] = BYTEAOID;
     oids[2] = INT8OID;
     Datum * vals = (Datum *)palloc (nargs*sizeof (Datum));
@@ -112,19 +112,19 @@ Datum saverand(PG_FUNCTION_ARGS)
         pfree (randBuf);
         PG_RETURN_INT32 (-4);
     }
-    int8 id;
+    long int id;
     TupleDesc tupdesc = SPI_tuptable->tupdesc;
     SPITupleTable *tuptable = SPI_tuptable;
     HeapTuple tuple = tuptable->vals[0];
     char * id_str = SPI_getvalue (tuple, tupdesc, 1);
     id = atol (id_str);
-    elog (INFO, "id=%d\n", id);
+    elog (INFO, "id=%ld\n", id);
     vals[0] = Int32GetDatum(id);
     vals[1] = 0;//PointerGetDatum (randBuf);
     unsigned long long seed = gsl_rng_get (r);
-    snprintf (r_sql, nr_ins, "insert into rand_state (id, state_rand, rand_seed) values (%d, null::bytea, %llu);", id, seed);
+    snprintf (r_sql, nr_ins, "insert into rand_state (id, state_rand, rand_seed) values (%ld, null::bytea, %llu);", id, seed);
     vals[2] = Int64GetDatum (seed);
-    elog (INFO, "value=%d id=%d\n", DatumGetInt32 (vals[0]), id);
+    elog (INFO, "value=%d id=%ld\n", DatumGetInt32 (vals[0]), id);
     elog (INFO, "%s\n", r_sql);
     int rins = SPI_execute (r_sql, false, 1L);//SPI_execute_with_args (r_sql, nargs, oids, vals, nulls, false, 1L);
     if (rins != SPI_OK_INSERT)
