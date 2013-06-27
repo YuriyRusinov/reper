@@ -28,40 +28,11 @@ begin
             from
                 message_streams
         loop
+            select into ctime current_timestamp;
             if (r.start_time > ctime or ctime > r.stop_time) then
                 continue;
             end if;
             id_distrib := r.id_partition_low;
-
-            select count(*) into rand_cnt from rand_state;
-            if (rand_cnt = 0) then
-                perform initrand(0);
-                perform saverand();
-            end if;
-
-
-            perform loadrand();
-
-            if (id_distrib = 1) then
-                select into time_step r.moda+gaussrand(r.sigma);
-            elsif (id_distrib = 2) then
-                select into time_step exprand (r.lambda);
-            elsif (id_distrib = 3) then
-                select into time_step r.min_p + (r.max_p-r.min_p)*unirand ();
-            else
-                raise warning 'Does not have any another distributions';
-                select droprand();
-                continue;
-            end if;
-
-            perform saverand();
-
-            perform droprand();
-
-            if (time_step is null) then
-                raise warning 'Incorrect parameters';
-                return NULL;
-            end if;
 
             select into tunit name from time_units tu where tu.id=r.id_time_unit;
             for rr in
@@ -76,7 +47,14 @@ begin
             end if;
 
             if (prev_time_step is null) then
+                time_step := generatetimestep(r.id); 
+                if (time_step is null) then
+                    raise warning 'Incorrect parameters';
+                    return NULL;
+                end if;
                 prev_time_step := time_step;
+                insert into message_series (id_message_stream, time, time_step) values (r.id, ctime, time_step);
+                continue;
             end if;
 
             tquery := E'select ';
@@ -85,11 +63,18 @@ begin
             execute tquery into tinterv;
             --last_time := last_time + tinterv;
             raise warning 'last time is %, interval is %', last_time, tinterv;
-            select into ctime current_timestamp;
 
-            if (ctime >= last_time+tinterv and ctime <= r.stop_time) then
-                insert into message_series (id_message_stream, time, time_step) values (r.id, ctime, time_step);
+            if (ctime < last_time+tinterv or ctime > r.stop_time) then
+                continue;         
             end if;
+
+            time_step := generatetimestep(r.id);
+            if (time_step is null) then
+                raise warning 'Incorrect parameters';
+                return NULL;
+            end if;
+
+            insert into message_series (id_message_stream, time, time_step) values (r.id, ctime, time_step);
 
         end loop;
 
