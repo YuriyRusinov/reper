@@ -75,7 +75,7 @@
 #include "KKSStuffFactory.h"
 #include "KKSRubricFactory.h"
 #include "KKSIndFactory.h"
-#include <KKSCategoryAttr.h>
+#include <KKSAttribute.h>
 #include <KKSType.h>
 #include <KKSItemDelegate.h>
 #include <KKSMessageWidget.h>
@@ -600,6 +600,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
 
     }
 
+    //системные параметры для записей пользовательских справочников
     if(!io && wObjE->io()->id() > _MAX_SYS_IO_ID_ ){
         this->putSystemParams(wObjE, objEditorWidget, tabObj, tabObj->count());
     }
@@ -654,8 +655,8 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditorParam (int idObject,// идент
                                                            const KKSList<const KKSFilterGroup *> & filters,// Применяется для ЭИО, которые являются контейнерными ИО. Содержит набор фильтров их таблицы
                                                            const QString & extraTitle,
                                                            const KKSCategory* wCat, // категория информационных объектов
-                                                           const KKSMap<int, KKSAttrValue *>& io_aVals, // список априорно заданных параметров атрибутов ИО
-                                                           const KKSMap<int, KKSAttrValue *>& aVals, // список априорно заданных параметров атрибутов ЭИО
+                                                           const KKSMap<qint64, KKSAttrValue *>& io_aVals, // список априорно заданных параметров атрибутов ИО
+                                                           const KKSMap<qint64, KKSAttrValue *>& aVals, // список априорно заданных параметров атрибутов ЭИО
                                                            bool mode, // наличие кнопок OK, Cancel, Apply
                                                            const QString& tableName, // название доп. таблицы, основная таблица соотвествует пустому значению
                                                            bool bShowExecButton, //определяет наличие кнопки "Отправить адресату" при исполнении распоряжения. Во всех остальных случаях ее быть не должно
@@ -991,12 +992,12 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditorParam (int idObject,// идент
  * io -- Информационный объект
  * aVals -- набор значений атрибутов.
  */
-void KKSObjEditorFactory :: setPreliminaryAttrs (KKSObject * io, const KKSMap<int, KKSAttrValue *>& aVals) const
+void KKSObjEditorFactory :: setPreliminaryAttrs (KKSObject * io, const KKSMap<qint64, KKSAttrValue *>& aVals) const
 {
     if (!io || aVals.isEmpty())
         return;
 
-    for (KKSMap<int, KKSAttrValue*>::const_iterator pa = aVals.constBegin(); \
+    for (KKSMap<qint64, KKSAttrValue*>::const_iterator pa = aVals.constBegin(); \
          pa != aVals.constEnd(); \
          pa++)
     {
@@ -1016,7 +1017,7 @@ void KKSObjEditorFactory :: setPreliminaryAttrs (KKSObject * io, const KKSMap<in
  * cio -- экземпляр информационного объекта
  * aVals -- набор значений атрибутов.
  */
-void KKSObjEditorFactory :: setPreliminaryAttrs (KKSObjectExemplar * cio, const KKSMap<int, KKSAttrValue *>& aVals) const
+void KKSObjEditorFactory :: setPreliminaryAttrs (KKSObjectExemplar * cio, const KKSMap<qint64, KKSAttrValue *>& aVals) const
 {
     if (!cio || aVals.isEmpty())
         return;
@@ -1032,7 +1033,7 @@ void KKSObjEditorFactory :: setPreliminaryAttrs (KKSObjectExemplar * cio, const 
     c = c->tableCategory ();
     if (!c)
         return;
-    for (KKSMap<int, KKSAttrValue*>::const_iterator pa = aVals.constBegin(); \
+    for (KKSMap<qint64, KKSAttrValue*>::const_iterator pa = aVals.constBegin(); \
          pa != aVals.constEnd(); \
          pa++)
     {
@@ -1077,10 +1078,16 @@ void KKSObjEditorFactory :: setIONameSecret (KKSObjEditor * editor, KKSObjectExe
     //const KKSCategoryAttr * pCategAttr = attr->attribute();
 #ifdef Q_CC_MSVC
     QLineEdit * lEIOName = new KKSEdit (attr, KKSIndAttr::KKSIndAttrClass::iacTableAttr, io->name (), parentWProp);//QLineEdit (io->name (), parentWProp);
-    connect (lEIOName, SIGNAL (valueChanged(int, KKSIndAttr::KKSIndAttrClass, QVariant)), editor, SLOT (setValue (int, KKSIndAttr::KKSIndAttrClass, QVariant)) );
+    connect (lEIOName, 
+             SIGNAL (valueChanged(qint64, KKSIndAttr::KKSIndAttrClass, QVariant)), 
+             editor, 
+             SLOT (setValue (qint64, KKSIndAttr::KKSIndAttrClass, QVariant)) );
 #else
     QLineEdit * lEIOName = new KKSEdit (attr, KKSIndAttr::iacTableAttr, io->name (), parentWProp);//QLineEdit (io->name (), parentWProp);
-    connect (lEIOName, SIGNAL (valueChanged(int, KKSIndAttr::KKSIndAttrClass, QVariant)), editor, SLOT (setValue (int, KKSIndAttr::KKSIndAttrClass, QVariant)) );
+    connect (lEIOName, 
+             SIGNAL (valueChanged(qint64, KKSIndAttr::KKSIndAttrClass, QVariant)), 
+             editor, 
+             SLOT (setValue (qint64, KKSIndAttr::KKSIndAttrClass, QVariant)) );
 #endif
     lEIOName->setReadOnly (io->isSystem ());
     hIOLay->addWidget (lIOName);
@@ -1134,7 +1141,11 @@ void KKSObjEditorFactory :: setIONameSecret (KKSObjEditor * editor, KKSObjectExe
     aRefW->setValue (attr->id(), KKSIndAttr::iacTableAttr, cV);
 #endif
     aRefW->setAttrWidget (lEIOMacLabel);
-    connect (aRefW, SIGNAL (valueChanged(int, KKSIndAttr::KKSIndAttrClass, QVariant)), editor, SLOT (setValue (int, KKSIndAttr::KKSIndAttrClass, QVariant)) );
+    connect (aRefW, 
+             SIGNAL (valueChanged(qint64, KKSIndAttr::KKSIndAttrClass, QVariant)), 
+             editor, 
+             SLOT (setValue (qint64, KKSIndAttr::KKSIndAttrClass, QVariant)) );
+
     hIOLay->addWidget (tbMac);
     tbMac->setEnabled (!io->isSystem ());
 
@@ -2507,7 +2518,15 @@ void KKSObjEditorFactory :: createNewEditor (QWidget * editor, int idObject, con
  * aVals  -- параметры создаваемого ЭИО
  * recModel -- модель для записи
  */
-void KKSObjEditorFactory :: createNewEditorParam (QWidget * editor, int idObject, const KKSCategory * c, QString tableName, int nTab, bool isModal, const KKSMap<int, KKSAttrValue *>& ioAvals, const KKSMap<int, KKSAttrValue *>& aVals, QAbstractItemModel * recModel)
+void KKSObjEditorFactory :: createNewEditorParam (QWidget * editor, 
+                                                  int idObject, 
+                                                  const KKSCategory * c, 
+                                                  QString tableName, 
+                                                  int nTab, 
+                                                  bool isModal, 
+                                                  const KKSMap<qint64, KKSAttrValue *>& ioAvals, 
+                                                  const KKSMap<qint64, KKSAttrValue *>& aVals, 
+                                                  QAbstractItemModel * recModel)
 {
     if (ioAvals.isEmpty () && aVals.isEmpty ())
     {
@@ -3314,14 +3333,52 @@ void KKSObjEditorFactory :: loadAttributeReference (QString tableName, QWidget *
         
         KKSAttrValue * av = NULL;
 
-        KKSMap<int, KKSAttrValue *> sysAttrValues = editor->getSysAttrValues();
+        KKSMap<qint64, KKSAttrValue *> sysAttrValues = editor->getSysAttrValues();
         av = sysAttrValues.value(aRefW->getIdAttrValue(), NULL);
         if(!av){
-            KKSMap<int, KKSAttrValue *> ioAttrValues = editor->getIOAttrValues();
+            KKSMap<qint64, KKSAttrValue *> ioAttrValues = editor->getIOAttrValues();
             av = ioAttrValues.value(aRefW->getIdAttrValue(), NULL);
             if(!av){
-                KKSMap<int, KKSAttrValue *> recAttrValues = editor->getRecAttrValues();
+                KKSMap<qint64, KKSAttrValue *> recAttrValues = editor->getRecAttrValues();
                 av = recAttrValues.value(aRefW->getIdAttrValue(), NULL);
+            }
+        }
+
+        if(!av){
+            //пройдемся по всем составным атрибутам ИО (ЭИО), если такие присутствуют
+            KKSMap<qint64, KKSAttrValue*> aaList = editor->getSysAttrValues();
+            KKSMap<qint64, KKSAttrValue*>::const_iterator i;
+            for (i=aaList.constBegin (); i != aaList.constEnd(); i++){
+                const KKSAttrValue *avC = i.value();            
+                if(avC->attribute()->type()->attrType() != KKSAttrType::atComplex)
+                    continue;
+                av = avC->attrsValues().value(aRefW->getIdAttrValue(), NULL);
+                if(av)
+                    break;
+            }
+
+            if(!av){
+                aaList = editor->getIOAttrValues();
+                for (i=aaList.constBegin (); i != aaList.constEnd(); i++){
+                    const KKSAttrValue *avC = i.value();            
+                    if(avC->attribute()->type()->attrType() != KKSAttrType::atComplex)
+                        continue;
+                    av = avC->attrsValues().value(aRefW->getIdAttrValue(), NULL);
+                    if(av)
+                        break;
+                }
+
+                if(!av){
+                    aaList = editor->getRecAttrValues();
+                    for (i=aaList.constBegin (); i != aaList.constEnd(); i++){
+                        const KKSAttrValue *avC = i.value();            
+                        if(avC->attribute()->type()->attrType() != KKSAttrType::atComplex)
+                            continue;
+                        av = avC->attrsValues().value(aRefW->getIdAttrValue(), NULL);
+                        if(av)
+                            break;
+                    }
+                }
             }
         }
         
@@ -6982,8 +7039,8 @@ void KKSObjEditorFactory :: addSearchTemplateType (const QModelIndex& parent, QA
     }
     
     c = c->tableCategory();
-    KKSMap<int, KKSAttrValue *> io_aVals;
-    KKSMap<int, KKSAttrValue *> aVals;
+    KKSMap<qint64, KKSAttrValue *> io_aVals;
+    KKSMap<qint64, KKSAttrValue *> aVals;
     if (parent.isValid())
     {
         int idp = parent.data (Qt::UserRole).toInt();
@@ -7055,8 +7112,8 @@ void KKSObjEditorFactory :: editSearchTemplateType (const QModelIndex& wIndex, Q
     }
     
     c = c->tableCategory();
-    KKSMap<int, KKSAttrValue *> io_aVals;
-    KKSMap<int, KKSAttrValue *> aVals;
+    KKSMap<qint64, KKSAttrValue *> io_aVals;
+    KKSMap<qint64, KKSAttrValue *> aVals;
     QModelIndex parent = wIndex.parent();
     if (parent.isValid())
     {
@@ -8138,8 +8195,8 @@ int KKSObjEditorFactory :: putAttrsGroupsOnWidget ( KKSObject * obj,
         KKSAttrValue * av = NULL;
         //bool isAvalsSet = false;
         
-        KKSMap<int, KKSAttrValue*> sysAttrValue = editor->getSysAttrValues();
-        for (KKSMap<int, KKSAttrValue*>::const_iterator pa = sysAttrValue.constBegin(); pa != sysAttrValue.constEnd(); pa++)
+        KKSMap<qint64, KKSAttrValue*> sysAttrValue = editor->getSysAttrValues();
+        for (KKSMap<qint64, KKSAttrValue*>::const_iterator pa = sysAttrValue.constBegin(); pa != sysAttrValue.constEnd(); pa++)
         {
             KKSAttrValue * av1 = pa.value();
             if(av1->attribute()->id() == a->id()){
@@ -8271,8 +8328,8 @@ int KKSObjEditorFactory :: putRecAttrsGroupsOnWidget ( KKSObject * obj,
         KKSAttrValue * av = NULL;
         //bool isAvalsSet = false;
         
-        KKSMap<int, KKSAttrValue*> recAttrValue = editor->getRecAttrValues();
-        for (KKSMap<int, KKSAttrValue*>::const_iterator pa = recAttrValue.constBegin(); pa != recAttrValue.constEnd(); pa++)
+        KKSMap<qint64, KKSAttrValue*> recAttrValue = editor->getRecAttrValues();
+        for (KKSMap<qint64, KKSAttrValue*>::const_iterator pa = recAttrValue.constBegin(); pa != recAttrValue.constEnd(); pa++)
         {
             KKSAttrValue * av1 = pa.value();
             if(av1->attribute()->id() == a->id()){
@@ -8362,7 +8419,15 @@ int KKSObjEditorFactory :: putRecAttrsGroupsOnWidget ( KKSObject * obj,
     return n_str;
 }
 
-void KKSObjEditorFactory :: putAttrsGroupsOnWidget (KKSObject * obj, KKSObjEditor * editor, int& nc, const KKSCategory *c, KKSAttrGroup * aGroup, QGridLayout *gbLay, QGridLayout * gAttrLayout, bool isGrouped, bool updateView)
+void KKSObjEditorFactory :: putAttrsGroupsOnWidget (KKSObject * obj, 
+                                                    KKSObjEditor * editor, 
+                                                    int& nc, 
+                                                    const KKSCategory *c, 
+                                                    KKSAttrGroup * aGroup, 
+                                                    QGridLayout *gbLay, 
+                                                    QGridLayout * gAttrLayout, 
+                                                    bool isGrouped, 
+                                                    bool updateView)
 {
     if (!aGroup)
         return;
@@ -8400,8 +8465,8 @@ void KKSObjEditorFactory :: putAttrsGroupsOnWidget (KKSObject * obj, KKSObjEdito
         KKSAttrValue * av = NULL;
         //bool isAvalsSet = false;
         
-        KKSMap<int, KKSAttrValue*> ioAttrValue = editor->getIOAttrValues();
-        for (KKSMap<int, KKSAttrValue*>::const_iterator pa = ioAttrValue.constBegin(); pa != ioAttrValue.constEnd(); pa++)
+        KKSMap<qint64, KKSAttrValue*> ioAttrValue = editor->getIOAttrValues();
+        for (KKSMap<qint64, KKSAttrValue*>::const_iterator pa = ioAttrValue.constBegin(); pa != ioAttrValue.constEnd(); pa++)
         {
             KKSAttrValue * av1 = pa.value();
             if(av1->attribute()->id() == a->id()){
@@ -8613,7 +8678,10 @@ void KKSObjEditorFactory :: putSystemParams (KKSObjectExemplar * recio,
             QObject::connect (tbRef, SIGNAL(pressed()), lE, SLOT(openFile()));
             edLay->addWidget (tbRef);
             lE->setMinimumHeight (20);
-            QObject::connect (lE, SIGNAL (valueChanged(int, KKSIndAttr::KKSIndAttrClass, QVariant)), editor, SLOT (setValue (int, KKSIndAttr::KKSIndAttrClass, QVariant)) );
+            QObject::connect (lE, 
+                              SIGNAL (valueChanged(qint64, KKSIndAttr::KKSIndAttrClass, QVariant)), 
+                              editor, 
+                              SLOT (setValue (qint64, KKSIndAttr::KKSIndAttrClass, QVariant)) );
         }
         else if(i == 4 || i == 5)
         {
@@ -8640,7 +8708,10 @@ void KKSObjEditorFactory :: putSystemParams (KKSObjectExemplar * recio,
 
             }
             av->release();
-            QObject::connect (lE, SIGNAL (valueChanged(int, KKSIndAttr::KKSIndAttrClass, QVariant)), editor, SLOT (setValue (int, KKSIndAttr::KKSIndAttrClass, QVariant)) );
+            QObject::connect (lE, 
+                              SIGNAL (valueChanged(qint64, KKSIndAttr::KKSIndAttrClass, QVariant)), 
+                              editor, 
+                              SLOT (setValue (qint64, KKSIndAttr::KKSIndAttrClass, QVariant)) );
 
             QSizePolicy hPwt (QSizePolicy::Expanding, QSizePolicy::Fixed);//Expanding);
             lE->setSizePolicy (hPwt);

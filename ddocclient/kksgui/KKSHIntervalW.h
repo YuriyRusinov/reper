@@ -35,7 +35,7 @@ private slots:
     void secChanged (int sec);
 
 signals:
-    void valueChanged (int id, KKSIndAttr::KKSIndAttrClass isSys, QVariant val);
+    void valueChanged (qint64 id, KKSIndAttr::KKSIndAttrClass isSys, QVariant val);
 
 private:
     //

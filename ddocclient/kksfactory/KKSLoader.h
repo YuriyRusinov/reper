@@ -228,7 +228,8 @@ class _F_EXPORT KKSLoader
         KKSMap<int, KKSIndicatorType *> loadIndicatorTypes (void) const;
 
         void loadAttrAttrs(KKSAttribute * a) const;
-        KKSMap<int, KKSAttrAttr*> loadAttrAttrs(int idAttr) const;
+        KKSMap<int, KKSCategoryAttr*> loadAttrAttrs(int idAttr) const;
+        KKSMap<qint64, KKSAttrValue *> loadAttrAttrValues(KKSAttrValue * av, bool forRec = false) const;
         
         QList<int> getForbiddenTypes (void) const;
 

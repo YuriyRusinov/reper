@@ -25,20 +25,22 @@ public:
     KKSAttrUUIDWidget (QWidget *parent=0, Qt::WindowFlags f=0);
     ~KKSAttrUUIDWidget (void);
 
-    int getIdAttrValue (void) const;
+    qint64 getIdAttrValue (void) const;
     KKSIndAttr::KKSIndAttrClass isSysAttr (void) const;
     const QVariant& getValue (void) const;
     QToolButton * getButton (void) const;
     Qt::CheckState checkState (void) const;
 
 public slots:
-    void setVal (int id, KKSIndAttr::KKSIndAttrClass sys, QVariant val);
+    void setVal (qint64 id, KKSIndAttr::KKSIndAttrClass sys, QVariant val);
+    void setVal();
+    void setVal(const QString & t);
     void setUUID (QString uuid);
     void generate_uuid (void);
 
 signals:
-    void valueChanged (int id, KKSIndAttr::KKSIndAttrClass sys, QVariant val);
-    void generateUUID (int id);
+    void valueChanged (qint64 id, KKSIndAttr::KKSIndAttrClass sys, QVariant val);
+    void generateUUID (qint64 id);
 
 private:
     //
@@ -48,7 +50,7 @@ private:
     QToolButton * tbGen;
     QCheckBox * chAuto;
     QGridLayout * gAttrLay;
-    int idAttrValue;
+    qint64 idAttrValue;
     QVariant cVal;
     KKSIndAttr::KKSIndAttrClass isSystem;
 

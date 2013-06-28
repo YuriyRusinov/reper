@@ -10,7 +10,7 @@
 #include <KKSObjectExemplar.h>
 #include <KKSObject.h>
 #include <KKSCategory.h>
-#include <KKSCategoryAttr.h>
+#include <KKSAttribute.h>
 #include <KKSAttrType.h>
 #include <KKSAttrValue.h>
 #include <KKSValue.h>

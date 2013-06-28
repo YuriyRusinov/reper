@@ -1,5 +1,6 @@
 # Input
 HEADERS += \
+                KKSComplexAttrWidget.h \
                 KKSAttrCheckListWidget.h \
                 KKSAttrProxyModel.h \
                 KKSAttributesModel.h \
@@ -90,6 +91,7 @@ HEADERS += \
 	   	kksgui_config.h
 
 SOURCES += \
+                KKSComplexAttrWidget.cpp \
                 KKSAttrCheckListWidget.cpp \
                 KKSAttributesModel.cpp \
                 KKSAttrProxyModel.cpp \
@@ -204,6 +206,7 @@ FORMS   += \
                 ui/kks_state_form.ui
 
 headers.files += \
+                KKSComplexAttrWidget.h \
                 KKSAttrCheckListWidget.h \
                 KKSAttributesModel.h \
                 KKSAttrProxyModel.h \

@@ -1238,7 +1238,7 @@ int KKSEIOFactory::insertIndValues(const KKSObjectExemplar * eio) const
         //eio->indValue(1)->attribute()->idCategoryAttr
         sql += QString("select eioInsertIndicator(%1, %2, %3::varchar, %4, %5, %6, %7, %8);")
                               .arg(eio->id())
-                              .arg(a->idCategoryAttr())
+                              .arg(a->idRow())
                               .arg(v.valueForInsert())
                               .arg(dtStart)
                               .arg(dtStop)
@@ -1377,7 +1377,7 @@ int KKSEIOFactory::updateIndValues(const KKSObjectExemplar * eio) const
         
         QString s = QString("select eioUpdateIndicator(%1, %2, %3::varchar, NULL, NULL, %4, %5, %6);")
                               .arg(eio->id())
-                              .arg(a->idCategoryAttr())
+                              .arg(a->idRow())
                               .arg(v.valueForInsert())
                               //.arg(dtStart)
                               //.arg(dtStop)

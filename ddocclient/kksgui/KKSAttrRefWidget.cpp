@@ -51,7 +51,7 @@ QGridLayout * KKSAttrRefWidget :: getLayout (void) const
     return gAttrLay;
 }
 
-void KKSAttrRefWidget :: setValue (int id, KKSIndAttr::KKSIndAttrClass sys, QVariant val)
+void KKSAttrRefWidget :: setValue (qint64 id, KKSIndAttr::KKSIndAttrClass sys, QVariant val)
 {
     idAttrValue = id;
     isSystem = sys;
@@ -59,7 +59,7 @@ void KKSAttrRefWidget :: setValue (int id, KKSIndAttr::KKSIndAttrClass sys, QVar
     emit valueChanged (idAttrValue, sys, val);
 }
 
-int KKSAttrRefWidget :: getIdAttrValue (void) const
+qint64 KKSAttrRefWidget :: getIdAttrValue (void) const
 {
     return idAttrValue;
 }

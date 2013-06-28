@@ -47,7 +47,7 @@
 #include <KKSEIODataModel.h>
 #include <KKSRecProxyModel.h>
 #include <KKSCategory.h>
-#include <KKSCategoryAttr.h>
+#include <KKSAttribute.h>
 #include <KKSSortFilterProxyModel.h>
 #include <KKSAttributesModel.h>
 #include <KKSCatAttrsModel.h>
@@ -1431,7 +1431,7 @@ void KKSViewFactory :: updateAttrAttrsModel (const KKSAttribute *a, QAbstractIte
         return;
     
     int n=model->rowCount ();
-    KKSMap<int, KKSAttrAttr *> attrs = a->attrsAttrs();
+    KKSMap<int, KKSCategoryAttr *> attrs = a->attrs();
     
     int nCol = model->columnCount ();
     if (nCol < 4)
@@ -1447,7 +1447,7 @@ void KKSViewFactory :: updateAttrAttrsModel (const KKSAttribute *a, QAbstractIte
         return;
 
     int i=0;
-    KKSMap<int, KKSAttrAttr*>::const_iterator p;
+    KKSMap<int, KKSCategoryAttr*>::const_iterator p;
     for (p=attrs.constBegin(); p != attrs.constEnd(); p++)
     {
         QModelIndex wIndex = model->index (i, 0);

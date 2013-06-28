@@ -14,7 +14,7 @@
 
 #include <KKSValue.h>
 #include <KKSAttrType.h>
-#include "KKSCategoryAttr.h"
+#include "KKSAttribute.h"
 #include "kkscatattreditor.h"
 #include "ui_kkscatattr_editor.h"
 

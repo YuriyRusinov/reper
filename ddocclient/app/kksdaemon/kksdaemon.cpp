@@ -197,7 +197,7 @@ void KKSDaemon::processCommand(int code)
 
 void KKSDaemon::readSettings()
 {
-    QSettings * s = new QSettings("DynamicSoft" , "KKSDaemon Service 1.0.0");
+    QSettings * s = new QSettings("DynamicSoft" , "KKSDaemon Service 1.2.0");
     //s->readSettings ( );
 
     s->beginGroup ("System settings/Database");

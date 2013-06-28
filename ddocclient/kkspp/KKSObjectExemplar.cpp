@@ -11,7 +11,7 @@
 #include "KKSObjectExemplar.h"
 #include "KKSValue.h"
 #include "KKSAttrType.h"
-#include "KKSCategoryAttr.h"
+#include "KKSAttribute.h"
 #include "KKSRubric.h"
 #include "defines.h"
 

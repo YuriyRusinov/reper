@@ -28,7 +28,7 @@ public:
     //void setItemData(int index);
 
 signals:
-    void valueChanged (int id, KKSIndAttr::KKSIndAttrClass sys, QVariant val);
+    void valueChanged (qint64 id, KKSIndAttr::KKSIndAttrClass sys, QVariant val);
 
 protected:
 

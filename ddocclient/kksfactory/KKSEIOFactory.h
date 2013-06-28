@@ -14,7 +14,7 @@
 #include "KKSMap.h"
 #include "KKSList.h"
 #include "KKSAttrValue.h"
-#include "KKSCategoryAttr.h"
+#include "KKSAttribute.h"
 
 class KKSDatabase;
 class KKSObjectExemplar;

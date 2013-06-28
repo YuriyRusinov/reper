@@ -24,7 +24,7 @@
 #include "kksdatabase.h"
 #include "KKSObject.h"
 #include "KKSCategory.h"
-#include "KKSCategoryAttr.h"
+#include "KKSAttribute.h"
 #include "KKSValue.h"
 #include "KKSType.h"
 #include "KKSAttrValue.h"
@@ -1273,7 +1273,7 @@ int KKSPPFactory::insertAttrView(int idCategory, int idTemplate, int idGroup, KK
     if(!inTransaction())
         db->begin();
 
-    int idCategoryAttr = av->idCategoryAttr();
+    int idCategoryAttr = av->idRow();
     int idAttr = av->id();
 
     //атрибут не сохранен в БД
@@ -1285,7 +1285,7 @@ int KKSPPFactory::insertAttrView(int idCategory, int idTemplate, int idGroup, KK
             return ERROR_CODE;
         }
         idAttr = av->id();
-        idCategoryAttr = av->idCategoryAttr();
+        idCategoryAttr = av->idRow();
     }
 
 
@@ -2092,7 +2092,7 @@ int KKSPPFactory::insertCategoryAttr(int idCategory, KKSCategoryAttr * a) const
     if(idCategoryAttr <= 0)
         return ERROR_CODE;
 
-    a->setIdCategoryAttr(idCategoryAttr);
+    a->setIdRow(idCategoryAttr);
 
     return OK_CODE;
 }
@@ -2102,7 +2102,7 @@ int KKSPPFactory::updateCategoryAttr(int idCategory, KKSCategoryAttr * a) const
     if(!db || !a)
         return ERROR_CODE;
 
-    if(a->idCategoryAttr() <= 0 || a->id() <= 0){
+    if(a->idRow() <= 0 || a->id() <= 0){
         return ERROR_CODE;
     }
 
@@ -4511,7 +4511,7 @@ int KKSPPFactory :: writePrivilegies (KKSAccessEntity * at, const KKSMap<int, KK
     return OK_CODE;
 }
 
-int KKSPPFactory::insertAttrAttr(int idParentAttr, KKSAttrAttr * aa) const
+int KKSPPFactory::insertAttrAttr(int idParentAttr, KKSCategoryAttr * aa) const
 {
     if(!db || !aa)
         return ERROR_CODE;
@@ -4532,7 +4532,7 @@ int KKSPPFactory::insertAttrAttr(int idParentAttr, KKSAttrAttr * aa) const
     bool isMandatory = aa->isMandatory();
     bool isReadOnly = aa->isReadOnly();
 
-    QString sql = QString("select aInsertAttrAttr(%1, %2, %3, %4, %5)")
+    QString sql = QString("select aInsertAttrAttr(%1, %2, %3::varchar, %4, %5)")
                             .arg(idParentAttr)
                             .arg(idAttr)
                             .arg(defVal)
@@ -4563,10 +4563,10 @@ int KKSPPFactory::insertAttrAttrs(const KKSAttribute * a) const
 
     QString sqlIn = "-1";
 
-    KKSMap<int, KKSAttrAttr *>::const_iterator pca;
-    for (pca = a->attrsAttrs().constBegin(); pca != a->attrsAttrs().constEnd(); pca++)
+    KKSMap<int, KKSCategoryAttr *>::const_iterator pca;
+    for (pca = a->attrs().constBegin(); pca != a->attrs().constEnd(); pca++)
     {
-        KKSAttrAttr * aa = pca.value();
+        KKSCategoryAttr * aa = pca.value();
 
         int idAttrAttr = insertAttrAttr(a->id(), aa);
         if(idAttrAttr == ERROR_CODE){

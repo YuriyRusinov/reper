@@ -12,7 +12,7 @@
 #include <QtDebug>
 
 #include <KKSAttribute.h>
-#include <KKSCategoryAttr.h>
+#include <KKSAttribute.h>
 #include <KKSAttrType.h>
 
 #include "KKSRecWidget.h"

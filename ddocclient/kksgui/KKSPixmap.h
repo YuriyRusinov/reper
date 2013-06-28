@@ -28,7 +28,7 @@ class _GUI_EXPORT KKSPixmap : public QLabel, public KKSAttrWidget
         QByteArray save();
 
     signals:
-        void valueChanged (int id, KKSIndAttr::KKSIndAttrClass isSys, QVariant val);
+        void valueChanged (qint64 id, KKSIndAttr::KKSIndAttrClass isSys, QVariant val);
 
     public slots:
         

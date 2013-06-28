@@ -14,11 +14,11 @@
 
 #include <KKSValue.h>
 #include <KKSAttrType.h>
-#include "KKSAttrAttr.h"
+#include "KKSAttribute.h"
 #include "kksattrattreditor.h"
 #include "ui_kksattrattr_editor.h"
 
-KKSAttrAttrEditor :: KKSAttrAttrEditor (KKSAttrAttr *attr, bool for_template, QWidget *parent)
+KKSAttrAttrEditor :: KKSAttrAttrEditor (KKSCategoryAttr *attr, bool for_template, QWidget *parent)
     : QDialog (parent),
     attribute (attr),
     ui (new Ui::kksattrattr_editor)
@@ -79,12 +79,12 @@ void KKSAttrAttrEditor :: init_widgets (bool for_template)
     this->set_types ();
 }
 
-KKSAttrAttr * KKSAttrAttrEditor :: getAttrAttribute (void)
+KKSCategoryAttr * KKSAttrAttrEditor :: getAttrAttribute (void)
 {
     return attribute;
 }
 
-const KKSAttrAttr * KKSAttrAttrEditor :: getAttrAttribute (void) const
+const KKSCategoryAttr * KKSAttrAttrEditor :: getAttrAttribute (void) const
 {
     return attribute;
 }

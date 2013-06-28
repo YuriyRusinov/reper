@@ -6,14 +6,14 @@
  ***********************************************************************/
 
 #include "KKSValue.h"
-#include "KKSCategoryAttr.h"
+#include "KKSAttribute.h"
 #include "KKSAttrValue.h"
 #include "KKSObject.h"
 
-int m_defId = -2;
+qint64 m_defId = -2;
 
 void KKSAttrValue::initDefId(){ m_defId = -2;}
-int  KKSAttrValue::getDefId(){ return m_defId;}
+qint64  KKSAttrValue::getDefId(){ return m_defId;}
 void KKSAttrValue::decDefId() {m_defId--;}
 
 
@@ -27,7 +27,8 @@ void KKSAttrValue::decDefId() {m_defId--;}
 KKSAttrValue::KKSAttrValue() : KKSData(),
 m_ioSrc(0),
 m_ioSrc1(0),
-m_isActual(true)
+m_isActual(true),
+m_attrsValuesLoaded(false)
 {
    m_attribute = NULL;
    
@@ -38,7 +39,8 @@ m_isActual(true)
 KKSAttrValue::KKSAttrValue(const KKSAttrValue & av) : KKSData(),
 m_ioSrc(0),
 m_ioSrc1(0),
-m_isActual(true)
+m_isActual(true),
+m_attrsValuesLoaded(false)
 {
     m_attribute = NULL;
 
@@ -48,6 +50,8 @@ m_isActual(true)
     setInsertDateTime(av.insertDateTime());
     setStartDateTime(av.startDateTime());
     setStopDateTime(av.stopDateTime());
+
+    m_attrsValues = av.attrsValues();
 
     setIOSrc(const_cast<KKSObject *>(av.ioSrc()));
     setIOSrc1(const_cast<KKSObject *>(av.ioSrc1()));
@@ -65,7 +69,8 @@ m_isActual(true)
 KKSAttrValue::KKSAttrValue(const KKSValue & v, KKSCategoryAttr * a) : KKSData(),
 m_ioSrc(0),
 m_ioSrc1(0),
-m_isActual(true)
+m_isActual(true),
+m_attrsValuesLoaded(false)
 {
     m_id = KKSAttrValue::getDefId();
     KKSAttrValue::decDefId();
@@ -96,6 +101,36 @@ KKSAttrValue::~KKSAttrValue()
 
 const KKSValue & KKSAttrValue::value() const
 {
+    if(!attribute())
+        return m_value;
+
+    if(attribute()->type()->attrType() == KKSAttrType::atComplex){
+        KKSMap<qint64, KKSAttrValue*> aaList = m_attrsValues;
+        KKSMap<qint64, KKSAttrValue*>::const_iterator  i;
+        QString V;
+        for(i=aaList.constBegin(); i != aaList.constEnd(); i++){
+            KKSAttrValue * av = i.value();
+            if(!av || !av->attribute())
+                continue;
+            
+            int idAttrAttr = av->attribute()->idRow();//фактически это attr_attr
+            QString v_str = av->value().valueForInsert();
+            //if(v_str.startsWith("'"))
+            //    v_str.remove(0, 1);
+            //if(v_str.endsWith("'"))
+            //    v_str.remove(v_str.length()-1, 1);
+            
+            QString v = QString("%1~~~%2").arg(QString::number(idAttrAttr)).arg(v_str);
+            if(!V.isEmpty())
+                V += QString("^~^~^");
+            V += v;
+        }
+
+        KKSValue vv = KKSValue(V, KKSAttrType::atComplex);
+        
+        m_value = vv;
+    }
+
     return m_value;
 }
 
@@ -144,13 +179,13 @@ void KKSAttrValue::setAttribute(KKSCategoryAttr * attr)
         m_attribute->addRef();
 }
 
-int KKSAttrValue::id() const
+qint64 KKSAttrValue::id() const
 {
     return m_id;
 }
 
 
-void KKSAttrValue::setId(int id)
+void KKSAttrValue::setId(qint64 id)
 {
     m_id = id;
 }
@@ -269,3 +304,23 @@ void KKSAttrValue::setActual(bool a)
     m_isActual = a;
 }
 
+void KKSAttrValue::setAttrsValues(const KKSMap<qint64, KKSAttrValue *> & attrsValues)
+{
+    m_attrsValues = attrsValues;
+    m_attrsValuesLoaded = true;
+}
+
+const KKSMap<qint64, KKSAttrValue*> & KKSAttrValue::attrsValues() const
+{
+    return m_attrsValues;
+}
+
+KKSMap<qint64, KKSAttrValue*> & KKSAttrValue::attrsValues()
+{
+    return m_attrsValues;
+}
+
+bool KKSAttrValue::attrsValuesLoaded() const
+{
+    return m_attrsValuesLoaded;
+}

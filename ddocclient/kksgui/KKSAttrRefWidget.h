@@ -25,15 +25,15 @@ class _GUI_EXPORT KKSAttrRefWidget : public QWidget
         void setAttrWidget (QWidget *aw);
         QWidget * getAttrWidget (void) const;
         QGridLayout * getLayout (void) const;
-        int getIdAttrValue (void) const;
+        qint64 getIdAttrValue (void) const;
         KKSIndAttr::KKSIndAttrClass isSysAttr (void) const;
         const QVariant& getValue (void) const;
 
     public slots:
-        void setValue (int id, KKSIndAttr::KKSIndAttrClass sys, QVariant val);
+        void setValue (qint64 id, KKSIndAttr::KKSIndAttrClass sys, QVariant val);
 
     signals:
-        void valueChanged (int id, KKSIndAttr::KKSIndAttrClass sys, QVariant val);
+        void valueChanged (qint64 id, KKSIndAttr::KKSIndAttrClass sys, QVariant val);
 
     private:
         //
@@ -41,7 +41,7 @@ class _GUI_EXPORT KKSAttrRefWidget : public QWidget
         //
         QWidget * refWidget;
         QGridLayout * gAttrLay;
-        int idAttrValue;
+        qint64 idAttrValue;
         QVariant cVal;
         KKSIndAttr::KKSIndAttrClass isSystem;
 

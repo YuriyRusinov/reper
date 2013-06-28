@@ -25,7 +25,7 @@ public:
     virtual ~KKSCheckBox (void);
 
 signals:
-    void valueChanged (int id, KKSIndAttr::KKSIndAttrClass sys, QVariant val);
+    void valueChanged (qint64 id, KKSIndAttr::KKSIndAttrClass sys, QVariant val);
 
 public slots:
     void setState (int state);

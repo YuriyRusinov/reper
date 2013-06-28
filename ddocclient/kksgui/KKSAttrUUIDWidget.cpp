@@ -37,6 +37,7 @@ KKSAttrUUIDWidget :: KKSAttrUUIDWidget (QWidget *parent, Qt::WindowFlags f)
     uuidWidget->setValidator (uuidVal);
 
     connect (uuidWidget, SIGNAL (editingFinished()), this, SLOT (setVal()) );
+    connect (uuidWidget, SIGNAL (textChanged(const QString &)), this, SLOT (setVal(const QString &)) );
     connect (tbGen, SIGNAL (clicked()), this, SLOT (generate_uuid()) );
 }
 
@@ -44,15 +45,43 @@ KKSAttrUUIDWidget :: ~KKSAttrUUIDWidget (void)
 {
 }
 
-void KKSAttrUUIDWidget :: setVal (int id, KKSIndAttr::KKSIndAttrClass sys, QVariant val)
+void KKSAttrUUIDWidget :: setVal()
+{
+    if (!uuidWidget)
+        return;
+    
+    QString uuid = uuidWidget->text();
+    
+    cVal = QVariant (uuid);
+    emit valueChanged (idAttrValue, isSystem, cVal);
+}
+
+void KKSAttrUUIDWidget :: setVal(const QString & t)
+{
+    if (!uuidWidget)
+        return;
+
+    if(!t.isEmpty())
+        return;
+    
+    QString uuid = uuidWidget->text();
+    
+    cVal = QVariant (uuid);
+    emit valueChanged (idAttrValue, isSystem, cVal);
+}
+
+void KKSAttrUUIDWidget :: setVal (qint64 id, KKSIndAttr::KKSIndAttrClass sys, QVariant val)
 {
     idAttrValue = id;
     isSystem = sys;
+    
+    uuidWidget->setText (val.toString());
+    
     cVal = val;
     emit valueChanged (idAttrValue, sys, val);
 }
 
-int KKSAttrUUIDWidget :: getIdAttrValue (void) const
+qint64 KKSAttrUUIDWidget :: getIdAttrValue (void) const
 {
     return idAttrValue;
 }

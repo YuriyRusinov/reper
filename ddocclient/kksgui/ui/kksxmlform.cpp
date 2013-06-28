@@ -21,7 +21,7 @@
 #include <KKSObject.h>
 #include <KKSAttribute.h>
 #include <KKSAttrType.h>
-#include <KKSCategoryAttr.h>
+#include <KKSAttribute.h>
 #include <KKSAttrValue.h>
 #include <KKSObjectExemplar.h>
 #include <KKSEIOData.h>

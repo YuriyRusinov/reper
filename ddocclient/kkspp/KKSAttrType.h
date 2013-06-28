@@ -53,7 +53,8 @@ public:
        atGeometryPoly = 29,       //ГИС-объект (стандартный полигон)
        atInt64 = 30,              //целочисленное (64 бита)
        atUUID = 31,               //уникальный идентификатор (UUID)
-       atUserDef = 32             //пользовательский (for future use)
+       atComplex = 32,            //Составной атрибут
+       atUserDef = 33             //пользовательский (for future use)
    };
 
    KKSAttrTypes attrType() const;

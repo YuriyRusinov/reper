@@ -15,7 +15,7 @@
 #include "KKSItemDelegate.h"
 #include "KKSAttrCheckListWidget.h"
 #include "KKSAttrValue.h"
-#include "KKSCategoryAttr.h"
+#include "KKSAttribute.h"
 #include "KKSSortFilterProxyModel.h"
 
 KKSAttrCheckWidget :: KKSAttrCheckWidget (const KKSAttrValue * attr, KKSIndAttr::KKSIndAttrClass isSys, QWidget * parent, Qt::WFlags f)

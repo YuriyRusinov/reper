@@ -13,7 +13,7 @@
 class KKSCategory;
 
 #include "KKSAttrGroup.h"
-#include "KKSCategoryAttr.h"
+#include "KKSAttribute.h"
 #include "KKSRecord.h"
 #include "KKSList.h"
 #include "KKSMap.h"

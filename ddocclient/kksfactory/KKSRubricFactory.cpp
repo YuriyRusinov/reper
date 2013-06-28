@@ -24,7 +24,7 @@
 #include <KKSObjectExemplar.h>
 #include "KKSAttrType.h"
 #include <KKSCategory.h>
-#include <KKSCategoryAttr.h>
+#include <KKSAttribute.h>
 #include <KKSAttrView.h>
 #include <KKSTemplate.h>
 #include <KKSList.h>

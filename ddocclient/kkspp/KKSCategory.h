@@ -17,7 +17,7 @@ class KKSAccessEntity;
 
 #include <KKSRecord.h>
 #include "KKSMap.h"
-#include "KKSCategoryAttr.h"
+#include "KKSAttribute.h"
 #include "KKSTemplate.h"
 #include "KKSFilter.h"
 #include "KKSAttrType.h"

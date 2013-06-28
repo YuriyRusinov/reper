@@ -112,10 +112,16 @@ void KKSValue::verify(void) const
         m_isValid = true;
         if (a_type == KKSAttrType::atString ||
             a_type == KKSAttrType::atFixString ||
-            a_type == KKSAttrType::atText)
+            a_type == KKSAttrType::atText ||
+            a_type == KKSAttrType::atComplex)
         {
             m_isLiteral = true;
             m_isNull = false;
+        }
+        else if (a_type == KKSAttrType::atUUID)
+        {
+            m_isLiteral = true;
+            m_isNull = true;
         }
         else if (a_type == KKSAttrType::atJPG ||
                  a_type == KKSAttrType::atSVG ||
@@ -241,7 +247,7 @@ void KKSValue::verify(void) const
         if(m_value.canConvert(QVariant::Double)){
             m_isValid = true;
         }
-        m_isLiteral = false;
+        m_isLiteral = true;
         return;
     }
 
@@ -261,7 +267,8 @@ void KKSValue::verify(void) const
         a_type == KKSAttrType::atJPG ||
         a_type == KKSAttrType::atVideo ||
         a_type == KKSAttrType::atSVG ||
-        a_type == KKSAttrType::atXMLDoc
+        a_type == KKSAttrType::atXMLDoc ||
+        a_type == KKSAttrType::atComplex
        )
     {
         if(m_value.canConvert(QVariant::String)){
@@ -713,6 +720,15 @@ QString KKSValue::value(void) const
         return m_value.toStringList().join(",");
     }
 
+    if(m_type == KKSAttrType::atDouble){
+        if(m_value.isNull())
+            return "";
+
+        double v = m_value.toDouble();
+        QString s = QString("%1").arg(v);
+        return s;
+    }
+
     return m_value.toString();
 }
 
@@ -823,7 +839,8 @@ QString KKSValue::valueForInsert() const
     if (a_type == KKSAttrType::atString ||
         a_type == KKSAttrType::atFixString ||
         a_type == KKSAttrType::atText ||
-        a_type == KKSAttrType::atXMLDoc)
+        a_type == KKSAttrType::atXMLDoc ||
+        a_type == KKSAttrType::atComplex)
     {
         QString sVal (value());
         QString escVal (sVal);
@@ -841,6 +858,11 @@ QString KKSValue::valueForInsert() const
     }
 
     if(a_type == KKSAttrType::atInt64){
+        val += QString("'%1'").arg(value());
+        return val;
+    }
+
+    if(a_type == KKSAttrType::atUUID){
         val += QString("'%1'").arg(value());
         return val;
     }

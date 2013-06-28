@@ -3,7 +3,7 @@
 #include "KKSAttribute.h"
 #include "KKSAttrView.h"
 #include "KKSList.h"
-#include "KKSCategoryAttr.h"
+#include "KKSAttribute.h"
 #include "KKSAttrType.h"
 #include "KKSRubric.h"
 

@@ -33,7 +33,7 @@ KKSAttribute::KKSAttribute(const KKSAttribute & a) : KKSIndAttr(a),
     m_group (a.m_group),
     m_st (a.m_st),
     m_isSystem (a.m_isSystem),
-    m_attrsAttrs(a.m_attrsAttrs),
+    m_attrs(a.m_attrs),
     m_attrsLoaded(a.m_attrsLoaded)
 {
     if (m_group)
@@ -141,22 +141,49 @@ bool KKSAttribute::isAttribute (void) const
 }
 
 
-void KKSAttribute::setAttrsAttrs(const KKSMap<int, KKSAttrAttr *> & attrs)
+void KKSAttribute::setAttrs(const KKSMap<int, KKSCategoryAttr *> & attrs)
 {
-    m_attrsAttrs = attrs;
+    m_attrs = attrs;
     m_attrsLoaded = true;
 }
 
-const KKSMap<int, KKSAttrAttr*> & KKSAttribute::attrsAttrs() const
+const KKSMap<int, KKSCategoryAttr*> & KKSAttribute::attrs() const
 {
-    return m_attrsAttrs;
+    return m_attrs;
 }
 
-KKSMap<int, KKSAttrAttr*> & KKSAttribute::attrsAttrs()
+KKSMap<int, KKSCategoryAttr*> & KKSAttribute::attrs()
 {
-    return m_attrsAttrs;
+    return m_attrs;
 }
 
+const KKSCategoryAttr * KKSAttribute::attrAttr(int id) const
+{
+    KKSCategoryAttr * a = NULL;
+
+     KKSMap<int, KKSCategoryAttr *>::const_iterator i = m_attrs.find(id);
+     while (i != m_attrs.end() && i.key() == id) {
+         a = i.value();
+         //берем всегда первый атрибут
+         break;
+     }
+
+    return a;
+}
+
+KKSCategoryAttr * KKSAttribute::attrAttr(int id)
+{
+    KKSCategoryAttr * a = NULL;
+
+     QMap<int, KKSCategoryAttr *>::iterator i = m_attrs.find(id);
+     while (i != m_attrs.end() && i.key() == id) {
+         a = i.value();
+         //берем всегда первый атрибут
+         break;
+     }
+
+    return a;
+}
 
 
 /**************************************

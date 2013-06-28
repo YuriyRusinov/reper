@@ -38,7 +38,7 @@ signals:
     void refIOOpen (QString tableName);
     void refRecOpen (QString tableName, qint64 id);
     
-    void valueChanged (int id, KKSIndAttr::KKSIndAttrClass sys, QVariant val);
+    void valueChanged (qint64 id, KKSIndAttr::KKSIndAttrClass sys, QVariant val);
 
 private slots:
     void addAttrRef (void);

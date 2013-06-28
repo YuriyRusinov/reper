@@ -20,7 +20,7 @@
 #include <QtDebug>
 
 #include <KKSCategory.h>
-#include <KKSCategoryAttr.h>
+#include <KKSAttribute.h>
 #include <KKSAttrType.h>
 #include <KKSMap.h>
 #include <KKSRubric.h>

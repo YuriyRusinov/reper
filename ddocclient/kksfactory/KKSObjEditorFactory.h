@@ -134,8 +134,8 @@ public:
                                         const KKSList<const KKSFilterGroup *> & filters,// Применяется для ЭИО, которые являются контейнерными ИО. Содержит набор фильтров их таблицы
                                         const QString & extraTitle,
                                         const KKSCategory* wCat, // категория информационных объектов
-                                        const KKSMap<int, KKSAttrValue *>& io_aVals, // список априорно заданных параметров атрибутов ИО
-                                        const KKSMap<int, KKSAttrValue *>& aVals, // список априорно заданных параметров атрибутов ЭИО
+                                        const KKSMap<qint64, KKSAttrValue *>& io_aVals, // список априорно заданных параметров атрибутов ИО
+                                        const KKSMap<qint64, KKSAttrValue *>& aVals, // список априорно заданных параметров атрибутов ЭИО
                                         bool mode=true, // наличие кнопок OK, Cancel, Apply
                                         const QString& tableName = QString(), // название доп. таблицы, основная таблица соотвествует пустому значению
                                         bool bShowExecButton = false, //определяет наличие кнопки "Отправить адресату" при исполнении распоряжения. Во всех остальных случаях ее быть не должно
@@ -255,9 +255,25 @@ public slots:
     void refreshEIO (KKSObjEditor * editor, int idObject, const KKSCategory * cat, QString tableName, QAbstractItemModel * sourceMod);
     void filterTemplateEIO (KKSObjEditor * editor, int idObject, const KKSCategory * cat=0, QString tableName=QString());
     void createNewEditor (QWidget * editor, int idObject, const KKSCategory * c, QString tableName, int nTab, bool isModal, QAbstractItemModel * recModel=0);
-    void createNewEditorParam (QWidget * editor, int idObject, const KKSCategory * c, QString tableName, int nTab, bool isModal, const KKSMap<int, KKSAttrValue *>& ioAvals, const KKSMap<int, KKSAttrValue *>& aVals, QAbstractItemModel * recModel=0);
+    void createNewEditorParam (QWidget * editor, 
+                               int idObject, 
+                               const KKSCategory * c, 
+                               QString tableName, 
+                               int nTab, 
+                               bool isModal, 
+                               const KKSMap<qint64, KKSAttrValue *>& ioAvals, 
+                               const KKSMap<qint64, KKSAttrValue *>& aVals, 
+                               QAbstractItemModel * recModel=0);
     
-    void editExistOE (QWidget * editor, int idObject, qint64 idObjEx, const KKSCategory * c, QString tableName, int nTab, bool isModal, QAbstractItemModel * recModel=0, const QModelIndex& recIndex=QModelIndex());
+    void editExistOE (QWidget * editor, 
+                      int idObject, 
+                      qint64 idObjEx, 
+                      const KKSCategory * c, 
+                      QString tableName, 
+                      int nTab, 
+                      bool isModal, 
+                      QAbstractItemModel * recModel=0, 
+                      const QModelIndex& recIndex=QModelIndex());
     int deleteOE (QWidget * editor, int idObject, qint64 idObjEx, QString tableName, QAbstractItemModel * recModel, const QModelIndex& pRecIndex);
     
     void addAttrSearchTemplate (void);
@@ -469,9 +485,9 @@ private:
                       QWidget * ioAttrWidget, 
                       QGridLayout * gIOLay);
     void setPreliminaryAttrs (KKSObject * io, 
-                              const KKSMap<int, KKSAttrValue *>& aVals) const;
+                              const KKSMap<qint64, KKSAttrValue *>& aVals) const;
     void setPreliminaryAttrs (KKSObjectExemplar * cio, 
-                              const KKSMap<int, KKSAttrValue *>& aVals) const;
+                              const KKSMap<qint64, KKSAttrValue *>& aVals) const;
     void getModelIds (QAbstractItemModel * mod, const QModelIndex& wIndex, QList<int>& ids) const;
     int searchParents (const KKSList<KKSObjectExemplar *>& oeList, 
                        const KKSCategoryAttr *cAttr, 

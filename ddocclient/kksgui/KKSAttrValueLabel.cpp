@@ -7,7 +7,7 @@
 
 #include "KKSAttrValueLabel.h"
 #include "KKSAttrValue.h"
-#include "KKSCategoryAttr.h"
+#include "KKSAttribute.h"
 #include <QMessageBox>
 #include <KKSAttrValuePropsForm.h>
 
@@ -73,51 +73,53 @@ void KKSAttrValueLabel :: setLabelProps()
 		
 	QColor colour(Qt::darkBlue); 
     QString coloredText;
-   
+    bool isUnderline = false;
+
 #ifdef Q_CC_MSVC
-    if(m_isSystem != KKSIndAttr::KKSIndAttrClass::iacTableAttr)
+    if(m_isSystem != KKSIndAttr::KKSIndAttrClass::iacTableAttr &&
+       m_isSystem != KKSIndAttr::KKSIndAttrClass::iacAttrAttr)
 #else
-    if(m_isSystem != KKSIndAttr::iacTableAttr)
+    if(m_isSystem != KKSIndAttr::iacTableAttr &&
+       m_isSystem != KKSIndAttr::iacAttrAttr )
 #endif
+    {
         coloredText = tr("<font color='blue'>%2</font>").arg(text);
+        isUnderline = true;
+    }
     else
+    {
         coloredText = text;
+        isUnderline = false;
+    }
 
     this->setText( coloredText );	
 	
     QFont lFont = this->font ();
-#ifdef Q_CC_MSVC
-    lFont.setUnderline( m_isSystem != KKSIndAttr::KKSIndAttrClass::iacTableAttr ? true : false);
-#else
-    lFont.setUnderline( m_isSystem != KKSIndAttr::iacTableAttr ? true : false);
-#endif
-	if (isMandatory)
+    lFont.setUnderline( isUnderline);
+
+    if (isMandatory)
     {
         lFont.setBold (true);
     }
 
 	this->setFont (lFont);
 
-#ifdef Q_CC_MSVC
-    if(m_isSystem != KKSIndAttr::KKSIndAttrClass::iacTableAttr){
-#else
-    if(m_isSystem != KKSIndAttr::iacTableAttr){
-#endif
+    if(isUnderline){
         setToolTip(tr("Click on label to show extended attribute properties"));
         setCursor(Qt::PointingHandCursor);
     }
-
 
 }
 
 void KKSAttrValueLabel :: showAttrValueProps()
 {
 #ifdef Q_CC_MSVC
-    if(!m_av || m_isSystem == KKSIndAttr::KKSIndAttrClass::iacTableAttr)
+    if(!m_av || m_isSystem == KKSIndAttr::KKSIndAttrClass::iacTableAttr || m_isSystem == KKSIndAttr::KKSIndAttrClass::iacAttrAttr)
 #else
-    if(!m_av || m_isSystem == KKSIndAttr::iacTableAttr)
+    if(!m_av || m_isSystem == KKSIndAttr::iacTableAttr || m_isSystem == KKSIndAttr::iacAttrAttr)
 #endif
         return;
+
 #ifdef Q_CC_MSVC
     KKSAttrValuePropsForm * f = new KKSAttrValuePropsForm(m_av, 
                                                           true, 

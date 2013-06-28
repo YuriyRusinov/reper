@@ -6,8 +6,14 @@
  ***********************************************************************/
 
 #include "KKSValue.h"
-#include "KKSCategoryAttr.h"
+#include "KKSAttribute.h"
 #include "KKSAttrType.h"
+
+int m_defIdRow = -2;
+
+void KKSCategoryAttr::initDefIdRow(){ m_defIdRow = -2;}
+int  KKSCategoryAttr::getDefIdRow(){ return m_defIdRow;}
+void KKSCategoryAttr::decDefIdRow() {m_defIdRow--;}
 
 ////////////////////////////////////////////////////////////////////////
 // Name:       KKSCategoryAttr::KKSCategoryAttr()
@@ -20,7 +26,11 @@ KKSCategoryAttr::KKSCategoryAttr() : KKSAttribute()
     //m_defValue = NULL;
     m_isMandatory = false;
     m_isReadOnly = false;
-    m_idCategoryAttr = -1;
+
+    m_idRow = getDefIdRow();
+    decDefIdRow();
+
+    m_order = 1;
 }
 
 KKSCategoryAttr::KKSCategoryAttr(const KKSAttribute & a) : KKSAttribute(a)
@@ -28,7 +38,11 @@ KKSCategoryAttr::KKSCategoryAttr(const KKSAttribute & a) : KKSAttribute(a)
     //m_defValue = NULL;
     m_isMandatory = false;
     m_isReadOnly = false;
-    m_idCategoryAttr = -1;
+
+    m_idRow = getDefIdRow();
+    decDefIdRow();
+
+    m_order = 1;
 }
 
 KKSCategoryAttr::KKSCategoryAttr(const KKSCategoryAttr & a) : KKSAttribute(a)
@@ -36,7 +50,8 @@ KKSCategoryAttr::KKSCategoryAttr(const KKSCategoryAttr & a) : KKSAttribute(a)
     m_defValue = a.defValue();
     m_isMandatory = a.isMandatory();
     m_isReadOnly = a.isReadOnly();
-    m_idCategoryAttr = a.idCategoryAttr();
+    m_idRow = a.idRow();
+    m_order = a.order();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -137,18 +152,42 @@ KKSCategoryAttr * KKSCategoryAttr::create(KKSAttribute * a,
     return ca;
 }
 
-int KKSCategoryAttr::idCategoryAttr() const
+int KKSCategoryAttr::idRow() const
 {
-    return m_idCategoryAttr;
+    return m_idRow;
 }
 
-int KKSCategoryAttr::idCategoryAttr()
+int KKSCategoryAttr::idRow()
 {
-    return m_idCategoryAttr;
+    return m_idRow;
 }
 
-void KKSCategoryAttr::setIdCategoryAttr(int id)
+void KKSCategoryAttr::setIdRow(int id)
 {
-    m_idCategoryAttr = id;
+    m_idRow = id;
 }
 
+int KKSCategoryAttr::idParent() const 
+{
+    return m_idParent;
+}
+
+int KKSCategoryAttr::idParent() 
+{
+    return m_idParent;
+}
+
+void KKSCategoryAttr::setIdParent(int id)
+{
+    m_idParent = id;
+}
+
+int KKSCategoryAttr::order() const
+{
+    return m_order;
+}
+
+void KKSCategoryAttr::setOrder(int o)
+{
+    m_order = o;
+}

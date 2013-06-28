@@ -6,7 +6,7 @@
  ***********************************************************************/
 
 #include "KKSType.h"
-#include "KKSCategoryAttr.h"
+#include "KKSAttribute.h"
 #include "KKSLifeCycle.h"
 #include "KKSCategory.h"
 #include "KKSAttrType.h"

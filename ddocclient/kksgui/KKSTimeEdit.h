@@ -23,7 +23,7 @@ class _GUI_EXPORT KKSTimeEdit : public QTimeEdit, public KKSAttrWidget
         virtual ~KKSTimeEdit (void);
 
     signals:
-        void valueChanged (int id, KKSIndAttr::KKSIndAttrClass isSys, QVariant val);
+        void valueChanged (qint64 id, KKSIndAttr::KKSIndAttrClass isSys, QVariant val);
 
     public slots:
         void setTime (const QTime& dt);

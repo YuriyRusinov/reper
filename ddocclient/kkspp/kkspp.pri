@@ -37,9 +37,7 @@ HEADERS += \
            KKSSearchTemplate.h \
            KKSSearchTemplateType.h \
            KKSIndicator.h \
-           KKSIndicatorValue.h \
-           KKSAttrAttr.h \
-           KKSAttrAttrValue.h 
+           KKSIndicatorValue.h 
 
 
 SOURCES += \
@@ -79,9 +77,7 @@ SOURCES += \
            KKSSearchTemplate.cpp \
            KKSSearchTemplateType.cpp \
            KKSIndicator.cpp \
-           KKSIndicatorValue.cpp \
-           KKSAttrAttr.cpp \
-           KKSAttrAttrValue.cpp 
+           KKSIndicatorValue.cpp 
 
 
 
@@ -123,9 +119,7 @@ headers.files += \
            KKSSearchTemplate.h \
            KKSSearchTemplateType.h \
            KKSIndicator.h \
-           KKSIndicatorValue.h \
-           KKSAttrAttr.h \
-           KKSAttrAttrValue.h 
+           KKSIndicatorValue.h 
 
 
 

@@ -14,15 +14,13 @@ class KKSAttrType;
 #include "kkspp_config.h"
 #include <KKSRecord.h>
 #include <KKSIndAttr.h>
-//#include <KKSAttrAttr.h>
 #include "KKSMap.h"
 #include "KKSList.h"
 #include "KKSValue.h"
 
 class KKSSearchTemplate;
 class KKSAttribute;
-class KKSAttrAttr;
-
+class KKSCategoryAttr;
 
 
 class _PP_EXPORT KKSAGroup : public KKSRecord
@@ -84,10 +82,12 @@ public:
     void setAsSystem(KKSIndAttrClass yes = iacTableAttr);
     virtual bool isAttribute (void) const;
 
-    void setAttrsAttrs(const KKSMap<int, KKSAttrAttr *> & attrs);
-    const KKSMap<int, KKSAttrAttr*> & attrsAttrs() const;
-    KKSMap<int, KKSAttrAttr*> & attrsAttrs();
+    void setAttrs(const KKSMap<int, KKSCategoryAttr *> & attrs);
+    const KKSMap<int, KKSCategoryAttr*> & attrs() const;
+    KKSMap<int, KKSCategoryAttr*> & attrs();
 
+    const KKSCategoryAttr * attrAttr(int id) const;
+    KKSCategoryAttr * attrAttr(int id);
 
 protected:
 private:
@@ -100,7 +100,7 @@ private:
 
     KKSIndAttrClass m_isSystem;
 
-    KKSMap<int, KKSAttrAttr*> m_attrsAttrs;//список атрибутов, описывающих данный атрибут. 
+    KKSMap<int, KKSCategoryAttr*> m_attrs; //список атрибутов, описывающих данный атрибут. 
                                            //Для ускорения работы системы загружаются только по отдельной команде
                                            //имеется флаг m_attrsLoaded, определяющий факт загруженности данных атрибутов
                                            //Факт загруженности определяется тем, вызывался ли метод setAttrsAttrs(). 
@@ -109,57 +109,75 @@ private:
 };
 
 
-class _PP_EXPORT KKSAttrAttr : public KKSAttribute
+class _PP_EXPORT KKSCategoryAttr : public KKSAttribute
 {
 public:
-    bool isMandatory(void) const;
-    void setMandatory(bool newIsMandatory);
-    bool isReadOnly(void) const;
-    void setReadOnly(bool newIsReadOnly);
+   bool isMandatory(void) const;
+   void setMandatory(bool newIsMandatory);
+   bool isReadOnly(void) const;
+   void setReadOnly(bool newIsReadOnly);
 
-    int idParentAttr();
-    int idParentAttr() const;
-    void setIdParentAttr(int id);
+   int order() const;
+   void setOrder(int o);
 
-    int idAttrAttr();
-    int idAttrAttr() const;
-    void setIdAttrAttr(int id);
+   const KKSValue & defValue() const;
+   KKSValue  & defValue();
+   void setDefValue(const KKSValue & _defValue);
 
-    const KKSValue & defValue() const;
-    KKSValue  & defValue();
-    void setDefValue(const KKSValue & _defValue);
+   int idRow() const;
+   int idRow();
+   void setIdRow(int id);
 
-    KKSAttrAttr();
-    KKSAttrAttr(const KKSAttribute & a);
-    KKSAttrAttr(const KKSAttrAttr & a);
-    virtual ~KKSAttrAttr();
+    int idParent();
+    int idParent() const;
+    void setIdParent(int id);
+    
+    KKSCategoryAttr();
+    KKSCategoryAttr(const KKSAttribute & a);
+    KKSCategoryAttr(const KKSCategoryAttr & a);
+    virtual ~KKSCategoryAttr();
 
     //метод создает экземпляр данного класса по заданным параметрам
     //если строковое представление значения по умолчанию в данном атрибуте
     //не удалось привести к типу атрибута, то bBadValue устанавливается в TRUE
     //в противном случае в FALSE
-    static KKSAttrAttr * create(KKSAttribute * a, 
-                                bool bMandatory, 
-                                bool bReadOnly, 
-                                const QString & defValue = QString::null,
-                                bool * bBadValue = NULL);
+    static KKSCategoryAttr * create(KKSAttribute * a, 
+                                    bool bMandatory, 
+                                    bool bReadOnly, 
+                                    const QString & defValue = QString::null,
+                                    bool * bBadValue = NULL);
 
-    static void initDefIdParent();
-    static int getDefIdParent();
-    static void decDefIdParent();
 
+    static void initDefIdRow();
+    static int getDefIdRow();
+    static void decDefIdRow();
 
 protected:
 private:
 
-    int m_rowId;//id в таблице attrs_attrs
-    int m_idParentAttr;//идентификуатор описываемого атрибута
+   bool m_isMandatory;
+   bool m_isReadOnly;
+   int m_order;
+   int m_idRow; //id в таблице attrs_categories или в таблице attrs_attrs
 
-    bool m_isMandatory;
-    bool m_isReadOnly;
-    KKSValue m_defValue;
+   int m_idParent;//идентификатор описываемого атрибута (который содержит данный экземпляр класса) или категории (для KKSCategoryAttr)
+   
+   KKSValue m_defValue;
+
 
 };
+
+inline bool compareCategoryAttrs(KKSCategoryAttr * item1, KKSCategoryAttr * item2)
+{
+    if(item1->order() < item2->order()) 
+        return true; 
+    
+    return false;
+}
+
+
+Q_DECLARE_METATYPE (KKSCategoryAttr);
+Q_DECLARE_METATYPE (const KKSCategoryAttr *);
 
 Q_DECLARE_METATYPE (KKSAGroup*);
 Q_DECLARE_METATYPE (KKSAttribute*);

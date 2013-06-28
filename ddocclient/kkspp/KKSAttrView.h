@@ -10,7 +10,7 @@
 
 #include "KKSValue.h"
 
-#include <KKSCategoryAttr.h>
+#include <KKSAttribute.h>
 #include "kkspp_config.h"
 
 class _PP_EXPORT KKSAttrView : public KKSCategoryAttr

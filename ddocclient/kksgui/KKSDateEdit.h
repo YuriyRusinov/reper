@@ -26,7 +26,7 @@ class _GUI_EXPORT KKSDateEdit : public QDateEdit, public KKSAttrWidget
         virtual ~KKSDateEdit (void);
 
     signals:
-        void valueChanged (int id, KKSIndAttr::KKSIndAttrClass isSys, QVariant val);
+        void valueChanged (qint64 id, KKSIndAttr::KKSIndAttrClass isSys, QVariant val);
 
     public slots:
         void setDate (const QDate& d);

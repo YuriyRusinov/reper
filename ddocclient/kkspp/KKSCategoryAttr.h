@@ -1,5 +1,5 @@
 /***********************************************************************
- * Module:  KKSCategoryAttr.h
+ * Module:  KKSAttribute.h
  * Author:  sergey
  * Modified: 1 декабр€ 2008 г. 12:12:50
  * Purpose: Declaration of the class KKSCategoryAttr
@@ -7,7 +7,7 @@
 
 #if !defined(__KKSSITOOOM_KKSCategoryAttr_h)
 #define __KKSSITOOOM_KKSCategoryAttr_h
-
+/*
 #include "KKSValue.h"
 
 #include <KKSAttribute.h>
@@ -25,14 +25,18 @@ public:
    KKSValue  & defValue();
    void setDefValue(const KKSValue & _defValue);
 
-   int idCategoryAttr() const;
-   int idCategoryAttr();
-   void setIdCategoryAttr(int id);
+   int idRow() const;
+   int idRow();
+   void setIdRow(int id);
 
-   KKSCategoryAttr();
-   KKSCategoryAttr(const KKSAttribute & a);
-   KKSCategoryAttr(const KKSCategoryAttr & a);
-   virtual ~KKSCategoryAttr();
+    int idParent();
+    int idParent() const;
+    void setIdParent(int id);
+    
+    KKSCategoryAttr();
+    KKSCategoryAttr(const KKSAttribute & a);
+    KKSCategoryAttr(const KKSCategoryAttr & a);
+    virtual ~KKSCategoryAttr();
 
     //метод создает экземпл€р данного класса по заданным параметрам
     //если строковое представление значени€ по умолчанию в данном атрибуте
@@ -50,7 +54,9 @@ private:
 
    bool m_isMandatory;
    bool m_isReadOnly;
-   int m_idCategoryAttr;
+   int m_idRow; //id в таблице attrs_categories или в таблице attrs_attrs
+
+   int m_idParent;//идентификатор описываемого атрибута (который содержит данный экземпл€р класса) или категории (дл€ KKSCategoryAttr)
    
    KKSValue m_defValue;
 
@@ -59,5 +65,6 @@ private:
 
 Q_DECLARE_METATYPE (KKSCategoryAttr);
 Q_DECLARE_METATYPE (const KKSCategoryAttr *);
+*/
 
 #endif

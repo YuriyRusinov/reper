@@ -14,7 +14,7 @@
 #include "KKSObject.h"
 #include "KKSEIOData.h"
 #include "KKSCategory.h"
-#include "KKSCategoryAttr.h"
+#include "KKSAttribute.h"
 #include "KKSValue.h"
 #include "KKSType.h"
 #include "KKSSyncType.h"
@@ -251,6 +251,75 @@ KKSList<KKSAttrValue *> KKSLoader::loadAttrValues(KKSObject * io) const
     return attrs;
 }
 
+KKSMap<qint64, KKSAttrValue *> KKSLoader::loadAttrAttrValues(KKSAttrValue * av, bool forRec) const
+{
+    KKSMap<qint64, KKSAttrValue *> aavList;
+
+    if(!av || !av->attribute())
+        return aavList;
+    
+    QString sql;
+    if(!forRec)
+        sql = QString("select * from aGetAttrsAttrsValues(%1)").arg(av->id());
+    else
+        sql = QString("select * from aGetRecAttrsAttrsValues(%1)").arg(av->id());
+
+    KKSResult * res = db->execute(sql);
+    if(!res)
+        return aavList;
+
+    int count = res->getRowCount();
+    if(count == 0){
+        delete res;
+        return aavList;
+    }
+
+    KKSCategoryAttr * ca = av->attribute();
+
+    for(int row=0; row<count; row++){
+        //параметры самого атрибута
+        int idAttrAttr = res->getCellAsInt(row, 3);
+        KKSCategoryAttr * a = ca->attrAttr(idAttrAttr);
+        if(!a){
+            qWarning("The attrValue contain attr-value but categoryAttr does not contain attribute! idAttr = %d, idObject = %d, idCategory = %d", idAttrAttr, av->id(), ca->id());
+            continue;
+        }
+
+        KKSAttrValue * attrAttrValue = new KKSAttrValue();
+        attrAttrValue->setAttribute(a);
+
+        if(!res->isEmpty(row, 2)){
+            KKSValue v = constructValue(res->getCellAsString(row, 2), a, a->tableName()); //3-й параметр - parentTable. Для комплексных атрибутов не допускается в их составе иметь атрибут типа родитель-потомок
+            if(!v.isValid())
+            {
+                //qWarning("Value for attribute is NOT valid! Value = %s, idCategoryAttr = %d, idAttrValue = %d, idAttrValue = %d",
+                //            res->getCellAsString(row, 2).toLocal8Bit().data(),
+                //            ca->id(),
+                //            res->getCellAsInt(row, 1),
+                //            av->id());
+            }
+            attrAttrValue->setValue(v);
+        }
+
+        
+        
+        //устанавливаем дополнительные характеристики значения атрибута
+        if(!res->isEmpty(row, 0))
+            attrAttrValue->setId(res->getCellAsInt64(row, 0));
+        
+        attrAttrValue->setActual(true);//для атрибутов, входящих в состав составного атрибута актуальность всегда устанавлдиваем в true, 
+                                       //т.к. их значения связаны с актуальтым значением составного атрибута в целом.
+                                       //темпоральность отдельных частей составных атрибюутов не поддерживается
+
+        aavList.insert(attrAttrValue->id(), attrAttrValue);
+        attrAttrValue->release();
+    }
+    
+    delete res;
+
+    return aavList;
+}
+
 QString KKSLoader::loadColumnValue(const KKSIndAttr * a,
                                    qint64 id, 
                                    const QString & parentTable) const
@@ -316,7 +385,7 @@ KKSMap<int, KKSCategoryAttr *> KKSLoader::loadCategoryAttrs(int idCategory) cons
     for(int row=0; row<count; row++){
         //параметры самого атрибута
         KKSCategoryAttr * attr = new KKSCategoryAttr();
-        attr->setIdCategoryAttr(res->getCellAsInt(row, 21));
+        attr->setIdRow(res->getCellAsInt(row, 21));
         attr->setId(res->getCellAsInt(row, 0));
         attr->setCode(res->getCellAsString(row, 2));
         attr->setName(res->getCellAsString(row, 3));
@@ -1243,6 +1312,7 @@ KKSAttrType * KKSLoader::loadAttrType(KKSAttrType::KKSAttrTypes type) const
         case KKSAttrType::atGeometryPoly: id = 29; break;       //ГИС-объект (стандартный полигон)
         case KKSAttrType::atInt64: id = 30; break;              //целочисленное (64 бита)
         case KKSAttrType::atUUID: id = 31; break;               //уникальный идентификатор (UUID)
+        case KKSAttrType::atComplex: id = 32; break;            //Составной атрибут
     }
 
     KKSAttrType * aType = loadAttrType(id);
@@ -2129,7 +2199,7 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
             if(tableName.toLower() != "io_objects"){
                 attrs += QString(", 'pixmap/svg/video/xml data type' as %1").arg(code);
                 withAttrs += QString(", 'pixmap/svg/video/xml data type' as %1").arg(code);
-                attrsWith += QString(", xml_data_type_%1").arg(a->idCategoryAttr());
+                attrsWith += QString(", xml_data_type_%1").arg(a->idRow());
                 attrsWith1 += QString(", 'pixmap/svg/video/xml data type' as %1").arg(code);
             }
             else{
@@ -5856,16 +5926,16 @@ void KKSLoader::loadAttrAttrs(KKSAttribute * a) const
     if(!a || a->id() <= 0)
         return;
 
-    KKSMap<int, KKSAttrAttr *> aaList = loadAttrAttrs(a->id());
+    KKSMap<int, KKSCategoryAttr *> aaList = loadAttrAttrs(a->id());
     
-    a->setAttrsAttrs(aaList);
+    a->setAttrs(aaList);
     
     return;
 }
 
-KKSMap<int, KKSAttrAttr*> KKSLoader::loadAttrAttrs(int idAttr) const
+KKSMap<int, KKSCategoryAttr*> KKSLoader::loadAttrAttrs(int idAttr) const
 {
-    KKSMap<int, KKSAttrAttr *> aaList;
+    KKSMap<int, KKSCategoryAttr *> aaList;
 
     if(idAttr <= 0)
         return aaList;
@@ -5881,7 +5951,7 @@ KKSMap<int, KKSAttrAttr*> KKSLoader::loadAttrAttrs(int idAttr) const
     }
 
     for(int row=0; row<cnt; row++){
-        KKSAttrAttr * attr = new KKSAttrAttr();
+        KKSCategoryAttr * attr = new KKSCategoryAttr();
         int idAttrAttr = res->getCellAsInt(row, 21);
         
 /**/
@@ -5893,8 +5963,8 @@ KKSMap<int, KKSAttrAttr*> KKSLoader::loadAttrAttrs(int idAttr) const
         attr->setColumnName(res->getCellAsString(row, 6));
         attr->setDefWidth(res->getCellAsInt(row, 7));
 
-        attr->setIdAttrAttr(idAttrAttr);
-        attr->setIdParentAttr(idAttr);
+        attr->setIdRow(idAttrAttr);
+        attr->setIdParent(idAttr);
         
         //тип атрибута
         KKSAttrType * type = new KKSAttrType();
@@ -6056,7 +6126,7 @@ KKSList<KKSAttrValue *> KKSLoader::loadIndValues(KKSObjectExemplar * eio) const
         attr->setValue(v);
         
         //устанавливаем дополнительные характеристики значения атрибута
-        attr->setId(res->getCellAsInt(row, 7));
+        attr->setId(res->getCellAsInt64(row, 7));
         attr->setStartDateTime(res->getCellAsDateTime(row, 8));
         attr->setStopDateTime(res->getCellAsDateTime(row, 9));
         //attr->setMeasDateTime(res->getCellAsDateTime(row, 10));

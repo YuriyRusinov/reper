@@ -21,7 +21,7 @@ class _GUI_EXPORT KKSIntervalWidget : public QWidget, public KKSAttrWidget
         void setComboUnits (QComboBox *cb);
 
     signals:
-        void valueChanged (int id, KKSIndAttr::KKSIndAttrClass isSys, QVariant val);
+        void valueChanged (qint64 id, KKSIndAttr::KKSIndAttrClass isSys, QVariant val);
 
     public slots:
         void setValue (void);

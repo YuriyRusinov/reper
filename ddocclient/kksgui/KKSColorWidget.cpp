@@ -9,7 +9,7 @@
 #include <QtDebug>
 
 #include <KKSAttrValue.h>
-#include <KKSCategoryAttr.h>
+#include <KKSAttribute.h>
 #include "KKSColorWidget.h"
 
 KKSColorWidget :: KKSColorWidget (const KKSAttrValue *attr, 

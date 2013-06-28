@@ -22,7 +22,7 @@
 #include <kksstuffform.h>
 #include <KKSObjectExemplar.h>
 #include "kksdatabase.h"
-#include "KKSCategoryAttr.h"
+#include "KKSAttribute.h"
 #include <KKSAclTemplate.h>
 #include <KKSAccessEntity.h>
 #include <KKSOrganizationAddrForm.h>
@@ -600,8 +600,8 @@ void KKSStuffFactory :: addStuffElement (const QModelIndex& parent, int entity, 
     QWidget * editor = qobject_cast<QWidget *>(this->sender());
     KKSObject * io = 0;
     KKSCategory * c = 0;
-    KKSMap<int, KKSAttrValue *> ioVals;
-    KKSMap<int, KKSAttrValue *> aVals;
+    KKSMap<qint64, KKSAttrValue *> ioVals;
+    KKSMap<qint64, KKSAttrValue *> aVals;
     int id = -1;
     int parent_entity = -1;
     if (parent.isValid())

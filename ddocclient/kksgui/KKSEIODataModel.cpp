@@ -10,7 +10,7 @@
 #include "KKSTemplate.h"
 #include "KKSCategory.h"
 #include "KKSAttrType.h"
-#include "KKSCategoryAttr.h"
+#include "KKSAttribute.h"
 #include "KKSAttrView.h"
 #include "KKSTreeItem.h"
 #include "KKSEIODataModel.h"

@@ -12,7 +12,7 @@
 #include "KKSObject.h"
 #include "KKSObjectExemplar.h"
 #include "KKSAttribute.h"
-#include "KKSCategoryAttr.h"
+#include "KKSAttribute.h"
 #include "KKSAttrValue.h"
 
 #include <QtDebug>

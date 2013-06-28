@@ -33,7 +33,7 @@
 #include <KKSCatEditor.h>
 #include <KKSObjEditor.h>
 #include <KKSCategory.h>
-#include <KKSCategoryAttr.h>
+#include <KKSAttribute.h>
 #include <KKSRecWidget.h>
 #include <KKSEIOData.h>
 #include <KKSType.h>

@@ -1356,7 +1356,10 @@ void KKSIndFactory :: setValue (QWidget *aw, const KKSIndicator * pCategAttr, co
 
 void KKSIndFactory :: connectToSlots (QObject *aw, QWidget* wEditor)
 {
-    QObject::connect (aw, SIGNAL (valueChanged(int, KKSIndAttr::KKSIndAttrClass, QVariant)), wEditor, SLOT (setIndValue (int, KKSIndAttr::KKSIndAttrClass, QVariant)) );
+    QObject::connect (aw, 
+                      SIGNAL (valueChanged(int64, KKSIndAttr::KKSIndAttrClass, QVariant)), 
+                      wEditor, 
+                      SLOT (setIndValue (qint64, KKSIndAttr::KKSIndAttrClass, QVariant)) );
 }
 
 void KKSIndFactory :: viewIOIndicator (KKSObject * io, int idIndicator)

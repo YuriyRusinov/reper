@@ -11,7 +11,7 @@
 #include "KKSState.h"
 #include "KKSType.h"
 #include "KKSSyncType.h"
-#include "KKSCategoryAttr.h"
+#include "KKSAttribute.h"
 #include "KKSAttrType.h"
 #include "defines.h"
 #include "KKSTemplate.h"

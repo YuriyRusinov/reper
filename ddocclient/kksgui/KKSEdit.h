@@ -24,7 +24,7 @@ class _GUI_EXPORT KKSEdit : public QLineEdit, public KKSAttrWidget
         virtual ~KKSEdit (void);
 
     signals:
-        void valueChanged (int id, KKSIndAttr::KKSIndAttrClass isSys, QVariant val);
+        void valueChanged (qint64 id, KKSIndAttr::KKSIndAttrClass isSys, QVariant val);
 
     public slots:
         void setVal (const QString & newText);

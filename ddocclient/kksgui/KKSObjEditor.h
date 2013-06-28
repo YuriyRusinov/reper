@@ -17,7 +17,7 @@
 #include <QModelIndex>
 //#include "KKSWidget.h"
 
-#include "KKSCategoryAttr.h"
+#include "KKSAttribute.h"
 #include "KKSIndAttr.h"
 #include "KKSMap.h"
 #include "KKSList.h"
@@ -121,7 +121,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void setRecTab (QTabWidget * tabEnc);
         
     public slots:
-        void setValue (int id, KKSIndAttr::KKSIndAttrClass sys, QVariant val);
+        void setValue (qint64 id, KKSIndAttr::KKSIndAttrClass sys, QVariant val);
         //void setIndValue (int id, bool sys, QVariant val);
 
     private slots:
@@ -184,7 +184,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void refreshIndices (QAbstractItemModel * sourceMod);
 
         void viewIndicator (void);
-        void generateIOUUID (int idAttrVal);
+        void generateIOUUID (qint64 idAttrVal);
         void setIOUUID (QString uuid);
         
         void recSaved (KKSObjectExemplar * rec);
@@ -278,9 +278,9 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void setSysAttrValue( KKSAttrValue* av);
         void setIOAttrValue ( KKSAttrValue* av);
         void setIndValue (KKSAttrValue *av);
-        KKSMap<int, KKSAttrValue*> & getSysAttrValues();
-        KKSMap<int, KKSAttrValue*> & getIOAttrValues();
-        KKSMap<int, KKSAttrValue*> & getRecAttrValues();
+        KKSMap<qint64, KKSAttrValue*> & getSysAttrValues();
+        KKSMap<qint64, KKSAttrValue*> & getIOAttrValues();
+        KKSMap<qint64, KKSAttrValue*> & getRecAttrValues();
 
 
         void clearOptionals (void);
@@ -360,13 +360,13 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         KKSList<const KKSFilterGroup*> m_filters;
 
         //KKSMap<int, const KKSCategoryAttr*> sysAttributes;
-        KKSMap<int, KKSAttrValue *> sysAttrValues;
+        KKSMap<qint64, KKSAttrValue *> sysAttrValues;
         //QMap<int, QVariant> sysAttributesValues;
         QMap<QCheckBox*, int> chSysOpt;
         QMultiMap<int, QWidget*> chSysOptWidgets;
 
         //KKSMap<int, const KKSCategoryAttr*> ioAttributes;
-        KKSMap<int, KKSAttrValue *> ioAttrValues;
+        KKSMap<qint64, KKSAttrValue *> ioAttrValues;
         //QMap<int, QVariant> ioAttributesValues;
         QMap<QCheckBox*, int> chIOOpt;
         QMultiMap<int, QWidget*> chIOOptWidgets;
@@ -376,7 +376,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         KKSMap<int, const KKSAttrValue*> listAttrValues;
 
         int indNumW;
-        KKSMap<int, KKSAttrValue *> ioIndicatorValues;
+        KKSMap<qint64, KKSAttrValue *> ioIndicatorValues;
         QMap<QCheckBox*, int> chIndOpt;
         QMultiMap<int, QWidget*> chIndOptWidgets;
         QMap<QToolButton *, int> tbViews;

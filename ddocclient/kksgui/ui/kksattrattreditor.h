@@ -21,17 +21,17 @@ namespace Ui
     class kksattrattr_editor;
 };
 
-class KKSAttrAttr;
+class KKSCategoryAttr;
 class KKSAttrType;
 
 class _GUI_EXPORT KKSAttrAttrEditor : public QDialog
 {
     public:
-        KKSAttrAttrEditor (KKSAttrAttr *attr, bool for_template=false, QWidget *parent=0);
+        KKSAttrAttrEditor (KKSCategoryAttr *attr, bool for_template=false, QWidget *parent=0);
         ~KKSAttrAttrEditor (void);
 
-        KKSAttrAttr * getAttrAttribute (void);
-        const KKSAttrAttr * getAttrAttribute (void) const;
+        KKSCategoryAttr * getAttrAttribute (void);
+        const KKSCategoryAttr * getAttrAttribute (void) const;
 
         int getTypeID (void) const;
 
@@ -49,7 +49,7 @@ class _GUI_EXPORT KKSAttrAttrEditor : public QDialog
         //
         // Variables
         //
-        KKSAttrAttr *attribute;
+        KKSCategoryAttr *attribute;
         Ui::kksattrattr_editor* ui;
 
     private:
