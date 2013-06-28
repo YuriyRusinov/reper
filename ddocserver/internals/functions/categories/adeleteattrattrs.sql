@@ -11,11 +11,20 @@ begin
 
     if(idsExclude isnull) then
         delete from attrs_attrs_values where id_attr_attr in (select id from attrs_attrs where id_attr_parent = idParent);
+        delete from rec_attrs_attrs_values where id_attr_attr in (select id from attrs_attrs where id_attr_parent = idParent);
         delete from attrs_attrs where id_attr_parent = idParent;
         return 1;
     end if;
 
     delete from attrs_attrs_values 
+    where 
+        id_attr_attr in (select id from attrs_attrs 
+                         where 
+                             id not in (select id from attrs_attrs 
+                                        where id = ANY (idsExclude)) 
+                             and id_attr_parent = idParent);
+
+    delete from rec_attrs_attrs_values 
     where 
         id_attr_attr in (select id from attrs_attrs 
                          where 

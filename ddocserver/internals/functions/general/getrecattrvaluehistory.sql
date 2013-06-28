@@ -20,7 +20,7 @@ create type h_eio_get_indicators as(
                                   description varchar);
 */
 
-create or replace function getRecAttrValueHistory(int4, timestamp, timestamp) returns setof h_eio_get_indicators as
+create or replace function getRecAttrValueHistory(int8, timestamp, timestamp) returns setof h_eio_get_indicators as
 $BODY$
 declare
     idAttrValue alias for $1;
@@ -91,11 +91,11 @@ language 'plpgsql';
 
 select f_safe_drop_type('h_get_id_rec_id_cat_attr');
 create type h_get_id_rec_id_cat_attr as(
-                                  id_record int4,
+                                  id_record int8,
                                   id_attr_category int4);
 
 --функция нужна для ускорения получения данной информации. Чтобы читать с правами admin'a
-create or replace function getIdRecordForIdAttrValue(int4) returns h_get_id_rec_id_cat_attr as
+create or replace function getIdRecordForIdAttrValue(int8) returns h_get_id_rec_id_cat_attr as
 $BODY$
 declare
     idAttrValue alias for $1;

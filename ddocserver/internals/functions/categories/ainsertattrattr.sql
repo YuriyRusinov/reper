@@ -9,6 +9,7 @@ declare
 
     cnt int4;
     idAttrAttr int4;
+    idType int4;
 begin
 
     select id into idAttrAttr from attrs_attrs where id_attr_parent = idParent and id_attr_child = idAttr;

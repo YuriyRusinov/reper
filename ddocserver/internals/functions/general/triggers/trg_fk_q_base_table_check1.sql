@@ -1,7 +1,7 @@
 create or replace function fkQBaseTableCheck1() returns trigger as
 $BODY$
 declare
-    theId int4;
+    theId int8;
 begin
     if(TG_OP = 'UPDATE') then
         if(old.id <> new.id) then
@@ -11,6 +11,7 @@ begin
         return new;
     end if;
 
+    delete from rec_attrs_attrs_values where id_rec_attr_value in (select id from rec_attrs_values where id_record = old.id);
     delete from rec_attrs_values where id_record = old.id;
     delete from rubric_records where id_record = old.id;
     delete from rubric_records where id_rubric in (select id from recGetRubrics(old.id) where type in (0, 1));

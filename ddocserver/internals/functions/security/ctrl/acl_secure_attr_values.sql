@@ -67,6 +67,7 @@ begin
     --если без поддержки темпоральной модели (это случай когда удал€етс€ полностью сам информационный объект, 
     --соответственно тогда надо –≈јЋ№Ќќ удалить и все, что на него ссылаетс€)
     if(isTemporary = false) then
+        delete from attrs_attrs_values where id_attr_value in (select id from tbl_attrs_values where id_io_object = ii_id_io_object and id_attr_category = ii_id_attr_category);
         delete from "tbl_attrs_values" where id_io_object = ii_id_io_object and id_attr_category = ii_id_attr_category;
         return 1;
     end if;
@@ -98,8 +99,6 @@ declare
 begin
     if(getPrivilege(getCurrentUser(), 7, 4, true) = false) then raise exception 'You have insufficient permissions to do the operation!'; return 0; end if;
 
-    raise warning 'Desc = %', iDesc;
-    
     for r in 
         select * from tbl_attrs_values where id_io_object = old_id_io_object and id_attr_category = old_id_attr_category and is_actual = true
     loop

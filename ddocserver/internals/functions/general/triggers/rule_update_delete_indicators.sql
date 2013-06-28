@@ -10,6 +10,7 @@ begin
     --если без поддержки темпоральной модели (это случай когда удал€етс€ полностью сам информационный объект, 
     --соответственно тогда надо –≈јЋ№Ќќ удалить и все, что на него ссылаетс€)
     if(isTemporary = false) then
+        delete from rec_attrs_attrs_values where id_rec_attr_value in (select id from rec_attrs_values where id_record = ii_id_record and id_attr_category = ii_id_attr_category);
         delete from "rec_attrs_values" where id_record = ii_id_record and id_attr_category = ii_id_attr_category;
         return 1;
     end if;

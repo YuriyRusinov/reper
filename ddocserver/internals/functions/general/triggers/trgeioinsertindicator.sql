@@ -24,6 +24,14 @@ begin
         return NULL;
     end if;
 */    
+
+    if(TG_OP = 'UPDATE') then
+        if(new.value <> old.value) then
+            raise exception 'UPDATE "value" field in rec_attrs_values disallowed! Realized via insert new record!';
+            return NULL;
+        end if;
+    end if;
+
     if(new.start_time isnull) then
         new.start_time := current_timestamp;
     end if;
@@ -42,6 +50,7 @@ begin
             new.is_actual := false;
         end if;
     end if;
+
 
 /*
     if(new.is_actual = true) then

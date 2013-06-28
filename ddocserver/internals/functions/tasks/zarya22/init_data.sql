@@ -338,42 +338,42 @@ values ('localorg-io_objects-76', 76, 155, 1, 1, 'Реестр предметных областей (За
 insert into access_table (id_io_object, id_role, allow_readlist, allow_read, allow_delete, allow_update)
 values (76, -10, TRUE, TRUE, FALSE, FALSE);
 
-select acl_secureTable('shu_domains');
+select acl_secureTable_shu('shu_domains');
 
 insert into tbl_io_objects (unique_id, id, id_io_category, author, id_io_state, name, table_name, description, information, is_system, is_global, id_sync_type, insert_time, id_maclabel, id_owner_org)
 values ('localorg-io_objects-77', 77, 157, 1, 1, 'Реестр методов расчета контрольных сумм (Заря22)', 'shu_chksum', NULL, 'Системный объект', true, true, 5, current_timestamp, 1, NULL);
 insert into access_table (id_io_object, id_role, allow_readlist, allow_read, allow_delete, allow_update)
 values (77, -10, TRUE, TRUE, FALSE, FALSE);
 
-select acl_secureTable('shu_chksum');
+select acl_secureTable_shu('shu_chksum');
 
 insert into tbl_io_objects (unique_id, id, id_io_category, author, id_io_state, name, table_name, description, information, is_system, is_global, id_sync_type, insert_time, id_maclabel, id_owner_org)
 values ('localorg-io_objects-78', 78, 159, 1, 1, 'Реестр организационных единиц (Заря22)', 'shu_orgs', NULL, 'Системный объект', true, true, 5, current_timestamp, 1, NULL);
 insert into access_table (id_io_object, id_role, allow_readlist, allow_read, allow_delete, allow_update)
 values (78, -10, TRUE, TRUE, FALSE, FALSE);
 
-select acl_secureTable('shu_orgs');
+select acl_secureTable_shu('shu_orgs');
 
 insert into tbl_io_objects (unique_id, id, id_io_category, author, id_io_state, name, table_name, description, information, is_system, is_global, id_sync_type, insert_time, id_maclabel, id_owner_org)
 values ('localorg-io_objects-79', 79, 161, 1, 1, 'Реестр должностных единиц (Заря22)', 'shu_positions', NULL, 'Системный объект', true, true, 5, current_timestamp, 1, NULL);
 insert into access_table (id_io_object, id_role, allow_readlist, allow_read, allow_delete, allow_update)
 values (79, -10, TRUE, TRUE, FALSE, FALSE);
 
-select acl_secureTable('shu_positions');
+select acl_secureTable_shu('shu_positions');
 
 insert into tbl_io_objects (unique_id, id, id_io_category, author, id_io_state, name, table_name, description, information, is_system, is_global, id_sync_type, insert_time, id_maclabel, id_owner_org)
 values ('localorg-io_objects-80', 80, 163, 1, 1, 'Реестр АСУ (Заря22)', 'shu_acs', NULL, 'Системный объект', true, true, 5, current_timestamp, 1, NULL);
 insert into access_table (id_io_object, id_role, allow_readlist, allow_read, allow_delete, allow_update)
 values (80, -10, TRUE, TRUE, FALSE, FALSE);
 
-select acl_secureTable('shu_acs');
+select acl_secureTable_shu('shu_acs');
 
 insert into tbl_io_objects (unique_id, id, id_io_category, author, id_io_state, name, table_name, description, information, is_system, is_global, id_sync_type, insert_time, id_maclabel, id_owner_org)
 values ('localorg-io_objects-81', 81, 165, 1, 1, 'Реестр должностных лиц (Заря22)', 'shu_dls', NULL, 'Системный объект', true, true, 5, current_timestamp, 1, NULL);
 insert into access_table (id_io_object, id_role, allow_readlist, allow_read, allow_delete, allow_update)
 values (81, -10, TRUE, TRUE, FALSE, FALSE);
 
-select acl_secureTable('shu_dls');
+select acl_secureTable_shu('shu_dls');
 
 --insert into tbl_io_objects (unique_id, id, id_io_category, author, id_io_state, name, table_name, description, information, is_system, is_global, id_sync_type, insert_time, id_maclabel, id_owner_org)
 --values ('localorg-io_objects-82', 82, 167, 1, 1, 'Реестр адресов (Заря22)', 'shu_addressee', NULL, 'Системный объект', true, true, 5, current_timestamp, 1, NULL);

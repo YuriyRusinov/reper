@@ -195,7 +195,7 @@ begin
                 and p.id = cio.id_io_processing_order
                 and p.id_io_category = new.id_io_category 
                 and p.id_state_dest = new.id_io_state
-                and p.id_state_src = NULL
+                and p.id_state_src is NULL
         loop
 
             idChain = r.id;

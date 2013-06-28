@@ -21,6 +21,10 @@
 \i ./functions/general/eioupdateindicator.sql
 \i ./functions/general/getrecattrvaluehistory.sql
 
+\i ./functions/general/insertrecattrsattrsvalues.sql
+\i ./functions/general/insertattrsattrsvalues.sql
+\i ./functions/general/agetrecattrsattrsvalues.sql
+
 \i ./functions/general/triggers/readd_triggers.sql
 
 --invoked in /internals/initdb.sql

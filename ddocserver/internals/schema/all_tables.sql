@@ -1,8 +1,7 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     31.05.2013 13:49:37                          */
+/* Created on:     27.06.2013 17:58:39                          */
 /*==============================================================*/
-
 
 /*==============================================================*/
 /* Table: root_table                                            */
@@ -543,6 +542,7 @@ create table attrs_attrs (
    def_value            VARCHAR              null,
    is_mandatory         BOOL                 null,
    is_read_only         BOOL                 null,
+   "order"              INT4                 not null default 1,
    constraint PK_ATTRS_ATTRS primary key (id)
 )
 inherits (root_table);
@@ -573,6 +573,9 @@ comment on column attrs_attrs.is_mandatory is
 
 comment on column attrs_attrs.is_read_only is
 'Флаг "только для чтения"';
+
+comment on column attrs_attrs."order" is
+'Порядок отображения атрибутов при визуализации его родителя.';
 
 select setMacToNULL('attrs_attrs');
 select createTriggerUID('attrs_attrs');
@@ -634,6 +637,7 @@ create table attrs_categories (
    def_value            VARCHAR              null,
    is_mandatory         BOOL                 not null,
    is_read_only         BOOL                 not null,
+   "order"              INT4                 not null default 0,
    constraint PK_ATTRS_CATEGORIES primary key (id)
 )
 inherits (root_table);
@@ -922,6 +926,7 @@ create table chains_data (
    start_service_time   TIMESTAMP            null,
    end_service_time     TIMESTAMP            null,
    return_code          INT4                 null,
+   what_happens         INT2                 null,
    constraint PK_CHAINS_DATA primary key (id)
 )
 inherits (root_table);
@@ -3092,6 +3097,27 @@ select setMacToNULL('ranks');
 select createTriggerUID('ranks');
 
 /*==============================================================*/
+/* Table: rec_attrs_attrs_values                                */
+/*==============================================================*/
+create table rec_attrs_attrs_values (
+   id                   BIGSERIAL            not null,
+   id_rec_attr_value    INT8                 not null,
+   id_attr_attr         INT4                 not null,
+   value                VARCHAR              not null
+)
+inherits (root_table);
+
+comment on table rec_attrs_attrs_values is
+'Значения атрибутов, описывающих другие атрибуты (показатели) для записей справочников.
+Записи в данной таблице появляются при редактировании Значения атрибута записи справочника';
+
+comment on column rec_attrs_attrs_values.value is
+'Значение (строковое представление) описывающего показатель атрибута';
+
+select setMacToNULL('rec_attrs_attrs_values');
+select createTriggerUID('rec_attrs_attrs_values');
+
+/*==============================================================*/
 /* Table: rec_attrs_values                                      */
 /*==============================================================*/
 create table rec_attrs_values (
@@ -3310,6 +3336,7 @@ create table roles_actions (
 );
 
 select setMacToNULL('roles_actions');
+
 
 /*==============================================================*/
 /* Table: rubric_records                                        */
@@ -4986,6 +5013,16 @@ alter table q_base_table
 alter table queue_results
    add constraint FK_QUEUE_RE_REFERENCE_TRANSPOR foreign key (id_transport)
       references transport (id)
+      on delete restrict on update restrict;
+
+alter table rec_attrs_attrs_values
+   add constraint FK_REC_ATTR_REFERENCE_REC_ATTR foreign key (id_rec_attr_value)
+      references rec_attrs_values (id)
+      on delete restrict on update restrict;
+
+alter table rec_attrs_attrs_values
+   add constraint FK_REC_ATTR_REFERENCE_ATTRS_AT foreign key (id_attr_attr)
+      references attrs_attrs (id)
       on delete restrict on update restrict;
 
 alter table rec_attrs_values

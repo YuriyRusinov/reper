@@ -39,5 +39,6 @@ set search_path = public, pg_catalog;
 \i ./functions/tasks/zarya22/rectoxml.sql
 \i ./functions/tasks/zarya22/readrecfiles.sql
 
+\i ./functions/tasks/zarya22/acl_securetable_shu.sql
 
 commit;

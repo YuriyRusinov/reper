@@ -22,7 +22,6 @@ begin
         new.ref_column_name := NULL;
     end if;
 
-    raise warning '% % %', new.id, new.table_name, new.column_name;
     if(new.table_name isnull) then
         new.ref_column_name := NULL;
         --для атрибута типа родитель-потомок мы не знаем название таблицы, поэтому на данном этапе не можем вычислить 

@@ -1,9 +1,14 @@
+
 create or replace function ioInsertAttrCheckAfter() returns trigger as
 $BODY$
 declare
     idChainsData int4;
     idChain int4;
     r record;
+
+    idType int4;
+    res int4;
+
 begin
 
     --chains
@@ -16,6 +21,39 @@ begin
             return new;
         end if;
     end if;
+
+    --complex attrs
+
+    if(TG_OP = 'INSERT') then
+        --for complex attributes we need to setup values for all childs (in rec_attrs_attrs_values)
+        -- by parsing new.value
+        -- format is: id~~~val^~^~^id~~~val^~^~^id~~~val ...
+        select 
+            a.id_a_type into idType 
+        from 
+            attributes a,
+            attrs_categories ac
+        where
+            a.id = ac.id_io_attribute
+            and ac.id = new.id_attr_category;
+
+        if(idType isnull) then
+            raise exception 'Found attribute with NULL type!';
+            return NULL;
+        end if;
+
+        if(idType = 32) then --complex attribute
+            res = insertAttrsAttrsValues(new.id, new.value);
+            if(res <= 0) then
+                raise exception 'Cannot parse and setup data in attrs_attrs_values!';
+                return NULL;
+            end if;
+        end if;
+    end if;
+
+
+
+    --for chains
 
     for r in 
         select 

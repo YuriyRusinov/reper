@@ -7,7 +7,7 @@ create type h_eio_get_indicators as(
                                   attr_code varchar,  --при информационном обмене (в ф-и ioGetObjectAttrsEx() в качестве значения данного поля используется unique_id)
                                   id_attr_type int4,
                                   id_attr_category int4,
-                                  id_attr_value int4, 
+                                  id_attr_value int8, 
                                   start_time timestamp,
                                   stop_time timestamp,
                                   insert_time timestamp,

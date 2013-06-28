@@ -40,6 +40,7 @@
 
 \i ./functions/categories/acgetattrcategoryid.sql
 \i ./functions/categories/cforbiddentypes.sql
+\i ./functions/categories/agetattrsattrsvalues.sql
 
 --invoked in ./internals/initiotriggers.sql
 --\i ./functions/categories/triggers/readd_triggers.sql

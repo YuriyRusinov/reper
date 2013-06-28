@@ -11,6 +11,13 @@ declare
 begin
 
     if(TG_OP = 'UPDATE') then
+        if(new.value <> old.value) then
+            raise exception 'UPDATE "value" field in attrs_values disallowed! Realized via insert new record!';
+            return NULL;
+        end if;
+    end if;
+
+    if(TG_OP = 'UPDATE') then
         if(old.is_actual = false) then
             raise exception 'You cannot update attribute values placed in archive!';
             return NULL;
@@ -53,7 +60,6 @@ begin
             return NULL;
         end if;
     end if;
-
 
 
     if(TG_OP = 'INSERT') then

@@ -40,13 +40,17 @@ begin
         select id_child from io_categories where id = idCategory
     loop
         raise warning '%', r.id_child;
-        perform cDeleteCategory(r.id_child);-- from io_categories where id = idCategory and id_child is not null;
+        if(r.id_child is not null) then
+            perform cDeleteCategory(r.id_child);-- from io_categories where id = idCategory and id_child is not null;
+        end if;
     end loop;
     for r in
         select id_child2 from io_categories where id = idCategory
     loop
         raise warning '%', r.id_child2;
-        perform cDeleteCategory(r.id_child2);-- from io_categories where id = idCategory and id_child is not null;
+        if(r.id_child2 is not null) then
+            perform cDeleteCategory(r.id_child2);-- from io_categories where id = idCategory and id_child is not null;
+        end if;
     end loop;
 
     return 1;
