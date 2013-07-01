@@ -58,7 +58,7 @@ begin
             end if;
 
             tquery := E'select ';
-            tquery := tquery || E'interval \''|| prev_time_step || E' ' || tunit || E'\'';
+            tquery := tquery || E'interval \''|| to_char(prev_time_step, '0000000D99999999') || E' ' || tunit || E'\'';
 
             execute tquery into tinterv;
             --last_time := last_time + tinterv;
