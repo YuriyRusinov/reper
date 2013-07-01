@@ -18,7 +18,7 @@
 class KKSAttrValue;
 class QGridLayout;
 class QGroupBox;
-class KKSAttributesFactory;
+//class KKSAttributesFactory;
 class KKSObjEditor;
 
 class _GUI_EXPORT KKSComplexAttrWidget : public QWidget, public KKSAttrWidget
@@ -26,7 +26,7 @@ class _GUI_EXPORT KKSComplexAttrWidget : public QWidget, public KKSAttrWidget
 public:
     KKSComplexAttrWidget (const KKSAttrValue*attr, 
                           KKSIndAttr::KKSIndAttrClass isSys, 
-                          KKSAttributesFactory * a,
+                          //KKSAttributesFactory * a,
                           KKSObjEditor * objEditor,
                           QWidget *parent=NULL, 
                           Qt::WindowFlags flags=0);
@@ -35,23 +35,25 @@ public:
 
 public slots:
     void setVal (const QString & newText);
+    void init();
 
 private slots:
 
 signals:
     void valueChanged (qint64 id, KKSIndAttr::KKSIndAttrClass isSys, QVariant val);
+    void putAttrAttrOnWidget(KKSAttrValue*, KKSObjEditor*, QGridLayout*, int, KKSIndAttr::KKSIndAttrClass, QString, int);
 
 protected:
 
 private:
-    void init();
+
     //
     // Variables
     //
 
     QGridLayout * m_gAttrLay;
     QGroupBox * m_groupBox;
-    KKSAttributesFactory * m_awf;
+    //KKSAttributesFactory * m_awf;
     KKSObjEditor * m_objEditor;
 
 private:

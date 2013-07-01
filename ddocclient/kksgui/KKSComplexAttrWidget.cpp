@@ -11,18 +11,18 @@
 #include "KKSAttribute.h"
 #include "KKSComplexAttrWidget.h"
 #include "KKSAttrType.h"
-#include "KKSAttributesFactory.h"
+//#include "KKSAttributesFactory.h"
 #include "KKSObjEditor.h"
 
 KKSComplexAttrWidget :: KKSComplexAttrWidget (const KKSAttrValue *attr, 
                                               KKSIndAttr::KKSIndAttrClass isSys, 
-                                              KKSAttributesFactory * a,
+                                              //KKSAttributesFactory * a,
                                               KKSObjEditor * objEditor,
                                               QWidget *parent, 
                                               Qt::WindowFlags flags)
     : QWidget (parent ,flags), 
       KKSAttrWidget(attr, isSys),
-      m_awf(a),
+      //m_awf(a),
       m_objEditor(objEditor),
       m_gAttrLay (new QGridLayout())
 {
@@ -44,7 +44,6 @@ KKSComplexAttrWidget :: KKSComplexAttrWidget (const KKSAttrValue *attr,
 
     m_gAttrLay->addWidget(m_groupBox, 0, 0, 1, 1);
 
-    init();
 }
 
 
@@ -58,8 +57,8 @@ void KKSComplexAttrWidget :: init()
     if(!m_av)
         return;
 
-    if(!m_awf)
-        return;
+    //if(!m_awf)
+    //    return;
 
     if(m_av->attrsValues().count() == 0)
     {
@@ -124,19 +123,20 @@ void KKSComplexAttrWidget :: init()
             av->addRef ();
 
         //gAttrLayout->setVerticalSpacing (10);
-        m_awf->putAttrWidget (av, 
-                              m_objEditor, //KKSObjEditor -- в данном контексте имеем право указать NULL. Поле используется только в расширенных св-вах атрибута (показателя), которых у данного атрибута нет 
-                              (QGridLayout *)(m_groupBox->layout()), 
-                              ii, 
+        emit putAttrAttrOnWidget (av, 
+                                  m_objEditor, //KKSObjEditor -- в данном контексте имеем право указать NULL. Поле используется только в расширенных св-вах атрибута (показателя), которых у данного атрибута нет 
+                                  (QGridLayout *)(m_groupBox->layout()), 
+                                  ii, 
 #ifdef Q_CC_MSVC
-                              KKSIndAttr::KKSIndAttrClass::iacAttrAttr,
+                                  KKSIndAttr::KKSIndAttrClass::iacAttrAttr,
 #else
-                              KKSIndAttr::iacAttrAttr,
+                                  KKSIndAttr::iacAttrAttr,
 #endif
-                              av->attribute()->tableName(), //таблица, из которой для ссылочных атрибутов будут загружаться значения
-                              -1);//(c ? c->id():-1));
+                                  av->attribute()->tableName(), //таблица, из которой для ссылочных атрибутов будут загружаться значения
+                                  -1);//(c ? c->id():-1));
 
-        av->release ();
+        if(av)
+            av->release ();
     }
 
     

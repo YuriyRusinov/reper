@@ -20,14 +20,28 @@ class QHBoxLayout;
 
 class KKSAttrValue;
 
+class _GUI_EXPORT IntervalHValue{
+public:
+    int h;
+    int m;
+    int s;
+    IntervalHValue(){h=0; m=0; s=0;}
+};
+
 class _GUI_EXPORT KKSHIntervalW : public QWidget, public KKSAttrWidget
 {
 public:
     KKSHIntervalW (const KKSAttrValue *attr, KKSIndAttr::KKSIndAttrClass isSys, QWidget * parent=0, Qt::WindowFlags f=0);
     virtual ~KKSHIntervalW (void);
 
+    void value(int * h, int * m, int * s);
+    IntervalHValue value();
+
 public slots:
     void setValue (int h=-1, int m=-1, int s=-1);
+    void setValue (const IntervalHValue & v);
+
+    
 
 private slots:
     void hourChanged (int hour);

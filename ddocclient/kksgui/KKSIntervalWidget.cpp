@@ -68,3 +68,25 @@ void KKSIntervalWidget :: setUnit (int index)
     QVariant val (str);
     emit valueChanged(m_av->id(), m_isSystem, val);
 }
+
+void KKSIntervalWidget :: setValue(const IntervalValue & v)
+{
+    
+    int a;
+    QString w;
+    int iW;
+
+    v.value(&a, w, &iW);
+    lEValue->setText(QString::number(a));
+    cbUnit->setCurrentIndex(cbUnit->findText(w));
+
+    setValue();
+}
+
+IntervalValue KKSIntervalWidget :: value()
+{
+    IntervalValue v;
+    v.setValue(lEValue->text().toInt(), cbUnit->currentText());
+
+    return v;
+}

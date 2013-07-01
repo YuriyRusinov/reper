@@ -185,23 +185,34 @@ void KKSValue::verify(void) const
         QStringList sl = m_value.toStringList();
         
         m_isValid = true;
-        if(sl.count() != 2)
+        if(sl.count() != 2){
             m_isValid = false;
+            m_isNull = true;
+        }
         else{
             QString amount = sl.at(0);
             bool ok = true;
             int a = amount.toInt(&ok);
             Q_UNUSED(a);
-            if(!ok)
+            if(!ok){
                 m_isValid = false;
+                m_isNull = true;
+            }
             else{
                 QString unit = sl.at(1);
                 bool b = KKSAttrType::isValidUnit(unit);
-                if(!b)
+                if(!b){
                     m_isValid = false;
+                    m_isNull = true;
+                }
+            }
+            if(a == 0){
+                m_isNull = true;
             }
         }
+
         m_isLiteral = true;
+
         return;
     }
 
@@ -213,30 +224,37 @@ void KKSValue::verify(void) const
 
         if(sl.count() != 3){
             m_isValid = false;
+            m_isNull = true;
             return;
         } 
         else{
             QString aHours = sl.at(0);
             bool ok = true;
-            int a = aHours.toInt(&ok);
+            int h = aHours.toInt(&ok);
             if(!ok){
                 m_isValid = false;
+                m_isNull = true;
                 return;
             }
             QString aMin = sl.at(1);
             ok = true;
-            a = aMin.toInt(&ok);
+            int m = aMin.toInt(&ok);
             if(!ok){
                 m_isValid = false;
+                m_isNull = true;
                 return;
             }
             QString aSec = sl.at(2);
             ok = true;
-            a = aSec.toInt(&ok);
-            Q_UNUSED(a);
+            int s = aSec.toInt(&ok);
+            
             if(!ok){
                 m_isValid = false;
+                m_isNull = true;
                 return;
+            }
+            if(h==0 && m==0 && s==0){
+                m_isNull = true;
             }
         }
 
@@ -783,6 +801,9 @@ QString KKSValue::valueForInsert() const
         if(m_value.toStringList().count() < 2)
             return "NULL";
 
+        if(m_isNull)
+            return "NULL";
+
         int amount = m_value.toStringList().at(0).toInt();
         int what = KKSAttrType::intervalNameToId(m_value.toStringList().at(1));
         val = QString("'{%1,%2}'").arg(amount).arg(what);
@@ -791,6 +812,9 @@ QString KKSValue::valueForInsert() const
     
     if(a_type == KKSAttrType::atIntervalH){
         if(m_value.toStringList().count() < 3)
+            return "NULL";
+
+        if(m_isNull)
             return "NULL";
 
         int hours = m_value.toStringList().at(0).toInt();

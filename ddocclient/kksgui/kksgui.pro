@@ -13,10 +13,7 @@ LIBS *= -L$$DESTDIR -lkksutils
 INCLUDEPATH *= ../kkspp
 DEPENDPATH *= ../kkspp
 
-INCLUDEPATH *= ../kksfactory
-DEPENDPATH *= ../kksfactory
-
-LIBS *= -L$$DESTDIR -lkkspp -lkksfactory
+LIBS *= -L$$DESTDIR -lkkspp
 
 CONFIG += qt
 

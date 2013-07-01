@@ -1183,7 +1183,13 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                     gLayout->addWidget (lTitle, n_str, 0, 2, 2, Qt::AlignRight | Qt::AlignVCenter);
                 }
 
-                attrWidget = new KKSComplexAttrWidget (av, attrClass, this, objEditor);
+                attrWidget = new KKSComplexAttrWidget (av, attrClass, objEditor);
+                connect(attrWidget, 
+                        SIGNAL(putAttrAttrOnWidget(KKSAttrValue*, KKSObjEditor*, QGridLayout*, int, KKSIndAttr::KKSIndAttrClass, QString, int)), 
+                        this, 
+                        SLOT(putAttrWidget (KKSAttrValue*, KKSObjEditor*, QGridLayout*, int, KKSIndAttr::KKSIndAttrClass, QString, int)));
+
+                ((KKSComplexAttrWidget*)attrWidget)->init();
                 //qobject_cast<KKSComplexAttrWidget *>(attrWidget)->setFixedSymCount (av->attribute()->defWidth());
                 //qobject_cast<QTextEdit *>(attrWidget)->setReadOnly (isRef);
 
@@ -1209,11 +1215,13 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                 attrWidget = new KKSIntervalWidget (av, attrClass);
                 attrWidget->setSizePolicy (hPw);
                 attrWidget->setMinimumHeight (20);
+                
                 QString v = V.toStringList().join(" ");
                 QStringList vl = v.split (" ");
                 int vi = vl[0].toInt();
                 QIntValidator *dVal = new QIntValidator( 1, 24, 0);
                 QLineEdit *lEdit = new QLineEdit (QString::number (vi));
+                
                 lEdit->setMinimumHeight (20);
                 lEdit->setValidator (dVal);
                 QSizePolicy lPw (QSizePolicy::Expanding, QSizePolicy::Fixed, QSizePolicy::LineEdit);
@@ -1226,7 +1234,9 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                 cPw.setHorizontalStretch (1);
                 cbUnit->setSizePolicy (cPw);
                 cbUnit->setMinimumHeight (20);
+                
                 cbUnit->addItem (QString(), QVariant());
+                
                 QStringList units = KKSAttrType::getIntervalUnits();
                 for (int i=0; i<units.count(); i++)
                     cbUnit->addItem (units[i], i);
@@ -1887,7 +1897,7 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
                 if (!isRef)
                 {
                     connectToSlots (aw, wEditor);
-                    qobject_cast<QDateTimeEdit *>(aw)->setTime (v);
+                    qobject_cast<QTimeEdit *>(aw)->setTime (v);
                 }
                 else
                 {

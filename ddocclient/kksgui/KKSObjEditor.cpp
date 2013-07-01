@@ -50,8 +50,14 @@
 #include "KKSAttrType.h"
 #include "KKSCheckBox.h"
 #include "KKSComboBox.h"
+
+#include "KKSTimeEdit.h"
 #include "KKSDateEdit.h"
 #include "KKSDateTimeEdit.h"
+
+#include "KKSHIntervalW.h"
+#include "KKSIntervalWidget.h"
+
 #include "KKSEdit.h"
 #include "KKSCategory.h"
 #include "KKSState.h"
@@ -64,6 +70,8 @@
 #include <KKSRubric.h>
 #include "KKSAttrUUIDWidget.h"
 #include "defines.h"
+
+
 
 
 KKSObjEditor :: KKSObjEditor (const KKSTemplate *t, 
@@ -1318,6 +1326,9 @@ void KKSObjEditor :: clearAttributes (void)
     //sysAttributesValues.clear ();
 
     ioAttrValues.clear ();
+
+    //ioIndicatorValues.clear();
+    
     //ioAttributesValues.clear ();
 }
 
@@ -1331,6 +1342,7 @@ void KKSObjEditor :: setSysAttrValue(KKSAttrValue * attrValue)
         sysAttrValues.remove (id);
     }
     sysAttrValues.insert (id, attrValue);
+    //attrValue->release();
     //sysAttributesValues.insert (id, val);
 }
 
@@ -1344,6 +1356,7 @@ void KKSObjEditor :: setIOAttrValue(KKSAttrValue * av)
         ioAttrValues.remove (id);
     }
     ioAttrValues.insert (id, av);
+    //av->release();
 }
 
 KKSMap<qint64, KKSAttrValue*> & KKSObjEditor :: getSysAttrValues()
@@ -1644,12 +1657,13 @@ void KKSObjEditor :: setEnableO (int state)
         if (wList[i])
         {
             wList[i]->setEnabled (isEnable);
-            if (qobject_cast<QDateTimeEdit *>(wList[i]))
+            //KKSDateTimeEdit, KKSDateEdit, KKSTimeEdit наследуются от соответственно QDateTimeEdit, QDateEdit, QTimeEdit, которые наследуются от QDateTimeEdit
+            if (qobject_cast<QDateTimeEdit *>(wList[i])) 
             {
                 QVariant val;
-                if (qobject_cast<QDateEdit*>(wList[i]))
+                if (qobject_cast<KKSDateEdit*>(wList[i]))
                 {
-                    QDateEdit * dEdit = qobject_cast<QDateEdit*>(wList[i]);
+                    KKSDateEdit * dEdit = qobject_cast<KKSDateEdit*>(wList[i]);
                     if (isEnable)
                     {
                         val = dEdit->date().isNull() ? QDate::currentDate() : dEdit->date();
@@ -1666,9 +1680,9 @@ void KKSObjEditor :: setEnableO (int state)
                     setValue (id, isSystem ? KKSIndAttr::iacTableAttr : KKSIndAttr::iacIOUserAttr, val);
 #endif
                 }
-                else if (qobject_cast<QTimeEdit*>(wList[i]))
+                else if (qobject_cast<KKSTimeEdit*>(wList[i]))
                 {
-                    QTimeEdit * dtEdit = qobject_cast<QTimeEdit*>(wList[i]);
+                    KKSTimeEdit * dtEdit = qobject_cast<KKSTimeEdit*>(wList[i]);
                     if (isEnable)
                     {
                         val = dtEdit->time().isNull() ? QTime::currentTime() : dtEdit->time();
@@ -1687,7 +1701,7 @@ void KKSObjEditor :: setEnableO (int state)
                 }
                 else
                 {
-                    QDateTimeEdit * dtEdit = qobject_cast<QDateTimeEdit*>(wList[i]);
+                    KKSDateTimeEdit * dtEdit = qobject_cast<KKSDateTimeEdit*>(wList[i]);
                     if (isEnable)
                     {
                         val = dtEdit->dateTime().isNull() ? QDateTime::currentDateTime() : dtEdit->dateTime();
@@ -1705,6 +1719,41 @@ void KKSObjEditor :: setEnableO (int state)
 #endif
                 }
             }
+            
+            if (qobject_cast<KKSHIntervalW *>(wList[i])) 
+            {
+                IntervalHValue val;
+
+                KKSHIntervalW * hInterval = qobject_cast<KKSHIntervalW*>(wList[i]);
+                if (isEnable)
+                {
+                    val = hInterval->value();// dEdit->date().isNull() ? QDate::currentDate() : dEdit->date();
+                    hInterval->setValue(val);
+                }
+                else
+                {
+                    val = IntervalHValue();
+                    hInterval->setValue(val);
+                }
+            }
+
+            if (qobject_cast<KKSIntervalWidget *>(wList[i])) 
+            {
+                IntervalValue val;
+
+                KKSIntervalWidget * wInterval = qobject_cast<KKSIntervalWidget*>(wList[i]);
+                if (isEnable)
+                {
+                    val = wInterval->value();// dEdit->date().isNull() ? QDate::currentDate() : dEdit->date();
+                    wInterval->setValue(val);
+                }
+                else
+                {
+                    val = IntervalValue();
+                    wInterval->setValue(val);
+                }
+            }
+
         }
 
 }
@@ -2473,10 +2522,11 @@ void KKSObjEditor :: setIndValue (KKSAttrValue *av)
     av->addRef ();
     if (ioIndicatorValues.contains (id))
     {
-        ioIndicatorValues.value (id)->release ();
+        //ioIndicatorValues.value (id)->release ();
         ioIndicatorValues.remove (id);
     }
     ioIndicatorValues.insert (id, av);
+    //av->release();
 
 }
 /*

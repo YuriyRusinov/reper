@@ -8,6 +8,7 @@
  ***********************************************************************/
 
 #include "KKSData.h"
+#include "KKSAttrValue.h"
 #include <QtDebug>
 
 KKSData::KKSData()

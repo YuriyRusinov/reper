@@ -6,10 +6,48 @@
 #include <QVariant>
 #include "kksgui_config.h"
 #include <KKSAttrWidget.h>
+#include "KKSAttrType.h"
 
 class QHBoxLayout;
 
 class KKSAttrValue;
+
+class _GUI_EXPORT IntervalValue
+{
+public:
+    IntervalValue(){amount = 0; iWhat = 0; what = "";}
+    IntervalValue(int a, const QString & w)
+    {
+        setValue(a, w);
+    }
+    
+    void setValue(int a, const QString & w)
+    {
+        amount = a; 
+        what = w;
+        if((iWhat = KKSAttrType::intervalNameToId(w)) == 0){
+            amount = 0;
+            what = "";
+        }
+
+        return;
+    }
+
+    void value(int * a, QString & w, int * iW) const
+    {
+        if(!a || !iW)
+            return;
+
+        *a = amount;
+        w = what;
+        *iW = iWhat;
+    }
+
+private:
+    int amount;
+    int iWhat;
+    QString what;
+};
 
 class _GUI_EXPORT KKSIntervalWidget : public QWidget, public KKSAttrWidget
 {
@@ -19,12 +57,15 @@ class _GUI_EXPORT KKSIntervalWidget : public QWidget, public KKSAttrWidget
 
         void setLineEdit (QLineEdit *le);
         void setComboUnits (QComboBox *cb);
+        
+        IntervalValue value();
 
     signals:
         void valueChanged (qint64 id, KKSIndAttr::KKSIndAttrClass isSys, QVariant val);
 
     public slots:
         void setValue (void);
+        void setValue(const IntervalValue & v);
         void setUnit (int index);
 
     private:

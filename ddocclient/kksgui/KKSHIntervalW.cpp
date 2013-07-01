@@ -59,6 +59,12 @@ void KKSHIntervalW :: setValue (int h, int m, int s)
     }
 }
 
+void KKSHIntervalW :: setValue (const IntervalHValue & v)
+{
+    setValue(v.h, v.m, v.s);
+}
+
+
 void KKSHIntervalW :: hourChanged (int hour)
 {
     int m = spMinute->value();
@@ -82,3 +88,26 @@ void KKSHIntervalW :: secChanged (int sec)
     QString val=QString("{%1,%2,%3}").arg (h).arg (m).arg (sec);
     emit valueChanged (m_av->id(), m_isSystem, QVariant(val));
 }
+
+void KKSHIntervalW :: value(int * h, int * m, int * s)
+{
+    if(!h || !m || !s)
+        return;
+
+    *h = spHour->value();
+    *m = spMinute->value();
+    *s = spSecond->value();
+}
+
+IntervalHValue KKSHIntervalW :: value()
+{
+    IntervalHValue v;
+    
+    v.h = spHour->value();
+    v.m = spMinute->value();
+    v.s = spSecond->value();
+
+    return v;
+}
+
+

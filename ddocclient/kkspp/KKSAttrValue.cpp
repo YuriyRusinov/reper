@@ -114,6 +114,9 @@ const KKSValue & KKSAttrValue::value() const
                 continue;
             
             int idAttrAttr = av->attribute()->idRow();//фактически это attr_attr
+            if(av->value().isNull() || !av->value().isValid())
+                continue;
+
             QString v_str = av->value().valueForInsert();
             //if(v_str.startsWith("'"))
             //    v_str.remove(0, 1);

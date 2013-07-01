@@ -743,8 +743,10 @@ qint64 KKSEIOFactory::generateInsertQuery(const KKSRecord * rec,
     qint64 fillColor = -1;
     qint64 textColor = -1;
     if(rec){
-        fillColor = rec->recordFillColor().rgba();
-        textColor = rec->recordTextColor().rgba();
+        if(rec->recordFillColor().isValid())
+            fillColor = rec->recordFillColor().rgba();
+        if(rec->recordTextColor().isValid())
+            textColor = rec->recordTextColor().rgba();
     }
     
     if(isSys){

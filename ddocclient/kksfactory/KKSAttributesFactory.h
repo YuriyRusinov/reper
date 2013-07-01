@@ -42,13 +42,6 @@ public:
     KKSAttributesEditor * viewAttributes (const KKSList<const KKSFilterGroup *>& filters, bool mode, QWidget * parent=0, Qt::WFlags f=0);
 
     static KKSAttrValue* createAttrValue(const QString & xml);
-    void putAttrWidget (KKSAttrValue *attr, 
-                        KKSObjEditor *objEditor, 
-                        QGridLayout *gLayout, 
-                        int n_str, 
-                        KKSIndAttr::KKSIndAttrClass isSystem, 
-                        QString tableName = QString::null, 
-                        int idCat=-1);
     
     static QString toXML (KKSCategoryAttr* attr);
     
@@ -67,6 +60,14 @@ public:
                    bool isRef=false);
     
     void setOEF(KKSObjEditorFactory * _oef);
+public slots:
+    void putAttrWidget (KKSAttrValue *attr, 
+                        KKSObjEditor *objEditor, 
+                        QGridLayout *gLayout, 
+                        int n_str, 
+                        KKSIndAttr::KKSIndAttrClass isSystem, 
+                        QString tableName = QString::null, 
+                        int idCat=-1);
 
 private slots:
     void findAttributes (int idAttrs, QAbstractItemModel *aModel, KKSAttributesEditor * attrsEditor);

@@ -260,9 +260,9 @@ KKSMap<qint64, KKSAttrValue *> KKSLoader::loadAttrAttrValues(KKSAttrValue * av, 
     
     QString sql;
     if(!forRec)
-        sql = QString("select * from aGetAttrsAttrsValues(%1)").arg(av->id());
+        sql = QString("select * from aGetAttrsAttrsValues(%1, %2)").arg(av->id()).arg(av->attribute()->id());
     else
-        sql = QString("select * from aGetRecAttrsAttrsValues(%1)").arg(av->id());
+        sql = QString("select * from aGetRecAttrsAttrsValues(%1, %2)").arg(av->id()).arg(av->attribute()->id());
 
     KKSResult * res = db->execute(sql);
     if(!res)
