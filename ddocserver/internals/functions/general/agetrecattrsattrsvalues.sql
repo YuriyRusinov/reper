@@ -6,10 +6,11 @@ create type h_get_rec_attrs_attrs_values as (id_attr_attr_value int8,
                                              id_attr_parent int4,
                                              id_attr_child int4);
 
-create or replace function aGetRecAttrsAttrsValues(int8) returns setof h_get_rec_attrs_attrs_values as
+create or replace function aGetRecAttrsAttrsValues(int8, int4) returns setof h_get_rec_attrs_attrs_values as
 $BODY$
 declare
     idRecAttrValue alias for $1;
+    idAttrParent alias for $2;
 
     r h_get_rec_attrs_attrs_values%rowtype;
 begin
@@ -18,7 +19,6 @@ begin
         select 
             raav.id,
             raav.id_rec_attr_value,
-            raav.id_attr_attr,
             raav.value,
             aa.id,
             aa.id_attr_parent,
@@ -30,6 +30,8 @@ begin
             left join rec_attrs_values rav on (raav.id_rec_attr_value = rav.id)
             left join attrs_categories ac on (ac.id = rav.id_attr_category)
             left join attributes a on (ac.id_io_attribute = a.id and aa.id_attr_parent = a.id)
+        where aa.id_attr_parent = idAttrParent
+        order by aa."order", aa.id
 
     loop
         return next r;

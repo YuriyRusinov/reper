@@ -11,6 +11,7 @@ declare
     r h_attr_attr_value%rowtype;
     ok boolean;
     str varchar;
+    realVal varchar;
 begin
 
     for r in select id_attr_attr, a_val from parseAttrAttrValue(iValue)
@@ -21,8 +22,19 @@ begin
             return -1;
         end if;
 
-        if(r.a_val <> 'NULL' and r.a_val <> '') then
+        if(r.a_val isnull) then
+            raise exception '%', r.a_val;
+        end if;
+
+        execute 'select $1' into realVal using r.a_val;
+        if(realVal isnull) then
+            
+            continue;
+        end if;
+
+        if(lower(r.a_val) <> 'null' and lower(r.a_val) <> 'null::bigint' and r.a_val <> '') then
             select getNextSeq('rec_attrs_attrs_values', 'id') into idRecAttrAttrValue;
+            --raise warning '%', r.a_val;
 
             str = 'insert into rec_attrs_attrs_values (id, id_rec_attr_value, id_attr_attr, value) values (' || idRecAttrAttrValue || ', ' || idRecAttrValue || ', ' || r.id_attr_attr || ', ' || r.a_val || ')';
             execute str;
