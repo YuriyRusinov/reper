@@ -19,21 +19,34 @@ begin
         return NULL;
     end if;
 
-    perform loadrand();
+    --perform loadrand();
 
     if (id_distrib = 1) then
-        select into new_time_step new.moda+gaussrand(new.sigma);
+        if (new.moda - 3*new.sigma < 0.001) then
+            raise EXCEPTION 'Incorrect values for gaussian distribution time step';
+            return NULL;
+        end if;
+--        select into new_time_step new.moda+gaussrand(new.sigma);
     elsif (id_distrib = 2) then
-        select into new_time_step exprand (new.lambda);
+        if (new.lambda < 0.0) then
+            raise EXCEPTION 'Incorrect value for exponential distribution';
+            return NULL;
+        end if;
+--        select into new_time_step exprand (new.lambda);
     elsif (id_distrib = 3) then
-        select into new_time_step new.min_p + (new.max_p-new.min_p)*unirand ();
+        if (new.min_p <= 0 or new.max_p <= 0 or new.max_p < new.min_p) then
+            raise EXCEPTION 'Incorrect parameters for uniform distribution';
+            return NULL;
+        end if;
+--        select into new_time_step new.min_p + (new.max_p-new.min_p)*unirand ();
     else
         raise warning 'Does not have any another distributions';
         select droprand();
         return NULL;
     end if;
+    new_time_step := generatetimestep (new.id);
 
-    perform droprand();
+    --perform droprand();
 
     if (new_time_step is null) then
         raise warning 'Incorrect parameters';
