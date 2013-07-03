@@ -1158,19 +1158,39 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
 
                 if(!av->attrsValuesLoaded()){
                     KKSMap<qint64, KKSAttrValue*> aav_list;
+#ifdef Q_CC_MSVC
                     if(attrClass == KKSIndAttr::KKSIndAttrClass::iacIOUserAttr){
+#else
+                    if(attrClass == KKSIndAttr::iacIOUserAttr){
+#endif
                         aav_list = loader->loadAttrAttrValues(av, false);
                     }
+#ifdef Q_CC_MSVC
                     if(attrClass == KKSIndAttr::KKSIndAttrClass::iacEIOUserAttr){
+#else
+                    if(attrClass == KKSIndAttr::iacEIOUserAttr){
+#endif
                         aav_list = loader->loadAttrAttrValues(av, true);
                     }
+#ifdef Q_CC_MSVC
                     if(attrClass == KKSIndAttr::KKSIndAttrClass::iacAttrAttr ){
+#else
+                    if(attrClass == KKSIndAttr::iacAttrAttr ){
+#endif
                         //aav_list = loader->loadAttrAttrValues(av->id(), false);
                     }
+#ifdef Q_CC_MSVC
                     if(attrClass == KKSIndAttr::KKSIndAttrClass::iacEIOSysAttr){
+#else
+                    if(attrClass == KKSIndAttr::iacEIOSysAttr){
+#endif
                         //aav_list = loader->loadAttrAttrValues(av->id(), false);
                     }
+#ifdef Q_CC_MSVC
                     if(attrClass == KKSIndAttr::KKSIndAttrClass::iacTableAttr){
+#else
+                    if(attrClass == KKSIndAttr::iacTableAttr){
+#endif
                         //aav_list = loader->loadAttrAttrValues(av->id(), false);
                     }
 
