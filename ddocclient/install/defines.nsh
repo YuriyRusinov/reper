@@ -2,7 +2,7 @@
 !define PRODUCT_NAME_ENG1 "DynamicDocs"
 !define PRODUCT_NAME "${PRODUCT_NAME1} (клиентская часть)"
 !define PRODUCT_NAME_ENG "${PRODUCT_NAME_ENG1} Client"
-!define PRODUCT_VERSION "1.1.0"
+!define PRODUCT_VERSION "1.2.0"
 !define PRODUCT_PUBLISHER "DynamicSoft"
 !define EXECUTABLE_PREFIX "ddocclient"
 !define PRODUCT_WEB_SITE "http://www.dynamicdocs.ru"

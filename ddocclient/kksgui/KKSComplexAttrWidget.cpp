@@ -82,7 +82,7 @@ void KKSComplexAttrWidget :: init()
     //    все они отфильтровываются на триггерном уровне БД
     for (KKSMap<int, KKSCategoryAttr*>::const_iterator pa = attrs.constBegin(); pa != attrs.constEnd(); pa++){
         if(
-            pa.value()->type()->attrType() == KKSAttrType::atCheckList || 
+            //pa.value()->type()->attrType() == KKSAttrType::atCheckList || 
             pa.value()->type()->attrType() == KKSAttrType::atCheckListEx ||
             pa.value()->type()->attrType() == KKSAttrType::atComplex ||
             pa.value()->type()->attrType() == KKSAttrType::atParent ||

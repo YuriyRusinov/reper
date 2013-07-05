@@ -280,17 +280,17 @@ void DDocStreamsGenerator::run()
         QString sql = QString("select getMessageStreams()");
         KKSResult * res = m_db->execute(sql.toLocal8Bit().constData());
         if(!res)
-            return;
+            continue;
 
         if(res->getRowCount() != 1){
             delete res;
-            return;
+            continue;
         }
 
         int r = res->getCellAsInt(0, 0);
         delete res;
         if(r != 1)
-            return;
+            continue;
 
     }
     

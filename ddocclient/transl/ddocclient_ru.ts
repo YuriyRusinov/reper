@@ -2703,6 +2703,22 @@ Do you want to save the changes before closing?</source>
         <source>Indicators of %1</source>
         <translation>Показатели %1</translation>
     </message>
+    <message>
+        <source>Life cycle :</source>
+        <translation>Жизненный цикл:</translation>
+    </message>
+    <message>
+        <source>...</source>
+        <translation type="unfinished">...</translation>
+    </message>
+    <message>
+        <source>Set life cycle onto category %1</source>
+        <translation>Задать жизненный цикл для категории %1</translation>
+    </message>
+    <message>
+        <source>Clear life cycle from category %1</source>
+        <translation>Снять жизненный цикл с категории %1</translation>
+    </message>
 </context>
 <context>
     <name>KKSCatEditorFactory</name>
@@ -2781,6 +2797,46 @@ Do you want to save the changes before closing?</source>
     <message>
         <source>Creation new category on %1</source>
         <translation>Создание новой категории по %1</translation>
+    </message>
+    <message>
+        <source>Set life cycle onto category %1</source>
+        <translation>Задать жизненный цикл для категории %1</translation>
+    </message>
+    <message>
+        <source>Add new life cycle</source>
+        <translation>Создать новый жизненный цикл</translation>
+    </message>
+    <message>
+        <source>Cannot add new life cycle. Database error</source>
+        <translation>Не могу создать жизненный цикл. Ошибка БД!</translation>
+    </message>
+    <message>
+        <source>Edit life cycle</source>
+        <translation>Редактировать жизненный цикл</translation>
+    </message>
+    <message>
+        <source>Cannot update life cycle. Database error</source>
+        <translation>Не могу изменить параметры жизненного цикла. Ошибка БД!</translation>
+    </message>
+    <message>
+        <source>Remove life cycle</source>
+        <translation>Удалить жизненный цикл</translation>
+    </message>
+    <message>
+        <source>Cannot delete life cycle. Database error</source>
+        <translation>Не могу удалить жизненный цикл. Ошибка БД!</translation>
+    </message>
+    <message>
+        <source>View life cycles</source>
+        <translation>Открыть список жизненных циклов</translation>
+    </message>
+    <message>
+        <source>Save life cycle</source>
+        <translation>Сохранить жизненный цикл</translation>
+    </message>
+    <message>
+        <source>Error in life cycle save</source>
+        <translation>Не могу сохранить жизненный цикл</translation>
     </message>
 </context>
 <context>
@@ -3094,6 +3150,13 @@ Press YES to clear the color value or NO to remains current value</source>
         <translation>Вы отменили выбор цвета в диалоге
 Вы хотите очистить цвет и задать цвет принятый по умолчанию или сохранить текущую величину?
 Нажмите YES для очистки или NO для оставления текущего цвета</translation>
+    </message>
+</context>
+<context>
+    <name>KKSComplexAttrWidget</name>
+    <message>
+        <source> (complex attribute)</source>
+        <translation> (Составной атрибут)</translation>
     </message>
 </context>
 <context>
@@ -3441,7 +3504,7 @@ try to rename it with extention. Example: filename.vsd</source>
     </message>
     <message>
         <source>Creation of new IO allowed only for rubrics with accigned category!</source>
-        <translation>Создание новых информационных объектов доступно только для рубрик с ассоциированной категорией!</translation>
+        <translation type="obsolete">Создание новых информационных объектов доступно только для рубрик с ассоциированной категорией!</translation>
     </message>
     <message>
         <source>Rotate widget</source>
@@ -3542,6 +3605,10 @@ try to rename it with extention. Example: filename.vsd</source>
     <message>
         <source>Select documents for send</source>
         <translation>Выберите документы для отправки</translation>
+    </message>
+    <message>
+        <source>Creation of new IO allowed only for rubrics with assigned category!</source>
+        <translation>Создание новых информационных объектов допустимо только для рубрик с установленной категорией!</translation>
     </message>
 </context>
 <context>
@@ -3906,11 +3973,11 @@ Proceed?</source>
     </message>
     <message>
         <source>&amp;%1 %2</source>
-        <translation>&amp;%1 %2</translation>
+        <translation type="obsolete">&amp;%1 %2</translation>
     </message>
     <message>
         <source>%1 %2</source>
-        <translation>%1 %2</translation>
+        <translation type="obsolete">%1 %2</translation>
     </message>
     <message>
         <source>Save</source>
@@ -4027,6 +4094,10 @@ Please connect to your system administrator.</source>
     <message>
         <source>Generate message streams</source>
         <translation>Генерация информационных потоков</translation>
+    </message>
+    <message>
+        <source>Windows</source>
+        <translation>Окна</translation>
     </message>
 </context>
 <context>
@@ -4177,6 +4248,14 @@ Please connect to your system administrator.</source>
     </message>
     <message utf8="true">
         <source>Системные справочники...</source>
+        <translation></translation>
+    </message>
+    <message utf8="true">
+        <source>Создать жизненный цикл...</source>
+        <translation></translation>
+    </message>
+    <message utf8="true">
+        <source>Открыть жизненный цикл...</source>
         <translation></translation>
     </message>
 </context>
@@ -4911,27 +4990,111 @@ Please save it before creating new records in it.</source>
     </message>
     <message>
         <source>Identificator :</source>
-        <translation>ИД:</translation>
+        <translation type="obsolete">ИД:</translation>
     </message>
     <message>
         <source>Unique Identificator :</source>
-        <translation>Уникальный ИД (UUID-OSSP):</translation>
+        <translation type="obsolete">Уникальный ИД (UUID-OSSP):</translation>
     </message>
     <message>
         <source>State Identificator :</source>
-        <translation>Состояние:</translation>
+        <translation type="obsolete">Состояние:</translation>
     </message>
     <message>
         <source>Last update :</source>
-        <translation>Дата и время последнего изменения:</translation>
+        <translation type="obsolete">Дата и время последнего изменения:</translation>
     </message>
     <message>
         <source>unique_id :</source>
-        <translation>Уникальный идентификатор (DynamicDocs):</translation>
+        <translation type="obsolete">Уникальный идентификатор (DynamicDocs):</translation>
     </message>
     <message>
         <source>System parameters</source>
         <translation>Системные параметры</translation>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation>Название:</translation>
+    </message>
+    <message>
+        <source>Visualization:</source>
+        <translation>Визуализация:</translation>
+    </message>
+    <message>
+        <source>Identification:</source>
+        <translation>Идентификация:</translation>
+    </message>
+    <message>
+        <source>ID*: </source>
+        <translation>ИД*:</translation>
+    </message>
+    <message>
+        <source>Name: </source>
+        <translation>Название:</translation>
+    </message>
+    <message>
+        <source>State*: </source>
+        <translation>Состояние*:</translation>
+    </message>
+    <message>
+        <source>Icon: </source>
+        <translation>Условный знак:</translation>
+    </message>
+    <message>
+        <source>Fill color: </source>
+        <translation>Цвет фона:</translation>
+    </message>
+    <message>
+        <source>Text color: </source>
+        <translation>Цвет текста:</translation>
+    </message>
+    <message>
+        <source>Unique ID (UUID_OSSP)*: </source>
+        <translation>Уникальный идентификатор (UUID_OSSP)*:</translation>
+    </message>
+    <message>
+        <source>DynamicDocs UID*: </source>
+        <translation>Уникальный идентификатор (DynamicDocs UID)*:</translation>
+    </message>
+    <message>
+        <source>Last update*: </source>
+        <translation>Дата-время последнего изменения*:</translation>
+    </message>
+    <message>
+        <source>...</source>
+        <translation>...</translation>
+    </message>
+    <message>
+        <source>Active</source>
+        <translation>Активный</translation>
+    </message>
+    <message>
+        <source>Set state</source>
+        <translation>Задать состояние</translation>
+    </message>
+    <message>
+        <source>Add state</source>
+        <translation>Добавить состояние</translation>
+    </message>
+    <message>
+        <source>Cannot insert new state into Db, error !</source>
+        <translation>Не могу создать новое состояние в БД! Ошибка!</translation>
+    </message>
+    <message>
+        <source>Edit state</source>
+        <translation>Редактировать состояние</translation>
+    </message>
+    <message>
+        <source>Cannot update state in Db, error !</source>
+        <translation>Не могу изменить параметры состояния в БД! Ошибка!</translation>
+    </message>
+    <message>
+        <source>Add state into life cycle</source>
+        <translation>Добавить состояние в жизненный цикл</translation>
+    </message>
+    <message>
+        <source>Cannot add state into life cycle %1, Db error</source>
+        <translation>Не могу добавить состояние в жизненный цикл %1, Ошибка БД</translation>
     </message>
 </context>
 <context>
@@ -5151,7 +5314,7 @@ Please save it before creating new records in it.</source>
     <message>
         <source>You are put document of category %1 to rubric with category %2.
  Do you want to proceed ?</source>
-        <translation>Помещение документа категории %1 в рубрику с категорией %2
+        <translation type="obsolete">Помещение документа категории %1 в рубрику с категорией %2
 Продолжить ? </translation>
     </message>
     <message>
@@ -5161,6 +5324,54 @@ Please save it before creating new records in it.</source>
     <message>
         <source>You cannot add one item to rubric twise</source>
         <translation>Невозможно добавить один информационный объект в рубрику дважды</translation>
+    </message>
+    <message>
+        <source>Select reference IO</source>
+        <translation>Выберите исходный информационный объект</translation>
+    </message>
+    <message>
+        <source>You are put document of category
+&quot;%1&quot;
+to rubric with category:
+&quot;%2&quot;.
+This is not allowed!</source>
+        <translation>Вы пытаетесь поместить информационный объект категории
+&quot;%1&quot;
+в рубрику с установленной категорией:
+&quot;%2&quot;.
+Это недопустимо!</translation>
+    </message>
+    <message>
+        <source>Select record for rubric</source>
+        <translation>Выберите запись справочника</translation>
+    </message>
+    <message>
+        <source>Add new item</source>
+        <translation>Добавить новый элемент</translation>
+    </message>
+    <message>
+        <source>Cannot load record %1</source>
+        <translation>Не могу загрузить запись справочника %1</translation>
+    </message>
+    <message>
+        <source>id</source>
+        <translation>ИД</translation>
+    </message>
+    <message>
+        <source>name</source>
+        <translation>Название</translation>
+    </message>
+    <message>
+        <source>state</source>
+        <translation>Состояние</translation>
+    </message>
+    <message>
+        <source>uuid_t</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>id_io_state</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9716,6 +9927,128 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>kks_life_cycle_form</name>
+    <message>
+        <source>Life Cycle</source>
+        <translation>Жизненный цикл</translation>
+    </message>
+    <message>
+        <source>Parameters</source>
+        <translation>Параметры</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;ID :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Name :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Description :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>States</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Start state :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set start state</source>
+        <translation>Начальное состояние</translation>
+    </message>
+    <message>
+        <source>...</source>
+        <translation>...</translation>
+    </message>
+    <message>
+        <source>Clear start state</source>
+        <translation>Снять начальное состояние</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Auto state attribute :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set auto state after changes of attributes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove auto state after changes of attributes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Auto state indicator :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set auto state after changes of indices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove auto state after changes of indices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete state from life cycle</source>
+        <translation>Удалить состояние из жизненного цикла</translation>
+    </message>
+    <message>
+        <source>Add state to life cycle</source>
+        <translation>Добавить состояние в жизненный цикл</translation>
+    </message>
+    <message>
+        <source>State crosses</source>
+        <translation>Переходы между состояниями</translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation>&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>&amp;Отмена</translation>
+    </message>
+</context>
+<context>
+    <name>kks_state_form</name>
+    <message>
+        <source>State</source>
+        <translation>Состояние</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;ID :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Name :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Description :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Parent :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>...</source>
+        <translation type="unfinished">...</translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation>&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>&amp;Отмена</translation>
+    </message>
+</context>
+<context>
     <name>kksattr_editor</name>
     <message>
         <source>Attribute</source>
@@ -10054,8 +10387,31 @@ p, li { white-space: pre-wrap; }
         <translation></translation>
     </message>
     <message utf8="true">
-        <source>Добавить в список</source>
-        <translation></translation>
+        <source>Выгрузка файла с сервера в файловую систему клиента</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Открыть файл в предпочитаемом внешнем редакторе</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Удалить файл с сервера</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Выбрать файл из файловой системы</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Добавить в список файлов информационного объекта</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>kkslifecycleform</name>
+    <message>
+        <source>Available states</source>
+        <translation>Доступные состояния</translation>
     </message>
 </context>
 <context>

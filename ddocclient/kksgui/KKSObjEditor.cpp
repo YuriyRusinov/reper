@@ -1468,7 +1468,7 @@ void KKSObjEditor :: setValue (qint64 idAttrValue, KKSIndAttr::KKSIndAttrClass s
 #ifdef Q_CC_MSVC
     case KKSIndAttr::KKSIndAttrClass::iacAttrAttr:
 #else
-    case KKSIndAttr::iacAttrAttr: /*default:*/
+    case KKSIndAttr::iacAttrAttr: 
 #endif
         {
             //надо изменить значение в одном из атрибутов комплексного атрибута. 
