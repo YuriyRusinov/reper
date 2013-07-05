@@ -58,6 +58,10 @@ begin
                 if (time_step is null) then
                     raise warning 'Incorrect parameters';
                     return NULL;
+                elsif (time_step < 0) then
+                    while (time_step < 0) loop
+                        time_step := generatetimestep(r.id);
+                    end loop;
                 end if;
                 prev_time_step := time_step;
                 insert into message_series (id_message_stream, time, time_step) values (r.id, ctime, time_step);
@@ -80,6 +84,10 @@ begin
             if (time_step is null) then
                 raise warning 'Incorrect parameters';
                 return NULL;
+            elsif (time_step < 0) then
+                while (time_step < 0) loop
+                    time_step := generatetimestep(r.id);
+                end loop;
             end if;
 
             insert into message_series (id_message_stream, time, time_step) values (r.id, ctime, time_step);
