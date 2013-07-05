@@ -7,7 +7,7 @@ begin
 
     safeACode = replace(aTag, '___', '-');
 
-    return safeACode;
+    return substring(safeACode from 3);--remove z_
 end
 $BODY$
 LANGUAGE 'plpgsql';

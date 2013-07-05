@@ -66,7 +66,7 @@ begin
 
     isFound = false;
 
-    create temp table XXXX (tag_name varchar, the_name varchar, the_type varchar, the_value varchar);
+    create temp table XXXX (tag_name varchar, the_name varchar, the_title varchar, the_type varchar, the_value varchar);
 
     ttt_aaa = '';
 
@@ -75,7 +75,8 @@ begin
         isFound = true;
 
         idAttrType = getXMLAttrType(r.attr_type);
-        select aInsert(idAttrType, r.attr_code, r.attr_name || ' (' || r.attr_code || ')', r.attr_name, NULL, NULL, 150, NULL) into idAttr;
+        select aInsert(idAttrType, r.attr_code, r.attr_name, r.attr_title, NULL, NULL, NULL, NULL) into idAttr;
+
         if(idAttr isnull or idAttr <= 0) then
             drop table AAA;
             drop table XXXX;
@@ -84,13 +85,9 @@ begin
         end if;
         insert into AAA (id_attr, a_val) values (idAttr, r.attr_value);
         ttt_aaa = ttt_aaa || idAttr || ', ';
-        --raise exception '%', idAttr;
-        --raise exception E'\n\n\n!!%!!\n\n\n', r.attr_value;
-        --exit;
     end loop;
 
     drop table XXXX;
-    --raise exception '%', ttt_aaa;
 
     if(isFound = false) then
         raise exception 'Income message does not have any attributes! Cannot create from it new IO!';
@@ -106,14 +103,15 @@ begin
                 io_categories c
             where 
                 ac_ordered.id_io_category = c.id
-                and c.is_archived = false  
+                and c.is_archived = false
+                and c.is_main = true
             group by ac_ordered.id_io_category ) as ac
         where
             ac.arr = (select array_agg(aaa_ordered.id_attr) from (select id_attr from AAA order by 1) as aaa_ordered)
         order by 1
         limit 1;
 
-        --raise exception '%', idCat;
+        raise warning '%', idCat;
        
         if(idCat isnull) then
             --raise exception '%', idCat;

@@ -1,6 +1,6 @@
 select f_safe_drop_type('h_xml_parameters');
 
-CREATE TYPE h_xml_parameters AS (attr_code varchar, attr_name varchar, attr_type varchar, attr_value varchar);
+CREATE TYPE h_xml_parameters AS (attr_code varchar, attr_name varchar, attr_title varchar, attr_type varchar, attr_value varchar);
 
 -- Function: getxmlparameteres()
 CREATE OR REPLACE FUNCTION getxmlparams(character varying)
@@ -17,6 +17,7 @@ declare
     xml_val varchar;
     xml_tag_name varchar;
     xml_name varchar;
+    xml_title varchar;
     xml_type varchar;
     
     xml_tag_numbers xml[];
@@ -77,7 +78,7 @@ begin
     for i in 1..cnt 
     loop
 		number = xml_tag_numbers[i]::varchar;
-                -- get tag_name
+                -- get tag_name   (code of attribute)
 
 		tbody :=  '/msg/body/' || sectionName || '/formalized_parameters/parameters_description/parameter[@number=' || asString(number, false) || ']/tag_name/text()';
 		--query := 'SELECT trim((xpath('||quote_literal(tbody) ||', '||quote_literal(theValue) ||'::xml))[1]::varchar) As date';
@@ -85,9 +86,14 @@ begin
 		--execute query INTO xml_tag_name;
 
 		-- get name
-
 		tbody :=  '/msg/body/' || sectionName || '/formalized_parameters/parameters_description/parameter[@number=' || asString(number, false) ||']/name/text()';
                 select getXMLValue(tBody, theValue) INTO xml_name;
+                --query := 'SELECT trim((xpath('||quote_literal(tbody) ||', '||quote_literal(theValue) ||'::xml))[1]::varchar) As date';
+		--execute query INTO xml_name;
+
+		-- get attr title
+		tbody :=  '/msg/body/' || sectionName || '/formalized_parameters/parameters_description/parameter[@number=' || asString(number, false) ||']/text_description/text()';
+                select getXMLValue(tBody, theValue) INTO xml_title;
                 --query := 'SELECT trim((xpath('||quote_literal(tbody) ||', '||quote_literal(theValue) ||'::xml))[1]::varchar) As date';
 		--execute query INTO xml_name;
 
@@ -106,7 +112,7 @@ begin
 		--raise exception E'\n\n\n% \n\n\n', xml_val;
 
              --raise warning '___ % % % %',xml_tag_name, xml_name, xmt_type, xml_val;  
-		insert into XXXX (tag_name, the_name, the_type, the_value) values (xml_tag_name, xml_name, xml_type, xml_val);
+		insert into XXXX (tag_name, the_name, the_title, the_type, the_value) values (tagToAttCode(xml_tag_name), xml_name, xml_title, xml_type, xml_val);
 	
     end loop;
     

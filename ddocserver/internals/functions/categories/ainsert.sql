@@ -20,6 +20,7 @@ declare
     idAttr int4;
     ok int4;
     existCode varchar;
+    defWidth int4;
 begin
 
     select aFindEqual(idAttrType, aName, aTitle, aTable, aColumn, aDefWidth) into idAttr;
@@ -43,8 +44,14 @@ begin
 */
     --existCode = uniqueID; --may be NULL
 
+    if(aDefWidth isnull) then
+        defWidth = 150;
+    else
+        defWidth = aDefWidth;
+    end if;
+
     insert into attributes (id, id_a_type, code, name, title, table_name, column_name, def_width, is_system, unique_id)
-    values(idAttr, idAttrType, /*existCode*/aCode, aName, aTitle, aTable, aColumn, aDefWidth, false, uniqueID);
+    values(idAttr, idAttrType, /*existCode*/aCode, aName, aTitle, aTable, aColumn, defWidth, false, uniqueID);
 
     if(FOUND = FALSE) then
         return -1;
@@ -80,6 +87,7 @@ declare
     idAttr int4;
     ok int4;
     existCode varchar;
+    defWidth int4;
 begin
 
     select aFindEqualEx(idAttrType, aCode, aName, aTitle, aTable, aColumn, aDefWidth) into idAttr;
@@ -89,9 +97,15 @@ begin
 
     select getNextSeq('attributes', 'id') into idAttr;
 
+    if(aDefWidth isnull) then
+        defWidth = 150;
+    else
+        defWidth = aDefWidth;
+    end if;
+
     --«десь важным отличием €вл€етс€ то, что задаетс€ значение дл€ ref_column_name. » оно в большинстве случаев не будет id
     insert into attributes (id, id_a_type, code, name, title, table_name, column_name, def_width, is_system, unique_id, ref_column_name) 
-    values(idAttr, idAttrType, aCode, aName, aTitle, aTable, aColumn, aDefWidth, false, uniqueID, refColumn);
+    values(idAttr, idAttrType, aCode, aName, aTitle, aTable, aColumn, defWidth, false, uniqueID, refColumn);
 
     if(FOUND = FALSE) then
         return -1;

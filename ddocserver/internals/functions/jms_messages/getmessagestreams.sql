@@ -1,4 +1,4 @@
-create or replace function getmessagestreams () returns int4 as
+create or replace function getMessageStreams () returns int4 as
 $BODY$
 declare
     r record;
@@ -35,8 +35,15 @@ begin
             id_distrib := r.id_partition_low;
 
             select into tunit name from time_units tu where tu.id=r.id_time_unit;
+
             for rr in
-                select mser.time,mser.time_step from message_series mser where mser.id_message_stream=r.id and mser.time = (select max(time) from message_series where id_message_stream=r.id)
+                select mser.time, mser.time_step 
+                from message_series mser 
+                where 
+                    mser.id_message_stream = r.id 
+                order by mser.time desc
+                limit 1
+                    --and mser.time = (select max(time) from message_series where id_message_stream = r.id)
             loop
                 last_time := rr.time;
                 prev_time_step := rr.time_step;
@@ -58,7 +65,8 @@ begin
             end if;
 
             tquery := E'select ';
-            tquery := tquery || E'interval \''|| to_char(prev_time_step, '0000000D99999999') || E' ' || tunit || E'\'';
+            tquery := tquery || E'interval \''|| to_char(prev_time_step, '0000000.99999999') || E' ' || tunit || E'\'';
+            --raise exception '%', tquery;
 
             execute tquery into tinterv;
             --last_time := last_time + tinterv;

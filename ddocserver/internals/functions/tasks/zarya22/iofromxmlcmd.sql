@@ -210,14 +210,14 @@ begin
 -- idCat = 169
     isFound = false;
 
-    create temp table XXXX (tag_name varchar, the_name varchar, the_type varchar, the_value varchar);
+    create temp table XXXX (tag_name varchar, the_name varchar, the_title varchar, the_type varchar, the_value varchar);
 
     for r in select * from getXMLParams(value)
     loop
         isFound = true;
 
         idAttrType = getXMLAttrType(r.attr_type);
-        select aInsert(idAttrType, r.attr_code, r.attr_name || ' (' || r.attr_code || ')', r.attr_name, NULL, NULL, 150, NULL) into idAttr;
+        select aInsert(idAttrType, r.attr_code, r.attr_name, r.attr_title, NULL, NULL, NULL, NULL) into idAttr;
         if(idAttr isnull or idAttr <= 0) then
             drop table XXX;
             drop table XXXX;
@@ -232,12 +232,28 @@ begin
     if(isFound = false) then
         idCat = 169;
     else
-        select ac.id_io_category into idCat
+/*        select ac.id_io_category into idCat
         from 
            (select ac.id_io_category, array_agg(ac.id_io_attribute) as arr
             from attrs_categories ac group by ac.id_io_category ) as ac
         where
             ac.arr = (select array_agg(id_attr) from XXX);
+*/
+        select ac.id_io_category into idCat
+        from 
+           (select ac_ordered.id_io_category, array_agg(ac_ordered.id_io_attribute) as arr
+            from 
+                (select ac.id_io_category, ac.id_io_attribute from attrs_categories ac order by 1, 2) as ac_ordered, 
+                io_categories c
+            where 
+                ac_ordered.id_io_category = c.id
+                and c.is_archived = false
+                and c.is_main = true
+            group by ac_ordered.id_io_category ) as ac
+        where
+            ac.arr = (select array_agg(aaa_ordered.id_attr) from (select id_attr from XXX order by 1) as aaa_ordered)
+        order by 1
+        limit 1;
        
         if(idCat isnull) then
             select cInsert('Команда от 7т1 с кодом ' || tcode, NULL, NULL, 3, NULL, true, NULL, false, 1) into idCat;

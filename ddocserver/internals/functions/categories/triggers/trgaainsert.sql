@@ -35,6 +35,18 @@ begin
             raise exception 'Complex attributes can only contain not complex childs! (type <> 32)!';
             return NULL;
         end if;
+
+        if(idType = 26 or
+           idType = 25 or
+           idType = 18 or
+           idType = 19 or 
+           idType = 17 or 
+           idType = 3
+          ) then
+            raise exception 'Complex attributes cannot contain attributes of given type!';
+            return NULL;
+        end if;
+
     end if;
 
     select name into aName from attributes where id = new.id_attr_child;
