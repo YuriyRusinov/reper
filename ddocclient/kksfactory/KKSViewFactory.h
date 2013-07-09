@@ -98,6 +98,7 @@ class _F_EXPORT KKSViewFactory
                                                     Qt::WindowFlags f=0);
 
         static KKSRecWidget * createAttrAttrsView (const KKSAttribute *a,
+                                                   bool mode,
                                                    QWidget *parent,
                                                    Qt::WindowFlags f);
 

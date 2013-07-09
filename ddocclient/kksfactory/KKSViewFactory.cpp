@@ -1331,6 +1331,7 @@ KKSRecWidget * KKSViewFactory :: createCategAttrsView (const KKSCategory *cat,
  * виджет с атрибутами
  */
 KKSRecWidget * KKSViewFactory :: createAttrAttrsView (const KKSAttribute *a,
+                                                    bool mode,
                                                     QWidget *parent,
                                                     Qt::WindowFlags f)
 {
@@ -1338,7 +1339,7 @@ KKSRecWidget * KKSViewFactory :: createAttrAttrsView (const KKSAttribute *a,
         return 0;
     
     QTreeView *tv = new QTreeView ();
-    KKSRecWidget * recWidget = new KKSRecWidget (tv, false, parent, f);
+    KKSRecWidget * recWidget = new KKSRecWidget (tv, mode, parent, f);
 
     recWidget->hideGroup (0);//gbSearch->setVisible (false);
     recWidget->hideGroup (2);//tbSetView->setVisible (false);

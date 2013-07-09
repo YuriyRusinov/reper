@@ -26,6 +26,7 @@
 #include <QTreeView>
 #include <QAction>
 #include <QHeaderView>
+#include <QPushButton>
 
 #include <KKSAttributesEditor.h>
 #include <KKSObjEditor.h>
@@ -2214,7 +2215,7 @@ void KKSAttributesFactory :: showAttrsWidget (KKSAttribute *a, KKSAttrEditor *pa
     KKSRecWidget * rw (0);
 
     if (a){
-        rw = KKSViewFactory :: createAttrAttrsView (a, parent, parent->windowFlags());
+        rw = KKSViewFactory :: createAttrAttrsView (a, true, parent, parent->windowFlags());
         parent->setRecWidget(rw);
     }
     else
@@ -2231,6 +2232,7 @@ void KKSAttributesFactory :: showAttrsWidget (KKSAttribute *a, KKSAttrEditor *pa
         acModel->setHeaderData (3, Qt::Horizontal, QObject::tr ("Read only"));
         
         KKSViewFactory::updateAttrAttrsModel (0, acModel);
+        qDebug () << __PRETTY_FUNCTION__ << rw->pbOk->isVisible();
         
         tvTableAttrs->setModel (acModel);
         
@@ -2246,7 +2248,7 @@ void KKSAttributesFactory :: showAttrsWidget (KKSAttribute *a, KKSAttrEditor *pa
         KKSItemDelegate *itemDeleg = new KKSItemDelegate (rw);
         tvTableAttrs->setItemDelegate (itemDeleg);
 
-        parent->setRecWidget(rw);
+        //parent->setRecWidget(rw);
     }
     
     connect (rw->actAdd, SIGNAL (triggered()), parent, SLOT (addTriggered()) );
@@ -2254,11 +2256,18 @@ void KKSAttributesFactory :: showAttrsWidget (KKSAttribute *a, KKSAttrEditor *pa
     connect (rw->actDel, SIGNAL (triggered()), parent, SLOT (delTriggered()) );
 
 
-    if(rw){
-        rw->setWindowModality(Qt::WindowModal);
-        rw->move(parent->pos());
-        rw->setWindowTitle(tr("Select attribute"));
-        rw->show();
+    if(rw)
+    {
+        //rw->setWindowModality(Qt::WindowModal);
+        QDialog * attrDial = new QDialog;
+        QGridLayout * gLay = new QGridLayout (attrDial);
+        gLay->addWidget (rw, 0, 0, 1, 1);
+        //rw->move(parent->pos());
+        attrDial->setWindowTitle(tr("Select attribute"));
+        QObject::connect (rw->pbCancel, SIGNAL (clicked()), attrDial, SLOT (reject()));
+        QObject::connect (rw->pbOk, SIGNAL (clicked()), attrDial, SLOT (accept()));
+        if (attrDial->exec() != QDialog::Accepted)
+            return;
     }
 }
 

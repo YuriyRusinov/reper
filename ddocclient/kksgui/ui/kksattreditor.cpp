@@ -447,7 +447,7 @@ void KKSAttrEditor::editTriggered()
 {
     //int answer = QMessageBox::question(this, tr(""), tr(), QMessageBox::Yes|QMessageBox::No, QMessageBox::No);
     //if(answer == QMessageBox::Yes)
-        emit editAttribute(m_recW->getID(), attribute, m_recW->getModel(), this);
+    emit editAttribute(m_recW->getID(), attribute, m_recW->getModel(), this);
 }
 
 void KKSAttrEditor::delTriggered()
