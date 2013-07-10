@@ -1446,6 +1446,9 @@ void KKSIncludesWidget :: setRubrModel (QAbstractItemModel * rModel)
     twIncludes->setModel(rModel);
     if (oldModel && oldModel != rModel)
         delete oldModel;
+    const KKSRubricBase * rubr = rModel->data(QModelIndex(), Qt::UserRole+4).value<const KKSRubricBase *>();
+    m_rootRubric=(KKSRubric *)(rubr);
+    //qDebug () << __PRETTY_FUNCTION__ << m_rootRubric << (m_rootRubric ? m_rootRubric->id() : -2);
     QItemSelectionModel * selModel = twIncludes->selectionModel ();
     if (selModel)
         connect (selModel, \

@@ -2074,8 +2074,10 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
             continue;
         if(a->code() == "uuid_t")
             continue;
-        if(a->code() == "r_icon")
-            continue;
+        if(a->code() == "r_icon"){ 
+            if(tableName.toLower() != "rubricator") //в справочнике "общесистемный рубрикатор" имеется колонка r_icon, но он при этом является системным, т.е. isSys = true
+                continue;
+        }
         if(a->code() == "record_fill_color")
             continue;
         if(a->code() == "record_text_color")
@@ -2196,7 +2198,7 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
         {
             //необходимо опустить содержимое атрибутов типа JPG и SVG, поскольку они сильно тормозят систему
             //и к тому же в список ЭИО не выводятся
-            if(tableName.toLower() != "io_objects"){
+            if(tableName.toLower() != "io_objects" && tableName.toLower() != "rubricator"){
                 attrs += QString(", 'pixmap/svg/video/xml data type' as %1").arg(code);
                 withAttrs += QString(", 'pixmap/svg/video/xml data type' as %1").arg(code);
                 attrsWith += QString(", xml_data_type_%1").arg(a->idRow());
@@ -3924,6 +3926,12 @@ KKSRubric * KKSLoader::loadRubric (int idRubr, bool withInherit) const
     }
     rootRubric->setCategory (c);
 
+    QString code = res->getCellAsString(0, 6);
+    QString desc = res->getCellAsString(0, 7);
+    QString icon = res->getCellAsString(0, 11);
+    rootRubric->setCode (code);
+    rootRubric->setDesc (desc);
+    rootRubric->setIcon (icon);
     int cnt = res->getRowCount();
     
     for(int i=1; i<cnt; i++){

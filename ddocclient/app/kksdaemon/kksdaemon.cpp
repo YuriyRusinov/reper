@@ -3,6 +3,7 @@
 #include <kksdatabase.h>
 #include <QSettings>
 #include <QUrl>
+#include <QApplication>
 
 #include <QtDebug>
 
@@ -88,7 +89,12 @@ void KKSDaemon::start()
     dbTimer = new KKSPGDatabase();
     dbStreams = new KKSPGDatabase();
 
-    readSettings();
+    if(!readSettings()){
+        (*fLogOut) << QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm.ss") << " --- " << "Cannot open config file! Exited!\n";
+        fLogOut->flush();
+
+        return;
+    }
 
     bool ok = db->connect(ipServer, database, user, passwd, port);
     if(!ok)
@@ -195,12 +201,21 @@ void KKSDaemon::processCommand(int code)
     }
 }
 
-void KKSDaemon::readSettings()
+bool KKSDaemon::readSettings()
 {
-    QSettings * s = new QSettings("DynamicSoft" , "KKSDaemon Service 1.2.0");
+    //QSettings * s = new QSettings("DynamicSoft" , "KKSDaemon Service 1.2.0");
+    QString appPath = QApplication::applicationDirPath();
+    QString fileName = appPath + "/kksdaemon.conf";
+    QFile f(fileName);
+    //if(!f.exists()){
+    //    return false;
+    //}
+    QFileInfo fi(f);
+
+    QSettings * s = new QSettings(fi.absoluteFilePath(), QSettings::IniFormat);
     //s->readSettings ( );
 
-    s->beginGroup ("System settings/Database");
+    //s->beginGroup ("System settings/Database");
     ipServer = s->value("ip").toString();
     database = s->value("database").toString();
     port = s->value("port").toString();
@@ -239,7 +254,7 @@ void KKSDaemon::readSettings()
 #ifdef WIN32
         sPsqlPath = QString("\"C:\\Program Files\\PostgreSQL\\9.2\\bin\\psql.exe\"");
 #else
-        sPsqlPath = QString("/opt/postgresql/bin/psql");
+        sPsqlPath = QString("/opt/ddocserver/bin/psql");
 #endif
         s->setValue("psqlPath", sPsqlPath);
     }
@@ -260,8 +275,11 @@ void KKSDaemon::readSettings()
     }
 
 
-    s->endGroup (); // Database
+    //s->endGroup (); // Database
 
+    delete s;
+
+    return true;
 }
 
 void DDocStreamsGenerator::run()

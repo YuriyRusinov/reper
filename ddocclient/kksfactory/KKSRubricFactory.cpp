@@ -322,7 +322,8 @@ KKSIncludesWidget * KKSRubricFactory::createModalRubricEditor(int mode, const KK
     return iW;
 }
 
-void KKSRubricFactory::saveRubric(KKSRubric * rootR, bool isMyDocs) {
+void KKSRubricFactory::saveRubric(KKSRubric * rootR, bool isMyDocs)
+{
     int res = ppf->updateRubricators(rootR, isMyDocs);
 
     KKSIncludesWidget *wParent = qobject_cast<KKSIncludesWidget *>(this->sender());
@@ -1339,7 +1340,8 @@ void KKSRubricFactory::setAccessDocs(const QList<int>& ioIDList) {
     delete sForm;
 }
 
-KKSRubric * KKSRubricFactory::loadRubric(KKSRubric * r, int idRubr, QAbstractItemModel * rubrMod, const QModelIndex& recIndex) {
+KKSRubric * KKSRubricFactory::loadRubric(KKSRubric * r, int idRubr, QAbstractItemModel * rubrMod, const QModelIndex& recIndex)
+{
     KKSRubric * rw = loader->loadRubric(idRubr);
     if (!rw)
         return r;
@@ -1355,6 +1357,8 @@ KKSRubric * KKSRubricFactory::loadRubric(KKSRubric * r, int idRubr, QAbstractIte
     KKSAccessEntity * acr = rw->getAccessRules();
     r->setAccessRules(acr);
     rubrMod->setData(recIndex, QVariant::fromValue<const KKSRubricBase *>(r), Qt::UserRole + 1);
+    if (!rw->getIcon().isNull())
+        rubrMod->setData (recIndex, rw->getIcon(), Qt::DecorationRole);
 
     rw->release();
 

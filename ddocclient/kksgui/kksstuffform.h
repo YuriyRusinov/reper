@@ -32,10 +32,10 @@ class _GUI_EXPORT KKSStuffForm : public KKSDialog
                       QWidget *parent=0,
                       Qt::WindowFlags flags=0);
 
-	KKSStuffForm (int idCUser,
-	              int level=-1,
-	              QWidget * parent=0,
-	              Qt::WindowFlags flags=0);
+	    KKSStuffForm (int idCUser,
+	                  int level=-1,
+	                  QWidget * parent=0,
+	                  Qt::WindowFlags flags=0);
 
         KKSStuffForm (KKSAclTemplate * at,
                       int idCUser,

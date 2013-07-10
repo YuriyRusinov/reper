@@ -82,7 +82,7 @@ private:
     friend class DDocServerListener;
     friend class DDocStreamsGenerator;
 
-    void readSettings();
+    bool readSettings();
 
     bool bNeedExit;
     bool bPause;

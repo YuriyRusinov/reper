@@ -23,11 +23,11 @@ KKSRubricModel::KKSRubricModel(const KKSRubric * rootRubr, bool forRecs, QObject
 
 KKSRubricModel::KKSRubricModel(const KKSMap< qint64, KKSEIOData * >& rubrRecs, QObject * parent)
     : QAbstractItemModel (parent),
-      rootItem (new KKSRubricTreeItem (-1, 0)),
+      rootItem (new KKSRubricTreeItem (-1, new KKSRubric(-1, "root rubric for all tree"))),
       forRecords (false)
 {
-    KKSRubric * rootRubric = new KKSRubric(-1, "root rubric for all tree");
-    rootItem->setData(rootRubric);
+//    KKSRubric * rootRubric = new KKSRubric(-1, "root rubric for all tree");
+//    rootItem->setData(rootRubric);
     setupData (rubrRecs);
 }
 
@@ -40,6 +40,12 @@ KKSRubricModel::~KKSRubricModel()
 
 QVariant KKSRubricModel :: data (const QModelIndex &index, int role) const
 {
+    if (!index.isValid() && role == Qt::UserRole+4 && this->rootItem)
+    {
+        const KKSRubricBase * rubr = rootItem->getData();
+        return QVariant::fromValue<const KKSRubricBase *>(rubr);
+    }
+
     if (!index.isValid())
         return QVariant ();
     
@@ -209,7 +215,7 @@ bool KKSRubricModel :: setData (const QModelIndex& index, const QVariant& value,
             return false;
         
         wRubr->setData(wNewRubr);
-        setupRubrData (wRubr, forRecords);
+        //setupRubrData (wRubr, forRecords);
 
         emit dataChanged (index, index);
         return true;

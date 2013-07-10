@@ -320,6 +320,9 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
         //
         //Статистика
         //
+        //
+        // Test of layouts
+        //
         QWidget * statW = new QWidget ();
         QGridLayout *gStatLay = new QGridLayout (statW);
         //statW->setLayout (gStatLay);
@@ -340,13 +343,11 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
             acl = new KKSAccessEntity ();
             io->setAccessRules (acl);
         }
+        //
+        // Test layouts
+        //
         KKSStuffForm *sForm = m_sf->createStuffEditorForm (acl, io->author(), stuffW);
         tabProp->addTab (sForm/*stuffW*/, tr ("User privilegies"));
-        //gStuffLay->addWidget (sForm, 0, 0, 1, 1);
-/*        connect (sForm, SIGNAL (privilegiesChanged (KKSPrivilege *, KKSObject *)),
-                 objEditorWidget,
-                 SLOT (privChanged (KKSPrivilege *, KKSObject *))
-                );*/
         connect (sForm, SIGNAL (accessRulesChanged (KKSAccessEntity *)),
                  objEditorWidget,
                  SLOT (setAccessIO(KKSAccessEntity *))
@@ -361,6 +362,9 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
 
         //
         // Рубрикатор
+        //
+        //
+        // Test of layouts
         //
         this->putRubricator (io, objEditorWidget, tabObj);
         //
@@ -8803,12 +8807,13 @@ void KKSObjEditorFactory :: putRubricator (KKSObject * obj, KKSObjEditor * edito
     // Рубрикатор
     //
     //QWidget * includesW = new QWidget ();
-    QSizePolicy iwSizePolicy (QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+    QSizePolicy iwSizePolicy (QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);// MinimumExpanding
     //includesW->setSizePolicy (iwSizePolicy);
     //qDebug () << __PRETTY_FUNCTION__ << includesW->sizePolicy ();
     //QGridLayout *gIncludesLay = new QGridLayout (includesW);
     KKSIncludesWidget * iW = new KKSIncludesWidget (obj->rootRubric(), true, false, false, false);//includesW);
-    iW->setSizePolicy (iwSizePolicy);
+//    qDebug () << __FUNCTION__ << iW->sizePolicy().horizontalPolicy() << iW->sizePolicy().verticalPolicy();
+    //iW->setSizePolicy (iwSizePolicy);
     if (iW && m_rf)
     {
         connect (iW, SIGNAL (saveRubric (KKSRubric *, bool)), m_rf, SLOT (saveRubric (KKSRubric *, bool)) );
