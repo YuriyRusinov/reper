@@ -40,7 +40,7 @@ class /*_PP_EXPORT*/ KKSMap : public QMap<Key, T>
             if(!p)
                 return 0;
 
-            if(count(key) != 0){
+            if(this->count(key) != 0){
                 qWarning() << "There are exist record in KKSMap with key = " << key;
                 return 0;
             }
