@@ -3,15 +3,13 @@ HEADERS += \
         config_dyndoc_synch.h \
         dyndoc_synch.h \
         dyndoc_synch_form.h \
-        dyndoc_itemmodel.h \
-        dyndoc_standard_elem.h \
+        dyndoc_itemmodel.h 
         
 SOURCES += \
         dyndoc_synch.cpp \
         dyndoc_synch_form.cpp \
         main.cpp \
-        dyndoc_itemmodel.cpp \
-        dyndoc_standard_elem.cpp
+        dyndoc_itemmodel.cpp 
 
 FORMS   += \
         dyndoc_synch_form.ui

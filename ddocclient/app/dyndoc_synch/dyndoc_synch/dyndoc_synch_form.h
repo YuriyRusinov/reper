@@ -10,6 +10,8 @@
 #include "dyndoc_synch.h"
 #include "dyndoc_itemmodel.h"
 
+class dyndoc_itemModel;
+
 namespace Ui {
 class dyndoc_synch_form;
 }
