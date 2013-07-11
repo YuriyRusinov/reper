@@ -326,6 +326,9 @@ KKSRubric::KKSRubric(const KKSRubric & other) : KKSRubricBase(other),
     m_items = other.items();
     m_rubrics = other.rubrics();
 
+    m_deletedRubrics = other.m_deletedRubrics;
+    m_deletedItems = other.m_deletedItems;
+
     if (m_searchTemplate)
         m_searchTemplate->addRef ();
 
@@ -378,6 +381,9 @@ KKSRubric & KKSRubric::operator = (const KKSRubric & other)
 
     setItems(other.items());
     setRubrics(other.rubrics());
+
+    m_deletedRubrics = other.m_deletedRubrics;
+    m_deletedItems = other.m_deletedItems;
     
     m_searchTemplate = other.m_searchTemplate;
     if (m_searchTemplate)
@@ -429,6 +435,9 @@ void KKSRubric::addItems(const KKSList<const KKSRubricItem*> & items)
 
 void KKSRubric::setItems(const KKSList<const KKSRubricItem *> & items)
 {
+    //?????????!!!!!!!!!
+    //m_deletedItems.append(m_items);
+    
     m_items.clear();
     m_items = items;
     KKSList<const KKSRubricBase *> subNodes = subnodes();
@@ -444,6 +453,15 @@ void KKSRubric::setItems(const KKSList<const KKSRubricItem *> & items)
 
 void KKSRubric::removeItem(int index)
 {
+    const KKSRubricItem * ri = m_items.at(index);
+    if(!ri)
+        return;
+
+    KKSList<const KKSRubricBase *> subNodes = subnodes();
+    subNodes.removeAll (ri);
+    setNodes (subNodes);
+    m_deletedItems.append(ri);
+
     m_items.removeAt(index);
 }
 
@@ -456,6 +474,9 @@ void KKSRubric::clear()
 
 void KKSRubric::clearItems()
 {
+    //?????????!!!!!!!!!
+    //m_deletedItems.append(m_items);
+
     m_items.clear();
     KKSList<const KKSRubricBase *> subNodes = subnodes();
     for (int i=0; i<subNodes.count(); )
@@ -470,6 +491,9 @@ void KKSRubric::clearItems()
 
 void KKSRubric::clearRubrics()
 {
+    //?????????!!!!!!!!!
+    //m_deletedRubrics.append(m_rubrics);
+
     m_rubrics.clear();
     KKSList<const KKSRubricBase *> subNodes = subnodes();
     for (int i=0; i<subNodes.count(); )
@@ -523,6 +547,9 @@ void KKSRubric::addRubrics(const KKSList<const KKSRubric *> & rubrics)
 
 void KKSRubric::setRubrics(const KKSList<const KKSRubric*> & rubrics)
 {
+    //?????????!!!!!!!!!
+    //m_deletedRubrics.append(m_rubrics);
+
     m_rubrics.clear();
     KKSList<const KKSRubricBase *> subNodes = subnodes();
     for (int i=0; i<subNodes.count(); )
@@ -594,6 +621,7 @@ const KKSRubric * KKSRubric::rubricForId(int id, bool recursivelly) const
     return NULL;
 }
 
+//возвращается рубрика по ее идентификатору
 KKSRubric * KKSRubric::rubricForId(int id, bool recursivelly)
 {
     if(id <= 0)
@@ -618,6 +646,8 @@ KKSRubric * KKSRubric::rubricForId(int id, bool recursivelly)
     return NULL;
 }
 
+//возвращается item, находящийся в данной рубрике по его id
+//нерекурсивно
 const KKSRubricItem * KKSRubric::itemForId(int id) const
 {
     if(id <= 0)
@@ -852,3 +882,9 @@ void KKSRubric :: setCategorized (bool c)
 {
     m_isCategorized = c;
 }
+
+const KKSList<const KKSRubricItem *> & KKSRubric :: deletedItems() const
+{
+    return m_deletedItems;
+}
+

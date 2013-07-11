@@ -170,7 +170,8 @@ private:
         int updateRubric(KKSRubric * r) const;
         int insertRubrics(KKSRubric * parent, int idMyDocsRubricator = -1) const;
         int insertRubric(KKSRubric * r, int idParent, int idObject, bool root = false, int idMyDocsRubricator = -1) const;
-        int insertRubricItem(int idRubric, int idObject, bool isAutomated) const;
+        int insertRubricItem(int idRubric, int idObject, const QString & rIcon) const;
+        int removeRubricItem(int idRubric, int idObject) const;
         void rollbackRubrics(KKSRubric * r, bool forUpdate = false) const;
         void rollbackRubric(KKSRubric * r, bool forUpdate = false) const;
         void commitRubrics(KKSRubric * r) const;

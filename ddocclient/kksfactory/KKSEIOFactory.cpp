@@ -1554,16 +1554,31 @@ int KKSEIOFactory::updateRubrics(KKSRubric * parent, int idMyDocsRubricator) con
             return ERROR_CODE;
     }
     
+    /*
     //сначала удалим все вложения в рубрику
     QString sql = QString("delete from rubric_records where id_rubric = %1").arg(parent->id());
     int ok = db->executeCmd(sql);
     if(ok != OK_CODE)
         return ERROR_CODE;
+    */
 
     cnt = parent->items().count();
     for(int i=0; i<cnt; i++){
         const KKSRubricItem * item = parent->item(i);
-        int ok = insertRubricItem(parent->id(), item->id(), item->isAutomated());
+        if(!item)
+            continue;
+        int ok = insertRubricItem(parent->id(), item->id(), item->iconAsString());
+        if(ok != OK_CODE)
+            return ERROR_CODE;
+    }
+
+    const KKSList<const KKSRubricItem *> deletedItems = parent->deletedItems();
+    cnt = deletedItems.count();
+    for(int i=0; i<cnt; i++){
+        const KKSRubricItem * item = deletedItems.at(i);
+        if(!item)
+            continue;
+        int ok = removeRubricItem(parent->id(), item->id());
         if(ok != OK_CODE)
             return ERROR_CODE;
     }
@@ -1621,7 +1636,7 @@ int KKSEIOFactory::insertRubrics(KKSRubric * parent, int idMyDocsRubricator) con
     cnt = parent->items().count();
     for(int i=0; i<cnt; i++){
         const KKSRubricItem * item = parent->item(i);
-        int ok = insertRubricItem(parent->id(), item->id(), item->isAutomated());
+        int ok = insertRubricItem(parent->id(), item->id(), item->iconAsString());
         if(ok != OK_CODE)
             return ERROR_CODE;
     }
@@ -1672,18 +1687,50 @@ int KKSEIOFactory::insertRubric(KKSRubric * r, int idParent, int idRec, bool roo
 
 }
 
-int KKSEIOFactory::insertRubricItem(int idRubric, int idRec, bool isAutomated) const
+int KKSEIOFactory::removeRubricItem(int idRubric, qint64 idRec) const
 {
-    Q_UNUSED(isAutomated);
-
     if(idRubric <= 0 || idRec <= 0)
         return OK_CODE;
 
-    QString sql = QString("insert into rubric_records (id_record, id_rubric) values(%1, %2)")
-		        .arg(idRec)
-                        .arg(idRubric);
+    //если ИО уже находится в рубрике в БД, то данная функция ничего не делает и просто завершает работу
+    QString sql = QString("select recRemoveFromRubric(%1, %2)")
+    	                  .arg(idRec)
+						  .arg(idRubric);
     
-    int ok = db->executeCmd(sql);
+    KKSResult * res = db->execute(sql);
+    if (!res)
+    {
+        return ERROR_CODE;
+    }
+    int ok = res->getCellAsInt (0, 0);
+    delete res;
+
+    if(ok != OK_CODE){
+        return ERROR_CODE;
+    }
+
+    return OK_CODE;
+}
+
+int KKSEIOFactory::insertRubricItem(int idRubric, qint64 idRec, const QString & rIcon) const
+{
+    if(idRubric <= 0 || idRec <= 0)
+        return OK_CODE;
+
+    //если запись справочника уже находится в рубрике в БД, то данная функция ничего не делает и просто завершает работу
+    QString sql = QString("select recAddToRubric(%1, %2, %3)")
+    	                  .arg(idRec)
+						  .arg(idRubric)
+						  .arg(rIcon.isEmpty() ? QString("NULL") : QString("'%1'").arg(rIcon));
+    
+    KKSResult * res = db->execute(sql);
+    if (!res)
+    {
+        return ERROR_CODE;
+    }
+    int ok = res->getCellAsInt (0, 0);
+    delete res;
+
     if(ok != OK_CODE){
         return ERROR_CODE;
     }

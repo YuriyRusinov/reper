@@ -204,8 +204,11 @@ public:
 private:
 
     KKSList<const KKSRubricItem *> m_items;
+    KKSList<const KKSRubricItem *> m_deletedItems;
+
     KKSList<const KKSRubric *> m_rubrics;
     KKSList<const KKSRubric *> m_deletedRubrics;
+    
     KKSSearchTemplate * m_searchTemplate;
     KKSCategory * m_category;
 
@@ -240,6 +243,8 @@ private:
 
     QString getFullTreeOfIdsString() const;//возвращает список идентификаторов вложенных подрубрик (включая данную рурику) в виде id1, id2, id3
     QString getFullTreeOfDeletedIds() const;//возвращает список удаленных подрубрик
+
+    const KKSList<const KKSRubricItem *> & deletedItems() const;
 };
 
 Q_DECLARE_METATYPE(const KKSRubricBase *);

@@ -3104,9 +3104,9 @@ int KKSPPFactory::updateRubrics(KKSRubric * parent, int idMyDocsRubricator) cons
         
         int ok;
         if(r->id() <= 0)
-            ok = insertRubric(r, parent->id(), -1, false, idMyDocsRubricator);
+            ok = insertRubric(r, parent->id(), -1, false, idMyDocsRubricator);//обрабатываются только параметры самой рубрики, без вложений
         else
-            ok = updateRubric(r);
+            ok = updateRubric(r); //обрабатываются только параметры самой рубрики, без вложений
         
         if (ok <0 )
             return ERROR_CODE;
@@ -3116,19 +3116,36 @@ int KKSPPFactory::updateRubrics(KKSRubric * parent, int idMyDocsRubricator) cons
             return ERROR_CODE;
     }
     
+    /*
     //сначала удалим все вложения в рубрику
     QString sql = QString("delete from io_rubricator where id_rubric = %1").arg(parent->id());
     int ok = db->executeCmd(sql);
     if(ok != OK_CODE)
         return ERROR_CODE;
+    */
 
+    //добавляем ИО в рубрику. Если ИО уже присутствует в рубрике, то он еще раз не добавится. Только обновится иконка
     cnt = parent->items().count();
     for(int i=0; i<cnt; i++){
         const KKSRubricItem * item = parent->item(i);
-        int ok = insertRubricItem(parent->id(), item->id(), item->isAutomated());
+        if(!item)
+            continue;
+        int ok = insertRubricItem(parent->id(), item->id(), item->iconAsString());
         if(ok != OK_CODE)
             return ERROR_CODE;
     }
+
+    const KKSList<const KKSRubricItem *> deletedItems = parent->deletedItems();
+    cnt = deletedItems.count();
+    for(int i=0; i<cnt; i++){
+        const KKSRubricItem * item = deletedItems.at(i);
+        if(!item)
+            continue;
+        int ok = removeRubricItem(parent->id(), item->id());
+        if(ok != OK_CODE)
+            return ERROR_CODE;
+    }
+
 
     return OK_CODE;
 }
@@ -3154,7 +3171,11 @@ int KKSPPFactory::insertRubrics(KKSRubric * parent, int idMyDocsRubricator) cons
     cnt = parent->items().count();
     for(int i=0; i<cnt; i++){
         const KKSRubricItem * item = parent->item(i);
-        int ok = insertRubricItem(parent->id(), item->id(), item->isAutomated());
+        
+        if(!item)
+            continue;
+
+        int ok = insertRubricItem(parent->id(), item->id(), item->iconAsString());
         if(ok != OK_CODE)
             return ERROR_CODE;
     }
@@ -3252,17 +3273,50 @@ int KKSPPFactory::insertRubric(KKSRubric * r, int idParent, int idObject, bool r
     return idRubric;
 }
 
-int KKSPPFactory::insertRubricItem(int idRubric, int idObject, bool isAutomated) const
+int KKSPPFactory::removeRubricItem(int idRubric, int idObject) const
 {
     if(idRubric <= 0 || idObject <= 0)
         return OK_CODE;
 
-    QString sql = QString("insert into io_rubricator (id_io_object, id_rubric, is_automated) values(%1, %2, %3)")
-		                  .arg(idObject)
-						  .arg(idRubric)
-						  .arg(isAutomated ? QString("TRUE") : QString("FALSE"));
+    //если ИО уже находится в рубрике в БД, то данная функция ничего не делает и просто завершает работу
+    QString sql = QString("select ioRemoveFromRubric(%1, %2)")
+    	                  .arg(idObject)
+						  .arg(idRubric);
     
-    int ok = db->executeCmd(sql);
+    KKSResult * res = db->execute(sql);
+    if (!res)
+    {
+        return ERROR_CODE;
+    }
+    int ok = res->getCellAsInt (0, 0);
+    delete res;
+
+    if(ok != OK_CODE){
+        return ERROR_CODE;
+    }
+
+    return OK_CODE;
+}
+
+int KKSPPFactory::insertRubricItem(int idRubric, int idObject, const QString & rIcon) const
+{
+    if(idRubric <= 0 || idObject <= 0)
+        return OK_CODE;
+
+    //если ИО уже находится в рубрике в БД, то данная функция ничего не делает и просто завершает работу
+    QString sql = QString("select ioAddToRubric(%1, %2, %3)")
+    	                  .arg(idObject)
+						  .arg(idRubric)
+						  .arg(rIcon.isEmpty() ? QString("NULL") : QString("'%1'").arg(rIcon));
+    
+    KKSResult * res = db->execute(sql);
+    if (!res)
+    {
+        return ERROR_CODE;
+    }
+    int ok = res->getCellAsInt (0, 0);
+    delete res;
+
     if(ok != OK_CODE){
         return ERROR_CODE;
     }
