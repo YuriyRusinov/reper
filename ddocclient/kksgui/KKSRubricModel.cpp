@@ -337,6 +337,7 @@ void KKSRubricModel :: setupData (const KKSMap< qint64, KKSEIOData * >& rubrRecs
         //qDebug () << __PRETTY_FUNCTION__ << p.value()->sysFieldValue("id") << p.key();
         KKSRubric * r = new KKSRubric (p.key(), p.value()->fieldValue("name"));
         r->setIcon(tIcon);
+        r->setInitialized(false);
         QString valStr = p.value()->sysFieldValue("id_parent");
         bool ok;
         int idParent = valStr.isEmpty() ? -1 : valStr.toLongLong(&ok);

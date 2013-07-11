@@ -63,10 +63,20 @@ public:
     KKSList<const KKSRubricBase *>& subnodes (void);
     void setNodes (const KKSList<const KKSRubricBase *>& nodes);
 
+    void setInitialized(bool yes = true);
+    bool isInitialized() const;
+
 protected:
     
     QIcon m_rubrIcon;
     QString m_iconData;
+
+    bool m_isChanged;
+    bool m_isInitialized; //загружена ли рубрика или ее вложение полностью из БД. 
+                          //По умолчанию предполагаем, что да. 
+                          //Если рубрика не инициализирована, то считаем, что ее не надо сохранять в БД. Т.к. скорее всего в ней содержится не полная информация.
+                          //В случае визуализации рубрикатора через loadEIOList() необходимо выставить это поле в false
+                          //соответственно далее, если в визуализаторе рубрикатора рубрика выбрана, то необходимо выставить это поле в true (после загрузки данных в из БД в рубрику)
 
 private:
     KKSList<const KKSRubricBase *> m_subNodes;

@@ -19,14 +19,18 @@ QPixmap * pxRubricItem = NULL;
 KKSRubricBase :: KKSRubricBase (void) : KKSRecord (),
     m_rubrIcon (QIcon()),
     m_iconData (QString()),
-    m_subNodes (KKSList<const KKSRubricBase *>())
+    m_subNodes (KKSList<const KKSRubricBase *>()),
+    m_isInitialized(true),
+    m_isChanged(false)
 {
 }
 
 KKSRubricBase :: KKSRubricBase (qint64 id, const QString& name, const QString& desc) : KKSRecord (id, name, desc),
     m_rubrIcon (QIcon()),
     m_iconData (QString()),
-    m_subNodes (KKSList<const KKSRubricBase *>())
+    m_subNodes (KKSList<const KKSRubricBase *>()),
+    m_isInitialized(true),
+    m_isChanged(false)
 {
 }
 
@@ -34,7 +38,9 @@ KKSRubricBase :: KKSRubricBase (const KKSRubricBase& RB)
     : KKSRecord (RB),
       m_rubrIcon (RB.m_rubrIcon),
       m_iconData (RB.m_iconData),
-      m_subNodes (RB.m_subNodes)
+      m_subNodes (RB.m_subNodes),
+      m_isInitialized(RB.m_isInitialized),
+      m_isChanged(RB.m_isChanged)
 {
 }
 
@@ -53,6 +59,10 @@ KKSRubricBase& KKSRubricBase :: operator= (const KKSRubricBase& rb)
     m_rubrIcon = rb.m_rubrIcon;
     m_iconData = rb.m_iconData;
     m_subNodes = rb.m_subNodes;
+
+    m_isInitialized = rb.m_isInitialized;
+    m_isChanged = rb.m_isChanged;
+
     return *this;
 }
 
@@ -75,11 +85,13 @@ void KKSRubricBase :: setIcon (const QString & s)
 
     m_rubrIcon = QIcon(px);
     m_iconData = s;
+    m_isChanged = true;
 }
 
 void KKSRubricBase :: setIcon (const QIcon& icon)
 {
     m_rubrIcon = icon;
+    m_isChanged = true;
 }
 
 int KKSRubricBase :: childNumber (void) const
@@ -147,6 +159,18 @@ void KKSRubricBase :: setNodes (const KKSList<const KKSRubricBase *>& nodes)
 {
     m_subNodes = nodes;
 }
+
+void KKSRubricBase :: setInitialized(bool yes)
+{
+    m_isInitialized = yes;
+}
+
+bool KKSRubricBase :: isInitialized() const
+{
+    return m_isInitialized;
+}
+
+
 /*=============*/
 
 KKSRubricOthers :: KKSRubricOthers (void) : KKSRubricBase ()
@@ -412,6 +436,8 @@ void KKSRubric::addItem(const KKSRubricItem * item)
     
     m_items.append(item);
     addNode (item);
+    
+    m_isChanged = true;
 }
 
 void KKSRubric::insertItem (int i, const KKSRubricItem * item)
@@ -421,6 +447,8 @@ void KKSRubric::insertItem (int i, const KKSRubricItem * item)
 
     m_items.insert (i, item);
     insertNode (i, item);
+
+    m_isChanged = true;
 }
 
 void KKSRubric::addItems(const KKSList<const KKSRubricItem*> & items)
@@ -431,6 +459,8 @@ void KKSRubric::addItems(const KKSList<const KKSRubricItem*> & items)
         m_items.append(item);
         addNode (item);
     }
+
+    m_isChanged = true;
 }
 
 void KKSRubric::setItems(const KKSList<const KKSRubricItem *> & items)
@@ -449,6 +479,8 @@ void KKSRubric::setItems(const KKSList<const KKSRubricItem *> & items)
             i++;
     }
     setNodes (subNodes);
+
+    m_isChanged = true;
 }
 
 void KKSRubric::removeItem(int index)
@@ -463,6 +495,8 @@ void KKSRubric::removeItem(int index)
     m_deletedItems.append(ri);
 
     m_items.removeAt(index);
+
+    m_isChanged = true;
 }
 
 void KKSRubric::clear()
@@ -470,6 +504,8 @@ void KKSRubric::clear()
     clearItems();
     clearRubrics();
     clearNodes ();
+
+    m_isChanged = true;
 }
 
 void KKSRubric::clearItems()
@@ -487,6 +523,8 @@ void KKSRubric::clearItems()
             i++;
     }
     setNodes (subNodes);
+
+    m_isChanged = true;
 }
 
 void KKSRubric::clearRubrics()
@@ -504,6 +542,8 @@ void KKSRubric::clearRubrics()
             i++;
     }
     setNodes (subNodes);
+
+    m_isChanged = true;
 }
 
 const KKSRubricItem * KKSRubric::item(int index) const
@@ -524,6 +564,8 @@ void KKSRubric::addRubric(const KKSRubric * r)
     
     m_rubrics.append(r);
     addNode (r);
+
+    m_isChanged = true;
 }
 
 void KKSRubric::insertRubric (int i, const KKSRubric * r)
@@ -533,6 +575,8 @@ void KKSRubric::insertRubric (int i, const KKSRubric * r)
 
     m_rubrics.insert(i, r);
     insertNode (i, r);
+
+    m_isChanged = true;
 }
 
 void KKSRubric::addRubrics(const KKSList<const KKSRubric *> & rubrics)
@@ -543,6 +587,8 @@ void KKSRubric::addRubrics(const KKSList<const KKSRubric *> & rubrics)
         m_rubrics.append(r);
         addNode (r);
     }
+
+    m_isChanged = true;
 }
 
 void KKSRubric::setRubrics(const KKSList<const KKSRubric*> & rubrics)
@@ -564,6 +610,8 @@ void KKSRubric::setRubrics(const KKSList<const KKSRubric*> & rubrics)
     }
     setNodes (subNodes);
     m_rubrics = rubrics;
+
+    m_isChanged = true;
 }
 
 void KKSRubric::removeRubric(int index)
@@ -577,6 +625,8 @@ void KKSRubric::removeRubric(int index)
     setNodes (subNodes);
     m_deletedRubrics.append(rr);
     m_rubrics.removeAt(index);
+
+    m_isChanged = true;
 }
 
 const KKSRubric * KKSRubric::rubric(int index) const
@@ -736,6 +786,8 @@ void KKSRubric::setSearchTemplate (KKSSearchTemplate * st)
 
     if (m_searchTemplate)
         m_searchTemplate->addRef ();
+
+    m_isChanged = true;
 }
 
 KKSCategory * KKSRubric::getCategory (void) const
@@ -752,6 +804,8 @@ void KKSRubric::setCategory (KKSCategory *c)
 
     if (m_category)
         m_category->addRef ();
+
+    m_isChanged = true;
 }
 
 KKSAccessEntity * KKSRubric::getAccessRules (void) const
@@ -768,6 +822,8 @@ void KKSRubric::setAccessRules (KKSAccessEntity * _acl)
 
     if (m_acl)
         m_acl->addRef ();
+
+    m_isChanged = true;
 }
 
 QString KKSRubric::getFullTreeOfIdsString() const

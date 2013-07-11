@@ -1354,6 +1354,8 @@ KKSRubric * KKSRubricFactory::loadRubric(KKSRubric * r, int idRubr, QAbstractIte
     if (!rw)
         return r;
 
+
+
     KKSCategory * c = rw->getCategory();
     //    if (c)
     //        c->addRef();
@@ -1369,6 +1371,10 @@ KKSRubric * KKSRubricFactory::loadRubric(KKSRubric * r, int idRubr, QAbstractIte
         rubrMod->setData (recIndex, rw->getIcon(), Qt::DecorationRole);
 
     rw->release();
+
+    r->setInitialized(true);//сохранять в БД в дальнейшем мы будем только рубрики, для которых сделан данный вызов
+                            //фактически он означает, что на рубрику кликнули мышкой и информация о ней полностью подгрузилась из БД в модель.
+                            
 
     return r;
 }

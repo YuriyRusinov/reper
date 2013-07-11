@@ -99,6 +99,8 @@ void dyndoc_synch_form::init_query()
                                 \"map_symbol\",\
                                 \"dt_prev_mode\",\
                                 \"dt_curr_mode\",\
+                                \"is_main\", \
+                                \"is_created\", \
                                 ii_rec_order)\
                         as\
                             (select\
@@ -121,6 +123,8 @@ void dyndoc_synch_form::init_query()
                                 organization.\"map_symbol\",\
                                 organization.\"dt_prev_mode\",\
                                 organization.\"dt_curr_mode\",\
+                                organization.\"is_main\", \
+                                organization.\"is_created\", \
                                 0\
                             from\
                                 organization\
@@ -148,6 +152,8 @@ void dyndoc_synch_form::init_query()
                                 organization.\"map_symbol\",\
                                 organization.\"dt_prev_mode\",\
                                 organization.\"dt_curr_mode\",\
+                                organization.\"is_main\", \
+                                organization.\"is_created\", \
                                 organization_rec.ii_rec_order+1\
                             from\
                                 organization_rec,\
@@ -191,7 +197,9 @@ void dyndoc_synch_form::init_query()
                                 organization_rec.\"dt_prev_mode\",\
                                 organization_rec.\"dt_curr_mode\",\
                                 ot1.address,\
-                                ot1.port,\
+                                ot1.port, \
+                                organization_rec.\"is_main\", \
+                                organization_rec.\"is_created\", \
                                 organization_rec.ii_rec_order\
                             \
                             from\
