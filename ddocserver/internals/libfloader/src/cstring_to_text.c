@@ -1,5 +1,6 @@
 #include "floader.h"
 
+
 text * cstring_to_text_ex(const char * str)
 {
 	int len = 0;

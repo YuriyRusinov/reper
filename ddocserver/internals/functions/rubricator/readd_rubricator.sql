@@ -8,6 +8,7 @@
 \i ./functions/rubricator/putIOIntoRubric.sql
 \i ./functions/rubricator/getioforrubric.sql
 \i ./functions/rubricator/ioaddtorubric.sql
+\i ./functions/rubricator/ioremovefromrubric.sql
 \i ./functions/rubricator/setrubriccategory.sql
 \i ./functions/rubricator/setrubricsearchtemplate.sql
 

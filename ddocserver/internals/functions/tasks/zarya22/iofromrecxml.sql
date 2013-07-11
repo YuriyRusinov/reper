@@ -105,6 +105,7 @@ begin
                 ac_ordered.id_io_category = c.id
                 and c.is_archived = false
                 and c.is_main = true
+                and c.id > 300
             group by ac_ordered.id_io_category ) as ac
         where
             ac.arr = (select array_agg(aaa_ordered.id_attr) from (select id_attr from AAA order by 1) as aaa_ordered)

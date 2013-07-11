@@ -71,7 +71,7 @@ begin
         --raise warning 'attributes are % %', rattr.id_attribute, rattr.a_code;
         xml_str := xml_str || E'\t\t<parameter number="' || i::varchar || E'">\n';
         xml_str := xml_str || E'\t\t\t<tag_name>' || attCodeToTag(rattr.a_code) || E'</tag_name>\n';
-        query1 := E'select ' || rattr.a_code || E' from ' || tableName || E' where id = ' || idRec;
+        query1 := E'select "' || rattr.a_code || E'" from "' || tableName || E'" where id = ' || idRec;
         execute query1 into attr_value;
         if (attr_value is null) then
             attr_value := E'';
