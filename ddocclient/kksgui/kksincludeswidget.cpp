@@ -773,6 +773,8 @@ void KKSIncludesWidget :: delSelectedDocs (QAbstractItemModel * itemModel, const
         int pType = index.data (Qt::UserRole+2).toInt();
         if ((isRec && pType != KKSRubricBase::atRubricItem))
             continue;
+        else
+            index = this->recWItems->getSourceIndex();
         QModelIndex wIndex (smInc->currentIndex());
         if (isRec)
             wIndex = wIndex.parent ();
@@ -785,7 +787,8 @@ void KKSIncludesWidget :: delSelectedDocs (QAbstractItemModel * itemModel, const
         if(!r)
             continue;
 
-        r->removeItem (index.row());
+        int iRow = index.row();
+        r->removeItem (iRow);
 
     //    if (isRubr)
     //        twIncludes->model()->removeRow(wIndex.row(), wIndex.parent());
@@ -868,8 +871,10 @@ void KKSIncludesWidget :: delRubricItem (void)
 
     if(!r)
         return;
+    index = this->recWItems->getSourceIndex();
+    int iRow = index.row();
 
-    r->removeItem (index.row());
+    r->removeItem (iRow);
 
 //    if (isRubr)
 //        twIncludes->model()->removeRow(wIndex.row(), wIndex.parent());
@@ -877,7 +882,7 @@ void KKSIncludesWidget :: delRubricItem (void)
     if (isRec)
         twIncludes->model()->removeRows (index.row(), 1, index.parent());
     else
-        tvItems->model ()->removeRow (index.row(), index.parent());
+        recWItems->getSourceModel()->removeRow (index.row(), index.parent());
     isChanged = true;
     emit rubricsChanged ();
 }
@@ -914,6 +919,8 @@ void KKSIncludesWidget :: addRubricItem (void)
     QAbstractItemModel * itemModel = recWItems->getSourceModel ();
 
     emit rubricItemRequested(r, isRec, itemModel);
+    QSortFilterProxyModel * sortMod = qobject_cast<QSortFilterProxyModel *>(this->recWItems->getModel());
+    sortMod->sort(tvItems->header()->sortIndicatorSection());
 }
 
 void KKSIncludesWidget :: createRubricItem (QAbstractItemModel * itemModel, const QModelIndex& parent)
@@ -1020,7 +1027,11 @@ void KKSIncludesWidget::slotAddRubricItem(int idObject, QString name)
         qDebug () << __PRETTY_FUNCTION__ ;
     }
     else
+    {
         emit appendRubricItemIntoModel (attachModel, item);
+        QSortFilterProxyModel * sortMod = qobject_cast<QSortFilterProxyModel *>(this->recWItems->getModel());
+        sortMod->sort(tvItems->header()->sortIndicatorSection());
+    }
 //            QSortFilterProxyModel * sortModel = new KKSSortFilterProxyModel();
 //            attachModel = new QStandardItemModel (0, 0);
 //            sortModel->setSourceModel (attachModel);
