@@ -295,17 +295,17 @@ void KKSAttributesFactory :: loadAttribute (int idAttr, QAbstractItemModel * aMo
     connect (attrEditor, 
              SIGNAL(addAttribute(KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)), 
              this, 
-             SLOT(addAttribute(KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)) );
+             SLOT(addComplexAttr(KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)) );
 
     connect (attrEditor, 
              SIGNAL(editAttribute(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)), 
              this, 
-             SLOT(editAttribute(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)) );
+             SLOT(editComplexAttr(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)) );
 
     connect (attrEditor, 
              SIGNAL(delAttribute(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)), 
              this, 
-             SLOT(delAttribute(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)) );
+             SLOT(delComplexAttr(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)) );
 
 
     QModelIndex pIndex = aIndex;
@@ -2377,4 +2377,28 @@ void KKSAttributesFactory :: delAttribute (int id, KKSAttribute *a, QAbstractIte
 
     KKSViewFactory::updateAttrAttrsModel(a, attrModel);
     editor->update ();
+}
+
+void KKSAttributesFactory :: addComplexAttr (KKSAttribute *a, QAbstractItemModel * attrModel, KKSAttrEditor *editor)
+{
+    if (!a || !attrModel)
+        return;
+    qDebug () << __PRETTY_FUNCTION__ << a->id() << a->name() << a->title();
+    Q_UNUSED (editor);
+}
+
+void KKSAttributesFactory :: editComplexAttr (int id, KKSAttribute *a, QAbstractItemModel * attrModel, KKSAttrEditor *editor)
+{
+    if (!a || !attrModel)
+        return;
+    qDebug () << __PRETTY_FUNCTION__ << id << a->id() << a->name() << a->title();
+    Q_UNUSED (editor);
+}
+
+void KKSAttributesFactory :: delComplexAttr (int id, KKSAttribute *a, QAbstractItemModel * attrModel, KKSAttrEditor *editor)
+{
+    if (!a || !attrModel)
+        return;
+    qDebug () << __PRETTY_FUNCTION__ << id << a->id() << a->name() << a->title();
+    Q_UNUSED (editor);
 }

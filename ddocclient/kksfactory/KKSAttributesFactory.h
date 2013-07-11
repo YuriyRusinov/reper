@@ -92,6 +92,9 @@ private slots:
     void editAttribute (int id, KKSAttribute *a, QAbstractItemModel * attrModel, KKSAttrEditor *editor);
     void delAttribute (int id, KKSAttribute *a, QAbstractItemModel * attrModel, KKSAttrEditor *editor);
 
+    void addComplexAttr (KKSAttribute *a, QAbstractItemModel * attrModel, KKSAttrEditor *editor);
+    void editComplexAttr (int id, KKSAttribute *a, QAbstractItemModel * attrModel, KKSAttrEditor *editor);
+    void delComplexAttr (int id, KKSAttribute *a, QAbstractItemModel * attrModel, KKSAttrEditor *editor);
 
 signals:
     void viewHistory(const KKSList<KKSAttrValue *> &);

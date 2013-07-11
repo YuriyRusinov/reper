@@ -26,34 +26,34 @@ class KKSAttrType;
 
 class _GUI_EXPORT KKSAttrAttrEditor : public QDialog
 {
-    public:
-        KKSAttrAttrEditor (KKSCategoryAttr *attr, bool for_template=false, QWidget *parent=0);
-        ~KKSAttrAttrEditor (void);
+public:
+    KKSAttrAttrEditor (KKSCategoryAttr *attr, bool for_template=false, QWidget *parent=0);
+    ~KKSAttrAttrEditor (void);
 
-        KKSCategoryAttr * getAttrAttribute (void);
-        const KKSCategoryAttr * getAttrAttribute (void) const;
+    KKSCategoryAttr * getAttrAttribute (void);
+    const KKSCategoryAttr * getAttrAttribute (void) const;
 
-        int getTypeID (void) const;
+    int getTypeID (void) const;
 
-    private slots:
-        void accept ();
+private slots:
+    void accept ();
 
-    private:
-        //
-        // Functions
-        //
-        void init_widgets (bool isCat);
-        void set_types (void);
+private:
+    //
+    // Functions
+    //
+    void init_widgets (bool isCat);
+    void set_types (void);
 
-    private:
-        //
-        // Variables
-        //
-        KKSCategoryAttr *attribute;
-        Ui::kksattrattr_editor* ui;
+private:
+    //
+    // Variables
+    //
+    KKSCategoryAttr *attribute;
+    Ui::kksattrattr_editor* ui;
 
-    private:
-        Q_OBJECT
+private:
+    Q_OBJECT
 };
 
 #endif

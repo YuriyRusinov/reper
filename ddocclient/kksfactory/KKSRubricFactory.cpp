@@ -1041,6 +1041,7 @@ void KKSRubricFactory::initRubricAttachments(const KKSRubric * r, bool isRec)
     if (!r)
         return;
 
+    //qDebug () << __PRETTY_FUNCTION__ << r->items().count();
     const KKSTemplate * t = isRec ? rubrRecTemlate() : 0;
     KKSMap<qint64, KKSEIOData *> rData = isRec ? loader->loadRecList (r) : KKSConverter::rubricEntityToData(loader, r);
     const KKSCategory * cat(0);
@@ -1060,7 +1061,8 @@ void KKSRubricFactory::initRubricAttachments(const KKSRubric * r, bool isRec)
     {
         int nr = attachModel->rowCount();
         //qDebug () << __PRETTY_FUNCTION__ << attachModel->rowCount() << attachModel->columnCount();
-        for (int i = 0; i < nr; i++) {
+        for (int i = 0; i < nr; i++)
+        {
             QModelIndex iconInd = attachModel->index(i, 0);
             //
             // поскольку справочник неиерархический, то достаточно пройтись только по индексам верхнего уровня
@@ -1079,15 +1081,21 @@ void KKSRubricFactory::initRubricAttachments(const KKSRubric * r, bool isRec)
             if (!ioIcon.isNull()) {
                 //qDebug () << __PRETTY_FUNCTION__ << QString::compare (rItem->iconAsString(), io->iconAsString());
                 attachModel->setData(iconInd, ioIcon, Qt::DecorationRole);
-            } else if (r->rubricType() == KKSRubricBase::atRubricCategory) {
-                if (ioIcon.isNull()) {
+            }
+            else if (r->rubricType() == KKSRubricBase::atRubricCategory)
+            {
+                if (ioIcon.isNull())
+                {
                     if (rItem)
                         attachModel->setData(iconInd, (rItem->getIcon().isNull() ? rItem->getDefaultIcon() : rItem->getIcon()), Qt::DecorationRole);
                     else
                         attachModel->setData(iconInd, KKSRubricItem::icon(), Qt::DecorationRole);
-                } else
+                }
+                else
                     attachModel->setData(iconInd, ioIcon, Qt::DecorationRole);
-            } else {
+            }
+            else
+            {
                 if (rItem)
                     attachModel->setData(iconInd, (rItem->getIcon().isNull() ? rItem->getDefaultIcon() : rItem->getIcon()), Qt::DecorationRole); // rItem->getDefaultIcon()
                 else

@@ -868,7 +868,7 @@ void KKSIncludesWidget :: delRubricItem (void)
 
     if(!r)
         return;
-    
+
     r->removeItem (index.row());
 
 //    if (isRubr)
@@ -1058,6 +1058,7 @@ void KKSIncludesWidget :: slotInitAttachmentsModel (QAbstractItemModel * attachM
     if (!t)
         return;
     QHeaderView * hItems = recWItems->getView()->header();
+    tvItems->setSortingEnabled (true);
     for (int i=0; i<attachModel->columnCount(); i++)
     {
         QSize hSize = attachModel->headerData(i, Qt::Horizontal, Qt::SizeHintRole).toSize();
@@ -1191,6 +1192,7 @@ const KKSRubric * KKSIncludesWidget::getRubric(QModelIndex index)
     else if (wr->rubricType() != KKSRubricBase::atOthers)
     {
         const KKSRubric * r = static_cast<const KKSRubric *>(wr);
+        qDebug () << __PRETTY_FUNCTION__ << r->items().count();
         emit rubricRequested(const_cast<KKSRubric *>(r), index.data(Qt::UserRole).toInt(), model, index);
         return r;//static_cast<const KKSRubric *>(wr);
     }

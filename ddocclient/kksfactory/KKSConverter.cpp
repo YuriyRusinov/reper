@@ -720,12 +720,30 @@ KKSMap<qint64, KKSEIOData *> KKSConverter :: rubricEntityToData (const KKSLoader
     const KKSFilter * f = new KKSFilter (aid, val, KKSFilter::foInSQL);
     KKSFilterGroup * fg = new KKSFilterGroup (false);
     fg->addFilter (f);
+    f->release ();
+    val->release();
+    for (int i=0; i<rubricB->items().count(); i++)
+    {
+        KKSValue * valItem = new KKSValue (QString::number (rubricB->item(i)->id()), KKSAttrType::atInt64);
+        const KKSFilter * fitem = new KKSFilter (aid, valItem, KKSFilter::foEq);
+        fg->addFilter (fitem);
+        fitem->release();
+        valItem->release();
+    }
     KKSList<const KKSFilterGroup *> filters;
     filters.append (fg);
     fg->release ();
-    f->release ();
     rubricData = loader->loadEIOList (cat, refIO->tableName(), filters, refIO->id() <= _MAX_SYS_IO_ID_ ? true : false);
-    qDebug () << __PRETTY_FUNCTION__ << rubricData.count();
+    int nItems = rubricData.count();
+    qDebug () << __PRETTY_FUNCTION__ << nItems;
+    for (int i=0; i<nItems; i++)
+    {
+        KKSMap<qint64, KKSEIOData *>::const_iterator p = rubricData.constBegin();
+        p += i;
+        KKSRubricItem * rItem = new KKSRubricItem(p.key(), p.value()->fieldValue("name"), true, p.value()->fieldValue("r_icon"));
+        const_cast<KKSRubric *>(rubricB)->addItem (rItem);
+        rItem->release();
+    }
     refRubr->release();
     refIO->release();
 
