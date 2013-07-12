@@ -300,25 +300,6 @@ KKSIncludesWidget * KKSRubricFactory::createModalRubricEditor(int mode, const KK
 
     //QAbstractItemDelegate *iDeleg = tv->itemDelegate ();
     //qDebug () << __PRETTY_FUNCTION__ << iDeleg;
-    /*
-        connect (iW, SIGNAL (saveRubric (KKSRubric *, bool)), this, SLOT (saveRubric (KKSRubric *, bool)) );
-        connect (iW, SIGNAL (rubricItemRequested (bool)), this, SLOT (rubricItemUpload(bool)) );
-        connect (iW, SIGNAL (rubricItemCreationRequested (const KKSRubric *, QAbstractItemModel*, const QModelIndex&)), this, SLOT (rubricItemCreate(const KKSRubric *, QAbstractItemModel *, const QModelIndex&)) );
-        connect (iW, SIGNAL (openRubricItemRequested (int)), this, SLOT (openRubricItem (int)) );
-        connect (iW, SIGNAL (loadStuffModel (RubricForm *)), this, SLOT (loadRubricPrivilegies(RubricForm *)) );
-        connect (iW, SIGNAL (loadSearchtemplate (RubricForm *)), this, SLOT (loadSearchTemplate (RubricForm *)) );
-        connect (iW, SIGNAL (loadCategory (RubricForm *)), this, SLOT (loadCategory (RubricForm *)) );
-        connect (iW, SIGNAL (rubricAttachmentsView (QAbstractItemModel *, const KKSRubric *)), this, SLOT (viewAttachments (QAbstractItemModel *, const KKSRubric *)) );
-        connect (iW, SIGNAL (copyFromRubr(KKSRubric *, QAbstractItemModel *, const QModelIndex&)), this, SLOT (copyFromRubric (KKSRubric *, QAbstractItemModel *, const QModelIndex&)) );
-        connect (iW, SIGNAL (initAttachmentsModel (const KKSRubric *)), this, SLOT (initRubricAttachments (const KKSRubric *)) );
-        connect (iW, SIGNAL (appendRubricItemIntoModel (QAbstractItemModel *, const KKSRubricItem * )), this, SLOT (appendRubricItem (QAbstractItemModel *, const KKSRubricItem *)) );
-        connect (iW, SIGNAL (setSyncIO(const QList<int>&)), this, SLOT (setSyncSettings (const QList<int>&)) );
-        connect (iW, SIGNAL (putIOSIntoRubr (const QList<int>&, const KKSRubric*)), this, SLOT (putIntoRubr (const QList<int>&, const KKSRubric*)) );
-        connect (iW, SIGNAL (sendIOS (const QList<int>&)), this, SLOT (sendDocs (const QList<int>&)) );
-        connect (iW, SIGNAL (setAccessIOS (const QList<int>&)), this, SLOT (setAccessDocs (const QList<int>&)) );
-    
-        connect (this, SIGNAL (rubricAttachments (QAbstractItemModel *)), iW, SLOT (slotInitAttachmentsModel (QAbstractItemModel *)) );
-     */
     return iW;
 }
 

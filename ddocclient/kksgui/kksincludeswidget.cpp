@@ -6,6 +6,7 @@
 #include "KKSRubricModel.h"
 #include "KKSRubricMessageBox.h"
 #include <KKSSearchTemplate.h>
+#include <KKSTemplate.h>
 
 #include "KKSRubric.h"
 #include <KKSCategory.h>
@@ -1053,6 +1054,11 @@ void KKSIncludesWidget :: slotInitAttachmentsModel (QAbstractItemModel * attachM
     if (!attachModel)
         return;
     
+    const KKSTemplate * t = attachModel->data(attachModel->index (0, 0), Qt::UserRole+2).value<const KKSTemplate *>();
+    if (!t)
+        return;
+    QHeaderView * hItems = tvItems->header();
+    tvItems->setSortingEnabled (true);
     if (qobject_cast<QAbstractProxyModel*>(recWItems->getModel()))
     {
         QAbstractProxyModel * proxyModel = qobject_cast<QAbstractProxyModel*>(recWItems->getModel());
@@ -1060,16 +1066,20 @@ void KKSIncludesWidget :: slotInitAttachmentsModel (QAbstractItemModel * attachM
     }
     else
     {
+        hItems->setSortIndicator(0,Qt::AscendingOrder);
         QSortFilterProxyModel * sortModel = new KKSSortFilterProxyModel();
         sortModel->setSourceModel (attachModel);
         recWItems->setEIOModel (sortModel);
+        KKSList<KKSAttrView*> sAttrs = t->sortedAttrs();
+        int na = sAttrs.count();
+        for (int i=0; i<na; i++)
+        {
+            KKSAttrView * av = sAttrs[i];
+            (qobject_cast<KKSSortFilterProxyModel *>(sortModel))->addAttrView (av);
+        }
+        sortModel->sort (hItems->sortIndicatorSection(), hItems->sortIndicatorOrder());
     }
     recWItems->setVisible (true);
-    const KKSTemplate * t = attachModel->data(attachModel->index (0, 0), Qt::UserRole+2).value<const KKSTemplate *>();
-    if (!t)
-        return;
-    QHeaderView * hItems = recWItems->getView()->header();
-    tvItems->setSortingEnabled (true);
     for (int i=0; i<attachModel->columnCount(); i++)
     {
         QSize hSize = attachModel->headerData(i, Qt::Horizontal, Qt::SizeHintRole).toSize();
