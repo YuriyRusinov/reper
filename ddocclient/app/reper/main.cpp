@@ -10,7 +10,10 @@
 #include <qgsproviderregistry.h>
 
 
+/*
 
+ZHUKOV
+*/
 /*
 #include "config.h"
 
