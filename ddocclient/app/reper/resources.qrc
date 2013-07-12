@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="" >
+        <file>./ico/mActionAddLayer.png</file>
+        <file>./ico/mActionPan.png</file>
+        <file>./ico/mActionZoomIn.png</file>
+        <file>./ico/mActionZoomOut.png</file>
+    </qresource>
+</RCC>
