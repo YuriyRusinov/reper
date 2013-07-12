@@ -1,7 +1,7 @@
 
 //#include <QtGui>
 //#include <QApplication>
-
+// hello world
 #include <simple_map_window.h>
 //
 // QGIS Includes
