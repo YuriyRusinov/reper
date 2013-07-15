@@ -2709,7 +2709,7 @@ Do you want to save the changes before closing?</source>
     </message>
     <message>
         <source>...</source>
-        <translation type="unfinished">...</translation>
+        <translation>...</translation>
     </message>
     <message>
         <source>Set life cycle onto category %1</source>
@@ -6645,6 +6645,13 @@ Further work is impossible. You should use equal versions of client and server s
     </message>
 </context>
 <context>
+    <name>MainWindow</name>
+    <message>
+        <source>File</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MassWidget</name>
     <message>
         <source>Mass creation</source>
@@ -8535,6 +8542,45 @@ Please contact your Systems Administrator and report this issue.</source>
     </message>
 </context>
 <context>
+    <name>SimpleMapWindowBase</name>
+    <message>
+        <source>MapWindow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Таблица содержания</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom In</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exit</source>
+        <translation type="unfinished">Выход</translation>
+    </message>
+</context>
+<context>
     <name>StringEdit</name>
     <message>
         <source>Name:</source>
@@ -9490,6 +9536,175 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>dds_HttpWindow</name>
+    <message>
+        <source>DynamicDocs Interactor </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to start the server: %1.</source>
+        <translation type="unfinished">Не могу запустить сервер: %1.</translation>
+    </message>
+    <message>
+        <source>DynamicDocs Interactor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to connect to the database: %1.</source>
+        <translation type="unfinished">Не могу соединиться в БД: %1.</translation>
+    </message>
+    <message>
+        <source>&amp;URL:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please enter the URL for system where you want send datas.</source>
+        <translation type="unfinished">Укажите URL для объекта, на который вы хотите отправить данные.</translation>
+    </message>
+    <message>
+        <source>Send</source>
+        <translation type="unfinished">Отправить как сообщение</translation>
+    </message>
+    <message>
+        <source>Quit</source>
+        <translation type="unfinished">Выход</translation>
+    </message>
+    <message>
+        <source>Sendind data %1.</source>
+        <translation type="unfinished">Передача данных %1.</translation>
+    </message>
+    <message>
+        <source>Data transfer canceled.</source>
+        <translation type="unfinished">Передача данных отменена.</translation>
+    </message>
+    <message>
+        <source>ERROR: Data transfer failed: %1.</source>
+        <translation type="unfinished">ОШИБКА: передача данных завершилась с ошибкой: %1.</translation>
+    </message>
+    <message>
+        <source>Data transfer http %1 complete.</source>
+        <translation type="unfinished">Передача данных завершена успешно (%1).</translation>
+    </message>
+</context>
+<context>
+    <name>dds_TransportSettingsForm</name>
+    <message>
+        <source>Host where dabatabase runs</source>
+        <translation type="unfinished">Хост, на котором запущен сервер БД текущего объекта</translation>
+    </message>
+    <message>
+        <source>Database name</source>
+        <translation type="unfinished">Название  БД</translation>
+    </message>
+    <message>
+        <source>User database name</source>
+        <translation type="unfinished">Пользователь БД</translation>
+    </message>
+    <message>
+        <source>Password user database</source>
+        <translation type="unfinished">Пароль</translation>
+    </message>
+    <message>
+        <source>Port database</source>
+        <translation type="unfinished">Порт</translation>
+    </message>
+    <message>
+        <source>Host where client must connect</source>
+        <translation type="unfinished">Хост, на который требуется передавать данные</translation>
+    </message>
+    <message>
+        <source>Port where client must connect</source>
+        <translation type="unfinished">Порт на этом хосте</translation>
+    </message>
+    <message>
+        <source>Identificator transport in system (for tcp/ip protocol has to be 1, for http-protocol has to be 2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server port number</source>
+        <translation type="unfinished">Порт этого сервера</translation>
+    </message>
+</context>
+<context>
+    <name>dyndoc_synch_form</name>
+    <message>
+        <source>Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start
+synchronization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop
+synchronization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Poll</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display
+log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Implement
+initial
+synchronization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parameters</source>
+        <translation type="unfinished">Параметры</translation>
+    </message>
+    <message>
+        <source>Activity automatically check</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exit</source>
+        <translation type="unfinished">Выход</translation>
+    </message>
+    <message>
+        <source>Organization</source>
+        <translation type="unfinished">Организация</translation>
+    </message>
+    <message>
+        <source>Protocol</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Syncronizer
+activity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Data base
+activity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Initial
+syncronization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transmition</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>edit_file_form</name>
     <message>
         <source>...</source>
@@ -10388,23 +10603,23 @@ p, li { white-space: pre-wrap; }
     </message>
     <message utf8="true">
         <source>Выгрузка файла с сервера в файловую систему клиента</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message utf8="true">
         <source>Открыть файл в предпочитаемом внешнем редакторе</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message utf8="true">
         <source>Удалить файл с сервера</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message utf8="true">
         <source>Выбрать файл из файловой системы</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message utf8="true">
         <source>Добавить в список файлов информационного объекта</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
