@@ -39,7 +39,7 @@ KKSAttrEditor :: KKSAttrEditor (KKSAttribute *attr,
     ui (new Ui::kksattr_editor),
     io (0),
     searchTemplate(NULL),
-    m_recW(NULL)
+    m_recW(new KKSRecWidget(false, this))
 {
     if (attribute)
         attribute->addRef ();
@@ -50,6 +50,9 @@ KKSAttrEditor :: KKSAttrEditor (KKSAttribute *attr,
     QRegExpValidator * vAttrCode = new QRegExpValidator (cRegExp, this);
     ui->lECode->setValidator (vAttrCode);
     ui->leFilter->setReadOnly(true);
+    QGridLayout * gExtLay = new QGridLayout;
+    ui->tabExtended->setLayout (gExtLay);
+    gExtLay->addWidget (m_recW, 0, 0, 1, 1);
 
     if (attribute && attribute->id() >= 0)
     {
@@ -69,7 +72,7 @@ KKSAttrEditor :: KKSAttrEditor (KKSAttribute *attr,
         ui->chManually->setCheckState (Qt::Checked);
         setCodeEnabled (Qt::Checked);
         bool isComplex (attribute->type()->attrType()==KKSAttrType::atComplex);
-        ui->tabExtended->setEnabled (isComplex);
+        ui->attrTabW->setTabEnabled(1, isComplex);
 
 //        ui->pbAddAttrs->setText(tr("Show extended attributes"));
     }

@@ -5821,9 +5821,9 @@ void KKSObjEditorFactory :: sendIO (KKSObject *wObj, KKSObjectExemplar *wObjE, K
     }
 
 
-    QTreeView *tvPos = new QTreeView ();
+    KKSRecWidget *rwDls = new KKSRecWidget (false);
+    QTreeView *tvPos = rwDls->getView();//new QTreeView ();
     tvPos->setSelectionMode (QAbstractItemView::ExtendedSelection);
-    KKSRecWidget *rwDls = new KKSRecWidget (tvPos, false);
     rwDls->hideToolBar (); 
 //    rwDls->hideAllButtons ();
     KKSObject * ioDls = loader->loadIO (IO_POS_ID, true);
@@ -5851,7 +5851,8 @@ void KKSObjEditorFactory :: sendIO (KKSObject *wObj, KKSObjectExemplar *wObjE, K
     tvPos->setItemDelegate (itemDelegD);
     KKSViewFactory::loadEIOEx (0, ioDls, loader, tDls, tvPos, filterGroups, true, 0, QString(), 0, true);
 
-    QTreeView *tvIOs = new QTreeView ();
+    KKSRecWidget *rwIOs = new KKSRecWidget (false);
+    QTreeView *tvIOs = rwIOs->getView();//new QTreeView ();
     tvIOs->setSelectionMode (QAbstractItemView::SingleSelection);
     tvIOs->header()->setClickable (true);
     tvIOs->header()->setSortIndicatorShown (true);
@@ -5859,7 +5860,6 @@ void KKSObjEditorFactory :: sendIO (KKSObject *wObj, KKSObjectExemplar *wObjE, K
     tvIOs->setSortingEnabled (true);
     KKSItemDelegate *itemDelegIO = new KKSItemDelegate ();
     tvIOs->setItemDelegate (itemDelegIO);
-    KKSRecWidget *rwIOs = new KKSRecWidget (tvIOs, false);
     KKSObject * io = loader->loadIO (IO_IO_ID, true);
     if (!io)
     {
@@ -5958,9 +5958,9 @@ void KKSObjEditorFactory :: sendIOList (const QList<int>& idIOList)
 {
     int idUser = loader->getUserId();
 
-    QTreeView *tvPos = new QTreeView ();
+    KKSRecWidget *rwDls = new KKSRecWidget (false);
+    QTreeView *tvPos = rwDls->getView();//new QTreeView ();
     tvPos->setSelectionMode (QAbstractItemView::ExtendedSelection);
-    KKSRecWidget *rwDls = new KKSRecWidget (tvPos, false);
     rwDls->hideToolBar (); 
 //    rwDls->hideAllButtons ();
     KKSObject * ioDls = loader->loadIO (IO_POS_ID, true);
@@ -5988,7 +5988,8 @@ void KKSObjEditorFactory :: sendIOList (const QList<int>& idIOList)
     tvPos->setItemDelegate (itemDelegD);
     KKSViewFactory::loadEIOEx (0, ioDls, loader, tDls, tvPos, filterGroups, true, 0, QString(), 0, true);
 
-    QTreeView *tvIOs = new QTreeView ();
+    KKSRecWidget *rwIOs = new KKSRecWidget (false);
+    QTreeView *tvIOs = rwIOs->getView();//new QTreeView ();
     tvIOs->setSelectionMode (QAbstractItemView::SingleSelection);
     tvIOs->header()->setClickable (true);
     tvIOs->header()->setSortIndicatorShown (true);
@@ -5996,7 +5997,6 @@ void KKSObjEditorFactory :: sendIOList (const QList<int>& idIOList)
     tvIOs->setSortingEnabled (true);
     KKSItemDelegate *itemDelegIO = new KKSItemDelegate ();
     tvIOs->setItemDelegate (itemDelegIO);
-    KKSRecWidget *rwIOs = new KKSRecWidget (tvIOs, false);
     for (int i=0; i<idIOList.count(); i++)
     {
         KKSObject * wObj = loader->loadIO (idIOList[i]);

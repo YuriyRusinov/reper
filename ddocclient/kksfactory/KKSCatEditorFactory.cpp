@@ -662,8 +662,8 @@ KKSRecWidget * KKSCatEditorFactory :: getAttrsWidget (const KKSCategory *cat, bo
         rw = KKSViewFactory :: createCategAttrsView (cat, parent);
     else
     {
-        QTreeView * tvTableAttrs = new QTreeView ();
-        rw = new KKSRecWidget (tvTableAttrs, false); //mode);
+        rw = new KKSRecWidget (false); //mode);
+        QTreeView * tvTableAttrs = rw->getView();//new QTreeView ();
         rw->hideGroup (0);//gbSearch->setVisible (false);
         rw->hideGroup (2);//tbSetView->setVisible (false);
         rw->hideGroup (3);//gbImportExport->setVisible (false);
