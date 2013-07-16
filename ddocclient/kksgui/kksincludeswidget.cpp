@@ -61,8 +61,8 @@ KKSIncludesWidget::KKSIncludesWidget(KKSRubric * rootRubric,
     tBRubrActions (new QToolBar (this)),
     spRubrics (new QSplitter (Qt::Horizontal, this)),
     twIncludes (new QTreeView (spRubrics)),
-    tvItems (new QTreeView ()),
-    recWItems (new KKSRecWidget (tvItems, false, spRubrics)),
+    recWItems (new KKSRecWidget (false, spRubrics)),
+    tvItems (recWItems->getView()),
     pMenu (new QMenu(this))
 {
     //Q_INIT_RESOURCE (kksgui_icon_set);

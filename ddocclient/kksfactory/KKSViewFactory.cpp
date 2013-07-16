@@ -84,7 +84,8 @@ KKSRecWidget * KKSViewFactory :: createView (KKSTemplate* theTemplate,
                                         Qt::WindowFlags f)
 {
 //    KKSView *tv = new KKSView ();
-    QTreeView *tv = new QTreeView ();
+    KKSRecWidget *resWidget = new KKSRecWidget (false, parent, f);
+    QTreeView *tv = resWidget->getView();//new QTreeView ();
     tv->header()->setClickable (true);
     tv->header()->setSortIndicatorShown (true);
     tv->header()->setSortIndicator (0, Qt::AscendingOrder);
@@ -93,7 +94,6 @@ KKSRecWidget * KKSViewFactory :: createView (KKSTemplate* theTemplate,
     itemDeleg->setTemplate (theTemplate);
     //setCategory (theTemplate->category());
     tv->setItemDelegate (itemDeleg);
-    KKSRecWidget *resWidget = new KKSRecWidget (tv, false, parent, f);
     resWidget->showFilter ();
     KKSEventFilter *ef = new KKSEventFilter (resWidget);
     tv->viewport()->installEventFilter (ef);
@@ -1135,14 +1135,14 @@ QAbstractItemModel* KKSViewFactory :: initCategoriesModel (KKSLoader* l, const K
  */
 KKSRecWidget * KKSViewFactory :: createCategoryTemplates (int idCat, KKSLoader *l, QWidget *parent, Qt::WindowFlags f)
 {
-    QTreeView *tv = new QTreeView ();
+    KKSRecWidget *resWidget = new KKSRecWidget (false, parent, f);
+    QTreeView *tv = resWidget->getView();//new QTreeView ();
     if (!tv)
         return 0;
     tv->header()->setClickable (true);
     tv->header()->setSortIndicatorShown (true);
     tv->header()->setSortIndicator (0, Qt::AscendingOrder);
     tv->setSortingEnabled (true);
-    KKSRecWidget *resWidget = new KKSRecWidget (tv, false, parent, f);
     resWidget->hideGroup (0);//gbSearch->setVisible (false);
     resWidget->hideGroup (3);//tbSetView->setVisible (false);
     resWidget->hideGroup (2);//gbImportExport->setVisible (false);
@@ -1288,8 +1288,8 @@ KKSRecWidget * KKSViewFactory :: createCategAttrsView (const KKSCategory *cat,
 {
     if (!cat)
         return 0;
-    QTreeView *tv = new QTreeView ();
-    KKSRecWidget * recWidget = new KKSRecWidget (tv, false, parent, f);
+    KKSRecWidget * recWidget = new KKSRecWidget (false, parent, f);
+    QTreeView *tv = recWidget->getView();//new QTreeView ();
     //
     // QObject::tr("Filter"), QObject::tr("&Add"), QObject::tr ("&Edit"), QObject::tr ("&Delete"), QObject::tr("&Import"), QObject::tr("E&xport"), 
     //
@@ -1338,8 +1338,8 @@ KKSRecWidget * KKSViewFactory :: createAttrAttrsView (const KKSAttribute *a,
     if (!a)
         return 0;
     
-    QTreeView *tv = new QTreeView ();
-    KKSRecWidget * recWidget = new KKSRecWidget (tv, mode, parent, f);
+    KKSRecWidget * recWidget = new KKSRecWidget (mode, parent, f);
+    QTreeView *tv = recWidget->getView();//new QTreeView ();
 
     recWidget->hideGroup (0);//gbSearch->setVisible (false);
     recWidget->hideGroup (2);//tbSetView->setVisible (false);
@@ -1537,7 +1537,8 @@ KKSAttributesEditor * KKSViewFactory :: createAttrView (KKSLoader *l,
         return 0;
     }
 
-    QTreeView *tvAttrs = new QTreeView ();
+    KKSRecWidget *recW = new KKSRecWidget (mode, aEditor);
+    QTreeView *tvAttrs = recW->getView();//new QTreeView ();
     tvAttrs->header()->setClickable (true);
     tvAttrs->header()->setSortIndicatorShown (true);
     tvAttrs->header()->setSortIndicator (0, Qt::AscendingOrder);
@@ -1546,7 +1547,6 @@ KKSAttributesEditor * KKSViewFactory :: createAttrView (KKSLoader *l,
     tvAttrs->setDragDropMode (QAbstractItemView::DragOnly);
     tvAttrs->setDropIndicatorShown (true);
 
-    KKSRecWidget *recW = new KKSRecWidget (tvAttrs, mode, aEditor);
     aEditor->setRecordsWidget (recW);
     recW->hideGroup (3);//setVisible (false);
     recW->pbApply->setVisible (false);
@@ -1778,8 +1778,8 @@ KKSAttributesEditor * KKSViewFactory :: createAvailAttrView (const KKSMap<int, K
 {
     KKSAttributesEditor *aEditor = new KKSAttributesEditor ( parent, f);
 
-    QTreeView *tvAttrs = new QTreeView ();
-    KKSRecWidget *recW = new KKSRecWidget (tvAttrs, true, aEditor);
+    KKSRecWidget *recW = new KKSRecWidget (true, aEditor);
+    QTreeView *tvAttrs = recW->getView();//new QTreeView ();
     aEditor->setRecordsWidget (recW);
     recW->pbApply->setVisible (false);
     for (int i=0; i<=3; i++)
@@ -2037,14 +2037,14 @@ KKSRecWidget * KKSViewFactory :: createAdditionalView (KKSTemplate *t,
                                                        QWidget *parent,
                                                        Qt::WindowFlags f)
 {
-    QTreeView *tv = new QTreeView ();
+    KKSRecWidget *resWidget = new KKSRecWidget (false, parent, f);
+    QTreeView *tv = resWidget->getView();//new QTreeView ();
     tv->header()->setClickable (true);
     tv->header()->setSortIndicatorShown (true);
     tv->header()->setSortIndicator (0, Qt::AscendingOrder);
     tv->setSortingEnabled (true);
     KKSItemDelegate *itemDeleg = new KKSItemDelegate (tv);
     tv->setItemDelegate (itemDeleg);
-    KKSRecWidget *resWidget = new KKSRecWidget (tv, false, parent, f);
     KKSEventFilter *ef = new KKSEventFilter (resWidget);
     tv->viewport()->installEventFilter (ef);
     if (tv->selectionModel())

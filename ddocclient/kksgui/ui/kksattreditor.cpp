@@ -68,14 +68,16 @@ KKSAttrEditor :: KKSAttrEditor (KKSAttribute *attr,
         }
         ui->chManually->setCheckState (Qt::Checked);
         setCodeEnabled (Qt::Checked);
+        bool isComplex (attribute->type()->attrType()==KKSAttrType::atComplex);
+        ui->tabExtended->setEnabled (isComplex);
 
-        ui->pbAddAttrs->setText(tr("Show extended attributes"));
+//        ui->pbAddAttrs->setText(tr("Show extended attributes"));
     }
     else
     {
         ui->lEDefWidth->setText (QString::number (100));
         setCodeEnabled (Qt::Unchecked);
-        ui->pbAddAttrs->setText(tr("Add extended attributes"));
+//        ui->pbAddAttrs->setText(tr("Add extended attributes"));
     }
 
     QIntValidator *vDefWidthVal = new QIntValidator (0, 300, this);
@@ -87,7 +89,7 @@ KKSAttrEditor :: KKSAttrEditor (KKSAttribute *attr,
     connect (ui->chManually, SIGNAL (stateChanged (int)), this, SLOT (setCodeEnabled (int)) );
     connect (ui->tbAddFilter, SIGNAL (clicked()), this, SLOT (slotAddFilterClicked()) );
     connect (ui->tbDelFilter, SIGNAL (clicked()), this, SLOT (slotDelFilterClicked()) );
-    connect (ui->pbAddAttrs, SIGNAL(clicked()), this, SLOT(addAttrs()));
+//    connect (ui->pbAddAttrs, SIGNAL(clicked()), this, SLOT(addAttrs()));
     
     cRefTypes << KKSAttrType::atList 
               << KKSAttrType::atParent 

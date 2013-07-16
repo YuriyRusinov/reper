@@ -687,8 +687,8 @@ KKSRecWidget * KKSCatEditorFactory :: getTemplateWidget (const KKSCategory * cat
         rtw = KKSViewFactory :: createCategoryTemplates (cat->id (), loader, parent);
     else
     {
-        QTreeView * tvTableTempl = new QTreeView ();
-        rtw = new KKSRecWidget (tvTableTempl, mode);
+        rtw = new KKSRecWidget (mode);
+        QTreeView * tvTableTempl = rtw->getView();
         tvTableTempl->header()->setClickable (true);
         tvTableTempl->header()->setSortIndicatorShown (true);
         tvTableTempl->header()->setSortIndicator (0, Qt::AscendingOrder);

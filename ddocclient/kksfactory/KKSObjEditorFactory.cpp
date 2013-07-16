@@ -4046,7 +4046,7 @@ void KKSObjEditorFactory :: setEIOTemplates (KKSObjEditor* editor, KKSObject* wO
         return;
     editor->setRecTemplate (tRef);
     KKSList<const KKSFilterGroup*> filters = editor->m_filters;
-    KKSViewFactory::loadEIOEx (editor, wObj, loader, tRef, editor->recWidget->tv, filters, true);
+    KKSViewFactory::loadEIOEx (editor, wObj, loader, tRef, editor->recWidget->getView(), filters, true);
     tRef->release ();
     editor->update ();
 }

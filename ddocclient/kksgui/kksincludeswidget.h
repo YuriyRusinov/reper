@@ -145,8 +145,8 @@ private:
     QToolBar * tBRubrActions;
     QSplitter * spRubrics;
     QTreeView * twIncludes;
-    QTreeView * tvItems;
     KKSRecWidget * recWItems;
+    QTreeView * tvItems;
     QMenu * pMenu;
 
 private:

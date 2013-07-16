@@ -2220,8 +2220,8 @@ void KKSAttributesFactory :: showAttrsWidget (KKSAttribute *a, KKSAttrEditor *pa
     }
     else
     {
-        QTreeView * tvTableAttrs = new QTreeView ();
-        rw = new KKSRecWidget (tvTableAttrs, true, parent, parent->windowFlags());
+        rw = new KKSRecWidget (true, parent, parent->windowFlags());
+        QTreeView * tvTableAttrs = rw->getView();//new QTreeView ();
         rw->hideGroup (0);//gbSearch->setVisible (false);
         rw->hideGroup (2);//tbSetView->setVisible (false);
         rw->hideGroup (3);//gbImportExport->setVisible (false);

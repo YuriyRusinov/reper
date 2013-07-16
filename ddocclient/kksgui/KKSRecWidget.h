@@ -35,7 +35,7 @@ class KKSAttribute;
 class _GUI_EXPORT KKSRecWidget : public QWidget
 {
 public:
-    KKSRecWidget (QTreeView *tView, bool mode=false, QWidget *parent=0, Qt::WindowFlags f=0);
+    KKSRecWidget (bool mode=false, QWidget *parent=0, Qt::WindowFlags f=0);
     //KKSRecWidget (const QString& filterTitle, const QString& addTitle, const QString& editTitle, const QString& delTitle, const QString& importTitle, const QString& exportTitle, QTreeView *tView, bool mode=false, QWidget *parent=0, Qt::WindowFlags f=0);
     ~KKSRecWidget (void);
 
@@ -123,7 +123,7 @@ private:
     friend class KKSViewFactory;
     friend class KKSObjEditorFactory;
 
-    QTreeView * tv;
+    QTreeView * tView;
     QToolBar * tBActions;
     QMenu * pMenu;
     QMenu * pGroupBy;

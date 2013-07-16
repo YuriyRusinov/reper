@@ -30,9 +30,9 @@
 #include "KKSEIODataModel.h"
 #include "KKSRecWidget.h"
 
-KKSRecWidget :: KKSRecWidget (QTreeView *tView, bool mode, QWidget *parent, Qt::WindowFlags f)
+KKSRecWidget :: KKSRecWidget (bool mode, QWidget *parent, Qt::WindowFlags f)
     : QWidget (parent, f),
-    tv (tView),
+    tView (new QTreeView(this)),
     tBActions (new QToolBar(this)),
     pMenu (new QMenu(this)),
     pGroupBy (new QMenu (tr("Group &By ..."), this)),
@@ -56,7 +56,6 @@ KKSRecWidget :: KKSRecWidget (QTreeView *tView, bool mode, QWidget *parent, Qt::
     pbApply (new QPushButton (tr("A&pply"), this)),
     actSetView (new QAction (QIcon(":/ddoc/apply_template.png"), tr("Apply template"), this))
 {
-    tView->setParent (this);
     tView->setSelectionBehavior (QAbstractItemView::SelectRows);
     //Q_INIT_RESOURCE (kksgui_icon_set);
     this->init_widgets (mode);
@@ -76,7 +75,7 @@ KKSRecWidget :: KKSRecWidget (QTreeView *tView, bool mode, QWidget *parent, Qt::
 /*
 KKSRecWidget :: KKSRecWidget (const QString& filterTitle, const QString& addTitle, const QString& editTitle, const QString& delTitle, const QString& importTitle, const QString& exportTitle, QTreeView *tView, bool mode, QWidget *parent, Qt::WindowFlags f)
     : QWidget (parent, f),
-    tv (tView),
+    tView (tView),
     tBActions (new QToolBar(this)),
 //    tbFilter (new QToolButton (this)),//(tr("&Filter"))),
     actFilter (new QAction (QIcon(), tr("&Filter"), this)),
@@ -136,10 +135,10 @@ void KKSRecWidget :: showFilter (void)
 
 qint64 KKSRecWidget :: getID (void) const
 {
-    if (!tv || !tv->model() || !tv->selectionModel())
+    if (!tView || !tView->model() || !tView->selectionModel())
         return -1;
 
-    QItemSelectionModel *selModel = tv->selectionModel ();
+    QItemSelectionModel *selModel = tView->selectionModel ();
     int row = selModel->currentIndex ().row();
 
     QModelIndex wIndex = selModel->currentIndex ().sibling(row, 0);
@@ -163,8 +162,8 @@ void KKSRecWidget :: tvDoubleClicked(const QModelIndex & index)
 
 void KKSRecWidget :: setEIOModel (QAbstractItemModel *model)
 {
-    QAbstractItemModel *oldModel = tv->model ();
-    tv->setModel (model);
+    QAbstractItemModel *oldModel = tView->model ();
+    tView->setModel (model);
     if (oldModel && oldModel != model)
         delete oldModel;
 }
@@ -172,10 +171,10 @@ void KKSRecWidget :: setEIOModel (QAbstractItemModel *model)
 void KKSRecWidget :: init_widgets (bool mode)
 {
     gLay = new QGridLayout (this);
-    if (!tv)
+    if (!tView)
         return;
     gLay->addWidget (tBActions, 0, 0, 1, 1);
-    gLay->addWidget (tv, 2, 0, 1, 1);
+    gLay->addWidget (tView, 2, 0, 1, 1);
 
     QVBoxLayout * vButtonsLayout = new QVBoxLayout();
     vButtonsLayout->addStretch ();
@@ -279,22 +278,22 @@ void KKSRecWidget :: showToolBar (void)
 
 void KKSRecWidget :: resizeSections (const QList<int>& hAttrWidths)
 {
-    if (!tv)
+    if (!tView)
         return;
 
-    QAbstractItemModel * model = tv->model();
+    QAbstractItemModel * model = tView->model();
     if(!model)
         return;
 
     int nCols = qMin (model->columnCount (), hAttrWidths.count());
 //    qDebug () << __PRETTY_FUNCTION__ << nCols << model->columnCount();
     for (int i=0; i<nCols; i++)
-        tv->header ()->resizeSection (i, hAttrWidths[i]);
+        tView->header ()->resizeSection (i, hAttrWidths[i]);
 }
 
 QAbstractItemModel *KKSRecWidget :: getModel (void) const
 {
-    return (tv ? this->tv->model () : 0);
+    return (tView ? this->tView->model () : 0);
 }
 
 QAbstractItemModel * KKSRecWidget :: getSourceModel (void) const
@@ -308,7 +307,7 @@ QAbstractItemModel * KKSRecWidget :: getSourceModel (void) const
 
 QModelIndex KKSRecWidget :: getCurrentIndex (void) const
 {
-    return this->tv->selectionModel()->currentIndex ();;
+    return this->tView->selectionModel()->currentIndex ();;
 }
 
 QModelIndex KKSRecWidget :: getSourceIndex (void) const
@@ -326,7 +325,7 @@ QModelIndex KKSRecWidget :: getSourceIndex (void) const
 
 QModelIndexList KKSRecWidget :: getSourceIndexes (void) const
 {
-    QModelIndexList selIndexes = this->tv->selectionModel()->selectedIndexes ();
+    QModelIndexList selIndexes = this->tView->selectionModel()->selectedIndexes ();
     QModelIndexList selSourceIndexes;
     for (int i=0; i<selIndexes.count(); i++)
     {
@@ -344,7 +343,7 @@ QModelIndexList KKSRecWidget :: getSourceIndexes (void) const
 
 QItemSelection KKSRecWidget :: getSourceSelection (void) const
 {
-    QItemSelection sel = this->tv->selectionModel()->selection ();
+    QItemSelection sel = this->tView->selectionModel()->selection ();
     QItemSelection sourceSel (sel);
     QAbstractItemModel * mod = getModel ();
     while (qobject_cast<QAbstractProxyModel *>(mod))
@@ -357,12 +356,12 @@ QItemSelection KKSRecWidget :: getSourceSelection (void) const
 
 QItemSelectionModel *KKSRecWidget :: getSelectionModel (void) const
 {
-    return this->tv->selectionModel ();
+    return this->tView->selectionModel ();
 }
 
 QTreeView * KKSRecWidget :: getView (void) const
 {
-    return this->tv;
+    return this->tView;
 }
 
 void KKSRecWidget :: hideGroup (int num_gr)
@@ -430,13 +429,13 @@ void KKSRecWidget :: showGroup (int num_gr)
 
 QAbstractItemDelegate * KKSRecWidget :: getItemDelegate () const
 {
-    return tv->itemDelegate();
+    return tView->itemDelegate();
 }
 
 void KKSRecWidget :: setItemDelegate (QAbstractItemDelegate * deleg)
 {
-    QAbstractItemDelegate * oldDeleg = tv->itemDelegate();
-    tv->setItemDelegate (deleg);
+    QAbstractItemDelegate * oldDeleg = tView->itemDelegate();
+    tView->setItemDelegate (deleg);
     if (oldDeleg && oldDeleg != deleg)
     {
         oldDeleg->setParent (0);
@@ -510,13 +509,13 @@ void KKSRecWidget :: refreshRec (void)
 
 void KKSRecWidget :: setRecContextMenuPolicy (Qt::ContextMenuPolicy policy)
 {
-    tv->setContextMenuPolicy (policy);
+    tView->setContextMenuPolicy (policy);
 }
 
 void KKSRecWidget :: contextMenuEvent (QContextMenuEvent * event)
 {
-    //qDebug () << __PRETTY_FUNCTION__ << event->pos() << event->globalPos() << childAt (event->pos()) << tv;
-    if (this->tBActions->isVisible() && this->childAt(event->pos()) == tv->viewport())
+    //qDebug () << __PRETTY_FUNCTION__ << event->pos() << event->globalPos() << childAt (event->pos()) << tView;
+    if (this->tBActions->isVisible() && this->childAt(event->pos()) == tView->viewport())
     {
         pMenu->exec (event->globalPos());
         event->accept();
@@ -527,7 +526,7 @@ void KKSRecWidget :: contextMenuEvent (QContextMenuEvent * event)
 
 void KKSRecWidget :: hideRecord (void)
 {
-    QItemSelection sel = tv->selectionModel()->selection();
+    QItemSelection sel = tView->selectionModel()->selection();
     if (sel.indexes().isEmpty())
         return;
     qDebug () << __PRETTY_FUNCTION__;
@@ -542,11 +541,11 @@ void KKSRecWidget :: hideRecord (void)
     qobject_cast<KKSEIODataModel *>(sModel)->setupData(rItem);
 /* 
     setVisibleFrom (wIndex, false);
-    tv->update ();
-    QHeaderView * h = tv->header();
+    tView->update ();
+    QHeaderView * h = tView->header();
     int sortSection = h->sortIndicatorSection();
     Qt::SortOrder sOrder = h->sortIndicatorOrder();
-    QSortFilterProxyModel * mod = qobject_cast<QSortFilterProxyModel *> (tv->model ());
+    QSortFilterProxyModel * mod = qobject_cast<QSortFilterProxyModel *> (tView->model ());
     if (mod)
         mod->sort (sortSection, sOrder);
     QAbstractProxyModel * sortSourceModel = qobject_cast<QAbstractProxyModel *>(getModel());
@@ -575,7 +574,7 @@ void KKSRecWidget :: viewAllRecs (void)
 void KKSRecWidget :: viewRecsFromHere (void)
 {
 //    setVisibleFrom (QModelIndex(), false);
-    QItemSelection sel = tv->selectionModel()->selection();
+    QItemSelection sel = tView->selectionModel()->selection();
     if (sel.indexes().isEmpty())
         return;
     qDebug () << __PRETTY_FUNCTION__;
