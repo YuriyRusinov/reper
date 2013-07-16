@@ -27,7 +27,6 @@
 \i ./functions/indicators/readd_indicators.sql
 
 \i ./functions/jms_messages/readd_jms_messages.sql
-\i ./functions/salerik/readd_salerik.sql
 
 --\i ./functions/commands/readd_commands.sql
 

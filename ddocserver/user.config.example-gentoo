@@ -56,7 +56,6 @@ IS_MAIN_ORG=1
 #ORG_NAME="The Organization"
 
 #set to 0 if you do not want install any extended modules
-#currently there are only LessonScheduler module (ESSR Server)
 #on default the module will be installed
 USE_MODULES=1
 #end of user defined parameters
