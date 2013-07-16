@@ -5,3 +5,4 @@
 \i ./functions/tasks/salerik/add_module.sql
 
 \i ./functions/tasks/salerik/sd_ioseticon.sql
+\i ./functions/tasks/salerik/sd_ioupdateattr.sql
