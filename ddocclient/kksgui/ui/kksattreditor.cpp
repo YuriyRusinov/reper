@@ -23,6 +23,7 @@
 #include <KKSObject.h>
 #include <KKSRecWidget.h>
 #include <KKSSearchTemplate.h>
+#include "KKSAttrModel.h"
 #include "kksattreditor.h"
 #include "ui_kksattr_editor.h"
 
@@ -54,6 +55,7 @@ KKSAttrEditor :: KKSAttrEditor (KKSAttribute *attr,
     ui->tabExtended->setLayout (gExtLay);
     gExtLay->addWidget (m_recW, 0, 0, 1, 1);
     m_recW->hideGroup(0);
+    m_recW->hideFilter();
     for (int i=2; i<=3; i++)
         m_recW->hideGroup(i);
 
@@ -76,6 +78,11 @@ KKSAttrEditor :: KKSAttrEditor (KKSAttribute *attr,
         setCodeEnabled (Qt::Checked);
         bool isComplex (attribute->type()->attrType()==KKSAttrType::atComplex);
         ui->attrTabW->setTabEnabled(1, isComplex);
+        if (isComplex)
+        {
+            QAbstractItemModel * attrModel = new KKSAttrModel (attribute);
+            m_recW->setEIOModel (attrModel);
+        }
 
 //        ui->pbAddAttrs->setText(tr("Show extended attributes"));
     }

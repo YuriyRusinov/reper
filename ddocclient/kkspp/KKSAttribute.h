@@ -177,7 +177,7 @@ inline bool compareCategoryAttrs(KKSCategoryAttr * item1, KKSCategoryAttr * item
 }
 
 
-Q_DECLARE_METATYPE (KKSCategoryAttr);
+Q_DECLARE_METATYPE (KKSCategoryAttr *);
 Q_DECLARE_METATYPE (const KKSCategoryAttr *);
 
 Q_DECLARE_METATYPE (KKSAGroup*);

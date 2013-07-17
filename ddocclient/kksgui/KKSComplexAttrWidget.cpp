@@ -23,8 +23,9 @@ KKSComplexAttrWidget :: KKSComplexAttrWidget (const KKSAttrValue *attr,
     : QWidget (parent ,flags), 
       KKSAttrWidget(attr, isSys),
       //m_awf(a),
-      m_objEditor(objEditor),
-      m_gAttrLay (new QGridLayout())
+      m_gAttrLay (new QGridLayout()),
+      m_groupBox (new QGroupBox(this)),
+      m_objEditor(objEditor)
 {
     this->setLayout (m_gAttrLay);
     m_gAttrLay->setContentsMargins (0, 0, 0, 0);
@@ -36,7 +37,7 @@ KKSComplexAttrWidget :: KKSComplexAttrWidget (const KKSAttrValue *attr,
     QPalette p(b, w);
     this->setPalette(p);
 */
-    m_groupBox = new QGroupBox(this);
+    //m_groupBox = new QGroupBox(this);
     m_groupBox->setTitle(m_av->attribute()->title() + tr(" (complex attribute)"));
     m_groupBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     QGridLayout * g = new QGridLayout();

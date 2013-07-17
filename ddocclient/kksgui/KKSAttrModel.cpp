@@ -8,6 +8,10 @@
 #include <KKSAttribute.h>
 #include "KKSAttrModel.h"
 
+/*
+ * Конструктор создает модель сложного атрибута для визуального отображения
+ * в подходящем виджете, наследующем QAbstractItemView *
+ */
 KKSAttrModel::KKSAttrModel(const KKSAttribute * _attr, QObject *parent) 
     : QAbstractItemModel (parent),
     attr (_attr)
@@ -23,7 +27,7 @@ int KKSAttrModel::columnCount (const QModelIndex& /*parent*/) const
     return 4;
 }
 
-int KKSAttrModel::rowCount (const QModelIndex& parent) const
+int KKSAttrModel::rowCount (const QModelIndex& /*parent*/) const
 {
     if (!attr)
         return 0;
@@ -40,6 +44,8 @@ QModelIndex KKSAttrModel::index (int row, int column, const QModelIndex& parent)
         return QModelIndex();
 
     const KKSMap<int, KKSCategoryAttr *> cAttrs = attr->attrs();
+    if (row >= cAttrs.count())
+        return QModelIndex();
     const KKSMap<int, KKSCategoryAttr *>::const_iterator pc = cAttrs.constBegin()+row;
     if (pc != cAttrs.constEnd())
         return createIndex (row, column, pc.value());
@@ -68,8 +74,12 @@ QVariant KKSAttrModel::data (const QModelIndex& index, int role) const
     if (role == Qt::UserRole+2)
         return QVariant::fromValue<const KKSAttribute *>(attr);
 
+    if (!index.isValid())
+        return QVariant();
     int irow = index.row();
     const KKSMap<int, KKSCategoryAttr *> cAttrs = attr->attrs();
+    if (irow >= cAttrs.count())
+        return QVariant();
     const KKSMap<int, KKSCategoryAttr *>::const_iterator pc = cAttrs.constBegin()+irow;
     
     if (pc==cAttrs.constEnd())
@@ -77,6 +87,23 @@ QVariant KKSAttrModel::data (const QModelIndex& index, int role) const
 
     if (role == Qt::UserRole)
         return pc.key();
+
+    if (role == Qt::UserRole+1)
+        return QVariant::fromValue<KKSCategoryAttr *>(pc.value());
+
+    KKSCategoryAttr * cAttr (pc.value());
+    if (role == Qt::DisplayRole)
+    {
+        int iCol = index.column();
+        switch (iCol)
+        {
+            case 0: return QString::number (pc.key()); break;
+            case 1: return cAttr->name(); break;
+            case 2: return (cAttr->isMandatory() ? tr("Mandatory") : QString()); break;
+            case 3: return (cAttr->isReadOnly() ? tr("Read only") : QString()); break;
+            default: return QVariant(); break;
+        }
+    }
     
     return QVariant();
 }
