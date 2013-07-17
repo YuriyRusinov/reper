@@ -27,16 +27,16 @@ int KKSAttrModel::columnCount (const QModelIndex& /*parent*/) const
     return 4;
 }
 
-int KKSAttrModel::rowCount (const QModelIndex& /*parent*/) const
+int KKSAttrModel::rowCount (const QModelIndex& parent) const
 {
-    if (!attr)
+    if (!attr || parent.isValid())
         return 0;
     return attr->attrs().count();
 }
 
 QModelIndex KKSAttrModel::index (int row, int column, const QModelIndex& parent) const
 {
-    if (!attr || !hasIndex (row, column, parent))
+    if (!attr || parent.isValid() || !hasIndex (row, column, parent))
         return QModelIndex ();
 
     //qDebug () << __PRETTY_FUNCTION__ << row << parent;
@@ -53,7 +53,7 @@ QModelIndex KKSAttrModel::index (int row, int column, const QModelIndex& parent)
         return QModelIndex();
 }
 
-QModelIndex KKSAttrModel::parent (const QModelIndex& /*index*/) const
+QModelIndex KKSAttrModel::parent (const QModelIndex& index) const
 {
     return QModelIndex();
 }
