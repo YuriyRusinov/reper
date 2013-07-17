@@ -88,6 +88,7 @@ HEADERS += \
                 KKSRubricModel.h \
                 KKSRubricMessageBox.h \
                 KKSSearchTemplateDialog.h \
+                KKSAttrModel.h \
 	   	kksgui_config.h
 
 SOURCES += \
@@ -178,7 +179,8 @@ SOURCES += \
                 KKSRubricTreeItem.cpp \
                 KKSRubricModel.cpp \
                 KKSRubricMessageBox.cpp \
-                KKSSearchTemplateDialog.cpp
+                KKSSearchTemplateDialog.cpp \
+                KKSAttrModel.cpp
 
 FORMS   += \
                 ui/cmd_journal_form.ui \
@@ -293,4 +295,5 @@ headers.files += \
                 KKSRubricModel.h \
                 KKSRubricMessageBox.h \
                 KKSSearchTemplateDialog.h \
+                KKSAttrModel.h \
                 kksgui_config.h 

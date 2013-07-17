@@ -53,6 +53,9 @@ KKSAttrEditor :: KKSAttrEditor (KKSAttribute *attr,
     QGridLayout * gExtLay = new QGridLayout;
     ui->tabExtended->setLayout (gExtLay);
     gExtLay->addWidget (m_recW, 0, 0, 1, 1);
+    m_recW->hideGroup(0);
+    for (int i=2; i<=3; i++)
+        m_recW->hideGroup(i);
 
     if (attribute && attribute->id() >= 0)
     {
@@ -235,6 +238,9 @@ void KKSAttrEditor :: currentAttrTypeChanged (int index)
         }
     }
     //--ksa
+    bool isComplex (cType==KKSAttrType::atComplex);
+    ui->attrTabW->setTabEnabled(1, isComplex);
+
 }
 
 void KKSAttrEditor :: init_widgets (void)

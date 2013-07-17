@@ -108,6 +108,7 @@ private:
     bool m_attrsLoaded;
 };
 
+Q_DECLARE_METATYPE (const KKSAttribute *);
 
 class _PP_EXPORT KKSCategoryAttr : public KKSAttribute
 {
