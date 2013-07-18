@@ -1682,7 +1682,7 @@ void KKSViewFactory :: filterAttributesModel (KKSLoader *l, const KKSList<const 
 
 void KKSViewFactory :: parseAttrGroup (KKSLoader *l, const KKSAGroup* aGroup, const KKSList<const KKSFilterGroup *> & filters, QAbstractItemModel * aModel, const QModelIndex& parent)
 {
-    Q_UNUSED (filters);
+    //Q_UNUSED (filters);
     if (!l || !aGroup || !aModel)
         return;
 
@@ -1720,7 +1720,7 @@ void KKSViewFactory :: parseAttrGroup (KKSLoader *l, const KKSAGroup* aGroup, co
         aModel->setData (wIndex, p.key(), Qt::UserRole);
         aModel->setData (wIndex, p.value()->name(), Qt::DisplayRole);
         aModel->setData (wIndex, 0, Qt::UserRole+USER_ENTITY);
-        parseAttrGroup (l, p.value(), KKSList<const KKSFilterGroup *>(), aModel, wIndex);
+        parseAttrGroup (l, p.value(), filters/*KKSList<const KKSFilterGroup *>()*/, aModel, wIndex);
         i++;
     }
     //int nAttrs = aGroup->getAttributes().count();

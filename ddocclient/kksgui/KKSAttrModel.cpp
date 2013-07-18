@@ -53,7 +53,7 @@ QModelIndex KKSAttrModel::index (int row, int column, const QModelIndex& parent)
         return QModelIndex();
 }
 
-QModelIndex KKSAttrModel::parent (const QModelIndex& index) const
+QModelIndex KKSAttrModel::parent (const QModelIndex& /*index*/) const
 {
     return QModelIndex();
 }
@@ -133,14 +133,22 @@ QVariant KKSAttrModel::headerData (int section, Qt::Orientation orientation, int
 
 bool KKSAttrModel::insertRows (int row, int count, const QModelIndex& parent )
 {
-    Q_UNUSED (row);
-    Q_UNUSED (count);
-    Q_UNUSED (parent);
-    return false;
+    if (parent.isValid())
+        return false;
+    bool ok (true);
+    this->beginInsertRows(parent,row,row+count-1);
+    KKSMap<int, KKSCategoryAttr*> cAttrs=attr->attrs();
+    for (int i=0; i<count; i++)
+        cAttrs.insert(-1-i, 0);
+    (const_cast<KKSAttribute *>(attr))->setAttrs(cAttrs);
+    endInsertRows ();
+    return ok;
 }
 
 bool KKSAttrModel::removeRows (int row, int count, const QModelIndex& parent )
 {
+    if (parent.isValid())
+        return false;
     Q_UNUSED (row);
     Q_UNUSED (count);
     Q_UNUSED (parent);

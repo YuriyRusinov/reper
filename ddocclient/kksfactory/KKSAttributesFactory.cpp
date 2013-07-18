@@ -2384,7 +2384,57 @@ void KKSAttributesFactory :: addComplexAttr (KKSAttribute *a, QAbstractItemModel
     if (!a || !attrModel)
         return;
     qDebug () << __PRETTY_FUNCTION__ << a->id() << a->name() << a->title();
-    Q_UNUSED (editor);
+    KKSList<const KKSFilterGroup*> filters;
+    KKSObject * refAttrs = loader->loadIO(IO_ATTR_ID, true);
+    if (!refAttrs)
+        return;
+    KKSCategory * catAttr = refAttrs->category();
+    if (!catAttr || !catAttr->tableCategory())
+    {
+        refAttrs->release();
+        return;
+    }
+    catAttr = catAttr->tableCategory();
+    QStringList filtValues;
+    filtValues << QString::number(KKSAttrType::atParent);
+    filtValues << QString::number(KKSAttrType::atCheckListEx);
+    filtValues << QString::number(KKSAttrType::atRecordColor);
+    filtValues << QString::number(KKSAttrType::atRecordColorRef);
+    filtValues << QString::number(KKSAttrType::atRecordTextColor);
+    filtValues << QString::number(KKSAttrType::atRecordTextColorRef);
+    filtValues << QString::number(KKSAttrType::atComplex);
+    const KKSFilter * f = catAttr->createFilter(1,filtValues,KKSFilter::foNotIn);
+    KKSList<const KKSFilter*> filts;
+    filts.append (f);
+    KKSFilterGroup * fg = new KKSFilterGroup (true);
+    fg->setFilters(filts);
+    filters.append(fg);
+    fg->release();
+    KKSAttributesEditor * aListEditor = this->viewAttributes(filters, true, editor);
+    if (aListEditor->exec() == QDialog::Accepted)
+    {
+        QList<int> attrsId = aListEditor->getAttributesId();
+        if (attrsId.isEmpty())
+        {
+            refAttrs->release();
+            return;
+        }
+        int nAttrs = attrsId.count();
+        KKSCategoryAttr::initDefIdRow();
+        KKSMap<int, KKSCategoryAttr*> cAttrList = a->attrs();
+        int nr = attrModel->rowCount();
+        attrModel->insertRows(nr, nAttrs);
+        for (int i=0; i<nAttrs; i++)
+        {
+            KKSAttribute * attr = loader->loadAttribute(attrsId[i]);
+            KKSCategoryAttr * cAttr = KKSCategoryAttr::create(attr,false,false);
+            int a_key = KKSCategoryAttr::getDefIdRow();
+            cAttrList.insert(a_key, cAttr);
+            KKSCategoryAttr::decDefIdRow();
+        }
+        a->setAttrs(cAttrList);
+    }
+    refAttrs->release();
 }
 
 void KKSAttributesFactory :: editComplexAttr (int id, KKSAttribute *a, QAbstractItemModel * attrModel, KKSAttrEditor *editor)
