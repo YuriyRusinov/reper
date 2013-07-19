@@ -142,6 +142,7 @@ void KKSSearchTemplatesForm :: addCopySearchTemplate (void)
     QModelIndex wIndex = getCurrentIndex ();
     if (!wIndex.isValid())
     {
+        qWarning() << tr ("Select search template for copy");
         QMessageBox::warning (this, tr ("Search templates"), tr ("Select search template for copy"), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
@@ -154,6 +155,7 @@ void KKSSearchTemplatesForm :: editSearchTemplate (void)
     QModelIndex wIndex = getCurrentIndex ();
     if (!wIndex.isValid())
     {
+        qWarning() << tr ("Select search template for edit");
         QMessageBox::warning (this, tr ("Search templates"), tr ("Select search template for edit"), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
@@ -280,6 +282,7 @@ void KKSSearchTemplatesForm :: delSearchTemplateType (void)
         return;
     if (mod->rowCount (wIndex) > 0)
     {
+        qWarning() << tr ("Cannot delete type %1, it is not empty").arg (wIndex.data(Qt::DisplayRole).toString());
         QMessageBox::warning (this, tr ("Delete search template type"), tr ("Cannot delete type %1, it is not empty").arg (wIndex.data(Qt::DisplayRole).toString(), QMessageBox::Ok));
         return;
     }

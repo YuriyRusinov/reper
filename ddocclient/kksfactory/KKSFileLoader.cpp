@@ -620,8 +620,10 @@ int KKSFileLoader::rWriteFile( int idUrl,
                                             QMessageBox::Yes);
             if(yes == QMessageBox::Yes){
                 int ok = rRemoveUrl(idUrl);
-                if(ok <= 0)
-                    QMessageBox::warning(pImportD, QObject::tr("Error"), QObject::tr("Cannot delete uploaded part of file"));
+                if(ok <= 0){
+                    qCritical() << QObject::tr("Cannot delete uploaded part of file");
+                    QMessageBox::critical(pImportD, QObject::tr("Error"), QObject::tr("Cannot delete uploaded part of file"));
+                }
             }
 
             pImportD->hide ();

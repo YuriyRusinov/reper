@@ -227,7 +227,8 @@ void KKSXMLForm :: xmlParse (void)
         }
         else
         {
-            QMessageBox::warning (this, tr("XML header error"), tr ("Error is %1, line is %2, column %3 ").arg (xmlStreamR->errorString()).arg (xmlStreamR->lineNumber()).arg (xmlStreamR->columnNumber()), QMessageBox::Ok);
+            qCritical() << tr ("Error is %1, line is %2, column %3 ").arg (xmlStreamR->errorString()).arg (xmlStreamR->lineNumber()).arg (xmlStreamR->columnNumber());
+            QMessageBox::critical (this, tr("XML header error"), tr ("Error is %1, line is %2, column %3 ").arg (xmlStreamR->errorString()).arg (xmlStreamR->lineNumber()).arg (xmlStreamR->columnNumber()), QMessageBox::Ok);
             ui->lEFileName->clear ();
             ui->lEHFileName->clear ();
             ui->lEErrorString->setText (tr("File : %1, error is %2, line is %3, column is %4").arg (xmlFileName).arg (xmlStreamR->errorString()).arg (xmlStreamR->lineNumber()).arg (xmlStreamR->columnNumber()));

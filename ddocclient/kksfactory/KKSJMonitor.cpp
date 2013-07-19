@@ -1400,7 +1400,8 @@ void KKSJMonitor::slotCreateOutMsg()
             int res = m_eiof->insertMessage (mEIO);
             if (res< 0)
             {
-                QMessageBox::warning (messForm, tr ("Send message"), tr ("Send message failed"), QMessageBox::Ok);
+                qCritical() << tr ("Send message failed");
+                QMessageBox::critical(messForm, tr ("Send message"), tr ("Send message failed"), QMessageBox::Ok);
                 continue;
             }
             queryMsgJournal();

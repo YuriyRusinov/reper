@@ -542,6 +542,7 @@ void KKSStuffForm :: setPrivilegeForStuffEntity (const QModelIndex& ind)
 
     if (isAclReadOnly ())//m_acl && (wObject->author() <= 0 || idUser != wObject->author()) && idUser != ADMIN_ROLE )
     {
+        qWarning() << tr ("Only document author can change user privilegies"); 
         QMessageBox::warning (this, tr ("User Privilegies"), tr ("Only document author can change user privilegies"), QMessageBox::Ok);
         QAbstractItemModel* cModel = lvPrivilegies->model ();
         cModel->setData (ind, Qt::Checked-ind.data (Qt::CheckStateRole).toInt(), Qt::CheckStateRole);
@@ -758,6 +759,7 @@ void KKSStuffForm :: editOrganization (void)
 
     if (!pOrgIndex.isValid() || pOrgIndex.data (Qt::UserRole+USER_ENTITY).toInt() != atOrganization)
     {
+        qWarning() << tr ("Select organization to edit");
         QMessageBox::warning (this, tr ("Edit organization"), tr ("Select organization to edit"), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
@@ -801,6 +803,7 @@ void KKSStuffForm :: setOrganizationAddress (void)
 
     if (!pOrgIndex.isValid() || pOrgIndex.data (Qt::UserRole+USER_ENTITY).toInt() != atOrganization)
     {
+        qWarning() << tr ("Select organization for address setting"); 
         QMessageBox::warning (this, tr ("Set address"), tr ("Select organization for address setting"), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
@@ -820,6 +823,7 @@ void KKSStuffForm :: createDivision (void)
              selIndex.data (Qt::UserRole+USER_ENTITY).toInt() != atDivision)
             )
     {
+        qWarning() << tr ("Select parent organization or division");
         QMessageBox::warning (this, tr ("Create division"), tr ("Select parent organization or division"), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
@@ -837,6 +841,7 @@ void KKSStuffForm :: editDivision (void)
     QModelIndex selIndex = selModel->currentIndex();
     if (!selIndex.isValid() || selIndex.data (Qt::UserRole+USER_ENTITY).toInt() != atDivision)
     {
+        qWarning() << tr ("Select division");
         QMessageBox::warning (this, tr ("Edit division"), tr ("Select division"), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
@@ -872,6 +877,7 @@ void KKSStuffForm :: createPosition (void)
     if (!selIndex.isValid() || \
         (selIndex.data (Qt::UserRole+USER_ENTITY).toInt() != atOrganization && selIndex.data (Qt::UserRole+USER_ENTITY).toInt() != atDivision ))
     {
+        qWarning() << tr ("Select parent organization or division");
         QMessageBox::warning (this, tr ("Create position"), tr ("Select parent organization or division"), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
@@ -889,6 +895,7 @@ void KKSStuffForm :: editPosition (void)
     QModelIndex selIndex = selModel->currentIndex();
     if (!selIndex.isValid() || selIndex.data (Qt::UserRole+USER_ENTITY).toInt() != atPosition)
     {
+        qWarning() << tr ("Select position");
         QMessageBox::warning (this, tr ("Edit position"), tr ("Select position"), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
@@ -923,6 +930,7 @@ void KKSStuffForm :: createUser (void)
     QModelIndex selIndex = selModel->currentIndex();
     if (!selIndex.isValid() )
     {
+        qWarning() << tr ("Select parent organization or division");
         QMessageBox::warning (this, tr ("Create position"), tr ("Select parent organization or division"), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
@@ -940,6 +948,7 @@ void KKSStuffForm :: editUser (void)
     QModelIndex selIndex = selModel->currentIndex();
     if (!selIndex.isValid() || selIndex.data (Qt::UserRole+USER_ENTITY).toInt() != atUser)
     {
+        qWarning() << tr ("Select user");
         QMessageBox::warning (this, tr ("Edit user"), tr ("Select user"), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
@@ -1078,6 +1087,7 @@ void KKSStuffForm :: editTemplate (void)
     QItemSelectionModel *selModel = tvAccessTemplates->selectionModel ();
     if (!selModel || selModel->selectedIndexes ().isEmpty())
     {
+        qWarning() << tr ("Please select template");
         QMessageBox::warning (this, tr ("Access templates"), tr ("Please select template"), QMessageBox::Ok);
         return;
     }
@@ -1092,6 +1102,7 @@ void KKSStuffForm :: applyTemplate (void)
     QItemSelectionModel *selModel = tvAccessTemplates->selectionModel ();
     if (!selModel || selModel->selectedIndexes ().isEmpty())
     {
+        qWarning() << tr ("Please select template");
         QMessageBox::warning (this, tr ("Access templates"), tr ("Please select template"), QMessageBox::Ok);
         return;
     }
@@ -1123,6 +1134,7 @@ void KKSStuffForm :: dropTemplate (void)
     QItemSelectionModel *selModel = tvAccessTemplates->selectionModel ();
     if (!selModel || selModel->selectedIndexes ().isEmpty())
     {
+        qWarning() << tr ("Please select template");
         QMessageBox::warning (this, tr ("Access templates"), tr ("Please select template"), QMessageBox::Ok);
         return;
     }
@@ -1131,6 +1143,7 @@ void KKSStuffForm :: dropTemplate (void)
 
     if (isSystem)
     {
+        qWarning() << tr ("You cannot delete system templates");
         QMessageBox::warning (this, tr ("Delete access template"), tr ("You cannot delete system templates"), QMessageBox::Ok);
         return;
     }

@@ -36,6 +36,7 @@
 #include <kkscmdjournalitem.h>
 #include <kksmsgjournalitem.h>
 #include <KKSJournalWidget.h>
+#include <KKSDbgOutputWidget.h>
 #include <kksstuffform.h>
 #include <IndicatorForm.h>
 #include <kkslifecycleform.h>
@@ -398,6 +399,19 @@ void KKSMainWindow::initJournal()
 }
 
 
+void KKSMainWindow::initDebugWindow()
+{
+    m_debugWidget = kksSito->dbgWidget();
+
+    if (!m_debugWidget)
+        return;
+
+    m_debugWidget->setParent(this);
+    m_debugWidget->initMenuEmitting();
+
+    addDockWidget(Qt::RightDockWidgetArea, m_debugWidget);
+}
+
 void KKSMainWindow::initToolBars()
 {
     QToolBar * tbActions = new QToolBar(tr("Docs and Journals toolbar"), this);
@@ -643,7 +657,12 @@ bool KKSMainWindow::connectToDb()
     
     initJournal ();
 
+    initDebugWindow();
+
     if(kksSito->loader()->getLocalOrgId() == -1){
+        qWarning() << tr("Local organization in current database does not set."
+                                "\nMany operations such as creation of documnts and some others will not work correctly."
+                                "\nPlease connect to your system administrator.");
         QMessageBox::warning(this, 
                              tr("Incorrect system configuration"), 
                              tr("Local organization in current database does not set."
@@ -764,6 +783,7 @@ void KKSMainWindow::printActiveSubWindow()
         editor->print();
     }
     else{
+        qCritical() << tr("Current version of DynamicDocs Operator does not print this window");
         QMessageBox::critical(this, tr("Error"), tr("Current version of DynamicDocs Operator does not print this window"), QMessageBox::Ok);
     }
 }
@@ -854,6 +874,7 @@ void KKSMainWindow::slotCreateNewObjEditor(int idObject,
         wObj->release ();
 
     if(!objEditor){
+        qCritical() << tr("Insufficient privileges!");
         QMessageBox::critical(this, tr("Error"), tr("Insufficient privileges!"), QMessageBox::Ok);
         return;
     }

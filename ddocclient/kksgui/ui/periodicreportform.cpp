@@ -111,30 +111,35 @@ void PeriodicReportForm :: constructReport (void)
 
     if (UI->lECategory->text().isEmpty())
     {
+        qWarning() << tr ("Set IO category");
         QMessageBox::warning (this, tr ("Periodic report"), tr ("Set IO category"), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
 
     if (UI->lEAddressee->text().isEmpty())
     {
+        qWarning() << tr ("Set Addresse");
         QMessageBox::warning (this, tr ("Periodic report"), tr ("Set Addresse"), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
 
     if (UI->lEController->text().isEmpty())
     {
+        qWarning() <<  tr ("Set controller");
         QMessageBox::warning (this, tr ("Periodic report"), tr ("Set controller"), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
 
     if (UI->lEExecutor->text().isEmpty())
     {
+        qWarning() << tr ("Set executor");
         QMessageBox::warning (this, tr ("Periodic report"), tr ("Set executor"), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
 
     if (UI->tEReason->toPlainText().isEmpty())
     {
+        qWarning() << tr ("Set report text");
         QMessageBox::warning (this, tr ("Periodic report"), tr ("Set report text"), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }

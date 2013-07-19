@@ -439,6 +439,7 @@ void KKSMsgJournal::prepareFile (KKSFile *f)
 {
     if (!f)
     {
+        qWarning() << tr("Choose file for download!");
         QMessageBox::warning(this, 
                              tr("Download file"), 
                              tr("Choose file for download!"), 
@@ -460,6 +461,8 @@ void KKSMsgJournal::prepareFile (KKSFile *f)
 
     if (f->id() <= 0)
     {
+        qCritical() << tr("The file is not saved to database, just locally added!\n"
+                                 "You can't download it");
         QMessageBox::critical(this, 
                               tr("Download file"), 
                               tr("The file is not saved to database, just locally added!\n"
@@ -506,6 +509,9 @@ void KKSMsgJournal::prepareFile (KKSFile *f)
 
     if (!f->open())
     {
+        qCritical() << tr("Cannot open the file!\n\n"
+                                 "If you about to open file of Microsoft Visio type,\n"
+                                 "try to rename it with extention. Example: filename.vsd");
         QMessageBox::critical(this, 
                               tr("Open file"), 
                               tr("Cannot open the file!\n\n"
@@ -524,6 +530,7 @@ void KKSMsgJournal::on_aSetReaded_triggered()
 
 void KKSMsgJournal::slotShowError(QString error) const
 {
+    qCritical() << error;
     QMessageBox::critical(this->widget(), tr("Error"), error, QMessageBox::Ok);
 }
 

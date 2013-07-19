@@ -8,6 +8,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QMap>
+#include <QTextEdit>
 #include <QString>
 
 #include "kkssito.h"
@@ -27,6 +28,7 @@
 #include "KKSStuffFactory.h"
 #include "KKSAttributesFactory.h"
 #include "KKSIndFactory.h"
+#include "KKSDbgOutputWidget.h"
 
 #include "kkssettings.h"
 #include "cmdjournalsettingsform.h"
@@ -43,6 +45,32 @@ __CORE_EXPORT KKSSito * KKSSito::self = 0;
 
 const QString kksSitoNameEng = QString(EXECUTABLE_PREFIX);
 
+void KKSDbgOutputHandler(QtMsgType type, const char *msg)
+{
+     if(!kksSito || !kksSito->dbgWidget())
+         return;
+
+     switch (type) {
+     case QtDebugMsg:
+         kksSito->dbgWidget()->printMessage(KKSDbgOutputWidget::cMessage, QString::fromLocal8Bit(msg) );
+         fprintf(stdout, "Debug: %s\n", msg);
+         break;
+     case QtWarningMsg:
+         kksSito->dbgWidget()->printMessage(KKSDbgOutputWidget::cWarning, QString::fromLocal8Bit(msg) );
+         fprintf(stdout, "Warning: %s\n", msg);
+         break;
+     case QtCriticalMsg:
+         kksSito->dbgWidget()->printMessage(KKSDbgOutputWidget::cError, QString::fromLocal8Bit(msg) );
+         fprintf(stdout, "Critical: %s\n", msg);
+         break;
+     case QtFatalMsg:
+         kksSito->dbgWidget()->printMessage(KKSDbgOutputWidget::cCritical, QString::fromLocal8Bit(msg) );
+         fprintf(stdout, "Fatal: %s\n", msg);
+         abort();
+     }
+}
+
+
 /*!\brief Конструктор класса.
 
 Необходимо отметить, что в приложении можно создать только один экземпляр данного класса. При попытке создать второй, приложение завершится аварийно.
@@ -57,7 +85,8 @@ KKSSito::KKSSito(const QString & userName) :
     m_catf (0),
     m_tf (0),
     m_attrf (0),
-    m_indf (0)
+    m_indf (0),
+    m_dbgWidget(0)
 {
     if ( self )
         qFatal("There should be only one KKSSito object");
@@ -97,6 +126,9 @@ KKSSito::KKSSito(const QString & userName) :
     initFactories();
 
     getLastError();//это типа чтоп файл журнала создать в текущей папке (там где exe-шник лежЫт)
+
+    qInstallMsgHandler(KKSDbgOutputHandler);
+
 }
 
 void KKSSito::loadTranslator()
@@ -238,6 +270,15 @@ void KKSSito::clearLoader()
 
     m_loader->clearCache();
 }
+
+KKSDbgOutputWidget * KKSSito::dbgWidget() const
+{
+    if(!m_dbgWidget)
+        m_dbgWidget = new KKSDbgOutputWidget();
+
+    return m_dbgWidget;
+}
+
 
 /*!\brief Метод возвращает последнюю возникшую ошибку*/
 KKSError * KKSSito::getLastError()
@@ -696,8 +737,7 @@ int KKSSito::GUIConnect(QWidget * parent)
                              lf->pass(),
                              lf->port() ) )
         {
-            //char* l_err_mess = m_db->lastError();
-            //qDebug () << __PRETTY_FUNCTION__ << l_err_mess;
+            qCritical() << m_db->lastError();
             QMessageBox::critical( 0, 
                                    QObject::tr( "Error!" ), 
                                    QObject::tr(m_db->lastError()) );
@@ -775,6 +815,8 @@ int KKSSito::GUIConnect(QWidget * parent)
         if(m_db1)
             m_db1->disconnect();
         
+        qCritical() <<        tr("Cannot get information about current version of server software you connected to.\n\n"
+                              "Further work is impossible. You should use equal versions of client and server software");
         QMessageBox::critical(parent, 
                               tr("Database version mismatch"), 
                               tr("Cannot get information about current version of server software you connected to.\n\n"
@@ -792,6 +834,9 @@ int KKSSito::GUIConnect(QWidget * parent)
         if(m_db1)
             m_db1->disconnect();
         
+        qCritical() <<        tr("Current version of your client software is %1,\n"
+                              "Current version of server you connected to is %2.\n\n"
+                              "Further work is impossible. You should use equal versions of client and server software").arg(KKS_VERSION).arg(serverVersion);
         QMessageBox::critical(parent, 
                               tr("Database version mismatch"), 
                               tr("Current version of your client software is %1,\n"
@@ -812,6 +857,9 @@ int KKSSito::GUIConnect(QWidget * parent)
         if(m_db1)
             m_db1->disconnect();
 
+        qCritical() <<        tr("You successfully connect with DB,\n"
+                              "but no registered positions responsed.\n\n"
+                              "Further work is impossible.");
         QMessageBox::critical(parent, 
                               tr("Database authorization error"), 
                               tr("You successfully connect with DB,\n"
@@ -830,6 +878,9 @@ int KKSSito::GUIConnect(QWidget * parent)
         KKSResult * r = m_db->execute(sql);
         if(!r || r->getCellAsInt(0, 0) != 1){
             if(r->getCellAsInt(0, 0) == -1){
+                qCritical() << tr("Cannot make connection between\n"
+                                      "current user and current position.\n"
+                                      "Current user does not have rights of current position.");
                 QMessageBox::critical(parent, 
                                       tr("Database authorization error"), 
                                       tr("Cannot make connection between\n"
@@ -838,6 +889,7 @@ int KKSSito::GUIConnect(QWidget * parent)
                                       QMessageBox::Ok, QMessageBox::NoButton);
             }
             else if(r->getCellAsInt(0, 0) == -2){
+                qCritical() << tr("You are authorized for this position but not at current object.\nMake sure that you are at your home object!");
                 QMessageBox::critical(parent, 
                                       tr("Database authorization error"), 
                                       tr("You are authorized for this position but not at current object.\nMake sure that you are at your home object!"), 
@@ -886,6 +938,8 @@ int KKSSito::GUIConnect(QWidget * parent)
     delete res;
 
     if(f->exec() != QDialog::Accepted ){
+        qCritical() << tr("You haven't selected current position.\n"
+                                                     "Further work is impossible.");
         QMessageBox::critical(parent, 
                               tr("Select position"),
                               tr("You haven't selected current position.\n"
@@ -905,6 +959,9 @@ int KKSSito::GUIConnect(QWidget * parent)
     if(!r || r->getCellAsInt(0, 0) != 1){
         
         if(r->getCellAsInt(0, 0) == -1){
+            qCritical() <<        tr("Cannot make connection between\n"
+                                  "current user and current position.\n"
+                                  "Current user does not have rights of current position.");
             QMessageBox::critical(parent, 
                                   tr("Database authorization error"), 
                                   tr("Cannot make connection between\n"
@@ -913,6 +970,7 @@ int KKSSito::GUIConnect(QWidget * parent)
                                   QMessageBox::Ok, QMessageBox::NoButton);
         }
         else if(r->getCellAsInt(0, 0) == -2){
+            qCritical() << tr("You are authorized for this position but not at current object.\nMake sure that you are at your home object!");
             QMessageBox::critical(parent, 
                                   tr("Database authorization error"), 
                                   tr("You are authorized for this position but not at current object.\nMake sure that you are at your home object!"), 
@@ -1480,6 +1538,7 @@ KKSTemplateEditorFactory * KKSSito::tf () const
 void KKSSito::showConnectionInfo(QWidget * parent) const
 {
     if(!m_loader || !m_loader->getDb()){
+        qCritical() << tr("You are not connected to database");
         QMessageBox::warning(parent, tr("Warning"), tr("You are not connected to database"), QMessageBox::Ok);
         return;
     }

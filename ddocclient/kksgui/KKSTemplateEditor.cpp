@@ -221,6 +221,7 @@ void KKSTemplateEditor :: editTemplateGroup (void)
     QModelIndex gIndex = this->getSelectedIndex ();//selModel->currentIndex ();
     if (!gIndex.isValid () || gIndex.data (Qt::UserRole+USER_ENTITY).toInt() == 0)
     {
+        qWarning() << tr("Please select group");
         QMessageBox::warning (this, tr("Edit group of attributes"), tr("Please select group"));
         return;
     }
@@ -233,6 +234,7 @@ void KKSTemplateEditor :: delTemplateGroup (void)
     QModelIndex gIndex = this->getSelectedIndex ();//selModel->currentIndex ();
     if (!gIndex.isValid () || gIndex.data (Qt::UserRole+USER_ENTITY).toInt() == 0)
     {
+        qWarning() << tr("Please select group");
         QMessageBox::warning (this, tr("Delete group of attributes"), tr("Please select group"));
         return;
     }
@@ -242,12 +244,14 @@ void KKSTemplateEditor :: delTemplateGroup (void)
         //
         // Template contains only one group
         //
+        qWarning() << tr("You cannot delete single group");
         QMessageBox::warning (this, tr("Delete group of attributes"), tr ("You cannot delete single group"));
         return;
     }
 
     if (gIndex.child (0, 0).isValid ())
     {
+        qWarning() << tr ("You cannot delete not empty group");
         QMessageBox::warning (this, tr("Delete group of attributes"), tr ("You cannot delete not empty group"));
         return;
     }
@@ -262,6 +266,7 @@ void KKSTemplateEditor :: addAttribute (void)
     const KKSMap<int, KKSCategoryAttr *> avAttrs = tRef->availableAttrs();
     if (avAttrs.isEmpty())
     {
+        qWarning() << tr("No available attributes");
         QMessageBox::warning (this, tr("Add attributes into template"), tr("No available attributes"), QMessageBox::Ok);
         return;
     }
@@ -269,6 +274,7 @@ void KKSTemplateEditor :: addAttribute (void)
     QModelIndex gIndex = this->getSelectedIndex ();
     if (!gIndex.isValid () || gIndex.data (Qt::UserRole+USER_ENTITY).toInt() == 0)
     {
+        qWarning() << tr("Please select target group");
         QMessageBox::warning (this, tr("Add attribute"), tr("Please select target group"), QMessageBox::Ok);
         return;
     }

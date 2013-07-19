@@ -57,6 +57,7 @@ void KKSSettings :: editSettings ( QWidget * parent )
     SaveSettingsForm * setForm = new SaveSettingsForm (this, parent);
     if ( setForm->exec() == QDialog::Accepted )
     {
+        
         QMessageBox::information ( 0, tr("Save settings"),
                 tr("You have to restart your application in order to changes take effect"),
                 QMessageBox::Ok );

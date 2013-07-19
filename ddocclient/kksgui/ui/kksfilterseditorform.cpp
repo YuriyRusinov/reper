@@ -670,6 +670,7 @@ void KKSFiltersEditorForm :: addFilter ()
     }
     
     if(!f){
+        qCritical() << tr("Incorrect value for selected attribute and operation!");
         QMessageBox::critical(this, 
                               tr("Error"), 
                               tr("Incorrect value for selected attribute and operation!"), 
@@ -1055,6 +1056,7 @@ void KKSFiltersEditorForm :: createGroup (bool AND)
     int cnt = model->rowCount (index);
     if (!index.isValid () && cnt)
     {
+        qWarning() << tr ("Cannot create another group in the top level");
         QMessageBox::warning (this, tr ("Create group"), tr ("Cannot create another group in the top level"), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
@@ -1277,7 +1279,8 @@ void KKSFiltersEditorForm :: loadImage (void)
         QImage image(fileName);
         if (image.isNull())
         {
-            QMessageBox::information(this, tr("Error"),
+            qCritical() << tr("Cannot load %1.").arg(fileName);
+            QMessageBox::critical(this, tr("Error"),
                                      tr("Cannot load %1.").arg(fileName));
             return;
         }

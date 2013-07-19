@@ -28,9 +28,10 @@ void ChooseDlForm :: dblClickedSlot(const QModelIndex & i)
 void ChooseDlForm :: pbOKClicked ( void )
 {
     if(currentDl() == -1){
+        qWarning() << tr("You should choose any position");
         QMessageBox::warning(this, 
-                             QString::fromLocal8Bit("Выбор должностного лица"), 
-                             QString::fromLocal8Bit("Вы не выбрали должностное лицо"), 
+                             tr("position choosing"), 
+                             tr("You should choose any position"), 
                              QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }

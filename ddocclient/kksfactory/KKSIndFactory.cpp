@@ -1560,14 +1560,16 @@ void KKSIndFactory :: addNewIOIndicator (KKSObject * io, QWidget * indWidget)
     if (!refInds)
     {
         QWidget * parentW = qobject_cast <QWidget *>(this->sender());
-        QMessageBox::warning (parentW, tr ("Add new indicator value"), tr("Cannot load indicator reference"), QMessageBox::Ok, QMessageBox::NoButton);
+        qCritical() << tr("Cannot load indicator reference");
+        QMessageBox::critical (parentW, tr ("Add new indicator value"), tr("Cannot load indicator reference"), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
     KKSCategory * c = refInds->category ();
     if (!c)
     {
         QWidget * parentW = qobject_cast <QWidget *>(this->sender());
-        QMessageBox::warning (parentW, tr ("Add new indicator value"), tr("Invalid category"), QMessageBox::Ok, QMessageBox::NoButton);
+        qCritical() << tr("Invalid category");
+        QMessageBox::critical(parentW, tr ("Add new indicator value"), tr("Invalid category"), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
     
@@ -1575,7 +1577,8 @@ void KKSIndFactory :: addNewIOIndicator (KKSObject * io, QWidget * indWidget)
     if (!c)
     {
         QWidget * parentW = qobject_cast <QWidget *>(this->sender());
-        QMessageBox::warning (parentW, tr ("Add new indicator value"), tr("Invalid category"), QMessageBox::Ok, QMessageBox::NoButton);
+        qCritical() << tr("Invalid category");
+        QMessageBox::critical(parentW, tr ("Add new indicator value"), tr("Invalid category"), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
 

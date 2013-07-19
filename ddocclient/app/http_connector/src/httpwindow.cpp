@@ -83,6 +83,8 @@ HttpWindow::HttpWindow(QWidget *parent)
 
     tcpServer = new QTcpServer(this);
     if (!tcpServer->listen(QHostAddress::Any, server_port)) {
+        qCritical() << tr("Unable to start the server: %1.")
+                              .arg(tcpServer->errorString());
         QMessageBox::critical(this, tr("DynamicDocs Interactor "),
                               tr("Unable to start the server: %1.")
                               .arg(tcpServer->errorString()));
@@ -100,6 +102,8 @@ HttpWindow::HttpWindow(QWidget *parent)
     }
     else if (loader)
     {
+        qCritical() << tr("Unable to connect to the database: %1.")
+                              .arg(host);
         QMessageBox::critical(this, tr("DynamicDocs Interactor"),
                               tr("Unable to connect to the database: %1.")
                               .arg(host));

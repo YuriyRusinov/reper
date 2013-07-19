@@ -222,6 +222,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
                                                       Qt::WindowFlags f)//оконные флаги (Qt)
 {
     if(idObject <= 0){
+        qWarning() << tr("Current qualifier does not saved in database!\nPlease save it before creating new records in it.");
         QMessageBox::warning(parent, tr("Record creation does not allowed"), tr("Current qualifier does not saved in database!\nPlease save it before creating new records in it."));
         return NULL;
     }
@@ -1699,6 +1700,7 @@ void KKSObjEditorFactory :: saveObjectEx (KKSObjEditor * editor, KKSObjectExempl
 
     if (wObjE->id() >=0 && num > 1)
     {
+        qWarning() << tr ("Save IO copy. Only current copy will be updated");
         QMessageBox::warning (editor, tr ("Warning"), tr ("Save IO copy. Only current copy will be updated"), QMessageBox::Ok);
     }
 
@@ -1728,6 +1730,7 @@ void KKSObjEditorFactory :: saveObjectEx (KKSObjEditor * editor, KKSObjectExempl
 
         if (res != OK_CODE)
         {
+            qCritical() << tr("An error was occured while inserting or updating EIO in database!");
             QMessageBox::critical (editor, 
                                    tr("Error"), 
                                    tr("An error was occured while inserting or updating EIO in database!"), 
@@ -1907,6 +1910,7 @@ void KKSObjEditorFactory :: saveObjectAsCommandResult (KKSObjEditor* editor,
     int ok = updateInControlJournal(idJournal, wObj->id());
     if (ok != OK_CODE)
     {
+        qCritical() << tr("An error was orrured while updating data in control journal!");
         QMessageBox::critical(editor,
                               tr("Error"),
                               tr("An error was orrured while updating data in control journal!"),
@@ -1944,6 +1948,7 @@ void KKSObjEditorFactory :: saveObject (KKSObjEditor* editor,
     int nc = (pObjectEx->id() < 0 ? num : 1);
     if (pObjectEx->id() >=0 && num > 1)
     {
+        qWarning() << tr ("Save IO copy. Only existing copy will be updated");
         QMessageBox::warning (editor, tr ("Warning"), tr ("Save IO copy. Only existing copy will be updated"), QMessageBox::Ok);
     }
     qDebug () << __PRETTY_FUNCTION__ << num << nc;
@@ -1979,6 +1984,7 @@ void KKSObjEditorFactory :: saveObject (KKSObjEditor* editor,
 
         if (!ok)
         {
+            qCritical() << tr("An error was occured while inserting or updating IO in database!");
             QMessageBox::critical(editor, 
                                   tr("Error"), 
                                   tr("An error was occured while inserting or updating IO in database!"), 
@@ -1994,12 +2000,13 @@ void KKSObjEditorFactory :: saveObject (KKSObjEditor* editor,
             bool draft = editor->asDraft();
             //в журнал можно записать только одну копию!
             if(idJournal > 0 && nc > 1){
-                    QMessageBox::critical(editor,
-                                          tr("Error"),
-                                          tr("In control journal you can insert ONLY one copy of IO!"),
-                                          QMessageBox::Ok);
-                    transactionOk = false;
-                    break;
+                qCritical() <<     tr("In control journal you can insert ONLY one copy of IO!");
+                QMessageBox::critical(editor,
+                                      tr("Error"),
+                                      tr("In control journal you can insert ONLY one copy of IO!"),
+                                      QMessageBox::Ok);
+                transactionOk = false;
+                break;
             }
             
             //создание нового ИО
@@ -2020,7 +2027,8 @@ void KKSObjEditorFactory :: saveObject (KKSObjEditor* editor,
             }
             else
             {
-                QMessageBox::warning (editor, tr ("Insert document"), tr ("Cannot insert IO to DB"), QMessageBox::Ok, QMessageBox::Ok);
+                qCritical() <<  tr ("Cannot insert IO to DB");
+                QMessageBox::critical(editor, tr ("Insert document"), tr ("Cannot insert IO to DB"), QMessageBox::Ok, QMessageBox::Ok);
                 return;
             }
 
@@ -2029,6 +2037,7 @@ void KKSObjEditorFactory :: saveObject (KKSObjEditor* editor,
                 int ok = insertInControlJournal(idJournal, io ? io->id() : wObj->id(), draft);
                 if (ok != OK_CODE)
                 {
+                    qCritical() << tr("An error was orrured while inserting data in control journal!");
                     QMessageBox::critical(editor,
                                           tr("Error"),
                                           tr("An error was orrured while inserting data in control journal!"),
@@ -2046,18 +2055,21 @@ void KKSObjEditorFactory :: saveObject (KKSObjEditor* editor,
         if (res != OK_CODE)
         {
             if(res == ERROR_CODE){
+                qCritical() << tr("An error was occured while inserting or updating IO in database!");
                 QMessageBox::critical(editor, 
                                       tr("Error"), 
                                       tr("An error was occured while inserting or updating IO in database!"), 
                                       QMessageBox::Ok);
             }
             else if(res == PRIVILEGE_ERROR){
+                qCritical() << tr("You cannot update this IO because of insufficient privileges!");
                 QMessageBox::critical(editor, 
                                       tr("Error"), 
                                       tr("You cannot update this IO because of insufficient privileges!"), 
                                       QMessageBox::Ok);
             }
             else if(res == PRIVILEGE_ERROR1){
+                qWarning() << tr("User privileges was updated, but IO attributes stay unchanged because of only owner organization can modify the IO");
                 QMessageBox::warning( editor, 
                                       tr("Warning"), 
                                       tr("User privileges was updated, but IO attributes stay unchanged because of only owner organization can modify the IO"), 
@@ -2094,6 +2106,7 @@ void KKSObjEditorFactory :: loadObject (KKSObjEditor * editor, int idObjectE, in
 {
     KKSObject *wObj = loader->loadIO (idObject, true);
     if(!wObj){
+        qCritical() << tr("You cannot load the IO becase of insufficient privileges!");
         QMessageBox::critical(editor, 
                               tr("Error"), 
                               tr("You cannot load the IO becase of insufficient privileges!"), 
@@ -2478,6 +2491,7 @@ void KKSObjEditorFactory :: createNewEditor (QWidget * editor, int idObject, con
 
     if (!newObjEditor)
     {
+        qCritical() << tr("Cannot create new object editor! Corrupt data!");
         QMessageBox::critical(editor, 
                               tr("Error"), 
                               tr("Cannot create new object editor! Corrupt data!"), 
@@ -2562,6 +2576,7 @@ void KKSObjEditorFactory :: createNewEditorParam (QWidget * editor,
 
     if (!newObjEditor)
     {
+        qCritical() << tr("Cannot create new object editor! Corrupt data!");
         QMessageBox::critical(editor,
                               tr("Error"),
                               tr("Cannot create new object editor! Corrupt data!"),
@@ -2641,6 +2656,7 @@ void KKSObjEditorFactory :: editExistOE (QWidget * editor, int idObject, qint64 
 
     if(!newObjEditor)
     {
+        qCritical() << tr("Cannot create new object editor! Corrupt data!");
         QMessageBox::critical(editor, 
                               tr("Error"), 
                               tr("Cannot create new object editor! Corrupt data!"), 
@@ -2715,12 +2731,14 @@ int KKSObjEditorFactory :: deleteOE (QWidget * editor, int idObject, qint64 idOb
     if (resCode != OK_CODE)
     {
         if(resCode == ERROR_CODE){    
+            qCritical() << tr("An error was occured while deleting record!");
             QMessageBox::critical(editor, 
                                   tr("Error"), 
                                   tr("An error was occured while deleting record!"), 
                                   QMessageBox::Ok );
         }
         else if(resCode == PRIVILEGE_ERROR){
+            qCritical() << tr("You cannot delete this IO because of insufficient privileges!");
             QMessageBox::critical(editor, 
                                   tr("Error"), 
                                   tr("You cannot delete this IO because of insufficient privileges!"), 
@@ -3387,6 +3405,7 @@ void KKSObjEditorFactory :: loadAttributeReference (QString tableName, QWidget *
         }
         
         if(!av){
+            qCritical() << tr("Cannot find selected attribute!");
             QMessageBox::critical(editor, tr("Error"), tr("Cannot find selected attribute!"), QMessageBox::Ok);
             refObj->release();
             return;
@@ -3565,7 +3584,8 @@ void KKSObjEditorFactory :: loadAttributeReference (QString tableName, QWidget *
                         {
                             if (!loader->isLocalDl (v_str.toInt()) && !loader->isPublicDl (c_pos))
                             {
-                                QMessageBox::warning (cForm, tr ("Set executor"), tr ("Cannot send commands to remote positions"), QMessageBox::Ok);
+                                qCritical() << tr ("Cannot send commands to remote positions");
+                                QMessageBox::critical(cForm, tr ("Set executor"), tr ("Cannot send commands to remote positions"), QMessageBox::Ok);
                                 return;
                             }
                         }
@@ -3655,7 +3675,8 @@ void KKSObjEditorFactory :: loadAttributeReference (QString tableName, QWidget *
             {
                 if (!loader->isLocalDl (v_str.toInt()) && !loader->isPublicDl (c_pos))
                 {
-                    QMessageBox::warning (messForm, tr ("Set receiver"), tr ("Cannot send messages to remote positions"), QMessageBox::Ok);
+                    qCritical() << tr ("Cannot send messages to remote positions");
+                    QMessageBox::critical (messForm, tr ("Set receiver"), tr ("Cannot send messages to remote positions"), QMessageBox::Ok);
                     refObj->release();
                     return;
                 }
@@ -3940,6 +3961,7 @@ void KKSObjEditorFactory :: addExecReference (QString tableName, QAbstractItemMo
         QModelIndexList selIndexes = recEditor->getRecordsWidget()->getSourceIndexes();
         if (selIndexes.isEmpty())
         {
+            qWarning() << tr ("Select executor");
             QMessageBox::warning (recEditor, tr ("Add executor"), tr ("Select executor"), QMessageBox::Ok, QMessageBox::Ok);
             refObj->release();
             return;
@@ -4029,6 +4051,7 @@ void KKSObjEditorFactory :: setEIOTemplates (KKSObjEditor* editor, KKSObject* wO
             //надо просто обновить информацию о пользовательских шаблонах
             int ok = ppf->updateUserTemplates(wObj);
             if(ok != OK_CODE){
+                qCritical() << tr("Cannot update templates!");
                 QMessageBox::critical(editor, tr("Error"), tr("Cannot update templates!"), QMessageBox::Ok);
                 f->setParent (0);
                 delete f;
@@ -4260,6 +4283,7 @@ void KKSObjEditorFactory :: slotOpenRubricItemRequested(int idObject, KKSObjEdit
 
     if(!newObjEditor)
     {
+        qCritical() << tr("Cannot create new object editor! Corrupt data!");
         QMessageBox::critical(editor, 
                               tr("Error"), 
                               tr("Cannot create new object editor! Corrupt data!"), 
@@ -4308,6 +4332,7 @@ void KKSObjEditorFactory :: slotOpenRubricItemRecRequested(int idObjectE, KKSObj
 
     if(!newObjEditor)
     {
+        qCritical() << tr("Cannot create new object editor! Corrupt data!");
         QMessageBox::critical(editor, 
                               tr("Error"), 
                               tr("Cannot create new object editor! Corrupt data!"), 
@@ -4402,6 +4427,7 @@ void KKSObjEditorFactory :: regroupAttrs (QWidget *wIOAttr, QScrollArea *scIOatt
             int ok = ppf->updateUserTemplates(isSystem == KKSIndAttr::iacTableAttr ? io : wObj);
 #endif
             if(ok != OK_CODE){
+                qCritical() << tr("Cannot update templates!");
                 QMessageBox::critical(editor, tr("Error"), tr("Cannot update templates!"), QMessageBox::Ok);
                 f->setParent (0);
                 delete f;
@@ -4560,7 +4586,8 @@ void KKSObjEditorFactory :: importEIO (KKSObjEditor * editor, int idObject, cons
             xmlForm->getFieldDelimiter().isEmpty()
            )
         {
-            QMessageBox::warning (editor, tr ("Error"), tr("Invalid data"), QMessageBox::Ok);
+            qCritical() << tr("Invalid data");
+            QMessageBox::critical(editor, tr ("Error"), tr("Invalid data"), QMessageBox::Ok);
             io->release();
             return;
         }
@@ -4570,7 +4597,8 @@ void KKSObjEditorFactory :: importEIO (KKSObjEditor * editor, int idObject, cons
         
         if (c0->attributes().count() != c1->tableCategory()->attributes().count())//категория, в которую импортируем, не соответствует той, которая получена из xml-файла
         {
-            QMessageBox::warning (editor, tr ("Error"), tr("Inconsistent categories"), QMessageBox::Ok);
+            qCritical() << tr("Inconsistent categories");
+            QMessageBox::critical(editor, tr ("Error"), tr("Inconsistent categories"), QMessageBox::Ok);
             io->release();
             return;
         }
@@ -4581,7 +4609,8 @@ void KKSObjEditorFactory :: importEIO (KKSObjEditor * editor, int idObject, cons
         {
             if (pc0.key() != pc.key() )
             {
-                QMessageBox::warning (editor, tr ("Error"), tr("Inconsistent categories"), QMessageBox::Ok);
+                qCritical() << tr("Inconsistent categories");
+                QMessageBox::critical(editor, tr ("Error"), tr("Inconsistent categories"), QMessageBox::Ok);
                 io->release();
                 return;
             }
@@ -4710,7 +4739,8 @@ void KKSObjEditorFactory :: importCSV (QIODevice *csvDev, QString codeName, QStr
             //qDebug () << __PRETTY_FUNCTION__ << lineData.count() << dataModel->columnCount() << lineData;
             if (dataModel->rowCount())
                 dataModel->removeRows (0, dataModel->rowCount());
-            QMessageBox::warning (xmlForm, tr("Import data"), tr ("Inconsistence data on row %1").arg (i0));
+            qCritical() << tr ("Inconsistence data on row %1").arg (i0);
+            QMessageBox::critical(xmlForm, tr("Import data"), tr ("Inconsistence data on row %1").arg (i0));
             return;
         }
 
@@ -4960,7 +4990,8 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io,
     pImportD->hide ();
     if (res == ERROR_CODE)
     {
-        QMessageBox::warning (oEditor, tr("Import copies"), tr("Cannot insert into table"), QMessageBox::Ok);
+        qCritical() << tr("Cannot insert into table");
+        QMessageBox::critical (oEditor, tr("Import copies"), tr("Cannot insert into table"), QMessageBox::Ok);
         return;
     }
 //    pImportD->setValue (v++);
@@ -5176,27 +5207,31 @@ int KKSObjEditorFactory :: exportHeader (QIODevice *xmlDev, // XML-файл, содержа
 {
     if (!xmlDev)
     {
-        QMessageBox::warning (oEditor, tr("XML file"), tr ("Invalid device"), QMessageBox::Ok);
+        qCritical() <<  tr ("Invalid device");
+        QMessageBox::critical(oEditor, tr("XML file"), tr ("Invalid device"), QMessageBox::Ok);
         return ERROR_CODE;
     }
 
     if (!c)
     {
-        QMessageBox::warning (oEditor, tr("XML export"), tr ("Invalid category"), QMessageBox::Ok);
+        qCritical() << tr ("Invalid category");
+        QMessageBox::critical(oEditor, tr("XML export"), tr ("Invalid category"), QMessageBox::Ok);
         return ERROR_CODE;
     }
 
     bool isXmlOpen = xmlDev->isOpen ();
     if (!xmlDev->isOpen() && !xmlDev->open (QIODevice::WriteOnly))
     {
-        QMessageBox::warning (oEditor, tr ("File open error"), tr("Cannot open output header file"), QMessageBox::Ok);
+        qCritical() << tr("Cannot open output header file");
+        QMessageBox::critical(oEditor, tr ("File open error"), tr("Cannot open output header file"), QMessageBox::Ok);
         return ERROR_CODE;
     }
 
     QXmlStreamWriter * xmlWriter = new QXmlStreamWriter (xmlDev);
     if (!xmlWriter)
     {
-        QMessageBox::warning (oEditor, tr ("Xml writer"), tr ("Cannot set xml writer"), QMessageBox::Ok);
+        qCritical() << tr ("Cannot set xml writer");
+        QMessageBox::critical(oEditor, tr ("Xml writer"), tr ("Cannot set xml writer"), QMessageBox::Ok);
         return ERROR_CODE;
     }
 /*
@@ -5404,19 +5439,22 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // целевой CSV файл
     Q_UNUSED (tableName);
     if (!csvDev)
     {
-        QMessageBox::warning (oEditor, tr("CSV file"), tr ("Invalid device"), QMessageBox::Ok);
+        qCritical() << tr ("Invalid device");
+        QMessageBox::critical(oEditor, tr("CSV file"), tr ("Invalid device"), QMessageBox::Ok);
         return ERROR_CODE;
     }
 
     if (!c)
     {
-        QMessageBox::warning (oEditor, tr("CSV export"), tr ("Invalid category"), QMessageBox::Ok);
+        qCritical() << tr ("Invalid category");
+        QMessageBox::critical (oEditor, tr("CSV export"), tr ("Invalid category"), QMessageBox::Ok);
         return ERROR_CODE;
     }
 
     if (!csvDev->isOpen() && !csvDev->open (QIODevice::WriteOnly))
     {
-        QMessageBox::warning (oEditor, tr ("File open error"), tr("Cannot open output file"), QMessageBox::Ok);
+        qCritical() << tr("Cannot open output file");
+        QMessageBox::critical (oEditor, tr ("File open error"), tr("Cannot open output file"), QMessageBox::Ok);
         return ERROR_CODE;
     }
 
@@ -5424,7 +5462,8 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // целевой CSV файл
     QTextCodec *csvCodec = QTextCodec::codecForName (codeName.toAscii());
     if (!csvCodec)
     {
-        QMessageBox::warning (oEditor, tr ("CSV export"), tr ("Invalid encoding %1").arg (codeName), QMessageBox::Ok);
+        qCritical() << tr ("Invalid encoding %1").arg (codeName);
+        QMessageBox::critical(oEditor, tr ("CSV export"), tr ("Invalid encoding %1").arg (codeName), QMessageBox::Ok);
         return ERROR_CODE;
     }
     csvFile.setCodec (csvCodec);
@@ -5642,19 +5681,22 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // целевой CSV файл
 {
     if (!csvDev)
     {
-        QMessageBox::warning (oEditor, tr("CSV file"), tr ("Invalid device"), QMessageBox::Ok);
+        qCritical() << tr ("Invalid device");
+        QMessageBox::critical(oEditor, tr("CSV file"), tr ("Invalid device"), QMessageBox::Ok);
         return ERROR_CODE;
     }
 
     if (!c)
     {
-        QMessageBox::warning (oEditor, tr("CSV export"), tr ("Invalid category"), QMessageBox::Ok);
+        qCritical() << tr ("Invalid category");
+        QMessageBox::critical (oEditor, tr("CSV export"), tr ("Invalid category"), QMessageBox::Ok);
         return ERROR_CODE;
     }
 
     if (!csvDev->isOpen() && !csvDev->open (QIODevice::WriteOnly))
     {
-        QMessageBox::warning (oEditor, tr ("File open error"), tr("Cannot open output file"), QMessageBox::Ok);
+        qCritical() << tr("Cannot open output file");
+        QMessageBox::critical (oEditor, tr ("File open error"), tr("Cannot open output file"), QMessageBox::Ok);
         return ERROR_CODE;
     }
 
@@ -5662,7 +5704,8 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // целевой CSV файл
     QTextCodec *csvCodec = QTextCodec::codecForName (codeName.toAscii());
     if (!csvCodec)
     {
-        QMessageBox::warning (oEditor, tr ("CSV export"), tr ("Invalid encoding %1").arg (codeName), QMessageBox::Ok);
+        qCritical() << tr ("Invalid encoding %1").arg (codeName);
+        QMessageBox::critical (oEditor, tr ("CSV export"), tr ("Invalid encoding %1").arg (codeName), QMessageBox::Ok);
         return ERROR_CODE;
     }
     csvFile.setCodec (csvCodec);
@@ -5816,6 +5859,7 @@ void KKSObjEditorFactory :: sendIO (KKSObject *wObj, KKSObjectExemplar *wObjE, K
     int idUser = loader->getUserId();
     
     if(idUser != idAuthor && loader->getPrivilege(idUser, idObj, 5, true) == false){
+        qCritical() << tr("You does not have permissions for that operation!");
         QMessageBox::critical(editor, tr("Access error!"), tr("You does not have permissions for that operation!"), QMessageBox::Ok);
         return;
     }
@@ -5921,7 +5965,8 @@ void KKSObjEditorFactory :: sendIO (KKSObject *wObj, KKSObjectExemplar *wObjE, K
                     KKSResult *res = loader->getDb()->execute (ioSql);
                     if (!res || res->getRowCount () != 1 || res->getCellAsInt(0, 0) <= 0)
                     {
-                        QMessageBox::warning (messDial, tr("Send message"), tr ("Cannot send message to %1").arg (idDls[i]), QMessageBox::Ok);
+                        qCritical() << tr ("Cannot send message to %1").arg (idDls[i]);
+                        QMessageBox::critical(messDial, tr("Send message"), tr ("Cannot send message to %1").arg (idDls[i]), QMessageBox::Ok);
                         continue;
                     }
                     if (res)
@@ -5936,7 +5981,8 @@ void KKSObjEditorFactory :: sendIO (KKSObject *wObj, KKSObjectExemplar *wObjE, K
                 KKSResult * res = loader->getDb()->execute (messSql);
                 if (!res || res->getRowCount () != 1 || res->getCellAsInt(0, 0) <= 0)
                 {
-                    QMessageBox::warning (messDial, tr("Send message"), tr ("Cannot send message to %1").arg (idDls[i]), QMessageBox::Ok);
+                    qCritical() << tr ("Cannot send message to %1").arg (idDls[i]);
+                    QMessageBox::critical (messDial, tr("Send message"), tr ("Cannot send message to %1").arg (idDls[i]), QMessageBox::Ok);
                     continue;
                 }
                 if (res)
@@ -6010,6 +6056,7 @@ void KKSObjEditorFactory :: sendIOList (const QList<int>& idIOList)
         }
         if (idUser != idAuthor && !loader->getPrivilege(idUser, idObj, 5, true))
         {
+            qCritical() << tr("You does not have permissions for send document %1 !").arg (idObj);
             QMessageBox::critical(0, tr("Access error!"), tr("You does not have permissions for send document %1 !").arg (idObj), QMessageBox::Ok);
             return;
         }
@@ -6076,7 +6123,8 @@ void KKSObjEditorFactory :: sendIOList (const QList<int>& idIOList)
                     KKSResult *res = loader->getDb()->execute (ioSql);
                     if (!res || res->getRowCount () != 1 || res->getCellAsInt(0, 0) <= 0)
                     {
-                        QMessageBox::warning (messDial, tr("Send message"), tr ("Cannot send message to %1").arg (idDls[i]), QMessageBox::Ok);
+                        qCritical() << tr ("Cannot send message to %1").arg (idDls[i]);
+                        QMessageBox::critical (messDial, tr("Send message"), tr ("Cannot send message to %1").arg (idDls[i]), QMessageBox::Ok);
                         continue;
                     }
                     if (res)
@@ -6091,7 +6139,8 @@ void KKSObjEditorFactory :: sendIOList (const QList<int>& idIOList)
                 KKSResult * res = loader->getDb()->execute (messSql);
                 if (!res || res->getRowCount () != 1 || res->getCellAsInt(0, 0) <= 0)
                 {
-                    QMessageBox::warning (messDial, tr("Send message"), tr ("Cannot send message to %1").arg (idDls[i]), QMessageBox::Ok);
+                    qCritical() << tr ("Cannot send message to %1").arg (idDls[i]);
+                    QMessageBox::critical (messDial, tr("Send message"), tr ("Cannot send message to %1").arg (idDls[i]), QMessageBox::Ok);
                     continue;
                 }
                 if (res)
@@ -6238,7 +6287,8 @@ void KKSObjEditorFactory :: insertReport (qint64 idObjE, QWidget *parent, Qt::Wi
         int res = eiof->insertTSDRecord(rEIO);
         qDebug () << __PRETTY_FUNCTION__ << res;
 		if(res <= 0){
-			QMessageBox::critical(parent, tr("Error"), tr("Adressee, executor and controller must be all either public or local!"), QMessageBox::Ok);
+			qCritical() << tr("Adressee, executor and controller must be all either public or local!");
+            QMessageBox::critical(parent, tr("Error"), tr("Adressee, executor and controller must be all either public or local!"), QMessageBox::Ok);
 		}
     }
 
@@ -6588,7 +6638,8 @@ void KKSObjEditorFactory :: searchTemplateCategoryChanged (KKSSearchTemplate * s
     if (!isApp)
     {
         QWidget * pWidget = qobject_cast<QWidget *>(this->sender());
-        QMessageBox::warning (pWidget, tr("Set category into search template"), tr("Category %1 is not applicable into search template %2").arg (idCategory).arg(st->id()), QMessageBox::Ok);
+        qCritical() << tr("Category %1 is not applicable into search template %2").arg (idCategory).arg(st->id());
+        QMessageBox::critical (pWidget, tr("Set category into search template"), tr("Category %1 is not applicable into search template %2").arg (idCategory).arg(st->id()), QMessageBox::Ok);
         return;
     }
 }
@@ -6604,7 +6655,8 @@ void KKSObjEditorFactory :: loadSearchCriteria ()//QAbstractItemModel * mod)
     QWidget * parent = qobject_cast<QWidget *>(this->sender());
     if (!searchT)
     {
-        QMessageBox::warning (parent, tr ("Select template"), tr ("Cannot load search template from database"), QMessageBox::Ok, QMessageBox::NoButton);
+        qCritical() << tr ("Cannot load search template from database");
+        QMessageBox::critical (parent, tr ("Select template"), tr ("Cannot load search template from database"), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
 
@@ -6821,7 +6873,8 @@ void KKSObjEditorFactory :: addCopySearchTempl (const QModelIndex& wIndex, QAbst
     KKSSearchTemplate * st = loader->loadSearchTemplate (idSearchTemplate);
     if (!st)
     {
-        QMessageBox::warning (qobject_cast<QWidget *>(this->sender()), tr ("Search templates"), tr ("Cannot load original search template."), QMessageBox::Ok, QMessageBox::NoButton);
+        qCritical() << tr ("Cannot load original search template.");
+        QMessageBox::critical (qobject_cast<QWidget *>(this->sender()), tr ("Search templates"), tr ("Cannot load original search template."), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
     st->setId (-1);
@@ -6832,7 +6885,8 @@ void KKSObjEditorFactory :: addCopySearchTempl (const QModelIndex& wIndex, QAbst
     int res = ppf->insertSearchTemplate (st);
     if (res < 0)
     {
-        QMessageBox::warning (qobject_cast<QWidget *>(this->sender()), tr ("Search templates"), tr ("Cannot insert copy of search template into db."), QMessageBox::Ok, QMessageBox::NoButton);
+        qCritical() << tr ("Cannot insert copy of search template into db.");
+        QMessageBox::critical(qobject_cast<QWidget *>(this->sender()), tr ("Search templates"), tr ("Cannot insert copy of search template into db."), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
     int nr = searchMod->rowCount (wIndex.parent());
@@ -6856,7 +6910,8 @@ void KKSObjEditorFactory :: updateSearchTempl (const QModelIndex& wIndex, QAbstr
     KKSSearchTemplate * st = loader->loadSearchTemplate (idSearchTemplate);
     if (!st)
     {
-        QMessageBox::warning (pWidget, tr ("Search templates"), tr ("Cannot load original search template."), QMessageBox::Ok, QMessageBox::NoButton);
+        qCritical() << tr ("Cannot load original search template.");
+        QMessageBox::critical(pWidget, tr ("Search templates"), tr ("Cannot load original search template."), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
 
@@ -6869,6 +6924,7 @@ void KKSObjEditorFactory :: updateSearchTempl (const QModelIndex& wIndex, QAbstr
     if (idUser != 1 && idAuthor != idUser)
     {
         st->release ();
+        qWarning() << tr ("Only admin and author can change search template");
         QMessageBox::warning (pWidget, tr ("Search templates"), tr ("Only admin and author can change search template"), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
@@ -6994,7 +7050,8 @@ void KKSObjEditorFactory :: deleleSearchTempl (const QModelIndex& wIndex, QAbstr
     KKSSearchTemplate * st = loader->loadSearchTemplate (idSearchTemplate);
     if (!st)
     {
-        QMessageBox::warning (pWidget, tr ("Search templates"), tr ("Cannot load original search template."), QMessageBox::Ok, QMessageBox::NoButton);
+        qCritical() << tr ("Cannot load original search template.");
+        QMessageBox::critical (pWidget, tr ("Search templates"), tr ("Cannot load original search template."), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
     int idUser = loader->getUserId ();
@@ -7002,6 +7059,7 @@ void KKSObjEditorFactory :: deleleSearchTempl (const QModelIndex& wIndex, QAbstr
     if (idUser != 1 && idAuthor != idUser)
     {
         
+        qWarning() << tr ("Only admin and author can delete search template %1").arg (st->name ());
         QMessageBox::warning (pWidget, 
 							  tr ("Search templates"), 
 							  tr ("Only admin and author can delete search template %1").arg (st->name ()), 
@@ -7015,7 +7073,8 @@ void KKSObjEditorFactory :: deleleSearchTempl (const QModelIndex& wIndex, QAbstr
     int res = ppf->deleteSearchTemplate (idSearchTemplate);
     if (res < 0)
     {
-        QMessageBox::warning (pWidget, tr ("Search templates"), tr ("Cannot delete search template."), QMessageBox::Ok, QMessageBox::NoButton);
+        qCritical() << tr ("Cannot delete search template.");
+        QMessageBox::critical (pWidget, tr ("Search templates"), tr ("Cannot delete search template."), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
     searchMod->removeRows (wIndex.row(), 1);
@@ -7536,6 +7595,7 @@ void KKSObjEditorFactory :: loadObjCAttrRef (KKSObjectExemplar * wObjE, const KK
         
         if (!av)
         {
+            qCritical() << tr("Cannot set value");
             QMessageBox::critical (wEditor, avE->attribute()->title(), tr("Cannot set value"), QMessageBox::Ok, QMessageBox::NoButton);
         }
         else
@@ -7751,6 +7811,7 @@ void KKSObjEditorFactory :: loadSyncAddAttrRef (KKSAttrValue * avE, QAbstractIte
         
         if (!av)
         {
+            qCritical() << tr("Cannot set value");
             QMessageBox::critical (wEditor, av->attribute()->title(), tr("Cannot set value"), QMessageBox::Ok, QMessageBox::NoButton);
         }
         else
@@ -8062,7 +8123,8 @@ void KKSObjEditorFactory :: printReport(KKSObject* io)
     db.setPassword(k_db->getPass());
     if (!db.open())
     {
-        qDebug () << __PRETTY_FUNCTION__ << db.lastError ();
+        qCritical() << __PRETTY_FUNCTION__ << db.lastError ();
+        qCritical() << tr("Current version of KKS SITO Operator does not print this window");
         QMessageBox::critical(0, tr("Error"), 
         		tr("Current version of KKS SITO Operator does not print this window"), QMessageBox::Ok);
         return;
@@ -8078,7 +8140,8 @@ void KKSObjEditorFactory :: printReport(KKSObject* io)
     KKSResult * res = k_db->execute (sql);
     if (!res)
     {
-        QMessageBox::warning (qobject_cast<QWidget *>(this->sender()), tr ("Report"),
+        qCritical() << tr ("Cannot read report source from database");
+        QMessageBox::critical(qobject_cast<QWidget *>(this->sender()), tr ("Report"),
                               tr ("Cannot read report source from database"),
                               QMessageBox::Ok,
                               QMessageBox::NoButton);
@@ -9161,7 +9224,8 @@ void KKSObjEditorFactory :: addNewState (QWidget* editor, int idObject, const KK
         int ier = ppf->insertState (stn);
         if (ier < 0)
         {
-            QMessageBox::warning (editor, tr("Add state"), tr("Cannot insert new state into Db, error !"), QMessageBox::Ok);
+            qCritical() << tr("Cannot insert new state into Db, error !");
+            QMessageBox::critical(editor, tr("Add state"), tr("Cannot insert new state into Db, error !"), QMessageBox::Ok);
             st->release();
             delete stForm;
             return;
@@ -9195,7 +9259,8 @@ void KKSObjEditorFactory :: editState (QWidget * editor, int idObject, qint64 id
         int ier = ppf->updateState (stn);
         if (ier < 0)
         {
-            QMessageBox::warning (editor, tr("Edit state"), tr("Cannot update state in Db, error !"), QMessageBox::Ok);
+            qCritical() << tr("Cannot update state in Db, error !");
+            QMessageBox::critical(editor, tr("Edit state"), tr("Cannot update state in Db, error !"), QMessageBox::Ok);
             st->release();
             delete stForm;
             return;
@@ -9259,7 +9324,8 @@ void KKSObjEditorFactory :: addLifeCycleState (KKSLifeCycleEx * lc, QAbstractIte
         KKSState * st = loader->loadState (idState);
         if (!st)
         {
-            QMessageBox::warning (wEditor, tr("Add state into life cycle"), tr("Cannot add state into life cycle %1, Db error").arg(lc->name()), QMessageBox::Ok);
+            qCritical() << tr("Cannot add state into life cycle %1, Db error").arg(lc->name());
+            QMessageBox::critical(wEditor, tr("Add state into life cycle"), tr("Cannot add state into life cycle %1, Db error").arg(lc->name()), QMessageBox::Ok);
             delete wEditor;
             refObj->release ();
             return;

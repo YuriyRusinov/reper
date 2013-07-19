@@ -228,7 +228,8 @@ void KKSAttributesFactory :: saveAttribute (KKSAttribute * cAttr, int idType, QA
     {
         if (aType)
             aType->release ();
-        QMessageBox::warning (aEditor, tr ("Save attribute"), tr ("Cannot save attribute %1").arg (cAttr->title()), QMessageBox::Ok);
+        qCritical() << tr ("Cannot save attribute %1").arg (cAttr->title());
+        QMessageBox::critical (aEditor, tr ("Save attribute"), tr ("Cannot save attribute %1").arg (cAttr->title()), QMessageBox::Ok);
         return;
     }
     if (isInsert)
@@ -372,8 +373,10 @@ void KKSAttributesFactory :: delAttribute (int idAttr, QAbstractItemModel * aMod
 
     if (eiof->deleteEIO(oe) != ERROR_CODE)
         aModel->removeRows (row, 1, aIndex.parent());
-    else
+    else{
+        qWarning() << tr("Attribute %1 is used").arg (attr->title());
         QMessageBox::warning (aEditor, tr("Delete Attribute"), tr("Attribute %1 is used").arg (attr->title()), QMessageBox::Ok);
+    }
 
     if (oe)
         oe->release ();
@@ -533,7 +536,8 @@ void KKSAttributesFactory :: addAttrGroup (QAbstractItemModel *aModel, KKSAttrib
     KKSObject * refIO = loader->loadIO (IO_ATTRS_GROUPS_ID, true);
     if (!refIO)
     {
-        QMessageBox::warning (attrEditor, tr ("Add new group"), tr ("Cannot load referece IO"), QMessageBox::Ok);
+        qCritical() << tr ("Cannot load referece IO");
+        QMessageBox::critical(attrEditor, tr ("Add new group"), tr ("Cannot load referece IO"), QMessageBox::Ok);
         return;
     }
     KKSCategory * c = refIO->category();
@@ -541,7 +545,8 @@ void KKSAttributesFactory :: addAttrGroup (QAbstractItemModel *aModel, KKSAttrib
         c = c->tableCategory();
     if (!c)
     {
-        QMessageBox::warning (attrEditor, tr ("Add new group"), tr ("Incorrect load referece IO"), QMessageBox::Ok);
+        qCritical() << tr ("Incorrect load referece IO");
+        QMessageBox::critical(attrEditor, tr ("Add new group"), tr ("Incorrect load referece IO"), QMessageBox::Ok);
         return;
     }
     KKSList<const KKSFilterGroup *> filters = KKSList<const KKSFilterGroup *>();
@@ -568,7 +573,8 @@ void KKSAttributesFactory :: editAttrGroup (int idAttrGroup, QAbstractItemModel 
     KKSObject * refIO = loader->loadIO (IO_ATTRS_GROUPS_ID, true);
     if (!refIO)
     {
-        QMessageBox::warning (attrEditor, tr ("Edit attributes group"), tr ("Cannot load referece IO"), QMessageBox::Ok);
+        qCritical() << tr ("Cannot load referece IO");
+        QMessageBox::critical(attrEditor, tr ("Edit attributes group"), tr ("Cannot load referece IO"), QMessageBox::Ok);
         return;
     }
     KKSCategory * c = refIO->category();
@@ -576,7 +582,8 @@ void KKSAttributesFactory :: editAttrGroup (int idAttrGroup, QAbstractItemModel 
         c = c->tableCategory();
     if (!c)
     {
-        QMessageBox::warning (attrEditor, tr ("Edit attributes group"), tr ("Incorrect load referece IO"), QMessageBox::Ok);
+        qCritical() << tr ("Incorrect load referece IO");
+        QMessageBox::critical(attrEditor, tr ("Edit attributes group"), tr ("Incorrect load referece IO"), QMessageBox::Ok);
         return;
     }
     KKSList<const KKSFilterGroup *> filters = KKSList<const KKSFilterGroup *>();
@@ -609,8 +616,10 @@ void KKSAttributesFactory :: delAttrGroup (int idAttrGroup, QAbstractItemModel *
     int row = aIndex.row();
     if (eiof->deleteEIO(oe) != ERROR_CODE)
         aModel->removeRows (row, 1, aIndex.parent());
-    else
-        QMessageBox::warning (attrEditor, tr("Delete group of attributes"), tr("Cannot delete group of attributes"), QMessageBox::Ok);
+    else{
+        qCritical() << tr("Cannot delete group of attributes");
+        QMessageBox::critical(attrEditor, tr("Delete group of attributes"), tr("Cannot delete group of attributes"), QMessageBox::Ok);
+    }
 
     if (oe)
         oe->release ();

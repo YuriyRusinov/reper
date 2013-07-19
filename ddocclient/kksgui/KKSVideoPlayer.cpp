@@ -76,7 +76,8 @@ void KKSVideoPlayer::openFile (void)
         m_movie = new QMovie (imFile);//Name);
         m_movie->setFileName (fileName);
         if (!m_movie) {
-            QMessageBox::information(this, tr("Error"),
+            qCritical() << tr("Cannot load %1.").arg(fileName);
+            QMessageBox::critical(this, tr("Error"),
                                      tr("Cannot load %1.").arg(fileName));
             return;
         }

@@ -407,7 +407,8 @@ void KKSStuffFactory :: createAclTemplate (QAbstractItemModel *mod)
         int ier = ppf->insertAclTemplate (aclTR);
         if (ier < 0)
         {
-            QMessageBox::warning (sTForm, tr ("Insert access template"), tr ("Cannot save access template db error"), QMessageBox::Ok, QMessageBox::NoButton);
+            qCritical() << tr ("Cannot save access template db error");
+            QMessageBox::critical(sTForm, tr ("Insert access template"), tr ("Cannot save access template db error"), QMessageBox::Ok, QMessageBox::NoButton);
             return;
         }
         this->loadTemplates (mod);
@@ -423,7 +424,8 @@ void KKSStuffFactory :: editAclTemplate (int idAclTemplate, QAbstractItemModel *
     QWidget * parentWidget = qobject_cast <QWidget *>(this->sender());
     if (!aclT)
     {
-        QMessageBox::warning (parentWidget, tr("Edit access template"), tr("Cannot load access template"), QMessageBox::Ok, QMessageBox::NoButton);
+        qCritical() << tr("Cannot load access template");
+        QMessageBox::critical(parentWidget, tr("Edit access template"), tr("Cannot load access template"), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
     KKSStuffForm * sTForm = new KKSStuffForm (aclT, loader->getUserId (), parentWidget, Qt::Dialog);
@@ -448,7 +450,8 @@ void KKSStuffFactory :: editAclTemplate (int idAclTemplate, QAbstractItemModel *
         int ier = ppf->updateAclTemplate (aclTR);
         if (ier < 0)
         {
-            QMessageBox::warning (sTForm, tr ("Insert access template"), tr ("Cannot save access template db error"), QMessageBox::Ok, QMessageBox::NoButton);
+            qCritical() << tr ("Cannot save access template db error");
+            QMessageBox::critical (sTForm, tr ("Insert access template"), tr ("Cannot save access template db error"), QMessageBox::Ok, QMessageBox::NoButton);
             return;
         }
         this->loadTemplates (mod);
@@ -938,7 +941,8 @@ void KKSStuffFactory :: setOrgAddress (const QModelIndex& orgIndex, QAbstractIte
         {
             if (orgAddrRes)
                 delete orgAddrRes;
-            QMessageBox::warning (orgAForm, tr ("Set organization address"), tr ("Error, cannot set address"), QMessageBox::Ok);
+            qCritical() << tr ("Error, cannot set address");
+            QMessageBox::critical (orgAForm, tr ("Set organization address"), tr ("Error, cannot set address"), QMessageBox::Ok);
             delete orgAForm;
             return;
         }
@@ -968,7 +972,8 @@ void KKSStuffFactory :: setUserToPosition (const QModelIndex& posIndex, QAbstrac
         {
             if (res)
                 delete res;
-            QMessageBox::warning (parentWidget, tr ("Set user onto position"), tr ("Cannot set user %1 onto %2").arg (idUser).arg (idPos), QMessageBox::Ok);
+            qCritical() << tr ("Cannot set user %1 onto %2").arg (idUser).arg (idPos);
+            QMessageBox::critical (parentWidget, tr ("Set user onto position"), tr ("Cannot set user %1 onto %2").arg (idUser).arg (idPos), QMessageBox::Ok);
             return;
         }
         delete res;
@@ -1001,7 +1006,8 @@ void KKSStuffFactory :: dismissUserFromPosition (const QModelIndex& posIndex, QA
     {
         if (res)
             delete res;
-        QMessageBox::warning (parentWidget, tr ("Dismiss user from position"), tr ("Cannot dismiss user from %1").arg (idPos), QMessageBox::Ok);
+        qCritical() << tr ("Cannot dismiss user from %1").arg (idPos);
+        QMessageBox::critical(parentWidget, tr ("Dismiss user from position"), tr ("Cannot dismiss user from %1").arg (idPos), QMessageBox::Ok);
         return;
     }
     delete res;
@@ -1065,6 +1071,7 @@ void KKSStuffFactory :: refreshEntity (KKSObjectExemplar * wObjE)
                 sForm->refreshStruct ();
         }
         catch(...){
+            qCritical() << tr("An internal error was occured during form refresh");
             QMessageBox::critical(0, tr("Error"), tr("An internal error was occured during form refresh"));
         }
     }

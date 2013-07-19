@@ -212,6 +212,7 @@ void KKSCatEditorFactory :: addCopyCategory (QWidget *ctw, int idCat, bool isChi
     KKSCategory *c = loader->loadCategory (idCat);
     if (!c)
     {
+        qCritical() << tr("Cannot load the category!");
         QMessageBox::critical(ctw, tr("Error!"), tr("Cannot load the category!"), QMessageBox::Ok);
         return;
     }
@@ -225,6 +226,7 @@ void KKSCatEditorFactory :: addCopyCategory (QWidget *ctw, int idCat, bool isChi
         int res = ppf->insertCategory(ct);
         if (res == ERROR_CODE)
         {
+            qCritical() << tr("Cannot create copy of the category");
             QMessageBox::critical(ctw, tr("Error!"), tr("Cannot create copy of the category"), QMessageBox::Ok);
             c->release();
             return;
@@ -238,6 +240,7 @@ void KKSCatEditorFactory :: addCopyCategory (QWidget *ctw, int idCat, bool isChi
 
     int res = ppf->insertCategory(c);
     if(res == ERROR_CODE){
+        qCritical() << tr("Cannot create copy of the category");
         QMessageBox::critical(ctw, tr("Error!"), tr("Cannot create copy of the category"), QMessageBox::Ok);
         c->release();
         return;
@@ -252,6 +255,7 @@ void KKSCatEditorFactory :: addCloneCategory (QWidget *ctw, int idCat, bool isCh
     KKSCategory *c = loader->loadCategory (idCat);
     if (!c)
     {
+        qCritical() << tr("Cannot load the category!");
         QMessageBox::critical(ctw, tr("Error!"), tr("Cannot load the category!"), QMessageBox::Ok);
         return;
     }
@@ -324,7 +328,8 @@ void KKSCatEditorFactory :: editCategory (QWidget* ctw, int idCat, bool isChild)
 
     if (!catEditor)
     {
-        QMessageBox::warning (ctw, tr ("Category edition"), tr ("Cannot create category editor id = %1").arg (idCat), QMessageBox::Ok);
+        qCritical() << tr ("Cannot create category editor id = %1").arg (idCat);
+        QMessageBox::critical(ctw, tr ("Category edition"), tr ("Cannot create category editor id = %1").arg (idCat), QMessageBox::Ok);
         return;
     }
     if (cwModal != Qt::NonModal)
@@ -360,7 +365,8 @@ void KKSCatEditorFactory :: delCategory (QWidget * ctw, int idCat)
     int res = ppf->deleteCategory (cat);
     if (res != OK_CODE)
     {
-        QMessageBox::warning (ctw, tr ("Category remove"), tr ("Cannot remove category %1").arg (cat->name()), QMessageBox::Ok);
+        qCritical() << tr ("Cannot remove category %1").arg (cat->name());
+        QMessageBox::critical (ctw, tr ("Category remove"), tr ("Cannot remove category %1").arg (cat->name()), QMessageBox::Ok);
         cat->release ();
         return;
     }
@@ -369,7 +375,8 @@ void KKSCatEditorFactory :: delCategory (QWidget * ctw, int idCat)
         int tres = ppf->deleteCategory (cat->tableCategory());
         if (tres != OK_CODE)
         {
-            QMessageBox::warning (ctw, tr ("Table Category remove"), tr ("Cannot remove category %1").arg (cat->tableCategory()->name()), QMessageBox::Ok);
+            qCritical() << tr ("Cannot remove category %1").arg (cat->tableCategory()->name());
+            QMessageBox::critical(ctw, tr ("Table Category remove"), tr ("Cannot remove category %1").arg (cat->tableCategory()->name()), QMessageBox::Ok);
             cat->release ();
             return;
         }
@@ -593,7 +600,8 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (KKSCategory *cat, // 
     KKSObject *attrTypesIO = loader->loadIO (IO_ATTR_TYPE_ID, true);
     if (!attrTypesIO)
     {
-        QMessageBox::warning (parent, QObject::tr ("Attributes types"), QObject::tr ("Cannot load attribute types"), QMessageBox::Ok);
+        qCritical() << QObject::tr ("Cannot load attribute types");
+        QMessageBox::critical (parent, QObject::tr ("Attributes types"), QObject::tr ("Cannot load attribute types"), QMessageBox::Ok);
         return 0;
     }
 
@@ -795,7 +803,8 @@ void KKSCatEditorFactory :: copyAttributesIntoCategory (KKSCategory *c, QAbstrac
         KKSCategory * cSourceCat = loader->loadCategory (idCat);
         if (!cSourceCat)
         {
-            QMessageBox::warning (cEditor, tr ("Category editor"), tr ("Cannot load source category"), QMessageBox::Ok);
+            qCritical() << tr ("Cannot load source category");
+            QMessageBox::critical (cEditor, tr ("Category editor"), tr ("Cannot load source category"), QMessageBox::Ok);
             ioCat->release ();
             return;
         }
@@ -902,7 +911,8 @@ void KKSCatEditorFactory :: saveCategory (KKSCategory *cat, int idTableCat, int 
     if (res == ERROR_CODE)
     {
         emit categoryDbError ();
-        QMessageBox::warning (cEditor, tr ("Category"), tr("Category is not saved"));
+        qCritical() << tr("Category is not saved");
+        QMessageBox::critical(cEditor, tr ("Category"), tr("Category is not saved"));
         return;
     }
     //if (qobject_cast<KKSCatEditor *>(cEditor->parent()) == 0)
@@ -1038,7 +1048,8 @@ void KKSCatEditorFactory :: addLifeCycle (QWidget * editor, int idObject, const 
     int ier = this->ppf->insertLifeCycle (lcf);
     if (ier < 0)
     {
-        QMessageBox::warning (editor, tr("Add new life cycle"), tr ("Cannot add new life cycle. Database error"), QMessageBox::Ok);
+        qCritical() << tr ("Cannot add new life cycle. Database error");
+        QMessageBox::critical(editor, tr("Add new life cycle"), tr ("Cannot add new life cycle. Database error"), QMessageBox::Ok);
         lcForm->setParent (0);
         delete lcForm;
         lc->release ();
@@ -1090,7 +1101,8 @@ void KKSCatEditorFactory :: editLifeCycle (QWidget * editor, int idObject, qint6
     int ier = this->ppf->updateLifeCycle (lcf);
     if (ier < 0)
     {
-        QMessageBox::warning (editor, tr("Edit life cycle"), tr ("Cannot update life cycle. Database error"), QMessageBox::Ok);
+        qCritical() <<  tr ("Cannot update life cycle. Database error");
+        QMessageBox::critical (editor, tr("Edit life cycle"), tr ("Cannot update life cycle. Database error"), QMessageBox::Ok);
         lcForm->setParent (0);
         delete lcForm;
         lc->release ();
@@ -1112,7 +1124,8 @@ void KKSCatEditorFactory :: delLifeCycle (QWidget * editor, int idObject, qint64
     int ier = ppf->deleteLifeCycle(idObjE);
     if (ier < 0)
     {
-        QMessageBox::warning (editor, tr("Remove life cycle"), tr ("Cannot delete life cycle. Database error"), QMessageBox::Ok);
+        qCritical() << tr ("Cannot delete life cycle. Database error");
+        QMessageBox::critical(editor, tr("Remove life cycle"), tr ("Cannot delete life cycle. Database error"), QMessageBox::Ok);
         return;
     }
     int row = recIndex.row();
@@ -1193,7 +1206,8 @@ void KKSCatEditorFactory :: saveLifeCycleToDb (KKSLifeCycleEx * lc)
     int ier = (lc->id() <= 0 ? ppf->insertLifeCycle (lc) : ppf->updateLifeCycle (lc));
     if (ier < 0)
     {
-        QMessageBox::warning (parentWidget, tr ("Save life cycle"), tr ("Error in life cycle save"), QMessageBox::Ok);
+        qCritical() << tr ("Error in life cycle save");
+        QMessageBox::critical(parentWidget, tr ("Save life cycle"), tr ("Error in life cycle save"), QMessageBox::Ok);
         return;
     }
     if (isIns && parentWidget)

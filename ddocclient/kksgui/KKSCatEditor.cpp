@@ -203,6 +203,7 @@ void KKSCatEditor :: apply (void)
 {
     if (lEName->text().isEmpty())
     {
+        qWarning() << tr ("Please set category name");
         QMessageBox::warning (this, tr ("Save category"), tr ("Please set category name"), QMessageBox::Ok);
         isCloseIgnored = true;
         return;

@@ -17,6 +17,7 @@ class KKSJMonitor;
 class KKSCmdJournal;
 class KKSMsgJournal;
 class KKSJournalWidget;
+class KKSDbgOutputWidget;
 class KKSObjEditor;
 class KKSCatEditor;
 class KKSDialog;
@@ -122,6 +123,7 @@ Q_OBJECT
         void initToolBars();
         void initIcons();
         void initJournal (void);
+        void initDebugWindow();
         void initStatusBar();
         void initConnections();
         bool connectToDb();
@@ -139,6 +141,7 @@ Q_OBJECT
         KKSJMonitor * m_jmonitor;
         //KKSMsgJournal * m_msgJ;
         KKSJournalWidget * m_journalW;
+        KKSDbgOutputWidget * m_debugWidget;
 
         QAction *aCloseWindow;
         QAction *aCloseAllWindows;

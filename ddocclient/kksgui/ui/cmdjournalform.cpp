@@ -318,6 +318,7 @@ void KKSCmdJournal::on_aExecute_triggered()
     int idJournal = cmd.id();
 
     if(idCategory <= 0 || idJournal <= 0){
+        qCritical() << tr("You should select one command!");
         QMessageBox::critical(this, 
                               tr("Error"), 
                               tr("You should select one command!"), 
@@ -340,6 +341,7 @@ void KKSCmdJournal::on_aExecuteEx_triggered()
     int idJournal = cmd.id();
 
     if(idCategory <= 0 || idJournal <= 0){
+        qCritical() << tr("You should select one command!");
         QMessageBox::critical(this, 
                               tr("Error"), 
                               tr("You should select one command!"), 

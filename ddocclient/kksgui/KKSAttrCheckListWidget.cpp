@@ -95,6 +95,7 @@ void KKSAttrCheckWidget :: delAttrRef (void)
     QModelIndexList sIndexes = sel.indexes ();
     if (sIndexes.isEmpty())
     {
+        qWarning() <<  tr ("Please select value");
         QMessageBox::warning (this, tr ("Delete attribute value"), tr ("Please select value"), QMessageBox::Ok, QMessageBox::Ok);
         return;
     }
@@ -121,6 +122,7 @@ void KKSAttrCheckWidget :: refRec (void)
     QModelIndexList sIndexes = sel.indexes ();
     if (sIndexes.isEmpty())
     {
+        qWarning() << tr ("Please select record");
         QMessageBox::warning (this, tr ("Open selected record"), tr ("Please select record"), QMessageBox::Ok, QMessageBox::Ok);
         return;
     }

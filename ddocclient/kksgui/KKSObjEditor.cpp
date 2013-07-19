@@ -436,6 +436,7 @@ int KKSObjEditor :: constructObject()
                  cAttrValue->attribute()->defValue().value().isEmpty() && 
                 (val.isNull() || value.isEmpty()))
             {
+                qWarning() << tr ("Mandatory attribute %1 has to be set").arg (cAttrValue->attribute()->name());
                 QMessageBox::warning (this, 
                                       tr ("Save document"), 
                                       tr ("Mandatory attribute %1 has to be set").arg (cAttrValue->attribute()->name()), 
@@ -622,6 +623,7 @@ int KKSObjEditor :: constructObject()
                  cAttrValue->attribute()->defValue().value().isEmpty() && 
                 (val.isNull() || value.isEmpty()))
             {
+                qWarning() << tr ("Mandatory attribute %1 has to be set").arg (cAttrValue->attribute()->name());
                 QMessageBox::warning (this, 
                                       tr ("Save document"), 
                                       tr ("Mandatory attribute %1 has to be set").arg (cAttrValue->attribute()->name()), 
@@ -786,6 +788,7 @@ int KKSObjEditor :: constructObject()
                  cAttrValue->attribute()->defValue().value().isEmpty() && 
                 (val.isNull() || value.isEmpty()))
             {
+                qWarning() << tr ("Mandatory attribute %1 has to be set").arg (cAttrValue->attribute()->name());
                 QMessageBox::warning (this, 
                                       tr ("Save document"), 
                                       tr ("Mandatory attribute %1 has to be set").arg (cAttrValue->attribute()->name()), 

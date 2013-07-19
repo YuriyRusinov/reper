@@ -125,12 +125,14 @@ void MessageForm :: constructMessage (void)
 
     if (UI->tEMessageBody->toPlainText().isEmpty())
     {
+        qWarning() << tr ("Set message text");
         QMessageBox::warning (this, tr ("Message"), tr ("Set message text"), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
 
     if (getReceivers().isEmpty())
     {
+        qWarning() << tr ("Set message receiver");
         QMessageBox::warning (this, tr ("Message"), tr ("Set message receiver"), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
@@ -152,6 +154,7 @@ void MessageForm :: loadReceiver (void)
     QAbstractItemModel * recvModel = UI->tvReceiver->model ();
     if (!recvModel)
     {
+        qWarning() << tr ("Set model into receivers");
         QMessageBox::warning (this, tr ("Message form"), tr ("Set model into receivers"), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
@@ -322,6 +325,7 @@ void MessageForm :: addMailList (void)
     QAbstractItemModel * mailModel = UI->tvReceiver->model ();
     if (!mailModel)
     {
+        qWarning() << tr ("Set model into executors");
         QMessageBox::warning (this, tr ("Message form"), tr ("Set model into executors"), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }

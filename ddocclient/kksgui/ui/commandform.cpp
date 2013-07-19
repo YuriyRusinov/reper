@@ -207,24 +207,28 @@ void CommandForm :: constructCommand (void)
 
     if (UI->lECategory->text().isEmpty())
     {
+        qWarning() << tr ("Set IO category");
         QMessageBox::warning (this, tr ("Command"), tr ("Set IO category"), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
 
     if (UI->lEController->text().isEmpty())
     {
+        qWarning() << tr ("Set controller");
         QMessageBox::warning (this, tr ("Command"), tr ("Set controller"), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
 
     if (getExecutors().isEmpty())
     {
+        qWarning() << tr ("Set executor");
         QMessageBox::warning (this, tr ("Command"), tr ("Set executor"), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
 
     if (UI->tECommandBody->toPlainText().isEmpty())
     {
+        qWarning() << tr ("Set command text");
         QMessageBox::warning (this, tr ("Command"), tr ("Set command text"), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
@@ -467,6 +471,7 @@ void CommandForm :: addMailList (void)
     QAbstractItemModel * exModel = UI->tvExecutor->model ();
     if (!exModel)
     {
+        qWarning() << tr ("Set model into executors");
         QMessageBox::warning (this, tr ("Command form"), tr ("Set model into executors"), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
@@ -528,6 +533,7 @@ void CommandForm :: loadExecutor (void)
     QAbstractItemModel * exModel = UI->tvExecutor->model ();
     if (!exModel)
     {
+        qWarning() << tr("Set model into executors");
         QMessageBox::warning (this, tr ("Command form"), tr ("Set model into executors"), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }

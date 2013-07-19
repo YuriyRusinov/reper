@@ -246,7 +246,8 @@ KKSIncludesWidget * KKSRubricFactory::createModalRubricEditor(int mode, const KK
         rootR->addRubric(rubrMyDocs);
         int res = ppf->updateRubricators(rootR, isDocs);
         if (res != OK_CODE) {
-            QMessageBox::warning(parent, tr("Rubricator"), tr("Cannot load My documents"), QMessageBox::Ok);
+            qCritical() << tr("Cannot load My documents");
+            QMessageBox::critical(parent, tr("Rubricator"), tr("Cannot load My documents"), QMessageBox::Ok);
             return 0;
         }
 
@@ -309,7 +310,8 @@ void KKSRubricFactory::saveRubric(KKSRubric * rootR, bool isMyDocs)
 
     KKSIncludesWidget *wParent = qobject_cast<KKSIncludesWidget *>(this->sender());
     if (res != OK_CODE) {
-        QMessageBox::warning(wParent, tr("Rubricators"), tr("Cannot save rubricators"), QMessageBox::Ok);
+        qCritical() << tr("Cannot save rubricators");
+        QMessageBox::critical(wParent, tr("Rubricators"), tr("Cannot save rubricators"), QMessageBox::Ok);
     } else
         wParent->setSaved(true);
 }
@@ -450,6 +452,9 @@ void KKSRubricFactory::rubricItemUpload(const KKSRubric *r, bool forRecords, QAb
             const KKSCategory * c = o->category();
             if (c->id() != r->getCategory()->id())
             {
+                qCritical() << tr("You are put document of category\n\"%1\"\nto rubric with category:\n\"%2\".\nThis is not allowed!")
+                                                    .arg(c->name())
+                                                    .arg(r->getCategory()->name());
                 int res = QMessageBox::critical(editor, 
                                                 tr("Add document into rubric"), 
                                                 tr("You are put document of category\n\"%1\"\nto rubric with category:\n\"%2\".\nThis is not allowed!")
@@ -499,7 +504,8 @@ void KKSRubricFactory::rubricItemUpload(const KKSRubric *r, bool forRecords, QAb
             KKSObjectExemplar * ioRec = loader->loadEIO(idRec, o);
             if (!ioRec)
             {
-                QMessageBox::warning (editor, tr("Add new item"), tr("Cannot load record %1").arg(idRec), QMessageBox::Ok);
+                qCritical() << tr("Cannot load record %1").arg(idRec);
+                QMessageBox::critical (editor, tr("Add new item"), tr("Cannot load record %1").arg(idRec), QMessageBox::Ok);
                 recEditor->setParent (0);
                 delete recEditor;
                 objEditor->setParent (0);
@@ -539,6 +545,7 @@ void KKSRubricFactory::rubricItemUpload(const KKSRubric *r, bool forRecords, QAb
     //editor->slotAddRubricItem (idObject, name);
     const KKSRubricItem * equalItem = r->itemForId(idObject);
     if (equalItem) {
+        qCritical() << tr("You cannot add one item to rubric twise");
         QMessageBox::critical(editor,
                 tr("Error"),
                 tr("You cannot add one item to rubric twise"),
@@ -1274,10 +1281,12 @@ void KKSRubricFactory::putIntoRubr(const QList<int>& ioIDList, const KKSRubric *
     if (rubrDial->exec() == QDialog::Accepted) {
         const KKSRubric * r = anotherW->getSelectedRubric();
         if (!r) {
+            qWarning() << tr("Select destignation");
             QMessageBox::warning(pWidget, tr("Copy documents"), tr("Select destignation"), QMessageBox::Ok);
             return;
         }
         if (oldRubric && (oldRubric == r || oldRubric->id() == r->id())) {
+            qWarning() << tr("You put documents into same rubric");
             QMessageBox::warning(pWidget, tr("Copy documents"), tr("You put documents into same rubric"), QMessageBox::Ok);
             return;
         }

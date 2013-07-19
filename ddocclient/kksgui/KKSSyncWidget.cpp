@@ -163,6 +163,7 @@ void KKSSyncWidget :: delSyncOrg (void)
     QModelIndexList sIndexes = sel.indexes ();
     if (sIndexes.isEmpty())
     {
+        qWarning() << tr ("Select organization for remove");
         QMessageBox::warning (this, tr ("Delete organization"), tr ("Select organization for remove"), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }

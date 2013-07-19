@@ -149,6 +149,7 @@ void SaveSearchTemplateForm :: staccept (void)
     qDebug () << __PRETTY_FUNCTION__;
     if (UI->lEName->text().isEmpty())
     {
+        qWarning() << tr ("Set search template name");
         QMessageBox::warning (this, tr ("Search template"), tr ("Set search template name"), QMessageBox::Ok);
         return;
     }
@@ -162,6 +163,7 @@ void SaveSearchTemplateForm :: catChanged (const QModelIndex& current, const QMo
     qDebug () << __PRETTY_FUNCTION__ << current << previous;
     if (current.isValid() && current.data(Qt::UserRole+USER_ENTITY).toInt() != 1)
     {
+        qWarning() << tr("You have to select category not type");
         QMessageBox::warning(this, tr("Select category"), tr("You have to select category not type"), QMessageBox::Ok);
         if (previous.isValid())
         {
@@ -181,6 +183,7 @@ void SaveSearchTemplateForm :: catChanged (const QModelIndex& current, const QMo
     }
     else if (!current.isValid() && previous.isValid() && previous.data(Qt::UserRole+USER_ENTITY) == 1)
     {
+        qWarning() << tr("You have to select category not type");
         QMessageBox::warning(this, tr("Select category"), tr("You have to select category not type"), QMessageBox::Ok);
         sMod->select(previous, QItemSelectionModel::ClearAndSelect);
         sMod->setCurrentIndex (previous, QItemSelectionModel::ClearAndSelect);
@@ -202,6 +205,7 @@ void SaveSearchTemplateForm :: selCatChanged (const QItemSelection& selected, co
         !current.isValid() && previous.isValid() && previous.data(Qt::UserRole+USER_ENTITY) == 1
        )
     {
+        qWarning() << tr("You have to select category not type");
         QMessageBox::warning(this, tr("Select category"), tr("You have to select category not type"), QMessageBox::Ok);
         return;
     }

@@ -212,9 +212,10 @@ void RubricForm :: loadRubricImage (void)
     QPixmap rubrPixmap (iconFile);
     if(rubrPixmap.isNull())
     {
+        qCritical() << tr("Cannot transform rubric image to QPixmap");
         QMessageBox::critical(this, 
                               tr("Error"), 
-                              tr(""), 
+                              tr("Cannot transform rubric image to QPixmap"), 
                               QMessageBox::Ok);
         return;
     }

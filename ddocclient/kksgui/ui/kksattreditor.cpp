@@ -162,6 +162,7 @@ void KKSAttrEditor :: accept ()
     if (isRef && ui->cbRefName->currentIndex () < 0 )
     {
         if(cType != KKSAttrType::atParent){//3 - это родитель/потомок
+            qWarning() << tr ("Select reference");
             QMessageBox::warning (this, tr ("Attribute edit"), tr ("Select reference"), QMessageBox::Ok);
             return;
         }
@@ -170,10 +171,12 @@ void KKSAttrEditor :: accept ()
     if (isRef )
     {
         if(cType == KKSAttrType::atParent && ui->cbRefField->currentText().isEmpty()){//родитель/потомок
+            qWarning() << tr ("Set reference field");
             QMessageBox::warning (this, tr ("Attribute edit"), tr ("Set reference field"), QMessageBox::Ok);
             return;
         }
         else if(cType != KKSAttrType::atParent && ui->cbRefField->currentIndex () < 0){
+            qWarning() << tr ("Select reference field");
             QMessageBox::warning (this, tr ("Attribute edit"), tr ("Select reference field"), QMessageBox::Ok);
             return;
         }

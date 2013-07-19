@@ -132,6 +132,7 @@ void KKSCategoryTemplateWidget :: addCat (void)
         emit addNewCategory (this, idCatType, false);
     else
     {
+        qWarning() << tr ("This is system type of category.\nCategory cannot been created.");
         QMessageBox::warning (this, tr ("Add category"), tr ("This is system type of category.\nCategory cannot been created."), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
@@ -147,8 +148,10 @@ void KKSCategoryTemplateWidget :: addCopyCat (void)
             pCatInd.insert (idCat, wIndex);
         emit addCopyCategory(this, idCat, false);
     }
-    else
+    else{
+        qWarning() << tr("Please select category");
         QMessageBox::warning (this, tr("Warning"), tr("Please select category"), QMessageBox::Ok);
+    }
 }
 
 void KKSCategoryTemplateWidget :: addCloneCat (void)
@@ -161,8 +164,10 @@ void KKSCategoryTemplateWidget :: addCloneCat (void)
             pCatInd.insert (idCat, wIndex);
         emit addNewCategoryE(this, idCat, false);
     }
-    else
+    else{
+        qWarning() << tr("Please select category");
         QMessageBox::warning (this, tr("Warning"), tr("Please select category"), QMessageBox::Ok);
+    }
 }
 
 void KKSCategoryTemplateWidget :: addTemplate (void)
@@ -174,8 +179,10 @@ void KKSCategoryTemplateWidget :: addTemplate (void)
         emit addNewTemplate (this, idCat);
         pCatInd.insert (idCat, cIndex);
     }
-    else
+    else{
+        qWarning() << tr("You have to select category");
         QMessageBox::warning (this, tr("Warning"), tr("You have to select category"), QMessageBox::Ok);
+    }
 }
 
 void KKSCategoryTemplateWidget :: editCat (void)
@@ -188,8 +195,10 @@ void KKSCategoryTemplateWidget :: editCat (void)
             pCatInd.insert (idCat, wIndex);
         emit editCategory (this, idCat, false);
     }
-    else
+    else{
+        qWarning() << tr("Please select category");
         QMessageBox::warning (this, tr("Warning"), tr("Please select category"), QMessageBox::Ok);
+    }
 }
 
 void KKSCategoryTemplateWidget :: editTemplate (void)
@@ -202,9 +211,14 @@ void KKSCategoryTemplateWidget :: editTemplate (void)
         if (tvCatTemplate->selectionModel()->currentIndex ().isValid() &&
             tvCatTemplate->selectionModel()->currentIndex ().parent().isValid() &&
             tvCatTemplate->selectionModel()->currentIndex ().data (Qt::UserRole+USER_ENTITY).toInt() == 0)
+        {
+            qWarning() << tr("Base template cannot be edited");
             QMessageBox::warning (this, tr("Warning"), tr("Base template cannot be edited"), QMessageBox::Ok);
-        else
+        }
+        else{
+            qWarning() << tr("Please select template");
             QMessageBox::warning (this, tr("Warning"), tr("Please select template"), QMessageBox::Ok);
+        }
     }
 }
 
@@ -213,6 +227,7 @@ void KKSCategoryTemplateWidget :: delCat (void)
     int idC = this->getCurrentCategoryId ();
     if (idC <= 0)
     {
+        qWarning() << tr ("Select category for delete");
         QMessageBox::warning (this, tr ("Delete category"), tr ("Select category for delete"), QMessageBox::Ok);
         return;
     }
@@ -231,7 +246,10 @@ void KKSCategoryTemplateWidget :: delTemplate (void)
         if (tvCatTemplate->selectionModel()->currentIndex ().isValid() &&
             tvCatTemplate->selectionModel()->currentIndex ().parent().isValid() &&
             tvCatTemplate->selectionModel()->currentIndex ().data (Qt::UserRole+USER_ENTITY).toInt() == 0)
+        {
+            qWarning() << tr("Base template cannot be deleted");
             QMessageBox::warning (this, tr("Warning"), tr("Base template cannot be deleted"), QMessageBox::Ok);
+        }
         return;
     }
 
@@ -347,6 +365,7 @@ void KKSCategoryTemplateWidget :: tvDoubleClicked(const QModelIndex & wIndex)
             emit editTempl (this, idT);
         else
         {
+            qWarning() << tr("Base template cannot be edited");
             QMessageBox::warning (this, tr("Warning"), tr("Base template cannot be edited"), QMessageBox::Ok);
         }
     }

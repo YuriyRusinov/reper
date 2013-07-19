@@ -816,6 +816,7 @@ int KKSJournalWidget :: currentMsgJournalRecord() const
 
 void KKSJournalWidget :: slotShowMsgError (QString error) const
 {
+    qCritical() << error;
     QMessageBox::critical(this->widget(), tr("Error"), error, QMessageBox::Ok);
 }
 
@@ -1099,6 +1100,7 @@ void KKSJournalWidget :: deleteOutCommand (void)
     QModelIndex cmdIndex = selModel->currentIndex ();
     if (tvJournal->model()->hasChildren (cmdIndex))
     {
+        qWarning() << tr ("Please select command for delete");
         QMessageBox::warning (this, tr ("Delete command"), tr ("Please select command for delete"), QMessageBox::Ok);
         return;
     }
@@ -1138,6 +1140,7 @@ void KKSJournalWidget :: editOutCommand (void)
     QModelIndex cmdIndex = selModel->currentIndex ();
     if (tvJournal->model()->hasChildren (cmdIndex))
     {
+        qWarning() << tr ("Please select command for edit");
         QMessageBox::warning (this, tr ("Edit command"), tr ("Please select command for edit"), QMessageBox::Ok);
         return;
     }
@@ -1177,6 +1180,7 @@ void KKSJournalWidget :: dropPeriodCommand (void)
     QModelIndex cmdIndex = selModel->currentIndex ();
     if (tvJournal->model()->hasChildren (cmdIndex))
     {
+        qWarning() << tr ("Please select command");
         QMessageBox::warning (this, tr ("Drop command period"), tr ("Please select command"), QMessageBox::Ok);
         return;
     }
@@ -1210,6 +1214,7 @@ void KKSJournalWidget :: viewCommand (void)
     QModelIndex cmdIndex = selModel->currentIndex ();
     if (tvJournal->model()->hasChildren (cmdIndex))
     {
+        qWarning() << tr ("Please select command");
         QMessageBox::warning (this, tr ("View command"), tr ("Please select command"), QMessageBox::Ok);
         return;
     }
@@ -1226,6 +1231,7 @@ void KKSJournalWidget :: viewCommandDoc (void)
     QModelIndex cmdIndex = selModel->currentIndex ();
     if (tvJournal->model()->hasChildren (cmdIndex))
     {
+        qWarning() << tr ("Please select command");
         QMessageBox::warning (this, tr ("View command"), tr ("Please select command"), QMessageBox::Ok);
         return;
     }
@@ -1244,6 +1250,7 @@ void KKSJournalWidget :: viewCommandResults (void)
     QModelIndex cmdIndex = selModel->currentIndex ();
     if (tvJournal->model()->hasChildren (cmdIndex))
     {
+        qWarning() << tr ("Please select command");
         QMessageBox::warning (this, tr ("View command results"), tr ("Please select command"), QMessageBox::Ok);
         return;
     }
@@ -1265,6 +1272,7 @@ void KKSJournalWidget :: executeCommand (void)
     QModelIndex cmdIndex = selModel->currentIndex ();
     if (tvJournal->model()->hasChildren (cmdIndex))
     {
+        qWarning() << tr ("Please select command");
         QMessageBox::warning (this, tr ("Execute command"), tr ("Please select command"), QMessageBox::Ok);
         return;
     }
@@ -1278,6 +1286,7 @@ void KKSJournalWidget :: executeCommand (void)
     int idJournal = cmd.id();
 
     if(idCategory <= 0 || idJournal <= 0){
+        qCritical() << tr("You should select one command!");
         QMessageBox::critical(this,
                               tr("Error"),
                               tr("You should select one command!"),
@@ -1313,6 +1322,7 @@ void KKSJournalWidget :: setDocumentAsResult (void)
     QModelIndex cmdIndex = selModel->currentIndex ();
     if (tvJournal->model()->hasChildren (cmdIndex))
     {
+        qWarning() << tr ("Please select command");
         QMessageBox::warning (this, tr ("Execute command"), tr ("Please select command"), QMessageBox::Ok);
         return;
     }
@@ -1326,6 +1336,7 @@ void KKSJournalWidget :: setDocumentAsResult (void)
     int idJournal = cmd.id();
 
     if(idCategory <= 0 || idJournal <= 0){
+        qCritical() << tr("You should select one command!");
         QMessageBox::critical(this,
                               tr("Error"),
                               tr("You should select one command!"),
@@ -1343,6 +1354,7 @@ void KKSJournalWidget :: setCommandOnExecute (void)
     QModelIndex cmdIndex = selModel->currentIndex ();
     if (tvJournal->model()->hasChildren (cmdIndex))
     {
+        qWarning() << tr ("Please select command");
         QMessageBox::warning (this, tr ("Execute command"), tr ("Please select command"), QMessageBox::Ok);
         return;
     }
@@ -1378,6 +1390,7 @@ void KKSJournalWidget :: markAsRead (void)
     QModelIndex msgIndex = selModel->currentIndex ();
     if (tvJournal->model()->hasChildren (msgIndex))
     {
+        qWarning() << tr ("Please select message");
         QMessageBox::warning (this, tr ("Mark message"), tr ("Please select message"), QMessageBox::Ok);
         return;
     }
@@ -1394,6 +1407,7 @@ void KKSJournalWidget :: viewMessageAttachments (void)
     QModelIndex msgIndex = selModel->currentIndex ();
     if (tvJournal->model()->hasChildren (msgIndex))
     {
+        qWarning() << tr ("Please select message");
         QMessageBox::warning (this, tr ("View message attachments"), tr ("Please select message"), QMessageBox::Ok);
         return;
     }
@@ -1411,6 +1425,7 @@ void KKSJournalWidget :: viewMessage (void)
     QModelIndex msgIndex = selModel->currentIndex ();
     if (tvJournal->model()->hasChildren (msgIndex))
     {
+        qWarning() << tr ("Please select message");
         QMessageBox::warning (this, tr ("View message"), tr ("Please select message"), QMessageBox::Ok);
         return;
     }

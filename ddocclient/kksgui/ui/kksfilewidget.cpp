@@ -108,6 +108,7 @@ void KKSFileWidget::on_pbDownload_clicked()
 {
     KKSFile * f = getCurrentFile();
     if(!f){
+        qWarning() << tr("Choose file for download!");
         QMessageBox::warning(this, 
                              tr("Download file"), 
                              tr("Choose file for download!"), 
@@ -117,6 +118,8 @@ void KKSFileWidget::on_pbDownload_clicked()
     }
     
     if(f->id() <= 0){
+        qCritical() << tr("The file is not saved to database, just locally added!\n"
+                                 "You can't download it");
         QMessageBox::critical(this, 
                               tr("Download file"), 
                               tr("The file is not saved to database, just locally added!\n"
@@ -179,6 +182,7 @@ void KKSFileWidget::on_pbOpen_clicked()
 {
     KKSFile * f = getCurrentFile();
     if(!f){
+        qWarning() << tr("Choose file for open!");
         QMessageBox::warning(this, 
                              tr("Open file"), 
                              tr("Choose file for open!"), 
@@ -203,6 +207,7 @@ void KKSFileWidget::on_pbOpen_clicked()
     }
     
     if(!f->loaded() || f->localUrl().isEmpty()){
+        qCritical() << tr("The file is not downloaded!");
         QMessageBox::critical(this, 
                               tr("Open file"), 
                               tr("The file is not downloaded!"), 
@@ -212,6 +217,9 @@ void KKSFileWidget::on_pbOpen_clicked()
     }
 
     if(!f->open()){
+        qCritical() << tr("Cannot open the file!\n\n"
+                                 "If you about to open file of Microsoft Visio type,\n"
+                                 "try to rename it with extention. Example: filename.vsd");
         QMessageBox::critical(this, 
                               tr("Open file"), 
                               tr("Cannot open the file!\n\n"
@@ -225,6 +233,7 @@ void KKSFileWidget::on_pbDelete_clicked()
 {
     KKSFile * f = getCurrentFile();
     if(!f){
+        qWarning() << tr("Choose file for remove!");
         QMessageBox::warning(this, 
                              tr("Remove file"), 
                              tr("Choose file for remove!"), 
@@ -265,6 +274,7 @@ void KKSFileWidget::on_pbAddFile_clicked()
     if(ui->lePath->text().isEmpty() || 
        ui->leName->text().isEmpty())
     {
+        qCritical() << tr("Path or name of file is invalid!");
         QMessageBox::critical(this, 
                               tr("Add file"), 
                               tr("Path or name of file is invalid!"), 
@@ -273,6 +283,7 @@ void KKSFileWidget::on_pbAddFile_clicked()
     }
 
     if(equalFileAdded()){
+        qCritical() << tr("You cannot add one file twise!");
         QMessageBox::critical(this, 
                               tr("Add file"), 
                               tr("You cannot add one file twise!"), 

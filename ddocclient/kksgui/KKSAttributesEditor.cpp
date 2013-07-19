@@ -143,6 +143,7 @@ void KKSAttributesEditor :: addAttribute (void)
     }
     if (!pIndex.isValid())
     {
+        qWarning() << tr("Select parent group");
         QMessageBox::warning (this, tr ("Add attribute"), tr("Select parent group"), QMessageBox::Ok);
         delete aEditor;
         attribute->release ();
@@ -176,6 +177,7 @@ void KKSAttributesEditor :: editAttribute (void)
     QAbstractItemModel * aModel = recW->getSourceModel ();
     if (!pIndex.isValid())
     {
+        qWarning() << tr("Select parent group");
         QMessageBox::warning (this, tr ("Edit attribute"), tr("Select parent group"), QMessageBox::Ok);
         return;
     }
@@ -191,6 +193,7 @@ void KKSAttributesEditor :: delAttribute (void)
     QModelIndex pIndex = recW->getSourceIndex();
     if (!pIndex.isValid())
     {
+        qWarning() << tr("Select parent group");
         QMessageBox::warning (this, tr ("Delete attribute"), tr("Select parent group"), QMessageBox::Ok);
         return;
     }
@@ -373,6 +376,7 @@ void KKSAttributesEditor :: editAGroup (void)
     wIndex = wIndex.sibling (wIndex.row(), 0);
     if (!wIndex.isValid())
     {
+        qWarning() << tr ("Select group of attributes.");
         QMessageBox::warning(this, tr("Edit attributes group"), tr ("Select group of attributes."), QMessageBox::Ok);
         return;
     }
@@ -388,11 +392,13 @@ void KKSAttributesEditor :: delAGroup (void)
     QModelIndex wIndex = recW->getSourceIndex ();
     if (!wIndex.isValid())
     {
+        qWarning() << tr ("Select group of attributes.");
         QMessageBox::warning(this, tr("Delete attributes group"), tr ("Select group of attributes."), QMessageBox::Ok);
         return;
     }
     if (wIndex.data(Qt::UserRole+USER_ENTITY).toInt() > 0 || aModel->hasChildren(wIndex))
     {
+        qWarning() << tr ("You cannot delete non empty group.");
         QMessageBox::warning(this, tr("Delete group"), tr ("You cannot delete non empty group."), QMessageBox::Ok);
         return;
     }

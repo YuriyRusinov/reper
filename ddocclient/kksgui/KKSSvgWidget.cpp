@@ -60,7 +60,8 @@ void KKSSvgWidget :: openFile (void)
     pic.load (fileName);
     if (pic.isNull())
     {
-        QMessageBox::information(this, tr("Error"),
+        qCritical() << tr("Cannot load %1.").arg(fileName);
+        QMessageBox::critical(this, tr("Error"),
                                  tr("Cannot load %1.").arg(fileName));
         return;
     }

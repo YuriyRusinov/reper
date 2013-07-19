@@ -420,6 +420,7 @@ void KKSIncludesWidget::delRubric (void)
             //
             // item or category-rubric selected
             //
+            qWarning() << tr ("Cannot remove category rubric/item");
             QMessageBox::warning(this, tr("Delete rubric"), tr ("Cannot remove category rubric/item"), QMessageBox::Ok);
             return;
         }
@@ -472,6 +473,7 @@ void KKSIncludesWidget :: addRubric (void)
         else if (index.data (Qt::UserRole+2).toInt() == KKSRubricBase::atRubricCategory ||
                  index.data (Qt::UserRole+2).toInt() == KKSRubricBase::atOthers)
         {
+            qWarning() << tr ("Cannot add subrubric into categorized rubric or another");
             QMessageBox::warning (this,
                                   tr ("Add rubric"),
                                   tr ("Cannot add subrubric into categorized rubric or another"),
@@ -595,6 +597,7 @@ void KKSIncludesWidget :: editRubric (void)
         else if (rType == KKSRubricBase::atOthers ||
                  rType == KKSRubricBase::atRubricCategory)
         {
+            qWarning() << tr ("Category or others rubric cannot been edited");
             QMessageBox::warning(this, tr("Edit rubric"), tr ("Category or others rubric cannot been edited"), QMessageBox::Ok);
             return;
         }
@@ -855,8 +858,10 @@ void KKSIncludesWidget :: delRubricItem (void)
             //
             // rubric selected
             //
-            if (pType == KKSRubricBase::atRubricCategory)
+            if (pType == KKSRubricBase::atRubricCategory){
+                qWarning() << tr ("Cannot delete item from categorized rubric.");
                 QMessageBox::warning (this, tr ("Delete rubric item"), tr ("Cannot delete item from categorized rubric."), QMessageBox::Ok);
+            }
             return;
         }
     }
@@ -898,6 +903,7 @@ void KKSIncludesWidget :: addRubricItem (void)
     QModelIndex index = sel.indexes().isEmpty() ? QModelIndex() : sel.indexes().at(0);
     if (!sm || !index.isValid())
     {
+        qWarning() << tr("You should select rubric to add item");
         QMessageBox::warning(this, 
                              tr("Warning"), 
                              tr("You should select rubric to add item"), 
@@ -907,6 +913,7 @@ void KKSIncludesWidget :: addRubricItem (void)
     else if (index.data (Qt::UserRole+2).toInt() == KKSRubricBase::atRubricCategory ||
              index.data (Qt::UserRole+2).toInt() == KKSRubricBase::atOthers)
     {
+        qWarning() << tr ("Cannot add document into categorized rubric or another");
         QMessageBox::warning (this,
                               tr ("Add rubric item"),
                               tr ("Cannot add document into categorized rubric or another"),
@@ -940,6 +947,7 @@ void KKSIncludesWidget :: createRubricItem (QAbstractItemModel * itemModel, cons
     QModelIndex index = sel.indexes().isEmpty() ? QModelIndex() : sel.indexes().at(0);
     if (!sm || !index.isValid())
     {
+        qWarning() << tr("You should select rubric to add item");
         QMessageBox::warning(this, 
                              tr("Warning"), 
                              tr("You should select rubric to add item"), 
@@ -953,6 +961,7 @@ void KKSIncludesWidget :: createRubricItem (QAbstractItemModel * itemModel, cons
 
     if (!r->getCategory())
     {
+        qWarning() << tr("Creation of new IO allowed only for rubrics with assigned category!");
         QMessageBox::warning(this, tr("Warning"), tr("Creation of new IO allowed only for rubrics with assigned category!"), QMessageBox::Ok);
         return;
     }
@@ -964,6 +973,7 @@ void KKSIncludesWidget::slotAddRubricItem(int idObject, QString name)
 {
 
     if(idObject <= 0){
+        qCritical() << tr("You should select object to add to rubric!");
         QMessageBox::critical(this, 
                               tr("Error"), 
                               tr("You should select object to add to rubric!"), 
@@ -976,6 +986,7 @@ void KKSIncludesWidget::slotAddRubricItem(int idObject, QString name)
     QItemSelection sel = sm ? sm->selection() : QItemSelection();
     if(!sm || sel.indexes().isEmpty())
     {
+        qWarning() << tr("You should select rubric to add item");
         QMessageBox::warning(this, 
                              tr("Warning"), 
                              tr("You should select rubric to add item"), 
@@ -998,6 +1009,7 @@ void KKSIncludesWidget::slotAddRubricItem(int idObject, QString name)
 
     const KKSRubricItem * equalItem = r->itemForId(idObject);
     if(equalItem){
+        qCritical() << tr("You cannot add one item to rubric twise");
         QMessageBox::critical(this, 
                              tr("Error"), 
                              tr("You cannot add one item to rubric twise"), 
@@ -1148,6 +1160,7 @@ void KKSIncludesWidget :: editRubricDoc (QAbstractItemModel * itemModel, const Q
         return;
     }
 
+    qCritical() << tr("Cannot open rubric item. Data is corrupt!");
     QMessageBox::critical(this,
                           tr("Error"),
                           tr("Cannot open rubric item. Data is corrupt!"),
@@ -1399,6 +1412,7 @@ void KKSIncludesWidget :: setRubricIcon (void)
         else if (rType == KKSRubricBase::atOthers ||
                  rType == KKSRubricBase::atRubricCategory)
         {
+            qWarning() << tr ("Category or others rubric cannot been edited");
             QMessageBox::warning(this, tr("Edit rubric"), tr ("Category or others rubric cannot been edited"), QMessageBox::Ok);
             return;
         }
@@ -1415,9 +1429,10 @@ void KKSIncludesWidget :: setRubricIcon (void)
 
     QPixmap rubrPixmap (iconFile);
     if(rubrPixmap.isNull()){
+        qCritical() << tr("Cannot transform icon to QPixmap");
         QMessageBox::critical(this, 
                               tr("Error"), 
-                              tr(""), 
+                              tr("Cannot transform icon to QPixmap"), 
                               QMessageBox::Ok);
         return;
     }
@@ -1529,6 +1544,7 @@ void KKSIncludesWidget :: setSyncSettings (void)
     QList<int> selectedIO = getSelectedIOS ();
     if (selectedIO.isEmpty())
     {
+        qWarning() << tr("Select documents for set");
         QMessageBox::warning (this, tr ("Set synchronization parameters"), tr("Select documents for set"), QMessageBox::Ok);
         return;
     }
@@ -1540,6 +1556,7 @@ void KKSIncludesWidget :: putIntoAnotherRubric (void)
     QList<int> selectedIO = getSelectedIOS ();
     if (selectedIO.isEmpty())
     {
+        qWarning() << tr("Select documents for copy");
         QMessageBox::warning (this, tr ("Put selected documents"), tr("Select documents for copy"), QMessageBox::Ok);
         return;
     }
@@ -1552,6 +1569,7 @@ void KKSIncludesWidget :: sendIOS (void)
     QList<int> selectedIO = getSelectedIOS ();
     if (selectedIO.isEmpty())
     {
+        qWarning() << tr("Select documents for send");
         QMessageBox::warning (this, tr ("Send selected documents"), tr("Select documents for send"), QMessageBox::Ok);
         return;
     }
@@ -1563,6 +1581,7 @@ void KKSIncludesWidget :: setAccessRules (void)
     QList<int> selectedIO = getSelectedIOS ();
     if (selectedIO.isEmpty())
     {
+        qWarning() << tr("Select documents for set");
         QMessageBox::warning (this, tr ("Set access rules"), tr("Select documents for set"), QMessageBox::Ok);
         return;
     }

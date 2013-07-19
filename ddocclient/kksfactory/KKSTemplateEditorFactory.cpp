@@ -219,7 +219,8 @@ void KKSTemplateEditorFactory :: addTemplate (QWidget *ctw, KKSCategory *c, QAbs
         if (t)
             t->release ();
 
-        QMessageBox::warning (ctw, tr ("Template editor"), tr ("Cannot create template editor"), QMessageBox::Ok);
+        qCritical() << tr ("Cannot create template editor");
+        QMessageBox::critical(ctw, tr ("Template editor"), tr ("Cannot create template editor"), QMessageBox::Ok);
     }
 
     if (isCat && mode && tEditor->exec () == QDialog::Accepted)
@@ -261,7 +262,8 @@ void KKSTemplateEditorFactory :: editTemplate (QWidget *ctw, int idTempl, QAbstr
         if (t)
             t->release ();
 
-        QMessageBox::warning (ctw, tr ("Template editor"), tr ("Cannot create template editor"), QMessageBox::Ok);
+        qCritical() << tr ("Cannot create template editor");
+        QMessageBox::critical (ctw, tr ("Template editor"), tr ("Cannot create template editor"), QMessageBox::Ok);
         return;
     }
 
@@ -298,7 +300,8 @@ void KKSTemplateEditorFactory :: editCatTemplate (QWidget *ctw, KKSTemplate *t, 
         if (t)
             t->release ();
 
-        QMessageBox::warning (ctw, tr ("Template editor"), tr ("Cannot create template editor"), QMessageBox::Ok);
+        qCritical() << tr ("Cannot create template editor");
+        QMessageBox::critical (ctw, tr ("Template editor"), tr ("Cannot create template editor"), QMessageBox::Ok);
         return;
     }
 
@@ -337,7 +340,8 @@ void KKSTemplateEditorFactory :: delTemplate (QWidget *ctw, int idTempl, QAbstra
         int res = ppf->deleteTemplate (t);
         if (res == ERROR_CODE)
         {
-            QMessageBox::warning (ctw, tr ("Template editor"), tr ("Cannot remove selected template"), QMessageBox::Ok);
+            qCritical() << tr ("Cannot remove selected template");
+            QMessageBox::critical(ctw, tr ("Template editor"), tr ("Cannot remove selected template"), QMessageBox::Ok);
             return;
         }
     }
@@ -453,6 +457,7 @@ void KKSTemplateEditorFactory :: addAttrToTemplate (int idAttrGroup, const QMode
     const KKSMap<int, KKSCategoryAttr *> avAttrs = t->availableAttrs();
     if (avAttrs.isEmpty())
     {
+        qWarning() << tr("No available attributes");
         QMessageBox::warning (tEditor, tr("Add attributes into template"), tr("No available attributes"), QMessageBox::Ok);
         return;
     }
@@ -597,7 +602,8 @@ void KKSTemplateEditorFactory :: editAttrInTemplate (int idAttr, int idAttrGroup
     KKSObject *attrTypesIO = loader->loadIO (IO_ATTR_TYPE_ID, true);
     if (!attrTypesIO)
     {
-        QMessageBox::warning (tEditor, QObject::tr ("Attributes types"), QObject::tr ("Cannot load attribute types"), QMessageBox::Ok);
+        qCritical() << QObject::tr ("Cannot load attribute types");
+        QMessageBox::critical (tEditor, QObject::tr ("Attributes types"), QObject::tr ("Cannot load attribute types"), QMessageBox::Ok);
         return;
     }
 
@@ -730,7 +736,8 @@ void KKSTemplateEditorFactory :: saveTemplate (KKSTemplate *t, KKSTemplateEditor
     if (res == ERROR_CODE)
     {
         emit templateDbError();
-        QMessageBox::warning (tEditor, tr("Save template"), tr("Cannot save template"));
+        qCritical() << tr("Cannot save template");
+        QMessageBox::critical (tEditor, tr("Save template"), tr("Cannot save template"));
         return;
     }
     else if (cEditor && wIndex.isValid ())

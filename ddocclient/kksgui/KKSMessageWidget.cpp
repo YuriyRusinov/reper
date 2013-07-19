@@ -155,6 +155,7 @@ void KKSMessageWidget :: accept (void)
     QList<int> idDls = getDlsList();
     if (idDls.isEmpty())
     {
+        qWarning() << tr ("Please select user");
         QMessageBox::warning (this, tr("Message parameters"), tr ("Please select user"), QMessageBox::Ok);
         return;
     }

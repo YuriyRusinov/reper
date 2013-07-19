@@ -87,6 +87,7 @@ void KKSPixmap::openFile()
     if (!fileName.isEmpty()) {
         QImage image(fileName);
         if (image.isNull()) {
+            qWarning() << tr("Cannot load %1.").arg(fileName);
             QMessageBox::information(this, tr("Error"),
                                      tr("Cannot load %1.").arg(fileName));
             return;

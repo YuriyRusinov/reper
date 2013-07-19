@@ -44,6 +44,8 @@ void ChooseTemplateForm::init()
 void ChooseTemplateForm::on_pbOk_clicked()
 {
     if(!ui->twTemplates->currentItem()){
+        qCritical() << tr("You should select one template!");
+        
         QMessageBox::critical(this, 
                               tr("Error"), 
                               tr("You should select one template!"), 

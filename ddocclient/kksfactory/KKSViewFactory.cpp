@@ -1219,7 +1219,8 @@ void KKSViewFactory :: loadCategoryTemplates (int idCat,
     KKSCategory *cat = l->loadCategory (idCat);
     if (!cat)
     {
-        QMessageBox::warning (0, QObject::tr("Category"), QObject::tr("Cannot load category id=%1").arg (idCat));
+        qCritical() << QObject::tr("Cannot load category id=%1").arg (idCat);
+        QMessageBox::critical (0, QObject::tr("Category"), QObject::tr("Cannot load category id=%1").arg (idCat));
         return;
     }
 
@@ -1229,7 +1230,8 @@ void KKSViewFactory :: loadCategoryTemplates (int idCat,
     KKSTemplate *defT = new KKSTemplate (cat->defTemplate());
     if (!defT)
     {
-        QMessageBox::warning (0, QObject::tr("Default template"), QObject::tr("Cannot load default template"));
+        qCritical() << QObject::tr("Cannot load default template");
+        QMessageBox::critical (0, QObject::tr("Default template"), QObject::tr("Cannot load default template"));
         return;
     }
 
@@ -1500,7 +1502,8 @@ KKSAttributesEditor * KKSViewFactory :: createAttrView (KKSLoader *l,
     KKSObject *attrTypesIO = l->loadIO (IO_ATTR_TYPE_ID, true);
     if (!attrTypesIO)
     {
-        QMessageBox::warning (parent, QObject::tr ("Attributes types"), QObject::tr ("Cannot load attribute types"), QMessageBox::Ok);
+        qCritical() << QObject::tr ("Cannot load attribute types");
+        QMessageBox::critical (parent, QObject::tr ("Attributes types"), QObject::tr ("Cannot load attribute types"), QMessageBox::Ok);
         return 0;
     }
 
@@ -1533,7 +1536,8 @@ KKSAttributesEditor * KKSViewFactory :: createAttrView (KKSLoader *l,
     KKSObject *attrIO = l->loadIO (IO_ATTR_ID, true);
     if (!attrIO)
     {
-        QMessageBox::warning (parent, QObject::tr ("Attributes"), QObject::tr ("Cannot load attributes"), QMessageBox::Ok);
+        qCritical() << QObject::tr ("Cannot load attributes");
+        QMessageBox::critical (parent, QObject::tr ("Attributes"), QObject::tr ("Cannot load attributes"), QMessageBox::Ok);
         return 0;
     }
 

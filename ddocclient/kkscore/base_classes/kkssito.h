@@ -46,8 +46,10 @@ class KKSAttributesFactory;
 class KKSCmdJSettings;
 class KKSMsgJSettings;
 class KKSIndFactory;
+class KKSDbgOutputWidget;
 
 class QWidget;
+class QTextEdit;
 class QTextCodec;
 class QTranslator;
 
@@ -121,6 +123,8 @@ public:
     KKSStuffFactory *sf () const;
     KKSIndFactory * indf () const;
 
+    KKSDbgOutputWidget * dbgWidget() const;
+
 private:
     KKSSettings * getKKSSettings (const QString & organization, 
                                   const QString & application = QString());
@@ -128,6 +132,7 @@ private:
     QString & getWDir();
 
 public:
+
 
     void loadTranslator();
 
@@ -193,6 +198,8 @@ private:
     mutable KKSStuffFactory * m_sf;
     mutable KKSAttributesFactory * m_attrf;
     mutable KKSIndFactory * m_indf;
+
+    mutable KKSDbgOutputWidget * m_dbgWidget;
 
     static KKSSito * self;
     QTranslator * tor;
