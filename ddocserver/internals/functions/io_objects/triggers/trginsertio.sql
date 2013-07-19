@@ -225,8 +225,8 @@ begin
                 and p.id = cio.id_io_processing_order
                 and p.id_io_category = new.id_io_category 
                 and p.id_state_dest = new.id_io_state
-                and p.id_state_src = old.id_io_state
-                and (new.is_completed = 1 or new.is_completed = 2) --changing or creation of IO is completed
+                and (p.id_state_src isnull or p.id_state_src = old.id_io_state)
+                --and (new.is_completed = 1 or new.is_completed = 2) --changing or creation of IO will be completed ONLY after the main record is updated!
         loop
 
             idChain = r.id;

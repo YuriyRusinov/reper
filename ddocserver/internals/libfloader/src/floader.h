@@ -34,6 +34,8 @@ FLOADER_EXPORT Datum rdeletefile(PG_FUNCTION_ARGS);
 FLOADER_EXPORT Datum kkssitoversion(PG_FUNCTION_ARGS);
 FLOADER_EXPORT Datum rxpm2jpeg(PG_FUNCTION_ARGS);
 
+FLOADER_EXPORT Datum rhashfile(PG_FUNCTION_ARGS);
+
 FLOADER_EXPORT Datum initrand(PG_FUNCTION_ARGS);
 FLOADER_EXPORT Datum droprand(PG_FUNCTION_ARGS);
 FLOADER_EXPORT Datum unirand(PG_FUNCTION_ARGS);
@@ -51,7 +53,8 @@ FLOADER_EXPORT Datum testspi(PG_FUNCTION_ARGS);
 
 FLOADER_EXPORT text* cstring_to_text_ex(const char *);
 FLOADER_EXPORT char* text_to_cstring_ex(text *);
-FLOADER_EXPORT FILE * openFile(FILE * f, char * url, char * am);
+FLOADER_EXPORT FILE * openFile(FILE * f, const char * url, char * am);
+FLOADER_EXPORT unsigned char * hashFile(const char * url, int * digestLength);
 
 int xpm2jpeg(char *xpm, unsigned long xpmsize,
                             unsigned char **pjpeg, unsigned long *pjpegsize);

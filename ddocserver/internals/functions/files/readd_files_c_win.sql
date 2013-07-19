@@ -38,4 +38,7 @@ create or replace function gaussrand (float8) returns float8
 create or replace function exprand (float8) returns float8
     as '$libdir/libfloader.dll', 'exprand' language 'c' strict security definer;
 
+
+create or replace function rGetHashFile(varchar) returns varchar
+    as '$libdir/libfloader.dll', 'rgethashfile' language 'c' strict security definer;
 */

@@ -1,6 +1,6 @@
 #include "floader.h"
 
-FILE * openFile(FILE * f, char * url, char * am)
+FILE * openFile(FILE * f, const char * url, char * am)
 {
     if(!url || !am)
         return NULL;

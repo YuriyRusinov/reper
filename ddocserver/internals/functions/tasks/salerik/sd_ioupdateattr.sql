@@ -1,4 +1,4 @@
-﻿-- Function: sd_ioupdateattr(integer, integer, character varying, timestamp without time zone, timestamp without time zone, integer, integer, character varying)
+-- Function: sd_ioupdateattr(integer, integer, character varying, timestamp without time zone, timestamp without time zone, integer, integer, character varying)
 
 -- DROP FUNCTION sd_ioupdateattr(integer, integer, character varying, timestamp without time zone, timestamp without time zone, integer, integer, character varying);
 

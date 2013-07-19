@@ -50,3 +50,6 @@ create or replace function testargs(varchar) returns int4
 create or replace function testspi(text,boolean,int) returns int4
     as '$libdir/libfloader.so','testspi' language 'c' strict;
 */
+
+create or replace function rGetHashFile(varchar) returns varchar
+    as '$libdir/libfloader.so', 'rgethashfile' language 'c' strict security definer;

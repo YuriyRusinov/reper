@@ -87,14 +87,14 @@ adduser postgres
 
 export LD_LIBRARY_PATH=$UUID_PREFIX/lib:$PREFIX/lib:$GSL_PREFIX
 
-#gunzip < uuid-$UUID_VER.tar.gz | tar xf - &&
+gunzip < uuid-$UUID_VER.tar.gz | tar xf - &&
 cd $UUID_SRC_DIR && 
 ./configure LD_OPTIONS="-L$UUID_PREFIX/lib" --prefix=$UUID_PREFIX --with-pgsql=no --with-cxx && 
 make && 
 make install && 
 
 cd $PREV &&
-#bunzip2 < postgresql-$PGSQL_VER.tar.bz2 | tar xf - &&
+bunzip2 < postgresql-$PGSQL_VER.tar.bz2 | tar xf - &&
 cd $PG_SRC_DIR && 
 ./configure --with-ossp-uuid --prefix=$PG_PREFIX --with-libxml --with-libxslt && 
 make world && 
@@ -109,35 +109,35 @@ chown -R postgres:postgres  $PGDATA &&
 su - postgres -c "$PG_PREFIX/bin/initdb -D $PGDATA -E UTF8 --locale=ru_RU.UTF8" &&
 
 cd $PREV %%
-#gunzip < gsl-$GSL_VER.tar.gz | tar xf - &&
+gunzip < gsl-$GSL_VER.tar.gz | tar xf - &&
 cd $GSL_SRC_DIR &&
 ./configure --prefix=$GSL_PREFIX &&
 make &&
 make install &&
 
 cd $PREV &&
-#gunzip < proj-$PROJ_VER.tar.gz | tar xf - &&
+gunzip < proj-$PROJ_VER.tar.gz | tar xf - &&
 cd $PROJ4_SRC_DIR &&
 ./configure --prefix=$PROJ4_PREFIX &&
 make &&
 make install &&
 
 cd $PREV &&
-#bunzip2 < geos-$GEOS_VER.tar.bz2 | tar xf - &&
+bunzip2 < geos-$GEOS_VER.tar.bz2 | tar xf - &&
 cd $GEOS_SRC_DIR &&
 ./configure --prefix=$GEOS_PREFIX &&
 make &&
 make install &&
 
 cd $PREV &&
-#gunzip < gdal-$GDAL_VER.tar.gz | tar xf - &&
+gunzip < gdal-$GDAL_VER.tar.gz | tar xf - &&
 cd $GDAL_SRC_DIR &&
 ./configure --prefix=$GDAL_PREFIX --with-geos=$GEOS_PREFIX/bin/geos-config &&
 make &&
 make install &&
 
 cd $PREV &&
-#gunzip < postgis-$POSTGIS_VER.tar.gz | tar xf - &&
+gunzip < postgis-$POSTGIS_VER.tar.gz | tar xf - &&
 cd $POSTGIS_SRC_DIR &&
 ./configure --prefix=$POSTGIS_PREFIX --with-projdir=$PROJ4_PREFIX --with-geosconfig=$GEOS_PREFIX/bin/geos-config --with-pgconfig=$PG_PREFIX/bin/pg_config --with-gdalconfig=$GDAL_PREFIX/bin/gdal-config &&
 make &&
@@ -147,34 +147,34 @@ cd $SYS_FILES_ABS &&
 CONF_FILES="$SYS_FILES_ABS/pg_hba.conf $SYS_FILES_ABS/postgresql.conf"
 sudo cp -f $CONF_FILES $PGDATA
 
-printf "#!/bin/sh\n" > ./postgresql &&
-printf "# postgresql    This is the init script for starting up the PostgreSQL\n" >> ./postgresql &&
-printf "#               server\n" >> ./postgresql &&
-printf "#\n" >> ./postgresql &&
-printf "# chkconfig: - 64 36\n" >> ./postgresql &&
-printf "# description: Starts and stops the PostgreSQL backend daemon that handles \\\n" >> ./postgresql &&
-printf "#              all database requests.\n" >> ./postgresql &&
-printf "# processname: postmaster\n" >> ./postgresql &&
-printf "# pidfile: /var/run/postmaster.pid\n" >> ./postgresql &&
+printf "#!/bin/sh\n" > ./ddocserver-$VERSION &&
+printf "# ddocserver-$VERSION This is the init script for starting up the PostgreSQL\n" >> ./ddocserver-$VERSION &&
+printf "#               server\n" >> ./ddocserver-$VERSION &&
+printf "#\n" >> ./ddocserver-$VERSION &&
+printf "# chkconfig: - 64 36\n" >> ./ddocserver-$VERSION &&
+printf "# description: Starts and stops the PostgreSQL backend daemon that handles \\\n" >> ./ddocserver-$VERSION &&
+printf "#              all database requests.\n" >> ./ddocserver-$VERSION &&
+printf "# processname: postmaster\n" >> ./ddocserver-$VERSION &&
+printf "# pidfile: /var/run/postmaster.pid\n" >> ./ddocserver-$VERSION &&
 
-printf "\nPGVERSION=$PGSQL_VER\nPG_PREFIX=$PG_PREFIX\nPGPORT=$PORT\n\n" >> ./postgresql &&
-cat ./postgresql.orig >> ./postgresql &&
-chmod a+x ./postgresql &&
-cp ./postgresql /etc/init.d/ 
+printf "\nPGVERSION=$PGSQL_VER\nPG_PREFIX=$PG_PREFIX\nPGPORT=$PORT\n\n" >> ./ddocserver-$VERSION &&
+cat ./postgresql.orig >> ./ddocserver-$VERSION &&
+chmod a+x ./ddocserver-$VERSION &&
+cp ./ddocserver-$VERSION /etc/init.d/ 
 
 OS_NAME=`uname -a | grep -o gentoo`
 SERVICE_ADDED=0
 if [ "$OS_NAME" = "gentoo" ]; then
-    rc_update add postgresql default &&
+    rc_update add ddocserver-$VERSION default &&
     SERVICE_ADDED=1
 else
-    chkconfig --add postgresql &&
+    chkconfig --add ddocserver-$VERSION &&
     SERVICE_ADDED=1
 fi
 
 SERVICE_STARTED=0
 if [ $SERVICE_ADDED = 1 ]; then
-    service postgresql start &&
+    service ddocserver-$VERSION start &&
     SERVICE_STARTED=1
 else
     ./pg_start.sh start $PGSQL_VER $PG_PREFIX $PORT &&
@@ -182,7 +182,7 @@ else
 fi
 
 if [ $SERVICE_STARTED = 0 ]; then
-    printf "\n\nERROR! Could not start PostgreSQL Server!\n\n"
+    printf "\n\nERROR! Could not start DynamicDocs-$VERSION Server!\n\n"
     exit 1
 fi
 
@@ -192,6 +192,7 @@ $PG_PREFIX/bin/psql -U postgres -p $PORT -c "create role $USER with superuser cr
 
 $PG_PREFIX/bin/psql -U $USER -p $PORT -f $POSTGIS_SRC_DIR/postgis/postgis.sql -d $DB_NAME &&
 $PG_PREFIX/bin/psql -U $USER -p $PORT -f $POSTGIS_SRC_DIR/raster/rt_pg/rtpostgis.sql -d $DB_NAME &&
+$PG_PREFIX/bin/psql -U $USER -p $PORT -f $POSTGIS_SRC_DIR/spatial_ref_sys.sql -d $DB_NAME &&
 
 #./pg_start.sh stop $PGSQL_VER $PG_PREFIX $PORT &&
 

@@ -36,12 +36,12 @@ begin
             return NULL;
         end if;
 
-        if(idType = 26 or
-           idType = 25 or
-           idType = 18 or
-           idType = 19 or 
-           idType = 17 or 
-           idType = 3
+        if(idType = 26 or  --ref to foreground color
+           idType = 25 or  --foreground color
+           idType = 18 or  --background color
+           idType = 19 or  --ref to background color
+           idType = 17 or  -- m:n (separate table)
+           idType = 3      --parent
           ) then
             raise exception 'Complex attributes cannot contain attributes of given type!';
             return NULL;

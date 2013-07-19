@@ -13,3 +13,5 @@
 \i ./functions/files/rsetuploaded.sql
 
 \i ./functions/files/readd_files_c.sql
+
+\i ./functions/files/triggers/readd_triggers.sql
