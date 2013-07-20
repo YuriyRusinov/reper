@@ -49,7 +49,6 @@
 #include <KKSCategory.h>
 #include <KKSAttribute.h>
 #include <KKSSortFilterProxyModel.h>
-#include <KKSAttributesModel.h>
 #include <KKSCatAttrsModel.h>
 #include <KKSItemDelegate.h>
 #include <KKSObjectExemplar.h>

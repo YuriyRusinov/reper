@@ -71,14 +71,14 @@ public slots:
 
 private slots:
     void findAttributes (int idAttrs, QAbstractItemModel *aModel, KKSAttributesEditor * attrsEditor);
-    void saveAttribute (KKSAttribute * cAttr, int idType, QAbstractItemModel * aModel, int idAttrGroup, KKSAttributesEditor *aEditor);
+    void saveAttribute (const QModelIndex&, QAbstractItemModel * aModel, KKSAttributesEditor *aEditor);
     void loadAttribute (int idAttr, QAbstractItemModel * aModel, const QModelIndex& aIndex, KKSAttributesEditor *aEditor);
     void delAttribute (int idAttr, QAbstractItemModel * aModel, const QModelIndex& aIndex, KKSAttributesEditor *aEditor);
     void loadAttrsRefFields (KKSAttribute * attr, int idRef, KKSAttrEditor * aEditor);
     void loadSearchTemplates (KKSAttrEditor * aEditor);
     void loadAttrsRefs (KKSAttribute * attr, KKSAttrEditor * aEditor);
 
-    void addAttrGroup (QAbstractItemModel *aModel, KKSAttributesEditor *attrEditor);
+    void addAttrGroup (QAbstractItemModel *aModel, const QModelIndex& pIndex, KKSAttributesEditor *attrEditor);
     void editAttrGroup (int idAttrGroup, QAbstractItemModel *aModel, const QModelIndex& aIndex, KKSAttributesEditor *attrEditor);
     void delAttrGroup (int idAttrGroup, QAbstractItemModel *aModel, const QModelIndex& aIndex, KKSAttributesEditor *attrEditor);
 

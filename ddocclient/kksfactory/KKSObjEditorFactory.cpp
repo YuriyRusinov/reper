@@ -2465,9 +2465,10 @@ void KKSObjEditorFactory :: filterTemplateEIO (KKSObjEditor * editor,
  * nTab -- номер вкладки в редакторе, где произошел вызов
  * isModal -- флаг модальности
  * recModel -- модель записей
+ * flags -- сопутствующие флаги
  */
 
-void KKSObjEditorFactory :: createNewEditor (QWidget * editor, int idObject, const KKSCategory * c, QString tableName, int nTab, bool isModal, QAbstractItemModel * recModel)
+KKSObjEditor* KKSObjEditorFactory :: createNewEditor (QWidget * editor, int idObject, const KKSCategory * c, QString tableName, int nTab, bool isModal, QAbstractItemModel * recModel, Qt::WindowFlags flags)
 {
     KKSObjEditor * oEditor = qobject_cast <KKSObjEditor *>(editor);
     if (qobject_cast <KKSObjEditor *>(editor))
@@ -2487,7 +2488,8 @@ void KKSObjEditorFactory :: createNewEditor (QWidget * editor, int idObject, con
                                                          tableName,
                                                          false,
                                                          oEditor ? oEditor->windowModality () : Qt::NonModal,
-                                                         NULL);
+                                                         0,
+                                                         flags);
 
     if (!newObjEditor)
     {
@@ -2496,7 +2498,7 @@ void KKSObjEditorFactory :: createNewEditor (QWidget * editor, int idObject, con
                               tr("Error"), 
                               tr("Cannot create new object editor! Corrupt data!"), 
                               QMessageBox::Ok);
-        return;
+        return 0;
     }
 //    connect(newObjEditor, 
 //            SIGNAL(eioChanged(KKSObject *, const KKSMap<qint64, KKSObjectExemplar *>&, QAbstractItemModel *, const QModelIndex& )), 
@@ -2521,6 +2523,7 @@ void KKSObjEditorFactory :: createNewEditor (QWidget * editor, int idObject, con
 //    newObjEditor->setObjChanged (false);
     qDebug () << __PRETTY_FUNCTION__ << newObjEditor->isObjChanged();
     emit editorCreated(newObjEditor);
+    return newObjEditor;
 }
 
 /*
@@ -2535,21 +2538,22 @@ void KKSObjEditorFactory :: createNewEditor (QWidget * editor, int idObject, con
  * ioAvals -- параметры создаваемого ИО
  * aVals  -- параметры создаваемого ЭИО
  * recModel -- модель для записи
+ * flags -- сопутствующие флаги
  */
-void KKSObjEditorFactory :: createNewEditorParam (QWidget * editor, 
-                                                  int idObject, 
-                                                  const KKSCategory * c, 
-                                                  QString tableName, 
-                                                  int nTab, 
-                                                  bool isModal, 
-                                                  const KKSMap<qint64, KKSAttrValue *>& ioAvals, 
-                                                  const KKSMap<qint64, KKSAttrValue *>& aVals, 
-                                                  QAbstractItemModel * recModel)
+KKSObjEditor* KKSObjEditorFactory :: createNewEditorParam (QWidget * editor, 
+                                                           int idObject, 
+                                                           const KKSCategory * c, 
+                                                           QString tableName, 
+                                                           int nTab, 
+                                                           bool isModal, 
+                                                           const KKSMap<qint64, KKSAttrValue *>& ioAvals, 
+                                                           const KKSMap<qint64, KKSAttrValue *>& aVals, 
+                                                           QAbstractItemModel * recModel,
+                                                           Qt::WindowFlags flags)
 {
     if (ioAvals.isEmpty () && aVals.isEmpty ())
     {
-        this->createNewEditor (editor, idObject, c, tableName, nTab, isModal);
-        return;
+        return this->createNewEditor (editor, idObject, c, tableName, nTab, isModal, recModel);
     }
     KKSObjEditor * oEditor = qobject_cast <KKSObjEditor *>(editor);
     if (qobject_cast <KKSObjEditor *>(editor))
@@ -2572,7 +2576,8 @@ void KKSObjEditorFactory :: createNewEditorParam (QWidget * editor,
                                                               tableName,
                                                               false,
                                                               oEditor ? oEditor->windowModality () : Qt::NonModal,
-                                                              NULL);
+                                                              0,
+                                                              flags);
 
     if (!newObjEditor)
     {
@@ -2581,7 +2586,7 @@ void KKSObjEditorFactory :: createNewEditorParam (QWidget * editor,
                               tr("Error"),
                               tr("Cannot create new object editor! Corrupt data!"),
                               QMessageBox::Ok);
-        return;
+        return 0;
     }
 
     if (qobject_cast <KKSObjEditor *>(editor))
@@ -2596,6 +2601,7 @@ void KKSObjEditorFactory :: createNewEditorParam (QWidget * editor,
 //    newObjEditor->setObjChanged (false);
     qDebug () << __PRETTY_FUNCTION__ << newObjEditor->isObjChanged();
     emit editorCreated(newObjEditor);
+    return newObjEditor;
 }
 
 /*

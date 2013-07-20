@@ -3,7 +3,7 @@ HEADERS += \
                 KKSComplexAttrWidget.h \
                 KKSAttrCheckListWidget.h \
                 KKSAttrProxyModel.h \
-                KKSAttributesModel.h \
+#                KKSAttributesModel.h \
                 KKSCatAttrsModel.h \
  		KKSPixmap.h \
            	KKSCheckBox.h \
@@ -95,7 +95,7 @@ HEADERS += \
 SOURCES += \
                 KKSComplexAttrWidget.cpp \
                 KKSAttrCheckListWidget.cpp \
-                KKSAttributesModel.cpp \
+#                KKSAttributesModel.cpp \
                 KKSAttrProxyModel.cpp \
                 KKSCatAttrsModel.cpp \
  		KKSPixmap.cpp \
@@ -212,7 +212,7 @@ FORMS   += \
 headers.files += \
                 KKSComplexAttrWidget.h \
                 KKSAttrCheckListWidget.h \
-                KKSAttributesModel.h \
+#                KKSAttributesModel.h \
                 KKSAttrProxyModel.h \
                 KKSCatAttrsModel.h \
  		KKSPixmap.h \

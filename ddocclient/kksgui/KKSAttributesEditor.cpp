@@ -98,6 +98,14 @@ QList<int> KKSAttributesEditor :: getAttributesId (void) const
 
 void KKSAttributesEditor :: addAttribute (void)
 {
+    QAbstractItemModel * aModel = recW->getSourceModel ();
+    QModelIndex pIndex = recW->getSourceIndexes().isEmpty() ? QModelIndex() : recW->getSourceIndexes().at(0);
+    pIndex = pIndex.sibling(pIndex.row(), 0);
+    if (pIndex.data(Qt::UserRole+USER_ENTITY).toInt() != 0)
+        pIndex = pIndex.parent();
+    emit insertAttr(pIndex, aModel, this);
+
+/*
     KKSAttribute *attribute = new KKSAttribute ();
     if (!attribute)
         return;
@@ -164,6 +172,7 @@ void KKSAttributesEditor :: addAttribute (void)
     }
 
     attribute->release ();
+ */
 }
 
 void KKSAttributesEditor :: editAttribute (void)
@@ -366,7 +375,11 @@ KKSMap<int, KKSAGroup *> KKSAttributesEditor :: getAvailableGroups (void) const
 void KKSAttributesEditor :: addAGroup (void)
 {
     QAbstractItemModel * aModel = recW->getSourceModel ();
-    emit insertAttrGroup (aModel, this);
+    QModelIndex pIndex = recW->getSourceIndexes().isEmpty() ? QModelIndex() : recW->getSourceIndexes().at(0);
+    pIndex = pIndex.sibling(pIndex.row(), 0);
+    if (pIndex.data(Qt::UserRole+USER_ENTITY).toInt() != 0)
+        pIndex = pIndex.parent();
+    emit insertAttrGroup (aModel, pIndex, this);
 }
 
 void KKSAttributesEditor :: editAGroup (void)

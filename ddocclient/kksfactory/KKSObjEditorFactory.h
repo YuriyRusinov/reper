@@ -254,8 +254,8 @@ public slots:
     void filterEIO (KKSObjEditor * editor, int idObject, const KKSCategory * cat=0, QString tableName=QString());
     void refreshEIO (KKSObjEditor * editor, int idObject, const KKSCategory * cat, QString tableName, QAbstractItemModel * sourceMod);
     void filterTemplateEIO (KKSObjEditor * editor, int idObject, const KKSCategory * cat=0, QString tableName=QString());
-    void createNewEditor (QWidget * editor, int idObject, const KKSCategory * c, QString tableName, int nTab, bool isModal, QAbstractItemModel * recModel=0);
-    void createNewEditorParam (QWidget * editor, 
+    KKSObjEditor* createNewEditor (QWidget * editor, int idObject, const KKSCategory * c, QString tableName, int nTab, bool isModal, QAbstractItemModel * recModel=0, Qt::WindowFlags flags=0);
+    KKSObjEditor* createNewEditorParam (QWidget * editor, 
                                int idObject, 
                                const KKSCategory * c, 
                                QString tableName, 
@@ -263,7 +263,8 @@ public slots:
                                bool isModal, 
                                const KKSMap<qint64, KKSAttrValue *>& ioAvals, 
                                const KKSMap<qint64, KKSAttrValue *>& aVals, 
-                               QAbstractItemModel * recModel=0);
+                               QAbstractItemModel * recModel=0,
+                               Qt::WindowFlags flags=0);
     
     void editExistOE (QWidget * editor, 
                       int idObject, 

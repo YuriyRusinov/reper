@@ -254,6 +254,13 @@ void KKSAttrEditor :: currentAttrTypeChanged (int index)
     }
     //--ksa
     bool isComplex (cType==KKSAttrType::atComplex);
+    if (isComplex && !this->m_recW->getSourceModel())
+    {
+        QAbstractItemModel * attrMod = new KKSAttrModel (this->attribute);
+        QAbstractProxyModel * sortAttrMod = new KKSSortFilterProxyModel();
+        sortAttrMod->setSourceModel(attrMod);
+        m_recW->setEIOModel(sortAttrMod);
+    }
     ui->attrTabW->setTabEnabled(1, isComplex);
 
 }

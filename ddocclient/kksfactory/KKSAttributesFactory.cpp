@@ -64,6 +64,7 @@
 #include <KKSObjectExemplar.h>
 #include <KKSEIOData.h>
 #include <KKSEIODataModel.h>
+#include <KKSAttrValue.h>
 
 #include "KKSViewFactory.h"
 #include "KKSAttributesFactory.h"
@@ -90,7 +91,7 @@ KKSAttributesEditor * KKSAttributesFactory :: viewAttributes (const KKSList<cons
     aEditor->setWindowModality (mode ? Qt::WindowModal : Qt::NonModal);
 
     connect (aEditor, SIGNAL (findInAttributes (int, QAbstractItemModel *, KKSAttributesEditor *)), this, SLOT (findAttributes (int, QAbstractItemModel *, KKSAttributesEditor * )) );
-    connect (aEditor, SIGNAL (insertAttr (KKSAttribute *, int, QAbstractItemModel *, int, KKSAttributesEditor *)), this, SLOT (saveAttribute (KKSAttribute *, int, QAbstractItemModel*, int, KKSAttributesEditor *)) );
+    connect (aEditor, SIGNAL (insertAttr (const QModelIndex&, QAbstractItemModel *, KKSAttributesEditor *)), this, SLOT (saveAttribute (const QModelIndex&, QAbstractItemModel*, KKSAttributesEditor *)) );
     connect (aEditor, 
              SIGNAL (updateAttr (int, QAbstractItemModel *, const QModelIndex&, KKSAttributesEditor *)), 
              this, 
@@ -100,7 +101,7 @@ KKSAttributesEditor * KKSAttributesFactory :: viewAttributes (const KKSList<cons
     connect (aEditor, SIGNAL (getFieldsOfReference (KKSAttribute *, int, KKSAttrEditor * )), this, SLOT (loadAttrsRefFields (KKSAttribute *, int, KKSAttrEditor *)) );
     connect (aEditor, SIGNAL (getSearchTemplate (KKSAttrEditor * )), this, SLOT (loadSearchTemplates (KKSAttrEditor *)) );
     
-    connect (aEditor, SIGNAL (insertAttrGroup (QAbstractItemModel *,KKSAttributesEditor *)), this, SLOT (addAttrGroup (QAbstractItemModel *, KKSAttributesEditor *)) );
+    connect (aEditor, SIGNAL (insertAttrGroup (QAbstractItemModel *,const QModelIndex&, KKSAttributesEditor *)), this, SLOT (addAttrGroup (QAbstractItemModel *, const QModelIndex&, KKSAttributesEditor *)) );
     connect (aEditor, SIGNAL (updateAttrGroup (int, QAbstractItemModel *, const QModelIndex&, KKSAttributesEditor *)), this, SLOT (editAttrGroup (int, QAbstractItemModel *, const QModelIndex&,  KKSAttributesEditor *)) );
     connect (aEditor, SIGNAL (deleteAttrGroup (int, QAbstractItemModel *, const QModelIndex&,  KKSAttributesEditor *)), this, SLOT (delAttrGroup (int, QAbstractItemModel *, const QModelIndex&, KKSAttributesEditor *)) );
 
@@ -198,20 +199,62 @@ void KKSAttributesFactory :: findAttributes (int idAttrs, QAbstractItemModel * a
  * idAttrGroup -- идентификатор группы атрибутов
  * aEditor -- виджет со списком атрибутов
  */
-void KKSAttributesFactory :: saveAttribute (KKSAttribute * cAttr, int idType, QAbstractItemModel* aModel, int idAttrGroup, KKSAttributesEditor *aEditor)
+void KKSAttributesFactory :: saveAttribute (const QModelIndex& parent, QAbstractItemModel* aModel, KKSAttributesEditor *attrEditor)
 {
+    if (!parent.isValid() || !aModel || !attrEditor)
+        return;
+    KKSAttribute *cAttr = new KKSAttribute ();
     if (!cAttr)
         return;
 
-    qDebug () << __PRETTY_FUNCTION__ << cAttr->id ();
-    if (idType < KKSAttrType::atUndef || idType > KKSAttrType::atUserDef)
-        return;
+    KKSMap<int, KKSAttrType *> attrTypes=attrEditor->getTypes();
+    KKSMap<int, KKSAGroup *> attrsGroups=attrEditor->getAvailableGroups();
+    QMap<int, QString> ioRefs=attrEditor->getReferences();
+    KKSAttrEditor *aEditor = new KKSAttrEditor (cAttr, attrTypes, attrsGroups, ioRefs, attrEditor);
+    connect (aEditor, 
+             SIGNAL (getReferenceFields (KKSAttribute *, int, KKSAttrEditor *)),
+             attrEditor,
+             SLOT (getRefFields (KKSAttribute *, int, KKSAttrEditor *)));
 
-    KKSAttrType::KKSAttrTypes idAttrType = (KKSAttrType::KKSAttrTypes)idType;
-    KKSAttrType *aType = loader->loadAttrType (idAttrType);
-    cAttr->setType (aType);
-    if (cAttr->type() == 0)
+    connect (aEditor, 
+             SIGNAL (getSearchTemplate (KKSAttrEditor *)),
+             attrEditor,
+             SLOT (slotGetSearchTemplate (KKSAttrEditor *)) );
+    
+    connect (aEditor, 
+             SIGNAL(showAttrsWidget(KKSAttribute *, KKSAttrEditor *)), 
+             attrEditor, 
+             SIGNAL(showAttrsWidget(KKSAttribute *, KKSAttrEditor *)) ); //передаем все в KKSAttributesFactory
+    
+    connect (aEditor, 
+             SIGNAL(addAttribute(KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)), 
+             this, 
+             SLOT(addComplexAttr(KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)) );
+
+    connect (aEditor, 
+             SIGNAL(editAttribute(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)), 
+             this, 
+             SLOT(editComplexAttr(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)) );
+
+    connect (aEditor, 
+             SIGNAL(delAttribute(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)), 
+             this, 
+             SLOT(delComplexAttr(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)) );
+
+    if (aEditor->exec() != QDialog::Accepted)
+    {
+        cAttr->release();
         return;
+    }
+    //int idType = aEditor->getAttribute()->type()->id();
+    qDebug () << __PRETTY_FUNCTION__ << cAttr->id ();
+
+    //KKSAttrType::KKSAttrTypes idAttrType = (KKSAttrType::KKSAttrTypes)idType;
+    KKSAttrType *aType = aEditor->getAttribute()->type();
+//    cAttr->setType (aType);
+//    if (cAttr->type() == 0)
+//        return;
+    int idAttrGroup = parent.data(Qt::UserRole).toInt();
     KKSAGroup * aGr = loader->loadAttrGroup(idAttrGroup);
     cAttr->setGroup (aGr);
     aGr->release ();
@@ -528,7 +571,7 @@ void KKSAttributesFactory :: loadAttrsRefs (KKSAttribute * attr, KKSAttrEditor *
  * aModel -- модель атрибутов
  * attrEditor -- родительский виджет
  */
-void KKSAttributesFactory :: addAttrGroup (QAbstractItemModel *aModel, KKSAttributesEditor *attrEditor)
+void KKSAttributesFactory :: addAttrGroup (QAbstractItemModel *aModel, const QModelIndex& pIndex, KKSAttributesEditor *attrEditor)
 {
     if (!aModel || !attrEditor)
         return;
@@ -550,11 +593,36 @@ void KKSAttributesFactory :: addAttrGroup (QAbstractItemModel *aModel, KKSAttrib
         return;
     }
     KKSList<const KKSFilterGroup *> filters = KKSList<const KKSFilterGroup *>();
-    /*KKSObjEditor * oEditor = */
-    m_oef->createNewEditor (attrEditor, IO_ATTRS_GROUPS_ID, c, refIO->tableName(), 0, (attrEditor->windowModality() != Qt::NonModal));
-    //m_oef->createObjEditor(IO_ATTRS_GROUPS_ID, -1, filters, tr("Add new group"), c, false, refIO->tableName(), false, Qt::NonModal, 0, 0);
-    //oEditor->setAttribute (Qt::WA_DeleteOnClose);
-    //oEditor->show ();
+    
+    KKSMap<qint64, KKSAttrValue *> ioAvals;
+    KKSMap<qint64, KKSAttrValue *> aVals;
+    if (pIndex.isValid())
+    {
+        KKSValue val = KKSValue (QString::number(pIndex.data(Qt::UserRole).toInt()), KKSAttrType::atParent);
+        KKSAttribute * aPar = loader->loadAttribute(ATTR_ID_PARENT);
+        KKSCategoryAttr * cAttr = KKSCategoryAttr::create(aPar,false, true);
+        aPar->release();
+        KKSAttrValue * av = new KKSAttrValue(val, cAttr);
+        cAttr->release();
+        aVals.insert(ATTR_ID_PARENT, av);
+        av->release();
+    }
+    /*KKSObjEditor * oEditor =*/
+    m_oef->createNewEditorParam(attrEditor, IO_ATTRS_GROUPS_ID, c, refIO->tableName(), 0, (attrEditor->windowModality() != Qt::NonModal), ioAvals, aVals, aModel);
+/*    if (oEditor->exec() == QDialog::Accepted)
+    {
+        int nr = aModel->rowCount(pIndex);
+        aModel->insertRows(nr, 1, pIndex);
+        QModelIndex gInd = aModel->index(nr, 0, pIndex);
+        KKSObjectExemplar * pObjEx = oEditor->getObjectEx();
+        int gId = pObjEx->id();
+        QString name = pObjEx->name();
+        aModel->setData(gInd, gId, Qt::UserRole);
+        aModel->setData(gInd, name, Qt::DisplayRole);
+        aModel->setData(gInd, 0, Qt::UserRole+USER_ENTITY);
+        
+    }*/
+//    m_oef->createNewEditor (attrEditor, IO_ATTRS_GROUPS_ID, c, refIO->tableName(), 0, (attrEditor->windowModality() != Qt::NonModal));
     refIO->release ();
 }
 

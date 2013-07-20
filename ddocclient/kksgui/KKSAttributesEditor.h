@@ -66,7 +66,7 @@ private slots:
     void setAttr (const QModelIndex & index);
 
 signals:
-    void insertAttr (KKSAttribute * a, int idType, QAbstractItemModel *aModel, int idAGroup, KKSAttributesEditor *attrEditor);
+    void insertAttr (const QModelIndex& parent, QAbstractItemModel *aModel, KKSAttributesEditor *attrEditor);
     void updateAttr (int idAttr, QAbstractItemModel *aModel, const QModelIndex& parent, KKSAttributesEditor *attrEditor);
     void deleteAttr (int idAttr, QAbstractItemModel *aModel, const QModelIndex& parent, KKSAttributesEditor *attrEditor);
     //void showAttrsWidget(KKSAttribute *, KKSAttrEditor *);//показать виджет с атрибутами для случая с описывающими атрибутами атрибута
@@ -79,7 +79,7 @@ signals:
 
 //    void requestAttr (int idAttr, KKSAttributesEditor *);
 
-    void insertAttrGroup (QAbstractItemModel *aModel, KKSAttributesEditor *attrEditor);
+    void insertAttrGroup (QAbstractItemModel *aModel, const QModelIndex& parent, KKSAttributesEditor *attrEditor);
     void updateAttrGroup (int idAttrGroup, QAbstractItemModel *aModel, const QModelIndex& aIndex, KKSAttributesEditor *attrEditor);
     void deleteAttrGroup (int idAttrGroup, QAbstractItemModel *aModel, const QModelIndex& aIndex, KKSAttributesEditor *attrEditor);
 
