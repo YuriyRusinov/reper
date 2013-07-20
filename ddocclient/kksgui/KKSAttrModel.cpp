@@ -12,7 +12,7 @@
  * Конструктор создает модель сложного атрибута для визуального отображения
  * в подходящем виджете, наследующем QAbstractItemView *
  */
-KKSAttrModel::KKSAttrModel(const KKSAttribute * _attr, QObject *parent) 
+KKSAttrModel::KKSAttrModel(KKSAttribute * _attr, QObject *parent) 
     : QAbstractItemModel (parent),
     attr (_attr)
 {
@@ -110,9 +110,26 @@ QVariant KKSAttrModel::data (const QModelIndex& index, int role) const
 
 bool KKSAttrModel::setData (const QModelIndex& index, const QVariant& value, int role)
 {
-    Q_UNUSED (index);
-    Q_UNUSED (value);
-    Q_UNUSED (role);
+    if (!index.isValid() && role != Qt::UserRole+2)
+        return false;
+
+    if (role == Qt::UserRole+1)
+    {
+        int irow = index.row();
+        KKSMap<int, KKSCategoryAttr *> cAttrs = attr->attrs();
+        if (irow >= cAttrs.count())
+            return false;
+        const KKSMap<int, KKSCategoryAttr *>::const_iterator pc = cAttrs.constBegin()+irow;
+        int ikey = pc.key();
+        KKSCategoryAttr * oldAttr = pc.value();
+        KKSCategoryAttr * newAttr = value.value<KKSCategoryAttr *>();
+        if (newAttr != oldAttr)
+            oldAttr->release();
+        cAttrs.insert (ikey, newAttr);
+        attr->setAttrs (cAttrs);
+        emit dataChanged (index.sibling(irow, 0), index.sibling(irow, 3));
+        return true;
+    }
     return false;
 }
 

@@ -20,6 +20,9 @@ namespace Ui
     class kksattr_editor;
 };
 
+class QModelIndex;
+class QAbstractItemModel;
+
 class KKSAttribute;
 class KKSAttrType;
 class KKSAGroup;
@@ -58,8 +61,8 @@ signals:
 
     void showAttrsWidget(KKSAttribute *, KKSAttrEditor *);//показать виджет с атрибутами для случая с описывающими атрибутами атрибута
     void addAttribute(KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *);
-    void editAttribute(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *);
-    void delAttribute(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *);
+    void editAttribute(int, KKSAttribute *, QAbstractItemModel*, const QModelIndex&, KKSAttrEditor *);
+    void delAttribute(int, KKSAttribute *, QAbstractItemModel*, const QModelIndex&, KKSAttrEditor *);
 
 public slots:
     void addTriggered();//испускает сигнал addAttribute

@@ -57,6 +57,7 @@
 #include <KKSCatAttrsModel.h>
 #include <KKSItemDelegate.h>
 #include <kksattrattreditor.h>
+#include <kkscatattreditor.h>
 
 #include <KKSFilter.h>
 #include <KKSObject.h>
@@ -232,14 +233,14 @@ void KKSAttributesFactory :: saveAttribute (const QModelIndex& parent, QAbstract
              SLOT(addComplexAttr(KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)) );
 
     connect (aEditor, 
-             SIGNAL(editAttribute(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)), 
+             SIGNAL(editAttribute(int, KKSAttribute *, QAbstractItemModel*, const QModelIndex&, KKSAttrEditor *)), 
              this, 
-             SLOT(editComplexAttr(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)) );
+             SLOT(editComplexAttr(int, KKSAttribute *, QAbstractItemModel*, const QModelIndex&, KKSAttrEditor *)) );
 
     connect (aEditor, 
-             SIGNAL(delAttribute(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)), 
+             SIGNAL(delAttribute(int, KKSAttribute *, QAbstractItemModel*, const QModelIndex&, KKSAttrEditor *)), 
              this, 
-             SLOT(delComplexAttr(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)) );
+             SLOT(delComplexAttr(int, KKSAttribute *, QAbstractItemModel*, const QModelIndex&, KKSAttrEditor *)) );
 
     if (aEditor->exec() != QDialog::Accepted)
     {
@@ -342,14 +343,14 @@ void KKSAttributesFactory :: loadAttribute (int idAttr, QAbstractItemModel * aMo
              SLOT(addComplexAttr(KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)) );
 
     connect (attrEditor, 
-             SIGNAL(editAttribute(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)), 
+             SIGNAL(editAttribute(int, KKSAttribute *, QAbstractItemModel*, const QModelIndex&, KKSAttrEditor *)), 
              this, 
-             SLOT(editComplexAttr(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)) );
+             SLOT(editComplexAttr(int, KKSAttribute *, QAbstractItemModel*, const QModelIndex&, KKSAttrEditor *)) );
 
     connect (attrEditor, 
-             SIGNAL(delAttribute(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)), 
+             SIGNAL(delAttribute(int, KKSAttribute *, QAbstractItemModel*, const QModelIndex&, KKSAttrEditor *)), 
              this, 
-             SLOT(delComplexAttr(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)) );
+             SLOT(delComplexAttr(int, KKSAttribute *, QAbstractItemModel*, const QModelIndex&, KKSAttrEditor *)) );
 
 
     QModelIndex pIndex = aIndex;
@@ -2491,6 +2492,7 @@ void KKSAttributesFactory :: addComplexAttr (KKSAttribute *a, QAbstractItemModel
     if (aListEditor->exec() == QDialog::Accepted)
     {
         QList<int> attrsId = aListEditor->getAttributesId();
+        qDebug () << __PRETTY_FUNCTION__ << attrsId;
         if (attrsId.isEmpty())
         {
             refAttrs->release();
@@ -2514,18 +2516,61 @@ void KKSAttributesFactory :: addComplexAttr (KKSAttribute *a, QAbstractItemModel
     refAttrs->release();
 }
 
-void KKSAttributesFactory :: editComplexAttr (int id, KKSAttribute *a, QAbstractItemModel * attrModel, KKSAttrEditor *editor)
+void KKSAttributesFactory :: editComplexAttr (int id, KKSAttribute *a, QAbstractItemModel * attrModel, const QModelIndex& attrInd, KKSAttrEditor *editor)
 {
-    if (!a || !attrModel)
+    if (!a || !attrModel || !attrInd.isValid())
         return;
     qDebug () << __PRETTY_FUNCTION__ << id << a->id() << a->name() << a->title();
-    Q_UNUSED (editor);
+    KKSObject *attrTypesIO = loader->loadIO (IO_ATTR_TYPE_ID, true);
+    if (!attrTypesIO)
+    {
+        qCritical() << QObject::tr ("Cannot load attribute types");
+        QMessageBox::critical (editor, QObject::tr ("Attributes types"), QObject::tr ("Cannot load attribute types"), QMessageBox::Ok);
+        return;
+    }
+
+    KKSMap<int, KKSAttrType*> aTypes;
+    KKSMap<qint64, KKSEIOData *> attrTypesList = loader->loadEIOList (attrTypesIO);
+    KKSMap<qint64, KKSEIOData *>::const_iterator pAttrs;
+    for (pAttrs = attrTypesList.constBegin(); pAttrs != attrTypesList.constEnd(); pAttrs++)
+    {
+        KKSAttrType *aType = new KKSAttrType ();
+        if (!aType)
+            continue;
+        aType->setId (pAttrs.key());
+        aType->setName (pAttrs.value()->fields ().value ("name"));
+        aType->setCode (pAttrs.value()->fields ().value ("code"));
+        aTypes.insert (pAttrs.key(), aType);
+        if (aType)
+            aType->release ();
+    }
+    attrTypesIO->release();
+    KKSMap<int, KKSCategoryAttr *> cAttrs = a->attrs();
+    KKSMap<int, KKSCategoryAttr *>::const_iterator pa = cAttrs.constBegin()+attrInd.row();
+    KKSCategoryAttr * oldAttr = pa.value();
+    KKSCategoryAttr * cAttr (oldAttr);
+    cAttr->addRef();
+    int ikey = pa.key();
+    KKSCatAttrEditor * cEditor = new KKSCatAttrEditor (cAttr, aTypes, false, 0);
+    if (cEditor->exec() == QDialog::Accepted)
+    {
+        cAttrs.insert (ikey, cAttr);
+        attrModel->setData (attrInd, QVariant::fromValue<KKSCategoryAttr *>(cAttr), Qt::UserRole+1);
+        a->setAttrs (cAttrs);
+    }
 }
 
-void KKSAttributesFactory :: delComplexAttr (int id, KKSAttribute *a, QAbstractItemModel * attrModel, KKSAttrEditor *editor)
+void KKSAttributesFactory :: delComplexAttr (int id, KKSAttribute *a, QAbstractItemModel * attrModel, const QModelIndex& attrInd, KKSAttrEditor *editor)
 {
-    if (!a || !attrModel)
+    if (!a || !attrModel || !attrInd.isValid())
         return;
     qDebug () << __PRETTY_FUNCTION__ << id << a->id() << a->name() << a->title();
+    KKSMap<int, KKSCategoryAttr*> cAttrList = a->attrs();
+    int iRow = attrInd.row();
+    KKSMap<int, KKSCategoryAttr*>::iterator p = cAttrList.begin()+iRow;
+    cAttrList.erase (p);
+    QModelIndex pInd = attrInd.parent();
+    attrModel->removeRows (iRow, 1, pInd);
+    a->setAttrs(cAttrList);
     Q_UNUSED (editor);
 }

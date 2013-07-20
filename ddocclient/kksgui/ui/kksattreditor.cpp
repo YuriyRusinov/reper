@@ -480,12 +480,12 @@ void KKSAttrEditor::editTriggered()
 {
     //int answer = QMessageBox::question(this, tr(""), tr(), QMessageBox::Yes|QMessageBox::No, QMessageBox::No);
     //if(answer == QMessageBox::Yes)
-    emit editAttribute(m_recW->getID(), attribute, m_recW->getSourceModel(), this);
+    emit editAttribute(m_recW->getID(), attribute, m_recW->getSourceModel(), m_recW->getSourceIndex(), this);
 }
 
 void KKSAttrEditor::delTriggered()
 {
     int answer = QMessageBox::question(this, tr("Remove attribute"), tr("Do you really want to remove selected attribute from list?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::No);
     if(answer == QMessageBox::Yes)
-        emit delAttribute(m_recW->getID(), attribute, m_recW->getSourceModel(), this);
+        emit delAttribute(m_recW->getID(), attribute, m_recW->getSourceModel(), m_recW->getSourceIndex(), this);
 }

@@ -18,7 +18,7 @@ class KKSAttribute;
 class _GUI_EXPORT KKSAttrModel : public QAbstractItemModel
 {
 public:
-    KKSAttrModel(const KKSAttribute * _attr, QObject *parent = 0);
+    KKSAttrModel(KKSAttribute * _attr, QObject *parent = 0);
     virtual ~KKSAttrModel();
 
     virtual int columnCount (const QModelIndex& parent = QModelIndex()) const;
@@ -41,7 +41,7 @@ private:
     //
     // Variables
     //
-    const KKSAttribute * attr;
+    KKSAttribute * attr;
    
 private:
     Q_OBJECT
