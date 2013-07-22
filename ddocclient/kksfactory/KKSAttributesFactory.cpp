@@ -2570,7 +2570,9 @@ void KKSAttributesFactory :: delComplexAttr (int id, KKSAttribute *a, QAbstractI
     KKSMap<int, KKSCategoryAttr*>::iterator p = cAttrList.begin()+iRow;
     cAttrList.erase (p);
     QModelIndex pInd = attrInd.parent();
-    attrModel->removeRows (iRow, 1, pInd);
+    bool isRemoved = attrModel->removeRows (iRow, 1, pInd);
+    if (!isRemoved)
+        return;
     a->setAttrs(cAttrList);
     Q_UNUSED (editor);
 }

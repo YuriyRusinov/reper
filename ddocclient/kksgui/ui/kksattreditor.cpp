@@ -104,9 +104,9 @@ KKSAttrEditor :: KKSAttrEditor (KKSAttribute *attr,
     connect (ui->chManually, SIGNAL (stateChanged (int)), this, SLOT (setCodeEnabled (int)) );
     connect (ui->tbAddFilter, SIGNAL (clicked()), this, SLOT (slotAddFilterClicked()) );
     connect (ui->tbDelFilter, SIGNAL (clicked()), this, SLOT (slotDelFilterClicked()) );
-    connect (m_recW->actAdd, SIGNAL (triggered()), this, SLOT(addTriggered()));
-    connect (m_recW->actEdit, SIGNAL (triggered()), this, SLOT(editTriggered()));
-    connect (m_recW->actDel, SIGNAL (triggered()), this, SLOT(delTriggered()));
+    connect (m_recW, SIGNAL (addEntity (QAbstractItemModel *, const QModelIndex&)), this, SLOT(addTriggered(QAbstractItemModel *, const QModelIndex&)));
+    connect (m_recW, SIGNAL (editEntity(QAbstractItemModel *, const QModelIndex&)), this, SLOT(editTriggered(QAbstractItemModel *, const QModelIndex& )));
+    connect (m_recW, SIGNAL (delEntity(QAbstractItemModel *, const QModelIndex&)), this, SLOT(delTriggered(QAbstractItemModel *, const QModelIndex&)));
 //    connect (ui->pbAddAttrs, SIGNAL(clicked()), this, SLOT(addAttrs()));
     
     cRefTypes << KKSAttrType::atList 
@@ -471,21 +471,26 @@ void KKSAttrEditor::setRecWidget(KKSRecWidget* recW)
     m_recW = recW;
 }
 
-void KKSAttrEditor::addTriggered()
+void KKSAttrEditor::addTriggered(QAbstractItemModel * sourceModel, const QModelIndex& parent)
 {
-    emit addAttribute(attribute, m_recW->getSourceModel(), this);
+    qDebug () << __PRETTY_FUNCTION__ << parent;
+    emit addAttribute(attribute, sourceModel, this);
 }
 
-void KKSAttrEditor::editTriggered()
+void KKSAttrEditor::editTriggered(QAbstractItemModel * sourceMod, const QModelIndex& wIndex)
 {
     //int answer = QMessageBox::question(this, tr(""), tr(), QMessageBox::Yes|QMessageBox::No, QMessageBox::No);
     //if(answer == QMessageBox::Yes)
-    emit editAttribute(m_recW->getID(), attribute, m_recW->getSourceModel(), m_recW->getSourceIndex(), this);
+    int idAttr = wIndex.sibling(wIndex.row(), 0).data(Qt::UserRole).toInt();
+    emit editAttribute(idAttr, attribute, sourceMod, wIndex, this);
 }
 
-void KKSAttrEditor::delTriggered()
+void KKSAttrEditor::delTriggered(QAbstractItemModel * sourceMod, const QModelIndex& wIndex)
 {
     int answer = QMessageBox::question(this, tr("Remove attribute"), tr("Do you really want to remove selected attribute from list?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::No);
     if(answer == QMessageBox::Yes)
-        emit delAttribute(m_recW->getID(), attribute, m_recW->getSourceModel(), m_recW->getSourceIndex(), this);
+    {
+        int idAttr = wIndex.sibling(wIndex.row(), 0).data(Qt::UserRole).toInt();
+        emit delAttribute(idAttr, attribute, sourceMod, wIndex, this);
+    }
 }

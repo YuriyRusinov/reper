@@ -31,6 +31,7 @@ class KKSSearchTemplate;
 class KKSRecWidget;
 
 class QAbstractItemModel;
+class QModelIndex;
 
 class _GUI_EXPORT KKSAttrEditor : public QDialog
 {
@@ -65,9 +66,9 @@ signals:
     void delAttribute(int, KKSAttribute *, QAbstractItemModel*, const QModelIndex&, KKSAttrEditor *);
 
 public slots:
-    void addTriggered();//испускает сигнал addAttribute
-    void editTriggered();//испускает сигнал editAttribute
-    void delTriggered();//испускает сигнал delAttribute
+    void addTriggered(QAbstractItemModel * sourceMod, const QModelIndex& parent);//испускает сигнал addAttribute
+    void editTriggered(QAbstractItemModel * sourceMod, const QModelIndex& wIndex);//испускает сигнал editAttribute
+    void delTriggered(QAbstractItemModel * sourceMod, const QModelIndex& wIndex);//испускает сигнал delAttribute
 
 private slots:
     void accept ();

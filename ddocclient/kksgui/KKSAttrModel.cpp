@@ -166,10 +166,14 @@ bool KKSAttrModel::removeRows (int row, int count, const QModelIndex& parent )
 {
     if (parent.isValid())
         return false;
-    Q_UNUSED (row);
-    Q_UNUSED (count);
-    Q_UNUSED (parent);
-    return false;
+    this->beginRemoveRows(parent,row,row+count-1);
+    KKSMap<int, KKSCategoryAttr*> cAttrs=attr->attrs();
+    KKSMap<int, KKSCategoryAttr*>::iterator p = cAttrs.begin()+row;
+    for (int i=0; i<count; i++)
+        cAttrs.erase(p);
+    (const_cast<KKSAttribute *>(attr))->setAttrs(cAttrs);
+    this->endRemoveRows();
+    return true;
     
 }
 
