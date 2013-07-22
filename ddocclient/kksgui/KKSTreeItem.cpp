@@ -192,6 +192,12 @@ void KKSTreeItem :: setData (KKSEIOData * d, const KKSTemplate * t)
         {
             attrValue = QObject::tr("<Video data %1>").arg (i);
         }
+        else if (v->type()->attrType() == KKSAttrType::atComplex ||
+                 (v->refType() && v->refType()->attrType() == KKSAttrType::atComplex)
+                )
+        {
+            attrValue = QObject::tr("<Complex value %1>").arg (i);
+        }
         else
         {
             QString aCode = v->code(false);
