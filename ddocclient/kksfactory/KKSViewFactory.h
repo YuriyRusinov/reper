@@ -107,7 +107,7 @@ class _F_EXPORT KKSViewFactory
                                                      bool mode,
                                                      QWidget *parent=0,
                                                      Qt::WindowFlags f=0);
-
+        
         static void updateAttributesModel (KKSLoader *l, QAbstractItemModel * wModel);
 
         static void filterAttributesModel (KKSLoader *l, const KKSList<const KKSFilterGroup *> & filters, QAbstractItemModel * wModel);

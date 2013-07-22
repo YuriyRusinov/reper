@@ -1708,6 +1708,7 @@ void KKSViewFactory :: parseAttrGroup (KKSLoader *l, const KKSAGroup* aGroup, co
     aModel->setData (pIndex, aGroup->id(), Qt::UserRole);
     aModel->setData (pIndex, aGroup->name(), Qt::DisplayRole);
     aModel->setData (pIndex, 0, Qt::UserRole+USER_ENTITY);
+    aModel->setData (pIndex, QIcon(":/ddoc/rubric.png"), Qt::DecorationRole);
     
     int nChild = aGroup->childGroups().size();
     aModel->insertRows (0, nChild, pIndex);
@@ -1723,6 +1724,7 @@ void KKSViewFactory :: parseAttrGroup (KKSLoader *l, const KKSAGroup* aGroup, co
         aModel->setData (wIndex, p.key(), Qt::UserRole);
         aModel->setData (wIndex, p.value()->name(), Qt::DisplayRole);
         aModel->setData (wIndex, 0, Qt::UserRole+USER_ENTITY);
+        aModel->setData (wIndex, QIcon(":/ddoc/rubric.png"), Qt::DecorationRole);
         parseAttrGroup (l, p.value(), filters/*KKSList<const KKSFilterGroup *>()*/, aModel, wIndex);
         i++;
     }
@@ -1742,6 +1744,7 @@ void KKSViewFactory :: parseAttrGroup (KKSLoader *l, const KKSAGroup* aGroup, co
             aModel->setData (wIndex, pa.key(), Qt::UserRole);
             aModel->setData (wIndex, pa.value()->name(), Qt::DisplayRole);
             aModel->setData (wIndex, 1, Qt::UserRole+USER_ENTITY);
+            aModel->setData (wIndex, QIcon(":/ddoc/rubric_item.png"), Qt::DecorationRole);
             QModelIndex tIndex = aModel->index (i, 1, pIndex);
             aModel->setData (tIndex, attr->type()->name(), Qt::DisplayRole);
             QModelIndex titleIndex = aModel->index (i, 2, pIndex);

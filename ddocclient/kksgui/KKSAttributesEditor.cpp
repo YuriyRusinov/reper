@@ -104,8 +104,7 @@ void KKSAttributesEditor :: addAttribute (void)
     if (pIndex.data(Qt::UserRole+USER_ENTITY).toInt() != 0)
         pIndex = pIndex.parent();
     emit insertAttr(pIndex, aModel, this);
-
-/*
+/* 
     KKSAttribute *attribute = new KKSAttribute ();
     if (!attribute)
         return;
@@ -291,6 +290,7 @@ void KKSAttributesEditor :: setRecordsWidget (KKSRecWidget * rw)
         QAction * gaSep = new QAction (this);
         gaSep->setSeparator (true);
         recW->insertToolBarAction (recW->actAdd, gaSep);
+        connect (recW, SIGNAL (refreshMod (QAbstractItemModel *)), this, SLOT (refreshAttrModel (QAbstractItemModel *)) );
     }
     this->init_widgets ();
 }
@@ -372,6 +372,12 @@ KKSMap<int, KKSAGroup *> KKSAttributesEditor :: getAvailableGroups (void) const
     return attrsGroups;
 }
 
+void KKSAttributesEditor :: setAvailableGroups (const KKSMap<int, KKSAGroup *>& aGroups)
+{
+    attrsGroups.clear();
+    attrsGroups = aGroups;
+}
+
 void KKSAttributesEditor :: addAGroup (void)
 {
     QAbstractItemModel * aModel = recW->getSourceModel ();
@@ -418,4 +424,11 @@ void KKSAttributesEditor :: delAGroup (void)
     int idAttrGroup = wIndex.data(Qt::UserRole).toInt();
     if (QMessageBox::question(this, tr ("Delete group"), tr ("Do you really want to delete ?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
         emit deleteAttrGroup (idAttrGroup, aModel, wIndex, this);
+}
+
+void KKSAttributesEditor :: refreshAttrModel (QAbstractItemModel * attrMod)
+{
+    if (!attrMod)
+        return;
+    emit updateAttributesModel (attrMod);
 }

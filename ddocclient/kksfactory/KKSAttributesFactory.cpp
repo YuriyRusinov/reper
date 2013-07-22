@@ -125,6 +125,12 @@ KKSAttributesEditor * KKSAttributesFactory :: viewAttributes (const KKSList<cons
              SIGNAL(delAttribute(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)), 
              this, 
              SLOT(delAttribute(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *)) );
+    
+    connect (aEditor,
+             SIGNAL (updateAttributesModel (QAbstractItemModel *)),
+             this,
+             SLOT (updateAttrModel (QAbstractItemModel *))
+            );
 
     return aEditor;
 }
@@ -2575,4 +2581,13 @@ void KKSAttributesFactory :: delComplexAttr (int id, KKSAttribute *a, QAbstractI
         return;
     a->setAttrs(cAttrList);
     Q_UNUSED (editor);
+}
+
+void KKSAttributesFactory :: updateAttrModel (QAbstractItemModel * attrModel)
+{
+    KKSViewFactory::updateAttributesModel(loader,attrModel);
+    KKSMap<int, KKSAGroup *> aGroups = loader->loadAvailAttrsGroups();
+    KKSAttributesEditor * aEditor = qobject_cast<KKSAttributesEditor *>(this->sender());
+    if (aEditor)
+        aEditor->setAvailableGroups(aGroups);
 }

@@ -47,6 +47,7 @@ public:
     QMap<int, QString> getReferences (void) const;
     QTreeView * getView (void) const;
     KKSMap<int, KKSAGroup *> getAvailableGroups (void) const;
+    void setAvailableGroups (const KKSMap<int, KKSAGroup *>& aGroups);
 
 private slots:
     void addAttribute (void);
@@ -64,6 +65,8 @@ private slots:
 
     void searchAttrs (void);
     void setAttr (const QModelIndex & index);
+    
+    void refreshAttrModel (QAbstractItemModel * attrMod);
 
 signals:
     void insertAttr (const QModelIndex& parent, QAbstractItemModel *aModel, KKSAttributesEditor *attrEditor);
@@ -76,6 +79,7 @@ signals:
     void editAttribute(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *);
     void delAttribute(int, KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *);
 
+    void updateAttributesModel (QAbstractItemModel * attrMod);
 
 //    void requestAttr (int idAttr, KKSAttributesEditor *);
 
