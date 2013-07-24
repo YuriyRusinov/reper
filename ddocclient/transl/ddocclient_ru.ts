@@ -203,6 +203,17 @@
     </message>
 </context>
 <context>
+    <name>ChooseDlForm</name>
+    <message>
+        <source>You should choose any position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>position choosing</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ChooseTemplateForm</name>
     <message>
         <source>Error</source>
@@ -2450,11 +2461,11 @@ Do you want to save the changes before closing?</source>
     </message>
     <message>
         <source>Show extended attributes</source>
-        <translation>Показать расширенные атрибуты</translation>
+        <translation type="obsolete">Показать расширенные атрибуты</translation>
     </message>
     <message>
         <source>Add extended attributes</source>
-        <translation>Добавить расширенные атрибуты</translation>
+        <translation type="obsolete">Добавить расширенные атрибуты</translation>
     </message>
     <message>
         <source>Remove attribute</source>
@@ -2463,6 +2474,25 @@ Do you want to save the changes before closing?</source>
     <message>
         <source>Do you really want to remove selected attribute from list?</source>
         <translation>Вы действительно хотите удалить выбранный атрибут из списка?</translation>
+    </message>
+</context>
+<context>
+    <name>KKSAttrModel</name>
+    <message>
+        <source>Mandatory</source>
+        <translation>Обязательно</translation>
+    </message>
+    <message>
+        <source>Read only</source>
+        <translation>Только чтение</translation>
+    </message>
+    <message>
+        <source>ID</source>
+        <translation>ID</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Название</translation>
     </message>
 </context>
 <context>
@@ -3160,6 +3190,37 @@ Press YES to clear the color value or NO to remains current value</source>
     </message>
 </context>
 <context>
+    <name>KKSDbgOutputWidget</name>
+    <message>
+        <source>Debug output window</source>
+        <translation>Окно отладочных сообщений</translation>
+    </message>
+    <message>
+        <source>Floating</source>
+        <translation>Плавающее окно</translation>
+    </message>
+    <message>
+        <source>Place on Left</source>
+        <translation>Пристыковать слева</translation>
+    </message>
+    <message>
+        <source>Place on Right</source>
+        <translation>Пристыковать справа</translation>
+    </message>
+    <message>
+        <source>Place on Top</source>
+        <translation>Пристыковать сверху</translation>
+    </message>
+    <message>
+        <source>Place on Bottom</source>
+        <translation>Пристыковать снизу</translation>
+    </message>
+    <message>
+        <source>Debug output</source>
+        <translation>Отладочные сообщения</translation>
+    </message>
+</context>
+<context>
     <name>KKSFileWidget</name>
     <message>
         <source>Yes</source>
@@ -3609,6 +3670,10 @@ try to rename it with extention. Example: filename.vsd</source>
     <message>
         <source>Creation of new IO allowed only for rubrics with assigned category!</source>
         <translation>Создание новых информационных объектов допустимо только для рубрик с установленной категорией!</translation>
+    </message>
+    <message>
+        <source>Cannot transform icon to QPixmap</source>
+        <translation>Не могу преобразовать иконку в объект QPixmap</translation>
     </message>
 </context>
 <context>
@@ -7589,6 +7654,26 @@ Please contact your Systems Administrator and report this issue.</source>
         <source>Search by template</source>
         <translation>Поиск по шаблону</translation>
     </message>
+    <message>
+        <source>MESSAGE.</source>
+        <translation>ОТЛАДКА.</translation>
+    </message>
+    <message>
+        <source>WARNING!</source>
+        <translation>ПРЕДУПРЕЖДЕНИЕ!</translation>
+    </message>
+    <message>
+        <source>ERROR!</source>
+        <translation>ОШИБКА!</translation>
+    </message>
+    <message>
+        <source>CRITICAL!</source>
+        <translation>КРИТИЧЕСКАЯ ОШИБКА!</translation>
+    </message>
+    <message>
+        <source>&lt;Complex value %1&gt;</source>
+        <translation>&lt;Составной атрибут %1&gt;</translation>
+    </message>
 </context>
 <context>
     <name>QueryComboBox</name>
@@ -8402,6 +8487,10 @@ Please contact your Systems Administrator and report this issue.</source>
     <message>
         <source>Error</source>
         <translation>Ошибка</translation>
+    </message>
+    <message>
+        <source>Cannot transform rubric image to QPixmap</source>
+        <translation>Не могу преобразовать иконку рубрики в объект QPixmap</translation>
     </message>
 </context>
 <context>
@@ -10327,7 +10416,7 @@ syncronization</source>
     </message>
     <message>
         <source>Add extended attributes</source>
-        <translation>Добавить расширенные атрибуты</translation>
+        <translation type="obsolete">Добавить расширенные атрибуты</translation>
     </message>
     <message>
         <source>Set reference filter</source>
@@ -10336,6 +10425,14 @@ syncronization</source>
     <message>
         <source>Clear filters</source>
         <translation>Очистить шаблон поиска</translation>
+    </message>
+    <message>
+        <source>Attribute parameters</source>
+        <translation>Характеристики атрибута</translation>
+    </message>
+    <message>
+        <source>Extended attributes</source>
+        <translation>Вложенные атрибуты</translation>
     </message>
 </context>
 <context>
@@ -11265,13 +11362,6 @@ System Error &apos;%1&apos;
     <message>
         <source>Save to file</source>
         <translation>Сохранить в файл</translation>
-    </message>
-</context>
-<context>
-    <name>table_viewClass</name>
-    <message>
-        <source>table_view</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

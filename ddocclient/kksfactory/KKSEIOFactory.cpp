@@ -1262,9 +1262,9 @@ int KKSEIOFactory::insertIndValues(const KKSObjectExemplar * eio) const
         return ERROR_CODE;
     }
 
-    int ok = res->getCellAsInt(0, 0);
+    qint64 idRecAttrValue = res->getCellAsInt64(0, 0);
     delete res;
-    if(ok != 1)
+    if(idRecAttrValue <= 0)
         return ERROR_CODE;
 
     if(!sqlEx.isEmpty()){

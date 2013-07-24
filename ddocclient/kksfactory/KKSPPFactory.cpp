@@ -1629,6 +1629,7 @@ int KKSPPFactory::insertCategory(KKSCategory* c) const
     }
 
 
+    //если категория имеет вторую дочернюю категорию (для хранения показателей), то сохраним ее
     if(c->recAttrCategory()){
         if(c->recAttrCategory()->id() <= 0){
             setInTransaction();
