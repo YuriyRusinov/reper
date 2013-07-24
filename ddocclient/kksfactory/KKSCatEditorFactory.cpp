@@ -52,6 +52,7 @@
 #include <KKSCatAttrsModel.h>
 #include <KKSItemDelegate.h>
 #include <kkslifecycleform.h>
+#include <KKSAttrModel.h>
 #include <defines.h>
 
 ////////////////////////////////////////////////////////////////////////

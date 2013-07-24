@@ -57,6 +57,7 @@
 #include <KKSAttrGroup.h>
 #include <KKSSearchTemplate.h>
 #include <KKSSearchTemplateType.h>
+#include <KKSAttrModel.h>
 #include <kksresult.h>
 #include <defines.h>
 
@@ -1297,12 +1298,14 @@ KKSRecWidget * KKSViewFactory :: createCategAttrsView (const KKSCategory *cat,
     recWidget->hideGroup (0);//gbSearch->setVisible (false);
     recWidget->hideGroup (2);//tbSetView->setVisible (false);
     recWidget->hideGroup (3);//gbImportExport->setVisible (false);
-    QStandardItemModel * acModel = new KKSCatAttrsModel (0, 4);//QStandardItemModel (0, 4);
+    QAbstractItemModel * acModel = new KKSAttrModel (cat);
+/*    QStandardItemModel * acModel = new KKSCatAttrsModel (0, 4);//QStandardItemModel (0, 4);
     acModel->setHeaderData (0, Qt::Horizontal, QObject::tr ("Name"));
     acModel->setHeaderData (1, Qt::Horizontal, QObject::tr ("Default value"));
     acModel->setHeaderData (2, Qt::Horizontal, QObject::tr ("Mandatory"));
     acModel->setHeaderData (3, Qt::Horizontal, QObject::tr ("Read only"));
     updateAttrModel (cat, acModel);
+ */
     tv->setModel (acModel);
 
     QHeaderView * header = tv->header();

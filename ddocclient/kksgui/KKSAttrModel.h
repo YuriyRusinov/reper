@@ -14,11 +14,13 @@
 #include "kksgui_config.h"
 
 class KKSAttribute;
+class KKSCategory;
 
 class _GUI_EXPORT KKSAttrModel : public QAbstractItemModel
 {
 public:
-    KKSAttrModel(KKSAttribute * _attr, QObject *parent = 0);
+    KKSAttrModel(const KKSAttribute * _attr, QObject *parent = 0);
+    KKSAttrModel(const KKSCategory * _cat, QObject *parent = 0);
     virtual ~KKSAttrModel();
 
     virtual int columnCount (const QModelIndex& parent = QModelIndex()) const;
@@ -41,7 +43,8 @@ private:
     //
     // Variables
     //
-    KKSAttribute * attr;
+    const KKSAttribute * attr;
+    const KKSCategory * cat;
    
 private:
     Q_OBJECT
