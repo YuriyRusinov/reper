@@ -1,4 +1,4 @@
-create or replace function eioInsertIndicator(int8, int4, varchar, timestamp, timestamp, int4, int4, varchar) returns int4 as
+create or replace function eioInsertIndicator(int8, int4, varchar, timestamp, timestamp, int4, int4, varchar) returns int8 as
 $BODY$
 declare
     idRec alias for $1;
@@ -14,19 +14,22 @@ declare
 
     idCategory int4;
     idCatAttr int4;
+    idRecAttrValue int8;
 begin
 
     if(ioValue isnull) then
-        return 1;
+        return 0;
     end if;
 
-    insert into rec_attrs_values(id_record, id_attr_category, value, start_time, stop_time, id_io_object_src, id_io_object_src1, description)
-    values (idRec, idCategoryAttr, ioValue, iStartTime, iStopTime, iIdObjectSrc, iIdObjectSrc1, iDesc);
+    select getNextSeq('tbl_rec_attrs_values', 'id') into idRecAttrValue;
+
+    insert into rec_attrs_values(id, id_record, id_attr_category, value, start_time, stop_time, id_io_object_src, id_io_object_src1, description)
+    values (idRecAttrValue, idRec, idCategoryAttr, ioValue, iStartTime, iStopTime, iIdObjectSrc, iIdObjectSrc1, iDesc);
 --    if(FOUND = FALSE) then
 --        return -1;
 --    end if;
 
-    return 1;
+    return idRecAttrValue;
 
 end
 $BODY$

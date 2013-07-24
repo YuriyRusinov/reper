@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     18.07.2013 17:48:46                          */
+/* Created on:     24.07.2013 11:05:10                          */
 /*==============================================================*/
 
 
@@ -23,6 +23,7 @@ select setMacToNULL('root_table');
 create unique index Index_1 on root_table using BTREE (
 unique_id
 );
+
 
 /*==============================================================*/
 /* User: public                                                 */
@@ -877,6 +878,15 @@ comment on table categories_rubrics is
 Данные рубрики затем наследуются ИО, созданными на основе категории
 Данные из этой таблицы затем копируются в таблицу rubricator';
 
+comment on column categories_rubrics.id_parent is
+'идентификатор родительской рубрики. Не может быть задан вместе с идентификатором категории';
+
+comment on column categories_rubrics.id_category is
+'идентификатор категории. Не может быть задан вместе с идентификатором родительской рубрики';
+
+comment on column categories_rubrics.name is
+'Название рубрики';
+
 select setMacToNULL('categories_rubrics');
 select createTriggerUID('categories_rubrics');
 
@@ -1637,6 +1647,11 @@ comment on column io_categories.id_life_cycle is
 
 comment on column io_categories.is_global is
 'признак глобальности категории';
+
+comment on column io_categories.is_completed is
+'0 - категория находится в процессе изменения (создания)
+1 - процесс завершен. Происходила операция изменения категории
+2 - процесс завершен. Происходила операция создания новой категории';
 
 comment on column io_categories.is_archived is
 'Архивные категории не используются в работе. Считаются удаленными.';
@@ -3340,7 +3355,6 @@ create table roles_actions (
 );
 
 select setMacToNULL('roles_actions');
-
 
 /*==============================================================*/
 /* Table: rubric_records                                        */

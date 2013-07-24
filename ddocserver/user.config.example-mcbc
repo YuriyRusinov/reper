@@ -11,11 +11,11 @@ USER=admin
 # group 
 GROUP=admin
 
-#root path to PostgreSQL 9.x
-#if that was installed by default, the path typically is /opt/postgres
-LINTER_ROOT=/opt/postgres
+#root path to DynamicDocs Server installation directory
+#if that was installed by default, the path typically is /opt/ddocserver-X.X.X
+LINTER_ROOT=/opt/ddocserver
 
-# port of database server (5432 is the defaults)
+# port of DynamicDocs Server (5432 is the defaults)
 LINTER_PORT=5432
 
 #encoding of the DynamicDocs Server and all its databases
@@ -23,14 +23,14 @@ LINTER_PORT=5432
 ENCODING=UTF8
 
 #path to active cluster data directory
-#defaults for PostgreSQL 9.x is /opt/postgres/data
+#defaults for DynamicDocs Server is /opt/ddocserver-X.X.X/data
 #Just execute 'ps afx' command and find output record '.../postmaster ... -D {PGDATA_DIR}'.
 #PGDATA_DIR is active cluster data directory
 #Example:
 #ps afx 
 #...
-# 964 ?        S      0:02 /opt/postgres/bin/postmaster -D /opt/postgres/data
-PGDATA_DIR=/opt/postgres/data
+# 964 ?        S      0:02 /opt/ddocserver-1.2.3/bin/postmaster -D /opt/ddocserver-1.2.3/data
+PGDATA_DIR=/opt/ddocserver/data
 
 #file archive path
 FILE_ARCH=io_files

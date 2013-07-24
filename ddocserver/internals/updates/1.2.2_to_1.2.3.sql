@@ -8,6 +8,9 @@ select setCurrentDl(4);
 select setAsNotLogging(1);
 select setAsNotLogging(2);
 
+drop function eioinsertindicator(bigint, integer, character varying, timestamp without time zone, timestamp without time zone, integer, integer, character varying);
+drop FUNCTION eioupdateindicator(bigint, integer, character varying, timestamp without time zone, timestamp without time zone, integer, integer, character varying);
+drop FUNCTION eiocatindexist(bigint, integer);
 
 \i ./functions/misc/f_safe_drop_trigger.sql
 \i ./functions/misc/f_create_trigger.sql
@@ -32,6 +35,9 @@ select setAsLogging(2);
 \i ./functions/security/readd_security.sql
 
 \i ./functions/tasks/readd_tasks_func.sql
+
+
+alter table io_urls add column hash_sum varchar;
 
 
 
