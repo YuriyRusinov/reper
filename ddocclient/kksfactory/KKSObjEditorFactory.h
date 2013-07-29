@@ -141,7 +141,7 @@ public:
                                         bool bShowExecButton = false, //определяет наличие кнопки "Отправить адресату" при исполнении распоряжения. Во всех остальных случаях ее быть не должно
                                         Qt::WindowModality windowModality=Qt::NonModal, // модальность окна
                                         QWidget *parent=0,
-                                        Qt::WindowFlags f=0
+                                        Qt::WindowFlags flags=0
                                         );
 
     void createSearchTemplate();

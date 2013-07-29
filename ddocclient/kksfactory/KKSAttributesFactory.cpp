@@ -605,30 +605,36 @@ void KKSAttributesFactory :: addAttrGroup (QAbstractItemModel *aModel, const QMo
     KKSMap<qint64, KKSAttrValue *> aVals;
     if (pIndex.isValid())
     {
-        KKSValue val = KKSValue (QString::number(pIndex.data(Qt::UserRole).toInt()), KKSAttrType::atParent);
+        int idGroup = pIndex.data(Qt::UserRole).toInt();
+        KKSValue val = KKSValue (QString::number(idGroup), KKSAttrType::atParent);
         KKSAttribute * aPar = loader->loadAttribute(ATTR_ID_PARENT);
-        KKSCategoryAttr * cAttr = KKSCategoryAttr::create(aPar,false, true);
+        KKSCategoryAttr * cAttr = KKSCategoryAttr::create(aPar, false, true, QString::number(idGroup));
         aPar->release();
         KKSAttrValue * av = new KKSAttrValue(val, cAttr);
+        if (av)
+            aVals.insert(cAttr->id(), av);
         cAttr->release();
-        aVals.insert(ATTR_ID_PARENT, av);
         av->release();
     }
-    /*KKSObjEditor * oEditor =*/
-    m_oef->createNewEditorParam(attrEditor, IO_ATTRS_GROUPS_ID, c, refIO->tableName(), 0, (attrEditor->windowModality() != Qt::NonModal), ioAvals, aVals, aModel);
-/*    if (oEditor->exec() == QDialog::Accepted)
+    KKSObjEditor * oEditor = m_oef->createObjEditorParam(IO_ATTRS_GROUPS_ID, -1, filters, tr("Add/edit group of attributes"), c, ioAvals, aVals, true, QString(), false, Qt::WindowModal, attrEditor, Qt::Dialog);
+    //m_oef->createNewEditorParam(attrEditor, IO_ATTRS_GROUPS_ID, c, refIO->tableName(), 0, (attrEditor->windowModality() != Qt::NonModal), ioAvals, aVals, aModel);
+    if (oEditor->exec() == QDialog::Accepted)
     {
-        int nr = aModel->rowCount(pIndex);
-        aModel->insertRows(nr, 1, pIndex);
-        QModelIndex gInd = aModel->index(nr, 0, pIndex);
         KKSObjectExemplar * pObjEx = oEditor->getObjectEx();
+        int pId = pObjEx->attrValue(ATTR_ID_PARENT)->value().value().toInt();
+        QString name = pObjEx->attrValue(ATTR_NAME)->value().value();
+        QModelIndex parIndex = KKSViewFactory::searchModelRowsIndexMultiType (aModel, pId);
+        qDebug () << __PRETTY_FUNCTION__ << pId << name << parIndex;
+        int nr = aModel->rowCount(parIndex);
+        aModel->insertRows(nr, 1, parIndex);
+        QModelIndex gInd = aModel->index(nr, 0, parIndex);
         int gId = pObjEx->id();
-        QString name = pObjEx->name();
         aModel->setData(gInd, gId, Qt::UserRole);
         aModel->setData(gInd, name, Qt::DisplayRole);
+        aModel->setData(gInd, QIcon(":/ddoc/rubric.png"), Qt::DecorationRole);
         aModel->setData(gInd, 0, Qt::UserRole+USER_ENTITY);
         
-    }*/
+    }
 //    m_oef->createNewEditor (attrEditor, IO_ATTRS_GROUPS_ID, c, refIO->tableName(), 0, (attrEditor->windowModality() != Qt::NonModal));
     refIO->release ();
 }
@@ -662,8 +668,26 @@ void KKSAttributesFactory :: editAttrGroup (int idAttrGroup, QAbstractItemModel 
         return;
     }
     KKSList<const KKSFilterGroup *> filters = KKSList<const KKSFilterGroup *>();
-    m_oef->editExistOE (attrEditor, refIO->id(), idAttrGroup, c, refIO->tableName(), 0, false);
-    Q_UNUSED (aIndex);
+    KKSObjEditor * oEditor = m_oef->createObjEditor(IO_ATTRS_GROUPS_ID, idAttrGroup, filters, tr("Add/edit group of attributes"), c, true, QString(), false, Qt::WindowModal, attrEditor, Qt::Dialog);
+    if (oEditor->exec() == QDialog::Accepted)
+    {
+        int iRow = aIndex.row();
+        QModelIndex pIndex = aIndex.parent();
+        aModel->removeRows(iRow, 1, pIndex);
+        KKSObjectExemplar * pObjEx = oEditor->getObjectEx();
+        int pId = pObjEx->attrValue(ATTR_ID_PARENT)->value().value().toInt();
+        QString name = pObjEx->attrValue(ATTR_NAME)->value().value();
+        QModelIndex parIndex = KKSViewFactory::searchModelRowsIndexMultiType (aModel, pId);
+        qDebug () << __PRETTY_FUNCTION__ << pId << name << parIndex;
+        int nr = aModel->rowCount(parIndex);
+        aModel->insertRows(nr, 1, parIndex);
+        QModelIndex gInd = aModel->index(nr, 0, parIndex);
+        int gId = pObjEx->id();
+        aModel->setData(gInd, gId, Qt::UserRole);
+        aModel->setData(gInd, name, Qt::DisplayRole);
+        aModel->setData(gInd, QIcon(":/ddoc/rubric.png"), Qt::DecorationRole);
+        aModel->setData(gInd, 0, Qt::UserRole+USER_ENTITY);
+    }
 }
 
 /* Метод осуществляет удаление группы атрибутов.

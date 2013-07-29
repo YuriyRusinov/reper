@@ -650,7 +650,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
  * в остальных случаях данная кнопка должна отсутствовать
  * windowModality -- модальность окна
  * parent -- виджет-родитель
- * f -- флаги создания окна
+ * flags -- сопутствующие флаги создания окна
  Результат
  * виджет редактирования ИО/ЭИО
 */
@@ -667,7 +667,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditorParam (int idObject,// идент
                                                            bool bShowExecButton, //определяет наличие кнопки "Отправить адресату" при исполнении распоряжения. Во всех остальных случаях ее быть не должно
                                                            Qt::WindowModality windowModality, // модальность окна
                                                            QWidget *parent,
-                                                           Qt::WindowFlags f
+                                                           Qt::WindowFlags flags
                                                           )
 {
     KKSObject *obj = 0;
@@ -701,7 +701,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditorParam (int idObject,// идент
                                                        (idObject == IO_IO_ID ? true:false),
                                                        tbOper,
                                                        parent,
-                                                       f);
+                                                       flags);
 
     objEditorWidget->setShowExecButton(bShowExecButton);
 
