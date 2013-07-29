@@ -89,14 +89,14 @@ export LD_LIBRARY_PATH=$UUID_PREFIX/lib:$PREFIX/lib:$GSL_PREFIX
 
 gunzip < uuid-$UUID_VER.tar.gz | tar xf - &&
 cd $UUID_SRC_DIR && 
-./configure LD_OPTIONS="-L$UUID_PREFIX/lib" --prefix=$UUID_PREFIX --with-pgsql=no --with-cxx && 
+./configure --prefix=$UUID_PREFIX --with-pgsql=no --with-cxx && 
 make && 
 make install && 
 
 cd $PREV &&
 bunzip2 < postgresql-$PGSQL_VER.tar.bz2 | tar xf - &&
 cd $PG_SRC_DIR && 
-./configure --with-ossp-uuid --prefix=$PG_PREFIX --with-libxml --with-libxslt && 
+./configure LDFLAGS="-L$UUID_PREFIX/lib" CPPFLAGS="-I$UUID_PREFIX/include" --with-ossp-uuid --prefix=$PG_PREFIX --with-libxml --with-libxslt && 
 make world && 
 make install && 
 cd ./contrib && 
@@ -108,7 +108,7 @@ mkdir $PGDATA &&
 chown -R postgres:postgres  $PGDATA && 
 su - postgres -c "$PG_PREFIX/bin/initdb -D $PGDATA -E UTF8 --locale=ru_RU.UTF8" &&
 
-cd $PREV %%
+cd $PREV &&
 gunzip < gsl-$GSL_VER.tar.gz | tar xf - &&
 cd $GSL_SRC_DIR &&
 ./configure --prefix=$GSL_PREFIX &&
@@ -132,7 +132,7 @@ make install &&
 cd $PREV &&
 gunzip < gdal-$GDAL_VER.tar.gz | tar xf - &&
 cd $GDAL_SRC_DIR &&
-./configure --prefix=$GDAL_PREFIX --with-geos=$GEOS_PREFIX/bin/geos-config &&
+./configure LDFLAGS="-L$PREFIX/lib" CPPFLAGS="-I$PREFIX/include" --prefix=$GDAL_PREFIX --with-geos=$GEOS_PREFIX/bin/geos-config &&
 make &&
 make install &&
 
