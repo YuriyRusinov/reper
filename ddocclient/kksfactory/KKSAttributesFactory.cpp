@@ -208,8 +208,9 @@ void KKSAttributesFactory :: findAttributes (int idAttrs, QAbstractItemModel * a
  */
 void KKSAttributesFactory :: saveAttribute (const QModelIndex& parent, QAbstractItemModel* aModel, KKSAttributesEditor *attrEditor)
 {
-    if (!parent.isValid() || !aModel || !attrEditor)
+    if (!parent.isValid() || !aModel || !attrEditor || parent.data(Qt::UserRole+USER_ENTITY).toInt() != 0)
         return;
+
     KKSAttribute *cAttr = new KKSAttribute ();
     if (!cAttr)
         return;
@@ -218,6 +219,8 @@ void KKSAttributesFactory :: saveAttribute (const QModelIndex& parent, QAbstract
     KKSMap<int, KKSAGroup *> attrsGroups=attrEditor->getAvailableGroups();
     QMap<int, QString> ioRefs=attrEditor->getReferences();
     KKSAttrEditor *aEditor = new KKSAttrEditor (cAttr, attrTypes, attrsGroups, ioRefs, attrEditor);
+    int idAttrGroup = parent.data(Qt::UserRole).toInt();
+    aEditor->setGroupId(idAttrGroup);
     connect (aEditor, 
              SIGNAL (getReferenceFields (KKSAttribute *, int, KKSAttrEditor *)),
              attrEditor,
@@ -261,8 +264,8 @@ void KKSAttributesFactory :: saveAttribute (const QModelIndex& parent, QAbstract
 //    cAttr->setType (aType);
 //    if (cAttr->type() == 0)
 //        return;
-    int idAttrGroup = parent.data(Qt::UserRole).toInt();
-    KKSAGroup * aGr = loader->loadAttrGroup(idAttrGroup);
+    int idNewAttrGroup = aEditor->getGroupId();
+    KKSAGroup * aGr = loader->loadAttrGroup(idNewAttrGroup);
     cAttr->setGroup (aGr);
     aGr->release ();
 
@@ -285,9 +288,53 @@ void KKSAttributesFactory :: saveAttribute (const QModelIndex& parent, QAbstract
     if (isInsert)
         cAttr->setId (objC->id());
 
+    QModelIndex aInd = (isInsert ? QModelIndex() : KKSViewFactory::searchModelRowsIndexMultiType(aModel, cAttr->id(), 1, parent));
+    QModelIndex pGroupInd = KKSViewFactory::searchModelRowsIndexMultiType(aModel, idNewAttrGroup, 0);
+    if (aInd.isValid() && pGroupInd != parent)
+    {
+        //
+        // Если группа изменилась, то удаляем старую сущность в модели и ставим новую
+        //
+        int iRow = aInd.row();
+        aModel->removeRows (iRow, 1, parent);
+        int nr = aModel->rowCount(pGroupInd);
+        aModel->insertRows(nr, 1, pGroupInd);
+        aInd = aModel->index(nr, 0, pGroupInd);
+    }
+    else if (!aInd.isValid())
+    {
+        int nr = aModel->rowCount(pGroupInd);
+        aModel->insertRows(nr, 1, pGroupInd);
+        aInd = aModel->index(nr, 0, pGroupInd);
+    }
+    aModel->setData(aInd, cAttr->id(), Qt::UserRole);
+    aModel->setData(aInd, cAttr->name(), Qt::DisplayRole);
+    aModel->setData(aInd, QIcon(":/ddoc/rubric_item.png"), Qt::DecorationRole);
+    aModel->setData(aInd, 1, Qt::UserRole+USER_ENTITY);
+    
+    aInd = aInd.sibling (aInd.row(), 1);
+    aModel->setData(aInd, cAttr->type()->name(), Qt::DisplayRole);
+    aInd = aInd.sibling (aInd.row(), 2);
+    aModel->setData(aInd, cAttr->title(), Qt::DisplayRole);
+    QModelIndex nIndex = aInd.sibling (aInd.row(), 3);
+    if (cAttr->type()->id() == 2 ||
+        cAttr->type()->id() == 7 ||
+        cAttr->type()->id() == 12 ||
+        cAttr->type()->id() == 17 ||
+        cAttr->type()->id() == 19 ||
+        cAttr->type()->id() == 26
+    )
+    {
+        KKSObject * io = loader->loadIO (cAttr->tableName(), true);
+        QString refVal = QString("%1(%2)").arg ((io ? io->name() : QString())).arg (cAttr->name());
+        aModel->setData (nIndex, refVal, Qt::DisplayRole);
+        if (io)
+            io->release();
+    }
+    
     m_ppf->insertAttrAttrs(cAttr);
 
-    KKSViewFactory::updateAttributesModel (loader, aModel);
+    //KKSViewFactory::updateAttributesModel (loader, aModel);
 
     if (aType)
         aType->release ();
@@ -364,6 +411,7 @@ void KKSAttributesFactory :: loadAttribute (int idAttr, QAbstractItemModel * aMo
         pIndex = pIndex.parent();
     attrEditor->setGroupId(pIndex.data(Qt::UserRole).toInt());
 
+    QModelIndex aInd (aIndex);
     if (attrEditor->exec () == QDialog::Accepted)
     {
         KKSAttribute *cAttrRes = attrEditor->getAttribute ();
@@ -385,13 +433,44 @@ void KKSAttributesFactory :: loadAttribute (int idAttr, QAbstractItemModel * aMo
         }
 
         oe->release ();
+        QModelIndex pGroupInd = KKSViewFactory::searchModelRowsIndexMultiType(aModel, idAttrGr, 0);
+        if (pGroupInd != pIndex)
+        {
+            //
+            // Если группа изменилась, то удаляем старую сущность в модели и ставим новую
+            //
+            int iRow = aIndex.row();
+            aModel->removeRows (iRow, 1, pIndex);
+            int nr = aModel->rowCount(pGroupInd);
+            aModel->insertRows(nr, 1, pGroupInd);
+            aInd = aModel->index(nr, 0, pGroupInd);
+        }
+        aModel->setData(aInd, cAttrRes->id(), Qt::UserRole);
+        aModel->setData(aInd, cAttrRes->name(), Qt::DisplayRole);
+        aModel->setData(aInd, QIcon(":/ddoc/rubric_item.png"), Qt::DecorationRole);
+        aModel->setData(aInd, 1, Qt::UserRole+USER_ENTITY);
 
-        aModel->setData (aIndex, cAttrRes->id(), Qt::UserRole);
-        aModel->setData (aIndex, cAttrRes->name(), Qt::DisplayRole);
-        QModelIndex titleIndex = aIndex.sibling (aIndex.row(), 2);
-        aModel->setData (titleIndex, cAttrRes->title(), Qt::DisplayRole);
+        aInd = aInd.sibling (aInd.row(), 1);
+        aModel->setData(aInd, cAttrRes->type()->name(), Qt::DisplayRole);
+        aInd = aInd.sibling (aInd.row(), 2);
+        aModel->setData(aInd, cAttrRes->title(), Qt::DisplayRole);
+        QModelIndex nIndex = aInd.sibling (aInd.row(), 3);
+        if (cAttrRes->type()->id() == 2 ||
+            cAttrRes->type()->id() == 7 ||
+            cAttrRes->type()->id() == 12 ||
+            cAttrRes->type()->id() == 17 ||
+            cAttrRes->type()->id() == 19 ||
+            cAttrRes->type()->id() == 26
+        )
+        {
+            KKSObject * io = loader->loadIO (cAttrRes->tableName(), true);
+            QString refVal = QString("%1(%2)").arg ((io ? io->name() : QString())).arg (cAttrRes->name());
+            aModel->setData (nIndex, refVal, Qt::DisplayRole);
+            if (io)
+                io->release();
+        }
 
-        KKSViewFactory::updateAttributesModel (loader, aModel);
+        //KKSViewFactory::updateAttributesModel (loader, aModel);
     }
 
     if (attrEditor)
@@ -624,7 +703,7 @@ void KKSAttributesFactory :: addAttrGroup (QAbstractItemModel *aModel, const QMo
         int pId = pObjEx->attrValue(ATTR_ID_PARENT)->value().value().toInt();
         QString name = pObjEx->attrValue(ATTR_NAME)->value().value();
         QModelIndex parIndex = KKSViewFactory::searchModelRowsIndexMultiType (aModel, pId);
-        qDebug () << __PRETTY_FUNCTION__ << pId << name << parIndex;
+        //qDebug () << __PRETTY_FUNCTION__ << pId << name << parIndex;
         int nr = aModel->rowCount(parIndex);
         aModel->insertRows(nr, 1, parIndex);
         QModelIndex gInd = aModel->index(nr, 0, parIndex);
@@ -678,7 +757,7 @@ void KKSAttributesFactory :: editAttrGroup (int idAttrGroup, QAbstractItemModel 
         int pId = pObjEx->attrValue(ATTR_ID_PARENT)->value().value().toInt();
         QString name = pObjEx->attrValue(ATTR_NAME)->value().value();
         QModelIndex parIndex = KKSViewFactory::searchModelRowsIndexMultiType (aModel, pId);
-        qDebug () << __PRETTY_FUNCTION__ << pId << name << parIndex;
+        //qDebug () << __PRETTY_FUNCTION__ << pId << name << parIndex;
         int nr = aModel->rowCount(parIndex);
         aModel->insertRows(nr, 1, parIndex);
         QModelIndex gInd = aModel->index(nr, 0, parIndex);
