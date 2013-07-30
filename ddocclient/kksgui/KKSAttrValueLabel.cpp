@@ -31,14 +31,16 @@ KKSAttrValueLabel:: ~KKSAttrValueLabel (void)
 
 void KKSAttrValueLabel::mouseReleaseEvent ( QMouseEvent * event )
 {
-    Q_UNUSED(event);
+    QLabel::mouseReleaseEvent(event);
     emit clicked();
 }
 
+/*
 void KKSAttrValueLabel :: mouseMoveEvent( QMouseEvent * event )
 {
     Q_UNUSED(event);
 }
+ */
 
 void KKSAttrValueLabel :: setAttrValue(KKSAttrValue * av) 
 {
@@ -63,15 +65,15 @@ void KKSAttrValueLabel :: setLabelProps()
     if(!m_av)
         return;
 
-	bool isMandatory = m_av->attribute()->isMandatory();
-	QString aTitle = m_av->attribute()->title();
-    //bool isSystem = m_av->attribute()->isSystem();
-	
-	QString text = QString ("%1%2:")
-		               .arg (aTitle)
-					   .arg(isMandatory ? QString("*"): QString());
-		
-	QColor colour(Qt::darkBlue); 
+    bool isMandatory = m_av->attribute()->isMandatory();
+    QString aTitle = m_av->attribute()->title();
+//bool isSystem = m_av->attribute()->isSystem();
+
+    QString text = QString ("%1%2:")
+                           .arg (aTitle)
+                           .arg(isMandatory ? QString("*"): QString());
+
+    QColor colour(Qt::darkBlue); 
     QString coloredText;
     bool isUnderline = false;
 
@@ -102,7 +104,7 @@ void KKSAttrValueLabel :: setLabelProps()
         lFont.setBold (true);
     }
 
-	this->setFont (lFont);
+    this->setFont (lFont);
 
     if(isUnderline){
         setToolTip(tr("Click on label to show extended attribute properties"));
@@ -121,14 +123,16 @@ void KKSAttrValueLabel :: showAttrValueProps()
         return;
 
 #ifdef Q_CC_MSVC
+    bool isSys = (m_isSystem == KKSIndAttr::KKSIndAttrClass::iacIOUserAttr);
     KKSAttrValuePropsForm * f = new KKSAttrValuePropsForm(m_av, 
                                                           true, 
-                                                          m_isSystem == KKSIndAttr::KKSIndAttrClass::iacIOUserAttr ? false : true,
+                                                          !isSys,
                                                           this);
 #else
+    bool isSys (KKSIndAttr::iacIOUserAttr == KKSIndAttr::iacIOUserAttr);
     KKSAttrValuePropsForm * f = new KKSAttrValuePropsForm(m_av, 
                                                           true, 
-                                                          m_isSystem == KKSIndAttr::iacIOUserAttr ? false : true,
+                                                          !isSys,
                                                           this);
 #endif
 

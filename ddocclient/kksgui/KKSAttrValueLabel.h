@@ -41,7 +41,7 @@ class _GUI_EXPORT KKSAttrValueLabel : public QLabel
 
     protected:
         void mouseReleaseEvent ( QMouseEvent * event ) ;
-        void mouseMoveEvent( QMouseEvent * event ) ;
+        //void mouseMoveEvent( QMouseEvent * event ) ;
         void setLabelProps();
 
     private:

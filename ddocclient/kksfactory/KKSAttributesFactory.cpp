@@ -895,7 +895,7 @@ QString KKSAttributesFactory :: toXML (KKSCategoryAttr* attr)
  */
 QLabel * KKSAttributesFactory :: createAttrTitle (KKSAttrValue * av, KKSIndAttr::KKSIndAttrClass isSystem, KKSObjEditor *objEditor)
 {
-	if(!av)
+    if(!av)
         return new QLabel();
 
     QLabel * lTitle = new KKSAttrValueLabel(av, isSystem);
