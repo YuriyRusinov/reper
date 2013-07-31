@@ -3,25 +3,29 @@
 #include <QMessageBox>
 #include <QAbstractItemModel>
 #include <QStandardItemModel>
+#include <QSortFilterProxyModel>
+#include <QHeaderView>
 #include <QItemSelectionModel>
 #include <QtDebug>
 #include <QHeaderView>
 
 #include <KKSAttrValue.h>
 #include <KKSObject.h>
+#include <qt4/QtGui/qheaderview.h>
 
 #include "attrhistory.h"
 #include "ui_attr_history.h"
 #include "defines.h"
+#include "KKSAttrHistoryProxyModel.h"
 
-#define c_id 0
-#define c_start 1
-#define c_stop 2
-#define c_value 3
+const int c_id = 0;
+const int c_start = 1;
+const int c_stop = 2;
+const int c_value = 3;
 //#define c_measured 4
-#define c_source 4
-#define c_transfer 5
-#define c_description 6
+const int c_source = 4;
+const int c_transfer = 5;
+const int c_description = 6;
 
 AttrHistory::AttrHistory (const KKSList<KKSAttrValue*> & histlist, QWidget *parent, Qt::WFlags f)
     : QDialog (parent, f),
@@ -34,6 +38,7 @@ AttrHistory::AttrHistory (const KKSList<KKSAttrValue*> & histlist, QWidget *pare
         view (histlist);
     }
 
+    connect (UI->pbClose, SIGNAL(clicked()), this, SLOT (reject()) );
 }
 
 AttrHistory::~AttrHistory ()
@@ -53,13 +58,14 @@ void AttrHistory::view(const KKSList<KKSAttrValue*> & histlist)
     QString tempStr;
     //QStandardItem *tree;
 
-    QStandardItemModel *model =new QStandardItemModel;
+    int n = histlist.count();
+    QStandardItemModel *model =new QStandardItemModel (n, c_description+1);
     QStandardItem *item;
 
     //Получаем Имя Тип И Группу атрибута
     av = histlist.first();
     attr = av->attribute();
-    qDebug()<<"Category ID "<<attr->id()<<" Category Name: "<<attr->name()<<" Category Group: "<<attr->group()->name()<<" Category Type: "<< attr->type()->name();
+    qDebug()<< __PRETTY_FUNCTION__ << "Category ID "<<attr->id()<<" Category Name: "<<attr->name()<<" Category Group: "<<attr->group()->name()<<" Category Type: "<< attr->type()->name();
 
     UI->leGroup->setText(attr->group()->name());
     UI->leType->setText(attr->type()->name());
@@ -72,31 +78,76 @@ void AttrHistory::view(const KKSList<KKSAttrValue*> & histlist)
     QHeaderView *headerView = UI->tabHistory->header();
     headerView->setDefaultAlignment(Qt::AlignCenter);
 
-    //Обходим все значениея истории изменений атрибута и вносим в таблицу
-    for (int i =0; i<histlist.count(); i++)
+    //
+    // Обходим все значения истории изменений атрибута и вносим в таблицу
+    //
+    for (int i =0; i<n; i++)
     {
         av = histlist.at(i);
 
-            item = new QStandardItem(tempStr.setNum(av->id()));
-            item->setTextAlignment(Qt::AlignCenter);
-            model->setItem(i,c_id,item);
-            tempStr.clear();
+        item = new QStandardItem(tempStr.setNum(av->id()));
+        item->setTextAlignment(Qt::AlignCenter);
+        model->setItem(i,c_id,item);
+        tempStr.clear();
 
         if (av->value().valueForInsert() != NULL)
         {
-            item = new QStandardItem(av->value().valueForInsert());
+            KKSAttribute * a = av->attribute();
+            if (!a)
+                continue;
+            const KKSAttrType * t = a->type();
+            const KKSAttrType * rt = a->refType();
+            int tId = t->attrType();
+            if (tId == KKSAttrType::atJPG ||
+                (rt && rt->attrType() == KKSAttrType::atJPG)
+               )
+                item = new QStandardItem(tr("<Image data %1>").arg(i));
+            else if (tId == KKSAttrType::atSVG ||
+                     (rt && rt->attrType() == KKSAttrType::atSVG)
+                    )
+                item = new QStandardItem(tr("<SVG data %1>").arg(i));
+            else if( tId == KKSAttrType::atXMLDoc || 
+                    (rt && rt->attrType() == KKSAttrType::atXMLDoc)
+                   )
+                item = new QStandardItem(tr("<XML document %1>").arg(i));
+            else if( tId == KKSAttrType::atVideo || 
+                    (rt && rt->attrType() == KKSAttrType::atVideo)
+                   )
+                item = new QStandardItem(tr("<Video data %1>").arg(i));
+            else if (tId == KKSAttrType::atRecordColor || 
+                     tId == KKSAttrType::atRecordColorRef)
+            {
+                item = new QStandardItem(tr("Text example"));
+                bool ok;
+                quint64 vl = av->value().valueForInsert().toLongLong(&ok);
+                if (!ok)
+                    continue;
+                item->setData(QColor::fromRgba(vl), Qt::BackgroundRole);
+            }
+            else if (tId == KKSAttrType::atRecordTextColor || 
+                     tId == KKSAttrType::atRecordTextColorRef)
+            {
+                item = new QStandardItem(tr("Text example"));
+                bool ok;
+                quint64 vl = av->value().valueForInsert().toLongLong(&ok);
+                if (!ok)
+                    continue;
+                item->setData(QColor::fromRgba(vl), Qt::ForegroundRole);
+            }
+            else
+                item = new QStandardItem(av->value().valueForInsert());
             item->setTextAlignment(Qt::AlignCenter);
             model->setItem(i,c_value,item);
         }
 
 
-            item = new QStandardItem(av->startDateTime().toString());
-            item->setTextAlignment(Qt::AlignCenter);
-            model->setItem(i,c_start,item);
+        item = new QStandardItem(av->startDateTime().toString("dd.MM.yyyy hh:mm:ss"));
+        item->setTextAlignment(Qt::AlignCenter);
+        model->setItem(i,c_start,item);
 
-            item = new QStandardItem(av->stopDateTime().toString());
-            item->setTextAlignment(Qt::AlignCenter);
-            model->setItem(i,c_stop,item);
+        item = new QStandardItem(av->stopDateTime().toString("dd.MM.yyyy hh:mm:ss"));
+        item->setTextAlignment(Qt::AlignCenter);
+        model->setItem(i,c_stop,item);
 
 
         if (av->ioSrc() != NULL)
@@ -109,7 +160,7 @@ void AttrHistory::view(const KKSList<KKSAttrValue*> & histlist)
         if (av->ioSrc1() != NULL)
         {
             item = new QStandardItem(av->ioSrc1()->name());
-            item->setTextAlignment(Qt::AlignCenter);if (av->ioSrc1() != NULL)
+            item->setTextAlignment(Qt::AlignCenter);
             model->setItem(i,c_transfer,item);
         }
 
@@ -126,8 +177,17 @@ void AttrHistory::view(const KKSList<KKSAttrValue*> & histlist)
         }
 
     }
+    QSortFilterProxyModel * attrHistModel = new KKSAttrHistoryProxyModel(this);
+    attrHistModel->setSourceModel (model);
+    QHeaderView * hv = UI->tabHistory->header();
+    hv->setClickable(true);
+    attrHistModel->setDynamicSortFilter(true);
+    hv->setSortIndicator(0,Qt::AscendingOrder);
+    hv->setSortIndicatorShown(true);
+    attrHistModel->sort(0,Qt::AscendingOrder);
 
-       UI->tabHistory->setModel(model);
+    UI->tabHistory->setModel(attrHistModel);
+    UI->tabHistory->setSortingEnabled(true);
 
 
 }
