@@ -67,6 +67,8 @@ private slots:
     void setAttr (const QModelIndex & index);
     
     void refreshAttrModel (QAbstractItemModel * attrMod);
+    
+    void expandAttrInd (const QModelIndex& ind);
 
 signals:
     void insertAttr (const QModelIndex& parent, QAbstractItemModel *aModel, KKSAttributesEditor *attrEditor);

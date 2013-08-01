@@ -132,6 +132,8 @@ KKSAttributesEditor * KKSAttributesFactory :: viewAttributes (const KKSList<cons
              SLOT (updateAttrModel (QAbstractItemModel *))
             );
 
+    connect (this, SIGNAL(expandIndex (const QModelIndex&)), aEditor, SLOT (expandAttrInd (const QModelIndex&)) );
+
     return aEditor;
 }
 
@@ -250,6 +252,8 @@ void KKSAttributesFactory :: saveAttribute (const QModelIndex& parent, QAbstract
              SIGNAL(delAttribute(int, KKSAttribute *, QAbstractItemModel*, const QModelIndex&, KKSAttrEditor *)), 
              this, 
              SLOT(delComplexAttr(int, KKSAttribute *, QAbstractItemModel*, const QModelIndex&, KKSAttrEditor *)) );
+    
+    connect (this, SIGNAL(expandIndex (const QModelIndex&)), aEditor, SLOT (expandAttrInd (const QModelIndex&)) );
 
     if (aEditor->exec() != QDialog::Accepted)
     {
@@ -334,6 +338,8 @@ void KKSAttributesFactory :: saveAttribute (const QModelIndex& parent, QAbstract
     
     m_ppf->insertAttrAttrs(cAttr);
 
+    aInd = aInd.sibling (aInd.row(), 0);
+    emit expandIndex (aInd);
     //KKSViewFactory::updateAttributesModel (loader, aModel);
 
     if (aType)
@@ -405,6 +411,7 @@ void KKSAttributesFactory :: loadAttribute (int idAttr, QAbstractItemModel * aMo
              this, 
              SLOT(delComplexAttr(int, KKSAttribute *, QAbstractItemModel*, const QModelIndex&, KKSAttrEditor *)) );
 
+    connect (this, SIGNAL(expandIndex (const QModelIndex&)), aEditor, SLOT (expandAttrInd (const QModelIndex&)) );
 
     QModelIndex pIndex = aIndex;
     while (pIndex.parent().isValid() && pIndex.data(Qt::UserRole+USER_ENTITY).toInt() > 0)
@@ -469,6 +476,8 @@ void KKSAttributesFactory :: loadAttribute (int idAttr, QAbstractItemModel * aMo
             if (io)
                 io->release();
         }
+        aInd = aInd.sibling (aInd.row(), 0);
+        emit expandIndex (aInd);
 
         //KKSViewFactory::updateAttributesModel (loader, aModel);
     }

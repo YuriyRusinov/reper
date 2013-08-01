@@ -4,8 +4,8 @@
 #include <QModelIndex>
 #include <QAbstractItemModel>
 #include <QItemSelectionModel>
-//#include <QPushButton>
-//#include <QToolButton>
+#include <QTreeView>
+#include <QAbstractProxyModel>
 #include <QAction>
 #include <QMouseEvent>
 #include <QDragEnterEvent>
@@ -353,6 +353,29 @@ void KKSAttributesEditor :: setAttr (const QModelIndex & index)
         editAGroup ();
     //if (index.isValid())
     //    accept ();
+}
+
+void KKSAttributesEditor :: expandAttrInd (const QModelIndex& ind)
+{
+    QTreeView * tv = recW->getView();
+    if (!tv || !ind.isValid())
+        return;
+    QItemSelectionModel * selModel = tv->selectionModel();
+    QAbstractProxyModel * proxyMod = qobject_cast<QAbstractProxyModel *>(tv->model());
+    QModelIndex wIndex;
+    if (proxyMod)
+        wIndex = proxyMod->mapFromSource(ind);
+    else
+        wIndex = ind;
+    selModel->select(wIndex, QItemSelectionModel::Select | QItemSelectionModel::Rows);
+    selModel->setCurrentIndex(wIndex, QItemSelectionModel::Select | QItemSelectionModel::Rows);
+    tv->expand(wIndex);
+    tv->scrollTo(wIndex);
+    while (wIndex.parent().isValid())
+    {
+        wIndex = wIndex.parent();
+        tv->expand(wIndex);
+    }
 }
 
 void KKSAttributesEditor :: mousePressEvent (QMouseEvent *event)

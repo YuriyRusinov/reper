@@ -100,6 +100,7 @@ private slots:
 
 signals:
     void viewHistory(const KKSList<KKSAttrValue *> &);
+    void expandIndex (const QModelIndex&);
     
 private:
     //
