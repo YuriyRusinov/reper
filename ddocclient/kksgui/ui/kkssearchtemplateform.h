@@ -1,5 +1,5 @@
-#ifndef KKSFILTERSEDITORFORM_H
-#define KKSFILTERSEDITORFORM_H
+#ifndef KKSSearchTemplateForm_H
+#define KKSSearchTemplateForm_H
 
 #include <QDialog>
 #include <kksgui_config.h>
