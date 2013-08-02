@@ -61,6 +61,7 @@ HEADERS += \
 		ui/choosetemplateform.h \
                 ui/commandform.h \
 		ui/kksfilterseditorform.h \
+                ui/kkssearchtemplateform.h \
 		ui/kksfilewidget.h \
 		kksincludeswidget.h \
 		KKSIncludesDialog.h \
@@ -156,6 +157,7 @@ SOURCES += \
                 ui/kkscatattreditor.cpp \
                 ui/kksattrattreditor.cpp \
 		ui/kksfilterseditorform.cpp \
+                ui/kkssearchtemplateform.cpp \
 		ui/kksfilewidget.cpp \
 		kksincludeswidget.cpp \
 		KKSIncludesDialog.cpp \
@@ -194,6 +196,7 @@ FORMS   += \
                 ui/command_form.ui \
                 ui/msg_journal_settings_form.ui \
 		ui/filters_editor_form.ui \
+                ui/kkssearch_template_form.ui \
 		ui/kksfile_widget.ui \
                 ui/kksxml_form.ui \
                 ui/kksattr_editor.ui \
@@ -270,6 +273,7 @@ headers.files += \
                 ui/msgjournalform.h \
                 ui/msgjournalsettingsform.h \
 		ui/kksfilterseditorform.h \
+                ui/kkssearchtemplateform.h \
 		ui/kksfilewidget.h \
 		ui/kksstatisticview.h \
 		kksincludeswidget.h \

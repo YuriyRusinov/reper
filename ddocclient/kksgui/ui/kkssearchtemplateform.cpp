@@ -1,5 +1,5 @@
-#include "kksfilterseditorform.h"
-#include "ui_filters_editor_form.h"
+#include "kkssearchtemplateform.h"
+#include "ui_kkssearch_template_form.h"
 
 #include <KKSAttribute.h>
 #include <KKSCategory.h>
@@ -46,43 +46,7 @@
 #include <QAction>
 #include <QtDebug>
 
-KKSFiltersEditorForm :: KKSFiltersEditorForm(const KKSCategory * _c, 
-                                             const QString & tableName, //используется только при обработке атрибутов типа atCheckListEx
-                                             KKSMap<int, KKSAttribute *> attrsIO,
-                                             bool forIO, 
-                                             QWidget *parent,
-                                             Qt::WFlags f)
-    : QDialog (parent, f),
-    ui (new Ui::filters_editor_form),
-    sortRefModel (new QSortFilterProxyModel (this)),
-    c (_c),
-    m_attrsIO (attrsIO),
-    m_bForIO (forIO),
-    sTempl (0),
-    delSearchEntity (new QAction (this)),
-    isDbSaved (false),
-    m_parentTable(tableName)
-{
-    ui->setupUi(this);
-    if (c)
-        c->addRef();
-    QKeySequence dKey (Qt::Key_Delete);//QKeySequence::Delete);
-    delSearchEntity->setShortcut (dKey);
-    addAction (delSearchEntity);
-
-    init ();
-    connect (ui->pbOK, SIGNAL (clicked()), this, SLOT (accept()) );
-    connect (ui->pbCancel, SIGNAL (clicked()), this, SLOT (reject()) );
-    connect (ui->pbAddGroup, SIGNAL (clicked()), this, SLOT (addGroup()) );
-    connect (cbAttribute, SIGNAL (currentIndexChanged(int)), this, SLOT (attrChanged (int)) );
-    connect (cbOper, SIGNAL (currentIndexChanged(int)), this, SLOT (setValueWidget(int)) );
-    connect (pbAddFilter, SIGNAL (clicked()), this, SLOT (addFilter()) );
-    connect (ui->pbSaveToDb, SIGNAL (clicked()), this, SLOT (saveSQLQuery()) );
-    connect (ui->pbLoadFromDb, SIGNAL (clicked()), this, SLOT (loadSQLQuery()) );
-    connect (delSearchEntity, SIGNAL (triggered()), this, SLOT (delFilter()) );
-}
-
-KKSFiltersEditorForm :: KKSFiltersEditorForm (const KKSCategory * _c, 
+KKSSearchTemplateForm :: KKSSearchTemplateForm (const KKSCategory * _c, 
                                               const QString & tableName,
                                               KKSMap<int, KKSAttribute *> attrsIO,
                                               bool forIO,
@@ -91,7 +55,7 @@ KKSFiltersEditorForm :: KKSFiltersEditorForm (const KKSCategory * _c,
                                               QWidget *parent,
                                               Qt::WFlags f)
     : QDialog (parent, f),
-    ui (new Ui::filters_editor_form),
+    ui (new Ui::kkssearch_template_form),
     sortRefModel (new QSortFilterProxyModel (this)),
     c (_c),
     m_attrsIO (attrsIO),
@@ -126,6 +90,7 @@ KKSFiltersEditorForm :: KKSFiltersEditorForm (const KKSCategory * _c,
     connect (ui->pbOK, SIGNAL (clicked()), this, SLOT (saveSQLAccept()) );
     connect (ui->pbCancel, SIGNAL (clicked()), this, SLOT (reject()) );
     connect (ui->pbAddGroup, SIGNAL (clicked()), this, SLOT (addGroup()) );
+    connect (ui->pbShowSQL, SIGNAL (clicked()), this, SLOT (viewSQL()));
     connect (cbAttribute, SIGNAL (currentIndexChanged(int)), this, SLOT (attrChanged (int)) );
     connect (cbOper, SIGNAL (currentIndexChanged(int)), this, SLOT (setValueWidget(int)) );
     connect (pbAddFilter, SIGNAL (clicked()), this, SLOT (addFilter()) );
@@ -134,7 +99,7 @@ KKSFiltersEditorForm :: KKSFiltersEditorForm (const KKSCategory * _c,
     connect (delSearchEntity, SIGNAL (triggered()), this, SLOT (delFilter()) );
 }
 
-KKSFiltersEditorForm :: ~KKSFiltersEditorForm (void)
+KKSSearchTemplateForm :: ~KKSSearchTemplateForm (void)
 {
     if (c)
         c->release ();
@@ -142,7 +107,7 @@ KKSFiltersEditorForm :: ~KKSFiltersEditorForm (void)
         sTempl->release ();
 }
 
-void KKSFiltersEditorForm :: init()
+void KKSSearchTemplateForm :: init()
 {
 //    twFilters = new QTreeView (ui->frame);
     KKSEventFilter *ef = new KKSEventFilter (this);
@@ -205,7 +170,7 @@ void KKSFiltersEditorForm :: init()
 }
 
 
-void KKSFiltersEditorForm :: initFilterTypes (KKSAttrType::KKSAttrTypes type)
+void KKSSearchTemplateForm :: initFilterTypes (KKSAttrType::KKSAttrTypes type)
 {
     QString oper;
     QVariant data;
@@ -306,7 +271,7 @@ void KKSFiltersEditorForm :: initFilterTypes (KKSAttrType::KKSAttrTypes type)
     cbOper->setCurrentIndex (0);
 }
 
-void KKSFiltersEditorForm :: initAttrs()
+void KKSSearchTemplateForm :: initAttrs()
 {
     if (!c && m_attrsIO.isEmpty())
         return;
@@ -347,7 +312,7 @@ void KKSFiltersEditorForm :: initAttrs()
     cbAttribute->setCurrentIndex (0);
 }
 
-void KKSFiltersEditorForm :: initValuesWidgets (void)
+void KKSSearchTemplateForm :: initValuesWidgets (void)
 {
     QWidget * cWNum = new QWidget (wValue);
     //
@@ -492,7 +457,7 @@ void KKSFiltersEditorForm :: initValuesWidgets (void)
     stLayValue->addWidget (cWImage);//insertWidget (9, cWImage);
 }
 
-void KKSFiltersEditorForm :: on_pbShowSQL_clicked()
+void KKSSearchTemplateForm :: viewSQL()
 {
     if(ui->teSQLView->isVisible()){
         ui->teSQLView->setVisible(false);
@@ -504,7 +469,7 @@ void KKSFiltersEditorForm :: on_pbShowSQL_clicked()
     }
 }
 
-void KKSFiltersEditorForm :: addGroup (void)
+void KKSSearchTemplateForm :: addGroup (void)
 {
     if(ui->rbAND->isChecked())
         createGroup(true);
@@ -513,7 +478,7 @@ void KKSFiltersEditorForm :: addGroup (void)
     isDbSaved = false;
 }
 
-void KKSFiltersEditorForm :: addFilter ()
+void KKSSearchTemplateForm :: addFilter ()
 {
     QItemSelectionModel * sm = ui->twFilters->selectionModel();
     QModelIndex index;
@@ -750,7 +715,7 @@ void KKSFiltersEditorForm :: addFilter ()
     isDbSaved = false;
 }
 
-void KKSFiltersEditorForm :: setValueWidget (int index)
+void KKSSearchTemplateForm :: setValueWidget (int index)
 {
     qDebug () << __PRETTY_FUNCTION__ << index;
 
@@ -771,7 +736,7 @@ void KKSFiltersEditorForm :: setValueWidget (int index)
     }
 }
 
-void KKSFiltersEditorForm :: updateSQL()
+void KKSSearchTemplateForm :: updateSQL()
 {
     QString sql;
     QString tmp;
@@ -800,7 +765,7 @@ void KKSFiltersEditorForm :: updateSQL()
     ui->teSQLView->setText(sql);
 }
 
-QString KKSFiltersEditorForm :: parseGroup(const KKSFilterGroup * g, const QString & tableName)
+QString KKSSearchTemplateForm :: parseGroup(const KKSFilterGroup * g, const QString & tableName)
 {
     QString sql;
     QString tmp;
@@ -885,7 +850,7 @@ QString KKSFiltersEditorForm :: parseGroup(const KKSFilterGroup * g, const QStri
     return sql;
 }
 
-QString KKSFiltersEditorForm :: parseFilter(const KKSFilter * f, const QString & tableName)
+QString KKSSearchTemplateForm :: parseFilter(const KKSFilter * f, const QString & tableName)
 {
     QString sql;
     
@@ -986,12 +951,12 @@ QString KKSFiltersEditorForm :: parseFilter(const KKSFilter * f, const QString &
     return sql;
 }
 
-KKSList<const KKSFilterGroup*> & KKSFiltersEditorForm :: filters()
+KKSList<const KKSFilterGroup*> & KKSSearchTemplateForm :: filters()
 {
     return m_filters;
 }
 
-void KKSFiltersEditorForm :: setFilters (const KKSList<const KKSFilterGroup*> & filters)
+void KKSSearchTemplateForm :: setFilters (const KKSList<const KKSFilterGroup*> & filters)
 {
     m_filters = filters;
     if (m_filters.isEmpty())
@@ -1019,7 +984,7 @@ void KKSFiltersEditorForm :: setFilters (const KKSList<const KKSFilterGroup*> & 
     updateSQL ();
 }
 
-void KKSFiltersEditorForm :: createGroup (bool AND)
+void KKSSearchTemplateForm :: createGroup (bool AND)
 {
     QItemSelectionModel * sm = ui->twFilters->selectionModel();
     if (!sm)
@@ -1099,7 +1064,7 @@ void KKSFiltersEditorForm :: createGroup (bool AND)
     ui->twFilters->update(index);
 }
 
-KKSFilterGroup * KKSFiltersEditorForm :: getGroup(QModelIndex index)
+KKSFilterGroup * KKSSearchTemplateForm :: getGroup(QModelIndex index)
 {
     
     if(index.parent().isValid()){
@@ -1127,7 +1092,7 @@ KKSFilterGroup * KKSFiltersEditorForm :: getGroup(QModelIndex index)
     return const_cast<KKSFilterGroup*>(m_filters.at(index.row()));
 }
 
-KKSFilterGroup * KKSFiltersEditorForm :: currentGroup()
+KKSFilterGroup * KKSSearchTemplateForm :: currentGroup()
 {
 
     QItemSelectionModel * sm = ui->twFilters->selectionModel();
@@ -1139,7 +1104,7 @@ KKSFilterGroup * KKSFiltersEditorForm :: currentGroup()
     return getGroup(index);
 }
 
-void KKSFiltersEditorForm :: attrChanged (int index)
+void KKSSearchTemplateForm :: attrChanged (int index)
 {
     KKSMap<int, KKSAttribute *>::const_iterator pa = index>=1 ? m_attrsAll.constBegin()+index-1 : m_attrsAll.constEnd();
     int idAttrType;
@@ -1257,7 +1222,7 @@ void KKSFiltersEditorForm :: attrChanged (int index)
     }
 }
 
-void KKSFiltersEditorForm :: setBoolValChanged (int state)
+void KKSSearchTemplateForm :: setBoolValChanged (int state)
 {
     bool val (state==Qt::Checked);
 
@@ -1267,7 +1232,7 @@ void KKSFiltersEditorForm :: setBoolValChanged (int state)
         chValue->setText (tr("is not set"));
 }
 
-void KKSFiltersEditorForm :: loadImage (void)
+void KKSSearchTemplateForm :: loadImage (void)
 {
     QString fileName = QFileDialog::getOpenFileName(this,
                                                     tr("Open Image File"), 
@@ -1291,7 +1256,7 @@ void KKSFiltersEditorForm :: loadImage (void)
     }
 }
 
-void KKSFiltersEditorForm :: saveSQLQuery (void)
+void KKSSearchTemplateForm :: saveSQLQuery (void)
 {
     if (sTempl)
         emit saveSearchCriteria (sTempl, sTempl->getMainGroup(), c);
@@ -1300,12 +1265,12 @@ void KKSFiltersEditorForm :: saveSQLQuery (void)
     isDbSaved = true;
 }
 
-void KKSFiltersEditorForm :: loadSQLQuery (void)
+void KKSSearchTemplateForm :: loadSQLQuery (void)
 {
     emit loadSearchCriteria ();//ui->twFilters->model());
 }
 
-void KKSFiltersEditorForm :: setFiltersModel (QAbstractItemModel * mod, const QModelIndex& parent, const KKSFilterGroup * parentGroup)
+void KKSSearchTemplateForm :: setFiltersModel (QAbstractItemModel * mod, const QModelIndex& parent, const KKSFilterGroup * parentGroup)
 {
     if (!mod || !parent.isValid() || !parentGroup)
         return;
@@ -1378,19 +1343,19 @@ void KKSFiltersEditorForm :: setFiltersModel (QAbstractItemModel * mod, const QM
     }
 }
 
-void KKSFiltersEditorForm :: saveSQLAccept (void)
+void KKSSearchTemplateForm :: saveSQLAccept (void)
 {
     if (!isDbSaved)
         this->saveSQLQuery ();
     this->accept ();
 }
 
-KKSSearchTemplate * KKSFiltersEditorForm :: searchT (void) const
+KKSSearchTemplate * KKSSearchTemplateForm :: searchT (void) const
 {
     return sTempl;
 }
 
-void KKSFiltersEditorForm :: setSearchTemplate (KKSSearchTemplate * st)
+void KKSSearchTemplateForm :: setSearchTemplate (KKSSearchTemplate * st)
 {
     if (sTempl)
         sTempl->release ();
@@ -1401,7 +1366,7 @@ void KKSFiltersEditorForm :: setSearchTemplate (KKSSearchTemplate * st)
         sTempl->addRef ();
 }
 
-void KKSFiltersEditorForm :: delFilter (void)
+void KKSSearchTemplateForm :: delFilter (void)
 {
     qDebug () << __PRETTY_FUNCTION__;
     QItemSelectionModel *selModel = ui->twFilters->selectionModel ();
