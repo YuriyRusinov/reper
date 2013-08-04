@@ -180,7 +180,8 @@ void KKSMainWindow::updateMenus()
         aList[j]->setChecked(false);
     }
     
-    for (int i = 0; i < windows.size(); i++) {
+    for (int i = 0; i < windows.size(); i++)
+    {
         
         KKSDialog *child = qobject_cast<KKSDialog*>(windows.at(i)->widget());
 
