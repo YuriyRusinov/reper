@@ -6,14 +6,66 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>859</width>
-    <height>555</height>
+    <width>563</width>
+    <height>362</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Search template editor</string>
   </property>
   <layout class="QGridLayout" name="gridSearchTemplateLay">
+   <item row="1" column="0">
+    <layout class="QHBoxLayout" name="hButtonLayout">
+     <item>
+      <widget class="QPushButton" name="pbShowSQL">
+       <property name="text">
+        <string>S&amp;how SQL</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pbSaveToDb">
+       <property name="text">
+        <string>&amp;Save to DB</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pbLoadFromDb">
+       <property name="text">
+        <string>&amp;Load from DB</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>391</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pbOK">
+       <property name="text">
+        <string>&amp;OK</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pbCancel">
+       <property name="text">
+        <string>&amp;Cancel</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
    <item row="0" column="0">
     <widget class="QTabWidget" name="tabSearchWidget">
      <property name="currentIndex">
@@ -219,58 +271,6 @@
       </layout>
      </widget>
     </widget>
-   </item>
-   <item row="1" column="0">
-    <layout class="QHBoxLayout" name="hButtonLayout">
-     <item>
-      <widget class="QPushButton" name="pbShowSQL">
-       <property name="text">
-        <string>S&amp;how SQL</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pbSaveToDb">
-       <property name="text">
-        <string>&amp;Save to DB</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pbLoadFromDb">
-       <property name="text">
-        <string>&amp;Load from DB</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>391</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pbOK">
-       <property name="text">
-        <string>&amp;OK</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pbCancel">
-       <property name="text">
-        <string>&amp;Cancel</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
    </item>
   </layout>
  </widget>

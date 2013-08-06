@@ -96,6 +96,7 @@
 #include "messageform.h"
 #include "periodicreportform.h"
 #include "kksfilterseditorform.h"
+#include "kkssearchtemplateform.h"
 #include "kksfilewidget.h"
 #include "kksincludeswidget.h"
 #include "kksxmlform.h"
@@ -6825,12 +6826,15 @@ void KKSObjEditorFactory :: addNewSearchTempl (const QModelIndex& parent,
     if(!c || (c && c->id() == IO_TABLE_CATEGORY_ID))
         attrsIO = loader->loadIOUsedAttrs ();//атрибуты информационных объектов грузим только если обрабатываем справоник ИО
     
-    KKSFiltersEditorForm *filterForm = new KKSFiltersEditorForm (c, tableName, attrsIO, false, st, pWidget);
+    //KKSFiltersEditorForm *filterForm = new KKSFiltersEditorForm (c, tableName, attrsIO, false, st, pWidget);
+    KKSSearchTemplateForm * filterForm = new KKSSearchTemplateForm (c, tableName, attrsIO, false, st, pWidget);
     
     connect (filterForm, SIGNAL (saveSearchCriteria (KKSSearchTemplate *, KKSFilterGroup *, const KKSCategory *)), this, SLOT (saveSearchCriteria (KKSSearchTemplate *, KKSFilterGroup *, const KKSCategory *)) );
     //connect (filterForm, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QComboBox *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QComboBox *)) );
     connect (filterForm, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QAbstractItemModel *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QAbstractItemModel *)) );
     
+    emit editorSearchTemplate (filterForm);
+/*
     if (filterForm->exec () == QDialog::Accepted)
     {
         int res = filterForm->searchT()->id ();
@@ -6866,6 +6870,7 @@ void KKSObjEditorFactory :: addNewSearchTempl (const QModelIndex& parent,
     delete filterForm;
 
     st->release ();
+ */
 }
 
 /* Метод копирует существующий шаблон поиска с идентификатором в wIndex и добавляет соответствующую запись в модель searchMod.

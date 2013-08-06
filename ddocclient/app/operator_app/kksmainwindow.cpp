@@ -40,6 +40,7 @@
 #include <kksstuffform.h>
 #include <IndicatorForm.h>
 #include <kkslifecycleform.h>
+#include <kkssearchtemplateform.h>
 
 #include "cmdjournalsettingsform.h"
 #include "msgjournalsettingsform.h"
@@ -93,6 +94,11 @@ KKSMainWindow::KKSMainWindow(QWidget *parent)
              SIGNAL(editorCreated(KKSObjEditor *)), 
              this, 
              SLOT(slotCreateNewObjEditor(KKSObjEditor*)));
+    
+    connect (oef,
+             SIGNAL (editorSearchTemplate (KKSSearchTemplateForm *)),
+             this,
+             SLOT (slotSearchTemplateEdit(KKSSearchTemplateForm *)));
 
     connect (catf, 
              SIGNAL(categoryEditorCreated (KKSCatEditor *)), 
@@ -921,6 +927,14 @@ void KKSMainWindow::slotCreateNewObjEditor(KKSObjEditor * objEditor)
 
 }
 
+void KKSMainWindow::slotSearchTemplateEdit (KKSSearchTemplateForm * stForm)
+{
+    if (!stForm)
+        return;
+    QMdiSubWindow * m_StFormW = m_mdiArea->addSubWindow (stForm);
+    m_StFormW->setAttribute (Qt::WA_DeleteOnClose);
+    stForm->show();
+}
 
 void KKSMainWindow::slotCreateNewObjEditor(int attrId, 
                                            const QString & value, 

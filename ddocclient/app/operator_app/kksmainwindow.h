@@ -26,6 +26,7 @@ class KKSTemplateEditor;
 class KKSIncludesWidget;
 class IndicatorForm;
 class kkslifecycleform;
+class KKSSearchTemplateForm;
 
 class MassWidget;
 //class FBFavourites;
@@ -64,6 +65,7 @@ Q_OBJECT
         void slotCreateNewRubricEditor (KKSIncludesWidget *rEditor);
         void slotIndicatorEdit (IndicatorForm * iForm);
 
+        void slotSearchTemplateEdit (KKSSearchTemplateForm * stForm);
 
         void updateMenus();
         void updateWindowMenu(bool bFirstTime = false);

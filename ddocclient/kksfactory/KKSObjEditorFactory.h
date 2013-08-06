@@ -55,6 +55,7 @@ class SaveSearchTemplateForm;
 class KKSLifeCycleEx;
 class kkslifecycleform;
 class kksstateform;
+class KKSSearchTemplateForm;
 
 class QScrollArea;
 class QGridLayout;
@@ -242,6 +243,8 @@ signals:
     void templateAdded (KKSTemplate *templ);
     void cioSaved (KKSObjectExemplar * cio);
     void setuuid (QString uuid);
+    
+    void editorSearchTemplate (KKSSearchTemplateForm * stForm);
 
 private slots:
     void saveObject (KKSObjEditor * editor, KKSObject * wObj, KKSObjectExemplar * wObjEx, int num=1, QAbstractItemModel * recModel=0);
