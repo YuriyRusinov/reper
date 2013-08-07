@@ -96,9 +96,9 @@ KKSMainWindow::KKSMainWindow(QWidget *parent)
              SLOT(slotCreateNewObjEditor(KKSObjEditor*)));
     
     connect (oef,
-             SIGNAL (editorSearchTemplate (KKSSearchTemplateForm *)),
+             SIGNAL (editorSearchTemplate (QWidget *)),
              this,
-             SLOT (slotSearchTemplateEdit(KKSSearchTemplateForm *)));
+             SLOT (slotSearchTemplateEdit(QWidget *)));
 
     connect (catf, 
              SIGNAL(categoryEditorCreated (KKSCatEditor *)), 
@@ -927,7 +927,7 @@ void KKSMainWindow::slotCreateNewObjEditor(KKSObjEditor * objEditor)
 
 }
 
-void KKSMainWindow::slotSearchTemplateEdit (KKSSearchTemplateForm * stForm)
+void KKSMainWindow::slotSearchTemplateEdit (QWidget * stForm)
 {
     if (!stForm)
         return;

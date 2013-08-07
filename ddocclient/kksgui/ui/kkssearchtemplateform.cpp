@@ -166,9 +166,27 @@ void KKSSearchTemplateForm :: init()
 
     initAttrs ();
     this->attrChanged (0);
+    if (sTempl)
+        ui->lESearchTemplateName->setText (sTempl->name());
 //    initFilterTypes();
 }
 
+void KKSSearchTemplateForm :: setSearchTemplateModel (QAbstractItemModel * sTypeMod)
+{
+    if (!sTypeMod)
+        return;
+    QAbstractItemModel * oldModel = ui->tvSearchTemplateTypes->model();
+    ui->tvSearchTemplateTypes->setModel (sTypeMod);
+    if (oldModel && oldModel != sTypeMod)
+        delete oldModel;
+}
+
+void KKSSearchTemplateForm :: selectTypeInd (const QModelIndex& wIndex)
+{
+    QItemSelectionModel * selMod = ui->tvSearchTemplateTypes->selectionModel();
+    selMod->select(wIndex, QItemSelectionModel::ClearAndSelect);
+    selMod->setCurrentIndex(wIndex, QItemSelectionModel::ClearAndSelect);
+}
 
 void KKSSearchTemplateForm :: initFilterTypes (KKSAttrType::KKSAttrTypes type)
 {
@@ -357,13 +375,14 @@ void KKSSearchTemplateForm :: initValuesWidgets (void)
     // Text attributes
     //
     QWidget * cWText = new QWidget (wValue);
-    QSizePolicy stp (QSizePolicy::Minimum, QSizePolicy::Minimum);
+    QSizePolicy stp (QSizePolicy::Minimum, QSizePolicy::Preferred);
     cWText->setSizePolicy (stp);
     QVBoxLayout * vLay4 = new QVBoxLayout (cWText);
     vLay4->setContentsMargins (0, 0, 0, 0);
     //vLay4->setSizeConstraint (QLayout::SetMinimumSize);
     teValue = new QTextEdit (cWText);
-    teValue->setSizePolicy (stp);
+    QSizePolicy sTextP (QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
+    teValue->setSizePolicy (sTextP);
     cWText->setSizePolicy (stp);
     teValue->setVerticalScrollBarPolicy (Qt::ScrollBarAsNeeded);
     chTextCaseSensitive = new QCheckBox (tr ("Case sensitive"), cWText);
@@ -372,8 +391,8 @@ void KKSSearchTemplateForm :: initValuesWidgets (void)
     chTextCaseSensitive->setEnabled (true);
     vLay4->addWidget (teValue);
     vLay4->addWidget (chTextCaseSensitive);//, 0, Qt::AlignTop);
-    vLay4->addStretch ();
-    stLayValue->insertWidget (3, cWText);
+    //vLay4->addStretch ();
+    stLayValue->addWidget (cWText);
 //    qDebug () << __PRETTY_FUNCTION__ << teValue->sizeHint () << teValue->minimumSizeHint ();
 
     //
@@ -436,15 +455,17 @@ void KKSSearchTemplateForm :: initValuesWidgets (void)
     // Reference set
     //
     lvCheckRef = new QListView (wValue);
+    lvCheckRef->viewport()->setSizePolicy(stp);
     checkRefModel = 0;//new KKSCheckableModel (0, 1, this);
     lvCheckRef->setModel (sortRefModel);//checkRefModel);
     sortRefModel->setSortCaseSensitivity(Qt::CaseInsensitive);
-    stLayValue->insertWidget (8, lvCheckRef);
+    stLayValue->addWidget (lvCheckRef);
 
     //
     // Image attribute
     //
     QWidget * cWImage = new QWidget (wValue);
+    cWImage->setSizePolicy(stp);
     QGridLayout * gLay1 = new QGridLayout (cWImage);
     gLay1->setContentsMargins (0, 0, 0, 0);
     wImage = new KKSImage (cWImage);

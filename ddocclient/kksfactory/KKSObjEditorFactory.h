@@ -129,7 +129,6 @@ public:
                       KKSObjEditor *oEditor // родительский редактор ИО и ЭИО
                       );
     
-    KKSSearchTemplate * loadSearchTemplate (void) const;
     KKSObjEditor* createObjEditorParam (int idObject,// идентификатор ИО, который будет содержать создаваемый (редактируемый) ЭИО (для ЭИО, которые являются ИО этот идентификатор должен быть равен IO_IO_ID)
                                         qint64 idObjE, // идентификатор создаваемого (редактируемого) ЭИО. Если ЭИО создается, должно быть равно -1
                                         const KKSList<const KKSFilterGroup *> & filters,// Применяется для ЭИО, которые являются контейнерными ИО. Содержит набор фильтров их таблицы
@@ -244,7 +243,7 @@ signals:
     void cioSaved (KKSObjectExemplar * cio);
     void setuuid (QString uuid);
     
-    void editorSearchTemplate (KKSSearchTemplateForm * stForm);
+    void editorSearchTemplate (QWidget * stForm);
 
 private slots:
     void saveObject (KKSObjEditor * editor, KKSObject * wObj, KKSObjectExemplar * wObjEx, int num=1, QAbstractItemModel * recModel=0);
@@ -254,6 +253,7 @@ private slots:
     void loadObject (KKSObjEditor * editor, int idObjectEx, int idObject);
 
 public slots:
+    KKSSearchTemplate * loadSearchTemplate (void);
     void filterEIO (KKSObjEditor * editor, int idObject, const KKSCategory * cat=0, QString tableName=QString());
     void refreshEIO (KKSObjEditor * editor, int idObject, const KKSCategory * cat, QString tableName, QAbstractItemModel * sourceMod);
     void filterTemplateEIO (KKSObjEditor * editor, int idObject, const KKSCategory * cat=0, QString tableName=QString());

@@ -6677,7 +6677,7 @@ void KKSObjEditorFactory :: loadSearchCriteria ()//QAbstractItemModel * mod)
 
 /* Метод загружает шаблоны поиска из БД.
  */
-KKSSearchTemplate * KKSObjEditorFactory :: loadSearchTemplate (void) const
+KKSSearchTemplate * KKSObjEditorFactory :: loadSearchTemplate (void)
 {
     KKSSearchTemplate * searchT = 0;
     QWidget * parent = qobject_cast<QWidget *>(this->sender());
@@ -6713,7 +6713,7 @@ KKSSearchTemplate * KKSObjEditorFactory :: loadSearchTemplate (void) const
     QItemSelectionModel * selTModel = stForm->selectionModel ();
     QAbstractProxyModel * sortTModel = qobject_cast<QAbstractProxyModel *>(stForm->dataModel());
 
-    if (selTModel && stForm->exec () == QDialog::Accepted)
+/*    if (selTModel && stForm->exec () == QDialog::Accepted)
     {
         if (selTModel->selection().indexes ().isEmpty())
             return 0;
@@ -6729,6 +6729,8 @@ KKSSearchTemplate * KKSObjEditorFactory :: loadSearchTemplate (void) const
 
     stForm->setParent (0);
     delete stForm;
+ */
+    emit editorSearchTemplate (stForm);
     return searchT;
 }
 
@@ -6828,6 +6830,12 @@ void KKSObjEditorFactory :: addNewSearchTempl (const QModelIndex& parent,
     
     //KKSFiltersEditorForm *filterForm = new KKSFiltersEditorForm (c, tableName, attrsIO, false, st, pWidget);
     KKSSearchTemplateForm * filterForm = new KKSSearchTemplateForm (c, tableName, attrsIO, false, st, pWidget);
+    QAbstractItemModel * searchTypesMod = new QStandardItemModel (0, 1);
+    searchTypesMod->setHeaderData(0, Qt::Horizontal, tr("Search template type name"), Qt::DisplayRole);
+    KKSViewFactory::getSearchTemplates(loader, searchTypesMod, QModelIndex(), false);
+    filterForm->setSearchTemplateModel (searchTypesMod);
+    QModelIndex tIndex = KKSViewFactory::searchModelIndex(searchTypesMod, 1, QModelIndex(), Qt::UserRole);
+    filterForm->selectTypeInd (tIndex);
     
     connect (filterForm, SIGNAL (saveSearchCriteria (KKSSearchTemplate *, KKSFilterGroup *, const KKSCategory *)), this, SLOT (saveSearchCriteria (KKSSearchTemplate *, KKSFilterGroup *, const KKSCategory *)) );
     //connect (filterForm, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QComboBox *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QComboBox *)) );

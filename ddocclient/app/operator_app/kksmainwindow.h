@@ -65,7 +65,7 @@ Q_OBJECT
         void slotCreateNewRubricEditor (KKSIncludesWidget *rEditor);
         void slotIndicatorEdit (IndicatorForm * iForm);
 
-        void slotSearchTemplateEdit (KKSSearchTemplateForm * stForm);
+        void slotSearchTemplateEdit (QWidget * stForm);
 
         void updateMenus();
         void updateWindowMenu(bool bFirstTime = false);

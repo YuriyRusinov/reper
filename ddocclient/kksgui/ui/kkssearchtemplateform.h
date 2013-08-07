@@ -64,6 +64,10 @@ public:
 
     KKSSearchTemplate * searchT (void) const;
     void setSearchTemplate (KKSSearchTemplate * st);
+    
+    void setSearchTemplateModel (QAbstractItemModel * sTypeMod);
+    
+    void selectTypeInd (const QModelIndex& wIndex);
 
 private slots:
     void viewSQL();
