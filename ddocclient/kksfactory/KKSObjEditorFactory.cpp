@@ -2366,7 +2366,7 @@ void KKSObjEditorFactory :: filterTemplateEIO (KKSObjEditor * editor,
     KKSSearchTemplate * searchT = 0;
     KKSList<KKSSearchTemplate *> stList = loader->loadSearchTemplates ();
 
-    KKSSearchTemplatesForm *stForm = new KKSSearchTemplatesForm (c, tableName, editor);
+    KKSSearchTemplatesForm *stForm = new KKSSearchTemplatesForm (c, tableName, true, editor);
     initSearchTemplateModel (stForm);
     QItemSelectionModel * selTModel = stForm->selectionModel ();
     QAbstractProxyModel * sortTModel = qobject_cast<QAbstractProxyModel *>(stForm->dataModel());
@@ -6605,17 +6605,30 @@ SaveSearchTemplateForm * KKSObjEditorFactory :: GUISearchTemplate (KKSSearchTemp
     QModelIndex stCInd = KKSViewFactory::searchModelRowsIndex(searchTModel, st->type()->id(), QModelIndex(), Qt::UserRole);
     stForm->setTypesModel (searchTModel);
     stForm->selectType (stCInd);
-    KKSList<const KKSFilterGroup *> filters;
+/*    KKSList<const KKSFilterGroup *> filters;
     KKSObject * refCatObj = loader->loadIO (IO_CAT_ID, true);
     if (!refCatObj)
         return 0;
-    KKSFilter * cMainFilter = refCatObj->category()->tableCategory()->createFilter (ATTR_IS_MAIN, QString("false"), KKSFilter::foEq);
+    KKSCategory * cat = refCatObj->category();
+    if (!cat || !cat->tableCategory())
+    {
+        refCatObj->release();
+        return 0;
+    }
+    cat = cat->tableCategory();
+    KKSFilter * cMainFilter = cat->createFilter (ATTR_IS_MAIN, QString("false"), KKSFilter::foEq);
     if (!cMainFilter)
+    {
+        refCatObj->release();
         return 0;
+    }
 
-    KKSFilter * cArchFilter = refCatObj->category()->tableCategory()->createFilter (ATTR_IS_ARCHIVED, QString("FALSE"), KKSFilter::foEq);
+    KKSFilter * cArchFilter = cat->createFilter (ATTR_IS_ARCHIVED, QString("FALSE"), KKSFilter::foEq);
     if (!cArchFilter)
+    {
+        refCatObj->release();
         return 0;
+    }
     KKSList<const KKSFilterGroup *> cFilterGroups;
     KKSList<const KKSFilter*> catFilters;
     
@@ -6627,14 +6640,63 @@ SaveSearchTemplateForm * KKSObjEditorFactory :: GUISearchTemplate (KKSSearchTemp
     cGroup->setFilters (catFilters);
     cFilterGroups.append (cGroup);
     cGroup->release ();
-
-    QAbstractItemModel * catModel = KKSViewFactory::initCategoriesModel (loader, filters, cFilterGroups);
-    QModelIndex catInd = KKSViewFactory::searchModelRowsIndexMultiType(catModel, st->idCategory(), 1);
+*/
+    QModelIndex catInd;
+    QAbstractItemModel * catModel = initSearchCatsModel (st, catInd);
+ //KKSViewFactory::initCategoriesModel (loader, filters, cFilterGroups);
+//    QModelIndex catInd = KKSViewFactory::searchModelRowsIndexMultiType(catModel, st->idCategory(), 1);
     qDebug () << __PRETTY_FUNCTION__ << catInd;
     stForm->setCategoryModel (catModel);
     stForm->selectCategory (catInd);
     connect (stForm, SIGNAL (categoryChanged(KKSSearchTemplate *, int)), this, SLOT (searchTemplateCategoryChanged(KKSSearchTemplate *, int)));
     return stForm;
+}
+
+QAbstractItemModel * KKSObjEditorFactory :: initSearchCatsModel (KKSSearchTemplate * st, QModelIndex & catInd) const
+{
+    if (!st)
+        return 0;
+    KKSList<const KKSFilterGroup *> filters;
+    KKSObject * refCatObj = loader->loadIO (IO_CAT_ID, true);
+    if (!refCatObj)
+        return 0;
+    KKSCategory * cat = refCatObj->category();
+    if (!cat || !cat->tableCategory())
+    {
+        refCatObj->release();
+        return 0;
+    }
+    cat = cat->tableCategory();
+    KKSFilter * cMainFilter = cat->createFilter (ATTR_IS_MAIN, QString("false"), KKSFilter::foEq);
+    if (!cMainFilter)
+    {
+        refCatObj->release();
+        return 0;
+    }
+
+    KKSFilter * cArchFilter = cat->createFilter (ATTR_IS_ARCHIVED, QString("FALSE"), KKSFilter::foEq);
+    if (!cArchFilter)
+    {
+        refCatObj->release();
+        return 0;
+    }
+    KKSList<const KKSFilterGroup *> cFilterGroups;
+    KKSList<const KKSFilter*> catFilters;
+    
+    catFilters.append (cMainFilter);
+    cMainFilter->release();
+    catFilters.append (cArchFilter);
+    cArchFilter->release();
+    
+    KKSFilterGroup * cGroup = new KKSFilterGroup (true);
+    
+    cGroup->setFilters (catFilters);
+    cFilterGroups.append (cGroup);
+    cGroup->release ();
+
+    QAbstractItemModel * catModel = KKSViewFactory::initCategoriesModel (loader, filters, cFilterGroups);
+    catInd = KKSViewFactory::searchModelRowsIndexMultiType(catModel, st->idCategory(), 1);
+    return catModel;
 }
 
 void KKSObjEditorFactory :: searchTemplateCategoryChanged (KKSSearchTemplate * st, int idCategory)
@@ -6703,7 +6765,7 @@ KKSSearchTemplate * KKSObjEditorFactory :: loadSearchTemplate (void)
     }
     io->release();
 
-    KKSSearchTemplatesForm *stForm = new KKSSearchTemplatesForm (c, "io_objects", parent);
+    KKSSearchTemplatesForm *stForm = new KKSSearchTemplatesForm (c, "io_objects", false, parent);
     this->initSearchTemplateModel (stForm);
     
     QAbstractItemModel * searchTModel = stForm->dataModel();
@@ -6792,8 +6854,9 @@ void KKSObjEditorFactory :: addNewSearchTempl (const QModelIndex& parent,
     else if (parent.isValid() && parent.data (Qt::UserRole+USER_ENTITY).toInt() == 0)
         pIndex = parent;
 
-    qDebug () << __PRETTY_FUNCTION__ << pIndex;
-    int idSearchType = pIndex.data (Qt::UserRole).toInt ();
+    bool isMod = pWidget ? pWidget->isModal() : false;
+    qDebug () << __PRETTY_FUNCTION__ << pIndex << isMod;
+    int idSearchType = pIndex.isValid() ? pIndex.data (Qt::UserRole).toInt () : 1;
     QString stName;
     KKSSearchTemplate * st = new KKSSearchTemplate (-1, 0, stName, loader->getUserId());
     if (!st)
@@ -6829,20 +6892,28 @@ void KKSObjEditorFactory :: addNewSearchTempl (const QModelIndex& parent,
         attrsIO = loader->loadIOUsedAttrs ();//атрибуты информационных объектов грузим только если обрабатываем справоник ИО
     
     //KKSFiltersEditorForm *filterForm = new KKSFiltersEditorForm (c, tableName, attrsIO, false, st, pWidget);
-    KKSSearchTemplateForm * filterForm = new KKSSearchTemplateForm (c, tableName, attrsIO, false, st, pWidget);
+    KKSSearchTemplateForm * filterForm = new KKSSearchTemplateForm (c, tableName, attrsIO, false, st, isMod, pWidget);
     QAbstractItemModel * searchTypesMod = new QStandardItemModel (0, 1);
     searchTypesMod->setHeaderData(0, Qt::Horizontal, tr("Search template type name"), Qt::DisplayRole);
     KKSViewFactory::getSearchTemplates(loader, searchTypesMod, QModelIndex(), false);
     filterForm->setSearchTemplateModel (searchTypesMod);
-    QModelIndex tIndex = KKSViewFactory::searchModelIndex(searchTypesMod, 1, QModelIndex(), Qt::UserRole);
+    QModelIndex tIndex = KKSViewFactory::searchModelIndex(searchTypesMod, idSearchType, QModelIndex(), Qt::UserRole);
     filterForm->selectTypeInd (tIndex);
+    QModelIndex catInd;
+    QAbstractItemModel * catModel = initSearchCatsModel (st, catInd);
+    filterForm->setCatModel (catModel);
+    filterForm->setCatInd (catInd);
     
     connect (filterForm, SIGNAL (saveSearchCriteria (KKSSearchTemplate *, KKSFilterGroup *, const KKSCategory *)), this, SLOT (saveSearchCriteria (KKSSearchTemplate *, KKSFilterGroup *, const KKSCategory *)) );
     //connect (filterForm, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QComboBox *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QComboBox *)) );
     connect (filterForm, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QAbstractItemModel *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QAbstractItemModel *)) );
-    
-    emit editorSearchTemplate (filterForm);
-/*
+
+    if (!isMod)
+    {
+        emit editorSearchTemplate (filterForm);
+        return;
+    }
+
     if (filterForm->exec () == QDialog::Accepted)
     {
         int res = filterForm->searchT()->id ();
@@ -6878,7 +6949,6 @@ void KKSObjEditorFactory :: addNewSearchTempl (const QModelIndex& parent,
     delete filterForm;
 
     st->release ();
- */
 }
 
 /* Метод копирует существующий шаблон поиска с идентификатором в wIndex и добавляет соответствующую запись в модель searchMod.

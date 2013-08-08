@@ -1152,6 +1152,7 @@ comment on column criteria.is_not is
 'Данный флаг задает, применяется ли унарная операция отрицания к данному критерию';
 
 select setMacToNULL('criteria');
+select createTriggerUID ('criteria');
 
 /*==============================================================*/
 /* Table: criteria_types                                        */

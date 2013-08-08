@@ -505,6 +505,7 @@ private:
     
     SaveSearchTemplateForm * GUISearchTemplate (KKSSearchTemplate * st, bool mode=true, QWidget *parent = 0, Qt::WindowFlags f=0) const;
 
+    QAbstractItemModel * initSearchCatsModel (KKSSearchTemplate * st, QModelIndex & catInd) const;
 private:
     //
     // Variables

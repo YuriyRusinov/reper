@@ -68,6 +68,10 @@ public:
     void setSearchTemplateModel (QAbstractItemModel * sTypeMod);
     
     void selectTypeInd (const QModelIndex& wIndex);
+    
+    void setCatModel (QAbstractItemModel * sCatMod);
+    
+    void setCatInd (const QModelIndex& catInd);
 
 private slots:
     void viewSQL();

@@ -27,7 +27,7 @@
 #include <KKSEventFilter.h>
 #include <KKSItemDelegate.h>
 
-KKSSearchTemplatesForm :: KKSSearchTemplatesForm (const KKSCategory * c1, const QString & tableName, QWidget * parent, Qt::WFlags f)
+KKSSearchTemplatesForm :: KKSSearchTemplatesForm (const KKSCategory * c1, const QString & tableName, bool mode, QWidget * parent, Qt::WFlags f)
     : QDialog (parent, f),
     idUser (-1),
     c(c1),
@@ -78,6 +78,8 @@ KKSSearchTemplatesForm :: KKSSearchTemplatesForm (const KKSCategory * c1, const 
 
     connect (lEFilter, SIGNAL (textEdited(const QString&)), this, SLOT (setFilterSt (const QString&)) );
 
+    pbOk->setVisible (mode);
+    pbCancel->setVisible (mode);
     connect (pbOk, SIGNAL (clicked()), this, SLOT (accept()) );
     connect (pbCancel, SIGNAL (clicked()), this, SLOT (reject()) );
 }

@@ -188,6 +188,23 @@ void KKSSearchTemplateForm :: selectTypeInd (const QModelIndex& wIndex)
     selMod->setCurrentIndex(wIndex, QItemSelectionModel::ClearAndSelect);
 }
 
+void KKSSearchTemplateForm :: setCatModel (QAbstractItemModel * sCatMod)
+{
+    if (!sCatMod)
+        return;
+    QAbstractItemModel * oldModel = ui->tvSearchTemplateCategory->model();
+    ui->tvSearchTemplateCategory->setModel (sCatMod);
+    if (oldModel && oldModel != sCatMod)
+        delete oldModel;
+}
+
+void KKSSearchTemplateForm :: setCatInd (const QModelIndex& catInd)
+{
+    QItemSelectionModel * selMod = ui->tvSearchTemplateCategory->selectionModel();
+    selMod->select(catInd, QItemSelectionModel::ClearAndSelect);
+    selMod->setCurrentIndex(catInd, QItemSelectionModel::ClearAndSelect);
+}
+
 void KKSSearchTemplateForm :: initFilterTypes (KKSAttrType::KKSAttrTypes type)
 {
     QString oper;

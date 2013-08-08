@@ -19,7 +19,7 @@ class KKSCategory;
 class _GUI_EXPORT KKSSearchTemplatesForm : public QDialog
 {
 public:
-    KKSSearchTemplatesForm (const KKSCategory * c, const QString & tableName, QWidget * parent=0, Qt::WFlags f=0);
+    KKSSearchTemplatesForm (const KKSCategory * c, const QString & tableName, bool mode=true, QWidget * parent=0, Qt::WFlags f=0);
     ~KKSSearchTemplatesForm (void);
 
     int getIdSearchTemplate (void) const;
