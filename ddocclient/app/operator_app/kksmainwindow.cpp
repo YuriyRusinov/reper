@@ -781,6 +781,15 @@ kkslifecycleform * KKSMainWindow::activeLCEditor ()
     return 0;
 }
 
+KKSSearchTemplateForm * KKSMainWindow::activeSTEditor ()
+{
+    if (activeObjEditor() || activeCatEditor() || activeTemplateEditor () || activeRubricEditor () || activeLCEditor ())
+        return 0;
+    
+    if (QMdiSubWindow *activeSubWindow = m_mdiArea->activeSubWindow())
+        return qobject_cast<KKSSearchTemplateForm *>(activeSubWindow->widget());
+    return 0;
+}
 void KKSMainWindow::printActiveSubWindow()
 {
     KKSObjEditor * editor = activeObjEditor();
@@ -832,6 +841,13 @@ void KKSMainWindow::saveActiveSubWindow()
     if (lcEditor)
     {
         lcEditor->save ();
+        return;
+    }
+    
+    KKSSearchTemplateForm * stForm = activeSTEditor ();
+    if (stForm)
+    {
+        stForm->saveSQLQuery();
         return;
     }
 }

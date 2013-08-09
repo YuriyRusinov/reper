@@ -72,6 +72,9 @@ public:
     void setCatModel (QAbstractItemModel * sCatMod);
     
     void setCatInd (const QModelIndex& catInd);
+    
+    int getIdCat (void) const;
+    int getIdType (void) const;
 
 private slots:
     void viewSQL();
@@ -84,9 +87,11 @@ private slots:
     void setBoolValChanged (int state);
     void loadImage (void);
 
+public slots: 
     void saveSQLQuery (void);
     void loadSQLQuery (void);
 
+private slots:
     void saveSQLAccept (void);
     void delFilter (void);
 

@@ -139,6 +139,7 @@ Q_OBJECT
         KKSTemplateEditor *activeTemplateEditor ();
         KKSIncludesWidget *activeRubricEditor ();
         kkslifecycleform * activeLCEditor ();
+        KKSSearchTemplateForm * activeSTEditor ();
 
         KKSJMonitor * m_jmonitor;
         //KKSMsgJournal * m_msgJ;

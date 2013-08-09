@@ -80,6 +80,8 @@ KKSSearchTemplateForm :: KKSSearchTemplateForm (const KKSCategory * _c,
         KKSList<const KKSFilterGroup*> groups;
         groups.append (sTempl->getMainGroup());
         setFilters (groups);
+        ui->lESearchTemplateName->setText(st->name());
+        ui->tEDesc->setPlainText(st->desc());
     }
 
     ui->pbSaveToDb->setVisible (m_bForIO);
@@ -1297,10 +1299,41 @@ void KKSSearchTemplateForm :: loadImage (void)
 void KKSSearchTemplateForm :: saveSQLQuery (void)
 {
     if (sTempl)
+    {
+        sTempl->setName(ui->lESearchTemplateName->text());
+        if (sTempl->name().isEmpty())
+        {
+            ui->tabSearchWidget->setCurrentIndex(1);
+            QMessageBox::warning(this, tr("Save search template"), tr("Set name of search template"), QMessageBox::Ok);
+            return;
+        }
+        sTempl->setDesc(ui->tEDesc->toPlainText());
         emit saveSearchCriteria (sTempl, sTempl->getMainGroup(), c);
+    }
     else if (!m_filters.isEmpty ())
         emit saveSearchCriteria (sTempl, const_cast<KKSFilterGroup *>(m_filters[0]), c);
     isDbSaved = true;
+}
+
+int KKSSearchTemplateForm :: getIdCat (void) const
+{
+    QItemSelectionModel * selMod = ui->tvSearchTemplateCategory->selectionModel();
+    if (!selMod)
+        return -1;
+    QModelIndex catInd = selMod->currentIndex();
+    if (!catInd.isValid() || !catInd.parent().isValid())
+        return -1;
+    return catInd.data(Qt::UserRole).toInt();
+}
+
+int KKSSearchTemplateForm :: getIdType (void) const
+{
+    QItemSelectionModel * selMod = ui->tvSearchTemplateTypes->selectionModel();
+    if (!selMod)
+        return -1;
+
+    QModelIndex sTypeInd = selMod->currentIndex();
+    return sTypeInd.data (Qt::UserRole).toInt();
 }
 
 void KKSSearchTemplateForm :: loadSQLQuery (void)

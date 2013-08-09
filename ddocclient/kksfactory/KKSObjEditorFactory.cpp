@@ -6524,43 +6524,38 @@ void KKSObjEditorFactory :: saveSearchCriteria (KKSSearchTemplate * st, KKSFilte
     Q_UNUSED (isContains);
     Q_UNUSED (c);
     QString stName;
-/*    do
-    {
-        bool ok;
-        stName = QInputDialog::getText (qobject_cast<QWidget *>(this->sender()), tr ("Save search template"), tr ("Name :"), QLineEdit::Normal, QString(), &ok);
-        qDebug () << __PRETTY_FUNCTION__ << stName << ok;
-        if (!ok || stName.isEmpty())
-            return;
-
-        isContains = false;
-        
-
-        
-        for (int i=0; i<stList.size() && !isContains; i++)
-        {
-            if (stList[i]->name() == stName)
-            {
-                isContains = true;
-                numc = i;
-                int button = QMessageBox::warning(qobject_cast<QWidget *>(this->sender()), 
-                                                  tr("Warning"), 
-                                                  tr("Search template with equal name is already exist in database.\n"
-                                                     "Input another name to save your search template.\n"
-                                                     "Press OK to continue or Cancel to cancel the operation"), 
-                                                  QMessageBox::Ok, 
-                                                  QMessageBox::Cancel);
-                if(button == QMessageBox::Cancel)
-                    return;
-            }
-        }
-
-    } while (isContains);
-
-    qDebug () << __PRETTY_FUNCTION__ << isContains;
- */
     if (!st)
         st = new KKSSearchTemplate (-1, group, stName, loader->getUserId());
-    SaveSearchTemplateForm * stForm = GUISearchTemplate (st);
+    KKSSearchTemplateForm * stForm = qobject_cast<KKSSearchTemplateForm *>(this->sender());
+    if (stForm)
+    {
+        int idCat = stForm->getIdCat();
+        KKSCategory * cat = loader->loadCategory (idCat);
+        if (cat)
+        {
+            st->setCategory (cat->id(), cat->name());
+            cat->release ();
+        }
+
+        int idSearchTemplateType = stForm->getIdType ();
+        KKSMap<int, KKSSearchTemplateType *> sTypes = loader->loadSearchTemplateTypes ();
+        KKSSearchTemplateType * sType = sTypes.value (idSearchTemplateType);
+        st->setType (sType);
+        int idSearchTemplate (-1);
+        if (st->id() < 0)
+        {
+            idSearchTemplate = ppf->insertSearchTemplate(st);
+            st->setId (idSearchTemplate);
+        }
+        else
+            idSearchTemplate = ppf->updateSearchTemplate(st);
+        if (idSearchTemplate < 0)
+        {
+            QMessageBox::warning(stForm,tr("Save search template"), tr("Cannot save search template, Error!"), QMessageBox::Ok);
+            return;
+        }
+    }
+/*    SaveSearchTemplateForm * stForm = GUISearchTemplate (st);
     if (st && stForm->exec () == QDialog::Accepted)
     {
         KKSSearchTemplate * stt = stForm->getSearchTemplate ();
@@ -6590,6 +6585,7 @@ void KKSObjEditorFactory :: saveSearchCriteria (KKSSearchTemplate * st, KKSFilte
         st->release ();
     }
     delete stForm;
+ */
 }
 
 SaveSearchTemplateForm * KKSObjEditorFactory :: GUISearchTemplate (KKSSearchTemplate * st, bool mode, QWidget *parent, Qt::WindowFlags f) const
@@ -6994,6 +6990,7 @@ void KKSObjEditorFactory :: updateSearchTempl (const QModelIndex& wIndex, QAbstr
     qDebug () << __PRETTY_FUNCTION__ << wIndex << searchMod;
     if (!wIndex.isValid () || !searchMod)
         return;
+    QModelIndex pIndex = wIndex.sibling(wIndex.row(), 0).parent();
     int idSearchTemplate = wIndex.data (Qt::UserRole).toInt ();
     QWidget * pWidget = qobject_cast<QWidget *>(this->sender());
     KKSSearchTemplate * st = loader->loadSearchTemplate (idSearchTemplate);
@@ -7003,7 +7000,72 @@ void KKSObjEditorFactory :: updateSearchTempl (const QModelIndex& wIndex, QAbstr
         QMessageBox::critical(pWidget, tr ("Search templates"), tr ("Cannot load original search template."), QMessageBox::Ok, QMessageBox::NoButton);
         return;
     }
+    bool isMod = pWidget ? pWidget->isModal() : false;
+    int idCat = st->idCategory();
+    KKSCategory * c = loader->loadCategory(idCat, true);
+    QString tableName;
+    KKSMap<int, KKSAttribute *> attrsIO;
+    if(!c || (c && c->id() == IO_TABLE_CATEGORY_ID))
+        attrsIO = loader->loadIOUsedAttrs ();//атрибуты информационных объектов грузим только если обрабатываем справоник ИО
+    KKSSearchTemplateForm * filterForm = new KKSSearchTemplateForm (c, tableName, attrsIO, false, st, isMod, pWidget);
+    QAbstractItemModel * searchTypesMod = new QStandardItemModel (0, 1);
+    searchTypesMod->setHeaderData(0, Qt::Horizontal, tr("Search template type name"), Qt::DisplayRole);
+    KKSViewFactory::getSearchTemplates(loader, searchTypesMod, QModelIndex(), false);
+    filterForm->setSearchTemplateModel (searchTypesMod);
+    int idSearchType = st->type()->id();
+    QModelIndex tIndex = KKSViewFactory::searchModelIndex(searchTypesMod, idSearchType, QModelIndex(), Qt::UserRole);
+    filterForm->selectTypeInd (tIndex);
+    QModelIndex catInd;
+    QAbstractItemModel * catModel = initSearchCatsModel (st, catInd);
+    filterForm->setCatModel (catModel);
+    filterForm->setCatInd (catInd);
+    
+    connect (filterForm, SIGNAL (saveSearchCriteria (KKSSearchTemplate *, KKSFilterGroup *, const KKSCategory *)), this, SLOT (saveSearchCriteria (KKSSearchTemplate *, KKSFilterGroup *, const KKSCategory *)) );
+    //connect (filterForm, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QComboBox *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QComboBox *)) );
+    connect (filterForm, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QAbstractItemModel *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QAbstractItemModel *)) );
 
+    if (!isMod)
+    {
+        emit editorSearchTemplate (filterForm);
+        return;
+    }
+
+    if (filterForm->exec () == QDialog::Accepted)
+    {
+        int res = filterForm->searchT()->id ();
+        if (res > 0)
+        {
+            KKSSearchTemplate * stdb = loader->loadSearchTemplate (res);
+            QString stName = stdb->name ();
+            stdb->release ();
+            if(searchMod){
+                int nr = searchMod->rowCount(pIndex);
+                searchMod->insertRows (nr, 1, pIndex);
+                if (searchMod->columnCount(pIndex) >= 1)
+                {
+                    QModelIndex wIndex = searchMod->index (nr, 0, pIndex);
+                    searchMod->setData (wIndex, stName, Qt::DisplayRole);
+                    searchMod->setData (wIndex, res, Qt::UserRole);
+                }
+                else
+                {
+                    QModelIndex wIndex = searchMod->index (nr, 0, pIndex);
+                    searchMod->setData (wIndex, res, Qt::DisplayRole);
+                    searchMod->setData (wIndex, res, Qt::UserRole);
+                    
+                    wIndex = searchMod->index (nr, 1, pIndex);
+                    searchMod->setData (wIndex, stName, Qt::DisplayRole);
+                    searchMod->setData (wIndex, res, Qt::UserRole);
+                }
+            }
+        }
+    }
+
+    filterForm->setParent (0);
+    delete filterForm;
+
+    st->release ();
+/*
     KKSFilterGroup * m_group = st->getMainGroup();
     if (!m_group)
         return;
@@ -7020,21 +7082,6 @@ void KKSObjEditorFactory :: updateSearchTempl (const QModelIndex& wIndex, QAbstr
 
     QString oldName = st->name();
     SaveSearchTemplateForm * stForm = GUISearchTemplate (st);
-/*    QAbstractItemModel * searchTModel = new QStandardItemModel (0, 5);
-    searchTModel->setHeaderData (0, Qt::Horizontal, tr ("Search criteria"), Qt::DisplayRole);
-    searchTModel->setHeaderData (1, Qt::Horizontal, tr ("Author"), Qt::DisplayRole);
-    searchTModel->setHeaderData (2, Qt::Horizontal, tr ("Creation date/time"), Qt::DisplayRole);
-    searchTModel->setHeaderData (3, Qt::Horizontal, tr ("Category"), Qt::DisplayRole);
-    searchTModel->setHeaderData (4, Qt::Horizontal, tr ("Type"), Qt::DisplayRole);
-    KKSViewFactory::getSearchTemplates (loader, searchTModel, QModelIndex(), false);
-    stForm->setTypesModel (searchTModel);
-    KKSList<const KKSFilterGroup *> filters;
-    QAbstractItemModel * catModel = KKSViewFactory::initCategoriesModel (loader, filters);
-    int idCat = st->idCategory();
-    QModelIndex catIndex = KKSViewFactory::searchModelRowsIndexMultiType(catModel,idCat,1);
-    qDebug () << __PRETTY_FUNCTION__ << catIndex;
-    stForm->setCategoryModel (catModel);
- */
     if (!stForm || stForm->exec() != QDialog::Accepted)
         return;
     QString stName = stForm->getName();//QInputDialog::getText (pWidget, tr ("Search template"), tr ("Search template name :"), QLineEdit::Normal, oldName, &ok);
@@ -7123,7 +7170,7 @@ void KKSObjEditorFactory :: updateSearchTempl (const QModelIndex& wIndex, QAbstr
         o->release ();
 
     }
-
+*/
 //    st->release ();
 }
 
