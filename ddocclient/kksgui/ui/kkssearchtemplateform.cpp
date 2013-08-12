@@ -198,6 +198,13 @@ void KKSSearchTemplateForm :: setCatModel (QAbstractItemModel * sCatMod)
     ui->tvSearchTemplateCategory->setModel (sCatMod);
     if (oldModel && oldModel != sCatMod)
         delete oldModel;
+    QItemSelectionModel * selCatMod = ui->tvSearchTemplateCategory->selectionModel();
+    disconnect (selCatMod);
+    connect (selCatMod,
+             SIGNAL (currentChanged(const QModelIndex&, const QModelIndex&)),
+             this,
+             SLOT (catChanged(const QModelIndex&, const QModelIndex&))
+            );
 }
 
 void KKSSearchTemplateForm :: setCatInd (const QModelIndex& catInd)
@@ -1495,4 +1502,20 @@ void KKSSearchTemplateForm :: delFilter (void)
     QAbstractItemModel * fModel = ui->twFilters->model ();
     fModel->removeRows (ind.row(), 1, ind.parent());
     updateSQL();
+}
+
+void KKSSearchTemplateForm :: catChanged (const QModelIndex& currCat, const QModelIndex& prevCat)
+{
+    qDebug () << __PRETTY_FUNCTION__ << currCat << prevCat;
+    if (currCat.data(Qt::UserRole+USER_ENTITY).toInt() != 1 && prevCat.data(Qt::UserRole+USER_ENTITY).toInt() == 1)
+    {
+        QMessageBox::warning(this,tr("Set category"), tr("Category does not set"), QMessageBox::Ok);
+        return;
+    }
+    else if ((currCat.data(Qt::UserRole+USER_ENTITY).toInt() != 1 && prevCat.data(Qt::UserRole+USER_ENTITY).toInt() != 1) || 
+            !prevCat.isValid())
+        return;
+
+    int idCat = currCat.data(Qt::UserRole).toInt();
+    emit catSearchTemplateChanged (sTempl, idCat);
 }

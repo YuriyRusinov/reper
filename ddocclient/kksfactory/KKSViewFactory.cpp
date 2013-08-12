@@ -1076,6 +1076,7 @@ QAbstractItemModel* KKSViewFactory :: initCategoriesModel (KKSLoader* l, const K
         catTypeTemplModel->setData (ctIndex, pCatTypes.value()->fields().value("name"), Qt::DisplayRole);
         catTypeTemplModel->setData (ctIndex, pCatTypes.key(), Qt::UserRole);
         catTypeTemplModel->setData (ctIndex, 2, Qt::UserRole+USER_ENTITY);
+        catTypeTemplModel->setData (ctIndex, QIcon(":/ddoc/category_folder.png"), Qt::DecorationRole);
         QSize catRow = catTypeTemplModel->data (ctIndex, Qt::SizeHintRole).toSize();
         catRow.rheight() = 24;
         catTypeTemplModel->setData (ctIndex, catRow, Qt::SizeHintRole);
@@ -1109,6 +1110,7 @@ QAbstractItemModel* KKSViewFactory :: initCategoriesModel (KKSLoader* l, const K
             catTypeTemplModel->setData (cIndex, cat->fieldValue("name"), Qt::DisplayRole);
             catTypeTemplModel->setData (cIndex, cat->fieldValue("id"), Qt::UserRole);
             catTypeTemplModel->setData (cIndex, 1, Qt::UserRole+USER_ENTITY);
+            catTypeTemplModel->setData (cIndex, QIcon(":/ddoc/category.png"), Qt::DecorationRole);
             QSize catRow = catTypeTemplModel->data (cIndex, Qt::SizeHintRole).toSize();
             catRow.rheight() = 24;
             catTypeTemplModel->setData (cIndex, catRow, Qt::SizeHintRole);

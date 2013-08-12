@@ -504,6 +504,7 @@ private:
     void initSearchTemplateModel (KKSSearchTemplatesForm *stForm) const;
     
     SaveSearchTemplateForm * GUISearchTemplate (KKSSearchTemplate * st, bool mode=true, QWidget *parent = 0, Qt::WindowFlags f=0) const;
+    KKSSearchTemplateForm * GUISearchTemplateInit (KKSSearchTemplate * st, const KKSCategory * cat=0, bool forIO=false, const QString& tableName=QString(), bool mode=true, QWidget *parent = 0, Qt::WindowFlags flags=0) const;
 
     QAbstractItemModel * initSearchCatsModel (KKSSearchTemplate * st, QModelIndex & catInd) const;
 private:

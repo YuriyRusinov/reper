@@ -94,12 +94,14 @@ public slots:
 private slots:
     void saveSQLAccept (void);
     void delFilter (void);
+    void catChanged (const QModelIndex& currCat, const QModelIndex& prevCat);
 
 signals:
     //void loadAttributeRefValues (const QString & tableName, const KKSAttribute * attr, QComboBox * cbList);
     void loadAttributeRefValues (const QString & tableName, const KKSAttribute * attr, QAbstractItemModel * mod);
     void saveSearchCriteria (KKSSearchTemplate *, KKSFilterGroup *, const KKSCategory * c); //c - категория для которой можно применить поисковы запрос
     void loadSearchCriteria (void);//QAbstractItemModel *);
+    void catSearchTemplateChanged (KKSSearchTemplate *, int);
 
 private:
     //
