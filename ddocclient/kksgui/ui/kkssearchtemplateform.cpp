@@ -1423,7 +1423,7 @@ void KKSSearchTemplateForm :: setFiltersModel (QAbstractItemModel * mod, const Q
 
 void KKSSearchTemplateForm :: saveSQLAccept (void)
 {
-    if (!isDbSaved)
+    if (!isDbSaved && !m_bForIO)
         this->saveSQLQuery ();
     this->accept ();
 }

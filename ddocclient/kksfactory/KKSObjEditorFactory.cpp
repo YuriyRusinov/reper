@@ -2184,7 +2184,7 @@ void KKSObjEditorFactory::filterEIO(KKSObjEditor * editor, int idObject, const K
 //    connect (f, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QComboBox *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QComboBox *)) );
 //    connect (f, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QAbstractItemModel *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QAbstractItemModel *)) );
 //    connect (f, SIGNAL (saveSearchCriteria (KKSSearchTemplate *, KKSFilterGroup *, const KKSCategory *)), this, SLOT (saveSearchCriteria (KKSSearchTemplate *, KKSFilterGroup *, const KKSCategory *)) );
-//    connect (f, SIGNAL (loadSearchCriteria (void)), this, SLOT (loadSearchCriteria (void)) );
+    connect (filterForm, SIGNAL (loadSearchCriteria (void)), this, SLOT (loadSearchCriteria (void)) );
     if(filterForm->exec() == QDialog::Accepted){
         const KKSTemplate * t = new KKSTemplate (c->defTemplate());
         KKSList<const KKSFilterGroup *> filters;
