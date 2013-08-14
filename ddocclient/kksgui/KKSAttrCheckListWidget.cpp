@@ -10,6 +10,7 @@
 #include <QSpacerItem>
 #include <QToolBar>
 #include <QSize>
+#include <QLabel>
 #include <QtDebug>
 
 #include "KKSItemDelegate.h"
@@ -73,6 +74,10 @@ void KKSAttrCheckWidget :: setupWidget (void)
     tbActions->addAction (actRefRec);
     tbActions->addSeparator ();
     tbActions->addAction (actRefIO);
+    tbActions->addSeparator ();
+    QLabel * lHist = new QLabel (tr("View history"));
+    lHist->setTextInteractionFlags (Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard);
+    tbActions->addWidget (lHist);
  
     gLay->addWidget (tv, 1, 0, 1, 1);
     tv->header()->setClickable (true);
