@@ -386,6 +386,8 @@ private slots:
     
     void addNewState (QWidget* editor, int idObject, const KKSCategory * c, QString tableName, int nTab, bool isModal, QAbstractItemModel * stateModel);
     void editState (QWidget * editor, int idObject, qint64 idObjEx, const KKSCategory * c, QString tableName, int nTab, bool isModal, QAbstractItemModel * recModel=0, const QModelIndex& recIndex=QModelIndex());
+    
+    void GUIloadDBSearchTemplate (KKSSearchTemplate *st, const KKSCategory* c, QString tableName);
 
 private:
     //

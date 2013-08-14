@@ -1345,7 +1345,7 @@ int KKSSearchTemplateForm :: getIdType (void) const
 
 void KKSSearchTemplateForm :: loadSQLQuery (void)
 {
-    emit loadSearchCriteria ();//ui->twFilters->model());
+    emit loadSearchCriteria (sTempl, c, m_parentTable);//ui->twFilters->model());
 }
 
 void KKSSearchTemplateForm :: setFiltersModel (QAbstractItemModel * mod, const QModelIndex& parent, const KKSFilterGroup * parentGroup)

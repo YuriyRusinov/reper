@@ -2184,7 +2184,7 @@ void KKSObjEditorFactory::filterEIO(KKSObjEditor * editor, int idObject, const K
 //    connect (f, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QComboBox *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QComboBox *)) );
 //    connect (f, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QAbstractItemModel *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QAbstractItemModel *)) );
 //    connect (f, SIGNAL (saveSearchCriteria (KKSSearchTemplate *, KKSFilterGroup *, const KKSCategory *)), this, SLOT (saveSearchCriteria (KKSSearchTemplate *, KKSFilterGroup *, const KKSCategory *)) );
-    connect (filterForm, SIGNAL (loadSearchCriteria (void)), this, SLOT (loadSearchCriteria (void)) );
+    connect (filterForm, SIGNAL (loadSearchCriteria (KKSSearchTemplate *, const KKSCategory*, QString)), this, SLOT ( GUIloadDBSearchTemplate(KKSSearchTemplate *, const KKSCategory*, QString)) );
     if(filterForm->exec() == QDialog::Accepted){
         const KKSTemplate * t = new KKSTemplate (c->defTemplate());
         KKSList<const KKSFilterGroup *> filters;
@@ -6740,6 +6740,26 @@ void KKSObjEditorFactory :: loadSearchCriteria ()//QAbstractItemModel * mod)
         feForm->setFilters (fGroups);
 }
 
+void KKSObjEditorFactory :: GUIloadDBSearchTemplate (KKSSearchTemplate *st, const KKSCategory* c, QString tableName)
+{
+    KKSSearchTemplatesForm * stForm = new KKSSearchTemplatesForm (c, tableName, true);
+    this->initSearchTemplateModel(stForm);
+    stForm->hideActions(0, 9);
+    if (stForm && stForm->exec() == QDialog::Accepted)
+    {
+        int idSearchTemplate = stForm->getIdSearchTemplate();
+        if (idSearchTemplate < 0)
+            return;
+        KKSSearchTemplate * searchT = loader->loadSearchTemplate(idSearchTemplate);
+        KKSFilterGroup * mainGroup = searchT->getMainGroup ();
+        st->setMainGroup(mainGroup);
+        KKSList<const KKSFilterGroup *> fGroups;
+        fGroups.append (mainGroup);
+        KKSSearchTemplateForm * feForm = (qobject_cast<KKSSearchTemplateForm *>(this->sender()));
+        if (feForm)
+            feForm->setFilters (fGroups);
+    }
+}
 /* Метод загружает шаблоны поиска из БД.
  */
 KKSSearchTemplate * KKSObjEditorFactory :: loadSearchTemplate (void)

@@ -100,7 +100,7 @@ signals:
     //void loadAttributeRefValues (const QString & tableName, const KKSAttribute * attr, QComboBox * cbList);
     void loadAttributeRefValues (const QString & tableName, const KKSAttribute * attr, QAbstractItemModel * mod);
     void saveSearchCriteria (KKSSearchTemplate *, KKSFilterGroup *, const KKSCategory * c); //c - категория для которой можно применить поисковы запрос
-    void loadSearchCriteria (void);//QAbstractItemModel *);
+    void loadSearchCriteria (KKSSearchTemplate *, const KKSCategory*, QString);//QAbstractItemModel *);
     void catSearchTemplateChanged (KKSSearchTemplate *, int);
 
 private:

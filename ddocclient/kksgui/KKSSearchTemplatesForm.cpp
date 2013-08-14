@@ -18,6 +18,7 @@
 #include <QLineEdit>
 #include <QAbstractItemDelegate>
 #include <QMessageBox>
+#include <QLabel>
 #include <QtDebug>
 
 #include "KKSSearchTemplatesForm.h"
@@ -94,10 +95,23 @@ int KKSSearchTemplatesForm :: getIdSearchTemplate (void) const
 {
     QItemSelectionModel * selModel = searchView->selectionModel ();
     QModelIndex wIndex = selModel->currentIndex ();
-    if (!wIndex.isValid ())
+    if (!wIndex.isValid () || wIndex.data(Qt::UserRole+USER_ENTITY).toInt() != 1)
         return -1;
     else
         return wIndex.data (Qt::UserRole).toInt ();
+}
+
+int KKSSearchTemplatesForm :: getIdSearchTemplateType (void) const
+{
+    QItemSelectionModel * selModel = searchView->selectionModel ();
+    QModelIndex wIndex = selModel->currentIndex ();
+    if (!wIndex.isValid ())
+        return -1;
+    else if  (wIndex.data(Qt::UserRole+USER_ENTITY).toInt() == 1)
+        return wIndex.parent().data (Qt::UserRole).toInt ();
+    else
+        return wIndex.data (Qt::UserRole).toInt ();
+    
 }
 
 QAbstractItemModel * KKSSearchTemplatesForm :: dataModel (void)
@@ -211,6 +225,8 @@ void KKSSearchTemplatesForm :: init (void)
     tbActions->addAction (actEdit);
     tbActions->addAction (actDel);
     tbActions->addSeparator ();
+    QLabel * lFilter = new QLabel (tr("Filter :"));
+    tbActions->addWidget (lFilter);
     tbActions->addWidget (lEFilter);
     gLayout->addWidget (searchView, 1, 0, 1, 1);
     QSizePolicy twSizePol (QSizePolicy::Expanding, QSizePolicy::MinimumExpanding);
@@ -237,6 +253,30 @@ void KKSSearchTemplatesForm :: init (void)
     searchView->setModel (searchModel);
     QSize rs = this->sizeHint();
     this->resize (rs.width()*2, rs.height()*2);
+}
+
+void KKSSearchTemplatesForm :: hideActions (int aBegin, int aEnd)
+{
+    int ia0 = qMax (aBegin, 0);
+    int ia1 = qMin (aEnd, tbActions->actions().size());
+    for (int i=ia0; i<ia1; i++)
+    {
+        QAction * a = tbActions->actions().at(i);
+        if (a)
+            a->setVisible (false);
+    }
+}
+
+void KKSSearchTemplatesForm :: showActions (int aBegin, int aEnd)
+{
+    int ia0 = qMax (aBegin, 0);
+    int ia1 = qMin (aEnd, tbActions->actions().size());
+    for (int i=ia0; i<ia1; i++)
+    {
+        QAction * a = tbActions->actions().at(i);
+        if (a)
+            a->setVisible (true);
+    }
 }
 
 QModelIndex KKSSearchTemplatesForm :: getCurrentIndex (void) const

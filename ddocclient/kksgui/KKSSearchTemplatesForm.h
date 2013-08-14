@@ -23,6 +23,9 @@ public:
     ~KKSSearchTemplatesForm (void);
 
     int getIdSearchTemplate (void) const;
+    int getIdSearchTemplateType (void) const;
+    void hideActions (int aBegin, int aEnd);
+    void showActions (int aBegin, int aEnd);
     QAbstractItemModel *dataModel (void);
     void setDataModel (QAbstractItemModel * mod);
     void setUserId (int iduser);
