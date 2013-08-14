@@ -75,8 +75,10 @@ void KKSAttrCheckWidget :: setupWidget (void)
     tbActions->addSeparator ();
     tbActions->addAction (actRefIO);
     tbActions->addSeparator ();
-    QLabel * lHist = new QLabel (tr("View history"));
+    QLabel * lHist = new QLabel ("<a href=\"View history\">View history</a>");// tr("View history")
+    lHist->setOpenExternalLinks(false);
     lHist->setTextInteractionFlags (Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard);
+    connect (lHist, SIGNAL (linkActivated (const QString &)), this, SLOT (viewHist (const QString&)) );
     tbActions->addWidget (lHist);
  
     gLay->addWidget (tv, 1, 0, 1, 1);
@@ -179,4 +181,9 @@ void KKSAttrCheckWidget :: removeRows (const QModelIndex& parent, int start, int
     }
     QVariant val (sl);
     emit valueChanged (m_av->id(), m_isSystem, val);
+}
+
+void KKSAttrCheckWidget :: viewHist (const QString& link)
+{
+    qDebug () << __PRETTY_FUNCTION__ << link;
 }
