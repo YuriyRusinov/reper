@@ -21,6 +21,7 @@ class QAbstractItemModel;
 class QModelIndex;
 class QToolBar;
 class QAction;
+class QLabel;
 
 class KKSAttrValue;
 
@@ -31,6 +32,8 @@ public:
     ~KKSAttrCheckWidget (void);
 
     void setModel (QAbstractItemModel * sourceModel);
+    
+    QLabel * getHistLabel (void) const;
 
 signals:
     void addAttrRef (const KKSAttrValue * attribute, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel);
@@ -74,6 +77,7 @@ private:
     QPushButton *pbRef;
 */
     QSortFilterProxyModel *viewModel;
+    QLabel * lHist;
 
 private:
     Q_OBJECT

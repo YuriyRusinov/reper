@@ -17,6 +17,7 @@
 #include "ui_attr_history.h"
 #include "defines.h"
 #include "KKSAttrHistoryProxyModel.h"
+#include "KKSItemDelegate.h"
 
 const int c_id = 0;
 const int c_start = 1;
@@ -38,6 +39,8 @@ AttrHistory::AttrHistory (const KKSList<KKSAttrValue*> & histlist, QWidget *pare
         view (histlist);
     }
 
+    QAbstractItemDelegate * iDeleg = new KKSItemDelegate();
+    UI->tvHistory->setItemDelegate(iDeleg);
     connect (UI->pbClose, SIGNAL(clicked()), this, SLOT (reject()) );
 }
 
@@ -75,7 +78,7 @@ void AttrHistory::view(const KKSList<KKSAttrValue*> & histlist)
     listHeader <<tr("Id")<<tr("Start")<<tr("Stop")<<tr("Value")<<tr("Source")<<tr("Transfer")<<tr("Description");
     model->setHorizontalHeaderLabels(listHeader);
 
-    QHeaderView *headerView = UI->tabHistory->header();
+    QHeaderView *headerView = UI->tvHistory->header();
     headerView->setDefaultAlignment(Qt::AlignCenter);
 
     //
@@ -179,15 +182,15 @@ void AttrHistory::view(const KKSList<KKSAttrValue*> & histlist)
     }
     QSortFilterProxyModel * attrHistModel = new KKSAttrHistoryProxyModel(this);
     attrHistModel->setSourceModel (model);
-    QHeaderView * hv = UI->tabHistory->header();
+    QHeaderView * hv = UI->tvHistory->header();
     hv->setClickable(true);
     attrHistModel->setDynamicSortFilter(true);
     hv->setSortIndicator(0,Qt::AscendingOrder);
     hv->setSortIndicatorShown(true);
     attrHistModel->sort(0,Qt::AscendingOrder);
 
-    UI->tabHistory->setModel(attrHistModel);
-    UI->tabHistory->setSortingEnabled(true);
+    UI->tvHistory->setModel(attrHistModel);
+    UI->tvHistory->setSortingEnabled(true);
 
 
 }

@@ -43,9 +43,18 @@ public:
     void clearChildren (void);
     QIcon getIcon (void) const;
     void setIcon (const QIcon& icon);
-    
+
 private:
+    //
+    // Functions
+    //
+    void initData (KKSEIOData * d, const KKSTemplate * t);
+private:
+    //
+    // Variables
+    //
     qint64 idItem;
+    const KKSTemplate * templ;
     KKSEIOData * data;
     QIcon itemIcon;
     QVector<QVariant> itemData;

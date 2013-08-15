@@ -18,6 +18,7 @@
 #include "KKSAttrValue.h"
 #include "KKSAttribute.h"
 #include "KKSSortFilterProxyModel.h"
+#include "KKSAttrValueLabel.h"
 
 KKSAttrCheckWidget :: KKSAttrCheckWidget (const KKSAttrValue * attr, KKSIndAttr::KKSIndAttrClass isSys, QWidget * parent, Qt::WFlags f)
     : QWidget (parent, f), KKSAttrWidget(attr, isSys),
@@ -75,7 +76,7 @@ void KKSAttrCheckWidget :: setupWidget (void)
     tbActions->addSeparator ();
     tbActions->addAction (actRefIO);
     tbActions->addSeparator ();
-    QLabel * lHist = new QLabel ("<a href=\"View history\">View history</a>");// tr("View history")
+    lHist = new KKSAttrValueLabel(const_cast<KKSAttrValue *>(m_av), m_isSystem, this);//QLabel ("<a href=\"View history\">View history</a>");// tr("View history")
     lHist->setOpenExternalLinks(false);
     lHist->setTextInteractionFlags (Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard);
     connect (lHist, SIGNAL (linkActivated (const QString &)), this, SLOT (viewHist (const QString&)) );
@@ -93,6 +94,11 @@ void KKSAttrCheckWidget :: setupWidget (void)
 void KKSAttrCheckWidget :: addAttrRef (void)
 {
     emit addAttrRef (m_av, m_isSystem, viewModel->sourceModel ());
+}
+
+QLabel * KKSAttrCheckWidget :: getHistLabel (void) const
+{
+    return lHist;
 }
 
 void KKSAttrCheckWidget :: delAttrRef (void)

@@ -1695,6 +1695,14 @@ QWidget * KKSAttributesFactory :: createAttrCheckWidget (const KKSAttrValue * av
     QSizePolicy hPw (QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
     attrWidget->setSizePolicy(hPw);
     tabW->addTab (attrWidget, av->attribute()->title());
+    QLabel * lHist = qobject_cast<KKSAttrCheckWidget *>(attrWidget)->getHistLabel();
+    if (lHist)
+    {
+        connect (lHist, SIGNAL(loadIOSrc(KKSObject **, QWidget * )), this, SLOT(slotLoadIOSrc(KKSObject **, QWidget * )));
+        connect (lHist, SIGNAL(viewIOSrc(KKSObject *, QWidget *)), this, SLOT(viewIOSrc(KKSObject *, QWidget *)));
+        connect (lHist, SIGNAL(loadHistory(const KKSAttrValue *, bool)), this, SLOT(loadIOAttrValueHistory(const KKSAttrValue *, bool)));
+        connect (this, SIGNAL(viewHistory(const KKSList<KKSAttrValue *> &)), lHist, SIGNAL(viewHistory(const KKSList<KKSAttrValue *> &)));
+    }
     return attrWidget;
 }
 

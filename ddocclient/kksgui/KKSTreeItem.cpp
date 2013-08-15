@@ -9,6 +9,7 @@
 
 KKSTreeItem :: KKSTreeItem (qint64 id, KKSEIOData * d, const KKSTemplate * t, const QIcon& itIcon, KKSTreeItem * parent)
     : idItem (id),
+      templ (t),
       data (NULL),
       itemIcon (itIcon),
       parentItem (parent),
@@ -125,7 +126,9 @@ void KKSTreeItem :: appendChild (KKSTreeItem * ch)
     if (!ch)
         return;
     ch->setParent (this);
+    KKSEIOData * d = ch->data;
     childItems.append(ch);
+    ch->initData (d, templ);
 }
 
 void KKSTreeItem :: setParent (KKSTreeItem * p)
@@ -158,11 +161,19 @@ void KKSTreeItem :: setData (KKSEIOData * d, const KKSTemplate * t)
 
     if (data)
         data->addRef ();
-    itemData.clear ();
     
     if (!data)
         return;
 
+    initData (d, t);
+}
+
+void KKSTreeItem :: initData (KKSEIOData * d, const KKSTemplate * t)
+{
+    if (!d || !t)
+        return;
+    itemData.clear ();
+    int iNum = this->childNumber()+1;
     KKSList<KKSAttrView *> sAttrs = t->sortedAttrs();
     for (int i=0; i<sAttrs.size(); i++)
     {
@@ -172,31 +183,31 @@ void KKSTreeItem :: setData (KKSEIOData * d, const KKSTemplate * t)
             (v->refType() && v->refType()->attrType() == KKSAttrType::atJPG)
             )
         {
-            attrValue = QObject::tr("<Image data %1>").arg (i);
+            attrValue = QObject::tr("<Image data %1>").arg (iNum);
         }
         else if( v->type()->attrType() == KKSAttrType::atSVG || 
                 (v->refType() && v->refType()->attrType() == KKSAttrType::atSVG)
                 )
         {
-            attrValue = QObject::tr("<SVG data %1>").arg (i);
+            attrValue = QObject::tr("<SVG data %1>").arg (iNum);
         }
         else if( v->type()->attrType() == KKSAttrType::atXMLDoc || 
                 (v->refType() && v->refType()->attrType() == KKSAttrType::atXMLDoc)
                 )
         {
-            attrValue = QObject::tr("<XML document %1>").arg (i);
+            attrValue = QObject::tr("<XML document %1>").arg (iNum);
         }
         else if( v->type()->attrType() == KKSAttrType::atVideo || 
                 (v->refType() && v->refType()->attrType() == KKSAttrType::atVideo)
                 )
         {
-            attrValue = QObject::tr("<Video data %1>").arg (i);
+            attrValue = QObject::tr("<Video data %1>").arg (iNum);
         }
         else if (v->type()->attrType() == KKSAttrType::atComplex ||
                  (v->refType() && v->refType()->attrType() == KKSAttrType::atComplex)
                 )
         {
-            attrValue = QObject::tr("<Complex value %1>").arg (i);
+            attrValue = QObject::tr("<Complex value %1>").arg (iNum);
         }
         else
         {
