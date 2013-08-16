@@ -14,6 +14,9 @@
 #include "KKSAttrValuePropsForm.h"
 
 class QLineEdit;
+class QContextMenuEvent;
+class QMenu;
+class QAction;
 
 namespace Ui
 {
@@ -26,12 +29,31 @@ public:
     AttrHistory (const KKSList<KKSAttrValue*> & histlist, QWidget *parent=0, Qt::WFlags f=0);
     virtual ~AttrHistory();
 
+private slots:
+    void viewVal (void);
+
+protected:
+    //
+    // Overrides functions
+    //
+    void contextMenuEvent (QContextMenuEvent * event);
+    
 private:
+    //
+    // Functions
+    //
     void view(const KKSList<KKSAttrValue*> &);
 
-    //
+signals:
+    void viewAttrValue (int);
+
 private:
+    //
+    // Variables
+    //
     Ui::attr_history *UI;
+    QMenu * pHistMenu;
+    QAction * aViewVals;
     Q_OBJECT
 };
 

@@ -6,8 +6,13 @@
 #include <QSortFilterProxyModel>
 #include <QHeaderView>
 #include <QItemSelectionModel>
-#include <QtDebug>
+#include <QModelIndex>
+#include <QMenu>
 #include <QHeaderView>
+#include <QContextMenuEvent>
+#include <QPoint>
+#include <QAction>
+#include <QtDebug>
 
 #include <KKSAttrValue.h>
 #include <KKSObject.h>
@@ -30,7 +35,9 @@ const int c_description = 6;
 
 AttrHistory::AttrHistory (const KKSList<KKSAttrValue*> & histlist, QWidget *parent, Qt::WFlags f)
     : QDialog (parent, f),
-    UI (new Ui::attr_history)
+    UI (new Ui::attr_history),
+    pHistMenu (new QMenu),
+    aViewVals (new QAction(tr("View values"), this))
 {
 
     UI->setupUi (this);
@@ -39,13 +46,18 @@ AttrHistory::AttrHistory (const KKSList<KKSAttrValue*> & histlist, QWidget *pare
         view (histlist);
     }
 
+    pHistMenu->addAction(aViewVals);
     QAbstractItemDelegate * iDeleg = new KKSItemDelegate();
     UI->tvHistory->setItemDelegate(iDeleg);
+    connect (aViewVals, SIGNAL(triggered()), this, SLOT (viewVal()) );
     connect (UI->pbClose, SIGNAL(clicked()), this, SLOT (reject()) );
 }
 
 AttrHistory::~AttrHistory ()
 {
+    aViewVals->setParent(0);
+    delete aViewVals;
+    delete pHistMenu;
     delete UI;
 }
 
@@ -193,4 +205,28 @@ void AttrHistory::view(const KKSList<KKSAttrValue*> & histlist)
     UI->tvHistory->setSortingEnabled(true);
 
 
+}
+
+void AttrHistory::contextMenuEvent (QContextMenuEvent * event)
+{
+    QPoint p = event->pos();
+    QPoint gp = event->globalPos();
+    QWidget * tCh = childAt (p);
+    //qDebug () << __PRETTY_FUNCTION__ << p << tCh << UI->tvHistory->viewport() ;
+    if (tCh == UI->tvHistory->viewport())
+    {
+        pHistMenu->popup(gp);
+        return;
+    }
+    QWidget::contextMenuEvent(event);
+}
+
+void AttrHistory::viewVal (void)
+{
+    QItemSelectionModel * selModel = UI->tvHistory->selectionModel();
+    QModelIndex wIndex = selModel->currentIndex();
+    wIndex = wIndex.sibling(wIndex.row(), 0);
+    int idAttrVal = wIndex.data(Qt::DisplayRole).toInt();
+    qDebug () << __PRETTY_FUNCTION__ << idAttrVal;
+    emit viewAttrValue (idAttrVal);
 }
