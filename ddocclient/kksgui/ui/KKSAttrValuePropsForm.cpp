@@ -274,7 +274,15 @@ void KKSAttrValuePropsForm::viewHistory(const KKSList<KKSAttrValue*> & history)
         return;
 
     AttrHistory * hForm = new AttrHistory(history, this);
+    connect (hForm, SIGNAL (viewAttrValue (int)), this, SLOT (viewAttrVal(int)) );
     hForm->exec();
     delete hForm;
 
+}
+
+void KKSAttrValuePropsForm::viewAttrVal (int idAVal)
+{
+    qDebug () << __PRETTY_FUNCTION__ << idAVal;
+    QWidget * pWidget = qobject_cast<QWidget *>(this->sender());
+    emit viewAttrValue (m_av, idAVal, pWidget);
 }

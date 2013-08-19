@@ -8,10 +8,12 @@
 #if !defined(__KKSSITOOOM_KKSAttrValue_h)
 #define __KKSSITOOOM_KKSAttrValue_h
 
+#include <QDateTime>
+#include <QMetaType>
+
 #include "KKSValue.h"
 #include "kkspp_config.h"
 #include "KKSData.h"
-#include <QDateTime>
 #include "KKSMap.h"
 #include <qglobal.h>
 
@@ -105,5 +107,8 @@ class _PP_EXPORT KKSAttrValue : public KKSData
         
 
 };
+
+Q_DECLARE_METATYPE (KKSAttrValue *);
+Q_DECLARE_METATYPE (const KKSAttrValue *);
 
 #endif

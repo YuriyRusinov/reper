@@ -70,7 +70,6 @@ void AttrHistory::view(const KKSList<KKSAttrValue*> & histlist)
 
     KKSAttrValue * av;
     KKSCategoryAttr * attr;
-    QString tempStr;
     //QStandardItem *tree;
 
     int n = histlist.count();
@@ -99,11 +98,13 @@ void AttrHistory::view(const KKSList<KKSAttrValue*> & histlist)
     for (int i =0; i<n; i++)
     {
         av = histlist.at(i);
+        int idAv = av->id();
 
-        item = new QStandardItem(tempStr.setNum(av->id()));
+        item = new QStandardItem(QString::number(idAv));
         item->setTextAlignment(Qt::AlignCenter);
+        item->setData(idAv, Qt::UserRole);
+        item->setData(QVariant::fromValue<KKSAttrValue *>(av), Qt::UserRole+1);
         model->setItem(i,c_id,item);
-        tempStr.clear();
 
         if (av->value().valueForInsert() != NULL)
         {
@@ -152,16 +153,19 @@ void AttrHistory::view(const KKSList<KKSAttrValue*> & histlist)
             else
                 item = new QStandardItem(av->value().valueForInsert());
             item->setTextAlignment(Qt::AlignCenter);
+            item->setData(idAv, Qt::UserRole);
             model->setItem(i,c_value,item);
         }
 
 
         item = new QStandardItem(av->startDateTime().toString("dd.MM.yyyy hh:mm:ss"));
         item->setTextAlignment(Qt::AlignCenter);
+        item->setData(idAv, Qt::UserRole);
         model->setItem(i,c_start,item);
 
         item = new QStandardItem(av->stopDateTime().toString("dd.MM.yyyy hh:mm:ss"));
         item->setTextAlignment(Qt::AlignCenter);
+        item->setData(idAv, Qt::UserRole);
         model->setItem(i,c_stop,item);
 
 
@@ -169,6 +173,7 @@ void AttrHistory::view(const KKSList<KKSAttrValue*> & histlist)
         {
             item = new QStandardItem(av->ioSrc()->name());
             item->setTextAlignment(Qt::AlignCenter);
+            item->setData(idAv, Qt::UserRole);
             model->setItem(i,c_source,item);
         }
 
@@ -176,6 +181,7 @@ void AttrHistory::view(const KKSList<KKSAttrValue*> & histlist)
         {
             item = new QStandardItem(av->ioSrc1()->name());
             item->setTextAlignment(Qt::AlignCenter);
+            item->setData(idAv, Qt::UserRole);
             model->setItem(i,c_transfer,item);
         }
 
@@ -188,6 +194,7 @@ void AttrHistory::view(const KKSList<KKSAttrValue*> & histlist)
         {
             item = new QStandardItem(av->desc());
             item->setTextAlignment(Qt::AlignCenter);
+            item->setData(idAv, Qt::UserRole);
             model->setItem(i,c_description,item);
         }
 
@@ -226,7 +233,7 @@ void AttrHistory::viewVal (void)
     QItemSelectionModel * selModel = UI->tvHistory->selectionModel();
     QModelIndex wIndex = selModel->currentIndex();
     wIndex = wIndex.sibling(wIndex.row(), 0);
-    int idAttrVal = wIndex.data(Qt::DisplayRole).toInt();
+    int idAttrVal = wIndex.data(Qt::UserRole).toInt();
     qDebug () << __PRETTY_FUNCTION__ << idAttrVal;
     emit viewAttrValue (idAttrVal);
 }
