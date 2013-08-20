@@ -129,7 +129,7 @@ void KKSAttrValueLabel :: showAttrValueProps()
                                                           !isSys,
                                                           this);
 #else
-    bool isSys (KKSIndAttr::iacIOUserAttr == KKSIndAttr::iacIOUserAttr);
+    bool isSys (m_isSystem == KKSIndAttr::iacIOUserAttr);
     KKSAttrValuePropsForm * f = new KKSAttrValuePropsForm(m_av, 
                                                           true, 
                                                           !isSys,
@@ -139,10 +139,18 @@ void KKSAttrValueLabel :: showAttrValueProps()
     connect(f, SIGNAL(loadIOSrc(KKSObject **, QWidget *)), this, SIGNAL(loadIOSrc(KKSObject **, QWidget *)));
     connect(f, SIGNAL(viewIOSrc(KKSObject *, QWidget *)), this, SIGNAL(viewIOSrc(KKSObject *, QWidget *)));
     connect(f, SIGNAL(loadHistory(const KKSAttrValue *, bool)), this, SIGNAL(loadHistory(const KKSAttrValue *, bool)));
+    connect(f, SIGNAL(viewAttrValue (const KKSAttrValue *, int, QWidget *)), this, SLOT (viewAVal(const KKSAttrValue *, int, QWidget *)));
     connect(this, SIGNAL(viewHistory(const KKSList<KKSAttrValue *> &)), f, SLOT(viewHistory(const KKSList<KKSAttrValue *> &)));
 
     if(f->exec() == QDialog::Accepted)
         emit attrValueChanged();
 
     delete f;
+}
+
+void KKSAttrValueLabel :: viewAVal (const KKSAttrValue * av, int idAVal, QWidget * pWidget)
+{
+    if (!av || idAVal < 0)
+        return;
+    emit viewDetailAttrVal (av, idAVal, m_isSystem, pWidget);
 }

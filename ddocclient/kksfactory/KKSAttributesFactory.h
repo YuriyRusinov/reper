@@ -97,6 +97,8 @@ private slots:
     void delComplexAttr (int id, KKSAttribute *a, QAbstractItemModel * attrModel, const QModelIndex& attrInd, KKSAttrEditor *editor);
     
     void updateAttrModel (QAbstractItemModel * attrModel);
+    
+    void viewAttrValue (const KKSAttrValue * av, int idAVal, int isSys, QWidget * pWidget);
 
 signals:
     void viewHistory(const KKSList<KKSAttrValue *> &);
@@ -128,6 +130,8 @@ private:
                                  QToolButton *&tbRef, 
                                  QCheckBox *&ch, 
                                  bool isRef=false);
+    
+    QWidget * createAttrValWidget (const KKSAttrValue * pAttrValue, QWidget * parent=0, Qt::WindowFlags flags=0);
 
     QWidget * createAttrCheckWidget (const KKSAttrValue * pAttrValue, const KKSAttrType *pCatType,  KKSIndAttr::KKSIndAttrClass isSystem, QTabWidget * tabW);
 

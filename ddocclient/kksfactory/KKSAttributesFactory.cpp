@@ -27,6 +27,7 @@
 #include <QAction>
 #include <QHeaderView>
 #include <QPushButton>
+#include <QSpacerItem>
 
 #include <KKSAttributesEditor.h>
 #include <KKSObjEditor.h>
@@ -909,9 +910,10 @@ QLabel * KKSAttributesFactory :: createAttrTitle (KKSAttrValue * av, KKSIndAttr:
 
     QLabel * lTitle = new KKSAttrValueLabel(av, isSystem);
 
-    connect(lTitle, SIGNAL(loadIOSrc(KKSObject **, QWidget * )), this, SLOT(slotLoadIOSrc(KKSObject **, QWidget * )));
-    connect(lTitle, SIGNAL(viewIOSrc(KKSObject *, QWidget *)), this, SLOT(viewIOSrc(KKSObject *, QWidget *)));
+    connect (lTitle, SIGNAL(loadIOSrc(KKSObject **, QWidget * )), this, SLOT(slotLoadIOSrc(KKSObject **, QWidget * )));
+    connect (lTitle, SIGNAL(viewIOSrc(KKSObject *, QWidget *)), this, SLOT(viewIOSrc(KKSObject *, QWidget *)));
     connect (lTitle, SIGNAL(loadHistory(const KKSAttrValue *, bool)), this, SLOT(loadIOAttrValueHistory(const KKSAttrValue *, bool)));
+    connect (lTitle, SIGNAL(viewDetailAttrVal (const KKSAttrValue *, int, int, QWidget *)), this, SLOT(viewAttrValue (const KKSAttrValue *, int, int, QWidget *)) );
     connect (this, SIGNAL(viewHistory(const KKSList<KKSAttrValue *> &)), lTitle, SIGNAL(viewHistory(const KKSList<KKSAttrValue *> &)));
 
     if(objEditor)
@@ -1701,6 +1703,7 @@ QWidget * KKSAttributesFactory :: createAttrCheckWidget (const KKSAttrValue * av
         connect (lHist, SIGNAL(loadIOSrc(KKSObject **, QWidget * )), this, SLOT(slotLoadIOSrc(KKSObject **, QWidget * )));
         connect (lHist, SIGNAL(viewIOSrc(KKSObject *, QWidget *)), this, SLOT(viewIOSrc(KKSObject *, QWidget *)));
         connect (lHist, SIGNAL(loadHistory(const KKSAttrValue *, bool)), this, SLOT(loadIOAttrValueHistory(const KKSAttrValue *, bool)));
+        connect (lHist, SIGNAL(viewDetailAttrVal (const KKSAttrValue *, int, int, QWidget *)), this, SLOT(viewAttrValue (const KKSAttrValue *, int, int, QWidget *)) );
         connect (this, SIGNAL(viewHistory(const KKSList<KKSAttrValue *> &)), lHist, SIGNAL(viewHistory(const KKSList<KKSAttrValue *> &)));
     }
     return attrWidget;
@@ -2710,4 +2713,44 @@ void KKSAttributesFactory :: updateAttrModel (QAbstractItemModel * attrModel)
     KKSAttributesEditor * aEditor = qobject_cast<KKSAttributesEditor *>(this->sender());
     if (aEditor)
         aEditor->setAvailableGroups(aGroups);
+}
+
+void KKSAttributesFactory :: viewAttrValue (const KKSAttrValue * av, int idAVal, int isSys, QWidget * pWidget)
+{
+    if (!av || idAVal < 0)
+        return;
+    qDebug () << __PRETTY_FUNCTION__ << av->id() << idAVal << isSys << pWidget;
+    QWidget * avW = createAttrValWidget (av, pWidget, Qt::Window);
+    if (!avW)
+        return;
+    switch (isSys)
+    {
+        case KKSIndAttr::iacIOUserAttr:
+        {
+            qDebug () << __PRETTY_FUNCTION__ << isSys;
+            break;
+        }
+        case KKSIndAttr::iacEIOUserAttr:
+        {
+            qDebug () << __PRETTY_FUNCTION__ << isSys;
+            break;
+        }
+        default: break;
+    }
+    avW->adjustSize();
+    avW->show();
+}
+
+QWidget * KKSAttributesFactory :: createAttrValWidget (const KKSAttrValue * pAttrValue, QWidget * parent, Qt::WindowFlags flags)
+{
+    if (!pAttrValue)
+        return 0;
+    QWidget * avWidget = new QWidget (parent, flags);
+    QGridLayout * avGLay = new QGridLayout (avWidget);
+    QSpacerItem * spItem = new QSpacerItem (80, 20, QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
+    avGLay->addItem(spItem, 1, 0, 1, 1);
+    QPushButton * pbClose = new QPushButton (tr("&Close"), avWidget);
+    connect (pbClose, SIGNAL (clicked()), avWidget, SLOT (close()));
+    avGLay->addWidget(pbClose, 1, 1, 1, 1);
+    return avWidget;
 }
