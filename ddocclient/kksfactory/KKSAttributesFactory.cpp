@@ -2745,8 +2745,88 @@ QWidget * KKSAttributesFactory :: createAttrValWidget (const KKSAttrValue * pAtt
 {
     if (!pAttrValue)
         return 0;
+    
+    if (!pAttrValue->attribute())
+        return 0;
+    
+    const KKSAttribute * attr = pAttrValue->attribute();
+    const KKSAttrType * aType = attr->type();
     QWidget * avWidget = new QWidget (parent, flags);
     QGridLayout * avGLay = new QGridLayout (avWidget);
+    KKSAttrType::KKSAttrTypes idAttrType = aType->attrType();
+    QWidget * aW (0);
+    switch (idAttrType)
+    {
+        case KKSAttrType::atBool: aW = new QCheckBox (avWidget); break;
+        case KKSAttrType::atCheckList:
+        case KKSAttrType::atCheckListEx:
+        case KKSAttrType::atComplex:
+        {
+            aW = new QListView (avWidget);
+            break;
+        }
+        case KKSAttrType::atDouble:
+        case KKSAttrType::atFixString:
+        case KKSAttrType::atInt:
+        case KKSAttrType::atInt64:
+        case KKSAttrType::atString:
+        case KKSAttrType::atList:
+        case KKSAttrType::atParent:
+        case KKSAttrType::atObjRef:
+        case KKSAttrType::atUUID:
+        case KKSAttrType::atUrl:
+        case KKSAttrType::atRecordColor:
+        case KKSAttrType::atRecordColorRef:
+        case KKSAttrType::atRecordTextColor:
+        case KKSAttrType::atRecordTextColorRef:
+        {
+            aW = new QLineEdit (avWidget);
+            QLineEdit * lE = (qobject_cast<QLineEdit *>(aW));
+            lE->setReadOnly (true);
+            lE->setText(pAttrValue->value().valueVariant().toString());
+            break;
+        }
+        case KKSAttrType::atMaclabel:
+        {
+            aW = new QWidget (avWidget);
+            QHBoxLayout * hLay = new QHBoxLayout (aW);
+            for (int i=0; i<2; i++)
+            {
+                QLineEdit * lE = new QLineEdit (aW);
+                hLay->addWidget (lE);
+            }
+            break;
+        }
+        case KKSAttrType::atDate:
+        {
+            aW = new QDateEdit (avWidget);
+            QDateEdit * dE = qobject_cast<QDateEdit *>(aW);
+            dE->setDate(pAttrValue->value().valueVariant().toDate());
+            dE->setReadOnly(true);
+            //QDate::fromString(pAttrValue->value().valueForInsert(), QString("dd.MM.yyyy")));
+            break;
+        }
+        case KKSAttrType::atTime:
+        {
+            aW = new QTimeEdit (avWidget);
+            QTimeEdit * tE = qobject_cast<QTimeEdit *>(aW);
+            tE->setTime(pAttrValue->value().valueVariant().toTime());//QTime::fromString(pAttrValue->value().valueForInsert(), QString("hh.mm.ss")));
+            tE->setReadOnly(true);
+            break;
+        }
+        case KKSAttrType::atDateTime:
+        {
+            aW = new QDateTimeEdit (avWidget);
+            QDateTimeEdit * dtE = qobject_cast<QDateTimeEdit *>(aW);
+            qDebug () << __PRETTY_FUNCTION__ << pAttrValue->value().valueVariant();
+            dtE->setDateTime(pAttrValue->value().valueVariant().toDateTime());//QDateTime::fromString(pAttrValue->value().valueVariant(), QString("dd.MM.yyyy hh.mm.ss")));
+            dtE->setReadOnly(true);
+            break;
+        }
+        default:break;
+    }
+    if (aW)
+        avGLay->addWidget (aW, 0, 0, 1, 2);
     QSpacerItem * spItem = new QSpacerItem (80, 20, QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
     avGLay->addItem(spItem, 1, 0, 1, 1);
     QPushButton * pbClose = new QPushButton (tr("&Close"), avWidget);
