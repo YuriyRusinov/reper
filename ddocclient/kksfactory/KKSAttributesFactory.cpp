@@ -1917,59 +1917,10 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
             break;
         case KKSAttrType::atCheckListEx:
             {
-                QString tableName = av->attribute()->tableName ();
                 KKSAttrCheckWidget * arw = qobject_cast<KKSAttrCheckWidget *>(aw);
                 if (!arw)
                     break;
-
-                QStringList vArray = V.toStringList();
-                qDebug () << __PRETTY_FUNCTION__ << vArray << av->id() << av->attribute()->id();
-                KKSObject * refIO = loader->loadIO (tableName, true);
-                if (!refIO)
-                    break;
-                KKSCategory * c = refIO->category ();
-                if (!c)
-                {
-                    refIO->release ();
-                    break;
-                }
-                KKSCategory * ct = c->tableCategory ();
-                if (!ct)
-                {
-                    refIO->release ();
-                    break;
-                }
-                KKSList<const KKSFilterGroup*> filters;
-                QString vals;
-                for (int i=0; i<vArray.count(); i++)
-                {
-                    vals += vArray[i];
-                    if (i < vArray.count()-1)
-                        vals += ",";
-                }
-                QString value;
-                if (!vals.isEmpty())
-                {
-                    value = QString ("select id from %1 where id in (%2) ").arg (tableName).arg (vals);
-                }
-                else
-                {
-                    value = QString ("select id from %1 where id is null ").arg (tableName);
-                }
-                //const KKSFilter * filter = ct->createFilter ("id", value, KKSFilter::foInSQL);
-                const KKSFilter * filter = ct->createFilter (ATTR_ID, value, KKSFilter::foInSQL);
-                KKSList <const KKSFilter *> fl;
-                fl.append (filter);
-                filter->release ();
-                KKSFilterGroup * fg = new KKSFilterGroup(true);
-                fg->setFilters(fl);
-                filters.append(fg);
-                fg->release();
-                KKSMap<qint64, KKSEIOData *> eioList = loader->loadEIOList (refIO, filters);
-                const KKSTemplate * ctempl = new KKSTemplate (ct->defTemplate());
-                QAbstractItemModel * sAttrModel = new KKSEIODataModel (ctempl, eioList);
-                ctempl->release();
-                refIO->release ();
+                QAbstractItemModel * sAttrModel = aValComplexModel(av);//new KKSEIODataModel (ctempl, eioList);
                 QObject :: connect (arw, 
                                     SIGNAL (addAttrRef (const KKSAttrValue*,  KKSIndAttr::KKSIndAttrClass, QAbstractItemModel*)), 
                                     wEditor, 
@@ -2757,12 +2708,18 @@ QWidget * KKSAttributesFactory :: createAttrValWidget (const KKSAttrValue * pAtt
     QWidget * aW (0);
     switch (idAttrType)
     {
-        case KKSAttrType::atBool: aW = new QCheckBox (avWidget); break;
+        case KKSAttrType::atBool: 
+        {
+            aW = new QCheckBox (avWidget);
+            break;
+        }
         case KKSAttrType::atCheckList:
         case KKSAttrType::atCheckListEx:
         case KKSAttrType::atComplex:
         {
-            aW = new QListView (avWidget);
+            aW = new QTreeView (avWidget);
+            QAbstractItemModel * aMod = this->aValComplexModel(pAttrValue);
+            (qobject_cast<QTreeView *>(aW))->setModel (aMod);
             break;
         }
         case KKSAttrType::atDouble:
@@ -2833,4 +2790,62 @@ QWidget * KKSAttributesFactory :: createAttrValWidget (const KKSAttrValue * pAtt
     connect (pbClose, SIGNAL (clicked()), avWidget, SLOT (close()));
     avGLay->addWidget(pbClose, 1, 1, 1, 1);
     return avWidget;
+}
+
+QAbstractItemModel * KKSAttributesFactory :: aValComplexModel (const KKSAttrValue * pAttrValue)
+{
+    if (!pAttrValue || !pAttrValue->attribute())
+        return 0;
+    QString tableName = pAttrValue->attribute()->tableName ();
+    QVariant V = pAttrValue->value().valueVariant();
+
+    QStringList vArray = V.toStringList();
+    qDebug () << __PRETTY_FUNCTION__ << vArray << pAttrValue->id() << pAttrValue->attribute()->id();
+    KKSObject * refIO = loader->loadIO (tableName, true);
+    if (!refIO)
+        return 0;
+    KKSCategory * c = refIO->category ();
+    if (!c)
+    {
+        refIO->release ();
+        return 0;
+    }
+    KKSCategory * ct = c->tableCategory ();
+    if (!ct)
+    {
+        refIO->release ();
+        return 0;
+    }
+    KKSList<const KKSFilterGroup*> filters;
+    QString vals;
+    for (int i=0; i<vArray.count(); i++)
+    {
+        vals += vArray[i];
+        if (i < vArray.count()-1)
+            vals += ",";
+    }
+    QString value;
+    if (!vals.isEmpty())
+    {
+        value = QString ("select id from %1 where id in (%2) ").arg (tableName).arg (vals);
+    }
+    else
+    {
+        value = QString ("select id from %1 where id is null ").arg (tableName);
+    }
+    //const KKSFilter * filter = ct->createFilter ("id", value, KKSFilter::foInSQL);
+    const KKSFilter * filter = ct->createFilter (ATTR_ID, value, KKSFilter::foInSQL);
+    KKSList <const KKSFilter *> fl;
+    fl.append (filter);
+    filter->release ();
+    KKSFilterGroup * fg = new KKSFilterGroup(true);
+    fg->setFilters(fl);
+    filters.append(fg);
+    fg->release();
+    KKSMap<qint64, KKSEIOData *> eioList = loader->loadEIOList (refIO, filters);
+    const KKSTemplate * ctempl = new KKSTemplate (ct->defTemplate());
+    QAbstractItemModel * sAttrModel = new KKSEIODataModel (ctempl, eioList);
+    ctempl->release();
+    refIO->release ();
+    return sAttrModel;
 }
