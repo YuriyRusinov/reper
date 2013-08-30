@@ -23,7 +23,7 @@ namespace Ui
     class attr_history;
 };
 
-class AttrHistory : public QDialog
+class _GUI_EXPORT AttrHistory : public QDialog
 {
 public:
     AttrHistory (const KKSList<KKSAttrValue*> & histlist, QWidget *parent=0, Qt::WFlags f=0);

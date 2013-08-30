@@ -3,8 +3,8 @@ HEADERS += \
                 KKSComplexAttrWidget.h \
                 KKSAttrCheckListWidget.h \
                 KKSAttrProxyModel.h \
-#                KKSAttributesModel.h \
                 KKSCatAttrsModel.h \
+                KKSAttrHistModel.h \
  		KKSPixmap.h \
            	KKSCheckBox.h \
            	KKSAttrWidget.h \
@@ -97,7 +97,7 @@ HEADERS += \
 SOURCES += \
                 KKSComplexAttrWidget.cpp \
                 KKSAttrCheckListWidget.cpp \
-#                KKSAttributesModel.cpp \
+                KKSAttrHistModel.cpp \
                 KKSAttrProxyModel.cpp \
                 KKSCatAttrsModel.cpp \
  		KKSPixmap.cpp \
@@ -217,7 +217,7 @@ FORMS   += \
 headers.files += \
                 KKSComplexAttrWidget.h \
                 KKSAttrCheckListWidget.h \
-#                KKSAttributesModel.h \
+                KKSAttrHistModel.h \
                 KKSAttrProxyModel.h \
                 KKSCatAttrsModel.h \
  		KKSPixmap.h \
@@ -282,6 +282,7 @@ headers.files += \
                 ui/kksattreditor.h \
                 ui/kkscatattreditor.h \
                 ui/kksattrattreditor.h \
+                ui/attrhistory.h \
                 kksstuffform.h \
                 KKSStuffDialog.h \
                 ui/messageform.h \
