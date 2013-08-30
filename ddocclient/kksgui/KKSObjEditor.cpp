@@ -756,6 +756,7 @@ int KKSObjEditor :: constructObject()
                     value = val.toTime().toString (Qt::ISODate);
                 else
                     value = QString ();
+                qDebug () << __PRETTY_FUNCTION__ << value;
             }
             else if (type == KKSAttrType::atIntervalH)
                 value = QString ("{%1}").arg (val.toStringList().join(","));
@@ -823,6 +824,10 @@ int KKSObjEditor :: constructObject()
             {
                 v.setColumnValue (cAttrValue->value().columnValue());
             }
+            //else if (type == KKSAttrType::atTime)
+            //{
+            //    qDebug () << __PRETTY_FUNCTION__ << v.valueForInsert() << v.valueVariant();
+            //}
             
             KKSAttrValue * av = new KKSAttrValue (*cAttrValue); 
             av->setValue(v);

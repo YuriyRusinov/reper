@@ -784,8 +784,8 @@ QString KKSValue::valueForInsert() const
 
 
     if(a_type == KKSAttrType::atDateTime ||
-       a_type == KKSAttrType::atDate ||
-       a_type == KKSAttrType::atTime)
+       a_type == KKSAttrType::atDate
+       )
     {
         QString tVal = value();
         if(tVal == "current_timestamp"){
@@ -794,6 +794,19 @@ QString KKSValue::valueForInsert() const
         QDateTime dt = m_value.toDateTime();
         tVal = dt.toString("dd.MM.yyyy hh:mm:ss");
         val = QString("to_timestamp('%1', 'DD.MM.YYYY HH24:MI:SS')::timestamp").arg(tVal);
+        return val;
+    }
+    else if (a_type == KKSAttrType::atTime)
+    {
+        QString tVal = value();
+        if(QString::compare(tVal, "current_timestamp", Qt::CaseInsensitive) == 0 ||
+           QString::compare (tVal, "current_time", Qt::CaseInsensitive) == 0)
+        {
+            return tVal + "::timestamp";
+        }
+        QTime dt = m_value.toTime();
+        tVal = dt.toString("hh:mm:ss");
+        val = QString("to_time('%1')").arg(tVal);
         return val;
     }
 
