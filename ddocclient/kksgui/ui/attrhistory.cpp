@@ -16,6 +16,7 @@
 
 #include <KKSAttrValue.h>
 #include <KKSObject.h>
+#include <KKSAttrHistModel.h>
 #include <qt4/QtGui/qheaderview.h>
 
 #include "attrhistory.h"
@@ -72,9 +73,9 @@ void AttrHistory::view(const KKSList<KKSAttrValue*> & histlist)
     KKSCategoryAttr * attr;
     //QStandardItem *tree;
 
-    int n = histlist.count();
-    QStandardItemModel *model =new QStandardItemModel (n, c_description+1);
-    QStandardItem *item;
+    //int n = histlist.count();
+    QAbstractItemModel *model =new KKSAttrHistModel (histlist);//QStandardItemModel (n, c_description+1);
+    //QStandardItem *item;
 
     //Получаем Имя Тип И Группу атрибута
     av = histlist.first();
@@ -85,12 +86,13 @@ void AttrHistory::view(const KKSList<KKSAttrValue*> & histlist)
     UI->leType->setText(attr->type()->name());
     UI->leName->setText(attr->name());
 
+    QHeaderView *headerView = UI->tvHistory->header();
+    headerView->setDefaultAlignment(Qt::AlignCenter);
+
+/*
     QStringList listHeader;
     listHeader <<tr("Id")<<tr("Start")<<tr("Stop")<<tr("Value")<<tr("Source")<<tr("Transfer")<<tr("Description");
     model->setHorizontalHeaderLabels(listHeader);
-
-    QHeaderView *headerView = UI->tvHistory->header();
-    headerView->setDefaultAlignment(Qt::AlignCenter);
 
     //
     // Обходим все значения истории изменений атрибута и вносим в таблицу
@@ -199,6 +201,7 @@ void AttrHistory::view(const KKSList<KKSAttrValue*> & histlist)
         }
 
     }
+*/
     QSortFilterProxyModel * attrHistModel = new KKSAttrHistoryProxyModel(this);
     attrHistModel->setSourceModel (model);
     QHeaderView * hv = UI->tvHistory->header();
