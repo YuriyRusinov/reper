@@ -131,7 +131,7 @@ private:
                                  QCheckBox *&ch, 
                                  bool isRef=false);
     
-    QWidget * createAttrValWidget (const KKSAttrValue * pAttrValue, QWidget * parent=0, Qt::WindowFlags flags=0);
+    QWidget * createAttrValWidget (const KKSAttrValue * pAttrValue, int idAVal, int isSys, QWidget * parent=0, Qt::WindowFlags flags=0);
 
     QWidget * createAttrCheckWidget (const KKSAttrValue * pAttrValue, const KKSAttrType *pCatType,  KKSIndAttr::KKSIndAttrClass isSystem, QTabWidget * tabW);
     QAbstractItemModel * aValComplexModel (const KKSAttrValue * pAttrValue);

@@ -52,6 +52,7 @@ AttrHistory::AttrHistory (const KKSList<KKSAttrValue*> & histlist, QWidget *pare
     UI->tvHistory->setItemDelegate(iDeleg);
     connect (aViewVals, SIGNAL(triggered()), this, SLOT (viewVal()) );
     connect (UI->pbClose, SIGNAL(clicked()), this, SLOT (reject()) );
+    connect (UI->tvHistory, SIGNAL (doubleClicked(const QModelIndex&)), this, SLOT (viewDblVal (const QModelIndex&)) );
 }
 
 AttrHistory::~AttrHistory ()
@@ -226,6 +227,7 @@ void AttrHistory::contextMenuEvent (QContextMenuEvent * event)
     if (tCh == UI->tvHistory->viewport())
     {
         pHistMenu->popup(gp);
+        event->accept();
         return;
     }
     QWidget::contextMenuEvent(event);
@@ -238,5 +240,12 @@ void AttrHistory::viewVal (void)
     wIndex = wIndex.sibling(wIndex.row(), 0);
     int idAttrVal = wIndex.data(Qt::UserRole).toInt();
     qDebug () << __PRETTY_FUNCTION__ << idAttrVal;
+    emit viewAttrValue (idAttrVal);
+}
+
+void AttrHistory::viewDblVal (const QModelIndex& wIndex)
+{
+    QModelIndex vInd = wIndex.sibling(wIndex.row(), 0);
+    int idAttrVal = vInd.data(Qt::UserRole).toInt();
     emit viewAttrValue (idAttrVal);
 }

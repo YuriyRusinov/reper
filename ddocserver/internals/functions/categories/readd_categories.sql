@@ -44,3 +44,4 @@
 
 --invoked in ./internals/initiotriggers.sql
 --\i ./functions/categories/triggers/readd_triggers.sql
+\i ./functions/categories/agetrefvalue.sql

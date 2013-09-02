@@ -17,6 +17,7 @@ class QLineEdit;
 class QContextMenuEvent;
 class QMenu;
 class QAction;
+class QModelIndex;
 
 namespace Ui
 {
@@ -31,6 +32,7 @@ public:
 
 private slots:
     void viewVal (void);
+    void viewDblVal (const QModelIndex&);
 
 protected:
     //

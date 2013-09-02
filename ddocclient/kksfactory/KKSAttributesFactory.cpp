@@ -2671,9 +2671,27 @@ void KKSAttributesFactory :: viewAttrValue (const KKSAttrValue * av, int idAVal,
     if (!av || idAVal < 0)
         return;
     qDebug () << __PRETTY_FUNCTION__ << av->id() << idAVal << isSys << pWidget;
-    QWidget * avW = createAttrValWidget (av, pWidget, Qt::Window);
+    QWidget * avW = createAttrValWidget (av, idAVal, isSys, pWidget, Qt::Window);
     if (!avW)
         return;
+    avW->adjustSize();
+    avW->show();
+}
+
+QWidget * KKSAttributesFactory :: createAttrValWidget (const KKSAttrValue * pAttrValue, int idAVal, int isSys, QWidget * parent, Qt::WindowFlags flags)
+{
+    if (!pAttrValue)
+        return 0;
+    
+    if (!pAttrValue->attribute())
+        return 0;
+    
+    const KKSAttribute * attr = pAttrValue->attribute();
+    const KKSAttrType * aType = attr->type();
+    QWidget * avWidget = new QWidget (parent, flags);
+    QGridLayout * avGLay = new QGridLayout (avWidget);
+    KKSAttrType::KKSAttrTypes idAttrType = aType->attrType();
+    QWidget * aW (0);
     switch (isSys)
     {
         case KKSIndAttr::iacIOUserAttr:
@@ -2688,24 +2706,7 @@ void KKSAttributesFactory :: viewAttrValue (const KKSAttrValue * av, int idAVal,
         }
         default: break;
     }
-    avW->adjustSize();
-    avW->show();
-}
 
-QWidget * KKSAttributesFactory :: createAttrValWidget (const KKSAttrValue * pAttrValue, QWidget * parent, Qt::WindowFlags flags)
-{
-    if (!pAttrValue)
-        return 0;
-    
-    if (!pAttrValue->attribute())
-        return 0;
-    
-    const KKSAttribute * attr = pAttrValue->attribute();
-    const KKSAttrType * aType = attr->type();
-    QWidget * avWidget = new QWidget (parent, flags);
-    QGridLayout * avGLay = new QGridLayout (avWidget);
-    KKSAttrType::KKSAttrTypes idAttrType = aType->attrType();
-    QWidget * aW (0);
     switch (idAttrType)
     {
         case KKSAttrType::atBool: 

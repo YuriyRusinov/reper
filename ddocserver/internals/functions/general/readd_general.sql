@@ -20,6 +20,7 @@
 \i ./functions/general/eioinsertindicator.sql
 \i ./functions/general/eioupdateindicator.sql
 \i ./functions/general/getrecattrvaluehistory.sql
+\i ./functions/general/getrecattrvalue.sql
 
 \i ./functions/general/insertrecattrsattrsvalues.sql
 \i ./functions/general/insertattrsattrsvalues.sql
