@@ -756,7 +756,6 @@ int KKSObjEditor :: constructObject()
                     value = val.toTime().toString (Qt::ISODate);
                 else
                     value = QString ();
-                qDebug () << __PRETTY_FUNCTION__ << value;
             }
             else if (type == KKSAttrType::atIntervalH)
                 value = QString ("{%1}").arg (val.toStringList().join(","));

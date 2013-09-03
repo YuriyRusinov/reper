@@ -11,6 +11,9 @@ declare
     column_name varchar;
     r record;
     val varchar;
+    vals varchar[];
+    cnt int8;
+    i int8;
 begin
 
     if (theValue is null) then
@@ -22,23 +25,42 @@ begin
         return theValue;
     end if;
 
-    if (idType = 2 or idType = 3 or idType = 19 or idType = 26) then
-        for r in
-            select a.table_name, a.column_name from attributes a where a.id=idAttribute
-        loop
-            table_name = r.table_name;
-            column_name = r.column_name;
-            if (idType = 3 and table_name isnull) then
-                table_name := tName;
-            end if;
-            if (column_name isnull) then
-                column_name := E'id';
-            end if;
-            raise warning '% %', table_name, column_name;
-        end loop;
+    for r in
+        select a.table_name, a.column_name from attributes a where a.id=idAttribute
+    loop
+        table_name = r.table_name;
+        column_name = r.column_name;
+        if (idType = 3 and table_name isnull) then
+            table_name := tName;
+        end if;
+        if (column_name isnull) then
+            column_name := E'id';
+        end if;
+        raise warning '% %', table_name, column_name;
+    end loop;
+
+    if (idType <> 12 and idType <> 17) then
         query := E'select "' || column_name || E'" from ' || table_name || E' where ' || table_name || E'.id=' || theValue;
         execute query into val;
 
+        return val;
+    else
+        if (theValue = E'{}') then
+            return theValue;
+        end if;
+
+        query := E'select "' || column_name || E'" from ' || table_name || E' where ' || table_name || E'.id in' || theValue || '::varchar[] as a';
+        execute query into vals;
+        cnt := array_upper (vals, 1);
+        val := E'{';
+        for i in 1..cnt
+        loop
+            val := val || vals[i];
+            if (i < cnt-1 and char_length(val) > 1) then
+                val := val || E',';
+            end if;
+        end loop;
+        val := val || E'}';
         return val;
     end if;
 

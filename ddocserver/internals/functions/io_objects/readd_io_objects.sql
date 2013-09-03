@@ -18,6 +18,7 @@
 \i ./functions/io_objects/iogetobjectattrs.sql 
 --должен идти всегда после iogetobjectattrs.sql
 \i ./functions/io_objects/getioattrvaluehistory.sql
+\i ./functions/io_objects/getioattrvalue.sql
 \i ./functions/io_objects/ioinsert.sql
 \i ./functions/io_objects/ioupdate.sql
 \i ./functions/io_objects/ioinsertattr.sql

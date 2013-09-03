@@ -1,5 +1,5 @@
 /*
---îïðåäåëÿåòñÿ â ôàéëå iogetobjectattrs.sql
+--Ð¾Ð¿Ñ€ÐµÐ´ÐµÐ»ÑÐµÑ‚ÑÑ Ð² Ñ„Ð°Ð¹Ð»Ðµ iogetobjectattrs.sql
 
 select f_safe_drop_type('h_get_object_attrs');
 create type h_get_object_attrs as(
@@ -7,7 +7,7 @@ create type h_get_object_attrs as(
                                   id_io_category int4,
                                   id_io_attribute int4,
                                   value varchar,
-                                  attr_code varchar,  --ïðè èíôîðìàöèîííîì îáìåíå (â ô-è ioGetObjectAttrsEx() â êà÷åñòâå çíà÷åíèÿ äàííîãî ïîëÿ èñïîëüçóåòñÿ unique_id)
+                                  attr_code varchar,  --Ð¿Ñ€Ð¸ Ð¸Ð½Ñ„Ð¾Ñ€Ð¼Ð°Ñ†Ð¸Ð¾Ð½Ð½Ð¾Ð¼ Ð¾Ð±Ð¼ÐµÐ½Ðµ (Ð² Ñ„-Ð¸ ioGetObjectAttrsEx() Ð² ÐºÐ°Ñ‡ÐµÑÑ‚Ð²Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ Ð´Ð°Ð½Ð½Ð¾Ð³Ð¾ Ð¿Ð¾Ð»Ñ Ð¸ÑÐ¿Ð¾Ð»ÑŒÐ·ÑƒÐµÑ‚ÑÑ unique_id)
                                   id_attr_type int4,
                                   id_attr_category int4,
                                   id_attr_value int4, 
@@ -20,7 +20,7 @@ create type h_get_object_attrs as(
                                   description varchar);
 */
 
-create or replace function getIOAttrValueHistory(int4, timestamp, timestamp) returns setof h_get_object_attrs as
+create or replace function getIOAttrValueHistory(int8, timestamp, timestamp) returns setof h_get_object_attrs as
 $BODY$
 declare
     idAttrValue alias for $1;
@@ -32,8 +32,8 @@ declare
 
     iStartTime timestamp;
     iStopTime timestamp;
-    idObject int4;
-    idAttrCategory int4;
+    idObject int8;
+    idAttrCategory int8;
 begin
 
     if(startTime isnull) then
@@ -74,7 +74,7 @@ begin
             av.is_actual,
             av.description
         from 
-            (f_sel_attrs_values(idObject) av inner join attrs_categories ac on (av.id_attr_category = ac.id) inner join attributes a on (ac.id_io_attribute=a.id and av.id_io_object = idObject))
+            (f_sel_attrs_values(idObject::int4) av inner join attrs_categories ac on (av.id_attr_category = ac.id) inner join attributes a on (ac.id_io_attribute=a.id and av.id_io_object = idObject))
         where 
             av.start_time >= iStartTime 
             and (av.stop_time isnull or av.stop_time <= iStopTime)
@@ -91,11 +91,11 @@ language 'plpgsql';
 
 select f_safe_drop_type('h_get_id_obj_id_cat_attr');
 create type h_get_id_obj_id_cat_attr as(
-                                  id_io_object int4,
-                                  id_attr_category int4);
+                                  id_io_object int8,
+                                  id_attr_category int8);
 
---ôóíêöèÿ íóæíà äëÿ óñêîðåíèÿ ïîëó÷åíèÿ äàííîé èíôîðìàöèè. ×òîáû ÷èòàòü ñ ïðàâàìè admin'a
-create or replace function getIdObjectForIdAttrValue(int4) returns h_get_id_obj_id_cat_attr as
+--Ñ„ÑƒÐ½ÐºÑ†Ð¸Ñ Ð½ÑƒÐ¶Ð½Ð° Ð´Ð»Ñ ÑƒÑÐºÐ¾Ñ€ÐµÐ½Ð¸Ñ Ð¿Ð¾Ð»ÑƒÑ‡ÐµÐ½Ð¸Ñ Ð´Ð°Ð½Ð½Ð¾Ð¹ Ð¸Ð½Ñ„Ð¾Ñ€Ð¼Ð°Ñ†Ð¸Ð¸. Ð§Ñ‚Ð¾Ð±Ñ‹ Ñ‡Ð¸Ñ‚Ð°Ñ‚ÑŒ Ñ Ð¿Ñ€Ð°Ð²Ð°Ð¼Ð¸ admin'a
+create or replace function getIdObjectForIdAttrValue(int8) returns h_get_id_obj_id_cat_attr as
 $BODY$
 declare
     idAttrValue alias for $1;

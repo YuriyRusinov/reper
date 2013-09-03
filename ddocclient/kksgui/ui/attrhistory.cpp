@@ -12,6 +12,7 @@
 #include <QContextMenuEvent>
 #include <QPoint>
 #include <QAction>
+#include <QKeySequence>
 #include <QtDebug>
 
 #include <KKSAttrValue.h>
@@ -38,7 +39,7 @@ AttrHistory::AttrHistory (const KKSList<KKSAttrValue*> & histlist, QWidget *pare
     : QDialog (parent, f),
     UI (new Ui::attr_history),
     pHistMenu (new QMenu),
-    aViewVals (new QAction(tr("View values"), this))
+    aViewVals (new QAction(tr("View &values"), this))
 {
 
     UI->setupUi (this);
@@ -46,7 +47,7 @@ AttrHistory::AttrHistory (const KKSList<KKSAttrValue*> & histlist, QWidget *pare
     {
         view (histlist);
     }
-
+    
     pHistMenu->addAction(aViewVals);
     QAbstractItemDelegate * iDeleg = new KKSItemDelegate();
     UI->tvHistory->setItemDelegate(iDeleg);
@@ -238,9 +239,7 @@ void AttrHistory::viewVal (void)
     QItemSelectionModel * selModel = UI->tvHistory->selectionModel();
     QModelIndex wIndex = selModel->currentIndex();
     wIndex = wIndex.sibling(wIndex.row(), 0);
-    int idAttrVal = wIndex.data(Qt::UserRole).toInt();
-    qDebug () << __PRETTY_FUNCTION__ << idAttrVal;
-    emit viewAttrValue (idAttrVal);
+    viewDblVal (wIndex);
 }
 
 void AttrHistory::viewDblVal (const QModelIndex& wIndex)

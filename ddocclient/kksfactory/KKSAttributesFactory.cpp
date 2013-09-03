@@ -2692,20 +2692,9 @@ QWidget * KKSAttributesFactory :: createAttrValWidget (const KKSAttrValue * pAtt
     QGridLayout * avGLay = new QGridLayout (avWidget);
     KKSAttrType::KKSAttrTypes idAttrType = aType->attrType();
     QWidget * aW (0);
-    switch (isSys)
-    {
-        case KKSIndAttr::iacIOUserAttr:
-        {
-            qDebug () << __PRETTY_FUNCTION__ << isSys;
-            break;
-        }
-        case KKSIndAttr::iacEIOUserAttr:
-        {
-            qDebug () << __PRETTY_FUNCTION__ << isSys;
-            break;
-        }
-        default: break;
-    }
+    KKSAttrValue * av = loader->loadIOAttrValue(pAttrValue,idAVal,(isSys!=KKSIndAttr::iacIOUserAttr));
+    if (!av)
+        return 0;
 
     switch (idAttrType)
     {
@@ -2741,7 +2730,7 @@ QWidget * KKSAttributesFactory :: createAttrValWidget (const KKSAttrValue * pAtt
             aW = new QLineEdit (avWidget);
             QLineEdit * lE = (qobject_cast<QLineEdit *>(aW));
             lE->setReadOnly (true);
-            lE->setText(pAttrValue->value().valueVariant().toString());
+            lE->setText(av->value().valueVariant().toString());
             break;
         }
         case KKSAttrType::atMaclabel:
@@ -2759,7 +2748,7 @@ QWidget * KKSAttributesFactory :: createAttrValWidget (const KKSAttrValue * pAtt
         {
             aW = new QDateEdit (avWidget);
             QDateEdit * dE = qobject_cast<QDateEdit *>(aW);
-            dE->setDate(pAttrValue->value().valueVariant().toDate());
+            dE->setDate(av->value().valueVariant().toDate());
             dE->setReadOnly(true);
             //QDate::fromString(pAttrValue->value().valueForInsert(), QString("dd.MM.yyyy")));
             break;
@@ -2768,7 +2757,7 @@ QWidget * KKSAttributesFactory :: createAttrValWidget (const KKSAttrValue * pAtt
         {
             aW = new QTimeEdit (avWidget);
             QTimeEdit * tE = qobject_cast<QTimeEdit *>(aW);
-            tE->setTime(pAttrValue->value().valueVariant().toTime());//QTime::fromString(pAttrValue->value().valueForInsert(), QString("hh.mm.ss")));
+            tE->setTime(av->value().valueVariant().toTime());//QTime::fromString(pAttrValue->value().valueForInsert(), QString("hh.mm.ss")));
             tE->setReadOnly(true);
             break;
         }
@@ -2777,12 +2766,13 @@ QWidget * KKSAttributesFactory :: createAttrValWidget (const KKSAttrValue * pAtt
             aW = new QDateTimeEdit (avWidget);
             QDateTimeEdit * dtE = qobject_cast<QDateTimeEdit *>(aW);
             qDebug () << __PRETTY_FUNCTION__ << pAttrValue->value().valueVariant();
-            dtE->setDateTime(pAttrValue->value().valueVariant().toDateTime());//QDateTime::fromString(pAttrValue->value().valueVariant(), QString("dd.MM.yyyy hh.mm.ss")));
+            dtE->setDateTime(av->value().valueVariant().toDateTime());//QDateTime::fromString(pAttrValue->value().valueVariant(), QString("dd.MM.yyyy hh.mm.ss")));
             dtE->setReadOnly(true);
             break;
         }
         default:break;
     }
+    av->release();
     if (aW)
         avGLay->addWidget (aW, 0, 0, 1, 2);
     QSpacerItem * spItem = new QSpacerItem (80, 20, QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);

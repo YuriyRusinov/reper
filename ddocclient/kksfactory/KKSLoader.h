@@ -222,6 +222,7 @@ class _F_EXPORT KKSLoader
         KKSMap<int, KKSAGroup *> loadAvailAttrsGroups (void) const;
         
         KKSList<KKSAttrValue *> loadIOAttrValueHistory(const KKSAttrValue * av, bool forRecords = false) const;
+        KKSAttrValue * loadIOAttrValue(const KKSAttrValue * av, int idVal, bool forRecords = false) const;
         
         KKSIndicatorValue * loadIOIndicatorValue (KKSObject * io, int idIndicator) const;
         KKSIndicator * loadIndicator (int idIndicator) const;

@@ -5924,9 +5924,78 @@ KKSList<KKSAttrValue *> KKSLoader::loadIOAttrValueHistory(const KKSAttrValue * a
         avList.append(attr);
         attr->release();
     }
-    
+    delete res;
     return avList;
 
+}
+
+KKSAttrValue * KKSLoader::loadIOAttrValue(const KKSAttrValue * av, int idVal, bool forRecords) const
+{
+    KKSList<KKSAttrValue *> avList;
+
+    if(!av || av->id() <= 0)
+        return 0;
+
+    QString sql;
+    
+    if(forRecords)
+        sql = QString ("select * from getRecAttrValue(%1)").arg (idVal);
+    else
+        sql = QString ("select * from getIOAttrValue(%1)").arg (idVal);
+
+    KKSResult * res = db->execute (sql);
+    int cnt = res ? res->getRowCount() : 0;
+    if (!res || cnt != 1)
+    {
+        if (res)
+            delete res;
+        return 0;
+    }
+
+    KKSCategoryAttr * a = const_cast<KKSCategoryAttr*>(av->attribute());
+
+    KKSAttrValue * attr = new KKSAttrValue();
+    attr->setAttribute(a);
+
+    int row = 0;
+    KKSValue v = constructValue(res->getCellAsString(row, 3), a);
+    if(!v.isValid())
+    {
+        qWarning("Value for attribute is NOT valid! Value = %s, idAttrValue= %d ",
+                    res->getCellAsString(row, 3).toLocal8Bit().data(),
+                    res->getCellAsInt(row, 7)
+                );
+    }
+
+    attr->setValue(v);
+
+    //устанавливаем дополнительные характеристики значения атрибута
+    attr->setId(res->getCellAsInt(row, 7));
+    attr->setStartDateTime(res->getCellAsDateTime(row, 8));
+    attr->setStopDateTime(res->getCellAsDateTime(row, 9));
+    //attr->setMeasDateTime(res->getCellAsDateTime(row, 10));
+    attr->setInsertDateTime(res->getCellAsDateTime(row, 11));
+    attr->setDesc(res->getCellAsString(row, 15));
+
+    int idObjSrc = res->getCellAsInt(row, 12);
+    if(idObjSrc > 0){
+        KKSObject * o = loadIO(idObjSrc, true);//упрощенно
+        attr->setIOSrc(o);
+        if(o)
+            o->release();
+    }
+
+    int idObjSrc1 = res->getCellAsInt(row, 13);
+    if(idObjSrc1 > 0){
+        KKSObject * o = loadIO(idObjSrc1, true);//упрощенно
+        attr->setIOSrc1(o);
+        if(o)
+            o->release();
+    }
+
+    attr->setActual(res->getCellAsBool(row, 14));
+    delete res;
+    return attr;
 }
 
 void KKSLoader::loadAttrAttrs(KKSAttribute * a) const
