@@ -28,6 +28,7 @@
 #include <QHeaderView>
 #include <QPushButton>
 #include <QSpacerItem>
+#include <QHBoxLayout>
 
 #include <KKSAttributesEditor.h>
 #include <KKSObjEditor.h>
@@ -2670,7 +2671,7 @@ void KKSAttributesFactory :: viewAttrValue (const KKSAttrValue * av, int idAVal,
 {
     if (!av || idAVal < 0)
         return;
-    qDebug () << __PRETTY_FUNCTION__ << av->id() << idAVal << isSys << pWidget;
+    //qDebug () << __PRETTY_FUNCTION__ << av->id() << idAVal << isSys << pWidget;
     QWidget * avW = createAttrValWidget (av, idAVal, isSys, pWidget, Qt::Window);
     if (!avW)
         return;
@@ -2775,11 +2776,14 @@ QWidget * KKSAttributesFactory :: createAttrValWidget (const KKSAttrValue * pAtt
     av->release();
     if (aW)
         avGLay->addWidget (aW, 0, 0, 1, 2);
-    QSpacerItem * spItem = new QSpacerItem (80, 20, QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
-    avGLay->addItem(spItem, 1, 0, 1, 1);
+    QHBoxLayout * buttonsLay = new QHBoxLayout;
+    //QSpacerItem * spItem = new QSpacerItem (20, 80, QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
+    //avGLay->addItem(spItem, 1, 0, 1, 1);
+    buttonsLay->addStretch(1);
     QPushButton * pbClose = new QPushButton (tr("&Close"), avWidget);
     connect (pbClose, SIGNAL (clicked()), avWidget, SLOT (close()));
-    avGLay->addWidget(pbClose, 1, 1, 1, 1);
+    buttonsLay->addWidget(pbClose);
+    avGLay->addLayout (buttonsLay, 1, 0, 1, 2, Qt::AlignJustify | Qt::AlignBottom);//addWidget(pbClose, 1, 1, 1, 1);
     return avWidget;
 }
 

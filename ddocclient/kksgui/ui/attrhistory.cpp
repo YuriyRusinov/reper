@@ -10,6 +10,7 @@
 #include <QMenu>
 #include <QHeaderView>
 #include <QContextMenuEvent>
+#include <QKeyEvent>
 #include <QPoint>
 #include <QAction>
 #include <QKeySequence>
@@ -51,6 +52,8 @@ AttrHistory::AttrHistory (const KKSList<KKSAttrValue*> & histlist, QWidget *pare
     QAbstractItemDelegate * iDeleg = new KKSItemDelegate();
     UI->tvHistory->setItemDelegate(iDeleg);
     connect (aViewVals, SIGNAL(triggered()), this, SLOT (viewVal()) );
+    connect (UI->pbUp, SIGNAL(clicked()), this, SLOT (upClicked()) );
+    connect (UI->pbDown, SIGNAL (clicked()), this, SLOT (downClicked()) );
     connect (UI->pbClose, SIGNAL(clicked()), this, SLOT (reject()) );
     connect (UI->tvHistory, SIGNAL (doubleClicked(const QModelIndex&)), this, SLOT (viewDblVal (const QModelIndex&)) );
 }
@@ -245,5 +248,23 @@ void AttrHistory::viewDblVal (const QModelIndex& wIndex)
 {
     QModelIndex vInd = wIndex.sibling(wIndex.row(), 0);
     int idAttrVal = vInd.data(Qt::UserRole).toInt();
-    emit viewAttrValue (idAttrVal);
+    emit viewAttrValue (idAttrVal, UI->tvHistory->viewport());
+}
+
+void AttrHistory::upClicked (void)
+{
+    QKeyEvent * kUpEvent = new QKeyEvent (QEvent::KeyPress, Qt::Key_Up, Qt::NoModifier);
+    (qobject_cast<QObject *>(UI->tvHistory))->event (kUpEvent);
+    //QCoreApplication::sendEvent (UI->tvHistory, kUpEvent);
+    //this->keyPressEvent(kUpEvent);
+    delete kUpEvent;
+}
+
+void AttrHistory::downClicked (void)
+{
+    QKeyEvent * kDownEvent = new QKeyEvent (QEvent::KeyPress, Qt::Key_Down, Qt::NoModifier);
+    (qobject_cast<QObject *>(UI->tvHistory))->event (kDownEvent);
+    //QCoreApplication::sendEvent (UI->tvHistory, kDownEvent);
+    //this->keyPressEvent(kUpEvent);
+    delete kDownEvent;
 }

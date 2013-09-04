@@ -33,6 +33,8 @@ public:
 private slots:
     void viewVal (void);
     void viewDblVal (const QModelIndex&);
+    void upClicked (void);
+    void downClicked (void);
 
 protected:
     //
@@ -47,7 +49,7 @@ private:
     void view(const KKSList<KKSAttrValue*> &);
 
 signals:
-    void viewAttrValue (int);
+    void viewAttrValue (int, QWidget *);
 
 private:
     //

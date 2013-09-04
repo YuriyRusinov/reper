@@ -45,7 +45,7 @@ private slots:
     void viewHistory(const KKSList<KKSAttrValue*> & history);
     void pbHistoryClicked();
     
-    void viewAttrVal (int idAVal);
+    void viewAttrVal (int idAVal, QWidget * parent=0);
 
 signals:
     void viewIOSrc (KKSObject*, QWidget *);
