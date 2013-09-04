@@ -13,6 +13,8 @@ declare
 
     idCategory int4;
     idCatAttr int4;
+
+    idAttrValue int4;
 begin
 
     select id_io_category into idCategory from f_sel_io_objects(idObject) where id = idObject;
@@ -22,18 +24,20 @@ begin
     end if;
 
     if(ioValue isnull) then
-        return 1;
+        return 0;
     end if;
 
     idCatAttr = acGetAttrCategoryId(idCategory, idAttr);
 
-    insert into attrs_values(id_io_object, id_attr_category, value, start_time, stop_time, id_io_object_src, id_io_object_src1, description)
-    values (idObject, idCatAttr, ioValue, iStartTime, iStopTime, iIdObjectSrc, iIdObjectSrc1, iDesc);
+    select getNextSeq('attrs_values', 'id') into idAttrValue;
+
+    insert into attrs_values(id, id_io_object, id_attr_category, value, start_time, stop_time, id_io_object_src, id_io_object_src1, description)
+    values (idAttrValue, idObject, idCatAttr, ioValue, iStartTime, iStopTime, iIdObjectSrc, iIdObjectSrc1, iDesc);
 --    if(FOUND = FALSE) then
 --        return -1;
 --    end if;
 
-    return 1;
+    return idAttrValue;
 
 end
 $BODY$
@@ -91,7 +95,7 @@ declare
 begin
 
     if(idObject isnull or uniqueId isnull or ioValue isnull) then
-        return 1;
+        return 0;
     end if;
     
     for r in select id, id_a_type, table_name from attributes where unique_id = uniqueId

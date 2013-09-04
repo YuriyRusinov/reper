@@ -21,7 +21,7 @@ begin
         return 0;
     end if;
 
-    select getNextSeq('tbl_rec_attrs_values', 'id') into idRecAttrValue;
+    select getNextSeq('rec_attrs_values', 'id') into idRecAttrValue;
 
     insert into rec_attrs_values(id, id_record, id_attr_category, value, start_time, stop_time, id_io_object_src, id_io_object_src1, description)
     values (idRecAttrValue, idRec, idCategoryAttr, ioValue, iStartTime, iStopTime, iIdObjectSrc, iIdObjectSrc1, iDesc);

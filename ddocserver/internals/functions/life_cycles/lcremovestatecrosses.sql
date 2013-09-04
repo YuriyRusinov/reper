@@ -8,6 +8,11 @@ declare
     r RECORD;
 begin
 
+    if(excludes isnull) then
+        delete from state_crosses where id_life_cycle = idLifeCycle;
+        return 1;
+    end if;
+
     delete from state_crosses 
     where 
         id_life_cycle = idLifeCycle 

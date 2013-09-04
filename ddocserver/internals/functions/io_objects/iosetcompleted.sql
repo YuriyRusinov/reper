@@ -5,7 +5,8 @@ declare
     oper alias for $2;
 begin
 
-    update io_objects set is_completed = oper where id = idObject;
+    update io_objects set is_completed = oper where id = idObject;    -- oper = 1 - after insert
+                                                                      -- oper = 2 - after update 
     --if(FOUND = FALSE) then
     --    return 0;
     --end if;

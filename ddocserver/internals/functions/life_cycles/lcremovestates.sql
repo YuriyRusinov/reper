@@ -8,6 +8,11 @@ declare
     r RECORD;
 begin
 
+    if(excludes isnull) then
+        delete from life_cycle_io_states where id_life_cycle = idLifeCycle;
+        return 1;
+    end if;
+
     delete from life_cycle_io_states 
     where 
         id_life_cycle = idLifeCycle 

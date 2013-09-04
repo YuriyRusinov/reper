@@ -34,7 +34,10 @@ begin
             av.is_actual,
             av.description
         from 
-            (tbl_rec_attrs_values av inner join attrs_categories ac on (av.id_attr_category = ac.id) inner join attributes a on (ac.id_io_attribute=a.id and av.id_record = idRecord and av.id_attr_category = idAttrCategory and av.id=idAttrValue))
+            (f_sel_rec_attrs_values(idRecord) av 
+                inner join attrs_categories ac on (av.id_attr_category = ac.id) 
+                inner join attributes a on (ac.id_io_attribute=a.id and av.id_record = idRecord and av.id_attr_category = idAttrCategory and av.id=idAttrValue)
+            )
     loop
         return next r;
     end loop;

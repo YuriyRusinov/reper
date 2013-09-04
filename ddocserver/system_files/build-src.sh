@@ -144,8 +144,9 @@ make &&
 make install &&
 
 cd $SYS_FILES_ABS &&
-CONF_FILES="$SYS_FILES_ABS/pg_hba.conf $SYS_FILES_ABS/postgresql.conf"
-sudo cp -f $CONF_FILES $PGDATA
+#CONF_FILES="$SYS_FILES_ABS/pg_hba.conf $SYS_FILES_ABS/postgresql.conf"
+sudo cp -f $SYS_FILES_ABS/pg_hba.conf $PGDATA &&
+sudo cp -f $SYS_FILES_ABS/postgresql.conf $PGDATA &&
 
 printf "#!/bin/sh\n" > ./ddocserver-$VERSION &&
 printf "# ddocserver-$VERSION This is the init script for starting up the PostgreSQL\n" >> ./ddocserver-$VERSION &&
@@ -158,9 +159,9 @@ printf "# processname: postmaster\n" >> ./ddocserver-$VERSION &&
 printf "# pidfile: /var/run/postmaster.pid\n" >> ./ddocserver-$VERSION &&
 
 printf "\nPGVERSION=$PGSQL_VER\nPG_PREFIX=$PG_PREFIX\nPGPORT=$PORT\n\n" >> ./ddocserver-$VERSION &&
-cat ./postgresql.orig >> ./ddocserver-$VERSION &&
-chmod a+x ./ddocserver-$VERSION &&
-cp ./ddocserver-$VERSION /etc/init.d/ 
+cat $SYS_FILES_ABS/postgresql.orig >> $SYS_FILES_ABS/ddocserver-$VERSION &&
+chmod a+x $SYS_FILES_ABS/ddocserver-$VERSION &&
+sudo cp $SYS_FILES_ABS/ddocserver-$VERSION /etc/init.d/ 
 
 OS_NAME=`uname -a | grep -o gentoo`
 SERVICE_ADDED=0

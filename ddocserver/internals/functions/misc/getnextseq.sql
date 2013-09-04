@@ -18,12 +18,15 @@ begin
         --seqName := 'kks_roles' || '_' || pkName || '_seq';
         seqTableName := 'kks_roles'; -- || '_' || pkName || '_seq';
     else
-        if(substr(tableName, 1, 4) = 'tbl_') then
+        if(substr(tableName, 1, 4) = 'tbl_' or
+           tableName = 'rec_attrs_values' or
+           tableName = 'attrs_values' 
+          ) then
             --seqName := tableName || '_' || pkName || '_seq';
             seqTableName := tableName;-- || '_' || pkName || '_seq';
         else
 
-            select f_is_view_exist(tableName) into isExist; --≈сли представление с таким названием существует, то это означает, что реальна€ таблица имеет название с префиксом tbl_
+            select f_is_view_exist(tableName) into isExist; --if view with given name is exist this means that the real table has name with prefix tbl_
             if(isExist = 1) then
                 --seqName := 'tbl_' || tableName || '_' || pkName || '_seq';
                 seqTableName := 'tbl_' || tableName;-- || '_' || pkName || '_seq';
