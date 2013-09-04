@@ -17,8 +17,7 @@
 
 #include <KKSAttrValue.h>
 #include <KKSObject.h>
-//#include <qt4/QtGui/qheaderview.h>
-//#include <qheaderview.h>
+#include <KKSAttrHistModel.h>
 
 #include "attrhistory.h"
 #include "ui_attr_history.h"
