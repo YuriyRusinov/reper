@@ -111,6 +111,10 @@ void KKSDbgOutputWidget :: printMessage(Criticality c, const QString & message)
         if(m_logWidgetCursor->atEnd())
             m_logWidget->verticalScrollBar()->setValue(m_logWidget->verticalScrollBar()->maximum());
     }
+    if(m_logWidget->horizontalScrollBar()){
+        int v = m_logWidget->horizontalScrollBar()->minimum();
+        m_logWidget->horizontalScrollBar()->setValue(v);
+    }
 
     m_criticality = oldCriticality;
     //m_message = oldMessage;

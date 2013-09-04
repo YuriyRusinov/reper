@@ -1044,7 +1044,7 @@ int JKKSLoader :: insertDocument (JKKSDocument *doc) const
             attr_ier = attrRes->getCellAsInt (0, 0);
             delete attrRes;
         }
-        if (attr_ier <= 0){
+        if (attr_ier < 0){
             qWarning () << __PRETTY_FUNCTION__ << "ERROR! ioInsertAttrEx() for document with UID = " << doc->uid() << " failed!";
             return ERROR_CODE;
         }

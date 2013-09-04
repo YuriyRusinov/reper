@@ -90,7 +90,7 @@ bool KKSPGDatabase::connect( QString _ipServer,
     
     if( !connected() ){
         char * err = PQerrorMessage(conn);
-        qWarning() << err;
+        qCritical() << err;
 
         return connected();
     }
@@ -120,20 +120,20 @@ bool KKSPGDatabase::connect( QString _ipServer,
 #endif
     
     if(!execute("set client_encoding to utf8")){
-        qWarning("cannot set client_encoding to utf8");
+        qCritical("cannot set client_encoding to utf8");
         disconnect();
         return connected();
     }
 
     if(!execute("select f_set_all_schemas_visible()")){
-        qWarning("cannot set search_path to public, dic, nub");
+        qCritical("cannot set search_path to public, dic, nub");
         disconnect();
         return connected();
     }
     
 
     if(!execute("select createTempTables()")){
-        qWarning("cannot execute createTempTables()");
+        qCritical("cannot execute createTempTables()");
         disconnect();
         return connected();
     }
@@ -143,7 +143,7 @@ bool KKSPGDatabase::connect( QString _ipServer,
         snprintf(q, 99, "select setCurrentDl(%d)", idCurrentDl);
         if(!execute(q)){
             delete[] q;
-            qWarning("cannot execute setCurrentDl()");
+            qCritical("cannot execute setCurrentDl()");
             disconnect();
             return connected();
         }
@@ -449,7 +449,7 @@ KKSResult* KKSPGDatabase::execParams(const char* command,
     if ( status != KKSResult::CommandOk && status != KKSResult::TuplesOk )
     {
         fprintf(stderr, "PQdatabase: %s SQL: %s\n", _res->errorMessage().toLocal8Bit().constData(), command);
-        qWarning() << _res->errorMessage();
+        qCritical() << _res->errorMessage() << " SQL: " << command;
         delete _res;
         return NULL;
     }
@@ -504,7 +504,7 @@ KKSResult * KKSPGDatabase::prepare(
     if ( status != KKSResult::CommandOk && status != KKSResult::TuplesOk )
     {
         fprintf(stderr, "PQdatabase: %s SQL: %s\n", _res->errorMessage().toLocal8Bit().constData(), query);
-        qWarning() << _res->errorMessage();
+        qCritical() << _res->errorMessage() << " SQL: " << query;
         delete _res;
         return NULL;
     }
@@ -552,7 +552,7 @@ KKSResult * KKSPGDatabase::execPrepared(
 
     if ( status != KKSResult::CommandOk && status != KKSResult::TuplesOk )
     {
-        qWarning() << _res->errorMessage();
+        qCritical() << _res->errorMessage();
         delete _res;
         return NULL;
     }
@@ -733,7 +733,7 @@ bool KKSPGDatabase::_exec( const char * sql, KKSPGResult ** _res ) const
     if ( status != KKSResult::CommandOk && status != KKSResult::TuplesOk )
     {
         //fprintf(stderr, "PQdatabase: %s SQL: %s\n", (*_res)->errorMessage().toLocal8Bit().constData(), sql);
-        qWarning("PQdatabase: %s SQL: %s\n", (*_res)->errorMessage().toLocal8Bit().constData(), sql);
+        qCritical("PQdatabase: %s SQL: %s\n", (*_res)->errorMessage().toLocal8Bit().constData(), sql);
         delete *_res;
         return FALSE;
     }

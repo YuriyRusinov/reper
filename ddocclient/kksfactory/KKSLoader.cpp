@@ -363,6 +363,7 @@ QString KKSLoader::loadColumnValue(const KKSIndAttr * a,
     }
 
     value = res->getCellAsString(0, 0);
+    delete res;
 
     return value;
 }
@@ -2860,6 +2861,37 @@ QString KKSLoader::parseFilter(const KKSFilter * f, const QString & tableName, Q
     }
     else
         sql += QString(" %1.%2 ").arg(tableName).arg(code);
+
+    
+    //если в качестве атрибута в фильтре используетс€ "ссылка на элемент справочника",
+    //необходимо определить, как называетс€ поле, на которое ссылаетс€ внешний ключ.
+    //это может быть поле, отличное от id
+    //в этом случае нам надо из Ѕƒ подгрузить значение этого пол€, поскольку у нас в KKSFilter::values() содержитс€ значение только пол€ id
+    if(a->type()->attrType() == KKSAttrType::atList){
+        if(!a->refColumnName().isEmpty() && a->refColumnName() != "id"){
+            QString sql = QString("select \"%1\" from %2 where id = %3")
+                                    .arg(a->refColumnName())
+                                    .arg(a->tableName())
+                                    .arg(values.at(0)->valueForInsert());
+
+            KKSResult * res = db->execute(sql);
+            if(!res)
+                return QString::null;
+
+            int count = res->getRowCount();
+            if(count != 1){
+                qWarning("The column value does not present in table!");
+                delete res;
+                return QString::null;
+            }
+
+            QString val = res->getCellAsString(0, 0);
+            delete res;
+            KKSValue * v = const_cast<KKSValue *>(values.at(0));
+            v->setValue(val, KKSAttrType::atList);
+
+        }
+    }
 
     QString str;
     switch (oper){

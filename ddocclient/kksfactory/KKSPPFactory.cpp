@@ -1055,7 +1055,7 @@ int KKSPPFactory::insertAttrValues(const KKSObject * io) const
 
     int ok = res->getCellAsInt(0, 0);
     delete res;
-    if(ok != 1)
+    if(ok < 0)
         return ERROR_CODE;
 
     if(!sqlEx.isEmpty()){

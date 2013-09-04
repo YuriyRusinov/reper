@@ -290,7 +290,7 @@ int DBSynchronizer::insertAttrs(int idObject, const QList<QPair<int, QString> > 
             attr_ier = attrRes->getCellAsInt (0, 0);
             delete attrRes;
         }
-        if (attr_ier <= 0){
+        if (attr_ier < 0){
             UI->teLog->setPlainText(UI->teLog->toPlainText() + 
 				                    tr("An ERROR was occured while inserting metadata values for IO in DynamicDocs database!\n") + 
 									QString("idObject = %1, idAttribute = %2, value = %3 \n").arg(idObject).arg(attr.first).arg(attr.second) );
