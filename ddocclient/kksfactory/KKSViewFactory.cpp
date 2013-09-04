@@ -2232,7 +2232,7 @@ void KKSViewFactory::getSearchTemplates (KKSLoader * loader, QAbstractItemModel 
         searchTModel->setData (wIndex, st->name(), Qt::DisplayRole);
         searchTModel->setData (wIndex, st->id (), Qt::UserRole);
         searchTModel->setData (wIndex, 0, Qt::UserRole+USER_ENTITY);
-        searchTModel->setData (wIndex, QIcon(":/ddoc/rubric.png"), Qt::DecorationRole);
+        searchTModel->setData (wIndex, QIcon(":/ddoc/rubric.png").pixmap(24, 24), Qt::DecorationRole);
         QSize searchRow = searchTModel->data (wIndex, Qt::SizeHintRole).toSize();
         searchRow.rheight() = 24;
         searchTModel->setData (wIndex, searchRow, Qt::SizeHintRole);
@@ -2252,7 +2252,7 @@ void KKSViewFactory::getSearchTemplates (KKSLoader * loader, QAbstractItemModel 
             searchTModel->setData (wsIndex, p.value()->id (), Qt::UserRole);
             searchTModel->setData (wsIndex, p.value()->idAuthor (), Qt::UserRole+1);
             searchTModel->setData (wsIndex, 1, Qt::UserRole+USER_ENTITY);
-            searchTModel->setData (wsIndex, QIcon(":/ddoc/rubric_item.png"), Qt::DecorationRole);
+            searchTModel->setData (wsIndex, QIcon(":/ddoc/rubric_item.png").pixmap(24, 24), Qt::DecorationRole);
             QSize searchRow = searchTModel->data (wsIndex, Qt::SizeHintRole).toSize();
             searchRow.rheight() = 24;
             searchTModel->setData (wsIndex, searchRow, Qt::SizeHintRole);

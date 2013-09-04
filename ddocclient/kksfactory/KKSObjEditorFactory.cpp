@@ -7103,15 +7103,15 @@ void KKSObjEditorFactory :: updateSearchTempl (const QModelIndex& wIndex, QAbstr
             if(searchMod){
                 int nr = searchMod->rowCount(pIndex);
                 searchMod->insertRows (nr, 1, pIndex);
+                QModelIndex wIndex = searchMod->index (nr, 0, pIndex);
+                searchMod->setData(wIndex, QIcon(":/ddoc/rubric_item.png").pixmap(24, 24), Qt::DecorationRole);
                 if (searchMod->columnCount(pIndex) >= 1)
                 {
-                    QModelIndex wIndex = searchMod->index (nr, 0, pIndex);
                     searchMod->setData (wIndex, stName, Qt::DisplayRole);
                     searchMod->setData (wIndex, res, Qt::UserRole);
                 }
                 else
                 {
-                    QModelIndex wIndex = searchMod->index (nr, 0, pIndex);
                     searchMod->setData (wIndex, res, Qt::DisplayRole);
                     searchMod->setData (wIndex, res, Qt::UserRole);
                     
@@ -7241,7 +7241,7 @@ void KKSObjEditorFactory :: addSearchTemplateType (const QModelIndex& parent, QA
         searchMod->setData (wIndex, p.value()->name(), Qt::DisplayRole);
         searchMod->setData (wIndex, p.value()->id (), Qt::UserRole);
         searchMod->setData (wIndex, 0, Qt::UserRole+USER_ENTITY);
-        searchMod->setData (wIndex, QIcon(":/ddoc/rubric.png"), Qt::DecorationRole);
+        searchMod->setData (wIndex, QIcon(":/ddoc/rubric.png").pixmap(24, 24), Qt::DecorationRole);
         if (sortMod)
         {
             int logIndex = stForm->getIndicatorSection();

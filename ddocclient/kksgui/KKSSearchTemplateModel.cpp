@@ -29,7 +29,7 @@ QVariant KKSSearchTemplateModel :: data (const QModelIndex &index, int role) con
     if (!index.isValid())
         return QVariant();
 
-    if (role != Qt::DisplayRole && role != Qt::UserRole)
+    if (role != Qt::DisplayRole && role != Qt::UserRole && role != Qt::DecorationRole)
         return QVariant();
     
     KKSSearchTreeItem *item = static_cast<KKSSearchTreeItem*>(index.internalPointer());
@@ -49,6 +49,13 @@ QVariant KKSSearchTemplateModel :: data (const QModelIndex &index, int role) con
             case 4: return item->getSearchTemplate()->type()->name(); break;
             default: return QVariant();
         }
+    }
+    else if (role == Qt::DecorationRole)
+    {
+        if (item->getSearchTemplateType())
+            return QIcon(":/ddoc/rubric.png").pixmap(24, 24);
+        else
+            return QIcon(":/ddoc/rubric_item.png").pixmap(24, 24);
     }
     else
         return QVariant ();
