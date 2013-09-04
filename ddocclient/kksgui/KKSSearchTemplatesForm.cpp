@@ -341,3 +341,20 @@ void KKSSearchTemplatesForm :: setFilterSt (const QString& text)
     sortTMod->setFilterRegExp (text);
 //    sortTMod->setFilterKeyColumn (-1);
 }
+
+int KKSSearchTemplatesForm :: getIndicatorSection (void) const
+{
+    QHeaderView * hv = searchView->header();
+    if (!hv)
+        return -1;
+    int logIndex = hv->sortIndicatorSection();
+    return logIndex;
+}
+
+Qt::SortOrder KKSSearchTemplatesForm :: getIndicatorOrder (void) const
+{
+    QHeaderView * hv = searchView->header();
+    if (!hv)
+        return Qt::DescendingOrder;
+    return hv->sortIndicatorOrder();
+}

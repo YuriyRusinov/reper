@@ -30,6 +30,9 @@ public:
     void setDataModel (QAbstractItemModel * mod);
     void setUserId (int iduser);
     QItemSelectionModel * selectionModel (void) const;
+    
+    int getIndicatorSection (void) const;
+    Qt::SortOrder getIndicatorOrder (void) const;
 
 private slots:
     void addEmptySearchTemplate (void);

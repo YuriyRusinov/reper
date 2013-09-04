@@ -4218,7 +4218,7 @@ int KKSPPFactory :: insertSearchCriterion (KKSFilter * f) const
         value = val->value ();
         QRegExp reg ("(')");
         if (value.contains (reg))
-            value.replace (reg, "\\'");
+            value.replace (reg, "\''");
     }
     int idType = 1;//val->type ();
     int idOperation = f->operation();

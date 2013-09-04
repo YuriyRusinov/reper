@@ -7082,19 +7082,6 @@ void KKSObjEditorFactory :: updateSearchTempl (const QModelIndex& wIndex, QAbstr
         attrsIO = loader->loadIOUsedAttrs ();//атрибуты информационных объектов грузим только если обрабатываем справоник ИО
     KKSSearchTemplateForm * filterForm = GUISearchTemplateInit (st, c, false, tableName, isMod, pWidget);
     //new KKSSearchTemplateForm (c, tableName, attrsIO, false, st, isMod, pWidget);
-/*
-    QAbstractItemModel * searchTypesMod = new QStandardItemModel (0, 1);
-    searchTypesMod->setHeaderData(0, Qt::Horizontal, tr("Search template type name"), Qt::DisplayRole);
-    KKSViewFactory::getSearchTemplates(loader, searchTypesMod, QModelIndex(), false);
-    filterForm->setSearchTemplateModel (searchTypesMod);
-    int idSearchType = st->type()->id();
-    QModelIndex tIndex = KKSViewFactory::searchModelIndex(searchTypesMod, idSearchType, QModelIndex(), Qt::UserRole);
-    filterForm->selectTypeInd (tIndex);
-    QModelIndex catInd;
-    QAbstractItemModel * catModel = initSearchCatsModel (st, catInd);
-    filterForm->setCatModel (catModel);
-    filterForm->setCatInd (catInd);
-*/
     connect (filterForm, SIGNAL (saveSearchCriteria (KKSSearchTemplate *, KKSFilterGroup *, const KKSCategory *)), this, SLOT (saveSearchCriteria (KKSSearchTemplate *, KKSFilterGroup *, const KKSCategory *)) );
     //connect (filterForm, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QComboBox *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QComboBox *)) );
     connect (filterForm, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QAbstractItemModel *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QAbstractItemModel *)) );
@@ -7140,113 +7127,6 @@ void KKSObjEditorFactory :: updateSearchTempl (const QModelIndex& wIndex, QAbstr
     delete filterForm;
 
     st->release ();
-/*
-    KKSFilterGroup * m_group = st->getMainGroup();
-    if (!m_group)
-        return;
-    int oldIdGroup = m_group->id();
-    int idUser = loader->getUserId ();
-    int idAuthor = st->idAuthor ();
-    if (idUser != 1 && idAuthor != idUser)
-    {
-        st->release ();
-        qWarning() << tr ("Only admin and author can change search template");
-        QMessageBox::warning (pWidget, tr ("Search templates"), tr ("Only admin and author can change search template"), QMessageBox::Ok, QMessageBox::NoButton);
-        return;
-    }
-
-    QString oldName = st->name();
-    SaveSearchTemplateForm * stForm = GUISearchTemplate (st);
-    if (!stForm || stForm->exec() != QDialog::Accepted)
-        return;
-    QString stName = stForm->getName();//QInputDialog::getText (pWidget, tr ("Search template"), tr ("Search template name :"), QLineEdit::Normal, oldName, &ok);
-    if (!stName.isEmpty() )//&& oldName != stName)
-    {
-        if (oldName != stName)
-            st->setName (stName);
-
-        KKSObject * o = loader->loadIO (IO_IO_ID, true);
-        if (!o)
-        {
-            st->release ();
-            return;
-        }
-
-        KKSCategory * c = o->category()->tableCategory();
-        if (!c)
-        {
-            o->release();
-            st->release ();
-            return;
-        }
-
-        KKSMap<int, KKSAttribute *> attrsIO;
-        attrsIO = loader->loadIOUsedAttrs ();
-        
-        KKSFiltersEditorForm *filterForm = new KKSFiltersEditorForm (c, "io_objects", attrsIO, false, st, pWidget);
-        
-//        connect (filterForm, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QComboBox *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QComboBox *)) );
-        connect (filterForm, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QAbstractItemModel *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QAbstractItemModel *)) );
-        
-        if (stName.isEmpty())
-            connect (filterForm, SIGNAL (saveSearchCriteria (KKSSearchTemplate *, KKSFilterGroup *, const KKSCategory *)), this, SLOT (saveSearchCriteria (KKSSearchTemplate *, KKSFilterGroup *, const KKSCategory *)) );
-        if (filterForm->exec () == QDialog::Accepted)
-        {
-            int res = filterForm->searchT()->id ();
-            if (res > 0)
-            {
-                KKSSearchTemplate * stdb = filterForm->searchT();//loader->loadSearchTemplate (res);
-                KKSFilterGroup * m_group = stdb->getMainGroup();//st->getMainGroup();// stdb->getMainGroup();
-                qDebug () << __PRETTY_FUNCTION__ << oldIdGroup << m_group->filters().count();
-                if (m_group)
-                {
-                    m_group->setId (-1);
-                    int stres = ppf->insertSearchGroup (-1, m_group);
-                    qDebug () << __PRETTY_FUNCTION__ << stres << m_group->filters().count();
-                    stdb->setMainGroup (m_group);
-                }
-                //saveSearchCriteria (stdb->getMainGroup(), c);
-                int stres = ppf->updateSearchTemplate (stdb);
-                if (stres > 0)
-                {
-                    stName = stdb->name ();
-                    stdb->release ();
-                    if (searchMod->columnCount() == 1)
-                    {
-                        searchMod->setData (wIndex, stName, Qt::DisplayRole);
-                        searchMod->setData (wIndex, stres, Qt::UserRole);
-                    }
-                    else
-                    {
-                        QModelIndex wcIndex = wIndex.sibling (wIndex.row(), 0);
-                        searchMod->setData (wcIndex, stName, Qt::DisplayRole);
-                        searchMod->setData (wcIndex, res, Qt::UserRole);
-
-                        wcIndex = wIndex.sibling (wIndex.row(), 2);
-                        searchMod->setData (wcIndex, stdb->creationDatetime().toString("dd.MM.yyyy"), Qt::DisplayRole);
-                        searchMod->setData (wcIndex, res, Qt::UserRole);
-                        
-                        wcIndex = wIndex.sibling (wIndex.row(), 3);
-                        searchMod->setData (wcIndex, stdb->categoryName(), Qt::DisplayRole);
-                        searchMod->setData (wcIndex, res, Qt::UserRole);
-
-                        wcIndex = wIndex.sibling (wIndex.row(), 4);
-                        searchMod->setData (wcIndex, stdb->type()->name(), Qt::DisplayRole);
-                        searchMod->setData (wcIndex, res, Qt::UserRole);
-                    }
-                }
-                //int dres = ppf->deleteSearchGroup (oldIdGroup);//m_group->id());
-                //qDebug () << __PRETTY_FUNCTION__ << dres;
-            }
-        }
-
-        filterForm->setParent (0);
-        delete filterForm;
-        o->release ();
-
-    }
-*/
-//    st->release ();
 }
 
 /* Метод удаляет существующий шаблон поиска с идентификатором в wIndex и соответствующую запись в модель searchMod.
@@ -7353,12 +7233,21 @@ void KKSObjEditorFactory :: addSearchTemplateType (const QModelIndex& parent, QA
         KKSObjectExemplar * pObj = editor->getObjectEx();
         KKSMap<int, KKSSearchTemplateType *> stt = loader->loadSearchTemplateTypes();
         KKSMap<int, KKSSearchTemplateType *>::const_iterator p = stt.constFind (pObj->id());
-        searchMod->insertRows (0, 1, parent);
-        QModelIndex wIndex = searchMod->index (0, 0, parent);
+        KKSSearchTemplatesForm * stForm = qobject_cast<KKSSearchTemplatesForm *> (this->sender());
+        QSortFilterProxyModel * sortMod = stForm ? qobject_cast<QSortFilterProxyModel *>(stForm->dataModel()) : 0;
+        int nr = searchMod->rowCount (parent);
+        searchMod->insertRows (nr, 1, parent);
+        QModelIndex wIndex = searchMod->index (nr, 0, parent);
         searchMod->setData (wIndex, p.value()->name(), Qt::DisplayRole);
         searchMod->setData (wIndex, p.value()->id (), Qt::UserRole);
         searchMod->setData (wIndex, 0, Qt::UserRole+USER_ENTITY);
         searchMod->setData (wIndex, QIcon(":/ddoc/rubric.png"), Qt::DecorationRole);
+        if (sortMod)
+        {
+            int logIndex = stForm->getIndicatorSection();
+            Qt::SortOrder order = stForm->getIndicatorOrder();
+            sortMod->sort(logIndex, order);
+        }
     }
     
     refObj->release ();
