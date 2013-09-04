@@ -1216,7 +1216,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                 if (V.isNull() || V.toString() == "current_timestamp")
                 {
                     v = QDateTime::currentDateTime();
-                    QVariant var(v);
+                    //QVariant var(v);
                 }
                 else
                     v = V.toDateTime ();
@@ -1250,7 +1250,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                 if (V.isNull() || V.toString() == "current_timestamp")
                 {
                     v = QTime::currentTime();
-                    QVariant var(v);
+                    //QVariant var(v);
                 }
                 else
                     v = V.toTime ();
@@ -2708,7 +2708,7 @@ QWidget * KKSAttributesFactory :: createAttrValWidget (const KKSAttrValue * pAtt
         case KKSAttrType::atComplex:
         {
             aW = new QTreeView (avWidget);
-            QAbstractItemModel * aMod = this->aValComplexModel(pAttrValue);
+            QAbstractItemModel * aMod = this->aValComplexModel(pAttrValue, av);
             (qobject_cast<QTreeView *>(aW))->setModel (aMod);
             break;
         }
@@ -2783,15 +2783,15 @@ QWidget * KKSAttributesFactory :: createAttrValWidget (const KKSAttrValue * pAtt
     return avWidget;
 }
 
-QAbstractItemModel * KKSAttributesFactory :: aValComplexModel (const KKSAttrValue * pAttrValue)
+QAbstractItemModel * KKSAttributesFactory :: aValComplexModel (const KKSAttrValue * pAttrValue, const KKSAttrValue * av)
 {
     if (!pAttrValue || !pAttrValue->attribute())
         return 0;
     QString tableName = pAttrValue->attribute()->tableName ();
-    QVariant V = pAttrValue->value().valueVariant();
+    QVariant V = av ? av->value().valueVariant() : pAttrValue->value().valueVariant();
 
     QStringList vArray = V.toStringList();
-    qDebug () << __PRETTY_FUNCTION__ << vArray << pAttrValue->id() << pAttrValue->attribute()->id();
+    //qDebug () << __PRETTY_FUNCTION__ << vArray << pAttrValue->id() << pAttrValue->attribute()->id();
     KKSObject * refIO = loader->loadIO (tableName, true);
     if (!refIO)
         return 0;
