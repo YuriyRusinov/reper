@@ -83,5 +83,7 @@
     <file>folder_edit.png</file>
     <file>folder_del.png</file>
     <file>message_stream.png</file>
+    <file>uparrow.png</file>
+    <file>downarrow.png</file>
   </qresource>
 </RCC>
