@@ -19,11 +19,13 @@ class QTimeEdit;
 class QLineEdit;
 class QTreeView;
 class QCheckBox;
+class QGroupBox;
 
 class QDate;
 class QTime;
 class QDateTime;
 class QAbstractItemModel;
+class QStackedLayout;
 
 class KKSAttrValue;
 class KKSAttribute;
@@ -49,6 +51,7 @@ private slots:
 signals:
     void prevVal (void);
     void nextVal (void);
+    void updateMod (const KKSAttrValue *, const QVariant&, QAbstractItemModel *);
 
 private:
     //
@@ -56,6 +59,14 @@ private:
     //
     KKSAttrValue * pAttrValue;
     QWidget * valWidget;
+    QStackedLayout * stLay;
+    QLineEdit * lEVal;
+    QDateEdit * dEVal;
+    QTimeEdit * tEVal;
+    QDateTimeEdit * dtEVal;
+    QTreeView * tvVal;
+    QCheckBox * chVal;
+    QGroupBox * gbVal;
 private:
     Q_OBJECT
 

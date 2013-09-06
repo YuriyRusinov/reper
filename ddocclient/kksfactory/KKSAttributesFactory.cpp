@@ -2844,3 +2844,70 @@ QAbstractItemModel * KKSAttributesFactory :: aValComplexModel (const KKSAttrValu
     refIO->release ();
     return sAttrModel;
 }
+
+void KKSAttributesFactory :: updateAttrValueModel (const KKSAttrValue * pAttrValue, const QVariant& val, QAbstractItemModel * attrValModel)
+{
+    if (!pAttrValue || !pAttrValue->attribute())
+        return;
+    QString tableName = pAttrValue->attribute()->tableName ();
+    QVariant V (val);//= av ? av->value().valueVariant() : pAttrValue->value().valueVariant();
+
+    QStringList vArray = V.toStringList();
+    //qDebug () << __PRETTY_FUNCTION__ << vArray << pAttrValue->id() << pAttrValue->attribute()->id();
+    KKSObject * refIO = loader->loadIO (tableName, true);
+    if (!refIO)
+        return;
+    KKSCategory * c = refIO->category ();
+    if (!c)
+    {
+        refIO->release ();
+        return;
+    }
+    KKSCategory * ct = c->tableCategory ();
+    if (!ct)
+    {
+        refIO->release ();
+        return;
+    }
+    KKSList<const KKSFilterGroup*> filters;
+    QString vals;
+    for (int i=0; i<vArray.count(); i++)
+    {
+        vals += vArray[i];
+        if (i < vArray.count()-1)
+            vals += ",";
+    }
+    QString value;
+    if (!vals.isEmpty())
+    {
+        value = QString ("select id from %1 where id in (%2) ").arg (tableName).arg (vals);
+    }
+    else
+    {
+        value = QString ("select id from %1 where id is null ").arg (tableName);
+    }
+    //const KKSFilter * filter = ct->createFilter ("id", value, KKSFilter::foInSQL);
+    const KKSFilter * filter = ct->createFilter (ATTR_ID, value, KKSFilter::foInSQL);
+    KKSList <const KKSFilter *> fl;
+    fl.append (filter);
+    filter->release ();
+    KKSFilterGroup * fg = new KKSFilterGroup(true);
+    fg->setFilters(fl);
+    filters.append(fg);
+    fg->release();
+    KKSMap<qint64, KKSEIOData *> eioList = loader->loadEIOList (refIO, filters);
+    refIO->release ();
+    int nr = attrValModel->rowCount();
+    attrValModel->removeRows(0, nr);
+    nr = eioList.count();
+    attrValModel->insertRows (0,nr);
+    int i=0;
+    for (KKSMap<qint64, KKSEIOData *>::const_iterator p = eioList.constBegin();
+         p != eioList.constEnd(); p++)
+    {
+        QModelIndex wIndex = attrValModel->index (i, 0);
+        attrValModel->setData(wIndex,QVariant::fromValue<KKSEIOData*>(p.value()), Qt::UserRole+1);
+        
+        ++i;
+    }
+}
