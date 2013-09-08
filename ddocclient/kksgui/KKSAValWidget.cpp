@@ -20,6 +20,11 @@
 #include <QPushButton>
 #include <QStackedLayout>
 #include <QToolButton>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QIcon>
+#include <QTextEdit>
+#include <QSizePolicy>
 
 #include <KKSAttrValue.h>
 #include <KKSAttribute.h>
@@ -29,53 +34,66 @@
 KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFlags flags)
     : QWidget (parent, flags),
       pAttrValue (_av),
-      valWidget (new QWidget()),
-      stLay (new QStackedLayout (valWidget)),
-      lEVal (new QLineEdit),
-      dEVal (new QDateEdit),
-      tEVal (new QTimeEdit),
-      dtEVal (new QDateTimeEdit),
-      tvVal (new QTreeView),
-      chVal (new QCheckBox),
-      gbVal (new QGroupBox)
+      valWidget (0),
+      lEVal (0),
+      dEVal (0),
+      tEVal (0),
+      dtEVal (0),
+      tvVal (0),
+      chVal (0),
+      gbVal (0),
+      macVal (0),
+      textEVal (0),
+      tbUp (new QToolButton),
+      tbDown (new QToolButton)
 {
     if (pAttrValue)
         pAttrValue->addRef();
     
     QGridLayout * avGLay = new QGridLayout;
     setLayout (avGLay);
-    if (pAttrValue)
-        chVal->setText (pAttrValue->attribute()->name());
-    stLay->addWidget (lEVal);
-    stLay->setAlignment(lEVal, Qt::AlignLeft | Qt::AlignVCenter);
-    stLay->addWidget (dEVal);
-    stLay->setAlignment(dEVal, Qt::AlignLeft | Qt::AlignVCenter);
-    stLay->addWidget (tEVal);
-    stLay->setAlignment(tEVal, Qt::AlignLeft | Qt::AlignVCenter);
-    stLay->addWidget (dtEVal);
-    stLay->setAlignment(dtEVal, Qt::AlignLeft | Qt::AlignVCenter);
-    stLay->addWidget (tvVal);
-    stLay->setAlignment(tvVal, Qt::AlignJustify | Qt::AlignVCenter);
-    stLay->addWidget(chVal);
-    stLay->setAlignment(chVal, Qt::AlignLeft | Qt::AlignVCenter);
-    stLay->addWidget(gbVal);
-    stLay->setAlignment(gbVal, Qt::AlignJustify | Qt::AlignVCenter);
+    //
+    // Конструируем только 1 виджет в зависимости от типа.
+    //
+    avGLay->setContentsMargins (0, 0, 0, 0);
+//    QSizePolicy leSp (QSizePolicy::Expanding, QSizePolicy::Fixed);
+//    lEVal->setSizePolicy (leSp);
+
+    tbUp->setIcon (QIcon(":/ddoc/uparrow.png"));
+    tbUp->setToolTip (tr("Previous value"));
+    tbDown->setIcon (QIcon(":/ddoc/downarrow.png"));
+    tbDown->setToolTip (tr("Next value"));
 
     const KKSAttribute * attr = pAttrValue->attribute();
     const KKSAttrType * aType = attr->type();
     KKSAttrType::KKSAttrTypes idAttrType = aType->attrType();
+    QVariant V (pAttrValue->value().valueVariant());
     switch (idAttrType)
     {
         case KKSAttrType::atBool: 
         {
-            valWidget = new QCheckBox (this);
+            chVal = new QCheckBox;
+            chVal->setText (pAttrValue->attribute()->name());
+            Qt::CheckState chState;
+            if (V.toBool())
+                chState = Qt::Checked;
+            else
+                chState = Qt::Unchecked;
+            chVal->setCheckState (chState);
+            valWidget = qobject_cast<QWidget *>(chVal);
             break;
         }
         case KKSAttrType::atCheckList:
         case KKSAttrType::atCheckListEx:
+        {
+            tvVal = new QTreeView;
+            valWidget = qobject_cast<QWidget *>(tvVal);
+            break;
+        }
         case KKSAttrType::atComplex:
         {
-            valWidget = new QTreeView (this);
+            gbVal = new QGroupBox;
+            valWidget = qobject_cast<QWidget *> (gbVal);
             break;
         }
         case KKSAttrType::atDouble:
@@ -93,53 +111,73 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
         case KKSAttrType::atRecordTextColor:
         case KKSAttrType::atRecordTextColorRef:
         {
-            lEVal->setText(pAttrValue->value().valueVariant().toString());
+            lEVal = new QLineEdit;
             lEVal->setReadOnly (true);
+            lEVal->setText(V.toString());
+            valWidget = qobject_cast<QWidget *>(lEVal);
             break;
         }
         case KKSAttrType::atMaclabel:
         {
-/*            valWidget = new QWidget (this);
-            QHBoxLayout * hLay = new QHBoxLayout (valWidget);
+            macVal = new QWidget;
+            QHBoxLayout * hLay = new QHBoxLayout (macVal);
             for (int i=0; i<2; i++)
             {
-                QLineEdit * lE = new QLineEdit (valWidget);
-                hLay->addWidget (lE);
-            }*/
+                lE[i] = new QLineEdit (macVal);
+                lE[i]->setReadOnly(true);
+                hLay->addWidget (lE[i]);
+            }
+            valWidget = macVal;
             break;
         }
         case KKSAttrType::atDate:
         {
-            dEVal->setDate(pAttrValue->value().valueVariant().toDate());
-            dEVal->setReadOnly(true);
+            dEVal = new QDateEdit;
+            dEVal->setReadOnly (true);
+            dEVal->setDate(V.toDate());
+            valWidget = qobject_cast<QWidget *>(dEVal);
             break;
         }
         case KKSAttrType::atTime:
         {
-            tEVal->setTime(pAttrValue->value().valueVariant().toTime());//QTime::fromString(pAttrValue->value().valueForInsert(), QString("hh.mm.ss")));
-            tEVal->setReadOnly(true);
+            tEVal = new QTimeEdit;
+            tEVal->setReadOnly (true);
+            tEVal->setTime(V.toTime());//QTime::fromString(pAttrValue->value().valueForInsert(), QString("hh.mm.ss")));
+            valWidget = qobject_cast<QWidget *>(tEVal);
             break;
         }
         case KKSAttrType::atDateTime:
         {
-            dtEVal->setDateTime(pAttrValue->value().valueVariant().toDateTime());//QDateTime::fromString(pAttrValue->value().valueVariant(), QString("dd.MM.yyyy hh.mm.ss")));
-            dtEVal->setReadOnly(true);
+            dtEVal = new QDateTimeEdit;
+            dtEVal->setReadOnly (true);
+            dtEVal->setDateTime(V.toDateTime());//QDateTime::fromString(pAttrValue->value().valueVariant(), QString("dd.MM.yyyy hh.mm.ss")));
+            valWidget = qobject_cast<QWidget *> (dtEVal);
+            break;
+        }
+        case KKSAttrType::atText:
+        {
+            textEVal = new QTextEdit;
+            textEVal->setReadOnly (true);
+            textEVal->setPlainText (V.toString());
+            valWidget = qobject_cast<QWidget *>(textEVal);
             break;
         }
         default:break;
     }
 
-    avGLay->addWidget (valWidget, 0, 0, 1, 1, Qt::AlignJustify | Qt::AlignVCenter);
-    QToolButton * tbUp = new QToolButton;
-    tbUp->setIcon(QIcon(":/ddoc/uparrow.png"));
+//    QSizePolicy valSp (QSizePolicy::Expanding, QSizePolicy::Preferred);
+//    valWidget->setSizePolicy (valSp);
+    avGLay->addWidget (valWidget, 0, 0, 2, 1);//, Qt::AlignJustify | Qt::AlignVCenter);
+    QVBoxLayout * vNavLay = new QVBoxLayout;
+    vNavLay->addWidget (tbUp);
+    vNavLay->addWidget (tbDown);
+    avGLay->addLayout (vNavLay, 0, 1, 2, 1, Qt::AlignVCenter);
     QHBoxLayout * buttonsLay = new QHBoxLayout;
-    //QSpacerItem * spItem = new QSpacerItem (20, 80, QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
-    //avGLay->addItem(spItem, 1, 0, 1, 1);
     buttonsLay->addStretch(1);
     QPushButton * pbClose = new QPushButton (tr("&Close"), this);
     connect (pbClose, SIGNAL (clicked()), this, SLOT (close()));
     buttonsLay->addWidget(pbClose);
-    avGLay->addLayout (buttonsLay, 1, 0, 1, 2, Qt::AlignJustify | Qt::AlignBottom);//addWidget(pbClose, 1, 1, 1, 1);
+    avGLay->addLayout (buttonsLay, , 0, 1, 2, Qt::AlignJustify | Qt::AlignBottom);//addWidget(pbClose, 1, 1, 1, 1);
 
 }
 
@@ -147,43 +185,11 @@ KKSAValWidget::~KKSAValWidget()
 {
     if (pAttrValue)
         pAttrValue->release();
-    delete gbVal;
-    delete chVal;
-    delete tvVal;
-    delete dtEVal;
-    delete tEVal;
-    delete dEVal;
-    delete lEVal;
-    delete valWidget;
-}
+    if (valWidget)
+        delete valWidget;
 
-void KKSAValWidget::setDate (const KKSAttribute * a, const QDate& D)
-{
-    
-}
-
-void KKSAValWidget::setTime (const KKSAttribute * a, const QTime& T)
-{
-    
-}
-
-void KKSAValWidget::setDateTime (const KKSAttribute * a, const QDateTime& DT)
-{
-    
-}
-
-void KKSAValWidget::setModel (const KKSAttribute * a, QAbstractItemModel * mod)
-{
-    
-}
-
-void KKSAValWidget::setCheck (const KKSAttribute * a, bool ch)
-{
-    
-}
-
-void KKSAValWidget::setText (const KKSAttribute * a, QString text)
-{
+    delete tbUp;
+    delete tbDown;
 }
 
 void KKSAValWidget::setValue (const KKSAttribute * a, QVariant val)
@@ -198,18 +204,22 @@ void KKSAValWidget::setValue (const KKSAttribute * a, QVariant val)
         case KKSAttrType::atBool: 
         {
             bool isCh = val.toBool();
-            stLay->setCurrentIndex (5);
+//            stLay->setCurrentIndex (5);
             //QCheckBox * ch = (qobject_cast<QCheckBox *>(stLay->widget(5)));
             chVal->setCheckState (isCh ? Qt::Checked : Qt::Unchecked);
             break;
         }
         case KKSAttrType::atCheckList:
         case KKSAttrType::atCheckListEx:
-        //case KKSAttrType::atComplex:
         {
             QAbstractItemModel * avMod = tvVal->model();
             emit updateMod (pAttrValue, val, avMod);
-            stLay->setCurrentIndex (4);
+//            stLay->setCurrentIndex (4);
+            break;
+        }
+        case KKSAttrType::atComplex:
+        {
+            emit updateComplexAttr (pAttrValue, val, gbVal);
             break;
         }
         case KKSAttrType::atDouble:
@@ -228,19 +238,19 @@ void KKSAValWidget::setValue (const KKSAttribute * a, QVariant val)
         case KKSAttrType::atRecordTextColorRef:
         {
             //valWidget = new QLineEdit (this);
-            stLay->setCurrentWidget (lEVal);
+            //stLay->setCurrentWidget (lEVal);
             lEVal->setText(val.toString());
             break;
         }
         case KKSAttrType::atMaclabel:
         {
-/*            valWidget = new QWidget (this);
-            QHBoxLayout * hLay = new QHBoxLayout (valWidget);
+            QList<QVariant> macList = val.toList();
+            if (macList.count() < 2)
+                break;
             for (int i=0; i<2; i++)
             {
-                QLineEdit * lE = new QLineEdit (valWidget);
-                hLay->addWidget (lE);
-            }*/
+                lE[i]->setText (macList[i].toString());
+            }
             break;
         }
         case KKSAttrType::atDate:
@@ -248,7 +258,6 @@ void KKSAValWidget::setValue (const KKSAttribute * a, QVariant val)
             //valWidget = new QDateEdit (this);
             //QDateEdit * dE = qobject_cast<QDateEdit *>(valWidget);
             dEVal->setDate(val.toDate());
-            dEVal->setReadOnly(true);
             break;
         }
         case KKSAttrType::atTime:
@@ -256,13 +265,11 @@ void KKSAValWidget::setValue (const KKSAttribute * a, QVariant val)
             //valWidget = new QTimeEdit (this);
             //QTimeEdit * tE = qobject_cast<QTimeEdit *>(valWidget);
             tEVal->setTime(val.toTime());//QTime::fromString(pAttrValue->value().valueForInsert(), QString("hh.mm.ss")));
-            tEVal->setReadOnly(true);
             break;
         }
         case KKSAttrType::atDateTime:
         {
             dtEVal->setDateTime(val.toDateTime());//QDateTime::fromString(pAttrValue->value().valueVariant(), QString("dd.MM.yyyy hh.mm.ss")));
-            dtEVal->setReadOnly(true);
             break;
         }
         default:break;
@@ -279,4 +286,12 @@ void KKSAValWidget::downVal (void)
     emit nextVal();
 }
 
-
+void KKSAValWidget::setValModel (QAbstractItemModel * valMod)
+{
+    if (!tvVal)
+        return;
+    QAbstractItemModel * oldModel = tvVal->model ();
+    tvVal->setModel (valMod);
+    if (oldModel && oldModel != valMod)
+        delete oldModel;
+}

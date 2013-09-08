@@ -6,7 +6,6 @@ SUBDIRS += \
 	http_connector \
         sync_queue_viewer \
         dyndoc_synch \
-        sync_queue_viewer \
         kksdaemon
 
 win32{

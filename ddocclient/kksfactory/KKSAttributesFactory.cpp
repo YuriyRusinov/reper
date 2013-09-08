@@ -60,6 +60,7 @@
 #include <KKSItemDelegate.h>
 #include <kksattrattreditor.h>
 #include <kkscatattreditor.h>
+#include <KKSAValWidget.h>
 
 #include <KKSFilter.h>
 #include <KKSObject.h>
@@ -2687,17 +2688,27 @@ QWidget * KKSAttributesFactory :: createAttrValWidget (const KKSAttrValue * pAtt
     if (!pAttrValue->attribute())
         return 0;
     
-    const KKSAttribute * attr = pAttrValue->attribute();
-    const KKSAttrType * aType = attr->type();
-    QWidget * avWidget = new QWidget (parent, flags);
-    QGridLayout * avGLay = new QGridLayout (avWidget);
-    KKSAttrType::KKSAttrTypes idAttrType = aType->attrType();
-    QWidget * aW (0);
     KKSAttrValue * av = loader->loadIOAttrValue(pAttrValue,idAVal,(isSys!=KKSIndAttr::iacIOUserAttr));
     if (!av)
         return 0;
+    QWidget * avWidget = new KKSAValWidget (av, parent, flags);//QWidget (parent, flags);
+    connect (avWidget, SIGNAL (updateMod (const KKSAttrValue *, const QVariant&, QAbstractItemModel *)),
+             this,
+             SLOT (updateAttrValueModel(const KKSAttrValue *, const QVariant&, QAbstractItemModel *))
+            );
+//    QGridLayout * avGLay = new QGridLayout (avWidget);
+    const KKSAttribute * a = pAttrValue->attribute();
+    const KKSAttrType * aType = a->type();
+    KKSAttrType::KKSAttrTypes idAttrType = aType->attrType();
+    if (idAttrType == KKSAttrType::atCheckList ||
+        idAttrType == KKSAttrType::atCheckListEx)
+    {
+        QAbstractItemModel * avMod = aValComplexModel (pAttrValue, av->value().valueVariant());
+        (qobject_cast<KKSAValWidget *>(avWidget))->setValModel (avMod);
+    }
+//    QWidget * aW (0);
 
-    switch (idAttrType)
+/*    switch (idAttrType)
     {
         case KKSAttrType::atBool: 
         {
@@ -2784,15 +2795,16 @@ QWidget * KKSAttributesFactory :: createAttrValWidget (const KKSAttrValue * pAtt
     connect (pbClose, SIGNAL (clicked()), avWidget, SLOT (close()));
     buttonsLay->addWidget(pbClose);
     avGLay->addLayout (buttonsLay, 1, 0, 1, 2, Qt::AlignJustify | Qt::AlignBottom);//addWidget(pbClose, 1, 1, 1, 1);
+*/
     return avWidget;
 }
 
-QAbstractItemModel * KKSAttributesFactory :: aValComplexModel (const KKSAttrValue * pAttrValue, const KKSAttrValue * av)
+QAbstractItemModel * KKSAttributesFactory :: aValComplexModel (const KKSAttrValue * pAttrValue, const QVariant& av)
 {
     if (!pAttrValue || !pAttrValue->attribute())
         return 0;
     QString tableName = pAttrValue->attribute()->tableName ();
-    QVariant V = av ? av->value().valueVariant() : pAttrValue->value().valueVariant();
+    QVariant V = av.isValid() ? av : pAttrValue->value().valueVariant();
 
     QStringList vArray = V.toStringList();
     //qDebug () << __PRETTY_FUNCTION__ << vArray << pAttrValue->id() << pAttrValue->attribute()->id();
@@ -2910,4 +2922,12 @@ void KKSAttributesFactory :: updateAttrValueModel (const KKSAttrValue * pAttrVal
         
         ++i;
     }
+}
+
+void KKSAttributesFactory :: initAttrValueModel (const KKSAttrValue * pAttrValue, const QVariant& val)
+{
+    KKSAValWidget * avW = qobject_cast<KKSAValWidget *> (sender());
+    QAbstractItemModel * avMod = aValComplexModel (pAttrValue, val);
+    if (avW)
+        avW->setValModel (avMod);
 }

@@ -20,6 +20,8 @@ class QLineEdit;
 class QTreeView;
 class QCheckBox;
 class QGroupBox;
+class QToolButton;
+class QTextEdit;
 
 class QDate;
 class QTime;
@@ -35,14 +37,9 @@ public:
     KKSAValWidget(KKSAttrValue * _av, QWidget * parent=0, Qt::WindowFlags flags=0);
     virtual ~KKSAValWidget();
 
+    void setValModel (QAbstractItemModel * valMod);
+
 private slots:
-    void setDate (const KKSAttribute * a, const QDate& D);
-    void setTime (const KKSAttribute * a, const QTime& T);
-    void setDateTime (const KKSAttribute * a, const QDateTime& DT);
-    void setModel (const KKSAttribute * a, QAbstractItemModel * mod);
-    void setCheck (const KKSAttribute * a, bool ch);
-    void setText (const KKSAttribute * a, QString text);
-    
     void setValue (const KKSAttribute * a, QVariant val);
 
     void upVal (void);
@@ -52,6 +49,7 @@ signals:
     void prevVal (void);
     void nextVal (void);
     void updateMod (const KKSAttrValue *, const QVariant&, QAbstractItemModel *);
+    void updateComplexAttr (const KKSAttrValue *, const QVariant&, QGroupBox *);
 
 private:
     //
@@ -59,7 +57,6 @@ private:
     //
     KKSAttrValue * pAttrValue;
     QWidget * valWidget;
-    QStackedLayout * stLay;
     QLineEdit * lEVal;
     QDateEdit * dEVal;
     QTimeEdit * tEVal;
@@ -67,6 +64,12 @@ private:
     QTreeView * tvVal;
     QCheckBox * chVal;
     QGroupBox * gbVal;
+    QWidget * macVal;
+    QLineEdit * lE [2];
+    QTextEdit * textEVal;
+
+    QToolButton * tbUp;
+    QToolButton * tbDown;
 private:
     Q_OBJECT
 

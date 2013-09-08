@@ -101,6 +101,7 @@ private slots:
     void viewAttrValue (const KKSAttrValue * av, int idAVal, int isSys, QWidget * pWidget);
     
     void updateAttrValueModel (const KKSAttrValue * pAttrValue, const QVariant& val, QAbstractItemModel * attrValModel);
+    void initAttrValueModel (const KKSAttrValue * pAttrValue, const QVariant& val);
 
 signals:
     void viewHistory(const KKSList<KKSAttrValue *> &);
@@ -136,7 +137,7 @@ private:
     QWidget * createAttrValWidget (const KKSAttrValue * pAttrValue, int idAVal, int isSys, QWidget * parent=0, Qt::WindowFlags flags=0);
 
     QWidget * createAttrCheckWidget (const KKSAttrValue * pAttrValue, const KKSAttrType *pCatType,  KKSIndAttr::KKSIndAttrClass isSystem, QTabWidget * tabW);
-    QAbstractItemModel * aValComplexModel (const KKSAttrValue * pAttrValue, const KKSAttrValue * av=0);
+    QAbstractItemModel * aValComplexModel (const KKSAttrValue * pAttrValue, const QVariant& av=QVariant());
 
     void connectToSlots (QObject *aw, QWidget* wEditor);
 
