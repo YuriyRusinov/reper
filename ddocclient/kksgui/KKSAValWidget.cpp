@@ -177,7 +177,7 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
     QPushButton * pbClose = new QPushButton (tr("&Close"), this);
     connect (pbClose, SIGNAL (clicked()), this, SLOT (close()));
     buttonsLay->addWidget(pbClose);
-    avGLay->addLayout (buttonsLay, , 0, 1, 2, Qt::AlignJustify | Qt::AlignBottom);//addWidget(pbClose, 1, 1, 1, 1);
+    avGLay->addLayout (buttonsLay, 2, 0, 1, 2, Qt::AlignJustify | Qt::AlignBottom);//addWidget(pbClose, 1, 1, 1, 1);
 
 }
 
