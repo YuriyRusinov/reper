@@ -14,6 +14,7 @@
 #include <QDateEdit>
 #include <QDateTimeEdit>
 #include <QTreeView>
+#include <QListView>
 #include <QCheckBox>
 #include <QGroupBox>
 #include <QGridLayout>
@@ -70,6 +71,7 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
     const KKSAttrType * aType = attr->type();
     KKSAttrType::KKSAttrTypes idAttrType = aType->attrType();
     QVariant V (pAttrValue->value().valueVariant());
+    int numR (1);
     switch (idAttrType)
     {
         case KKSAttrType::atBool: 
@@ -90,6 +92,7 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
         {
             tvVal = new QTreeView;
             valWidget = qobject_cast<QWidget *>(tvVal);
+            numR++;
             break;
         }
         case KKSAttrType::atComplex:
@@ -98,6 +101,8 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
             (qobject_cast<KKSComplexAttrWidget*>(gbVal))->init();
             (qobject_cast<KKSComplexAttrWidget*>(gbVal))->setVal(V.toString());
             valWidget = qobject_cast<QWidget *> (gbVal);
+            initComplexWidget (pAttrValue, (qobject_cast<KKSComplexAttrWidget*>(gbVal))->getLay(), gbVal);
+            numR++;
             break;
         }
         case KKSAttrType::atDouble:
@@ -164,6 +169,7 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
             textEVal->setReadOnly (true);
             textEVal->setPlainText (V.toString());
             valWidget = qobject_cast<QWidget *>(textEVal);
+            numR++;
             break;
         }
         default:break;
@@ -171,17 +177,17 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
 
 //    QSizePolicy valSp (QSizePolicy::Expanding, QSizePolicy::Preferred);
 //    valWidget->setSizePolicy (valSp);
-    avGLay->addWidget (valWidget, 0, 0, 2, 1);//, Qt::AlignJustify | Qt::AlignVCenter);
+    avGLay->addWidget (valWidget, 0, 0, 1, 1);//, Qt::AlignJustify | Qt::AlignVCenter);
     QVBoxLayout * vNavLay = new QVBoxLayout;
     vNavLay->addWidget (tbUp);
     vNavLay->addWidget (tbDown);
-    avGLay->addLayout (vNavLay, 0, 1, 2, 1, Qt::AlignVCenter);
+    avGLay->addLayout (vNavLay, 0, 1, 1, 1, Qt::AlignVCenter);
     QHBoxLayout * buttonsLay = new QHBoxLayout;
     buttonsLay->addStretch(1);
     QPushButton * pbClose = new QPushButton (tr("&Close"), this);
     connect (pbClose, SIGNAL (clicked()), this, SLOT (close()));
     buttonsLay->addWidget(pbClose);
-    avGLay->addLayout (buttonsLay, 2, 0, 1, 2, Qt::AlignJustify | Qt::AlignBottom);//addWidget(pbClose, 1, 1, 1, 1);
+    avGLay->addLayout (buttonsLay, 1, 0, 1, 2, Qt::AlignJustify | Qt::AlignBottom);//addWidget(pbClose, 1, 1, 1, 1);
 
 }
 
@@ -202,21 +208,18 @@ void KKSAValWidget::initComplexWidget (KKSAttrValue * av, QGridLayout * gLay, QW
         const KKSAttribute * attr = aV->attribute();
         const KKSAttrType * aType = attr->type();
         int idAType = aType->attrType();
-        QLabel * lTitle = new QLabel (attr->name(), parent, flags);
-        gLay->addWidget (lTitle, i, 0, 1, 1);
+        QVariant val (aV->value().valueVariant());
+        QWidget * aW (0);
         switch (idAType)
         {
             case KKSAttrType::atBool:
             {
+                aW = new QCheckBox;
                 break;
             }
             case KKSAttrType::atCheckList:
-            case KKSAttrType::atCheckListEx:
             {
-                break;
-            }
-            case KKSAttrType::atComplex:
-            {
+                aW = new QListView;
                 break;
             }
             case KKSAttrType::atDouble:
@@ -225,40 +228,70 @@ void KKSAValWidget::initComplexWidget (KKSAttrValue * av, QGridLayout * gLay, QW
             case KKSAttrType::atInt64:
             case KKSAttrType::atString:
             case KKSAttrType::atList:
-            case KKSAttrType::atParent:
             case KKSAttrType::atObjRef:
             case KKSAttrType::atUUID:
             case KKSAttrType::atUrl:
-            case KKSAttrType::atRecordColor:
-            case KKSAttrType::atRecordColorRef:
-            case KKSAttrType::atRecordTextColor:
-            case KKSAttrType::atRecordTextColorRef:
             {
+                aW = new QLineEdit (parent);
+                QLineEdit * lE = qobject_cast<QLineEdit *>(aW);
+                lE->setText (val.toString());
+                lE->setReadOnly (true);
                 break;
             }
             case KKSAttrType::atMaclabel:
             {
+                aW = new QWidget (parent);
+                QHBoxLayout * hLay = new QHBoxLayout (aW);
+                QList<QVariant> macList = val.toList();
+                if (macList.count() < 2)
+                    break;
+                for (int i=0; i<2; i++)
+                {
+                    QLineEdit * lEMac = new QLineEdit (aW);
+                    lEMac->setText (macList[i].toString());
+                    lEMac->setReadOnly (true);
+                    hLay->addWidget (lEMac);
+                }
                 break;
             }
             case KKSAttrType::atDate:
             {
+                aW = new QDateEdit (parent);
+                QDateEdit * dE = qobject_cast<QDateEdit *>(aW);
+                dE->setDate (val.toDate());
+                dE->setReadOnly (true);
                 break;
             }
             case KKSAttrType::atTime:
             {
+                aW = new QTimeEdit (parent);
+                QTimeEdit * tE = qobject_cast<QTimeEdit *>(aW);
+                tE->setTime (val.toTime());
+                tE->setReadOnly (true);
                 break;
             }
             case KKSAttrType::atDateTime:
             {
+                aW = new QDateTimeEdit (parent);
+                QDateTimeEdit * dtE = qobject_cast<QDateTimeEdit *>(aW);
+                dtE->setDateTime(val.toDateTime());
+                dtE->setReadOnly (true);
                 break;
             }
             case KKSAttrType::atText:
             {
+                aW = new QTextEdit (parent);
+                QTextEdit * textE = qobject_cast<QTextEdit *>(aW);
+                textE->setText (val.toString());
+                textE->setReadOnly (true);
                 break;
             }
-            default:break;
+            default:continue;
             
         }
+        QLabel * lTitle = new QLabel (attr->name(), parent, flags);
+        gLay->addWidget (lTitle, i, 0, 1, 1);
+        gLay->addWidget (aW, i, 1, 1, 1);
         i++;
     }
 }
