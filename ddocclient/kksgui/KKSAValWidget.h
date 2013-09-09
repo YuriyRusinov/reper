@@ -10,6 +10,7 @@
 
 #include <QWidget>
 #include <QVariant>
+#include <QList>
 
 #include "kksgui_config.h"
 
@@ -22,6 +23,7 @@ class QCheckBox;
 class QGroupBox;
 class QToolButton;
 class QTextEdit;
+class QGridLayout;
 
 class QDate;
 class QTime;
@@ -49,8 +51,13 @@ signals:
     void prevVal (void);
     void nextVal (void);
     void updateMod (const KKSAttrValue *, const QVariant&, QAbstractItemModel *);
-    void updateComplexAttr (const KKSAttrValue *, const QVariant&, QGroupBox *);
+    void updateComplexAttr (const KKSAttrValue *, const QVariant&, QWidget *);
 
+private:
+    //
+    // Functions
+    //
+    void initComplexWidget (KKSAttrValue * av, QGridLayout * gLay, QWidget * parent=0, Qt::WindowFlags flags=0);
 private:
     //
     // Variables
@@ -63,7 +70,8 @@ private:
     QDateTimeEdit * dtEVal;
     QTreeView * tvVal;
     QCheckBox * chVal;
-    QGroupBox * gbVal;
+    QWidget * gbVal;
+    QList<QWidget *> aWVals;
     QWidget * macVal;
     QLineEdit * lE [2];
     QTextEdit * textEVal;

@@ -25,11 +25,13 @@
 #include <QIcon>
 #include <QTextEdit>
 #include <QSizePolicy>
+#include <QLabel>
 
 #include <KKSAttrValue.h>
 #include <KKSAttribute.h>
 #include <KKSAttrType.h>
 #include "KKSAValWidget.h"
+#include "KKSComplexAttrWidget.h"
 
 KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFlags flags)
     : QWidget (parent, flags),
@@ -92,7 +94,9 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
         }
         case KKSAttrType::atComplex:
         {
-            gbVal = new QGroupBox;
+            gbVal = new KKSComplexAttrWidget (pAttrValue, attr->isSystem());
+            (qobject_cast<KKSComplexAttrWidget*>(gbVal))->init();
+            (qobject_cast<KKSComplexAttrWidget*>(gbVal))->setVal(V.toString());
             valWidget = qobject_cast<QWidget *> (gbVal);
             break;
         }
@@ -181,6 +185,84 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
 
 }
 
+void KKSAValWidget::initComplexWidget (KKSAttrValue * av, QGridLayout * gLay, QWidget * parent, Qt::WindowFlags flags)
+{
+    if (!av || !gLay)
+        return;
+    KKSMap<qint64, KKSAttrValue*> aVals = av->attrsValues();
+    KKSMap<qint64, KKSAttrValue*>::const_iterator p = aVals.constBegin();
+
+    int i=0;
+    aWVals.clear();
+    for (;p != aVals.constEnd(); p++)
+    {
+        KKSAttrValue * aV = p.value();
+        if (!aV || !av->attribute())
+            continue;
+        const KKSAttribute * attr = aV->attribute();
+        const KKSAttrType * aType = attr->type();
+        int idAType = aType->attrType();
+        QLabel * lTitle = new QLabel (attr->name(), parent, flags);
+        gLay->addWidget (lTitle, i, 0, 1, 1);
+        switch (idAType)
+        {
+            case KKSAttrType::atBool:
+            {
+                break;
+            }
+            case KKSAttrType::atCheckList:
+            case KKSAttrType::atCheckListEx:
+            {
+                break;
+            }
+            case KKSAttrType::atComplex:
+            {
+                break;
+            }
+            case KKSAttrType::atDouble:
+            case KKSAttrType::atFixString:
+            case KKSAttrType::atInt:
+            case KKSAttrType::atInt64:
+            case KKSAttrType::atString:
+            case KKSAttrType::atList:
+            case KKSAttrType::atParent:
+            case KKSAttrType::atObjRef:
+            case KKSAttrType::atUUID:
+            case KKSAttrType::atUrl:
+            case KKSAttrType::atRecordColor:
+            case KKSAttrType::atRecordColorRef:
+            case KKSAttrType::atRecordTextColor:
+            case KKSAttrType::atRecordTextColorRef:
+            {
+                break;
+            }
+            case KKSAttrType::atMaclabel:
+            {
+                break;
+            }
+            case KKSAttrType::atDate:
+            {
+                break;
+            }
+            case KKSAttrType::atTime:
+            {
+                break;
+            }
+            case KKSAttrType::atDateTime:
+            {
+                break;
+            }
+            case KKSAttrType::atText:
+            {
+                break;
+            }
+            default:break;
+            
+        }
+        i++;
+    }
+}
+
 KKSAValWidget::~KKSAValWidget()
 {
     if (pAttrValue)
@@ -219,6 +301,7 @@ void KKSAValWidget::setValue (const KKSAttribute * a, QVariant val)
         }
         case KKSAttrType::atComplex:
         {
+            (qobject_cast<KKSComplexAttrWidget*>(gbVal))->setVal(val.toString());
             emit updateComplexAttr (pAttrValue, val, gbVal);
             break;
         }

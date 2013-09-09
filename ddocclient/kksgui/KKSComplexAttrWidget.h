@@ -27,12 +27,13 @@ public:
     KKSComplexAttrWidget (const KKSAttrValue*attr, 
                           KKSIndAttr::KKSIndAttrClass isSys, 
                           //KKSAttributesFactory * a,
-                          KKSObjEditor * objEditor,
+                          KKSObjEditor * objEditor=0,
                           QWidget *parent=NULL, 
                           Qt::WindowFlags flags=0);
     
     ~KKSComplexAttrWidget(void);
 
+    QGridLayout * getLay (void) const;
 public slots:
     void setVal (const QString & newText);
     void init();

@@ -854,7 +854,7 @@ void KKSAttributesFactory :: putAttrWidget (KKSAttrValue* av,
     const KKSCategoryAttr * pCategAttr = av->attribute();
     QVariant V = pVal.valueVariant();
 
-    bool isExist (objEditor->getObjectEx()->id()>0);
+    bool isExist (objEditor ? objEditor->getObjectEx()->id()>0 : false);
 
     if (!pCategAttr)
     {
@@ -1113,25 +1113,6 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                 }
                 hPw.setHorizontalStretch (10);
                 attrWidget = new KKSAttrUUIDWidget ();
-/*                QLabel *l=0;
-                QToolButton *tb = 0;
-                QCheckBox *chr = 0;
-                QVariant vr = QVariant ();
-
-                KKSAttribute * cAttr = 0;
-                QWidget *arw = new QLineEdit();
-                createAttrWidget (av, 
-                                                 objEditor, 
-                                                 is_mandatory, 
-                                                 cAttr ? cAttr->refType() : pCategAttr->refType(), 
-                                                 isSystem, 
-                                                 qobject_cast<QGridLayout *>(attrWidget->layout ()), 
-                                                 0, 
-                                                 vr, 
-                                                 l, 
-                                                 tb,
-                                                 chr, 
-                                                 true);*/
                 
                 qDebug () << __PRETTY_FUNCTION__ << "Widget has created" << pCategAttr->type()->attrType();
                 attrWidget->setMinimumHeight (20);
@@ -1410,7 +1391,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                         this, 
                         SLOT(putAttrWidget (KKSAttrValue*, KKSObjEditor*, QGridLayout*, int, KKSIndAttr::KKSIndAttrClass, QString, int)));
 
-                ((KKSComplexAttrWidget*)attrWidget)->init();
+                (qobject_cast<KKSComplexAttrWidget*>(attrWidget))->init();
                 //qobject_cast<KKSComplexAttrWidget *>(attrWidget)->setFixedSymCount (av->attribute()->defWidth());
                 //qobject_cast<QTextEdit *>(attrWidget)->setReadOnly (isRef);
 
@@ -2706,96 +2687,7 @@ QWidget * KKSAttributesFactory :: createAttrValWidget (const KKSAttrValue * pAtt
         QAbstractItemModel * avMod = aValComplexModel (pAttrValue, av->value().valueVariant());
         (qobject_cast<KKSAValWidget *>(avWidget))->setValModel (avMod);
     }
-//    QWidget * aW (0);
 
-/*    switch (idAttrType)
-    {
-        case KKSAttrType::atBool: 
-        {
-            aW = new QCheckBox (avWidget);
-            break;
-        }
-        case KKSAttrType::atCheckList:
-        case KKSAttrType::atCheckListEx:
-        case KKSAttrType::atComplex:
-        {
-            aW = new QTreeView (avWidget);
-            QAbstractItemModel * aMod = this->aValComplexModel(pAttrValue, av);
-            (qobject_cast<QTreeView *>(aW))->setModel (aMod);
-            break;
-        }
-        case KKSAttrType::atDouble:
-        case KKSAttrType::atFixString:
-        case KKSAttrType::atInt:
-        case KKSAttrType::atInt64:
-        case KKSAttrType::atString:
-        case KKSAttrType::atList:
-        case KKSAttrType::atParent:
-        case KKSAttrType::atObjRef:
-        case KKSAttrType::atUUID:
-        case KKSAttrType::atUrl:
-        case KKSAttrType::atRecordColor:
-        case KKSAttrType::atRecordColorRef:
-        case KKSAttrType::atRecordTextColor:
-        case KKSAttrType::atRecordTextColorRef:
-        {
-            aW = new QLineEdit (avWidget);
-            QLineEdit * lE = (qobject_cast<QLineEdit *>(aW));
-            lE->setReadOnly (true);
-            lE->setText(av->value().valueVariant().toString());
-            break;
-        }
-        case KKSAttrType::atMaclabel:
-        {
-            aW = new QWidget (avWidget);
-            QHBoxLayout * hLay = new QHBoxLayout (aW);
-            for (int i=0; i<2; i++)
-            {
-                QLineEdit * lE = new QLineEdit (aW);
-                hLay->addWidget (lE);
-            }
-            break;
-        }
-        case KKSAttrType::atDate:
-        {
-            aW = new QDateEdit (avWidget);
-            QDateEdit * dE = qobject_cast<QDateEdit *>(aW);
-            dE->setDate(av->value().valueVariant().toDate());
-            dE->setReadOnly(true);
-            //QDate::fromString(pAttrValue->value().valueForInsert(), QString("dd.MM.yyyy")));
-            break;
-        }
-        case KKSAttrType::atTime:
-        {
-            aW = new QTimeEdit (avWidget);
-            QTimeEdit * tE = qobject_cast<QTimeEdit *>(aW);
-            tE->setTime(av->value().valueVariant().toTime());//QTime::fromString(pAttrValue->value().valueForInsert(), QString("hh.mm.ss")));
-            tE->setReadOnly(true);
-            break;
-        }
-        case KKSAttrType::atDateTime:
-        {
-            aW = new QDateTimeEdit (avWidget);
-            QDateTimeEdit * dtE = qobject_cast<QDateTimeEdit *>(aW);
-            qDebug () << __PRETTY_FUNCTION__ << pAttrValue->value().valueVariant();
-            dtE->setDateTime(av->value().valueVariant().toDateTime());//QDateTime::fromString(pAttrValue->value().valueVariant(), QString("dd.MM.yyyy hh.mm.ss")));
-            dtE->setReadOnly(true);
-            break;
-        }
-        default:break;
-    }
-    av->release();
-    if (aW)
-        avGLay->addWidget (aW, 0, 0, 1, 2);
-    QHBoxLayout * buttonsLay = new QHBoxLayout;
-    //QSpacerItem * spItem = new QSpacerItem (20, 80, QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
-    //avGLay->addItem(spItem, 1, 0, 1, 1);
-    buttonsLay->addStretch(1);
-    QPushButton * pbClose = new QPushButton (tr("&Close"), avWidget);
-    connect (pbClose, SIGNAL (clicked()), avWidget, SLOT (close()));
-    buttonsLay->addWidget(pbClose);
-    avGLay->addLayout (buttonsLay, 1, 0, 1, 2, Qt::AlignJustify | Qt::AlignBottom);//addWidget(pbClose, 1, 1, 1, 1);
-*/
     return avWidget;
 }
 

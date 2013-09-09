@@ -149,3 +149,8 @@ void KKSComplexAttrWidget :: setVal (const QString & newText)
     QVariant v (newText);
     emit valueChanged (m_av->id(), m_isSystem, v);
 }
+
+QGridLayout * KKSComplexAttrWidget :: getLay (void) const
+{
+    return m_gAttrLay;
+}
