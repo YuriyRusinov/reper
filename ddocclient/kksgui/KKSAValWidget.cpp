@@ -98,10 +98,11 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
         case KKSAttrType::atComplex:
         {
             gbVal = new KKSComplexAttrWidget (pAttrValue, attr->isSystem());
-            (qobject_cast<KKSComplexAttrWidget*>(gbVal))->init();
-            (qobject_cast<KKSComplexAttrWidget*>(gbVal))->setVal(V.toString());
+//            (qobject_cast<KKSComplexAttrWidget*>(gbVal))->init();
+//            (qobject_cast<KKSComplexAttrWidget*>(gbVal))->setVal(V.toString());
             valWidget = qobject_cast<QWidget *> (gbVal);
-            initComplexWidget (pAttrValue, (qobject_cast<KKSComplexAttrWidget*>(gbVal))->getLay(), gbVal);
+            QGridLayout * gLay = (qobject_cast<KKSComplexAttrWidget*>(gbVal))->getLay();
+            initComplexWidget (pAttrValue, gLay, gbVal);
             numR++;
             break;
         }
@@ -290,6 +291,7 @@ void KKSAValWidget::initComplexWidget (KKSAttrValue * av, QGridLayout * gLay, QW
             
         }
         QLabel * lTitle = new QLabel (attr->name(), parent, flags);
+        aWVals.append (aW);
         gLay->addWidget (lTitle, i, 0, 1, 1);
         gLay->addWidget (aW, i, 1, 1, 1);
         i++;
@@ -336,6 +338,7 @@ void KKSAValWidget::setValue (const KKSAttribute * a, QVariant val)
         {
             (qobject_cast<KKSComplexAttrWidget*>(gbVal))->setVal(val.toString());
             emit updateComplexAttr (pAttrValue, val, gbVal);
+            this->initComplexWidget(pAttrValue,(qobject_cast<KKSComplexAttrWidget*>(gbVal))->getLay(), gbVal);
             break;
         }
         case KKSAttrType::atDouble:

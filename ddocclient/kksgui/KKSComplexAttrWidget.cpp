@@ -126,7 +126,7 @@ void KKSComplexAttrWidget :: init()
         //gAttrLayout->setVerticalSpacing (10);
         emit putAttrAttrOnWidget (av, 
                                   m_objEditor, //KKSObjEditor -- в данном контексте имеем право указать NULL. Поле используется только в расширенных св-вах атрибута (показателя), которых у данного атрибута нет 
-                                  (QGridLayout *)(m_groupBox->layout()), 
+                                  qobject_cast<QGridLayout *>(m_groupBox->layout()), 
                                   ii, 
 #ifdef Q_CC_MSVC
                                   KKSIndAttr::KKSIndAttrClass::iacAttrAttr,
@@ -152,5 +152,5 @@ void KKSComplexAttrWidget :: setVal (const QString & newText)
 
 QGridLayout * KKSComplexAttrWidget :: getLay (void) const
 {
-    return m_gAttrLay;
+    return qobject_cast<QGridLayout *>(m_groupBox->layout());
 }

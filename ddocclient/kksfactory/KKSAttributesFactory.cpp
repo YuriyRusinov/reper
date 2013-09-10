@@ -2672,6 +2672,15 @@ QWidget * KKSAttributesFactory :: createAttrValWidget (const KKSAttrValue * pAtt
     KKSAttrValue * av = loader->loadIOAttrValue(pAttrValue,idAVal,(isSys!=KKSIndAttr::iacIOUserAttr));
     if (!av)
         return 0;
+    if (av->attribute()->type()->attrType() == KKSAttrType::atComplex)
+    {
+        loader->loadAttrAttrs(av->attribute());
+        if(!av->attrsValuesLoaded())
+        {
+            KKSMap<qint64, KKSAttrValue*> aav_list = loader->loadAttrAttrValues(av, false);
+            av->setAttrsValues(aav_list);
+        }
+    }
     QWidget * avWidget = new KKSAValWidget (av, parent, flags);//QWidget (parent, flags);
     connect (avWidget, SIGNAL (updateMod (const KKSAttrValue *, const QVariant&, QAbstractItemModel *)),
              this,
@@ -2715,33 +2724,7 @@ QAbstractItemModel * KKSAttributesFactory :: aValComplexModel (const KKSAttrValu
         refIO->release ();
         return 0;
     }
-    KKSList<const KKSFilterGroup*> filters;
-    QString vals;
-    for (int i=0; i<vArray.count(); i++)
-    {
-        vals += vArray[i];
-        if (i < vArray.count()-1)
-            vals += ",";
-    }
-    QString value;
-    if (!vals.isEmpty())
-    {
-        value = QString ("select id from %1 where id in (%2) ").arg (tableName).arg (vals);
-    }
-    else
-    {
-        value = QString ("select id from %1 where id is null ").arg (tableName);
-    }
-    //const KKSFilter * filter = ct->createFilter ("id", value, KKSFilter::foInSQL);
-    const KKSFilter * filter = ct->createFilter (ATTR_ID, value, KKSFilter::foInSQL);
-    KKSList <const KKSFilter *> fl;
-    fl.append (filter);
-    filter->release ();
-    KKSFilterGroup * fg = new KKSFilterGroup(true);
-    fg->setFilters(fl);
-    filters.append(fg);
-    fg->release();
-    KKSMap<qint64, KKSEIOData *> eioList = loader->loadEIOList (refIO, filters);
+    KKSMap<qint64, KKSEIOData *> eioList = this->getAttrList(pAttrValue, V);
     const KKSTemplate * ctempl = new KKSTemplate (ct->defTemplate());
     QAbstractItemModel * sAttrModel = new KKSEIODataModel (ctempl, eioList);
     ctempl->release();
@@ -2753,54 +2736,7 @@ void KKSAttributesFactory :: updateAttrValueModel (const KKSAttrValue * pAttrVal
 {
     if (!pAttrValue || !pAttrValue->attribute())
         return;
-    QString tableName = pAttrValue->attribute()->tableName ();
-    QVariant V (val);//= av ? av->value().valueVariant() : pAttrValue->value().valueVariant();
-
-    QStringList vArray = V.toStringList();
-    //qDebug () << __PRETTY_FUNCTION__ << vArray << pAttrValue->id() << pAttrValue->attribute()->id();
-    KKSObject * refIO = loader->loadIO (tableName, true);
-    if (!refIO)
-        return;
-    KKSCategory * c = refIO->category ();
-    if (!c)
-    {
-        refIO->release ();
-        return;
-    }
-    KKSCategory * ct = c->tableCategory ();
-    if (!ct)
-    {
-        refIO->release ();
-        return;
-    }
-    KKSList<const KKSFilterGroup*> filters;
-    QString vals;
-    for (int i=0; i<vArray.count(); i++)
-    {
-        vals += vArray[i];
-        if (i < vArray.count()-1)
-            vals += ",";
-    }
-    QString value;
-    if (!vals.isEmpty())
-    {
-        value = QString ("select id from %1 where id in (%2) ").arg (tableName).arg (vals);
-    }
-    else
-    {
-        value = QString ("select id from %1 where id is null ").arg (tableName);
-    }
-    //const KKSFilter * filter = ct->createFilter ("id", value, KKSFilter::foInSQL);
-    const KKSFilter * filter = ct->createFilter (ATTR_ID, value, KKSFilter::foInSQL);
-    KKSList <const KKSFilter *> fl;
-    fl.append (filter);
-    filter->release ();
-    KKSFilterGroup * fg = new KKSFilterGroup(true);
-    fg->setFilters(fl);
-    filters.append(fg);
-    fg->release();
-    KKSMap<qint64, KKSEIOData *> eioList = loader->loadEIOList (refIO, filters);
-    refIO->release ();
+    KKSMap<qint64, KKSEIOData *> eioList = this->getAttrList (pAttrValue, val);
     int nr = attrValModel->rowCount();
     attrValModel->removeRows(0, nr);
     nr = eioList.count();
@@ -2814,6 +2750,62 @@ void KKSAttributesFactory :: updateAttrValueModel (const KKSAttrValue * pAttrVal
         
         ++i;
     }
+}
+
+KKSMap<qint64, KKSEIOData *> KKSAttributesFactory :: getAttrList (const KKSAttrValue * pAttrValue, const QVariant& val) const
+{
+    KKSMap<qint64, KKSEIOData *> eioList;
+    if (!pAttrValue || !pAttrValue->attribute())
+        return eioList;
+    QString tableName = pAttrValue->attribute()->tableName ();
+    QVariant V (val);//= av.isValid() ? av : pAttrValue->value().valueVariant();
+
+    QStringList vArray = V.toStringList();
+    //qDebug () << __PRETTY_FUNCTION__ << vArray << pAttrValue->id() << pAttrValue->attribute()->id();
+    KKSObject * refIO = loader->loadIO (tableName, true);
+    if (!refIO)
+        return eioList;
+    KKSCategory * c = refIO->category ();
+    if (!c)
+    {
+        refIO->release ();
+        return eioList;
+    }
+    KKSCategory * ct = c->tableCategory ();
+    if (!ct)
+    {
+        refIO->release ();
+        return eioList;
+    }
+    KKSList<const KKSFilterGroup*> filters;
+    QString vals;
+    for (int i=0; i<vArray.count(); i++)
+    {
+        vals += vArray[i];
+        if (i < vArray.count()-1)
+            vals += ",";
+    }
+    QString value;
+    if (!vals.isEmpty())
+    {
+        value = QString ("select id from %1 where id in (%2) ").arg (tableName).arg (vals);
+    }
+    else
+    {
+        value = QString ("select id from %1 where id is null ").arg (tableName);
+    }
+    //const KKSFilter * filter = ct->createFilter ("id", value, KKSFilter::foInSQL);
+    const KKSFilter * filter = ct->createFilter (ATTR_ID, value, KKSFilter::foInSQL);
+    KKSList <const KKSFilter *> fl;
+    fl.append (filter);
+    filter->release ();
+    KKSFilterGroup * fg = new KKSFilterGroup(true);
+    fg->setFilters(fl);
+    filters.append(fg);
+    fg->release();
+    eioList = loader->loadEIOList (refIO, filters);
+    refIO->release();
+    return eioList;
 }
 
 void KKSAttributesFactory :: initAttrValueModel (const KKSAttrValue * pAttrValue, const QVariant& val)

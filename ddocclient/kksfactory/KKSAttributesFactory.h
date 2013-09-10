@@ -35,6 +35,7 @@ class KKSAttrValue;
 class KKSAttribute;
 class KKSAttrType;
 class KKSObject;
+class KKSEIOData;
 
 class _F_EXPORT KKSAttributesFactory : public KKSEntityFactory
 {
@@ -141,6 +142,7 @@ private:
 
     void connectToSlots (QObject *aw, QWidget* wEditor);
 
+    KKSMap<qint64, KKSEIOData *> getAttrList (const KKSAttrValue * pAttrValue, const QVariant& val) const;
 private:
     //
     // Variables

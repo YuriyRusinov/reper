@@ -51,7 +51,7 @@ signals:
     void prevVal (void);
     void nextVal (void);
     void updateMod (const KKSAttrValue *, const QVariant&, QAbstractItemModel *);
-    void updateComplexAttr (const KKSAttrValue *, const QVariant&, QWidget *);
+    void updateComplexAttr (KKSAttrValue *, const QVariant&, QWidget *);
 
 private:
     //
