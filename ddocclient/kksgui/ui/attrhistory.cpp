@@ -93,119 +93,6 @@ void AttrHistory::view(const KKSList<KKSAttrValue*> & histlist)
     QHeaderView *headerView = UI->tvHistory->header();
     headerView->setDefaultAlignment(Qt::AlignCenter);
 
-/*
-    QStringList listHeader;
-    listHeader <<tr("Id")<<tr("Start")<<tr("Stop")<<tr("Value")<<tr("Source")<<tr("Transfer")<<tr("Description");
-    model->setHorizontalHeaderLabels(listHeader);
-
-    //
-    // Обходим все значения истории изменений атрибута и вносим в таблицу
-    //
-    for (int i =0; i<n; i++)
-    {
-        av = histlist.at(i);
-        int idAv = av->id();
-
-        item = new QStandardItem(QString::number(idAv));
-        item->setTextAlignment(Qt::AlignCenter);
-        item->setData(idAv, Qt::UserRole);
-        item->setData(QVariant::fromValue<KKSAttrValue *>(av), Qt::UserRole+1);
-        model->setItem(i,c_id,item);
-
-        if (av->value().valueForInsert() != NULL)
-        {
-            KKSAttribute * a = av->attribute();
-            if (!a)
-                continue;
-            const KKSAttrType * t = a->type();
-            const KKSAttrType * rt = a->refType();
-            int tId = t->attrType();
-            if (tId == KKSAttrType::atJPG ||
-                (rt && rt->attrType() == KKSAttrType::atJPG)
-               )
-                item = new QStandardItem(tr("<Image data %1>").arg(i));
-            else if (tId == KKSAttrType::atSVG ||
-                     (rt && rt->attrType() == KKSAttrType::atSVG)
-                    )
-                item = new QStandardItem(tr("<SVG data %1>").arg(i));
-            else if( tId == KKSAttrType::atXMLDoc || 
-                    (rt && rt->attrType() == KKSAttrType::atXMLDoc)
-                   )
-                item = new QStandardItem(tr("<XML document %1>").arg(i));
-            else if( tId == KKSAttrType::atVideo || 
-                    (rt && rt->attrType() == KKSAttrType::atVideo)
-                   )
-                item = new QStandardItem(tr("<Video data %1>").arg(i));
-            else if (tId == KKSAttrType::atRecordColor || 
-                     tId == KKSAttrType::atRecordColorRef)
-            {
-                item = new QStandardItem(tr("Text example"));
-                bool ok;
-                quint64 vl = av->value().valueForInsert().toLongLong(&ok);
-                if (!ok)
-                    continue;
-                item->setData(QColor::fromRgba(vl), Qt::BackgroundRole);
-            }
-            else if (tId == KKSAttrType::atRecordTextColor || 
-                     tId == KKSAttrType::atRecordTextColorRef)
-            {
-                item = new QStandardItem(tr("Text example"));
-                bool ok;
-                quint64 vl = av->value().valueForInsert().toLongLong(&ok);
-                if (!ok)
-                    continue;
-                item->setData(QColor::fromRgba(vl), Qt::ForegroundRole);
-            }
-            else
-                item = new QStandardItem(av->value().valueForInsert());
-            item->setTextAlignment(Qt::AlignCenter);
-            item->setData(idAv, Qt::UserRole);
-            model->setItem(i,c_value,item);
-        }
-
-
-        item = new QStandardItem(av->startDateTime().toString("dd.MM.yyyy hh:mm:ss"));
-        item->setTextAlignment(Qt::AlignCenter);
-        item->setData(idAv, Qt::UserRole);
-        model->setItem(i,c_start,item);
-
-        item = new QStandardItem(av->stopDateTime().toString("dd.MM.yyyy hh:mm:ss"));
-        item->setTextAlignment(Qt::AlignCenter);
-        item->setData(idAv, Qt::UserRole);
-        model->setItem(i,c_stop,item);
-
-
-        if (av->ioSrc() != NULL)
-        {
-            item = new QStandardItem(av->ioSrc()->name());
-            item->setTextAlignment(Qt::AlignCenter);
-            item->setData(idAv, Qt::UserRole);
-            model->setItem(i,c_source,item);
-        }
-
-        if (av->ioSrc1() != NULL)
-        {
-            item = new QStandardItem(av->ioSrc1()->name());
-            item->setTextAlignment(Qt::AlignCenter);
-            item->setData(idAv, Qt::UserRole);
-            model->setItem(i,c_transfer,item);
-        }
-
-        //item = new QStandardItem(av->measDateTime().toString());
-        //item->setTextAlignment(Qt::AlignCenter);
-        //model->setItem(i,c_measured,item);
-
-
-        if (av->desc() != NULL)
-        {
-            item = new QStandardItem(av->desc());
-            item->setTextAlignment(Qt::AlignCenter);
-            item->setData(idAv, Qt::UserRole);
-            model->setItem(i,c_description,item);
-        }
-
-    }
-*/
     QSortFilterProxyModel * attrHistModel = new KKSAttrHistoryProxyModel(this);
     attrHistModel->setSourceModel (model);
     QHeaderView * hv = UI->tvHistory->header();
@@ -248,7 +135,7 @@ void AttrHistory::viewDblVal (const QModelIndex& wIndex)
 {
     QModelIndex vInd = wIndex.sibling(wIndex.row(), 0);
     int idAttrVal = vInd.data(Qt::UserRole).toInt();
-    emit viewAttrValue (idAttrVal, UI->tvHistory->viewport());
+    emit viewAttrValue (idAttrVal, this);
 }
 
 void AttrHistory::upClicked (void)

@@ -61,6 +61,7 @@
 #include <kksattrattreditor.h>
 #include <kkscatattreditor.h>
 #include <KKSAValWidget.h>
+#include <KKSAttrValuePropsForm.h>
 
 #include <KKSFilter.h>
 #include <KKSObject.h>
@@ -2654,9 +2655,15 @@ void KKSAttributesFactory :: viewAttrValue (const KKSAttrValue * av, int idAVal,
     if (!av || idAVal < 0)
         return;
     //qDebug () << __PRETTY_FUNCTION__ << av->id() << idAVal << isSys << pWidget;
+    QWidget * histW = qobject_cast<QWidget *>(this->sender());
     QWidget * avW = createAttrValWidget (av, idAVal, isSys, pWidget, Qt::Window);
     if (!avW)
         return;
+    if (qobject_cast<KKSAttrValuePropsForm *>(sender()))
+    {
+        connect (avW, SIGNAL (prevVal()), histW, SLOT (upClicked()) );
+        connect (avW, SIGNAL (nextVal()), histW, SLOT (downClicked()) );
+    }
     avW->adjustSize();
     avW->show();
 }
