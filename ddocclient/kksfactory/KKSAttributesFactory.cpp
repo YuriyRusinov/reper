@@ -62,6 +62,7 @@
 #include <kkscatattreditor.h>
 #include <KKSAValWidget.h>
 #include <KKSAttrValuePropsForm.h>
+#include <attrhistory.h>
 
 #include <KKSFilter.h>
 #include <KKSObject.h>
@@ -2654,15 +2655,14 @@ void KKSAttributesFactory :: viewAttrValue (const KKSAttrValue * av, int idAVal,
 {
     if (!av || idAVal < 0)
         return;
-    //qDebug () << __PRETTY_FUNCTION__ << av->id() << idAVal << isSys << pWidget;
-    QWidget * histW = qobject_cast<QWidget *>(this->sender());
+    qDebug () << __PRETTY_FUNCTION__ << av->id() << idAVal << isSys << (qobject_cast<QWidget *>(this->sender()));
     QWidget * avW = createAttrValWidget (av, idAVal, isSys, pWidget, Qt::Window);
     if (!avW)
         return;
-    if (qobject_cast<KKSAttrValuePropsForm *>(sender()))
+    if (qobject_cast<AttrHistory *>(pWidget))
     {
-        connect (avW, SIGNAL (prevVal()), histW, SLOT (upClicked()) );
-        connect (avW, SIGNAL (nextVal()), histW, SLOT (downClicked()) );
+        connect (avW, SIGNAL (prevVal()), pWidget, SLOT (upClicked()) );
+        connect (avW, SIGNAL (nextVal()), pWidget, SLOT (downClicked()) );
     }
     avW->adjustSize();
     avW->show();
@@ -2821,4 +2821,6 @@ void KKSAttributesFactory :: initAttrValueModel (const KKSAttrValue * pAttrValue
     QAbstractItemModel * avMod = aValComplexModel (pAttrValue, val);
     if (avW)
         avW->setValModel (avMod);
+    else
+        delete avMod;
 }

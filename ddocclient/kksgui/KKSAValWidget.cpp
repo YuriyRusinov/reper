@@ -190,6 +190,8 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
     buttonsLay->addWidget(pbClose);
     avGLay->addLayout (buttonsLay, 1, 0, 1, 2, Qt::AlignJustify | Qt::AlignBottom);//addWidget(pbClose, 1, 1, 1, 1);
 
+    connect (tbUp, SIGNAL (clicked()), this, SLOT (upVal()) );
+    connect (tbDown, SIGNAL (clicked()), this, SLOT (downVal()) );
 }
 
 void KKSAValWidget::initComplexWidget (KKSAttrValue * av, QGridLayout * gLay, QWidget * parent, Qt::WindowFlags flags)

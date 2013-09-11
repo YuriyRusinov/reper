@@ -6,6 +6,8 @@
 #include <QSortFilterProxyModel>
 #include <QHeaderView>
 #include <QItemSelectionModel>
+#include <QItemSelection>
+#include <QItemSelectionRange>
 #include <QModelIndex>
 #include <QMenu>
 #include <QHeaderView>
@@ -140,18 +142,42 @@ void AttrHistory::viewDblVal (const QModelIndex& wIndex)
 
 void AttrHistory::upClicked (void)
 {
-    QKeyEvent * kUpEvent = new QKeyEvent (QEvent::KeyPress, Qt::Key_Up, Qt::NoModifier);
-    (qobject_cast<QObject *>(UI->tvHistory))->event (kUpEvent);
-    //QCoreApplication::sendEvent (UI->tvHistory, kUpEvent);
-    //this->keyPressEvent(kUpEvent);
-    delete kUpEvent;
+    QAbstractItemModel * histMod = UI->tvHistory->model();
+    if (!histMod)
+        return;
+    QItemSelectionModel * selModel = UI->tvHistory->selectionModel();
+    QItemSelection iSel = selModel->selection();
+    if (iSel.isEmpty())
+        return;
+    QModelIndex topWIndex = iSel.indexes().at(0);
+    int iRow = topWIndex.row();
+    if (iRow==0)
+        return;
+    QItemSelectionRange selRange = iSel.at(0);
+    QModelIndex wLeftIndex = histMod->index(iRow-1, 0, topWIndex.parent());
+    QModelIndex wRightIndex = histMod->index(iRow-1, selRange.width()-1, topWIndex.parent());
+    QItemSelection newSel (wLeftIndex, wRightIndex);
+    //qDebug () << __PRETTY_FUNCTION__ << newSel << wLeftIndex << wRightIndex;
+    selModel->select(newSel, QItemSelectionModel::ClearAndSelect);
 }
 
 void AttrHistory::downClicked (void)
 {
-    QKeyEvent * kDownEvent = new QKeyEvent (QEvent::KeyPress, Qt::Key_Down, Qt::NoModifier);
-    (qobject_cast<QObject *>(UI->tvHistory))->event (kDownEvent);
-    //QCoreApplication::sendEvent (UI->tvHistory, kDownEvent);
-    //this->keyPressEvent(kUpEvent);
-    delete kDownEvent;
+    QAbstractItemModel * histMod = UI->tvHistory->model();
+    if (!histMod)
+        return;
+    QItemSelectionModel * selModel = UI->tvHistory->selectionModel();
+    QItemSelection iSel = selModel->selection();
+    if (iSel.isEmpty())
+        return;
+    QModelIndex topWIndex = iSel.indexes().at(0);
+    int iRow = topWIndex.row();
+    if (iRow==histMod->rowCount(topWIndex.parent())-1)
+        return;
+    QItemSelectionRange selRange = iSel.at(0);
+    QModelIndex wLeftIndex = histMod->index(iRow+1, 0, topWIndex.parent());
+    QModelIndex wRightIndex = histMod->index(iRow+1, selRange.width()-1, topWIndex.parent());
+    QItemSelection newSel (wLeftIndex, wRightIndex);
+    //qDebug () << __PRETTY_FUNCTION__ << newSel << wLeftIndex << wRightIndex;
+    selModel->select(newSel, QItemSelectionModel::ClearAndSelect);
 }
