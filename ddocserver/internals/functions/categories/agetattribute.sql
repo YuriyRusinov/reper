@@ -163,9 +163,9 @@ begin
             a.def_width, 
             att.name, 
             att.code, 
-            NULL, --def_value
-            NULL, --is_mandatory
-            NULL, --is_read_only
+            ac.def_value,
+            ac.is_mandatory,
+            ac.is_read_only,
             a.id_ref_attr_type as ref_attr_type_id, --(case when a.column_name isnull then NULL else (select a1.id_a_type from attributes a1 where a1.code = a.column_name) end) as ref_attr_type 
             NULL as ref_attr_type_name,
             NULL as ref_attr_type_code,
