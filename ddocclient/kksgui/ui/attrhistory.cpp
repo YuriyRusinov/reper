@@ -18,13 +18,13 @@
 
 #include <KKSAttrValue.h>
 #include <KKSObject.h>
-#include <KKSAttrHistModel.h>
 
 #include "attrhistory.h"
 #include "ui_attr_history.h"
 #include "defines.h"
 #include "KKSAttrHistoryProxyModel.h"
 #include "KKSItemDelegate.h"
+#include "KKSAttrHistModel.h"
 
 const int c_id = 0;
 const int c_start = 1;
@@ -78,7 +78,7 @@ void AttrHistory::view(const KKSList<KKSAttrValue*> & histlist)
     //QStandardItem *tree;
 
     //int n = histlist.count();
-    QAbstractItemModel *model =new KKSAttrHistModel (histlist);//QStandardItemModel (n, c_description+1);
+    QAbstractItemModel *model = new KKSAttrHistModel (histlist);//QStandardItemModel (n, c_description+1);
     //QStandardItem *item;
 
     //Получаем Имя Тип И Группу атрибута

@@ -5973,7 +5973,7 @@ KKSAttrValue * KKSLoader::loadIOAttrValue(const KKSAttrValue * av, int idVal, bo
     if(forRecords)
         sql = QString ("select * from getRecAttrValue(%1)").arg (idVal);
     else
-        sql = QString ("select * from getIOAttrValue(%1)").arg (idVal);
+        sql = QString ("select * from getIOAttrValue(%1::int8)").arg (idVal);
 
     KKSResult * res = db->execute (sql);
     int cnt = res ? res->getRowCount() : 0;
