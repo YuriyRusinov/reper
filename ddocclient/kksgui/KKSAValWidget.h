@@ -58,6 +58,7 @@ private:
     // Functions
     //
     void initComplexWidget (KKSAttrValue * av, QGridLayout * gLay, QWidget * parent=0, Qt::WindowFlags flags=0);
+    void setComplexVals (const QVariant& val);
 private:
     //
     // Variables

@@ -100,6 +100,7 @@ private slots:
     void updateAttrModel (QAbstractItemModel * attrModel);
     
     void viewAttrValue (const KKSAttrValue * av, int idAVal, int isSys, QWidget * pWidget);
+    void refreshAttrValue (const KKSAttrValue * av, int idAVal);
     
     void updateAttrValueModel (const KKSAttrValue * pAttrValue, const QVariant& val, QAbstractItemModel * attrValModel);
     void initAttrValueModel (const KKSAttrValue * pAttrValue, const QVariant& val);
@@ -107,6 +108,7 @@ private slots:
 signals:
     void viewHistory(const KKSList<KKSAttrValue *> &);
     void expandIndex (const QModelIndex&);
+    void aValRefresh (const KKSAttribute *, QVariant);
     
 private:
     //

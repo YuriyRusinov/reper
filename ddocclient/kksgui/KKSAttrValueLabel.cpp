@@ -136,10 +136,11 @@ void KKSAttrValueLabel :: showAttrValueProps()
                                                           this);
 #endif
 
-    connect(f, SIGNAL(loadIOSrc(KKSObject **, QWidget *)), this, SIGNAL(loadIOSrc(KKSObject **, QWidget *)));
-    connect(f, SIGNAL(viewIOSrc(KKSObject *, QWidget *)), this, SIGNAL(viewIOSrc(KKSObject *, QWidget *)));
-    connect(f, SIGNAL(loadHistory(const KKSAttrValue *, bool)), this, SIGNAL(loadHistory(const KKSAttrValue *, bool)));
-    connect(f, SIGNAL(viewAttrValue (const KKSAttrValue *, int, QWidget *)), this, SLOT (viewAVal(const KKSAttrValue *, int, QWidget *)));
+    connect (f, SIGNAL(loadIOSrc(KKSObject **, QWidget *)), this, SIGNAL(loadIOSrc(KKSObject **, QWidget *)));
+    connect (f, SIGNAL(viewIOSrc(KKSObject *, QWidget *)), this, SIGNAL(viewIOSrc(KKSObject *, QWidget *)));
+    connect (f, SIGNAL(loadHistory(const KKSAttrValue *, bool)), this, SIGNAL(loadHistory(const KKSAttrValue *, bool)));
+    connect (f, SIGNAL(viewAttrValue (const KKSAttrValue *, int, QWidget *)), this, SLOT (viewAVal(const KKSAttrValue *, int, QWidget *)));
+    connect (f, SIGNAL(refreshAttrValue (const KKSAttrValue *, int)), this, SIGNAL(refreshDetailAttrVal (const KKSAttrValue *, int)) );
     connect(this, SIGNAL(viewHistory(const KKSList<KKSAttrValue *> &)), f, SLOT(viewHistory(const KKSList<KKSAttrValue *> &)));
 
     if(f->exec() == QDialog::Accepted)

@@ -191,4 +191,9 @@ void AttrHistory::downClicked (void)
 void AttrHistory::histSelectionChanged (const QItemSelection& selected, const QItemSelection& deselected)
 {
     qDebug () << __PRETTY_FUNCTION__ << selected << deselected;
+    if (selected.isEmpty())
+        return;
+    QModelIndex topWIndex = selected.indexes().at(0);
+    int idVal = topWIndex.data (Qt::UserRole).toInt();
+    emit refreshAttrValue (idVal);
 }

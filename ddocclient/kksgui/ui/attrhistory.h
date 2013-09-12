@@ -53,6 +53,7 @@ private:
 
 signals:
     void viewAttrValue (int, QWidget *);
+    void refreshAttrValue (int);
 
 private:
     //

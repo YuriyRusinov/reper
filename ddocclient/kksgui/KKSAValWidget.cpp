@@ -9,6 +9,7 @@
 #include <QTime>
 #include <QDateTime>
 #include <QAbstractItemModel>
+#include <QAbstractItemView>
 
 #include <QLineEdit>
 #include <QDateEdit>
@@ -313,7 +314,7 @@ KKSAValWidget::~KKSAValWidget()
 
 void KKSAValWidget::setValue (const KKSAttribute * a, QVariant val)
 {
-    if (!a || !a->id() != pAttrValue->attribute()->id())
+    if (!a || a->id() != pAttrValue->attribute()->id())
         return;
     const KKSAttribute * attr = pAttrValue->attribute();
     const KKSAttrType * aType = attr->type();
@@ -340,7 +341,10 @@ void KKSAValWidget::setValue (const KKSAttribute * a, QVariant val)
         {
             (qobject_cast<KKSComplexAttrWidget*>(gbVal))->setVal(val.toString());
             emit updateComplexAttr (pAttrValue, val, gbVal);
-            this->initComplexWidget(pAttrValue,(qobject_cast<KKSComplexAttrWidget*>(gbVal))->getLay(), gbVal);
+            if (aWVals.isEmpty())//qobject_cast<QWidget *>(sender()))
+                this->initComplexWidget(pAttrValue,(qobject_cast<KKSComplexAttrWidget*>(gbVal))->getLay(), gbVal);
+            else
+                setComplexVals (val);
             break;
         }
         case KKSAttrType::atDouble:
@@ -415,4 +419,54 @@ void KKSAValWidget::setValModel (QAbstractItemModel * valMod)
     tvVal->setModel (valMod);
     if (oldModel && oldModel != valMod)
         delete oldModel;
+}
+
+void KKSAValWidget::setComplexVals (const QVariant& val)
+{
+    QList<QVariant> valArr = val.toList();
+    
+    int nw = aWVals.count();
+    KKSMap<qint64, KKSAttrValue*> aVals = pAttrValue->attrsValues();
+    KKSMap<qint64, KKSAttrValue*>::const_iterator p = aVals.constBegin();
+    for (int i=0; i<nw; i++)
+    {
+        QWidget * aW = aWVals[i];
+        if (qobject_cast<QCheckBox *>(aW))
+        {
+            QCheckBox * ch = qobject_cast<QCheckBox *>(aW);
+            bool isCh = valArr[i].toBool();
+            ch->setChecked(isCh);
+        }
+        else if (qobject_cast<QAbstractItemView *>(aW))
+        {
+            QAbstractItemModel * aMod = (qobject_cast<QAbstractItemView *>(aW))->model();
+            emit updateMod (p.value(), valArr[i], aMod);
+        }
+        else if (qobject_cast<QDateEdit *>(aW) && !qobject_cast<QDateTimeEdit *>(aW))
+        {
+            QDateEdit * dE = qobject_cast<QDateEdit *>(aW);
+            dE->setDate(valArr[i].toDate());
+        }
+        else if (qobject_cast<QTimeEdit *>(aW) && !qobject_cast<QDateTimeEdit *>(aW))
+        {
+            QTimeEdit * tE = qobject_cast<QTimeEdit *>(aW);
+            tE->setTime(valArr[i].toTime());
+        }
+        else if (qobject_cast<QDateTimeEdit *>(aW))
+        {
+            QDateTimeEdit * dtE = qobject_cast<QDateTimeEdit *>(aW);
+            dtE->setDateTime(valArr[i].toDateTime());
+        }
+        else if (qobject_cast<QLineEdit *>(aW))
+        {
+            QLineEdit * lE = qobject_cast<QLineEdit *>(aW);
+            lE->setText(valArr[i].toString());
+        }
+        else if (qobject_cast<QTextEdit *>(aW))
+        {
+            QTextEdit * tE = qobject_cast<QTextEdit *>(aW);
+            tE->setPlainText(valArr[i].toString());
+        }
+        p++;
+    }
 }

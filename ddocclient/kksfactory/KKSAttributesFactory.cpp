@@ -918,6 +918,7 @@ QLabel * KKSAttributesFactory :: createAttrTitle (KKSAttrValue * av, KKSIndAttr:
     connect (lTitle, SIGNAL(viewIOSrc(KKSObject *, QWidget *)), this, SLOT(viewIOSrc(KKSObject *, QWidget *)));
     connect (lTitle, SIGNAL(loadHistory(const KKSAttrValue *, bool)), this, SLOT(loadIOAttrValueHistory(const KKSAttrValue *, bool)));
     connect (lTitle, SIGNAL(viewDetailAttrVal (const KKSAttrValue *, int, int, QWidget *)), this, SLOT(viewAttrValue (const KKSAttrValue *, int, int, QWidget *)) );
+    connect (lTitle, SIGNAL(refreshDetailAttrVal (const KKSAttrValue *, int)), this, SLOT (refreshAttrValue (const KKSAttrValue *, int)) );
     connect (this, SIGNAL(viewHistory(const KKSList<KKSAttrValue *> &)), lTitle, SIGNAL(viewHistory(const KKSList<KKSAttrValue *> &)));
 
     if(objEditor)
@@ -1689,6 +1690,7 @@ QWidget * KKSAttributesFactory :: createAttrCheckWidget (const KKSAttrValue * av
         connect (lHist, SIGNAL(viewIOSrc(KKSObject *, QWidget *)), this, SLOT(viewIOSrc(KKSObject *, QWidget *)));
         connect (lHist, SIGNAL(loadHistory(const KKSAttrValue *, bool)), this, SLOT(loadIOAttrValueHistory(const KKSAttrValue *, bool)));
         connect (lHist, SIGNAL(viewDetailAttrVal (const KKSAttrValue *, int, int, QWidget *)), this, SLOT(viewAttrValue (const KKSAttrValue *, int, int, QWidget *)) );
+        connect (lHist, SIGNAL(refreshDetailAttrVal (const KKSAttrValue *, int)), this, SLOT (refreshAttrValue (const KKSAttrValue *, int)) );
         connect (this, SIGNAL(viewHistory(const KKSList<KKSAttrValue *> &)), lHist, SIGNAL(viewHistory(const KKSList<KKSAttrValue *> &)));
     }
     return attrWidget;
@@ -2693,6 +2695,10 @@ QWidget * KKSAttributesFactory :: createAttrValWidget (const KKSAttrValue * pAtt
              this,
              SLOT (updateAttrValueModel(const KKSAttrValue *, const QVariant&, QAbstractItemModel *))
             );
+    connect (this, SIGNAL (aValRefresh (const KKSAttribute *, QVariant)),
+             avWidget,
+             SLOT (setValue (const KKSAttribute *, QVariant))
+            );
 //    QGridLayout * avGLay = new QGridLayout (avWidget);
     const KKSAttribute * a = pAttrValue->attribute();
     const KKSAttrType * aType = a->type();
@@ -2714,7 +2720,7 @@ QAbstractItemModel * KKSAttributesFactory :: aValComplexModel (const KKSAttrValu
     QString tableName = pAttrValue->attribute()->tableName ();
     QVariant V = av.isValid() ? av : pAttrValue->value().valueVariant();
 
-    QStringList vArray = V.toStringList();
+    //QStringList vArray = V.toStringList();
     //qDebug () << __PRETTY_FUNCTION__ << vArray << pAttrValue->id() << pAttrValue->attribute()->id();
     KKSObject * refIO = loader->loadIO (tableName, true);
     if (!refIO)
@@ -2823,4 +2829,25 @@ void KKSAttributesFactory :: initAttrValueModel (const KKSAttrValue * pAttrValue
         avW->setValModel (avMod);
     else
         delete avMod;
+}
+
+void KKSAttributesFactory :: refreshAttrValue (const KKSAttrValue * av, int idAVal)
+{
+    if (!av)
+        return;
+    KKSAttrValue * avNew = loader->loadIOAttrValue(av, idAVal, false);
+    if (!avNew)
+        return;
+    if (avNew->attribute()->type()->attrType() == KKSAttrType::atComplex)
+    {
+        loader->loadAttrAttrs(avNew->attribute());
+        if(!avNew->attrsValuesLoaded())
+        {
+            KKSMap<qint64, KKSAttrValue*> aav_list = loader->loadAttrAttrValues(avNew, false);
+            avNew->setAttrsValues(aav_list);
+        }
+    }
+    QVariant val (avNew->value().valueVariant());
+    emit aValRefresh (av->attribute(), val);
+    avNew->release();
 }

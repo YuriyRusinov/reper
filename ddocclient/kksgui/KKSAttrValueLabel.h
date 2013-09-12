@@ -35,6 +35,7 @@ signals:
     void loadHistory(const KKSAttrValue *, bool);
     void viewHistory(const KKSList<KKSAttrValue *> &);
     void viewDetailAttrVal (const KKSAttrValue *, int, int, QWidget *);
+    void refreshDetailAttrVal (const KKSAttrValue *, int);
 
 private slots:
     void viewAVal (const KKSAttrValue * av, int idAVal, QWidget * pWidget);
