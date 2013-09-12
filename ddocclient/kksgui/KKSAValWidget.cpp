@@ -431,6 +431,7 @@ void KKSAValWidget::setComplexVals (const QVariant& val)
     for (int i=0; i<nw; i++)
     {
         QWidget * aW = aWVals[i];
+        qDebug () << __PRETTY_FUNCTION__ << valArr[i];
         if (qobject_cast<QCheckBox *>(aW))
         {
             QCheckBox * ch = qobject_cast<QCheckBox *>(aW);
@@ -442,20 +443,20 @@ void KKSAValWidget::setComplexVals (const QVariant& val)
             QAbstractItemModel * aMod = (qobject_cast<QAbstractItemView *>(aW))->model();
             emit updateMod (p.value(), valArr[i], aMod);
         }
-        else if (qobject_cast<QDateEdit *>(aW) && !qobject_cast<QDateTimeEdit *>(aW))
-        {
-            QDateEdit * dE = qobject_cast<QDateEdit *>(aW);
-            dE->setDate(valArr[i].toDate());
-        }
-        else if (qobject_cast<QTimeEdit *>(aW) && !qobject_cast<QDateTimeEdit *>(aW))
-        {
-            QTimeEdit * tE = qobject_cast<QTimeEdit *>(aW);
-            tE->setTime(valArr[i].toTime());
-        }
         else if (qobject_cast<QDateTimeEdit *>(aW))
         {
             QDateTimeEdit * dtE = qobject_cast<QDateTimeEdit *>(aW);
             dtE->setDateTime(valArr[i].toDateTime());
+        }
+        else if (qobject_cast<QDateEdit *>(aW))
+        {
+            QDateEdit * dE = qobject_cast<QDateEdit *>(aW);
+            dE->setDate(valArr[i].toDate());
+        }
+        else if (qobject_cast<QTimeEdit *>(aW))
+        {
+            QTimeEdit * tE = qobject_cast<QTimeEdit *>(aW);
+            tE->setTime(valArr[i].toTime());
         }
         else if (qobject_cast<QLineEdit *>(aW))
         {
