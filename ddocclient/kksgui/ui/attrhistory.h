@@ -18,6 +18,7 @@ class QContextMenuEvent;
 class QMenu;
 class QAction;
 class QModelIndex;
+class QItemSelection;
 
 namespace Ui
 {
@@ -35,6 +36,8 @@ private slots:
     void viewDblVal (const QModelIndex&);
     void upClicked (void);
     void downClicked (void);
+
+    void histSelectionChanged (const QItemSelection& selected, const QItemSelection& deselected);
 
 protected:
     //

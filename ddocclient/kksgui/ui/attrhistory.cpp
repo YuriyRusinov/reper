@@ -53,6 +53,12 @@ AttrHistory::AttrHistory (const KKSList<KKSAttrValue*> & histlist, QWidget *pare
     pHistMenu->addAction(aViewVals);
     QAbstractItemDelegate * iDeleg = new KKSItemDelegate();
     UI->tvHistory->setItemDelegate(iDeleg);
+    QItemSelectionModel * selModel = UI->tvHistory->selectionModel ();
+    connect (selModel,
+             SIGNAL (selectionChanged (const QItemSelection&, const QItemSelection&)),
+             this,
+             SLOT (histSelectionChanged (const QItemSelection&, const QItemSelection&))
+            );
     connect (aViewVals, SIGNAL(triggered()), this, SLOT (viewVal()) );
     connect (UI->pbUp, SIGNAL(clicked()), this, SLOT (upClicked()) );
     connect (UI->pbDown, SIGNAL (clicked()), this, SLOT (downClicked()) );
@@ -180,4 +186,9 @@ void AttrHistory::downClicked (void)
     QItemSelection newSel (wLeftIndex, wRightIndex);
     //qDebug () << __PRETTY_FUNCTION__ << newSel << wLeftIndex << wRightIndex;
     selModel->select(newSel, QItemSelectionModel::ClearAndSelect);
+}
+
+void AttrHistory::histSelectionChanged (const QItemSelection& selected, const QItemSelection& deselected)
+{
+    qDebug () << __PRETTY_FUNCTION__ << selected << deselected;
 }
