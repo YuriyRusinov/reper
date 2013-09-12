@@ -2838,6 +2838,7 @@ void KKSAttributesFactory :: refreshAttrValue (const KKSAttrValue * av, int idAV
     KKSAttrValue * avNew = loader->loadIOAttrValue(av, idAVal, false);
     if (!avNew)
         return;
+    QVariant val (avNew->value().valueVariant());
     if (avNew->attribute()->type()->attrType() == KKSAttrType::atComplex)
     {
         loader->loadAttrAttrs(avNew->attribute());
@@ -2846,8 +2847,16 @@ void KKSAttributesFactory :: refreshAttrValue (const KKSAttrValue * av, int idAV
             KKSMap<qint64, KKSAttrValue*> aav_list = loader->loadAttrAttrValues(avNew, false);
             avNew->setAttrsValues(aav_list);
         }
+        QList<QVariant> valList;
+        for (KKSMap<qint64, KKSAttrValue*>::const_iterator p=avNew->attrsValues().constBegin();
+                p != avNew->attrsValues().constEnd();
+                p++)
+        {
+            QVariant v = p.value()->value().valueVariant();
+            valList.append (v);
+        }
+        val = QVariant(valList);
     }
-    QVariant val (avNew->value().valueVariant());
     emit aValRefresh (av->attribute(), val);
     avNew->release();
 }
