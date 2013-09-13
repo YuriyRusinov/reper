@@ -2847,15 +2847,15 @@ void KKSAttributesFactory :: refreshAttrValue (const KKSAttrValue * av, int idAV
             KKSMap<qint64, KKSAttrValue*> aav_list = loader->loadAttrAttrValues(avNew, false);
             avNew->setAttrsValues(aav_list);
         }
-        QList<QVariant> valList;
+        QMap<QString, QVariant> valMap;
         for (KKSMap<qint64, KKSAttrValue*>::const_iterator p=avNew->attrsValues().constBegin();
                 p != avNew->attrsValues().constEnd();
                 p++)
         {
             QVariant v = p.value()->value().valueVariant();
-            valList.append (v);
+            valMap.insert(QString::number(p.key()), v);
         }
-        val = QVariant(valList);
+        val = QVariant(valMap);
     }
     emit aValRefresh (av->attribute(), val);
     avNew->release();

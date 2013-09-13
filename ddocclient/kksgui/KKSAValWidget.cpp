@@ -342,7 +342,7 @@ void KKSAValWidget::setValue (const KKSAttribute * a, QVariant val)
             (qobject_cast<KKSComplexAttrWidget*>(gbVal))->setVal(val.toString());
             emit updateComplexAttr (pAttrValue, val, gbVal);
             if (aWVals.isEmpty())//qobject_cast<QWidget *>(sender()))
-                this->initComplexWidget(pAttrValue,(qobject_cast<KKSComplexAttrWidget*>(gbVal))->getLay(), gbVal);
+                initComplexWidget(pAttrValue,(qobject_cast<KKSComplexAttrWidget*>(gbVal))->getLay(), gbVal);
             else
                 setComplexVals (val);
             break;
@@ -423,51 +423,92 @@ void KKSAValWidget::setValModel (QAbstractItemModel * valMod)
 
 void KKSAValWidget::setComplexVals (const QVariant& val)
 {
-    QList<QVariant> valArr = val.toList();
+    QMap<QString, QVariant> valArr = val.toMap();
     
-    int nw = aWVals.count();
+    //int nw = aWVals.count();
     KKSMap<qint64, KKSAttrValue*> aVals = pAttrValue->attrsValues();
+    //qDebug () << __PRETTY_FUNCTION__ << valArr << aVals.keys();
     KKSMap<qint64, KKSAttrValue*>::const_iterator p = aVals.constBegin();
-    for (int i=0; i<nw; i++)
+    int i=0;
+    for (; p != aVals.constEnd(); p++)
     {
         QWidget * aW = aWVals[i];
-        qDebug () << __PRETTY_FUNCTION__ << valArr[i];
-        if (qobject_cast<QCheckBox *>(aW))
+        KKSAttrValue * av = p.value();
+        if (!av || !av->attribute() || !av->attribute()->type())
+            continue;
+        int idAttrType = av->attribute()->type()->attrType();
+        QMap<QString, QVariant>::const_iterator pv = valArr.constBegin()+i;
+        QVariant valW = pv.value();//valArr.value(QString::number(p.key()));
+        qDebug () << __PRETTY_FUNCTION__ << valW << idAttrType;
+        switch (idAttrType)
         {
-            QCheckBox * ch = qobject_cast<QCheckBox *>(aW);
-            bool isCh = valArr[i].toBool();
-            ch->setChecked(isCh);
+            case KKSAttrType::atBool:
+            {
+                QCheckBox * ch = qobject_cast<QCheckBox *>(aW);
+                bool isCh = valW.toBool();
+                ch->setChecked(isCh);
+                break;
+            }
+            case KKSAttrType::atCheckList:
+            case KKSAttrType::atCheckListEx:
+            {
+                QAbstractItemModel * aMod = (qobject_cast<QAbstractItemView *>(aW))->model();
+                emit updateMod (p.value(), valW, aMod);
+                break;
+            }
+            case KKSAttrType::atDateTime:
+            {
+                QDateTimeEdit * dtE = qobject_cast<QDateTimeEdit *>(aW);
+                if (valW.isValid())
+                    dtE->setDateTime(valW.toDateTime());
+                else
+                    dtE->setDateTime(QDateTime());
+                break;
+            }
+            case KKSAttrType::atDate:
+            {
+                QDateEdit * dE = qobject_cast<QDateEdit *>(aW);
+                if (valW.isValid())
+                    dE->setDate(valW.toDate());
+                else
+                    dE->setDate(QDate());
+                break;
+            }
+            case KKSAttrType::atTime:
+            {
+                QTimeEdit * tE = qobject_cast<QTimeEdit *>(aW);
+                if (valW.isValid())
+                    tE->setTime(valW.toTime());
+                else
+                    tE->setTime(QTime());
+                break;
+            }
+            case KKSAttrType::atDouble:
+            case KKSAttrType::atFixString:
+            case KKSAttrType::atInt:
+            case KKSAttrType::atInt64:
+            case KKSAttrType::atString:
+            case KKSAttrType::atList:
+            case KKSAttrType::atParent:
+            case KKSAttrType::atObjRef:
+            case KKSAttrType::atUUID:
+            case KKSAttrType::atUrl:
+            case KKSAttrType::atRecordColor:
+            case KKSAttrType::atRecordColorRef:
+            case KKSAttrType::atRecordTextColor:
+            case KKSAttrType::atRecordTextColorRef:
+            {
+                QLineEdit * lE = qobject_cast<QLineEdit *>(aW);
+                lE->setText(valW.toString());
+                break;
+            }
+            case KKSAttrType::atText:
+            {
+                QTextEdit * textE = qobject_cast<QTextEdit *>(aW);
+                textE->setPlainText(valW.toString());
+                break;
+            }
         }
-        else if (qobject_cast<QAbstractItemView *>(aW))
-        {
-            QAbstractItemModel * aMod = (qobject_cast<QAbstractItemView *>(aW))->model();
-            emit updateMod (p.value(), valArr[i], aMod);
-        }
-        else if (qobject_cast<QDateTimeEdit *>(aW))
-        {
-            QDateTimeEdit * dtE = qobject_cast<QDateTimeEdit *>(aW);
-            dtE->setDateTime(valArr[i].toDateTime());
-        }
-        else if (qobject_cast<QDateEdit *>(aW))
-        {
-            QDateEdit * dE = qobject_cast<QDateEdit *>(aW);
-            dE->setDate(valArr[i].toDate());
-        }
-        else if (qobject_cast<QTimeEdit *>(aW))
-        {
-            QTimeEdit * tE = qobject_cast<QTimeEdit *>(aW);
-            tE->setTime(valArr[i].toTime());
-        }
-        else if (qobject_cast<QLineEdit *>(aW))
-        {
-            QLineEdit * lE = qobject_cast<QLineEdit *>(aW);
-            lE->setText(valArr[i].toString());
-        }
-        else if (qobject_cast<QTextEdit *>(aW))
-        {
-            QTextEdit * tE = qobject_cast<QTextEdit *>(aW);
-            tE->setPlainText(valArr[i].toString());
-        }
-        p++;
+        i++;
     }
 }
