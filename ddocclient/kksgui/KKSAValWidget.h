@@ -33,6 +33,10 @@ class QStackedLayout;
 
 class KKSAttrValue;
 class KKSAttribute;
+class KKSSvgWidget;
+class KKSPointTable;
+class KKSPixmap;
+class KKSVideoPlayer;
 
 class _GUI_EXPORT KKSAValWidget : public QWidget {
 public:
@@ -76,6 +80,10 @@ private:
     QWidget * macVal;
     QLineEdit * lE [2];
     QTextEdit * textEVal;
+    KKSSvgWidget * svgVal;
+    KKSPointTable * pointsVal;
+    KKSPixmap * pixVal;
+    KKSVideoPlayer * videoVal;
 
     QToolButton * tbUp;
     QToolButton * tbDown;

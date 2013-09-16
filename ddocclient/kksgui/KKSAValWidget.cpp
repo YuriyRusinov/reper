@@ -33,6 +33,10 @@
 #include <KKSAttribute.h>
 #include <KKSAttrType.h>
 #include "KKSAValWidget.h"
+#include "KKSSvgWidget.h"
+#include "KKSPointTable.h"
+#include "KKSPixmap.h"
+#include "KKSVideoPlayer.h"
 #include "KKSComplexAttrWidget.h"
 
 KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFlags flags)
@@ -48,6 +52,10 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
       gbVal (0),
       macVal (0),
       textEVal (0),
+      svgVal (0),
+      pointsVal (0),
+      pixVal (0),
+      videoVal (0),
       tbUp (new QToolButton),
       tbDown (new QToolButton)
 {
@@ -166,12 +174,39 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
             break;
         }
         case KKSAttrType::atText:
+        case KKSAttrType::atGeometry:
+        case KKSAttrType::atGeometryPoly:
         {
             textEVal = new QTextEdit;
             textEVal->setReadOnly (true);
             textEVal->setPlainText (V.toString());
             valWidget = qobject_cast<QWidget *>(textEVal);
             numR++;
+            break;
+        }
+        case KKSAttrType::atSVG:
+        {
+            svgVal = new KKSSvgWidget (pAttrValue, KKSIndAttr::iacIOUserAttr, V.toByteArray());
+            valWidget = qobject_cast<QWidget *>(svgVal);
+            break;
+        }
+        case KKSAttrType::atPoints:
+        {
+            pointsVal = new KKSPointTable (pAttrValue, KKSIndAttr::iacIOUserAttr, V.toList());
+            valWidget = qobject_cast<QWidget *>(pointsVal);
+            break;
+        }
+        case KKSAttrType::atJPG:
+        {
+            pixVal = new KKSPixmap (pAttrValue, KKSIndAttr::iacIOUserAttr, V.toString());
+            valWidget = qobject_cast<QWidget *>(pixVal);
+            break;
+        }
+        case KKSAttrType::atVideo:
+        {
+            videoVal = new KKSVideoPlayer (pAttrValue, KKSIndAttr::iacIOUserAttr);
+            videoVal->setMovie(V.toByteArray());
+            valWidget = qobject_cast<QWidget *>(videoVal);
             break;
         }
         default:break;
@@ -283,11 +318,34 @@ void KKSAValWidget::initComplexWidget (KKSAttrValue * av, QGridLayout * gLay, QW
                 break;
             }
             case KKSAttrType::atText:
+            case KKSAttrType::atGeometry:
+            case KKSAttrType::atGeometryPoly:
             {
                 aW = new QTextEdit (parent);
                 QTextEdit * textE = qobject_cast<QTextEdit *>(aW);
                 textE->setText (val.toString());
                 textE->setReadOnly (true);
+                break;
+            }
+            case KKSAttrType::atSVG:
+            {
+                aW = new KKSSvgWidget (aV, KKSIndAttr::iacIOUserAttr, val.toByteArray(), parent);
+                break;
+            }
+            case KKSAttrType::atPoints:
+            {
+                aW = new KKSPointTable (aV, KKSIndAttr::iacIOUserAttr, val.toList());
+                break;
+            }
+            case KKSAttrType::atJPG:
+            {
+                aW = new KKSPixmap (pAttrValue, KKSIndAttr::iacIOUserAttr, val.toString());
+                break;
+            }
+            case KKSAttrType::atVideo:
+            {
+                aW = new KKSVideoPlayer (pAttrValue, KKSIndAttr::iacIOUserAttr);
+                (qobject_cast<KKSVideoPlayer *>(aW))->setMovie(val.toByteArray());
                 break;
             }
             default:continue;
@@ -397,6 +455,33 @@ void KKSAValWidget::setValue (const KKSAttribute * a, QVariant val)
             dtEVal->setDateTime(val.toDateTime());//QDateTime::fromString(pAttrValue->value().valueVariant(), QString("dd.MM.yyyy hh.mm.ss")));
             break;
         }
+        case KKSAttrType::atText:
+        case KKSAttrType::atGeometry:
+        case KKSAttrType::atGeometryPoly:
+        {
+            textEVal->setPlainText(val.toString());
+            break;
+        }
+        case KKSAttrType::atSVG:
+        {
+            svgVal->setContents(val.toByteArray());
+            break;
+        }
+        case KKSAttrType::atPoints:
+        {
+            pointsVal->setData(val.toList());
+            break;
+        }
+        case KKSAttrType::atJPG:
+        {
+            pixVal->setPixmap(val.toString());
+            break;
+        }
+        case KKSAttrType::atVideo:
+        {
+            videoVal->setMovie(val.toByteArray());
+            break;
+        }
         default:break;
     }
 }
@@ -439,7 +524,7 @@ void KKSAValWidget::setComplexVals (const QVariant& val)
         int idAttrType = av->attribute()->type()->attrType();
         QMap<QString, QVariant>::const_iterator pv = valArr.constBegin()+i;
         QVariant valW = pv.value();//valArr.value(QString::number(p.key()));
-        qDebug () << __PRETTY_FUNCTION__ << valW << idAttrType;
+        //qDebug () << __PRETTY_FUNCTION__ << valW << idAttrType;
         switch (idAttrType)
         {
             case KKSAttrType::atBool:
@@ -503,9 +588,35 @@ void KKSAValWidget::setComplexVals (const QVariant& val)
                 break;
             }
             case KKSAttrType::atText:
+            case KKSAttrType::atGeometry:
+            case KKSAttrType::atGeometryPoly:
             {
                 QTextEdit * textE = qobject_cast<QTextEdit *>(aW);
                 textE->setPlainText(valW.toString());
+                break;
+            }
+            case KKSAttrType::atSVG:
+            {
+                KKSSvgWidget * svgW = qobject_cast<KKSSvgWidget *>(aW);
+                svgW->setContents(valW.toByteArray());
+                break;
+            }
+            case KKSAttrType::atPoints:
+            {
+                KKSPointTable * pointW = qobject_cast<KKSPointTable *>(aW);
+                pointW->setData(valW.toList());
+                break;
+            }
+            case KKSAttrType::atJPG:
+            {
+                KKSPixmap * pixW = qobject_cast<KKSPixmap *>(aW);
+                pixW->setPixmap (valW.toString());
+                break;
+            }
+            case KKSAttrType::atVideo:
+            {
+                KKSVideoPlayer * vpW = qobject_cast<KKSVideoPlayer *>(aW);
+                vpW->setMovie(valW.toByteArray());
                 break;
             }
         }
