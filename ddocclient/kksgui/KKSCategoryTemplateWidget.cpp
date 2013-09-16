@@ -465,6 +465,7 @@ void KKSCategoryTemplateWidget :: addCatRec (KKSCategory * c)
     cModel->setData (wIndex, c->id(), Qt::UserRole);
     cModel->setData (wIndex, c->name(), Qt::DisplayRole);
     cModel->setData (wIndex, 1, Qt::UserRole+USER_ENTITY);
+    cModel->setData(wIndex, QIcon(":/ddoc/category.png"), Qt::DecorationRole);
     this->tvCatTemplate->update();
     //c->release ();
 }
