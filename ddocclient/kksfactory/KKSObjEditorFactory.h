@@ -145,12 +145,13 @@ public:
                                         );
 
     void createSearchTemplate();
-
+    
 public slots:
     void sendIO (KKSObject *wObj, KKSObjectExemplar *wObjE, KKSObjEditor *editor);
     void sendIOList (const QList<int>& idIOList);
     void printReport (KKSObject* io);
     void sendEditor (KKSObjEditor * editor);
+    KKSSearchTemplatesForm * GUISearchTemplate (bool mode=false, QWidget * parent=0, Qt::WindowFlags flags=0);
 
 private:
     //

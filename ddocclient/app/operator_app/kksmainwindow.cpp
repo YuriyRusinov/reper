@@ -1271,7 +1271,7 @@ void KKSMainWindow::slotShowSearchQueries()
     if(!oef)
         return;
     
-    oef->loadSearchTemplate();
+    oef->GUISearchTemplate();
 }
 
 void KKSMainWindow::slotCreateMsg()

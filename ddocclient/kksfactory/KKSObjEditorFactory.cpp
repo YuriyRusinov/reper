@@ -6760,22 +6760,41 @@ void KKSObjEditorFactory :: GUIloadDBSearchTemplate (KKSSearchTemplate *st, cons
             feForm->setFilters (fGroups);
     }
 }
-/* Метод загружает шаблоны поиска из БД.
+/* Метод загружает шаблоны поиска из БД и осуществляет выбор из формы.
  */
 KKSSearchTemplate * KKSObjEditorFactory :: loadSearchTemplate (void)
 {
     KKSSearchTemplate * searchT = 0;
     QWidget * parent = qobject_cast<QWidget *>(this->sender());
-//    KKSList<KKSSearchTemplate *> stList = loader->loadSearchTemplates ();
-//    int ncount = stList.count();
-    /*
-    if (!ncount)
-    {
-        QMessageBox::warning (parent, tr ("Search templates"), tr("There are no available search templates in database"), QMessageBox::Ok, QMessageBox::NoButton);
-        return 0;
-    }
-    */
+    KKSSearchTemplatesForm *stForm = GUISearchTemplate (true, parent);
+    QAbstractItemModel * searchTModel = stForm->dataModel();
+    while (qobject_cast<QAbstractProxyModel *>(searchTModel))
+        searchTModel = (qobject_cast<QAbstractProxyModel *>(searchTModel))->sourceModel();
 
+    QItemSelectionModel * selTModel = stForm->selectionModel ();
+    QAbstractProxyModel * sortTModel = qobject_cast<QAbstractProxyModel *>(stForm->dataModel());
+
+    if (selTModel && stForm->exec () == QDialog::Accepted)
+    {
+        if (selTModel->selection().indexes ().isEmpty())
+            return 0;
+        QModelIndex stProxyIndex = selTModel->selection().indexes ().at (0);
+        QModelIndex stIndex = sortTModel->mapToSource (stProxyIndex);
+
+        QVariant v = searchTModel->data (stIndex, Qt::UserRole+USER_ENTITY);
+        if (v.toInt() == 0)
+            return 0;
+        int idSearchTemplate = stIndex.data (Qt::UserRole).toInt();
+        searchT = loader->loadSearchTemplate (idSearchTemplate);
+    }
+
+    stForm->setParent (0);
+    delete stForm;
+    return searchT;
+}
+
+KKSSearchTemplatesForm * KKSObjEditorFactory :: GUISearchTemplate (bool mode, QWidget * parent, Qt::WindowFlags flags)
+{
     KKSObject * io = loader->loadIO (IO_IO_ID, true);
     if (!io)
         return NULL;
@@ -6788,35 +6807,11 @@ KKSSearchTemplate * KKSObjEditorFactory :: loadSearchTemplate (void)
     }
     io->release();
 
-    KKSSearchTemplatesForm *stForm = new KKSSearchTemplatesForm (c, "io_objects", false, parent);
+    KKSSearchTemplatesForm *stForm = new KKSSearchTemplatesForm (c, "io_objects", mode, parent, flags);
     this->initSearchTemplateModel (stForm);
-    
-    QAbstractItemModel * searchTModel = stForm->dataModel();
-    while (qobject_cast<QAbstractProxyModel *>(searchTModel))
-        searchTModel = (qobject_cast<QAbstractProxyModel *>(searchTModel))->sourceModel();
-/*
-    QItemSelectionModel * selTModel = stForm->selectionModel ();
-    QAbstractProxyModel * sortTModel = qobject_cast<QAbstractProxyModel *>(stForm->dataModel());
-
-    if (selTModel && stForm->exec () == QDialog::Accepted)
-    {
-        if (selTModel->selection().indexes ().isEmpty())
-            return 0;
-        QModelIndex stProxyIndex = selTModel->selection().indexes ().at (0);
-        QModelIndex stIndex = sortTModel->mapToSource (stProxyIndex);
-
-        QVariant v = searchTModel->data (stIndex, Qt::UserRole+USER_ENTITY);
-		if (v.toInt() == 0)
-            return 0;
-        int idSearchTemplate = stIndex.data (Qt::UserRole).toInt();
-        searchT = loader->loadSearchTemplate (idSearchTemplate);
-    }
-
-    stForm->setParent (0);
-    delete stForm;
- */
-    emit editorSearchTemplate (stForm);
-    return searchT;
+    if (!mode)
+        emit editorSearchTemplate (stForm);
+    return stForm;
 }
 
 void KKSObjEditorFactory :: initSearchTemplateModel (KKSSearchTemplatesForm *stForm) const
