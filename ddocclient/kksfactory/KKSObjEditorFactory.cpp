@@ -6744,7 +6744,7 @@ void KKSObjEditorFactory :: GUIloadDBSearchTemplate (KKSSearchTemplate *st, cons
 {
     KKSSearchTemplatesForm * stForm = new KKSSearchTemplatesForm (c, tableName, true);
     this->initSearchTemplateModel(stForm);
-    stForm->hideActions(0, 9);
+    stForm->hideActions(0, 11);
     if (stForm && stForm->exec() == QDialog::Accepted)
     {
         int idSearchTemplate = stForm->getIdSearchTemplate();
@@ -6835,6 +6835,8 @@ void KKSObjEditorFactory :: initSearchTemplateModel (KKSSearchTemplatesForm *stF
     connect (stForm, SIGNAL (addSearchTemplateType (const QModelIndex&, QAbstractItemModel * )), this, SLOT (addSearchTemplateType (const QModelIndex&, QAbstractItemModel *)) );
     connect (stForm, SIGNAL (updateSearchTemplateType (const QModelIndex&, QAbstractItemModel * )), this, SLOT (editSearchTemplateType (const QModelIndex&, QAbstractItemModel *)) );
     connect (stForm, SIGNAL (delSearchTemplateType (const QModelIndex&, QAbstractItemModel * )), this, SLOT (delSearchTemplateType (const QModelIndex&, QAbstractItemModel *)) );
+    
+    connect (stForm, SIGNAL (refSearchTemplates (QAbstractItemModel *)), this, SLOT (refreshSearchTemplates (QAbstractItemModel *)) );
 
     QSortFilterProxyModel * sortTModel = new KKSSearchTemplateFilterProxyModel;//QSortFilterProxyModel;
     sortTModel->setFilterCaseSensitivity (Qt::CaseInsensitive);
@@ -6850,6 +6852,19 @@ void KKSObjEditorFactory :: initSearchTemplateModel (KKSSearchTemplatesForm *stF
     sortTModel->setSortCaseSensitivity(Qt::CaseInsensitive);
     sortTModel->sort(0);
     stForm->setDataModel (sortTModel);
+}
+
+void KKSObjEditorFactory::refreshSearchTemplates (QAbstractItemModel * searchMod)
+{
+    if (!searchMod)
+        return;
+    if (searchMod->rowCount())
+    {
+        int nr = searchMod->rowCount();
+        searchMod->removeRows(0, nr);
+    }
+    KKSViewFactory::getSearchTemplates (loader, searchMod);
+    
 }
 
 void KKSObjEditorFactory::createSearchTemplate()

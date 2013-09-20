@@ -101,29 +101,49 @@ KKSRecWidget * KKSViewFactory :: createView (KKSTemplate* theTemplate,
         tv->selectionModel()->clearSelection ();
 
     if (resWidget->actFilter)
+    {
+        resWidget->actFilter->setToolTip(QObject::tr("Filter records by criterion(ia)"));
         QObject::connect (resWidget->actFilter, SIGNAL (triggered()), objEditor, SLOT (filterObjectE()) );
+    }
     if (resWidget->actSearchT)
+    {
+        resWidget->actSearchT->setToolTip(QObject::tr("Filter records by preared search templates"));
         QObject::connect (resWidget->actSearchT, SIGNAL (triggered()), objEditor, SLOT (filterObjectT()) );
+    }
     if (resWidget->actAdd)
+    {
+        resWidget->actAdd->setToolTip(QObject::tr("Add new record"));
         QObject::connect (resWidget->actAdd, SIGNAL (triggered()), objEditor, SLOT (addObjectE()) );
+    }
     if (resWidget->actEdit)
     {
         QKeySequence kEdit (Qt::Key_F4);
         resWidget->actEdit->setShortcut (kEdit);
+        resWidget->actEdit->setToolTip (QObject::tr("Edit selected record"));
         QObject::connect (resWidget->actEdit, SIGNAL (triggered()), objEditor, SLOT (editObjectE()) );
     }
     if (resWidget->actDel)
     {
         QKeySequence kDel (Qt::Key_Delete);
         resWidget->actDel->setShortcut (kDel);
+        resWidget->actDel->setToolTip(QObject::tr("Delete selected record"));
         QObject::connect (resWidget->actDel, SIGNAL (triggered()), objEditor, SLOT (delObjectE()) );
     }
     if (resWidget->actImport)
+    {
+        resWidget->actImport->setToolTip(QObject::tr("Import records"));
         QObject::connect (resWidget->actImport, SIGNAL (triggered()), objEditor, SLOT (importObjectE()) );
+    }
     if (resWidget->actExport)
+    {
+        resWidget->actExport->setToolTip(QObject::tr("Export records"));
         QObject::connect (resWidget->actExport, SIGNAL (triggered()), objEditor, SLOT (exportObjectE()) );
+    }
     if (resWidget->actSetView)
+    {
+        resWidget->actSetView->setToolTip(QObject::tr("Set view template"));
         QObject::connect (resWidget->actSetView, SIGNAL (triggered()), objEditor, SLOT (setView()) );
+    }
     QObject::connect (resWidget, SIGNAL (refreshMod (QAbstractItemModel *)), objEditor, SLOT (refreshRecModel(QAbstractItemModel *)) );
     tv->setSelectionMode(QAbstractItemView::ExtendedSelection);
     tv->setSelectionBehavior(QAbstractItemView::SelectRows);

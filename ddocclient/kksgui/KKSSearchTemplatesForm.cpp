@@ -42,6 +42,7 @@ KKSSearchTemplatesForm :: KKSSearchTemplatesForm (const KKSCategory * c1, const 
     actAddNewType (new QAction (tr("Add new search template type"), this)),
     actEditType (new QAction (tr("Edit search template type"), this)),
     actDelType (new QAction (tr("Delete search template type"), this)),
+    actRefresh (new QAction(tr("&Refresh model"), this)),
     lEFilter (new QLineEdit (this)),
     pbOk (new QPushButton (tr("&OK"), this)),
     pbCancel (new QPushButton (tr("&Cancel"), this))
@@ -76,6 +77,8 @@ KKSSearchTemplatesForm :: KKSSearchTemplatesForm (const KKSCategory * c1, const 
     connect (actAddNewType, SIGNAL (triggered()), this, SLOT (addSearchTemplateType()) );
     connect (actEditType, SIGNAL (triggered()), this, SLOT (editSearchTemplateType()) );
     connect (actDelType, SIGNAL (triggered()), this, SLOT (delSearchTemplateType()) );
+    
+    connect (actRefresh, SIGNAL(triggered()), this, SLOT (refreshSearchTemplates()) );
 
     connect (lEFilter, SIGNAL (textEdited(const QString&)), this, SLOT (setFilterSt (const QString&)) );
 
@@ -214,6 +217,9 @@ void KKSSearchTemplatesForm :: init (void)
     actEdit->setIcon (QIcon (":/ddoc/edit.png"));
     actDel->setToolTip (tr("Delete search template"));
     actDel->setIcon (QIcon (":/ddoc/delete.png"));
+    
+    actRefresh->setIcon(QIcon(":/ddoc/refreshIcon.png"));
+    actRefresh->setToolTip(tr("Refresh search templates"));
 
     tbActions->addAction (actAddNewType);
     tbActions->addAction (actEditType);
@@ -224,6 +230,8 @@ void KKSSearchTemplatesForm :: init (void)
     tbActions->addAction (actAddCopy);
     tbActions->addAction (actEdit);
     tbActions->addAction (actDel);
+    tbActions->addSeparator ();
+    tbActions->addAction(actRefresh);
     tbActions->addSeparator ();
     QLabel * lFilter = new QLabel (tr("Filter :"));
     tbActions->addWidget (lFilter);
@@ -357,4 +365,16 @@ Qt::SortOrder KKSSearchTemplatesForm :: getIndicatorOrder (void) const
     if (!hv)
         return Qt::DescendingOrder;
     return hv->sortIndicatorOrder();
+}
+
+void KKSSearchTemplatesForm :: refreshSearchTemplates (void)
+{
+    QAbstractItemModel * mod = dataModel ();
+    emit refSearchTemplates (mod);
+    QSortFilterProxyModel * sortMod = qobject_cast<QSortFilterProxyModel *>(searchView->model());
+    if (!sortMod)
+        return;
+    int sortInd = getIndicatorSection();
+    Qt::SortOrder sortOrd = getIndicatorOrder();
+    sortMod->sort(sortInd,sortOrd);
 }

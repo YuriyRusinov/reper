@@ -45,6 +45,8 @@ private slots:
     void delSearchTemplateType (void);
 
     void searchTemplatesSelectionChanged (const QItemSelection & selected, const QItemSelection & deselected);
+    
+    void refreshSearchTemplates (void);
 
     void setFilterSt (const QString& text);
 
@@ -60,6 +62,8 @@ signals:
     void addSearchTemplateType (const QModelIndex& parent, QAbstractItemModel * searchMod);
     void updateSearchTemplateType (const QModelIndex& wIndex, QAbstractItemModel * searchMod);
     void delSearchTemplateType (const QModelIndex& wIndex, QAbstractItemModel * searchMod);
+    
+    void refSearchTemplates (QAbstractItemModel * searchMod);
 
 private:
     //
@@ -89,6 +93,8 @@ private:
     QAction * actAddNewType;
     QAction * actEditType;
     QAction * actDelType;
+    
+    QAction * actRefresh;
 
     QLineEdit * lEFilter;
 
