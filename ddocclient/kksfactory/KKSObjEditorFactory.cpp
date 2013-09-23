@@ -2395,6 +2395,16 @@ void KKSObjEditorFactory :: filterTemplateEIO (KKSObjEditor * editor,
             c->release ();
             o->release ();
         }
+        bool isApp = loader->isApplicable(searchT,c->id());
+        if (!isApp)
+        {
+            QMessageBox::warning (stForm, tr("Search by templates"), tr("Search template %1 cannot been applied onto this reference").arg(searchT->name()), QMessageBox::Ok);
+            stForm->setParent (0);
+            delete stForm;
+            c->release ();
+            o->release ();
+            return;
+        }
         const KKSTemplate * t = new KKSTemplate (c->defTemplate());
         KKSList< const KKSFilterGroup*> filters = editor->filters();
         KKSFilterGroup * stGroup = searchT->getMainGroup ();
@@ -6710,8 +6720,11 @@ void KKSObjEditorFactory :: searchTemplateCategoryChanged (KKSSearchTemplate * s
     if (!isApp)
     {
         QWidget * pWidget = qobject_cast<QWidget *>(this->sender());
-        qCritical() << tr("Category %1 is not applicable into search template %2").arg (idCategory).arg(st->id());
-        QMessageBox::critical (pWidget, tr("Set category into search template"), tr("Category %1 is not applicable into search template %2").arg (idCategory).arg(st->id()), QMessageBox::Ok);
+        
+        KKSCategory * c = loader->loadCategory(idCategory, true);
+        qCritical() << tr("Category %1 is not applicable into search template %2").arg (c->name()).arg(st->id());
+        QMessageBox::critical (pWidget, tr("Set category into search template"), tr("Category %1 is not applicable into search template %2").arg (c->name()).arg(st->name()), QMessageBox::Ok);
+        c->release ();
         return;
     }
 }

@@ -60,8 +60,6 @@ AttrHistory::AttrHistory (const KKSList<KKSAttrValue*> & histlist, QWidget *pare
              SLOT (histSelectionChanged (const QItemSelection&, const QItemSelection&))
             );
     connect (aViewVals, SIGNAL(triggered()), this, SLOT (viewVal()) );
-    connect (UI->pbUp, SIGNAL(clicked()), this, SLOT (upClicked()) );
-    connect (UI->pbDown, SIGNAL (clicked()), this, SLOT (downClicked()) );
     connect (UI->pbClose, SIGNAL(clicked()), this, SLOT (reject()) );
     connect (UI->tvHistory, SIGNAL (doubleClicked(const QModelIndex&)), this, SLOT (viewDblVal (const QModelIndex&)) );
 }
