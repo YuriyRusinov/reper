@@ -210,6 +210,8 @@ void KKSSearchTemplateForm :: setCatModel (QAbstractItemModel * sCatMod)
 void KKSSearchTemplateForm :: setCatInd (const QModelIndex& catInd)
 {
     QItemSelectionModel * selMod = ui->tvSearchTemplateCategory->selectionModel();
+    if (!selMod)
+        return;
     selMod->select(catInd, QItemSelectionModel::ClearAndSelect);
     selMod->setCurrentIndex(catInd, QItemSelectionModel::ClearAndSelect);
 }

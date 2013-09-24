@@ -1084,7 +1084,7 @@ QAbstractItemModel* KKSViewFactory :: initCategoriesModel (KKSLoader* l, const K
     if (!refCatObj)
         return 0;
     QStandardItemModel *catTypeTemplModel = new QStandardItemModel (n, 1);
-    catTypeTemplModel->setHeaderData (0, Qt::Horizontal, QObject::tr("Select category and template"), Qt::DisplayRole);
+    catTypeTemplModel->setHeaderData (0, Qt::Horizontal, QObject::tr("Select category"), Qt::DisplayRole);
     KKSMap<qint64, KKSEIOData *>::const_iterator pCatTypes;
 
 

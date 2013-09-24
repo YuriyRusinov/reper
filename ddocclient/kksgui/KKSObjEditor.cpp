@@ -484,39 +484,14 @@ int KKSObjEditor :: constructObject()
         avalList.append (av);
     }
 
-    /*
-    if(pObjectEx->attrValue(ATTR_TABLE_NAME) != NULL){
-        QString tableName;
-        //QString ioCode;
-        tableName = pObjectEx->attrValue(ATTR_TABLE_NAME)->value().value();
-        //ioCode = pObjectEx->attrValue("code")->value().value();
-        
-        pObjectEx->setAttrValues (avalList);
-        
-        KKSAttrValue * a = pObjectEx->attrValue(ATTR_TABLE_NAME);
-        if(a != NULL){
-            //if(a->value().value().trimmed().isEmpty()){
-                KKSValue v(tableName, KKSAttrType::atString);
-                a->setValue(v);
-            //}
-        }
-
-        //a = pObjectEx->attrValue("code");
-        //if(a != NULL){
-            //if(a->value().value().trimmed().isEmpty()){
-        //        KKSValue v(ioCode, KKSAttrType::atString);
-        //        a->setValue(v);
-            //}
-        //}
-    }
-    else{*/
-        pObjectEx->setAttrValues (avalList);
-    //}
+    pObjectEx->setAttrValues (avalList);
 
     KKSList<KKSAttrValue*> avalIndList;
     KKSMap<qint64, KKSAttrValue*>::const_iterator pIndAttrValues;
     
-    //показатели (для записей справочников)
+    //
+    // показатели (для записей справочников)
+    //
     for (pIndAttrValues=ioIndicatorValues.constBegin (); pIndAttrValues != ioIndicatorValues.constEnd(); pIndAttrValues++)
     {
         const KKSAttrValue *cAttrValue = pIndAttrValues.value();
@@ -836,23 +811,6 @@ int KKSObjEditor :: constructObject()
 
         pObj->setAttrValues(avalList);
 
-/*
-        KKSList<KKSIndicatorValue *> rIVals;
-        for (int i=0; i<pObj->indicatorValues().count(); i++)
-        {
-            int idInd = pObj->indicatorValues().at (i)->id();
-            const KKSIndicator * ind = pObj->indicatorValue(i)->indicator();//ioIndicators.value (idInd);
-            int type = ind->type()->attrType();
-            QString v = ioIndicatorValues.value (idInd).toString();
-            qDebug () << __PRETTY_FUNCTION__ << v << idInd;
-            KKSValue val (v, type);
-            KKSIndicatorValue * iVal = new KKSIndicatorValue(idInd, const_cast<KKSIndicator *>(ind), val);
-            rIVals.append (iVal);
-        }
-
-        pObj->setIndicatorValues (rIVals);
-*/        
-        
         //
         // добавляем файлы
         //

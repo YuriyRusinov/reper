@@ -6670,6 +6670,25 @@ QAbstractItemModel * KKSObjEditorFactory :: initSearchCatsModel (KKSSearchTempla
     if (!st)
         return 0;
     KKSList<const KKSFilterGroup *> filters;
+    KKSObject * refCatTypeObj = loader->loadIO(IO_CAT_TYPE_ID, true);
+    if (!refCatTypeObj)
+        return 0;
+    KKSCategory * catType = refCatTypeObj->category();
+    if (!catType || !catType->tableCategory())
+    {
+        refCatTypeObj->release();
+        return 0;
+    }
+    catType = catType->tableCategory();
+    KKSFilter * ctSysFilter = catType->createFilter(1, QString("select id from io_category_types where id not in (8,9)"), KKSFilter::foInSQL);
+    KKSList<const KKSFilter*> catTypeFilters;
+    catTypeFilters.append (ctSysFilter);
+    ctSysFilter->release();
+    KKSFilterGroup * ctGroup = new KKSFilterGroup (true);
+    ctGroup->setFilters(catTypeFilters);
+    filters.append (ctGroup);
+    ctGroup->release();
+    refCatTypeObj->release();
     KKSObject * refCatObj = loader->loadIO (IO_CAT_ID, true);
     if (!refCatObj)
         return 0;
@@ -6680,26 +6699,19 @@ QAbstractItemModel * KKSObjEditorFactory :: initSearchCatsModel (KKSSearchTempla
         return 0;
     }
     cat = cat->tableCategory();
-    KKSFilter * cMainFilter = cat->createFilter (ATTR_IS_MAIN, QString("false"), KKSFilter::foEq);
-    if (!cMainFilter)
+    KKSFilter * cSysFilter = cat->createFilter (1, QString("select id from io_categories where id_io_category_type not in (8,9)"), KKSFilter::foInSQL);
+    if (!cSysFilter)
     {
         refCatObj->release();
         return 0;
     }
 
-    KKSFilter * cArchFilter = cat->createFilter (ATTR_IS_ARCHIVED, QString("FALSE"), KKSFilter::foEq);
-    if (!cArchFilter)
-    {
-        refCatObj->release();
-        return 0;
-    }
     KKSList<const KKSFilterGroup *> cFilterGroups;
     KKSList<const KKSFilter*> catFilters;
     
-    catFilters.append (cMainFilter);
-    cMainFilter->release();
-    catFilters.append (cArchFilter);
-    cArchFilter->release();
+    catFilters.append (cSysFilter);
+    cSysFilter->release();
+    refCatObj->release ();
     
     KKSFilterGroup * cGroup = new KKSFilterGroup (true);
     
