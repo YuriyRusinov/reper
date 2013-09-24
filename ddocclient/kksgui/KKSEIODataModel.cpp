@@ -132,7 +132,7 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
         return QVariant ();
     qint64 idw = wItem->id();//index.internalId();
     KKSList<KKSAttrView*> avList = tRef ? tRef->sortedAttrs() : KKSList<KKSAttrView*>();
-    if (role == Qt::DisplayRole)
+    if (role == Qt::DisplayRole || role == Qt::ToolTipRole)
         return wItem->columnData(index.column());
     else if (role == Qt::UserRole)
     {

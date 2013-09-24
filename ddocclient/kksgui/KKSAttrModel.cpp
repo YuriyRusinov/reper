@@ -26,10 +26,14 @@ KKSAttrModel::KKSAttrModel(const KKSCategory * _cat, QObject *parent)
     attr (0),
     cat (_cat)
 {
+    if (cat)
+        cat->addRef();
 }
 
 KKSAttrModel::~KKSAttrModel()
 {
+    if (cat)
+        cat->release();
 }
 
 int KKSAttrModel::columnCount (const QModelIndex& /*parent*/) const
@@ -157,6 +161,19 @@ bool KKSAttrModel::setData (const QModelIndex& index, const QVariant& value, int
             (const_cast<KKSCategory *>(cat))->setAttributes(cAttrs);
         emit dataChanged (index.sibling(irow, 0), index.sibling(irow, 3));
         return true;
+    }
+    else if (role == Qt::UserRole+2 && cat)
+    {
+        KKSCategory * catNew = value.value<KKSCategory *>();
+        if (!catNew)
+            return false;
+        if (cat && cat != catNew)
+            cat->release();
+        
+        cat = catNew;
+        int irow = 0;
+        int nr = rowCount();
+        emit dataChanged (this->index(irow, 0), this->index(nr, 4));
     }
     return false;
 }

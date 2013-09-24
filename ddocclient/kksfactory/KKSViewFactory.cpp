@@ -1410,14 +1410,15 @@ void KKSViewFactory :: updateAttrModel (const KKSCategory *cat, QAbstractItemMod
         return;
     int n=model->rowCount ();
     KKSMap<int, KKSCategoryAttr *> attrs = cat->attributes();
+    int na = attrs.size();
     int nCol = model->columnCount ();
     if (nCol < 4)
         return;
     bool isOk = true;
-    if (n < attrs.size())
-        isOk = model->insertRows (n, attrs.size()-n);
-    else if (n > attrs.size())
-        isOk = model->removeRows (attrs.size(), n-attrs.size());
+    if (n < na)
+        isOk = model->insertRows (n, na-n);
+    else if (n > na)
+        isOk = model->removeRows (na, n-na);
 
     if (!isOk)
         return;
@@ -1434,7 +1435,7 @@ void KKSViewFactory :: updateAttrModel (const KKSCategory *cat, QAbstractItemMod
             continue;
         p.value()->addRef ();
         QString ctitle (p.value()->title());
-        qDebug () << __PRETTY_FUNCTION__ << p.value()->id();//(title.isNull () ? QString() : title);
+        qDebug () << __PRETTY_FUNCTION__ << p.value()->id() << wIndex;
         model->setData (wIndex, ctitle, Qt::DisplayRole);
         wIndex = model->index (i, 1);
         model->setData (wIndex, p.value()->defValue().valueVariant(), Qt::DisplayRole);

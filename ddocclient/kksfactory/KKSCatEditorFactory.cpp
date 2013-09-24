@@ -766,11 +766,17 @@ void KKSCatEditorFactory :: addAttributeIntoCategory (KKSCategory *c, QAbstractI
                 return;
             }
             if (!c->attributes().contains (cAttr->id()))
+            {
+                attrModel->insertRows(c->attributes().count(), 1);
                 c->addAttribute(cAttr->id(), cAttr);
+                //qDebug () << __PRETTY_FUNCTION__ << c->attributes().count() << attrModel->rowCount();
+            }
             cAttr->release ();
             attr->release();
         }
-        KKSViewFactory::updateAttrModel (c, attrModel);
+        attrModel->setData(QModelIndex(), QVariant::fromValue<KKSCategory *>(c), Qt::UserRole+2);
+        qDebug () << __PRETTY_FUNCTION__ << c->attributes().count() << attrModel->rowCount();
+        //KKSViewFactory::updateAttrModel (c, attrModel);
     }
     editor->resize(editor->size() + QSize(1, 1));
     editor->update ();
