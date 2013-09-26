@@ -124,6 +124,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void setValue (qint64 id, KKSIndAttr::KKSIndAttrClass sys, QVariant val);
         //void setIndValue (int id, bool sys, QVariant val);
 
+        void loadAttrHistory (const KKSAttrValue * av, bool forRecs);
     private slots:
 
         void accept (void);
@@ -245,6 +246,8 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         
         void generateUUID (int idAttr, const KKSAttrValue * av);
         void setUUID (QString uuid);
+        
+        void loadHistory (const KKSAttrValue *, qint64, qint64, bool);
 
     public slots:
         //void slotRubricItemRequested();

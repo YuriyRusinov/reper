@@ -87,6 +87,7 @@ private slots:
     void viewIOSrc (KKSObject * io, QWidget * parent);
     //void slotLoadIOSrc1 (const KKSAttrValue * av, QLineEdit * lESrc1);
     void loadIOAttrValueHistory(const KKSAttrValue * av, bool forRecords = false);
+    void loadIOAttrValueHistoryR(const KKSAttrValue * av, qint64 idObj, qint64 idRec, bool forRecords = false);
     
     void showAttrsWidget(KKSAttribute *, KKSAttrEditor *);//показать виджет с атрибутами для случая с описывающими атрибутами атрибута
     void addAttribute (KKSAttribute *a, QAbstractItemModel * attrModel, KKSAttrEditor *editor);
@@ -139,7 +140,7 @@ private:
     
     QWidget * createAttrValWidget (const KKSAttrValue * pAttrValue, int idAVal, int isSys, QWidget * parent=0, Qt::WindowFlags flags=0);
 
-    QWidget * createAttrCheckWidget (const KKSAttrValue * pAttrValue, const KKSAttrType *pCatType,  KKSIndAttr::KKSIndAttrClass isSystem, QTabWidget * tabW);
+    QWidget * createAttrCheckWidget (const KKSAttrValue * pAttrValue, const KKSAttrType *pCatType,  KKSIndAttr::KKSIndAttrClass isSystem, QTabWidget * tabW, KKSObjEditor * objEditor);
     QAbstractItemModel * aValComplexModel (const KKSAttrValue * pAttrValue, const QVariant& av=QVariant());
 
     void connectToSlots (QObject *aw, QWidget* wEditor);

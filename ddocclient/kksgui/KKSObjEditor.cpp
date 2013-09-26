@@ -2609,3 +2609,20 @@ void KKSObjEditor :: setStateWidget (QWidget * w)
     stateWidget = w;
     stateWidget->setParent (this);
 }
+
+void KKSObjEditor :: loadAttrHistory (const KKSAttrValue * av, bool forRecs)
+{
+    if (!av)
+        return;
+    qint64 idAttr = av->attribute()->id();
+    KKSAttrValue * avIO (0);
+    qint64 idObj = pObj->id();
+    qint64 idRec = pObjectEx->id();
+    if (forRecs)
+        avIO = pObjectEx->attrValue(idAttr);
+    else
+        avIO = pObj->attrValueId(idAttr);
+
+    qDebug () << __PRETTY_FUNCTION__ << idObj << idRec << av->id() << avIO->id();
+    emit loadHistory (avIO, idObj, idRec, forRecs);
+}

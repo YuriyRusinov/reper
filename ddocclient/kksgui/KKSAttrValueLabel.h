@@ -39,6 +39,7 @@ signals:
 
 private slots:
     void viewAVal (const KKSAttrValue * av, int idAVal, QWidget * pWidget);
+    void viewAHist (const KKSList<KKSAttrValue *> &);
 
 public slots:
     void showAttrValueProps ();

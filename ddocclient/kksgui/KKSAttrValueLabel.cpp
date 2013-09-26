@@ -155,3 +155,10 @@ void KKSAttrValueLabel :: viewAVal (const KKSAttrValue * av, int idAVal, QWidget
         return;
     emit viewDetailAttrVal (av, idAVal, m_isSystem, pWidget);
 }
+
+void KKSAttrValueLabel :: viewAHist (const KKSList<KKSAttrValue *> & vList)
+{
+    qDebug () << __PRETTY_FUNCTION__ << vList.count();
+    if (vList.count())
+        emit viewHistory (vList);
+}

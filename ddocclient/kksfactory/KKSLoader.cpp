@@ -5895,15 +5895,24 @@ KKSList<KKSAttrValue *> KKSLoader::loadIOAttrValueHistory(const KKSAttrValue * a
 {
     KKSList<KKSAttrValue *> avList;
 
-    if(!av || av->id() <= 0)
+    if(!av)
         return avList;
 
     QString sql;
+    int idAVal;
+    if (av->id() > 0)
+        idAVal = av->id();
+    else
+        return avList;
+//    {
+//        const KKSAttrValue * avIO = av->ioSrc()->attrValueId(av->attribute()->id());
+//        idAVal = avIO->id();
+//    }
     
     if(forRecords)
-        sql = QString ("select * from getRecAttrValueHistory(%1, NULL, NULL)").arg (av->id());
+        sql = QString ("select * from getRecAttrValueHistory(%1, NULL, NULL)").arg (idAVal);
     else
-        sql = QString ("select * from getIOAttrValueHistory(%1, NULL, NULL)").arg (av->id());
+        sql = QString ("select * from getIOAttrValueHistory(%1, NULL, NULL)").arg (idAVal);
 
     KKSResult * res = db->execute (sql);
     int cnt = 0;
