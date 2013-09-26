@@ -94,15 +94,37 @@ declare
 
     old_id_io_object alias for $9;
     old_id_attr_category alias for $10;
+    
+    oldV varchar;
+    newV varchar;
 
     r record;
 begin
     if(getPrivilege(getCurrentUser(), 7, 4, true) = false) then raise exception 'You have insufficient permissions to do the operation!'; return 0; end if;
 
+    newV = iValue;
+
     for r in 
         select * from tbl_attrs_values where id_io_object = old_id_io_object and id_attr_category = old_id_attr_category and is_actual = true
     loop
-        if(r.value = iValue and 
+        
+        oldV = r.value;
+        
+        if(upper(r.value) = 'T' or upper(r.value) = 'TRUE') then
+            oldV = 'TRUE';
+        end if;
+        if( upper(r.value) = 'F' or upper(r.value) = 'FALSE') then
+            oldV = 'FALSE';
+        end if;
+        
+        if(upper(iValue) = 'T' or upper(iValue) = 'TRUE') then
+            newV = 'TRUE';
+        end if;
+        if( upper(iValue) = 'F' or upper(iValue) = 'FALSE') then
+            newV = 'FALSE';
+        end if;
+
+        if( (oldV = newV ) and 
            ((r.id_io_object_src isnull and iIdObjectSrc isnull) or r.id_io_object_src = iIdObjectSrc) and 
            ((r.id_io_object_src1 isnull and iIdObjectSrc1 isnull) or r.id_io_object_src1 = iIdObjectSrc1) and 
            ((r.description isnull and iDesc isnull) or r.description = iDesc)
@@ -117,7 +139,7 @@ begin
     --потом создаем новое, как копию и присваиваем новые значения
     insert into "tbl_attrs_values" (id_io_object, id_attr_category, "value", start_time, stop_time, id_io_object_src, id_io_object_src1, is_actual, description) 
     values 
-    (ii_id_io_object, ii_id_attr_category, iValue, current_timestamp, NULL, iIdObjectSrc, iIdObjectSrc1, true, iDesc);
+    (ii_id_io_object, ii_id_attr_category, newV, current_timestamp, NULL, iIdObjectSrc, iIdObjectSrc1, true, iDesc);
 
 
     return 1;

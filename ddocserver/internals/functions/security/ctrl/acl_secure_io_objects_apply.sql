@@ -33,7 +33,8 @@ select "f_ins_io_objects" (new."unique_id",
                            new."id_search_template", 
                            new."ref_table_name",
                            new."id_io_type",
-                           new."r_icon");
+                           new."r_icon",
+                           new."uuid_t");
 
 
 create or replace rule "r_del_io_objects" as on delete to "io_objects" do instead select "f_del_io_objects"(old.id);
@@ -62,4 +63,5 @@ select "f_upd_io_objects" (new."unique_id",
                            new."id_search_template", 
                            new."ref_table_name",
                            new."id_io_type",
-                           new."r_icon");
+                           new."r_icon",
+                           new."uuid_t");

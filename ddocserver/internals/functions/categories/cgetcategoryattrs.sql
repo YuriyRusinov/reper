@@ -21,6 +21,124 @@ create type h_get_category_attrs as(id_attribute int4,
                                     id_ex);
 */
 
+create or replace function cGetCategoryAttr(int4) returns setof h_get_attribute as
+$BODY$
+declare
+    idCategoryAttr alias for $1;
+    r h_get_attribute%rowtype;
+    rr RECORD;
+    query varchar;
+begin
+
+    query := E'select 
+            a.id, 
+            att.id, 
+            a.code, 
+            a.name, 
+            a.title, 
+            a.table_name, 
+            a.column_name, 
+            a.def_width, 
+            att.name, 
+            att.code, 
+            ca.def_value, 
+            ca.is_mandatory, 
+            ca.is_read_only,
+            a.id_ref_attr_type as ref_attr_type_id,  
+            NULL as ref_attr_type_name,
+            NULL as ref_attr_type_code,
+            a.unique_id,
+            a.id_search_template,
+            a.ref_column_name,
+            a.id_attr_group,
+            ag.name,
+            ca.id
+        from  
+            attrs_categories ca 
+            inner join attributes a on (ca.id = ' || idCategoryAttr || E' and ca.id_io_attribute = a.id) 
+            inner join a_types att on (a.id_a_type = att.id) 
+            inner join attrs_groups ag on (a.id_attr_group = ag.id)';
+    for r in 
+        execute query
+    loop
+        if(r.column_name is not null) then
+            for rr in 
+                select * from atGetAttrType(r.ref_attr_type_id)
+            loop
+                --r.ref_attr_type_id = rr.id;
+                r.ref_attr_type_name = rr.name;
+                r.ref_attr_type_code = rr.code;
+            end loop;  
+        end if;
+        
+        return next r;
+    end loop;
+    
+    return;
+end
+$BODY$
+language 'plpgsql';
+
+create or replace function cGetCategoryAttr(int4, int4) returns setof h_get_attribute as
+$BODY$
+declare
+    idCategory alias for $1;
+    idAttr alias for $2;
+
+    r h_get_attribute%rowtype;
+    rr RECORD;
+    query varchar;
+begin
+
+    query := E'select 
+            a.id, 
+            att.id, 
+            a.code, 
+            a.name, 
+            a.title, 
+            a.table_name, 
+            a.column_name, 
+            a.def_width, 
+            att.name, 
+            att.code, 
+            ca.def_value, 
+            ca.is_mandatory, 
+            ca.is_read_only,
+            a.id_ref_attr_type as ref_attr_type_id,  
+            NULL as ref_attr_type_name,
+            NULL as ref_attr_type_code,
+            a.unique_id,
+            a.id_search_template,
+            a.ref_column_name,
+            a.id_attr_group,
+            ag.name,
+            ca.id
+        from  
+            attrs_categories ca 
+            inner join attributes a on (ca.id_io_category = ' || idCategory || E' and ca.id_io_attribute = ' || idAttr || E' and ca.id_io_attribute = a.id) 
+            inner join a_types att on (a.id_a_type = att.id) 
+            inner join attrs_groups ag on (a.id_attr_group = ag.id)';
+    for r in 
+        execute query
+    loop
+        if(r.column_name is not null) then
+            for rr in 
+                select * from atGetAttrType(r.ref_attr_type_id)
+            loop
+                --r.ref_attr_type_id = rr.id;
+                r.ref_attr_type_name = rr.name;
+                r.ref_attr_type_code = rr.code;
+            end loop;  
+        end if;
+        
+        return next r;
+    end loop;
+    
+    return;
+end
+$BODY$
+language 'plpgsql';
+
 create or replace function cGetCategoryAttrs(int4) returns setof h_get_attribute as
 $BODY$
 declare

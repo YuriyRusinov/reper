@@ -1144,6 +1144,7 @@ insert into attributes (unique_id, id, id_a_type, code, name, title, table_name,
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-346', 346, 8, 'port', 'Порт транспорта', 'Порт транспорта', NULL, NULL, 150, TRUE);
 
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-347', 347, 17, 'io_processing_order_chains', 'Перечень очередей обработки', 'Перечень очередей обработки', 'chains', 'name', 200, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-348', 348, 31, 'uuid_t', 'Уникальный идентификатор (UUID)', 'UUID', NULL, NULL, 200, TRUE);
 
 SELECT pg_catalog.setval('attributes_id_seq', 1000, true); --все пользовательские атрибуты будут начинаться с номера 1001
                                                           --это сделано для того, чтобы оставить резерв для системных атрибутов
@@ -1253,6 +1254,7 @@ insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (56, 13, 110, NULL, false, false);--id_search_template
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (57, 13, 216, NULL, false, false);--ref_table_name
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (534, 13, 312, NULL, false, false);--r_icon
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (606, 13, 348, NULL, false, true);--uuid_t
 
 
 
@@ -2206,7 +2208,7 @@ insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is
 --603 используется в справочнике транспортов межобъектового обмена
 --604 используется в справочнике адресов организаций
 --605 используется в справочникепорядка обработки ИО в различных состояниях ЖЦ
-
+--606 используется в справочнике информационных объектов
 
 
 SELECT pg_catalog.setval('attrs_categories_id_seq', 2000, true); --все пользовательские атрибуты в категориях будут начинаться с номера 2001
@@ -2739,6 +2741,7 @@ insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only
 insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(40, 1, 1, false, 2, NULL);--description
 insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(41, 1, 1, false, 3, '1');--id_io_type
 insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(48, 1, 1, false, 4, '1');--id_io_state
+insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(606, 1, 1, true, 5, NULL);--uuid_t
 
 insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(45, 1, 2, false, 1, NULL); --information
 insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(47, 1, 2, true, 2, 'current_timestamp'); --insert_time
@@ -2808,6 +2811,7 @@ insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only
 insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(545, 4, 14, false, 3, '0'); --moda
 insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(546, 4, 14, false, 4, '0'); --min_p
 insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(547, 4, 14, false, 5, '0'); --max_p
+insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(584, 4, 14, false, 6, '1'); --id_time_unit
 
 insert into a_groups (id_io_template, id_parent, name, "order") values(4, NULL, 'Диапазон генерации потока', 2); --15
 insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(548, 4, 15, false, 0, NULL);--start_time

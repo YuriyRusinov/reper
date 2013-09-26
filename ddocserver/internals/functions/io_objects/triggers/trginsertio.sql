@@ -33,6 +33,10 @@ begin
         new.id_owner_org := getLocalOrgId();
     end if;
 
+    if(new.uuid_t isnull) then
+        new.uuid_t = generateUUID();
+    end if;
+
     if(new.is_global = true) then
         select is_global into isGlobal from io_categories where id = new.id_io_category;
         if(isGlobal isnull or isGlobal = false) then

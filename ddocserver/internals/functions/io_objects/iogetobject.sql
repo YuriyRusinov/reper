@@ -28,7 +28,8 @@ create type h_get_object as (id int4,
                              t_name varchar,
                              t_desc varchar,
                              uid_io_type varchar,
-                             r_icon varchar);
+                             r_icon varchar,
+                             uuid_t uuid);
                              
 create or replace function ioGetObject(int4) returns setof h_get_object as
 $BODY$
@@ -68,7 +69,8 @@ begin
             t.name,
             t.description,
             t.unique_id,
-            io.r_icon
+            io.r_icon,
+            io.uuid_t
         from
             --io_objects io
             f_sel_io_objects(idObject) io

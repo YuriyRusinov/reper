@@ -1,8 +1,7 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     24.07.2013 11:05:10                          */
+/* Created on:     23.09.2013 16:33:38                          */
 /*==============================================================*/
-
 
 /*==============================================================*/
 /* Table: root_table                                            */
@@ -1152,7 +1151,6 @@ comment on column criteria.is_not is
 'Данный флаг задает, применяется ли унарная операция отрицания к данному критерию';
 
 select setMacToNULL('criteria');
-select createTriggerUID ('criteria');
 
 /*==============================================================*/
 /* Table: criteria_types                                        */
@@ -1493,6 +1491,18 @@ comment on table handlers is
 Для каждой очереди может быть определен только один сервис-обработчик.
 Сервис-обработчик представляет собой автономную подпрограмму, которая получает на вход идентификатор записи в таблице очередей и приступает к ообработке ИО, определяемого данным идентификатором.';
 
+comment on column handlers.name is
+'Название';
+
+comment on column handlers.description is
+'Описание';
+
+comment on column handlers.h_host is
+'IP-адрес хоста, на котором функционирует сервис-обработчик';
+
+comment on column handlers.h_port is
+'Порт хоста, на котором функционирует сервис-обработчик';
+
 comment on column handlers.service is
 'параметры сервиса (сигнатура сервиса)
 Каждый сервис должен иметь следующие вх. параметры:
@@ -1750,6 +1760,7 @@ create table io_objects (
    id_search_template   INT4                 null,
    ref_table_name       VARCHAR              null,
    r_icon               VARCHAR              null,
+   uuid_t               UUID                 not null,
    constraint PK_IO_OBJECTS primary key (id)
 )
 inherits (root_table);
@@ -1805,7 +1816,11 @@ comment on column io_objects.ref_table_name is
 comment on column io_objects.r_icon is
 'иконка при отображении информационного объекта в списке или в рубрикаторе. Если не задана, то используется значение по умолчанию (определяется клиентским приложением). При отображении в рубрикаторе используется, если не задана иконка в соответствующей записи io_rubricator';
 
+comment on column io_objects.uuid_t is
+'Уникальный идентификатор ИО';
+
 select createTriggerUID('io_objects');
+alter table io_objects alter column uuid_t set default uuid_generate_v1();
 
 /*==============================================================*/
 /* Index: i_category                                            */
@@ -1865,6 +1880,9 @@ inherits (root_table);
 comment on table io_processing_order is
 'Справочник подярка обработки информационных объектов в различных состояниях жизненного цикла';
 
+comment on column io_processing_order.name is
+'название';
+
 comment on column io_processing_order.id_state_src is
 'Из какого (id_state_src) состояния в какое (id_state_dest) переходит ИО, которые должны обрабатываться данной очередью';
 
@@ -1888,6 +1906,12 @@ create table io_processing_order_chains (
 
 comment on table io_processing_order_chains is
 'Перечень очередей, в которые должны быть помещены ИО и ЭИО при изменении их состояния';
+
+comment on column io_processing_order_chains.id_io_processing_order is
+'порядок обрботки ИО в очереди';
+
+comment on column io_processing_order_chains.id_chains is
+'очередь, в которую должен быть помещен ИО, удовлетворяющий условиям, указанным в порядке обработки';
 
 select setMacToNULL('io_processing_order_chains');
 
@@ -1934,6 +1958,9 @@ comment on table io_states is
 -архивный
 -осуществляется первоначальная синхронизация
 -осуществляется синхронизация';
+
+comment on column io_states.is_system is
+'флаг системного состояния. Состояния с идентификаторами 2-5 являются системными и не могут быть использованы для назначения информационным объектам';
 
 select setMacToNULL('io_states');
 select createTriggerUID('io_states');
@@ -2615,6 +2642,28 @@ create table object_ref_tables (
    constraint PK_OBJECT_REF_TABLES primary key (id)
 )
 inherits (root_table);
+
+comment on table object_ref_tables is
+'Дополнительные таблицы информационного объекта.
+Допускаются только для информационных объектов типа "справочник"';
+
+comment on column object_ref_tables.table_name is
+'название физической таблицы БД, хранящей записи данного справочника';
+
+comment on column object_ref_tables.id_io_object is
+'идентификатор соответствующего информационного объекта';
+
+comment on column object_ref_tables.id_io_category is
+'категория, которой должна соответствовать структура дополнительной таблицы';
+
+comment on column object_ref_tables.title is
+'название (заголовок) дополнительной таблицы';
+
+comment on column object_ref_tables.id_search_template is
+'идентификатор поискового запроса, который используется для формирования записей данной дополнительной таблицы, если справочник виртуальный';
+
+comment on column object_ref_tables.ref_table_name is
+'название физической таблицы БД (базового справочника), который используется для формирования записей данной доп. таблицы (для виртуальных справочников)';
 
 select setMacToNULL('object_ref_tables');
 select createTriggerUID('object_ref_tables');
@@ -3356,6 +3405,7 @@ create table roles_actions (
 );
 
 select setMacToNULL('roles_actions');
+
 
 /*==============================================================*/
 /* Table: rubric_records                                        */

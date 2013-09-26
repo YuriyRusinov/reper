@@ -318,7 +318,7 @@ language 'plpgsql' security definer;
 create or replace function createIOView (varchar, int4, int4, varchar) returns varchar as
 $BODY$
 declare
-    viewName alias for $1;
+    view_Name alias for $1;
     idCategory alias for $2; --CHILD CATEGORY, NOT MAIN!!!
     idSearchTemplate alias for $3;
     refTableName alias for $4;
@@ -333,15 +333,15 @@ declare
 
 begin
 
-    select into res count (*) from pg_tables as t where t.tablename = viewName;
+    select into res count (*) from pg_tables as t where t.tablename = view_Name;
     if (res > 0) then
-        raise exception 'entity % (table) already exists in database', viewName;
+        raise exception 'entity % (table) already exists in database', view_Name;
         return NULL;
     end if;
 
-    select into res count (*) from pg_views as v where v.viewname = viewName;
+    select into res count (*) from pg_views as v where v.viewname = view_Name;
     if (res > 0) then
-        raise exception 'entity % (view) already exists in database', viewName;
+        raise exception 'entity % (view) already exists in database', view_Name;
         return NULL;
     end if;
 
@@ -351,6 +351,9 @@ begin
     whatPart1 := whatPart1 || refTableName || asString('."last_update", ', false); 
     whatPart1 := whatPart1 || refTableName || asString('."uuid_t", ', false); 
     whatPart1 := whatPart1 || refTableName || asString('."id_io_state", ', false); 
+    whatPart1 := whatPart1 || refTableName || asString('."r_icon", ', false);
+    whatPart1 := whatPart1 || refTableName || asString('."record_fill_color", ', false);
+    whatPart1 := whatPart1 || refTableName || asString('."record_text_color", ', false);
 
     select 
         array_to_string(array_agg(refTableName || asString('."', false) || a.code || asString('"', false) ),  ',') into whatPart 
@@ -368,13 +371,13 @@ begin
 
     whatPart := whatPart1 || whatPart;
 
-    q = 'create view ' || viewName || ' as select ' || whatPart || ' from ' || refTableName || ' where 1=1 ' || wherePart;
+    q = 'create view ' || view_Name || ' as select ' || whatPart || ' from ' || refTableName || ' where 1=1 ' || wherePart;
 
     raise notice '%', q;
 
     execute q;
     if (not FOUND) then
-        raise exception 'Cannot create view %', viewName;
+        raise exception 'Cannot create view %', view_Name;
         return NULL;
     end if;
 
@@ -411,13 +414,13 @@ begin
 
     columnsPart := columnsPart1 ||columnsPart;
 
-    q = 'create rule i_rule_' || viewName || ' as on INSERT TO ' || viewName || 
+    q = 'create rule i_rule_' || view_Name || ' as on INSERT TO ' || view_Name || 
           ' do instead insert into ' || refTableName || '(' || columnsPart || ') values (' || whatPart || ');';
     raise notice '%', q;
 
     execute q;
     if (not FOUND) then
-        raise exception 'Cannot create rule for INSERT on view %', viewName;
+        raise exception 'Cannot create rule for INSERT on view %', view_Name;
         return NULL;
     end if;
 
@@ -433,31 +436,31 @@ begin
         and ac.id_io_category = idCategory
         and a.code <> 'id';
 
-    q = 'create rule u_rule_' || viewName || ' as on UPDATE TO ' || viewName || 
+    q = 'create rule u_rule_' || view_Name || ' as on UPDATE TO ' || view_Name || 
           ' do instead update ' || refTableName || ' set ' || whatPart || ' where id = old.id;';
     raise notice '%', q;
 
     execute q;
     if (not FOUND) then
-        raise exception 'Cannot create rule for UPDATE on view %', viewName;
+        raise exception 'Cannot create rule for UPDATE on view %', view_Name;
         return NULL;
     end if;
 
 
-    q = 'create rule d_rule_' || viewName || ' as on DELETE TO ' || viewName || 
+    q = 'create rule d_rule_' || view_Name || ' as on DELETE TO ' || view_Name || 
           ' do instead delete from ' || refTableName || ' where id = old.id;';
     raise notice '%', q;
 
     execute q;
     if (not FOUND) then
-        raise exception 'Cannot create rule for DELETE on view %', viewName;
+        raise exception 'Cannot create rule for DELETE on view %', view_Name;
         return NULL;
     end if;
 
     --Применяем подсистему дискреционого разграничения доступа
-    perform acl_secureTable(viewName);
+    perform acl_secureTable(view_Name);
 
-    return viewName;
+    return view_Name;
 end
 $BODY$
 language 'plpgsql';

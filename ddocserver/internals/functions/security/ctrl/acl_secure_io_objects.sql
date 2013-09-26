@@ -96,7 +96,7 @@ $BODY$
 language 'plpgsql' security definer;
 
 
-create or replace function "f_ins_io_objects"(varchar, timestamp, int4, int4, int4, int4, int4, int4, int4, varchar, varchar, varchar, text, bool, timestamp, int4, bool, int8, int8, int4, varchar, int4, varchar) returns int4 as 
+create or replace function "f_ins_io_objects"(varchar, timestamp, int4, int4, int4, int4, int4, int4, int4, varchar, varchar, varchar, text, bool, timestamp, int4, bool, int8, int8, int4, varchar, int4, varchar, uuid) returns int4 as 
 $BODY$
 declare 
     "ii_unique_id" alias for $1;
@@ -122,6 +122,7 @@ declare
     "ii_ref_table_name" alias for $21;
     "ii_id_io_type" alias for $22;
     "ii_r_icon" alias for $23;
+    "ii_uuid_t" alias for $24;
  
 begin 
     if(getPrivilege(getCurrentUser(), 7, 4, true) = false) then raise exception 'You have insufficient permissions to do the operation!'; return 0; end if;
@@ -147,7 +148,8 @@ begin
                                   "id_search_template", 
                                   "ref_table_name",
                                   "id_io_type",
-                                  "r_icon") 
+                                  "r_icon",
+                                  "uuid_t") 
     values ("ii_unique_id", 
             "ii_id", 
             "ii_id_io_category", 
@@ -169,8 +171,9 @@ begin
             "ii_id_search_template", 
             "ii_ref_table_name",
             "ii_id_io_type",
-            "ii_r_icon");
-return 1; 
+            "ii_r_icon",
+            "ii_uuid_t");
+    return 1; 
 end 
 $BODY$ 
 language 'plpgsql' security definer;
@@ -184,64 +187,68 @@ begin
     if(getPrivilege(getCurrentUser(), 7, 4, true) = false) then raise exception 'You have insufficient permissions to do the operation!'; return 0; end if;
 
     delete from "tbl_io_objects" where id = ii_id;
-return 1; 
+    return 1; 
 end 
 $BODY$ 
 language 'plpgsql' security definer;
 
 
-create or replace function "f_upd_io_objects"(varchar, timestamp, int4, int4, int4, int4, int4, int4, int4, varchar, varchar, varchar, text, bool, timestamp, int4, bool, int8, int8, int4, varchar, int4, varchar) returns int4 as 
+create or replace function "f_upd_io_objects"(varchar, timestamp, int4, int4, int4, int4, int4, int4, int4, varchar, varchar, varchar, text, bool, timestamp, int4, bool, int8, int8, int4, varchar, int4, varchar, uuid) returns int4 as 
 $BODY$ 
 declare 
-"ii_unique_id" alias for $1;
-"ii_last_update" alias for $2;
-"ii_id" alias for $3;
-"ii_id_io_category" alias for $4;
-"ii_id_io_state" alias for $5;
-"ii_id_maclabel" alias for $6;
-"ii_author" alias for $7;
-"ii_id_sync_type" alias for $8;
-"ii_id_owner_org" alias for $9;
-"ii_name" alias for $10;
-"ii_table_name" alias for $11;
-"ii_description" alias for $12;
-"ii_information" alias for $13;
-"ii_is_system" alias for $14;
-"ii_insert_time" alias for $15;
-"ii_is_completed" alias for $16;
-"ii_is_global" alias for $17;
-"ii_record_fill_color" alias for $18;
-"ii_record_text_color" alias for $19;
-"ii_id_search_template" alias for $20;
-"ii_ref_table_name" alias for $21;
-"ii_id_io_type" alias for $22;
-"ii_r_icon" alias for $23;
+    "ii_unique_id" alias for $1;
+    "ii_last_update" alias for $2;
+    "ii_id" alias for $3;
+    "ii_id_io_category" alias for $4;
+    "ii_id_io_state" alias for $5;
+    "ii_id_maclabel" alias for $6;
+    "ii_author" alias for $7;
+    "ii_id_sync_type" alias for $8;
+    "ii_id_owner_org" alias for $9;
+    "ii_name" alias for $10;
+    "ii_table_name" alias for $11;
+    "ii_description" alias for $12;
+    "ii_information" alias for $13;
+    "ii_is_system" alias for $14;
+    "ii_insert_time" alias for $15;
+    "ii_is_completed" alias for $16;
+    "ii_is_global" alias for $17;
+    "ii_record_fill_color" alias for $18;
+    "ii_record_text_color" alias for $19;
+    "ii_id_search_template" alias for $20;
+    "ii_ref_table_name" alias for $21;
+    "ii_id_io_type" alias for $22;
+    "ii_r_icon" alias for $23;
+    "ii_uuid_t" alias for $24;
+
  
 begin 
     if(getPrivilege(getCurrentUser(), 7, 4, true) = false) then raise exception 'You have insufficient permissions to do the operation!'; return 0; end if;
 
-update "tbl_io_objects" set 
- "id_io_state" = "ii_id_io_state",
- "id_maclabel" = "ii_id_maclabel",
- "author" = "ii_author",
- "id_sync_type" = "ii_id_sync_type",
- "id_owner_org" = "ii_id_owner_org",
- "name" = "ii_name",
- "table_name" = "ii_table_name",
- "description" = "ii_description",
- "information" = "ii_information",
- "is_system" = "ii_is_system",
- "insert_time" = "ii_insert_time",
- "is_global" = "ii_is_global",
- "is_completed" = "ii_is_completed",
- "record_fill_color" = "ii_record_fill_color",
- "record_text_color" = "ii_record_text_color",
- "id_search_template" = "ii_id_search_template",
- "ref_table_name" = "ii_ref_table_name",
- "id_io_type" = "ii_id_io_type",
- "r_icon" = "ii_r_icon"
- where id = ii_id;
-return 1; 
+    update "tbl_io_objects" set 
+        "id_io_state" = "ii_id_io_state",
+        "id_maclabel" = "ii_id_maclabel",
+        "author" = "ii_author",
+        "id_sync_type" = "ii_id_sync_type",
+        "id_owner_org" = "ii_id_owner_org",
+        "name" = "ii_name",
+        "table_name" = "ii_table_name",
+        "description" = "ii_description",
+        "information" = "ii_information",
+        "is_system" = "ii_is_system",
+        "insert_time" = "ii_insert_time",
+        "is_global" = "ii_is_global",
+        "is_completed" = "ii_is_completed",
+        "record_fill_color" = "ii_record_fill_color",
+        "record_text_color" = "ii_record_text_color",
+        "id_search_template" = "ii_id_search_template",
+        "ref_table_name" = "ii_ref_table_name",
+        "id_io_type" = "ii_id_io_type",
+        "r_icon" = "ii_r_icon",
+        "uuid_t" = "ii_uuid_t"
+    where id = ii_id;
+ 
+    return 1; 
 end 
 $BODY$ 
 language 'plpgsql' security definer;
