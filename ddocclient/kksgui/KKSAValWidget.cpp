@@ -10,6 +10,7 @@
 #include <QDateTime>
 #include <QAbstractItemModel>
 #include <QAbstractItemView>
+#include <QFrame>
 
 #include <QLineEdit>
 #include <QDateEdit>
@@ -43,6 +44,7 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
     : QWidget (parent, flags),
       pAttrValue (_av),
       valWidget (0),
+      valFrame (new QFrame),
       lEVal (0),
       dEVal (0),
       tEVal (0),
@@ -61,13 +63,14 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
 {
     if (pAttrValue)
         pAttrValue->addRef();
-    
+
+    QGridLayout * mainGLay = new QGridLayout (this);
     QGridLayout * avGLay = new QGridLayout;
-    setLayout (avGLay);
+    valFrame->setLayout (avGLay);
     //
     // Конструируем только 1 виджет в зависимости от типа.
     //
-    avGLay->setContentsMargins (0, 0, 0, 0);
+    //avGLay->setContentsMargins (0, 0, 0, 0);
 //    QSizePolicy leSp (QSizePolicy::Expanding, QSizePolicy::Fixed);
 //    lEVal->setSizePolicy (leSp);
 
@@ -215,16 +218,17 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
 //    QSizePolicy valSp (QSizePolicy::Expanding, QSizePolicy::Preferred);
 //    valWidget->setSizePolicy (valSp);
     avGLay->addWidget (valWidget, 0, 0, 1, 1);//, Qt::AlignJustify | Qt::AlignVCenter);
+    mainGLay->addWidget (valFrame, 0, 0, 1, 1);
     QVBoxLayout * vNavLay = new QVBoxLayout;
     vNavLay->addWidget (tbUp);
     vNavLay->addWidget (tbDown);
-    avGLay->addLayout (vNavLay, 0, 1, 1, 1, Qt::AlignVCenter);
+    mainGLay->addLayout (vNavLay, 0, 1, 1, 1, Qt::AlignVCenter);
     QHBoxLayout * buttonsLay = new QHBoxLayout;
     buttonsLay->addStretch(1);
     QPushButton * pbClose = new QPushButton (tr("&Close"), this);
     connect (pbClose, SIGNAL (clicked()), this, SLOT (close()));
     buttonsLay->addWidget(pbClose);
-    avGLay->addLayout (buttonsLay, 1, 0, 1, 2, Qt::AlignJustify | Qt::AlignBottom);//addWidget(pbClose, 1, 1, 1, 1);
+    mainGLay->addLayout (buttonsLay, 1, 0, 1, 2, Qt::AlignJustify | Qt::AlignBottom);//addWidget(pbClose, 1, 1, 1, 1);
 
     connect (tbUp, SIGNAL (clicked()), this, SLOT (upVal()) );
     connect (tbDown, SIGNAL (clicked()), this, SLOT (downVal()) );
@@ -363,8 +367,10 @@ KKSAValWidget::~KKSAValWidget()
 {
     if (pAttrValue)
         pAttrValue->release();
-    if (valWidget)
-        delete valWidget;
+    
+    delete valFrame;
+    //if (valWidget)
+    //    delete valWidget;
 
     delete tbUp;
     delete tbDown;

@@ -24,6 +24,7 @@ class QGroupBox;
 class QToolButton;
 class QTextEdit;
 class QGridLayout;
+class QFrame;
 
 class QDate;
 class QTime;
@@ -69,6 +70,7 @@ private:
     //
     KKSAttrValue * pAttrValue;
     QWidget * valWidget;
+    QFrame * valFrame;
     QLineEdit * lEVal;
     QDateEdit * dEVal;
     QTimeEdit * tEVal;

@@ -5,6 +5,7 @@
  * Created on 30 Август 2013 г., 16:16
  */
 #include <QStringList>
+#include <QSize>
 
 #include <KKSAttrValue.h>
 #include <KKSAttribute.h>
@@ -174,6 +175,18 @@ QVariant KKSAttrHistModel::data (const QModelIndex& index, int role) const
                 }
                 break;
             }
+            case Qt::SizeHintRole:
+            {
+                switch (iCol)
+                {
+                    case 0: return QSize (50, 24); break;
+                    case 1: case 2: return QSize (120, 24); break;
+                    case 3: return QSize (150, 24); break;
+                    case 4: case 5: return QSize (120, 24); break;
+                    case 6: return QSize (100, 24); break;
+                }
+                break;
+            }
         }
         default: break;
     }
@@ -184,7 +197,7 @@ QVariant KKSAttrHistModel::data (const QModelIndex& index, int role) const
 QVariant KKSAttrHistModel::headerData (int section, Qt::Orientation orientation, int role) const
 {
     QStringList listHeader;
-    listHeader <<tr("Id")<<tr("Start")<<tr("Stop")<<tr("Value")<<tr("Source")<<tr("Transfer")<<tr("Description");
+    listHeader <<tr("Id")<<tr("Start time")<<tr("Stop time")<<tr("Value")<<tr("Source")<<tr("Transfer")<<tr("Description");
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
         return listHeader[section];
     else
