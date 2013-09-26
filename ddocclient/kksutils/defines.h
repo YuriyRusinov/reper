@@ -200,6 +200,7 @@ const int ATTR_RECORD_TEXT_COLOR = 207;
 #define ATTR_ID_UNIT 31
 #define ATTR_SHORT_NAME 19
 const int ATTR_R_ICON = 312;
+const int ATTR_UUID_T = 348;
 
 
 

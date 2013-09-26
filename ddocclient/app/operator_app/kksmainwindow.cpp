@@ -415,8 +415,10 @@ void KKSMainWindow::initDebugWindow()
 
     m_debugWidget->setParent(this);
     m_debugWidget->initMenuEmitting();
-
+    bool enabled = m_debugWidget->isVisible();
     addDockWidget(Qt::RightDockWidgetArea, m_debugWidget);
+    if(!enabled)
+        m_debugWidget->hide();
 }
 
 void KKSMainWindow::initToolBars()
@@ -510,6 +512,9 @@ void KKSMainWindow::initIcons()
     ui->aConnInfo->setIcon(QIcon(":/ddoc/connection_info.png"));
     //ui->aQuit->setIcon();
 
+    //ui->aShowJournals->setIcon(QIcon(":/ddoc/show_journals.png"));
+    //ui->aShowJournals->setIcon(QIcon(":/ddoc/show_dbg_win.png"));
+
     ui->aCreateDoc->setIcon(QIcon(":/ddoc/new_doc.png"));
     ui->aFindDoc->setIcon(QIcon(":/ddoc/find_doc.png"));
     ui->aMyDocs->setIcon(QIcon(":/ddoc/my_docs.png"));
@@ -561,6 +566,9 @@ void KKSMainWindow::initConnections()
     connect(ui->aChangeUser, SIGNAL(triggered()), this, SLOT(slotChangeUser()));
     connect(ui->aConnInfo, SIGNAL(triggered()), this, SLOT(slotConnInfo()));
     connect(ui->aQuit, SIGNAL(triggered()), this, SLOT(slotClose()));
+
+    //connect(ui->aShowJournals, SIGNAL(triggered(bool)), this, SLOT(slotShowJournls(bool)));
+    //connect(ui->aShowDbgWindow, SIGNAL(triggered(bool)), this, SLOT(slotShowDbgWin(bool)));
 
     connect(ui->aCreateDoc, SIGNAL(triggered()), this, SLOT(slotCreateDoc()));
     connect(ui->aFindDoc, SIGNAL(triggered()), this, SLOT(slotFindDoc()));
@@ -663,8 +671,15 @@ bool KKSMainWindow::connectToDb()
     //initMsgJournal();
     
     initJournal ();
-
     initDebugWindow();
+
+    QAction * aJ = m_journalW->toggleViewAction();
+    QAction * aD = m_debugWidget->toggleViewAction();
+    aJ->setIcon(QIcon(":/ddoc/show_journals.png"));
+    aD->setIcon(QIcon(":/ddoc/show_dbg_win.png"));
+    ui->menuView->addSeparator();
+    ui->menuView->addAction(aJ);
+    ui->menuView->addAction(aD);
 
     if(kksSito->loader()->getLocalOrgId() == -1){
         qWarning() << tr("Local organization in current database does not set."
@@ -862,6 +877,23 @@ void KKSMainWindow::setActiveSubWindow(QWidget *window)
         return;
     
     m_mdiArea->setActiveSubWindow(q_win);
+}
+
+
+void KKSMainWindow::slotShowJournls(bool yes)
+{
+    if(!yes)
+        m_journalW->hide();
+    else
+        m_journalW->show();
+}
+
+void KKSMainWindow::slotShowDbgWin(bool yes)
+{
+    if(!yes)
+        m_debugWidget->hide();
+    else
+        m_debugWidget->show();
 }
 
 void KKSMainWindow::slotCreateNewObjEditor(int idObject, 

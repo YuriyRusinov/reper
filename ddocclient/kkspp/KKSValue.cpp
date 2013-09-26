@@ -367,6 +367,14 @@ void KKSValue::verify(void) const
         return;
     }
 
+    if( a_type == KKSAttrType::atUUID){
+        if(m_value.canConvert(QVariant::String)){
+            m_isValid = true;
+        }
+        m_isLiteral = true;
+
+    }
+
     return;
 }
 

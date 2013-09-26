@@ -421,8 +421,11 @@ int KKSObjEditor :: constructObject()
                                                 QMessageBox::Yes | QMessageBox::No);
                 if (res == QMessageBox::No)
                     return ERROR_CODE;
-                else
+                else{
                     emit generateUUID (cAttrValue->attribute()->id(), cAttrValue);
+                    value = cAttrValue->value().value();
+                    val = cAttrValue->value().valueVariant();
+                }
             }
             else if ( type == KKSAttrType::atUUID && 
                      (val.isNull() || value.isEmpty()) && 
@@ -430,6 +433,8 @@ int KKSObjEditor :: constructObject()
                      qobject_cast<KKSAttrUUIDWidget *>(awAttrs.value(cAttrValue->id()))->checkState() == Qt::Checked)
             {
                 emit generateUUID (cAttrValue->attribute()->id(), cAttrValue);
+                value = cAttrValue->value().value();
+                val = cAttrValue->value().valueVariant();
             }
             
             if ( cAttrValue->attribute()->isMandatory() && 

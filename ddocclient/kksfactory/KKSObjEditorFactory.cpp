@@ -8236,7 +8236,8 @@ void KKSObjEditorFactory :: loadRefRec (QString tableName, qint64 id)
     bool isModal = editor->isModal ();
     QString s;
     
-    this->editExistOE (editor, idObj, id, wObj->category()->tableCategory(), s, 0, isModal);
+    //this->editExistOE (editor, idObj, id, wObj->category()->tableCategory(), s, 0, isModal);
+    this->editExistOE (editor, idObj, id, wObj->category(), s, 0, isModal);
     
     wObj->release ();
 }

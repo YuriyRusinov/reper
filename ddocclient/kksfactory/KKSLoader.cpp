@@ -221,10 +221,10 @@ KKSList<KKSAttrValue *> KKSLoader::loadAttrValues(KKSObject * io) const
         attr->setStartDateTime(res->getCellAsDateTime(row, 8));
         attr->setStopDateTime(res->getCellAsDateTime(row, 9));
         //attr->setMeasDateTime(res->getCellAsDateTime(row, 10));
-        attr->setInsertDateTime(res->getCellAsDateTime(row, 11));
-        attr->setDesc(res->getCellAsString(row, 15));
+        attr->setInsertDateTime(res->getCellAsDateTime(row, 10));
+        attr->setDesc(res->getCellAsString(row, 14));
 
-        int idObjSrc = res->getCellAsInt(row, 12);
+        int idObjSrc = res->getCellAsInt(row, 11);
         if(idObjSrc > 0){
             KKSObject * o = loadIO(idObjSrc, true);//упрощенно
             attr->setIOSrc(o);
@@ -232,7 +232,7 @@ KKSList<KKSAttrValue *> KKSLoader::loadAttrValues(KKSObject * io) const
                 o->release();
         }
 
-        int idObjSrc1 = res->getCellAsInt(row, 13);
+        int idObjSrc1 = res->getCellAsInt(row, 12);
         if(idObjSrc1 > 0){
             KKSObject * o = loadIO(idObjSrc1, true);//упрощенно
             attr->setIOSrc1(o);
@@ -240,7 +240,7 @@ KKSList<KKSAttrValue *> KKSLoader::loadAttrValues(KKSObject * io) const
                 o->release();
         }
 
-        attr->setActual(res->getCellAsBool(row, 14));
+        attr->setActual(res->getCellAsBool(row, 13));
 
         attrs.append(attr);
         attr->release();
@@ -849,6 +849,7 @@ KKSObject * KKSLoader::loadIO(int id, bool simplify) const
     
     io->setIdSearchTemplate(res->getCellAsInt(0, 22));
     io->setRefTableName(res->getCellAsString(0, 23));
+    io->setUuid(res->getCellAsString(0, 30));
 
     if(simplify){
         delete res;
@@ -944,6 +945,8 @@ KKSObject * KKSLoader::loadIO(const QString & tableName, bool simplify) const
     }
     
     int id = res->getCellAsInt(0, 0);
+    delete res;
+
     io = loadIO(id, simplify);
     return io;
 }
@@ -2073,8 +2076,10 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
             continue;
         if(a->code() == "id_io_state")
             continue;
-        if(a->code() == "uuid_t")
-            continue;
+        if(a->code() == "uuid_t"){
+            if(tableName.toLower() != "io_objects" && tableName.toLower() != "tbl_io_objects")//в справочнике ИО есть атрибут uuit_t
+                continue;
+        }
         if(a->code() == "r_icon"){ 
             if(tableName.toLower() != "rubricator") //в справочнике "общесистемный рубрикатор" имеется колонка r_icon, но он при этом является системным, т.е. isSys = true
                 continue;
@@ -2431,14 +2436,17 @@ KKSMap<qint64, KKSEIOData *> KKSLoader::loadEIOList(const KKSCategory * c0,
                code == "id" || 
                code == "unique_id" || 
                code == "last_update" || 
-               code == "uuid_t" || 
                code == "id_io_state" || 
+               code == "uuid_t" ||
                code == "r_icon" || 
                code == "record_fill_color" || 
                code == "record_text_color")
             {
                 eio->addSysField(code, value);
             }
+//            else if(code == "uuid_t" && tableName.toLower() != "io_objects" && tableName.toLower() != "tbl_io_objects"){
+//                eio->addSysField(code, value);
+//            }
 
             //в данном случае получение атрибута по его коду (хотя он и не является уникальным) 
             //допустимо, поскольку категория описывает таблицу, а в таблице не может быть 
@@ -6239,10 +6247,10 @@ KKSList<KKSAttrValue *> KKSLoader::loadIndValues(KKSObjectExemplar * eio) const
         attr->setStartDateTime(res->getCellAsDateTime(row, 8));
         attr->setStopDateTime(res->getCellAsDateTime(row, 9));
         //attr->setMeasDateTime(res->getCellAsDateTime(row, 10));
-        attr->setInsertDateTime(res->getCellAsDateTime(row, 11));
-        attr->setDesc(res->getCellAsString(row, 15));
+        attr->setInsertDateTime(res->getCellAsDateTime(row, 10));
+        attr->setDesc(res->getCellAsString(row, 14));
 
-        int idObjSrc = res->getCellAsInt(row, 12);
+        int idObjSrc = res->getCellAsInt(row, 11);
         if(idObjSrc > 0){
             KKSObject * o = loadIO(idObjSrc, true);//упрощенно
             attr->setIOSrc(o);
@@ -6250,7 +6258,7 @@ KKSList<KKSAttrValue *> KKSLoader::loadIndValues(KKSObjectExemplar * eio) const
                 o->release();
         }
 
-        int idObjSrc1 = res->getCellAsInt(row, 13);
+        int idObjSrc1 = res->getCellAsInt(row, 12);
         if(idObjSrc1 > 0){
             KKSObject * o = loadIO(idObjSrc1, true);//упрощенно
             attr->setIOSrc1(o);
@@ -6258,7 +6266,7 @@ KKSList<KKSAttrValue *> KKSLoader::loadIndValues(KKSObjectExemplar * eio) const
                 o->release();
         }
 
-        attr->setActual(res->getCellAsBool(row, 14));
+        attr->setActual(res->getCellAsBool(row, 13));
 
         attrs.append(attr);
         attr->release();

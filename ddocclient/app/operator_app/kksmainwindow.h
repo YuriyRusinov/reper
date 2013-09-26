@@ -81,6 +81,10 @@ Q_OBJECT
         void slotConnInfo();
         void slotClose();
 
+        void slotShowJournls(bool yes);
+        void slotShowDbgWin(bool yes);
+
+
         void slotCreateDoc();
         void slotFindDoc();
         void slotMyDocs ();

@@ -424,6 +424,12 @@ KKSObjectExemplar * KKSConverter::objToExemplar(const KKSLoader * loader, const 
     else
         appendAttrValue(tc, attrValues, 312, io->iconAsString(), KKSAttrType::atJPG);//r_icon
 
+    //uuid_t
+    if(io->uuid().isEmpty())
+        appendAttrValue(tc, attrValues, 348, QString::null/*::number(-1)*/, KKSAttrType::atUUID);
+        
+    else
+        appendAttrValue(tc, attrValues, 348, io->uuid(), KKSAttrType::atUUID);//uuid_t
 
     eio->setAttrValues(attrValues);
 
@@ -669,6 +675,12 @@ bool KKSConverter::objectFromExemplar(const KKSLoader * loader, KKSObject * io, 
     if(!av)
         return false;
     io->setIcon(av->value().value());
+
+    av = eio->attrValue(ATTR_UUID_T);
+    if(!av)
+        return false;
+    io->setUuid(av->value().value());
+
     //
     // Серега неправ
     //(av->value().value().toUInt());

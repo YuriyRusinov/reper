@@ -96,7 +96,7 @@ private:
     DDocServerListener * listener;
     DDocStreamsGenerator * streamsGenerator;
 
-    QHttp http;
+    QHttp * http;
 
     QTimer m_timer;
 

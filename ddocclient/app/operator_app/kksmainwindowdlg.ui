@@ -33,7 +33,7 @@
      <x>0</x>
      <y>0</y>
      <width>770</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -266,6 +266,28 @@
   <action name="actLCOpen">
    <property name="text">
     <string>Открыть жизненный цикл...</string>
+   </property>
+  </action>
+  <action name="aShowJournals">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Журнал распоряжений, команд и сообщений</string>
+   </property>
+  </action>
+  <action name="aShowDbgWindow">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Окно отладочных сообщений</string>
    </property>
   </action>
  </widget>

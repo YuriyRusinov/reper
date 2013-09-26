@@ -30,6 +30,7 @@ KKSAttrUUIDWidget :: KKSAttrUUIDWidget (QWidget *parent, Qt::WindowFlags f)
     gAttrLay->setContentsMargins (0, 0, 0, 0);
     gAttrLay->setAlignment (Qt::AlignRight | Qt::AlignVCenter);
     
+    chAuto->setChecked(true);
     tbGen->setToolTip(tr("Generate automatically"));
     tbGen->setText ("...");
     QRegExp uuidRegExp ("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}");

@@ -85,5 +85,7 @@
     <file>message_stream.png</file>
     <file>uparrow.png</file>
     <file>downarrow.png</file>
+    <file>show_journals.png</file>
+    <file>show_dbg_win.png</file>
   </qresource>
 </RCC>
