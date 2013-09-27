@@ -619,7 +619,7 @@ void KKSIncludesWidget :: editRubric (void)
     rForm->setSearchTemplate (r->getSearchTemplate());
     rForm->setCategory (r->getCategory());
     rForm->setAccessEntity (r->getAccessRules());
-    rForm->setIcon (r->getIcon().pixmap(22, 22));
+    rForm->setIcon (r->getIcon().pixmap(24, 24));
     if (!rForm)
         return;
 

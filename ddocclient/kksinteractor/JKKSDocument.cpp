@@ -9,33 +9,34 @@
 
 
 JKKSDocument :: JKKSDocument (const QString& name, 
-                              //const QString& code, 
                               int idCat, 
                               int idAuth, 
-                              int idSt, 
                               const QString& tName, 
                               const QString& desc, 
                               const QString& info, 
                               int idmaclabel, 
-                              const JKKSAddress & addr, 
-                              const QString& mess_code,
-                              const QString& uid,
                               int idsynctype,
                               const QString& sync_name,
                               const QString& sync_desc,
                               int idownerorg,
                               bool isglobal,
                               const QString & orgUID,
-                              QColor bkCol,
-                              QColor fgCol
+
+                              const JKKSAddress & addr, 
+                              const QString& mess_code,
+
+                              const QString & uid,
+                              const QString & uuid,
+                              int idState, 
+                              const QColor bkCol,
+                              const QColor fgCol,
+                              const QIcon rIcon
                               )
-    : JKKSMessage (addr, mess_code), JKKSUID(uid),
+    : JKKSMessage (addr, mess_code), JKKSUID(uid, uuid, idState, bkCol, fgCol, rIcon),
     idObject (-1),
     ioName (name),
-    //ioCode (code),
     idCategory (idCat),
     idAuthor (idAuth),
-    idState (idSt),
     tableName (tName),
     ioDesc (desc),
     ioInfo (info),
@@ -52,9 +53,7 @@ JKKSDocument :: JKKSDocument (const QString& name,
     syncDesc (sync_desc),
     idOwnerOrg (idownerorg),
     isGlobal (isglobal),
-    ownerOrgUID(orgUID),
-    bkColor (bkCol),
-    fgColor (fgCol)
+    ownerOrgUID(orgUID)
 {
 }
 
@@ -62,10 +61,8 @@ JKKSDocument :: JKKSDocument (const JKKSDocument& io)
     : JKKSMessage (io), JKKSUID(io),
     idObject (io.idObject),
     ioName (io.ioName),
-    //ioCode (io.ioCode),
     idCategory (io.idCategory),
     idAuthor (io.idAuthor),
-    idState (io.idState),
     tableName (io.tableName),
     ioDesc (io.ioDesc),
     ioInfo (io.ioInfo),
@@ -84,8 +81,6 @@ JKKSDocument :: JKKSDocument (const JKKSDocument& io)
     idOwnerOrg (io.idOwnerOrg),
     isGlobal (io.isGlobal),
     ownerOrgUID(io.ownerOrgUID),
-    bkColor (io.bkColor),
-    fgColor (io.fgColor),
     m_type(io.m_type)
 {
 }
@@ -100,13 +95,12 @@ QByteArray JKKSDocument :: serialize (void) const
     qBuffer.open (QIODevice::WriteOnly);
     QDataStream out (&qBuffer);
 
-    out << getAddr();
-    out << getCode();
+    out << getAddr(); //from jkksmessage
+    out << getCode(); //from jkksmessage
+
     out << ioName;
-    //out << ioCode;
     out << idCategory;
     out << idAuthor;
-    out << idState;
     out << tableName;
     out << ioDesc;
     out << ioInfo;
@@ -119,16 +113,21 @@ QByteArray JKKSDocument :: serialize (void) const
     out << idCommand;
     out << realTime;
     out << idJournal;
-    out << uid();
     out << idSyncType;
     out << syncName;
     out << syncDesc;
     out << idOwnerOrg;
     out << isGlobal;
     out << ownerOrgUID;
-    out << bkColor;
-    out << fgColor;
     out << m_type;
+
+    //from jkksuid
+    out << uid();
+    out << uuid();
+    out << idState();
+    out << bgColor();
+    out << fgColor();
+    out << rIcon();
 
     return qBuffer.buffer();
 }
@@ -142,13 +141,15 @@ int JKKSDocument :: unserialize (const QByteArray& mess)
 
     JKKSAddress addr;
     QString code;
-    in >> addr;
-    in >> code;
+    
+    in >> addr; //from jkksmessage
+    in >> code; //from jkksmessage
+    setAddr (addr);
+    setCode (code);
+    
     in >> ioName;
-    //in >> ioCode;
     in >> idCategory;
     in >> idAuthor;
-    in >> idState;
     in >> tableName;
     in >> ioDesc;
     in >> ioInfo;
@@ -161,22 +162,38 @@ int JKKSDocument :: unserialize (const QByteArray& mess)
     in >> idCommand;
     in >> realTime;
     in >> idJournal;
-    QString uid;
-    in >> uid;
+    
     in >> idSyncType;
     in >> syncName;
     in >> syncDesc;
     in >> idOwnerOrg;
     in >> isGlobal;
     in >> ownerOrgUID;
-    in >> bkColor;
-    in >> fgColor;
     in >> m_type;
+
+    //from jkksuid
+
+    QString uid;
+    QString uuid;
+    int idSt;
+    QColor bgCol;
+    QColor fgCol;
+    QIcon rIc;
+
+    in >> uid;
+    in >> uuid;
+    in >> idSt;
+    in >> bgCol;
+    in >> fgCol;
+    in >> rIc;
 
 
     setUid (uid);
-    setAddr (addr);
-    setCode (code);
+    setUuid(uuid);
+    setIdState(idSt);
+    setBgColor(bgCol);
+    setFgColor(fgCol);
+    setRIcon(rIc);
 
     return OK_CODE;
 }
@@ -230,16 +247,6 @@ void JKKSDocument :: setName (const QString& name)
     ioName = name;
 }
 
-//QString JKKSDocument :: getIOCode (void) const
-//{
-//    return ioCode;
-//}
-
-//void JKKSDocument :: setIOCode (const QString& code)
-//{
-//    ioCode = code;
-//}
-
 int JKKSDocument :: getIdIoCat (void) const
 {
     return idCategory;
@@ -258,16 +265,6 @@ int JKKSDocument :: getIdAuthor (void) const
 void JKKSDocument :: setIdAuthor (int idAuth)
 {
     idAuthor = idAuth;
-}
-
-int JKKSDocument :: getIdState (void) const
-{
-    return idState;
-}
-
-void JKKSDocument :: setIdState (int idSt)
-{
-    idState = idSt;
 }
 
 QString JKKSDocument :: getTableName (void) const
@@ -448,26 +445,6 @@ bool JKKSDocument :: getGlobal (void) const
 void JKKSDocument :: setGlobal (bool is_global)
 {
     isGlobal = is_global;
-}
-
-QColor JKKSDocument :: getBkCol (void) const
-{
-    return bkColor;
-}
-
-void JKKSDocument :: setBkColor (QColor bkCol)
-{
-    bkColor = bkCol;
-}
-
-QColor JKKSDocument :: getFgCol (void) const
-{
-    return fgColor;
-}
-
-void JKKSDocument :: setFgCol (QColor fgCol)
-{
-    fgColor = fgCol;
 }
 
 const JKKSType & JKKSDocument :: getType(void) const

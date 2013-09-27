@@ -1,21 +1,20 @@
 #include "KKSTreeItem.h"
 #include "KKSTemplate.h"
 #include "KKSAttribute.h"
-#include "KKSAttrView.h"
-#include "KKSList.h"
 #include "KKSAttribute.h"
 #include "KKSAttrType.h"
 #include "KKSEIOData.h"
 
-KKSTreeItem :: KKSTreeItem (qint64 id, KKSEIOData * d, const KKSTemplate * t, const QIcon& itIcon, KKSTreeItem * parent)
+KKSTreeItem :: KKSTreeItem (qint64 id, KKSEIOData * d, const KKSTemplate * t, const KKSList<KKSAttrView*>& visAttrs, const QIcon& itIcon, KKSTreeItem * parent)
     : idItem (id),
       templ (t),
       data (NULL),
       itemIcon (itIcon),
       parentItem (parent),
-      childItems (QList<KKSTreeItem*>())
+      childItems (QList<KKSTreeItem*>()),
+      vAttrs (visAttrs)
 {
-    setData(d, t);
+    setData(d, t, visAttrs);
 }
 
 KKSTreeItem :: ~KKSTreeItem (void)
@@ -58,7 +57,7 @@ bool KKSTreeItem :: insertChildren(int position, int count)
          KKSEIOData * d = 0;//data;
          const KKSTemplate * t (0);
          QIcon ic;
-         KKSTreeItem *item = new KKSTreeItem(-1-row, d, t, ic, this);
+         KKSTreeItem *item = new KKSTreeItem(-1-row, d, t, vAttrs, ic, this);
          childItems.insert(position, item);
      }
 
@@ -128,7 +127,7 @@ void KKSTreeItem :: appendChild (KKSTreeItem * ch)
     ch->setParent (this);
     KKSEIOData * d = ch->data;
     childItems.append(ch);
-    ch->initData (d, templ);
+    ch->initData (d, templ, vAttrs);
 }
 
 void KKSTreeItem :: setParent (KKSTreeItem * p)
@@ -149,7 +148,7 @@ void KKSTreeItem :: setId (qint64 newId)
     idItem = newId;
 }
 
-void KKSTreeItem :: setData (KKSEIOData * d, const KKSTemplate * t)
+void KKSTreeItem :: setData (KKSEIOData * d, const KKSTemplate * t, const KKSList<KKSAttrView*>& visAttrs)
 {
     if (!t || data == d)
         return;
@@ -165,17 +164,18 @@ void KKSTreeItem :: setData (KKSEIOData * d, const KKSTemplate * t)
     if (!data)
         return;
 
-    initData (d, t);
+    initData (d, t, visAttrs);
 }
 
-void KKSTreeItem :: initData (KKSEIOData * d, const KKSTemplate * t)
+void KKSTreeItem :: initData (KKSEIOData * d, const KKSTemplate * t, const KKSList<KKSAttrView*>& visAttrs)
 {
     if (!d || !t)
         return;
     itemData.clear ();
     int iNum = this->childNumber()+1;
-    KKSList<KKSAttrView *> sAttrs = t->sortedAttrs();
-    for (int i=0; i<sAttrs.size(); i++)
+    KKSList<KKSAttrView *> sAttrs = visAttrs;//t->sortedAttrs ();
+    int na = sAttrs.size();
+    for (int i=0; i<na; i++)
     {
         KKSAttrView * v = sAttrs[i];
         QString attrValue;
@@ -221,6 +221,8 @@ void KKSTreeItem :: initData (KKSEIOData * d, const KKSTemplate * t)
             }
             else if (attrValue.contains ("\n"))
                 attrValue = attrValue.mid (0, attrValue.indexOf("\n")) + "...";
+            if (QString::compare (aCode, QString("UUID_t"), Qt::CaseInsensitive)==0)
+                qDebug () << __PRETTY_FUNCTION__ << attrValue;
         }
         
         itemData.append(QVariant(attrValue));

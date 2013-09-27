@@ -8,7 +8,7 @@ JKKSIOTable :: JKKSIOTable (int idIOTable,
                             const QString & title,
                             const QString & uid
              )
-    : JKKSUID (uid),
+    : JKKSUID (uid, QString()),
     id (idIOTable),
     tableName (table_name),
     category (QMap<int, JKKSCategory>()),

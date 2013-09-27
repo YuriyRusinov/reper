@@ -33,13 +33,20 @@ public:
                    int id_rec=-1, 
                    int id_entity_type=-1, 
                    const QString& tName=QString(), 
-                   const QString& t_uid=QString(), 
                    int sync_type=-1, 
                    const JKKSCategory& aCat=JKKSCategory(), 
                    const QStringList& attrsVals=QStringList(), 
+
                    const JKKSAddress & addr = JKKSAddress (),
                    const QString& mess_code=QString(), 
-                   const QString& uid = QString());
+
+                   const QString & t_uid = QString(), 
+                   const QString & uid = QString(),
+                   const QString & uuid = QString(),
+                   int idState = 1, 
+                   const QColor bkCol = QColor(),
+                   const QColor fgCol = QColor(),
+                   const QIcon rIcon = QIcon());
     
     JKKSRefRecord (const JKKSRefRecord& RR);
     

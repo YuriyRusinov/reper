@@ -2,7 +2,7 @@
 #include "JKKSType.h"
 
 JKKSType :: JKKSType (int id, const QString& name, const QString& desc, const QString& uid)
-    : JKKSUID (uid),
+    : JKKSUID (uid, QString()),
     m_id(id),
     m_name(name),
     m_desc(desc)

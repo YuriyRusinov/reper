@@ -2,7 +2,7 @@
 #include "JKKSWorkMode.h"
 
 JKKSWorkMode :: JKKSWorkMode (int id, const QString& wm_name, const QString& desc, const QString& symbol, const JKKSWorkModeType& type, const QString& uid)
-    : JKKSUID (uid),
+    : JKKSUID (uid, QString()),
     idWM (id),
     wmName (wm_name),
     wmDesc (desc),

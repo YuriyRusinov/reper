@@ -34,25 +34,28 @@ class _I_EXPORT JKKSDocument : public JKKSMessage, public JKKSUID
 {
     public:
         JKKSDocument (const QString& name = QString(), 
-                      //const QString& code = QString(), 
                       int idCat = -1, 
                       int idAuth = -1, 
-                      int idSt = -1, 
                       const QString& tName = QString(), 
                       const QString& desc = QString(), 
                       const QString& info = QString(), 
                       int idmaclabel = 1, 
-                      const JKKSAddress & addr = JKKSAddress(), 
-                      const QString& mess_code = QString(),
-                      const QString& uid = QString(),
                       int idsynctype = -1,
                       const QString& sync_name = QString(),
                       const QString& sync_desc = QString(),
                       int idownerorg = -1,
                       bool isglobal = false,
                       const QString & ownerOrgUID = QString(),
-                      QColor bkCol=QColor(),
-                      QColor fgCol=QColor());
+
+                      const JKKSAddress & addr = JKKSAddress(), 
+                      const QString& mess_code = QString(),
+
+                      const QString& uid = QString(),
+                      const QString & uuid = QString(),
+                      int idState = 1, 
+                      const QColor bkCol = QColor(),
+                      const QColor fgCol = QColor(),
+                      const QIcon rIcon = QIcon());
 
         JKKSDocument (const JKKSDocument& io);
         virtual ~JKKSDocument (void);
@@ -85,8 +88,8 @@ class _I_EXPORT JKKSDocument : public JKKSMessage, public JKKSUID
         int getIdAuthor (void) const;
         void setIdAuthor (int idAuth);
 
-        int getIdState (void) const;
-        void setIdState (int idSt);
+        //int getIdState (void) const;
+        //void setIdState (int idSt);
 
         QString getTableName (void) const;
         void setTableName (const QString& tName);
@@ -139,11 +142,11 @@ class _I_EXPORT JKKSDocument : public JKKSMessage, public JKKSUID
         bool getGlobal (void) const;
         void setGlobal (bool is_global);
 
-        QColor getBkCol (void) const;
-        void setBkColor (QColor bkCol);
+        //QColor getBkCol (void) const;
+        //void setBkColor (QColor bkCol);
 
-        QColor getFgCol (void) const;
-        void setFgCol (QColor fgCol);
+        //QColor getFgCol (void) const;
+        //void setFgCol (QColor fgCol);
 
         const JKKSType & getType() const;
         void setType(const JKKSType & type);
@@ -154,7 +157,7 @@ class _I_EXPORT JKKSDocument : public JKKSMessage, public JKKSUID
         //QString ioCode;
         int idCategory;
         int idAuthor;
-        int idState;
+        //int idState;
         
         QString tableName;
         QString ioDesc;
@@ -178,8 +181,8 @@ class _I_EXPORT JKKSDocument : public JKKSMessage, public JKKSUID
         bool isGlobal;
         QString ownerOrgUID;
 
-        QColor bkColor;
-        QColor fgColor;
+        //QColor bkColor;
+        //QColor fgColor;
 
         JKKSType m_type;
 };

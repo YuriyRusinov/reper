@@ -18,6 +18,7 @@
 class JKKSCategory;
 class JKKSLoader;
 
+/*адрес получателя сообщения*/
 class _I_EXPORT JKKSAddress
 {
 public:
@@ -45,6 +46,7 @@ private:
     int m_port;
 };
 
+/*базовый класс для сообщения, отправляемого получателю*/
 class _I_EXPORT JKKSMessage
 {
     public:

@@ -16,7 +16,7 @@ JKKSCategoryAttr :: JKKSCategoryAttr (int idAttr,
                                       bool isMandatory, 
                                       bool isReadOnly,
                                       const QString & uid)
-    : JKKSUID(uid),
+    : JKKSUID(uid, QString()),
     m_idAttribute (idAttr),
     m_idAttrType (idAttrType),
     m_aCode (aCode),

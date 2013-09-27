@@ -506,25 +506,28 @@ JKKSDocument JKKSLoader :: readDocument (int idObject, int idOrganization) const
     QString s;//empty string
 
     JKKSDocument doc (dRes->getCellAsString (0, 4), // name
-                      //dRes->getCellAsString (0, 5), // code
                       idCat, // category
                       dRes->getCellAsInt (0, 2), // author
-                      dRes->getCellAsInt (0, 3), // io_state
                       dRes->getCellAsString (0, 6), // tableName
                       dRes->getCellAsString (0, 7), // description
                       dRes->getCellAsString (0, 8), // info
                       dRes->getCellAsInt (0, 13), // mac label
-                      s,
-                      s,
-                      dRes->getCellAsString(0, 14), // uniqueID
                       dRes->getCellAsInt (0, 15), // id_sync_type
                       dRes->getCellAsString (0, 16), // sync_name
                       dRes->getCellAsString (0, 17), // sync_desc
                       dRes->getCellAsInt (0, 18), // id_owner_org
                       dRes->getCellAsBool (0, 19), // is_global
                       dRes->getCellAsString (0, 24), //email_prefix (owner org UID)
+
+                      s,
+                      s,
+
+                      dRes->getCellAsString(0, 14), // uniqueID
+                      s, //uuid
+                      dRes->getCellAsInt (0, 3), // io_state
                       dRes->getCellAsString (0, 20).isEmpty() ? QColor() : QColor::fromRgba (dRes->getCellAsInt64 (0, 20)), // background color
-                      dRes->getCellAsString (0, 21).isEmpty() ? QColor() : QColor::fromRgba (dRes->getCellAsInt64 (0, 21)) // foreground color
+                      dRes->getCellAsString (0, 21).isEmpty() ? QColor() : QColor::fromRgba (dRes->getCellAsInt64 (0, 21)), // foreground color
+                      QIcon() //r_icon
                       );
     
     doc.setId (idObject);
@@ -756,15 +759,15 @@ int JKKSLoader :: updateDocument (JKKSDocument *doc) const
     sql = QString ("select * from ioUpdate (%1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, NULL);")
         .arg (doc->id())
         .arg (doc->getName().isEmpty() ? QString ("NULL") : QString ("'%1'").arg (doc->getName()))//name
-        .arg (doc->getIdState () < 0 ? QString ("NULL") : QString::number (doc->getIdState()) )//id_state
+        .arg (doc->idState () < 0 ? QString ("NULL") : QString::number (doc->idState()) )//id_state
         //.arg (doc->getTableName().isEmpty() ? QString ("NULL") : QString ("'%1'").arg (doc->getTableName()))//table_name
         .arg (doc->getDescription().isEmpty() ? QString ("NULL") : QString ("'%1'").arg (doc->getDescription())) //desc
         .arg (doc->getInfo().isEmpty() ? QString ("NULL") : QString ("'%1'").arg (doc->getInfo()))//info
         .arg (QString::number (doc->getIdMaclabel ()))//id_maclabel
         .arg (doc->getSyncType() < 0 ? QString ("NULL") : QString::number (doc->getSyncType()) ) //id_sync_type
         .arg (doc->getGlobal() ? QString ("TRUE") : QString ("FALSE")) //is_global
-        .arg (doc->getBkCol().isValid() ? QString::number (doc->getBkCol().rgba()) : QString ("NULL"))
-        .arg (doc->getFgCol().isValid() ? QString::number (doc->getFgCol().rgba()) : QString ("NULL"))
+        .arg (doc->bgColor().isValid() ? QString::number (doc->bgColor().rgba()) : QString ("NULL"))
+        .arg (doc->fgColor().isValid() ? QString::number (doc->fgColor().rgba()) : QString ("NULL"))
         .arg ( QString::number(idType) ); //id_type
 
 
@@ -984,7 +987,7 @@ int JKKSLoader :: insertDocument (JKKSDocument *doc) const
         .arg (doc->getName().isEmpty() ? QString ("NULL") : QString ("'%1'").arg (doc->getName()))//name
         .arg (doc->getIdIoCat())//id_io_category
         .arg (QString ("NULL"))// ибо в БД-приемнике автора (пользователя) может не быть (как правило не будет)
-        .arg (doc->getIdState () < 0 ? QString ("NULL") : QString::number (doc->getIdState()) )//id_state
+        .arg (doc->idState () < 0 ? QString ("NULL") : QString::number (doc->idState()) )//id_state
         .arg (QString ("NULL"))//table_name
         .arg (doc->getDescription().isEmpty() ? QString ("NULL") : QString ("'%1'").arg (doc->getDescription())) //desc
         .arg (doc->getInfo().isEmpty() ? QString ("NULL") : QString ("'%1'").arg (doc->getInfo()))//info
@@ -993,8 +996,8 @@ int JKKSLoader :: insertDocument (JKKSDocument *doc) const
         .arg (doc->getSyncType() < 0 ? QString ("NULL") : QString::number (doc->getSyncType()) ) //id_sync_type
         .arg (doc->getOwnerOrgUID().isEmpty() ? QString ("NULL") : QString::number (getIdByUID("organization", doc->getOwnerOrgUID()))) //id_owner_org
         .arg (doc->getGlobal() ? QString ("TRUE") : QString ("FALSE")) //is_global
-        .arg (doc->getBkCol().isValid() ? QString::number (doc->getBkCol().rgba()) : QString ("NULL"))
-        .arg (doc->getFgCol().isValid() ? QString::number (doc->getFgCol().rgba()) : QString ("NULL"))
+        .arg (doc->bgColor().isValid() ? QString::number (doc->bgColor().rgba()) : QString ("NULL"))
+        .arg (doc->fgColor().isValid() ? QString::number (doc->fgColor().rgba()) : QString ("NULL"))
         .arg (QString::number(idType));//id_io_type
 
     KKSResult * res = dbWrite->execute (sql);
@@ -3010,9 +3013,16 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readTableRecords (void) const
                                id, // idRec
                                entity_type, // entity_type
                                res->getCellAsString (i, 6), // table name
-                               res->getCellAsString (i, 5), // table UID
-                               sync_type // sync type
+                               sync_type, //sync_type
+                               JKKSCategory(), //JKKSCategory
+                               QStringList(), //attrsVals
+
+                               QString(), //addr
+                               QString(), //mess_code
+
+                               res->getCellAsString (i, 5)// table UID
                     );
+
             rec.setSenderAddr (getLocalAddress());
             QString receiverUID = res->getCellAsString (i, 10);
 

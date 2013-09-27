@@ -25,7 +25,7 @@ JKKSOrganization :: JKKSOrganization (int idOrg,
                                       const QString& mess_code,
                                       const QString& uid)
     : JKKSMessage (addr, mess_code),
-      JKKSUID (uid),
+      JKKSUID (uid, QString()),
       m_id (idOrg),
       m_uidParent (uidParent),
       m_uidParent1 (uidParent1),

@@ -16,7 +16,7 @@ JKKSCategory :: JKKSCategory (int idCat,
                               const QString & uid,
                               int state,
                               bool isCGlobal)
-    : JKKSUID(uid),
+    : JKKSUID(uid, QString()),
     id_io_category (idCat),
     m_catName (cName),
     m_catCode (cCode),

@@ -4,7 +4,7 @@
 #include "JKKSWorkModeType.h"
 
 JKKSWorkModeType :: JKKSWorkModeType (int id, const QString& nameType, const QString& shortNameType, const QString& uid)
-    : JKKSUID (uid),
+    : JKKSUID (uid, QString()),
       idWMType (id),
       wmNameType (nameType),
       wmShortNameType (shortNameType)

@@ -18,7 +18,7 @@ JKKSMailMessage :: JKKSMailMessage (int idMess,
                                     const QString& inputNumber,
                                     const QString& outputNumber,
                                     int idUL)
-    : JKKSMessage (addr, mess_code), JKKSUID(uid),
+    : JKKSMessage (addr, mess_code), JKKSUID(uid, QString()),
     idMessage (idMess),
     idIO (idObject),
     messageBody (messBody),

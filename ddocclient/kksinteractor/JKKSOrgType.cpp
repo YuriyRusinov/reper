@@ -2,7 +2,7 @@
 #include "JKKSOrgType.h"
 
 JKKSOrgType :: JKKSOrgType (int id_org_type, const QString& orgTypeName, const QString& orgTypeSName, const QString& uid)
-    : JKKSUID (uid),
+    : JKKSUID (uid, QString()),
     idOrgType (id_org_type),
     organizationTypeName (orgTypeName),
     organizationTypeShortName (orgTypeSName)

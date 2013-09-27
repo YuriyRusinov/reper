@@ -10,15 +10,22 @@ JKKSRefRecord :: JKKSRefRecord (int id_queue,
                                 int id_rec, 
                                 int id_entity_type, 
                                 const QString& tName, 
-                                const QString& t_uid, 
                                 int sync_type, 
                                 const JKKSCategory& aCat, 
                                 const QStringList& attrsVals, 
+
                                 const JKKSAddress & addr, 
                                 const QString& mess_code, 
-                                const QString& uid)
+
+                                const QString & uid,
+                                const QString & t_uid, 
+                                const QString & uuid,
+                                int idState, 
+                                const QColor bkCol,
+                                const QColor fgCol,
+                                const QIcon rIcon)
     : JKKSMessage (addr, mess_code),
-      JKKSUID (uid),
+      JKKSUID (uid, uuid, idState, bkCol, fgCol, rIcon),
       idQueue (id_queue),
       idRec (id_rec),
       idEntityType (id_entity_type),
@@ -220,6 +227,11 @@ QDataStream& operator<< (QDataStream& out, const JKKSRefRecord& RR)
     out << RR.senderAddr;
 
     out << RR.uid();
+    out << RR.uuid();
+    out << RR.idState();
+    out << RR.bgColor();
+    out << RR.fgColor();
+    out << RR.rIcon();
 
     return out;
 }
@@ -231,6 +243,8 @@ QDataStream& operator>> (QDataStream& in, JKKSRefRecord& RR)
 
     in >> addr;
     in >> code;
+    RR.setAddr (addr);// = JKKSRefRecord (avals, uid);
+    RR.setCode (code);
 
     in >> RR.idQueue;
     in >> RR.idRec;
@@ -247,12 +261,29 @@ QDataStream& operator>> (QDataStream& in, JKKSRefRecord& RR)
 
     in >> RR.ioTable;
     in >> RR.senderAddr;
-    QString uid;
-    in >> uid;
-    RR.setUid (uid);
 
-    RR.setAddr (addr);// = JKKSRefRecord (avals, uid);
-    RR.setCode (code);
+    //from jkksuid
+    QString uid;
+    QString uuid;
+    int idState;
+    QColor fColor;
+    QColor bColor;
+    QIcon rIc;
+
+    in >> uid;
+    in >> uuid;
+    in >> idState;
+    in >> fColor;
+    in >> bColor;
+    in >> rIc;
+
+    RR.setUid (uid);
+    RR.setUuid(uuid);
+    RR.setIdState(idState);
+    RR.setBgColor(bColor);
+    RR.setFgColor(fColor);
+    RR.setRIcon(rIc);
+
 
     return in;
 }

@@ -6,7 +6,7 @@ JKKSTransport :: JKKSTransport (int id_transport,
                                 const JKKSAddress & lAddr, 
                                 bool isActive, 
                                 const QString& uid)
-    : JKKSUID (uid),
+    : JKKSUID (uid, QString()),
     idTransport (id_transport),
     transportName (trName),
     localAddr (lAddr),

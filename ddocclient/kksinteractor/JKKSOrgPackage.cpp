@@ -8,7 +8,7 @@
 
 JKKSOrgPackage :: JKKSOrgPackage (int id, const JKKSAddress & addr, const QString& code, const QString& uid)
     : JKKSMessage (addr, code),
-      JKKSUID (uid),
+      JKKSUID (uid, QString()),
       m_id (id)
 {
 }

@@ -22,7 +22,7 @@ KKSEIODataModel :: KKSEIODataModel (const KKSTemplate * t, const KKSMap< qint64,
     objRecords (objRecs),
     //parIndexList (QMap<qint64, QModelIndex>()),
     //indList (QMap<qint64, QList<qint64> >()),
-    rootItem (new KKSTreeItem(-1, 0, t)),
+    rootItem (0),
     cAttrBackground (0),
     cAttrForeground (0)
 {
@@ -35,8 +35,9 @@ KKSEIODataModel :: KKSEIODataModel (const KKSTemplate * t, const KKSMap< qint64,
     cAttrForeground = getFirstAttribute (KKSAttrType::atRecordTextColor);
     if (!cAttrForeground)
         cAttrForeground = getFirstAttribute (KKSAttrType::atRecordTextColorRef);
-    setupData (rootItem);
     setVisibleAttrs ();
+    rootItem = new KKSTreeItem(-1, 0, t, visibleAttrs);
+    setupData (rootItem);
 }
 
 KKSEIODataModel :: ~KKSEIODataModel ()
@@ -132,8 +133,9 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
         return QVariant ();
     qint64 idw = wItem->id();//index.internalId();
     KKSList<KKSAttrView*> avList = tRef ? tRef->sortedAttrs() : KKSList<KKSAttrView*>();
+    int iCol (index.column());
     if (role == Qt::DisplayRole || role == Qt::ToolTipRole)
-        return wItem->columnData(index.column());
+        return wItem->columnData(iCol);
     else if (role == Qt::UserRole)
     {
         return idw;//wItem->id();//p.key();
@@ -239,7 +241,7 @@ bool KKSEIODataModel :: setData (const QModelIndex& index, const QVariant& value
             objRecords.remove (wItem->id());
             objRecords.insert (wItem->id(), dVal);
         }
-        wItem->setData (dVal, tRef);
+        wItem->setData (dVal, tRef, visibleAttrs);
         dVal->release ();
         emit dataChanged (topL, bottomR);
     }
@@ -251,7 +253,7 @@ bool KKSEIODataModel :: setData (const QModelIndex& index, const QVariant& value
             objRecords.remove (wItem->id());
             objRecords.insert (wItem->id(), dVal);
         }
-        wItem->setData (dVal, tRef);
+        wItem->setData (dVal, tRef, visibleAttrs);
         emit dataChanged (topL, bottomR);
     }
     else if (role == Qt::UserRole+2)
@@ -268,7 +270,7 @@ bool KKSEIODataModel :: setData (const QModelIndex& index, const QVariant& value
             tRef->addRef();
         }
         KKSEIOData * dVal = wItem->getData();;
-        wItem->setData (dVal, tRef);
+        wItem->setData (dVal, tRef, visibleAttrs);
         emit dataChanged (topL, bottomR);
     }
     else if (role == Qt::DecorationRole && index.column() == 0)
@@ -361,12 +363,19 @@ void KKSEIODataModel :: setupData (KKSTreeItem * parent)
             if (p.value())
             {
                 QString strIcon = p.value()->sysFieldValue("r_icon");
-                //qDebug () << __PRETTY_FUNCTION__ << strIcon;
-                QPixmap pIcon;
-                pIcon.loadFromData (strIcon.toUtf8());
-                tIcon = QIcon (pIcon);
+                if (strIcon.isEmpty())
+                {
+                    tIcon = QIcon(":/ddoc/rubric_item.png");
+                }
+                else
+                {
+                    //qDebug () << __PRETTY_FUNCTION__ << strIcon;
+                    QPixmap pIcon;
+                    pIcon.loadFromData (strIcon.toUtf8());
+                    tIcon = QIcon (pIcon);
+                }
             }
-            KKSTreeItem * t = new KKSTreeItem (p.key(), p.value(), tRef, tIcon);
+            KKSTreeItem * t = new KKSTreeItem (p.key(), p.value(), tRef, visibleAttrs, tIcon);
             parent->appendChild (t);
         }
         if (nr > 0 && parent->childCount() > nr)
@@ -406,7 +415,7 @@ void KKSEIODataModel :: setupData (KKSTreeItem * parent)
             pIcon.loadFromData (strIcon.toUtf8());
             tIcon = QIcon (pIcon);
         }
-        KKSTreeItem * t = new KKSTreeItem (p.value()->sysFieldValue("id").toLongLong(), p.value(), tRef, tIcon);
+        KKSTreeItem * t = new KKSTreeItem (p.value()->sysFieldValue("id").toLongLong(), p.value(), tRef, visibleAttrs, tIcon);
         if (!t->getData() || !t->getData()->isVisible())
             continue;
         QString valStr = p.value()->sysFieldValue(cAttrP->code(false));

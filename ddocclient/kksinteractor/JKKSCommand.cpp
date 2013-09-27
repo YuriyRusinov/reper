@@ -39,7 +39,7 @@ JKKSCommand :: JKKSCommand (int id,
                             const QString & outputNumber,
                             int   idUL,
                             int   idObj)
-    : JKKSMessage (address, code), JKKSUID(uid),
+    : JKKSMessage (address, code), JKKSUID(uid, QString()),
     idCommand (id),
     u_idDlFrom (u_idFrom),
     dlFromName (dl_from_name),
@@ -66,7 +66,7 @@ JKKSCommand :: JKKSCommand (int id,
 }
 
 JKKSCommand :: JKKSCommand (const JKKSCommand& command)
-    : JKKSMessage (command), JKKSUID(command.m_uid),
+: JKKSMessage (command), JKKSUID(command.m_uid, command.m_uuid),
     idCommand (command.idCommand),
     u_idDlFrom (command.u_idDlFrom),
     dlFromName (command.dlFromName),
