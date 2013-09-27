@@ -179,7 +179,19 @@ void KKSTreeItem :: initData (KKSEIOData * d, const KKSTemplate * t, const KKSLi
     {
         KKSAttrView * v = sAttrs[i];
         QString attrValue;
-        if( v->type()->attrType() == KKSAttrType::atJPG || 
+        if (v->type()->attrType() == KKSAttrType::atCheckList || 
+                (v->refType() && v->refType()->attrType() == KKSAttrType::atCheckList)
+                )
+        {
+            attrValue = QObject::tr("<Set of references %1, dbl-click for details>").arg (iNum);
+        }
+        else if (v->type()->attrType() == KKSAttrType::atCheckListEx || 
+                (v->refType() && v->refType()->attrType() == KKSAttrType::atCheckListEx)
+                )
+        {
+            attrValue = QObject::tr("<Set of references %1, dbl-click for details and see result table>").arg (iNum);
+        }
+        else if( v->type()->attrType() == KKSAttrType::atJPG || 
             (v->refType() && v->refType()->attrType() == KKSAttrType::atJPG)
             )
         {
@@ -208,18 +220,6 @@ void KKSTreeItem :: initData (KKSEIOData * d, const KKSTemplate * t, const KKSLi
                 )
         {
             attrValue = QObject::tr("<Complex value %1>").arg (iNum);
-        }
-        else if (v->type()->attrType() == KKSAttrType::atCheckListEx || 
-                (v->refType() && v->refType()->attrType() == KKSAttrType::atCheckListEx)
-                )
-        {
-            attrValue = QObject::tr("<Set of references %1, dbl-click for details and see result table>").arg (iNum);
-        }
-        else if (v->type()->attrType() == KKSAttrType::atCheckList || 
-                (v->refType() && v->refType()->attrType() == KKSAttrType::atCheckList)
-                )
-        {
-            attrValue = QObject::tr("<Set of references %1, dbl-click for details>").arg (iNum);
         }
         else
         {
