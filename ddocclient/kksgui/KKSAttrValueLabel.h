@@ -27,7 +27,7 @@ public:
     KKSAttrValue * attrValue() const;
 
 signals:
-    void clicked();
+    //void clicked();
     void loadIOSrc (KKSObject **, QWidget *);
     void viewIOSrc(KKSObject *, QWidget *);
     void attrValueChanged();

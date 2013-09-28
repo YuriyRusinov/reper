@@ -90,7 +90,7 @@ void AttrHistory::view(const KKSList<KKSAttrValue*> & histlist)
     //Получаем Имя Тип И Группу атрибута
     av = histlist.first();
     attr = av->attribute();
-    qDebug()<< __PRETTY_FUNCTION__ << "Category ID "<<attr->id()<<" Category Name: "<<attr->name()<<" Category Group: "<<attr->group()->name()<<" Category Type: "<< attr->type()->name();
+    //qDebug()<< __PRETTY_FUNCTION__ << "Category ID "<<attr->id()<<" Category Name: "<<attr->name()<<" Category Group: "<<attr->group()->name()<<" Category Type: "<< attr->type()->name();
 
     UI->leGroup->setText(attr->group()->name());
     UI->leType->setText(attr->type()->name());
@@ -188,8 +188,8 @@ void AttrHistory::downClicked (void)
 
 void AttrHistory::histSelectionChanged (const QItemSelection& selected, const QItemSelection& deselected)
 {
-    qDebug () << __PRETTY_FUNCTION__ << selected << deselected;
-    if (selected.isEmpty())
+    //qDebug () << __PRETTY_FUNCTION__ << selected << deselected;
+    if (selected.isEmpty() && !deselected.isEmpty())
         return;
     QModelIndex topWIndex = selected.indexes().at(0);
     int idVal = topWIndex.data (Qt::UserRole).toInt();

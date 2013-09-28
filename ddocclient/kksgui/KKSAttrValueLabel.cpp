@@ -20,7 +20,7 @@ KKSAttrValueLabel :: KKSAttrValueLabel (KKSAttrValue * av, KKSIndAttr::KKSIndAtt
                            //2 - показатель (расширенный атрибут) для ЭИО (хранится в rec_attrs_values). На него распространяется ведение расширенных свойств и истории значений
     setAttrValue(av);
 
-    connect( this, SIGNAL( clicked() ), this, SLOT( showAttrValueProps() ) );
+    //connect( this, SIGNAL( clicked() ), this, SLOT( showAttrValueProps() ) );
 }
 
 KKSAttrValueLabel:: ~KKSAttrValueLabel (void)
@@ -32,7 +32,7 @@ KKSAttrValueLabel:: ~KKSAttrValueLabel (void)
 void KKSAttrValueLabel::mouseReleaseEvent ( QMouseEvent * event )
 {
     QLabel::mouseReleaseEvent(event);
-    emit clicked();
+    showAttrValueProps();
 }
 
 /*
@@ -74,8 +74,8 @@ void KKSAttrValueLabel :: setLabelProps()
                            .arg(isMandatory ? QString("*"): QString());
 
     QColor colour(Qt::darkBlue); 
-    QString coloredText;
-    bool isUnderline = false;
+    QString coloredText (text);
+    bool isUnderline (false);
 
 #ifdef Q_CC_MSVC
     if(m_isSystem != KKSIndAttr::KKSIndAttrClass::iacTableAttr &&
@@ -88,14 +88,9 @@ void KKSAttrValueLabel :: setLabelProps()
         coloredText = tr("<font color='blue'>%2</font>").arg(text);
         isUnderline = true;
     }
-    else
-    {
-        coloredText = text;
-        isUnderline = false;
-    }
 
     this->setText( coloredText );	
-	
+
     QFont lFont = this->font ();
     lFont.setUnderline( isUnderline);
 
