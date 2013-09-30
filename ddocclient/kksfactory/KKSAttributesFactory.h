@@ -107,7 +107,7 @@ private slots:
     void initAttrValueModel (const KKSAttrValue * pAttrValue, const QVariant& val);
 
 signals:
-    void viewHistory(const KKSList<KKSAttrValue *> &);
+    void viewHistory(const KKSAttrValue *, const KKSList<KKSAttrValue *> &);
     void expandIndex (const QModelIndex&);
     void aValRefresh (const KKSAttribute *, QVariant);
     

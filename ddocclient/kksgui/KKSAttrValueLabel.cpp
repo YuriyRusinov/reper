@@ -133,7 +133,7 @@ void KKSAttrValueLabel :: showAttrValueProps()
 
     connect (f, SIGNAL(loadIOSrc(KKSObject **, QWidget *)), this, SIGNAL(loadIOSrc(KKSObject **, QWidget *)));
     connect (f, SIGNAL(viewIOSrc(KKSObject *, QWidget *)), this, SIGNAL(viewIOSrc(KKSObject *, QWidget *)));
-    connect (f, SIGNAL(loadHistory(const KKSAttrValue *, bool)), this, SIGNAL(loadHistory(const KKSAttrValue *, bool)));
+    connect (f, SIGNAL(loadHistory(const KKSAttrValue *, bool)), this, SLOT(loadHist(const KKSAttrValue *, bool)));
     connect (f, SIGNAL(viewAttrValue (const KKSAttrValue *, int, QWidget *)), this, SLOT (viewAVal(const KKSAttrValue *, int, QWidget *)));
     connect (f, SIGNAL(refreshAttrValue (const KKSAttrValue *, int)), this, SIGNAL(refreshDetailAttrVal (const KKSAttrValue *, int)) );
     connect(this, SIGNAL(viewHistory(const KKSList<KKSAttrValue *> &)), f, SLOT(viewHistory(const KKSList<KKSAttrValue *> &)));
@@ -144,6 +144,13 @@ void KKSAttrValueLabel :: showAttrValueProps()
     delete f;
 }
 
+void KKSAttrValueLabel :: loadHist (const KKSAttrValue * av, bool forRecs)
+{
+    if (!av)
+        return;
+    emit loadHistory (av, forRecs);
+}
+
 void KKSAttrValueLabel :: viewAVal (const KKSAttrValue * av, int idAVal, QWidget * pWidget)
 {
     if (!av || idAVal < 0)
@@ -151,9 +158,19 @@ void KKSAttrValueLabel :: viewAVal (const KKSAttrValue * av, int idAVal, QWidget
     emit viewDetailAttrVal (av, idAVal, m_isSystem, pWidget);
 }
 
-void KKSAttrValueLabel :: viewAHist (const KKSList<KKSAttrValue *> & vList)
+void KKSAttrValueLabel :: viewAHist (const KKSAttrValue * av, const KKSList<KKSAttrValue *> & vList)
 {
     qDebug () << __PRETTY_FUNCTION__ << vList.count();
+    if (av && av->id() > 0 && (!m_av || m_av->id() < 0) && m_av != av)
+    {
+        if (m_av)
+            m_av->release();
+        
+        m_av = const_cast<KKSAttrValue *>(av);
+        
+        if (m_av)
+            m_av->addRef ();
+    }
     if (vList.count())
         emit viewHistory (vList);
 }

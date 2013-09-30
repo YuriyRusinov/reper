@@ -1578,6 +1578,8 @@ KKSTemplate * KKSObjEditorFactory :: getRecordTemplate (KKSObject * io, const KK
 
 void KKSObjEditorFactory :: setObjConnect (KKSObjEditor *editor)
 {
+    if (!editor)
+        return;
     connect (editor, SIGNAL(includeRequested(KKSObjEditor*)), this, SLOT(slotIncludeRequested(KKSObjEditor*)));
     connect (editor, SIGNAL(includeRecRequested(KKSObjEditor*)), this, SLOT(slotIncludeRecRequested(KKSObjEditor*)));
     connect (editor, SIGNAL(openRubricItemRequested(int, KKSObjEditor*)), this, SLOT(slotOpenRubricItemRequested(int, KKSObjEditor*)));
@@ -1617,6 +1619,13 @@ void KKSObjEditorFactory :: setObjConnect (KKSObjEditor *editor)
     connect (editor, SIGNAL (viewIOIndicator (KKSObject *, int)), m_indf, SLOT (viewIOIndicator (KKSObject *, int)) );
     connect (editor, SIGNAL (editIOIndicator (KKSObject *, int, QWidget *)), m_indf, SLOT (editIOIndicator (KKSObject *, int, QWidget *)) );
     connect (editor, SIGNAL (addIOIndicator (KKSObject *, QWidget *)), m_indf, SLOT (addNewIOIndicator (KKSObject *, QWidget *)) );
+
+    if ((editor->getObj () && editor->getObj()->id() < 0) ||
+        (editor->getObjectEx() && editor->getObjectEx()->id() < 0))
+    {
+        connect (editor, SIGNAL(loadHistory(const KKSAttrValue *, qint64, qint64, bool)), this->m_awf, SLOT(loadIOAttrValueHistoryR(const KKSAttrValue *, qint64, qint64, bool)));
+        connect (m_awf, SIGNAL(viewHistory(const KKSAttrValue *, const KKSList<KKSAttrValue *> &)), editor, SLOT(viewAHist(const KKSAttrValue *, const KKSList<KKSAttrValue *> &)));
+    }
     
     connect (editor, SIGNAL (generateUUID (int, const KKSAttrValue *)), this, SLOT (genUUID (int, const KKSAttrValue *)) );
     connect (this, SIGNAL (setuuid (QString)), editor, SLOT (setIOUUID (QString)) );

@@ -5982,7 +5982,7 @@ KKSAttrValue * KKSLoader::loadIOAttrValue(const KKSAttrValue * av, int idVal, bo
 {
     KKSList<KKSAttrValue *> avList;
 
-    if(!av || av->id() <= 0)
+    if(!av || (av->id() <= 0 && idVal < 0))
         return 0;
 
     QString sql;

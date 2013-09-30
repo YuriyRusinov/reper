@@ -39,10 +39,11 @@ signals:
 
 private slots:
     void viewAVal (const KKSAttrValue * av, int idAVal, QWidget * pWidget);
-    void viewAHist (const KKSList<KKSAttrValue *> &);
+    void loadHist (const KKSAttrValue *, bool);
 
 public slots:
     void showAttrValueProps ();
+    void viewAHist (const KKSAttrValue *, const KKSList<KKSAttrValue *> &);
 
 protected:
     void mouseReleaseEvent ( QMouseEvent * event ) ;

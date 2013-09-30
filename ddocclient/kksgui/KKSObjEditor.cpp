@@ -69,6 +69,7 @@
 #include <KKSIndicator.h>
 #include <KKSRubric.h>
 #include "KKSAttrUUIDWidget.h"
+#include "KKSAttrValueLabel.h"
 #include "defines.h"
 
 
@@ -122,7 +123,8 @@ KKSObjEditor :: KKSObjEditor (const KKSTemplate *t,
     includesRecWidget (0),
     isChanged (false),
     pRecModel (0),
-    pRecIndex (QModelIndex())
+    pRecIndex (QModelIndex()),
+    activeLabel (0)
 {
     if (m_sysTemplate)
         m_sysTemplate->addRef ();
@@ -2624,5 +2626,22 @@ void KKSObjEditor :: loadAttrHistory (const KKSAttrValue * av, bool forRecs)
         avIO = pObj->attrValueId(idAttr);
 
     qDebug () << __PRETTY_FUNCTION__ << idObj << idRec << av->id() << avIO->id();
+    if (activeLabel)
+        disconnect (this, SIGNAL (viewHist(KKSAttrValue *, const KKSList<KKSAttrValue *>&)), activeLabel, SLOT (viewAHist (KKSAttrValue *, const KKSList<KKSAttrValue *> &)) );
+    activeLabel = qobject_cast<QLabel *>(this->sender());
+    if (activeLabel)
+        connect (this, SIGNAL (viewHist(KKSAttrValue *, const KKSList<KKSAttrValue *>&)), activeLabel, SLOT (viewAHist (KKSAttrValue *, const KKSList<KKSAttrValue *> &)) );
     emit loadHistory (avIO, idObj, idRec, forRecs);
+}
+
+void KKSObjEditor :: viewAHist (const KKSAttrValue * av, const KKSList<KKSAttrValue *>& histList)
+{
+    qDebug () << __PRETTY_FUNCTION__ << histList.count();
+    if (histList.isEmpty())
+        return;
+    if (qobject_cast<KKSAttrValueLabel *>(activeLabel))
+    {
+        (qobject_cast<KKSAttrValueLabel *>(activeLabel))->viewAHist (av, histList);
+    }
+    //emit viewHist (histList);
 }

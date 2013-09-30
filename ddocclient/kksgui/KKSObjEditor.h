@@ -189,6 +189,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void setIOUUID (QString uuid);
         
         void recSaved (KKSObjectExemplar * rec);
+        void viewAHist (const KKSAttrValue *, const KKSList<KKSAttrValue *>& histList);
 //        void editIndicator (void);
 //        void delIndicator (void);
 //        void addIndicator (void);
@@ -248,6 +249,8 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         void setUUID (QString uuid);
         
         void loadHistory (const KKSAttrValue *, qint64, qint64, bool);
+        
+        void viewHist (const KKSList<KKSAttrValue *>&);
 
     public slots:
         //void slotRubricItemRequested();
@@ -433,6 +436,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         QAbstractItemModel * pRecModel;
         QModelIndex pRecIndex;
 
+        QLabel * activeLabel;
     private:
         Q_OBJECT
 

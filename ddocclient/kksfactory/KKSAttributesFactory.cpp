@@ -921,15 +921,15 @@ QLabel * KKSAttributesFactory :: createAttrTitle (KKSAttrValue * av, KKSIndAttr:
     if (wObjC && wObjC->id() > 0)
     {
         connect (lTitle, SIGNAL(loadHistory(const KKSAttrValue *, bool)), this, SLOT(loadIOAttrValueHistory(const KKSAttrValue *, bool)));
+        connect (this, SIGNAL(viewHistory(const KKSAttrValue *, const KKSList<KKSAttrValue *> &)), lTitle, SLOT(viewAHist(const KKSAttrValue*, const KKSList<KKSAttrValue *> &)));
     }
     else if (objEditor)
     {
         connect (lTitle, SIGNAL(loadHistory(const KKSAttrValue *, bool)), objEditor, SLOT(loadAttrHistory(const KKSAttrValue *, bool)));
-        connect (objEditor, SIGNAL(loadHistory(const KKSAttrValue *, qint64, qint64, bool)), this, SLOT(loadIOAttrValueHistoryR(const KKSAttrValue *, qint64, qint64, bool)));
+        connect (objEditor, SIGNAL (viewHist (const KKSAttrValue *, const KKSList<KKSAttrValue *>&)), lTitle, SLOT(viewAHist(const KKSAttrValue *, const KKSList<KKSAttrValue *> &)));
     }
     connect (lTitle, SIGNAL(viewDetailAttrVal (const KKSAttrValue *, int, int, QWidget *)), this, SLOT(viewAttrValue (const KKSAttrValue *, int, int, QWidget *)) );
     connect (lTitle, SIGNAL(refreshDetailAttrVal (const KKSAttrValue *, int)), this, SLOT (refreshAttrValue (const KKSAttrValue *, int)) );
-    connect (this, SIGNAL(viewHistory(const KKSList<KKSAttrValue *> &)), lTitle, SLOT(viewAHist(const KKSList<KKSAttrValue *> &)));
 
     if(objEditor)
         connect(lTitle, SIGNAL(attrValueChanged()), objEditor, SLOT(attrValueChanged())); 
@@ -1700,15 +1700,19 @@ QWidget * KKSAttributesFactory :: createAttrCheckWidget (const KKSAttrValue * av
         connect (lHist, SIGNAL(viewIOSrc(KKSObject *, QWidget *)), this, SLOT(viewIOSrc(KKSObject *, QWidget *)));
         KKSObjectExemplar * wObjC = objEditor->getObjectEx();
         if (wObjC && wObjC->id() > 0)
+        {
             connect (lHist, SIGNAL(loadHistory(const KKSAttrValue *, bool)), this, SLOT(loadIOAttrValueHistory(const KKSAttrValue *, bool)));
+            connect (this, SIGNAL(viewHistory(const KKSAttrValue *, const KKSList<KKSAttrValue *> &)), lHist, SLOT(viewAHist(const KKSAttrValue *, const KKSList<KKSAttrValue *> &)));
+        }
         else if (objEditor)
         {
             connect (lHist, SIGNAL(loadHistory(const KKSAttrValue *, bool)), objEditor, SLOT(loadAttrHistory(const KKSAttrValue *, bool)));
-            connect (objEditor, SIGNAL(loadHistory(const KKSAttrValue *, qint64, qint64, bool)), this, SLOT(loadIOAttrValueHistoryR(const KKSAttrValue *, qint64, qint64, bool)));
+            connect (objEditor, SIGNAL (viewHist (const KKSAttrValue *, const KKSList<KKSAttrValue *>&)), lHist, SLOT(viewAHist(const KKSAttrValue *, const KKSList<KKSAttrValue *> &)));
+//            connect (objEditor, SIGNAL(loadHistory(const KKSAttrValue *, qint64, qint64, bool)), this, SLOT(loadIOAttrValueHistoryR(const KKSAttrValue *, qint64, qint64, bool)));
+//            connect (this, SIGNAL(viewHistory(const KKSList<KKSAttrValue *> &)), objEditor, SLOT(viewAHist(const KKSList<KKSAttrValue *> &)));
         }
         connect (lHist, SIGNAL(viewDetailAttrVal (const KKSAttrValue *, int, int, QWidget *)), this, SLOT(viewAttrValue (const KKSAttrValue *, int, int, QWidget *)) );
         connect (lHist, SIGNAL(refreshDetailAttrVal (const KKSAttrValue *, int)), this, SLOT (refreshAttrValue (const KKSAttrValue *, int)) );
-        connect (this, SIGNAL(viewHistory(const KKSList<KKSAttrValue *> &)), lHist, SLOT(viewAHist(const KKSList<KKSAttrValue *> &)));
     }
     return attrWidget;
 }
@@ -2370,7 +2374,7 @@ void KKSAttributesFactory::loadIOAttrValueHistory(const KKSAttrValue * av, bool 
     KKSList<KKSAttrValue *> avList = loader->loadIOAttrValueHistory(av, forRecords);
     qDebug () << __PRETTY_FUNCTION__ << avList.count();
 
-    emit viewHistory(avList);
+    emit viewHistory(av, avList);
 }
 
 void KKSAttributesFactory::loadIOAttrValueHistoryR(const KKSAttrValue * av, qint64 idObj, qint64 idRec, bool forRecords)
@@ -2382,7 +2386,9 @@ void KKSAttributesFactory::loadIOAttrValueHistoryR(const KKSAttrValue * av, qint
     }
     else if (!qobject_cast<KKSObjEditor *>(sender()))
         return;
-    
+
+    KKSList<KKSAttrValue *> avList;
+    const KKSAttrValue * avR (0);
     if (forRecords)
     {
         KKSObject * io = loader->loadIO (idObj);
@@ -2394,28 +2400,26 @@ void KKSAttributesFactory::loadIOAttrValueHistoryR(const KKSAttrValue * av, qint
             io->release();
             return;
         }
-        const KKSAttrValue * avR = recIO->attrValue (av->attribute()->id());
-        loadIOAttrValueHistory (avR, forRecords);
+        avR = recIO->attrValue (av->attribute()->id());
+        (const_cast<KKSAttrValue *>(av))->setId (avR->id());
+        avList = loader->loadIOAttrValueHistory(avR, forRecords);
         recIO->release();
         io->release ();
-        return;
     }
     else
     {
         KKSObject * io = loader->loadIO (idObj);
         if (!io)
             return;
-        const KKSAttrValue * avR = io->attrValueId (av->attribute()->id());
-        KKSList<KKSAttrValue *> avList = loader->loadIOAttrValueHistory(avR, forRecords);
+        avR = io->attrValueId (av->attribute()->id());
+        (const_cast<KKSAttrValue *>(av))->setId (avR->id());
+        avList = loader->loadIOAttrValueHistory(avR, forRecords);
         
-        qDebug () << __PRETTY_FUNCTION__ << avList.count();
+        qDebug () << __PRETTY_FUNCTION__ << avList.count() << this->sender();
         io->release ();
-        emit viewHistory(avList);
-        return;
         
     }
-    
-    
+    emit viewHistory(avR, avList);
 }
 
 void KKSAttributesFactory :: showAttrsWidget (KKSAttribute *a, KKSAttrEditor *parent)
