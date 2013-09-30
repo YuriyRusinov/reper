@@ -273,7 +273,7 @@ void KKSAttrValuePropsForm::viewHistory(const KKSList<KKSAttrValue*> & history)
     if(history.count() == 0)
         return;
 
-    AttrHistory * hForm = new AttrHistory(history, this);
+    AttrHistory * hForm = new AttrHistory(history);
     connect (hForm, SIGNAL (viewAttrValue (int, QWidget *)), this, SLOT (viewAttrVal(int, QWidget *)) );
     connect (hForm, SIGNAL (refreshAttrValue (int)), this, SLOT (refreshAttrVal(int)) );
     hForm->exec();

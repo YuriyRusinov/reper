@@ -141,6 +141,7 @@ void KKSAttrValueLabel :: showAttrValueProps()
     if(f->exec() == QDialog::Accepted)
         emit attrValueChanged();
 
+    f->setParent (0);
     delete f;
 }
 
@@ -163,13 +164,7 @@ void KKSAttrValueLabel :: viewAHist (const KKSAttrValue * av, const KKSList<KKSA
     qDebug () << __PRETTY_FUNCTION__ << vList.count();
     if (av && av->id() > 0 && (!m_av || m_av->id() < 0) && m_av != av)
     {
-        if (m_av)
-            m_av->release();
-        
-        m_av = const_cast<KKSAttrValue *>(av);
-        
-        if (m_av)
-            m_av->addRef ();
+        m_av->setId (av->id());
     }
     if (vList.count())
         emit viewHistory (vList);
