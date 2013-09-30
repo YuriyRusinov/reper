@@ -49,6 +49,8 @@ private slots:
     void refreshSearchTemplates (void);
 
     void setFilterSt (const QString& text);
+    
+    void executeSt (void);
 
 signals:
     void addNewEmptySearchTemplate (const QModelIndex& parent, 
@@ -95,6 +97,8 @@ private:
     QAction * actDelType;
     
     QAction * actRefresh;
+    
+    QAction * actExecute;
 
     QLineEdit * lEFilter;
 

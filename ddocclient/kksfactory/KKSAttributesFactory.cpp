@@ -2372,7 +2372,7 @@ void KKSAttributesFactory :: viewIOSrc (KKSObject * io, QWidget * parent)
 void KKSAttributesFactory::loadIOAttrValueHistory(const KKSAttrValue * av, bool forRecords)
 {
     KKSList<KKSAttrValue *> avList = loader->loadIOAttrValueHistory(av, forRecords);
-    qDebug () << __PRETTY_FUNCTION__ << avList.count();
+    //qDebug () << __PRETTY_FUNCTION__ << avList.count();
 
     emit viewHistory(av, avList);
 }
@@ -2415,7 +2415,7 @@ void KKSAttributesFactory::loadIOAttrValueHistoryR(const KKSAttrValue * av, qint
         (const_cast<KKSAttrValue *>(av))->setId (avR->id());
         avList = loader->loadIOAttrValueHistory(avR, forRecords);
         
-        qDebug () << __PRETTY_FUNCTION__ << avList.count() << this->sender();
+        //qDebug () << __PRETTY_FUNCTION__ << avList.count() << this->sender();
         io->release ();
         
     }
@@ -2444,7 +2444,7 @@ void KKSAttributesFactory :: showAttrsWidget (KKSAttribute *a, KKSAttrEditor *pa
         acModel->setHeaderData (3, Qt::Horizontal, QObject::tr ("Read only"));
         
         KKSViewFactory::updateAttrAttrsModel (0, acModel);
-        qDebug () << __PRETTY_FUNCTION__ << rw->pbOk->isVisible();
+        //qDebug () << __PRETTY_FUNCTION__ << rw->pbOk->isVisible();
         
         tvTableAttrs->setModel (acModel);
         
@@ -2595,7 +2595,7 @@ void KKSAttributesFactory :: addComplexAttr (KKSAttribute *a, QAbstractItemModel
 {
     if (!a || !attrModel)
         return;
-    qDebug () << __PRETTY_FUNCTION__ << a->id() << a->name() << a->title();
+    //qDebug () << __PRETTY_FUNCTION__ << a->id() << a->name() << a->title();
     KKSList<const KKSFilterGroup*> filters;
     KKSObject * refAttrs = loader->loadIO(IO_ATTR_ID, true);
     if (!refAttrs)
@@ -2626,7 +2626,7 @@ void KKSAttributesFactory :: addComplexAttr (KKSAttribute *a, QAbstractItemModel
     if (aListEditor->exec() == QDialog::Accepted)
     {
         QList<int> attrsId = aListEditor->getAttributesId();
-        qDebug () << __PRETTY_FUNCTION__ << attrsId;
+        //qDebug () << __PRETTY_FUNCTION__ << attrsId;
         if (attrsId.isEmpty())
         {
             refAttrs->release();
@@ -2654,7 +2654,7 @@ void KKSAttributesFactory :: editComplexAttr (int id, KKSAttribute *a, QAbstract
 {
     if (!a || !attrModel || !attrInd.isValid())
         return;
-    qDebug () << __PRETTY_FUNCTION__ << id << a->id() << a->name() << a->title();
+    //qDebug () << __PRETTY_FUNCTION__ << id << a->id() << a->name() << a->title();
     KKSObject *attrTypesIO = loader->loadIO (IO_ATTR_TYPE_ID, true);
     if (!attrTypesIO)
     {
@@ -2698,7 +2698,7 @@ void KKSAttributesFactory :: delComplexAttr (int id, KKSAttribute *a, QAbstractI
 {
     if (!a || !attrModel || !attrInd.isValid())
         return;
-    qDebug () << __PRETTY_FUNCTION__ << id << a->id() << a->name() << a->title();
+    //qDebug () << __PRETTY_FUNCTION__ << id << a->id() << a->name() << a->title();
     KKSMap<int, KKSCategoryAttr*> cAttrList = a->attrs();
     int iRow = attrInd.row();
     KKSMap<int, KKSCategoryAttr*>::iterator p = cAttrList.begin()+iRow;

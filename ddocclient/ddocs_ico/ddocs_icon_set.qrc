@@ -87,5 +87,6 @@
     <file>downarrow.png</file>
     <file>show_journals.png</file>
     <file>show_dbg_win.png</file>
+    <file>execute_search.png</file>
   </qresource>
 </RCC>

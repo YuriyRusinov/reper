@@ -19,6 +19,7 @@
 #include <QAbstractItemDelegate>
 #include <QMessageBox>
 #include <QLabel>
+#include <QSize>
 #include <QtDebug>
 
 #include "KKSSearchTemplatesForm.h"
@@ -43,6 +44,7 @@ KKSSearchTemplatesForm :: KKSSearchTemplatesForm (const KKSCategory * c1, const 
     actEditType (new QAction (tr("Edit search template type"), this)),
     actDelType (new QAction (tr("Delete search template type"), this)),
     actRefresh (new QAction(tr("&Refresh model"), this)),
+    actExecute (new QAction(tr("E&xecute search template"), this)),
     lEFilter (new QLineEdit (this)),
     pbOk (new QPushButton (tr("&OK"), this)),
     pbCancel (new QPushButton (tr("&Cancel"), this))
@@ -52,6 +54,7 @@ KKSSearchTemplatesForm :: KKSSearchTemplatesForm (const KKSCategory * c1, const 
 
     this->init ();
 
+    tbActions->setIconSize (QSize(24, 24));
     QItemSelectionModel * selModel = searchView->selectionModel ();
     QHeaderView * hv = searchView->header();
 
@@ -77,7 +80,7 @@ KKSSearchTemplatesForm :: KKSSearchTemplatesForm (const KKSCategory * c1, const 
     connect (actAddNewType, SIGNAL (triggered()), this, SLOT (addSearchTemplateType()) );
     connect (actEditType, SIGNAL (triggered()), this, SLOT (editSearchTemplateType()) );
     connect (actDelType, SIGNAL (triggered()), this, SLOT (delSearchTemplateType()) );
-    
+    connect (actExecute, SIGNAL (triggered()), this, SLOT (executeSt()) );
     connect (actRefresh, SIGNAL(triggered()), this, SLOT (refreshSearchTemplates()) );
 
     connect (lEFilter, SIGNAL (textEdited(const QString&)), this, SLOT (setFilterSt (const QString&)) );
@@ -220,6 +223,9 @@ void KKSSearchTemplatesForm :: init (void)
     
     actRefresh->setIcon(QIcon(":/ddoc/refreshIcon.png"));
     actRefresh->setToolTip(tr("Refresh search templates"));
+    
+    actExecute->setIcon(QIcon(":/ddoc/execute_search.png"));
+    actExecute->setToolTip(tr("Execute selected search template"));
 
     tbActions->addAction (actAddNewType);
     tbActions->addAction (actEditType);
@@ -230,6 +236,8 @@ void KKSSearchTemplatesForm :: init (void)
     tbActions->addAction (actAddCopy);
     tbActions->addAction (actEdit);
     tbActions->addAction (actDel);
+    tbActions->addSeparator ();
+    tbActions->addAction (actExecute);
     tbActions->addSeparator ();
     tbActions->addAction(actRefresh);
     tbActions->addSeparator ();
@@ -377,4 +385,9 @@ void KKSSearchTemplatesForm :: refreshSearchTemplates (void)
     int sortInd = getIndicatorSection();
     Qt::SortOrder sortOrd = getIndicatorOrder();
     sortMod->sort(sortInd,sortOrd);
+}
+
+void KKSSearchTemplatesForm :: executeSt (void)
+{
+    qDebug () << __PRETTY_FUNCTION__;
 }

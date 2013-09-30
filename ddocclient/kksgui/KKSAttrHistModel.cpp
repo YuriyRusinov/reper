@@ -1,6 +1,6 @@
 /* 
  * File:   KKSAttrHistModel.cpp
- * Author: rusinov
+ * Author: yuriyrusinov
  * 
  * Created on 30 Август 2013 г., 16:16
  */
@@ -179,11 +179,11 @@ QVariant KKSAttrHistModel::data (const QModelIndex& index, int role) const
             {
                 switch (iCol)
                 {
-                    case 0: return QSize (50, 24); break;
-                    case 1: case 2: return QSize (120, 24); break;
+                    case 0: return QSize (20, 24); break;
+                    case 1: case 2: return QSize (140, 24); break;
                     case 3: return QSize (150, 24); break;
                     case 4: case 5: return QSize (120, 24); break;
-                    case 6: return QSize (100, 24); break;
+                    case 6: default: return QSize (100, 24); break;
                 }
                 break;
             }
