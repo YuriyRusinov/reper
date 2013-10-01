@@ -66,6 +66,8 @@ signals:
     void delSearchTemplateType (const QModelIndex& wIndex, QAbstractItemModel * searchMod);
     
     void refSearchTemplates (QAbstractItemModel * searchMod);
+    
+    void applySearchTemplate (int);
 
 private:
     //

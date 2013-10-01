@@ -6871,6 +6871,7 @@ void KKSObjEditorFactory :: initSearchTemplateModel (KKSSearchTemplatesForm *stF
     connect (stForm, SIGNAL (delSearchTemplateType (const QModelIndex&, QAbstractItemModel * )), this, SLOT (delSearchTemplateType (const QModelIndex&, QAbstractItemModel *)) );
     
     connect (stForm, SIGNAL (refSearchTemplates (QAbstractItemModel *)), this, SLOT (refreshSearchTemplates (QAbstractItemModel *)) );
+    connect (stForm, SIGNAL (applySearchTemplate (int)), this, SLOT (applySearchTemplate(int)) );
 
     QSortFilterProxyModel * sortTModel = new KKSSearchTemplateFilterProxyModel;//QSortFilterProxyModel;
     sortTModel->setFilterCaseSensitivity (Qt::CaseInsensitive);
@@ -6899,6 +6900,40 @@ void KKSObjEditorFactory::refreshSearchTemplates (QAbstractItemModel * searchMod
     }
     KKSViewFactory::getSearchTemplates (loader, searchMod);
     
+}
+
+void KKSObjEditorFactory::applySearchTemplate (int idSearchTemplate)
+{
+    KKSSearchTemplate * searchT = loader->loadSearchTemplate(idSearchTemplate);
+    if (!searchT)
+    {
+        QWidget * pWidget = qobject_cast<QWidget *>(sender());
+        QMessageBox::warning (pWidget, tr("Apply search template"), tr("Cannot load search template %1 from DB").arg (idSearchTemplate), QMessageBox::Ok);
+        return;
+    }
+    int idCat = searchT->idCategory();
+    const KKSObject * refObj = loader->loadIO (IO_IO_ID);
+    const KKSCategory * c = refObj->category();
+    //loader->loadCategory(idCat, true);
+    if (!c || !c->tableCategory())
+    {
+        refObj->release();
+        searchT->release();
+        return;
+    }
+    const KKSCategory * ct = c->tableCategory ();
+    KKSFilter * f = ct->createFilter(12, QString::number (idCat), KKSFilter::foEq);
+    KKSFilterGroup * fg = new KKSFilterGroup (true);
+    fg->addFilter (f);
+    f->release ();
+    KKSList<const KKSFilterGroup *> filters;
+    filters.append (fg);
+    fg->release ();
+    KKSMap<qint64, KKSEIOData *> rList = loader->loadEIOList(refObj, filters);
+    qDebug () << __PRETTY_FUNCTION__ << rList.count();
+
+    refObj->release();
+    searchT->release ();
 }
 
 void KKSObjEditorFactory::createSearchTemplate()

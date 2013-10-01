@@ -349,6 +349,8 @@ private slots:
     void delSearchTemplateType (const QModelIndex& wIndex, QAbstractItemModel * searchMod);
     
     void refreshSearchTemplates (QAbstractItemModel * searchMod);
+    
+    void applySearchTemplate (int idSearchTemplate);
 
     void addIOTable (KKSObject * wObj, KKSObjEditor * editor);
 

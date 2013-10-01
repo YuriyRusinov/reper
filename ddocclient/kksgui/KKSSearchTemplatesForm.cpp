@@ -390,4 +390,11 @@ void KKSSearchTemplatesForm :: refreshSearchTemplates (void)
 void KKSSearchTemplatesForm :: executeSt (void)
 {
     qDebug () << __PRETTY_FUNCTION__;
+    int idSearchTemplate = this->getIdSearchTemplate();
+    if (idSearchTemplate < 0)
+    {
+        QMessageBox::warning(this, tr("Search template application"), tr("Select search template"), QMessageBox::Ok);
+        return;
+    }
+    emit applySearchTemplate (idSearchTemplate);
 }
