@@ -6922,7 +6922,7 @@ void KKSObjEditorFactory::applySearchTemplate (int idSearchTemplate)
         return;
     }
     const KKSCategory * ct = c->tableCategory ();
-    KKSFilter * f = ct->createFilter(12, QString::number (idCat), KKSFilter::foEq);
+    KKSFilter * f = ct->createFilter(1, QString("select io.id from io_objects io inner join io_categories c on (io.id_io_category=c.id and c.id_child=%1)").arg (idCat), KKSFilter::foInSQL);
     KKSFilterGroup * fg = new KKSFilterGroup (true);
     fg->addFilter (f);
     f->release ();
@@ -6930,7 +6930,31 @@ void KKSObjEditorFactory::applySearchTemplate (int idSearchTemplate)
     filters.append (fg);
     fg->release ();
     KKSMap<qint64, KKSEIOData *> rList = loader->loadEIOList(refObj, filters);
-    qDebug () << __PRETTY_FUNCTION__ << rList.count();
+    if (!rList.count())
+    {
+        QWidget * pWidget = qobject_cast<QWidget *>(sender());
+        QMessageBox::warning (pWidget, tr("Apply search template"), tr("No convenient references for search"), QMessageBox::Ok);
+        refObj->release();
+        searchT->release();
+        return;
+    }
+    else if (rList.count() == 1)
+    {
+        QString extraTitle;
+        KKSList<const KKSFilterGroup *> refFilters;
+        qint64 idObject = rList.begin().key();
+        KKSObjEditor * editor = createObjEditor (IO_IO_ID, 
+                                                 idObject, 
+                                                 refFilters, 
+                                                 extraTitle,
+                                                 c,
+                                                 false, 
+                                                 QString(),
+                                                 false,
+                                                 Qt::NonModal,
+                                                 0);
+        emit editorCreated (editor);
+    }
 
     refObj->release();
     searchT->release ();
