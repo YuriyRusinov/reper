@@ -196,14 +196,7 @@ private:
                              KKSObjEditor *editor,
                              bool updateView=false
                              );
-
-/*    void setIndicators (KKSObject * obj,
-                        QWidget * indWidget,
-                        QGridLayout * gIndLay,
-                        KKSObjEditor * editor,
-                        bool updateView=false
-                       );*/
-    
+   
     int setIndicators (const KKSTemplate *t,
                        KKSObject * obj,
                        QWidget * indWidget,
@@ -514,6 +507,8 @@ private:
     KKSSearchTemplateForm * GUISearchTemplateInit (KKSSearchTemplate * st, const KKSCategory * cat=0, bool forIO=false, const QString& tableName=QString(), bool mode=true, QWidget *parent = 0, Qt::WindowFlags flags=0) const;
 
     QAbstractItemModel * initSearchCatsModel (KKSSearchTemplate * st, QModelIndex & catInd) const;
+    
+    void filterSysIO (const KKSCategory * ct, KKSList<const KKSFilterGroup *> & filters);
 private:
     //
     // Variables

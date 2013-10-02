@@ -124,6 +124,10 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
         return QVariant::fromValue<const KKSTemplate *>(tRef);
     else if (role == Qt::UserRole+3)
         return QVariant::fromValue<const KKSCategoryAttr *>(cAttrP);
+    else if (role == Qt::UserRole+4)
+        return QVariant::fromValue<const KKSCategoryAttr *>(cAttrBackground);
+    else if (role == Qt::UserRole+5)
+        return QVariant::fromValue<const KKSCategoryAttr *>(cAttrForeground);
 
     if (!index.isValid() )//&& role <= Qt::UserRole+1)
         return QVariant();
@@ -296,6 +300,36 @@ bool KKSEIODataModel :: setData (const QModelIndex& index, const QVariant& value
         }
         wItem->setIcon (icon);
         emit dataChanged (topL, topL);
+    }
+    else if (role == Qt::BackgroundRole)
+    {
+        if (!wItem->getData() || !cAttrBackground)
+            return false;
+        KKSEIOData * d = wItem->getData ();
+        bool ok;
+        //qDebug () << __PRETTY_FUNCTION__ << d->fields().value (cAttrBackground->code(false).toLower());
+        quint64 vl = value.toLongLong(&ok);//cAttrForeground ? d->fields().value (cAttrForeground->code(false)).toULongLong (&ok) : d->sysFields().value("record_text_color").toULongLong (&ok);
+        if (!ok)
+            return false;
+        d->fields().insert (cAttrBackground->code(false), QString::number (vl));
+        //QVariant vc = QColor::fromRgba (vl);
+        emit dataChanged (topL, topL);
+        return true;
+    }
+    else if (role == Qt::ForegroundRole)
+    {
+        if (!wItem->getData() || !cAttrForeground)
+            return false;
+        KKSEIOData * d = wItem->getData ();
+        bool ok;
+        //qDebug () << __PRETTY_FUNCTION__ << d->fields().value (cAttrBackground->code(false).toLower());
+        quint64 vl = value.toLongLong(&ok);//cAttrForeground ? d->fields().value (cAttrForeground->code(false)).toULongLong (&ok) : d->sysFields().value("record_text_color").toULongLong (&ok);
+        if (!ok)
+            return false;
+        d->fields().insert (cAttrForeground->code(false), QString::number (vl));
+        //QVariant vc = QColor::fromRgba (vl);
+        emit dataChanged (topL, topL);
+        return true;
     }
     else
         return false;

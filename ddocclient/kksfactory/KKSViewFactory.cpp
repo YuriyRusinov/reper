@@ -765,12 +765,15 @@ void KKSViewFactory :: updateEIOEx (KKSLoader *l,
     
 
     const KKSCategoryAttr * cAttrP = sourceModel->data(QModelIndex(), Qt::UserRole+3).value<const KKSCategoryAttr*>();
+    const KKSCategoryAttr * cAttrB = sourceModel->data(QModelIndex(), Qt::UserRole+4).value<const KKSCategoryAttr*>();
+    const KKSCategoryAttr * cAttrF = sourceModel->data(QModelIndex(), Qt::UserRole+5).value<const KKSCategoryAttr*>();
     for (KKSMap<qint64, KKSObjectExemplar*>::const_iterator pr = objRecs.constBegin();
             pr != objRecs.constEnd(); 
             pr++)
     {
         QModelIndex recIndex = searchModelRowsIndex (sourceModel, pr.key());
         KKSObjectExemplar * rec = pr.value();
+        KKSEIOData * d = getRecordData (rec);
         if (cAttrP)
         {
             //
@@ -797,11 +800,12 @@ void KKSViewFactory :: updateEIOEx (KKSLoader *l,
                     return;
                 recIndex = sourceModel->index(nr, 0, pIndex);
             }
-            KKSEIOData * d = getRecordData (rec);
             sourceModel->setData (recIndex, rec->id(), Qt::UserRole);
-            bool isTempl = sourceModel->setData (recIndex, QVariant::fromValue<const KKSTemplate *>(t), Qt::UserRole+2);
-            bool isData = sourceModel->setData (recIndex, QVariant::fromValue<KKSEIOData *>(d), Qt::UserRole+1);
-            qDebug () << __PRETTY_FUNCTION__ << idParent << pIndex << recIndex << isData << isTempl;
+            /*bool isTempl = */
+            sourceModel->setData (recIndex, QVariant::fromValue<const KKSTemplate *>(t), Qt::UserRole+2);
+            /*bool isData = */
+            sourceModel->setData (recIndex, QVariant::fromValue<KKSEIOData *>(d), Qt::UserRole+1);
+            //qDebug () << __PRETTY_FUNCTION__ << idParent << pIndex << recIndex << isData << isTempl;
         }
         else
         {
@@ -812,130 +816,41 @@ void KKSViewFactory :: updateEIOEx (KKSLoader *l,
                 isInserted = sourceModel->insertRows(nr, 1);
                 recIndex = sourceModel->index(nr, 0);
             }
-            KKSEIOData * d = getRecordData (rec);
             sourceModel->setData (recIndex, rec->id(), Qt::UserRole);
-            bool isTempl = sourceModel->setData (recIndex, QVariant::fromValue<const KKSTemplate *>(t), Qt::UserRole+2);
-            bool isData = sourceModel->setData (recIndex, QVariant::fromValue<KKSEIOData *>(d), Qt::UserRole+1);
-            qDebug () << __PRETTY_FUNCTION__ << recIndex << isInserted << isData << isTempl;
+            /*bool isTempl = */
+            sourceModel->setData (recIndex, QVariant::fromValue<const KKSTemplate *>(t), Qt::UserRole+2);
+            /*bool isData = */
+            sourceModel->setData (recIndex, QVariant::fromValue<KKSEIOData *>(d), Qt::UserRole+1);
+            //qDebug () << __PRETTY_FUNCTION__ << recIndex << isInserted << isData << isTempl;
         }
-    }
-/*    KKSCategory * cobjCat (0);//= pObj->category()->tableCategory();
-    int idPAttr (-1);
-    QList<int> pattrs;
-    if (cat && cat->isAttrTypeContains(KKSAttrType::atParent) )
-        pattrs = cat->searchAttributesByType (KKSAttrType::atParent);
-    else if (pObj && pObj->category() && pObj->category()->tableCategory())
-    {
-        cobjCat = pObj->category()->tableCategory();
-        pattrs = cobjCat->searchAttributesByType (KKSAttrType::atParent);
-    }
-    if (!pattrs.isEmpty())
-        idPAttr = pattrs[0];
-    QModelIndex wIndex;
-    if (idPAttr < 0)
-        wIndex = sourceModel->index (recIndex.row(), 0);
-    else
-    {
-        KKSObjectExemplar * ioc = l->loadEIO(idObjEx, pObj);
-        KKSAttrValue * av = ioc ? ioc->attrValue (idPAttr) : 0;
-        int idp = av ? av->value().valueVariant().toInt() : 0;
-        if (idp > 0)
+        QIcon tIcon;
+        if (d)
         {
-            QModelIndex cIndex = searchModelIndex (sourceModel, idObjEx, QModelIndex(), Qt::UserRole);
-            int ir = cIndex.row();
-            QModelIndex pIndex = searchModelIndex (sourceModel, idp, QModelIndex(), Qt::UserRole);
-            sourceModel->removeRows (ir, 1, cIndex.parent());
-            int nr = sourceModel->rowCount(pIndex);
-            sourceModel->insertRows (nr, 1, pIndex);
-            if (sourceModel->columnCount (pIndex) == 0)
-                sourceModel->insertColumns (0, sourceModel->columnCount(), pIndex);
-            wIndex = sourceModel->index (nr, 0, pIndex);
-        }
-        else
-            wIndex = sourceModel->index (recIndex.row(), 0);
-    }
-    if (!wIndex.isValid())
-        return;
-   
-    sourceModel->setData (wIndex, idObjEx, Qt::UserRole);
-    QList<KKSAttrView*> attrs_list = t->sortedAttrs();
-    KKSMap<qint64, KKSEIOData *> objExList;
-    if (!cat || tableName.isEmpty())
-        objExList = l->loadEIOList (pObj);//, filters);
-    else
-        objExList = l->loadEIOList (cat, tableName);
-
-    QVariant bkColVal = QVariant();
-    QVariant fgColVal = QVariant();
-
-    KKSMap<qint64, KKSEIOData *>::const_iterator p = objExList.find (idObjEx);
-    if (p == objExList.constEnd())
-        return;
-    else
-    {
-        //const KKSCategory * cat = t->category();
-        KKSEIOData * d = p.value ();
-
-        bkColVal = drawViewCells (cat, d, KKSAttrType::atRecordColor, l, sourceModel, wIndex);
-        fgColVal = drawViewCells (cat, d, KKSAttrType::atRecordTextColor, l, sourceModel, wIndex);
-    }
-
-    int ii=0;
-    for (int i=0; i<attrs_list.count(); i++)
-    {
-        if (attrs_list[i]->isVisible() && 
-			attrs_list[i]->type()->attrType () != KKSAttrType::atRecordColor 
-			&& attrs_list[i]->type()->attrType () != KKSAttrType::atRecordColorRef 
-			&& attrs_list[i]->type()->attrType () != KKSAttrType::atRecordTextColor 
-			&& attrs_list[i]->type()->attrType () != KKSAttrType::atRecordTextColorRef)
-        {
-            QModelIndex cIndex = wIndex.sibling (wIndex.row(), ii);//sourceModel->index (row, ii);
-            KKSAttrView * v = attrs_list [i];
-            QString attrCode = v->code ();
-
-            QString attrValue;
-            if( v->type()->attrType() == KKSAttrType::atJPG || 
-               (v->refType() && v->refType()->attrType() == KKSAttrType::atJPG)
-               )
+            QString strIcon = d->sysFieldValue("r_icon");
+            if (!strIcon.isEmpty())
             {
-                attrValue = QObject::tr("<Image data %1>").arg (row);
-            }
-            else if( v->type()->attrType() == KKSAttrType::atSVG || 
-               (v->refType() && v->refType()->attrType() == KKSAttrType::atSVG)
-               )
-            {
-                attrValue = QObject::tr("<SVG data %1>").arg (row);
-            }
-            else if( v->type()->attrType() == KKSAttrType::atXMLDoc || 
-               (v->refType() && v->refType()->attrType() == KKSAttrType::atXMLDoc)
-               )
-            {
-                attrValue = QObject::tr("<XML document %1>").arg (row);
-            }
-            else if( v->type()->attrType() == KKSAttrType::atVideo || 
-               (v->refType() && v->refType()->attrType() == KKSAttrType::atVideo)
-               )
-            {
-                attrValue = QObject::tr("<Video data %1>").arg (row);
+                QPixmap pIcon;
+                pIcon.loadFromData (strIcon.toUtf8());
+                tIcon = QIcon (pIcon);
             }
             else
+                tIcon = QIcon(":/ddoc/rubric_item.png");
+            if (cAttrB)
             {
-                attrValue = p.value()->fields().value (attrCode);
-                if(attrValue.isEmpty())
-                    attrValue = p.value()->fields().value (attrCode.toLower());
-                else if (attrValue.contains ("\n"))
-                    attrValue = attrValue.mid (0, attrValue.indexOf("\n")) + "...";
+                bool ok;
+                quint64 vl = d->fields().value (cAttrB->code(false)).toLongLong (&ok);
+                sourceModel->setData (recIndex, vl, Qt::BackgroundRole);
             }
-
-            sourceModel->setData (cIndex, attrValue, Qt::DisplayRole);
-            //if (bkColVal.isValid())
-            sourceModel->setData (cIndex, bkColVal, Qt::BackgroundRole);
-            //if (fgColVal.isValid())
-            sourceModel->setData (cIndex, fgColVal, Qt::ForegroundRole);
-            ii++;
+            if (cAttrF)
+            {
+                bool ok;
+                quint64 vl = d->fields().value (cAttrF->code(false)).toLongLong (&ok);
+                sourceModel->setData (recIndex, vl, Qt::ForegroundRole);
+            }
+            sourceModel->setData(recIndex.sibling(recIndex.row(), 0), tIcon, Qt::DecorationRole );
         }
+        
     }
- */
 }
 
 KKSEIOData * KKSViewFactory :: getRecordData (const KKSObjectExemplar * rec)
@@ -1020,6 +935,16 @@ KKSEIOData * KKSViewFactory :: getRecordData (const KKSObjectExemplar * rec)
             QString sysValue = rec->attrValueIndex(col)->value().value();
             ier = dRec->addField(code, value);
             ier = dRec->addSysField(code, sysValue);
+        }
+        else if (a->type()->attrType() == KKSAttrType::atRecordColor ||
+                 a->type()->attrType() == KKSAttrType::atRecordColorRef ||
+                 a->type()->attrType() == KKSAttrType::atRecordTextColor ||
+                 a->type()->attrType() == KKSAttrType::atRecordTextColorRef)
+        {
+            QString val = rec->attrValue(a->id())->value().valueForInsert();
+            qint64 vl = val.toLongLong();
+            ier = dRec->addField(code, QString::number (vl));
+            ier = dRec->addSysField(code, QString::number (vl));
         }
         else            
             ier = dRec->addField(code, value);

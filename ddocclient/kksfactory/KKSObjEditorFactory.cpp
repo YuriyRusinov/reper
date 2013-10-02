@@ -2419,40 +2419,7 @@ void KKSObjEditorFactory :: filterTemplateEIO (KKSObjEditor * editor,
         KKSFilterGroup * stGroup = searchT->getMainGroup ();
         filters.append (stGroup);
         if(forIO && loader->getUserId() != ADMIN_ROLE){
-            KKSList<const KKSFilter *> fl;
-            QString value = "select id from io_categories where id_io_category_type <> 2";//исключаем журналы
-            const KKSFilter * f = c->createFilter(ATTR_ID_IO_CATEGORY, value, KKSFilter::foInSQL);
-            if(!f){
-                qWarning() << __PRETTY_FUNCTION__ << "Cannon create system filter!!";
-                return;
-            }
-
-            fl.append(f);
-            f->release();
-
-            value = "select id from io_categories where id_io_category_type <> 8";//исключаем системные справочники
-            f = c->createFilter(ATTR_ID_IO_CATEGORY, value, KKSFilter::foInSQL);
-            if(!f){
-                qWarning() << __PRETTY_FUNCTION__ << "Cannon create system filter!!";
-                return;
-            }
-
-            fl.append(f);
-            f->release();
-
-            value = "select id from io_categories where id_io_category_type <> 9";//исключаем системный справочник категорий
-            f = c->createFilter(ATTR_ID_IO_CATEGORY, value, KKSFilter::foInSQL);
-            if(!f){
-                qWarning() << __PRETTY_FUNCTION__ << "Cannon create system filter!!";
-                return;
-            }
-            fl.append(f);
-            f->release();
-
-            KKSFilterGroup * fg = new KKSFilterGroup(true);
-            fg->setFilters(fl);
-            filters.append(fg);
-            fg->release();
+            filterSysIO (c, filters);
         }
 
         QTreeView * tv=0;
@@ -2837,9 +2804,28 @@ void KKSObjEditorFactory :: updateEIOView (KKSObject * wObj, const KKSMap<qint64
         if (d)
         {
             QString strIcon = d->sysFieldValue("r_icon");
-            QPixmap pIcon;
-            pIcon.loadFromData (strIcon.toUtf8());
-            tIcon = QIcon (pIcon);
+            if (!strIcon.isEmpty())
+            {
+                QPixmap pIcon;
+                pIcon.loadFromData (strIcon.toUtf8());
+                tIcon = QIcon (pIcon);
+            }
+            else
+                tIcon = QIcon(":/ddoc/rubric_item.png");
+            const KKSCategoryAttr * cAttrB = recModel->data(QModelIndex(), Qt::UserRole+4).value<const KKSCategoryAttr*>();
+            const KKSCategoryAttr * cAttrF = recModel->data(QModelIndex(), Qt::UserRole+5).value<const KKSCategoryAttr*>();
+            if (cAttrB)
+            {
+                bool ok;
+                quint64 vl = d->fields().value (cAttrB->code(false)).toLongLong (&ok);
+                recModel->setData (recIndex, vl, Qt::BackgroundRole);
+            }
+            if (cAttrF)
+            {
+                bool ok;
+                quint64 vl = d->fields().value (cAttrF->code(false)).toLongLong (&ok);
+                recModel->setData (recIndex, vl, Qt::ForegroundRole);
+            }
         }
         recModel->setData (recIndex.sibling(recIndex.row(), 0), tIcon, Qt::DecorationRole);
         d->release ();
@@ -6930,6 +6916,7 @@ void KKSObjEditorFactory::applySearchTemplate (int idSearchTemplate)
     filters.append (fg);
     fg->release ();
     KKSMap<qint64, KKSEIOData *> rList = loader->loadEIOList(refObj, filters);
+    qint64 idObject (-1);
     if (!rList.count())
     {
         QWidget * pWidget = qobject_cast<QWidget *>(sender());
@@ -6938,26 +6925,115 @@ void KKSObjEditorFactory::applySearchTemplate (int idSearchTemplate)
         searchT->release();
         return;
     }
-    else if (rList.count() == 1)
+    else if (rList.count() > 1)
     {
-        QString extraTitle;
-        KKSList<const KKSFilterGroup *> refFilters;
-        qint64 idObject = rList.begin().key();
-        KKSObjEditor * editor = createObjEditor (IO_IO_ID, 
-                                                 idObject, 
-                                                 refFilters, 
-                                                 extraTitle,
-                                                 c,
-                                                 false, 
-                                                 QString(),
-                                                 false,
-                                                 Qt::NonModal,
-                                                 0);
-        emit editorCreated (editor);
+        KKSObjEditor * recEditor = this->createObjRecEditor(IO_IO_ID,IO_IO_ID,filters,tr("Select reference"), ct, true, false, Qt::WindowModal, 0, Qt::Dialog);
+        if (recEditor && recEditor->exec() == QDialog::Accepted)
+        {
+            idObject = recEditor->getID();
+            delete recEditor;
+        }
+        else
+        {
+            refObj->release();
+            searchT->release();
+            delete recEditor;
+            return;
+        }
     }
+    else
+        idObject = rList.begin().key();
+    QString extraTitle;
+    KKSList<const KKSFilterGroup *> refFilters;
+    KKSObject * o = loader->loadIO (idObject);
+    if (!o)
+    {
+        refObj->release();
+        searchT->release();
+        return;
+    }
+    const KKSCategory * wCat = o->category();
+    if (!wCat || !wCat->tableCategory())
+    {
+        o->release();
+        refObj->release();
+        searchT->release();
+        return;
+    }
+    wCat = wCat->tableCategory();
+    const KKSTemplate * t = new KKSTemplate (wCat->defTemplate());
+    KKSFilterGroup * stGroup = searchT->getMainGroup ();
+    refFilters.append (stGroup);
+    KKSObjEditor * editor = createObjEditor (IO_IO_ID, 
+                                             idObject, 
+                                             refFilters, 
+                                             extraTitle,
+                                             wCat,
+                                             false, 
+                                             QString(),
+                                             false,
+                                             Qt::NonModal,
+                                             0);
+    QTreeView * tv=0;
+    tv = editor->recWidget->getView();
+    QString tableName = o->tableName();
+    //qDebug () << __PRETTY_FUNCTION__ << tableName;
+    if (idObject == IO_IO_ID && loader->getUserId() != ADMIN_ROLE)
+        filterSysIO (wCat, refFilters);
+    KKSViewFactory::loadEIOEx (editor,
+                               o,
+                               loader,
+                               t,
+                               tv,
+                               refFilters,
+                               false,
+                               wCat,
+                               tableName);
+    editor->setFilters (refFilters);
+    o->release();
+    t->release();
+    emit editorCreated (editor);
 
     refObj->release();
     searchT->release ();
+}
+
+void KKSObjEditorFactory::filterSysIO (const KKSCategory * ct, KKSList<const KKSFilterGroup *> & filters)
+{
+    KKSList<const KKSFilter *> fl;
+    QString value = "select id from io_categories where id_io_category_type <> 2";//исключаем журналы
+    const KKSFilter * f = ct->createFilter(ATTR_ID_IO_CATEGORY, value, KKSFilter::foInSQL);
+    if(!f){
+        qWarning() << __PRETTY_FUNCTION__ << "Cannon create system filter!!";
+        return;
+    }
+
+    fl.append(f);
+    f->release();
+
+    value = "select id from io_categories where id_io_category_type <> 8";//исключаем системные справочники
+    f = ct->createFilter(ATTR_ID_IO_CATEGORY, value, KKSFilter::foInSQL);
+    if(!f){
+        qWarning() << __PRETTY_FUNCTION__ << "Cannon create system filter!!";
+        return;
+    }
+
+    fl.append(f);
+    f->release();
+
+    value = "select id from io_categories where id_io_category_type <> 9";//исключаем системный справочник категорий
+    f = ct->createFilter(ATTR_ID_IO_CATEGORY, value, KKSFilter::foInSQL);
+    if(!f){
+        qWarning() << __PRETTY_FUNCTION__ << "Cannon create system filter!!";
+        return;
+    }
+    fl.append(f);
+    f->release();
+
+    KKSFilterGroup * fg = new KKSFilterGroup(true);
+    fg->setFilters(fl);
+    filters.append(fg);
+    fg->release();
 }
 
 void KKSObjEditorFactory::createSearchTemplate()
