@@ -62,7 +62,10 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
       tbDown (new QToolButton)
 {
     if (pAttrValue)
+    {
         pAttrValue->addRef();
+        this->setWindowTitle(_av->attribute()->title());
+    }
 
     QGridLayout * mainGLay = new QGridLayout (this);
     QGridLayout * avGLay = new QGridLayout;

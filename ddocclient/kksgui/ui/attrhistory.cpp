@@ -141,7 +141,7 @@ void AttrHistory::viewDblVal (const QModelIndex& wIndex)
 {
     QModelIndex vInd = wIndex.sibling(wIndex.row(), 0);
     int idAttrVal = vInd.data(Qt::UserRole).toInt();
-    emit viewAttrValue (idAttrVal, this);
+    emit viewAttrValue (idAttrVal, this->UI->tvHistory);
 }
 
 void AttrHistory::upClicked (void)

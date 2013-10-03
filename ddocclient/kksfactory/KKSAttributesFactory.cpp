@@ -2734,6 +2734,7 @@ void KKSAttributesFactory :: viewAttrValue (const KKSAttrValue * av, int idAVal,
     if (!avW)
         return;
     avW->adjustSize();
+    avW->setWindowModality(Qt::ApplicationModal);
     avW->show();
 }
 
