@@ -682,7 +682,7 @@ void KKSTemplateEditorFactory :: saveTemplate (KKSTemplate *t, KKSTemplateEditor
     if (!t)
         return;
 
-    int res;
+    int res (OK_CODE);
     KKSCatEditor *cEditor = 0;
     QAbstractItemModel * sortTemplModel = 0;
     QAbstractItemModel * tModel = 0;
@@ -697,12 +697,12 @@ void KKSTemplateEditorFactory :: saveTemplate (KKSTemplate *t, KKSTemplateEditor
     }
     KKSCategory * c = t->category();
 
-    qDebug () << __PRETTY_FUNCTION__ << t->groups().count();
+    //qDebug () << __PRETTY_FUNCTION__ << t->groups().count();
     for (KKSMap<int, KKSAttrGroup *>::const_iterator pg=t->groups().constBegin(); \
          pg != t->groups().constEnd(); \
          pg++)
     {
-        qDebug () << __PRETTY_FUNCTION__ << pg.value()->id() << pg.value()->attrViews ().count() << pg.value()->attrViews ().keys();
+        //qDebug () << __PRETTY_FUNCTION__ << pg.value()->id() << pg.value()->attrViews ().count() << pg.value()->attrViews ().keys();
         KKSAttrGroup *g = pg.value();
         for (KKSMap<int, KKSAttrView *>::const_iterator pa=g->attrViews().constBegin(); \
                 pa != g->attrViews().constEnd(); \
@@ -711,7 +711,7 @@ void KKSTemplateEditorFactory :: saveTemplate (KKSTemplate *t, KKSTemplateEditor
             KKSAttrView * av = pa.value ();
             if (!av)
                 continue;
-            qDebug () << __PRETTY_FUNCTION__ << av->defValue().valueForInsert() << av->defValue().valueVariant();
+            //qDebug () << __PRETTY_FUNCTION__ << av->defValue().valueForInsert() << av->defValue().valueVariant();
         }
     }
     if (!c->getTemplates().contains (t->id()))
@@ -732,7 +732,7 @@ void KKSTemplateEditorFactory :: saveTemplate (KKSTemplate *t, KKSTemplateEditor
             wIndex = qobject_cast<QAbstractProxyModel *>(sortTemplModel) ? qobject_cast<QAbstractProxyModel *>(sortTemplModel)->mapToSource (cEditor->getSelectedTemplateIndex ()) : cEditor->getSelectedTemplateIndex ();
     }
 */
-    qDebug () << __PRETTY_FUNCTION__ << wIndex << t->name() << t->id();
+    //qDebug () << __PRETTY_FUNCTION__ << wIndex << t->name() << t->id();
     if (res == ERROR_CODE)
     {
         emit templateDbError();

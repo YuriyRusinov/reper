@@ -25,6 +25,7 @@
 #include "KKSItemDelegate.h"
 #include "KKSEventFilter.h"
 #include "KKSCategoryTemplateWidget.h"
+#include "KKSSortFilterProxyModel.h"
 
 KKSCategoryTemplateWidget :: KKSCategoryTemplateWidget (bool mode, const QList<int>& fTypes, bool asAdmin, QWidget *parent, Qt::WindowFlags f)
     : KKSDialog (parent, f),
@@ -42,7 +43,8 @@ KKSCategoryTemplateWidget :: KKSCategoryTemplateWidget (bool mode, const QList<i
     actDelC (new QAction (QIcon (":/ddoc/delete.png"), tr("Delete selected category"), this)),
     actDelT (new QAction (QIcon (":/ddoc/delete.png"), tr("Delete template"), this)),
     m_asAdmin(asAdmin),
-    forbiddenTypes (fTypes)
+    forbiddenTypes (fTypes),
+    sortCatMod (new KKSSortFilterProxyModel)
 {
     this->init_widgets ();
 
@@ -51,6 +53,7 @@ KKSCategoryTemplateWidget :: KKSCategoryTemplateWidget (bool mode, const QList<i
     tvCatTemplate->setItemDelegate (itemDeleg);
     KKSEventFilter *eFilter = new KKSEventFilter (this);
     tvCatTemplate->viewport()->installEventFilter (eFilter);
+    tvCatTemplate->setModel (sortCatMod);
 
     if (sModel)
         connect (sModel, SIGNAL (currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT (currIndexChanged (const QModelIndex&, const QModelIndex&)) );
@@ -302,7 +305,8 @@ int KKSCategoryTemplateWidget :: getCurrentCategoryId (void) const
             tvCatTemplate->selectionModel()->currentIndex ().isValid())
     {
         QModelIndex wIndex = tvCatTemplate->selectionModel()->currentIndex ();
-        if (wIndex.data (Qt::UserRole+USER_ENTITY).toInt() == 0)
+        wIndex = sortCatMod->mapToSource(wIndex);
+        if (wIndex.data (Qt::UserRole+USER_ENTITY).toInt() == 2)
         {
             //
             // Template item is selected
@@ -338,6 +342,7 @@ int KKSCategoryTemplateWidget :: getCurrentTemplateId (void) const
             tvCatTemplate->selectionModel()->currentIndex ().parent().isValid())
     {
         QModelIndex wIndex = tvCatTemplate->selectionModel()->currentIndex ();
+        wIndex = sortCatMod->mapToSource(wIndex);
         if (wIndex.data (Qt::UserRole+USER_ENTITY).toInt() == 0)
         {
             //
@@ -354,13 +359,14 @@ void KKSCategoryTemplateWidget :: tvDoubleClicked(const QModelIndex & wIndex)
     if (!wIndex.isValid())
         return;
 
-       
-    if (wIndex.data (Qt::UserRole+USER_ENTITY).toInt() == 0)
+    QModelIndex wcIndex = sortCatMod->mapToSource(wIndex);
+
+    if (wcIndex.data (Qt::UserRole+USER_ENTITY).toInt() == 2)
     {
         //
         // Template item is selected
         //
-        int idT = wIndex.data (Qt::UserRole).toInt();
+        int idT = wcIndex.data (Qt::UserRole).toInt();
         if (idT > 0)
             emit editTempl (this, idT);
         else
@@ -369,7 +375,7 @@ void KKSCategoryTemplateWidget :: tvDoubleClicked(const QModelIndex & wIndex)
             QMessageBox::warning (this, tr("Warning"), tr("Base template cannot be edited"), QMessageBox::Ok);
         }
     }
-    else if (wIndex.data (Qt::UserRole+USER_ENTITY).toInt() == 1)
+    else if (wcIndex.data (Qt::UserRole+USER_ENTITY).toInt() == 1)
     {
         //
         // Category item is selected
@@ -377,10 +383,10 @@ void KKSCategoryTemplateWidget :: tvDoubleClicked(const QModelIndex & wIndex)
         
         //idCat = wIndex.parent().parent().isValid() ? wIndex.parent().data (Qt::UserRole).toInt () : wIndex.data (Qt::UserRole).toInt ();
         
-        int idCat = wIndex.data (Qt::UserRole).toInt();
+        int idCat = wcIndex.data (Qt::UserRole).toInt();
         emit editCategory (this, idCat, false);
     }
-    else if (wIndex.data (Qt::UserRole+USER_ENTITY).toInt() < 0)
+    else if (wcIndex.data (Qt::UserRole+USER_ENTITY).toInt() < 0)
     {
         //
         // word "Templates"
@@ -393,8 +399,8 @@ void KKSCategoryTemplateWidget :: tvDoubleClicked(const QModelIndex & wIndex)
 void KKSCategoryTemplateWidget :: currIndexChanged (const QModelIndex& current, const QModelIndex& previous)
 {
     qDebug () << __PRETTY_FUNCTION__ << current << previous;
-    QAbstractItemModel * tModel = tvCatTemplate->model ();
-    QModelIndex tIndex (current);
+    QAbstractItemModel * tModel = sortCatMod->sourceModel();//tvCatTemplate->model ();
+    QModelIndex tIndex (sortCatMod->mapToSource (current));
     while (tIndex.parent().isValid())
         tIndex = tIndex.parent();
     bool isActionsDisabled (forbiddenTypes.contains (tIndex.data(Qt::UserRole).toInt()));
@@ -406,21 +412,22 @@ void KKSCategoryTemplateWidget :: currIndexChanged (const QModelIndex& current, 
             current.isValid () && 
             current.parent().isValid() && 
             !current.parent().parent().isValid() &&
-            tModel->rowCount (current) == 0)
+            tModel->rowCount (sortCatMod->mapToSource (current)) == 0)
     {
-        int idCat = current.data (Qt::UserRole).toInt ();
-        emit uploadTemplatesIntoCategory (this, idCat, current);
+        int idCat = sortCatMod->mapToSource (current).data (Qt::UserRole).toInt ();
+        emit uploadTemplatesIntoCategory (this, idCat, sortCatMod->mapToSource (current));
     }
     Q_UNUSED (previous);
 }
 
 void KKSCategoryTemplateWidget :: uploadModel (QAbstractItemModel *mod)
 {
-    QAbstractItemModel * oldModel = tvCatTemplate->model ();
-    tvCatTemplate->setModel (mod);
-    if (oldModel)
+    QAbstractItemModel * oldModel = sortCatMod->sourceModel();//tvCatTemplate->model ();
+    sortCatMod->setSourceModel (mod);//tvCatTemplate->setModel (mod);
+    if (oldModel && oldModel != mod)
         delete oldModel;
 
+    sortCatMod->sort(0, Qt::AscendingOrder);
     if (!mod)// && sModel)
         disconnect (SIGNAL (currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT (currIndexChanged (const QModelIndex&, const QModelIndex&)) );
 
@@ -475,7 +482,7 @@ void KKSCategoryTemplateWidget :: uploadCatT (KKSTemplate *t)
     QModelIndex cIndex = pCatInd.value (t->category()->id());
     qDebug () << __PRETTY_FUNCTION__ << t->id () << cIndex;
     if (cIndex.isValid())
-        emit uploadTemplatesIntoCategory (this, t->category()->id(), cIndex);
+        emit uploadTemplatesIntoCategory (this, t->category()->id(), sortCatMod->mapToSource(cIndex));
 }
 
 QModelIndex KKSCategoryTemplateWidget :: getMainCatIndex (void) const
@@ -485,7 +492,7 @@ QModelIndex KKSCategoryTemplateWidget :: getMainCatIndex (void) const
             tvCatTemplate->selectionModel()->currentIndex ().isValid())
     {
         QModelIndex wIndex = tvCatTemplate->selectionModel()->currentIndex ();
-        if (wIndex.data (Qt::UserRole+USER_ENTITY).toInt() == 0)
+        if (wIndex.data (Qt::UserRole+USER_ENTITY).toInt() == 2)
         {
             //
             // Template item is selected
@@ -515,12 +522,13 @@ QModelIndex KKSCategoryTemplateWidget :: getMainCatIndex (void) const
 
 QAbstractItemModel * KKSCategoryTemplateWidget :: getModel (void) const
 {
-    return this->tvCatTemplate->model ();
+    return sortCatMod->sourceModel();
 }
 
 QModelIndex KKSCategoryTemplateWidget :: getSelectedIndex (void) const
 {
-    return this->tvCatTemplate->selectionModel()->currentIndex ();
+    QModelIndex pIndex (this->tvCatTemplate->selectionModel()->currentIndex ());
+    return sortCatMod->mapToSource (pIndex);
 }
 
 QSize KKSCategoryTemplateWidget :: sizeHint (void) const

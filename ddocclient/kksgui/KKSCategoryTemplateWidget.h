@@ -27,6 +27,7 @@ class QAbstractItemModel;
 class QAction;
 class QMenu;
 class QToolBar;
+class QSortFilterProxyModel;
 
 class KKSCategory;
 class KKSTemplate;
@@ -126,6 +127,8 @@ class _GUI_EXPORT KKSCategoryTemplateWidget : public KKSDialog
         //(надо показать кнопки редактирования категорий и шаблонов)
         bool m_asAdmin;
         QList<int> forbiddenTypes;
+        
+        QSortFilterProxyModel * sortCatMod;
 
     private:
         Q_OBJECT

@@ -1020,7 +1020,7 @@ QAbstractItemModel* KKSViewFactory :: initCategoriesModel (KKSLoader* l, const K
         QModelIndex ctIndex = catTypeTemplModel->index (itype++, 0);
         catTypeTemplModel->setData (ctIndex, pCatTypes.value()->fields().value("name"), Qt::DisplayRole);
         catTypeTemplModel->setData (ctIndex, pCatTypes.key(), Qt::UserRole);
-        catTypeTemplModel->setData (ctIndex, 2, Qt::UserRole+USER_ENTITY);
+        catTypeTemplModel->setData (ctIndex, 0, Qt::UserRole+USER_ENTITY);
         catTypeTemplModel->setData (ctIndex, QIcon(":/ddoc/category_folder.png"), Qt::DecorationRole);
         QSize catRow = catTypeTemplModel->data (ctIndex, Qt::SizeHintRole).toSize();
         catRow.rheight() = 24;
