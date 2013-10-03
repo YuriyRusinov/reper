@@ -17,6 +17,7 @@
 #include <QMenu>
 #include <QAction>
 #include <QToolBar>
+#include <QHeaderView>
 #include <QIcon>
 
 #include "defines.h"
@@ -54,6 +55,11 @@ KKSCategoryTemplateWidget :: KKSCategoryTemplateWidget (bool mode, const QList<i
     KKSEventFilter *eFilter = new KKSEventFilter (this);
     tvCatTemplate->viewport()->installEventFilter (eFilter);
     tvCatTemplate->setModel (sortCatMod);
+    tvCatTemplate->setSortingEnabled (true);
+    QHeaderView * hv = tvCatTemplate->header();
+    hv->setClickable(true);
+    hv->setSortIndicator(0, Qt::AscendingOrder);
+    hv->setSortIndicatorShown(true);
 
     if (sModel)
         connect (sModel, SIGNAL (currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT (currIndexChanged (const QModelIndex&, const QModelIndex&)) );
@@ -427,7 +433,10 @@ void KKSCategoryTemplateWidget :: uploadModel (QAbstractItemModel *mod)
     if (oldModel && oldModel != mod)
         delete oldModel;
 
-    sortCatMod->sort(0, Qt::AscendingOrder);
+    QHeaderView * hv = tvCatTemplate->header();
+    int sortInd = hv->sortIndicatorSection();
+    Qt::SortOrder so = hv->sortIndicatorOrder();
+    sortCatMod->sort(sortInd, so);
     if (!mod)// && sModel)
         disconnect (SIGNAL (currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT (currIndexChanged (const QModelIndex&, const QModelIndex&)) );
 
