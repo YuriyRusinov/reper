@@ -41,7 +41,7 @@
 #include "KKSComplexAttrWidget.h"
 
 KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFlags flags)
-    : QWidget (parent, flags),
+    : QDialog (parent, flags),
       pAttrValue (_av),
       valWidget (0),
       valFrame (new QFrame),
@@ -229,7 +229,7 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
     QHBoxLayout * buttonsLay = new QHBoxLayout;
     buttonsLay->addStretch(1);
     QPushButton * pbClose = new QPushButton (tr("&Close"), this);
-    connect (pbClose, SIGNAL (clicked()), this, SLOT (close()));
+    connect (pbClose, SIGNAL (clicked()), this, SLOT (reject()));
     buttonsLay->addWidget(pbClose);
     mainGLay->addLayout (buttonsLay, 1, 0, 1, 2, Qt::AlignJustify | Qt::AlignBottom);//addWidget(pbClose, 1, 1, 1, 1);
 

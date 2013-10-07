@@ -8,7 +8,7 @@
 #ifndef KKSAVALWIDGET_H
 #define	KKSAVALWIDGET_H
 
-#include <QWidget>
+#include <QDialog>
 #include <QVariant>
 #include <QList>
 
@@ -39,7 +39,7 @@ class KKSPointTable;
 class KKSPixmap;
 class KKSVideoPlayer;
 
-class _GUI_EXPORT KKSAValWidget : public QWidget {
+class _GUI_EXPORT KKSAValWidget : public QDialog {
 public:
     KKSAValWidget(KKSAttrValue * _av, QWidget * parent=0, Qt::WindowFlags flags=0);
     virtual ~KKSAValWidget();

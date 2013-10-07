@@ -2735,7 +2735,10 @@ void KKSAttributesFactory :: viewAttrValue (const KKSAttrValue * av, int idAVal,
         return;
     avW->adjustSize();
     avW->setWindowModality(Qt::ApplicationModal);
-    avW->show();
+    if (qobject_cast<QDialog *>(avW))
+        (qobject_cast<QDialog *>(avW))->exec();
+    else
+        avW->show();
 }
 
 QWidget * KKSAttributesFactory :: createAttrValWidget (const KKSAttrValue * pAttrValue, int idAVal, int isSys, QWidget * parent, Qt::WindowFlags flags)
