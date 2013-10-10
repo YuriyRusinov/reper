@@ -110,4 +110,9 @@ IntervalHValue KKSHIntervalW :: value()
     return v;
 }
 
-
+void KKSHIntervalW :: setReadOnly (bool val)
+{
+    spHour->setReadOnly(val);
+    spMinute->setReadOnly(val);
+    spSecond->setReadOnly(val);
+}

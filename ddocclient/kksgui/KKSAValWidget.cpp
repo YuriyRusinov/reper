@@ -39,6 +39,8 @@
 #include "KKSPixmap.h"
 #include "KKSVideoPlayer.h"
 #include "KKSComplexAttrWidget.h"
+#include "KKSIntervalWidget.h"
+#include "KKSHIntervalW.h"
 
 KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFlags flags)
     : QDialog (parent, flags),
@@ -58,6 +60,8 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
       pointsVal (0),
       pixVal (0),
       videoVal (0),
+      iValW (0),
+      iValWH (0),
       tbUp (new QToolButton),
       tbDown (new QToolButton)
 {
@@ -215,6 +219,52 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
             valWidget = qobject_cast<QWidget *>(videoVal);
             break;
         }
+        case KKSAttrType::atInterval:
+        {
+            iValW = new KKSIntervalWidget (pAttrValue, KKSIndAttr::iacIOUserAttr);
+            QString v = V.toStringList().join(" ");
+            QStringList vl = v.split (" ");
+            int vi = vl[0].toInt();
+            QLineEdit *lEdit = new QLineEdit (QString::number (vi));
+            lEdit->setReadOnly (true);
+            iValW->setLineEdit (lEdit);
+            QComboBox *cbUnit = new QComboBox ();
+            QSizePolicy cPw (QSizePolicy::MinimumExpanding, QSizePolicy::Fixed, QSizePolicy::ComboBox);
+            cPw.setHorizontalStretch (1);
+            cbUnit->setSizePolicy (cPw);
+            cbUnit->setMinimumHeight (20);
+
+            cbUnit->addItem (QString(), QVariant());
+
+            QStringList units = KKSAttrType::getIntervalUnits();
+            for (int i=0; i<units.count(); i++)
+                cbUnit->addItem (units[i], i);
+            if (vl.size()>1)
+            {
+                int ind = cbUnit->findText (vl[1], Qt::MatchContains);
+                if (ind>0)
+                    cbUnit->setCurrentIndex (ind);
+            }
+            cbUnit->setDisabled(true);
+            cbUnit->setSizeAdjustPolicy (QComboBox::AdjustToContentsOnFirstShow);
+            iValW->setComboUnits (cbUnit);
+            valWidget = qobject_cast<QWidget *>(iValW);
+            break;
+        }
+        case KKSAttrType::atIntervalH:
+        {
+            iValWH = new KKSHIntervalW (pAttrValue, KKSIndAttr::iacIOUserAttr);
+            iValWH->setReadOnly (true);
+            valWidget = qobject_cast<QWidget *> (iValWH);
+            QString v = V.toStringList().join(" ");
+            QStringList vl = v.split (" ");
+            int h = vl.size() >= 3 ? vl[0].toInt() : -1;
+            int m = vl.size() >= 3 ? vl[1].toInt() : -1;
+            int s = vl.size() >= 3 ? vl[2].toInt() : -1;
+            IntervalHValue ihv (h, m, s);
+            iValWH->setValue(ihv);
+            break;
+        }
         default:break;
     }
 
@@ -355,6 +405,32 @@ void KKSAValWidget::initComplexWidget (KKSAttrValue * av, QGridLayout * gLay, QW
                 (qobject_cast<KKSVideoPlayer *>(aW))->setMovie(val.toByteArray());
                 break;
             }
+            case KKSAttrType::atInterval:
+            {
+                aW = new KKSIntervalWidget (pAttrValue, KKSIndAttr::iacIOUserAttr);
+                KKSIntervalWidget * iW = qobject_cast<KKSIntervalWidget *>(aW);
+                QString v = val.toStringList().join(" ");
+                QStringList vl = v.split (" ");
+                int vi = vl[0].toInt();
+                QString unit = vl[1];
+                IntervalValue iv (vi, unit);
+                iW->setValue (iv);
+                break;
+            }
+            case KKSAttrType::atIntervalH:
+            {
+                aW = new KKSHIntervalW (pAttrValue, KKSIndAttr::iacIOUserAttr);
+                KKSHIntervalW * iHW = qobject_cast<KKSHIntervalW *>(aW);
+                iHW->setReadOnly(true);
+                QString v = val.toStringList().join(" ");
+                QStringList vl = v.split (" ");
+                int h = vl.size() >= 3 ? vl[0].toInt() : -1;
+                int m = vl.size() >= 3 ? vl[1].toInt() : -1;
+                int s = vl.size() >= 3 ? vl[2].toInt() : -1;
+                IntervalHValue ihv (h, m, s);
+                iHW->setValue(ihv);
+                break;
+            }
             default:continue;
             
         }
@@ -489,6 +565,26 @@ void KKSAValWidget::setValue (const KKSAttribute * a, QVariant val)
         case KKSAttrType::atVideo:
         {
             videoVal->setMovie(val.toByteArray());
+            break;
+        }
+        case KKSAttrType::atInterval:
+        {
+            QString v = val.toStringList().join(" ");
+            QStringList vl = v.split (" ");
+            int vi = vl[0].toInt();
+            QString unit = (vl.size() >= 2 ? vl[1] : tr("seconds"));
+            IntervalValue iv (vi, unit);
+            iValW->setValue (iv);
+        }
+        case KKSAttrType::atIntervalH:
+        {
+            QString v = val.toStringList().join(" ");
+            QStringList vl = v.split (" ");
+            int h = vl.size() >= 3 ? vl[0].toInt() : -1;
+            int m = vl.size() >= 3 ? vl[1].toInt() : -1;
+            int s = vl.size() >= 3 ? vl[2].toInt() : -1;
+            IntervalHValue ihv (h, m, s);
+            iValWH->setValue(ihv);
             break;
         }
         default:break;

@@ -2725,11 +2725,11 @@ void KKSAttributesFactory :: viewAttrValue (const KKSAttrValue * av, int idAVal,
     if (!av || idAVal < 0)
         return;
     //qDebug () << __PRETTY_FUNCTION__ << av->id() << idAVal << isSys << (qobject_cast<QWidget *>(this->sender()));
-    QWidget * avW = createAttrValWidget (av, idAVal, isSys, pWidget, Qt::Window);
-    if (qobject_cast<AttrHistory *>(pWidget))
+    QWidget * avW = createAttrValWidget (av, idAVal, isSys, pWidget, Qt::Dialog);
+    if (pWidget && pWidget->parentWidget() && qobject_cast<AttrHistory *>(pWidget->parentWidget()->parentWidget()))
     {
-        connect (avW, SIGNAL (prevVal()), pWidget, SLOT (upClicked()) );
-        connect (avW, SIGNAL (nextVal()), pWidget, SLOT (downClicked()) );
+        connect (avW, SIGNAL (prevVal()), pWidget->parentWidget()->parentWidget(), SLOT (upClicked()) );
+        connect (avW, SIGNAL (nextVal()), pWidget->parentWidget()->parentWidget(), SLOT (downClicked()) );
     }
     if (!avW)
         return;

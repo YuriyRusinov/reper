@@ -25,7 +25,8 @@ public:
     int h;
     int m;
     int s;
-    IntervalHValue(){h=0; m=0; s=0;}
+//    IntervalHValue(){h=0; m=0; s=0;}
+    IntervalHValue(int hh=0, int mm=0, int sec=0) : h(hh), m(mm), s(sec) {}
 };
 
 class _GUI_EXPORT KKSHIntervalW : public QWidget, public KKSAttrWidget
@@ -37,6 +38,7 @@ public:
     void value(int * h, int * m, int * s);
     IntervalHValue value();
 
+    void setReadOnly (bool val);
 public slots:
     void setValue (int h=-1, int m=-1, int s=-1);
     void setValue (const IntervalHValue & v);

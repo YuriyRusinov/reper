@@ -38,6 +38,8 @@ class KKSSvgWidget;
 class KKSPointTable;
 class KKSPixmap;
 class KKSVideoPlayer;
+class KKSIntervalWidget;
+class KKSHIntervalW;
 
 class _GUI_EXPORT KKSAValWidget : public QDialog {
 public:
@@ -86,6 +88,8 @@ private:
     KKSPointTable * pointsVal;
     KKSPixmap * pixVal;
     KKSVideoPlayer * videoVal;
+    KKSIntervalWidget * iValW;
+    KKSHIntervalW * iValWH;
 
     QToolButton * tbUp;
     QToolButton * tbDown;
