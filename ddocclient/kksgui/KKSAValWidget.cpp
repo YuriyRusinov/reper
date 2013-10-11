@@ -29,6 +29,7 @@
 #include <QTextEdit>
 #include <QSizePolicy>
 #include <QLabel>
+#include <QColor>
 
 #include <KKSAttrValue.h>
 #include <KKSAttribute.h>
@@ -41,6 +42,7 @@
 #include "KKSComplexAttrWidget.h"
 #include "KKSIntervalWidget.h"
 #include "KKSHIntervalW.h"
+#include "KKSColorWidget.h"
 
 KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFlags flags)
     : QDialog (parent, flags),
@@ -62,6 +64,7 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
       videoVal (0),
       iValW (0),
       iValWH (0),
+      iColW (0),
       tbUp (new QToolButton),
       tbDown (new QToolButton)
 {
@@ -135,9 +138,7 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
         case KKSAttrType::atObjRef:
         case KKSAttrType::atUUID:
         case KKSAttrType::atUrl:
-        case KKSAttrType::atRecordColor:
         case KKSAttrType::atRecordColorRef:
-        case KKSAttrType::atRecordTextColor:
         case KKSAttrType::atRecordTextColorRef:
         {
             lEVal = new QLineEdit;
@@ -263,6 +264,17 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
             int s = vl.size() >= 3 ? vl[2].toInt() : -1;
             IntervalHValue ihv (h, m, s);
             iValWH->setValue(ihv);
+            break;
+        }
+        case KKSAttrType::atRecordColor:
+        case KKSAttrType::atRecordTextColor:
+        {
+            unsigned int vlc = V.toUInt ();
+            QRgb rgb_col (vlc);// = V.value<QColor>();//toUInt ();
+            QColor rgb_color = QColor::fromRgba (rgb_col);//V.value<QColor>();//toInt ();
+            
+            iColW = new KKSColorWidget (pAttrValue, KKSIndAttr::iacIOUserAttr, rgb_color, pAttrValue->attribute()->type()->attrType());
+            valWidget = qobject_cast<QWidget *>(iColW);
             break;
         }
         default:break;
@@ -431,6 +443,18 @@ void KKSAValWidget::initComplexWidget (KKSAttrValue * av, QGridLayout * gLay, QW
                 iHW->setValue(ihv);
                 break;
             }
+            case KKSAttrType::atRecordColor:
+            case KKSAttrType::atRecordTextColor:
+            {
+                unsigned int vlc = val.toUInt ();
+                QRgb rgb_col (vlc);// = V.value<QColor>();//toUInt ();
+                QColor rgb_color = QColor::fromRgba (rgb_col);//V.value<QColor>();//toInt ();
+
+                aW = new KKSColorWidget (pAttrValue, KKSIndAttr::iacIOUserAttr, rgb_color, pAttrValue->attribute()->type()->attrType());
+                KKSColorWidget * iCW = qobject_cast<KKSColorWidget *>(aW);
+                iCW->setColor(rgb_color);
+                break;
+            }
             default:continue;
             
         }
@@ -500,9 +524,7 @@ void KKSAValWidget::setValue (const KKSAttribute * a, QVariant val)
         case KKSAttrType::atObjRef:
         case KKSAttrType::atUUID:
         case KKSAttrType::atUrl:
-        case KKSAttrType::atRecordColor:
         case KKSAttrType::atRecordColorRef:
-        case KKSAttrType::atRecordTextColor:
         case KKSAttrType::atRecordTextColorRef:
         {
             //valWidget = new QLineEdit (this);
@@ -585,6 +607,16 @@ void KKSAValWidget::setValue (const KKSAttribute * a, QVariant val)
             int s = vl.size() >= 3 ? vl[2].toInt() : -1;
             IntervalHValue ihv (h, m, s);
             iValWH->setValue(ihv);
+            break;
+        }
+        case KKSAttrType::atRecordColor:
+        case KKSAttrType::atRecordTextColor:
+        {
+            unsigned int vlc = val.toUInt ();
+            QRgb rgb_col (vlc);// = V.value<QColor>();//toUInt ();
+            QColor rgb_color = QColor::fromRgba (rgb_col);//V.value<QColor>();//toInt ();
+            
+            iColW->setColor(rgb_color);// = new KKSColorWidget (pAttrValue, KKSIndAttr::iacIOUserAttr, rgb_color, pAttrValue->attribute()->type()->attrType());
             break;
         }
         default:break;
@@ -683,9 +715,7 @@ void KKSAValWidget::setComplexVals (const QVariant& val)
             case KKSAttrType::atObjRef:
             case KKSAttrType::atUUID:
             case KKSAttrType::atUrl:
-            case KKSAttrType::atRecordColor:
             case KKSAttrType::atRecordColorRef:
-            case KKSAttrType::atRecordTextColor:
             case KKSAttrType::atRecordTextColorRef:
             {
                 QLineEdit * lE = qobject_cast<QLineEdit *>(aW);
@@ -722,6 +752,40 @@ void KKSAValWidget::setComplexVals (const QVariant& val)
             {
                 KKSVideoPlayer * vpW = qobject_cast<KKSVideoPlayer *>(aW);
                 vpW->setMovie(valW.toByteArray());
+                break;
+            }
+            case KKSAttrType::atInterval:
+            {
+                KKSIntervalWidget * iW = qobject_cast<KKSIntervalWidget *>(aW);
+                QString v = valW.toStringList().join(" ");
+                QStringList vl = v.split (" ");
+                int vi = vl[0].toInt();
+                QString unit = (vl.size() >= 2 ? vl[1] : tr("seconds"));
+                IntervalValue iv (vi, unit);
+                iW->setValue(iv);
+                break;
+            }
+            case KKSAttrType::atIntervalH:
+            {
+                KKSHIntervalW * iHW = qobject_cast<KKSHIntervalW *>(aW);
+                QString v = val.toStringList().join(" ");
+                QStringList vl = v.split (" ");
+                int h = vl.size() >= 3 ? vl[0].toInt() : -1;
+                int m = vl.size() >= 3 ? vl[1].toInt() : -1;
+                int s = vl.size() >= 3 ? vl[2].toInt() : -1;
+                IntervalHValue ihv (h, m, s);
+                iHW->setValue(ihv);
+                break;
+            }
+            case KKSAttrType::atRecordColor:
+            case KKSAttrType::atRecordTextColor:
+            {
+                KKSColorWidget * iCW = qobject_cast<KKSColorWidget *>(aW);
+                unsigned int vlc = val.toUInt ();
+                QRgb rgb_col (vlc);// = V.value<QColor>();//toUInt ();
+                QColor rgb_color = QColor::fromRgba (rgb_col);//V.value<QColor>();//toInt ();
+
+                iCW->setColor(rgb_color);// = new KKSColorWidget (pAttrValue, KKSIndAttr::iacIOUserAttr, rgb_color, pAttrValue->attribute()->type()->attrType());
                 break;
             }
         }

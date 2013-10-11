@@ -40,6 +40,7 @@ class KKSPixmap;
 class KKSVideoPlayer;
 class KKSIntervalWidget;
 class KKSHIntervalW;
+class KKSColorWidget;
 
 class _GUI_EXPORT KKSAValWidget : public QDialog {
 public:
@@ -90,6 +91,7 @@ private:
     KKSVideoPlayer * videoVal;
     KKSIntervalWidget * iValW;
     KKSHIntervalW * iValWH;
+    KKSColorWidget * iColW;
 
     QToolButton * tbUp;
     QToolButton * tbDown;
