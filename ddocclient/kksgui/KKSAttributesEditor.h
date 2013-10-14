@@ -49,6 +49,10 @@ public:
     KKSMap<int, KKSAGroup *> getAvailableGroups (void) const;
     void setAvailableGroups (const KKSMap<int, KKSAGroup *>& aGroups);
 
+public slots:    
+    void addAGroup (KKSAGroup * aGroup);
+    void delAGroup (int idAGroup);
+
 private slots:
     void addAttribute (void);
     void editAttribute (void);

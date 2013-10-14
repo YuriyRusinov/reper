@@ -5453,7 +5453,7 @@ KKSMap<int, KKSAGroup *> KKSLoader :: loadAttrsGroups (void) const
 {
     KKSMap<int, KKSAGroup*> results;
 
-    QString sql ("select * from aGetAttrGroup(null::int4);");
+    QString sql ("select * from aGetAttrGroups(null::int4);");
     KKSResult * res = db->execute (sql);
     if (!res)
         return results;
@@ -5523,7 +5523,9 @@ void KKSLoader::addAttributesToGroup(KKSAGroup * ag) const
     {
         int idAttr = res->getCellAsInt (ii, 0);
 
-        //параметры самого атрибута
+        //
+        // параметры самого атрибута
+        //
         KKSAttribute * attr = new KKSAttribute();
         attr->setId(res->getCellAsInt(ii, 0));
         attr->setCode(res->getCellAsString(ii, 2));
@@ -5532,14 +5534,17 @@ void KKSLoader::addAttributesToGroup(KKSAGroup * ag) const
         attr->setTableName(res->getCellAsString(ii, 5));
         attr->setColumnName(res->getCellAsString(ii, 6));
         attr->setDefWidth(res->getCellAsInt(ii, 7));
-    
+        //
         //тип атрибута
+        //
         KKSAttrType * type = new KKSAttrType();
         type->setId(res->getCellAsInt(ii, 1));
         type->setName(res->getCellAsString(ii, 8));
         type->setCode(res->getCellAsString(ii, 9));
 
+        //
         //Тип ссылочного атрибута
+        //
         if(!attr->columnName().isEmpty()){
             KKSAttrType * refType = new KKSAttrType();
             int idRefType = res->getCellAsInt(ii, 13);
@@ -5576,7 +5581,9 @@ void KKSLoader::addAttributesToGroup(KKSAGroup * ag) const
         attr->setType(type);
         type->release();
 
+        //
         //поисковый запрос
+        //
         if(res->isEmpty(ii, 17))
             attr->setSearchTemplate(NULL);
         else{
@@ -5587,13 +5594,16 @@ void KKSLoader::addAttributesToGroup(KKSAGroup * ag) const
             }
         }
 
+        //
         //название ссылочной колонки
+        //
         if(!res->isEmpty(ii, 18)){
             attr->setRefColumnName(res->getCellAsString(ii, 18));
             attr->setRefColumnType(type);//внутри сделается addRef()
         }
-        
+        //
         //группа атрибута
+        //
         int idGroup = res->getCellAsInt(ii, 19);
         QString groupName = res->getCellAsString(ii, 20);
         KKSAGroup * g = new KKSAGroup(idGroup, groupName);
@@ -5613,7 +5623,7 @@ KKSMap<int, KKSAGroup *> KKSLoader :: loadAvailAttrsGroups (void) const
 {
     KKSMap<int, KKSAGroup*> results;
 
-    QString sql ("select * from aGetAttrGroup(null::int4);");
+    QString sql ("select * from aGetAttrGroups(null::int4);");
     KKSResult * res = db->execute (sql);
     if (!res)
         return results;

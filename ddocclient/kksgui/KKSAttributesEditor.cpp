@@ -411,6 +411,13 @@ void KKSAttributesEditor :: addAGroup (void)
     emit insertAttrGroup (aModel, pIndex, this);
 }
 
+void KKSAttributesEditor :: addAGroup (KKSAGroup * aGroup)
+{
+    if (!aGroup || aGroup->id() < 0)
+        return;
+    attrsGroups.insert (aGroup->id(), aGroup);
+}
+
 void KKSAttributesEditor :: editAGroup (void)
 {
     QAbstractItemModel * aModel = recW->getSourceModel ();
@@ -447,6 +454,11 @@ void KKSAttributesEditor :: delAGroup (void)
     int idAttrGroup = wIndex.data(Qt::UserRole).toInt();
     if (QMessageBox::question(this, tr ("Delete group"), tr ("Do you really want to delete ?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
         emit deleteAttrGroup (idAttrGroup, aModel, wIndex, this);
+}
+
+void KKSAttributesEditor :: delAGroup (int idAGroup)
+{
+    attrsGroups.remove (idAGroup);
 }
 
 void KKSAttributesEditor :: refreshAttrModel (QAbstractItemModel * attrMod)

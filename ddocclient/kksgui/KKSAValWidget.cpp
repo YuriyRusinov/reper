@@ -269,11 +269,13 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
         case KKSAttrType::atRecordColor:
         case KKSAttrType::atRecordTextColor:
         {
-            unsigned int vlc = V.toUInt ();
-            QRgb rgb_col (vlc);// = V.value<QColor>();//toUInt ();
-            QColor rgb_color = QColor::fromRgba (rgb_col);//V.value<QColor>();//toInt ();
+            //qDebug () << __PRETTY_FUNCTION__ << V;
+            //unsigned int vlc = V.toUInt ();
+            //QRgb rgb_col (V.value<QColor>().toRgb());//toUInt ();
+            QColor rgb_color = V.value<QColor>();//QColor::fromRgba (rgb_col);//V.value<QColor>();//toInt ();
             
             iColW = new KKSColorWidget (pAttrValue, KKSIndAttr::iacIOUserAttr, rgb_color, pAttrValue->attribute()->type()->attrType());
+            iColW->hideToolButton();
             valWidget = qobject_cast<QWidget *>(iColW);
             break;
         }
@@ -446,12 +448,13 @@ void KKSAValWidget::initComplexWidget (KKSAttrValue * av, QGridLayout * gLay, QW
             case KKSAttrType::atRecordColor:
             case KKSAttrType::atRecordTextColor:
             {
-                unsigned int vlc = val.toUInt ();
-                QRgb rgb_col (vlc);// = V.value<QColor>();//toUInt ();
-                QColor rgb_color = QColor::fromRgba (rgb_col);//V.value<QColor>();//toInt ();
+                //unsigned int vlc = val.toUInt ();
+                //QRgb rgb_col (vlc);// = V.value<QColor>();//toUInt ();
+                QColor rgb_color = val.value<QColor>();//::fromRgba (rgb_col);//V.value<QColor>();//toInt ();
 
                 aW = new KKSColorWidget (pAttrValue, KKSIndAttr::iacIOUserAttr, rgb_color, pAttrValue->attribute()->type()->attrType());
                 KKSColorWidget * iCW = qobject_cast<KKSColorWidget *>(aW);
+                iCW->hideToolButton();
                 iCW->setColor(rgb_color);
                 break;
             }
@@ -612,9 +615,9 @@ void KKSAValWidget::setValue (const KKSAttribute * a, QVariant val)
         case KKSAttrType::atRecordColor:
         case KKSAttrType::atRecordTextColor:
         {
-            unsigned int vlc = val.toUInt ();
-            QRgb rgb_col (vlc);// = V.value<QColor>();//toUInt ();
-            QColor rgb_color = QColor::fromRgba (rgb_col);//V.value<QColor>();//toInt ();
+            //unsigned int vlc = val.toUInt ();
+            //QRgb rgb_col (vlc);// = V.value<QColor>();//toUInt ();
+            QColor rgb_color = val.value<QColor>();//::fromRgba (rgb_col);//V.value<QColor>();//toInt ();
             
             iColW->setColor(rgb_color);// = new KKSColorWidget (pAttrValue, KKSIndAttr::iacIOUserAttr, rgb_color, pAttrValue->attribute()->type()->attrType());
             break;

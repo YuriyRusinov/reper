@@ -8,6 +8,28 @@ create type h_get_attrgroup as (id_attr_group int4,
 create or replace function aGetAttrGroup (int4) returns setof h_get_attrgroup as
 $BODY$
 declare
+    idAttrGroup alias for $1;
+
+    query varchar;
+    rec h_get_attrgroup%rowtype;
+    rrec h_get_attrgroup%rowtype;
+begin
+
+    query := E'select ag.id, ag.id_parent, ag.name from attrs_groups ag where ag.id=' || idAttrGroup;
+    for rec in
+        execute query
+    loop
+        return next rec;
+    end loop;
+
+    return;
+end
+$BODY$
+language 'plpgsql';
+
+create or replace function aGetAttrGroups (int4) returns setof h_get_attrgroup as
+$BODY$
+declare
     idAttrPGroup alias for $1;
 
     query varchar;
@@ -26,7 +48,7 @@ begin
     loop
         return next rec;
         for rrec in
-            select * from aGetAttrGroup (rec.id_attr_group)
+            select * from aGetAttrGroups (rec.id_attr_group)
         loop
             return next rrec;
         end loop;

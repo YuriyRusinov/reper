@@ -20,6 +20,7 @@
 
 #include <KKSAttrValue.h>
 #include <KKSObject.h>
+#include <KKSEventFilter.h>
 
 #include "attrhistory.h"
 #include "ui_attr_history.h"
@@ -49,6 +50,8 @@ AttrHistory::AttrHistory (const KKSList<KKSAttrValue*> & histlist, QWidget *pare
     {
         view (histlist);
     }
+    KKSEventFilter * ef = new KKSEventFilter (this);
+    UI->tvHistory->viewport()->installEventFilter(ef);
     
     pHistMenu->addAction(aViewVals);
     QAbstractItemDelegate * iDeleg = new KKSItemDelegate();
@@ -132,7 +135,10 @@ void AttrHistory::contextMenuEvent (QContextMenuEvent * event)
 void AttrHistory::viewVal (void)
 {
     QItemSelectionModel * selModel = UI->tvHistory->selectionModel();
-    QModelIndex wIndex = selModel->currentIndex();
+    QItemSelection iSel = selModel->selection();
+    if (iSel.isEmpty())
+        return;
+    QModelIndex wIndex = iSel.indexes().at(0);
     wIndex = wIndex.sibling(wIndex.row(), 0);
     viewDblVal (wIndex);
 }

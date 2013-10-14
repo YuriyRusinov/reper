@@ -313,12 +313,15 @@ void KKSAttributesFactory :: saveAttribute (const QModelIndex& parent, QAbstract
     else if (!aInd.isValid())
     {
         int nr = aModel->rowCount(pGroupInd);
-        aModel->insertRows(nr, 1, pGroupInd);
+        bool isIns = aModel->insertRows(nr, 1, pGroupInd);
+        if (aModel->columnCount(pGroupInd) == 0 && isIns)
+            aModel->insertColumns(0, 4, pGroupInd);
         aInd = aModel->index(nr, 0, pGroupInd);
+        //qDebug () << __PRETTY_FUNCTION__ << aInd << isIns;
     }
     aModel->setData(aInd, cAttr->id(), Qt::UserRole);
     aModel->setData(aInd, cAttr->name(), Qt::DisplayRole);
-    aModel->setData(aInd, QIcon(":/ddoc/rubric_item.png"), Qt::DecorationRole);
+    aModel->setData(aInd, QIcon(":/ddoc/rubric_item.png").pixmap(24, 24), Qt::DecorationRole);
     aModel->setData(aInd, 1, Qt::UserRole+USER_ENTITY);
     
     aInd = aInd.sibling (aInd.row(), 1);
@@ -459,7 +462,7 @@ void KKSAttributesFactory :: loadAttribute (int idAttr, QAbstractItemModel * aMo
         }
         aModel->setData(aInd, cAttrRes->id(), Qt::UserRole);
         aModel->setData(aInd, cAttrRes->name(), Qt::DisplayRole);
-        aModel->setData(aInd, QIcon(":/ddoc/rubric_item.png"), Qt::DecorationRole);
+        aModel->setData(aInd, QIcon(":/ddoc/rubric_item.png").pixmap(24, 24), Qt::DecorationRole);
         aModel->setData(aInd, 1, Qt::UserRole+USER_ENTITY);
 
         aInd = aInd.sibling (aInd.row(), 1);
@@ -724,9 +727,13 @@ void KKSAttributesFactory :: addAttrGroup (QAbstractItemModel *aModel, const QMo
         int gId = pObjEx->id();
         aModel->setData(gInd, gId, Qt::UserRole);
         aModel->setData(gInd, name, Qt::DisplayRole);
-        aModel->setData(gInd, QIcon(":/ddoc/rubric.png"), Qt::DecorationRole);
+        aModel->setData(gInd, QIcon(":/ddoc/rubric.png").pixmap(24, 24), Qt::DecorationRole);
         aModel->setData(gInd, 0, Qt::UserRole+USER_ENTITY);
-        
+        KKSAGroup * agr = loader->loadAttrGroup(gId);
+        //qDebug () << __PRETTY_FUNCTION__ << agr->name ();
+        attrEditor->addAGroup(agr);
+        if (agr)
+            agr->release ();
     }
 //    m_oef->createNewEditor (attrEditor, IO_ATTRS_GROUPS_ID, c, refIO->tableName(), 0, (attrEditor->windowModality() != Qt::NonModal));
     refIO->release ();
@@ -778,7 +785,7 @@ void KKSAttributesFactory :: editAttrGroup (int idAttrGroup, QAbstractItemModel 
         int gId = pObjEx->id();
         aModel->setData(gInd, gId, Qt::UserRole);
         aModel->setData(gInd, name, Qt::DisplayRole);
-        aModel->setData(gInd, QIcon(":/ddoc/rubric.png"), Qt::DecorationRole);
+        aModel->setData(gInd, QIcon(":/ddoc/rubric.png").pixmap(24, 24), Qt::DecorationRole);
         aModel->setData(gInd, 0, Qt::UserRole+USER_ENTITY);
     }
 }
@@ -807,7 +814,10 @@ void KKSAttributesFactory :: delAttrGroup (int idAttrGroup, QAbstractItemModel *
 
     int row = aIndex.row();
     if (eiof->deleteEIO(oe) != ERROR_CODE)
+    {
         aModel->removeRows (row, 1, aIndex.parent());
+        attrEditor->delAGroup(idAttrGroup);
+    }
     else{
         qCritical() << tr("Cannot delete group of attributes");
         QMessageBox::critical(attrEditor, tr("Delete group of attributes"), tr("Cannot delete group of attributes"), QMessageBox::Ok);
@@ -860,7 +870,8 @@ void KKSAttributesFactory :: putAttrWidget (KKSAttrValue* av,
 
     if (!pCategAttr)
     {
-        qDebug () << __PRETTY_FUNCTION__ << "Category attribute is null";
+        //qDebug () << __PRETTY_FUNCTION__ << "Category attribute is null";
+        QMessageBox::warning(objEditor, tr("Set attribute"), tr ("Category attribute is null"), QMessageBox::Ok);
         return;
     }
 
@@ -1631,7 +1642,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                 QColor rgb_color = QColor::fromRgba (rgb_col);//V.value<QColor>();//toInt ();
                 if (V.toString().isEmpty())
                     rgb_color =  QColor ();
-                qDebug () << __PRETTY_FUNCTION__ << rgb_color << vlc << V;
+                //qDebug () << __PRETTY_FUNCTION__ << rgb_color << vlc << V;
                 attrWidget = new KKSColorWidget (av, attrClass, rgb_color, av->attribute()->type()->attrType());
                 if (isRef)
                     qobject_cast<KKSColorWidget *>(attrWidget)->hideToolButton ();

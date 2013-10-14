@@ -1546,7 +1546,9 @@ KKSAttributesEditor * KKSViewFactory :: createAttrView (KKSLoader *l,
     }
 
 
+    tvAttrs->setRootIsDecorated(true);
     tvAttrs->update ();
+    //qDebug () << __PRETTY_FUNCTION__ << tvAttrs->itemsExpandable() << tvAttrs->expandsOnDoubleClick () << tvAttrs->rootIsDecorated();
 
     if (mode)
     {
@@ -1659,7 +1661,7 @@ void KKSViewFactory :: parseAttrGroup (KKSLoader *l, const KKSAGroup* aGroup, co
     aModel->setData (pIndex, aGroup->id(), Qt::UserRole);
     aModel->setData (pIndex, aGroup->name(), Qt::DisplayRole);
     aModel->setData (pIndex, 0, Qt::UserRole+USER_ENTITY);
-    aModel->setData (pIndex, QIcon(":/ddoc/rubric.png"), Qt::DecorationRole);
+    aModel->setData (pIndex, QIcon(":/ddoc/rubric.png").pixmap(24, 24), Qt::DecorationRole);
     
     int nChild = aGroup->childGroups().size();
     aModel->insertRows (0, nChild, pIndex);
@@ -1675,7 +1677,7 @@ void KKSViewFactory :: parseAttrGroup (KKSLoader *l, const KKSAGroup* aGroup, co
         aModel->setData (wIndex, p.key(), Qt::UserRole);
         aModel->setData (wIndex, p.value()->name(), Qt::DisplayRole);
         aModel->setData (wIndex, 0, Qt::UserRole+USER_ENTITY);
-        aModel->setData (wIndex, QIcon(":/ddoc/rubric.png"), Qt::DecorationRole);
+        aModel->setData (wIndex, QIcon(":/ddoc/rubric.png").pixmap(24, 24), Qt::DecorationRole);
         parseAttrGroup (l, p.value(), filters/*KKSList<const KKSFilterGroup *>()*/, aModel, wIndex);
         i++;
     }
@@ -1687,15 +1689,20 @@ void KKSViewFactory :: parseAttrGroup (KKSLoader *l, const KKSAGroup* aGroup, co
     {
         //--if (!attrsKeys.contains (pa.key()))
         //--    continue;
-        aModel->insertRows (i, 1, pIndex);
+        bool isIns = aModel->insertRows (i, 1, pIndex);
+        if (!isIns)
+            continue;
+        if (aModel->columnCount(pIndex) == 0)
+            aModel->insertColumns (0, 4, pIndex);
         QModelIndex wIndex = aModel->index (i, 0, pIndex);
         KKSAttribute *attr = pa.value();//l->loadAttribute (pa.key());
         if (attr)
         {
+            //qDebug () << __PRETTY_FUNCTION__ << pa.key() << attr->id() << attr->name() << wIndex;
             aModel->setData (wIndex, pa.key(), Qt::UserRole);
-            aModel->setData (wIndex, pa.value()->name(), Qt::DisplayRole);
+            aModel->setData (wIndex, attr->name(), Qt::DisplayRole);
             aModel->setData (wIndex, 1, Qt::UserRole+USER_ENTITY);
-            aModel->setData (wIndex, QIcon(":/ddoc/rubric_item.png"), Qt::DecorationRole);
+            aModel->setData (wIndex, QIcon(":/ddoc/rubric_item.png").pixmap(24, 24), Qt::DecorationRole);
             QModelIndex tIndex = aModel->index (i, 1, pIndex);
             aModel->setData (tIndex, attr->type()->name(), Qt::DisplayRole);
             QModelIndex titleIndex = aModel->index (i, 2, pIndex);
