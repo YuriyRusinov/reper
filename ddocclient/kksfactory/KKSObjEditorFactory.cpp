@@ -9278,7 +9278,7 @@ void KKSObjEditorFactory :: putSyncWidget (KKSObjEditor * editor, KKSObjectExemp
             */
         KKSCategoryAttr * globAttr = ct->attribute (ATTR_IS_GLOBAL);//is_global
 
-        KKSValue val (QString("false"), KKSAttrType::atBool);
+        KKSValue val (QString("true"), KKSAttrType::atBool);
         KKSAttrValue * av = new KKSAttrValue (val, globAttr);
         if (!av)
             return;
@@ -9346,6 +9346,14 @@ void KKSObjEditorFactory :: putSyncWidget (KKSObjEditor * editor, KKSObjectExemp
     connect (syncW, SIGNAL (setSyncType (QLineEdit *)), editor, SLOT (setSyncType (QLineEdit *)) );
     connect (syncW, SIGNAL (addSyncOrganization (KKSAttrValue *, QAbstractItemModel *)), editor, SLOT (addSyncOrg (KKSAttrValue *, QAbstractItemModel *)) );
     connect (syncW, SIGNAL (delSyncOrganization (KKSAttrValue *, const QModelIndex&, QAbstractItemModel *)), editor, SLOT (delSyncOrg (KKSAttrValue *, const QModelIndex&, QAbstractItemModel *)) );
+    if (idObjE < 0)
+    {
+        syncW->setCheckGlobal(true);
+        KKSValue valSyncType (QString::number(1), KKSAttrType::atList);
+        KKSCategoryAttr * syncTypeAttr = ct->attribute (ATTR_ID_SYNC_TYPE);
+        KKSAttrValue * syncAttrVal = new KKSAttrValue (valSyncType, syncTypeAttr);
+        syncW->setSyncAttrVal(syncAttrVal);
+    }
     tabObj->addTab (syncW, tr ("Syncronization"));
 }
 
