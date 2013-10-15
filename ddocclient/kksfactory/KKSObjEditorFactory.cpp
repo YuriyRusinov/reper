@@ -9358,8 +9358,12 @@ void KKSObjEditorFactory :: putSyncWidget (KKSObjEditor * editor, KKSObjectExemp
         syncW->setCheckGlobal(true);
         KKSValue valSyncType (QString::number(1), KKSAttrType::atList);
         KKSCategoryAttr * syncTypeAttr = ct->attribute (ATTR_ID_SYNC_TYPE);
-        KKSAttrValue * syncAttrVal = new KKSAttrValue (valSyncType, syncTypeAttr);
-        syncW->setSyncAttrVal(syncAttrVal);
+        KKSAttrValue * syncTypeAttrVal = new KKSAttrValue (valSyncType, syncTypeAttr);
+        QMap<int, QString> refColumnValues;
+        QMap<int, QString> syncVals = loader->loadAttributeValues (syncTypeAttr, refColumnValues);
+        syncW->setSyncAttrVal(syncTypeAttrVal);
+        wObjE->addAttrValue (syncTypeAttrVal);
+        syncW->setSyncType (syncVals.value(1));
     }
     tabObj->addTab (syncW, tr ("Syncronization"));
 }

@@ -79,6 +79,12 @@ void KKSSyncWidget :: setCheckGlobal (bool global)
 {
     if (global)
         chGlobal->setCheckState (Qt::Checked);
+    else if (!global && sortModel->sourceModel() && sortModel->sourceModel()->rowCount() > 0)
+    {
+        QMessageBox::warning (this, tr("Set document"), tr ("Cannot drop syncronization for already global document"), QMessageBox::Ok);
+        chGlobal->setCheckState (Qt::Checked);
+        return;
+    }
     else
         chGlobal->setCheckState (Qt::Unchecked);
 
