@@ -20,6 +20,7 @@
 #include <QMessageBox>
 #include <QLabel>
 #include <QSize>
+#include <QCheckBox>
 #include <QtDebug>
 
 #include "KKSSearchTemplatesForm.h"
@@ -46,6 +47,7 @@ KKSSearchTemplatesForm :: KKSSearchTemplatesForm (const KKSCategory * c1, const 
     actRefresh (new QAction(tr("&Refresh model"), this)),
     actExecute (new QAction(tr("E&xecute search template"), this)),
     lEFilter (new QLineEdit (this)),
+    chSearchInResults (new QCheckBox(tr("Search in results"), this)),
     pbOk (new QPushButton (tr("&OK"), this)),
     pbCancel (new QPushButton (tr("&Cancel"), this))
 {
@@ -253,6 +255,7 @@ void KKSSearchTemplatesForm :: init (void)
     pbSizePol.setHorizontalStretch (0);
 
     QHBoxLayout * hButtonsLay = new QHBoxLayout ();
+    hButtonsLay->addWidget(chSearchInResults);
     hButtonsLay->addStretch (1);
     //QSpacerItem *sp = new QSpacerItem (40, 20, QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
     //gLayout->addItem (sp, 2, 0, 1, 1, Qt::AlignLeft | Qt::AlignTop);
@@ -311,9 +314,14 @@ QItemSelectionModel * KKSSearchTemplatesForm :: selectionModel (void) const
     return searchView->selectionModel ();
 }
 
+void KKSSearchTemplatesForm :: setResultsVisible (bool isVisible)
+{
+    this->chSearchInResults->setVisible (isVisible);
+}
+
 void KKSSearchTemplatesForm :: addSearchTemplateType (void)
 {
-    qDebug () << __PRETTY_FUNCTION__;
+    //qDebug () << __PRETTY_FUNCTION__;
     QModelIndex pIndex = getCurrentIndex ();
     QAbstractItemModel * mod = dataModel ();
     if (pIndex.data (Qt::UserRole+USER_ENTITY) == 1)
@@ -323,7 +331,7 @@ void KKSSearchTemplatesForm :: addSearchTemplateType (void)
 
 void KKSSearchTemplatesForm :: editSearchTemplateType (void)
 {
-    qDebug () << __PRETTY_FUNCTION__;
+    //qDebug () << __PRETTY_FUNCTION__;
     QModelIndex wIndex = getCurrentIndex ();
     QAbstractItemModel * mod = dataModel ();
     if (wIndex.data (Qt::UserRole+USER_ENTITY) == 1)
@@ -333,7 +341,7 @@ void KKSSearchTemplatesForm :: editSearchTemplateType (void)
 
 void KKSSearchTemplatesForm :: delSearchTemplateType (void)
 {
-    qDebug () << __PRETTY_FUNCTION__;
+    //qDebug () << __PRETTY_FUNCTION__;
     QModelIndex wIndex = getCurrentIndex ();
     QAbstractItemModel * mod = dataModel ();
     if (wIndex.data (Qt::UserRole+USER_ENTITY) == 1)
@@ -389,7 +397,7 @@ void KKSSearchTemplatesForm :: refreshSearchTemplates (void)
 
 void KKSSearchTemplatesForm :: executeSt (void)
 {
-    qDebug () << __PRETTY_FUNCTION__;
+    //qDebug () << __PRETTY_FUNCTION__;
     int idSearchTemplate = this->getIdSearchTemplate();
     if (idSearchTemplate < 0)
     {
@@ -397,4 +405,9 @@ void KKSSearchTemplatesForm :: executeSt (void)
         return;
     }
     emit applySearchTemplate (idSearchTemplate);
+}
+
+Qt::CheckState KKSSearchTemplatesForm :: getSearchInRes (void) const
+{
+    return chSearchInResults->checkState();
 }

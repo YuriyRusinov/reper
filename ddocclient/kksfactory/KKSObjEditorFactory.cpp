@@ -2325,6 +2325,7 @@ void KKSObjEditorFactory :: refreshEIO (KKSObjEditor * editor, int idObject, con
         o->release ();
         return;
     }
+    t->addRef();
     //sourceMod->setData (QModelIndex(), val, Qt::UserRole+1);
     recList.clear ();
     
@@ -2343,6 +2344,7 @@ void KKSObjEditorFactory :: refreshEIO (KKSObjEditor * editor, int idObject, con
                                 true,
                                 c,
                                 tableName);
+    t->release ();
     c->release ();
     o->release ();
 }
@@ -2415,6 +2417,8 @@ void KKSObjEditorFactory :: filterTemplateEIO (KKSObjEditor * editor,
             return;
         }
         const KKSTemplate * t = new KKSTemplate (c->defTemplate());
+        if (stForm->getSearchInRes() == Qt::Unchecked)
+            editor->clearFilters();
         KKSList< const KKSFilterGroup*> filters = editor->filters();
         KKSFilterGroup * stGroup = searchT->getMainGroup ();
         filters.append (stGroup);
@@ -6830,7 +6834,10 @@ KKSSearchTemplatesForm * KKSObjEditorFactory :: GUISearchTemplate (bool mode, QW
     KKSSearchTemplatesForm *stForm = new KKSSearchTemplatesForm (c, "io_objects", mode, parent, flags);
     this->initSearchTemplateModel (stForm);
     if (!mode)
+    {
+        stForm->setResultsVisible(false);
         emit editorSearchTemplate (stForm);
+    }
     return stForm;
 }
 

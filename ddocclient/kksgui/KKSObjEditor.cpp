@@ -2230,6 +2230,11 @@ void KKSObjEditor :: setFilters (const KKSList<const KKSFilterGroup *>& filters)
     m_filters = filters;
 }
 
+void KKSObjEditor :: clearFilters (void)
+{
+    m_filters.clear ();
+}
+
 void KKSObjEditor :: sendIO (void)
 {
     if (isChanged)

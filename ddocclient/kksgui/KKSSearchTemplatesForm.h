@@ -13,6 +13,7 @@ class QModelIndex;
 class QAction;
 class QToolBar;
 class QLineEdit;
+class QCheckBox;
 
 class KKSCategory;
 
@@ -33,6 +34,10 @@ public:
     
     int getIndicatorSection (void) const;
     Qt::SortOrder getIndicatorOrder (void) const;
+    
+    Qt::CheckState getSearchInRes (void) const;
+    
+    void setResultsVisible (bool isVisible);
 
 private slots:
     void addEmptySearchTemplate (void);
@@ -104,6 +109,7 @@ private:
 
     QLineEdit * lEFilter;
 
+    QCheckBox * chSearchInResults;
     QPushButton * pbOk;
     QPushButton * pbCancel;
 

@@ -86,6 +86,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
 
         const KKSList<const KKSFilterGroup*> & filters() const;
         void setFilters (const KKSList<const KKSFilterGroup *>& filters);
+        void clearFilters (void);
 
         void set_object_ex_data (KKSObjectExemplar* ioObjectE);
         KKSObjectExemplar* getObjectEx (void);
