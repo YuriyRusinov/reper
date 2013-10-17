@@ -88,7 +88,7 @@ KKSObjEditor :: KKSObjEditor (const KKSTemplate *t,
                               QToolBar * tBar,
                               QWidget *parent, 
                               Qt::WindowFlags f)
-    : KKSDialog (parent, f),
+    : KKSRecDialog (false, Qt::Vertical, parent, f),
     m_sysTemplate (t),
     m_ioTemplate (_ioTemplate),
     m_recTemplate (rTemplate),
@@ -117,7 +117,7 @@ KKSObjEditor :: KKSObjEditor (const KKSTemplate *t,
     scIOAttrs (0),
     ioAttrsW (0),
     stateWidget (0),
-    recWidget (0),
+//    recWidget (0),
     fileWidget(0),
     includesWidget(0),
     includesRecWidget (0),
@@ -147,6 +147,7 @@ KKSObjEditor :: KKSObjEditor (const KKSTemplate *t,
     m_filters = filters;
 
     this->setLayout (mainLayout);
+    this->setRecordsWidget(0);
     
     if(pObj){
         QString title;
@@ -320,7 +321,7 @@ void KKSObjEditor :: accept (void)
     this->saveToDb (numCopies);
     if (!isChanged)
     {
-        KKSDialog::accept ();
+        KKSRecDialog::accept ();
         close ();
     }
 }
@@ -1077,6 +1078,7 @@ void KKSObjEditor :: editObjectE (void)
     int idObjectE=-1;
     int i = tabEnclosures ? tabEnclosures->currentIndex () : 0;
     QModelIndex recIndex;
+    KKSRecWidget * recWidget = this->getRecordsWidget ();
     if (i == 0 && recWidget && recWidget->getID() > 0)
     {
         idObjectE = recWidget->getID();//index.data(Qt::UserRole).toInt();
@@ -1147,6 +1149,7 @@ void KKSObjEditor :: delObjectE (void)
     if (res != QMessageBox::Yes)
         return;
     this->clearW ();
+    KKSRecWidget * recWidget = this->getRecordsWidget ();
     if (!recWidget || recWidget->getID() <= 0)
         return;
 
@@ -1256,6 +1259,7 @@ void KKSObjEditor :: updateEIOEx (KKSObject * refObj, const KKSMap<qint64, KKSOb
 //    qDebug () << __PRETTY_FUNCTION__ << tabName << nTab;
     int nTab (-1);
     QModelIndexList selIndexes;// = (nTab == 0 ? recWidget->getSourceIndexes() : addRecWidgets[nTab-1]->getSourceIndexes());
+    KKSRecWidget * recWidget = this->getRecordsWidget ();
     if (recWidget && recModel == recWidget->getSourceModel())
     {
         nTab = 0;
@@ -1287,6 +1291,7 @@ void KKSObjEditor :: addAdditionalCopy (KKSObjectExemplar * rec)
 void KKSObjEditor :: paintEvent (QPaintEvent * event)
 {
     QWidget::paintEvent (event);
+    KKSRecWidget * recWidget = this->getRecordsWidget ();
     if (recWidget && !hAttrWidths.isEmpty())
         recWidget->resizeSections (hAttrWidths);
     this->clearW ();
@@ -1832,7 +1837,7 @@ void KKSObjEditor :: childWidget (KKSObjEditor *editor)
     //editor->hide();//
     //editor->show ();
 }
-
+/*
 void KKSObjEditor :: setRecordsWidget (KKSRecWidget *rw)
 {
     if (recWidget)
@@ -1842,10 +1847,11 @@ void KKSObjEditor :: setRecordsWidget (KKSRecWidget *rw)
     }
     recWidget = rw;
 }
+ */
 
 void KKSObjEditor :: addRecordsWidget (KKSRecWidget *rw)
 {
-    if (!recWidget)
+    if (!getRecordsWidget())
         setRecordsWidget (rw);
 
     if (rw)
@@ -2068,6 +2074,7 @@ void KKSObjEditor :: setTabWidget (QTabWidget *tObj)
 
 void KKSObjEditor :: setAttrView (void)
 {
+    KKSRecWidget * recWidget = this->getRecordsWidget ();
     if (isChanged)
     {
         int res = QMessageBox::question (this, tr("Object editor"), tr ("Object was changed. Do you want to save it before ?"), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
@@ -2127,7 +2134,7 @@ void KKSObjEditor :: currentRecSelChanged (const QItemSelection& selected, const
 {
     qDebug () << __PRETTY_FUNCTION__ << selected << deselected;
 }
-
+/*
 int KKSObjEditor :: getID (void) const
 {
     if(recWidget)
@@ -2135,6 +2142,7 @@ int KKSObjEditor :: getID (void) const
 
 	return -1;
 }
+ */
 
 void KKSObjEditor :: rubricsChanged (void)
 {
@@ -2362,11 +2370,12 @@ void KKSObjEditor :: openReferenceRec (QString tableName, qint64 id)
     qDebug () << __PRETTY_FUNCTION__ << tableName;
     emit openRefRec (tableName, id);
 }
-
+/*
 KKSRecWidget * KKSObjEditor :: getRecordsWidget (void) const
 {
     return recWidget;
 }
+ */
 
 void KKSObjEditor :: setSyncType (QLineEdit * leType)
 {

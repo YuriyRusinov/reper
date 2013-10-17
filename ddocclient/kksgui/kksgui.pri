@@ -93,6 +93,7 @@ HEADERS += \
                 KKSAttrModel.h \
                 KKSDbgOutputWidget.h \
                 KKSAValWidget.h \
+                KKSRecDialog.h \
 	   	kksgui_config.h
 
 SOURCES += \
@@ -189,6 +190,7 @@ SOURCES += \
                 KKSSearchTemplateDialog.cpp \
                 KKSDbgOutputWidget.cpp \
                 KKSAValWidget.cpp \
+                KKSRecDialog.cpp
 
 FORMS   += \
                 ui/cmd_journal_form.ui \
@@ -310,4 +312,5 @@ headers.files += \
                 KKSDbgOutputWidget.h \
                 KKSAttrModel.h \
                 KKSAValWidget.h \
+                KKSRecDialog.h \
                 kksgui_config.h 

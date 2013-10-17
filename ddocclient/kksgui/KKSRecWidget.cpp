@@ -6,6 +6,7 @@
 #include <QIcon>
 #include <QTreeView>
 #include <QGridLayout>
+#include <QBoxLayout>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QItemSelectionModel>
@@ -30,7 +31,7 @@
 #include "KKSEIODataModel.h"
 #include "KKSRecWidget.h"
 
-KKSRecWidget :: KKSRecWidget (bool mode, QWidget *parent, Qt::WindowFlags f)
+KKSRecWidget :: KKSRecWidget (bool mode, Qt::Orientation orient, QWidget *parent, Qt::WindowFlags f)
     : QWidget (parent, f),
     tView (new QTreeView(this)),
     tBActions (new QToolBar(this)),
@@ -59,7 +60,7 @@ KKSRecWidget :: KKSRecWidget (bool mode, QWidget *parent, Qt::WindowFlags f)
     tView->setRootIsDecorated (false);
     tView->setSelectionBehavior (QAbstractItemView::SelectRows);
     //Q_INIT_RESOURCE (kksgui_icon_set);
-    this->init_widgets (mode);
+    this->init_widgets (mode, orient);
     hideFilter ();
 
     connect (actAdd, SIGNAL(triggered()), this, SLOT (addRec()) );
@@ -73,32 +74,6 @@ KKSRecWidget :: KKSRecWidget (bool mode, QWidget *parent, Qt::WindowFlags f)
     connect (tView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(tvDoubleClicked(const QModelIndex &)));
     connect (filterLE, SIGNAL (textEdited ( const QString &)), this, SLOT (filterRecs (const QString&)) );
 }
-/*
-KKSRecWidget :: KKSRecWidget (const QString& filterTitle, const QString& addTitle, const QString& editTitle, const QString& delTitle, const QString& importTitle, const QString& exportTitle, QTreeView *tView, bool mode, QWidget *parent, Qt::WindowFlags f)
-    : QWidget (parent, f),
-    tView (tView),
-    tBActions (new QToolBar(this)),
-//    tbFilter (new QToolButton (this)),//(tr("&Filter"))),
-    actFilter (new QAction (QIcon(), tr("&Filter"), this)),
-//    tbAdd (new QToolButton (this)),//(tr("&Add"))),
-    actAdd (new QAction (QIcon(), tr("&Add"), this)),
-//    tbEdit (new QToolButton (this)),//(tr("&Edit"))),
-    actEdit (new QAction (QIcon(), tr("&Edit"), this)),
-//    tbDel (new QToolButton (this)),//(tr("&Delete"))),
-    actDel (new QAction (QIcon(), tr("&Delete"), this)),
-//    tbImport (new QToolButton (this)),//(tr("&Import"))),
-    actImport (new QAction (QIcon(), tr("&Import"), this)),
-//    tbExport (new QToolButton (this)),//(tr("E&xport"))),
-    actExport (new QAction (QIcon(), tr("E&xport"), this)),
-    pbOk (new QPushButton (tr("&OK"))),
-    pbCancel (new QPushButton (tr("&Cancel"))),
-    pbApply (new QPushButton (tr("A&pply"))),
-//    tbSetView (new QToolButton (this)),//(tr("Set View")))
-    actSetView (new QAction (QIcon(), tr("Set View"), this))
-{
-    this->init_widgets (mode);
-}
-*/
 
 KKSRecWidget :: ~KKSRecWidget (void)
 {
@@ -169,7 +144,7 @@ void KKSRecWidget :: setEIOModel (QAbstractItemModel *model)
         delete oldModel;
 }
 
-void KKSRecWidget :: init_widgets (bool mode)
+void KKSRecWidget :: init_widgets (bool mode, Qt::Orientation orient)
 {
     gLay = new QGridLayout (this);
     if (!tView)
@@ -177,13 +152,20 @@ void KKSRecWidget :: init_widgets (bool mode)
     gLay->addWidget (tBActions, 0, 0, 1, 1);
     gLay->addWidget (tView, 2, 0, 1, 1);
 
-    QVBoxLayout * vButtonsLayout = new QVBoxLayout();
+    bool isVertical (orient == Qt::Vertical);
+    if (isVertical)
+        vButtonsLayout = new QVBoxLayout();
+    else
+        vButtonsLayout = new QHBoxLayout();
     vButtonsLayout->addStretch ();
     vButtonsLayout->addWidget (pbOk);
     vButtonsLayout->addWidget (pbCancel);
     vButtonsLayout->addWidget (pbApply);
 
-    gLay->addLayout (vButtonsLayout, 2, 1, 1, 1);
+    if (isVertical)
+        gLay->addLayout (vButtonsLayout, 2, 1, 1, 1);
+    else
+        gLay->addLayout (vButtonsLayout, 3, 0, 1, 1);
 
     QSize iconSize (24, 24);
     tBActions->setIconSize (iconSize);
@@ -244,6 +226,11 @@ void KKSRecWidget :: init_widgets (bool mode)
     pbOk->setVisible (mode);
     pbCancel->setVisible (mode);
     pbApply->setVisible (mode);
+}
+
+QBoxLayout * KKSRecWidget :: getButtonsLay (void) const
+{
+    return this->vButtonsLayout;
 }
 
 void KKSRecWidget :: filterRecs (const QString& text)

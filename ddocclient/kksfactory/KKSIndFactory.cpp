@@ -73,7 +73,7 @@ void KKSIndFactory ::setOEF (KKSObjEditorFactory * _oef)
 
 KKSRecWidget * KKSIndFactory :: getIOIndices (KKSObject * io, QWidget * parent, Qt::WindowFlags flags)
 {
-    KKSRecWidget * recW = new KKSRecWidget (false, parent, flags);
+    KKSRecWidget * recW = new KKSRecWidget (false, Qt::Vertical, parent, flags);
     QTreeView * tv = recW->getView();//new QTreeView;
     QAction * actNewInd =  new QAction (QIcon(":/ddoc/add_index.png"), tr ("Add new index"), recW);
     recW->insertToolBarAction (recW->actEdit, actNewInd);

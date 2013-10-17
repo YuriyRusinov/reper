@@ -41,7 +41,7 @@ KKSAttrEditor :: KKSAttrEditor (KKSAttribute *attr,
     ui (new Ui::kksattr_editor),
     io (0),
     searchTemplate(NULL),
-    m_recW(new KKSRecWidget(false, this))
+    m_recW(new KKSRecWidget(false, Qt::Vertical, this))
 {
     if (attribute)
         attribute->addRef ();

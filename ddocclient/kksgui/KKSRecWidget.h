@@ -29,13 +29,14 @@ class QToolBar;
 class QMenu;
 class QContextMenuEvent;
 class QLineEdit;
+class QBoxLayout;
 
 class KKSAttribute;
 
 class _GUI_EXPORT KKSRecWidget : public QWidget
 {
 public:
-    KKSRecWidget (bool mode=false, QWidget *parent=0, Qt::WindowFlags f=0);
+    KKSRecWidget (bool mode=false, Qt::Orientation orient=Qt::Vertical, QWidget *parent=0, Qt::WindowFlags f=0);
     //KKSRecWidget (const QString& filterTitle, const QString& addTitle, const QString& editTitle, const QString& delTitle, const QString& importTitle, const QString& exportTitle, QTreeView *tView, bool mode=false, QWidget *parent=0, Qt::WindowFlags f=0);
     ~KKSRecWidget (void);
 
@@ -79,6 +80,8 @@ public:
     void clearGroupMenu (void);
     QAction * addGroupAttribute (KKSAttribute * attr);
     
+    QBoxLayout * getButtonsLay (void) const;
+    
 protected:
     //
     // Widget reimplementation
@@ -113,7 +116,7 @@ private:
     // Functions
     //
     void setTreeView (QTreeView *_tv);
-    void init_widgets (bool mode);
+    void init_widgets (bool mode, Qt::Orientation orient);
     void setVisibleFrom (const QModelIndex & sParent=QModelIndex(), bool v=true);
 
 private:
@@ -130,6 +133,8 @@ private:
     QMenu * pFilter;
     QLineEdit * filterLE;
     QGroupBox * gbFilter;
+
+    QBoxLayout * vButtonsLayout;
 
 public:
 

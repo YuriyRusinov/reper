@@ -23,6 +23,7 @@
 #include "KKSList.h"
 #include "KKSFilter.h"
 #include "KKSDialog.h"
+#include "KKSRecDialog.h"
 
 class QPushButton;
 class QGridLayout;
@@ -59,7 +60,7 @@ class KKSStuffForm;
 class KKSIndicator;
 class KKSAttrValue;
 
-class _GUI_EXPORT KKSObjEditor : public KKSDialog
+class _GUI_EXPORT KKSObjEditor : public KKSRecDialog
 {
    public:
         KKSObjEditor (const KKSTemplate *t, //шаблон для системных параметров (т.е. как для ЭИО)
@@ -109,7 +110,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         bool showExecButton() const;
         void setShowExecButton(bool yes = true);
 
-        int getID (void) const;
+        //int getID (void) const;
 
         void save(int num=1);
 
@@ -298,8 +299,8 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
 
         void clearCbList (void);
 
-        void setRecordsWidget (KKSRecWidget *rw);
-        KKSRecWidget* getRecordsWidget (void) const;
+        //void setRecordsWidget (KKSRecWidget *rw);
+        //KKSRecWidget* getRecordsWidget (void) const;
         void addRecordsWidget (KKSRecWidget *rw);
         void addAdditionalCategory (const KKSCategory * wCat);
         void addAdditionalTable (KKSAddTable * wTable);
@@ -387,12 +388,6 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
         QMap<QCheckBox*, int> chIndOpt;
         QMultiMap<int, QWidget*> chIndOptWidgets;
         QMap<QToolButton *, int> tbViews;
-/*        KKSMap<int, const KKSIndicator*> ioIndicators;
-        QMap<int, QVariant> ioIndicatorsValues;
-        QMap<QToolButton *, int> tbIEdit;
-        QMap<QToolButton *, int> tbDelInds;
-        QMap<int, QWidget *> indWidgets;
-        QMap<int, QLabel *> indLabels;*/
         int numCopies;
 
         QList<int> hAttrWidths;
@@ -424,7 +419,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSDialog
 
         QWidget * stateWidget;
 
-        KKSRecWidget * recWidget;
+        //KKSRecWidget * recWidget;
         QList <KKSRecWidget *> addRecWidgets;
         KKSFileWidget * fileWidget;
         KKSIncludesWidget * includesWidget;

@@ -2256,7 +2256,7 @@ void KKSObjEditorFactory::filterEIO(KKSObjEditor * editor, int idObject, const K
         QTreeView * tv=0;
         int i = editor->tabEnclosures ? editor->tabEnclosures->currentIndex () : 0;
         if (i==0)
-            tv = editor->recWidget->getView();
+            tv = editor->getRecordsWidget()->getView();
         else if (i <= editor->addRecWidgets.count())
             tv = editor->addRecWidgets[i-1]->getView();
         KKSViewFactory::loadEIOEx (editor,
@@ -2332,7 +2332,7 @@ void KKSObjEditorFactory :: refreshEIO (KKSObjEditor * editor, int idObject, con
     QTreeView * tv=0;
     int i = editor->tabEnclosures ? editor->tabEnclosures->currentIndex () : 0;
     if (i==0)
-        tv = editor->recWidget->getView();
+        tv = editor->getRecordsWidget()->getView();
     else if (i <= editor->addRecWidgets.count())
         tv = editor->addRecWidgets[i-1]->getView();
     KKSViewFactory::loadEIOEx (editor,
@@ -2429,7 +2429,7 @@ void KKSObjEditorFactory :: filterTemplateEIO (KKSObjEditor * editor,
         QTreeView * tv=0;
         int i = editor->tabEnclosures ? editor->tabEnclosures->currentIndex () : 0;
         if (i==0)
-            tv = editor->recWidget->getView();
+            tv = editor->getRecordsWidget()->getView();
         else if (i <= editor->addRecWidgets.count())
             tv = editor->addRecWidgets[i-1]->getView();
         KKSViewFactory::loadEIOEx (editor,
@@ -4092,7 +4092,7 @@ void KKSObjEditorFactory :: setEIOTemplates (KKSObjEditor* editor, KKSObject* wO
         return;
     editor->setRecTemplate (tRef);
     KKSList<const KKSFilterGroup*> filters = editor->m_filters;
-    KKSViewFactory::loadEIOEx (editor, wObj, loader, tRef, editor->recWidget->getView(), filters, true);
+    KKSViewFactory::loadEIOEx (editor, wObj, loader, tRef, editor->getRecordsWidget()->getView(), filters, true);
     tRef->release ();
     editor->update ();
 }
@@ -4161,7 +4161,7 @@ void KKSObjEditorFactory :: slotIncludeRequested(KKSObjEditor * editor)
     QString name;
 
     if(res == QDialog::Accepted){
-        idObject = objEditor->recWidget->getID();
+        idObject = objEditor->getID();
         KKSObject * o = loader->loadIO(idObject, true);
         if(!o){
             delete objEditor;
@@ -4236,7 +4236,7 @@ void KKSObjEditorFactory :: slotIncludeRecRequested(KKSObjEditor * editor)
     int idObjRec (-1);
 
     if(res == QDialog::Accepted){
-        idObject = objEditor->recWidget->getID();
+        idObject = objEditor->getID();
         KKSObject * o = loader->loadIO(idObject, true);
         if(!o){
             delete objEditor;
@@ -4257,7 +4257,7 @@ void KKSObjEditorFactory :: slotIncludeRecRequested(KKSObjEditor * editor)
                                                           Qt::Dialog);
         if (refObjEditor->exec() == QDialog::Accepted)
         {
-            idObjRec = refObjEditor->recWidget->getID();
+            idObjRec = refObjEditor->getID();
             KKSObjectExemplar * rec = loader->loadEIO(idObjRec, o);
             if (rec)
             {
@@ -5031,7 +5031,7 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io,
     int i = oEditor->tabEnclosures->currentIndex ();
     QTreeView * tv=0;
     if (i==0)
-        tv = oEditor->recWidget->getView();
+        tv = oEditor->getRecordsWidget()->getView();
     else if (i <= oEditor->addRecWidgets.count())
         tv = oEditor->addRecWidgets[i-1]->getView();
 
@@ -5872,8 +5872,8 @@ void KKSObjEditorFactory :: sendIO (KKSObject *wObj, KKSObjectExemplar *wObjE, K
         idObj = wObjE->id ();
         idAuthor = -1;//мы не знаем здесь автора (отсылка из справочника ИО)
     }
-    else if (editor && editor->recWidget){//здесь автор тоже неизвестен
-        idObj = editor->recWidget->getID();
+    else if (editor && editor->getRecordsWidget()){//здесь автор тоже неизвестен
+        idObj = editor->getID();
         idAuthor = -1;
     }
     else
@@ -6982,7 +6982,7 @@ void KKSObjEditorFactory::applySearchTemplate (int idSearchTemplate)
                                              Qt::NonModal,
                                              0);
     QTreeView * tv=0;
-    tv = editor->recWidget->getView();
+    tv = editor->getRecordsWidget()->getView();
     QString tableName = o->tableName();
     //qDebug () << __PRETTY_FUNCTION__ << tableName;
     if (idObject == IO_IO_ID && loader->getUserId() != ADMIN_ROLE)
@@ -7614,7 +7614,7 @@ void KKSObjEditorFactory :: addIOTable (KKSObject * wObj, KKSObjEditor * editor)
 
     if (recEditor->exec () == QDialog::Accepted)
     {
-        int idCat = recEditor->recWidget->getID ();
+        int idCat = recEditor->getID ();
         qDebug () << __PRETTY_FUNCTION__ << idCat;
         //QWidget * rw = new QWidget (editor);
         //KKSRecWidget * rw = new KKSRecWidget (tabEnc);

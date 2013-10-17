@@ -61,7 +61,7 @@ KKSIncludesWidget::KKSIncludesWidget(KKSRubric * rootRubric,
     tBRubrActions (new QToolBar (this)),
     spRubrics (new QSplitter (Qt::Horizontal, this)),
     twIncludes (new QTreeView (spRubrics)),
-    recWItems (new KKSRecWidget (false, spRubrics)),
+    recWItems (new KKSRecWidget (false, Qt::Vertical, spRubrics)),
     tvItems (recWItems->getView()),
     pMenu (new QMenu(this))
 {
