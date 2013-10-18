@@ -7082,46 +7082,6 @@ void KKSObjEditorFactory :: addNewSearchTempl (const QModelIndex& parent,
     KKSMap<int, KKSSearchTemplateType*> sTemplates = loader->loadSearchTemplateTypes ();
     KKSSearchTemplateType * stt = sTemplates.value (idSearchType);
     st->setType (stt);
-/*
-    const KKSCategory * c = cat;
-
-    if(!c){
-        KKSObject * o = loader->loadIO (IO_IO_ID, true);
-        if (!o)
-        {
-            st->release ();
-            return;
-        }
-
-        c = o->category()->tableCategory();
-        if (!c)
-        {
-            o->release();
-            st->release ();
-            return;
-        }
-        o->release();
-    }
-
-    st->setCategory(c->id(), c->name());
-
-    KKSMap<int, KKSAttribute *> attrsIO;
-    if(!c || (c && c->id() == IO_TABLE_CATEGORY_ID))
-        attrsIO = loader->loadIOUsedAttrs ();//атрибуты информационных объектов грузим только если обрабатываем справоник ИО
-    
-    //KKSFiltersEditorForm *filterForm = new KKSFiltersEditorForm (c, tableName, attrsIO, false, st, pWidget);
-    KKSSearchTemplateForm * filterForm = new KKSSearchTemplateForm (c, tableName, attrsIO, false, st, isMod, pWidget);
-    QAbstractItemModel * searchTypesMod = new QStandardItemModel (0, 1);
-    searchTypesMod->setHeaderData(0, Qt::Horizontal, tr("Search template type name"), Qt::DisplayRole);
-    KKSViewFactory::getSearchTemplates(loader, searchTypesMod, QModelIndex(), false);
-    filterForm->setSearchTemplateModel (searchTypesMod);
-    QModelIndex tIndex = KKSViewFactory::searchModelIndex(searchTypesMod, idSearchType, QModelIndex(), Qt::UserRole);
-    filterForm->selectTypeInd (tIndex);
-    QModelIndex catInd;
-    QAbstractItemModel * catModel = initSearchCatsModel (st, catInd);
-    filterForm->setCatModel (catModel);
-    filterForm->setCatInd (catInd);
- */   
     KKSSearchTemplateForm * filterForm = GUISearchTemplateInit (st, cat, false, tableName, isMod, pWidget);
     connect (filterForm, SIGNAL (saveSearchCriteria (KKSSearchTemplate *, KKSFilterGroup *, const KKSCategory *)), this, SLOT (saveSearchCriteria (KKSSearchTemplate *, KKSFilterGroup *, const KKSCategory *)) );
     //connect (filterForm, SIGNAL (loadAttributeRefValues (const QString &, const KKSAttribute *, QComboBox *)), this, SLOT (loadAttributeFilters (const QString &, const KKSAttribute *, QComboBox *)) );
@@ -7144,22 +7104,26 @@ void KKSObjEditorFactory :: addNewSearchTempl (const QModelIndex& parent,
             if(searchMod){
                 int nr = searchMod->rowCount(pIndex);
                 searchMod->insertRows (nr, 1, pIndex);
+                QModelIndex wIndex = searchMod->index (nr, 0, pIndex);
                 if (searchMod->columnCount(pIndex) >= 1)
                 {
-                    QModelIndex wIndex = searchMod->index (nr, 0, pIndex);
                     searchMod->setData (wIndex, stName, Qt::DisplayRole);
                     searchMod->setData (wIndex, res, Qt::UserRole);
                 }
                 else
                 {
-                    QModelIndex wIndex = searchMod->index (nr, 0, pIndex);
                     searchMod->setData (wIndex, res, Qt::DisplayRole);
                     searchMod->setData (wIndex, res, Qt::UserRole);
                     
-                    wIndex = searchMod->index (nr, 1, pIndex);
-                    searchMod->setData (wIndex, stName, Qt::DisplayRole);
-                    searchMod->setData (wIndex, res, Qt::UserRole);
+                    QModelIndex w1Index = searchMod->index (nr, 1, pIndex);
+                    searchMod->setData (w1Index, stName, Qt::DisplayRole);
+                    searchMod->setData (w1Index, res, Qt::UserRole);
                 }
+                searchMod->setData (wIndex, QIcon(":/ddoc/rubric_item.png").pixmap(24, 24), Qt::DecorationRole);
+                searchMod->setData (wIndex, 1, Qt::UserRole+USER_ENTITY);
+                QSize searchRow = searchMod->data (wIndex, Qt::SizeHintRole).toSize();
+                searchRow.rheight() = 24;
+                searchMod->setData (wIndex, searchRow, Qt::SizeHintRole);
             }
         }
     }
