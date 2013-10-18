@@ -23,6 +23,7 @@
 #include <KKSMap.h>
 
 class KKSObjEditor;
+class KKSRecDialog;
 class KKSTemplate;
 class KKSObject;
 class KKSObjectExemplar;
@@ -82,7 +83,7 @@ public:
                                    QWidget *parent=0,
                                    Qt::WindowFlags f=0);
 
-    KKSObjEditor* createObjRecEditor (int idObject,// идентификатор ИО, который будет содержать создаваемый (редактируемый) ЭИО (для ЭИО, которые являются ИО этот идентификатор должен быть равен IO_IO_ID)
+    KKSRecDialog* createObjRecEditor (int idObject,// идентификатор ИО, который будет содержать создаваемый (редактируемый) ЭИО (для ЭИО, которые являются ИО этот идентификатор должен быть равен IO_IO_ID)
                                       qint64 idObjE, // идентификатор создаваемого (редактируемого) ЭИО. Если ЭИО создается, должно быть равно -1
                                       const KKSList<const KKSFilterGroup *> & filters,// Применяется для ЭИО, которые являются контейнерными ИО. Содержит набор фильтров их таблицы
                                       const QString & extraTitle,
@@ -226,7 +227,7 @@ private:
 
 signals:
     void editorCreated (KKSObjEditor * editor);
-    void editorCreatedModal (KKSObjEditor * editor);
+    void editorCreatedModal (KKSRecDialog * editor);
     void categoryEditorCreated (KKSCatEditor *cEditor);
     void categoryEditorCreatedModal (KKSCatEditor *cEditor);
     void attributesListLoaded (KKSAttributesEditor *aEditor);

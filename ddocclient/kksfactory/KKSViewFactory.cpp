@@ -2163,7 +2163,8 @@ void KKSViewFactory::getSearchTemplates (KKSLoader * loader, QAbstractItemModel 
             prevIndex = searchModelRowsIndexMultiType (searchTModel, st->parent()->id(), 0, QModelIndex(), Qt::UserRole);
             ncount = searchTModel->rowCount (prevIndex);
             bool isIns = searchTModel->insertRows(ncount, 1, prevIndex);
-            Q_UNUSED (isIns);
+            if (!isIns)
+                continue;
             if (searchTModel->columnCount (prevIndex) == 0)
                 searchTModel->insertColumns (0, nCols, prevIndex);
             wIndex = searchTModel->index (ncount, 0, prevIndex);

@@ -7,7 +7,9 @@
 
 #include <QCloseEvent>
 #include <QGridLayout>
+#include <QTreeView>
 
+#include <KKSAttribute.h>
 #include "KKSRecWidget.h"
 #include "KKSRecDialog.h"
 
@@ -37,6 +39,8 @@ KKSRecWidget* KKSRecDialog::getRecordsWidget (void) const
 
 void KKSRecDialog::setRecordsWidget (KKSRecWidget *rw)
 {
+    if (recW == rw)
+        return;
     if (recW)
     {
         recW->setParent (0);
@@ -44,6 +48,13 @@ void KKSRecDialog::setRecordsWidget (KKSRecWidget *rw)
         recW = 0;
     }
     recW = rw;
+    if (recW && recW->getSourceModel())
+    {
+        QAbstractItemModel * sMod = recW->getSourceModel();
+        const KKSCategoryAttr * cAttrP = sMod->data(QModelIndex(), Qt::UserRole+3).value<const KKSCategoryAttr *>();
+        if (cAttrP)
+            recW->getView()->setRootIsDecorated(true);
+    }
 }
 
 const QIcon & KKSRecDialog::icon() const

@@ -20,6 +20,7 @@
 #include "KKSObjEditorFactory.h"
 #include "KKSStuffFactory.h"
 #include <KKSObjEditor.h>
+#include <KKSRecDialog.h>
 #include <KKSObject.h>
 #include <KKSObjectExemplar.h>
 #include "KKSAttrType.h"
@@ -421,7 +422,7 @@ void KKSRubricFactory::rubricItemUpload(const KKSRubric *r, bool forRecords, QAb
         group->release();
     }
 
-    KKSObjEditor *objEditor = oef->createObjRecEditor(IO_IO_ID,
+    KKSRecDialog *objEditor = oef->createObjRecEditor(IO_IO_ID,
             IO_IO_ID,
             filterGroups,
             tr("Select reference IO"),
@@ -478,7 +479,7 @@ void KKSRubricFactory::rubricItemUpload(const KKSRubric *r, bool forRecords, QAb
                 return;
             }
             c = c->tableCategory();
-            KKSObjEditor *recEditor = oef->createObjRecEditor(IO_IO_ID,
+            KKSRecDialog *recEditor = oef->createObjRecEditor(IO_IO_ID,
                     idObject,
                     filterGroups,
                     tr("Select record for rubric"),
@@ -573,7 +574,7 @@ void KKSRubricFactory::appendRecord(int idObject, const KKSRubric* r, QAbstractI
     }
     QWidget * objEditor = qobject_cast<QWidget *>(this->sender());
     KKSList<const KKSFilterGroup *> recFilterGroups;
-    KKSObjEditor * refObjEditor = oef->createObjRecEditor(IO_IO_ID,
+    KKSRecDialog * refObjEditor = oef->createObjRecEditor(IO_IO_ID,
             idObject,
             recFilterGroups,
             "",
@@ -706,7 +707,7 @@ void KKSRubricFactory::loadCategory(RubricForm * rForm)
     fg->setFilters(fl);
     filters.append(fg);
     fg->release();
-    KKSObjEditor * recEditor = oef->createObjRecEditor(IO_IO_ID,
+    KKSRecDialog * recEditor = oef->createObjRecEditor(IO_IO_ID,
             refObj->id(),
             filters,
             "",
@@ -1012,7 +1013,7 @@ void KKSRubricFactory::copyFromRubric(KKSRubric * rDest, QAbstractItemModel * aM
         return;
     }
 
-    KKSObjEditor * oEditor = oef->createObjRecEditor(IO_IO_ID, IO_RUBR_ID, filters, tr("Select source rubric"), cat, true, Qt::WindowModal);
+    KKSRecDialog * oEditor = oef->createObjRecEditor(IO_IO_ID, IO_RUBR_ID, filters, tr("Select source rubric"), cat, true, Qt::WindowModal);
     if (oEditor && oEditor->exec() == QDialog::Accepted) {
         int idRubr = oEditor->getID();
         KKSRubric * rSource = loader->loadRubric(idRubr, true);

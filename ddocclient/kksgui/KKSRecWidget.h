@@ -51,6 +51,7 @@ public:
     QModelIndexList getSourceIndexes (void) const;
     QItemSelection getSourceSelection (void) const;
     QTreeView * getView (void) const;
+    QToolBar * getToolBar (void) const;
     QAbstractItemDelegate * getItemDelegate () const;
     void setItemDelegate (QAbstractItemDelegate * deleg);
 

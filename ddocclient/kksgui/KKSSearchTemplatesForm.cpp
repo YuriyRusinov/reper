@@ -27,16 +27,17 @@
 #include "KKSHIntervalW.h"
 #include "defines.h"
 #include "KKSCategory.h"
+#include "KKSRecWidget.h"
 #include <KKSEventFilter.h>
 #include <KKSItemDelegate.h>
 
 KKSSearchTemplatesForm :: KKSSearchTemplatesForm (const KKSCategory * c1, const QString & tableName, bool mode, QWidget * parent, Qt::WFlags f)
-    : QDialog (parent, f),
+    : KKSRecDialog (mode, Qt::Horizontal, parent, f),
     idUser (-1),
     c(c1),
     m_tableName(tableName),
-    searchView (new QTreeView (this)),
-    tbActions (new QToolBar (this)),
+    searchView (getRecordsWidget()->getView()),
+    tbActions (getRecordsWidget()->getToolBar()),
     actAddNew (new QAction (tr("&Add empty template"), this)),
     actAddCopy (new QAction (tr("Add copy template"), this)),
     actEdit (new QAction (tr("&Edit template"), this)),
@@ -48,12 +49,15 @@ KKSSearchTemplatesForm :: KKSSearchTemplatesForm (const KKSCategory * c1, const 
     actExecute (new QAction(tr("E&xecute search template"), this)),
     lEFilter (new QLineEdit (this)),
     chSearchInResults (new QCheckBox(tr("Search in results"), this)),
-    pbOk (new QPushButton (tr("&OK"), this)),
-    pbCancel (new QPushButton (tr("&Cancel"), this))
+    pbOk (recW->pbOk),
+    pbCancel (recW->pbCancel)
 {
+    searchView->setRootIsDecorated(true);
+    recW->pbApply->setVisible (false);
     if(c)
         c->addRef();
 
+    tbActions->clear ();
     this->init ();
 
     tbActions->setIconSize (QSize(24, 24));
@@ -410,4 +414,9 @@ void KKSSearchTemplatesForm :: executeSt (void)
 Qt::CheckState KKSSearchTemplatesForm :: getSearchInRes (void) const
 {
     return chSearchInResults->checkState();
+}
+
+qint64 KKSSearchTemplatesForm :: getID (void) const
+{
+    return this->getIdSearchTemplate();
 }

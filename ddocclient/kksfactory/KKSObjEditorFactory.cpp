@@ -53,7 +53,8 @@
 #include <QtDebug>
 
 #include "KKSObjEditorFactory.h"
-#include "KKSObjEditor.h"
+#include <KKSObjEditor.h>
+#include <KKSRecDialog.h>
 #include "KKSObject.h"
 #include <KKSIndicator.h>
 #include "KKSObjectExemplar.h"
@@ -1434,7 +1435,7 @@ void KKSObjEditorFactory :: initIOAttrs (KKSObject * io, KKSObjectExemplar * wOb
  * виджет просмотра и выбора подходящей записи.
 */
 
-KKSObjEditor* KKSObjEditorFactory :: createObjRecEditor (int idObject,// идентификатор ИО, который будет содержать создаваемый (редактируемый) ЭИО (для ЭИО, которые являются ИО этот идентификатор должен быть равен IO_IO_ID) 
+KKSRecDialog* KKSObjEditorFactory :: createObjRecEditor (int idObject,// идентификатор ИО, который будет содержать создаваемый (редактируемый) ЭИО (для ЭИО, которые являются ИО этот идентификатор должен быть равен IO_IO_ID) 
                                                          qint64 idObjE, // идентификатор создаваемого (редактируемого) ЭИО. Если ЭИО создается, должно быть равно -1
                                                          const KKSList<const KKSFilterGroup *> & filters,// Применяется для ЭИО, которые являются контейнерными ИО. Содержит набор фильтров их таблицы
                                                          const QString & extraTitle,
@@ -1443,8 +1444,14 @@ KKSObjEditor* KKSObjEditorFactory :: createObjRecEditor (int idObject,// идентиф
                                                          bool toolB,
                                                          Qt::WindowModality windowModality, // модальность окна
                                                          QWidget *parent, 
-                                                         Qt::WindowFlags f)
+                                                         Qt::WindowFlags flags)
 {
+    if (idObjE == IO_SEARCH_ID)
+    {
+        KKSSearchTemplatesForm *stForm = new KKSSearchTemplatesForm (wCat, "io_objects", true, parent, flags);
+        this->initSearchTemplateModel (stForm);
+        return stForm;
+    }
     KKSObject *obj = 0;
     KKSObjectExemplar * wObjE = 0;
     const KKSTemplate * tSystem = 0;//new KKSTemplate (obj->category()->tableCategory()->defTemplate());
@@ -1463,7 +1470,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjRecEditor (int idObject,// идентиф
 
     KKSTemplate * tRec = this->getRecordTemplate(io, wCat);
 
-    KKSObjEditor * objEditorWidget = new KKSObjEditor (tSystem, ioTemplate, tRec, wCat, filters, extraTitle, mode, wObjE, io, (idObject == IO_IO_ID ? true:false), 0, parent, f);
+    KKSObjEditor * objEditorWidget = new KKSObjEditor (tSystem, ioTemplate, tRec, wCat, filters, extraTitle, mode, wObjE, io, (idObject == IO_IO_ID ? true:false), 0, parent, flags);
 
     if (mode)
         objEditorWidget->setWindowModality (windowModality);
@@ -3354,7 +3361,7 @@ void KKSObjEditorFactory :: loadAttributeReference (QString tableName, QWidget *
 
     }
 
-    KKSObjEditor * recEditor = this->createObjRecEditor (IO_IO_ID, 
+    KKSRecDialog * recEditor = this->createObjRecEditor (IO_IO_ID, 
                                                          refObj->id (), 
                                                          //editor->m_filters, 
                                                          filters,//KKSList<const KKSFilterGroup*>(), 
@@ -3551,7 +3558,8 @@ void KKSObjEditorFactory :: loadAttributeReference (QString tableName, QWidget *
         CommandForm * cForm = qobject_cast<CommandForm *> (this->sender());
         QLineEdit * lE = qobject_cast<QLineEdit *> (awAttr);
         KKSMap<int, KKSCategoryAttr*>::const_iterator pa = cForm->getCommand()->io()->category()->tableCategory()->attributes().constFind (idAttr);
-        switch (recEditor->getObjectEx()->id())
+        KKSObjEditor * oRecEditor = qobject_cast<KKSObjEditor *>(recEditor);
+        switch (oRecEditor->getObjectEx()->id())
         {
             case IO_CAT_ID:
                 {
@@ -3819,7 +3827,7 @@ void KKSObjEditorFactory :: setRecState (KKSObjEditor * editor, QWidget * stateW
     //aRefW->
 
     KKSList<const KKSFilterGroup*> filters;
-    KKSObjEditor * recEditor = this->createObjRecEditor (IO_IO_ID, 
+    KKSRecDialog * recEditor = this->createObjRecEditor (IO_IO_ID, 
                                                          refObj->id (), 
                                                          //editor->m_filters, 
                                                          filters,//KKSList<const KKSFilterGroup*>(), 
@@ -3873,7 +3881,7 @@ void KKSObjEditorFactory :: loadExecReference (QAbstractItemModel *exModel)
     QWidget * wEditor = qobject_cast<QWidget *>(this->sender());
     KKSList<const KKSFilterGroup*> filters;
 
-    KKSObjEditor * recEditor = this->createObjRecEditor (IO_IO_ID, 
+    KKSRecDialog * recEditor = this->createObjRecEditor (IO_IO_ID, 
                                                          refObj->id (), 
                                                          filters,
                                                          "",
@@ -3951,7 +3959,7 @@ void KKSObjEditorFactory :: addExecReference (QString tableName, QAbstractItemMo
     QWidget * wEditor = qobject_cast<QWidget *>(this->sender());
     KKSList<const KKSFilterGroup*> filters;
 
-    KKSObjEditor * recEditor = this->createObjRecEditor (IO_IO_ID, 
+    KKSRecDialog * recEditor = this->createObjRecEditor (IO_IO_ID, 
                                                          refObj->id (), 
                                                          filters,
                                                          "",
@@ -4219,7 +4227,7 @@ void KKSObjEditorFactory :: slotIncludeRecRequested(KKSObjEditor * editor)
     filterGroups.append(group);
     group->release();
     
-    KKSObjEditor *objEditor = createObjRecEditor(IO_IO_ID, 
+    KKSRecDialog *objEditor = createObjRecEditor(IO_IO_ID, 
                                                  IO_IO_ID, 
                                                  filterGroups, 
                                                  "",
@@ -4245,7 +4253,7 @@ void KKSObjEditorFactory :: slotIncludeRecRequested(KKSObjEditor * editor)
         /*name = o->name();
         o->release();*/
         KKSList<const KKSFilterGroup *> recFilterGroups;
-        KKSObjEditor * refObjEditor = createObjRecEditor (IO_IO_ID,
+        KKSRecDialog * refObjEditor = createObjRecEditor (IO_IO_ID,
                                                           idObject,
                                                           recFilterGroups,
                                                           "",
@@ -6210,7 +6218,7 @@ void KKSObjEditorFactory :: addSendIO (void)
 
     fg->release ();
 
-    KKSObjEditor * editor = this->createObjRecEditor (IO_IO_ID,
+    KKSRecDialog * editor = this->createObjRecEditor (IO_IO_ID,
                                                       IO_IO_ID,
                                                       filterGroup,
                                                       "",
@@ -6220,7 +6228,7 @@ void KKSObjEditorFactory :: addSendIO (void)
                                                       messDial,
                                                       Qt::Dialog);
 
-    if (editor && editor->exec() == QDialog::Accepted && editor->getID () > 0)
+    if (qobject_cast<KKSObjEditor *>(editor) && editor->exec() == QDialog::Accepted && editor->getID () > 0)
     {
         qDebug () << __PRETTY_FUNCTION__ << editor->getID();
         QAbstractItemModel *sAttModel = messDial->getAttachmentsModel ();
@@ -6229,8 +6237,9 @@ void KKSObjEditorFactory :: addSendIO (void)
         KKSTemplate * t = new KKSTemplate (c->defTemplate());
         if (t)
         {
+            KKSObjEditor * oEditor = qobject_cast<KKSObjEditor *>(editor);
             KKSMap<qint64, KKSObjectExemplar *> recs;
-            recs.insert(editor->getID(), editor->getObjectEx());
+            recs.insert(editor->getID(), oEditor->getObjectEx());
             KKSViewFactory::updateEIOEx (loader, io, recs, t, sAttModel);
             t->release ();
         }
@@ -6934,7 +6943,7 @@ void KKSObjEditorFactory::applySearchTemplate (int idSearchTemplate)
     }
     else if (rList.count() > 1)
     {
-        KKSObjEditor * recEditor = this->createObjRecEditor(IO_IO_ID,IO_IO_ID,filters,tr("Select reference"), ct, true, false, Qt::WindowModal, 0, Qt::Dialog);
+        KKSRecDialog * recEditor = this->createObjRecEditor(IO_IO_ID,IO_IO_ID,filters,tr("Select reference"), ct, true, false, Qt::WindowModal, 0, Qt::Dialog);
         if (recEditor && recEditor->exec() == QDialog::Accepted)
         {
             idObject = recEditor->getID();
@@ -7597,7 +7606,7 @@ void KKSObjEditorFactory :: addIOTable (KKSObject * wObj, KKSObjEditor * editor)
     fg->setFilters(fl);
     filters.append(fg);
     fg->release();
-    KKSObjEditor * recEditor = this->createObjRecEditor (IO_IO_ID, 
+    KKSRecDialog * recEditor = this->createObjRecEditor (IO_IO_ID, 
                                                          IO_CAT_ID, 
                                                          filters,
                                                          "",
@@ -7712,7 +7721,7 @@ void KKSObjEditorFactory :: loadObjAttrRef (KKSObject * wObj, const KKSAttrValue
     filters.append (fg);
     fg->release ();
 
-    KKSObjEditor * recEditor = this->createObjRecEditor (IO_IO_ID, 
+    KKSRecDialog * recEditor = this->createObjRecEditor (IO_IO_ID, 
                                                          refObj->id (), 
                                                          //editor->m_filters, 
                                                          filters, 
@@ -7827,7 +7836,7 @@ void KKSObjEditorFactory :: loadObjCAttrRef (KKSObjectExemplar * wObjE, const KK
     filters.append (fg);
     fg->release ();
 
-    KKSObjEditor * recEditor = this->createObjRecEditor (IO_IO_ID, 
+    KKSRecDialog * recEditor = this->createObjRecEditor (IO_IO_ID, 
                                                          refObj->id (), 
                                                          //editor->m_filters, 
                                                          filters, 
@@ -7950,7 +7959,7 @@ void KKSObjEditorFactory :: loadSyncType (QString tableName, QWidget * attrW, qi
         }
     }
 
-    KKSObjEditor * recEditor = this->createObjRecEditor (IO_IO_ID, 
+    KKSRecDialog * recEditor = this->createObjRecEditor (IO_IO_ID, 
                                                          refObj->id (), 
                                                          //editor->m_filters, 
                                                          filters,//KKSList<const KKSFilterGroup*>(), 
@@ -8045,7 +8054,7 @@ void KKSObjEditorFactory :: loadSyncAddAttrRef (KKSAttrValue * avE, QAbstractIte
     filters.append (fg);
     fg->release ();
 
-    KKSObjEditor * recEditor = this->createObjRecEditor (IO_IO_ID, 
+    KKSRecDialog * recEditor = this->createObjRecEditor (IO_IO_ID, 
                                                          refObj->id (), 
                                                          //editor->m_filters, 
                                                          filters, 
@@ -9464,7 +9473,7 @@ void KKSObjEditorFactory :: loadLifeCycleState (KKSLifeCycleEx * lc, QLineEdit *
     fg->setFilters(stFilters);
     filters.append(fg);
     fg->release();
-    KKSObjEditor * wEditor = this->createObjRecEditor (IO_IO_ID,
+    KKSRecDialog * wEditor = this->createObjRecEditor (IO_IO_ID,
                                                        IO_STATE_ID,
                                                        filters,
                                                        tr("Set state"),
@@ -9597,7 +9606,7 @@ void KKSObjEditorFactory :: addLifeCycleState (KKSLifeCycleEx * lc, QAbstractIte
     fg->setFilters(stFilters);
     filters.append(fg);
     fg->release();
-    KKSObjEditor * wEditor = this->createObjRecEditor (IO_IO_ID,
+    KKSRecDialog * wEditor = this->createObjRecEditor (IO_IO_ID,
                                                        IO_STATE_ID,
                                                        filters,
                                                        tr("Set state"),

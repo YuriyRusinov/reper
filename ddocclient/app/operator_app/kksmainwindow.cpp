@@ -1479,7 +1479,7 @@ void KKSMainWindow::slotCreateLC()
 void KKSMainWindow::slotOpenLC()
 {
     KKSCatEditorFactory * catF = kksSito->catf();
-    KKSObjEditor * lcEditor = catF->openLifeCycle();
+    KKSObjEditor * lcEditor = qobject_cast<KKSObjEditor *>(catF->openLifeCycle());
 
     slotCreateNewObjEditor (lcEditor);
 }

@@ -39,6 +39,7 @@ class KKSAttributesFactory;
 class KKSStuffFactory;
 class KKSRecWidget;
 class KKSObjEditor;
+class KKSRecDialog;
 class kkslifecycleform;
 class KKSLifeCycleEx;
 
@@ -100,7 +101,7 @@ class _F_EXPORT KKSCatEditorFactory : public KKSEntityFactory
         void saveLifeCycleToDb (KKSLifeCycleEx * lc);
         
     public slots:
-        KKSObjEditor * openLifeCycle ();
+        KKSRecDialog * openLifeCycle ();
         kkslifecycleform * createLifeCycle ();
 
     private slots:

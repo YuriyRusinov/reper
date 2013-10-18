@@ -639,3 +639,8 @@ void KKSRecWidget :: enableFilterMenu (bool enable)
 {
     this->pFilter->setEnabled (enable);
 }
+
+QToolBar * KKSRecWidget :: getToolBar (void) const
+{
+    return this->tBActions;
+}

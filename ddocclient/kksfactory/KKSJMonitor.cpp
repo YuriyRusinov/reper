@@ -33,6 +33,7 @@
 #include <KKSJournalWidget.h>
 
 #include <KKSObjEditor.h>
+#include <KKSRecDialog.h>
 #include <KKSFile.h>
 
 #ifndef WIN32
@@ -830,7 +831,7 @@ void KKSJMonitor::slotExecuteExCmd(int idJournal, int idCategory)
     filterGroups.append(group);
     group->release();
     
-    KKSObjEditor *objEditor = m_oef->createObjRecEditor(IO_IO_ID, 
+    KKSRecDialog *objEditor = m_oef->createObjRecEditor(IO_IO_ID, 
                                                         IO_IO_ID, 
                                                         filterGroups, 
                                                         "",

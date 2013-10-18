@@ -32,6 +32,9 @@ public:
     const QIcon & icon() const;
 
 protected:
+    //
+    // override functions
+    //
     virtual void closeEvent (QCloseEvent * event);
 
     QIcon m_icon; // иконка, которая отображается в меню и тулбаре главного окна, когда данное окно отображено как QMdiSubWindow
@@ -39,7 +42,7 @@ protected:
 signals:
     void aboutToClose(KKSRecDialog *);
 
-private:
+protected:
     //
     // Variables
     //

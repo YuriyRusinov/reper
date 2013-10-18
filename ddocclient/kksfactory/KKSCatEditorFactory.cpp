@@ -32,6 +32,7 @@
 #include "KKSTemplateEditorFactory.h"
 #include <KKSCatEditor.h>
 #include <KKSObjEditor.h>
+#include <KKSRecDialog.h>
 #include <KKSCategory.h>
 #include <KKSAttribute.h>
 #include <KKSRecWidget.h>
@@ -793,7 +794,7 @@ void KKSCatEditorFactory :: copyAttributesIntoCategory (KKSCategory *c, QAbstrac
     if (!ioCat)
         return;
     KKSList<const KKSFilterGroup *> filters;
-    KKSObjEditor * oEditor = objf->createObjRecEditor (IO_IO_ID,
+    KKSRecDialog * oEditor = objf->createObjRecEditor (IO_IO_ID,
                                                        IO_CAT_ID,
                                                        filters,
                                                        tr ("Select source category"),
@@ -974,7 +975,7 @@ void KKSCatEditorFactory :: setLifeCycleIntoCategory (KKSCategory * c, QLineEdit
         wCat = wCat->tableCategory();
     if (lcIO)
         lcIO->release();
-    KKSObjEditor * lcEditor = this->objf->createObjRecEditor(IO_IO_ID,
+    KKSRecDialog * lcEditor = this->objf->createObjRecEditor(IO_IO_ID,
                                                              IO_LIFE_CYCLE_ID,
                                                              KKSList<const KKSFilterGroup *>(),
                                                              tr("Set life cycle onto category %1").arg (c->name()),
@@ -1140,7 +1141,7 @@ void KKSCatEditorFactory :: delLifeCycle (QWidget * editor, int idObject, qint64
     recModel->removeRows (row, 1, pInd);
 }
 
-KKSObjEditor * KKSCatEditorFactory :: openLifeCycle ()
+KKSRecDialog * KKSCatEditorFactory :: openLifeCycle ()
 {
     KKSObject * lcIO = loader->loadIO(IO_LIFE_CYCLE_ID, true);
     if (!lcIO)
@@ -1148,7 +1149,7 @@ KKSObjEditor * KKSCatEditorFactory :: openLifeCycle ()
     const KKSCategory * wCat = lcIO->category();
     if (wCat)
         wCat = wCat->tableCategory();
-    KKSObjEditor * lcEditor = this->objf->createObjRecEditor(IO_IO_ID,
+    KKSRecDialog * lcEditor = this->objf->createObjRecEditor(IO_IO_ID,
                                                              IO_LIFE_CYCLE_ID,
                                                              KKSList<const KKSFilterGroup *>(),
                                                              tr("View life cycles"),

@@ -1,7 +1,7 @@
 #ifndef _KKSSearchTemplatesForm_H
 #define _KKSSearchTemplatesForm_H
 
-#include <QDialog>
+#include <KKSRecDialog.h>
 #include <kksgui_config.h>
 
 class QTreeView;
@@ -17,12 +17,13 @@ class QCheckBox;
 
 class KKSCategory;
 
-class _GUI_EXPORT KKSSearchTemplatesForm : public QDialog
+class _GUI_EXPORT KKSSearchTemplatesForm : public KKSRecDialog
 {
 public:
     KKSSearchTemplatesForm (const KKSCategory * c, const QString & tableName, bool mode=true, QWidget * parent=0, Qt::WFlags f=0);
     ~KKSSearchTemplatesForm (void);
 
+    virtual qint64 getID (void) const;
     int getIdSearchTemplate (void) const;
     int getIdSearchTemplateType (void) const;
     void hideActions (int aBegin, int aEnd);

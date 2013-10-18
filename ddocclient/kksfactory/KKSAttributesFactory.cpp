@@ -32,6 +32,7 @@
 
 #include <KKSAttributesEditor.h>
 #include <KKSObjEditor.h>
+#include <KKSRecDialog.h>
 #include <kksfilterseditorform.h>
 #include <kksattreditor.h>
 #include <KKSCheckBox.h>
@@ -549,7 +550,7 @@ void KKSAttributesFactory :: loadSearchTemplates (KKSAttrEditor * aEditor)
     if(!c)
         return;
 
-    KKSObjEditor *objEditor = m_oef->createObjRecEditor(IO_IO_ID, 
+    KKSRecDialog *objEditor = m_oef->createObjRecEditor(IO_IO_ID, 
                                                         IO_SEARCH_ID, 
                                                         filters, 
                                                         "",
@@ -2357,7 +2358,7 @@ void KKSAttributesFactory :: slotLoadIOSrc (KKSObject ** io, QWidget * parent)
     
     //QWidget * parentW = qobject_cast<QWidget *>(this->sender());
     
-    KKSObjEditor* ioSrc = m_oef->createObjRecEditor(IO_IO_ID, IO_IO_ID, filters, tr ("Select document"), 0, true, false, Qt::WindowModal, parent);
+    KKSRecDialog* ioSrc = m_oef->createObjRecEditor(IO_IO_ID, IO_IO_ID, filters, tr ("Select document"), 0, true, false, Qt::WindowModal, parent);
     if (ioSrc->exec () == QDialog::Accepted)
     {
         int idObject = ioSrc->getID();

@@ -31,6 +31,7 @@
 
 #include <KKSRecWidget.h>
 #include <KKSObjEditor.h>
+#include <KKSRecDialog.h>
 #include <KKSObject.h>
 #include <KKSCheckBox.h>
 #include <KKSAttrCheckListWidget.h>
@@ -1481,7 +1482,7 @@ void KKSIndFactory :: loadIndType (KKSIndicatorValue * indVal, QLineEdit * lEInd
         return;
     KKSList<const KKSFilterGroup *> filters;
     QWidget * parentW = qobject_cast<QWidget *>(this->sender());
-    KKSObjEditor* intTypeRec = oef->createObjRecEditor(IO_IO_ID, 86, filters, tr ("Select indicator type"), 0, true, false, Qt::WindowModal, parentW);
+    KKSRecDialog* intTypeRec = oef->createObjRecEditor(IO_IO_ID, 86, filters, tr ("Select indicator type"), 0, true, false, Qt::WindowModal, parentW);
     if (intTypeRec->exec () == QDialog::Accepted)
     {
         int idType = intTypeRec->getID();
@@ -1499,7 +1500,7 @@ void KKSIndFactory :: loadIndIOSRC (KKSIndicatorValue * indVal, QLineEdit * lEIn
         return;
     KKSList<const KKSFilterGroup *> filters;
     QWidget * parentW = qobject_cast<QWidget *>(this->sender());
-    KKSObjEditor* indSrc = oef->createObjRecEditor(IO_IO_ID, IO_IO_ID, filters, tr ("Select indicator type"), 0, true, false, Qt::WindowModal, parentW);
+    KKSRecDialog* indSrc = oef->createObjRecEditor(IO_IO_ID, IO_IO_ID, filters, tr ("Select indicator type"), 0, true, false, Qt::WindowModal, parentW);
     if (indSrc->exec () == QDialog::Accepted)
     {
         int idObject = indSrc->getID();
@@ -1517,7 +1518,7 @@ void KKSIndFactory :: loadIndIOSRC1 (KKSIndicatorValue * indVal, QLineEdit * lEI
         return;
     KKSList<const KKSFilterGroup *> filters;
     QWidget * parentW = qobject_cast<QWidget *>(this->sender());
-    KKSObjEditor* indSrc = oef->createObjRecEditor(IO_IO_ID, IO_IO_ID, filters, tr ("Select indicator type"), 0, true, false, Qt::WindowModal, parentW);
+    KKSRecDialog* indSrc = oef->createObjRecEditor(IO_IO_ID, IO_IO_ID, filters, tr ("Select indicator type"), 0, true, false, Qt::WindowModal, parentW);
     if (indSrc->exec () == QDialog::Accepted)
     {
         int idObject = indSrc->getID();
@@ -1601,7 +1602,7 @@ void KKSIndFactory :: addNewIOIndicator (KKSObject * io, QWidget * indWidget)
         fg->release ();
     }
     QWidget * parentW = qobject_cast <QWidget *>(this->sender());
-    KKSObjEditor* indSrcW = oef->createObjRecEditor(IO_IO_ID, IO_INDICATOR_ID, filters, tr ("Select indicator"), 0, true, false, Qt::WindowModal, parentW);
+    KKSRecDialog* indSrcW = oef->createObjRecEditor(IO_IO_ID, IO_INDICATOR_ID, filters, tr ("Select indicator"), 0, true, false, Qt::WindowModal, parentW);
     if (indSrcW->exec () == QDialog::Accepted)
     {
         int idIndicator = indSrcW->getID();
