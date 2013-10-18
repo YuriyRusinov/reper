@@ -445,20 +445,12 @@ void KKSAValWidget::initComplexWidget (KKSAttrValue * av, QGridLayout * gLay, QW
                 iHW->setValue(ihv);
                 break;
             }
-            case KKSAttrType::atRecordColor:
-            case KKSAttrType::atRecordTextColor:
+            default:
             {
-                //unsigned int vlc = val.toUInt ();
-                //QRgb rgb_col (vlc);// = V.value<QColor>();//toUInt ();
-                QColor rgb_color = val.value<QColor>();//::fromRgba (rgb_col);//V.value<QColor>();//toInt ();
-
-                aW = new KKSColorWidget (pAttrValue, KKSIndAttr::iacIOUserAttr, rgb_color, pAttrValue->attribute()->type()->attrType());
-                KKSColorWidget * iCW = qobject_cast<KKSColorWidget *>(aW);
-                iCW->hideToolButton();
-                iCW->setColor(rgb_color);
-                break;
+                aW = 0;
+                aWVals.append (aW);
+                continue;
             }
-            default:continue;
             
         }
         QLabel * lTitle = new QLabel (attr->name(), parent, flags);
@@ -658,6 +650,12 @@ void KKSAValWidget::setComplexVals (const QVariant& val)
     for (; p != aVals.constEnd(); p++)
     {
         QWidget * aW = aWVals[i];
+        //qDebug () << __PRETTY_FUNCTION__ << aW << i;
+        if (!aW)
+        {
+            i++;
+            continue;
+        }
         KKSAttrValue * av = p.value();
         if (!av || !av->attribute() || !av->attribute()->type())
             continue;
@@ -713,13 +711,9 @@ void KKSAValWidget::setComplexVals (const QVariant& val)
             case KKSAttrType::atInt:
             case KKSAttrType::atInt64:
             case KKSAttrType::atString:
-            case KKSAttrType::atList:
-            case KKSAttrType::atParent:
             case KKSAttrType::atObjRef:
             case KKSAttrType::atUUID:
             case KKSAttrType::atUrl:
-            case KKSAttrType::atRecordColorRef:
-            case KKSAttrType::atRecordTextColorRef:
             {
                 QLineEdit * lE = qobject_cast<QLineEdit *>(aW);
                 lE->setText(valW.toString());
@@ -778,17 +772,6 @@ void KKSAValWidget::setComplexVals (const QVariant& val)
                 int s = vl.size() >= 3 ? vl[2].toInt() : -1;
                 IntervalHValue ihv (h, m, s);
                 iHW->setValue(ihv);
-                break;
-            }
-            case KKSAttrType::atRecordColor:
-            case KKSAttrType::atRecordTextColor:
-            {
-                KKSColorWidget * iCW = qobject_cast<KKSColorWidget *>(aW);
-                unsigned int vlc = val.toUInt ();
-                QRgb rgb_col (vlc);// = V.value<QColor>();//toUInt ();
-                QColor rgb_color = QColor::fromRgba (rgb_col);//V.value<QColor>();//toInt ();
-
-                iCW->setColor(rgb_color);// = new KKSColorWidget (pAttrValue, KKSIndAttr::iacIOUserAttr, rgb_color, pAttrValue->attribute()->type()->attrType());
                 break;
             }
         }
