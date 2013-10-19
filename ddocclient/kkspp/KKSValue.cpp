@@ -565,7 +565,8 @@ int KKSValue::setValue(const QString & _value, int _type)
         //qDebug () << __PRETTY_FUNCTION__ << dt << _value;
         m_value = dt;
     }
-	else if(a_type == KKSAttrType::atBool){
+    else if(a_type == KKSAttrType::atBool)
+    {
         QString s = _value.toLower();
         if(s == "t" || s == "true" || s == "1"){
             m_value = QVariant(true);
@@ -601,7 +602,7 @@ int KKSValue::setValue(const QString & _value, int _type)
         }
         
         if(sl.count() < 2){
-                m_value = QVariant();
+            m_value = QVariant();
         }
         else{
             //если данные пришли из Ѕƒ, то значением what будет число и надо его преобразовать в строку

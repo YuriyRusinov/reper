@@ -1961,6 +1961,13 @@ void KKSObjEditorFactory :: saveObject (KKSObjEditor* editor,
     }
 
     bool transactionOk = true;
+//    int nac = wObj->attrValues().count();
+//    for (int ii=0; ii<nac; ii++)
+//    {
+//        KKSAttrValue * avRec = wObj->attrValue (ii);
+//        if (avRec && avRec->attribute()->type()->attrType() == KKSAttrType::atInterval)
+//            qDebug () << __PRETTY_FUNCTION__ << avRec->value().valueVariant() << avRec->value().valueForInsert();
+//    }
 
     int nc = (pObjectEx->id() < 0 ? num : 1);
     if (pObjectEx->id() >=0 && num > 1)
@@ -1968,7 +1975,7 @@ void KKSObjEditorFactory :: saveObject (KKSObjEditor* editor,
         qWarning() << tr ("Save IO copy. Only existing copy will be updated");
         QMessageBox::warning (editor, tr ("Warning"), tr ("Save IO copy. Only existing copy will be updated"), QMessageBox::Ok);
     }
-    qDebug () << __PRETTY_FUNCTION__ << num << nc;
+    //qDebug () << __PRETTY_FUNCTION__ << num << nc;
     bool isNew (pObjectEx->id() < 0);
 
     editor->clearAdditionalCopies ();
@@ -1983,10 +1990,13 @@ void KKSObjEditorFactory :: saveObject (KKSObjEditor* editor,
         KKSObject * io = 0;
 
         ok = KKSConverter::objectFromExemplar (loader, wObj, pObjectEx);
-        KKSAttrValue * avRec = pObjectEx->attrValue (ATTR_RECORD_FILL_COLOR);
-        if (avRec)
-            qDebug () << __PRETTY_FUNCTION__ << avRec->value().valueVariant() << avRec->value().valueForInsert() << avRec->value().valueVariant().value<QColor>();
-        qDebug () << __PRETTY_FUNCTION__ << wObj->recordFillColor();
+        //int nac = wObj->attrValues().count();
+        //for (int ii=0; ii<nac; ii++)
+        //{
+        //    KKSAttrValue * avRec = wObj->attrValue (ii);
+        //    if (avRec && avRec->attribute()->type()->attrType() == KKSAttrType::atInterval)
+        //        qDebug () << __PRETTY_FUNCTION__ << avRec->value().valueVariant() << avRec->value().valueForInsert();
+        //}
         if (i > 0)
         {
             wObjCopy = new KKSObjectExemplar (*pObjectEx);

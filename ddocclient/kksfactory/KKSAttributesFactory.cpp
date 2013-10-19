@@ -2110,6 +2110,7 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
             break;
         case KKSAttrType::atDouble:
         case KKSAttrType::atInt:
+        case KKSAttrType::atInt64:
             {
                 double v = V.toDouble ();
                 int vi = V.toInt ();
@@ -2122,7 +2123,7 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
                 KKSEdit *lEdit = qobject_cast<KKSEdit *>(aw);
                 if (pCatType->attrType() == KKSAttrType::atDouble && !V.toString().isEmpty())
                     lEdit->setVal (QString::number (v));
-                else if (pCatType->attrType() == KKSAttrType::atInt && (!V.toString().isEmpty() || vi < 0))
+                else if ((pCatType->attrType() == KKSAttrType::atInt || pCatType->attrType() == KKSAttrType::atInt64)  && (!V.toString().isEmpty() || vi < 0))
                 {
                     lEdit->setVal (QString::number (vi));
                     lEdit->QLineEdit::setText (QString::number (vi));
@@ -2134,7 +2135,7 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
                 {
                     if (pCatType->attrType() == KKSAttrType::atDouble && !V.toString().isEmpty())
                         lEdit->setText (QString::number (v, 'f', 16));
-                    else if (pCatType->attrType() == KKSAttrType::atInt && !V.toString().isEmpty())
+                    else if ((pCatType->attrType() == KKSAttrType::atInt || pCatType->attrType() == KKSAttrType::atInt64) && !V.toString().isEmpty())
                         lEdit->setText (QString::number (vi));
                 }
                 lEdit->setVal (lEdit->text());

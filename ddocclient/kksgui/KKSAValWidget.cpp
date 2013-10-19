@@ -592,6 +592,7 @@ void KKSAValWidget::setValue (const KKSAttribute * a, QVariant val)
             QString unit = (vl.size() >= 2 ? vl[1] : tr("seconds"));
             IntervalValue iv (vi, unit);
             iValW->setValue (iv);
+            break;
         }
         case KKSAttrType::atIntervalH:
         {

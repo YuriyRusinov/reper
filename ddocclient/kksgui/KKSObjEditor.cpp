@@ -410,6 +410,8 @@ int KKSObjEditor :: constructObject()
             }
             else if (type == KKSAttrType::atIntervalH)
                 value = QString ("{%1}").arg (val.toStringList().join(","));
+            else if (type == KKSAttrType::atInterval)
+                value = QString ("{%1}").arg (val.toStringList().join(" "));
             else
                 value = val.toString(); 
 
@@ -577,6 +579,8 @@ int KKSObjEditor :: constructObject()
             }
             else if (type == KKSAttrType::atIntervalH)
                 value = QString ("{%1}").arg (val.toStringList().join(","));
+            else if (type == KKSAttrType::atInterval)
+                value = QString ("{%1}").arg (val.toStringList().join(" "));
             else
                 value = val.toString(); 
 
@@ -742,6 +746,8 @@ int KKSObjEditor :: constructObject()
             }
             else if (type == KKSAttrType::atIntervalH)
                 value = QString ("{%1}").arg (val.toStringList().join(","));
+            else if (type == KKSAttrType::atInterval)
+                value = QString ("{%1}").arg (val.toStringList().join(" "));
             else
                 value = val.toString(); 
             
