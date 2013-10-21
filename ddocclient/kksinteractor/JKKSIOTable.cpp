@@ -3,7 +3,7 @@
 #include "JKKSCategory.h"
 #include "JKKSIOTable.h"
 
-JKKSIOTable :: JKKSIOTable (int idIOTable,
+JKKSIOTable :: JKKSIOTable (qint64 idIOTable,
                             const QString & table_name,
                             const QString & title,
                             const QString & uid
@@ -11,7 +11,7 @@ JKKSIOTable :: JKKSIOTable (int idIOTable,
     : JKKSUID (uid, QString()),
     id (idIOTable),
     tableName (table_name),
-    category (QMap<int, JKKSCategory>()),
+    category (QMap<qint64, JKKSCategory>()),
     Title (title)
 {
 }
@@ -29,12 +29,12 @@ JKKSIOTable :: ~JKKSIOTable (void)
 {
 }
 
-int JKKSIOTable :: getIDTable (void) const
+qint64 JKKSIOTable :: getIDTable (void) const
 {
     return id;
 }
 
-void JKKSIOTable :: setIDTable (int _id)
+void JKKSIOTable :: setIDTable (qint64 _id)
 {
     id = _id;
 }
@@ -49,12 +49,12 @@ void JKKSIOTable :: setName (QString tName)
     tableName = tName;
 }
 
-const QMap<int, JKKSCategory>& JKKSIOTable :: getCategory (void) const
+const QMap<qint64, JKKSCategory>& JKKSIOTable :: getCategory (void) const
 {
     return category;
 }
 
-void JKKSIOTable :: setCategory (const QMap<int, JKKSCategory>& catMap)
+void JKKSIOTable :: setCategory (const QMap<qint64, JKKSCategory>& catMap)
 {
     category = catMap;
 }

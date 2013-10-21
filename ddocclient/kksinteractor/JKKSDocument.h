@@ -34,16 +34,16 @@ class _I_EXPORT JKKSDocument : public JKKSMessage, public JKKSUID
 {
     public:
         JKKSDocument (const QString& name = QString(), 
-                      int idCat = -1, 
-                      int idAuth = -1, 
+                      qint64 idCat = -1, 
+                      qint64 idAuth = -1, 
                       const QString& tName = QString(), 
                       const QString& desc = QString(), 
                       const QString& info = QString(), 
-                      int idmaclabel = 1, 
-                      int idsynctype = -1,
+                      qint64 idmaclabel = 1, 
+                      qint64 idsynctype = -1,
                       const QString& sync_name = QString(),
                       const QString& sync_desc = QString(),
-                      int idownerorg = -1,
+                      qint64 idownerorg = -1,
                       bool isglobal = false,
                       const QString & ownerOrgUID = QString(),
 
@@ -52,10 +52,10 @@ class _I_EXPORT JKKSDocument : public JKKSMessage, public JKKSUID
 
                       const QString& uid = QString(),
                       const QString & uuid = QString(),
-                      int idState = 1, 
+                      qint64 idState = 1, 
                       const QColor bkCol = QColor(),
                       const QColor fgCol = QColor(),
-                      const QIcon rIcon = QIcon());
+                      const QString & rIcon = QString());
 
         JKKSDocument (const JKKSDocument& io);
         virtual ~JKKSDocument (void);
@@ -65,13 +65,16 @@ class _I_EXPORT JKKSDocument : public JKKSMessage, public JKKSUID
         //
         QByteArray serialize (void) const;
         int unserialize (const QByteArray& mess);
-        const QMap<int, JKKSCategory>& getCategory (void) const;
-        void setCategory (const QMap<int, JKKSCategory>& catMap);
+        
+        const QMap<qint64, JKKSCategory>& getCategory (void) const;
+        void setCategory (const QMap<qint64, JKKSCategory>& catMap);
+        
         int writeToDB (const JKKSLoader * loader, const QString& senderUID, const QString& receiverUID);
-        int id (void) const;
+        
         JKKSMessageType getMessageType (void) const;
 
-        void setId (int id);
+        qint64 id (void) const;
+        void setId (qint64 id);
 
         void setAttrValues (const QMap<QString, QString>& aVals);
         const QMap<QString, QString>& getAttrValues (void) const;
@@ -79,17 +82,11 @@ class _I_EXPORT JKKSDocument : public JKKSMessage, public JKKSUID
         QString getName (void) const;
         void setName (const QString& name);
 
-        //QString getIOCode (void) const;
-        //void setIOCode (const QString& code);
+        qint64 getIdIoCat (void) const;
+        void setIdIoCat (qint64 id_io_category);
 
-        int getIdIoCat (void) const;
-        void setIdIoCat (int id_io_category);
-
-        int getIdAuthor (void) const;
-        void setIdAuthor (int idAuth);
-
-        //int getIdState (void) const;
-        //void setIdState (int idSt);
+        qint64 getIdAuthor (void) const;
+        void setIdAuthor (qint64 idAuth);
 
         QString getTableName (void) const;
         void setTableName (const QString& tName);
@@ -100,32 +97,32 @@ class _I_EXPORT JKKSDocument : public JKKSMessage, public JKKSUID
         QString getInfo (void) const;
         void setInfo (const QString& info);
 
-        int getIdMaclabel (void) const;
-        void setIdMaclabel (int idmaclabel);
+        qint64 getIdMaclabel (void) const;
+        void setIdMaclabel (qint64 idmaclabel);
 
-        int getCommandId (void) const;
-        void setCommandId (int idc);
+        qint64 getCommandId (void) const;
+        void setCommandId (qint64 idc);
 
         const QDateTime& getRealTime (void) const;
         void setRealTime (const QDateTime& rt);
 
-        int getJournal (void) const;
-        void setJournal (int idJ);
+        qint64 getJournal (void) const;
+        void setJournal (qint64 idJ);
 
-        const QMap<int, JKKSGlobalRubric>& rubrics (void) const;
-        QMap<int, JKKSGlobalRubric>& rubrics (void);
-        void setRubrics (const QMap<int, JKKSGlobalRubric>& rubrs);
+        const QMap<qint64, JKKSGlobalRubric>& rubrics (void) const;
+        QMap<qint64, JKKSGlobalRubric>& rubrics (void);
+        void setRubrics (const QMap<qint64, JKKSGlobalRubric>& rubrs);
 
-        const QMap<int, JKKSIOUrl>& urls (void) const;
-        QMap<int, JKKSIOUrl>& urls (void);
-        void setUrls (const QMap<int, JKKSIOUrl>& urls);
+        const QMap<qint64, JKKSIOUrl>& urls (void) const;
+        QMap<qint64, JKKSIOUrl>& urls (void);
+        void setUrls (const QMap<qint64, JKKSIOUrl>& urls);
 
-        const QMap<int, JKKSIOTable>& ref_tables (void) const;
-        QMap<int, JKKSIOTable>& ref_tables (void);
-        void setTables (const QMap<int, JKKSIOTable>& ref_tables);
+        const QMap<qint64, JKKSIOTable>& ref_tables (void) const;
+        QMap<qint64, JKKSIOTable>& ref_tables (void);
+        void setTables (const QMap<qint64, JKKSIOTable>& ref_tables);
 
-        int getSyncType (void) const;
-        void setSyncType (int id_sync_type);
+        qint64 getSyncType (void) const;
+        void setSyncType (qint64 id_sync_type);
 
         const QString& getSyncName (void) const;
         void setSyncName (const QString& sync_name);
@@ -133,8 +130,8 @@ class _I_EXPORT JKKSDocument : public JKKSMessage, public JKKSUID
         const QString& getSyncDesc (void) const;
         void setSyncDesc (const QString& sync_desc);
 
-        int getOwnerOrg (void) const;
-        void setOwnerOrg (int id_owner_org);
+        qint64 getOwnerOrg (void) const;
+        void setOwnerOrg (qint64 id_owner_org);
 
         const QString & getOwnerOrgUID (void) const;
         void setOwnerOrgUID (const QString & orgUid);
@@ -152,32 +149,32 @@ class _I_EXPORT JKKSDocument : public JKKSMessage, public JKKSUID
         void setType(const JKKSType & type);
 
     private:
-        int idObject;
+        qint64 idObject;
         QString ioName;
         //QString ioCode;
-        int idCategory;
-        int idAuthor;
+        qint64 idCategory;
+        qint64 idAuthor;
         //int idState;
         
         QString tableName;
         QString ioDesc;
         QString ioInfo;
-        int id_maclabel;
+        qint64 id_maclabel;
 
-        QMap<int, JKKSCategory> category;
+        QMap<qint64, JKKSCategory> category;
         QMap<QString, QString> attrValues;
-        QMap<int, JKKSGlobalRubric> m_rubrics;
-        QMap<int, JKKSIOUrl> m_urls;
-        QMap<int, JKKSIOTable> m_tables;
+        QMap<qint64, JKKSGlobalRubric> m_rubrics;
+        QMap<qint64, JKKSIOUrl> m_urls;
+        QMap<qint64, JKKSIOTable> m_tables;
 
-        int idCommand;
+        qint64 idCommand;
         QDateTime realTime;
-        int idJournal;
+        qint64 idJournal;
 
-        int idSyncType;
+        qint64 idSyncType;
         QString syncName;
         QString syncDesc;
-        int idOwnerOrg;
+        qint64 idOwnerOrg;
         bool isGlobal;
         QString ownerOrgUID;
 

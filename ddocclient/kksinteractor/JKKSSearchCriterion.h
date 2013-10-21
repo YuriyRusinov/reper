@@ -21,7 +21,7 @@ class QTextStream;
 class _I_EXPORT JKKSSearchCriterion
 {
 public:
-    JKKSSearchCriterion (int idc = -1,
+    JKKSSearchCriterion (qint64 idc = -1,
                          const JKKSCategoryAttr& attr = JKKSCategoryAttr(), \
                          QString val = QString(), \
                          int type = -1, \
@@ -31,8 +31,8 @@ public:
     JKKSSearchCriterion (const JKKSSearchCriterion& sc);
     ~JKKSSearchCriterion (void);
 
-    int id (void) const;
-    void setId (int idc);
+    qint64 id (void) const;
+    void setId (qint64 idc);
 
     JKKSCategoryAttr getAttribute (void) const;
     void setAttribute (const JKKSCategoryAttr& attr);
@@ -63,7 +63,7 @@ private:
     //
     // Variables
     //
-    int idC;
+    qint64 idC;
     JKKSCategoryAttr attribute;
     QString value;
     int criterionType;

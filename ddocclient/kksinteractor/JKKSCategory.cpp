@@ -6,15 +6,15 @@
 #include "JKKSCategoryAttr.h"
 #include "JKKSCategory.h"
 
-JKKSCategory :: JKKSCategory (int idCat, 
+JKKSCategory :: JKKSCategory (qint64 idCat, 
                               const QString& cName, 
                               const QString& cCode, 
                               const QString& cDesc, 
                               int type,
-                              int id_child, 
+                              qint64 id_child, 
                               bool isCMain,
                               const QString & uid,
-                              int state,
+                              qint64 state,
                               bool isCGlobal)
     : JKKSUID(uid, QString()),
     id_io_category (idCat),
@@ -49,12 +49,12 @@ JKKSCategory :: ~JKKSCategory (void)
 {
 }
 
-int JKKSCategory :: id (void) const
+qint64 JKKSCategory :: id (void) const
 {
     return id_io_category;
 }
 
-void JKKSCategory :: setId (int idCat)
+void JKKSCategory :: setId (qint64 idCat)
 {
     id_io_category = idCat;
 }
@@ -99,22 +99,22 @@ void JKKSCategory :: setType (int type)
     m_idType = type;
 }
 
-int JKKSCategory :: getState (void) const
+qint64 JKKSCategory :: getState (void) const
 {
     return m_idState;
 }
 
-void JKKSCategory :: setState (int state)
+void JKKSCategory :: setState (qint64 state)
 {
     m_idState = state;
 }
 
-int JKKSCategory :: getIDChild (void) const
+qint64 JKKSCategory :: getIDChild (void) const
 {
     return m_idChild;
 }
 
-void JKKSCategory :: setIDChild (int idc)
+void JKKSCategory :: setIDChild (qint64 idc)
 {
     m_idChild = idc;
 }
@@ -139,32 +139,32 @@ void JKKSCategory :: setGlobal (bool val)
     m_isGlobal = val;
 }
 
-const QMap<int, JKKSCategoryAttr >& JKKSCategory :: attributes (void) const
+const QMap<qint64, JKKSCategoryAttr >& JKKSCategory :: attributes (void) const
 {
     return m_attributes;
 }
 
-QMap<int, JKKSCategoryAttr >& JKKSCategory :: attributes (void)
+QMap<qint64, JKKSCategoryAttr >& JKKSCategory :: attributes (void)
 {
     return m_attributes;
 }
 
-void JKKSCategory :: setAttributes (const QMap<int, JKKSCategoryAttr >& attrs)
+void JKKSCategory :: setAttributes (const QMap<qint64, JKKSCategoryAttr >& attrs)
 {
     m_attributes = attrs;
 }
 
-const QMap<int, JKKSRubric>& JKKSCategory :: rubrics (void) const
+const QMap<qint64, JKKSRubric>& JKKSCategory :: rubrics (void) const
 {
     return m_rubrics;
 }
 
-QMap<int, JKKSRubric>& JKKSCategory :: rubrics (void)
+QMap<qint64, JKKSRubric>& JKKSCategory :: rubrics (void)
 {
     return m_rubrics;
 }
 
-void JKKSCategory :: setRubrics (const QMap<int, JKKSRubric>& rubrs)
+void JKKSCategory :: setRubrics (const QMap<qint64, JKKSRubric>& rubrs)
 {
     m_rubrics = rubrs;
 }

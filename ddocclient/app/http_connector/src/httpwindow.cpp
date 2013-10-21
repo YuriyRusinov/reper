@@ -1,38 +1,17 @@
-/****************************************************************************
-**
-** Copyright (C) 2004-2008 Trolltech ASA. All rights reserved.
-**
-** This file is part of the example classes of the Qt Toolkit.
-**
-** Licensees holding a valid Qt License Agreement may use this file in
-** accordance with the rights, responsibilities and obligations
-** contained therein.  Please consult your licensing agreement or
-** contact sales@trolltech.com if any conditions of this licensing
-** agreement are not clear to you.
-**
-** Further information about Qt licensing is available at:
-** http://www.trolltech.com/products/qt/licensing.html or by
-** contacting info@trolltech.com.
-**
-** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
-** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-**
-****************************************************************************/
 
 #include <QtGui>
 #include <QtNetwork>
+#include <QCryptographicHash>
 
 #include "httpwindow.h"
 #include "timerform.h"
-//#include "ui_authenticationdialog.h"
 #include <kksresult.h>
 #include <kksdatabase.h>
 #include <defines.h>
 #include <KKSList.h>
 #include <JKKSIOUrl.h>
 #include <JKKSMessage.h>
-
-//#define _HTTP_DEBUG
+#include <kksclient_name.h>
 
 HttpWindow::HttpWindow(QWidget *parent)
     : QDialog(parent)
@@ -44,14 +23,10 @@ HttpWindow::HttpWindow(QWidget *parent)
     QString user;//(settings.value("Database/user", "jupiter").toString());
     QString password;//(settings.value("Database/password", "111").toString());
     int port;//(settings.value("Database/port", "5432").toInt());
-    
-    QString http_host;//(settings.value("Http/host", "192.168.17.56").toString()); //адрес приложения "Сервер"
-    int http_port;//(settings.value("Http/port", "6000").toInt());// порт сервера
+
 
     int transport;//(settings.value("Http/transport","1").toInt());  
-    QString addr;//(settings.value("Http/local","a01").toString());
 
-    //QString server_host;//(settings.value("Http/server_host", "192.168.17.56").toString());
     int server_port;//(settings.value("Http/server_port", "6000").toInt());
       
     settings.beginGroup ("Database");
@@ -64,22 +39,16 @@ HttpWindow::HttpWindow(QWidget *parent)
 
     settings.beginGroup("Transport");
     transport = settings.value ("transport","1").toInt ();
-    //addr = settings.value ("portal", "a01").toString ();
-    addr = QString();//!!!!
     settings.endGroup ();
 
     settings.beginGroup ("Http");
-    http_host = settings.value ("host", "127.0.0.1").toString ();
-    http_port = settings.value ("port", "8001").toInt ();
   
-    //server_host = settings.value ("server_host", "127.0.0.1").toString ();
-    server_port = settings.value ("server_port", "8001").toInt ();
+    server_port = settings.value ("server_port", "8080").toInt ();
+    
+    gatewayHost = settings.value ("host", "").toString();
+    gatewayPort = settings.value ("port", "0").toInt();
+
     settings.endGroup ();
-
-    //QHostAddress address(server_host);
-
-    urlLineEdit = new QLineEdit("http://" + http_host + ":" + QString::number(http_port) + "/" + addr);
-
 
     tcpServer = new QTcpServer(this);
     if (!tcpServer->listen(QHostAddress::Any, server_port)) {
@@ -91,8 +60,6 @@ HttpWindow::HttpWindow(QWidget *parent)
         close();
         return;
     }
-
-
 
     loader = new (std::nothrow) JKKSLoader (host, dbName, user, password, port, transport);
     localDBInfo = QString("DBHost: %1, DBName: %2").arg(host).arg(dbName);
@@ -113,10 +80,7 @@ HttpWindow::HttpWindow(QWidget *parent)
 
     connect(tcpServer, SIGNAL(newConnection()), this, SLOT(loadData()));
 
-
-    urlLabel = new QLabel(tr("&URL:"));
-    urlLabel->setBuddy(urlLineEdit);
-    statusLabel = new QLabel(tr("Please enter the URL for system where you want send datas."));
+    statusLabel = new QLabel(tr("Waiting for data to sent..."));
 
     startButton = new QPushButton(tr("Send"));
     startButton->setDefault(true);
@@ -127,53 +91,25 @@ HttpWindow::HttpWindow(QWidget *parent)
     buttonBox->addButton(startButton, QDialogButtonBox::ActionRole);
     buttonBox->addButton(quitButton, QDialogButtonBox::RejectRole);
 
-    progressDialog = new QProgressDialog(this);
-
     http = new QHttp(this);
 
     //срабатывает, когда в методе httpRequestFinished пришел очередной ответ и удалена запись из списка http_messages
     connect(this, SIGNAL(httpMessageRemoved(int)), this, SLOT(slotHttpMessageRemoved(int)));
 
-    connect(urlLineEdit, SIGNAL(textChanged(const QString &)),
-            this, SLOT(enableDownloadButton()));
     connect(http, SIGNAL(requestFinished(int, bool)),
             this, SLOT(httpRequestFinished(int, bool)));
-    connect(http, SIGNAL(dataReadProgress(int, int)),
-            this, SLOT(updateDataReadProgress(int, int)));
     connect(http, SIGNAL(responseHeaderReceived(const QHttpResponseHeader &)),
             this, SLOT(readResponseHeader(const QHttpResponseHeader &)));
-/*  connect(http, SIGNAL(authenticationRequired(const QString &, quint16, QAuthenticator *)),
-            this, SLOT(slotAuthenticationRequired(const QString &, quint16, QAuthenticator *)));
-#ifndef QT_NO_OPENSSL
-    connect(http, SIGNAL(sslErrors(const QList<QSslError> &)),
-            this, SLOT(sslErrors(const QList<QSslError> &)));
-#endif */
-    connect(progressDialog, SIGNAL(canceled()), this, SLOT(cancelDownload()));
+
     connect(startButton, SIGNAL(clicked()), this, SLOT(startTimer()));
     connect(quitButton, SIGNAL(clicked()), this, SLOT(close()));
 
-    QHBoxLayout *topLayout = new QHBoxLayout;
-    topLayout->addWidget(urlLabel);
-    topLayout->addWidget(urlLineEdit);
-
     QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addLayout(topLayout);
     mainLayout->addWidget(statusLabel);
     mainLayout->addWidget(buttonBox);
-    mainLayout->addWidget(progressDialog);
     setLayout(mainLayout);
 
-
-    //responses << "HTTP/1.1 200 OK ";
-    //responses << "Date:";
-    //responses << "Server: DYNAMICDOCS INTERACTOR/1.0.0";
-    //responses << "Last-Modified: Mon, 14 Jun 2010 06:04:27 GMT";
-    //responses << "Content-Type: text/html";
-    //responses << "Content-Length: 500";
-    //responses << "Content-Location: http://";
-
     setWindowTitle(tr("DynamicDocs Interactor"));
-    urlLineEdit->setFocus();
 
     user_timer = 36000; //by defaul set timer
 
@@ -193,14 +129,15 @@ HttpWindow::HttpWindow(QWidget *parent)
     {
 		manual = false;
         user_timer = timerForm->getTimer();
-		//if(user_timer < 10000)
-		//{
-		//	user_timer = 36000;
-		//}
 
         startTimer();
         delete timerForm;
     }
+
+    msgForSent = 0;
+    filesForSent = 0;
+    cntFilesSended = 0;
+    cntMsgSended = 0;
 }
 
 
@@ -208,11 +145,9 @@ void HttpWindow::startTimer()
 {
     
     startButton->setEnabled(false);
-    urlLineEdit->setEnabled(false);
 
     if(manual == false)
 	{
-		//QTimer *timer = new QTimer(this);
         m_timer = new QTimer(this);
 		connect(m_timer, SIGNAL(timeout()), this, SLOT(startProc()));
         m_timer->setInterval(user_timer);
@@ -227,75 +162,48 @@ void HttpWindow::startTimer()
 void HttpWindow::startProc()
 
 {
-#ifdef _HTTP_DEBUG
-    qWarning() << "Entered to startProc()" << localDBInfo;
-#endif
-
     if(manual == false){
         m_timer->stop();
-#ifdef _HTTP_DEBUG
-        qWarning() << "Timer stopped" << localDBInfo;
-#endif
     }
-    
-    //QUrl url(urlLineEdit->text());
- 
 
-    //QHttp::ConnectionMode mode = url.scheme().toLower() == "https" ? QHttp::ConnectionModeHttps : QHttp::ConnectionModeHttp;
-    //http->setHost(url.host(), mode, url.port() == -1 ? 0 : url.port());
-    
-    /*if (!url.userName().isEmpty())
-        http->setUser(url.userName(), url.password());*/
-
-    httpRequestAborted = false;
-    httpTransferComplete = false;
-
-    //QByteArray path = QUrl::toPercentEncoding(url.path(), "!$&'()*+,;=:@/");
-    //if (path.isEmpty())
-    //    path = "/";
-
-
-    
+    statusLabel->setText(tr("Waiting for data to sent..."));
+   
     messageList = loader->readMessages();
-    count_send = 0;
+    QList<JKKSFilePart *> files = loader->readFileParts();
+    filesForSent = files.count();
+    msgForSent = messageList.size();
 
+    if(msgForSent + filesForSent <= 0){
+        startButton->setEnabled(true);
+        if(manual == false){
+            m_timer->start();
+        }
+        return;
+    }
+        
+    cntMsgSended = 0;
+    cntFilesSended = 0;
 
-    if(messageList.size() > 0 )
+    statusLabel->setText(tr("Found messages for transferring: %1\nTransfered: %2").arg(QString::number(msgForSent + filesForSent)).arg(QString::number(0)));
+
+    if(msgForSent > 0 )
     {
-
-        progressDialog->setWindowTitle(tr("DynamicDocs Interactor"));
-        progressDialog->setLabelText(tr("Sendind data %1.").arg("DynamicDocs Interactor"));
-
-        progressDialog->show();
-        progressDialog->setMaximum(messageList.size());
 
         httpMessages.clear();
 
         for (QList<JKKSPMessWithAddr *>::const_iterator iterator = messageList.constBegin();iterator != messageList.constEnd();++iterator)
         {
-            bool stat = sendOutMessage((*iterator)) ;
+            bool stat = sendOutMessage((*iterator) /*, false*/) ;
         }
 
         while(!messageList.isEmpty())
             delete messageList.takeFirst();
     }
-    else{
-        startButton->setEnabled(true);
-        urlLineEdit->setEnabled(true);
-        if(manual == false){
-            m_timer->start();
-#ifdef _HTTP_DEBUG
-            qWarning() << "Timer started" << localDBInfo;
-#endif
-        }
-    }
 
-    QList<JKKSFilePart *> files = loader->readFileParts();
     qint64 position = 0;
     int block = _MAX_FILE_BLOCK2;
-    int cnt = files.count();
     
-    for(int i=0; i<cnt; i++){
+    for(int i=0; i<filesForSent; i++){
         do
         {
             JKKSPMessWithAddr * pMes = NULL;
@@ -322,7 +230,7 @@ void HttpWindow::startProc()
                 part.setData(data);
 
             JKKSPMessage pM(part.serialize(), JKKSMessage::atFilePart);
-            pM.verifyReceiver = false;
+            pM.setVerifyReceiver(false);
             //pM.receiverUID = part.getAddr();
             //pM.senderUID = part.getSenderAddr();
             
@@ -331,7 +239,8 @@ void HttpWindow::startProc()
             bool stat = sendOutMessage(pMessWithAddr) ;
             
             if(eof){
-                httpMessages.insert(httpGetId, qMakePair(pMessWithAddr->id, pMessWithAddr->pMess.getType()) );
+                //соответственно, метод httpRequestFinished() отработает полностью только когда передана последняя часть файла
+                httpMessages.insert(httpGetId, qMakePair(pMessWithAddr->id, (qint64)pMessWithAddr->pMess.getType()) );
                 break;
             }
             
@@ -345,107 +254,106 @@ void HttpWindow::startProc()
 
 }
 
-void HttpWindow::cancelDownload()
-{
-#ifdef _HTTP_DEBUG
-    qWarning() << "Entered to cancelDownload" << localDBInfo;
-#endif
-
-    statusLabel->setText(tr("Data transfer canceled."));
-    httpRequestAborted = true;
-    http->abort();
-    startButton->setEnabled(true);
-    
-    if(manual == false){
-        m_timer->start();
-#ifdef _HTTP_DEBUG
-        qWarning() << "Timer started" << localDBInfo;
-#endif
-    }
-
-}
-
+//ответ http-сервера на запрос типа POST
 void HttpWindow::httpRequestFinished(int requestId, bool error)
 {
+    /*
+        Здесь возможны два варианта
+        1) Завершился запрос типа POST, который был передан на целевой объект напрямую (другому аналогичному http_connector)
+           В этом случае readAll должна вернуть либо OK, либо ничего, причем в последнем случае параметр error должен быть равен TRUE.
+           В случае ОК мы должны отметить переданное (статус  корректностии обработки получателем придет позже в спец.квитанции!!!) 
+           сообщение как доставленное (setAsSended).
+           При ошибке - вывести сообщение об ошибке.
+           Сообщения, которые помечены в БД как недоставленные, будут при следующем опросе БД снова находится в отправляемых данных
+
+        2) Завершился запрос типа POST, который был передан в шлюз (ТПС). В этом случае здесь мы ожидаем квитанцию от ТПС о том, 
+           "подхватила" ли она это сообщение или при его транспортировке возникла ошибка.
+           При ошибке не надо делать никаких дополнительных действий в БД. Однако стоит вывести сообщение об ошибке.
+           При успехе - необходимо пометить сообщение в БД как отправленное (факт обработки придет позже)
+           Кроме того, при взаимодействии через шлюз (ТПС) придет квитанция о факте доведения шлюзом сообщения до целевого объекта
+           Обрабатывая данную квитанцию (метод processNotification), в случае, если код возврата там будет не равен 1, 
+           мы переотметим данное сообщение, как требующее повторной отправки (недоставленное).
+           Сообщения, которые помечены в БД как недоставленные, будут при следующем опросе БД снова находится в отправляемых данных
+
+       В любом случае мы должны будем удалить сообщение из списка httpMessages. 
+       Если его в списке нет - требуется ничего не делать (ибо это может быть просто сетевой спам)
+    */
+
     bool bFound = false;
+    
+    qWarning() << "In httpRequestFinished() requestId = " << requestId;
+    
     uint messCount = httpMessages.count();
-    if(messCount > 0)
-    {
-        QPair<int, int> defValue = QPair<int, int>();
-        QPair<int, int> t = httpMessages.value(requestId, defValue);
-        if(t == defValue){
-            bFound = false;
+    if(messCount <= 0)
+        return;
+    
+    QPair<qint64, qint64> defValue = QPair<qint64, qint64>();
+    QPair<qint64, qint64> t = httpMessages.value(requestId, defValue);
+    if(t == defValue){
+        return;
+    }
+    
+    qWarning() << "In httpRequestFinished(). Found corresponding request. requestId = " << requestId;
+
+    httpMessages.remove(requestId);
+    
+    cntMsgSended++;
+    emit httpMessageRemoved(cntMsgSended);
+
+    statusLabel->setText(tr("Found messages for transferring: %1\nTransfered: %2").arg(QString::number(msgForSent+filesForSent)).arg(QString::number(cntMsgSended)));
+
+    if (error) {
+        qCritical() << tr("ERROR: Data transfer for requestId = %1 failed: %2").arg(requestId).arg(http->errorString());
+        return;
+    } 
+    
+    //здесь мы полагаем, что если пришел ответ на сообщение с requestId из нашего перечня (и error = false), 
+    //мы должны обработать тело этого сообщения
+    //если тело == OK или оно пустое, то это скорее всего было взаимодействие напрямую с http_connector'ом 
+    //в противном случае ответ должен быть в формате
+    // 1 OK
+    // 1 ERROR 15
+    //и это означает, что взаимодействие осуществлялось через шлюз (ТПС)
+    QByteArray ba = http->readAll();
+    if(ba.length() <= 0 || ba == "OK"){//это сообщение было передано напрямую на целевой объект в http_connector
+        if(!setMessageAsSended(t.first, t.second)){
+            qCritical() << "ERROR: Cannot mark message as sended! Database Error";
         }
-        else
-        {
-            if(!httpRequestAborted){
-                if(!setMessageAsSended(t.first, t.second))
-    		    {
-                    qWarning() << "ERROR: Cannot mark message as sended! Database Error";
-                }
-            }
-
-            bFound = true;
-            httpMessages.remove(requestId);
-            emit httpMessageRemoved(count_send++);
-        }
-    }
-
-    if(messCount > 0){
-        if(!bFound)
-        {}//qWarning() << "ERROR: Cannot find corresponding requestId in http_message map!";
-        else{   
-            if (error) {
-                httpRequestAborted = true;
-                statusLabel->setText(tr("ERROR: Data transfer failed: %1.").arg(http->errorString()));
-                qWarning() << tr("ERROR: Data transfer failed: %1.").arg(http->errorString());
-            } 
-	        else {
-                statusLabel->setText(tr("Data transfer http %1 complete.").arg(requestId));
-                httpTransferComplete = true;
-            }
-        }
-    }
-}
-
-void HttpWindow::slotHttpMessageRemoved(int progress)
-{
-    //qWarning() << "Entered in slotHttpMessageRemoved()";
-
-    //maximum выставляется в методе startProc() при чтении кол-ва сообщений на отправку
-    if(progressDialog->maximum () == progress){
-        progressDialog->setValue(progress);
-        progressDialog->hide();
-    }
-    else{
-        progressDialog->setValue(progress);
-    }
-
-    if(httpMessages.count() > 0){ 
-#ifdef _HTTP_DEBUG
-        qWarning() << "Skip to start timer bacause of http_message map does not empty (current count = " << httpMessages.count() << ")";
-#endif
         return;
     }
 
-    progressDialog->setValue(progressDialog->maximum());
+    //далее полагаем, что ответ пришел от шлюза
+    //и в случае, если ответ не содержит " ERROR ", помечаем сообщение как отправленное
+    if( ! ba.contains(" ERROR ")){
+        if(!setMessageAsSended(t.first, t.second)){
+            qCritical() << "ERROR: Cannot mark message as sended! Database Error";
+        }
+    }
+
+}
+
+void HttpWindow::slotHttpMessageRemoved(int sendedCount)
+{
+    //msgForSent + filesForSent выставляется в методе startProc() при чтении кол-ва сообщений и файлов на отправку
+
+    if(httpMessages.count() > 0 || (msgForSent + filesForSent) != sendedCount){ 
+        return;
+    }
     
-    if(!progressDialog->isHidden())
-        progressDialog->hide();
-	
+    //если подготовленных сообщений на отправку больше нет - включаем таймер и ждем данных из БД
     if(manual == false){
         m_timer->start();
-#ifdef _HTTP_DEBUG
-        qWarning() << "Timer started" << localDBInfo;
-#endif
     }
     else
-        startButton->setEnabled(true);
+        startButton->setEnabled(true); //если активен ручной (отладочный) режим - делаем доступной кнопку отправки
 }
 
 void HttpWindow::readResponseHeader(const QHttpResponseHeader &responseHeader)
 {
+    qWarning() << "In readResponseHeader()";
+
     int status = responseHeader.statusCode();
+    QString str = responseHeader.toString();
     switch (status) {
     case 200:                   // Ok
     case 301:                   // Moved Permanently
@@ -456,44 +364,19 @@ void HttpWindow::readResponseHeader(const QHttpResponseHeader &responseHeader)
         // these are not error conditions
         break;
 
-    default:
-        //QMessageBox::information(this, tr("HTTP"),
-        //                         tr("Data transfer failed: %1.")
-        //                         .arg(responseHeader.reasonPhrase()));
-        httpRequestAborted = true;
-        progressDialog->hide();
-        http->abort();
+    default: break;
 
-        if(manual == false){
-            m_timer->start();
-#ifdef _HTTP_DEBUG
-            qWarning() << "Timer started" << localDBInfo;
-#endif
-        }
-
+        //if(manual == false){
+        //    m_timer->start();
+        //}
     }
 }
 
-void HttpWindow::updateDataReadProgress(int bytesRead, int totalBytes)
+bool HttpWindow::setMessageAsSended(const qint64 & id, const int & type, bool sended)
 {
-    if (httpRequestAborted)
-        return;
-
-    progressDialog->setMaximum(totalBytes);
-    progressDialog->setValue(bytesRead);
-}
-
-void HttpWindow::enableDownloadButton()
-{
-    startButton->setEnabled(!urlLineEdit->text().isEmpty());
-}
-
-bool HttpWindow::setMessageAsSended(const int & id, const int & type)
-{
-    //qDebug() << __PRETTY_FUNCTION__ << id << type;
     bool result = false;
     if(loader)
-        result = loader->setAsSended(id, type);
+        result = loader->setAsSended(id, type, sended);
 
     return result;
 }
@@ -501,106 +384,124 @@ bool HttpWindow::setMessageAsSended(const int & id, const int & type)
 bool HttpWindow::sendOutMessage(const JKKSPMessWithAddr * message, bool filePartsFlag)
 {
     
+    qWarning() << "In sendOutMessage() ";
+
     if(message == NULL)
         return false;
 
     if(http == NULL)
         return false;
-        
-    httpRequestAborted = false;
-    httpTransferComplete = false;
 
     QByteArray byteArray = message->pMess.serialize();  
     if(byteArray.size() == 0)
         return false;
+    
+    QByteArray hash = QCryptographicHash::hash(byteArray, QCryptographicHash::Sha1);
+
+    QString unp = message->unp;
+
+    //base64
+    byteArray = byteArray.toBase64();
+    //zip
+    byteArray = qCompress(byteArray, 9);
+
+    //ВАЖНО!!! 
+    //Для передачи данных через шлюз ТПС используется механизм псевдофасетного кодирования идентификатора пересылаемого сообщения
+    //В конец строкового представления идентификатора пересылаемого сообщения добавляются два байта (две цифры), характеризующие тип
+    //(т.е. из какой таблицы взят идентификатор). Эта особенность не влияет на логику обработки пересылаемых данных посредством kksinteractor и http_connector
+    //однако в теле почтового сообщения, отдаваемого в шлюз ТПС, учитывается.
+    //
+    //Формат сообщения: mesid=<ID><type_digit_1><type_digit_2>&unp=<email_prefix>&data="........(base64)......"
+    //Если тип имеет одну цифру, перед ней ставится 0. т.е. 00 - atCommand, 02 - atDocument, и т.д.
+    
+    QString mesId;
+    int t = message->pMess.getType(); //тип сообщения. см. типы сообщений в перечислении JKKSMessage::JKKSMessageType
+    if(t >= 0 && t <= 9){
+        mesId = QString("0%1").arg(QString::number(t));
+    }
+    else{
+        mesId = QString("%1").arg(QString::number(t));
+    }
+
+    //создаем строку сообщения в унифицированном прикладном протоколе передачи данных ТПС
+    QString s = QString("mesid=%1%2&unp=%3&data=\"")
+                          .arg(QString::number(message->id)) //идентификатор сообщения из соответствующей таблице
+                          .arg(mesId) 
+                          .arg(message->unp.isEmpty() ? QString("1919") : message->unp);//Условный номер получателя (используем email_prefix)
+
+    byteArray.prepend(s.toAscii());
+    byteArray.append("\"");
+    //hash-сумма
+    byteArray.append("&hash=\"");
+    hash = hash.toBase64();
+    byteArray.append(hash);
+    byteArray.append("\"");
+    
 
     JKKSAddress addr = message->addr;
+
+    QString recvHost;
+    int recvPort;
+
+    //если в параметрах транспорта объекта-получателя сказано, что для доставки сообщений необходимо использовать шлюз (ТПС) ...
+    // и при этом локальный http_connector подключен к этому шлюзу (ТПС)
+    if(addr.useGateway() && !gatewayHost.isEmpty() && gatewayPort > 0){
+        recvHost = gatewayHost;
+        recvPort = gatewayPort;
+    }
+    else{ //в противном случае отправляем сообщение напрямую на http_connector целевого объекта
+        recvHost = addr.address();
+        recvPort = addr.port();
+    }
     
-    QString sUrl = QString("http://" + addr.address() + ":" + QString::number(addr.port()) + "/");
-    QUrl url(sUrl);
+    QUrl url;
+    url.setHost(recvHost);
+    url.setPort(recvPort);
+    url.setScheme("http");
+    
     QHttp::ConnectionMode mode = url.scheme().toLower() == "https" ? QHttp::ConnectionModeHttps : QHttp::ConnectionModeHttp;
-    http->setHost(url.host(), mode, url.port() == -1 ? 0 : url.port());
+    QString h = url.host();
+    int p = url.port(8080);
     
-    /*if (!url.userName().isEmpty())
-        http->setUser(url.userName(), url.password());*/
+    http->setHost(h, mode, p);
 
     QByteArray path = QUrl::toPercentEncoding(url.path(), "!$&'()*+,;=:@/");
     if (path.isEmpty())
         path = "/";
 
-
-
-    // encrypt
-/*
-#ifndef WIN32
-	unsigned long crc;
-    int key = 0;
-    
-    encrypt(&byteArray, crc, key, CFB, ENCRYPT);
-    CryptMessage cryptMessage(byteArray, key, crc);
-    byteArray = cryptMessage.serialize();
-	
-#endif
-*/
 	if(filePartsFlag)
 	{
 		QEventLoop eventLoop;
 		connect(http,SIGNAL(requestFinished(int,bool)),&eventLoop,SLOT(quit()));
-	//!!!!!!!!!
-	//error
+
+        qWarning() << "1 before post-> ";
         httpGetId = http->post ( path, byteArray ) ;
+        qWarning() << "2 after post-> ";
 
 		eventLoop.exec();
 	}
 	else
         httpGetId = http->post ( path, byteArray ) ;
 
-    //QHttpResponseHeader responseHeader = http->lastResponse();
-    //if(responseHeader.statusCode() != 401 && //packet was ignored by receiver organization
-    //   responseHeader.statusCode() != 400 ) //ERROR
-    //{ 
+    qWarning() << "3 after eventLoop.exec() ";
 
     if(message->pMess.getType() != JKKSMessage::atFilePart)//для файлов, передаваемых частями информация в этот список заносится отдельно
-        httpMessages.insert(httpGetId, qMakePair(message->id, message->pMess.getType()) );
-    
-    //}
-        
-    /* JKKSPMessage pMessage(byteArray);//byteArray);
-     qDebug() << "Message type: " << pMessage.getType();*/
+        httpMessages.insert(httpGetId, qMakePair(message->id, (qint64)message->pMess.getType()) );
   
     return true;
-
 }
 
 void HttpWindow::loadData()
 {
-   /* QByteArray block;
-    QDataStream out(&block, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_4_0);
-
-    out << (quint16)0;
-    
-    for (int j = 0 ; j < responses.size(); j++)
-    { 
-        out << responses.at(j);
-    }
-
-    out.device()->seek(0);
-    out << (quint16)(block.size() - sizeof(quint16));
-    */
-
-    QHttpResponseHeader response; 
+    qWarning() << "In loadData() ";
 
     QTcpSocket *clientConnection = tcpServer->nextPendingConnection();
     connect(clientConnection, SIGNAL(disconnected()),
             clientConnection, SLOT(deleteLater()));
 
-
-
     int numRead = 0, numReadTotal = 0;
-
     
-    QByteArray all_data,bt;
+    QByteArray all_data, bt;
 
     forever {
         bt  = clientConnection->read(1000);
@@ -619,16 +520,11 @@ void HttpWindow::loadData()
         }
     }
 
-    // QMessageBox::critical(this, "test","Read data from DynamicDocs Client. Datas size: " + QString::number(numReadTotal));
-    //qDebug() << "Receive data size: " << QString::number(numReadTotal);
-
-    QByteArray block;
-    QString str;
-
     if(numReadTotal == 0){
 
-        //qDebug() << "Receive data size: " << QString::number(numReadTotal);
-        response = QHttpResponseHeader( 200 , "HTTP/1.1 200 OK" );
+        QByteArray block;
+
+        QHttpResponseHeader response = QHttpResponseHeader( 200 , "HTTP/1.1 200 OK" );
 		QString str = response.toString();
 		block.append(str);
         clientConnection->write(block);
@@ -637,142 +533,255 @@ void HttpWindow::loadData()
         
         return;
     }
-     
 
-     QHttpRequestHeader header( all_data );
+    QHttpRequestHeader header( all_data );
 
+    bool b = header.hasContentLength();
 
-    QByteArray bad_block;
-    QDataStream ot(&bad_block, QIODevice::WriteOnly);
-    ot.setVersion(QDataStream::Qt_4_0);
+    if(b)
+    {
+        qWarning() << "In loadData. Data found!";
 
-    ot << (quint16)0;
-    
-    ot << "HTTP/1.1 400 Bad Request";
-    ot << "Date:";
-    ot << "Server: DYNAMICDOCS INTERACTOR/1.0.0";
-    ot << "Last-Modified: Mon, 14 Jun 2010 06:04:27 GMT";
-    ot << "Content-Type: text/html";
-    ot << "Content-Length: 500";
-    ot << "Content-Location: http://";        
+        int sz_dt = header.contentLength();
+        all_data = all_data.right(sz_dt); 
 
-    ot.device()->seek(0);
-    ot << (quint16)(bad_block.size() - sizeof(quint16));
+        QByteArray byteArray = all_data;
 
+        //Входящие данные имеют один из следующих форматов:
+        //mesid=<ID><type_digit_1><type_digit_2>&uno=<email_prefix>&data="........(base64)......"
+        //mesid=<ID><type_digit_1><type_digit_2>&uno=<email_prefix>&received=<code>
+        //в первом случае нам mesid и uno не интересны. Но надо в зависимости от типа сообщения правильно его обработать
+        //во втором случае нам интересен идентификатор и тип сообщения, которое было доведено и обработано с указанным в received результатом
 
-    QByteArray ignore_block;
-    QDataStream oti(&ignore_block, QIODevice::WriteOnly);
-    oti.setVersion(QDataStream::Qt_4_0);
+        if(byteArray.contains("mesid=") && (byteArray.contains("&uno=") || byteArray.contains("&unp=")) && byteArray.contains("&received=")){
+            processNotification(byteArray, clientConnection);
+        }
+        else if(byteArray.contains("mesid=") && (byteArray.contains("&uno=") || byteArray.contains("&unp=")) && byteArray.contains("&data=\"") && byteArray.contains("&hash=\"")){
+            processMessage(byteArray, clientConnection);
+        }
+        else{
+            QByteArray block;
 
-    oti << (quint16)0;
-
-    oti << "HTTP/1.1 204 Bad Request";
-    oti << "Date:";
-    oti << "Server: DYNAMICDOCS INTERACTOR/1.0.0";
-    oti << "Last-Modified: Mon, 14 Jun 2010 06:04:27 GMT";
-    oti << "Content-Type: text/html";
-    oti << "Content-Length: 500";
-    oti << "Content-Location: http://";        
-
-    oti.device()->seek(0);
-    oti << (quint16)(ignore_block.size() - sizeof(quint16));
-
-     if(header.isValid() && header.hasContentLength ())
-     {
-         int sz_dt = header.contentLength();
-         all_data = all_data.right(sz_dt); 
-
-         QByteArray byteArray = all_data; 
-
-/*
-#ifndef WIN32
-         CryptMessage cryptMessage(all_data);
-            byteArray = cryptMessage.message;
-            unsigned long new_crc = 0;
-            int key = cryptMessage.hash - qHash(cryptMessage.message);
-            
-            encrypt(&byteArray, new_crc, key, CFB, DECRYPT);
-	    qDebug() << "Crypt message.hash" << cryptMessage.hash;
-	    qDebug() << "Crypt message.crc: " <<  cryptMessage.CRC;
-	    qDebug() << "Encrypt crc: " <<  new_crc;
-	    qDebug() << "key: " << key;
-#endif
-*/
-            JKKSPMessage pMessage(byteArray);//byteArray);
-            
-            int res = loader->writeMessage(pMessage);
-            if(res <= 0){
-                qDebug() << "Message type: " << pMessage.getType();
-                qDebug() << "Write message status : " << res;
-            }
-
-           
-
-            if(res == ERROR_CODE)
-            {
-				response = QHttpResponseHeader( 400 , "HTTP/1.1 205 Bad Request" );
-				str = response.toString();
-				block.append(str);
-
-                clientConnection->write(block);
-            }
-            else if(res == OK_CODE)
-            {
-				response = QHttpResponseHeader( 200 , "HTTP/1.1 200 OK" );
-				QString str = response.toString();
-				block.append(str);
-                clientConnection->write(block);
-            }
-            else if(res == IGNORE_CODE)
-            {
-				response = QHttpResponseHeader( 204 , "HTTP/1.1 204 Bad Request" );
-				QString str = response.toString();
-				block.append(str);
-                clientConnection->write(block);
-            }
-
-           clientConnection->disconnectFromHost();
-     }
-     else
-     {
-		    response = QHttpResponseHeader( 400 , "HTTP/1.1 400 Bad Request" );
-			str = response.toString();
-		    block.append(str);
+            QHttpResponseHeader response = QHttpResponseHeader( 400 , "HTTP/1.1 400 Bad Request" );
+            QString str = response.toString();
+            block.append(str);
             clientConnection->write(block);
-            clientConnection->disconnectFromHost();
+        }
      }
+    else
+    {
+        QByteArray block;
+
+        QHttpResponseHeader response = QHttpResponseHeader( 400 , "HTTP/1.1 400 Bad Request" );
+        QString str = response.toString();
+        block.append(str);
+        clientConnection->write(block);
+    }
+
+    clientConnection->disconnectFromHost();
 }
 
-
-/*void HttpWindow::slotAuthenticationRequired(const QString &hostName, quint16, QAuthenticator *authenticator)
+int HttpWindow::processMessage(const QByteArray & ba, QTcpSocket * clientConnection)
 {
-    QDialog dlg;
-    Ui::Dialog ui;
-    ui.setupUi(&dlg);
-    dlg.adjustSize();
-    ui.siteDescription->setText(tr("%1 at %2").arg(authenticator->realm()).arg(hostName));
-    
-    if (dlg.exec() == QDialog::Accepted) {
-        authenticator->setUser(ui.userEdit->text());
-        authenticator->setPassword(ui.passwordEdit->text());
-    }
-}*/
 
-/*#ifndef QT_NO_OPENSSL
-void HttpWindow::sslErrors(const QList<QSslError> &errors)
-{
-    QString errorString;
-    foreach (const QSslError &error, errors) {
-        if (!errorString.isEmpty())
-            errorString += ", ";
-        errorString += error.errorString();
+    if(!ba.contains("mesid=") ||  (!ba.contains("&uno=") && !ba.contains("&unp=")) || !ba.contains("&data=\"") || !ba.contains("&hash=\"")){
+        QByteArray block;
+
+        QHttpResponseHeader response = QHttpResponseHeader( 400 , "HTTP/1.1 400 Bad Request" );
+        QString str = response.toString();
+        block.append(str);
+        clientConnection->write(block);
+        return -1;
     }
+
+    int index = ba.indexOf("&data=\"");
+    if(index < 13){ //если даже числа 1 и 1, то данная подстрока встретится не ранее чем на 13-й позиции
+        QByteArray block;
+
+        QHttpResponseHeader response = QHttpResponseHeader( 400 , "HTTP/1.1 400 Bad Request" );
+        QString str = response.toString();
+        block.append(str);
+        clientConnection->write(block);
+        return -1;
+    }
+
+    QByteArray byteArray = ba.mid(index + 7);
+    int h = byteArray.indexOf("&hash=\"");
+    //эталонная hash-сумма пришедших данных
+    QByteArray etaloneHash = byteArray.mid(h+7, byteArray.length() - (h+7) - 1);
+    etaloneHash = QByteArray::fromBase64(etaloneHash);
     
-    if (QMessageBox::warning(this, tr("HTTP Example"),
-                             tr("One or more SSL errors has occurred: %1").arg(errorString),
-                             QMessageBox::Ignore | QMessageBox::Abort) == QMessageBox::Ignore) {
-        http->ignoreSslErrors();
+    byteArray = byteArray.left(h-1);
+    byteArray = qUncompress(byteArray);
+    byteArray = QByteArray::fromBase64(byteArray);
+
+    //вычисленная hash-сумма пришедших данных
+    QByteArray hash = QCryptographicHash::hash(byteArray, QCryptographicHash::Sha1);
+    if(etaloneHash != hash){
+        qCritical() << "ERROR! Hash sum inconsistent!";
+        QByteArray block;
+
+        QHttpResponseHeader response = QHttpResponseHeader( 400 , "HTTP/1.1 400 Bad Request" );
+        QString str = response.toString();
+        block.append(str);
+        clientConnection->write(block);
+        return -1;
     }
+
+    JKKSPMessage pMessage(byteArray);
+
+    //эталонная hash-сумма пришедших данных
+    QByteArray storedHash = pMessage.cryptoHash();
+            
+    int res = loader->writeMessage(pMessage);
+    if(res <= 0){
+        qDebug() << "Message type: " << pMessage.getType();
+        qDebug() << "Write message status : " << res;
+    }
+
+   
+    QHttpResponseHeader response; 
+    QByteArray block;
+    QString str;
+
+    //в настоящее время мы полагаем, что вне зависимости от результата обработки входящего сообщения в БД
+    //мы в качестве ответа на запрос объекта-отправителя (ну или шлюза (ТПС)) возвращаем OK
+    //тем самым мы говорим о том, что факт приема сообщения состоялся успешно
+    //при этом результат обработки будет отправлен отдельно в виде спец. квитанции
+    if(res == ERROR_CODE)
+    {
+		response = QHttpResponseHeader( 400 , "HTTP/1.1 200 OK" );
+		str = response.toString();
+		block.append(str);
+        block.append("OK");
+
+        clientConnection->write(block);
+    }
+    else if(res == OK_CODE)
+    {
+		response = QHttpResponseHeader( 200 , "HTTP/1.1 200 OK" );
+		QString str = response.toString();
+		block.append(str);
+        block.append(QString("OK"));
+        clientConnection->write(block);
+    }
+    else if(res == IGNORE_CODE)
+    {
+		response = QHttpResponseHeader( 204 , "HTTP/1.1 200 OK" );
+		QString str = response.toString();
+		block.append(str);
+        block.append("OK");
+        clientConnection->write(block);
+    }
+
+    return 1;
 }
-#endif*/
 
+//пришла квитанция о доставке на объект-получатель ранее отправленного сообщения
+//данный блок кода должен исполняться только при взаимодействии через шлюз (ТПС)
+//результатом может быть факт успешной или неуспешной доставки
+//в последнем случае мы должны пометить сообщение как неотправленное
+//в случае успешной доставки ничего делать не надо, т.к. еще на этапе отправки сообщения с объекта отправителя в ТПС мы это сообщение отметили как доставленное
+int HttpWindow::processNotification(const QByteArray & ba, QTcpSocket * clientConnection)
+{
+    if(!ba.contains("mesid=") ||  (!ba.contains("&uno=") && !ba.contains("&unp=")) || !ba.contains("&received=")){
+        QByteArray block;
+
+        QHttpResponseHeader response = QHttpResponseHeader( 400 , "HTTP/1.1 400 Bad Request" );
+        QString str = response.toString();
+        block.append(str);
+        clientConnection->write(block);
+        return -1;
+    }
+
+    qint64 idMsg = -1;
+    int msgType = -1;
+    int index = ba.indexOf("&uno");
+    if(index <= 0)
+        index = ba.indexOf("&unp"); //попробуем тогда взять "запасной" вариант
+    
+    QByteArray byteArray = ba.mid(6, index-6-2);//6 - индекс начала цифр в идентификаторе сообщения. 2 последние цифры  - это тип сообщения
+    idMsg = byteArray.toLongLong();
+    if(idMsg <= 0){
+        qCritical() << "ERROR! Cannot parse MESID of the notification";
+        QByteArray block;
+
+        QHttpResponseHeader response = QHttpResponseHeader( 400 , "HTTP/1.1 400 Bad Request" );
+        QString str = response.toString();
+        block.append(str);
+        clientConnection->write(block);
+        return -1;
+    }
+
+    byteArray = ba.mid(index-2, 2);
+    msgType = byteArray.toInt();
+    if(msgType < 0){
+        qCritical() << "ERROR! Cannot parse MESID (type part) of the notification";
+        QByteArray block;
+
+        QHttpResponseHeader response = QHttpResponseHeader( 400 , "HTTP/1.1 400 Bad Request" );
+        QString str = response.toString();
+        block.append(str);
+        clientConnection->write(block);
+        return -1;
+    }
+
+
+    index = ba.indexOf("&received=");
+    if(index < 13){ //если даже числа 1 и 1, то данная подстрока встретится не ранее чем на 13-й позиции
+        QByteArray block;
+
+        QHttpResponseHeader response = QHttpResponseHeader( 400 , "HTTP/1.1 400 Bad Request" );
+        QString str = response.toString();
+        block.append(str);
+        clientConnection->write(block);
+        return -1;
+    }
+
+    QHttpResponseHeader response; 
+    QByteArray block;
+    QString str;
+
+    byteArray = ba.mid(index + 9);
+    int receiverResult = byteArray.toInt();
+    bool ok = false;
+
+    if(receiverResult != 1){
+        qCritical() << "ERROR: Message with id = " << idMsg << " and type = " << msgType << " does not received by receiver! Result = " << receiverResult;
+        
+		response = QHttpResponseHeader( 200 , "HTTP/1.1 200 OK" );
+		QString str = response.toString();
+		block.append(str);
+        block.append(QString("OK"));
+
+        clientConnection->write(block);
+        ok = setMessageAsSended(idMsg, msgType, false);
+     }
+    else {
+        ok = true;//setMessageAsSended(idMsg, msgType);
+    }
+
+    if(!ok)
+    {
+        qCritical() << "ERROR: Cannot mark message as sended! Database Error. idMsg = " << idMsg << " type = " << msgType;
+        
+        response = QHttpResponseHeader( 400 , "HTTP/1.1 200 OK" );
+		str = response.toString();
+		block.append(str);
+        block.append("OK");
+
+        clientConnection->write(block);
+    }
+    else
+    {
+		response = QHttpResponseHeader( 200 , "HTTP/1.1 200 OK" );
+		QString str = response.toString();
+		block.append(str);
+        block.append(QString("OK"));
+
+        clientConnection->write(block);
+    }
+
+
+    return 1;
+}

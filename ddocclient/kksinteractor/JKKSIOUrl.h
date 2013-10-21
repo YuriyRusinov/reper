@@ -30,11 +30,11 @@ public:
     void setAbsUrl(const QString & url);
     const QString & getAbsUrl() const;
 
-    void setIdUrl(int idUrl);
-    int getIdUrl() const;
+    void setIdUrl(qint64 idUrl);
+    qint64 getIdUrl() const;
 
-    int id() const;//id in out_sync_queue
-    void setId(int _id);
+    qint64 id() const;//id in out_sync_queue
+    void setId(qint64 _id);
 
     void setIsLast(bool isLast = true);
     bool isLast() const;
@@ -55,7 +55,7 @@ private:
     QByteArray m_data;
     //QString m_uid;
     JKKSAddress m_senderAddr;
-    int m_idUrl;
+    qint64 m_idUrl;
     bool m_isLast;
     QString m_absUrl;
     qint64 m_idQueue;
@@ -64,8 +64,8 @@ private:
 class _I_EXPORT JKKSIOUrl : public JKKSUID
 {
 public:
-    JKKSIOUrl (int id=-1, 
-               int id_url=-1, 
+    JKKSIOUrl (qint64 id=-1, 
+               qint64 id_url=-1, 
                const QString& name1=QString(), 
                const QString& name2=QString(), 
                int type=-1, 
@@ -75,11 +75,11 @@ public:
     JKKSIOUrl (const JKKSIOUrl& url);
     ~JKKSIOUrl (void);
 
-    int getIOId (void) const;
-    void setIOId (int id);
+    qint64 getIOId (void) const;
+    void setIOId (qint64 id);
 
-    int getURLId (void) const;
-    void setURLId (int idUrl);
+    qint64 getURLId (void) const;
+    void setURLId (qint64 idUrl);
 
     const QString& getIOURL (void) const;
     void setIOURL (const QString& io_url);
@@ -107,8 +107,8 @@ private:
     friend QDataStream& operator>> (QDataStream& in, JKKSIOUrl& URL);
 
 private:
-    int idObject;
-    int idURL;
+    qint64 idObject;
+    qint64 idURL;
     QString IO_URL;
     QString URL;
     int urlType;

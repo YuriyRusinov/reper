@@ -1,7 +1,7 @@
 #include <QDataStream>
 #include "JKKSWorkMode.h"
 
-JKKSWorkMode :: JKKSWorkMode (int id, const QString& wm_name, const QString& desc, const QString& symbol, const JKKSWorkModeType& type, const QString& uid)
+JKKSWorkMode :: JKKSWorkMode (qint64 id, const QString& wm_name, const QString& desc, const QString& symbol, const JKKSWorkModeType& type, const QString& uid)
     : JKKSUID (uid, QString()),
     idWM (id),
     wmName (wm_name),
@@ -25,12 +25,12 @@ JKKSWorkMode :: ~JKKSWorkMode (void)
 {
 }
 
-int JKKSWorkMode :: id (void) const
+qint64 JKKSWorkMode :: id (void) const
 {
     return idWM;
 }
 
-void JKKSWorkMode :: setId (int _id)
+void JKKSWorkMode :: setId (qint64 _id)
 {
     idWM = _id;
 }

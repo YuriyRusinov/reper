@@ -21,25 +21,26 @@ class JKKSLoader;
 class _I_EXPORT JKKSOrgPackage : public JKKSMessage, public JKKSUID
 {
 public:
-    JKKSOrgPackage (int id=-1, 
+    JKKSOrgPackage (qint64 id=-1, 
                     const JKKSAddress & addr = JKKSAddress(), 
                     const QString& code=QString(), 
                     const QString& uid=QString());
+
     JKKSOrgPackage (const JKKSOrgPackage& OP);
 
     virtual QByteArray serialize (void) const;
     virtual int unserialize (const QByteArray& mess);
-    virtual int id (void) const;
+    virtual qint64 id (void) const;
     virtual int writeToDB (const JKKSLoader * loader, const QString& senderUID, const QString& receiverUID);
     virtual JKKSMessageType getMessageType (void) const;
 
-    const QMap<int, JKKSTransport>& getTransports (void) const;
-    void setTransports (const QMap<int, JKKSTransport>& T);
+    const QMap<qint64, JKKSTransport>& getTransports (void) const;
+    void setTransports (const QMap<qint64, JKKSTransport>& T);
 
-    const QMap<int, JKKSOrganization>& getOrgs (void) const;
-    void setOrgs (const QMap<int, JKKSOrganization>& orgs);
+    const QMap<qint64, JKKSOrganization>& getOrgs (void) const;
+    void setOrgs (const QMap<qint64, JKKSOrganization>& orgs);
 
-    void setId (int id);
+    void setId (qint64 id);
 
 private:
     //
@@ -52,9 +53,9 @@ private:
     //
     // Variables
     //
-    int m_id;
-    QMap<int, JKKSTransport> Transports;
-    QMap<int, JKKSOrganization> Orgs;
+    qint64 m_id;
+    QMap<qint64, JKKSTransport> Transports;
+    QMap<qint64, JKKSOrganization> Orgs;
 };
 
 #endif	/* __KKSSITOOOM_JKKSORGPACKAGE_H */

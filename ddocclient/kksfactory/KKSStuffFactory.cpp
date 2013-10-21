@@ -843,16 +843,18 @@ void KKSStuffFactory :: setOrgAddress (const QModelIndex& orgIndex, QAbstractIte
     QMap<int, QString> addrs;
     QMap<int, bool> actives;
     QMap<int, int> ports;
+    QMap<int, bool> useGateway;
 
-    KKSOrgModel * orgTrModel = new KKSOrgModel (tRes->getRowCount(), 5);
+    KKSOrgModel * orgTrModel = new KKSOrgModel (tRes->getRowCount(), 6);
     QStringList headers;
     headers << tr ("Transport set is enabled")
             << tr ("Transport name")
             << tr ("Transport address")
             << tr ("Transport port")
-            << tr ("Transport is active");
+            << tr ("Transport is active")
+            << tr ("Transport use gateway");
     
-    for (int i=0; i<5; i++)
+    for (int i=0; i<6; i++)
         orgTrModel->setHeaderData (i, Qt::Horizontal, headers[i], Qt::DisplayRole);
     
     for (int i=0; i<tRes->getRowCount(); i++)
@@ -862,6 +864,7 @@ void KKSStuffFactory :: setOrgAddress (const QModelIndex& orgIndex, QAbstractIte
         addrs.insert (idTr, tRes->getCellAsString(i, 3));
         actives.insert (idTr, tRes->getCellAsBool (i, 4));
         ports.insert (idTr, tRes->getCellAsInt (i, 5));
+        useGateway.insert(idTr, tRes->getCellAsBool(i, 6));
 
         QModelIndex orgIndex = orgTrModel->index (i, 0);
         orgTrModel->setData (orgIndex, idTr, Qt::UserRole);
@@ -874,13 +877,15 @@ void KKSStuffFactory :: setOrgAddress (const QModelIndex& orgIndex, QAbstractIte
         orgTrModel->setData (orgIndex, tRes->getCellAsInt (i, 5), Qt::DisplayRole);
         orgIndex = orgTrModel->index (i, 4);
         orgTrModel->setData (orgIndex, tRes->getCellAsBool (i, 4), Qt::CheckStateRole);
+        orgIndex = orgTrModel->index (i, 5);
+        orgTrModel->setData (orgIndex, tRes->getCellAsBool (i, 6), Qt::CheckStateRole);
     }
 
 
     delete tRes;
     delete res;
 
-    KKSOrganizationAddrForm * orgAForm = new KKSOrganizationAddrForm (idOrg, orgName, transps, addrs, actives, ports);
+    KKSOrganizationAddrForm * orgAForm = new KKSOrganizationAddrForm (idOrg, orgName, transps, addrs, actives, ports, useGateway);
     
     QAbstractItemDelegate * orgIDeleg = new KKSOrgItemDelegate;
     orgAForm->setModel (orgTrModel);
@@ -891,15 +896,18 @@ void KKSStuffFactory :: setOrgAddress (const QModelIndex& orgIndex, QAbstractIte
         QMap<int, QString> addresses = orgAForm->getAddrs();
         QMap<int, bool> actives = orgAForm->getActiveList();
         QMap<int, int> ports = orgAForm->getPortList();
+        QMap<int, bool> useGateway = orgAForm->getUseGatewayList();
         
         QString transpStr = QString ("ARRAY[");
         QString addrs = QString ("ARRAY[");
         QString actStr = QString ("ARRAY[");
         QString portStr = QString ("ARRAY[");
+        QString useGatewayStr = QString ("ARRAY[");
         
         int i=0;
         QMap<int, bool>::const_iterator pact = actives.constBegin();
         QMap<int, int>::const_iterator pport = ports.constBegin();
+        QMap<int, bool>::const_iterator pUseGateway = useGateway.constBegin();
         
         for (QMap<int, QString>::const_iterator pa = addresses.constBegin();
                 pa != addresses.constEnd();
@@ -911,6 +919,7 @@ void KKSStuffFactory :: setOrgAddress (const QModelIndex& orgIndex, QAbstractIte
             addrs += QString ("'%1'").arg (pa.value());
             actStr += QString ("%1").arg (pact != actives.constEnd() && pact.value() ? QString("true") : QString ("false"));
             portStr += QString ("%1").arg ((pport != ports.constEnd() && pport.value() <= 0) ? QString("NULL::int4") : QString::number (pport.value()));
+            useGatewayStr += QString ("%1").arg (pUseGateway != useGateway.constEnd() && pUseGateway.value() ? QString("true") : QString ("false"));
 
             if (i < addresses.size()-1)
             {
@@ -918,23 +927,27 @@ void KKSStuffFactory :: setOrgAddress (const QModelIndex& orgIndex, QAbstractIte
                 addrs += QString(",");
                 actStr += QString (",");
                 portStr += QString (",");
+                useGatewayStr += QString (",");
             }
             i++;
             pact++;
             pport++;
+            pUseGateway++;
         }
 
         transpStr += QString("]");
         addrs += QString("]");
         actStr += QString("]");
         portStr += QString("]");
+        useGatewayStr += QString("]");
 
-        QString orgAddrSql = QString ("select setOrganizationAddress (%1, %2, %3, %4, %5)")
+        QString orgAddrSql = QString ("select setOrganizationAddress (%1, %2, %3, %4, %5, %6)")
                 .arg (idOrg)
                 .arg (transpStr)
                 .arg (addrs)
                 .arg (portStr)
-                .arg (actStr);
+                .arg (actStr)
+                .arg (useGatewayStr);
 
         KKSResult * orgAddrRes = db->execute (orgAddrSql);
         if (!orgAddrRes || orgAddrRes->getRowCount() != 1)

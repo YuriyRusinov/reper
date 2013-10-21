@@ -22,12 +22,12 @@ class QDataStream;
 class _I_EXPORT JKKSSearchTemplate
 {
 public:
-    JKKSSearchTemplate (int id=-1, QString name=QString(), QString desc=QString());
+    JKKSSearchTemplate (qint64 id=-1, QString name=QString(), QString desc=QString());
     JKKSSearchTemplate (const JKKSSearchTemplate& ST);
     ~JKKSSearchTemplate (void);
 
-    int id (void) const;
-    void setId (int id);
+    qint64 id (void) const;
+    void setId (qint64 id);
 
     QString getName (void) const;
     void setName (QString name);
@@ -35,9 +35,9 @@ public:
     QString getDesc (void) const;
     void setDesc (QString desc);
 
-    const QMap<int, JKKSSearchGroup>& getGroups (void) const;
-    QMap<int, JKKSSearchGroup>& getGroups (void);
-    void setGroups (QMap<int, JKKSSearchGroup>& grs);
+    const QMap<qint64, JKKSSearchGroup>& getGroups (void) const;
+    QMap<qint64, JKKSSearchGroup>& getGroups (void);
+    void setGroups (QMap<qint64, JKKSSearchGroup>& grs);
 
 private:
     //
@@ -50,11 +50,11 @@ private:
     //
     // Variables
     //
-    int idSearchTemplate;
+    qint64 idSearchTemplate;
     QString searchTemplateName;
     QString searchTemplateDesc;
 
-    QMap<int, JKKSSearchGroup> groups;
+    QMap<qint64, JKKSSearchGroup> groups;
 };
 
 #endif

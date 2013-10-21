@@ -4,7 +4,7 @@
 #include <defines.h>
 #include "JKKSLoader.h"
 
-JKKSIOUrl :: JKKSIOUrl (int id, int id_url, const QString& name1, const QString& name2, int type, const QString& Src_ext, int l, const char * d)
+JKKSIOUrl :: JKKSIOUrl (qint64 id, qint64 id_url, const QString& name1, const QString& name2, int type, const QString& Src_ext, int l, const char * d)
     : idObject (id),
     idURL (id_url),
     IO_URL (name1),
@@ -33,22 +33,22 @@ JKKSIOUrl :: ~JKKSIOUrl (void)
 {
 }
 
-int JKKSIOUrl :: getIOId (void) const
+qint64 JKKSIOUrl :: getIOId (void) const
 {
     return idObject;
 }
 
-void JKKSIOUrl :: setIOId (int id)
+void JKKSIOUrl :: setIOId (qint64 id)
 {
     idObject = id;
 }
 
-int JKKSIOUrl :: getURLId (void) const
+qint64 JKKSIOUrl :: getURLId (void) const
 {
     return idURL;
 }
 
-void JKKSIOUrl :: setURLId (int idUrl)
+void JKKSIOUrl :: setURLId (qint64 idUrl)
 {
     idURL = idUrl;
 }
@@ -203,22 +203,22 @@ const QString & JKKSFilePart::getAbsUrl() const
     return m_absUrl;
 }
 
-void JKKSFilePart::setIdUrl(int idUrl)
+void JKKSFilePart::setIdUrl(qint64 idUrl)
 {
     m_idUrl = idUrl;
 }
 
-int JKKSFilePart::getIdUrl() const
+qint64 JKKSFilePart::getIdUrl() const
 {
     return m_idUrl;
 }
 
-void JKKSFilePart::setId(int idQueue)
+void JKKSFilePart::setId(qint64 idQueue)
 {
     m_idQueue = idQueue;
 }
 
-int JKKSFilePart::id() const
+qint64 JKKSFilePart::id() const
 {
     return m_idQueue;
 }

@@ -23,15 +23,15 @@ class QDataStream;
 class _I_EXPORT JKKSSearchGroup
 {
 public:
-    JKKSSearchGroup (int id=-1, int id_parent=-1, int oper=-1, bool is_not=false, int gr_type=-1);
+    JKKSSearchGroup (qint64 id=-1, qint64 id_parent=-1, int oper=-1, bool is_not=false, int gr_type=-1);
     JKKSSearchGroup (const JKKSSearchGroup& SG);
     ~JKKSSearchGroup (void);
 
-    int id (void) const;
-    void setId (int id);
+    qint64 id (void) const;
+    void setId (qint64 id);
 
-    int idParent (void) const;
-    void setParent (int id_parent);
+    qint64 idParent (void) const;
+    void setParent (qint64 id_parent);
 
     int getOper (void) const;
     void setOper (int op);
@@ -42,9 +42,9 @@ public:
     int getType (void) const;
     void setType (int type);
 
-    const QMap<int, JKKSSearchCriterion>& getCriteria (void) const;
-    QMap<int, JKKSSearchCriterion>& getCriteria (void);
-    void setCriteria (const QMap<int, JKKSSearchCriterion>& crit);
+    const QMap<qint64, JKKSSearchCriterion>& getCriteria (void) const;
+    QMap<qint64, JKKSSearchCriterion>& getCriteria (void);
+    void setCriteria (const QMap<qint64, JKKSSearchCriterion>& crit);
 
 private:
     //
@@ -57,13 +57,13 @@ private:
     //
     // Variables
     //
-    int idGroup;
-    int idParentGroup;
+    qint64 idGroup;
+    qint64 idParentGroup;
     int operGroup;
     bool isNot;
     int typeGroup;
 
-    QMap<int, JKKSSearchCriterion> searchCriteria;
+    QMap<qint64, JKKSSearchCriterion> searchCriteria;
 };
 
 #endif

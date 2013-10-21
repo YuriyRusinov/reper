@@ -6,7 +6,7 @@
 #include "JKKSOrgPackage.h"
 #include "defines.h"
 
-JKKSOrgPackage :: JKKSOrgPackage (int id, const JKKSAddress & addr, const QString& code, const QString& uid)
+JKKSOrgPackage :: JKKSOrgPackage (qint64 id, const JKKSAddress & addr, const QString& code, const QString& uid)
     : JKKSMessage (addr, code),
       JKKSUID (uid, QString()),
       m_id (id)
@@ -46,12 +46,12 @@ int JKKSOrgPackage :: unserialize (const QByteArray& mess)
     return OK_CODE;
 }
 
-int JKKSOrgPackage :: id (void) const
+qint64 JKKSOrgPackage :: id (void) const
 {
     return m_id;
 }
 
-void JKKSOrgPackage :: setId (int id)
+void JKKSOrgPackage :: setId (qint64 id)
 {
     m_id = id;
 }
@@ -67,22 +67,22 @@ JKKSMessage::JKKSMessageType JKKSOrgPackage :: getMessageType (void) const
     return JKKSMessage::atOrgPackage;
 }
 
-const QMap<int, JKKSTransport>& JKKSOrgPackage :: getTransports (void) const
+const QMap<qint64, JKKSTransport>& JKKSOrgPackage :: getTransports (void) const
 {
     return Transports;
 }
 
-void JKKSOrgPackage :: setTransports (const QMap<int, JKKSTransport>& T)
+void JKKSOrgPackage :: setTransports (const QMap<qint64, JKKSTransport>& T)
 {
     Transports = T;
 }
 
-const QMap<int, JKKSOrganization>& JKKSOrgPackage :: getOrgs (void) const
+const QMap<qint64, JKKSOrganization>& JKKSOrgPackage :: getOrgs (void) const
 {
     return Orgs;
 }
 
-void JKKSOrgPackage :: setOrgs (const QMap<int, JKKSOrganization>& orgs)
+void JKKSOrgPackage :: setOrgs (const QMap<qint64, JKKSOrganization>& orgs)
 {
     Orgs = orgs;
 }
@@ -117,5 +117,6 @@ QDataStream& operator>> (QDataStream& in, JKKSOrgPackage& OP)
     OP.setUid (uid);
     OP.setAddr (addr);// = JKKSRefRecord (avals, uid);
     OP.setCode (code);
+
     return in;
 }

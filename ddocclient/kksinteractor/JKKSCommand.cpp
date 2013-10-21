@@ -15,7 +15,7 @@
 #include "kksresult.h"
 #include "defines.h"
 
-JKKSCommand :: JKKSCommand (int id,
+JKKSCommand :: JKKSCommand (qint64 id,
                             const QString& u_idFrom,
                             const QString& dl_from_name,
                             const QString& u_idExec,
@@ -24,9 +24,9 @@ JKKSCommand :: JKKSCommand (int id,
                             const JKKSAddress& eOrgAddr,
                             const QString& u_idTo,
                             const QString& dl_to_name,
-                            int idIoCat,
+                            qint64 idIoCat,
                             const QString& category_code,
-                            int idJrSt,
+                            qint64 idJrSt,
                             const QDateTime& iTime,
                             const QDateTime& eTime,
                             int e_t_interval,
@@ -37,8 +37,8 @@ JKKSCommand :: JKKSCommand (int id,
                             const QString & uid,
                             const QString & inputNumber,
                             const QString & outputNumber,
-                            int   idUL,
-                            int   idObj)
+                            qint64   idUL,
+                            qint64   idObj)
     : JKKSMessage (address, code), JKKSUID(uid, QString()),
     idCommand (id),
     u_idDlFrom (u_idFrom),
@@ -173,7 +173,7 @@ int JKKSCommand :: unserialize (const QByteArray& mess)
     in >> m_idUrgencyLevel;
     in >> m_idObject;
 
-    for (QMap<int, JKKSCategory>::const_iterator pc = category.constBegin (); \
+    for (QMap<qint64, JKKSCategory>::const_iterator pc = category.constBegin (); \
             pc != category.constEnd (); \
             pc++)
     {
@@ -206,22 +206,22 @@ JKKSMessage::JKKSMessageType JKKSCommand :: getMessageType (void) const
     return JKKSMessage::atCommand;
 }
 
-const QMap<int, JKKSCategory>& JKKSCommand :: getCategory (void) const
+const QMap<qint64, JKKSCategory>& JKKSCommand :: getCategory (void) const
 {
     return category;
 }
 
-void JKKSCommand::setCategory (const QMap<int, JKKSCategory>& catMap)
+void JKKSCommand::setCategory (const QMap<qint64, JKKSCategory>& catMap)
 {
     category = catMap;
 }
 
-int JKKSCommand :: id (void) const
+qint64 JKKSCommand :: id (void) const
 {
     return idCommand;
 }
 
-void JKKSCommand :: setId (int id)
+void JKKSCommand :: setId (qint64 id)
 {
     idCommand = id;
 }
@@ -306,12 +306,12 @@ void JKKSCommand :: setDlToName (const QString& dl_to_name)
     dlToName = dl_to_name;
 }
 
-int JKKSCommand :: getIdIoCat (void) const
+qint64 JKKSCommand :: getIdIoCat (void) const
 {
     return idIOCategory;
 }
 
-void JKKSCommand :: setIdIoCat (int id_io_category)
+void JKKSCommand :: setIdIoCat (qint64 id_io_category)
 {
     idIOCategory = id_io_category;
 }
@@ -326,12 +326,12 @@ void JKKSCommand :: setCategoryCode (const QString& category_code)
     categoryCode = category_code;
 }
 
-int JKKSCommand :: getJournalState (void) const
+qint64 JKKSCommand :: getJournalState (void) const
 {
     return idJrState;
 }
 
-void JKKSCommand :: setJournalState (int idState)
+void JKKSCommand :: setJournalState (qint64 idState)
 {
     idJrState = idState;
 }
@@ -396,9 +396,9 @@ void JKKSCommand :: setAttachment (const JKKSDocument& doc)
 
 /***************************/
 
-JKKSCmdConfirmation::JKKSCmdConfirmation(int idCmd, 
+JKKSCmdConfirmation::JKKSCmdConfirmation(qint64 idCmd, 
                                          const QString & extraId,
-                                         int idState,
+                                         qint64 idState,
                                          const QDateTime & acceptedDatetime,
                                          const QDateTime & receiveDatetime,
                                          const JKKSAddress & addr,
@@ -454,6 +454,7 @@ int JKKSCmdConfirmation::unserialize (const QByteArray& mess)
 
     JKKSAddress addr;
     QString code;
+
     in >> addr;
     in >> code;
     in >> m_id;
@@ -480,12 +481,12 @@ JKKSMessage::JKKSMessageType JKKSCmdConfirmation::getMessageType (void) const
     return JKKSMessage::atCmdConfirmation;
 }
 
-int JKKSCmdConfirmation::id (void) const
+qint64 JKKSCmdConfirmation::id (void) const
 {
     return m_id;
 }
 
-void JKKSCmdConfirmation::setId (int the_id)
+void JKKSCmdConfirmation::setId (qint64 the_id)
 {
     m_id = the_id;
 }
@@ -500,12 +501,12 @@ void JKKSCmdConfirmation::setExtraId (const QString & the_id)
     unique_id = the_id;
 }
 
-int JKKSCmdConfirmation::idState() const
+qint64 JKKSCmdConfirmation::idState() const
 {
     return m_idState;
 }
 
-void JKKSCmdConfirmation::setIdState(int state)
+void JKKSCmdConfirmation::setIdState(qint64 state)
 {
     m_idState = state;
 }

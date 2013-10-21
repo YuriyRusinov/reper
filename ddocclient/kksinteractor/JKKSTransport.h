@@ -10,7 +10,7 @@ class QDataStream;
 class _I_EXPORT JKKSTransport : public JKKSUID
 {
 public:
-    JKKSTransport (int id_transport=-1, 
+    JKKSTransport (qint64 id_transport=-1, 
                    const QString& trName=QString(), 
                    const JKKSAddress & lAddr = JKKSAddress(), 
                    bool isActive=false, 
@@ -19,8 +19,8 @@ public:
     JKKSTransport (const JKKSTransport& T);
     ~JKKSTransport (void);
 
-    int id (void) const;
-    void setId (int id);
+    qint64 id (void) const;
+    void setId (qint64 id);
 
     QString getTransportName (void) const;
     void setTransportName (const QString& name);
@@ -41,7 +41,7 @@ private:
     //
     // Variables
     //
-    int idTransport;
+    qint64 idTransport;
     QString transportName;
     JKKSAddress localAddr;
     bool m_isActive;

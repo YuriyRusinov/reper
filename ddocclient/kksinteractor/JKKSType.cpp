@@ -1,7 +1,7 @@
 #include <QDataStream>
 #include "JKKSType.h"
 
-JKKSType :: JKKSType (int id, const QString& name, const QString& desc, const QString& uid)
+JKKSType :: JKKSType (qint64 id, const QString& name, const QString& desc, const QString& uid)
     : JKKSUID (uid, QString()),
     m_id(id),
     m_name(name),
@@ -21,12 +21,12 @@ JKKSType :: ~JKKSType (void)
 {
 }
 
-int JKKSType :: getIdType (void) const
+qint64 JKKSType :: getIdType (void) const
 {
     return m_id;
 }
 
-void JKKSType :: setIdType (int id)
+void JKKSType :: setIdType (qint64 id)
 {
     m_id = id;
 }

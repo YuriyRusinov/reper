@@ -2,7 +2,7 @@
 
 #include "JKKSSearchCriterion.h"
 
-JKKSSearchCriterion :: JKKSSearchCriterion (int idc, \
+JKKSSearchCriterion :: JKKSSearchCriterion (qint64 idc, \
                                             const JKKSCategoryAttr& attr, \
                                             QString val, \
                                             int type, \
@@ -34,12 +34,12 @@ JKKSSearchCriterion :: ~JKKSSearchCriterion (void)
 {
 }
 
-int JKKSSearchCriterion :: id (void) const
+qint64 JKKSSearchCriterion :: id (void) const
 {
     return idC;
 }
 
-void JKKSSearchCriterion :: setId (int idc)
+void JKKSSearchCriterion :: setId (qint64 idc)
 {
     idC = idc;
 }

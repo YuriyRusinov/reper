@@ -6,17 +6,17 @@
 
 #include "JKKSMessage.h"
 
-JKKSAddress :: JKKSAddress(const QString & addr, int port) : m_address(addr), m_port(port)
+JKKSAddress :: JKKSAddress(const QString & addr, int port, bool useGateway) : m_address(addr), m_port(port), m_useGateway(useGateway)
 {
 
 }
 
-JKKSAddress :: JKKSAddress() : m_address(QString()), m_port(0)
+JKKSAddress :: JKKSAddress() : m_address(QString()), m_port(0), m_useGateway(false)
 {
 
 }
 
-JKKSAddress::JKKSAddress(const JKKSAddress & a) : m_address(a.m_address), m_port(a.m_port)
+JKKSAddress::JKKSAddress(const JKKSAddress & a) : m_address(a.m_address), m_port(a.m_port), m_useGateway(a.m_useGateway)
 {
 
 }
@@ -40,6 +40,11 @@ int JKKSAddress::port() const
     return m_port;
 }
 
+bool JKKSAddress::useGateway() const
+{
+    return m_useGateway;
+}
+
 void JKKSAddress::setAddress(const QString & addr)
 {
     m_address = addr;
@@ -50,10 +55,16 @@ void JKKSAddress::setPort(int p)
     m_port = p;
 }
 
+void JKKSAddress::setUseGateway(bool b)
+{
+    m_useGateway = b;
+}
+
 QDataStream& operator<< (QDataStream& out, const JKKSAddress& T)
 {
     out << T.m_address;
     out << T.m_port;
+    out << T.m_useGateway;
 
     return out;
 }
@@ -62,6 +73,7 @@ QDataStream& operator>> (QDataStream& in, JKKSAddress& T)
 {
     in >> T.m_address;
     in >> T.m_port;
+    in >> T.m_useGateway;
 
     return in;
 }
@@ -70,7 +82,7 @@ QDataStream& operator>> (QDataStream& in, JKKSAddress& T)
 JKKSMessage :: JKKSMessage (const JKKSAddress & address, const QString& code)
     : m_addr (address),
     m_kvs (code),
-    c (QMap<int, JKKSCategory>())
+    c (QMap<qint64, JKKSCategory>())
 {
 }
 
@@ -122,12 +134,12 @@ QByteArray JKKSMessage :: serialize (void) const
     return res;
 }
 
-const QMap<int, JKKSCategory>& JKKSMessage :: getCategory (void) const
+const QMap<qint64, JKKSCategory>& JKKSMessage :: getCategory (void) const
 {
     return c;
 }
 
-void JKKSMessage :: setCategory (const QMap<int, JKKSCategory>& catMap)
+void JKKSMessage :: setCategory (const QMap<qint64, JKKSCategory>& catMap)
 {
     Q_UNUSED (catMap);
 }

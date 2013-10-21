@@ -57,7 +57,7 @@ KKSRecWidget :: KKSRecWidget (bool mode, Qt::Orientation orient, QWidget *parent
     pbApply (new QPushButton (tr("A&pply"), this)),
     actSetView (new QAction (QIcon(":/ddoc/apply_template.png"), tr("Apply template"), this))
 {
-    tView->setRootIsDecorated (false);
+    tView->setRootIsDecorated (true);
     tView->setSelectionBehavior (QAbstractItemView::SelectRows);
     //Q_INIT_RESOURCE (kksgui_icon_set);
     this->init_widgets (mode, orient);

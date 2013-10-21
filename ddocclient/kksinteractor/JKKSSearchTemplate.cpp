@@ -2,11 +2,11 @@
 
 #include "JKKSSearchTemplate.h"
 
-JKKSSearchTemplate :: JKKSSearchTemplate (int id, QString name, QString desc)
+JKKSSearchTemplate :: JKKSSearchTemplate (qint64 id, QString name, QString desc)
     : idSearchTemplate (id),
     searchTemplateName (name),
     searchTemplateDesc (desc),
-    groups (QMap<int, JKKSSearchGroup>())
+    groups (QMap<qint64, JKKSSearchGroup>())
 {
 }
 
@@ -23,12 +23,12 @@ JKKSSearchTemplate :: ~JKKSSearchTemplate (void)
     groups.clear();
 }
 
-int JKKSSearchTemplate :: id (void) const
+qint64 JKKSSearchTemplate :: id (void) const
 {
     return idSearchTemplate;
 }
 
-void JKKSSearchTemplate :: setId (int id)
+void JKKSSearchTemplate :: setId (qint64 id)
 {
     idSearchTemplate = id;
 }
@@ -53,17 +53,17 @@ void JKKSSearchTemplate :: setDesc (QString desc)
     searchTemplateDesc = desc;
 }
 
-const QMap<int, JKKSSearchGroup>& JKKSSearchTemplate :: getGroups (void) const
+const QMap<qint64, JKKSSearchGroup>& JKKSSearchTemplate :: getGroups (void) const
 {
     return groups;
 }
 
-QMap<int, JKKSSearchGroup>& JKKSSearchTemplate :: getGroups (void)
+QMap<qint64, JKKSSearchGroup>& JKKSSearchTemplate :: getGroups (void)
 {
     return groups;
 }
 
-void JKKSSearchTemplate :: setGroups (QMap<int, JKKSSearchGroup>& grs)
+void JKKSSearchTemplate :: setGroups (QMap<qint64, JKKSSearchGroup>& grs)
 {
     groups = grs;
 }

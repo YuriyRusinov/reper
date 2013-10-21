@@ -29,8 +29,8 @@ class JKKSLoader;
 class _I_EXPORT JKKSRefRecord : public JKKSMessage, public JKKSUID
 {
 public:
-    JKKSRefRecord (int id_queue=-1, 
-                   int id_rec=-1, 
+    JKKSRefRecord (qint64 id_queue=-1, 
+                   qint64 id_rec=-1, 
                    int id_entity_type=-1, 
                    const QString& tName=QString(), 
                    int sync_type=-1, 
@@ -43,10 +43,10 @@ public:
                    const QString & t_uid = QString(), 
                    const QString & uid = QString(),
                    const QString & uuid = QString(),
-                   int idState = 1, 
+                   qint64 idState = 1, 
                    const QColor bkCol = QColor(),
                    const QColor fgCol = QColor(),
-                   const QIcon rIcon = QIcon());
+                   const QString & rIcon = QString());
     
     JKKSRefRecord (const JKKSRefRecord& RR);
     
@@ -58,13 +58,13 @@ public:
     QByteArray serialize (void) const;
     int unserialize (const QByteArray& mess);
     int writeToDB (const JKKSLoader * loader, const QString& senderUID, const QString& receiverUID);
-    int id (void) const;
+    qint64 id (void) const;
     JKKSMessageType getMessageType (void) const;
 
-    void setId (int id);
+    void setId (qint64 id);
 
-    int getIDQueue (void) const;
-    void setIDQueue (int idq);
+    qint64 getIDQueue (void) const;
+    void setIDQueue (qint64 idq);
 
     int getEntityType (void) const;
     void setEntityType (int id_entity_type);
@@ -78,11 +78,14 @@ public:
     int getSyncType (void) const;
     void setSyncType (int sync_type);
 
-    const QMap<int, JKKSCategory>& getCategory (void) const;
-    void setCategory (const QMap<int, JKKSCategory>& aCats);
+    const QMap<qint64, JKKSCategory>& getCategory (void) const;
+    void setCategory (const QMap<qint64, JKKSCategory>& aCats);
 
     const QStringList& attrsValues (void) const;
     void setAttrsValues (const QStringList& attrs_vals);
+
+    const QMap<QString, QString> & indValues(void) const;
+    void setIndValues (const QMap<QString, QString> & ind_vals);
 
     const JKKSDocument& getIODoc (void) const;
     void setIODoc (const JKKSDocument& doc);
@@ -104,14 +107,16 @@ private:
     //
     // Variables
     //
-    int idQueue;
-    int idRec;
+    qint64 idQueue;
+    qint64 idRec;
     int idEntityType;
     QString tableName;
-    QString tableUID;
+    QString tableUID;//фактически это unique_id информационного объекта, содержащего Ё»ќ
     int syncType;
-    QMap<int, JKKSCategory> cat;
-    QStringList aVals;
+
+    QMap<qint64, JKKSCategory> cat;
+    QStringList aVals;//список значений табличных атрибутов. ≈сли атрибут ссылочный, то дл€ такого атрибута в качестве значени€ используетс€ его unique_id
+    QMap<QString, QString> indVals; //список значений показателей записей справочников. ≈сли показатель ссылочный, то дл€ него в качестве значени€ используетс€ его unique_id
 
     JKKSDocument ioDoc;
     JKKSIOTable ioTable;
@@ -121,8 +126,8 @@ private:
 class _I_EXPORT JKKSQueueResponse : public JKKSMessage 
 {
 public:
-    JKKSQueueResponse (int local_id=-1, 
-                       int id_queue=-1, 
+    JKKSQueueResponse (qint64 local_id=-1, 
+                       qint64 id_queue=-1, 
                        int sync_result=-1, 
                        const JKKSAddress & addr = JKKSAddress(), 
                        const QString& type=QString());
@@ -135,16 +140,19 @@ public:
     QByteArray serialize (void) const;
     int unserialize (const QByteArray& mess);
     int writeToDB (const JKKSLoader * loader, const QString& senderUID, const QString& receiverUID);
-    int id (void) const;
+    qint64 id (void) const;
     JKKSMessageType getMessageType (void) const;
 
-    void setId (int id);
+    void setOrgUid(const QString & orgUid);
+    const QString & orgUid() const;
+
+    void setId (qint64 id);
 
     int getResult (void) const;
     void setResult (int sRes);
 
-    int getExternalId (void) const;
-    void setExternalId (int idq);
+    qint64 getExternalId (void) const;
+    void setExternalId (qint64 idq);
 
 private:
     //
@@ -157,9 +165,10 @@ private:
     //
     // Variables
     //
-    int localId;
-    int idQueue;
+    qint64 localId;
+    qint64 idQueue;
     int syncResult;
+    QString m_orgUid;
 };
 
 #endif

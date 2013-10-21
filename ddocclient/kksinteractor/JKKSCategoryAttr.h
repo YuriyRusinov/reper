@@ -12,6 +12,7 @@
 #include "jkksuid.h"
 
 #include <QString>
+#include <QMap>
 
 class QDataStream;
 class QTextStream;
@@ -25,8 +26,8 @@ class _I_EXPORT JKKSCategoryAttr : public JKKSUID
         //
         // Functions
         //
-        JKKSCategoryAttr (int idAttr=-1, 
-                          int idAttrType=-1, 
+        JKKSCategoryAttr (qint64 idAttr=-1, 
+                          qint64 idAttrType=-1, 
                           const QString& aCode=QString(), 
                           const QString& aName=QString(), 
                           const QString& aTitle=QString(), 
@@ -42,11 +43,11 @@ class _I_EXPORT JKKSCategoryAttr : public JKKSUID
         JKKSCategoryAttr (const JKKSCategoryAttr& cAttr);
         ~JKKSCategoryAttr (void);
 
-        int id (void) const;
-        void setId (int id);
+        qint64 id (void) const;
+        void setId (qint64 id);
 
-        int idAttrType (void) const;
-        void setIdAttrType (int id);
+        qint64 idAttrType (void) const;
+        void setIdAttrType (qint64 id);
 
         const QString & code (void) const;
         void setCode (const QString& nCode);
@@ -81,6 +82,13 @@ class _I_EXPORT JKKSCategoryAttr : public JKKSUID
         bool transferrable (void) const;
         void setTransferrable (bool v);
 
+        const QString & attrAttrUid() const;
+        void setAttrAttrUid(const QString & uid);
+
+        void setAttrs(const QMap<qint64, JKKSCategoryAttr> & attrs);
+        const QMap<qint64, JKKSCategoryAttr> & attrs() const;
+        QMap<qint64, JKKSCategoryAttr> & attrs();
+
         bool operator< (const JKKSCategoryAttr& A) const;
 
     private:
@@ -95,19 +103,22 @@ class _I_EXPORT JKKSCategoryAttr : public JKKSUID
         //
         // Variables
         //
-        int m_idAttribute;
-        int m_idAttrType;
+        qint64 m_idAttribute;
+        qint64 m_idAttrType;
         //QString m_uid;
         QString m_aCode;
         QString m_aName;
         QString m_aTitle;
         QString m_aTable;
-        QString m_aTableUid;
+        QString m_aTableUid;//unique_id ИО, на таблицу которого ссылается данный атрибут (по нему будем получать настоящее название таблицы на приемном конце)
         QString m_aColumn;
         int m_aDefWidth;
         QString m_aDefValue;
         bool m_isMandatory;
         bool m_isReadOnly;
+        QString m_attrAttrUid; //unique_id in attrs_attrs table. Если данный атрибут входит в состав составного
+
+        QMap<qint64, JKKSCategoryAttr> m_attrs; //список атрибутов, описывающих данный атрибут. Для составных атрибутов
 
         bool m_transferrable;//специальный параметр, отвечающий за 
                              //синхронизацию только определенных колонок таблицы

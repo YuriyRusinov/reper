@@ -14,12 +14,12 @@
 class _I_EXPORT JKKSWorkModeType : public JKKSUID
 {
 public:
-    JKKSWorkModeType (int id=-1, const QString& nameType=QString(), const QString& shortNameType=QString(), const QString& uid = QString());
+    JKKSWorkModeType (qint64 id=-1, const QString& nameType=QString(), const QString& shortNameType=QString(), const QString& uid = QString());
     JKKSWorkModeType (const JKKSWorkModeType& wmType);
     ~JKKSWorkModeType (void);
 
-    int id (void) const;
-    void setId (int _id);
+    qint64 id (void) const;
+    void setId (qint64 _id);
 
     const QString& getName (void) const;
     void setName (const QString& name);
@@ -38,7 +38,7 @@ private:
     //
     // Variables
     //
-    int idWMType;
+    qint64 idWMType;
     QString wmNameType;
     QString wmShortNameType;
 };

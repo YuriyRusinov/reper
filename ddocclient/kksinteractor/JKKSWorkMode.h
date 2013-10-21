@@ -10,7 +10,7 @@ class QDataStream;
 class _I_EXPORT JKKSWorkMode : public JKKSUID 
 {
 public:
-    JKKSWorkMode (int id=-1, 
+    JKKSWorkMode (qint64 id=-1, 
                   const QString& wm_name=QString(), 
                   const QString& desc=QString(), 
                   const QString& symbol=QString(), 
@@ -19,8 +19,8 @@ public:
     JKKSWorkMode (const JKKSWorkMode& WM);
     ~JKKSWorkMode (void);
 
-    int id (void) const;
-    void setId (int _id);
+    qint64 id (void) const;
+    void setId (qint64 _id);
 
     const QString& getName (void) const;
     void setName (const QString& name);
@@ -45,7 +45,7 @@ private:
     //
     // Variables
     //
-    int idWM;
+    qint64 idWM;
     QString wmName;
     QString wmDesc;
     QString wmSymbol;

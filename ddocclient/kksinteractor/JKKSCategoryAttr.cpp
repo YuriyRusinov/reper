@@ -3,8 +3,8 @@
 
 #include "JKKSCategoryAttr.h"
 
-JKKSCategoryAttr :: JKKSCategoryAttr (int idAttr, 
-                                      int idAttrType, 
+JKKSCategoryAttr :: JKKSCategoryAttr (qint64 idAttr, 
+                                      qint64 idAttrType, 
                                       const QString& aCode, 
                                       const QString& aName, 
                                       const QString& aTitle, 
@@ -47,7 +47,9 @@ JKKSCategoryAttr :: JKKSCategoryAttr (const JKKSCategoryAttr& cAttr)
     m_aDefValue (cAttr.m_aDefValue),
     m_isMandatory (cAttr.m_isMandatory),
     m_isReadOnly (cAttr.m_isReadOnly),
-    m_transferrable(cAttr.m_transferrable)
+    m_transferrable(cAttr.m_transferrable),
+    m_attrs(cAttr.m_attrs),
+    m_attrAttrUid(cAttr.m_attrAttrUid)
 {
 }
 
@@ -70,7 +72,9 @@ QDataStream& operator<< (QDataStream& out, const JKKSCategoryAttr& attr)
     out << attr.m_isMandatory;
     out << attr.m_isReadOnly;
     out << attr.uid();
+    out << attr.attrs();
     out << attr.m_transferrable;
+    out << attr.m_attrAttrUid;
 
     return out;
 }
@@ -92,28 +96,30 @@ QDataStream& operator>> (QDataStream& in, JKKSCategoryAttr& attr)
     QString uid;
     in >> uid;
     attr.setUid (uid);
+    in >> attr.m_attrs;
     in >> attr.m_transferrable;
+    in >> attr.m_attrAttrUid;
 
     return in;
 }
 
 
-int JKKSCategoryAttr :: id (void) const
+qint64 JKKSCategoryAttr :: id (void) const
 {
     return m_idAttribute;
 }
 
-void JKKSCategoryAttr :: setId (int id)
+void JKKSCategoryAttr :: setId (qint64 id)
 {
     m_idAttribute = id;
 }
 
-int JKKSCategoryAttr :: idAttrType (void) const
+qint64 JKKSCategoryAttr :: idAttrType (void) const
 {
     return m_idAttrType;
 }
 
-void JKKSCategoryAttr :: setIdAttrType (int id)
+void JKKSCategoryAttr :: setIdAttrType (qint64 id)
 {
     m_idAttrType = id;
 }
@@ -218,6 +224,21 @@ void JKKSCategoryAttr :: setReadOnly (bool v)
     m_isReadOnly = v;
 }
 
+void JKKSCategoryAttr::setAttrs(const QMap<qint64, JKKSCategoryAttr> & attrs)
+{
+    m_attrs = attrs;
+}
+
+const QMap<qint64, JKKSCategoryAttr> & JKKSCategoryAttr::attrs() const
+{
+    return m_attrs;
+}
+
+QMap<qint64, JKKSCategoryAttr> & JKKSCategoryAttr::attrs()
+{
+    return m_attrs;
+}
+
 bool JKKSCategoryAttr :: transferrable (void) const
 {
     return m_transferrable;
@@ -247,4 +268,14 @@ QTextStream& JKKSCategoryAttr :: loadFromBuffer (QTextStream& f, QString& str)
 bool JKKSCategoryAttr :: operator< (const JKKSCategoryAttr& A) const
 {
     return m_aCode < A.m_aCode;
+}
+
+const QString & JKKSCategoryAttr :: attrAttrUid() const
+{
+    return m_attrAttrUid;
+}
+
+void JKKSCategoryAttr :: setAttrAttrUid(const QString & uid)
+{
+    m_attrAttrUid = uid;
 }

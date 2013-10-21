@@ -4,10 +4,10 @@
 #include "JKKSRubric.h"
 #include "JKKSSearchTemplate.h"
 
-JKKSRubric :: JKKSRubric (int id, 
+JKKSRubric :: JKKSRubric (qint64 id, 
                           const QString& uid, 
-                          int idp, 
-                          int idc, 
+                          qint64 idp, 
+                          qint64 idc, 
                           const QString& name, 
                           const QString& code, 
                           const QString& desc)
@@ -55,12 +55,12 @@ JKKSRubric& JKKSRubric :: operator= (const JKKSRubric& R)
     return *this;
 }
 
-int JKKSRubric :: getId (void) const
+qint64 JKKSRubric :: getId (void) const
 {
     return idRubric;
 }
 
-void JKKSRubric :: setId (int idr)
+void JKKSRubric :: setId (qint64 idr)
 {
     idRubric = idr;
 }
@@ -76,22 +76,22 @@ void JKKSRubric :: setUid (const QString& uid)
 }
 
 
-int JKKSRubric :: getParent (void) const
+qint64 JKKSRubric :: getParent (void) const
 {
     return idParent;
 }
 
-void JKKSRubric :: setParent (int idp)
+void JKKSRubric :: setParent (qint64 idp)
 {
     idParent = idp;
 }
 
-int JKKSRubric :: getEntity (void) const
+qint64 JKKSRubric :: getEntity (void) const
 {
     return idEntity;
 }
 
-void JKKSRubric :: setEntity (int idc)
+void JKKSRubric :: setEntity (qint64 idc)
 {
     idEntity = idc;
 }

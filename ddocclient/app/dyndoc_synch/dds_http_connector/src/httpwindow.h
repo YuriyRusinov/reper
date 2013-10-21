@@ -83,7 +83,7 @@ private:
 
     QList<JKKSPMessWithAddr *> messageList;
 
-    QMap<int, QPair<int, int> > httpMessages;
+    QMap<int, QPair<qint64, qint64> > httpMessages;
 
     //QList< QPair<int, int> > http_message;
     //QList< QPair<int, int> > message_type;

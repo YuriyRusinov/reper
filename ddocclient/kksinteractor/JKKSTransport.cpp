@@ -1,7 +1,7 @@
 #include <QDataStream>
 #include "JKKSTransport.h"
 
-JKKSTransport :: JKKSTransport (int id_transport, 
+JKKSTransport :: JKKSTransport (qint64 id_transport, 
                                 const QString& trName, 
                                 const JKKSAddress & lAddr, 
                                 bool isActive, 
@@ -27,12 +27,12 @@ JKKSTransport :: ~JKKSTransport (void)
 {
 }
 
-int JKKSTransport :: id (void) const
+qint64 JKKSTransport :: id (void) const
 {
     return idTransport;
 }
 
-void JKKSTransport :: setId (int id)
+void JKKSTransport :: setId (qint64 id)
 {
     idTransport = id;
 }

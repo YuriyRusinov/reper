@@ -22,10 +22,10 @@ class QDataStream;
 class _I_EXPORT JKKSGlobalRubric : public JKKSRubric
 {
 public:
-    JKKSGlobalRubric (int id=-1, 
+    JKKSGlobalRubric (qint64 id=-1, 
                       const QString & uid = QString(),
-                      int idp=-1, 
-                      int idc=-1, 
+                      qint64 idp=-1, 
+                      qint64 idc=-1, 
                       const QString& name=QString(), 
                       const QString& code=QString(), 
                       const QString& desc=QString());
@@ -33,9 +33,9 @@ public:
     ~JKKSGlobalRubric (void);
     JKKSGlobalRubric& operator= (const JKKSGlobalRubric& R);
 
-    const QMap<int, JKKSCategory>& getCategory (void) const;
-    QMap<int, JKKSCategory>& getCategory (void);
-    void setCategory (const QMap<int, JKKSCategory>& c);
+    const QMap<qint64, JKKSCategory>& getCategory (void) const;
+    QMap<qint64, JKKSCategory>& getCategory (void);
+    void setCategory (const QMap<qint64, JKKSCategory>& c);
 
     const JKKSSearchTemplate& getSearchTemplate (void) const;
     void setSearchTemplate (const JKKSSearchTemplate& st);
@@ -48,7 +48,7 @@ private:
     friend QDataStream& operator>> (QDataStream& in, JKKSGlobalRubric& R);
 
 private:
-    QMap<int, JKKSCategory> category;
+    QMap<qint64, JKKSCategory> category;
     JKKSSearchTemplate searchTemplate;
 };
 

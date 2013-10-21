@@ -56,7 +56,7 @@ void TransportSettingsForm :: setConnectionSettings (void)
     settings->endGroup();
 
 
-    settings->beginGroup ("Http");
+    settings->beginGroup ("Http"); //понимаем как адрес шлюза для отправки корреспонденции (ТПС)
     settings->setValue ("host", UI->lEHttpHost->text ());
     settings->setValue ("port", UI->lEHttpPort->text ());
    

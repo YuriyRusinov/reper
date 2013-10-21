@@ -7,7 +7,7 @@
 #include "JKKSOrganization.h"
 #include "defines.h"
 
-JKKSOrganization :: JKKSOrganization (int idOrg,
+JKKSOrganization :: JKKSOrganization (qint64 idOrg,
                                       const QString& uidParent,
                                       const QString& uidParent1,
                                       const QString& uidSubstitutor,
@@ -26,7 +26,7 @@ JKKSOrganization :: JKKSOrganization (int idOrg,
                                       const QString& uid)
     : JKKSMessage (addr, mess_code),
       JKKSUID (uid, QString()),
-      m_id (idOrg),
+      m_id ((qint64)idOrg),
       m_uidParent (uidParent),
       m_uidParent1 (uidParent1),
       m_uidSubstitutor (uidSubstitutor),
@@ -106,7 +106,7 @@ int JKKSOrganization :: writeToDB (const JKKSLoader * loader, const QString& sen
     return ier;
 }
 
-int JKKSOrganization :: id (void) const
+qint64 JKKSOrganization :: id (void) const
 {
     return m_id;
 }
@@ -116,7 +116,7 @@ JKKSMessage::JKKSMessageType JKKSOrganization :: getMessageType (void) const
     return JKKSMessage::atOrganization;
 }
 
-void JKKSOrganization :: setId (int id)
+void JKKSOrganization :: setId (qint64 id)
 {
     m_id = id;
 }
@@ -283,12 +283,12 @@ void JKKSOrganization :: setTransport (const JKKSTransport& T)
     orgTransport = T;
 }
 
-const QMap<int, JKKSWorkMode>& JKKSOrganization :: getWorkModes (void) const
+const QMap<qint64, JKKSWorkMode>& JKKSOrganization :: getWorkModes (void) const
 {
     return workModes;
 }
 
-void JKKSOrganization :: setWorkModes (const QMap<int, JKKSWorkMode>& wms)
+void JKKSOrganization :: setWorkModes (const QMap<qint64, JKKSWorkMode>& wms)
 {
     workModes = wms;
 }

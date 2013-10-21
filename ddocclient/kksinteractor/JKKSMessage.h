@@ -22,7 +22,7 @@ class JKKSLoader;
 class _I_EXPORT JKKSAddress
 {
 public:
-    JKKSAddress(const QString & addr, int port = 0);
+    JKKSAddress(const QString & addr, int port = 0, bool useGateway = false);
     JKKSAddress();
     JKKSAddress(const JKKSAddress & a);
 
@@ -30,9 +30,11 @@ public:
 
     const QString & address() const;
     int port() const;
+    bool useGateway() const;
 
     void setAddress(const QString & addr);
     void setPort(int p);
+    void setUseGateway(bool b);
 
 private:
     //
@@ -44,6 +46,7 @@ private:
 private:
     QString m_address;
     int m_port;
+    bool m_useGateway;
 };
 
 /*базовый класс для сообщения, отправляемого получателю*/
@@ -63,12 +66,20 @@ class _I_EXPORT JKKSMessage
         virtual QByteArray serialize (void) const;
         virtual int unserialize (const QByteArray& mess)=0;
 
-        virtual const QMap<int, JKKSCategory>& getCategory (void) const;
-        virtual void setCategory (const QMap<int, JKKSCategory>& catMap);
+        virtual const QMap<qint64, JKKSCategory>& getCategory (void) const;
+        virtual void setCategory (const QMap<qint64, JKKSCategory>& catMap);
         
-        virtual int id (void) const=0;
+        virtual qint64 id (void) const=0;
         virtual int writeToDB (const JKKSLoader * loader, const QString& senderUID, const QString& receiverUID) = 0;
 
+        //ВАЖНО!!! 
+        //Для передачи данных через шлюз ТПС используется механизм псевдофасетного кодирования идентификатора пересылаемого сообщения
+        //В конец строкового представления идентификатора пересылаемого сообщения добавляются два байта (две цифры), характеризующие тип
+        //(т.е. из какой таблицы взят идентификатор). Эта особенность не влияет на логику обработки пересылаемых данных посредством kksinteractor и http_connector
+        //однако в теле почтового сообщения, отдаваемого в шлюз ТПС, учитывается.
+        //
+        //Формат сообщения: mesid=<ID><type_digit_1><type_digit_2>&unp=<email_prefix>&data="........(base64)......"
+        //Если тип имеет одну цифру, перед ней ставится 0. т.е. 00 - atCommand, 02 - atDocument, и т.д.
         enum JKKSMessageType
         {
             atUnknownType = -1,
@@ -84,14 +95,14 @@ class _I_EXPORT JKKSMessage
             atPosition = 10,
             atOrgPackage = 11,
             atFilePart = 12
-        };
+        }; 
 
         virtual JKKSMessageType getMessageType (void) const;
 
     private:
         JKKSAddress m_addr;
         QString m_kvs;
-        QMap<int, JKKSCategory> c;
+        QMap<qint64, JKKSCategory> c;
 };
 
 #endif

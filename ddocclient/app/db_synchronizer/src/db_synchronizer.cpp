@@ -224,7 +224,7 @@ int DBSynchronizer::createIO(int idCategory,
 		fName.remove("C:\\fakepath\\");	
 
 	//!!!!!ÄËß ÍÎÂÎÉ ÂÅÐÑÈÈ ÄÎÁÀÂÈÒÜ ÅÙÅ ÎÄÈÍ ÏÀÐÀÌÅÒÐ Â ÔÓÍÊÖÈÞ! R_COLOR = NULL
-    QString sql = QString ("select * from ioInsert (%1::varchar, %2, %3, %4, %5, %6, %7, %8, %9::varchar, %10, %11, %12, NULL, NULL, %13, %14, %15);")
+    QString sql = QString ("select * from ioInsert (%1::varchar, %2, %3, %4, %5, %6, %7, %8, %9::varchar, %10, %11, %12, NULL, NULL, %13, %14, %15, NULL::varchar, NULL::uuid);")
 	    .arg (QString("'") + fName + QString("'"))//name
 		.arg (QString::number(idCategory))//id_io_category
         .arg (QString::number (1))// admin, èáî â ÁÄ-ïðèåìíèêå àâòîðà (ïîëüçîâàòåëÿ) ìîæåò íå áûòü (êàê ïðàâèëî íå áóäåò)
@@ -237,8 +237,8 @@ int DBSynchronizer::createIO(int idCategory,
         .arg (QString::number (1)) //id_sync_type
         .arg (QString::number (idOrg)) //id_owner_org
         .arg (QString ("TRUE")) //is_global
-        .arg (QString ("NULL")) //bgColor
-        .arg (QString ("NULL")) //fgColor
+        .arg (QString ("NULL::int8")) //bgColor
+        .arg (QString ("NULL::int8")) //fgColor
         .arg (QString::number(1));//id_io_type	
 	
 	KKSResult * res = db->execute(sql);

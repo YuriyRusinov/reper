@@ -6,8 +6,8 @@
 #include "JKKSLoader.h"
 #include "defines.h"
 
-JKKSMailMessage :: JKKSMailMessage (int idMess,
-                                    int idObject, 
+JKKSMailMessage :: JKKSMailMessage (qint64 idMess,
+                                    qint64 idObject, 
                                     const QString& messBody,
                                     const QString& u_idDlReceiver,
                                     const QString& u_idDlSender,
@@ -124,7 +124,7 @@ int JKKSMailMessage :: writeToDB (const JKKSLoader * loader, const QString& send
     return loader->writeMessage (this);
 }
 
-int JKKSMailMessage :: id (void) const
+qint64 JKKSMailMessage :: id (void) const
 {
     return idMessage;
 }
@@ -134,17 +134,17 @@ JKKSMessage::JKKSMessageType JKKSMailMessage :: getMessageType (void) const
     return JKKSMessage::atMailMessage;
 }
 
-void JKKSMailMessage :: setId (int id)
+void JKKSMailMessage :: setId (qint64 id)
 {
     idMessage = id;
 }
 
-int JKKSMailMessage :: getIO (void) const
+qint64 JKKSMailMessage :: getIO (void) const
 {
     return idIO;
 }
 
-void JKKSMailMessage :: setIO (int idObject)
+void JKKSMailMessage :: setIO (qint64 idObject)
 {
     idIO = idObject;
 }
@@ -203,8 +203,8 @@ void JKKSMailMessage :: setAttachment (const JKKSDocument& doc)
 
 /***************************/
 
-JKKSMailConfirmation::JKKSMailConfirmation(int idMess, 
-                                           int extraId,
+JKKSMailConfirmation::JKKSMailConfirmation(qint64 idMess, 
+                                           qint64 extraId,
                                            const QDateTime & readDatetime,
                                            const QDateTime & receiveDatetime,
                                            const JKKSAddress & addr,
@@ -282,22 +282,22 @@ JKKSMessage::JKKSMessageType JKKSMailConfirmation::getMessageType (void) const
     return JKKSMessage::atMailConfirmation;
 }
 
-int JKKSMailConfirmation::id (void) const
+qint64 JKKSMailConfirmation::id (void) const
 {
     return m_id;
 }
 
-void JKKSMailConfirmation::setId (int the_id)
+void JKKSMailConfirmation::setId (qint64 the_id)
 {
     m_id = the_id;
 }
 
-int JKKSMailConfirmation::extraId (void) const
+qint64 JKKSMailConfirmation::extraId (void) const
 {
     return m_dst_id;
 }
 
-void JKKSMailConfirmation::setExtraId (int the_id)
+void JKKSMailConfirmation::setExtraId (qint64 the_id)
 {
     m_dst_id = the_id;
 }

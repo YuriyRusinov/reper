@@ -28,13 +28,14 @@ class _I_EXPORT JKKSCmdConfirmation: public JKKSMessage
 {
     public:
         
-        JKKSCmdConfirmation(int idCmd=-1, 
+        JKKSCmdConfirmation(qint64 idCmd=-1, 
                             const QString & extraId = QString(),
-                            int idState = 3,
+                            qint64 idState = 3,
                             const QDateTime & acceptedDatetime = QDateTime::currentDateTime(),
                             const QDateTime & receiveDatetime = QDateTime::currentDateTime(),
                             const JKKSAddress & addr=JKKSAddress(),
                             const QString & kvs=QString());
+
         JKKSCmdConfirmation(const JKKSCmdConfirmation & cfm);
         virtual ~JKKSCmdConfirmation();
 
@@ -43,14 +44,14 @@ class _I_EXPORT JKKSCmdConfirmation: public JKKSMessage
         int writeToDB (const JKKSLoader * loader, const QString& senderUID, const QString& receiverUID);
         JKKSMessageType getMessageType (void) const;
 
-        int id (void) const;
-        void setId (int id);
+        qint64 id (void) const;
+        void setId (qint64 id);
 
         const QString & extraId (void) const;
         void setExtraId (const QString & uid);
 
-        int idState() const;
-        void setIdState(int state);
+        qint64 idState() const;
+        void setIdState(qint64 state);
 
         const QDateTime & acceptedDatetime() const;
         void setAcceptedDatetime(const QDateTime & dt);
@@ -59,9 +60,9 @@ class _I_EXPORT JKKSCmdConfirmation: public JKKSMessage
         void setReceiveDatetime(const QDateTime & dt);
 
 private:
-        int m_id;//src_id
+        qint64 m_id;//src_id
         QString unique_id;//extraID
-        int m_idState;
+        qint64 m_idState;
         QDateTime m_acceptedDatetime;
         QDateTime m_receiveDatetime;
 
@@ -70,7 +71,7 @@ private:
 class _I_EXPORT JKKSCommand : public JKKSMessage, public JKKSUID
 {
     public:
-        JKKSCommand (int id=-1, 
+        JKKSCommand (qint64 id=-1, 
                      const QString& u_idFrom=QString(),
                      const QString& dl_from_name=QString(), 
                      const QString& u_idExec=QString(), 
@@ -79,9 +80,9 @@ class _I_EXPORT JKKSCommand : public JKKSMessage, public JKKSUID
                      const JKKSAddress & eOrgAddr = JKKSAddress(), 
                      const QString& u_idTo=QString(), 
                      const QString& dl_to_name=QString(), 
-                     int idIoCat=-1, 
+                     qint64 idIoCat=-1, 
                      const QString& category_code=QString(), 
-                     int idJrSt=-1, 
+                     qint64 idJrSt=-1, 
                      const QDateTime& iTime=QDateTime(), 
                      const QDateTime& eTime=QDateTime(), 
                      int e_t_interval=1, 
@@ -92,8 +93,8 @@ class _I_EXPORT JKKSCommand : public JKKSMessage, public JKKSUID
                      const QString& uid=QString(),
                      const QString & inputNumber=QString(),
                      const QString & outputNumber=QString(),
-                     int idUL = 1,
-                     int idObj=-1);
+                     qint64 idUL = 1,
+                     qint64 idObj=-1);
 
         JKKSCommand (const JKKSCommand& command);
         virtual ~JKKSCommand (void);
@@ -105,11 +106,11 @@ class _I_EXPORT JKKSCommand : public JKKSMessage, public JKKSUID
 
         JKKSMessageType getMessageType (void) const;
 
-        const QMap<int, JKKSCategory>& getCategory (void) const;
-        void setCategory (const QMap<int, JKKSCategory>& catMap);
+        const QMap<qint64, JKKSCategory>& getCategory (void) const;
+        void setCategory (const QMap<qint64, JKKSCategory>& catMap);
 
-        int id (void) const;
-        void setId (int id);
+        qint64 id (void) const;
+        void setId (qint64 id);
 
         QString getDlFrom (void) const;
         void setDlFrom (const QString& u_idFrom);
@@ -132,13 +133,13 @@ class _I_EXPORT JKKSCommand : public JKKSMessage, public JKKSUID
         QString getDlToName (void) const;
         void setDlToName (const QString& dl_to_name);
 
-        int getIdIoCat (void) const;
-        void setIdIoCat (int id_io_category);
+        qint64 getIdIoCat (void) const;
+        void setIdIoCat (qint64 id_io_category);
         QString getCategoryCode (void) const;
         void setCategoryCode (const QString& category_code);
 
-        int getJournalState (void) const;
-        void setJournalState (int idState);
+        qint64 getJournalState (void) const;
+        void setJournalState (qint64 idState);
 
         const QDateTime& getInsertTime (void) const;
         void setInsertTime (const QDateTime& iTime);
@@ -158,11 +159,11 @@ class _I_EXPORT JKKSCommand : public JKKSMessage, public JKKSUID
         const QString & outputNumber (void) const {return m_outputNumber;}
         void setOutputNumber(const QString & on) { m_outputNumber = on; }
 
-        int idUrgencyLevel (void) const {return m_idUrgencyLevel; }
-        void setIdUrgencyLevel (int idUL) { m_idUrgencyLevel = idUL; }
+        qint64 idUrgencyLevel (void) const {return m_idUrgencyLevel; }
+        void setIdUrgencyLevel (qint64 idUL) { m_idUrgencyLevel = idUL; }
 
-        int idObject (void) const { return m_idObject; }
-        void setIdObject(int idObj) { m_idObject = idObj; }
+        qint64 idObject (void) const { return m_idObject; }
+        void setIdObject(qint64 idObj) { m_idObject = idObj; }
 
         const JKKSDocument& getAttachedDoc (void) const;
         void setAttachment (const JKKSDocument& doc);
@@ -176,7 +177,7 @@ private:
         //
         // Variables
         //
-        int idCommand;
+        qint64 idCommand;
         QString u_idDlFrom;
         QString dlFromName;
         QString u_idDlExecutor;
@@ -185,9 +186,9 @@ private:
         JKKSAddress execOrgAddress; //not used
         QString u_idDlTo;
         QString dlToName;
-        int idIOCategory;
+        qint64 idIOCategory;
         QString categoryCode;
-        int idJrState;
+        qint64 idJrState;
         QDateTime insertTime;
         QDateTime execTime;
         int exec_time_interval;
@@ -195,10 +196,10 @@ private:
         QString messageBody;
         QString m_inputNumber;
         QString m_outputNumber;
-        int m_idUrgencyLevel;
-        int m_idObject;
+        qint64 m_idUrgencyLevel;
+        qint64 m_idObject;
 
-        QMap<int, JKKSCategory> category;
+        QMap<qint64, JKKSCategory> category;
         JKKSDocument ioDoc;
 };
 

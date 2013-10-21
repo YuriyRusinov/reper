@@ -3,13 +3,13 @@
 #include "JKKSSearchCriterion.h"
 #include "JKKSSearchGroup.h"
 
-JKKSSearchGroup :: JKKSSearchGroup (int id, int id_parent, int oper, bool is_not, int gr_type)
+JKKSSearchGroup :: JKKSSearchGroup (qint64 id, qint64 id_parent, int oper, bool is_not, int gr_type)
     : idGroup (id),
     idParentGroup (id_parent),
     operGroup (oper),
     isNot (is_not),
     typeGroup (gr_type),
-    searchCriteria (QMap<int, JKKSSearchCriterion>())
+    searchCriteria (QMap<qint64, JKKSSearchCriterion>())
 {
 }
 
@@ -27,22 +27,22 @@ JKKSSearchGroup :: ~JKKSSearchGroup (void)
 {
 }
 
-int JKKSSearchGroup :: id (void) const
+qint64 JKKSSearchGroup :: id (void) const
 {
     return idGroup;
 }
 
-void JKKSSearchGroup :: setId (int id)
+void JKKSSearchGroup :: setId (qint64 id)
 {
     idGroup = id;
 }
 
-int JKKSSearchGroup :: idParent (void) const
+qint64 JKKSSearchGroup :: idParent (void) const
 {
     return idParentGroup;
 }
 
-void JKKSSearchGroup :: setParent (int id_parent)
+void JKKSSearchGroup :: setParent (qint64 id_parent)
 {
     idParentGroup = id_parent;
 }
@@ -77,17 +77,17 @@ void JKKSSearchGroup :: setType (int type)
     typeGroup = type;
 }
 
-const QMap<int, JKKSSearchCriterion>& JKKSSearchGroup :: getCriteria (void) const
+const QMap<qint64, JKKSSearchCriterion>& JKKSSearchGroup :: getCriteria (void) const
 {
     return searchCriteria;
 }
 
-QMap<int, JKKSSearchCriterion>& JKKSSearchGroup :: getCriteria (void)
+QMap<qint64, JKKSSearchCriterion>& JKKSSearchGroup :: getCriteria (void)
 {
     return searchCriteria;
 }
 
-void JKKSSearchGroup :: setCriteria (const QMap<int, JKKSSearchCriterion>& crit)
+void JKKSSearchGroup :: setCriteria (const QMap<qint64, JKKSSearchCriterion>& crit)
 {
     searchCriteria = crit;
 }

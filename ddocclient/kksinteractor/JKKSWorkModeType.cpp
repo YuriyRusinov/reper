@@ -3,7 +3,7 @@
 
 #include "JKKSWorkModeType.h"
 
-JKKSWorkModeType :: JKKSWorkModeType (int id, const QString& nameType, const QString& shortNameType, const QString& uid)
+JKKSWorkModeType :: JKKSWorkModeType (qint64 id, const QString& nameType, const QString& shortNameType, const QString& uid)
     : JKKSUID (uid, QString()),
       idWMType (id),
       wmNameType (nameType),
@@ -23,12 +23,12 @@ JKKSWorkModeType :: ~JKKSWorkModeType (void)
 {
 }
 
-int JKKSWorkModeType :: id (void) const
+qint64 JKKSWorkModeType :: id (void) const
 {
     return idWMType;
 }
 
-void JKKSWorkModeType :: setId (int _id)
+void JKKSWorkModeType :: setId (qint64 _id)
 {
     idWMType = _id;
 }

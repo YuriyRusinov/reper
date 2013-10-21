@@ -17,6 +17,7 @@ KKSOrganizationAddrForm :: KKSOrganizationAddrForm (int idOrg,
                                                     const QMap<int, QString>& aList, 
                                                     const QMap<int, bool>& actList, 
                                                     const QMap<int, int>& pList, 
+                                                    const QMap<int, bool>& gtwList, 
                                                     QWidget * parent, 
                                                     Qt::WindowFlags flags)
         : QDialog (parent, flags),
@@ -26,6 +27,7 @@ KKSOrganizationAddrForm :: KKSOrganizationAddrForm (int idOrg,
         addrs (aList),
         activeList (actList),
         portList (pList),
+        useGatewayList(gtwList),
         tvTransporters (new QTreeView(this)),
         pbOk (new QPushButton (tr("&OK"), this)),
         pbCancel (new QPushButton (tr("&Cancel"), this))
@@ -53,6 +55,11 @@ const QMap<int, bool>& KKSOrganizationAddrForm :: getActiveList (void) const
 const QMap<int, int>& KKSOrganizationAddrForm :: getPortList (void) const
 {
     return portList;
+}
+
+const QMap<int, bool>& KKSOrganizationAddrForm :: getUseGatewayList (void) const
+{
+    return useGatewayList;
 }
 
 void KKSOrganizationAddrForm :: setItemDelegate (QAbstractItemDelegate * deleg)
@@ -103,6 +110,11 @@ void KKSOrganizationAddrForm :: addrChanged (const QModelIndex& topLeft, const Q
     {
         bool isActive = (wIndex.data (Qt::CheckStateRole).toInt() == Qt::Checked);
         activeList.insert (idTr, isActive);
+    }
+    else if (wIndex.column () == 5)
+    {
+        bool useGateway = (wIndex.data (Qt::CheckStateRole).toInt() == Qt::Checked);
+        useGatewayList.insert (idTr, useGateway);
     }
 }
 

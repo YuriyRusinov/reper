@@ -22,28 +22,29 @@ class JKKSGlobalRubric;
 class _I_EXPORT JKKSRubric
 {
 public:
-    JKKSRubric (int id=-1, 
+    JKKSRubric (qint64 id=-1, 
                 const QString & uid = QString(),
-                int idp=-1, 
-                int idc=-1, 
+                qint64 idp=-1, 
+                qint64 idc=-1, 
                 const QString& name=QString(), 
                 const QString& code=QString(), 
                 const QString& desc=QString());
+
     JKKSRubric (const JKKSRubric& R);
     ~JKKSRubric (void);
     JKKSRubric& operator= (const JKKSRubric& R);
 
-    int getId (void) const;
-    void setId (int idr);
+    qint64 getId (void) const;
+    void setId (qint64 idr);
 
     const QString & getUid (void) const;
     void setUid (const QString & uid);
 
-    int getParent (void) const;
-    void setParent (int idp);
+    qint64 getParent (void) const;
+    void setParent (qint64 idp);
 
-    int getEntity (void) const;
-    void setEntity (int idc);
+    qint64 getEntity (void) const;
+    void setEntity (qint64 idc);
 
     const QString& getName (void) const;
     void setName (const QString& name);
@@ -68,10 +69,10 @@ private:
     //
     // Variables
     //
-    int idRubric;
+    qint64 idRubric;
     QString uidRubric;
-    int idParent;
-    int idEntity;
+    qint64 idParent;
+    qint64 idEntity;
     QString rubricName;
     QString rubricCode;
     QString rubricDesc;

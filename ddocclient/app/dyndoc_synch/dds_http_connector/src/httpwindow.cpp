@@ -318,7 +318,7 @@ void dds_HttpWindow::startProc()
                 part.setData(data);
 
             JKKSPMessage pM(part.serialize(), JKKSMessage::atFilePart);
-            pM.verifyReceiver = false;
+            pM.setVerifyReceiver(false);
             //pM.receiverUID = part.getAddr();
             //pM.senderUID = part.getSenderAddr();
             
@@ -327,7 +327,7 @@ void dds_HttpWindow::startProc()
             bool stat = sendOutMessage(pMessWithAddr) ;
             
             if(eof){
-                httpMessages.insert(httpGetId, qMakePair(pMessWithAddr->id, pMessWithAddr->pMess.getType()) );
+                httpMessages.insert(httpGetId, qMakePair(pMessWithAddr->id, (qint64)pMessWithAddr->pMess.getType()) );
                 break;
             }
             
@@ -367,8 +367,8 @@ void dds_HttpWindow::httpRequestFinished(int requestId, bool error)
     uint messCount = httpMessages.count();
     if(messCount > 0)
     {
-        QPair<int, int> defValue = QPair<int, int>();
-        QPair<int, int> t = httpMessages.value(requestId, defValue);
+        QPair<qint64, qint64> defValue = QPair<qint64, qint64>();
+        QPair<qint64, qint64> t = httpMessages.value(requestId, defValue);
         if(t == defValue){
             bFound = false;
         }
@@ -557,7 +557,7 @@ bool dds_HttpWindow::sendOutMessage(const JKKSPMessWithAddr * message, bool file
     //{ 
 
     if(message->pMess.getType() != JKKSMessage::atFilePart)//для файлов, передаваемых частями информация в этот список заносится отдельно
-        httpMessages.insert(httpGetId, qMakePair(message->id, message->pMess.getType()) );
+        httpMessages.insert(httpGetId, qMakePair(message->id, (qint64)message->pMess.getType()) );
     
     //}
         

@@ -1,7 +1,10 @@
 #include <QDataStream>
 #include "JKKSOrgType.h"
 
-JKKSOrgType :: JKKSOrgType (int id_org_type, const QString& orgTypeName, const QString& orgTypeSName, const QString& uid)
+JKKSOrgType :: JKKSOrgType (qint64 id_org_type, 
+                            const QString& orgTypeName, 
+                            const QString& orgTypeSName, 
+                            const QString& uid)
     : JKKSUID (uid, QString()),
     idOrgType (id_org_type),
     organizationTypeName (orgTypeName),
@@ -21,12 +24,12 @@ JKKSOrgType :: ~JKKSOrgType (void)
 {
 }
 
-int JKKSOrgType :: getIdOrgType (void) const
+qint64 JKKSOrgType :: getIdOrgType (void) const
 {
     return idOrgType;
 }
 
-void JKKSOrgType :: setIdOrgType (int id)
+void JKKSOrgType :: setIdOrgType (qint64 id)
 {
     idOrgType = id;
 }

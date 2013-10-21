@@ -9344,7 +9344,7 @@ void KKSObjEditorFactory :: putSyncWidget (KKSObjEditor * editor, KKSObjectExemp
         KKSAttrValue * syncTypeAttrVal = new KKSAttrValue (valSyncType, syncTypeAttr);
         QMap<int, QString> refColumnValues;
         QMap<int, QString> syncVals = loader->loadAttributeValues (syncTypeAttr, refColumnValues);
-        syncW->setSyncAttrVal(syncTypeAttrVal);
+        //syncW->setSyncAttrVal(syncTypeAttrVal);
         wObjE->addAttrValue (syncTypeAttrVal);
         syncW->setSyncType (syncVals.value(1));
     }

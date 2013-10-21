@@ -6,8 +6,8 @@
 #include "JKKSLoader.h"
 #include "JKKSRefRecord.h"
 
-JKKSRefRecord :: JKKSRefRecord (int id_queue, 
-                                int id_rec, 
+JKKSRefRecord :: JKKSRefRecord (qint64 id_queue, 
+                                qint64 id_rec, 
                                 int id_entity_type, 
                                 const QString& tName, 
                                 int sync_type, 
@@ -20,10 +20,10 @@ JKKSRefRecord :: JKKSRefRecord (int id_queue,
                                 const QString & uid,
                                 const QString & t_uid, 
                                 const QString & uuid,
-                                int idState, 
+                                qint64 idState, 
                                 const QColor bkCol,
                                 const QColor fgCol,
-                                const QIcon rIcon)
+                                const QString & rIcon)
     : JKKSMessage (addr, mess_code),
       JKKSUID (uid, uuid, idState, bkCol, fgCol, rIcon),
       idQueue (id_queue),
@@ -94,7 +94,7 @@ int JKKSRefRecord :: writeToDB (const JKKSLoader * loader, const QString& sender
     return ier;
 }
 
-int JKKSRefRecord :: id (void) const
+qint64 JKKSRefRecord :: id (void) const
 {
     return idRec;
 }
@@ -104,17 +104,17 @@ JKKSMessage::JKKSMessageType JKKSRefRecord :: getMessageType (void) const
     return JKKSMessage::atRecord;
 }
 
-void JKKSRefRecord :: setId (int id)
+void JKKSRefRecord :: setId (qint64 id)
 {
     idRec = id;
 }
 
-int JKKSRefRecord :: getIDQueue (void) const
+qint64 JKKSRefRecord :: getIDQueue (void) const
 {
     return idQueue;
 }
 
-void JKKSRefRecord :: setIDQueue (int idq)
+void JKKSRefRecord :: setIDQueue (qint64 idq)
 {
     idQueue = idq;
 }
@@ -159,12 +159,12 @@ void JKKSRefRecord :: setSyncType (int sync_type)
     syncType = sync_type;
 }
 
-const QMap<int, JKKSCategory>& JKKSRefRecord :: getCategory (void) const
+const QMap<qint64, JKKSCategory>& JKKSRefRecord :: getCategory (void) const
 {
     return cat;
 }
 
-void JKKSRefRecord :: setCategory (const QMap<int, JKKSCategory>& aCats)
+void JKKSRefRecord :: setCategory (const QMap<qint64, JKKSCategory>& aCats)
 {
     cat = aCats;
 }
@@ -177,6 +177,16 @@ const QStringList& JKKSRefRecord :: attrsValues (void) const
 void JKKSRefRecord :: setAttrsValues (const QStringList& attrs_vals)
 {
     aVals = attrs_vals;
+}
+
+const QMap<QString, QString> & JKKSRefRecord :: indValues (void) const
+{
+    return indVals;
+}
+
+void JKKSRefRecord :: setIndValues (const QMap<QString, QString> & ind_vals)
+{
+    indVals = ind_vals;
 }
 
 const JKKSDocument& JKKSRefRecord :: getIODoc (void) const
@@ -233,6 +243,8 @@ QDataStream& operator<< (QDataStream& out, const JKKSRefRecord& RR)
     out << RR.fgColor();
     out << RR.rIcon();
 
+    out << RR.indValues();
+
     return out;
 }
 
@@ -265,10 +277,10 @@ QDataStream& operator>> (QDataStream& in, JKKSRefRecord& RR)
     //from jkksuid
     QString uid;
     QString uuid;
-    int idState;
+    qint64 idState;
     QColor fColor;
     QColor bColor;
-    QIcon rIc;
+    QString rIc;
 
     in >> uid;
     in >> uuid;
@@ -284,12 +296,16 @@ QDataStream& operator>> (QDataStream& in, JKKSRefRecord& RR)
     RR.setFgColor(fColor);
     RR.setRIcon(rIc);
 
+    QMap<QString, QString> iV;
+    in >> iV;
+    RR.setIndValues(iV);
+
 
     return in;
 }
 
-JKKSQueueResponse :: JKKSQueueResponse (int local_id, 
-                                        int id_queue, 
+JKKSQueueResponse :: JKKSQueueResponse (qint64 local_id, 
+                                        qint64 id_queue, 
                                         int sync_result, 
                                         const JKKSAddress & addr, 
                                         const QString& type)
@@ -304,7 +320,8 @@ JKKSQueueResponse :: JKKSQueueResponse (const JKKSQueueResponse& QR)
     : JKKSMessage (QR),
     localId (QR.localId),
     idQueue (QR.idQueue),
-    syncResult (QR.syncResult)
+    syncResult (QR.syncResult),
+    m_orgUid(QR.m_orgUid)
 {
 }
 
@@ -344,7 +361,7 @@ int JKKSQueueResponse :: writeToDB (const JKKSLoader * loader, const QString& se
     return ier;
 }
 
-int JKKSQueueResponse :: id (void) const
+qint64 JKKSQueueResponse :: id (void) const
 {
     return localId;//idQueue;
 }
@@ -354,7 +371,7 @@ JKKSMessage::JKKSMessageType JKKSQueueResponse :: getMessageType (void) const
     return JKKSMessage::atRecConfirmation;
 }
 
-void JKKSQueueResponse :: setId (int id)
+void JKKSQueueResponse :: setId (qint64 id)
 {
     localId = id;//idQueue = id;
 }
@@ -368,15 +385,27 @@ void JKKSQueueResponse :: setResult (int sRes)
 {
     syncResult = sRes;
 }
-int JKKSQueueResponse :: getExternalId (void) const
+
+qint64 JKKSQueueResponse :: getExternalId (void) const
 {
     return idQueue;
 }
 
-void JKKSQueueResponse :: setExternalId (int idq)
+void JKKSQueueResponse :: setExternalId (qint64 idq)
 {
     idQueue = idq;
 }
+
+void JKKSQueueResponse :: setOrgUid(const QString & orgUid)
+{
+    m_orgUid = orgUid;
+}
+
+const QString & JKKSQueueResponse :: orgUid() const
+{
+    return m_orgUid;
+}
+
 
 QDataStream& operator<< (QDataStream& out, const JKKSQueueResponse& RR)
 {
@@ -386,6 +415,8 @@ QDataStream& operator<< (QDataStream& out, const JKKSQueueResponse& RR)
     out << RR.localId;
     out << RR.idQueue;
     out << RR.syncResult;
+
+    out << RR.m_orgUid;
 
     return out;
 }
@@ -401,6 +432,7 @@ QDataStream& operator>> (QDataStream& in, JKKSQueueResponse& RR)
     in >> RR.localId;
     in >> RR.idQueue;
     in >> RR.syncResult;
+    in >> RR.m_orgUid;
 
     RR.setAddr (addr);// = JKKSRefRecord (avals, uid);
     RR.setCode (code);

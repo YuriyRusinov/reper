@@ -4,6 +4,7 @@
  */
 
 #include "JKKSPMessage.h"
+#include <QCryptographicHash>
 
 JKKSPMessage::JKKSPMessage (const QByteArray& messData, 
                             const int & type, 
@@ -11,9 +12,9 @@ JKKSPMessage::JKKSPMessage (const QByteArray& messData,
                             const QString& receiver_uid)
     :data(messData),
     messType(type),
-    senderUID (sender_uid),
-    receiverUID (receiver_uid),
-    verifyReceiver(true),
+    m_senderUID (sender_uid),
+    m_receiverUID (receiver_uid),
+    m_verifyReceiver(true),
     m_urgencyLevel('C'),
     m_macLabel('0')
 {
@@ -22,9 +23,9 @@ JKKSPMessage::JKKSPMessage (const QByteArray& messData,
 JKKSPMessage :: JKKSPMessage (void)
     : data (QByteArray()),
     messType (-1),
-    senderUID (QString()),
-    receiverUID (QString()),
-    verifyReceiver(true),
+    m_senderUID (QString()),
+    m_receiverUID (QString()),
+    m_verifyReceiver(true),
     m_urgencyLevel('C'),
     m_macLabel('0')
 {
@@ -34,11 +35,12 @@ JKKSPMessage :: JKKSPMessage (const JKKSPMessage& pmess)
     : data (pmess.data),
     messType (pmess.messType),
     urlList (pmess.urlList),
-    senderUID (pmess.senderUID),
-    receiverUID (pmess.receiverUID),
-    verifyReceiver(pmess.verifyReceiver),
+    m_senderUID (pmess.senderUID()),
+    m_receiverUID (pmess.receiverUID()),
+    m_verifyReceiver(pmess.verifyReceiver()),
     m_urgencyLevel(pmess.m_urgencyLevel),
-    m_macLabel(pmess.m_macLabel)
+    m_macLabel(pmess.m_macLabel),
+    m_cryptoHash(pmess.m_cryptoHash)
 {
 }
 
@@ -51,11 +53,13 @@ JKKSPMessage::JKKSPMessage(const QByteArray& mess)
 
     in >> messType;
     in >> data;
-    in >> senderUID;
-    in >> receiverUID;
-    in >> verifyReceiver;
+    in >> m_senderUID;
+    in >> m_receiverUID;
+    in >> m_verifyReceiver;
     in >> m_urgencyLevel;
     in >> m_macLabel;
+
+    in >> m_cryptoHash;
 }
 
 QByteArray JKKSPMessage :: getData (void) const
@@ -75,14 +79,33 @@ QByteArray JKKSPMessage :: serialize (void) const
     QDataStream out(&buffer);    
     out << messType;
     out << data;
-    out << senderUID;
-    out << receiverUID;
-    out << verifyReceiver;
+    out << m_senderUID;
+    out << m_receiverUID;
+    out << m_verifyReceiver;
     out << m_urgencyLevel;
     out << m_macLabel;
 
+    out << m_cryptoHash;
+
     return buffer.data();
 }
+
+const QByteArray & JKKSPMessage :: cryptoHash() const //hash-сумма. Возвращается сохраненное значение. Если оно пустое, то сначала пересчитывается
+{
+    if(m_cryptoHash.isEmpty())
+        return calculateCryptoHash();
+
+    return m_cryptoHash;
+}
+
+const QByteArray & JKKSPMessage :: calculateCryptoHash() const //вычисление hash-суммы. Вызывается метод serialize()
+{
+    QByteArray d = this->serialize();
+    m_cryptoHash = QCryptographicHash::hash(d, QCryptographicHash::Sha1);
+    
+    return m_cryptoHash;
+}
+
 
 QStringList JKKSPMessage :: getFiles (void) const
 {
@@ -124,14 +147,14 @@ JKKSPMessWithAddr :: JKKSPMessWithAddr (void)
 {
 }
 
-JKKSPMessWithAddr :: JKKSPMessWithAddr (const JKKSPMessage& pm, const JKKSAddress & a, const int& _id)
+JKKSPMessWithAddr :: JKKSPMessWithAddr (const JKKSPMessage& pm, const JKKSAddress & a, const qint64 & _id)
     : pMess (pm),
     addr (a),
     id (_id)
 {
 }
 
-JKKSPMessWithAddr::JKKSPMessWithAddr (JKKSPMessage * message, const JKKSAddress & a, const int& c) :
+JKKSPMessWithAddr::JKKSPMessWithAddr (JKKSPMessage * message, const JKKSAddress & a, const qint64 & c) :
     pMess(*message),
     addr(a),
     id(c)

@@ -127,7 +127,7 @@ KKSSito::KKSSito(const QString & userName) :
 
     getLastError();//это типа чтоп файл журнала создать в текущей папке (там где exe-шник лежџт)
 
-    qInstallMsgHandler(KKSDbgOutputHandler);
+    //qInstallMsgHandler(KKSDbgOutputHandler);
 
 }
 

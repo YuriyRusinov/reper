@@ -18,7 +18,7 @@ class JKKSLoader;
 class _I_EXPORT JKKSOrganization : public JKKSMessage, public JKKSUID
 {
 public:
-    JKKSOrganization (int idOrg=-1,
+    JKKSOrganization (qint64 idOrg=-1,
                       const QString& uidParent=QString(),
                       const QString& uidParent1=QString(),
                       const QString& uidSubstitutor=QString(),
@@ -43,10 +43,10 @@ public:
     QByteArray serialize (void) const;
     int unserialize (const QByteArray& mess);
     int writeToDB (const JKKSLoader * loader, const QString& senderUID, const QString& receiverUID);
-    int id (void) const;
+    qint64 id (void) const;
     JKKSMessageType getMessageType (void) const;
 
-    void setId (int id);
+    void setId (qint64 id);
 
     JKKSOrgType getType (void) const;
     void setType (const JKKSOrgType& oType);
@@ -66,8 +66,8 @@ public:
     const JKKSWorkMode& getPreviousMode (void) const;
     void setPreviousMode (const JKKSWorkMode& pMode);
 
-    const QMap<int, JKKSWorkMode>& getWorkModes (void) const;
-    void setWorkModes (const QMap<int, JKKSWorkMode>& wms);
+    const QMap<qint64, JKKSWorkMode>& getWorkModes (void) const;
+    void setWorkModes (const QMap<qint64, JKKSWorkMode>& wms);
 
     const QString& getName (void) const;
     void setName (const QString& name);
@@ -110,7 +110,7 @@ private:
     //
     // Variables
     //
-    int m_id;
+    qint64 m_id;
     JKKSOrgType orgType;
     QString m_uidParent;
     QString m_uidParent1;
@@ -127,7 +127,7 @@ private:
     QString m_treeSymbol;
     QDateTime m_dtPrevMode;
     QDateTime m_dtCurrMode;
-    QMap<int, JKKSWorkMode> workModes;
+    QMap<qint64, JKKSWorkMode> workModes;
 
     JKKSTransport orgTransport;
 };

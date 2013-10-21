@@ -22,12 +22,13 @@ class _I_EXPORT JKKSMailConfirmation: public JKKSMessage
 {
     public:
         
-        JKKSMailConfirmation(int idMess=-1, 
-                             int extraId=-1,
+        JKKSMailConfirmation(qint64 idMess=-1, 
+                             qint64 extraId=-1,
                              const QDateTime & readDatetime = QDateTime::currentDateTime(),
                              const QDateTime & receiveDatetime = QDateTime::currentDateTime(),
                              const JKKSAddress & addr=JKKSAddress(),
                              const QString & kvs=QString());
+
         JKKSMailConfirmation(const JKKSMailConfirmation & cfm);
         virtual ~JKKSMailConfirmation();
 
@@ -36,11 +37,11 @@ class _I_EXPORT JKKSMailConfirmation: public JKKSMessage
         int writeToDB (const JKKSLoader * loader, const QString& senderUID, const QString& receiverUID);
         JKKSMessageType getMessageType (void) const;
 
-        int id (void) const;
-        void setId (int id);
+        qint64 id (void) const;
+        void setId (qint64 id);
         
-        int extraId() const;
-        void setExtraId(int id);
+        qint64 extraId() const;
+        void setExtraId(qint64 id);
 
         const QDateTime & readDatetime() const;
         void setReadDatetime(const QDateTime & dt);
@@ -49,8 +50,8 @@ class _I_EXPORT JKKSMailConfirmation: public JKKSMessage
         void setReceiveDatetime(const QDateTime & dt);
 
 private:
-        int m_id;//m_src_id
-        int m_dst_id;//extra_id
+        qint64 m_id;//m_src_id
+        qint64 m_dst_id;//extra_id
         QDateTime m_readDatetime;
         QDateTime m_receiveDatetime;
 
@@ -59,8 +60,8 @@ private:
 class _I_EXPORT JKKSMailMessage : public JKKSMessage, public JKKSUID
 {
     public:
-        JKKSMailMessage (int idMess=-1, 
-                         int idObject=-1, 
+        JKKSMailMessage (qint64 idMess=-1, 
+                         qint64 idObject=-1, 
                          const QString& messBody=QString(), 
                          const QString& u_idDlReceiver=QString(),
                          const QString& u_idDlSender=QString(), 
@@ -82,13 +83,13 @@ class _I_EXPORT JKKSMailMessage : public JKKSMessage, public JKKSUID
         QByteArray serialize (void) const;
         int unserialize (const QByteArray& mess);
         int writeToDB (const JKKSLoader * loader, const QString& senderUID, const QString& receiverUID);
-        int id (void) const;
         JKKSMessageType getMessageType (void) const;
 
-        void setId (int id);
+        qint64 id (void) const;
+        void setId (qint64 id);
 
-        int getIO (void) const;
-        void setIO (int idObject);
+        qint64 getIO (void) const;
+        void setIO (qint64 idObject);
 
         const QString& getMessageBody (void) const;
         void setMessageBody (const QString& mess);
@@ -114,8 +115,8 @@ class _I_EXPORT JKKSMailMessage : public JKKSMessage, public JKKSUID
         int idUrgencyLevel() const {return m_idUrgencyLevel;}
         void setIdUrgencyLevel(int idUL) { m_idUrgencyLevel = idUL; }
 private:
-        int idMessage;
-        int idIO;
+        qint64 idMessage;
+        qint64 idIO;
         QString messageBody;
         QString u_idDlTo;
         QString u_idDlFrom;

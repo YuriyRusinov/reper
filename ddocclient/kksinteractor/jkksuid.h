@@ -21,15 +21,16 @@ class _I_EXPORT JKKSUID
     public:
         JKKSUID(const QString & u, 
                 const QString & uuid,
-                int idState = 1,
+                qint64 idState = 1,
                 const QColor bkCol = QColor(),
                 const QColor fgCol = QColor(),
-                const QIcon rIcon = QIcon()) : 
+                const QString & rIcon = QString()) : 
             m_uid(u),
             m_uuid(uuid),
             m_idState(idState),
             m_fgColor(fgCol),
-            m_bgColor(bkCol)
+            m_bgColor(bkCol),
+            m_rIcon(rIcon)
         {
             if(m_idState <= 0)
                 m_idState = 1;
@@ -40,7 +41,8 @@ class _I_EXPORT JKKSUID
             m_uuid(U.m_uuid),
             m_idState(U.m_idState),
             m_bgColor(U.m_bgColor),
-            m_fgColor(U.m_fgColor)
+            m_fgColor(U.m_fgColor),
+            m_rIcon(U.m_rIcon)
         {
             
         };
@@ -54,8 +56,8 @@ class _I_EXPORT JKKSUID
         const QString & uuid() const {return m_uuid;}
         void setUuid(const QString & uuid) {m_uuid = uuid;}
 
-        int idState() const {return m_idState;}
-        void setIdState(int id) {m_idState = id > 0 ? id : 1;}
+        qint64 idState() const {return m_idState;}
+        void setIdState(qint64 id) {m_idState = id > 0 ? id : 1;}
 
         const QColor & bgColor() const {return m_bgColor;}
         void setBgColor(const QColor & c){ m_bgColor = c;}
@@ -63,16 +65,16 @@ class _I_EXPORT JKKSUID
         const QColor & fgColor() const {return m_fgColor;}
         void setFgColor(const QColor & c){ m_fgColor = c;}
 
-        const QIcon & rIcon() const {return m_rIcon;}
-        void setRIcon(const QIcon & i){ m_rIcon = i;}
+        const QString & rIcon() const {return m_rIcon;}
+        void setRIcon(const QString & i){ m_rIcon = i;}
 
 protected:
         QString m_uid;
         QString m_uuid;
-        int m_idState;
+        qint64 m_idState;
         QColor m_bgColor;
         QColor m_fgColor;
-        QIcon m_rIcon;
+        QString m_rIcon;
 };
 
 #endif

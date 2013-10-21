@@ -28,6 +28,7 @@ public:
                                  const QMap<int, QString>& aList, 
                                  const QMap<int, bool>& actList, 
                                  const QMap<int, int>& pList, 
+                                 const QMap<int, bool>& useGatewayList, 
                                  QWidget * parent=0, 
                                  Qt::WindowFlags flags=0);
     ~KKSOrganizationAddrForm (void);
@@ -35,6 +36,7 @@ public:
     const QMap<int, QString>& getAddrs (void) const;
     const QMap<int, bool>& getActiveList (void) const;
     const QMap<int, int>& getPortList (void) const;
+    const QMap<int, bool>& getUseGatewayList (void) const;
 
     void setItemDelegate (QAbstractItemDelegate * deleg);
     void setModel (QAbstractItemModel * mod);
@@ -57,6 +59,7 @@ private:
     QMap<int, QString> addrs;
     QMap<int, bool> activeList;
     QMap<int, int> portList;
+    QMap<int, bool> useGatewayList;
 
     QTreeView * tvTransporters;
     QPushButton * pbOk;

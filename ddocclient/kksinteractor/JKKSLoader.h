@@ -48,7 +48,7 @@ class JKKSSearchCriterion;
 class JKKSCategoryPair;
 class JKKSOrgPackage;
 
-typedef QPair<int, int> idTableMap;
+//typedef QPair<qint64, qint64> idTableMap;
 
 class _I_EXPORT JKKSLoader
 {
@@ -61,11 +61,12 @@ class _I_EXPORT JKKSLoader
                     const QString& user, 
                     const QString& pass, 
                     int p, 
-                    int idTransport = 1);
+                    qint64 idTransport = 1);
 
         ~JKKSLoader (void);
+
         int setLocalAddress(const JKKSAddress & address) const;
-        const JKKSAddress & getLocalAddress() const;
+        const JKKSAddress & getLocalAddress(bool reload = false) const;
 
         QList<JKKSPMessWithAddr *> readMessages (void) const;
         int writeMessage(const JKKSPMessage & message) const;
@@ -84,7 +85,7 @@ class _I_EXPORT JKKSLoader
         int writeMessage (JKKSDocument *doc, int syncType=1) const;
         int writeMessage (JKKSMailMessage *mMess) const;
         int writeMessage (JKKSMailConfirmation *cfm) const;
-        int setAsSended (int id, int idType) const;
+        int setAsSended (qint64 id, int idType, bool sended = true) const;
         //int writeMessage (JKKSDocument *document) const;
         int writeMessage (JKKSRefRecord *refRec, const QString& senderUID) const;
         int writeMessage (JKKSQueueResponse *response) const;
@@ -115,7 +116,7 @@ class _I_EXPORT JKKSLoader
         QString getDlName (void) const;
         QString getUserName (void) const;
 
-        int getIdTransport() const;
+        qint64 getIdTransport() const;
 
         //QString getLocalAddr (void) const;
         //void setLocalAddr (const QString& localAddr);
@@ -128,68 +129,74 @@ class _I_EXPORT JKKSLoader
         //
         // Functions
         //
-        QPair<int,JKKSCategory> readCategory(int) const;
-        QMap<int, JKKSCategory> readCategories (int idCat) const;
-        QMap<int, JKKSCategory> readPCategories (int idCatChild) const;
-        JKKSDocument readDocument (int idObject, int idOrganization) const; //второй параметр используется в случае когда требуется передача прикрепленых файлов блоками
+        QPair<qint64,JKKSCategory> readCategory(qint64) const;
+        QMap<qint64, JKKSCategory> readCategories (qint64 idCat) const;
+        QMap<qint64, JKKSCategory> readPCategories (qint64 idCatChild) const;
+        JKKSDocument readDocument (qint64 idObject, qint64 idOrganization) const; //второй параметр используется в случае когда требуется передача прикрепленых файлов блоками
 
-        QMap<int, JKKSCategoryAttr> readCategoryAttrs (int idCat) const;
-        JKKSCategoryAttr readAttribute (int id) const;
+        QMap<qint64, JKKSCategoryAttr> readCategoryAttrs (qint64 idCat) const;
         void writeCategoryAttrs (const JKKSCategory& cat) const;
-        QMap<int, JKKSRubric> readCategoryRubrics (int idCat) const;
+
+        QMap<qint64, JKKSCategoryAttr> readAttrAttrs(qint64 idAttr) const;
+        void writeAttrAttrs (const JKKSCategoryAttr& attr) const;
+
+        JKKSCategoryAttr readAttribute (qint64 id) const;
+
+        QMap<qint64, JKKSRubric> readCategoryRubrics (qint64 idCat) const;
         void writeCategoryRubrics (const JKKSCategory& cat) const;
 
-        QMap<int, JKKSIOUrl> readDocumentFiles (int idObject, int idOrganization) const;//второй параметр используется в случае когда требуется передача прикрепленых файлов блоками
-        int writeDocumentFile (JKKSIOUrl& url) const;
+        QMap<qint64, JKKSIOUrl> readDocumentFiles (qint64 idObject, qint64 idOrganization) const;//второй параметр используется в случае когда требуется передача прикрепленых файлов блоками
+        qint64 writeDocumentFile (JKKSIOUrl& url) const;
 
-        qint64 getFileDataSize(int idUrl) const;
-        QByteArray getFileData (int idUrl, int blockSize=_MAX_FILE_BLOCK) const;
+        qint64 getFileDataSize(qint64 idUrl) const;
+        QByteArray getFileData (qint64 idUrl, int blockSize=_MAX_FILE_BLOCK) const;
         int writeFileData (const JKKSIOUrl& url, int blockSize=_MAX_FILE_BLOCK) const;
 
-        QMap<int, JKKSIOTable> readDocumentTables (int idObject) const;
-        int writeAddTable (int idObject, JKKSIOTable& table) const;
-        JKKSIOTable readIOTable (QString entityuid, int& idObject) const;
+        QMap<qint64, JKKSIOTable> readDocumentTables (qint64 idObject) const;
+        qint64 writeAddTable (qint64 idObject, JKKSIOTable& table) const;
+        JKKSIOTable readIOTable (QString entityuid, qint64& idObject) const;
 
         void generateQueueResponse (JKKSQueueResponse & resp) const;
 
-        int writeIOType (JKKSType& ioType) const;
+        qint64 writeIOType (JKKSType& ioType) const;
 
-        int writeOrganization (JKKSQueueResponse & resp) const;
-        QMap<int, JKKSIOTable> dependencyTables (const JKKSRefRecord& RR) const;
-        QPair<int, int> getIDMap (const QString& table_name, const JKKSRefRecord& RR) const;
+        QMap<qint64, JKKSIOTable> dependencyTables (const JKKSRefRecord& RR) const;
+        QPair<qint64, qint64> getIDMap (const QString& table_name, const JKKSRefRecord& RR) const;
         int readRecordFromTable (const QString& tableName, JKKSRefRecord& rec) const;
-        QMap<int, JKKSOrganization> readOrganizations (int idOrg) const;
-        int writeTransport (JKKSTransport& T) const;
-        int writeOrgType (JKKSOrgType& OT) const;
-        int writeOrgWM (JKKSWorkMode& wm) const;
-        int writeWMType (JKKSWorkModeType& wmt) const;
-        QMap<int, JKKSWorkMode> readOrgWM (int idOrg) const;
-        JKKSWorkMode readWM (int idWM) const;
+        
+        qint64 writeOrganization (JKKSQueueResponse & resp) const;
+        QMap<qint64, JKKSOrganization> readOrganizations (qint64 idOrg) const;
+        qint64 writeTransport (JKKSTransport& T) const;
+        qint64 writeOrgType (JKKSOrgType& OT) const;
+        qint64 writeOrgWM (JKKSWorkMode& wm) const;
+        qint64 writeWMType (JKKSWorkModeType& wmt) const;
+        QMap<qint64, JKKSWorkMode> readOrgWM (qint64 idOrg) const;
+        JKKSWorkMode readWM (qint64 idWM) const;
 
-        int getIdByUID(const QString & tableName, const QString & uid) const; //метод возвращает id записи  по unique_id в заданной таблице
-        QString getUIDSbyIDs (int attrId, const QString& tableName, const QList<int>& ids) const;
+        qint64 getIdByUID(const QString & tableName, const QString & uid) const; //метод возвращает id записи  по unique_id в заданной таблице
+        QString getUIDSbyIDs (qint64 attrId, const QString& tableName, const QList<qint64>& ids) const;
 
-        int insertDocument(JKKSDocument * doc) const;
-        int updateDocument(JKKSDocument * doc) const;
-        int deleteDocument(JKKSDocument * doc) const;
+        qint64 insertDocument(JKKSDocument * doc) const;
+        qint64 updateDocument(JKKSDocument * doc) const;
+        qint64 deleteDocument(JKKSDocument * doc) const;
 
-        int checkForExist(const QString & docUID) const;
+        qint64 checkForExist(const QString & docUID) const;
 
-        JKKSSearchTemplate readSearchTemplate (int idSearchTemplate) const;
-        void readGroups (int idMainGroup, QMap<int, JKKSSearchGroup>& stGroups) const;
-        QMap<int, JKKSSearchCriterion> readCriteriaForGroup (int idGroup) const;
+        JKKSSearchTemplate readSearchTemplate (qint64 idSearchTemplate) const;
+        void readGroups (qint64 idMainGroup, QMap<qint64, JKKSSearchGroup>& stGroups) const;
+        QMap<qint64, JKKSSearchCriterion> readCriteriaForGroup (qint64 idGroup) const;
 
-        int writeSearchTemplate (const JKKSSearchTemplate& st) const;
-        QMap<int, JKKSSearchGroup> writeGroups (int idParentGr, const QMap<int, JKKSSearchGroup>& stGroups) const;
-        int writeCriteriaForGroup (JKKSSearchCriterion& sc) const;
+        qint64 writeSearchTemplate (const JKKSSearchTemplate& st) const;
+        QMap<qint64, JKKSSearchGroup> writeGroups (qint64 idParentGr, const QMap<qint64, JKKSSearchGroup>& stGroups) const;
+        qint64 writeCriteriaForGroup (JKKSSearchCriterion& sc) const;
 
-        JKKSCategoryPair parseCategories(const QMap<int, JKKSCategory> & cats) const;
-        QMap<int, JKKSCategory> pairToMap(const JKKSCategoryPair & pair) const;
+        JKKSCategoryPair parseCategories(const QMap<qint64, JKKSCategory> & cats) const;
+        QMap<qint64, JKKSCategory> pairToMap(const JKKSCategoryPair & pair) const;
 
-        JKKSOrgPackage readOrgs (int id, const QString& receiverUID) const;
-        QMap<int, JKKSTransport> readTransports (const QString& receiverUID) const;
+        JKKSOrgPackage readOrgs (qint64 id, const QString& receiverUID) const;
+        QMap<qint64, JKKSTransport> readTransports (const QString& receiverUID) const;
 
-        int writeReceipt (JKKSQueueResponse& response) const;
+        qint64 writeReceipt (JKKSQueueResponse& response) const;
     private:
         //
         // Variables
@@ -201,7 +208,7 @@ class _I_EXPORT JKKSLoader
         int dbPort;
 
         //идентификатор текущего транспорта
-        int m_idTransport;
+        qint64 m_idTransport;
 
         //
         // db1 предназначен для работы с исходящими
@@ -225,7 +232,7 @@ class _I_EXPORT JKKSLoader
 
 
         mutable QList<JKKSPMessWithAddr *> queueResults;
-        mutable QMap<QPair <QString, int>, int> records;
+        mutable QMap<QPair <QString, qint64>, qint64> records;
 };
 
 #endif

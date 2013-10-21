@@ -9,16 +9,16 @@
 
 
 JKKSDocument :: JKKSDocument (const QString& name, 
-                              int idCat, 
-                              int idAuth, 
+                              qint64 idCat, 
+                              qint64 idAuth, 
                               const QString& tName, 
                               const QString& desc, 
                               const QString& info, 
-                              int idmaclabel, 
-                              int idsynctype,
+                              qint64 idmaclabel, 
+                              qint64 idsynctype,
                               const QString& sync_name,
                               const QString& sync_desc,
-                              int idownerorg,
+                              qint64 idownerorg,
                               bool isglobal,
                               const QString & orgUID,
 
@@ -27,10 +27,10 @@ JKKSDocument :: JKKSDocument (const QString& name,
 
                               const QString & uid,
                               const QString & uuid,
-                              int idState, 
+                              qint64 idState, 
                               const QColor bkCol,
                               const QColor fgCol,
-                              const QIcon rIcon
+                              const QString& rIcon
                               )
     : JKKSMessage (addr, mess_code), JKKSUID(uid, uuid, idState, bkCol, fgCol, rIcon),
     idObject (-1),
@@ -41,10 +41,10 @@ JKKSDocument :: JKKSDocument (const QString& name,
     ioDesc (desc),
     ioInfo (info),
     id_maclabel (idmaclabel),
-    category (QMap<int, JKKSCategory>()),
+    category (QMap<qint64, JKKSCategory>()),
     attrValues (QMap<QString, QString>()),
-    m_rubrics (QMap<int, JKKSGlobalRubric>()),
-    m_urls (QMap<int, JKKSIOUrl>()),
+    m_rubrics (QMap<qint64, JKKSGlobalRubric>()),
+    m_urls (QMap<qint64, JKKSIOUrl>()),
     idCommand (-1),
     realTime (QDateTime::currentDateTime()),
     idJournal (-1),
@@ -175,10 +175,10 @@ int JKKSDocument :: unserialize (const QByteArray& mess)
 
     QString uid;
     QString uuid;
-    int idSt;
+    qint64 idSt;
     QColor bgCol;
     QColor fgCol;
-    QIcon rIc;
+    QString rIc;
 
     in >> uid;
     in >> uuid;
@@ -198,12 +198,12 @@ int JKKSDocument :: unserialize (const QByteArray& mess)
     return OK_CODE;
 }
 
-const QMap<int, JKKSCategory>& JKKSDocument :: getCategory (void) const
+const QMap<qint64, JKKSCategory>& JKKSDocument :: getCategory (void) const
 {
     return category;
 }
 
-void JKKSDocument :: setCategory (const QMap<int, JKKSCategory>& catMap)
+void JKKSDocument :: setCategory (const QMap<qint64, JKKSCategory>& catMap)
 {
     category = catMap;
 }
@@ -217,7 +217,7 @@ int JKKSDocument :: writeToDB (const JKKSLoader * loader, const QString& senderU
     return ier;
 }
 
-int JKKSDocument :: id (void) const
+qint64 JKKSDocument :: id (void) const
 {
     return idObject;
 }
@@ -247,22 +247,22 @@ void JKKSDocument :: setName (const QString& name)
     ioName = name;
 }
 
-int JKKSDocument :: getIdIoCat (void) const
+qint64 JKKSDocument :: getIdIoCat (void) const
 {
     return idCategory;
 }
 
-void JKKSDocument :: setIdIoCat (int id_io_category)
+void JKKSDocument :: setIdIoCat (qint64 id_io_category)
 {
     idCategory = id_io_category;
 }
 
-int JKKSDocument :: getIdAuthor (void) const
+qint64 JKKSDocument :: getIdAuthor (void) const
 {
     return idAuthor;
 }
 
-void JKKSDocument :: setIdAuthor (int idAuth)
+void JKKSDocument :: setIdAuthor (qint64 idAuth)
 {
     idAuthor = idAuth;
 }
@@ -297,27 +297,27 @@ void JKKSDocument :: setInfo (const QString& info)
     ioInfo = info;
 }
 
-int JKKSDocument :: getIdMaclabel (void) const
+qint64 JKKSDocument :: getIdMaclabel (void) const
 {
     return id_maclabel;
 }
 
-void JKKSDocument :: setIdMaclabel (int idmaclabel)
+void JKKSDocument :: setIdMaclabel (qint64 idmaclabel)
 {
     id_maclabel = idmaclabel;
 }
 
-void JKKSDocument :: setId (int id)
+void JKKSDocument :: setId (qint64 id)
 {
     idObject = id;
 }
 
-int JKKSDocument :: getCommandId (void) const
+qint64 JKKSDocument :: getCommandId (void) const
 {
     return idCommand;
 }
 
-void JKKSDocument :: setCommandId (int idc)
+void JKKSDocument :: setCommandId (qint64 idc)
 {
     idCommand = idc;
 }
@@ -332,67 +332,67 @@ void JKKSDocument :: setRealTime (const QDateTime& rt)
     realTime = rt;
 }
 
-int JKKSDocument :: getJournal (void) const
+qint64 JKKSDocument :: getJournal (void) const
 {
     return idJournal;
 }
 
-void JKKSDocument :: setJournal (int idJ)
+void JKKSDocument :: setJournal (qint64 idJ)
 {
     idJournal = idJ;
 }
 
-const QMap<int, JKKSGlobalRubric>& JKKSDocument :: rubrics (void) const
+const QMap<qint64, JKKSGlobalRubric>& JKKSDocument :: rubrics (void) const
 {
     return m_rubrics;
 }
 
-QMap<int, JKKSGlobalRubric>& JKKSDocument :: rubrics (void)
+QMap<qint64, JKKSGlobalRubric>& JKKSDocument :: rubrics (void)
 {
     return m_rubrics;
 }
 
-void JKKSDocument :: setRubrics (const QMap<int, JKKSGlobalRubric>& rubrs)
+void JKKSDocument :: setRubrics (const QMap<qint64, JKKSGlobalRubric>& rubrs)
 {
     m_rubrics = rubrs;
 }
 
-const QMap<int, JKKSIOUrl>& JKKSDocument :: urls (void) const
+const QMap<qint64, JKKSIOUrl>& JKKSDocument :: urls (void) const
 {
     return m_urls;
 }
 
-QMap<int, JKKSIOUrl>& JKKSDocument :: urls (void)
+QMap<qint64, JKKSIOUrl>& JKKSDocument :: urls (void)
 {
     return m_urls;
 }
 
-void JKKSDocument :: setUrls (const QMap<int, JKKSIOUrl>& urls)
+void JKKSDocument :: setUrls (const QMap<qint64, JKKSIOUrl>& urls)
 {
     m_urls = urls;
 }
 
-const QMap<int, JKKSIOTable>& JKKSDocument :: ref_tables (void) const
+const QMap<qint64, JKKSIOTable>& JKKSDocument :: ref_tables (void) const
 {
     return m_tables;
 }
 
-QMap<int, JKKSIOTable>& JKKSDocument :: ref_tables (void)
+QMap<qint64, JKKSIOTable>& JKKSDocument :: ref_tables (void)
 {
     return m_tables;
 }
 
-void JKKSDocument :: setTables (const QMap<int, JKKSIOTable>& ref_tables)
+void JKKSDocument :: setTables (const QMap<qint64, JKKSIOTable>& ref_tables)
 {
     m_tables = ref_tables;
 }
 
-int JKKSDocument :: getSyncType (void) const
+qint64 JKKSDocument :: getSyncType (void) const
 {
     return idSyncType;
 }
 
-void JKKSDocument :: setSyncType (int id_sync_type)
+void JKKSDocument :: setSyncType (qint64 id_sync_type)
 {
     idSyncType = id_sync_type;
 }
@@ -417,12 +417,12 @@ void JKKSDocument :: setSyncDesc (const QString& sync_desc)
     syncDesc = sync_desc;
 }
 
-int JKKSDocument :: getOwnerOrg (void) const
+qint64 JKKSDocument :: getOwnerOrg (void) const
 {
     return idOwnerOrg;
 }
 
-void JKKSDocument :: setOwnerOrg (int id_owner_org)
+void JKKSDocument :: setOwnerOrg (qint64 id_owner_org)
 {
     idOwnerOrg = id_owner_org;
 }
