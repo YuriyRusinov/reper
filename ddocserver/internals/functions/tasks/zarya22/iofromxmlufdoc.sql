@@ -257,7 +257,25 @@ begin
 
     select into idOrg id_organization from getlocalorg();
 
-    select into idObject ioinsert (ioName, idCat, 2/*jupiter*/, 1, null::varchar, null::varchar, NULL::varchar, 1,  NULL::varchar, 1, idOrg, false, null::int4, null::varchar, null::int8, null::int8, 1, NULL::VARCHAR);
+    select into idObject ioinsert (ioName, 
+                                   idCat, 
+                                   2/*jupiter*/, --author
+                                   1, --id_state
+                                   null::varchar, --table_name
+                                   null::varchar, --desc
+                                   NULL::varchar, --info
+                                   1, --id_maclabel
+                                   NULL::varchar, --unique_id
+                                   1, --id_sync_type
+                                   idOrg, --owner
+                                   false, --is_global
+                                   null::int4, --id_search_template
+                                   null::varchar, --ref_table
+                                   null::int8, --fill
+                                   null::int8, --text_color
+                                   1, --id_type
+                                   NULL::VARCHAR,--r_icon
+                                   null::uuid);--uuid_t
     if (idObject is null or idObject <= 0) then
         drop table AAA;
         return false;

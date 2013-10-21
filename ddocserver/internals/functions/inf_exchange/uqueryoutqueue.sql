@@ -1,9 +1,9 @@
 select f_safe_drop_type('h_out_queue');
 
 create type h_out_queue as(full_address varchar, 
-                           id_queue int4, 
+                           id_queue int8, 
                            id_org int4, 
-                           id_entity int4, 
+                           id_entity int8, 
                            entityUID varchar,
                            entity_io_UID varchar,
                            entity_table varchar, 
@@ -11,7 +11,8 @@ create type h_out_queue as(full_address varchar,
                            sync_type int4, 
                            sync_result int4,
                            receiver_uid varchar, --receiver organization email_prefix
-                           port int4); --port of the transport (for IP-transports)
+                           port int4, --port of the transport (for IP-transports)
+                           use_gateway bool); 
 
 create or replace function uQueryOutQueue() returns setof h_out_queue as
 $BODY$
@@ -38,7 +39,8 @@ begin
             q.sync_type,
             q.sync_result,
             o.email_prefix,
-            (select port from uGetAddressExOrg(q.id_organization, idTransport)) as port
+            (select port from uGetAddressExOrg(q.id_organization, idTransport)) as port,
+            (select use_gateway from uGetAddressExOrg(q.id_organization, idTransport)) as use_gateway
 
         from
             out_sync_queue q,

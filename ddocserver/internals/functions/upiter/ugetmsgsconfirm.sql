@@ -5,7 +5,9 @@ create type h_get_msg_conf as(full_address varchar,
                               extra_id int4, 
                               read_datetime timestamp,
                               receive_datetime timestamp,
-                              port int4);
+                              port int4, 
+                              org_uid varchar,
+                              use_gateway bool);
 
 create or replace function uGetMsgsConfirm() returns setof h_get_msg_conf as
 $BODY$
@@ -26,7 +28,9 @@ begin
             msg.extra_id,
             msg.read_datetime,
             msg.receive_datetime,
-            (select port from uGetAddressEx(msg.id_dl_sender, idTransport)) as port
+            (select port from uGetAddressEx(msg.id_dl_sender, idTransport)) as port,
+            (select org_uid from uGetAddressEx(msg.id_dl_sender, idTransport)) as org_uid,
+            (select use_gateway from uGetAddressEx(msg.id_dl_sender, idTransport)) as use_gateway
 
         from
             message_journal msg

@@ -9,7 +9,9 @@ create type h_get_out_objects as( full_address varchar,
                                   id_dl_executor int4,
                                   control_journal_id int4,
                                   id_organization int4,
-                                  port int4  
+                                  port int4,
+                                  org_uid varchar,
+                                  use_gateway bool
                                   );
 
 create or replace function uGetOutObjects() returns setof h_get_out_objects as
@@ -37,7 +39,9 @@ begin
             cmd.id_dl_executor,
             tcj.id,
             u.id_organization,
-            (select port from uGetAddressEx(cmd.id_dl_to, idTransport)) as port
+            (select port from uGetAddressEx(cmd.id_dl_to, idTransport)) as port,
+            (select org_uid from uGetAddressEx(cmd.id_dl_to, idTransport)) as org_uid,
+            (select use_gateway from uGetAddressEx(cmd.id_dl_to, idTransport)) as use_gateway
 
         from 
             command_journal cmd,

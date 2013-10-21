@@ -1,4 +1,4 @@
-create or replace function getSyncResult(int4) returns int4 as
+create or replace function getSyncResult(int8) returns int4 as
 $BODY$
 declare
     idQueue alias for $1;

@@ -5,7 +5,8 @@ create type h_transports as (unique_id varchar,
                              transport_name varchar,
                              local_address varchar,
                              is_active boolean,
-                             local_port int4);
+                             local_port int4,
+                             use_gateway bool);
 
 create or replace function getTransportAddresses (varchar) returns setof h_transports as
 $BODY$
@@ -26,12 +27,13 @@ begin
                t.name,
                otr.address,
                (t.is_active and otr.is_active) as tis_active,
-               otr.port
+               otr.port,
+               otr.use_gateway
         from
-            transport t left join (organization_transport otr
-            inner join organization o on 
-            (otr.id_organization=o.id and o.email_prefix = receiverUID))
-            on (t.id = otr.id_transport)
+            transport t 
+            left join (organization_transport otr 
+                       inner join organization o on (otr.id_organization=o.id and o.email_prefix = receiverUID)
+                      ) on (t.id = otr.id_transport)
         order by t.id    
     loop
         return next r;

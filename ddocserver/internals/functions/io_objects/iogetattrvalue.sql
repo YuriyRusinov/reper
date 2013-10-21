@@ -1,4 +1,4 @@
-create or replace function ioGetAttrValue(int4, int4, int4) returns varchar as
+create or replace function ioGetAttrValue(int4, int8, int4) returns varchar as
 $BODY$
 declare
     idAttribute alias for $1;

@@ -28,7 +28,9 @@ create type h_get_out_cmds as (full_address varchar,
                                accepted_datetime timestamp,
                                urgency_level_code varchar,
                                id_organization int4,
-                               port int4
+                               port int4,
+                               org_uid varchar,
+                               use_gateway bool
                                );
 
 create or replace function uGetOutCmds() returns setof h_get_out_cmds as
@@ -85,10 +87,17 @@ begin
             end) as id_organization,
             (case 
                   when cmd.id_jr_state = 7 then (select port from uGetAddressEx(cmd.id_dl_from, idTransport))
-                  --when cmd.id_jr_state = 1 and isLocalDl(cmd.id_dl_executor) = FALSE then (uGetAddressEx(cmd.id_dl_executor, idTransport) )
-                  --when cmd.id_jr_state = 1 and isLocalDl(cmd.id_dl_to) = FALSE then (uGetAddressEx(cmd.id_dl_to, idTransport) )
                   else (select port from uGetAddressEx(cmd.id_dl_executor, idTransport) ) 
-            end ) as port
+            end ) as port,
+            (case 
+                  when cmd.id_jr_state = 7 then (select org_uid from uGetAddressEx(cmd.id_dl_from, idTransport))
+                  else (select org_uid from uGetAddressEx(cmd.id_dl_executor, idTransport) ) 
+            end ) as org_uid,
+            (case 
+                  when cmd.id_jr_state = 7 then (select use_gateway from uGetAddressEx(cmd.id_dl_from, idTransport))
+                  else (select use_gateway from uGetAddressEx(cmd.id_dl_executor, idTransport) ) 
+            end ) as use_gateway
+
             
         from
             command_journal cmd,
@@ -183,7 +192,15 @@ begin
                   --when cmd.id_jr_state = 1 and isLocalDl(cmd.id_dl_executor) = FALSE then (uGetAddressEx(cmd.id_dl_executor, idTransport) )
                   --when cmd.id_jr_state = 1 and isLocalDl(cmd.id_dl_to) = FALSE then (uGetAddressEx(cmd.id_dl_to, idTransport) )
                   else (select port from uGetAddressEx(cmd.id_dl_to, idTransport) ) 
-            end ) as port
+            end ) as port,
+            (case 
+                  when cmd.id_jr_state = 7 then (select org_uid from uGetAddressEx(cmd.id_dl_from, idTransport))
+                  else (select org_uid from uGetAddressEx(cmd.id_dl_to, idTransport) ) 
+            end ) as org_uid,
+            (case 
+                  when cmd.id_jr_state = 7 then (select use_gateway from uGetAddressEx(cmd.id_dl_from, idTransport))
+                  else (select use_gateway from uGetAddressEx(cmd.id_dl_to, idTransport) ) 
+            end ) as use_gateway
             
         from
             command_journal cmd,
@@ -269,8 +286,10 @@ begin
             (case 
                  when cmd.id_jr_state = 7 then u1.id_organization
                  else u2.id_organization 
-            end) as id_organization,
-            (case when id_jr_state = 7 then (select port from uGetAddressEx(cmd.id_dl_from, idTransport)) else (select port from uGetAddressEx(cmd.id_dl_executor, idTransport)) end) as port
+            end) as id_organization,                                                                                                                                                         
+            (case when id_jr_state = 7 then (select port from uGetAddressEx(cmd.id_dl_from, idTransport)) else (select port from uGetAddressEx(cmd.id_dl_executor, idTransport)) end) as port,
+            (case when id_jr_state = 7 then (select org_uid from uGetAddressEx(cmd.id_dl_from, idTransport)) else (select org_uid from uGetAddressEx(cmd.id_dl_executor, idTransport)) end) as org_uid,
+            (case when id_jr_state = 7 then (select use_gateway from uGetAddressEx(cmd.id_dl_from, idTransport)) else (select use_gateway from uGetAddressEx(cmd.id_dl_executor, idTransport)) end) as use_gateway
 
         from
             command_journal cmd,

@@ -4,7 +4,8 @@ create type h_local_org_desc as(id_organization int4,
                                 org_name varchar,
                                 address varchar,
                                 the_uid varchar,
-                                port int4
+                                port int4,
+                                use_gateway bool                                
                                );
 
 create or replace function getLocalOrg() returns setof h_local_org_desc as
@@ -21,7 +22,8 @@ begin
             o.name, 
             ot.address, 
             o.email_prefix,
-            ot.port
+            ot.port,
+            ot.use_gateway
         from
             organization o,
             organization_transport ot,

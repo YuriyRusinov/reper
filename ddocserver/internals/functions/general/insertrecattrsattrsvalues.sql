@@ -1,6 +1,9 @@
 select f_safe_drop_type('h_attr_attr_value');
 create type h_attr_attr_value as (id_attr_attr int4, a_val varchar);
 
+select f_safe_drop_type('h_attr_attr_value_ex'); --in information exchange
+create type h_attr_attr_value_ex as (attr_attr_unique_id varchar, a_val varchar);
+
 create or replace function insertRecAttrsAttrsValues(int8, varchar) returns int4 as
 $BODY$
 declare
@@ -54,6 +57,34 @@ $BODY$
 declare
     iVal alias for $1;
     r h_attr_attr_value%rowtype;
+begin
+
+    for r in 
+        select b.id_val[1], b.id_val[2] 
+        from 
+        (
+            select string_to_array(a.attr, '~~~') as id_val
+            from 
+            (
+                    select unnest(string_to_array(iVal, '^~^~^')) as attr 
+            ) as a 
+        ) as b
+    loop
+        return next r;
+    end loop;
+
+    return;
+
+end
+$BODY$
+language 'plpgsql';
+
+--in information exchange
+create or replace function parseAttrAttrValueEx(varchar) returns setof h_attr_attr_value_ex as
+$BODY$
+declare
+    iVal alias for $1;
+    r h_attr_attr_value_ex%rowtype;
 begin
 
     for r in 

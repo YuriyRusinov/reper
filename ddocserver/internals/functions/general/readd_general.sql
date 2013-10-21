@@ -26,6 +26,11 @@
 \i ./functions/general/insertattrsattrsvalues.sql
 \i ./functions/general/agetrecattrsattrsvalues.sql
 
+\i ./functions/general/recgetsysparams.sql
+\i ./functions/general/recsetsysparams.sql
+
+\i ./functions/general/convertattrattrvalue.sql
+
 \i ./functions/general/triggers/readd_triggers.sql
 
 --invoked in /internals/initdb.sql

@@ -2,7 +2,7 @@
 
 . ./user.config
 
-VERSION=1.2.4
+VERSION=1.2.5
 
 PROJECT_NAME=DynamicDocs
 
@@ -170,6 +170,10 @@ fi;
 
 IO_FILES=$PGDATA_DIR/$FILE_ARCH
 
+if [ "$ORG_UID" = "" ]; then
+    ORG_UID="localorg_prefix"
+fi;
+
 case $COMMAND in
     clean)
     
@@ -192,7 +196,7 @@ case $COMMAND in
 	chmod a+x ./build.sh &&
 	./build.sh "$VERSION" "$LINTER_PREFIX" "$PGDATA_DIR" "$FILE_ARCH" "0" "$AUTO_CREATE" "$PROJECT_NAME" &&
 	chmod a+x ./createdb.sh &&
-	./createdb.sh "$BASE" "$USER" "$LINTER_PORT" "$LINTER_PREFIX" "$ENCODING" "1" "$PASSWD" "$VERSION" "$LOCAL_ADDRESS" "$IO_FILES" "$USE_MODULES" "$IS_MAIN_ORG" "$ORG_NAME" "$LOCAL_PORT" 2>$PREV/createdb.log &&
+	./createdb.sh "$BASE" "$USER" "$LINTER_PORT" "$LINTER_PREFIX" "$ENCODING" "1" "$PASSWD" "$VERSION" "$LOCAL_ADDRESS" "$IO_FILES" "$USE_MODULES" "$IS_MAIN_ORG" "$ORG_NAME" "$LOCAL_PORT" "$USE_GATEWAY" "$ORG_UID" 2>$PREV/createdb.log &&
 	chmod a+x ./createanalyzer.sh &&
 	./createanalyzer.sh "$BASE" "$USER" "$LINTER_PORT" "$LINTER_PREFIX" "$PGDATA_DIR" &&
 	chmod a+x ./createdumper.sh &&
@@ -213,7 +217,7 @@ case $COMMAND in
 	chmod a+x ./build.sh &&
 	./build.sh "$VERSION" "$LINTER_PREFIX" "$PGDATA_DIR" "$FILE_ARCH" "0" "$AUTO_CREATE" "$PROJECT_NAME" &&
 	chmod a+x ./createdb.sh &&
-	./createdb.sh "$BASE" "$USER" "$LINTER_PORT" "$LINTER_PREFIX" "$ENCODING" "1" "$PASSWD" "$VERSION" "$LOCAL_ADDRESS" "$IO_FILES" "$USE_MODULES" "$IS_MAIN_ORG" "$ORG_NAME" "$LOCAL_PORT" 2>$PREV/createdb.log &&
+	./createdb.sh "$BASE" "$USER" "$LINTER_PORT" "$LINTER_PREFIX" "$ENCODING" "1" "$PASSWD" "$VERSION" "$LOCAL_ADDRESS" "$IO_FILES" "$USE_MODULES" "$IS_MAIN_ORG" "$ORG_NAME" "$LOCAL_PORT" "$USE_GATEWAY" "$ORG_UID" 2>$PREV/createdb.log &&
 	chmod a+x ./createanalyzer.sh &&
 	./createanalyzer.sh "$BASE" "$USER" "$LINTER_PORT" "$LINTER_PREFIX" "$PGDATA_DIR" &&
 	chmod a+x ./createdumper.sh &&

@@ -1,4 +1,4 @@
-create or replace function uSetAsSended(int4, int4) returns int4 as
+create or replace function uSetAsSended(int8, int4) returns int4 as
 $BODY$
 declare
     id alias for $1;
@@ -10,15 +10,15 @@ begin
     res := 0;
 
     if (itype = 0) then --command
-        select uSetAsSended(id) into res;
+        select uSetAsSended(id::int4) into res;
     elsif (itype = 1) then --document as response of command
-        select uSetObjAsSended(id) into res;
+        select uSetObjAsSended(id::int4) into res;
     elsif (itype = 2) then --message
-        select uSetMsgAsSended(id) into res;
+        select uSetMsgAsSended(id::int4) into res;
     elsif (itype = 3) then --mail confirmation
-        select uSetMsgAsConfirmed(id) into res;
+        select uSetMsgAsConfirmed(id::int4) into res;
     elsif (itype = 4) then --cmd confirmation
-        select uSetCmdAsConfirmed(id) into res;
+        select uSetCmdAsConfirmed(id::int4) into res;
     elsif (itype = 5 or itype=11) then --record or org package (in out_sync_queue)
         select uSetRecordAsSended(id) into res;
     elsif (itype = 6) then --record confirmation
@@ -112,7 +112,7 @@ end
 $BODY$
 language 'plpgsql';
 
-create or replace function uSetReceptionAsSended(int4) returns int4 as
+create or replace function uSetReceptionAsSended(int8) returns int4 as
 $BODY$
 declare
     idRecv alias for $1;

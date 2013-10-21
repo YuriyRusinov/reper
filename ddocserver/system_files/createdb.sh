@@ -16,6 +16,8 @@ USE_MODULES=${11}
 IS_MAIN_ORG=${12}
 ORG_NAME=${13}
 LOCAL_PORT=${14}
+USE_GATEWAY=${15}
+ORG_EMAIL_PREFIX=${16}
 
 . ./io_files_name.conf
 
@@ -45,8 +47,10 @@ cp -f ./functions/files/readd_files_c_lin.sql ./functions/files/readd_files_c.sq
 
 CREATED=0
 THE_LOG=0
+
 $LINTER_PREFIX/bin/createdb -h $DB_HOST -p $DB_PORT -E $ENCODING -U $USER $BASE  &&
 CREATED=1
+
 if [ $CREATED = 0 ]; then
     printf "\n\nERROR! Cannot create database $BASE\n"
     printf "Maybe no left space on device or database template1 is accessed by another user\n"
@@ -77,13 +81,20 @@ $LINTER_PREFIX/bin/psql -h $DB_HOST -p $DB_PORT -d $BASE -f ./initdata.sql $USER
 
 $LINTER_PREFIX/bin/psql -h $DB_HOST -p $DB_PORT -d $BASE -f ./initiotriggers.sql $USER
 
-$LINTER_PREFIX/bin/psql -h $DB_HOST -p $DB_PORT -d $BASE -c "select usetlocaladdress('$LOCAL_ADDRESS', $LOCAL_PORT)" -t $USER > /dev/null &&
-$LINTER_PREFIX/bin/psql -h $DB_HOST -p $DB_PORT -d $BASE -c "select createTempTables(); select setCurrentDl(4); select insertlocalorg('$ORG_NAME', '$ORG_NAME', '$ORG_NAME', 'localorg_prefix', 1, NULL, 1, '$LOCAL_ADDRESS', $LOCAL_PORT)" -t $USER > /dev/null
+$LINTER_PREFIX/bin/psql -h $DB_HOST -p $DB_PORT -d $BASE -c "select usetlocaladdress('$LOCAL_ADDRESS', $LOCAL_PORT, $USE_GATEWAY)" -t $USER > /dev/null &&
 
-if [ "$USE_MODULES" != "1" ]; then
-    exit 0;
+if [ "$USE_MODULES" != "0" ]; then
+    $LINTER_PREFIX/bin/psql -h $DB_HOST -p $DB_PORT -d $BASE -f ./initmodules.sql $USER
 fi
 
-$LINTER_PREFIX/bin/psql -h $DB_HOST -p $DB_PORT -d $BASE -f ./initmodules.sql $USER
+# !!! localorg_prefix_slave is used in trigger on table organization_transport !!!
+if [ "$IS_MAIN_ORG" = "1" ]; then
+    $LINTER_PREFIX/bin/psql -h $DB_HOST -p $DB_PORT -d $BASE -c "select createTempTables(); select setCurrentDl(4); select insertlocalorg('$ORG_NAME', '$ORG_NAME', '$ORG_NAME', '$ORG_EMAIL_PREFIX', 1, NULL, 1, '$LOCAL_ADDRESS', $LOCAL_PORT, $USE_GATEWAY)" -t $USER > /dev/null
+    $LINTER_PREFIX/bin/psql -h $DB_HOST -p $DB_PORT -d $BASE -c "create unique index ot_addr_port on organization_transport (address, port);" -t $USER > /dev/null
+fi
+
+if [ "$IS_MAIN_ORG" != "1" ]; then
+    $LINTER_PREFIX/bin/psql -h $DB_HOST -p $DB_PORT -d $BASE -c "select createTempTables(); select setCurrentDl(4); select insertlocalorg('$ORG_NAME', '$ORG_NAME', '$ORG_NAME', '$ORG_EMAIL_PREFIX', 1, NULL, 1, '$LOCAL_ADDRESS', $LOCAL_PORT, $USE_GATEWAY)" -t $USER > /dev/null
+fi
 
 exit 0

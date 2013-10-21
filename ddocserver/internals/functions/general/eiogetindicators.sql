@@ -79,3 +79,42 @@ begin
 end
 $BODY$
 language 'plpgsql';
+
+
+--используется в информационном обмене
+create or replace function eioGetIndicatorsEx(int8) returns setof h_eio_get_indicators as
+$BODY$
+declare
+    idRecord alias for $1;
+    r h_eio_get_indicators%rowtype;
+begin
+
+    for r in 
+        select 
+            rav.id_record, 
+            ac.id_io_category, 
+            ac.id_io_attribute,--!!! 
+            getUniqueValue(rav.value, a.id_a_type, a.table_name) as value,
+            a.unique_id,
+            a.id_a_type,
+            rav.id_attr_category,
+            rav.id,
+            rav.start_time,
+            rav.stop_time,
+            rav.insert_time,
+            rav.id_io_object_src,
+            rav.id_io_object_src1,
+            rav.is_actual,
+            rav.description
+        from 
+            (f_sel_rec_attrs_values(idRecord) rav inner join attrs_categories ac on (rav.id_attr_category = ac.id) inner join attributes a on (ac.id_io_attribute=a.id and rav.id_record = idRecord))
+        where 
+            rav.is_actual = true 
+    loop
+        return next r;
+    end loop;
+
+    return;
+end
+$BODY$
+language 'plpgsql';

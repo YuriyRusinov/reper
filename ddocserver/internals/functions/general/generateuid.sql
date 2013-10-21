@@ -48,6 +48,7 @@ declare
     tableName varchar;
     UID varchar;
     idUser int4;
+    idObject int4;
 begin
 
     if(new.last_update isnull) then
@@ -96,8 +97,12 @@ begin
 
     localId = new.id;
 
-
-    UID = generateUID(localId, tableName);
+    --select id into idObject from tbl_io_objects where table_name = tableName;-- system tables MUST have uid with localorg-XXX-XXX template
+    --if(idObject < 300) then
+    --    UID = 'localorg-' || tableName || '-' || localId;
+    --else
+        UID = generateUID(localId, tableName);
+    --end if;
 
     if(UID isnull) then
         raise exception 'Cannot generate unique_id for the record! TABLE = %, LOCALID = %', tableName, localId;
@@ -124,7 +129,7 @@ begin
     return new;
 end
 $BODY$
-language 'plpgsql';
+language 'plpgsql' security definer;
 
 
 create or replace function createTriggerUID(varchar) returns int4 as

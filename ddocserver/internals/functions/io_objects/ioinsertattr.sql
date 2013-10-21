@@ -110,7 +110,13 @@ begin
         return -1;
     end if;
 
-    if(idType <> 2 and idType <> 3 and idType <> 7 and idType <> 12 and idType <> 17 and idType <> 19 and idType <> 26)  then
+    if(idType <> 2 and  --atList
+       idType <> 3 and  --atParent
+       idType <> 12 and --old checkboxes
+       idType <> 17 and --new checkboxes
+       idType <> 19 and --ref to color (fill)
+       idType <> 26)    --ref to color (text)
+    then
         
         select ioInsertAttr(idObject, idAttr, ioValue, iStartTime, iStopTime, iIdObjectSrc, iIdObjectSrc1, iDesc) into ok;
         return ok;

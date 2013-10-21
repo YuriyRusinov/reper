@@ -1,5 +1,5 @@
 select f_safe_drop_type('h_get_address_ex');
-create type h_get_address_ex as (address varchar, port int4);
+create type h_get_address_ex as (address varchar, port int4, org_uid varchar, use_gateway bool, id_organization int4);
 
 create or replace function uGetAddressEx() returns setof h_get_address_ex as 
 $BODY$
@@ -29,7 +29,10 @@ begin
     for r in
        select 
             ot.address,
-            ot.port
+            ot.port,
+            o.email_prefix,
+            ot.use_gateway,
+            o.id
         from 
             transport t,
             organization_transport ot,
@@ -67,7 +70,10 @@ begin
     for r  in
         select 
             ot.address,
-            ot.port
+            ot.port,
+            o.email_prefix,
+            ot.use_gateway,
+            o.id
         from 
             transport t,
             organization_transport ot,
@@ -106,10 +112,14 @@ begin
     for r in 
         select 
             ot.address,
-            ot.port
+            ot.port,
+            o.email_prefix,
+            ot.use_gateway,
+            o.id
         from 
-            transport t inner join
-            organization_transport ot on (ot.id_transport = t.id and ot.is_active and t.is_active and ot.id_transport = idTransport) inner join organization o on (ot.id_organization=o.id and o.id = idOrg)
+            transport t 
+            inner join organization_transport ot on (ot.id_transport = t.id and ot.is_active and t.is_active and ot.id_transport = idTransport) 
+            inner join organization o on (ot.id_organization=o.id and o.id = idOrg)
     loop
         return next r;
     end loop;

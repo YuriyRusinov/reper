@@ -41,7 +41,8 @@ begin
                   otr.address as transport_addr, 
                   t.unique_id as transport_uid, 
                   (otr.is_active and t.is_active) as transport_active,
-                  otr.port as transport_port
+                  otr.port as transport_port,
+                  otr.use_gateway
               from organization o inner join organization_type ot on (o.id_type_org = ot.id )';
 
     query := query || ' inner join work_mode as wmc on (o.id_curr_mode=wmc.id) inner join work_mode as wmp on (o.id_curr_mode=wmp.id) inner join organization_transport otr on (o.id=otr.id_organization) inner join transport t on (otr.id_transport=t.id and otr.address=' || quote_literal (address) ||' )';

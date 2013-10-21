@@ -134,10 +134,23 @@ declare
     val varchar;
     cnt int4;
 
+    idAttrAttr int4;
+    aValue varchar;
+
 begin
 
-    if(idType <> 2 and idType <> 3 and idType <> 7 and idType <> 12 and idType <> 17 and idType <> 19 and idType <> 26) then
+    if(idType <> 2 and idType <> 3 and idType <> 7 and idType <> 12 and idType <> 17 and idType <> 19 and idType <> 26 and idType <> 32) then
         return theValue;
+    end if;
+
+    if(idType = 32) then --atComplex
+        if(theValue isnull or theValue = '') then
+            return NULL;
+        end if;
+
+        val = convertAttrAttrValue1(theValue); --from id to unique_id
+
+        return val;
     end if;
 
     if(tableName isnull or theValue isnull or idType isnull) then

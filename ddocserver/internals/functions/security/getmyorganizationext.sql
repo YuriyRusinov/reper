@@ -7,7 +7,8 @@ create type h_organization_desc_ext as(id_organization int4,
                            map_symbol varchar,
                            tree_symbol varchar,
                            mode_name varchar,
-                           port int4
+                           port int4,
+                           use_gateway bool
                            );
 
 create or replace function getMyOrganizationExt() returns setof h_organization_desc_ext as
@@ -31,7 +32,8 @@ begin
                 o.map_symbol, 
                 o.tree_symbol, 
                 wm.name,
-                ot.port
+                ot.port,
+                ot.use_gateway
             from
                 organization o inner join
                 organization_transport ot on (o.id = ot.id_organization) inner join
@@ -54,7 +56,8 @@ begin
             o.map_symbol, 
             o.tree_symbol, 
             wm.name,
-            ot.port
+            ot.port,
+            ot.use_gateway
         from 
             organization o inner join  
             organization_transport ot on (o.id = ot.id_organization) inner join

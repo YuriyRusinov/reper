@@ -41,6 +41,12 @@ begin
         end if;
 
         if(idType = 32) then --complex attribute
+            /* --invoked in before trigger
+            if(session_user = 'jupiter') then --information exchange. in that case new.value contains unique_id of attr_attr. We should convert it to ID of attr_attr
+                new.value = convertAttrAttrValue(new.value);
+            end if;
+            */
+
             res = insertRecAttrsAttrsValues(new.id, new.value);
             if(res <= 0) then
                 raise exception 'Cannot parse and setup data in rec_attrs_attrs_values!';

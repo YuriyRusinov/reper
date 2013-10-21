@@ -8,6 +8,7 @@ declare
     idOrganization int4;
     cnt int4;
     isExist int4;
+    idType int4;
 begin
 
     if(TG_OP = 'UPDATE') then
@@ -58,6 +59,23 @@ begin
         if(cnt > 0) then
             raise exception 'Current version of DynamicDocs Server does not support multiple actual copies of the attribute value! id_io_object = %, id_attr_category = %', new.id_io_object, new.id_attr_category;
             return NULL;
+        end if;
+    end if;
+
+    if(session_user = 'jupiter') then --information exchange. in that case new.value for complex attrs contains unique_id of attr_attr. We should convert it to ID of attr_attr
+        select a.id_a_type into idType 
+        from  attributes a, attrs_categories ac
+        where
+            a.id = ac.id_io_attribute
+            and ac.id = new.id_attr_category;
+
+        if(idType isnull) then
+            raise exception 'Found attribute with NULL type!';
+            return NULL;
+        end if;
+
+        if(idType = 32) then --complex attribute
+            new.value = convertAttrAttrValue(new.value);
         end if;
     end if;
 

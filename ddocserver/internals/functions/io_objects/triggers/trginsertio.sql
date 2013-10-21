@@ -17,7 +17,7 @@ begin
             raise exception 'Change global object to nonglobal is not allowed!';
             return NULL;
         end if;
-        if(new.id_owner_org <> old.id_owner_org) then
+        if(getCurrentUser() <> 2 and new.id_owner_org <> old.id_owner_org) then --'jupiter'
             raise exception 'You cannot change organization-owner of the object!';
             return NULL;
         end if;
@@ -86,7 +86,6 @@ begin
     if(new.information isnull) then
         new.information := getAuthorInfo();
     end if;
-    raise warning 'information is %', new.information;
 
     --данный блок кода был перенесен из триггера-after, чтобы избежать ошибки с уникальным индексом на поле table_name
     if(TG_OP = 'INSERT') then

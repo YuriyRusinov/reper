@@ -86,7 +86,7 @@ begin
             end if;
             insert into t_cat_created values(idCategory);
 
-            idObject = ioInsert(r.rel_desc, idCategory, 1, 1, r.relname, r.rel_desc, NULL, 1, NULL, 1, NULL, true, NULL, NULL, NULL, NULL, 1); --create category and IO  select * from io_sync_types
+            idObject = ioInsert(r.rel_desc, idCategory, 1, 1, r.relname, r.rel_desc, NULL, 1, NULL, 1, NULL, true, NULL, NULL, NULL::int8, NULL::int8, 1); --create category and IO  select * from io_sync_types
             if(idObject isnull or idObject <= 0) then
                 drop table t_cat_created;
                 return -5;

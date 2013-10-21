@@ -6,7 +6,9 @@ create type h_get_cmd_conf as(full_address varchar,
                               id_jr_state int4, 
                               accepted_datetime timestamp, 
                               receive_datetime timestamp,
-                              port int4);
+                              port int4,
+                              org_uid varchar, --email_prefix from organization table
+                              use_gateway bool); --use_gateway from organization_transport
 
 create or replace function uGetCmdsConfirm() returns setof h_get_cmd_conf as
 $BODY$
@@ -29,7 +31,9 @@ begin
             cmd.id_jr_state,
             cmd.accepted_datetime,
             cmd.receive_datetime,
-            (select port from uGetAddressEx(cmd.id_dl_from, idTransport)) as port
+            (select port from uGetAddressEx(cmd.id_dl_from, idTransport)) as port,
+            (select org_uid from uGetAddressEx(cmd.id_dl_from, idTransport)) as org_uid,
+            (select use_gateway from uGetAddressEx(cmd.id_dl_from, idTransport)) as use_gateway
 
         from
             command_journal cmd,
@@ -70,8 +74,9 @@ begin
             cmd.id_jr_state,
             cmd.accepted_datetime,
             cmd.receive_datetime,
-            (select port from uGetAddressEx(cmd.id_dl_to, idTransport)) as port
-
+            (select port from uGetAddressEx(cmd.id_dl_to, idTransport)) as port,
+            (select org_uid from uGetAddressEx(cmd.id_dl_to, idTransport)) as org_uid,
+            (select use_gateway from uGetAddressEx(cmd.id_dl_from, idTransport)) as use_gateway
         from
             command_journal cmd,
             cmd_confirmations cfm

@@ -24,7 +24,7 @@ begin
 
     select into tableName io.table_name from f_sel_io_objects(id_io_object) io where io.id = id_io_object;
 
-    raise notice '%', tableName;
+    --raise notice '%', tableName;
     if (tableName is null) then
         raise notice 'Document % is not a reference', id_io_object;
         return NULL;
@@ -38,7 +38,7 @@ begin
 
     --fields := ARRAY[''];
     for r in
-        select a.id,a.code,a.id_a_type, a.table_name from attributes a inner join attrs_categories ac on (a.id=ac.id_io_attribute and ac.id_io_category=idIoCategory) order by a.id
+        select a.id, a.code, a.id_a_type, a.table_name from attributes a inner join attrs_categories ac on (a.id=ac.id_io_attribute and ac.id_io_category=idIoCategory) order by a.id
     loop
         if (r.id_a_type = 17) then
             rTable := tableName || '_' || r.table_name;
@@ -60,75 +60,66 @@ begin
             attrs_code = r.code;
         end if;
 
-        if (fields is null and (tableName = 'organization' or 
+        --for all system qualifiers exclude fields from q_base_table!
+        -- system qualifiers have ID < 300
+/*        if (fields is null and (tableName = 'organization' or 
                                 tableName = 'organization_type' or 
                                 tableName = 'transport' or 
                                 tableName = 'work_mode' or 
                                 tableName = 'position' or 
                                 tableName = 'units' or 
-                                tableName = 'organization_transport')) 
+                                tableName = 'organization_transport' or 
+                                tableName = 'a_groups' or 
+                                tableName = 'io_views' or 
+                                tableName = 'a_groups' or 
+                                table_name = 'ranks'))    */
+        if(fields is null and id_io_object < 300)
         then
-            fields := ARRAY [''];
-            fields[1] := attrs_code;
+            fields := ARRAY ['unique_id'];
+            fields := array_append(fields, 'NULL');
+            fields := array_append(fields, '1');
+            fields := array_append(fields, 'NULL');
+            fields := array_append(fields, 'NULL');
+            fields := array_append(fields, 'NULL');
+            fields := array_append (fields, attrs_code);
         elsif (fields is null) then
             fields := ARRAY ['unique_id'];
+            fields := array_append(fields, 'uuid_t');
+            fields := array_append(fields, 'id_io_state');
+            fields := array_append(fields, 'r_icon');
+            fields := array_append(fields, 'record_fill_color');
+            fields := array_append(fields, 'record_text_color');
             fields := array_append (fields, attrs_code);
         else
             fields := array_append (fields, attrs_code);
         end if;
     end loop;
 
-    raise notice '%', fields;
+
     r_query := 'select  ';
+
     for i in 1..array_upper (fields, 1)
     loop
+
         if (fields[i] like '(%') then
             r_query := r_query || fields[i] || ' as f' || i;
         else
-            r_query := r_query || '"' || fields[i] || '"' || ' as f' || i;
+            if(i >= 7) then
+                r_query := r_query || '"' || fields[i] || '"' || ' as f' || i;
+            else
+                r_query := r_query || fields[i] || ' as f' || i;
+            end if;
         end if;
+
         if (i < array_upper (fields, 1)) then
             r_query := r_query || ', ';
         end if;
+
     end loop;
 
-    r_query := r_query || ' from ' || tableName || ' where id=' || id_copy;
-    raise notice '%', r_query;
+    r_query := r_query || ' from ' || tableName || ' where id = ' || id_copy;
 
     return r_query;
-/*
---    execute r_query into res_string;
-    i := 1;
-    --raise notice 'result string is %', res_string;
---    result_values := string_to_array(res_string, ',');
-
-    for rr in
-        execute r_query
-    loop
-        if (i = 1) then
-            result_values := ARRAY[''];
-            result_values[1] := rr || @attrs_code;
-        else
-            result_values := array_append (result_values, rr);
-        end if;
-        i := i+1;
-    end loop;
-
-    raise notice '%', array_upper (result_values, 1);
-
-    for rr in 
-        select unnest (result_values)
-    loop
-        return next rr;
-    end loop;
-*/
-/*    for i in 1..array_upper (result_values, 1)
-    loop
-        rr := unnest (result_values);
-        return next rr;
-    end loop;
-*/
-    return NULL;
 
 end
 $BODY$

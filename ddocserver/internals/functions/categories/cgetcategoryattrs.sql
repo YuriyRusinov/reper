@@ -18,7 +18,8 @@ create type h_get_category_attrs as(id_attribute int4,
                                     unique_id varchar,
                                     id_search_template int4,
                                     ref_column_name varchar,
-                                    id_ex);
+                                    id_ex,
+                                    unique_id_ex);
 */
 
 create or replace function cGetCategoryAttr(int4) returns setof h_get_attribute as
@@ -52,7 +53,8 @@ begin
             a.ref_column_name,
             a.id_attr_group,
             ag.name,
-            ca.id
+            ca.id,
+            ca.unique_id
         from  
             attrs_categories ca 
             inner join attributes a on (ca.id = ' || idCategoryAttr || E' and ca.id_io_attribute = a.id) 
@@ -112,7 +114,8 @@ begin
             a.ref_column_name,
             a.id_attr_group,
             ag.name,
-            ca.id
+            ca.id,
+            ca.unique_id
         from  
             attrs_categories ca 
             inner join attributes a on (ca.id_io_category = ' || idCategory || E' and ca.id_io_attribute = ' || idAttr || E' and ca.id_io_attribute = a.id) 
@@ -170,7 +173,8 @@ begin
             a.ref_column_name,
             a.id_attr_group,
             ag.name,
-            ca.id
+            ca.id,
+            ca.unique_id
         from  
             attrs_categories ca inner join attributes a on (ca.id_io_category = ' || idCategory || E' and ca.id_io_attribute = a.id) inner join a_types att on (a.id_a_type = att.id) inner join attrs_groups ag on (a.id_attr_group = ag.id)';
     raise warning 'query is %', query;
@@ -229,7 +233,8 @@ begin
             a.ref_column_name,
             a.id_attr_group,
             ag.name,
-            ca.id
+            ca.id,
+            ca.unique_id
         from  
             attrs_categories ca,
             attributes a,

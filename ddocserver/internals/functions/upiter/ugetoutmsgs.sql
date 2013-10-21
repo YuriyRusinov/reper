@@ -18,7 +18,9 @@ create type h_get_out_msgs as (full_address varchar,
                                dl_receiver_uid varchar,
                                urgency_level_code varchar,
                                id_organization int4,
-                               port int4
+                               port int4,
+                               org_uid varchar,
+                               use_gateway bool
                                );
 
 create or replace function uGetOutMsgs() returns setof h_get_out_msgs as
@@ -55,7 +57,9 @@ begin
             p2.unique_id,
             ul.code,
             u.id_organization, --ИД организации, на которую отправляется сообщение (нужно для механизма пересылки больших файлов блоками)
-            (select port from uGetAddressExOrg(u.id_organization, idTransport)) as port
+            (select port from uGetAddressExOrg(u.id_organization, idTransport)) as port,
+            (select org_uid from uGetAddressExOrg(u.id_organization, idTransport)) as org_uid,
+            (select use_gateway from uGetAddressExOrg(u.id_organization, idTransport)) as use_gateway
 
         from
             message_journal msg,
@@ -116,7 +120,9 @@ begin
             p2.unique_id,
             ul.code,
             u.id_organization,
-            (select port from uGetAddressExOrg(u.id_organization, idTransport)) as port
+            (select port from uGetAddressExOrg(u.id_organization, idTransport)) as port,
+            (select org_uid from uGetAddressExOrg(u.id_organization, idTransport)) as org_uid,
+            (select use_gateway from uGetAddressExOrg(u.id_organization, idTransport)) as use_gateway
 
         from
             message_journal msg,

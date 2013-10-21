@@ -10,6 +10,7 @@
 \i ./functions/upiter/uinsertvirtualcmd.sql
 \i ./functions/upiter/usetrecordassended.sql
 \i ./functions/upiter/usetassended.sql
+\i ./functions/upiter/usetasnotsended.sql
 \i ./functions/upiter/usetlocaladdress.sql
 --\i ./functions/upiter/ugetaddress.sql
 \i ./functions/upiter/ugetaddressex.sql

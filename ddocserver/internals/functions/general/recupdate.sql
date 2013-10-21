@@ -1,4 +1,4 @@
-create or replace function recUpdate (varchar, varchar[], varchar[], varchar, varchar) returns int4 as
+create or replace function recUpdate (varchar, varchar[], varchar[], varchar, varchar) returns int8 as
 $BODY$
 declare
     table_uid alias for $1;
@@ -8,6 +8,7 @@ declare
     key_val alias for $5;
 
     idRec int8;
+
     ref_table_name varchar;
     r_query varchar;
     n int4;
@@ -201,6 +202,7 @@ begin
             end if;
         end if;
     end loop;
+
     r_query := regexp_replace (r_query, E'\\,$', '');
     r_query := r_query || ' WHERE ' || key_attr || '=' || quote_literal (key_val);
 
@@ -218,7 +220,7 @@ begin
 --                return -1;
 --            end if;
         end if;
-        return 1;
+        return idRec;
 --    end if;
 
     return 1;

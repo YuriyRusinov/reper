@@ -9,6 +9,7 @@
 \i ./functions/categories/caddattr.sql
 \i ./functions/categories/ainsertattrattr.sql
 \i ./functions/categories/cupdateattr.sql
+\i ./functions/categories/aainsert.sql
 
 \i ./functions/categories/atgetattrtype.sql
 \i ./functions/categories/agetattribute.sql

@@ -263,7 +263,7 @@ begin
             d1.name as dl_from_name, 
             cmd.id_dl_executor, 
             d2.name as dl_executor_name, 
-            case when u.id_organization isnull then NULL else e.name end as executor_name,
+            e.name as executor_name,
             cmd.id_dl_to, 
             d3.name as dl_to_name, 
             cmd.id_io_category, 
@@ -295,8 +295,7 @@ begin
             "position" d3, 
             io_categories c, 
             jr_states s, 
-            organization e, 
-            units u 
+            units u left join organization e on u.id_organization = e.id 
         where 
             cmd.id_io_category = c.id 
             and cmd.id_jr_state = s.id 
@@ -305,7 +304,6 @@ begin
             and cmd.id_dl_executor = d2.id 
             and d2.id_unit = u.id 
             and cmd.id_jr_state <> 7 --виртуальная команда.
-            and (u.id_organization isnull or u.id_organization = e.id)
             and (cmd.id_dl_from = ' || idCurrentDl || ' or cmd.id_dl_to = ' || idCurrentDl || ' or cmd.id_dl_executor = ' || idCurrentDl || ')
             and cmd.is_archived = false
         ';
@@ -376,7 +374,7 @@ begin
             d1.name as dl_from_name, 
             cmd.id_dl_executor, 
             d2.name as dl_executor_name, 
-            case when u.id_organization isnull then NULL else e.name end as executor_name,
+            e.name as executor_name,
             cmd.id_dl_to, 
             d3.name as dl_to_name, 
             cmd.id_io_category, 
@@ -408,8 +406,7 @@ begin
             "position" d3, 
             io_categories c, 
             jr_states s, 
-            organization e, 
-            units u 
+            units u left join organization e on u.id_organization = e.id
         where 
             cmd.id_io_category = c.id 
             and cmd.id_jr_state = s.id 
@@ -418,7 +415,6 @@ begin
             and cmd.id_dl_executor = d2.id 
             and d2.id_unit = u.id 
             and cmd.id_jr_state <> 7 --виртуальная команда.
-            and (u.id_organization isnull or u.id_organization = e.id)
             and (cmd.id_dl_from = ' || idCurrentDl || ' or cmd.id_dl_to = ' || idCurrentDl || ' or cmd.id_dl_executor = ' || idCurrentDl || ')
             and cmd.is_archived = false
             and cmd.id = ' || idCmd;

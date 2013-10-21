@@ -1,4 +1,4 @@
-create or replace function insertLocalOrg(varchar, varchar, varchar, varchar, int4, int4, int4, varchar, int4) returns int4 as
+create or replace function insertLocalOrg(varchar, varchar, varchar, varchar, int4, int4, int4, varchar, int4, bool) returns int4 as
 $BODY$
 declare
     oName alias for $1;
@@ -11,6 +11,7 @@ declare
     idTransport alias for $7;
     oAddress alias for $8;
     oPort alias for $9;
+    useGateway alias for $10;
 
     idOrg int4;
     idOrgAddr int4;
@@ -19,7 +20,7 @@ begin
 
     select insertOrganization(oName, oShortName, oCodeName, oEmailPrefix, oType, oParent) into idOrg;
     if(idOrg is not null and idOrg > 0) then
-        select insertOrgAddress(idOrg, idTransport, oAddress, oPort, true) into idOrgAddr;
+        select insertOrgAddress(idOrg, idTransport, oAddress, oPort, true, useGateway) into idOrgAddr;
         if(idOrgAddr isnull or idOrgAddr <= 0) then
             return -2;
         end if;

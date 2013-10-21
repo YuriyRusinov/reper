@@ -36,9 +36,12 @@ AUTO_CREATE=1
 #For admins only! You should get that from your boss
 LOCAL_ADDRESS=192.168.0.1
 LOCAL_PORT=9000
+USE_GATEWAY=FALSE
 
 #The name of database local organization
 ORG_NAME="New organization"
+#The unique identifier of database local organization
+ORG_UID="localorg_prefix"
 
 #set this parameter to 1 if your organization is main
 #ONLY main organization have full access to organization table

@@ -15,7 +15,8 @@ create or replace function ioInsert(varchar,
                                     int8,
                                     int8,
                                     int4,
-                                    varchar) returns int4 as
+                                    varchar,
+                                    uuid) returns int4 as
 $BODY$
 declare
     ioName alias for $1;
@@ -36,6 +37,7 @@ declare
     recordTextColor alias for $16;
     idType alias for $17;
     rIcon alias for $18;
+    m_uuid alias for $19;
 
     idObject int4;
 begin
@@ -66,7 +68,8 @@ begin
                             record_fill_color,
                             record_text_color,
                             id_io_type,
-                            r_icon)
+                            r_icon,
+                            uuid_t)
                    values  (
                             idObject,
                             idCategory,
@@ -88,7 +91,8 @@ begin
                             recordFillColor,
                             recordTextColor,
                             idType,
-                            rIcon);
+                            rIcon,
+                            m_uuid);
 
 
     return idObject;

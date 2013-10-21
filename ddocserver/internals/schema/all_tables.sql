@@ -1,7 +1,8 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     23.09.2013 16:33:38                          */
+/* Created on:     21.10.2013 9:50:13                           */
 /*==============================================================*/
+
 
 /*==============================================================*/
 /* Table: root_table                                            */
@@ -548,7 +549,7 @@ create table attrs_attrs (
 inherits (root_table);
 
 comment on table attrs_attrs is
-'Таблица описывает взаимосвязи атрибутов.
+'Таблица описывает составные атрибуты
 Атрибут может описываться набором других атрибутов, которым могут быть присвоены значения.
 И так далее вниз по иерархии.
 Иными словами, атрибут может напоминать категорию, но ТОЛЬКО в смысле возможности описания дополнительных характеристик для значения атрибута (ибо как мы помним категория это не только набор атрибутов, но и много чего другого).
@@ -608,8 +609,8 @@ create table attrs_attrs_values (
 inherits (root_table);
 
 comment on table attrs_attrs_values is
-'Значения атрибутов, описывающих другие атрибуты (показатели).
-Записи в данной таблице появляются при редактировании Значения атрибута в информационном объекте';
+'Значения составных атрибутов (показателей) для ИО.
+Записи в данной таблице появляются автоматически при редактировании Значения атрибута в информационном объекте';
 
 comment on column attrs_attrs_values.id is
 'Идентификатор записи';
@@ -2791,12 +2792,19 @@ create table organization_transport (
    address              VARCHAR              not null,
    port                 INT4                 null,
    is_active            bool                 not null default TRUE,
+   use_gateway          BOOL                 not null default FALSE,
    constraint PK_ORGANIZATION_TRANSPORT primary key (id)
 )
 inherits (root_table);
 
 comment on table organization_transport is
-'используемые организацией транспорты межобъектового обмена';
+'используемые организацией транспорты межобъектового обмена
+
+ВАЖНО!!!
+В случае, если текущая БД является подчиненой, в функции replaceLocalOrg() создается уникальный индекс на поля address, port
+В скрипте создания БД его создавать нельзя, поскольку при первоначальной синхронизации возможно дублирование адреса.
+
+Если текущая БД главная, то уникальный индекс на данные поля создается в инсталляторе';
 
 comment on column organization_transport.address is
 'адрес организации в данном транспорте';
@@ -2804,6 +2812,9 @@ comment on column organization_transport.address is
 comment on column organization_transport.port is
 'Порт транспортной задачи, которая обрабатывает БД данной организации.
 Порт используется только в IP-сетях, если используется транспорт http_connector';
+
+comment on column organization_transport.use_gateway is
+'Использовать ли шлюз для взаимодействия (ТПС в настоящее время)';
 
 select setMacToNULL('organization_transport');
 select createTriggerUID('organization_transport');
@@ -2851,9 +2862,9 @@ select setMacToNULL('organization_work_mode');
 /* Table: out_sync_queue                                        */
 /*==============================================================*/
 create table out_sync_queue (
-   id                   SERIAL               not null,
+   id                   BIGSERIAL            not null,
    id_organization      INT4                 not null,
-   id_entity            INT4                 not null,
+   id_entity            INT8                 not null,
    entity_table         VARCHAR              not null,
    entity_type          INT4                 not null,
    sync_type            INT4                 not null,
@@ -3113,16 +3124,44 @@ alter table q_base_table alter column uuid_t set default uuid_generate_v1();
 /* Table: queue_results                                         */
 /*==============================================================*/
 create table queue_results (
-   id                   SERIAL               not null,
+   id                   BIGSERIAL            not null,
    id_transport         INT4                 not null,
-   id_external_queue    INT4                 not null,
+   id_external_queue    INT8                 not null,
    sync_result          INT4                 not null default 4,
    address              varchar              not null,
    is_read              INT4                 not null default 1,
    port                 INT4                 null,
+   org_uid              VARCHAR              not null,
+   use_gateway          BOOL                 not null default FALSE,
    constraint PK_QUEUE_RESULTS primary key (id)
 )
 inherits (root_table);
+
+comment on table queue_results is
+'таблица с кватанциями о результатах обработки синхронизации';
+
+comment on column queue_results.id_external_queue is
+'идентификатор в справочнике исходящей очереди на объекте-отправителе';
+
+comment on column queue_results.sync_result is
+'результат обработки сообщения (будет возвращаться в квитанции)';
+
+comment on column queue_results.address is
+'адрес получателя квитанции';
+
+comment on column queue_results.is_read is
+'1 - не прочитанное, требующее отправки
+2 - прочитанное и не требующее отправки';
+
+comment on column queue_results.port is
+'порт получателя квитанции';
+
+comment on column queue_results.org_uid is
+'email_prefix организации, которой надо отослать квитанцию. В это поле заносится соответствующая информация из входящего сообщения. Значение используется транспортом ТПС';
+
+comment on column queue_results.use_gateway is
+'флаг определяет необходимость отправки квитанции через шлюз (ТПС)
+Т.е. подключен ли объект, которому надо отправить квитанцию, к шлюзу';
 
 select setMacToNULL('queue_results');
 select createTriggerUID('queue_results');
@@ -3177,8 +3216,8 @@ create table rec_attrs_attrs_values (
 inherits (root_table);
 
 comment on table rec_attrs_attrs_values is
-'Значения атрибутов, описывающих другие атрибуты (показатели) для записей справочников.
-Записи в данной таблице появляются при редактировании Значения атрибута записи справочника';
+'Значения составных атрибутов (показателей) для записей справочников.
+Записи в данной таблице появляются автоматически при редактировании Значения атрибута записи справочника';
 
 comment on column rec_attrs_attrs_values.value is
 'Значение (строковое представление) описывающего показатель атрибута';
@@ -3405,7 +3444,6 @@ create table roles_actions (
 );
 
 select setMacToNULL('roles_actions');
-
 
 /*==============================================================*/
 /* Table: rubric_records                                        */
@@ -3661,6 +3699,7 @@ create table transport (
    local_address        VARCHAR              not null,
    local_port           INT4                 null,
    is_active            bool                 not null default TRUE,
+   use_gateway          BOOL                 null,
    constraint PK_TRANSPORT primary key (id)
 )
 inherits (root_table);
@@ -3674,6 +3713,9 @@ comment on column transport.local_address is
 comment on column transport.local_port is
 'Порт транспортной задачи, которая обрабатывает БД локальной  организации.
 Порт используется только в IP-сетях, если используется транспорт http_connector';
+
+comment on column transport.use_gateway is
+'Должен ли транспорт быть подключен к шлюзу (ТПС) для взаимодействия с доугими объектами ';
 
 select setMacToNULL('transport');
 select createTriggerUID('transport');

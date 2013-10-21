@@ -1,4 +1,4 @@
-create or replace function addSyncRecord(int4, int4, varchar, varchar, varchar, int4, int4) returns int4 as
+create or replace function addSyncRecord(int4, int8, varchar, varchar, varchar, int4, int4) returns int8 as
 $BODY$
 declare
     idOrganization alias for $1;
@@ -20,7 +20,7 @@ declare
                               -- 12 - files (transferred by parts) (creation, updating)
                               -- 13 - files (transferred by parts) (deleting)
 
-    idRecord int4;
+    idRecord int8;
 begin
 
 
@@ -60,7 +60,7 @@ create or replace function syncRecords() returns trigger as
 $BODY$
 declare
     theTable varchar;
-    idEntity int4;
+    idEntity int8;
     entityUID varchar;
     entityIOUID varchar;
     syncType int4;

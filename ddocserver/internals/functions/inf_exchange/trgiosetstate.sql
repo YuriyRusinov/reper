@@ -23,9 +23,9 @@ begin
     end if;
 
     if(new.entity_type = 2) then --IO
-        select table_name into tName from f_sel_io_objects(new.id_entity) where id = new.id_entity;
+        select table_name into tName from f_sel_io_objects(new.id_entity::int4) where id = new.id_entity::int4;
         if(tName isnull) then --IO is not qualifier, so just change its state
-            update io_objects set id_io_state = 1 where id = new.id_entity and id_io_state = 3;--first sync
+            update io_objects set id_io_state = 1 where id = new.id_entity::int4 and id_io_state = 3;--first sync
         end if;
 
         return new;

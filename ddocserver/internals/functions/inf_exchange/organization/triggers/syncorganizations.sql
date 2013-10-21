@@ -39,7 +39,7 @@ begin
    
     idLocalOrg = getLocalOrgId();
 
-    raise notice '%', TG_OP;
+    --raise notice '%', TG_OP;
     
     if(TG_OP = 'UPDATE') then
         --raise exception E'\n\nasasasas\n\n';

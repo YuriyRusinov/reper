@@ -106,8 +106,11 @@ begin
                     1, --id_sync_type (does not sync)
                     getLocalOrgId(), --localorg
                     false --is_global,
-                    NULL,
-                    NULL
+                    NULL::int4,--id_search_template
+                    NULL::varchar, --ref_table 
+                    NULL::int8,--fill_color
+                    NULL::int8,--test_color
+                    NULL::int4--id_type
                    ) into idObject;
 
     if(idObject < 0) then

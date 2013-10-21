@@ -20,7 +20,8 @@ create type h_get_attribute as(     id_attribute int4,
                                     ref_column_name varchar,
                                     attr_group_id int4,
                                     attr_group_name varchar,
-                                    id_ex int4);//id либо из таблицы attrs_attrs либо category_attrs (в зависимости от вызываемой функции)
+                                    id_ex int4, --id либо из таблицы attrs_attrs либо category_attrs (в зависимости от вызываемой функции)
+                                    unique_id_ex);--unique_id либо из таблицы attrs_attrs либо category_attrs (в зависимости от вызываемой функции)
 */
 
 create or replace function aGetAttrAttrs(int4) returns setof h_get_attribute as
@@ -54,7 +55,8 @@ begin
             a.ref_column_name,
             a.id_attr_group,
             ag.name,
-            aa.id
+            aa.id,
+            aa.unique_id
         from  
             attrs_attrs aa,
             attributes a,

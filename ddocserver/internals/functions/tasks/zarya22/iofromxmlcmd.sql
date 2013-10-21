@@ -275,7 +275,25 @@ begin
 
     select into idOrg id_organization from getlocalorg();
 
-    select into idObject ioinsert (ioName, idCat, 2/*jupiter*/, 1, null::varchar, null::varchar, NULL::varchar, 1,  NULL::varchar, 1, idOrg, false, null::int4, null::varchar, null::int8, null::int8, 1, NULL::VARCHAR);
+    select into idObject ioinsert (ioName, 
+                                   idCat, 
+                                   2/*jupiter*/, --author
+                                   1, --id_io_state
+                                   null::varchar, --table_name
+                                   null::varchar, --desc
+                                   NULL::varchar, --info
+                                   1, --id_maclabel
+                                   NULL::varchar, --unique_id
+                                   1, --id_sync_type
+                                   idOrg, --id_owner_org
+                                   false, --is_global
+                                   null::int4, --id_search_template
+                                   null::varchar, --ref_table_name
+                                   null::int8, --record_fill_color
+                                   null::int8, --record_text_color
+                                   1, --id_type
+                                   NULL::VARCHAR,--r_icon
+                                   NULL::uuid);--uuid_t
     --raise warning 'Document id is %', idObject;
     if (idObject is null or idObject <= 0) then
         return false;

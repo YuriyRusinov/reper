@@ -14,6 +14,17 @@ select setAsNotLogging(2);
 
 \i ./functions/contribs/readd_contribs.sql
 
+drop function uSetRecordAsSended(int4) cascade;
+drop function uSetAsSended(int4, int4) cascade;
+drop function uSetReceptionAsSended(int4) cascade;
+drop function setSyncResult(int4, int4) cascade;
+drop function getSyncResult(int4) cascade;
+drop function addSyncRecord(int4, int4, varchar, varchar, varchar, int4, int4) cascade;
+drop function addQueueResult(int4, int4, varchar, int4) cascade;
+drop function "f_upd_io_objects"(varchar, timestamp, int4, int4, int4, int4, int4, int4, int4, varchar, varchar, varchar, text, bool, timestamp, int4, bool, int8, int8, int4, varchar, int4, varchar) cascade;
+drop function "f_ins_io_objects"(varchar, timestamp, int4, int4, int4, int4, int4, int4, int4, varchar, varchar, varchar, text, bool, timestamp, int4, bool, int8, int8, int4, varchar, int4, varchar) cascade; 
+
+
 --In readd_functions this calls does not invoked
 --So, we should to invoke that here
 \i ./functions/general/generateuid.sql
@@ -43,8 +54,13 @@ alter table tbl_io_objects alter column uuid_t set default uuid_generate_v1();
 update tbl_io_objects set uuid_t = uuid_generate_v1();
 alter table tbl_io_objects alter column uuid_t set not null;
 
-drop function "f_upd_io_objects"(varchar, timestamp, int4, int4, int4, int4, int4, int4, int4, varchar, varchar, varchar, text, bool, timestamp, int4, bool, int8, int8, int4, varchar, int4, varchar) cascade;
-drop function "f_ins_io_objects"(varchar, timestamp, int4, int4, int4, int4, int4, int4, int4, varchar, varchar, varchar, text, bool, timestamp, int4, bool, int8, int8, int4, varchar, int4, varchar) cascade; 
+alter table out_sync_queue alter column id type int8;
+alter table out_sync_queue alter column id_entity type int8;
+
+alter table queue_results alter column id type int8;
+alter table queue_results alter column id_external_queue type int8;
+
+
 
 \i ./functions/security/ctrl/acl_secure_io_objects.sql
 \i ./functions/security/ctrl/acl_secure_io_objects_apply.sql

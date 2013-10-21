@@ -1,6 +1,7 @@
 \i ./functions/security/triggers/trgroleinsert.sql
 \i ./functions/security/triggers/trgaccesstable.sql
 \i ./functions/security/triggers/trgorginsert.sql
+\i ./functions/security/triggers/trgorginsert_before.sql
 \i ./functions/security/triggers/trgdlinsert.sql
 \i ./functions/security/triggers/trguserinsert.sql
 \i ./functions/security/triggers/trgunitinsert.sql

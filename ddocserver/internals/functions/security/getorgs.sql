@@ -27,7 +27,8 @@ create type h_get_orgs as (id int4,
                            transport_addr varchar,
                            transport_uid varchar,
                            transport_active boolean,
-                           transport_port int4
+                           transport_port int4,
+                           transport_use_gateway bool
                            );
 
 create or replace function getOrgs (int4) returns setof h_get_orgs as
@@ -68,7 +69,8 @@ begin
                   otr.address as transport_addr, 
                   t.unique_id as transport_uid, 
                   (otr.is_active and t.is_active) as transport_active,
-                  otr.port as transport_port
+                  otr.port as transport_port,
+                  otr.use_gateway
               from organization o inner join organization_type ot on (o.id_type_org = ot.id';
 
     if (idOrganization is null) then

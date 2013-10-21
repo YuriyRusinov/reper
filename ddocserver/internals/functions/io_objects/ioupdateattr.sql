@@ -173,7 +173,7 @@ declare
     start_time timestamp;
 begin
 
-    if (iStartTime is null and iStopTime is null and iMeasTime is null) then
+    if (iStartTime is null and iStopTime is null) then
         raise warning 'All time stamps are null';
         start_time := current_timestamp;
     else

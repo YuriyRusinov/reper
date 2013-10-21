@@ -11,6 +11,6 @@
 \i ./functions/inf_exchange/organization/insertorgaddress.sql
 \i ./functions/inf_exchange/organization/insertlocalorg.sql
 
-
+\i ./functions/inf_exchange/organization/replacelocalorg.sql
 
 \i ./functions/inf_exchange/organization/triggers/readd_triggers.sql

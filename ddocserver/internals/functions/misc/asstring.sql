@@ -38,6 +38,28 @@ end
 $BODY$
 language 'plpgsql';
 
+create or replace function asString(uuid, boolean) returns varchar as
+$BODY$
+declare
+    num alias for $1;
+    needQuote alias for $2;
+    string varchar;
+begin
+    if(num isnull) then
+	return 'NULL';
+    end if;
+    
+    string := '' || num;
+
+    if(needQuote = TRUE) then
+        return quote_literal(string);
+    end if;
+    
+    return string;
+end
+$BODY$
+language 'plpgsql';
+
 create or replace function asString(int4[], boolean) returns varchar as
 $BODY$
 declare

@@ -1,4 +1,4 @@
-create or replace function setOrganizationAddress (int4, int4[], varchar[], int4[], boolean[]) returns int4 as
+create or replace function setOrganizationAddress (int4, int4[], varchar[], int4[], boolean[], boolean[]) returns int4 as
 $BODY$
 declare
     idOrg alias for $1;
@@ -6,6 +6,7 @@ declare
     addressList alias for $3;
     portList alias for $4;
     activeList alias for $5;
+    useGatewayList alias for $6;
 
     cnt int4;
     is_active boolean;
@@ -40,6 +41,10 @@ begin
                 query := query || E',is_active';
             end if;
 
+            if (useGatewayList is not null and i <= array_upper (useGatewayList, 1)) then
+                query := query || E', use_gateway';
+            end if;
+
             query := query || E') values (' || id_org_tr || E',' || idOrg || E',' || idTransportList[i] || E',' || quote_literal (addressList[i]);
 
             if (portList is not null and i <= array_upper (portList, 1)) then
@@ -58,6 +63,14 @@ begin
                 end if;
             end if;
 
+            if (useGatewayList is not null and i <= array_upper (useGatewayList, 1)) then
+                if(useGatewayList[i] is not null) then
+                    query := query || E',' || useGatewayList[i];
+                else
+                    query := query || E', false ';
+                end if;
+            end if;
+
             query := query || E');';
 
         elsif (cnt > 0 and length (trim(addressList[i])) > 0) then
@@ -73,6 +86,14 @@ begin
                     query := query || E', is_active=' || activeList[i];
                 else
                     query := query || E', is_active = true';
+                end if;
+            end if;
+
+            if (useGatewayList is not null and i <= array_upper (useGatewayList, 1)) then
+                if(useGatewayList[i] is not null) then
+                    query := query || E', use_gateway =' || useGatewayList[i];
+                else
+                    query := query || E', use_gateway = false';
                 end if;
             end if;
 

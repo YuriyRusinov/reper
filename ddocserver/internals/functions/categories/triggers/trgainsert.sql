@@ -44,10 +44,10 @@ begin
         for r in
             select id from atGetAttrType(new.column_name, new.table_name) limit 1
         loop
-            raise warning '%', r.id;
+            --raise warning '%', r.id;
             new.id_ref_attr_type := r.id;
         end loop;
-        raise warning '% % % %', new.id, new.table_name, new.column_name, new.id_ref_attr_type;
+        --raise warning '% % % %', new.id, new.table_name, new.column_name, new.id_ref_attr_type;
     end if;
 
 
