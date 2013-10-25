@@ -21,11 +21,10 @@
 #ifndef HTTPWINDOW_H
 #define HTTPWINDOW_H
 
+#include <QtGui>
+#include <QtNetwork>
 #include <QDialog>
 
-//#ifndef WIN32
-//#include "cryptmessage.h"
-//#endif
 #include <JKKSLoader.h>
 #include <JKKSPMessage.h>
 //gui
@@ -42,68 +41,119 @@ class QTcpServer;
 class QSslError;
 class QAuthenticator;
 
+class netThread;
 
-class dds_HttpWindow : public QDialog
+namespace dyndoc_HTTPconnector
+{
+    class HTTPconnectorError
+    {
+    public:
+        HTTPconnectorError();
+        virtual ~HTTPconnectorError();
+
+        virtual QString getError() const;
+    };
+
+    class TCPserverError: public HTTPconnectorError
+    {
+    public:
+        TCPserverError();
+        virtual ~TCPserverError();
+
+        virtual QString getError() const;
+    };
+
+    class loaderError: public HTTPconnectorError
+    {
+    public:
+        loaderError();
+        virtual ~loaderError();
+
+        virtual QString getError() const;
+    };
+
+    struct HTTPsettings
+    {
+        QString dbName;
+        QString host;
+        QString user;
+        QString password;
+        int port;
+
+        QString http_host;
+        int http_port;
+        int transport;
+        QString addr;
+        int server_port;
+    };
+}
+
+class dds_HttpWindow : public QObject
 {
     Q_OBJECT
 
 public:
-    dds_HttpWindow(QWidget *parent = 0);
+    dds_HttpWindow(dyndoc_HTTPconnector::HTTPsettings& settings, QObject *parent = 0);
     bool sendOutMessage( const JKKSPMessWithAddr * message, bool filePartsFlag = true);//filePartsFlag - флаг передачи файла по частям
     bool setMessageAsSended(const int & id, const int & type);
+
+    void run();
     
 private slots:
     void startProc();
-    void startTimer();
     void loadData();
     void cancelDownload();
     void httpRequestFinished(int requestId, bool error);
     void readResponseHeader(const QHttpResponseHeader &responseHeader);
-    void updateDataReadProgress(int bytesRead, int totalBytes);
-    void enableDownloadButton();
-
-    void slotHttpMessageRemoved(int progress);
-   /* void slotAuthenticationRequired(const QString &, quint16, QAuthenticator *);
-#ifndef QT_NO_OPENSSL
-    void sslErrors(const QList<QSslError> &errors);
-#endif
-    */
 
 signals:
     void httpMessageRemoved(int progress);
 
-private:
-    QLabel *statusLabel;
-    QLabel *urlLabel;
-    QLineEdit *urlLineEdit;
-    QProgressDialog *progressDialog;
-    QPushButton *startButton;
-    QPushButton *quitButton;
-    QDialogButtonBox *buttonBox;
+    void signalCancelDownload();
+    void signalErrorDataTransferFailed(QString str);
+    void signalDataTransferComplete();
 
+private:
     QList<JKKSPMessWithAddr *> messageList;
 
     QMap<int, QPair<qint64, qint64> > httpMessages;
 
-    //QList< QPair<int, int> > http_message;
-    //QList< QPair<int, int> > message_type;
+    QString dbName;
+    QString host;
+    QString user;
+    QString password;
+    int port;
 
+    QString http_host;
+    int http_port;
+    int transport;
+    QString addr;
+    int server_port;
 
     QHttp *http;
     JKKSLoader * loader;
 
-    QTimer * m_timer;
     QString  localDBInfo;
     
     QTcpServer *tcpServer;
     QStringList responses;
 
     int  httpGetId;
-    int  user_timer;
     int  count_send;
     bool httpRequestAborted;
     bool httpTransferComplete;
-	bool manual;
+
+    inline void init(dyndoc_HTTPconnector::HTTPsettings& settings);
+
+    inline void init_interface();
+    inline void init_TCPserver();
+    inline void init_loader();
+    inline void init_connections();
+
+    inline void init_settings(dyndoc_HTTPconnector::HTTPsettings& settings);
+    inline void init_settingsDB(dyndoc_HTTPconnector::HTTPsettings& settings);
+    inline void init_settingsTransportProtocol(dyndoc_HTTPconnector::HTTPsettings& settings);
+    inline void init_settingsServerAndLocal(dyndoc_HTTPconnector::HTTPsettings& settings);
 };
 
 #endif

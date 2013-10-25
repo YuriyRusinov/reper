@@ -47,12 +47,14 @@ unix: LIBS *= -lpq
 # Input
 HEADERS += src/httpwindow.h \
            src/timerform.h \
-           src/transportsettingsform.h #\
+           src/transportsettingsform.h \ 
+           src/netThread.h
 #           src/cryptmessage.h
 
 SOURCES += src/httpwindow.cpp \
-	     src/timerform.cpp \	
+           src/timerform.cpp \	
            src/transportsettingsform.cpp \
+           src/netThread.cpp \
            src/main.cpp #\
 #           src/cryptmessage.cpp
 

@@ -1,6 +1,8 @@
 #ifndef _TRANSPORT_SETTINGS_FORM_H
 #define _TRANSPORT_SETTINGS_FORM_H
 
+#include "httpwindow.h"
+
 #include <QDialog>
 #include <QHostInfo>
 class QSettings;
@@ -14,28 +16,22 @@ namespace Ui
 class dds_TransportSettingsForm : public QDialog
 {
 public:
-    dds_TransportSettingsForm (QSettings *s, QWidget *parent=0, Qt::WFlags f=0);
+    dds_TransportSettingsForm (dyndoc_HTTPconnector::HTTPsettings& settings, QWidget *parent=0, Qt::WFlags f=0);
     virtual ~dds_TransportSettingsForm (void);
 
-    QSettings * getSettings (void) const;
+    dyndoc_HTTPconnector::HTTPsettings* getSettings (void) const;
 
 private slots:
     void setConnectionSettings (void);
 
 private:
-    //
-    // Functions
-    //
     void init (void);
 
 private:
-    //
-    // Variables
-    //
     Ui::transport_settings_form *UI;
-    QSettings * settings;
-	QHostAddress   serverIp;//IP  
+    QHostAddress serverIp;
 
+    dyndoc_HTTPconnector::HTTPsettings* Csettings;
 private:
     Q_OBJECT
 };

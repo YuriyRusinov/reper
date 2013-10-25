@@ -22,6 +22,7 @@
 #include <QApplication>
 #include <QSettings>
 
+#include "netThread.h"
 #include "httpwindow.h"
 #include "transportsettingsform.h"
 #include "kkssito.h"
@@ -33,10 +34,9 @@ int main(int argc, char *argv[])
     if(!sito)
         return 1;
 
-    QSettings settings (QCoreApplication::applicationDirPath ()+"/http.ini", QSettings::IniFormat);
-        //("/etc/kkssito/http_client.ini1", QSettings::IniFormat);
+    dyndoc_HTTPconnector::HTTPsettings settings;
 
-    dds_TransportSettingsForm * sForm = new dds_TransportSettingsForm (&settings);
+    dds_TransportSettingsForm * sForm = new dds_TransportSettingsForm (settings);
     if (!sForm)
         return 1;
     if (sForm->exec () != QDialog::Accepted)
@@ -44,10 +44,8 @@ int main(int argc, char *argv[])
         delete sForm;
         return 1;
     }
-    settings.sync ();
+
     delete sForm;
 
-    dds_HttpWindow httpWin;
-    httpWin.show();
-    return httpWin.exec();
+    dds_HttpWindow httpWin(settings);
 }

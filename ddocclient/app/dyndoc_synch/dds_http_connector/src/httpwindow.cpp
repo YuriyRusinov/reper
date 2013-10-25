@@ -19,12 +19,8 @@
 **
 ****************************************************************************/
 
-#include <QtGui>
-#include <QtNetwork>
-
 #include "httpwindow.h"
 #include "timerform.h"
-//#include "ui_authenticationdialog.h"
 #include <kksresult.h>
 #include <kksdatabase.h>
 #include <defines.h>
@@ -32,192 +28,111 @@
 #include <JKKSIOUrl.h>
 #include <JKKSMessage.h>
 
-//#define _HTTP_DEBUG
-
-dds_HttpWindow::dds_HttpWindow(QWidget *parent)
-    : QDialog(parent)
+dds_HttpWindow::dds_HttpWindow(dyndoc_HTTPconnector::HTTPsettings& settings,QObject *parent)
+    : QObject(parent)
 {
-    QSettings settings (QCoreApplication::applicationDirPath ()+"/http.ini", QSettings::IniFormat);
-    
-    QString dbName;//(settings.value("Database/database", "tsync_db1").toString());
-    QString host;//(settings.value("Database/host", "192.168.17.176").toString());
-    QString user;//(settings.value("Database/user", "jupiter").toString());
-    QString password;//(settings.value("Database/password", "111").toString());
-    int port;//(settings.value("Database/port", "5432").toInt());
-    
-    QString http_host;//(settings.value("Http/host", "192.168.17.56").toString()); //адрес приложения "Сервер"
-    int http_port;//(settings.value("Http/port", "6000").toInt());// порт сервера
+    init(settings);
+}
 
-    int transport;//(settings.value("Http/transport","1").toInt());  
-    QString addr;//(settings.value("Http/local","a01").toString());
-
-    //QString server_host;//(settings.value("Http/server_host", "192.168.17.56").toString());
-    int server_port;//(settings.value("Http/server_port", "6000").toInt());
-      
-    settings.beginGroup ("Database");
-    dbName = settings.value ("database").toString ();
-    host = settings.value ("host", "127.0.0.1").toString ();
-    user = settings.value ("user", "jupiter").toString ();
-    password = settings.value("password", "111").toString ();
-    port = settings.value("port", "5432").toInt ();
-    settings.endGroup ();
-
-    settings.beginGroup("Transport");
-    transport = settings.value ("transport","1").toInt ();
-    //addr = settings.value ("portal", "a01").toString ();
-    addr = QString();//!!!!
-    settings.endGroup ();
-
-    settings.beginGroup ("Http");
-    http_host = settings.value ("host", "127.0.0.1").toString ();
-    http_port = settings.value ("port", "8001").toInt ();
-  
-    //server_host = settings.value ("server_host", "127.0.0.1").toString ();
-    server_port = settings.value ("server_port", "8001").toInt ();
-    settings.endGroup ();
-
-    //QHostAddress address(server_host);
-
-    urlLineEdit = new QLineEdit("http://" + http_host + ":" + QString::number(http_port) + "/" + addr);
-
-
-    tcpServer = new QTcpServer(this);
-    if (!tcpServer->listen(QHostAddress::Any, server_port)) {
-        QMessageBox::critical(this, tr("DynamicDocs Interactor "),
-                              tr("Unable to start the server: %1.")
-                              .arg(tcpServer->errorString()));
-        close();
-        return;
+void dds_HttpWindow::init(dyndoc_HTTPconnector::HTTPsettings& settings)
+{
+    try
+    {
+        init_settings(settings);
+        init_interface();
+        init_TCPserver();
+        init_loader();
+        init_connections();
     }
+    catch(dyndoc_HTTPconnector::HTTPconnectorError& errorMessage)
+    {
+        QMessageBox msgBox;
+        msgBox.setText(errorMessage.getError());
+        msgBox.exec();
+    }
+    catch(...)
+    {
+        throw;
+    }
+}
 
+void dds_HttpWindow::init_TCPserver()
+{
+    tcpServer = new QTcpServer(this);
+    if (!tcpServer->listen(QHostAddress::Any, server_port))
+    {
+        QMessageBox msgBox;
+        msgBox.setWindowTitle(tr("DynamicDocs Interactor "));
+        msgBox.setText(tr("Unable to start the server: ") + tcpServer->errorString());
+        msgBox.exec();
 
+        throw dyndoc_HTTPconnector::TCPserverError();
+    }
+}
 
+void dds_HttpWindow::init_loader()
+{
     loader = new (std::nothrow) JKKSLoader (host, dbName, user, password, port, transport);
     localDBInfo = QString("DBHost: %1, DBName: %2").arg(host).arg(dbName);
-    if (loader && loader->connectToDb ())
+    if( loader && !(loader && loader->connectToDb()) )
     {
-     
-    }
-    else if (loader)
-    {
-        QMessageBox::critical(this, tr("DynamicDocs Interactor"),
-                              tr("Unable to connect to the database: %1.")
-                              .arg(host));
-        close();
-        return;
-    }
+        QMessageBox msgBox;
+        msgBox.setWindowTitle(tr("DynamicDocs Interactor "));
+        msgBox.setText(tr("Unable to connect to the database:: %1") + host);
+        msgBox.exec();
 
+        throw dyndoc_HTTPconnector::loaderError();
+    }
+}
+
+void dds_HttpWindow::init_connections()
+{
     connect(tcpServer, SIGNAL(newConnection()), this, SLOT(loadData()));
-
-
-    urlLabel = new QLabel(tr("&URL:"));
-    urlLabel->setBuddy(urlLineEdit);
-    statusLabel = new QLabel(tr("Please enter the URL for system where you want send datas."));
-
-    startButton = new QPushButton(tr("Send"));
-    startButton->setDefault(true);
-    quitButton = new QPushButton(tr("Quit"));
-    quitButton->setAutoDefault(false);
-
-    buttonBox = new QDialogButtonBox;
-    buttonBox->addButton(startButton, QDialogButtonBox::ActionRole);
-    buttonBox->addButton(quitButton, QDialogButtonBox::RejectRole);
-
-    progressDialog = new QProgressDialog(this);
-
-    http = new QHttp(this);
 
     //срабатывает, когда в методе httpRequestFinished пришел очередной ответ и удалена запись из списка http_messages
     connect(this, SIGNAL(httpMessageRemoved(int)), this, SLOT(slotHttpMessageRemoved(int)));
 
-    connect(urlLineEdit, SIGNAL(textChanged(const QString &)),
-            this, SLOT(enableDownloadButton()));
     connect(http, SIGNAL(requestFinished(int, bool)),
             this, SLOT(httpRequestFinished(int, bool)));
     connect(http, SIGNAL(dataReadProgress(int, int)),
             this, SLOT(updateDataReadProgress(int, int)));
     connect(http, SIGNAL(responseHeaderReceived(const QHttpResponseHeader &)),
             this, SLOT(readResponseHeader(const QHttpResponseHeader &)));
-/*  connect(http, SIGNAL(authenticationRequired(const QString &, quint16, QAuthenticator *)),
-            this, SLOT(slotAuthenticationRequired(const QString &, quint16, QAuthenticator *)));
-#ifndef QT_NO_OPENSSL
-    connect(http, SIGNAL(sslErrors(const QList<QSslError> &)),
-            this, SLOT(sslErrors(const QList<QSslError> &)));
-#endif */
-    connect(progressDialog, SIGNAL(canceled()), this, SLOT(cancelDownload()));
-    connect(startButton, SIGNAL(clicked()), this, SLOT(startTimer()));
-    connect(quitButton, SIGNAL(clicked()), this, SLOT(close()));
-
-    QHBoxLayout *topLayout = new QHBoxLayout;
-    topLayout->addWidget(urlLabel);
-    topLayout->addWidget(urlLineEdit);
-
-    QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addLayout(topLayout);
-    mainLayout->addWidget(statusLabel);
-    mainLayout->addWidget(buttonBox);
-    mainLayout->addWidget(progressDialog);
-    setLayout(mainLayout);
-
-
-    //responses << "HTTP/1.1 200 OK ";
-    //responses << "Date:";
-    //responses << "Server: DYNAMICDOCS INTERACTOR/1.0.0";
-    //responses << "Last-Modified: Mon, 14 Jun 2010 06:04:27 GMT";
-    //responses << "Content-Type: text/html";
-    //responses << "Content-Length: 500";
-    //responses << "Content-Location: http://";
-
-    setWindowTitle(tr("DynamicDocs Interactor"));
-    urlLineEdit->setFocus();
-
-    user_timer = 36000; //by defaul set timer
-
-
-    dds_TimerForm * timerForm = new dds_TimerForm ();
-    
-    if (!timerForm)
-        return ;
-    
-    if (timerForm->exec () != QDialog::Accepted)
-    {
-        delete timerForm;
-        //manual
-		manual = true;
-    }
-    else
-    {
-		manual = false;
-        user_timer = timerForm->getTimer();
-		//if(user_timer < 10000)
-		//{
-		//	user_timer = 36000;
-		//}
-
-        startTimer();
-        delete timerForm;
-    }
 }
 
-
-void dds_HttpWindow::startTimer()
+void dds_HttpWindow::init_interface()
 {
-    
-    startButton->setEnabled(false);
-    urlLineEdit->setEnabled(false);
+    http = new QHttp(this);
+}
 
-    if(manual == false)
-	{
-		//QTimer *timer = new QTimer(this);
-        m_timer = new QTimer(this);
-		connect(m_timer, SIGNAL(timeout()), this, SLOT(startProc()));
-        m_timer->setInterval(user_timer);
-        m_timer->start();
-	}
-	else
-	{
-		startProc();
-	}
+void dds_HttpWindow::init_settings(dyndoc_HTTPconnector::HTTPsettings& settings)
+{
+    init_settingsDB(settings);
+    init_settingsTransportProtocol(settings);
+    init_settingsServerAndLocal(settings);
+}
+
+void dds_HttpWindow::init_settingsDB(dyndoc_HTTPconnector::HTTPsettings& settings)
+{
+    dbName = settings.dbName;//settings.value ("database").toString ();
+    host = settings.host;//settings.value ("host", "127.0.0.1").toString ();
+    user = settings.user;//settings.value ("user", "jupiter").toString ();
+    password = settings.password;//settings.value("password", "111").toString ();
+    port = settings.port;//settings.value("port", "5432").toInt ();
+}
+
+void dds_HttpWindow::init_settingsTransportProtocol(dyndoc_HTTPconnector::HTTPsettings& settings)
+{
+    transport = settings.transport;//settings.value ("transport","1").toInt ();
+    addr = QString();//!!!!
+}
+
+void dds_HttpWindow::init_settingsServerAndLocal(dyndoc_HTTPconnector::HTTPsettings& settings)
+{
+    http_host = settings.http_host;//settings.value ("host", "127.0.0.1").toString ();
+    http_port = settings.http_port;//settings.value ("port", "8001").toInt ();
+
+    server_port = settings.server_port;//settings.value ("server_port", "8001").toInt ();
 }
 
 void dds_HttpWindow::startProc()
@@ -227,44 +142,15 @@ void dds_HttpWindow::startProc()
     qWarning() << "Entered to startProc()" << localDBInfo;
 #endif
 
-    if(manual == false){
-        m_timer->stop();
-#ifdef _HTTP_DEBUG
-        qWarning() << "Timer stopped" << localDBInfo;
-#endif
-    }
-    
-    //QUrl url(urlLineEdit->text());
- 
-
-    //QHttp::ConnectionMode mode = url.scheme().toLower() == "https" ? QHttp::ConnectionModeHttps : QHttp::ConnectionModeHttp;
-    //http->setHost(url.host(), mode, url.port() == -1 ? 0 : url.port());
-    
-    /*if (!url.userName().isEmpty())
-        http->setUser(url.userName(), url.password());*/
-
     httpRequestAborted = false;
     httpTransferComplete = false;
 
-    //QByteArray path = QUrl::toPercentEncoding(url.path(), "!$&'()*+,;=:@/");
-    //if (path.isEmpty())
-    //    path = "/";
-
-
-    
     messageList = loader->readMessages();
     count_send = 0;
 
 
     if(messageList.size() > 0 )
     {
-
-        progressDialog->setWindowTitle(tr("DynamicDocs Interactor"));
-        progressDialog->setLabelText(tr("Sendind data %1.").arg("DynamicDocs Interactor"));
-
-        progressDialog->show();
-        progressDialog->setMaximum(messageList.size());
-
         httpMessages.clear();
 
         for (QList<JKKSPMessWithAddr *>::const_iterator iterator = messageList.constBegin();iterator != messageList.constEnd();++iterator)
@@ -274,16 +160,6 @@ void dds_HttpWindow::startProc()
 
         while(!messageList.isEmpty())
             delete messageList.takeFirst();
-    }
-    else{
-        startButton->setEnabled(true);
-        urlLineEdit->setEnabled(true);
-        if(manual == false){
-            m_timer->start();
-#ifdef _HTTP_DEBUG
-            qWarning() << "Timer started" << localDBInfo;
-#endif
-        }
     }
 
     QList<JKKSFilePart *> files = loader->readFileParts();
@@ -319,8 +195,6 @@ void dds_HttpWindow::startProc()
 
             JKKSPMessage pM(part.serialize(), JKKSMessage::atFilePart);
             pM.setVerifyReceiver(false);
-            //pM.receiverUID = part.getAddr();
-            //pM.senderUID = part.getSenderAddr();
             
             JKKSPMessWithAddr * pMessWithAddr = new JKKSPMessWithAddr(pM, part.getAddr(), part.id());
             
@@ -347,18 +221,10 @@ void dds_HttpWindow::cancelDownload()
     qWarning() << "Entered to cancelDownload" << localDBInfo;
 #endif
 
-    statusLabel->setText(tr("Data transfer canceled."));
     httpRequestAborted = true;
     http->abort();
-    startButton->setEnabled(true);
-    
-    if(manual == false){
-        m_timer->start();
-#ifdef _HTTP_DEBUG
-        qWarning() << "Timer started" << localDBInfo;
-#endif
-    }
 
+    emit signalCancelDownload();
 }
 
 void dds_HttpWindow::httpRequestFinished(int requestId, bool error)
@@ -393,50 +259,15 @@ void dds_HttpWindow::httpRequestFinished(int requestId, bool error)
         else{   
             if (error) {
                 httpRequestAborted = true;
-                statusLabel->setText(tr("ERROR: Data transfer failed: %1.").arg(http->errorString()));
+                emit signalErrorDataTransferFailed(http->errorString());
                 qWarning() << tr("ERROR: Data transfer failed: %1.").arg(http->errorString());
             } 
 	        else {
-                statusLabel->setText(tr("Data transfer http %1 complete.").arg(requestId));
+                emit signalDataTransferComplete();
                 httpTransferComplete = true;
             }
         }
     }
-}
-
-void dds_HttpWindow::slotHttpMessageRemoved(int progress)
-{
-    //qWarning() << "Entered in slotHttpMessageRemoved()";
-
-    //maximum выставляется в методе startProc() при чтении кол-ва сообщений на отправку
-    if(progressDialog->maximum () == progress){
-        progressDialog->setValue(progress);
-        progressDialog->hide();
-    }
-    else{
-        progressDialog->setValue(progress);
-    }
-
-    if(httpMessages.count() > 0){ 
-#ifdef _HTTP_DEBUG
-        qWarning() << "Skip to start timer bacause of http_message map does not empty (current count = " << httpMessages.count() << ")";
-#endif
-        return;
-    }
-
-    progressDialog->setValue(progressDialog->maximum());
-    
-    if(!progressDialog->isHidden())
-        progressDialog->hide();
-	
-    if(manual == false){
-        m_timer->start();
-#ifdef _HTTP_DEBUG
-        qWarning() << "Timer started" << localDBInfo;
-#endif
-    }
-    else
-        startButton->setEnabled(true);
 }
 
 void dds_HttpWindow::readResponseHeader(const QHttpResponseHeader &responseHeader)
@@ -457,31 +288,8 @@ void dds_HttpWindow::readResponseHeader(const QHttpResponseHeader &responseHeade
         //                         tr("Data transfer failed: %1.")
         //                         .arg(responseHeader.reasonPhrase()));
         httpRequestAborted = true;
-        progressDialog->hide();
         http->abort();
-
-        if(manual == false){
-            m_timer->start();
-#ifdef _HTTP_DEBUG
-            qWarning() << "Timer started" << localDBInfo;
-#endif
-        }
-
     }
-}
-
-void dds_HttpWindow::updateDataReadProgress(int bytesRead, int totalBytes)
-{
-    if (httpRequestAborted)
-        return;
-
-    progressDialog->setMaximum(totalBytes);
-    progressDialog->setValue(bytesRead);
-}
-
-void dds_HttpWindow::enableDownloadButton()
-{
-    startButton->setEnabled(!urlLineEdit->text().isEmpty());
 }
 
 bool dds_HttpWindow::setMessageAsSended(const int & id, const int & type)
@@ -523,8 +331,6 @@ bool dds_HttpWindow::sendOutMessage(const JKKSPMessWithAddr * message, bool file
     QByteArray path = QUrl::toPercentEncoding(url.path(), "!$&'()*+,;=:@/");
     if (path.isEmpty())
         path = "/";
-
-
 
     // encrypt
 /*
@@ -570,21 +376,6 @@ bool dds_HttpWindow::sendOutMessage(const JKKSPMessWithAddr * message, bool file
 
 void dds_HttpWindow::loadData()
 {
-   /* QByteArray block;
-    QDataStream out(&block, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_4_0);
-
-    out << (quint16)0;
-    
-    for (int j = 0 ; j < responses.size(); j++)
-    { 
-        out << responses.at(j);
-    }
-
-    out.device()->seek(0);
-    out << (quint16)(block.size() - sizeof(quint16));
-    */
-
     QHttpResponseHeader response; 
 
     QTcpSocket *clientConnection = tcpServer->nextPendingConnection();
@@ -614,9 +405,6 @@ void dds_HttpWindow::loadData()
             break;
         }
     }
-
-    // QMessageBox::critical(this, "test","Read data from DynamicDocs Client. Datas size: " + QString::number(numReadTotal));
-    //qDebug() << "Receive data size: " << QString::number(numReadTotal);
 
     QByteArray block;
     QString str;
@@ -680,20 +468,6 @@ void dds_HttpWindow::loadData()
 
          QByteArray byteArray = all_data; 
 
-/*
-#ifndef WIN32
-         CryptMessage cryptMessage(all_data);
-            byteArray = cryptMessage.message;
-            unsigned long new_crc = 0;
-            int key = cryptMessage.hash - qHash(cryptMessage.message);
-            
-            encrypt(&byteArray, new_crc, key, CFB, DECRYPT);
-	    qDebug() << "Crypt message.hash" << cryptMessage.hash;
-	    qDebug() << "Crypt message.crc: " <<  cryptMessage.CRC;
-	    qDebug() << "Encrypt crc: " <<  new_crc;
-	    qDebug() << "key: " << key;
-#endif
-*/
             JKKSPMessage pMessage(byteArray);//byteArray);
             
             int res = loader->writeMessage(pMessage);
@@ -739,36 +513,48 @@ void dds_HttpWindow::loadData()
      }
 }
 
-
-/*void dds_HttpWindow::slotAuthenticationRequired(const QString &hostName, quint16, QAuthenticator *authenticator)
+void dds_HttpWindow::run()
 {
-    QDialog dlg;
-    Ui::Dialog ui;
-    ui.setupUi(&dlg);
-    dlg.adjustSize();
-    ui.siteDescription->setText(tr("%1 at %2").arg(authenticator->realm()).arg(hostName));
-    
-    if (dlg.exec() == QDialog::Accepted) {
-        authenticator->setUser(ui.userEdit->text());
-        authenticator->setPassword(ui.passwordEdit->text());
-    }
-}*/
-
-/*#ifndef QT_NO_OPENSSL
-void dds_HttpWindow::sslErrors(const QList<QSslError> &errors)
-{
-    QString errorString;
-    foreach (const QSslError &error, errors) {
-        if (!errorString.isEmpty())
-            errorString += ", ";
-        errorString += error.errorString();
-    }
-    
-    if (QMessageBox::warning(this, tr("HTTP Example"),
-                             tr("One or more SSL errors has occurred: %1").arg(errorString),
-                             QMessageBox::Ignore | QMessageBox::Abort) == QMessageBox::Ignore) {
-        http->ignoreSslErrors();
-    }
+    startProc();
 }
-#endif*/
+
+//*****************************************************
+dyndoc_HTTPconnector::HTTPconnectorError::HTTPconnectorError()
+{
+}
+
+dyndoc_HTTPconnector::HTTPconnectorError::~HTTPconnectorError()
+{
+}
+
+QString dyndoc_HTTPconnector::HTTPconnectorError::getError() const
+{
+    return QString("Connector error!");
+}
+
+dyndoc_HTTPconnector::TCPserverError::TCPserverError()
+{
+}
+
+dyndoc_HTTPconnector::TCPserverError::~TCPserverError()
+{
+}
+
+QString dyndoc_HTTPconnector::TCPserverError::getError() const
+{
+    return QString("TCP server error!");
+}
+
+dyndoc_HTTPconnector::loaderError::loaderError()
+{
+}
+
+dyndoc_HTTPconnector::loaderError::~loaderError()
+{
+}
+
+QString dyndoc_HTTPconnector::loaderError::getError() const
+{
+    return QString("Loader error!");
+}
 
