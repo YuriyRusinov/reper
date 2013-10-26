@@ -7770,7 +7770,7 @@ void KKSObjEditorFactory :: loadObjCAttrRef (KKSObjectExemplar * wObjE, const KK
     if (!wObjE || !avE || !sMod)
         return;
     
-    qDebug () << __PRETTY_FUNCTION__ << wObjE->id() << avE->attribute()->id() << avE->attribute()->type()->id() << isSystem;
+    //qDebug () << __PRETTY_FUNCTION__ << wObjE->id() << avE->attribute()->id() << avE->attribute()->type()->id() << isSystem;
     
     QString tableName = avE->attribute()->tableName ();
     KKSObject *refObj = loader->loadIO (tableName, true);
@@ -7796,13 +7796,24 @@ void KKSObjEditorFactory :: loadObjCAttrRef (KKSObjectExemplar * wObjE, const KK
 
     QString value = sl.isEmpty() ? QString ("select id from %1").arg (tableName) : QString ("select id from %1 where id not in (%2)").arg (tableName).arg (sl.join (","));
     
+    KKSList<const KKSFilter*> fl;
+    if (refObj->id() == IO_ORG_ID)
+    {
+        QString orgValue = QString("select id from organization where id != getLocalOrgId()");
+        const KKSFilter * fOrg = ct->createFilter (ATTR_ID, orgValue, KKSFilter::foInSQL);
+        if (!fOrg){
+            refObj->release();
+            return;
+        }
+
+        fl.append (fOrg);
+        fOrg->release ();
+    }
     const KKSFilter * f = ct->createFilter (ATTR_ID, value, KKSFilter::foInSQL);
     if (!f){
         refObj->release();
         return;
     }
-
-    KKSList<const KKSFilter*> fl;
     fl.append (f);
     f->release ();
     KKSFilterGroup * fg = new KKSFilterGroup (true);

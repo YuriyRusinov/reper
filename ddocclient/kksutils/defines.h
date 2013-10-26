@@ -89,7 +89,7 @@ const int IO_IO_ID = 7;
 
 //данный дефайн задает идентификатор системного информационного объекта, 
 //который описывает справочник организаций
-#define IO_ORG_ID 27
+const int IO_ORG_ID = 27;
 
 //данный дефайн задает идентификатор системного информационного объекта, 
 //который описывает справочник подразделений
@@ -140,7 +140,7 @@ const int IO_LIFE_CYCLE_ID = 95;
 //в том числе по изменению привилегий на ИО, авторами которых он не является
 #define ADMIN_ROLE 1
 
-#define ATTR_ID 1
+const int ATTR_ID = 1;
 const int ATTR_NAME = 2;
 #define ATTR_MACLABEL 63
 #define ATTR_INPUT_NUMBER 99
