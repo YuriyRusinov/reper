@@ -124,6 +124,8 @@ class _I_EXPORT JKKSLoader
         QList<JKKSFilePart*> readFileParts() const;
         QByteArray readFilePartData(const QString & absUrl, qint64 blockSize, qint64 position, qint64 * readed) const;
         int writeFilePartData(JKKSFilePart * part) const;
+        qint64 getFileDataSize(qint64 idUrl) const;
+
 
     private:
         //
@@ -148,7 +150,6 @@ class _I_EXPORT JKKSLoader
         QMap<qint64, JKKSIOUrl> readDocumentFiles (qint64 idObject, qint64 idOrganization) const;//второй параметр используется в случае когда требуется передача прикрепленых файлов блоками
         qint64 writeDocumentFile (JKKSIOUrl& url) const;
 
-        qint64 getFileDataSize(qint64 idUrl) const;
         QByteArray getFileData (qint64 idUrl, int blockSize=_MAX_FILE_BLOCK) const;
         int writeFileData (const JKKSIOUrl& url, int blockSize=_MAX_FILE_BLOCK) const;
 

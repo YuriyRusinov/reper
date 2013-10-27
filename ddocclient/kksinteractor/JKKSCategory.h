@@ -34,7 +34,8 @@ class _I_EXPORT JKKSCategory : public JKKSUID
                       const QString& cCode=QString(), 
                       const QString& cDesc=QString(), 
                       int type=-1, 
-                      qint64 id_child=-1, 
+                      qint64 id_child=-1,
+                      qint64 id_child2=-1,
                       bool isCMain=false,
                       const QString & uid = QString(),
                       qint64 id_io_state=1,
@@ -64,6 +65,9 @@ class _I_EXPORT JKKSCategory : public JKKSUID
 
         qint64 getIDChild (void) const;
         void setIDChild (qint64 idc);
+
+        qint64 getIDChild2 (void) const;
+        void setIDChild2 (qint64 idc);
 
         bool isMain (void) const;
         void setMain (bool val);
@@ -98,6 +102,7 @@ class _I_EXPORT JKKSCategory : public JKKSUID
         int m_idType;
         qint64 m_idState;
         qint64 m_idChild;
+        qint64 m_idChild2;
         bool m_isMain;
         bool m_isGlobal;
 
@@ -111,7 +116,13 @@ QDataStream& operator>> (QDataStream& in, JKKSCategory& cat);
 class _I_EXPORT JKKSCategoryPair
 {
     public:
-        JKKSCategoryPair(const JKKSCategory & cMain, const JKKSCategory & cChild);
+        JKKSCategoryPair(const JKKSCategory & cMain, 
+                         const JKKSCategory & cChild,
+                         const JKKSCategory & cChild2);
+        
+        JKKSCategoryPair(const JKKSCategory & cMain, 
+                         const JKKSCategory & cChild);
+
         JKKSCategoryPair(const JKKSCategory & cAlone);
         JKKSCategoryPair();
 
@@ -119,18 +130,24 @@ class _I_EXPORT JKKSCategoryPair
 
         void setMainCategory(const JKKSCategory & cMain);
         void setChildCategory(const JKKSCategory & cChild);
+        void setChild2Category(const JKKSCategory & cChild2);
 
         const JKKSCategory & mainCategory() const;
         const JKKSCategory & childCategory() const;
+        const JKKSCategory & child2Category() const;
 
         bool isNull() const{ return m_null;}
         bool isAlone() const{ return m_alone;}
+        bool hasChild2() const { return m_hasChild2; }
 
     private:
         JKKSCategory m_mainCategory;
         JKKSCategory m_childCategory;
+        JKKSCategory m_child2Category;
+       
         bool m_null;
         bool m_alone;
+        bool m_hasChild2;
 };
 
 

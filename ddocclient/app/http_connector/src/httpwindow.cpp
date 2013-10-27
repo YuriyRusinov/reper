@@ -138,6 +138,8 @@ HttpWindow::HttpWindow(QWidget *parent)
     filesForSent = 0;
     cntFilesSended = 0;
     cntMsgSended = 0;
+    cntFilePartsSended = 0;
+    filePartsForSent = 0;
 }
 
 
@@ -170,8 +172,10 @@ void HttpWindow::startProc()
    
     messageList = loader->readMessages();
     QList<JKKSFilePart *> files = loader->readFileParts();
+    
     filesForSent = files.count();
     msgForSent = messageList.size();
+    filePartsForSent = 0;
 
     if(msgForSent + filesForSent <= 0){
         startButton->setEnabled(true);
@@ -183,8 +187,18 @@ void HttpWindow::startProc()
         
     cntMsgSended = 0;
     cntFilesSended = 0;
+    cntFilePartsSended = 0;
 
-    statusLabel->setText(tr("Found messages for transferring: %1\nTransfered: %2").arg(QString::number(msgForSent + filesForSent)).arg(QString::number(0)));
+    statusLabel->setText(tr("Data transferring started ...\n\n"
+                            "Messages for transfer: %1 ---> %3\n"
+                            "Files for transfer: %2 (for current file: %5 parts) ---> %4 (for current file: %6 parts)")
+                            .arg(msgForSent)
+                            .arg(filesForSent)
+                            .arg(cntMsgSended)
+                            .arg(cntFilesSended)
+                            .arg(filePartsForSent)
+                            .arg(cntFilePartsSended));
+    //statusLabel->setText(tr("Found messages for transferring: %1\nTransfered: %2").arg(QString::number(msgForSent + filesForSent)).arg(QString::number(0)));
 
     if(msgForSent > 0 )
     {
@@ -193,7 +207,7 @@ void HttpWindow::startProc()
 
         for (QList<JKKSPMessWithAddr *>::const_iterator iterator = messageList.constBegin();iterator != messageList.constEnd();++iterator)
         {
-            bool stat = sendOutMessage((*iterator) /*, false*/) ;
+            bool stat = sendOutMessage((*iterator), true, false) ;
         }
 
         while(!messageList.isEmpty())
@@ -201,9 +215,27 @@ void HttpWindow::startProc()
     }
 
     qint64 position = 0;
-    int block = _MAX_FILE_BLOCK2;
+    int block = _MAX_FILE_BLOCK3;
     
     for(int i=0; i<filesForSent; i++){
+        qint64 fileSize = loader->getFileDataSize(files.at(i)->getIdUrl());
+        qint64 partsCount = fileSize / (qint64 )_MAX_FILE_BLOCK3 ;
+        if(fileSize > 0 && partsCount == 0)
+            partsCount = 1;
+
+        filePartsForSent = (int)partsCount;
+        cntFilePartsSended = 0;
+
+        statusLabel->setText(tr("Data transferring started ...\n\n"
+                                "Messages for transfer: %1 ---> %3\n"
+                                "Files for transfer: %2 (for current file: %5 parts) ---> %4 (for current file: %6 parts)")
+                                .arg(msgForSent)
+                                .arg(filesForSent)
+                                .arg(cntMsgSended)
+                                .arg(cntFilesSended)
+                                .arg(filePartsForSent)
+                                .arg(cntFilePartsSended));
+
         do
         {
             JKKSPMessWithAddr * pMes = NULL;
@@ -236,11 +268,9 @@ void HttpWindow::startProc()
             
             JKKSPMessWithAddr * pMessWithAddr = new JKKSPMessWithAddr(pM, part.getAddr(), part.id());
             
-            bool stat = sendOutMessage(pMessWithAddr) ;
+            bool stat = sendOutMessage(pMessWithAddr, true, eof) ;
             
             if(eof){
-                //соответственно, метод httpRequestFinished() отработает полностью только когда передана последн€€ часть файла
-                httpMessages.insert(httpGetId, qMakePair(pMessWithAddr->id, (qint64)pMessWithAddr->pMess.getType()) );
                 break;
             }
             
@@ -294,13 +324,33 @@ void HttpWindow::httpRequestFinished(int requestId, bool error)
     }
     
     qWarning() << "In httpRequestFinished(). Found corresponding request. requestId = " << requestId;
+    emit needToExitEventLoop();
 
     httpMessages.remove(requestId);
     
-    cntMsgSended++;
-    emit httpMessageRemoved(cntMsgSended);
+    if( (JKKSMessage::JKKSMessageType) t.second == JKKSMessage::atFilePart)
+        cntFilesSended++;
+    else if((JKKSMessage::JKKSMessageType) t.second == JKKSMessage::atUnknownType)
+        cntFilePartsSended++;
+    else
+        cntMsgSended++;
 
-    statusLabel->setText(tr("Found messages for transferring: %1\nTransfered: %2").arg(QString::number(msgForSent+filesForSent)).arg(QString::number(cntMsgSended)));
+    statusLabel->setText(tr("Data transferring started ...\n\n"
+                            "Messages for transfer: %1 ---> %3\n"
+                            "Files for transfer: %2 (for current file: %5 parts) ---> %4 (for current file: %6 parts)")
+                            .arg(msgForSent)
+                            .arg(filesForSent)
+                            .arg(cntMsgSended)
+                            .arg(cntFilesSended)
+                            .arg(filePartsForSent)
+                            .arg(cntFilePartsSended));
+    //statusLabel->setText(tr("Found messages for transferring: %1\nTransfered: %2").arg(QString::number(msgForSent+filesForSent)).arg(QString::number(cntMsgSended)));
+
+    //если мы отправл€ли часть файла и она не €вл€етс€ последней
+    if( (JKKSMessage::JKKSMessageType) t.second == JKKSMessage::atUnknownType)
+        return;
+
+    emit httpMessageRemoved(cntMsgSended + cntFilesSended);
 
     if (error) {
         qCritical() << tr("ERROR: Data transfer for requestId = %1 failed: %2").arg(requestId).arg(http->errorString());
@@ -381,7 +431,9 @@ bool HttpWindow::setMessageAsSended(const qint64 & id, const int & type, bool se
     return result;
 }
 
-bool HttpWindow::sendOutMessage(const JKKSPMessWithAddr * message, bool filePartsFlag)
+bool HttpWindow::sendOutMessage(const JKKSPMessWithAddr * message, 
+                                bool filePartsFlag,
+                                bool isLastFilePart)
 {
     
     qWarning() << "In sendOutMessage() ";
@@ -472,21 +524,48 @@ bool HttpWindow::sendOutMessage(const JKKSPMessWithAddr * message, bool filePart
 	if(filePartsFlag)
 	{
 		QEventLoop eventLoop;
-		connect(http,SIGNAL(requestFinished(int,bool)),&eventLoop,SLOT(quit()));
+		connect(this,SIGNAL(needToExitEventLoop()),&eventLoop,SLOT(quit()));
 
         qWarning() << "1 before post-> ";
         httpGetId = http->post ( path, byteArray ) ;
-        qWarning() << "2 after post-> ";
 
-		eventLoop.exec();
+        if(message->pMess.getType() != JKKSMessage::atFilePart){//дл€ файлов, передаваемых част€ми информаци€ в этот список заноситс€ отдельно
+            httpMessages.insert(httpGetId, qMakePair(message->id, (qint64)message->pMess.getType()) );
+        }
+        else{
+            if(isLastFilePart){
+                //это приведет к тому, что в методе httpRequestFinished обработка факта полной передачи файла сработает только однажды, когда передана последн€€ часть файла
+                httpMessages.insert(httpGetId, qMakePair(message->id, (qint64)message->pMess.getType()) );
+            }
+            else{
+                //Ёто приведет к тому, что в методе httpRequestFinished обработки факта передачи файла не произойдет, однако сгенерируетс€ сигнал, который завершит eventLoop
+                httpMessages.insert(httpGetId, qMakePair(message->id, (qint64)JKKSMessage::atUnknownType) );
+            }
+        }
+		
+        //qWarning() << "2 after post-> ";
+
+        eventLoop.exec();
+        qWarning() << "3 after eventLoop.exec() ";
 	}
-	else
+    else 
+    {
         httpGetId = http->post ( path, byteArray ) ;
 
-    qWarning() << "3 after eventLoop.exec() ";
-
-    if(message->pMess.getType() != JKKSMessage::atFilePart)//дл€ файлов, передаваемых част€ми информаци€ в этот список заноситс€ отдельно
-        httpMessages.insert(httpGetId, qMakePair(message->id, (qint64)message->pMess.getType()) );
+        if(message->pMess.getType() != JKKSMessage::atFilePart){//дл€ файлов, передаваемых част€ми информаци€ в этот список заноситс€ отдельно
+            httpMessages.insert(httpGetId, qMakePair(message->id, (qint64)message->pMess.getType()) );
+        }
+        else{
+            if(isLastFilePart){
+                //это приведет к тому, что в методе httpRequestFinished обработка факта полной передачи файла сработает только однажды, когда передана последн€€ часть файла
+                httpMessages.insert(httpGetId, qMakePair(message->id, (qint64)message->pMess.getType()) );
+            }
+            else{
+                //Ёто приведет к тому, что в методе httpRequestFinished обработки факта передачи файла не произойдет, однако сгенерируетс€ сигнал, который завершит eventLoop
+                httpMessages.insert(httpGetId, qMakePair(message->id, (qint64)JKKSMessage::atUnknownType) );
+            }
+        }
+    }
   
     return true;
 }

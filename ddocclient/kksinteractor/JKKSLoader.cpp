@@ -1473,7 +1473,7 @@ JKKSCategoryPair JKKSLoader::parseCategories(const QMap<qint64, JKKSCategory> & 
 
     int cnt = oldCats.count();
 
-    if(cnt < 1 || cnt > 2)
+    if(cnt < 1 || cnt > 3)
         return cNull;
 
     QMap<qint64, JKKSCategory>::const_iterator pc = oldCats.constBegin();
@@ -1483,20 +1483,29 @@ JKKSCategoryPair JKKSLoader::parseCategories(const QMap<qint64, JKKSCategory> & 
         c.setState(1);
         if(cnt == 1){
             c.setIDChild(-1);
+            c.setIDChild2(-1);
             cCats.setMainCategory(c);
             break;
         }
 
-        if(c.getIDChild() > 0)
+        if(c.getIDChild() <= 0)
+            continue;
+        else{
             cCats.setMainCategory(c);
-        else            
-            cCats.setChildCategory(c);
+                    
+            cCats.setChildCategory(oldCats.value(c.getIDChild()));
+            if(c.getIDChild2() > 0)
+                cCats.setChild2Category(oldCats.value(c.getIDChild2()));
+
+            break;
+        }
     }
 
     if(cCats.isNull())
         return cNull;
 
     qint64 idChild = -1;
+    qint64 idChild2 = -1;
     int res = 0;
 	
     if(cCats.isAlone()){
@@ -1521,8 +1530,21 @@ JKKSCategoryPair JKKSLoader::parseCategories(const QMap<qint64, JKKSCategory> & 
     else
         return cNull;
 
+    if(cCats.hasChild2()){
+        JKKSCategory c = cCats.child2Category();
+        res = writeCategory (c);
+        if (res != ERROR_CODE){
+            cCats.setChild2Category(c);
+            idChild2 = c.id();
+        }
+        else
+            return cNull;
+    }
+
     c = cCats.mainCategory();
     c.setIDChild(idChild);
+    c.setIDChild2(idChild2);
+
     res = writeCategory (c);
     if (res != ERROR_CODE){
         cCats.setMainCategory(c);
@@ -1536,9 +1558,14 @@ JKKSCategoryPair JKKSLoader::parseCategories(const QMap<qint64, JKKSCategory> & 
 QMap<qint64, JKKSCategory> JKKSLoader::pairToMap(const JKKSCategoryPair & pair) const
 {
     QMap<qint64, JKKSCategory> newCats;
+    
     newCats.insert(pair.mainCategory().id(), pair.mainCategory());
-    if(!pair.isAlone())
+    
+    if(!pair.isAlone()){
         newCats.insert(pair.childCategory().id(), pair.childCategory());
+        if(!pair.hasChild2())
+            newCats.insert(pair.child2Category().id(), pair.child2Category());
+    }
 
     return newCats;
 }
@@ -1643,6 +1670,7 @@ QPair<qint64, JKKSCategory> JKKSLoader :: readCategory (qint64 idCat) const
                                 res->getCellAsString (0, 4), // description
                                 res->getCellAsInt (0, 1), // type
                                 res->isEmpty(0, 2) ? -1 : res->getCellAsInt (0, 2), // child
+                                res->isEmpty(0, 16) ? -1 : res->getCellAsInt(0, 16), //id_child2
                                 res->getCellAsBool (0, 7), // main category
                                 res->getCellAsString(0, 9), //uniqueID
                                 res->getCellAsInt(0, 11), //id_io_state
@@ -1672,6 +1700,11 @@ QMap<qint64, JKKSCategory> JKKSLoader :: readCategories (qint64 idCat) const
             category = readCategory(category.second.getIDChild());
             result.insert(category.first, category.second);
         }
+
+        while(category.second.getIDChild2() > 0){
+            category = readCategory(category.second.getIDChild2());
+            result.insert(category.first, category.second);
+        }
     }
     return result;
 }
@@ -1682,7 +1715,7 @@ int JKKSLoader :: writeCategory (JKKSCategory& cat) const
 
     if (!cat.getName().isEmpty())
     {
-        QString sql = QString ("select * from cInsert ('%1', %2, %3, %4, %5, %6, %7, %8, %9);")
+        QString sql = QString ("select * from cInsertEx('%1', %2, %3, %4, %5, %6, %7, %8, %9, %10, %11);")
                                 .arg (cat.getName())
                                 .arg (QString ("NULL"))//FIXME
                                 .arg (cat.getDescription().isEmpty() ? QString ("NULL") : QString ("'%1'").arg (cat.getDescription()))
@@ -1691,7 +1724,10 @@ int JKKSLoader :: writeCategory (JKKSCategory& cat) const
                                 .arg (cat.isMain() ? QString("true") : QString("false"))
                                 .arg (cat.uid().isEmpty() ? QString ("NULL") : QString ("'%1'").arg (cat.uid()))
                                 .arg (cat.isGlobal() ? QString("true") : QString("false"))
-                                .arg (cat.getState());
+                                .arg (cat.getState())
+                                .arg (cat.getIDChild2() < 0 ? QString("NULL") : QString::number (cat.getIDChild2()))
+                                .arg (QString("NULL") );
+
 
         KKSResult *res = dbWrite->execute (sql);
 
@@ -2498,6 +2534,12 @@ QMap<qint64, JKKSCategory> JKKSLoader :: readPCategories (qint64 idCatChild) con
     delete res;
     cats.insert (result.first, result.second);
     cats.insert (C.first, C.second);
+
+    if(result.second.getIDChild2() > 0){
+        QPair<qint64, JKKSCategory> child2 = readCategory(result.second.getIDChild2());
+        cats.insert(child2.first, child2.second);
+    }
+    
     return cats;
 }
 
@@ -2516,6 +2558,7 @@ int JKKSLoader :: writeMessage (JKKSRefRecord *refRec, const QString& sender_uid
 
     if (refRec->getEntityType () == 1)//category
     {
+        //parseCategories в том числе и записывает категории в БД
         JKKSCategoryPair cCats = parseCategories(refRec->getCategory());
         if (cCats.isNull())
             recResp.setResult(4);

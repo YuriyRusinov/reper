@@ -49,7 +49,7 @@ private:
     bool m_useGateway;
 };
 
-/*базовый класс для сообщения, отправляемого получателю*/
+/*базовый класс для сообщения, отправляемого получателю (pure virtual)*/
 class _I_EXPORT JKKSMessage
 {
     public:

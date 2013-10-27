@@ -12,6 +12,7 @@ JKKSCategory :: JKKSCategory (qint64 idCat,
                               const QString& cDesc, 
                               int type,
                               qint64 id_child, 
+                              qint64 id_child2,
                               bool isCMain,
                               const QString & uid,
                               qint64 state,
@@ -24,6 +25,7 @@ JKKSCategory :: JKKSCategory (qint64 idCat,
     m_idType (type),
     m_idState(state),
     m_idChild (id_child),
+    m_idChild2 (id_child2),
     m_isMain (isCMain),
     m_isGlobal (isCGlobal)
 {
@@ -38,6 +40,7 @@ JKKSCategory :: JKKSCategory (const JKKSCategory& cat)
     m_idType (cat.m_idType),
     m_idState (cat.m_idState),
     m_idChild (cat.m_idChild),
+    m_idChild2 (cat.m_idChild2),
     m_isMain (cat.m_isMain),
     m_isGlobal (cat.m_isGlobal),
     m_attributes (cat.m_attributes),
@@ -119,6 +122,16 @@ void JKKSCategory :: setIDChild (qint64 idc)
     m_idChild = idc;
 }
 
+qint64 JKKSCategory :: getIDChild2 (void) const
+{
+    return m_idChild2;
+}
+
+void JKKSCategory :: setIDChild2 (qint64 idc)
+{
+    m_idChild2 = idc;
+}
+
 bool JKKSCategory :: isMain (void) const
 {
     return m_isMain;
@@ -177,6 +190,7 @@ QDataStream& operator<< (QDataStream& out, const JKKSCategory& cat)
     out << cat.m_catDesc;
     out << cat.m_idType;
     out << cat.m_idChild;
+    out << cat.m_idChild2;
     out << cat.m_isMain;
     out << cat.m_attributes;
     out << cat.m_rubrics;
@@ -195,6 +209,7 @@ QDataStream& operator>> (QDataStream& in, JKKSCategory& cat)
     in >> cat.m_catDesc;
     in >> cat.m_idType;
     in >> cat.m_idChild;
+    in >> cat.m_idChild2;
     in >> cat.m_isMain;
     in >> cat.m_attributes;
     in >> cat.m_rubrics;
@@ -222,6 +237,7 @@ void JKKSCategory::copy(const JKKSCategory & that) throw(  )
     m_catDesc = that.m_catDesc;
     m_idType = that.m_idType;
     m_idChild = that.m_idChild;
+    m_idChild2 = that.m_idChild2;
     m_isMain = that.m_isMain;
     m_attributes = that.m_attributes;
     m_rubrics = that.m_rubrics;
@@ -230,13 +246,27 @@ void JKKSCategory::copy(const JKKSCategory & that) throw(  )
     m_isGlobal = that.m_isGlobal;
 }
 
+JKKSCategoryPair::JKKSCategoryPair(const JKKSCategory & cMain, 
+                                   const JKKSCategory & cChild,
+                                   const JKKSCategory & cChild2)
+{
+    m_mainCategory = cMain;
+    m_childCategory = cChild;
+    m_child2Category = cChild2;
 
-JKKSCategoryPair::JKKSCategoryPair(const JKKSCategory & cMain, const JKKSCategory & cChild)
+    m_null = false;
+    m_alone = false;
+    m_hasChild2 = true;
+}
+
+JKKSCategoryPair::JKKSCategoryPair(const JKKSCategory & cMain, 
+                                   const JKKSCategory & cChild)
 {
     m_mainCategory = cMain;
     m_childCategory = cChild;
     m_null = false;
     m_alone = false;
+    m_hasChild2 = false;
 }
 
 JKKSCategoryPair::JKKSCategoryPair(const JKKSCategory & cAlone)
@@ -244,12 +274,14 @@ JKKSCategoryPair::JKKSCategoryPair(const JKKSCategory & cAlone)
     m_mainCategory = cAlone;
     m_null = false;
     m_alone = true;
+    m_hasChild2 = false;
 }
 
 JKKSCategoryPair::JKKSCategoryPair()
 {
     m_null = true;
     m_alone = true;
+    m_hasChild2 = false; 
 }
 
 void JKKSCategoryPair::setMainCategory(const JKKSCategory & cMain)
@@ -265,6 +297,14 @@ void JKKSCategoryPair::setChildCategory(const JKKSCategory & cChild)
     m_alone = false;
 }
 
+void JKKSCategoryPair::setChild2Category(const JKKSCategory & cChild2)
+{
+    m_child2Category = cChild2;
+    m_null = false;
+    m_alone = false;
+    m_hasChild2 = true;
+}
+
 const JKKSCategory & JKKSCategoryPair::mainCategory() const
 {
     return m_mainCategory;
@@ -273,4 +313,9 @@ const JKKSCategory & JKKSCategoryPair::mainCategory() const
 const JKKSCategory & JKKSCategoryPair::childCategory() const
 {
     return m_childCategory;
+}
+
+const JKKSCategory & JKKSCategoryPair::child2Category() const
+{
+    return m_child2Category;
 }

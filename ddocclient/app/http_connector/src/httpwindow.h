@@ -28,7 +28,9 @@ class HttpWindow : public QDialog
 
 public:
     HttpWindow(QWidget *parent = 0);
-    bool sendOutMessage( const JKKSPMessWithAddr * message, bool filePartsFlag = true);//filePartsFlag - флаг передачи файла по частям
+    bool sendOutMessage( const JKKSPMessWithAddr * message, 
+                         bool filePartsFlag = true, //filePartsFlag - флаг передачи файла по частям. Приводит к тому, что включается синхронный режим для QHttp::post()
+                         bool isLastFilePart = false); //означает, что передается последняя часть файла, передаваемого частями
     bool setMessageAsSended(const qint64 & id, const int & type, bool sended = true);//последний параметр - флаг успешности доставки сообщения
     
 private slots:
@@ -45,6 +47,7 @@ private slots:
 
 signals:
     void httpMessageRemoved(int progress);
+    void needToExitEventLoop(); //генерируется в httpRequestFinished. Означает, что завершился вызов __нашего__ вызова post-> . Говорит о том, что надо завершить EventLoop и приступить к отправке следующего пакета
 
 private:
     QLabel *statusLabel;
@@ -76,6 +79,8 @@ private:
     int msgForSent; //количество сообщений, подготовленных для отправки
     int cntFilesSended;//количество отправленных файлов
     int filesForSent; //количество файлов, подготовленных для отправки
+    int filePartsForSent;//количество частей файлов для отправки
+    int cntFilePartsSended;//количество отправленных частей файлов
     
 	bool manual;
 };
