@@ -94,7 +94,7 @@ if [ "$IS_MAIN_ORG" = "1" ]; then
 fi
 
 if [ "$IS_MAIN_ORG" != "1" ]; then
-    $LINTER_PREFIX/bin/psql -h $DB_HOST -p $DB_PORT -d $BASE -c "select createTempTables(); select setCurrentDl(4); select insertlocalorg('$ORG_NAME', '$ORG_NAME', '$ORG_NAME', '$ORG_EMAIL_PREFIX', 1, NULL, 1, '$LOCAL_ADDRESS', $LOCAL_PORT, $USE_GATEWAY)" -t $USER > /dev/null
+    $LINTER_PREFIX/bin/psql -h $DB_HOST -p $DB_PORT -d $BASE -c "select createTempTables(); select setCurrentDl(4); select insertlocalorg('$ORG_NAME', '$ORG_NAME', '$ORG_NAME', 'localorg_prefix_slave', 1, NULL, 1, '$LOCAL_ADDRESS', $LOCAL_PORT, $USE_GATEWAY)" -t $USER > /dev/null
 fi
 
 exit 0

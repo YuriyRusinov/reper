@@ -48,6 +48,7 @@ USE_GATEWAY=FALSE
 #The name of database local organization
 ORG_NAME="New organization"
 #The unique identifier of database local organization
+#WARNING! does NOT used for slave organizations (if IS_MAIN_ORG=0)
 ORG_UID="localorg_prefix"
 
 #set this parameter to 1 if your organization is main
