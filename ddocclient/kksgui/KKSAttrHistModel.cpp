@@ -116,6 +116,13 @@ QVariant KKSAttrHistModel::data (const QModelIndex& index, int role) const
                                 return QVariant();
                             return QString::number (vl);// ("Text example");
                         }
+                        else if (tId == KKSAttrType::atInterval ||
+                                 tId == KKSAttrType::atIntervalH ||
+                                 tId == KKSAttrType::atGeometry ||
+                                 tId == KKSAttrType::atGeometryPoly)
+                        {
+                            return av->value().valueForInsert();
+                        }
                         else
                             return av->value().valueVariant();
                         break;
