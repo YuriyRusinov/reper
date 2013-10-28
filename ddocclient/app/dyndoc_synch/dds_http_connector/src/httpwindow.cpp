@@ -20,7 +20,6 @@
 ****************************************************************************/
 
 #include "httpwindow.h"
-#include "timerform.h"
 #include <kksresult.h>
 #include <kksdatabase.h>
 #include <defines.h>
@@ -56,7 +55,7 @@ void dds_HttpWindow::init(dyndoc_HTTPconnector::HTTPsettings& settings)
     }
 }
 
-void dds_HttpWindow::init_TCPserver()
+void dds_HttpWindow::init_TCPserver()// запускаем сервер на прослушку порта
 {
     tcpServer = new QTcpServer(this);
     if (!tcpServer->listen(QHostAddress::Any, server_port))
@@ -70,7 +69,7 @@ void dds_HttpWindow::init_TCPserver()
     }
 }
 
-void dds_HttpWindow::init_loader()
+void dds_HttpWindow::init_loader()// создаем лоадер
 {
     loader = new (std::nothrow) JKKSLoader (host, dbName, user, password, port, transport);
     localDBInfo = QString("DBHost: %1, DBName: %2").arg(host).arg(dbName);
@@ -136,7 +135,6 @@ void dds_HttpWindow::init_settingsServerAndLocal(dyndoc_HTTPconnector::HTTPsetti
 }
 
 void dds_HttpWindow::startProc()
-
 {
 #ifdef _HTTP_DEBUG
     qWarning() << "Entered to startProc()" << localDBInfo;
@@ -147,7 +145,6 @@ void dds_HttpWindow::startProc()
 
     messageList = loader->readMessages();
     count_send = 0;
-
 
     if(messageList.size() > 0 )
     {
@@ -212,7 +209,6 @@ void dds_HttpWindow::startProc()
 
     while(!files.isEmpty())
         delete files.takeFirst();
-
 }
 
 void dds_HttpWindow::cancelDownload()

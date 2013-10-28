@@ -5,7 +5,7 @@ SUBDIRS += \
 	operator_app \
 	http_connector \
         sync_queue_viewer \
-        dyndoc_synch \
+        #dyndoc_synch \
         kksdaemon
 
 win32{
