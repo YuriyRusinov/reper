@@ -82,6 +82,8 @@ class _F_EXPORT KKSStuffFactory : public KKSEntityFactory
         void refreshStuffStruct (KKSAccessEntity * acl, int level, QAbstractItemModel * stuffModel, const QItemSelection& sel, QTreeView * tv);
         void refreshEntity (KKSObjectExemplar * wObjE);
         void applyAclTemplateIO (int idAclTemplate, KKSAccessEntity * acl);
+        
+        void wEditorDestroy (QObject * wObj);
 
     private:
         //

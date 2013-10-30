@@ -736,7 +736,10 @@ void KKSStuffFactory :: addStuffElement (const QModelIndex& parent, int entity, 
         return;
     oef->createNewEditorParam (editor, io->id(), c, io->tableName(), 3, false, ioVals, aVals);
     if (editor && !wModels.contains (editor))
+    {
         wModels.insert (editor, stuffModel);
+        connect (editor, SIGNAL (destroyed(QObject *)), this, SLOT (wEditorDestroy (QObject *)) );
+    }
     io->release ();
 }
 
@@ -773,7 +776,10 @@ void KKSStuffFactory :: editStuffElement (const QModelIndex& index, int entity, 
         return;
     oef->editExistOE (editor, io->id(), index.data (Qt::UserRole).toInt(), c, io->tableName(), 3, false);
     if (editor && !wModels.contains (editor))
+    {
         wModels.insert (editor, stuffModel);
+        connect (editor, SIGNAL (destroyed(QObject *)), this, SLOT (wEditorDestroy (QObject *)) );
+    }
     io->release ();
 }
 
@@ -1106,4 +1112,11 @@ void KKSStuffFactory :: applyAclTemplateIO (int idAclTemplate, KKSAccessEntity *
     Q_UNUSED (acl);
 
     aclT->release ();
+}
+
+void KKSStuffFactory :: wEditorDestroy (QObject * wObj)
+{
+    QWidget * dW = qobject_cast<QWidget *> (wObj);
+    if (dW && wModels.contains(dW))
+        wModels.remove(dW);
 }
