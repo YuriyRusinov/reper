@@ -1,11 +1,12 @@
 select f_safe_drop_type('h_get_rec_rubrics');
-create type h_get_rec_rubrics as (id int4, 
-                                  id_parent int4, 
+create type h_get_rec_rubrics as (id int8, 
+                                  id_parent int8, 
                                   id_record int8, 
                                   name varchar, 
                                   description varchar, 
                                   type int4,
-                                  r_icon varchar);
+                                  r_icon varchar,
+                                  unique_id varchar);
 
 create or replace function recGetRubrics(int8) returns setof h_get_rec_rubrics as
 $BODY$
@@ -23,7 +24,8 @@ begin
             r.name, 
             r.description, 
             0,
-            r.r_icon
+            r.r_icon,
+            r.unique_id
         from record_rubricator r
         where r.id_record = idRecord
         order by r.id
@@ -42,7 +44,7 @@ end
 $BODY$
 language 'plpgsql';
 
-create or replace function recGetSubRubrics(int4) returns setof h_get_rec_rubrics as
+create or replace function recGetSubRubrics(int8) returns setof h_get_rec_rubrics as
 $BODY$
 declare
     idRubric alias for $1;
@@ -51,7 +53,7 @@ declare
 begin
 
     for rec in 
-        select r.id, r.id_parent, NULL, r.name, r.description, 1, r.r_icon
+        select r.id, r.id_parent, NULL, r.name, r.description, 1, r.r_icon, r.unique_id
         from record_rubricator r
         where r.id_parent = idRubric
         order by r.id
@@ -78,7 +80,7 @@ end
 $BODY$
 language 'plpgsql';
 
-create or replace function recGetRubricItems(int4) returns setof h_get_rec_rubrics as
+create or replace function recGetRubricItems(int8) returns setof h_get_rec_rubrics as
 $BODY$
 declare
     idRubric alias for $1;
@@ -104,24 +106,27 @@ begin
         order by 1
     loop
         select into tname getRecordTable (r.id_record);
-        raise warning 'table name is % id_record is %', tname, r.id_record;
         cquery := E'select pg_attribute.attname as cname FROM pg_attribute WHERE pg_attribute.attrelid = (SELECT pg_class.oid FROM pg_class LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace AND pg_namespace.nspname = \'public\' WHERE pg_class.relname = ' || quote_literal (tname) || E' and pg_attribute.attname=\'name\');';
         execute cquery into column_name;
+
         cquery := E'select pg_attribute.attname as cname FROM pg_attribute WHERE pg_attribute.attrelid = (SELECT pg_class.oid FROM pg_class LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace AND pg_namespace.nspname = \'public\' WHERE pg_class.relname = ' || quote_literal (tname) || E' and pg_attribute.attname=\'description\');';
         execute cquery into column_desc;
+
         query := E'select t.id, ' || r.id_rubric || E' as id_parent, NULL as id_record, ';
         if (column_name is not null) then
             query := query || E't.name, ';
         else
             query := query || E'NULL, ';
         end if;
+
         if (column_desc is not null) then
             query := query || E't.description, 2';
         else
-            query := query || E'NULL, 2, ' || asString(r.r_icon, true);
+            query := query || E'NULL, 2, ' || asString(r.r_icon, true) || ', NULL ' ;
         end if;
+
         query := query || ' from ' || tname || ' as t where t.id=' || r.id_record;
-        raise warning 'query is %', query;
+
         for rrec
             in execute query
         loop

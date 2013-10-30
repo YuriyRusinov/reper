@@ -2,6 +2,16 @@
 
 begin;
 
+drop function if exists recUpdateRubric(int4, varchar, varchar, int4, int4, int4, int8, varchar, varchar) cascade;
+drop function if exists recUpdateRubricEx(varchar, varchar, varchar, int4, int8, varchar) cascade;
+drop function if exists recUpdateRubricLocal(int4, varchar, varchar, varchar, varchar) cascade;
+drop function if exists recInsertRubric(int4, int8, varchar, varchar, varchar, varchar) cascade;
+drop function if exists recDeleteIncludes(int8, int4[]) cascade;
+drop function if exists recGetSubRubrics(int4) cascade;
+drop function if exists recGetRubricItems(int4) cascade;
+
+select createTriggerUID('criteria');
+
 select createTempTables();
 select setCurrentDl(4);
 

@@ -21,7 +21,7 @@ begin
     end if;
     
     if(TG_OP = 'UPDATE') then
-        if(new.is_completed = 0 and new.is_global = true) then
+        if(new.is_completed = 0 and (new.is_global = true and old.is_global = false)) then
             raise exception 'current category is still empty (is_completed = 0), so you cannot have is_global = TRUE!';
             return NULL;
         end if;

@@ -52,6 +52,7 @@ end
 $BODY$
 language 'plpgsql';
 
+--used in information exchange
 create or replace function cInsertEx(varchar, varchar, varchar, int4, int4, boolean, varchar, boolean, int4, int4, int4) returns int4 as
 $BODY$
 declare
@@ -68,10 +69,18 @@ declare
     idLifeCycle alias for $11;
     
     idCategory int4;
+    ccc int4;
 begin
 
     select cFindEqual(cName, cCode, cDesc, idType, idChild, isMain) into idCategory;
     if(idCategory is not null and idCategory > 0) then
+        --child category for indicators can be added after creation and synchronization of the category.
+        --so, we must detect this case and add child2 category to existing category
+        select id_child2 into ccc from io_categories where id = idCategory;
+        if(ccc is null and idChild2 is not null) then
+            update io_categories set id_child2 = idChild2 where id = idCategory;
+        end if;
+
         return idCategory;
     end if;
     

@@ -43,6 +43,7 @@ declare
     idAttr alias for $2;
 
     tableName varchar;
+    tName varchar;
     idCategory int4;
     idCatAttr int4;
 begin
@@ -51,9 +52,18 @@ begin
     FROM q_base_table qq, pg_class p
     WHERE qq.id = idRecord and qq.tableoid = p.oid;
 
-    select id_io_category into idCategory from tbl_io_objects where table_name = tableName;
+    if(substr(tableName, 1, 4) = 'tbl_') then
+        tName = substr(tableName, 5);
+    else
+        tName = tableName;
+    end if;
+
+    select id_io_category into idCategory from tbl_io_objects where table_name = tName;
     if(idCategory isnull) then
-        return -1;
+        select id_io_category into idCategory from tbl_io_objects where table_name = tableName;
+        if(idCategory isnull) then
+            return -1;
+        end if;
     end if;
 
     select id_child into idCategory from io_categories where id = idCategory;
@@ -79,6 +89,7 @@ declare
     idAttr alias for $2;
 
     tableName varchar;
+    tName varchar;
     idCategory int4;
     idCatAttr int4;
 begin
@@ -87,9 +98,18 @@ begin
     FROM q_base_table qq, pg_class p
     WHERE qq.id = idRecord and qq.tableoid = p.oid;
 
-    select id_io_category into idCategory from tbl_io_objects where table_name = tableName;
+    if(substr(tableName, 1, 4) = 'tbl_') then
+        tName = substr(tableName, 5);
+    else
+        tName = tableName;
+    end if;
+
+    select id_io_category into idCategory from tbl_io_objects where table_name = tName;
     if(idCategory isnull) then
-        return -1;
+        select id_io_category into idCategory from tbl_io_objects where table_name = tableName;
+        if(idCategory isnull) then
+            return -1;
+        end if;
     end if;
 
     select id_child2 into idCategory from io_categories where id = idCategory;

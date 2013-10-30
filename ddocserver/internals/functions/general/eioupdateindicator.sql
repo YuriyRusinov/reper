@@ -69,7 +69,7 @@ declare
     iDesc alias for $8;
 
     idAttr int4;
-    idAttrCategory int8;
+    idAttrCategory int4;
     idType int4;
     tableName varchar;
     theValue varchar;
@@ -90,7 +90,7 @@ begin
         start_time := iStartTime;
     end if;
 
-    if(idObject isnull or uniqueId isnull or ioValue isnull) then
+    if(idRecord isnull or uniqueId isnull or ioValue isnull) then
         return 1;
     end if;
     

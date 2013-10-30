@@ -63,7 +63,7 @@ end
 $BODY$
 language 'plpgsql' security definer;
 
-create or replace function recDeleteIncludes(int8, int4[]) returns int4 as
+create or replace function recDeleteIncludes(int8, int8[]) returns int4 as
 $BODY$
 declare
     idRecord alias for $1;
@@ -86,9 +86,9 @@ begin
 
     return 1;
 
-    exception when OTHERS
-    then
-        return -1;
+    --exception when OTHERS
+    --then
+    --    return -1;
 end
 $BODY$
 language 'plpgsql' security definer;
