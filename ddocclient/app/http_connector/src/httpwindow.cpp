@@ -170,7 +170,13 @@ void HttpWindow::startProc()
 
     statusLabel->setText(tr("Waiting for data to sent..."));
    
-    messageList = loader->readMessages();
+    QStringList receivers;
+    messageList = loader->readMessages(receivers);
+    if(receivers.isEmpty())
+        return;
+
+    QMap<qint64, JKKSPing> pings = loader->createPings(receivers);
+
     QList<JKKSFilePart *> files = loader->readFileParts();
     
     filesForSent = files.count();

@@ -103,7 +103,9 @@ int KKSEIOFactory::updateEIO(KKSObjectExemplar* eio,
     int rres = updateIncludes (eio);
     if (rres <=0)
         return ERROR_CODE;
+
     commitRubrics (eio->rootRubric());
+    
     return res;
 }
 
@@ -1472,8 +1474,10 @@ int KKSEIOFactory::updateIncludes(const KKSObjectExemplar * eio) const
         ok = res->getCellAsInt(0, 0);
         delete res;
     }
-    if(ok < 0)
+    if(ok < 0){
+        rollbackRubrics(rootRubric, true);
         return ERROR_CODE;
+    }
 
     return OK_CODE;
 
@@ -1530,7 +1534,7 @@ int KKSEIOFactory::deleteIncludes(int idRec) const
     return OK_CODE;
 }
 
-int KKSEIOFactory::updateRubrics(KKSRubric * parent, int idMyDocsRubricator) const
+int KKSEIOFactory::updateRubrics(KKSRubric * parent, qint64 idMyDocsRubricator) const
 {
     if(!parent)
         return ERROR_CODE;
@@ -1615,7 +1619,7 @@ int KKSEIOFactory::updateRubric(KKSRubric * r) const
 
 }
 
-int KKSEIOFactory::insertRubrics(KKSRubric * parent, int idMyDocsRubricator) const
+int KKSEIOFactory::insertRubrics(KKSRubric * parent, qint64 idMyDocsRubricator) const
 {
     if(!parent)
         return ERROR_CODE;
@@ -1645,7 +1649,7 @@ int KKSEIOFactory::insertRubrics(KKSRubric * parent, int idMyDocsRubricator) con
 
 }
 
-int KKSEIOFactory::insertRubric(KKSRubric * r, int idParent, int idRec, bool root, int idMyDocsRubricator) const
+int KKSEIOFactory::insertRubric(KKSRubric * r, qint64 idParent, qint64 idRec, bool root, qint64 idMyDocsRubricator) const
 {
     if (!r)
         return ERROR_CODE;
@@ -1653,9 +1657,9 @@ int KKSEIOFactory::insertRubric(KKSRubric * r, int idParent, int idRec, bool roo
     int idRubric = ERROR_CODE;//eiof->getNextSeq("rubricator", "id");
     
     QString icon = r->iconAsString();
-    QString sql = QString("select * from recInsertRubric(%1, %2, '%3', '%4', %5);")
-                          .arg ( (root || idParent <= 0) ? QString("NULL") : QString::number(idParent))
-                          .arg (root ? QString::number(idRec) : QString("NULL"))
+    QString sql = QString("select * from recInsertRubric(%1, %2, '%3', '%4', %5, NULL::varchar);")
+                          .arg ( (root || idParent <= 0) ? QString("NULL::int8") : QString::number(idParent))
+                          .arg (root ? QString::number(idRec) : QString("NULL::int8"))
                           .arg (r->name())
                           .arg (r->desc())
                           .arg (icon.isEmpty() ? QString("NULL") : QString("'%1'").arg(icon));
@@ -1687,7 +1691,7 @@ int KKSEIOFactory::insertRubric(KKSRubric * r, int idParent, int idRec, bool roo
 
 }
 
-int KKSEIOFactory::removeRubricItem(int idRubric, qint64 idRec) const
+int KKSEIOFactory::removeRubricItem(qint64 idRubric, qint64 idRec) const
 {
     if(idRubric <= 0 || idRec <= 0)
         return OK_CODE;
@@ -1712,7 +1716,7 @@ int KKSEIOFactory::removeRubricItem(int idRubric, qint64 idRec) const
     return OK_CODE;
 }
 
-int KKSEIOFactory::insertRubricItem(int idRubric, qint64 idRec, const QString & rIcon) const
+int KKSEIOFactory::insertRubricItem(qint64 idRubric, qint64 idRec, const QString & rIcon) const
 {
     if(idRubric <= 0 || idRec <= 0)
         return OK_CODE;
@@ -1784,7 +1788,7 @@ void KKSEIOFactory::commitRubric(KKSRubric * r) const
     r->m_intId = r->id();
 }
 
-int KKSEIOFactory::insertRubricators(KKSRubric * rootRubric, int idMyDocsRubricator, bool bMyDocs) const
+int KKSEIOFactory::insertRubricators(KKSRubric * rootRubric, qint64 idMyDocsRubricator, bool bMyDocs) const
 {
     Q_UNUSED(bMyDocs);
     Q_UNUSED(idMyDocsRubricator);

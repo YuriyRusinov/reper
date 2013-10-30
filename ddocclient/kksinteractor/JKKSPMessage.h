@@ -64,9 +64,9 @@ private:
         mutable QByteArray m_cryptoHash;// hash-сумма содержимого сообщения
 
     //public:
-        QString m_senderUID;
-        QString m_receiverUID;
-        bool m_verifyReceiver;
+        QString m_senderUID;//уникальный идентификатор организации-отправителя
+        QString m_receiverUID;//уникальный идентификатор организации-получателя
+        bool m_verifyReceiver;//флаг необходимости проверки получателя на приемном конце (т.е. что посылка предназначается именно той организации, которая находится на приемном конце
         unsigned char m_urgencyLevel;//хранится в поле code таблицы urgency_levels (должно быть A, B, C, соответственно "внеочередная", "срочная", "обычная")
         unsigned char m_macLabel;//возвращается функцией сервера (должно быть 0, 1, 2, 3 - НС, С, СС, ОВ)
         

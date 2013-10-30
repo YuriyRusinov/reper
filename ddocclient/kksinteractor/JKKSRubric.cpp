@@ -55,12 +55,12 @@ JKKSRubric& JKKSRubric :: operator= (const JKKSRubric& R)
     return *this;
 }
 
-qint64 JKKSRubric :: getId (void) const
+qint64 JKKSRubric :: getIdRubric (void) const
 {
     return idRubric;
 }
 
-void JKKSRubric :: setId (qint64 idr)
+void JKKSRubric :: setIdRubric (qint64 idr)
 {
     idRubric = idr;
 }

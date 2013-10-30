@@ -1,59 +1,29 @@
 
 //#include <QtGui>
 //#include <QApplication>
-// hello world
+
 #include <simple_map_window.h>
 //
 // QGIS Includes
 //
 #include <qgsapplication.h>
+#include <qgslegendmodel.h>
 #include <qgsproviderregistry.h>
 
-
-/*
-
-ZHUKOV
-*/
-/*
-#include "config.h"
-
-#include <qgsapplication.h>
-#include <qgsproviderregistry.h>
-#include <qgssinglesymbolrendererv2.h>
-#include <qgsmaplayerregistry.h>
-#include <qgsvectorlayer.h>
-#include <qgsmapcanvas.h>
-//
-// Qt Includes
-//
-#include <QString>
-#include <QApplication>
-#include <QWidget>
-*/
 
 int main(int argc, char ** argv) 
 {
   // Start the Application
-  //QgsApplication a(argc, argv);
-
   QgsApplication * app = new QgsApplication(argc, argv, true);
 
   QString myPluginsDir        = "C:\\Program Files (x86)\\Quantum GIS 1.7.0\\plugins";
-  //QgsApplication::init();
-
-  //QgsApplication::setPluginPath(myPluginsDir);
   app->setPluginPath(myPluginsDir);
-  //QgsApplication::initQgis();
   app->initQgis();
 
   QString s = app->showSettings();
   qWarning() << s;
 
-  //QCoreApplication * aaa = a.instance();
-
-  
   MainWindow * mypMainWindow = new MainWindow();
-  
   mypMainWindow->show();
   
   // Start the Application Event Loop

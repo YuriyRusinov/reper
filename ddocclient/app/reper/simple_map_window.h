@@ -23,12 +23,48 @@
 
 #include "config.h"
 
+
+#include <ogr_api.h>
+#include <gdal_priv.h>
 //QGis Includes
+
+#include <qgsapplication.h>
+#include <qgsfield.h>
 #include <qgsmapcanvas.h>
 #include <qgsmaptool.h>
+#include <qgslabel.h>
+#include <qgslabelattributes.h>
+#include <qgslegendmodel.h>
+#include <qgslegendinterface.h>
+#include <qgsmaplayerregistry.h>
+#include <qgsproject.h>
+#include <qgsproviderregistry.h>
+#include <qgsrasterlayer.h>
+#include <qgssinglesymbolrendererv2.h>
+//#include <qgssinglesymbolrenderer.h>
+#include <qgsstylev2.h>
+#include <qgsvectorlayer.h>
+#include <qgsvectorfilewriter.h>
+
+
+#include "qgsmaptoolpan.h"
+#include "qgsmaptoolzoom.h"
+
+//#include <qgslegend.h>
+
+//#include <qgsrasterlayer.h>
+//#include <qgsfield.h>
+//#include <qgslabel.h>
+//#include <qgslabelattributes.h>
+
+// GDAL / ORG Includes
+
 
 //QT Includes
 #include <QtGui>
+#include <QMessageBox>
+#include <QPainter>
+
 
 //Local Includes
 #include <ui_simple_map_window_base.h>
@@ -40,21 +76,55 @@ class MainWindow : public QMainWindow, private Ui::SimpleMapWindowBase
 {
   Q_OBJECT;
 public:
+
     MainWindow(QWidget* parent = 0, Qt::WFlags fl = 0 );
     ~MainWindow();
 public slots:
     void zoomInMode();
     void zoomOutMode();
     void panMode();
-    void addLayer();
+    void azLoadLayer(QgsMapLayer *theMapLayer, bool isExtent = false);
+    void addLayerToTOC(QgsMapLayer *mapLayer);
+    void azRemoveAnnotationItems();
+    void azRemoveAllLayers();
+    static void azSetTitleWindow(QWidget & azApp);
+
+private slots:
+    void SLOTmpActionFileExit();
+    void SLOTmpActionFileOpenProject();
+    void SLOTsetRenderer();
+    void SLOTmpActionAddVectorLayer();
+    void SLOTmpActionAddRasterLayer();
+    void SLOTmpActionVectorize();
+    void SLOTazShowContextMenuForLegend(const QPoint & pos);
 
 private:
+    bool needPaint;
+    QgsRasterLayer *testLayer;
     QgsMapCanvas * mpMapCanvas;
-    QVBoxLayout  * mpLayout;
+//    QVBoxLayout  * mpLayout;
+    QVBoxLayout  * mpMapLayout;
+    QVBoxLayout  * mpLegendLayout;
     QToolBar * mpMapToolBar;
+    QDockWidget * mpLeftDock;
+    QDockWidget * mpBottomDock;
     QgsMapTool * mpPanTool;
     QgsMapTool * mpZoomInTool;
     QgsMapTool * mpZoomOutTool;
+//    QgsLegendModel * mpLegendModel;
+    QgsLegend * mpMapLegend;
+    QgsMapLayerRegistry *mpRegistry;
+    QList<QgsMapCanvasLayer> mpLayerSet;
+    QMenu *mpContextLegendMenu;
+    // Actions
+    QAction *mpVectorize;
+    QAction *mpActionAddVectorLayer;
+    QAction *mpActionAddRasterLayer;
+    QAction *mpContextShowExtent;
+    QAction *mpContextRemoveLayer;
+
+protected:
+//    void paintEvent(QPaintEvent *event);
 
 };
 

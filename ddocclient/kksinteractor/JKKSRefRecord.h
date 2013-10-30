@@ -96,6 +96,14 @@ public:
     const JKKSAddress & getSenderAddr (void) const;
     void setSenderAddr (const JKKSAddress & addr);
 
+    const QMap<qint64, JKKSGlobalRubric>& rubrics (void) const;
+    QMap<qint64, JKKSGlobalRubric>& rubrics (void);
+    void setRubrics (const QMap<qint64, JKKSGlobalRubric>& rubrs);
+
+    const QMap<qint64, JKKSIOUrl>& urls (void) const;
+    QMap<qint64, JKKSIOUrl>& urls (void);
+    void setUrls (const QMap<qint64, JKKSIOUrl>& urls);
+
 private:
     //
     // Functions
@@ -117,6 +125,9 @@ private:
     QMap<qint64, JKKSCategory> cat;
     QStringList aVals;//список значений табличных атрибутов. Если атрибут ссылочный, то для такого атрибута в качестве значения используется его unique_id
     QMap<QString, QString> indVals; //список значений показателей записей справочников. Если показатель ссылочный, то для него в качестве значения используется его unique_id
+
+    QMap<qint64, JKKSGlobalRubric> m_rubrics; //рубрики
+    QMap<qint64, JKKSIOUrl> m_urls;//прикрепленные файлы
 
     JKKSDocument ioDoc;
     JKKSIOTable ioTable;

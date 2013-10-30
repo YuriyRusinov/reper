@@ -47,12 +47,6 @@ KKSRubricBase :: KKSRubricBase (const KKSRubricBase& RB)
 KKSRubricBase :: ~KKSRubricBase (void)
 {
 }
-/*
-int KKSRubricBase :: id() const
-{
-    return 0;
-}
-*/
 
 KKSRubricBase& KKSRubricBase :: operator= (const KKSRubricBase& rb)
 {
@@ -240,27 +234,6 @@ KKSRubricItem& KKSRubricItem :: operator= (const KKSRubricItem& other)
     m_isUpdated = other.m_isUpdated;
     return *this;
 }
-/*
-void KKSRubricItem::setId(int id)
-{
-    m_idItem = id;
-}
-
-int KKSRubricItem::id() const
-{
-    return m_idItem;
-}
-
-void KKSRubricItem::setName(const QString & name)
-{
-    m_name = name;
-}
-
-const QString & KKSRubricItem::name() const
-{
-    return m_name;
-}
-*/
 
 void KKSRubricItem::setGeneralIcon(const QPixmap& px)
 {
@@ -299,26 +272,7 @@ QPixmap KKSRubricItem::icon()
     return px;
     
 }
-/*
-QIcon KKSRubricItem::getIcon (void) const
-{
-    return m_rubrItemIcon;
-}
 
-void KKSRubricItem :: setIcon (const QString & s)
-{
-    QPixmap px;
-    px.loadFromData(s.toUtf8());
-
-    m_rubrItemIcon = QIcon(px);
-    m_iconData = s;
-}
-
-const QString KKSRubricItem :: iconAsString () const
-{
-    return m_iconData;
-}
-*/
 
 int KKSRubricItem::rubricType (void) const
 {
@@ -364,7 +318,7 @@ KKSRubric::KKSRubric(const KKSRubric & other) : KKSRubricBase(other),
     //setOthersPrivilege(other.othersPrivilege());
 }
 
-KKSRubric::KKSRubric(int id, const QString & name, KKSSearchTemplate * st, KKSCategory * c, KKSAccessEntity * ac) : KKSRubricBase(id, name),
+KKSRubric::KKSRubric(qint64 id, const QString & name, KKSSearchTemplate * st, KKSCategory * c, KKSAccessEntity * ac) : KKSRubricBase(id, name),
     m_searchTemplate (st),
     m_category (c),
     m_isCategorized (false),
@@ -647,7 +601,7 @@ const KKSList<const KKSRubric*> & KKSRubric::rubrics() const
     return m_rubrics;
 }
 
-const KKSRubric * KKSRubric::rubricForId(int id, bool recursivelly) const
+const KKSRubric * KKSRubric::rubricForId(qint64 id, bool recursivelly) const
 {
     if(id <= 0)
         return NULL;
@@ -672,7 +626,7 @@ const KKSRubric * KKSRubric::rubricForId(int id, bool recursivelly) const
 }
 
 //возвращается рубрика по ее идентификатору
-KKSRubric * KKSRubric::rubricForId(int id, bool recursivelly)
+KKSRubric * KKSRubric::rubricForId(qint64 id, bool recursivelly)
 {
     if(id <= 0)
         return NULL;
@@ -698,7 +652,7 @@ KKSRubric * KKSRubric::rubricForId(int id, bool recursivelly)
 
 //возвращается item, находящийся в данной рубрике по его id
 //нерекурсивно
-const KKSRubricItem * KKSRubric::itemForId(int id) const
+const KKSRubricItem * KKSRubric::itemForId(qint64 id) const
 {
     if(id <= 0)
         return NULL;
@@ -714,7 +668,7 @@ const KKSRubricItem * KKSRubric::itemForId(int id) const
     return NULL;
 }
 
-KKSRubricItem * KKSRubric::itemForId(int id)
+KKSRubricItem * KKSRubric::itemForId(qint64 id)
 {
     if(id <= 0)
         return NULL;

@@ -124,7 +124,16 @@ QVariant KKSAttrHistModel::data (const QModelIndex& index, int role) const
                             return av->value().valueForInsert();
                         }
                         else
-                            return av->value().valueVariant();
+                        {
+                            QVariant val;
+                            QString sVal (av->value().valueVariant().toString());
+                            if (sVal.contains (QString("\n")))
+                                val = sVal.mid (0, sVal.indexOf("\n"))+ QString("...");
+                            else
+                                val = sVal;
+
+                            return val;//av->value().valueVariant();
+                        }
                         break;
                     }
                 case 1:

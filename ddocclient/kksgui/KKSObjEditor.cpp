@@ -804,6 +804,10 @@ int KKSObjEditor :: constructObject()
                     value = QString("");
             }
 
+            //if (type == KKSAttrType::atInt64 ||
+            //    type == KKSAttrType::atInterval ||
+            //    type == KKSAttrType::atIntervalH)
+            //    qDebug () << __PRETTY_FUNCTION__ << value;
             KKSValue v (value, type);
             if (type == KKSAttrType::atList ||
                 type == KKSAttrType::atParent ||

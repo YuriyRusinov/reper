@@ -39,6 +39,7 @@
 #include "JKKSSearchCriterion.h"
 #include "JKKSOrgPackage.h"
 #include "JKKSType.h"
+#include "JKKSPing.h"
 
 
 JKKSLoader :: JKKSLoader (const QString& host,
@@ -57,6 +58,7 @@ JKKSLoader :: JKKSLoader (const QString& host,
       dbWrite (new KKSPGDatabase()),
       idCurrentDl(-1),
       idCurrentUser(-1),
+      m_localOrgId(-1),
       local_address (JKKSAddress()),
       senderUID(QString()),
       receiverUID(QString())
@@ -232,7 +234,29 @@ qint64 JKKSLoader :: getIdTransport (void) const
     return m_idTransport;
 }
 
-QList<JKKSPMessWithAddr *> JKKSLoader :: readMessages (void) const
+int JKKSLoader :: getLocalOrgId() const
+{
+    if(m_localOrgId > 0)
+        return m_localOrgId;
+
+    QString sql =  QString ("select * from getLocalOrgId();");
+    KKSResult * r1 = dbRead->execute (sql);
+    if (!r1 || r1->getRowCount() != 1)
+    {
+        if (r1)
+            delete r1;
+        return m_localOrgId;
+    }
+    else
+        m_localOrgId = r1->getCellAsInt(0, 0);
+    
+    if(r1)
+        delete r1;
+
+    return m_localOrgId;
+}
+
+QList<JKKSPMessWithAddr *> JKKSLoader :: readMessages (QStringList & receivers) const
 {
     QList<JKKSPMessWithAddr *> messList;
 
@@ -251,26 +275,27 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readMessages (void) const
         if(r1)
             delete r1;
     }
+
     if(!senderUID.isEmpty()){
-        messList += readCommands();
+        messList += readCommands(receivers);
         //
         // TODO process documents, etc...
         //
-        messList += readDocuments();
-        messList += readMails ();
+        messList += readDocuments(receivers);
+        messList += readMails (receivers);
 
-        messList += readMailConfirmations();
-        messList += readCmdConfirmations();
+        messList += readMailConfirmations(receivers);
+        messList += readCmdConfirmations(receivers);
 
-        messList += readTableRecords();
+        messList += readTableRecords(receivers);
     }
     
-    messList += readQueueResults ();
+    messList += readQueueResults (receivers);
 
     return messList;
 }
 
-QList<JKKSPMessWithAddr *> JKKSLoader :: readCmdConfirmations(void) const
+QList<JKKSPMessWithAddr *> JKKSLoader :: readCmdConfirmations(QStringList & receivers) const
 {
     QList<JKKSPMessWithAddr *> result;
     KKSResult * res = dbRead->execute ("select * from uGetCmdsConfirm () union select * from uGetCmdsConfirm1();");
@@ -292,9 +317,14 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readCmdConfirmations(void) const
             
             JKKSPMessage pM(cfm.serialize(), cfm.getMessageType());
             pM.setVerifyReceiver(false);
+            pM.setSenderUID(this->senderUID);
+            pM.setReceiverUID(res->getCellAsString(i, 7));//email_prefix
             JKKSPMessWithAddr * pMessWithAddr(new JKKSPMessWithAddr(pM, cfm.getAddr(), cfm.id()));
-            pMessWithAddr->unp = res->getCellAsString(i, 7);
+            pMessWithAddr->unp = res->getCellAsString(i, 7);//email_prefix
             result.append(pMessWithAddr);
+
+            if(!receivers.contains(pM.receiverUID()))
+                receivers.append(pM.receiverUID());
         }
     }
     if (res)
@@ -303,7 +333,7 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readCmdConfirmations(void) const
     return result;
 }
 
-QList<JKKSPMessWithAddr *> JKKSLoader :: readMailConfirmations(void) const
+QList<JKKSPMessWithAddr *> JKKSLoader :: readMailConfirmations(QStringList & receivers) const
 {
     QList<JKKSPMessWithAddr *> result;
     KKSResult * res = dbRead->execute ("select * from uGetMsgsConfirm ();");
@@ -324,9 +354,14 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readMailConfirmations(void) const
             
             JKKSPMessage pM(cfm.serialize(), cfm.getMessageType());
             pM.setVerifyReceiver(false);
+            pM.setSenderUID(this->senderUID);
+            pM.setReceiverUID(res->getCellAsString(i, 6));//email_prefix
             JKKSPMessWithAddr * pMessWithAddr(new JKKSPMessWithAddr(pM, cfm.getAddr(), cfm.id()));
-            pMessWithAddr->unp = res->getCellAsString(i, 6);
+            pMessWithAddr->unp = res->getCellAsString(i, 6);//email_prefix
             result.append(pMessWithAddr);
+
+            if(!receivers.contains(pM.receiverUID()))
+                receivers.append(pM.receiverUID());
         }
     }
     if (res)
@@ -336,7 +371,7 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readMailConfirmations(void) const
 }
 
 
-QList<JKKSPMessWithAddr *> JKKSLoader :: readCommands (void) const
+QList<JKKSPMessWithAddr *> JKKSLoader :: readCommands (QStringList & receivers) const
 {
     QList<JKKSPMessWithAddr *> result;
     KKSResult * res = dbRead->execute ("select * from ugetoutcmds () union select * from uGetOutCmds1();");
@@ -392,9 +427,14 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readCommands (void) const
             JKKSPMessage pM(command.serialize(), command.getMessageType());
             pM.setUrgencyLevel(res->getCellAsString(i, 27));
             pM.setVerifyReceiver(false);
+            pM.setSenderUID(this->senderUID);
+            pM.setReceiverUID(res->getCellAsString(i, 30)); //email_prefix
             JKKSPMessWithAddr * pMessWithAddr(new JKKSPMessWithAddr(pM, command.getAddr(), command.id()));
-            pMessWithAddr->unp = res->getCellAsString(i, 30);
+            pMessWithAddr->unp = res->getCellAsString(i, 30); //email_prefix
             result.append(pMessWithAddr);
+
+            if(!receivers.contains(pM.receiverUID()))
+                receivers.append(pM.receiverUID());
         }
     }
     if (res)
@@ -403,7 +443,7 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readCommands (void) const
     return result;
 }
 
-QList<JKKSPMessWithAddr *> JKKSLoader :: readDocuments (void) const
+QList<JKKSPMessWithAddr *> JKKSLoader :: readDocuments (QStringList & receivers) const
 {
     QList<JKKSPMessWithAddr *> result;
     KKSResult * res = dbRead->execute ("select * from uGetOutObjects();");
@@ -428,9 +468,15 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readDocuments (void) const
             
             JKKSPMessage pM(doc.serialize(), doc.getMessageType());
             pM.setVerifyReceiver(false);
+            pM.setSenderUID(this->senderUID);
+            pM.setReceiverUID(res->getCellAsString(i, 11));//email_prefix
             JKKSPMessWithAddr * pMessWithAddr(new JKKSPMessWithAddr(pM, doc.getAddr(), doc.getJournal()));
-            pMessWithAddr->unp = res->getCellAsString(i, 11);
+            pMessWithAddr->unp = res->getCellAsString(i, 11);//email_prefix
             result.append(pMessWithAddr);
+
+            if(!receivers.contains(pM.receiverUID()))
+                receivers.append(pM.receiverUID());
+
         }
     }
 
@@ -440,7 +486,7 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readDocuments (void) const
     return result;
 }
 
-QList<JKKSPMessWithAddr *> JKKSLoader :: readMails (void) const
+QList<JKKSPMessWithAddr *> JKKSLoader :: readMails (QStringList & receivers) const
 {
     QList<JKKSPMessWithAddr *> result;
     KKSResult * res = dbRead->execute ("select * from uGetOutMsgs();");
@@ -489,9 +535,16 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readMails (void) const
             JKKSPMessage pM(mMessage.serialize(), mMessage.getMessageType());
             pM.setUrgencyLevel(res->getCellAsString(i, 17));
             pM.setVerifyReceiver(false);
+            pM.setSenderUID(this->senderUID);
+            pM.setReceiverUID(res->getCellAsString(i, 20));//email_prefix
+
             JKKSPMessWithAddr * pMessWithAddr (new JKKSPMessWithAddr (pM, mMessage.getAddr(), mMessage.id()));
-            pMessWithAddr->unp = res->getCellAsString(i, 20);
+            pMessWithAddr->unp = res->getCellAsString(i, 20);//email_prefix
             result.append (pMessWithAddr);
+
+            if(!receivers.contains(pM.receiverUID()))
+                receivers.append(pM.receiverUID());
+
          }
    }
 
@@ -578,7 +631,7 @@ JKKSDocument JKKSLoader :: readDocument (qint64 idObject, qint64 idOrganization)
     QMap<qint64, JKKSGlobalRubric> rubrs;
     for (int ii=0; ii<rubrRes->getRowCount(); ii++)
     {
-        if (rubrRes->getCellAsInt (ii, 7) == 2)
+        if (rubrRes->getCellAsInt (ii, 8) == 2)
         {
             //
             // rubric item cannot been sent
@@ -606,10 +659,12 @@ JKKSDocument JKKSLoader :: readDocument (qint64 idObject, qint64 idOrganization)
             JKKSSearchTemplate st = readSearchTemplate (idSearchTemplate);
             wRubr.setSearchTemplate (st);
         }
-        rubrs.insert (rubrRes->getCellAsInt (ii, 0), wRubr);
+        rubrs.insert (wRubr.getIdRubric(), wRubr);
     }
 
     doc.setRubrics (rubrs);
+
+    //прикрепленные файлы
     QMap<qint64, JKKSIOUrl> files = readDocumentFiles (doc.id(), idOrganization);
     doc.setUrls (files);
 
@@ -826,9 +881,9 @@ qint64 JKKSLoader :: updateDocument (JKKSDocument *doc) const
     // удаления удаленных не происходит
     //
     QMap<qint64, JKKSGlobalRubric> rubrs = doc->rubrics ();
-    QMap<qint64, qint64> idpRub;
-    //qDebug () << __PRETTY_FUNCTION__ << rubrs.count();
-    for (QMap<qint64, JKKSGlobalRubric>::const_iterator pr = rubrs.constBegin (); 
+    QMap<qint64, qint64> idpRub; //здесь храним соответствие идентификатора рубрики в исходной БД и целевой БД (в процессе создания рубрик исходный родитель обновляется на целевой)
+    
+    for (QMap<qint64, JKKSGlobalRubric>::iterator pr = rubrs.constBegin (); 
             pr != rubrs.constEnd (); 
             pr++)
     {
@@ -836,6 +891,8 @@ qint64 JKKSLoader :: updateDocument (JKKSDocument *doc) const
             continue;
 
         JKKSGlobalRubric wRubr = pr.value ();
+        
+        //если рубрика имеет родителя, обновляем информацию об этом родителе на актуальное значение
         if (wRubr.getParent () >= 0 && idpRub.constFind (wRubr.getParent ()) != idpRub.constEnd ())
             wRubr.setParent (idpRub.constFind (wRubr.getParent ()).value ());
 
@@ -856,14 +913,17 @@ qint64 JKKSLoader :: updateDocument (JKKSDocument *doc) const
         {
             idSearchT = writeSearchTemplate (wRubr.getSearchTemplate());
         }
-        QString sql =  QString ("select * from ioUpdateInclude ('%1', '%2', '%3', '%4', NULL, %7, %5, %6, NULL );")
+
+        QString sql =  QString ("select * from ioUpdateInclude ('%1', '%2', '%3', '%4', %5, %6, %7, %8, NULL );")
                                 .arg (wRubr.getUid())
                                 .arg (wRubr.getName ())
                                 .arg (wRubr.getCode ())
                                 .arg (wRubr.getDesc ())
-                                .arg (idChild <= 0 ? QString ("NULL") : QString::number (idChild))
-                                .arg (idSearchT < 0 ? QString ("NULL") : QString::number (idSearchT))
-                                .arg (result);
+                                .arg (wRubr.getParent () <= 0 ? QString ("NULL::int4") : QString::number (wRubr.getParent ()))
+                                .arg (pr == rubrs.constBegin () ? QString::number (doc->id()) : QString ("NULL::int4"))//idObject
+                                .arg (idChild <= 0 ? QString ("NULL::int4") : QString::number (idChild))
+                                .arg (idSearchT < 0 ? QString ("NULL::int4") : QString::number (idSearchT));
+                                
         //qDebug () << __PRETTY_FUNCTION__ << sql;
 
 
@@ -875,7 +935,7 @@ qint64 JKKSLoader :: updateDocument (JKKSDocument *doc) const
             return ERROR_CODE;
         }
         else
-            idpRub.insert (wRubr.getId (), res->getCellAsInt (0, 0));
+            idpRub.insert (wRubr.getIdRubric (), res->getCellAsInt (0, 0));
 
         if (res)
             delete res;
@@ -1082,9 +1142,8 @@ qint64 JKKSLoader :: insertDocument (JKKSDocument *doc) const
     }
 
     QMap<qint64, JKKSGlobalRubric> rubrs = doc->rubrics ();
-    QMap<qint64, qint64> idpRub;
+    QMap<qint64, qint64> idpRub;//здесь храним соответствие идентификатора рубрики в исходной БД и целевой БД (в процессе создания рубрик исходный родитель обновляется на целевой)
     
-    //qDebug () << __PRETTY_FUNCTION__ << rubrs.count();
     for (QMap<qint64, JKKSGlobalRubric>::const_iterator pr = rubrs.constBegin (); \
             pr != rubrs.constEnd (); \
             pr++)
@@ -1093,6 +1152,8 @@ qint64 JKKSLoader :: insertDocument (JKKSDocument *doc) const
             continue;
 
         JKKSGlobalRubric wRubr = pr.value ();
+        
+        //если рубрика имеет родителя, обновляем информацию об этом родителе на актуальное значение
         if (wRubr.getParent () >= 0 && idpRub.constFind (wRubr.getParent ()) != idpRub.constEnd ())
             wRubr.setParent (idpRub.constFind (wRubr.getParent ()).value ());
 
@@ -1101,7 +1162,7 @@ qint64 JKKSLoader :: insertDocument (JKKSDocument *doc) const
         {
             JKKSCategoryPair cCats = parseCategories (wRubr.getCategory());
             if(cCats.isNull()){
-                qWarning() << __PRETTY_FUNCTION__ << "ERROR! parseCategories() for rubrics for document with UID = " << doc->uid() << " failed!";
+                qCritical() << __PRETTY_FUNCTION__ << "ERROR! parseCategories() for rubrics for document with UID = " << doc->uid() << " failed!";
                 return ERROR_CODE;
             }
             
@@ -1113,15 +1174,15 @@ qint64 JKKSLoader :: insertDocument (JKKSDocument *doc) const
         {
             idSearchT = writeSearchTemplate (wRubr.getSearchTemplate());
         }
-        QString sql =  QString ("select * from ioinsertinclude (%1, %2, '%3', '%4', '%5', %8, %7, '%6', NULL);")
-                                .arg (wRubr.getParent () <= 0 ? QString ("NULL") : QString::number (wRubr.getParent ()))
-                                .arg (pr == rubrs.constBegin () ? QString::number (doc->id()) : QString ("NULL"))
+        QString sql =  QString ("select * from ioinsertinclude (%1, %2, '%3', '%4', '%5', %6, %7, '%8', NULL);")
+                                .arg (wRubr.getParent () <= 0 ? QString ("NULL::int4") : QString::number (wRubr.getParent ()))
+                                .arg (pr == rubrs.constBegin () ? QString::number (doc->id()) : QString ("NULL::int4"))
                                 .arg (wRubr.getName ())
                                 .arg (wRubr.getCode ())
                                 .arg (wRubr.getDesc ())
-                                .arg (wRubr.getUid  ())
+                                .arg (idSearchT<0 ? QString ("NULL::int4") : QString::number (idSearchT))
                                 .arg (idChild<0 ? QString("NULL::int4") : QString::number(idChild))
-                                .arg (idSearchT<0 ? QString ("NULL::int4") : QString::number (idSearchT));
+                                .arg (wRubr.getUid  ());
 
         KKSResult * res = dbWrite->execute (sql);
         
@@ -1132,7 +1193,7 @@ qint64 JKKSLoader :: insertDocument (JKKSDocument *doc) const
             return ERROR_CODE;
         }
         else
-            idpRub.insert (wRubr.getId (), res->getCellAsInt64 (0, 0));
+            idpRub.insert (wRubr.getIdRubric (), res->getCellAsInt64 (0, 0));
 
         if (res)
             delete res;
@@ -1404,6 +1465,7 @@ JKKSMessage * JKKSLoader::unpackMessage (const JKKSPMessage & pMessage) const
         case JKKSMessage::atPosition: message = new JKKSRefRecord(); break;
         case JKKSMessage::atOrgPackage: message = new JKKSOrgPackage(); break;
         case JKKSMessage::atFilePart: message = new JKKSFilePart(); break;
+        case JKKSMessage::atPing: message = new JKKSPing(); break;
         default: qDebug("Error: unknown message type");
     }
 
@@ -1466,18 +1528,46 @@ int JKKSLoader::writeMessage (JKKSMailConfirmation *cfm) const
     return result;
 }
 
-JKKSCategoryPair JKKSLoader::parseCategories(const QMap<qint64, JKKSCategory> & oldCats) const
+int JKKSLoader::writeMessage (JKKSPing *ping, const QString & senderUID) const
+{
+    int result = ERROR_CODE;
+    if (!ping)
+        return ERROR_CODE;
+
+    
+/*
+    QString sql = QString ("select * from uConfirmMsg(%1, %2, %3);")
+        .arg (cfm->extraId())
+        .arg (cfm->readDatetime().isNull() ? QString("NULL") :
+                                             QString ("to_timestamp('") +
+                                                cfm->readDatetime().toString ("dd.MM.yyyy hh:mm:ss") +
+                                                    QString("', 'DD.MM.YYYY HH24:MI:SS')::timestamp"))
+        .arg (cfm->receiveDatetime().isNull() ? QString("NULL") :
+                                             QString ("to_timestamp('") +
+                                                cfm->receiveDatetime().toString ("dd.MM.yyyy hh:mm:ss") +
+                                                    QString("', 'DD.MM.YYYY HH24:MI:SS')::timestamp"))                                                        ;
+
+    KKSResult * res = dbWrite->execute (sql);
+    if (res && res->getRowCount() == 1)
+        result = res->getCellAsInt (0, 0);
+    delete res;
+
+*/
+    return result;
+}
+
+JKKSCategoryPair JKKSLoader::mapToPair(const QMap<qint64, JKKSCategory> & cats) const
 {
     JKKSCategoryPair cCats;
     JKKSCategoryPair cNull;
 
-    int cnt = oldCats.count();
+    int cnt = cats.count();
 
     if(cnt < 1 || cnt > 3)
         return cNull;
 
-    QMap<qint64, JKKSCategory>::const_iterator pc = oldCats.constBegin();
-    for (; pc != oldCats.constEnd(); ++pc )
+    QMap<qint64, JKKSCategory>::const_iterator pc = cats.constBegin();
+    for (; pc != cats.constEnd(); ++pc )
     {
         JKKSCategory c = pc.value();
         c.setState(1);
@@ -1493,9 +1583,9 @@ JKKSCategoryPair JKKSLoader::parseCategories(const QMap<qint64, JKKSCategory> & 
         else{
             cCats.setMainCategory(c);
                     
-            cCats.setChildCategory(oldCats.value(c.getIDChild()));
+            cCats.setChildCategory(cats.value(c.getIDChild()));
             if(c.getIDChild2() > 0)
-                cCats.setChild2Category(oldCats.value(c.getIDChild2()));
+                cCats.setChild2Category(cats.value(c.getIDChild2()));
 
             break;
         }
@@ -1503,6 +1593,19 @@ JKKSCategoryPair JKKSLoader::parseCategories(const QMap<qint64, JKKSCategory> & 
 
     if(cCats.isNull())
         return cNull;
+
+    return cCats;
+
+}
+
+JKKSCategoryPair JKKSLoader::parseCategories(const QMap<qint64, JKKSCategory> & oldCats) const
+{
+    JKKSCategoryPair cCats;
+    JKKSCategoryPair cNull;
+
+    cCats = mapToPair(oldCats);
+    if(cCats.isNull())
+        return cCats;
 
     qint64 idChild = -1;
     qint64 idChild2 = -1;
@@ -1563,7 +1666,7 @@ QMap<qint64, JKKSCategory> JKKSLoader::pairToMap(const JKKSCategoryPair & pair) 
     
     if(!pair.isAlone()){
         newCats.insert(pair.childCategory().id(), pair.childCategory());
-        if(!pair.hasChild2())
+        if(pair.hasChild2())
             newCats.insert(pair.child2Category().id(), pair.child2Category());
     }
 
@@ -1696,16 +1799,17 @@ QMap<qint64, JKKSCategory> JKKSLoader :: readCategories (qint64 idCat) const
         QPair<qint64, JKKSCategory> category = readCategory(idCat);
         result.insert(category.first, category.second);
 
-        while(category.second.getIDChild() > 0 ){
-            category = readCategory(category.second.getIDChild());
-            result.insert(category.first, category.second);
+        if(category.second.getIDChild() > 0 ){
+            QPair<qint64, JKKSCategory> cat = readCategory(category.second.getIDChild());
+            result.insert(cat.first, cat.second);
         }
 
-        while(category.second.getIDChild2() > 0){
-            category = readCategory(category.second.getIDChild2());
-            result.insert(category.first, category.second);
+        if(category.second.getIDChild2() > 0){
+            QPair<qint64, JKKSCategory> cat = readCategory(category.second.getIDChild2());
+            result.insert(cat.first, cat.second);
         }
     }
+
     return result;
 }
 
@@ -2057,7 +2161,7 @@ void JKKSLoader :: writeCategoryRubrics (const JKKSCategory& cat) const
 
         KKSResult * res = dbWrite->execute (sql);
         if (res && res->getRowCount () == 1)
-            idpRub.insert (wRubr.getId (), res->getCellAsInt64 (0, 0));
+            idpRub.insert (wRubr.getIdRubric (), res->getCellAsInt64 (0, 0));
 
         if (res)
             delete res;
@@ -2304,6 +2408,45 @@ qint64 JKKSLoader :: writeDocumentFile (JKKSIOUrl& url) const
     
     return ier <= 0 ? ERROR_CODE : OK_CODE;
 }
+
+qint64 JKKSLoader :: writeRecordFile (JKKSIOUrl& url) const
+{
+    QString url_ins_sql = QString ("select * from rInsertUrl ('%1', '%2', 'not assigned', %3, '%4');")
+                                  .arg (url.uid())
+                                  .arg (url.getIOURL())
+                                  //.arg (url.getURL())
+                                  .arg (url.getType())
+                                  .arg (url.getSrcExt ());
+
+    KKSResult * url_res = dbWrite->execute (url_ins_sql);
+    if (!url_res)
+        return ERROR_CODE;
+
+    qint64 id = url_res->getCellAsInt (0, 0);
+    if(id <= 0)
+        return ERROR_CODE;
+
+    url.setURLId (id);
+
+    delete url_res;
+
+    QString sql = QString ("select * from recInsertUrl (%1, %2, '%3');")
+                          .arg (url.getIOId ())
+                          .arg (url.getURLId ())
+                          .arg (url.getURL ());
+
+    KKSResult * res = dbWrite->execute (sql);
+
+    if (!res)
+        return ERROR_CODE;
+
+    delete res;
+
+    int ier = this->writeFileData (url);
+    
+    return ier <= 0 ? ERROR_CODE : OK_CODE;
+}
+
 
 QByteArray JKKSLoader :: getFileData (qint64 idUrl, int blockSize) const
 {
@@ -2681,22 +2824,19 @@ int JKKSLoader :: writeMessage (JKKSRefRecord *refRec, const QString& sender_uid
         {
             sql = QString ("select recUpdate ('%1',").arg (tableUID);//QString ("UPDATE %1 SET ").arg (newTableName);
             QMap<qint64, JKKSCategory> cat = refRec->getCategory();
-            if (cat.isEmpty())
+            JKKSCategoryPair p = mapToPair(cat);
+            if (p.isNull() || p.isAlone())
             {
-                qWarning() << __PRETTY_FUNCTION__ << "ERROR! writeMessage: category is empty!";
+                qWarning() << __PRETTY_FUNCTION__ << "ERROR! writeMessage: category is empty or inconsistent!";
                 recResp.setResult (4);
                 generateQueueResponse (recResp);
                 return ERROR_CODE;
             }
 
-            JKKSCategory C = cat.constBegin().value();
-            if (C.getType() != 10)
-            {
-                for (QMap<qint64, JKKSCategory>::const_iterator pc = cat.constBegin();
-                     C.getType() != 10 && pc != cat.constEnd();
-                     pc++)
-                    C = pc.value();
-            }
+
+
+            JKKSCategory C = p.childCategory();
+
             QStringList attrsVals = refRec->attrsValues ();
             int ic = attrsVals.count () - C.attributes().count();
 
@@ -2778,65 +2918,35 @@ int JKKSLoader :: writeMessage (JKKSRefRecord *refRec, const QString& sender_uid
             delete res;
             
             if(idRec > 0){
-                sysSql = QString("select recSetSysParams(%1, %2, %3, %4, %5, %6, %7)")
-                                                   .arg(idRec)
-                                                   .arg(refRec->idState() <= 0 ? QString("1") : QString("%1").arg(refRec->idState()))
-                                                   .arg(refRec->uuid().isEmpty() ? QString("NULL") : QString("'%1'").arg(refRec->uuid()))
-                                                   .arg(refRec->uid().isEmpty() ? QString("NULL") : QString("'%1'").arg(refRec->uid()))
-                                                   .arg(refRec->rIcon().isEmpty() ? QString("NULL") : QString("'%1'").arg(refRec->rIcon()))
-                                                   .arg(!refRec->bgColor().isValid() ? QString("NULL") : QString("'%1'").arg(QString::number(refRec->bgColor().rgba())))
-                                                   .arg(!refRec->fgColor().isValid() ? QString("NULL") : QString("'%1'").arg(QString::number(refRec->fgColor().rgba())));
-
-                KKSResult * tRecRes = dbWrite->execute(sysSql);
-                if (!tRecRes || tRecRes->getRowCount() != 1 || tRecRes->getCellAsInt64(0, 0) <= -1)
-                {
-                    qCritical() << __PRETTY_FUNCTION__ << "Cannot insert system parameters for the record! SQL = " << sysSql;
-                    if (tRecRes)
-                        delete tRecRes;
+                refRec->setId(idRec);
+                //
+                // Системные атрибуты
+                //
+                int ok = writeRefRecordSysParams(refRec);
+                if(ok != OK_CODE)
                     return ERROR_CODE;
-                }
-                delete tRecRes;
 
                 //
-                //обновление значений показателей
+                //обновление значений показателей (если показатель не существует, он будет создан)
                 //
-                QMap<QString, QString> attrVals = refRec->indValues ();
-                for (QMap<QString, QString>::const_iterator pa = attrVals.constBegin(); pa != attrVals.constEnd(); pa++)
-                {
-                    QString val (pa.value());
-                    if (val.startsWith("'")){
-                        val = val.mid (1);
-                        if (val.endsWith("'"))
-                            val = val.mid (0, val.length()-1);
-                    }
-                    val = val.trimmed();
-                    
-                    if(!val.isEmpty()){ //если строка не пустая, то заэскейпим служебные символы, если таковые имеются в строке
-                        val.replace("'", "''");
-                        //val.replace("\\", "\\\\");
-                        //val.replace("\"", "\\\"");
-                        val.prepend("'");
-                        val.append ("'");
-                    }
-                    QString indSql = QString ("select * from eioUpdateIndicatorEx (%1, %2, %3, NULL::timestamp, NULL::timestamp, NULL::int4, NULL::int4, NULL::varchar);")
-                        .arg (idRec)
-                        .arg (QString("'")+pa.key()+QString("'")) //здесь в качестве ключа используется unique_id
-                        .arg (val.isEmpty() ? QString ("NULL") : val);
-                    
-                    KKSResult * indRes = dbWrite->execute (indSql);
+                ok = writeRefRecordIndicators(refRec);
+                if(ok != OK_CODE)
+                    return ERROR_CODE;
 
-                    qint64 idRecAttrValue = ERROR_CODE;
-                    if (indRes)
-                    {
-                        idRecAttrValue = indRes->getCellAsInt64 (0, 0);
-                        delete indRes;
-                    }
-                    if (idRecAttrValue <= 0){
-                        qCritical() << __PRETTY_FUNCTION__ << "ERROR! eioUpdateIndicatorEx() for record with UID = " << refRec->uid() << " failed!";
-                        return ERROR_CODE;
-                    }
-                }
-            
+                //
+                // обновляем рубрики записи справочника
+                //
+                ok = writeRefRecordRubrics(refRec);
+                if(ok != OK_CODE)
+                    return ERROR_CODE;
+
+                //
+                // обновляем прикрепленные файлы для записи справочника
+                //
+                ok = writeRefRecordFiles(refRec);
+                if(ok != OK_CODE)
+                    return ERROR_CODE;
+
             }
 
         }
@@ -3032,6 +3142,165 @@ int JKKSLoader :: writeMessage (JKKSRefRecord *refRec, const QString& sender_uid
     return OK_CODE;
 }
 
+int JKKSLoader :: writeRefRecordSysParams(JKKSRefRecord * refRec) const
+{
+    
+    if(!refRec || refRec->id() <= 0)
+        return ERROR_CODE;
+
+    QString sysSql = QString("select recSetSysParams(%1, %2, %3, %4, %5, %6, %7)")
+                                       .arg(refRec->id())
+                                       .arg(refRec->idState() <= 0 ? QString("1") : QString("%1").arg(refRec->idState()))
+                                       .arg(refRec->uuid().isEmpty() ? QString("NULL") : QString("'%1'").arg(refRec->uuid()))
+                                       .arg(refRec->uid().isEmpty() ? QString("NULL") : QString("'%1'").arg(refRec->uid()))
+                                       .arg(refRec->rIcon().isEmpty() ? QString("NULL") : QString("'%1'").arg(refRec->rIcon()))
+                                       .arg(!refRec->bgColor().isValid() ? QString("NULL") : QString("'%1'").arg(QString::number(refRec->bgColor().rgba())))
+                                       .arg(!refRec->fgColor().isValid() ? QString("NULL") : QString("'%1'").arg(QString::number(refRec->fgColor().rgba())));
+
+    KKSResult * tRecRes = dbWrite->execute(sysSql);
+    if (!tRecRes || tRecRes->getRowCount() != 1 || tRecRes->getCellAsInt64(0, 0) <= -1)
+    {
+        qCritical() << __PRETTY_FUNCTION__ << "Cannot insert system parameters for the record! SQL = " << sysSql;
+        if (tRecRes)
+            delete tRecRes;
+        
+        return ERROR_CODE;
+    }
+
+    delete tRecRes;
+    
+    return OK_CODE;
+}
+
+int JKKSLoader :: writeRefRecordIndicators(JKKSRefRecord *refRec) const
+{
+    if(!refRec || refRec->id() <= 0)
+        return ERROR_CODE;
+    
+    QMap<QString, QString> attrVals = refRec->indValues ();
+    for (QMap<QString, QString>::const_iterator pa = attrVals.constBegin(); pa != attrVals.constEnd(); pa++)
+    {
+        QString val (pa.value());
+        if (val.startsWith("'")){
+            val = val.mid (1);
+            if (val.endsWith("'"))
+                val = val.mid (0, val.length()-1);
+        }
+        val = val.trimmed();
+        
+        if(!val.isEmpty()){ //если строка не пустая, то заэскейпим служебные символы, если таковые имеются в строке
+            val.replace("'", "''");
+            //val.replace("\\", "\\\\");
+            //val.replace("\"", "\\\"");
+            val.prepend("'");
+            val.append ("'");
+        }
+        QString indSql = QString ("select * from eioUpdateIndicatorEx (%1, %2, %3, NULL::timestamp, NULL::timestamp, NULL::int4, NULL::int4, NULL::varchar);")
+            .arg (refRec->id())
+            .arg (QString("'")+pa.key()+QString("'")) //здесь в качестве ключа используется unique_id
+            .arg (val.isEmpty() ? QString ("NULL") : val);
+        
+        KKSResult * indRes = dbWrite->execute (indSql);
+
+        qint64 idRecAttrValue = ERROR_CODE;
+        if (indRes)
+        {
+            idRecAttrValue = indRes->getCellAsInt64 (0, 0);
+            delete indRes;
+        }
+        if (idRecAttrValue <= 0){
+            qCritical() << __PRETTY_FUNCTION__ << "ERROR! eioUpdateIndicatorEx() for record with UID = " << refRec->uid() << " failed!";
+            return ERROR_CODE;
+        }
+    }
+
+    return OK_CODE;
+}
+
+int JKKSLoader :: writeRefRecordRubrics(JKKSRefRecord * refRec) const
+{
+    if(!refRec || refRec->id() <= 0)
+        return ERROR_CODE;
+
+    QMap<qint64, JKKSGlobalRubric> rubrs = refRec->rubrics ();
+    QMap<qint64, qint64> idpRub;//здесь храним соответствие идентификатора рубрики в исходной БД и целевой БД (в процессе создания рубрик исходный родитель обновляется на целевой)
+    
+    for (QMap<qint64, JKKSGlobalRubric>::const_iterator pr = rubrs.constBegin (); \
+            pr != rubrs.constEnd (); \
+            pr++)
+    {
+        if (pr.key () < 0)
+            continue;
+
+        JKKSGlobalRubric wRubr = pr.value ();
+        
+        //если рубрика имеет родителя, обновляем информацию об этом родителе на актуальное значение
+        if (wRubr.getParent () >= 0 && idpRub.constFind (wRubr.getParent ()) != idpRub.constEnd ())
+            wRubr.setParent (idpRub.constFind (wRubr.getParent ()).value ());
+
+        //пока у рубрик в записях справочников нет категории и поискового запроса
+        /*
+        qint64 idChild = -1;
+        if (wRubr.getCategory().count() != 0)
+        {
+            JKKSCategoryPair cCats = parseCategories (wRubr.getCategory());
+            if(cCats.isNull()){
+                qCritical() << __PRETTY_FUNCTION__ << "ERROR! parseCategories() for rubrics for refRecord with UID = " << refRec->uid() << " failed!";
+                return ERROR_CODE;
+            }
+            
+            idChild = cCats.mainCategory().id();
+        }
+
+        qint64 idSearchT = -1;
+        if (wRubr.getSearchTemplate().id() > 0)
+        {
+            idSearchT = writeSearchTemplate (wRubr.getSearchTemplate());
+        }
+        */
+
+        QString sql =  QString ("select * from recUpdateRubricEx('%1', '%2', '%3', %4, %5, NULL);")
+                                .arg (wRubr.getUid  ())                    
+                                .arg (wRubr.getName ())
+                                .arg (wRubr.getDesc ())
+                                .arg (wRubr.getParent () <= 0 ? QString ("NULL::int8") : QString::number (wRubr.getParent ()))
+                                .arg (pr == rubrs.constBegin () ? QString::number (refRec->id()) : QString ("NULL::int8"));
+
+        KKSResult * res = dbWrite->execute (sql);
+        
+        if (!res || res->getRowCount () != 1 || res->getCellAsInt(0, 0) <= 0){
+            qWarning() << __PRETTY_FUNCTION__ << "ERROR! recUpdateRubricEx() for refRecord with UID = " << refRec->uid() << " failed!";
+            if(res)
+                delete res;
+            return ERROR_CODE;
+        }
+        else
+            idpRub.insert (wRubr.getIdRubric (), res->getCellAsInt64 (0, 0));
+
+        if (res)
+            delete res;
+    }
+
+    return OK_CODE;
+}
+
+int JKKSLoader :: writeRefRecordFiles(JKKSRefRecord * refRec) const
+{
+    if(!refRec || refRec->id() <= 0)
+        return ERROR_CODE;
+
+    QMap<qint64, JKKSIOUrl> urls = refRec->urls ();
+    for (QMap<qint64, JKKSIOUrl>::const_iterator pf = urls.constBegin (); \
+            pf != urls.constEnd (); \
+            pf++)
+    {
+        JKKSIOUrl url = pf.value ();
+        url.setIOId (refRec->id ());
+        writeRecordFile (url);
+    }
+
+    return OK_CODE;
+}
 
 int JKKSLoader :: writeMessage (JKKSFilePart *filePart, const QString& sender_uid) const
 {
@@ -3246,7 +3515,7 @@ qint64 JKKSLoader :: writeOrganization (JKKSQueueResponse & resp) const
     return OK_CODE;
 }
 
-QList<JKKSPMessWithAddr *> JKKSLoader :: readTableRecords (void) const
+QList<JKKSPMessWithAddr *> JKKSLoader :: readTableRecords (QStringList & receivers) const
 {
     QList<JKKSPMessWithAddr *> result;
     KKSResult * res = dbRead->execute ("select * from uQueryOutQueue () order by 2;");
@@ -3308,7 +3577,7 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readTableRecords (void) const
             else if (entity_type == 3 || entity_type == 4) 
             {
                 QString tableName = res->getCellAsString (i, 6);
-                int ier = readRecordFromTable (tableName, rec);
+                int ier = readRecordFromTable (tableName, rec, idOrganization);
                 if (ier < 0)
                     continue;
             }
@@ -3334,12 +3603,15 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readTableRecords (void) const
                 OP.setAddr (getLocalAddress());
                 JKKSPMessage pM (OP.serialize(), OP.getMessageType());
                 pM.setReceiverUID(receiverUID);
-                pM.setSenderUID(senderUID);
+                pM.setSenderUID(this->senderUID);
                 pM.setVerifyReceiver(false);
                 JKKSPMessWithAddr * pMessOrg = new JKKSPMessWithAddr (pM, rec.getAddr(), OP.id());
                 pMessOrg->unp = receiverUID;
                 if (pMessOrg)
                     result.append (pMessOrg);
+
+                if(!receivers.contains(pM.receiverUID()))
+                    receivers.append(pM.receiverUID());
             }
             //9 - передача записи справочника организаций на все участвующие в инф. обмене объекты
             else if (entity_type == 9)
@@ -3355,13 +3627,17 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readTableRecords (void) const
                         JKKSOrganization org = orgList[ii];//po.value ();
                         org.setAddr (rec.getAddr());
                         JKKSPMessage pM (org.serialize(), org.getMessageType());
-                        pM.setReceiverUID(receiverUID);//res->getCellAsString (i, 10);
+                        pM.setSenderUID(this->senderUID);
+                        pM.setReceiverUID(receiverUID);
                         if(entity_type == 8)
                             pM.setVerifyReceiver(false);
                         JKKSPMessWithAddr * pMessOrg = new JKKSPMessWithAddr (pM, rec.getAddr(), rec.getIDQueue());
                         pMessOrg->unp = receiverUID;
                         if (pMessOrg)
                             result.append (pMessOrg);
+
+                        if(!receivers.contains(pM.receiverUID()))
+                        receivers.append(pM.receiverUID());
                     }
                 }
             }
@@ -3370,7 +3646,7 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readTableRecords (void) const
             else if (entity_type == 10 || entity_type == 11) //position create or delete
             {
                 QString tableName = res->getCellAsString (i, 6);
-                int ier = readRecordFromTable (tableName, rec);
+                int ier = readRecordFromTable (tableName, rec, idOrganization);
                 if (ier < 0)
                     continue;
             }
@@ -3380,20 +3656,21 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readTableRecords (void) const
             {
                 ; //файлы, передаваемые блоками. Такого быть здесь не может, поскольку стоит в хранимой процедуре фильтр. Данные типы обрабатываются отдельно
             }
-            
-            QString orgReceiverUID = res->getCellAsString(i, 10);
-            
-            JKKSPMessage pM(rec.serialize(), rec.getMessageType(), senderUID, orgReceiverUID);
+                        
+            JKKSPMessage pM(rec.serialize(), rec.getMessageType(), senderUID, receiverUID);
             if(entity_type == 6 || entity_type == 8)
                 pM.setVerifyReceiver(false);
             
             JKKSPMessWithAddr * pMessWithAddr = new JKKSPMessWithAddr (pM,
                                                                         rec.getAddr(),
                                                                         rec.getIDQueue());
-            pMessWithAddr->unp = orgReceiverUID;
+            pMessWithAddr->unp = receiverUID;
 
             if (pMessWithAddr && (entity_type != 8 && entity_type != 9))
                 result.append (pMessWithAddr);
+
+            if(!receivers.contains(pM.receiverUID()))
+                receivers.append(pM.receiverUID());
         }
     }
     if (res)
@@ -3402,7 +3679,7 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readTableRecords (void) const
     return result;
 }
 
-int JKKSLoader :: readRecordFromTable (const QString& tableName, JKKSRefRecord& rec) const
+int JKKSLoader :: readRecordFromTable (const QString& tableName, JKKSRefRecord& rec, qint64 idOrganization) const
 {
     int sync_type = rec.getSyncType();
     QString io_id_sql = QString("select ioGetObjectIDByTableName ('%1');").arg(tableName);
@@ -3431,7 +3708,7 @@ int JKKSLoader :: readRecordFromTable (const QString& tableName, JKKSRefRecord& 
     delete io_res;
     
     QMap<qint64, JKKSCategory> c_result = readCategories (idCat);
-    if (c_result.count () != 2)
+    if (c_result.count () < 2 || c_result.count () > 3) //у записи справочника могут быть также и показатели, в этом случае имеем одну категорию главную и две категории дочерние
         return ERROR_CODE;
     
     rec.setCategory (c_result);
@@ -3442,153 +3719,301 @@ int JKKSLoader :: readRecordFromTable (const QString& tableName, JKKSRefRecord& 
     //2 - заменить сущность на данную на целевом объекте (если она не существует, создать новую)
     if (sync_type == 1 || sync_type == 2)
     {
-        QString dataSql;
-        QString querySql = QString ("select * from getEIO (%1, %2)").arg (rec.id()).arg (io_id);
-        KKSResult * qRes = dbRead->execute (querySql);
-        if (!qRes || qRes->getRowCount() != 1)
-        {
-            if (qRes)
-                delete qRes;
+        int ok = readRefRecordTableValues(rec, io_id);
+        if(ok != OK_CODE)
             return ERROR_CODE;
-        }
-        dataSql = qRes->getCellAsString (0, 0);
-        delete qRes;
-
-        KKSResult *dRes = dbRead->execute (dataSql);
-        if (!dRes || dRes->getRowCount() != 1)
-        {
-            qCritical() << __PRETTY_FUNCTION__ << "ERROR! SQL = " << dataSql;
-            if (dRes)
-                delete dRes;
-            return ERROR_CODE;
-        }
-
-        QStringList values;
-        QMap<qint64, JKKSCategory>::const_iterator pc = c_result.constBegin();
-        while (pc.value().getType () != 10)//двигаемся на подчиненную категорию
-            pc++;
-        
-        JKKSCategory tc = pc.value ();
-        QMap<qint64, JKKSCategoryAttr>::const_iterator pa = tc.attributes().constBegin();
-        
-        rec.setUid(dRes->getCellAsString(0, 0));//unique_id
-        rec.setUuid(dRes->getCellAsString(0, 1));//uuid_t
-        rec.setIdState(dRes->getCellAsInt(0, 2));//id_io_state
-        rec.setRIcon(dRes->getCellAsString(0, 3));//r_icon
-        //bgColor
-        QColor bkcolor = QColor();
-        if (dRes->getCell (0, 4).isValid())
-        {
-            unsigned int vlc = dRes->getCellAsInt64(0, 4);
-            bkcolor = QColor::fromRgba (vlc);
-            rec.setBgColor(bkcolor);
-        }
-        //fgColor
-        QColor fgcolor = QColor();
-        if (dRes->getCell (0, 5).isValid())
-        {
-            unsigned int vltc = dRes->getCellAsInt64(0, 5);
-            fgcolor = QColor::fromRgba (vltc);
-            rec.setFgColor(fgcolor);
-        }
-
-        //пропустим первые 6 колонок из рез-та запроса - они системные и есть всегда
-        for (int i=6; i < dRes->getColumnCount() && pa != tc.attributes().constEnd(); i++)
-        {
-            if (!dRes->getCellAsString (0, i).isEmpty() && 
-                   (pa.value().idAttrType () == 2 ||  //atList
-                    pa.value().idAttrType() == 3 ) && //atParent
-                pa.value().table() != "maclabels")
-            {
-                //
-                // т.е. если поле таблицы представляет собой ссылку на справочник и при этом не NULL
-                //
-                QString r_uid_sql;
-                if(pa.value().table() == "organization")
-                    r_uid_sql = QString ("select email_prefix from %1 where id = %2").arg (pa.value().table()).arg (dRes->getCellAsString (0, i));
-                else {
-                    if(pa.value().idAttrType() == 2)
-                        r_uid_sql = QString ("select unique_id from %1 where id = %2").arg (pa.value().table()).arg (dRes->getCellAsString (0, i));
-                    else{
-                        QString s = QString("select table_name from io_objects where id = %1").arg(io_id);
-                         KKSResult * r = dbRead->execute(s);
-                         if(!r || r->getRowCount() != 1){
-                             if(r)
-                                 delete r;
-                             return ERROR_CODE;
-                         }
-                         QString theTable = r->getCellAsString(0, 0);
-                         delete r;
-                         
-                         if(theTable == "organization")
-                             r_uid_sql = QString ("select email_prefix from %1 where id=%2").arg (theTable)  .arg  (dRes->getCellAsString (0, i));
-                         else
-                             r_uid_sql = QString ("select unique_id from %1 where id=%2").arg (theTable)  .arg  (dRes->getCellAsString (0, i));
-                    }
-                }
-                
-                KKSResult * refres = dbRead->execute (r_uid_sql);
-                if (!refres || refres->getRowCount () != 1)
-                {
-                    if (refres)
-                        delete refres;
-                    return ERROR_CODE;
-                }
-
-                values += refres->getCellAsString (0, 0);
-                delete refres;
-            }
-            else if (!dRes->getCellAsString (0, i).isEmpty() && 
-                       (//pa.value().idAttrType() == 12 ||  //atCheckList
-                        pa.value().idAttrType() == 17) && //atCheckListEx
-                    pa.value().table() != "maclabels")
-            {
-                //
-                // т.е. если поле таблицы представляет собой ссылку на справочник и при этом не NULL
-                //
-                QString r_uid_sql;
-                if(pa.value().table() == "organization")
-                    r_uid_sql = QString ("select array_to_string(array_agg(email_prefix), ',') from %1 where id in (%2)").arg (pa.value().table()).arg (dRes->getCellAsString (0, i));
-                else
-                    r_uid_sql = QString ("select array_to_string(array_agg(unique_id), ',') from %1 where id in (%2)").arg (pa.value().table()).arg (dRes->getCellAsString (0, i));
-                
-                KKSResult * refres = dbRead->execute (r_uid_sql);
-                if (!refres || refres->getRowCount () != 1)
-                {
-                    if (refres)
-                        delete refres;
-                    return ERROR_CODE;
-                }
-                values += refres->getCellAsString (0, 0);
-                delete refres;
-            }
-            else{
-                values += dRes->getCellAsString (0, i);
-            }
-            
-            //if (i>0 || tableName == QString("position"))
-                pa++;
-        }
-
-        rec.setAttrsValues (values);
 
 
         //показатели записи справочника
-        QString indSql = QString ("select * from eioGetIndicatorsEx(%1)").arg (QString::number(rec.id()));
-        KKSResult * aRes = dbRead->execute (indSql);
-        QMap<QString, QString> indVals;
-        if (!aRes)
+        ok = readRefRecordIndicators(rec);
+        if(ok != OK_CODE)
             return ERROR_CODE;
 
-        for (int ii=0; ii<aRes->getRowCount(); ii++)
-        {
-            indVals.insert (aRes->getCellAsString (ii, 4), aRes->getCellAsString (ii, 3));//здесь в качестве ключа используется поле unique_id
-        }
+        //рубрики
+        ok = readRefRecordRubrics(rec);
+        if(ok != OK_CODE)
+            return ERROR_CODE;
 
-        delete aRes;
-
-        rec.setIndValues(indVals);
+        //прикрепленные файлы
+        ok = readRefRecordFiles(rec, idOrganization);
+        if(ok != OK_CODE)
+            return ERROR_CODE;
     }
+
+    return OK_CODE;
+}
+
+int JKKSLoader :: readRefRecordRubrics(JKKSRefRecord & rec) const
+{
+    //рубрики
+    QString rubrSql = QString ("select * from recGetRubrics (%1);").arg (rec.id());
+    
+    KKSResult * rubrRes = dbRead->execute (rubrSql);
+    if (!rubrRes)
+        return ERROR_CODE;
+
+    QMap<qint64, JKKSGlobalRubric> rubrs;
+    for (int ii=0; ii<rubrRes->getRowCount(); ii++)
+    {
+        if (rubrRes->getCellAsInt (ii, 5) == 2)
+        {
+            //
+            // rubric item cannot been sent
+            //
+            continue;
+        }
+        JKKSGlobalRubric wRubr (rubrRes->getCellAsInt64 (ii, 0), // id
+                                rubrRes->getCellAsString(ii, 7), //uid
+                                rubrRes->getCellAsInt64 (ii, 1) <= 0 ? -1 : rubrRes->getCellAsInt64 (ii, 1), // idParent
+                                rubrRes->getCellAsInt64 (ii, 2) <= 0 ? -1 : rec.id(), // idRecord
+                                rubrRes->getCellAsString (ii, 3), // name
+                                rubrRes->getCellAsString (ii, 4) // description
+                                );
+        /*
+        qint64 idCategory = rubrRes->getCellAsInt (ii, 4);
+        if (idCategory > 0)
+        {
+            QMap<qint64, JKKSCategory> rubrCats = readCategories (idCategory);
+            wRubr.setCategory (rubrCats);
+        }
+        
+        qint64 idSearchTemplate = rubrRes->getCellAsInt (ii, 3);
+        if (idSearchTemplate > 0)
+        {
+            JKKSSearchTemplate st = readSearchTemplate (idSearchTemplate);
+            wRubr.setSearchTemplate (st);
+        }
+        */
+        rubrs.insert (wRubr.getIdRubric(), wRubr);
+    }
+
+    rec.setRubrics (rubrs);
+
+    return OK_CODE;
+}
+
+int JKKSLoader :: readRefRecordFiles(JKKSRefRecord & rec, qint64 idOrganization) const
+{
+    //прикрепленные файлы
+
+
+    QMap<qint64, JKKSIOUrl> urls;
+    QString sql = QString ("select * from recGetFiles (%1);").arg (rec.id());
+    KKSResult *res = dbRead->execute (sql);
+
+    if (res)
+    {
+        for (int i=0; i<res->getRowCount (); i++)
+        {
+            qint64 idUrl = res->getCellAsInt64 (i, 1);
+            JKKSIOUrl res_url( rec.id(), // idRecord
+                               idUrl,
+                               res->getCellAsString (i, 2),//urls_records.name
+                               res->getCellAsString (i, 3), //io_urls.name
+                               res->getCellAsInt (i, 4), //type
+                               res->getCellAsString (i, 8) //src_ext
+                               );
+            res_url.setUid(res->getCellAsString (i, 9));
+            
+            qint64 size = getFileDataSize(idUrl);
+            
+            //если размер файла больше данного значения, то содержимое файла передается отдельно блоками (readFileParts())
+            //в таблицу out_sync_queue записывается информация о файле, который надо поблочно передать
+            //в этом случае res_url.m_data имеет пустое значение. На приемном конце этот факт должен анализироваться, и сам файл не записываться в ФС сервера
+            //если же размер файла меньше данного значения, то содержимое файла передается вместе с пакетом (традиционный вариант), поблочной передачи не происходит
+            if(size < _MAX_FILE_BLOCK2){
+                QByteArray b = getFileData (idUrl);
+                res_url.setData (b);
+            }
+            else{
+                QString sql = QString("select addSyncRecord(%1, %2, '%3', '%4', '%5', %6, %7)")
+                                .arg(idOrganization)
+                                .arg(idUrl)
+                                .arg(res_url.uid())
+                                .arg("localorg-io_objects-7")//в настоящее время справочника прикрепленных файлов в системе не существует. 
+                                                              //Тем не менее в любом случае это значение использоваться не будет, 
+                                                              //поэтому задаем любое, например, UID справочника ИО
+                                .arg("io_urls")//название таблицы, содержащей пересылаемую сущность (для нас io_urls)
+                                .arg(2)//тип синхронизации (обновляем, или создаем новый, если не существует)
+                                .arg(12);//тип пересылаемой сущности (для нас - прикрепленные файлы (частями))
+
+                KKSResult * res = dbRead->execute(sql);
+                if(!res || res->getRowCount() <= 0){
+                    qWarning() << __PRETTY_FUNCTION__ << "addSyncRecord() error! " << (res ? res->errorMessage() : "");
+                    if(res)
+                        delete res;
+                    //return 
+                }
+
+                delete res;
+            }
+            
+            urls.insert (idUrl, res_url);
+        }
+        delete res;
+    }
+
+    rec.setUrls (urls);
+
+    return OK_CODE;
+}
+
+
+int JKKSLoader :: readRefRecordTableValues(JKKSRefRecord & rec, qint64 idObject) const
+{
+    QString dataSql;
+    QString querySql = QString ("select * from getEIO (%1, %2)").arg (rec.id()).arg (idObject);
+
+    KKSResult * qRes = dbRead->execute (querySql);
+    if (!qRes || qRes->getRowCount() != 1)
+    {
+        if (qRes)
+            delete qRes;
+        return ERROR_CODE;
+    }
+    dataSql = qRes->getCellAsString (0, 0);
+    delete qRes;
+
+    KKSResult *dRes = dbRead->execute (dataSql);
+    if (!dRes || dRes->getRowCount() != 1)
+    {
+        qCritical() << __PRETTY_FUNCTION__ << "ERROR! SQL = " << dataSql;
+        if (dRes)
+            delete dRes;
+        return ERROR_CODE;
+    }
+
+    QStringList values;
+    JKKSCategoryPair p = mapToPair(rec.getCategory());
+    if(p.isNull() || p.isAlone()){
+        qCritical() << __PRETTY_FUNCTION__ << "ERROR! Category is empty or inconsistent!";
+        return ERROR_CODE;
+    }
+
+    JKKSCategory tc = p.childCategory();
+    QMap<qint64, JKKSCategoryAttr>::const_iterator pa = tc.attributes().constBegin();
+    
+    rec.setUid(dRes->getCellAsString(0, 0));//unique_id
+    rec.setUuid(dRes->getCellAsString(0, 1));//uuid_t
+    rec.setIdState(dRes->getCellAsInt(0, 2));//id_io_state
+    rec.setRIcon(dRes->getCellAsString(0, 3));//r_icon
+    //bgColor
+    QColor bkcolor = QColor();
+    if (dRes->getCell (0, 4).isValid())
+    {
+        unsigned int vlc = dRes->getCellAsInt64(0, 4);
+        bkcolor = QColor::fromRgba (vlc);
+        rec.setBgColor(bkcolor);
+    }
+    //fgColor
+    QColor fgcolor = QColor();
+    if (dRes->getCell (0, 5).isValid())
+    {
+        unsigned int vltc = dRes->getCellAsInt64(0, 5);
+        fgcolor = QColor::fromRgba (vltc);
+        rec.setFgColor(fgcolor);
+    }
+
+    //пропустим первые 6 колонок из рез-та запроса - они системные и есть всегда
+    for (int i=6; i < dRes->getColumnCount() && pa != tc.attributes().constEnd(); i++)
+    {
+        if (!dRes->getCellAsString (0, i).isEmpty() && 
+               (pa.value().idAttrType () == 2 ||  //atList
+                pa.value().idAttrType() == 3 ) && //atParent
+            pa.value().table() != "maclabels")
+        {
+            //
+            // т.е. если поле таблицы представляет собой ссылку на справочник и при этом не NULL
+            //
+            QString r_uid_sql;
+            if(pa.value().table() == "organization")
+                r_uid_sql = QString ("select email_prefix from %1 where id = %2").arg (pa.value().table()).arg (dRes->getCellAsString (0, i));
+            else {
+                if(pa.value().idAttrType() == 2)
+                    r_uid_sql = QString ("select unique_id from %1 where id = %2").arg (pa.value().table()).arg (dRes->getCellAsString (0, i));
+                else{
+                    QString s = QString("select table_name from io_objects where id = %1").arg(idObject);
+                     KKSResult * r = dbRead->execute(s);
+                     if(!r || r->getRowCount() != 1){
+                         if(r)
+                             delete r;
+                         return ERROR_CODE;
+                     }
+                     QString theTable = r->getCellAsString(0, 0);
+                     delete r;
+                     
+                     if(theTable == "organization")
+                         r_uid_sql = QString ("select email_prefix from %1 where id=%2").arg (theTable)  .arg  (dRes->getCellAsString (0, i));
+                     else
+                         r_uid_sql = QString ("select unique_id from %1 where id=%2").arg (theTable)  .arg  (dRes->getCellAsString (0, i));
+                }
+            }
+            
+            KKSResult * refres = dbRead->execute (r_uid_sql);
+            if (!refres || refres->getRowCount () != 1)
+            {
+                if (refres)
+                    delete refres;
+                return ERROR_CODE;
+            }
+
+            values += refres->getCellAsString (0, 0);
+            delete refres;
+        }
+        else if (!dRes->getCellAsString (0, i).isEmpty() && 
+                   (//pa.value().idAttrType() == 12 ||  //atCheckList
+                    pa.value().idAttrType() == 17) && //atCheckListEx
+                pa.value().table() != "maclabels")
+        {
+            //
+            // т.е. если поле таблицы представляет собой ссылку на справочник и при этом не NULL
+            //
+            QString r_uid_sql;
+            if(pa.value().table() == "organization")
+                r_uid_sql = QString ("select array_to_string(array_agg(email_prefix), ',') from %1 where id in (%2)").arg (pa.value().table()).arg (dRes->getCellAsString (0, i));
+            else
+                r_uid_sql = QString ("select array_to_string(array_agg(unique_id), ',') from %1 where id in (%2)").arg (pa.value().table()).arg (dRes->getCellAsString (0, i));
+            
+            KKSResult * refres = dbRead->execute (r_uid_sql);
+            if (!refres || refres->getRowCount () != 1)
+            {
+                if (refres)
+                    delete refres;
+                return ERROR_CODE;
+            }
+            values += refres->getCellAsString (0, 0);
+            delete refres;
+        }
+        else{
+            values += dRes->getCellAsString (0, i);
+        }
+        
+        //if (i>0 || tableName == QString("position"))
+            pa++;
+    }
+
+    rec.setAttrsValues (values);
+
+    return OK_CODE;
+}
+
+int JKKSLoader :: readRefRecordIndicators(JKKSRefRecord & rec) const
+{
+    
+    QString indSql = QString ("select * from eioGetIndicatorsEx(%1)").arg (QString::number(rec.id()));
+    KKSResult * aRes = dbRead->execute (indSql);
+    QMap<QString, QString> indVals;
+    if (!aRes)
+        return ERROR_CODE;
+
+    for (int ii=0; ii<aRes->getRowCount(); ii++)
+    {
+        indVals.insert (aRes->getCellAsString (ii, 4), aRes->getCellAsString (ii, 3));//здесь в качестве ключа используется поле unique_id
+    }
+
+    delete aRes;
+
+    rec.setIndValues(indVals);
 
     return OK_CODE;
 }
@@ -3620,7 +4045,7 @@ JKKSIOTable JKKSLoader :: readIOTable (QString entityuid, qint64& idObject) cons
     return T;
 }
 
-QList<JKKSPMessWithAddr *> JKKSLoader :: readQueueResults (void) const
+QList<JKKSPMessWithAddr *> JKKSLoader :: readQueueResults (QStringList & receivers) const
 {
     QList<JKKSPMessWithAddr *> result;// (queueResults);
     
@@ -3646,14 +4071,18 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readQueueResults (void) const
 
         JKKSPMessage pM(resp->serialize(), resp->getMessageType());
         pM.setVerifyReceiver(false);
+        pM.setSenderUID(this->senderUID);
+        pM.setReceiverUID(res->getCellAsString(i, 6)); //email_prefix
 
         qWarning() << "Response Address = " << resp->getAddr().address() << "Response port = " << resp->getAddr().port();
 
         JKKSPMessWithAddr * pMessWithAddr = new JKKSPMessWithAddr (pM, resp->getAddr(), resp->id());
-        pMessWithAddr->unp = res->getCellAsString(i, 6);
+        pMessWithAddr->unp = res->getCellAsString(i, 6); //email_prefix
         if (pMessWithAddr)
             result.append (pMessWithAddr);
-        //this->setAsSended (res->getCellAsInt (i, 1), 6);
+
+        if(!receivers.contains(pM.receiverUID()))
+            receivers.append(pM.receiverUID());
     }
     return result;
 }
@@ -3738,10 +4167,17 @@ QPair<qint64, qint64> JKKSLoader :: getIDMap (const QString& ref_uid, const JKKS
     // (категорий)
     //
     QMap<qint64, JKKSCategory> tCat = RR.getCategory ();
-    QMap<qint64, JKKSCategory>::const_iterator pc (tCat.constBegin());
-    for (; pc != tCat.constEnd() && pc.value ().getType () != 10; pc++)
-        ;
-    JKKSCategory tc = pc.value ();
+    
+    //здесь мы пытаемся создать в БД структуру категорий. Фактически, это должно привести лишь к тому, что в JKKSCategoryPair будут записаны реальные ИДы
+    //Однако возможна ситуация, когда будет явно создана дочерняя категория для показателей.
+    JKKSCategoryPair p = parseCategories(tCat);
+    if(p.isNull() || p.isAlone()){
+        qCritical () << __PRETTY_FUNCTION__ << "Bad category in refRecord!";
+        return id_old_new;
+    }
+
+    JKKSCategory tc = p.childCategory();
+
     QString attrs_uids (QString("ARRAY["));
     //
     // если таблица не является таблицей организаций, т.е. мегасистемной 
@@ -3759,9 +4195,6 @@ QPair<qint64, qint64> JKKSLoader :: getIDMap (const QString& ref_uid, const JKKS
     QMap<qint64, JKKSCategoryAttr>::const_iterator pa (attrs.constBegin());
     int nAttrsC = attrs.count ();
     int nAttrsV = aVals.count ();
-
-    if(nAttrsV != nAttrsC)
-        int a=0;
 
     for (int i=nAttrsV-nAttrsC; pa != attrs.constEnd(); pa++) //???????
     {
@@ -3796,82 +4229,9 @@ QPair<qint64, qint64> JKKSLoader :: getIDMap (const QString& ref_uid, const JKKS
                       pa.value().idAttrType() == 26)    //ссылка на цвет (текст)
                 )
         {
-/*            QString newAttrTableName;
-            QString sqlTN = QString ("select * from agetattribute('%1');").arg (pa.value().code());
-            KKSResult * tAttrRes = dbWrite->execute (sqlTN);
-            if (!tAttrRes || tAttrRes->getRowCount() !=1)
-            {
-                qWarning() << __PRETTY_FUNCTION__ << " ERROR! SQL = " << sqlTN;
-                if (tAttrRes)
-                    delete tAttrRes;
-                return id_old_new;
-            }
 
-            newAttrTableName =  pa.value().idAttrType() != 3 ? tAttrRes->getCellAsString (0, 5) : tableName;
-            if(newAttrTableName.isEmpty()){
-                qWarning() << __PRETTY_FUNCTION__ << " ERROR! Cannot get real reference table for attribute CODE = " << pa.value().code();
-                if (tAttrRes)
-                    delete tAttrRes;
-                
-                return id_old_new;
-            }
-            
-            delete tAttrRes;
-            QStringList aRefValues = aVals[i].split(",");
-            qDebug () << __PRETTY_FUNCTION__ << aVals[i] << aVals[i].split(",");
-            QString recSql;
-            if (aRefValues.count() == 1){
-                if(newAttrTableName == "organization"){
-                    recSql = QString ("select id from %1 where email_prefix='%2'").arg (newAttrTableName).arg (aVals[i]);
-                }
-                else{
-                    recSql = QString ("select id from %1 where unique_id='%2'").arg (newAttrTableName).arg (aVals[i]);
-                }                
-            }
-            else
-            {
-                if(newAttrTableName == "organization"){
-                    recSql = QString ("select id from %1 where email_prefix in (").arg (newAttrTableName);
-                }
-                else{
-                    recSql = QString ("select id from %1 where unique_id in (").arg (newAttrTableName);
-                }
-                
-                for (int ii=0; ii<aRefValues.count(); ii++)
-                {
-                    recSql += QString ("'%1'").arg (aRefValues[ii]);
-                    if (ii<aRefValues.count()-1)
-                        recSql += ",";
-                }
-                recSql += ")";
-            }
-
-            KKSResult * refRes = dbWrite->execute (recSql);
-            if (!refRes || refRes->getRowCount() != aRefValues.count())
-            {
-                qWarning() << __PRETTY_FUNCTION__ << " ERROR! SQL = " << recSql;
-                if (refRes)
-                    delete refRes;
-                return id_old_new;
-            }
-
-            int idARef = refRes->getCellAsInt (0, 0);
-            if (idARef > 0 && refRes->getRowCount() == 1)
-                value = QString::number (idARef);
-            else if (idARef > 0 && refRes->getRowCount() > 1)
-            {
-                value = QString ();
-                for (int ii=0; ii<refRes->getRowCount(); ii++)
-                {
-                    value += QString::number (refRes->getCellAsInt (ii, 0));
-                    if (ii<refRes->getRowCount()-1)
-                        value += QString (",");
-                }
-            }
-            else
-                return id_old_new;
- */
         }
+
         int a_type = pa.value().idAttrType();
         if (a_type == 9 || //KKSAttrType::atString ||
             a_type == 14 || //KKSAttrType::atFixString ||
@@ -3931,6 +4291,10 @@ QPair<qint64, qint64> JKKSLoader :: getIDMap (const QString& ref_uid, const JKKS
     delete tRecRes;
     
     //добавляем показатели
+    if(!p.hasChild2()){
+        return id_old_new;
+    }
+
     QMap<QString, QString> attrVals = RR.indValues ();
     for (QMap<QString, QString>::const_iterator pa = attrVals.constBegin(); pa != attrVals.constEnd(); pa++)
     {
@@ -4757,4 +5121,25 @@ JKKSWorkMode JKKSLoader :: readWM (qint64 idWM) const
                     );
     delete res;
     return wm;
+}
+
+QMap<qint64, JKKSPing> JKKSLoader :: createPings(const QStringList & receivers) const 
+{
+    QMap<qint64, JKKSPing> pings;
+
+    return pings;
+}
+
+QMap<qint64, JKKSPing> JKKSLoader :: createPings() const
+{
+    QMap<qint64, JKKSPing> pings;
+
+    return pings;
+}
+
+JKKSPing JKKSLoader :: createPing(qint64 idOrg) const
+{
+    JKKSPing ping;
+
+    return ping;
 }

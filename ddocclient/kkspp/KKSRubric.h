@@ -151,7 +151,7 @@ class _PP_EXPORT KKSRubric : public KKSRubricBase
 {
 public:
     KKSRubric();
-    KKSRubric(int id, const QString & name, KKSSearchTemplate * st=0, KKSCategory * c=0, KKSAccessEntity * ac=0);
+    KKSRubric(qint64 id, const QString & name, KKSSearchTemplate * st=0, KKSCategory * c=0, KKSAccessEntity * ac=0);
     KKSRubric(const KKSRubric & other);
     ~KKSRubric();
     
@@ -177,11 +177,11 @@ public:
     const KKSList<const KKSRubricItem *> & items() const;
     const KKSRubric * rubric(int index) const;
     const KKSList<const KKSRubric*> & rubrics() const;
-    const KKSRubric * rubricForId(int id, bool recursivelly = true) const;
-    const KKSRubricItem * itemForId(int id) const;
+    const KKSRubric * rubricForId(qint64 id, bool recursivelly = true) const;
+    const KKSRubricItem * itemForId(qint64 id) const;
 
-    KKSRubricItem * itemForId(int id);
-    KKSRubric * rubricForId(int id, bool recursivelly = true);
+    KKSRubricItem * itemForId(qint64 id);
+    KKSRubric * rubricForId(qint64 id, bool recursivelly = true);
     KKSRubric * rubric(int index);
 
     static void setGeneralIcon(const QPixmap & px);
@@ -246,7 +246,7 @@ private:
     //—пециально примен€етс€ только служебна€ роль OTHERS_ROLE
     KKSAccessEntity * m_acl;
 
-    int m_intId;//служебное поле, используетс€ дл€ определени€, 
+    qint64 m_intId;//служебное поле, используетс€ дл€ определени€, 
               //€вл€етс€ ли данна€ рубрика новой или она уже существует в Ѕƒ
               // и осуществл€етс€ ее обновление
               //ƒанное поле будет  > 0, если рубрика загружена из Ѕƒ

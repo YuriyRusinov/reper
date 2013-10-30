@@ -20,7 +20,7 @@ SOURCES += \
         Namespaces/netStruct.cpp
 
 FORMS   += \
-        ./UserInterface/dyndocForm/dyndocForm.ui
+        UserInterface/dyndocForm/dyndocForm.ui
 
 headers.files += \
         config_scheduler.h \

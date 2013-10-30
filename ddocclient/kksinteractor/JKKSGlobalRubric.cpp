@@ -63,6 +63,7 @@ QDataStream& operator<< (QDataStream& out, const JKKSGlobalRubric& R)
     out << R.idRubric;
     out << R.idParent;
     out << R.idEntity;
+    out << R.uidRubric;
     out << R.rubricName;
     out << R.rubricCode;
     out << R.rubricDesc;
@@ -78,6 +79,7 @@ QDataStream& operator>> (QDataStream& in, JKKSGlobalRubric& R)
     in >> R.idRubric;
     in >> R.idParent;
     in >> R.idEntity;
+    in >> R.uidRubric;
     in >> R.rubricName;
     in >> R.rubricCode;
     in >> R.rubricDesc;

@@ -14,21 +14,141 @@
    <string>MapWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout">
-    <property name="margin">
-     <number>9</number>
-    </property>
-    <property name="spacing">
-     <number>6</number>
-    </property>
-    <item row="0" column="0">
-     <widget class="QFrame" name="frameMap">
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QSplitter" name="splitter">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
       </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
+      <property name="minimumSize">
+       <size>
+        <width>30</width>
+        <height>0</height>
+       </size>
       </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <widget class="QWidget" name="layoutWidget">
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="sizeConstraint">
+         <enum>QLayout::SetMinimumSize</enum>
+        </property>
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Legend:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QTreeView" name="treeView"/>
+        </item>
+        <item>
+         <widget class="QTableWidget" name="tableLegend">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>200</width>
+            <height>200</height>
+           </size>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="editTriggers">
+           <set>QAbstractItemView::NoEditTriggers</set>
+          </property>
+          <property name="selectionMode">
+           <enum>QAbstractItemView::ExtendedSelection</enum>
+          </property>
+          <property name="selectionBehavior">
+           <enum>QAbstractItemView::SelectRows</enum>
+          </property>
+          <property name="columnCount">
+           <number>3</number>
+          </property>
+          <attribute name="verticalHeaderVisible">
+           <bool>false</bool>
+          </attribute>
+          <attribute name="verticalHeaderHighlightSections">
+           <bool>false</bool>
+          </attribute>
+          <column/>
+          <column/>
+          <column/>
+         </widget>
+        </item>
+        <item>
+         <widget class="QFrame" name="frameLegend">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>20</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QFrame" name="frameMap">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>200</horstretch>
+         <verstretch>200</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -55,33 +175,15 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionExit"/>
+    <addaction name="mpActionFileOpenProject"/>
+    <addaction name="mpActionFileSaveProject"/>
+    <addaction name="separator"/>
+    <addaction name="mpActionFileExit"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuMap"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <widget class="QDockWidget" name="dockWigTOC">
-   <property name="sizePolicy">
-    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-     <horstretch>0</horstretch>
-     <verstretch>0</verstretch>
-    </sizepolicy>
-   </property>
-   <property name="minimumSize">
-    <size>
-     <width>170</width>
-     <height>42</height>
-    </size>
-   </property>
-   <property name="windowTitle">
-    <string>Таблица содержания</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>1</number>
-   </attribute>
-   <widget class="QWidget" name="dockWidgetContents_2"/>
-  </widget>
   <action name="mpActionZoomIn">
    <property name="icon">
     <iconset resource="resources.qrc">
@@ -118,9 +220,35 @@
     <string>Add Layer</string>
    </property>
   </action>
-  <action name="actionExit">
+  <action name="mpActionFileExit">
+   <property name="icon">
+    <iconset>
+     <normalon>:/ico/mActionFileExit.png</normalon>
+    </iconset>
+   </property>
    <property name="text">
     <string>Exit</string>
+   </property>
+   <property name="toolTip">
+    <string>Close Application</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+W</string>
+   </property>
+  </action>
+  <action name="mpActionFileOpenProject">
+   <property name="icon">
+    <iconset>
+     <normalon>:/ico/mActionFileOpen.png</normalon>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Open Project</string>
+   </property>
+  </action>
+  <action name="mpActionFileSaveProject">
+   <property name="text">
+    <string>Save Project</string>
    </property>
   </action>
  </widget>

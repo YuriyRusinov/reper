@@ -4,8 +4,9 @@ TEMPLATE = subdirs
 SUBDIRS += \
 	operator_app \
 	http_connector \
-        sync_queue_viewer \
-        #dyndoc_synch \
+#        reper \
+#        sync_queue_viewer \
+#        dyndoc_synch \
         kksdaemon
 
 win32{

@@ -34,8 +34,8 @@ public:
     ~JKKSRubric (void);
     JKKSRubric& operator= (const JKKSRubric& R);
 
-    qint64 getId (void) const;
-    void setId (qint64 idr);
+    qint64 getIdRubric (void) const;
+    void setIdRubric (qint64 idr);
 
     const QString & getUid (void) const;
     void setUid (const QString & uid);

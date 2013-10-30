@@ -3428,7 +3428,8 @@ void KKSLoader::loadRubrics(KKSObject * io) const
     if(!io || io->id() <= 0)
         return;
 
-    QString sql = QString("select * from ioGetRubrics(%1) order by 8,1").arg(io->id());
+    //QString sql = QString("select * from ioGetRubrics(%1) order by 9,1").arg(io->id());
+    QString sql = QString("select * from ioGetRubrics(%1)").arg(io->id());
     KKSResult * res = db->execute(sql);
     if(!res || res->getRowCount() == 0){
         if(res)
@@ -3536,7 +3537,8 @@ void KKSLoader::loadRubrics(KKSCategory * c) const
     if(!c || c->id() <= 0)
         return;
 
-    QString sql = QString("select * from cGetRubrics(%1) order by 5").arg(c->id());
+    //QString sql = QString("select * from cGetRubrics(%1) order by 5").arg(c->id());
+    QString sql = QString("select * from cGetRubrics(%1)").arg(c->id());
     KKSResult * res = db->execute(sql);
     if(!res || res->getRowCount() == 0){
         if(res)
@@ -3613,7 +3615,8 @@ void KKSLoader::loadRecRubrics (KKSObjectExemplar * eio) const
     if(!eio || eio->id() <= 0)
         return;
 
-    QString sql = QString("select * from recGetRubrics(%1) order by 5,1").arg(eio->id());
+    //QString sql = QString("select * from recGetRubrics(%1) order by 5,1").arg(eio->id());
+    QString sql = QString("select * from recGetRubrics(%1)").arg(eio->id());
     KKSResult * res = db->execute(sql);
     if(!res || res->getRowCount() == 0){
         if(res)
@@ -3752,7 +3755,8 @@ KKSRubric * KKSLoader::loadRubricators(bool bOnlyMyDocs) const
 {
 
     int idUser = getUserId();
-    QString sql = QString("select * from getRubricators(%1, %2) order by id,type").arg(idUser).arg(bOnlyMyDocs? "TRUE" : "FALSE");
+    //QString sql = QString("select * from getRubricators(%1, %2) order by id,type").arg(idUser).arg(bOnlyMyDocs? "TRUE" : "FALSE");
+    QString sql = QString("select * from getRubricators(%1, %2)").arg(idUser).arg(bOnlyMyDocs? "TRUE" : "FALSE");
     KKSResult * res = db->execute(sql);
     if(!res || res->getRowCount() == 0){
         if(res)
@@ -3938,7 +3942,8 @@ KKSList<const KKSRubricItem *> KKSLoader::loadCatRubricItems (const KKSCategory*
 
 KKSRubric * KKSLoader::loadRubric (int idRubr, bool withInherit) const
 {
-    QString sql = QString("select * from getRubric(%1, %2) order by id, type").arg(idRubr).arg(withInherit ? QString("TRUE") : QString("FALSE"));
+    //QString sql = QString("select * from getRubric(%1, %2) order by id, type").arg(idRubr).arg(withInherit ? QString("TRUE") : QString("FALSE"));
+    QString sql = QString("select * from getRubric(%1, %2)").arg(idRubr).arg(withInherit ? QString("TRUE") : QString("FALSE"));
 
     KKSResult * res = db->execute(sql);
     if(!res || res->getRowCount() == 0){

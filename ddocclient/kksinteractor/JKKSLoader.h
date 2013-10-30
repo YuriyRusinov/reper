@@ -17,6 +17,7 @@
 #include <QMap>
 
 #include "JKKSMessage.h"
+#include "JKKSPing.h"
 
 class KKSDatabase;
 class JKKSMessage;
@@ -68,7 +69,15 @@ class _I_EXPORT JKKSLoader
         int setLocalAddress(const JKKSAddress & address) const;
         const JKKSAddress & getLocalAddress(bool reload = false) const;
 
-        QList<JKKSPMessWithAddr *> readMessages (void) const;
+        int getLocalOrgId() const;//идентификатор локальной организации
+
+        //возвращается все исходящие данные для отправки, которые необходимо отправить по текущему транспорту
+        //receivers - перечень уникальных идентификаторов организаций-получателей корреспонденции
+        QList<JKKSPMessWithAddr *> readMessages (QStringList & receivers) const;
+        
+        //получаем, обрабатываем и записываем в БД то, что пришло от организации-отправителя
+        //именно этот метод вызывается в http_connector'е
+        //и он является отправной точкой для анализа того, что за сообщение нам пришло
         int writeMessage(const JKKSPMessage & message) const;
 
         bool connectToDb (void);
@@ -92,6 +101,12 @@ class _I_EXPORT JKKSLoader
         int writeMessage (JKKSOrganization * org, const QString& receiverUID) const;
         int writeMessage (JKKSOrgPackage * OrgPack, const QString& senderUID, const QString& receiverUID) const;
         int writeMessage (JKKSFilePart * filePart, const QString& senderUID) const;
+        int writeMessage (JKKSPing * ping, const QString & senderUID) const;
+
+        QMap<qint64, JKKSPing> createPings() const; //создаются пинги для проверки всех организаций, занесенных в таблицу organization
+        QMap<qint64, JKKSPing> createPings(const QStringList & receivers) const; //создаются пинги для проверки указанных организаций (задаются своими email_prefix)
+        JKKSPing createPing(qint64 idOrg) const;//создается пинг, который будет отправлен в целевую организацию JKKSPing::m_idOrgTo
+
         //
         // Category has to be syncronized without other entities.
         //
@@ -103,13 +118,13 @@ class _I_EXPORT JKKSLoader
         // TODO: for tests
         //
         JKKSMessage * unpackMessage (const JKKSPMessage & pMessage) const;
-        QList<JKKSPMessWithAddr *> readCommands (void) const;
-        QList<JKKSPMessWithAddr *> readDocuments (void) const;
-        QList<JKKSPMessWithAddr *> readMails (void) const;
-        QList<JKKSPMessWithAddr *> readCmdConfirmations (void) const;
-        QList<JKKSPMessWithAddr *> readMailConfirmations (void) const;
-        QList<JKKSPMessWithAddr *> readTableRecords (void) const;
-        QList<JKKSPMessWithAddr *> readQueueResults (void) const;
+        QList<JKKSPMessWithAddr *> readCommands (QStringList & receivers) const;
+        QList<JKKSPMessWithAddr *> readDocuments (QStringList & receivers) const;
+        QList<JKKSPMessWithAddr *> readMails (QStringList & receivers) const;
+        QList<JKKSPMessWithAddr *> readCmdConfirmations (QStringList & receivers) const;
+        QList<JKKSPMessWithAddr *> readMailConfirmations (QStringList & receivers) const;
+        QList<JKKSPMessWithAddr *> readTableRecords (QStringList & receivers) const;
+        QList<JKKSPMessWithAddr *> readQueueResults (QStringList & receivers) const;
 
         int getDlId (void) const;
         int getUserId (void) const;
@@ -149,6 +164,7 @@ class _I_EXPORT JKKSLoader
 
         QMap<qint64, JKKSIOUrl> readDocumentFiles (qint64 idObject, qint64 idOrganization) const;//второй параметр используется в случае когда требуется передача прикрепленых файлов блоками
         qint64 writeDocumentFile (JKKSIOUrl& url) const;
+        qint64 writeRecordFile (JKKSIOUrl& url) const;
 
         QByteArray getFileData (qint64 idUrl, int blockSize=_MAX_FILE_BLOCK) const;
         int writeFileData (const JKKSIOUrl& url, int blockSize=_MAX_FILE_BLOCK) const;
@@ -162,8 +178,14 @@ class _I_EXPORT JKKSLoader
         qint64 writeIOType (JKKSType& ioType) const;
 
         QMap<qint64, JKKSIOTable> dependencyTables (const JKKSRefRecord& RR) const;
+        
         QPair<qint64, qint64> getIDMap (const QString& table_name, const JKKSRefRecord& RR) const;
-        int readRecordFromTable (const QString& tableName, JKKSRefRecord& rec) const;
+        int writeRefRecordSysParams(JKKSRefRecord * rec) const;
+        int writeRefRecordIndicators(JKKSRefRecord * rec) const;
+        int writeRefRecordRubrics(JKKSRefRecord * rec) const;
+        int writeRefRecordFiles(JKKSRefRecord * rec) const;
+
+        int readRecordFromTable (const QString& tableName, JKKSRefRecord& rec, qint64 idOrganization) const;
         
         qint64 writeOrganization (JKKSQueueResponse & resp) const;
         QMap<qint64, JKKSOrganization> readOrganizations (qint64 idOrg) const;
@@ -193,11 +215,17 @@ class _I_EXPORT JKKSLoader
 
         JKKSCategoryPair parseCategories(const QMap<qint64, JKKSCategory> & cats) const;
         QMap<qint64, JKKSCategory> pairToMap(const JKKSCategoryPair & pair) const;
+        JKKSCategoryPair mapToPair(const QMap<qint64, JKKSCategory> & cats) const;
 
         JKKSOrgPackage readOrgs (qint64 id, const QString& receiverUID) const;
         QMap<qint64, JKKSTransport> readTransports (const QString& receiverUID) const;
 
         qint64 writeReceipt (JKKSQueueResponse& response) const;
+
+        int readRefRecordIndicators(JKKSRefRecord & rec) const;
+        int readRefRecordTableValues(JKKSRefRecord & rec, qint64 idObject) const;
+        int readRefRecordRubrics(JKKSRefRecord & rec) const;
+        int readRefRecordFiles(JKKSRefRecord & rec, qint64 idOrganization) const;
     private:
         //
         // Variables
@@ -225,6 +253,8 @@ class _I_EXPORT JKKSLoader
         mutable int idCurrentUser;//текущий пользователь
 
         mutable JKKSAddress local_address;
+
+        mutable int m_localOrgId;//идентификатор локальной организации
 
         //email_prefix организации-отправителя
         mutable QString senderUID;

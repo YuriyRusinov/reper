@@ -116,17 +116,18 @@ private:
     int updateIncludes(const KKSObjectExemplar * eio) const;
     int insertIncludes(const KKSObjectExemplar * eio) const;
     int deleteIncludes(int idObject) const;
-    int updateRubrics(KKSRubric * parent, int idMyDocsRubricator = -1) const;
+    
+    int updateRubrics(KKSRubric * parent, qint64 idMyDocsRubricator = -1) const;
     int updateRubric(KKSRubric * r) const;
-    int insertRubrics(KKSRubric * parent, int idMyDocsRubricator = -1) const;
-    int insertRubric(KKSRubric * r, int idParent, int idRec, bool root = false, int idMyDocsRubricator = -1) const;
-    int insertRubricItem(int idRubric, qint64 idRec, const QString & rIcon) const;
-    int removeRubricItem(int idRubric, qint64 idRec) const;
+    int insertRubrics(KKSRubric * parent, qint64 idMyDocsRubricator = -1) const;
+    int insertRubric(KKSRubric * r, qint64 idParent, qint64 idRec, bool root = false, qint64 idMyDocsRubricator = -1) const;
+    int insertRubricItem(qint64 idRubric, qint64 idRec, const QString & rIcon) const;
+    int removeRubricItem(qint64 idRubric, qint64 idRec) const;
     void rollbackRubrics(KKSRubric * r, bool forUpdate = false) const;
     void rollbackRubric(KKSRubric * r, bool forUpdate = false) const;
     void commitRubrics(KKSRubric * r) const;
     void commitRubric(KKSRubric * r) const;
-    int insertRubricators(KKSRubric * rootRubric, int idMyDocsRubricator, bool bMyDocs = false) const;
+    int insertRubricators(KKSRubric * rootRubric, qint64 idMyDocsRubricator, bool bMyDocs = false) const;
     int deleteRubricators(bool bMyDocs = false) const;
     int deleteRubric(int idRubric) const;
 

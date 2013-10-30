@@ -32,6 +32,8 @@ JKKSRefRecord :: JKKSRefRecord (qint64 id_queue,
       tableName (tName),
       tableUID (t_uid),
       syncType (sync_type),
+      m_rubrics (QMap<qint64, JKKSGlobalRubric>()),
+      m_urls (QMap<qint64, JKKSIOUrl>()),
       aVals (attrsVals),
       ioDoc (JKKSDocument()),
       ioTable (JKKSIOTable()),
@@ -51,6 +53,8 @@ JKKSRefRecord :: JKKSRefRecord (const JKKSRefRecord & RR)
       tableUID (RR.tableUID),
       syncType (RR.syncType),
       cat (RR.cat),
+      m_rubrics (RR.m_rubrics),
+      m_urls (RR.m_urls),
       aVals (RR.aVals),
       ioDoc (RR.ioDoc),
       ioTable (RR.ioTable),
@@ -219,6 +223,37 @@ void JKKSRefRecord :: setSenderAddr (const JKKSAddress & addr)
     senderAddr = addr;
 }
 
+const QMap<qint64, JKKSGlobalRubric>& JKKSRefRecord :: rubrics (void) const
+{
+    return m_rubrics;
+}
+
+QMap<qint64, JKKSGlobalRubric>& JKKSRefRecord :: rubrics (void)
+{
+    return m_rubrics;
+}
+
+void JKKSRefRecord :: setRubrics (const QMap<qint64, JKKSGlobalRubric>& rubrs)
+{
+    m_rubrics = rubrs;
+}
+
+const QMap<qint64, JKKSIOUrl>& JKKSRefRecord :: urls (void) const
+{
+    return m_urls;
+}
+
+QMap<qint64, JKKSIOUrl>& JKKSRefRecord :: urls (void)
+{
+    return m_urls;
+}
+
+void JKKSRefRecord :: setUrls (const QMap<qint64, JKKSIOUrl>& urls)
+{
+    m_urls = urls;
+}
+
+
 QDataStream& operator<< (QDataStream& out, const JKKSRefRecord& RR)
 {
     out << RR.getAddr();
@@ -231,6 +266,8 @@ QDataStream& operator<< (QDataStream& out, const JKKSRefRecord& RR)
     out << RR.tableUID;
     out << RR.syncType;
     out << RR.cat;
+    out << RR.m_rubrics;
+    out << RR.m_urls;
     out << RR.aVals;
     out << RR.ioDoc.serialize ();
     out << RR.ioTable;
@@ -265,6 +302,8 @@ QDataStream& operator>> (QDataStream& in, JKKSRefRecord& RR)
     in >> RR.tableUID;
     in >> RR.syncType;
     in >> RR.cat;
+    in >> RR.m_rubrics;
+    in >> RR.m_urls;
     in >> RR.aVals;
 
     QByteArray docArr;
