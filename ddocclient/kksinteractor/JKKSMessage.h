@@ -95,7 +95,8 @@ class _I_EXPORT JKKSMessage
             atPosition = 10,
             atOrgPackage = 11,
             atFilePart = 12,
-            atPing = 13
+            atPing = 13,
+            atPingResponse = 14
         }; 
 
         virtual JKKSMessageType getMessageType (void) const;

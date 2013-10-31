@@ -103,9 +103,10 @@ class _I_EXPORT JKKSLoader
         int writeMessage (JKKSFilePart * filePart, const QString& senderUID) const;
         int writeMessage (JKKSPing * ping, const QString & senderUID) const;
 
-        QMap<qint64, JKKSPing> createPings() const; //создаются пинги для проверки всех организаций, занесенных в таблицу organization
-        QMap<qint64, JKKSPing> createPings(const QStringList & receivers) const; //создаются пинги для проверки указанных организаций (задаются своими email_prefix)
-        JKKSPing createPing(qint64 idOrg) const;//создается пинг, который будет отправлен в целевую организацию JKKSPing::m_idOrgTo
+        QMap<QString, JKKSPing> createPings() const; //создаются пинги для проверки всех организаций, занесенных в таблицу organization
+        QMap<QString, JKKSPing> createPings(const QStringList & receivers) const; //создаются пинги для проверки указанных организаций (задаются своими email_prefix)
+        JKKSPing createPing(const QString &  uidOrg) const;//создается пинг, который будет отправлен в целевую организацию JKKSPing::m_uidTo
+        static QList<JKKSPMessWithAddr *> pingsToPMessWithAddr(const QMap<QString, JKKSPing> pings);
 
         //
         // Category has to be syncronized without other entities.
@@ -125,6 +126,7 @@ class _I_EXPORT JKKSLoader
         QList<JKKSPMessWithAddr *> readMailConfirmations (QStringList & receivers) const;
         QList<JKKSPMessWithAddr *> readTableRecords (QStringList & receivers) const;
         QList<JKKSPMessWithAddr *> readQueueResults (QStringList & receivers) const;
+        QList<JKKSPMessWithAddr *> readPingResults (QStringList & receivers) const;
 
         int getDlId (void) const;
         int getUserId (void) const;

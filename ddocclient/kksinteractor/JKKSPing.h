@@ -16,7 +16,8 @@ class _I_EXPORT JKKSPing : public JKKSMessage
 public:
     JKKSPing (qint64 id=-1, 
               const JKKSAddress & addr=JKKSAddress(), 
-              const QString & kvs=QString());
+              const QString & kvs=QString(),
+              bool isResponse = false);
     JKKSPing (const JKKSPing & ping);
     ~JKKSPing (void);
 
@@ -66,6 +67,12 @@ public:
     void setCreated(int c);
     void setCompleted(bool c);
 
+    void setSenderAddress(const JKKSAddress & addr);
+    const JKKSAddress & senderAddress() const;
+
+    bool operator == (const JKKSPing & in) const;
+    JKKSPing & operator = ( const JKKSPing & in );
+
 private:
     //
     // Variables
@@ -104,6 +111,9 @@ private:
     //При смене значения данного флага с FALSE на TRUE запускается механизм проверки связи с введенной организацией.
     //Флаг меняется при задании для данной организации хотя бы одного транспорта и назначения адреса (в справочнике organization_transport)
     bool m_completed;
+
+    bool m_isResponse;//если true - то является ответом на пинг (в этом случае ряд атрибутов будет не заполнен
+    JKKSAddress m_senderAddress;//адрес отправителя пинга. Будет записываться на приемном конце в таблицу queue_results
 };
 
 

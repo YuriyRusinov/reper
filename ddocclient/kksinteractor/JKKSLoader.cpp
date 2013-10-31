@@ -291,6 +291,7 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readMessages (QStringList & receivers) 
     }
     
     messList += readQueueResults (receivers);
+    //messList += readPingResults(receivers);
 
     return messList;
 }
@@ -1466,6 +1467,7 @@ JKKSMessage * JKKSLoader::unpackMessage (const JKKSPMessage & pMessage) const
         case JKKSMessage::atOrgPackage: message = new JKKSOrgPackage(); break;
         case JKKSMessage::atFilePart: message = new JKKSFilePart(); break;
         case JKKSMessage::atPing: message = new JKKSPing(); break;
+        case JKKSMessage::atPingResponse: message = new JKKSPing(); break;
         default: qDebug("Error: unknown message type");
     }
 
@@ -1534,26 +1536,34 @@ int JKKSLoader::writeMessage (JKKSPing *ping, const QString & senderUID) const
     if (!ping)
         return ERROR_CODE;
 
+    int idOrgTo = ping->idOrgTo();
+    idOrgTo *= -1;
+
+    JKKSQueueResponse resp (-1, 
+                            idOrgTo, 
+                            3, 
+                            ping->senderAddress());
+
+    resp.setOrgUid(ping->uidFrom());
     
-/*
-    QString sql = QString ("select * from uConfirmMsg(%1, %2, %3);")
-        .arg (cfm->extraId())
-        .arg (cfm->readDatetime().isNull() ? QString("NULL") :
-                                             QString ("to_timestamp('") +
-                                                cfm->readDatetime().toString ("dd.MM.yyyy hh:mm:ss") +
-                                                    QString("', 'DD.MM.YYYY HH24:MI:SS')::timestamp"))
-        .arg (cfm->receiveDatetime().isNull() ? QString("NULL") :
-                                             QString ("to_timestamp('") +
-                                                cfm->receiveDatetime().toString ("dd.MM.yyyy hh:mm:ss") +
-                                                    QString("', 'DD.MM.YYYY HH24:MI:SS')::timestamp"))                                                        ;
+    QString sql = QString("select kkssitoversion1()");
+    KKSResult * res = dbWrite->execute(sql);
+    if (res && res->getRowCount() == 1){
+        QString ver = res->getCellAsString (0, 0);
+        if(ver == ping->versionFrom())
+            resp.setResult(3);
+        else
+            resp.setResult(4);
+    }
+    else
+        resp.setResult(4);
 
-    KKSResult * res = dbWrite->execute (sql);
-    if (res && res->getRowCount() == 1)
-        result = res->getCellAsInt (0, 0);
-    delete res;
+    if(res)
+        delete res;
 
-*/
-    return result;
+    generateQueueResponse(resp);
+
+    return OK_CODE;
 }
 
 JKKSCategoryPair JKKSLoader::mapToPair(const QMap<qint64, JKKSCategory> & cats) const
@@ -4087,6 +4097,58 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readQueueResults (QStringList & receive
     return result;
 }
 
+QList<JKKSPMessWithAddr *> JKKSLoader :: readPingResults (QStringList & receivers) const
+{
+    QList<JKKSPMessWithAddr *> result;
+    
+    QString sql = QString ("select * from uGetPingResults()");
+    KKSResult * res = dbRead->execute (sql);
+    if (!res)
+        return result;
+
+    for (int i=0; i<res->getRowCount(); i++)
+    {
+        JKKSAddress addr(res->getCellAsString (i, 0), 
+                         res->getCellAsInt (i, 5),
+                         res->getCellAsBool(i, 7));
+
+        int idOrgTo = res->getCellAsInt (i, 3);//здесь будет получено отрицательное число
+        idOrgTo *= -1;
+
+        JKKSPing * ping = new JKKSPing (res->getCellAsInt (i, 1),
+                                        addr,
+                                        QString(),
+                                        true);
+        
+        ping->setCompleted(true);
+        ping->setCreated(1);
+        ping->setIdOrgTo(idOrgTo);
+        ping->setState1(1);
+        ping->setState2(1);
+        ping->setState3(1);
+        ping->setState4(res->getCellAsInt(i, 4) == 3 ? 1 : 0);
+        ping->setUidFrom(res->getCellAsString(i, 6));//email_prefix
+        ping->setUidTo(this->senderUID);//email_prefix
+        //ping->setVersionTo();
+
+
+        JKKSPMessage pM(ping->serialize(), ping->getMessageType());
+        pM.setVerifyReceiver(false);
+        pM.setSenderUID(this->senderUID);
+        pM.setReceiverUID(res->getCellAsString(i, 6)); //email_prefix
+
+        JKKSPMessWithAddr * pMessWithAddr = new JKKSPMessWithAddr (pM, ping->getAddr(), ping->id());
+        pMessWithAddr->unp = res->getCellAsString(i, 6); //email_prefix
+        if (pMessWithAddr)
+            result.append (pMessWithAddr);
+
+        if(!receivers.contains(pM.receiverUID()))
+            receivers.append(pM.receiverUID());
+    }
+    
+    return result;
+}
+
 int JKKSLoader :: writeMessage (JKKSQueueResponse *response) const
 {
     if (!response)
@@ -4108,8 +4170,9 @@ qint64 JKKSLoader :: writeReceipt (JKKSQueueResponse& response) const
     
 //    qWarning () << __PRETTY_FUNCTION__ << response.id();
     
-    if (response.getExternalId() < 0)
-        return ERROR_CODE;
+    //external_id Может быть отрицательным для ответов на пинги!
+    //if (response.getExternalId() < 0)
+    //    return ERROR_CODE;
 
     QString sql (QString("select addQueueResult (%1, %2, '%3', %4, '%5', %6);")
                          .arg (response.getExternalId())
@@ -5123,23 +5186,138 @@ JKKSWorkMode JKKSLoader :: readWM (qint64 idWM) const
     return wm;
 }
 
-QMap<qint64, JKKSPing> JKKSLoader :: createPings(const QStringList & receivers) const 
+QMap<QString, JKKSPing> JKKSLoader :: createPings(const QStringList & receivers) const 
 {
-    QMap<qint64, JKKSPing> pings;
+    QMap<QString, JKKSPing> pings;
+
+    QString emailPrefixes;
+    for(int i=0; i<receivers.count(); i++){
+        emailPrefixes.append(QString("'") + receivers.at(i) + QString("'"));
+        if(i < receivers.count()-1)
+            emailPrefixes.append(", ");
+    }
+
+    QString sql = QString ("select * from uGetPings(ARRAY[%1])").arg(emailPrefixes);
+    KKSResult * res = dbRead->execute (sql);
+    if (!res)
+        return pings;
+    
+    for (int i=0; i<res->getRowCount(); i++)
+    {
+        JKKSAddress addr(res->getCellAsString (i, 6), 
+                         res->getCellAsInt (i, 8),
+                         res->getCellAsBool(i, 9));
+
+        JKKSPing ping = JKKSPing(res->getCellAsInt64 (i, 0),
+                                 addr);
+
+        ping.setSenderAddress(getLocalAddress());
+        ping.setCompleted(res->getCellAsBool(i, 11));
+        ping.setCreated(res->getCellAsInt(i, 10));
+        ping.setIdOrgFrom(res->getCellAsInt(i, 14));
+        ping.setIdOrgTo(res->getCellAsInt64(i, 0));
+        ping.setNameFrom(res->getCellAsString(i, 15));
+        ping.setNameTo(res->getCellAsString(i, 1));
+        ping.setUidFrom(res->getCellAsString(i, 19));
+        ping.setUidTo(res->getCellAsString(i, 3));
+        ping.setVersionFrom(res->getCellAsString(i, 13));
+        
+        pings.insert(ping.uidTo(), ping);
+    }
+    
+    delete res;
 
     return pings;
 }
 
-QMap<qint64, JKKSPing> JKKSLoader :: createPings() const
+QMap<QString, JKKSPing> JKKSLoader :: createPings() const
 {
-    QMap<qint64, JKKSPing> pings;
+    QMap<QString, JKKSPing> pings;
 
+    QString sql = QString ("select * from uGetPings()");
+    KKSResult * res = dbRead->execute (sql);
+    if (!res)
+        return pings;
+    
+    for (int i=0; i<res->getRowCount(); i++)
+    {
+        JKKSAddress addr(res->getCellAsString (i, 6), 
+                         res->getCellAsInt (i, 8),
+                         res->getCellAsBool(i, 9));
+        
+        JKKSPing ping = JKKSPing(res->getCellAsInt64 (i, 0),
+                                 addr);
+
+        ping.setSenderAddress(getLocalAddress());
+        ping.setCompleted(res->getCellAsBool(i, 11));
+        ping.setCreated(res->getCellAsInt(i, 10));
+        ping.setIdOrgFrom(res->getCellAsInt(i, 14));
+        ping.setIdOrgTo(res->getCellAsInt64(i, 0));
+        ping.setNameFrom(res->getCellAsString(i, 15));
+        ping.setNameTo(res->getCellAsString(i, 1));
+        ping.setUidFrom(res->getCellAsString(i, 19));
+        ping.setUidTo(res->getCellAsString(i, 3));
+        ping.setVersionFrom(res->getCellAsString(i, 13));
+        
+        pings.insert(ping.uidTo(), ping);
+    }
+
+    delete res;
+    
     return pings;
 }
 
-JKKSPing JKKSLoader :: createPing(qint64 idOrg) const
+JKKSPing JKKSLoader :: createPing(const QString & uidOrg) const
 {
     JKKSPing ping;
 
+    QString sql = QString ("select * from uGetPings('%1')").arg(uidOrg);
+    KKSResult * res = dbRead->execute (sql);
+    if (!res)
+        return ping;
+    
+    JKKSAddress addr(res->getCellAsString (0, 6), 
+                     res->getCellAsInt (0, 8),
+                     res->getCellAsBool(0, 9));
+
+    ping = JKKSPing(res->getCellAsInt64 (0, 0),
+                    addr);
+
+    ping.setSenderAddress(getLocalAddress());
+    ping.setCompleted(res->getCellAsBool(0, 11));
+    ping.setCreated(res->getCellAsInt(0, 10));
+    ping.setIdOrgFrom(res->getCellAsInt(0, 14));
+    ping.setIdOrgTo(res->getCellAsInt64(0, 0));
+    ping.setNameFrom(res->getCellAsString(0, 15));
+    ping.setNameTo(res->getCellAsString(0, 1));
+    ping.setUidFrom(res->getCellAsString(0, 19));
+    ping.setUidTo(res->getCellAsString(0, 3));
+    ping.setVersionFrom(res->getCellAsString(0, 13));
+        
+    delete res;
+
     return ping;
+}
+
+QList<JKKSPMessWithAddr *> JKKSLoader :: pingsToPMessWithAddr(const QMap<QString, JKKSPing> pings)
+{
+    QList<JKKSPMessWithAddr *> result;
+
+    for (QMap<QString, JKKSPing>::const_iterator pa = pings.constBegin(); pa != pings.constEnd(); pa++)
+    {
+        JKKSPing ping (pa.value());
+    
+        JKKSPMessage pM(ping.serialize(), ping.getMessageType());
+        pM.setVerifyReceiver(false);
+        pM.setSenderUID(ping.uidFrom());
+        pM.setReceiverUID(ping.uidTo()); //email_prefix
+
+        
+        JKKSPMessWithAddr * pMessWithAddr = new JKKSPMessWithAddr (pM, ping.getAddr(), ping.id());
+        pMessWithAddr->unp = ping.uidTo(); //email_prefix
+        if (pMessWithAddr)
+            result.append (pMessWithAddr);
+    }
+
+    return result;
 }

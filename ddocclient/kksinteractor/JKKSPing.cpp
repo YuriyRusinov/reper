@@ -7,7 +7,7 @@
 #include "defines.h"
 
 
-JKKSPing:: JKKSPing (qint64 id, const JKKSAddress & addr, const QString & kvs)
+JKKSPing:: JKKSPing (qint64 id, const JKKSAddress & addr, const QString & kvs, bool isResponse)
     : JKKSMessage (addr, kvs), 
     m_id(id),
     m_idOrgFrom(-1),
@@ -23,7 +23,9 @@ JKKSPing:: JKKSPing (qint64 id, const JKKSAddress & addr, const QString & kvs)
     m_uidFrom(QString()),
     m_uidTo(QString()),
     m_nameFrom(QString()),
-    m_nameTo(QString())
+    m_nameTo(QString()),
+    m_isResponse(isResponse),
+    m_senderAddress(JKKSAddress())
 {
 }
 
@@ -43,7 +45,9 @@ JKKSPing :: JKKSPing(const JKKSPing & ping)
     m_uidFrom(ping.m_uidFrom),
     m_uidTo(ping.m_uidTo),
     m_nameFrom(ping.m_nameFrom),
-    m_nameTo(ping.m_nameTo)
+    m_nameTo(ping.m_nameTo),
+    m_isResponse(ping.m_isResponse),
+    m_senderAddress(ping.m_senderAddress)
 {
 }
 
@@ -81,6 +85,10 @@ QByteArray JKKSPing::serialize (void) const
     out << m_nameFrom;
     out << m_nameTo;
 
+    out << m_isResponse;
+
+    out << m_senderAddress;
+
     return qBuffer.buffer();
 }
 
@@ -117,6 +125,10 @@ int JKKSPing::unserialize (const QByteArray& mess)
     in >> m_nameFrom;
     in >> m_nameTo;
 
+    in >> m_isResponse;
+
+    in >> m_senderAddress;
+
     setAddr (addr);
     setCode (code);
 
@@ -132,7 +144,10 @@ int JKKSPing::writeToDB (const JKKSLoader * loader, const QString& senderUID, co
 
 JKKSMessage::JKKSMessageType JKKSPing::getMessageType (void) const
 {
-    return JKKSMessage::atPing;
+    if(!m_isResponse)
+        return JKKSMessage::atPing;
+
+    return JKKSMessage::atPingResponse;
 }
 
 qint64 JKKSPing::id (void) const
@@ -264,3 +279,111 @@ void JKKSPing::setNameTo(const QString & n)
 {
     m_nameTo = n;
 }
+
+const QString & JKKSPing::versionFrom() const
+{
+    return m_versionFrom;
+}
+
+const QString & JKKSPing::versionTo() const
+{
+    return m_versionTo;
+}
+
+void JKKSPing::setVersionFrom(const QString & v)
+{
+    m_versionFrom = v;
+}
+
+void JKKSPing::setVersionTo(const QString & v)
+{
+    m_versionTo = v;
+}
+
+void JKKSPing::setSenderAddress(const JKKSAddress & addr)
+{
+    m_senderAddress.setAddress(addr.address());
+    m_senderAddress.setPort(addr.port());
+    m_senderAddress.setUseGateway(addr.useGateway());
+}
+
+const JKKSAddress & JKKSPing::senderAddress() const
+{
+    return m_senderAddress;
+}
+
+
+bool JKKSPing::operator == (const JKKSPing & in) const
+{
+    if(m_completed != in.m_completed)
+        return false;
+    if(m_created != in.m_created)
+        return false;
+    if(m_id != in.m_id)
+        return false;
+    if(m_idOrgFrom != in.m_idOrgFrom)
+        return false;
+    if(m_idOrgTo != in.m_idOrgTo)
+        return false;
+    if(m_uidFrom != in.m_uidFrom)
+        return false;
+    if(m_uidTo != in.m_uidTo)
+        return false;
+    if(m_uidFrom != in.m_uidFrom)
+        return false;
+    if(m_nameFrom != in.m_nameFrom)
+        return false;
+    if(m_nameTo != in.m_nameTo)
+        return false;
+    if(m_versionFrom != in.m_versionFrom)
+        return false;
+    if(m_versionTo != in.m_versionTo)
+        return false;
+    if(m_state1 != in.m_state1)
+        return false;
+    if(m_state2 != in.m_state2)
+        return false;
+    if(m_state3 != in.m_state3)
+        return false;
+    if(m_state4 != in.m_state4)
+        return false;
+    if(m_isResponse != m_isResponse)
+        return false;
+    if(m_senderAddress.address() != in.m_senderAddress.address())
+        return false;
+    if(m_senderAddress.port() != in.m_senderAddress.port())
+        return false;
+    if(m_senderAddress.useGateway() != in.m_senderAddress.useGateway())
+        return false;
+
+    return true;
+}
+
+JKKSPing & JKKSPing::operator = ( const JKKSPing & in )
+{
+    m_completed = in.m_completed;
+    m_created = in.m_created;
+    m_id = in.m_id;
+    m_idOrgFrom = in.m_idOrgFrom;
+    m_idOrgTo = in.m_idOrgTo;
+    m_uidFrom = in.m_uidFrom;
+    m_uidTo = in.m_uidTo;
+    m_uidFrom = in.m_uidFrom;
+    m_nameFrom = in.m_nameFrom;
+    m_nameTo = in.m_nameTo;
+    m_versionFrom = in.m_versionFrom;
+    m_versionTo = in.m_versionTo;
+    m_state1 = in.m_state1;
+    m_state2 = in.m_state2;
+    m_state3 = in.m_state3;
+    m_state4 = in.m_state4;
+    m_isResponse = in.m_isResponse;
+
+    m_senderAddress.setAddress(in.m_senderAddress.address());
+    m_senderAddress.setPort(in.m_senderAddress.port());
+    m_senderAddress.setUseGateway(in.m_senderAddress.useGateway());
+
+    return * this;
+}
+
+    

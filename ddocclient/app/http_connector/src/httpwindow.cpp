@@ -18,6 +18,8 @@ HttpWindow::HttpWindow(QWidget *parent)
 {
     QSettings settings (QCoreApplication::applicationDirPath ()+"/http.ini", QSettings::IniFormat);
     
+    m_doNotStart = false;
+
     QString dbName;//(settings.value("Database/database", "tsync_db1").toString());
     QString host;//(settings.value("Database/host", "192.168.17.176").toString());
     QString user;//(settings.value("Database/user", "jupiter").toString());
@@ -57,7 +59,7 @@ HttpWindow::HttpWindow(QWidget *parent)
         QMessageBox::critical(this, tr("DynamicDocs Interactor "),
                               tr("Unable to start the server: %1.")
                               .arg(tcpServer->errorString()));
-        close();
+        m_doNotStart = true;
         return;
     }
 
@@ -74,7 +76,7 @@ HttpWindow::HttpWindow(QWidget *parent)
         QMessageBox::critical(this, tr("DynamicDocs Interactor"),
                               tr("Unable to connect to the database: %1.")
                               .arg(host));
-        close();
+        m_doNotStart = true;
         return;
     }
 
@@ -92,14 +94,21 @@ HttpWindow::HttpWindow(QWidget *parent)
     buttonBox->addButton(quitButton, QDialogButtonBox::RejectRole);
 
     http = new QHttp(this);
+    pingHttp = new QHttp(this);
 
     //срабатывает, когда в методе httpRequestFinished пришел очередной ответ и удалена запись из списка http_messages
     connect(this, SIGNAL(httpMessageRemoved(int)), this, SLOT(slotHttpMessageRemoved(int)));
 
     connect(http, SIGNAL(requestFinished(int, bool)),
             this, SLOT(httpRequestFinished(int, bool)));
-    connect(http, SIGNAL(responseHeaderReceived(const QHttpResponseHeader &)),
-            this, SLOT(readResponseHeader(const QHttpResponseHeader &)));
+    //connect(http, SIGNAL(responseHeaderReceived(const QHttpResponseHeader &)),
+    //        this, SLOT(readResponseHeader(const QHttpResponseHeader &)));
+
+    connect(pingHttp, SIGNAL(requestFinished(int, bool)),
+            this, SLOT(pingHttpRequestFinished(int, bool)));
+    //connect(pingHttp, SIGNAL(responseHeaderReceived(const QHttpResponseHeader &)),
+    //        this, SLOT(pingHttpReadResponseHeader(const QHttpResponseHeader &)));
+
 
     connect(startButton, SIGNAL(clicked()), this, SLOT(startTimer()));
     connect(quitButton, SIGNAL(clicked()), this, SLOT(close()));
@@ -116,8 +125,10 @@ HttpWindow::HttpWindow(QWidget *parent)
 
     TimerForm * timerForm = new TimerForm ();
     
-    if (!timerForm)
+    if (!timerForm){
+        m_doNotStart = true;
         return ;
+    }
     
     if (timerForm->exec () != QDialog::Accepted)
     {
@@ -140,6 +151,8 @@ HttpWindow::HttpWindow(QWidget *parent)
     cntMsgSended = 0;
     cntFilePartsSended = 0;
     filePartsForSent = 0;
+    cntPingsSended = 0;
+    pingsForSent = 0;
 }
 
 
@@ -171,11 +184,54 @@ void HttpWindow::startProc()
     statusLabel->setText(tr("Waiting for data to sent..."));
    
     QStringList receivers;
-    messageList = loader->readMessages(receivers);
-    if(receivers.isEmpty())
-        return;
+    
+    //сначала отправим ответы на полученные ранее пинги
+    messageList = loader->readPingResults(receivers);
+    if(messageList.count() > 0 )
+    {
+        httpMessages.clear();
 
-    QMap<qint64, JKKSPing> pings = loader->createPings(receivers);
+        for (QList<JKKSPMessWithAddr *>::const_iterator iterator = messageList.constBegin();iterator != messageList.constEnd();++iterator)
+        {
+            bool stat = sendOutMessage((*iterator), true, false) ;
+        }
+
+        while(!messageList.isEmpty())
+            delete messageList.takeFirst();
+    }
+    
+    receivers.clear();
+    
+    messageList = loader->readMessages(receivers);
+    if(receivers.isEmpty()){
+        startButton->setEnabled(true);
+        if(manual == false)
+            m_timer->start();
+        return;
+    }
+
+    //потом отправим пинги ("пузыри") во все организации, на которые необходимо отправить данные
+    //в случае, если на какие-либо организации пинги прошли неудачно - на такие организации данные не отправляем
+    //отправляем пинги асинхронно
+    //а далее ждем все ответы, и когда все ответы придут - обновляем набор пингов и начинаем отправку сообщений
+    m_pings = loader->createPings(receivers);
+    pingsForSent = m_pings.count();
+    cntPingsSended = 0;
+
+    //* Рассылаем пинги и ждем пока этот процесс не завершится*/ 
+	QEventLoop eventLoop;
+	connect(this,SIGNAL(pingsSentCompleted()),&eventLoop,SLOT(quit()));
+    if(sendPings() != 0)
+        eventLoop.exec();
+    else{
+        startButton->setEnabled(true);
+        if(manual == false){
+            m_timer->start();
+        }
+
+        return;
+    }
+    //**/
 
     QList<JKKSFilePart *> files = loader->readFileParts();
     
@@ -385,7 +441,6 @@ void HttpWindow::httpRequestFinished(int requestId, bool error)
             qCritical() << "ERROR: Cannot mark message as sended! Database Error";
         }
     }
-
 }
 
 void HttpWindow::slotHttpMessageRemoved(int sendedCount)
@@ -404,6 +459,7 @@ void HttpWindow::slotHttpMessageRemoved(int sendedCount)
         startButton->setEnabled(true); //если активен ручной (отладочный) режим - делаем доступной кнопку отправки
 }
 
+/*
 void HttpWindow::readResponseHeader(const QHttpResponseHeader &responseHeader)
 {
     qWarning() << "In readResponseHeader()";
@@ -427,6 +483,7 @@ void HttpWindow::readResponseHeader(const QHttpResponseHeader &responseHeader)
         //}
     }
 }
+*/
 
 bool HttpWindow::setMessageAsSended(const qint64 & id, const int & type, bool sended)
 {
@@ -449,6 +506,22 @@ bool HttpWindow::sendOutMessage(const JKKSPMessWithAddr * message,
 
     if(http == NULL)
         return false;
+
+    //для ответов на пинги не надо проверять активен ли получатель
+    if(message->pMess.getType() != JKKSMessage::atPingResponse){
+        QString receiver = message->pMess.receiverUID();
+        JKKSPing ping = m_pings.value(receiver);
+        if( ping.created() != 1 ||
+            !ping.completed() ||
+            ping.state1() != 1 ||
+            ping.state2() != 1 ||
+            ping.state3() != 1 ||
+            ping.state4() != 1)
+        {
+            qCritical() << "Destination organization does not active! Data sending for that skipped!";
+            return false;
+        }
+    }
 
     QByteArray byteArray = message->pMess.serialize();  
     if(byteArray.size() == 0)
@@ -483,7 +556,7 @@ bool HttpWindow::sendOutMessage(const JKKSPMessWithAddr * message,
 
     //создаем строку сообщения в унифицированном прикладном протоколе передачи данных ТПС
     QString s = QString("mesid=%1%2&unp=%3&data=\"")
-                          .arg(QString::number(message->id)) //идентификатор сообщения из соответствующей таблице
+                          .arg(QString::number(message->id)) //идентификатор сообщения из соответствующей таблицы
                           .arg(mesId) 
                           .arg(message->unp.isEmpty() ? QString("1919") : message->unp);//Условный номер получателя (используем email_prefix)
 
@@ -606,16 +679,7 @@ void HttpWindow::loadData()
     }
 
     if(numReadTotal == 0){
-
-        QByteArray block;
-
-        QHttpResponseHeader response = QHttpResponseHeader( 200 , "HTTP/1.1 200 OK" );
-		QString str = response.toString();
-		block.append(str);
-        clientConnection->write(block);
-        
-        clientConnection->disconnectFromHost();
-        
+        sendOKBlock(clientConnection, false);
         return;
     }
 
@@ -645,22 +709,12 @@ void HttpWindow::loadData()
             processMessage(byteArray, clientConnection);
         }
         else{
-            QByteArray block;
-
-            QHttpResponseHeader response = QHttpResponseHeader( 400 , "HTTP/1.1 400 Bad Request" );
-            QString str = response.toString();
-            block.append(str);
-            clientConnection->write(block);
+            sendBadBlock(clientConnection);
         }
      }
     else
     {
-        QByteArray block;
-
-        QHttpResponseHeader response = QHttpResponseHeader( 400 , "HTTP/1.1 400 Bad Request" );
-        QString str = response.toString();
-        block.append(str);
-        clientConnection->write(block);
+        sendBadBlock(clientConnection);
     }
 
     clientConnection->disconnectFromHost();
@@ -670,23 +724,13 @@ int HttpWindow::processMessage(const QByteArray & ba, QTcpSocket * clientConnect
 {
 
     if(!ba.contains("mesid=") ||  (!ba.contains("&uno=") && !ba.contains("&unp=")) || !ba.contains("&data=\"") || !ba.contains("&hash=\"")){
-        QByteArray block;
-
-        QHttpResponseHeader response = QHttpResponseHeader( 400 , "HTTP/1.1 400 Bad Request" );
-        QString str = response.toString();
-        block.append(str);
-        clientConnection->write(block);
+        sendBadBlock(clientConnection);
         return -1;
     }
 
     int index = ba.indexOf("&data=\"");
     if(index < 13){ //если даже числа 1 и 1, то данная подстрока встретится не ранее чем на 13-й позиции
-        QByteArray block;
-
-        QHttpResponseHeader response = QHttpResponseHeader( 400 , "HTTP/1.1 400 Bad Request" );
-        QString str = response.toString();
-        block.append(str);
-        clientConnection->write(block);
+        sendBadBlock(clientConnection);
         return -1;
     }
 
@@ -704,12 +748,7 @@ int HttpWindow::processMessage(const QByteArray & ba, QTcpSocket * clientConnect
     QByteArray hash = QCryptographicHash::hash(byteArray, QCryptographicHash::Sha1);
     if(etaloneHash != hash){
         qCritical() << "ERROR! Hash sum inconsistent!";
-        QByteArray block;
-
-        QHttpResponseHeader response = QHttpResponseHeader( 400 , "HTTP/1.1 400 Bad Request" );
-        QString str = response.toString();
-        block.append(str);
-        clientConnection->write(block);
+        sendBadBlock(clientConnection);
         return -1;
     }
 
@@ -718,16 +757,21 @@ int HttpWindow::processMessage(const QByteArray & ba, QTcpSocket * clientConnect
     //эталонная hash-сумма пришедших данных
     QByteArray storedHash = pMessage.cryptoHash();
             
+    //если пришло сообщение - ответ на пинг, то необходимо обработать его и завершить работу метода
+    //при этом важно увеличить количество отправленных пингов на один
+    //и если их кол-во равно кол-ву подготовленных для отправко - сгенерировать сигналы
+    if(pMessage.getType() == (int)JKKSMessage::atPingResponse){
+        JKKSPing * ping = (JKKSPing *)loader->unpackMessage(pMessage);
+        processPingResponse(ping);
+        sendOKBlock(clientConnection, true);
+        return 1;
+    }
+
     int res = loader->writeMessage(pMessage);
     if(res <= 0){
         qDebug() << "Message type: " << pMessage.getType();
         qDebug() << "Write message status : " << res;
     }
-
-   
-    QHttpResponseHeader response; 
-    QByteArray block;
-    QString str;
 
     //в настоящее время мы полагаем, что вне зависимости от результата обработки входящего сообщения в БД
     //мы в качестве ответа на запрос объекта-отправителя (ну или шлюза (ТПС)) возвращаем OK
@@ -735,28 +779,15 @@ int HttpWindow::processMessage(const QByteArray & ba, QTcpSocket * clientConnect
     //при этом результат обработки будет отправлен отдельно в виде спец. квитанции
     if(res == ERROR_CODE)
     {
-		response = QHttpResponseHeader( 400 , "HTTP/1.1 200 OK" );
-		str = response.toString();
-		block.append(str);
-        block.append("OK");
-
-        clientConnection->write(block);
+        sendOKBlock(clientConnection, true);
     }
     else if(res == OK_CODE)
     {
-		response = QHttpResponseHeader( 200 , "HTTP/1.1 200 OK" );
-		QString str = response.toString();
-		block.append(str);
-        block.append(QString("OK"));
-        clientConnection->write(block);
+        sendOKBlock(clientConnection, true);    
     }
     else if(res == IGNORE_CODE)
     {
-		response = QHttpResponseHeader( 204 , "HTTP/1.1 200 OK" );
-		QString str = response.toString();
-		block.append(str);
-        block.append("OK");
-        clientConnection->write(block);
+        sendOKBlock(clientConnection, true);
     }
 
     return 1;
@@ -770,12 +801,7 @@ int HttpWindow::processMessage(const QByteArray & ba, QTcpSocket * clientConnect
 int HttpWindow::processNotification(const QByteArray & ba, QTcpSocket * clientConnection)
 {
     if(!ba.contains("mesid=") ||  (!ba.contains("&uno=") && !ba.contains("&unp=")) || !ba.contains("&received=")){
-        QByteArray block;
-
-        QHttpResponseHeader response = QHttpResponseHeader( 400 , "HTTP/1.1 400 Bad Request" );
-        QString str = response.toString();
-        block.append(str);
-        clientConnection->write(block);
+        sendBadBlock(clientConnection);
         return -1;
     }
 
@@ -789,12 +815,7 @@ int HttpWindow::processNotification(const QByteArray & ba, QTcpSocket * clientCo
     idMsg = byteArray.toLongLong();
     if(idMsg <= 0){
         qCritical() << "ERROR! Cannot parse MESID of the notification";
-        QByteArray block;
-
-        QHttpResponseHeader response = QHttpResponseHeader( 400 , "HTTP/1.1 400 Bad Request" );
-        QString str = response.toString();
-        block.append(str);
-        clientConnection->write(block);
+        sendBadBlock(clientConnection);
         return -1;
     }
 
@@ -802,44 +823,35 @@ int HttpWindow::processNotification(const QByteArray & ba, QTcpSocket * clientCo
     msgType = byteArray.toInt();
     if(msgType < 0){
         qCritical() << "ERROR! Cannot parse MESID (type part) of the notification";
-        QByteArray block;
-
-        QHttpResponseHeader response = QHttpResponseHeader( 400 , "HTTP/1.1 400 Bad Request" );
-        QString str = response.toString();
-        block.append(str);
-        clientConnection->write(block);
+        sendBadBlock(clientConnection);
         return -1;
     }
 
 
     index = ba.indexOf("&received=");
     if(index < 13){ //если даже числа 1 и 1, то данная подстрока встретится не ранее чем на 13-й позиции
-        QByteArray block;
-
-        QHttpResponseHeader response = QHttpResponseHeader( 400 , "HTTP/1.1 400 Bad Request" );
-        QString str = response.toString();
-        block.append(str);
-        clientConnection->write(block);
+        sendBadBlock(clientConnection);
         return -1;
     }
-
-    QHttpResponseHeader response; 
-    QByteArray block;
-    QString str;
 
     byteArray = ba.mid(index + 9);
     int receiverResult = byteArray.toInt();
     bool ok = false;
 
+    //обрабатываем пинги
+    //если пришел ответ на передачу пинга, то надо обновить значение соответствующего пинга в списке и завершить работу метода
+    //если результат квитанции положительный, количество отправленных пингов не увеличиваем, т.к. ждем, пока из целеволй БД придет результат обработки в ней отправленного пинга
+    //если отрицательный - то число отправленных пингов увеличиваем на один, т.к. другого ответа не будет
+    if(msgType == (int)JKKSMessage::atPing){
+
+        processPingNotification(idMsg, receiverResult);
+        sendOKBlock(clientConnection, true);
+
+        return 1;
+    }
+
     if(receiverResult != 1){
         qCritical() << "ERROR: Message with id = " << idMsg << " and type = " << msgType << " does not received by receiver! Result = " << receiverResult;
-        
-		response = QHttpResponseHeader( 200 , "HTTP/1.1 200 OK" );
-		QString str = response.toString();
-		block.append(str);
-        block.append(QString("OK"));
-
-        clientConnection->write(block);
         ok = setMessageAsSended(idMsg, msgType, false);
      }
     else {
@@ -849,24 +861,326 @@ int HttpWindow::processNotification(const QByteArray & ba, QTcpSocket * clientCo
     if(!ok)
     {
         qCritical() << "ERROR: Cannot mark message as sended! Database Error. idMsg = " << idMsg << " type = " << msgType;
-        
-        response = QHttpResponseHeader( 400 , "HTTP/1.1 200 OK" );
-		str = response.toString();
-		block.append(str);
-        block.append("OK");
-
-        clientConnection->write(block);
+        sendOKBlock(clientConnection, true);        
     }
     else
     {
-		response = QHttpResponseHeader( 200 , "HTTP/1.1 200 OK" );
-		QString str = response.toString();
-		block.append(str);
-        block.append(QString("OK"));
-
-        clientConnection->write(block);
+        sendOKBlock(clientConnection, true);
     }
 
 
     return 1;
 }
+
+//обрабатываем пинги
+//если пришел ответ на передачу пинга, то надо обновить значение соответствующего пинга в списке и завершить работу метода
+//если результат квитанции положительный, количество отправленных пингов не увеличиваем, т.к. ждем, пока из целеволй БД придет результат обработки в ней отправленного пинга
+//если отрицательный - то число отправленных пингов увеличиваем на один, т.к. другого ответа не будет
+//если все пинги отправлены - генерируем сигналы
+int HttpWindow::processPingNotification(int idMsg, int result)
+{
+    if(result != 1){
+        qCritical() << "ERROR! Destination organization cannot receive ping!";
+        cntPingsSended++;
+    }
+
+    for (QMap<QString, JKKSPing>::iterator pa = m_pings.begin(); pa != m_pings.end(); pa++){
+        if(pa.value().id() == idMsg){
+            pa.value().setState1(result != 1 ? 0 : 1);
+            pa.value().setState2(1);
+            //pa.value().setState3(0);
+            //pa.value().setState4(0);
+        }
+    }
+    
+    if(pingsForSent <= cntPingsSended){
+        emit pingsSended(m_pings);
+        emit pingsSentCompleted();
+    }
+
+    return 1;
+}
+
+//если пришло сообщение - ответ на пинг, то необходимо обработать его и завершить работу метода
+//при этом важно увеличить количество отправленных пингов на один
+//и если их кол-во равно кол-ву подготовленных для отправко - сгенерировать сигналы
+int HttpWindow::processPingResponse(const JKKSPing * ping)
+{
+    if(!ping){
+        return 1;
+    }
+
+    cntPingsSended++;
+
+    for (QMap<QString, JKKSPing>::iterator pa = m_pings.begin(); pa != m_pings.end(); pa++){
+        //поскольку в ответе на пинг нет информации какой был идентификатор у организации-отправителя пинга 
+        //(а именно он используется в качестве JKKSPing::id())
+        //То проверку осуществляем по идентификатору организации-получателя пинга (в таблице БД отправителя пинга).
+        //он заносится в качестве id_external_queue (отрицательного) на целевой БД
+        if(pa.value().idOrgTo() == ping->idOrgTo()){ 
+            pa.value().setVersionTo(ping->versionTo());
+            pa.value().setState1(ping->state1());
+            pa.value().setState2(ping->state2());
+            pa.value().setState3(ping->state3());
+            pa.value().setState4(ping->state4());
+        }
+    }
+    
+    if(pingsForSent <= cntPingsSended){
+        emit pingsSended(m_pings);
+        emit pingsSentCompleted();
+    }
+
+    return 1;
+}
+
+int HttpWindow::sendPings()
+{
+    if(m_pings.isEmpty()){
+        emit pingsSentCompleted();
+        return 0;
+    }
+    
+    QList<JKKSPMessWithAddr *> pingList = JKKSLoader::pingsToPMessWithAddr(m_pings);
+
+    for (QList<JKKSPMessWithAddr *>::const_iterator iterator = pingList.constBegin();iterator != pingList.constEnd();++iterator)
+    {
+        bool stat = sendOutPing((*iterator)) ;
+    }
+
+    while(!pingList.isEmpty())
+        delete pingList.takeFirst();
+
+    return 1;
+
+}
+
+bool HttpWindow::sendOutPing(const JKKSPMessWithAddr *ping)
+{
+    
+    qWarning() << "In sendOutPing()";
+
+    if(ping == NULL)
+        return false;
+
+    if(pingHttp == NULL)
+        return false;
+
+    QByteArray byteArray = ping->pMess.serialize();  
+    if(byteArray.size() == 0)
+        return false;
+    
+    QByteArray hash = QCryptographicHash::hash(byteArray, QCryptographicHash::Sha1);
+
+    QString unp = ping->unp;
+
+    //base64
+    byteArray = byteArray.toBase64();
+    //zip
+    byteArray = qCompress(byteArray, 9);
+
+    //ВАЖНО!!! 
+    //Для передачи данных через шлюз ТПС используется механизм псевдофасетного кодирования идентификатора пересылаемого сообщения
+    //В конец строкового представления идентификатора пересылаемого сообщения добавляются два байта (две цифры), характеризующие тип
+    //(т.е. из какой таблицы взят идентификатор). Эта особенность не влияет на логику обработки пересылаемых данных посредством kksinteractor и http_connector
+    //однако в теле почтового сообщения, отдаваемого в шлюз ТПС, учитывается.
+    //
+    //Формат сообщения: mesid=<ID><type_digit_1><type_digit_2>&unp=<email_prefix>&data="........(base64)......"
+    //Если тип имеет одну цифру, перед ней ставится 0. т.е. 00 - atCommand, 02 - atDocument, и т.д.
+    
+    QString mesId;
+    int t = JKKSMessage::atPing; // = 13
+    if(t >= 0 && t <= 9){
+        mesId = QString("0%1").arg(QString::number(t));
+    }
+    else{
+        mesId = QString("%1").arg(QString::number(t));
+    }
+
+    //создаем строку сообщения в унифицированном прикладном протоколе передачи данных ТПС
+    QString s = QString("mesid=%1%2&unp=%3&data=\"")
+                          .arg(QString::number(ping->id)) //идентификатор пинга. Равен идентификатору организации из таблицы organization
+                          .arg(mesId) 
+                          .arg(ping->unp.isEmpty() ? QString("1919") : ping->unp);//Условный номер получателя (используем email_prefix)
+
+    byteArray.prepend(s.toAscii());
+    byteArray.append("\"");
+    //hash-сумма
+    byteArray.append("&hash=\"");
+    hash = hash.toBase64();
+    byteArray.append(hash);
+    byteArray.append("\"");
+    
+
+    JKKSAddress addr = ping->addr;
+
+    QString recvHost;
+    int recvPort;
+
+    //если в параметрах транспорта объекта-получателя сказано, что для доставки сообщений необходимо использовать шлюз (ТПС) ...
+    // и при этом локальный http_connector подключен к этому шлюзу (ТПС)
+    if(addr.useGateway() && !gatewayHost.isEmpty() && gatewayPort > 0){
+        recvHost = gatewayHost;
+        recvPort = gatewayPort;
+    }
+    else{ //в противном случае отправляем сообщение напрямую на http_connector целевого объекта
+        recvHost = addr.address();
+        recvPort = addr.port();
+    }
+    
+    QUrl url;
+    url.setHost(recvHost);
+    url.setPort(recvPort);
+    url.setScheme("http");
+    
+    QHttp::ConnectionMode mode = url.scheme().toLower() == "https" ? QHttp::ConnectionModeHttps : QHttp::ConnectionModeHttp;
+    QString h = url.host();
+    int p = url.port(8080);
+    
+    pingHttp->setHost(h, mode, p);
+
+    QByteArray path = QUrl::toPercentEncoding(url.path(), "!$&'()*+,;=:@/");
+    if (path.isEmpty())
+        path = "/";
+
+    //отправляем пинги асинхронно
+    //а далее ждем все ответы, и когда все ответы придут - обновляем набор пингов и начинаем отправку сообщений
+    int httpGetId = pingHttp->post ( path, byteArray ) ;
+
+    //мы имеем право взять нужный нам пинг из списка подготовленных на отправку пингов, используя email_prefix организации-получателя пинга
+    JKKSPing pp = m_pings.value(ping->pMess.receiverUID());
+    pingHttpMessages.insert(httpGetId, pp);
+  
+    return true;
+}
+
+//ответ http-сервера на запрос передачи пинга 
+void HttpWindow::pingHttpRequestFinished(int requestId, bool error)
+{
+    bool bFound = false;
+    
+    qWarning() << "In pingHttpRequestFinished() requestId = " << requestId;
+    
+    uint messCount = pingHttpMessages.count();
+    if(messCount <= 0)
+        return;
+    
+    JKKSPing defValue = JKKSPing();
+    JKKSPing t = pingHttpMessages.value(requestId, defValue);
+    if(t == defValue){
+        return;
+    }
+    
+    pingHttpMessages.remove(requestId);
+    
+    statusLabel->setText(tr("Pings transferring started ...\n\n"
+                            "Pings for transfer: %1 ---> %2")
+                            .arg(pingsForSent)
+                            .arg(cntPingsSended));
+
+    if (error) {
+        qCritical() << tr("ERROR: Data transfer for requestId = %1 failed: %2").arg(requestId).arg(pingHttp->errorString());
+        t.setState1(0);
+        t.setState2(0);
+        t.setState3(0);
+        t.setState4(0);
+        processPingResponse(&t);
+        return;
+    } 
+    
+    //здесь мы полагаем, что если пришел ответ на сообщение с requestId из нашего перечня (и error = false), 
+    //мы должны обработать тело этого сообщения
+    //если тело == OK или оно пустое, то это скорее всего было взаимодействие напрямую с http_connector'ом 
+    //в противном случае ответ должен быть в формате
+    // 1 OK
+    // 1 ERROR 15
+    //и это означает, что взаимодействие осуществлялось через шлюз (ТПС)
+    QByteArray ba = http->readAll();
+    if(ba.length() <= 0 || ba == "OK"){//это сообщение было передано напрямую на целевой объект в http_connector
+        return;
+    }
+
+    //далее полагаем, что ответ пришел от шлюза
+    //и в случае, если ответ содержит " ERROR ", помечаем сообщение как отправленное
+    if( ba.contains(" ERROR ")){
+        t.setState1(0);
+        t.setState2(0);
+        t.setState3(0);
+        t.setState4(0);
+        processPingResponse(&t);
+    }
+
+    //if(pingsForSent == cntPingsSended){
+    //    emit pingsSended(m_pings);
+    //    emit pingsSentCompleted();
+    //}
+}
+
+/*
+void HttpWindow::pingHttpReadResponseHeader(const QHttpResponseHeader &responseHeader)
+{
+    qWarning() << "In readResponseHeader()";
+
+    int status = responseHeader.statusCode();
+    QString str = responseHeader.toString();
+    switch (status) {
+    case 200:                   // Ok
+    case 301:                   // Moved Permanently
+    case 302:                   // Found
+    case 303:                   // See Other
+    case 307:                   // Temporary Redirect
+    case 205:
+        // these are not error conditions
+        break;
+
+    default: break;
+
+        //if(manual == false){
+        //    m_timer->start();
+        //}
+    }
+}
+*/
+
+void HttpWindow :: sendOKBlock(QTcpSocket * clientConnection, bool withData)
+{
+    if(!clientConnection)
+        return;
+
+    QByteArray block;
+    QHttpResponseHeader response = QHttpResponseHeader( 200 , "HTTP/1.1 200 OK" );
+	QString str = response.toString();
+	block.append(str);
+    if(withData)
+        block.append("OK");
+    
+    clientConnection->write(block);
+}
+
+void HttpWindow :: sendBadBlock(QTcpSocket * clientConnection)
+{
+    if(!clientConnection)
+        return;
+
+    QByteArray block;
+    QHttpResponseHeader response = QHttpResponseHeader( 400 , "HTTP/1.1 400 Bad Request" );
+    QString str = response.toString();
+    block.append(str);
+    clientConnection->write(block);
+
+}
+
+ void HttpWindow::closeEvent(QCloseEvent *event)
+ {
+  
+     if(tcpServer)
+         delete tcpServer;
+     
+     if(http)
+        delete http;
+     
+     if(pingHttp)
+        delete pingHttp;
+     
+     event->accept();
+ }

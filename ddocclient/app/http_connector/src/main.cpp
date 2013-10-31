@@ -47,7 +47,14 @@ int main(int argc, char *argv[])
     settings.sync ();
     delete sForm;
 
+    int res = 1;
     HttpWindow httpWin;
-    httpWin.show();
-    return httpWin.exec();
+    
+    if(!httpWin.doNotStart()){
+        httpWin.show();
+    
+        res = httpWin.exec();
+    }
+
+    return res;
 }
