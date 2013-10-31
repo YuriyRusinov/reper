@@ -883,7 +883,7 @@ qint64 JKKSLoader :: updateDocument (JKKSDocument *doc) const
     QMap<qint64, JKKSGlobalRubric> rubrs = doc->rubrics ();
     QMap<qint64, qint64> idpRub; //здесь храним соответствие идентификатора рубрики в исходной БД и целевой БД (в процессе создания рубрик исходный родитель обновляется на целевой)
     
-    for (QMap<qint64, JKKSGlobalRubric>::iterator pr = rubrs.constBegin (); 
+    for (QMap<qint64, JKKSGlobalRubric>::const_iterator pr = rubrs.constBegin (); 
             pr != rubrs.constEnd (); 
             pr++)
     {
