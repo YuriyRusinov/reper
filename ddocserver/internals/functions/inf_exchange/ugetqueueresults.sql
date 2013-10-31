@@ -34,6 +34,7 @@ begin
             queue_results qr 
         where
             qr.is_read = 1
+            and id_external_queue > 0 --if negative - see description in database scheme in powerdesigner
         order by 2
     loop
         if (r.full_address is not null) then

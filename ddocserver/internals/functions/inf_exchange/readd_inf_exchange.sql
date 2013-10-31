@@ -21,5 +21,7 @@
 \i ./functions/inf_exchange/checkforpublic.sql
 \i ./functions/inf_exchange/addqueueresult.sql
 \i ./functions/inf_exchange/trgiosetstate.sql
+\i ./functions/inf_exchange/ugetpings.sql
+\i ./functions/inf_exchange/ugetpingresults.sql
 
 \i ./functions/inf_exchange/organization/readd_organization.sql 

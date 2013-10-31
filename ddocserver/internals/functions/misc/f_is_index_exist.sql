@@ -1,4 +1,4 @@
-create or replace function f_is_column_exist(varchar) returns bool as
+create or replace function f_is_index_exist(varchar) returns bool as
 $BODY$
 declare
     indexName alias for $1;

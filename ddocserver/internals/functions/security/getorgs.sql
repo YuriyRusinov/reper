@@ -78,7 +78,9 @@ begin
     else
         query := query || ' and o.id=' || idOrganization || ')';
     end if;
+
     query := query || ' inner join work_mode as wmc on (o.id_curr_mode=wmc.id) inner join work_mode as wmp on (o.id_curr_mode=wmp.id) left join organization_transport otr on (o.id=otr.id_organization) left join transport t on (otr.id_transport=t.id) order by id';
+
     for r in
         execute query
     loop

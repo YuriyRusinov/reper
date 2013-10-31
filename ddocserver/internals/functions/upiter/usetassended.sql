@@ -21,7 +21,7 @@ begin
         select uSetCmdAsConfirmed(id::int4) into res;
     elsif (itype = 5 or itype=11) then --record or org package (in out_sync_queue)
         select uSetRecordAsSended(id) into res;
-    elsif (itype = 6) then --record confirmation
+    elsif (itype = 6 or itype = 14) then --record confirmation --or ping result
         select uSetReceptionAsSended (id) into res;
     elsif (itype = 8) then --organization (in out_sync_queue)
         select uSetRecordAsSended(id) into res;

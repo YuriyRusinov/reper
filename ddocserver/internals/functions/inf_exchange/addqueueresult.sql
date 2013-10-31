@@ -34,7 +34,7 @@ begin
     end loop;
 
     if (idRes is not null) then
-        uquery := 'update queue_results set sync_result = ' || syncResult || ' where id = ' || r.id;
+        uquery := 'update queue_results set sync_result = ' || syncResult || ',  is_read = 1 where id = ' || r.id;
         execute uquery;
         return idRes;
     end if;

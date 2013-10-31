@@ -47,6 +47,56 @@ end
 $BODY$
 language 'plpgsql' security definer;
 
+--localorg on given transport
+--ifidTransport = -1 - use current registered transport for the session
+create or replace function getLocalOrg(int4) returns setof h_local_org_desc as
+$BODY$
+declare
+    idTransport alias for $1;
+
+    r h_local_org_desc%rowtype;
+    idTr int4;
+begin
+
+    if(idTransport isnull or idTransport < 0) then
+        idTr = getCurrentTransport();
+    else
+        idTr = idTransport;
+    end if;
+
+    for r in 
+        select 
+            o.id, 
+            o.name, 
+            ot.address, 
+            o.email_prefix,
+            ot.port,
+            ot.use_gateway
+        from
+            organization o,
+            organization_transport ot,
+            transport t
+        where
+            o.id = ot.id_organization
+            and ot.id_transport = t.id
+            and t.id = idTr
+            and t.local_address = ot.address
+            and (
+                  (ot.port isnull and t.local_port isnull)
+                  or (ot.port = t.local_port)
+                )
+    loop
+        return next r;
+        return;
+    end loop;
+
+    return;
+
+end 
+$BODY$
+language 'plpgsql' security definer;
+
+
 create or replace function getLocalOrgId() returns int4 as
 $BODY$
 declare
