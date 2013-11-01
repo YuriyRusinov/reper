@@ -174,6 +174,7 @@ bool KKSAttrModel::setData (const QModelIndex& index, const QVariant& value, int
         int irow = 0;
         int nr = rowCount();
         emit dataChanged (this->index(irow, 0), this->index(nr, 4));
+        return true;
     }
     return false;
 }

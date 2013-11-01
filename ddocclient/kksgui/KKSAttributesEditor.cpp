@@ -363,7 +363,7 @@ void KKSAttributesEditor :: expandAttrInd (const QModelIndex& ind)
     QItemSelectionModel * selModel = tv->selectionModel();
     QAbstractProxyModel * proxyMod = qobject_cast<QAbstractProxyModel *>(tv->model());
     QModelIndex wIndex;
-    if (proxyMod)
+    if (proxyMod && ind.model() != proxyMod)
         wIndex = proxyMod->mapFromSource(ind);
     else
         wIndex = ind;

@@ -468,95 +468,6 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (int idCategory, // ид
 
     KKSCatEditor * cEditor = createCategoryEditor (cat, filters, isChildCat, idCatType, mode, windowModality, parent, f);
     return cEditor;
-/*
-    if (isChildCat && qobject_cast<KKSCatEditor *>(parent))
-    {
-        KKSCatEditor *pEditor = qobject_cast<KKSCatEditor *>(parent);
-        pEditor->category()->setTableCategory (cat);
-    }
-
-    KKSRecWidget *rAttrCw = getAttrsWidget (cat, mode, 0);
-    //cEditor->setAttrs (rw);
-    KKSType * cTableT = loader->loadType (10);
-    KKSRecWidget * rAttrTCw = getAttrsWidget (cat->tableCategory(), mode, 0);
-    KKSRecWidget * recAttrCw = getAttrsWidget (cat->recAttrCategory(), mode, 0);
-    QAction * actCopyFrom = new QAction (QIcon (":/ddoc/add_copy.png"), tr("Copy attributes from"), rAttrTCw);
-    rAttrTCw->addToolBarAction (actCopyFrom);
-    KKSMap<int, KKSType*> cTypes = loader->loadAvailableTypes();
-
-    KKSRecWidget *rwt = getTemplateWidget (cat, false, 0);//KKSViewFactory :: createCategoryTemplates (cat->id (), loader, 0);
-//    cEditor->setTemplates (rwt);
-    KKSRecWidget *rwtT = getTemplateWidget (cat->tableCategory(), false, 0);
-    KKSRecWidget *rawtT = getTemplateWidget (cat->recAttrCategory(), false, 0);
-
-    KKSCatEditor *cEditor = new KKSCatEditor (cat, rAttrCw, rAttrTCw, recAttrCw, rwt, rwtT, rawtT, cTypes, idCatType, mode, parent, f);
-    if (!cEditor)
-        return 0;
-    connect (actCopyFrom, SIGNAL (triggered()), cEditor, SLOT (copyAttributesFrom()));
-
-    cEditor->setTableType (cTableT);
-
-    KKSObject *attrTypesIO = loader->loadIO (IO_ATTR_TYPE_ID, true);
-    if (!attrTypesIO)
-    {
-        QMessageBox::warning (parent, QObject::tr ("Attributes types"), QObject::tr ("Cannot load attribute types"), QMessageBox::Ok);
-        return 0;
-    }
-
-    KKSMap<int, KKSAttrType*> availAttrTypes;
-    KKSMap<qint64, KKSEIOData *> attrTypesList = loader->loadEIOList (attrTypesIO);
-    KKSMap<qint64, KKSEIOData *>::const_iterator pAttrs;
-    for (pAttrs = attrTypesList.constBegin(); pAttrs != attrTypesList.constEnd(); pAttrs++)
-    {
-        KKSAttrType *aType = new KKSAttrType ();
-        if (!aType)
-            continue;
-        aType->setId (pAttrs.key());
-        aType->setName (pAttrs.value()->fields ().value ("name"));
-        aType->setCode (pAttrs.value()->fields ().value ("code"));
-        availAttrTypes.insert (pAttrs.key(), aType);
-        if (aType)
-            aType->release ();
-    }
-
-    cEditor->setAttrTypes (availAttrTypes);
-    if (!isChildCat)
-    {
-        KKSStuffForm *sForm = stuffF->createStuffEditorForm (cat->getAccessRules(), 1, cEditor);
-        cEditor->setAccessWidget (sForm);
-    }
-
-    connect (cEditor, SIGNAL (addAttrsIntoCat (KKSCategory *, QAbstractItemModel *, KKSCatEditor *)), this, SLOT (addAttributeIntoCategory (KKSCategory *, QAbstractItemModel *, KKSCatEditor *)) );
-    connect (cEditor, SIGNAL (copyAttrsFromAnotherCat (KKSCategory *, QAbstractItemModel *, KKSCatEditor *)), this, SLOT (copyAttributesIntoCategory (KKSCategory *, QAbstractItemModel *, KKSCatEditor *)) );
-    connect (cEditor, SIGNAL (setAttribute (int, KKSCategory*, QAbstractItemModel *, KKSCatEditor *)), this, SLOT (loadCatAttribute (int, KKSCategory*, QAbstractItemModel *, KKSCatEditor *)));
-    connect (cEditor, SIGNAL (setAttribute (KKSCategoryAttr *, KKSCategory*, QAbstractItemModel *, KKSCatEditor *)), this, SLOT (loadCatAttribute (KKSCategoryAttr *, KKSCategory*, QAbstractItemModel *, KKSCatEditor *)) );
-    connect (cEditor, SIGNAL (delAttrFromCategory (int, KKSCategory *, QAbstractItemModel *, KKSCatEditor *)), this, SLOT (delCatAttribute(int, KKSCategory *, QAbstractItemModel *, KKSCatEditor *)) );
-    
-    connect (cEditor, SIGNAL (saveCategory (KKSCategory *, int, int, KKSCatEditor *)), this, SLOT (saveCategory (KKSCategory *, int, int, KKSCatEditor *)) );
-    connect (cEditor, SIGNAL (addChildCat (QWidget *, int, bool)), this, SLOT (addCategory (QWidget *, int, bool)) );
-    connect (cEditor, SIGNAL (editChildCat (QWidget *, int, bool)), this, SLOT (editCategory (QWidget *, int, bool)) );
-    
-    connect (cEditor, SIGNAL (addNewCategoryTemplate (QWidget *, KKSCategory *, QAbstractItemModel *)), tf, SLOT (addTemplate (QWidget *, KKSCategory *, QAbstractItemModel *)) );
-    connect (cEditor, SIGNAL (editCategoryTemplate (QWidget *, KKSTemplate *, QAbstractItemModel *, const QModelIndex& )), tf, SLOT (editCatTemplate (QWidget *, KKSTemplate *, QAbstractItemModel *, const QModelIndex&)) );
-    connect (cEditor, SIGNAL (delCategoryTemplate (QWidget *, int, QAbstractItemModel *, const QModelIndex& )), tf, SLOT (delTemplate (QWidget *, int, QAbstractItemModel *, const QModelIndex&)) );
-    
-    connect (this, SIGNAL (categoryDbError ()), cEditor, SLOT (catDbError()) );
-    connect (this, SIGNAL (categoryAdded(KKSCategory *)), cEditor, SLOT (catDbOk(KKSCategory *)) );
-    
-    connect (cEditor, SIGNAL (refreshTemplates (KKSCategory *, QAbstractItemModel *)), this, SLOT (refreshCategoryTemplates (KKSCategory *, QAbstractItemModel *)) );
-
-    cEditor->setWindowModality (windowModality);
-    if (windowModality != Qt::NonModal)
-    {
-        cEditor->show ();
-        emit categoryEditorCreatedModal (cEditor);
-    }
-    else
-        emit categoryEditorCreated (cEditor);
-//    typeRef->release ();
-//    cat->release ();
-    return cEditor;
-*/
 }
 
 KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (KKSCategory *cat, // категория
@@ -672,12 +583,17 @@ KKSRecWidget * KKSCatEditorFactory :: getAttrsWidget (const KKSCategory *cat, bo
         rw = KKSViewFactory :: createCategAttrsView (cat, parent);
     else
     {
+        KKSType * cTableT = KKSType::createType10(); //child type
+        cat = new KKSCategory (-1, QString(), cTableT);
+        //cat->setName("Indicators of " + pCategory->name());
+        KKSAccessEntity * acl = new KKSAccessEntity ();
+        const_cast<KKSCategory *>(cat)->setAccessRules (acl);
         rw = new KKSRecWidget (false); //mode);
         QTreeView * tvTableAttrs = rw->getView();//new QTreeView ();
         rw->hideGroup (0);//gbSearch->setVisible (false);
         rw->hideGroup (2);//tbSetView->setVisible (false);
         rw->hideGroup (3);//gbImportExport->setVisible (false);
-        QAbstractItemModel * acModel = new KKSCatAttrsModel (0, 4);//QStandardItemModel (0, 4);
+        QAbstractItemModel * acModel = new KKSAttrModel (cat);//QStandardItemModel (0, 4);
         acModel->setHeaderData (0, Qt::Horizontal, QObject::tr ("Name"));
         acModel->setHeaderData (1, Qt::Horizontal, QObject::tr ("Default value"));
         acModel->setHeaderData (2, Qt::Horizontal, QObject::tr ("Mandatory"));
@@ -775,8 +691,12 @@ void KKSCatEditorFactory :: addAttributeIntoCategory (KKSCategory *c, QAbstractI
             cAttr->release ();
             attr->release();
         }
-        attrModel->setData(QModelIndex(), QVariant::fromValue<KKSCategory *>(c), Qt::UserRole+2);
-        qDebug () << __PRETTY_FUNCTION__ << c->attributes().count() << attrModel->rowCount();
+        bool isCat = attrModel->setData(QModelIndex(), QVariant::fromValue<KKSCategory *>(c), Qt::UserRole+2);
+        if (!isCat)
+        {
+            return;
+        }
+        //qDebug () << __PRETTY_FUNCTION__ << c->attributes().count() << attrModel->rowCount() << isCat << attrModel;
         //KKSViewFactory::updateAttrModel (c, attrModel);
     }
     editor->resize(editor->size() + QSize(1, 1));
@@ -920,7 +840,7 @@ void KKSCatEditorFactory :: saveCategory (KKSCategory *cat, int idTableCat, int 
     {
         emit categoryDbError ();
         qCritical() << tr("Category is not saved");
-        QMessageBox::critical(cEditor, tr ("Category"), tr("Category is not saved"));
+        QMessageBox::critical(cEditor, tr ("Category editor"), tr("Category %1 is not saved").arg (cat->name()));
         return;
     }
     //if (qobject_cast<KKSCatEditor *>(cEditor->parent()) == 0)
