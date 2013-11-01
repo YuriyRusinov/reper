@@ -14,6 +14,7 @@ INCLUDEPATH += 	. \
                 ../../../kksfactory \
 		../../../kksutils \
                 ../../../kksinteractor \
+                ../dyndoc_synch/Namespaces \
                 ./include
 #                /usr/local/kkssito/include\
 #                /usr/local/pgsql/include

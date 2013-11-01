@@ -4,15 +4,33 @@
 #include <QString>
 #include <QList>
 
-namespace dyndoc_netThread
+namespace dyndoc_mainStructs
 {
     struct hostInformation
     {
-        QString hostAddress;
-        int hostPort;
+        QString address;
+        int port;
     };
 
     typedef hostInformation hostInf;
+
+    struct hostStructInformation
+    {
+        QString name;
+        QString parentName;
+        QString protocol;
+        QString id;
+    };
+
+    typedef hostStructInformation hostStructInf;
+
+    struct hostModelInformation
+    {
+        hostStructInf structInf;
+        hostInf address;
+    };
+
+    typedef hostModelInformation hostModelInf;
 
     struct dataBaseInformation
     {
@@ -26,6 +44,16 @@ namespace dyndoc_netThread
 
     typedef dataBaseInformation dbInf;
 
+    struct transportInformation
+    {
+        int transportProtocol;
+        int serverport;
+
+        hostInf gateway;
+    };
+
+    typedef transportInformation transportInf;
+
     struct timerInformation
     {
         bool timerFlag;
@@ -34,23 +62,14 @@ namespace dyndoc_netThread
 
     typedef timerInformation timerInf;
 
-    struct localHostInformation
+    struct networkThreadInitialInformation
     {
-        dbInf db;
-        hostInf localhost;
-        int transport;
-    };
-
-    typedef localHostInformation mainInf;
-
-    struct synchronizationList
-    {
-        mainInf local;
+        dbInf dataBase;
+        transportInf transport;
         timerInf timer;
-        QList<hostInf> hosts;
     };
 
-    typedef synchronizationList synchList;
+    typedef networkThreadInitialInformation netThreadInf;
 }
 
 #endif

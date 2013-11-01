@@ -1,32 +1,14 @@
-/****************************************************************************
-**
-** Copyright (C) 2004-2008 Trolltech ASA. All rights reserved.
-**
-** This file is part of the example classes of the Qt Toolkit.
-**
-** Licensees holding a valid Qt License Agreement may use this file in
-** accordance with the rights, responsibilities and obligations
-** contained therein.  Please consult your licensing agreement or
-** contact sales@trolltech.com if any conditions of this licensing
-** agreement are not clear to you.
-**
-** Further information about Qt licensing is available at:
-** http://www.trolltech.com/products/qt/licensing.html or by
-** contacting info@trolltech.com.
-**
-** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
-** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-**
-****************************************************************************/
-#ifndef HTTPWINDOW_H
-#define HTTPWINDOW_H
 
-#include <QtGui>
-#include <QtNetwork>
+#ifndef DDS_HTTPWINDOW_H
+#define DDS_HTTPWINDOW_H
+
 #include <QDialog>
 
 #include <JKKSLoader.h>
 #include <JKKSPMessage.h>
+
+#include "../dyndoc_synch/Namespaces/netStruct.h"
+
 //gui
 class QDialogButtonBox;
 class QFile;
@@ -38,122 +20,78 @@ class QPushButton;
 class QHttp;
 class QHttpResponseHeader;
 class QTcpServer;
+class QTcpSocket;
 class QSslError;
 class QAuthenticator;
 
-class netThread;
 
-namespace dyndoc_HTTPconnector
-{
-    class HTTPconnectorError
-    {
-    public:
-        HTTPconnectorError();
-        virtual ~HTTPconnectorError();
-
-        virtual QString getError() const;
-    };
-
-    class TCPserverError: public HTTPconnectorError
-    {
-    public:
-        TCPserverError();
-        virtual ~TCPserverError();
-
-        virtual QString getError() const;
-    };
-
-    class loaderError: public HTTPconnectorError
-    {
-    public:
-        loaderError();
-        virtual ~loaderError();
-
-        virtual QString getError() const;
-    };
-
-    struct HTTPsettings
-    {
-        QString dbName;
-        QString host;
-        QString user;
-        QString password;
-        int port;
-
-        QString http_host;
-        int http_port;
-        int transport;
-        QString addr;
-        int server_port;
-    };
-}
-
-class dds_HttpWindow : public QObject
+class dds_HttpWindow : public QDialog
 {
     Q_OBJECT
 
 public:
-    dds_HttpWindow(dyndoc_HTTPconnector::HTTPsettings& settings, QObject *parent = 0);
-    bool sendOutMessage( const JKKSPMessWithAddr * message, bool filePartsFlag = true);//filePartsFlag - флаг передачи файла по частям
-    bool setMessageAsSended(const int & id, const int & type);
-
-    void run();
+    dds_HttpWindow(dyndoc_mainStructs::netThreadInf rhs, QWidget *parent = 0);
+    bool sendOutMessage( const JKKSPMessWithAddr * message, 
+                         bool filePartsFlag = true, //filePartsFlag - пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ QHttp::post()
+                         bool isLastFilePart = false); //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    bool setMessageAsSended(const qint64 & id, const int & type, bool sended = true);//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     
+    ~dds_HttpWindow();
+
 private slots:
     void startProc();
+    void startTimer();
     void loadData();
-    void cancelDownload();
     void httpRequestFinished(int requestId, bool error);
     void readResponseHeader(const QHttpResponseHeader &responseHeader);
 
+    int processMessage(const QByteArray & ba, QTcpSocket * clientConnection);
+    int processNotification(const QByteArray & ba, QTcpSocket * clientConnection);
+
+    void slotHttpMessageRemoved(int progress);
+
 signals:
     void httpMessageRemoved(int progress);
-
-    void signalCancelDownload();
-    void signalErrorDataTransferFailed(QString str);
-    void signalDataTransferComplete();
+    void needToExitEventLoop(); //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ httpRequestFinished. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ __пїЅпїЅпїЅпїЅпїЅпїЅ__ пїЅпїЅпїЅпїЅпїЅпїЅ post-> . пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ EventLoop пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 
 private:
+    QLabel *statusLabel;
+
+    QPushButton *startButton;
+    QPushButton *quitButton;
+    QDialogButtonBox *buttonBox;
+
     QList<JKKSPMessWithAddr *> messageList;
 
     QMap<int, QPair<qint64, qint64> > httpMessages;
 
-    QString dbName;
-    QString host;
-    QString user;
-    QString password;
-    int port;
-
-    QString http_host;
-    int http_port;
-    int transport;
-    QString addr;
-    int server_port;
+    QString gatewayHost;
+    int gatewayPort;
 
     QHttp *http;
     JKKSLoader * loader;
 
-    QString  localDBInfo;
+    QTimer * m_timer;
+    QString localDBInfo;
     
     QTcpServer *tcpServer;
     QStringList responses;
 
-    int  httpGetId;
-    int  count_send;
-    bool httpRequestAborted;
-    bool httpTransferComplete;
+    int httpGetId;
+    int user_timer;
+    
+    int cntMsgSended;//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    int msgForSent; //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    int cntFilesSended;//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+    int filesForSent; //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    int filePartsForSent;//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    int cntFilePartsSended;//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+    
+	bool manual;
 
-    inline void init(dyndoc_HTTPconnector::HTTPsettings& settings);
-
-    inline void init_interface();
-    inline void init_TCPserver();
-    inline void init_loader();
-    inline void init_connections();
-
-    inline void init_settings(dyndoc_HTTPconnector::HTTPsettings& settings);
-    inline void init_settingsDB(dyndoc_HTTPconnector::HTTPsettings& settings);
-    inline void init_settingsTransportProtocol(dyndoc_HTTPconnector::HTTPsettings& settings);
-    inline void init_settingsServerAndLocal(dyndoc_HTTPconnector::HTTPsettings& settings);
+    dyndoc_mainStructs::dbInf* dataBase;
+    dyndoc_mainStructs::transportInf* transport;
+    dyndoc_mainStructs::timerInf* timer;
 };
 
 #endif

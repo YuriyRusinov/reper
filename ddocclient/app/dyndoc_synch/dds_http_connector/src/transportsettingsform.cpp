@@ -4,9 +4,10 @@
 #include "ui_transport_settings_form.h"
 #include "transportsettingsform.h"
 
-dds_TransportSettingsForm :: dds_TransportSettingsForm (dyndoc_HTTPconnector::HTTPsettings& settings, QWidget *parent, Qt::WFlags f)
+dds_TransportSettingsForm :: dds_TransportSettingsForm (QSettings *s, QWidget *parent, Qt::WFlags f)
     : QDialog (parent, f),
-    UI (new Ui::transport_settings_form)
+    UI (new Ui::transport_settings_form),
+    settings (s)
 {
     UI->setupUi (this);
 
@@ -19,12 +20,10 @@ dds_TransportSettingsForm :: dds_TransportSettingsForm (dyndoc_HTTPconnector::HT
     QIntValidator *pServerVal = new QIntValidator (0, 100000, this);
     UI->lEServerPort->setValidator (pServerVal);
 
-    Csettings = &settings;
-
     this->init ();
 
     connect (UI->pbQuit, SIGNAL (clicked()), this, SLOT (reject()) );
-    connect (UI->pbStart, SIGNAL (clicked()), this, SLOT (setConnectionSettings()) );
+    connect (UI->pbStart, SIGNAL (clicked()), this, SLOT(accept()));//SLOT (setConnectionSettings()) );
 }
 
 dds_TransportSettingsForm :: ~dds_TransportSettingsForm (void)
@@ -32,34 +31,44 @@ dds_TransportSettingsForm :: ~dds_TransportSettingsForm (void)
     delete UI;
 }
 
-dyndoc_HTTPconnector::HTTPsettings* dds_TransportSettingsForm :: getSettings (void) const
+QSettings * dds_TransportSettingsForm :: getSettings (void) const
 {
-    return Csettings;
+    return settings;
 }
 
 void dds_TransportSettingsForm :: setConnectionSettings (void)
 {
-    Csettings->host = UI->lEHost->text();
-    Csettings->dbName = UI->lEDBName->text();
-    Csettings->user = UI->lEUserName->text();
-    Csettings->password = UI->lEPassword->text();
-    Csettings->port = UI->lEPort->text().toInt();
+    if (!settings)
+    {
+        reject ();
+        return;
+    }
+    settings->beginGroup ("Database");
+    settings->setValue ("host", UI->lEHost->text ());
+    settings->setValue ("database", UI->lEDBName->text ());
+    settings->setValue ("user", UI->lEUserName->text ());
+    settings->setValue ("password", UI->lEPassword->text ());
+    settings->setValue ("port", UI->lEPort->text ());
+    settings->endGroup ();
 
-    Csettings->transport = UI->lEHttpTransport->text().toInt();
+    settings->beginGroup("Transport");
+    settings->setValue ("transport", UI->lEHttpTransport->text ());
+    settings->endGroup();
 
-    Csettings->http_host = UI->lEHttpHost->text();
-    Csettings->http_port = UI->lEHttpPort->text().toInt();
+
+    settings->beginGroup ("Http"); //???????? ??? ????? ????? ??? ???????? ??????????????? (???)
+    settings->setValue ("host", UI->lEHttpHost->text ());
+    settings->setValue ("port", UI->lEHttpPort->text ());
    
 
-    Csettings->addr = serverIp.toString();
-    Csettings->server_port = UI->lEServerPort->text().toInt();
+    settings->setValue ("server_host", serverIp.toString());
+    settings->setValue ("server_port", UI->lEServerPort->text ());
+    settings->endGroup ();
     accept ();
 }
 
 void dds_TransportSettingsForm :: init (void)
 {
-    QSettings* settings = new QSettings (QCoreApplication::applicationDirPath ()+"/http.ini", QSettings::IniFormat);
-
     settings->beginGroup ("Database");
     UI->lEHost->setText (settings->value ("host").toString());
 
@@ -91,12 +100,17 @@ void dds_TransportSettingsForm :: init (void)
     UI->lEHttpHost->setText (settings->value ("host").toString());
     UI->lEHttpPort->setText (settings->value ("port").toString());
   
-	//Получение адреса локального хоста
+    //, UI->lEAddress->text ());
+
+	//????????? ?????? ?????????? ?????
 	QList<QHostAddress> serverIpList = QHostInfo::fromName(QHostInfo::localHostName()).addresses();
 	serverIp = serverIpList.first();
+
+	//QString string;
+	//string = serverIp.toString();
+
+    //UI->lEServerHost->setText (settings->value ("server_host").toString ());//, UI->lEServerHost->text ());
     UI->lEServerPort->setText (settings->value ("server_port").toString ());
-
+    //, UI->lEServerPort->text ());
     settings->endGroup ();
-
-    delete settings;
 }

@@ -1,5 +1,5 @@
-#ifndef _TIMER_FORM_H
-#define _TIMER_FORM_H
+#ifndef DDS_TIMER_FORM_H
+#define DDS_TIMER_FORM_H
 
 #include <QDialog>
 class QSettings;

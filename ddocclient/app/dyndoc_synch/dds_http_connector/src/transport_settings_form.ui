@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>262</width>
+    <width>290</width>
     <height>433</height>
    </rect>
   </property>
@@ -100,9 +100,9 @@
     </widget>
    </item>
    <item row="2" column="0" colspan="3">
-    <widget class="QGroupBox" name="gbHttp">
+    <widget class="QGroupBox" name="gbHttpGateway">
      <property name="title">
-      <string>Http client (connect to:)</string>
+      <string>Gateway (connect to):</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
       <item row="0" column="0">
