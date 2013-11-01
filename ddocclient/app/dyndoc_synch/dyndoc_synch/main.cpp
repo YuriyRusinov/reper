@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
     userForm->init();
 
     userForm->setDbInf(dataUnit->getDbInf());
-    userForm->getData();
+    userForm->reciveData(dataUnit->getData());
     userForm->exec();
 
     userForm->setViewWidget(0);
