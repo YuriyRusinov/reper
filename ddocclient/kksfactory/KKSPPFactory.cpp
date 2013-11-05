@@ -2103,7 +2103,7 @@ int KKSPPFactory::updateCategoryAttr(int idCategory, KKSCategoryAttr * a) const
     if(!db || !a)
         return ERROR_CODE;
 
-    if(a->idRow() <= 0 || a->id() <= 0){
+    if(a->id() <= 0){
         return ERROR_CODE;
     }
 
@@ -2136,6 +2136,8 @@ int KKSPPFactory::updateCategoryAttr(int idCategory, KKSCategoryAttr * a) const
 
     if(idCategoryAttr <= 0)
         return ERROR_CODE;
+
+    a->setIdRow(idCategoryAttr);
 
     return OK_CODE;
 }

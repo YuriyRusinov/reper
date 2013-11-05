@@ -57,7 +57,7 @@ void dyndoc_synch_form::initInterface()
     viewModel->setHeaderData(3,Qt::Horizontal,Qt::AlignCenter,Qt::TextAlignmentRole);
     viewModel->setHeaderData(4,Qt::Horizontal,QString(tr("Syncronizer\nactivity")));
     viewModel->setHeaderData(4,Qt::Horizontal,Qt::AlignCenter,Qt::TextAlignmentRole);
-    viewModel->setHeaderData(5,Qt::Horizontal,QString(tr("Data base\nactivity")));
+    viewModel->setHeaderData(5,Qt::Horizontal,QString(tr("Database\nactivity")));
     viewModel->setHeaderData(5,Qt::Horizontal,Qt::AlignCenter,Qt::TextAlignmentRole);
     viewModel->setHeaderData(6,Qt::Horizontal,QString(tr("Initial\nsyncronization")));
     viewModel->setHeaderData(6,Qt::Horizontal,Qt::AlignCenter,Qt::TextAlignmentRole);

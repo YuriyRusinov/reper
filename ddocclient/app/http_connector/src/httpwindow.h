@@ -31,7 +31,7 @@ public:
     
     
     bool sendOutMessage( const JKKSPMessWithAddr * message, 
-                         bool filePartsFlag = true, //filePartsFlag - флаг передачи файла по частям. Приводит к тому, что включается синхронный режим для QHttp::post()
+                         bool bSync = true, // флаг передачи данных в синхронном режиме. TRUE приводит к тому, что включается синхронный режим для QHttp::post()
                          bool isLastFilePart = false); //означает, что передается последняя часть файла, передаваемого частями
     bool setMessageAsSended(const qint64 & id, const int & type, bool sended = true);//последний параметр - флаг успешности доставки сообщения
 
@@ -40,19 +40,19 @@ public:
 private slots:
     void startProc();
     void startTimer();
-    void loadData();
-    void httpRequestFinished(int requestId, bool error);
-    //void readResponseHeader(const QHttpResponseHeader &responseHeader);
-
+    
+    void loadData();//tcp-сервер получил данные от передающей стороны
+    
+    void httpRequestFinished(int requestId, bool error);//обрабатываем ответ для сообщений
     void pingHttpRequestFinished(int requestId, bool error);//обрабатываем ответ для пингов
-    //void pingHttpReadResponseHeader(const QHttpResponseHeader &responseHeader);//анализируем заголовок ответа для пингов
 
     int processMessage(const QByteArray & ba, QTcpSocket * clientConnection);
     int processPingResponse(const JKKSPing * ping);
     int processNotification(const QByteArray & ba, QTcpSocket * clientConnection);
     int processPingNotification(int idMsg, int result);
-    void sendOKBlock(QTcpSocket * clientConnection, bool withData);
-    void sendBadBlock(QTcpSocket * clientConnection);
+    
+    void sendOKBlock(QTcpSocket * clientConnection, bool withData);//сгенерировать серверу отвт OK на запрос передающей стороны
+    void sendBadBlock(QTcpSocket * clientConnection);//сгенерировать серверу отвт Bad response на запрос передающей стороны
 
     void slotHttpMessageRemoved(int progress);
 
@@ -75,28 +75,24 @@ private:
     QPushButton *quitButton;
     QDialogButtonBox *buttonBox;
 
-    QList<JKKSPMessWithAddr *> messageList;
+    QList<JKKSPMessWithAddr *> messageList;//список сообщений для отправки. Запрашивается из JKKSLoader и очищается сразу после отправки (вызова sendOutMessage() или sendPings() )
 
     QMap<int, QPair<qint64, qint64> > httpMessages;//отправленные сообщения через this->http. В качестве ключа используется идентификатор запроса из метода QHttp::post()
     QMap<int, JKKSPing> pingHttpMessages; //отправленные пинги через this->pingHttp. В качестве ключа используется идентификатор запроса из метода QHttp::post()
 
     QMap<QString, JKKSPing> m_pings; //в качестве ключа используется email_prefix целевой организации
 
-    QString gatewayHost;
+    QString gatewayHost;//хост и порт шлюза ТПС, если используется ТПС для отправки сообщений
     int gatewayPort;
 
-    QHttp *http;
+    QHttp *http; //используется для отправки сообщений
     QHttp *pingHttp; //используется для отправки пингов
     JKKSLoader * loader;
 
-    QTimer * m_timer;
-    QString localDBInfo;
-    
     QTcpServer *tcpServer;
-    QStringList responses;
 
-    int httpGetId;
-    int user_timer;
+    QTimer * m_timer;
+    int user_timer; //интервал таймера на опрос БД. Важно! при отправке данных таймер приостанавливается до окончания передачи
     
     int cntMsgSended;//количество отправленных сообщений
     int msgForSent; //количество сообщений, подготовленных для отправки
@@ -108,7 +104,7 @@ private:
     int cntPingsSended;//количество отправленных пингов
     int pingsForSent;//количество пингов, подготовленных для отправки
     
-	bool manual;
+	bool manual; //true - ручной режим опроса БД 
 
     bool m_doNotStart;//если запуск tcpServer завершился неудачно или иные проблемы возникли в конструкторе, то данный флаг выставляется в true и означает, что не надо запускать приложение
 };

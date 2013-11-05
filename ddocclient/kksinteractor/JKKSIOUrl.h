@@ -18,7 +18,7 @@ class _I_EXPORT JKKSFilePart : public JKKSMessage, public JKKSUID
 public:
     JKKSFilePart();
     JKKSFilePart(const JKKSFilePart & part);
-    JKKSFilePart(QString uid, bool isLast = false);
+    JKKSFilePart(QString uid, bool isLast, bool isFirst);
     ~JKKSFilePart();
 
     void setData(const QByteArray & data);
@@ -39,8 +39,17 @@ public:
     void setIsLast(bool isLast = true);
     bool isLast() const;
 
+    void setIsFirst(bool isFirst = true);
+    bool isFirst() const;
+
     const JKKSAddress & getSenderAddr (void) const;
     void setSenderAddr (const JKKSAddress & addr);
+
+    const QString & receiverUID() const;
+    const QString & senderUID() const;
+    void setReceiverUID(const QString & uid);
+    void setSenderUID(const QString & uid);
+
 
     virtual QByteArray serialize (void) const;
     virtual int unserialize (const QByteArray& mess);
@@ -56,9 +65,13 @@ private:
     //QString m_uid;
     JKKSAddress m_senderAddr;
     qint64 m_idUrl;
-    bool m_isLast;
+    bool m_isLast;//обозначает, что содержатся данные, представляющие собой самый конец файла (последняя из передаваемых частей)
+    bool m_isFirst;//обозначает, что содержатся данные, представляющие собой самое начало файла (первая из передаваемых частей)
     QString m_absUrl;
     qint64 m_idQueue;
+
+    QString m_receiverUID;
+    QString m_senderUID;
 };
 
 class _I_EXPORT JKKSIOUrl : public JKKSUID

@@ -155,6 +155,8 @@ QDataStream& operator>> (QDataStream& in, JKKSIOUrl& URL)
 JKKSFilePart::JKKSFilePart() : JKKSMessage()
 {
     m_isLast = true;
+    m_isFirst = true;
+
     m_idUrl = -1;
     m_idQueue = -1;
 }
@@ -162,18 +164,22 @@ JKKSFilePart::JKKSFilePart() : JKKSMessage()
 JKKSFilePart::JKKSFilePart(const JKKSFilePart & part) : JKKSMessage(part)
 {
     m_isLast = part.m_isLast;
+    m_isFirst = part.m_isFirst;
     m_idUrl = part.m_idUrl;
     m_uid = part.m_uid;
     m_data = part.m_data;
     m_idQueue = part.m_idQueue;
     m_senderAddr = part.m_senderAddr;
     m_absUrl = part.m_absUrl;
+    m_senderUID = part.m_senderUID;
+    m_receiverUID = part.m_receiverUID;
 }
 
-JKKSFilePart::JKKSFilePart(QString uid, bool isLast) : JKKSMessage()
+JKKSFilePart::JKKSFilePart(QString uid, bool isLast, bool isFirst) : JKKSMessage()
 {
     m_uid = uid;
     m_isLast = isLast;
+    m_isFirst = isFirst;
     m_idUrl = -1;
     m_idQueue = -1;
 }
@@ -226,11 +232,29 @@ qint64 JKKSFilePart::id() const
 void JKKSFilePart::setIsLast(bool isLast)
 {
     m_isLast = isLast;
+    
+    // !!! часть файла может быть одновременно и первой и последней
+    //if(m_isLast)
+    //    m_isFirst = false;
 }
 
 bool JKKSFilePart::isLast() const
 {
     return m_isLast;
+}
+
+void JKKSFilePart::setIsFirst(bool isFirst)
+{
+    m_isFirst = isFirst;
+    
+    // !!! часть файла может быть одновременно и первой и последней
+    //if(m_isFirst)
+    //    m_isLast = false;
+}
+
+bool JKKSFilePart::isFirst() const
+{
+    return m_isFirst;
 }
 
 const JKKSAddress & JKKSFilePart::getSenderAddr() const
@@ -250,10 +274,14 @@ QDataStream& operator<< (QDataStream& out, const JKKSFilePart& part)
     out << part.m_uid;
     out << part.m_data;
     out << part.m_isLast;
+    out << part.m_isFirst;
     out << part.m_absUrl;
     out << part.getAddr();
     out << part.m_senderAddr;
     out << part.m_idQueue;
+
+    out << part.m_senderUID;
+    out << part.m_receiverUID;
 
     return out;
 }
@@ -264,6 +292,7 @@ QDataStream& operator>> (QDataStream& in, JKKSFilePart& part)
     in >> part.m_uid;
     in >> part.m_data;
     in >> part.m_isLast;
+    in >> part.m_isFirst;
     in >> part.m_absUrl;
     
     JKKSAddress addr;
@@ -273,6 +302,9 @@ QDataStream& operator>> (QDataStream& in, JKKSFilePart& part)
     in >> part.m_senderAddr;
     
     in >> part.m_idQueue;
+
+    in >> part.m_senderUID;
+    in >> part.m_receiverUID;
 
     return in;
 }
@@ -291,8 +323,11 @@ QByteArray JKKSFilePart :: serialize (void) const
     out << m_uid;
     out << m_data;
     out << m_isLast;
+    out << m_isFirst;
     out << m_absUrl;
     out << m_idQueue;
+    out << m_senderUID;
+    out << m_receiverUID;
 
     return qBuffer.buffer();
 }
@@ -315,8 +350,11 @@ int JKKSFilePart :: unserialize (const QByteArray& mess)
     in >> m_uid;
     in >> m_data;
     in >> m_isLast;
+    in >> m_isFirst;
     in >> m_absUrl;
     in >> m_idQueue;
+    in >> m_senderUID;
+    in >> m_receiverUID;
 
     return OK_CODE;
 }
@@ -325,4 +363,24 @@ int JKKSFilePart :: writeToDB (const JKKSLoader * loader, const QString& senderU
 {
     int ier = loader->writeMessage (this, senderUID);
     return ier;
+}
+
+const QString & JKKSFilePart :: receiverUID() const
+{
+    return m_receiverUID;
+}
+
+const QString & JKKSFilePart :: senderUID() const
+{
+    return m_senderUID;
+}
+
+void JKKSFilePart :: setReceiverUID(const QString & uid)
+{
+    m_senderUID = uid;
+}
+
+void JKKSFilePart :: setSenderUID(const QString & uid)
+{
+    m_receiverUID = uid;
 }

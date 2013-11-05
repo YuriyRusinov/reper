@@ -21,6 +21,7 @@
 
 #include <QApplication>
 #include <QSettings>
+#include <QTextCodec>
 
 #include "httpwindow.h"
 #include "transportsettingsform.h"
@@ -29,7 +30,9 @@
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-    KKSSito *sito = KKSSito::init (false);
+    QTextCodec::setCodecForTr(QTextCodec::codecForName("Windows-1251"));
+
+    KKSSito *sito = KKSSito::init (false, QString(), true);
     if(!sito)
         return 1;
 

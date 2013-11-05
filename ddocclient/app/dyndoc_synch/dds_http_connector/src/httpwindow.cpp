@@ -160,8 +160,8 @@ void dds_HttpWindow::startProc()
 
     //statusLabel->setText(tr("Waiting for data to sent..."));
    
-    messageList = loader->readMessages();
-    QList<JKKSFilePart *> files = loader->readFileParts();
+    //messageList = loader->readMessages();
+    QList<JKKSFilePart *> files;// = loader->readFileParts();
     
     filesForSent = files.count();
     msgForSent = messageList.size();

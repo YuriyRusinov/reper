@@ -2,9 +2,11 @@
 #include <QtGui>
 #include <QtNetwork>
 #include <QCryptographicHash>
+#include <QDockWidget>
 
 #include "httpwindow.h"
 #include "timerform.h"
+#include <kkssito.h>
 #include <kksresult.h>
 #include <kksdatabase.h>
 #include <defines.h>
@@ -64,7 +66,6 @@ HttpWindow::HttpWindow(QWidget *parent)
     }
 
     loader = new (std::nothrow) JKKSLoader (host, dbName, user, password, port, transport);
-    localDBInfo = QString("DBHost: %1, DBName: %2").arg(host).arg(dbName);
     if (loader && loader->connectToDb ())
     {
      
@@ -82,6 +83,7 @@ HttpWindow::HttpWindow(QWidget *parent)
 
     connect(tcpServer, SIGNAL(newConnection()), this, SLOT(loadData()));
 
+    
     statusLabel = new QLabel(tr("Waiting for data to sent..."));
 
     startButton = new QPushButton(tr("Send"));
@@ -93,6 +95,16 @@ HttpWindow::HttpWindow(QWidget *parent)
     buttonBox->addButton(startButton, QDialogButtonBox::ActionRole);
     buttonBox->addButton(quitButton, QDialogButtonBox::RejectRole);
 
+    QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout->addWidget(statusLabel);
+    QDockWidget * w = (QDockWidget*)kksSito->dbgWidget();
+    mainLayout->addWidget(w->widget());
+    mainLayout->addWidget(buttonBox);
+    setLayout(mainLayout);
+
+    setWindowTitle(tr("DynamicDocs Server Interactor"));
+
+
     http = new QHttp(this);
     pingHttp = new QHttp(this);
 
@@ -101,24 +113,12 @@ HttpWindow::HttpWindow(QWidget *parent)
 
     connect(http, SIGNAL(requestFinished(int, bool)),
             this, SLOT(httpRequestFinished(int, bool)));
-    //connect(http, SIGNAL(responseHeaderReceived(const QHttpResponseHeader &)),
-    //        this, SLOT(readResponseHeader(const QHttpResponseHeader &)));
 
     connect(pingHttp, SIGNAL(requestFinished(int, bool)),
             this, SLOT(pingHttpRequestFinished(int, bool)));
-    //connect(pingHttp, SIGNAL(responseHeaderReceived(const QHttpResponseHeader &)),
-    //        this, SLOT(pingHttpReadResponseHeader(const QHttpResponseHeader &)));
-
 
     connect(startButton, SIGNAL(clicked()), this, SLOT(startTimer()));
     connect(quitButton, SIGNAL(clicked()), this, SLOT(close()));
-
-    QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addWidget(statusLabel);
-    mainLayout->addWidget(buttonBox);
-    setLayout(mainLayout);
-
-    setWindowTitle(tr("DynamicDocs Interactor"));
 
     user_timer = 36000; //by defaul set timer
 
@@ -189,20 +189,28 @@ void HttpWindow::startProc()
     messageList = loader->readPingResults(receivers);
     if(messageList.count() > 0 )
     {
+        qWarning() << tr("Found %1 ping results for sent").arg(QString::number(messageList.count()));
         httpMessages.clear();
 
         for (QList<JKKSPMessWithAddr *>::const_iterator iterator = messageList.constBegin();iterator != messageList.constEnd();++iterator)
         {
-            bool stat = sendOutMessage((*iterator), true, false) ;
+            bool stat = sendOutMessage((*iterator), true, false) ; //Второй параметр отвечает за то, что данные будут уходить синхронно или асинхронно. 
+                                                                    //Здесь асинхронно. Т.е. система не будет ожидать, пока не завершится передача одного сообщения
+                                                                    //прежде чем приступить к передаче следующего
         }
+
 
         while(!messageList.isEmpty())
             delete messageList.takeFirst();
+
+        qWarning() << tr("Ping results sending complete");
     }
     
     receivers.clear();
     
     messageList = loader->readMessages(receivers);
+    QList<JKKSFilePart *> files = loader->readFileParts(receivers);
+
     if(receivers.isEmpty()){
         startButton->setEnabled(true);
         if(manual == false)
@@ -218,6 +226,9 @@ void HttpWindow::startProc()
     pingsForSent = m_pings.count();
     cntPingsSended = 0;
 
+    if(pingsForSent > 0)
+        qWarning() << tr("Starting to send %1 ping requests.\nSending messages will be suspended until all ping results do not come back").arg(QString::number(pingsForSent));
+
     //* Рассылаем пинги и ждем пока этот процесс не завершится*/ 
 	QEventLoop eventLoop;
 	connect(this,SIGNAL(pingsSentCompleted()),&eventLoop,SLOT(quit()));
@@ -231,10 +242,11 @@ void HttpWindow::startProc()
 
         return;
     }
+
+    qWarning() << tr("Pings sending complete");
     //**/
 
-    QList<JKKSFilePart *> files = loader->readFileParts();
-    
+   
     filesForSent = files.count();
     msgForSent = messageList.size();
     filePartsForSent = 0;
@@ -251,25 +263,47 @@ void HttpWindow::startProc()
     cntFilesSended = 0;
     cntFilePartsSended = 0;
 
-    statusLabel->setText(tr("Data transferring started ...\n\n"
-                            "Messages for transfer: %1 ---> %3\n"
-                            "Files for transfer: %2 (for current file: %5 parts) ---> %4 (for current file: %6 parts)")
+    QString msg = tr("Data transferring started ...\n"
+                     "Messages for transfer: %1 ---> %3\n"
+                     "Files for transfer: %2 (for current file: %5 parts) ---> %4 (for current file: %6 parts)")
                             .arg(msgForSent)
                             .arg(filesForSent)
                             .arg(cntMsgSended)
                             .arg(cntFilesSended)
                             .arg(filePartsForSent)
-                            .arg(cntFilePartsSended));
-    //statusLabel->setText(tr("Found messages for transferring: %1\nTransfered: %2").arg(QString::number(msgForSent + filesForSent)).arg(QString::number(0)));
+                            .arg(cntFilePartsSended);
+
+    qWarning() << msg;
+    statusLabel->setText(msg);
 
     if(msgForSent > 0 )
     {
-
         httpMessages.clear();
 
         for (QList<JKKSPMessWithAddr *>::const_iterator iterator = messageList.constBegin();iterator != messageList.constEnd();++iterator)
         {
-            bool stat = sendOutMessage((*iterator), true, false) ;
+            //Второй параметр отвечает за то, что данные будут уходить синхронно или асинхронно. 
+            //Здесь синхронно. Т.е. система будет ожидать, пока не завершится передача одного сообщения
+            //прежде чем приступить к передаче следующего
+            //Причины:
+            //1 - Если при передаче предыдущего сообщения произошел сбой, то последующие мы переджавать не будем. Обновим соответствующий JKKSPing
+            //2 - В процессе передачи теоретически может возникнуть ситуация, когда отправленное асинхронно вторым сообщение придет на приемный конец раньше первого. А это не правильно
+            //3 - Задача транспорта - передать данные полностью, причем здесь важна не скорость а гарантированность доставки. И здесь асинхронный режим не быстрее синхронного
+            bool stat = sendOutMessage((*iterator), true, false);
+            
+            //если было принято решение не отправлять сообщение
+            if(stat == false){
+                cntMsgSended++; //все-таки считаем его отправленным
+                
+                //если отправили всё
+                if(cntMsgSended >= msgForSent && filesForSent == 0){
+                    startButton->setEnabled(true);
+                    if(manual == false){
+                        m_timer->start();
+                    }
+                }
+
+            }
         }
 
         while(!messageList.isEmpty())
@@ -298,6 +332,7 @@ void HttpWindow::startProc()
                                 .arg(filePartsForSent)
                                 .arg(cntFilePartsSended));
 
+        bool isFirst = true;
         do
         {
             JKKSPMessWithAddr * pMes = NULL;
@@ -310,6 +345,8 @@ void HttpWindow::startProc()
             part.setAddr(files.at(i)->getAddr());
             part.setId(files.at(i)->id());
             part.setIdUrl(files.at(i)->getIdUrl());
+            part.setIsFirst(isFirst);
+            isFirst = false;//далее все части файла не являются первыми
         
             if(readed == -1)//при ошибке чтения выходим на следующий файл, текущий не передаем
                 break;
@@ -325,13 +362,28 @@ void HttpWindow::startProc()
 
             JKKSPMessage pM(part.serialize(), JKKSMessage::atFilePart);
             pM.setVerifyReceiver(false);
-            //pM.receiverUID = part.getAddr();
-            //pM.senderUID = part.getSenderAddr();
+            pM.setReceiverUID(part.receiverUID());
+            pM.setSenderUID(part.senderUID());
             
             JKKSPMessWithAddr * pMessWithAddr = new JKKSPMessWithAddr(pM, part.getAddr(), part.id());
             
+            //части файлов обязательно передаем синхронно
             bool stat = sendOutMessage(pMessWithAddr, true, eof) ;
-            
+
+            if(!stat){
+                cntFilePartsSended++; //все-таки считаем часть файла отправленной
+                if(eof)
+                    cntFilesSended++;//если отправляли последнюю часть файла, то и сам файл считаем отправленным
+                
+                //если отправили всё
+                if(cntFilesSended >= filesForSent){
+                    startButton->setEnabled(true);
+                    if(manual == false){
+                        m_timer->start();
+                    }
+                }
+            }
+
             if(eof){
                 break;
             }
@@ -373,8 +425,6 @@ void HttpWindow::httpRequestFinished(int requestId, bool error)
 
     bool bFound = false;
     
-    qWarning() << "In httpRequestFinished() requestId = " << requestId;
-    
     uint messCount = httpMessages.count();
     if(messCount <= 0)
         return;
@@ -385,17 +435,23 @@ void HttpWindow::httpRequestFinished(int requestId, bool error)
         return;
     }
     
-    qWarning() << "In httpRequestFinished(). Found corresponding request. requestId = " << requestId;
+    qWarning() << tr("Message sending request completed. requestId = ") << requestId;
     emit needToExitEventLoop();
 
     httpMessages.remove(requestId);
     
-    if( (JKKSMessage::JKKSMessageType) t.second == JKKSMessage::atFilePart)
+    if( (JKKSMessage::JKKSMessageType) t.second == JKKSMessage::atFilePart){
+        qWarning() << tr("Next file transferred (%1 from %2)").arg(cntFilesSended).arg(filesForSent);
         cntFilesSended++;
-    else if((JKKSMessage::JKKSMessageType) t.second == JKKSMessage::atUnknownType)
+    }
+    else if((JKKSMessage::JKKSMessageType) t.second == JKKSMessage::atUnknownType){
+        qWarning() << tr("Next file part transferred (%1 from %2)").arg(cntFilePartsSended).arg(filePartsForSent);
         cntFilePartsSended++;
-    else
+    }
+    else{
+        qWarning() << tr("Next message transferred (%1 from %2)").arg(cntMsgSended).arg(msgForSent);
         cntMsgSended++;
+    }
 
     statusLabel->setText(tr("Data transferring started ...\n\n"
                             "Messages for transfer: %1 ---> %3\n"
@@ -406,7 +462,6 @@ void HttpWindow::httpRequestFinished(int requestId, bool error)
                             .arg(cntFilesSended)
                             .arg(filePartsForSent)
                             .arg(cntFilePartsSended));
-    //statusLabel->setText(tr("Found messages for transferring: %1\nTransfered: %2").arg(QString::number(msgForSent+filesForSent)).arg(QString::number(cntMsgSended)));
 
     //если мы отправляли часть файла и она не является последней
     if( (JKKSMessage::JKKSMessageType) t.second == JKKSMessage::atUnknownType)
@@ -416,6 +471,18 @@ void HttpWindow::httpRequestFinished(int requestId, bool error)
 
     if (error) {
         qCritical() << tr("ERROR: Data transfer for requestId = %1 failed: %2").arg(requestId).arg(http->errorString());
+        
+        //здесь надо обновить информацию о состоянии целевой организации (в пингах).
+        //Сделать ее неактивной, чтобы последующие сообщения не слались далее.
+        QString emailPrefix = loader->getReceiverEmailPrefix(t.first, t.second);
+        if(emailPrefix.isEmpty())
+            return;//но это так не должно быть
+
+        JKKSPing p = m_pings.value(emailPrefix);
+        p.setState1(0);
+        p.setState2(0);
+        m_pings.insert(emailPrefix, p);
+
         return;
     } 
     
@@ -441,49 +508,38 @@ void HttpWindow::httpRequestFinished(int requestId, bool error)
             qCritical() << "ERROR: Cannot mark message as sended! Database Error";
         }
     }
+    else{
+        //в противном случае помечаем информацию о целевой организации (в пинге)
+        //Делаем ее неактивной
+        QString emailPrefix = loader->getReceiverEmailPrefix(t.first, t.second);
+        if(emailPrefix.isEmpty())
+            return;//но это так не должно быть
+
+        JKKSPing p = m_pings.value(emailPrefix);
+        p.setState1(0);
+        p.setState2(0);
+        m_pings.insert(emailPrefix, p);
+
+        return;
+    }
 }
 
 void HttpWindow::slotHttpMessageRemoved(int sendedCount)
 {
     //msgForSent + filesForSent выставляется в методе startProc() при чтении кол-ва сообщений и файлов на отправку
 
-    if(httpMessages.count() > 0 || (msgForSent + filesForSent) != sendedCount){ 
+    if((msgForSent + filesForSent) > sendedCount){ 
         return;
     }
     
     //если подготовленных сообщений на отправку больше нет - включаем таймер и ждем данных из БД
+    qWarning() << tr("Waiting for data to sent...");
     if(manual == false){
         m_timer->start();
     }
     else
         startButton->setEnabled(true); //если активен ручной (отладочный) режим - делаем доступной кнопку отправки
 }
-
-/*
-void HttpWindow::readResponseHeader(const QHttpResponseHeader &responseHeader)
-{
-    qWarning() << "In readResponseHeader()";
-
-    int status = responseHeader.statusCode();
-    QString str = responseHeader.toString();
-    switch (status) {
-    case 200:                   // Ok
-    case 301:                   // Moved Permanently
-    case 302:                   // Found
-    case 303:                   // See Other
-    case 307:                   // Temporary Redirect
-    case 205:
-        // these are not error conditions
-        break;
-
-    default: break;
-
-        //if(manual == false){
-        //    m_timer->start();
-        //}
-    }
-}
-*/
 
 bool HttpWindow::setMessageAsSended(const qint64 & id, const int & type, bool sended)
 {
@@ -498,9 +554,6 @@ bool HttpWindow::sendOutMessage(const JKKSPMessWithAddr * message,
                                 bool filePartsFlag,
                                 bool isLastFilePart)
 {
-    
-    qWarning() << "In sendOutMessage() ";
-
     if(message == NULL)
         return false;
 
@@ -518,7 +571,11 @@ bool HttpWindow::sendOutMessage(const JKKSPMessWithAddr * message,
             ping.state3() != 1 ||
             ping.state4() != 1)
         {
-            qCritical() << "Destination organization does not active! Data sending for that skipped!";
+            qCritical() << tr("Destination organization does not active! Data sending for that skipped!");
+            qCritical() << tr("Receiver address = (IP=%1, port=%2, use gateway = %3)")
+                                    .arg(message->addr.address())
+                                    .arg(message->addr.port())
+                                    .arg(message->addr.useGateway() ? QString("TRUE") : QString("FALSE"));
             return false;
         }
     }
@@ -605,8 +662,7 @@ bool HttpWindow::sendOutMessage(const JKKSPMessWithAddr * message,
 		QEventLoop eventLoop;
 		connect(this,SIGNAL(needToExitEventLoop()),&eventLoop,SLOT(quit()));
 
-        qWarning() << "1 before post-> ";
-        httpGetId = http->post ( path, byteArray ) ;
+        int httpGetId = http->post ( path, byteArray ) ;
 
         if(message->pMess.getType() != JKKSMessage::atFilePart){//для файлов, передаваемых частями информация в этот список заносится отдельно
             httpMessages.insert(httpGetId, qMakePair(message->id, (qint64)message->pMess.getType()) );
@@ -621,15 +677,14 @@ bool HttpWindow::sendOutMessage(const JKKSPMessWithAddr * message,
                 httpMessages.insert(httpGetId, qMakePair(message->id, (qint64)JKKSMessage::atUnknownType) );
             }
         }
-		
-        //qWarning() << "2 after post-> ";
 
+        qWarning() << tr("Message sending request sheduled. requestId = %1").arg(httpGetId);
+		
         eventLoop.exec();
-        qWarning() << "3 after eventLoop.exec() ";
 	}
     else 
     {
-        httpGetId = http->post ( path, byteArray ) ;
+        int httpGetId = http->post ( path, byteArray ) ;
 
         if(message->pMess.getType() != JKKSMessage::atFilePart){//для файлов, передаваемых частями информация в этот список заносится отдельно
             httpMessages.insert(httpGetId, qMakePair(message->id, (qint64)message->pMess.getType()) );
@@ -644,6 +699,9 @@ bool HttpWindow::sendOutMessage(const JKKSPMessWithAddr * message,
                 httpMessages.insert(httpGetId, qMakePair(message->id, (qint64)JKKSMessage::atUnknownType) );
             }
         }
+        
+         qWarning() << tr("Message sending request sheduled. requestId = %1").arg(httpGetId);
+
     }
   
     return true;
@@ -651,8 +709,6 @@ bool HttpWindow::sendOutMessage(const JKKSPMessWithAddr * message,
 
 void HttpWindow::loadData()
 {
-    qWarning() << "In loadData() ";
-
     QTcpSocket *clientConnection = tcpServer->nextPendingConnection();
     connect(clientConnection, SIGNAL(disconnected()),
             clientConnection, SLOT(deleteLater()));
@@ -689,7 +745,7 @@ void HttpWindow::loadData()
 
     if(b)
     {
-        qWarning() << "In loadData. Data found!";
+        qWarning() << tr("Income message arrived");
 
         int sz_dt = header.contentLength();
         all_data = all_data.right(sz_dt); 
@@ -718,6 +774,7 @@ void HttpWindow::loadData()
     }
 
     clientConnection->disconnectFromHost();
+    qWarning() << tr("Disconnected from socket");
 }
 
 int HttpWindow::processMessage(const QByteArray & ba, QTcpSocket * clientConnection)
@@ -747,7 +804,7 @@ int HttpWindow::processMessage(const QByteArray & ba, QTcpSocket * clientConnect
     //вычисленная hash-сумма пришедших данных
     QByteArray hash = QCryptographicHash::hash(byteArray, QCryptographicHash::Sha1);
     if(etaloneHash != hash){
-        qCritical() << "ERROR! Hash sum inconsistent!";
+        qCritical() << "ERROR! Hash sum for income message is inconsistent!";
         sendBadBlock(clientConnection);
         return -1;
     }
@@ -769,8 +826,8 @@ int HttpWindow::processMessage(const QByteArray & ba, QTcpSocket * clientConnect
 
     int res = loader->writeMessage(pMessage);
     if(res <= 0){
-        qDebug() << "Message type: " << pMessage.getType();
-        qDebug() << "Write message status : " << res;
+        qCritical() << tr("ERROR! Cannot processing income message! Data was not write to database");
+        qCritical() << "Message type: " << pMessage.getType() << ". Write message status : " << res;
     }
 
     //в настоящее время мы полагаем, что вне зависимости от результата обработки входящего сообщения в БД
@@ -801,6 +858,7 @@ int HttpWindow::processMessage(const QByteArray & ba, QTcpSocket * clientConnect
 int HttpWindow::processNotification(const QByteArray & ba, QTcpSocket * clientConnection)
 {
     if(!ba.contains("mesid=") ||  (!ba.contains("&uno=") && !ba.contains("&unp=")) || !ba.contains("&received=")){
+        qCritical() << tr("Found inconsistent incoming notification! Bad format");
         sendBadBlock(clientConnection);
         return -1;
     }
@@ -814,7 +872,7 @@ int HttpWindow::processNotification(const QByteArray & ba, QTcpSocket * clientCo
     QByteArray byteArray = ba.mid(6, index-6-2);//6 - индекс начала цифр в идентификаторе сообщения. 2 последние цифры  - это тип сообщения
     idMsg = byteArray.toLongLong();
     if(idMsg <= 0){
-        qCritical() << "ERROR! Cannot parse MESID of the notification";
+        qCritical() << tr("ERROR! Cannot parse MESID of the notification");
         sendBadBlock(clientConnection);
         return -1;
     }
@@ -822,7 +880,7 @@ int HttpWindow::processNotification(const QByteArray & ba, QTcpSocket * clientCo
     byteArray = ba.mid(index-2, 2);
     msgType = byteArray.toInt();
     if(msgType < 0){
-        qCritical() << "ERROR! Cannot parse MESID (type part) of the notification";
+        qCritical() << tr("ERROR! Cannot parse MESID (type part) of the notification");
         sendBadBlock(clientConnection);
         return -1;
     }
@@ -830,6 +888,7 @@ int HttpWindow::processNotification(const QByteArray & ba, QTcpSocket * clientCo
 
     index = ba.indexOf("&received=");
     if(index < 13){ //если даже числа 1 и 1, то данная подстрока встретится не ранее чем на 13-й позиции
+        qCritical() << tr("ERROR! Cannot parse result status of the notification");
         sendBadBlock(clientConnection);
         return -1;
     }
@@ -844,6 +903,7 @@ int HttpWindow::processNotification(const QByteArray & ba, QTcpSocket * clientCo
     //если отрицательный - то число отправленных пингов увеличиваем на один, т.к. другого ответа не будет
     if(msgType == (int)JKKSMessage::atPing){
 
+        qWarning() << tr("Receive ping notification from gateway. Id = %1, result = %2.").arg(idMsg).arg(receiverResult);
         processPingNotification(idMsg, receiverResult);
         sendOKBlock(clientConnection, true);
 
@@ -851,7 +911,11 @@ int HttpWindow::processNotification(const QByteArray & ba, QTcpSocket * clientCo
     }
 
     if(receiverResult != 1){
-        qCritical() << "ERROR: Message with id = " << idMsg << " and type = " << msgType << " does not received by receiver! Result = " << receiverResult;
+        qCritical() << tr("ERROR: Message with id = %1 and type = %2 does not received by receiver! Result = %3")
+                                          .arg(idMsg) 
+                                          .arg(msgType)
+                                          .arg(receiverResult);
+
         ok = setMessageAsSended(idMsg, msgType, false);
      }
     else {
@@ -860,7 +924,9 @@ int HttpWindow::processNotification(const QByteArray & ba, QTcpSocket * clientCo
 
     if(!ok)
     {
-        qCritical() << "ERROR: Cannot mark message as sended! Database Error. idMsg = " << idMsg << " type = " << msgType;
+        qCritical() << tr("ERROR: Cannot mark message as sended! Database Error. idMsg = %1, type = %2")
+                                            .arg(idMsg)
+                                            .arg(msgType);
         sendOKBlock(clientConnection, true);        
     }
     else
@@ -880,7 +946,7 @@ int HttpWindow::processNotification(const QByteArray & ba, QTcpSocket * clientCo
 int HttpWindow::processPingNotification(int idMsg, int result)
 {
     if(result != 1){
-        qCritical() << "ERROR! Destination organization cannot receive ping!";
+        qCritical() << tr("ERROR! Destination organization cannot receive ping!");
         cntPingsSended++;
     }
 
@@ -926,6 +992,9 @@ int HttpWindow::processPingResponse(const JKKSPing * ping)
         }
     }
     
+    //pingsForSent Может быть меньше, чем cntPingsSended (т.е. пришло ответов больше, чем запрашивали)
+    //т.к. может прийти ответ на пинг, который не ждем. Это возможно, когда коннектор отправил запрос на пинг, не дождался ответа, завершил работу.
+    //а потом, когда включился снова, ответ на пинг пришел.
     if(pingsForSent <= cntPingsSended){
         emit pingsSended(m_pings);
         emit pingsSentCompleted();
@@ -957,9 +1026,6 @@ int HttpWindow::sendPings()
 
 bool HttpWindow::sendOutPing(const JKKSPMessWithAddr *ping)
 {
-    
-    qWarning() << "In sendOutPing()";
-
     if(ping == NULL)
         return false;
 
@@ -1050,6 +1116,8 @@ bool HttpWindow::sendOutPing(const JKKSPMessWithAddr *ping)
     //мы имеем право взять нужный нам пинг из списка подготовленных на отправку пингов, используя email_prefix организации-получателя пинга
     JKKSPing pp = m_pings.value(ping->pMess.receiverUID());
     pingHttpMessages.insert(httpGetId, pp);
+
+    qWarning() << tr("Ping sending request sheduled. requestId = %1").arg(httpGetId);
   
     return true;
 }
@@ -1058,8 +1126,6 @@ bool HttpWindow::sendOutPing(const JKKSPMessWithAddr *ping)
 void HttpWindow::pingHttpRequestFinished(int requestId, bool error)
 {
     bool bFound = false;
-    
-    qWarning() << "In pingHttpRequestFinished() requestId = " << requestId;
     
     uint messCount = pingHttpMessages.count();
     if(messCount <= 0)
@@ -1072,12 +1138,10 @@ void HttpWindow::pingHttpRequestFinished(int requestId, bool error)
     }
     
     pingHttpMessages.remove(requestId);
-    
-    statusLabel->setText(tr("Pings transferring started ...\n\n"
-                            "Pings for transfer: %1 ---> %2")
-                            .arg(pingsForSent)
-                            .arg(cntPingsSended));
 
+    qWarning() << tr("Ping sending request completed. requestId = ") << requestId;
+
+    //если не смогли отправить пинг - помечаем его как отправленного и неудачно доставленного (приемная сторона не отвечает)
     if (error) {
         qCritical() << tr("ERROR: Data transfer for requestId = %1 failed: %2").arg(requestId).arg(pingHttp->errorString());
         t.setState1(0);
@@ -1097,50 +1161,21 @@ void HttpWindow::pingHttpRequestFinished(int requestId, bool error)
     //и это означает, что взаимодействие осуществлялось через шлюз (ТПС)
     QByteArray ba = http->readAll();
     if(ba.length() <= 0 || ba == "OK"){//это сообщение было передано напрямую на целевой объект в http_connector
+        qWarning() << tr("Ping request delivered to destination organization. Waiting for answer");
         return;
     }
 
     //далее полагаем, что ответ пришел от шлюза
     //и в случае, если ответ содержит " ERROR ", помечаем сообщение как отправленное
     if( ba.contains(" ERROR ")){
+        qCritical() << tr("ERROR: Data transfer for requestId = %1 failed: %2").arg(requestId).arg(pingHttp->errorString());
         t.setState1(0);
         t.setState2(0);
         t.setState3(0);
         t.setState4(0);
         processPingResponse(&t);
     }
-
-    //if(pingsForSent == cntPingsSended){
-    //    emit pingsSended(m_pings);
-    //    emit pingsSentCompleted();
-    //}
 }
-
-/*
-void HttpWindow::pingHttpReadResponseHeader(const QHttpResponseHeader &responseHeader)
-{
-    qWarning() << "In readResponseHeader()";
-
-    int status = responseHeader.statusCode();
-    QString str = responseHeader.toString();
-    switch (status) {
-    case 200:                   // Ok
-    case 301:                   // Moved Permanently
-    case 302:                   // Found
-    case 303:                   // See Other
-    case 307:                   // Temporary Redirect
-    case 205:
-        // these are not error conditions
-        break;
-
-    default: break;
-
-        //if(manual == false){
-        //    m_timer->start();
-        //}
-    }
-}
-*/
 
 void HttpWindow :: sendOKBlock(QTcpSocket * clientConnection, bool withData)
 {

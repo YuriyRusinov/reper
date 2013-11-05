@@ -67,7 +67,7 @@ class __CORE_EXPORT KKSSito : public QObject
     Q_OBJECT
 
 public:
-    KKSSito(const QString & userName = QString());
+    KKSSito(const QString & userName = QString(), bool msgToWindow = true);
     virtual ~KKSSito();
 
     KKSError * getLastError();  
@@ -175,7 +175,7 @@ public:
     \endcode*/
 
     static KKSSito * instance() { return self; }
-    static KKSSito * init (bool with_connect = true, const QString & userName = QString());
+    static KKSSito * init (bool with_connect = true, const QString & userName = QString(), bool msgToWindow = true);
     static int GUIConnect(QWidget * parent = NULL);
 
 

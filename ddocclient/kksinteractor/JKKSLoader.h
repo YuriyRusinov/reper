@@ -135,10 +135,9 @@ class _I_EXPORT JKKSLoader
 
         qint64 getIdTransport() const;
 
-        //QString getLocalAddr (void) const;
-        //void setLocalAddr (const QString& localAddr);
+        QString getReceiverEmailPrefix(qint64 id, qint64 type) const;//получить email_prefix организации-получателя для заданного сообщения (с заданным типом)
 
-        QList<JKKSFilePart*> readFileParts() const;
+        QList<JKKSFilePart*> readFileParts(QStringList & receivers) const;
         QByteArray readFilePartData(const QString & absUrl, qint64 blockSize, qint64 position, qint64 * readed) const;
         int writeFilePartData(JKKSFilePart * part) const;
         qint64 getFileDataSize(qint64 idUrl) const;

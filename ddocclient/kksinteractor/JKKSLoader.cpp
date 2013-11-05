@@ -2208,7 +2208,7 @@ int JKKSLoader :: setAsSended (qint64 id, int idType, bool sended) const
 //В данном методе мы не вычитываем содержимое блока файла, поскольку файл передается поблочно и все его части передаются отдельно путем вызова метода readFilePartData()
 //Здесь мы просто получаем необходимую информацию о том, какие файлы требуют поблочной передачи 
 //ВАЖНО: файлы размером менее _MAX_FILE_BLOCK2 передаются полностью в методе readDocumentFiles() 
-QList<JKKSFilePart*> JKKSLoader :: readFileParts() const
+QList<JKKSFilePart*> JKKSLoader :: readFileParts(QStringList & receivers) const
 {
     QList<JKKSFilePart *> parts;
     
@@ -2230,7 +2230,14 @@ QList<JKKSFilePart*> JKKSLoader :: readFileParts() const
             part->setAbsUrl(res->getCellAsString(i, 5));
             part->setIsLast(false);
             part->setUid(res->getCellAsString(i, 4));
-            
+
+            part->setReceiverUID(res->getCellAsString(i, 8));
+            part->setSenderUID(this->senderUID);
+                        
+            if(!receivers.contains(part->receiverUID()))
+                receivers.append(part->receiverUID());
+
+
             parts.append(part);
         }
         delete res;
@@ -3407,8 +3414,12 @@ int JKKSLoader::writeFilePartData(JKKSFilePart * part) const
     sprintf(command, "select rWriteFile(%d, $1, $2);", (int)idUrl);
     
     //int mode = 2; //это означает, что сначала будет осуществлена попытка чтения файла, и если онабудет успешной (файл существует) будет возврат с ошибкой (т.н. safe-mode)
-                    //Однако этот вариант нам не подходит!! Поскольку мы получаем данные порциями. Поэтому:
+                    //Однако этот вариант нам не подходит!! Поскольку мы получаем данные порциями. 
+                    //Поэтому если пришла первая часть файла (part.isFirst() = true), то делаем mode = 0 (файл будет перезаписан)
+                    //В противном случае и далее делаем mode = 1
     int mode = 1;
+    if(part->isFirst())
+        mode = 0;
 
     int  * paramTypes = new int[nParams];
     int  * paramLengths = new int[nParams]; 
@@ -3447,9 +3458,9 @@ int JKKSLoader::writeFilePartData(JKKSFilePart * part) const
         paramLengths[1]  = 0;
         if(mode == 0)
             paramValues[1] = ((char *)"0");
-        else if(mode == 1) //всегда работает этот вариант
+        else if(mode == 1)
             paramValues[1] = ((char *)"1");
-        else 
+        else //данный вариант не работает (mode = 0 или 1)
             paramValues[1] = ((char *)"2");
 
         KKSResult * res = dbWrite->execParams (command, 
@@ -3487,7 +3498,7 @@ int JKKSLoader::writeFilePartData(JKKSFilePart * part) const
 
             return ERROR_CODE;
         }
-        mode = 1;
+        mode = 1;//далее в рамках работы этого метода считаем, что прочитанное из пришедшего буфера дописываем в конец файла, хотя в настоящее время на следующий шаг цикл переходить не должен
         delete res;
     }
     delete[] paramValues[0];
@@ -5320,4 +5331,24 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: pingsToPMessWithAddr(const QMap<QString
     }
 
     return result;
+}
+
+QString JKKSLoader :: getReceiverEmailPrefix(qint64 id, qint64 type) const//получить email_prefix организации-получателя для заданного сообщения (с заданным типом)
+{
+    QString emailPrefix;
+
+    if(id <= 0 || type <= 0)
+        return emailPrefix;
+
+    QString sql = QString("select getReceiverEmailPrefix(%1, %2)").arg(id).arg(type);
+    KKSResult * res = dbRead->execute(sql);
+    if(!res || res->getRowCount() != 1){
+        if(res)
+            delete res;
+        return emailPrefix;
+    }
+
+    emailPrefix = res->getCellAsString(0, 0);
+
+    return emailPrefix;
 }

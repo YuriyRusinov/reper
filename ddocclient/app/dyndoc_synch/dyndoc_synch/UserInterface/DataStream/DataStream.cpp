@@ -192,7 +192,7 @@ void dataStream::executeQuery()
     if(!( res = db->execute(sqlQuery) ))
     {
         QMessageBox msgBox;
-        msgBox.setWindowTitle(tr("Data base error"));
+        msgBox.setWindowTitle(tr("Database error"));
         msgBox.setText("Res is NULL!");
         msgBox.exec();
     }

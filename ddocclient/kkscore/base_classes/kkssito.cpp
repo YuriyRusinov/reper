@@ -16,7 +16,6 @@
 #include <kkspgdatabase.h>
 #include <kksdatabase.h>
 
-//#include "KKSRecordFactory.h"
 #include "KKSLoader.h"
 #include "KKSFileLoader.h"
 #include "KKSPPFactory.h"
@@ -79,7 +78,7 @@ void KKSDbgOutputHandler(QtMsgType type, const char *msg)
 
  роме того загружаютс€ необходимые данные дл€ класса QTranslator (русификаци€). ѕо умолчанию используетс€ файл kkssito_ru.ts в корневом каталоге приложени€.
 */
-KKSSito::KKSSito(const QString & userName) :
+KKSSito::KKSSito(const QString & userName, bool msgToWindow) :
     poDb (0),
     m_objf (0),
     m_catf (0),
@@ -127,7 +126,8 @@ KKSSito::KKSSito(const QString & userName) :
 
     getLastError();//это типа чтоп файл журнала создать в текущей папке (там где exe-шник лежџт)
 
-    //qInstallMsgHandler(KKSDbgOutputHandler);
+    if(msgToWindow)
+        qInstallMsgHandler(KKSDbgOutputHandler);
 
 }
 
@@ -619,7 +619,7 @@ void KKSSito::loadLastSelectedFilter()
 }
 
 
-KKSSito * KKSSito::init (bool with_connect, const QString & userName)
+KKSSito * KKSSito::init (bool with_connect, const QString & userName, bool msgToWindow)
 {
     QApplication * app;
 	
@@ -636,7 +636,7 @@ KKSSito * KKSSito::init (bool with_connect, const QString & userName)
     KKSSito * xG0;
     bool bDel = false;
     if ( !self ){
-        xG0 = new KKSSito (userName);
+        xG0 = new KKSSito (userName, msgToWindow);
         bDel = true;
     }
     else
