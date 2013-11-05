@@ -21,3 +21,4 @@
 \i ./functions/upiter/uconfirmmsg.sql
 \i ./functions/upiter/uconfirmcmd.sql
 \i ./functions/upiter/uinserttransport.sql
+\i ./functions/upiter/ugetreceiveremailprefix.sql
