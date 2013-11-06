@@ -239,6 +239,8 @@ class _F_EXPORT KKSLoader
         qint64 getIdByUID (const QString& tableName, const QString& uid) const;
         
         bool isApplicable (KKSSearchTemplate * st, int idCategory) const;
+        
+        bool isIOCreated (const KKSCategory * cat) const;
 
         KKSLoader();
         ~KKSLoader();

@@ -130,7 +130,7 @@ KKSCatEditor :: KKSCatEditor (KKSCategory *c,
         connect (recWidget, SIGNAL (entityDoubleClicked()), this, SLOT (editAttribute()) );
     }
 
-    if (recTableW)
+    if (recTableW && recTableW->actAdd->isEnabled())
     {
         connect (recTableW->actAdd, SIGNAL (triggered()), this, SLOT (addTableAttribute()) );
         connect (recTableW->actEdit, SIGNAL (triggered()), this, SLOT (editTableAttribute()) );

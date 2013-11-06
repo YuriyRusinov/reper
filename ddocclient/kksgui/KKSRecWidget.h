@@ -72,6 +72,8 @@ public:
     QAction * addToolBarSeparator (void);
     void insertToolBarAction (QAction * before, QAction * action);
     void removeToolBarAction (QAction * action);
+    
+    void setToolBarActionEnabled (QAction * act, bool isEnabled);
 
     QSize sizeHint() const;
     void setRecContextMenuPolicy (Qt::ContextMenuPolicy policy);

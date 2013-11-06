@@ -644,3 +644,11 @@ QToolBar * KKSRecWidget :: getToolBar (void) const
 {
     return this->tBActions;
 }
+
+void KKSRecWidget :: setToolBarActionEnabled (QAction * act, bool isEnabled)
+{
+    QList<QAction *> tbActs = tBActions->actions();
+    if (!tbActs.contains (act))
+        return;
+    act->setEnabled (isEnabled);
+}
