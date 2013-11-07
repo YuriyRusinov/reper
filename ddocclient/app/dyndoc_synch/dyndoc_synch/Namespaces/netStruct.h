@@ -19,7 +19,8 @@ namespace dyndoc_mainStructs
         QString name;
         QString parentName;
         QString protocol;
-        QString id;
+        QString id;      
+        QString email_prefix;
     };
 
     typedef hostStructInformation hostStructInf;
@@ -28,6 +29,7 @@ namespace dyndoc_mainStructs
     {
         hostStructInf structInf;
         hostInf address;
+        QString icon;
     };
 
     typedef hostModelInformation hostModelInf;

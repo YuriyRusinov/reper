@@ -26,8 +26,6 @@ int main(int argc, char *argv[])
     dataStream* dataUnit = new dataStream(sito->db());
     networkStream* netUnit = new networkStream();
 
-    QObject::connect(userForm,SIGNAL(signalGetData()),dataUnit,SLOT(slotGetData()));
-    QObject::connect(dataUnit,SIGNAL(signalDataTable(QList<viewElement*>*)),userForm,SLOT(reciveData(QList<viewElement*>*)));
     QObject::connect(userForm,SIGNAL(signal_startSyncronization(dyndoc_netThread::synchList*)),netUnit,SLOT(slotStartSyncronization(dyndoc_netThread::synchList*)));
     QObject::connect(userForm,SIGNAL(signal_stopSyncronization()),netUnit,SLOT(slotStopSyncronization()));
 

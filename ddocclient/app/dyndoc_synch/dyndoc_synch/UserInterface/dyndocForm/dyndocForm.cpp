@@ -49,20 +49,42 @@ void dyndoc_synch_form::initInterface()
 {
     viewModel->setHeaderData(0,Qt::Horizontal,QString(tr("Organization")));
     viewModel->setHeaderData(0,Qt::Horizontal,Qt::AlignCenter,Qt::TextAlignmentRole);
+    viewWidget->setColumnWidth(0,250);
+
     viewModel->setHeaderData(1,Qt::Horizontal,QString(tr("Protocol")));
     viewModel->setHeaderData(1,Qt::Horizontal,Qt::AlignCenter,Qt::TextAlignmentRole);
+    viewWidget->setColumnWidth(1,100);
+
     viewModel->setHeaderData(2,Qt::Horizontal,QString(tr("Adress")));
     viewModel->setHeaderData(2,Qt::Horizontal,Qt::AlignCenter,Qt::TextAlignmentRole);
+    viewWidget->setColumnWidth(2,100);
+
     viewModel->setHeaderData(3,Qt::Horizontal,QString(tr("Port")));
     viewModel->setHeaderData(3,Qt::Horizontal,Qt::AlignCenter,Qt::TextAlignmentRole);
+    viewWidget->setColumnWidth(3,100);
+
     viewModel->setHeaderData(4,Qt::Horizontal,QString(tr("Syncronizer\nactivity")));
     viewModel->setHeaderData(4,Qt::Horizontal,Qt::AlignCenter,Qt::TextAlignmentRole);
+    viewWidget->setColumnWidth(4,100);
+
     viewModel->setHeaderData(5,Qt::Horizontal,QString(tr("Database\nactivity")));
     viewModel->setHeaderData(5,Qt::Horizontal,Qt::AlignCenter,Qt::TextAlignmentRole);
+    viewWidget->setColumnWidth(5,100);
+
     viewModel->setHeaderData(6,Qt::Horizontal,QString(tr("Initial\nsyncronization")));
     viewModel->setHeaderData(6,Qt::Horizontal,Qt::AlignCenter,Qt::TextAlignmentRole);
+    viewWidget->setColumnWidth(6,100);
+
     viewModel->setHeaderData(7,Qt::Horizontal,QString(tr("Transmition")));
     viewModel->setHeaderData(7,Qt::Horizontal,Qt::AlignCenter,Qt::TextAlignmentRole);
+    viewWidget->setColumnWidth(7,100);
+
+    viewWidget->setRootIsDecorated(false);
+
+    dyndoc_delegate* sizeDelegate = new dyndoc_delegate(this);
+    viewWidget->setItemDelegate(sizeDelegate);
+
+    this->setWindowTitle(tr("Interaction monitor"));
 }
 //*****
 
@@ -209,14 +231,19 @@ int dyndoc_synch_form::addColumnName(QList<QStandardItem*>& rhs,int query_index,
     item->setData(dataTable.at(query_index).structInf.name,Qt::DisplayRole);
     item->setData(dataTable.at(query_index).structInf.name,Qt::ToolTipRole);
     item->setData(dataTable.at(query_index).structInf.id,Qt::UserRole+1);
+    item->setData(dataTable.at(query_index).structInf.email_prefix,Qt::UserRole+2);
 
     item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+    item->setTextAlignment(Qt::AlignVCenter);
+    item->setData(Qt::red,Qt::BackgroundColorRole);
 
     if(item->data(Qt::UserRole+1).toString() == "localorg-organization-1")
     {
          QFont boldItemFont = item->font();
          boldItemFont.setBold(true);
          item->setFont(boldItemFont);
+
+         item->setData(QString("*") + item->data(Qt::DisplayRole).toString(),Qt::DisplayRole);
     }
 
     rhs.append(item);
@@ -231,7 +258,9 @@ int dyndoc_synch_form::addColumnProtocol(QList<QStandardItem*>& rhs,int query_in
     item->setData(dataTable.at(query_index).structInf.protocol,Qt::DisplayRole);
     item->setData(dataTable.at(query_index).structInf.protocol,Qt::ToolTipRole);
 
+    item->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
     item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+    item->setData(Qt::red,Qt::BackgroundColorRole);
 
     rhs.append(item);
 
@@ -245,7 +274,9 @@ int dyndoc_synch_form::addColumnAdress(QList<QStandardItem*>& rhs,int query_inde
     item->setData(dataTable.at(query_index).address.address,Qt::DisplayRole);
     item->setData(dataTable.at(query_index).address.address,Qt::ToolTipRole);
 
+    item->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
     item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+    item->setData(Qt::red,Qt::BackgroundColorRole);
 
     rhs.append(item);
 
@@ -259,7 +290,9 @@ int dyndoc_synch_form::addColumnPort(QList<QStandardItem*>& rhs,int query_index,
     item->setData(dataTable.at(query_index).address.port,Qt::DisplayRole);
     item->setData(dataTable.at(query_index).address.port,Qt::ToolTipRole);
 
+    item->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
     item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+    item->setData(Qt::red,Qt::BackgroundColorRole);
 
     rhs.append(item);
 

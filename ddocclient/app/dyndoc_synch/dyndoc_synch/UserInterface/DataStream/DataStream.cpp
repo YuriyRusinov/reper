@@ -1,4 +1,4 @@
-#include "./UserInterface/DataStream/DataStream.h"
+#include "DataStream.h"
 
 dataStream::dataStream(KKSDatabase* adb,QObject *parent):
     QObject(parent), flagDBisOpen(false)
@@ -191,10 +191,7 @@ void dataStream::executeQuery()
 {
     if(!( res = db->execute(sqlQuery) ))
     {
-        QMessageBox msgBox;
-        msgBox.setWindowTitle(tr("Database error"));
-        msgBox.setText("Res is NULL!");
-        msgBox.exec();
+        //QMessageBox::critical(this,tr("Database error"),tr("Result is empty."));
     }
 }
 
@@ -211,8 +208,10 @@ void dataStream::createOrganizationsListFromRes()
         newOrg.structInf.name = res->getCellAsString(i,3);
         newOrg.structInf.parentName = res->getCellAsString(i,4);
         newOrg.structInf.protocol = "TCP/IP";
+        newOrg.structInf.email_prefix = res->getCellAsString(i,27);
         newOrg.address.address = res->getCellAsString(i,33);
-        newOrg.address.port = res->getCellAsInt(i,34);//getCellAsString(i,34);
+        newOrg.address.port = res->getCellAsInt(i,34);
+        //newOrg.icon = res->get;//(i,14);
 
         organizations.append(newOrg);
     }

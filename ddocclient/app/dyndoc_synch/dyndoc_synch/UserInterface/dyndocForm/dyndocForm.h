@@ -13,6 +13,7 @@
 #include "UserInterface/DataElements/dyndocView.h"
 #include "UserInterface/DataElements/dyndocModel.h"
 #include "UserInterface/DataElements/viewElement.h"
+#include "UserInterface/DataElements/dyndoc_delegate.h"
 
 class dyndocModel;
 

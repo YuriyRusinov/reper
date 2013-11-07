@@ -7,6 +7,7 @@ HEADERS += \
         UserInterface/DataElements/viewElement.h \
         UserInterface/DataElements/dyndocModel.h \
         UserInterface/DataElements/dyndocView.h \
+        UserInterface/DataElements/dyndoc_delegate.h \
         Namespaces/netStruct.h
         
 SOURCES += \
@@ -17,6 +18,7 @@ SOURCES += \
         UserInterface/DataElements/viewElement.cpp \
         UserInterface/DataElements/dyndocModel.cpp \
         UserInterface/DataElements/dyndocView.cpp \
+        UserInterface/DataElements/dyndoc_delegate.cpp \
         Namespaces/netStruct.cpp
 
 FORMS   += \
