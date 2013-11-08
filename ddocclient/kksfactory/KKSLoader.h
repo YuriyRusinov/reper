@@ -241,6 +241,8 @@ class _F_EXPORT KKSLoader
         bool isApplicable (KKSSearchTemplate * st, int idCategory) const;
         
         bool isIOCreated (const KKSCategory * cat) const;
+        
+        bool isIOSynced (const KKSCategory * cat) const;
 
         KKSLoader();
         ~KKSLoader();

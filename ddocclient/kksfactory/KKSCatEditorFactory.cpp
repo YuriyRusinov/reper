@@ -500,6 +500,9 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (KKSCategory *cat, // 
     if (isIOs)
         rAttrTCw->setStatusTip(tr("There are documents created by category %1, operations with attributes are unavailable").arg (cat->name()));
     KKSRecWidget * recAttrCw = getAttrsWidget (cat->recAttrCategory(), mode, 0);
+    bool isIOSync = loader->isIOSynced(cat);
+    recAttrCw->setToolBarActionEnabled(recAttrCw->actAdd, !isIOSync);
+    recAttrCw->setToolBarActionEnabled(recAttrCw->actDel, !isIOSync);
     QAction * actCopyFrom = new QAction (QIcon (":/ddoc/add_copy.png"), tr("Copy attributes from"), rAttrTCw);
     rAttrTCw->addToolBarAction (actCopyFrom);
     KKSMap<int, KKSType*> cTypes = loader->loadAvailableTypes();

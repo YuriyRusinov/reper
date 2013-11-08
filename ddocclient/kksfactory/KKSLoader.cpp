@@ -6362,3 +6362,20 @@ bool KKSLoader :: isIOCreated (const KKSCategory * cat) const
     delete res;
     return isc;
 }
+
+bool KKSLoader :: isIOSynced (const KKSCategory * cat) const
+{
+    if (!cat)
+        return false;
+    QString sql = QString("select isIOSynced(%1);").arg (cat->id());
+    KKSResult * res = db->execute (sql);
+    if (!res || res->getRowCount() != 1)
+    {
+        if (res)
+            delete res;
+        return false;
+    }
+    bool isc = res->getCellAsBool (0, 0);
+    delete res;
+    return isc; 
+}
