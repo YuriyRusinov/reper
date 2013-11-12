@@ -3,7 +3,7 @@
 
 #include <QThread>
 
-#include <httpwindow.h>
+//#include <httpwindow.h>
 
 class HttpWindow;
 
@@ -25,7 +25,7 @@ public slots:
 private:
     volatile bool stop;
 
-    HttpWindow* httpWin;
+    //HttpWindow* httpWin;
 };
 
 #endif

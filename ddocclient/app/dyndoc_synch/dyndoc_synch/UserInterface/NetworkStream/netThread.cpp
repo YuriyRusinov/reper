@@ -3,7 +3,7 @@
 netThread::netThread(QObject* parent):
     QThread(parent)
 {
-    httpWin = 0;
+    //httpWin = 0;
     stop = false;
 
     //moveToThread(this);

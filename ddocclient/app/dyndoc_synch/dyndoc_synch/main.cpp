@@ -30,9 +30,24 @@ int main(int argc, char *argv[])
 
     dyndoc_mainStructs::dbInf dbInfForLoader = dataUnit->getDbInf();
 
-    //JKKSLoader* idOrganization = new JKKSLoader(dbInfForLoader.hostAddress,dbInfForLoader.dbName,dbInfForLoader.userName,dbInfForLoader.password,dbInfForLoader.port);
-    //int id = idOrganization->getLocalOrgId();
-    //delete idOrganization;
+    JKKSLoader* idOrganization = new JKKSLoader(dbInfForLoader.hostAddress,dbInfForLoader.dbName,dbInfForLoader.userName,dbInfForLoader.password,dbInfForLoader.port);
+    if (idOrganization && idOrganization->connectToDb ())
+    {
+        ;//OK
+    }
+    else if (idOrganization)
+    {
+        delete idOrganization;
+        qCritical() << QObject::tr("Unable to connect to the database: %1")
+                              .arg(dbInfForLoader.hostAddress);
+        QMessageBox::critical(0, QObject::tr("DynamicDocs Interactor"),
+                              QObject::tr("Unable to connect to the database: %1")
+                              .arg(dbInfForLoader.hostAddress));
+        return 0;
+    }
+
+    int id = idOrganization->getLocalOrgId();
+    delete idOrganization;
 
     QObject::connect(userForm,SIGNAL(signalStartSyncronization()),netUnit,SLOT(slotStartSyncronization()));
     QObject::connect(userForm,SIGNAL(signalStopSyncronization()),netUnit,SLOT(slotStopSyncronization()));

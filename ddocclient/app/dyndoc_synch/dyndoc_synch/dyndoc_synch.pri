@@ -9,9 +9,7 @@ HEADERS += \
         UserInterface/DataElements/dyndocModel.h \
         UserInterface/DataElements/dyndocView.h \
         UserInterface/DataElements/dyndoc_delegate.h \
-        Namespaces/netStruct.h \
-        ../../http_connector/src/httpwindow.h \
-        ../../http_connector/src/timerform.h
+        Namespaces/netStruct.h 
 
 SOURCES += \
         main.cpp \
@@ -23,12 +21,9 @@ SOURCES += \
         UserInterface/DataElements/dyndocModel.cpp \
         UserInterface/DataElements/dyndocView.cpp \
         UserInterface/DataElements/dyndoc_delegate.cpp \
-        Namespaces/netStruct.cpp \
-        ../../http_connector/src/httpwindow.cpp \
-        ../../http_connector/src/timerform.cpp
+        Namespaces/netStruct.cpp
 
 FORMS   += \
-        UserInterface/dyndocForm/dyndocForm.ui \
-        ../../http_connector/src/timer_form.ui
+        UserInterface/dyndocForm/dyndocForm.ui 
 
 QT += network
