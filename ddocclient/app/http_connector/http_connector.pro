@@ -14,9 +14,8 @@ INCLUDEPATH += 	. \
                 ../../kksfactory \
 		../../kksutils \
                 ../../kksinteractor \
+                ../../kkshttpconnector \
                 ./include
-#                /usr/local/kkssito/include\
-#                /usr/local/pgsql/include
 
 DEPENDPATH += 	. \
 		../../dataaccess \
@@ -26,11 +25,10 @@ DEPENDPATH += 	. \
                 ../../kksfactory \
 		../../kksutils \
                 ../../kksinteractor \
+                ../../kkshttpconnector \
                 ./gost
 
-LIBS += -L/usr/local/kkssito/lib\
-#        -L./gost\ 
-        -L$$DESTDIR -ldataaccess -lkksutils -lkkscore -lkksfactory -lkkspp -lkksgui -lkksinteractor
+LIBS += -L$$DESTDIR -ldataaccess -lkksutils -lkkscore -lkksfactory -lkkspp -lkksgui -lkksinteractor -lkkshttpconnector
 
 # libpq support
 LIBS += -L$${PSQL_HOME}/lib
@@ -42,23 +40,8 @@ win32 {
 win32-g++:LIBS += $${PSQL_HOME}/lib/libpq.dll.a
 }
 unix: LIBS *= -lpq
-#unix: LIBS *= -L./gost -lgost
 
-# Input
-HEADERS += src/httpwindow.h \
-           src/timerform.h \
-           src/transportsettingsform.h #\
-#           src/cryptmessage.h
-
-SOURCES += src/httpwindow.cpp \
-	     src/timerform.cpp \	
-           src/transportsettingsform.cpp \
-           src/main.cpp #\
-#           src/cryptmessage.cpp
-
-FORMS += src/authenticationdialog.ui \
-         src/transport_settings_form.ui \
-	   src/timer_form.ui	
+include (./http_connector.pri)
 
 QT += network
 

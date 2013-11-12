@@ -12,6 +12,7 @@ SUBDIRS += \
     kksgui \
     kksfactory \
     kksinteractor \
+    kkshttpconnector \
     kkscore \
     kksrunservice \
     app 

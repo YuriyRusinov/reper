@@ -70,7 +70,7 @@ void KKSDbgOutputWidget :: initWidget()
     QTextCharFormat charFormat;
     charFormat.setForeground(Qt::black);
     m_logWidgetCursor->atBlockStart();
-    m_logWidgetCursor->insertText(QDateTime::currentDateTime().toString(Qt::TextDate));
+    m_logWidgetCursor->insertText(QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss"));
     m_logWidgetCursor->insertText("\n");
 
 }
@@ -88,17 +88,18 @@ void KKSDbgOutputWidget :: printMessage(Criticality c, const QString & message)
     QBrush brush;
         
     switch(m_criticality){
-        case cError:
-        case cCritical:
+        case cCriticalMsg:
+        case cFatalMsg:
             brush = QBrush(Qt::darkRed);
             break;
-        case cWarning:
+        case cWarningMsg:
             brush = QBrush(Qt::darkYellow);
             break;
-        case cMessage:
+        case cInfoMsg:
+        case cImportantInfoMsg:
             brush = QBrush(Qt::darkGreen);
             break;
-        default:
+        default://cDebugMsg
             brush = QBrush(Qt::black);
             break;
     }
@@ -124,18 +125,20 @@ QString KKSDbgOutputWidget :: criticalityAsString(Criticality c)
 {
     QString s;
     switch (c){
-        case cMessage:
-            s = QObject::tr("MESSAGE.");
+        case cInfoMsg:
+        case cImportantInfoMsg:
+            s = QObject::tr("INFO:");
             break;
-        case cWarning:
+        case cWarningMsg:
             s = QObject::tr("WARNING!");
             break;
         default:
-        case cError:
+        case cCriticalMsg:
+        case cFatalMsg:
             s = QObject::tr("ERROR!");
             break;
-        case cCritical:
-            s = QObject::tr("CRITICAL!");
+        case cDebugMsg:
+            s = QObject::tr("DEBUG:");
             break;
     }
 

@@ -377,10 +377,10 @@ const QString & JKKSFilePart :: senderUID() const
 
 void JKKSFilePart :: setReceiverUID(const QString & uid)
 {
-    m_senderUID = uid;
+    m_receiverUID = uid;
 }
 
 void JKKSFilePart :: setSenderUID(const QString & uid)
 {
-    m_receiverUID = uid;
+    m_senderUID = uid;
 }

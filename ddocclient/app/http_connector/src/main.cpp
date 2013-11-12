@@ -23,21 +23,30 @@
 #include <QSettings>
 #include <QTextCodec>
 
-#include "httpwindow.h"
+#include <ddocinteractorwindow.h>
+#include <ddocinteractorbase.h>
+#include "timerform.h"
 #include "transportsettingsform.h"
 #include "kkssito.h"
+#include "KKSDebug.h"
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
     QTextCodec::setCodecForTr(QTextCodec::codecForName("Windows-1251"));
 
-    KKSSito *sito = KKSSito::init (false, QString(), true);
+    KKSDebug::setMinMsgType(KKSInfoMsg);
+    KKSDebug::setUseQDebug(true);
+
+    KKSSito *sito = KKSSito::init (false, QString(), false);
     if(!sito)
         return 1;
 
+    ///////////
+    //Init main settings
+    ///////////
+
     QSettings settings (QCoreApplication::applicationDirPath ()+"/http.ini", QSettings::IniFormat);
-        //("/etc/kkssito/http_client.ini1", QSettings::IniFormat);
 
     TransportSettingsForm * sForm = new TransportSettingsForm (&settings);
     if (!sForm)
@@ -51,9 +60,46 @@ int main(int argc, char *argv[])
     delete sForm;
 
     int res = 1;
-    HttpWindow httpWin;
+
+    //////////
+    //Init timer settings
+    //////////
+
+    int interval = 36000; //in msec. = 600 sec, = 10 min
+    bool mode = true; //true = manual
+    TimerForm * timerForm = new TimerForm ();
+    if (!timerForm){
+        return 1;
+    }
     
-    if(!httpWin.doNotStart()){
+    if (timerForm->exec () != QDialog::Accepted){
+		mode = true; //manual
+    }
+    else
+    {
+		mode = false;//auto
+        interval = timerForm->getTimer();
+    }
+    delete timerForm;
+
+    ////////////
+    //Start log window and threads
+    ////////////
+
+    DDocInteractorWindow httpWin;
+    DDocInteractorBase * m_base = new DDocInteractorBase(NULL);
+
+    httpWin.setInteractorBase(m_base);    
+
+    int ok = m_base->start(mode, interval);
+    if(ok != 1)
+        return 1;
+
+
+    ///////////
+    //Show log window
+    //////////
+    if(ok){
         httpWin.show();
     
         res = httpWin.exec();

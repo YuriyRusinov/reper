@@ -1406,9 +1406,14 @@ int JKKSLoader::writeMessage (JKKSMailMessage *mMess) const
             mMess->setIO (doc->id());
         }
 
+        QString msgBody = mMess->getMessageBody();
+        if(!msgBody.isEmpty()){
+            msgBody.replace("'", "''");
+        }
+
         QString sql = QString ("select * from msginsertin (%1, %2, %3, %4, %5, %6, %7, %8, %9)")
                                 .arg (mMess->getIO() > 0 ? QString::number (mMess->getIO()) : QString ("NULL::integer"))
-                                .arg (mMess->getMessageBody().isEmpty() ? QString ("NULL") : QString ("'%1'").arg (mMess->getMessageBody()))
+                                .arg (msgBody.isEmpty() ? QString ("NULL") : QString ("'%1'").arg (msgBody))
                                 .arg ((int)getIdByUID("position", mMess->getIdDlTo()))
                                 .arg ((int)getIdByUID("position", mMess->getIdDlFrom()))
                                 .arg (mMess->getSentDateTime().isNull() ? QString("NULL") :
@@ -1712,6 +1717,11 @@ int JKKSLoader::writeMessage (JKKSCommand *command) const
             }
             command->setIdObject (doc->id());
         }
+        
+        QString msgBody = command->getMessageBody();
+        if(!msgBody.isEmpty()){
+            msgBody.replace("'", "''");
+        }
 
         if(command->getJournalState() == 7){ //virtual
             sql = QString ("select * from uInsertVirtualOutCmd (%1, %2, %3, %4, %5, '%6', %7, %8, %9);")
@@ -1723,7 +1733,7 @@ int JKKSLoader::writeMessage (JKKSCommand *command) const
                                 QString ("to_timestamp('") +
                                 command->getExecTime().toString ("dd.MM.yyyy hh:mm:ss") +
                                 QString("', 'DD.MM.YYYY HH24:MI:SS')::timestamp")) //exec_datetime
-                            .arg (command->getMessageBody()) //message_body
+                            .arg (msgBody) //message_body
                             .arg (command->uid().isEmpty() ? QString ("NULL") : QString ("'%1'").arg (command->uid())) //unique_id
                             .arg (command->idUrgencyLevel() > 0 ? command->idUrgencyLevel() : 1) //id_urgency_level
                             .arg (command->idObject() > 0 ? QString::number (command->idObject()) : QString("NULL")); //id_io_object_att
@@ -1748,7 +1758,7 @@ int JKKSLoader::writeMessage (JKKSCommand *command) const
                                 command->getExecTime().toString ("dd.MM.yyyy hh:mm:ss") +
                                 QString("', 'DD.MM.YYYY HH24:MI:SS')::timestamp")) //exec_datetime
                             .arg (command->getTimeInterval()) //exec_interval
-                            .arg (command->getMessageBody()) //message_body
+                            .arg (msgBody) //message_body
                             .arg (command->uid().isEmpty() ? QString ("NULL") : QString ("'%1'").arg (command->uid())) //unique_id
                             .arg (command->outputNumber().isEmpty() ? QString ("NULL") : QString ("'%1'").arg (command->outputNumber())) //output_number
                             .arg (command->idUrgencyLevel() > 0 ? command->idUrgencyLevel() : 1) //id_urgency_level

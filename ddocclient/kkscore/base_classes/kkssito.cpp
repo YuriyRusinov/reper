@@ -51,19 +51,19 @@ void KKSDbgOutputHandler(QtMsgType type, const char *msg)
 
      switch (type) {
      case QtDebugMsg:
-         kksSito->dbgWidget()->printMessage(KKSDbgOutputWidget::cMessage, QString::fromLocal8Bit(msg) );
+         kksSito->dbgWidget()->printMessage(KKSDbgOutputWidget::cDebugMsg, QString::fromLocal8Bit(msg) );
          fprintf(stdout, "Debug: %s\n", msg);
          break;
      case QtWarningMsg:
-         kksSito->dbgWidget()->printMessage(KKSDbgOutputWidget::cWarning, QString::fromLocal8Bit(msg) );
+         kksSito->dbgWidget()->printMessage(KKSDbgOutputWidget::cWarningMsg, QString::fromLocal8Bit(msg) );
          fprintf(stdout, "Warning: %s\n", msg);
          break;
      case QtCriticalMsg:
-         kksSito->dbgWidget()->printMessage(KKSDbgOutputWidget::cError, QString::fromLocal8Bit(msg) );
+         kksSito->dbgWidget()->printMessage(KKSDbgOutputWidget::cCriticalMsg, QString::fromLocal8Bit(msg) );
          fprintf(stdout, "Critical: %s\n", msg);
          break;
      case QtFatalMsg:
-         kksSito->dbgWidget()->printMessage(KKSDbgOutputWidget::cCritical, QString::fromLocal8Bit(msg) );
+         kksSito->dbgWidget()->printMessage(KKSDbgOutputWidget::cFatalMsg, QString::fromLocal8Bit(msg) );
          fprintf(stdout, "Fatal: %s\n", msg);
          abort();
      }

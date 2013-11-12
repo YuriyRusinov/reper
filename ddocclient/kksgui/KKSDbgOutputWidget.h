@@ -31,10 +31,12 @@ public:
     void initMenuEmitting();
 
     enum Criticality {
-        cMessage = 0,
-        cWarning = 1,
-        cError = 2,
-        cCritical = 3
+        cDebugMsg         =   0, //отладочное
+        cInfoMsg          =   1, //блок информации
+        cImportantInfoMsg =   2, //блок важной информации, который также должен быть представлен в виде QMessageBox
+        cWarningMsg       =   3, //предупреждение
+        cCriticalMsg      =   4, //ошибка
+        cFatalMsg         =   5  //системная ошибка
     };
 
 
