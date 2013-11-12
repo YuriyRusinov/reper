@@ -11,7 +11,9 @@ INCLUDEPATH += .\
                 ../../../kkscore \
                 ../../../kkspp \
                 ../../../kksfactory \
-                ../../../kksutils
+                ../../../kksutils \
+                ../../../kksinteractor \
+                ../../http_connector/src
 
 DEPENDPATH += 	. \
                 ../../../dataaccess \
@@ -19,9 +21,12 @@ DEPENDPATH += 	. \
                 ../../../kkscore/base_classes \
                 ../../../kkspp \
                 ../../../kksfactory \
-                ../../../kksutils
+                ../../../kksutils \
+                ../../../kksinteractor \
+                ../../http_connector/src
 
-LIBS += -L$$DESTDIR -ldataaccess -lkksutils -lkkscore -lkksfactory -lkkspp -lkksgui
+LIBS += -L/usr/local/kkssito/lib\
+	-L$$DESTDIR -ldataaccess -lkksutils -lkkscore -lkksfactory -lkkspp -lkksgui -lkksinteractor
 
 # libpq support
 LIBS += -L$${PSQL_HOME}/lib

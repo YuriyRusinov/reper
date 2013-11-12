@@ -4,6 +4,8 @@
 
 #include <QApplication>
 
+#include <JKKSLoader.h>
+
 #include "UserInterface/dyndocForm/dyndocForm.h"
 #include "UserInterface/DataStream/DataStream.h"
 #include "UserInterface/NetworkStream/NetworkStream.h"
@@ -26,15 +28,21 @@ int main(int argc, char *argv[])
     dataStream* dataUnit = new dataStream(sito->db());
     networkStream* netUnit = new networkStream();
 
-    QObject::connect(userForm,SIGNAL(signal_startSyncronization(dyndoc_netThread::synchList*)),netUnit,SLOT(slotStartSyncronization(dyndoc_netThread::synchList*)));
-    QObject::connect(userForm,SIGNAL(signal_stopSyncronization()),netUnit,SLOT(slotStopSyncronization()));
+    dyndoc_mainStructs::dbInf dbInfForLoader = dataUnit->getDbInf();
+
+    //JKKSLoader* idOrganization = new JKKSLoader(dbInfForLoader.hostAddress,dbInfForLoader.dbName,dbInfForLoader.userName,dbInfForLoader.password,dbInfForLoader.port);
+    //int id = idOrganization->getLocalOrgId();
+    //delete idOrganization;
+
+    QObject::connect(userForm,SIGNAL(signalStartSyncronization()),netUnit,SLOT(slotStartSyncronization()));
+    QObject::connect(userForm,SIGNAL(signalStopSyncronization()),netUnit,SLOT(slotStopSyncronization()));
 
     viewWidget->setModel(viewModel);
 
     userForm->setViewWidget(viewWidget);
     userForm->init();
 
-    userForm->setDbInf(dataUnit->getDbInf());
+    userForm->setDbInf(dbInfForLoader);
     userForm->reciveData(dataUnit->getData());
     userForm->exec();
 

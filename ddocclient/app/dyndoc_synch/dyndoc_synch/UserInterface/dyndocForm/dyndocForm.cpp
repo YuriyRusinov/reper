@@ -230,14 +230,19 @@ int dyndoc_synch_form::addColumnName(QList<QStandardItem*>& rhs,int query_index,
 
     item->setData(dataTable.at(query_index).structInf.name,Qt::DisplayRole);
     item->setData(dataTable.at(query_index).structInf.name,Qt::ToolTipRole);
-    item->setData(dataTable.at(query_index).structInf.id,Qt::UserRole+1);
-    item->setData(dataTable.at(query_index).structInf.email_prefix,Qt::UserRole+2);
+    item->setData(dataTable.at(query_index).structInf.idNum,Qt::UserRole+1);
+    item->setData(dataTable.at(query_index).structInf.id,Qt::UserRole+2);
+    item->setData(dataTable.at(query_index).structInf.email_prefix,Qt::UserRole+3);
+
+    QPixmap icon;
+    icon.loadFromData(dataTable.at(query_index).icon.toUtf8());
+    item->setData(icon.scaled(24,24),Qt::DecorationRole);
 
     item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     item->setTextAlignment(Qt::AlignVCenter);
     item->setData(Qt::red,Qt::BackgroundColorRole);
 
-    if(item->data(Qt::UserRole+1).toString() == "localorg-organization-1")
+    if(item->data(Qt::UserRole+2).toString() == "localorg-organization-1")
     {
          QFont boldItemFont = item->font();
          boldItemFont.setBold(true);
@@ -306,6 +311,7 @@ int dyndoc_synch_form::addColumnSynch(QList<QStandardItem*>& rhs)
     item->setData(Qt::Unchecked,Qt::CheckStateRole);
     item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     item->setData(tr("false"),Qt::ToolTipRole);
+    item->setData(Qt::red,Qt::BackgroundColorRole);
 
     rhs.append(item);
 
@@ -319,6 +325,7 @@ int dyndoc_synch_form::addColumnDb(QList<QStandardItem*>& rhs)
     item->setData(Qt::Unchecked,Qt::CheckStateRole);
     item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     item->setData(tr("false"),Qt::ToolTipRole);
+    item->setData(Qt::red,Qt::BackgroundColorRole);
 
     rhs.append(item);
 
@@ -332,6 +339,7 @@ int dyndoc_synch_form::addColumnInit(QList<QStandardItem*>& rhs)
     item->setData(Qt::Unchecked,Qt::CheckStateRole);
     item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     item->setData(tr("false"),Qt::ToolTipRole);
+    item->setData(Qt::red,Qt::BackgroundColorRole);
 
     rhs.append(item);
 
@@ -345,6 +353,7 @@ int dyndoc_synch_form::addColumnTrans(QList<QStandardItem*>& rhs)
     item->setData(Qt::Unchecked,Qt::CheckStateRole);
     item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     item->setData(tr("false"),Qt::ToolTipRole);
+    item->setData(Qt::red,Qt::BackgroundColorRole);
 
     rhs.append(item);
 

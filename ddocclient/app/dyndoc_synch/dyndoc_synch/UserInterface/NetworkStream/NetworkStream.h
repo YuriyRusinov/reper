@@ -4,6 +4,7 @@
 #include <QMessageBox>
 
 #include "Namespaces/netStruct.h"
+#include "netThread.h"
 
 class networkStream : public QObject
 {
@@ -12,6 +13,11 @@ class networkStream : public QObject
 public:
     networkStream(QObject * parent = 0);
     virtual ~networkStream();
+
+signals:
+    void signalSynchStart();
+    void signalSynchStop();
+    void signalThreadStop();
 
 public slots:
     void slotStartSyncronization();
@@ -23,6 +29,8 @@ public slots:
 private:
     networkStream(networkStream& adb);
     const networkStream& operator=(const networkStream& rhs);
+
+    netThread* net;
 };
 
 #endif

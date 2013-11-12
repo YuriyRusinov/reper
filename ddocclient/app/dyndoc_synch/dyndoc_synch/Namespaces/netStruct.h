@@ -19,7 +19,8 @@ namespace dyndoc_mainStructs
         QString name;
         QString parentName;
         QString protocol;
-        QString id;      
+        QString id;
+        int idNum;
         QString email_prefix;
     };
 
