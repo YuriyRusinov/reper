@@ -7,10 +7,11 @@ declare
     res boolean;
 begin
 
-    select into cnt count(*) from io_objects where id_io_category = id_cat;
+    select into cnt count(*) from tbl_io_objects where id_io_category = id_cat;
 
     res := cnt > 0;
+
     return res;
 end
 $BODY$
-language 'plpgsql';
+language 'plpgsql' security definer;
