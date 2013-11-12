@@ -1465,6 +1465,7 @@ JKKSMessage * JKKSLoader::unpackMessage (const JKKSPMessage & pMessage) const
         case JKKSMessage::atMailMessage: message = new JKKSMailMessage (); break;
         case JKKSMessage::atMailConfirmation: message = new JKKSMailConfirmation(); break;
         case JKKSMessage::atCmdConfirmation: message = new JKKSCmdConfirmation(); break;
+        case JKKSMessage::atEcho:
         case JKKSMessage::atRecord: message = new JKKSRefRecord(); break;
         case JKKSMessage::atRecConfirmation: message = new JKKSQueueResponse(); break;
         case JKKSMessage::atOrganization: message = new JKKSOrganization (); break;
@@ -3689,6 +3690,11 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readTableRecords (QStringList & receive
             }
                         
             JKKSPMessage pM(rec.serialize(), rec.getMessageType(), senderUID, receiverUID);
+            
+            if(entity_type == 6){//запрос на проверку связи. В этом  случае надо тип пересылаемого сообщения установить в atEcho
+                pM.setType(JKKSMessage::atEcho);
+            }
+            
             if(entity_type == 6 || entity_type == 8)
                 pM.setVerifyReceiver(false);
             

@@ -524,18 +524,19 @@ QByteArray DDocInteractorClient::prepareForSend(QHttpRequestHeader & header,
         if(message->pMess.getType() != JKKSMessage::atPingResponse){
             QString receiver = message->pMess.receiverUID();
             JKKSPing ping = m_parent->m_pings.value(receiver);
-            if( ping.created() != 1 ||
-                !ping.completed() ||
+            
+            if(ping.created() != 1){
+                //разрешаем в таком случае отсылку только для "проверки связи" при первоначальной синхронизации
+                if(message->pMess.getType() != JKKSMessage::atEcho)
+                    return ba;
+            }
+
+            if(!ping.completed() ||
                 ping.state1() != 1 ||
                 ping.state2() != 1 ||
                 ping.state3() != 1 ||
                 ping.state4() != 1)
             {
-                //kksCritical() << tr("Destination organization does not active! Data sending for that skipped!");
-                //kksCritical() << tr("Receiver address = (IP=%1, port=%2, use gateway = %3)")
-                //                        .arg(message->addr.address())
-                //                        .arg(message->addr.port())
-                //                        .arg(message->addr.useGateway() ? QString("TRUE") : QString("FALSE"));
                 return ba;
             }
         }
@@ -854,7 +855,16 @@ bool DDocInteractorClient::verifyPings()
     for (QMap<QString, JKKSPing>::iterator pa = m_parent->m_pings.begin(); pa != m_parent->m_pings.end(); pa++){
         JKKSPing ping = pa.value();
 
-        if( ping.created() == 1 &&
+        if(ping.created() != 1){
+            kksWarning() << tr("Organization %1 with address = (IP=%2, port=%3, use gateway = %4) was not complete the first syncronization procedure." 
+                                "Only first synchronization queries for that will be allowed")
+                                     .arg(ping.nameTo())
+                                     .arg(ping.getAddr().address())
+                                     .arg(ping.getAddr().port())
+                                     .arg(ping.getAddr().useGateway() ? QString("TRUE") : QString("FALSE"));
+        }
+        
+        if( //ping.created() == 1 &&
             ping.completed() &&
             ping.state1() == 1 &&
             ping.state2() == 1 &&

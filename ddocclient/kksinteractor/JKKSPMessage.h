@@ -33,6 +33,7 @@ class _I_EXPORT JKKSPMessage
 
         QByteArray getData (void) const;
         int getType (void) const;
+        void setType(int t);
         QByteArray serialize (void) const;
 
         QStringList getFiles (void) const;

@@ -72,6 +72,11 @@ int JKKSPMessage :: getType (void) const
     return messType;
 }
 
+void JKKSPMessage :: setType(int t)
+{
+    messType = t;
+}
+
 QByteArray JKKSPMessage :: serialize (void) const
 {
     QBuffer buffer;

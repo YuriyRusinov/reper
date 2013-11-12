@@ -4,6 +4,9 @@
 #include <defines.h>
 #include "KKSDbgOutputWidget.h"
 
+#include <QDate>
+#include <QDateTime>
+#include <QTime>
 
 KKSMsgType m_minMsgType = KKSDebugMsg;
 bool m_useQDebug = true;
@@ -18,19 +21,24 @@ void KKSDebug::setUseQDebug(bool b)
     m_useQDebug = b;
 }
 
-KKSDebug::KKSDebug(KKSMsgType type)
+KKSDebug::KKSDebug(KKSMsgType type) : ts(&m_buffer, QIODevice::WriteOnly)
 {
     m_msgType = type;
 }
 
-KKSDebug::KKSDebug(const KKSDebug & d)
+KKSDebug::KKSDebug(const KKSDebug & d) : ts(&m_buffer, QIODevice::WriteOnly)
 {
     m_msgType = d.m_msgType;
 }
 
 KKSDebug::~KKSDebug()
 {
+    if(this->m_buffer.isEmpty())
+        return;
 
+    this->qDebug() << m_buffer;
+    
+    print(m_buffer);
 }
 
 QDebug KKSDebug::qDebug()
@@ -53,9 +61,11 @@ KKSDebug & KKSDebug::operator << (const QString & t)
     if(m_msgType < m_minMsgType)
         return *this;
 
-    this->qDebug() << t;
+    ts << t;
+
+    //this->qDebug() << t;
     
-    print(t);
+    //print(t);
     
     return *this;
 }
@@ -65,21 +75,24 @@ KKSDebug & KKSDebug::operator << (const QByteArray & t)
     if(m_msgType < m_minMsgType)
         return *this;
 
-    this->qDebug() << t;
+    ts << t;
+    //this->qDebug() << t;
     
-    print(t);
+    //print(t);
 
     return *this;
 }
 
+/*
 KKSDebug & KKSDebug::operator << (const QDateTime & t) 
 { 
     if(m_msgType < m_minMsgType)
         return *this;
 
-    this->qDebug() << t;
+    ts << t;
+    //this->qDebug() << t;
 
-    print(t.toString("dd.MM.yyyy hh:mm:ss"));
+    //print(t.toString("dd.MM.yyyy hh:mm:ss"));
 
     return *this;
 }
@@ -89,9 +102,10 @@ KKSDebug & KKSDebug::operator << (const QDate & t)
     if(m_msgType < m_minMsgType)
         return *this;
 
-    this->qDebug() << t;
+    ts << t;
+    //this->qDebug() << t;
 
-    print(t.toString("hh.MM.yyyy"));
+    //print(t.toString("hh.MM.yyyy"));
 
     return *this;
 }
@@ -101,11 +115,30 @@ KKSDebug & KKSDebug::operator << (const QTime & t)
     if(m_msgType < m_minMsgType)
         return *this;
 
-    this->qDebug() << t;
+    ts << t;
+    //this->qDebug() << t;
 
-    print(t.toString("hh:mm:ss"));
+    //print(t.toString("hh:mm:ss"));
 
     return *this;
+}
+*/
+
+KKSDebug & KKSDebug::operator << (QTextStreamFunction f)
+{
+    if(m_msgType < m_minMsgType)
+        return *this;
+
+    ts << f;
+    return *this;
+}
+
+KKSDebug & KKSDebug::operator << (QTextStreamManipulator m)
+{ 
+    if(m_msgType < m_minMsgType)
+        return *this;
+    ts << m; 
+    return *this; 
 }
 
 KKSDebug & KKSDebug::operator << (int t) 
@@ -113,9 +146,10 @@ KKSDebug & KKSDebug::operator << (int t)
     if(m_msgType < m_minMsgType)
         return *this;
 
-    this->qDebug() << t;
+    ts << t;
+    //this->qDebug() << t;
 
-    print(QString::number(t));
+    //print(QString::number(t));
     
     return *this;
 }

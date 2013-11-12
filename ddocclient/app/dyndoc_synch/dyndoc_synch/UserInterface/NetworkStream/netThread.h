@@ -5,7 +5,7 @@
 
 //#include <httpwindow.h>
 
-class HttpWindow;
+//class HttpWindow;
 
 class netThread : public QThread
 {

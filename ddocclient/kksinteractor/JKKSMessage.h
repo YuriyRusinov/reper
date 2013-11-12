@@ -96,10 +96,12 @@ class _I_EXPORT JKKSMessage
             atOrgPackage = 11,
             atFilePart = 12,
             atPing = 13,
-            atPingResponse = 14
+            atPingResponse = 14,
+            atEcho = 15 //пересылаем строку из таблицы out_sync_queue с entity_type = 6 (проверка связи). Отдельный тип нужен, чтобы в DDocInteractorClient можно было отправить такое сообщение даже для "плохого" пинга
         }; 
 
         virtual JKKSMessageType getMessageType (void) const;
+
 
     private:
         JKKSAddress m_addr;

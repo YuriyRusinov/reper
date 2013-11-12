@@ -183,6 +183,9 @@ void DDocInteractorBase::slotStartClient()
         return;
 
     m_client->manual = false;
+    disconnect(this, SIGNAL(startSending()), m_client, SLOT(startProc()));
+    disconnect(m_client, SIGNAL(sendingStarted()), this, SIGNAL(sendingStarted()));
+    disconnect(m_client, SIGNAL(sendingCompleted()), this, SIGNAL(sendingCompleted()));
     
     if(!m_client->m_timer)
         m_client->createTimer();
@@ -199,5 +202,9 @@ void DDocInteractorBase::slotStopClient()
     m_client->manual = true; //выставление этого параметра в true приведет к тому, что даже если таймер уже остановлен для отправки данных, он не запустится вновь
     if(m_client->m_timer)
         m_client->m_timer->stop();
+
+    connect(this, SIGNAL(startSending()), m_client, SLOT(startProc()));
+    connect(m_client, SIGNAL(sendingStarted()), this, SIGNAL(sendingStarted()));
+    connect(m_client, SIGNAL(sendingCompleted()), this, SIGNAL(sendingCompleted()));
 
 }
