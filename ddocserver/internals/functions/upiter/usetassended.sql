@@ -19,7 +19,7 @@ begin
         select uSetMsgAsConfirmed(id::int4) into res;
     elsif (itype = 4) then --cmd confirmation
         select uSetCmdAsConfirmed(id::int4) into res;
-    elsif (itype = 5 or itype=11) then --record or org package (in out_sync_queue)
+    elsif (itype = 5 or itype=11 or itype=15) then --record or org package or query for first sync (in out_sync_queue)
         select uSetRecordAsSended(id) into res;
     elsif (itype = 6 or itype = 14) then --record confirmation --or ping result
         select uSetReceptionAsSended (id) into res;

@@ -19,7 +19,7 @@ begin
         select uSetMsgAsNotConfirmed(id::int4) into res;
     elsif (itype = 4) then --cmd confirmation
         select uSetCmdAsNotConfirmed(id::int4) into res;
-    elsif (itype = 5 or itype=11) then --record or org package (in out_sync_queue)
+    elsif (itype = 5 or itype=11 or itype=15) then --record or org package or query for first sync (in out_sync_queue)
         select uSetRecordAsNotSended(id) into res;
     elsif (itype = 6) then --record confirmation
         select uSetReceptionAsNotSended (id) into res;

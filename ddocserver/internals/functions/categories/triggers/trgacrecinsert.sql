@@ -44,6 +44,6 @@ end
 $BODY$
 language 'plpgsql';
 
-select f_safe_drop_trigger('trgacinsert', 'attrs_categories');
+select f_safe_drop_trigger('trgacrecinsert', 'attrs_categories');
 
-select f_create_trigger('trgacinsert', 'before', 'insert or update', 'attrs_categories', 'arecinsertcheck()');
+select f_create_trigger('trgacrecinsert', 'before', 'insert or update', 'attrs_categories', 'arecinsertcheck()');
