@@ -63,10 +63,6 @@ KKSDebug & KKSDebug::operator << (const QString & t)
 
     ts << t;
 
-    //this->qDebug() << t;
-    
-    //print(t);
-    
     return *this;
 }
 
@@ -76,53 +72,9 @@ KKSDebug & KKSDebug::operator << (const QByteArray & t)
         return *this;
 
     ts << t;
-    //this->qDebug() << t;
-    
-    //print(t);
 
     return *this;
 }
-
-/*
-KKSDebug & KKSDebug::operator << (const QDateTime & t) 
-{ 
-    if(m_msgType < m_minMsgType)
-        return *this;
-
-    ts << t;
-    //this->qDebug() << t;
-
-    //print(t.toString("dd.MM.yyyy hh:mm:ss"));
-
-    return *this;
-}
-
-KKSDebug & KKSDebug::operator << (const QDate & t) 
-{ 
-    if(m_msgType < m_minMsgType)
-        return *this;
-
-    ts << t;
-    //this->qDebug() << t;
-
-    //print(t.toString("hh.MM.yyyy"));
-
-    return *this;
-}
-
-KKSDebug & KKSDebug::operator << (const QTime & t) 
-{ 
-    if(m_msgType < m_minMsgType)
-        return *this;
-
-    ts << t;
-    //this->qDebug() << t;
-
-    //print(t.toString("hh:mm:ss"));
-
-    return *this;
-}
-*/
 
 KKSDebug & KKSDebug::operator << (QTextStreamFunction f)
 {
@@ -147,9 +99,6 @@ KKSDebug & KKSDebug::operator << (int t)
         return *this;
 
     ts << t;
-    //this->qDebug() << t;
-
-    //print(QString::number(t));
     
     return *this;
 }
@@ -171,94 +120,3 @@ void KKSDebug::print(const QString & msg)
     
     kksSito->dbgWidget()->printMessage( c, msg );
 }
-
-/*
-KKSError::KKSError()
-{
-    m_type = etNoError;
-    m_code = "00000"; 
-    m_name = "SUCCESSFUL COMPLETION"; 
-    m_message = "SUCCESSFUL COMPLETION"; 
-    m_group = "SUCCESSFUL COMPLETION";
-}
-
-KKSError::KKSError(ErrorTypes type, QString code, QString name, QString message, QString group)
-{
-    m_type = type;
-    m_code = code; 
-    m_name = name; 
-    m_message = message; 
-    m_group = group;
-}
-
-KKSError::~KKSError()
-{
-    if(log.isOpen())
-        log.flush();
-}
-
-void KKSError::print(PrintFlags flags, QWidget * parent)
-{
-    if(flags & asQDebug){
-        qDebug() << "ERROR! Code:" << code() << " : " << message();
-    }
-    if(flags & asQWarning){
-        qWarning() << "ERROR! Code:" << code() << " : " << message().toUtf8().constData();
-    }
-    if(flags & asInfoDialog){
-        QMessageBox::information(parent, 
-                                 name(), 
-                                 QString("Error code: %1\n\n%2\n%3").arg(code()).arg(name()).arg(message()), 
-                                 QMessageBox::Ok);
-    }
-    if(flags & asWarningDialog){
-        QMessageBox::warning(parent, 
-                             name(), 
-                             QString("Error code: %1\n\n%2\n%3").arg(code()).arg(name()).arg(message()), 
-                             QMessageBox::Ok, 
-                             QMessageBox::NoButton);
-    }
-    if(flags & asCriticalDialog){
-        QMessageBox::critical(parent, 
-                              name(), 
-                              QString("Error code: %1\n\n%2\n%3").arg(code()).arg(name()).arg(message()), 
-                              QMessageBox::Ok, 
-                              QMessageBox::NoButton);
-    }
-
-    if(flags & asLogFile){
-        if(!log.isOpen())
-            return;
-
-        QByteArray b, b1, b2;
-        b = code().toLocal8Bit();
-        b1 = message().toLocal8Bit();
-        b2 = b + QByteArray(" : ") + b1;
-        log.write( b2 );
-        log.putChar('\n');
-    }
-
-}
-
-void KKSError::init(ErrorTypes type, QString code, QString name, QString message, QString group)
-{
-    setType(type);
-    setCode(code);
-    setName(name);
-    setMessage(message);
-    setGroup(group);
-}
-
-int KKSError::setLogFile(QString & fileName)
-{
-    log.setFileName(fileName);
-    bool ok = log.open(QFile::WriteOnly);
-    if(!ok || !log.isOpen())
-        return ERROR_CODE;
-
-    log.write(QDateTime::currentDateTime().toString(Qt::TextDate).toLocal8Bit());
-    log.putChar('\n');
-    return OK_CODE;
-}
-
-*/

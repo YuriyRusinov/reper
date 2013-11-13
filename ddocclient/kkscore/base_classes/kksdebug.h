@@ -37,9 +37,6 @@ public:
        
     inline KKSDebug & operator << (const QString & t);
     inline KKSDebug & operator << (const QByteArray & t);
-    ///inline KKSDebug & operator << (const QDateTime & t);
-    //inline KKSDebug & operator << (const QDate & t);
-    //inline KKSDebug & operator << (const QTime & t);
     inline KKSDebug & operator << (int t);
     inline KKSDebug &operator<<(QTextStreamFunction f); 
     inline KKSDebug &operator<<(QTextStreamManipulator m);

@@ -74,7 +74,6 @@ void DDocInteractorServer::loadData(int socketDescriptor)
     
     QByteArray all_data, bt;
 
-    QAbstractSocket::SocketState state = clientConnection->state();
     bool ok = clientConnection->waitForReadyRead();
     if(!ok){
         sendBadBlock(clientConnection);
@@ -386,7 +385,7 @@ int DDocInteractorServer::processPingResponse(const JKKSPing * ping)
         //поскольку в ответе на пинг нет информации какой был идентификатор у организации-отправителя пинга 
         //(а именно он используется в качестве JKKSPing::id())
         //То проверку осуществляем по идентификатору организации-получателя пинга (в таблице БД отправителя пинга).
-        //он заносится в качестве id_external_queue (отрицательного) на целевой БД
+        //он заносится в качестве id_external_queue (отрицательного или 0 (для случая процедуры первоначальной синхронизации)) на целевой БД
         if(pa.value().idOrgTo() == ping->idOrgTo()){ 
             pa.value().setVersionTo(ping->versionTo());
             pa.value().setState1(ping->state1());

@@ -98,7 +98,7 @@ class _I_EXPORT JKKSLoader
         //int writeMessage (JKKSDocument *document) const;
         int writeMessage (JKKSRefRecord *refRec, const QString& senderUID) const;
         int writeMessage (JKKSQueueResponse *response) const;
-        int writeMessage (JKKSOrganization * org, const QString& receiverUID) const;
+        int writeMessage (JKKSOrganization * org, const QString & senderUID, const QString& receiverUID, bool bGenResponse) const;
         int writeMessage (JKKSOrgPackage * OrgPack, const QString& senderUID, const QString& receiverUID) const;
         int writeMessage (JKKSFilePart * filePart, const QString& senderUID) const;
         int writeMessage (JKKSPing * ping, const QString & senderUID) const;
@@ -189,7 +189,7 @@ class _I_EXPORT JKKSLoader
         int readRecordFromTable (const QString& tableName, JKKSRefRecord& rec, qint64 idOrganization) const;
         
         qint64 writeOrganization (JKKSQueueResponse & resp) const;
-        QMap<qint64, JKKSOrganization> readOrganizations (qint64 idOrg) const;
+        QMap<qint64, JKKSOrganization> readOrganizations (qint64 idOrg, qint64 idQueue) const;
         qint64 writeTransport (JKKSTransport& T) const;
         qint64 writeOrgType (JKKSOrgType& OT) const;
         qint64 writeOrgWM (JKKSWorkMode& wm) const;

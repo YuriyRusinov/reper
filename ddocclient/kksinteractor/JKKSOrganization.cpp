@@ -39,7 +39,8 @@ JKKSOrganization :: JKKSOrganization (qint64 idOrg,
       m_mapSymbol (mapSymbol),
       m_treeSymbol (treeSymbol),
       m_dtPrevMode (dtPrevMode),
-      m_dtCurrMode (dtCurrMode)
+      m_dtCurrMode (dtCurrMode),
+      m_idQueue(-1)
 {
 }
 
@@ -64,16 +65,15 @@ JKKSOrganization :: JKKSOrganization (const JKKSOrganization& Org)
       m_dtPrevMode (Org.m_dtPrevMode),
       m_dtCurrMode (Org.m_dtCurrMode),
       workModes (Org.workModes),
-      orgTransport (Org.orgTransport)
+      orgTransport (Org.orgTransport),
+      m_idQueue(Org.m_idQueue)
 {
 }
 
 JKKSOrganization :: ~JKKSOrganization (void)
 {
 }
-//
-// virtual functions definition
-//
+
 QByteArray JKKSOrganization :: serialize (void) const
 {
     QBuffer qBuffer;
@@ -100,9 +100,7 @@ int JKKSOrganization :: unserialize (const QByteArray& mess)
 
 int JKKSOrganization :: writeToDB (const JKKSLoader * loader, const QString& senderUID, const QString& receiverUID)
 {
-    //qDebug() << __PRETTY_FUNCTION__;
-    Q_UNUSED (senderUID);
-    int ier = loader->writeMessage (this, receiverUID);
+    int ier = loader->writeMessage (this, senderUID, receiverUID, true);
     return ier;
 }
 
@@ -119,6 +117,16 @@ JKKSMessage::JKKSMessageType JKKSOrganization :: getMessageType (void) const
 void JKKSOrganization :: setId (qint64 id)
 {
     m_id = id;
+}
+
+void JKKSOrganization :: setIdQueue(qint64 id)
+{
+    m_idQueue = id;
+}
+
+qint64 JKKSOrganization :: idQueue() const 
+{
+    return m_idQueue;
 }
 
 JKKSOrgType JKKSOrganization :: getType (void) const
@@ -320,6 +328,8 @@ QDataStream& operator<< (QDataStream& out, const JKKSOrganization& OO)
 
     out << OO.uid();
 
+    out << OO.m_idQueue;
+
     return out;
 }
 
@@ -353,6 +363,9 @@ QDataStream& operator>> (QDataStream& in, JKKSOrganization& OO)
 
     QString uid;
     in >> uid;
+
+    in >> OO.m_idQueue;
+
     OO.setUid (uid);
     OO.setAddr (addr);// = JKKSRefRecord (avals, uid);
     OO.setCode (code);

@@ -715,7 +715,7 @@ bool DDocInteractorClient::sendOutMessage(const JKKSPMessWithAddr * message,
         int httpGetId = m_http->request(header, ba);
         saveRequestId(httpGetId, message, isLastFilePart);
 
-        kksWarning() << dbgMsg << QString("%1").arg(httpGetId);
+        kksInfo() << dbgMsg << QString("%1").arg(httpGetId);
 		
         eventLoop.exec();
         if(m_isExiting)

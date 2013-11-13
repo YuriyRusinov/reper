@@ -35,11 +35,10 @@ public:
                       const JKKSAddress & addr=JKKSAddress(),
                       const QString& mess_code=QString(),
                       const QString& uid = QString());
+
     JKKSOrganization (const JKKSOrganization& Org);
     ~JKKSOrganization (void);
-    //
-    // virtual functions definition
-    //
+
     QByteArray serialize (void) const;
     int unserialize (const QByteArray& mess);
     int writeToDB (const JKKSLoader * loader, const QString& senderUID, const QString& receiverUID);
@@ -47,6 +46,9 @@ public:
     JKKSMessageType getMessageType (void) const;
 
     void setId (qint64 id);
+
+    void setIdQueue(qint64 idQueue);
+    qint64 idQueue() const;
 
     JKKSOrgType getType (void) const;
     void setType (const JKKSOrgType& oType);
@@ -111,22 +113,31 @@ private:
     // Variables
     //
     qint64 m_id;
+    qint64 m_idQueue; //если организация передается посредством чтения таблицы out_sync_queue, то данное поле содержит соответствующий идентификатор в ней. Используется на приемном конце для создания квитанции в queue_results
+
     JKKSOrgType orgType;
+
     QString m_uidParent;
     QString m_uidParent1;
     QString m_uidSubstitutor;
+
     JKKSWorkMode currMode;
     JKKSWorkMode prevMode;
+
     QString m_name;
     QString m_shortName;
     QString m_codeName;
     QString m_email_prefix;
+
     double m_longitude;
     double m_latitude;
+
     QString m_mapSymbol;
     QString m_treeSymbol;
+
     QDateTime m_dtPrevMode;
     QDateTime m_dtCurrMode;
+
     QMap<qint64, JKKSWorkMode> workModes;
 
     JKKSTransport orgTransport;

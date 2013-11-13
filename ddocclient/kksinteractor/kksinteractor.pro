@@ -34,12 +34,13 @@ unix: LIBS *= -lpq
 #INCLUDEPATH += ../kksgui ../kksgui/ui
 #DEPENDPATH += ../kksgui
 #LIBS += -L$$DESTDIR -lkksgui
+
 #
 #kkscore support
 #
-#INCLUDEPATH += ../kkscore ../kkscore/base_classes
-#DEPENDPATH += ../kkscore ../kkscore/base_classes
-#LIBS += -L$$DESTDIR -lkkscore
+INCLUDEPATH += ../kkscore ../kkscore/base_classes
+DEPENDPATH += ../kkscore ../kkscore/base_classes
+LIBS += -L$$DESTDIR -lkkscore
 
 unix {
 LIBS += -lcurses
