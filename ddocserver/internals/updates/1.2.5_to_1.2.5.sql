@@ -10,8 +10,6 @@ drop function if exists recDeleteIncludes(int8, int4[]) cascade;
 drop function if exists recGetSubRubrics(int4) cascade;
 drop function if exists recGetRubricItems(int4) cascade;
 
-select createTriggerUID('criteria');
-
 select createTempTables();
 select setCurrentDl(4);
 
@@ -21,6 +19,8 @@ select setAsNotLogging(2);
 \i ./functions/misc/f_safe_drop_trigger.sql
 \i ./functions/misc/f_create_trigger.sql
 \i ./functions/misc/f_is_table_exist.sql
+
+select createTriggerUIDEx('criteria');
 
 \i ./functions/contribs/readd_contribs.sql
 

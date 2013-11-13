@@ -15,7 +15,7 @@ begin
 
     select id into tId from transport where unique_id = tUniqueId;
 
-    raise notice 'local address is %', tAddress;
+    --raise notice 'local address is %', tAddress;
 
     if (tAddress is null) then
         transportAddr = 'Not available';
@@ -35,7 +35,7 @@ begin
         return tId;
     end if;
 
-    update transport set local_address = tAddress, local_port = tPort, use_gateway = useGateway where id = tId;
+    --update transport set local_address = tAddress, local_port = tPort, use_gateway = useGateway where id = tId;
 
     return tId;
 

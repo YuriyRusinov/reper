@@ -101,8 +101,7 @@ printf "rm -f $HOME_DIR/.pgpass\n" >> ./analyzer.sh
 printf "cd \$CWD\n" >> ./analyzer.sh
 
 #once per minute
-printf "* * * * * root $PGDATA_DIR/$A_DIR/analyzer.sh\n" >> /etc/crontab
-
-/etc/rc.d/init.d/crond restart
+#printf "* * * * * root $PGDATA_DIR/$A_DIR/analyzer.sh\n" >> /etc/crontab
+#/etc/rc.d/init.d/crond restart
 
 cd $CWD

@@ -30,6 +30,7 @@
 \i ./functions/general/recsetsysparams.sql
 
 \i ./functions/general/convertattrattrvalue.sql
+\i ./functions/general/createtriggeruidex.sql
 
 \i ./functions/general/triggers/readd_triggers.sql
 

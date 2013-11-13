@@ -109,8 +109,7 @@ printf "rm -f $HOME_DIR/.pgpass\n" >> ./dumper.sh
 
 printf "cd \$CWD\n" >> ./dumper.sh
 
-printf "0 18 * * * root $PGDATA_DIR/$DUMPER_DIR/dumper.sh\n" >> /etc/crontab
-
-/etc/rc.d/init.d/crond restart
+#printf "0 18 * * * root $PGDATA_DIR/$DUMPER_DIR/dumper.sh\n" >> /etc/crontab
+#/etc/rc.d/init.d/crond restart
 
 cd $CWD

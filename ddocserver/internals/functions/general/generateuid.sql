@@ -132,6 +132,7 @@ $BODY$
 language 'plpgsql' security definer;
 
 
+--invoked when tables creation executed. In that case functions f_safe_drop_XXX, f_safe_create_XXX dows not exist yet.
 create or replace function createTriggerUID(varchar) returns int4 as
 $BODY$
 declare
@@ -153,3 +154,30 @@ begin
 end
 $BODY$
 language 'plpgsql';
+
+--more safe function. Can be used when update database to newer version or on ordinary work
+--MUST be created in separate file!!!!
+--this file invoked in initdb.sql script
+/*
+create or replace function createTriggerUIDEx(varchar) returns int4 as
+$BODY$
+declare
+    tableName alias for $1;
+    query varchar;
+begin
+
+    select f_safe_drop_trigger('trgsetuid', tableName);
+
+    query = 'create trigger trgsetuid
+             before insert or update
+             on ' || tableName || '
+             for each row 
+             execute procedure uidCheck();';
+
+    execute query;
+
+    return 1;
+end
+$BODY$
+language 'plpgsql';
+*/

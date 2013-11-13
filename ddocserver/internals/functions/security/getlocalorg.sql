@@ -48,7 +48,7 @@ $BODY$
 language 'plpgsql' security definer;
 
 --localorg on given transport
---ifidTransport = -1 - use current registered transport for the session
+--if idTransport = -1 - use current registered transport for the session
 create or replace function getLocalOrg(int4) returns setof h_local_org_desc as
 $BODY$
 declare

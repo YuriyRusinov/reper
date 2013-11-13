@@ -34,7 +34,8 @@ begin
             queue_results qr 
         where
             qr.is_read = 1
-            and id_external_queue < 0 --if negative - see description in database scheme in powerdesigner
+            and id_external_queue <= 0 --if negative - see description in database scheme in powerdesigner
+                                       --in case of zero -- first sync procedure is processing
         order by 2
     loop
         if (r.full_address is not null) then
