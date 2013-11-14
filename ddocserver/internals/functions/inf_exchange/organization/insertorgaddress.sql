@@ -59,7 +59,11 @@ begin
         return -1;
     end if;
 
-    
+    select id into idAddr from organization_transport where id_organization = idOrg and id_transport = idTransport;
+    if(idAddr is not null) then
+        update organization_transport set address = oAddress, port = oPort, is_active = isActive, use_gateway = useGateway where id = idAddr;
+        return idAddr;
+    end if;
 
     select getNextSeq('organization_transport', 'id') into idAddr;
     insert into organization_transport (id, id_organization, id_transport, address, port, is_active, use_gateway) values

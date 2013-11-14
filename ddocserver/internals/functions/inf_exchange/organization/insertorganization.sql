@@ -85,13 +85,33 @@ begin
     end if;
 
     select id into idOrg from organization where email_prefix = oEmailPrefix;
-    --if(idOrg is not null and oEmailPrefix = 'localorg_prefix') then --in that case we have autimatically created organization in installer
-    --
-    --    return idOrg;
-    --els
     if(idOrg is not null) then
-        raise exception 'Found organization with equal email_prefix! Query failed!';
-        return -1;
+        /*
+        update organization set
+                            id_type_org = idType,
+                            id_parent = idParent,
+                            id_parent1 = idParent1,
+                            id_substitutor = idSubstitutor,
+                            id_curr_mode = idCurrMode,
+                            id_prev_mode = idPrevMode,
+
+                            name = oName,
+                            short_name = oShortName,
+                            code_name = oCodeName, 
+                            latitude = oLat, 
+                            longitude = oLon, 
+                            map_symbol = pix1, 
+                            tree_symbol = pix2,
+                            dt_prev_mode = dtCurrMode,
+                            dt_curr_mode  = dtPrevMode
+        where
+            id = idOrg;
+
+        delete from organization_work_mode where id_organization = idOrg;
+        insert into organization_work_mode (id_organization, id_work_mode) select idOrg, unnest(wmModes);
+        */
+        
+        return idOrg;
     end if;
 
     select getNextSeq('organization', 'id') into idOrg;
