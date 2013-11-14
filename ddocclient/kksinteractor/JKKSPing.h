@@ -67,8 +67,8 @@ public:
     void setCreated(int c);
     void setCompleted(bool c);
 
-    void setSenderAddress(const JKKSAddress & addr);
-    const JKKSAddress & senderAddress() const;
+    //void setSenderAddress(const JKKSAddress & addr);
+    //const JKKSAddress & senderAddress() const;
 
     bool operator == (const JKKSPing & in) const;
     JKKSPing & operator = ( const JKKSPing & in );
@@ -113,7 +113,7 @@ private:
     bool m_completed;
 
     bool m_isResponse;//если true - то является ответом на пинг (в этом случае ряд атрибутов будет не заполнен
-    JKKSAddress m_senderAddress;//адрес отправителя пинга. Будет записываться на приемном конце в таблицу queue_results
+    //JKKSAddress m_senderAddress;//адрес отправителя пинга. Будет записываться на приемном конце в таблицу queue_results
 };
 
 

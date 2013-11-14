@@ -96,6 +96,7 @@ QByteArray JKKSDocument :: serialize (void) const
     QDataStream out (&qBuffer);
 
     out << getAddr(); //from jkksmessage
+    out << getSenderAddr();//from jkksmessage
     out << getCode(); //from jkksmessage
 
     out << ioName;
@@ -140,11 +141,14 @@ int JKKSDocument :: unserialize (const QByteArray& mess)
     QDataStream in(&buffer);
 
     JKKSAddress addr;
+    JKKSAddress senderAddr;
     QString code;
     
     in >> addr; //from jkksmessage
+    in >> senderAddr;//from jkksmessage
     in >> code; //from jkksmessage
     setAddr (addr);
+    setSenderAddr(senderAddr);
     setCode (code);
     
     in >> ioName;

@@ -42,8 +42,8 @@ public:
     void setIsFirst(bool isFirst = true);
     bool isFirst() const;
 
-    const JKKSAddress & getSenderAddr (void) const;
-    void setSenderAddr (const JKKSAddress & addr);
+    //const JKKSAddress & getSenderAddr (void) const;
+    //void setSenderAddr (const JKKSAddress & addr);
 
     const QString & receiverUID() const;
     const QString & senderUID() const;
@@ -63,7 +63,7 @@ private:
 
     QByteArray m_data;
     //QString m_uid;
-    JKKSAddress m_senderAddr;
+    //JKKSAddress m_senderAddr;
     qint64 m_idUrl;
     bool m_isLast;//обозначает, что содержатся данные, представляющие собой самый конец файла (последняя из передаваемых частей)
     bool m_isFirst;//обозначает, что содержатся данные, представляющие собой самое начало файла (первая из передаваемых частей)

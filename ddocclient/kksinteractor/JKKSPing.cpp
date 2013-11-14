@@ -24,8 +24,7 @@ JKKSPing:: JKKSPing (qint64 id, const JKKSAddress & addr, const QString & kvs, b
     m_uidTo(QString()),
     m_nameFrom(QString()),
     m_nameTo(QString()),
-    m_isResponse(isResponse),
-    m_senderAddress(JKKSAddress())
+    m_isResponse(isResponse)    
 {
 }
 
@@ -46,8 +45,7 @@ JKKSPing :: JKKSPing(const JKKSPing & ping)
     m_uidTo(ping.m_uidTo),
     m_nameFrom(ping.m_nameFrom),
     m_nameTo(ping.m_nameTo),
-    m_isResponse(ping.m_isResponse),
-    m_senderAddress(ping.m_senderAddress)
+    m_isResponse(ping.m_isResponse)
 {
 }
 
@@ -62,6 +60,7 @@ QByteArray JKKSPing::serialize (void) const
     QDataStream out (&qBuffer);
 
     out << getAddr();
+    out << getSenderAddr();
     out << getCode();
     out << m_id;
 
@@ -87,8 +86,6 @@ QByteArray JKKSPing::serialize (void) const
 
     out << m_isResponse;
 
-    out << m_senderAddress;
-
     return qBuffer.buffer();
 }
 
@@ -100,8 +97,10 @@ int JKKSPing::unserialize (const QByteArray& mess)
     QDataStream in(&buffer);
 
     JKKSAddress addr;
+    JKKSAddress senderAddr;
     QString code;
     in >> addr;
+    in >> senderAddr;
     in >> code;
     in >> m_id;
 
@@ -127,9 +126,8 @@ int JKKSPing::unserialize (const QByteArray& mess)
 
     in >> m_isResponse;
 
-    in >> m_senderAddress;
-
     setAddr (addr);
+    setSenderAddr(senderAddr);
     setCode (code);
 
     return OK_CODE;
@@ -300,19 +298,6 @@ void JKKSPing::setVersionTo(const QString & v)
     m_versionTo = v;
 }
 
-void JKKSPing::setSenderAddress(const JKKSAddress & addr)
-{
-    m_senderAddress.setAddress(addr.address());
-    m_senderAddress.setPort(addr.port());
-    m_senderAddress.setUseGateway(addr.useGateway());
-}
-
-const JKKSAddress & JKKSPing::senderAddress() const
-{
-    return m_senderAddress;
-}
-
-
 bool JKKSPing::operator == (const JKKSPing & in) const
 {
     if(m_completed != in.m_completed)
@@ -349,11 +334,11 @@ bool JKKSPing::operator == (const JKKSPing & in) const
         return false;
     if(m_isResponse != m_isResponse)
         return false;
-    if(m_senderAddress.address() != in.m_senderAddress.address())
+    if(getSenderAddr().address() != in.getSenderAddr().address())
         return false;
-    if(m_senderAddress.port() != in.m_senderAddress.port())
+    if(getSenderAddr().port() != in.getSenderAddr().port())
         return false;
-    if(m_senderAddress.useGateway() != in.m_senderAddress.useGateway())
+    if(getSenderAddr().useGateway() != in.getSenderAddr().useGateway())
         return false;
 
     return true;
@@ -379,9 +364,7 @@ JKKSPing & JKKSPing::operator = ( const JKKSPing & in )
     m_state4 = in.m_state4;
     m_isResponse = in.m_isResponse;
 
-    m_senderAddress.setAddress(in.m_senderAddress.address());
-    m_senderAddress.setPort(in.m_senderAddress.port());
-    m_senderAddress.setUseGateway(in.m_senderAddress.useGateway());
+    setSenderAddr(in.getSenderAddr());
 
     return * this;
 }

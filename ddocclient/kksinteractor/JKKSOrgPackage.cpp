@@ -90,6 +90,7 @@ void JKKSOrgPackage :: setOrgs (const QMap<qint64, JKKSOrganization>& orgs)
 QDataStream& operator<< (QDataStream& out, const JKKSOrgPackage& OP)
 {
     out << OP.getAddr ();
+    out << OP.getSenderAddr();
     out << OP.getCode ();
 
     out << OP.m_id;
@@ -103,9 +104,11 @@ QDataStream& operator<< (QDataStream& out, const JKKSOrgPackage& OP)
 QDataStream& operator>> (QDataStream& in, JKKSOrgPackage& OP)
 {
     JKKSAddress addr;
+    JKKSAddress senderAddr;
     QString code;
 
     in >> addr;
+    in >> senderAddr;
     in >> code;
 
     in >> OP.m_id;
@@ -116,6 +119,7 @@ QDataStream& operator>> (QDataStream& in, JKKSOrgPackage& OP)
     in >> uid;
     OP.setUid (uid);
     OP.setAddr (addr);// = JKKSRefRecord (avals, uid);
+    OP.setSenderAddr(senderAddr);
     OP.setCode (code);
 
     return in;

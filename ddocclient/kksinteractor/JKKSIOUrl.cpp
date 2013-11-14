@@ -169,7 +169,7 @@ JKKSFilePart::JKKSFilePart(const JKKSFilePart & part) : JKKSMessage(part)
     m_uid = part.m_uid;
     m_data = part.m_data;
     m_idQueue = part.m_idQueue;
-    m_senderAddr = part.m_senderAddr;
+    setSenderAddr(part.getSenderAddr());
     m_absUrl = part.m_absUrl;
     m_senderUID = part.m_senderUID;
     m_receiverUID = part.m_receiverUID;
@@ -257,16 +257,6 @@ bool JKKSFilePart::isFirst() const
     return m_isFirst;
 }
 
-const JKKSAddress & JKKSFilePart::getSenderAddr() const
-{
-    return m_senderAddr;
-}
-
-void JKKSFilePart::setSenderAddr(const JKKSAddress & addr)
-{
-    m_senderAddr = addr;
-}
-
 
 QDataStream& operator<< (QDataStream& out, const JKKSFilePart& part)
 {
@@ -277,7 +267,7 @@ QDataStream& operator<< (QDataStream& out, const JKKSFilePart& part)
     out << part.m_isFirst;
     out << part.m_absUrl;
     out << part.getAddr();
-    out << part.m_senderAddr;
+    out << part.getSenderAddr();
     out << part.m_idQueue;
 
     out << part.m_senderUID;
@@ -299,7 +289,9 @@ QDataStream& operator>> (QDataStream& in, JKKSFilePart& part)
     in >> addr;
     part.setAddr(addr);
 
-    in >> part.m_senderAddr;
+    JKKSAddress senderAddr;
+    in >> senderAddr;
+    part.setSenderAddr(senderAddr);
     
     in >> part.m_idQueue;
 
@@ -316,8 +308,7 @@ QByteArray JKKSFilePart :: serialize (void) const
     QDataStream out(&qBuffer);
 
     out << getAddr();
-
-    out << m_senderAddr;
+    out << getSenderAddr();
 
     out << m_idUrl;
     out << m_uid;
@@ -344,7 +335,9 @@ int JKKSFilePart :: unserialize (const QByteArray& mess)
     in >> addr;
     setAddr(addr);
 
-    in >> m_senderAddr;
+    JKKSAddress senderAddr;
+    in >> senderAddr;
+    setSenderAddr(senderAddr);
     
     in >> m_idUrl;
     in >> m_uid;

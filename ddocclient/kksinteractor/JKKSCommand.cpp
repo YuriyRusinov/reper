@@ -104,6 +104,7 @@ QByteArray JKKSCommand :: serialize (void) const
     QDataStream out(&qBuffer);
 
     out << getAddr();
+    out << getSenderAddr();
     out << getCode();
     out << idCommand;
     out << u_idDlFrom;
@@ -146,8 +147,10 @@ int JKKSCommand :: unserialize (const QByteArray& mess)
     QDataStream in(&buffer);
 
     JKKSAddress addr;
+    JKKSAddress senderAddr;
     QString code;
     in >> addr;
+    in >> senderAddr;
     in >> code;
     in >> idCommand;
     in >> u_idDlFrom;
@@ -188,6 +191,7 @@ int JKKSCommand :: unserialize (const QByteArray& mess)
     }
 
     setAddr(addr);
+    setSenderAddr(senderAddr);
     setCode(code);
 
     return OK_CODE;
@@ -435,6 +439,7 @@ QByteArray JKKSCmdConfirmation::serialize (void) const
     QDataStream out (&qBuffer);
 
     out << getAddr();
+    out << getSenderAddr();
     out << getCode();
     out << id();
     out << extraId();
@@ -453,9 +458,11 @@ int JKKSCmdConfirmation::unserialize (const QByteArray& mess)
     QDataStream in(&buffer);
 
     JKKSAddress addr;
+    JKKSAddress senderAddr;
     QString code;
 
     in >> addr;
+    in >> senderAddr;
     in >> code;
     in >> m_id;
     in >> unique_id;
@@ -464,6 +471,7 @@ int JKKSCmdConfirmation::unserialize (const QByteArray& mess)
     in >> m_receiveDatetime;
 
     setAddr (addr);
+    setSenderAddr(senderAddr);
     setCode (code);
 
     return OK_CODE;

@@ -304,6 +304,7 @@ void JKKSOrganization :: setWorkModes (const QMap<qint64, JKKSWorkMode>& wms)
 QDataStream& operator<< (QDataStream& out, const JKKSOrganization& OO)
 {
     out << OO.getAddr();
+    out << OO.getSenderAddr();
     out << OO.getCode();
 
     out << OO.m_id;
@@ -336,9 +337,11 @@ QDataStream& operator<< (QDataStream& out, const JKKSOrganization& OO)
 QDataStream& operator>> (QDataStream& in, JKKSOrganization& OO)
 {
     JKKSAddress addr;
+    JKKSAddress senderAddr;
     QString code;
 
     in >> addr;
+    in >> senderAddr;
     in >> code;
 
     in >> OO.m_id;
@@ -368,6 +371,7 @@ QDataStream& operator>> (QDataStream& in, JKKSOrganization& OO)
 
     OO.setUid (uid);
     OO.setAddr (addr);// = JKKSRefRecord (avals, uid);
+    OO.setSenderAddr(senderAddr);
     OO.setCode (code);
     return in;
 }

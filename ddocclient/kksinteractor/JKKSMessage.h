@@ -57,8 +57,11 @@ class _I_EXPORT JKKSMessage
         JKKSMessage (const JKKSMessage& mess);
         virtual ~JKKSMessage (void);
 
-        const JKKSAddress & getAddr (void) const;
+        const JKKSAddress & getAddr (void) const; //адрес получателя
         void setAddr (const JKKSAddress & addr);
+
+        const JKKSAddress & getSenderAddr() const; //адрес отправителя
+        void setSenderAddr(const JKKSAddress & addr);
 
         QString getCode (void) const;
         void setCode (const QString& code);
@@ -105,6 +108,7 @@ class _I_EXPORT JKKSMessage
 
     private:
         JKKSAddress m_addr;
+        JKKSAddress m_senderAddr;
         QString m_kvs;
         QMap<qint64, JKKSCategory> c;
 };

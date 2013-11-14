@@ -59,6 +59,7 @@ QByteArray JKKSMailMessage :: serialize (void) const
 
     out << idMessage;
     out << getAddr();
+    out << getSenderAddr();
     out << getCode();
     out << idIO;
     out << messageBody;
@@ -88,9 +89,11 @@ int JKKSMailMessage :: unserialize (const QByteArray& mess)
     QDataStream in(&buffer);
 
     JKKSAddress addr;
+    JKKSAddress senderAddr;
     QString code;
     in >> idMessage;
     in >> addr;
+    in >> senderAddr;
     in >> code;
     in >> idIO;
     in >> messageBody;
@@ -112,6 +115,7 @@ int JKKSMailMessage :: unserialize (const QByteArray& mess)
     }
 
     setAddr (addr);
+    setSenderAddr(senderAddr);
     setCode (code);
 
     return OK_CODE;
@@ -209,20 +213,20 @@ JKKSMailConfirmation::JKKSMailConfirmation(qint64 idMess,
                                            const QDateTime & receiveDatetime,
                                            const JKKSAddress & addr,
                                            const QString & kvs)
-: JKKSMessage (addr, kvs),
-m_id(idMess),
-m_dst_id(extraId),
-m_readDatetime(readDatetime),
-m_receiveDatetime(receiveDatetime)
+    : JKKSMessage (addr, kvs),
+    m_id(idMess),
+    m_dst_id(extraId),
+    m_readDatetime(readDatetime),
+    m_receiveDatetime(receiveDatetime)
 {
 }
 
 JKKSMailConfirmation::JKKSMailConfirmation(const JKKSMailConfirmation & cfm)
-: JKKSMessage (cfm),
-m_id(cfm.m_id),
-m_dst_id(cfm.m_dst_id),
-m_readDatetime(cfm.m_readDatetime),
-m_receiveDatetime(cfm.m_receiveDatetime)
+    : JKKSMessage (cfm),
+    m_id(cfm.m_id),
+    m_dst_id(cfm.m_dst_id),
+    m_readDatetime(cfm.m_readDatetime),
+    m_receiveDatetime(cfm.m_receiveDatetime)
 {
 
 }
@@ -239,6 +243,7 @@ QByteArray JKKSMailConfirmation::serialize (void) const
     QDataStream out (&qBuffer);
 
     out << getAddr();
+    out << getSenderAddr();
     out << getCode();
     out << id();
     out << extraId();
@@ -256,8 +261,10 @@ int JKKSMailConfirmation::unserialize (const QByteArray& mess)
     QDataStream in(&buffer);
 
     JKKSAddress addr;
+    JKKSAddress senderAddr;
     QString code;
     in >> addr;
+    in >> senderAddr;
     in >> code;
     in >> m_id;
     in >> m_dst_id;
@@ -265,6 +272,7 @@ int JKKSMailConfirmation::unserialize (const QByteArray& mess)
     in >> m_receiveDatetime;
 
     setAddr (addr);
+    setSenderAddr(senderAddr);
     setCode (code);
 
     return OK_CODE;

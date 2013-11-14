@@ -36,8 +36,7 @@ JKKSRefRecord :: JKKSRefRecord (qint64 id_queue,
       m_urls (QMap<qint64, JKKSIOUrl>()),
       aVals (attrsVals),
       ioDoc (JKKSDocument()),
-      ioTable (JKKSIOTable()),
-      senderAddr (JKKSAddress())
+      ioTable (JKKSIOTable())
 {
     cat.clear ();
     cat.insert (aCat.id(), aCat);
@@ -57,8 +56,7 @@ JKKSRefRecord :: JKKSRefRecord (const JKKSRefRecord & RR)
       m_urls (RR.m_urls),
       aVals (RR.aVals),
       ioDoc (RR.ioDoc),
-      ioTable (RR.ioTable),
-      senderAddr (RR.senderAddr)
+      ioTable (RR.ioTable)
 {
 }
 
@@ -213,16 +211,6 @@ void JKKSRefRecord :: setAddTable (const JKKSIOTable& table)
     ioTable = table;
 }
 
-const JKKSAddress & JKKSRefRecord :: getSenderAddr (void) const
-{
-    return senderAddr;
-}
-
-void JKKSRefRecord :: setSenderAddr (const JKKSAddress & addr)
-{
-    senderAddr = addr;
-}
-
 const QMap<qint64, JKKSGlobalRubric>& JKKSRefRecord :: rubrics (void) const
 {
     return m_rubrics;
@@ -257,6 +245,7 @@ void JKKSRefRecord :: setUrls (const QMap<qint64, JKKSIOUrl>& urls)
 QDataStream& operator<< (QDataStream& out, const JKKSRefRecord& RR)
 {
     out << RR.getAddr();
+    out << RR.getSenderAddr();
     out << RR.getCode();
 
     out << RR.idQueue;
@@ -271,7 +260,6 @@ QDataStream& operator<< (QDataStream& out, const JKKSRefRecord& RR)
     out << RR.aVals;
     out << RR.ioDoc.serialize ();
     out << RR.ioTable;
-    out << RR.senderAddr;
 
     out << RR.uid();
     out << RR.uuid();
@@ -288,11 +276,14 @@ QDataStream& operator<< (QDataStream& out, const JKKSRefRecord& RR)
 QDataStream& operator>> (QDataStream& in, JKKSRefRecord& RR)
 {
     JKKSAddress addr;
+    JKKSAddress senderAddr;
     QString code;
 
     in >> addr;
+    in >> senderAddr;
     in >> code;
     RR.setAddr (addr);// = JKKSRefRecord (avals, uid);
+    RR.setSenderAddr(senderAddr);
     RR.setCode (code);
 
     in >> RR.idQueue;
@@ -311,7 +302,6 @@ QDataStream& operator>> (QDataStream& in, JKKSRefRecord& RR)
     RR.ioDoc.unserialize (docArr);
 
     in >> RR.ioTable;
-    in >> RR.senderAddr;
 
     //from jkksuid
     QString uid;
@@ -449,6 +439,7 @@ const QString & JKKSQueueResponse :: orgUid() const
 QDataStream& operator<< (QDataStream& out, const JKKSQueueResponse& RR)
 {
     out << RR.getAddr();
+    out << RR.getSenderAddr();
     out << RR.getCode();
 
     out << RR.localId;
@@ -463,9 +454,11 @@ QDataStream& operator<< (QDataStream& out, const JKKSQueueResponse& RR)
 QDataStream& operator>> (QDataStream& in, JKKSQueueResponse& RR)
 {
     JKKSAddress addr;
+    JKKSAddress senderAddr;
     QString code;
 
     in >> addr;
+    in >> senderAddr;
     in >> code;
 
     in >> RR.localId;
@@ -474,6 +467,7 @@ QDataStream& operator>> (QDataStream& in, JKKSQueueResponse& RR)
     in >> RR.m_orgUid;
 
     RR.setAddr (addr);// = JKKSRefRecord (avals, uid);
+    RR.setSenderAddr(senderAddr);
     RR.setCode (code);
 
     return in;

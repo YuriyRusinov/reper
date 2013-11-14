@@ -1,4 +1,4 @@
-/**********************************************************************
+ /**********************************************************************
  * Module:  JKKSLoader.cpp
  * Author:  yuriyrusinov
  * Modified: 1 апреля 2008 г. 17:15
@@ -1569,7 +1569,7 @@ int JKKSLoader::writeMessage (JKKSPing *ping, const QString & senderUID) const
     JKKSQueueResponse resp (-1, 
                             idOrgTo, 
                             3, 
-                            ping->senderAddress());
+                            ping->getSenderAddr());
 
     resp.setOrgUid(ping->uidFrom());
     
@@ -3738,7 +3738,8 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readTableRecords (QStringList & receive
             else if (entity_type == 8)
             {
                 JKKSOrgPackage OP = readOrgs (rec.getIDQueue(), receiverUID);
-                OP.setAddr (getLocalAddress());
+                OP.setAddr (rec.getAddr());
+                OP.setSenderAddr(getLocalAddress());
                 JKKSPMessage pM (OP.serialize(), OP.getMessageType());
                 pM.setReceiverUID(receiverUID);
                 pM.setSenderUID(this->senderUID);
@@ -3764,6 +3765,7 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readTableRecords (QStringList & receive
                     {
                         JKKSOrganization org = orgList[ii];//po.value ();
                         org.setAddr (rec.getAddr());
+                        org.setSenderAddr(getLocalAddress());
                        
                         JKKSPMessage pM (org.serialize(), org.getMessageType());
                         pM.setSenderUID(this->senderUID);
@@ -4514,10 +4516,10 @@ QPair<qint64, qint64> JKKSLoader :: getIDMap (const QString& ref_uid, const JKKS
 int JKKSLoader :: writeMessage (JKKSOrgPackage * OrgPack, const QString& senderUID, const QString& receiverUID) const
 {
 
-    JKKSQueueResponse recResp (-1, OrgPack->id(), 2, OrgPack->getAddr());
+    JKKSQueueResponse recResp (-1, OrgPack->id(), 2, OrgPack->getSenderAddr());
     recResp.setOrgUid(senderUID);
 
-    kksDebug () << senderUID << OrgPack->getAddr ().address() << OrgPack->getAddr ().port();
+    kksDebug () << QString("Sender  = ") << senderUID << OrgPack->getSenderAddr().address() << OrgPack->getSenderAddr().port();
 
     QMap<qint64, JKKSTransport> T = OrgPack->getTransports();
     for (QMap<qint64, JKKSTransport>::const_iterator pt = T.constBegin();
@@ -4584,7 +4586,7 @@ int JKKSLoader :: writeMessage (JKKSOrganization * org, const QString & senderUI
     if (!org)
         return ERROR_CODE;
 
-    JKKSQueueResponse recResp (-1, org->id(), 2, org->getAddr());
+    JKKSQueueResponse recResp (-1, org->idQueue(), 2, org->getSenderAddr());
     recResp.setOrgUid(senderUID);
 
     //тип организации
@@ -4703,10 +4705,11 @@ int JKKSLoader :: writeMessage (JKKSOrganization * org, const QString & senderUI
 
         kksCritical() << QObject::tr("insertOrganizationEx() failed! SQL = %1").arg(sql);
 
-        if(bGenResponse){
+        /*if(bGenResponse){
             recResp.setResult(4);
             generateQueueResponse (recResp);
         }
+        */
 
         return ERROR_CODE;
     }
@@ -4720,7 +4723,9 @@ int JKKSLoader :: writeMessage (JKKSOrganization * org, const QString & senderUI
 
         if(bGenResponse){
             recResp.setResult(4);
-            generateQueueResponse (recResp);
+            int res1 = generateQueueResponse (recResp);
+            if(res1 == ERROR_CODE)
+                return ERROR_CODE;
         }
 
         return ERROR_CODE;
@@ -4735,10 +4740,12 @@ int JKKSLoader :: writeMessage (JKKSOrganization * org, const QString & senderUI
         if (idTr < 0){
             kksCritical() << QObject::tr("writeTransport Error!");
 
+            /*
             if(bGenResponse){
                 recResp.setResult(4);
                 generateQueueResponse (recResp);
             }
+            */
 
             return ERROR_CODE;
         }
@@ -4763,10 +4770,12 @@ int JKKSLoader :: writeMessage (JKKSOrganization * org, const QString & senderUI
             if (otRes)
                 delete otRes;
 
+            /*
             if(bGenResponse){
                 recResp.setResult(4);
                 generateQueueResponse (recResp);
             }
+            */
     
             return ERROR_CODE;
         }
@@ -4775,16 +4784,18 @@ int JKKSLoader :: writeMessage (JKKSOrganization * org, const QString & senderUI
     }
 
     //помечаем организацию как созданную
-    QString is_create_sql = QString ("update organization set is_created = 1 where id=%1").arg (idOrg);
+    QString is_create_sql = QString ("select setOrgAsCreated(%1, 1)").arg (idOrg);
     
     KKSResult * crRes = dbWrite->execute (is_create_sql);
     if (!crRes){
         kksCritical() << QObject::tr("query failed! SQL = %1").arg(is_create_sql);
 
+        /*
         if(bGenResponse){
             recResp.setResult(4);
             generateQueueResponse (recResp);
         }
+        */
 
         return ERROR_CODE;
     }
@@ -4796,7 +4807,9 @@ int JKKSLoader :: writeMessage (JKKSOrganization * org, const QString & senderUI
 
     if(bGenResponse){
         recResp.setResult(3);
-        generateQueueResponse (recResp);
+        int res1 = generateQueueResponse (recResp);
+        if(res1 == ERROR_CODE)
+            return ERROR_CODE;
     }
 
     getLocalAddress(true);
@@ -5205,7 +5218,7 @@ QMap<qint64, JKKSSearchGroup> JKKSLoader :: writeGroups (qint64 idParentGr, cons
         JKKSSearchCriterion sc = pc.value();
         int ier = writeCriteriaForGroup (sc);
         if (ier < 0)
-            continue;
+            return QMap<qint64, JKKSSearchGroup>();
 
         QString gscSql = QString ("select ioInsertCriterionIntoGroup (%1, %2);").arg (ier).arg (idGroup);
         KKSResult * gsres = dbWrite->execute (gscSql);
@@ -5214,7 +5227,8 @@ QMap<qint64, JKKSSearchGroup> JKKSLoader :: writeGroups (qint64 idParentGr, cons
             kksCritical() << QObject::tr("ioInsertCriterionIntoGroup() failed! SQL = %1").arg(gscSql);
             if (gsres)
                 delete gsres;
-            continue;
+            
+            return QMap<qint64, JKKSSearchGroup>();;
         }
 
         delete gsres;
@@ -5427,7 +5441,7 @@ QMap<QString, JKKSPing> JKKSLoader :: createPings(const QStringList & receivers)
         ping.setNameTo(res->getCellAsString(i, 1));
         ping.setUidTo(res->getCellAsString(i, 3));
         
-        ping.setSenderAddress(getLocalAddress());
+        ping.setSenderAddr(getLocalAddress());
         
         ping.setCreated(res->getCellAsInt(i, 10));
         ping.setCompleted(res->getCellAsBool(i, 11));
@@ -5463,7 +5477,7 @@ QMap<QString, JKKSPing> JKKSLoader :: createPings() const
         JKKSPing ping = JKKSPing(res->getCellAsInt64 (i, 0),
                                  addr);
 
-        ping.setSenderAddress(getLocalAddress());
+        ping.setSenderAddr(getLocalAddress());
         ping.setCompleted(res->getCellAsBool(i, 11));
         ping.setCreated(res->getCellAsInt(i, 10));
         ping.setIdOrgFrom(res->getCellAsInt(i, 14));
@@ -5498,7 +5512,7 @@ JKKSPing JKKSLoader :: createPing(const QString & uidOrg) const
     ping = JKKSPing(res->getCellAsInt64 (0, 0),
                     addr);
 
-    ping.setSenderAddress(getLocalAddress());
+    ping.setSenderAddr(getLocalAddress());
     ping.setCompleted(res->getCellAsBool(0, 11));
     ping.setCreated(res->getCellAsInt(0, 10));
     ping.setIdOrgFrom(res->getCellAsInt(0, 14));

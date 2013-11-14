@@ -78,7 +78,8 @@ QDataStream& operator>> (QDataStream& in, JKKSAddress& T)
     return in;
 }
 
-
+/*****************************************/
+/*****************************************/
 JKKSMessage :: JKKSMessage (const JKKSAddress & address, const QString& code)
     : m_addr (address),
     m_kvs (code),
@@ -89,7 +90,8 @@ JKKSMessage :: JKKSMessage (const JKKSAddress & address, const QString& code)
 JKKSMessage :: JKKSMessage (const JKKSMessage& mess)
     : m_addr (mess.m_addr),
     m_kvs (mess.m_kvs),
-    c (mess.c)
+    c (mess.c),
+    m_senderAddr(mess.m_senderAddr)
 {
 }
 
@@ -110,6 +112,16 @@ QString JKKSMessage :: getCode (void) const
 void JKKSMessage :: setAddr (const JKKSAddress & addr)
 {
     m_addr = addr;
+}
+
+const JKKSAddress & JKKSMessage :: getSenderAddr() const
+{
+    return m_senderAddr;
+}
+
+void JKKSMessage :: setSenderAddr(const JKKSAddress & addr)
+{
+    m_senderAddr = addr;
 }
 
 void JKKSMessage :: setCode (const QString& code)

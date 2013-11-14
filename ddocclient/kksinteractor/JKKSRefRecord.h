@@ -93,9 +93,6 @@ public:
     const JKKSIOTable& getAddTable (void) const;
     void setAddTable (const JKKSIOTable& table);
 
-    const JKKSAddress & getSenderAddr (void) const;
-    void setSenderAddr (const JKKSAddress & addr);
-
     const QMap<qint64, JKKSGlobalRubric>& rubrics (void) const;
     QMap<qint64, JKKSGlobalRubric>& rubrics (void);
     void setRubrics (const QMap<qint64, JKKSGlobalRubric>& rubrs);
@@ -131,7 +128,6 @@ private:
 
     JKKSDocument ioDoc;
     JKKSIOTable ioTable;
-    JKKSAddress senderAddr;
 };
 
 class _I_EXPORT JKKSQueueResponse : public JKKSMessage 
