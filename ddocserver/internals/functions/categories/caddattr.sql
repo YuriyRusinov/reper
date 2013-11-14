@@ -8,14 +8,29 @@ declare
     isReadOnly alias for $5;
 
     cnt int4;
+    r record;
     idCategoryAttr int4;
 begin
 
-    select id into idCategoryAttr from attrs_categories where id_io_category = idCategory and id_io_attribute = idAttr;
-    if(idCategoryAttr is not null) then
-        update attrs_categories set def_value = defValue, is_mandatory = isMandatory, is_read_only = isReadOnly where id_io_category = idCategory and id_io_attribute = idAttr;
-        return idCategoryAttr;
-    end if;
+    idCategoryAttr := NULL;
+    for r in 
+        select 
+            id, def_value, is_mandatory, is_read_only 
+        from attrs_categories 
+       where 
+           id_io_category = idCategory and id_io_attribute = idAttr
+    loop
+        idCategoryAttr := r.id;
+        
+        if(idCategoryAttr is not null) then
+            if(r.def_value <> defValue or r.is_mandatory <> isMandatory or r.is_read_only <> isReadOnly) then
+                update attrs_categories set def_value = defValue, is_mandatory = isMandatory, is_read_only = isReadOnly where id_io_category = idCategory and id_io_attribute = idAttr;
+            end if;
+
+            return idCategoryAttr;
+        end if;
+    end loop;
+
 
     idCategoryAttr := getNextSeq('attrs_categories', 'id');
 
