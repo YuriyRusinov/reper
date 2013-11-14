@@ -127,7 +127,7 @@ void DDocInteractorClient::startProc()
 
         for (QList<JKKSPMessWithAddr *>::const_iterator iterator = pingResultsList.constBegin();iterator != pingResultsList.constEnd();++iterator)
         {
-            bool stat = sendOutMessage((*iterator), true, false) ;  //Второй параметр отвечает за то, что данные будут уходить синхронно или асинхронно. 
+            bool stat = sendOutMessage((*iterator), false, false) ;  //Второй параметр отвечает за то, что данные будут уходить синхронно или асинхронно. 
                                                                     //Здесь асинхронно. Т.е. система не будет ожидать, пока не завершится передача одного сообщения
                                                                     //прежде чем приступить к передаче следующего
         }

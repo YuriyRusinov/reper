@@ -7,7 +7,7 @@
 
 #include <JKKSPing.h>
 
-class DDocINteractorClient;
+class DDocInteractorClient;
 class DDocInteractorServer;
 
 class __HTTP_CONNECTOR_EXPORT DDocInteractorBase : public QObject
