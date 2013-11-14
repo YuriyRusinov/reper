@@ -5,7 +5,7 @@
 #include "ddocinteractorbase.h"
 #include "ddocinteractorserver.h"
 #include <defines.h>
-#include <KKSDebug.h>
+#include <kksdebug.h>
 #include <JKKSIOUrl.h>
 #include <JKKSMessage.h>
 #include <kksclient_name.h>
@@ -108,12 +108,12 @@ void DDocInteractorServer::loadData(int socketDescriptor)
 
     QHttpRequestHeader header( all_data );
 
+    kksInfo() << tr("New income data found on socket. Start processing...");
+
     bool b = header.hasContentLength();
 
     if(b)
     {
-        kksInfo() << tr("Income message arrived");
-
         int sz_dt = header.contentLength();
         all_data = all_data.right(sz_dt); 
 
@@ -137,7 +137,7 @@ void DDocInteractorServer::loadData(int socketDescriptor)
      }
     else
     {
-        kksCritical() << tr("Data not found in incomming request");
+        kksCritical() << tr("Correct data does not found in incomming request");
         sendBadBlock(clientConnection);
     }
 
@@ -166,6 +166,8 @@ void DDocInteractorServer :: sendBadBlock(QTcpSocket * clientConnection)
 {
     if(!clientConnection)
         return;
+
+    kksCritical() << tr("Found inconsistent income data on socket! Sending \"Bad request\" response to client") ;
 
     QByteArray block;
     QHttpResponseHeader response = QHttpResponseHeader( 400 , "HTTP/1.1 400 Bad Request" );
@@ -196,7 +198,7 @@ int DDocInteractorServer::processMessage(QMap <QString, QByteArray> &post_data, 
     //вычисленная hash-сумма пришедших данных
     QByteArray hash = QCryptographicHash::hash(byteArray, QCryptographicHash::Sha1);
     if(etaloneHash != hash){
-        kksCritical() << tr("ERROR! Hash sum for income message is inconsistent!");
+        kksCritical() << tr("Hash sum for income message is inconsistent!");
         sendBadBlock(clientConnection);
         return -1;
     }
@@ -216,35 +218,61 @@ int DDocInteractorServer::processMessage(QMap <QString, QByteArray> &post_data, 
         return 1;
     }
 
+    bool ok = m_loader->beginTransaction();
+    if(!ok){
+        kksCritical() << QObject::tr("Cannot start transaction for message writing");
+        sendBadBlock(clientConnection);
+        return 1;
+    }
+
     int res = m_loader->writeMessage(pMessage);
     if(res <= 0){
-        kksCritical() << tr("ERROR! Cannot processing income message! Data was not write to database");
-        kksCritical() << tr("Message type: ") << pMessage.getType() << tr(". Write message status : ") << res;
-    }
-    
-    kksInfo() << tr("Income message was successfully written to database");
+        kksCritical() << tr("Cannot processing income message! Data was not writen to database");
+        kksCritical() << tr("Sender = %1, receiver = %2, message type = %3. %4")
+                                       .arg(pMessage.senderUID())
+                                       .arg(pMessage.receiverUID())
+                                       .arg(pMessage.getType())
+                                       .arg(res == IGNORE_CODE ? tr("Message was IGNORED!") : tr("Database error!"));
 
-    kksDebug() << QString("[")  << ERROR_CODE << QString("] [") << OK_CODE << QString("] [") <<  IGNORE_CODE << QString("]");
-    if (res!=ERROR_CODE && res!=OK_CODE && res!=IGNORE_CODE){
-        kksDebug() << QString("WTF of Result? : ") << res;
-        res=OK_CODE;
+        bool ok = m_loader->rollbackTransaction();
+        if(!ok){
+            kksCritical() << QObject::tr("Cannot rollback transaction for message writing");
+            sendBadBlock(clientConnection);
+            return 1;
+        }
+
+    }
+    else{    
+        kksInfo() << tr("Income message was successfully written to database");
+        bool ok = m_loader->commitTransaction();
+        if(!ok){
+            kksCritical() << QObject::tr("Cannot commit transaction for message writing");
+            sendBadBlock(clientConnection);
+            return 1;
+        }
+
+        res = OK_CODE;
     }
 
-    //в настоящее время мы полагаем, что вне зависимости от результата обработки входящего сообщения в БД
-    //мы в качестве ответа на запрос объекта-отправителя (ну или шлюза (ТПС)) возвращаем OK
-    //тем самым мы говорим о том, что факт приема сообщения состоялся успешно
-    //при этом результат обработки будет отправлен отдельно в виде спец. квитанции
-    if(res == ERROR_CODE)
-    {
-        sendOKBlock(clientConnection, true);
-    }
-    else if(res == OK_CODE)
+    // --неверно -- в настоящее время мы полагаем, что вне зависимости от результата обработки входящего сообщения в БД
+    // --неверно -- мы в качестве ответа на запрос объекта-отправителя (ну или шлюза (ТПС)) возвращаем OK
+    // --неверно -- тем самым мы говорим о том, что факт приема сообщения состоялся успешно
+    // --неверно -- при этом результат обработки будет отправлен отдельно в виде спец. квитанции
+
+    if(res == OK_CODE)
     {
         sendOKBlock(clientConnection, true);    
+    }
+    else if(res == ERROR_CODE)
+    {
+        sendBadBlock(clientConnection);
     }
     else if(res == IGNORE_CODE)
     {
         sendOKBlock(clientConnection, true);
+    }
+    else{
+        sendBadBlock(clientConnection);//другое отрицательное число или 0
     }
 
     return 1;
@@ -271,14 +299,14 @@ int DDocInteractorServer::processNotification(QMap <QString, QByteArray> &post_d
 	kksDebug() << QString("Mes ID: ") << idMsg;
 
     if(idMsg <= 0){
-        kksCritical() << tr("ERROR! Cannot parse MESID of the notification");
+        kksCritical() << tr("Cannot parse MESID of the notification");
         sendBadBlock(clientConnection);
         return -1;
     }
 
     msgType = (byteArray.right(byteArray.length()-2)).toInt();
     if(msgType < 0){
-        kksCritical() << tr("ERROR! Cannot parse MESID (type part) of the notification ");
+        kksCritical() << tr("Cannot parse MESID (type part) of the notification ");
         sendBadBlock(clientConnection);
         return -1;
     }
@@ -314,7 +342,7 @@ int DDocInteractorServer::processNotification(QMap <QString, QByteArray> &post_d
         p.setState2(0);
         m_parent->m_pings.insert(emailPrefix, p);
 
-        kksCritical() << tr("ERROR: Message with id = %1 and type = %2 does not received by receiver! Result = %3")
+        kksCritical() << tr("Message with id = %1 and type = %2 does not received by receiver! Result = %3")
                                           .arg(idMsg) 
                                           .arg(msgType)
                                           .arg(receiverResult);
@@ -327,7 +355,7 @@ int DDocInteractorServer::processNotification(QMap <QString, QByteArray> &post_d
 
     if(!ok)
     {
-        kksCritical() << tr("ERROR: Cannot mark message as sended! Database Error. idMsg = %1, type = %2")
+        kksCritical() << tr("Cannot mark message as sended! Database Error. idMsg = %1, type = %2")
                                             .arg(idMsg)
                                             .arg(msgType);
         sendOKBlock(clientConnection, true);        
@@ -349,7 +377,7 @@ int DDocInteractorServer::processNotification(QMap <QString, QByteArray> &post_d
 int DDocInteractorServer::processPingNotification(int idMsg, int result)
 {
     if(result != 1){
-        kksCritical() << tr("ERROR! Destination organization cannot receive ping!");
+        kksCritical() << tr("Destination organization cannot receive ping request!");
         m_parent->cntPingsSended++;
     }
 

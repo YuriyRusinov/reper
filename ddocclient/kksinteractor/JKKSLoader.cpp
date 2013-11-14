@@ -16,7 +16,7 @@
 #include "kksresult.h"
 #include "kkspgdatabase.h"
 
-#include <KKSDebug.h>
+#include <kksdebug.h>
 
 #include "JKKSLoader.h"
 #include "JKKSRubric.h"
@@ -705,9 +705,8 @@ int JKKSLoader :: writeMessage (const JKKSPMessage & pMessage) const
     {
         result = message->writeToDB (this, pMessage.senderUID(), pMessage.receiverUID());
         delete message;
-        if(result == ERROR_CODE){
-            int a=0;
-            Q_UNUSED (a);
+        if(result <= 0){
+            result = ERROR_CODE;
         }
     }
 
@@ -830,7 +829,9 @@ qint64 JKKSLoader :: updateDocument (JKKSDocument *doc) const
 
     if (res && res->getRowCount() == 1)
         result = res->getCellAsInt (0, 0);
-    delete res;
+    
+    if(res)
+        delete res;
     
     if (result <= 0){
         kksCritical() << QObject::tr("ioUpdate() for document with UID = %1 failed").arg(doc->uid());
@@ -916,6 +917,8 @@ qint64 JKKSLoader :: updateDocument (JKKSDocument *doc) const
         if (wRubr.getSearchTemplate().id() > 0)
         {
             idSearchT = writeSearchTemplate (wRubr.getSearchTemplate());
+            if(idSearchT <= 0)
+                return ERROR_CODE;
         }
 
         QString sql =  QString ("select * from ioUpdateInclude ('%1', '%2', '%3', '%4', %5, %6, %7, %8, NULL );")
@@ -967,7 +970,9 @@ qint64 JKKSLoader :: updateDocument (JKKSDocument *doc) const
     {
         JKKSIOUrl url = pf.value ();
         url.setIOId (doc->id ());
-        this->writeDocumentFile (url);//pf.value());
+        int res = this->writeDocumentFile (url);//pf.value());
+        if(res <= 0)
+            return ERROR_CODE;
     }
 
     //
@@ -1050,6 +1055,8 @@ qint64 JKKSLoader :: insertDocument (JKKSDocument *doc) const
     }
     else{
         idType = writeIOType(type);
+        if(idType <= 0)
+            return ERROR_CODE;
     }
 
     QString sql = QString ("select * from ioInsert (%1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, NULL, NULL, %13, %14, %15, %16, %17);")
@@ -1136,8 +1143,13 @@ qint64 JKKSLoader :: insertDocument (JKKSDocument *doc) const
             attr_ier = attrRes->getCellAsInt (0, 0);
             delete attrRes;
         }
-        if (attr_ier < 0){
-            kksCritical() << QObject::tr("ioInsertAttrEx() for document with UID = %1 failed!").arg(doc->uid());
+        
+        if (attr_ier < 0){ //если 0, то это означает, что в качестве значения атрибута использовался NULL
+            kksCritical() << QObject::tr("ioInsertAttrEx() for document with UID = %1 failed! SQL = %2").arg(doc->uid()).arg(attrSql);
+            return ERROR_CODE;
+        }
+        else if(attr_ier == 0 && !val.isEmpty()){
+            kksCritical() << QObject::tr("ioInsertAttrEx() for document with UID = %1 failed! Result is 0, but value is not NULL! SQL = %2").arg(doc->uid()).arg(attrSql);
             return ERROR_CODE;
         }
     }
@@ -1174,6 +1186,8 @@ qint64 JKKSLoader :: insertDocument (JKKSDocument *doc) const
         if (wRubr.getSearchTemplate().id() > 0)
         {
             idSearchT = writeSearchTemplate (wRubr.getSearchTemplate());
+            if(idSearchT <= 0)
+                return ERROR_CODE;
         }
         QString sql =  QString ("select * from ioinsertinclude (%1, %2, '%3', '%4', '%5', %6, %7, '%8', NULL);")
                                 .arg (wRubr.getParent () <= 0 ? QString ("NULL::int4") : QString::number (wRubr.getParent ()))
@@ -1207,7 +1221,9 @@ qint64 JKKSLoader :: insertDocument (JKKSDocument *doc) const
     {
         JKKSIOUrl url = pf.value ();
         url.setIOId (doc->id ());
-        this->writeDocumentFile (url);//pf.value());
+        int res = this->writeDocumentFile (url);//pf.value());
+        if(res <= 0)
+            return ERROR_CODE;
     }
 
     QMap<qint64, JKKSIOTable> tables = doc->ref_tables ();
@@ -1289,18 +1305,21 @@ qint64 JKKSLoader :: insertDocument (JKKSDocument *doc) const
         cjSql = QString ("select id_dl_from from command_journal where id=%1").arg (doc->getCommandId());
         
         KKSResult *cPriv = dbWrite->execute (cjSql);
-        if (!cPriv)
+        if (!cPriv){
             kksCritical() << QObject::tr("Error in command journal");
+            return ERROR_CODE;
+        }
         else
         {
             int idRole = cPriv->getCellAsInt (0, 0);
             qint64 idObject = doc->id();
             cjSql = QString ("select setprivileges (%1, %2, TRUE, TRUE, TRUE, TRUE, TRUE);").arg (idRole).arg (idObject);
             KKSResult *cSPriv = dbWrite->execute (cjSql);
-            if (!cSPriv)
+            if (!cSPriv){
                 kksCritical() << QObject::tr("Cannot set privilegies");
-            else
-                delete cSPriv;
+                return ERROR_CODE;
+            }
+
             delete cPriv;
         }
     }
@@ -1309,10 +1328,12 @@ qint64 JKKSLoader :: insertDocument (JKKSDocument *doc) const
     
     KKSResult * complRes = dbWrite->execute (sqlComplete);
     
-    if (!complRes)
+    if (!complRes){
         kksCritical() << QObject::tr("Cannot set document as completed");
-    else
-        delete complRes;
+        return ERROR_CODE;
+    }
+
+    delete complRes;
 
     return result;
 }
@@ -1428,15 +1449,17 @@ int JKKSLoader::writeMessage (JKKSMailMessage *mMess) const
         if (res)
             delete res;
 
-        if (doc && result != ERROR_CODE)
+        if (doc && result > 0)
         {
             QString idRole = mMess->getIdDlTo();
             qint64 idObject = mMess->getIO();
 
             QString mMessSql = QString ("select setprivileges ('%1', %2, TRUE, TRUE, TRUE, TRUE, TRUE);") .arg (idRole).arg (idObject);
             KKSResult *cSPriv = dbWrite->execute (mMessSql);
-            if (!cSPriv || cSPriv->getCellAsInt(0, 0) <= 0)
+            if (!cSPriv || cSPriv->getCellAsInt(0, 0) <= 0){
                 kksCritical() << QObject::tr("Cannot set privilegies for the document with ID = %1").arg(idObject);
+                return ERROR_CODE;
+            }
             if(cSPriv)
                 delete cSPriv;
 
@@ -1499,6 +1522,9 @@ int JKKSLoader::writeMessage (JKKSCmdConfirmation *cfm) const
         delete res;
     }
 
+    if(result <= 0)
+        return ERROR_CODE;
+
     return result;
 }
 
@@ -1524,6 +1550,9 @@ int JKKSLoader::writeMessage (JKKSMailConfirmation *cfm) const
             result = res->getCellAsInt (0, 0);
         delete res;
     }
+
+    if(result <= 0)
+        return ERROR_CODE;
 
     return result;
 }
@@ -1559,7 +1588,9 @@ int JKKSLoader::writeMessage (JKKSPing *ping, const QString & senderUID) const
     if(res)
         delete res;
 
-    generateQueueResponse(resp);
+    int res1 = generateQueueResponse(resp);
+    if(res1 <= 0)
+        return ERROR_CODE;
 
     return OK_CODE;
 }
@@ -1851,17 +1882,26 @@ int JKKSLoader :: writeCategory (JKKSCategory& cat) const
         if (res && res->getRowCount () == 1)
         {
             int idc = res->getCellAsInt (0, 0);
+            delete res;
+
             cat.setId (idc);
-            writeCategoryAttrs (cat);
-            writeCategoryRubrics (cat);
+            int ok = writeCategoryAttrs (cat);
+            if(ok <= 0)
+                return ERROR_CODE;
+
+            ok = writeCategoryRubrics (cat);
+            if(ok <= 0)
+                return ERROR_CODE;
+
             result = OK_CODE;
         }
-
-        if (res)
-            delete res;
+        else{
+            if (res)
+                delete res;
+        }
     }
 
-    if(result == ERROR_CODE){
+    if(result <= 0){
         kksCritical() << QObject::tr("cinsert() for categoryUID = %1 failed!").arg(cat.uid());
     }
 
@@ -2025,10 +2065,10 @@ JKKSCategoryAttr JKKSLoader :: readAttribute (qint64 id) const
     return attr;
 }
 
-void JKKSLoader :: writeCategoryAttrs (const JKKSCategory& cat) const
+int JKKSLoader :: writeCategoryAttrs (const JKKSCategory& cat) const
 {
     if (cat.id() < 0)
-        return;
+        return ERROR_CODE;
 
     QMap<qint64, JKKSCategoryAttr> attributes = cat.attributes ();
     for (QMap<qint64, JKKSCategoryAttr>::const_iterator pa = attributes.constBegin();
@@ -2060,7 +2100,9 @@ void JKKSLoader :: writeCategoryAttrs (const JKKSCategory& cat) const
             kksCritical() << QObject::tr("acInsert() failed! Result = %1 SQL = %2").arg( res ? res->getCellAsString(0, 0) : "NULL" ).arg(sql);
             if(res)
                 delete res;
-            continue;
+            
+            return ERROR_CODE;
+            //continue;
         }
 
         JKKSCategoryAttr attr = pa.value();
@@ -2068,15 +2110,19 @@ void JKKSLoader :: writeCategoryAttrs (const JKKSCategory& cat) const
         delete res;
 
         if(attr.idAttrType() == 32){ //atComplex
-            writeAttrAttrs(attr);
+            int res = writeAttrAttrs(attr);
+            if(res == ERROR_CODE)
+                return ERROR_CODE;
         }
     }
+
+    return OK_CODE;
 }
 
-void JKKSLoader :: writeAttrAttrs (const JKKSCategoryAttr & attr) const
+int JKKSLoader :: writeAttrAttrs (const JKKSCategoryAttr & attr) const
 {
     if (attr.id() < 0)
-        return;
+        return ERROR_CODE;
 
     QMap<qint64, JKKSCategoryAttr> attributes = attr.attrs();
     for (QMap<qint64, JKKSCategoryAttr>::const_iterator pa = attributes.constBegin();
@@ -2108,11 +2154,15 @@ void JKKSLoader :: writeAttrAttrs (const JKKSCategoryAttr & attr) const
             kksCritical() << QObject::tr("aaInsert() for complex attribute fail! SQL = %1").arg(sql);
             if(res)
                 delete res;
-            continue;
+            
+            return ERROR_CODE;
+            //continue;
         }
 
         delete res;
     }
+
+    return OK_CODE;
 }
 
 QMap<qint64, JKKSRubric> JKKSLoader :: readCategoryRubrics (qint64 idCat) const
@@ -2145,11 +2195,11 @@ QMap<qint64, JKKSRubric> JKKSLoader :: readCategoryRubrics (qint64 idCat) const
     return rubrs;
 }
 
-void JKKSLoader :: writeCategoryRubrics (const JKKSCategory& cat) const
+int JKKSLoader :: writeCategoryRubrics (const JKKSCategory& cat) const
 {
     qint64 idCat = cat.id ();
     if (idCat < 0)
-        return;
+        return ERROR_CODE;
 
     QMap<qint64, JKKSRubric> rubrs = cat.rubrics ();
     QMap<qint64, qint64> idpRub;
@@ -2170,12 +2220,21 @@ void JKKSLoader :: writeCategoryRubrics (const JKKSCategory& cat) const
                                 .arg (wRubr.getName ());
 
         KKSResult * res = dbWrite->execute (sql);
-        if (res && res->getRowCount () == 1)
-            idpRub.insert (wRubr.getIdRubric (), res->getCellAsInt64 (0, 0));
+        if(!res || res->getRowCount() != 1 || res->getCellAsInt64(0, 0) <= 0){
+            kksCritical() << QObject::tr("cInsertRubric() fail! SQL = %1").arg(sql);
+            if(res)
+                delete res;
+            
+            return ERROR_CODE;
+        }
+
+        idpRub.insert (wRubr.getIdRubric (), res->getCellAsInt64 (0, 0));
 
         if (res)
             delete res;
     }
+
+    return OK_CODE;
 }
 
 int JKKSLoader :: setAsSended (qint64 id, int idType, bool sended) const
@@ -2190,7 +2249,7 @@ int JKKSLoader :: setAsSended (qint64 id, int idType, bool sended) const
 
     KKSResult *res = dbRead->execute (sql);
 
-    int ier = 0;
+    int ier = ERROR_CODE;
     if (res && res->getRowCount()==1)
         ier = res->getCellAsInt (0, 0);
     else{
@@ -2641,10 +2700,17 @@ int JKKSLoader :: writeFileData (const JKKSIOUrl& url, int blockSize) const
     file.close();
 
     QString sql = QString("select rSetUploaded(%1, true)").arg(idUrl);
+    
     KKSResult * res = dbWrite->execute(sql);
+    
     if(!res || res->getRowCount() < 1){
         kksCritical() << QObject::tr("Cannot set file as uploaded! ID = %1").arg(idUrl);
+        if(res)
+            delete res;
+        
+        return ERROR_CODE;
     }
+
     if(res)
         delete res;
 
@@ -2724,7 +2790,9 @@ int JKKSLoader :: writeMessage (JKKSRefRecord *refRec, const QString& sender_uid
         else
             recResp.setResult(3);
 
-        generateQueueResponse (recResp);
+        int res1 = generateQueueResponse (recResp);
+        if(res1 == ERROR_CODE)
+            return ERROR_CODE;
 
         refRec->setCategory (pairToMap(cCats));
         
@@ -2737,12 +2805,15 @@ int JKKSLoader :: writeMessage (JKKSRefRecord *refRec, const QString& sender_uid
         int syncType = refRec->getSyncType();//тип синхронизации (1 - инсерт, 2 - апдейт, 3 - удаление)
         
         int res = writeMessage (&ioDoc, syncType);
-        if (res != ERROR_CODE)
+        if (res > 0)
             recResp.setResult (3);
         else
             recResp.setResult (4);
         
-        generateQueueResponse (recResp);
+        int res1 = generateQueueResponse (recResp);
+        if(res1 == ERROR_CODE)
+            return ERROR_CODE;        
+        
         return res;
     }
     else if (refRec->getEntityType () == 3 || refRec->getEntityType () == 4) // ЭИО (запись справочника)
@@ -2759,7 +2830,11 @@ int JKKSLoader :: writeMessage (JKKSRefRecord *refRec, const QString& sender_uid
                 delete tRes;
 
             recResp.setResult (4);
-            generateQueueResponse (recResp);
+            
+            int res1 = generateQueueResponse (recResp);
+            if(res1 == ERROR_CODE)
+                return ERROR_CODE;
+            
             return ERROR_CODE;
         }
 
@@ -2767,7 +2842,11 @@ int JKKSLoader :: writeMessage (JKKSRefRecord *refRec, const QString& sender_uid
         if(newTableName.isEmpty()){
             kksCritical() << QObject::tr("writeMessage: ioGetTableNameByUid() returns NULL value! TableUID = %1").arg(tableUID);
             recResp.setResult (4);
-            generateQueueResponse (recResp);
+
+            int res1 = generateQueueResponse (recResp);
+            if(res1 == ERROR_CODE)
+                return ERROR_CODE;
+
             return ERROR_CODE;
         }
 
@@ -2806,7 +2885,11 @@ int JKKSLoader :: writeMessage (JKKSRefRecord *refRec, const QString& sender_uid
         if (cnt != 0 && refRec->getSyncType() == 1)
         {
             recResp.setResult (3);
-            generateQueueResponse (recResp);
+            
+            int res1 = generateQueueResponse (recResp);
+            if(res1 == ERROR_CODE)
+                return ERROR_CODE;
+            
             return OK_CODE;
         }
         else if (cnt == 0 && refRec->getSyncType() == 3)
@@ -2831,8 +2914,13 @@ int JKKSLoader :: writeMessage (JKKSRefRecord *refRec, const QString& sender_uid
             }
             else
                 recResp.setResult (4);
-            generateQueueResponse (recResp);
+            
+            int res1 = generateQueueResponse (recResp);
+            if(res1 == ERROR_CODE)
+                return ERROR_CODE;
+
             sql = QString();
+                
             sysSql = QString();
         }
         else if (cnt > 0 && refRec->getSyncType() == 2) //обновление записи справочника
@@ -2847,8 +2935,6 @@ int JKKSLoader :: writeMessage (JKKSRefRecord *refRec, const QString& sender_uid
                 generateQueueResponse (recResp);
                 return ERROR_CODE;
             }
-
-
 
             JKKSCategory C = p.childCategory();
 
@@ -2965,8 +3051,12 @@ int JKKSLoader :: writeMessage (JKKSRefRecord *refRec, const QString& sender_uid
             }
 
         }
+
         recResp.setResult (3);
-        generateQueueResponse (recResp);
+
+        int res1 = generateQueueResponse (recResp);
+        if(res1 == ERROR_CODE)
+            return ERROR_CODE;
     }
     //Дополнительная таблица справочника (передается вместе с категорией, на основе которой она создана и UID информационного объекта, к которому она относится)
     else if (refRec->getEntityType () == 5)
@@ -2984,6 +3074,7 @@ int JKKSLoader :: writeMessage (JKKSRefRecord *refRec, const QString& sender_uid
             generateQueueResponse (recResp);
             return ERROR_CODE;
         }
+
         qint64 idObject = ioIDRes->getCellAsInt (0, 0);
         delete ioIDRes;
         JKKSIOTable table = refRec->getAddTable ();
@@ -3005,7 +3096,10 @@ int JKKSLoader :: writeMessage (JKKSRefRecord *refRec, const QString& sender_uid
                 recResp.setResult (4);
             else
                 recResp.setResult (3);
-            generateQueueResponse (recResp);
+
+            int res1 = generateQueueResponse (recResp);
+            if(res1 == ERROR_CODE)
+                return ERROR_CODE;
 
             return wres;
         }
@@ -3021,7 +3115,11 @@ int JKKSLoader :: writeMessage (JKKSRefRecord *refRec, const QString& sender_uid
             }
 
             recResp.setResult (3);
-            generateQueueResponse (recResp);
+
+            int res1 = generateQueueResponse (recResp);
+            if(res1 == ERROR_CODE)
+                return ERROR_CODE;
+
             delete res;
         }
     }
@@ -3116,7 +3214,11 @@ int JKKSLoader :: writeMessage (JKKSRefRecord *refRec, const QString& sender_uid
         }
 
         recResp.setResult (3);
-        generateQueueResponse (recResp);
+
+        int res1 = generateQueueResponse (recResp);
+        if(res1 == ERROR_CODE)
+            return ERROR_CODE;
+
         delete pRes;
     }
     else if (refRec->getEntityType() == 11)
@@ -3142,7 +3244,9 @@ int JKKSLoader :: writeMessage (JKKSRefRecord *refRec, const QString& sender_uid
         else
             recResp.setResult (3);
         
-        generateQueueResponse (recResp);
+        int res1 = generateQueueResponse (recResp);
+        if(res1 == ERROR_CODE)
+            return ERROR_CODE;
 
     }
     else if(refRec->getEntityType() == 12 || refRec->getEntityType() == 13)
@@ -3280,7 +3384,7 @@ int JKKSLoader :: writeRefRecordRubrics(JKKSRefRecord * refRec) const
 
         KKSResult * res = dbWrite->execute (sql);
         
-        if (!res || res->getRowCount () != 1 || res->getCellAsInt(0, 0) <= 0){
+        if (!res || res->getRowCount () != 1 || res->getCellAsInt64(0, 0) <= 0){
             kksCritical() << QObject::tr("recUpdateRubricEx() for refRecord with UID = %1 failed!").arg(refRec->uid());
             if(res)
                 delete res;
@@ -3308,7 +3412,9 @@ int JKKSLoader :: writeRefRecordFiles(JKKSRefRecord * refRec) const
     {
         JKKSIOUrl url = pf.value ();
         url.setIOId (refRec->id ());
-        writeRecordFile (url);
+        int res = writeRecordFile (url);
+        if(res <= 0)
+            return ERROR_CODE;
     }
 
     return OK_CODE;
@@ -3330,13 +3436,16 @@ int JKKSLoader :: writeMessage (JKKSFilePart *filePart, const QString& sender_ui
     int ok = writeFilePartData(filePart);
 
     if(filePart->isLast()){
-        if(ok != OK_CODE) //все плохо
+        if(ok != OK_CODE){ //все плохо
             recResp.setResult(4);
+            return ERROR_CODE;
+        }
         else{//все хорошо
             QString sql = QString("select rSetUploaded(%1, true)").arg(filePart->id());
             KKSResult * res = dbWrite->execute(sql);
             if(!res || res->getRowCount() < 1){
                 kksCritical() << QObject::tr("Cannot set file as uploaded! ID = %1").arg(filePart->id());
+                return ERROR_CODE;
             }
             if(res)
                 delete res;
@@ -3344,8 +3453,12 @@ int JKKSLoader :: writeMessage (JKKSFilePart *filePart, const QString& sender_ui
             recResp.setResult(3);
         }
 
-        generateQueueResponse (recResp);
+        int res1 = generateQueueResponse (recResp);
+        if(res1 == ERROR_CODE)
+            return ERROR_CODE;
     }
+    if(ok <= 0)
+        return ERROR_CODE;
 
     return OK_CODE;
 }
@@ -3509,9 +3622,13 @@ int JKKSLoader::writeFilePartData(JKKSFilePart * part) const
     return OK_CODE;
 }
 
-void JKKSLoader :: generateQueueResponse (JKKSQueueResponse & resp) const
+int JKKSLoader :: generateQueueResponse (JKKSQueueResponse & resp) const
 {
-    writeReceipt (resp);
+    int res = writeReceipt (resp);
+    if(res <= 0)
+        return ERROR_CODE;
+
+    return OK_CODE;
 }
 
 qint64 JKKSLoader :: writeOrganization (JKKSQueueResponse & resp) const
@@ -3526,7 +3643,11 @@ qint64 JKKSLoader :: writeOrganization (JKKSQueueResponse & resp) const
     }
 
     resp.setResult (3);
-    generateQueueResponse (resp);
+
+    int res1 = generateQueueResponse (resp);
+    if(res1 == ERROR_CODE)
+        return ERROR_CODE;
+
     delete res;
     return OK_CODE;
 }
@@ -4408,7 +4529,11 @@ int JKKSLoader :: writeMessage (JKKSOrgPackage * OrgPack, const QString& senderU
         if (iert < 0)
         {
             recResp.setResult (4);
-            generateQueueResponse (recResp);
+
+            int res1 = generateQueueResponse (recResp);
+            if(res1 == ERROR_CODE)
+                return ERROR_CODE;
+
             return ERROR_CODE;
         }
     }
@@ -4425,13 +4550,20 @@ int JKKSLoader :: writeMessage (JKKSOrgPackage * OrgPack, const QString& senderU
         if (iero < 0)
         {
             recResp.setResult (4);
-            generateQueueResponse (recResp);
+
+            int res1 = generateQueueResponse (recResp);
+            if(res1 == ERROR_CODE)
+                return ERROR_CODE;
+
             return ERROR_CODE;
         }
     }
 
     recResp.setResult (3);
-    generateQueueResponse (recResp);
+
+    int res1 = generateQueueResponse (recResp);
+    if(res1 == ERROR_CODE)
+        return ERROR_CODE;
 
     return OK_CODE;
 }
@@ -4498,6 +4630,7 @@ int JKKSLoader :: writeMessage (JKKSOrganization * org, const QString & senderUI
 
         return ERROR_CODE;
     }
+   
     org->setPreviousMode (pMode);
 
     //режимы функционирования организации
@@ -5002,14 +5135,21 @@ qint64 JKKSLoader :: writeSearchTemplate (const JKKSSearchTemplate& st) const
 
     if (idMainGroup < 0)
         return ERROR_CODE;
+
     QString sql = QString ("select ioInsertSearchTemplate('%1', %2)").arg (st.getName()).arg (idMainGroup);
     KKSResult * res = dbWrite->execute (sql);
 
-    if (!res)
+    if (!res || res->getCellAsInt64(0, 0) <= 0){
+        kksCritical() << QObject::tr("ioInsertSearchTemplate() failed! SQL = %1").arg(sql);
+        if(res)
+            delete res;
+
         return ERROR_CODE;
+    }
 
     qint64 id = res->getCellAsInt (0, 0);
     delete res;
+
     return id;
 }
 
@@ -5039,6 +5179,7 @@ QMap<qint64, JKKSSearchGroup> JKKSLoader :: writeGroups (qint64 idParentGr, cons
     KKSResult * res = dbWrite->execute (sql);
     if (!res || res->getRowCount() == 0)
     {
+        kksCritical() << QObject::tr("ioInsertSearchGroup() failed! SQL = %1").arg(sql);
         if (res)
             delete res;
 
@@ -5070,6 +5211,7 @@ QMap<qint64, JKKSSearchGroup> JKKSLoader :: writeGroups (qint64 idParentGr, cons
         KKSResult * gsres = dbWrite->execute (gscSql);
         if (!gsres || gsres->getRowCount() == 0)
         {
+            kksCritical() << QObject::tr("ioInsertCriterionIntoGroup() failed! SQL = %1").arg(gscSql);
             if (gsres)
                 delete gsres;
             continue;
@@ -5077,6 +5219,7 @@ QMap<qint64, JKKSSearchGroup> JKKSLoader :: writeGroups (qint64 idParentGr, cons
 
         delete gsres;
     }
+
     return gRes;
 }
 
@@ -5093,6 +5236,7 @@ qint64 JKKSLoader :: writeCriteriaForGroup (JKKSSearchCriterion& sc) const
     KKSResult * res = dbWrite->execute (sql);
     if (!res || res->getRowCount() == 0 || res->getCellAsInt (0, 0) < 0)
     {
+        kksCritical() << QObject::tr("ioInsertSearchCriterion() failed! SQL = %1").arg(sql);
         if (res)
             delete res;
 
@@ -5400,9 +5544,10 @@ QString JKKSLoader :: getReceiverEmailPrefix(qint64 id, qint64 type) const//полу
     if(id <= 0 || type <= 0)
         return emailPrefix;
 
-    QString sql = QString("select getReceiverEmailPrefix(%1, %2)").arg(id).arg(type);
+    QString sql = QString("select uGetReceiverEmailPrefix(%1, %2)").arg(id).arg(type);
     KKSResult * res = dbRead->execute(sql);
     if(!res || res->getRowCount() != 1){
+        kksCritical() << QObject::tr("uGetReceiverEmailPrefix() failed! SQL = %1").arg(sql);
         if(res)
             delete res;
         return emailPrefix;
@@ -5411,4 +5556,20 @@ QString JKKSLoader :: getReceiverEmailPrefix(qint64 id, qint64 type) const//полу
     emailPrefix = res->getCellAsString(0, 0);
 
     return emailPrefix;
+}
+
+
+bool JKKSLoader :: beginTransaction() const
+{
+    return dbWrite->begin();
+}
+
+bool JKKSLoader :: commitTransaction() const
+{
+    return dbWrite->commit();
+}
+
+bool JKKSLoader :: rollbackTransaction() const
+{
+    return dbWrite->rollback();
 }

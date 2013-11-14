@@ -82,6 +82,10 @@ class _I_EXPORT JKKSLoader
 
         bool connectToDb (void);
 
+        bool beginTransaction() const;
+        bool commitTransaction() const;
+        bool rollbackTransaction() const;
+
 //        void setDb1 (KKSDatabase * _db);
         KKSDatabase * getDbRead (void) const;
         KKSDatabase * getDbWrite (void) const;
@@ -153,15 +157,15 @@ class _I_EXPORT JKKSLoader
         JKKSDocument readDocument (qint64 idObject, qint64 idOrganization) const; //второй параметр используется в случае когда требуется передача прикрепленых файлов блоками
 
         QMap<qint64, JKKSCategoryAttr> readCategoryAttrs (qint64 idCat) const;
-        void writeCategoryAttrs (const JKKSCategory& cat) const;
+        int writeCategoryAttrs (const JKKSCategory& cat) const;
 
         QMap<qint64, JKKSCategoryAttr> readAttrAttrs(qint64 idAttr) const;
-        void writeAttrAttrs (const JKKSCategoryAttr& attr) const;
+        int writeAttrAttrs (const JKKSCategoryAttr& attr) const;
 
         JKKSCategoryAttr readAttribute (qint64 id) const;
 
         QMap<qint64, JKKSRubric> readCategoryRubrics (qint64 idCat) const;
-        void writeCategoryRubrics (const JKKSCategory& cat) const;
+        int writeCategoryRubrics (const JKKSCategory& cat) const;
 
         QMap<qint64, JKKSIOUrl> readDocumentFiles (qint64 idObject, qint64 idOrganization) const;//второй параметр используется в случае когда требуется передача прикрепленых файлов блоками
         qint64 writeDocumentFile (JKKSIOUrl& url) const;
@@ -174,7 +178,7 @@ class _I_EXPORT JKKSLoader
         qint64 writeAddTable (qint64 idObject, JKKSIOTable& table) const;
         JKKSIOTable readIOTable (QString entityuid, qint64& idObject) const;
 
-        void generateQueueResponse (JKKSQueueResponse & resp) const;
+        int generateQueueResponse (JKKSQueueResponse & resp) const;
 
         qint64 writeIOType (JKKSType& ioType) const;
 

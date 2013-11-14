@@ -28,7 +28,7 @@
 #include "timerform.h"
 #include "transportsettingsform.h"
 #include "kkssito.h"
-#include "KKSDebug.h"
+#include "kksdebug.h"
 
 int main(int argc, char *argv[])
 {

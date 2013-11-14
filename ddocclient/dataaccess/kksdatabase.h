@@ -74,9 +74,9 @@ class __DA_EXPORT KKSDatabase : QObject
         virtual QString   escapeBinaryString(const unsigned char * fromString) const = 0;
 
 
-        virtual void begin() const = 0;
-        virtual void commit() const = 0;
-        virtual void rollback() const = 0;
+        virtual bool begin() const = 0;
+        virtual bool commit() const = 0;
+        virtual bool rollback() const = 0;
 
         virtual void createSavePoint(const char * savePointName = NULL) const = 0;
         virtual void releaseSavePoint(const char * savePointName = NULL) const = 0;

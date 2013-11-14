@@ -9,7 +9,7 @@
 #include <JKKSLoader.h>
 
 #include <defines.h>
-#include <KKSDebug.h>
+#include <kksdebug.h>
 #include <KKSList.h>
 #include <JKKSIOUrl.h>
 #include <JKKSMessage.h>
@@ -23,6 +23,7 @@ DDocInteractorClient::DDocInteractorClient(JKKSLoader* loader, DDocInteractorBas
       m_parent(NULL),
       http(NULL),
       pingHttp(NULL),
+      pingResHttp(NULL),
       manual(false),
       m_timer(NULL),
       m_interval(0),
@@ -44,6 +45,7 @@ DDocInteractorClient::~DDocInteractorClient()
     disconnect(this, SIGNAL(httpMessageRemoved(int)), this, SLOT(slotHttpMessageRemoved(int)));
     disconnect(http, SIGNAL(requestFinished(int, bool)), this, SLOT(httpRequestFinished(int, bool)));
     disconnect(pingHttp, SIGNAL(requestFinished(int, bool)), this, SLOT(pingHttpRequestFinished(int, bool)));
+    disconnect(pingResHttp, SIGNAL(requestFinished(int, bool)), this, SLOT(pingResHttpRequestFinished(int, bool)));
 
     wait();
 
@@ -52,6 +54,9 @@ DDocInteractorClient::~DDocInteractorClient()
      
     if(pingHttp)
         delete pingHttp;
+
+    if(pingResHttp)
+        delete pingResHttp;
 
 }
 
@@ -70,6 +75,7 @@ void DDocInteractorClient::init()
     
     http = new QHttp(this);
     pingHttp = new QHttp(this);
+    pingResHttp = new QHttp(this);
 
     //срабатывает, когда в методе httpRequestFinished пришел очередной ответ и удалена запись из списка http_messages
     connect(this, SIGNAL(httpMessageRemoved(int)), this, SLOT(slotHttpMessageRemoved(int)));
@@ -77,6 +83,8 @@ void DDocInteractorClient::init()
     connect(http, SIGNAL(requestFinished(int, bool)), this, SLOT(httpRequestFinished(int, bool)));
     //завершен запрос на передачу данных через pingHttp
     connect(pingHttp, SIGNAL(requestFinished(int, bool)), this, SLOT(pingHttpRequestFinished(int, bool)));
+    //завершен запрос на передачу данных через pingResHttp
+    connect(pingResHttp, SIGNAL(requestFinished(int, bool)), this, SLOT(pingResHttpRequestFinished(int, bool)));
     
     createTimer();
 }
@@ -106,26 +114,27 @@ void DDocInteractorClient::startProc()
     }
     
     emit showStatusText(tr("Waiting for data to sent..."));
+    //kksInfo() << tr("Waiting for data to sent...");
    
     QStringList receivers;
     
     //сначала отправим ответы на полученные ранее пинги
-    messageList = m_loader->readPingResults(receivers);
-    if(messageList.count() > 0 )
+    QList<JKKSPMessWithAddr *> pingResultsList = m_loader->readPingResults(receivers);
+    if(pingResultsList.count() > 0 )
     {
-        kksInfo() << tr("Found %1 ping results for sent").arg(QString::number(messageList.count()));
+        kksInfo() << tr("Found %1 ping results for sent").arg(QString::number(pingResultsList.count()));
         httpMessages.clear();
 
-        for (QList<JKKSPMessWithAddr *>::const_iterator iterator = messageList.constBegin();iterator != messageList.constEnd();++iterator)
+        for (QList<JKKSPMessWithAddr *>::const_iterator iterator = pingResultsList.constBegin();iterator != pingResultsList.constEnd();++iterator)
         {
-            bool stat = sendOutMessage((*iterator), true, false) ; //Второй параметр отвечает за то, что данные будут уходить синхронно или асинхронно. 
+            bool stat = sendOutMessage((*iterator), true, false) ;  //Второй параметр отвечает за то, что данные будут уходить синхронно или асинхронно. 
                                                                     //Здесь асинхронно. Т.е. система не будет ожидать, пока не завершится передача одного сообщения
                                                                     //прежде чем приступить к передаче следующего
         }
 
 
-        while(!messageList.isEmpty())
-            delete messageList.takeFirst();
+        while(!pingResultsList.isEmpty())
+            delete pingResultsList.takeFirst();
 
         kksInfo() << tr("Ping results sending complete");
     }
@@ -279,6 +288,7 @@ void DDocInteractorClient::startProc()
                                 .arg(m_parent->filePartsForSent)
                                 .arg(m_parent->cntFilePartsSended);
         emit showStatusText(msg);
+        kksInfo() << msg;
         
 
         bool isFirst = true;
@@ -374,8 +384,6 @@ void DDocInteractorClient::httpRequestFinished(int requestId, bool error)
        В любом случае мы должны будем удалить сообщение из списка httpMessages. 
        Если его в списке нет - требуется ничего не делать (ибо это может быть просто сетевой спам)
     */
-
-    bool bFound = false;
     
     uint messCount = httpMessages.count();
     if(messCount <= 0)
@@ -387,7 +395,7 @@ void DDocInteractorClient::httpRequestFinished(int requestId, bool error)
         return;
     }
     
-    kksDebug() << tr("Message sending request completed. requestId = ") << requestId;
+    kksDebug() << tr("Message sending request completed. Internal request ID = %1").arg(requestId);
     emit needToExitEventLoop();
 
     httpMessages.remove(requestId);
@@ -416,15 +424,26 @@ void DDocInteractorClient::httpRequestFinished(int requestId, bool error)
                             .arg(m_parent->cntFilePartsSended);
     
     emit showStatusText(msg);
+    kksInfo() << msg;
 
     //если мы отправляли часть файла и она не является последней
     if( (JKKSMessage::JKKSMessageType) t.second == JKKSMessage::atUnknownType)
         return;
 
     emit httpMessageRemoved(m_parent->cntMsgSended + m_parent->cntFilesSended);
+    
+    bool bError = error;
+    QHttpResponseHeader header = http->lastResponse();
+    if(!header.isValid()){
+        bError = true;
+    }
 
-    if (error) {
-        kksCritical() << tr("ERROR: Data transfer for requestId = %1 failed: %2").arg(requestId).arg(http->errorString());
+    if(header.statusCode() != 200 ){ //OK code
+        bError = true;
+    }
+
+    if (bError) {
+        kksCritical() << tr("Message sending request failed! Internal request ID = %1").arg(requestId);
         
         //здесь надо обновить информацию о состоянии целевой организации (в пингах).
         //Сделать ее неактивной, чтобы последующие сообщения не слались далее.
@@ -432,7 +451,11 @@ void DDocInteractorClient::httpRequestFinished(int requestId, bool error)
         if(emailPrefix.isEmpty())
             return;//но это так не должно быть
 
-        JKKSPing p = m_parent->m_pings.value(emailPrefix);
+        JKKSPing defValue = JKKSPing();
+        JKKSPing p = m_parent->m_pings.value(emailPrefix, defValue);
+        if(p == defValue){
+            int a = 0;
+        }
         p.setState1(0);
         p.setState2(0);
         m_parent->m_pings.insert(emailPrefix, p);
@@ -450,7 +473,7 @@ void DDocInteractorClient::httpRequestFinished(int requestId, bool error)
     QByteArray ba = http->readAll();
     if(ba.length() <= 0 || ba == "OK"){//это сообщение было передано напрямую на целевой объект в http_connector
         if(!setMessageAsSended(t.first, t.second)){
-            kksCritical() << tr("ERROR: Cannot mark message as sended! Database Error");
+            kksCritical() << tr("Cannot mark message as sended! Database Error. Message ID = %1, Message type = %2. Internal request ID = %3").arg(t.first).arg(t.second).arg(requestId);
         }
         return;
     }
@@ -459,7 +482,7 @@ void DDocInteractorClient::httpRequestFinished(int requestId, bool error)
     //и в случае, если ответ не содержит " ERROR ", помечаем сообщение как отправленное
     if( ! ba.contains(" ERROR ")){
         if(!setMessageAsSended(t.first, t.second)){
-            kksCritical() << tr("ERROR: Cannot mark message as sended! Database Error");
+            kksCritical() << tr("Cannot mark message as sended! Database Error. Message ID = %1, Message type = %2. Internal request ID = %3").arg(t.first).arg(t.second).arg(requestId);
         }
     }
     else{
@@ -469,7 +492,11 @@ void DDocInteractorClient::httpRequestFinished(int requestId, bool error)
         if(emailPrefix.isEmpty())
             return;//но это так не должно быть
 
-        JKKSPing p = m_parent->m_pings.value(emailPrefix);
+        JKKSPing defValue = JKKSPing();
+        JKKSPing p = m_parent->m_pings.value(emailPrefix, defValue);
+        if(p == defValue){
+            int a = 0;
+        }
         p.setState1(0);
         p.setState2(0);
         m_parent->m_pings.insert(emailPrefix, p);
@@ -493,6 +520,90 @@ void DDocInteractorClient::slotHttpMessageRemoved(int sendedCount)
     }
     else
         emit sendingCompleted(); //если активен ручной (отладочный) режим - делаем доступной кнопку отправки
+}
+
+//ответ http-сервера на запрос типа POST
+void DDocInteractorClient::pingResHttpRequestFinished(int requestId, bool error)
+{
+    /*
+        Здесь возможны два варианта
+        1) Завершился запрос типа POST, который был передан на целевой объект напрямую (другому аналогичному http_connector)
+           В этом случае readAll должна вернуть либо OK, либо ничего, причем в последнем случае параметр error должен быть равен TRUE.
+           В случае ОК мы должны отметить переданное (статус  корректностии обработки получателем придет позже в спец.квитанции!!!) 
+           сообщение как доставленное (setAsSended).
+           При ошибке - вывести сообщение об ошибке.
+           Сообщения, которые помечены в БД как недоставленные, будут при следующем опросе БД снова находится в отправляемых данных
+
+        2) Завершился запрос типа POST, который был передан в шлюз (ТПС). В этом случае здесь мы ожидаем квитанцию от ТПС о том, 
+           "подхватила" ли она это сообщение или при его транспортировке возникла ошибка.
+           При ошибке не надо делать никаких дополнительных действий в БД. Однако стоит вывести сообщение об ошибке.
+           При успехе - необходимо пометить сообщение в БД как отправленное (факт обработки придет позже)
+           Кроме того, при взаимодействии через шлюз (ТПС) придет квитанция о факте доведения шлюзом сообщения до целевого объекта
+           Обрабатывая данную квитанцию (метод processNotification), в случае, если код возврата там будет не равен 1, 
+           мы переотметим данное сообщение, как требующее повторной отправки (недоставленное).
+           Сообщения, которые помечены в БД как недоставленные, будут при следующем опросе БД снова находится в отправляемых данных
+
+       В любом случае мы должны будем удалить сообщение из списка httpMessages. 
+       Если его в списке нет - требуется ничего не делать (ибо это может быть просто сетевой спам)
+    */
+    
+    uint messCount = pingResHttpMessages.count();
+    if(messCount <= 0)
+        return;
+    
+    QPair<qint64, qint64> defValue = QPair<qint64, qint64>();
+    QPair<qint64, qint64> t = pingResHttpMessages.value(requestId, defValue);
+    if(t == defValue){
+        return;
+    }
+    
+    kksDebug() << tr("Ping result sending request completed. Internal request ID = %1").arg(requestId);
+    //emit needToExitEventLoop();
+
+    pingResHttpMessages.remove(requestId);
+    
+    kksInfo() << tr("Next ping result transferred");
+    //m_parent->cntMsgSended++;
+    
+    //emit httpMessageRemoved(m_parent->cntMsgSended + m_parent->cntFilesSended);
+    
+    bool bError = error;
+    QHttpResponseHeader header = pingResHttp->lastResponse();
+    if(!header.isValid()){
+        bError = true;
+    }
+
+    if(header.statusCode() != 200 ){ //OK code
+        bError = true;
+    }
+
+    if (bError) {
+        kksCritical() << tr("Ping result sending request failed! Internal request ID = %1").arg(requestId);
+        return;
+    } 
+    
+    //здесь мы полагаем, что если пришел ответ на сообщение с requestId из нашего перечня (и error = false), 
+    //мы должны обработать тело этого сообщения
+    //если тело == OK или оно пустое, то это скорее всего было взаимодействие напрямую с http_connector'ом 
+    //в противном случае ответ должен быть в формате
+    // 1 OK
+    // 1 ERROR 15
+    //и это означает, что взаимодействие осуществлялось через шлюз (ТПС)
+    QByteArray ba = pingResHttp->readAll();
+    if(ba.length() <= 0 || ba == "OK"){//это сообщение было передано напрямую на целевой объект в http_connector
+        if(!setMessageAsSended(t.first, t.second)){
+            kksCritical() << tr("Cannot mark ping result as sended! Database Error. Message ID = %1, Message type = %2. Internal request ID = %3").arg(t.first).arg(t.second).arg(requestId);
+        }
+        return;
+    }
+
+    //далее полагаем, что ответ пришел от шлюза
+    //и в случае, если ответ не содержит " ERROR ", помечаем сообщение как отправленное
+    if( ! ba.contains(" ERROR ")){
+        if(!setMessageAsSended(t.first, t.second)){
+            kksCritical() << tr("Cannot mark ping result as sended! Database Error. Message ID = %1, Message type = %2. Internal request ID = %3").arg(t.first).arg(t.second).arg(requestId);
+        }
+    }
 }
 
 bool DDocInteractorClient::setMessageAsSended(const qint64 & id, const int & type, bool sended)
@@ -661,6 +772,11 @@ void DDocInteractorClient::saveRequestId(int reqId, const JKKSPMessWithAddr * me
         return;
     }
 
+    if(message->pMess.getType() == JKKSMessage::atPingResponse){
+        pingResHttpMessages.insert(reqId, qMakePair(message->id, (qint64)message->pMess.getType()) );
+        return;
+    }
+
     if(message->pMess.getType() != JKKSMessage::atFilePart){//для файлов, передаваемых частями информация в этот список заносится отдельно
         httpMessages.insert(reqId, qMakePair(message->id, (qint64)message->pMess.getType()) );
     }
@@ -695,14 +811,20 @@ bool DDocInteractorClient::sendOutMessage(const JKKSPMessWithAddr * message,
         m_http = pingHttp;
         connect(this,SIGNAL(needToExitEventLoopPing()),&eventLoop,SLOT(quit()));
         connect(m_parent, SIGNAL(exitThreads()), &eventLoop, SLOT(quit()));
-        dbgMsg = tr("Ping sending request sheduled. requestId = ");
+        dbgMsg = tr("Ping sending request sheduled. Receiver = %1, Adress = (IP = %2, port = %3). Internal request ID = ").arg(message->pMess.receiverUID()).arg(message->addr.address()).arg(message->addr.port());
 
+    }
+    else if(message->pMess.getType() == JKKSMessage::atPingResponse){
+        m_http = pingResHttp;
+        connect(this,SIGNAL(needToExitEventLoopPingRes()),&eventLoop,SLOT(quit()));
+        connect(m_parent, SIGNAL(exitThreads()), &eventLoop, SLOT(quit()));
+        dbgMsg = tr("Ping response sending request sheduled. Receiver = %1, Adress = (IP = %2, port = %3). Internal request ID = ").arg(message->pMess.receiverUID()).arg(message->addr.address()).arg(message->addr.port());
     }
     else{
         m_http = http;
         connect(this,SIGNAL(needToExitEventLoop()),&eventLoop,SLOT(quit()));
         connect(m_parent, SIGNAL(exitThreads()), &eventLoop, SLOT(quit()));
-        dbgMsg = tr("Message sending request sheduled. requestId = ");
+        dbgMsg = tr("Message sending request sheduled. Receiver = %1, Adress = (IP = %2, port = %3). Internal request ID = ").arg(message->pMess.receiverUID()).arg(message->addr.address()).arg(message->addr.port());
     }
 
     QHttpRequestHeader header;
@@ -755,9 +877,7 @@ int DDocInteractorClient::sendPings(bool bSync)
 
 //ответ http-сервера на запрос передачи пинга 
 void DDocInteractorClient::pingHttpRequestFinished(int requestId, bool error)
-{
-    bool bFound = false;
-    
+{    
     uint messCount = pingHttpMessages.count();
     if(messCount <= 0)
         return;
@@ -772,11 +892,22 @@ void DDocInteractorClient::pingHttpRequestFinished(int requestId, bool error)
     
     emit needToExitEventLoopPing();
 
-    kksDebug() << tr("Ping sending request completed. requestId = ") << requestId;
+    bool bError = error;
+    QHttpResponseHeader header = pingHttp->lastResponse();
+    if(!header.isValid()){
+        bError = true;
+    }
+
+    if(header.statusCode() != 200 ){ //OK code
+        bError = true;
+    }
 
     //если не смогли отправить пинг - помечаем его как отправленного и неудачно доставленного (приемная сторона не отвечает)
-    if (error) {
-        kksCritical() << tr("ERROR: Data transfer for requestId = %1 failed: %2").arg(requestId).arg(pingHttp->errorString());
+    if (bError) {
+        kksCritical() << tr("Ping sending request failed! Receiver = %1, Adress = (IP = %2, port = %3). Internal request ID = %4").arg(t.uidTo()).arg(t.getAddr().address()).arg(t.getAddr().port()).arg(requestId);
+        if(!pingHttp->errorString().isEmpty())
+            kksCritical() << pingHttp->errorString();
+
         t.setState1(0);
         t.setState2(0);
         t.setState3(0);
@@ -794,20 +925,25 @@ void DDocInteractorClient::pingHttpRequestFinished(int requestId, bool error)
     //и это означает, что взаимодействие осуществлялось через шлюз (ТПС)
     QByteArray ba = pingHttp->readAll();
     if(ba.length() <= 0 || ba == "OK"){//это сообщение было передано напрямую на целевой объект в http_connector
-        kksDebug() << tr("Ping request delivered to destination organization. Waiting for answer");
+        kksDebug() << tr("Ping request delivered to destination organization. Receiver = %1, Adress = (IP = %2, port = %3). Internal request ID = %4. Waiting for answer").arg(t.uidTo()).arg(t.getAddr().address()).arg(t.getAddr().port()).arg(requestId);;
         return;
     }
 
     //далее полагаем, что ответ пришел от шлюза
     //и в случае, если ответ содержит " ERROR ", помечаем сообщение как отправленное
     if( ba.contains(" ERROR ")){
-        kksCritical() << tr("ERROR: Data transfer for requestId = %1 failed: %2").arg(requestId).arg(pingHttp->errorString());
+        kksCritical() << tr("Ping sending request failed! Receiver = %1, Adress = (IP = %2, port = %3). Internal request ID = %4").arg(t.uidTo()).arg(t.getAddr().address()).arg(t.getAddr().port()).arg(requestId);
+        if(!pingHttp->errorString().isEmpty())
+            kksCritical() << pingHttp->errorString();
+
         t.setState1(0);
         t.setState2(0);
         t.setState3(0);
         t.setState4(0);
         processPingResponse(&t);
     }
+
+    kksDebug() << tr("Ping sending request completed. Receiver = %1, Adress = (IP = %2, port = %3). Internal request ID = %4").arg(t.uidTo()).arg(t.getAddr().address()).arg(t.getAddr().port()).arg(requestId);
 }
 
 //если пришло сообщение - ответ на пинг, то необходимо обработать его и завершить работу метода

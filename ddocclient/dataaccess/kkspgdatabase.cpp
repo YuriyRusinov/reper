@@ -565,42 +565,54 @@ KKSResult * KKSPGDatabase::execPrepared(
 //
 // KKSPGDatabase::begin
 //
-void KKSPGDatabase::begin() const
+bool KKSPGDatabase::begin() const
 {
     KKSResult* tempres;
 
     tempres = execute( "BEGIN");// ISOLATION LEVEL SERIALIZABLE" );
 
-    if(tempres) 
+    if(tempres){
         delete tempres;
+        return true;
+    }
+
+    return false;
 }
 
 //------------------------------------------------------------------------------
 //
 // KKSPGDatabase::commit
 //
-void KKSPGDatabase::commit() const
+bool KKSPGDatabase::commit() const
 {
     KKSResult* tempres;
 
     tempres = execute( "COMMIT" );
 
-    if(tempres) 
+    if(tempres){ 
         delete tempres;
+        return true;
+    }
+
+    return false;
 }
 
 //------------------------------------------------------------------------------
 //
 // KKSPGDatabase::rollback
 //
-void KKSPGDatabase::rollback() const
+bool KKSPGDatabase::rollback() const
 {
     KKSResult* tempres;
 
     tempres = execute( "ROLLBACK" );
 
-    if(tempres) 
+    if(tempres){
         delete tempres;
+        return true;
+    }
+
+    return false;
 }
 
 void KKSPGDatabase::createSavePoint(const char * savePointName) const

@@ -88,9 +88,9 @@ class __DA_EXPORT KKSPGDatabase : public KKSDatabase
         char       *    escapeAsciiString(const char * fromString) const;
         QString         escapeBinaryString(const unsigned char * fromString) const;
 
-        void begin() const;
-        void commit() const;
-        void rollback() const;
+        bool begin() const;
+        bool commit() const;
+        bool rollback() const;
         void createSavePoint(const char * savePointName = NULL) const;
         void releaseSavePoint(const char * savePointName = NULL) const;
         void rollbackToSavePoint(const char * savePointName = NULL) const;

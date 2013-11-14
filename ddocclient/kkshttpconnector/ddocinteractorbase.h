@@ -5,6 +5,11 @@
 #include <JKKSLoader.h>
 #include "config_httpconnector.h"
 
+#include <JKKSPing.h>
+
+class DDocINteractorClient;
+class DDocInteractorServer;
+
 class __HTTP_CONNECTOR_EXPORT DDocInteractorBase : public QObject
 {
     Q_OBJECT

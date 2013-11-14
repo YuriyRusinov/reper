@@ -7,7 +7,9 @@
 #include <QMap>
 #include <QPair>
 #include "config_httpconnector.h"
+
 #include <JKKSPing.h>
+
 //net
 class QHttp;
 class QHttpResponseHeader;
@@ -37,7 +39,7 @@ public:
 
 private:
     bool sendOutMessage( const JKKSPMessWithAddr * message, 
-                         bool bSync = true, // флаг передачи данных в синхронном режиме. TRUE приводит к тому, что включается синхронный режим для QHttp::post()
+                         bool bSync = true, // флаг передачи данных в синхронном режиме. TRUE приводит к тому, что включается синхронный режим для QHttp::request()
                          bool isLastFilePart = false); //означает, что передается последняя часть файла, передаваемого частями
     bool setMessageAsSended(const qint64 & id, const int & type, bool sended = true);//последний параметр - флаг успешности доставки сообщения
 
@@ -59,7 +61,7 @@ private:
                              int length);
 
     void saveRequestId(int reqId, const JKKSPMessWithAddr * message, bool isLastFilePart);
-    bool verifyPings();
+    bool verifyPings();//проверка доступности целевых объектов через пинги.
 
 public slots:
     void startProc();
@@ -71,6 +73,7 @@ private slots:
 
     void httpRequestFinished(int requestId, bool error);//обрабатываем ответ для сообщений
     void pingHttpRequestFinished(int requestId, bool error);//обрабатываем ответ для пингов
+    void pingResHttpRequestFinished(int requestId, bool error);//обрабатываем результат получаения ответа на пинги
 
     void slotHttpMessageRemoved(int progress);
 
@@ -91,21 +94,21 @@ private:
     JKKSLoader * m_loader;
     DDocInteractorBase * m_parent;
 
-    QHttp *http; //используется для отправки сообщений
-    QHttp *pingHttp; //используется для отправки пингов
+    QHttp *http; //используется для отправки сообщений (синхронно)
+    QHttp *pingHttp; //используется для отправки пингов (синхронно)
+    QHttp *pingResHttp; //используется для отправки ответов на пинги (асинхронно)
 
 	bool manual; //true - ручной режим опроса БД 
 
     QTimer * m_timer;
     int m_interval; //интервал таймера на опрос БД. Важно! при отправке данных таймер приостанавливается до окончания передачи
     bool m_isExiting;//true - происходит завершение работы приложения. Необходимо завершить работу потока
-    //bool m_needToStart;//true - требуется активировать таймер. Это должно произойти только после того, как завершится процесс отправки данных и получания результатов
-    //bool m_needToStop;//true - требуется остановить таймер. Это означает, что по завершению отправки данных и получения результата таймер не будет запущен
-    //bool m_sendingStarted;//true - происходит отправка данных и получение результатов. В это время нельзя активизировать таймер
 
     QList<JKKSPMessWithAddr *> messageList;//список сообщений для отправки. Запрашивается из JKKSLoader и очищается сразу после отправки (вызова sendOutMessage() или sendPings() )
-    QMap<int, QPair<qint64, qint64> > httpMessages;//отправленные сообщения через this->http. В качестве ключа используется идентификатор запроса из метода QHttp::post()
-    QMap<int, JKKSPing> pingHttpMessages; //отправленные пинги через this->pingHttp. В качестве ключа используется идентификатор запроса из метода QHttp::post()
+    QMap<int, QPair<qint64, qint64> > httpMessages;//отправленные сообщения через this->http. В качестве ключа используется идентификатор запроса из метода QHttp::request()
+    QMap<int, JKKSPing> pingHttpMessages; //отправленные пинги через this->pingHttp. В качестве ключа используется идентификатор запроса из метода QHttp::request()
+    QMap<int, QPair<qint64, qint64> > pingResHttpMessages;//отправленные ответы на пинги через this->pingResHttp. В качестве ключа используется идентификатор запроса из метода QHttp::request()
+
 
     QString gatewayHost;//хост и порт шлюза ТПС, если используется ТПС для отправки сообщений
     int gatewayPort;
