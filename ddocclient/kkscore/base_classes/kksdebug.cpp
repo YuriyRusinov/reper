@@ -25,27 +25,6 @@ void KKSDebug::setUseQDebug(bool b)
 {
     m_useQDebug = b;
 }
-/*
-KKSDebug::KKSDebug(KKSMsgType type) : ts(&m_buffer, QIODevice::WriteOnly)
-{
-    m_msgType = type;
-}
-
-KKSDebug::KKSDebug(const KKSDebug & d) : ts(&m_buffer, QIODevice::WriteOnly)
-{
-    m_msgType = d.m_msgType;
-}
-
-KKSDebug::~KKSDebug()
-{
-    if(this->m_buffer.isEmpty())
-        return;
-
-    this->qDebug() << m_buffer;
-    
-    print(m_buffer);
-}
-*/
 
 QDebug KKSDebug::qDebug()
 {
@@ -62,7 +41,6 @@ QDebug KKSDebug::qDebug()
     return ::qDebug();
 }
 
-/*
 KKSDebug & KKSDebug::operator << (const QString & t) 
 { 
     if(m_msgType < m_minMsgType)
@@ -72,7 +50,7 @@ KKSDebug & KKSDebug::operator << (const QString & t)
 
     return *this;
 }
-*/
+
 KKSDebug & KKSDebug::operator << (const QByteArray & t) 
 { 
     if(m_msgType < m_minMsgType)
@@ -129,3 +107,4 @@ void KKSDebug::print(const QString & msg)
 
     kksSito->dbgWidget()->printMessage( c, msg );
 }
+

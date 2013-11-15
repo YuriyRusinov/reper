@@ -126,7 +126,6 @@
  Иванов В. И. 8.6.2010
 */
 
-#include "kkssito.h"
 #include "kksdatabase.h"
 
 #include <openreports.h>

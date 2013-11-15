@@ -18,12 +18,13 @@
 #include <windows.h>
 #pragma warning (disable:4251)
 #pragma warning (disable:4530)
-#ifdef __USE_DLL_KKSCORE
 
-	#define __CORE_EXPORT __declspec(dllexport)
-#else
-	#define __CORE_EXPORT __declspec(dllimport)
-#endif
+    #ifdef __USE_DLL_KKSCORE
+	    #define __CORE_EXPORT __declspec(dllexport)
+    #else
+	    #define __CORE_EXPORT __declspec(dllimport)
+    #endif
+
 #else
 	#define __CORE_EXPORT
 #endif

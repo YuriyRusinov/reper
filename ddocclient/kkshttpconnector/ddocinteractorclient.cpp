@@ -168,17 +168,18 @@ void DDocInteractorClient::startProc()
     m_parent->cntPingsSended = 0;
 
     if(m_parent->pingsForSent > 0)
-        kksInfo() << tr("Starting to send %1 ping requests.\nSending messages will be suspended until all ping results do not come back").arg(QString::number(m_parent->pingsForSent));
+        kksWarning() << tr("Starting to send %1 ping requests.\nSending messages will be suspended until all ping results do not come back").arg(QString::number(m_parent->pingsForSent));
 
     
     //* –ассылаем пинги и ждем пока этот процесс не завершитс€*/ 
     //¬ажно! Ќельз€ здесь делать евент-луп, если пинги рассылаютс€ синхронно, т.к. в этом случае сигнал о завершении рассылки придет раньше, чем стартует евент-луп
-    bool bSync = false;
+    
+    bool bSync1 = false;
     QEventLoop eventLoop;
 	connect(m_parent, SIGNAL(pingsSentCompleted()), &eventLoop, SLOT(quit()));
     connect(m_parent, SIGNAL(exitThreads()), &eventLoop, SLOT(quit()));
     
-    if(sendPings(bSync) != 0){
+    if(sendPings(bSync1) != 0){
         eventLoop.exec();
     }
     else{
@@ -196,7 +197,7 @@ void DDocInteractorClient::startProc()
     
     bool somePingsOK = verifyPings();
     if(!somePingsOK){
-        kksCritical() << tr("All of destination organization is offline. Data sending ignored");
+        qCritical() << tr("All of destination organization is offline. Data sending ignored");
 
         emit sendingCompleted();
 
@@ -451,7 +452,7 @@ void DDocInteractorClient::httpRequestFinished(int requestId, bool error)
     }
 
     if (bError) {
-        kksCritical() << tr("Message sending request failed! Internal request ID = %1").arg(requestId);
+        qCritical() << tr("Message sending request failed! Internal request ID = %1").arg(requestId);
         
         //здесь надо обновить информацию о состо€нии целевой организации (в пингах).
         //—делать ее неактивной, чтобы последующие сообщени€ не слались далее.
@@ -481,7 +482,7 @@ void DDocInteractorClient::httpRequestFinished(int requestId, bool error)
     QByteArray ba = http->readAll();
     if(ba.length() <= 0 || ba == "OK"){//это сообщение было передано напр€мую на целевой объект в http_connector
         if(!setMessageAsSended(t.first, t.second)){
-            kksCritical() << tr("Cannot mark message as sended! Database Error. Message ID = %1, Message type = %2. Internal request ID = %3").arg(t.first).arg(t.second).arg(requestId);
+            qCritical() << tr("Cannot mark message as sended! Database Error. Message ID = %1, Message type = %2. Internal request ID = %3").arg(t.first).arg(t.second).arg(requestId);
         }
         return;
     }
@@ -490,7 +491,7 @@ void DDocInteractorClient::httpRequestFinished(int requestId, bool error)
     //и в случае, если ответ не содержит " ERROR ", помечаем сообщение как отправленное
     if( ! ba.contains(" ERROR ")){
         if(!setMessageAsSended(t.first, t.second)){
-            kksCritical() << tr("Cannot mark message as sended! Database Error. Message ID = %1, Message type = %2. Internal request ID = %3").arg(t.first).arg(t.second).arg(requestId);
+            qCritical() << tr("Cannot mark message as sended! Database Error. Message ID = %1, Message type = %2. Internal request ID = %3").arg(t.first).arg(t.second).arg(requestId);
         }
     }
     else{
@@ -586,7 +587,7 @@ void DDocInteractorClient::pingResHttpRequestFinished(int requestId, bool error)
     }
 
     if (bError) {
-        kksCritical() << tr("Ping result sending request failed! Internal request ID = %1").arg(requestId);
+        qCritical() << tr("Ping result sending request failed! Internal request ID = %1").arg(requestId);
         return;
     } 
     
@@ -600,7 +601,7 @@ void DDocInteractorClient::pingResHttpRequestFinished(int requestId, bool error)
     QByteArray ba = pingResHttp->readAll();
     if(ba.length() <= 0 || ba == "OK"){//это сообщение было передано напр€мую на целевой объект в http_connector
         if(!setMessageAsSended(t.first, t.second)){
-            kksCritical() << tr("Cannot mark ping result as sended! Database Error. Message ID = %1, Message type = %2. Internal request ID = %3").arg(t.first).arg(t.second).arg(requestId);
+            qCritical() << tr("Cannot mark ping result as sended! Database Error. Message ID = %1, Message type = %2. Internal request ID = %3").arg(t.first).arg(t.second).arg(requestId);
         }
         return;
     }
@@ -609,7 +610,7 @@ void DDocInteractorClient::pingResHttpRequestFinished(int requestId, bool error)
     //и в случае, если ответ не содержит " ERROR ", помечаем сообщение как отправленное
     if( ! ba.contains(" ERROR ")){
         if(!setMessageAsSended(t.first, t.second)){
-            kksCritical() << tr("Cannot mark ping result as sended! Database Error. Message ID = %1, Message type = %2. Internal request ID = %3").arg(t.first).arg(t.second).arg(requestId);
+            qCritical() << tr("Cannot mark ping result as sended! Database Error. Message ID = %1, Message type = %2. Internal request ID = %3").arg(t.first).arg(t.second).arg(requestId);
         }
     }
 }
@@ -912,9 +913,9 @@ void DDocInteractorClient::pingHttpRequestFinished(int requestId, bool error)
 
     //если не смогли отправить пинг - помечаем его как отправленного и неудачно доставленного (приемна€ сторона не отвечает)
     if (bError) {
-        kksCritical() << tr("Ping sending request failed! Receiver = %1, Adress = (IP = %2, port = %3). Internal request ID = %4").arg(t.uidTo()).arg(t.getAddr().address()).arg(t.getAddr().port()).arg(requestId);
+        qCritical() << tr("Ping sending request failed! Receiver = %1, Adress = (IP = %2, port = %3). Internal request ID = %4").arg(t.uidTo()).arg(t.getAddr().address()).arg(t.getAddr().port()).arg(requestId);
         if(!pingHttp->errorString().isEmpty())
-            kksCritical() << pingHttp->errorString();
+            qCritical() << pingHttp->errorString();
 
         t.setState1(0);
         t.setState2(0);
@@ -940,9 +941,9 @@ void DDocInteractorClient::pingHttpRequestFinished(int requestId, bool error)
     //далее полагаем, что ответ пришел от шлюза
     //и в случае, если ответ содержит " ERROR ", помечаем сообщение как отправленное
     if( ba.contains(" ERROR ")){
-        kksCritical() << tr("Ping sending request failed! Receiver = %1, Adress = (IP = %2, port = %3). Internal request ID = %4").arg(t.uidTo()).arg(t.getAddr().address()).arg(t.getAddr().port()).arg(requestId);
+        qCritical() << tr("Ping sending request failed! Receiver = %1, Adress = (IP = %2, port = %3). Internal request ID = %4").arg(t.uidTo()).arg(t.getAddr().address()).arg(t.getAddr().port()).arg(requestId);
         if(!pingHttp->errorString().isEmpty())
-            kksCritical() << pingHttp->errorString();
+            qCritical() << pingHttp->errorString();
 
         t.setState1(0);
         t.setState2(0);

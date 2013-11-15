@@ -1,3 +1,4 @@
+
 #ifndef KKSDEBUG_H
 #define KKSDEBUG_H
 
@@ -28,11 +29,10 @@ class __CORE_EXPORT KKSDebug
 {
 public:
     
-    inline KKSDebug(KKSMsgType type) : ts(&m_buffer, QIODevice::WriteOnly){ m_msgType = type;}
+    KKSDebug(KKSMsgType type) : ts(&m_buffer, QIODevice::WriteOnly){ m_msgType = type;}
+    KKSDebug(const KKSDebug & d) : ts(&m_buffer, QIODevice::WriteOnly) { m_msgType = d.m_msgType;}
 
-    inline KKSDebug(const KKSDebug & d) : ts(&m_buffer, QIODevice::WriteOnly) { m_msgType = d.m_msgType;}
-
-    inline ~KKSDebug(){
+    ~KKSDebug(){
         if(this->m_buffer.isEmpty())
             return;
         this->qDebug() << m_buffer;
@@ -43,15 +43,15 @@ public:
     static KKSMsgType minMsgType();
     static void setUseQDebug(bool b = true);
        
-    inline KKSDebug & operator << (const QString & t)
-    { 
+    KKSDebug & operator << (const QString & t);
+    /*{ 
         if(m_msgType < minMsgType())
             return *this;
 
         ts << t;
 
         return *this;
-    }
+    }*/
 
     KKSDebug & operator << (const QByteArray & t);
     KKSDebug & operator << (int t);
@@ -70,11 +70,18 @@ private:
 
 };
 
-__CORE_EXPORT inline KKSDebug kksDebug() { return KKSDebug(KKSDebugMsg); }
-__CORE_EXPORT inline KKSDebug kksWarning() { return KKSDebug(KKSWarningMsg); }
-__CORE_EXPORT inline KKSDebug kksCritical() { return KKSDebug(KKSCriticalMsg); }
-__CORE_EXPORT inline KKSDebug kksFatal() { return KKSDebug(KKSFatalMsg); }
-__CORE_EXPORT inline KKSDebug kksInfo() { return KKSDebug(KKSInfoMsg); }
-__CORE_EXPORT inline KKSDebug kksImportantInfo() { return KKSDebug(KKSImportantInfoMsg); }
+#define kksWarning() KKSDebug(KKSWarningMsg)
+#define kksDebug() KKSDebug(KKSDebugMsg)
+#define kksCritical() KKSDebug(KKSCriticalMsg)
+#define kksFatal() KKSDebug(KKSFatalMsg)
+#define kksInfo() KKSDebug(KKSInfoMsg)
+#define kksImportantInfo() KKSDebug(KKSImportantInfoMsg)
+//__CORE_EXPORT KKSDebug qDebug() { return KKSDebug(KKSDebugMsg); }
+//__CORE_EXPORT KKSDebug qWarning() { return KKSDebug(KKSWarningMsg); }
+//__CORE_EXPORT KKSDebug qCritical() { return KKSDebug(KKSCriticalMsg); }
+//__CORE_EXPORT KKSDebug kksFatal() { return KKSDebug(KKSFatalMsg); }
+//__CORE_EXPORT KKSDebug //--kksInfo() { return KKSDebug(KKSInfoMsg); }
+//__CORE_EXPORT KKSDebug kksImportantInfo() { return KKSDebug(KKSImportantInfoMsg); }
 
 #endif
+

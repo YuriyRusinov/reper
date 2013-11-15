@@ -5,6 +5,7 @@ TARGET = kkscore
 
 DESTDIR = ../build
 include(../ddocclient.conf)
+
 #utils support
 INCLUDEPATH *= ../kksutils
 DEPENDPATH *= ../kksutils
@@ -43,8 +44,7 @@ CONFIG += qt
 
 CONFIG += warn_on dll
 
-DEFINES += __USE_DLL_KKSCORE
-#DEFINES -= UNICODE
+DEFINES *= __USE_DLL_KKSCORE
 
 win32:LITERAL_QUOTE = " "
 unix:LITERAL_QUOTE = \'

@@ -39,7 +39,6 @@
 #include "KKSSearchTemplateType.h"
 #include "KKSAclTemplate.h"
 #include "KKSAccessEntity.h"
-#include "kkssito.h"
 
 ////////////////////////////////////////////////////////////////////////
 // Name:       KKSPPFactory::KKSPPFactory()
@@ -2504,7 +2503,7 @@ bool KKSPPFactory::categoryInUse(KKSCategory * c) const
     {
         qWarning() << "KKSPPFactory::categoryInUse() method was invoked."
                       "A transaction is currently started. "
-                      "Because of current version of " +kksSitoName+" Server "
+                      "Because of current version of DynamicDocs Server "
                       "does not supported savepoints (subtransactions) "
                       "you cannot verify using of the category."
                       "So returning error!"

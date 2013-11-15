@@ -13,6 +13,9 @@ SOURCES += \
            ddocinteractorclient.cpp \
            ddocinteractorbase.cpp \
            timerform.cpp
+FORMS += \
+           timer_form.ui
+
 headers.files += \
            config_httpconnector.h \
            ddocinteractorwindow.h \

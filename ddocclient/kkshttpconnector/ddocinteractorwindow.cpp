@@ -77,9 +77,9 @@ void DDocInteractorWindow::setTimerParams(int v, int u, bool m)
     }
     kksInfo() << tr("Set timer interval to %1 %2").arg(m_timerInterval).arg(sUnits);
     
-    if(m_startManually)
+    if(m_startManually) 
         kksInfo() << tr("Timer is disabled now. Use <Single query database> button to manually querying database or <Start querying> button to start timer");
-    else
+    else 
         kksInfo() << tr("Timer is enabled now. Use <Stop querying> button to stop timer");
 }
 
