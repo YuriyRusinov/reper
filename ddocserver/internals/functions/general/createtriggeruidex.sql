@@ -6,15 +6,15 @@ declare
     query varchar;
 begin
 
-    select f_safe_drop_trigger('trgsetuid', tableName);
+    perform f_safe_drop_trigger('trgsetuid', tableName);
 
-    query = 'create trigger trgsetuid
-             before insert or update
-             on ' || tableName || '
-             for each row 
-             execute procedure uidCheck();';
+    query := 'create trigger trgsetuid
+              before insert or update
+              on ' || tableName || '
+              for each row 
+              execute procedure uidCheck();';
 
-    execute query;
+    perform query;
 
     return 1;
 end
