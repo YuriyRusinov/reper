@@ -11,9 +11,9 @@ SUBDIRS += \
     openrpt \
     kksgui \
     kksfactory \
+    kkscore \
     kksinteractor \
     kkshttpconnector \
-    kkscore \
     kksrunservice \
     app 
 
