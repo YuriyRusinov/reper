@@ -16,11 +16,16 @@ void KKSDebug::setMinMsgType(KKSMsgType t)
     m_minMsgType = t;
 }
 
+KKSMsgType KKSDebug::minMsgType()
+{
+    return m_minMsgType;
+} 
+
 void KKSDebug::setUseQDebug(bool b)
 {
     m_useQDebug = b;
 }
-
+/*
 KKSDebug::KKSDebug(KKSMsgType type) : ts(&m_buffer, QIODevice::WriteOnly)
 {
     m_msgType = type;
@@ -40,6 +45,7 @@ KKSDebug::~KKSDebug()
     
     print(m_buffer);
 }
+*/
 
 QDebug KKSDebug::qDebug()
 {
@@ -56,6 +62,7 @@ QDebug KKSDebug::qDebug()
     return ::qDebug();
 }
 
+/*
 KKSDebug & KKSDebug::operator << (const QString & t) 
 { 
     if(m_msgType < m_minMsgType)
@@ -65,7 +72,7 @@ KKSDebug & KKSDebug::operator << (const QString & t)
 
     return *this;
 }
-
+*/
 KKSDebug & KKSDebug::operator << (const QByteArray & t) 
 { 
     if(m_msgType < m_minMsgType)

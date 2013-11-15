@@ -28,18 +28,35 @@ class __CORE_EXPORT KKSDebug
 {
 public:
     
-    KKSDebug(const KKSDebug & d);
-    KKSDebug(KKSMsgType type);
-    virtual ~KKSDebug();
+    inline KKSDebug(KKSMsgType type) : ts(&m_buffer, QIODevice::WriteOnly){ m_msgType = type;}
+
+    inline KKSDebug(const KKSDebug & d) : ts(&m_buffer, QIODevice::WriteOnly) { m_msgType = d.m_msgType;}
+
+    inline ~KKSDebug(){
+        if(this->m_buffer.isEmpty())
+            return;
+        this->qDebug() << m_buffer;
+        print(m_buffer);
+    }
     
     static void setMinMsgType(KKSMsgType t);
+    static KKSMsgType minMsgType();
     static void setUseQDebug(bool b = true);
        
-    KKSDebug & operator << (const QString & t);
+    inline KKSDebug & operator << (const QString & t)
+    { 
+        if(m_msgType < minMsgType())
+            return *this;
+
+        ts << t;
+
+        return *this;
+    }
+
     KKSDebug & operator << (const QByteArray & t);
     KKSDebug & operator << (int t);
-    KKSDebug &operator<<(QTextStreamFunction f); 
-    KKSDebug &operator<<(QTextStreamManipulator m);
+    KKSDebug & operator << (QTextStreamFunction f); 
+    KKSDebug & operator << (QTextStreamManipulator m);
 
 private:
 

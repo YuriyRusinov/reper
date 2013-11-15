@@ -1,5 +1,6 @@
 # Input
 HEADERS += \
+           config_httpconnector.h \
            ddocinteractorwindow.h \
            ddocinteractorserver.h \
            ddocinteractorclient.h \
@@ -10,3 +11,10 @@ SOURCES += \
            ddocinteractorserver.cpp \
            ddocinteractorclient.cpp \
            ddocinteractorbase.cpp
+
+headers.files += \
+           config_httpconnector.h \
+           ddocinteractorwindow.h \
+           ddocinteractorserver.h \
+           ddocinteractorclient.h \
+           ddocinteractorbase.h
