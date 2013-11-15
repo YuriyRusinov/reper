@@ -9,6 +9,7 @@
 #include <QMessageBox>
 #include <QMap>
 #include <QTextEdit>
+#include <QTextStream>
 #include <QString>
 
 #include "kkssito.h"
@@ -123,6 +124,8 @@ KKSSito::KKSSito(const QString & userName, bool msgToWindow) :
     loadAccLevels();
 
     initFactories();
+    
+    initLogStream();
 
     getLastError();//это типа чтоп файл журнала создать в текущей папке (там где exe-шник лежџт)
 
@@ -241,6 +244,8 @@ KKSSito::~KKSSito( )
 
 
     self = 0;
+
+    m_logStream.flush();
 }
 
 
@@ -290,6 +295,17 @@ KKSError * KKSSito::getLastError()
     }
 
     return lastError;
+}
+
+void KKSSito::initLogStream()
+{
+    QString fileName = QString( getWDir() + "/log.log" );
+    QFile log(fileName);
+    
+    if (log.open(QFile::WriteOnly | QFile::Truncate)) {
+        m_logStream.setDevice(&log);
+        m_logStream << QObject::tr("Log started at ") + QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss");
+    }
 }
 
 /*!\brief ћетод обновл€ет информацию о последней возникшей ошибке. 
@@ -1539,7 +1555,7 @@ void KKSSito::showConnectionInfo(QWidget * parent) const
 {
     if(!m_loader || !m_loader->getDb()){
         qCritical() << tr("You are not connected to database");
-        QMessageBox::warning(parent, tr("Warning"), tr("You are not connected to database"), QMessageBox::Ok);
+        QMessageBox::critical(parent, tr("Warning"), tr("You are not connected to database"), QMessageBox::Ok);
         return;
     }
 
@@ -1549,4 +1565,25 @@ void KKSSito::showConnectionInfo(QWidget * parent) const
     cif->setDatabaseInfo(m_loader->getDb()->getHost(), m_loader->getDb()->getPort(), m_loader->getDb()->getName());
     cif->exec();
     delete cif;
+}
+
+void KKSSito::showConnectionInfo(KKSDatabase * db, const QString & userName, const QString & dlName, const QString & macLabel, QWidget * parent) const
+{
+    if(!db){
+        qCritical() << tr("You are not connected to database");
+        QMessageBox::critical(parent, tr("Warning"), tr("You are not connected to database"), QMessageBox::Ok);
+        return;
+    }
+
+    ConnectionInfoForm * cif = new ConnectionInfoForm(parent);
+    
+    cif->setUserInfo(userName, dlName, macLabel);
+    cif->setDatabaseInfo(db->getHost(), db->getPort(), db->getName());
+    cif->exec();
+    delete cif;
+}
+
+QTextStream & KKSSito::logStream()
+{
+    return m_logStream;
 }

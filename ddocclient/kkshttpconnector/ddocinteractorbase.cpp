@@ -3,6 +3,7 @@
 #include <QMessageBox>
 #include <QTimer>
 
+#include <kksdebug.h>
 #include "ddocinteractorbase.h"
 
 #include "ddocinteractorclient.h"
@@ -81,7 +82,7 @@ int DDocInteractorBase::start(bool mode, int interval)
     m_loader = new (std::nothrow) JKKSLoader (host, dbName, user, password, port, transport);
     if (m_loader && m_loader->connectToDb ())
     {
-        ;//OK
+        kksInfo() << tr("Successfully connected to database. Host = %1:%2, database = %3, user = %4, transport ID = %5").arg(host).arg(port).arg(dbName).arg(user).arg(transport);
     }
     else if (m_loader)
     {
@@ -112,7 +113,7 @@ int DDocInteractorBase::start(bool mode, int interval)
 
     connect(m_client, SIGNAL(pingsSended(QMap<QString, JKKSPing>)), this, SIGNAL(pingsSended(QMap<QString, JKKSPing>)));
     connect(m_client, SIGNAL(pingsSentCompleted()), this, SIGNAL(pingsSentCompleted()));
-    connect(m_client, SIGNAL(showStatusText(QString)), this, SIGNAL(showStatusText(QString)));
+    connect(this, SIGNAL(refreshTimer(int)), m_client, SLOT(slotRefreshTimer(int)));
    
     connect(this, SIGNAL(theSignal()), m_client, SLOT(init()));
     m_client->start();

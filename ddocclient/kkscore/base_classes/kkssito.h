@@ -24,6 +24,7 @@
 #include <QSettings>
 #include <QObject>
 #include <QStringList>
+#include <QTextStream>
 
 #include <kkserror.h>
 #include <KKSList.h>
@@ -72,6 +73,7 @@ public:
 
     KKSError * getLastError();  
     void showConnectionInfo(QWidget * parent = NULL) const;
+    void showConnectionInfo(KKSDatabase * db, const QString & userName, const QString & dlName, const QString & macLabel, QWidget * parent = NULL) const;
 
     void updateLastError(KKSError::ErrorTypes type, 
                          QString code, 
@@ -124,6 +126,7 @@ public:
     KKSIndFactory * indf () const;
 
     KKSDbgOutputWidget * dbgWidget() const;
+    QTextStream & logStream();
 
 private:
     KKSSettings * getKKSSettings (const QString & organization, 
@@ -200,6 +203,7 @@ private:
     mutable KKSIndFactory * m_indf;
 
     mutable KKSDbgOutputWidget * m_dbgWidget;
+    QTextStream m_logStream;
 
     static KKSSito * self;
     QTranslator * tor;
@@ -226,6 +230,7 @@ private:
     void loadDefAccLevels();
 
     void initFactories();
+    void initLogStream();
 
 private slots:
     

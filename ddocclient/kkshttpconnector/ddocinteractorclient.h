@@ -66,6 +66,7 @@ private:
 public slots:
     void startProc();
     void init();
+    void slotRefreshTimer(int interval);
 
 private slots:
     void createTimer();
@@ -88,7 +89,7 @@ signals:
     void sendingStarted();//генерируется, когда происходит получение данных и их отправка получателю
     void sendingCompleted();//генерируется, когда отправка данных получателю завершена
 
-    void showStatusText(QString);//генерируется, когда требуется вывести на форму нектороый текст о текущем состоянии отправки данных
+    //void showStatusText(QString);//генерируется, когда требуется вывести на форму нектороый текст о текущем состоянии отправки данных
 
 private:
     JKKSLoader * m_loader;

@@ -24,6 +24,7 @@ public:
 
     DDocInteractorWindow(QWidget *parent = 0);
     void setInteractorBase(DDocInteractorBase * b);
+    void setTimerParams(int v, int u, bool m);
     
 public slots:
     void closeApp();
@@ -35,9 +36,11 @@ protected:
 private slots:
     void slotSendingStarted();
     void slotSendingCompleted();
-    void showStatusText(QString str);
+    //void showStatusText(QString str);
     void slotHideManualStartButton();
     void slotShowManualStartButton();
+    void slotSetTimerParams();
+    void slotShowConnInfo();
 
 
 signals:
@@ -45,15 +48,20 @@ signals:
 
     void stopReadDatabase();
     void startReadDatabase();
+    void refreshTimer(int interval);
 
 private:
-    QLabel *statusLabel;
+    //QLabel *statusLabel;
 
     QPushButton  *manualStartButton;
     QPushButton * quitButton;
     QPushButton * stopButton;
 
     DDocInteractorBase * m_base;
+
+    int m_timerInterval;
+    int m_timerUnits;
+    bool m_startManually;
 };
 
 #endif

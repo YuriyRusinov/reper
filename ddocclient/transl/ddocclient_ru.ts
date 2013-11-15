@@ -5,31 +5,35 @@
     <name>AttrHistory</name>
     <message>
         <source>Id</source>
-        <translation>ИД</translation>
+        <translation type="obsolete">ИД</translation>
     </message>
     <message>
         <source>Start</source>
-        <translation>Актуален с</translation>
+        <translation type="obsolete">Актуален с</translation>
     </message>
     <message>
         <source>Stop</source>
-        <translation>Актуален по</translation>
+        <translation type="obsolete">Актуален по</translation>
     </message>
     <message>
         <source>Value</source>
-        <translation>Значение</translation>
+        <translation type="obsolete">Значение</translation>
     </message>
     <message>
         <source>Source</source>
-        <translation>Источник</translation>
+        <translation type="obsolete">Источник</translation>
     </message>
     <message>
         <source>Transfer</source>
-        <translation>Довел</translation>
+        <translation type="obsolete">Довел</translation>
     </message>
     <message>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation type="obsolete">Описание</translation>
+    </message>
+    <message>
+        <source>View &amp;values</source>
+        <translation>Просмотр &amp;значения</translation>
     </message>
 </context>
 <context>
@@ -206,11 +210,11 @@
     <name>ChooseDlForm</name>
     <message>
         <source>You should choose any position</source>
-        <translation type="unfinished"></translation>
+        <translation>Необходимо выбрать должность</translation>
     </message>
     <message>
         <source>position choosing</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбор должности</translation>
     </message>
 </context>
 <context>
@@ -1389,6 +1393,281 @@ End of querying SIU database.
     </message>
 </context>
 <context>
+    <name>DDocInteractorBase</name>
+    <message>
+        <source>Successfully connected to database. Host = %1:%2, database = %3, user = %4, transport ID = %5</source>
+        <translation>Успешно подключились к базе данных. Хост = %1:%2, БД = %3, пользователь = %4, транспорт = %5</translation>
+    </message>
+    <message>
+        <source>Unable to connect to the database: %1</source>
+        <translation>Не могу соединиться с БД: %1</translation>
+    </message>
+    <message>
+        <source>DynamicDocs Interactor</source>
+        <translation>DynamicDocs (Управление информационным обменом)</translation>
+    </message>
+    <message>
+        <source>Unable to start the server: %1</source>
+        <translation>Не могу запустить TCP-сервер: %1</translation>
+    </message>
+    <message>
+        <source>DynamicDocs Interactor </source>
+        <translation>DynamicDocs (Управление информационным обменом)</translation>
+    </message>
+</context>
+<context>
+    <name>DDocInteractorClient</name>
+    <message>
+        <source>Found %1 ping results for sent</source>
+        <translation>Получено %1 ответов на проверку соединения</translation>
+    </message>
+    <message>
+        <source>Ping results sending complete</source>
+        <translation>Отправка ответов на проверку соединения завершена</translation>
+    </message>
+    <message>
+        <source>Starting to send %1 ping requests.
+Sending messages will be suspended until all ping results do not come back</source>
+        <translation>Начинаю отправку %1 запросов на проверку соединения с удаленным(и) сервером(ами)
+Отправка данных будет приостановлена пока не придут все ответы на данные запросы</translation>
+    </message>
+    <message>
+        <source>All of destination organization is offline. Data sending ignored</source>
+        <translation>Со всеми удаленными серверами отсутствует соединение. Отправка данных отменена</translation>
+    </message>
+    <message>
+        <source>Pings sending complete</source>
+        <translation>Отправка запросов на проверку соединения завершена</translation>
+    </message>
+    <message>
+        <source>Data transferring started ...
+Messages for transfer: %1 ---&gt; %3
+Files for transfer: %2 (for current file: %5 parts) ---&gt; %4 (for current file: %6 parts)</source>
+        <translation>Начата отправка данных ...
+Сообщений для отправки: %1 ---&gt; %3
+Файлов для отправки: %2 (для текущего файла: %5 частей) ---&gt; %4 (для текущего файла: %6 частей)</translation>
+    </message>
+    <message>
+        <source>Data transferring started ...
+
+Messages for transfer: %1 ---&gt; %3
+Files for transfer: %2 (for current file: %5 parts) ---&gt; %4 (for current file: %6 parts)</source>
+        <translation>Начата отправка данных ...
+Сообщений для отправки: %1 ---&gt; %3
+Файлов для отправки: %2 (для текущего файла: %5 частей) ---&gt; %4 (для текущего файла: %6 частей)</translation>
+    </message>
+    <message>
+        <source>Message sending request completed. Internal request ID = %1</source>
+        <translation>Завершен запрос на передачу очередного сообщения. Внутренний идентификатор запроса = %1</translation>
+    </message>
+    <message>
+        <source>Next file transferred (%1 from %2)</source>
+        <translation>Очередной файл передан (%1 из %2)</translation>
+    </message>
+    <message>
+        <source>Next file part transferred (%1 from %2)</source>
+        <translation>Очередная часть текущего файла передана (%1 из %2)</translation>
+    </message>
+    <message>
+        <source>Next message transferred (%1 from %2)</source>
+        <translation>Очередное сообщение передано (%1 из %2)</translation>
+    </message>
+    <message>
+        <source>Message sending request failed! Internal request ID = %1</source>
+        <translation>Запрос на передачу сообщения завершился с ошибкой! Внутренний идентификатор запроса = %1</translation>
+    </message>
+    <message>
+        <source>Cannot mark message as sended! Database Error. Message ID = %1, Message type = %2. Internal request ID = %3</source>
+        <translation>Не могу пометить сообщение как переданное. Ошибка БД. ИД сообщения = %1, тип = %2. Внутренний идентификатор запроса на передачу = %3</translation>
+    </message>
+    <message>
+        <source>Waiting for data to sent...</source>
+        <translation>Ожидаю появления в БД данных для передачи...</translation>
+    </message>
+    <message>
+        <source>Ping result sending request completed. Internal request ID = %1</source>
+        <translation>Запрос на отправку ответа на проверку соединения завершен. Внутренний идентификатор запроса = %1</translation>
+    </message>
+    <message>
+        <source>Next ping result transferred</source>
+        <translation>Очередной ответ на  проверку соединения передан</translation>
+    </message>
+    <message>
+        <source>Ping result sending request failed! Internal request ID = %1</source>
+        <translation>Запрос на передачу ответа на проверку соединения завершился с ошибкой! Внутренний ИД запроса = %1</translation>
+    </message>
+    <message>
+        <source>Cannot mark ping result as sended! Database Error. Message ID = %1, Message type = %2. Internal request ID = %3</source>
+        <translation>Не могу отметить ответ на проверку соединения как отправленный. Ошибка БД. ИД ответа -= %1, тип = %2. Внутренний ИД запроса = %3</translation>
+    </message>
+    <message>
+        <source>Ping sending request sheduled. Receiver = %1, Adress = (IP = %2, port = %3). Internal request ID = </source>
+        <translation>Запрос на проверку соединения поставлен в очередь. Прлучатель = %1, адрес = (IP = %2, port = %3). Внутренний ИД запроса =</translation>
+    </message>
+    <message>
+        <source>Ping response sending request sheduled. Receiver = %1, Adress = (IP = %2, port = %3). Internal request ID = </source>
+        <translation>Запрос на отправку ответа на проверку соединения поставлен в очередь. Прлучатель = %1, адрес = (IP = %2, port = %3). Внутренний ИД запроса =</translation>
+    </message>
+    <message>
+        <source>Message sending request sheduled. Receiver = %1, Adress = (IP = %2, port = %3). Internal request ID = </source>
+        <translation>Запрос на отправку сообщения поставлен в очередь. Прлучатель = %1, адрес = (IP = %2, port = %3). Внутренний ИД запроса =</translation>
+    </message>
+    <message>
+        <source>Ping sending request failed! Receiver = %1, Adress = (IP = %2, port = %3). Internal request ID = %4</source>
+        <translation>Запрос на проверку соединения завершился с ошибкой! Получатель = %1, адрес = (IP = %2, порт = %3). Внутренний ИД запроса = %4</translation>
+    </message>
+    <message>
+        <source>Ping request delivered to destination organization. Receiver = %1, Adress = (IP = %2, port = %3). Internal request ID = %4. Waiting for answer</source>
+        <translation>Запрос на проверку соединения доставлен на удаленный сервер. Получатель = %1, адрес = (IP = %2, gjhn = %3). Внутренний ИД запроса = %4. Ожидаю ответ</translation>
+    </message>
+    <message>
+        <source>Ping sending request completed. Receiver = %1, Adress = (IP = %2, port = %3). Internal request ID = %4</source>
+        <translation>Запрос на проверку соединения завершен. Получатель = %1, Адрес = (IP = %2, порт = %3). Внутренний ИД запроса = %4</translation>
+    </message>
+    <message>
+        <source>Organization %1 with address = (IP=%2, port=%3, use gateway = %4) was not complete the first syncronization procedure.Only first synchronization queries for that will be allowed</source>
+        <translation>Удаленный сервер %1 с адресом = (IP = %2, порт = %3, использование шлюза = %4) не прошел этап первоначальной синхронизации. Только запросы на первоначальную синхронизацию будут разрешены</translation>
+    </message>
+    <message>
+        <source>Organization %1 with address = (IP=%2, port=%3, use gateway = %4) is offline. Data sending for that will be ignored</source>
+        <translation>Удаленный сервер %1 с адресом = (IP = %2, порт = %3, использование шлюза = %4) не отвечает. Отправка данных для него будет игнорироваться</translation>
+    </message>
+</context>
+<context>
+    <name>DDocInteractorServer</name>
+    <message>
+        <source>Bad socket! Cannot create connection!</source>
+        <translation>Поврежденный сокет! Не могу создать соединение!</translation>
+    </message>
+    <message>
+        <source>New income data found on socket. Start processing...</source>
+        <translation>Поступили входящие данные на сокет. Начинаю их обработку...</translation>
+    </message>
+    <message>
+        <source>New income data found on socket. But correct data does not found in incomming request</source>
+        <translation>Поступили входящие данные на сокет. Не обнаружено данных, пригодных для дальнейшей обработки</translation>
+    </message>
+    <message>
+        <source>Disconnected from socket</source>
+        <translation>Отключаюсь от сокета</translation>
+    </message>
+    <message>
+        <source>Found inconsistent income data on socket! Sending &quot;Bad request&quot; response to client</source>
+        <translation>Обнаружены поврежденные данные на сокете! Посылаю &quot;Bad Request&quot; отправителю</translation>
+    </message>
+    <message>
+        <source>Hash sum for income message is inconsistent!</source>
+        <translation>Хэш-сумма входящих данных не соответствует требуемой!</translation>
+    </message>
+    <message>
+        <source>Cannot processing income message! Data was not writen to database</source>
+        <translation>Не могу обработать входящие данные. Произошла ошибка при их записи в БД</translation>
+    </message>
+    <message>
+        <source>Sender = %1, receiver = %2, message type = %3. %4</source>
+        <translation>Отправитель = %1, получатель = %2, тип сообщения = %3. %4</translation>
+    </message>
+    <message>
+        <source>Message was IGNORED!</source>
+        <translation>Сообщение проигнорировано!</translation>
+    </message>
+    <message>
+        <source>Database error!</source>
+        <translation>Ошибка БД!</translation>
+    </message>
+    <message>
+        <source>Income message was successfully written to database</source>
+        <translation>Входящие данные успешно сохранены в БД</translation>
+    </message>
+    <message>
+        <source>Found inconsistent incoming notification! Bad format</source>
+        <translation>Обнаружена поврежденная входящая квитанция. Неподдерживаемый формат</translation>
+    </message>
+    <message>
+        <source>Cannot parse MESID of the notification</source>
+        <translation>Не могу прочитать MESID входящей квитанции</translation>
+    </message>
+    <message>
+        <source>Cannot parse MESID (type part) of the notification </source>
+        <translation>Не могу прочитать MESID (тип сообщения) входящей квитанции</translation>
+    </message>
+    <message>
+        <source>Receive ping notification from gateway. Id = %1, result = %2.</source>
+        <translation>Получена квитанция об отправке запроса на проверку соединения от шлюза. ИД = %1, результат = %2.</translation>
+    </message>
+    <message>
+        <source>Message with id = %1 and type = %2 does not received by receiver! Result = %3</source>
+        <translation>Сообщение с ИД = %1 и типом = %2 не доставлено получателю! Результат операции = %3</translation>
+    </message>
+    <message>
+        <source>Cannot mark message as sended! Database Error. idMsg = %1, type = %2</source>
+        <translation>Не могу отметить сообщение как отправленное! Ошибка БД. ИД сообщения = %1, тип = %2</translation>
+    </message>
+    <message>
+        <source>Ping request notification received. Destination organization cannot receive ping request!</source>
+        <translation>Получена квитанция об отправке запроса на проверку соединения. Удаленный сервер не отвечает!</translation>
+    </message>
+    <message>
+        <source>Ping request notification received. Destination organization successfully received ping request</source>
+        <translation>Получена квитанция об отправке запроса на проверку соединения. Удаленный сервер успешно получил запрос</translation>
+    </message>
+</context>
+<context>
+    <name>DDocInteractorWindow</name>
+    <message>
+        <source>Stop querying</source>
+        <translation>Остановить опрос БД</translation>
+    </message>
+    <message>
+        <source>Single query database</source>
+        <translation>Опросить БД один раз</translation>
+    </message>
+    <message>
+        <source>Timer params</source>
+        <translation>Параметры таймера опроса БД</translation>
+    </message>
+    <message>
+        <source>Connection info</source>
+        <translation>Информация о соединении с БД</translation>
+    </message>
+    <message>
+        <source>Quit</source>
+        <translation>Выход</translation>
+    </message>
+    <message>
+        <source>DynamicDocs Server Interactor</source>
+        <translation>DynamicDocs (Управление информационным обменом)</translation>
+    </message>
+    <message>
+        <source>second(s)</source>
+        <translation>секунд(ы)</translation>
+    </message>
+    <message>
+        <source>minute(s)</source>
+        <translation>минут(ы)</translation>
+    </message>
+    <message>
+        <source>hour(s)</source>
+        <translation>час(ы)</translation>
+    </message>
+    <message>
+        <source>Set timer interval to %1 %2</source>
+        <translation>Установить интервал опроса БД в %1 %2</translation>
+    </message>
+    <message>
+        <source>Timer is disabled now. Use &lt;Single query database&gt; button to manually querying database or &lt;Start querying&gt; button to start timer</source>
+        <translation>Таймер приостановлен. Используйте кнопку &quot;Опросить БД один раз&quot; для ручного опроса БД или &quot;Начать опрос БД&quot; для возобновления работы таймера</translation>
+    </message>
+    <message>
+        <source>Timer is enabled now. Use &lt;Stop querying&gt; button to stop timer</source>
+        <translation>Таймер запущен. Используйте кнопку &quot;Остановить опрос БД&quot; для приостановки таймера</translation>
+    </message>
+    <message>
+        <source>Not used</source>
+        <translation>Не используется</translation>
+    </message>
+</context>
+<context>
     <name>DetailGroupSectionDialog</name>
     <message>
         <source>&amp;OK</source>
@@ -2187,51 +2466,39 @@ Do you want to save the changes before closing?</source>
     <name>HttpWindow</name>
     <message>
         <source>Unable to start the server: %1.</source>
-        <translation>Не могу запустить сервер: %1.</translation>
+        <translation type="obsolete">Не могу запустить сервер: %1.</translation>
     </message>
     <message>
         <source>Unable to connect to the database: %1.</source>
-        <translation>Не могу соединиться в БД: %1.</translation>
-    </message>
-    <message>
-        <source>&amp;URL:</source>
-        <translation></translation>
+        <translation type="obsolete">Не могу соединиться в БД: %1.</translation>
     </message>
     <message>
         <source>Please enter the URL for system where you want send datas.</source>
-        <translation>Укажите URL для объекта, на который вы хотите отправить данные.</translation>
+        <translation type="obsolete">Укажите URL для объекта, на который вы хотите отправить данные.</translation>
     </message>
     <message>
         <source>Send</source>
-        <translation>Отправить как сообщение</translation>
+        <translation type="obsolete">Отправить как сообщение</translation>
     </message>
     <message>
         <source>Quit</source>
-        <translation>Выход</translation>
+        <translation type="obsolete">Выход</translation>
     </message>
     <message>
         <source>Sendind data %1.</source>
-        <translation>Передача данных %1.</translation>
+        <translation type="obsolete">Передача данных %1.</translation>
     </message>
     <message>
         <source>Data transfer canceled.</source>
-        <translation>Передача данных отменена.</translation>
+        <translation type="obsolete">Передача данных отменена.</translation>
     </message>
     <message>
         <source>Data transfer http %1 complete.</source>
-        <translation>Передача данных завершена успешно (%1).</translation>
-    </message>
-    <message>
-        <source>DynamicDocs Interactor </source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>DynamicDocs Interactor</source>
-        <translation></translation>
+        <translation type="obsolete">Передача данных завершена успешно (%1).</translation>
     </message>
     <message>
         <source>ERROR: Data transfer failed: %1.</source>
-        <translation>ОШИБКА: передача данных завершилась с ошибкой: %1.</translation>
+        <translation type="obsolete">ОШИБКА: передача данных завершилась с ошибкой: %1.</translation>
     </message>
 </context>
 <context>
@@ -2373,6 +2640,25 @@ Do you want to save the changes before closing?</source>
     </message>
 </context>
 <context>
+    <name>KKSAValWidget</name>
+    <message>
+        <source>Previous value</source>
+        <translation>Предыдущее значение</translation>
+    </message>
+    <message>
+        <source>Next value</source>
+        <translation>Следующее значение</translation>
+    </message>
+    <message>
+        <source>&amp;Close</source>
+        <translation>&amp;Закрыть</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>секунды</translation>
+    </message>
+</context>
+<context>
     <name>KKSAbout</name>
     <message>
         <source>Version %1</source>
@@ -2477,6 +2763,53 @@ Do you want to save the changes before closing?</source>
     </message>
 </context>
 <context>
+    <name>KKSAttrHistModel</name>
+    <message>
+        <source>&lt;Image data %1&gt;</source>
+        <translation>&lt;Фрагмент изображения %1&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;SVG data %1&gt;</source>
+        <translation>&lt;Фрагмент файла SVG %1&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;XML document %1&gt;</source>
+        <translation>&lt;Фрагмент XML документа %1&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Video data %1&gt;</source>
+        <translation>&lt;Фрагмент видео-файла %1&gt;</translation>
+    </message>
+    <message>
+        <source>Id</source>
+        <translation>ИД</translation>
+    </message>
+    <message>
+        <source>Start time</source>
+        <translation>Начало актуальности</translation>
+    </message>
+    <message>
+        <source>Stop time</source>
+        <translation>Окончание актуальности</translation>
+    </message>
+    <message>
+        <source>Value</source>
+        <translation>Значение</translation>
+    </message>
+    <message>
+        <source>Source</source>
+        <translation>Источник</translation>
+    </message>
+    <message>
+        <source>Transfer</source>
+        <translation>Довел</translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation>Описание</translation>
+    </message>
+</context>
+<context>
     <name>KKSAttrModel</name>
     <message>
         <source>Mandatory</source>
@@ -2493,6 +2826,10 @@ Do you want to save the changes before closing?</source>
     <message>
         <source>Name</source>
         <translation>Название</translation>
+    </message>
+    <message>
+        <source>Default value</source>
+        <translation>Значение по умолчанию</translation>
     </message>
 </context>
 <context>
@@ -2625,6 +2962,18 @@ Do you want to save the changes before closing?</source>
     <message>
         <source>Select attribute</source>
         <translation>Выберите атрибут</translation>
+    </message>
+    <message>
+        <source>Add/edit group of attributes</source>
+        <translation>Добавить/редактировать группу атрибутов</translation>
+    </message>
+    <message>
+        <source>Set attribute</source>
+        <translation>Задать атрибут</translation>
+    </message>
+    <message>
+        <source>Category attribute is null</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2762,7 +3111,7 @@ Do you want to save the changes before closing?</source>
     </message>
     <message>
         <source>Category</source>
-        <translation>Категория</translation>
+        <translation type="obsolete">Категория</translation>
     </message>
     <message>
         <source>Category is not saved</source>
@@ -2867,6 +3216,14 @@ Do you want to save the changes before closing?</source>
     <message>
         <source>Error in life cycle save</source>
         <translation>Не могу сохранить жизненный цикл</translation>
+    </message>
+    <message>
+        <source>There are documents created by category %1, operations with attributes are unavailable</source>
+        <translation>В БД существуют информационные объекты, созданные по категории %1, операции с атрибутами будут недоступны</translation>
+    </message>
+    <message>
+        <source>Category %1 is not saved</source>
+        <translation>Категория %1 не сохранена в БД</translation>
     </message>
 </context>
 <context>
@@ -4323,6 +4680,14 @@ Please connect to your system administrator.</source>
         <source>Открыть жизненный цикл...</source>
         <translation></translation>
     </message>
+    <message utf8="true">
+        <source>Журнал распоряжений, команд и сообщений</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Окно отладочных сообщений</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>KKSMessageWidget</name>
@@ -4757,7 +5122,7 @@ try to rename it with extention. Example: filename.vsd</source>
     </message>
     <message>
         <source>Only admin and author can change search template</source>
-        <translation>Только Администратор и автор могут изменять шаблон поиска</translation>
+        <translation type="obsolete">Только Администратор и автор могут изменять шаблон поиска</translation>
     </message>
     <message>
         <source>Only admin and author can delete search template %1</source>
@@ -5161,6 +5526,42 @@ Please save it before creating new records in it.</source>
         <source>Cannot add state into life cycle %1, Db error</source>
         <translation>Не могу добавить состояние в жизненный цикл %1, Ошибка БД</translation>
     </message>
+    <message>
+        <source>Search by templates</source>
+        <translation>Поиск по шаблону</translation>
+    </message>
+    <message>
+        <source>Search template %1 cannot been applied onto this reference</source>
+        <translation>Поисковый запрос %1 не может быть применен к данному справочнику</translation>
+    </message>
+    <message>
+        <source>Save search template</source>
+        <translation>Сохранить шаблон поиска</translation>
+    </message>
+    <message>
+        <source>Cannot save search template, Error!</source>
+        <translation>Не могу сохранить шаблон поиска, Ошибка!</translation>
+    </message>
+    <message>
+        <source>Apply search template</source>
+        <translation>Применить шаблон поиска</translation>
+    </message>
+    <message>
+        <source>Cannot load search template %1 from DB</source>
+        <translation>Не могу загрузить шаблон поиска из БД</translation>
+    </message>
+    <message>
+        <source>No convenient references for search</source>
+        <translation>Нет соответствующего справочника для поиска</translation>
+    </message>
+    <message>
+        <source>Select reference</source>
+        <translation>Выберите справочник</translation>
+    </message>
+    <message>
+        <source>Search template type name</source>
+        <translation>Название типа поискового запроса</translation>
+    </message>
 </context>
 <context>
     <name>KKSOrganizationAddrForm</name>
@@ -5481,6 +5882,181 @@ This is not allowed!</source>
     </message>
 </context>
 <context>
+    <name>KKSSearchTemplateForm</name>
+    <message>
+        <source>Attribute :</source>
+        <translation>Атрибут :</translation>
+    </message>
+    <message>
+        <source>Operation :</source>
+        <translation>Операция :</translation>
+    </message>
+    <message>
+        <source>Value :</source>
+        <translation>Значение :</translation>
+    </message>
+    <message>
+        <source>Add &amp;filter</source>
+        <translation>Добавить &amp;фильтр</translation>
+    </message>
+    <message>
+        <source>Attribute</source>
+        <translation>Атрибут</translation>
+    </message>
+    <message>
+        <source>Operation</source>
+        <translation>Операция</translation>
+    </message>
+    <message>
+        <source>Value</source>
+        <translation>Значение</translation>
+    </message>
+    <message>
+        <source>Group operation</source>
+        <translation>Групповая операция</translation>
+    </message>
+    <message>
+        <source>Show SQL</source>
+        <translation>Показать SQL</translation>
+    </message>
+    <message>
+        <source>Equal</source>
+        <translation>Равно</translation>
+    </message>
+    <message>
+        <source>Not equal</source>
+        <translation>Не равно</translation>
+    </message>
+    <message>
+        <source>Greather</source>
+        <translation>Больше</translation>
+    </message>
+    <message>
+        <source>Not fewer</source>
+        <translation>Не меньше</translation>
+    </message>
+    <message>
+        <source>Fewer</source>
+        <translation>Меньше</translation>
+    </message>
+    <message>
+        <source>Not greather</source>
+        <translation>Не больше</translation>
+    </message>
+    <message>
+        <source>Contain (LIKE &apos;%AAA%&apos;)</source>
+        <translation>Содержит (LIKE &apos;%AAA%&apos;)</translation>
+    </message>
+    <message>
+        <source>Start with (LIKE &apos;AAA%&apos;)</source>
+        <translation>Начинается с (LIKE &apos;AAA%&apos;)</translation>
+    </message>
+    <message>
+        <source>End with (LIKE &apos;%AAA&apos;)</source>
+        <translation>Оканчивается на (LIKE &apos;%AAA&apos;)</translation>
+    </message>
+    <message>
+        <source>Correspond to template (LIKE &apos;AAA&apos;)</source>
+        <translation>Соответствует шаблону (LIKE &apos;AAA&apos;)</translation>
+    </message>
+    <message>
+        <source>Involve</source>
+        <translation>Включает в себя</translation>
+    </message>
+    <message>
+        <source>Not involve</source>
+        <translation>Не включает в себя</translation>
+    </message>
+    <message>
+        <source>Is null (NULL)</source>
+        <translation>Не имеет значения (NULL)</translation>
+    </message>
+    <message>
+        <source>Is not null (NOT NULL)</source>
+        <translation>Имеет значение (NOT NULL)</translation>
+    </message>
+    <message>
+        <source>Search by all attributes</source>
+        <translation>Поиск по всем атрибутам</translation>
+    </message>
+    <message>
+        <source>Case sensitive</source>
+        <translation>Чувствительно к регистру</translation>
+    </message>
+    <message>
+        <source>is not set</source>
+        <translation>не задано</translation>
+    </message>
+    <message>
+        <source>...</source>
+        <translation>...</translation>
+    </message>
+    <message>
+        <source>Hide SQL</source>
+        <translation>Скрыть SQL</translation>
+    </message>
+    <message>
+        <source>Incorrect value for selected attribute and operation!</source>
+        <translation>Некорректное значение для выбранного атрибута и операции!</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Ошибка</translation>
+    </message>
+    <message>
+        <source>Cannot create another group in the top level</source>
+        <translation>Невозможно создать вторую группу на верхнем уровне</translation>
+    </message>
+    <message>
+        <source>Create group</source>
+        <translation>Создать группу</translation>
+    </message>
+    <message>
+        <source>AND</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OR</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group</source>
+        <translation>Группа</translation>
+    </message>
+    <message>
+        <source>is set</source>
+        <translation>задано</translation>
+    </message>
+    <message>
+        <source>Open Image File</source>
+        <translation>Открыть файл рисунка</translation>
+    </message>
+    <message>
+        <source>Images (*.png *.xpm *.jpg *.PNG *.XPM *.JPG)</source>
+        <translation>Изображения (*.png *.xpm *.jpg *.PNG *.XPM *.JPG)</translation>
+    </message>
+    <message>
+        <source>Cannot load %1.</source>
+        <translation>Не могу загрузить %1.</translation>
+    </message>
+    <message>
+        <source>Save search template</source>
+        <translation>Сохранить шаблон поиска</translation>
+    </message>
+    <message>
+        <source>Set name of search template</source>
+        <translation>Задать название шаблону поиска</translation>
+    </message>
+    <message>
+        <source>Set category</source>
+        <translation>Задать категорию</translation>
+    </message>
+    <message>
+        <source>Category does not set</source>
+        <translation>Категория не задана</translation>
+    </message>
+</context>
+<context>
     <name>KKSSearchTemplateModel</name>
     <message>
         <source>Search criteria</source>
@@ -5523,11 +6099,11 @@ This is not allowed!</source>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation>&amp;OK</translation>
+        <translation type="obsolete">&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation>&amp;Отмена</translation>
+        <translation type="obsolete">&amp;Отмена</translation>
     </message>
     <message>
         <source>Search templates</source>
@@ -5576,6 +6152,38 @@ This is not allowed!</source>
     <message>
         <source>Cannot delete type %1, it is not empty</source>
         <translation>Запрещено удалять непустой тип %1</translation>
+    </message>
+    <message>
+        <source>&amp;Refresh model</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>E&amp;xecute search template</source>
+        <translation>Выполнить поисковый запрос</translation>
+    </message>
+    <message>
+        <source>Search in results</source>
+        <translation>Поиск в найденном</translation>
+    </message>
+    <message>
+        <source>Refresh search templates</source>
+        <translation>обновить список поисковых запросов</translation>
+    </message>
+    <message>
+        <source>Execute selected search template</source>
+        <translation>Выполнить выбранный поисковый запрос</translation>
+    </message>
+    <message>
+        <source>Filter :</source>
+        <translation>Фильтр:</translation>
+    </message>
+    <message>
+        <source>Search template application</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select search template</source>
+        <translation>Выбрать поисковый запрос</translation>
     </message>
 </context>
 <context>
@@ -5843,6 +6451,10 @@ Further work is impossible. You should use equal versions of client and server s
     <message>
         <source>Transport port</source>
         <translation>Порт транспорта</translation>
+    </message>
+    <message>
+        <source>Transport use gateway</source>
+        <translation>Транспорт использует шлюз</translation>
     </message>
 </context>
 <context>
@@ -6147,6 +6759,14 @@ Further work is impossible. You should use equal versions of client and server s
     <message>
         <source>Syncronize</source>
         <translation>Синхронизировать</translation>
+    </message>
+    <message>
+        <source>Set document</source>
+        <translation>Задать информационный объект</translation>
+    </message>
+    <message>
+        <source>Cannot drop syncronization for already global document</source>
+        <translation>Не могу отменить синхронизацию, для глобальных информационных объектов</translation>
     </message>
 </context>
 <context>
@@ -6713,6 +7333,38 @@ Further work is impossible. You should use equal versions of client and server s
     <name>MainWindow</name>
     <message>
         <source>File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vectorize</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add &amp;Vector Layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add &amp;Raster Layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add a vector layer to the map window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add a raster layer to the map window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>V</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Layer&apos;s name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Style</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7656,7 +8308,7 @@ Please contact your Systems Administrator and report this issue.</source>
     </message>
     <message>
         <source>MESSAGE.</source>
-        <translation>ОТЛАДКА.</translation>
+        <translation type="obsolete">ОТЛАДКА.</translation>
     </message>
     <message>
         <source>WARNING!</source>
@@ -7668,11 +8320,1408 @@ Please contact your Systems Administrator and report this issue.</source>
     </message>
     <message>
         <source>CRITICAL!</source>
-        <translation>КРИТИЧЕСКАЯ ОШИБКА!</translation>
+        <translation type="obsolete">КРИТИЧЕСКАЯ ОШИБКА!</translation>
     </message>
     <message>
         <source>&lt;Complex value %1&gt;</source>
         <translation>&lt;Составной атрибут %1&gt;</translation>
+    </message>
+    <message>
+        <source>Unable to connect to the database: %1</source>
+        <translation>Не могу соединиться в БД: %1</translation>
+    </message>
+    <message>
+        <source>DynamicDocs Interactor</source>
+        <translation>DynamicDocs (Управление информационным обменом)</translation>
+    </message>
+    <message>
+        <source>CRS undefined - defaulting to project CRS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CRS undefined - defaulting to default CRS: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation>Внимание</translation>
+    </message>
+    <message>
+        <source>Cannot get GDAL raster band: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open GDAL MEM dataset %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot GDALCreateGenImgProjTransformer: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot inittialize GDALWarpOperation : </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot ChunkAndWarpImage: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[GDAL] All files (*)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GDAL/OGR VSIFileHandler</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This raster file has no bands and is invalid as a raster layer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Log started at </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter records by criterion(ia)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter records by preared search templates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add new record</source>
+        <translation>Добавить новую запись справочника</translation>
+    </message>
+    <message>
+        <source>Edit selected record</source>
+        <translation>Редактировать выбранную запись справочника</translation>
+    </message>
+    <message>
+        <source>Delete selected record</source>
+        <translation>Удалить выбранную запись</translation>
+    </message>
+    <message>
+        <source>Import records</source>
+        <translation>Импорт данных</translation>
+    </message>
+    <message>
+        <source>Export records</source>
+        <translation>Экспорт данных</translation>
+    </message>
+    <message>
+        <source>Set view template</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select category</source>
+        <translation>Выбрать категорию</translation>
+    </message>
+    <message>
+        <source>INFO:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DEBUG:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Set of references %1, dbl-click for details&gt;</source>
+        <translation>&lt;Набор значений %1ю Двойной щелчек для просморта&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Set of references %1, dbl-click for details and see result table&gt;</source>
+        <translation>&lt;Набор значений %1ю Двойной щелчек для просморта таблицы&gt;</translation>
+    </message>
+    <message>
+        <source>Ping response reveiced and saved</source>
+        <translation>Запрос на проверку соединения получен и сохранен в БД</translation>
+    </message>
+    <message>
+        <source>Cannot start transaction for message writing</source>
+        <translation>Не могу начать транзакцию для сохранения данных в БД</translation>
+    </message>
+    <message>
+        <source>Cannot rollback transaction for message writing</source>
+        <translation>Не могу выполнить откат транзакции для сохранения данных в БД</translation>
+    </message>
+    <message>
+        <source>Cannot commit transaction for message writing</source>
+        <translation>Не могу завершить транзакцию для сохранения данных в БД</translation>
+    </message>
+    <message>
+        <source>Correct notification result received from gateway</source>
+        <translation>Корректная квитанция получена из шлюза</translation>
+    </message>
+    <message>
+        <source>Cannot execute getLocalOrg()</source>
+        <translation>Не могу выполнить функцию getLocalOrg()</translation>
+    </message>
+    <message>
+        <source>Document (UID = %1) has no categories!</source>
+        <translation>Информационный объект (UID = %1) не имеет категории!</translation>
+    </message>
+    <message>
+        <source>ioSetUpdating(%1) for document with UID = %2 failed!</source>
+        <translation>Функция ioSetUpdating(%1) для ИО с UID = %2 завершилась с ошибкой!</translation>
+    </message>
+    <message>
+        <source>ioUpdate() for document with UID = %1 failed</source>
+        <translation>Функция ioUpdate() для ИО с UID = %1 завершилась с ошибкой</translation>
+    </message>
+    <message>
+        <source>ioUpdateAttrEx() for document with UID = %1 failed!</source>
+        <translation>Функция ioUpdateAttrEx() для ИО с UID = %1 завершилась с ошибкой!</translation>
+    </message>
+    <message>
+        <source>parseCategories() for rubrics for document with UID = %1 failed!</source>
+        <translation>Функция parseCategories() для ИО с UID = %1 завершилась с ошибкой!</translation>
+    </message>
+    <message>
+        <source>ioUpdateInclude() for document with UID = %1 failed!</source>
+        <translation>Функция ioUpdateInclude() для ИО с UID = %1 завершилась с ошибкой!</translation>
+    </message>
+    <message>
+        <source>rRemoveObjUrl() for document with UID = %1 failed!</source>
+        <translation>Функция rRemoveObjUrl() для ИО с UID = %1 завершилась с ошибкой!</translation>
+    </message>
+    <message>
+        <source>parseCategories() for addition tables for document with UID = %1 failed!</source>
+        <translation>Функция parseCategories() для дополнительных таблиц ИО с UID = %1 завершилась с ошибкой!</translation>
+    </message>
+    <message>
+        <source>ioupdatetable() for addition tables for document with UID = %1 failed!</source>
+        <translation>Функция ioUpdateTable() для дополнительных таблиц ИО с UID = %1 завершилась с ошибкой!</translation>
+    </message>
+    <message>
+        <source>ioSetCompleted() for document with UID = %1 failed!</source>
+        <translation>Функция ioSetCompleted() для ИО с UID = %1 завершилась с ошибкой!</translation>
+    </message>
+    <message>
+        <source>ioInsert() for document with UID = %1 failed</source>
+        <translation>Функция ioInsert() для ИО с UID = %1 завершилась с ошибкой</translation>
+    </message>
+    <message>
+        <source>ioGetObject(%1) for document with UID = %2 failed!</source>
+        <translation>Функция ioGetObject(%1) для ИО с UID = %2 завершилась с ошибкой!</translation>
+    </message>
+    <message>
+        <source>ioInsertAttrEx() for document with UID = %1 failed! SQL = %2</source>
+        <translation>Функция ioInsertAttrEx() для ИО с UID = %1 завершилась с ошибкой! SQL = %2</translation>
+    </message>
+    <message>
+        <source>ioInsertAttrEx() for document with UID = %1 failed! Result is 0, but value is not NULL! SQL = %2</source>
+        <translation>Функция ioInsertAttrEx() для ИО с UID = %1 завершилась с ошибкой!Результат = 0, но значение атрибута не NULL! SQL = %2</translation>
+    </message>
+    <message>
+        <source>ioinsertinclude() for document with UID = %1 failed!</source>
+        <translation>Функция ioInsertInclude() для ИО с UID = %1 завершилась с ошибкой!</translation>
+    </message>
+    <message>
+        <source>ioinserttable() for document with UID = %1 failed!</source>
+        <translation>Функция ioInsertTable() для ИО с UID = %1 завершилась с ошибкой!</translation>
+    </message>
+    <message>
+        <source>cjInsertEx() for document with UID = %1 failed!</source>
+        <translation>Функция cjInsertEx() для ИО с UID = %1 завершилась с ошибкой!</translation>
+    </message>
+    <message>
+        <source>cjSetAsResult() for document with UID = %1 failed!</source>
+        <translation>Функция cjSetAsResult() для ИО с UID = %1 завершилась с ошибкой!</translation>
+    </message>
+    <message>
+        <source>Error in command journal</source>
+        <translation>Произошла ошибка при работе с журналом команд</translation>
+    </message>
+    <message>
+        <source>Cannot set privilegies</source>
+        <translation>Не могу задать права доступа</translation>
+    </message>
+    <message>
+        <source>Cannot set document as completed</source>
+        <translation>Не могу пометить документ как глобальный</translation>
+    </message>
+    <message>
+        <source>parseCategories() for addition tables IdObject = %1 failed!</source>
+        <translation>Функция parseCategories() для дополнительных таблиц ИО с ID = %1 завершилась с ошибкой!</translation>
+    </message>
+    <message>
+        <source>ioinserttable() for addition tables IdObject = %1 failed!</source>
+        <translation>Функция ioInsertTable() для дополнительных таблиц ИО с ID = %1 завершилась с ошибкой!</translation>
+    </message>
+    <message>
+        <source>Cannot set privilegies for the document with ID = %1</source>
+        <translation>Не могу задать права доступа для ИО с UID = %1</translation>
+    </message>
+    <message>
+        <source>Error: unknown message type</source>
+        <translation type="unfinished">Ошибка: Неизвестный тип сообщения</translation>
+    </message>
+    <message>
+        <source>Error in command creation! SQL = %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>cinsert() for categoryUID = %1 failed!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>acInsert() failed! Result = %1 SQL = %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>aaInsert() for complex attribute fail! SQL = %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>cInsertRubric() fail! SQL = %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>setAsSended failed! SQL = %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>setAsNotSended failed! SQL = %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Result setAsSended is %1! SQL = %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Result setAsNotSended is %1! SQL = %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>addSyncRecord() error! %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot set file as uploaded! ID = %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>refRecord is NULL!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>writeMessage: ioGetTableNameByUid() fails! SQL = %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>writeMessage: ioGetTableNameByUid() returns NULL value! TableUID = %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>refRecord UID is empty!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SQL query failed! SQL = %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>writeMessage: refRec sync type = %1 but count of records with equal UID in database = %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>writeMessage: category is empty or inconsistent!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>iogetobjectidbyuid() for object UID = %1 failed!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ERROR in SQL query! SQL = %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot insert system parameters for the record! SQL = %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>eioUpdateIndicatorEx() for record with UID = %1 failed!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>recUpdateRubricEx() for refRecord with UID = %1 failed!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>filePart is NULL!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot get abs_url for the file! UID = %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot get ID by UNIQUE_ID for the io_urls record! UID = %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error in SQL query! SQL = %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Category is empty or inconsistent!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot execute query %1. Function error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot execute query %1. Result is %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bad category in refRecord!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot insert record! SQL = %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>eioInsertIndicatorEx() for record with UID = %1 failed!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>writeOrgType Error!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>writeOrgWM Error!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>writeOrgWM Error! 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>insertOrganizationEx() failed! SQL = %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>writeTransport Error!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>query failed! SQL = %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ioInsertSearchTemplate() failed! SQL = %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ioInsertSearchGroup() failed! SQL = %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ioInsertCriterionIntoGroup() failed! SQL = %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ioInsertSearchCriterion() failed! SQL = %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>uGetReceiverEmailPrefix() failed! SQL = %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QgisApp</name>
+    <message>
+        <source>Quantum GIS </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Multiple Instances of QgisApp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Multiple instances of Quantum GIS application object detected.
+Please contact the developers.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Checking database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reading settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Setting up the GUI</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Map canvas. This is where raster and vector layers are displayed when added to the map</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GPS Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Log Messages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Quantum GIS - %1 (&apos;%2&apos;)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>QGIS starting...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Checking provider plugins</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Starting Python</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restoring loaded plugins</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Initializing file filters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restoring window state</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>QGIS Ready!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minimize</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+M</source>
+        <comment>Minimize Window</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minimizes the active window to the dock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggles between a predefined size and the window size set by the user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bring All to Front</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bring forward all open windows</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished">Ошибка</translation>
+    </message>
+    <message>
+        <source>Failed to open Python console:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Panels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toolbars</source>
+        <translation type="unfinished">Панели инструментов</translation>
+    </message>
+    <message>
+        <source>Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vect&amp;or</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Web</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Progress bar that displays the status of rendering layers and other time-intensive operations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle extents and mouse position display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Coordinate:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current map coordinate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shows the map coordinates at the current cursor position. The display is continuously updated as the mouse is moved. It also allows editing to set the canvas center to a given position.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current map coordinate (formatted as x,y)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scale </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current map scale</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Displays the current map scale</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current map scale (formatted as x:y)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop map rendering</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Render</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When checked, the map layers are rendered in response to map navigation commands and other events. When not checked, no rendering is done. This allows you to add a large number of layers and symbolize them before rendering.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle map rendering</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This icon shows whether on the fly coordinate reference system transformation is enabled or not. Click the icon to bring up the project properties dialog to alter this behaviour.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CRS status - Click to open coordinate reference system dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ready</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Map overview canvas. This canvas can be used to display a locator map that shows the current extent of the map canvas. The current extent is shown as a red rectangle. Any layer on the map can be added to the overview canvas.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Overview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Map legend that displays all the layers currently on the map canvas. Click on the check box to turn a layer on or off. Double click on a layer in the legend to customize its appearance and set other properties.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Layers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Control rendering order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Map layer list that displays all layers in drawing order.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Layer order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[ERROR] Can not make qgis.db private copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Private qgis.db</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open qgis.db</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Migration of private qgis.db failed.
+%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>QGIS version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>QGIS code revision</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Compiled against Qt</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Running against Qt</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Compiled against GDAL/OGR</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Running against GDAL/OGR</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GEOS Version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PostgreSQL Client Version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SpatiaLite Version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>QWT Version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This copy of QGIS writes debugging output.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 doesn&apos;t have any layers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Data Source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 is not a valid or recognized data source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select raster layers to add...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Raster</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select vector layers to add...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PostgreSQL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot get PostgreSQL select dialog from provider.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 is an invalid layer - not loaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 is an invalid layer and cannot be loaded.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SpatiaLite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot get SpatiaLite select dialog from provider.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MSSQL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot get MSSQL select dialog from provider.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>WMS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot get WMS select dialog from provider.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>WFS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot get WFS select dialog from provider.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Calculating...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Abort...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose a QGIS project file to open</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>QGis files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>QGIS Project Read Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to open project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose a QGIS project file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Saved project to: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to save project %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose a file name to save the QGIS project file as</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to load %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose a file name to save the map image as</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Saved map image to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Labeling</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please select a vector layer first.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Saving done</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export to vector file has been completed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export to vector file failed.
+Error: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Layer Selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To delete features, you must select a vector layer in the legend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Vector Layer Selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deleting features only works on vector layers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Provider does not support deletion</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Data provider does not support deleting features</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Layer not editable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The current layer is not editable. Choose &apos;Start editing&apos; in the digitizing toolbar.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete features</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Delete %n feature(s)?</source>
+        <comment>number of features to delete</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Features deleted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Problem deleting features</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A problem occured during deletion of features</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Merging features...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Abort</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Composer %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No active layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No active layer found. Please select a layer in the layer list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Active layer is not vector</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The merge features tool only works on vector layers. Please select a vector layer from the layer list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Merging features can only be done for layers in editing mode. To use the merge tool, go to  Layer-&gt;Toggle editing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not enough features selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The merge tool requires at least two selected features</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Merged feature attributes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Merge failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error occured during the merge operation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Union operation canceled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The union operation would result in a geometry type that is not compatible with the current layer and therefore is canceled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Merged features</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Features cut</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Features pasted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot copy style: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot parse style: %1:%2:%3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot read style: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not commit changes to layer %1
+
+Errors: %2
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start editing failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Provider cannot be opened for editing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop editing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do you want to save the changes to layer %1?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Problems during roll back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid scale</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tile scale</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t load Python support library: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t resolve python support library&apos;s instance() symbol.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Python support ENABLED :-) </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There is a new version of QGIS available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are running a development version of QGIS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are running the current version of QGIS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Would you like more information?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>QGIS Version Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>QGIS - Changes since last release</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to get current version information from server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection refused - server may be down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>QGIS server was not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown network socket error: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to communicate with QGIS Version server
+%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To perform a full histogram stretch, you need to have a raster layer selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Raster Layer Selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Valid Raster Layer Selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To perform a local histogram stretch, you need to have a grayscale or multiband (multiband single layer, singleband grayscale or multiband color)  raster layer selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To perform a local histogram stretch, you need to have a raster layer selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Layer is not valid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The layer %1 is not a valid layer and can not be added to the map</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The layer is not a valid layer and can not be added to the map</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do you want to save the current project?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current CRS: %1 (OTFR enabled)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current CRS: %1 (OTFR disabled)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Map coordinates for the current view extents</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Map coordinates at mouse cursor position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Extents:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maptips require an active layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n feature(s) selected on layer %1.</source>
+        <comment>number of selected features</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Open a GDAL Supported Raster Data Source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 is not a valid or recognized raster data source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 is not a supported raster data source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsupported Data Source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p&gt;This project file was saved by an older version of QGIS. When saving this project file, QGIS will update it to the latest version, possibly rendering it useless for older versions of QGIS.&lt;p&gt;Even though QGIS developers try to maintain backwards compatibility, some of the information from the old project file might be lost. To improve the quality of QGIS, we appreciate if you file a bug report at %3. Be sure to include the old project file, and state the version of QGIS you used to discover the error.&lt;p&gt;To remove this warning when opening an older project file, uncheck the box &apos;%5&apos; in the %4 menu.&lt;p&gt;Version of the project file: %1&lt;br&gt;Current version of QGIS: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tt&gt;Settings:Options:General&lt;/tt&gt;</source>
+        <comment>Menu path to setting options</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warn me when opening a project file saved with an older version of QGIS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Project file is older</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This project file was saved by an older version of QGIS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation type="unfinished">Внимание</translation>
+    </message>
+    <message>
+        <source>This layer doesn&apos;t have a properties dialog.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Authentication required</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Proxy authentication required</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SSL errors occured accessing URL %1:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>
+
+Always ignore these errors?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n SSL errors occured</source>
+        <comment>number of errors</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>QgsGdalProvider</name>
+    <message>
+        <source>Dataset Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Band %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dimensions:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>X: %1 Y: %2 Bands: %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Origin:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pixel Size:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>out of extent</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>null (no data)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Average Magphase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Average</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QgsLegend</name>
+    <message>
+        <source>sub-group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Legend context</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Make to Toplevel Item</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom to Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Set Group CRS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Group Selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy Style</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paste Style</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Add New Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Expand All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Collapse All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Update Drawing Order</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QgsLegendLayer</name>
+    <message>
+        <source>&amp;Zoom to Layer Extent</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Zoom to Best Scale (100%)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Stretch Using Current Extent</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Show in Overview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Set Layer CRS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set &amp;Project CRS from Layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Open Attribute Table</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save As...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Selection As...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Query...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Feature Count</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Properties</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Updating feature count for layer %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Abort</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8668,6 +10717,26 @@ Please contact your Systems Administrator and report this issue.</source>
         <source>Exit</source>
         <translation type="unfinished">Выход</translation>
     </message>
+    <message>
+        <source>Legend:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close Application</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+W</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Project</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>StringEdit</name>
@@ -9037,7 +11106,7 @@ Please contact your Systems Administrator and report this issue.</source>
     </message>
     <message>
         <source>Identificator transport in system (for tcp/ip protocol has to be 1, for http-protocol has to be 2)</source>
-        <translation type="unfinished"></translation>
+        <translation>ИД транспорта (для TCP/IP = 1)</translation>
     </message>
 </context>
 <context>
@@ -9111,11 +11180,11 @@ Please contact your Systems Administrator and report this issue.</source>
     <name>attr_history</name>
     <message>
         <source>Altered attribute history</source>
-        <translation>История изменений атрибута</translation>
+        <translation type="obsolete">История изменений атрибута</translation>
     </message>
     <message>
         <source>Alteration history</source>
-        <translation>История изменений</translation>
+        <translation type="obsolete">История изменений</translation>
     </message>
     <message>
         <source>Properties</source>
@@ -9132,6 +11201,18 @@ Please contact your Systems Administrator and report this issue.</source>
     <message>
         <source>Group:</source>
         <translation>Группа:</translation>
+    </message>
+    <message>
+        <source>History of attribute changes</source>
+        <translation>История изменения значений атрибута</translation>
+    </message>
+    <message>
+        <source>History of changes</source>
+        <translation>История значений</translation>
+    </message>
+    <message>
+        <source>&amp;Close</source>
+        <translation>&amp;Закрыть</translation>
     </message>
 </context>
 <context>
@@ -9643,36 +11724,36 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished">Не могу соединиться в БД: %1.</translation>
     </message>
     <message>
-        <source>&amp;URL:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Please enter the URL for system where you want send datas.</source>
-        <translation type="unfinished">Укажите URL для объекта, на который вы хотите отправить данные.</translation>
+        <translation type="obsolete">Укажите URL для объекта, на который вы хотите отправить данные.</translation>
     </message>
     <message>
         <source>Send</source>
-        <translation type="unfinished">Отправить как сообщение</translation>
+        <translation type="obsolete">Отправить как сообщение</translation>
     </message>
     <message>
         <source>Quit</source>
-        <translation type="unfinished">Выход</translation>
+        <translation type="obsolete">Выход</translation>
     </message>
     <message>
         <source>Sendind data %1.</source>
-        <translation type="unfinished">Передача данных %1.</translation>
+        <translation type="obsolete">Передача данных %1.</translation>
     </message>
     <message>
         <source>Data transfer canceled.</source>
-        <translation type="unfinished">Передача данных отменена.</translation>
+        <translation type="obsolete">Передача данных отменена.</translation>
     </message>
     <message>
         <source>ERROR: Data transfer failed: %1.</source>
-        <translation type="unfinished">ОШИБКА: передача данных завершилась с ошибкой: %1.</translation>
+        <translation type="obsolete">ОШИБКА: передача данных завершилась с ошибкой: %1.</translation>
     </message>
     <message>
         <source>Data transfer http %1 complete.</source>
-        <translation type="unfinished">Передача данных завершена успешно (%1).</translation>
+        <translation type="obsolete">Передача данных завершена успешно (%1).</translation>
+    </message>
+    <message>
+        <source>ERROR: Data transfer for requestId = %1 failed: %2</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9779,17 +11860,45 @@ activity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Data base
-activity</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Initial
 syncronization</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Transmition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Database
+activity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Interaction monitor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>false</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Button test</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>poll</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>display log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>initial synch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>param</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -9947,6 +12056,30 @@ syncronization</source>
     <message>
         <source>Add &amp;group</source>
         <translation>Добавить &amp;группу</translation>
+    </message>
+    <message>
+        <source>Search Filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search Template Parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search template name :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search template type :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>...</source>
+        <translation type="unfinished">...</translation>
+    </message>
+    <message>
+        <source>Search template category :</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10727,6 +12860,77 @@ syncronization</source>
     </message>
 </context>
 <context>
+    <name>kkssearch_template_form</name>
+    <message>
+        <source>Search template editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S&amp;how SQL</source>
+        <translation type="unfinished">Показать &amp;SQL</translation>
+    </message>
+    <message>
+        <source>&amp;Save to DB</source>
+        <translation type="unfinished">&amp;Сохранение в БД</translation>
+    </message>
+    <message>
+        <source>&amp;Load from DB</source>
+        <translation type="unfinished">&amp;Загрузить из БД</translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation type="unfinished">&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Отмена</translation>
+    </message>
+    <message>
+        <source>Search Filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create filter group</source>
+        <translation type="unfinished">Создать группу фильтров</translation>
+    </message>
+    <message>
+        <source>with operator OR</source>
+        <translation type="unfinished">с операцией ИЛИ</translation>
+    </message>
+    <message>
+        <source>with operator AND</source>
+        <translation type="unfinished">с операцией И</translation>
+    </message>
+    <message>
+        <source>Add &amp;group</source>
+        <translation type="unfinished">Добавить &amp;группу</translation>
+    </message>
+    <message>
+        <source>Set filter</source>
+        <translation type="unfinished">Параметры фильтра</translation>
+    </message>
+    <message>
+        <source>Search Template Parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search template name :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search template type :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search template category :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Description :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Описание :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+</context>
+<context>
     <name>login</name>
     <message>
         <source>&amp;Cancel</source>
@@ -11021,6 +13225,24 @@ System Error &apos;%1&apos;
     <message utf8="true">
         <source>Отмена</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>netThread</name>
+    <message>
+        <source>Button test</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>param</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>networkStream</name>
+    <message>
+        <source>Button test</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -11386,6 +13608,42 @@ System Error &apos;%1&apos;
         <source>Time sets  in milisecunds (60 ms = 1 sec)</source>
         <translation>Время задается в миллисекундах (60 мс = 1 сек)</translation>
     </message>
+    <message>
+        <source>Timer params</source>
+        <translation>Параметры таймера</translation>
+    </message>
+    <message>
+        <source>Timer interval:</source>
+        <translation>Интервал опроса БД:</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>секунды</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>минут(ы)</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>часы</translation>
+    </message>
+    <message>
+        <source>Do not start timer (will be started manually later)</source>
+        <translation>Не запускать таймер (будет запущен вручную позднее)</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Отмена</translation>
+    </message>
+    <message>
+        <source>Time sets  in milliseconds (60 ms = 1 sec)</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>transport_settings_form</name>
@@ -11439,7 +13697,7 @@ System Error &apos;%1&apos;
     </message>
     <message>
         <source>Http client (connect to:)</source>
-        <translation>Хост (на который передаются данные)</translation>
+        <translation type="obsolete">Хост (на который передаются данные)</translation>
     </message>
     <message>
         <source>host :</source>
@@ -11468,6 +13726,10 @@ System Error &apos;%1&apos;
     <message>
         <source>Id transport</source>
         <translation>ИД транспортной задачи :</translation>
+    </message>
+    <message>
+        <source>Gateway (connect to):</source>
+        <translation>Шлюз:</translation>
     </message>
 </context>
 </TS>

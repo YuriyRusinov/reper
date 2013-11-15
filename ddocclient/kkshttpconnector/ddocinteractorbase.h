@@ -14,6 +14,8 @@ class __HTTP_CONNECTOR_EXPORT DDocInteractorBase : public QObject
 {
     Q_OBJECT
 public:
+    friend class DDocInteractorWindow;
+
     DDocInteractorBase(QObject * parent);
     ~DDocInteractorBase();
 
@@ -36,7 +38,8 @@ signals:
     void sendingStarted();//генерируется, когда происходит в потоке чтения БД получение данных и их отправка получателю
     void sendingCompleted();//генерируется, когда отправка данных получателю завершена
     void startSending();//генерируется, когда нажата кнопка "start" и необходимо начать опрос БД и отправку данных (в ручном режиме)
-    void showStatusText(QString);//генерируется, когда требуется вывести на форму нектороый текст о текущем состоянии отправки данных
+    //void showStatusText(QString);//генерируется, когда требуется вывести на форму нектороый текст о текущем состоянии отправки данных
+    void refreshTimer(int interval); //изменить значение интервала таймера
 
     void theSignal();
     void exitThreads();//генерируется, когда требуется завершить работу потоков

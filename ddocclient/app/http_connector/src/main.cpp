@@ -25,7 +25,7 @@
 
 #include <ddocinteractorwindow.h>
 #include <ddocinteractorbase.h>
-#include "timerform.h"
+#include <timerform.h>
 #include "transportsettingsform.h"
 #include "kkssito.h"
 #include "kksdebug.h"
@@ -65,20 +65,26 @@ int main(int argc, char *argv[])
     //Init timer settings
     //////////
 
-    int interval = 36000; //in msec. = 600 sec, = 10 min
-    bool mode = true; //true = manual
+    int intervalMs = 10000;
+    int interval = 10;
+    int units = 0;//seconds
+    bool mode = false; //true = manual
+
     TimerForm * timerForm = new TimerForm ();
     if (!timerForm){
         return 1;
     }
+
+    timerForm->init(interval, units, mode, true);
     
     if (timerForm->exec () != QDialog::Accepted){
-		mode = true; //manual
+		delete timerForm;
+        return 1;
     }
     else
     {
-		mode = false;//auto
-        interval = timerForm->getTimer();
+		mode = timerForm->startManually();
+        intervalMs = timerForm->getTimerMs();
     }
     delete timerForm;
 
@@ -88,10 +94,11 @@ int main(int argc, char *argv[])
 
     DDocInteractorWindow httpWin;
     DDocInteractorBase * m_base = new DDocInteractorBase(NULL);
-
+    
+    httpWin.setTimerParams(interval, units, mode);
     httpWin.setInteractorBase(m_base);    
 
-    int ok = m_base->start(mode, interval);
+    int ok = m_base->start(mode, intervalMs);
     if(ok != 1)
         return 1;
 

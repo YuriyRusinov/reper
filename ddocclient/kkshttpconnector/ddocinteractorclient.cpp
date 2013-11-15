@@ -100,6 +100,14 @@ void DDocInteractorClient::createTimer()
 	}
 }
 
+void DDocInteractorClient::slotRefreshTimer(int interval)
+{
+    if(interval < 0)
+        return;
+
+    m_timer->setInterval(interval);
+}
+
 void DDocInteractorClient::startProc()
 
 {
@@ -113,7 +121,7 @@ void DDocInteractorClient::startProc()
         m_timer->stop();
     }
     
-    emit showStatusText(tr("Waiting for data to sent..."));
+    //emit showStatusText(tr("Waiting for data to sent..."));
     //kksInfo() << tr("Waiting for data to sent...");
    
     QStringList receivers;
@@ -229,7 +237,7 @@ void DDocInteractorClient::startProc()
                             .arg(m_parent->cntFilePartsSended);
 
     kksWarning() << msg;
-    emit showStatusText(msg);
+    //emit showStatusText(msg);
     
 
     if(m_parent->msgForSent > 0 )
@@ -287,7 +295,7 @@ void DDocInteractorClient::startProc()
                                 .arg(m_parent->cntFilesSended)
                                 .arg(m_parent->filePartsForSent)
                                 .arg(m_parent->cntFilePartsSended);
-        emit showStatusText(msg);
+        //emit showStatusText(msg);
         kksInfo() << msg;
         
 
@@ -423,7 +431,7 @@ void DDocInteractorClient::httpRequestFinished(int requestId, bool error)
                             .arg(m_parent->filePartsForSent)
                             .arg(m_parent->cntFilePartsSended);
     
-    emit showStatusText(msg);
+    //emit showStatusText(msg);
     kksInfo() << msg;
 
     //если мы отправляли часть файла и она не является последней

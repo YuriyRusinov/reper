@@ -108,12 +108,12 @@ void DDocInteractorServer::loadData(int socketDescriptor)
 
     QHttpRequestHeader header( all_data );
 
-    kksInfo() << tr("New income data found on socket. Start processing...");
-
     bool b = header.hasContentLength();
 
     if(b)
     {
+        kksInfo() << tr("New income data found on socket. Start processing...");
+
         int sz_dt = header.contentLength();
         all_data = all_data.right(sz_dt); 
 
@@ -137,7 +137,7 @@ void DDocInteractorServer::loadData(int socketDescriptor)
      }
     else
     {
-        kksCritical() << tr("Correct data does not found in incomming request");
+        kksCritical() << tr("New income data found on socket. But correct data does not found in incomming request");
         sendBadBlock(clientConnection);
     }
 
@@ -213,6 +213,7 @@ int DDocInteractorServer::processMessage(QMap <QString, QByteArray> &post_data, 
     //и если их кол-во равно кол-ву подготовленных для отправко - сгенерировать сигналы
     if(pMessage.getType() == (int)JKKSMessage::atPingResponse){
         JKKSPing * ping = (JKKSPing *)m_loader->unpackMessage(pMessage);
+        kksInfo() << QObject::tr("Ping response received and saved");
         processPingResponse(ping);
         sendOKBlock(clientConnection, true);
         return 1;
@@ -350,6 +351,7 @@ int DDocInteractorServer::processNotification(QMap <QString, QByteArray> &post_d
         ok = setMessageAsSended(idMsg, msgType, false);
     }
     else {
+        kksInfo() << QObject::tr("Correct notification result received from gateway");
         ok = true;//setMessageAsSended(idMsg, msgType);
     }
 
@@ -377,9 +379,11 @@ int DDocInteractorServer::processNotification(QMap <QString, QByteArray> &post_d
 int DDocInteractorServer::processPingNotification(int idMsg, int result)
 {
     if(result != 1){
-        kksCritical() << tr("Destination organization cannot receive ping request!");
+        kksCritical() << tr("Ping request notification received. Destination organization cannot receive ping request!");
         m_parent->cntPingsSended++;
     }
+
+    kksInfo() << tr("Ping request notification received. Destination organization successfully received ping request");
 
     for (QMap<QString, JKKSPing>::iterator pa = m_parent->m_pings.begin(); pa != m_parent->m_pings.end(); pa++){
         if(pa.value().id() == idMsg){

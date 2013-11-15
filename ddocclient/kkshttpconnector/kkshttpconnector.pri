@@ -4,14 +4,15 @@ HEADERS += \
            ddocinteractorwindow.h \
            ddocinteractorserver.h \
            ddocinteractorclient.h \
-           ddocinteractorbase.h
+           ddocinteractorbase.h \
+           timerform.h
 
 SOURCES += \
            ddocinteractorwindow.cpp \
            ddocinteractorserver.cpp \
            ddocinteractorclient.cpp \
-           ddocinteractorbase.cpp
-
+           ddocinteractorbase.cpp \
+           timerform.cpp
 headers.files += \
            config_httpconnector.h \
            ddocinteractorwindow.h \
