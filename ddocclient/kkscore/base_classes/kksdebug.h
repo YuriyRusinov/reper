@@ -35,11 +35,11 @@ public:
     static void setMinMsgType(KKSMsgType t);
     static void setUseQDebug(bool b = true);
        
-    inline KKSDebug & operator << (const QString & t);
-    inline KKSDebug & operator << (const QByteArray & t);
-    inline KKSDebug & operator << (int t);
-    inline KKSDebug &operator<<(QTextStreamFunction f); 
-    inline KKSDebug &operator<<(QTextStreamManipulator m);
+    KKSDebug & operator << (const QString & t);
+    KKSDebug & operator << (const QByteArray & t);
+    KKSDebug & operator << (int t);
+    KKSDebug &operator<<(QTextStreamFunction f); 
+    KKSDebug &operator<<(QTextStreamManipulator m);
 
 private:
 
