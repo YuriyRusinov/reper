@@ -1559,7 +1559,9 @@ int JKKSLoader::writeMessage (JKKSMailConfirmation *cfm) const
 
 int JKKSLoader::writeMessage (JKKSPing *ping, const QString & senderUID) const
 {
-    int result = ERROR_CODE;
+    Q_UNUSED(senderUID);
+
+    //int result = ERROR_CODE;
     if (!ping)
         return ERROR_CODE;
 

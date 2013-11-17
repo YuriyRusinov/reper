@@ -73,9 +73,9 @@ KKSDatabase * KKSEIOFactory::getDb() const
 int KKSEIOFactory::insertEIO(KKSObjectExemplar* eio, 
                              const KKSCategory* cat, 
                              const QString& table, 
-                             bool bImported,
-                             QWidget * parent) const
+                             bool bImported) const
 {
+    
     if(!eio || !eio->io())
         return ERROR_CODE;
 
@@ -1792,6 +1792,7 @@ int KKSEIOFactory::insertRubricators(KKSRubric * rootRubric, qint64 idMyDocsRubr
 {
     Q_UNUSED(bMyDocs);
     Q_UNUSED(idMyDocsRubricator);
+    Q_UNUSED(rootRubric);
     return 0;
 }
 

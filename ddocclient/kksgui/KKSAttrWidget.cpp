@@ -9,7 +9,7 @@
 #include "KKSAttrWidget.h"
 
 
-KKSAttrWidget :: KKSAttrWidget (const KKSAttrValue * av, KKSIndAttr::KKSIndAttrClass isSys):
+KKSAttrWidget :: KKSAttrWidget (const KKSAttrValue * av, KKSIndAttrClass isSys):
     m_av (0),
     m_isSystem (isSys)
 {

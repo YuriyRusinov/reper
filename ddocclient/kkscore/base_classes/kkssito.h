@@ -46,7 +46,6 @@ class KKSStuffFactory;
 class KKSAttributesFactory;
 class KKSCmdJSettings;
 class KKSMsgJSettings;
-class KKSIndFactory;
 class KKSDbgOutputWidget;
 
 class QWidget;
@@ -123,7 +122,7 @@ public:
     KKSCatEditorFactory * catf () const;
     KKSTemplateEditorFactory *tf () const;
     KKSStuffFactory *sf () const;
-    KKSIndFactory * indf () const;
+    //KKSIndFactory * indf () const;
 
     KKSDbgOutputWidget * dbgWidget() const;
     QTextStream & logStream();
@@ -200,7 +199,7 @@ private:
     mutable KKSTemplateEditorFactory * m_tf;
     mutable KKSStuffFactory * m_sf;
     mutable KKSAttributesFactory * m_attrf;
-    mutable KKSIndFactory * m_indf;
+    //mutable KKSIndFactory * m_indf;
 
     mutable KKSDbgOutputWidget * m_dbgWidget;
     QTextStream m_logStream;

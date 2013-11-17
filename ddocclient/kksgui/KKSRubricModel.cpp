@@ -370,7 +370,7 @@ KKSRubricTreeItem * KKSRubricModel :: getModelItem (qint64 val, KKSRubricTreeIte
         //QString refCol = QString ("id");
         QString pStr = QString::number (item->getData()->id());//sysFieldValue(refCol);
         //qDebug () << __PRETTY_FUNCTION__ << pStr << refCol << cAttrP->code(false) << item->getData()->fields();
-        bool ok (true);
+        //bool ok (true);
         qint64 iVal (-1);
         iVal = item->id();
         if (iVal == val)

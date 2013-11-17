@@ -18,9 +18,9 @@ KKSAttrUUIDWidget :: KKSAttrUUIDWidget (QWidget *parent, Qt::WindowFlags f)
     idAttrValue (-1),
     cVal (QVariant()),
 #ifdef Q_CC_MSVC
-    isSystem (KKSIndAttr::KKSIndAttrClass::iacIOUserAttr)
+    isSystem (iacIOUserAttr)
 #else
-    isSystem (KKSIndAttr::iacIOUserAttr)
+    isSystem (iacIOUserAttr)
 #endif
 {
     this->setLayout (gAttrLay);
@@ -71,7 +71,7 @@ void KKSAttrUUIDWidget :: setVal(const QString & t)
     emit valueChanged (idAttrValue, isSystem, cVal);
 }
 
-void KKSAttrUUIDWidget :: setVal (qint64 id, KKSIndAttr::KKSIndAttrClass sys, QVariant val)
+void KKSAttrUUIDWidget :: setVal (qint64 id, KKSIndAttrClass sys, QVariant val)
 {
     idAttrValue = id;
     isSystem = sys;
@@ -87,7 +87,7 @@ qint64 KKSAttrUUIDWidget :: getIdAttrValue (void) const
     return idAttrValue;
 }
 
-KKSIndAttr::KKSIndAttrClass KKSAttrUUIDWidget :: isSysAttr (void) const
+KKSIndAttrClass KKSAttrUUIDWidget :: isSysAttr (void) const
 {
     return isSystem;
 }

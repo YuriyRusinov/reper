@@ -14,14 +14,14 @@
 // Return:     
 ////////////////////////////////////////////////////////////////////////
 
-KKSEdit :: KKSEdit (const KKSAttrValue *attr, KKSIndAttr::KKSIndAttrClass isSys, QWidget *parent)
+KKSEdit :: KKSEdit (const KKSAttrValue *attr, KKSIndAttrClass isSys, QWidget *parent)
     : QLineEdit (parent), KKSAttrWidget(attr, isSys),
     m_fixedSymCount(0)
 {
     connect (this, SIGNAL (editingFinished()), this, SLOT (setVal()) );
 }
 
-KKSEdit :: KKSEdit (const KKSAttrValue *attr, KKSIndAttr::KKSIndAttrClass isSys, const QString& contents, QWidget *parent)
+KKSEdit :: KKSEdit (const KKSAttrValue *attr, KKSIndAttrClass isSys, const QString& contents, QWidget *parent)
     : QLineEdit (contents, parent), KKSAttrWidget(attr, isSys),
     m_fixedSymCount(0)
 {

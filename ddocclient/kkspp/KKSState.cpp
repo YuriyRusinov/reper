@@ -24,7 +24,7 @@ KKSState::KKSState(const KKSState & s) : KKSRecord(s)
     m_isSystem = s.m_isSystem;
 }
 
-KKSState::KKSState(int id, const QString & name, const QString & desc, bool isKKSState) : KKSRecord(id, name, desc, QString::null, isKKSState)
+KKSState::KKSState(int id, const QString & name, const QString & desc/*, bool isKKSState*/) : KKSRecord(id, name, desc, QString::null)//, isKKSState)
 , m_isSystem(false)
 {
 
@@ -53,7 +53,7 @@ KKSState::~KKSState()
 
 KKSState * KKSState::defState1()
 {
-    KKSState * state = new KKSState(1, QObject::tr("Active"), QString::null, true);
+    KKSState * state = new KKSState(1, QObject::tr("Active"), QString::null);//, true);
     state->m_isSystem = true;
 
     return state;
@@ -61,7 +61,7 @@ KKSState * KKSState::defState1()
 
 KKSState * KKSState::defState2()
 {
-    KKSState * state = new KKSState(2, QObject::tr("Archive"), QString::null, true);
+    KKSState * state = new KKSState(2, QObject::tr("Archive"), QString::null);//, true);
     state->m_isSystem = true;
 
     return state;

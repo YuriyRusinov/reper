@@ -49,7 +49,7 @@ public:
     void setValue (QWidget *aw, 
                    const KKSAttrValue * pattrValue, 
                    const KKSAttrType *pCatType, 
-                   KKSIndAttr::KKSIndAttrClass isSystem, 
+                   KKSIndAttrClass isSystem, 
                    const QVariant& v, 
                    bool isObjExist, 
                    QString tableName, 
@@ -66,7 +66,7 @@ public slots:
                         KKSObjEditor *objEditor, 
                         QGridLayout *gLayout, 
                         int n_str, 
-                        KKSIndAttr::KKSIndAttrClass isSystem, 
+                        KKSIndAttrClass isSystem, 
                         QString tableName = QString::null, 
                         int idCat=-1);
 
@@ -120,16 +120,16 @@ private:
     virtual ~KKSAttributesFactory (void);
 
 #ifdef Q_CC_MSVC
-    QLabel * createAttrTitle (KKSAttrValue * av, KKSIndAttr::KKSIndAttrClass isSystem = KKSIndAttr::KKSIndAttrClass::iacIOUserAttr, KKSObjEditor *objEditor = NULL);
+    QLabel * createAttrTitle (KKSAttrValue * av, KKSIndAttrClass isSystem = iacIOUserAttr, KKSObjEditor *objEditor = NULL);
 #else
-    QLabel * createAttrTitle (KKSAttrValue * av, KKSIndAttr::KKSIndAttrClass isSystem = KKSIndAttr::iacIOUserAttr, KKSObjEditor *objEditor = NULL);
+    QLabel * createAttrTitle (KKSAttrValue * av, KKSIndAttrClass isSystem = iacIOUserAttr, KKSObjEditor *objEditor = NULL);
 #endif
     QCheckBox * createChDateTime (bool isMandatory, QGridLayout *gLayout, QLabel *lTitle, int n_str);
     QWidget * createAttrWidget ( KKSAttrValue * pAttrValue, 
                                  KKSObjEditor *objEditor,
                                  bool is_mandatory, 
                                  const KKSAttrType *pCatType,  
-                                 KKSIndAttr::KKSIndAttrClass isSystem, 
+                                 KKSIndAttrClass isSystem, 
                                  QGridLayout *gLayout, 
                                  int n_str, 
                                  const QVariant& V, 
@@ -140,7 +140,7 @@ private:
     
     QWidget * createAttrValWidget (const KKSAttrValue * pAttrValue, int idAVal, int isSys, QWidget * parent=0, Qt::WindowFlags flags=0);
 
-    QWidget * createAttrCheckWidget (const KKSAttrValue * pAttrValue, const KKSAttrType *pCatType,  KKSIndAttr::KKSIndAttrClass isSystem, QTabWidget * tabW, KKSObjEditor * objEditor);
+    QWidget * createAttrCheckWidget (const KKSAttrValue * pAttrValue, const KKSAttrType *pCatType,  KKSIndAttrClass isSystem, QTabWidget * tabW, KKSObjEditor * objEditor);
     QAbstractItemModel * aValComplexModel (const KKSAttrValue * pAttrValue, const QVariant& av=QVariant());
 
     void connectToSlots (QObject *aw, QWidget* wEditor);

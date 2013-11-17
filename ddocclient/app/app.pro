@@ -9,9 +9,9 @@ SUBDIRS += \
         dyndoc_synch \
         kksdaemon
 
-win32{
-        SUBDIRS += \
-                   db_synchronizer
-}
+#win32{
+#        SUBDIRS += \
+#                   db_synchronizer
+#}
 
 #SUBDIRS += kaps_manager

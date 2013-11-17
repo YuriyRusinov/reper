@@ -261,7 +261,7 @@ m_recordTextColor(r.recordTextColor())
     setParent(const_cast<KKSRecord*>(r.parent()));
 }
 
-KKSRecord::KKSRecord(qint64 _id, const QString & _name, const QString & _desc, const QString & _code, bool isKKSState) :
+KKSRecord::KKSRecord(qint64 _id, const QString & _name, const QString & _desc, const QString & _code) : //, bool isKKSState) :
 m_recordFillColor(QColor()),
 m_recordTextColor(QColor())
 {

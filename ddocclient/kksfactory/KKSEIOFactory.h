@@ -40,8 +40,7 @@ public:
     int insertEIO(KKSObjectExemplar* eio, 
                   const KKSCategory* cat=0, 
                   const QString& table=QString(), 
-                  bool bImported = false,
-                  QWidget * parent = NULL) const; 
+                  bool bImported = false) const; 
 
     int updateEIO(KKSObjectExemplar* eio, 
                   const KKSCategory* cat=0, 

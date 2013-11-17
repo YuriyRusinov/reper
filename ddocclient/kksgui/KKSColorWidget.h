@@ -24,7 +24,7 @@ class _GUI_EXPORT KKSColorWidget : public QWidget, public KKSAttrWidget
 {
 public:
     KKSColorWidget (const KKSAttrValue *attr, 
-                    KKSIndAttr::KKSIndAttrClass isSys, 
+                    KKSIndAttrClass isSys, 
                     QColor rgb_col, 
                     KKSAttrType::KKSAttrTypes type,
                     QWidget *parent=NULL, 
@@ -36,7 +36,7 @@ public:
     void setColor (QColor rgb_col);
 
 signals:
-    void valueChanged (qint64 id, KKSIndAttr::KKSIndAttrClass isSys, QVariant val);
+    void valueChanged (qint64 id, KKSIndAttrClass isSys, QVariant val);
 
 public slots:
     void setColor (void);

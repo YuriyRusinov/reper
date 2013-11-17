@@ -11,7 +11,7 @@
 #include <QMessageBox>
 #include <KKSAttrValuePropsForm.h>
 
-KKSAttrValueLabel :: KKSAttrValueLabel (KKSAttrValue * av, KKSIndAttr::KKSIndAttrClass isSystem, QWidget *parent)
+KKSAttrValueLabel :: KKSAttrValueLabel (KKSAttrValue * av, KKSIndAttrClass isSystem, QWidget *parent)
     : QLabel (parent)
 {
     m_av = NULL;
@@ -78,11 +78,11 @@ void KKSAttrValueLabel :: setLabelProps()
     bool isUnderline (false);
 
 #ifdef Q_CC_MSVC
-    if(m_isSystem != KKSIndAttr::KKSIndAttrClass::iacTableAttr &&
-       m_isSystem != KKSIndAttr::KKSIndAttrClass::iacAttrAttr)
+    if(m_isSystem != iacTableAttr &&
+       m_isSystem != iacAttrAttr)
 #else
-    if(m_isSystem != KKSIndAttr::iacTableAttr &&
-       m_isSystem != KKSIndAttr::iacAttrAttr )
+    if(m_isSystem != iacTableAttr &&
+       m_isSystem != iacAttrAttr )
 #endif
     {
         coloredText = tr("<font color='blue'>%2</font>").arg(text);
@@ -111,20 +111,20 @@ void KKSAttrValueLabel :: setLabelProps()
 void KKSAttrValueLabel :: showAttrValueProps()
 {
 #ifdef Q_CC_MSVC
-    if(!m_av || m_isSystem == KKSIndAttr::KKSIndAttrClass::iacTableAttr || m_isSystem == KKSIndAttr::KKSIndAttrClass::iacAttrAttr)
+    if(!m_av || m_isSystem == iacTableAttr || m_isSystem == iacAttrAttr)
 #else
-    if(!m_av || m_isSystem == KKSIndAttr::iacTableAttr || m_isSystem == KKSIndAttr::iacAttrAttr)
+    if(!m_av || m_isSystem == iacTableAttr || m_isSystem == iacAttrAttr)
 #endif
         return;
 
 #ifdef Q_CC_MSVC
-    bool isSys = (m_isSystem == KKSIndAttr::KKSIndAttrClass::iacIOUserAttr);
+    bool isSys = (m_isSystem == iacIOUserAttr);
     KKSAttrValuePropsForm * f = new KKSAttrValuePropsForm(m_av, 
                                                           true, 
                                                           !isSys,
                                                           this);
 #else
-    bool isSys (m_isSystem == KKSIndAttr::iacIOUserAttr);
+    bool isSys (m_isSystem == iacIOUserAttr);
     KKSAttrValuePropsForm * f = new KKSAttrValuePropsForm(m_av, 
                                                           true, 
                                                           !isSys,

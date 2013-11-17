@@ -16,7 +16,7 @@ HEADERS += \
 	KKSJMonitor.h \
         KKSStuffFactory.h \
         KKSPrerender.h \
-        KKSIndFactory.h \
+        #KKSIndFactory.h \
 	kksfactory_config.h
 
 SOURCES += \
@@ -35,8 +35,8 @@ SOURCES += \
 	KKSJMonitor.cpp \
 	KKSPPFactory.cpp \
         KKSStuffFactory.cpp \
-        KKSPrerender.cpp \
-        KKSIndFactory.cpp
+        KKSPrerender.cpp
+        #KKSIndFactory.cpp
 
 headers.files += \
         KKSAttributesFactory.h \
@@ -55,5 +55,5 @@ headers.files += \
 	KKSJMonitor.h \
         KKSStuffFactory.h \
         KKSPrerender.h \
-        KKSIndFactory.h \
+        #KKSIndFactory.h \
 	kksfactory_config.h

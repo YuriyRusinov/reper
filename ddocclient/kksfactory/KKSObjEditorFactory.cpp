@@ -75,7 +75,7 @@
 #include "KKSEIOFactory.h"
 #include "KKSStuffFactory.h"
 #include "KKSRubricFactory.h"
-#include "KKSIndFactory.h"
+//#include "KKSIndFactory.h"
 #include <KKSAttribute.h>
 #include <KKSType.h>
 #include <KKSItemDelegate.h>
@@ -163,8 +163,7 @@ KKSObjEditorFactory::KKSObjEditorFactory(KKSPPFactory * _ppf,
     fileLoader(fl),
     eiof (_eiof),
     m_sf (0),
-    m_rf (0),
-    m_indf (0)
+    m_rf (0)
 {
     //Q_INIT_RESOURCE (kksfactory_icon_set);
 }
@@ -1083,17 +1082,17 @@ void KKSObjEditorFactory :: setIONameSecret (KKSObjEditor * editor, KKSObjectExe
     //const KKSValue pVal = attr->value();
     //const KKSCategoryAttr * pCategAttr = attr->attribute();
 #ifdef Q_CC_MSVC
-    QLineEdit * lEIOName = new KKSEdit (attr, KKSIndAttr::KKSIndAttrClass::iacTableAttr, io->name (), parentWProp);//QLineEdit (io->name (), parentWProp);
+    QLineEdit * lEIOName = new KKSEdit (attr, iacTableAttr, io->name (), parentWProp);//QLineEdit (io->name (), parentWProp);
     connect (lEIOName, 
-             SIGNAL (valueChanged(qint64, KKSIndAttr::KKSIndAttrClass, QVariant)), 
+             SIGNAL (valueChanged(qint64, KKSIndAttrClass, QVariant)), 
              editor, 
-             SLOT (setValue (qint64, KKSIndAttr::KKSIndAttrClass, QVariant)) );
+             SLOT (setValue (qint64, KKSIndAttrClass, QVariant)) );
 #else
-    QLineEdit * lEIOName = new KKSEdit (attr, KKSIndAttr::iacTableAttr, io->name (), parentWProp);//QLineEdit (io->name (), parentWProp);
+    QLineEdit * lEIOName = new KKSEdit (attr, iacTableAttr, io->name (), parentWProp);//QLineEdit (io->name (), parentWProp);
     connect (lEIOName, 
-             SIGNAL (valueChanged(qint64, KKSIndAttr::KKSIndAttrClass, QVariant)), 
+             SIGNAL (valueChanged(qint64, KKSIndAttrClass, QVariant)), 
              editor, 
-             SLOT (setValue (qint64, KKSIndAttr::KKSIndAttrClass, QVariant)) );
+             SLOT (setValue (qint64, KKSIndAttrClass, QVariant)) );
 #endif
     lEIOName->setReadOnly (io->isSystem ());
     hIOLay->addWidget (lIOName);
@@ -1129,9 +1128,9 @@ void KKSObjEditorFactory :: setIONameSecret (KKSObjEditor * editor, KKSObjectExe
         v_str = pv.value();
 
 #ifdef Q_CC_MSVC
-    QLineEdit * lEIOMacLabel = new KKSEdit (attr, KKSIndAttr::KKSIndAttrClass::iacTableAttr, v_str, aRefW);
+    QLineEdit * lEIOMacLabel = new KKSEdit (attr, iacTableAttr, v_str, aRefW);
 #else
-    QLineEdit * lEIOMacLabel = new KKSEdit (attr, KKSIndAttr::iacTableAttr, v_str, aRefW);
+    QLineEdit * lEIOMacLabel = new KKSEdit (attr, iacTableAttr, v_str, aRefW);
 #endif
     QSizePolicy spMac (QSizePolicy::Minimum, QSizePolicy::Fixed);
     lEIOMacLabel->setReadOnly (true);
@@ -1142,9 +1141,9 @@ void KKSObjEditorFactory :: setIONameSecret (KKSObjEditor * editor, KKSObjectExe
     editor->addListAttrWidget (tbMac, aRefW, attr);
     connect (tbMac, SIGNAL (clicked()), editor, SLOT (setList()) );
 #ifdef Q_CC_MSVC
-    aRefW->setValue (attr->id(), KKSIndAttr::KKSIndAttrClass::iacTableAttr, cV);
+    aRefW->setValue (attr->id(), iacTableAttr, cV);
 #else
-    aRefW->setValue (attr->id(), KKSIndAttr::iacTableAttr, cV);
+    aRefW->setValue (attr->id(), iacTableAttr, cV);
 #endif
     aRefW->setAttrWidget (lEIOMacLabel);
     connect (aRefW, 
@@ -1618,13 +1617,13 @@ void KKSObjEditorFactory :: setObjConnect (KKSObjEditor *editor)
 
     connect (editor, SIGNAL (printReport(KKSObject*)), this, SLOT (printReport(KKSObject*)));
 
-    connect (editor, SIGNAL (addIOIndex (KKSObject *, const QModelIndex&, QAbstractItemModel*)), m_indf, SLOT(addIOIndex (KKSObject *, const QModelIndex&, QAbstractItemModel *)) );
-    connect (editor, SIGNAL (editIOIndex (KKSObject *, const QModelIndex&, QAbstractItemModel*)), m_indf, SLOT(editIOIndex (KKSObject *, const QModelIndex&, QAbstractItemModel *)) );
-    connect (editor, SIGNAL (delIOIndex (KKSObject *, const QModelIndex&, QAbstractItemModel*)), m_indf, SLOT(delIOIndex (KKSObject *, const QModelIndex&, QAbstractItemModel *)) );
-    connect (editor, SIGNAL (refreshIOIndex (KKSObject *, QAbstractItemModel*)), m_indf, SLOT(refreshIndices (KKSObject *, QAbstractItemModel *)) );
-    connect (editor, SIGNAL (viewIOIndicator (KKSObject *, int)), m_indf, SLOT (viewIOIndicator (KKSObject *, int)) );
-    connect (editor, SIGNAL (editIOIndicator (KKSObject *, int, QWidget *)), m_indf, SLOT (editIOIndicator (KKSObject *, int, QWidget *)) );
-    connect (editor, SIGNAL (addIOIndicator (KKSObject *, QWidget *)), m_indf, SLOT (addNewIOIndicator (KKSObject *, QWidget *)) );
+    //connect (editor, SIGNAL (addIOIndex (KKSObject *, const QModelIndex&, QAbstractItemModel*)), m_indf, SLOT(addIOIndex (KKSObject *, const QModelIndex&, QAbstractItemModel *)) );
+    //connect (editor, SIGNAL (editIOIndex (KKSObject *, const QModelIndex&, QAbstractItemModel*)), m_indf, SLOT(editIOIndex (KKSObject *, const QModelIndex&, QAbstractItemModel *)) );
+    //connect (editor, SIGNAL (delIOIndex (KKSObject *, const QModelIndex&, QAbstractItemModel*)), m_indf, SLOT(delIOIndex (KKSObject *, const QModelIndex&, QAbstractItemModel *)) );
+    //connect (editor, SIGNAL (refreshIOIndex (KKSObject *, QAbstractItemModel*)), m_indf, SLOT(refreshIndices (KKSObject *, QAbstractItemModel *)) );
+    //connect (editor, SIGNAL (viewIOIndicator (KKSObject *, int)), m_indf, SLOT (viewIOIndicator (KKSObject *, int)) );
+    //connect (editor, SIGNAL (editIOIndicator (KKSObject *, int, QWidget *)), m_indf, SLOT (editIOIndicator (KKSObject *, int, QWidget *)) );
+    //connect (editor, SIGNAL (addIOIndicator (KKSObject *, QWidget *)), m_indf, SLOT (addNewIOIndicator (KKSObject *, QWidget *)) );
 
     if ((editor->getObj () && editor->getObj()->id() < 0) ||
         (editor->getObjectEx() && editor->getObjectEx()->id() < 0))
@@ -1731,7 +1730,7 @@ void KKSObjEditorFactory :: saveObjectEx (KKSObjEditor * editor, KKSObjectExempl
         {
             wObjCopy->setId (-1);
             qDebug () << __PRETTY_FUNCTION__ << tableName << wObjCopy->io()->tableName();
-            res = eiof->insertEIO (wObjCopy, cat, tableName, false, editor);
+            res = eiof->insertEIO (wObjCopy, cat, tableName, false);
             if (res == OK_CODE)
             {
                 editor->addAdditionalCopy (wObjCopy);
@@ -4392,7 +4391,7 @@ void KKSObjEditorFactory :: slotOpenRubricItemRecRequested(int idObjectE, KKSObj
 
 /* Слот выбирает подходящий пользовательский шаблон и перегруппировывает атрибуты.
  */
-void KKSObjEditorFactory :: regroupAttrs (QWidget *wIOAttr, QScrollArea *scIOattr, QWidget *ioAttrs, int idObj, const KKSCategory *c, KKSIndAttr::KKSIndAttrClass isSystem, KKSObjEditor *editor)
+void KKSObjEditorFactory :: regroupAttrs (QWidget *wIOAttr, QScrollArea *scIOattr, QWidget *ioAttrs, int idObj, const KKSCategory *c, KKSIndAttrClass isSystem, KKSObjEditor *editor)
 {
     KKSObject *wObj = idObj > 0 ? loader->loadIO (idObj, false) : editor->getObj();
     if (!wObj || !editor )//|| (!c && !isSystem))
@@ -4402,9 +4401,9 @@ void KKSObjEditorFactory :: regroupAttrs (QWidget *wIOAttr, QScrollArea *scIOatt
     KKSList<KKSTemplate*> tListDb;
     KKSObject *io = 0;
 #ifdef Q_CC_MSVC
-    if (isSystem == KKSIndAttr::KKSIndAttrClass::iacTableAttr)
+    if (isSystem == iacTableAttr)
 #else
-    if (isSystem == KKSIndAttr::iacTableAttr)
+    if (isSystem == iacTableAttr)
 #endif
     {
         io = loader->loadIO (IO_IO_ID, false);
@@ -4450,9 +4449,9 @@ void KKSObjEditorFactory :: regroupAttrs (QWidget *wIOAttr, QScrollArea *scIOatt
         if (f->isSave ())
         {
 #ifdef Q_CC_MSVC
-            if (isSystem == KKSIndAttr::KKSIndAttrClass::iacTableAttr)
+            if (isSystem == iacTableAttr)
 #else
-            if (isSystem == KKSIndAttr::iacTableAttr)
+            if (isSystem == iacTableAttr)
 #endif
                 io->setAttrTemplate (tRef);
             else
@@ -4462,9 +4461,9 @@ void KKSObjEditorFactory :: regroupAttrs (QWidget *wIOAttr, QScrollArea *scIOatt
             //int res = ppf->updateIO (isSystem ? io : wObj);
             //надо просто обновить информацию о пользовательских шаблонах
 #ifdef Q_CC_MSVC
-            int ok = ppf->updateUserTemplates(isSystem == KKSIndAttr::KKSIndAttrClass::iacTableAttr ? io : wObj);
+            int ok = ppf->updateUserTemplates(isSystem == iacTableAttr ? io : wObj);
 #else
-            int ok = ppf->updateUserTemplates(isSystem == KKSIndAttr::iacTableAttr ? io : wObj);
+            int ok = ppf->updateUserTemplates(isSystem == iacTableAttr ? io : wObj);
 #endif
             if(ok != OK_CODE){
                 qCritical() << tr("Cannot update templates!");
@@ -4483,9 +4482,9 @@ void KKSObjEditorFactory :: regroupAttrs (QWidget *wIOAttr, QScrollArea *scIOatt
         return;
 
 #ifdef Q_CC_MSVC
-    if (isSystem == KKSIndAttr::KKSIndAttrClass::iacTableAttr)
+    if (isSystem == iacTableAttr)
 #else
-    if (isSystem == KKSIndAttr::iacTableAttr)
+    if (isSystem == iacTableAttr)
 #endif
         editor->setSysTemplate (tRef);
     else
@@ -4497,9 +4496,9 @@ void KKSObjEditorFactory :: regroupAttrs (QWidget *wIOAttr, QScrollArea *scIOatt
     if (ioAttrs)
     {
 #ifdef Q_CC_MSVC
-        if (isSystem == KKSIndAttr::KKSIndAttrClass::iacTableAttr)
+        if (isSystem == iacTableAttr)
 #else
-        if (isSystem == KKSIndAttr::iacTableAttr)
+        if (isSystem == iacTableAttr)
 #endif
             editor->setSysAttrWidgets (wIOAttr, scIOattr, 0);
         else
@@ -4520,9 +4519,9 @@ void KKSObjEditorFactory :: regroupAttrs (QWidget *wIOAttr, QScrollArea *scIOatt
     QGridLayout *gIOAttrLay = new QGridLayout (ioAttrsW);
     ioAttrsW->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Fixed);
 #ifdef Q_CC_MSVC
-    if (isSystem == KKSIndAttr::KKSIndAttrClass::iacTableAttr)
+    if (isSystem == iacTableAttr)
 #else
-    if (isSystem == KKSIndAttr::iacTableAttr)
+    if (isSystem == iacTableAttr)
 #endif
     {
         editor->setSysAttrWidgets (wIOAttr, scIOAttrs, ioAttrsW);
@@ -4536,9 +4535,9 @@ void KKSObjEditorFactory :: regroupAttrs (QWidget *wIOAttr, QScrollArea *scIOatt
     
     ioAttrsW->setLayout (gIOAttrLay);
 #ifdef Q_CC_MSVC
-    if (isSystem == KKSIndAttr::KKSIndAttrClass::iacTableAttr)
+    if (isSystem == iacTableAttr)
 #else
-    if (isSystem == KKSIndAttr::iacTableAttr)
+    if (isSystem == iacTableAttr)
 #endif
     {
         KKSObjectExemplar *wObjE = editor->getObjectEx();//KKSConverter::objToExemplar (loader, wObj);// loader->loadEIO (idObj, io);
@@ -7650,7 +7649,7 @@ void KKSObjEditorFactory :: addIOTable (KKSObject * wObj, KKSObjEditor * editor)
  * isSystem -- не используется
  * sMod -- модель значений атрибутов
  */
-void KKSObjEditorFactory :: loadObjAttrRef (KKSObject * wObj, const KKSAttrValue* avE, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sMod)
+void KKSObjEditorFactory :: loadObjAttrRef (KKSObject * wObj, const KKSAttrValue* avE, KKSIndAttrClass isSystem, QAbstractItemModel * sMod)
 {
     if (!wObj || !avE || !sMod)
         return;
@@ -7764,7 +7763,10 @@ void KKSObjEditorFactory :: loadObjAttrRef (KKSObject * wObj, const KKSAttrValue
  * isSystem -- не используется
  * sMod -- модель значений атрибутов
  */
-void KKSObjEditorFactory :: loadObjCAttrRef (KKSObjectExemplar * wObjE, const KKSAttrValue* avE, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sMod)
+void KKSObjEditorFactory :: loadObjCAttrRef (KKSObjectExemplar * wObjE, 
+                                             const KKSAttrValue* avE, 
+                                             //KKSIndAttrClass isSystem, 
+                                             QAbstractItemModel * sMod)
 {
     if (!wObjE || !avE || !sMod)
         return;
@@ -8251,7 +8253,7 @@ void KKSObjEditorFactory :: updateAttrModel (const QModelIndex & wIndex, QAbstra
  * isSystem -- не используется
  * sMod -- модель значений атрибутов
  */
-void KKSObjEditorFactory :: loadObjDelAttrRef (KKSObject * wObj, const KKSAttrValue* avE, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel, const QModelIndex& wInd)
+void KKSObjEditorFactory :: loadObjDelAttrRef (KKSObject * wObj, const KKSAttrValue* avE, KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel, const QModelIndex& wInd)
 {
     Q_UNUSED (isSystem);
 
@@ -8303,7 +8305,7 @@ void KKSObjEditorFactory :: loadObjDelAttrRef (KKSObject * wObj, const KKSAttrVa
     refObj->release();
 }
 
-void KKSObjEditorFactory :: loadObjCDelAttrRef (KKSObjectExemplar * wObjE, const KKSAttrValue* avE, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel, const QModelIndex& wInd)
+void KKSObjEditorFactory :: loadObjCDelAttrRef (KKSObjectExemplar * wObjE, const KKSAttrValue* avE, KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel, const QModelIndex& wInd)
 {
     if (!wObjE || !avE || !sourceModel || !wInd.isValid())
         return;
@@ -8587,9 +8589,9 @@ int KKSObjEditorFactory :: putAttrsGroupsOnWidget ( KKSObject * obj,
                                   gbLay, 
                                   n_str,
 #ifdef Q_CC_MSVC
-                                  KKSIndAttr::KKSIndAttrClass::iacTableAttr,
+                                  iacTableAttr,
 #else
-                                  KKSIndAttr::iacTableAttr,
+                                  iacTableAttr,
 #endif
                                   (tableName.isEmpty () ? obj->tableName() : tableName), 
                                   (c ? c->id():-1));
@@ -8601,9 +8603,9 @@ int KKSObjEditorFactory :: putAttrsGroupsOnWidget ( KKSObject * obj,
                                   gAttrLayout, 
                                   nc, 
 #ifdef Q_CC_MSVC
-                                  KKSIndAttr::KKSIndAttrClass::iacTableAttr,
+                                  iacTableAttr,
 #else
-                                  KKSIndAttr::iacTableAttr,
+                                  iacTableAttr,
 #endif
                                   obj->tableName(), 
                                   (c ? c->id():-1));
@@ -8720,9 +8722,9 @@ int KKSObjEditorFactory :: putRecAttrsGroupsOnWidget ( KKSObject * obj,
                                   gbLay, 
                                   n_str, 
 #ifdef Q_CC_MSVC
-                                  KKSIndAttr::KKSIndAttrClass::iacEIOUserAttr, 
+                                  iacEIOUserAttr, 
 #else
-                                  KKSIndAttr::iacEIOUserAttr, 
+                                  iacEIOUserAttr, 
 #endif
                                   (tableName.isEmpty () ? obj->tableName() : tableName), 
                                   (c ? c->id():-1));
@@ -8734,9 +8736,9 @@ int KKSObjEditorFactory :: putRecAttrsGroupsOnWidget ( KKSObject * obj,
                                   gAttrLayout, 
                                   nc, 
 #ifdef Q_CC_MSVC
-                                  KKSIndAttr::KKSIndAttrClass::iacEIOUserAttr, 
+                                  iacEIOUserAttr, 
 #else
-                                  KKSIndAttr::iacEIOUserAttr, 
+                                  iacEIOUserAttr, 
 #endif
                                   obj->tableName(), 
                                   (c ? c->id():-1));
@@ -8854,9 +8856,9 @@ void KKSObjEditorFactory :: putAttrsGroupsOnWidget (KKSObject * obj,
                                   gbLay, 
                                   n_str, 
 #ifdef Q_CC_MSVC
-                                  KKSIndAttr::KKSIndAttrClass::iacIOUserAttr, 
+                                  iacIOUserAttr, 
 #else
-                                  KKSIndAttr::iacIOUserAttr, 
+                                  iacIOUserAttr, 
 #endif
                                   obj->tableName(), 
                                   (c ? c->id():-1));
@@ -8868,9 +8870,9 @@ void KKSObjEditorFactory :: putAttrsGroupsOnWidget (KKSObject * obj,
                                   gAttrLayout, 
                                   nc, 
 #ifdef Q_CC_MSVC
-                                  KKSIndAttr::KKSIndAttrClass::iacIOUserAttr, 
+                                  iacIOUserAttr, 
 #else
-                                  KKSIndAttr::iacIOUserAttr, 
+                                  iacIOUserAttr, 
 #endif
                                   obj->tableName(), 
                                   (c ? c->id():-1));
@@ -8897,6 +8899,7 @@ void KKSObjEditorFactory :: putAttrsGroupsOnWidget (KKSObject * obj,
     }
 }
 
+/*
 void KKSObjEditorFactory :: putIndicatorsGroupsOnToWidget (KKSObject * obj, KKSObjEditor * editor, int& nc, const KKSMap<int, KKSIndicatorValue*>& indMap, QGridLayout *gbLay, QGridLayout * gIndLayout, bool isGrouped, bool updateView)
 {
     if (!obj || !editor || !gIndLayout || indMap.isEmpty())
@@ -8921,6 +8924,7 @@ void KKSObjEditorFactory :: putIndicatorsGroupsOnToWidget (KKSObject * obj, KKSO
 //    gIndLayout->addItem (indLay, n_str, 0, 1, 4);
     nc = n_str;
 }
+*/
 
 void KKSObjEditorFactory :: putSystemParams (KKSObjectExemplar * recio,
                                              KKSObjEditor * editor,
@@ -9013,7 +9017,7 @@ void KKSObjEditorFactory :: putSystemParams (KKSObjectExemplar * recio,
             av->setId(attr->id());
             attr->release();
             ca->release();
-            lE = new KKSPixmap(av, KKSIndAttr::iacEIOSysAttr, recio->iconAsString(), currentGroupBox);
+            lE = new KKSPixmap(av, iacEIOSysAttr, recio->iconAsString(), currentGroupBox);
             edLay->addWidget(lE, Qt::AlignCenter | Qt::AlignVCenter);
             l->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
             ((KKSPixmap *)lE)->setAlignment( Qt::AlignCenter | Qt::AlignVCenter);
@@ -9045,13 +9049,13 @@ void KKSObjEditorFactory :: putSystemParams (KKSObjectExemplar * recio,
                 rgb_color = recio->recordFillColor();
                 if (rgb_color.isValid())
                     av->setValue (KKSValue(QString::number(rgb_color.rgba()), KKSAttrType::atRecordColor));
-                lE = new KKSColorWidget(av, KKSIndAttr::iacEIOSysAttr, rgb_color, KKSAttrType::atRecordColor, currentGroupBox);
+                lE = new KKSColorWidget(av, iacEIOSysAttr, rgb_color, KKSAttrType::atRecordColor, currentGroupBox);
             }
             else{
                 rgb_color = recio->recordTextColor();
                 if (rgb_color.isValid())
                     av->setValue (KKSValue(QString::number(rgb_color.rgba()), KKSAttrType::atRecordTextColor));
-                lE = new KKSColorWidget(av, KKSIndAttr::iacEIOSysAttr, rgb_color, KKSAttrType::atRecordTextColor, currentGroupBox);
+                lE = new KKSColorWidget(av, iacEIOSysAttr, rgb_color, KKSAttrType::atRecordTextColor, currentGroupBox);
 
             }
             av->release();
@@ -9359,11 +9363,6 @@ void KKSObjEditorFactory :: putSyncWidget (KKSObjEditor * editor, KKSObjectExemp
         syncW->setSyncType (syncVals.value(1));
     }
     tabObj->addTab (syncW, tr ("Syncronization"));
-}
-
-void KKSObjEditorFactory :: setIndicesFactory (KKSIndFactory * _indf)
-{
-    m_indf = _indf;
 }
 
 void KKSObjEditorFactory :: addAttrSearchTemplate (void)

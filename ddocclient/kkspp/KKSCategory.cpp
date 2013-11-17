@@ -501,9 +501,9 @@ KKSFilter * KKSCategory::createFilter(int attrId,
         a->setName("후");
         a->setTitle("후");
 #ifdef Q_CC_MSVC
-        a->setAsSystem(KKSIndAttr::KKSIndAttrClass::iacTableAttr);
+        a->setAsSystem(iacTableAttr);
 #else
-        a->setAsSystem(KKSIndAttr::iacTableAttr);
+        a->setAsSystem(iacTableAttr);
 #endif
         KKSAttrType * t = new KKSAttrType(KKSAttrType::atInt);
         a->setType(t);
@@ -568,9 +568,9 @@ KKSFilter * KKSCategory::createFilter(int attrId,
         a->setName("후");
         a->setTitle("후");
 #ifdef Q_CC_MSVC
-        a->setAsSystem(KKSIndAttr::KKSIndAttrClass::iacTableAttr);
+        a->setAsSystem(iacTableAttr);
 #else
-        a->setAsSystem(KKSIndAttr::iacTableAttr);
+        a->setAsSystem(iacTableAttr);
 #endif
         KKSAttrType * t = new KKSAttrType(KKSAttrType::atInt);
         a->setType(t);

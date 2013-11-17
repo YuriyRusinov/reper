@@ -19,12 +19,12 @@ class KKSAttrValue;
 class _GUI_EXPORT KKSEdit : public QLineEdit, public KKSAttrWidget
 {
     public:
-        KKSEdit (const KKSAttrValue *attr, KKSIndAttr::KKSIndAttrClass isSys, QWidget *parent=NULL);
-        KKSEdit (const KKSAttrValue *attr, KKSIndAttr::KKSIndAttrClass isSys, const QString& contents, QWidget *parent=NULL);
+        KKSEdit (const KKSAttrValue *attr, KKSIndAttrClass isSys, QWidget *parent=NULL);
+        KKSEdit (const KKSAttrValue *attr, KKSIndAttrClass isSys, const QString& contents, QWidget *parent=NULL);
         virtual ~KKSEdit (void);
 
     signals:
-        void valueChanged (qint64 id, KKSIndAttr::KKSIndAttrClass isSys, QVariant val);
+        void valueChanged (qint64 id, KKSIndAttrClass isSys, QVariant val);
 
     public slots:
         void setVal (const QString & newText);

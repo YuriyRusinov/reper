@@ -18,7 +18,7 @@ class _PP_EXPORT KKSState : public KKSRecord
 public:
    KKSState();
    KKSState(const KKSState & s);
-   KKSState(int id, const QString & name, const QString & desc = QString::null, bool isKKSState = false);
+   KKSState(int id, const QString & name, const QString & desc = QString::null);//, bool isKKSState = false);
    virtual ~KKSState();
 
    static KKSState * defState1();

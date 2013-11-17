@@ -50,14 +50,14 @@ private:
     QByteArray prepareForSend(QHttpRequestHeader & header,
                               QHttp * http,
                               const JKKSPMessWithAddr * message, 
-                              bool bSync,
-                              bool isLastFilePart,
+                              //bool bSync,
+                              //bool isLastFilePart,
                               bool isPing);
 
     bool createRequestHeader(QHttpRequestHeader & header,
                              const QString & host, 
                              int port, 
-                             bool https, 
+                             //bool https, 
                              int length);
 
     void saveRequestId(int reqId, const JKKSPMessWithAddr * message, bool isLastFilePart);

@@ -859,7 +859,7 @@ void KKSAttributesFactory :: putAttrWidget (KKSAttrValue* av,
                                             KKSObjEditor * objEditor, 
                                             QGridLayout *gLayout, 
                                             int n_str, 
-                                            KKSIndAttr::KKSIndAttrClass isSystem, 
+                                            KKSIndAttrClass isSystem, 
                                             QString tableName, 
                                             int idCat)
 {
@@ -919,7 +919,7 @@ QString KKSAttributesFactory :: toXML (KKSCategoryAttr* attr)
  * Результат:
  * QLabel * c названием атрибута
  */
-QLabel * KKSAttributesFactory :: createAttrTitle (KKSAttrValue * av, KKSIndAttr::KKSIndAttrClass isSystem, KKSObjEditor *objEditor)
+QLabel * KKSAttributesFactory :: createAttrTitle (KKSAttrValue * av, KKSIndAttrClass isSystem, KKSObjEditor *objEditor)
 {
     if(!av)
         return new QLabel();
@@ -1000,7 +1000,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                                                     KKSObjEditor *objEditor, 
                                                     bool is_mandatory, 
                                                     const KKSAttrType *pCatType, 
-                                                    KKSIndAttr::KKSIndAttrClass attrClass, 
+                                                    KKSIndAttrClass attrClass, 
                                                     QGridLayout *gLayout, 
                                                     int n_str, 
                                                     const QVariant& V, 
@@ -1366,37 +1366,37 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                 if(!av->attrsValuesLoaded()){
                     KKSMap<qint64, KKSAttrValue*> aav_list;
 #ifdef Q_CC_MSVC
-                    if(attrClass == KKSIndAttr::KKSIndAttrClass::iacIOUserAttr){
+                    if(attrClass == iacIOUserAttr){
 #else
-                    if(attrClass == KKSIndAttr::iacIOUserAttr){
+                    if(attrClass == iacIOUserAttr){
 #endif
                         aav_list = loader->loadAttrAttrValues(av, false);
                     }
 #ifdef Q_CC_MSVC
-                    if(attrClass == KKSIndAttr::KKSIndAttrClass::iacEIOUserAttr){
+                    if(attrClass == iacEIOUserAttr){
 #else
-                    if(attrClass == KKSIndAttr::iacEIOUserAttr){
+                    if(attrClass == iacEIOUserAttr){
 #endif
                         aav_list = loader->loadAttrAttrValues(av, true);
                     }
 #ifdef Q_CC_MSVC
-                    if(attrClass == KKSIndAttr::KKSIndAttrClass::iacAttrAttr ){
+                    if(attrClass == iacAttrAttr ){
 #else
-                    if(attrClass == KKSIndAttr::iacAttrAttr ){
+                    if(attrClass == iacAttrAttr ){
 #endif
                         //aav_list = loader->loadAttrAttrValues(av->id(), false);
                     }
 #ifdef Q_CC_MSVC
-                    if(attrClass == KKSIndAttr::KKSIndAttrClass::iacEIOSysAttr){
+                    if(attrClass == iacEIOSysAttr){
 #else
-                    if(attrClass == KKSIndAttr::iacEIOSysAttr){
+                    if(attrClass == iacEIOSysAttr){
 #endif
                         //aav_list = loader->loadAttrAttrValues(av->id(), false);
                     }
 #ifdef Q_CC_MSVC
-                    if(attrClass == KKSIndAttr::KKSIndAttrClass::iacTableAttr){
+                    if(attrClass == iacTableAttr){
 #else
-                    if(attrClass == KKSIndAttr::iacTableAttr){
+                    if(attrClass == iacTableAttr){
 #endif
                         //aav_list = loader->loadAttrAttrValues(av->id(), false);
                     }
@@ -1690,7 +1690,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
  * Результат:
  * виджет атрибута, добавленный в tabW.
  */
-QWidget * KKSAttributesFactory :: createAttrCheckWidget (const KKSAttrValue * av, const KKSAttrType *pCatType,  KKSIndAttr::KKSIndAttrClass isSystem, QTabWidget * tabW, KKSObjEditor * objEditor)
+QWidget * KKSAttributesFactory :: createAttrCheckWidget (const KKSAttrValue * av, const KKSAttrType *pCatType,  KKSIndAttrClass isSystem, QTabWidget * tabW, KKSObjEditor * objEditor)
 {
     QWidget * attrWidget = 0;
     if (!av || !pCatType || !tabW)
@@ -1749,7 +1749,7 @@ QWidget * KKSAttributesFactory :: createAttrCheckWidget (const KKSAttrValue * av
 void KKSAttributesFactory :: setValue (QWidget *aw, 
                                        const KKSAttrValue * av, 
                                        const KKSAttrType *pCatType, 
-                                       KKSIndAttr::KKSIndAttrClass isSystem, 
+                                       KKSIndAttrClass isSystem, 
                                        const QVariant& V, 
                                        bool isObjExist, 
                                        QString tableName, 
@@ -2665,6 +2665,7 @@ void KKSAttributesFactory :: addComplexAttr (KKSAttribute *a, QAbstractItemModel
 
 void KKSAttributesFactory :: editComplexAttr (int id, KKSAttribute *a, QAbstractItemModel * attrModel, const QModelIndex& attrInd, KKSAttrEditor *editor)
 {
+    Q_UNUSED(id);
     if (!a || !attrModel || !attrInd.isValid())
         return;
     //qDebug () << __PRETTY_FUNCTION__ << id << a->id() << a->name() << a->title();
@@ -2709,6 +2710,8 @@ void KKSAttributesFactory :: editComplexAttr (int id, KKSAttribute *a, QAbstract
 
 void KKSAttributesFactory :: delComplexAttr (int id, KKSAttribute *a, QAbstractItemModel * attrModel, const QModelIndex& attrInd, KKSAttrEditor *editor)
 {
+    Q_UNUSED(id);
+
     if (!a || !attrModel || !attrInd.isValid())
         return;
     //qDebug () << __PRETTY_FUNCTION__ << id << a->id() << a->name() << a->title();
@@ -2762,7 +2765,7 @@ QWidget * KKSAttributesFactory :: createAttrValWidget (const KKSAttrValue * pAtt
     if (!pAttrValue->attribute())
         return 0;
     
-    KKSAttrValue * av = loader->loadIOAttrValue(pAttrValue,idAVal,(isSys!=KKSIndAttr::iacIOUserAttr));
+    KKSAttrValue * av = loader->loadIOAttrValue(pAttrValue,idAVal,(isSys!=iacIOUserAttr));
     if (!av)
         return 0;
     if (av->attribute()->type()->attrType() == KKSAttrType::atComplex)

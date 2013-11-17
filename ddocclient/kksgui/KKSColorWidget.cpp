@@ -13,7 +13,7 @@
 #include "KKSColorWidget.h"
 
 KKSColorWidget :: KKSColorWidget (const KKSAttrValue *attr, 
-                                  KKSIndAttr::KKSIndAttrClass isSys, 
+                                  KKSIndAttrClass isSys, 
                                   QColor rgb_col,
                                   KKSAttrType::KKSAttrTypes type,
                                   QWidget *parent, 

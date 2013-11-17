@@ -18,12 +18,12 @@ class KKSAttrValue;
 class _GUI_EXPORT KKSTimeEdit : public QTimeEdit, public KKSAttrWidget
 {
     public:
-        KKSTimeEdit (const KKSAttrValue*attr, KKSIndAttr::KKSIndAttrClass isSys, QWidget *parent=NULL);
-        KKSTimeEdit (const KKSAttrValue*attr, KKSIndAttr::KKSIndAttrClass isSys, const QTime& time, QWidget * parent=NULL);
+        KKSTimeEdit (const KKSAttrValue*attr, KKSIndAttrClass isSys, QWidget *parent=NULL);
+        KKSTimeEdit (const KKSAttrValue*attr, KKSIndAttrClass isSys, const QTime& time, QWidget * parent=NULL);
         virtual ~KKSTimeEdit (void);
 
     signals:
-        void valueChanged (qint64 id, KKSIndAttr::KKSIndAttrClass isSys, QVariant val);
+        void valueChanged (qint64 id, KKSIndAttrClass isSys, QVariant val);
 
     public slots:
         void setTime (const QTime& dt);

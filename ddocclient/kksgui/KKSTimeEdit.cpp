@@ -14,13 +14,13 @@
 // Return:     
 ////////////////////////////////////////////////////////////////////////
 
-KKSTimeEdit :: KKSTimeEdit (const KKSAttrValue *attr, KKSIndAttr::KKSIndAttrClass isSys, QWidget* parent) :
+KKSTimeEdit :: KKSTimeEdit (const KKSAttrValue *attr, KKSIndAttrClass isSys, QWidget* parent) :
     QTimeEdit (parent), KKSAttrWidget(attr, isSys)
 {
     connect (this, SIGNAL (timeChanged (const QTime&)), this, SLOT (setTime (const QTime&)) );
 }
 
-KKSTimeEdit :: KKSTimeEdit (const KKSAttrValue *attr, KKSIndAttr::KKSIndAttrClass isSys, const QTime& time, QWidget * parent)
+KKSTimeEdit :: KKSTimeEdit (const KKSAttrValue *attr, KKSIndAttrClass isSys, const QTime& time, QWidget * parent)
     : QTimeEdit (parent), KKSAttrWidget(attr, isSys)
 {
 	if(time.isValid())

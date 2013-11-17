@@ -48,7 +48,6 @@ class KKSRubricFactory;
 class KKSSearchTemplate;
 class KKSAttrGroup;
 class KKSAttrValue;
-class KKSIndFactory;
 class KKSIndicator;
 class KKSIndicatorValue;
 class KKSSearchTemplatesForm;
@@ -177,7 +176,7 @@ private:
 
     void setRubrFactory (KKSRubricFactory * _rf);
 
-    void setIndicesFactory (KKSIndFactory * _indf);
+    //void setIndicesFactory (KKSIndFactory * _indf);
 
     int setAttributes (const KKSTemplate *t,
                              KKSObject *obj,
@@ -303,7 +302,7 @@ private slots:
                        QWidget *ioAttrs, 
                        int idObj, 
                        const KKSCategory *c, 
-                       KKSIndAttr::KKSIndAttrClass isSystem, 
+                       KKSIndAttrClass isSystem, 
                        KKSObjEditor *editor);
 
     void loadAttributeReference (QString tableName, QWidget *awAttr, int attrId);
@@ -350,20 +349,20 @@ private slots:
 
     void loadObjAttrRef (KKSObject * wObj, 
                          const KKSAttrValue* attr, 
-                         KKSIndAttr::KKSIndAttrClass isSystem, 
+                         KKSIndAttrClass isSystem, 
                          QAbstractItemModel * sMod);
     void loadObjCAttrRef (KKSObjectExemplar * wObjE, 
                           const KKSAttrValue* attr, 
-                          KKSIndAttr::KKSIndAttrClass isSystem, 
+                          //KKSIndAttrClass isSystem, 
                           QAbstractItemModel * sMod);
     void loadObjDelAttrRef (KKSObject * wObj, 
                             const KKSAttrValue* attribute, 
-                            KKSIndAttr::KKSIndAttrClass isSystem, 
+                            KKSIndAttrClass isSystem, 
                             QAbstractItemModel * sourceModel, 
                             const QModelIndex& wInd);
     void loadObjCDelAttrRef (KKSObjectExemplar * wObjE, 
                              const KKSAttrValue* attribute, 
-                             KKSIndAttr::KKSIndAttrClass isSystem, 
+                             KKSIndAttrClass isSystem, 
                              QAbstractItemModel * sourceModel, 
                              const QModelIndex& wInd);
 public slots:
@@ -428,6 +427,7 @@ private:
                                  QGridLayout * gAttrLayout, 
                                  bool isGrouped, 
                                  bool updateView);
+    /*
     void putIndicatorsGroupsOnToWidget (KKSObject * obj, 
                                         KKSObjEditor * editor, 
                                         int& nc, 
@@ -436,6 +436,7 @@ private:
                                         QGridLayout * gAttrLayout, 
                                         bool isGrouped, 
                                         bool updateView);
+    */
     void putSystemParams (KKSObjectExemplar * recio,
                           KKSObjEditor * editor,
                           QTabWidget * tabObj,
@@ -522,7 +523,6 @@ private:
     //QItemSelection cSelection;
     KKSStuffFactory * m_sf;
     KKSRubricFactory * m_rf;
-    KKSIndFactory * m_indf;
 
 private:
     Q_OBJECT

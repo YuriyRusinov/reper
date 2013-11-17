@@ -32,7 +32,7 @@ public:
 class _GUI_EXPORT KKSHIntervalW : public QWidget, public KKSAttrWidget
 {
 public:
-    KKSHIntervalW (const KKSAttrValue *attr, KKSIndAttr::KKSIndAttrClass isSys, QWidget * parent=0, Qt::WindowFlags f=0);
+    KKSHIntervalW (const KKSAttrValue *attr, KKSIndAttrClass isSys, QWidget * parent=0, Qt::WindowFlags f=0);
     virtual ~KKSHIntervalW (void);
 
     void value(int * h, int * m, int * s);
@@ -51,7 +51,7 @@ private slots:
     void secChanged (int sec);
 
 signals:
-    void valueChanged (qint64 id, KKSIndAttr::KKSIndAttrClass isSys, QVariant val);
+    void valueChanged (qint64 id, KKSIndAttrClass isSys, QVariant val);
 
 private:
     //

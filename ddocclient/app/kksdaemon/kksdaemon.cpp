@@ -358,7 +358,7 @@ void DDocServerListener::notify( char* notify_name, char * payload )
         return;
     }
 
-    int idHandler = res->getCellAsInt(0, 0);
+    //int idHandler = res->getCellAsInt(0, 0);
     QString name = res->getCellAsString(0, 1);
     QString service = res->getCellAsString(0, 3);
     QString extraParams = res->getCellAsString(0, 4);
@@ -371,8 +371,8 @@ void DDocServerListener::notify( char* notify_name, char * payload )
     if(isExternal){
         
         QString uri = QString("http://") + hHost + QString(":") + QString::number(hPort) + QString("/") + service;
-	//QString uri = QString("/") + service + QString("?id=") + QString::number(id); // + extraParams;
-	QUrl u(uri);
+	    //QString uri = QString("/") + service + QString("?id=") + QString::number(id); // + extraParams;
+	    QUrl u(uri);
 
 
         QHttp::ConnectionMode mode = QHttp::ConnectionModeHttp;
@@ -387,12 +387,13 @@ void DDocServerListener::notify( char* notify_name, char * payload )
         h.setValue("Port", QString::number(u.port()));
         
 
-	////QEventLoop eventLoop;
-	////connect(m_parent->http,SIGNAL(requestFinished(int,bool)),&eventLoop,SLOT(quit()));
+	    ////QEventLoop eventLoop;
+	    ////connect(m_parent->http,SIGNAL(requestFinished(int,bool)),&eventLoop,SLOT(quit()));
         //httpGetId = http->post ( path, byteArray ) ;
         //int uid = m_parent->http->get(path);
-        int uid = m_parent->http->request(h);
-	////eventLoop.exec();
+        //int uid = 
+        m_parent->http->request(h);
+	    ////eventLoop.exec();
 
         //qWarning() << "!!!!!!!  " << uid;
         

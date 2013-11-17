@@ -312,6 +312,8 @@ int KKSFileLoader::rGetFile(int idUrl, QString toUrl, int blockSize, QWidget * p
 
 int KKSFileLoader::rGetFile(QString fromUrl, QString toUrl, int blockSize, QWidget * parent) const
 {
+    Q_UNUSED(parent);
+
     if(blockSize <= 0)
         blockSize = getDefaultBlockSize();
     QTime t;

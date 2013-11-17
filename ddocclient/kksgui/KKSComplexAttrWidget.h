@@ -25,7 +25,7 @@ class _GUI_EXPORT KKSComplexAttrWidget : public QWidget, public KKSAttrWidget
 {
 public:
     KKSComplexAttrWidget (const KKSAttrValue*attr, 
-                          KKSIndAttr::KKSIndAttrClass isSys, 
+                          KKSIndAttrClass isSys, 
                           //KKSAttributesFactory * a,
                           KKSObjEditor * objEditor=0,
                           QWidget *parent=NULL, 
@@ -41,8 +41,8 @@ public slots:
 private slots:
 
 signals:
-    void valueChanged (qint64 id, KKSIndAttr::KKSIndAttrClass isSys, QVariant val);
-    void putAttrAttrOnWidget(KKSAttrValue*, KKSObjEditor*, QGridLayout*, int, KKSIndAttr::KKSIndAttrClass, QString, int);
+    void valueChanged (qint64 id, KKSIndAttrClass isSys, QVariant val);
+    void putAttrAttrOnWidget(KKSAttrValue*, KKSObjEditor*, QGridLayout*, int, KKSIndAttrClass, QString, int);
 
 protected:
 

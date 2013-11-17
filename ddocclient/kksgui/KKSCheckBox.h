@@ -20,12 +20,12 @@ class KKSAttrValue;
 class _GUI_EXPORT KKSCheckBox : public QCheckBox, public KKSAttrWidget
 {
 public:
-    KKSCheckBox (const KKSAttrValue * attr, KKSIndAttr::KKSIndAttrClass isSys, QWidget *parent=NULL);
-    KKSCheckBox (const KKSAttrValue* attr, KKSIndAttr::KKSIndAttrClass isSys, const QString& text, QWidget *parent=NULL);
+    KKSCheckBox (const KKSAttrValue * attr, KKSIndAttrClass isSys, QWidget *parent=NULL);
+    KKSCheckBox (const KKSAttrValue* attr, KKSIndAttrClass isSys, const QString& text, QWidget *parent=NULL);
     virtual ~KKSCheckBox (void);
 
 signals:
-    void valueChanged (qint64 id, KKSIndAttr::KKSIndAttrClass sys, QVariant val);
+    void valueChanged (qint64 id, KKSIndAttrClass sys, QVariant val);
 
 public slots:
     void setState (int state);

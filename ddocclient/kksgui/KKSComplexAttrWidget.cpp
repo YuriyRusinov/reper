@@ -15,7 +15,7 @@
 #include "KKSObjEditor.h"
 
 KKSComplexAttrWidget :: KKSComplexAttrWidget (const KKSAttrValue *attr, 
-                                              KKSIndAttr::KKSIndAttrClass isSys, 
+                                              KKSIndAttrClass isSys, 
                                               //KKSAttributesFactory * a,
                                               KKSObjEditor * objEditor,
                                               QWidget *parent, 
@@ -129,9 +129,9 @@ void KKSComplexAttrWidget :: init()
                                   qobject_cast<QGridLayout *>(m_groupBox->layout()), 
                                   ii, 
 #ifdef Q_CC_MSVC
-                                  KKSIndAttr::KKSIndAttrClass::iacAttrAttr,
+                                  iacAttrAttr,
 #else
-                                  KKSIndAttr::iacAttrAttr,
+                                  iacAttrAttr,
 #endif
                                   av->attribute()->tableName(), //таблица, из которой для ссылочных атрибутов будут загружаться значения
                                   -1);//(c ? c->id():-1));

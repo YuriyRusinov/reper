@@ -456,7 +456,7 @@ void KKSRubricFactory::rubricItemUpload(const KKSRubric *r, bool forRecords, QAb
                 qCritical() << tr("You are put document of category\n\"%1\"\nto rubric with category:\n\"%2\".\nThis is not allowed!")
                                                     .arg(c->name())
                                                     .arg(r->getCategory()->name());
-                int res = QMessageBox::critical(editor, 
+                QMessageBox::critical(editor, 
                                                 tr("Add document into rubric"), 
                                                 tr("You are put document of category\n\"%1\"\nto rubric with category:\n\"%2\".\nThis is not allowed!")
                                                     .arg(c->name())
@@ -1185,7 +1185,7 @@ void KKSRubricFactory::setSyncSettings(const QList<int>& ioIDList) {
 
     KKSSyncDialog * syncD = new KKSSyncDialog();
     KKSSyncWidget * syncW = syncD->getSyncWidget();
-    int idUser = loader->getUserId();
+    //int idUser = loader->getUserId();
     KKSObject * refObj = loader->loadIO(IO_IO_ID);
     KKSObjectExemplar * wObjE = loader->loadEIO(ioIDList.at(0), refObj);
     int attrId = ATTR_ID_SYNC_TYPE;
@@ -1277,8 +1277,8 @@ void KKSRubricFactory::putIntoRubr(const QList<int>& ioIDList, const KKSRubric *
     KKSIncludesDialog * rubrDial = new KKSIncludesDialog(anotherW);
     anotherW->hideIncludes();
     QWidget * pWidget = qobject_cast<QWidget *>(this->sender());
-    KKSIncludesWidget * iW = qobject_cast<KKSIncludesWidget *>(this->sender());
-    QAbstractItemModel * attachModel = iW->rubrItemsModel();
+    //KKSIncludesWidget * iW = qobject_cast<KKSIncludesWidget *>(this->sender());
+    //QAbstractItemModel * attachModel = iW->rubrItemsModel();
     if (rubrDial->exec() == QDialog::Accepted) {
         const KKSRubric * r = anotherW->getSelectedRubric();
         if (!r) {

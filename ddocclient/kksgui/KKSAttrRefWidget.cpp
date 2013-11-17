@@ -10,9 +10,9 @@ KKSAttrRefWidget :: KKSAttrRefWidget (QWidget *parent, Qt::WindowFlags f)
     idAttrValue (-1),
     cVal (QVariant()),
 #ifdef Q_CC_MSVC
-    isSystem (KKSIndAttr::KKSIndAttrClass::iacIOUserAttr)
+    isSystem (iacIOUserAttr)
 #else
-    isSystem (KKSIndAttr::iacIOUserAttr)
+    isSystem (iacIOUserAttr)
 #endif
 {
     this->setLayout (gAttrLay);
@@ -51,7 +51,7 @@ QGridLayout * KKSAttrRefWidget :: getLayout (void) const
     return gAttrLay;
 }
 
-void KKSAttrRefWidget :: setValue (qint64 id, KKSIndAttr::KKSIndAttrClass sys, QVariant val)
+void KKSAttrRefWidget :: setValue (qint64 id, KKSIndAttrClass sys, QVariant val)
 {
     idAttrValue = id;
     isSystem = sys;
@@ -64,7 +64,7 @@ qint64 KKSAttrRefWidget :: getIdAttrValue (void) const
     return idAttrValue;
 }
 
-KKSIndAttr::KKSIndAttrClass KKSAttrRefWidget :: isSysAttr (void) const
+KKSIndAttrClass KKSAttrRefWidget :: isSysAttr (void) const
 {
     return isSystem;
 }

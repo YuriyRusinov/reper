@@ -27,7 +27,7 @@
 #include "KKSRubricFactory.h"
 #include "KKSStuffFactory.h"
 #include "KKSAttributesFactory.h"
-#include "KKSIndFactory.h"
+//#include "KKSIndFactory.h"
 #include "KKSDbgOutputWidget.h"
 
 #include "kkssettings.h"
@@ -85,7 +85,6 @@ KKSSito::KKSSito(const QString & userName, bool msgToWindow) :
     m_catf (0),
     m_tf (0),
     m_attrf (0),
-    m_indf (0),
     m_dbgWidget(0)
 {
     if ( self )
@@ -1076,15 +1075,6 @@ void KKSSito::initFactories()
     if (!m_tf)
         m_tf = new KKSTemplateEditorFactory (m_loader, m_ppf);
 
-    if (!m_indf)
-        m_indf = new KKSIndFactory (db(), m_loader);
-
-    if (m_objf && m_indf)
-    {
-        m_objf->setIndicesFactory (m_indf);
-        m_indf->setOEF (m_objf);
-    }
-
     if (m_catf && m_tf)
     {
         m_catf->setTemplateEditorFactory (m_tf);
@@ -1128,11 +1118,6 @@ KKSRubricFactory * KKSSito::rf () const
 KKSStuffFactory *KKSSito::sf () const
 {
     return m_sf;
-}
-
-KKSIndFactory * KKSSito::indf () const
-{
-    return m_indf;
 }
 
 KKSCmdJSettings * KKSSito::getCmdJSettings()

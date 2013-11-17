@@ -17,7 +17,7 @@
 #include <KKSAttrValue.h>
 #include "KKSVideoPlayer.h"
 
-KKSVideoPlayer::KKSVideoPlayer(const KKSAttrValue *attr, KKSIndAttr::KKSIndAttrClass isSys, QWidget * parent, Qt::WindowFlags flags)
+KKSVideoPlayer::KKSVideoPlayer(const KKSAttrValue *attr, KKSIndAttrClass isSys, QWidget * parent, Qt::WindowFlags flags)
     : QLabel (parent, flags), KKSAttrWidget(attr, isSys),
       m_movie (0)
 {

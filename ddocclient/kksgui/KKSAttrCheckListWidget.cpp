@@ -20,7 +20,7 @@
 #include "KKSSortFilterProxyModel.h"
 #include "KKSAttrValueLabel.h"
 
-KKSAttrCheckWidget :: KKSAttrCheckWidget (const KKSAttrValue * attr, KKSIndAttr::KKSIndAttrClass isSys, QWidget * parent, Qt::WFlags f)
+KKSAttrCheckWidget :: KKSAttrCheckWidget (const KKSAttrValue * attr, KKSIndAttrClass isSys, QWidget * parent, Qt::WFlags f)
     : QWidget (parent, f), KKSAttrWidget(attr, isSys),
     tv (new QTreeView (this)),
     tbActions (new QToolBar (this)),

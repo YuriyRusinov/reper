@@ -18,14 +18,14 @@ class KKSAttrValue;
 class _GUI_EXPORT KKSDateTimeEdit : public QDateTimeEdit, public KKSAttrWidget
 {
     public:
-        KKSDateTimeEdit (const KKSAttrValue *attr, KKSIndAttr::KKSIndAttrClass isSys, QWidget *parent=NULL);
-        KKSDateTimeEdit (const KKSAttrValue *attr, KKSIndAttr::KKSIndAttrClass isSys, const QDateTime& datetime, QWidget *parent=NULL);
-        KKSDateTimeEdit (const KKSAttrValue *attr, KKSIndAttr::KKSIndAttrClass isSys, const QDate& date, QWidget *parent=NULL);
-        KKSDateTimeEdit (const KKSAttrValue *attr, KKSIndAttr::KKSIndAttrClass isSys, const QTime& time, QWidget * parent=NULL);
+        KKSDateTimeEdit (const KKSAttrValue *attr, KKSIndAttrClass isSys, QWidget *parent=NULL);
+        KKSDateTimeEdit (const KKSAttrValue *attr, KKSIndAttrClass isSys, const QDateTime& datetime, QWidget *parent=NULL);
+        KKSDateTimeEdit (const KKSAttrValue *attr, KKSIndAttrClass isSys, const QDate& date, QWidget *parent=NULL);
+        KKSDateTimeEdit (const KKSAttrValue *attr, KKSIndAttrClass isSys, const QTime& time, QWidget * parent=NULL);
         virtual ~KKSDateTimeEdit (void);
 
     signals:
-        void valueChanged (qint64 id, KKSIndAttr::KKSIndAttrClass isSys, QVariant val);
+        void valueChanged (qint64 id, KKSIndAttrClass isSys, QVariant val);
 
     public slots:
         void setDateTime (const QDateTime& dt);

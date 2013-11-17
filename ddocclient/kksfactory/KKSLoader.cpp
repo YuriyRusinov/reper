@@ -3877,9 +3877,9 @@ KKSRubricBase * KKSLoader::loadCatRubricators(void) const
     for(int i=0; i<cnt; i++){
         int id = res->getCellAsInt(i, 0);
         
-        int idParent = -1;
+        //int idParent = -1;
         
-        KKSSearchTemplate * st = 0;
+        //KKSSearchTemplate * st = 0;
         
         KKSCategory * c = NULL;//this->loadCategory (id);
 
@@ -3888,7 +3888,7 @@ KKSRubricBase * KKSLoader::loadCatRubricators(void) const
         QString desc = res->getCellAsString(i, 4);
         QString icon = QString();//res->getCellAsString(i, 11);
 
-        int type = 0;//res->getCellAsInt(i, 8);
+        //int type = 0;//res->getCellAsInt(i, 8);
 
         KKSRubric * theRubric = new KKSRubric(id, name);
         theRubric->setCategorized (true);

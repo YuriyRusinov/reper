@@ -462,9 +462,7 @@ void DDocInteractorClient::httpRequestFinished(int requestId, bool error)
 
         JKKSPing defValue = JKKSPing();
         JKKSPing p = m_parent->m_pings.value(emailPrefix, defValue);
-        if(p == defValue){
-            int a = 0;
-        }
+
         p.setState1(0);
         p.setState2(0);
         m_parent->m_pings.insert(emailPrefix, p);
@@ -503,9 +501,7 @@ void DDocInteractorClient::httpRequestFinished(int requestId, bool error)
 
         JKKSPing defValue = JKKSPing();
         JKKSPing p = m_parent->m_pings.value(emailPrefix, defValue);
-        if(p == defValue){
-            int a = 0;
-        }
+
         p.setState1(0);
         p.setState2(0);
         m_parent->m_pings.insert(emailPrefix, p);
@@ -628,8 +624,8 @@ bool DDocInteractorClient::setMessageAsSended(const qint64 & id, const int & typ
 QByteArray DDocInteractorClient::prepareForSend(QHttpRequestHeader & header,
                                                 QHttp * http,
                                                 const JKKSPMessWithAddr * message, 
-                                                bool bSync,
-                                                bool isLastFilePart,
+                                                //bool bSync,
+                                                //bool isLastFilePart,
                                                 bool isPing)
 {
     QByteArray ba;
@@ -744,7 +740,7 @@ QByteArray DDocInteractorClient::prepareForSend(QHttpRequestHeader & header,
     if (path.isEmpty())
         path = "/";
 
-    bool ok = createRequestHeader(header, h, p, (mode == QHttp::ConnectionModeHttps), ba.length());    
+    bool ok = createRequestHeader(header, h, p, ba.length());    
     if(!ok)
         return QByteArray();
    
@@ -756,7 +752,7 @@ QByteArray DDocInteractorClient::prepareForSend(QHttpRequestHeader & header,
 bool DDocInteractorClient::createRequestHeader(QHttpRequestHeader & header,
                                                const QString & host, 
                                                int port, 
-                                               bool https, 
+                                               //bool https, 
                                                int length)
 {
     header = QHttpRequestHeader("POST", "/");
@@ -837,7 +833,7 @@ bool DDocInteractorClient::sendOutMessage(const JKKSPMessWithAddr * message,
     }
 
     QHttpRequestHeader header;
-    QByteArray ba = prepareForSend(header, m_http, message, bSync, isLastFilePart, isPing);
+    QByteArray ba = prepareForSend(header, m_http, message, isPing);
     if(ba.isEmpty())
         return false;
 

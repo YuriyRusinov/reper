@@ -52,7 +52,7 @@ private:
 class _GUI_EXPORT KKSIntervalWidget : public QWidget, public KKSAttrWidget
 {
     public:
-        KKSIntervalWidget (const KKSAttrValue *attr, KKSIndAttr::KKSIndAttrClass isSys, QWidget *parent=NULL);
+        KKSIntervalWidget (const KKSAttrValue *attr, KKSIndAttrClass isSys, QWidget *parent=NULL);
         ~KKSIntervalWidget (void);
 
         void setLineEdit (QLineEdit *le);
@@ -61,7 +61,7 @@ class _GUI_EXPORT KKSIntervalWidget : public QWidget, public KKSAttrWidget
         IntervalValue value();
 
     signals:
-        void valueChanged (qint64 id, KKSIndAttr::KKSIndAttrClass isSys, QVariant val);
+        void valueChanged (qint64 id, KKSIndAttrClass isSys, QVariant val);
 
     public slots:
         void setValue (void);

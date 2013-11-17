@@ -21,14 +21,14 @@ class KKSAttrValue;
 class _GUI_EXPORT KKSComboBox : public QComboBox, public KKSAttrWidget
 {
     public:
-        KKSComboBox (const KKSAttrValue * attr, KKSIndAttr::KKSIndAttrClass isSys, QWidget *parent=NULL);
+        KKSComboBox (const KKSAttrValue * attr, KKSIndAttrClass isSys, QWidget *parent=NULL);
         virtual ~KKSComboBox (void);
         
         //void addItem(const QString & value, int itemData);
         //void setItemData(int index);
 
     signals:
-        void valueChanged (qint64 id, KKSIndAttr::KKSIndAttrClass sys, QVariant val);
+        void valueChanged (qint64 id, KKSIndAttrClass sys, QVariant val);
 
     protected:
 

@@ -64,7 +64,7 @@ public:
    
     KKSRecord();
     KKSRecord(const KKSRecord & r);
-    KKSRecord(qint64 id, const QString & name, const QString & desc = QString::null, const QString & code = QString::null, bool isKKSState = false);
+    KKSRecord(qint64 id, const QString & name, const QString & desc = QString::null, const QString & code = QString::null);//, bool isKKSState = false);
     virtual ~KKSRecord();
 
 protected:

@@ -20,15 +20,15 @@ class KKSAttrValue;
 class _GUI_EXPORT KKSPixmap : public QLabel, public KKSAttrWidget
 {
     public:
-        KKSPixmap (const KKSAttrValue*attr, KKSIndAttr::KKSIndAttrClass isSys, QWidget *parent=NULL);
-        KKSPixmap (const KKSAttrValue*attr, KKSIndAttr::KKSIndAttrClass isSys, const QString& contents, QWidget *parent=NULL);
+        KKSPixmap (const KKSAttrValue*attr, KKSIndAttrClass isSys, QWidget *parent=NULL);
+        KKSPixmap (const KKSAttrValue*attr, KKSIndAttrClass isSys, const QString& contents, QWidget *parent=NULL);
         virtual ~KKSPixmap (void);
 
         const QPixmap & pixmap() const;
         QByteArray save();
 
     signals:
-        void valueChanged (qint64 id, KKSIndAttr::KKSIndAttrClass isSys, QVariant val);
+        void valueChanged (qint64 id, KKSIndAttrClass isSys, QVariant val);
 
     public slots:
         

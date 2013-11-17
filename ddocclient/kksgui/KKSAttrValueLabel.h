@@ -20,7 +20,7 @@ class KKSObject;
 class _GUI_EXPORT KKSAttrValueLabel : public QLabel
 {
 public:
-    KKSAttrValueLabel (KKSAttrValue * av, KKSIndAttr::KKSIndAttrClass isSystem, QWidget *parent=NULL);
+    KKSAttrValueLabel (KKSAttrValue * av, KKSIndAttrClass isSystem, QWidget *parent=NULL);
     virtual ~KKSAttrValueLabel (void);
 
     void setAttrValue(KKSAttrValue * av);
@@ -55,7 +55,7 @@ private:
     // Variables
     //
     KKSAttrValue *m_av;
-    KKSIndAttr::KKSIndAttrClass m_isSystem;
+    KKSIndAttrClass m_isSystem;
 
 private:
     Q_OBJECT

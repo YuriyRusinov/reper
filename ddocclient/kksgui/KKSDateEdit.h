@@ -21,12 +21,12 @@ class KKSAttrValue;
 class _GUI_EXPORT KKSDateEdit : public QDateEdit, public KKSAttrWidget
 {
     public:
-        KKSDateEdit (const KKSAttrValue *attr, KKSIndAttr::KKSIndAttrClass isSys, QWidget *parent=NULL);
-        KKSDateEdit (const KKSAttrValue *attr, KKSIndAttr::KKSIndAttrClass isSys, const QDate& date, QWidget *parent=NULL);
+        KKSDateEdit (const KKSAttrValue *attr, KKSIndAttrClass isSys, QWidget *parent=NULL);
+        KKSDateEdit (const KKSAttrValue *attr, KKSIndAttrClass isSys, const QDate& date, QWidget *parent=NULL);
         virtual ~KKSDateEdit (void);
 
     signals:
-        void valueChanged (qint64 id, KKSIndAttr::KKSIndAttrClass isSys, QVariant val);
+        void valueChanged (qint64 id, KKSIndAttrClass isSys, QVariant val);
 
     public slots:
         void setDate (const QDate& d);

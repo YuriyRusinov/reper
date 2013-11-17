@@ -354,6 +354,8 @@ int JKKSFilePart :: unserialize (const QByteArray& mess)
 
 int JKKSFilePart :: writeToDB (const JKKSLoader * loader, const QString& senderUID, const QString& receiverUID)
 {
+    Q_UNUSED(receiverUID);
+
     int ier = loader->writeMessage (this, senderUID);
     return ier;
 }

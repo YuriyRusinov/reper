@@ -30,7 +30,7 @@
 #include <KKSAttributesFactory.h>
 #include <KKSStuffFactory.h>
 #include <KKSRubricFactory.h>
-#include <KKSIndFactory.h>
+//#include <KKSIndFactory.h>
 
 #include <kksincludeswidget.h>
 #include <kkscmdjournalitem.h>
@@ -89,7 +89,7 @@ KKSMainWindow::KKSMainWindow(QWidget *parent)
     KKSCatEditorFactory * catf = kksSito->catf ();
     KKSTemplateEditorFactory * tf = kksSito->tf ();
     KKSRubricFactory * rf = kksSito->rf ();
-    KKSIndFactory * indf = kksSito->indf ();
+    //KKSIndFactory * indf = kksSito->indf ();
     connect (oef, 
              SIGNAL(editorCreated(KKSObjEditor *)), 
              this, 
@@ -119,12 +119,6 @@ KKSMainWindow::KKSMainWindow(QWidget *parent)
              SIGNAL (objEditorCreated (KKSObjEditor *)), 
              this, 
              SLOT (slotCreateNewObjEditor(KKSObjEditor*)));
-
-    connect (indf,
-             SIGNAL (viewIndicatorWidget (IndicatorForm *)),
-             this,
-             SLOT (slotIndicatorEdit (IndicatorForm *))
-            );
 
     init();
     

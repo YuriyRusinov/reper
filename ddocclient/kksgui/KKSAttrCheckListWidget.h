@@ -28,7 +28,7 @@ class KKSAttrValue;
 class _GUI_EXPORT KKSAttrCheckWidget : public QWidget, public KKSAttrWidget
 {
 public:
-    KKSAttrCheckWidget (const KKSAttrValue* attr, KKSIndAttr::KKSIndAttrClass isSys, QWidget * parent=0, Qt::WFlags f=0);
+    KKSAttrCheckWidget (const KKSAttrValue* attr, KKSIndAttrClass isSys, QWidget * parent=0, Qt::WFlags f=0);
     ~KKSAttrCheckWidget (void);
 
     void setModel (QAbstractItemModel * sourceModel);
@@ -36,12 +36,12 @@ public:
     QLabel * getHistLabel (void) const;
 
 signals:
-    void addAttrRef (const KKSAttrValue * attribute, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel);
-    void delAttrRef (const KKSAttrValue * attribute, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel, const QModelIndex& wInd);
+    void addAttrRef (const KKSAttrValue * attribute, KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel);
+    void delAttrRef (const KKSAttrValue * attribute, KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel, const QModelIndex& wInd);
     void refIOOpen (QString tableName);
     void refRecOpen (QString tableName, qint64 id);
     
-    void valueChanged (qint64 id, KKSIndAttr::KKSIndAttrClass sys, QVariant val);
+    void valueChanged (qint64 id, KKSIndAttrClass sys, QVariant val);
 
 private slots:
     void addAttrRef (void);

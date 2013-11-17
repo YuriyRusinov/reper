@@ -125,12 +125,12 @@ void KKSAttribute::setDefWidth(int w)
         m_defWidth = 100;
 }
 
-KKSIndAttr::KKSIndAttrClass KKSAttribute::isSystem() const
+KKSIndAttrClass KKSAttribute::isSystem() const
 {
     return m_isSystem;
 }
 
-void KKSAttribute::setAsSystem(KKSIndAttr::KKSIndAttrClass yes)
+void KKSAttribute::setAsSystem(KKSIndAttrClass yes)
 {
     m_isSystem = yes;
 }

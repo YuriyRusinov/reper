@@ -123,7 +123,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSRecDialog
         void setRecTab (QTabWidget * tabEnc);
         
     public slots:
-        void setValue (qint64 id, KKSIndAttr::KKSIndAttrClass sys, QVariant val);
+        void setValue (qint64 id, KKSIndAttrClass sys, QVariant val);
         //void setIndValue (int id, bool sys, QVariant val);
 
         void loadAttrHistory (const KKSAttrValue * av, bool forRecs);
@@ -167,8 +167,8 @@ class _GUI_EXPORT KKSObjEditor : public KKSRecDialog
         void privChanged (KKSPrivilege *p, KKSObject * obj);
         void addAnotherTable (void);
 
-        void addAttributeCheckReference (const KKSAttrValue* av, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel);
-        void delAttributeCheckReference (const KKSAttrValue* av, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel, const QModelIndex& wInd);
+        void addAttributeCheckReference (const KKSAttrValue* av, KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel);
+        void delAttributeCheckReference (const KKSAttrValue* av, KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel, const QModelIndex& wInd);
         
         void openReferenceIO (QString tableName);
         void openReferenceRec (QString tableName, qint64 id );
@@ -224,15 +224,15 @@ class _GUI_EXPORT KKSObjEditor : public KKSRecDialog
         void openRubricItemRequested(int idObject, KKSObjEditor * editor);
         void openRubricItemRecRequested(int idObjectE, KKSObjEditor * editor);
 
-        void updateAttributes (QWidget *ioAttrWidget, QScrollArea *sc, QWidget *ioAttrsW, /*KKSObject * wObj*/ int idObj, const KKSCategory * wCat, KKSIndAttr::KKSIndAttrClass isSystem, KKSObjEditor* editor);
+        void updateAttributes (QWidget *ioAttrWidget, QScrollArea *sc, QWidget *ioAttrsW, /*KKSObject * wObj*/ int idObj, const KKSCategory * wCat, KKSIndAttrClass isSystem, KKSObjEditor* editor);
         void closeEditor (void);
         void prepareIO (KKSObject* wObj, KKSObjectExemplar * wObjEx, KKSObjEditor* editor);
         void addAnotherTable (KKSObject * wObj, KKSObjEditor* editor);
         
-        void editObjAttrRef (KKSObject * wObj, const KKSAttrValue* av, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sMod);
-        void editObjCAttrRef (KKSObjectExemplar * wObjE, const KKSAttrValue* av, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sMod);
-        void delObjAttrRef (KKSObject * wObj, const KKSAttrValue* av, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel, const QModelIndex& wInd);
-        void delObjCAttrRef (KKSObjectExemplar * wObjE, const KKSAttrValue* av, KKSIndAttr::KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel, const QModelIndex& wInd);
+        void editObjAttrRef (KKSObject * wObj, const KKSAttrValue* av, KKSIndAttrClass isSystem, QAbstractItemModel * sMod);
+        void editObjCAttrRef (KKSObjectExemplar * wObjE, const KKSAttrValue* av, KKSIndAttrClass isSystem, QAbstractItemModel * sMod);
+        void delObjAttrRef (KKSObject * wObj, const KKSAttrValue* av, KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel, const QModelIndex& wInd);
+        void delObjCAttrRef (KKSObjectExemplar * wObjE, const KKSAttrValue* av, KKSIndAttrClass isSystem, QAbstractItemModel * sourceModel, const QModelIndex& wInd);
         
         void openRefIO (QString tableName);
         void openRefRec (QString tableName, qint64);
@@ -309,8 +309,8 @@ class _GUI_EXPORT KKSObjEditor : public KKSRecDialog
         void setParentTab (int nt);
         int addCatsCount (void) const;
         void addListAttrWidget (QToolButton *tb, QWidget *aw, const KKSAttrValue* av);
-        void setOpt (int id, KKSIndAttr::KKSIndAttrClass isSystem, QCheckBox* ch);
-        void addOptWidget (int id, KKSIndAttr::KKSIndAttrClass isSystem, QWidget *w);
+        void setOpt (int id, KKSIndAttrClass isSystem, QCheckBox* ch);
+        void addOptWidget (int id, KKSIndAttrClass isSystem, QWidget *w);
         
         void setRecordsModel (QAbstractItemModel * recMod);
         void setRecordsIndex (const QModelIndex& recInd);

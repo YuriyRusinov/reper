@@ -197,32 +197,32 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
         }
         case KKSAttrType::atSVG:
         {
-            svgVal = new KKSSvgWidget (pAttrValue, KKSIndAttr::iacIOUserAttr, V.toByteArray());
+            svgVal = new KKSSvgWidget (pAttrValue, iacIOUserAttr, V.toByteArray());
             valWidget = qobject_cast<QWidget *>(svgVal);
             break;
         }
         case KKSAttrType::atPoints:
         {
-            pointsVal = new KKSPointTable (pAttrValue, KKSIndAttr::iacIOUserAttr, V.toList());
+            pointsVal = new KKSPointTable (pAttrValue, iacIOUserAttr, V.toList());
             valWidget = qobject_cast<QWidget *>(pointsVal);
             break;
         }
         case KKSAttrType::atJPG:
         {
-            pixVal = new KKSPixmap (pAttrValue, KKSIndAttr::iacIOUserAttr, V.toString());
+            pixVal = new KKSPixmap (pAttrValue, iacIOUserAttr, V.toString());
             valWidget = qobject_cast<QWidget *>(pixVal);
             break;
         }
         case KKSAttrType::atVideo:
         {
-            videoVal = new KKSVideoPlayer (pAttrValue, KKSIndAttr::iacIOUserAttr);
+            videoVal = new KKSVideoPlayer (pAttrValue, iacIOUserAttr);
             videoVal->setMovie(V.toByteArray());
             valWidget = qobject_cast<QWidget *>(videoVal);
             break;
         }
         case KKSAttrType::atInterval:
         {
-            iValW = new KKSIntervalWidget (pAttrValue, KKSIndAttr::iacIOUserAttr);
+            iValW = new KKSIntervalWidget (pAttrValue, iacIOUserAttr);
             QString v = V.toStringList().join(" ");
             QStringList vl = v.split (" ");
             int vi = vl[0].toInt();
@@ -254,7 +254,7 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
         }
         case KKSAttrType::atIntervalH:
         {
-            iValWH = new KKSHIntervalW (pAttrValue, KKSIndAttr::iacIOUserAttr);
+            iValWH = new KKSHIntervalW (pAttrValue, iacIOUserAttr);
             iValWH->setReadOnly (true);
             valWidget = qobject_cast<QWidget *> (iValWH);
             QString v = V.toStringList().join(" ");
@@ -274,7 +274,7 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
             //QRgb rgb_col (V.value<QColor>().toRgb());//toUInt ();
             QColor rgb_color = V.value<QColor>();//QColor::fromRgba (rgb_col);//V.value<QColor>();//toInt ();
             
-            iColW = new KKSColorWidget (pAttrValue, KKSIndAttr::iacIOUserAttr, rgb_color, pAttrValue->attribute()->type()->attrType());
+            iColW = new KKSColorWidget (pAttrValue, iacIOUserAttr, rgb_color, pAttrValue->attribute()->type()->attrType());
             iColW->hideToolButton();
             valWidget = qobject_cast<QWidget *>(iColW);
             break;
@@ -400,28 +400,28 @@ void KKSAValWidget::initComplexWidget (KKSAttrValue * av, QGridLayout * gLay, QW
             }
             case KKSAttrType::atSVG:
             {
-                aW = new KKSSvgWidget (aV, KKSIndAttr::iacIOUserAttr, val.toByteArray(), parent);
+                aW = new KKSSvgWidget (aV, iacIOUserAttr, val.toByteArray(), parent);
                 break;
             }
             case KKSAttrType::atPoints:
             {
-                aW = new KKSPointTable (aV, KKSIndAttr::iacIOUserAttr, val.toList());
+                aW = new KKSPointTable (aV, iacIOUserAttr, val.toList());
                 break;
             }
             case KKSAttrType::atJPG:
             {
-                aW = new KKSPixmap (pAttrValue, KKSIndAttr::iacIOUserAttr, val.toString());
+                aW = new KKSPixmap (pAttrValue, iacIOUserAttr, val.toString());
                 break;
             }
             case KKSAttrType::atVideo:
             {
-                aW = new KKSVideoPlayer (pAttrValue, KKSIndAttr::iacIOUserAttr);
+                aW = new KKSVideoPlayer (pAttrValue, iacIOUserAttr);
                 (qobject_cast<KKSVideoPlayer *>(aW))->setMovie(val.toByteArray());
                 break;
             }
             case KKSAttrType::atInterval:
             {
-                aW = new KKSIntervalWidget (pAttrValue, KKSIndAttr::iacIOUserAttr);
+                aW = new KKSIntervalWidget (pAttrValue, iacIOUserAttr);
                 KKSIntervalWidget * iW = qobject_cast<KKSIntervalWidget *>(aW);
                 QString v = val.toStringList().join(" ");
                 QStringList vl = v.split (" ");
@@ -433,7 +433,7 @@ void KKSAValWidget::initComplexWidget (KKSAttrValue * av, QGridLayout * gLay, QW
             }
             case KKSAttrType::atIntervalH:
             {
-                aW = new KKSHIntervalW (pAttrValue, KKSIndAttr::iacIOUserAttr);
+                aW = new KKSHIntervalW (pAttrValue, iacIOUserAttr);
                 KKSHIntervalW * iHW = qobject_cast<KKSHIntervalW *>(aW);
                 iHW->setReadOnly(true);
                 QString v = val.toStringList().join(" ");
