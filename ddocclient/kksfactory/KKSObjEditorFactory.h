@@ -353,7 +353,7 @@ private slots:
                          QAbstractItemModel * sMod);
     void loadObjCAttrRef (KKSObjectExemplar * wObjE, 
                           const KKSAttrValue* attr, 
-                          //KKSIndAttrClass isSystem, 
+                          KKSIndAttrClass isSystem, 
                           QAbstractItemModel * sMod);
     void loadObjDelAttrRef (KKSObject * wObj, 
                             const KKSAttrValue* attribute, 

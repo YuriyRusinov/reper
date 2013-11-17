@@ -2345,9 +2345,9 @@ void KKSAttributesFactory :: connectToSlots (QObject *aw, QWidget* wEditor)
 {
 //    if (aw->metaObject ()->indexOfSignal (SIGNAL (valueChanged(int, bool, QVariant))) >= 0)
     QObject::connect (aw, 
-                      SIGNAL (valueChanged(qint64, KKSIndAttr::KKSIndAttrClass, QVariant)), 
+                      SIGNAL (valueChanged(qint64, KKSIndAttrClass, QVariant)), 
                       wEditor, 
-                      SLOT (setValue (qint64, KKSIndAttr::KKSIndAttrClass, QVariant)) );
+                      SLOT (setValue (qint64, KKSIndAttrClass, QVariant)) );
 }
 
 void KKSAttributesFactory :: slotLoadIOSrc (KKSObject ** io, QWidget * parent)

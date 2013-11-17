@@ -1589,7 +1589,7 @@ void KKSObjEditorFactory :: setObjConnect (KKSObjEditor *editor)
     connect (editor, SIGNAL(includeRecRequested(KKSObjEditor*)), this, SLOT(slotIncludeRecRequested(KKSObjEditor*)));
     connect (editor, SIGNAL(openRubricItemRequested(int, KKSObjEditor*)), this, SLOT(slotOpenRubricItemRequested(int, KKSObjEditor*)));
     connect (editor, SIGNAL(openRubricItemRecRequested(int, KKSObjEditor*)), this, SLOT(slotOpenRubricItemRecRequested(int, KKSObjEditor*)));
-    connect (editor, SIGNAL (updateAttributes (QWidget *, QScrollArea *, QWidget *, int, const KKSCategory *, KKSIndAttr::KKSIndAttrClass, KKSObjEditor*)), this, SLOT (regroupAttrs (QWidget *, QScrollArea *, QWidget *, int, const KKSCategory*, KKSIndAttr::KKSIndAttrClass, KKSObjEditor*)) );
+    connect (editor, SIGNAL (updateAttributes (QWidget *, QScrollArea *, QWidget *, int, const KKSCategory *, KKSIndAttrClass, KKSObjEditor*)), this, SLOT (regroupAttrs (QWidget *, QScrollArea *, QWidget *, int, const KKSCategory*, KKSIndAttrClass, KKSObjEditor*)) );
     connect (editor, SIGNAL (saveObj(KKSObjEditor*, KKSObject*, KKSObjectExemplar*, int, QAbstractItemModel *)), this, SLOT (saveObject(KKSObjEditor*, KKSObject*, KKSObjectExemplar*, int, QAbstractItemModel *)) );
     connect (editor, SIGNAL (saveObjAsCommandResult(KKSObjEditor*, KKSObject*, KKSObjectExemplar*, int, QAbstractItemModel *)), this, SLOT (saveObjectAsCommandResult(KKSObjEditor*, KKSObject*, KKSObjectExemplar*, int, QAbstractItemModel *)) );
     connect (editor, SIGNAL (saveObjE(KKSObjEditor*, KKSObjectExemplar *, const KKSCategory*, QString, int, QAbstractItemModel *)), this, SLOT (saveObjectEx(KKSObjEditor*, KKSObjectExemplar *, const KKSCategory*, QString, int, QAbstractItemModel *)) );
@@ -1607,10 +1607,10 @@ void KKSObjEditorFactory :: setObjConnect (KKSObjEditor *editor)
     connect (editor, SIGNAL (exportObjectEx (KKSObjEditor *, int, const KKSCategory *, QString, QAbstractItemModel *)), this, SLOT (exportEIO (KKSObjEditor *, int, const KKSCategory *, QString, QAbstractItemModel *)) );
     connect (editor, SIGNAL (prepareIO (KKSObject*, KKSObjectExemplar *, KKSObjEditor*)), this, SLOT (sendIO (KKSObject *, KKSObjectExemplar *, KKSObjEditor *)) );
     
-    connect (editor, SIGNAL (editObjAttrRef (KKSObject *, const KKSAttrValue*, KKSIndAttr::KKSIndAttrClass, QAbstractItemModel *)), this, SLOT (loadObjAttrRef (KKSObject *, const KKSAttrValue*, KKSIndAttr::KKSIndAttrClass, QAbstractItemModel *)) );
-    connect (editor, SIGNAL (editObjCAttrRef (KKSObjectExemplar *, const KKSAttrValue*, KKSIndAttr::KKSIndAttrClass, QAbstractItemModel *) ), this, SLOT (loadObjCAttrRef (KKSObjectExemplar *, const KKSAttrValue*, KKSIndAttr::KKSIndAttrClass, QAbstractItemModel *) ) );
-    connect (editor, SIGNAL (delObjAttrRef (KKSObject *, const KKSAttrValue*, KKSIndAttr::KKSIndAttrClass, QAbstractItemModel *, const QModelIndex&)), this, SLOT (loadObjDelAttrRef (KKSObject *, const KKSAttrValue*, KKSIndAttr::KKSIndAttrClass, QAbstractItemModel *, const QModelIndex&)) );
-    connect (editor, SIGNAL (delObjCAttrRef (KKSObjectExemplar *, const KKSAttrValue*, KKSIndAttr::KKSIndAttrClass, QAbstractItemModel *, const QModelIndex&)), this, SLOT (loadObjCDelAttrRef (KKSObjectExemplar *, const KKSAttrValue*, KKSIndAttr::KKSIndAttrClass, QAbstractItemModel *, const QModelIndex&)) );
+    connect (editor, SIGNAL (editObjAttrRef (KKSObject *, const KKSAttrValue*, KKSIndAttrClass, QAbstractItemModel *)), this, SLOT (loadObjAttrRef (KKSObject *, const KKSAttrValue*, KKSIndAttrClass, QAbstractItemModel *)) );
+    connect (editor, SIGNAL (editObjCAttrRef (KKSObjectExemplar *, const KKSAttrValue*, KKSIndAttrClass, QAbstractItemModel *) ), this, SLOT (loadObjCAttrRef (KKSObjectExemplar *, const KKSAttrValue*, KKSIndAttrClass, QAbstractItemModel *) ) );
+    connect (editor, SIGNAL (delObjAttrRef (KKSObject *, const KKSAttrValue*, KKSIndAttrClass, QAbstractItemModel *, const QModelIndex&)), this, SLOT (loadObjDelAttrRef (KKSObject *, const KKSAttrValue*, KKSIndAttrClass, QAbstractItemModel *, const QModelIndex&)) );
+    connect (editor, SIGNAL (delObjCAttrRef (KKSObjectExemplar *, const KKSAttrValue*, KKSIndAttrClass, QAbstractItemModel *, const QModelIndex&)), this, SLOT (loadObjCDelAttrRef (KKSObjectExemplar *, const KKSAttrValue*, KKSIndAttrClass, QAbstractItemModel *, const QModelIndex&)) );
 
     connect (editor, SIGNAL (openRefIO (QString)), this, SLOT (loadRefIO (QString)) );
     connect (editor, SIGNAL (openRefRec (QString, qint64)), this, SLOT (loadRefRec (QString, qint64)) );
@@ -7765,9 +7765,10 @@ void KKSObjEditorFactory :: loadObjAttrRef (KKSObject * wObj, const KKSAttrValue
  */
 void KKSObjEditorFactory :: loadObjCAttrRef (KKSObjectExemplar * wObjE, 
                                              const KKSAttrValue* avE, 
-                                             //KKSIndAttrClass isSystem, 
+                                             KKSIndAttrClass isSystem, 
                                              QAbstractItemModel * sMod)
 {
+    Q_UNUSED (isSystem);
     if (!wObjE || !avE || !sMod)
         return;
     
