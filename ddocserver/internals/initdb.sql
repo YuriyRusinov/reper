@@ -6,6 +6,7 @@ begin;
 \i ./functions/misc/f_is_type_exist.sql
 \i ./functions/misc/f_safe_drop_type.sql
 \i ./functions/general/generateuid.sql
+\i ./functions/general/createtriggeruidex.sql
 commit;
 
 \i ./functions/contribs/readd_contribs.sql
