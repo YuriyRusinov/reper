@@ -612,7 +612,7 @@ void KKSAValWidget::setValue (const KKSAttribute * a, QVariant val)
             //QRgb rgb_col (vlc);// = V.value<QColor>();//toUInt ();
             QColor rgb_color = val.value<QColor>();//::fromRgba (rgb_col);//V.value<QColor>();//toInt ();
             
-            iColW->setColor(rgb_color);// = new KKSColorWidget (pAttrValue, KKSIndAttr::iacIOUserAttr, rgb_color, pAttrValue->attribute()->type()->attrType());
+            iColW->setColor(rgb_color);// = new KKSColorWidget (pAttrValue, iacIOUserAttr, rgb_color, pAttrValue->attribute()->type()->attrType());
             break;
         }
         default:break;

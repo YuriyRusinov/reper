@@ -4837,6 +4837,10 @@ int JKKSLoader :: writeMessage (JKKSOrganization * org, const QString & senderUI
 
 qint64 JKKSLoader :: writeTransport (JKKSTransport& T) const
 {
+    if(T.getTransportName().isEmpty()){
+        int a = 0;
+    }
+
     //здесь транспорт будет создан, если в БД целевого объекта нет такого транспорта
     //причем, поскольку объект-отправитель не знает, функционирует ли этот транспорт на целевом объекте
     //необходимо is_active ему выставить в false

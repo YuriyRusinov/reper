@@ -1412,9 +1412,9 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
 
                 attrWidget = new KKSComplexAttrWidget (av, attrClass, objEditor);
                 connect(attrWidget, 
-                        SIGNAL(putAttrAttrOnWidget(KKSAttrValue*, KKSObjEditor*, QGridLayout*, int, KKSIndAttr::KKSIndAttrClass, QString, int)), 
+                        SIGNAL(putAttrAttrOnWidget(KKSAttrValue*, KKSObjEditor*, QGridLayout*, int, KKSIndAttrClass, QString, int)), 
                         this, 
-                        SLOT(putAttrWidget (KKSAttrValue*, KKSObjEditor*, QGridLayout*, int, KKSIndAttr::KKSIndAttrClass, QString, int)));
+                        SLOT(putAttrWidget (KKSAttrValue*, KKSObjEditor*, QGridLayout*, int, KKSIndAttrClass, QString, int)));
 
                 (qobject_cast<KKSComplexAttrWidget*>(attrWidget))->init();
                 //qobject_cast<KKSComplexAttrWidget *>(attrWidget)->setFixedSymCount (av->attribute()->defWidth());
@@ -1942,15 +1942,15 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
                     break;
                 QAbstractItemModel * sAttrModel = aValComplexModel(av);//new KKSEIODataModel (ctempl, eioList);
                 QObject :: connect (arw, 
-                                    SIGNAL (addAttrRef (const KKSAttrValue*,  KKSIndAttr::KKSIndAttrClass, QAbstractItemModel*)), 
+                                    SIGNAL (addAttrRef (const KKSAttrValue*,  KKSIndAttrClass, QAbstractItemModel*)), 
                                     wEditor, 
-                                    SLOT (addAttributeCheckReference (const KKSAttrValue*, KKSIndAttr::KKSIndAttrClass, QAbstractItemModel *)) 
+                                    SLOT (addAttributeCheckReference (const KKSAttrValue*, KKSIndAttrClass, QAbstractItemModel *)) 
                                     );
                 
                 QObject :: connect (arw,
-                                    SIGNAL (delAttrRef (const KKSAttrValue*, KKSIndAttr::KKSIndAttrClass, QAbstractItemModel*, const QModelIndex&)), 
+                                    SIGNAL (delAttrRef (const KKSAttrValue*, KKSIndAttrClass, QAbstractItemModel*, const QModelIndex&)), 
                                     wEditor, 
-                                    SLOT (delAttributeCheckReference (const KKSAttrValue*, KKSIndAttr::KKSIndAttrClass, QAbstractItemModel*, const QModelIndex&)) 
+                                    SLOT (delAttributeCheckReference (const KKSAttrValue*, KKSIndAttrClass, QAbstractItemModel*, const QModelIndex&)) 
                                     );
                 
                 QObject :: connect (arw, 

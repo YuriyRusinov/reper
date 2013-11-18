@@ -1147,9 +1147,9 @@ void KKSObjEditorFactory :: setIONameSecret (KKSObjEditor * editor, KKSObjectExe
 #endif
     aRefW->setAttrWidget (lEIOMacLabel);
     connect (aRefW, 
-             SIGNAL (valueChanged(qint64, KKSIndAttr::KKSIndAttrClass, QVariant)), 
+             SIGNAL (valueChanged(qint64, KKSIndAttrClass, QVariant)), 
              editor, 
-             SLOT (setValue (qint64, KKSIndAttr::KKSIndAttrClass, QVariant)) );
+             SLOT (setValue (qint64, KKSIndAttrClass, QVariant)) );
 
     hIOLay->addWidget (tbMac);
     tbMac->setEnabled (!io->isSystem ());
@@ -9031,9 +9031,9 @@ void KKSObjEditorFactory :: putSystemParams (KKSObjectExemplar * recio,
             edLay->addWidget (tbRef);
             lE->setMinimumHeight (20);
             QObject::connect (lE, 
-                              SIGNAL (valueChanged(qint64, KKSIndAttr::KKSIndAttrClass, QVariant)), 
+                              SIGNAL (valueChanged(qint64, KKSIndAttrClass, QVariant)), 
                               editor, 
-                              SLOT (setValue (qint64, KKSIndAttr::KKSIndAttrClass, QVariant)) );
+                              SLOT (setValue (qint64, KKSIndAttrClass, QVariant)) );
         }
         else if(i == 4 || i == 5)
         {
@@ -9061,9 +9061,9 @@ void KKSObjEditorFactory :: putSystemParams (KKSObjectExemplar * recio,
             }
             av->release();
             QObject::connect (lE, 
-                              SIGNAL (valueChanged(qint64, KKSIndAttr::KKSIndAttrClass, QVariant)), 
+                              SIGNAL (valueChanged(qint64, KKSIndAttrClass, QVariant)), 
                               editor, 
-                              SLOT (setValue (qint64, KKSIndAttr::KKSIndAttrClass, QVariant)) );
+                              SLOT (setValue (qint64, KKSIndAttrClass, QVariant)) );
 
             QSizePolicy hPwt (QSizePolicy::Expanding, QSizePolicy::Fixed);//Expanding);
             lE->setSizePolicy (hPwt);
