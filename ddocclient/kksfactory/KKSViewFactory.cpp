@@ -2202,7 +2202,8 @@ void KKSViewFactory::getSearchTemplates (KKSLoader * loader, QAbstractItemModel 
                 p != searchTemplates.constEnd(); p++)
         {
             QModelIndex wsIndex = searchTModel->index (ii, 0, wIndex);
-            searchTModel->setData (wsIndex, p.value()->name(), Qt::DisplayRole);
+            setSearchTemplateIntoModel (p.value(), searchTModel, wsIndex);
+/*            searchTModel->setData (wsIndex, p.value()->name(), Qt::DisplayRole);
             searchTModel->setData (wsIndex, p.value()->id (), Qt::UserRole);
             searchTModel->setData (wsIndex, p.value()->idAuthor (), Qt::UserRole+1);
             searchTModel->setData (wsIndex, 1, Qt::UserRole+USER_ENTITY);
@@ -2233,10 +2234,54 @@ void KKSViewFactory::getSearchTemplates (KKSLoader * loader, QAbstractItemModel 
             searchTModel->setData (wsIndex, p.value()->type()->name(), Qt::DisplayRole);
             searchTModel->setData (wsIndex, p.value()->id (), Qt::UserRole);
             searchTModel->setData (wsIndex, p.value()->idAuthor (), Qt::UserRole+1);
-            searchTModel->setData (wsIndex, 1, Qt::UserRole+USER_ENTITY);
+            searchTModel->setData (wsIndex, 1, Qt::UserRole+USER_ENTITY);*/
             ii++;
         }
         
         searchTemplates.clear ();
     }
+}
+
+void KKSViewFactory::setSearchTemplateIntoModel (const KKSSearchTemplate * stdb, QAbstractItemModel * searchMod, const QModelIndex& wIndex)
+{
+    if (!stdb || stdb->id() <= 0 || !searchMod || !wIndex.isValid())
+        return;
+
+    int ii = wIndex.row();
+    int res = stdb->id();
+    QString stName = stdb->name ();
+
+    searchMod->setData (wIndex, stName, Qt::DisplayRole);
+    searchMod->setData (wIndex, res, Qt::UserRole);
+    QModelIndex wsIndex = wIndex.sibling (ii, 1);
+    searchMod->setData (wsIndex, stdb->authorName(), Qt::DisplayRole);
+    searchMod->setData (wsIndex, res, Qt::UserRole);
+    searchMod->setData (wsIndex, stdb->idAuthor (), Qt::UserRole+1);
+    searchMod->setData (wsIndex, 1, Qt::UserRole+USER_ENTITY);
+
+    wsIndex = wIndex.sibling (ii, 2);
+    searchMod->setData (wsIndex, stdb->creationDatetime().toString("dd.MM.yyyy"), Qt::DisplayRole);
+    searchMod->setData (wsIndex, stdb->id (), Qt::UserRole);
+    searchMod->setData (wsIndex, stdb->idAuthor (), Qt::UserRole+1);
+    searchMod->setData (wsIndex, 1, Qt::UserRole+USER_ENTITY);
+
+    wsIndex = wIndex.sibling (ii, 3);
+    searchMod->setData (wsIndex, stdb->categoryName(), Qt::DisplayRole);
+    searchMod->setData (wsIndex, stdb->id (), Qt::UserRole);
+    searchMod->setData (wsIndex, stdb->idAuthor (), Qt::UserRole+1);
+    searchMod->setData (wsIndex, 1, Qt::UserRole+USER_ENTITY);
+
+    wsIndex = wIndex.sibling (ii, 4);
+    searchMod->setData (wsIndex, stdb->type()->name(), Qt::DisplayRole);
+    searchMod->setData (wsIndex, stdb->id (), Qt::UserRole);
+    searchMod->setData (wsIndex, stdb->idAuthor (), Qt::UserRole+1);
+    searchMod->setData (wsIndex, 1, Qt::UserRole+USER_ENTITY);
+
+    searchMod->setData (wIndex, stdb->idAuthor(), Qt::UserRole+1);
+    searchMod->setData (wIndex, QIcon(":/ddoc/rubric_item.png").pixmap(24, 24), Qt::DecorationRole);
+    searchMod->setData (wIndex, 1, Qt::UserRole+USER_ENTITY);
+    QSize searchRow = searchMod->data (wIndex, Qt::SizeHintRole).toSize();
+    searchRow.rheight() = 24;
+    searchMod->setData (wIndex, searchRow, Qt::SizeHintRole);
+    
 }

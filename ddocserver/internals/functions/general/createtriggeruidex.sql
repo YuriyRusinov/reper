@@ -14,7 +14,7 @@ begin
               for each row 
               execute procedure uidCheck();';
 
-    perform query;
+    execute query;
 
     return 1;
 end

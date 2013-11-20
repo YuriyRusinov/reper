@@ -34,6 +34,7 @@ class KKSAGroup;
 class KKSCategoryAttr;
 class KKSEIOData;
 class KKSObjectExemplar;
+class KKSSearchTemplate;
 
 class _F_EXPORT KKSViewFactory
 {
@@ -146,6 +147,8 @@ class _F_EXPORT KKSViewFactory
         static KKSEIOData * getRecordData (const KKSObjectExemplar * rec);
         
         static void getSearchTemplates (KKSLoader * loader, QAbstractItemModel * searchTModel, const QModelIndex& pIndex=QModelIndex(), bool withSearchTemplates=true);
+        
+        static void setSearchTemplateIntoModel (const KKSSearchTemplate * stdb, QAbstractItemModel * searchMod, const QModelIndex& wIndex);
 
     protected:
     private:

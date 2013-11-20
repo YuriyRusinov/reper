@@ -7081,7 +7081,7 @@ void KKSObjEditorFactory :: addNewSearchTempl (const QModelIndex& parent,
         pIndex = parent;
 
     bool isMod = pWidget ? pWidget->isModal() : false;
-    qDebug () << __PRETTY_FUNCTION__ << pIndex << isMod;
+    //qDebug () << __PRETTY_FUNCTION__ << pIndex << isMod;
     int idSearchType = pIndex.isValid() ? pIndex.data (Qt::UserRole).toInt () : 1;
     QString stName;
     KKSSearchTemplate * st = new KKSSearchTemplate (-1, 0, stName, loader->getUserId());
@@ -7108,15 +7108,40 @@ void KKSObjEditorFactory :: addNewSearchTempl (const QModelIndex& parent,
         {
             KKSSearchTemplate * stdb = loader->loadSearchTemplate (res);
             stName = stdb->name ();
-            stdb->release ();
             if(searchMod){
                 int nr = searchMod->rowCount(pIndex);
                 searchMod->insertRows (nr, 1, pIndex);
                 QModelIndex wIndex = searchMod->index (nr, 0, pIndex);
                 if (searchMod->columnCount(pIndex) >= 1)
                 {
+                    KKSViewFactory::setSearchTemplateIntoModel(stdb,searchMod,wIndex);
+/*                    
                     searchMod->setData (wIndex, stName, Qt::DisplayRole);
                     searchMod->setData (wIndex, res, Qt::UserRole);
+                    QModelIndex wsIndex = wIndex.sibling (ii, 1);
+                    searchMod->setData (wsIndex, stdb->authorName(), Qt::DisplayRole);
+                    searchMod->setData (wsIndex, res, Qt::UserRole);
+                    searchMod->setData (wsIndex, stdb->idAuthor (), Qt::UserRole+1);
+                    searchMod->setData (wsIndex, 1, Qt::UserRole+USER_ENTITY);
+
+                    wsIndex = wIndex.sibling (ii, 2);
+                    searchMod->setData (wsIndex, stdb->creationDatetime().toString("dd.MM.yyyy"), Qt::DisplayRole);
+                    searchMod->setData (wsIndex, stdb->id (), Qt::UserRole);
+                    searchMod->setData (wsIndex, stdb->idAuthor (), Qt::UserRole+1);
+                    searchMod->setData (wsIndex, 1, Qt::UserRole+USER_ENTITY);
+
+                    wsIndex = wIndex.sibling (ii, 3);
+                    searchMod->setData (wsIndex, stdb->categoryName(), Qt::DisplayRole);
+                    searchMod->setData (wsIndex, stdb->id (), Qt::UserRole);
+                    searchMod->setData (wsIndex, stdb->idAuthor (), Qt::UserRole+1);
+                    searchMod->setData (wsIndex, 1, Qt::UserRole+USER_ENTITY);
+
+                    wsIndex = wIndex.sibling (ii, 4);
+                    searchMod->setData (wsIndex, stdb->type()->name(), Qt::DisplayRole);
+                    searchMod->setData (wsIndex, stdb->id (), Qt::UserRole);
+                    searchMod->setData (wsIndex, stdb->idAuthor (), Qt::UserRole+1);
+                    searchMod->setData (wsIndex, 1, Qt::UserRole+USER_ENTITY);
+ */
                 }
                 else
                 {
@@ -7127,12 +7152,14 @@ void KKSObjEditorFactory :: addNewSearchTempl (const QModelIndex& parent,
                     searchMod->setData (w1Index, stName, Qt::DisplayRole);
                     searchMod->setData (w1Index, res, Qt::UserRole);
                 }
+                searchMod->setData (wIndex, stdb->idAuthor(), Qt::UserRole+1);
                 searchMod->setData (wIndex, QIcon(":/ddoc/rubric_item.png").pixmap(24, 24), Qt::DecorationRole);
                 searchMod->setData (wIndex, 1, Qt::UserRole+USER_ENTITY);
                 QSize searchRow = searchMod->data (wIndex, Qt::SizeHintRole).toSize();
                 searchRow.rheight() = 24;
                 searchMod->setData (wIndex, searchRow, Qt::SizeHintRole);
             }
+            stdb->release ();
         }
     }
 
