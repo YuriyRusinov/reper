@@ -1,7 +1,7 @@
 # dyndoc_synch
 HEADERS += \
         config_dyndoc_synch.h \
-        UserInterface/dyndocForm/dyndocForm.h \
+        UserInterface/dyndocForm/dyndocsyncform.h \
         UserInterface/DataStream/DataStream.h \
         UserInterface/NetworkStream/netThread.h \
         UserInterface/NetworkStream/NetworkStream.h \
@@ -13,7 +13,7 @@ HEADERS += \
 
 SOURCES += \
         main.cpp \
-        UserInterface/dyndocForm/dyndocForm.cpp \
+        UserInterface/dyndocForm/dyndocsyncform.cpp \
         UserInterface/DataStream/DataStream.cpp \
         UserInterface/NetworkStream/netThread.cpp \
         UserInterface/NetworkStream/NetworkStream.cpp \
@@ -24,6 +24,6 @@ SOURCES += \
         Namespaces/netStruct.cpp
 
 FORMS   += \
-        UserInterface/dyndocForm/dyndocForm.ui 
+        UserInterface/dyndocForm/dyndoc_sync_form.ui 
 
 QT += network

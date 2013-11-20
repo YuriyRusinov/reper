@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>dyndoc_synch_form</class>
- <widget class="QDialog" name="dyndoc_synch_form">
+ <class>dyndoc_sync_form</class>
+ <widget class="QDialog" name="dyndoc_sync_form">
   <property name="geometry">
    <rect>
     <x>0</x>

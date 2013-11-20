@@ -1,20 +1,21 @@
-#include "UserInterface/dyndocForm/dyndocForm.h"
-#include "ui_dyndoc_synch_form.h"
+#include "UserInterface/dyndocForm/dyndocsyncform.h"
+#include "ui_dyndoc_sync_form.h"
 
-dyndoc_synch_form::dyndoc_synch_form(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::dyndoc_synch_form)
+DyndocSyncForm::DyndocSyncForm(QWidget *parent) :
+    QDialog(parent)
 {
+    ui = new Ui::dyndoc_sync_form;
+
     ui->setupUi(this);
 }
 
-dyndoc_synch_form::~dyndoc_synch_form()
+DyndocSyncForm::~DyndocSyncForm()
 {   
     delete ui;
 }
 
 //*****
-void dyndoc_synch_form::init()
+void DyndocSyncForm::init()
 {
     try
     {
@@ -28,12 +29,12 @@ void dyndoc_synch_form::init()
     }
 }
 
-void dyndoc_synch_form::initData()
+void DyndocSyncForm::initData()
 {
     viewModel->setColumnCount(8);
 }
 
-void dyndoc_synch_form::initSlots() const
+void DyndocSyncForm::initSlots() const
 {
     connect(ui->qpb_exit,SIGNAL(clicked()),this,SLOT(close()));
 
@@ -45,7 +46,7 @@ void dyndoc_synch_form::initSlots() const
     connect(ui->qpb_param,SIGNAL(clicked()),this,SLOT(slot_parametersClicked()));
 }
 
-void dyndoc_synch_form::initInterface()
+void DyndocSyncForm::initInterface()
 {
     viewModel->setHeaderData(0,Qt::Horizontal,QString(tr("Organization")));
     viewModel->setHeaderData(0,Qt::Horizontal,Qt::AlignCenter,Qt::TextAlignmentRole);
@@ -89,7 +90,7 @@ void dyndoc_synch_form::initInterface()
 //*****
 
 //*****
-void dyndoc_synch_form::setViewWidget(dyndocView *new_viewWidget)
+void DyndocSyncForm::setViewWidget(dyndocView *new_viewWidget)
 {
     if(new_viewWidget)
     {
@@ -101,7 +102,7 @@ void dyndoc_synch_form::setViewWidget(dyndocView *new_viewWidget)
     }
 }
 
-void dyndoc_synch_form::newViewWidgetIsTrue(dyndocView* new_viewWidget)
+void DyndocSyncForm::newViewWidgetIsTrue(dyndocView* new_viewWidget)
 {
     if(verificationExistingFrameLayout())
     {
@@ -115,7 +116,7 @@ void dyndoc_synch_form::newViewWidgetIsTrue(dyndocView* new_viewWidget)
     addViewWidgetToFrameLayout(new_viewWidget);
 }
 
-void dyndoc_synch_form::newViewWidgetIsFalse()
+void DyndocSyncForm::newViewWidgetIsFalse()
 {
     if(verificationExistingFrameLayout())
     {
@@ -123,7 +124,7 @@ void dyndoc_synch_form::newViewWidgetIsFalse()
     }
 }
 
-bool dyndoc_synch_form::verificationExistingFrameLayout()
+bool DyndocSyncForm::verificationExistingFrameLayout()
 {
     QLayout* frameLayout = ui->frame->layout();
 
@@ -133,7 +134,7 @@ bool dyndoc_synch_form::verificationExistingFrameLayout()
         return false;
 }
 
-void dyndoc_synch_form::deleteOldViewWidget()
+void DyndocSyncForm::deleteOldViewWidget()
 {
     QLayout* frameLayout = ui->frame->layout();
 
@@ -147,13 +148,13 @@ void dyndoc_synch_form::deleteOldViewWidget()
     }
 }
 
-void dyndoc_synch_form::createFrameLayout()
+void DyndocSyncForm::createFrameLayout()
 {
     QVBoxLayout* frameLayout = new QVBoxLayout;
     ui->frame->setLayout(frameLayout);
 }
 
-void dyndoc_synch_form::addViewWidgetToFrameLayout(dyndocView *new_viewWidget)
+void DyndocSyncForm::addViewWidgetToFrameLayout(dyndocView *new_viewWidget)
 {
     viewWidget = new_viewWidget;
     viewWidget->setParent(ui->frame);
@@ -167,19 +168,19 @@ void dyndoc_synch_form::addViewWidgetToFrameLayout(dyndocView *new_viewWidget)
 
 //*****
 
-void dyndoc_synch_form::setDbInf(dyndoc_mainStructs::dbInf dataBaseInf)
+void DyndocSyncForm::setDbInf(dyndoc_mainStructs::dbInf dataBaseInf)
 {
     db = dataBaseInf;
 }
 
-void dyndoc_synch_form::reciveData(const QList<dyndoc_mainStructs::hostModelInf>& orgsForModel)
+void DyndocSyncForm::reciveData(const QList<dyndoc_mainStructs::hostModelInf>& orgsForModel)
 {
     QStandardItem* rootItem = viewModel->invisibleRootItem();
 
     addChilds(*rootItem,QString(""),orgsForModel);
 }
 
-int dyndoc_synch_form::addChilds(QStandardItem& rhs,const QString& text,const QList<dyndoc_mainStructs::hostModelInf>& dataTable)
+int DyndocSyncForm::addChilds(QStandardItem& rhs,const QString& text,const QList<dyndoc_mainStructs::hostModelInf>& dataTable)
 {
     int col = 0;//Индекс потомков элемента
 
@@ -210,7 +211,7 @@ int dyndoc_synch_form::addChilds(QStandardItem& rhs,const QString& text,const QL
     return 0;//
 }
 
-int dyndoc_synch_form::addColumns(QList<QStandardItem*>& rhs,int query_index,const QList<dyndoc_mainStructs::hostModelInf>& dataTable)
+int DyndocSyncForm::addColumns(QList<QStandardItem*>& rhs,int query_index,const QList<dyndoc_mainStructs::hostModelInf>& dataTable)
 {
     addColumnName(rhs,query_index,dataTable);
     addColumnProtocol(rhs,query_index,dataTable);
@@ -224,7 +225,7 @@ int dyndoc_synch_form::addColumns(QList<QStandardItem*>& rhs,int query_index,con
     return 0;
 }
 
-int dyndoc_synch_form::addColumnName(QList<QStandardItem*>& rhs,int query_index,const QList<dyndoc_mainStructs::hostModelInf>& dataTable)
+int DyndocSyncForm::addColumnName(QList<QStandardItem*>& rhs,int query_index,const QList<dyndoc_mainStructs::hostModelInf>& dataTable)
 {
     QStandardItem* item = new QStandardItem;
 
@@ -256,7 +257,7 @@ int dyndoc_synch_form::addColumnName(QList<QStandardItem*>& rhs,int query_index,
     return 0;
 }
 
-int dyndoc_synch_form::addColumnProtocol(QList<QStandardItem*>& rhs,int query_index,const QList<dyndoc_mainStructs::hostModelInf>& dataTable)
+int DyndocSyncForm::addColumnProtocol(QList<QStandardItem*>& rhs,int query_index,const QList<dyndoc_mainStructs::hostModelInf>& dataTable)
 {
     QStandardItem* item = new QStandardItem;
 
@@ -272,7 +273,7 @@ int dyndoc_synch_form::addColumnProtocol(QList<QStandardItem*>& rhs,int query_in
     return 0;
 }
 
-int dyndoc_synch_form::addColumnAdress(QList<QStandardItem*>& rhs,int query_index,const QList<dyndoc_mainStructs::hostModelInf>& dataTable)
+int DyndocSyncForm::addColumnAdress(QList<QStandardItem*>& rhs,int query_index,const QList<dyndoc_mainStructs::hostModelInf>& dataTable)
 {
     QStandardItem* item = new QStandardItem;
 
@@ -288,7 +289,7 @@ int dyndoc_synch_form::addColumnAdress(QList<QStandardItem*>& rhs,int query_inde
     return 0;
 }
 
-int dyndoc_synch_form::addColumnPort(QList<QStandardItem*>& rhs,int query_index,const QList<dyndoc_mainStructs::hostModelInf>& dataTable)
+int DyndocSyncForm::addColumnPort(QList<QStandardItem*>& rhs,int query_index,const QList<dyndoc_mainStructs::hostModelInf>& dataTable)
 {
     QStandardItem* item = new QStandardItem;
 
@@ -304,7 +305,7 @@ int dyndoc_synch_form::addColumnPort(QList<QStandardItem*>& rhs,int query_index,
     return 0;
 }
 
-int dyndoc_synch_form::addColumnSynch(QList<QStandardItem*>& rhs)
+int DyndocSyncForm::addColumnSynch(QList<QStandardItem*>& rhs)
 {
     QStandardItem* item = new QStandardItem;
 
@@ -318,7 +319,7 @@ int dyndoc_synch_form::addColumnSynch(QList<QStandardItem*>& rhs)
     return 0;
 }
 
-int dyndoc_synch_form::addColumnDb(QList<QStandardItem*>& rhs)
+int DyndocSyncForm::addColumnDb(QList<QStandardItem*>& rhs)
 {
     QStandardItem* item = new QStandardItem;
 
@@ -332,7 +333,7 @@ int dyndoc_synch_form::addColumnDb(QList<QStandardItem*>& rhs)
     return 0;
 }
 
-int dyndoc_synch_form::addColumnInit(QList<QStandardItem*>& rhs)
+int DyndocSyncForm::addColumnInit(QList<QStandardItem*>& rhs)
 {
     QStandardItem* item = new QStandardItem;
 
@@ -346,7 +347,7 @@ int dyndoc_synch_form::addColumnInit(QList<QStandardItem*>& rhs)
     return 0;
 }
 
-int dyndoc_synch_form::addColumnTrans(QList<QStandardItem*>& rhs)
+int DyndocSyncForm::addColumnTrans(QList<QStandardItem*>& rhs)
 {
     QStandardItem* item = new QStandardItem;
 
@@ -362,17 +363,17 @@ int dyndoc_synch_form::addColumnTrans(QList<QStandardItem*>& rhs)
 //*****
 
 //*****
-void dyndoc_synch_form::slot_startSyncronizationClicked()
+void DyndocSyncForm::slot_startSyncronizationClicked()
 {
     emit signalStartSyncronization();
 }
 
-void dyndoc_synch_form::slot_stopSyncronizationClicked()
+void DyndocSyncForm::slot_stopSyncronizationClicked()
 {
     emit signalStopSyncronization();
 }
 
-void dyndoc_synch_form::slot_pollClicked()
+void DyndocSyncForm::slot_pollClicked()
 {
     QMessageBox msgBox;
     msgBox.setWindowTitle(tr("Button test"));
@@ -380,7 +381,7 @@ void dyndoc_synch_form::slot_pollClicked()
     msgBox.exec();
 }
 
-void dyndoc_synch_form::slot_displayLogClicked()
+void DyndocSyncForm::slot_displayLogClicked()
 {
     QMessageBox msgBox;
     msgBox.setWindowTitle(tr("Button test"));
@@ -388,7 +389,7 @@ void dyndoc_synch_form::slot_displayLogClicked()
     msgBox.exec();
 }
 
-void dyndoc_synch_form::slot_implementInitialSyncronizationClicked()
+void DyndocSyncForm::slot_implementInitialSyncronizationClicked()
 {
     QMessageBox msgBox;
     msgBox.setWindowTitle(tr("Button test"));
@@ -396,7 +397,7 @@ void dyndoc_synch_form::slot_implementInitialSyncronizationClicked()
     msgBox.exec();
 }
 
-void dyndoc_synch_form::slot_parametersClicked()
+void DyndocSyncForm::slot_parametersClicked()
 {
     QMessageBox msgBox;
     msgBox.setWindowTitle(tr("Button test"));

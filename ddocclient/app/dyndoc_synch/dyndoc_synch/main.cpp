@@ -6,7 +6,7 @@
 
 #include <JKKSLoader.h>
 
-#include "UserInterface/dyndocForm/dyndocForm.h"
+#include "UserInterface/dyndocForm/dyndocsyncform.h"
 #include "UserInterface/DataStream/DataStream.h"
 #include "UserInterface/NetworkStream/NetworkStream.h"
 #include "kkssito.h"
@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     if(!sito->db())
         return 1;
 
-    dyndoc_synch_form* userForm = new dyndoc_synch_form();
+    DyndocSyncForm* userForm = new DyndocSyncForm();
     dyndocView* viewWidget = new dyndocView();
     dyndocModel* viewModel = new dyndocModel();
 

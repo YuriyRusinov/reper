@@ -1,5 +1,5 @@
-#ifndef DYNDOC_SYNCH_FORM_H
-#define DYNDOC_SYNCH_FORM_H
+#ifndef DYNDOC_SYNC_FORM_H
+#define DYNDOC_SYNC_FORM_H
 
 #include <QDialog>
 #include <QStandardItemModel>
@@ -19,16 +19,16 @@ class dyndocModel;
 
 namespace Ui
 {
-    class dyndoc_synch_form;
+    class dyndoc_sync_form;
 }
 
-class dyndoc_synch_form : public QDialog
+class DyndocSyncForm : public QDialog
 {
     Q_OBJECT
     
 public:
-    explicit dyndoc_synch_form(QWidget *parent = 0);
-    ~dyndoc_synch_form();
+    explicit DyndocSyncForm(QWidget *parent = 0);
+    ~DyndocSyncForm();
 
     void init();
     void setViewWidget(dyndocView* new_ViewWidget = 0);
@@ -51,15 +51,15 @@ private slots:
     void slot_parametersClicked();
 
 private:
-    Ui::dyndoc_synch_form *ui;
+    Ui::dyndoc_sync_form *ui;
 
     dyndocView* viewWidget;
     dyndocModel* viewModel;
 
     dyndoc_mainStructs::dbInf db;
 
-    dyndoc_synch_form(dyndoc_synch_form& adb);
-    const dyndoc_synch_form& operator=(const dyndoc_synch_form& rhs);
+    DyndocSyncForm(DyndocSyncForm& adb);
+    const DyndocSyncForm& operator=(const DyndocSyncForm& rhs);
 
     inline void initData();
     inline void initSlots() const;
@@ -86,4 +86,4 @@ private:
     inline int addColumnTrans(QList<QStandardItem*>& rhs);
 };
 
-#endif // DYNDOC_SYNCH_FORM_H
+#endif // DYNDOC_SYNC_FORM_H
