@@ -45,6 +45,7 @@ begin
             raise exception 'Delete attribute from category with existing objects';
             return null;
         end if;
+    end if;
     return old;
 end
 $BODY$
@@ -52,4 +53,4 @@ language 'plpgsql';
 
 select f_safe_drop_trigger('trgacrecdelete', 'attrs_categories');
 
-select f_create_trigger('trgacrecinsert', 'before', 'delete', 'attrs_categories', 'arecdelcheck()');
+select f_create_trigger('trgacrecdelete', 'before', 'delete', 'attrs_categories', 'arecdelcheck()');
