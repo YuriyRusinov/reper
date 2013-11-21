@@ -9186,10 +9186,11 @@ void KKSObjEditorFactory :: putRubricator (KKSObject * obj, KKSObjEditor * edito
     //includesW->setSizePolicy (iwSizePolicy);
     //qDebug () << __PRETTY_FUNCTION__ << includesW->sizePolicy ();
     //QGridLayout *gIncludesLay = new QGridLayout (includesW);
-    KKSIncludesWidget * iW = new KKSIncludesWidget (obj->rootRubric(), true, false, false, false);//includesW);
+    KKSIncludesWidget * iW = m_rf->createRubricRecEditor (obj->rootRubric(), true, false, false, false);
+    //new KKSIncludesWidget (obj->rootRubric(), true, false, false, false);//includesW);
 //    qDebug () << __FUNCTION__ << iW->sizePolicy().horizontalPolicy() << iW->sizePolicy().verticalPolicy();
     //iW->setSizePolicy (iwSizePolicy);
-    if (iW && m_rf)
+/*    if (iW && m_rf)
     {
         connect (iW, SIGNAL (saveRubric (KKSRubric *, bool)), m_rf, SLOT (saveRubric (KKSRubric *, bool)) );
         connect (iW, SIGNAL (rubricItemRequested (const KKSRubric*, bool, QAbstractItemModel *)), m_rf, SLOT (rubricItemUpload(const KKSRubric*, bool, QAbstractItemModel *)) );
@@ -9205,6 +9206,7 @@ void KKSObjEditorFactory :: putRubricator (KKSObject * obj, KKSObjEditor * edito
 
         connect (m_rf, SIGNAL (rubricAttachments (QAbstractItemModel *)), iW, SLOT (slotInitAttachmentsModel (QAbstractItemModel *)) );
     }
+ */
     QTreeView *tv = iW->tvRubr();
     KKSEventFilter *ef = new KKSEventFilter (iW);
     tv->viewport()->installEventFilter (ef);
@@ -9227,9 +9229,10 @@ void KKSObjEditorFactory :: putRubricator (KKSObjectExemplar * eio, KKSObjEditor
     //includesW->setSizePolicy (iwSizePolicy);
     //qDebug () << __PRETTY_FUNCTION__ << includesW->sizePolicy ();
     //QGridLayout *gIncludesLay = new QGridLayout (includesW);
-    KKSIncludesWidget * iW = new KKSIncludesWidget (eio->rootRubric(), true, false, false, true);// includesW);
+    KKSIncludesWidget * iW = m_rf->createRubricRecEditor(eio->rootRubric(), true, false, false, true);
+            //new KKSIncludesWidget (eio->rootRubric(), true, false, false, true);// includesW);
     iW->setSizePolicy (iwSizePolicy);
-    if (iW && m_rf)
+/*    if (iW && m_rf)
     {
         connect (iW, SIGNAL (saveRubric (KKSRubric *, bool)), m_rf, SLOT (saveRubric (KKSRubric *, bool)) );
         connect (iW, SIGNAL (rubricItemRequested (const KKSRubric*, bool, QAbstractItemModel *)), m_rf, SLOT (rubricItemUpload(const KKSRubric*, bool, QAbstractItemModel *)) );
@@ -9250,6 +9253,7 @@ void KKSObjEditorFactory :: putRubricator (KKSObjectExemplar * eio, KKSObjEditor
 //        connect (eiW, SIGNAL (loadCategory (RubricForm *)), m_rf, SLOT (loadCategory (RubricForm *)) );
 //        connect (eiW, SIGNAL (rubricAttachmentsView (QAbstractItemModel *, const KKSRubric *)), m_rf, SLOT (viewAttachments (QAbstractItemModel *, const KKSRubric *)) );
     }
+ */
     QTreeView *tv = iW->tvRubr();
     KKSEventFilter *ef = new KKSEventFilter (iW);
     tv->viewport()->installEventFilter (ef);

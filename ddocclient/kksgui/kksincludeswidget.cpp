@@ -1061,9 +1061,9 @@ void KKSIncludesWidget::slotAddRubricItem(int idObject, QString name)
     emit rubricsChanged ();
 }
 
-void KKSIncludesWidget :: slotInitAttachmentsModel (QAbstractItemModel * attachModel)
+void KKSIncludesWidget :: slotInitAttachmentsModel (QAbstractItemModel * attachModel, KKSIncludesWidget * iW)
 {
-    if (!attachModel)
+    if (!attachModel || iW != this)
         return;
     
     const KKSTemplate * t = attachModel->data(attachModel->index (0, 0), Qt::UserRole+2).value<const KKSTemplate *>();

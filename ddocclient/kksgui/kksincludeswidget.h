@@ -100,7 +100,7 @@ private slots:
 
 public slots:
     void slotAddRubricItem(int idRubricItem, QString name);
-    void slotInitAttachmentsModel (QAbstractItemModel * attachModel);
+    void slotInitAttachmentsModel (QAbstractItemModel * attachModel, KKSIncludesWidget * iW);
 
 private slots:
     void init();

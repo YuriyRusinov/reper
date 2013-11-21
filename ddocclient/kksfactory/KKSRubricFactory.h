@@ -47,12 +47,19 @@ class _F_EXPORT KKSRubricFactory : public KKSEntityFactory
             atOthers = 2
         };
         KKSIncludesWidget * createModalRubricEditor (int mode, const KKSList<const KKSFilterGroup *>& filters, bool withCategories=true, QWidget* parent=0);
+        KKSIncludesWidget * createRubricRecEditor (KKSRubric * rootRubric,
+                                     bool isAttach,
+                                     bool isDocs,
+                                     bool forCategory,
+                                     bool forRecord,
+                                     QWidget *parent=0,
+                                     Qt::WindowFlags flags=0);
         static KKSTemplate * rubrRecTemlate (void);
 
     signals:
         void rubricEditorCreated (KKSIncludesWidget *rEditor);
         void objEditorCreated (KKSObjEditor *oEditor);
-        void rubricAttachments (QAbstractItemModel * rModel);
+        void rubricAttachments (QAbstractItemModel * rModel, KKSIncludesWidget * iW);
 
     private slots:
         void saveRubric (KKSRubric * rootR, bool isMyDocs);

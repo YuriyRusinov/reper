@@ -228,13 +228,14 @@ KKSIncludesWidget * KKSRubricFactory :: createRubricEditor (int mode, const KKSL
     connect(iW, SIGNAL(rubricRequested(KKSRubric *, int, QAbstractItemModel*, const QModelIndex&)), this, SLOT(loadRubric(KKSRubric *, int, QAbstractItemModel*, const QModelIndex&)));
     connect(iW, SIGNAL(rubricCategoryRequested(KKSRubric *)), this, SLOT(loadCategoryIntoRubric(KKSRubric *)));
 
-    connect(this, SIGNAL(rubricAttachments(QAbstractItemModel *)), iW, SLOT(slotInitAttachmentsModel(QAbstractItemModel *)));
+    connect(this, SIGNAL(rubricAttachments(QAbstractItemModel *, KKSIncludesWidget *)), iW, SLOT(slotInitAttachmentsModel(QAbstractItemModel *, KKSIncludesWidget *)));
     emit rubricEditorCreated(iW);
 
     return iW;
 }
 
-KKSIncludesWidget * KKSRubricFactory::createModalRubricEditor(int mode, const KKSList<const KKSFilterGroup *> & filters, bool withCategories, QWidget* parent) {
+KKSIncludesWidget * KKSRubricFactory::createModalRubricEditor(int mode, const KKSList<const KKSFilterGroup *> & filters, bool withCategories, QWidget* parent)
+{
     Q_UNUSED(filters);
     bool isDocs(mode == atMyDocsRubric);
 
@@ -302,6 +303,40 @@ KKSIncludesWidget * KKSRubricFactory::createModalRubricEditor(int mode, const KK
 
     //QAbstractItemDelegate *iDeleg = tv->itemDelegate ();
     //qDebug () << __PRETTY_FUNCTION__ << iDeleg;
+    return iW;
+}
+
+KKSIncludesWidget * KKSRubricFactory::createRubricRecEditor (KKSRubric * rootRubric,
+                                                             bool isAttach,
+                                                             bool isDocs,
+                                                             bool forCategory,
+                                                             bool forRecord,
+                                                             QWidget *parent,
+                                                             Qt::WindowFlags flags)
+{
+    KKSIncludesWidget * iW = new KKSIncludesWidget (rootRubric, isAttach, isDocs, forCategory, forRecord, parent, flags);
+
+    connect(iW, SIGNAL(saveRubric(KKSRubric *, bool)), this, SLOT(saveRubric(KKSRubric *, bool)));
+    connect(iW, SIGNAL(rubricItemRequested(const KKSRubric*, bool, QAbstractItemModel *)), this, SLOT(rubricItemUpload(const KKSRubric *, bool, QAbstractItemModel *)));
+    connect(iW, SIGNAL(rubricItemCreationRequested(const KKSRubric *, QAbstractItemModel*, const QModelIndex&)), this, SLOT(rubricItemCreate(const KKSRubric *, QAbstractItemModel *, const QModelIndex&)));
+    connect(iW, SIGNAL(openRubricItemRequested(int)), this, SLOT(openRubricItem(int)));
+    connect(iW, SIGNAL(loadStuffModel(RubricForm *)), this, SLOT(loadRubricPrivilegies(RubricForm *)));
+    connect(iW, SIGNAL(loadSearchtemplate(RubricForm *)), this, SLOT(loadSearchTemplate(RubricForm *)));
+    connect(iW, SIGNAL(loadCategory(RubricForm *)), this, SLOT(loadCategory(RubricForm *)));
+    connect(iW, SIGNAL(rubricAttachmentsView(QAbstractItemModel *, const KKSRubric *)), this, SLOT(viewAttachments(QAbstractItemModel *, const KKSRubric *)));
+    connect(iW, SIGNAL(copyFromRubr(KKSRubric *, QAbstractItemModel *, const QModelIndex&)), this, SLOT(copyFromRubric(KKSRubric *, QAbstractItemModel *, const QModelIndex&)));
+    connect(iW, SIGNAL(initAttachmentsModel(const KKSRubric *, bool)), this, SLOT(initRubricAttachments(const KKSRubric *, bool)));
+    connect(iW, SIGNAL(appendRubricItemIntoModel(QAbstractItemModel *, const KKSRubricItem *)), this, SLOT(appendRubricItem(QAbstractItemModel *, const KKSRubricItem *)));
+    connect(iW, SIGNAL(setSyncIO(const QList<int>&)), this, SLOT(setSyncSettings(const QList<int>&)));
+    connect(iW, SIGNAL(putIOSIntoRubr(const QList<int>&, const KKSRubric*)), this, SLOT(putIntoRubr(const QList<int>&, const KKSRubric*)));
+    connect(iW, SIGNAL(sendIOS(const QList<int>&)), this, SLOT(sendDocs(const QList<int>&)));
+    connect(iW, SIGNAL(setAccessIOS(const QList<int>&)), this, SLOT(setAccessDocs(const QList<int>&)));
+    connect(iW, SIGNAL(rubricRequested(KKSRubric *, int, QAbstractItemModel*, const QModelIndex&)), this, SLOT(loadRubric(KKSRubric *, int, QAbstractItemModel*, const QModelIndex&)));
+    connect(iW, SIGNAL(rubricCategoryRequested(KKSRubric *)), this, SLOT(loadCategoryIntoRubric(KKSRubric *)));
+
+    connect(this, SIGNAL(rubricAttachments(QAbstractItemModel *, KKSIncludesWidget *)), iW, SLOT(slotInitAttachmentsModel(QAbstractItemModel *, KKSIncludesWidget *)));
+    //emit rubricEditorCreated(iW);
+
     return iW;
 }
 
@@ -1029,7 +1064,7 @@ void KKSRubricFactory::initRubricAttachments(const KKSRubric * r, bool isRec)
 {
     if (!r)
         return;
-
+    KKSIncludesWidget * iW = qobject_cast<KKSIncludesWidget *>(this->sender());
     //qDebug () << __PRETTY_FUNCTION__ << r->items().count();
     const KKSTemplate * t = isRec ? rubrRecTemlate() : 0;
     KKSMap<qint64, KKSEIOData *> rData = isRec ? loader->loadRecList (r) : KKSConverter::rubricEntityToData(loader, r);
@@ -1096,7 +1131,7 @@ void KKSRubricFactory::initRubricAttachments(const KKSRubric * r, bool isRec)
     }
     t->release();
 
-    emit rubricAttachments(attachModel);
+    emit rubricAttachments(attachModel, iW);
 }
 
 /* Слот добавляет существующий ИО в рубрику с последующим отображением в визуальной модели

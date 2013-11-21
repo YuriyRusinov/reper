@@ -2203,38 +2203,6 @@ void KKSViewFactory::getSearchTemplates (KKSLoader * loader, QAbstractItemModel 
         {
             QModelIndex wsIndex = searchTModel->index (ii, 0, wIndex);
             setSearchTemplateIntoModel (p.value(), searchTModel, wsIndex);
-/*            searchTModel->setData (wsIndex, p.value()->name(), Qt::DisplayRole);
-            searchTModel->setData (wsIndex, p.value()->id (), Qt::UserRole);
-            searchTModel->setData (wsIndex, p.value()->idAuthor (), Qt::UserRole+1);
-            searchTModel->setData (wsIndex, 1, Qt::UserRole+USER_ENTITY);
-            searchTModel->setData (wsIndex, QIcon(":/ddoc/rubric_item.png").pixmap(24, 24), Qt::DecorationRole);
-            QSize searchRow = searchTModel->data (wsIndex, Qt::SizeHintRole).toSize();
-            searchRow.rheight() = 24;
-            searchTModel->setData (wsIndex, searchRow, Qt::SizeHintRole);
- 
-            wsIndex = searchTModel->index (ii, 1, wIndex);
-            searchTModel->setData (wsIndex, p.value()->authorName(), Qt::DisplayRole);
-            searchTModel->setData (wsIndex, p.value()->id (), Qt::UserRole);
-            searchTModel->setData (wsIndex, p.value()->idAuthor (), Qt::UserRole+1);
-            searchTModel->setData (wsIndex, 1, Qt::UserRole+USER_ENTITY);
-
-            wsIndex = searchTModel->index (ii, 2, wIndex);
-            searchTModel->setData (wsIndex, p.value()->creationDatetime().toString("dd.MM.yyyy"), Qt::DisplayRole);
-            searchTModel->setData (wsIndex, p.value()->id (), Qt::UserRole);
-            searchTModel->setData (wsIndex, p.value()->idAuthor (), Qt::UserRole+1);
-            searchTModel->setData (wsIndex, 1, Qt::UserRole+USER_ENTITY);
-
-            wsIndex = searchTModel->index (ii, 3, wIndex);
-            searchTModel->setData (wsIndex, p.value()->categoryName(), Qt::DisplayRole);
-            searchTModel->setData (wsIndex, p.value()->id (), Qt::UserRole);
-            searchTModel->setData (wsIndex, p.value()->idAuthor (), Qt::UserRole+1);
-            searchTModel->setData (wsIndex, 1, Qt::UserRole+USER_ENTITY);
-
-            wsIndex = searchTModel->index (ii, 4, wIndex);
-            searchTModel->setData (wsIndex, p.value()->type()->name(), Qt::DisplayRole);
-            searchTModel->setData (wsIndex, p.value()->id (), Qt::UserRole);
-            searchTModel->setData (wsIndex, p.value()->idAuthor (), Qt::UserRole+1);
-            searchTModel->setData (wsIndex, 1, Qt::UserRole+USER_ENTITY);*/
             ii++;
         }
         
