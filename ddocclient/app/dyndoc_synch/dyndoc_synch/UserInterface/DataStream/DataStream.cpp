@@ -204,15 +204,14 @@ void dataStream::createOrganizationsListFromRes()
     {
         dyndoc_mainStructs::hostModelInf newOrg;
 
-        newOrg.structInf.id = res->getCellAsString(i,1);
-        newOrg.structInf.idNum = res->getCellAsInt(i,0);
+        newOrg.structInf.id = res->getCellAsInt(i,0);
         newOrg.structInf.name = res->getCellAsString(i,3);
         newOrg.structInf.parentName = res->getCellAsString(i,4);
         newOrg.structInf.protocol = "TCP/IP";
         newOrg.structInf.email_prefix = res->getCellAsString(i,27);
         newOrg.address.address = res->getCellAsString(i,33);
         newOrg.address.port = res->getCellAsInt(i,34);
-        newOrg.icon = res->getCellAsString(i,14);//(i,14);
+        newOrg.icon = res->getCellAsString(i,14);
 
         organizations.append(newOrg);
     }

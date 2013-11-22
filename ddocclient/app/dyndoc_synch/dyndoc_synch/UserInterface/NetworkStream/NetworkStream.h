@@ -6,6 +6,10 @@
 #include "Namespaces/netStruct.h"
 #include "netThread.h"
 
+#include <ddocinteractorwindow.h>
+#include <ddocinteractorbase.h>
+#include <timerform.h>
+
 class networkStream : public QObject
 {
     Q_OBJECT
@@ -19,6 +23,8 @@ signals:
     void signalSynchStop();
     void signalThreadStop();
 
+    void signalPingsSended(QMap<QString,JKKSPing> rhs);
+
 public slots:
     void slotStartSyncronization();
     void slotStopSyncronization();
@@ -26,11 +32,14 @@ public slots:
     void slotPoll();
     void slotImplementInitialSyncronization();
 
+    void slotPingsSended(QMap<QString,JKKSPing> rhs);
+
 private:
     networkStream(networkStream& adb);
     const networkStream& operator=(const networkStream& rhs);
 
-    netThread* net;
+    DDocInteractorWindow* httpWin;
+    DDocInteractorBase* m_base;
 };
 
 #endif

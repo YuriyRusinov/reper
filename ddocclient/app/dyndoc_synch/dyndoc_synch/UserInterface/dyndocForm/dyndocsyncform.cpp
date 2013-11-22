@@ -7,6 +7,8 @@ DyndocSyncForm::DyndocSyncForm(QWidget *parent) :
     ui = new Ui::dyndoc_sync_form;
 
     ui->setupUi(this);
+
+    localOrganizationId = 0;
 }
 
 DyndocSyncForm::~DyndocSyncForm()
@@ -32,6 +34,8 @@ void DyndocSyncForm::init()
 void DyndocSyncForm::initData()
 {
     viewModel->setColumnCount(8);
+
+    ui->qpb_stop_synch->setDisabled(true);
 }
 
 void DyndocSyncForm::initSlots() const
@@ -168,6 +172,11 @@ void DyndocSyncForm::addViewWidgetToFrameLayout(dyndocView *new_viewWidget)
 
 //*****
 
+void DyndocSyncForm::setLocalId(int id)
+{
+    localOrganizationId = id;
+}
+
 void DyndocSyncForm::setDbInf(dyndoc_mainStructs::dbInf dataBaseInf)
 {
     db = dataBaseInf;
@@ -231,8 +240,8 @@ int DyndocSyncForm::addColumnName(QList<QStandardItem*>& rhs,int query_index,con
 
     item->setData(dataTable.at(query_index).structInf.name,Qt::DisplayRole);
     item->setData(dataTable.at(query_index).structInf.name,Qt::ToolTipRole);
-    item->setData(dataTable.at(query_index).structInf.idNum,Qt::UserRole+1);
-    item->setData(dataTable.at(query_index).structInf.id,Qt::UserRole+2);
+    item->setData(dataTable.at(query_index).structInf.id,Qt::UserRole+1);
+    item->setData(dataTable.at(query_index).structInf.parentName,Qt::UserRole+2);
     item->setData(dataTable.at(query_index).structInf.email_prefix,Qt::UserRole+3);
 
     QPixmap icon;
@@ -243,7 +252,7 @@ int DyndocSyncForm::addColumnName(QList<QStandardItem*>& rhs,int query_index,con
     item->setTextAlignment(Qt::AlignVCenter);
     item->setData(Qt::red,Qt::BackgroundColorRole);
 
-    if(item->data(Qt::UserRole+2).toString() == "localorg-organization-1")
+    if(item->data(Qt::UserRole+1) == localOrganizationId)
     {
          QFont boldItemFont = item->font();
          boldItemFont.setBold(true);
@@ -362,14 +371,78 @@ int DyndocSyncForm::addColumnTrans(QList<QStandardItem*>& rhs)
 }
 //*****
 
+void DyndocSyncForm::setConnectionSettings()
+{
+    QSettings settings(QCoreApplication::applicationDirPath ()+"/http.ini", QSettings::IniFormat);
+
+    if(settings.status())
+        return;
+
+    settings.beginGroup ("Database");
+    settings.setValue ("host",optionsForm->getDBhost());//db.hostAddress);
+    settings.setValue ("database",optionsForm->getDBname()); //db.dbName);
+    settings.setValue ("user",optionsForm->getDBuser()); //db.userName);
+    settings.setValue ("password",optionsForm->getDBpass()); //db.password);
+    settings.setValue ("port",optionsForm->getDBport()); //db.port);
+    settings.endGroup ();
+
+    settings.beginGroup("Transport");
+    settings.setValue ("transport",optionsForm->getTransport()); //UI->lEHttpTransport->text ());
+    settings.endGroup();
+
+
+    settings.beginGroup ("Http"); //понимаем как адрес шлюза для отправки корреспонденции (ТПС)
+    settings.setValue ("host",optionsForm->getGatewayHost()); //UI->lEHttpHost->text ());
+    settings.setValue ("port",optionsForm->getGatewayPort()); //UI->lEHttpPort->text ());
+
+
+    settings.setValue ("server_host",optionsForm->getServerHost()); //serverIp.toString());
+    settings.setValue ("server_port",optionsForm->getServerPort()); //UI->lEServerPort->text ());
+    settings.endGroup ();
+}
+
+void DyndocSyncForm::loadSettings()
+{
+    QSettings settings (QCoreApplication::applicationDirPath ()+"/http.ini", QSettings::IniFormat);
+
+    if(settings.status())
+        return;
+
+    settings.beginGroup ("Database");
+    optionsForm->setDBhost(settings.value("host").toString());
+    optionsForm->setDBname(settings.value ("database").toString());
+    optionsForm->setDBuser(settings.value ("user").toString());
+    optionsForm->setDBpass(settings.value ("password").toString());
+    optionsForm->setDBport(settings.value ("port").toString());
+    settings.endGroup ();
+
+    settings.beginGroup("Transport");
+    optionsForm->setTransport(settings.value ("transport").toString ());
+    settings.endGroup ();
+
+    settings.beginGroup ("Http");
+    optionsForm->setGatewayHost(settings.value("host").toString());
+    optionsForm->setGatewayPort(settings.value("port").toString());
+
+    optionsForm->setServerHost(settings.value ("server_host").toString ());
+    optionsForm->setServerPort(settings.value ("server_port").toString ());
+    settings.endGroup ();
+}
+
 //*****
 void DyndocSyncForm::slot_startSyncronizationClicked()
 {
+    ui->qpb_start_synch->setDisabled(true);
+    ui->qpb_stop_synch->setEnabled(true);
+
     emit signalStartSyncronization();
 }
 
 void DyndocSyncForm::slot_stopSyncronizationClicked()
 {
+    ui->qpb_stop_synch->setDisabled(true);
+    ui->qpb_start_synch->setEnabled(true);
+
     emit signalStopSyncronization();
 }
 
@@ -399,10 +472,90 @@ void DyndocSyncForm::slot_implementInitialSyncronizationClicked()
 
 void DyndocSyncForm::slot_parametersClicked()
 {
-    QMessageBox msgBox;
-    msgBox.setWindowTitle(tr("Button test"));
-    msgBox.setText(tr("param"));
-    msgBox.exec();
+    optionsForm = new OptionsDialog(this);
+    loadSettings();
+
+    connect(optionsForm,SIGNAL(okClic()),this,SLOT(slot_optionsAccepted()));
+    connect(optionsForm,SIGNAL(cancelClic()),this,SLOT(slot_optionsRejected()));
+
+    optionsForm->show();
 }
 
+void DyndocSyncForm::slot_optionsAccepted()
+{
+    setConnectionSettings();
 
+    optionsForm->close();
+    delete optionsForm;
+}
+
+void DyndocSyncForm::slot_optionsRejected()
+{
+    optionsForm->close();
+    delete optionsForm;
+}
+
+void DyndocSyncForm::slot_pings(QMap<QString,JKKSPing> rhs)
+{
+    QMapIterator<QString,JKKSPing> i(rhs);
+
+    while(i.hasNext())
+    {
+        int color = 1;
+
+        i.next();
+
+        if(i.value().state1() == 1 && i.value().state2() == 1 && i.value().state3() == 1 && i.value().state4() == 1)
+        {
+            color = 2;
+        }
+        if(i.value().created() == 0 || i.value().created() == 2)
+        {
+            color = 0;
+        }
+
+        setColor(i.key(),color);
+    }
+}
+
+void DyndocSyncForm::setColor(QString key,int color)
+{
+    QStandardItem* root = viewModel->invisibleRootItem();
+    bool findFlag;
+
+    root = findItem(root,key,findFlag);
+
+    if(color == 2)
+    {
+        root->setData(Qt::green,Qt::BackgroundColorRole);
+    }
+    if(color == 1)
+    {
+        root->setData(Qt::yellow,Qt::BackgroundColorRole);
+    }
+    else
+    {
+        root->setData(Qt::red,Qt::BackgroundColorRole);
+    }
+}
+
+QStandardItem* DyndocSyncForm::findItem(QStandardItem* it,QString key,bool& findFlag)
+{
+    if(it->data(Qt::UserRole+2).toString() == key)
+    {
+        findFlag = true;
+        return it;
+    }
+
+    for(int i=0; i<it->rowCount();i++)
+    {
+        QStandardItem* itemChild = it->child(i);
+
+        itemChild = findItem(itemChild,key,findFlag);
+
+        if(findFlag)
+            return itemChild;
+    }
+
+    return 0;
+}

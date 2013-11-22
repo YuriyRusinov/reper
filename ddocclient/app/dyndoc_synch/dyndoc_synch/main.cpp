@@ -46,7 +46,8 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    int id = idOrganization->getLocalOrgId();
+    idOrganization->connectToDb();
+    int id = idOrganization->getLocalOrgId();      
     delete idOrganization;
 
     QObject::connect(userForm,SIGNAL(signalStartSyncronization()),netUnit,SLOT(slotStartSyncronization()));
@@ -58,6 +59,7 @@ int main(int argc, char *argv[])
     userForm->init();
 
     userForm->setDbInf(dbInfForLoader);
+    userForm->setLocalId(id);
     userForm->reciveData(dataUnit->getData());
     userForm->exec();
 

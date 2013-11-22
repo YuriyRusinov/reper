@@ -9,6 +9,7 @@ HEADERS += \
         UserInterface/DataElements/dyndocModel.h \
         UserInterface/DataElements/dyndocView.h \
         UserInterface/DataElements/dyndoc_delegate.h \
+        UserInterface/dyndocForm/optionsdialog.h \
         Namespaces/netStruct.h 
 
 SOURCES += \
@@ -21,9 +22,11 @@ SOURCES += \
         UserInterface/DataElements/dyndocModel.cpp \
         UserInterface/DataElements/dyndocView.cpp \
         UserInterface/DataElements/dyndoc_delegate.cpp \
+        UserInterface/dyndocForm/optionsdialog.cpp \
         Namespaces/netStruct.cpp
 
 FORMS   += \
-        UserInterface/dyndocForm/dyndoc_sync_form.ui 
+        UserInterface/dyndocForm/dyndoc_sync_form.ui \
+        UserInterface/dyndocForm/options_dialog.ui
 
 QT += network
