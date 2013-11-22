@@ -1321,7 +1321,7 @@ void KKSIncludesWidget::addCategoryIntoRubric (void)
 
 void KKSIncludesWidget::rubricSelectionChanged (const QItemSelection& selected, const QItemSelection& deselected)
 {
-    qDebug () << __PRETTY_FUNCTION__ << selected << deselected;
+    //qDebug () << __PRETTY_FUNCTION__ << selected << deselected;
     QModelIndexList wIndexList (selected.indexes());
     QModelIndexList oldIndexList (deselected.indexes());
 
@@ -1336,6 +1336,16 @@ void KKSIncludesWidget::rubricSelectionChanged (const QItemSelection& selected, 
     QModelIndex wIndex = wIndexList[0];
     int rType = wIndex.data (Qt::UserRole+2).toInt();
     int idr = wIndex.data (Qt::UserRole).toInt();
+    bool isRubrCat (rType == KKSRubricBase::atRubricCategory ||
+                    rType == KKSRubricBase::atOthers);
+    QList<QAction *> actList = tBRubrActions->actions();
+    for (int i=4; i<=6; i++)
+    {
+        QAction * act = actList.at(i);
+        act->setEnabled (!isRubrCat);
+    }
+    QAction * act = actList.at (9);
+    act->setEnabled (!isRubrCat);
     if (!wIndex.isValid() || idr == 1 || rType == KKSRubricBase::atRootRubric 
                                       || rType == KKSRubricBase::atOthers)
     {
