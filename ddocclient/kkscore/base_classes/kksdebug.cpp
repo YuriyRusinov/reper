@@ -103,7 +103,8 @@ void KKSDebug::print(const QString & msg)
         case KKSFatalMsg: c = KKSDbgOutputWidget::cFatalMsg; break;
     }
     
-    kksSito->logStream() << msg;
+    kksSito->logStream() << msg << "\n";
+    kksSito->logStream().flush();
 
     kksSito->dbgWidget()->printMessage( c, msg );
 }

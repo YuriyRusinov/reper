@@ -13,19 +13,19 @@
 #include <QTextEdit>
 #include <QTextCursor>
 
-#include "kksgui_config.h"
+#include "config_core.h"
 
 class QMenu;
 class QAction;
 class QActionGroup;
 
-class _GUI_EXPORT KKSDbgOutputWidget : public QDockWidget
+class __CORE_EXPORT KKSDbgOutputWidget : public QDockWidget
 {
     Q_OBJECT
 
 public:
 
-    KKSDbgOutputWidget(QWidget *parent = 0, Qt::WindowFlags flags = 0);
+    KKSDbgOutputWidget(bool bForDockable, QWidget *parent = 0, Qt::WindowFlags flags = 0);
     ~KKSDbgOutputWidget(void);
 
     void initMenuEmitting();
@@ -53,6 +53,14 @@ public slots:
     void placeTop(bool p);
     void placeBottom(bool p);
 
+    void showDbgMsg(bool);
+    void showInfoMsg(bool);
+    void showImpInfoMsg(bool);
+    void showWrnMsg(bool);
+    void showErrMsg(bool);
+
+    void clearLog();
+
 protected:
     virtual void contextMenuEvent(QContextMenuEvent *e);
     //virtual bool event(QEvent *);
@@ -64,7 +72,7 @@ private:
     void initWidget(void);
     
 
-    void initSysMenu();
+    void initSysMenu(bool bForDockable);
 
     void place(Qt::DockWidgetArea area, bool place);
     QString criticalityAsString(Criticality c);
@@ -83,6 +91,13 @@ private:
     QAction *rightAction;
     QAction *topAction;
     QAction *bottomAction;
+
+    QAction * m_clearLog;
+    QAction * m_dbgMinLog;
+    QAction * m_infoMinLog;
+    QAction * m_impInfoMinLog;
+    QAction * m_wrnMinLog;
+    QAction * m_errMinLog;
 
     QTextEdit * m_logWidget;
     QTextCursor * m_logWidgetCursor;

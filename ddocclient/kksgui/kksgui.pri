@@ -91,7 +91,6 @@ HEADERS += \
                 KKSRubricMessageBox.h \
                 KKSSearchTemplateDialog.h \
                 KKSAttrModel.h \
-                KKSDbgOutputWidget.h \
                 KKSAValWidget.h \
                 KKSRecDialog.h \
 	   	kksgui_config.h
@@ -188,7 +187,6 @@ SOURCES += \
                 KKSRubricMessageBox.cpp \
                 KKSAttrModel.cpp \
                 KKSSearchTemplateDialog.cpp \
-                KKSDbgOutputWidget.cpp \
                 KKSAValWidget.cpp \
                 KKSRecDialog.cpp
 

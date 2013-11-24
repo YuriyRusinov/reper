@@ -8,10 +8,10 @@
 #include <QScrollBar>
 
 #include "KKSDbgOutputWidget.h"
-
+#include <kksdebug.h>
 #include <defines.h>
 
-KKSDbgOutputWidget :: KKSDbgOutputWidget(QWidget *parent, Qt::WindowFlags flags)
+KKSDbgOutputWidget :: KKSDbgOutputWidget(bool bForDockable, QWidget *parent, Qt::WindowFlags flags)
     : QDockWidget (tr("Debug output window"), parent, flags)
 {
 
@@ -24,7 +24,7 @@ KKSDbgOutputWidget :: KKSDbgOutputWidget(QWidget *parent, Qt::WindowFlags flags)
     initWidget();
 
     this->setWidget (m_logWidget);
-    this->initSysMenu ();
+    this->initSysMenu (bForDockable);
 }
 
 KKSDbgOutputWidget :: ~KKSDbgOutputWidget(void)
@@ -45,6 +45,8 @@ void KKSDbgOutputWidget :: initMenuEmitting()
             this,
             SLOT(showSysContextMenu(const QPoint &))
             );
+
+    //connect(m_
 }
 
 void KKSDbgOutputWidget :: initWidget()
@@ -71,7 +73,7 @@ void KKSDbgOutputWidget :: initWidget()
     charFormat.setForeground(Qt::black);
     m_logWidgetCursor->atBlockStart();
     m_logWidgetCursor->insertText(QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss"));
-    m_logWidgetCursor->insertText("\n");
+    m_logWidgetCursor->insertText("\n\n");
 
 }
 
@@ -106,8 +108,8 @@ void KKSDbgOutputWidget :: printMessage(Criticality c, const QString & message)
 
     QTextCharFormat charFormat;
     charFormat.setForeground(brush);
-    m_logWidgetCursor->insertBlock();
-    m_logWidgetCursor->insertText(sCriticality + " " + message, charFormat);
+    //m_logWidgetCursor->insertBlock();
+    m_logWidgetCursor->insertText(sCriticality + " " + message + "\n", charFormat);
     if(m_logWidget->verticalScrollBar()){
         if(m_logWidgetCursor->atEnd())
             m_logWidget->verticalScrollBar()->setValue(m_logWidget->verticalScrollBar()->maximum());
@@ -146,7 +148,7 @@ QString KKSDbgOutputWidget :: criticalityAsString(Criticality c)
 }
 
 
-void KKSDbgOutputWidget :: initSysMenu()
+void KKSDbgOutputWidget :: initSysMenu(bool bForDockable)
 {
     floatingAction = new QAction(tr("Floating"), this);
     floatingAction->setCheckable(true);
@@ -176,12 +178,65 @@ void KKSDbgOutputWidget :: initSysMenu()
     areaActions->addAction(topAction);
     areaActions->addAction(bottomAction);
 
+    m_clearLog = new QAction(tr("Clear log") , this);
+    m_clearLog->setCheckable(false);
+    connect(m_clearLog, SIGNAL(triggered()), SLOT(clearLog()));
+
+    m_dbgMinLog = new QAction(tr("Show debug messages") , this);
+    m_dbgMinLog->setCheckable(true);
+    connect(m_dbgMinLog, SIGNAL(triggered(bool)), SLOT(showDbgMsg(bool)));
+
+    m_infoMinLog = new QAction(tr("Show info messages") , this);
+    m_infoMinLog->setCheckable(true);
+    connect(m_infoMinLog, SIGNAL(triggered(bool)), SLOT(showInfoMsg(bool)));
+
+    m_impInfoMinLog = new QAction(tr("Show important info messages") , this);
+    m_impInfoMinLog->setCheckable(true);
+    connect(m_impInfoMinLog, SIGNAL(triggered(bool)), SLOT(showImpInfoMsg(bool)));
+
+    m_wrnMinLog = new QAction(tr("Show warning messages") , this);
+    m_wrnMinLog->setCheckable(true);
+    connect(m_wrnMinLog, SIGNAL(triggered(bool)), SLOT(showWrnMsg(bool)));
+
+    m_errMinLog = new QAction(tr("Show error messages") , this);
+    m_errMinLog->setCheckable(true);
+    connect(m_errMinLog, SIGNAL(triggered(bool)), SLOT(showErrMsg(bool)));
+
+    QActionGroup * dbgActions = new QActionGroup(this);
+    dbgActions->setExclusive(true);
+    dbgActions->addAction(m_dbgMinLog);
+    dbgActions->addAction(m_infoMinLog);
+    dbgActions->addAction(m_impInfoMinLog);
+    dbgActions->addAction(m_wrnMinLog);
+    dbgActions->addAction(m_errMinLog);
+    switch(KKSDebug::minMsgType()){
+        case KKSDebugMsg: m_dbgMinLog->setChecked(true); break;
+        case KKSInfoMsg: m_infoMinLog->setChecked(true); break;
+        case KKSImportantInfoMsg: m_impInfoMinLog->setChecked(true); break;
+        case KKSWarningMsg: m_wrnMinLog->setChecked(true); break;
+        case KKSCriticalMsg: m_errMinLog->setChecked(true); break;
+    }
+
+
     m_pSysMenu = new QMenu(tr("Debug output"), this);
-    m_pSysMenu->addAction(toggleViewAction());
-    m_pSysMenu->addSeparator();
-    m_pSysMenu->addAction(floatingAction);
-    m_pSysMenu->addSeparator();
-    m_pSysMenu->addActions(areaActions->actions());
+    
+    if(bForDockable){
+        m_pSysMenu->addAction(toggleViewAction());
+        m_pSysMenu->addSeparator();
+        QMenu * dbgMenu = new QMenu(tr("Log details"), this);
+        dbgMenu->addActions(dbgActions->actions());
+        m_pSysMenu->addAction(m_clearLog);
+        m_pSysMenu->addMenu(dbgMenu);
+        m_pSysMenu->addSeparator();
+        m_pSysMenu->addAction(floatingAction);
+        m_pSysMenu->addSeparator();
+        m_pSysMenu->addActions(areaActions->actions());
+    }
+    else{
+        m_pSysMenu->addAction(m_clearLog);
+        m_pSysMenu->addSeparator();
+        m_pSysMenu->addActions(dbgActions->actions());
+    }
 
     //m_logWidget->s
 
@@ -231,4 +286,47 @@ void KKSDbgOutputWidget :: place(Qt::DockWidgetArea area, bool place)
     if(mainWindow)
         mainWindow->addDockWidget(area, this);
 
+}
+
+void KKSDbgOutputWidget :: showDbgMsg(bool yes)
+{
+    if(yes)
+        KKSDebug::setMinMsgType(KKSDebugMsg);
+}
+
+void KKSDbgOutputWidget :: showInfoMsg(bool yes)
+{
+    if(yes)
+        KKSDebug::setMinMsgType(KKSInfoMsg);
+}
+
+void KKSDbgOutputWidget :: showImpInfoMsg(bool yes)
+{
+    if(yes)
+        KKSDebug::setMinMsgType(KKSImportantInfoMsg);
+}
+
+void KKSDbgOutputWidget :: showWrnMsg(bool yes)
+{
+    if(yes)
+        KKSDebug::setMinMsgType(KKSWarningMsg);
+
+}
+
+void KKSDbgOutputWidget :: showErrMsg(bool yes)
+{
+    if(yes)
+        KKSDebug::setMinMsgType(KKSCriticalMsg);
+}
+
+void KKSDbgOutputWidget :: clearLog()
+{
+    m_logWidget->clear();
+
+    m_logWidgetCursor->atStart();
+    QTextCharFormat charFormat;
+    charFormat.setForeground(Qt::black);
+    m_logWidgetCursor->atBlockStart();
+    m_logWidgetCursor->insertText(QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss"));
+    m_logWidgetCursor->insertText("\n\n");
 }

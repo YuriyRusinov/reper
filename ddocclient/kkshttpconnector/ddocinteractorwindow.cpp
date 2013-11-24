@@ -37,7 +37,7 @@ DDocInteractorWindow::DDocInteractorWindow(QWidget *parent) : QDialog(parent)
     buttonLayout->setSizeConstraint(QLayout::SetFixedSize);
 
     QHBoxLayout *mainLayout = new QHBoxLayout;
-    QDockWidget * w = (QDockWidget*)kksSito->dbgWidget();
+    QDockWidget * w = (QDockWidget*)kksSito->dbgWidget(true, false);
     mainLayout->addWidget(w->widget());
     mainLayout->addLayout(buttonLayout);
     setLayout(mainLayout);

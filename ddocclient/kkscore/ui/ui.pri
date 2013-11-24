@@ -5,7 +5,8 @@ HEADERS += \
             ui/savesettingsform.h \
             ui/editsettingsform.h \
 	    ui/choosedlform.h \
-            ui/connectioninfoform.h
+            ui/connectioninfoform.h \
+            ui/KKSDbgOutputWidget.h
 
 FORMS += \
             ui/save_settings_form.ui \
@@ -20,5 +21,6 @@ SOURCES += \
             ui/editsettingsform.cpp \
 	    ui/loginform.cpp \
 	    ui/choosedlform.cpp \
-            ui/connectioninfoform.cpp
+            ui/connectioninfoform.cpp \
+            ui/KKSDbgOutputWidget.cpp
 	    

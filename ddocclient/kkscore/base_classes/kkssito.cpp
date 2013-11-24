@@ -44,6 +44,7 @@
 __CORE_EXPORT KKSSito * KKSSito::self = 0;
 
 const QString kksSitoNameEng = QString(EXECUTABLE_PREFIX);
+QFile m_logFile;
 
 void KKSDbgOutputHandler(QtMsgType type, const char *msg)
 {
@@ -275,10 +276,13 @@ void KKSSito::clearLoader()
     m_loader->clearCache();
 }
 
-KKSDbgOutputWidget * KKSSito::dbgWidget() const
+KKSDbgOutputWidget * KKSSito::dbgWidget(bool bCreateMenu, bool bForDockable) const
 {
-    if(!m_dbgWidget)
-        m_dbgWidget = new KKSDbgOutputWidget();
+    if(!m_dbgWidget){
+        m_dbgWidget = new KKSDbgOutputWidget(bForDockable);
+        if(bCreateMenu)
+            m_dbgWidget->initMenuEmitting();
+    }
 
     return m_dbgWidget;
 }
@@ -299,11 +303,11 @@ KKSError * KKSSito::getLastError()
 void KKSSito::initLogStream()
 {
     QString fileName = QString( getWDir() + "/log.log" );
-    QFile log(fileName);
+    m_logFile.setFileName(fileName);
     
-    if (log.open(QFile::WriteOnly | QFile::Truncate)) {
-        m_logStream.setDevice(&log);
-        m_logStream << QObject::tr("Log started at ") + QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss");
+    if (m_logFile.open(QFile::WriteOnly | QFile::Truncate)) {
+        m_logStream.setDevice(&m_logFile);
+        m_logStream << QObject::tr("Log started at ") + QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss") + "\n";
     }
 }
 

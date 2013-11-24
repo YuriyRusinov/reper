@@ -402,13 +402,12 @@ void KKSMainWindow::initJournal()
 
 void KKSMainWindow::initDebugWindow()
 {
-    m_debugWidget = kksSito->dbgWidget();
+    m_debugWidget = kksSito->dbgWidget(true, true);
 
     if (!m_debugWidget)
         return;
 
     m_debugWidget->setParent(this);
-    m_debugWidget->initMenuEmitting();
     bool enabled = m_debugWidget->isVisible();
     addDockWidget(Qt::RightDockWidgetArea, m_debugWidget);
     if(!enabled)

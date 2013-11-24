@@ -124,7 +124,7 @@ public:
     KKSStuffFactory *sf () const;
     //KKSIndFactory * indf () const;
 
-    KKSDbgOutputWidget * dbgWidget() const;
+    KKSDbgOutputWidget * dbgWidget(bool bCreateMenu = true, bool bForDockable = true) const;
     QTextStream & logStream();
 
 private:
