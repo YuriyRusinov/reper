@@ -2834,11 +2834,22 @@ QString KKSLoader::parseFilter(const KKSFilter * f, const QString & tableName, Q
         if(!exTables.contains(attrTable))
             exTables.append(attrTable);
 
-        sql += QString(" %1.id=%1_%2_ref_%3.id_%1 and %1_%2_ref_%3.id_%2=%2.id and %2.id in(%4) ")
-                .arg (tableName)
-                .arg (a->tableName())
-                .arg (a->id())
-                .arg (values.at(0)->valueForInsert().mid (2, values.at(0)->valueForInsert().length()-4));
+        QString sqlIn = values.at(0)->valueForInsert().mid (2, values.at(0)->valueForInsert().length()-4);
+        if (!sqlIn.trimmed().isEmpty())
+        {
+            sql += QString(" %1.id=%1_%2_ref_%3.id_%1 and %1_%2_ref_%3.id_%2=%2.id and %2.id in(%4) ")
+                    .arg (tableName)
+                    .arg (a->tableName())
+                    .arg (a->id())
+                    .arg (sqlIn);
+        }
+        else
+        {
+            sql += QString(" %1.id=%1_%2_ref_%3.id_%1 and %1_%2_ref_%3.id_%2=%2.id  ")
+                    .arg (tableName)
+                    .arg (a->tableName())
+                    .arg (a->id());
+        }
 
 /*
         sqlEx += QString (" inner join %1_%2_ref_%3 on (%1.id=%1_%2_ref_%3.id_%1) inner join %2 on (%1_%2_ref_%3.id_%2=%2.id and %2.id in(%4))")
@@ -2928,13 +2939,16 @@ QString KKSLoader::parseFilter(const KKSFilter * f, const QString & tableName, Q
             str += QString(" is not null");
             break;
         case KKSFilter::foIn:
-            str += QString(" in (%1)").arg(f->constructForIn());
+            if (!f->constructForIn().trimmed().isEmpty())
+                str += QString(" in (%1)").arg(f->constructForIn());
             break;
         case KKSFilter::foNotIn:
-            str += QString(" not in (%1)").arg(f->constructForIn());
+            if (!f->constructForIn().trimmed().isEmpty())
+                str += QString(" not in (%1)").arg(f->constructForIn());
             break;
         case KKSFilter::foInSQL:
-            str += QString(" in (%1)").arg(values.at(0)->value());
+            if (!values.at(0)->value().trimmed().isEmpty())
+                str += QString(" in (%1)").arg(values.at(0)->value());
             break;
         case KKSFilter::foBetween:
             str += QString(" between %1 and %2")

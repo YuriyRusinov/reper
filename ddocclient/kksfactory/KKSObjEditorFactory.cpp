@@ -3351,6 +3351,26 @@ void KKSObjEditorFactory :: loadAttributeReference (QString tableName, QWidget *
         filters.append(fg);
         fg->release();
     }
+    else if (refObj->id() == IO_STATE_ID)
+    {
+        KKSObject * wObj = editor->getObj ();
+        KKSCategory *wC = wObj->category();
+        qDebug () << __PRETTY_FUNCTION__ << wObj->id() << wC->lifeCycle();
+        KKSAttribute * a = loader->loadAttribute(attrId);
+        if(!a){
+            refObj->release();
+            return;
+        }
+
+        KKSSearchTemplate * st = NULL;
+        st = a->searchTemplate();
+        if(st){
+            KKSFilterGroup * fg = st->getMainGroup();
+            if(fg){
+                filters.append(fg);
+            }
+        }
+    }
     else{ //все остальные случаи (обычные атрибуты)
         KKSAttribute * a = loader->loadAttribute(attrId);
         if(!a){

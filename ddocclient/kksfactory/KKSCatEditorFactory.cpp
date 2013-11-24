@@ -998,6 +998,7 @@ void KKSCatEditorFactory :: addLifeCycle (QWidget * editor, int idObject, const 
     KKSEIOData * lcInfo = this->loader->loadEIOInfo (idObject, lcf->id());
     sRecMod->setData (recIndex, QVariant::fromValue<KKSEIOData *>(lcInfo), Qt::UserRole+1);
     sRecMod->setData (recIndex, lcf->id(), Qt::UserRole);
+    sRecMod->setData (recIndex, QIcon(":/ddoc/rubric_item.png"), Qt::DecorationRole);
     
     lcForm->setParent (0);
     delete lcForm;
@@ -1047,6 +1048,7 @@ void KKSCatEditorFactory :: editLifeCycle (QWidget * editor, int idObject, qint6
     }
     KKSEIOData * lcInfo = this->loader->loadEIOInfo (idObject, lcf->id());
     sRecMod->setData (recIndex, QVariant::fromValue<KKSEIOData *>(lcInfo), Qt::UserRole+1);
+    sRecMod->setData (recIndex, QIcon(":/ddoc/rubric_item.png"), Qt::DecorationRole);
     lcForm->setParent (0);
     delete lcForm;
     lc->release ();
