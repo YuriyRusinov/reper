@@ -3355,7 +3355,31 @@ void KKSObjEditorFactory :: loadAttributeReference (QString tableName, QWidget *
     {
         KKSObject * wObj = editor->getObj ();
         KKSCategory *wC = wObj->category();
-        qDebug () << __PRETTY_FUNCTION__ << wObj->id() << wC->lifeCycle();
+        //qDebug () << __PRETTY_FUNCTION__ << wObj->id() << wC->lifeCycle();
+        KKSCategory * ct = c->tableCategory ();
+        if (!ct)
+        {
+            refObj->release();
+            return;
+        }
+        if (wC && wC->lifeCycle())
+        {
+            KKSLifeCycleEx * lc = wC->lifeCycle();
+            QString lcval = QString("select s.id from io_states s inner join life_cycle lc on ((lc.id_start_state = s.id or lc.id_auto_state_attr = s.id or lc.id_auto_state_ind = s.id) and lc.id=%1)").arg (lc->id());
+            const KKSFilter * f = ct->createFilter (ATTR_ID, lcval, KKSFilter::foInSQL);
+            if (!f)
+            {
+                refObj->release ();
+                return;
+            }
+            KKSList<const KKSFilter *> fl;
+            fl.append (f);
+            f->release ();
+            KKSFilterGroup * fg = new KKSFilterGroup(true);
+            fg->setFilters(fl);
+            filters.append(fg);
+            fg->release();
+        }
         KKSAttribute * a = loader->loadAttribute(attrId);
         if(!a){
             refObj->release();
@@ -9500,10 +9524,13 @@ void KKSObjEditorFactory :: loadLifeCycleState (KKSLifeCycleEx * lc, QLineEdit *
     {
         values += QString("%1%2").arg(st[i]).arg(i<nrst-1 ? QString(",") : QString());
     }
-    const KKSFilter * f = wCat->createFilter(1, QString("select id from %1 where id in(%2) and not is_system").arg(refObj->tableName()).arg(values), KKSFilter::foInSQL);
     KKSList<const KKSFilter *> stFilters;
-    stFilters.append(f);
-    f->release();
+    if (!values.isEmpty())
+    {
+        const KKSFilter * f = wCat->createFilter(1, QString("select id from %1 where id in(%2) and not is_system").arg(refObj->tableName()).arg(values), KKSFilter::foInSQL);
+        stFilters.append(f);
+        f->release();
+    }
     KKSFilterGroup * fg = new KKSFilterGroup (true);
     fg->setFilters(stFilters);
     filters.append(fg);

@@ -2837,7 +2837,7 @@ QString KKSLoader::parseFilter(const KKSFilter * f, const QString & tableName, Q
         QString sqlIn = values.at(0)->valueForInsert().mid (2, values.at(0)->valueForInsert().length()-4);
         if (!sqlIn.trimmed().isEmpty())
         {
-            sql += QString(" %1.id=%1_%2_ref_%3.id_%1 and %1_%2_ref_%3.id_%2=%2.id and %2.id in(%4) ")
+            sql += QString(" %1.id=%1_%2_ref_%3.id_%1 and %1_%2_ref_%3.id_%2=%2.id and %2.id in (%4) ")
                     .arg (tableName)
                     .arg (a->tableName())
                     .arg (a->id())
