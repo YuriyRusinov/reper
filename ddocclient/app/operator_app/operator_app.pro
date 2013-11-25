@@ -9,6 +9,7 @@ DESTDIR = ../../build
 INCLUDEPATH += 	. \
 		../../dataaccess \
 		../../kkscore/base_classes \
+		../../kkscore/ui \
 		../../kkscore \
 		../../kksutils \
 		../../kksfactory \
