@@ -3,8 +3,6 @@ HEADERS += \
         config_dyndoc_synch.h \
         UserInterface/dyndocForm/dyndocsyncform.h \
         UserInterface/DataStream/DataStream.h \
-        UserInterface/NetworkStream/netThread.h \
-        UserInterface/NetworkStream/NetworkStream.h \
         UserInterface/DataElements/viewElement.h \
         UserInterface/DataElements/dyndocModel.h \
         UserInterface/DataElements/dyndocView.h \
@@ -16,8 +14,6 @@ SOURCES += \
         main.cpp \
         UserInterface/dyndocForm/dyndocsyncform.cpp \
         UserInterface/DataStream/DataStream.cpp \
-        UserInterface/NetworkStream/netThread.cpp \
-        UserInterface/NetworkStream/NetworkStream.cpp \
         UserInterface/DataElements/viewElement.cpp \
         UserInterface/DataElements/dyndocModel.cpp \
         UserInterface/DataElements/dyndocView.cpp \

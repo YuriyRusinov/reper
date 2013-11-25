@@ -16,7 +16,10 @@
 #include "UserInterface/DataElements/dyndoc_delegate.h"
 #include "optionsdialog.h"
 
+#include <ddocinteractorwindow.h>
 #include <ddocinteractorbase.h>
+#include <timerform.h>
+
 
 class dyndocModel;
 
@@ -74,6 +77,9 @@ private:
     int localOrganizationId;
 
     dyndoc_mainStructs::dbInf db;
+
+    DDocInteractorWindow* httpWin;
+    DDocInteractorBase* m_base;
 
     DyndocSyncForm(DyndocSyncForm& adb);
     const DyndocSyncForm& operator=(const DyndocSyncForm& rhs);

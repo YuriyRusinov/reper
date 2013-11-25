@@ -8,7 +8,6 @@
 
 #include "UserInterface/dyndocForm/dyndocsyncform.h"
 #include "UserInterface/DataStream/DataStream.h"
-#include "UserInterface/NetworkStream/NetworkStream.h"
 #include "kkssito.h"
 
 int main(int argc, char *argv[])
@@ -26,8 +25,6 @@ int main(int argc, char *argv[])
     dyndocModel* viewModel = new dyndocModel();
 
     dataStream* dataUnit = new dataStream(sito->db());
-    networkStream* netUnit = new networkStream();
-
     dyndoc_mainStructs::dbInf dbInfForLoader = dataUnit->getDbInf();
 
     JKKSLoader* idOrganization = new JKKSLoader(dbInfForLoader.hostAddress,dbInfForLoader.dbName,dbInfForLoader.userName,dbInfForLoader.password,dbInfForLoader.port);
@@ -50,9 +47,6 @@ int main(int argc, char *argv[])
     int id = idOrganization->getLocalOrgId();      
     delete idOrganization;
 
-    QObject::connect(userForm,SIGNAL(signalStartSyncronization()),netUnit,SLOT(slotStartSyncronization()));
-    QObject::connect(userForm,SIGNAL(signalStopSyncronization()),netUnit,SLOT(slotStopSyncronization()));
-
     viewWidget->setModel(viewModel);
 
     userForm->setViewWidget(viewWidget);
@@ -66,7 +60,6 @@ int main(int argc, char *argv[])
     userForm->setViewWidget(0);
 
     delete dataUnit;
-    delete netUnit;
     delete viewModel;
     delete viewWidget;
     delete userForm;

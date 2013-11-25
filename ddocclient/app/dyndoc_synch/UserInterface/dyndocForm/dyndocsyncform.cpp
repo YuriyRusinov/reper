@@ -9,6 +9,9 @@ DyndocSyncForm::DyndocSyncForm(QWidget *parent) :
     ui->setupUi(this);
 
     localOrganizationId = 0;
+
+    m_base = 0;
+    httpWin = 0;
 }
 
 DyndocSyncForm::~DyndocSyncForm()
@@ -435,7 +438,50 @@ void DyndocSyncForm::slot_startSyncronizationClicked()
     ui->qpb_start_synch->setDisabled(true);
     ui->qpb_stop_synch->setEnabled(true);
 
-    emit signalStartSyncronization();
+    int intervalMs = 10000;
+    int interval = 10;
+    int units = 0;//seconds
+    bool mode = false; //true = manual
+
+    TimerForm * timerForm = new TimerForm ();
+    if (!timerForm)
+    {
+        return;
+    }
+
+    timerForm->init(interval, units, mode, true);
+
+    if (timerForm->exec () != QDialog::Accepted)
+    {
+        delete timerForm;
+        return;
+    }
+    else
+    {
+        mode = timerForm->startManually();
+        intervalMs = timerForm->getTimerMs();
+    }
+    delete timerForm;
+
+    httpWin = new DDocInteractorWindow(this);
+
+    m_base = new DDocInteractorBase(NULL);
+
+    connect(this,SIGNAL(signalStopSyncronization()),httpWin,SLOT(closeApp()));
+    connect(m_base,SIGNAL(pingsSended(QMap<QString,JKKSPing>)),this,SLOT(slot_pings(QMap<QString,JKKSPing> rhs)));
+
+    httpWin->setWindowModality(Qt::NonModal);
+    httpWin->setTimerParams(interval, units, mode);
+    httpWin->setInteractorBase(m_base);
+
+    int ok = m_base->start(mode, intervalMs);
+    if(ok != 1)
+        return;
+
+    if(ok)
+    {
+        httpWin->show();
+    }
 }
 
 void DyndocSyncForm::slot_stopSyncronizationClicked()
@@ -444,6 +490,9 @@ void DyndocSyncForm::slot_stopSyncronizationClicked()
     ui->qpb_start_synch->setEnabled(true);
 
     emit signalStopSyncronization();
+
+    m_base = 0;
+    httpWin = 0;
 }
 
 void DyndocSyncForm::slot_pollClicked()
