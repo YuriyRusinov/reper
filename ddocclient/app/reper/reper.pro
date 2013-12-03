@@ -6,15 +6,15 @@ QT += network core gui xml
 TARGET = reper
 
 DESTDIR = ../../build
-#QGISDIR = "D:/OSGeo4W/apps/qgis-dev"
 QGISDIR = "C:/Program Files (x86)/Quantum GIS 1.7.0"
+
 DEFINES *= __USE_EXPORTS
 
 INCLUDEPATH +=  . \
-		$$QGISDIR/include \
-    	        ../../dataaccess \
+                $$QGISDIR/include \
+                ../../dataaccess \
                 ../../kksutils \
-                ../../kksrunservice \
+                ../../kksrunservice
 
 
 DEPENDPATH += 	\
@@ -23,10 +23,8 @@ DEPENDPATH += 	\
                 ../../kksutils \
                 ../../kksrunservice
 
-INCLUDEPATH +=c:/OSGeo4W/include
-#LIBS += -L$$DESTDIR -ldataaccess -lkksutils -lkksrunservice 
-LIBS += -Lc:/OSGeo4W/lib/  -lproj_i -lgdal_i
-LIBS += -L$$QGISDIR/lib -lqgis_core -lqgis_gui 
+#LIBS += -L$$DESTDIR -ldataaccess -lkksutils -lkksrunservice
+LIBS += -L$$QGISDIR/lib -lqgis_core -lqgis_gui
 
 # libpq support
 LIBS += -L$${PSQL_HOME}/lib
@@ -43,3 +41,5 @@ include(reper.pri)
 
 target.path = $$KKS_EXEC_DIR
 INSTALLS += target
+
+

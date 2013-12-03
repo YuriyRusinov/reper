@@ -23,13 +23,15 @@
 
 #include "config.h"
 
-
+// OSGEO includes
 #include <ogr_api.h>
 #include <gdal_priv.h>
-//QGis Includes
 
+//QGis includes
 #include <qgsapplication.h>
 #include <qgsfield.h>
+#include <qgsfeature.h>
+#include <qgsgeometry.h>
 #include <qgsmapcanvas.h>
 #include <qgsmaptool.h>
 #include <qgslabel.h>
@@ -37,41 +39,36 @@
 #include <qgslegendmodel.h>
 #include <qgslegendinterface.h>
 #include <qgsmaplayerregistry.h>
+
 #include <qgsproject.h>
 #include <qgsproviderregistry.h>
+#include <qgsvectordataprovider.h>
 #include <qgsrasterlayer.h>
 #include <qgssinglesymbolrendererv2.h>
-//#include <qgssinglesymbolrenderer.h>
 #include <qgsstylev2.h>
 #include <qgsvectorlayer.h>
 #include <qgsvectorfilewriter.h>
+#include <qgsmaptoolpan.h>
+#include <qgsmaptoolzoom.h>
+#include <qgscoordinatereferencesystem.h>
 
-
-#include "qgsmaptoolpan.h"
-#include "qgsmaptoolzoom.h"
-
-//#include <qgslegend.h>
-
-//#include <qgsrasterlayer.h>
-//#include <qgsfield.h>
-//#include <qgslabel.h>
-//#include <qgslabelattributes.h>
-
-// GDAL / ORG Includes
+//#include "aztoc.h"
 
 
 //QT Includes
 #include <QtGui>
 #include <QMessageBox>
+#include <QFile>
 #include <QPainter>
-
+#include <QApplication>
 
 //Local Includes
 #include <ui_simple_map_window_base.h>
 
-/**
-@author Tim Sutton
-*/
+//Denis Includes (dn)
+#include "dn/dnspecbath.h"
+#include "dn/Added/dnvector.h"
+
 class MainWindow : public QMainWindow, private Ui::SimpleMapWindowBase
 {
   Q_OBJECT;
@@ -79,6 +76,10 @@ public:
 
     MainWindow(QWidget* parent = 0, Qt::WFlags fl = 0 );
     ~MainWindow();
+
+
+    QgsMapLayer * mpSelectedLayer; //selected map layer
+
 public slots:
     void zoomInMode();
     void zoomOutMode();
@@ -87,19 +88,41 @@ public slots:
     void addLayerToTOC(QgsMapLayer *mapLayer);
     void azRemoveAnnotationItems();
     void azRemoveAllLayers();
+    bool azSelectLayer(const QString layerName);
+    bool azSelectLayer(const int layerNumber);
     static void azSetTitleWindow(QWidget & azApp);
+    static bool azRasterEnhancement(QgsRasterLayer & azRasterLayer);
+    static bool azRasterCheckBandName(QgsRasterLayer & azRasterLayer, QString strBandName);
+    static bool azCopyFiles(QString azSource, QString azDestPath, bool bUse = false);
+    bool azMakeLayer(QGis::WkbType azType, QString pDestDir, QString pName);
+    bool azAddLayerVector(QFileInfo pFile);
+
+
 
 private slots:
+    void SLOTazContextShowExtent();
+    void SLOTazCoordsCenter();
+    void SLOTazGetSelectedLegendItem();
+    void SLOTazThemTaskSpectralBathynometry();
+    void SLOTazShowContextMenuForLegend(const QPoint & pos);
+    void SLOTazShowMouseCoordinate(const QgsPoint & p);
     void SLOTmpActionFileExit();
     void SLOTmpActionFileOpenProject();
-    void SLOTsetRenderer();
     void SLOTmpActionAddVectorLayer();
     void SLOTmpActionAddRasterLayer();
     void SLOTmpActionVectorize();
-    void SLOTazShowContextMenuForLegend(const QPoint & pos);
+    void SLOTsetRenderer();
+    void SLOTtempUse();
+
 
 private:
-    bool needPaint;
+    // Setup's for statusBar
+    QLabel * mpCoordsLabel;
+    QLineEdit * mpCoordsEdit;
+    QValidator * mpCoordsEditValidator;
+    QgsPoint mpLastMapPosition;
+
+
     QgsRasterLayer *testLayer;
     QgsMapCanvas * mpMapCanvas;
 //    QVBoxLayout  * mpLayout;
@@ -111,7 +134,10 @@ private:
     QgsMapTool * mpPanTool;
     QgsMapTool * mpZoomInTool;
     QgsMapTool * mpZoomOutTool;
+
 //    QgsLegendModel * mpLegendModel;
+//    AzTOC * mpTOC;
+
     QgsLegend * mpMapLegend;
     QgsMapLayerRegistry *mpRegistry;
     QList<QgsMapCanvasLayer> mpLayerSet;
@@ -122,6 +148,14 @@ private:
     QAction *mpActionAddRasterLayer;
     QAction *mpContextShowExtent;
     QAction *mpContextRemoveLayer;
+    QAction *mpActionFileExit;
+    QString mpAppPath;
+
+    // dn's
+    DNSpecBath *dnThemTaskSpecBath;
+
+    // functions
+    long azGetEPSG(const QString rastrPath);
 
 protected:
 //    void paintEvent(QPaintEvent *event);
