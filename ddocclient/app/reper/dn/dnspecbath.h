@@ -9,7 +9,7 @@
 #include <QInputDialog>
 #include <QSettings>
 #include <QTreeWidgetItem>
-#include "c:/OSGeo4W/include/gdal_priv.h"
+#include "gdal_priv.h"
 #include "dn/Added/dnimagelib.h"
 #include "dn/imagearea.h"
 #include "dn/Added/First/structs.h"

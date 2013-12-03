@@ -6,7 +6,8 @@ QT += network core gui xml
 TARGET = reper
 
 DESTDIR = ../../build
-QGISDIR = "C:/Program Files (x86)/Quantum GIS 1.7.0"
+QGISDIR = $$EXTERNAL_PREFIX/QGS17
+OSGEODIR = $$EXTERNAL_PREFIX/OSGEO
 
 DEFINES *= __USE_EXPORTS
 
@@ -32,10 +33,18 @@ INCLUDEPATH *= $${PSQL_HOME}/include
 INCLUDEPATH *= $${PSQL_INCLUDE_DIR}
 
 win32 {
-!win32-g++:LIBS *= libs/libpqdll.lib
+!win32-g++:LIBS *= libpqdll.lib
 win32-g++:LIBS += $${PSQL_HOME}/lib/libpq.dll.a
 }
 unix: LIBS += -lpq
+
+INCLUDEPATH += $$OSGEODIR/include \
+                             $$QGISDIR/include \
+                             dn
+
+
+LIBS += -L$$OSGEODIR/lib  -lproj -lgdal_i
+
 
 include(reper.pri)
 

@@ -19,7 +19,8 @@ int main(int argc, char ** argv)
 
     QgsApplication * app = new QgsApplication(argc, argv, true);
 
-    QString myPluginsDir        = "C:\\Program Files (x86)\\Quantum GIS 1.7.0\\plugins";
+    //QString myPluginsDir        = "C:\\Program Files (x86)\\Quantum GIS 1.7.0\\plugins";
+	QString myPluginsDir        = "D:\\REP_EXT\\QGS17\\plugins";
     app->setPluginPath(myPluginsDir);
     app->initQgis();
 

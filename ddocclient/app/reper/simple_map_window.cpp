@@ -79,7 +79,8 @@ MainWindow::MainWindow(QWidget* parent, Qt::WFlags fl)
 //    this->addDockWidget(Qt::BottomDockWidgetArea, mpBottomDock, Qt::Horizontal);
 //    mpLeftDock->setWidget(mpMapLegend);
     }
-    QString myPluginsDir        = "C:\\Program Files (x86)\\Quantum GIS 1.7.0\\plugins";
+    //QString myPluginsDir        = "C:\\Program Files (x86)\\Quantum GIS 1.7.0\\plugins";
+	QString myPluginsDir        = "D:\\REP_EXT\\QGS17\\plugins";
     QgsProviderRegistry::instance(myPluginsDir);
 
     // Get the registry singleton

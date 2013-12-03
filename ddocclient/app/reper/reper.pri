@@ -34,16 +34,3 @@ FORMS += \
 RESOURCES += \
                 resources.qrc
 
-INCLUDEPATH += C:/OSGeo4W/include \
-               dn/
-
-# c:/OSGeo4W/apps/qgis-dev/include \
-#LIBPATH += c:/OSGeo4W/lib
-
-#LIBS += -Lc:/OSGeo4W/lib/ -lgdal_i
-
-#LIBPATH += C:/OSGeo4W/lib/
-
-#LIBS += -LC:/OSGeo4W/lib/  -lqgis_core -lproj -lqgis_gui -lgdal_i
-LIBS += -LC:/OSGeo4W/lib/  -lproj -lgdal_i
-
