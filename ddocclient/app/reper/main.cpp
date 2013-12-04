@@ -9,6 +9,9 @@
 #include <qgsapplication.h>
 #include <qgsproviderregistry.h>
 
+// Qt Includes
+#include <QTranslator>
+#include <QMessageBox>
 
 int main(int argc, char ** argv) 
 {
@@ -18,6 +21,14 @@ int main(int argc, char ** argv)
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("utf-8"));
 
     QgsApplication * app = new QgsApplication(argc, argv, true);
+
+//    QTranslator translator;
+//    translator.load("reper_ru.qm", ".");
+//    if (translator.isEmpty())
+//    {
+//        QMessageBox::about(0, "empty", "");
+//    }
+//    app->installTranslator(&translator);
 
     //QString myPluginsDir        = "C:\\Program Files (x86)\\Quantum GIS 1.7.0\\plugins";
 	QString myPluginsDir        = "D:\\REP_EXT\\QGS17\\plugins";

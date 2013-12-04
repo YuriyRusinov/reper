@@ -46,8 +46,8 @@ MainWindow::MainWindow(QWidget* parent, Qt::WFlags fl)
     mpCoordsLabel->setMaximumHeight(20);
     mpCoordsLabel->setFrameStyle(QFrame::NoFrame);
     mpCoordsLabel->setAlignment(Qt::AlignCenter);
-    mpCoordsLabel->setText(tr("Coordinate:"));
-    mpCoordsLabel->setToolTip(tr("Current map coordinate") );
+    mpCoordsLabel->setText(tr("Координаты:"));
+    mpCoordsLabel->setToolTip(tr("Текущие координаты карты") );
     statusBar()->addPermanentWidget(mpCoordsLabel, 0);
 
     mpCoordsEdit = new QLineEdit( QString(), statusBar() );
@@ -60,11 +60,9 @@ MainWindow::MainWindow(QWidget* parent, Qt::WFlags fl)
     mpCoordsEdit->setAlignment( Qt::AlignCenter );
     QRegExp coordValidator( "[+-]?\\d+\\.?\\d*\\s*,\\s*[+-]?\\d+\\.?\\d*" );
     mpCoordsEditValidator = new QRegExpValidator( coordValidator, mpCoordsEdit );
-    mpCoordsEdit->setWhatsThis( tr( "Shows the map coordinates at the "
-                                   "current cursor position. The display is continuously updated "
-                                   "as the mouse is moved. It also allows editing to set the canvas "
-                                   "center to a given position." ) );
-    mpCoordsEdit->setToolTip( tr( "Current map coordinate (formatted as x,y)" ) );
+    mpCoordsEdit->setWhatsThis( tr( "Показывает координаты карты "
+                                   "в позиции курсора." ) );
+    mpCoordsEdit->setToolTip( tr( "Текущие координаты карты (в формате x, y)" ) );
     statusBar()->addPermanentWidget( mpCoordsEdit, 0 );
 
 
@@ -116,19 +114,19 @@ MainWindow::MainWindow(QWidget* parent, Qt::WFlags fl)
 
     //create actions
     mpVectorize = new QAction(QIcon(":/ico/vectorize.png"), tr("Vectorize"), this);
-    mpActionAddVectorLayer = new QAction(QIcon(":/ico/add_vector.png"), tr("Add &Vector Layer"), this);
-    mpActionAddRasterLayer = new QAction(QIcon(":/ico/add_raster.png"), tr("Add &Raster Layer"), this);
-    mpActionAddVectorLayer->setStatusTip(tr("Add a vector layer to the map window"));
-    mpActionAddRasterLayer->setStatusTip(tr("Add a raster layer to the map window"));
-    mpContextShowExtent = new QAction("Show extent", tableLegend);
-    mpContextRemoveLayer = new QAction("Remove", tableLegend);
-    mpActionFileExit = new QAction(QIcon(":/ico/mActionFileExit.png"), tr("Exit"), this);
+    mpActionAddVectorLayer = new QAction(QIcon(":/ico/add_vector.png"), tr("Добавить &векторный слой"), this);
+    mpActionAddRasterLayer = new QAction(QIcon(":/ico/add_raster.png"), tr("Добавить &растровый слой"), this);
+    mpActionAddVectorLayer->setStatusTip(tr("Добавить векторный слой в окно карты"));
+    mpActionAddRasterLayer->setStatusTip(tr("Добавить растровый слой в окно карты"));
+    mpContextShowExtent = new QAction("Показать экстент", tableLegend);
+    mpContextRemoveLayer = new QAction("Удалить", tableLegend);
+    mpActionFileExit = new QAction(QIcon(":/ico/mActionFileExit.png"), tr("Выход"), this);
     mpActionFileExit->setStatusTip(tr("Close Application"));
     mpActionFileExit->setShortcuts(QKeySequence::Close);
 
     //settings of TOC-tableWiget
     {
-    tableLegend->setHorizontalHeaderLabels(QStringList() << tr("") << tr("Layer's name") << tr("Style") << ("Path"));
+    tableLegend->setHorizontalHeaderLabels(QStringList() << tr("") << tr("Имя слоя") << tr("Стиль") << ("Путь"));
     tableLegend->setColumnCount(tableLegend->horizontalHeader()->count());
     tableLegend->setColumnWidth(0, 25);
     tableLegend->setColumnWidth(1, 185);
@@ -192,7 +190,7 @@ MainWindow::MainWindow(QWidget* parent, Qt::WFlags fl)
     mpZoomOutTool = new QgsMapToolZoom(mpMapCanvas, TRUE ); //true = out
     mpZoomOutTool->setAction(mpActionZoomOut);
 
-    statusBar()->showMessage("Reper is ready.");
+    statusBar()->showMessage("Репер готов к работе.");
 }
 
 MainWindow::~MainWindow()
@@ -286,7 +284,7 @@ bool MainWindow::azSelectLayer(const QString layerName)
         {
             mpSelectedLayer = i.value();
             bComplete = true;
-            this->statusBar()->showMessage("Selected layer: '" + mpSelectedLayer->name() + "'.");
+            this->statusBar()->showMessage("Выбранный слой: '" + mpSelectedLayer->name() + "'.");
             break;
         }
 
@@ -297,7 +295,7 @@ bool MainWindow::azSelectLayer(const QString layerName)
         {
             mpSelectedLayer = pRezLayer; // возвращаем значение слоя, который был
             bComplete = false; // сообщаем, что выбор слоя неудачен
-            this->statusBar()->showMessage("Layer: '" + mpSelectedLayer->name() + "' can't be select.");
+            this->statusBar()->showMessage("Слой: '" + mpSelectedLayer->name() + "' не может быть выбран.");
         }
     }
     return bComplete;
@@ -330,7 +328,7 @@ bool MainWindow::azSelectLayer(const int layerNumber)
         {
             mpSelectedLayer = i.value();
             bComplete = true;
-            this->statusBar()->showMessage("Selected layer: '" + mpSelectedLayer->name() + "'.");
+            this->statusBar()->showMessage("Выбранный слой: '" + mpSelectedLayer->name() + "'.");
             break;
         }
 
@@ -341,7 +339,7 @@ bool MainWindow::azSelectLayer(const int layerNumber)
         {
             mpSelectedLayer = pRezLayer; // возвращаем значение слоя, который был
             bComplete = false; // сообщаем, что выбор слоя неудачен
-            this->statusBar()->showMessage("Layer: '" + mpSelectedLayer->name() + "' can't be select.");
+            this->statusBar()->showMessage("Слой: '" + mpSelectedLayer->name() + "' не может быть выбран.");
         }
     }
     return bComplete;
@@ -349,7 +347,7 @@ bool MainWindow::azSelectLayer(const int layerNumber)
 
 void MainWindow::azSetTitleWindow(QWidget &azApp)
 {
-      QString caption = "Reper";
+      QString caption = "Репер";
 
       if ( QgsProject::instance()->title().isEmpty() )
       {
@@ -502,8 +500,8 @@ bool MainWindow::azMakeLayer(QGis::WkbType azType, QString pDestDir, QString pNa
     {
         if (!azCopyFiles(mpAppPath + pAddName + pExp, pDestDir + pName + pExp))
         {
-            QMessageBox::about(this, "Not copied", "from" + mpAppPath + pAddName + pExp +
-                               "\n to" + pDestDir + pName + pExp);
+            QMessageBox::about(this, "Не скопирован", "из" + mpAppPath + pAddName + pExp +
+                               "\n в" + pDestDir + pName + pExp);
             bComplete = false;
         }
     }
@@ -520,8 +518,8 @@ bool MainWindow::azAddLayerVector(QFileInfo pFile)
     mypLayer->setRendererV2(mypRenderer);
     if (!mypLayer->isValid())
     {
-        qDebug("Shp layer is not valid. Layer was not added to map." + pFile.filePath().toAscii());
-        this->statusBar()->showMessage("Layer is not valid. Layer was not added to map."
+        qDebug("Shp слой некорректный. Слой не добавлен на карту." + pFile.filePath().toAscii());
+        this->statusBar()->showMessage("Shp слой некорректный. Слой не добавлен на карту."
                                        "\n " + pFile.filePath() + "'");
         return false;
     }
@@ -585,21 +583,21 @@ void MainWindow::SLOTmpActionFileExit() // Exit from Application
     QString pMessageText("");
     uint pButtonsPack(0);
     int pButton(0);
-    ProjectChange = true;
+    ProjectChange = false;
     if (ProjectChange)
     {
         pButtonsPack = 0x00410800;
-        pMessageText = "The Document has changed,"
-                "\n Do you want to save changes before close application?";
+        pMessageText = "Проект был изменен,"
+                "\n вы хотите сохранить изменения перед выходом из приложения?";
     }
     else
     {
         pButtonsPack = 0x00404000;
-        pMessageText = "Do you want to close application?";
+        pMessageText = "Вы уверены, что хотите закрыть приложение?";
     }
 
     QMessageBox * pExitApp = new QMessageBox (QMessageBox::Question,
-                                              "Exit from Application",
+                                              "Выход из приложения",
                                         pMessageText,
                            (QMessageBox::StandardButton)pButtonsPack);
     pButton = pExitApp->exec();
@@ -777,6 +775,7 @@ void MainWindow::SLOTmpActionVectorize()
     if (this->dnThemTaskSpecBath->Polygons.count() < 1)
     {
         pMessage = tr("Selected objects haven't information for vectoring.");
+        this->statusBar()->showMessage(pMessage);
         return;
     }
 
@@ -827,48 +826,12 @@ void MainWindow::SLOTmpActionVectorize()
         QgsVectorFileWriter::WriterError mError;
         myWriter.addFeature( pFeature );
         mError = myWriter.hasError();
-		//QMessageBox::about(0, "", );
-		qWarning() << myWriter.errorMessage();
+        if (mError != 0)
+        {
+            qWarning() << myWriter.errorMessage();
+        }
     }
-
-
-//    QgsPoint mPoint1;
-//    QgsPoint mPoint2;
-//    QgsPoint mPoint3;
-
-
-//    mPoint1 = QgsPoint( 10.0, 10.0 );
-//    mPoint2 = QgsPoint( 15.0, 10.0 );
-//    mPoint3 = QgsPoint( 15.0, 12.0 );
-
-
-//    QString myFileName ("/testply.shp");
-//    myFileName = "D:/!Share/src/reper/ddocclient/build/layers" + myFileName;
-//    QgsVectorFileWriter myWriter( myFileName, mEncoding, mFields, QGis::WKBPolygon, &pSRS);
-
-//    QgsPolyline myPolyline;
-//    myPolyline << mPoint1 << mPoint2 << mPoint3 << mPoint1;
-//    QgsPolygon myPolygon;
-//    myPolygon << myPolyline;
-//    //polygon: first item of the list is outer ring,
-//    // inner rings (if any) start from second item
-//    //
-//    // NOTE: don't delete this pointer again -
-//    // ownership is passed to the feature which will
-//    // delete it in its dtor!
-//    QgsGeometry * mypPolygonGeometry = QgsGeometry::fromPolygon( myPolygon );
-//    QgsFeature myFeature;
-//    myFeature.setTypeName( "WKBPolygon" );
-//    myFeature.setGeometry( mypPolygonGeometry );
-//    myFeature.addAttribute( 0, "HelloWorld" );
-//    myFeature.addAttribute(1, 334);
-
-//    QgsVectorFileWriter::WriterError mError;
-//    myWriter.addFeature( myFeature );
-//    mError = myWriter.hasError();
-
     return;
-
 }
 
 void MainWindow::SLOTazShowMouseCoordinate(const QgsPoint & p )
@@ -940,7 +903,7 @@ void MainWindow::SLOTazThemTaskSpectralBathynometry()
         connect(this->dnThemTaskSpecBath, SIGNAL(SIGNALcreateVector()), this, SLOT(SLOTmpActionVectorize()));
     }
 
-    dnThemTaskSpecBath->setWindowTitle(tr("Спектральная Батинометрия"));
+    dnThemTaskSpecBath->setWindowTitle(tr("Оценка глубин прибрежных территорий"));
     dnThemTaskSpecBath->setWindowModality(Qt::WindowModal);
     dnThemTaskSpecBath->show();
 }

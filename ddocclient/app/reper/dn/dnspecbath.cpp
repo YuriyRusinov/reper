@@ -249,9 +249,11 @@ void DNSpecBath::on_Batinometriy_triggered()
  if(this->SerPoly!=NULL)
  {
   if(this->GdalImage->Ch==8)
-   this->SerPoly->Batinometr();
+      QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+      this->SerPoly->Batinometr();
   if(this->GdalImage->Ch>8)
   {
+   QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
    QList <int> nCh;
    nCh<<GdalImage->DetermNCh(590)<<GdalImage->DetermNCh(830)<<GdalImage->DetermNCh(900)<<GdalImage->DetermNCh(580)<<
         GdalImage->DetermNCh(620)<<GdalImage->DetermNCh(485)<<GdalImage->DetermNCh(560)<<GdalImage->DetermNCh(660)<<
@@ -260,21 +262,18 @@ void DNSpecBath::on_Batinometriy_triggered()
   }
   GeoDataStruct GDSt;
   GdalImage->GetGeoData(&GDSt);
-  QMessageBox::about(0, "Test", "Этап 1"); // -azzz
   Polygons=this->SerPoly->RastrToVector(GDSt.XTopLeftPix,GDSt.XD,GDSt.XAngle,GDSt.YTopLeftPix,GDSt.YD,GDSt.YAngle,SerPoly->KofV,SerPoly->MinV, this->FileNameOpen);
-  QMessageBox::about(0, "Test", "Этап 2"); // -azzz
   QDir Dir;
 
   if(!Dir.exists(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly))
    Dir.mkdir(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly);
-  QMessageBox::about(0, "Test", "Этап 3"); // -azzz
   QFile FileClassMass(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly+'/'+"Batimetr"+".kls");
   FileClassMass.open(QIODevice::Truncate|QIODevice::WriteOnly);
-       QMessageBox::about(0, "Test", "Этап 4"); // -azzz
   FileClassMass.write((char*)this->SerPoly->ClassifMass,sizeof(int)*this->SerPoly->W*this->SerPoly->H);
-       QMessageBox::about(0, "Test", "Этап 5"); // -azzz
   FileClassMass.close();
-
+  ui->pbVectorize->setEnabled(true);
+  ui->statusBar->showMessage(tr("Расчет спектральной батинометрии завершен"));
+  QApplication::restoreOverrideCursor();
  }//if(this->SerPoly!=NULL)
 }
 

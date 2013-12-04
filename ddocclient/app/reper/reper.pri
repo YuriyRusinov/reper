@@ -15,10 +15,10 @@ HEADERS += \
     dn/Added/First/dncalcstring.h \
     dn/dnwidgetimage.h
 SOURCES += \
-		simple_map_window.cpp \
-		junk.cpp \
-		dn/imagearea.cpp \
-		dn/dnspecbath.cpp \
+    simple_map_window.cpp \
+    junk.cpp \
+    dn/imagearea.cpp \
+    dn/dnspecbath.cpp \
     main.cpp \
     dn/Added/dnvector.cpp \
     dn/Added/dnpoly.cpp \
@@ -28,7 +28,7 @@ SOURCES += \
     dn/Added/First/dncalcstring.cpp \
     dn/dnwidgetimage.cpp
 FORMS += \
-                simple_map_window_base.ui \
+    simple_map_window_base.ui \
     dn/dnspecbath.ui
 
 RESOURCES += \

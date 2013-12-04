@@ -49,7 +49,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Legend:</string>
+           <string>Легенда:</string>
           </property>
          </widget>
         </item>
@@ -161,7 +161,7 @@
    </property>
    <widget class="QMenu" name="menuMap">
     <property name="title">
-     <string>Map</string>
+     <string>Карта</string>
     </property>
     <addaction name="mpActionZoomIn"/>
     <addaction name="mpActionZoomOut"/>
@@ -169,7 +169,7 @@
    </widget>
    <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>File</string>
+     <string>Файл</string>
     </property>
     <addaction name="mpActionFileOpenProject"/>
     <addaction name="mpActionFileSaveProject"/>
@@ -177,7 +177,7 @@
    </widget>
    <widget class="QMenu" name="menuThematic_Analysis">
     <property name="title">
-     <string>Thematic Analysis</string>
+     <string>Тематический анализ</string>
     </property>
     <addaction name="mpActionBathymetry"/>
    </widget>
@@ -192,7 +192,7 @@
      <normaloff>:/ico/mActionZoomIn.png</normaloff>:/ico/mActionZoomIn.png</iconset>
    </property>
    <property name="text">
-    <string>Zoom In</string>
+    <string>Приблизить</string>
    </property>
   </action>
   <action name="mpActionZoomOut">
@@ -201,7 +201,7 @@
      <normaloff>:/ico/mActionZoomOut.png</normaloff>:/ico/mActionZoomOut.png</iconset>
    </property>
    <property name="text">
-    <string>Zoom Out</string>
+    <string>Отдалить</string>
    </property>
   </action>
   <action name="mpActionPan">
@@ -210,7 +210,7 @@
      <normaloff>:/ico/mActionPan.png</normaloff>:/ico/mActionPan.png</iconset>
    </property>
    <property name="text">
-    <string>Pan</string>
+    <string>Перемещение</string>
    </property>
    <property name="shortcut">
     <string>H</string>
@@ -223,10 +223,10 @@
     </iconset>
    </property>
    <property name="text">
-    <string>Exit</string>
+    <string>Выход</string>
    </property>
    <property name="toolTip">
-    <string>Close Application</string>
+    <string>Закрыть приложение</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+W</string>
@@ -239,17 +239,17 @@
     </iconset>
    </property>
    <property name="text">
-    <string>Open Project</string>
+    <string>Открыть проект</string>
    </property>
   </action>
   <action name="mpActionFileSaveProject">
    <property name="text">
-    <string>Save Project</string>
+    <string>Сохранить проект</string>
    </property>
   </action>
   <action name="mpActionBathymetry">
    <property name="text">
-    <string>Spectral bathymetry</string>
+    <string>Оценка глубин прибрежных территорий</string>
    </property>
   </action>
   <action name="mpActionAddRasterLayer">
@@ -258,7 +258,7 @@
      <normaloff>:/ico/add_raster.png</normaloff>:/ico/add_raster.png</iconset>
    </property>
    <property name="text">
-    <string>Add Raster Layer</string>
+    <string>Добавить растровый слой</string>
    </property>
   </action>
   <action name="mpActionAddVectorLayer">
@@ -267,7 +267,7 @@
      <normaloff>:/ico/add_vector.png</normaloff>:/ico/add_vector.png</iconset>
    </property>
    <property name="text">
-    <string>Add Vector Layer</string>
+    <string>Добавить векторный слой</string>
    </property>
   </action>
  </widget>

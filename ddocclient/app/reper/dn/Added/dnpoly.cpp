@@ -2272,12 +2272,10 @@ void DNPoly::Batinometr()
  if(this->Ch==this->IshCh)
  {
   this->AddChanal("sqrt([6]*[6]+[7]*[7]+[8]*[8])");
-
  }//if(this->Ch==this->IshCh)
  if(this->Ch-this->IshCh==1)
  {
   this->AddSKOChanal(10,this->Ch-1);
-
  }//if(this->Ch-this->IshCh==1)
  bool *MaskCh;
  QList <int> nCh;
@@ -2296,7 +2294,7 @@ void DNPoly::Batinometr()
    {
     this->ClassifMass[x+y*this->W]=1; //Всё остальное
     if(Brigth[1+x*nCh.size()]>0.01)
-     this->ClassifMass[x+y*this->W]=0; //Макрофиты
+     this->ClassifMass[x+y*this->W]=0; //Мокрофиты
     if(Brigth[x*nCh.size()]>0.03)
      this->ClassifMass[x+y*this->W]=1; //Песок
    }//if(this->MassPoly>=0)
@@ -2333,7 +2331,6 @@ void DNPoly::Batinometr()
  }//for(int y=0;y<this->H;y++)
 
  this->AddChanal(NewCh);
-
  delete[] NewCh;
  float *Apert,*NewCh2;
  int n=7;
@@ -2364,6 +2361,8 @@ void DNPoly::Batinometr()
  if(HMax!=HMin)
   Kof=(HMax-HMin)/10;
 
+ this->KofV=Kof;
+ this->MinV=HMin;
  for(int y=0;y<this->H;y++)
  {
   for(int x=0;x<this->W;x++)
@@ -2379,7 +2378,6 @@ void DNPoly::Batinometr()
  delete[] NewCh2;
 // this->CreateIndexImg("proba_1.bmp",7);
  this->CreateIndexImg("Batinometr.bmp",this->Ch-1);
-
 }
 void DNPoly::Batinometr(int N590,int N830,int N900,
                         int N580,int N620,
@@ -2489,6 +2487,9 @@ void DNPoly::Batinometr(int N590,int N830,int N900,
 
  if(HMax!=HMin)
   Kof=(HMax-HMin)/10;
+
+ this->KofV=Kof;
+ this->MinV=HMin;
 
  for(int y=0;y<this->H;y++)
  {

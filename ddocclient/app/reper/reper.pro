@@ -1,4 +1,6 @@
-TEMPLATE = app
+#TEMPLATE = app
+
+TRANSLATIONS +=reper_ru.ts
 
 include(../../ddocclient.conf)
 QT += network core gui xml
