@@ -15,7 +15,7 @@ OBJ     = $(tmp_dir)/testargs.o $(tmp_dir)/exec_spi.o $(tmp_dir)/text_to_cstring
 	  $(tmp_dir)/rgetfile.o $(tmp_dir)/rgetfilebyurl.o $(tmp_dir)/rgetfilesizebyurl.o $(tmp_dir)/rwritefile.o \
 	  $(tmp_dir)/rdeletefile.o $(tmp_dir)/rgetabsurl.o $(tmp_dir)/openfile.o \
 	  $(tmp_dir)/xpm2jpeg.o $(tmp_dir)/rxpm2jpeg.o $(tmp_dir)/rand.o \
-          $(tmp_dir)/hashfile.o $(tmp_dir)/rgethashfile.o
+          $(tmp_dir)/hashfile.o $(tmp_dir)/rgethashfile.o $(tmp_dir)/hist.o
 
 TARGET  = libfloader.so
 
