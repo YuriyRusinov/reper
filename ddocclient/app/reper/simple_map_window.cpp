@@ -407,7 +407,7 @@ UserDefinedShader
 ----------------------
     */
 
-    azRasterLayer.setDrawingStyle( QgsRasterLayer::MultiBandColor); // устанавливаем "3-х цветное изображение"
+
     // пока делаю так: 3-х цветное изображение и каналы:
     // 4 - красный; 3 - зеленый; 2 - синий.
     if (azRasterLayer.bandCount() < 3)
@@ -416,6 +416,7 @@ UserDefinedShader
     }
     else if (azRasterLayer.bandCount() == 3)
     {
+        azRasterLayer.setDrawingStyle( QgsRasterLayer::MultiBandColor); // устанавливаем "3-х цветное изображение"
         // по умолчанию если три то пусть идут в обратном
         azRasterLayer.setRedBandName(azRasterLayer.bandName(3));
         azRasterLayer.setGreenBandName(azRasterLayer.bandName(2));
@@ -424,6 +425,7 @@ UserDefinedShader
     }
     else
     {
+        azRasterLayer.setDrawingStyle( QgsRasterLayer::MultiBandColor); // устанавливаем "3-х цветное изображение"
             // проверяем название каждого канала
         if (azRasterCheckBandName(azRasterLayer, "Band 4"))
         {
@@ -431,13 +433,12 @@ UserDefinedShader
         }
         if (azRasterCheckBandName(azRasterLayer, "Band 3"))
         {
-            azRasterLayer.setRedBandName("Band 3");
+            azRasterLayer.setGreenBandName("Band 3");
         }
         if (azRasterCheckBandName(azRasterLayer, "Band 2"))
         {
-            azRasterLayer.setRedBandName("Band 2");
+            azRasterLayer.setBlueBandName("Band 2");
         }
-        azRasterLayer.setBlueBandName("Band 2");
         bComplete = true;
     }
 
@@ -615,7 +616,7 @@ void MainWindow::SLOTmpActionFileExit() // Exit from Application
 
 void MainWindow::SLOTmpActionFileOpenProject() // Open QGIS Project in MapDock
 {
-    QString projectFileName = QFileDialog::getOpenFileName(this, "Open map project *.qgs", "", "*.qgs");
+    QString projectFileName = QFileDialog::getOpenFileName(this, "Открыть файл проекта карты *.qgs", "", "*.qgs");
     if (projectFileName.isNull())
     {
         return;
@@ -629,9 +630,9 @@ void MainWindow::SLOTmpActionFileOpenProject() // Open QGIS Project in MapDock
     if ( !QgsProject::instance()->read() )
     {
         QApplication::restoreOverrideCursor();
-        this->statusBar()->showMessage("Failed to open project!"
+        this->statusBar()->showMessage("Ошибка открытия файла проекта!"
                                        "\n " + projectFileName + "'");
-        qDebug("Failed to open project!" + projectFileName.toAscii());
+        qDebug("Ошибка открытия файла проекта!" + projectFileName.toAscii());
         mpMapCanvas->freeze(false);
         mpMapCanvas->refresh();
         return;
@@ -681,8 +682,8 @@ void MainWindow::SLOTsetRenderer()
 
 void MainWindow::SLOTtempUse()
 {
-    QString pFilePath("D:/!Share/rastrs/union_den.tif");
-    QMessageBox::about(this, "hello world!", QString::number(azGetEPSG(pFilePath)));
+    QFileInfo pFile("D:/!Share/layers/baba.shp");
+    this->azAddLayerVector(pFile);
 }
 
 long MainWindow::azGetEPSG(const QString rastrPath)
@@ -699,7 +700,7 @@ long MainWindow::azGetEPSG(const QString rastrPath)
 
 void MainWindow::SLOTmpActionAddVectorLayer()
 {
-    QString fullLayerName = QFileDialog::getOpenFileName(this, "Add layer", "", "All supported (*.shp *.tif *tiff);;Shapefiles (*.shp);;Geotiff (*.tif *.tiff)");
+    QString fullLayerName = QFileDialog::getOpenFileName(this, "Добавить векторный слой", "", "Все поддерживаемые форматы(*.shp);;Shapefiles (*.shp)");
     QFileInfo azFileInfo(fullLayerName);
     if (!azFileInfo.isFile())
     {
@@ -727,8 +728,8 @@ void MainWindow::SLOTmpActionAddRasterLayer()
 {
     // СЛОТ: добавление растра в окно карты
     // сначала вызываем диалог, получаем путь к файлу
-    QString fullLayerName = QFileDialog::getOpenFileName(this, "Add raster layer", "",
-                         "Raster files (*.img *.asc *.tif *tiff *.bmp *.jpg *.jpeg);;Geotiff (*.tif *.tiff)");
+    QString fullLayerName = QFileDialog::getOpenFileName(this, "Добавить растровый слой", "",
+                         "Все поддерживаемые растровые форматы (*.img *.asc *.tif *tiff *.bmp *.jpg *.jpeg);;Geotiff (*.tif *.tiff)");
     QFileInfo azFileInfo(fullLayerName);
     if (!azFileInfo.isFile()) // проверка существования файла
     {
@@ -742,13 +743,13 @@ void MainWindow::SLOTmpActionAddRasterLayer()
     if (!mypLayer->isValid()) // проверяем его корректность
     {
         qDebug("Raster layer is not valid or not supported by GDAL. Layer was not added to map." + fullLayerName.toAscii());
-        this->statusBar()->showMessage("Raster layer is not valid or not supported by GDAL. Layer was not added to map."
+        this->statusBar()->showMessage("Файл растра не явялется корректным или не поддерживается библиотекой GDAL. Слой не был добавлен на карту."
                                        "\n " + fullLayerName + "'");
         return;
     }
     if (!this->azRasterEnhancement(*mypLayer)) // применяем улучшение снимка
     {
-        qDebug("Enhancement wasn't used. Unrecognize type of image" + fullLayerName.toAscii());
+        qDebug("Улучшение растра не использовано. Нераспознаный формат растра." + fullLayerName.toAscii());
     }
     // применяем улучшение контраста (т.е. цвета отображаются от минимума до максимума)
     mypLayer->setContrastEnhancementAlgorithm(QgsContrastEnhancement::StretchToMinimumMaximum, false );
@@ -771,10 +772,11 @@ void MainWindow::SLOTmpActionAddRasterLayer()
 
 void MainWindow::SLOTmpActionVectorize()
 {
+    dnThemTaskSpecBath->close();
     QString pMessage(""); // сообщение в статус баре о результате векторизации
     if (this->dnThemTaskSpecBath->Polygons.count() < 1)
     {
-        pMessage = tr("Selected objects haven't information for vectoring.");
+        pMessage = tr("Выбранные объекты не содержат информации для векторизации");
         this->statusBar()->showMessage(pMessage);
         return;
     }
@@ -793,15 +795,16 @@ void MainWindow::SLOTmpActionVectorize()
     pSRS.createFromOgcWmsCrs("EPSG:" +
                              QString::number(azGetEPSG(dnThemTaskSpecBath->Polygons.at(0).EPSG)));
     pSRS.validate();
-    QString myFileName ("/" + dnThemTaskSpecBath->Polygons.at(0).NameLayer +
-                        QString::number(QTime::currentTime().hour())  + "-" +
-                        QString::number(QTime::currentTime().minute())  + "-" +
-                        QString::number(QTime::currentTime().second()) + "-" +
-                        QString::number(QTime::currentTime().msec()) + ".shp");
+    //QString myFileName (dnThemTaskSpecBath->Polygons.at(0).NameLayer +
+    //                    QString::number(QTime::currentTime().hour())  + "-" +
+    //                    QString::number(QTime::currentTime().minute())  + "-" +
+    //                    QString::number(QTime::currentTime().second()) + "-" +
+    //                    QString::number(QTime::currentTime().msec()) + ".shp");
+    QString myFileName ("baba.shp");
     myFileName = "D:/!Share/layers/" + myFileName;
     QgsVectorFileWriter myWriter( myFileName, mEncoding, mFields, QGis::WKBPolygon, &pSRS);
 
-    QMessageBox::about(this->dnThemTaskSpecBath, "test", "Hello!");
+//    QMessageBox::about(this->dnThemTaskSpecBath, "test", "Hello!");
     for (int i = 0; i < dnThemTaskSpecBath->Polygons.size(); i++)
     {
         DNVector dnVec;
@@ -831,7 +834,21 @@ void MainWindow::SLOTmpActionVectorize()
             qWarning() << myWriter.errorMessage();
         }
     }
-    return;
+	QFileInfo pFile("D:/!Share/layers/baba.shp");
+	this->azAddLayerVector(pFile);
+	return;
+    
+
+    /*QFileInfo pFile(myFileName);
+    if (pFile.isFile())
+    {
+	    if (azAddLayerVector(pFile))
+		{
+			pMessage = "Добавлен слой '" + myFileName + "'";
+			this->statusBar()->showMessage(pMessage);
+		}
+    }*/
+
 }
 
 void MainWindow::SLOTazShowMouseCoordinate(const QgsPoint & p )
@@ -904,7 +921,7 @@ void MainWindow::SLOTazThemTaskSpectralBathynometry()
     }
 
     dnThemTaskSpecBath->setWindowTitle(tr("Оценка глубин прибрежных территорий"));
-    dnThemTaskSpecBath->setWindowModality(Qt::WindowModal);
+//    dnThemTaskSpecBath->setWindowModality(Qt::WindowModal);
     dnThemTaskSpecBath->show();
 }
 
