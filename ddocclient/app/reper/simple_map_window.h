@@ -27,6 +27,16 @@
 #include <ogr_api.h>
 #include <gdal_priv.h>
 
+//QT Includes
+#include <QtGui>
+#include <QMessageBox>
+#include <QFile>
+#include <QPainter>
+#include <QApplication>
+
+#undef min(a,b)
+#undef max(a,b)
+
 //QGis includes
 #include <qgsapplication.h>
 #include <qgsfield.h>
@@ -55,12 +65,7 @@
 //#include "aztoc.h"
 
 
-//QT Includes
-#include <QtGui>
-#include <QMessageBox>
-#include <QFile>
-#include <QPainter>
-#include <QApplication>
+
 
 //Local Includes
 #include <ui_simple_map_window_base.h>
@@ -68,6 +73,8 @@
 //Denis Includes (dn)
 #include "dn/dnspecbath.h"
 #include "dn/Added/dnvector.h"
+
+class KKSBadLayerHandler;
 
 class MainWindow : public QMainWindow, private Ui::SimpleMapWindowBase
 {
@@ -106,10 +113,18 @@ private slots:
     void SLOTazThemTaskSpectralBathynometry();
     void SLOTazShowContextMenuForLegend(const QPoint & pos);
     void SLOTazShowMouseCoordinate(const QgsPoint & p);
+    
     void SLOTmpActionFileExit();
     void SLOTmpActionFileOpenProject();
+    void SLOTmpActionFileSaveProjectAs();
+    void SLOTmpActionFileSaveProject();
+    void SLOTmpCloseProject();
+
     void SLOTmpActionAddVectorLayer();
     void SLOTmpActionAddRasterLayer();
+    void SLOTmpActionAddPostGISLayer();
+
+
     void SLOTmpActionVectorize();
     void SLOTsetRenderer();
     void SLOTtempUse();
@@ -121,6 +136,8 @@ private:
     QLineEdit * mpCoordsEdit;
     QValidator * mpCoordsEditValidator;
     QgsPoint mpLastMapPosition;
+
+    KKSBadLayerHandler * m_badLayerHandler; //обработчик слоев, которые по тем или иным причинам не загрузились из файла проекта
 
 
     QgsRasterLayer *testLayer;
@@ -144,8 +161,11 @@ private:
     QMenu *mpContextLegendMenu;
     // Actions
     QAction *mpVectorize;
+    
     QAction *mpActionAddVectorLayer;
     QAction *mpActionAddRasterLayer;
+    QAction *mpActionAddPostGISLayer;
+    
     QAction *mpContextShowExtent;
     QAction *mpContextRemoveLayer;
     QAction *mpActionFileExit;
@@ -161,5 +181,8 @@ protected:
 //    void paintEvent(QPaintEvent *event);
 
 };
+
+
+
 
 #endif

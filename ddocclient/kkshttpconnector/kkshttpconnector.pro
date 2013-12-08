@@ -10,7 +10,7 @@ CONFIG += qt
 CONFIG += warn_on dll
 QT += network
 
-DEFINES += __USE_DLL_KKSHTTPCONNECTOR
+DEFINES *= __USE_DLL_KKSHTTPCONNECTOR
 
 INCLUDEPATH += 	. \
 		../dataaccess \

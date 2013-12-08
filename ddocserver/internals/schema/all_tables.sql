@@ -1,28 +1,7 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     21.10.2013 9:50:13                           */
+/* Created on:     22.11.2013 13:10:05                          */
 /*==============================================================*/
-
-
-/*==============================================================*/
-/* Table: root_table                                            */
-/*==============================================================*/
-create table root_table (
-   unique_id            VARCHAR              not null,
-   last_update          TIMESTAMP            not null default CURRENT_TIMESTAMP
-);
-
-comment on column root_table.last_update is
-'Дата и время последней модификации (создания) записи';
-
-select setMacToNULL('root_table');
-
-/*==============================================================*/
-/* Index: Index_1                                               */
-/*==============================================================*/
-create unique index Index_1 on root_table using BTREE (
-unique_id
-);
 
 
 /*==============================================================*/
@@ -1152,6 +1131,7 @@ comment on column criteria.is_not is
 'Данный флаг задает, применяется ли унарная операция отрицания к данному критерию';
 
 select setMacToNULL('criteria');
+select createTriggerUID('criteria');
 
 /*==============================================================*/
 /* Table: criteria_types                                        */
@@ -3022,7 +3002,7 @@ select createTriggerUID('persons');
 /* Table: "position"                                            */
 /*==============================================================*/
 create table "position" (
---   id                   INT4                 not null,
+   id                   INT4                 not null,
    id_unit              INT4                 not null,
    id_maclabel          INT4                 not null default 1,
    id_user_vrio         INT4                 null,
@@ -3111,6 +3091,7 @@ create table q_base_table (
    id                   BIGSERIAL            not null,
    id_io_state          INT4                 not null default 1,
    uuid_t               UUID                 not null,
+   name                 VARCHAR              not null,
    r_icon               VARCHAR              null,
    record_fill_color    INT8                 null,
    record_text_color    INT8                 null,
@@ -3141,10 +3122,18 @@ comment on table queue_results is
 'таблица с кватанциями о результатах обработки синхронизации';
 
 comment on column queue_results.id_external_queue is
-'идентификатор в справочнике исходящей очереди на объекте-отправителе';
+'идентификатор в справочнике исходящей очереди на объекте-отправителе
+Если результат обработки является ответом на пинг (atPingResponse), 
+то в этом поле содержится  (помноженный на -1) идентификатор организации-получателя пинга в БД отправителя пинга
+
+Если в качестве значения содержится 0 - это означает, что происходит процедура первоначальной синхронизации.
+Строка представляет собой ответ на пинг, но в БД-отправителе пинга еще нет данных о взаимодействующих организациях (они еще не пришли). В этом случае отправитель пинга в качестве идентификуатора idOrgTo поставил 0.
+';
 
 comment on column queue_results.sync_result is
-'результат обработки сообщения (будет возвращаться в квитанции)';
+'результат обработки сообщения (будет возвращаться в квитанции)
+3 - успешно
+4 - с ошибкой';
 
 comment on column queue_results.address is
 'адрес получателя квитанции';
@@ -3444,6 +3433,26 @@ create table roles_actions (
 );
 
 select setMacToNULL('roles_actions');
+
+/*==============================================================*/
+/* Table: root_table                                            */
+/*==============================================================*/
+create table root_table (
+   unique_id            VARCHAR              not null,
+   last_update          TIMESTAMP            not null default CURRENT_TIMESTAMP
+);
+
+comment on column root_table.last_update is
+'Дата и время последней модификации (создания) записи';
+
+select setMacToNULL('root_table');
+
+/*==============================================================*/
+/* Index: Index_1                                               */
+/*==============================================================*/
+create unique index Index_1 on root_table using BTREE (
+unique_id
+);
 
 /*==============================================================*/
 /* Table: rubric_records                                        */
@@ -3878,7 +3887,7 @@ select createTriggerUID('tso_units');
 /* Table: units                                                 */
 /*==============================================================*/
 create table units (
---   id                   SERIAL not null,
+   id                   SERIAL not null,
    id_organization      INT4                 null,
    id_parent            INT4                 null,
    id_curr_mode         INT4                 not null,
@@ -4131,6 +4140,7 @@ comment on table user_state is
 'Состояние пользователя (отпуск, командировка и т.п.)';
 
 select setMacToNULL('user_state');
+select createTriggerUID('user_state');
 
 /*==============================================================*/
 /* Table: user_templates                                        */
@@ -4161,7 +4171,7 @@ select setMacToNULL('user_templates');
 /* Table: users                                                 */
 /*==============================================================*/
 create table users (
---   id                   SERIAL not null,
+   id                   SERIAL not null,
    id_rank              INT4                 not null,
    id_state             INT4                 not null,
    id_maclabel          INT4                 not null default 1,

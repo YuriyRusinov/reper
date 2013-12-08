@@ -8,7 +8,7 @@ QT += network core gui xml
 TARGET = reper
 
 DESTDIR = ../../build
-QGISDIR = $$EXTERNAL_PREFIX/QGS17
+QGISDIR = $$EXTERNAL_PREFIX/QGS21
 OSGEODIR = $$EXTERNAL_PREFIX/OSGEO
 
 DEFINES *= __USE_EXPORTS
@@ -45,7 +45,7 @@ INCLUDEPATH += $$OSGEODIR/include \
                              dn
 
 
-LIBS += -L$$OSGEODIR/lib  -lproj -lgdal_i
+LIBS += -L$$OSGEODIR/lib  -lproj_i -lgdal_i
 
 
 include(reper.pri)

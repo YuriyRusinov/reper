@@ -18,10 +18,13 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "simple_map_window.h"
+#include "kksbadlayerhandler.h"
 
 //#include <gdal.h>
 //#include <gdal_priv.h>
 
+//#include <qgslegend.h>
+#include <qgsapplication.h>
 
 MainWindow::MainWindow(QWidget* parent, Qt::WFlags fl)
     : QMainWindow(parent,fl)
@@ -46,8 +49,8 @@ MainWindow::MainWindow(QWidget* parent, Qt::WFlags fl)
     mpCoordsLabel->setMaximumHeight(20);
     mpCoordsLabel->setFrameStyle(QFrame::NoFrame);
     mpCoordsLabel->setAlignment(Qt::AlignCenter);
-    mpCoordsLabel->setText(tr("Координаты:"));
-    mpCoordsLabel->setToolTip(tr("Текущие координаты карты") );
+    mpCoordsLabel->setText(tr("Coordinate:"));
+    mpCoordsLabel->setToolTip(tr("Current map coordinate") );
     statusBar()->addPermanentWidget(mpCoordsLabel, 0);
 
     mpCoordsEdit = new QLineEdit( QString(), statusBar() );
@@ -60,9 +63,11 @@ MainWindow::MainWindow(QWidget* parent, Qt::WFlags fl)
     mpCoordsEdit->setAlignment( Qt::AlignCenter );
     QRegExp coordValidator( "[+-]?\\d+\\.?\\d*\\s*,\\s*[+-]?\\d+\\.?\\d*" );
     mpCoordsEditValidator = new QRegExpValidator( coordValidator, mpCoordsEdit );
-    mpCoordsEdit->setWhatsThis( tr( "Показывает координаты карты "
-                                   "в позиции курсора." ) );
-    mpCoordsEdit->setToolTip( tr( "Текущие координаты карты (в формате x, y)" ) );
+    mpCoordsEdit->setWhatsThis( tr( "Shows the map coordinates at the "
+                                   "current cursor position. The display is continuously updated "
+                                   "as the mouse is moved. It also allows editing to set the canvas "
+                                   "center to a given position." ) );
+    mpCoordsEdit->setToolTip( tr( "Current map coordinate (formatted as x,y)" ) );
     statusBar()->addPermanentWidget( mpCoordsEdit, 0 );
 
 
@@ -78,14 +83,15 @@ MainWindow::MainWindow(QWidget* parent, Qt::WFlags fl)
 //    mpLeftDock->setWidget(mpMapLegend);
     }
     //QString myPluginsDir        = "C:\\Program Files (x86)\\Quantum GIS 1.7.0\\plugins";
-	QString myPluginsDir        = "D:\\REP_EXT\\QGS17\\plugins";
+    QString myPluginsDir        = "C:\\Program Files (x86)\\DynamicSoft\\DynamicDocs Client 1.2.3\\QGS21\\plugins";
+	//QString myPluginsDir        = "D:\\REP_EXT\\QGS17\\plugins";
     QgsProviderRegistry::instance(myPluginsDir);
 
     // Get the registry singleton
     mpRegistry = QgsMapLayerRegistry::instance();
 
     // Create the Map Canvas
-    mpMapCanvas= new QgsMapCanvas(0, 0);
+    mpMapCanvas = new QgsMapCanvas(0, 0);
     mpMapCanvas->enableAntiAliasing(true);
     mpMapCanvas->useImageToRender(false);
     mpMapCanvas->setCanvasColor(QColor(255, 255, 255));
@@ -114,19 +120,23 @@ MainWindow::MainWindow(QWidget* parent, Qt::WFlags fl)
 
     //create actions
     mpVectorize = new QAction(QIcon(":/ico/vectorize.png"), tr("Vectorize"), this);
-    mpActionAddVectorLayer = new QAction(QIcon(":/ico/add_vector.png"), tr("Добавить &векторный слой"), this);
-    mpActionAddRasterLayer = new QAction(QIcon(":/ico/add_raster.png"), tr("Добавить &растровый слой"), this);
-    mpActionAddVectorLayer->setStatusTip(tr("Добавить векторный слой в окно карты"));
-    mpActionAddRasterLayer->setStatusTip(tr("Добавить растровый слой в окно карты"));
-    mpContextShowExtent = new QAction("Показать экстент", tableLegend);
-    mpContextRemoveLayer = new QAction("Удалить", tableLegend);
-    mpActionFileExit = new QAction(QIcon(":/ico/mActionFileExit.png"), tr("Выход"), this);
+    
+    mpActionAddVectorLayer = new QAction(QIcon(":/ico/add_vector.png"), tr("Add &Vector Layer"), this);
+    mpActionAddRasterLayer = new QAction(QIcon(":/ico/add_raster.png"), tr("Add &Raster Layer"), this);
+    mpActionAddPostGISLayer = new QAction(QIcon(":/ico/add_postgis.png"), tr("Add &Database Layer"), this);
+    mpActionAddVectorLayer->setStatusTip(tr("Add a vector layer to the map window"));
+    mpActionAddRasterLayer->setStatusTip(tr("Add a raster layer to the map window"));
+    mpActionAddPostGISLayer->setStatusTip(tr("Add database layer to the map window"));
+    
+    mpContextShowExtent = new QAction("Show extent", tableLegend);
+    mpContextRemoveLayer = new QAction("Remove", tableLegend);
+    mpActionFileExit = new QAction(QIcon(":/ico/mActionFileExit.png"), tr("Exit"), this);
     mpActionFileExit->setStatusTip(tr("Close Application"));
     mpActionFileExit->setShortcuts(QKeySequence::Close);
 
     //settings of TOC-tableWiget
     {
-    tableLegend->setHorizontalHeaderLabels(QStringList() << tr("") << tr("Имя слоя") << tr("Стиль") << ("Путь"));
+    tableLegend->setHorizontalHeaderLabels(QStringList() << tr("") << tr("Layer's name") << tr("Style") << ("Path"));
     tableLegend->setColumnCount(tableLegend->horizontalHeader()->count());
     tableLegend->setColumnWidth(0, 25);
     tableLegend->setColumnWidth(1, 185);
@@ -147,11 +157,19 @@ MainWindow::MainWindow(QWidget* parent, Qt::WFlags fl)
      connect(this->mpActionPan, SIGNAL(triggered()), this, SLOT(panMode()));
      connect(this->mpActionZoomIn, SIGNAL(triggered()), this, SLOT(zoomInMode()));
      connect(this->mpActionZoomOut, SIGNAL(triggered()), this, SLOT(zoomOutMode()));
+     
      connect(this->mpActionAddVectorLayer, SIGNAL(triggered()), this, SLOT(SLOTmpActionAddVectorLayer()));
      connect(this->mpActionAddRasterLayer, SIGNAL(triggered()), this, SLOT(SLOTmpActionAddRasterLayer()));
-     connect(this->mpActionFileExit, SIGNAL(triggered()), this, SLOT(SLOTmpActionFileExit()));
+     connect(this->mpActionAddPostGISLayer, SIGNAL(triggered()), this, SLOT(SLOTmpActionAddPostGISLayer()));
+     
      connect(this->mpVectorize, SIGNAL(triggered()), this, SLOT(SLOTtempUse()));
+     
      connect(this->mpActionFileOpenProject, SIGNAL(triggered()), this, SLOT(SLOTmpActionFileOpenProject()));
+     connect(this->mpActionFileSaveProjectAs, SIGNAL(triggered()), this, SLOT(SLOTmpActionFileSaveProjectAs()));
+     connect(this->mpActionFileSaveProject, SIGNAL(triggered()), this, SLOT(SLOTmpActionFileSaveProject()));
+     connect(this->mpActionFileCloseProject, SIGNAL(triggered()), this, SLOT(SLOTmpCloseProject()));
+     connect(this->mpActionFileExit, SIGNAL(triggered()), this, SLOT(SLOTmpActionFileExit()));
+     
      connect(this->mpRegistry, SIGNAL(layerWasAdded(QgsMapLayer *)), this, SLOT(addLayerToTOC(QgsMapLayer *)));
      connect(this->mpContextShowExtent, SIGNAL(triggered()), this, SLOT(SLOTazContextShowExtent()));
      connect(this->mpCoordsEdit, SIGNAL(editingFinished()), this, SLOT( SLOTazCoordsCenter()));
@@ -171,13 +189,16 @@ MainWindow::MainWindow(QWidget* parent, Qt::WFlags fl)
     mpMapToolBar->addAction(mpActionPan);
     mpMapToolBar->addAction(mpActionAddVectorLayer);
     mpMapToolBar->addAction(mpActionAddRasterLayer);
+    mpMapToolBar->addAction(mpActionAddPostGISLayer);
     mpMapToolBar->addAction(mpVectorize);
     }
 
 // menu Bar
     {
+        this->menuFile->addSeparator();
         this->menuFile->addAction(mpActionAddVectorLayer);
         this->menuFile->addAction(mpActionAddRasterLayer);
+        this->menuFile->addAction(mpActionAddPostGISLayer);
         this->menuFile->addSeparator();
         this->menuFile->addAction(mpActionFileExit);
     }
@@ -190,7 +211,10 @@ MainWindow::MainWindow(QWidget* parent, Qt::WFlags fl)
     mpZoomOutTool = new QgsMapToolZoom(mpMapCanvas, TRUE ); //true = out
     mpZoomOutTool->setAction(mpActionZoomOut);
 
-    statusBar()->showMessage("Репер готов к работе.");
+    m_badLayerHandler = new KKSBadLayerHandler;
+    QgsProject::instance()->setBadLayerHandler(m_badLayerHandler);
+
+    statusBar()->showMessage("Reper is ready.");
 }
 
 MainWindow::~MainWindow()
@@ -284,7 +308,7 @@ bool MainWindow::azSelectLayer(const QString layerName)
         {
             mpSelectedLayer = i.value();
             bComplete = true;
-            this->statusBar()->showMessage("Выбранный слой: '" + mpSelectedLayer->name() + "'.");
+            this->statusBar()->showMessage("Selected layer: '" + mpSelectedLayer->name() + "'.");
             break;
         }
 
@@ -295,7 +319,7 @@ bool MainWindow::azSelectLayer(const QString layerName)
         {
             mpSelectedLayer = pRezLayer; // возвращаем значение слоя, который был
             bComplete = false; // сообщаем, что выбор слоя неудачен
-            this->statusBar()->showMessage("Слой: '" + mpSelectedLayer->name() + "' не может быть выбран.");
+            this->statusBar()->showMessage("Layer: '" + mpSelectedLayer->name() + "' can't be select.");
         }
     }
     return bComplete;
@@ -328,7 +352,7 @@ bool MainWindow::azSelectLayer(const int layerNumber)
         {
             mpSelectedLayer = i.value();
             bComplete = true;
-            this->statusBar()->showMessage("Выбранный слой: '" + mpSelectedLayer->name() + "'.");
+            this->statusBar()->showMessage("Selected layer: '" + mpSelectedLayer->name() + "'.");
             break;
         }
 
@@ -339,7 +363,7 @@ bool MainWindow::azSelectLayer(const int layerNumber)
         {
             mpSelectedLayer = pRezLayer; // возвращаем значение слоя, который был
             bComplete = false; // сообщаем, что выбор слоя неудачен
-            this->statusBar()->showMessage("Слой: '" + mpSelectedLayer->name() + "' не может быть выбран.");
+            this->statusBar()->showMessage("Layer: '" + mpSelectedLayer->name() + "' can't be select.");
         }
     }
     return bComplete;
@@ -347,7 +371,7 @@ bool MainWindow::azSelectLayer(const int layerNumber)
 
 void MainWindow::azSetTitleWindow(QWidget &azApp)
 {
-      QString caption = "Репер";
+      QString caption = "Reper";
 
       if ( QgsProject::instance()->title().isEmpty() )
       {
@@ -407,6 +431,7 @@ UserDefinedShader
 ----------------------
     */
 
+    //ksa -- azRasterLayer.setDrawingStyle( QgsRasterLayer::MultiBandColor); // устанавливаем "3-х цветное изображение"
 
     // пока делаю так: 3-х цветное изображение и каналы:
     // 4 - красный; 3 - зеленый; 2 - синий.
@@ -416,33 +441,32 @@ UserDefinedShader
     }
     else if (azRasterLayer.bandCount() == 3)
     {
-        azRasterLayer.setDrawingStyle( QgsRasterLayer::MultiBandColor); // устанавливаем "3-х цветное изображение"
         // по умолчанию если три то пусть идут в обратном
-        azRasterLayer.setRedBandName(azRasterLayer.bandName(3));
-        azRasterLayer.setGreenBandName(azRasterLayer.bandName(2));
-        azRasterLayer.setBlueBandName(azRasterLayer.bandName(1));
+        //ksa -- azRasterLayer.setRedBandName(azRasterLayer.bandName(3));
+        //ksa -- azRasterLayer.setGreenBandName(azRasterLayer.bandName(2));
+        //ksa -- azRasterLayer.setBlueBandName(azRasterLayer.bandName(1));
         bComplete = true;
     }
     else
     {
-        azRasterLayer.setDrawingStyle( QgsRasterLayer::MultiBandColor); // устанавливаем "3-х цветное изображение"
             // проверяем название каждого канала
         if (azRasterCheckBandName(azRasterLayer, "Band 4"))
         {
-            azRasterLayer.setRedBandName("Band 4"); // есть - добавляем
+            //ksa -- azRasterLayer.setRedBandName("Band 4"); // есть - добавляем
         }
         if (azRasterCheckBandName(azRasterLayer, "Band 3"))
         {
-            azRasterLayer.setGreenBandName("Band 3");
+            //ksa -- azRasterLayer.setRedBandName("Band 3");
         }
         if (azRasterCheckBandName(azRasterLayer, "Band 2"))
         {
-            azRasterLayer.setBlueBandName("Band 2");
+            //ksa -- azRasterLayer.setRedBandName("Band 2");
         }
+        //ksa -- azRasterLayer.setBlueBandName("Band 2");
         bComplete = true;
     }
 
-    azRasterLayer.setStandardDeviations(2.5); // для рястяжки по гистограмме яркости
+    //ksa -- azRasterLayer.setStandardDeviations(2.5); // для рястяжки по гистограмме яркости
                                               // исп. среднее квадратичное отклонение 2.5
     return bComplete;
 }
@@ -501,8 +525,8 @@ bool MainWindow::azMakeLayer(QGis::WkbType azType, QString pDestDir, QString pNa
     {
         if (!azCopyFiles(mpAppPath + pAddName + pExp, pDestDir + pName + pExp))
         {
-            QMessageBox::about(this, "Не скопирован", "из" + mpAppPath + pAddName + pExp +
-                               "\n в" + pDestDir + pName + pExp);
+            QMessageBox::about(this, "Not copied", "from" + mpAppPath + pAddName + pExp +
+                               "\n to" + pDestDir + pName + pExp);
             bComplete = false;
         }
     }
@@ -519,8 +543,8 @@ bool MainWindow::azAddLayerVector(QFileInfo pFile)
     mypLayer->setRendererV2(mypRenderer);
     if (!mypLayer->isValid())
     {
-        qDebug("Shp слой некорректный. Слой не добавлен на карту." + pFile.filePath().toAscii());
-        this->statusBar()->showMessage("Shp слой некорректный. Слой не добавлен на карту."
+        qDebug("Shp layer is not valid. Layer was not added to map." + pFile.filePath().toAscii());
+        this->statusBar()->showMessage("Layer is not valid. Layer was not added to map."
                                        "\n " + pFile.filePath() + "'");
         return false;
     }
@@ -584,21 +608,21 @@ void MainWindow::SLOTmpActionFileExit() // Exit from Application
     QString pMessageText("");
     uint pButtonsPack(0);
     int pButton(0);
-    ProjectChange = false;
+    ProjectChange = true;
     if (ProjectChange)
     {
         pButtonsPack = 0x00410800;
-        pMessageText = "Проект был изменен,"
-                "\n вы хотите сохранить изменения перед выходом из приложения?";
+        pMessageText = "The Document has changed,"
+                "\n Do you want to save changes before close application?";
     }
     else
     {
         pButtonsPack = 0x00404000;
-        pMessageText = "Вы уверены, что хотите закрыть приложение?";
+        pMessageText = "Do you want to close application?";
     }
 
     QMessageBox * pExitApp = new QMessageBox (QMessageBox::Question,
-                                              "Выход из приложения",
+                                              "Exit from Application",
                                         pMessageText,
                            (QMessageBox::StandardButton)pButtonsPack);
     pButton = pExitApp->exec();
@@ -612,27 +636,48 @@ void MainWindow::SLOTmpActionFileExit() // Exit from Application
         // save NEEDED TO CONNECT
         this->close();
     }
+    
+    SLOTmpCloseProject();
+}
+
+void MainWindow::SLOTmpCloseProject()
+{
+    // unload the project macros before changing anything
+    //if ( mTrustedMacros ){
+    //    QgsPythonRunner::run( "qgis.utils.unloadProjectMacros();" );
+    //}
+
+    // remove any message widgets from the message bar
+    //mInfoBar->clearWidgets();
+
+    //mTrustedMacros = false;
+
+    //deletePrintComposers();
+    this->azRemoveAnnotationItems();
+    // clear out any stuff from project
+    mpMapCanvas->freeze( true );
+    azRemoveAllLayers();
+    mpLayerSet.clear();
+    mpMapCanvas->refresh();
 }
 
 void MainWindow::SLOTmpActionFileOpenProject() // Open QGIS Project in MapDock
 {
-    QString projectFileName = QFileDialog::getOpenFileName(this, "Открыть файл проекта карты *.qgs", "", "*.qgs");
+    QString projectFileName = QFileDialog::getOpenFileName(this, "Open map project *.qgs", "", "*.qgs");
     if (projectFileName.isNull())
     {
         return;
     }
-    //    deletePrintComposers();
-    this->azRemoveAnnotationItems();
-    this->azRemoveAllLayers();
-    mpLayerSet.clear();
+    
+    SLOTmpCloseProject();
 
     QgsProject::instance()->setFileName(projectFileName);
     if ( !QgsProject::instance()->read() )
     {
         QApplication::restoreOverrideCursor();
-        this->statusBar()->showMessage("Ошибка открытия файла проекта!"
+        this->statusBar()->showMessage("Failed to open project!"
                                        "\n " + projectFileName + "'");
-        qDebug("Ошибка открытия файла проекта!" + projectFileName.toAscii());
+        qDebug("Failed to open project!" + projectFileName.toAscii());
         mpMapCanvas->freeze(false);
         mpMapCanvas->refresh();
         return;
@@ -662,6 +707,8 @@ void MainWindow::SLOTmpActionFileOpenProject() // Open QGIS Project in MapDock
         }
 
     }
+
+    //QgsLegend * mpLegend = QgisApp::instance()->legend();
     // TODO add last Open Project
     QApplication::restoreOverrideCursor();
     mpMapCanvas->setLayerSet(mpLayerSet);
@@ -682,8 +729,8 @@ void MainWindow::SLOTsetRenderer()
 
 void MainWindow::SLOTtempUse()
 {
-    QFileInfo pFile("D:/!Share/layers/baba.shp");
-    this->azAddLayerVector(pFile);
+    QString pFilePath("D:/!Share/rastrs/union_den.tif");
+    QMessageBox::about(this, "hello world!", QString::number(azGetEPSG(pFilePath)));
 }
 
 long MainWindow::azGetEPSG(const QString rastrPath)
@@ -694,13 +741,13 @@ long MainWindow::azGetEPSG(const QString rastrPath)
         return -1;
     }
     QgsRasterLayer * pRLayer = new QgsRasterLayer(pFileInfo.filePath(), pFileInfo.completeBaseName());
-    return pRLayer->crs().epsg();
+    return pRLayer->crs().srsid();
 }
 
 
 void MainWindow::SLOTmpActionAddVectorLayer()
 {
-    QString fullLayerName = QFileDialog::getOpenFileName(this, "Добавить векторный слой", "", "Все поддерживаемые форматы(*.shp);;Shapefiles (*.shp)");
+    QString fullLayerName = QFileDialog::getOpenFileName(this, "Add layer", "", "All supported (*.shp *.tif *tiff);;Shapefiles (*.shp);;Geotiff (*.tif *.tiff)");
     QFileInfo azFileInfo(fullLayerName);
     if (!azFileInfo.isFile())
     {
@@ -708,6 +755,36 @@ void MainWindow::SLOTmpActionAddVectorLayer()
     }
     this->azAddLayerVector(azFileInfo);
 }
+
+void MainWindow::SLOTmpActionAddPostGISLayer()
+{
+    
+    if ( mpMapCanvas && mpMapCanvas->isDrawing() ){
+        return;
+    }
+
+    // Fudge for now
+    QgsDebugMsg( "about to addRasterLayer" );
+
+    // TODO: QDialog for now, switch to QWidget in future
+    QDialog *dbs = dynamic_cast<QDialog*>( QgsProviderRegistry::instance()->selectWidget( "postgres", this ) );
+    if ( !dbs )
+    {
+        QMessageBox::warning( this, tr( "PostgreSQL" ), tr( "Cannot get PostgreSQL select dialog from provider." ) );
+        return;
+    }
+  
+    connect( dbs, SIGNAL( addDatabaseLayers( QStringList const &, QString const & ) ),
+             this, SLOT( addDatabaseLayers( QStringList const &, QString const & ) ) );
+    connect( dbs, SIGNAL( progress( int, int ) ),
+             this, SLOT( showProgress( int, int ) ) );
+    connect( dbs, SIGNAL( progressMessage( QString ) ),
+             this, SLOT( showStatusMessage( QString ) ) );
+  
+    dbs->exec();
+    delete dbs;
+} 
+
 
 /*void MainWindow::paintEvent(QPaintEvent *pPaint)
 {
@@ -728,8 +805,8 @@ void MainWindow::SLOTmpActionAddRasterLayer()
 {
     // СЛОТ: добавление растра в окно карты
     // сначала вызываем диалог, получаем путь к файлу
-    QString fullLayerName = QFileDialog::getOpenFileName(this, "Добавить растровый слой", "",
-                         "Все поддерживаемые растровые форматы (*.img *.asc *.tif *tiff *.bmp *.jpg *.jpeg);;Geotiff (*.tif *.tiff)");
+    QString fullLayerName = QFileDialog::getOpenFileName(this, "Add raster layer", "",
+                         "Raster files (*.img *.asc *.tif *tiff *.bmp *.jpg *.jpeg);;Geotiff (*.tif *.tiff)");
     QFileInfo azFileInfo(fullLayerName);
     if (!azFileInfo.isFile()) // проверка существования файла
     {
@@ -743,16 +820,19 @@ void MainWindow::SLOTmpActionAddRasterLayer()
     if (!mypLayer->isValid()) // проверяем его корректность
     {
         qDebug("Raster layer is not valid or not supported by GDAL. Layer was not added to map." + fullLayerName.toAscii());
-        this->statusBar()->showMessage("Файл растра не явялется корректным или не поддерживается библиотекой GDAL. Слой не был добавлен на карту."
+        this->statusBar()->showMessage("Raster layer is not valid or not supported by GDAL. Layer was not added to map."
                                        "\n " + fullLayerName + "'");
         return;
     }
+    
     if (!this->azRasterEnhancement(*mypLayer)) // применяем улучшение снимка
     {
-        qDebug("Улучшение растра не использовано. Нераспознаный формат растра." + fullLayerName.toAscii());
+        qDebug("Enhancement wasn't used. Unrecognize type of image" + fullLayerName.toAscii());
     }
+    
     // применяем улучшение контраста (т.е. цвета отображаются от минимума до максимума)
-    mypLayer->setContrastEnhancementAlgorithm(QgsContrastEnhancement::StretchToMinimumMaximum, false );
+    //ksa -- mypLayer->setContrastEnhancementAlgorithm(QgsContrastEnhancement::StretchToMinimumMaximum, false );
+    mypLayer->setContrastEnhancement(QgsContrastEnhancement::StretchToMinimumMaximum);
 
     // самообновление
     connect(mypLayer, SIGNAL(repaintRequested()), mpMapCanvas, SLOT(refresh()) );
@@ -772,39 +852,40 @@ void MainWindow::SLOTmpActionAddRasterLayer()
 
 void MainWindow::SLOTmpActionVectorize()
 {
-    dnThemTaskSpecBath->close();
     QString pMessage(""); // сообщение в статус баре о результате векторизации
     if (this->dnThemTaskSpecBath->Polygons.count() < 1)
     {
-        pMessage = tr("Выбранные объекты не содержат информации для векторизации");
-        this->statusBar()->showMessage(pMessage);
+        pMessage = tr("Selected objects haven't information for vectoring.");
         return;
     }
 
     QString mEncoding; // кодировка
     mEncoding = "UTF-8";
 
-    QgsFieldMap mFields;
+    //ksa -- QgsFieldMap mFields;
+    QgsFields mFields;
     QgsField myField1("value", QVariant::Double, "Double", 0, 0);
     QgsField myField2( "comment", QVariant::String, "String", 10, 0, "Comment" );
-    mFields.insert( 0, myField1 );
-    mFields.insert( 1, myField2 );
+    mFields.append(myField1);
+    mFields.append(myField2);
+    //ksa -- mFields.insert( 0, myField1 );
+    //ksa -- mFields.insert( 1, myField2 );
     QgsCoordinateReferenceSystem pSRS;
 
     // создаем систему координат идентичную растру
     pSRS.createFromOgcWmsCrs("EPSG:" +
                              QString::number(azGetEPSG(dnThemTaskSpecBath->Polygons.at(0).EPSG)));
     pSRS.validate();
-    //QString myFileName (dnThemTaskSpecBath->Polygons.at(0).NameLayer +
-    //                    QString::number(QTime::currentTime().hour())  + "-" +
-    //                    QString::number(QTime::currentTime().minute())  + "-" +
-    //                    QString::number(QTime::currentTime().second()) + "-" +
-    //                    QString::number(QTime::currentTime().msec()) + ".shp");
-    QString myFileName ("baba.shp");
+    QString myFileName ("/" + dnThemTaskSpecBath->Polygons.at(0).NameLayer +
+                        QString::number(QTime::currentTime().hour())  + "-" +
+                        QString::number(QTime::currentTime().minute())  + "-" +
+                        QString::number(QTime::currentTime().second()) + "-" +
+                        QString::number(QTime::currentTime().msec()) + ".shp");
     myFileName = "D:/!Share/layers/" + myFileName;
+    
     QgsVectorFileWriter myWriter( myFileName, mEncoding, mFields, QGis::WKBPolygon, &pSRS);
 
-//    QMessageBox::about(this->dnThemTaskSpecBath, "test", "Hello!");
+    QMessageBox::about(this->dnThemTaskSpecBath, "test", "Hello!");
     for (int i = 0; i < dnThemTaskSpecBath->Polygons.size(); i++)
     {
         DNVector dnVec;
@@ -821,33 +902,55 @@ void MainWindow::SLOTmpActionVectorize()
         pPolygon << pPolyLine;
         QgsGeometry * pPolygonGeometry = QgsGeometry::fromPolygon( pPolygon );
         QgsFeature pFeature;
-        pFeature.setTypeName( "WKBPolygon" );
+        //ksa -- pFeature.setTypeName( "WKBPolygon" );
         pFeature.setGeometry( pPolygonGeometry );
-        pFeature.addAttribute( 1, "val" );
-        pFeature.addAttribute(0, (double)dnVec.Vol);
+        pFeature.setAttribute( "comment", "val" );
+        pFeature.setAttribute("value", (double)dnVec.Vol);
 
         QgsVectorFileWriter::WriterError mError;
         myWriter.addFeature( pFeature );
         mError = myWriter.hasError();
-        if (mError != 0)
-        {
-            qWarning() << myWriter.errorMessage();
-        }
+		//QMessageBox::about(0, "", );
+		qWarning() << myWriter.errorMessage();
     }
-	QFileInfo pFile("D:/!Share/layers/baba.shp");
-	this->azAddLayerVector(pFile);
-	return;
-    
 
-    /*QFileInfo pFile(myFileName);
-    if (pFile.isFile())
-    {
-	    if (azAddLayerVector(pFile))
-		{
-			pMessage = "Добавлен слой '" + myFileName + "'";
-			this->statusBar()->showMessage(pMessage);
-		}
-    }*/
+
+//    QgsPoint mPoint1;
+//    QgsPoint mPoint2;
+//    QgsPoint mPoint3;
+
+
+//    mPoint1 = QgsPoint( 10.0, 10.0 );
+//    mPoint2 = QgsPoint( 15.0, 10.0 );
+//    mPoint3 = QgsPoint( 15.0, 12.0 );
+
+
+//    QString myFileName ("/testply.shp");
+//    myFileName = "D:/!Share/src/reper/ddocclient/build/layers" + myFileName;
+//    QgsVectorFileWriter myWriter( myFileName, mEncoding, mFields, QGis::WKBPolygon, &pSRS);
+
+//    QgsPolyline myPolyline;
+//    myPolyline << mPoint1 << mPoint2 << mPoint3 << mPoint1;
+//    QgsPolygon myPolygon;
+//    myPolygon << myPolyline;
+//    //polygon: first item of the list is outer ring,
+//    // inner rings (if any) start from second item
+//    //
+//    // NOTE: don't delete this pointer again -
+//    // ownership is passed to the feature which will
+//    // delete it in its dtor!
+//    QgsGeometry * mypPolygonGeometry = QgsGeometry::fromPolygon( myPolygon );
+//    QgsFeature myFeature;
+//    myFeature.setTypeName( "WKBPolygon" );
+//    myFeature.setGeometry( mypPolygonGeometry );
+//    myFeature.addAttribute( 0, "HelloWorld" );
+//    myFeature.addAttribute(1, 334);
+
+//    QgsVectorFileWriter::WriterError mError;
+//    myWriter.addFeature( myFeature );
+//    mError = myWriter.hasError();
+
+    return;
 
 }
 
@@ -920,8 +1023,8 @@ void MainWindow::SLOTazThemTaskSpectralBathynometry()
         connect(this->dnThemTaskSpecBath, SIGNAL(SIGNALcreateVector()), this, SLOT(SLOTmpActionVectorize()));
     }
 
-    dnThemTaskSpecBath->setWindowTitle(tr("Оценка глубин прибрежных территорий"));
-//    dnThemTaskSpecBath->setWindowModality(Qt::WindowModal);
+    dnThemTaskSpecBath->setWindowTitle(tr("Спектральная Батинометрия"));
+    dnThemTaskSpecBath->setWindowModality(Qt::WindowModal);
     dnThemTaskSpecBath->show();
 }
 
@@ -947,3 +1050,113 @@ void MainWindow::SLOTazCoordsCenter()
     mpMapCanvas->refresh();
 }
 
+void MainWindow::SLOTmpActionFileSaveProjectAs()
+{
+  
+    if ( mpMapCanvas && mpMapCanvas->isDrawing() ){
+        return;
+    }
+
+    // Retrieve last used project dir from persistent settings
+    QSettings settings;
+    QString lastUsedDir = settings.value( "/UI/lastProjectDir", "." ).toString();
+
+    QString path = QFileDialog::getSaveFileName( this,
+                                                 tr( "Choose a file name to save the QGIS project file as" ),
+                                                 lastUsedDir + "/" + QgsProject::instance()->title(),
+                                                 tr( "QGis files" ) + " (*.qgs *.QGS)" );
+    if ( path.isEmpty() )
+        return;
+
+    QFileInfo fullPath( path );
+
+    settings.setValue( "/UI/lastProjectDir", fullPath.path() );
+
+    // make sure the .qgs extension is included in the path name. if not, add it...
+    if ( "qgs" != fullPath.suffix().toLower() ){
+        fullPath.setFile( fullPath.filePath() + ".qgs" );
+    }
+
+    QgsProject::instance()->setFileName( fullPath.filePath() );
+
+    if ( QgsProject::instance()->write() ){
+        //setTitleBarText_( *this ); // update title bar
+        statusBar()->showMessage( tr( "Saved project to: %1" ).arg( QgsProject::instance()->fileName() ), 5000 );
+        // add this to the list of recently used project files
+        //saveRecentProjectPath( fullPath.filePath(), settings );
+    }
+    else{
+        QMessageBox::critical( this,
+                               tr( "Unable to save project %1" ).arg( QgsProject::instance()->fileName() ),
+                               QgsProject::instance()->error(),
+                               QMessageBox::Ok,
+                               Qt::NoButton );
+    }
+}
+
+void MainWindow::SLOTmpActionFileSaveProject()
+{
+    if ( mpMapCanvas && mpMapCanvas->isDrawing() ){
+        return;
+    }
+
+    // if we don't have a file name, then obviously we need to get one; note
+    // that the project file name is reset to null in fileNew()
+    QFileInfo fullPath;
+
+    // we need to remember if this is a new project so that we know to later
+    // update the "last project dir" settings; we know it's a new project if
+    // the current project file name is empty
+    bool isNewProject = false;
+
+    if ( QgsProject::instance()->fileName().isNull() ){
+        isNewProject = true;
+
+        // Retrieve last used project dir from persistent settings
+        QSettings settings;
+        QString lastUsedDir = settings.value( "/UI/lastProjectDir", "." ).toString();
+
+        QString path = QFileDialog::getSaveFileName(
+                                                     this,
+                                                     tr( "Choose a QGIS project file" ),
+                                                     lastUsedDir + "/" + QgsProject::instance()->title(),
+                                                     tr( "QGis files" ) + " (*.qgs *.QGS)" 
+                                                   );
+        if ( path.isEmpty() )
+            return;
+
+        fullPath.setFile( path );
+
+        // make sure we have the .qgs extension in the file name
+        if ( "qgs" != fullPath.suffix().toLower() ){
+            fullPath.setFile( fullPath.filePath() + ".qgs" );
+        }
+
+        QgsProject::instance()->setFileName( fullPath.filePath() );
+    }
+
+    if ( QgsProject::instance()->write() ){
+        //setTitleBarText_( *this ); // update title bar
+        statusBar()->showMessage( tr( "Saved project to: %1" ).arg( QgsProject::instance()->fileName() ), 5000 );
+
+        if ( isNewProject ){
+            // add this to the list of recently used project files
+            //QSettings settings;
+            //saveRecentProjectPath( fullPath.filePath(), settings );
+        }
+    }
+    else{
+        QMessageBox::critical( this,
+                               tr( "Unable to save project %1" ).arg( QgsProject::instance()->fileName() ),
+                               QgsProject::instance()->error() 
+                             );
+        return;
+    }
+
+    // run the saved project macro
+    //if ( mTrustedMacros ){
+    //    QgsPythonRunner::run( "qgis.utils.saveProjectMacro();" );
+    //}
+
+    return;
+}
