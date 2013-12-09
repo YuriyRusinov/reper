@@ -69,7 +69,7 @@ float DNMathAdd::CalcEntropOtn(float *Mass,quint64 KDiskr,unsigned long long RMa
  qint64 Var;
  float fVar;
  QQueue <qint64> SMass;
- QMap <int,float> pi; //Р’РµСЂРѕСЏС‚РЅРѕСЃС‚Рё РїРѕСЏРІР»РµРЅРёСЏ С‚РѕС‡РєРё
+ QMap <int,float> pi; //Вероятности появления точки
 
  unsigned long long i,Razm;
 
@@ -77,9 +77,9 @@ float DNMathAdd::CalcEntropOtn(float *Mass,quint64 KDiskr,unsigned long long RMa
  MinM=this->GetMin(Mass,RMass);
  MaxM=this->GetMax(Mass,RMass);
 
- //Р’С‹С‡РёСЃР»РµРЅРёРµ РјР°РєСЃРёРјР°Р»СЊРЅРѕ РІРѕР·РјРѕР¶РЅРѕР№ СЌРЅС‚СЂРѕРїРёРё
+ //Вычисление максимально возможной энтропии
  I0=log(/*MaxM-MinM+1*/(long double)KDiskr)/log((long double)2);
- //Р”РёСЃРєСЂРёС‚РёР·Р°С†РёСЏ РјР°СЃСЃРёРІР°
+ //Дискритизация массива
  Kof=KDiskr/(MaxM-MinM);
  for(i=0;i<RMass;i++)
  {
@@ -90,7 +90,7 @@ float DNMathAdd::CalcEntropOtn(float *Mass,quint64 KDiskr,unsigned long long RMa
 
  qSort(SMass);
 
- /*Р’С‹С‡РёСЃР»РµРЅРёРµ РІРµСЂРѕСЏС‚РЅРѕСЃС‚РµР№*/
+ /*Вычисление вероятностей*/
  for(i=0;i<RMass;i++)
   pi[SMass[i]]=0;
 
@@ -141,20 +141,20 @@ float DNMathAdd::CalcEvklid(float *Mass1,float *Mass2, quint64 RMass)
  return ReturnV;
 }
 
-/*Р¤СѓРЅРєС†РёРё СЂР°Р±РѕС‚С‹ СЃ РјР°С‚СЂРёС†Р°РјРё*/
-void DNMathAdd::CalcCovMatr(int nMass /*СЂР°Р·РјРµСЂ РјР°СЃСЃРёРІР°*/,int nElem,double *Mass /*РњР°СЃСЃРёРІ*/,double *CovMatr /*РЈРєР°Р·Р°С‚РµР»СЊ РЅР° РјР°СЃСЃРёРІ РјР°С‚СЂРёС†С‹*/)
+/*Функции работы с матрицами*/
+void DNMathAdd::CalcCovMatr(int nMass /*размер массива*/,int nElem,double *Mass /*Массив*/,double *CovMatr /*Указатель на массив матрицы*/)
 {
  /*
-РњР°СЃСЃРёРІ Mass Р·Р°РїРѕР»РЅСЏРµС‚СЃСЏ РїРѕ РїСЂРёРЅС†РёРїСѓ:
-РЅРѕРјРµСЂ СЃС‚СЂРѕРєРё - РЅРѕРјРµСЂ СЌР»РµРјРµРЅС‚Р° РјР°СЃРёРІР°
-РЅРѕРµСЂ СЃС‚РѕР»Р±С†Р° - РЅРѕРјРµСЂ СЃР°РјРѕРіРѕ РјР°СЃСЃРёРІР°
+Массив Mass заполняется по принципу:
+номер строки - номер элемента масива
+ноер столбца - номер самого массива
 Mass[nMass][nElem]
-РєРѕРІР°СЂРёР°С†РёРѕРЅРЅР°СЏ РјР°С‚СЂРёС†Р° РёРјРµРµС‚ СЂР°Р·РјРµСЂ nElem РЅР° nElem
+ковариационная матрица имеет размер nElem на nElem
 */
  int j_x=0,j_y=0,j_x2=0;
  double *sred,den;
 
- /*Р’С‹С‡РёСЃР»РµРЅРёРµ СЃСЂРµРґРЅРёС… РґР»СЏ РєР°Р¶РґРѕРіРѕ РјР°СЃСЃРёРІР°*/
+ /*Вычисление средних для каждого массива*/
  sred=new double[nElem];
 
  for(j_x=0;j_x<nElem;j_x++)
@@ -168,7 +168,7 @@ Mass[nMass][nElem]
   den=sred[j_x];
  }
 
-/*Р Р°СЃСЃС‡С‘С‚ СЌР»РµРјРµРЅС‚РѕРІ РєРѕРІР°СЂРёР°С†РёРѕРЅРЅРѕР№ РјР°С‚СЂРёС†С‹*/
+/*Рассчёт элементов ковариационной матрицы*/
  for(j_x=0;j_x<nElem;j_x++)
  {
   for(j_y=0;j_y<nElem;j_y++)
@@ -183,7 +183,7 @@ Mass[nMass][nElem]
  delete[] sred;
 }
 
-double DNMathAdd::CalcOpredMatr(int nMass /*СЂР°Р·РјРµСЂ РјР°СЃСЃРёРІР°*/,double *Matr /*РЈРєР°Р·Р°С‚РµР»СЊ РЅР° РјР°СЃСЃРёРІ РјР°С‚СЂРёС†С‹*/)
+double DNMathAdd::CalcOpredMatr(int nMass /*размер массива*/,double *Matr /*Указатель на массив матрицы*/)
 {
     double max,var,*a,Result;
     int i,j_x,j_y,NumString,znak;
@@ -202,7 +202,7 @@ double DNMathAdd::CalcOpredMatr(int nMass /*СЂР°Р·РјРµСЂ РјР°СЃСЃРёРІР°*/,double
     znak=1;
     for(i=0;i<nMass;i++)
     {
-   /*РС‰РµРј РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЌР»РµРјРµРЅС‚ РІ i-С‚РѕРј СЃС‚РѕР»Р±С†Рµ РјР°С‚СЂРёС†С‹*/
+   /*Ищем максимальный элемент в i-том столбце матрицы*/
      max=a[i+i*nMass];
      NumString=i;
      for(j_y=i;j_y<nMass;j_y++)
@@ -213,7 +213,7 @@ double DNMathAdd::CalcOpredMatr(int nMass /*СЂР°Р·РјРµСЂ РјР°СЃСЃРёРІР°*/,double
        NumString=j_y;
       }
      }
-   /*РњРµРЅСЏРµРј СЃС‚СЂРѕРєСѓ, СЃРѕРґРµСЂР¶Р°С‰СѓСЋ РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЌР»РµРјРµРЅС‚ РјР°С‚СЂРёС†С‹ РІ i-С‚РѕРј СЃС‚РѕР»Р±С†Рµ, СЃ i-С‚РѕР№ СЃС‚СЂРѕРєРѕР№*/
+   /*Меняем строку, содержащую максимальный элемент матрицы в i-том столбце, с i-той строкой*/
      if(NumString!=i)
      {
       znak=znak*(-1);
@@ -226,7 +226,7 @@ double DNMathAdd::CalcOpredMatr(int nMass /*СЂР°Р·РјРµСЂ РјР°СЃСЃРёРІР°*/,double
      }
      if(a[i+i*nMass]!=0)
      {
-   /*РџРѕС‡Р»РµРЅРЅРѕ РїСЂРёР±Р°РІР»СЏРµРј i-С‚СѓСЋ СЃС‚СЂРѕРєСѓ СѓРјРЅРѕР¶РµРЅРЅСѓСЋ РЅР° РєРѕСЌС„С„РёС†РёРµРЅС‚ Рє РїРѕСЃР»РµРґСѓСЋС‰РёРј СЃС‚СЂРѕРєР°Рј*/
+   /*Почленно прибавляем i-тую строку умноженную на коэффициент к последующим строкам*/
       for(j_y=i+1;j_y<nMass;j_y++)
       {
        var=(-1)*(a[i+j_y*nMass]/a[i+i*nMass]);
@@ -287,7 +287,7 @@ void DNMathAdd::MatrInverse(double *a,int n)
  znak=1;
  for(i=0;i<n;i++)
  {
-/*РС‰РµРј РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЌР»РµРјРµРЅС‚ РІ i-С‚РѕРј СЃС‚РѕР»Р±С†Рµ РјР°С‚СЂРёС†С‹*/
+/*Ищем максимальный элемент в i-том столбце матрицы*/
   max=a[i+i*n];
 
   NumString=i;
@@ -299,7 +299,7 @@ void DNMathAdd::MatrInverse(double *a,int n)
     NumString=j_y;
    }
   }
-/*РњРµРЅСЏРµРј СЃС‚СЂРѕРєСѓ, СЃРѕРґРµСЂР¶Р°С‰СѓСЋ РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЌР»РµРјРµРЅС‚ РјР°С‚СЂРёС†С‹ РІ i-С‚РѕРј СЃС‚РѕР»Р±С†Рµ, СЃ i-С‚РѕР№ СЃС‚СЂРѕРєРѕР№*/
+/*Меняем строку, содержащую максимальный элемент матрицы в i-том столбце, с i-той строкой*/
   if(NumString!=i)
   {
    znak=znak*(-1);
@@ -316,7 +316,7 @@ void DNMathAdd::MatrInverse(double *a,int n)
   }
   if(a[i+i*n]!=0)
   {
-/*РџРѕС‡Р»РµРЅРЅРѕ РїСЂРёР±Р°РІР»СЏРµРј i-С‚СѓСЋ СЃС‚СЂРѕРєСѓ СѓРјРЅРѕР¶РµРЅРЅСѓСЋ РЅР° РєРѕСЌС„С„РёС†РёРµРЅС‚ Рє РїРѕСЃР»РµРґСѓСЋС‰РёРј СЃС‚СЂРѕРєР°Рј*/
+/*Почленно прибавляем i-тую строку умноженную на коэффициент к последующим строкам*/
    var=a[i+i*n];
    for(j_x=0;j_x<n;j_x++)
    {
@@ -432,7 +432,7 @@ void DNMathAdd::MatrAdd(double *Matr1,double *Matr2,int x,int y)
   Matr1[i]+=Matr2[i];
 }
 
-/*РЎС‚Р°С‚РёСЃС‚РёРєР°*/
+/*Статистика*/
 double DNMathAdd::CalcCorel(quint64 nMass,float *Mass1,float *Mass2)
 {
  double MMass1=0,MMass2=0;

@@ -25,19 +25,19 @@ double DNTheam::Batinometr(int TypeBottom,float R485,float R560,float R660,float
 
  TypeBottom=1;
 
- if(TypeBottom==0) //РњР°РєСЂРѕС„РёС‚С‹
+ if(TypeBottom==0) //Макрофиты
  {
   R1b=0.02;
   R2b=0.06;
   R3b=0.065;
  }
- if(TypeBottom==1)  //РџРµСЃРѕРє
+ if(TypeBottom==1)  //Песок
  {
   R1b=0.03;
   R2b=0.092;
   R3b=0.11;
  }
- if(TypeBottom==2) //Р’РѕРґРѕСЂРѕСЃР»Рё
+ if(TypeBottom==2) //Водоросли
  {
   R1b=0.06;
   R2b=0.09;
@@ -85,12 +85,12 @@ QList<BigthResult> DNTheam::CalcFunkBatimetrObr(int TypeBottom)
  double f1,f2,f3;
  double d1,d2,d3,k1,k2,k3;
  double lamda1=425,lamda2=545,lamda3=605;
- double awLamda1=0.0045,awLamda2=0.056,awLamda3=0.240;  //РїРѕРєР°Р·Р°С‚РµР»СЊ РїРѕРіР»РѕС‰РµРЅРёСЏ С‡РёСЃС‚РѕР№ РјРѕСЂСЃРєРѕР№ РІРѕРґРѕР№
- double bwLamda1=0.004,bwLamda2=0.00135,bwLamda3=0.00093;  //РїРѕРєР°Р·Р°С‚РµР»СЊ СЂР°СЃСЃРµРёРІР°РЅРёСЏ С‡РёСЃС‚РѕР№ РјРѕСЂСЃРєРѕР№ РІРѕРґРѕР№
- double ALamda1=0.0362,ALamda2=0.009,ALamda3=0.0056; //РєРѕСЌС„С„РёС†РёРµРЅС‚С‹ РґР»СЏ СЂР°СЃС‡РµС‚Р° РїРѕРєРјР·РјС‚РµР»СЏ РїРѕРіР»РѕС‰РµРЅРёСЏ С…Р»РѕСЂРѕС„РёР»Р»РѕРј
- double BLamda1=0.313,BLamda2=0.073,BLamda3=0.093;  //РєРѕСЌС„С„РёС†РёРµРЅС‚С‹ РґР»СЏ СЂР°СЃС‡РµС‚Р° РїРѕРєРјР·РјС‚РµР»СЏ РїРѕРіР»РѕС‰РµРЅРёСЏ С…Р»РѕСЂРѕС„РёР»Р»РѕРј
- double s500=0.017,s501=0.011; //РєРѕСЌС„С„РёС†РёРµРЅС‚С‹ РґР»СЏ СЂР°СЃС‡РµС‚Р° РїРѕРєР°Р·Р°С‚РµР»СЏ РїРѕРіР»РѕС‰РµРЅРёСЏ Р РћР’
- double Cph=0.1; //РєРѕРЅС†РµРЅС‚СЂР°С†РёСЏ С…Р»РѕСЂРѕС„РёР»Р»Р° РјРі/Рј3
+ double awLamda1=0.0045,awLamda2=0.056,awLamda3=0.240;  //показатель поглощения чистой морской водой
+ double bwLamda1=0.004,bwLamda2=0.00135,bwLamda3=0.00093;  //показатель рассеивания чистой морской водой
+ double ALamda1=0.0362,ALamda2=0.009,ALamda3=0.0056; //коэффициенты для расчета покмзмтеля поглощения хлорофиллом
+ double BLamda1=0.313,BLamda2=0.073,BLamda3=0.093;  //коэффициенты для расчета покмзмтеля поглощения хлорофиллом
+ double s500=0.017,s501=0.011; //коэффициенты для расчета показателя поглощения РОВ
+ double Cph=0.1; //концентрация хлорофилла мг/м3
  double con1[8],con2[8],con3[8];
 
  double R1a,R2a,R3a;
@@ -101,19 +101,19 @@ QList<BigthResult> DNTheam::CalcFunkBatimetrObr(int TypeBottom)
 
  TypeBottom=1;
 
- if(TypeBottom==0) //РњР°РєСЂРѕС„РёС‚С‹
+ if(TypeBottom==0) //Макрофиты
  {
   R1b=0.02;
   R2b=0.06;
   R3b=0.065;
  }
- if(TypeBottom==1)  //РџРµСЃРѕРє
+ if(TypeBottom==1)  //Песок
  {
   R1b=0.03;
   R2b=0.092;
   R3b=0.11;
  }
- if(TypeBottom==2) //Р’РѕРґРѕСЂРѕСЃР»Рё
+ if(TypeBottom==2) //Водоросли
  {
   R1b=0.06;
   R2b=0.09;
@@ -188,12 +188,12 @@ BatimetrResult DNTheam::CalcFunkBatimetrObr(double a,double b,double h,double R1
  double f1,f2,f3;
  double d1,d2,d3,k1,k2,k3;
  double lamda1=425,lamda2=545,lamda3=605;
- double awLamda1=0.0045,awLamda2=0.056,awLamda3=0.240;  //РїРѕРєР°Р·Р°С‚РµР»СЊ РїРѕРіР»РѕС‰РµРЅРёСЏ С‡РёСЃС‚РѕР№ РјРѕСЂСЃРєРѕР№ РІРѕРґРѕР№
- double bwLamda1=0.004,bwLamda2=0.00135,bwLamda3=0.00093;  //РїРѕРєР°Р·Р°С‚РµР»СЊ СЂР°СЃСЃРµРёРІР°РЅРёСЏ С‡РёСЃС‚РѕР№ РјРѕСЂСЃРєРѕР№ РІРѕРґРѕР№
- double ALamda1=0.0362,ALamda2=0.009,ALamda3=0.0056; //РєРѕСЌС„С„РёС†РёРµРЅС‚С‹ РґР»СЏ СЂР°СЃС‡РµС‚Р° РїРѕРєРјР·РјС‚РµР»СЏ РїРѕРіР»РѕС‰РµРЅРёСЏ С…Р»РѕСЂРѕС„РёР»Р»РѕРј
- double BLamda1=0.313,BLamda2=0.073,BLamda3=0.093;  //РєРѕСЌС„С„РёС†РёРµРЅС‚С‹ РґР»СЏ СЂР°СЃС‡РµС‚Р° РїРѕРєРјР·РјС‚РµР»СЏ РїРѕРіР»РѕС‰РµРЅРёСЏ С…Р»РѕСЂРѕС„РёР»Р»РѕРј
- double s500=0.017,s501=0.011; //РєРѕСЌС„С„РёС†РёРµРЅС‚С‹ РґР»СЏ СЂР°СЃС‡РµС‚Р° РїРѕРєР°Р·Р°С‚РµР»СЏ РїРѕРіР»РѕС‰РµРЅРёСЏ Р РћР’
- double Cph=0.1; //РєРѕРЅС†РµРЅС‚СЂР°С†РёСЏ С…Р»РѕСЂРѕС„РёР»Р»Р° РјРі/Рј3
+ double awLamda1=0.0045,awLamda2=0.056,awLamda3=0.240;  //показатель поглощения чистой морской водой
+ double bwLamda1=0.004,bwLamda2=0.00135,bwLamda3=0.00093;  //показатель рассеивания чистой морской водой
+ double ALamda1=0.0362,ALamda2=0.009,ALamda3=0.0056; //коэффициенты для расчета покмзмтеля поглощения хлорофиллом
+ double BLamda1=0.313,BLamda2=0.073,BLamda3=0.093;  //коэффициенты для расчета покмзмтеля поглощения хлорофиллом
+ double s500=0.017,s501=0.011; //коэффициенты для расчета показателя поглощения РОВ
+ double Cph=0.1; //концентрация хлорофилла мг/м3
  double con1[8],con2[8],con3[8];
 
  double R1a,R2a,R3a;
@@ -261,12 +261,12 @@ BatimetrResult DNTheam::CalcFunkBatimetr(double a,double b,double h,float R1a,fl
  double ap,ao,bp,bo,hp,ho,dh=0.00001;
  double d_FMainA,d_FMainB,d_FMainH;
  double lamda1=425,lamda2=545,lamda3=605;
- double awLamda1=0.0045,awLamda2=0.056,awLamda3=0.240;  //РїРѕРєР°Р·Р°С‚РµР»СЊ РїРѕРіР»РѕС‰РµРЅРёСЏ С‡РёСЃС‚РѕР№ РјРѕСЂСЃРєРѕР№ РІРѕРґРѕР№
- double bwLamda1=0.004,bwLamda2=0.00135,bwLamda3=0.00093;  //РїРѕРєР°Р·Р°С‚РµР»СЊ СЂР°СЃСЃРµРёРІР°РЅРёСЏ С‡РёСЃС‚РѕР№ РјРѕСЂСЃРєРѕР№ РІРѕРґРѕР№
- double ALamda1=0.0362,ALamda2=0.009,ALamda3=0.0056; //РєРѕСЌС„С„РёС†РёРµРЅС‚С‹ РґР»СЏ СЂР°СЃС‡РµС‚Р° РїРѕРєРјР·РјС‚РµР»СЏ РїРѕРіР»РѕС‰РµРЅРёСЏ С…Р»РѕСЂРѕС„РёР»Р»РѕРј
- double BLamda1=0.313,BLamda2=0.073,BLamda3=0.093;  //РєРѕСЌС„С„РёС†РёРµРЅС‚С‹ РґР»СЏ СЂР°СЃС‡РµС‚Р° РїРѕРєРјР·РјС‚РµР»СЏ РїРѕРіР»РѕС‰РµРЅРёСЏ С…Р»РѕСЂРѕС„РёР»Р»РѕРј
- double s500=0.017,s501=0.011; //РєРѕСЌС„С„РёС†РёРµРЅС‚С‹ РґР»СЏ СЂР°СЃС‡РµС‚Р° РїРѕРєР°Р·Р°С‚РµР»СЏ РїРѕРіР»РѕС‰РµРЅРёСЏ Р РћР’
- double Cph=0.1; //РєРѕРЅС†РµРЅС‚СЂР°С†РёСЏ С…Р»РѕСЂРѕС„РёР»Р»Р° РјРі/Рј3
+ double awLamda1=0.0045,awLamda2=0.056,awLamda3=0.240;  //показатель поглощения чистой морской водой
+ double bwLamda1=0.004,bwLamda2=0.00135,bwLamda3=0.00093;  //показатель рассеивания чистой морской водой
+ double ALamda1=0.0362,ALamda2=0.009,ALamda3=0.0056; //коэффициенты для расчета покмзмтеля поглощения хлорофиллом
+ double BLamda1=0.313,BLamda2=0.073,BLamda3=0.093;  //коэффициенты для расчета покмзмтеля поглощения хлорофиллом
+ double s500=0.017,s501=0.011; //коэффициенты для расчета показателя поглощения РОВ
+ double Cph=0.1; //концентрация хлорофилла мг/м3
  double con1[8],con2[8],con3[8];
 
  double delta[3];
@@ -331,7 +331,7 @@ BatimetrResult DNTheam::CalcFunkBatimetr(double a,double b,double h,float R1a,fl
  d3=(con3[0]+b*con3[1])/(con3[2]+a*con3[3]);
 
  double dap[3],dbp[3],dao[3],dbo[3],dhp[3],dho[3];
- /*РџР»СЋСЃ*/
+ /*Плюс*/
  dap[0]=(con1[0]+b*con1[1])/(con1[2]+ap*con1[3]);
  dap[1]=(con2[0]+b*con2[1])/(con2[2]+ap*con2[3]);
  dap[2]=(con3[0]+b*con3[1])/(con3[2]+ap*con3[3]);
@@ -344,7 +344,7 @@ BatimetrResult DNTheam::CalcFunkBatimetr(double a,double b,double h,float R1a,fl
  dhp[1]=(con2[0]+b*con2[1])/(con2[2]+a*con2[3]);
  dhp[2]=(con3[0]+b*con3[1])/(con3[2]+a*con3[3]);
 
- /*РњРёРЅСѓСЃ*/
+ /*Минус*/
  dao[0]=(con1[0]+b*con1[1])/(con1[2]+ao*con1[3]);
  dao[1]=(con2[0]+b*con2[1])/(con2[2]+ao*con2[3]);
  dao[2]=(con3[0]+b*con3[1])/(con3[2]+ao*con3[3]);
@@ -389,13 +389,13 @@ BatimetrResult DNTheam::CalcFunkBatimetr(double a,double b,double h,float R1a,fl
  kho[1]=exp(-2*ho*(con2[7]+b*con2[6]+con2[5]+a*con2[4]));
  kho[2]=exp(-2*ho*(con3[7]+b*con3[6]+con3[5]+a*con3[4]));
 
- /*РџСЂРѕРёР·РІРѕРґРЅС‹Рµ*/
+ /*Производные*/
  d_da[0]=(con1[0]+b*con1[1])*(-1)*con1[3]*(1/((con1[2]+a*con1[3])*(con1[2]+a*con1[3])));
  d_da[1]=(con2[0]+b*con2[1])*(-1)*con2[3]*(1/((con2[2]+a*con2[3])*(con2[2]+a*con2[3])));
  d_da[2]=(con3[0]+b*con3[1])*(-1)*con3[3]*(1/((con3[2]+a*con3[3])*(con3[2]+a*con3[3])));
 
  double d_daap[3],d_dabp[3],d_daao[3],d_dabo[3],d_dahp[3],d_daho[3];
- /*РџР»СЋСЃ*/
+ /*Плюс*/
  d_daap[0]=(con1[0]+b*con1[1])*(-1)*con1[3]*(1/((con1[2]+ap*con1[3])*(con1[2]+ap*con1[3])));
  d_daap[1]=(con2[0]+b*con2[1])*(-1)*con2[3]*(1/((con2[2]+ap*con2[3])*(con2[2]+ap*con2[3])));
  d_daap[2]=(con3[0]+b*con3[1])*(-1)*con3[3]*(1/((con3[2]+ap*con3[3])*(con3[2]+ap*con3[3])));
@@ -408,7 +408,7 @@ BatimetrResult DNTheam::CalcFunkBatimetr(double a,double b,double h,float R1a,fl
  d_dahp[1]=(con2[0]+b*con2[1])*(-1)*con2[3]*(1/((con2[2]+a*con2[3])*(con2[2]+a*con2[3])));
  d_dahp[2]=(con3[0]+b*con3[1])*(-1)*con3[3]*(1/((con3[2]+a*con3[3])*(con3[2]+a*con3[3])));
 
- /*РњРёРЅСѓСЃ*/
+ /*Минус*/
  d_daao[0]=(con1[0]+b*con1[1])*(-1)*con1[3]*(1/((con1[2]+ao*con1[3])*(con1[2]+ao*con1[3])));
  d_daao[1]=(con2[0]+b*con2[1])*(-1)*con2[3]*(1/((con2[2]+ao*con2[3])*(con2[2]+ao*con2[3])));
  d_daao[2]=(con3[0]+b*con3[1])*(-1)*con3[3]*(1/((con3[2]+ao*con3[3])*(con3[2]+ao*con3[3])));
@@ -426,7 +426,7 @@ BatimetrResult DNTheam::CalcFunkBatimetr(double a,double b,double h,float R1a,fl
  d_db[2]=(1/(con3[2]+a*con3[3]))*con3[1];
 
  double d_dbap[3],d_dbao[3],d_dbbp[3],d_dbbo[3],d_dbhp[3],d_dbho[3];
- /*РџР»СЋСЃ*/
+ /*Плюс*/
  d_dbap[0]=(1/(con1[2]+ap*con1[3]))*con1[1];
  d_dbap[1]=(1/(con2[2]+ap*con2[3]))*con2[1];
  d_dbap[2]=(1/(con3[2]+ap*con3[3]))*con3[1];
@@ -438,7 +438,7 @@ BatimetrResult DNTheam::CalcFunkBatimetr(double a,double b,double h,float R1a,fl
  d_dbhp[0]=(1/(con1[2]+a*con1[3]))*con1[1];
  d_dbhp[1]=(1/(con2[2]+a*con2[3]))*con2[1];
  d_dbhp[2]=(1/(con3[2]+a*con3[3]))*con3[1];
- /*РњРёРЅСѓСЃ*/
+ /*Минус*/
  d_dbao[0]=(1/(con1[2]+ao*con1[3]))*con1[1];
  d_dbao[1]=(1/(con2[2]+ao*con2[3]))*con2[1];
  d_dbao[2]=(1/(con3[2]+ao*con3[3]))*con3[1];
@@ -457,7 +457,7 @@ BatimetrResult DNTheam::CalcFunkBatimetr(double a,double b,double h,float R1a,fl
  d_ka[2]=k3*(-2*h*con3[4]);
 
  double d_kaap[3],d_kaao[3],d_kabp[3],d_kabo[3],d_kahp[3],d_kaho[3];
- /*РџР»СЋСЃ*/
+ /*Плюс*/
  d_kaap[0]=kap[0]*(-2*h*con1[4]);
  d_kaap[1]=kap[1]*(-2*h*con2[4]);
  d_kaap[2]=kap[2]*(-2*h*con3[4]);
@@ -470,7 +470,7 @@ BatimetrResult DNTheam::CalcFunkBatimetr(double a,double b,double h,float R1a,fl
  d_kahp[1]=khp[1]*(-2*hp*con2[4]);
  d_kahp[2]=khp[2]*(-2*hp*con3[4]);
 
- /*РњРёРЅСѓСЃ*/
+ /*Минус*/
  d_kaao[0]=kao[0]*(-2*h*con1[4]);
  d_kaao[1]=kao[1]*(-2*h*con2[4]);
  d_kaao[2]=kao[2]*(-2*h*con3[4]);
@@ -489,7 +489,7 @@ BatimetrResult DNTheam::CalcFunkBatimetr(double a,double b,double h,float R1a,fl
  d_kb[2]=k3*(-2*h*con3[6]);
 
  double d_kbap[3],d_kbbp[3],d_kbhp[3],d_kbao[3],d_kbbo[3],d_kbho[3];
- /*РџР»СЋСЃ*/
+ /*Плюс*/
  d_kbap[0]=kap[0]*(-2*h*con1[6]);
  d_kbap[1]=kap[1]*(-2*h*con2[6]);
  d_kbap[2]=kap[2]*(-2*h*con3[6]);
@@ -502,7 +502,7 @@ BatimetrResult DNTheam::CalcFunkBatimetr(double a,double b,double h,float R1a,fl
  d_kbhp[1]=khp[1]*(-2*hp*con2[6]);
  d_kbhp[2]=khp[2]*(-2*hp*con3[6]);
 
- /*РњРёРЅСѓСЃ*/
+ /*Минус*/
  d_kbao[0]=kao[0]*(-2*h*con1[6]);
  d_kbao[1]=kao[1]*(-2*h*con2[6]);
  d_kbao[2]=kao[2]*(-2*h*con3[6]);
@@ -521,7 +521,7 @@ BatimetrResult DNTheam::CalcFunkBatimetr(double a,double b,double h,float R1a,fl
  d_kh[2]=k3*(-2*(con3[7]+b*con3[6]+con3[5]+a*con3[4]));
 
  double d_khap[3],d_khbp[3],d_khhp[3],d_khao[3],d_khbo[3],d_khho[3];
- /*РџР»СЋСЃ*/
+ /*Плюс*/
  d_khap[0]=kap[0]*(-2*(con1[7]+b*con1[6]+con1[5]+ap*con1[4]));
  d_khap[1]=kap[1]*(-2*(con2[7]+b*con2[6]+con2[5]+ap*con2[4]));
  d_khap[2]=kap[2]*(-2*(con3[7]+b*con3[6]+con3[5]+ap*con3[4]));
@@ -534,7 +534,7 @@ BatimetrResult DNTheam::CalcFunkBatimetr(double a,double b,double h,float R1a,fl
  d_khhp[1]=khp[0]*(-2*(con2[7]+b*con2[6]+con2[5]+a*con2[4]));
  d_khhp[2]=khp[0]*(-2*(con3[7]+b*con3[6]+con3[5]+a*con3[4]));
 
- /*РњРёРЅСѓСЃ*/
+ /*Минус*/
  d_khao[0]=kao[0]*(-2*(con1[7]+b*con1[6]+con1[5]+ao*con1[4]));
  d_khao[1]=kao[1]*(-2*(con2[7]+b*con2[6]+con2[5]+ao*con2[4]));
  d_khao[2]=kao[2]*(-2*(con3[7]+b*con3[6]+con3[5]+ao*con3[4]));
@@ -553,7 +553,7 @@ BatimetrResult DNTheam::CalcFunkBatimetr(double a,double b,double h,float R1a,fl
  f3=(0.2895*d3*(1-k3)+R3b*k3-R3a)*1;
 
  double fap[3],fbp[3],fhp[3],fao[3],fbo[3],fho[3];
-/*РџР»СЋСЃ*/
+/*Плюс*/
  fap[0]=(0.2895*dap[0]*(1-kap[0])+R1b*kap[0]-R1a)*1;
  fap[1]=(0.2895*dap[1]*(1-kap[1])+R2b*kap[1]-R2a)*1;
  fap[2]=(0.2895*dap[2]*(1-kap[2])+R3b*kap[2]-R3a)*1;
@@ -566,7 +566,7 @@ BatimetrResult DNTheam::CalcFunkBatimetr(double a,double b,double h,float R1a,fl
  fhp[1]=(0.2895*dhp[1]*(1-khp[1])+R2b*khp[1]-R2a)*1;
  fhp[2]=(0.2895*dhp[2]*(1-khp[2])+R3b*khp[2]-R3a)*1;
 
-/*РњРёРЅСѓСЃ*/
+/*Минус*/
  fao[0]=(0.2895*dao[0]*(1-kao[0])+R1b*kao[0]-R1a)*1;
  fao[1]=(0.2895*dao[1]*(1-kao[1])+R2b*kao[1]-R2a)*1;
  fao[2]=(0.2895*dao[2]*(1-kao[2])+R3b*kao[2]-R3a)*1;
@@ -585,7 +585,7 @@ BatimetrResult DNTheam::CalcFunkBatimetr(double a,double b,double h,float R1a,fl
  d_fa[2]=(0.2895*(d_da[2]*(1-k3)+d3*(-1)*d_ka[2])+R3b*d_ka[2])*1;
 
  double d_faap[3],d_fabp[3],d_fahp[3],d_faao[3],d_fabo[3],d_faho[3];
- /*РџР»СЋСЃ*/
+ /*Плюс*/
  d_faap[0]=(0.2895*(d_daap[0]*(1-kap[0])+dap[0]*(-1)*d_kaap[0])+R1b*d_kaap[0])*1;
  d_faap[1]=(0.2895*(d_daap[1]*(1-kap[1])+dap[1]*(-1)*d_kaap[1])+R2b*d_kaap[1])*1;
  d_faap[2]=(0.2895*(d_daap[2]*(1-kap[2])+dap[2]*(-1)*d_kaap[2])+R3b*d_kaap[2])*1;
@@ -597,7 +597,7 @@ BatimetrResult DNTheam::CalcFunkBatimetr(double a,double b,double h,float R1a,fl
  d_fahp[0]=(0.2895*(d_dahp[0]*(1-khp[0])+dhp[0]*(-1)*d_kahp[0])+R1b*d_kahp[0])*1;
  d_fahp[1]=(0.2895*(d_dahp[1]*(1-khp[1])+dhp[1]*(-1)*d_kahp[1])+R2b*d_kahp[1])*1;
  d_fahp[2]=(0.2895*(d_dahp[2]*(1-khp[2])+dhp[2]*(-1)*d_kahp[2])+R3b*d_kahp[2])*1;
- /*РњРёРЅСѓСЃ*/
+ /*Минус*/
  d_faao[0]=(0.2895*(d_daao[0]*(1-kao[0])+dao[0]*(-1)*d_kaao[0])+R1b*d_kaao[0])*1;
  d_faao[1]=(0.2895*(d_daao[1]*(1-kao[1])+dao[1]*(-1)*d_kaao[1])+R2b*d_kaao[1])*1;
  d_faao[2]=(0.2895*(d_daao[2]*(1-kao[2])+dao[2]*(-1)*d_kaao[2])+R3b*d_kaao[2])*1;
@@ -616,7 +616,7 @@ BatimetrResult DNTheam::CalcFunkBatimetr(double a,double b,double h,float R1a,fl
  d_fb[2]=(0.2895*(d_db[2]*(1-k3)+d3*(-1)*d_kb[2])+R3b*d_kb[2])*1;
 
  double d_fbap[3],d_fbbp[3],d_fbhp[3],d_fbao[3],d_fbbo[3],d_fbho[3];
- /*РџР»СЋСЃ*/
+ /*Плюс*/
  d_fbap[0]=(0.2895*(d_dbap[0]*(1-kap[0])+dap[0]*(-1)*d_kbap[0])+R1b*d_kbap[0])*1;
  d_fbap[1]=(0.2895*(d_dbap[1]*(1-kap[1])+dap[1]*(-1)*d_kbap[1])+R2b*d_kbap[1])*1;
  d_fbap[2]=(0.2895*(d_dbap[2]*(1-kap[2])+dap[2]*(-1)*d_kbap[2])+R3b*d_kbap[2])*1;
@@ -629,7 +629,7 @@ BatimetrResult DNTheam::CalcFunkBatimetr(double a,double b,double h,float R1a,fl
  d_fbhp[1]=(0.2895*(d_dbhp[1]*(1-khp[1])+dhp[1]*(-1)*d_kbhp[1])+R2b*d_kbhp[1])*1;
  d_fbhp[2]=(0.2895*(d_dbhp[2]*(1-khp[2])+dhp[2]*(-1)*d_kbhp[2])+R3b*d_kbhp[2])*1;
 
- /*РњРёРЅСѓСЃ*/
+ /*Минус*/
  d_fbao[0]=(0.2895*(d_dbao[0]*(1-kao[0])+dao[0]*(-1)*d_kbao[0])+R1b*d_kbao[0])*1;
  d_fbao[1]=(0.2895*(d_dbao[1]*(1-kao[1])+dao[1]*(-1)*d_kbao[1])+R2b*d_kbao[1])*1;
  d_fbao[2]=(0.2895*(d_dbao[2]*(1-kao[2])+dao[2]*(-1)*d_kbao[2])+R3b*d_kbao[2])*1;
@@ -648,7 +648,7 @@ BatimetrResult DNTheam::CalcFunkBatimetr(double a,double b,double h,float R1a,fl
  d_fh[2]=(0.2895*d3*(-1)*d_kh[2]+R3b*d_kh[2])*1;
 
  double d_fhap[3],d_fhbp[3],d_fhhp[3],d_fhao[3],d_fhbo[3],d_fhho[3];
- /*РџР»СЋСЃ*/
+ /*Плюс*/
  d_fhap[0]=(0.2895*dap[0]*(-1)*d_khap[0]+R1b*d_khap[0])*1;
  d_fhap[1]=(0.2895*dap[1]*(-1)*d_khap[1]+R2b*d_khap[1])*1;
  d_fhap[2]=(0.2895*dap[2]*(-1)*d_khap[2]+R3b*d_khap[2])*1;
@@ -660,7 +660,7 @@ BatimetrResult DNTheam::CalcFunkBatimetr(double a,double b,double h,float R1a,fl
  d_fhhp[0]=(0.2895*dhp[0]*(-1)*d_khhp[0]+R1b*d_khhp[0])*1;
  d_fhhp[1]=(0.2895*dhp[0]*(-1)*d_khhp[1]+R2b*d_khhp[1])*1;
  d_fhhp[2]=(0.2895*dhp[0]*(-1)*d_khhp[2]+R3b*d_khhp[2])*1;
- /*РњРёРЅСѓСЃ*/
+ /*Минус*/
  d_fhao[0]=(0.2895*dao[0]*(-1)*d_khao[0]+R1b*d_khao[0])*1;
  d_fhao[1]=(0.2895*dao[1]*(-1)*d_khao[1]+R2b*d_khao[1])*1;
  d_fhao[2]=(0.2895*dao[2]*(-1)*d_khao[2]+R3b*d_khao[2])*1;
@@ -687,7 +687,7 @@ BatimetrResult DNTheam::CalcFunkBatimetr(double a,double b,double h,float R1a,fl
  d_FMainLen=sqrt(d_FMainA*d_FMainA+d_FMainB*d_FMainB+d_FMainH*d_FMainH);
 
  double d2_FMainP[9],d2_FMainO[9];
- /*РџР»СЋСЃ*/
+ /*Плюс*/
  d2_FMainP[0]=2*fap[0]*d_faap[0]+2*fap[1]*d_faap[1]+2*fap[2]*d_faap[2];
  d2_FMainP[1]=2*fbp[0]*d_fabp[0]+2*fbp[1]*d_fabp[1]+2*fbp[2]*d_fabp[2];
  d2_FMainP[2]=2*fhp[0]*d_fahp[0]+2*fhp[1]*d_fahp[1]+2*fhp[2]*d_fahp[2];
@@ -699,7 +699,7 @@ BatimetrResult DNTheam::CalcFunkBatimetr(double a,double b,double h,float R1a,fl
  d2_FMainP[6]=2*fap[0]*d_fhap[0]+2*fap[1]*d_fhap[1]+2*fap[2]*d_fhap[2];
  d2_FMainP[7]=2*fbp[0]*d_fhbp[0]+2*fbp[1]*d_fhbp[1]+2*fbp[2]*d_fhbp[2];
  d2_FMainP[8]=2*fhp[0]*d_fhhp[0]+2*fhp[1]*d_fhhp[1]+2*fhp[2]*d_fhhp[2];
- /*РњРёРЅСѓСЃ*/
+ /*Минус*/
  d2_FMainO[0]=2*fao[0]*d_faao[0]+2*fao[1]*d_faao[1]+2*fao[2]*d_faao[2];
  d2_FMainO[1]=2*fbo[0]*d_fabo[0]+2*fbo[1]*d_fabo[1]+2*fbo[2]*d_fabo[2];
  d2_FMainO[2]=2*fho[0]*d_faho[0]+2*fho[1]*d_faho[1]+2*fho[2]*d_faho[2];
@@ -805,14 +805,14 @@ BatimetrResult DNTheam::CalcFunkBatimetr2(double a, double b, double h, float R1
  double f1,f2,f3;
  double d1,d2,d3,k1,k2,k3;
  double lamda1=425.,lamda2=545.,lamda3=605.;
- //double awLamda1=0.0045,awLamda2=0.056,awLamda3=0.240;  //РїРѕРєР°Р·Р°С‚РµР»СЊ РїРѕРіР»РѕС‰РµРЅРёСЏ С‡РёСЃС‚РѕР№ РјРѕСЂСЃРєРѕР№ РІРѕРґРѕР№
- double awLamda1=0.015,awLamda2=0.06,awLamda3=0.245;  //РїРѕРєР°Р·Р°С‚РµР»СЊ РїРѕРіР»РѕС‰РµРЅРёСЏ С‡РёСЃС‚РѕР№ РјРѕСЂСЃРєРѕР№ РІРѕРґРѕР№
- //double bwLamda1=0.004,bwLamda2=0.00135,bwLamda3=0.00093;  //РїРѕРєР°Р·Р°С‚РµР»СЊ СЂР°СЃСЃРµРёРІР°РЅРёСЏ С‡РёСЃС‚РѕР№ РјРѕСЂСЃРєРѕР№ РІРѕРґРѕР№
- double bwLamda1=0.004,bwLamda2=0.0018,bwLamda3=0.00115;  //РїРѕРєР°Р·Р°С‚РµР»СЊ СЂР°СЃСЃРµРёРІР°РЅРёСЏ С‡РёСЃС‚РѕР№ РјРѕСЂСЃРєРѕР№ РІРѕРґРѕР№
- double ALamda1=0.0362,ALamda2=0.009,ALamda3=0.0056; //РєРѕСЌС„С„РёС†РёРµРЅС‚С‹ РґР»СЏ СЂР°СЃС‡РµС‚Р° РїРѕРєРјР·РјС‚РµР»СЏ РїРѕРіР»РѕС‰РµРЅРёСЏ С…Р»РѕСЂРѕС„РёР»Р»РѕРј
- double BLamda1=0.313,BLamda2=0.073,BLamda3=0.093;  //РєРѕСЌС„С„РёС†РёРµРЅС‚С‹ РґР»СЏ СЂР°СЃС‡РµС‚Р° РїРѕРєРјР·РјС‚РµР»СЏ РїРѕРіР»РѕС‰РµРЅРёСЏ С…Р»РѕСЂРѕС„РёР»Р»РѕРј
- double s500=0.017,s501=0.011; //РєРѕСЌС„С„РёС†РёРµРЅС‚С‹ РґР»СЏ СЂР°СЃС‡РµС‚Р° РїРѕРєР°Р·Р°С‚РµР»СЏ РїРѕРіР»РѕС‰РµРЅРёСЏ Р РћР’
- double Cph=0.6; //РєРѕРЅС†РµРЅС‚СЂР°С†РёСЏ С…Р»РѕСЂРѕС„РёР»Р»Р° РјРі/Рј3
+ //double awLamda1=0.0045,awLamda2=0.056,awLamda3=0.240;  //показатель поглощения чистой морской водой
+ double awLamda1=0.015,awLamda2=0.06,awLamda3=0.245;  //показатель поглощения чистой морской водой
+ //double bwLamda1=0.004,bwLamda2=0.00135,bwLamda3=0.00093;  //показатель рассеивания чистой морской водой
+ double bwLamda1=0.004,bwLamda2=0.0018,bwLamda3=0.00115;  //показатель рассеивания чистой морской водой
+ double ALamda1=0.0362,ALamda2=0.009,ALamda3=0.0056; //коэффициенты для расчета покмзмтеля поглощения хлорофиллом
+ double BLamda1=0.313,BLamda2=0.073,BLamda3=0.093;  //коэффициенты для расчета покмзмтеля поглощения хлорофиллом
+ double s500=0.017,s501=0.011; //коэффициенты для расчета показателя поглощения РОВ
+ double Cph=0.6; //концентрация хлорофилла мг/м3
 
  double F,hMain=-1;
  double con1[8],con2[8],con3[8];
@@ -852,7 +852,7 @@ BatimetrResult DNTheam::CalcFunkBatimetr2(double a, double b, double h, float R1
 
  hMain=-5;
 
- // РћРїРёСЃР°РЅРёРµ РёСЃС…РѕРґРЅС‹С… СѓСЂР°РІРЅРµРЅРёР№
+ // Описание исходных уравнений
 
  d1=(con1[0]+b*con1[1])/(con1[2]+a*con1[3]);
  d2=(con2[0]+b*con2[1])/(con2[2]+a*con2[3]);
@@ -903,19 +903,19 @@ double DNTheam::CalcFunkBatimetrNew(int TypeBottom,float R485, float R560,float 
 
  TypeBottom=1;
 
- if(TypeBottom==0) //РњР°РєСЂРѕС„РёС‚С‹
+ if(TypeBottom==0) //Макрофиты
  {
   Rb[0]=0.025;
   Rb[1]=0.1;
   Rb[2]=0.13;
  }
- if(TypeBottom==1)  //РџРµСЃРѕРє
+ if(TypeBottom==1)  //Песок
  {
   Rb[0]=0.1;
   Rb[1]=0.18;
   Rb[2]=0.22;
  }
- if(TypeBottom==2) //Р’РѕРґРѕСЂРѕСЃР»Рё
+ if(TypeBottom==2) //Водоросли
  {
   Rb[0]=0.025;
   Rb[1]=0.07;

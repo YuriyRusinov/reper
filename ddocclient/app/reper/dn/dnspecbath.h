@@ -9,14 +9,14 @@
 #include <QInputDialog>
 #include <QSettings>
 #include <QTreeWidgetItem>
-#include "ui_DlgShowDeptch.h"
 #include "gdal_priv.h"
 #include "dn/Added/dnimagelib.h"
 #include "dn/imagearea.h"
 #include "dn/Added/First/structs.h"
 #include "dn/Added/dnpoly.h"
 #include "dn/Added/dnvector.h"
-//#include "dnwidgetimage.h"
+#include "ui_DlgShowDeptch.h"
+#include "ui_dnspecbath.h"
 
 namespace Ui {
 class DNSpecBath;
@@ -40,9 +40,9 @@ public:
     QString NameOrg;
     QString AppDir;
     QList <QString> NamesPoly;
-    QString CurrentNamePoly; //РРјСЏ С‚РµРєСѓС‰РµРіРѕ РїРѕР»РёРіРѕРЅР°
-    QString CurrentNameClassif; //РРјСЏ С‚РµРєСѓС‰РµР№ РєР»Р°СЃСЃРёС„РёРєР°С†РёРё (СЃРѕРґРµСЂР¶РёС‚ С‚Р°РєР¶Рµ РёРјСЏ РїРѕР»РёРіРѕРЅР° Рє РєРѕС‚РѕСЂРѕРјСѓ РїСЂРёРјРµРЅРµРЅР° РєР»Р°СЃСЃРёС„РёРєР°С†РёСЏ)
-    bool IsCurPolyClassif; //РџСЂРёР·РЅР°Рє С‚РѕРіРѕ С‡С‚Рѕ С‚РµРєСѓС‰Р°СЏ РїРѕР·РёС†РёСЏ СЏРІР»СЏРµС‚СЃСЏ СЂРµР·СѓР»СЊС‚Р°С‚РѕРј РєР»Р°СЃСЃРёС„РёРєР°С†РёРё
+    QString CurrentNamePoly; //Имя текущего полигона
+    QString CurrentNameClassif; //Имя текущей классификации (содержит также имя полигона к которому применена классификация)
+    bool IsCurPolyClassif; //Признак того что текущая позиция является результатом классификации
     bool IsTreePolygonClear;
     QList <DNVector> Polygons;
 
@@ -68,14 +68,14 @@ private:
     Ui::DNSpecBath *ui;
     QString FileNameLast;
 
-    void FillMainForm(); //Р—Р°РїРѕР»РЅРёС‚СЊ С„РѕСЂРјСѓ РіР»Р°РІРЅРѕРіРѕ РѕРєРЅР°
-    void FillTreePolygons(QString StartPath, QTreeWidgetItem *ItemParent); //Р—Р°РїРѕР»РЅРёС‚СЊ РґРµСЂРµРІРѕ РїРѕР»РёРіРѕРЅРѕРІ
-    void FillTreePolygons(QString StartPath, QTreeWidget *ItemParent); //Р—Р°РїРѕР»РЅРёС‚СЊ РґРµСЂРµРІРѕ РїРѕР»РёРіРѕРЅРѕРІ
-    void FillStackPolygons(); //Р—Р°РїРѕР»РЅРёС‚СЊ СЃС‚СЌРє РїРѕР»РёРіРѕРЅРѕРІ
+    void FillMainForm(); //Заполнить форму главного окна
+    void FillTreePolygons(QString StartPath, QTreeWidgetItem *ItemParent); //Заполнить дерево полигонов
+    void FillTreePolygons(QString StartPath, QTreeWidget *ItemParent); //Заполнить дерево полигонов
+    void FillStackPolygons(); //Заполнить стэк полигонов
     void ReadFilePoly(QString PolyFileName);
     void ReadFileClassif(QString PolyFileClassif);
     QString NamePolyToFile(QString NamePoly);
-    void ChangeCurrentPoly(); //РЎРѕР±С‹С‚РёРµ РёР·РјРµРЅРµРЅРёСЏ С‚РµРєСѓС‰РµРіРѕ РїРѕР»РёРіРѕРЅР°
+    void ChangeCurrentPoly(); //Событие изменения текущего полигона
 
 
 protected:

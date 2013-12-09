@@ -1,4 +1,4 @@
-п»ї#include "dnwidgetimage.h"
+#include "dnwidgetimage.h"
 
 DNWidgetImage::DNWidgetImage(QWidget *parent) :
     QWidget(parent)
@@ -49,7 +49,7 @@ void DNWidgetImage::paintEvent(QPaintEvent *pe)
  Color=Qt::magenta;
  Painter.begin(this);
 
- //Р•СЃР»Рё РєР°СЂС‚РёРЅРєР° Р·Р°РіСЂСѓР¶РµРЅР°
+ //Если картинка загружена
  if(this->isImgLoad)
  {
   ww=(int)(this->img.width()/**this->NewKof*/);
@@ -59,7 +59,7 @@ void DNWidgetImage::paintEvent(QPaintEvent *pe)
   Painter.drawImage(0,0,this->img/*Scale*/,0,0);
  }//if(this->LoadImg)
 
-//РћС‚СЂРёСЃРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РїРѕР»РёРіРѕРЅР°
+//Отрисовка текущего полигона
 
  if(this->Polygon.pt.size()>0)
  {
@@ -110,7 +110,7 @@ void DNWidgetImage::paintEvent(QPaintEvent *pe)
    Painter.drawPolygon(Polygon);
   }
 
-//Р•СЃР»Рё Рє С‚РµРєСѓС‰РµРјСѓ РїРѕР»РёРіРѕРЅСѓ РїСЂРёРјРµРЅСЏР»РёСЃСЊ РјРµС‚РѕРґС‹ РєР»Р°СЃСЃРёС„РёРєР°С†РёРё С‚Рѕ РѕС‚СЂРёСЃРѕРІС‹РІР°РµРј РЅР° РїРѕР»РёРіРѕРЅРµ СЂРµР·СѓР»СЊС‚Р°С‚С‹ РєР»Р°СЃСЃРёС„РёРєР°С†РёРё
+//Если к текущему полигону применялись методы классификации то отрисовываем на полигоне результаты классификации
   if(this->Polygon.IsPolyClassif)
   {
    this->Polygon.maxY=this->Polygon.GetMaxP().y();
@@ -118,14 +118,14 @@ void DNWidgetImage::paintEvent(QPaintEvent *pe)
    this->Polygon.maxX=this->Polygon.GetMaxP().x();
    this->Polygon.minX=this->Polygon.GetMinP().x();
 
-//Р Р°Р·РјРµСЂ РѕС‚СЂРёСЃРѕРІРєРё РєР»Р°СЃСЃРёС„РёС†РёСЂРѕРІР°РЅРЅРѕР№ РѕР±Р»Р°СЃС‚Рё СЃ СѓС‡С‘С‚РѕРј С‚РµРєСѓС‰РµРіРѕ РјР°СЃС€С‚Р°Р±Р° РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
+//Размер отрисовки классифицированной области с учётом текущего масштаба изображения
    int ThisWK=(this->Polygon.maxX-this->Polygon.minX)*this->NewKof;
    int ThisHK=(this->Polygon.maxY-this->Polygon.minY)*this->NewKof;
 
    int ThisW=(this->Polygon.maxX-this->Polygon.minX);
    int ThisH=(this->Polygon.maxY-this->Polygon.minY);
 
-//РџРµСЂРµРјРµРЅРЅС‹Рµ РїРµСЂРµРІРѕРґР° РёР· РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°РЅРЅРѕРіРѕ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ РІ РЅРѕСЂРјР°Р»СЊРЅРѕРµ
+//Переменные перевода из масштабированного изображения в нормальное
    int xp,yp;
 
    for(int jy=0;jy<ThisHK;jy++)
@@ -145,7 +145,7 @@ void DNWidgetImage::paintEvent(QPaintEvent *pe)
   }//if(this->Polygon.IsPolyClassif)
  }//if(this->KolvoPixPoly>0)
 
- //РћС‚СЂРёСЃРѕРІРєР° РїРѕР»РёРіРѕРЅРѕРІ
+ //Отрисовка полигонов
 
  if(this->Polygons.size()>0)
  {
@@ -198,7 +198,7 @@ void DNWidgetImage::mousePressEvent(QMouseEvent *mEvent)
  QPoint Point;
  x=this->MouseX/this->NewKof;
  y=this->MouseY/this->NewKof;
- if(this->IsCretaePolyOn) //Р•СЃР»Рё РІС‹Р±СЂР°РЅ РїСѓРЅРєС‚ РјРµРЅСЋ Р’С‹РґРµР»РёС‚СЊ РїРѕР»РёРіРѕРЅ
+ if(this->IsCretaePolyOn) //Если выбран пункт меню Выделить полигон
  {
   Point.setX(x);
   Point.setY(y);
@@ -306,7 +306,7 @@ QPoint DNImgPoly::GetMaxP()
  return Point;
 }
 
-/*Р’С‹РґРµР»РµРЅРёРµ РїРѕР»РёРіРѕРЅР°*/
+/*Выделение полигона*/
 void DNImgPoly::SelectPolygon()
 {
  int MassW,MassH;
@@ -341,7 +341,7 @@ void DNImgPoly::SelectPolygon()
  }//if(this->pt.size()>2)
 }
 
-/*РџСЂРѕРІРµСЂРєР° РїРѕРїР°РґР°РµС‚ Р»Рё С‚РѕС‡РєР° РІ РїРѕР»РёРіРѕРЅ*/
+/*Проверка попадает ли точка в полигон*/
 bool DNImgPoly::IsPointInside(int xp,int yp)
 {
  int intersections_num = 0;

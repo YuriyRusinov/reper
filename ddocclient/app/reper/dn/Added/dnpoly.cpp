@@ -1,12 +1,12 @@
 /*
-РљР»Р°СЃСЃ РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ С„Р°Р№Р»РѕРј СЃРїРµРєС‚СЂР°Р»СЊРЅС‹С… РґР°РЅРЅС‹С… СѓРЅРёРІРµСЂСЃР°Р»СЊРЅРѕРіРѕ СЂР°Р·РјРµСЂР°
-Р¤РѕСЂРјР°С‚ С„Р°Р№Р»Р°:
-1. СЃС‚СЂСѓРєС‚СѓСЂР°, РІ РєРѕС‚РѕСЂРѕР№ РѕРїСЂРµРґРµР»РµРЅС‹ РѕСЃРЅРѕРІРЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹,
-2. РјР°СЃСЃРёРІ РїРѕР»РёРіРѕРЅР° -1 - С‚РѕС‡РєР° РЅРµ СЂР°СЃСЃРјР°С‚СЂРёРІР°РµС‚СЃСЏ, 1 - С‚РѕС‡РєР° СЂР°СЃСЃРјР°С‚СЂРёРІР°РµС‚СЃСЏ
-3. РјР°СЃСЃРёРІ РєРѕРѕСЂРґРёРЅР°С‚ РІРµСЂС€РёРЅ РјРЅРѕРіРѕСѓРіРѕР»СЊРЅРёРєР°
-4. СЃРїРµРєС‚СЂР°Р»СЊРЅС‹Рµ РґР°РЅРЅС‹Рµ
+Класс для работы с файлом спектральных данных универсального размера
+Формат файла:
+1. структура, в которой определены основные параметры,
+2. массив полигона -1 - точка не рассматривается, 1 - точка рассматривается
+3. массив координат вершин многоугольника
+4. спектральные данные
 
-x Рё y Р·Р°РґР°СЋС‚СЃСЏ РІ РєРѕРѕСЂРґРёРЅР°С‚Р°С… РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
+x и y задаются в координатах изображения
 */
 
 #include "dnpoly.h"
@@ -57,7 +57,7 @@ DNPoly::DNPoly(QString SerFileName)
  this->OffsetData=SerFile.pos();
  SerFile.close();
 
-//Р—Р°РїРѕР»РЅРµРЅРёСЏ РјР°СЃСЃРёРІР° РєР»Р°СЃСЃРёС„РёРєР°С†РёРё
+//Заполнения массива классификации
  for(jy=0;jy<H;jy++)
  {
   for(jx=0;jx<W;jx++)
@@ -79,7 +79,7 @@ DNPoly::DNPoly(QString SerFileName)
    this->px++;
  }
 
- //РЈСЃС‚Р°РЅРѕРІРєР° РЅР°С‡Р°Р»СЊРЅС‹С… Р·РЅР°С‡РµРЅРёР№
+ //Установка начальных значений
  this->IsPolyClassif=FALSE;
 }
 DNPoly::~DNPoly()
@@ -92,8 +92,8 @@ DNPoly::~DNPoly()
   delete[] this->ClassifMass;
 }
 
-/*Р¤СѓРЅРєС†РёРё РѕРїСЂРµРґРµР»РµРЅРёСЏ СЃРїРµРєС‚СЂР°Р»СЊРЅС‹С… С…Р°СЂР°РєС‚РµСЂРёСЃС‚РёРє*/
-/*Р’Р·СЏС‚СЊ СЃРїРµРєС‚СЂ РѕРґРЅРѕР№ С‚РѕС‡РєРё*/
+/*Функции определения спектральных характеристик*/
+/*Взять спектр одной точки*/
 void DNPoly::GetSpectrPoint(int x,int y,float *DataSpec,bool *MaskCh)
 {
  QFile SerFile(this->SerFileName);
@@ -104,7 +104,7 @@ void DNPoly::GetSpectrPoint(int x,int y,float *DataSpec,bool *MaskCh)
  x=x-this->xn;
  y=y-this->yn;
 
- // РЈР·РЅР°С‘Рј РєРѕР»РёС‡РµСЃС‚РІРѕ РєР°РЅР°Р»РѕРІ РёРЅС‚РµСЂРµСЃР°
+ // Узнаём количество каналов интереса
  ThisCh=0;
  for(i=0;i<this->Ch;i++)
  {
@@ -131,7 +131,7 @@ void DNPoly::GetSpectrPoint(int x,int y,float *DataSpec,bool *MaskCh)
  }//for(i=0;i<this->Ch;i++)
  delete[] SpecPoint;
 }
-/*Р’Р·СЏС‚СЊ СЃРїРµРєС‚СЂ СЃС‚СЂРѕРєРё*/
+/*Взять спектр строки*/
 void DNPoly::GetSpectrString(int y,float *DataSpec,bool *MaskCh)
 {
  QFile SerFile(this->SerFileName);
@@ -145,7 +145,7 @@ void DNPoly::GetSpectrString(int y,float *DataSpec,bool *MaskCh)
  if(y==132)
   proba=0;
 
- // РЈР·РЅР°С‘Рј РєРѕР»РёС‡РµСЃС‚РІРѕ РєР°РЅР°Р»РѕРІ РёРЅС‚РµСЂРµСЃР°
+ // Узнаём количество каналов интереса
  ThisCh=0;
  for(i=0;i<this->Ch;i++)
  {
@@ -177,14 +177,14 @@ void DNPoly::GetSpectrString(int y,float *DataSpec,bool *MaskCh)
  }//for(j=0;j<this->W;j++)
  delete[] SpecStr;
 }
-/*Р’Р·СЏС‚СЊ СЃРїРµРєС‚СЂ СѓС‡Р°СЃС‚РєР° РёР·РѕР±СЂР°Р¶РµРЅРёСЏ, РѕР±РѕР·РЅР°С‡РµРЅРЅРѕРіРѕ РІ РјР°СЃСЃРёРІРµ CurentPoly*/
+/*Взять спектр участка изображения, обозначенного в массиве CurentPoly*/
 void DNPoly::GetSpectrZone(float *DataSpec,bool *MaskCh)
 {
  int jx,jy,i,ThisCh,iCh;
  float *SpecString,proba;
  unsigned long long ip;
 
- // РЈР·РЅР°С‘Рј РєРѕР»РёС‡РµСЃС‚РІРѕ РєР°РЅР°Р»РѕРІ РёРЅС‚РµСЂРµСЃР°
+ // Узнаём количество каналов интереса
  ThisCh=0;
  for(i=0;i<this->Ch;i++)
  {
@@ -218,7 +218,7 @@ void DNPoly::GetSpectrZone(float *DataSpec,bool *MaskCh)
 
  delete[]SpecString;
 }
-/*Р’Р·СЏС‚СЊ СЏСЂРєРѕСЃС‚СЊ РІСЃРµС… С‚РѕС‡РµРє РїРѕР»РёРіРѕРЅР° РІ РѕРїСЂРµРґРµР»С‘РЅРЅРѕРј РєР°РЅР°Р»Рµ*/
+/*Взять яркость всех точек полигона в определённом канале*/
 void DNPoly::GetBrigthChanPoly(float *DataSpec,int nCh,bool *NoBlackPixels)
 {
  int jx,jy,i,xn,yn,xk,yk;
@@ -282,7 +282,7 @@ void DNPoly::GetBrigthChanPoly(float *DataSpec,int nCh,bool *NoBlackPixels)
  delete[]SpecString;
  delete[]MaskCh;
 }
-/*Р’Р·СЏС‚СЊ СЏСЂРєРѕСЃС‚СЊ РІ РєР°РЅР°Р»Рµ РїСЏРјРѕСѓРіРѕР»СЊРЅРёРєР° РІ РєРѕС‚РѕСЂРѕРј РЅР°С…РѕРґРёС‚СЃСЏ РёСЃС…РѕРґРµС‹Р№ РїРѕР»РёРіРѕРЅ*/
+/*Взять яркость в канале пямоугольника в котором находится исходеый полигон*/
 void DNPoly::GetBrigthSqare(float *DataSpec,int nCh)
 {
  bool *MaskChan;
@@ -312,7 +312,7 @@ void DNPoly::GetBrigthSqare(float *DataSpec,int nCh)
  delete[] SpecStr;
  delete[] MaskChan;
 }
-/*РЈРјРЅРѕР¶РёС‚СЊ РІСЃРµ Р·РЅР°С‡РµРЅРёСЏ СЏСЂРєРѕСЃС‚Рё РЅР° РјРЅРѕР¶РёС‚РµР»СЊ*/
+/*Умножить все значения яркости на множитель*/
 void DNPoly::MultiCh(float Kof)
 {
  PolygonProp HeaderStruct;
@@ -377,8 +377,8 @@ void DNPoly::MultiCh(float Kof)
  delete[] SpecString;
  delete[] SpecStringNew;
 }
-/*Р¤СѓРЅРєС†РёРё РѕРїСЂРµРґРµР»РµРЅРёСЏ СЃС‚Р°С‚РёСЃС‚РёС‡РµСЃРєРёС… РїР°СЂР°РјРµС‚СЂРѕРІ РѕРєСЂСѓР¶РµРЅРёСЏ С‚РѕС‡РєРё*/
-/*Р’С‹С‡РёСЃР»РёС‚СЊ СЌРЅС‚СЂРѕРїРёСЋ РѕРєСЂСѓР¶РµРЅРёСЏ С‚РѕС‡РєРё*/
+/*Функции определения статистических параметров окружения точки*/
+/*Вычислить энтропию окружения точки*/
 float DNPoly::GetEntropPoint(int x,int y,int nPixels,quint64 KDiskr,int NumCh)
 {
  QList <QPoint> SelectPix;
@@ -407,7 +407,7 @@ float DNPoly::GetEntropPoint(int x,int y,int nPixels,quint64 KDiskr,int NumCh)
  SelectPix.clear();
  return EntropPix[0];
 }
-/*Р’С‹С‡РёСЃР»РёС‚СЊ РЎРљРћ РѕРєСЂСѓР¶РµРЅРёСЏ С‚РѕС‡РєРё*/
+/*Вычислить СКО окружения точки*/
 float DNPoly::GetSKOPoint(int x,int y,int nPixels,int NumCh)
 {
  QList <QPoint> SelectPix;
@@ -433,8 +433,8 @@ float DNPoly::GetSKOPoint(int x,int y,int nPixels,int NumCh)
  SelectPix.clear();
  return SKOPix[0];
 }
-/*Р¤СѓРЅРєС†РёРё СЂР°Р±РѕС‚С‹ СЃ РїРѕР»РёРіРѕРЅР°РјРё*/
-/*Р’С‹РґРµР»РёС‚СЊ РїРѕР»РёРіРѕРЅ Рє РєРѕС‚РѕСЂРѕРјСѓ РїСЂРёРЅР°РґР»РµР¶РёС‚ Р·Р°РґР°РЅРЅР°СЏ С‚РѕС‡РєР° (РїРѕР»СѓС‡РёС‚СЊ РјР°СЃСЃРёРІ NoBlackPixels)*/
+/*Функции работы с полигонами*/
+/*Выделить полигон к которому принадлежит заданная точка (получить массив NoBlackPixels)*/
 quint64 DNPoly::GetKolvoPointPoly(int x,int y,int *MassIsh,bool *NoBlackPixels)
 {
  bool *Prover;
@@ -536,14 +536,14 @@ quint64 DNPoly::GetKolvoPointPoly(int x,int y,int *MassIsh,bool *NoBlackPixels)
  delete[] Prover;
  return KolvoPix;
 }
-/*РЎС‚Р°С‚РёСЃС‚РёС‡РµСЃРєРёРµ С…Р°СЂР°РєС‚РµСЂРёСЃС‚РёРєРё РїРѕР»РёРіРѕРЅРѕРІ*/
+/*Статистические характеристики полигонов*/
 void DNPoly::GetMidlSpecPoly(bool *NoBlackPixels,unsigned long long KolvoPixPoly,float *MidlSpecPoly,bool *MaskCh)
 {
  int jx,jy,i,ThisCh,iCh;
  float *SpecString;
  unsigned long long ip;
 
- // РЈР·РЅР°С‘Рј РєРѕР»РёС‡РµСЃС‚РІРѕ РєР°РЅР°Р»РѕРІ РёРЅС‚РµСЂРµСЃР°
+ // Узнаём количество каналов интереса
  ThisCh=0;
  for(i=0;i<this->Ch;i++)
  {
@@ -619,7 +619,7 @@ void DNPoly::GetEntropPoly(bool *NoBlackPixels,unsigned long long KolvoPixPoly, 
 
  delete[] DataSpec;
 }
-/*Р¤СѓРЅРєС†РёРё СЂР°Р±РѕС‚С‹ СЃ РєР»Р°СЃСЃР°РјРё*/
+/*Функции работы с классами*/
 quint64 DNPoly::GetKolvoPointClass(int NumKl,int *MassIsh,bool *NoBlackPixels)
 {
  quint64 KolPoint=0;
@@ -665,7 +665,7 @@ void DNPoly::GetMidleSpectrClass(float *DataSpec,quint64 KPoint,int NumClass,int
 {
  float *SpecString;
  //quint64 KPoint;
- // РЈР·РЅР°С‘Рј РєРѕР»РёС‡РµСЃС‚РІРѕ РєР°РЅР°Р»РѕРІ РёРЅС‚РµСЂРµСЃР°
+ // Узнаём количество каналов интереса
  int ThisCh=0;
  for(int i=0;i<this->Ch;i++)
  {
@@ -690,7 +690,7 @@ void DNPoly::GetMidleSpectrClass(float *DataSpec,quint64 KPoint,int NumClass,int
 
  delete[] SpecString;
 }
-/*Р¤СѓРЅРєС†РёРё РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ СЃРїРµРєС‚СЂР°Р»СЊРЅС‹С… РєР°РЅР°Р»РѕРІ*/
+/*Функции преобразования спектральных каналов*/
 void DNPoly::AddChanal(QString Formula)
 {
  PolygonProp HeaderStruct;
@@ -967,14 +967,14 @@ void DNPoly::CreateIndexImg(QString BMPFileName,int NumCh)
      this->GetSpectrString(jy+this->yn,SerString,MaskCh);
      for(int jx=0;jx<this->W;jx++)
      {
-      /*Р•СЃР»Рё С‚РѕС‡РєР° РїРµСЂРІР°СЏ С‚Рѕ Р·Р°РїРѕРјРёРЅР°РµРј РµС‘ С…Р°СЂР°РєС‚РµСЂРёСЃС‚РёРєРё*/
+      /*Если точка первая то запоминаем её характеристики*/
       if(this->MassPoly[jx+jy*this->W]>=0 && FlagZap==FALSE)
       {
        MaxBright=SerString[jx];
        MinBright=SerString[jx];
        FlagZap=TRUE;
       }//if(jy==0 && jx==0)
-      /*Р•СЃР»Рё С‚РѕС‡РєР° РЅРµ РїРµСЂРІР°СЏ*/
+      /*Если точка не первая*/
       if(this->MassPoly[jx+jy*this->W]>=0 && FlagZap==TRUE)
       {
        if(MaxBright<=SerString[jx])
@@ -990,7 +990,7 @@ void DNPoly::CreateIndexImg(QString BMPFileName,int NumCh)
     KofMain=255/(MaxBright-MinBright);
 
 
-    /*РЎРѕР·РґР°РЅРёРµ  BMP С„Р°Р№Р»Р°*/
+    /*Создание  BMP файла*/
 
 
     int den=0;
@@ -1205,8 +1205,8 @@ float DNPoly::CalcMidleBrigth(int NumCh1,int NumCh2,float *SpecData)
  return MidleSpec;
 }
 
-/*Р¤СѓРЅРєС†РёРё С„РёР»СЊС‚СЂР°С†РёРё РєР°РЅР°Р»РѕРІ*/
-/*Р›РёРЅРµР№РЅР°СЏ С„РёР»СЊС‚СЂР°С†РёСЏ*/
+/*Функции фильтрации каналов*/
+/*Линейная фильтрация*/
 float* DNPoly::LinearFilter(int side,float *Apert,float Kof,int NumCh)
 {
  float *NewCh;
@@ -1262,8 +1262,8 @@ float* DNPoly::LinearFilter(int side,float *Apert,float Kof,int NumCh)
 }
 /***********************************************************************************/
 
-/*РњРµС‚РѕРґС‹ СЃРµР»РµРєС†РёРё Рё РІС‹РґРµР»РµРЅРёСЏ*/
-/*Р’РѕР»С€РµР±РЅР°СЏ РїР°Р»РѕС‡РєР°*/
+/*Методы селекции и выделения*/
+/*Волшебная палочка*/
 quint64 DNPoly::MagicWand(bool *NoBlackPixels,int x,int y,float Contrast,int NumCh, int mode,bool *NoBlackPixels2)
 {
  x=x-this->xn;
@@ -1271,7 +1271,7 @@ quint64 DNPoly::MagicWand(bool *NoBlackPixels,int x,int y,float Contrast,int Num
  quint64 KolvoPx;
  KolvoPx=-1;
 
-/*Р•СЃР»Рё Р·Р°РґР°РЅРЅР°СЏ С‚РѕС‡РєР° РїСЂРµРЅР°РґР»РµР¶РёС‚ РѕС†РµРЅРёРІР°РµРјРѕРјСѓ РїРѕР»РёРіРѕРЅСѓ*/
+/*Если заданная точка пренадлежит оцениваемому полигону*/
  if(NoBlackPixels[x+y*this->W])
  {
   float *SpectrData,CContrast;
@@ -1296,7 +1296,7 @@ quint64 DNPoly::MagicWand(bool *NoBlackPixels,int x,int y,float Contrast,int Num
   dy[3]=1;
 
   Prover=new bool[this->W*this->H];
-//РЈСЃС‚Р°РЅРѕРІРєР° РЅР°С‡Р°Р»СЊРЅС‹С… Р·РЅР°С‡РµРЅРёР№ СЌР»РµРјРµРЅС‚РѕРІ РІС‹С…РѕРґРЅРѕРіРѕ РјР°СЃСЃРёРІР°
+//Установка начальных значений элементов выходного массива
   KolvoPx=0;
   for(quint64 i=0;i<this->W*this->H;i++)
   {
@@ -1304,11 +1304,11 @@ quint64 DNPoly::MagicWand(bool *NoBlackPixels,int x,int y,float Contrast,int Num
    Prover[i]=FALSE;
   }
 
-//РџРѕР»СѓС‡РµРЅРёРµ СЏСЂРєРѕСЃС‚Рё С‚РѕС‡РµРє РїРѕР»РёРіРѕРЅР° РІ РєР°РЅР°Р»Рµ
+//Получение яркости точек полигона в канале
   SpectrData=new float[this->W*this->H];
   this->GetBrigthSqare(SpectrData,NumCh);
 
-//РЇСЂРєРѕСЃС‚СЊ РїРµСЂРІРѕР№ С‚РѕС‡РєРё
+//Яркость первой точки
   FirstPix=SpectrData[x+y*this->W];
   Pix1.setX(x);
   Pix1.setY(y);
@@ -1334,23 +1334,23 @@ quint64 DNPoly::MagicWand(bool *NoBlackPixels,int x,int y,float Contrast,int Num
       do{
          AtherPix=SpectrData[xc+yc*this->W];
          Prover[xc+yc*this->W]=TRUE;
-         //Р•СЃР»Рё СЃС‡РёС‚Р°РµРј РїРѕ РєРѕРЅС‚СЂР°СЃС‚Сѓ СЃ РїРµСЂРІРѕР№ С‚РѕС‡РєРѕР№
+         //Если считаем по контрасту с первой точкой
          if(mode==0)
          {
           CContrast=(AtherPix-FirstPix)/(AtherPix+FirstPix);
          }//if(mode==0)
-         //Р•СЃР»Рё СЃС‡РёС‚Р°РµРј РїРѕ СЏСЂРєРѕСЃС‚Рё
+         //Если считаем по яркости
          if(mode==1)
          {
           CContrast=AtherPix;
          }//if(mode==1)
-         //Р•СЃР»Рё СЃС‡РёС‚Р°РµРј РїРѕ РєРѕРЅС‚СЂР°СЃС‚Сѓ СЃРјРµР¶РЅС‹С… С‚РѕС‡РµРє
+         //Если считаем по контрасту смежных точек
          if(mode==2)
          {
           CContrast=(AtherPix-FirstPix)/(AtherPix+FirstPix);
           FirstPix=AtherPix;
          }//if(mode==0)
-         //Р•СЃР»Рё СѓСЃР»РѕРІРёРµ РІС‹РїРѕР»РЅСЏРµС‚СЃСЏ Р·Р°РїРёСЃС‹РІР°РµРј С‚РѕС‡РєСѓ РІ СЃС‚РµРє
+         //Если условие выполняется записываем точку в стек
          if(fabs(CContrast)<=fabs(Contrast))
          {
           Pix2.setX(xc);
@@ -1377,7 +1377,7 @@ quint64 DNPoly::MagicWand(bool *NoBlackPixels,int x,int y,float Contrast,int Num
 
  }//if(NoBlackPixels[x+y*this->W])
 
-//Р—Р°РїРѕР»РЅРµРЅРёРµ РјР°СЃСЃРёРІР° РєР»Р°СЃСЃРёС„РёРєР°С†РёРё
+//Заполнение массива классификации
  if(KolvoPx>0)
  {
   this->IsPolyClassif=TRUE;
@@ -1415,7 +1415,7 @@ int DNPoly::IsoData(bool *NoBlackPixels,int KolvoClass,float MaxSKO,float Qc,int
 
  int ProgR,ProgCV;
 
- //РћРїСЂРµРґРµР»СЏРµРј РєРѕР»РёС‡РµСЃС‚РІРѕ Р°РЅР°Р»РёР·РёСЂСѓРµРјС‹С… С‚РѕС‡РµРє
+ //Определяем количество анализируемых точек
  KPix=0;
  ClassOne.Dsr=0;
  ClassOne.KPix=0;
@@ -1430,7 +1430,7 @@ int DNPoly::IsoData(bool *NoBlackPixels,int KolvoClass,float MaxSKO,float Qc,int
   }
  }//for(quint64 i=0;i<this->W*this->H;i++)
 
- //РћРїСЂРµРґРµР»СЏРµРј РєРѕР»РёС‡РµСЃС‚РІРѕ Р°РЅР°Р»РёР·РёСЂСѓРµРјС‹С… РєР°РЅР°Р»РѕРІ
+ //Определяем количество анализируемых каналов
  ThisCh=0;
  for(int i=0;i<this->Ch;i++)
  {
@@ -1441,11 +1441,11 @@ int DNPoly::IsoData(bool *NoBlackPixels,int KolvoClass,float MaxSKO,float Qc,int
  SpectrString=new float[this->W*ThisCh];
  Mass1=new float[ThisCh];
 
- //Р—Р°РґР°С‘Рј РЅР°С‡Р°Р»СЊРЅС‹Рµ СѓСЃР»РѕРІРёСЏ
+ //Задаём начальные условия
  Classes<<ClassOne;
  Classes[0].Zk=new float[ThisCh];
  Classes[0].SKO=new float[ThisCh];
- KolvoI=0; //РљРѕР»РёС‡РµСЃС‚РІРѕ РёС‚РµСЂР°С†РёР№
+ KolvoI=0; //Количество итераций
 
  ProgR=3*I+1;
  ProgCV=0;
@@ -1465,7 +1465,7 @@ int DNPoly::IsoData(bool *NoBlackPixels,int KolvoClass,float MaxSKO,float Qc,int
     for(int i=0;i<Classes.size();i++)
      Classes[i].KPix=0;
 
-//РЁР°Рі 2 Р Р°СЃРїСЂРµРґРµР»РµРЅРёРµ С‚РѕС‡РµРє СЃРѕРіР»Р°СЃРЅРѕ С†РµРЅС‚СЂР°Рј РєР»Р°СЃС‚РµСЂРѕРІ
+//Шаг 2 Распределение точек согласно центрам кластеров
     for(int jy=0;jy<this->H;jy++)
     {
      this->GetSpectrString(jy+this->yn,SpectrString,MaskCh);
@@ -1477,7 +1477,7 @@ int DNPoly::IsoData(bool *NoBlackPixels,int KolvoClass,float MaxSKO,float Qc,int
        {
         Mass1[iCh]=SpectrString[iCh+jx*ThisCh];
        }//for(int iCh=0;iCh<ThisCh;iCh++)
-    //Р’С‹С‡РёСЃР»РµРЅРёРµ СЂР°СЃСЃС‚РѕСЏРЅРёР№ РјРµР¶РґСѓ С‚РѕС‡РєРѕР№ Рё С†РµРЅС‚СЂРѕРј РєР»Р°СЃС‚РµСЂРѕРІ
+    //Вычисление расстояний между точкой и центром кластеров
        float Dmin,D;
        int NumKl=0;
        Dmin=ThisMath.CalcEvklid(Mass1,Classes[0].Zk,ThisCh);
@@ -1499,7 +1499,7 @@ int DNPoly::IsoData(bool *NoBlackPixels,int KolvoClass,float MaxSKO,float Qc,int
     ProgCV++;
     emit ChangeProgressVal(ProgR,ProgCV);
 
-//РЁР°Рі 3 СѓРґР°Р»СЏРµРј РєР»Р°СЃС‚РµСЂС‹ СЃ РЅСѓР»РµРІС‹РјРё РїРёРєСЃРµР»СЏРјРё
+//Шаг 3 удаляем кластеры с нулевыми пикселями
     k=0;
     int KolvoDelKl=0;
     int k2=0;
@@ -1521,7 +1521,7 @@ int DNPoly::IsoData(bool *NoBlackPixels,int KolvoClass,float MaxSKO,float Qc,int
     int KKlass;
     KKlass=Classes.size();
 
-   //РћР±РЅСѓР»СЏРµРј РІСЃСЋ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ РєР»Р°СЃС‚РµСЂР°С…
+   //Обнуляем всю информацию о кластерах
    for(int i=0;i<Classes.size();i++)
    {
     Classes[i].KPix=0;
@@ -1534,8 +1534,8 @@ int DNPoly::IsoData(bool *NoBlackPixels,int KolvoClass,float MaxSKO,float Qc,int
     }//
    }//for(int i=0;i<Classes.size();i++)
 
-//РЁР°Рі 4 Р Р°СЃСЃС‡С‘С‚ С†РµРЅС‚СЂР° РєР»Р°СЃС‚РµСЂРѕРІ
-   //РќР°С‡РёРЅР°РµРј СЂР°СЃСЃС‡С‘С‚
+//Шаг 4 Рассчёт центра кластеров
+   //Начинаем рассчёт
    for(int jy=0;jy<this->H;jy++)
    {
     this->GetSpectrString(jy+this->yn,SpectrString,MaskCh);
@@ -1544,7 +1544,7 @@ int DNPoly::IsoData(bool *NoBlackPixels,int KolvoClass,float MaxSKO,float Qc,int
      if(NoBlackPixels[jx+jy*this->W])
      {
       int NumKl;
-      //РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РјР°СЃСЃРёРІР° РєР»Р°СЃСЃРёС„РёРєР°С†РёРё РІ СЃРІСЏР·Рё СЃ СѓРґР°Р»С‘РЅРЅС‹РјРё РєР»Р°СЃС‚РµСЂР°РјРё
+      //Преобразование массива классификации в связи с удалёнными кластерами
       this->ClassifMass[jx+jy*this->W]=this->ClassifMass[jx+jy*this->W]-DeleteKlProp[this->ClassifMass[jx+jy*this->W]];
       NumKl=this->ClassifMass[jx+jy*this->W];
       Classes[NumKl].KPix++;
@@ -1567,7 +1567,7 @@ int DNPoly::IsoData(bool *NoBlackPixels,int KolvoClass,float MaxSKO,float Qc,int
     }//for(int iCh=0;iCh<ThisCh;iCh++)
    }//for(int i=0;i<Classes.size();i++)
 
-//РЁР°Рі 5 Р’С‹С‡РёСЃР»СЏРµС‚СЃСЏ СЃСЂРµРґРЅРµРµ СЂР°СЃСЃС‚РѕСЏРЅРёРµ РјРµР¶РґСѓ С‚РѕС‡РєР°РјРё РєР»Р°СЃСЃР° Рё РµРіРѕ С†РµРЅС‚СЂРѕРј
+//Шаг 5 Вычисляется среднее расстояние между точками класса и его центром
    for(int jy=0;jy<this->H;jy++)
    {
     this->GetSpectrString(jy+this->yn,SpectrString,MaskCh);
@@ -1589,7 +1589,7 @@ int DNPoly::IsoData(bool *NoBlackPixels,int KolvoClass,float MaxSKO,float Qc,int
    ProgCV++;
    emit ChangeProgressVal(ProgR,ProgCV);
 
-//РЁР°Рі 6 Р’С‹С‡РёСЃР»СЏРµС‚СЃСЏ РѕР±С‰РµРµ СЃСЂРµРґРЅРµРµ СЂР°СЃСЃС‚РѕСЏРЅРёРµ РјРµР¶РґСѓ С†РµРЅС‚СЂР°РјРё РєР»Р°СЃС‚РµСЂРѕРІ
+//Шаг 6 Вычисляется общее среднее расстояние между центрами кластеров
    Dsr=0;
    for(int i=0;i<Classes.size();i++)
    {
@@ -1602,7 +1602,7 @@ int DNPoly::IsoData(bool *NoBlackPixels,int KolvoClass,float MaxSKO,float Qc,int
 
    if(KolvoI<I && Classes.size()<=KolvoClass/2 || ((KolvoI)%2==1 && Classes.size()<=KolvoClass/2))
    {
-//РЁР°Рі 8 Р’С‹С‡РёСЃР»СЏРµРј РЎРљРћ РґР»СЏ РєР°Р¶РґРѕРіРѕ РєР»Р°СЃС‚РµСЂР°
+//Шаг 8 Вычисляем СКО для каждого кластера
     for(int jy=0;jy<this->H;jy++)
     {
      this->GetSpectrString(jy+this->yn,SpectrString,MaskCh);
@@ -1620,7 +1620,7 @@ int DNPoly::IsoData(bool *NoBlackPixels,int KolvoClass,float MaxSKO,float Qc,int
      }//for(int jx=0;jx<this->xn+this->W;jx++)
     }//for(int jy=0;jy<this->H;jy++)
 
-//РЁР°Рі 9 РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РєРѕРјРїРѕРЅРµРЅС‚С‹ РЎРљРћ
+//Шаг 9 Максимальное значение компоненты СКО
     for(int i=0;i<Classes.size();i++)
     {
      Classes[i].SKOMax=Classes[i].SKO[0];
@@ -1635,19 +1635,19 @@ int DNPoly::IsoData(bool *NoBlackPixels,int KolvoClass,float MaxSKO,float Qc,int
      }//for(int iCh=0;iCh<ThisCh;iCh++)
     }//for(int i=0;i<Classes.size();i++)
 
-//РЁР°Рі 10 Р Р°СЃС‰РµРїР»РµРЅРёРµ РєР»Р°СЃС‚РµСЂРѕРІ
+//Шаг 10 Расщепление кластеров
     k=Classes.size();
     for(int i=0;i<k;i++)
     {
      if(Classes[i].SKOMax>MaxSKO && (Classes[i].Dsr>Dsr || Classes.size()<=KolvoClass/2) && Classes[i].KPix>0)
      {
-      //РљРѕСЂСЂРµРєС‚РёСЂРѕРІРєР° РєРѕРѕСЂРґРёРЅР°С‚ С†РµРЅС‚СЂР° СЃС‚Р°СЂРѕРіРѕ РєР»Р°СЃС‚РµСЂР°
+      //Корректировка координат центра старого кластера
       Classes[i].KPix=0;
       Classes[i].Dsr=0;
       Classes[i].SKOMax=0;
       Classes[i].Zk[Classes[i].NumChSKOMax]=Classes[i].Zk[Classes[i].NumChSKOMax]+0.5*Classes[i].Zk[Classes[i].NumChSKOMax];
 
-      //РЎРѕР·РґР°РЅРёРµ РЅРѕРІРѕРіРѕ РєР»Р°СЃС‚РµСЂР°
+      //Создание нового кластера
       Classes<<ClassOne;
       Classes[Classes.size()-1].Zk=new float[ThisCh];
       Classes[Classes.size()-1].SKO=new float[ThisCh];
@@ -1666,12 +1666,12 @@ int DNPoly::IsoData(bool *NoBlackPixels,int KolvoClass,float MaxSKO,float Qc,int
 //    KolvoI++;
 
 //   QMessageBox msg;
-//   msg.setText(QObject::tr("Р Р°СЃС‰РµРїР»РµРЅРёРµ РєР»Р°СЃС‚РµСЂР°: ")+QString().setNum(Classes.size()));
+//   msg.setText(QObject::tr("Расщепление кластера: ")+QString().setNum(Classes.size()));
 //   msg.exec();
 
   }while(IsClassDual);
 
-//РЁР°Рі 11 Р’С‹С‡РёСЃР»СЏСЋС‚СЃСЏ СЂР°СЃСЃС‚РѕСЏРЅРёСЏ РјРµР¶РґСѓ РІСЃРµРјРё РїР°СЂР°РјРё С†РµРЅС‚СЂРѕРІ РєР»Р°СЃС‚РµСЂРѕРІ
+//Шаг 11 Вычисляются расстояния между всеми парами центров кластеров
   Metas.clear();
 
   for(int i1=0;i1<Classes.size();i1++)
@@ -1690,10 +1690,10 @@ int DNPoly::IsoData(bool *NoBlackPixels,int KolvoClass,float MaxSKO,float Qc,int
   }//for(int i1=0;i1<Classes.size();i1++)
 
 //     QMessageBox msg;
-//     msg.setText(QObject::tr("РћР±СЉРµРґРёРЅСЏРµРјС‹Рµ РєР»Р°СЃС‚РµСЂС‹: ")+QString().setNum(Metas.size()));
+//     msg.setText(QObject::tr("Объединяемые кластеры: ")+QString().setNum(Metas.size()));
 //     msg.exec();
 
-//РЁР°Рі 12 РЎРѕСЂС‚РёСЂРѕРІРєР° СЂР°СЃСЃС‚РѕСЏРЅРёР№ РїРѕ РІРѕР·СЂР°СЃС‚Р°РЅРёСЋ
+//Шаг 12 Сортировка расстояний по возрастанию
   for(int i1=0;i1<Metas.size();i1++)
   {
    for(int i2=0;i2<Metas.size()-1;i2++)
@@ -1707,7 +1707,7 @@ int DNPoly::IsoData(bool *NoBlackPixels,int KolvoClass,float MaxSKO,float Qc,int
    }//for(int i2=0;i2<Metas.size()-1;i2++)
   }//for(int i1=0;i1<Metas.size();i1++)
 
-//РЁР°Рі 13 РЎР»РёСЏРЅРёРµ РєР»Р°СЃС‚РµСЂРѕРІ
+//Шаг 13 Слияние кластеров
   for(int i=0;i<Metas.size();i++)
   {
    if(!Classes[Metas[i].NumCl1].Objed && !Classes[Metas[i].NumCl2].Objed)
@@ -1729,7 +1729,7 @@ int DNPoly::IsoData(bool *NoBlackPixels,int KolvoClass,float MaxSKO,float Qc,int
    }//if(!Classes[Metas[i].NumCl1].Objed && !Classes[Metas[i].NumCl2].Objed)
   }//for(int i=0;i<Metas.size();i++)
 
- //РЈРґР°Р»РµРЅРёРµ РєР»Р°СЃС‚РµСЂРѕРІ РєРѕС‚РѕСЂС‹Рµ Р±С‹Р»Рё РѕР±СЉРµРґРµРЅРµРЅС‹ РІ РѕРґРёРЅ
+ //Удаление кластеров которые были объеденены в один
   k=0;
   int k3=0;
   while(k<Classes.size())
@@ -1745,7 +1745,7 @@ int DNPoly::IsoData(bool *NoBlackPixels,int KolvoClass,float MaxSKO,float Qc,int
 //  KolvoI++;
 
 //  QMessageBox msg2;
-//  msg2.setText(QObject::tr("РўРµРєСѓС‰РµРµ С‡РёСЃР»Рѕ РєР»Р°СЃС‚РµСЂРѕРІ: ")+QString().setNum(Classes.size()));
+//  msg2.setText(QObject::tr("Текущее число кластеров: ")+QString().setNum(Classes.size()));
 //  msg2.exec();
   if(KolvoI/*+1*/==I)
   {
@@ -1770,7 +1770,7 @@ int DNPoly::IsoData(bool *NoBlackPixels,int KolvoClass,float MaxSKO,float Qc,int
  Classes.clear();
  return k;
 }
-/*РњРµС‚РѕРґ СЃРїРµРєС‚СЂР°Р»СЊРЅРѕРіРѕ СѓРіР»Р°*/
+/*Метод спектрального угла*/
 int DNPoly::SAM(bool *NoBlackPixels,QStringList PolyFileNames,bool IsSKOEnabled,float LimitSKO,bool *MaskCh)
 {
  DNPoly *ThisPoly;
@@ -1785,7 +1785,7 @@ int DNPoly::SAM(bool *NoBlackPixels,QStringList PolyFileNames,bool IsSKOEnabled,
 
  int ProgR,ProgCV;
 
- //РћРїСЂРµРґРµР»РµРЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° РєР°РЅР°Р»РѕРІ
+ //Определение количества каналов
  for(int i=0; i<this->Ch;i++)
  {
   if(MaskCh[i])
@@ -1796,7 +1796,7 @@ int DNPoly::SAM(bool *NoBlackPixels,QStringList PolyFileNames,bool IsSKOEnabled,
  ProgCV=0;
  emit ChangeProgressVal(ProgR,ProgCV);
 
- //РћС‚РєСЂС‹С‚РёРµ Р·Р°РґР°РЅРЅС‹С… РїРѕР»РёРіРѕРЅРѕРІ Рё РѕРїСЂРµРґРµР»РµРЅРёРµ РєР»СЋС‡РµРІС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
+ //Открытие заданных полигонов и определение ключевых параметров
  for(int i=0;i<PolyFileNames.size();i++)
  {
   MLam<<new float[KolvoCh];
@@ -1804,7 +1804,7 @@ int DNPoly::SAM(bool *NoBlackPixels,QStringList PolyFileNames,bool IsSKOEnabled,
 
   if(ThisPoly->Ch==this->Ch)
   {
-   //РћРїСЂРµРґРµР»РµРЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° С‚РѕС‡РµРє РІ РїРѕР»РёРіРѕРЅРµ
+   //Определение количества точек в полигоне
    KolPoint=0;
    for(quint64 ip=0;ip<ThisPoly->W*ThisPoly->H;ip++)
    {
@@ -1812,7 +1812,7 @@ int DNPoly::SAM(bool *NoBlackPixels,QStringList PolyFileNames,bool IsSKOEnabled,
      KolPoint++;
    }//for(quint64 ip=0;ip<ThisPoly->W*ThisPoly->H;ip++)
 
-   //РџРѕР»СѓС‡РµРЅРёРµ СЃРїРµРєС‚СЂР°Р»СЊРЅС‹С… С…Р°СЂР°РєС‚РµСЂРёСЃС‚РёРє РїРѕР»РёРіРѕРЅР°
+   //Получение спектральных характеристик полигона
    float *DataSpec;
    float *SpecPoint;
    float *PointsAngle;
@@ -1821,7 +1821,7 @@ int DNPoly::SAM(bool *NoBlackPixels,QStringList PolyFileNames,bool IsSKOEnabled,
    PointsAngle=new float[KolPoint];
    ThisPoly->GetSpectrZone(DataSpec,MaskCh);
 
-   //Р Р°СЃС‡С‘С‚ СЃСЂРµРґРЅРёС… Р·РЅР°С‡РµРЅРёР№ СЏСЂРєРѕСЃС‚РµР№ С‚РѕС‡РµРє РїРѕР»РёРіРѕРЅР° РІ РєР°Р¶РґРѕРј РєР°РЅР°Р»Рµ
+   //Расчёт средних значений яркостей точек полигона в каждом канале
    for(int iCh=0;iCh<KolvoCh;iCh++)
    {
     MLam[i][iCh]=0;
@@ -1831,7 +1831,7 @@ int DNPoly::SAM(bool *NoBlackPixels,QStringList PolyFileNames,bool IsSKOEnabled,
     }//for(quint64 ip=0;ip<KolPoint;ip++)
    }//for(int iCh=0;iCh<KolvoCh;iCh++)
 
-  //Р Р°СЃСЃС‡С‘С‚ СѓРіР»РѕРІ РІ СЏСЂРєРѕСЃС‚РЅРѕРј РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІРµ РјРµР¶РґСѓ РІРµРєС‚РѕСЂРѕРј СЃСЂРµРґРЅРёС… Р·РЅР°С‡РµРЅРёР№ Рё РєР°Р¶РґРѕР№ С‚РѕС‡РєРѕР№
+  //Рассчёт углов в яркостном пространстве между вектором средних значений и каждой точкой
    if(IsSKOEnabled)
    {
     for(quint64 ip=0;ip<KolPoint;ip++)
@@ -1843,7 +1843,7 @@ int DNPoly::SAM(bool *NoBlackPixels,QStringList PolyFileNames,bool IsSKOEnabled,
      PointsAngle[ip]=Math.CalcSpecAngle(KolvoCh,SpecPoint,MLam[i]);
     }//for(quint64 ip=0;ip<KolPoint;ip++)
 
-    //Р Р°СЃС‡С‘С‚ РЎРљРћ СѓРіР»РѕРІ
+    //Расчёт СКО углов
     SKO=Math.CalcSKO(PointsAngle,KolPoint);
     StandOAngel<<(float)sqrt(SKO*KolPoint/(KolPoint-1));
     //proba=SKOAngel[i];
@@ -1856,7 +1856,7 @@ int DNPoly::SAM(bool *NoBlackPixels,QStringList PolyFileNames,bool IsSKOEnabled,
   else
   {
    QMessageBox msg;
-   msg.setText(tr("РљРѕР»РёС‡РµСЃС‚РІРѕ РєР°РЅР°Р»РѕРІ СЌС‚Р°Р»РѕРЅР°\n")+PolyFileNames[i]+"\n"+tr("РќРµСЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ РєР»Р°СЃСЃРёС„РёС†РёСЂСѓРµРјРѕРјСѓ РёР·РѕР±СЂР°Р¶РµРЅРёСЋ"));
+   msg.setText(tr("Количество каналов эталона\n")+PolyFileNames[i]+"\n"+tr("Несоответствует классифицируемому изображению"));
    msg.exec();
   }
   delete ThisPoly;
@@ -1864,7 +1864,7 @@ int DNPoly::SAM(bool *NoBlackPixels,QStringList PolyFileNames,bool IsSKOEnabled,
   emit ChangeProgressVal(ProgR,ProgCV);
  }//for(int i=0;i<PolyFileNames.size();i++)
 
- //РљР»Р°СЃСЃРёС„РёРєР°С†РёСЏ С‚РѕС‡РµРє С‚РµРєСѓС‰РµРіРѕ РїРѕР»РёРіРѕРЅР°
+ //Классификация точек текущего полигона
  float *SpecString;
  float *Mass;
  float Angle,pi,MaxPi,MinAngle;
@@ -1922,7 +1922,7 @@ int DNPoly::SAM(bool *NoBlackPixels,QStringList PolyFileNames,bool IsSKOEnabled,
  return PolyFileNames.size();
 }
 
-/*Р¤РёР»СЊС‚СЂ*/
+/*Фильтр*/
 void DNPoly::FilterPix(bool *NoBlackPixels,QString Formula,int Usl, float Value2)
 {
  QString DataStr;
@@ -2127,7 +2127,7 @@ void DNPoly::FilterPoly(int *MassIsh,QString Formula,int Usl, float Value2)
 }
 
 /**********************************************************************************************************************************/
-//РўРµРјР°С‚РёС‡РµСЃРєРёРµ Р·Р°РґР°С‡Рё
+//Тематические задачи
 void DNPoly::SelectWater()
 {
  QList <int> NumKlasses;
@@ -2292,11 +2292,11 @@ void DNPoly::Batinometr()
    this->ClassifMass[x+y*this->W]=-1;
    if(this->MassPoly[x+y*this->W]>=0)
    {
-    this->ClassifMass[x+y*this->W]=1; //Р’СЃС‘ РѕСЃС‚Р°Р»СЊРЅРѕРµ
+    this->ClassifMass[x+y*this->W]=1; //Всё остальное
     if(Brigth[1+x*nCh.size()]>0.01)
-     this->ClassifMass[x+y*this->W]=0; //РњРѕРєСЂРѕС„РёС‚С‹
+     this->ClassifMass[x+y*this->W]=0; //Мокрофиты
     if(Brigth[x*nCh.size()]>0.03)
-     this->ClassifMass[x+y*this->W]=1; //РџРµСЃРѕРє
+     this->ClassifMass[x+y*this->W]=1; //Песок
    }//if(this->MassPoly>=0)
   }//for(quint64 i=0;i<this->W*this->H;i++)
  }//for(int y=0;y<this->H;y++)
@@ -2419,11 +2419,11 @@ void DNPoly::Batinometr(int N590,int N830,int N900,
    this->ClassifMass[x+y*this->W]=-1;
    if(this->MassPoly[x+y*this->W]>=0)
    {
-    this->ClassifMass[x+y*this->W]=1; //Р’СЃС‘ РѕСЃС‚Р°Р»СЊРЅРѕРµ
+    this->ClassifMass[x+y*this->W]=1; //Всё остальное
     if(Brigth[1+x*nCh.size()]>0.01)
-     this->ClassifMass[x+y*this->W]=0; //РњРѕРєСЂРѕС„РёС‚С‹
+     this->ClassifMass[x+y*this->W]=0; //Мокрофиты
     if(Brigth[x*nCh.size()]>0.03)
-     this->ClassifMass[x+y*this->W]=1; //РџРµСЃРѕРє
+     this->ClassifMass[x+y*this->W]=1; //Песок
    }//if(this->MassPoly>=0)
   }//for(quint64 i=0;i<this->W*this->H;i++)
  }//for(int y=0;y<this->H;y++)
@@ -2511,7 +2511,7 @@ void DNPoly::Batinometr(int N590,int N830,int N900,
 
 /**********************************************************************************************************************************/
 
-//Р’РµРєС‚РѕСЂРёР·Р°С†РёСЏ
+//Векторизация
 void DNPoly::PixToGeo(int xp,int yp,double xTopLeft,double XD,double XAngle,double yTopLeft,double YD,double yAngle,double *xGeo,double *yGeo)
 {
  *xGeo=xTopLeft+xp*XD*cos(XAngle)-yp*YD*sin(XAngle);
@@ -2563,22 +2563,22 @@ QList <DNVector> DNPoly::RastrToVector(double xTopLeft,double XD,double XAngle,d
  bool *PixProver;
  QList <DNVector> Polygons;
  DNVector Polygon;
-// QString DataString[3]; /*РќР°РёРјРµРЅРѕРІР°РЅРёРµ СЃР»РѕСЏ Р°РЅРіР»*/
-// QString DataString2[3]; /*РќР°РёРјРµРЅРѕРІР°РЅРёРµ СЃР»РѕСЏ СЂСѓСЃ*/
-// QString DataString3[3]; /*РЎРІРѕР№СЃС‚РІРѕ 1*/
-// QString DataString4[3]; /*РЎРІРѕР№СЃС‚РІРѕ 2*/
+// QString DataString[3]; /*Наименование слоя англ*/
+// QString DataString2[3]; /*Наименование слоя рус*/
+// QString DataString3[3]; /*Свойство 1*/
+// QString DataString4[3]; /*Свойство 2*/
 // QString DataNumString;
  //TCHAR *VectorFileName;
  //LPSTR VFileName;
  //char *CharString;
  //CharString=new char[200];
- bool PolygonZap=FALSE; /*РџСЂРёР·РЅР°Рє Р·Р°РїРёСЃРё СЃРѕР·РґР°РЅРёСЏ РїРѕР»РёРіРѕРЅР°*/
- int Old_j_pol=-10;/*РЎС‚Р°СЂС‹Р№ РЅРѕРјРµСЂ РїРѕР»РёРіРѕРЅР°*/
+ bool PolygonZap=FALSE; /*Признак записи создания полигона*/
+ int Old_j_pol=-10;/*Старый номер полигона*/
 
 // bool PixAreaTrue;
 
  int i,j_x,j_y,m,j,k,j_pol;
- int KolvoPointProver; /*РљРѕР»РёС‡РµСЃС‚РІРѕ С‚РѕС‡РµРє, РєРѕС‚РѕСЂРѕРµ РЅРµРѕР±С…РѕРґРёРјРѕ РїСЂРѕРІРµСЂРёС‚СЊ РІ Р°Р»РіРѕСЂРёС‚РјРµ РІРѕР»С€РµР±РЅРѕР№ РїР°Р»РѕС‡РєРё (РїСЂРѕРІРµСЂСЏС‚СЊ РґРёР°РіРѕРЅР°Р»Рё РёР»Рё РЅРµС‚: РјРѕР¶РµС‚ СЂР°РІРЅСЏС‚СЊСЃСЏ 4 РёР»Рё 8)*/
+ int KolvoPointProver; /*Количество точек, которое необходимо проверить в алгоритме волшебной палочки (проверять диагонали или нет: может равняться 4 или 8)*/
  int xP2,yP2,NullB;
  int IarkFirstPix,IarkPix,IarkPixMax=-1,IarkPixMin=255;
  int Number,SummObod;
@@ -2606,16 +2606,16 @@ QList <DNVector> DNPoly::RastrToVector(double xTopLeft,double XD,double XAngle,d
 
 
 //  DataString[0]=_T("SHFields;");
-//  DataString2[0]=_T("РЎРµР»СЊСЃРєРѕС…РѕР·СЏР№СЃС‚РІРµРЅРЅРѕРµ РїРѕР»Рµ;");
-//  DataString3[0]=_T("Р—Р°Р»РµР¶СЊ;");
+//  DataString2[0]=_T("Сельскохозяйственное поле;");
+//  DataString3[0]=_T("Залежь;");
 
 //  DataString[1]=_T("SHFields;");
-//  DataString2[1]=_T("РЎРµР»СЊСЃРєРѕС…РѕР·СЏР№СЃС‚РІРµРЅРЅРѕРµ РїРѕР»Рµ;");
-//  DataString3[1]=_T("РџР°С€РЅСЏ;");
+//  DataString2[1]=_T("Сельскохозяйственное поле;");
+//  DataString3[1]=_T("Пашня;");
 
 //  DataString[2]=_T("SHFields;");
-//  DataString2[2]=_T("РЎРµР»СЊСЃРєРѕС…РѕР·СЏР№СЃС‚РІРµРЅРЅРѕРµ РїРѕР»Рµ;");
-//  DataString3[2]=_T("РџР°СЂ;");
+//  DataString2[2]=_T("Сельскохозяйственное поле;");
+//  DataString3[2]=_T("Пар;");
 
 
 // ::wcscpy(VectorFileName,(TCHAR*)Obj->MainPath);
@@ -2710,7 +2710,7 @@ QList <DNVector> DNPoly::RastrToVector(double xTopLeft,double XD,double XAngle,d
          yP2=Pix.y-1;
          NullB=1;
         }
-/*РџСЂРѕРІРµСЂРєР° РґРёР°РіРѕРЅР°Р»СЊРЅС‹С… С‚РѕС‡РµРє*/
+/*Проверка диагональных точек*/
         if((i==4)&&(Pix.y-1>=0)&&(Pix.x-1>=0)&&(Points[(Pix.x-1)+(Pix.y-1)*(this->W+1)].Prover==FALSE))
         {
          xP2=Pix.x-1;
@@ -2774,7 +2774,7 @@ QList <DNVector> DNPoly::RastrToVector(double xTopLeft,double XD,double XAngle,d
    BlackAreaKrai[i]=FALSE;
   }
 
- /*Р—Р°РїРѕРјРёРЅР°РµРј РЅРѕРјРµСЂР° РєСЂР°РµРІС‹С… С‡С‘СЂРЅС‹С… Р·РѕРЅ*/
+ /*Запоминаем номера краевых чёрных зон*/
 
   for(j_x=0;j_x<this->W;j_x++)
   {
@@ -2858,7 +2858,7 @@ QList <DNVector> DNPoly::RastrToVector(double xTopLeft,double XD,double XAngle,d
        Points[j_x+j_y*(this->W+1)].Uglov+=Obod[m]<<m;
       FlagArea++;
      }
-/**********************Р”РёР°РіРѕРЅР°Р»СЊРЅС‹Рµ С‚РѕС‡РєРё*************************************/
+/**********************Диагональные точки*************************************/
      if(SummObod==2&&Obod[0]==Obod[3]&&Obod[1]==Obod[2])
      {
       Points[j_x+j_y*(this->W+1)].Uglov=0;
@@ -3039,10 +3039,10 @@ QList <DNVector> DNPoly::RastrToVector(double xTopLeft,double XD,double XAngle,d
   }
 
 
-/*Р—Р°РїРёСЃСЊ РІ С„Р°Р№Р» Рё РїРµСЂРµРІРѕРґ РєРѕРѕСЂРґРёРЅР°С‚ РІ С‚РёС„*/
+/*Запись в файл и перевод координат в тиф*/
   if(Number>0)
   {
-/*РџСЂРѕРІРµСЂРєР° РіСЂСѓРїРїС‹ РїРѕР»РёРіРѕРЅРѕРІ РЅР° С‡С‘СЂРЅС‹Рµ Р·РѕРЅС‹, РµСЃР»Рё РІСЃРµ Р·РѕРЅС‹ С‡С‘СЂРЅС‹Рµ, Р·Р°РїРёСЃСЊ РІ С„Р°Р№Р» РЅРµ РѕСЃСѓС‰РµСЃС‚РІР»СЏРµС‚СЃСЏ*/
+/*Проверка группы полигонов на чёрные зоны, если все зоны чёрные, запись в файл не осуществляется*/
    k=-1;
    for(i=0;i<Number;i++)
    {
@@ -3069,7 +3069,7 @@ QList <DNVector> DNPoly::RastrToVector(double xTopLeft,double XD,double XAngle,d
 //     CharString=Obj->UnicodeToAnsi(DataString2[j_pol]);
 //     fwrite(&CharString,strlen(CharString),1,VektorFile);
 
-/*Р—Р°РїРёСЃСЊ EPSG РєРѕРґР° РґР»СЏ СЃР»РѕСЏ*/
+/*Запись EPSG кода для слоя*/
 //     itoa(EPSGCode,CharString,10);
 //     fwrite(&CharString,strlen(CharString),1,VektorFile);
 
@@ -3089,7 +3089,7 @@ QList <DNVector> DNPoly::RastrToVector(double xTopLeft,double XD,double XAngle,d
 //     CharString=Obj->UnicodeToAnsi(_T("SHuse;"));
 //     fwrite(&CharString,strlen(CharString),1,VektorFile);
 
-//     CharString=Obj->UnicodeToAnsi(_T("РЎС‚РµРїРµРЅСЊ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ РїРѕР»СЏ;"));
+//     CharString=Obj->UnicodeToAnsi(_T("Степень использования поля;"));
 //     fwrite(&CharString,strlen(CharString),1,VektorFile);
 
 //     fwrite(&Enter,sizeof(WORD),1,VektorFile);
@@ -3184,7 +3184,7 @@ QList <DNVector> DNPoly::RastrToVector(double xTopLeft,double XD,double XAngle,d
 }
 
 //private
-//x Рё y РІ РїСЂРёРІР°С‚Рµ СЃС‡РёС‚Р°СЋС‚СЃСЏ РѕС‚ РЅР°С‡Р°Р»Р° РїРѕР»РёРіРѕРЅР°
+//x и y в привате считаются от начала полигона
 QList<QPoint> DNPoly::DefinePixels(int NumPixels,int x,int y)
 {
  //QList<QPoint> DefPix;

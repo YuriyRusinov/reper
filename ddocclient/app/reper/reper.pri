@@ -1,11 +1,8 @@
 HEADERS += \
                 simple_map_window.h \
                 config.h \
-                dn/ui_mainwindow.h \
-                dn/ui_dnspecbath.h \
                 dn/imagearea.h \
                 dn/dnspecbath.h \
-                dn/Added/dnwidgetimage.h \
                 dn/Added/dnvector.h \
                 dn/Added/dnpoly.h \
                 dn/Added/dnimagelib.h \
@@ -32,7 +29,8 @@ SOURCES += \
                 kksbadlayerhandler.cpp
 FORMS += \
     simple_map_window_base.ui \
-                dn/dnspecbath.ui
+    dn/dnspecbath.ui \
+    dn/DlgShowDeptch.ui
 
 RESOURCES += \
                 resources.qrc

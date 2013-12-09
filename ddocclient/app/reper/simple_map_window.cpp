@@ -37,7 +37,7 @@ MainWindow::MainWindow(QWidget* parent, Qt::WFlags fl)
     mpAppPath = "D:/!Share/src/reper/ddocclient/app/reper/";
 	mpSelectedLayer = NULL;
     dnThemTaskSpecBath = NULL;
-
+    azWorkList.clear();
 
     // setup StatusBar
     {
@@ -49,8 +49,6 @@ MainWindow::MainWindow(QWidget* parent, Qt::WFlags fl)
     mpCoordsLabel->setMaximumHeight(20);
     mpCoordsLabel->setFrameStyle(QFrame::NoFrame);
     mpCoordsLabel->setAlignment(Qt::AlignCenter);
-    mpCoordsLabel->setText(tr("Coordinate:"));
-    mpCoordsLabel->setToolTip(tr("Current map coordinate") );
     statusBar()->addPermanentWidget(mpCoordsLabel, 0);
 
     mpCoordsEdit = new QLineEdit( QString(), statusBar() );
@@ -63,11 +61,6 @@ MainWindow::MainWindow(QWidget* parent, Qt::WFlags fl)
     mpCoordsEdit->setAlignment( Qt::AlignCenter );
     QRegExp coordValidator( "[+-]?\\d+\\.?\\d*\\s*,\\s*[+-]?\\d+\\.?\\d*" );
     mpCoordsEditValidator = new QRegExpValidator( coordValidator, mpCoordsEdit );
-    mpCoordsEdit->setWhatsThis( tr( "Shows the map coordinates at the "
-                                   "current cursor position. The display is continuously updated "
-                                   "as the mouse is moved. It also allows editing to set the canvas "
-                                   "center to a given position." ) );
-    mpCoordsEdit->setToolTip( tr( "Current map coordinate (formatted as x,y)" ) );
     statusBar()->addPermanentWidget( mpCoordsEdit, 0 );
 
 
@@ -83,15 +76,15 @@ MainWindow::MainWindow(QWidget* parent, Qt::WFlags fl)
 //    mpLeftDock->setWidget(mpMapLegend);
     }
     //QString myPluginsDir        = "C:\\Program Files (x86)\\Quantum GIS 1.7.0\\plugins";
-    QString myPluginsDir        = "C:\\Program Files (x86)\\DynamicSoft\\DynamicDocs Client 1.2.3\\QGS21\\plugins";
-	//QString myPluginsDir        = "D:\\REP_EXT\\QGS17\\plugins";
+    //QString myPluginsDir        = "C:\\Program Files (x86)\\DynamicSoft\\DynamicDocs Client 1.2.3\\QGS21\\plugins";
+    QString myPluginsDir        = "D:\\REP_EXT\\QGS21\\plugins";
     QgsProviderRegistry::instance(myPluginsDir);
 
     // Get the registry singleton
     mpRegistry = QgsMapLayerRegistry::instance();
 
     // Create the Map Canvas
-    mpMapCanvas = new QgsMapCanvas(0, 0);
+    mpMapCanvas= new QgsMapCanvas(0, 0);
     mpMapCanvas->enableAntiAliasing(true);
     mpMapCanvas->useImageToRender(false);
     mpMapCanvas->setCanvasColor(QColor(255, 255, 255));
@@ -103,7 +96,7 @@ MainWindow::MainWindow(QWidget* parent, Qt::WFlags fl)
 
     this->azSetTitleWindow(*this);
 
-    // РґРѕР±Р°РІР»СЏРµРј С„СЂРµР№Рј Рё РІСЃС‚Р°РІР»СЏРµРј РІ РЅРµРіРѕ РІРёРґР¶РµС‚ "РћРєРЅРѕ РєР°СЂС‚С‹"(Map Canvas)
+    // добавляем фрейм и вставляем в него виджет "Окно карты"(Map Canvas)
     mpMapLayout = new QVBoxLayout(frameMap); //main Layout
     mpMapLayout->addWidget(mpMapCanvas); // adding MapCanvas in Layout
 
@@ -119,36 +112,35 @@ MainWindow::MainWindow(QWidget* parent, Qt::WFlags fl)
 //    mpLegendLayout->addWidget(mpMapLegend); //adding TOC to Layout2
 
     //create actions
+
+    //create actions
     mpVectorize = new QAction(QIcon(":/ico/vectorize.png"), tr("Vectorize"), this);
-    
-    mpActionAddVectorLayer = new QAction(QIcon(":/ico/add_vector.png"), tr("Add &Vector Layer"), this);
-    mpActionAddRasterLayer = new QAction(QIcon(":/ico/add_raster.png"), tr("Add &Raster Layer"), this);
-    mpActionAddPostGISLayer = new QAction(QIcon(":/ico/add_postgis.png"), tr("Add &Database Layer"), this);
-    mpActionAddVectorLayer->setStatusTip(tr("Add a vector layer to the map window"));
-    mpActionAddRasterLayer->setStatusTip(tr("Add a raster layer to the map window"));
-    mpActionAddPostGISLayer->setStatusTip(tr("Add database layer to the map window"));
-    
-    mpContextShowExtent = new QAction("Show extent", tableLegend);
-    mpContextRemoveLayer = new QAction("Remove", tableLegend);
-    mpActionFileExit = new QAction(QIcon(":/ico/mActionFileExit.png"), tr("Exit"), this);
+    mpActionAddVectorLayer = new QAction(QIcon(":/ico/add_vector.png"), tr("Добавить &векторный слой"), this);
+    mpActionAddRasterLayer = new QAction(QIcon(":/ico/add_raster.png"), tr("Добавить &растровый слой"), this);
+    mpActionAddVectorLayer->setStatusTip(tr("Добавить векторный слой в окно карты"));
+    mpActionAddRasterLayer->setStatusTip(tr("Добавить растровый слой в окно карты"));
+    mpActionFileExit = new QAction(QIcon(":/ico/mActionFileExit.png"), tr("Выход"), this);
     mpActionFileExit->setStatusTip(tr("Close Application"));
     mpActionFileExit->setShortcuts(QKeySequence::Close);
+    mpActionAddPostGISLayer = new QAction(QIcon(":/ico/add_postgis.png"), tr("Add &Database Layer"), this);
+    mpActionAddPostGISLayer->setStatusTip(tr("Add database layer to the map window"));
+
 
     //settings of TOC-tableWiget
     {
-    tableLegend->setHorizontalHeaderLabels(QStringList() << tr("") << tr("Layer's name") << tr("Style") << ("Path"));
+
     tableLegend->setColumnCount(tableLegend->horizontalHeader()->count());
     tableLegend->setColumnWidth(0, 25);
     tableLegend->setColumnWidth(1, 185);
     tableLegend->setColumnWidth(2, 50);
-    tableLegend->setContextMenuPolicy(Qt::CustomContextMenu);
-    tableLegend->setSelectionBehavior(QAbstractItemView::SelectRows);
+    //tableLegend->setContextMenuPolicy(Qt::CustomContextMenu);
+    //tableLegend->setSelectionBehavior(QAbstractItemView::SelectRows);
 
-    mpContextLegendMenu = new QMenu(tableLegend);
-    mpContextLegendMenu->addAction(mpContextShowExtent);
-    mpContextLegendMenu->addAction(mpContextRemoveLayer);
-    tableLegend->addAction(mpContextShowExtent);
-    tableLegend->addAction(mpContextRemoveLayer);
+    //mpContextLegendMenu = new QMenu(tableLegend);
+    //mpContextLegendMenu->addAction(mpContextShowExtent);
+    //mpContextLegendMenu->addAction(mpContextRemoveLayer);
+    //tableLegend->addAction(mpContextShowExtent);
+    //tableLegend->addAction(mpContextRemoveLayer);
     }
 
 
@@ -157,21 +149,16 @@ MainWindow::MainWindow(QWidget* parent, Qt::WFlags fl)
      connect(this->mpActionPan, SIGNAL(triggered()), this, SLOT(panMode()));
      connect(this->mpActionZoomIn, SIGNAL(triggered()), this, SLOT(zoomInMode()));
      connect(this->mpActionZoomOut, SIGNAL(triggered()), this, SLOT(zoomOutMode()));
-     
      connect(this->mpActionAddVectorLayer, SIGNAL(triggered()), this, SLOT(SLOTmpActionAddVectorLayer()));
      connect(this->mpActionAddRasterLayer, SIGNAL(triggered()), this, SLOT(SLOTmpActionAddRasterLayer()));
      connect(this->mpActionAddPostGISLayer, SIGNAL(triggered()), this, SLOT(SLOTmpActionAddPostGISLayer()));
-     
      connect(this->mpVectorize, SIGNAL(triggered()), this, SLOT(SLOTtempUse()));
-     
      connect(this->mpActionFileOpenProject, SIGNAL(triggered()), this, SLOT(SLOTmpActionFileOpenProject()));
      connect(this->mpActionFileSaveProjectAs, SIGNAL(triggered()), this, SLOT(SLOTmpActionFileSaveProjectAs()));
      connect(this->mpActionFileSaveProject, SIGNAL(triggered()), this, SLOT(SLOTmpActionFileSaveProject()));
      connect(this->mpActionFileCloseProject, SIGNAL(triggered()), this, SLOT(SLOTmpCloseProject()));
      connect(this->mpActionFileExit, SIGNAL(triggered()), this, SLOT(SLOTmpActionFileExit()));
-     
      connect(this->mpRegistry, SIGNAL(layerWasAdded(QgsMapLayer *)), this, SLOT(addLayerToTOC(QgsMapLayer *)));
-     connect(this->mpContextShowExtent, SIGNAL(triggered()), this, SLOT(SLOTazContextShowExtent()));
      connect(this->mpCoordsEdit, SIGNAL(editingFinished()), this, SLOT( SLOTazCoordsCenter()));
      connect(this->mpMapCanvas, SIGNAL(xyCoordinates(const QgsPoint &)), this, SLOT(SLOTazShowMouseCoordinate(const QgsPoint &)));
      connect(this->mpActionBathymetry, SIGNAL(triggered()), this, SLOT(SLOTazThemTaskSpectralBathynometry()));
@@ -193,7 +180,7 @@ MainWindow::MainWindow(QWidget* parent, Qt::WFlags fl)
     mpMapToolBar->addAction(mpVectorize);
     }
 
-// menu Bar
+    // menu Bar
     {
         this->menuFile->addSeparator();
         this->menuFile->addAction(mpActionAddVectorLayer);
@@ -211,10 +198,10 @@ MainWindow::MainWindow(QWidget* parent, Qt::WFlags fl)
     mpZoomOutTool = new QgsMapToolZoom(mpMapCanvas, TRUE ); //true = out
     mpZoomOutTool->setAction(mpActionZoomOut);
 
+    statusBar()->showMessage("ПК Репер готов к работе.");
     m_badLayerHandler = new KKSBadLayerHandler;
     QgsProject::instance()->setBadLayerHandler(m_badLayerHandler);
 
-    statusBar()->showMessage("Reper is ready.");
 }
 
 MainWindow::~MainWindow()
@@ -292,10 +279,10 @@ void MainWindow::azRemoveAllLayers()
 bool MainWindow::azSelectLayer(const QString layerName)
 {
     bool bComplete(false);
-    // СЃРѕР·РґР°РґРёРј СЂРµР·РµСЂРІРЅСѓСЋ РєРѕРїРёСЋ СЂР°Р±РѕС‡РµРіРѕ СЃР»РѕСЏ
+    // создадим резервную копию рабочего слоя
     QgsMapLayer * pRezLayer;
     pRezLayer = NULL;
-    if (mpSelectedLayer == NULL) // РµСЃР»Рё РѕРЅ РµСЃС‚СЊ
+    if (mpSelectedLayer == NULL) // если он есть
     {
         pRezLayer = mpSelectedLayer;
     }
@@ -308,18 +295,18 @@ bool MainWindow::azSelectLayer(const QString layerName)
         {
             mpSelectedLayer = i.value();
             bComplete = true;
-            this->statusBar()->showMessage("Selected layer: '" + mpSelectedLayer->name() + "'.");
+
             break;
         }
 
     }
     if (pRezLayer != NULL)
     {
-        if (!mpSelectedLayer->isValid() && pRezLayer->isValid()) // РµСЃР»Рё mpSelectedLayer Р±С‹Р» Р·Р°РјРµС‰РµРЅ РЅРµРєРѕСЂСЂРµРєС‚РЅС‹Рј СЃР»РѕРµРј
+        if (!mpSelectedLayer->isValid() && pRezLayer->isValid()) // если mpSelectedLayer был замещен некорректным слоем
         {
-            mpSelectedLayer = pRezLayer; // РІРѕР·РІСЂР°С‰Р°РµРј Р·РЅР°С‡РµРЅРёРµ СЃР»РѕСЏ, РєРѕС‚РѕСЂС‹Р№ Р±С‹Р»
-            bComplete = false; // СЃРѕРѕР±С‰Р°РµРј, С‡С‚Рѕ РІС‹Р±РѕСЂ СЃР»РѕСЏ РЅРµСѓРґР°С‡РµРЅ
-            this->statusBar()->showMessage("Layer: '" + mpSelectedLayer->name() + "' can't be select.");
+            mpSelectedLayer = pRezLayer; // возвращаем значение слоя, который был
+            bComplete = false; // сообщаем, что выбор слоя неудачен
+
         }
     }
     return bComplete;
@@ -329,7 +316,7 @@ bool MainWindow::azSelectLayer(const QString layerName)
 bool MainWindow::azSelectLayer(const int layerNumber)
 {
     bool bComplete(false);
-    // СЃРѕР·РґР°РґРёРј СЂРµР·РµСЂРІРЅСѓСЋ РєРѕРїРёСЋ СЂР°Р±РѕС‡РµРіРѕ СЃР»РѕСЏ
+    // создадим резервную копию рабочего слоя
     if (layerNumber > mpRegistry->count())
     {
         return bComplete;
@@ -337,12 +324,12 @@ bool MainWindow::azSelectLayer(const int layerNumber)
 
     QgsMapLayer * pRezLayer;
     pRezLayer = NULL;
-    if (mpSelectedLayer == NULL) // РµСЃР»Рё РѕРЅ РµСЃС‚СЊ
+    if (mpSelectedLayer == NULL) // если он есть
     {
         pRezLayer = mpSelectedLayer;
     }
 
-    int n(0); // РёРЅРёС†РёРёСЂСѓРµРј СЃС‡РµС‚С‡РёРє
+    int n(0); // инициируем счетчик
     QMapIterator < QString, QgsMapLayer * > i(this->mpRegistry->mapLayers());
     while (i.hasNext())
     {
@@ -352,18 +339,18 @@ bool MainWindow::azSelectLayer(const int layerNumber)
         {
             mpSelectedLayer = i.value();
             bComplete = true;
-            this->statusBar()->showMessage("Selected layer: '" + mpSelectedLayer->name() + "'.");
+
             break;
         }
 
     }
     if (pRezLayer != NULL)
     {
-        if (!mpSelectedLayer->isValid() && pRezLayer->isValid()) // РµСЃР»Рё mpSelectedLayer Р±С‹Р» Р·Р°РјРµС‰РµРЅ РЅРµРєРѕСЂСЂРµРєС‚РЅС‹Рј СЃР»РѕРµРј
+        if (!mpSelectedLayer->isValid() && pRezLayer->isValid()) // если mpSelectedLayer был замещен некорректным слоем
         {
-            mpSelectedLayer = pRezLayer; // РІРѕР·РІСЂР°С‰Р°РµРј Р·РЅР°С‡РµРЅРёРµ СЃР»РѕСЏ, РєРѕС‚РѕСЂС‹Р№ Р±С‹Р»
-            bComplete = false; // СЃРѕРѕР±С‰Р°РµРј, С‡С‚Рѕ РІС‹Р±РѕСЂ СЃР»РѕСЏ РЅРµСѓРґР°С‡РµРЅ
-            this->statusBar()->showMessage("Layer: '" + mpSelectedLayer->name() + "' can't be select.");
+            mpSelectedLayer = pRezLayer; // возвращаем значение слоя, который был
+            bComplete = false; // сообщаем, что выбор слоя неудачен
+
         }
     }
     return bComplete;
@@ -371,7 +358,8 @@ bool MainWindow::azSelectLayer(const int layerNumber)
 
 void MainWindow::azSetTitleWindow(QWidget &azApp)
 {
-      QString caption = "Reper";
+      QString caption = "ПК Репер";
+
 
       if ( QgsProject::instance()->title().isEmpty() )
       {
@@ -395,80 +383,80 @@ void MainWindow::azSetTitleWindow(QWidget &azApp)
 }
 
 bool MainWindow::azRasterEnhancement(QgsRasterLayer & azRasterLayer)
-// С„СѓРЅРєС†РёСЏ СѓР»СѓС‡С€РµРЅРёСЏ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
-// С†РµР»СЊ: СѓР»СѓС‡С€РёС‚СЊ РІРёРґ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ СЃРЅРёРјРєР° РґР»СЏ С‡РµР»РѕРІРµС‡РµСЃРєРѕРіРѕ РІРѕСЃРїСЂРёСЏС‚РёСЏ
-// (РїРѕ РёРґРµРµ РґРѕР»Р¶РЅР° РѕРїСЂРµРґРµР»СЏС‚СЊ С‚РёРї СЃРЅРёРјРєР° Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё Рё
-// РїРѕРґСЃС‚СЂР°РёРІР°С‚СЊ СЃРѕРѕС‚РІРµС‚РІРµС‚СЃС‚РІСѓСЋС‰РёРµ РїР°СЂР°РјРµС‚СЂС‹)
-
 {
-    bool bComplete(false); // РёРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј РїСЂРµРјРµРЅРЅСѓСЋ РґР»СЏ СЃРёРіРЅР°Р»РёР·Р°С†РёРё РѕР±
-                          //    СѓСЃРїРµС€РЅРѕРј СѓР»СѓС‡С€РµРЅРёРё
+//    // функция улучшения изображения
+//    // цель: улучшить вид отображения снимка для человеческого восприятия
+//    // (по идее должна определять тип снимка автоматически и
+//    // подстраивать соответветствующие параметры)
+//    bool bComplete(false); // инициализируем пременную для сигнализации об
+//                          //    успешном улучшении
 
-    /*
-      --------------------
-// СЃРїРѕСЃРѕР±С‹ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ СЃРЅРёРјРєР°:
-    pLayer->setDrawingStyle:
-UndefinedDrawingStyle
-SingleBandGray
-SingleBandPseudoColor
-PalettedColor
-PalettedSingleBandGray
-PalettedSingleBandPseudoColor
-PalettedMultiBandColor          - С‚СЂРё С†РІРµС‚Р°
-MultiBandSingleGandGray
-MultiBandSingleBandGray
-MultiBandSingleBandPseudoColor
-MultiBandColor
-SingleBandColorDataStyle
----------------------------
-// Р°Р»РіРѕСЂРёС‚Рј С†РІРµС‚РѕРїРµСЂРµРґР°С‡Рё:
-    pLayer->setColorShadingAlgorithm:
-UndefinedShader
-PseudoColorShader
-FreakOutShader
-ColorRampShader
-UserDefinedShader
-----------------------
-    */
+//    /*
+//      --------------------
+//// способы отображения снимка:
+//    pLayer->setDrawingStyle:
+//UndefinedDrawingStyle
+//SingleBandGray
+//SingleBandPseudoColor
+//PalettedColor
+//PalettedSingleBandGray
+//PalettedSingleBandPseudoColor
+//PalettedMultiBandColor          - три цвета
+//MultiBandSingleGandGray
+//MultiBandSingleBandGray
+//MultiBandSingleBandPseudoColor
+//MultiBandColor
+//SingleBandColorDataStyle
+//---------------------------
+//// алгоритм цветопередачи:
+//    pLayer->setColorShadingAlgorithm:
+//UndefinedShader
+//PseudoColorShader
+//FreakOutShader
+//ColorRampShader
+//UserDefinedShader
+//----------------------
+//    */
 
-    //ksa -- azRasterLayer.setDrawingStyle( QgsRasterLayer::MultiBandColor); // СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРј "3-С… С†РІРµС‚РЅРѕРµ РёР·РѕР±СЂР°Р¶РµРЅРёРµ"
+//    //ksa -- azRasterLayer.setDrawingStyle( QgsRasterLayer::MultiBandColor); // устанавливаем "3-х цветное изображение"
 
-    // РїРѕРєР° РґРµР»Р°СЋ С‚Р°Рє: 3-С… С†РІРµС‚РЅРѕРµ РёР·РѕР±СЂР°Р¶РµРЅРёРµ Рё РєР°РЅР°Р»С‹:
-    // 4 - РєСЂР°СЃРЅС‹Р№; 3 - Р·РµР»РµРЅС‹Р№; 2 - СЃРёРЅРёР№.
-    if (azRasterLayer.bandCount() < 3)
-    {
-        // РјРµРЅСЊС€Рµ 3-С… РєР°РЅР°Р»РѕРІ РЅРµ СѓР»СѓС‡С€Р°РµРј
-    }
-    else if (azRasterLayer.bandCount() == 3)
-    {
-        // РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ РµСЃР»Рё С‚СЂРё С‚Рѕ РїСѓСЃС‚СЊ РёРґСѓС‚ РІ РѕР±СЂР°С‚РЅРѕРј
-        //ksa -- azRasterLayer.setRedBandName(azRasterLayer.bandName(3));
-        //ksa -- azRasterLayer.setGreenBandName(azRasterLayer.bandName(2));
-        //ksa -- azRasterLayer.setBlueBandName(azRasterLayer.bandName(1));
-        bComplete = true;
-    }
-    else
-    {
-            // РїСЂРѕРІРµСЂСЏРµРј РЅР°Р·РІР°РЅРёРµ РєР°Р¶РґРѕРіРѕ РєР°РЅР°Р»Р°
-        if (azRasterCheckBandName(azRasterLayer, "Band 4"))
-        {
-            //ksa -- azRasterLayer.setRedBandName("Band 4"); // РµСЃС‚СЊ - РґРѕР±Р°РІР»СЏРµРј
-        }
-        if (azRasterCheckBandName(azRasterLayer, "Band 3"))
-        {
-            //ksa -- azRasterLayer.setRedBandName("Band 3");
-        }
-        if (azRasterCheckBandName(azRasterLayer, "Band 2"))
-        {
-            //ksa -- azRasterLayer.setRedBandName("Band 2");
-        }
-        //ksa -- azRasterLayer.setBlueBandName("Band 2");
-        bComplete = true;
-    }
+//    // пока делаю так: 3-х цветное изображение и каналы:
+//    // 4 - красный; 3 - зеленый; 2 - синий.
+//    if (azRasterLayer.bandCount() < 3)
+//    {
+//        // меньше 3-х каналов не улучшаем
+//    }
+//    else if (azRasterLayer.bandCount() == 3)
+//    {
+//        // по умолчанию если три то пусть идут в обратном
 
-    //ksa -- azRasterLayer.setStandardDeviations(2.5); // РґР»СЏ СЂСЏСЃС‚СЏР¶РєРё РїРѕ РіРёСЃС‚РѕРіСЂР°РјРјРµ СЏСЂРєРѕСЃС‚Рё
-                                                       // РёСЃРї. СЃСЂРµРґРЅРµРµ РєРІР°РґСЂР°С‚РёС‡РЅРѕРµ РѕС‚РєР»РѕРЅРµРЅРёРµ 2.5
-    return bComplete;
+//        //ksa -- azRasterLayer.setRedBandName(azRasterLayer.bandName(3));
+//        //ksa -- azRasterLayer.setGreenBandName(azRasterLayer.bandName(2));
+//        //ksa -- azRasterLayer.setBlueBandName(azRasterLayer.bandName(1));
+//        bComplete = true;
+//    }
+//    else
+//    {
+//            // проверяем название каждого канала
+//        if (azRasterCheckBandName(azRasterLayer, "Band 4"))
+//        {
+//            //ksa -- azRasterLayer.setRedBandName("Band 4"); // есть - добавляем
+//        }
+//        if (azRasterCheckBandName(azRasterLayer, "Band 3"))
+//        {
+//            //ksa -- azRasterLayer.setRedBandName("Band 3");
+//        }
+//        if (azRasterCheckBandName(azRasterLayer, "Band 2"))
+//        {
+//            //ksa -- azRasterLayer.setRedBandName("Band 2");
+//        }
+//        //ksa -- azRasterLayer.setBlueBandName("Band 2");
+//        bComplete = true;
+//    }
+
+//    //ksa -- azRasterLayer.setStandardDeviations(2.5); // для рястяжки по гистограмме яркости
+//                                                       // исп. среднее квадратичное отклонение 2.5
+    return false;
 }
 
 bool MainWindow::azRasterCheckBandName(QgsRasterLayer &azRasterLayer, QString strBandName)
@@ -525,8 +513,8 @@ bool MainWindow::azMakeLayer(QGis::WkbType azType, QString pDestDir, QString pNa
     {
         if (!azCopyFiles(mpAppPath + pAddName + pExp, pDestDir + pName + pExp))
         {
-            QMessageBox::about(this, "Not copied", "from" + mpAppPath + pAddName + pExp +
-                               "\n to" + pDestDir + pName + pExp);
+
+//            QDebug("Файл не скопирован в" + pDestDir.toAscii() + pName.toAscii() + pExp.toAscii());
             bComplete = false;
         }
     }
@@ -543,9 +531,8 @@ bool MainWindow::azAddLayerVector(QFileInfo pFile)
     mypLayer->setRendererV2(mypRenderer);
     if (!mypLayer->isValid())
     {
-        qDebug("Shp layer is not valid. Layer was not added to map." + pFile.filePath().toAscii());
-        this->statusBar()->showMessage("Layer is not valid. Layer was not added to map."
-                                       "\n " + pFile.filePath() + "'");
+
+//        QDebug("Слой некорректный '" + pFile.filePath().toAscii() + "'");
         return false;
     }
 
@@ -559,6 +546,102 @@ bool MainWindow::azAddLayerVector(QFileInfo pFile)
     mpMapCanvas->setLayerSet(mpLayerSet);
     mpMapCanvas->refresh();
     return true;
+}
+
+void MainWindow::SLOTmpActionVectorize()
+{
+    this->azVectorize();
+    this->azAddWorkListToMap(azWorkList);
+}
+
+void MainWindow::azAddWorkListToMap(QStringList &pList)
+{
+    long i(0);
+    QString pMessage("");
+    foreach (const QString &pString, pList)
+    {
+        QFileInfo pFile(pString);
+        if (pFile.isFile())
+        {
+            if (azAddLayerVector(pFile))
+            {
+                i = i + 1;
+                pMessage = "Добавлен слой '" + pFile.baseName() + "'";
+                this->statusBar()->showMessage(pMessage);
+            }
+        }
+    }
+    if (i > 1)
+    {
+        pMessage = "Добавлено " + QString::number(i )+ "слоя(ев)";
+        this->statusBar()->showMessage(pMessage);
+    }
+}
+
+void MainWindow::azVectorize()
+{
+    dnThemTaskSpecBath->close();
+    QString pMessage(""); // сообщение в статус баре о результате векторизации
+    if (this->dnThemTaskSpecBath->Polygons.count() < 1)
+    {
+        pMessage = tr("Выбранные объекты не содержат информации для векторизации");
+        this->statusBar()->showMessage(pMessage);
+        return;
+    }
+
+    QString mEncoding; // кодировка
+    mEncoding = "UTF-8";
+
+    QgsFields mFields;
+    QgsField myField1("value", QVariant::Double, "Double", 0, 0);
+    QgsField myField2( "comment", QVariant::String, "String", 10, 0, "Comment" );
+    mFields.append( myField1 );
+    mFields.append( myField2 );
+    QgsCoordinateReferenceSystem pSRS;
+
+    // создаем систему координат идентичную растру
+    pSRS.createFromOgcWmsCrs("EPSG:" +
+                             QString::number(azGetEPSG(dnThemTaskSpecBath->Polygons.at(0).EPSG)));
+    pSRS.validate();
+    QString myFileName (dnThemTaskSpecBath->Polygons.at(0).NameLayer +
+                        QString::number(QTime::currentTime().hour())  + "-" +
+                        QString::number(QTime::currentTime().minute())  + "-" +
+                        QString::number(QTime::currentTime().second()) + "-" +
+                        QString::number(QTime::currentTime().msec()) + ".shp");
+    QgsVectorFileWriter myWriter( myFileName, mEncoding, mFields, QGis::WKBPolygon, &pSRS);
+
+    for (int i = 0; i < dnThemTaskSpecBath->Polygons.size(); i++)
+    {
+        DNVector dnVec;
+        dnVec = dnThemTaskSpecBath->Polygons.at(i);
+        QgsPolyline pPolyLine;
+        QgsPoint pFirstPoint (dnVec.GPt.at(0).x, dnVec.GPt.at(0).y);
+        for (int j = 0; j < dnVec.GPt.size(); j++)
+        {
+            QgsPoint p(dnVec.GPt.at(j).x, dnVec.GPt.at(j).y);
+            pPolyLine << p;
+        }
+        pPolyLine << pFirstPoint;
+        QgsPolygon pPolygon;
+        pPolygon << pPolyLine;
+        QgsGeometry * pPolygonGeometry = QgsGeometry::fromPolygon( pPolygon );
+        QgsFeature pFeature;
+//        pFeature.setTypeName( "WKBPolygon" );
+        pFeature.setGeometry( pPolygonGeometry );
+        pFeature.setAttribute("comment", "deep" );
+        pFeature.setAttribute("val",(double)dnVec.Vol);
+
+        QgsVectorFileWriter::WriterError mError;
+        myWriter.addFeature( pFeature );
+        mError = myWriter.hasError();
+        if (mError != 0)
+        {
+            qWarning() << myWriter.errorMessage();
+        }
+    }
+    QFileInfo pFile(myFileName);
+    this->azAddLayerVector(pFile);
+    return;
 }
 
 
@@ -608,21 +691,20 @@ void MainWindow::SLOTmpActionFileExit() // Exit from Application
     QString pMessageText("");
     uint pButtonsPack(0);
     int pButton(0);
-    ProjectChange = true;
+ 
     if (ProjectChange)
     {
         pButtonsPack = 0x00410800;
-        pMessageText = "The Document has changed,"
-                "\n Do you want to save changes before close application?";
+
     }
     else
     {
         pButtonsPack = 0x00404000;
-        pMessageText = "Do you want to close application?";
+
     }
 
     QMessageBox * pExitApp = new QMessageBox (QMessageBox::Question,
-                                              "Exit from Application",
+                                              "Выход из приложения",
                                         pMessageText,
                            (QMessageBox::StandardButton)pButtonsPack);
     pButton = pExitApp->exec();
@@ -663,7 +745,7 @@ void MainWindow::SLOTmpCloseProject()
 
 void MainWindow::SLOTmpActionFileOpenProject() // Open QGIS Project in MapDock
 {
-    QString projectFileName = QFileDialog::getOpenFileName(this, "Open map project *.qgs", "", "*.qgs");
+    QString projectFileName("");
     if (projectFileName.isNull())
     {
         return;
@@ -675,9 +757,9 @@ void MainWindow::SLOTmpActionFileOpenProject() // Open QGIS Project in MapDock
     if ( !QgsProject::instance()->read() )
     {
         QApplication::restoreOverrideCursor();
-        this->statusBar()->showMessage("Failed to open project!"
-                                       "\n " + projectFileName + "'");
-        qDebug("Failed to open project!" + projectFileName.toAscii());
+
+//                                       "\n " + projectFileName + "'");
+
         mpMapCanvas->freeze(false);
         mpMapCanvas->refresh();
         return;
@@ -736,18 +818,19 @@ void MainWindow::SLOTtempUse()
 long MainWindow::azGetEPSG(const QString rastrPath)
 {
     QFileInfo pFileInfo(rastrPath);
-    if (!pFileInfo.isFile()) // РїСЂРѕРІРµСЂРєР° СЃСѓС‰РµСЃС‚РІРѕРІР°РЅРёСЏ С„Р°Р№Р»Р°
+    if (!pFileInfo.isFile()) // проверка существования файла
     {
         return -1;
     }
     QgsRasterLayer * pRLayer = new QgsRasterLayer(pFileInfo.filePath(), pFileInfo.completeBaseName());
-    return pRLayer->crs().srsid();
+    return pRLayer->crs().srsid(); //почему?
 }
 
 
 void MainWindow::SLOTmpActionAddVectorLayer()
 {
-    QString fullLayerName = QFileDialog::getOpenFileName(this, "Add layer", "", "All supported (*.shp *.tif *tiff);;Shapefiles (*.shp);;Geotiff (*.tif *.tiff)");
+    QString fullLayerName = QFileDialog::getOpenFileName(this, "Добавить векторный слой",
+                            "", "Все поддерживаемые форматы(*.shp);;Shapefiles (*.shp)");
     QFileInfo azFileInfo(fullLayerName);
     if (!azFileInfo.isFile())
     {
@@ -783,7 +866,8 @@ void MainWindow::SLOTmpActionAddPostGISLayer()
   
     dbs->exec();
     delete dbs;
-} 
+}
+
 
 
 /*void MainWindow::paintEvent(QPaintEvent *pPaint)
@@ -803,154 +887,49 @@ void MainWindow::SLOTmpActionAddPostGISLayer()
 
 void MainWindow::SLOTmpActionAddRasterLayer()
 {
-    // РЎР›РћРў: РґРѕР±Р°РІР»РµРЅРёРµ СЂР°СЃС‚СЂР° РІ РѕРєРЅРѕ РєР°СЂС‚С‹
-    // СЃРЅР°С‡Р°Р»Р° РІС‹Р·С‹РІР°РµРј РґРёР°Р»РѕРі, РїРѕР»СѓС‡Р°РµРј РїСѓС‚СЊ Рє С„Р°Р№Р»Сѓ
-    QString fullLayerName = QFileDialog::getOpenFileName(this, "Add raster layer", "",
-                         "Raster files (*.img *.asc *.tif *tiff *.bmp *.jpg *.jpeg);;Geotiff (*.tif *.tiff)");
-    QFileInfo azFileInfo(fullLayerName);
-    if (!azFileInfo.isFile()) // РїСЂРѕРІРµСЂРєР° СЃСѓС‰РµСЃС‚РІРѕРІР°РЅРёСЏ С„Р°Р№Р»Р°
-    {
-        return;
-    }
-
-
-    // СЃРѕР·РґР°РµРј СЌРєР·РµРјРїР»СЏСЂ РєР»Р°СЃСЃР° QgsRasterLayer
-    // РѕРЅ СЃРѕРґРµСЂР¶РёС‚ РІСЃСЋ РёРЅС„Сѓ Рѕ СЂР°СЃС‚СЂРµ
-    QgsRasterLayer * mypLayer = new QgsRasterLayer(azFileInfo.filePath(), azFileInfo.completeBaseName());
-    if (!mypLayer->isValid()) // РїСЂРѕРІРµСЂСЏРµРј РµРіРѕ РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚СЊ
-    {
-        qDebug("Raster layer is not valid or not supported by GDAL. Layer was not added to map." + fullLayerName.toAscii());
-        this->statusBar()->showMessage("Raster layer is not valid or not supported by GDAL. Layer was not added to map."
-                                       "\n " + fullLayerName + "'");
-        return;
-    }
-    
-    if (!this->azRasterEnhancement(*mypLayer)) // РїСЂРёРјРµРЅСЏРµРј СѓР»СѓС‡С€РµРЅРёРµ СЃРЅРёРјРєР°
-    {
-        qDebug("Enhancement wasn't used. Unrecognize type of image" + fullLayerName.toAscii());
-    }
-    
-    // РїСЂРёРјРµРЅСЏРµРј СѓР»СѓС‡С€РµРЅРёРµ РєРѕРЅС‚СЂР°СЃС‚Р° (С‚.Рµ. С†РІРµС‚Р° РѕС‚РѕР±СЂР°Р¶Р°СЋС‚СЃСЏ РѕС‚ РјРёРЅРёРјСѓРјР° РґРѕ РјР°РєСЃРёРјСѓРјР°)
-    //ksa -- mypLayer->setContrastEnhancementAlgorithm(QgsContrastEnhancement::StretchToMinimumMaximum, false );
-    mypLayer->setContrastEnhancement(QgsContrastEnhancement::StretchToMinimumMaximum);
-
-    // СЃР°РјРѕРѕР±РЅРѕРІР»РµРЅРёРµ
-    connect(mypLayer, SIGNAL(repaintRequested()), mpMapCanvas, SLOT(refresh()) );
-
-    // Add the Vector Layer to the Layer Registry
-    mpRegistry->addMapLayer(mypLayer, TRUE);
-    // Add the Layer to the Layer Set
-    mpLayerSet.append(QgsMapCanvasLayer(mypLayer));
-    mpMapCanvas->setExtent(mypLayer->extent());
-    mpMapCanvas->setLayerSet(mpLayerSet);
-    mpMapCanvas->refresh();
-/*    QgsMapLayer *pLayer;
-    pLayer = mypLayer;
-    QgsCoordinateReferenceSystem pSRS;
-    pSRS = mypLayer->*/
-}
-
-void MainWindow::SLOTmpActionVectorize()
-{
-    QString pMessage(""); // СЃРѕРѕР±С‰РµРЅРёРµ РІ СЃС‚Р°С‚СѓСЃ Р±Р°СЂРµ Рѕ СЂРµР·СѓР»СЊС‚Р°С‚Рµ РІРµРєС‚РѕСЂРёР·Р°С†РёРё
-    if (this->dnThemTaskSpecBath->Polygons.count() < 1)
-    {
-        pMessage = tr("Selected objects haven't information for vectoring.");
-        return;
-    }
-
-    QString mEncoding; // РєРѕРґРёСЂРѕРІРєР°
-    mEncoding = "UTF-8";
-
-    //ksa -- QgsFieldMap mFields;
-    QgsFields mFields;
-    QgsField myField1("value", QVariant::Double, "Double", 0, 0);
-    QgsField myField2( "comment", QVariant::String, "String", 10, 0, "Comment" );
-    mFields.append(myField1);
-    mFields.append(myField2);
-    //ksa -- mFields.insert( 0, myField1 );
-    //ksa -- mFields.insert( 1, myField2 );
-    QgsCoordinateReferenceSystem pSRS;
-
-    // СЃРѕР·РґР°РµРј СЃРёСЃС‚РµРјСѓ РєРѕРѕСЂРґРёРЅР°С‚ РёРґРµРЅС‚РёС‡РЅСѓСЋ СЂР°СЃС‚СЂСѓ
-    pSRS.createFromOgcWmsCrs("EPSG:" +
-                             QString::number(azGetEPSG(dnThemTaskSpecBath->Polygons.at(0).EPSG)));
-    pSRS.validate();
-    QString myFileName ("/" + dnThemTaskSpecBath->Polygons.at(0).NameLayer +
-                        QString::number(QTime::currentTime().hour())  + "-" +
-                        QString::number(QTime::currentTime().minute())  + "-" +
-                        QString::number(QTime::currentTime().second()) + "-" +
-                        QString::number(QTime::currentTime().msec()) + ".shp");
-    myFileName = "D:/!Share/layers/" + myFileName;
-    
-    QgsVectorFileWriter myWriter( myFileName, mEncoding, mFields, QGis::WKBPolygon, &pSRS);
-
-    QMessageBox::about(this->dnThemTaskSpecBath, "test", "Hello!");
-    for (int i = 0; i < dnThemTaskSpecBath->Polygons.size(); i++)
-    {
-        DNVector dnVec;
-        dnVec = dnThemTaskSpecBath->Polygons.at(i);
-        QgsPolyline pPolyLine;
-		QgsPoint pFirstPoint (dnVec.GPt.at(0).x, dnVec.GPt.at(0).y);
-        for (int j = 0; j < dnVec.GPt.size(); j++)
+        // СЛОТ: добавление растра в окно карты
+        // сначала вызываем диалог, получаем путь к файлу
+        QString fullLayerName = QFileDialog::getOpenFileName(this, "Добавить растровый слой", "",
+                             "Все поддерживаемые растровые форматы (*.img *.asc *.tif *tiff *.bmp *.jpg *.jpeg);;Geotiff (*.tif *.tiff)");
+        QFileInfo azFileInfo(fullLayerName);
+        if (!azFileInfo.isFile()) // проверка существования файла
         {
-            QgsPoint p(dnVec.GPt.at(j).x, dnVec.GPt.at(j).y);
-            pPolyLine << p;
+            return;
         }
-		pPolyLine << pFirstPoint;
-        QgsPolygon pPolygon;
-        pPolygon << pPolyLine;
-        QgsGeometry * pPolygonGeometry = QgsGeometry::fromPolygon( pPolygon );
-        QgsFeature pFeature;
-        //ksa -- pFeature.setTypeName( "WKBPolygon" );
-        pFeature.setGeometry( pPolygonGeometry );
-        pFeature.setAttribute( "comment", "val" );
-        pFeature.setAttribute("value", (double)dnVec.Vol);
-
-        QgsVectorFileWriter::WriterError mError;
-        myWriter.addFeature( pFeature );
-        mError = myWriter.hasError();
-		//QMessageBox::about(0, "", );
-		qWarning() << myWriter.errorMessage();
-    }
 
 
-//    QgsPoint mPoint1;
-//    QgsPoint mPoint2;
-//    QgsPoint mPoint3;
+        // создаем экземпляр класса QgsRasterLayer
+        // он содержит всю инфу о растре
+        QgsRasterLayer * mypLayer = new QgsRasterLayer(azFileInfo.filePath(), azFileInfo.completeBaseName());
+        if (!mypLayer->isValid()) // проверяем его корректность
+        {
+            qDebug("Raster layer is not valid or not supported by GDAL. Layer was not added to map." + fullLayerName.toAscii());
+            this->statusBar()->showMessage("Файл растра не явялется корректным или не поддерживается библиотекой GDAL. Слой не был добавлен на карту."
+                                           "\n " + fullLayerName + "'");
+            return;
+        }
+        if (!this->azRasterEnhancement(*mypLayer)) // применяем улучшение снимка
+        {
+            qDebug("Улучшение растра не использовано. Нераспознаный формат растра." + fullLayerName.toAscii());
+        }
+        // применяем улучшение контраста (т.е. цвета отображаются от минимума до максимума)
+        mypLayer->setContrastEnhancement(QgsContrastEnhancement::StretchToMinimumMaximum);
 
+        // самообновление
+        connect(mypLayer, SIGNAL(repaintRequested()), mpMapCanvas, SLOT(refresh()) );
 
-//    mPoint1 = QgsPoint( 10.0, 10.0 );
-//    mPoint2 = QgsPoint( 15.0, 10.0 );
-//    mPoint3 = QgsPoint( 15.0, 12.0 );
+        // Add the Vector Layer to the Layer Registry
+        mpRegistry->addMapLayer(mypLayer, TRUE);
+        // Add the Layer to the Layer Set
+        mpLayerSet.append(QgsMapCanvasLayer(mypLayer));
+        mpMapCanvas->setExtent(mypLayer->extent());
+        mpMapCanvas->setLayerSet(mpLayerSet);
+        mpMapCanvas->refresh();
+    /*    QgsMapLayer *pLayer;
+        pLayer = mypLayer;
+        QgsCoordinateReferenceSystem pSRS;
+        pSRS = mypLayer->*/
 
-
-//    QString myFileName ("/testply.shp");
-//    myFileName = "D:/!Share/src/reper/ddocclient/build/layers" + myFileName;
-//    QgsVectorFileWriter myWriter( myFileName, mEncoding, mFields, QGis::WKBPolygon, &pSRS);
-
-//    QgsPolyline myPolyline;
-//    myPolyline << mPoint1 << mPoint2 << mPoint3 << mPoint1;
-//    QgsPolygon myPolygon;
-//    myPolygon << myPolyline;
-//    //polygon: first item of the list is outer ring,
-//    // inner rings (if any) start from second item
-//    //
-//    // NOTE: don't delete this pointer again -
-//    // ownership is passed to the feature which will
-//    // delete it in its dtor!
-//    QgsGeometry * mypPolygonGeometry = QgsGeometry::fromPolygon( myPolygon );
-//    QgsFeature myFeature;
-//    myFeature.setTypeName( "WKBPolygon" );
-//    myFeature.setGeometry( mypPolygonGeometry );
-//    myFeature.addAttribute( 0, "HelloWorld" );
-//    myFeature.addAttribute(1, 334);
-
-//    QgsVectorFileWriter::WriterError mError;
-//    myWriter.addFeature( myFeature );
-//    mError = myWriter.hasError();
-
-    return;
 
 }
 
@@ -1023,9 +1002,11 @@ void MainWindow::SLOTazThemTaskSpectralBathynometry()
         connect(this->dnThemTaskSpecBath, SIGNAL(SIGNALcreateVector()), this, SLOT(SLOTmpActionVectorize()));
     }
 
-    dnThemTaskSpecBath->setWindowTitle(tr("РЎРїРµРєС‚СЂР°Р»СЊРЅР°СЏ Р‘Р°С‚РёРЅРѕРјРµС‚СЂРёСЏ"));
-    dnThemTaskSpecBath->setWindowModality(Qt::WindowModal);
     dnThemTaskSpecBath->show();
+//    QMessageBox::about(0, "a", "a");
+//    QFileInfo pFile("D:/!Share/layers/baba.shp");
+//    this->azAddLayerVector(pFile);
+
 }
 
 void MainWindow::SLOTazCoordsCenter()

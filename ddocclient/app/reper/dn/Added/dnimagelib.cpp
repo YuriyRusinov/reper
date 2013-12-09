@@ -69,7 +69,7 @@ DnImageLib::~DnImageLib()
  delete[] RasterData;
 }
 
-/*Р Р°Р±РѕС‚Р° СЃРѕ СЃРїРµРєС‚СЂР°Р»СЊРЅС‹РјРё РґР°РЅРЅС‹РјРё*/
+/*Работа со спектральными данными*/
 float* DnImageLib::GetBandZone(int NumBand,int xn,int yn,int xk,int yk)
 {
  NumBand+=1;
@@ -150,8 +150,8 @@ float* DnImageLib::GetSpectrPoint(int xp,int yp,bool *MaskCh)
  return SpectrData;
 }
 
-/*Р Р°Р±РѕС‚Р° СЃ  РіРµРѕРіСЂР°С„РёС‡РµСЃРєРёРјРё РґР°РЅРЅС‹РјРё*/
-/*РџРѕР»СѓС‡РёС‚СЊ РіРµРѕРіСЂР°С„РёС‡РµСЃРєРёРµ РїР°СЂР°РјРµС‚СЂС‹*/
+/*Работа с  географическими данными*/
+/*Получить географические параметры*/
 void DnImageLib::GetGeoData(GeoDataStruct *GD)
 {
  double adfGeoTransform[6];
@@ -163,13 +163,13 @@ void DnImageLib::GetGeoData(GeoDataStruct *GD)
  GD->YD=adfGeoTransform[5];
  GD->YAngle=adfGeoTransform[4];
 }
-/*РџРµСЂРµСЃС‡РёС‚Р°С‚СЊ РєРѕРѕСЂРґРёРЅР°С‚С‹ С‚РѕС‡РєРё РёР·РѕР±СЂР°Р¶РµРЅРёСЏ РІ РіРµРѕРіСЂР°С„РёС‡РµСЃРєРёРµ*/
+/*Пересчитать координаты точки изображения в географические*/
 void DnImageLib::DetermGeoCoord(int xp,int yp,GeoDataStruct GD,double &XGeo,double &YGeo)
 {
  XGeo=GD.XTopLeftPix+xp*GD.XD*cos(GD.XAngle)-yp*GD.YD*sin(GD.XAngle);
  YGeo=GD.YTopLeftPix+yp*GD.YD*cos(GD.YAngle)-xp*GD.XD*sin(GD.YAngle);
 }
-/*Р¤СѓРЅРєС†РёРё РІРёР·СѓР°Р»РёР·Р°С†РёРё*/
+/*Функции визуализации*/
 QImage DnImageLib::GenerateImg(int Ch1,int Ch2,int Ch3,double B1,double B2,double B3,double Contrast)
 {
  bool *MaskCh;
@@ -206,7 +206,7 @@ QImage DnImageLib::GenerateImg(int Ch1,int Ch2,int Ch3,double B1,double B2,doubl
  if((BMax-BMin)>255 && BMin<0.)
   Kof=255/(BMax-BMin);
 
-/*РЎРѕР·РґР°РЅРёРµ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ*/
+/*Создание изображения*/
  const int n=3;
  const int nRead=(int)this->H/n;
  const int OstRead=this->H%n;
@@ -297,7 +297,7 @@ QImage DnImageLib::GenerateImg(int Ch1,int Ch2,int Ch3,double B1,double B2,doubl
  nCh.clear();
  return img;
 }
-/*Р—Р°РїРёСЃСЊ СЃРїРµРєС‚СЂР°Р»СЊРЅС‹С… РґР°РЅРЅС‹С… РІ С„Р°Р№Р»*/
+/*Запись спектральных данных в файл*/
 void DnImageLib::GenerateSpectrFile(int x,int y,int W,int H,QList <QPoint> pt, QString PolyName)
 {
  int xc,yc;
@@ -377,7 +377,7 @@ void DnImageLib::GenerateSpectrFile(int x,int y,int W,int H,QList <QPoint> pt, Q
  delete[] SpectrZone;
 }
 
-/*РћРїСЂРµРґРµР»РµРЅРёРµ РЅРѕРјРµСЂРѕРІ СЃРїРµРєС‚СЂР°Р»СЊРЅС‹С… РєР°РЅР°Р»РѕРІ*/
+/*Определение номеров спектральных каналов*/
 int DnImageLib::DetermNCh(float Lam)
 {
  int n=-1;

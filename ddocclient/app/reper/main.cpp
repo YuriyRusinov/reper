@@ -16,9 +16,9 @@
 int main(int argc, char ** argv) 
 {
   // Start the Application
-    QTextCodec::setCodecForTr(QTextCodec::codecForName("utf-8"));
-    QTextCodec::setCodecForCStrings(QTextCodec::codecForName("utf-8"));
-    QTextCodec::setCodecForLocale(QTextCodec::codecForName("utf-8"));
+    QTextCodec::setCodecForTr(QTextCodec::codecForName("cp1251"));
+    QTextCodec::setCodecForCStrings(QTextCodec::codecForName("cp1251"));
+    QTextCodec::setCodecForLocale(QTextCodec::codecForName("cp1251"));
 
     QgsApplication * app = new QgsApplication(argc, argv, true);
 
@@ -31,7 +31,7 @@ int main(int argc, char ** argv)
 //    app->installTranslator(&translator);
 
     //QString myPluginsDir        = "C:\\Program Files (x86)\\Quantum GIS 1.7.0\\plugins";
-	QString myPluginsDir        = "C:\\Program Files (x86)\\DynamicSoft\\DynamicDocs Client 1.2.3\\QGS21\\plugins";
+    QString myPluginsDir        = "D:\\REP_EXT\\QGS21\\plugins";
     app->setPluginPath(myPluginsDir);
     app->initQgis();
 

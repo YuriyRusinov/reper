@@ -1,6 +1,5 @@
-п»ї#include "dnspecbath.h"
+#include "dnspecbath.h"
 #include "dn/dnwidgetimage.h"
-#include "ui_dnspecbath.h"
 
 DNSpecBath::DNSpecBath(QWidget *parent) :
     QMainWindow(parent),
@@ -47,7 +46,7 @@ void DNSpecBath::resizeEvent(QResizeEvent*)
 void DNSpecBath::on_FileOpen_triggered()
 {
 
- this->FileNameOpen=QFileDialog::getOpenFileName(this,"РћС‚РєСЂС‹С‚СЊ С„Р°Р№Р» РїСЂРѕРµРєС‚Р°","","Raster files (*.img *.asc *.tif *tiff *.bmp *.jpg *.jpeg);;Geotiff (*.tif *.tiff)");
+ this->FileNameOpen=QFileDialog::getOpenFileName(this,"Открыть файл проекта","","Raster files (*.img *.asc *.tif *tiff *.bmp *.jpg *.jpeg);;Geotiff (*.tif *.tiff)");
  if(!this->FileNameOpen.isEmpty())
  {
   if(this->GdalImage!=NULL)
@@ -85,7 +84,7 @@ void DNSpecBath::on_FileOpen_triggered()
   this->FillMainForm();
 
 
-    //Р•СЃР»Рё СЃСѓС‰РµСЃС‚РІСѓСЋС‚ РїРѕР»РёРіРѕРЅС‹ РІ РїСЂРѕРµРєС‚Рµ, С‚Рѕ РґРµР»Р°РµРј РїРµСЂРІС‹Р№ РїРѕР»РёРіРѕРЅ С‚РµРєСѓС‰РёРј
+    //Если существуют полигоны в проекте, то делаем первый полигон текущим
    if(this->NamesPoly.size()>0)
    {
     this->CurrentNamePoly=this->NamesPoly[0];
@@ -162,11 +161,11 @@ void DNSpecBath::on_CreatePoly_triggered(bool checked)
 
  ui->DNWPic->IsCretaePolyOn=checked;
 
-//РЎРѕС…СЂР°РЅРµРЅРёРµ РїРѕР»РёРіРѕРЅР° РІ С„Р°Р№Р» (РµСЃР»Рё СЃРЅСЏС‚Р° РіР°Р»РѕС‡РєР° СЃ РјРµРЅСЋ РЎРѕР·РґР°С‚СЊ РїРѕР»РёРіРѕРЅ Рё СЃРѕР·РґР°РІР°РµРјС‹Р№ РїРѕР»РёРіРѕРЅ РёРјРµРµС‚ Р±РѕР»СЊС€Рµ РґРІСѓС… С‚РѕС‡РµРє)
+//Сохранение полигона в файл (если снята галочка с меню Создать полигон и создаваемый полигон имеет больше двух точек)
  if(!checked && ui->DNWPic->Polygon.pt.size()>2)
  {
   bool InputOk;
-  QString NamePoly=QInputDialog::getText(this,"РЎРѕР·РґР°С‚СЊ РїРѕР»РёРіРѕРЅ","Р’РІРµРґРёС‚Рµ РёРјСЏ РїРѕР»РёРіРѕРЅР°",
+  QString NamePoly=QInputDialog::getText(this,"Создать полигон","Введите имя полигона",
                                          QLineEdit::Normal,"Polygon_"+QString().setNum(ui->DNWPic->Polygons.size()+1),
                                          &InputOk);
   if(InputOk && !NamePoly.isEmpty())
@@ -243,7 +242,7 @@ void DNSpecBath::on_treePolygons_currentItemChanged(QTreeWidgetItem *current, QT
   this->FillStackPolygons();
   this->ChangeCurrentPoly();
 
-  //Р•СЃР»Рё С‚РµРєСѓС‰Р°СЏ РїРѕР·РёС†РёСЏ СЏРІР»СЏРµС‚СЃСЏ СЂРµР·СѓР»СЊС‚Р°С‚РѕРј РєР»Р°СЃСЃРёС„РёРєР°С†РёРё
+  //Если текущая позиция является результатом классификации
   if(this->IsCurPolyClassif)
   {
    this->ReadFileClassif(this->GdalImage->PathImgFile+'/'+this->GdalImage->NameImgFile+this->CurrentNameClassif+".kls");
@@ -286,7 +285,7 @@ void DNSpecBath::on_Batinometriy_triggered()
   Polygons=this->SerPoly->RastrToVector(GDSt.XTopLeftPix,GDSt.XD,GDSt.XAngle,GDSt.YTopLeftPix,GDSt.YD,GDSt.YAngle,SerPoly->KofV,SerPoly->MinV, this->FileNameOpen);
 
   ui->pbVectorize->setEnabled(true);
-  ui->statusBar->showMessage(tr("Р Р°СЃС‡РµС‚ СЃРїРµРєС‚СЂР°Р»СЊРЅРѕР№ Р±Р°С‚РёРЅРѕРјРµС‚СЂРёРё Р·Р°РІРµСЂС€РµРЅ"));
+  ui->statusBar->showMessage(tr("Расчет спектральной батинометрии завершен"));
   QApplication::restoreOverrideCursor();
 
   this->FillMainForm();
@@ -299,7 +298,7 @@ void DNSpecBath::on_MultiChan_triggered()
  if(this->SerPoly!=NULL)
  {
   bool InputOk;
-  QString MultiCh=QInputDialog::getText(this,tr("РњРЅРѕР¶РёС‚РµР»СЊ РєР°РЅР°Р»РѕРІ"),tr("Р’РІРµРґРёС‚Рµ РјРЅРѕР¶РёС‚РµР»СЊ РєР°РЅР°Р»РѕРІ"),QLineEdit::Normal,"0.0001",&InputOk);
+  QString MultiCh=QInputDialog::getText(this,tr("Множитель каналов"),tr("Введите множитель каналов"),QLineEdit::Normal,"0.0001",&InputOk);
   if(InputOk)
   {
    float Kof=MultiCh.replace(",",".").toFloat();
@@ -322,11 +321,11 @@ void DNSpecBath::FillMainForm()
  ui->ComboG->clear();
  ui->ComboB->clear();
 
-//Р—Р°РїРѕР»РЅРµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
+//Заполнение параметров изображения
  for(i=0;i<this->GdalImage->Ch;i++)
  {
   DataString2.setNum((float)i+1,'d',0);
-  DataString1=tr("РљР°РЅР°Р» ")+DataString2;
+  DataString1=tr("Канал ")+DataString2;
   ui->ComboR->addItem(DataString1);
   ui->ComboG->addItem(DataString1);
   ui->ComboB->addItem(DataString1);
@@ -342,10 +341,10 @@ void DNSpecBath::FillMainForm()
  DataString1.setNum((float)this->BKof[2],'d',1);
  ui->EditKB->setText(DataString1);
 
-//Р—Р°РїРѕР»РЅРµРЅРёРµ РґРµСЂРµРІР° РїРѕР»РёРіРѕРЅРѕРІ Рё СЃРѕС…СЂР°РЅРµРЅРёРµ РёРјС‘РЅ РїРѕР»РёРіРѕРЅРѕРІ
+//Заполнение дерева полигонов и сохранение имён полигонов
 // DataString1="*.ser";
  PolygonsFiles=DirPolygons.entryList(QStringList()<<"*.pol",QDir::Files,QDir::Name);
- ui->treePolygons->setHeaderLabel(tr("РџРѕР»РёРіРѕРЅС‹"));
+ ui->treePolygons->setHeaderLabel(tr("Полигоны"));
  ui->treePolygons->clear();
  this->NamesPoly.clear();
 
@@ -361,7 +360,7 @@ void DNSpecBath::FillMainForm()
  this->FillTreePolygons(this->GdalImage->PathImgFile+'/'+this->GdalImage->NameImgFile,ui->treePolygons);
 }
 
-/*Р—Р°РїРѕР»РЅРёС‚СЊ РґРµСЂРµРІРѕ РїРѕР»РёРіРѕРЅРѕРІ*/
+/*Заполнить дерево полигонов*/
 void DNSpecBath::FillTreePolygons(QString StartPath,QTreeWidgetItem *ItemParent)
 {
  QDir CurDir(StartPath),Dir;
@@ -405,7 +404,7 @@ void DNSpecBath::FillTreePolygons(QString StartPath,QTreeWidget *ItemParent)
   }
  }//foreach(DataString1,PolygonsFiles)
 }
-/*РџСЂРѕС‡РµСЃС‚СЊ С„Р°Р№Р» РїРѕР»РёРіРѕРЅР° Рё РѕС‚РѕР±СЂР°Р·РёС‚СЊ РёРЅС„РѕСЂРјР°С†РёСЋ РІ РѕРєРЅРµ*/
+/*Прочесть файл полигона и отобразить информацию в окне*/
 void DNSpecBath::ReadFilePoly(QString PolyFileName)
 {
  QFileInfo *fInfo;
@@ -452,7 +451,7 @@ void DNSpecBath::ReadFileClassif(QString PolyFileClassif)
  ui->DNWPic->Polygon.ClassifMass=this->SerPoly->ClassifMass;
 }
 
-/*РџРµСЂРµРІРѕРґ РёР· РёРјРµРЅРё РїРѕР»РёРіРѕРЅР° РІ РїРѕР»РЅРѕРµ РёРјСЏ С„Р°Р№Р»Р° РїРѕР»РёРіРѕРЅР°*/
+/*Перевод из имени полигона в полное имя файла полигона*/
 QString DNSpecBath::NamePolyToFile(QString NamePoly)
 {
  QString DataString,DataString2;
@@ -460,7 +459,7 @@ QString DNSpecBath::NamePolyToFile(QString NamePoly)
  DataString2=QObject::tr(qPrintable(DataString));
  return DataString2;
 }
-/*Р—Р°РїРѕР»РЅРёС‚СЊ СЃС‚СЌРє РїРѕР»РёРіРѕРЅРѕРІ*/
+/*Заполнить стэк полигонов*/
 void DNSpecBath::FillStackPolygons()
 {
  int ip;
@@ -477,7 +476,7 @@ void DNSpecBath::FillStackPolygons()
 //  }//if(this->NamesPoly[ip]!=this->CurrentNamePoly)
  }//for(ip=0;ip<this->NamesPoly.size();ip++)
 }
-/*РЎРѕР±С‹С‚РёРµ РёР·РјРµРЅРµРЅРёСЏ С‚РµРєСѓС‰РµРіРѕ РїРѕР»РёРіРѕРЅР°*/
+/*Событие изменения текущего полигона*/
 void DNSpecBath::ChangeCurrentPoly()
 {
  if(this->SerPoly!=NULL)
@@ -492,7 +491,7 @@ void DNSpecBath::ChangeCurrentPoly()
 
 void DNSpecBath::on_pbVectorize_clicked()
 {
-    emit SIGNALcreateVector(); // РїРѕСЃС‹Р»Р°РµРј СЃРёРіРЅР°Р» РґР»СЏ РІС‹РїРѕР»РЅРµРЅРёСЏ РІРµРєС‚РѕСЂРёР·Р°С†РёРё
+    emit SIGNALcreateVector(); // посылаем сигнал для выполнения векторизации
 }
 
 void DNSpecBath::on_ShowDeptch_triggered()

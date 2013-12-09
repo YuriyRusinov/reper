@@ -208,3 +208,105 @@ void SLOTmpActionVectorize()
 
 }
 */
+// -------------------------------- Vectorize
+//    void vectorize()
+//{
+//    QString pMessage(""); // сообщение в статус баре о результате векторизации
+//    if (this->dnThemTaskSpecBath->Polygons.count() < 1)
+//    {
+
+//    }
+
+//    QString mEncoding; // кодировка
+//    mEncoding = "UTF-8";
+
+//    //ksa -- QgsFieldMap mFields;
+//    QgsFields mFields;
+//    QgsField myField1("value", QVariant::Double, "Double", 0, 0);
+//    QgsField myField2( "comment", QVariant::String, "String", 10, 0, "Comment" );
+//    mFields.append(myField1);
+//    mFields.append(myField2);
+//    //ksa -- mFields.insert( 0, myField1 );
+//    //ksa -- mFields.insert( 1, myField2 );
+//    QgsCoordinateReferenceSystem pSRS;
+
+//    // создаем систему координат идентичную растру
+//    pSRS.createFromOgcWmsCrs("EPSG:" +
+//                             QString::number(azGetEPSG(dnThemTaskSpecBath->Polygons.at(0).EPSG)));
+//    pSRS.validate();
+//    QString myFileName ("/" + dnThemTaskSpecBath->Polygons.at(0).NameLayer +
+//                        QString::number(QTime::currentTime().hour())  + "-" +
+//                        QString::number(QTime::currentTime().minute())  + "-" +
+//                        QString::number(QTime::currentTime().second()) + "-" +
+//                        QString::number(QTime::currentTime().msec()) + ".shp");
+//    myFileName = "D:/!Share/layers/" + myFileName;
+
+//    QgsVectorFileWriter myWriter( myFileName, mEncoding, mFields, QGis::WKBPolygon, &pSRS);
+
+//    QMessageBox::about(this->dnThemTaskSpecBath, "test", "Hello!");
+//    for (int i = 0; i < dnThemTaskSpecBath->Polygons.size(); i++)
+//    {
+//        DNVector dnVec;
+//        dnVec = dnThemTaskSpecBath->Polygons.at(i);
+//        QgsPolyline pPolyLine;
+//		QgsPoint pFirstPoint (dnVec.GPt.at(0).x, dnVec.GPt.at(0).y);
+//        for (int j = 0; j < dnVec.GPt.size(); j++)
+//        {
+//            QgsPoint p(dnVec.GPt.at(j).x, dnVec.GPt.at(j).y);
+//            pPolyLine << p;
+//        }
+//		pPolyLine << pFirstPoint;
+//        QgsPolygon pPolygon;
+//        pPolygon << pPolyLine;
+//        QgsGeometry * pPolygonGeometry = QgsGeometry::fromPolygon( pPolygon );
+//        QgsFeature pFeature;
+//        //ksa -- pFeature.setTypeName( "WKBPolygon" );
+//        pFeature.setGeometry( pPolygonGeometry );
+//        pFeature.setAttribute( "comment", "val" );
+//        pFeature.setAttribute("value", (double)dnVec.Vol);
+
+//        QgsVectorFileWriter::WriterError mError;
+//        myWriter.addFeature( pFeature );
+//        mError = myWriter.hasError();
+//		//QMessageBox::about(0, "", );
+//		qWarning() << myWriter.errorMessage();
+
+
+////    QgsPoint mPoint1;
+////    QgsPoint mPoint2;
+////    QgsPoint mPoint3;
+
+
+////    mPoint1 = QgsPoint( 10.0, 10.0 );
+////    mPoint2 = QgsPoint( 15.0, 10.0 );
+////    mPoint3 = QgsPoint( 15.0, 12.0 );
+
+
+////    QString myFileName ("/testply.shp");
+////    myFileName = "D:/!Share/src/reper/ddocclient/build/layers" + myFileName;
+////    QgsVectorFileWriter myWriter( myFileName, mEncoding, mFields, QGis::WKBPolygon, &pSRS);
+
+////    QgsPolyline myPolyline;
+////    myPolyline << mPoint1 << mPoint2 << mPoint3 << mPoint1;
+////    QgsPolygon myPolygon;
+////    myPolygon << myPolyline;
+////    //polygon: first item of the list is outer ring,
+////    // inner rings (if any) start from second item
+////    //
+////    // NOTE: don't delete this pointer again -
+////    // ownership is passed to the feature which will
+////    // delete it in its dtor!
+////    QgsGeometry * mypPolygonGeometry = QgsGeometry::fromPolygon( myPolygon );
+////    QgsFeature myFeature;
+////    myFeature.setTypeName( "WKBPolygon" );
+////    myFeature.setGeometry( mypPolygonGeometry );
+////    myFeature.addAttribute( 0, "HelloWorld" );
+////    myFeature.addAttribute(1, 334);
+
+////    QgsVectorFileWriter::WriterError mError;
+////    myWriter.addFeature( myFeature );
+////    mError = myWriter.hasError();
+
+//    return;
+
+//    }

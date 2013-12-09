@@ -84,7 +84,7 @@ public:
     MainWindow(QWidget* parent = 0, Qt::WFlags fl = 0 );
     ~MainWindow();
 
-
+    QStringList azWorkList; // working list of anyone
     QgsMapLayer * mpSelectedLayer; //selected map layer
 
 public slots:
@@ -103,8 +103,8 @@ public slots:
     static bool azCopyFiles(QString azSource, QString azDestPath, bool bUse = false);
     bool azMakeLayer(QGis::WkbType azType, QString pDestDir, QString pName);
     bool azAddLayerVector(QFileInfo pFile);
-
-
+    void azAddWorkListToMap(QStringList & pList);
+    void azVectorize();
 
 private slots:
     void SLOTazContextShowExtent();
@@ -123,7 +123,6 @@ private slots:
     void SLOTmpActionAddVectorLayer();
     void SLOTmpActionAddRasterLayer();
     void SLOTmpActionAddPostGISLayer();
-
 
     void SLOTmpActionVectorize();
     void SLOTsetRenderer();
@@ -158,16 +157,12 @@ private:
     QgsLegend * mpMapLegend;
     QgsMapLayerRegistry *mpRegistry;
     QList<QgsMapCanvasLayer> mpLayerSet;
-    QMenu *mpContextLegendMenu;
+
     // Actions
     QAction *mpVectorize;
-    
     QAction *mpActionAddVectorLayer;
     QAction *mpActionAddRasterLayer;
     QAction *mpActionAddPostGISLayer;
-    
-    QAction *mpContextShowExtent;
-    QAction *mpContextRemoveLayer;
     QAction *mpActionFileExit;
     QString mpAppPath;
 

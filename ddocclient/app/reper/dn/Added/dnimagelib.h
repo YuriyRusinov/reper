@@ -29,33 +29,33 @@ class DnImageLib : public QObject
 public:
     DnImageLib(QString FileName);
     ~DnImageLib();
-/*Р Р°Р±РѕС‚Р° СЃРѕ СЃРїРµРєС‚СЂР°Р»СЊРЅС‹РјРё РґР°РЅРЅС‹РјРё*/
+/*Работа со спектральными данными*/
     float* GetBandZone(int NumBand,int xn,int yn,int xk,int yk);
     float* GetSpectrZone(int xn,int yn,int xk,int yk, bool *MaskCh);
     float* GetSpectrString(int y, bool *MaskCh);
     float* GetSpectrPoint(int xp,int yp, bool *MaskCh);
-/*Р Р°Р±РѕС‚Р° СЃ  РіРµРѕРіСЂР°С„РёС‡РµСЃРєРёРјРё РґР°РЅРЅС‹РјРё*/
+/*Работа с  географическими данными*/
     void GetGeoData(GeoDataStruct *GD);
     void DetermGeoCoord(int xp,int yp,GeoDataStruct GD,double &XGeo,double &YGeo);
-/*Р¤СѓРЅРєС†РёРё РІРёР·СѓР°Р»РёР·Р°С†РёРё*/
+/*Функции визуализации*/
     QImage GenerateImg(int Ch1,int Ch2,int Ch3,double B1,double B2,double B3,double Contrast);
-/*Р—Р°РїРёСЃСЊ РїРѕР»РёРіРѕРЅР° РІ С„Р°Р№Р»*/
+/*Запись полигона в файл*/
     void GenerateSpectrFile(int x,int y,int W,int H,QList <QPoint> pt,QString PolyName);
 
-/*РћРїСЂРµРґРµР»РµРЅРёРµ РЅРѕРјРµСЂРѕРІ СЃРїРµРєС‚СЂР°Р»СЊРЅС‹С… РєР°РЅР°Р»РѕРІ*/
+/*Определение номеров спектральных каналов*/
     int DetermNCh(float Lam);
-//РџРµСЂРµРјРµРЅРЅС‹Рµ
-    int W,H; //РЁРёСЂРёРЅР°, РІС‹СЃРѕС‚Р° РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
-    int Ch; //РљРѕР»РёС‡РµСЃС‚РІРѕ РєР°РЅР°Р»РѕРІ
+//Переменные
+    int W,H; //Ширина, высота изображения
+    int Ch; //Количество каналов
     float *Lamda;
     float *MinBrigth;
     float *MaxBrigth;
     float *MidleBrigth;
     bool *IsChanUsed;
     unsigned int *RasterData;
-    QString FileBMPName; //РџРѕР»РЅРѕРµ РёРјСЏ С„Р°Р№Р»Р° BMP
-    QString PathImgFile; //РџСѓС‚СЊ Рє РѕС‚РєСЂС‹С‚РѕРјСѓ С„Р°Р№Р»Сѓ
-    QString NameImgFile; //РРјСЏ РѕС‚РєСЂС‹С‚РѕРіРѕ С„Р°Р№Р»Р° Р±РµР· СЂР°СЃС€РёСЂРµРЅРёСЏ
+    QString FileBMPName; //Полное имя файла BMP
+    QString PathImgFile; //Путь к открытому файлу
+    QString NameImgFile; //Имя открытого файла без расширения
 
 signals:
     void ChangeProgressVal(int PrgR,int PrgV);
