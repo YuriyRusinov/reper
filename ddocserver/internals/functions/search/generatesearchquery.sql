@@ -342,6 +342,7 @@ declare
     case_sensitive boolean;
     search_pos int4;
     search_query varchar;
+    fullColumnName varchar;
     rs record;
 begin
 
@@ -361,13 +362,44 @@ begin
             f.case_sensitive, 
             o.the_value as operation_name, 
             at.code as atype, 
-            a.code as attr_code
+            a.code as attr_code,
+            at.id as atype_id
         from 
             (select * from iogetcriterion (idFilter)) as f 
             inner join operations o on (o.id=f.id_operation) 
             inner join attributes a on (f.attr_id = a.id) 
             inner join a_types at on (a.id_a_type=at.id) 
     loop
+
+
+        if (r.atype_id = 12) then --atCheckList
+
+            if (table_name is null or length (table_name)=0) then
+                fullColumnName := '"' || r.attr_code || '"';
+            else
+                fullColumnName := table_name || '."' || r.attr_code || '"';
+            end if;
+
+            if(r.id_operation = 1) then -- equal
+                res_query = ' (' || fullColumnName || ' @> ' || quote_literal(r.value) || ' and ' || quote_literal(r.value) || ' @> ' || fullColumnName || ' ) ';
+            elsif (r.id_operation = 10) then  -- not equal
+                res_query = ' not (' || fullColumnName || ' @> ' || quote_literal(r.value) || ' and ' || quote_literal(r.value) || ' @> ' || fullColumnName || ' ) ';
+            elsif (r.id_operation = 6) then -- contain
+                res_query = ' (' || fullColumnName || ' @> ' || quote_literal(r.value) || ' ) ';
+            elsif (r.id_operation = 7) then --not contain
+                res_query = ' not (' || fullColumnName || ' @> ' || quote_literal(r.value) || ' ) ';
+            elsif (r.id_operation = 11) then -- is null
+                res_query = ' (' || fullColumnName || ' is null or array_upper(' || fullColumnName || ', 1) = 0 ) ';
+            elsif (r.id_operation = 12) then -- is not null
+                res_query = ' (' || fullColumnName || ' is not null and array_upper(' || fullColumnName || ', 1) > 0 ) ';
+            else
+                return res_query;
+            end if;
+
+            return res_query;
+        end if;
+        
+
         if (upper (r.atype) <> 'VARCHAR' and upper (r.atype) <> 'TEXT') then
             case_sensitive := true;
         else

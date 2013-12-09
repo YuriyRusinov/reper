@@ -921,6 +921,50 @@ QString KKSFiltersEditorForm :: parseFilter(const KKSFilter * f, const QString &
 
     if(tableName.isEmpty())
         sql += QString(" %1 ").arg(code);
+    else if (a->type()->attrType() == KKSAttrType::atCheckList)
+    {
+        if(oper == KKSFilter::foIn){
+            sql += QString (" %1.%2 @> %3 ")
+                                .arg(tableName)
+                                .arg(code)
+                                .arg (values.at(0)->valueForInsert());
+        }
+        else if(oper == KKSFilter::foNotIn){
+            sql += QString (" not (%1.%2 @> %3) ")
+                                .arg(tableName)
+                                .arg(code)
+                                .arg (values.at(0)->valueForInsert());
+        }
+        else if(oper == KKSFilter::foEq){
+            sql += QString (" ( %1.%2 @> %3 and %3 @> %1.%2 ) ")
+                                .arg(tableName)
+                                .arg(code)
+                                .arg (values.at(0)->valueForInsert());
+        }
+        else if(oper == KKSFilter::foNotEq){
+            sql += QString (" not ( %1.%2 @> %3 and %3 @> %1.%2 ) ")
+                                .arg(tableName)
+                                .arg(code)
+                                .arg (values.at(0)->valueForInsert());
+        }
+        else if(oper == KKSFilter::foIsNull){
+            sql += QString (" %1.%2 is null or array_upper(%1.%2, 1) = 0 ")
+                                .arg(tableName)
+                                .arg(code);
+        }
+        else if(oper == KKSFilter::foIsNotNull){
+            sql += QString (" %1.%2 is not null and array_upper(%1.%2, 1) > 0 ")
+                                .arg(tableName)
+                                .arg(code);
+        }
+        else{
+            ;
+        }
+
+        //sql += endUpper;
+        qDebug () << __PRETTY_FUNCTION__ << sql;
+        return sql;
+    }
     else
         sql += QString(" %1.%2 ").arg(tableName).arg(code);
     

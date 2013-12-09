@@ -4216,15 +4216,12 @@ int KKSPPFactory :: insertSearchCriterion (KKSFilter * f) const
         if (!val)
             return ERROR_CODE;
         
-        value = val->value ();
-        QRegExp reg ("(')");
-        if (value.contains (reg))
-            value.replace (reg, "\''");
+        value = val->valueForInsert ();
     }
     int idType = 1;//val->type ();
     int idOperation = f->operation();
     bool isNot = false;
-    QString sql = QString ("select ioInsertSearchCriterion (%1, '%2', %3, %4, %5, %6);")
+    QString sql = QString ("select ioInsertSearchCriterion (%1, %2, %3, %4, %5, %6);")
                         .arg (attr->id())
                         .arg (value.isEmpty() ? QString ("NULL::varchar") : value)
                         .arg (idType < 0 ? QString ("NULL::int4") : QString::number (idType))
