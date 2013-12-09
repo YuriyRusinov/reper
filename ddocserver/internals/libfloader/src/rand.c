@@ -162,6 +162,7 @@ Datum loadrand(PG_FUNCTION_ARGS)
     if (retVal != SPI_OK_SELECT)
     {
         elog (ERROR, "Cannot load random generator state");
+        SPI_finish();
         PG_RETURN_INT32(-2);
     }
     int proc = SPI_processed;

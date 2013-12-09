@@ -44,7 +44,9 @@ create or replace function saverand() returns int4
 create or replace function loadrand() returns int4
     as '$libdir/libfloader.so', 'loadrand' language 'c' strict security definer;
 
-create or replace function histogram (bigint) returns float8
+create type hist_point as (inum bigint, bin float8);
+
+create or replace function histogram (varchar, float8, float8, int4) returns setof hist_point
     as '$libdir/libfloader.so', 'histogram' language 'c' strict security definer;
 /*
 create or replace function testargs(varchar) returns int4
