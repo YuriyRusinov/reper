@@ -73,7 +73,7 @@ private:
 signals:
 //    void MouseClicked(int x,int y);
 //    void MouseDoubleCliced(int x,int y);
-
+      void MouseMove(int x,int y);
 public slots:
 //    void ImgReduc();
 //    void ImgIncrease();

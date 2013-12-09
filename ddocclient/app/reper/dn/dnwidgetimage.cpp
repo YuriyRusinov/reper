@@ -1,4 +1,4 @@
-#include "dnwidgetimage.h"
+﻿#include "dnwidgetimage.h"
 
 DNWidgetImage::DNWidgetImage(QWidget *parent) :
     QWidget(parent)
@@ -186,6 +186,8 @@ void DNWidgetImage::mouseMoveEvent(QMouseEvent* mEvent)
 {
  this->MouseX=mEvent->x();
  this->MouseY=mEvent->y();
+
+ emit MouseMove(this->MouseX/this->NewKof,this->MouseY/this->NewKof);
 
  if(this->Polygon.pt.size()>0)
   this->repaint();

@@ -1,4 +1,4 @@
-#include "dnspecbath.h"
+﻿#include "dnspecbath.h"
 #include "dn/dnwidgetimage.h"
 #include "ui_dnspecbath.h"
 
@@ -6,14 +6,20 @@ DNSpecBath::DNSpecBath(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::DNSpecBath)
 {
+ QTextCodec::setCodecForTr(QTextCodec::codecForName("system"));
+ QTextCodec::setCodecForCStrings(QTextCodec::codecForName("system"));
+ QTextCodec::setCodecForLocale(QTextCodec::codecForName("system"));
+
  ui->setupUi(this);
  ui->scrollArea->setWidget(ui->DNWPic);
 
  this->GdalImage=NULL;
  this->SerPoly=NULL;
+ this->DlgShowDepth=NULL;
  this->NameProg="SuperProga";
  this->NameOrg="VKA";
  this->AppDir=QDir::currentPath();
+ this->IsTreePolygonClear=FALSE;
 }
 
 DNSpecBath::~DNSpecBath()
@@ -217,63 +223,74 @@ void DNSpecBath::on_treePolygons_currentItemChanged(QTreeWidgetItem *current, QT
  QString FileNamePoly;
  QTreeWidgetItem *itemP;
  itemP=current;
- this->CurrentNameClassif="";
- this->IsCurPolyClassif=FALSE;
- while(ui->treePolygons->indexOfTopLevelItem(itemP)<0)
+ if(!this->IsTreePolygonClear)
  {
+  this->CurrentNameClassif="";
+  this->IsCurPolyClassif=FALSE;
+
+  while(ui->treePolygons->indexOfTopLevelItem(itemP)<0)
+  {
+   this->CurrentNameClassif='/'+itemP->text(0)+this->CurrentNameClassif;
+   itemP=itemP->parent();
+   this->IsCurPolyClassif=TRUE;
+  }
+
+  this->CurrentNamePoly=itemP->text(0);
   this->CurrentNameClassif='/'+itemP->text(0)+this->CurrentNameClassif;
-  itemP=itemP->parent();
-  this->IsCurPolyClassif=TRUE;
- }
- this->CurrentNamePoly=itemP->text(0);
- this->CurrentNameClassif='/'+itemP->text(0)+this->CurrentNameClassif;
- FileNamePoly=this->NamePolyToFile(itemP->text(0));
+  FileNamePoly=this->NamePolyToFile(itemP->text(0));
 
- this->ReadFilePoly(FileNamePoly);
- this->FillStackPolygons();
- this->ChangeCurrentPoly();
+  this->ReadFilePoly(FileNamePoly);
+  this->FillStackPolygons();
+  this->ChangeCurrentPoly();
 
- //Если текущая позиция является результатом классификации
- if(this->IsCurPolyClassif)
+  //Если текущая позиция является результатом классификации
+  if(this->IsCurPolyClassif)
+  {
+   this->ReadFileClassif(this->GdalImage->PathImgFile+'/'+this->GdalImage->NameImgFile+this->CurrentNameClassif+".kls");
+  }
+  ui->DNWPic->repaint();
+ }//if(!this->IsTreePolygonClear)
+ else
  {
-//  QMessageBox msg;
-//  msg.setText(this->GdalImage->PathImgFile+'/'+this->GdalImage->NameImgFile+this->CurrentNameClassif+".kls");
-//  msg.exec();
-  this->ReadFileClassif(this->GdalImage->PathImgFile+'/'+this->GdalImage->NameImgFile+this->CurrentNameClassif+".kls");
+  this->IsTreePolygonClear=FALSE;
  }
- ui->DNWPic->repaint();
 }
 
 void DNSpecBath::on_Batinometriy_triggered()
 {
  if(this->SerPoly!=NULL)
  {
+  QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
   if(this->GdalImage->Ch==8)
-      QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-      this->SerPoly->Batinometr();
+   this->SerPoly->Batinometr();
   if(this->GdalImage->Ch>8)
   {
-   QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
    QList <int> nCh;
    nCh<<GdalImage->DetermNCh(590)<<GdalImage->DetermNCh(830)<<GdalImage->DetermNCh(900)<<GdalImage->DetermNCh(580)<<
         GdalImage->DetermNCh(620)<<GdalImage->DetermNCh(485)<<GdalImage->DetermNCh(560)<<GdalImage->DetermNCh(660)<<
         GdalImage->DetermNCh(450)<<GdalImage->DetermNCh(545)<<GdalImage->DetermNCh(605);
+
    this->SerPoly->Batinometr(nCh[0],nCh[1],nCh[2],nCh[3],nCh[4],nCh[5],nCh[6],nCh[7],nCh[8],nCh[9],nCh[10]);
   }
-  GeoDataStruct GDSt;
-  GdalImage->GetGeoData(&GDSt);
-  Polygons=this->SerPoly->RastrToVector(GDSt.XTopLeftPix,GDSt.XD,GDSt.XAngle,GDSt.YTopLeftPix,GDSt.YD,GDSt.YAngle,SerPoly->KofV,SerPoly->MinV, this->FileNameOpen);
-  QDir Dir;
 
+  QDir Dir;
   if(!Dir.exists(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly))
    Dir.mkdir(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly);
   QFile FileClassMass(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly+'/'+"Batimetr"+".kls");
   FileClassMass.open(QIODevice::Truncate|QIODevice::WriteOnly);
   FileClassMass.write((char*)this->SerPoly->ClassifMass,sizeof(int)*this->SerPoly->W*this->SerPoly->H);
   FileClassMass.close();
+
+  GeoDataStruct GDSt;
+  GdalImage->GetGeoData(&GDSt);
+  Polygons=this->SerPoly->RastrToVector(GDSt.XTopLeftPix,GDSt.XD,GDSt.XAngle,GDSt.YTopLeftPix,GDSt.YD,GDSt.YAngle,SerPoly->KofV,SerPoly->MinV, this->FileNameOpen);
+
   ui->pbVectorize->setEnabled(true);
   ui->statusBar->showMessage(tr("Расчет спектральной батинометрии завершен"));
   QApplication::restoreOverrideCursor();
+
+  this->FillMainForm();
+
  }//if(this->SerPoly!=NULL)
 }
 
@@ -294,6 +311,7 @@ void DNSpecBath::on_MultiChan_triggered()
 /********************************************************************************************/
 void DNSpecBath::FillMainForm()
 {
+ this->IsTreePolygonClear=TRUE;
  int i;
  QString DataString1,DataString2;
 
@@ -330,6 +348,7 @@ void DNSpecBath::FillMainForm()
  ui->treePolygons->setHeaderLabel(tr("Полигоны"));
  ui->treePolygons->clear();
  this->NamesPoly.clear();
+
  foreach(DataString1,PolygonsFiles)
  {
 //  QTreeWidgetItem *TreePolygons=new QTreeWidgetItem(ui->treePolygons);
@@ -474,4 +493,45 @@ void DNSpecBath::ChangeCurrentPoly()
 void DNSpecBath::on_pbVectorize_clicked()
 {
     emit SIGNALcreateVector(); // посылаем сигнал для выполнения векторизации
+}
+
+void DNSpecBath::on_ShowDeptch_triggered()
+{
+ if(this->DlgShowDepth!=NULL)
+  delete this->DlgShowDepth;
+
+ QDialog *Dlg;
+ Dlg=new QDialog(this);
+ this->DlgShowDepth=new Ui_DlgShowDeptch();
+ this->DlgShowDepth->setupUi(Dlg);
+ Dlg->show();
+
+ connect(ui->DNWPic,SIGNAL(MouseMove(int,int)),this,SLOT(MouseMove(int,int)));
+}
+
+void DNSpecBath::MouseMove(int x, int y)
+{
+ if(DlgShowDepth!=NULL)
+ {
+  DlgShowDepth->EditX->setText(QString().setNum(x));
+  DlgShowDepth->EditY->setText(QString().setNum(y));
+
+  if(this->SerPoly!=NULL &&
+     x>=this->SerPoly->xn && x<this->SerPoly->xn+this->SerPoly->W &&
+     y>=this->SerPoly->yn && y<this->SerPoly->yn+this->SerPoly->H &&
+     this->SerPoly->IsPolyClassif)
+  {
+   bool *MaskCh=new bool[this->SerPoly->Ch];
+   for(int i=0;i<this->SerPoly->Ch;i++)
+   {
+    MaskCh[i]=FALSE;
+    if(i==this->SerPoly->Ch-1)
+     MaskCh[i]=TRUE;
+   }//for(int i=0;i<this->SerPoly->Ch;i++)
+   float Brigth;
+   this->SerPoly->GetSpectrPoint(x,y,&Brigth,MaskCh);
+   DlgShowDepth->EditDeptch->setText(QString().setNum(Brigth,'d',4));
+   delete[] MaskCh;
+  }
+ }//if(DlgShowDepth!=NULL)
 }

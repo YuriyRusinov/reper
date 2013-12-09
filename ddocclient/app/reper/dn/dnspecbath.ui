@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Spectral Bathynometry</string>
+   <string>Оценка гл</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QScrollArea" name="scrollArea">
@@ -252,7 +252,7 @@
      <x>0</x>
      <y>0</y>
      <width>921</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -275,6 +275,7 @@
      <string>Тематические задачи</string>
     </property>
     <addaction name="Batinometriy"/>
+    <addaction name="ShowDeptch"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menu_2"/>
@@ -315,6 +316,11 @@
   <action name="MultiChan">
    <property name="text">
     <string>Множитель каналов</string>
+   </property>
+  </action>
+  <action name="ShowDeptch">
+   <property name="text">
+    <string>Показать значения глубин</string>
    </property>
   </action>
  </widget>

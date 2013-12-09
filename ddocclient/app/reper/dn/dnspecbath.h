@@ -9,6 +9,7 @@
 #include <QInputDialog>
 #include <QSettings>
 #include <QTreeWidgetItem>
+#include "ui_DlgShowDeptch.h"
 #include "gdal_priv.h"
 #include "dn/Added/dnimagelib.h"
 #include "dn/imagearea.h"
@@ -42,8 +43,10 @@ public:
     QString CurrentNamePoly; //Имя текущего полигона
     QString CurrentNameClassif; //Имя текущей классификации (содержит также имя полигона к которому применена классификация)
     bool IsCurPolyClassif; //Признак того что текущая позиция является результатом классификации
-
+    bool IsTreePolygonClear;
     QList <DNVector> Polygons;
+
+    Ui_DlgShowDeptch *DlgShowDepth;
 
 signals:
     void SIGNALcreateVector();
@@ -54,12 +57,12 @@ private slots:
     void on_OpenLastImg_triggered();
     void on_CreatePoly_triggered(bool checked);
     void on_treePolygons_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
-
     void on_Batinometriy_triggered();
-
     void on_MultiChan_triggered();
-
     void on_pbVectorize_clicked();
+    void on_ShowDeptch_triggered();
+
+    void MouseMove(int x,int y);
 
 private:
     Ui::DNSpecBath *ui;
