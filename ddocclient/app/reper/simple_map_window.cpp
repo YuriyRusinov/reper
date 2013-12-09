@@ -467,7 +467,7 @@ UserDefinedShader
     }
 
     //ksa -- azRasterLayer.setStandardDeviations(2.5); // для рястяжки по гистограмме яркости
-                                              // исп. среднее квадратичное отклонение 2.5
+                                                       // исп. среднее квадратичное отклонение 2.5
     return bComplete;
 }
 

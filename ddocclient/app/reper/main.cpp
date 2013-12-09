@@ -31,7 +31,7 @@ int main(int argc, char ** argv)
 //    app->installTranslator(&translator);
 
     //QString myPluginsDir        = "C:\\Program Files (x86)\\Quantum GIS 1.7.0\\plugins";
-	QString myPluginsDir        = "D:\\REP_EXT\\QGS17\\plugins";
+	QString myPluginsDir        = "C:\\Program Files (x86)\\DynamicSoft\\DynamicDocs Client 1.2.3\\QGS21\\plugins";
     app->setPluginPath(myPluginsDir);
     app->initQgis();
 
