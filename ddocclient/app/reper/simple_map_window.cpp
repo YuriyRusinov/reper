@@ -609,6 +609,8 @@ void MainWindow::azVectorize()
                         QString::number(QTime::currentTime().second()) + "-" +
                         QString::number(QTime::currentTime().msec()) + ".shp");
     QgsVectorFileWriter myWriter( myFileName, mEncoding, mFields, QGis::WKBPolygon, &pSRS);
+    azWorkList.clear();
+    azWorkList.append(myFileName);
 
     for (int i = 0; i < dnThemTaskSpecBath->Polygons.size(); i++)
     {
@@ -639,8 +641,6 @@ void MainWindow::azVectorize()
             qWarning() << myWriter.errorMessage();
         }
     }
-    QFileInfo pFile(myFileName);
-    this->azAddLayerVector(pFile);
     return;
 }
 
@@ -745,7 +745,7 @@ void MainWindow::SLOTmpCloseProject()
 
 void MainWindow::SLOTmpActionFileOpenProject() // Open QGIS Project in MapDock
 {
-    QString projectFileName("");
+    QString projectFileName = QFileDialog::getOpenFileName(this, "Открыть файл проекта карты *.qgs", "", "*.qgs");
     if (projectFileName.isNull())
     {
         return;
@@ -757,8 +757,9 @@ void MainWindow::SLOTmpActionFileOpenProject() // Open QGIS Project in MapDock
     if ( !QgsProject::instance()->read() )
     {
         QApplication::restoreOverrideCursor();
-
-//                                       "\n " + projectFileName + "'");
+        this->statusBar()->showMessage("Ошибка открытия файла проекта!"
+                                       "\n " + projectFileName + "'");
+        qDebug("Ошибка открытия файла проекта!" + projectFileName.toAscii());
 
         mpMapCanvas->freeze(false);
         mpMapCanvas->refresh();
@@ -772,7 +773,6 @@ void MainWindow::SLOTmpActionFileOpenProject() // Open QGIS Project in MapDock
     while (i.hasPrevious())
     {
         i.previous();
-//        QMessageBox::about(this, "hell", i.value()->name());
         if (i.value()->type() == QgsMapLayer::VectorLayer)
                 {
                     if (i.value()->isValid())
@@ -811,8 +811,8 @@ void MainWindow::SLOTsetRenderer()
 
 void MainWindow::SLOTtempUse()
 {
-    QString pFilePath("D:/!Share/rastrs/union_den.tif");
-    QMessageBox::about(this, "hello world!", QString::number(azGetEPSG(pFilePath)));
+//    QString pFilePath("D:/!Share/rastrs/union_den.tif");
+//    QMessageBox::about(this, "hello world!", QString::number(azGetEPSG(pFilePath)));
 }
 
 long MainWindow::azGetEPSG(const QString rastrPath)
@@ -823,7 +823,7 @@ long MainWindow::azGetEPSG(const QString rastrPath)
         return -1;
     }
     QgsRasterLayer * pRLayer = new QgsRasterLayer(pFileInfo.filePath(), pFileInfo.completeBaseName());
-    return pRLayer->crs().srsid(); //почему?
+    return pRLayer->crs().srsid();
 }
 
 

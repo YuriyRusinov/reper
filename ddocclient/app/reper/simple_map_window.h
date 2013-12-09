@@ -92,7 +92,7 @@ public slots:
     void zoomOutMode();
     void panMode();
     void azLoadLayer(QgsMapLayer *theMapLayer, bool isExtent = false);
-    void addLayerToTOC(QgsMapLayer *mapLayer);
+    void azAddWorkListToMap(QStringList & pList);
     void azRemoveAnnotationItems();
     void azRemoveAllLayers();
     bool azSelectLayer(const QString layerName);
@@ -101,10 +101,11 @@ public slots:
     static bool azRasterEnhancement(QgsRasterLayer & azRasterLayer);
     static bool azRasterCheckBandName(QgsRasterLayer & azRasterLayer, QString strBandName);
     static bool azCopyFiles(QString azSource, QString azDestPath, bool bUse = false);
+    void azVectorize();
     bool azMakeLayer(QGis::WkbType azType, QString pDestDir, QString pName);
     bool azAddLayerVector(QFileInfo pFile);
-    void azAddWorkListToMap(QStringList & pList);
-    void azVectorize();
+    void addLayerToTOC(QgsMapLayer *mapLayer);
+
 
 private slots:
     void SLOTazContextShowExtent();
