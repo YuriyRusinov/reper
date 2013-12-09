@@ -408,14 +408,18 @@ begin
 
         values := string_to_array (r.value, ',');
 
-        --«адаем сравниваемый атрибут
+        --
+        -- Attribute of comparation
+        --
         if (table_name is null or length (table_name)=0) then
             res_query := '"' || r.attr_code || '"';
         else
             res_query := table_name || '."' || r.attr_code || '"';
         end if;
 
-        --«адаем оператор сравнени€
+        --
+        -- Comparison operator
+        --
         if (r.id_operation <> 13 and 
             r.id_operation <> 9 and 
             r.id_operation <> 14 and 
@@ -425,8 +429,8 @@ begin
             res_query := res_query || ' ' || r.operation_name;
         elsif (r.id_operation = 13) then --in (select ...)
             res_query := res_query || ' in';
-        elsif ( r.id_operation = 9 or --это все операции LIKE («десь мы провер€ем на case_sensitive 
-                r.id_operation = 14 or -- и принимаем решение об использовании оператора LIKE или ILIKE)
+        elsif ( r.id_operation = 9 or -- operations LIKE (case_sensitive) 
+                r.id_operation = 14 or 
                 r.id_operation = 15 or 
                 r.id_operation = 16
               ) then
@@ -437,7 +441,9 @@ begin
             end if;
         end if;
 
-        --«адаем сравниваемое значение
+        --
+        -- Comparison value
+        --
         if (r.id_operation = 6 or --in
             r.id_operation = 7) then --not in
             res_query := res_query || ' (' || r.value || ')';
