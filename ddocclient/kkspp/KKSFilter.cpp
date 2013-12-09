@@ -143,6 +143,7 @@ bool KKSFilter::isCorrect() const
                 bCorrect = false;
             break;
         case foIn:
+        case foNotIn:
             if(m_values.count() == 0)
                 bCorrect = false;
             break;
