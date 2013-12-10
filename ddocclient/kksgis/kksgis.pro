@@ -15,6 +15,7 @@ DEFINES *= __USE_DLL_KKSGIS
 
 INCLUDEPATH +=  . \
                 dn \
+                legend \
                 ../../dataaccess \
                 ../../kksutils 
 

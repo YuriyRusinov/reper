@@ -1,5 +1,7 @@
 #include "kksgiswidgetqgis.h"
 #include "kksbadlayerhandler.h"
+#include "qgslegend.h"
+#include "qgslayerorder.h"
 
 #include <qgsproviderregistry.h>
 #include <qgsmaplayerregistry.h>
@@ -19,6 +21,9 @@ KKSGISWidgetQGIS::KKSGISWidgetQGIS(QWidget* parent, Qt::WFlags fl)
     m_badLayerHandler(NULL),
     mpMapCanvas(NULL),
     mpMapLegend(NULL),
+    mpMapLayerOrder(NULL),
+    mpMapLayerOrderWidget(NULL),
+    mpMapLegendWidget(NULL),
     mpMapToolBar(NULL),
     mpPanTool(NULL),
     mpZoomInTool(NULL),
@@ -35,7 +40,7 @@ KKSGISWidgetQGIS::KKSGISWidgetQGIS(QWidget* parent, Qt::WFlags fl)
     mpActionZoomIn(NULL),
     mpActionZoomOut(NULL),
     mpActionPan(NULL),
-    mpTableLegend(NULL),
+    //mpTableLegend(NULL),
     mpRegistry(QgsMapLayerRegistry::instance())
 {
     setWindowIcon(QIcon(":/ico/main64x64.png"));
@@ -47,7 +52,8 @@ KKSGISWidgetQGIS::KKSGISWidgetQGIS(QWidget* parent, Qt::WFlags fl)
     initUserSettings();
     initMapCanvas();
 
-    initLegend();
+    //initLegend();
+    initMapLegend();
 
     initActions();
     initConnections();
@@ -145,6 +151,66 @@ void KKSGISWidgetQGIS::initMapCanvas()
     mpMapLayout->addWidget(mpMapCanvas); // adding MapCanvas in Layout
 }
 
+void KKSGISWidgetQGIS::initMapLegend()
+{
+    // "theMapLegend" used to find this canonical instance later
+    mpMapLegend = new QgsLegend( mpMapCanvas, this, "theMapLegend" );
+
+    mpMapLegend->setWhatsThis( tr( "Map legend that displays all the layers currently on the map canvas. Click on the check box to turn a layer on or off. Double click on a layer in the legend to customize its appearance and set other properties." ) );
+
+    QCheckBox *orderCb = new QCheckBox( tr( "Control rendering order" ) );
+    orderCb->setChecked( false );
+
+    connect( orderCb, SIGNAL( toggled( bool ) ), mpMapLegend, SLOT( unsetUpdateDrawingOrder( bool ) ) );
+    connect( mpMapLegend, SIGNAL( updateDrawingOrderUnchecked( bool ) ), orderCb, SLOT( setChecked( bool ) ) );
+
+    mpMapLegendWidget = new QWidget( this );
+    QLayout *l = new QVBoxLayout;
+    l->setMargin( 0 );
+    l->addWidget( mpMapLegend );
+    mpMapLegendWidget->setLayout( l );
+    //mLegendDock = new QDockWidget( tr( "Layers" ), this );
+    //mLegendDock->setObjectName( "Legend" );
+    //mLegendDock->setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );
+    //mLegendDock->setWidget( mpMapLegendWidget );
+    //addDockWidget( Qt::LeftDockWidgetArea, mLegendDock );
+
+    // add to the Panel submenu
+    //mPanelMenu->addAction( mLegendDock->toggleViewAction() );
+
+    mpMapLayerOrder = new QgsLayerOrder( mpMapLegend, this, "theMapLayerOrder" );
+    mpMapLayerOrder->setWhatsThis( tr( "Map layer list that displays all layers in drawing order." ) );
+
+    mpMapLayerOrderWidget = new QWidget( this );
+    l = new QVBoxLayout;
+    l->setMargin( 0 );
+    l->addWidget( mpMapLayerOrder );
+    l->addWidget( orderCb );
+    mpMapLayerOrderWidget->setLayout( l );
+    //mLayerOrderDock = new QDockWidget( tr( "Layer order" ), this );
+    //mLayerOrderDock->setObjectName( "LayerOrder" );
+    //mLayerOrderDock->setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );
+    //mLayerOrderDock->setWidget( mpMapLayerOrderWidget );
+    //addDockWidget( Qt::LeftDockWidgetArea, mLayerOrderDock );
+    //mLayerOrderDock->hide();
+
+    // add to the Panel submenu
+    //mPanelMenu->addAction( mLayerOrderDock->toggleViewAction() );
+
+    return;
+}
+
+QWidget * KKSGISWidgetQGIS::mapLegendWidget()
+{
+    return mpMapLegendWidget;
+}
+
+QWidget * KKSGISWidgetQGIS::mapLayerOrderWidget()
+{
+    return mpMapLayerOrderWidget;
+}
+
+/*
 void KKSGISWidgetQGIS::initLegend()
 {
     mpTableLegend = new QTableWidget(this);
@@ -181,11 +247,13 @@ void KKSGISWidgetQGIS::initLegend()
     //tableLegend->addAction(mpContextShowExtent);
     //tableLegend->addAction(mpContextRemoveLayer);
 }
-
+*/
+/*
 QTableWidget * KKSGISWidgetQGIS::tableLegend()
 {
     return mpTableLegend;
 }
+*/
 
 void KKSGISWidgetQGIS::initActions()
 {

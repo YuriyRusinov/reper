@@ -17,9 +17,25 @@ MapWindow::MapWindow(QWidget* parent, Qt::WFlags fl)
     setWindowIcon(mpKKSGISWidget->windowIcon());
 
     setCentralWidget(mpKKSGISWidget);
-    QDockWidget * mpLeftDock = new QDockWidget("Legend", this);
-    addDockWidget(Qt::LeftDockWidgetArea, mpLeftDock, Qt::Horizontal);
-    mpLeftDock->setWidget(mpKKSGISWidget->tableLegend());
+    
+    QDockWidget * mLegendDock = new QDockWidget( tr( "Layers" ), this );
+    mLegendDock->setObjectName( "Legend" );
+    mLegendDock->setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );
+    mLegendDock->setWidget( mpKKSGISWidget->mapLegendWidget() );
+    addDockWidget( Qt::LeftDockWidgetArea, mLegendDock );
+
+    QDockWidget * mLayerOrderDock = new QDockWidget( tr( "Layer order" ), this );
+    mLayerOrderDock->setObjectName( "LayerOrder" );
+    mLayerOrderDock->setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );
+    mLayerOrderDock->setWidget( mpKKSGISWidget->mapLayerOrderWidget() );
+    addDockWidget( Qt::LeftDockWidgetArea, mLayerOrderDock );
+    mLayerOrderDock->hide();
+
+    //QDockWidget * mpLeftDock = new QDockWidget("Legend", this);
+    //addDockWidget(Qt::LeftDockWidgetArea, mpLeftDock, Qt::Horizontal);
+    //mpLeftDock->setWidget(mpKKSGISWidget->tableLegend());
+
+
     setWindowTitle(mpKKSGISWidget->windowTitle());
 
     // добавляем фрейм и вставляем в него виджет "Окно карты"(Map Canvas)

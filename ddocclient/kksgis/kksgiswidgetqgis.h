@@ -25,6 +25,7 @@ class QgsMapCanvas;
 class QgsMapCanvasLayer;
 class QgsMapTool;
 class QgsLegend;
+class QgsLayerOrder;
 class QgsMapLayerRegistry;
 class QTableWidget;
 
@@ -35,7 +36,9 @@ class _GIS_EXPORT KKSGISWidgetQGIS : public KKSGISWidget
 public:
     QStatusBar * statusBar() const;
     const QString & pluginsDir();
-    QTableWidget * tableLegend();
+    //QTableWidget * tableLegend();
+    QWidget * mapLegendWidget();
+    QWidget * mapLayerOrderWidget();
     QToolBar * toolBar() const;
     QMenuBar * menuBar() const;
 
@@ -73,7 +76,7 @@ private slots:
     void azVectorize();
     //bool azMakeLayer(QGis::WkbType azType, QString pDestDir, QString pName);
     bool azAddLayerVector(QFileInfo pFile);
-    void addLayerToTOC(QgsMapLayer *mapLayer);
+    //void addLayerToTOC(QgsMapLayer *mapLayer);
 
 
 private slots:
@@ -102,7 +105,8 @@ private:
     void initStatusBar();
     void initUserSettings();
     void initMapCanvas();
-    void initLegend();
+    //void initLegend();
+    void initMapLegend();
     void initActions();
     void initConnections();
     void initToolBar();
@@ -130,6 +134,10 @@ private:
     QgsMapLayerRegistry *mpRegistry;
     QgsMapCanvas * mpMapCanvas;
     QgsLegend * mpMapLegend;
+    QWidget * mpMapLegendWidget;
+    QgsLayerOrder *mpMapLayerOrder;
+    QWidget * mpMapLayerOrderWidget;
+    //QTableWidget * mpTableLegend;
     QList<QgsMapCanvasLayer> mpLayerSet;
 
     QToolBar * mpMapToolBar;
@@ -162,7 +170,7 @@ private:
     QAction * mpActionZoomOut;
     QAction * mpActionPan;
     
-    QTableWidget * mpTableLegend;
+
 
     QString mpAppPath;
     QString m_pluginsDir;

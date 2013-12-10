@@ -35,7 +35,7 @@
     онструктор, деструктор, инициализационные и обеспечивающие методы наход€тс€ в файле kksgiswidgethelper.cpp
 */
 
-
+/*
 void KKSGISWidgetQGIS::addLayerToTOC(QgsMapLayer* mapLayer)
 {
 //    mpLayerSet
@@ -66,6 +66,7 @@ void KKSGISWidgetQGIS::addLayerToTOC(QgsMapLayer* mapLayer)
 //    QStandardItemModel l1;
 
 }
+*/
 
 void KKSGISWidgetQGIS::azRemoveAnnotationItems()
 {

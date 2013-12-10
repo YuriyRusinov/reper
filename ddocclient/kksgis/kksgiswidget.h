@@ -16,7 +16,9 @@ public:
 
     virtual QStatusBar * statusBar() const = 0;
     virtual const QString & pluginsDir() = 0;
-    virtual QTableWidget * tableLegend() = 0;
+    //virtual QTableWidget * tableLegend() = 0;
+    virtual QWidget * mapLegendWidget() = 0;
+    virtual QWidget * mapLayerOrderWidget() = 0;
     virtual QToolBar * toolBar() const = 0;
     virtual QMenuBar * menuBar() const = 0;
     virtual const QMap<QString, QMenu *> & menuMap() const = 0;

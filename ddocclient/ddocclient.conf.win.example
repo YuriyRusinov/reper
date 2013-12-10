@@ -15,12 +15,20 @@ KKS_DATA_DIR = $$KKS_PREFIX/data
 
 
 #external libraries paths
-EXT = "C:/Program Files/DynamicSoft/DynamicDocs Client 0.13.0"
+EXT = "C:/Program Files (x86)/DynamicSoft/DynamicDocs Client 1.2.3"
 EXTERNAL_PREFIX = $$EXT
 PSQL_HOME = $$EXTERNAL_PREFIX
 PSQL_INCLUDE_DIR = $$EXTERNAL_PREFIX/include
 PSQL_LIB_DIR = $$EXTERNAL_PREFIX/lib
 PHP_INCLUDE_DIR = $$EXTERNAL_PREFIX/php5/include/php
+
+win32{ 
+    CONFIG *= qgis
+    #for KKSGIS
+    QGISDIR = $$EXTERNAL_PREFIX/QGS21
+    OSGEODIR = $$EXTERNAL_PREFIX/OSGEO
+}
+
 
 #additional installation params
 KKS_EXEC_DIR = $$KKS_PREFIX/bin

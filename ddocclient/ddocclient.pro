@@ -2,6 +2,8 @@
 
 TEMPLATE = subdirs
 
+include(./ddocclient.conf)
+
 # Directories
 SUBDIRS += \
     kksutils \
@@ -14,11 +16,13 @@ SUBDIRS += \
     kkscore \
     kksinteractor \
     kkshttpconnector \
-    kksrunservice \
-    kksgis \
-    app
+    kksrunservice
 
-include(./ddocclient.conf)
+qgis{
+    SUBDIRS += kksgis
+}
+
+SUBDIRS += app
 
 RESOURCES = ./ddocs_ico/ddocs_icon_set.qrc
 
