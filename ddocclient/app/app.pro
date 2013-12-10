@@ -4,10 +4,15 @@ TEMPLATE = subdirs
 SUBDIRS += \
 	operator_app \
 	http_connector \
-#        reper \
 #        sync_queue_viewer \
         dyndoc_synch \
         kksdaemon
+
+include(../ddocclient.conf)
+
+qgis{
+    SUBDIRS += reper_ksa
+}
 
 #win32{
 #        SUBDIRS += \

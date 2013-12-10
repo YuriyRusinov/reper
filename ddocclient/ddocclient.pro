@@ -15,7 +15,8 @@ SUBDIRS += \
     kksinteractor \
     kkshttpconnector \
     kksrunservice \
-    app 
+    kksgis \
+    app
 
 include(./ddocclient.conf)
 
