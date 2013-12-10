@@ -384,78 +384,90 @@ void MainWindow::azSetTitleWindow(QWidget &azApp)
 
 bool MainWindow::azRasterEnhancement(QgsRasterLayer & azRasterLayer)
 {
-//    // функци€ улучшени€ изображени€
-//    // цель: улучшить вид отображени€ снимка дл€ человеческого воспри€ти€
-//    // (по идее должна определ€ть тип снимка автоматически и
-//    // подстраивать соответветствующие параметры)
-//    bool bComplete(false); // инициализируем пременную дл€ сигнализации об
-//                          //    успешном улучшении
+    // функци€ улучшени€ изображени€
+    // цель: улучшить вид отображени€ снимка дл€ человеческого воспри€ти€
+    // (по идее должна определ€ть тип снимка автоматически и
+    // подстраивать соответветствующие параметры)
+    bool bComplete(false); // инициализируем пременную дл€ сигнализации об
+                          //    успешном улучшении
 
-//    /*
-//      --------------------
-//// способы отображени€ снимка:
-//    pLayer->setDrawingStyle:
-//UndefinedDrawingStyle
-//SingleBandGray
-//SingleBandPseudoColor
-//PalettedColor
-//PalettedSingleBandGray
-//PalettedSingleBandPseudoColor
-//PalettedMultiBandColor          - три цвета
-//MultiBandSingleGandGray
-//MultiBandSingleBandGray
-//MultiBandSingleBandPseudoColor
-//MultiBandColor
-//SingleBandColorDataStyle
-//---------------------------
-//// алгоритм цветопередачи:
-//    pLayer->setColorShadingAlgorithm:
-//UndefinedShader
-//PseudoColorShader
-//FreakOutShader
-//ColorRampShader
-//UserDefinedShader
-//----------------------
-//    */
+    /*
+      --------------------
+// способы отображени€ снимка:
+    pLayer->setDrawingStyle:
+UndefinedDrawingStyle
+SingleBandGray
+SingleBandPseudoColor
+PalettedColor
+PalettedSingleBandGray
+PalettedSingleBandPseudoColor
+PalettedMultiBandColor          - три цвета
+MultiBandSingleGandGray
+MultiBandSingleBandGray
+MultiBandSingleBandPseudoColor
+MultiBandColor
+SingleBandColorDataStyle
+---------------------------
+// алгоритм цветопередачи:
+    pLayer->setColorShadingAlgorithm:
+UndefinedShader
+PseudoColorShader
+FreakOutShader
+ColorRampShader
+UserDefinedShader
+----------------------
+    */
+    if (azRasterLayer.rasterType() == QgsRasterLayer::Multiband)
+    {
+//        azRasterLayer.setDrawingStyle(QgsRaster::MultiBandColor); // устанавливаем "3-х цветное изображение"
 
-//    //ksa -- azRasterLayer.setDrawingStyle( QgsRasterLayer::MultiBandColor); // устанавливаем "3-х цветное изображение"
+        // пока делаю так: 3-х цветное изображение и каналы:
+        // 4 - красный; 3 - зеленый; 2 - синий.
+        if (azRasterLayer.bandCount() < 3)
+        {
+            // меньше 3-х каналов не улучшаем
+        }
+        else if (azRasterLayer.bandCount() == 3)
+        {
+            // по умолчанию если три то пусть идут в обратном
 
-//    // пока делаю так: 3-х цветное изображение и каналы:
-//    // 4 - красный; 3 - зеленый; 2 - синий.
-//    if (azRasterLayer.bandCount() < 3)
-//    {
-//        // меньше 3-х каналов не улучшаем
-//    }
-//    else if (azRasterLayer.bandCount() == 3)
-//    {
-//        // по умолчанию если три то пусть идут в обратном
+            //ksa -- azRasterLayer.setRedBandName(azRasterLayer.bandName(3));
+            //ksa -- azRasterLayer.setGreenBandName(azRasterLayer.bandName(2));
+            //ksa -- azRasterLayer.setBlueBandName(azRasterLayer.bandName(1));
+            bComplete = true;
+        }
+        else
+        {
+//            pRast.BlueBand
+                // провер€ем название каждого канала
+            if (azRasterCheckBandName(azRasterLayer, "Band 4"))
+            {
 
-//        //ksa -- azRasterLayer.setRedBandName(azRasterLayer.bandName(3));
-//        //ksa -- azRasterLayer.setGreenBandName(azRasterLayer.bandName(2));
-//        //ksa -- azRasterLayer.setBlueBandName(azRasterLayer.bandName(1));
-//        bComplete = true;
-//    }
-//    else
-//    {
-//            // провер€ем название каждого канала
-//        if (azRasterCheckBandName(azRasterLayer, "Band 4"))
-//        {
-//            //ksa -- azRasterLayer.setRedBandName("Band 4"); // есть - добавл€ем
-//        }
-//        if (azRasterCheckBandName(azRasterLayer, "Band 3"))
-//        {
-//            //ksa -- azRasterLayer.setRedBandName("Band 3");
-//        }
-//        if (azRasterCheckBandName(azRasterLayer, "Band 2"))
-//        {
-//            //ksa -- azRasterLayer.setRedBandName("Band 2");
-//        }
-//        //ksa -- azRasterLayer.setBlueBandName("Band 2");
-//        bComplete = true;
-//    }
+//                azRasterLayer.set("Band 4"); // есть - добавл€ем
+            }
+            if (azRasterCheckBandName(azRasterLayer, "Band 3"))
+            {
+//                azRasterLayer.setRedBandName("Band 3");
+            }
+            if (azRasterCheckBandName(azRasterLayer, "Band 2"))
+            {
+//                azRasterLayer.setRedBandName("Band 2");
+            }
+            //ksa -- azRasterLayer.setBlueBandName("Band 2");
+            bComplete = true;
+        }
 
-//    //ksa -- azRasterLayer.setStandardDeviations(2.5); // дл€ р€ст€жки по гистограмме €ркости
-//                                                       // исп. среднее квадратичное отклонение 2.5
+//        azRasterLayer.setStandardDeviations(2.5); // дл€ р€ст€жки по гистограмме €ркости
+                                                           // исп. среднее квадратичное отклонение 2.5
+    }
+    else if (azRasterLayer.rasterType() == QgsRasterLayer::Palette)
+    {
+        return bComplete;
+    }
+    else // QgsRasterLayer::GrayOrUndefined
+    {
+        return bComplete;
+    }
     return false;
 }
 
