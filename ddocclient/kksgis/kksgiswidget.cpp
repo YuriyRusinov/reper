@@ -4,6 +4,8 @@
 #include "kksgiswidgetqgis.h"
 #endif
 
+//KKSGISWidget * KKSGISWidget::smInstance = 0;
+
 KKSGISWidget * KKSGISWidget::initQGISWidget(QWidget* parent, Qt::WFlags fl)
 {
 #ifndef __USE_QGIS__

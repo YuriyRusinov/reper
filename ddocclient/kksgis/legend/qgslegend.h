@@ -39,6 +39,8 @@ class QTreeWidgetItem;
 class QgsCoordinateReferenceSystem;
 class QgsMapCanvasLayer;
 
+class KKSGISWidgetQGIS;
+
 #include "qgsmaplayer.h"
 
 //Information about relationship between groups and layers
@@ -123,6 +125,8 @@ class QgsLegend : public QTreeWidget
 
     //! Destructor
     ~QgsLegend();
+
+    void setWorkingWidget(KKSGISWidgetQGIS * w);
 
     /** Returns QgsLegendLayer associated with current layer */
     QgsLegendLayer* currentLegendLayer();
@@ -601,6 +605,8 @@ class QgsLegend : public QTreeWidget
 
     //! popup QFrame containing WMS getLegendGraphic pixmap
     QFrame *mGetLegendGraphicPopup;
+
+    KKSGISWidgetQGIS * mWorkingWidget;
 
   signals:
     void itemAdded( QModelIndex index );

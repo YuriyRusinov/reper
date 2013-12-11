@@ -19,6 +19,7 @@
 
 #include <qgsapplication.h>
 //#include "qgisapp.h"
+#include "kksgiswidgetqgis.h" //!!!!! גלוסעמ qgisapp.h
 #include <qgslogger.h>
 #include "qgslegendgroup.h"
 #include "qgslegendlayer.h"
@@ -758,8 +759,7 @@ void QgsLegend::mouseReleaseEvent( QMouseEvent * e )
 
 void QgsLegend::mouseDoubleClickEvent( QMouseEvent *e )
 {
-    //ksa --
-    /* ksa
+    /*
 #ifdef Q_WS_MAC
   // fix for when quick left-then-right clicks (when legend is out of focus)
   //  register as left double click: show contextual menu as user intended
@@ -776,10 +776,10 @@ void QgsLegend::mouseDoubleClickEvent( QMouseEvent *e )
   switch ( settings.value( "/qgis/legendDoubleClickAction", 0 ).toInt() )
   {
     case 0:
-      QgisApp::instance()->layerProperties();
+      mWorkingWidget->layerProperties();
       break;
     case 1:
-      QgisApp::instance()->attributeTable();
+      //QgisApp::instance()->attributeTable();
       break;
     default:
       break;
@@ -3288,3 +3288,7 @@ QImage QgsLegend::getWmsLegendPixmap( QTreeWidgetItem *item )
   return rasterLayer->dataProvider()->getLegendGraphic( canvas()->scale() );
 }
 
+void QgsLegend::setWorkingWidget( KKSGISWidgetQGIS * w)
+{
+    mWorkingWidget = w;
+}

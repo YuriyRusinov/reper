@@ -54,6 +54,9 @@ public:
     void openRasterLayer(const QString & rLayerFile);
     void openDatabaseLayer();
 
+public slots:
+    void layerProperties();
+
 private:
     KKSGISWidgetQGIS(QWidget* parent = 0, Qt::WFlags fl = 0 );
     ~KKSGISWidgetQGIS();
@@ -114,6 +117,9 @@ private:
     void initMapTools();
 
     void azSetTitleWindow(QWidget & azApp);
+    QgsMapLayer *activeLayer();
+    bool setActiveLayer( QgsMapLayer * );
+    void showLayerProperties( QgsMapLayer *ml );
 
 
 private:

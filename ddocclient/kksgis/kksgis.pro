@@ -16,14 +16,10 @@ DEFINES *= __USE_DLL_KKSGIS
 INCLUDEPATH +=  . \
                 dn \
                 legend \
-                ../../dataaccess \
-                ../../kksutils 
+                layerprops 
 
-DEPENDPATH += 	. \
-                ../../dataaccess \
-                ../../kksutils 
 
-LIBS *= -L$$DESTDIR -lkksutils -ldataaccess
+#LIBS *= -L$$DESTDIR -lkksutils -ldataaccess
 
 qgis{
     DEFINES *= __USE_QGIS__

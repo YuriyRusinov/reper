@@ -4,6 +4,7 @@
 #include <gdal_priv.h>
 
 #include "kksgiswidgetqgis.h"
+#include "qgslegend.h"
 
 //QGis includes
 #include <qgsapplication.h>
@@ -960,4 +961,103 @@ void KKSGISWidgetQGIS::openDatabaseLayer()
 QString KKSGISWidgetQGIS::projectFileName()
 {
     return QgsProject::instance()->fileName();
+}
+
+void KKSGISWidgetQGIS::layerProperties()
+{
+  if ( mpMapCanvas && mpMapCanvas->isDrawing() )
+    return;
+
+  showLayerProperties( activeLayer() );
+}
+
+/** Get a pointer to the currently selected map layer */
+QgsMapLayer *KKSGISWidgetQGIS::activeLayer()
+{
+  return mpMapLegend ? mpMapLegend->currentLayer() : 0;
+}
+
+/** set the current layer */
+bool KKSGISWidgetQGIS::setActiveLayer( QgsMapLayer *layer )
+{
+  if ( !layer )
+    return false;
+
+  return mpMapLegend->setCurrentLayer( layer );
+}
+
+void KKSGISWidgetQGIS::showLayerProperties( QgsMapLayer *ml )
+{
+  /*
+  TODO: Consider reusing the property dialogs again.
+  Sometimes around mid 2005, the property dialogs were saved for later reuse;
+  this resulted in a time savings when reopening the dialog. The code below
+  cannot be used as is, however, simply by saving the dialog pointer here.
+  Either the map layer needs to be passed as an argument to sync or else
+  a separate copy of the dialog pointer needs to be stored with each layer.
+  */
+/*
+  if ( !ml )
+    return;
+
+  if ( !QgsProject::instance()->layerIsEmbedded( ml->id() ).isEmpty() )
+  {
+    return; //don't show properties of embedded layers
+  }
+
+  if ( ml->type() == QgsMapLayer::RasterLayer )
+  {
+    QgsRasterLayerProperties *rlp = NULL; // See note above about reusing this
+    if ( rlp )
+    {
+      rlp->sync();
+    }
+    else
+    {
+      rlp = new QgsRasterLayerProperties( ml, mMapCanvas, this );
+      connect( rlp, SIGNAL( refreshLegend( QString, bool ) ), mMapLegend, SLOT( refreshLayerSymbology( QString, bool ) ) );
+    }
+
+    rlp->exec();
+    delete rlp; // delete since dialog cannot be reused without updating code
+  }
+  else if ( ml->type() == QgsMapLayer::VectorLayer ) // VECTOR
+  {
+    QgsVectorLayer* vlayer = qobject_cast<QgsVectorLayer *>( ml );
+
+    QgsVectorLayerProperties *vlp = NULL; // See note above about reusing this
+    if ( vlp )
+    {
+      vlp->syncToLayer();
+    }
+    else
+    {
+      vlp = new QgsVectorLayerProperties( vlayer, this );
+      connect( vlp, SIGNAL( refreshLegend( QString, QgsLegendItem::Expansion ) ), mMapLegend, SLOT( refreshLayerSymbology( QString, QgsLegendItem::Expansion ) ) );
+    }
+
+    if ( vlp->exec() )
+    {
+      ;//activateDeactivateLayerRelatedActions( ml );
+    }
+    delete vlp; // delete since dialog cannot be reused without updating code
+  }
+  else if ( ml->type() == QgsMapLayer::PluginLayer )
+  {
+    QgsPluginLayer* pl = qobject_cast<QgsPluginLayer *>( ml );
+    if ( !pl )
+      return;
+
+    QgsPluginLayerType* plt = QgsPluginLayerRegistry::instance()->pluginLayerType( pl->pluginLayerType() );
+    if ( !plt )
+      return;
+
+    if ( !plt->showLayerProperties( pl ) )
+    {
+      messageBar()->pushMessage( tr( "Warning" ),
+                                 tr( "This layer doesn't have a properties dialog." ),
+                                 QgsMessageBar::INFO, messageTimeout() );
+    }
+  }
+  */
 }
