@@ -8,8 +8,8 @@ SOURCES += \
                 kksbadlayerhandler.cpp 
 
 RESOURCES += \
-                resources.qrc #\
-#                images/images.qrc
+                resources.qrc \
+                images/images.qrc
 
 qgis{
     HEADERS += \
@@ -22,4 +22,4 @@ qgis{
 
 include(legend/legend.pri)
 include(dn/dn.pri)
-#include (layerprops/layerprops.pri)
+include (layerprops/layerprops.pri)
