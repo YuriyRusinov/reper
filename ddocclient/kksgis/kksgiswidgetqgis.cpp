@@ -362,6 +362,7 @@ void KKSGISWidgetQGIS::SLOTmpActionVectorize()
 {
     this->azVectorize();
     this->azAddWorkListToMap(azWorkList);
+
 }
 
 void KKSGISWidgetQGIS::azAddWorkListToMap(QStringList &pList)
@@ -402,7 +403,7 @@ void KKSGISWidgetQGIS::azVectorize()
     QString mEncoding; // кодировка
     mEncoding = "UTF-8";
 
-    QgsFields mFields;
+    QgsFields mFields; // набор полей
     QgsField myField1("value", QVariant::Double, "Double", 0, 0);
     QgsField myField2( "comment", QVariant::String, "String", 10, 0, "Comment" );
     mFields.append( myField1 );

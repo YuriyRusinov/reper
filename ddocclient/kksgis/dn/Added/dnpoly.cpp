@@ -2554,7 +2554,7 @@ QList <DNVector> DNPoly::RastrToVector(double xTopLeft,double XD,double XAngle,d
  PointPlace Pix,Pix2;
  PointPlaceMass *ObjectKoord,*ObjectKoordUporadoch;
  PixArea *Points;
- vector<PointPlace> PixSteck;
+ std::vector <PointPlace> PixSteck;
 
  int *KolvoKraiPoint,*EllMass;
  int ObodX[4],ObodY[4],FlagArea=0;

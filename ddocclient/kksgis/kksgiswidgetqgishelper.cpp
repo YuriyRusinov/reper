@@ -296,6 +296,9 @@ void KKSGISWidgetQGIS::initActions()
     
     mpActionFileSaveProject = new QAction(this);
     mpActionFileSaveProject->setObjectName(QString::fromUtf8("mpActionFileSaveProject"));
+    QIcon icon5;
+    icon5.addFile(QString::fromUtf8(":/ico/mActionFileSave.png"), QSize(), QIcon::Normal, QIcon::On);
+    mpActionFileSaveProject->setIcon(icon5);
     mpActionFileSaveProject->setText(tr("Сохранить проект"));
     
     mpActionBathymetry = new QAction(this);
@@ -320,6 +323,9 @@ void KKSGISWidgetQGIS::initActions()
 
     mpActionFileSaveProjectAs = new QAction(this);
     mpActionFileSaveProjectAs->setObjectName(QString::fromUtf8("mpActionFileSaveProjectAs"));
+    QIcon icon6;
+    icon6.addFile(QString::fromUtf8(":/ico/mActionFileSaveAs.png"), QSize(), QIcon::Normal, QIcon::On);
+    mpActionFileSaveProjectAs->setIcon(icon6);
     mpActionFileSaveProjectAs->setText(tr("Сохранить проект как..."));
 
     mpActionFileCloseProject = new QAction(this);
@@ -327,7 +333,6 @@ void KKSGISWidgetQGIS::initActions()
     mpActionFileCloseProject->setText(tr("Закрыть проект"));
 
 
-    //create actions
     mpVectorize = new QAction(QIcon(":/ico/vectorize.png"), tr("Векторизация"), this);
     
     mpActionAddVectorLayer = new QAction(QIcon(":/ico/add_vector.png"), tr("Добавить &векторный слой"), this);
@@ -400,7 +405,7 @@ void KKSGISWidgetQGIS::initMenuBar()
 {
     mpMenuBar = new QMenuBar();
 
-    QMenu * menuFile = new QMenu(tr("File"));
+    QMenu * menuFile = new QMenu(tr("Файл"));
     menuFile->addAction(mpActionFileOpenProject);
     menuFile->addAction(mpActionFileSaveProject);
     menuFile->addAction(mpActionFileSaveProjectAs);
@@ -410,7 +415,7 @@ void KKSGISWidgetQGIS::initMenuBar()
     mpMenuBar->addMenu(menuFile);
     mpMenuMap.insert(tr("File"), menuFile);
 
-    QMenu * menuLayers = new QMenu(tr("Layers"));
+    QMenu * menuLayers = new QMenu(tr("Слои"));
     menuLayers->addAction(mpActionAddVectorLayer);
     menuLayers->addAction(mpActionAddRasterLayer);
     menuLayers->addAction(mpActionAddPostGISLayer);
@@ -418,7 +423,7 @@ void KKSGISWidgetQGIS::initMenuBar()
     mpMenuBar->addMenu(menuLayers);
     mpMenuMap.insert(tr("Layers"), menuLayers);
 
-    QMenu * menuNavigation = new QMenu(tr("Navigation"));
+    QMenu * menuNavigation = new QMenu(tr("Навигация по карте"));
     menuNavigation->addAction(mpActionZoomIn);
     menuNavigation->addAction(mpActionZoomOut);
     menuNavigation->addAction(mpActionPan);
@@ -426,7 +431,7 @@ void KKSGISWidgetQGIS::initMenuBar()
     mpMenuBar->addMenu(menuNavigation);
     mpMenuMap.insert(tr("Navigation"), menuNavigation);
 
-    QMenu * menuTasks = new QMenu(tr("Thematic Analysis"));
+    QMenu * menuTasks = new QMenu(tr("Тематический анализ"));
     menuTasks->addAction(mpActionBathymetry);
 
     mpMenuBar->addMenu(menuTasks);

@@ -120,10 +120,10 @@ MainWindow::MainWindow(QWidget* parent, Qt::WFlags fl)
     mpActionAddVectorLayer->setStatusTip(tr("Добавить векторный слой в окно карты"));
     mpActionAddRasterLayer->setStatusTip(tr("Добавить растровый слой в окно карты"));
     mpActionFileExit = new QAction(QIcon(":/ico/mActionFileExit.png"), tr("Выход"), this);
-    mpActionFileExit->setStatusTip(tr("Close Application"));
+    mpActionFileExit->setStatusTip(tr("Закрыть приложение"));
     mpActionFileExit->setShortcuts(QKeySequence::Close);
-    mpActionAddPostGISLayer = new QAction(QIcon(":/ico/add_postgis.png"), tr("Add &Database Layer"), this);
-    mpActionAddPostGISLayer->setStatusTip(tr("Add database layer to the map window"));
+    mpActionAddPostGISLayer = new QAction(QIcon(":/ico/add_postgis.png"), tr("Добавить слой &базы данных"), this);
+    mpActionAddPostGISLayer->setStatusTip(tr("Добавить слой базы данных в окно карты"));
 
 
     //settings of TOC-tableWiget

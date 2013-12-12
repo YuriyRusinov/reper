@@ -12,5 +12,8 @@
         <file>ico/add_raster.png</file>
         <file>ico/add_vector.png</file>
         <file>ico/vectorize.png</file>
+        <file>ico/mActionFileSave.png</file>
+        <file>ico/mActionFileSaveAs.png</file>
+        <file>ico/add_postgis.png</file>
     </qresource>
 </RCC>
