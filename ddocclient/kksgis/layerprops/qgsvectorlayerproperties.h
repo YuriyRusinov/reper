@@ -43,7 +43,9 @@ class QgsLabelingGui;
 class QgsDiagramProperties;
 class QgsFieldsProperties;
 
-class APP_EXPORT QgsVectorLayerProperties : public QgsOptionsDialogBase, private Ui::QgsVectorLayerPropertiesBase
+class KKSGISWidgetQGIS;
+
+class _GIS_EXPORT QgsVectorLayerProperties : public QgsOptionsDialogBase, private Ui::QgsVectorLayerPropertiesBase
 {
     Q_OBJECT
 
@@ -73,6 +75,8 @@ class APP_EXPORT QgsVectorLayerProperties : public QgsOptionsDialogBase, private
       @param name attribute name
       @return false in case of a non-existing attribute.*/
     bool deleteAttribute( int attr );
+
+    void setWorkingWidget(KKSGISWidgetQGIS * w);
 
   public slots:
 
@@ -156,6 +160,8 @@ class APP_EXPORT QgsVectorLayerProperties : public QgsOptionsDialogBase, private
     QMenu *mSaveAsMenu;
     QMenu *mLoadStyleMenu;
 
+    KKSGISWidgetQGIS * mWorkingWidget;
+
     /**Renderer dialog which is shown*/
     QDialog* mRendererDialog;
     /**Labeling dialog. If apply is pressed, options are applied to vector's QgsLabel */
@@ -183,3 +189,4 @@ inline QString QgsVectorLayerProperties::displayName()
   return txtDisplayName->text();
 }
 #endif
+

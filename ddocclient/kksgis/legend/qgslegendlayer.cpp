@@ -16,6 +16,7 @@
 
 #include "qgsapplication.h"
 //#include "qgisapp.h"
+#include "kksgiswidgetqgis.h" //!!!! גלוסעמ qgisapp.h
 #include "qgslegend.h"
 #include "qgslegendsymbologyitem.h"
 #include "qgslogger.h"
@@ -361,11 +362,12 @@ QPixmap QgsLegendLayer::getOriginalPixmap()
 void QgsLegendLayer::addToPopupMenu( QMenu& theMenu )
 {
 //ksa --
-/*ksa
+
   QgsMapLayer *lyr = layer();
-  QAction *toggleEditingAction = QgisApp::instance()->actionToggleEditing();
-  QAction *saveLayerEditsAction = QgisApp::instance()->actionSaveActiveLayerEdits();
-  QAction *allEditsAction = QgisApp::instance()->actionAllEdits();
+
+  QAction *toggleEditingAction = NULL; //ksa mWorkingWidget->actionToggleEditing();
+  QAction *saveLayerEditsAction = NULL;//ksa mWorkingWidget->actionSaveActiveLayerEdits();
+  QAction *allEditsAction = NULL; //ksa mWorkingWidget->actionAllEdits();
 
   // zoom to layer extent
   theMenu.addAction( QgsApplication::getThemeIcon( "/mActionZoomToLayer.svg" ),
@@ -389,16 +391,16 @@ void QgsLegendLayer::addToPopupMenu( QMenu& theMenu )
   showInOverviewAction->blockSignals( false );
 
   // remove from canvas
-  theMenu.addAction( QgsApplication::getThemeIcon( "/mActionRemoveLayer.svg" ), tr( "&Remove" ), QgisApp::instance(), SLOT( removeLayer() ) );
+  theMenu.addAction( QgsApplication::getThemeIcon( "/mActionRemoveLayer.svg" ), tr( "&Remove" ), mWorkingWidget, SLOT( removeLayer() ) );
 
   // duplicate layer
-  QAction* duplicateLayersAction = theMenu.addAction( QgsApplication::getThemeIcon( "/mActionDuplicateLayer.svg" ), tr( "&Duplicate" ), QgisApp::instance(), SLOT( duplicateLayers() ) );
+  //ksa QAction* duplicateLayersAction = theMenu.addAction( QgsApplication::getThemeIcon( "/mActionDuplicateLayer.svg" ), tr( "&Duplicate" ), QgisApp::instance(), SLOT( duplicateLayers() ) );
 
   // set layer crs
-  theMenu.addAction( QgsApplication::getThemeIcon( "/mActionSetCRS.png" ), tr( "&Set Layer CRS" ), QgisApp::instance(), SLOT( setLayerCRS() ) );
+  theMenu.addAction( QgsApplication::getThemeIcon( "/mActionSetCRS.png" ), tr( "&Set Layer CRS" ), mWorkingWidget, SLOT( setLayerCRS() ) );
 
   // assign layer crs to project
-  theMenu.addAction( QgsApplication::getThemeIcon( "/mActionSetProjectCRS.png" ), tr( "Set &Project CRS from Layer" ), QgisApp::instance(), SLOT( setProjectCRSFromLayer() ) );
+  theMenu.addAction( QgsApplication::getThemeIcon( "/mActionSetProjectCRS.png" ), tr( "Set &Project CRS from Layer" ), mWorkingWidget, SLOT( setProjectCRSFromLayer() ) );
 
   theMenu.addSeparator();
 
@@ -408,7 +410,7 @@ void QgsLegendLayer::addToPopupMenu( QMenu& theMenu )
 
     // attribute table
     theMenu.addAction( QgsApplication::getThemeIcon( "/mActionOpenTable.png" ), tr( "&Open Attribute Table" ),
-                       QgisApp::instance(), SLOT( attributeTable() ) );
+                      mWorkingWidget, SLOT( attributeTable() ) );
 
     // allow editing
     int cap = vlayer->dataProvider()->capabilities();
@@ -433,21 +435,21 @@ void QgsLegendLayer::addToPopupMenu( QMenu& theMenu )
     // disable duplication of memory layers
     if ( vlayer->storageType() == "Memory storage" && legend()->selectedLayers().count() == 1 )
     {
-      duplicateLayersAction->setEnabled( false );
+      //ksa duplicateLayersAction->setEnabled( false );
     }
 
     // save as vector file
-    theMenu.addAction( tr( "Save As..." ), QgisApp::instance(), SLOT( saveAsFile() ) );
+    theMenu.addAction( tr( "Save As..." ), mWorkingWidget, SLOT( saveAsFile() ) );
 
     // save selection as vector file
-    QAction* saveSelectionAsAction = theMenu.addAction( tr( "Save Selection As..." ), QgisApp::instance(), SLOT( saveSelectionAsVectorFile() ) );
+    QAction* saveSelectionAsAction = theMenu.addAction( tr( "Save Selection As..." ), mWorkingWidget, SLOT( saveSelectionAsVectorFile() ) );
     if ( vlayer->selectedFeatureCount() == 0 )
     {
       saveSelectionAsAction->setEnabled( false );
     }
 
     if ( !vlayer->isEditable() && vlayer->dataProvider()->supportsSubsetString() && vlayer->vectorJoins().isEmpty() )
-      theMenu.addAction( tr( "&Filter..." ), QgisApp::instance(), SLOT( layerSubsetString() ) );
+      theMenu.addAction( tr( "&Filter..." ), mWorkingWidget, SLOT( layerSubsetString() ) );
 
     //show number of features in legend if requested
     QAction* showNFeaturesAction = new QAction( tr( "Show Feature Count" ), &theMenu );
@@ -459,14 +461,14 @@ void QgsLegendLayer::addToPopupMenu( QMenu& theMenu )
   }
   else if ( lyr->type() == QgsMapLayer::RasterLayer )
   {
-    theMenu.addAction( tr( "Save As..." ), QgisApp::instance(), SLOT( saveAsRasterFile() ) );
+    theMenu.addAction( tr( "Save As..." ), mWorkingWidget, SLOT( saveAsRasterFile() ) );
   }
   else if ( lyr->type() == QgsMapLayer::PluginLayer && legend()->selectedLayers().count() == 1 )
   {
     // disable duplication of plugin layers
-    duplicateLayersAction->setEnabled( false );
+    //ksa duplicateLayersAction->setEnabled( false );
   }
-  */
+  
 }
 
 //////////
@@ -622,4 +624,9 @@ void QgsLegendLayer::setDrawingOrder( int order )
 {
   QgsDebugMsg( QString( "order %1: %2=>%3" ).arg( mLyr.layer()->name() ).arg( mDrawingOrder ).arg( order ) );
   mDrawingOrder = order;
+}
+
+void QgsLegendLayer::setWorkingWidget( KKSGISWidgetQGIS * w)
+{
+    mWorkingWidget = w;
 }

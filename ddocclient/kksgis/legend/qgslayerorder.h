@@ -20,8 +20,8 @@
 
 #include "kksgis_config.h"
 
-#undef max(a,b)
-#undef min(a,b)
+#undef max
+#undef min
 
 #include <QListWidget>
 

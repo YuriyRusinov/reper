@@ -3,6 +3,8 @@
 #include "qgslegend.h"
 #include "qgslayerorder.h"
 
+#include <qgsmessagebar.h>
+#include <qgspallabeling.h>
 #include <qgsproviderregistry.h>
 #include <qgsmaplayerregistry.h>
 #include <qgsmapcanvas.h>
@@ -144,11 +146,20 @@ void KKSGISWidgetQGIS::initMapCanvas()
     mpMapCanvas->freeze(false);
     mpMapCanvas->setVisible(true);
     mpMapCanvas->refresh();
+
+    mLBL = new QgsPalLabeling();
+    mpMapCanvas->mapRenderer()->setLabelingEngine( mLBL );
+
+    // a bar to warn the user with non-blocking messages
+    mInfoBar = new QgsMessageBar( this );
+    mInfoBar->setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Fixed );
+    
     mpMapCanvas->show();
 
     // добавляем фрейм и вставляем в него виджет "Окно карты"(Map Canvas)
     QVBoxLayout * mpMapLayout = new QVBoxLayout(this); //main Layout
     mpMapLayout->addWidget(mpMapCanvas); // adding MapCanvas in Layout
+    mpMapLayout->addWidget( mInfoBar);
 }
 
 void KKSGISWidgetQGIS::initMapLegend()

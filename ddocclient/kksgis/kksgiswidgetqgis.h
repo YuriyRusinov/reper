@@ -7,8 +7,8 @@
 //QT Includes
 #include <QtGui>
 
-#undef min(a,b)
-#undef max(a,b)
+#undef min
+#undef max
 
 #include <qgsapplication.h>
 #include <qgspoint.h>
@@ -28,6 +28,8 @@ class QgsLegend;
 class QgsLayerOrder;
 class QgsMapLayerRegistry;
 class QTableWidget;
+class QgsPalLabeling;
+class QgsMessageBar;
 
 class _GIS_EXPORT KKSGISWidgetQGIS : public KKSGISWidget
 {
@@ -54,8 +56,28 @@ public:
     void openRasterLayer(const QString & rLayerFile);
     void openDatabaseLayer();
 
+
+    QgsMapCanvas * mapCanvas() {return mpMapCanvas;}
+    QgsPalLabeling * palLabeling();
+    QgsMessageBar* messageBar();
+    int messageTimeout();
+
 public slots:
     void layerProperties();
+    void markDirty();
+    void labeling();
+
+    bool toggleEditing( QgsMapLayer *layer, bool allowCancel );
+    void toggleEditing();
+
+signals:
+    /** emitted when a project file is successfully read
+      @note
+      This is useful for plug-ins that store properties with project files.  A
+      plug-in can connect to this signal.  When it is emitted, the plug-in
+      knows to then check the project properties for any relevant state.
+      */
+    void projectRead();
 
 private:
     KKSGISWidgetQGIS(QWidget* parent = 0, Qt::WFlags fl = 0 );
@@ -104,6 +126,7 @@ private slots:
     void SLOTsetRenderer();
     void SLOTtempUse();
 
+
 private:
     void initStatusBar();
     void initUserSettings();
@@ -145,12 +168,16 @@ private:
     QWidget * mpMapLayerOrderWidget;
     //QTableWidget * mpTableLegend;
     QList<QgsMapCanvasLayer> mpLayerSet;
+    QgsPalLabeling* mLBL;
 
     QToolBar * mpMapToolBar;
 
     QgsMapTool * mpPanTool;
     QgsMapTool * mpZoomInTool;
     QgsMapTool * mpZoomOutTool;
+
+    //! a bar to display warnings in a non-blocker manner
+    QgsMessageBar *mInfoBar;
 
 
     //строка меню

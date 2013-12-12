@@ -18,6 +18,15 @@
 #include <qgslegendmodel.h>
 #include <qgslegendinterface.h>
 #include <qgsmaplayerregistry.h>
+#include <qgspallabeling.h>
+#include <qgslabelinggui.h>
+#include <qgsmessagebar.h>
+#include <qgsmessagebaritem.h>
+#include <qgsvectorlayerproperties.h>
+#include <qgsrasterlayerproperties.h>
+#include <qgspluginlayer.h>
+#include <qgspluginlayerregistry.h>
+
 
 #include <qgsproject.h>
 #include <qgsproviderregistry.h>
@@ -758,9 +767,24 @@ void KKSGISWidgetQGIS::openProject(const QString & prjFile)
         mpMapCanvas->refresh();
         return;
     }
+
     this->azSetTitleWindow( *this );
-    //    mpMapCanvas->setCanvasColor( myColor );
-    // k // QgsMapLayer *layer;
+
+    int  myRedInt = QgsProject::instance()->readNumEntry( "Gui", "/CanvasColorRedPart", 255 );
+    int  myGreenInt = QgsProject::instance()->readNumEntry( "Gui", "/CanvasColorGreenPart", 255 );
+    int  myBlueInt = QgsProject::instance()->readNumEntry( "Gui", "/CanvasColorBluePart", 255 );
+    QColor myColor = QColor( myRedInt, myGreenInt, myBlueInt );
+    mpMapCanvas->setCanvasColor( myColor ); //this is fill color before rendering starts
+
+    bool projectScales = QgsProject::instance()->readBoolEntry( "Scales", "/useProjectScales" );
+    if ( projectScales )
+    {
+        //ksa mScaleEdit->updateScales( QgsProject::instance()->readListEntry( "Scales", "/ScalesList" ) );
+    }
+
+    mpMapCanvas->updateScale();
+
+  // k // QgsMapLayer *layer;
     QMapIterator < QString, QgsMapLayer * > i(QgsMapLayerRegistry::instance()->mapLayers());
     i.toBack();
     while (i.hasPrevious())
@@ -782,8 +806,15 @@ void KKSGISWidgetQGIS::openProject(const QString & prjFile)
         }
 
     }
+    
+    QSettings settings;
+    // load PAL engine settings
+    mLBL->loadEngineSettings();
 
-    //QgsLegend * mpLegend = QgisApp::instance()->legend();
+    emit projectRead(); // let plug-ins know that we've read in a new
+    // project so that they can check any project
+    // specific plug-in state
+    
     // TODO add last Open Project
     QApplication::restoreOverrideCursor();
     mpMapCanvas->setLayerSet(mpLayerSet);
@@ -997,7 +1028,7 @@ void KKSGISWidgetQGIS::showLayerProperties( QgsMapLayer *ml )
   Either the map layer needs to be passed as an argument to sync or else
   a separate copy of the dialog pointer needs to be stored with each layer.
   */
-/*
+
   if ( !ml )
     return;
 
@@ -1015,8 +1046,9 @@ void KKSGISWidgetQGIS::showLayerProperties( QgsMapLayer *ml )
     }
     else
     {
-      rlp = new QgsRasterLayerProperties( ml, mMapCanvas, this );
-      connect( rlp, SIGNAL( refreshLegend( QString, bool ) ), mMapLegend, SLOT( refreshLayerSymbology( QString, bool ) ) );
+      rlp = new QgsRasterLayerProperties( ml, mpMapCanvas, this );
+      rlp->setWorkingWidget(this);
+      connect( rlp, SIGNAL( refreshLegend( QString, bool ) ), mpMapLegend, SLOT( refreshLayerSymbology( QString, bool ) ) );
     }
 
     rlp->exec();
@@ -1034,12 +1066,13 @@ void KKSGISWidgetQGIS::showLayerProperties( QgsMapLayer *ml )
     else
     {
       vlp = new QgsVectorLayerProperties( vlayer, this );
-      connect( vlp, SIGNAL( refreshLegend( QString, QgsLegendItem::Expansion ) ), mMapLegend, SLOT( refreshLayerSymbology( QString, QgsLegendItem::Expansion ) ) );
+      vlp->setWorkingWidget(this);
+      connect( vlp, SIGNAL( refreshLegend( QString, QgsLegendItem::Expansion ) ), mpMapLegend, SLOT( refreshLayerSymbology( QString, QgsLegendItem::Expansion ) ) );
     }
 
     if ( vlp->exec() )
     {
-      ;//activateDeactivateLayerRelatedActions( ml );
+      ;//ksa activateDeactivateLayerRelatedActions( ml );
     }
     delete vlp; // delete since dialog cannot be reused without updating code
   }
@@ -1060,5 +1093,204 @@ void KKSGISWidgetQGIS::showLayerProperties( QgsMapLayer *ml )
                                  QgsMessageBar::INFO, messageTimeout() );
     }
   }
-  */
+  
+}
+
+QgsPalLabeling *KKSGISWidgetQGIS::palLabeling()
+{
+  Q_ASSERT( mLBL );
+  return mLBL;
+}
+
+QgsMessageBar* KKSGISWidgetQGIS::messageBar()
+{
+  Q_ASSERT( mInfoBar );
+  return mInfoBar;
+}
+
+int KKSGISWidgetQGIS::messageTimeout()
+{
+  QSettings settings;
+  return settings.value( "/qgis/messageTimeout", 5 ).toInt();
+}
+
+void KKSGISWidgetQGIS::labeling()
+{
+  QgsVectorLayer *vlayer = qobject_cast<QgsVectorLayer*>( activeLayer() );
+  if ( !vlayer )
+  {
+    messageBar()->pushMessage( tr( "Labeling Options" ),
+                               tr( "Please select a vector layer first" ),
+                               QgsMessageBar::INFO,
+                               messageTimeout() );
+    return;
+  }
+
+
+  QDialog *dlg = new QDialog( this );
+  dlg->setWindowTitle( tr( "Layer labeling settings" ) );
+  QgsLabelingGui *labelingGui = new QgsLabelingGui( mLBL, vlayer, mpMapCanvas, dlg );
+  labelingGui->setWorkingWidget(this); //ksa
+  labelingGui->init(); // load QgsPalLayerSettings for layer
+  labelingGui->layout()->setContentsMargins( 0, 0, 0, 0 );
+  QVBoxLayout *layout = new QVBoxLayout( dlg );
+  layout->addWidget( labelingGui );
+
+  QDialogButtonBox *buttonBox = new QDialogButtonBox( QDialogButtonBox::Ok | QDialogButtonBox::Cancel | QDialogButtonBox::Apply, Qt::Horizontal, dlg );
+  layout->addWidget( buttonBox );
+
+  dlg->setLayout( layout );
+
+  QSettings settings;
+  dlg->restoreGeometry( settings.value( "/Windows/Labeling/geometry" ).toByteArray() );
+
+  connect( buttonBox->button( QDialogButtonBox::Ok ), SIGNAL( clicked() ), dlg, SLOT( accept() ) );
+  connect( buttonBox->button( QDialogButtonBox::Cancel ), SIGNAL( clicked() ), dlg, SLOT( reject() ) );
+  connect( buttonBox->button( QDialogButtonBox::Apply ), SIGNAL( clicked() ), labelingGui, SLOT( apply() ) );
+
+  if ( dlg->exec() )
+  {
+    labelingGui->apply();
+
+    settings.setValue( "/Windows/Labeling/geometry", dlg->saveGeometry() );
+
+    // alter labeling - save the changes
+    labelingGui->layerSettings().writeToLayer( vlayer );
+
+    // trigger refresh
+    if ( mpMapCanvas )
+    {
+      mpMapCanvas->refresh();
+    }
+  }
+
+  delete dlg;
+
+  //ksa activateDeactivateLayerRelatedActions( vlayer );
+}
+
+void KKSGISWidgetQGIS::markDirty()
+{
+  // notify the project that there was a change
+  QgsProject::instance()->dirty( true );
+}
+
+
+void KKSGISWidgetQGIS::toggleEditing()
+{
+  if ( mpMapCanvas && mpMapCanvas->isDrawing() )
+    return;
+
+  QgsVectorLayer *currentLayer = qobject_cast<QgsVectorLayer*>( activeLayer() );
+  if ( currentLayer )
+  {
+    toggleEditing( currentLayer, true );
+  }
+  else
+  {
+    // active although there's no layer active!?
+    //ksa mActionToggleEditing->setChecked( false );
+  }
+}
+
+bool KKSGISWidgetQGIS::toggleEditing( QgsMapLayer *layer, bool allowCancel )
+{
+  QgsVectorLayer *vlayer = qobject_cast<QgsVectorLayer *>( layer );
+  if ( !vlayer )
+  {
+    return false;
+  }
+
+  bool res = true;
+
+  if ( !vlayer->isEditable() && !vlayer->isReadOnly() )
+  {
+    if ( !( vlayer->dataProvider()->capabilities() & QgsVectorDataProvider::EditingCapabilities ) )
+    {
+      //ksa mActionToggleEditing->setChecked( false );
+      //ksa mActionToggleEditing->setEnabled( false );
+      messageBar()->pushMessage( tr( "Start editing failed" ),
+                                 tr( "Provider cannot be opened for editing" ),
+                                 QgsMessageBar::INFO, messageTimeout() );
+      return false;
+    }
+
+    vlayer->startEditing();
+
+    QSettings settings;
+    QString markerType = settings.value( "/qgis/digitizing/marker_style", "Cross" ).toString();
+    bool markSelectedOnly = settings.value( "/qgis/digitizing/marker_only_for_selected", false ).toBool();
+
+    // redraw only if markers will be drawn
+    if (( !markSelectedOnly || vlayer->selectedFeatureCount() > 0 ) &&
+        ( markerType == "Cross" || markerType == "SemiTransparentCircle" ) )
+    {
+      vlayer->triggerRepaint();
+    }
+  }
+  else if ( vlayer->isModified() )
+  {
+    QMessageBox::StandardButtons buttons = QMessageBox::Save | QMessageBox::Discard;
+    if ( allowCancel )
+      buttons |= QMessageBox::Cancel;
+
+    switch ( QMessageBox::information( 0,
+                                       tr( "Stop editing" ),
+                                       tr( "Do you want to save the changes to layer %1?" ).arg( vlayer->name() ),
+                                       buttons ) )
+    {
+      case QMessageBox::Cancel:
+        res = false;
+        break;
+
+      case QMessageBox::Save:
+        if ( !vlayer->commitChanges() )
+        {
+          //ksa commitError( vlayer );
+          // Leave the in-memory editing state alone,
+          // to give the user a chance to enter different values
+          // and try the commit again later
+          res = false;
+        }
+
+        vlayer->triggerRepaint();
+        break;
+
+      case QMessageBox::Discard:
+        mpMapCanvas->freeze( true );
+        if ( !vlayer->rollBack() )
+        {
+          messageBar()->pushMessage( tr( "Error" ),
+                                     tr( "Problems during roll back" ),
+                                     QgsMessageBar::CRITICAL );
+          res = false;
+        }
+        mpMapCanvas->freeze( false );
+
+        vlayer->triggerRepaint();
+        break;
+
+      default:
+        break;
+    }
+  }
+  else //layer not modified
+  {
+    mpMapCanvas->freeze( true );
+    vlayer->rollBack();
+    mpMapCanvas->freeze( false );
+    res = true;
+    vlayer->triggerRepaint();
+  }
+
+  if ( !res && layer == activeLayer() )
+  {
+    // while also called when layer sends editingStarted/editingStopped signals,
+    // this ensures correct restoring of gui state if toggling was canceled
+    // or layer commit/rollback functions failed
+    
+    //ksa activateDeactivateLayerRelatedActions( layer );
+  }
+
+  return res;
 }

@@ -19,12 +19,14 @@
 #include <memory>
 #include <limits>
 
+#include "qgsvectorlayerproperties.h"
+
 //#include "qgisapp.h"
-#inclide "kksgiswidgetqgis.h" //!!!! גלוסעמ qgisapp.h
+#include "kksgiswidgetqgis.h" //!!!! גלוסעמ qgisapp.h
 #include "qgsaddjoindialog.h"
 #include "qgsapplication.h"
 #include "qgsattributeactiondialog.h"
-#include "qgsapplydialog.h"
+//ksa #include "qgsapplydialog.h"
 #include "qgscontexthelp.h"
 #include "qgscoordinatetransform.h"
 #include "qgsdiagramproperties.h"
@@ -38,13 +40,12 @@
 #include "qgsgenericprojectionselector.h"
 #include "qgslogger.h"
 #include "qgsmaplayerregistry.h"
-#include "qgspluginmetadata.h"
-#include "qgspluginregistry.h"
+//ksa #include "qgspluginmetadata.h"
+//ksa #include "qgspluginregistry.h"
 #include "qgsproject.h"
 #include "qgssavestyletodbdialog.h"
 #include "qgsloadstylefromdbdialog.h"
 #include "qgsvectorlayer.h"
-#include "qgsvectorlayerproperties.h"
 #include "qgsconfig.h"
 #include "qgsvectordataprovider.h"
 #include "qgsquerybuilder.h"
@@ -75,8 +76,12 @@ QgsVectorLayerProperties::QgsVectorLayerProperties(
     , layer( lyr )
     , mMetadataFilled( false )
     , mRendererDialog( 0 )
+    , mWorkingWidget(NULL)
 {
   setupUi( this );
+  
+  mWorkingWidget = qobject_cast<KKSGISWidgetQGIS *>(parent);
+
   // QgsOptionsDialogBase handles saving/restoring of geometry, splitter and current tab states,
   // switching vertical tabs between icon/text to icon-only modes (splitter collapsed to left),
   // and connecting QDialogButtonBox's accepted/rejected signals to dialog's accept/reject slots
@@ -107,7 +112,8 @@ QgsVectorLayerProperties::QgsVectorLayerProperties(
     // Create the Labeling dialog tab
     layout = new QVBoxLayout( labelingFrame );
     layout->setMargin( 0 );
-    labelingDialog = new QgsLabelingGui( QgisApp::instance()->palLabeling(), layer, QgisApp::instance()->mapCanvas(), labelingFrame );
+    labelingDialog = new QgsLabelingGui( mWorkingWidget->palLabeling(), layer, mWorkingWidget->mapCanvas(), labelingFrame );
+    labelingDialog->setWorkingWidget(mWorkingWidget);
     labelingDialog->layout()->setContentsMargins( -1, 0, -1, 0 );
     layout->addWidget( labelingDialog );
     labelingFrame->setLayout( layout );
@@ -134,6 +140,7 @@ QgsVectorLayerProperties::QgsVectorLayerProperties(
   actionLayout->setMargin( 0 );
   const QgsFields &fields = layer->pendingFields();
   actionDialog = new QgsAttributeActionDialog( layer->actions(), fields, actionOptionsFrame );
+  actionDialog->setWorkingWidget(mWorkingWidget);
   actionDialog->layout()->setMargin( 0 );
   actionLayout->addWidget( actionDialog );
 
@@ -163,13 +170,14 @@ QgsVectorLayerProperties::QgsVectorLayerProperties(
                     this, SLOT( saveStyleAsMenuTriggered( QAction * ) ) );
 
   mFieldsPropertiesDialog = new QgsFieldsProperties( layer, mFieldsFrame );
+  mFieldsPropertiesDialog->setWorkingWidget(mWorkingWidget);
   mFieldsPropertiesDialog->layout()->setMargin( 0 );
   mFieldsFrame->setLayout( new QVBoxLayout( mFieldsFrame ) );
   mFieldsFrame->layout()->setMargin( 0 );
   mFieldsFrame->layout()->addWidget( mFieldsPropertiesDialog );
 
   connect( mFieldsPropertiesDialog, SIGNAL( toggleEditing() ), this, SLOT( toggleEditing() ) );
-  connect( this, SIGNAL( toggleEditing( QgsMapLayer* ) ), QgisApp::instance(), SLOT( toggleEditing( QgsMapLayer* ) ) );
+  connect( this, SIGNAL( toggleEditing( QgsMapLayer* ) ), mWorkingWidget, SLOT( toggleEditing( QgsMapLayer* ) ) );
 
   syncToLayer();
 
@@ -218,6 +226,7 @@ QgsVectorLayerProperties::QgsVectorLayerProperties(
   }
 
   diagramPropertiesDialog = new QgsDiagramProperties( layer, mDiagramFrame );
+  diagramPropertiesDialog->setWorkingWidget(mWorkingWidget);
   diagramPropertiesDialog->layout()->setMargin( 0 );
   mDiagramFrame->setLayout( new QVBoxLayout( mDiagramFrame ) );
   mDiagramFrame->layout()->setMargin( 0 );
@@ -1061,10 +1070,15 @@ void QgsVectorLayerProperties::enableLabelOptions( bool theFlag )
 
 void QgsVectorLayerProperties::on_mMinimumScaleSetCurrentPushButton_clicked()
 {
-  cbMinimumScale->setScale( 1.0 / QgisApp::instance()->mapCanvas()->mapRenderer()->scale() );
+  cbMinimumScale->setScale( 1.0 / mWorkingWidget->mapCanvas()->mapRenderer()->scale() );
 }
 
 void QgsVectorLayerProperties::on_mMaximumScaleSetCurrentPushButton_clicked()
 {
-  cbMaximumScale->setScale( 1.0 / QgisApp::instance()->mapCanvas()->mapRenderer()->scale() );
+  cbMaximumScale->setScale( 1.0 / mWorkingWidget->mapCanvas()->mapRenderer()->scale() );
+}
+
+void QgsVectorLayerProperties::setWorkingWidget( KKSGISWidgetQGIS * w)
+{
+    mWorkingWidget = w;
 }

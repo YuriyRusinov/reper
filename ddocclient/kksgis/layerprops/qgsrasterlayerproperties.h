@@ -40,7 +40,9 @@ class QgsRasterHistogramWidget;
   *@author Tim Sutton
   */
 
-class APP_EXPORT QgsRasterLayerProperties : public QgsOptionsDialogBase, private Ui::QgsRasterLayerPropertiesBase
+class KKSGISWidgetQGIS;
+
+class _GIS_EXPORT QgsRasterLayerProperties : public QgsOptionsDialogBase, private Ui::QgsRasterLayerPropertiesBase
 {
     Q_OBJECT
 
@@ -54,6 +56,8 @@ class APP_EXPORT QgsRasterLayerProperties : public QgsOptionsDialogBase, private
 
     /** synchronize state with associated raster layer */
     void sync();
+
+    void setWorkingWidget( KKSGISWidgetQGIS * w);
 
   public slots:
     //TODO: Verify that these all need to be public
@@ -188,5 +192,7 @@ class APP_EXPORT QgsRasterLayerProperties : public QgsOptionsDialogBase, private
     QgsRasterHistogramWidget* mHistogramWidget;
 
     QVector<bool> mTransparencyToEdited;
+
+    KKSGISWidgetQGIS * mWorkingWidget;
 };
 #endif

@@ -759,7 +759,6 @@ void QgsLegend::mouseReleaseEvent( QMouseEvent * e )
 
 void QgsLegend::mouseDoubleClickEvent( QMouseEvent *e )
 {
-    /*
 #ifdef Q_WS_MAC
   // fix for when quick left-then-right clicks (when legend is out of focus)
   //  register as left double click: show contextual menu as user intended
@@ -784,13 +783,11 @@ void QgsLegend::mouseDoubleClickEvent( QMouseEvent *e )
     default:
       break;
   }
-  */
 }
 
 void QgsLegend::handleRightClickEvent( QTreeWidgetItem* item, const QPoint& position )
 {
-  //ksa --
-  /* ksa
+  
   if ( !mMapCanvas || mMapCanvas->isDrawing() )
   {
     return;
@@ -870,7 +867,7 @@ void QgsLegend::handleRightClickEvent( QTreeWidgetItem* item, const QPoint& posi
       // properties goes on bottom of menu for consistency with normal ui standards
       // e.g. kde stuff
       if ( lyr->layer() && QgsProject::instance()->layerIsEmbedded( lyr->layer()->id() ).isEmpty() )
-        theMenu.addAction( tr( "&Properties" ), QgisApp::instance(), SLOT( layerProperties() ) );
+        theMenu.addAction( tr( "&Properties" ), mWorkingWidget, SLOT( layerProperties() ) );
 
       if ( li->parent() && !parentGroupEmbedded( li ) )
       {
@@ -883,7 +880,7 @@ void QgsLegend::handleRightClickEvent( QTreeWidgetItem* item, const QPoint& posi
                          tr( "Zoom to Group" ), this, SLOT( legendLayerZoom() ) );
 
       // use QGisApp::removeLayer() to remove all selected layers+groups
-      theMenu.addAction( QgsApplication::getThemeIcon( "/mActionRemoveLayer.svg" ), tr( "&Remove" ), QgisApp::instance(), SLOT( removeLayer() ) );
+      theMenu.addAction( QgsApplication::getThemeIcon( "/mActionRemoveLayer.svg" ), tr( "&Remove" ), mWorkingWidget, SLOT( removeLayer() ) );
 
       theMenu.addAction( QgsApplication::getThemeIcon( "/mActionSetCRS.png" ),
                          tr( "&Set Group CRS" ), this, SLOT( legendGroupSetCRS() ) );
@@ -906,12 +903,12 @@ void QgsLegend::handleRightClickEvent( QTreeWidgetItem* item, const QPoint& posi
 
   if ( selectedLayers().length() == 1 )
   {
-    QgisApp* app = QgisApp::instance();
-    theMenu.addAction( tr( "Copy Style" ), app, SLOT( copyStyle() ) );
-    if ( app->clipboard()->hasFormat( QGSCLIPBOARD_STYLE_MIME ) )
-    {
-      theMenu.addAction( tr( "Paste Style" ), app, SLOT( pasteStyle() ) );
-    }
+    //QgisApp* app = QgisApp::instance();
+    theMenu.addAction( tr( "Copy Style" ), mWorkingWidget, SLOT( copyStyle() ) );
+    //ksa if ( app->clipboard()->hasFormat( QGSCLIPBOARD_STYLE_MIME ) )
+    //{
+    //  theMenu.addAction( tr( "Paste Style" ), app, SLOT( pasteStyle() ) );
+    //}
   }
 
   theMenu.addAction( QgsApplication::getThemeIcon( "/folder_new.png" ), tr( "&Add New Group" ), this, SLOT( addGroupToCurrentItem() ) );
@@ -923,7 +920,7 @@ void QgsLegend::handleRightClickEvent( QTreeWidgetItem* item, const QPoint& posi
   updateDrawingOrderAction->setChecked( mUpdateDrawingOrder );
 
   theMenu.exec( position );
-  */
+  
 }
 
 void QgsLegend::initPixmaps()
@@ -1117,6 +1114,7 @@ void QgsLegend::addLayers( QList<QgsMapLayer *> theLayerList )
   {
     QgsMapLayer * layer = theLayerList.at( i );
     QgsLegendLayer* llayer = new QgsLegendLayer( layer );
+    llayer->setWorkingWidget(mWorkingWidget);
     if ( !QgsProject::instance()->layerIsEmbedded( layer->id() ).isEmpty() )
     {
       // start with already set font style
@@ -2081,6 +2079,7 @@ QgsLegendLayer* QgsLegend::readLayerFromXML( QDomElement& childelem, bool& isOpe
 
   // create the item
   QgsLegendLayer* ll = new QgsLegendLayer( theMapLayer );
+  ll->setWorkingWidget(mWorkingWidget);
   ll->setDrawingOrder( childelem.attribute( "drawingOrder", "-1" ).toInt() );
   ll->setShowFeatureCount( childelem.attribute( "showFeatureCount", "0" ).toInt(), false );
 

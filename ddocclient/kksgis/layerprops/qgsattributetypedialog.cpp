@@ -21,7 +21,8 @@
 #include "qgsmaplayerregistry.h"
 #include "qgsmapcanvas.h"
 #include "qgsexpressionbuilderdialog.h"
-#include "qgisapp.h"
+//#include "qgisapp.h"
+#include "kksgiswidgetqgis.h" //!!!! גלוסעמ qgisapp.h
 #include "qgsproject.h"
 #include "qgslogger.h"
 #include "qgseditorwidgetfactory.h"
@@ -235,7 +236,7 @@ void QgsAttributeTypeDialog::editValueRelationExpression()
 
   QgsDistanceArea myDa;
   myDa.setSourceCrs( vl->crs().srsid() );
-  myDa.setEllipsoidalMode( QgisApp::instance()->mapCanvas()->mapRenderer()->hasCrsTransformEnabled() );
+  myDa.setEllipsoidalMode( mWorkingWidget->mapCanvas()->mapRenderer()->hasCrsTransformEnabled() );
   myDa.setEllipsoid( QgsProject::instance()->readEntry( "Measure", "/Ellipsoid", GEO_NONE ) );
   dlg.setGeomCalculator( myDa );
 
@@ -880,4 +881,9 @@ void QgsAttributeTypeDialog::updateLayerColumns( int idx )
 
   valueRelationKeyColumn->setCurrentIndex( valueRelationKeyColumn->findText( mValueRelationData.mKey ) );
   valueRelationValueColumn->setCurrentIndex( valueRelationValueColumn->findText( mValueRelationData.mValue ) );
+}
+
+void QgsAttributeTypeDialog::setWorkingWidget( KKSGISWidgetQGIS * w)
+{
+    mWorkingWidget = w;
 }

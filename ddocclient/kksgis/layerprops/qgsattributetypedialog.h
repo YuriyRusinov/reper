@@ -27,14 +27,16 @@
 class QDialog;
 class QLayout;
 class QgsField;
-
-class APP_EXPORT QgsAttributeTypeDialog: public QDialog, private Ui::QgsAttributeTypeDialog
+class KKSGISWidgetQGIS;
+class _GIS_EXPORT QgsAttributeTypeDialog: public QDialog, private Ui::QgsAttributeTypeDialog
 {
     Q_OBJECT
 
   public:
     QgsAttributeTypeDialog( QgsVectorLayer *vl );
     ~QgsAttributeTypeDialog();
+
+    void setWorkingWidget(KKSGISWidgetQGIS * w);
 
     /**
      * Overloaded accept method which will write the feature field
@@ -240,6 +242,8 @@ class APP_EXPORT QgsAttributeTypeDialog: public QDialog, private Ui::QgsAttribut
     QMap<QString, QVariant> mWidgetV2Config;
 
     QMap< QString, QgsEditorConfigWidget* > mEditorConfigWidgets;
+
+    KKSGISWidgetQGIS * mWorkingWidget;
 };
 
 #endif

@@ -88,7 +88,7 @@
            <string>General</string>
           </property>
           <property name="icon">
-           <iconset resource="../../images/images.qrc">
+           <iconset resource="../images/images.qrc">
             <normaloff>:/images/themes/default/propertyicons/general.svg</normaloff>:/images/themes/default/propertyicons/general.svg</iconset>
           </property>
          </item>
@@ -100,7 +100,7 @@
            <string>Style</string>
           </property>
           <property name="icon">
-           <iconset resource="../../images/images.qrc">
+           <iconset resource="../images/images.qrc">
             <normaloff>:/images/themes/default/propertyicons/symbology.png</normaloff>:/images/themes/default/propertyicons/symbology.png</iconset>
           </property>
          </item>
@@ -112,7 +112,7 @@
            <string>Transparency</string>
           </property>
           <property name="icon">
-           <iconset resource="../../images/images.qrc">
+           <iconset resource="../images/images.qrc">
             <normaloff>:/images/themes/default/propertyicons/transparency.png</normaloff>:/images/themes/default/propertyicons/transparency.png</iconset>
           </property>
          </item>
@@ -124,7 +124,7 @@
            <string>Pyramids</string>
           </property>
           <property name="icon">
-           <iconset resource="../../images/images.qrc">
+           <iconset resource="../images/images.qrc">
             <normaloff>:/images/themes/default/propertyicons/pyramids.png</normaloff>:/images/themes/default/propertyicons/pyramids.png</iconset>
           </property>
          </item>
@@ -136,7 +136,7 @@
            <string>Histogram</string>
           </property>
           <property name="icon">
-           <iconset resource="../../images/images.qrc">
+           <iconset resource="../images/images.qrc">
             <normaloff>:/images/themes/default/propertyicons/histogram.png</normaloff>:/images/themes/default/propertyicons/histogram.png</iconset>
           </property>
          </item>
@@ -148,7 +148,7 @@
            <string>Metadata</string>
           </property>
           <property name="icon">
-           <iconset resource="../../images/images.qrc">
+           <iconset resource="../images/images.qrc">
             <normaloff>:/images/themes/default/propertyicons/metadata.png</normaloff>:/images/themes/default/propertyicons/metadata.png</iconset>
           </property>
          </item>
@@ -212,8 +212,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>693</width>
-                <height>646</height>
+                <width>701</width>
+                <height>675</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -379,11 +379,11 @@
                   <string notr="true">rastergeneral</string>
                  </property>
                  <layout class="QGridLayout" name="_5">
-                  <property name="verticalSpacing">
-                   <number>6</number>
-                  </property>
                   <property name="margin">
                    <number>11</number>
+                  </property>
+                  <property name="verticalSpacing">
+                   <number>6</number>
                   </property>
                   <item row="0" column="4">
                    <widget class="QLabel" name="textLabel1_2_2_2">
@@ -472,7 +472,7 @@
                      <string/>
                     </property>
                     <property name="pixmap">
-                     <pixmap resource="../../images/images.qrc">:/images/themes/default/mActionZoomIn.svg</pixmap>
+                     <pixmap resource="../images/images.qrc">:/images/themes/default/mActionZoomIn.svg</pixmap>
                     </property>
                     <property name="scaledContents">
                      <bool>true</bool>
@@ -503,7 +503,7 @@
                      <string/>
                     </property>
                     <property name="pixmap">
-                     <pixmap resource="../../images/images.qrc">:/images/themes/default/mActionZoomOut.svg</pixmap>
+                     <pixmap resource="../images/images.qrc">:/images/themes/default/mActionZoomOut.svg</pixmap>
                     </property>
                     <property name="scaledContents">
                      <bool>true</bool>
@@ -683,8 +683,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>610</width>
-                <height>360</height>
+                <width>460</width>
+                <height>270</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_13">
@@ -1076,7 +1076,7 @@
                      <string>Reset</string>
                     </property>
                     <property name="icon">
-                     <iconset resource="../../images/images.qrc">
+                     <iconset resource="../images/images.qrc">
                       <normaloff>:/images/themes/default/mActionUndo.png</normaloff>:/images/themes/default/mActionUndo.png</iconset>
                     </property>
                     <property name="toolButtonStyle">
@@ -1198,8 +1198,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>472</width>
-                <height>439</height>
+                <width>362</width>
+                <height>354</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -1465,7 +1465,7 @@
                        <string>...</string>
                       </property>
                       <property name="icon">
-                       <iconset resource="../../images/images.qrc">
+                       <iconset resource="../images/images.qrc">
                         <normaloff>:/images/themes/default/mActionSignPlus.png</normaloff>:/images/themes/default/mActionSignPlus.png</iconset>
                       </property>
                      </widget>
@@ -1482,7 +1482,7 @@
                        <string>...</string>
                       </property>
                       <property name="icon">
-                       <iconset resource="../../images/images.qrc">
+                       <iconset resource="../images/images.qrc">
                         <normaloff>:/images/themes/default/mActionContextHelp.png</normaloff>:/images/themes/default/mActionContextHelp.png</iconset>
                       </property>
                      </widget>
@@ -1496,7 +1496,7 @@
                        <string>...</string>
                       </property>
                       <property name="icon">
-                       <iconset resource="../../images/images.qrc">
+                       <iconset resource="../images/images.qrc">
                         <normaloff>:/images/themes/default/mActionSignMinus.png</normaloff>:/images/themes/default/mActionSignMinus.png</iconset>
                       </property>
                      </widget>
@@ -1510,7 +1510,7 @@
                        <string>...</string>
                       </property>
                       <property name="icon">
-                       <iconset resource="../../images/images.qrc">
+                       <iconset resource="../images/images.qrc">
                         <normaloff>:/images/themes/default/mActionOpenTable.png</normaloff>:/images/themes/default/mActionOpenTable.png</iconset>
                       </property>
                      </widget>
@@ -1524,7 +1524,7 @@
                        <string>...</string>
                       </property>
                       <property name="icon">
-                       <iconset resource="../../images/images.qrc">
+                       <iconset resource="../images/images.qrc">
                         <normaloff>:/images/themes/default/mActionFileOpen.svg</normaloff>:/images/themes/default/mActionFileOpen.svg</iconset>
                       </property>
                      </widget>
@@ -1538,7 +1538,7 @@
                        <string>...</string>
                       </property>
                       <property name="icon">
-                       <iconset resource="../../images/images.qrc">
+                       <iconset resource="../images/images.qrc">
                         <normaloff>:/images/themes/default/mActionFileSave.svg</normaloff>:/images/themes/default/mActionFileSave.svg</iconset>
                       </property>
                      </widget>
@@ -1615,8 +1615,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>632</width>
-                <height>199</height>
+                <width>457</width>
+                <height>169</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_12">
@@ -1679,7 +1679,7 @@
                        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Lucida Grande'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Cantarell'; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                       </property>
                      </widget>
@@ -1786,8 +1786,8 @@ p, li { white-space: pre-wrap; }
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>98</width>
-                <height>31</height>
+                <width>100</width>
+                <height>30</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_16">
@@ -1846,8 +1846,8 @@ p, li { white-space: pre-wrap; }
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>195</width>
-                <height>267</height>
+                <width>297</width>
+                <height>451</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -1954,52 +1954,52 @@ p, li { white-space: pre-wrap; }
                   <string notr="true">vectormeta</string>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_7">
-                 <item row="0" column="0">
-                  <widget class="QLabel" name="mLayerAttributionLabel">
-                   <property name="text">
-                    <string>Title</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="1">
-                  <widget class="QLineEdit" name="mLayerAttributionLineEdit"/>
-                 </item>
-                 <item row="2" column="0">
-                  <widget class="QLabel" name="mLayerAttributionUrlLabel">
-                   <property name="text">
-                    <string>Url</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="1">
-                  <widget class="QLineEdit" name="mLayerAttributionUrlLineEdit"/>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-              <item>
-               <widget class="QgsCollapsibleGroupBox" name="mMetaMetaUrlGrpBx">
-                <property name="title">
-                 <string>MetadataUrl</string>
-                </property>
-                <property name="syncGroup" stdset="0">
-                 <string notr="true">vectormeta</string>
-                </property>
-                <layout class="QGridLayout" name="gridLayout_9">
-                 <item row="0" column="0">
-                  <widget class="QLabel" name="mLayerMetadataUrlLabel">
-                   <property name="text">
-                    <string>Url</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="1">
-                  <widget class="QLineEdit" name="mLayerMetadataUrlLineEdit"/>
-                 </item>
-                 <item row="1" column="1">
-                  <layout class="QHBoxLayout" name="horizontalLayout_8">
-                   <item>
-                    <widget class="QLabel" name="mLayerMetadataUrlTypeLabel">
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="mLayerAttributionLabel">
+                    <property name="text">
+                     <string>Title</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QLineEdit" name="mLayerAttributionLineEdit"/>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QLabel" name="mLayerAttributionUrlLabel">
+                    <property name="text">
+                     <string>Url</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QLineEdit" name="mLayerAttributionUrlLineEdit"/>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QgsCollapsibleGroupBox" name="mMetaMetaUrlGrpBx">
+                 <property name="title">
+                  <string>MetadataUrl</string>
+                 </property>
+                 <property name="syncGroup" stdset="0">
+                  <string notr="true">vectormeta</string>
+                 </property>
+                 <layout class="QGridLayout" name="gridLayout_9">
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="mLayerMetadataUrlLabel">
+                    <property name="text">
+                     <string>Url</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QLineEdit" name="mLayerMetadataUrlLineEdit"/>
+                  </item>
+                  <item row="1" column="1">
+                   <layout class="QHBoxLayout" name="horizontalLayout_8">
+                    <item>
+                     <widget class="QLabel" name="mLayerMetadataUrlTypeLabel">
                       <property name="text">
                        <string>Type</string>
                       </property>
@@ -2009,7 +2009,7 @@ p, li { white-space: pre-wrap; }
                      <widget class="QComboBox" name="mLayerMetadataUrlTypeComboBox">
                       <item>
                        <property name="text">
-                        <string notr="true"></string>
+                        <string notr="true"/>
                        </property>
                       </item>
                       <item>
@@ -2035,7 +2035,7 @@ p, li { white-space: pre-wrap; }
                      <widget class="QComboBox" name="mLayerMetadataUrlFormatComboBox">
                       <item>
                        <property name="text">
-                        <string notr="true"></string>
+                        <string notr="true"/>
                        </property>
                       </item>
                       <item>
@@ -2199,6 +2199,7 @@ p, li { white-space: pre-wrap; }
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="../images/images.qrc"/>
   <include location="../../images/images.qrc"/>
  </resources>
  <connections>

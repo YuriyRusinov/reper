@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/images">
-        <file alias="last-hackfest.jpg">developers/essen-2012.jpg</file>
         <file>flags/af.png</file>
         <file>flags/ar.png</file>
         <file>flags/bg.png</file>
@@ -56,7 +55,6 @@
         <file>north_arrows/default.png</file>
         <file>north_arrows/gpsarrow.svg</file>
         <file>north_arrows/gpsarrow2.svg</file>
-        <file>splash/splash.png</file>
         <file>themes/default/cap_flat.png</file>
         <file>themes/default/cap_round.png</file>
         <file>themes/default/cap_square.png</file>
@@ -447,16 +445,5 @@
     </qresource>
     <qresource prefix="/images/tips">
         <file alias="symbol_levels.png">qgis_tips/symbol_levels.png</file>
-    </qresource>
-    <qresource prefix="/images/sponsors">
-        <file>sponsors/geosynergy.png</file>
-        <file>sponsors/ibw.png</file>
-        <file>sponsors/vorarlberg.png</file>
-        <file>sponsors/gaia.png</file>
-        <file>sponsors/aas_300wide.png</file>
-        <file>sponsors/bronze.png</file>
-        <file>sponsors/gold.png</file>
-        <file>sponsors/platinum.png</file>
-        <file>sponsors/silver.png</file>
     </qresource>
 </RCC>

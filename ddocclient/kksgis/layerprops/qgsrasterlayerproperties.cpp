@@ -18,8 +18,10 @@
 #include <limits>
 #include <typeinfo>
 
+#include "qgsrasterlayerproperties.h"
+
 //#include "qgisapp.h"
-#inclide "kksgiswidgetqgis.h" //!!!! גלוסעמ qgisapp.h
+#include "kksgiswidgetqgis.h" //!!!! גלוסעמ qgisapp.h
 #include "qgsapplication.h"
 #include "qgsbilinearrasterresampler.h"
 #include "qgscontexthelp.h"
@@ -41,7 +43,6 @@
 #include "qgsrasterhistogramwidget.h"
 #include "qgsrasteridentifyresult.h"
 #include "qgsrasterlayer.h"
-#include "qgsrasterlayerproperties.h"
 #include "qgsrasterpyramid.h"
 #include "qgsrasterrange.h"
 #include "qgsrasterrenderer.h"
@@ -1718,12 +1719,12 @@ void QgsRasterLayerProperties::toggleBuildPyramidsButton()
 
 void QgsRasterLayerProperties::on_mMinimumScaleSetCurrentPushButton_clicked()
 {
-  cbMinimumScale->setScale( 1.0 / QgisApp::instance()->mapCanvas()->mapRenderer()->scale() );
+  cbMinimumScale->setScale( 1.0 / mWorkingWidget->mapCanvas()->mapRenderer()->scale() );
 }
 
 void QgsRasterLayerProperties::on_mMaximumScaleSetCurrentPushButton_clicked()
 {
-  cbMaximumScale->setScale( 1.0 / QgisApp::instance()->mapCanvas()->mapRenderer()->scale() );
+  cbMaximumScale->setScale( 1.0 / mWorkingWidget->mapCanvas()->mapRenderer()->scale() );
 }
 
 void QgsRasterLayerProperties::on_mResetColorRenderingBtn_clicked()
@@ -1742,3 +1743,7 @@ bool QgsRasterLayerProperties::rasterIsMultiBandColor()
   return mRasterLayer && dynamic_cast<QgsMultiBandColorRenderer*>( mRasterLayer->renderer() ) != 0;
 }
 
+void QgsRasterLayerProperties::setWorkingWidget( KKSGISWidgetQGIS * w)
+{
+    mWorkingWidget = w;
+}

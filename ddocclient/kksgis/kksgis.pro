@@ -16,6 +16,7 @@ DEFINES *= __USE_DLL_KKSGIS
 INCLUDEPATH +=  . \
                 dn \
                 legend \
+                images \
                 layerprops 
 
 
@@ -28,6 +29,7 @@ qgis{
     LIBS *= -L$$QGISDIR/lib -lqgis_core -lqgis_gui
 
     INCLUDEPATH *= $$OSGEODIR/include \
+                   $$OSGEODIR/include/qwt \
                    $$QGISDIR/include
 
 

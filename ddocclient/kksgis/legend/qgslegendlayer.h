@@ -17,8 +17,8 @@
 
 #include "kksgis_config.h"
 
-#undef max(a,b)
-#undef min(a,b)
+#undef max
+#undef min
 
 #include "qgslegenditem.h"
 #include <QFileInfo>
@@ -32,6 +32,8 @@ class QgsRasterLayer;
 class QgsVectorLayer;
 
 class QTreeWidget;
+
+class KKSGISWidgetQGIS;
 
 typedef QList< QPair<QString, QPixmap> > SymbologyList;
 
@@ -47,6 +49,8 @@ class QgsLegendLayer : public QgsLegendItem
   public:
     QgsLegendLayer( QgsMapLayer* layer );
     ~QgsLegendLayer();
+
+    void setWorkingWidget(KKSGISWidgetQGIS * w);
 
     /**Returns the map layer associated the item*/
     QgsMapLayer* layer();
@@ -142,6 +146,8 @@ class QgsLegendLayer : public QgsLegendItem
 
     /**True if number of features per legend class should is shown in the legend items*/
     bool mShowFeatureCount;
+
+    KKSGISWidgetQGIS * mWorkingWidget;
 };
 
 #endif
