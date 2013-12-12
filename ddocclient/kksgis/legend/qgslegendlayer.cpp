@@ -361,13 +361,11 @@ QPixmap QgsLegendLayer::getOriginalPixmap()
 
 void QgsLegendLayer::addToPopupMenu( QMenu& theMenu )
 {
-//ksa --
-
   QgsMapLayer *lyr = layer();
 
-  QAction *toggleEditingAction = NULL; //ksa mWorkingWidget->actionToggleEditing();
-  QAction *saveLayerEditsAction = NULL;//ksa mWorkingWidget->actionSaveActiveLayerEdits();
-  QAction *allEditsAction = NULL; //ksa mWorkingWidget->actionAllEdits();
+  QAction *toggleEditingAction = mWorkingWidget->actionToggleEditing();
+  QAction *saveLayerEditsAction = mWorkingWidget->actionSaveActiveLayerEdits();
+  QAction *allEditsAction = mWorkingWidget->actionAllEdits();
 
   // zoom to layer extent
   theMenu.addAction( QgsApplication::getThemeIcon( "/mActionZoomToLayer.svg" ),
@@ -394,7 +392,7 @@ void QgsLegendLayer::addToPopupMenu( QMenu& theMenu )
   theMenu.addAction( QgsApplication::getThemeIcon( "/mActionRemoveLayer.svg" ), tr( "&Remove" ), mWorkingWidget, SLOT( removeLayer() ) );
 
   // duplicate layer
-  //ksa QAction* duplicateLayersAction = theMenu.addAction( QgsApplication::getThemeIcon( "/mActionDuplicateLayer.svg" ), tr( "&Duplicate" ), QgisApp::instance(), SLOT( duplicateLayers() ) );
+  QAction* duplicateLayersAction = theMenu.addAction( QgsApplication::getThemeIcon( "/mActionDuplicateLayer.svg" ), tr( "&Duplicate" ), mWorkingWidget, SLOT( duplicateLayers() ) );
 
   // set layer crs
   theMenu.addAction( QgsApplication::getThemeIcon( "/mActionSetCRS.png" ), tr( "&Set Layer CRS" ), mWorkingWidget, SLOT( setLayerCRS() ) );
@@ -435,7 +433,7 @@ void QgsLegendLayer::addToPopupMenu( QMenu& theMenu )
     // disable duplication of memory layers
     if ( vlayer->storageType() == "Memory storage" && legend()->selectedLayers().count() == 1 )
     {
-      //ksa duplicateLayersAction->setEnabled( false );
+      duplicateLayersAction->setEnabled( false );
     }
 
     // save as vector file
@@ -466,7 +464,7 @@ void QgsLegendLayer::addToPopupMenu( QMenu& theMenu )
   else if ( lyr->type() == QgsMapLayer::PluginLayer && legend()->selectedLayers().count() == 1 )
   {
     // disable duplication of plugin layers
-    //ksa duplicateLayersAction->setEnabled( false );
+    duplicateLayersAction->setEnabled( false );
   }
   
 }

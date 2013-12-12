@@ -21,6 +21,7 @@
 #include <qgspallabeling.h>
 #include <qgslabelinggui.h>
 #include <qgsmessagebar.h>
+#include <qgsscalecombobox.h>   
 #include <qgsmessagebaritem.h>
 #include <qgsvectorlayerproperties.h>
 #include <qgsrasterlayerproperties.h>
@@ -634,35 +635,27 @@ void KKSGISWidgetQGIS::SLOTazShowMouseCoordinate(const QgsPoint & p )
       if (!mpMapCanvas->underMouse()) return;
       mpLastMapPosition = p;
      
-/*      if ( mMapTipsVisible )
-//      {
-          // store the point, we need it for when the maptips timer fires
-          mpLastMapPosition = p;
-    // we use this slot to control the timer for maptips since it is fired each time
-    // the mouse moves.
-    if ( mMapCanvas->underMouse() )
+    if ( mpMapCanvas->mapUnits() == QGis::Degrees )
     {
-      // Clear the maptip (this is done conditionally)
-      mpMaptip->clear( mMapCanvas );
-      // don't start the timer if the mouse is not over the map canvas
-      mpMapTipsTimer->start();
-      //QgsDebugMsg("Started maptips timer");
-    }
-     }*/
+      QString format = QgsProject::instance()->readEntry( "PositionPrecision", "/DegreeFormat", "D" );
 
-      if ( mpMapCanvas->mapUnits() == QGis::DegreesMinutesSeconds )
-      {
-          mpCoordsEdit->setText( p.toDegreesMinutesSeconds(0) );
-      }
+      if ( format == "DM" )
+        mpCoordsEdit->setText( p.toDegreesMinutes( mMousePrecisionDecimalPlaces ) );
+      else if ( format == "DMS" )
+        mpCoordsEdit->setText( p.toDegreesMinutesSeconds( mMousePrecisionDecimalPlaces ) );
       else
-      {
-          mpCoordsEdit->setText( p.toString(/* mpMousePrecisionDecimalPlaces */) );
-      }
-      if ( mpCoordsEdit->width() > mpCoordsEdit->minimumWidth() )
-      {
-          mpCoordsEdit->setMinimumWidth( mpCoordsEdit->width() );
-      }
+        mpCoordsEdit->setText( p.toString( mMousePrecisionDecimalPlaces ) );
+    }
+    else
+    {
+      mpCoordsEdit->setText( p.toString( mMousePrecisionDecimalPlaces ) );
+    }
 
+    if ( mpCoordsEdit->width() > mpCoordsEdit->minimumWidth() )
+    {
+      mpCoordsEdit->setMinimumWidth( mpCoordsEdit->width() );
+    }
+ 
 }
 
 
@@ -779,7 +772,7 @@ void KKSGISWidgetQGIS::openProject(const QString & prjFile)
     bool projectScales = QgsProject::instance()->readBoolEntry( "Scales", "/useProjectScales" );
     if ( projectScales )
     {
-        //ksa mScaleEdit->updateScales( QgsProject::instance()->readListEntry( "Scales", "/ScalesList" ) );
+        mScaleEdit->updateScales( QgsProject::instance()->readListEntry( "Scales", "/ScalesList" ) );
     }
 
     mpMapCanvas->updateScale();
@@ -1072,7 +1065,7 @@ void KKSGISWidgetQGIS::showLayerProperties( QgsMapLayer *ml )
 
     if ( vlp->exec() )
     {
-      ;//ksa activateDeactivateLayerRelatedActions( ml );
+      activateDeactivateLayerRelatedActions( ml );
     }
     delete vlp; // delete since dialog cannot be reused without updating code
   }
@@ -1166,7 +1159,7 @@ void KKSGISWidgetQGIS::labeling()
 
   delete dlg;
 
-  //ksa activateDeactivateLayerRelatedActions( vlayer );
+  activateDeactivateLayerRelatedActions( vlayer );
 }
 
 void KKSGISWidgetQGIS::markDirty()
@@ -1189,7 +1182,7 @@ void KKSGISWidgetQGIS::toggleEditing()
   else
   {
     // active although there's no layer active!?
-    //ksa mActionToggleEditing->setChecked( false );
+    mActionToggleEditing->setChecked( false );
   }
 }
 
@@ -1207,8 +1200,8 @@ bool KKSGISWidgetQGIS::toggleEditing( QgsMapLayer *layer, bool allowCancel )
   {
     if ( !( vlayer->dataProvider()->capabilities() & QgsVectorDataProvider::EditingCapabilities ) )
     {
-      //ksa mActionToggleEditing->setChecked( false );
-      //ksa mActionToggleEditing->setEnabled( false );
+      mActionToggleEditing->setChecked( false );
+      mActionToggleEditing->setEnabled( false );
       messageBar()->pushMessage( tr( "Start editing failed" ),
                                  tr( "Provider cannot be opened for editing" ),
                                  QgsMessageBar::INFO, messageTimeout() );
@@ -1289,7 +1282,7 @@ bool KKSGISWidgetQGIS::toggleEditing( QgsMapLayer *layer, bool allowCancel )
     // this ensures correct restoring of gui state if toggling was canceled
     // or layer commit/rollback functions failed
     
-    //ksa activateDeactivateLayerRelatedActions( layer );
+    activateDeactivateLayerRelatedActions( layer );
   }
 
   return res;

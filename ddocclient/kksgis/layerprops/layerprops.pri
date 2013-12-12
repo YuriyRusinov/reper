@@ -16,7 +16,12 @@ HEADERS += layerprops/qgsaddattrdialog.h \
            layerprops/qgsrasterlayerproperties.h \
            layerprops/qgssavestyletodbdialog.h \
            layerprops/qgsvectorlayerproperties.h \
-           layerprops/qgsaddtaborgroup.h
+           layerprops/qgsaddtaborgroup.h \
+           layerprops/qgsattributetabledialog.h \
+           layerprops/qgsvectorlayersaveasdialog.h \
+           layerprops/qgsclipboard.h \
+           layerprops/qgsguivectorlayertools.h \
+           layerprops/qgsfeatureaction.h
 
 FORMS += layerprops/qgsaddattrdialogbase.ui \
          layerprops/qgsaddjoindialogbase.ui \
@@ -34,7 +39,9 @@ FORMS += layerprops/qgsaddattrdialogbase.ui \
          layerprops/qgsrasterlayerpropertiesbase.ui \
          layerprops/qgssavetodbdialog.ui \
          layerprops/qgsvectorlayerpropertiesbase.ui \
-         layerprops/qgsaddtaborgroupbase.ui
+         layerprops/qgsaddtaborgroupbase.ui \
+         layerprops/qgsattributetabledialog.ui \
+         layerprops/qgsvectorlayersaveasdialogbase.ui
 
 SOURCES += layerprops/qgsaddattrdialog.cpp \
            layerprops/qgsaddjoindialog.cpp \
@@ -53,4 +60,9 @@ SOURCES += layerprops/qgsaddattrdialog.cpp \
            layerprops/qgsrasterlayerproperties.cpp \
            layerprops/qgssavestyletodbdialog.cpp \
            layerprops/qgsvectorlayerproperties.cpp \
-           layerprops/qgsaddtaborgroup.cpp
+           layerprops/qgsaddtaborgroup.cpp \
+           layerprops/qgsattributetabledialog.cpp \
+           layerprops/qgsvectorlayersaveasdialog.cpp \
+           layerprops/qgsclipboard.cpp \
+           layerprops/qgsguivectorlayertools.cpp \
+           layerprops/qgsfeatureaction.cpp

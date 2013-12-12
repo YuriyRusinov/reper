@@ -34,7 +34,7 @@
 #include "qgsrasterlayer.h"
 #include "qgsvectorlayer.h"
 #include "qgsgenericprojectionselector.h"
-//#include "qgsclipboard.h"
+#include "qgsclipboard.h"
 #include "qgsmessagelog.h"
 
 #include <QFont>
@@ -903,12 +903,11 @@ void QgsLegend::handleRightClickEvent( QTreeWidgetItem* item, const QPoint& posi
 
   if ( selectedLayers().length() == 1 )
   {
-    //QgisApp* app = QgisApp::instance();
     theMenu.addAction( tr( "Copy Style" ), mWorkingWidget, SLOT( copyStyle() ) );
-    //ksa if ( app->clipboard()->hasFormat( QGSCLIPBOARD_STYLE_MIME ) )
-    //{
-    //  theMenu.addAction( tr( "Paste Style" ), app, SLOT( pasteStyle() ) );
-    //}
+    if ( mWorkingWidget->clipboard()->hasFormat( QGSCLIPBOARD_STYLE_MIME ) )
+    {
+      theMenu.addAction( tr( "Paste Style" ), mWorkingWidget, SLOT( pasteStyle() ) );
+    }
   }
 
   theMenu.addAction( QgsApplication::getThemeIcon( "/folder_new.png" ), tr( "&Add New Group" ), this, SLOT( addGroupToCurrentItem() ) );
