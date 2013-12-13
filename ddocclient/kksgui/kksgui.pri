@@ -93,7 +93,8 @@ HEADERS += \
                 KKSAttrModel.h \
                 KKSAValWidget.h \
                 KKSRecDialog.h \
-	   	kksgui_config.h
+                KKSHistWidget.h \
+	        kksgui_config.h
 
 SOURCES += \
                 KKSComplexAttrWidget.cpp \
@@ -188,7 +189,8 @@ SOURCES += \
                 KKSAttrModel.cpp \
                 KKSSearchTemplateDialog.cpp \
                 KKSAValWidget.cpp \
-                KKSRecDialog.cpp
+                KKSRecDialog.cpp \
+                KKSHistWidget.cpp
 
 FORMS   += \
                 ui/cmd_journal_form.ui \
@@ -311,4 +313,5 @@ headers.files += \
                 KKSAttrModel.h \
                 KKSAValWidget.h \
                 KKSRecDialog.h \
+                KKSHistWidget.h \
                 kksgui_config.h 

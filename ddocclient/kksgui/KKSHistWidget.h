@@ -11,12 +11,22 @@
 #include <QWidget>
 
 #include "kksgui_config.h"
+#include "KKSAttrWidget.h"
 
-class _GUI_EXPORT KKSHistWidget : public QWidget
+class QPaintEvent;
+
+class _GUI_EXPORT KKSHistWidget : public QWidget, public KKSAttrWidget
 {
 public:
-    KKSHistWidget(QWidget * parent=0, Qt::WindowFlags flags=0);
+    KKSHistWidget(const KKSAttrValue *av, KKSIndAttrClass isSys, QWidget * parent=0, Qt::WindowFlags flags=0);
     virtual ~KKSHistWidget();
+
+protected:
+    //
+    // Override functions of basic class
+    //
+    void paintEvent(QPaintEvent *event);
+
 private:
     Q_OBJECT
 };
