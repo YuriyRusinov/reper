@@ -19,7 +19,7 @@
   <widget class="QStatusBar" name="statusbar"/>
   <action name="mpActionZoomIn">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../../kksgis/resources.qrc">
      <normaloff>:/ico/mActionZoomIn.png</normaloff>:/ico/mActionZoomIn.png</iconset>
    </property>
    <property name="text">
@@ -28,7 +28,7 @@
   </action>
   <action name="mpActionZoomOut">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../../kksgis/resources.qrc">
      <normaloff>:/ico/mActionZoomOut.png</normaloff>:/ico/mActionZoomOut.png</iconset>
    </property>
    <property name="text">
@@ -37,7 +37,7 @@
   </action>
   <action name="mpActionPan">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../../kksgis/resources.qrc">
      <normaloff>:/ico/mActionPan.png</normaloff>:/ico/mActionPan.png</iconset>
    </property>
    <property name="text">
@@ -85,7 +85,7 @@
   </action>
   <action name="mpActionAddRasterLayer">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../../kksgis/resources.qrc">
      <normaloff>:/ico/add_raster.png</normaloff>:/ico/add_raster.png</iconset>
    </property>
    <property name="text">
@@ -94,7 +94,7 @@
   </action>
   <action name="mpActionAddVectorLayer">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../../kksgis/resources.qrc">
      <normaloff>:/ico/add_vector.png</normaloff>:/ico/add_vector.png</iconset>
    </property>
    <property name="text">
@@ -103,17 +103,17 @@
   </action>
   <action name="mpActionFileSaveProjectAs">
    <property name="text">
-    <string>Save Project As...</string>
+    <string>Сохранить проект как</string>
    </property>
   </action>
   <action name="mpActionFileCloseProject">
    <property name="text">
-    <string>Close Project</string>
+    <string>Закрыть проект</string>
    </property>
   </action>
  </widget>
  <resources>
-  <include location="resources.qrc"/>
+  <include location="../../kksgis/resources.qrc"/>
  </resources>
  <connections/>
 </ui>

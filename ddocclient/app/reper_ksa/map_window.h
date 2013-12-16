@@ -23,6 +23,7 @@ public:
 
 public slots:
     void SLOTmpActionFileExit(); // Exit from Application
+    void SLOTmpActionChangeTitle(); // Change window title to add name of current project
 
 private:
     KKSGISWidget * mpKKSGISWidget;

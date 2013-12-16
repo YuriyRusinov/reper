@@ -12,19 +12,21 @@ MapWindow::MapWindow(QWidget* parent, Qt::WFlags fl)
         QMessageBox::critical(0, "", "");
         return;
     }
+    connect(mpKKSGISWidget, SIGNAL(SIGNALchangeWindowTitle()), this, SLOT(SLOTmpActionChangeTitle()));
+    setWindowTitle(mpKKSGISWidget->windowTitle());
 
     setStatusBar(mpKKSGISWidget->statusBar());
     setWindowIcon(mpKKSGISWidget->windowIcon());
 
     setCentralWidget(mpKKSGISWidget);
     
-    QDockWidget * mLegendDock = new QDockWidget( tr( "Layers" ), this );
+    QDockWidget * mLegendDock = new QDockWidget( tr( "Слои" ), this );
     mLegendDock->setObjectName( "Legend" );
     mLegendDock->setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );
     mLegendDock->setWidget( mpKKSGISWidget->mapLegendWidget() );
     addDockWidget( Qt::LeftDockWidgetArea, mLegendDock );
 
-    QDockWidget * mLayerOrderDock = new QDockWidget( tr( "Layer order" ), this );
+    QDockWidget * mLayerOrderDock = new QDockWidget( tr( "Порядок слоев" ), this );
     mLayerOrderDock->setObjectName( "LayerOrder" );
     mLayerOrderDock->setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );
     mLayerOrderDock->setWidget( mpKKSGISWidget->mapLayerOrderWidget() );
@@ -36,7 +38,7 @@ MapWindow::MapWindow(QWidget* parent, Qt::WFlags fl)
     //mpLeftDock->setWidget(mpKKSGISWidget->tableLegend());
 
 
-    setWindowTitle(mpKKSGISWidget->windowTitle());
+
 
     // добавляем фрейм и вставляем в него виджет "Окно карты"(Map Canvas)
     //mpMapLayout = new QVBoxLayout(frameMap); //main Layout
@@ -49,10 +51,9 @@ MapWindow::MapWindow(QWidget* parent, Qt::WFlags fl)
     if(fileMenu){
         //create actions
         mpActionFileExit = new QAction(QIcon(":/ico/mActionFileExit.png"), tr("Выход"), this);
-        mpActionFileExit->setStatusTip(tr("Close Application"));
+        mpActionFileExit->setStatusTip(tr("Закрыть приложение"));
         mpActionFileExit->setShortcuts(QKeySequence::Close);
         connect(mpActionFileExit, SIGNAL(triggered()), this, SLOT(SLOTmpActionFileExit()));
-
         fileMenu->addSeparator();
         fileMenu->addAction(mpActionFileExit);
     }
@@ -104,5 +105,10 @@ void MapWindow::SLOTmpActionFileExit() // Exit from Application
     }
     
     mpKKSGISWidget->closeProject();
+}
+
+void MapWindow::SLOTmpActionChangeTitle()
+{
+    setWindowTitle(mpKKSGISWidget->windowTitle());
 }
 

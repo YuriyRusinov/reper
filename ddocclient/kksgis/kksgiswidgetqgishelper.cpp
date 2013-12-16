@@ -276,7 +276,7 @@ void KKSGISWidgetQGIS::initMapLegend()
 
     mpMapLegend->setWhatsThis( tr( "Map legend that displays all the layers currently on the map canvas. Click on the check box to turn a layer on or off. Double click on a layer in the legend to customize its appearance and set other properties." ) );
 
-    QCheckBox *orderCb = new QCheckBox( tr( "Control rendering order" ) );
+    QCheckBox *orderCb = new QCheckBox( tr( "Ручной контроль отрисовки слоев" ) );
     orderCb->setChecked( false );
 
     connect( orderCb, SIGNAL( toggled( bool ) ), mpMapLegend, SLOT( unsetUpdateDrawingOrder( bool ) ) );
@@ -554,7 +554,7 @@ void KKSGISWidgetQGIS::initConnections()
 
 void KKSGISWidgetQGIS::initToolBar()
 {
-    mpMapToolBar = new QToolBar(tr("File"));
+    mpMapToolBar = new QToolBar(tr("Стандартная панель инструментов"));
     mpMapToolBar->addAction(mpActionZoomIn);
     mpMapToolBar->addAction(mpActionZoomOut);
     mpMapToolBar->addAction(mpActionPan);
@@ -636,11 +636,11 @@ void KKSGISWidgetQGIS::initMapTools()
     mpZoomOutTool->setAction(mpActionZoomOut);
 }
 
-void KKSGISWidgetQGIS::azSetTitleWindow(QWidget &azApp)
+void KKSGISWidgetQGIS::azSetTitleWindow(QWidget & azApp)
+
 {
       QString caption = "ПК Репер";
-
-
+      QFileInfo projectFileInfo( QgsProject::instance()->fileName() );
       if ( QgsProject::instance()->title().isEmpty() )
       {
         if ( QgsProject::instance()->fileName().isEmpty() )
@@ -650,16 +650,15 @@ void KKSGISWidgetQGIS::azSetTitleWindow(QWidget &azApp)
         }
         else
         {
-          QFileInfo projectFileInfo( QgsProject::instance()->fileName() );
-          caption += " - " + projectFileInfo.completeBaseName();
+            caption += " - " + projectFileInfo.completeBaseName();
         }
       }
       else
       {
-        caption += " - " + QgsProject::instance()->title();
+          caption += " - " + QgsProject::instance()->title() + " [" + projectFileInfo.fileName() + "]";
       }
-
       azApp.setWindowTitle( caption );
+      emit this->SIGNALchangeWindowTitle();
 }
 
 void KKSGISWidgetQGIS::userScale()

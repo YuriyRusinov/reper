@@ -564,7 +564,9 @@ void KKSGISWidgetQGIS::SLOTmpCloseProject()
     mpMapCanvas->freeze( true );
     azRemoveAllLayers();
     mpLayerSet.clear();
+    mpMapCanvas->freeze( false);
     mpMapCanvas->refresh();
+    mpMapCanvas->freeze( true );
 }
 
 void KKSGISWidgetQGIS::SLOTmpActionFileOpenProject() // Open QGIS Project in MapDock
@@ -761,7 +763,7 @@ void KKSGISWidgetQGIS::openProject(const QString & prjFile)
         return;
     }
 
-    this->azSetTitleWindow( *this );
+    this->azSetTitleWindow(*this);
 
     int  myRedInt = QgsProject::instance()->readNumEntry( "Gui", "/CanvasColorRedPart", 255 );
     int  myGreenInt = QgsProject::instance()->readNumEntry( "Gui", "/CanvasColorGreenPart", 255 );

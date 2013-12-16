@@ -34,6 +34,9 @@ public:
     virtual void openRasterLayer(const QString & rLayerFile) = 0;
     virtual void openDatabaseLayer() = 0;
 
+signals:
+    void SIGNALchangeWindowTitle();
+
 protected:
     KKSGISWidget(QWidget* parent = 0, Qt::WFlags fl = 0 );
     virtual ~KKSGISWidget(){}
