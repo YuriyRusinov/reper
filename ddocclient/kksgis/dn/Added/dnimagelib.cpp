@@ -200,7 +200,7 @@ QImage DnImageLib::GenerateImg(int Ch1,int Ch2,int Ch3,double B1,double B2,doubl
   }
  }//for(int i=0;i<3;i++)
  Kof=1;
- if((BMax-BMin)>255 && BMin>=0.)
+ if(/*((BMax-BMin)>255 || (BMax-BMin)<1.) &&*/ BMin>=0.)
   Kof=255/BMax;
 
  if((BMax-BMin)>255 && BMin<0.)

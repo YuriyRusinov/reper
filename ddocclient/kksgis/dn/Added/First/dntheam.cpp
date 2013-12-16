@@ -22,27 +22,31 @@ double DNTheam::Batinometr(int TypeBottom,float R485,float R560,float R660,float
 
  BatimetrResult Res;
 
+// if(TypeBottom==0) //Макрофиты
+// {
+//  R1b=0.02;
+//  R2b=0.06;
+//  R3b=0.065;
+// }
+// if(TypeBottom==1)  //Песок
+// {
+//  R1b=0.03;
+//  R2b=0.092;
+//  R3b=0.11;
+// }
+// if(TypeBottom==2) //Водоросли
+// {
+//  R1b=0.06;
+//  R2b=0.09;
+//  R3b=0.1;
+// }
 
- TypeBottom=1;
-
- if(TypeBottom==0) //Макрофиты
- {
-  R1b=0.02;
-  R2b=0.06;
-  R3b=0.065;
- }
- if(TypeBottom==1)  //Песок
- {
-  R1b=0.03;
-  R2b=0.092;
-  R3b=0.11;
- }
- if(TypeBottom==2) //Водоросли
- {
-  R1b=0.06;
-  R2b=0.09;
-  R3b=0.1;
- }
+// if(TypeBottom==3) //Все остальное
+// {
+//  R1b=0.03;
+//  R2b=0.092;
+//  R3b=0.11;
+// }
 
  double Schet=0,hMin,FMin;
  FirstIter=TRUE;
@@ -922,6 +926,14 @@ double DNTheam::CalcFunkBatimetrNew(int TypeBottom,float R485, float R560,float 
   Rb[2]=0.1;
  }
 
+ if(TypeBottom==3)  //Все остальное
+ {
+  Rb[0]=0.2;
+  Rb[1]=0.36;
+  Rb[2]=0.44;
+ }
+
+
  ProbRa[0]=Ra[0];
  ProbRa[1]=Ra[1];
  ProbRa[2]=Ra[2];
@@ -962,6 +974,13 @@ double DNTheam::CalcFunkBatimetrNew(int TypeBottom,float R485, float R560,float 
 
 //  if(Chisl/Znam>0 && k_lam[i]!=0)
 //  {
+//   QMessageBox msg;
+//   msg.setText(QString().setNum(Ra[i],'d',4)+"\n"+
+//               QString().setNum(Rb[i],'d',4)+"\n"+
+//               QString().setNum(Rdp[i],'d',4)+"\n"+
+//               QString().setNum(k_lam[i],'d',4));
+//   msg.exec();
+
    H_lam[i]=this->CalcFunkNew(Rdp[i],Ra[i],Rb[i],k_lam[i]);/*log(Chisl/Znam)/(-2*k_lam[i]);*/
    H_main+=H_lam[i];
    sch++;

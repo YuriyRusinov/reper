@@ -534,3 +534,8 @@ void DNSpecBath::MouseMove(int x, int y)
   }
  }//if(DlgShowDepth!=NULL)
 }
+
+void DNSpecBath::on_DNSpecBath_destroyed()
+{
+
+}

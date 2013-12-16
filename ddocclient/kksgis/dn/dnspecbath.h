@@ -64,6 +64,8 @@ private slots:
 
     void MouseMove(int x,int y);
 
+    void on_DNSpecBath_destroyed();
+
 private:
     Ui::DNSpecBath *ui;
     QString FileNameLast;

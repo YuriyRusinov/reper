@@ -2292,7 +2292,7 @@ void DNPoly::Batinometr()
    this->ClassifMass[x+y*this->W]=-1;
    if(this->MassPoly[x+y*this->W]>=0)
    {
-    this->ClassifMass[x+y*this->W]=1; //Всё остальное
+    this->ClassifMass[x+y*this->W]=3; //Всё остальное
     if(Brigth[1+x*nCh.size()]>0.01)
      this->ClassifMass[x+y*this->W]=0; //Мокрофиты
     if(Brigth[x*nCh.size()]>0.03)
@@ -2419,7 +2419,7 @@ void DNPoly::Batinometr(int N590,int N830,int N900,
    this->ClassifMass[x+y*this->W]=-1;
    if(this->MassPoly[x+y*this->W]>=0)
    {
-    this->ClassifMass[x+y*this->W]=1; //Всё остальное
+    this->ClassifMass[x+y*this->W]=3; //Всё остальное
     if(Brigth[1+x*nCh.size()]>0.01)
      this->ClassifMass[x+y*this->W]=0; //Мокрофиты
     if(Brigth[x*nCh.size()]>0.03)
@@ -2436,6 +2436,9 @@ void DNPoly::Batinometr(int N590,int N830,int N900,
  MaskCh=this->FillMaskCh(nCh);
  Brigth=new float[this->W*nCh.size()];
  float *NewCh=new float[this->W*this->H];
+ float AddSpec[6]={0.0276,0.0265,0.031,0.033,0.033,0.0336};
+
+
 
  DNTheam Theam;
  for(int y=0;y<this->H;y++)
@@ -2445,6 +2448,13 @@ void DNPoly::Batinometr(int N590,int N830,int N900,
   {
    if(this->MassPoly[x+y*this->W]>=0)
    {
+    if(this->IshCh==290)
+    {
+     for(int i=0;i<nCh.size();i++)
+     {
+      Brigth[x*nCh.size()+i]=Brigth[x*nCh.size()+i]-AddSpec[i];
+     }//for(int i=0;i<nCh.size();i++)
+    }//if(this->IshCh==290)
     NewCh[x+y*this->W]=Theam.Batinometr(ClassifMass[x+y*this->W],
                                         Brigth[x*nCh.size()+1],
                                         Brigth[x*nCh.size()+3],
