@@ -1,7 +1,28 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     22.11.2013 13:10:05                          */
+/* Created on:     16.12.2013 17:06:42                          */
 /*==============================================================*/
+
+
+/*==============================================================*/
+/* Table: root_table                                            */
+/*==============================================================*/
+create table root_table (
+   unique_id            VARCHAR              not null,
+   last_update          TIMESTAMP            not null default CURRENT_TIMESTAMP
+);
+
+comment on column root_table.last_update is
+'Дата и время последней модификации (создания) записи';
+
+select setMacToNULL('root_table');
+
+/*==============================================================*/
+/* Index: Index_1                                               */
+/*==============================================================*/
+create unique index Index_1 on root_table using BTREE (
+unique_id
+);
 
 
 /*==============================================================*/
@@ -3002,7 +3023,7 @@ select createTriggerUID('persons');
 /* Table: "position"                                            */
 /*==============================================================*/
 create table "position" (
-   id                   INT4                 not null,
+--   id                   INT4                 not null,
    id_unit              INT4                 not null,
    id_maclabel          INT4                 not null default 1,
    id_user_vrio         INT4                 null,
@@ -3433,26 +3454,6 @@ create table roles_actions (
 );
 
 select setMacToNULL('roles_actions');
-
-/*==============================================================*/
-/* Table: root_table                                            */
-/*==============================================================*/
-create table root_table (
-   unique_id            VARCHAR              not null,
-   last_update          TIMESTAMP            not null default CURRENT_TIMESTAMP
-);
-
-comment on column root_table.last_update is
-'Дата и время последней модификации (создания) записи';
-
-select setMacToNULL('root_table');
-
-/*==============================================================*/
-/* Index: Index_1                                               */
-/*==============================================================*/
-create unique index Index_1 on root_table using BTREE (
-unique_id
-);
 
 /*==============================================================*/
 /* Table: rubric_records                                        */
@@ -3887,7 +3888,7 @@ select createTriggerUID('tso_units');
 /* Table: units                                                 */
 /*==============================================================*/
 create table units (
-   id                   SERIAL not null,
+--   id                   SERIAL not null,
    id_organization      INT4                 null,
    id_parent            INT4                 null,
    id_curr_mode         INT4                 not null,
@@ -4171,7 +4172,7 @@ select setMacToNULL('user_templates');
 /* Table: users                                                 */
 /*==============================================================*/
 create table users (
-   id                   SERIAL not null,
+--   id                   SERIAL not null,
    id_rank              INT4                 not null,
    id_state             INT4                 not null,
    id_maclabel          INT4                 not null default 1,

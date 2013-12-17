@@ -13,9 +13,13 @@ insert into a_views (id, name) values (12, 'Набор пространственных точек');
 insert into a_views (id, name) values (13, 'Объект SVG');
 insert into a_views (id, name) values (14, 'Видео-ролик');
 insert into a_views (id, name) values (15, 'Время');
-insert into a_views (id, name) values (16, 'ГИС-объект (базовый)');
-insert into a_views (id, name) values (17, 'ГИС-объект (стандартный полигон)');
+--insert into a_views (id, name) values (16, 'ГИС-объект (базовый)');
+--insert into a_views (id, name) values (17, 'ГИС-объект (стандартный полигон)');
 insert into a_views (id, name) values (18, 'Составной атрибут');
+insert into a_views (id, name) values (19, 'Гистограмма');
+insert into a_views (id, name) values (20, 'ГИС-объект');
+
+
 
 insert into a_types (id, id_a_view, name, code) values (1, 1, 'Логический', 'BOOL');
 insert into a_types (id, id_a_view, name, code) values (2, 2, 'Элемент справочника', 'INT8');
@@ -45,11 +49,15 @@ insert into a_types (id, id_a_view, name, code) values (24, 14, 'Видео-ролик', '
 insert into a_types (id, id_a_view, name, code) values (25, 11, 'Цвет записи в справочнике (текст)', 'INT8');
 insert into a_types (id, id_a_view, name, code) values (26, 11, 'Ссылка на цвет записи (текст)', 'INT8');
 insert into a_types (id, id_a_view, name, code) values (27, 15, 'Время', 'TIME');
-insert into a_types (id, id_a_view, name, code) values (28, 16, 'ГИС-объект (базовый)', 'GEOMETRY');
-insert into a_types (id, id_a_view, name, code) values (29, 17, 'ГИС-объект (стандартный полигон)', 'GEOMETRY');
+--insert into a_types (id, id_a_view, name, code) values (28, 16, 'ГИС-объект (базовый)', 'GEOMETRY');
+--insert into a_types (id, id_a_view, name, code) values (29, 17, 'ГИС-объект (стандартный полигон)', 'GEOMETRY');
 insert into a_types (id, id_a_view, name, code) values (30, 5, 'Целочисленное значение (64 бита)', 'INT8');
 insert into a_types (id, id_a_view, name, code) values (31, 5, 'Уникальный идентификатор (UUID)', 'UUID');
 insert into a_types (id, id_a_view, name, code) values (32, 18, 'Составной атрибут', 'VARCHAR');
+insert into a_types (id, id_a_view, name, code) values (33, 19, 'Гистограмма', 'VARCHAR');
+insert into a_types (id, id_a_view, name, code) values (34, 20, 'ГИС-объект (векторный слой)', 'VARCHAR');
+insert into a_types (id, id_a_view, name, code) values (35, 20, 'ГИС-объект (растровый слой)', 'VARCHAR');
+insert into a_types (id, id_a_view, name, code) values (36, 20, 'ГИС-объект (карта)', 'VARCHAR');
 
-SELECT pg_catalog.setval('a_views_id_seq', 18, true);
-SELECT pg_catalog.setval('a_types_id_seq', 32, true);
+SELECT pg_catalog.setval('a_views_id_seq', 20, true);
+SELECT pg_catalog.setval('a_types_id_seq', 36, true);
