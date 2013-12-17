@@ -11,20 +11,22 @@
 #include "KKSAttrValue.h"
 #include "defines.h"
 
-#ifdef __USE_QGIS__
-#include "kksgiswidget.h"
-#endif
+//#ifdef __USE_QGIS__
+//#include "kksgiswidget.h"
+//#endif
 
 KKSMapWidget::KKSMapWidget(const KKSAttrValue* attr, KKSIndAttrClass isSys, QWidget *parent)
     : QWidget(parent), 
       KKSAttrWidget(attr, isSys),
       m_legendWidget(0),
-      m_layerOrderWidget(0),
-      mpKKSGISWidget(0)
+      m_layerOrderWidget(0)
+//#ifdef __USE_QGIS__
+//      , mpKKSGISWidget(0)
+//#endif
 {
-#ifdef __USE_QGIS__
+//#ifdef __USE_QGIS__
     //init(this);
-#endif
+//#endif
 }
 
 KKSMapWidget::~KKSMapWidget()
@@ -35,13 +37,13 @@ KKSMapWidget::~KKSMapWidget()
     m_legendWidget = 0;
     m_layerOrderWidget = 0;
 
-#ifdef __USE_QGIS__
-    if(mpKKSGISWidget){
-        mpKKSGISWidget->setParent(0);
-        KKSGISWidget::destroyQGISWidget(mpKKSGISWidget);
-        mpKKSGISWidget = 0;
-    }
-#endif
+//#ifdef __USE_QGIS__
+//    if(mpKKSGISWidget){
+//        mpKKSGISWidget->setParent(0);
+//        KKSGISWidget::destroyQGISWidget(mpKKSGISWidget);
+//        mpKKSGISWidget = 0;
+//    }
+//#endif
 }
 
 QDockWidget * KKSMapWidget::legendWidget() const
@@ -54,7 +56,7 @@ QDockWidget * KKSMapWidget::layerOrderWidget() const
     return m_layerOrderWidget;
 }
 
-
+/*
 #ifdef __USE_QGIS__
 
 void KKSMapWidget::init(QWidget *parent)
@@ -93,7 +95,7 @@ void KKSMapWidget::init(QWidget *parent)
         m_legendWidget->setObjectName( "Legend" );
         m_legendWidget->setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );
         m_legendWidget->setWidget( legend );
-        /**/ //addDockWidget( Qt::LeftDockWidgetArea, mLegendDock );
+        //addDockWidget( Qt::LeftDockWidgetArea, mLegendDock );
     }
     
     QWidget * layerOrder = mpKKSGISWidget->mapLayerOrderWidget();
@@ -102,7 +104,7 @@ void KKSMapWidget::init(QWidget *parent)
         m_layerOrderWidget->setObjectName( "LayerOrder" );
         m_layerOrderWidget->setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );
         m_layerOrderWidget->setWidget( layerOrder );
-        /**/ //addDockWidget( Qt::LeftDockWidgetArea, mLayerOrderDock );
+        //addDockWidget( Qt::LeftDockWidgetArea, mLayerOrderDock );
         m_layerOrderWidget->hide();
     }
 
@@ -110,3 +112,4 @@ void KKSMapWidget::init(QWidget *parent)
 }
 
 #endif
+*/

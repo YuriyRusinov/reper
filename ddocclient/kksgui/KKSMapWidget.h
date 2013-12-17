@@ -21,9 +21,9 @@
 
 class KKSAttrValue;
 
-#ifdef __USE_QGIS__
-class KKSGISWidget;
-#endif
+//#ifdef __USE_QGIS__
+//class KKSGISWidget;
+//#endif
 
 class _GUI_EXPORT KKSMapWidget : public QWidget, public KKSAttrWidget
 {
@@ -43,14 +43,14 @@ private:
     QDockWidget * m_legendWidget;
     QDockWidget * m_layerOrderWidget;
 
-#ifdef __USE_QGIS__
+//#ifdef __USE_QGIS__
 
-private:
-    void init(QWidget *parent);
+//private:
+//    void init(QWidget *parent);
 
-private:
-    KKSGISWidget * mpKKSGISWidget;
-#endif
+//private:
+//    KKSGISWidget * mpKKSGISWidget;
+//#endif
 
 };
 
