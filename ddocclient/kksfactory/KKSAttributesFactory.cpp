@@ -904,7 +904,8 @@ void KKSAttributesFactory :: putAttrWidget (KKSAttrValue* av,
         aw = this->createAttrWidget (av, objEditor, pCategAttr->isMandatory(), pCatType, isSystem, gLayout, n_str, V, lTitle, tbRef, ch);
     }
 
-    this->setValue (aw, av, pCatType, isSystem, V, isExist, tableName, idCat, tbRef, ch, objEditor, lTitle);
+    if(aw)
+        this->setValue (aw, av, pCatType, isSystem, V, isExist, tableName, idCat, tbRef, ch, objEditor, lTitle);
 
     return;
 }
@@ -1802,20 +1803,32 @@ QWidget * KKSAttributesFactory :: createMapWidget (const KKSAttrValue * av,
         return 0;
     }
 
-    attrWidget = new KKSMapWidget(av, isSystem, parent);
-    attrWidget->setMinimumHeight(40);
-    QSizePolicy hPw (QSizePolicy::Expanding, QSizePolicy::Expanding);
-    attrWidget->setSizePolicy(hPw);
+    QVBoxLayout * vBoxLayout = new QVBoxLayout();
+    parent->setLayout(vBoxLayout);
 
-    QVBoxLayout * vBoxLayout = new QVBoxLayout(parent);
-    vBoxLayout->addWidget(attrWidget, 0);//, Qt
+    attrWidget = new KKSMapWidget(av, isSystem);
+    delete attrWidget;
+    attrWidget = 0;
+
+    QWidget * W = new QWidget();
+    vBoxLayout->addWidget(W, 0);
     vBoxLayout->setMargin(0);
 
-    QDockWidget * legendWidget = attrWidget->legendWidget();
-    QDockWidget * layerOrderWidget = attrWidget->layerOrderWidget();
-    if(legendWidget && layerOrderWidget){
-        connect(attrWidget, SIGNAL(aboutToDestroy(QDockWidget *, QDockWidget *)), this, SIGNAL(mapAboutToDestroy(QDockWidget *, QDockWidget *)));
-        emit mapCreated(legendWidget, layerOrderWidget);
+    
+    if(attrWidget){
+        vBoxLayout->addWidget(attrWidget, 0);
+        vBoxLayout->setMargin(0);
+        //attrWidget->setMinimumHeight(40);
+        //QSizePolicy hPw (QSizePolicy::Expanding, QSizePolicy::Expanding);
+        //attrWidget->setSizePolicy(hPw);
+
+
+        QDockWidget * legendWidget = attrWidget->legendWidget();
+        QDockWidget * layerOrderWidget = attrWidget->layerOrderWidget();
+        if(legendWidget && layerOrderWidget){
+            connect(attrWidget, SIGNAL(aboutToDestroy(QDockWidget *, QDockWidget *)), this, SIGNAL(mapAboutToDestroy(QDockWidget *, QDockWidget *)));
+            emit mapCreated(legendWidget, layerOrderWidget);
+        }
     }
     
     return attrWidget;

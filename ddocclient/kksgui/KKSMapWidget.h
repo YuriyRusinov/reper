@@ -39,6 +39,10 @@ signals:
     void valueChanged (qint64 id, KKSIndAttrClass sys, QVariant val);
     void aboutToDestroy(QDockWidget *, QDockWidget *);
 
+private:
+    QDockWidget * m_legendWidget;
+    QDockWidget * m_layerOrderWidget;
+
 #ifdef __USE_QGIS__
 
 private:
@@ -46,9 +50,6 @@ private:
 
 private:
     KKSGISWidget * mpKKSGISWidget;
-    QDockWidget * m_legendWidget;
-    QDockWidget * m_layerOrderWidget;
-
 #endif
 
 };

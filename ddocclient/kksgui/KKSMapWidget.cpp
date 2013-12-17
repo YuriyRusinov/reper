@@ -23,7 +23,7 @@ KKSMapWidget::KKSMapWidget(const KKSAttrValue* attr, KKSIndAttrClass isSys, QWid
       mpKKSGISWidget(0)
 {
 #ifdef __USE_QGIS__
-    init(parent);
+    //init(this);
 #endif
 }
 
@@ -36,8 +36,11 @@ KKSMapWidget::~KKSMapWidget()
     m_layerOrderWidget = 0;
 
 #ifdef __USE_QGIS__
-    if(mpKKSGISWidget)
+    if(mpKKSGISWidget){
+        mpKKSGISWidget->setParent(0);
         KKSGISWidget::destroyQGISWidget(mpKKSGISWidget);
+        mpKKSGISWidget = 0;
+    }
 #endif
 }
 

@@ -452,11 +452,12 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
         }
     }
 
-    QGridLayout * gMapLay = 0;
-    QWidget * mapWParent = 0;
+    //QGridLayout * gMapLay = 0;
+    //QWidget * mapWParent = 0;
     //QWidget * tabM = 0;
     if (isAttrMap)
     {
+        /*
         mapWParent = new QWidget (tabObj);
         tabObj->addTab (mapWParent, tr("Map"));
         tabObj->setCurrentIndex (tabObj->count()-1);
@@ -465,6 +466,25 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
 
         //objEditorWidget->setMapWidget (tabM);
         objEditorWidget->setMapWidget (mapWParent);
+
+        //если привутствует атрибут типа ГИС (векторный слой, растровый слой, карта)
+        if (isAttrMap){
+            //gMapLay->addWidget(tabM, 0, 0, 1, 1);
+            //gMapLay->setMargin(0);
+            //tabObj->setCurrentWidget(mapWParent);
+        }
+        */
+      
+        QWidget * mapWParent = new QWidget ();
+        QGridLayout *gMapLay = new QGridLayout ();
+        mapWParent->setLayout (gMapLay);
+        //KKSList<KKSFileType*> fileTypes = loader->loadFileTypes();
+        //KKSFileWidget * W = new KKSFileWidget(io->files(), fileTypes, false);
+        //connect(W, SIGNAL(downloadFile(KKSFile*, QWidget *)), this, SLOT(slotDownloadFile(KKSFile*, QWidget*)));
+        QWidget * W = new QWidget();
+        objEditorWidget->setMapWidget (W);
+        tabObj->addTab (mapWParent, tr("Map"));
+        gMapLay->addWidget (W, 0, 0, 1, 1);
     }
 
 
@@ -603,11 +623,11 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
         tabObj->setCurrentIndex (0);
 
     //если привутствует атрибут типа ГИС (векторный слой, растровый слой, карта)
-    if (isAttrMap){
-        //gMapLay->addW idget(tabM, 0, 0, 1, 1);
+    //if (isAttrMap){
+        //gMapLay->addWidget(tabM, 0, 0, 1, 1);
         //gMapLay->setMargin(0);
         //tabObj->setCurrentWidget(mapWParent);
-    }
+    //}
 
     if (tabEnc && tabEnc->count () > 0)
     {

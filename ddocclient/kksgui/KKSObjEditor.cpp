@@ -2442,6 +2442,7 @@ void KKSObjEditor :: setMapWidget (QWidget * mapW)
     }
 
     mapWidget = mapW;
+    mapWidget->setParent(this);
 }
 
 void KKSObjEditor :: setCurrentTable (const QString& tName)
