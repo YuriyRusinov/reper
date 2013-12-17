@@ -46,39 +46,6 @@
     онструктор, деструктор, инициализационные и обеспечивающие методы наход€тс€ в файле kksgiswidgethelper.cpp
 */
 
-/*
-void KKSGISWidgetQGIS::addLayerToTOC(QgsMapLayer* mapLayer)
-{
-//    mpLayerSet
-//    mpRegistry
-    int nRow(0);
-    int nCol(0);
-    nRow = mpTableLegend->rowCount();
-    nCol = mpTableLegend->columnCount();
-    mpTableLegend->insertRow(nRow);
-    QTableWidgetItem *pItem = new QTableWidgetItem(mapLayer->name());
-    mpTableLegend->setItem(nRow, 1, pItem);
-    pItem = new QTableWidgetItem(mapLayer->id());
-    mpTableLegend->setItem(nRow, 2, pItem);
-    //QVariant *ok;
-    Qt::CheckState pState;
-    if (mapLayer->hasScaleBasedVisibility())
-    {
-        pState = Qt::Checked;
-    }
-    else
-    {
-        pState = Qt::Unchecked;
-    }
-
-    pItem->setData(Qt::CheckStateRole, pState);
-    mpTableLegend->setItem(nRow, 0, pItem);
-    //mpMapLegend->addLayer(mapLayer);
-//    QStandardItemModel l1;
-
-}
-*/
-
 void KKSGISWidgetQGIS::azRemoveAnnotationItems()
 {
     if ( !mpMapCanvas )
@@ -633,9 +600,15 @@ void KKSGISWidgetQGIS::SLOTmpActionAddRasterLayer()
 
 void KKSGISWidgetQGIS::SLOTazShowMouseCoordinate(const QgsPoint & p )
 {
-      if ( mpLayerSet.count() < 1 ) return;
-      if (!mpMapCanvas->underMouse()) return;
-      mpLastMapPosition = p;
+    if(!mpCoordsEdit)
+        return;
+
+    if ( mpLayerSet.count() < 1 ) 
+        return;
+    if (!mpMapCanvas->underMouse()) 
+        return;
+    
+    mpLastMapPosition = p;
      
     if ( mpMapCanvas->mapUnits() == QGis::Degrees )
     {
@@ -702,6 +675,9 @@ void KKSGISWidgetQGIS::SLOTazThemTaskSpectralBathynometry()
 
 void KKSGISWidgetQGIS::SLOTazCoordsCenter()
 {
+    if(!mpCoordsEdit)
+        return;
+
     QStringList parts = mpCoordsEdit->text().split( ',' );
     if ( parts.size() != 2 )
       return;
@@ -774,7 +750,8 @@ void KKSGISWidgetQGIS::openProject(const QString & prjFile)
     bool projectScales = QgsProject::instance()->readBoolEntry( "Scales", "/useProjectScales" );
     if ( projectScales )
     {
-        mScaleEdit->updateScales( QgsProject::instance()->readListEntry( "Scales", "/ScalesList" ) );
+        if(mScaleEdit)
+            mScaleEdit->updateScales( QgsProject::instance()->readListEntry( "Scales", "/ScalesList" ) );
     }
 
     mpMapCanvas->updateScale();
@@ -1010,11 +987,16 @@ bool KKSGISWidgetQGIS::setActiveLayer( QgsMapLayer *layer )
   if ( !layer )
     return false;
 
+  if(!mpMapLegend)
+      return false;
+
   return mpMapLegend->setCurrentLayer( layer );
 }
 
 void KKSGISWidgetQGIS::showLayerProperties( QgsMapLayer *ml )
 {
+    if(!mpMapLegend)
+        return;
   /*
   TODO: Consider reusing the property dialogs again.
   Sometimes around mid 2005, the property dialogs were saved for later reuse;

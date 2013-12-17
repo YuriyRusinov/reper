@@ -79,6 +79,9 @@ void KKSComplexAttrWidget :: init()
     //    atRecordColorRef
     //    atRecordTextColor
     //    atRecordTextColorRef
+    //    atVectorLayer -- они вообще в другой таблице визуализируютс€
+    //    atRasterLayer -- они вообще в другой таблице визуализируютс€
+    //    atGISMap -- они вообще в другой таблице визуализируютс€
     //
     //    все они отфильтровываютс€ на триггерном уровне Ѕƒ
     for (KKSMap<int, KKSCategoryAttr*>::const_iterator pa = attrs.constBegin(); pa != attrs.constEnd(); pa++){
@@ -90,7 +93,10 @@ void KKSComplexAttrWidget :: init()
             pa.value()->type()->attrType() == KKSAttrType::atRecordColor ||
             pa.value()->type()->attrType() == KKSAttrType::atRecordColorRef ||
             pa.value()->type()->attrType() == KKSAttrType::atRecordTextColor ||
-            pa.value()->type()->attrType() == KKSAttrType::atRecordTextColorRef
+            pa.value()->type()->attrType() == KKSAttrType::atRecordTextColorRef ||
+            pa.value()->type()->attrType() == KKSAttrType::atVectorLayer ||
+            pa.value()->type()->attrType() == KKSAttrType::atRasterLayer ||
+            pa.value()->type()->attrType() == KKSAttrType::atGISMap
           )
         {
             continue;
@@ -128,11 +134,7 @@ void KKSComplexAttrWidget :: init()
                                   m_objEditor, //KKSObjEditor -- в данном контексте имеем право указать NULL. ѕоле используетс€ только в расширенных св-вах атрибута (показател€), которых у данного атрибута нет 
                                   qobject_cast<QGridLayout *>(m_groupBox->layout()), 
                                   ii, 
-#ifdef Q_CC_MSVC
                                   iacAttrAttr,
-#else
-                                  iacAttrAttr,
-#endif
                                   av->attribute()->tableName(), //таблица, из которой дл€ ссылочных атрибутов будут загружатьс€ значени€
                                   -1);//(c ? c->id():-1));
 

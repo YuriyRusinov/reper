@@ -25,17 +25,18 @@ KKSHistWidget::~KKSHistWidget()
 void KKSHistWidget::paintEvent(QPaintEvent *event)
 {
     QVariant val = m_av->value().valueVariant();
-    const KKSHistogram * m_hist = val.value<const KKSHistogram *>();
-    if (!m_hist)
+    KKSHistogram m_hist = val.value<KKSHistogram>();
+    if (m_hist.isEmpty())
     {
         QWidget::paintEvent(event);
         return;
     }
+
     QPainter painter(this);
-    int n = m_hist->size();
+    int n = m_hist.size();
     qreal barWidth = width() / (qreal)n;
     int h = height ();
-    QMap<int, double> m_h = m_hist->getVec();
+    QMap<int, double> m_h = m_hist.getVec();
     int i=0;
     for (QMap<int, double>::const_iterator p = m_h.constBegin(); p != m_h.constEnd(); p++)
     {

@@ -27,6 +27,27 @@ DEFINES += __USE_DLL_KKSGUI
 INCLUDEPATH *= . \
                ./ui
 
+
+qgis{
+    DEFINES *= __USE_QGIS__
+    DEFINES *= __USE_EXPORTS  #for qgis export library
+
+    LIBS *= -L$$QGISDIR/lib -lqgis_core -lqgis_gui
+    LIBS *= -L$$DESTDIR -lkksgis
+
+    INCLUDEPATH *= $$OSGEODIR/include \
+                   $$OSGEODIR/include/qwt \
+                   $$QGISDIR/include \
+                   ../kksgis \
+                   ../kksgis/layerprops \
+                   ../kksgis/legend
+
+    DEPENDPATH += ../kksgis
+
+    LIBS *= -L$$OSGEODIR/lib  -lproj_i -lgdal_i
+}
+
+
 include (kksgui.pri)
 
 # install targets

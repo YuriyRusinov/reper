@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-    KKSSito *sito = KKSSito::init (true);
+    KKSSito *sito = KKSSito::init (argc, argv, true);
     if(!sito)
         return 1;
     if(!sito->db())

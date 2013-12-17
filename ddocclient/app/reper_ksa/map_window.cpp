@@ -7,7 +7,9 @@ MapWindow::MapWindow(QWidget* parent, Qt::WFlags fl)
     //init's
     setupUi(this);
 
-    mpKKSGISWidget = KKSGISWidget::initQGISWidget(parent, fl);
+    bool withSubWindows = true;
+
+    mpKKSGISWidget = KKSGISWidget::initQGISWidget(withSubWindows, parent, fl);
     if(!mpKKSGISWidget){
         QMessageBox::critical(0, "", "");
         return;

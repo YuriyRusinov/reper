@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
     KKSDebug::setMinMsgType(KKSInfoMsg);
     KKSDebug::setUseQDebug(true);
 
-    KKSSito *sito = KKSSito::init (false, QString(), false);
+    KKSSito *sito = KKSSito::init (argc, argv, false, QString(), false);
     if(!sito)
         return 1;
 

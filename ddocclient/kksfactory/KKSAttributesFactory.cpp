@@ -80,6 +80,8 @@
 #include "KKSConverter.h"
 #include "KKSEIOFactory.h"
 #include "KKSPPFactory.h"
+#include "KKSHistWidget.h"
+#include "KKSMapWidget.h"
 
 #include <defines.h>
 
@@ -882,14 +884,24 @@ void KKSAttributesFactory :: putAttrWidget (KKSAttrValue* av,
     QCheckBox *ch = 0;
     QWidget *aw = 0;
     
-    if (pCatType->attrType() != KKSAttrType::atCheckListEx)
-        aw = this->createAttrWidget (av, objEditor, pCategAttr->isMandatory(), pCatType, isSystem, gLayout, n_str, V, lTitle, tbRef, ch);
-    else if (pCategAttr->id () == ATTR_IO_OBJECTS_ORGANIZATION)
-        return;
-    else
-    {
+    if (pCatType->attrType() == KKSAttrType::atCheckListEx){
+        if (pCategAttr->id () == ATTR_IO_OBJECTS_ORGANIZATION){
+            return;
+        }
+
         QTabWidget * tabEnc = objEditor->getRecTab();
         aw = this->createAttrCheckWidget (av, pCatType, isSystem, tabEnc, objEditor);
+    }
+    else if(pCatType->attrType() == KKSAttrType::atVectorLayer || 
+            pCatType->attrType() == KKSAttrType::atRasterLayer ||
+            pCatType->attrType() == KKSAttrType::atGISMap)
+    {
+        //ksa
+        QWidget * mapWidget = objEditor->getMapWidget();
+        aw = this->createMapWidget(av, pCatType, isSystem, mapWidget, objEditor);
+    }
+    else{
+        aw = this->createAttrWidget (av, objEditor, pCategAttr->isMandatory(), pCatType, isSystem, gLayout, n_str, V, lTitle, tbRef, ch);
     }
 
     this->setValue (aw, av, pCatType, isSystem, V, isExist, tableName, idCat, tbRef, ch, objEditor, lTitle);
@@ -1167,7 +1179,6 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
             {
                 break;
             }
-            break;
         case KKSAttrType::atObjRef:
             break;
         case KKSAttrType::atDate:
@@ -1365,39 +1376,19 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
 
                 if(!av->attrsValuesLoaded()){
                     KKSMap<qint64, KKSAttrValue*> aav_list;
-#ifdef Q_CC_MSVC
                     if(attrClass == iacIOUserAttr){
-#else
-                    if(attrClass == iacIOUserAttr){
-#endif
                         aav_list = loader->loadAttrAttrValues(av, false);
                     }
-#ifdef Q_CC_MSVC
                     if(attrClass == iacEIOUserAttr){
-#else
-                    if(attrClass == iacEIOUserAttr){
-#endif
                         aav_list = loader->loadAttrAttrValues(av, true);
                     }
-#ifdef Q_CC_MSVC
                     if(attrClass == iacAttrAttr ){
-#else
-                    if(attrClass == iacAttrAttr ){
-#endif
                         //aav_list = loader->loadAttrAttrValues(av->id(), false);
                     }
-#ifdef Q_CC_MSVC
                     if(attrClass == iacEIOSysAttr){
-#else
-                    if(attrClass == iacEIOSysAttr){
-#endif
                         //aav_list = loader->loadAttrAttrValues(av->id(), false);
                     }
-#ifdef Q_CC_MSVC
                     if(attrClass == iacTableAttr){
-#else
-                    if(attrClass == iacTableAttr){
-#endif
                         //aav_list = loader->loadAttrAttrValues(av->id(), false);
                     }
 
@@ -1532,6 +1523,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                 attrWidget->setMinimumHeight (20);
             }
             break;
+        /*
         case KKSAttrType::atGeometry:
         case KKSAttrType::atGeometryPoly:
             {
@@ -1552,6 +1544,56 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                 attrWidget->setMinimumHeight (20);
             }
             break;
+        */
+        case KKSAttrType::atHistogram:
+            {
+                //ksa
+                if (!isRef)
+                {
+                    lTitle = this->createAttrTitle (av, attrClass, objEditor);//, av->attribute()->title(), is_mandatory);
+                    gLayout->addWidget (lTitle, n_str, 0, 1, 2, Qt::AlignRight);
+                }
+                
+                QString v = V.toString ();
+                if (v.isNull())
+                    v = QString("");
+
+                attrWidget = new KKSHistWidget(av, attrClass);
+                //QToolButton *tbRef = new QToolButton ();
+                //tbRef->setMinimumHeight (20);
+                //tbRef->setText ("...");
+                //--px->setSizePolicy (hPw);
+                attrWidget->setMinimumHeight (20);
+                //px->setSizeAdjustPolicy (QComboBox::AdjustToMinimumContentsLength);
+                //--QHBoxLayout *hLay = new QHBoxLayout ();
+                //--hLay->addWidget (px);
+                //--hLay->addWidget (tbRef);
+
+                //--gLayout->addLayout (hLay, n_str, 2, 1, 1);
+                if (!isRef)
+                {
+                    gLayout->addWidget (attrWidget, n_str, 2, 1, 1, Qt::AlignCenter);
+                    //gLayout->addWidget (tbRef, n_str, 3, 1, 1);
+                
+                    //QObject::connect (tbRef, SIGNAL(pressed()), attrWidget, SLOT(openFile()));
+                }   //break;
+            }
+            break;
+        case KKSAttrType::atVectorLayer:
+            {
+                //ksa
+                break;
+            }
+        case KKSAttrType::atRasterLayer:
+            {
+                //ksa
+                break;
+            }
+        case KKSAttrType::atGISMap:
+            {
+                //ksa
+                break;
+            }
         case KKSAttrType::atJPG:
             {
                 if (!isRef)
@@ -1690,7 +1732,11 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
  * Результат:
  * виджет атрибута, добавленный в tabW.
  */
-QWidget * KKSAttributesFactory :: createAttrCheckWidget (const KKSAttrValue * av, const KKSAttrType *pCatType,  KKSIndAttrClass isSystem, QTabWidget * tabW, KKSObjEditor * objEditor)
+QWidget * KKSAttributesFactory :: createAttrCheckWidget (const KKSAttrValue * av, 
+                                                         const KKSAttrType *pCatType,  
+                                                         KKSIndAttrClass isSystem, 
+                                                         QTabWidget * tabW, 
+                                                         KKSObjEditor * objEditor)
 {
     QWidget * attrWidget = 0;
     if (!av || !pCatType || !tabW)
@@ -1728,6 +1774,53 @@ QWidget * KKSAttributesFactory :: createAttrCheckWidget (const KKSAttrValue * av
     }
     return attrWidget;
 }
+
+/* Метод создает виджет атрибута типа векторный слой, растровый слой, карта.
+ * Параметры:
+ * av -- величина атрибута
+ * pCatType -- тип поля, на которое ссылаются
+ * isSystem -- системный атрибут или нет
+ * tabW -- целевой QTabWidget
+ * Результат:
+ * виджет атрибута, добавленный в tabW.
+ */
+//ksa
+QWidget * KKSAttributesFactory :: createMapWidget (const KKSAttrValue * av, 
+                                                   const KKSAttrType *pCatType,  
+                                                   KKSIndAttrClass isSystem, 
+                                                   QWidget * parent, 
+                                                   KKSObjEditor * objEditor)
+{
+    KKSMapWidget * attrWidget = 0;
+    if (!av || !pCatType || !parent)
+        return 0;
+
+    if (pCatType->attrType() != KKSAttrType::atVectorLayer &&
+        pCatType->attrType() != KKSAttrType::atRasterLayer &&
+        pCatType->attrType() != KKSAttrType::atGISMap)
+    {
+        return 0;
+    }
+
+    attrWidget = new KKSMapWidget(av, isSystem, parent);
+    attrWidget->setMinimumHeight(40);
+    QSizePolicy hPw (QSizePolicy::Expanding, QSizePolicy::Expanding);
+    attrWidget->setSizePolicy(hPw);
+
+    QVBoxLayout * vBoxLayout = new QVBoxLayout(parent);
+    vBoxLayout->addWidget(attrWidget, 0);//, Qt
+    vBoxLayout->setMargin(0);
+
+    QDockWidget * legendWidget = attrWidget->legendWidget();
+    QDockWidget * layerOrderWidget = attrWidget->layerOrderWidget();
+    if(legendWidget && layerOrderWidget){
+        connect(attrWidget, SIGNAL(aboutToDestroy(QDockWidget *, QDockWidget *)), this, SIGNAL(mapAboutToDestroy(QDockWidget *, QDockWidget *)));
+        emit mapCreated(legendWidget, layerOrderWidget);
+    }
+    
+    return attrWidget;
+}
+
 
 /* Метод инициализирует виджет атрибута
  * Параметры:
@@ -2338,6 +2431,26 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
                 vw->setMovie (v);
             }
             break;
+        //ksa
+        case KKSAttrType::atHistogram:
+            {
+            }
+            break;
+        //ksa
+        case KKSAttrType::atVectorLayer:
+            {
+            }
+            break;
+        //ksa
+        case KKSAttrType::atRasterLayer:
+            {
+            }
+            break;
+        //ksa
+        case KKSAttrType::atGISMap:
+            {
+            }
+            break;
     }
 }
 
@@ -2620,6 +2733,8 @@ void KKSAttributesFactory :: addComplexAttr (KKSAttribute *a, QAbstractItemModel
         return;
     }
     catAttr = catAttr->tableCategory();
+    
+    //перечисляем типы атрибутов, которые НЕ могут входить в составной атрибут
     QStringList filtValues;
     filtValues << QString::number(KKSAttrType::atParent);
     filtValues << QString::number(KKSAttrType::atCheckListEx);
@@ -2628,7 +2743,12 @@ void KKSAttributesFactory :: addComplexAttr (KKSAttribute *a, QAbstractItemModel
     filtValues << QString::number(KKSAttrType::atRecordTextColor);
     filtValues << QString::number(KKSAttrType::atRecordTextColorRef);
     filtValues << QString::number(KKSAttrType::atComplex);
+    filtValues << QString::number(KKSAttrType::atVectorLayer);
+    filtValues << QString::number(KKSAttrType::atRasterLayer);
+    filtValues << QString::number(KKSAttrType::atGISMap);
+
     const KKSFilter * f = catAttr->createFilter(1,filtValues,KKSFilter::foNotIn);
+
     KKSList<const KKSFilter*> filts;
     filts.append (f);
     KKSFilterGroup * fg = new KKSFilterGroup (true);

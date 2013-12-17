@@ -75,11 +75,15 @@ void KKSAttrType::setAttrType()
         case 25: m_attrType = atRecordTextColor; break;   //Цветовая гамма текста записи справочника (при отображении в списке)
         case 26: m_attrType = atRecordTextColorRef;break; //Ссылка на цвет текста записи (при отображении в списке)
         case 27: m_attrType = atTime; break;              //время
-        case 28: m_attrType = atGeometry; break;          //ГИС-объект (базовый)
-        case 29: m_attrType = atGeometryPoly; break;      //ГИС-объект (стандартный полигон)
+        //case 28: m_attrType = atGeometry; break;          //ГИС-объект (базовый)
+        //case 29: m_attrType = atGeometryPoly; break;      //ГИС-объект (стандартный полигон)
         case 30: m_attrType = atInt64; break;             //целочисленное (64 бита)
         case 31: m_attrType = atUUID; break;              //уникальный идентификатор (UUID)
         case 32: m_attrType = atComplex; break;           //составной атрибут
+        case 33: m_attrType = atHistogram; break;         //Гистограмма
+        case 34: m_attrType = atVectorLayer; break;       //ГИС-объект (Векторный слой)
+        case 35: m_attrType = atRasterLayer; break;       //ГИС-объект (Растровый слой)
+        case 36: m_attrType = atGISMap; break;            //ГИС-объект (Карта)
 
         default: m_attrType = atUserDef; break;           //пользовательский (for future use)
     }

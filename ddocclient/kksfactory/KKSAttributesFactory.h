@@ -21,6 +21,7 @@ class QToolButton;
 class QTabWidget;
 class QAbstractItemModel;
 class QModelIndex;
+class QDockWidget;
 
 class KKSLoader;
 class KKSEIOFactory;
@@ -110,6 +111,10 @@ signals:
     void viewHistory(const KKSAttrValue *, const KKSList<KKSAttrValue *> &);
     void expandIndex (const QModelIndex&);
     void aValRefresh (const KKSAttribute *, QVariant);
+
+    void mapCreated(QDockWidget *, QDockWidget *);//генерируется, когда в редакторе ИО создан виджет с картой 
+                                                  //и надо разместить QDockWidget'ы с легендой в области главного окна приложения
+    void mapAboutToDestroy(QDockWidget *, QDockWidget *);//генерируется, когда окно с картой закрывается и требуется удалить QDockWidget'ы из области главного окна приложения
     
 private:
     //
@@ -140,7 +145,17 @@ private:
     
     QWidget * createAttrValWidget (const KKSAttrValue * pAttrValue, int idAVal, int isSys, QWidget * parent=0, Qt::WindowFlags flags=0);
 
-    QWidget * createAttrCheckWidget (const KKSAttrValue * pAttrValue, const KKSAttrType *pCatType,  KKSIndAttrClass isSystem, QTabWidget * tabW, KKSObjEditor * objEditor);
+    QWidget * createAttrCheckWidget (const KKSAttrValue * pAttrValue, 
+                                     const KKSAttrType *pCatType,  
+                                     KKSIndAttrClass isSystem, 
+                                     QTabWidget * tabW, 
+                                     KKSObjEditor * objEditor);
+    QWidget * createMapWidget (const KKSAttrValue * pAttrValue, 
+                               const KKSAttrType *pCatType,  
+                               KKSIndAttrClass isSystem, 
+                               QWidget * parent, 
+                               KKSObjEditor * objEditor);
+    
     QAbstractItemModel * aValComplexModel (const KKSAttrValue * pAttrValue, const QVariant& av=QVariant());
 
     void connectToSlots (QObject *aw, QWidget* wEditor);

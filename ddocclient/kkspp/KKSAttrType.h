@@ -49,12 +49,16 @@ public:
        atRecordTextColor = 25,    //Цветовая гамма текста записи справочника (при отображении в списке)
        atRecordTextColorRef = 26, //Ссылка на цвет текста записи (при отображении в списке)
        atTime = 27,               //время
-       atGeometry = 28,           //ГИС-объект (базовый)
-       atGeometryPoly = 29,       //ГИС-объект (стандартный полигон)
+       //atGeometry = 28,           //ГИС-объект (базовый)
+       //atGeometryPoly = 29,       //ГИС-объект (стандартный полигон)
        atInt64 = 30,              //целочисленное (64 бита)
        atUUID = 31,               //уникальный идентификатор (UUID)
        atComplex = 32,            //Составной атрибут
-       atUserDef = 33             //пользовательский (for future use)
+       atHistogram = 33,          //Гистограмма
+       atVectorLayer = 34,        //ГИС-объект (векторный слой)
+       atRasterLayer = 35,        //ГИС-объект (растровый слой)
+       atGISMap = 36,             //ГИС-объект (карта)
+       atUserDef = 37             //пользовательский (for future use)
    };
 
    KKSAttrTypes attrType() const;

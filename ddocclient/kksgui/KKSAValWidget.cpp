@@ -43,6 +43,8 @@
 #include "KKSIntervalWidget.h"
 #include "KKSHIntervalW.h"
 #include "KKSColorWidget.h"
+#include "KKSHistWidget.h"
+#include "KKSMapWidget.h"
 
 KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFlags flags)
     : QDialog (parent, flags),
@@ -185,8 +187,8 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
             break;
         }
         case KKSAttrType::atText:
-        case KKSAttrType::atGeometry:
-        case KKSAttrType::atGeometryPoly:
+        //case KKSAttrType::atGeometry:
+        //case KKSAttrType::atGeometryPoly:
         {
             textEVal = new QTextEdit;
             textEVal->setReadOnly (true);
@@ -195,6 +197,20 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
             numR++;
             break;
         }
+        case KKSAttrType::atHistogram:
+            //ksa 
+
+            break;
+        case KKSAttrType::atVectorLayer:
+            //ksa
+            break;
+        case KKSAttrType::atRasterLayer:
+            //ksa
+            break;
+        case KKSAttrType::atGISMap:
+            //ksa
+
+            break;
         case KKSAttrType::atSVG:
         {
             svgVal = new KKSSvgWidget (pAttrValue, iacIOUserAttr, V.toByteArray());
@@ -389,8 +405,8 @@ void KKSAValWidget::initComplexWidget (KKSAttrValue * av, QGridLayout * gLay, QW
                 break;
             }
             case KKSAttrType::atText:
-            case KKSAttrType::atGeometry:
-            case KKSAttrType::atGeometryPoly:
+            //case KKSAttrType::atGeometry:
+            //case KKSAttrType::atGeometryPoly:
             {
                 aW = new QTextEdit (parent);
                 QTextEdit * textE = qobject_cast<QTextEdit *>(aW);
@@ -398,6 +414,18 @@ void KKSAValWidget::initComplexWidget (KKSAttrValue * av, QGridLayout * gLay, QW
                 textE->setReadOnly (true);
                 break;
             }
+            case KKSAttrType::atHistogram:
+                //ksa
+                break;
+            case KKSAttrType::atVectorLayer:
+                //ksa
+                break;
+            case KKSAttrType::atRasterLayer:
+                //ksa
+                break;
+            case KKSAttrType::atGISMap:
+                //ksa
+                break;
             case KKSAttrType::atSVG:
             {
                 aW = new KKSSvgWidget (aV, iacIOUserAttr, val.toByteArray(), parent);
@@ -558,8 +586,8 @@ void KKSAValWidget::setValue (const KKSAttribute * a, QVariant val)
             break;
         }
         case KKSAttrType::atText:
-        case KKSAttrType::atGeometry:
-        case KKSAttrType::atGeometryPoly:
+        //case KKSAttrType::atGeometry:
+        //case KKSAttrType::atGeometryPoly:
         {
             textEVal->setPlainText(val.toString());
             break;
@@ -567,6 +595,26 @@ void KKSAValWidget::setValue (const KKSAttribute * a, QVariant val)
         case KKSAttrType::atSVG:
         {
             svgVal->setContents(val.toByteArray());
+            break;
+        }
+        case KKSAttrType::atHistogram:
+        {
+            //ksa
+            break;
+        }
+        case KKSAttrType::atVectorLayer:
+        {
+            //ksa
+            break;
+        }
+        case KKSAttrType::atRasterLayer:
+        {
+            //ksa
+            break;
+        }
+        case KKSAttrType::atGISMap:
+        {
+            //ksa
             break;
         }
         case KKSAttrType::atPoints:
@@ -721,8 +769,8 @@ void KKSAValWidget::setComplexVals (const QVariant& val)
                 break;
             }
             case KKSAttrType::atText:
-            case KKSAttrType::atGeometry:
-            case KKSAttrType::atGeometryPoly:
+            //case KKSAttrType::atGeometry:
+            //case KKSAttrType::atGeometryPoly:
             {
                 QTextEdit * textE = qobject_cast<QTextEdit *>(aW);
                 textE->setPlainText(valW.toString());
@@ -734,7 +782,22 @@ void KKSAValWidget::setComplexVals (const QVariant& val)
                 svgW->setContents(valW.toByteArray());
                 break;
             }
-            case KKSAttrType::atPoints:
+            case KKSAttrType::atHistogram:
+            {
+                //ksa
+                break;
+            }
+            case KKSAttrType::atVectorLayer:
+            {
+                //ksa
+                break;
+            }
+            case KKSAttrType::atRasterLayer:
+            {
+                //ksa
+                break;
+            }
+            case KKSAttrType::atGISMap:
             {
                 KKSPointTable * pointW = qobject_cast<KKSPointTable *>(aW);
                 pointW->setData(valW.toList());

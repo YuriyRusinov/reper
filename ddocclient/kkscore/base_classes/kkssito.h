@@ -21,6 +21,7 @@
 #define KKSSITO_H
 
 #include "config_core.h"
+
 #include <QSettings>
 #include <QObject>
 #include <QStringList>
@@ -66,10 +67,11 @@ class __CORE_EXPORT KKSSito : public QObject
 {
     Q_OBJECT
 
-public:
+private:
     KKSSito(const QString & userName = QString(), bool msgToWindow = true);
     virtual ~KKSSito();
 
+public:
     KKSError * getLastError();  
     void showConnectionInfo(QWidget * parent = NULL) const;
     void showConnectionInfo(KKSDatabase * db, const QString & userName, const QString & dlName, const QString & macLabel, QWidget * parent = NULL) const;
@@ -137,6 +139,7 @@ public:
 
 
     void loadTranslator();
+    void loadQGISPlugins();
 
     QByteArray toCString(QString str)
     {
@@ -177,7 +180,11 @@ public:
     \endcode*/
 
     static KKSSito * instance() { return self; }
-    static KKSSito * init (bool with_connect = true, const QString & userName = QString(), bool msgToWindow = true);
+    static KKSSito * init (int argc, 
+                           char *argv[],
+                           bool with_connect = true, 
+                           const QString & userName = QString(), 
+                           bool msgToWindow = true);
     static int GUIConnect(QWidget * parent = NULL);
 
 

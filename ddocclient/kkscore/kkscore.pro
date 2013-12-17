@@ -25,6 +25,25 @@ DEPENDPATH *= ../kksgui
 
 LIBS *= -L$$DESTDIR -lkksutils -ldataaccess -lkksfactory -lkkspp -lkksgui
 
+qgis{
+    DEFINES *= __USE_QGIS__
+    DEFINES *= __USE_EXPORTS  #for qgis export library
+
+    LIBS *= -L$$QGISDIR/lib -lqgis_core -lqgis_gui
+    LIBS *= -L$$DESTDIR -lkksgis
+
+    INCLUDEPATH *= $$OSGEODIR/include \
+                   $$OSGEODIR/include/qwt \
+                   $$QGISDIR/include \
+                   ../kksgis \
+                   ../kksgis/layerprops \
+                   ../kksgis/legend
+
+    DEPENDPATH += ../kksgis
+
+    LIBS *= -L$$OSGEODIR/lib  -lproj_i -lgdal_i
+}
+
 
 # libpq support
 LIBS += -L$${PSQL_LIB_DIR}

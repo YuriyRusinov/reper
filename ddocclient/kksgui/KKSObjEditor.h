@@ -122,6 +122,9 @@ class _GUI_EXPORT KKSObjEditor : public KKSRecDialog
         QTabWidget * getRecTab (void) const;
         void setRecTab (QTabWidget * tabEnc);
         
+        QWidget * getMapWidget(void) const;
+        void setMapWidget (QWidget * mapW);
+
     public slots:
         void setValue (qint64 id, KKSIndAttrClass sys, QVariant val);
         //void setIndValue (int id, bool sys, QVariant val);
@@ -404,6 +407,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSRecDialog
 
         QTabWidget * tabObj;
         QTabWidget * tabEnclosures;
+        QWidget * mapWidget;//Виджет, на котором располагается карта (ГИС), если  текущая сборка DDocClient поддерживает работу с ГИС
 
         QWidget *sysAttrWidget;
         QScrollArea *scSysAttrs;

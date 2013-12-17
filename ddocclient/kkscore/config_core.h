@@ -29,6 +29,18 @@
 	#define __CORE_EXPORT
 #endif
 
+#ifdef WIN32
+//for qgis includes
+#ifdef __USE_EXPORTS
+	#define CORE_EXPORT __declspec(dllimport)
+	#define GUI_EXPORT __declspec(dllimport)
+#endif
+#else
+	#define CORE_EXPORT
+	#define GUI_EXPORT
+#endif
+
+
 #include <math.h>
 #include <stdio.h>
 

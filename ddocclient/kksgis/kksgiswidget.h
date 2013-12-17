@@ -12,8 +12,9 @@ class _GIS_EXPORT KKSGISWidget : public QWidget
 {
   Q_OBJECT;
 public:
-    static KKSGISWidget * initQGISWidget(QWidget* parent = 0, Qt::WFlags fl = 0);
-    static KKSGISWidget * instanse();
+    static KKSGISWidget * initQGISWidget(bool withSubWindows, QWidget* parent = 0, Qt::WFlags fl = 0);
+    static void destroyQGISWidget(KKSGISWidget *);
+    //static KKSGISWidget * instanse();
 
     virtual QStatusBar * statusBar() const = 0;
     virtual const QString & pluginsDir() = 0;

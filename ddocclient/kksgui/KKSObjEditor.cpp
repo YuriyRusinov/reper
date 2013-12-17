@@ -70,6 +70,7 @@
 #include <KKSRubric.h>
 #include "KKSAttrUUIDWidget.h"
 #include "KKSAttrValueLabel.h"
+#include "KKSHistogram.h"
 #include "defines.h"
 
 
@@ -110,6 +111,7 @@ KKSObjEditor :: KKSObjEditor (const KKSTemplate *t,
     mainLayout (new QGridLayout()),
     tabObj (0),
     tabEnclosures (0),
+    mapWidget(0),
     sysAttrWidget (0),
     scSysAttrs (0),
     sysAttrsW (0),
@@ -349,11 +351,33 @@ int KKSObjEditor :: constructObject()
             QString value;
             int type = cAttrValue->attribute()->type()->attrType();
             QVariant val = cAttrValue->value().valueVariant(); //sysAttributesValues.value (pSysAttrs.key());
+            
             if (type == KKSAttrType::atCheckList || type == KKSAttrType::atCheckListEx)
             {
                 value = val.toStringList().join(",");
                 //qDebug () << __PRETTY_FUNCTION__ << cAttrValue->attribute()->id() << value;
             }
+            //ksa
+            else if (type == KKSAttrType::atHistogram)
+            {
+                value = val.value<KKSHistogram>().toString();
+            }
+            //ksa
+            else if(type == KKSAttrType::atVectorLayer)
+            {
+                value = val.toString();
+            }
+            //ksa
+            else if(type == KKSAttrType::atRasterLayer)
+            {
+                value = val.toString();
+            }
+            //ksa
+            else if(type == KKSAttrType::atGISMap)
+            {
+                value = val.toString();
+            }
+
             else if (type == KKSAttrType::atRecordColor || type == KKSAttrType::atRecordTextColor)
             {
                 QColor v_col = val.value<QColor>();
@@ -441,7 +465,9 @@ int KKSObjEditor :: constructObject()
                 value = cAttrValue->value().value();
                 val = cAttrValue->value().valueVariant();
             }
-            
+            /*end of if-elseif*/
+
+
             if ( cAttrValue->attribute()->isMandatory() && 
                  cAttrValue->attribute()->defValue().value().isEmpty() && 
                 (val.isNull() || value.isEmpty()))
@@ -514,19 +540,38 @@ int KKSObjEditor :: constructObject()
             //
             // Mandatory or enabled optional parameter
             //
-            //qWarning() << cAttr->code();
             QString value;
             int type = cAttrValue->attribute()->type()->attrType();
             QVariant val = cAttrValue->value().valueVariant(); //sysAttributesValues.value (pSysAttrs.key());
             if (type == KKSAttrType::atCheckList || type == KKSAttrType::atCheckListEx)
             {
                 value = val.toStringList().join(",");
-                //qDebug () << __PRETTY_FUNCTION__ << cAttrValue->attribute()->id() << value;
             }
+            //ksa
+            else if(type == KKSAttrType::atHistogram)
+            {
+                KKSHistogram h = val.value<KKSHistogram>();
+                value = h.toString();
+            }
+            //ksa
+            else if(type == KKSAttrType::atVectorLayer)
+            {
+                value = val.toString();
+            }
+            //ksa
+            else if(type == KKSAttrType::atRasterLayer)
+            {
+                value = val.toString();
+            }
+            //ksa
+            else if(type == KKSAttrType::atGISMap)
+            {
+                value = val.toString();
+            }
+
             else if (type == KKSAttrType::atRecordColor || type == KKSAttrType::atRecordTextColor)
             {
                 QColor v_col = val.value<QColor>();
-                //qDebug () << __PRETTY_FUNCTION__ << v_col << v_col.value() << v_col.rgba() << (pObj ? pObj->recordFillColor() : QString());
                 if (v_col.isValid())
                 {
                     QRgb v_rgba = v_col.rgba ();
@@ -583,6 +628,7 @@ int KKSObjEditor :: constructObject()
                 value = QString ("{%1}").arg (val.toStringList().join(" "));
             else
                 value = val.toString(); 
+            /*end of if-elseif*/
 
             if ( type == KKSAttrType::atUUID && 
                 (val.isNull() || value.isEmpty()) && 
@@ -690,7 +736,30 @@ int KKSObjEditor :: constructObject()
             int type = cAttrValue->attribute()->type()->attrType();
             if(type == KKSAttrType::atCheckList ||
                 type == KKSAttrType::atCheckListEx)
+            {
                 value = val.toStringList().join(","); 
+            }
+            //ksa
+            else if(type == KKSAttrType::atHistogram)
+            {
+                KKSHistogram h = val.value<KKSHistogram>();
+                value = h.toString();
+            }
+            //ksa
+            else if(type == KKSAttrType::atVectorLayer)
+            {
+                value = val.toString();
+            }
+            //ksa
+            else if(type == KKSAttrType::atRasterLayer)
+            {
+                value = val.toString();
+            }
+            //ksa
+            else if(type == KKSAttrType::atGISMap)
+            {
+                value = val.toString();
+            }
             else if (type == KKSAttrType::atRecordColor || type == KKSAttrType::atRecordTextColor)
             {
                 QColor v_col = val.value<QColor>();
@@ -2356,6 +2425,23 @@ void KKSObjEditor :: setRecTab (QTabWidget * tabEnc)
     }
 
     tabEnclosures = tabEnc;
+}
+
+QWidget * KKSObjEditor :: getMapWidget (void) const
+{
+    return mapWidget;
+}
+
+void KKSObjEditor :: setMapWidget (QWidget * mapW)
+{
+    if (mapWidget)
+    {
+        mapWidget->setParent (0);
+        delete mapWidget;
+        mapWidget = 0;
+    }
+
+    mapWidget = mapW;
 }
 
 void KKSObjEditor :: setCurrentTable (const QString& tName)

@@ -111,6 +111,7 @@
 #include "KKSAddTable.h"
 #include "KKSAttrType.h"
 #include "KKSSyncWidget.h"
+#include "KKSMapWidget.h"
 #include "KKSSyncDialog.h"
 #include <KKSAccessEntity.h>
 #include <KKSState.h>
@@ -120,6 +121,7 @@
 #include <KKSLifeCycle.h>
 #include <kksstateform.h>
 #include "defines.h"
+#include "KKSHistogram.h"
 
 /*
  Заголовочные ф-лы генератора отчетов
@@ -394,7 +396,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
     else
         mainLayout->addWidget (scSysAttrs, 1, 0, 1, 1);
 
-    // objEditorWidget->clearAttributes ();
+    //проверяем, надо ли создавать QTabWidget для вложений (атрибут многие-ко-многим и подчиненные таблицы справочников)
     QTabWidget * tabEnc = 0;
     bool isAttrCheckEx = false;
     for (KKSMap<int, KKSCategoryAttr *>::const_iterator pa = wCat->attributes().constBegin(); \
@@ -413,7 +415,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
 
     QGridLayout * gAttachLay = 0;
     QWidget * attachW = 0;
-    if (io || isAttrCheckEx)
+    if ( (io && io->category() && io->category()->tableCategory() ) || isAttrCheckEx) //т.е. справочники или если имеется атрибут "многие-ко-многим"
     {
         attachW = new QWidget ();
         tabObj->addTab (attachW, tr ("Tables"));
@@ -423,6 +425,49 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
 
         objEditorWidget->setRecTab (tabEnc);
     }
+
+    //проверяем, надо ли создавать QTabWidget для ГИС
+    bool isAttrMap = false;
+    for (KKSMap<int, KKSCategoryAttr *>::const_iterator pa = wCat->attributes().constBegin(); 
+            pa != wCat->attributes().constEnd() && !isAttrMap; 
+            pa++)
+    {
+         isAttrMap = isAttrMap || 
+                     pa.value()->type ()->attrType() == KKSAttrType::atVectorLayer || 
+                     pa.value()->type ()->attrType() == KKSAttrType::atRasterLayer ||
+                     pa.value()->type ()->attrType() == KKSAttrType::atGISMap;
+    }
+    
+    if (wCat && wCat->tableCategory () && !isAttrMap)
+    {
+        const KKSCategory * tCat = wCat->tableCategory ();
+        for (KKSMap<int, KKSCategoryAttr *>::const_iterator pa = tCat->attributes().constBegin(); 
+                pa != tCat->attributes().constEnd() && !isAttrCheckEx; 
+                pa++)
+        {
+             isAttrMap = isAttrMap || 
+                         pa.value()->type ()->attrType() == KKSAttrType::atVectorLayer || 
+                         pa.value()->type ()->attrType() == KKSAttrType::atRasterLayer ||
+                         pa.value()->type ()->attrType() == KKSAttrType::atGISMap;
+        }
+    }
+
+    QGridLayout * gMapLay = 0;
+    QWidget * mapWParent = 0;
+    //QWidget * tabM = 0;
+    if (isAttrMap)
+    {
+        mapWParent = new QWidget (tabObj);
+        tabObj->addTab (mapWParent, tr("Map"));
+        tabObj->setCurrentIndex (tabObj->count()-1);
+        gMapLay = new QGridLayout (mapWParent);
+        //tabM = new QWidget (mapWParent);
+
+        //objEditorWidget->setMapWidget (tabM);
+        objEditorWidget->setMapWidget (mapWParent);
+    }
+
+
     nCount = setAttributes (tSystem, obj, attrWidget, gAttrLay, wCat, wObjE, tableName, objEditorWidget);
 
     objEditorWidget->setSysAttrWidgets (qobject_cast<QWidget *>(scSysAttrs->parent()), scSysAttrs, attrWidget);
@@ -450,84 +495,58 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
         //
         //tabEnc = new QTabWidget (attachW);
         
-        gAttachLay->addWidget (tabEnc, 0, 0, 2, 1);//, Qt::AlignTop);
-#if 0
-        QWidget * indWidget = new QWidget ();
-        QGridLayout * gIndLay = new QGridLayout (indWidget);
-        this->setIndicators(io, indWidget, gIndLay, objEditorWidget);
-        int nInd = tabObj->addTab(indWidget, tr("Indicators"));
-        qDebug () << __PRETTY_FUNCTION__ << nInd;
-        objEditorWidget->setIndicatorNumber (nInd);
-        
-
-        KKSRecWidget * indicesW = m_indf->getIOIndices (io, objEditorWidget);
-        connect (indicesW,
-                 SIGNAL (addEntity (QAbstractItemModel *, const QModelIndex&)),
-                 objEditorWidget,
-                 SLOT (addIndex (QAbstractItemModel *, const QModelIndex&))
-                );
-        connect (indicesW,
-                 SIGNAL (editEntity (QAbstractItemModel *, const QModelIndex&)),
-                 objEditorWidget,
-                 SLOT (editIndex (QAbstractItemModel *, const QModelIndex&))
-                );
-        connect (indicesW,
-                 SIGNAL (delEntity (QAbstractItemModel *, const QModelIndex&)),
-                 objEditorWidget,
-                 SLOT (delIndex (QAbstractItemModel *, const QModelIndex&))
-                );
-        connect (indicesW,
-                 SIGNAL (refreshMod (QAbstractItemModel *)),
-                 objEditorWidget,
-                 SLOT (refreshIndices (QAbstractItemModel *))
-                );
-        tabObj->addTab (indicesW, tr("Indices"));
-#endif
-        QToolButton * tbAddTable = new QToolButton (attachW);
-        tbAddTable->setText ("...");// tr ("Add another table"),
-        QSizePolicy tbSp (QSizePolicy::Minimum, QSizePolicy::Minimum);
-        tbAddTable->setSizePolicy (tbSp);
-        tbAddTable->setEnabled (!io->isSystem ());
-        gAttachLay->addWidget (tbAddTable, 0, 1, 1, 1, Qt::AlignRight | Qt::AlignTop);
-        bool isVisible = (io->category() && io->category()->tableCategory()) || (wCat && wCat->tableCategory());
-        tbAddTable->setVisible (isVisible);
-        connect (tbAddTable, SIGNAL (clicked()), objEditorWidget, SLOT (addAnotherTable()) );
-        connect (objEditorWidget, SIGNAL (addAnotherTable (KKSObject *, KKSObjEditor *)), this, SLOT (addIOTable (KKSObject *, KKSObjEditor *)) );
-        KKSRecWidget * recW (0);
-        if (io->category() && io->category()->tableCategory())
+        if( (io->category() && io->category()->tableCategory() ) || isAttrCheckEx)
         {
-            KKSTemplate * tChild = NULL;
-            tChild = new KKSTemplate (io->tableTemplate() != 0 ? *(io->tableTemplate()) : io->category()->tableCategory()->defTemplate());
-            QWidget * copiesW = new QWidget ();
-            QGridLayout *gRecLay = new QGridLayout (copiesW);
-            recW = KKSViewFactory::createView (tChild, objEditorWidget, io, loader, filters, 0);//copiesW);
-            KKSList<KKSTemplate*> lTempls = loader->loadCategoryTemplates (io->category()->tableCategory()->id());
-            int nTemplC = lTempls.count();
-            recW->actSetView->setEnabled ( nTemplC > 0 );
-            objEditorWidget->setRecordsWidget (recW);
-            tabEnc->insertTab (0, copiesW, io->category()->tableCategory()->name());
-            gRecLay->addWidget (recW, 0, 0, 1, 1);
-            tChild->release();
-        }
-        else if (wCat && wCat->tableCategory())
-        {
-            KKSList<KKSTemplate*> lTempls = loader->loadCategoryTemplates (wCat->tableCategory()->id());
-            int nTemplC = lTempls.count();
-            KKSTemplate *tChild = nTemplC > 0 ? lTempls[0] : new KKSTemplate (wCat->tableCategory()->defTemplate());
+            gAttachLay->addWidget (tabEnc, 0, 0, 2, 1);//, Qt::AlignTop);
 
-            QWidget * copiesW = new QWidget ();
-            QGridLayout *gRecLay = new QGridLayout ();
-            copiesW->setLayout (gRecLay);
-            recW = KKSViewFactory::createView (tChild, objEditorWidget, io, loader, filters, 0);//copiesW);
-            recW->actSetView->setEnabled ( nTemplC > 0 );
-            objEditorWidget->setRecordsWidget (recW);
-            tabEnc->insertTab (0, copiesW, wCat->tableCategory()->name() );
-            gRecLay->addWidget (recW, 0, 0, 1, 1);
-            if (nTemplC <= 0)
-                tChild->release ();
+            QToolButton * tbAddTable = new QToolButton (attachW);
+            tbAddTable->setText ("...");// tr ("Add another table"),
+            QSizePolicy tbSp (QSizePolicy::Minimum, QSizePolicy::Minimum);
+            tbAddTable->setSizePolicy (tbSp);
+            tbAddTable->setEnabled (!io->isSystem ());
+            gAttachLay->addWidget (tbAddTable, 0, 1, 1, 1, Qt::AlignRight | Qt::AlignTop);
+            bool isVisible = (io->category() && io->category()->tableCategory()) || (wCat && wCat->tableCategory());
+            tbAddTable->setVisible (isVisible);
+            
+            connect (tbAddTable, SIGNAL (clicked()), objEditorWidget, SLOT (addAnotherTable()) );
+            connect (objEditorWidget, SIGNAL (addAnotherTable (KKSObject *, KKSObjEditor *)), this, SLOT (addIOTable (KKSObject *, KKSObjEditor *)) );
+            
+            KKSRecWidget * recW (0);
+            if (io->category() && io->category()->tableCategory())
+            {
+                KKSTemplate * tChild = NULL;
+                tChild = new KKSTemplate (io->tableTemplate() != 0 ? *(io->tableTemplate()) : io->category()->tableCategory()->defTemplate());
+                QWidget * copiesW = new QWidget ();
+                QGridLayout *gRecLay = new QGridLayout (copiesW);
+                recW = KKSViewFactory::createView (tChild, objEditorWidget, io, loader, filters, 0);//copiesW);
+                KKSList<KKSTemplate*> lTempls = loader->loadCategoryTemplates (io->category()->tableCategory()->id());
+                int nTemplC = lTempls.count();
+                recW->actSetView->setEnabled ( nTemplC > 0 );
+                objEditorWidget->setRecordsWidget (recW);
+                tabEnc->insertTab (0, copiesW, io->category()->tableCategory()->name());
+                gRecLay->addWidget (recW, 0, 0, 1, 1);
+                tChild->release();
+            }
+            else if (wCat && wCat->tableCategory())
+            {
+                KKSList<KKSTemplate*> lTempls = loader->loadCategoryTemplates (wCat->tableCategory()->id());
+                int nTemplC = lTempls.count();
+                KKSTemplate *tChild = nTemplC > 0 ? lTempls[0] : new KKSTemplate (wCat->tableCategory()->defTemplate());
+
+                QWidget * copiesW = new QWidget ();
+                QGridLayout *gRecLay = new QGridLayout ();
+                copiesW->setLayout (gRecLay);
+                recW = KKSViewFactory::createView (tChild, objEditorWidget, io, loader, filters, 0);//copiesW);
+                recW->actSetView->setEnabled ( nTemplC > 0 );
+                objEditorWidget->setRecordsWidget (recW);
+                tabEnc->insertTab (0, copiesW, wCat->tableCategory()->name() );
+                gRecLay->addWidget (recW, 0, 0, 1, 1);
+                if (nTemplC <= 0)
+                    tChild->release ();
+            }
+            else
+                tabObj->setCurrentIndex (0);
         }
-        else
-            tabObj->setCurrentIndex (0);
 
         //
         // Дополнительные таблицы, если таковые имеются
@@ -583,9 +602,17 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
     else
         tabObj->setCurrentIndex (0);
 
-    if ((isAttrCheckEx && io) ||
-            (tabEnc && tabEnc->count () > 0))
+    //если привутствует атрибут типа ГИС (векторный слой, растровый слой, карта)
+    if (isAttrMap){
+        //gMapLay->addW idget(tabM, 0, 0, 1, 1);
+        //gMapLay->setMargin(0);
+        //tabObj->setCurrentWidget(mapWParent);
+    }
+
+    if (tabEnc && tabEnc->count () > 0)
+    {
         tabEnc->setCurrentIndex (0);
+    }
 
     if (!io)
     {
@@ -604,6 +631,20 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
         gFilesLay->addWidget (W, 0, 0, 1, 1);
 
     }
+
+    //ksa
+    //!!!!!****TESTING****!!!!!
+    // окно с картой 
+    /*
+    QWidget * mapW = new QWidget ();
+    QGridLayout *gMapLay = new QGridLayout ();
+    mapW->setLayout (gMapLay);
+    KKSMapWidget * W = new KKSMapWidget();
+    W->setParent(objEditorWidget);
+    //objEditorWidget->addFileWidget (W);
+    tabObj->addTab (mapW, tr("Map"));
+    gMapLay->addWidget (W, 0, 0, 1, 1);
+*/
 
     //системные параметры для записей пользовательских справочников
     if(!io && wObjE->io()->id() > _MAX_SYS_IO_ID_ ){
@@ -803,7 +844,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditorParam (int idObject,// идент
     else
         mainLayout->addWidget (scSysAttrs, 1, 0, 1, 1);
 
-    // objEditorWidget->clearAttributes ();
+    //проверяем, надо ли создавать QTabWidget для вложений (атрибут многие-ко-многим и подчиненные таблицы справочников)
     QTabWidget * tabEnc = 0;
     bool isAttrCheckEx = false;
     for (KKSMap<int, KKSCategoryAttr *>::const_iterator pa = wCat->attributes().constBegin(); \
@@ -832,6 +873,47 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditorParam (int idObject,// идент
 
         objEditorWidget->setRecTab (tabEnc);
     }
+
+    //проверяем, надо ли создавать QTabWidget для ГИС
+    bool isAttrMap = false;
+    for (KKSMap<int, KKSCategoryAttr *>::const_iterator pa = wCat->attributes().constBegin(); \
+            pa != wCat->attributes().constEnd() && !isAttrCheckEx; \
+            pa++)
+    {
+         isAttrMap = isAttrMap || 
+                     pa.value()->type ()->attrType() == KKSAttrType::atVectorLayer ||
+                     pa.value()->type ()->attrType() == KKSAttrType::atRasterLayer ||
+                     pa.value()->type ()->attrType() == KKSAttrType::atGISMap;
+    }
+
+    if (wCat && wCat->tableCategory () && !isAttrMap)
+    {
+        const KKSCategory * tCat = wCat->tableCategory ();
+        for (KKSMap<int, KKSCategoryAttr *>::const_iterator pa = tCat->attributes().constBegin(); 
+                pa != tCat->attributes().constEnd() && !isAttrCheckEx; 
+                pa++)
+        {
+             isAttrMap = isAttrMap || 
+                         pa.value()->type ()->attrType() == KKSAttrType::atVectorLayer ||
+                         pa.value()->type ()->attrType() == KKSAttrType::atRasterLayer ||
+                         pa.value()->type ()->attrType() == KKSAttrType::atGISMap;
+        }
+    }
+
+    QGridLayout * gMapLay = 0;
+    QWidget * mapWParent = 0;
+    QWidget * tabM = 0;
+    if (io || isAttrMap)
+    {
+        mapWParent = new QWidget ();
+        tabObj->addTab (mapWParent, tr ("Map"));
+        tabObj->setCurrentIndex (tabObj->count ()-1);
+        gMapLay = new QGridLayout (mapWParent);
+        tabM = new QWidget (mapWParent);
+
+        objEditorWidget->setMapWidget (tabM);
+    }    
+    
     if (io && !io_aVals.isEmpty())
         this->setPreliminaryAttrs(io, io_aVals);
 
@@ -963,6 +1045,13 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditorParam (int idObject,// идент
         gAttachLay->addWidget (tabEnc, 0, 0, 1, 1);
     else
         tabObj->setCurrentIndex (0);
+
+    //если привутствует атрибут типа ГИС (векторный слой, растровый слой, карта)
+    if (isAttrMap){
+        gMapLay->addWidget(tabM, 0, 0, 1, 1);
+        gMapLay->setMargin(0);
+        tabObj->setCurrentWidget(mapWParent);
+    }
 
     if ((isAttrCheckEx && io) ||
             (tabEnc && tabEnc->count () > 0))
@@ -1384,6 +1473,7 @@ void KKSObjEditorFactory :: initIOAttrs (KKSObject * io, KKSObjectExemplar * wOb
     bool isEn (tcList.count () > 0);
     if (isEn)
         io->setAttrTemplate (tcList[0]);
+    
     gIOLay->addWidget (pbSetView, 1, 1, 1, 1);
     pbSetView->setEnabled (isEn);
     QSpacerItem *sPar = new QSpacerItem (20, 40, QSizePolicy::Expanding, QSizePolicy::Minimum);
@@ -2975,6 +3065,19 @@ int KKSObjEditorFactory :: setAttributes (const KKSTemplate *t,
         if (!isAtCheckListEx && isGrouped)
             continue;
 
+        //
+        // проверка на то, что группа может содержать только атрибуты с типом KKSAttrType::atGISMap или KKSAttrType::atVectorLayer или KKSAttrType::atRasterLayer
+        //
+        bool isAtMap = !aGroup->childGroups().isEmpty();//false;
+        for (int ii=0; ii<attrs_list.count() && !isAtMap; ii++)
+            isAtMap = isAtMap || 
+                      (attrs_list[ii]->type()->attrType() != KKSAttrType::atVectorLayer &&
+                       attrs_list[ii]->type()->attrType() != KKSAttrType::atRasterLayer &&
+                       attrs_list[ii]->type()->attrType() != KKSAttrType::atGISMap);
+
+        if (!isAtMap && isGrouped)
+            continue;
+
         QGroupBox *gbAttr = 0;
         QGridLayout *gbLay = 0;
         if (isGrouped)
@@ -3100,6 +3203,19 @@ int KKSObjEditorFactory :: setAttributes (const KKSTemplate *t,
             isAtCheckListEx = isAtCheckListEx || (attrs_list[ii]->type()->attrType() != KKSAttrType::atCheckListEx);
 
         if (!isAtCheckListEx && isIOGrouped)
+            continue;
+
+        //
+        // проверка на то, что группа может содержать только атрибуты с типом KKSAttrType::atVectorLayer или KKSAttrType::atRasterLayer или KKSAttrType::atGISMap
+        //
+        bool isAtMap = false;
+        for (int ii=0; ii<attrs_list.count() && !isAtMap; ii++)
+            isAtMap = isAtMap || 
+                      (attrs_list[ii]->type()->attrType() != KKSAttrType::atVectorLayer && 
+                       attrs_list[ii]->type()->attrType() != KKSAttrType::atRasterLayer &&
+                       attrs_list[ii]->type()->attrType() != KKSAttrType::atGISMap);
+
+        if (!isAtMap && isIOGrouped)
             continue;
 
         QGroupBox *gbAttr = 0;
@@ -3270,6 +3386,19 @@ int KKSObjEditorFactory :: setIndicators (const KKSTemplate *t,
             isAtCheckListEx = isAtCheckListEx || (attrs_list[ii]->type()->attrType() != KKSAttrType::atCheckListEx);
 
         if (!isAtCheckListEx && isGrouped)
+            continue;
+
+        //
+        // проверка на то, что группа может содержать только атрибуты с типом KKSAttrType::atVectorLayer или KKSAttrType::atRasterLayer или KKSAttrType::atGISMap
+        //
+        bool isAtMap = !aGroup->childGroups().isEmpty();//false;
+        for (int ii=0; ii<attrs_list.count() && !isAtMap; ii++)
+            isAtMap = isAtMap || 
+                      (attrs_list[ii]->type()->attrType() != KKSAttrType::atVectorLayer &&
+                       attrs_list[ii]->type()->attrType() != KKSAttrType::atRasterLayer &&
+                       attrs_list[ii]->type()->attrType() != KKSAttrType::atGISMap);
+
+        if (!isAtMap && isGrouped)
             continue;
 
         QGroupBox *gbAttr = 0;
@@ -4562,11 +4691,7 @@ void KKSObjEditorFactory :: regroupAttrs (QWidget *wIOAttr, QScrollArea *scIOatt
     QWidget *ioAttrsW = new QWidget ();
     QGridLayout *gIOAttrLay = new QGridLayout (ioAttrsW);
     ioAttrsW->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Fixed);
-#ifdef Q_CC_MSVC
     if (isSystem == iacTableAttr)
-#else
-    if (isSystem == iacTableAttr)
-#endif
     {
         editor->setSysAttrWidgets (wIOAttr, scIOAttrs, ioAttrsW);
         editor->clearSysOpts ();
@@ -4578,11 +4703,7 @@ void KKSObjEditorFactory :: regroupAttrs (QWidget *wIOAttr, QScrollArea *scIOatt
     }
     
     ioAttrsW->setLayout (gIOAttrLay);
-#ifdef Q_CC_MSVC
     if (isSystem == iacTableAttr)
-#else
-    if (isSystem == iacTableAttr)
-#endif
     {
         KKSObjectExemplar *wObjE = editor->getObjectEx();//KKSConverter::objToExemplar (loader, wObj);// loader->loadEIO (idObj, io);
         if (!wObjE)
@@ -5034,6 +5155,27 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io,
                      iType == KKSAttrType::atXMLDoc)
             {
                 val = KKSValue (QString("''"), iType);
+            }
+            //ksa
+            else if (iType == KKSAttrType::atHistogram)
+            {
+                KKSHistogram h;
+                val = KKSValue(h.toString(), iType);
+            }
+            //ksa
+            else if (iType == KKSAttrType::atVectorLayer)
+            {
+                val = KKSValue(QString("''"), iType);
+            }
+            //ksa
+            else if (iType == KKSAttrType::atRasterLayer)
+            {
+                val = KKSValue(QString("''"), iType);
+            }
+            //ksa
+            else if (iType == KKSAttrType::atGISMap)
+            {
+                val = KKSValue(QString("''"), iType);
             }
             else{
                 QString av_str = oesList[i][j+1];

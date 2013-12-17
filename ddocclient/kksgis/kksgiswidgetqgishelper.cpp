@@ -39,7 +39,7 @@
 
 
 
-KKSGISWidgetQGIS::KKSGISWidgetQGIS(QWidget* parent, Qt::WFlags fl)
+KKSGISWidgetQGIS::KKSGISWidgetQGIS(bool withSubWindows, QWidget* parent, Qt::WFlags fl)
     : KKSGISWidget(parent, fl),
     mpSelectedLayer(NULL),
     mpCoordsLabel(NULL),
@@ -49,9 +49,13 @@ KKSGISWidgetQGIS::KKSGISWidgetQGIS(QWidget* parent, Qt::WFlags fl)
     m_badLayerHandler(NULL),
     mpMapCanvas(NULL),
     mpMapLegend(NULL),
+    mpMapLegendWidget(NULL),
     mpMapLayerOrder(NULL),
     mpMapLayerOrderWidget(NULL),
-    mpMapLegendWidget(NULL),
+    mProgressBar(NULL),
+    mScaleEditValidator(NULL),
+    mScaleLabel(NULL),
+    mScaleEdit(NULL),
     mpMapToolBar(NULL),
     mpPanTool(NULL),
     mpZoomInTool(NULL),
@@ -90,6 +94,8 @@ KKSGISWidgetQGIS::KKSGISWidgetQGIS(QWidget* parent, Qt::WFlags fl)
     dnThemTaskSpecBath = NULL; //???
     azWorkList.clear();
 
+    m_bWithSubwindows = withSubWindows; //надо ли создавать дополнительные окна (меню, тулбар, статусбыр и т.п.)
+
     initStatusBar();
     initUserSettings();
     initMapCanvas();
@@ -108,7 +114,6 @@ KKSGISWidgetQGIS::KKSGISWidgetQGIS(QWidget* parent, Qt::WFlags fl)
 
     this->azSetTitleWindow(*this);
 
-    mpStatusBar->showMessage("ПК Репер готов к работе.");
     m_badLayerHandler = new KKSBadLayerHandler;
     QgsProject::instance()->setBadLayerHandler(m_badLayerHandler);
 
@@ -116,8 +121,8 @@ KKSGISWidgetQGIS::KKSGISWidgetQGIS(QWidget* parent, Qt::WFlags fl)
     mVectorFileFilter = QgsProviderRegistry::instance()->fileVectorFilters();
     mRasterFileFilter = QgsProviderRegistry::instance()->fileRasterFilters();
 
-  mInternalClipboard = new QgsClipboard; // create clipboard
-  connect( mInternalClipboard, SIGNAL( changed() ), this, SLOT( clipboardChanged() ) );
+    mInternalClipboard = new QgsClipboard; // create clipboard
+    connect( mInternalClipboard, SIGNAL( changed() ), this, SLOT( clipboardChanged() ) );
 
     mVectorLayerTools = new QgsGuiVectorLayerTools();
     ((QgsGuiVectorLayerTools *)mVectorLayerTools)->setWorkingWidget(this);
@@ -127,6 +132,8 @@ KKSGISWidgetQGIS::KKSGISWidgetQGIS(QWidget* parent, Qt::WFlags fl)
     context.setVectorLayerTools( vectorLayerTools() );
     editorWidgetRegistry->registerWidget( "RelationReference", new QgsRelationReferenceFactory( context, tr( "Relation Reference" ) ) );
 
+    if(mpStatusBar)
+        mpStatusBar->showMessage("ПК Репер готов к работе.");
 }
 
 
@@ -135,9 +142,16 @@ KKSGISWidgetQGIS::~KKSGISWidgetQGIS()
   delete mpZoomInTool;
   delete mpZoomOutTool;
   delete mpPanTool;
-  delete mpMapToolBar;
-  delete mpMenuBar;
-  delete mpStatusBar;
+  
+  if(mpMapToolBar)
+      delete mpMapToolBar;
+  
+  if(mpMenuBar)
+    delete mpMenuBar;
+  
+  if(mpStatusBar)
+      delete mpStatusBar;
+  
   delete mpMapCanvas;
 
   delete mInternalClipboard;
@@ -146,6 +160,9 @@ KKSGISWidgetQGIS::~KKSGISWidgetQGIS()
    
 void KKSGISWidgetQGIS::initStatusBar()
 {
+    if(!m_bWithSubwindows)
+        return;
+
     mpStatusBar = new QStatusBar();
     if(!mpStatusBar)
         return;
@@ -270,6 +287,9 @@ void KKSGISWidgetQGIS::initMapCanvas()
 
 void KKSGISWidgetQGIS::initMapLegend()
 {
+    if(!m_bWithSubwindows)
+        return;
+
     // "theMapLegend" used to find this canonical instance later
     mpMapLegend = new QgsLegend( mpMapCanvas, this, "theMapLegend" );
     mpMapLegend->setWorkingWidget(this);
@@ -308,6 +328,7 @@ void KKSGISWidgetQGIS::initMapLegend()
     l->addWidget( mpMapLayerOrder );
     l->addWidget( orderCb );
     mpMapLayerOrderWidget->setLayout( l );
+
     //mLayerOrderDock = new QDockWidget( tr( "Layer order" ), this );
     //mLayerOrderDock->setObjectName( "LayerOrder" );
     //mLayerOrderDock->setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );
@@ -330,51 +351,6 @@ QWidget * KKSGISWidgetQGIS::mapLayerOrderWidget()
 {
     return mpMapLayerOrderWidget;
 }
-
-/*
-void KKSGISWidgetQGIS::initLegend()
-{
-    mpTableLegend = new QTableWidget(this);
-    mpTableLegend->setColumnCount(3);
-    
-    mpTableLegend->setObjectName(QString::fromUtf8("tableLegend"));
-    
-    QSizePolicy sizePolicy2(QSizePolicy::MinimumExpanding, QSizePolicy::Expanding);
-    sizePolicy2.setHorizontalStretch(0);
-    sizePolicy2.setVerticalStretch(0);
-    sizePolicy2.setHeightForWidth(mpTableLegend->sizePolicy().hasHeightForWidth());
-    
-    mpTableLegend->setSizePolicy(sizePolicy2);
-    
-    mpTableLegend->setMinimumSize(QSize(200, 200));
-    mpTableLegend->setFrameShape(QFrame::StyledPanel);
-    mpTableLegend->setFrameShadow(QFrame::Plain);
-    mpTableLegend->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    mpTableLegend->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    mpTableLegend->setSelectionBehavior(QAbstractItemView::SelectRows);
-    mpTableLegend->setColumnCount(3);
-    mpTableLegend->verticalHeader()->setVisible(false);
-    mpTableLegend->verticalHeader()->setHighlightSections(false);
-
-    mpTableLegend->setColumnWidth(0, 25);
-    mpTableLegend->setColumnWidth(1, 185);
-    mpTableLegend->setColumnWidth(2, 50);
-    //tableLegend->setContextMenuPolicy(Qt::CustomContextMenu);
-    //tableLegend->setSelectionBehavior(QAbstractItemView::SelectRows);
-
-    //mpContextLegendMenu = new QMenu(tableLegend);
-    //mpContextLegendMenu->addAction(mpContextShowExtent);
-    //mpContextLegendMenu->addAction(mpContextRemoveLayer);
-    //tableLegend->addAction(mpContextShowExtent);
-    //tableLegend->addAction(mpContextRemoveLayer);
-}
-*/
-/*
-QTableWidget * KKSGISWidgetQGIS::tableLegend()
-{
-    return mpTableLegend;
-}
-*/
 
 void KKSGISWidgetQGIS::initActions()
 {
@@ -535,7 +511,10 @@ void KKSGISWidgetQGIS::initConnections()
     //connect(this->mpActionFileExit, SIGNAL(triggered()), this, SLOT(SLOTmpActionFileExit()));
 
     connect(this->mpRegistry, SIGNAL(layerWasAdded(QgsMapLayer *)), this, SLOT(addLayerToTOC(QgsMapLayer *)));
-    connect(this->mpCoordsEdit, SIGNAL(editingFinished()), this, SLOT( SLOTazCoordsCenter()));
+    
+    if(mpCoordsEdit)
+        connect(this->mpCoordsEdit, SIGNAL(editingFinished()), this, SLOT( SLOTazCoordsCenter()));
+    
     connect(this->mpActionBathymetry, SIGNAL(triggered()), this, SLOT(SLOTazThemTaskSpectralBathynometry()));
 
     connect( mpMapCanvas, SIGNAL(xyCoordinates(const QgsPoint &)), this, SLOT(SLOTazShowMouseCoordinate(const QgsPoint &)));
@@ -555,6 +534,9 @@ void KKSGISWidgetQGIS::initConnections()
 void KKSGISWidgetQGIS::initToolBar()
 {
     mpMapToolBar = new QToolBar(tr("Стандартная панель инструментов"));
+    if(!m_bWithSubwindows)
+        return;
+
     mpMapToolBar->addAction(mpActionZoomIn);
     mpMapToolBar->addAction(mpActionZoomOut);
     mpMapToolBar->addAction(mpActionPan);
@@ -578,6 +560,9 @@ QToolBar * KKSGISWidgetQGIS::toolBar() const
 
 void KKSGISWidgetQGIS::initMenuBar()
 {
+    if(!m_bWithSubwindows)
+        return;
+
     mpMenuBar = new QMenuBar();
 
     QMenu * menuFile = new QMenu(tr("Файл"));
@@ -663,12 +648,18 @@ void KKSGISWidgetQGIS::azSetTitleWindow(QWidget & azApp)
 
 void KKSGISWidgetQGIS::userScale()
 {
+    if(!mScaleEdit)
+        return;
+
   // Why has MapCanvas the scale inverted?
   mpMapCanvas->zoomScale( 1.0 / mScaleEdit->scale() );
 }
 
 void KKSGISWidgetQGIS::showScale( double theScale )
 {
+    if(!mScaleEdit)
+        return;
+
     // Why has MapCanvas the scale inverted?
     mScaleEdit->setScale( 1.0 / theScale );
 
@@ -764,6 +755,9 @@ void KKSGISWidgetQGIS::copyStyle( QgsMapLayer * sourceLayer )
 
 void KKSGISWidgetQGIS::pasteStyle( QgsMapLayer * destinationLayer )
 {
+  if(!mpMapLegend)
+      return;
+
   QgsMapLayer *selectionLayer = destinationLayer ? destinationLayer : activeLayer();
   if ( selectionLayer )
   {
@@ -998,6 +992,9 @@ void KKSGISWidgetQGIS::duplicateLayers( QList<QgsMapLayer *> lyrList )
 
 void KKSGISWidgetQGIS::attributeTable()
 {
+  if(!mpMapLegend)
+    return;
+  
   if ( mpMapCanvas && mpMapCanvas->isDrawing() )
   {
     return;
@@ -1501,6 +1498,9 @@ void KKSGISWidgetQGIS::setTheme( QString theThemeName )
 // slot to update the progress bar in the status bar
 void KKSGISWidgetQGIS::showProgress( int theProgress, int theTotalSteps )
 {
+  if(!mProgressBar)
+      return ;
+
   if ( theProgress == theTotalSteps )
   {
     mProgressBar->reset();
@@ -2543,10 +2543,14 @@ void KKSGISWidgetQGIS::saveEdits()
   if ( mpMapCanvas && mpMapCanvas->isDrawing() )
     return;
 
+  if(!mpMapLegend)
+      return;
+
   foreach ( QgsMapLayer * layer, mpMapLegend->selectedLayers() )
   {
     saveEdits( layer, true, false );
   }
+
   mpMapCanvas->refresh();
   activateDeactivateLayerRelatedActions( activeLayer() );
 }
@@ -2653,6 +2657,9 @@ void KKSGISWidgetQGIS::editPaste( QgsMapLayer *destinationLayer )
 
 void KKSGISWidgetQGIS::deleteSelected( QgsMapLayer *layer, QWidget* parent )
 {
+  if(!mpMapLegend)
+      return;
+
   if ( !layer )
   {
     layer = mpMapLegend->currentLayer();
@@ -2736,6 +2743,10 @@ bool KKSGISWidgetQGIS::verifyEditsActionDialog( const QString& act, const QStrin
 QList<QgsMapLayer *> KKSGISWidgetQGIS::editableLayers( bool modified ) const
 {
   QList<QgsMapLayer*> editLayers;
+
+  if(!mpMapLegend)
+    return editLayers;
+
   // use legend layers (instead of registry) so QList mirrors its order
   QList<QgsMapLayer*> layers = mpMapLegend->layers();
   if ( layers.count() > 0 )

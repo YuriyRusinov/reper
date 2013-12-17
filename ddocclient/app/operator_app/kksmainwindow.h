@@ -60,6 +60,9 @@ Q_OBJECT
                                     const QString & value, 
                                     const QString & extraTitle);
 
+        void addMapDockWidgets(QDockWidget *, QDockWidget *);
+        void destroyMapDockWidgets(QDockWidget *, QDockWidget *);
+
         void slotCreateNewCatEditor (KKSCatEditor *cEditor);
         void slotCreateNewTemplateEditor (KKSTemplateEditor *tEditor);
         void slotCreateNewRubricEditor (KKSIncludesWidget *rEditor);

@@ -41,6 +41,8 @@ class KKSVideoPlayer;
 class KKSIntervalWidget;
 class KKSHIntervalW;
 class KKSColorWidget;
+class KKSHistWidget;
+class KKSMapWidget;
 
 class _GUI_EXPORT KKSAValWidget : public QDialog {
 public:
@@ -92,6 +94,10 @@ private:
     KKSIntervalWidget * iValW;
     KKSHIntervalW * iValWH;
     KKSColorWidget * iColW;
+
+    //ksa
+    KKSMapWidget * iMapVal;//ГИС-объект (карта, векторный слой, растровый слой)
+    KKSHistWidget * iHistVal; //Гистограмма
 
     QToolButton * tbUp;
     QToolButton * tbDown;

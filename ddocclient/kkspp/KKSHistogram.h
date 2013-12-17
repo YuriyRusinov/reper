@@ -16,7 +16,8 @@
 class _PP_EXPORT KKSHistogram
 {
 public:
-    KKSHistogram(const QMap<int, double>& data=QMap<int, double>(), double xmin=0.0, double xmax=0.0, int n=-1);
+    KKSHistogram(const QMap<int, double>& data, double xmin, double xmax, int n);
+    KKSHistogram();
     KKSHistogram(const KKSHistogram& orig);
     virtual ~KKSHistogram();
     
@@ -30,15 +31,23 @@ public:
     int size (void) const;
     void setSize (int n);
 
+    //ksa
+    QString toString() const;
+    bool fromString(const QString & str);
+
+    bool isEmpty() const;
+
 private:
     QMap<int, double> dHist;
     double m_xmin;
     double m_xmax;
     int m_num;
 
+    bool m_isEmpty;
+
 };
 
-Q_DECLARE_METATYPE (const KKSHistogram*);
+Q_DECLARE_METATYPE (KKSHistogram);
 
 #endif	/* KKSHISTOGRAM_H */
 

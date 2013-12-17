@@ -1,3 +1,5 @@
+#include "kkssito.h"
+
 #include <QtGlobal>
 #include <QtDebug>
 #include <QLocale>
@@ -12,7 +14,7 @@
 #include <QTextStream>
 #include <QString>
 
-#include "kkssito.h"
+
 #include "defines.h"
 #include <kkspgdatabase.h>
 #include <kksdatabase.h>
@@ -40,6 +42,11 @@
 #include "choosedlform.h"
 
 #include "kksclient_name.h"
+
+#ifdef __USE_QGIS__
+#include <qgsapplication.h>
+#include <qgsproviderregistry.h>
+#endif
 
 __CORE_EXPORT KKSSito * KKSSito::self = 0;
 
@@ -123,6 +130,8 @@ KKSSito::KKSSito(const QString & userName, bool msgToWindow) :
     loadMsgJSetings();
     loadAccLevels();
 
+    loadQGISPlugins(); //only if qgis linked
+
     initFactories();
     
     initLogStream();
@@ -132,6 +141,42 @@ KKSSito::KKSSito(const QString & userName, bool msgToWindow) :
     if(msgToWindow)
         qInstallMsgHandler(KKSDbgOutputHandler);
 
+}
+
+void KKSSito::loadQGISPlugins()
+{
+#ifdef __USE_QGIS__
+    KKSSettings *kksSettings = kksSito->getKKSSettings();
+    if(!kksSettings)
+        return;
+    
+    QString plugins_path = getWDir() + "/plugins";
+    
+    kksSettings->beginGroup (QString("System settings/") + kksSitoNameEng);
+
+    if ( kksSettings->getParam("QGIS_plugins_path").isEmpty() )
+    {
+        kksSettings->endGroup();
+        kksSettings->writeSettings (QString("System settings/") + kksSitoNameEng, 
+                                     "QGIS_plugins_path", 
+                                     plugins_path);
+        kksSettings->beginGroup (QString("System settings/") + kksSitoNameEng);
+    }
+    
+    plugins_path = kksSettings->getParam("QGIS_plugins_path");
+
+    kksSettings->endGroup();
+    
+    qDebug() << "Try to load QGIS plugins from " << plugins_path;
+    
+    QgsApplication * a = static_cast<QgsApplication *>(QApplication::instance());
+    if(!a)
+        qFatal(tr("QgsApplication object does not exist!").toLocal8Bit().constData());
+
+    a->setPluginPath(plugins_path);
+    a->initQgis();
+
+#endif
 }
 
 void KKSSito::loadTranslator()
@@ -638,19 +683,30 @@ void KKSSito::loadLastSelectedFilter()
 }
 
 
-KKSSito * KKSSito::init (bool with_connect, const QString & userName, bool msgToWindow)
+KKSSito * KKSSito::init (int argc, 
+                         char *argv[], 
+                         bool with_connect, 
+                         const QString & userName, 
+                         bool msgToWindow)
 {
-    QApplication * app;
-	
-    if ( !QCoreApplication::instance() )
-    {
-        int argc = 1;
-        char ** argv = new char *;
-        argv[0] = new char;
-        app = new QApplication (argc, argv);
+    if ( self )
+        qFatal(tr("There should be only one KKSSito object").toLocal8Bit().constData());
+
+    if ( QCoreApplication::instance() ){
+        qFatal(tr("There are already exist a QApplication object. You did not create QApplication objects manually!").toLocal8Bit().constData());
     }
-    else
-        app = static_cast <QApplication *> (QCoreApplication::instance());
+
+    QApplication * app;
+
+#ifdef __USE_QGIS__
+    app = new QgsApplication(argc, argv, true);
+    //QgsApplication * a = static_cast <QgsApplication *> (app);
+    // ---- invoked in loadQGISPlugins ----
+    //a->setPluginPath(pluginPath);
+    //a->initQgis();
+#else
+    app = new QApplication(argc, argv);
+#endif
 
     KKSSito * xG0;
     bool bDel = false;

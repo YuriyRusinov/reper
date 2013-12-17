@@ -140,7 +140,7 @@ signals:
     void projectRead();
 
 private:
-    KKSGISWidgetQGIS(QWidget* parent = 0, Qt::WFlags fl = 0 );
+    KKSGISWidgetQGIS(bool withSubWindows, QWidget* parent = 0, Qt::WFlags fl = 0 );
     ~KKSGISWidgetQGIS();
 
 private slots:
@@ -325,7 +325,6 @@ private:
     QWidget * mpMapLegendWidget;
     QgsLayerOrder *mpMapLayerOrder;
     QWidget * mpMapLayerOrderWidget;
-    //QTableWidget * mpTableLegend;
     QList<QgsMapCanvasLayer> mpLayerSet;
     QgsPalLabeling* mLBL;
 
@@ -400,6 +399,8 @@ private:
 
     QString mpAppPath;
     QString m_pluginsDir;
+
+    bool m_bWithSubwindows;
 
     // dn's
     DNSpecBath *dnThemTaskSpecBath;

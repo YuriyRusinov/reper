@@ -89,7 +89,8 @@ KKSMainWindow::KKSMainWindow(QWidget *parent)
     KKSCatEditorFactory * catf = kksSito->catf ();
     KKSTemplateEditorFactory * tf = kksSito->tf ();
     KKSRubricFactory * rf = kksSito->rf ();
-    //KKSIndFactory * indf = kksSito->indf ();
+    KKSAttributesFactory * af = kksSito->attrf();
+
     connect (oef, 
              SIGNAL(editorCreated(KKSObjEditor *)), 
              this, 
@@ -119,6 +120,16 @@ KKSMainWindow::KKSMainWindow(QWidget *parent)
              SIGNAL (objEditorCreated (KKSObjEditor *)), 
              this, 
              SLOT (slotCreateNewObjEditor(KKSObjEditor*)));
+
+    connect (af, 
+             SIGNAL(mapCreated(QDockWidget *, QDockWidget *)), 
+             this, 
+             SLOT(addMapDockWidgets(QDockWidget *, QDockWidget *)));
+
+    connect (af, 
+             SIGNAL(mapAboutToDestroy(QDockWidget *, QDockWidget *)), 
+             this, 
+             SLOT(destroyMapDockWidgets(QDockWidget *, QDockWidget *)));
 
     init();
     
@@ -1475,4 +1486,27 @@ void KKSMainWindow::slotOpenLC()
     KKSObjEditor * lcEditor = qobject_cast<KKSObjEditor *>(catF->openLifeCycle());
 
     slotCreateNewObjEditor (lcEditor);
+}
+
+void KKSMainWindow::addMapDockWidgets(QDockWidget * legend, QDockWidget * layerOrder)
+{
+    legend->setParent(this);
+    layerOrder->setParent(this);
+    addDockWidget(Qt::LeftDockWidgetArea, legend);
+    addDockWidget(Qt::LeftDockWidgetArea, layerOrder);
+}
+
+void KKSMainWindow::destroyMapDockWidgets(QDockWidget * legend, QDockWidget * layerOrder)
+{
+    if(legend){
+        this->removeDockWidget(legend);
+        legend->setParent(0);
+        delete legend;
+    }
+    
+    if(layerOrder){
+        this->removeDockWidget(layerOrder);
+        layerOrder->setParent(0);
+        delete layerOrder;
+    }
 }

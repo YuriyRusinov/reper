@@ -16,6 +16,7 @@
 #include "KKSValue.h"
 #include "KKSAttrType.h"
 #include "defines.h"
+#include "KKSHistogram.h"
 
 ////////////////////////////////////////////////////////////////////////
 // Name:       KKSValue::KKSValue()
@@ -118,6 +119,30 @@ void KKSValue::verify(void) const
             m_isLiteral = true;
             m_isNull = false;
         }
+        else if(a_type == KKSAttrType::atHistogram)
+        {
+            //ksa
+            m_isLiteral = true;
+            m_isNull = true;
+        }
+        else if(a_type == KKSAttrType::atVectorLayer)
+        {
+            //ksa
+            m_isLiteral = true;
+            m_isNull = true;
+        }
+        else if(a_type == KKSAttrType::atRasterLayer)
+        {
+            //ksa
+            m_isLiteral = true;
+            m_isNull = true;
+        }
+        else if(a_type == KKSAttrType::atGISMap)
+        {
+            //ksa
+            m_isLiteral = true;
+            m_isNull = true;
+        }
         else if (a_type == KKSAttrType::atUUID)
         {
             m_isLiteral = true;
@@ -157,6 +182,33 @@ void KKSValue::verify(void) const
         return;
     }
 
+    //ksa
+    if(a_type == KKSAttrType::atHistogram){
+        if(m_value.canConvert<KKSHistogram>()){
+            m_isValid = true;
+        }
+        m_isLiteral = true;
+        return;
+    }
+    //ksa
+    if(a_type == KKSAttrType::atVectorLayer){
+        m_isValid = true;
+        m_isLiteral = true;
+        return;
+    }
+    //ksa
+    if(a_type == KKSAttrType::atRasterLayer){
+        m_isValid = true;
+        m_isLiteral = true;
+        return;
+    }
+    //ksa
+    if(a_type == KKSAttrType::atGISMap){
+        m_isValid = true;
+        m_isLiteral = true;
+        return;
+    }
+    
     if(a_type == KKSAttrType::atDate){
         if(m_value.canConvert(QVariant::Date)){
             m_isValid = true;
@@ -535,6 +587,59 @@ int KKSValue::setValue(const QString & _value, int _type)
         //qDebug () << __PRETTY_FUNCTION__ << dt << _value;
         m_value = dt;
     }
+    //ksa
+    else if(a_type == KKSAttrType::atHistogram){
+        if(_value.isEmpty()){
+            m_value = _value;
+            m_columnValue = value();
+            verify();
+            return OK_CODE;
+        }
+
+        KKSHistogram h;
+        bool ok = h.fromString(_value);
+        if(!ok){
+            m_isValid = false;
+            m_isLiteral = true;
+            return ERROR_CODE;
+        }
+        
+        m_value = m_value.fromValue<KKSHistogram>(h);
+    }
+    //ksa
+    else if(a_type == KKSAttrType::atVectorLayer){
+        if(_value.isEmpty()){
+            m_value = _value;
+            m_columnValue = value();
+            verify();
+            return OK_CODE;
+        }
+
+        m_value = _value;
+    }
+    //ksa
+    else if(a_type == KKSAttrType::atRasterLayer){
+        if(_value.isEmpty()){
+            m_value = _value;
+            m_columnValue = value();
+            verify();
+            return OK_CODE;
+        }
+
+        m_value = _value;
+    }
+    //ksa
+    else if(a_type == KKSAttrType::atGISMap){
+        if(_value.isEmpty()){
+            m_value = _value;
+            m_columnValue = value();
+            verify();
+            return OK_CODE;
+        }
+
+        m_value = _value;
+    }
+
     else if(a_type == KKSAttrType::atDate  &&
        _value != "current_timestamp" &&
 	   _value != "current_date")
@@ -746,6 +851,26 @@ QString KKSValue::value(void) const
     {
         return m_value.toStringList().join(",");
     }
+
+    //ksa
+    if(m_type == KKSAttrType::atHistogram){
+        KKSHistogram h = m_value.value<KKSHistogram>();
+
+        return h.toString();
+    }
+    //ksa
+    if(m_type == KKSAttrType::atVectorLayer){
+        return m_value.toString();
+    }
+    //ksa
+    if(m_type == KKSAttrType::atRasterLayer){
+        return m_value.toString();
+    }
+    //ksa
+    if(m_type == KKSAttrType::atGISMap){
+        return m_value.toString();
+    }
+
 
     if(m_type == KKSAttrType::atDouble){
         if(m_value.isNull())

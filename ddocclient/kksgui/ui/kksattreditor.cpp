@@ -115,7 +115,9 @@ KKSAttrEditor :: KKSAttrEditor (KKSAttribute *attr,
               << KKSAttrType::atCheckListEx 
               << KKSAttrType::atRecordColorRef
               << KKSAttrType::atRecordTextColorRef
-              << KKSAttrType::atObjRef;
+              << KKSAttrType::atObjRef
+              << KKSAttrType::atHistogram; //ksa
+
 
     this->init_widgets ();
 
@@ -188,17 +190,20 @@ void KKSAttrEditor :: accept ()
 
     attribute->setTitle (ui->lETitle->text());
     attribute->setName (ui->lEName->text());
+    
     if (ui->chManually->checkState () == Qt::Checked && !ui->lECode->isReadOnly ())
         attribute->setCode (ui->lECode->text());
     else if (!ui->lECode->isReadOnly ())
         attribute->setCode (QString());
+    
     attribute->setType (attrTypes.value (cType) );
     
     if (attribute->type ()->attrType() == KKSAttrType::atList ||
         attribute->type ()->attrType() == KKSAttrType::atCheckList ||
         attribute->type ()->attrType() == KKSAttrType::atCheckListEx ||
         attribute->type ()->attrType() == KKSAttrType::atRecordColorRef ||
-        attribute->type ()->attrType() == KKSAttrType::atRecordTextColorRef)
+        attribute->type ()->attrType() == KKSAttrType::atRecordTextColorRef ||
+        attribute->type ()->attrType() == KKSAttrType::atHistogram )
     {
         attribute->setTableName (io->tableName());
         attribute->setColumnName (ui->cbRefField->itemData (ui->cbRefField->currentIndex()).toString());
