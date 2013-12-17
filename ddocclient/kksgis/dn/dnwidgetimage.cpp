@@ -194,19 +194,26 @@ void DNWidgetImage::mouseMoveEvent(QMouseEvent* mEvent)
 }
 void DNWidgetImage::mousePressEvent(QMouseEvent *mEvent)
 {
- int x,y;
- QPoint Point;
- x=this->MouseX/this->NewKof;
- y=this->MouseY/this->NewKof;
- if(this->IsCretaePolyOn) //Если выбран пункт меню Выделить полигон
+ if(mEvent->button()==Qt::LeftButton)
  {
-  Point.setX(x);
-  Point.setY(y);
-  this->Polygon.pt<<Point;
-  //this->Polygon.KolvoPix++;
-  this->repaint();
+  int x,y;
+  QPoint Point;
+  x=this->MouseX/this->NewKof;
+  y=this->MouseY/this->NewKof;
+  if(this->IsCretaePolyOn) //Если выбран пункт меню Выделить полигон
+  {
+   Point.setX(x);
+   Point.setY(y);
+   this->Polygon.pt<<Point;
+   //this->Polygon.KolvoPix++;
+   this->repaint();
+  }//if(this->IsCretaePolyOn)
+  // emit this->MouseClicked(x,y);
+ }//if(mEvent->button()==QMouseEvent)
+ if(mEvent->button()==Qt::RightButton && this->Polygon.pt.size()>2)
+ {
+  emit OnRightButton(false);
  }
-// emit this->MouseClicked(x,y);
 }
 
 /*Private*/

@@ -59,6 +59,7 @@ public:
 
 signals:
     void ChangeProgressVal(int PrgR,int PrgV);
+
 public slots:
 
 private:

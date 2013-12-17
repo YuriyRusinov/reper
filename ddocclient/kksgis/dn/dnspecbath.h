@@ -56,7 +56,7 @@ private slots:
     void on_ButtonReCalcImg_clicked();
     void on_OpenLastImg_triggered();
     void on_CreatePoly_triggered(bool checked);
-    void on_treePolygons_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
+//    void on_treePolygons_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
     void on_Batinometriy_triggered();
     void on_MultiChan_triggered();
     void on_pbVectorize_clicked();
@@ -64,7 +64,9 @@ private slots:
 
     void MouseMove(int x,int y);
 
-    void on_DNSpecBath_destroyed();
+//    void on_treePolygons_clicked(const QModelIndex &index);
+
+    void on_treePolygons_itemClicked(QTreeWidgetItem *item, int column);
 
 private:
     Ui::DNSpecBath *ui;
@@ -82,6 +84,7 @@ private:
 
 protected:
     void resizeEvent(QResizeEvent*);
+    void closeEvent(QCloseEvent *);
 };
 
 #endif // MAINWINDOW_H

@@ -19,12 +19,29 @@ DNSpecBath::DNSpecBath(QWidget *parent) :
  this->NameOrg="VKA";
  this->AppDir=QDir::currentPath();
  this->IsTreePolygonClear=FALSE;
+
+ connect(ui->DNWPic,SIGNAL(OnRightButton(bool)),ui->CreatePoly,SIGNAL(triggered(bool)));
+ connect(ui->treePolygons,SIGNAL(clicked(QModelIndex)),ui->treePolygons,SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)));
 }
 
 DNSpecBath::~DNSpecBath()
 {
  if(this->GdalImage!=NULL)
   delete this->GdalImage;
+ if(this->SerPoly!=NULL)
+  delete this->SerPoly;
+ if(this->DlgShowDepth!=NULL)
+  delete this->DlgShowDepth;
+
+ Polygons.clear();
+ NamesPoly.clear();
+
+ for(int i=0;i<ui->DNWPic->Polygons.size();i++)
+  ui->DNWPic->Polygons[i].pt.clear();
+
+ ui->DNWPic->Polygons.clear();
+ ui->DNWPic->Polygon.pt.clear();
+
  delete ui;
 }
 
@@ -41,6 +58,32 @@ void DNSpecBath::resizeEvent(QResizeEvent*)
  ui->DNWPic->ViewAreaX=wMW;
  ui->DNWPic->ViewAreaY=hMW;
  ui->WidgetViewParam->setGeometry(wMW+10,10,ui->WidgetViewParam->width(),ui->WidgetViewParam->height());
+}
+
+void DNSpecBath::closeEvent(QCloseEvent *)
+{
+ if(this->GdalImage!=NULL)
+ {
+  delete this->GdalImage;
+  this->GdalImage=NULL;
+ }
+ if(this->SerPoly!=NULL)
+ {
+  delete this->SerPoly;
+  this->SerPoly=NULL;
+ }
+ if(this->DlgShowDepth!=NULL)
+ {
+  delete this->DlgShowDepth;
+  this->DlgShowDepth=NULL;
+ }
+ NamesPoly.clear();
+
+ for(int i=0;i<ui->DNWPic->Polygons.size();i++)
+  ui->DNWPic->Polygons[i].pt.clear();
+
+ ui->DNWPic->Polygons.clear();
+ ui->DNWPic->Polygon.pt.clear();
 }
 
 void DNSpecBath::on_FileOpen_triggered()
@@ -164,6 +207,7 @@ void DNSpecBath::on_CreatePoly_triggered(bool checked)
 //Сохранение полигона в файл (если снята галочка с меню Создать полигон и создаваемый полигон имеет больше двух точек)
  if(!checked && ui->DNWPic->Polygon.pt.size()>2)
  {
+  ui->CreatePoly->setChecked(false);
   bool InputOk;
   QString NamePoly=QInputDialog::getText(this,"Создать полигон","Введите имя полигона",
                                          QLineEdit::Normal,"Polygon_"+QString().setNum(ui->DNWPic->Polygons.size()+1),
@@ -217,13 +261,13 @@ void DNSpecBath::on_ButtonReCalcImg_clicked()
  ui->DNWPic->repaint();
 }
 
-void DNSpecBath::on_treePolygons_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous)
+void DNSpecBath::on_treePolygons_itemClicked(QTreeWidgetItem *item, int column)
 {
  QString FileNamePoly;
  QTreeWidgetItem *itemP;
- itemP=current;
- if(!this->IsTreePolygonClear)
- {
+ itemP=/*current*/item;
+// if(!this->IsTreePolygonClear)
+// {
   this->CurrentNameClassif="";
   this->IsCurPolyClassif=FALSE;
 
@@ -248,12 +292,33 @@ void DNSpecBath::on_treePolygons_currentItemChanged(QTreeWidgetItem *current, QT
    this->ReadFileClassif(this->GdalImage->PathImgFile+'/'+this->GdalImage->NameImgFile+this->CurrentNameClassif+".kls");
   }
   ui->DNWPic->repaint();
- }//if(!this->IsTreePolygonClear)
- else
- {
-  this->IsTreePolygonClear=FALSE;
- }
+// }//if(!this->IsTreePolygonClear)
+// else
+// {
+//  this->IsTreePolygonClear=FALSE;
+// }
 }
+
+
+//void DNSpecBath::on_treePolygons_clicked(const QModelIndex &index)
+//{
+
+//// this->IsTreePolygonClear=FALSE;
+//// QMessageBox msg;
+//// msg.setText("clicked "+QString().setNum(this->IsTreePolygonClear));
+//// msg.exec();
+//}
+
+//void DNSpecBath::on_treePolygons_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous)
+//{
+//// QMessageBox msg;
+//// msg.setText(QString().setNum(this->IsTreePolygonClear));
+//// msg.exec();
+////    QMessageBox msg;
+////    msg.setText("currentItemChanged "+QString().setNum(this->IsTreePolygonClear));
+////    msg.exec();
+
+//}
 
 void DNSpecBath::on_Batinometriy_triggered()
 {
@@ -535,7 +600,5 @@ void DNSpecBath::MouseMove(int x, int y)
  }//if(DlgShowDepth!=NULL)
 }
 
-void DNSpecBath::on_DNSpecBath_destroyed()
-{
 
-}
+
