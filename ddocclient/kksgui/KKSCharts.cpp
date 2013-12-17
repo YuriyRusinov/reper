@@ -18,7 +18,7 @@
  * Please contact gordos.kund@gmail.com with any questions on this license.
  */
 #include "KKSCharts.h"
-#include <qgraphicsscene>
+#include <QGraphicsScene>
 
 #ifndef M_PI
 #define M_PI       3.14159265358979323846
