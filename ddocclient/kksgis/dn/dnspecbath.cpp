@@ -19,6 +19,7 @@ DNSpecBath::DNSpecBath(QWidget *parent) :
  this->NameOrg="VKA";
  this->AppDir=QDir::currentPath();
  this->IsTreePolygonClear=FALSE;
+ this->IsPolygonCreateMode=FALSE;
 
  connect(ui->DNWPic,SIGNAL(OnRightButton(bool)),ui->CreatePoly,SIGNAL(triggered(bool)));
  connect(ui->treePolygons,SIGNAL(clicked(QModelIndex)),ui->treePolygons,SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)));
@@ -88,6 +89,29 @@ void DNSpecBath::closeEvent(QCloseEvent *)
 
 void DNSpecBath::on_FileOpen_triggered()
 {
+
+ if(this->GdalImage!=NULL)
+ {
+  delete this->GdalImage;
+  this->GdalImage=NULL;
+ }
+ if(this->SerPoly!=NULL)
+ {
+  delete this->SerPoly;
+  this->SerPoly=NULL;
+ }
+ if(this->DlgShowDepth!=NULL)
+ {
+  delete this->DlgShowDepth;
+  this->DlgShowDepth=NULL;
+ }
+ NamesPoly.clear();
+
+ for(int i=0;i<ui->DNWPic->Polygons.size();i++)
+  ui->DNWPic->Polygons[i].pt.clear();
+
+ ui->DNWPic->Polygons.clear();
+ ui->DNWPic->Polygon.pt.clear();
 
  this->FileNameOpen=QFileDialog::getOpenFileName(this,"Открыть файл проекта","","Raster files (*.img *.asc *.tif *tiff *.bmp *.jpg *.jpeg);;Geotiff (*.tif *.tiff)");
  if(!this->FileNameOpen.isEmpty())
@@ -200,12 +224,13 @@ void DNSpecBath::on_CreatePoly_triggered(bool checked)
  {
   ui->DNWPic->Polygon.pt.clear();
   ui->DNWPic->Polygon.IsPolyClassif=FALSE;
+  this->IsPolygonCreateMode=TRUE;
  }
 
  ui->DNWPic->IsCretaePolyOn=checked;
 
 //Сохранение полигона в файл (если снята галочка с меню Создать полигон и создаваемый полигон имеет больше двух точек)
- if(!checked && ui->DNWPic->Polygon.pt.size()>2)
+ if(!checked && ui->DNWPic->Polygon.pt.size()>2 && this->IsPolygonCreateMode)
  {
   ui->CreatePoly->setChecked(false);
   bool InputOk;
@@ -229,6 +254,7 @@ void DNSpecBath::on_CreatePoly_triggered(bool checked)
    this->ReadFilePoly(this->NamePolyToFile(this->CurrentNamePoly));
    this->FillMainForm();
   }//if(InputOk && !NamePoly.isEmpty())
+  this->IsPolygonCreateMode=FALSE;
  }//if(!checked && ui->DNWPic->Polygon.pt.size()>2)
 
  ui->DNWPic->repaint();
@@ -285,6 +311,11 @@ void DNSpecBath::on_treePolygons_itemClicked(QTreeWidgetItem *item, int column)
   this->ReadFilePoly(FileNamePoly);
   this->FillStackPolygons();
   this->ChangeCurrentPoly();
+
+//  QMessageBox msg;
+//  msg.setText(QString().setNum(ui->DNWPic->Polygons.size()));
+//  msg.exec();
+
 
   //Если текущая позиция является результатом классификации
   if(this->IsCurPolyClassif)
@@ -530,6 +561,10 @@ void DNSpecBath::FillStackPolygons()
  int ip;
  DNImgPoly Pol;
  DNPoly *Ser;
+ for(int i=0;i<ui->DNWPic->Polygons.size();i++)
+  ui->DNWPic->Polygons[i].pt.clear();
+ ui->DNWPic->Polygons.clear();
+
  for(ip=0;ip<this->NamesPoly.size();ip++)
  {
 //  if(this->NamesPoly[ip]!=this->CurrentNamePoly)

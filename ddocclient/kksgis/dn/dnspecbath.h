@@ -44,6 +44,7 @@ public:
     QString CurrentNameClassif; //Имя текущей классификации (содержит также имя полигона к которому применена классификация)
     bool IsCurPolyClassif; //Признак того что текущая позиция является результатом классификации
     bool IsTreePolygonClear;
+    bool IsPolygonCreateMode; //Признак включенного/выключенного режима создания полигона
     QList <DNVector> Polygons;
 
     Ui_DlgShowDeptch *DlgShowDepth;
