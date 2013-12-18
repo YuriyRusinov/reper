@@ -13,6 +13,9 @@
 #include "KKSAttrType.h"
 #include "KKSFile.h"
 #include "defines.h"
+#include <QDir>
+#include <QMessageBox>
+#include <QFile>
 
 #ifdef __USE_QGIS__
 #include "kksgiswidget.h"
@@ -137,7 +140,8 @@ void KKSMapWidget::initQGIS(QWidget *parent)
 
 int KKSMapWidget::openProject()//открываем проект, заданный в качестве значения атрибута
 {
-    if(!m_av)
+#ifdef __USE_QGIS__ 
+	if(!m_av)
         return -1;
 
     KKSValue v = m_av->value();
@@ -184,7 +188,9 @@ int KKSMapWidget::openProject()//открываем проект, заданный в качестве значения 
     mpKKSGISWidget->openProject(path);
 
     return 1;
-
+#else
+	return -1;
+#endif
 }
 
 //выгрузка на клиент файлов со слоями, если слои представлены файлами (т.е. не PostGIS)
@@ -256,6 +262,7 @@ int KKSMapWidget::downloadLayers(const QString & homeDir, const QString & xmlPrj
 //берем часть, которая представляет собой название файла, из datasource
 QString KKSMapWidget::getFileNameForDS(const QString & path, const QString & provider)
 {
+#ifdef __USE_QGIS__
     QString fileName;
     if(provider == "ogr"){
         QStringList theURIParts = path.split( "|" );
@@ -285,6 +292,9 @@ QString KKSMapWidget::getFileNameForDS(const QString & path, const QString & pro
     }
 
     return fileName;
+#else
+	return QString::null;
+#endif
 }
 //Берем часть, которая представляет собой идентификатор файла в таблице io_urls, из id слоя
 //Считаем, что идентификатор слоя представлен так: kks_file_<ID_URL>

@@ -9,6 +9,7 @@
 #define	_KKSHISTWIDGET_H
 
 #include <QWidget>
+#include <QVariant>
 
 #include "kksgui_config.h"
 #include "KKSAttrWidget.h"
