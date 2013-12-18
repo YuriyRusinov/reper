@@ -418,8 +418,11 @@ void KKSGISWidgetQGIS::azVectorize()
         QgsFeature pFeature;
 //        pFeature.setTypeName( "WKBPolygon" );
         pFeature.setGeometry( pPolygonGeometry );
-        pFeature.setAttribute("comment", "deep" );
-        pFeature.setAttribute("val",(double)dnVec.Vol);
+        pFeature.initAttributes(2);
+        pFeature.setAttribute(1, "deep" );
+        pFeature.setAttribute(0,(double)dnVec.Vol);
+//        pFeature.setAttribute("comment", "deep" );
+//        pFeature.setAttribute("value",(double)dnVec.Vol);
 
         QgsVectorFileWriter::WriterError mError;
         myWriter.addFeature( pFeature );
