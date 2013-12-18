@@ -29,7 +29,7 @@ class LoginExtForm : public QWidget//, public Ui::login_ext_form
   Q_OBJECT
   public:
     LoginExtForm(QWidget *parent = 0);
-    ~LoginExtForm();
+    virtual ~LoginExtForm();
 private:
 	friend class LoginForm;
 	Ui::login_ext_form * ui;
@@ -40,7 +40,7 @@ class LoginForm : public QDialog//, private Ui::login_form
   Q_OBJECT
   public:
     LoginForm(const KKSList<KKSAccLevel*> & levels, KKSAccLevel & currentLevel, QWidget *parent = 0);
-    ~LoginForm();
+    virtual ~LoginForm();
 
     void setHost(const QString &str);
     void setName(const QString &str);

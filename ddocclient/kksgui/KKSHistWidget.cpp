@@ -6,14 +6,26 @@
  */
 
 #include <QPainter>
+#include <QGroupBox>
+#include <QLineEdit>
+#include <QComboBox>
 
 #include <KKSHistogram.h>
 #include <KKSAttrValue.h>
+#include "KKSCharts.h"
 #include "KKSHistWidget.h"
 #include "KKSValue.h"
 
 KKSHistWidget::KKSHistWidget(const KKSAttrValue *av, KKSIndAttrClass isSys, QWidget * parent, Qt::WindowFlags flags)
-    : QWidget (parent, flags), KKSAttrWidget(av, isSys)
+    : QWidget (parent, flags), KKSAttrWidget(av, isSys),
+    lEFrom (new QLineEdit),
+    lETo (new QLineEdit),
+    lECount (new QLineEdit),
+    cbScenario (new QComboBox),
+    cbVariant (new QComboBox),
+    cbCategory (new QComboBox),
+    cbSource (new QComboBox),
+    cbReceiver (new QComboBox)
 {
     
 }
@@ -47,4 +59,9 @@ void KKSHistWidget::paintEvent(QPaintEvent *event)
         painter.fillRect(barWidth * i, 0, barWidth * (i + 1), h - y, Qt::black);
         i++;
     }
+}
+
+void KKSHistWidget::init (void)
+{
+    
 }

@@ -16,7 +16,7 @@ class SaveSettingsForm : public QDialog, private Ui::save_settings_form
 {
     public:
         SaveSettingsForm (QSettings * set=NULL, QWidget * parent=NULL);
-        ~SaveSettingsForm ( void );
+        virtual ~SaveSettingsForm ( void );
 
         QString curFile ( void ) const { return FileName; }
         void setFile ( const QString& name ) { FileName=name; }

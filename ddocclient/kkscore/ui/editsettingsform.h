@@ -7,7 +7,7 @@ class EditSettingsForm : public QDialog, private Ui::EditSettingsForm
 {
     public:
         EditSettingsForm (QString text = QString (), QWidget * parent = NULL);
-        ~EditSettingsForm ( void );
+        virtual ~EditSettingsForm ( void );
 
         QString getText ( void ) const { return this->lineEdit->text (); }
     private:

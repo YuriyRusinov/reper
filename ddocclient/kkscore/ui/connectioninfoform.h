@@ -4,25 +4,31 @@
 #include <QDialog>
 #include <QString>
 
-#include "ui_connection_info_form.h"
-
-
-class ConnectionInfoForm : public QDialog, private Ui::connection_info_form
+namespace Ui
 {
-    public:
-        ConnectionInfoForm (QWidget * parent=NULL);
-        ~ConnectionInfoForm ( );
-        
-        void setDatabaseInfo(const QString & host, const QString & port, const QString & db);
-        void setUserInfo(const QString & user, const QString & position, const QString & accLevel);
+    class connection_info_form;
+};
 
-    public slots:
-        void pbOKClicked();
+class ConnectionInfoForm : public QDialog//, private Ui::connection_info_form
+{
+public:
+    ConnectionInfoForm (QWidget * parent=NULL);
+    virtual ~ConnectionInfoForm ( );
+    
+    void setDatabaseInfo(const QString & host, const QString & port, const QString & db);
+    void setUserInfo(const QString & user, const QString & position, const QString & accLevel);
 
+public slots:
+    void pbOKClicked();
 
-    private:
+private:
+    //
+    // Variables
+    //
+    Ui::connection_info_form * UI;
+private:
 
-        Q_OBJECT
+    Q_OBJECT
 };
 
 #endif

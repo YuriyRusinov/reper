@@ -11,7 +11,7 @@ class ChooseDlForm : public QDialog, private Ui::choose_dl_form
 {
     public:
         ChooseDlForm (QWidget * parent=NULL);
-        ~ChooseDlForm ( );
+        virtual ~ChooseDlForm ( );
 
         int currentDl ( void ) const;
         void addDl(int id, const QString & dlName, const QString & posName, const QString & unitName);

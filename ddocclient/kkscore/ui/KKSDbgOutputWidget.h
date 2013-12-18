@@ -26,7 +26,7 @@ class __CORE_EXPORT KKSDbgOutputWidget : public QDockWidget
 public:
 
     KKSDbgOutputWidget(bool bForDockable, QWidget *parent = 0, Qt::WindowFlags flags = 0);
-    ~KKSDbgOutputWidget(void);
+    virtual ~KKSDbgOutputWidget(void);
 
     void initMenuEmitting();
 
