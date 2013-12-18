@@ -14,11 +14,10 @@ class _GIS_EXPORT KKSGISWidget : public QWidget
 public:
     static KKSGISWidget * initQGISWidget(bool withSubWindows, QWidget* parent = 0, Qt::WFlags fl = 0);
     static void destroyQGISWidget(KKSGISWidget *);
-    //static KKSGISWidget * instanse();
+    static KKSGISWidget * instance();
 
     virtual QStatusBar * statusBar() const = 0;
     virtual const QString & pluginsDir() = 0;
-    //virtual QTableWidget * tableLegend() = 0;
     virtual QWidget * mapLegendWidget() = 0;
     virtual QWidget * mapLayerOrderWidget() = 0;
     virtual QToolBar * toolBar() const = 0;
@@ -26,6 +25,7 @@ public:
     virtual const QMap<QString, QMenu *> & menuMap() const = 0;
 
     virtual QString projectFileName() = 0;
+    virtual QString readLayerFilePath(const QString & file) = 0;//возвращает абсолютный путь к файлу слоя, который прочитан из файла проекта QGIS
 
     virtual void openProject(const QString & prjFile) = 0;
     virtual void closeProject() = 0;
@@ -41,6 +41,8 @@ signals:
 protected:
     KKSGISWidget(QWidget* parent = 0, Qt::WFlags fl = 0 );
     virtual ~KKSGISWidget(){}
+    
+    static KKSGISWidget * smInstance;
 };
 
 #endif

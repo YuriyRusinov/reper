@@ -1806,13 +1806,15 @@ QWidget * KKSAttributesFactory :: createMapWidget (const KKSAttrValue * av,
     QVBoxLayout * vBoxLayout = new QVBoxLayout();
     parent->setLayout(vBoxLayout);
 
-    attrWidget = new KKSMapWidget(av, isSystem);
-    delete attrWidget;
-    attrWidget = 0;
+    attrWidget = new KKSMapWidget(m_GISHomeDir, av, isSystem);
+    //connect(attrWidget, SIGNAL(downloadFile(const QString&, const QString&, qint64)), this, SIGNAL(downloadFileForGIS(const QString&, const QString&, qint64)));
+    connect(attrWidget, SIGNAL(downloadFile(KKSFile*, QWidget *)), m_oef, SLOT(slotDownloadFile(KKSFile*, QWidget*)));    
+    //delete attrWidget;
+    //attrWidget = 0;
 
-    QWidget * W = new QWidget();
-    vBoxLayout->addWidget(W, 0);
-    vBoxLayout->setMargin(0);
+    //QWidget * W = new QWidget();
+    //vBoxLayout->addWidget(W, 0);
+    //vBoxLayout->setMargin(0);
 
     
     if(attrWidget){
@@ -2447,21 +2449,29 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
         //ksa
         case KKSAttrType::atHistogram:
             {
+                if (!isRef)
+                    connectToSlots (aw, wEditor);
             }
             break;
         //ksa
         case KKSAttrType::atVectorLayer:
             {
+                if (!isRef)
+                    connectToSlots (aw, wEditor);
             }
             break;
         //ksa
         case KKSAttrType::atRasterLayer:
             {
+                if (!isRef)
+                    connectToSlots (aw, wEditor);
             }
             break;
         //ksa
         case KKSAttrType::atGISMap:
             {
+                if (!isRef)
+                    connectToSlots (aw, wEditor);
             }
             break;
     }

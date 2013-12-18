@@ -179,6 +179,40 @@ void KKSSito::loadQGISPlugins()
 #endif
 }
 
+const QString & KKSSito::GISHomeDir() const
+{
+    if(!m_GISHomeDir.isEmpty())
+        return m_GISHomeDir;
+
+    KKSSettings *kksSettings = kksSito->getKKSSettings();
+    if(!kksSettings)
+        return m_GISHomeDir;
+    
+    QString homeDir = getWDir() + "/gis_home";
+    
+    kksSettings->beginGroup (QString("System settings/") + kksSitoNameEng);
+
+    if ( kksSettings->getParam("QGIS_files_home_path").isEmpty() )
+    {
+        kksSettings->endGroup();
+        kksSettings->writeSettings (QString("System settings/") + kksSitoNameEng, 
+                                     "QGIS_files_home_path", 
+                                     homeDir);
+        kksSettings->beginGroup (QString("System settings/") + kksSitoNameEng);
+    }
+    
+    homeDir = kksSettings->getParam("QGIS_files_home_path");
+
+    kksSettings->endGroup();
+    
+    qDebug() << "Set QGIS temporary files home dir to " << homeDir;
+
+    m_GISHomeDir = homeDir;
+
+    return m_GISHomeDir;
+    
+}
+
 void KKSSito::loadTranslator()
 {
     KKSSettings *kksSettings = kksSito->getKKSSettings();
@@ -1081,7 +1115,7 @@ int KKSSito::GUIConnect(QWidget * parent)
     return OK_CODE;
 }
 
-QString & KKSSito::getWDir()
+const QString & KKSSito::getWDir() const
 {
     return workingDir;
 }
@@ -1112,8 +1146,11 @@ void KKSSito::initFactories()
     m_eiof->setParams( m_fileLoader, m_ppf, db());
     m_ppf->setParams(m_loader, m_fileLoader, m_eiof, db());
 
-    if (!m_attrf)
+    if (!m_attrf){
         m_attrf = new KKSAttributesFactory (m_loader, m_eiof, NULL, m_ppf);
+        m_attrf->setGISHomeDir(GISHomeDir());
+    }
+
 
     if (!m_objf)
         m_objf = new KKSObjEditorFactory(m_ppf, m_loader, m_fileLoader, m_attrf, m_eiof);

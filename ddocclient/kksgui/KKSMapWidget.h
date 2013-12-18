@@ -17,19 +17,21 @@
 #include <QListWidget>
 #include <QVariant>
 #include <QDockWidget>
+#include <QDomDocument>
 
 
 class KKSAttrValue;
+class KKSFile;
 
-//#ifdef __USE_QGIS__
-//class KKSGISWidget;
-//#endif
+#ifdef __USE_QGIS__
+class KKSGISWidget;
+#endif
 
 class _GUI_EXPORT KKSMapWidget : public QWidget, public KKSAttrWidget
 {
     Q_OBJECT
 public:
-    KKSMapWidget(const KKSAttrValue* attr = 0, KKSIndAttrClass isSys = iacIOUserAttr, QWidget *parent=NULL);
+    KKSMapWidget(const QString & gisHomeDir, const KKSAttrValue* attr = 0, KKSIndAttrClass isSys = iacIOUserAttr, QWidget *parent=NULL);
     virtual ~KKSMapWidget(void);
 
     QDockWidget * legendWidget() const;
@@ -38,19 +40,32 @@ public:
 signals:
     void valueChanged (qint64 id, KKSIndAttrClass sys, QVariant val);
     void aboutToDestroy(QDockWidget *, QDockWidget *);
+    void downloadFile(KKSFile * f, QWidget * parent);//запрос на выгрузку файла со слоем из БД. файл задается идентификатором из таблицы io_urls
 
+public slots:
+    void slotMapChanged(QDomDocument&);
+    void slotDataChanged();
 private:
     QDockWidget * m_legendWidget;
     QDockWidget * m_layerOrderWidget;
+    QString m_GISHomeDir;
+    bool m_dataChanged;
 
-//#ifdef __USE_QGIS__
+    void init(QWidget * parent);
 
-//private:
-//    void init(QWidget *parent);
+    int openProject();//открываем проект, заданный в качестве значения атрибута
+    int downloadLayers(const QString & homeDir, const QString & xmlPrj);//выгрузка на клиент файлов со слоями, если слои представлены файлами (т.е. не PostGIS)
+    QString getFileNameForDS(const QString & path, const QString & provider);//берем часть, которая представляет собой название файла, из datasource слоя
+    qint64 getIdUrlForID(const QString & id);//Берем часть, которая представляет собой идентификатор файла в таблице io_urls, из id слоя
 
-//private:
-//    KKSGISWidget * mpKKSGISWidget;
-//#endif
+#ifdef __USE_QGIS__
+
+private:
+    void initQGIS(QWidget *parent);
+
+private:
+    KKSGISWidget * mpKKSGISWidget;
+#endif
 
 };
 

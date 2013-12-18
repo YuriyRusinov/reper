@@ -44,6 +44,7 @@ public:
     KKSAttributesEditor * viewAttributes (const KKSList<const KKSFilterGroup *>& filters, bool mode, QWidget * parent=0, Qt::WFlags f=0);
 
     static KKSAttrValue* createAttrValue(const QString & xml);
+    void setGISHomeDir(const QString & dir){m_GISHomeDir = dir;}//задает каталог для временного хранения выгруженных на клиент файлов проектов и слоев QGIS
     
     static QString toXML (KKSCategoryAttr* attr);
     
@@ -124,11 +125,8 @@ private:
     KKSAttributesFactory (KKSLoader *l, KKSEIOFactory *_eiof, KKSObjEditorFactory * _oef, KKSPPFactory * _ppf);
     virtual ~KKSAttributesFactory (void);
 
-#ifdef Q_CC_MSVC
     QLabel * createAttrTitle (KKSAttrValue * av, KKSIndAttrClass isSystem = iacIOUserAttr, KKSObjEditor *objEditor = NULL);
-#else
-    QLabel * createAttrTitle (KKSAttrValue * av, KKSIndAttrClass isSystem = iacIOUserAttr, KKSObjEditor *objEditor = NULL);
-#endif
+
     QCheckBox * createChDateTime (bool isMandatory, QGridLayout *gLayout, QLabel *lTitle, int n_str);
     QWidget * createAttrWidget ( KKSAttrValue * pAttrValue, 
                                  KKSObjEditor *objEditor,
@@ -169,6 +167,7 @@ private:
     KKSEIOFactory *eiof;
     KKSObjEditorFactory * m_oef;
     KKSPPFactory * m_ppf;
+    QString m_GISHomeDir;
 
 private:
     Q_OBJECT

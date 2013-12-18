@@ -652,20 +652,6 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
 
     }
 
-    //ksa
-    //!!!!!****TESTING****!!!!!
-    // окно с картой 
-    /*
-    QWidget * mapW = new QWidget ();
-    QGridLayout *gMapLay = new QGridLayout ();
-    mapW->setLayout (gMapLay);
-    KKSMapWidget * W = new KKSMapWidget();
-    W->setParent(objEditorWidget);
-    //objEditorWidget->addFileWidget (W);
-    tabObj->addTab (mapW, tr("Map"));
-    gMapLay->addWidget (W, 0, 0, 1, 1);
-*/
-
     //системные параметры для записей пользовательских справочников
     if(!io && wObjE->io()->id() > _MAX_SYS_IO_ID_ ){
         this->putSystemParams(wObjE, objEditorWidget, tabObj, tabObj->count());
@@ -1190,19 +1176,12 @@ void KKSObjEditorFactory :: setIONameSecret (KKSObjEditor * editor, KKSObjectExe
     }
     //const KKSValue pVal = attr->value();
     //const KKSCategoryAttr * pCategAttr = attr->attribute();
-#ifdef Q_CC_MSVC
     QLineEdit * lEIOName = new KKSEdit (attr, iacTableAttr, io->name (), parentWProp);//QLineEdit (io->name (), parentWProp);
     connect (lEIOName, 
              SIGNAL (valueChanged(qint64, KKSIndAttrClass, QVariant)), 
              editor, 
              SLOT (setValue (qint64, KKSIndAttrClass, QVariant)) );
-#else
-    QLineEdit * lEIOName = new KKSEdit (attr, iacTableAttr, io->name (), parentWProp);//QLineEdit (io->name (), parentWProp);
-    connect (lEIOName, 
-             SIGNAL (valueChanged(qint64, KKSIndAttrClass, QVariant)), 
-             editor, 
-             SLOT (setValue (qint64, KKSIndAttrClass, QVariant)) );
-#endif
+
     lEIOName->setReadOnly (io->isSystem ());
     hIOLay->addWidget (lIOName);
     hIOLay->addWidget (lEIOName);
@@ -1236,11 +1215,7 @@ void KKSObjEditorFactory :: setIONameSecret (KKSObjEditor * editor, KKSObjectExe
     if (pv != values.constEnd())
         v_str = pv.value();
 
-#ifdef Q_CC_MSVC
     QLineEdit * lEIOMacLabel = new KKSEdit (attr, iacTableAttr, v_str, aRefW);
-#else
-    QLineEdit * lEIOMacLabel = new KKSEdit (attr, iacTableAttr, v_str, aRefW);
-#endif
     QSizePolicy spMac (QSizePolicy::Minimum, QSizePolicy::Fixed);
     lEIOMacLabel->setReadOnly (true);
     lEIOMacLabel->setSizePolicy (spMac);
@@ -1249,11 +1224,7 @@ void KKSObjEditorFactory :: setIONameSecret (KKSObjEditor * editor, KKSObjectExe
     tbMac->setText ("...");
     editor->addListAttrWidget (tbMac, aRefW, attr);
     connect (tbMac, SIGNAL (clicked()), editor, SLOT (setList()) );
-#ifdef Q_CC_MSVC
     aRefW->setValue (attr->id(), iacTableAttr, cV);
-#else
-    aRefW->setValue (attr->id(), iacTableAttr, cV);
-#endif
     aRefW->setAttrWidget (lEIOMacLabel);
     connect (aRefW, 
              SIGNAL (valueChanged(qint64, KKSIndAttrClass, QVariant)), 
@@ -4593,11 +4564,7 @@ void KKSObjEditorFactory :: regroupAttrs (QWidget *wIOAttr, QScrollArea *scIOatt
     KKSTemplate * tDef;
     KKSList<KKSTemplate*> tListDb;
     KKSObject *io = 0;
-#ifdef Q_CC_MSVC
     if (isSystem == iacTableAttr)
-#else
-    if (isSystem == iacTableAttr)
-#endif
     {
         io = loader->loadIO (IO_IO_ID, false);
         if (!io)
@@ -4641,11 +4608,7 @@ void KKSObjEditorFactory :: regroupAttrs (QWidget *wIOAttr, QScrollArea *scIOatt
         tRef->addRef();
         if (f->isSave ())
         {
-#ifdef Q_CC_MSVC
             if (isSystem == iacTableAttr)
-#else
-            if (isSystem == iacTableAttr)
-#endif
                 io->setAttrTemplate (tRef);
             else
                 wObj->setAttrTemplate (tRef);
@@ -4653,11 +4616,7 @@ void KKSObjEditorFactory :: regroupAttrs (QWidget *wIOAttr, QScrollArea *scIOatt
             //так ни в коем случае нельзя делать!!!
             //int res = ppf->updateIO (isSystem ? io : wObj);
             //надо просто обновить информацию о пользовательских шаблонах
-#ifdef Q_CC_MSVC
             int ok = ppf->updateUserTemplates(isSystem == iacTableAttr ? io : wObj);
-#else
-            int ok = ppf->updateUserTemplates(isSystem == iacTableAttr ? io : wObj);
-#endif
             if(ok != OK_CODE){
                 qCritical() << tr("Cannot update templates!");
                 QMessageBox::critical(editor, tr("Error"), tr("Cannot update templates!"), QMessageBox::Ok);
@@ -4674,11 +4633,7 @@ void KKSObjEditorFactory :: regroupAttrs (QWidget *wIOAttr, QScrollArea *scIOatt
     if (!tRef)
         return;
 
-#ifdef Q_CC_MSVC
     if (isSystem == iacTableAttr)
-#else
-    if (isSystem == iacTableAttr)
-#endif
         editor->setSysTemplate (tRef);
     else
         editor->setIoTemplate (tRef);
@@ -4688,11 +4643,7 @@ void KKSObjEditorFactory :: regroupAttrs (QWidget *wIOAttr, QScrollArea *scIOatt
 
     if (ioAttrs)
     {
-#ifdef Q_CC_MSVC
         if (isSystem == iacTableAttr)
-#else
-        if (isSystem == iacTableAttr)
-#endif
             editor->setSysAttrWidgets (wIOAttr, scIOattr, 0);
         else
             editor->setIOAttrWidgets (wIOAttr, scIOattr, 0);
@@ -8822,11 +8773,7 @@ int KKSObjEditorFactory :: putAttrsGroupsOnWidget ( KKSObject * obj,
                                   editor, 
                                   gbLay, 
                                   n_str,
-#ifdef Q_CC_MSVC
                                   iacTableAttr,
-#else
-                                  iacTableAttr,
-#endif
                                   (tableName.isEmpty () ? obj->tableName() : tableName), 
                                   (c ? c->id():-1));
         else
@@ -8836,11 +8783,7 @@ int KKSObjEditorFactory :: putAttrsGroupsOnWidget ( KKSObject * obj,
                                   editor, 
                                   gAttrLayout, 
                                   nc, 
-#ifdef Q_CC_MSVC
                                   iacTableAttr,
-#else
-                                  iacTableAttr,
-#endif
                                   obj->tableName(), 
                                   (c ? c->id():-1));
 
@@ -8955,11 +8898,7 @@ int KKSObjEditorFactory :: putRecAttrsGroupsOnWidget ( KKSObject * obj,
                                   editor, 
                                   gbLay, 
                                   n_str, 
-#ifdef Q_CC_MSVC
                                   iacEIOUserAttr, 
-#else
-                                  iacEIOUserAttr, 
-#endif
                                   (tableName.isEmpty () ? obj->tableName() : tableName), 
                                   (c ? c->id():-1));
         else
@@ -8969,11 +8908,7 @@ int KKSObjEditorFactory :: putRecAttrsGroupsOnWidget ( KKSObject * obj,
                                   editor, 
                                   gAttrLayout, 
                                   nc, 
-#ifdef Q_CC_MSVC
                                   iacEIOUserAttr, 
-#else
-                                  iacEIOUserAttr, 
-#endif
                                   obj->tableName(), 
                                   (c ? c->id():-1));
 
@@ -9089,11 +9024,7 @@ void KKSObjEditorFactory :: putAttrsGroupsOnWidget (KKSObject * obj,
                                   editor, 
                                   gbLay, 
                                   n_str, 
-#ifdef Q_CC_MSVC
                                   iacIOUserAttr, 
-#else
-                                  iacIOUserAttr, 
-#endif
                                   obj->tableName(), 
                                   (c ? c->id():-1));
         else
@@ -9103,11 +9034,7 @@ void KKSObjEditorFactory :: putAttrsGroupsOnWidget (KKSObject * obj,
                                   editor, 
                                   gAttrLayout, 
                                   nc, 
-#ifdef Q_CC_MSVC
                                   iacIOUserAttr, 
-#else
-                                  iacIOUserAttr, 
-#endif
                                   obj->tableName(), 
                                   (c ? c->id():-1));
 

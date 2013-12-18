@@ -325,6 +325,7 @@ bool KKSGISWidgetQGIS::azAddLayerVector(QFileInfo pFile)
 
     // Add the Vector Layer to the Layer Registry
     mpRegistry->addMapLayer(mypLayer, TRUE);
+    connect(mypLayer, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
     // Add the Layer to the Layer Set
     mpLayerSet.append(QgsMapCanvasLayer(mypLayer));
     // set the canvas to the extent of our layer
@@ -770,6 +771,7 @@ void KKSGISWidgetQGIS::openProject(const QString & prjFile)
                     if (i.value()->isValid())
                     {
                         mpRegistry->addMapLayer(i.value(), TRUE);
+                        connect(i.value(), SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
                         mpLayerSet.append(QgsMapCanvasLayer(i.value()));
                     }
 
@@ -777,6 +779,7 @@ void KKSGISWidgetQGIS::openProject(const QString & prjFile)
         else if (i.value()->type() == QgsMapLayer::RasterLayer)
         {
             mpRegistry->addMapLayer(i.value(), TRUE);
+            connect(i.value(), SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
             mpLayerSet.append(QgsMapCanvasLayer(i.value()));
         }
 
@@ -930,6 +933,7 @@ void KKSGISWidgetQGIS::openRasterLayer(const QString & rLayerFile)
 
     // Add the Vector Layer to the Layer Registry
     mpRegistry->addMapLayer(mypLayer, TRUE);
+    connect(mypLayer, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
     // Add the Layer to the Layer Set
     mpLayerSet.append(QgsMapCanvasLayer(mypLayer));
     mpMapCanvas->setExtent(mypLayer->extent());
@@ -960,7 +964,8 @@ void KKSGISWidgetQGIS::openDatabaseLayer()
              this, SLOT( showProgress( int, int ) ) );
     connect( dbs, SIGNAL( progressMessage( QString ) ),
              this, SLOT( showStatusMessage( QString ) ) );
-  
+    /*!!!!*/
+    //connect(mypLayer, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
     dbs->exec();
     delete dbs;
 }
@@ -1273,4 +1278,10 @@ bool KKSGISWidgetQGIS::toggleEditing( QgsMapLayer *layer, bool allowCancel )
   }
 
   return res;
+}
+
+//возвращает абсолютный путь к файлу слоя, который прочитан из файла проекта QGIS
+QString KKSGISWidgetQGIS::readLayerFilePath(const QString & file)
+{
+    return QgsProject::instance()->readPath(file);
 }

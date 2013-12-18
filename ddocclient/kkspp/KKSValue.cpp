@@ -192,19 +192,25 @@ void KKSValue::verify(void) const
     }
     //ksa
     if(a_type == KKSAttrType::atVectorLayer){
-        m_isValid = true;
+        if(m_value.canConvert(QVariant::String)){
+            m_isValid = true;
+        }
         m_isLiteral = true;
         return;
     }
     //ksa
     if(a_type == KKSAttrType::atRasterLayer){
-        m_isValid = true;
+        if(m_value.canConvert(QVariant::String)){
+            m_isValid = true;
+        }
         m_isLiteral = true;
         return;
     }
     //ksa
     if(a_type == KKSAttrType::atGISMap){
-        m_isValid = true;
+        if(m_value.canConvert(QVariant::String)){
+            m_isValid = true;
+        }
         m_isLiteral = true;
         return;
     }
@@ -1016,8 +1022,23 @@ QString KKSValue::valueForInsert() const
         QString sVal (value());
         QString escVal (sVal);
         escVal.replace("'", "''");
-        escVal.replace("\\", "\\\\");
-        escVal.replace("\"", "\\\"");
+        //escVal.replace("\\", "\\\\");
+        //escVal.replace("\"", "\\\"");
+        escVal.prepend("'");
+        escVal.append ("'");
+        return escVal;
+    }
+
+    if (a_type == KKSAttrType::atVectorLayer ||
+        a_type == KKSAttrType::atGISMap ||
+        a_type == KKSAttrType::atRasterLayer ||
+        a_type == KKSAttrType::atHistogram)
+    {
+        QString sVal (value());
+        QString escVal (sVal);
+        escVal.replace("'", "''");
+        //escVal.replace("\\", "\\\\");
+        //escVal.replace("\"", "\\\"");
         escVal.prepend("'");
         escVal.append ("'");
         return escVal;

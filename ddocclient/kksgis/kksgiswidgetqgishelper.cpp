@@ -252,6 +252,8 @@ void KKSGISWidgetQGIS::initUserSettings()
     //QString myPluginsDir        = "D:\\REP_EXT\\QGS21\\plugins";
     QgsApplication::setPluginPath(m_pluginsDir);
     //QgsProviderRegistry::instance(m_pluginsDir);
+
+    //QgsProject::
 }
 
 const QString & KKSGISWidgetQGIS::pluginsDir()
@@ -277,12 +279,12 @@ void KKSGISWidgetQGIS::initMapCanvas()
     mInfoBar = new QgsMessageBar( this );
     mInfoBar->setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Fixed );
     
-    mpMapCanvas->show();
-
     // добавляем фрейм и вставляем в него виджет "Окно карты"(Map Canvas)
     QVBoxLayout * mpMapLayout = new QVBoxLayout(this); //main Layout
     mpMapLayout->addWidget(mpMapCanvas); // adding MapCanvas in Layout
     mpMapLayout->addWidget( mInfoBar);
+
+    mpMapCanvas->show();
 }
 
 void KKSGISWidgetQGIS::initMapLegend()
@@ -527,6 +529,10 @@ void KKSGISWidgetQGIS::initConnections()
 
     connect(QgsProject::instance(), SIGNAL(readProject(QDomDocument)), mpMapCanvas, SLOT(readProject(QDomDocument)));
     connect( QgsProject::instance(), SIGNAL( layerLoaded( int, int ) ), this, SLOT( showProgress( int, int ) ) );
+    connect( QgsProject::instance(), SIGNAL( writeProject(QDomDocument &) ), this, SIGNAL( mapSaved( QDomDocument& ) ) );
+
+    connect(this->mpRegistry, SIGNAL(layersRemoved(QStringList)), this, SIGNAL(dataChanged()));
+    connect(this->mpRegistry, SIGNAL(layersAdded(QList<QgsMapLayer *>)), this, SIGNAL(dataChanged()));
 
 }
 

@@ -77,13 +77,8 @@ void KKSAttrValueLabel :: setLabelProps()
     QString coloredText (text);
     bool isUnderline (false);
 
-#ifdef Q_CC_MSVC
     if(m_isSystem != iacTableAttr &&
        m_isSystem != iacAttrAttr)
-#else
-    if(m_isSystem != iacTableAttr &&
-       m_isSystem != iacAttrAttr )
-#endif
     {
         coloredText = tr("<font color='blue'>%2</font>").arg(text);
         isUnderline = true;
@@ -110,26 +105,14 @@ void KKSAttrValueLabel :: setLabelProps()
 
 void KKSAttrValueLabel :: showAttrValueProps()
 {
-#ifdef Q_CC_MSVC
     if(!m_av || m_isSystem == iacTableAttr || m_isSystem == iacAttrAttr)
-#else
-    if(!m_av || m_isSystem == iacTableAttr || m_isSystem == iacAttrAttr)
-#endif
         return;
 
-#ifdef Q_CC_MSVC
     bool isSys = (m_isSystem == iacIOUserAttr);
     KKSAttrValuePropsForm * f = new KKSAttrValuePropsForm(m_av, 
                                                           true, 
                                                           !isSys,
                                                           this);
-#else
-    bool isSys (m_isSystem == iacIOUserAttr);
-    KKSAttrValuePropsForm * f = new KKSAttrValuePropsForm(m_av, 
-                                                          true, 
-                                                          !isSys,
-                                                          this);
-#endif
 
     connect (f, SIGNAL(loadIOSrc(KKSObject **, QWidget *)), this, SIGNAL(loadIOSrc(KKSObject **, QWidget *)));
     connect (f, SIGNAL(viewIOSrc(KKSObject *, QWidget *)), this, SIGNAL(viewIOSrc(KKSObject *, QWidget *)));

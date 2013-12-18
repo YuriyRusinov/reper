@@ -17,11 +17,7 @@ KKSAttrUUIDWidget :: KKSAttrUUIDWidget (QWidget *parent, Qt::WindowFlags f)
     gAttrLay (new QGridLayout()),
     idAttrValue (-1),
     cVal (QVariant()),
-#ifdef Q_CC_MSVC
     isSystem (iacIOUserAttr)
-#else
-    isSystem (iacIOUserAttr)
-#endif
 {
     this->setLayout (gAttrLay);
     gAttrLay->addWidget (uuidWidget, 0, 0, 1, 1);

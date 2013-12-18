@@ -6,6 +6,7 @@
 
 //QT Includes
 #include <QtGui>
+#include <QDomDocument>
 
 #undef min
 #undef max
@@ -51,6 +52,7 @@ public:
     const QMap<QString, QMenu *> & menuMap() const;
 
     QString projectFileName();
+    QString readLayerFilePath(const QString & file);//возвращает абсолютный путь к файлу слоя, который прочитан из файла проекта QGIS
 
     void openProject(const QString & prjFile);
     void closeProject();
@@ -138,6 +140,9 @@ signals:
       knows to then check the project properties for any relevant state.
       */
     void projectRead();
+    
+    void dataChanged();
+    void mapSaved(QDomDocument&);
 
 private:
     KKSGISWidgetQGIS(bool withSubWindows, QWidget* parent = 0, Qt::WFlags fl = 0 );

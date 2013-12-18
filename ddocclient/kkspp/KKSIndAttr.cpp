@@ -206,10 +206,6 @@ void KKSIndAttr :: setRefColumnType(KKSAttrType * _type)
 
 KKSIndAttrClass KKSIndAttr :: isSystem() const
 {
-#ifdef Q_CC_MSVC
     return iacIOUserAttr;
-#else
-    return iacIOUserAttr;
-#endif    
 }
 

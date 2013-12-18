@@ -133,13 +133,14 @@ private:
     KKSSettings * getKKSSettings (const QString & organization, 
                                   const QString & application = QString());
     KKSSettings * getKKSSettings (const QString & fileName);
-    QString & getWDir();
+    const QString & getWDir() const;
 
 public:
 
 
     void loadTranslator();
     void loadQGISPlugins();
+    const QString & GISHomeDir() const;
 
     QByteArray toCString(QString str)
     {
@@ -206,6 +207,7 @@ private:
     mutable KKSTemplateEditorFactory * m_tf;
     mutable KKSStuffFactory * m_sf;
     mutable KKSAttributesFactory * m_attrf;
+    mutable QString m_GISHomeDir; //каталог для временного хранения выгруженных на клиент файлов проектов и слоев QGIS
     //mutable KKSIndFactory * m_indf;
 
     mutable KKSDbgOutputWidget * m_dbgWidget;
