@@ -44,6 +44,12 @@ protected:
                             QWidget * parent = NULL
                             ) const;
 
+        int     rGetGISFiles(bool bForRec, 
+                             const QString & homeDir, 
+                             qint64 idObj, 
+                             int blockSize = _MAX_FILE_BLOCK, 
+                             QWidget * parent = NULL) const;
+
         QString rGetAbsUrl( int idUrl ) const;
 
         int     rSetUrl(    int idUrl,
@@ -59,6 +65,9 @@ protected:
         int     rDeleteFile( int idUrl ) const;
         
         int     rRemoveUrl( int idUrl ) const;
+        
+        int     ioRemoveGISFiles(qint64 idObj, bool withFiles) const;
+        int     recRemoveGISFiles(qint64 idRecord, bool withFiles) const;
 
         qint64  rGetFileSize(int idUrl) const;
 

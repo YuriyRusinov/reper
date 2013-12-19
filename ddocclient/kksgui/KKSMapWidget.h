@@ -31,32 +31,40 @@ class _GUI_EXPORT KKSMapWidget : public QWidget, public KKSAttrWidget
 {
     Q_OBJECT
 public:
-    KKSMapWidget(const QString & gisHomeDir, const KKSAttrValue* attr = 0, KKSIndAttrClass isSys = iacIOUserAttr, QWidget *parent=NULL);
+    KKSMapWidget(qint64 idObj, 
+                 const QString & gisHomeDir, 
+                 const KKSAttrValue* attr = 0, 
+                 KKSIndAttrClass isSys = iacIOUserAttr, 
+                 QWidget *parent=NULL);
+
     virtual ~KKSMapWidget(void);
 
     QDockWidget * legendWidget() const;
     QDockWidget * layerOrderWidget() const;
+    void init();
 
 signals:
     void valueChanged (qint64 id, KKSIndAttrClass sys, QVariant val);
     void aboutToDestroy(QDockWidget *, QDockWidget *);
-    void downloadFile(KKSFile * f, QWidget * parent);//запрос на выгрузку файла со слоем из БД. файл задается идентификатором из таблицы io_urls
-
+    void downloadGISFiles(bool bForRec, const QString & homeDir, qint64 idObj, QWidget * parent);//запрос на выгрузку файла со слоем из БД. файл задается идентификатором из таблицы io_urls
+    void uploadGISFiles(bool bForRec, const QStringList & files, qint64 idObj, QWidget * parent);//загрузка файлов ГИС-проекта на сервер. Файлы задаются абсолютными путями
 public slots:
     void slotMapChanged(QDomDocument&);
     void slotDataChanged();
+    void slotUploadGISFiles(qint64 idObj);
 private:
     QDockWidget * m_legendWidget;
     QDockWidget * m_layerOrderWidget;
     QString m_GISHomeDir;
     bool m_dataChanged;
-
-    void init(QWidget * parent);
+    qint64 m_idObj;
 
     int openProject();//открываем проект, заданный в качестве значения атрибута
     int downloadLayers(const QString & homeDir, const QString & xmlPrj);//выгрузка на клиент файлов со слоями, если слои представлены файлами (т.е. не PostGIS)
     QString getFileNameForDS(const QString & path, const QString & provider);//берем часть, которая представляет собой название файла, из datasource слоя
-    qint64 getIdUrlForID(const QString & id);//Берем часть, которая представляет собой идентификатор файла в таблице io_urls, из id слоя
+    //qint64 getIdUrlForID(const QString & id);//Берем часть, которая представляет собой идентификатор файла в таблице io_urls, из id слоя
+    bool removeQGISPrjDir(const QString & path);
+    QStringList readGISProjectFiles(const QString & xml) const;
 
 #ifdef __USE_QGIS__
 

@@ -47,6 +47,7 @@ public:
     const QString & linApp() const;
 
     static KKSFileType defType();
+    static KKSFileType defGISType();
 
     void addExtention(KKSFileExtention * e);
     void setExtentions(const KKSList<KKSFileExtention*> & el);

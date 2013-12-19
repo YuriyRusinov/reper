@@ -203,6 +203,18 @@ KKSFileType KKSFileType::defType()
     return type;
 }
 
+KKSFileType KKSFileType::defGISType()
+{
+    KKSFileType type;
+    
+    type.setId(11);
+    type.setName(QObject::tr("System type for embedded GIS files"));
+    type.setLinApp("");
+    type.setWinApp("");
+
+    return type;
+}
+
 const QString & KKSFileType::app() const
 {
 #ifdef WIN32

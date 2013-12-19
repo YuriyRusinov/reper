@@ -51,6 +51,7 @@
 #include <QDateTimeEdit>
 #include <QVector>
 #include <QtDebug>
+#include <QFileInfo>
 
 #include "KKSObjEditorFactory.h"
 #include <KKSObjEditor.h>
@@ -141,6 +142,7 @@
 
 #include <QPrintDialog>
 #include <QFile>
+#include <QtDebug>
 
 #include <QDomDocument>
 #include <QSqlDatabase>
@@ -242,6 +244,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
     //
     // если ЭИО является ИО, то у него есть еще дополнительные параметры из таблицы attrs_values в БД
     // кроме того, необходимо открыть редактор в выбранном пользователем шаблоне, если шаблонов несколько
+    // io в этом случае будет не NULL
     //
     this->loadEIOasIO (ioTemplate, io, idObject, idObjE, wObjE, wCat);
 
@@ -4209,6 +4212,74 @@ void KKSObjEditorFactory :: slotDownloadFile(KKSFile * f, QWidget * parent)
         f->setLocalUrl(QString::null);
     }
 }
+
+/*
+слот осуществляет скачивание файлов для атрибута типа ГИС-объект из БД в локальную файловую систему
+*/
+void KKSObjEditorFactory :: slotDownloadGISFiles(bool bForRec, 
+                                                 const QString & homeDir, 
+                                                 qint64 idObj, 
+                                                 QWidget * parent)
+{
+    if(idObj <= 0)
+        return;
+
+    int res = fileLoader->rGetGISFiles(bForRec, homeDir, idObj, -1, parent);
+    if(res != OK_CODE)
+        qWarning() << tr("An error was occured while downloading GIS files!");
+
+    return;
+}
+
+void KKSObjEditorFactory :: slotUploadGISFiles(bool bForRec, 
+                                               const QStringList & files, 
+                                               qint64 idObj, 
+                                               QWidget * parent)
+{
+    if(idObj <= 0)
+        return;
+
+    if(files.count() <= 0)
+        return;
+
+    //сначала надо удалить все предыдущие ГИС-файлы с сервера
+    int res = -1;
+    if(!bForRec)
+        res = fileLoader->ioRemoveGISFiles(idObj, true);
+    else
+        res = fileLoader->recRemoveGISFiles(idObj, true);
+
+    if(res != OK_CODE){
+        QMessageBox::critical(parent, QObject::tr("Error"), QObject::tr("Cannot remove old GIS files from server for %1 with ID = %2!").arg(bForRec? QObject::tr("record") : QObject::tr("object")).arg(idObj));
+        return;
+    }
+
+    for(int i=0; i<files.count(); i++){
+        QString localUrl = files.at(i);
+        QFileInfo fi(localUrl);
+        if(!fi.exists()){
+            qCritical() << QObject::tr("GIS-object file does not exist!\nPath = %1").arg(localUrl);
+        }
+
+        KKSFile f(-1, fi.fileName());
+        //f.setId(-1);
+        f.setLocalUrl(localUrl);
+        //f.setName(fi.fileName());
+        f.setSrcExt(fi.suffix());
+        f.setType(KKSFileType::defGISType());
+        
+        if(!bForRec)
+            ppf->insertFile(idObj, &f, parent);
+        else
+            eiof->insertFile(idObj, &f, parent);
+        
+        if(f.id() <= 0)
+            qCritical() << QObject::tr("Cannot upload GIS-object file!\nPath = %1").arg(localUrl);
+    }
+
+}
+
+
 
 /* Метод осуществляет установку шаблонов для пользовательских атрибутов.
  * Параметры:

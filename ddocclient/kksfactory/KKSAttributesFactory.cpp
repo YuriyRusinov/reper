@@ -1806,9 +1806,21 @@ QWidget * KKSAttributesFactory :: createMapWidget (const KKSAttrValue * av,
     QVBoxLayout * vBoxLayout = new QVBoxLayout();
     parent->setLayout(vBoxLayout);
 
-    attrWidget = new KKSMapWidget(m_GISHomeDir, av, isSystem);
+    qint64 idObj = -1;
+    if(objEditor->getObj())
+        idObj = objEditor->getObj()->id();
+    else
+        idObj = objEditor->getObjectEx()->id();
+
+    attrWidget = new KKSMapWidget(idObj, m_GISHomeDir, av, isSystem, parent);
+    
+    connect(attrWidget, SIGNAL(downloadGISFiles(bool, const QString &, qint64, QWidget *)), m_oef, SLOT(slotDownloadGISFiles(bool, const QString &, qint64, QWidget *)));
+    connect(objEditor, SIGNAL(uploadGISFiles(qint64)), attrWidget, SLOT(slotUploadGISFiles(qint64)));//в редакторе ИО нажали на кнопку "сохранить". Требуется загрузить ГИС-файлы на сервер
+    connect(attrWidget, SIGNAL(uploadGISFiles(bool, const QStringList &, qint64, QWidget *)), m_oef, SLOT(slotUploadGISFiles(bool, const QStringList &, qint64, QWidget *)));
+    
+    attrWidget->init();
     //connect(attrWidget, SIGNAL(downloadFile(const QString&, const QString&, qint64)), this, SIGNAL(downloadFileForGIS(const QString&, const QString&, qint64)));
-    connect(attrWidget, SIGNAL(downloadFile(KKSFile*, QWidget *)), m_oef, SLOT(slotDownloadFile(KKSFile*, QWidget*)));    
+    //connect(attrWidget, SIGNAL(downloadFile(KKSFile*, QWidget *)), m_oef, SLOT(slotDownloadFile(KKSFile*, QWidget*)));    
     //delete attrWidget;
     //attrWidget = 0;
 

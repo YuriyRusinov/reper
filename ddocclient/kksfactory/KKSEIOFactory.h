@@ -60,6 +60,8 @@ public:
     int insertCommand(KKSObjectExemplar* eio) const;
     int insertMessage(KKSObjectExemplar* eio) const;
     int insertTSDRecord(KKSObjectExemplar* eio) const;
+
+    int insertFile(qint64 idRecord, KKSFile * f, QWidget * parent = NULL) const;
     
 
     void setDb(KKSDatabase * db);
@@ -130,7 +132,6 @@ private:
     int deleteRubricators(bool bMyDocs = false) const;
     int deleteRubric(int idRubric) const;
 
-    int insertFile(qint64 idRecord, KKSFile * f, QWidget * parent = NULL) const;
     int insertFiles(const KKSObjectExemplar * eio, QWidget * parent = NULL) const;
     int updateFiles(const KKSObjectExemplar * eio, QWidget * parent = NULL) const;
     int updateFileInfo(KKSFile * f) const;

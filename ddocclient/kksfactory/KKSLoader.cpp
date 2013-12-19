@@ -3401,10 +3401,7 @@ KKSList<KKSFileType *> KKSLoader::loadFileTypes() const
 {
     KKSList<KKSFileType *> fileTypes;
 
-    QString tableNames = QString(VIEW_PREFIX) + "url_types ut ";
-
-    QString sql = QString("select ut.id, ut.name, ut.win_app, ut.lin_app, extentions"
-                          " from %1 ").arg(tableNames);
+    QString sql = QString("select id, name, win_app, lin_app, extentions from rGetUrlTypes()");
 
     KKSResult * res = db->execute(sql);
     if(!res)

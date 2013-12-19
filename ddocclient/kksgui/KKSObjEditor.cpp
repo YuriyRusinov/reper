@@ -338,16 +338,12 @@ int KKSObjEditor :: constructObject()
     for (pSysAttrValues=sysAttrValues.constBegin (); pSysAttrValues != sysAttrValues.constEnd(); pSysAttrValues++)
     {
          const KKSAttrValue *cAttrValue = pSysAttrValues.value();
-        //int idAttr = cAttr->id();
         KKSValue v;
-        /*if (cAttr->id() == 97)
-            qDebug () << __PRETTY_FUNCTION__ << sysAttributesValues.value (pSysAttrs.key());*/
         if (!chSysOptWidgets.contains (pSysAttrValues.key()) || chSysOptWidgets.value (pSysAttrValues.key())->isEnabled())
         {
             //
             // Mandatory or enabled optional parameter
             //
-            //qWarning() << cAttr->code();
             QString value;
             int type = cAttrValue->attribute()->type()->attrType();
             QVariant val = cAttrValue->value().valueVariant(); //sysAttributesValues.value (pSysAttrs.key());
@@ -355,7 +351,6 @@ int KKSObjEditor :: constructObject()
             if (type == KKSAttrType::atCheckList || type == KKSAttrType::atCheckListEx)
             {
                 value = val.toStringList().join(",");
-                //qDebug () << __PRETTY_FUNCTION__ << cAttrValue->attribute()->id() << value;
             }
             //ksa
             else if (type == KKSAttrType::atHistogram)
@@ -366,6 +361,14 @@ int KKSObjEditor :: constructObject()
             else if(type == KKSAttrType::atVectorLayer)
             {
                 value = val.toString();
+                
+                //здесь нельзя делать этот emit. Т.к. в слкчае создания нового ИО (ЭИО) мы еще не сохранили его в БД (не знаем его идентификатор)
+                //Его мы узнаем только после сохранения (см. метод saveToDb())
+                
+                //emit uploadGISFiles();//требуется загрузка на сервер файлов для ГИС-объекта
+                                        //поскольку в рамках одного KKSObjEditor может быть только один атрибут типа ГИС-объект, 
+                                        //то в данном сигнале надо передавать Только ИД ИО (ЭИО). Его поймает нужный виджет
+                                        //который сам знает, что ему надо загружать
             }
             //ksa
             else if(type == KKSAttrType::atRasterLayer)
@@ -937,6 +940,10 @@ void KKSObjEditor :: saveToDb (int num)
         if (pCat && pCat->id () == pObjectEx->io()->category()->id ())
             isMain = true;
         emit saveObjE (this, pObjectEx, (isMain ? 0 : pCat), (isMain ? QString() : currTablename), num, pRecModel);
+        
+        //здесь (после сохранения ИО или ЭИО в БД) мы знаем их идентификатор
+        //теперь можно сохранить файлы для ГИС-объектов (если такие атрибуты присутствуют в данном ИО или ЭИО)
+        emit uploadGISFiles(pObjectEx->id());
     }
 
     //
@@ -947,7 +954,10 @@ void KKSObjEditor :: saveToDb (int num)
     if (pObj)
     {
         emit saveObj (this, pObj, pObjectEx, num, pRecModel);
-        //emit ioChanged();
+        
+        //здесь (после сохранения ИО или ЭИО в БД) мы знаем их идентификатор
+        //теперь можно сохранить файлы для ГИС-объектов (если такие атрибуты присутствуют в данном ИО или ЭИО)
+        emit uploadGISFiles(pObj->id());
     }
 
 }

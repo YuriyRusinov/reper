@@ -111,6 +111,40 @@ int KKSFileLoader::getDefaultBlockSize() const
     return _MAX_FILE_BLOCK;
 }
 
+
+int KKSFileLoader::rGetGISFiles(bool bForRec, 
+                                const QString & homeDir, 
+                                qint64 idObj, 
+                                int blockSize, 
+                                QWidget * parent) const
+{
+    //m_db
+    QString sql;
+    if(bForRec)
+        sql = QString("select * from recGetGISFiles(%1)").arg(idObj); //idObj means as idRecord
+    else
+        sql = QString("select * from ioGetGISFiles(%1)").arg(idObj);
+
+    KKSResult * res = m_db->execute(sql);
+    if(!res || res->getRowCount() <= 0){
+        if(res)
+            delete res;
+        return ERROR_CODE;
+    }
+
+    for(int i=0; i<res->getRowCount(); i++){
+        QString toUrl = homeDir + res->getCellAsString(i, 3) + res->getCellAsString(i, 8); //homedir + filename + ext
+        qint64 idUrl = res->getCellAsInt64(i, 1);
+        int ok = rGetFile(idUrl, toUrl, blockSize, parent);
+        if(ok != OK_CODE){
+            qWarning() << QObject::tr("Cannot download GIS file.\nID = %1, to URL = %2").arg(idUrl).arg(toUrl);
+        }
+    }
+
+    return OK_CODE;
+}
+
+
 /*!\brief Метод возвращает и сохраняет в файле локальной файловой системы заданный файл.
 
 Вызываются функции БСФ rGetAbsUrl(int4, int4) и rGetRaster(varchar, int4, int8).
@@ -842,4 +876,42 @@ void KKSFileLoader::clearLastError() const
     error->setGroup("SUCCESSFUL COMPLETION");
     error->setData("");
     */
+}
+
+int KKSFileLoader::ioRemoveGISFiles(qint64 idObj, bool withFiles) const
+{
+    QString sql = QString("select rRemoveGISObjUrl(%1, %2)").arg(idObj).arg(withFiles ? "TRUE" : "FALSE");
+    KKSResult * res = m_db->execute(sql);
+    if(!res || res->getRowCount() <= 0){
+        if(res)
+            delete res;
+        return ERROR_CODE;
+    }
+
+    int ok = res->getCellAsInt(0, 0);
+    delete res;
+    
+    if(ok != 1)
+        return ERROR_CODE;
+
+    return OK_CODE;
+}
+
+int KKSFileLoader::recRemoveGISFiles(qint64 idRecord, bool withFiles) const
+{
+    QString sql = QString("select rRemoveGISRecUrl(%1, %2)").arg(idRecord).arg(withFiles ? "TRUE" : "FALSE");
+    KKSResult * res = m_db->execute(sql);
+    if(!res || res->getRowCount() <= 0){
+        if(res)
+            delete res;
+        return ERROR_CODE;
+    }
+
+    int ok = res->getCellAsInt(0, 0);
+    delete res;
+    
+    if(ok != 1)
+        return ERROR_CODE;
+
+    return OK_CODE;
 }

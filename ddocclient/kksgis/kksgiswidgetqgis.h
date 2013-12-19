@@ -146,7 +146,7 @@ signals:
 
 private:
     KKSGISWidgetQGIS(bool withSubWindows, QWidget* parent = 0, Qt::WFlags fl = 0 );
-    ~KKSGISWidgetQGIS();
+    virtual ~KKSGISWidgetQGIS();
 
 private slots:
     void zoomInMode();

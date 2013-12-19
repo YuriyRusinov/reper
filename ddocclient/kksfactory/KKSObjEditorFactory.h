@@ -315,6 +315,16 @@ private slots:
     // используется для загрузки файлов с сервера в локальную ФС
     //
     void slotDownloadFile (KKSFile *, QWidget * parent);
+    //слот осуществляет скачивание файлов для атрибута типа ГИС-объект из БД в локальную файловую систему
+    void slotDownloadGISFiles(bool bForRec, 
+                              const QString & homeDir, 
+                              qint64 idObj, 
+                              QWidget * parent);
+    
+    void slotUploadGISFiles(bool bForRec, 
+                            const QStringList & files, 
+                            qint64 idObj, 
+                            QWidget * parent);
 
     void slotIncludeRequested (KKSObjEditor * editor);//используется при редактировании вложений ИО. Вызывает в режиме диалога редактор справочника ИО
     void slotIncludeRecRequested (KKSObjEditor * editor);//используется при редактировании вложений ИО. Вызывает в режиме диалога редактор справочника ИО

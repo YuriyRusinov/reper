@@ -950,8 +950,9 @@ qint64 JKKSLoader :: updateDocument (JKKSDocument *doc) const
     //
 
     //сначала удаляем старые
+    //TODO: не забыть про ГИС-файлы!
     result = -1;
-    sql = QString("select rRemoveObjUrl(%1, TRUE)").arg(doc->id());
+    sql = QString("select rRemoveObjUrl(%1, TRUE)").arg(doc->id());//данный вызов удаляет все файлы, включая ГИС-файлы
     res = dbWrite->execute(sql);
     if(res && res->getRowCount() == 1){
         result = res->getCellAsInt(0, 0);

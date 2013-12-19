@@ -256,6 +256,11 @@ class _GUI_EXPORT KKSObjEditor : public KKSRecDialog
         void loadHistory (const KKSAttrValue *, qint64, qint64, bool);
         
         void viewHist (const KKSList<KKSAttrValue *>&);
+        
+        void uploadGISFiles(qint64 id);//требуется загрузка на сервер файлов для ГИС-объекта
+                                       //поскольку в рамках одного KKSObjEditor может быть только один атрибут типа ГИС-объект, 
+                                       //то в данном сигнале надо передавать Только ИД ИО (ЭИО). Его поймает нужный виджет
+                                       //который сам знает, что ему надо загружать
 
     public slots:
         //void slotRubricItemRequested();
