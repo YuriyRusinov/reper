@@ -41,7 +41,7 @@ class KKSMainWindow : public QMainWindow
 Q_OBJECT
     public:
         KKSMainWindow(QWidget *parent=0);
-        ~KKSMainWindow();
+        virtual ~KKSMainWindow();
 
 
     protected:

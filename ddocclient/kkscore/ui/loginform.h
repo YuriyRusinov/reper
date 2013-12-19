@@ -58,6 +58,9 @@ class LoginForm : public QDialog//, private Ui::login_form
     QString level() const;
     int levelIndex() const;
 
+  public slots:
+      int exec (void);
+
   private:
     bool moreShown;
 

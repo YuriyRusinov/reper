@@ -1,5 +1,6 @@
 #include <QPushButton>
 #include <QLineEdit>
+#include <QtDebug>
 
 #include "loginform.h"
 #include "ui_login_form.h"
@@ -143,4 +144,11 @@ QString LoginForm::level() const
 int LoginForm::levelIndex() const
 {
     return ui->cbLevel->currentIndex();
+}
+
+int LoginForm::exec (void)
+{
+    qDebug () << __PRETTY_FUNCTION__;
+    int r = QDialog::exec();
+    return r;
 }

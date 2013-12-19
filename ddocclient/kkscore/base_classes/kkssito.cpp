@@ -817,6 +817,9 @@ int KKSSito::GUIConnect(QWidget * parent)
     }
 
     KKSAccLevel currLevel(currentLevel, port);
+//    QDialog * dlW = new QDialog ();
+//    if (dlW->exec() == QDialog::Accepted)
+//        qDebug () << __PRETTY_FUNCTION__;
     LoginForm * lf = new LoginForm( levels, currLevel, 0 );
     
     bool result = false;
@@ -825,7 +828,7 @@ int KKSSito::GUIConnect(QWidget * parent)
     {
         //lf->setAccLevels(m_accLevels);
 
-		lf->setUser(user, kksSito->allowedUserName.isEmpty() ? true : false);
+        lf->setUser(user, kksSito->allowedUserName.isEmpty() ? true : false);
         lf->setHost(ip);
         lf->setName(dbname);
         //lf->setPort(port);
