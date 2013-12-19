@@ -10,6 +10,7 @@
 \i ./functions/io_objects/iogetlog.sql
 
 \i ./functions/io_objects/iogetfiles.sql
+\i ./functions/io_objects/iogetgisfiles.sql
 \i ./functions/io_objects/ioinserturl.sql
 
 

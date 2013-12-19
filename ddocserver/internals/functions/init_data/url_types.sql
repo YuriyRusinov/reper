@@ -8,5 +8,6 @@ insert into url_types (id, name, win_app, lin_app, extentions) values (7, 'Файлы
 insert into url_types (id, name, win_app, lin_app, extentions) values (8, 'Файлы ГИС ArcGIS', 'arcgis', '', '{23}');
 insert into url_types (id, name, win_app, lin_app, extentions) values (9, 'Простые файлы изображений', 'paint', '', '{24,26,32,33}');
 insert into url_types (id, name, win_app, lin_app, extentions) values (10, 'Файлы ERDAS Imagine', '', '', '{24,25,26,27,28,29,30,31,32}');
+insert into url_types (id, name, win_app, lin_app, extentions) values (11, 'Файлы для встроенной поддержки ГИС (в список файлов ИО не попадают!)', '', '', '{}');
 
-SELECT pg_catalog.setval('url_types_id_seq', 10, true);
+SELECT pg_catalog.setval('url_types_id_seq', 11, true);

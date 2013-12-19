@@ -57,7 +57,8 @@ select f_create_trigger('zz_trgzioinserttableafter', 'after', 'insert', 'io_obje
 
 
 --ВСЕ ОСТАЛЬНОЕ ЗДЕСЬ
-
+insert into url_types (id, name, win_app, lin_app, extentions) values (11, 'Файлы для встроенной поддержки ГИС (в список файлов ИО не попадают!)', '', '', '{}');
+SELECT pg_catalog.setval('url_types_id_seq', 11, true);
 
 --почему-то иногда ряд атрибутов не обновляется.
 --*****

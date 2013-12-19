@@ -12,6 +12,7 @@
 \i ./functions/general/recupdate.sql
 \i ./functions/general/gettablebyuid.sql
 \i ./functions/general/recgetfiles.sql
+\i ./functions/general/recgetgisfiles.sql
 \i ./functions/general/recinserturl.sql
 \i ./functions/general/generateuuid.sql
 

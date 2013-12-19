@@ -38,6 +38,8 @@ begin
             uo.id_record = idRecord
             and uo.id_url = iu.id
             and iu.id_url_type = ut.id
+            and iu.uploaded = true
+            and ut.id <> 11 --system files for embedded GIS (not included in IO files list!!!)
     loop
         return next r;
     end loop;
