@@ -27,7 +27,7 @@ public:
                  bool isCreate=true, 
                  QWidget *parent=0, 
                  Qt::WFlags f=0);
-    ~CommandForm (void);
+    virtual ~CommandForm (void);
 
     KKSCategory * getCategory (void) const;
     void setCategory (KKSCategory * cat);

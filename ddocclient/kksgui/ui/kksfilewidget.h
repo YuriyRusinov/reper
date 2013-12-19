@@ -23,7 +23,7 @@ public:
                   const KKSList<KKSFileType*> & fileTypes,
                   bool dialogMode = false,
                   QWidget *parent = 0);
-    ~KKSFileWidget();
+    virtual ~KKSFileWidget();
 
     const KKSList<KKSFile*> & files() const;
     const KKSList<KKSFileType*> & fileTypes() const;

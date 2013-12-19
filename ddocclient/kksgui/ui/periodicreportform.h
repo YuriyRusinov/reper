@@ -21,7 +21,7 @@ class _GUI_EXPORT PeriodicReportForm : public QDialog
 {
 public:
     PeriodicReportForm (bool isCreate=true, QWidget * parent=0, Qt::WFlags f=0);
-    ~PeriodicReportForm (void);
+    virtual ~PeriodicReportForm (void);
 
     KKSObjectExemplar * getReport (void) const;
     void setReport (KKSObjectExemplar * peio);

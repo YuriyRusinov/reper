@@ -118,7 +118,7 @@ KKSSito::KKSSito(const QString & userName, bool msgToWindow) :
     m_sf = 0;
 
     self = this;
-	allowedUserName = userName;
+    allowedUserName = userName;
 
     QDir dir;
     workingDir = dir.absolutePath();
@@ -726,20 +726,25 @@ KKSSito * KKSSito::init (int argc,
     if ( self )
         qFatal(tr("There should be only one KKSSito object").toLocal8Bit().constData());
 
-    if ( QCoreApplication::instance() ){
-        qFatal(tr("There are already exist a QApplication object. You did not create QApplication objects manually!").toLocal8Bit().constData());
-    }
+//    if ( QCoreApplication::instance() ){
+//        qFatal(tr("There are already exist a QApplication object. You did not create QApplication objects manually!").toLocal8Bit().constData());
+//    }
 
-    QApplication * app;
+    QApplication * app (0);
+    if (QCoreApplication::instance() )
+        app = qobject_cast<QApplication *>(QCoreApplication::instance() );
 
 #ifdef __USE_QGIS__
-    app = new QgsApplication(argc, argv, true);
+    if (!app)
+        app = new QgsApplication(argc, argv, true);
+
     //QgsApplication * a = static_cast <QgsApplication *> (app);
-    // ---- invoked in loadQGISPlugins ----
+    // ---- invoked in KKSSito::loadQGISPlugins ----
     //a->setPluginPath(pluginPath);
     //a->initQgis();
 #else
-    app = new QApplication(argc, argv);
+    if (!app)
+        app = new QApplication(argc, argv);
 #endif
 
     KKSSito * xG0;

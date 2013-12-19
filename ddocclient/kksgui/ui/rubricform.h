@@ -23,7 +23,7 @@ class _GUI_EXPORT RubricForm : public QDialog
 {
 public:
     RubricForm (QString defaultRubricName=QString(), QString defaultRubricDesc=QString(), bool forRecords=false, QWidget* parent=0, Qt::WFlags f=0);
-    ~RubricForm (void);
+    virtual ~RubricForm (void);
 
     QString getRubricName (void) const;
     void setRubricName (QString rName);

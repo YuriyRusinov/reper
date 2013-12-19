@@ -68,7 +68,7 @@ public:
                          bool mode = true,
                          QWidget *parent = 0,
                          Qt::WFlags f=0);
-    ~KKSFiltersEditorForm();
+    virtual ~KKSFiltersEditorForm();
 
     KKSList<const KKSFilterGroup*> & filters();
     void setFilters (const KKSList<const KKSFilterGroup*> & filters);

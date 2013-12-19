@@ -26,37 +26,37 @@ class KKSAttrType;
 
 class _GUI_EXPORT KKSCatAttrEditor : public QDialog
 {
-    public:
-        KKSCatAttrEditor (KKSCategoryAttr *attr, const KKSMap<int, KKSAttrType *>& aTypes, bool for_template=false, QWidget *parent=0);
-        ~KKSCatAttrEditor (void);
+public:
+    KKSCatAttrEditor (KKSCategoryAttr *attr, const KKSMap<int, KKSAttrType *>& aTypes, bool for_template=false, QWidget *parent=0);
+    virtual ~KKSCatAttrEditor (void);
 
-        KKSCategoryAttr * getCatAttribute (void);
-        const KKSCategoryAttr * getCatAttribute (void) const;
+    KKSCategoryAttr * getCatAttribute (void);
+    const KKSCategoryAttr * getCatAttribute (void) const;
 
-        int getTypeID (void) const;
+    int getTypeID (void) const;
 
-    private slots:
-        void accept ();
-        void uploadAttributes ();
-        void currentAttrTypeChanged (int index);
+private slots:
+    void accept ();
+    void uploadAttributes ();
+    void currentAttrTypeChanged (int index);
 
-    private:
-        //
-        // Functions
-        //
-        void init_widgets (bool isCat);
-        void set_types (void);
+private:
+    //
+    // Functions
+    //
+    void init_widgets (bool isCat);
+    void set_types (void);
 
-    private:
-        //
-        // Variables
-        //
-        KKSCategoryAttr *attribute;
-        KKSMap<int, KKSAttrType *> attrTypes;
-        Ui::kkscatattr_editor* ui;
+private:
+    //
+    // Variables
+    //
+    KKSCategoryAttr *attribute;
+    KKSMap<int, KKSAttrType *> attrTypes;
+    Ui::kkscatattr_editor* ui;
 
-    private:
-        Q_OBJECT
+private:
+    Q_OBJECT
 };
 
 #endif

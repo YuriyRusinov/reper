@@ -99,7 +99,7 @@ class _GUI_EXPORT CmdJournalSettingsForm : public QDialog
 
 public:
     CmdJournalSettingsForm(const KKSCmdJSettings & settings, QWidget *parent = 0);
-    ~CmdJournalSettingsForm();
+    virtual ~CmdJournalSettingsForm();
 
     void setSettings(const KKSCmdJSettings & settings);
     const KKSCmdJSettings & settings();

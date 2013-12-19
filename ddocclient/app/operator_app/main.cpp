@@ -16,8 +16,8 @@ int main(int argc, char *argv[])
     //QApplication app(argc, argv);
 
     KKSSito *sito = NULL;
-	
-    KKSMainWindow * mainWindow = NULL;
+
+    QMainWindow * mainWindow = NULL;
 
     QTextCodec::setCodecForTr(QTextCodec::codecForName("Windows-1251"));
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("cp1251"));
@@ -27,13 +27,13 @@ int main(int argc, char *argv[])
         //sito = KKSSito::init (false);//, QString("admin"));
         sito = KKSSito::init (argc, argv, false, QString("admin"), true);
         mainWindow = new KKSMainWindow();
-		mainWindow->setWindowTitle(QObject::tr("DynamicDocs ") + QObject::tr("Administrator") + " " + KKS_VERSION);
+        mainWindow->setWindowTitle(QObject::tr("DynamicDocs ") + QObject::tr("Administrator") + " " + KKS_VERSION);
         //mainWindow->setWindowTitle(QObject::tr("PK IR ") + QObject::tr("Administrator") + " " + KKS_VERSION);
     }
     else{
         sito = KKSSito::init (argc, argv, false, QString(), true);
         mainWindow = new KKSMainWindow();
-		mainWindow->setWindowTitle(QObject::tr("DynamicDocs ") + QObject::tr("Operator") + " " + KKS_VERSION);
+        mainWindow->setWindowTitle(QObject::tr("DynamicDocs ") + QObject::tr("Operator") + " " + KKS_VERSION);
         //mainWindow->setWindowTitle(QObject::tr("PK IR ") + QObject::tr("Operator") + " " + KKS_VERSION);
     }
 
@@ -44,7 +44,6 @@ int main(int argc, char *argv[])
 
     mainWindow->show();
 
-    //int r = app.exec();
     int r = qApp->exec();
 
     delete mainWindow;

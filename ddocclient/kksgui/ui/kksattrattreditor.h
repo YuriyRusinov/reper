@@ -28,7 +28,7 @@ class _GUI_EXPORT KKSAttrAttrEditor : public QDialog
 {
 public:
     KKSAttrAttrEditor (KKSCategoryAttr *attr, bool for_template=false, QWidget *parent=0);
-    ~KKSAttrAttrEditor (void);
+    virtual ~KKSAttrAttrEditor (void);
 
     KKSCategoryAttr * getAttrAttribute (void);
     const KKSCategoryAttr * getAttrAttribute (void) const;

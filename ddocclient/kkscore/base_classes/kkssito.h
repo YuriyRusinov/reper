@@ -193,6 +193,9 @@ protected:
     KKSSettings * poSettings;
 
 private:
+    //
+    // Variables
+    //
     KKSError * lastError;
     mutable KKSDatabase * poDb;
     mutable KKSDatabase * poDb1;//для отдельного потока

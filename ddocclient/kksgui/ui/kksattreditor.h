@@ -37,7 +37,7 @@ class _GUI_EXPORT KKSAttrEditor : public QDialog
 {
 public:
     KKSAttrEditor (KKSAttribute *attr, const KKSMap<int, KKSAttrType *>& aTypes, const KKSMap<int, KKSAGroup*>& aGroups, const QMap<int, QString>& Refs, QWidget *parent=0);
-    ~KKSAttrEditor (void);
+    virtual ~KKSAttrEditor (void);
 
     KKSAttribute * getAttribute (void);
     const KKSAttribute * getAttribute (void) const;

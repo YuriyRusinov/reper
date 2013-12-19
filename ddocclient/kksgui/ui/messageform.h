@@ -28,7 +28,7 @@ public:
                  bool isCreate=true, 
                  QWidget *parent=0, 
                  Qt::WFlags f=0);
-    ~MessageForm (void);
+    virtual ~MessageForm (void);
 
     KKSObjectExemplar * getMessage (void) const;
     void setMessage (KKSObjectExemplar * meio);

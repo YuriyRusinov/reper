@@ -99,7 +99,7 @@ class _GUI_EXPORT MsgJournalSettingsForm : public QDialog
 
 public:
     MsgJournalSettingsForm(const KKSMsgJSettings & settings, QWidget *parent = 0);
-    ~MsgJournalSettingsForm();
+    virtual ~MsgJournalSettingsForm();
 
     void setSettings(const KKSMsgJSettings & settings);
     const KKSMsgJSettings & settings();

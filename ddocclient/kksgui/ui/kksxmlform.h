@@ -49,7 +49,7 @@ class _GUI_EXPORT KKSXMLForm : public QDialog
 {
 public:
     KKSXMLForm (KKSObject *obj, QString formTitle=QString(), bool for_export=false, QWidget *parent=0);
-    ~KKSXMLForm (void);
+    virtual ~KKSXMLForm (void);
 
     void setImport (bool value);
 

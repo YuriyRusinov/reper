@@ -18,7 +18,7 @@ class _GUI_EXPORT KKSStatisticView: public QTreeView
         KKSStatisticView (KKSList<KKSStatElement*> items,
                           QWidget *parent = 0);
 
-        ~KKSStatisticView();
+        virtual ~KKSStatisticView();
 
     private slots:
         void init();

@@ -35,7 +35,7 @@ public:
                   //QMenu * widgetMenu = 0,
                   QWidget *parent = 0, 
                   Qt::WFlags flags = 0);
-    ~KKSMsgJournal();
+    virtual ~KKSMsgJournal();
 
     QMenu * sysMenu() const { return m_pSysMenu; }
     //void setWidgetMenu(QMenu * widgetMenu);
