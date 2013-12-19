@@ -17,8 +17,6 @@
 
 int main(int argc, char *argv[])
 {
-    //QApplication app(argc, argv);
-
 #ifdef __USE_QGIS__
     QApplication * app = new QgsApplication(argc, argv, true);
 
@@ -62,5 +60,6 @@ int main(int argc, char *argv[])
     int r = qApp->exec();
 
     delete mainWindow;
+    delete app;
     return r;
 }

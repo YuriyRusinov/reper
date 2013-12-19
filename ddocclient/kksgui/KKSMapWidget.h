@@ -51,6 +51,7 @@ signals:
 public slots:
     void slotMapChanged(QDomDocument&);
     void slotDataChanged();
+    void slotMapOpened();
     void slotUploadGISFiles(qint64 idObj);
 private:
     QDockWidget * m_legendWidget;
@@ -64,7 +65,8 @@ private:
     QString getFileNameForDS(const QString & path, const QString & provider);//берем часть, которая представляет собой название файла, из datasource слоя
     //qint64 getIdUrlForID(const QString & id);//Берем часть, которая представляет собой идентификатор файла в таблице io_urls, из id слоя
     bool removeQGISPrjDir(const QString & path);
-    QStringList readGISProjectFiles(const QString & xml) const;
+    QStringList readGISProjectLayerFiles(const QString & xml) const;
+    QString readGISProjectFile();
 
 #ifdef __USE_QGIS__
 

@@ -133,7 +133,12 @@ int KKSFileLoader::rGetGISFiles(bool bForRec,
     }
 
     for(int i=0; i<res->getRowCount(); i++){
-        QString toUrl = homeDir + res->getCellAsString(i, 3) + res->getCellAsString(i, 8); //homedir + filename + ext
+        QString fileName = res->getCellAsString(i, 3);
+        QString ext = res->getCellAsString(i, 8);
+        QString toUrl = homeDir + "/" + fileName;
+        if(!fileName.endsWith(QString(".") + ext))
+            toUrl += ext; //homedir + filename + ext
+        
         qint64 idUrl = res->getCellAsInt64(i, 1);
         int ok = rGetFile(idUrl, toUrl, blockSize, parent);
         if(ok != OK_CODE){

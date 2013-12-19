@@ -136,6 +136,7 @@ void KKSMapWidget::initQGIS(QWidget *parent)
 
     openProject(); //открываем проект, который задан в качестве значения атрибута
     
+    connect(mpKKSGISWidget, SIGNAL(projectRead()), this, SLOT(slotMapOpened()));
 }
 
 #endif
@@ -376,8 +377,16 @@ void KKSMapWidget::slotDataChanged()
 
 void KKSMapWidget::slotMapChanged(QDomDocument & prjFile)
 {
-    QString xml = prjFile.toString();
+    Q_UNUSED(prjFile); //там данные все равно не корректные. Нет слоев
     
+    slotMapOpened();
+}
+
+void KKSMapWidget::slotMapOpened()
+{
+
+    QString xml = readGISProjectFile();
+
     KKSValue v(xml, KKSAttrType::atGISMap);
     if(!v.isValid()){
         QMessageBox::critical(this, tr("Error"), tr("Cannot set attribute value for GIS attribute!"));
@@ -448,17 +457,17 @@ void KKSMapWidget::slotUploadGISFiles(qint64 idObj)
     
     QStringList files;
     
-    QString xml = m_av->value().value();
+    QString xml = readGISProjectFile();
     if(xml.isEmpty())
         return;
 
-    files = readGISProjectFiles(xml);
+    files = readGISProjectLayerFiles(xml);
 
     m_idObj = idObj;
     emit uploadGISFiles(bForRec, files, m_idObj, this);//загрузка файлов ГИС-проекта на сервер. Файлы задаются абсолютными путями
 }
 
-QStringList KKSMapWidget::readGISProjectFiles(const QString & xml) const
+QStringList KKSMapWidget::readGISProjectLayerFiles(const QString & xml) const
 {
     QStringList files;
 
@@ -522,4 +531,24 @@ QStringList KKSMapWidget::readGISProjectFiles(const QString & xml) const
 #endif
 
     return files;
+}
+
+QString KKSMapWidget::readGISProjectFile()
+{
+    QString xml;
+
+#ifdef __USE_QGIS__
+    QString prjFile = mpKKSGISWidget->projectFileName();
+    QFile f(prjFile);
+    bool ok = f.open(QIODevice::ReadOnly);
+    if(!ok){
+        QMessageBox::critical(this, tr("Error"), tr("Cannot open project file! Path = %1").arg(prjFile));
+        return xml;
+    }
+
+    xml = f.readAll();
+
+#endif
+
+    return xml;
 }
