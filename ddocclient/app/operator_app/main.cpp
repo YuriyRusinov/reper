@@ -11,9 +11,24 @@
 #include "kkssito.h"
 #include "kksclient_name.h"
 
+#ifdef __USE_QGIS__ 
+#include <QgsApplication.h>
+#endif
+
 int main(int argc, char *argv[])
 {
     //QApplication app(argc, argv);
+
+#ifdef __USE_QGIS__
+    QApplication * app = new QgsApplication(argc, argv, true);
+
+    //QgsApplication * a = static_cast <QgsApplication *> (app);
+    // ---- invoked in KKSSito::loadQGISPlugins ----
+    //a->setPluginPath(pluginPath);
+    //a->initQgis();
+#else
+    QApplication *app = new QApplication(argc, argv);
+#endif
 
     KKSSito *sito = NULL;
 
