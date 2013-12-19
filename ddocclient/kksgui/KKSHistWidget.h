@@ -10,6 +10,8 @@
 
 #include <QWidget>
 #include <QVariant>
+#include <QMap>
+#include <KKSMap.h>
 
 #include "kksgui_config.h"
 #include "KKSAttrWidget.h"
@@ -21,6 +23,8 @@ class QLineEdit;
 class QComboBox;
 
 class KKSCharts;
+class KKSCategory;
+class KKSObject;
 
 class _GUI_EXPORT KKSHistWidget : public QWidget, public KKSAttrWidget
 {
@@ -36,6 +40,12 @@ public:
         tSource = 3,
         tReceiver = 4
     };
+    
+    void loadScenario (const QMap<int, QString>& scList);
+    void loadVariants (const QMap<int, QString>& varList);
+    void loadCategories (const KKSMap<int, KKSCategory *>& catList);
+    void loadIOList (const KKSMap<int, KKSObject *>& IOList);
+    void loadRecvList (const QMap<int, QString>& posList);
 protected:
     //
     // Override functions of basic class

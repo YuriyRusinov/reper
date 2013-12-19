@@ -9,12 +9,22 @@
 #include <QGroupBox>
 #include <QLineEdit>
 #include <QComboBox>
+#include <QGridLayout>
+#include <QLabel>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QDoubleValidator>
+#include <QIntValidator>
+#include <QValidator>
+#include <QtDebug>
 
 #include <KKSHistogram.h>
 #include <KKSAttrValue.h>
 #include "KKSCharts.h"
 #include "KKSHistWidget.h"
 #include "KKSValue.h"
+#include <KKSCategory.h>
+#include <KKSObject.h>
 
 KKSHistWidget::KKSHistWidget(const KKSAttrValue *av, KKSIndAttrClass isSys, QWidget * parent, Qt::WindowFlags flags)
     : QWidget (parent, flags), KKSAttrWidget(av, isSys),
@@ -27,11 +37,19 @@ KKSHistWidget::KKSHistWidget(const KKSAttrValue *av, KKSIndAttrClass isSys, QWid
     cbSource (new QComboBox),
     cbReceiver (new QComboBox)
 {
-    
+    init ();
 }
 
 KKSHistWidget::~KKSHistWidget()
 {
+    delete cbReceiver;
+    delete cbSource;
+    delete cbCategory;
+    delete cbVariant;
+    delete cbScenario;
+    delete lECount;
+    delete lETo;
+    delete lEFrom;
 }
 
 void KKSHistWidget::paintEvent(QPaintEvent *event)
@@ -63,5 +81,118 @@ void KKSHistWidget::paintEvent(QPaintEvent *event)
 
 void KKSHistWidget::init (void)
 {
+    QGridLayout * gLay = new QGridLayout (this);
+    QGroupBox * gbParams = new QGroupBox (tr("Parameters"), this);
+    gLay->addWidget (gbParams, 0, 0, 1, 1);
     
+    QGridLayout * gParLay = new QGridLayout (gbParams);
+    QHBoxLayout * hFromLay = new QHBoxLayout;
+    QLabel * lFrom = new QLabel (tr("From:"), this);
+    hFromLay->addWidget (lFrom);
+    hFromLay->addWidget (lEFrom);
+    QValidator * dFromVal = new QDoubleValidator (this);
+    lEFrom->setValidator (dFromVal);
+    gParLay->addLayout (hFromLay, 0, 0, 1, 1);
+    QLabel * lTo = new QLabel (tr("To:"), this);
+    QHBoxLayout * hToLay = new QHBoxLayout;
+    hToLay->addWidget (lTo);
+    hToLay->addWidget (lETo);
+    QValidator * dToVal = new QDoubleValidator (this);
+    lETo->setValidator (dToVal);
+    gParLay->addLayout (hToLay, 1, 0, 1, 1);
+    QLabel * lNum = new QLabel (tr("Number of bins:"), this);
+    QHBoxLayout * hNumLay = new QHBoxLayout;
+    hNumLay->addWidget (lNum);
+    QValidator * nCountVal = new QIntValidator (1, 1000000, this);
+    lECount->setValidator (nCountVal);
+    hNumLay->addWidget (lECount);
+    gParLay->addLayout (hNumLay, 2, 0, 1, 1);
+    
+    QGroupBox * gbFilters = new QGroupBox (tr("Filters"), this);
+    gLay->addWidget (gbFilters, 1, 0, 1, 1);
+    QGridLayout * gFiltLay = new QGridLayout (gbFilters);
+    QLabel * lScenario = new QLabel (tr("Scenario"), this);
+    QHBoxLayout * hScenarioLay = new QHBoxLayout;
+    hScenarioLay->addWidget (lScenario);
+    hScenarioLay->addWidget (cbScenario);
+    gFiltLay->addLayout(hScenarioLay, 0, 0, 1, 1);
+    QLabel * lVariant = new QLabel (tr("Variant"), this);
+    QHBoxLayout * hVariantLay = new QHBoxLayout;
+    hVariantLay->addWidget (lVariant);
+    hVariantLay->addWidget(cbVariant);
+    gFiltLay->addLayout (hVariantLay, 1, 0, 1, 1);
+    QLabel * lCategory = new QLabel (tr("Category"), this);
+    QHBoxLayout * hCatLay = new QHBoxLayout;
+    hCatLay->addWidget (lCategory);
+    hCatLay->addWidget(cbCategory);
+    gFiltLay->addLayout (hCatLay, 2, 0, 1, 1);
+    
+    QLabel * lSource = new QLabel (tr("Source"), this);
+    QHBoxLayout * hSourceLay = new QHBoxLayout;
+    hSourceLay->addWidget (lSource);
+    hSourceLay->addWidget (cbSource);
+    gFiltLay->addLayout (hSourceLay, 3, 0, 1, 1);
+
+    QLabel * lReceiver = new QLabel (tr("Receiver"), this);
+    QHBoxLayout * hRecLay = new QHBoxLayout;
+    hRecLay->addWidget (lReceiver);
+    hRecLay->addWidget (cbReceiver);
+    gFiltLay->addLayout (hRecLay, 4, 0, 1, 1);
+    
+//    gLay->addWidget (wCharts, 5, 0, 1, 1);
+}
+
+void KKSHistWidget::loadScenario (const QMap<int, QString>& scList)
+{
+    cbScenario->clear ();
+    for (QMap<int, QString>::const_iterator p=scList.constBegin();
+            p != scList.constEnd();
+            ++p)
+    {
+        cbScenario->addItem (p.value(), p.key());
+    }
+}
+
+void KKSHistWidget::loadVariants (const QMap<int, QString>& varList)
+{
+    cbVariant->clear ();
+    for (QMap<int, QString>::const_iterator p=varList.constBegin();
+            p != varList.constEnd();
+            ++p)
+    {
+        cbVariant->addItem (p.value(), p.key());
+    }
+}
+
+void KKSHistWidget::loadCategories (const KKSMap<int, KKSCategory *>& catList)
+{
+    this->cbCategory->clear();
+    for (KKSMap<int, KKSCategory *>::const_iterator p=catList.constBegin();
+            p != catList.constEnd();
+            ++p)
+    {
+        cbCategory->addItem (p.value()->name(), p.key());
+    }
+}
+
+void KKSHistWidget::loadIOList (const KKSMap<int, KKSObject *>& IOList)
+{
+    cbSource->clear ();
+    for (KKSMap<int, KKSObject *>::const_iterator p = IOList.constBegin();
+            p != IOList.constEnd();
+            ++p)
+    {
+        cbSource->addItem (p.value()->name(), p.key());
+    }
+}
+
+void KKSHistWidget::loadRecvList (const QMap<int, QString>& posList)
+{
+    cbReceiver->clear ();
+    for (QMap<int, QString>::const_iterator p=posList.constBegin();
+            p != posList.constEnd();
+            ++p)
+    {
+        cbReceiver->addItem (p.value(), p.key());
+    }
 }
