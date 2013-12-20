@@ -13,6 +13,10 @@
 
 #include "kkspp_config.h"
 
+class KKSCategory;
+class KKSObject;
+class KKSObjectExemplar;
+
 class _PP_EXPORT KKSHistogram
 {
 public:
@@ -36,14 +40,45 @@ public:
     bool fromString(const QString & str);
 
     bool isEmpty() const;
+    
+    int getScenario (void) const;
+    void setScenario (int idSc);
+    
+    int getVariant (void) const;
+    void setVariant (int idv);
+    
+    const KKSCategory * category (void) const;
+    void setCategory (const KKSCategory * cat);
+    
+    const KKSObject * srcObject (void) const;
+    void setSrcObject (const KKSObject * iosrc);
+    
+    int getSource (void) const;
+    void setSource (int ids);
+    
+    int getReceiver (void) const;
+    void setReceiver (int idr);
 
 private:
+    //
+    // Variables
+    //
     QMap<int, double> dHist;
     double m_xmin;
     double m_xmax;
     int m_num;
 
     bool m_isEmpty;
+    //
+    // filter parameters
+    //
+    int idScenario;
+    int idVariant;
+    const KKSCategory * c;
+    const KKSObject * io;
+    int idSource;
+    int idReceiver;
+    
 
 };
 

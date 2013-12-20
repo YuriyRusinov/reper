@@ -1552,7 +1552,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                 if (!isRef)
                 {
                     lTitle = this->createAttrTitle (av, attrClass, objEditor);//, av->attribute()->title(), is_mandatory);
-                    gLayout->addWidget (lTitle, n_str, 0, 1, 2, Qt::AlignRight);
+                    gLayout->addWidget (lTitle, n_str, 0, 2, 2, Qt::AlignRight);
                 }
                 
                 QString v = V.toString ();
@@ -1573,7 +1573,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                 //--gLayout->addLayout (hLay, n_str, 2, 1, 1);
                 if (!isRef)
                 {
-                    gLayout->addWidget (attrWidget, n_str, 2, 1, 1, Qt::AlignCenter);
+                    gLayout->addWidget (attrWidget, n_str, 2, 1, 2, Qt::AlignCenter);
                     //gLayout->addWidget (tbRef, n_str, 3, 1, 1);
                 
                     //QObject::connect (tbRef, SIGNAL(pressed()), attrWidget, SLOT(openFile()));
