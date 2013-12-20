@@ -61,6 +61,16 @@ QString OptionsDialog::getTimer()
     return ui->lineEdit_delay->text();
 }
 
+QString OptionsDialog::getTimerUnits()
+{
+    return ui->lineEdit_timerUnits->text();
+}
+
+bool OptionsDialog::getTimerMode()
+{
+    return ui->checkBox->isChecked();
+}
+
 QString OptionsDialog::getGatewayHost()
 {
     return ui->lineEdit_hostGateway->text();
@@ -114,6 +124,16 @@ void OptionsDialog::setTransport(QString rhs)
 void OptionsDialog::setTimer(QString rhs)
 {
     ui->lineEdit_delay->setText(rhs);
+}
+
+void OptionsDialog::setTimerUnits(QString rhs)
+{
+    ui->lineEdit_timerUnits->setText(rhs);
+}
+
+void OptionsDialog::setTimerMode(bool rhs)
+{
+    ui->checkBox->setChecked(rhs);
 }
 
 void OptionsDialog::setGatewayHost(QString rhs)

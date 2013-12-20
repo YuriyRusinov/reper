@@ -31,6 +31,8 @@ public:
 
     QString getTransport();
     QString getTimer();
+    QString getTimerUnits();
+    bool getTimerMode();
 
     QString getGatewayHost();
     QString getGatewayPort();
@@ -46,6 +48,8 @@ public:
 
     void setTransport(QString rhs);
     void setTimer(QString rhs);
+    void setTimerUnits(QString rhs);
+    void setTimerMode(bool rhs);
 
     void setGatewayHost(QString rhs);
     void setGatewayPort(QString rhs);

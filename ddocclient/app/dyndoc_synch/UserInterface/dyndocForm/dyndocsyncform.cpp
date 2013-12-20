@@ -1,7 +1,7 @@
 #include "UserInterface/dyndocForm/dyndocsyncform.h"
 #include "ui_dyndoc_sync_form.h"
 
-DyndocSyncForm::DyndocSyncForm(QWidget *parent) :
+DyndocSyncForm::DyndocSyncForm(KKSDatabase *adb, QWidget *parent) :
     QDialog(parent)
 {
     ui = new Ui::dyndoc_sync_form;
@@ -12,6 +12,8 @@ DyndocSyncForm::DyndocSyncForm(QWidget *parent) :
 
     m_base = 0;
     httpWin = 0;
+
+    dbLog = adb;
 }
 
 DyndocSyncForm::~DyndocSyncForm()
@@ -402,6 +404,12 @@ void DyndocSyncForm::setConnectionSettings()
     settings.setValue ("server_host",optionsForm->getServerHost()); //serverIp.toString());
     settings.setValue ("server_port",optionsForm->getServerPort()); //UI->lEServerPort->text ());
     settings.endGroup ();
+
+    //settings.beginGroup("Timer");
+    //settings.setValue("delay",optionsForm->getTimer());
+    //settings.setValue("Units",optionsForm->getTimerUnits());
+    //settings.setValue("Mode",optionsForm->getTimerMode());
+    //settings.endGroup();
 }
 
 void DyndocSyncForm::loadSettings()
@@ -430,6 +438,12 @@ void DyndocSyncForm::loadSettings()
     optionsForm->setServerHost(settings.value ("server_host").toString ());
     optionsForm->setServerPort(settings.value ("server_port").toString ());
     settings.endGroup ();
+
+    //settings.beginGroup("Timer");
+    //optionsForm->setTimer(settings.value("delay").toString());
+    //optionsForm->setTimerUnits(settings.value("Units").toString());
+    //optionsForm->setTimerMode(settings.value("Mode").toBool());
+    //settings.endGroup();
 }
 
 //*****
@@ -468,7 +482,7 @@ void DyndocSyncForm::slot_startSyncronizationClicked()
     m_base = new DDocInteractorBase(NULL);
 
     connect(this,SIGNAL(signalStopSyncronization()),httpWin,SLOT(closeApp()));
-    connect(m_base,SIGNAL(pingsSended(QMap<QString,JKKSPing>)),this,SLOT(slot_pings(QMap<QString,JKKSPing> rhs)));
+    connect(m_base,SIGNAL(pingsSended(QMap<QString,JKKSPing>)),this,SLOT(slot_pings(QMap<QString,JKKSPing>)));
 
     httpWin->setWindowModality(Qt::NonModal);
     httpWin->setTimerParams(interval, units, mode);
@@ -505,18 +519,16 @@ void DyndocSyncForm::slot_pollClicked()
 
 void DyndocSyncForm::slot_displayLogClicked()
 {
-    QMessageBox msgBox;
-    msgBox.setWindowTitle(tr("Button test"));
-    msgBox.setText(tr("display log"));
-    msgBox.exec();
+
+    log_form = new SyncQueueViewerForm(dbLog,this);
+
+    connect(log_form,SIGNAL(finished(int)),this,SLOT(slot_closeLog()));
+
+    log_form->show();
 }
 
 void DyndocSyncForm::slot_implementInitialSyncronizationClicked()
 {
-    QMessageBox msgBox;
-    msgBox.setWindowTitle(tr("Button test"));
-    msgBox.setText(tr("initial synch"));
-    msgBox.exec();
 }
 
 void DyndocSyncForm::slot_parametersClicked()
@@ -607,4 +619,11 @@ QStandardItem* DyndocSyncForm::findItem(QStandardItem* it,QString key,bool& find
     }
 
     return 0;
+}
+
+void DyndocSyncForm::slot_closeLog()
+{
+    log_form->close();
+    delete log_form;
+    log_form = 0;
 }

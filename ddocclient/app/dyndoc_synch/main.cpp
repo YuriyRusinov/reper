@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     if(!sito->db())
         return 1;
 
-    DyndocSyncForm* userForm = new DyndocSyncForm();
+    DyndocSyncForm* userForm = new DyndocSyncForm(sito->db());
     dyndocView* viewWidget = new dyndocView();
     dyndocModel* viewModel = new dyndocModel();
 

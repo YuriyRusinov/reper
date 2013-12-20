@@ -20,6 +20,7 @@
 #include <ddocinteractorbase.h>
 #include <timerform.h>
 
+#include <syncqueueviewerform.h>
 
 class dyndocModel;
 
@@ -33,7 +34,7 @@ class DyndocSyncForm : public QDialog
     Q_OBJECT
     
 public:
-    explicit DyndocSyncForm(QWidget *parent = 0);
+    explicit DyndocSyncForm(KKSDatabase* adb, QWidget *parent = 0);
     ~DyndocSyncForm();
 
     void init();
@@ -66,6 +67,8 @@ private slots:
 
     void slot_pings(QMap<QString,JKKSPing> rhs);
 
+    void slot_closeLog();
+
 private:
     Ui::dyndoc_sync_form *ui;
 
@@ -80,6 +83,9 @@ private:
 
     DDocInteractorWindow* httpWin;
     DDocInteractorBase* m_base;
+
+    KKSDatabase* dbLog;
+    SyncQueueViewerForm * log_form;
 
     DyndocSyncForm(DyndocSyncForm& adb);
     const DyndocSyncForm& operator=(const DyndocSyncForm& rhs);

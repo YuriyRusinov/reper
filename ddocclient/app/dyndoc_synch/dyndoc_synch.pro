@@ -14,7 +14,8 @@ INCLUDEPATH += .\
                 ../../kksfactory \
                 ../../kksutils \
                 ../../kksinteractor \
-                ../../kkshttpconnector
+                ../../kkshttpconnector \
+                ../../sync_queue_viewer
 
 DEPENDPATH += 	. \
                 ../../dataaccess \
@@ -24,10 +25,11 @@ DEPENDPATH += 	. \
                 ../../kksfactory \
                 ../../kksutils \
                 ../../kksinteractor \
-                ../../kkshttpconnector
+                ../../kkshttpconnector \
+                ../../sync_queue_viewer
 
 LIBS += -L/usr/local/kkssito/lib\
-        -L$$DESTDIR -ldataaccess -lkksutils -lkkscore -lkksfactory -lkkspp -lkksgui -lkksinteractor -lkkshttpconnector
+        -L$$DESTDIR -ldataaccess -lkksutils -lkkscore -lkksfactory -lkkspp -lkksgui -lkksinteractor -lkkshttpconnector -lsync_queue_viwer
 
 # libpq support
 LIBS += -L$${PSQL_HOME}/lib
