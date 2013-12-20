@@ -16,7 +16,8 @@ SUBDIRS += \
     kkscore \
     kksinteractor \
     kkshttpconnector \
-    kksrunservice
+    kksrunservice \
+    sync_queue_viewer
 
 qgis{
     SUBDIRS += kksgis

@@ -29,7 +29,7 @@ DEPENDPATH += 	. \
                 ../../sync_queue_viewer
 
 LIBS += -L/usr/local/kkssito/lib\
-        -L$$DESTDIR -ldataaccess -lkksutils -lkkscore -lkksfactory -lkkspp -lkksgui -lkksinteractor -lkkshttpconnector -lsync_queue_viwer
+        -L$$DESTDIR -ldataaccess -lkksutils -lkkscore -lkksfactory -lkkspp -lkksgui -lkksinteractor -lkkshttpconnector -lsync_queue_viewer
 
 # libpq support
 LIBS += -L$${PSQL_HOME}/lib
