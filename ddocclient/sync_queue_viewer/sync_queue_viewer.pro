@@ -1,7 +1,7 @@
 # http-client KKSSITO. 
 
 TEMPLATE = lib
-TARGET = sync_queue_viwer
+TARGET = sync_queue_viewer
 
 DESTDIR = ../build
 include(../ddocclient.conf)
