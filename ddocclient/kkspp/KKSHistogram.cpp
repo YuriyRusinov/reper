@@ -4,6 +4,7 @@
  * 
  * Created on 12 Декабрь 2013 г., 13:12
  */
+#include <QString>
 
 #include "KKSCategory.h"
 #include "KKSObject.h"
@@ -151,7 +152,7 @@ QString KKSHistogram::toString() const
 //ksa
 bool KKSHistogram::fromString(const QString & str)
 {
-    QStringList sParList = str.split(QString("~^~"),KeepEmptyParts,Qt::CaseInsensitive);
+    QStringList sParList = str.split(QString("~^~"),QString::KeepEmptyParts,Qt::CaseInsensitive);
     if (sParList.isEmpty())
         return false;
     return true;
