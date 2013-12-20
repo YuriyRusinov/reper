@@ -433,7 +433,10 @@ void KKSGISWidgetQGIS::azVectorize()
             qWarning() << myWriter.errorMessage();
         }
     }
+    delete dnThemTaskSpecBath;
+    dnThemTaskSpecBath = NULL;
     return;
+
 }
 
 
@@ -664,12 +667,12 @@ void KKSGISWidgetQGIS::SLOTazGetSelectedLegendItem()
 void KKSGISWidgetQGIS::SLOTazThemTaskSpectralBathynometry()
 {
     //ksa -- if (dnThemTaskSpecBath == NULL);
-    if (dnThemTaskSpecBath == NULL)
+    if (dnThemTaskSpecBath != NULL)
     {
-        dnThemTaskSpecBath = new DNSpecBath(this);
-        connect(this->dnThemTaskSpecBath, SIGNAL(SIGNALcreateVector()), this, SLOT(SLOTmpActionVectorize()));
+     delete dnThemTaskSpecBath;
     }
-
+    dnThemTaskSpecBath = new DNSpecBath(this);
+    connect(this->dnThemTaskSpecBath, SIGNAL(SIGNALcreateVector()), this, SLOT(SLOTmpActionVectorize()));
     dnThemTaskSpecBath->show();
 //    QMessageBox::about(0, "a", "a");
 //    QFileInfo pFile("D:/!Share/layers/baba.shp");

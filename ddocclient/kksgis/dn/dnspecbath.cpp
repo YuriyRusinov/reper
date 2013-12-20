@@ -367,7 +367,7 @@ void DNSpecBath::on_Batinometriy_triggered()
 
    this->SerPoly->Batinometr(nCh[0],nCh[1],nCh[2],nCh[3],nCh[4],nCh[5],nCh[6],nCh[7],nCh[8],nCh[9],nCh[10]);
   }
-
+  this->SerPoly->MedianFilter(3);
   QDir Dir;
   if(!Dir.exists(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly))
    Dir.mkdir(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly);

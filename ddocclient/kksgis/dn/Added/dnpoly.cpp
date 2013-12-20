@@ -1241,14 +1241,17 @@ float* DNPoly::LinearFilter(int side,float *Apert,float Kof,int NumCh)
     {
      float Summ=0;
      int i=0;
-     for(int xs=x-(int)n/2;xs<x+(int)n/2;xs++)
+     for(int xs=x-(int)n/2;xs<=x+(int)n/2;xs++)
      {
-      for(int ys=y-(int)n/2;ys<y+(int)n/2;ys++)
+      for(int ys=y-(int)n/2;ys<=y+(int)n/2;ys++)
       {
        Summ+=Brith[xs+this->W*ys]*Apert[i];
        i++;
       }//for(int ys=y-(int)n/2;ys<y+(int)n/2;y++)
      }//for(int xs=x-(int)n/2;xs<x+(int)n/2;x++)
+//     QMessageBox msg;
+//     msg.setText(QString().setNum(i));
+//     msg.exec();
      Summ=Summ*Kof;
      NewCh[x+this->W*y]=Summ;
 
@@ -1260,6 +1263,130 @@ float* DNPoly::LinearFilter(int side,float *Apert,float Kof,int NumCh)
  delete Brith;
  return NewCh;
 }
+/*Нелинейная фильтрация*/
+void DNPoly::MedianFilter(int side)
+{
+ int *MatrFilter=new int[side*side];
+ int *NewMass=new int[this->W*this->H];
+ int SredZnach=((side*side)-1)/2;
+ int n=side;
+ for(quint64 i=0;i<this->W*this->H;i++)
+  NewMass[i]=-1;
+
+ for(int y=(int)n/2;y<this->H-(int)n/2;y++)
+ {
+  for(int x=(int)n/2;x<this->W-(int)n/2;x++)
+  {
+   if(this->ClassifMass[x+this->W*y]>=0)
+   {
+    bool BlackPix=FALSE;
+    for(int xs=x-(int)n/2;xs<x+(int)n/2;xs++)
+    {
+     for(int ys=y-(int)n/2;ys<y+(int)n/2;ys++)
+     {
+      if(this->ClassifMass[xs+this->W*ys]<0)
+       BlackPix=TRUE;
+     }//for(int ys=y-(int)n/2;ys<y+(int)n/2;y++)
+    }//for(int xs=x-(int)n/2;xs<x+(int)n/2;x++)
+    if(!BlackPix)
+    {
+     int i=0;
+     for(int xs=x-(int)n/2;xs<=x+(int)n/2;xs++)
+     {
+      for(int ys=y-(int)n/2;ys<=y+(int)n/2;ys++)
+      {
+       MatrFilter[i]=this->ClassifMass[xs+this->W*ys];
+       i++;
+      }//for(int ys=y-(int)n/2;ys<y+(int)n/2;y++)
+     }//for(int xs=x-(int)n/2;xs<x+(int)n/2;x++)
+
+
+     /*Сортировка массива фильтра*/
+     int var;
+     for(int j_y2=0;j_y2<side*side;j_y2++)
+     {
+      for(int j_x2=0;j_x2<side*side-1;j_x2++)
+      {
+       if(MatrFilter[j_x2]>MatrFilter[j_x2+1])
+       {
+        var=MatrFilter[j_x2];
+        MatrFilter[j_x2]=MatrFilter[j_x2+1];
+        MatrFilter[j_x2+1]=var;
+       }//if(MatrFilter[j_x2]>MatrFilter[j_x2+1])
+      }
+     }
+     NewMass[x+y*this->W]=MatrFilter[SredZnach];
+    }//if(!BlackPix)
+   }//if(Brith[x+this->W*y]>=0)
+  }//for(int x=0;x<this->W;x++)
+ }//for(int y=0;y<this->H;y++)
+
+ for(quint64 i=0;i<this->W*this->H;i++)
+  this->ClassifMass[i]=NewMass[i];
+
+ delete[] NewMass;
+ delete[] MatrFilter;
+}
+
+/*Медианный фильтр*/
+//void DNPoly::MedianFilter(int *Mass,int side,int W,int H,int x1,int y1)
+//{
+// int i,j_x1,j_y1,j_x2,j_y2,OstX,OstY;
+// int *WindowF,var,SredZnach;
+// int *MassReturn;
+// WindowF=new int[side*side];
+// OstX=W-side+1;
+// OstY=H-side+1;
+// MassReturn=new int[OstX*OstY];
+// SredZnach=((side*side)-1)/2;
+// for(j_y1=0;j_y1<OstY;j_y1++)
+// {
+//  for(j_x1=0;j_x1<OstX;j_x1++)
+//  {
+//   /*Формирование массива фильтра*/
+//   for(j_y2=j_y1;j_y2<j_y1+side;j_y2++)
+//   {
+//    for(j_x2=j_x1;j_x2<j_x1+side;j_x2++)
+//    {
+//	 WindowF[(j_x2-j_x1)+(j_y2-j_y1)*side]=Mass[(j_x2+x1)+(j_y2+y1)*this->Width];
+//	}
+//   }//Конец формирования массива фильтра
+
+//   /*Сортировка массива фильтра*/
+//   for(j_y2=0;j_y2<side*side;j_y2++)
+//   {
+//    for(j_x2=0;j_x2<side*side-1;j_x2++)
+//    {
+//     if(WindowF[j_x2]>WindowF[j_x2+1])
+//     {
+//      var=WindowF[j_x2];
+//	  WindowF[j_x2]=WindowF[j_x2+1];
+//	  WindowF[j_x2+1]=var;
+//     }
+//    }
+//   }
+//   MassReturn[j_x1+j_y1*OstX]=WindowF[SredZnach];
+//  }
+// }
+
+///*Переделываем исходный массив*/
+// for(j_y1=0;j_y1<H;j_y1++)
+// {
+//  for(j_x1=0;j_x1<W;j_x1++)
+//  {
+//   if(j_y1<(H-OstY)/2 || j_y1>=H-((H-OstY)/2))
+//	Mass[(j_x1+x1)+(j_y1+y1)*this->Width]=-5;
+//   if(j_x1<(W-OstX)/2 || j_x1>=W-((W-OstX)/2))
+//	Mass[(j_x1+x1)+(j_y1+y1)*this->Width]=-5;
+
+//   if(j_x1>=(W-OstX)/2 && j_x1<W-((W-OstX)/2) && j_y1>=(H-OstY)/2 && j_y1<H-((H-OstY)/2))
+//   {
+//	Mass[(j_x1+x1)+(j_y1+y1)*this->Width]=MassReturn[(j_x1-((W-OstX)/2))+(j_y1-((H-OstY)/2))*OstX];
+//   }
+//  }
+// }
+// delete[] WindowF;
+//}
 /***********************************************************************************/
 
 /*Методы селекции и выделения*/
@@ -2358,8 +2485,11 @@ void DNPoly::Batinometr()
   }//for(int x=0;x<this->W;x++)
  }//for(int y=0;y<this->H;y++)
 
- if(HMax!=HMin)
+ if(HMax!=HMin && (HMax-HMin)/0.5>=10)
   Kof=(HMax-HMin)/10;
+
+ if(HMax!=HMin && (HMax-HMin)/0.5<10)
+  Kof=0.5;
 
  this->KofV=Kof;
  this->MinV=HMin;
@@ -2495,8 +2625,11 @@ void DNPoly::Batinometr(int N590,int N830,int N900,
   }//for(int x=0;x<this->W;x++)
  }//for(int y=0;y<this->H;y++)
 
- if(HMax!=HMin)
+ if(HMax!=HMin && (HMax-HMin)/0.5>=10)
   Kof=(HMax-HMin)/10;
+
+ if(HMax!=HMin && (HMax-HMin)/0.5<10)
+  Kof=0.5;
 
  this->KofV=Kof;
  this->MinV=HMin;

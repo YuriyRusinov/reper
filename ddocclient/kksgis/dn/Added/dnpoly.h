@@ -88,6 +88,8 @@ public:
 //Функции фильтрации
     /*Линейная фильтрация*/
     float *LinearFilter(int side,float *Apert,float Kof,int NumCh);
+    /*Нелинейная фильтрация*/
+    void MedianFilter(int side);
 
 //Методы классификации*/
     quint64 MagicWand(bool *NoBlackPixels,/*Входной массив, обрабатываются точки только со значениями TRUE*/
