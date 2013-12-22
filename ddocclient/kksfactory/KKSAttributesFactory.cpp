@@ -72,6 +72,7 @@
 #include <KKSEIOData.h>
 #include <KKSEIODataModel.h>
 #include <KKSAttrValue.h>
+#include <KKSHistogram.h>
 
 #include "KKSViewFactory.h"
 #include "KKSAttributesFactory.h"
@@ -2461,6 +2462,8 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
         //ksa
         case KKSAttrType::atHistogram:
             {
+                KKSHistWidget * hw = qobject_cast<KKSHistWidget *>(aw);
+                hw->setHist(V.value<KKSHistogram>());
                 if (!isRef)
                     connectToSlots (aw, wEditor);
             }

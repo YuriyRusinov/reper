@@ -5,8 +5,11 @@
  * Created on 12 Декабрь 2013 г., 13:12
  */
 #include <QString>
+#include <QBuffer>
+#include <QDataStream>
 
 #include "KKSCategory.h"
+#include "KKSType.h"
 #include "KKSObject.h"
 #include "KKSHistogram.h"
 
@@ -127,34 +130,96 @@ QString KKSHistogram::toString() const
     QString resStr;
     if (m_isEmpty)
         return resStr;
-    resStr = QString ("%1~^~%2~^~%3")
+    QString sep ("^~^~^");
+    resStr = QString ("%1%4%2%4%3")
               .arg (m_xmin)
               .arg (m_xmax)
-              .arg (m_num);
+              .arg (m_num)
+              .arg (sep);
     int i (0);
     for (QMap<int, double>::const_iterator p=dHist.constBegin();
             p != dHist.constEnd();
             ++p)
     {
-        resStr += QString("%1~^~%2~^~").arg (p.key()).arg (p.value());
+        resStr += QString("%1%3%2%3").arg (p.key()).arg (p.value()).arg (sep);
         i++;
         
     }
-    resStr += QString("%1~^~%2~^~%3~^~%4~^~%5~^~%6")
+    resStr += QString("%1%7%2%7%3%7%8%7%9%7%10%7%4%7%5%7%6")
             .arg (idScenario)
             .arg (idVariant)
             .arg (c ? QString::number (c->id()) : QString::number (-1))
             .arg (io ? QString::number (io->id()) : QString::number (-1))
             .arg (idSource)
-            .arg (idReceiver);
+            .arg (idReceiver)
+            .arg (sep)
+            .arg (c ? c->name() : QString())
+            .arg (c ? c->type()->id() : -1)
+            .arg (c ? c->type()->name() : QString());
     return resStr;
 }
 //ksa
 bool KKSHistogram::fromString(const QString & str)
 {
-    QStringList sParList = str.split(QString("~^~"),QString::KeepEmptyParts,Qt::CaseInsensitive);
+    QString sep ("^~^~^");
+    QStringList sParList = str.split(sep,QString::KeepEmptyParts,Qt::CaseInsensitive);
     if (sParList.isEmpty())
         return false;
+    bool ok;
+    m_xmin = sParList[0].toDouble(&ok);
+    if (!ok)
+        return false;
+    m_xmax = sParList[1].toDouble (&ok);
+    if (!ok)
+    {
+        m_xmin = 0.0;
+        return false;
+    }
+    m_num = sParList[2].toInt(&ok);
+    if (!ok)
+    {
+        m_xmin = 0.0;
+        m_xmax = 0.0;
+        return false;
+    }
+    for (int i=0; i<m_num; i++)
+    {
+        int key = sParList[2*i+3].toInt (&ok);
+        if (!ok)
+        {
+            m_xmin = 0.0;
+            m_xmax = 0.0;
+            m_num = -1;
+            return false;
+        }
+        double dVal = sParList[2*i+4].toDouble (&ok);
+        if (!ok)
+        {
+            m_xmin = 0.0;
+            m_xmax = 0.0;
+            m_num = -1;
+            return false;
+        }
+        dHist.insert(key, dVal);
+    }
+/*    QByteArray bStr = str.toAscii();
+    QBuffer hBuffer (&bStr);
+    if (!hBuffer.open(QIODevice::ReadOnly))
+        return false;
+    QDataStream hIn (&hBuffer);
+    QString sep, sep1;
+    hIn >> m_xmin >> sep >> m_xmax >> sep1 >> m_num;
+    dHist.clear ();
+    for (int i=0; i<m_num; i++)
+    {
+        int key;
+        double val;
+        hIn >> key >> sep >> val >> sep1;
+        dHist.insert (key, val);
+    }
+    hIn >> idScenario >> sep;
+    hIn >> idVariant >> sep;
+ */
     return true;
 }
 

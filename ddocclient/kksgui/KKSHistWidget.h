@@ -25,6 +25,7 @@ class QComboBox;
 class KKSCharts;
 class KKSCategory;
 class KKSObject;
+class KKSHistogram;
 
 class _GUI_EXPORT KKSHistWidget : public QWidget, public KKSAttrWidget
 {
@@ -46,6 +47,10 @@ public:
     void loadCategories (const KKSMap<int, KKSCategory *>& catList);
     void loadIOList (const KKSMap<int, KKSObject *>& IOList);
     void loadRecvList (const QMap<int, QString>& posList);
+
+public slots:
+    void setHist (const KKSHistogram& hist);
+
 protected:
     //
     // Override functions of basic class

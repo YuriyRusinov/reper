@@ -196,3 +196,9 @@ void KKSHistWidget::loadRecvList (const QMap<int, QString>& posList)
         cbReceiver->addItem (p.value(), p.key());
     }
 }
+
+void KKSHistWidget::setHist (const KKSHistogram& hist)
+{
+    QVariant v = QVariant::fromValue<KKSHistogram>(hist);
+    emit valueChanged (m_av->id(), m_isSystem, v);
+}

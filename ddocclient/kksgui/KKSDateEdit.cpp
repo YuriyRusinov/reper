@@ -10,9 +10,8 @@ KKSDateEdit :: KKSDateEdit (const KKSAttrValue *attr, KKSIndAttrClass isSys, QWi
 KKSDateEdit :: KKSDateEdit (const KKSAttrValue *attr, KKSIndAttrClass isSys, const QDate& date, QWidget *parent)
     : QDateEdit (parent), KKSAttrWidget(attr, isSys)
 {
-	
-	if(date.isValid())
-		QDateEdit::setDate(date);
+    if(date.isValid())
+        QDateEdit::setDate(date);
 
     connect (this, SIGNAL (dateChanged (const QDate&)), this, SLOT (setDate (const QDate&)) );
 }
