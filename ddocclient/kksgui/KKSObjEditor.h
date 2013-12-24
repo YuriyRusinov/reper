@@ -59,6 +59,7 @@ class KKSAccessEntity;
 class KKSStuffForm;
 class KKSIndicator;
 class KKSAttrValue;
+class KKSHistWidget;
 
 class _GUI_EXPORT KKSObjEditor : public KKSRecDialog
 {
@@ -195,6 +196,8 @@ class _GUI_EXPORT KKSObjEditor : public KKSRecDialog
         
         void recSaved (KKSObjectExemplar * rec);
         void viewAHist (const KKSAttrValue *, const KKSList<KKSAttrValue *>& histList);
+        
+        void loadHistCat (int idCat, QVariant vHist);
 //        void editIndicator (void);
 //        void delIndicator (void);
 //        void addIndicator (void);
@@ -261,6 +264,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSRecDialog
                                        //поскольку в рамках одного KKSObjEditor может быть только один атрибут типа ГИС-объект, 
                                        //то в данном сигнале надо передавать Только ИД ИО (ЭИО). Его поймает нужный виджет
                                        //который сам знает, что ему надо загружать
+        void setHistCat (int idCat, QVariant vHist, KKSHistWidget * hW);
 
     public slots:
         //void slotRubricItemRequested();

@@ -202,8 +202,8 @@ KKSList<KKSAttrValue *> KKSLoader::loadAttrValues(KKSObject * io) const
         KKSAttrValue * attr = new KKSAttrValue();
         attr->setAttribute(a);
 
-        if (a->type()->attrType() == KKSAttrType::atPoints)
-            qDebug () << __PRETTY_FUNCTION__ << a->id() << res->getCellAsString(row, 3);
+//        if (a->type()->attrType() == KKSAttrType::atPoints)
+//            qDebug () << __PRETTY_FUNCTION__ << a->id() << res->getCellAsString(row, 3);
         KKSValue v = constructValue(res->getCellAsString(row, 3), a, io->tableName());
         if(!v.isValid())
         {

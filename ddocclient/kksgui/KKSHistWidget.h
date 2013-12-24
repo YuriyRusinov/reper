@@ -50,6 +50,16 @@ public:
 
 public slots:
     void setHist (const KKSHistogram& hist);
+    
+private slots:
+    void fromChanged ();
+    void toChanged ();
+    void numChanged ();
+    
+    void catChanged (int cIndex);
+    void ioChanged (int ioIndex);
+    
+    void calcHist (void);
 
 protected:
     //
@@ -59,6 +69,7 @@ protected:
 
 signals:
     void valueChanged (qint64 id, KKSIndAttrClass isSys, QVariant val);
+    void loadCategory (int idCat, QVariant vHist);
     void updateVarsList (QComboBox *, FiltersType);
     void updateWidgetPars (KKSHistWidget *);
 

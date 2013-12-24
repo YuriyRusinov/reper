@@ -96,6 +96,7 @@ HEADERS += \
                 KKSMapWidget.h \
                 KKSHistWidget.h \
                 KKSCharts.h \
+                KKSHistDrawWidget.h \
 	        kksgui_config.h
 
 SOURCES += \
@@ -194,7 +195,8 @@ SOURCES += \
                 KKSMapWidget.cpp \
                 KKSRecDialog.cpp \
                 KKSHistWidget.cpp \
-                KKSCharts.cpp
+                KKSCharts.cpp \
+                KKSHistDrawWidget.cpp
 
 FORMS   += \
                 ui/cmd_journal_form.ui \
@@ -320,4 +322,5 @@ headers.files += \
                 KKSMapWidget.h \
                 KKSHistWidget.h \
                 KKSCharts.h \
+                KKSHistDrawWidget.h \
                 kksgui_config.h 

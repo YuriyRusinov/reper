@@ -1561,6 +1561,64 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                     v = QString("");
 
                 attrWidget = new KKSHistWidget(av, attrClass);
+                QMap<int, QString> scList;
+                scList.insert (-1, tr("All scenarios"));
+                scList.insert (1, tr("One"));
+                KKSHistWidget * haw = qobject_cast <KKSHistWidget *>(attrWidget);
+                haw->loadScenario (scList);
+                QMap<int, QString> vList;
+                vList.insert (-1, tr("All variants"));
+                vList.insert (1, tr ("1st variant"));
+                haw->loadVariants (vList);
+                KKSMap<int, KKSCategory *> cats;
+                KKSObject * refCats = loader->loadIO(IO_CAT_ID);
+                const KKSCategory * refC = refCats->category ();
+                refC = refC->tableCategory ();
+                QString value = QString ("select distinct c.id from io_categories c inner join io_objects io on (io.id_io_category=c.id) inner join message_streams mstr on (io.id=mstr.id_io_object)");
+                const KKSFilter * f = refC->createFilter (1, value, KKSFilter::foInSQL);
+                KKSFilterGroup * fg = new KKSFilterGroup (true);
+                fg->addFilter (f);
+                f->release ();
+                KKSList<const KKSFilterGroup *> filters;
+                filters.append (fg);
+                fg->release ();
+                KKSMap<qint64, KKSEIOData *> catMaps = loader->loadEIOList (refCats, filters);
+                for (KKSMap<qint64, KKSEIOData *>::const_iterator p=catMaps.constBegin();
+                        p != catMaps.constEnd();
+                        p++)
+                {
+                    int idc = p.key ();
+                    KKSCategory * c = loader->loadCategory (idc, true);
+                    cats.insert (idc, c);
+                    c->release ();
+                }
+                haw->loadCategories(cats);
+                refCats->release ();
+                KKSMap<int, KKSObject *> ioList;
+                KKSObject * refIO = loader->loadIO (IO_IO_ID);
+                refC = refIO->category ();
+                refC = refC->tableCategory ();
+                value = QString ("select distinct io.id from io_objects io inner join message_streams mstr on (io.id=mstr.id_io_object)");
+                const KKSFilter * fio = refC->createFilter (1, value, KKSFilter::foInSQL);
+                fg = new KKSFilterGroup (true);
+                fg->addFilter (fio);
+                filters.clear();
+                filters.append (fg);
+                fg->release ();
+                KKSMap<qint64, KKSEIOData *> ioMap = loader->loadEIOList (refIO, filters);
+                for (KKSMap<qint64, KKSEIOData *>::const_iterator pio = ioMap.constBegin();
+                        pio != ioMap.constEnd ();
+                        pio++)
+                {
+                    int id_io = pio.key ();
+                    KKSObject * io = loader->loadIO (id_io);
+                    ioList.insert (id_io, io);
+                    io->release ();
+                }
+                haw->loadIOList(ioList);
+                connect (haw, SIGNAL (loadCategory (int, QVariant)), objEditor, SLOT (loadHistCat (int, QVariant)) );
+                
+                refIO->release ();
                 //QToolButton *tbRef = new QToolButton ();
                 //tbRef->setMinimumHeight (20);
                 //tbRef->setText ("...");

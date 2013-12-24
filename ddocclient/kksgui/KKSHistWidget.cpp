@@ -38,6 +38,12 @@ KKSHistWidget::KKSHistWidget(const KKSAttrValue *av, KKSIndAttrClass isSys, QWid
     cbReceiver (new QComboBox)
 {
     init ();
+    
+    connect (lEFrom, SIGNAL (editingFinished()), this, SLOT (fromChanged ()) );
+    connect (lETo, SIGNAL (editingFinished ()), this, SLOT (toChanged ()) );
+    connect (lECount, SIGNAL (editingFinished ()), this, SLOT (numChanged ()) );
+    
+    connect (cbCategory, SIGNAL (activated(int)), this, SLOT (catChanged (int)) );
 }
 
 KKSHistWidget::~KKSHistWidget()
@@ -167,6 +173,7 @@ void KKSHistWidget::loadVariants (const QMap<int, QString>& varList)
 void KKSHistWidget::loadCategories (const KKSMap<int, KKSCategory *>& catList)
 {
     this->cbCategory->clear();
+    this->cbCategory->addItem (tr("No selected category"), -1);
     for (KKSMap<int, KKSCategory *>::const_iterator p=catList.constBegin();
             p != catList.constEnd();
             ++p)
@@ -200,5 +207,64 @@ void KKSHistWidget::loadRecvList (const QMap<int, QString>& posList)
 void KKSHistWidget::setHist (const KKSHistogram& hist)
 {
     QVariant v = QVariant::fromValue<KKSHistogram>(hist);
+    lEFrom->setText (QString::number (hist.getXMin()));
+    lETo->setText (QString::number (hist.getXMax()));
+    lECount->setText (QString::number (hist.getVec().count()));
+    int idCat = hist.category() ? hist.category()->id() : -1;
+    if (idCat > 0)
+    {
+        int cbInd = this->cbCategory->findData (idCat, Qt::UserRole);
+        cbCategory->setCurrentIndex (cbInd);
+    }
     emit valueChanged (m_av->id(), m_isSystem, v);
+}
+
+void KKSHistWidget::fromChanged ()
+{
+    QString text = lEFrom->text ();
+    KKSHistogram hist = m_av->value().valueVariant().value<KKSHistogram>();
+    double x = text.toDouble();
+    double xMax = hist.getXMax();
+    hist.setRange (x, xMax);
+    QVariant v = QVariant::fromValue<KKSHistogram>(hist);
+    qDebug () << __PRETTY_FUNCTION__ << v;
+    emit valueChanged (m_av->id(), m_isSystem, v);
+}
+
+void KKSHistWidget::toChanged ()
+{
+    QString text = lETo->text ();
+    KKSHistogram hist = m_av->value().valueVariant().value<KKSHistogram>();
+    hist.setRange (hist.getXMin(), text.toDouble());
+    QVariant v = QVariant::fromValue<KKSHistogram>(hist);
+    emit valueChanged (m_av->id(), m_isSystem, v);
+}
+
+void KKSHistWidget::numChanged ()
+{
+    QString text = lECount->text ();
+    KKSHistogram hist = m_av->value().valueVariant().value<KKSHistogram>();
+    hist.setSize(text.toInt());
+    QVariant v = QVariant::fromValue<KKSHistogram>(hist);
+    emit valueChanged (m_av->id(), m_isSystem, v);
+}
+
+void KKSHistWidget::catChanged (int cIndex)
+{
+    int idCat = cbCategory->itemData (cIndex).toInt ();
+    KKSHistogram hist = m_av->value().valueVariant().value<KKSHistogram>();
+    QVariant v = QVariant::fromValue<KKSHistogram>(hist);
+    emit loadCategory (idCat, v);
+
+    emit valueChanged (m_av->id(), m_isSystem, v);
+}
+
+void KKSHistWidget::ioChanged (int ioIndex)
+{
+    
+}
+
+void KKSHistWidget::calcHist (void)
+{
+    
 }

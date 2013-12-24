@@ -70,7 +70,8 @@
 #include <KKSRubric.h>
 #include "KKSAttrUUIDWidget.h"
 #include "KKSAttrValueLabel.h"
-#include "KKSHistogram.h"
+#include <KKSHistogram.h>
+#include "KKSHistWidget.h"
 #include "defines.h"
 
 
@@ -747,6 +748,7 @@ int KKSObjEditor :: constructObject()
             {
                 KKSHistogram h = val.value<KKSHistogram>();
                 value = h.toString();
+                qDebug () << __PRETTY_FUNCTION__ << value;
             }
             //ksa
             else if(type == KKSAttrType::atVectorLayer)
@@ -1445,7 +1447,7 @@ void KKSObjEditor :: setValue (qint64 idAttrValue, KKSIndAttrClass sys, QVariant
     
     switch (sys)
     {
-    case iacTableAttr: default:
+        case iacTableAttr: default:
         {
             if (!sysAttrValues.contains (idAttrValue))
                 return;
@@ -1465,10 +1467,15 @@ void KKSObjEditor :: setValue (qint64 idAttrValue, KKSIndAttrClass sys, QVariant
                 return;
 
             KKSAttrValue * av = ioAttrValues[idAttrValue];
+            if (av->attribute()->type()->attrType() == KKSAttrType::atHistogram)
+            {
+                KKSHistogram h = val.value<KKSHistogram>();
+                qDebug () << __PRETTY_FUNCTION__ << h.toString();
+            }
             KKSValue v(val.toString(), av->attribute()->type()->attrType());
             if (av->attribute()->type()->attrType() == KKSAttrType::atCheckList)
                 v.setValue (QString("{%1}").arg (val.toStringList().join(",")), KKSAttrType::atCheckList);
-            qDebug () << __PRETTY_FUNCTION__ << val << val.toString() << v.value(); 
+            qDebug () << __PRETTY_FUNCTION__ << val << val.toString() << v.value() << v.valueVariant(); 
             av->setValue(v);
             isChanged = true;
             break;
@@ -2701,4 +2708,10 @@ void KKSObjEditor :: viewAHist (const KKSAttrValue * av, const KKSList<KKSAttrVa
         (qobject_cast<KKSAttrValueLabel *>(activeLabel))->viewAHist (av, histList);
     }
     //emit viewHist (histList);
+}
+
+void KKSObjEditor :: loadHistCat (int idCat, QVariant vHist)
+{
+    KKSHistWidget * hw = qobject_cast<KKSHistWidget *> (this->sender());
+    emit setHistCat (idCat, vHist, hw);
 }

@@ -122,7 +122,8 @@
 #include <KKSLifeCycle.h>
 #include <kksstateform.h>
 #include "defines.h"
-#include "KKSHistogram.h"
+#include <KKSHistogram.h>
+#include <KKSHistWidget.h>
 
 /*
  Заголовочные ф-лы генератора отчетов
@@ -1717,6 +1718,7 @@ void KKSObjEditorFactory :: setObjConnect (KKSObjEditor *editor)
     }
     
     connect (editor, SIGNAL (generateUUID (int, const KKSAttrValue *)), this, SLOT (genUUID (int, const KKSAttrValue *)) );
+    connect (editor, SIGNAL (setHistCat (int, QVariant, KKSHistWidget *)), this, SLOT (loadIOHist(int, QVariant, KKSHistWidget *)) );
     connect (this, SIGNAL (setuuid (QString)), editor, SLOT (setIOUUID (QString)) );
     connect (this, SIGNAL (cioSaved(KKSObjectExemplar *)), editor, SLOT (recSaved(KKSObjectExemplar *)) );
 }
@@ -9878,4 +9880,14 @@ void KKSObjEditorFactory :: addLifeCycleState (KKSLifeCycleEx * lc, QAbstractIte
     }
     delete wEditor;
     refObj->release();
+}
+
+void KKSObjEditorFactory :: loadIOHist (int idCat, QVariant vHist, KKSHistWidget * hw)
+{
+    if (!vHist.canConvert<KKSHistogram> ())
+        return;
+    KKSHistogram h = vHist.value <KKSHistogram>();
+    KKSCategory * c = loader->loadCategory (idCat);
+    h.setCategory (c);
+    hw->setHist (h);
 }

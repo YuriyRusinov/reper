@@ -56,6 +56,7 @@ class KKSLifeCycleEx;
 class kkslifecycleform;
 class kksstateform;
 class KKSSearchTemplateForm;
+class KKSHistWidget;
 
 class QScrollArea;
 class QGridLayout;
@@ -396,6 +397,8 @@ private slots:
     void editState (QWidget * editor, int idObject, qint64 idObjEx, const KKSCategory * c, QString tableName, int nTab, bool isModal, QAbstractItemModel * recModel=0, const QModelIndex& recIndex=QModelIndex());
     
     void GUIloadDBSearchTemplate (KKSSearchTemplate *st, const KKSCategory* c, QString tableName);
+    
+    void loadIOHist (int idCat, QVariant vHist, KKSHistWidget * hw);
 
 private:
     //

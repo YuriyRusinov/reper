@@ -1,12 +1,13 @@
 /* 
  * File:   KKSHistogram.cpp
- * Author: rusinov
+ * Author: yuriyrusinov
  * 
  * Created on 12 Декабрь 2013 г., 13:12
  */
 #include <QString>
 #include <QBuffer>
 #include <QDataStream>
+#include <QTextStream>
 
 #include "KKSCategory.h"
 #include "KKSType.h"
@@ -131,31 +132,31 @@ QString KKSHistogram::toString() const
     if (m_isEmpty)
         return resStr;
     QString sep ("^~^~^");
-    resStr = QString ("%1%4%2%4%3")
-              .arg (m_xmin)
-              .arg (m_xmax)
-              .arg (m_num)
-              .arg (sep);
-    int i (0);
+    QBuffer outH;
+    QByteArray bh;
+    outH.setBuffer (&bh);
+    outH.open(QIODevice::WriteOnly);
+    QTextStream outHist (&outH);
+    outHist << m_xmin << sep << m_xmax << sep << m_num << sep;
+
+    //int i (0);
     for (QMap<int, double>::const_iterator p=dHist.constBegin();
             p != dHist.constEnd();
             ++p)
     {
-        resStr += QString("%1%3%2%3").arg (p.key()).arg (p.value()).arg (sep);
-        i++;
+        outHist << p.key() << sep << p.value() << sep;
+        //resStr += QString("%1%3%2%3").arg (p.key()).arg (p.value()).arg (sep);
+        //i++;
         
     }
-    resStr += QString("%1%7%2%7%3%7%8%7%9%7%10%7%4%7%5%7%6")
-            .arg (idScenario)
-            .arg (idVariant)
-            .arg (c ? QString::number (c->id()) : QString::number (-1))
-            .arg (io ? QString::number (io->id()) : QString::number (-1))
-            .arg (idSource)
-            .arg (idReceiver)
-            .arg (sep)
-            .arg (c ? c->name() : QString())
-            .arg (c ? c->type()->id() : -1)
-            .arg (c ? c->type()->name() : QString());
+    outHist << idScenario << sep << idVariant << sep;
+    if (!c || !c->tableCategory() || !c->type() || !io)
+        return QString (bh);
+    outHist << c->id() << sep << c->name () << sep << c->type()->id() << sep << c->type()->name() << sep;
+    outHist << c->tableCategory()->id() << sep << c->tableCategory()->name() << sep << c->tableCategory()->type()->id() << sep << c->tableCategory()->type()->name() << sep;
+    outHist << io->id() << sep << io->name () << sep << idSource << sep << idReceiver;
+    
+    resStr = QString (bh);
     return resStr;
 }
 //ksa
@@ -165,49 +166,13 @@ bool KKSHistogram::fromString(const QString & str)
     QStringList sParList = str.split(sep,QString::KeepEmptyParts,Qt::CaseInsensitive);
     if (sParList.isEmpty())
         return false;
-    bool ok;
-    m_xmin = sParList[0].toDouble(&ok);
-    if (!ok)
-        return false;
-    m_xmax = sParList[1].toDouble (&ok);
-    if (!ok)
-    {
-        m_xmin = 0.0;
-        return false;
-    }
-    m_num = sParList[2].toInt(&ok);
-    if (!ok)
-    {
-        m_xmin = 0.0;
-        m_xmax = 0.0;
-        return false;
-    }
-    for (int i=0; i<m_num; i++)
-    {
-        int key = sParList[2*i+3].toInt (&ok);
-        if (!ok)
-        {
-            m_xmin = 0.0;
-            m_xmax = 0.0;
-            m_num = -1;
-            return false;
-        }
-        double dVal = sParList[2*i+4].toDouble (&ok);
-        if (!ok)
-        {
-            m_xmin = 0.0;
-            m_xmax = 0.0;
-            m_num = -1;
-            return false;
-        }
-        dHist.insert(key, dVal);
-    }
-/*    QByteArray bStr = str.toAscii();
+
+    QByteArray bStr = str.toLocal8Bit();
     QBuffer hBuffer (&bStr);
     if (!hBuffer.open(QIODevice::ReadOnly))
         return false;
-    QDataStream hIn (&hBuffer);
-    QString sep, sep1;
+    QTextStream hIn (&hBuffer);
+    QString sep1;
     hIn >> m_xmin >> sep >> m_xmax >> sep1 >> m_num;
     dHist.clear ();
     for (int i=0; i<m_num; i++)
@@ -219,7 +184,37 @@ bool KKSHistogram::fromString(const QString & str)
     }
     hIn >> idScenario >> sep;
     hIn >> idVariant >> sep;
- */
+    int idCat;
+    hIn >> idCat >> sep;
+    QString cName;
+    hIn >> cName >> sep;
+    int idType;
+    hIn >> idType >> sep;
+    QString cTypeName;
+    hIn >> cTypeName >> sep;
+    KKSType * cType = new KKSType (idType, cTypeName);
+    const KKSCategory * cat = new KKSCategory (idCat, cName, cType);
+    int idTCat;
+    QString ctName;
+    hIn >> idTCat >> sep;
+    hIn >> ctName >> sep;
+    int idTType;
+    QString ctTypeName;
+    hIn >> idTType >> sep;
+    hIn >> ctTypeName >> sep;
+    KKSType * ctType = new KKSType (idTType, ctTypeName);
+    KKSCategory * ct = new KKSCategory (idTCat, ctName, ctType);
+    (const_cast<KKSCategory *>(cat))->setTableCategory(ct);
+    setCategory (cat);
+    int idObj;
+    QString objName;
+    hIn >> idObj >> sep;
+    hIn >> objName >> sep;
+    const KKSObject * obj = new KKSObject (idObj, const_cast<KKSCategory *>(cat), objName);
+    setSrcObject (obj);
+    hIn >> idSource >> sep;
+    hIn >> idReceiver;
+ 
     return true;
 }
 
