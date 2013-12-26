@@ -26,6 +26,63 @@ select setAsNotLogging(2);
 
 \i ./functions/io_objects/checkioforowner.sql
 
+create table processing_variant (
+   id                   SERIAL               not null,
+   name                 VARCHAR              not null,
+   description          VARCHAR              null,
+   constraint PK_PROCESSING_VARIANT primary key (id)
+)
+inherits (root_table);
+
+comment on table processing_variant is
+'варианты обработки »ќ в очеред€х';
+
+select setMacToNULL('processing_variant');
+select createTriggerUID('processing_variant');
+
+create table processing_scenario (
+   id                   SERIAL               not null,
+   name                 VARCHAR              not null,
+   description          VARCHAR              null,
+   constraint PK_PROCESSING_SCENARIO primary key (id)
+)
+inherits (root_table);
+
+comment on table processing_scenario is
+'—ценарии обработки »ќ
+(п€дь)';
+
+select setMacToNULL('processing_scenario');
+select createTriggerUID('processing_scenario');
+
+insert into processing_scenario (id, name) values (1, 'п”ќѕ„ќѕ  ”√≈ќЅ“… ');
+insert into processing_variant (id, name) values (1, 'п”ќѕ„ќѕ  „Ѕ“…Ѕќ‘');
+SELECT pg_catalog.setval('processing_scenario_id_seq', 1, true);
+SELECT pg_catalog.setval('processing_variant_id_seq', 1, true);
+
+
+alter table chains_data add column id_parent int4;
+alter table chains_data add column id_processing_scenario int4;
+alter table chains_data add column id_processing_variant int4;
+update chains_data set id_processing_scenario = 1, id_processing_variant = 1;
+alter table chains_data alter column id_processing_scenario set not null;
+alter table chains_data alter column id_processing_variant set not null;
+
+alter table chains_data
+   add constraint FK_CHAINS_D_REFERENCE_CHAINS_D foreign key (id_parent)
+      references chains_data (id)
+      on delete restrict on update restrict;
+
+alter table chains_data
+   add constraint FK_CHAINS_D_REF_PROCESSING_VARIANT foreign key (id_processing_variant)
+      references processing_variant (id)
+      on delete restrict on update restrict;
+
+alter table chains_data
+   add constraint FK_CHAINS_D_REFERENCE_PROCESSI foreign key (id_processing_scenario)
+      references processing_scenario (id)
+      on delete restrict on update restrict;
+
 
 select setAsLogging(1);
 select setAsLogging(2);

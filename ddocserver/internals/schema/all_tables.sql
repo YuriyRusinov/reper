@@ -1,8 +1,7 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     16.12.2013 17:06:42                          */
+/* Created on:     26.12.2013 14:15:57                          */
 /*==============================================================*/
-
 
 /*==============================================================*/
 /* Table: root_table                                            */
@@ -23,6 +22,7 @@ select setMacToNULL('root_table');
 create unique index Index_1 on root_table using BTREE (
 unique_id
 );
+
 
 
 /*==============================================================*/
@@ -928,6 +928,9 @@ create table chains_data (
    id                   SERIAL               not null,
    id_chain             INT4                 not null,
    id_io_object         INT4                 null,
+   id_parent            INT4                 null,
+   id_processing_scenario INT4                 not null,
+   id_processing_variant INT4                 not null,
    id_record            INT8                 null,
    insert_time          TIMESTAMP            not null default CURRENT_TIMESTAMP,
    is_handled           INT2                 not null default 0
@@ -937,6 +940,8 @@ create table chains_data (
    end_service_time     TIMESTAMP            null,
    return_code          INT4                 null,
    what_happens         INT2                 null,
+   handler_in_data      VARCHAR              null,
+   handler_out_data     VARCHAR              null,
    constraint PK_CHAINS_DATA primary key (id)
 )
 inherits (root_table);
@@ -951,6 +956,19 @@ comment on column chains_data.id_chain is
 
 comment on column chains_data.id_io_object is
 'ссылка на ИО, записанный в очередь (тип-документ)';
+
+comment on column chains_data.id_parent is
+'ссылается на запись справочника очередей обработки, инициировавшей  помещение ИО в очередь обработки (в случае если при анализе кода возврата сервиса-родителя порождаются новые сервисы)
+Если значение атрибуту не задано, то инициатором помещения ИО (ЭИО) в очередь является ЖЦ какого-то ИО';
+
+comment on column chains_data.id_processing_scenario is
+'Сценарий обработки ИО в очередях. Указывает на сценарий, который был зафиксирован как активный в момент начала эксперимента';
+
+comment on column chains_data.id_processing_variant is
+'Вариант обработки ИО в очередях. Указывает на вариант обработки, который был зафиксирован как активный в момент начала эксперимента';
+
+comment on column chains_data.id_record is
+'ижентификатор ЭИО, которыей помещен в очередь (если обрабатывается ЭИО)';
 
 comment on column chains_data.insert_time is
 'дата, время создания записи в таблице очередей (формируется автоматически при создании записи)';
@@ -969,6 +987,12 @@ comment on column chains_data.end_service_time is
 
 comment on column chains_data.return_code is
 'код возврата сервиса обработки';
+
+comment on column chains_data.handler_in_data is
+'Входные данные обработчика очереди>, в которые помещаются входные данные для обработчика очереди, и задача сервиса-обработчика очереди заключается в том, чтобы использовать их при обработке';
+
+comment on column chains_data.handler_out_data is
+'<Выходные данные обработчика очереди>, в которые помещаются выходные данные обработчика очереди и задача сервиса-обработчика очереди заключается в том, чтобы сформировать их при обработке';
 
 select setMacToNULL('chains_data');
 select createTriggerUID('chains_data');
@@ -3106,6 +3130,41 @@ comment on table position_work_mode is
 select setMacToNULL('position_work_mode');
 
 /*==============================================================*/
+/* Table: processing_scenario                                   */
+/*==============================================================*/
+create table processing_scenario (
+   id                   SERIAL               not null,
+   name                 VARCHAR              not null,
+   description          VARCHAR              null,
+   constraint PK_PROCESSING_SCENARIO primary key (id)
+)
+inherits (root_table);
+
+comment on table processing_scenario is
+'Сценарии обработки ИО
+(пядь)';
+
+select setMacToNULL('processing_scenario');
+select createTriggerUID('processing_scenario');
+
+/*==============================================================*/
+/* Table: processing_variant                                    */
+/*==============================================================*/
+create table processing_variant (
+   id                   SERIAL               not null,
+   name                 VARCHAR              not null,
+   description          VARCHAR              null,
+   constraint PK_PROCESSING_VARIANT primary key (id)
+)
+inherits (root_table);
+
+comment on table processing_variant is
+'варианты обработки ИО в очередях';
+
+select setMacToNULL('processing_variant');
+select createTriggerUID('processing_variant');
+
+/*==============================================================*/
 /* Table: q_base_table                                          */
 /*==============================================================*/
 create table q_base_table (
@@ -4595,6 +4654,21 @@ alter table chains_data
 alter table chains_data
    add constraint FK_CHAINS_D_REFERENCE_IO_OBJEC foreign key (id_io_object)
       references io_objects (id)
+      on delete restrict on update restrict;
+
+alter table chains_data
+   add constraint FK_CHAINS_D_REFERENCE_CHAINS_D foreign key (id_parent)
+      references chains_data (id)
+      on delete restrict on update restrict;
+
+alter table chains_data
+   add constraint FK_CHAINS_D_REF_PROCESSING_VARIANT foreign key (id_processing_variant)
+      references processing_variant (id)
+      on delete restrict on update restrict;
+
+alter table chains_data
+   add constraint FK_CHAINS_D_REFERENCE_PROCESSI foreign key (id_processing_scenario)
+      references processing_scenario (id)
       on delete restrict on update restrict;
 
 alter table cmd_confirmations
