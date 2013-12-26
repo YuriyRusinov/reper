@@ -5,6 +5,11 @@ declare
     idDl int4;
     isLocal boolean;
     idUser int4;
+
+    r record;
+    idDlTo int4;
+    idDlFrom int4;
+    cnt int4;
 begin
     
     perform clearLastError();
@@ -16,6 +21,28 @@ begin
                 raise exception 'You have insufficient privileges to send given result of command to another roles! ID_OBJECT = %', new.id_io_object;
                 return NULL;
             end if;
+        end if;
+    end if;
+
+    if(new.id_io_object is not null and new.id_journal is not null) then
+        for r in select id_dl_to, id_dl_executor from command_journal where id = new.id_journal
+        loop
+            idDlTo = r.id_dl_to;
+            idDlFrom = r.id_dl_from;
+        end loop;
+
+        select count(*) into cnt from access_table where id_io_object = new.id_io_object and id_role = idDlTo;
+        if(cnt = 0) then
+            insert into access_table (id_io_object, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_send) values (new.id_io_object, idDlTo, true, true, true, true, true);
+        else
+            update access_table set allow_read = true, allow_readlist = true, allow_delete = true, allow_update = true, allow_send = true where id_io_object = new.id_io_object and id_role = idDlTo;
+        end if;
+
+        select count(*) into cnt from access_table where id_io_object = new.id_io_object and id_role = idDlFrom;
+        if(cnt = 0) then
+            insert into access_table (id_io_object, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_send) values (new.id_io_object, idDlFrom, true, true, true, true, true);
+        else
+            update access_table set allow_read = true, allow_readlist = true, allow_delete = true, allow_update = true, allow_send = true where id_io_object = new.id_io_object and id_role = idDlFrom;
         end if;
     end if;
 
@@ -39,7 +66,7 @@ begin
 
 end
 $BODY$
-language 'plpgsql';
+language 'plpgsql' security definer;
 
 select f_safe_drop_trigger('trgctrljinsert', 'tsd_control_journal');
 

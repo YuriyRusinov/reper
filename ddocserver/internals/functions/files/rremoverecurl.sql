@@ -17,6 +17,7 @@ begin
 
     if(cnt = 1 and bFile = true) then
         select rDeleteFile(idUrl) into cnt;
+        delete from io_urls where id = idUrl;
         return cnt;
     end if;
 
@@ -27,6 +28,8 @@ end
 $BODY$
 language 'plpgsql' security definer;
 
+--remove with GIS files!!!
+--should be used when delete IO from database
 create or replace function rRemoveRecUrl(int8, boolean) returns int4 as
 $BODY$
 declare
@@ -47,10 +50,15 @@ begin
                 if(cnt = 0) then
                     return 0;
                 end if;
+                delete from urls_records where id_record = idRecord and id_url = r.id_url;
+                delete from io_urls where id = r.id_url;
             end if;
         end loop;
+
+        return 1;
     end if;
 
+    --in other case just remove relation between IO and files (NOT GIS files!!!)
     delete from urls_records where id_record = idRecord;
 
     return 1;
@@ -85,10 +93,15 @@ begin
                 if(cnt = 0) then
                     return 0;
                 end if;
+                delete from urls_records where id_record = idRecord and id_url = r.id_url;
+                delete from io_urls where id = r.id_url;
             end if;
         end loop;
+
+        return 1;
     end if;
 
+    --in other case just remove relation between IO and GIS files
     delete from urls_records
     where 
         id_record = idRecord
@@ -128,8 +141,12 @@ begin
                 if(cnt = 0) then
                     return 0;
                 end if;
+                delete from urls_records where id_record = idRecord and id_url = r.id_url;
+                delete from io_urls where id = r.id_url;
             end if;
         end loop;
+
+        return 1;
     end if;
 
     delete from urls_records 
