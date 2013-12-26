@@ -8,13 +8,21 @@ MapWindow::MapWindow(QWidget* parent, Qt::WFlags fl)
     setupUi(this);
 
     bool withSubWindows = true;
+    bool withAddons = true;
 
-    mpKKSGISWidget = KKSGISWidget::initQGISWidget(withSubWindows, parent, fl);
+    mpKKSGISWidget = new KKSGISWidget(withSubWindows, withAddons, parent, fl);
     if(!mpKKSGISWidget){
         QMessageBox::critical(0, "", "");
         return;
     }
+    
+    mpKKSGISWidget->initQGIS();
+    if(!mpKKSGISWidget->initCorrectly())
+        return;
+
     connect(mpKKSGISWidget, SIGNAL(SIGNALchangeWindowTitle()), this, SLOT(SLOTmpActionChangeTitle()));
+
+
     setWindowTitle(mpKKSGISWidget->windowTitle());
 
     setStatusBar(mpKKSGISWidget->statusBar());
@@ -51,7 +59,7 @@ MapWindow::MapWindow(QWidget* parent, Qt::WFlags fl)
     QMap<QString, QMenu*> menus = mpKKSGISWidget->menuMap();
     QMenu * fileMenu = menus.value(tr("File"));
     if(fileMenu){
-        //create actions
+        // add file exit menu!!!
         mpActionFileExit = new QAction(QIcon(":/ico/mActionFileExit.png"), tr("Выход"), this);
         mpActionFileExit->setStatusTip(tr("Закрыть приложение"));
         mpActionFileExit->setShortcuts(QKeySequence::Close);
@@ -60,8 +68,13 @@ MapWindow::MapWindow(QWidget* parent, Qt::WFlags fl)
         fileMenu->addAction(mpActionFileExit);
     }
     
-    addToolBar(mpKKSGISWidget->toolBar());
-    // add file exit menu!!!
+    //addToolBar(mpKKSGISWidget->toolBar());
+    QMap<QString, QToolBar *> mpToolBars = mpKKSGISWidget->toolBarMap();
+    addToolBar(mpToolBars.value("mpMapToolBar"));
+    addToolBar(mpToolBars.value("mpDataSourceToolBar"));
+    addToolBar(mpToolBars.value("mpToolsToolBar"));
+    addToolBar(mpToolBars.value("mpLayerToolBar"));
+    addToolBar(mpToolBars.value("mpTaskToolBar"));
 
     statusBar()->showMessage("ПК Репер готов к работе.");
 }

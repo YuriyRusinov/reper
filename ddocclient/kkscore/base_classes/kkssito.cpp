@@ -43,10 +43,12 @@
 
 #include "kksclient_name.h"
 
+
 #ifdef __USE_QGIS__
 #include <qgsapplication.h>
 #include <qgsproviderregistry.h>
 #endif
+
 
 __CORE_EXPORT KKSSito * KKSSito::self = 0;
 
@@ -145,6 +147,7 @@ KKSSito::KKSSito(const QString & userName, bool msgToWindow) :
 
 void KKSSito::loadQGISPlugins()
 {
+    
 #ifdef __USE_QGIS__
     KKSSettings *kksSettings = kksSito->getKKSSettings();
     if(!kksSettings)
@@ -177,6 +180,7 @@ void KKSSito::loadQGISPlugins()
     a->initQgis();
 
 #endif
+    
 }
 
 const QString & KKSSito::GISHomeDir() const
@@ -245,6 +249,17 @@ void KKSSito::loadTranslator()
     tor = new QTranslator(0);
     tor->load(QString("ddocclient_ru"), transl_path);
     QApplication::installTranslator(tor);
+
+#ifdef __USE_QGIS__
+    QTranslator * qgistor = new QTranslator(0);
+    bool ok = qgistor->load(QString("qgis_ru"), transl_path);
+
+    QgsApplication * a = static_cast<QgsApplication *>(QApplication::instance());
+    if(!a)
+        qFatal(tr("QgsApplication object does not exist!").toLocal8Bit().constData());
+
+    a->installTranslator(qgistor);
+#endif
 
 #ifdef _FOR_LESSONS_SHEDULER_    
 
@@ -737,6 +752,7 @@ KKSSito * KKSSito::init (int argc,
 #ifdef __USE_QGIS__
     if (!app)
         app = new QgsApplication(argc, argv, true);
+    //app->installTranslator(qgistor);
 
     //QgsApplication * a = static_cast <QgsApplication *> (app);
     // ---- invoked in KKSSito::loadQGISPlugins ----

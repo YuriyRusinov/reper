@@ -1,6 +1,8 @@
 #ifndef _SYNCQUEUEVIEWRFORM_H
 #define _SYNCQUEUEVIEWRFORM_H
 
+#include "kkssqv_config.h"
+
 #include <QMessageBox>
 #include <QApplication>
 #include <QDialog>
@@ -11,7 +13,7 @@
 #include "filtersform.h"
 #include "dataelement.h"
 
-class SyncQueueViewerForm : public QDialog
+class _SQV_EXPORT SyncQueueViewerForm : public QDialog
 {
     Q_OBJECT
 

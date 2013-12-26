@@ -338,7 +338,7 @@ int KKSObjEditor :: constructObject()
     //(т.е. в том числе для ИО - это те, которые находятся в таблице io_objects)
     for (pSysAttrValues=sysAttrValues.constBegin (); pSysAttrValues != sysAttrValues.constEnd(); pSysAttrValues++)
     {
-         const KKSAttrValue *cAttrValue = pSysAttrValues.value();
+        const KKSAttrValue *cAttrValue = pSysAttrValues.value();
         KKSValue v;
         if (!chSysOptWidgets.contains (pSysAttrValues.key()) || chSysOptWidgets.value (pSysAttrValues.key())->isEnabled())
         {
@@ -361,6 +361,12 @@ int KKSObjEditor :: constructObject()
             //ksa
             else if(type == KKSAttrType::atVectorLayer)
             {
+                //перед тем, как сохранить ИО (ЭИО) необходимо сохранить файл с ГИС-проектом (если присутствуют атрибуты ГИС)
+                //генерируем сигнал, его поймает ГИС-виджет, сохранить файл проекта, прочитает его в XML и вернет в качестве значения KKSValue
+                KKSValue v; // = const_case<KKSAttrValue *>(cAttrValue);
+                emit needToSaveGISProject(v);
+                val = v.valueVariant();
+                (const_cast<KKSAttrValue *>(cAttrValue))->setValue(v);
                 value = val.toString();
                 
                 //здесь нельзя делать этот emit. Т.к. в слкчае создания нового ИО (ЭИО) мы еще не сохранили его в БД (не знаем его идентификатор)
@@ -374,11 +380,23 @@ int KKSObjEditor :: constructObject()
             //ksa
             else if(type == KKSAttrType::atRasterLayer)
             {
+                //перед тем, как сохранить ИО (ЭИО) необходимо сохранить файл с ГИС-проектом (если присутствуют атрибуты ГИС)
+                //генерируем сигнал, его поймает ГИС-виджет, сохранить файл проекта, прочитает его в XML и вернет в качестве значения KKSValue
+                KKSValue v; // = const_case<KKSAttrValue *>(cAttrValue);
+                emit needToSaveGISProject(v);
+                val = v.valueVariant();
+                (const_cast<KKSAttrValue *>(cAttrValue))->setValue(v);
                 value = val.toString();
             }
             //ksa
             else if(type == KKSAttrType::atGISMap)
             {
+                //перед тем, как сохранить ИО (ЭИО) необходимо сохранить файл с ГИС-проектом (если присутствуют атрибуты ГИС)
+                //генерируем сигнал, его поймает ГИС-виджет, сохранить файл проекта, прочитает его в XML и вернет в качестве значения KKSValue
+                KKSValue v; // = const_case<KKSAttrValue *>(cAttrValue);
+                emit needToSaveGISProject(v);
+                val = v.valueVariant();
+                (const_cast<KKSAttrValue *>(cAttrValue))->setValue(v);
                 value = val.toString();
             }
 
@@ -560,16 +578,34 @@ int KKSObjEditor :: constructObject()
             //ksa
             else if(type == KKSAttrType::atVectorLayer)
             {
+                //перед тем, как сохранить ИО (ЭИО) необходимо сохранить файл с ГИС-проектом (если присутствуют атрибуты ГИС)
+                //генерируем сигнал, его поймает ГИС-виджет, сохранить файл проекта, прочитает его в XML и вернет в качестве значения KKSValue
+                KKSValue v; // = const_case<KKSAttrValue *>(cAttrValue);
+                emit needToSaveGISProject(v);
+                val = v.valueVariant();
+                (const_cast<KKSAttrValue *>(cAttrValue))->setValue(v);
                 value = val.toString();
             }
             //ksa
             else if(type == KKSAttrType::atRasterLayer)
             {
+                //перед тем, как сохранить ИО (ЭИО) необходимо сохранить файл с ГИС-проектом (если присутствуют атрибуты ГИС)
+                //генерируем сигнал, его поймает ГИС-виджет, сохранить файл проекта, прочитает его в XML и вернет в качестве значения KKSValue
+                KKSValue v; // = const_case<KKSAttrValue *>(cAttrValue);
+                emit needToSaveGISProject(v);
+                val = v.valueVariant();
+                (const_cast<KKSAttrValue *>(cAttrValue))->setValue(v);
                 value = val.toString();
             }
             //ksa
             else if(type == KKSAttrType::atGISMap)
             {
+                //перед тем, как сохранить ИО (ЭИО) необходимо сохранить файл с ГИС-проектом (если присутствуют атрибуты ГИС)
+                //генерируем сигнал, его поймает ГИС-виджет, сохранить файл проекта, прочитает его в XML и вернет в качестве значения KKSValue
+                KKSValue v; // = const_case<KKSAttrValue *>(cAttrValue);
+                emit needToSaveGISProject(v);
+                val = v.valueVariant();
+                (const_cast<KKSAttrValue *>(cAttrValue))->setValue(v);
                 value = val.toString();
             }
 
@@ -753,16 +789,34 @@ int KKSObjEditor :: constructObject()
             //ksa
             else if(type == KKSAttrType::atVectorLayer)
             {
+                //перед тем, как сохранить ИО (ЭИО) необходимо сохранить файл с ГИС-проектом (если присутствуют атрибуты ГИС)
+                //генерируем сигнал, его поймает ГИС-виджет, сохранить файл проекта, прочитает его в XML и вернет в качестве значения KKSValue
+                KKSValue v; // = const_case<KKSAttrValue *>(cAttrValue);
+                emit needToSaveGISProject(v);
+                val = v.valueVariant();
+                (const_cast<KKSAttrValue *>(cAttrValue))->setValue(v);
                 value = val.toString();
             }
             //ksa
             else if(type == KKSAttrType::atRasterLayer)
             {
+                //перед тем, как сохранить ИО (ЭИО) необходимо сохранить файл с ГИС-проектом (если присутствуют атрибуты ГИС)
+                //генерируем сигнал, его поймает ГИС-виджет, сохранить файл проекта, прочитает его в XML и вернет в качестве значения KKSValue
+                KKSValue v; // = const_case<KKSAttrValue *>(cAttrValue);
+                emit needToSaveGISProject(v);
+                val = v.valueVariant();
+                (const_cast<KKSAttrValue *>(cAttrValue))->setValue(v);
                 value = val.toString();
             }
             //ksa
             else if(type == KKSAttrType::atGISMap)
             {
+                //перед тем, как сохранить ИО (ЭИО) необходимо сохранить файл с ГИС-проектом (если присутствуют атрибуты ГИС)
+                //генерируем сигнал, его поймает ГИС-виджет, сохранить файл проекта, прочитает его в XML и вернет в качестве значения KKSValue
+                KKSValue v; // = const_case<KKSAttrValue *>(cAttrValue);
+                emit needToSaveGISProject(v);
+                val = v.valueVariant();
+                (const_cast<KKSAttrValue *>(cAttrValue))->setValue(v);
                 value = val.toString();
             }
             else if (type == KKSAttrType::atRecordColor || type == KKSAttrType::atRecordTextColor)
@@ -1226,6 +1280,7 @@ void KKSObjEditor :: editObjectE (void)
     QAbstractItemModel * sRecModel (0);
     if (rw)
         sRecModel = rw->getSourceModel ();
+
     emit editObjectEx (this, idObject, idObjectE, c, tabName, i, false, sRecModel, recIndex);
 }
 

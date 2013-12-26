@@ -7,7 +7,15 @@ include(./ddocclient.conf)
 # Directories
 SUBDIRS += \
     kksutils \
-    dataaccess \
+    dataaccess 
+
+qgis{
+
+SUBDIRS += \
+    kksqgis 
+}
+
+SUBDIRS += \
     kkspp \
     rptrenderer \
     openrpt \
@@ -19,10 +27,6 @@ SUBDIRS += \
     kksrunservice \
     sync_queue_viewer
 
-qgis{
-    SUBDIRS += kksgis
-}
-
 SUBDIRS += app
 
 RESOURCES = ./ddocs_ico/ddocs_icon_set.qrc
@@ -31,7 +35,7 @@ RESOURCES = ./ddocs_ico/ddocs_icon_set.qrc
 transl.files = ./transl/*.qm
 transl.path = $$KKS_TRANSL_DIR
 INSTALLS += transl
-TRANSLATIONS = ./transl/ddocclient_ru.ts
+TRANSLATIONS = ./transl/ddocclient_ru.ts ./transl/qgis_ru.ts
 
 unix{
     CONFIG_NAME_FILE = ./install_prefix.conf

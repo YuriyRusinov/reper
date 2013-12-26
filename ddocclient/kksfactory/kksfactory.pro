@@ -45,6 +45,29 @@ QT += xml sql svg
 DEFINES += __USE_DLL_KKSFACTORY
 #DEFINES -= UNICODE
 
+qgis{
+    DEFINES *= __USE_QGIS__
+    DEFINES *= __USE_EXPORTS  #for qgis export library
+
+    LIBS *= -L$$QGISDIR/lib -lqgis_core -lqgis_gui
+    LIBS *= -L$$DESTDIR -lkksqgis
+
+    INCLUDEPATH *= \
+                   $$OSGEODIR/include \
+                   $$OSGEODIR/include/qwt \
+                   $$QGISDIR/include \
+                   ../kksqgis \
+                   ../kksqgis/layerprops \
+                   ../kksqgis/legend \
+                   ../kksqgis/projectprops \
+                   ../kksqgis/maptools
+
+    DEPENDPATH *= ../kksqgis
+
+    LIBS *= -L$$OSGEODIR/lib  -lproj_i -lgdal_i -lsqlite3_i
+}
+
+
 include (kksfactory.pri)
 
 # install targets

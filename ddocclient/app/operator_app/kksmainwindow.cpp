@@ -1,4 +1,5 @@
 #include "kksmainwindow.h"
+
 #include "kksmasswidget.h"
 #include "cmdjournalform.h"
 #include "msgjournalform.h"

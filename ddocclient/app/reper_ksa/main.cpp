@@ -1,4 +1,4 @@
-#include <map_window.h>
+#include "map_window.h"
 //
 // QGIS Includes
 //
@@ -26,8 +26,14 @@ int main(int argc, char ** argv)
 //    }
 //    app->installTranslator(&translator);
 
-//    QString myPluginsDir        = "C:\\Program Files (x86)\\DynamicSoft\\DynamicDocs Client 1.2.3\\QGS21\\plugins";
-    QString myPluginsDir        = "D:\\REP_EXT\\QGS21\\plugins";
+    QString myPluginsDir        = "C:\\Program Files (x86)\\DynamicSoft\\DynamicDocs Client 1.3.0\\QGS21\\plugins";
+    //QString myPluginsDir        = "C:\\build\\plugins";
+    //QString myPluginsDir        = "D:\\REP_EXT\\QGS21\\plugins";
+
+    //QDir dir;
+    //QString workingDir = dir.absolutePath();
+    //QString myPluginsDir        = workingDir + QString("\\plugins");
+
     app->setPluginPath(myPluginsDir);
     
     app->initQgis();

@@ -12,27 +12,29 @@ DESTDIR = ../../build
 INCLUDEPATH +=  . \
                 ../../dataaccess \
                 ../../kksutils \
-                ../../kksgis
+                ../../kksqgis
 
 
 DEPENDPATH += 	\
                 . \
                 ../../dataaccess \
                 ../../kksutils \
-                ../../kksgis
+                ../../kksqgis
 
 #LIBS += -L$$DESTDIR -ldataaccess -lkksutils -lkksrunservice
 qgis{
+    DEFINES *= __USE_QGIS__
     DEFINES *= __USE_EXPORTS  #for qgis export library
 
     INCLUDEPATH += $$OSGEODIR/include \
                    $$QGISDIR/include
 
     LIBS += -L$$QGISDIR/lib -lqgis_core -lqgis_gui
-    LIBS += -L$$OSGEODIR/lib  -lproj_i -lgdal_i
+    LIBS += -L$$OSGEODIR/lib  -lproj_i -lgdal_i -lsqlite3_i
 }
 
-LIBS *= -L$$DESTDIR -lkksgis
+LIBS *= -L$$DESTDIR -lkksqgis
+
 # libpq support
 LIBS += -L$${PSQL_HOME}/lib
 INCLUDEPATH *= $${PSQL_HOME}/include

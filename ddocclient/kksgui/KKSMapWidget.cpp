@@ -16,13 +16,17 @@
 #include <QDir>
 #include <QMessageBox>
 #include <QFile>
-
-#ifdef __USE_QGIS__
-#include "kksgiswidget.h"
-#endif
+#include <QLayout>
+#include <QMenuBar>
+#include <QStatusBar>
+#include <QUrl>
 
 KKSMapWidget::KKSMapWidget(qint64 idObj, const QString & gisHomeDir, const KKSAttrValue* attr, KKSIndAttrClass isSys, QWidget *parent)
+#ifdef __USE_QGIS__
+    : KKSGISWidget(true, false, parent),
+#else
     : QWidget(parent), 
+#endif
       KKSAttrWidget(attr, isSys),
       m_legendWidget(0),
       m_layerOrderWidget(0),
@@ -30,15 +34,6 @@ KKSMapWidget::KKSMapWidget(qint64 idObj, const QString & gisHomeDir, const KKSAt
       m_dataChanged(false),
       m_idObj(idObj)
 {
-#ifdef __USE_QGIS__
-    mpKKSGISWidget = KKSGISWidget::instance(); //присваивается NULL
-    if(mpKKSGISWidget){ //уже открыт редактор ИО с картой
-        mpKKSGISWidget = 0;
-        QMessageBox::critical(parent, tr("GIS support error"), tr("There are already open an IO Editor with map! Current version of DynamicDocs Client supports only one opened IO Editor with GIS capabilities"));
-        return;
-    }
-#endif
-    //init(this); //вызывается отдельно!!!
 }
 
 KKSMapWidget::~KKSMapWidget()
@@ -48,14 +43,6 @@ KKSMapWidget::~KKSMapWidget()
     
     m_legendWidget = 0;
     m_layerOrderWidget = 0;
-
-#ifdef __USE_QGIS__
-    if(mpKKSGISWidget){
-        mpKKSGISWidget->setParent(0);
-        KKSGISWidget::destroyQGISWidget(mpKKSGISWidget);
-        mpKKSGISWidget = 0;
-    }
-#endif
 }
 
 QDockWidget * KKSMapWidget::legendWidget() const
@@ -71,7 +58,7 @@ QDockWidget * KKSMapWidget::layerOrderWidget() const
 void KKSMapWidget::init()
 {
 #ifdef __USE_QGIS__
-    initQGIS(this);
+    this->initQGIS();
 #else
     QMessageBox::warning(this, tr("Warning"), tr("Current IO contains GIS-object attribute!\nBut current build of DynamicDocs Client does not support GIS capabilities!\nWorking with this attribute will be disabled"), QMessageBox::Ok);
 #endif
@@ -80,40 +67,59 @@ void KKSMapWidget::init()
 
 #ifdef __USE_QGIS__
 
-void KKSMapWidget::initQGIS(QWidget *parent)
+void KKSMapWidget::initQGIS()
 {
-    bool withSubWindows = true;
-    
-    mpKKSGISWidget = KKSGISWidget::initQGISWidget(withSubWindows, parent);
-    if(!mpKKSGISWidget){
-        QMessageBox::critical(0, "", "");
+    QString prjName = KKSGISWidget::projectFileName();
+    if(!prjName.isEmpty()){
+        QMessageBox::critical(this, tr("Error"), tr("Current version of DynamicDocs Client supports only one opened GIS-enabled window!"));
         return;
     }
-    
-    connect(mpKKSGISWidget, SIGNAL(mapSaved(QDomDocument &)), this, SLOT(slotMapChanged(QDomDocument&)));
-    connect(mpKKSGISWidget, SIGNAL(dataChanged()), this, SLOT(slotDataChanged()));
 
-    QVBoxLayout * mpMapLayout = new QVBoxLayout(parent); //main Layout
-    QMenuBar * mb = mpKKSGISWidget->menuBar();
+    KKSGISWidget::initQGIS();
+
+    //bool withSubWindows = true;
+    
+    //mpKKSGISWidget = KKSGISWidget::initQGISWidget(withSubWindows, parent);
+    //if(!mpKKSGISWidget){
+    //    QMessageBox::critical(0, "", "");
+    //    return;
+    //}
+    
+    //QVBoxLayout * vBoxLayout = new QVBoxLayout();
+    //parent->setLayout(vBoxLayout);
+
+    QVBoxLayout * mpMapLayout = new QVBoxLayout(); //main Layout
+    QWidget * wParent = (QWidget*)parent();
+    wParent->setLayout(mpMapLayout);
+    
+    QMenuBar * mb = this->menuBar();
     if(mb)
         mpMapLayout->setMenuBar(mb);
     
-    QToolBar * tb = mpKKSGISWidget->toolBar();
-    if(tb)
-        mpMapLayout->addWidget(tb);
+    QHBoxLayout * mpToolBarLayout = new QHBoxLayout();
+    QMap<QString, QToolBar *> mpToolBars = toolBarMap();
+    mpToolBarLayout->addWidget(mpToolBars.value("mpMapToolBar"));
+    mpToolBarLayout->addWidget(mpToolBars.value("mpDataSourceToolBar"));
+    mpToolBarLayout->addWidget(mpToolBars.value("mpToolsToolBar"));
+    mpToolBarLayout->addWidget(mpToolBars.value("mpLayerToolBar"));
+    QSpacerItem * sp = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    mpToolBarLayout->addSpacerItem(sp);
+    
+    mpMapLayout->addLayout(mpToolBarLayout);
 
-    mpMapLayout->addWidget(mpKKSGISWidget);
+    mpMapLayout->addWidget(this);
 
-    QWidget * w = mpKKSGISWidget->statusBar();
+    QWidget * w = this->statusBar();
     if(w){
         w->setFixedHeight(30);
         mpMapLayout->addWidget(w);
     }
 
     mpMapLayout->setContentsMargins(0, 0, 0, 0);
+    mpMapLayout->setMargin(0);
 
 
-    QWidget * legend = mpKKSGISWidget->mapLegendWidget();
+    QWidget * legend = this->mapLegendWidget();
     if(legend){
         m_legendWidget = new QDockWidget( tr( "Layers" ), this );
         m_legendWidget->setObjectName( "Legend" );
@@ -122,7 +128,7 @@ void KKSMapWidget::initQGIS(QWidget *parent)
         //addDockWidget( Qt::LeftDockWidgetArea, mLegendDock );
     }
     
-    QWidget * layerOrder = mpKKSGISWidget->mapLayerOrderWidget();
+    QWidget * layerOrder = this->mapLayerOrderWidget();
     if(layerOrder){
         m_layerOrderWidget = new QDockWidget( tr( "Layer order" ), this );
         m_layerOrderWidget->setObjectName( "LayerOrder" );
@@ -132,11 +138,14 @@ void KKSMapWidget::initQGIS(QWidget *parent)
         m_layerOrderWidget->hide();
     }
 
-    setWindowTitle(mpKKSGISWidget->windowTitle());
+    //setWindowTitle(this->windowTitle());
 
     openProject(); //открываем проект, который задан в качестве значения атрибута
     
-    connect(mpKKSGISWidget, SIGNAL(projectRead()), this, SLOT(slotMapOpened()));
+    connect(this, SIGNAL(projectRead()), this, SLOT(slotDataChanged()));
+    connect(this, SIGNAL(mapSaved(QDomDocument &)), this, SLOT(slotMapChanged(QDomDocument&)));
+    connect(this, SIGNAL(dataChanged()), this, SLOT(slotDataChanged()));
+    
 }
 
 #endif
@@ -145,14 +154,20 @@ void KKSMapWidget::initQGIS(QWidget *parent)
 int KKSMapWidget::openProject()//открываем проект, заданный в качестве значения атрибута
 {
 #ifdef __USE_QGIS__ 
-	if(!m_av || m_idObj <= 0)
-        return -1;
+	
+    QString xmlPrj; //здесь будет содержимое проекта (для существующих ИО, ЭИО)
 
-    KKSValue v = m_av->value();
-    
-    QString xmlPrj = v.value();
-    if(xmlPrj.isEmpty())
-        return -1;
+    if(!m_av || m_idObj <= 0){
+        ;//return -1;
+    }
+    else{
+        KKSValue v = m_av->value();
+        
+        xmlPrj = v.value();
+        if(xmlPrj.isEmpty())
+            return -1;
+    }
+
 
     QString homeDir = m_GISHomeDir;
     QDir d(homeDir);
@@ -163,9 +178,11 @@ int KKSMapWidget::openProject()//открываем проект, заданный в качестве значения 
         }
     }
     
-    d.cd(homeDir);
+    //d.cd(homeDir);
     
     qint64 id = m_idObj;
+    if(id <= 0)
+        id = 0; //для новых ИО (ЭИО)
 
     QString prjHomeDir = QString("qgis_prj_") + QString::number(id);
     QDir dPrj(homeDir + "/" + prjHomeDir);
@@ -187,33 +204,39 @@ int KKSMapWidget::openProject()//открываем проект, заданный в качестве значения 
     }
 
     QString path = homeDir + "/" + prjHomeDir + "/qgis_prj_" + QString::number(id) + ".qgs";
-
-    QFile f(path);
     
-    bool ok = f.open(QIODevice::ReadWrite);
-    if(!ok){
-        QMessageBox::critical(this, tr("Error"), tr("Cannot create file for storing QGIS project file (%1)!").arg(path));
-        return -1;
+    if(id > 0){ //для существующих ИО (ЭИО) - записываем содержимое проекта (т.е. значение KKSValue) в файл
+        QFile f(path);
+        
+        bool ok = f.open(QIODevice::ReadWrite);
+        if(!ok){
+            QMessageBox::critical(this, tr("Error"), tr("Cannot create file for storing QGIS project file (%1)!").arg(path));
+            return -1;
+        }
+
+        qint64 bytes = f.write(xmlPrj.toLocal8Bit());
+        if(bytes <= 0){
+            QMessageBox::critical(this, tr("Error"), tr("Cannot write data to QGIS project file (%1)!").arg(path));
+            return -1;
+        }
+        
+        f.flush();
+        f.close();
+
+        int res = downloadLayers(homeDir + "/" + prjHomeDir, xmlPrj);
+        //if(res != 1){
+        //    QMessageBox::critical(this, tr("Error"), tr("Some of layer files for this GIS project was downloaded with errors!"));
+        //    return -1;
+        //}
+
+        KKSGISWidget::openProject(path);
     }
-
-    qint64 bytes = f.write(xmlPrj.toLocal8Bit());
-    if(bytes <= 0){
-        QMessageBox::critical(this, tr("Error"), tr("Cannot write data to QGIS project file (%1)!").arg(path));
-        return -1;
+    else{//для новых ИО (ЭИО) - сохраняем начальный пустой проект в указанный файл
+        saveProjectAs(path);
     }
-    
-    f.flush();
-    f.close();
-
-    int res = downloadLayers(homeDir + "/" + prjHomeDir, xmlPrj);
-    //if(res != 1){
-    //    QMessageBox::critical(this, tr("Error"), tr("Some of layer files for this GIS project was downloaded with errors!"));
-    //    return -1;
-    //}
-
-    mpKKSGISWidget->openProject(path);
 
     return 1;
+    
 #else
 	return -1;
 #endif
@@ -222,69 +245,6 @@ int KKSMapWidget::openProject()//открываем проект, заданный в качестве значения 
 //выгрузка на клиент файлов со слоями, если слои представлены файлами (т.е. не PostGIS)
 int KKSMapWidget::downloadLayers(const QString & homeDir, const QString & xmlPrj)
 {
-    /*QList<qint64> ids;
-
-    bool haveErrors = false;
-    QDomDocument d;
-    d.setContent(xmlPrj);
-    QDomNodeList layers = d.elementsByTagName("maplayer");
-    int cnt = layers.length();
-    for(int index = 0; index<cnt; index++){
-        QDomNode layer = layers.item(index);
-        QDomNodeList itemsDS = layer.toElement().elementsByTagName("datasource");
-        int cnt = itemsDS.count();
-        if(cnt != 1){
-            haveErrors = true;
-            continue;
-        }
-
-        QDomNodeList itemsID = layer.toElement().elementsByTagName("id");
-        cnt = itemsID.count();
-        if(cnt != 1){
-            haveErrors = true;
-            continue;
-        }
-
-        QDomNodeList itemsProvider = layer.toElement().elementsByTagName("provider");
-        cnt = itemsProvider.count();
-        if(cnt != 1){
-            haveErrors = true;
-            continue;
-        }
-
-        QDomNodeList itemsLayerName = layer.toElement().elementsByTagName("layername");
-        cnt = itemsLayerName.count();
-        if(cnt != 1){
-            haveErrors = true;
-            continue;
-        }
-
-        QString path = itemsDS.item(0).toElement().text();
-        QString id = itemsID.item(0).toElement().text();
-        QString provider = itemsProvider.item(0).toElement().text();
-        QString layerName = itemsLayerName.item(0).toElement().text();
-
-        QString fileName = getFileNameForDS(path, provider);
-        if(fileName.isEmpty()){
-            haveErrors = true;
-            continue;
-        }
-
-        qint64 idUrl = getIdUrlForID(id);
-        
-        KKSFile * f = new KKSFile(idUrl, layerName);
-        f->setLocalUrl(homeDir + fileName);
-        
-        emit downloadFile(f, this);
-        
-        if(f->localUrl().isEmpty()){
-            QMessageBox::critical(this, tr("Error"), tr("Cannot to download file with requested layer!\nTry to download to %1\nLayer id = %2\nLayer provider = %3").arg(homeDir + fileName).arg(id).arg(provider));
-            haveErrors = true;
-            continue;
-        }
-    }
-    */
-
     bool bForRec = false;
     switch (m_isSystem)
     {
@@ -310,82 +270,17 @@ int KKSMapWidget::downloadLayers(const QString & homeDir, const QString & xmlPrj
     return 1;
 }
 
-//берем часть, которая представляет собой название файла, из datasource
-QString KKSMapWidget::getFileNameForDS(const QString & path, const QString & provider)
-{
-#ifdef __USE_QGIS__
-    QString fileName;
-    if(provider == "ogr"){
-        QStringList theURIParts = path.split( "|" );
-        fileName = mpKKSGISWidget->readLayerFilePath( theURIParts[0] );//возвращает абсолютный путь к файлу слоя, который прочитан из файла проекта QGIS
-        QFileInfo fi(fileName);
-        fileName = fi.fileName();
-    }
-    else if ( provider == "delimitedtext" ){
-        QUrl urlSource = QUrl::fromEncoded( path.toAscii() );
- 
-        if ( !path.startsWith( "file:" ) ){
-            QUrl file = QUrl::fromLocalFile( path.left( path.indexOf( "?" ) ) );
-            urlSource.setScheme( "file" );
-            urlSource.setPath( file.path() );
-        }
- 
-        QUrl urlDest = QUrl::fromLocalFile( mpKKSGISWidget->readLayerFilePath( urlSource.toLocalFile() ) ); //возвращает абсолютный путь к файлу слоя, который прочитан из файла проекта QGIS
-        urlDest.setQueryItems( urlSource.queryItems() );
-        fileName = QString::fromAscii( urlDest.toEncoded() );
-    }
-    else if(provider == "postgres"){
-        //!!!!!!!!!!!!!!!!
-    }
-    else{ //rasters ??
-        fileName = mpKKSGISWidget->readLayerFilePath( path );//возвращает абсолютный путь к файлу слоя, который прочитан из файла проекта QGIS
-    }
-
-    return fileName;
-#else
-	return QString::null;
-#endif
-}
-//Берем часть, которая представляет собой идентификатор файла в таблице io_urls, из id слоя
-//Считаем, что идентификатор слоя представлен так: kks_file_<ID_URL>
-/*
-qint64 KKSMapWidget::getIdUrlForID(const QString & id)
-{
-    if(id.isEmpty())
-        return -1;
-
-    qint64 idUrl = -1;
-    if(!id.startsWith("kks_file_"))
-        return -1;
-
-    QString s = id;
-    s.remove(0, 9); //kks_file_
-    
-    bool ok = true;
-    idUrl = s.toLongLong(&ok, 10);
-    if(!ok)
-        return -1;
-
-    return idUrl;
-}
-*/
 
 void KKSMapWidget::slotDataChanged()
 {
-    //m_dataChanged = true;
-}
-
-void KKSMapWidget::slotMapChanged(QDomDocument & prjFile)
-{
-    Q_UNUSED(prjFile); //там данные все равно не корректные. Нет слоев
-    
-    slotMapOpened();
-}
-
-void KKSMapWidget::slotMapOpened()
-{
-
     QString xml = readGISProjectFile();
+    if(xml.isEmpty())//Файла проекта нет. Значит проект еще не создан
+        return;
+
+    //необходимо заменить пути к файлам слоев в тэге datasource на относительные вида ./filename. 
+    //Т.е. полагаем, что все файлы находятся в том же каталоге, что и файл проекта
+
+    xml = updateProjectXML(xml);
 
     KKSValue v(xml, KKSAttrType::atGISMap);
     if(!v.isValid()){
@@ -393,11 +288,16 @@ void KKSMapWidget::slotMapOpened()
         return;
     }
 
-    //m_av->setValue(v);//потом будем использовать при загрузке файлов на сервер
-
     emit valueChanged(m_av->id(), m_isSystem, v.valueVariant());
 
     m_dataChanged = true;
+}
+
+void KKSMapWidget::slotMapChanged(QDomDocument & prjFile)
+{
+    Q_UNUSED(prjFile); //там данные все равно не корректные. Нет слоев
+    
+    slotDataChanged();
 }
 
 bool KKSMapWidget::removeQGISPrjDir(const QString & path) 
@@ -409,7 +309,10 @@ bool KKSMapWidget::removeQGISPrjDir(const QString & path)
     while (itFile != files.end()) 
     {
         QFile file(path + "/" + *itFile);
-        file.remove();
+        bool ok = file.remove();
+        if(!ok){
+            int a=0;
+        }
         ++itFile;
     } 
 
@@ -503,13 +406,13 @@ QStringList KKSMapWidget::readGISProjectLayerFiles(const QString & xml) const
 
         if(provider == "ogr"){
             QStringList theURIParts = dataSource.split( "|" );
-            fileAbsUrl = mpKKSGISWidget->readLayerFilePath( theURIParts[0] );//возвращает абсолютный путь к файлу слоя, который прочитан из файла проекта QGIS
+            fileAbsUrl = this->readLayerFilePath( theURIParts[0] );//возвращает абсолютный путь к файлу слоя, который прочитан из файла проекта QGIS
         }
         else if ( provider == "delimitedtext" ){
             //???????????
         }
         else{ //rasters ??
-            fileAbsUrl = mpKKSGISWidget->readLayerFilePath( dataSource );//возвращает абсолютный путь к файлу слоя, который прочитан из файла проекта QGIS
+            fileAbsUrl = this->readLayerFilePath( dataSource );//возвращает абсолютный путь к файлу слоя, который прочитан из файла проекта QGIS
         }
         
         QFileInfo fi(fileAbsUrl);
@@ -533,12 +436,101 @@ QStringList KKSMapWidget::readGISProjectLayerFiles(const QString & xml) const
     return files;
 }
 
+//!!!не заменяет файл проекта!!! только готовит измененный xml для занесения в kksattrvalue
+QString KKSMapWidget::updateProjectXML(const QString & xml) const
+{
+    QString updatedXML;
+
+#ifdef __USE_QGIS__
+
+    QDomDocument d;
+    d.setContent(xml);
+    QDomNode qgis = d.namedItem("qgis");
+    QDomNode oldQgis(qgis);
+    QDomNode prjLayers = qgis.namedItem("projectlayers");
+    QDomNode oldPrjLayers(prjLayers);
+
+    QDomNodeList mapLayers = prjLayers.childNodes(); //maplayer
+    int cnt = mapLayers.length();
+    if(cnt <= 0)
+        return updatedXML;
+    
+    for(int index = 0; index<cnt; index++){
+        QDomNode layer = mapLayers.item(index);
+    
+        QDomNode mnl;
+        QDomElement mne;
+
+        QString provider;
+        QString dataSource;
+        
+        mnl = layer.namedItem("provider");
+        mne = mnl.toElement();
+        provider = mne.text();
+        
+        if(provider == "postgres" || provider == "spatialite" || provider == "wms"){
+            continue;//эти источники представлены ресурсами БД в сети, а не файлами
+        }
+
+        mnl = layer.namedItem( "datasource" );
+        mne = mnl.toElement();
+        dataSource = mne.text();
+
+        QString fileAbsUrl;
+
+        if(provider == "ogr"){
+            QStringList theURIParts = dataSource.split( "|" );
+            fileAbsUrl = this->readLayerFilePath( theURIParts[0] );//возвращает абсолютный путь к файлу слоя, который прочитан из файла проекта QGIS
+            
+            QFileInfo fi(fileAbsUrl);
+            theURIParts[0] = QString("./") + fi.fileName();
+            dataSource = theURIParts.join("|");
+        }
+        //else if ( provider == "delimitedtext" ){
+            //???????????
+        //}
+        else{ //rasters ??
+            fileAbsUrl = this->readLayerFilePath( dataSource );//возвращает абсолютный путь к файлу слоя, который прочитан из файла проекта QGIS
+            QFileInfo fi(fileAbsUrl);
+            dataSource = QString("./") + fi.fileName();
+        }
+
+        // datasource
+        //QDomNode newLayer(layer);
+        QDomElement dsNode = d.createElement( "datasource" );
+        QDomText dsText = d.createTextNode( dataSource );
+        dsNode.appendChild( dsText);
+        mapLayers.item(index).replaceChild(dsNode, mnl);
+        //prjLayers.replaceChild(newLayer, layer);
+
+    }
+
+    //prjLayers.replaceChild(mapLayers, oldMapLayers);
+    qgis.replaceChild(prjLayers, oldPrjLayers);
+    d.replaceChild(qgis, oldQgis);
+
+    updatedXML = d.toString();
+    //qWarning() << updatedXML;
+
+    //QFile f("./1111.xml");
+    //f.open(QIODevice::WriteOnly);
+    //f.write(updatedXML.toLocal8Bit());
+    //f.close();
+
+#endif
+    return updatedXML;
+}
+
 QString KKSMapWidget::readGISProjectFile()
 {
     QString xml;
 
 #ifdef __USE_QGIS__
-    QString prjFile = mpKKSGISWidget->projectFileName();
+
+    QString prjFile = this->projectFileName();
+    if(prjFile.isEmpty())// доверяем QGIS'у. Если файл проекта пустой, то это означает, что проект еще пуст
+        return xml;
+
     QFile f(prjFile);
     bool ok = f.open(QIODevice::ReadOnly);
     if(!ok){
@@ -547,8 +539,37 @@ QString KKSMapWidget::readGISProjectFile()
     }
 
     xml = f.readAll();
+    f.close();
 
 #endif
 
     return xml;
+}
+
+void KKSMapWidget::slotSaveGISProject(KKSValue & v)
+{
+    
+#ifdef __USE_QGIS__
+
+    disconnect(this, SIGNAL(mapSaved(QDomDocument &)), this, SLOT(slotMapChanged(QDomDocument&)));
+    
+    saveProject();
+
+    QString xml = readGISProjectFile();
+    if(xml.isEmpty())//Файла проекта нет. Значит проект еще не создан
+        return;
+
+    //необходимо заменить пути к файлам слоев в тэге datasource на относительные вида ./filename. 
+    //Т.е. полагаем, что все файлы находятся в том же каталоге, что и файл проекта
+
+    xml = updateProjectXML(xml);
+    
+    connect(this, SIGNAL(mapSaved(QDomDocument &)), this, SLOT(slotMapChanged(QDomDocument&)));
+    
+    v = KKSValue(xml, KKSAttrType::atGISMap);
+    if(!v.isValid()){
+        QMessageBox::critical(this, tr("Error"), tr("Cannot set attribute value for GIS attribute!"));
+        return;
+    }
+#endif
 }

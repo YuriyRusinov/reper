@@ -31,7 +31,7 @@ DEPENDPATH += 	. \
                ../kksfactory \
                ../kksutils 
 
-LIBS += -L$$DESTDIR -ldataaccess -lkksutils -lkkscore -lkksfactory -lkkspp -lkksgui
+LIBS += -L$$DESTDIR -ldataaccess -lkksutils -lkkscore -lkksfactory -lkkspp
 
 # libpq support
 LIBS += -L$${PSQL_HOME}/lib
@@ -52,7 +52,8 @@ HEADERS += \
            ./filtersform.h \
            ./sqv_delegate.h \
            dataelement.h \
-           sqv_datastream.h
+           sqv_datastream.h \
+           kkssqv_config.h
 
 SOURCES += \
            ./syncqueueviewerform.cpp \

@@ -264,7 +264,11 @@ class _GUI_EXPORT KKSObjEditor : public KKSRecDialog
                                        //поскольку в рамках одного KKSObjEditor может быть только один атрибут типа ГИС-объект, 
                                        //то в данном сигнале надо передавать Только ИД ИО (ЭИО). Его поймает нужный виджет
                                        //который сам знает, что ему надо загружать
+        
+        void needToSaveGISProject(KKSValue &); //перед тем, как сохранить ИО (ЭИО) необходимо сохранить файл с ГИС-проектом (если присутствуют атрибуты ГИС)
+                                               //генерируем сигнал, его поймает ГИС-виджет, сохранить файл проекта, прочитает его в XML и вернет в качестве значения KKSValue
         void setHistCat (int idCat, QVariant vHist, KKSHistWidget * hW);
+
 
     public slots:
         //void slotRubricItemRequested();

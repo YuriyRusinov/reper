@@ -154,6 +154,9 @@ int DDocInteractorBase::start(bool mode, int interval)
 
 void DDocInteractorBase::slotExitThreads()
 {
+    if(!m_server && !m_client)
+        return;
+
     m_isExiting = true;
     m_client->m_isExiting = true;
     m_server->m_isExiting = true;

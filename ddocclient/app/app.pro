@@ -1,5 +1,7 @@
 TEMPLATE = subdirs
 
+include(../ddocclient.conf)
+
 # Directories
 SUBDIRS += \
 	operator_app \
@@ -7,12 +9,6 @@ SUBDIRS += \
 #        sync_queue_viewer \
         dyndoc_synch \
         kksdaemon
-
-include(../ddocclient.conf)
-
-qgis{
-    SUBDIRS += reper_ksa
-}
 
 #win32{
 #        SUBDIRS += \

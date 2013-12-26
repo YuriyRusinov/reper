@@ -456,41 +456,17 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
         }
     }
 
-    //QGridLayout * gMapLay = 0;
-    //QWidget * mapWParent = 0;
-    //QWidget * tabM = 0;
+    QWidget * mapWParent = 0; //здесь будет храниться указатель на вкладку с картой. Ниже ее делаем активной (нсли ГИС-объект присутствует)
     if (isAttrMap)
     {
-        /*
-        mapWParent = new QWidget (tabObj);
-        tabObj->addTab (mapWParent, tr("Map"));
-        tabObj->setCurrentIndex (tabObj->count()-1);
-        gMapLay = new QGridLayout (mapWParent);
-        //tabM = new QWidget (mapWParent);
-
-        //objEditorWidget->setMapWidget (tabM);
-        objEditorWidget->setMapWidget (mapWParent);
-
-        //если привутствует атрибут типа ГИС (векторный слой, растровый слой, карта)
-        if (isAttrMap){
-            //gMapLay->addWidget(tabM, 0, 0, 1, 1);
-            //gMapLay->setMargin(0);
-            //tabObj->setCurrentWidget(mapWParent);
-        }
-        */
-      
-        QWidget * mapWParent = new QWidget ();
+        mapWParent = new QWidget ();
         QGridLayout *gMapLay = new QGridLayout ();
         mapWParent->setLayout (gMapLay);
-        //KKSList<KKSFileType*> fileTypes = loader->loadFileTypes();
-        //KKSFileWidget * W = new KKSFileWidget(io->files(), fileTypes, false);
-        //connect(W, SIGNAL(downloadFile(KKSFile*, QWidget *)), this, SLOT(slotDownloadFile(KKSFile*, QWidget*)));
         QWidget * W = new QWidget();
         objEditorWidget->setMapWidget (W);
         tabObj->addTab (mapWParent, tr("Map"));
         gMapLay->addWidget (W, 0, 0, 1, 1);
     }
-
 
     nCount = setAttributes (tSystem, obj, attrWidget, gAttrLay, wCat, wObjE, tableName, objEditorWidget);
 
@@ -626,13 +602,6 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
     else
         tabObj->setCurrentIndex (0);
 
-    //если привутствует атрибут типа ГИС (векторный слой, растровый слой, карта)
-    //if (isAttrMap){
-        //gMapLay->addWidget(tabM, 0, 0, 1, 1);
-        //gMapLay->setMargin(0);
-        //tabObj->setCurrentWidget(mapWParent);
-    //}
-
     if (tabEnc && tabEnc->count () > 0)
     {
         tabEnc->setCurrentIndex (0);
@@ -654,6 +623,12 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
         tabObj->addTab (filesW, tr("Files"));
         gFilesLay->addWidget (W, 0, 0, 1, 1);
 
+    }
+
+    //если ИО (ЭИО) содержит ГИС-объект, делаем его вкладку активной
+    if(mapWParent){
+        tabObj->setCurrentWidget(mapWParent);
+        mapWParent->update();
     }
 
     //системные параметры для записей пользовательских справочников
@@ -886,16 +861,16 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditorParam (int idObject,// идент
 
     //проверяем, надо ли создавать QTabWidget для ГИС
     bool isAttrMap = false;
-    for (KKSMap<int, KKSCategoryAttr *>::const_iterator pa = wCat->attributes().constBegin(); \
-            pa != wCat->attributes().constEnd() && !isAttrCheckEx; \
+    for (KKSMap<int, KKSCategoryAttr *>::const_iterator pa = wCat->attributes().constBegin(); 
+            pa != wCat->attributes().constEnd() && !isAttrMap; 
             pa++)
     {
          isAttrMap = isAttrMap || 
-                     pa.value()->type ()->attrType() == KKSAttrType::atVectorLayer ||
+                     pa.value()->type ()->attrType() == KKSAttrType::atVectorLayer || 
                      pa.value()->type ()->attrType() == KKSAttrType::atRasterLayer ||
                      pa.value()->type ()->attrType() == KKSAttrType::atGISMap;
     }
-
+    
     if (wCat && wCat->tableCategory () && !isAttrMap)
     {
         const KKSCategory * tCat = wCat->tableCategory ();
@@ -904,25 +879,23 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditorParam (int idObject,// идент
                 pa++)
         {
              isAttrMap = isAttrMap || 
-                         pa.value()->type ()->attrType() == KKSAttrType::atVectorLayer ||
+                         pa.value()->type ()->attrType() == KKSAttrType::atVectorLayer || 
                          pa.value()->type ()->attrType() == KKSAttrType::atRasterLayer ||
                          pa.value()->type ()->attrType() == KKSAttrType::atGISMap;
         }
     }
 
-    QGridLayout * gMapLay = 0;
-    QWidget * mapWParent = 0;
-    QWidget * tabM = 0;
-    if (io || isAttrMap)
+    QWidget * mapWParent = 0; //здесь будет храниться указатель на вкладку с картой. Ниже ее делаем активной (нсли ГИС-объект присутствует)
+    if (isAttrMap)
     {
         mapWParent = new QWidget ();
-        tabObj->addTab (mapWParent, tr ("Map"));
-        tabObj->setCurrentIndex (tabObj->count ()-1);
-        gMapLay = new QGridLayout (mapWParent);
-        tabM = new QWidget (mapWParent);
-
-        objEditorWidget->setMapWidget (tabM);
-    }    
+        QGridLayout *gMapLay = new QGridLayout ();
+        mapWParent->setLayout (gMapLay);
+        QWidget * W = new QWidget();
+        objEditorWidget->setMapWidget (W);
+        tabObj->addTab (mapWParent, tr("Map"));
+        gMapLay->addWidget (W, 0, 0, 1, 1);
+    }  
     
     if (io && !io_aVals.isEmpty())
         this->setPreliminaryAttrs(io, io_aVals);
@@ -1056,16 +1029,16 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditorParam (int idObject,// идент
     else
         tabObj->setCurrentIndex (0);
 
-    //если привутствует атрибут типа ГИС (векторный слой, растровый слой, карта)
-    if (isAttrMap){
-        gMapLay->addWidget(tabM, 0, 0, 1, 1);
-        gMapLay->setMargin(0);
-        tabObj->setCurrentWidget(mapWParent);
-    }
-
     if ((isAttrCheckEx && io) ||
             (tabEnc && tabEnc->count () > 0))
         tabEnc->setCurrentIndex (0);
+
+
+    //если ИО (ЭИО) содержит ГИС-объект, делаем его вкладку активной
+    if(mapWParent){
+        tabObj->setCurrentWidget(mapWParent);
+        mapWParent->update();
+    }
 
     if (mode)
     {

@@ -1,6 +1,11 @@
 #ifndef KKSMainWindow_H
 #define KKSMainWindow_H
 
+#ifdef __USE_QGIS__
+#include <kksqgis_config.h>
+#endif
+
+
 #include <QObject>
 #include <QMainWindow>
 #include <QtGui>

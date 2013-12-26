@@ -1,3 +1,5 @@
+#include "kksmainwindow.h"
+
 /* qt */
 #include <QApplication>
 #include <QFile>
@@ -7,7 +9,6 @@
 #include <QMainWindow>
 
 /* ui */
-#include "kksmainwindow.h"
 #include "kkssito.h"
 #include "kksclient_name.h"
 
@@ -15,8 +16,10 @@
 #include <QgsApplication.h>
 #endif
 
+
 int main(int argc, char *argv[])
 {
+    
 #ifdef __USE_QGIS__
     QApplication * app = new QgsApplication(argc, argv, true);
 
@@ -25,8 +28,11 @@ int main(int argc, char *argv[])
     //a->setPluginPath(pluginPath);
     //a->initQgis();
 #else
+    
     QApplication *app = new QApplication(argc, argv);
+
 #endif
+
 
     KKSSito *sito = NULL;
 

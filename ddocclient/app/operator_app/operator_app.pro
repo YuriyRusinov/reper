@@ -41,18 +41,21 @@ qgis{
     DEFINES *= __USE_EXPORTS  #for qgis export library
 
     LIBS *= -L$$QGISDIR/lib -lqgis_core -lqgis_gui
-    LIBS *= -L$$DESTDIR -lkksgis
+    LIBS *= -L$$DESTDIR -lkksqgis
 
-    INCLUDEPATH *= $$OSGEODIR/include \
+    INCLUDEPATH *= \
+                   $$OSGEODIR/include \
                    $$OSGEODIR/include/qwt \
                    $$QGISDIR/include \
-                   ../../kksgis \
-                   ../../kksgis/layerprops \
-                   ../../kksgis/legend
+                   ../../kksqgis \
+                   ../../kksqgis/layerprops \
+                   ../../kksqgis/legend \
+                   ../../kksqgis/projectprops \
+                   ../../kksqgis/maptools
 
-    DEPENDPATH += ../../kksgis
+    DEPENDPATH += ../../kksqgis
 
-    LIBS *= -L$$OSGEODIR/lib  -lproj_i -lgdal_i
+    LIBS *= -L$$OSGEODIR/lib  -lproj_i -lgdal_i -lsqlite3_i
 }
 
 

@@ -1,6 +1,8 @@
 #ifndef MAPWINDOW_H
 #define MAPWINDOW_H
 
+#include <kksqgis_config.h>
+
 
 //QT Includes
 #include <QtGui>
@@ -13,9 +15,11 @@
 #include <ui_map_window_base.h>
 #include "kksgiswidget.h"
 
+//class KKSGISWidget;
+
 class MapWindow : public QMainWindow, private Ui::MapWindowBase
 {
-  Q_OBJECT;
+  Q_OBJECT
 public:
 
     MapWindow(QWidget* parent = 0, Qt::WFlags fl = 0 );

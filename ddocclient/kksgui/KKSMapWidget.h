@@ -11,6 +11,7 @@
 
 #include "kksgui_config.h"
 
+#include <QObject>
 #include <KKSAttrWidget.h>
 #include <QString>
 #include <QList>
@@ -23,11 +24,19 @@
 class KKSAttrValue;
 class KKSFile;
 
+#include <KKSValue.h>
+
 #ifdef __USE_QGIS__
-class KKSGISWidget;
+#include "kksgiswidget.h"
+//#include "kksgiswidgetqgis.h"
+//class KKSGISWidget;
 #endif
 
+#ifdef __USE_QGIS__
+class _GUI_EXPORT KKSMapWidget : public KKSGISWidget, public KKSAttrWidget
+#else
 class _GUI_EXPORT KKSMapWidget : public QWidget, public KKSAttrWidget
+#endif
 {
     Q_OBJECT
 public:
@@ -51,8 +60,8 @@ signals:
 public slots:
     void slotMapChanged(QDomDocument&);
     void slotDataChanged();
-    void slotMapOpened();
     void slotUploadGISFiles(qint64 idObj);
+    void slotSaveGISProject(KKSValue & v);
 private:
     QDockWidget * m_legendWidget;
     QDockWidget * m_layerOrderWidget;
@@ -62,20 +71,13 @@ private:
 
     int openProject();//открываем проект, заданный в качестве значения атрибута
     int downloadLayers(const QString & homeDir, const QString & xmlPrj);//выгрузка на клиент файлов со слоями, если слои представлены файлами (т.е. не PostGIS)
-    QString getFileNameForDS(const QString & path, const QString & provider);//берем часть, которая представляет собой название файла, из datasource слоя
-    //qint64 getIdUrlForID(const QString & id);//Берем часть, которая представляет собой идентификатор файла в таблице io_urls, из id слоя
     bool removeQGISPrjDir(const QString & path);
     QStringList readGISProjectLayerFiles(const QString & xml) const;
+    QString updateProjectXML(const QString & xml) const;
     QString readGISProjectFile();
 
-#ifdef __USE_QGIS__
-
 private:
-    void initQGIS(QWidget *parent);
-
-private:
-    KKSGISWidget * mpKKSGISWidget;
-#endif
+    void initQGIS();
 
 };
 
