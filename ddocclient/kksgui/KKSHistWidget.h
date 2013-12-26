@@ -26,6 +26,7 @@ class KKSCharts;
 class KKSCategory;
 class KKSObject;
 class KKSHistogram;
+class KKSHistDrawWidget;
 
 class _GUI_EXPORT KKSHistWidget : public QWidget, public KKSAttrWidget
 {
@@ -70,6 +71,7 @@ protected:
 signals:
     void valueChanged (qint64 id, KKSIndAttrClass isSys, QVariant val);
     void loadCategory (int idCat, QVariant vHist);
+    void loadIO (int idIO, QVariant vHist);
     void updateVarsList (QComboBox *, FiltersType);
     void updateWidgetPars (KKSHistWidget *);
 
@@ -93,7 +95,7 @@ private:
     QComboBox * cbSource;
     QComboBox * cbReceiver;
     
-    KKSCharts * wCharts;
+    KKSHistDrawWidget * wHistDrawW;
 private:
     Q_OBJECT
 };

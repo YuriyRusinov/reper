@@ -22,6 +22,7 @@
 #include <KKSAttrValue.h>
 #include "KKSCharts.h"
 #include "KKSHistWidget.h"
+#include "KKSHistDrawWidget.h"
 #include "KKSValue.h"
 #include <KKSCategory.h>
 #include <KKSObject.h>
@@ -35,7 +36,8 @@ KKSHistWidget::KKSHistWidget(const KKSAttrValue *av, KKSIndAttrClass isSys, QWid
     cbVariant (new QComboBox),
     cbCategory (new QComboBox),
     cbSource (new QComboBox),
-    cbReceiver (new QComboBox)
+    cbReceiver (new QComboBox),
+    wHistDrawW (new KKSHistDrawWidget)
 {
     init ();
     
@@ -44,10 +46,12 @@ KKSHistWidget::KKSHistWidget(const KKSAttrValue *av, KKSIndAttrClass isSys, QWid
     connect (lECount, SIGNAL (editingFinished ()), this, SLOT (numChanged ()) );
     
     connect (cbCategory, SIGNAL (activated(int)), this, SLOT (catChanged (int)) );
+    connect (cbSource, SIGNAL (activated(int)), this, SLOT (ioChanged(int)) );
 }
 
 KKSHistWidget::~KKSHistWidget()
 {
+    delete wHistDrawW;
     delete cbReceiver;
     delete cbSource;
     delete cbCategory;
@@ -144,7 +148,7 @@ void KKSHistWidget::init (void)
     hRecLay->addWidget (lReceiver);
     hRecLay->addWidget (cbReceiver);
     gFiltLay->addLayout (hRecLay, 4, 0, 1, 1);
-    
+    gLay->addWidget (wHistDrawW, 5, 0, 1, 1);
 //    gLay->addWidget (wCharts, 5, 0, 1, 1);
 }
 
@@ -228,6 +232,11 @@ void KKSHistWidget::fromChanged ()
     hist.setRange (x, xMax);
     QVariant v = QVariant::fromValue<KKSHistogram>(hist);
     qDebug () << __PRETTY_FUNCTION__ << v;
+    if (!hist.category())
+    {
+        int idCat = cbCategory->itemData (cbCategory->currentIndex()).toInt ();
+        emit loadCategory (idCat, v);
+    }
     emit valueChanged (m_av->id(), m_isSystem, v);
 }
 
@@ -261,7 +270,11 @@ void KKSHistWidget::catChanged (int cIndex)
 
 void KKSHistWidget::ioChanged (int ioIndex)
 {
-    
+    int ioId = this->cbSource->itemData (ioIndex).toInt ();
+    KKSHistogram hist = m_av->value().valueVariant().value<KKSHistogram>();
+    QVariant v = QVariant::fromValue<KKSHistogram>(hist);
+    emit loadIO (ioId, v);
+    emit valueChanged (m_av->id(), m_isSystem, v);
 }
 
 void KKSHistWidget::calcHist (void)
