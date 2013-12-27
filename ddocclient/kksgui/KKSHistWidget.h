@@ -66,7 +66,7 @@ protected:
     //
     // Override functions of basic class
     //
-    void paintEvent(QPaintEvent *event);
+    //void paintEvent(QPaintEvent *event);
 
 signals:
     void valueChanged (qint64 id, KKSIndAttrClass isSys, QVariant val);

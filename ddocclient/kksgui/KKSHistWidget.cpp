@@ -62,6 +62,7 @@ KKSHistWidget::~KKSHistWidget()
     delete lEFrom;
 }
 
+/*
 void KKSHistWidget::paintEvent(QPaintEvent *event)
 {
     QVariant val = m_av->value().valueVariant();
@@ -88,6 +89,7 @@ void KKSHistWidget::paintEvent(QPaintEvent *event)
         i++;
     }
 }
+ */
 
 void KKSHistWidget::init (void)
 {
@@ -231,12 +233,12 @@ void KKSHistWidget::fromChanged ()
     double xMax = hist.getXMax();
     hist.setRange (x, xMax);
     QVariant v = QVariant::fromValue<KKSHistogram>(hist);
-    qDebug () << __PRETTY_FUNCTION__ << v;
     if (!hist.category())
     {
         int idCat = cbCategory->itemData (cbCategory->currentIndex()).toInt ();
         emit loadCategory (idCat, v);
     }
+    qDebug () << __PRETTY_FUNCTION__ << v;
     emit valueChanged (m_av->id(), m_isSystem, v);
 }
 
@@ -246,6 +248,7 @@ void KKSHistWidget::toChanged ()
     KKSHistogram hist = m_av->value().valueVariant().value<KKSHistogram>();
     hist.setRange (hist.getXMin(), text.toDouble());
     QVariant v = QVariant::fromValue<KKSHistogram>(hist);
+    qDebug () << __PRETTY_FUNCTION__ << v;
     emit valueChanged (m_av->id(), m_isSystem, v);
 }
 
@@ -255,6 +258,7 @@ void KKSHistWidget::numChanged ()
     KKSHistogram hist = m_av->value().valueVariant().value<KKSHistogram>();
     hist.setSize(text.toInt());
     QVariant v = QVariant::fromValue<KKSHistogram>(hist);
+    qDebug () << __PRETTY_FUNCTION__ << v;
     emit valueChanged (m_av->id(), m_isSystem, v);
 }
 
@@ -265,6 +269,7 @@ void KKSHistWidget::catChanged (int cIndex)
     QVariant v = QVariant::fromValue<KKSHistogram>(hist);
     emit loadCategory (idCat, v);
 
+    qDebug () << __PRETTY_FUNCTION__ << v;
     emit valueChanged (m_av->id(), m_isSystem, v);
 }
 
@@ -274,6 +279,7 @@ void KKSHistWidget::ioChanged (int ioIndex)
     KKSHistogram hist = m_av->value().valueVariant().value<KKSHistogram>();
     QVariant v = QVariant::fromValue<KKSHistogram>(hist);
     emit loadIO (ioId, v);
+    qDebug () << __PRETTY_FUNCTION__ << v;
     emit valueChanged (m_av->id(), m_isSystem, v);
 }
 
