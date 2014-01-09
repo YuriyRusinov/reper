@@ -60,6 +60,7 @@ class KKSStuffForm;
 class KKSIndicator;
 class KKSAttrValue;
 class KKSHistWidget;
+class KKSHistogram;
 
 class _GUI_EXPORT KKSObjEditor : public KKSRecDialog
 {
@@ -197,7 +198,8 @@ class _GUI_EXPORT KKSObjEditor : public KKSRecDialog
         void recSaved (KKSObjectExemplar * rec);
         void viewAHist (const KKSAttrValue *, const KKSList<KKSAttrValue *>& histList);
         
-        void loadHistCat (int idCat, QVariant vHist);
+        void loadHistCat (int idCat, KKSHistogram * vHist);
+        void loadHistIO (int idIO, KKSHistogram * vHist);
 //        void editIndicator (void);
 //        void delIndicator (void);
 //        void addIndicator (void);
@@ -267,8 +269,8 @@ class _GUI_EXPORT KKSObjEditor : public KKSRecDialog
         
         void needToSaveGISProject(KKSValue &); //перед тем, как сохранить ИО (ЭИО) необходимо сохранить файл с ГИС-проектом (если присутствуют атрибуты ГИС)
                                                //генерируем сигнал, его поймает ГИС-виджет, сохранить файл проекта, прочитает его в XML и вернет в качестве значения KKSValue
-        void setHistCat (int idCat, QVariant vHist, KKSHistWidget * hW);
-
+        void setHistCat (int idCat, KKSHistogram * vHist, KKSHistWidget * hW);
+        void setHistIO (int idIO, KKSHistogram * vHist, KKSHistWidget * hW);
 
     public slots:
         //void slotRubricItemRequested();

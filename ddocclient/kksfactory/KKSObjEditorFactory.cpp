@@ -1691,7 +1691,8 @@ void KKSObjEditorFactory :: setObjConnect (KKSObjEditor *editor)
     }
     
     connect (editor, SIGNAL (generateUUID (int, const KKSAttrValue *)), this, SLOT (genUUID (int, const KKSAttrValue *)) );
-    connect (editor, SIGNAL (setHistCat (int, QVariant, KKSHistWidget *)), this, SLOT (loadIOHist(int, QVariant, KKSHistWidget *)) );
+    connect (editor, SIGNAL (setHistCat (int, KKSHistogram *, KKSHistWidget *)), this, SLOT (loadCatHist(int, KKSHistogram *, KKSHistWidget *)) );
+    connect (editor, SIGNAL (setHistIO (int, KKSHistogram *, KKSHistWidget *)), this, SLOT (loadIOHist (int, KKSHistogram *, KKSHistWidget *)) );
     connect (this, SIGNAL (setuuid (QString)), editor, SLOT (setIOUUID (QString)) );
     connect (this, SIGNAL (cioSaved(KKSObjectExemplar *)), editor, SLOT (recSaved(KKSObjectExemplar *)) );
 }
@@ -9855,12 +9856,21 @@ void KKSObjEditorFactory :: addLifeCycleState (KKSLifeCycleEx * lc, QAbstractIte
     refObj->release();
 }
 
-void KKSObjEditorFactory :: loadIOHist (int idCat, QVariant vHist, KKSHistWidget * hw)
+void KKSObjEditorFactory :: loadCatHist (int idCat, KKSHistogram * vHist, KKSHistWidget * hw)
 {
-    if (!vHist.canConvert<KKSHistogram> ())
-        return;
-    KKSHistogram h = vHist.value <KKSHistogram>();
+    Q_UNUSED (hw);
     KKSCategory * c = loader->loadCategory (idCat);
-    h.setCategory (c);
-    hw->setHist (h);
+    vHist->setCategory (c);
+    if (c)
+        c->release ();
+    //hw->setHist (vHist);
+}
+
+void KKSObjEditorFactory :: loadIOHist (int idIO, KKSHistogram * vHist, KKSHistWidget * hw)
+{
+    KKSObject * io = loader->loadIO (idIO);
+    vHist->setSrcObject (io);
+    if (io)
+        io->release ();
+    Q_UNUSED (hw);
 }

@@ -57,6 +57,7 @@ class kkslifecycleform;
 class kksstateform;
 class KKSSearchTemplateForm;
 class KKSHistWidget;
+class KKSHistogram;
 
 class QScrollArea;
 class QGridLayout;
@@ -398,7 +399,8 @@ private slots:
     
     void GUIloadDBSearchTemplate (KKSSearchTemplate *st, const KKSCategory* c, QString tableName);
     
-    void loadIOHist (int idCat, QVariant vHist, KKSHistWidget * hw);
+    void loadCatHist (int idCat, KKSHistogram * vHist, KKSHistWidget * hw);
+    void loadIOHist (int idIO, KKSHistogram * vHist, KKSHistWidget * hw);
 
 private:
     //

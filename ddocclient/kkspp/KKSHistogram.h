@@ -11,13 +11,14 @@
 #include <QMetaType>
 #include <QMap>
 
+#include "KKSRecord.h"
 #include "kkspp_config.h"
 
 class KKSCategory;
 class KKSObject;
 class KKSObjectExemplar;
 
-class _PP_EXPORT KKSHistogram
+class _PP_EXPORT KKSHistogram : public KKSRecord
 {
 public:
     KKSHistogram(const QMap<int, double>& data, double xmin, double xmax, int n);

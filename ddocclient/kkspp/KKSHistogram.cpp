@@ -8,6 +8,7 @@
 #include <QBuffer>
 #include <QDataStream>
 #include <QTextStream>
+#include <QtDebug>
 
 #include "KKSCategory.h"
 #include "KKSType.h"
@@ -15,7 +16,7 @@
 #include "KKSHistogram.h"
 
 KKSHistogram::KKSHistogram()
-    : dHist(QMap<int, double>()),
+    : KKSRecord(), dHist(QMap<int, double>()),
     m_xmin(0.0),
     m_xmax(0.0),
     m_num(-1),
@@ -31,7 +32,7 @@ KKSHistogram::KKSHistogram()
 }
 
 KKSHistogram::KKSHistogram(const QMap<int, double>& data, double xmin, double xmax, int n)
-    : dHist (data),
+    : KKSRecord(), dHist (data),
     m_xmin (xmin),
     m_xmax (xmax),
     m_num (n),
@@ -48,7 +49,7 @@ KKSHistogram::KKSHistogram(const QMap<int, double>& data, double xmin, double xm
 }
 
 KKSHistogram::KKSHistogram(const KKSHistogram& orig)
-    : dHist (orig.dHist),
+    : KKSRecord(orig), dHist (orig.dHist),
     m_xmin (orig.m_xmin),
     m_xmax (orig.m_xmax),
     m_num (orig.m_num),
@@ -132,11 +133,9 @@ QString KKSHistogram::toString() const
     if (m_isEmpty)
         return resStr;
     QString sep ("^~^~^");
-    QBuffer outH;
-    QByteArray bh;
-    outH.setBuffer (&bh);
-    outH.open(QIODevice::WriteOnly);
-    QTextStream outHist (&outH);
+    //QByteArray bh;
+    QTextStream outHist;// (&bh, QIODevice::WriteOnly);
+    outHist.setString (&resStr);
     outHist << m_xmin << sep << m_xmax << sep << m_num << sep;
 
     //int i (0);
@@ -151,17 +150,19 @@ QString KKSHistogram::toString() const
     }
     outHist << idScenario << sep << idVariant << sep;
     if (!c || !c->tableCategory() || !c->type() || !io)
-        return QString (bh);
+        return resStr;
     outHist << c->id() << sep << c->name () << sep << c->type()->id() << sep << c->type()->name() << sep;
     outHist << c->tableCategory()->id() << sep << c->tableCategory()->name() << sep << c->tableCategory()->type()->id() << sep << c->tableCategory()->type()->name() << sep;
     outHist << io->id() << sep << io->name () << sep << idSource << sep << idReceiver;
     
-    resStr = QString (bh);
+    //resStr = QString (bh);
+    //qDebug () << __PRETTY_FUNCTION__ << bh << resStr;// << outH.data();
     return resStr;
 }
 //ksa
 bool KKSHistogram::fromString(const QString & str)
 {
+    qDebug () << __PRETTY_FUNCTION__ << str;
     QString sep ("^~^~^");
     QStringList sParList = str.split(sep,QString::KeepEmptyParts,Qt::CaseInsensitive);
     if (sParList.isEmpty())
@@ -173,7 +174,12 @@ bool KKSHistogram::fromString(const QString & str)
         return false;
     QTextStream hIn (&hBuffer);
     QString sep1;
-    hIn >> m_xmin >> sep >> m_xmax >> sep1 >> m_num;
+    hIn >> m_xmin;
+    hIn >> sep1;
+    qDebug () << __PRETTY_FUNCTION__ << sep1;
+    hIn >> m_xmax;
+    hIn >> sep1;
+    hIn >> m_num;
     dHist.clear ();
     for (int i=0; i<m_num; i++)
     {

@@ -21,6 +21,7 @@ class QPaintEvent;
 class QGroupBox;
 class QLineEdit;
 class QComboBox;
+class QPushButton;
 
 class KKSCharts;
 class KKSCategory;
@@ -53,10 +54,10 @@ public slots:
     void setHist (const KKSHistogram& hist);
     
 private slots:
-    void fromChanged ();
+/*    void fromChanged ();
     void toChanged ();
     void numChanged ();
-    
+*/
     void catChanged (int cIndex);
     void ioChanged (int ioIndex);
     
@@ -70,8 +71,8 @@ protected:
 
 signals:
     void valueChanged (qint64 id, KKSIndAttrClass isSys, QVariant val);
-    void loadCategory (int idCat, QVariant vHist);
-    void loadIO (int idIO, QVariant vHist);
+    void loadCategory (int idCat, KKSHistogram * h);
+    void loadIO (int idIO, KKSHistogram * h);
     void updateVarsList (QComboBox *, FiltersType);
     void updateWidgetPars (KKSHistWidget *);
 
@@ -96,6 +97,9 @@ private:
     QComboBox * cbReceiver;
     
     KKSHistDrawWidget * wHistDrawW;
+    KKSHistogram * hist;
+    
+    QPushButton * pbCalc;
 private:
     Q_OBJECT
 };
