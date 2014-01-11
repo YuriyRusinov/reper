@@ -381,6 +381,13 @@ void KKSHistWidget::calcHist (void)
     KKSHistogram * hist = new KKSHistogram;
     hist->setRange (xmin, xmax);
     hist->setSize (num);
+    //double dx = (xmax-xmin)/num;
+    hist->clear ();
+    for (int i=0; i<num; i++)
+    {
+        //double x = xmin + i*dx;
+        hist->setValue (i, 0.0);
+    }
     
     int idScenario = cbScenario->itemData (cbScenario->currentIndex()).toInt();
     int idVariant = cbVariant->itemData (cbVariant->currentIndex()).toInt ();
@@ -396,5 +403,5 @@ void KKSHistWidget::calcHist (void)
     qDebug () << __PRETTY_FUNCTION__ << hStr;
     KKSValue v (hStr, KKSAttrType::atHistogram);
     hist->release();
-    emit valueChanged (m_av->id(), m_isSystem, v.valueVariant());
+    emit valueChanged (m_av->id(), m_isSystem, hStr);//v.valueVariant());
 }

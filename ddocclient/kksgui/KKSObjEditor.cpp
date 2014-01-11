@@ -1524,8 +1524,10 @@ void KKSObjEditor :: setValue (qint64 idAttrValue, KKSIndAttrClass sys, QVariant
             KKSAttrValue * av = ioAttrValues[idAttrValue];
             if (av->attribute()->type()->attrType() == KKSAttrType::atHistogram)
             {
-                KKSHistogram h = val.value<KKSHistogram>();
-                qDebug () << __PRETTY_FUNCTION__ << h.toString();
+                KKSHistogram h;
+                QString hStr = val.toString();//value<KKSHistogram>();
+                h.fromString (hStr);
+                qDebug () << __PRETTY_FUNCTION__ << hStr << h.toString();
             }
             KKSValue v(val.toString(), av->attribute()->type()->attrType());
             if (av->attribute()->type()->attrType() == KKSAttrType::atCheckList)

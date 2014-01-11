@@ -29,6 +29,9 @@ public:
     const QMap<int, double>& getVec (void) const;
     void setVec (const QMap<int, double>& data);
     
+    void clear (void);
+    void setValue (int key, double val);
+    
     void setRange (double xmin, double xmax);
     double getXMin (void) const;
     double getXMax (void) const;

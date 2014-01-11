@@ -173,53 +173,73 @@ bool KKSHistogram::fromString(const QString & str)
     if (!hBuffer.open(QIODevice::ReadOnly))
         return false;
     QTextStream hIn (&hBuffer);
-    QString sep1;
+    hIn.setAutoDetectUnicode(true);
+    //QString sep1;
     hIn >> m_xmin;
-    hIn >> sep1;
-    qDebug () << __PRETTY_FUNCTION__ << sep1;
+    hIn.seek (hIn.pos()+sep.length());
     hIn >> m_xmax;
-    hIn >> sep1;
+    hIn.seek (hIn.pos()+sep.length());// >> sep1;
     hIn >> m_num;
+    hIn.seek (hIn.pos()+sep.length());
     dHist.clear ();
     for (int i=0; i<m_num; i++)
     {
         int key;
         double val;
-        hIn >> key >> sep >> val >> sep1;
+        hIn >> key;
+        hIn.seek (hIn.pos()+sep.length());
+        hIn >> val;
+        hIn.seek (hIn.pos()+sep.length());
         dHist.insert (key, val);
     }
-    hIn >> idScenario >> sep;
-    hIn >> idVariant >> sep;
+    hIn >> idScenario;
+    hIn.seek (hIn.pos()+sep.length());
+    hIn >> idVariant;
     int idCat;
-    hIn >> idCat >> sep;
-    QString cName;
-    hIn >> cName >> sep;
+    hIn.seek (hIn.pos()+sep.length());
+    hIn >> idCat;
+    hIn.seek (hIn.pos()+sep.length());
+    QString cName = sParList[m_num+26];
+    //qDebug () << __PRETTY_FUNCTION__ << cName;
+    hIn.seek (hIn.pos()+cName.length()+sep.length());// >> cName;
     int idType;
-    hIn >> idType >> sep;
-    QString cTypeName;
-    hIn >> cTypeName >> sep;
+    hIn >> idType;
+    hIn.seek (hIn.pos()+sep.length());
+    QString cTypeName = sParList[m_num+28];
+    //qDebug () << __PRETTY_FUNCTION__ << cTypeName;
+    hIn.seek (hIn.pos()+cTypeName.length()+sep.length());// >> cName;
     KKSType * cType = new KKSType (idType, cTypeName);
     const KKSCategory * cat = new KKSCategory (idCat, cName, cType);
     int idTCat;
-    QString ctName;
-    hIn >> idTCat >> sep;
-    hIn >> ctName >> sep;
+    QString ctName = sParList[m_num+30];
+    //qDebug () << __PRETTY_FUNCTION__ << ctName << hIn.pos();
+    hIn >> idTCat;
+    //qDebug () << __PRETTY_FUNCTION__ << hIn.pos();
+    hIn.seek (hIn.pos()+ctName.length()+2*sep.length());
+    //qDebug () << __PRETTY_FUNCTION__ << hIn.pos();
     int idTType;
-    QString ctTypeName;
-    hIn >> idTType >> sep;
-    hIn >> ctTypeName >> sep;
+    hIn >> idTType;
+    hIn.seek (hIn.pos()+sep.length());
+//    hIn >> ctName;
+    QString ctTypeName = sParList[m_num+32];
+    hIn.seek (hIn.pos()+ctTypeName.length()+sep.length());
+    //qDebug () << __PRETTY_FUNCTION__ << ctTypeName;
     KKSType * ctType = new KKSType (idTType, ctTypeName);
     KKSCategory * ct = new KKSCategory (idTCat, ctName, ctType);
     (const_cast<KKSCategory *>(cat))->setTableCategory(ct);
     setCategory (cat);
     int idObj;
-    QString objName;
-    hIn >> idObj >> sep;
-    hIn >> objName >> sep;
+    QString objName = sParList[m_num+34];
+    hIn >> idObj;
+    hIn.seek (hIn.pos()+objName.length()+sep.length());// >> objName >> sep;
     const KKSObject * obj = new KKSObject (idObj, const_cast<KKSCategory *>(cat), objName);
     setSrcObject (obj);
-    hIn >> idSource >> sep;
+    hIn >> idSource;
+    hIn.seek (hIn.pos()+sep.length());
     hIn >> idReceiver;
+    m_isEmpty = false;
+    if(EQUAL_F(m_xmin, 0.0) && EQUAL_F(m_xmax, 0.0) && m_num == -1)
+        m_isEmpty = true;
  
     return true;
 }
@@ -305,4 +325,14 @@ int KKSHistogram::getReceiver (void) const
 void KKSHistogram::setReceiver (int idr)
 {
     idReceiver = idr;
+}
+
+void KKSHistogram::clear (void)
+{
+    dHist.clear ();
+}
+
+void KKSHistogram::setValue (int key, double val)
+{
+    dHist.insert (key, val);
 }
