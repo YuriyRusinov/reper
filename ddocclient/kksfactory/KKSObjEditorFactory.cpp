@@ -9858,9 +9858,32 @@ void KKSObjEditorFactory :: addLifeCycleState (KKSLifeCycleEx * lc, QAbstractIte
 
 void KKSObjEditorFactory :: loadCatHist (int idCat, KKSHistogram * vHist, KKSHistWidget * hw)
 {
-    Q_UNUSED (hw);
     KKSCategory * c = loader->loadCategory (idCat);
     vHist->setCategory (c);
+    KKSMap<int, KKSObject *> ioList;
+    KKSObject * refIO = loader->loadIO (IO_IO_ID);
+    KKSCategory * refC = refIO->category ();
+    refC = refC->tableCategory ();
+    QString value = QString ("select distinct io.id from io_objects io inner join message_streams mstr on (io.id=mstr.id_io_object and io.id_io_category=%1)").arg (idCat);
+    const KKSFilter * fio = refC->createFilter (1, value, KKSFilter::foInSQL);
+    KKSFilterGroup * fg = new KKSFilterGroup (true);
+    fg->addFilter (fio);
+    KKSList<const KKSFilterGroup *> filters;
+    filters.clear();
+    filters.append (fg);
+    fg->release ();
+    KKSMap<qint64, KKSEIOData *> ioMap = loader->loadEIOList (refIO, filters);
+    for (KKSMap<qint64, KKSEIOData *>::const_iterator pio = ioMap.constBegin();
+            pio != ioMap.constEnd ();
+            pio++)
+    {
+        int id_io = pio.key ();
+        KKSObject * io = loader->loadIO (id_io);
+        ioList.insert (id_io, io);
+        io->release ();
+    }
+    hw->loadIOList(ioList);
+    refIO->release ();
     if (c)
         c->release ();
     //hw->setHist (vHist);

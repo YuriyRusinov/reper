@@ -2770,6 +2770,8 @@ void KKSObjEditor :: viewAHist (const KKSAttrValue * av, const KKSList<KKSAttrVa
 void KKSObjEditor :: loadHistCat (int idCat, KKSHistogram * vHist)
 {
     KKSHistWidget * hw = qobject_cast<KKSHistWidget *> (this->sender());
+    if (hw && idCat > 0)
+        hw->clearIO();
     emit setHistCat (idCat, vHist, hw);
 }
 

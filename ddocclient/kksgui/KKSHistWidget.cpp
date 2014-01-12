@@ -56,10 +56,10 @@ KKSHistWidget::KKSHistWidget(const KKSAttrValue *av, KKSIndAttrClass isSys, QWid
 /*    connect (lEFrom, SIGNAL (editingFinished()), this, SLOT (fromChanged ()) );
     connect (lETo, SIGNAL (editingFinished ()), this, SLOT (toChanged ()) );
     connect (lECount, SIGNAL (editingFinished ()), this, SLOT (numChanged ()) );
-
+*/
     connect (cbCategory, SIGNAL (activated(int)), this, SLOT (catChanged (int)) );
     connect (cbSource, SIGNAL (activated(int)), this, SLOT (ioChanged(int)) );
- */
+
     connect (pbCalc, SIGNAL (clicked()), this, SLOT (calcHist()) );
 }
 
@@ -354,7 +354,7 @@ void KKSHistWidget::catChanged (int cIndex)
     QVariant v = QVariant::fromValue<KKSHistogram>(hist);
     emit loadCategory (idCat, &hist);
 
-    qDebug () << __PRETTY_FUNCTION__ << v << hist.toString();
+    //qDebug () << __PRETTY_FUNCTION__ << v << hist.toString();
     emit valueChanged (m_av->id(), m_isSystem, v);
 }
 
@@ -364,7 +364,7 @@ void KKSHistWidget::ioChanged (int ioIndex)
     KKSHistogram hist = m_av->value().valueVariant().value<KKSHistogram>();
     QVariant v = QVariant::fromValue<KKSHistogram>(hist);
     emit loadIO (ioId, &hist);
-    qDebug () << __PRETTY_FUNCTION__ << v << hist.toString();
+    //qDebug () << __PRETTY_FUNCTION__ << v << hist.toString();
     emit valueChanged (m_av->id(), m_isSystem, v);
 }
 
@@ -400,8 +400,13 @@ void KKSHistWidget::calcHist (void)
     emit loadCategory (idCategory, hist);
     emit loadIO (idIOObject, hist);
     QString hStr = hist->toString();
-    qDebug () << __PRETTY_FUNCTION__ << hStr;
+    //qDebug () << __PRETTY_FUNCTION__ << hStr;
     KKSValue v (hStr, KKSAttrType::atHistogram);
     hist->release();
     emit valueChanged (m_av->id(), m_isSystem, hStr);//v.valueVariant());
+}
+
+void KKSHistWidget::clearIO (void)
+{
+    this->cbSource->clear();
 }

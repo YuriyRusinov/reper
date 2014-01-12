@@ -8,6 +8,7 @@
 #include <QBuffer>
 #include <QDataStream>
 #include <QTextStream>
+#include <QTextCodec>
 #include <QtDebug>
 
 #include "KKSCategory.h"
@@ -136,6 +137,7 @@ QString KKSHistogram::toString() const
     //QByteArray bh;
     QTextStream outHist;// (&bh, QIODevice::WriteOnly);
     outHist.setString (&resStr);
+    outHist.setCodec (QTextCodec::codecForName("UTF-8"));
     outHist << m_xmin << sep << m_xmax << sep << m_num << sep;
 
     //int i (0);
@@ -157,7 +159,7 @@ QString KKSHistogram::toString() const
     
     //resStr = QString (bh);
     //qDebug () << __PRETTY_FUNCTION__ << bh << resStr;// << outH.data();
-    return resStr;
+    return QString (resStr.toLocal8Bit());
 }
 //ksa
 bool KKSHistogram::fromString(const QString & str)
@@ -180,6 +182,8 @@ bool KKSHistogram::fromString(const QString & str)
     hIn >> m_xmax;
     hIn.seek (hIn.pos()+sep.length());// >> sep1;
     hIn >> m_num;
+    if (sParList.count() < m_num+34)
+        return false;
     hIn.seek (hIn.pos()+sep.length());
     dHist.clear ();
     for (int i=0; i<m_num; i++)
