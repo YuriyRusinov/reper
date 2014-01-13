@@ -304,6 +304,7 @@ void KKSHistWidget::setHist (const KKSHistogram& shist)
         int rind = cbReceiver->findData (idRecv);
         cbReceiver->setCurrentIndex (rind);
     }
+    //qDebug () << __PRETTY_FUNCTION__ << hist->getVec();
             
     //emit valueChanged (m_av->id(), m_isSystem, v);
 }

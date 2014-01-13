@@ -36,7 +36,8 @@
 
 
 //////
-#include "kksresult.h"////////
+#include "kksresult.h"
+#include "KKSHistogram.h"////////
 // Name:       KKSLoader::KKSLoader()
 // Purpose:    Implementation of KKSLoader::KKSLoader()
 // Return:     
@@ -635,6 +636,40 @@ KKSValue  KKSLoader::constructValue(const QString & value,
             v.setColumnValue(cv);
         else
             qWarning("The attribute KKSAttrType::atList points to empty or NULL value in corresponding table!");
+    }
+    else if (a->type()->attrType() == KKSAttrType::atHistogram)
+    {
+        qint64 aid = a->id();
+        QString tName = a->tableName();
+        QString cName = a->columnName();
+        //qDebug () << __PRETTY_FUNCTION__ << QString ("Load histogram attribute %1, its table %2, values from %3").arg (aid).arg(tName).arg(cName) << value;
+        KKSHistogram h;
+        h.fromString (value);
+        QString valSql = QString();
+        valSql = QString ("select value from random_values;");
+                       //QString ("select %1 from %2 as mser inner join message_streams ms on (mser.id_message_stream=ms.id and ms.id_io_object=%3)")
+                       //     .arg (cName)
+                       //     .arg (tName)
+                       //     .arg (h.srcObject()->id());
+        QString hsql = QString ("select * from histogram('%1', %2, %3, %4);").arg (valSql).arg(h.getXMin()).arg(h.getXMax()).arg (h.size());
+        qDebug () << __PRETTY_FUNCTION__ << valSql << hsql;
+        KKSResult * hRes = db->execute (hsql);
+        if (hRes)
+        {
+            QMap<int, double> hData;
+            int n = hRes->getRowCount();
+            for (int i=0; i<n; i++)
+            {
+                int key = hRes->getCellAsInt (i, 0);
+                double val = hRes->getCellAsDouble (i, 1);
+                hData.insert(key, val);
+            }
+            h.setVec(hData);
+            delete hRes;
+            QString hStr = h.toString();
+            qDebug () << __PRETTY_FUNCTION__ << hStr;
+            v.setValue (hStr, KKSAttrType::atHistogram);
+        }
     }
 
     return v;

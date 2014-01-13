@@ -233,8 +233,8 @@ void KKSTreeItem :: initData (KKSEIOData * d, const KKSTemplate * t, const KKSLi
             }
             else if (attrValue.contains ("\n"))
                 attrValue = attrValue.mid (0, attrValue.indexOf("\n")) + "...";
-            if (QString::compare (aCode, QString("UUID_t"), Qt::CaseInsensitive)==0)
-                qDebug () << __PRETTY_FUNCTION__ << attrValue;
+            //if (QString::compare (aCode, QString("UUID_t"), Qt::CaseInsensitive)==0)
+            //    qDebug () << __PRETTY_FUNCTION__ << attrValue;
         }
         
         itemData.append(QVariant(attrValue));
