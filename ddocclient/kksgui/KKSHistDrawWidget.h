@@ -9,6 +9,7 @@
 #define	KKSHISTDRAWWIDGET_H
 
 #include <QWidget>
+#include <QMap>
 
 #include "kksgui_config.h"
 
@@ -22,6 +23,8 @@ public:
     KKSHistDrawWidget(QWidget * parent=0, Qt::WindowFlags flags=0);
     virtual ~KKSHistDrawWidget();
 
+    void setData (const QMap<int, double>& hData);
+
 protected:
     //
     // Override functions of basic class
@@ -33,6 +36,8 @@ private:
     // Variables
     //
     KKSCharts * wCharts;
+    QMap<int, double> m_data;
+    double maxVal;
 
 private:
     Q_OBJECT
