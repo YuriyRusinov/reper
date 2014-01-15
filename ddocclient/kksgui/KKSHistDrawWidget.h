@@ -10,6 +10,8 @@
 
 #include <QWidget>
 #include <QMap>
+#include <QVector>
+#include <QColor>
 
 #include "kksgui_config.h"
 
@@ -38,6 +40,7 @@ private:
     KKSCharts * wCharts;
     QMap<int, double> m_data;
     double maxVal;
+    QVector<QColor> colors;
 
 private:
     Q_OBJECT

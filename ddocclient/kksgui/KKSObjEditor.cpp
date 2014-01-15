@@ -1527,12 +1527,12 @@ void KKSObjEditor :: setValue (qint64 idAttrValue, KKSIndAttrClass sys, QVariant
                 KKSHistogram h;
                 QString hStr = val.toString();//value<KKSHistogram>();
                 h.fromString (hStr);
-                qDebug () << __PRETTY_FUNCTION__ << hStr << h.toString();
+                //qDebug () << __PRETTY_FUNCTION__ << hStr << h.toString();
             }
             KKSValue v(val.toString(), av->attribute()->type()->attrType());
             if (av->attribute()->type()->attrType() == KKSAttrType::atCheckList)
                 v.setValue (QString("{%1}").arg (val.toStringList().join(",")), KKSAttrType::atCheckList);
-            qDebug () << __PRETTY_FUNCTION__ << val << val.toString() << v.value() << v.valueVariant(); 
+            //qDebug () << __PRETTY_FUNCTION__ << val << val.toString() << v.value() << v.valueVariant(); 
             av->setValue(v);
             isChanged = true;
             break;

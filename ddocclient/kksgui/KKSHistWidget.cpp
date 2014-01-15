@@ -173,6 +173,7 @@ void KKSHistWidget::init (void)
     hRecLay->addWidget (cbReceiver);
     gFiltLay->addLayout (hRecLay, 4, 0, 1, 1);
     gLay->addWidget (wHistDrawW, 5, 0, 1, 1);
+    wHistDrawW->setWindowTitle (tr("Histogram"));
     gLay->addWidget (pbCalc, 6, 0, 1, 1, Qt::AlignRight);
 //    gLay->addWidget (wCharts, 5, 0, 1, 1);
 }
@@ -305,7 +306,9 @@ void KKSHistWidget::setHist (const KKSHistogram& shist)
         cbReceiver->setCurrentIndex (rind);
     }
     //qDebug () << __PRETTY_FUNCTION__ << hist->getVec();
-            
+    wHistDrawW->setData (hist->getVec());
+    wHistDrawW->repaint();
+
     //emit valueChanged (m_av->id(), m_isSystem, v);
 }
 
