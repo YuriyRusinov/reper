@@ -5,6 +5,7 @@
  * Created on 23 Декабрь 2013 г., 22:18
  */
 #include <QPaintEvent>
+#include <QtDebug>
 
 #include "KKSHistDrawWidget.h"
 #include "KKSCharts.h"
@@ -15,6 +16,8 @@ KKSHistDrawWidget::KKSHistDrawWidget(QWidget * parent, Qt::WindowFlags flags)
     m_data (QMap<int, double>()),
     maxVal (-1.0)
 {
+    QPalette pal (Qt::blue);
+    setPalette (pal);
     colors.clear();
     colors << QColor(Qt::black)
            << QColor(Qt::red)
@@ -32,6 +35,7 @@ KKSHistDrawWidget::KKSHistDrawWidget(QWidget * parent, Qt::WindowFlags flags)
            << QColor(Qt::gray)
            << QColor(Qt::darkGray)
            << QColor(Qt::lightGray);
+    qDebug () << __PRETTY_FUNCTION__ << pal;//windowFlags();
 }
 
 KKSHistDrawWidget::~KKSHistDrawWidget()
@@ -40,6 +44,7 @@ KKSHistDrawWidget::~KKSHistDrawWidget()
 
 void KKSHistDrawWidget::paintEvent(QPaintEvent *event)
 {
+    qDebug () << __PRETTY_FUNCTION__ ;
     QWidget::paintEvent (event);
     QPainter painter;
     painter.begin(this);
@@ -70,5 +75,5 @@ void KKSHistDrawWidget::setData (const QMap<int, double>& hData)
             maxVal = qMax (maxVal, p.value());
         i++;
     }
-    update();
+    show ();
 }

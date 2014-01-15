@@ -39,7 +39,7 @@ KKSHistWidget::KKSHistWidget(const KKSAttrValue *av, KKSIndAttrClass isSys, QWid
     cbCategory (new QComboBox),
     cbSource (new QComboBox),
     cbReceiver (new QComboBox),
-    wHistDrawW (new KKSHistDrawWidget),
+    wHistDrawW (new KKSHistDrawWidget (0, Qt::Window | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint | Qt::WindowSoftkeysRespondHint)),
     hist (0),
     pbCalc (new QPushButton (tr("&Update")))
 {
@@ -114,6 +114,8 @@ void KKSHistWidget::init (void)
     gLay->addWidget (gbParams, 0, 0, 1, 1);
     
     QGridLayout * gParLay = new QGridLayout (gbParams);
+    QGroupBox * gbHist = new QGroupBox (tr("Histogram"), this);
+    QGridLayout * gHistLay = new QGridLayout (gbHist);
     QHBoxLayout * hFromLay = new QHBoxLayout;
     QLabel * lFrom = new QLabel (tr("From:"), this);
     hFromLay->addWidget (lFrom);
@@ -122,7 +124,7 @@ void KKSHistWidget::init (void)
     lEFrom->setValidator (dFromVal);
     if (hist && !hist->isEmpty())
         lEFrom->setText (QString::number (hist->getXMin()));
-    gParLay->addLayout (hFromLay, 0, 0, 1, 1);
+    gHistLay->addLayout (hFromLay, 0, 0, 1, 1);
     QLabel * lTo = new QLabel (tr("To:"), this);
     QHBoxLayout * hToLay = new QHBoxLayout;
     hToLay->addWidget (lTo);
@@ -131,7 +133,7 @@ void KKSHistWidget::init (void)
     lETo->setValidator (dToVal);
     if (hist && !hist->isEmpty())
         lETo->setText (QString::number (hist->getXMax()));
-    gParLay->addLayout (hToLay, 1, 0, 1, 1);
+    gHistLay->addLayout (hToLay, 1, 0, 1, 1);
     QLabel * lNum = new QLabel (tr("Number of bins:"), this);
     QHBoxLayout * hNumLay = new QHBoxLayout;
     hNumLay->addWidget (lNum);
@@ -140,10 +142,11 @@ void KKSHistWidget::init (void)
     if (hist && !hist->isEmpty())
         lECount->setText (QString::number (hist->size()));
     hNumLay->addWidget (lECount);
-    gParLay->addLayout (hNumLay, 2, 0, 1, 1);
+    gHistLay->addLayout (hNumLay, 2, 0, 1, 1);
+    gParLay->addWidget (gbHist, 0, 1, 1, 1);
     
     QGroupBox * gbFilters = new QGroupBox (tr("Filters"), this);
-    gLay->addWidget (gbFilters, 1, 0, 1, 1);
+    gParLay->addWidget (gbFilters, 0, 0, 1, 1);
     QGridLayout * gFiltLay = new QGridLayout (gbFilters);
     QLabel * lScenario = new QLabel (tr("Scenario"), this);
     QHBoxLayout * hScenarioLay = new QHBoxLayout;
@@ -172,9 +175,12 @@ void KKSHistWidget::init (void)
     hRecLay->addWidget (lReceiver);
     hRecLay->addWidget (cbReceiver);
     gFiltLay->addLayout (hRecLay, 4, 0, 1, 1);
-    gLay->addWidget (wHistDrawW, 5, 0, 1, 1);
-    wHistDrawW->setWindowTitle (tr("Histogram"));
-    gLay->addWidget (pbCalc, 6, 0, 1, 1, Qt::AlignRight);
+    //gLay->addWidget (wHistDrawW, 5, 0, 1, 1);
+    QGroupBox * gbPic = new QGroupBox (tr("View"), this);
+    QGridLayout * gPicLay = new QGridLayout (gbPic);
+    gPicLay->addWidget (wHistDrawW, 0, 0, 1, 1);
+    gLay->addWidget (gbPic, 5, 0, 1, 1);
+    gHistLay->addWidget (pbCalc, 3, 0, 1, 1, Qt::AlignRight);
 //    gLay->addWidget (wCharts, 5, 0, 1, 1);
 }
 
@@ -312,45 +318,6 @@ void KKSHistWidget::setHist (const KKSHistogram& shist)
     //emit valueChanged (m_av->id(), m_isSystem, v);
 }
 
-/*
-void KKSHistWidget::fromChanged ()
-{
-    QString text = lEFrom->text ();
-    KKSHistogram hist = m_av->value().valueVariant().value<KKSHistogram>();
-    double x = text.toDouble();
-    double xMax = hist.getXMax();
-    hist.setRange (x, xMax);
-    QVariant v = QVariant::fromValue<KKSHistogram>(hist);
-    if (!hist.category())
-    {
-        int idCat = cbCategory->itemData (cbCategory->currentIndex()).toInt ();
-        emit loadCategory (idCat, &hist);
-    }
-    qDebug () << __PRETTY_FUNCTION__ << v << hist.toString();
-    emit valueChanged (m_av->id(), m_isSystem, v);
-}
-
-void KKSHistWidget::toChanged ()
-{
-    QString text = lETo->text ();
-    KKSHistogram hist = m_av->value().valueVariant().value<KKSHistogram>();
-    hist.setRange (hist.getXMin(), text.toDouble());
-    QVariant v = QVariant::fromValue<KKSHistogram>(hist);
-    qDebug () << __PRETTY_FUNCTION__ << v << hist.toString();
-    emit valueChanged (m_av->id(), m_isSystem, v);
-}
-
-void KKSHistWidget::numChanged ()
-{
-    QString text = lECount->text ();
-    KKSHistogram hist = m_av->value().valueVariant().value<KKSHistogram>();
-    hist.setSize(text.toInt());
-    QVariant v = QVariant::fromValue<KKSHistogram>(hist);
-    qDebug () << __PRETTY_FUNCTION__ << v << hist.toString();
-    emit valueChanged (m_av->id(), m_isSystem, v);
-}
- */
-
 void KKSHistWidget::catChanged (int cIndex)
 {
     int idCat = cbCategory->itemData (cIndex).toInt ();
@@ -408,6 +375,7 @@ void KKSHistWidget::calcHist (void)
     KKSValue v (hStr, KKSAttrType::atHistogram);
     hist->release();
     emit valueChanged (m_av->id(), m_isSystem, hStr);//v.valueVariant());
+    wHistDrawW->repaint();
 }
 
 void KKSHistWidget::clearIO (void)

@@ -667,7 +667,7 @@ KKSValue  KKSLoader::constructValue(const QString & value,
             h.setVec(hData);
             delete hRes;
             QString hStr = h.toString();
-            qDebug () << __PRETTY_FUNCTION__ << hStr;
+            //qDebug () << __PRETTY_FUNCTION__ << hStr;
             v.setValue (hStr, KKSAttrType::atHistogram);
         }
     }
