@@ -12,12 +12,10 @@
 
 KKSHistDrawWidget::KKSHistDrawWidget(QWidget * parent, Qt::WindowFlags flags)
     : QWidget (parent, flags),
-    wCharts (new KKSCharts),
+    wCharts (0),//new KKSCharts),
     m_data (QMap<int, double>()),
     maxVal (-1.0)
 {
-    QPalette pal (Qt::blue);
-    setPalette (pal);
     colors.clear();
     colors << QColor(Qt::black)
            << QColor(Qt::red)
@@ -35,7 +33,6 @@ KKSHistDrawWidget::KKSHistDrawWidget(QWidget * parent, Qt::WindowFlags flags)
            << QColor(Qt::gray)
            << QColor(Qt::darkGray)
            << QColor(Qt::lightGray);
-    qDebug () << __PRETTY_FUNCTION__ << pal;//windowFlags();
 }
 
 KKSHistDrawWidget::~KKSHistDrawWidget()
@@ -44,11 +41,12 @@ KKSHistDrawWidget::~KKSHistDrawWidget()
 
 void KKSHistDrawWidget::paintEvent(QPaintEvent *event)
 {
-    qDebug () << __PRETTY_FUNCTION__ ;
+    //qDebug () << __PRETTY_FUNCTION__ ;
     QWidget::paintEvent (event);
     QPainter painter;
     painter.save();
     painter.begin(this);
+    wCharts = new KKSCharts;
     wCharts->setType(KKSCharts::Histogramm);
     int i = 0;
     int n = colors.size();
@@ -62,6 +60,8 @@ void KKSHistDrawWidget::paintEvent(QPaintEvent *event)
     wCharts->draw(&painter);
     painter.end();
     painter.restore();
+    delete wCharts;
+    wCharts = 0;
 }
 
 void KKSHistDrawWidget::setData (const QMap<int, double>& hData)
