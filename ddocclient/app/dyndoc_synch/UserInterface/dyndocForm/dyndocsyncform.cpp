@@ -9,6 +9,8 @@ DyndocSyncForm::DyndocSyncForm(KKSDatabase *adb, QWidget *parent) :
     ui->setupUi(this);
 
     localOrganizationId = 0;
+    flag_settingsInit = false;
+    flag_settingsFromDB = false;
 
     m_base = 0;
     httpWin = 0;
@@ -53,6 +55,7 @@ void DyndocSyncForm::initSlots() const
     connect(ui->qpb_display_log,SIGNAL(clicked()),this,SLOT(slot_displayLogClicked()));
     connect(ui->qpb_impinit_synch,SIGNAL(clicked()),this,SLOT(slot_implementInitialSyncronizationClicked()));
     connect(ui->qpb_param,SIGNAL(clicked()),this,SLOT(slot_parametersClicked()));
+    connect(this,SIGNAL(signal_startSync()),this,SLOT(slot_startThreads()));
 }
 
 void DyndocSyncForm::initInterface()
@@ -405,11 +408,11 @@ void DyndocSyncForm::setConnectionSettings()
     settings.setValue ("server_port",optionsForm->getServerPort()); //UI->lEServerPort->text ());
     settings.endGroup ();
 
-    //settings.beginGroup("Timer");
-    //settings.setValue("delay",optionsForm->getTimer());
-    //settings.setValue("Units",optionsForm->getTimerUnits());
-    //settings.setValue("Mode",optionsForm->getTimerMode());
-    //settings.endGroup();
+    settings.beginGroup("Timer");
+    settings.setValue("delay",optionsForm->getTimer());
+    settings.setValue("Units",optionsForm->getTimerUnits());
+    settings.setValue("Mode",optionsForm->getTimerMode());
+    settings.endGroup();
 }
 
 void DyndocSyncForm::loadSettings()
@@ -439,43 +442,38 @@ void DyndocSyncForm::loadSettings()
     optionsForm->setServerPort(settings.value ("server_port").toString ());
     settings.endGroup ();
 
-    //settings.beginGroup("Timer");
-    //optionsForm->setTimer(settings.value("delay").toString());
-    //optionsForm->setTimerUnits(settings.value("Units").toString());
-    //optionsForm->setTimerMode(settings.value("Mode").toBool());
-    //settings.endGroup();
+    settings.beginGroup("Timer");
+    optionsForm->setTimer(settings.value("delay").toString());
+    optionsForm->setTimerUnits(settings.value("Units").toString());
+    optionsForm->setTimerMode(settings.value("Mode").toBool());
+    settings.endGroup();
 }
 
 //*****
 void DyndocSyncForm::slot_startSyncronizationClicked()
 {
-    ui->qpb_start_synch->setDisabled(true);
-    ui->qpb_stop_synch->setEnabled(true);
-
-    int intervalMs = 10000;
-    int interval = 10;
-    int units = 0;//seconds
-    bool mode = false; //true = manual
-
-    TimerForm * timerForm = new TimerForm ();
-    if (!timerForm)
+    if(!flag_settingsInit)
     {
-        return;
-    }
+        optionsForm = new OptionsDialog(this);
+        loadSettings();
 
-    timerForm->init(interval, units, mode, true);
+        connect(optionsForm,SIGNAL(okClic()),this,SLOT(slot_optionsAccepted()));
+        connect(optionsForm,SIGNAL(cancelClic()),this,SLOT(slot_optionsRejected()));
 
-    if (timerForm->exec () != QDialog::Accepted)
-    {
-        delete timerForm;
-        return;
+        flag_settingsSetup = false;
+
+        optionsForm->show();
     }
     else
     {
-        mode = timerForm->startManually();
-        intervalMs = timerForm->getTimerMs();
+        slot_startThreads();
     }
-    delete timerForm;
+}
+
+void DyndocSyncForm::slot_startThreads()
+{
+    ui->qpb_start_synch->setDisabled(true);
+    ui->qpb_stop_synch->setEnabled(true);
 
     httpWin = new DDocInteractorWindow(this);
 
@@ -485,10 +483,10 @@ void DyndocSyncForm::slot_startSyncronizationClicked()
     connect(m_base,SIGNAL(pingsSended(QMap<QString,JKKSPing>)),this,SLOT(slot_pings(QMap<QString,JKKSPing>)));
 
     httpWin->setWindowModality(Qt::NonModal);
-    httpWin->setTimerParams(interval, units, mode);
+    httpWin->setTimerParams(timerValue,timerUnits,timerMode);
     httpWin->setInteractorBase(m_base);
 
-    int ok = m_base->start(mode, intervalMs);
+    int ok = m_base->start(timerMode,msInterval(timerValue,timerUnits));
     if(ok != 1)
         return;
 
@@ -503,10 +501,15 @@ void DyndocSyncForm::slot_stopSyncronizationClicked()
     ui->qpb_stop_synch->setDisabled(true);
     ui->qpb_start_synch->setEnabled(true);
 
-    emit signalStopSyncronization();
+    emit signalStopSyncronization();    
 
     m_base = 0;
-    httpWin = 0;
+
+    if(httpWin)
+    {
+        delete httpWin;
+        httpWin = 0;
+    }
 }
 
 void DyndocSyncForm::slot_pollClicked()
@@ -536,8 +539,12 @@ void DyndocSyncForm::slot_parametersClicked()
     optionsForm = new OptionsDialog(this);
     loadSettings();
 
+    setInitialSettings();
+
     connect(optionsForm,SIGNAL(okClic()),this,SLOT(slot_optionsAccepted()));
     connect(optionsForm,SIGNAL(cancelClic()),this,SLOT(slot_optionsRejected()));
+
+    flag_settingsSetup =true;
 
     optionsForm->show();
 }
@@ -546,8 +553,19 @@ void DyndocSyncForm::slot_optionsAccepted()
 {
     setConnectionSettings();
 
+    timerValue = optionsForm->getTimer().toInt();
+    timerUnits = optionsForm->getTimerUnits().toInt();
+    timerMode = optionsForm->getTimerMode();
+
     optionsForm->close();
     delete optionsForm;
+
+    if(!flag_settingsSetup)
+    {
+        emit signal_startSync();
+    }
+
+    flag_settingsInit = true;
 }
 
 void DyndocSyncForm::slot_optionsRejected()
@@ -626,4 +644,43 @@ void DyndocSyncForm::slot_closeLog()
     log_form->close();
     delete log_form;
     log_form = 0;
+}
+
+int DyndocSyncForm::msInterval(int delay,int mode)
+{
+    switch (mode)
+    {
+        case 1:
+        {
+            return delay*1000;
+        }
+        case 2:
+        {
+            return delay*1000*60;
+        }
+        case 3:
+        {
+            return delay*1000*60*60;
+        }
+    }
+
+    return 10000;
+}
+
+void DyndocSyncForm::setInitialSettings()
+{
+    if(optionsForm->getDBuser().isEmpty())
+        optionsForm->setDBuser("jupiter");
+    if(optionsForm->getTransport().isEmpty())
+        optionsForm->setTransport("1");
+    if(optionsForm->getServerPort().isEmpty())
+        optionsForm->setServerPort("9000");
+    if(optionsForm->getTimer().isEmpty())
+        optionsForm->setTimer("10");
+    if(optionsForm->getTimerUnits().isEmpty())
+        optionsForm->setTimerUnits("2");
+
+    optionsForm->setDBhost(dbLog->getHost());
+    optionsForm->setDBname(dbLog->getName());
+    optionsForm->setDBport(dbLog->getPort());
 }

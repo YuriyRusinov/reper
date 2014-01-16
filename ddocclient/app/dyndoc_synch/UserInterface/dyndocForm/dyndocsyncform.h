@@ -52,8 +52,12 @@ signals:
     void signalStartSyncronization();
     void signalStopSyncronization();
 
+    void signal_startSync();
+
 private slots:
     void slot_startSyncronizationClicked();
+    void slot_startThreads();
+
     void slot_stopSyncronizationClicked();
 
     void slot_pollClicked();
@@ -78,6 +82,14 @@ private:
     OptionsDialog* optionsForm;
 
     int localOrganizationId;
+
+    bool flag_settingsInit;
+    bool flag_settingsSetup;
+    bool flag_settingsFromDB;
+
+    int timerValue;
+    int timerUnits;
+    bool timerMode;
 
     dyndoc_mainStructs::dbInf db;
 
@@ -116,6 +128,10 @@ private:
 
     void setColor(QString key,int color);
     QStandardItem* findItem(QStandardItem* it, QString key, bool &findFlag);
+
+    int msInterval(int delay,int mode);
+
+    void setInitialSettings();
 };
 
 #endif // DYNDOC_SYNC_FORM_H

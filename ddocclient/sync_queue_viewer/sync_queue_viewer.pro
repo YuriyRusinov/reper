@@ -18,10 +18,7 @@ INCLUDEPATH += 	. \
                ../kkscore \
                ../kkspp \
                ../kksfactory \
-               ../kksutils 
-#                ./include
-#                /usr/local/kkssito/include\
-#                /usr/local/pgsql/include
+               ../kksutils
 
 DEPENDPATH += 	. \
                ../dataaccess \

@@ -1,13 +1,13 @@
 #include "filtersform.h"
 
-FiltersForm::FiltersForm(QWidget *parent)
+FiltersForm::FiltersForm(QStringList rhs,QWidget *parent)
 	: QDialog(parent)
 {
-    createInterface();
+    createInterface(rhs);
     createConnections();
 }
 
-void FiltersForm::createInterface()
+void FiltersForm::createInterface(QStringList rhs)
 {
     setModal(true);
     setWindowTitle(tr("Data base view: filters"));
@@ -18,9 +18,7 @@ void FiltersForm::createInterface()
 
     QStringList sl = QStringList();
 
-    sl << tr("OD 1") << tr("OD 2");
-
-    model_org = new QStringListModel(sl,this);
+    model_org = new QStringListModel(rhs,this);
     qgb_organizations->setModel(model_org);
     qgb_organizations->setSelectionMode(QAbstractItemView::MultiSelection);
     select_org = qgb_organizations->selectionModel();
@@ -84,12 +82,23 @@ void FiltersForm::createInterface()
     QHBoxLayout* qhbl_buttons = new QHBoxLayout;
     QVBoxLayout* qvbl_main = new QVBoxLayout;
 
+    QSplitter* qsh_textSplit1 = new QSplitter(this);
+    QSplitter* qsh_textSplit2 = new QSplitter(this);
+    QSplitter* qsh_textSplit3 = new QSplitter(this);
+
+    qsh_textSplit1->addWidget(qgb_organizations);
+    qsh_textSplit2->addWidget(qgb_objectType);
+    qsh_textSplit3->addWidget(qgb_result);
+
     qgl_groopbox->addWidget(qlb_organizations,0,0,Qt::AlignHCenter);
     qgl_groopbox->addWidget(qlb_objectType,0,1,Qt::AlignHCenter);
     qgl_groopbox->addWidget(qlb_result,0,2,Qt::AlignHCenter);
-    qgl_groopbox->addWidget(qgb_organizations,1,0,Qt::AlignHCenter);
-    qgl_groopbox->addWidget(qgb_objectType,1,1,Qt::AlignHCenter);
-    qgl_groopbox->addWidget(qgb_result,1,2,Qt::AlignHCenter);
+    qgl_groopbox->addWidget(qsh_textSplit1,1,0,Qt::AlignHCenter);
+    qgl_groopbox->addWidget(qsh_textSplit2,1,1,Qt::AlignHCenter);
+    qgl_groopbox->addWidget(qsh_textSplit3,1,2,Qt::AlignHCenter);
+    //qgl_groopbox->addWidget(qgb_organizations,1,0,Qt::AlignHCenter);
+    //qgl_groopbox->addWidget(qgb_objectType,1,1,Qt::AlignHCenter);
+    //qgl_groopbox->addWidget(qgb_result,1,2,Qt::AlignHCenter);
 
     QSplitter* qsh_datebutton = new QSplitter(Qt::Horizontal,this);
 

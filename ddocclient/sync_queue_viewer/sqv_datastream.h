@@ -20,6 +20,8 @@ public:
 
     bool cursorIsOpen() const;
 
+    QStringList orgNames();
+
 public slots:
     void slot_getData(sqv_data::scrollWindow rhs);
 

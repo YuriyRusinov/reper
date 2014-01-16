@@ -3,10 +3,9 @@
 SyncQueueViewerForm :: SyncQueueViewerForm(KKSDatabase * adb, QWidget * parent) :
     QDialog(parent),model(0),flag_clicked(false),t_dataRow(-1),b_dataRow(-1)
 {	
-    createInteface();
-
     dataPoint = new SQV_DataStream(adb,this);
 
+    createInteface();
     createConnections();
 }
 
@@ -53,7 +52,7 @@ inline void SyncQueueViewerForm::createInteface()
 
     qvbl_main->addWidget(syncQueueTreeWnd);
 
-    filtersDialog = new FiltersForm(this);
+    filtersDialog = new FiltersForm(dataPoint->orgNames(),this);
     filtersDialog->setVisible(false);
 }
 

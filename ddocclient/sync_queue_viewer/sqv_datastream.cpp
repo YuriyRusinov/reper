@@ -382,6 +382,23 @@ void SQV_DataStream::initQuary()
                 ");
 }
 
+QStringList SQV_DataStream::orgNames()
+{
+    QString quary = QString("select organization.\"name\" from organization");
+
+    KKSResult* res = 0;
+    res = db->execute(quary);
+
+    QStringList orgNameList;
+
+    for(int i = 0; i < res->getRowCount(); i++)
+    {
+        orgNameList << res->getCellAsString(i,0);
+    }
+
+    return orgNameList;
+}
+
 void SQV_DataStream::setQuaryFilters(const QString& filtersVariable)
 {
     sqlQuary += filtersVariable;

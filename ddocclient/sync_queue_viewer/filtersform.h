@@ -18,7 +18,7 @@ class FiltersForm : public QDialog
 	Q_OBJECT
 
 public:
-	FiltersForm(QWidget *parent);
+    FiltersForm(QStringList rhs, QWidget *parent);
 	~FiltersForm();
 
 	QStringList getOrganization();
@@ -60,7 +60,7 @@ private:
 	QDateTimeEdit* qdte_from;
 	QDateTimeEdit* qdte_to;
 
-    inline void createInterface();
+    inline void createInterface(QStringList rhs);
     inline void createConnections();
 
     inline QStringList selectionList(const QItemSelectionModel& selection);

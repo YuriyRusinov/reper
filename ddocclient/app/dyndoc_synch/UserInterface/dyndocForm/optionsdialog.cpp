@@ -83,12 +83,12 @@ QString OptionsDialog::getGatewayPort()
 
 QString OptionsDialog::getServerHost()
 {
-    return ui->lineEdit_hostServer->text();
+    return QString("192.168.17.118");//ui->lineEdit_hostServer->text();
 }
 
 QString OptionsDialog::getServerPort()
 {
-    return ui->lineEdit_hostPort->text();
+    return ui->lineEdit_portServer->text();
 }
 
 void OptionsDialog::setDBhost(QString rhs)
@@ -148,10 +148,10 @@ void OptionsDialog::setGatewayPort(QString rhs)
 
 void OptionsDialog::setServerHost(QString rhs)
 {
-    ui->lineEdit_hostServer->setText(rhs);
+    //ui->lineEdit_hostServer->setText(rhs);
 }
 
 void OptionsDialog::setServerPort(QString rhs)
 {
-    ui->lineEdit_hostPort->setText(rhs);
+    ui->lineEdit_portServer->setText(rhs);
 }
