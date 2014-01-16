@@ -97,7 +97,7 @@ private:
     QComboBox * cbSource;
     QComboBox * cbReceiver;
     
-    KKSHistDrawWidget * wHistDrawW;
+    QWidget * wHistDrawW;
     KKSHistogram * hist;
     
     QPushButton * pbCalc;

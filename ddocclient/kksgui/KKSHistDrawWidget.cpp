@@ -47,6 +47,7 @@ void KKSHistDrawWidget::paintEvent(QPaintEvent *event)
     qDebug () << __PRETTY_FUNCTION__ ;
     QWidget::paintEvent (event);
     QPainter painter;
+    painter.save();
     painter.begin(this);
     wCharts->setType(KKSCharts::Histogramm);
     int i = 0;
@@ -59,6 +60,8 @@ void KKSHistDrawWidget::paintEvent(QPaintEvent *event)
         i++;
     }
     wCharts->draw(&painter);
+    painter.end();
+    painter.restore();
 }
 
 void KKSHistDrawWidget::setData (const QMap<int, double>& hData)

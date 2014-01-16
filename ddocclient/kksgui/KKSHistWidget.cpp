@@ -43,6 +43,7 @@ KKSHistWidget::KKSHistWidget(const KKSAttrValue *av, KKSIndAttrClass isSys, QWid
     hist (0),
     pbCalc (new QPushButton (tr("&Update")))
 {
+    wHistDrawW->setMinimumSize(600, 200);
     if (av && av->value().valueVariant().canConvert<KKSHistogram>())
     {
         KKSValue hval = av->value();
@@ -312,7 +313,7 @@ void KKSHistWidget::setHist (const KKSHistogram& shist)
         cbReceiver->setCurrentIndex (rind);
     }
     //qDebug () << __PRETTY_FUNCTION__ << hist->getVec();
-    wHistDrawW->setData (hist->getVec());
+    (qobject_cast<KKSHistDrawWidget *>(wHistDrawW))->setData (hist->getVec());
     wHistDrawW->repaint();
 
     //emit valueChanged (m_av->id(), m_isSystem, v);
