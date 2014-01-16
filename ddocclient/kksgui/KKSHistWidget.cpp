@@ -43,7 +43,7 @@ KKSHistWidget::KKSHistWidget(const KKSAttrValue *av, KKSIndAttrClass isSys, QWid
     hist (0),
     pbCalc (new QPushButton (tr("&Update")))
 {
-    wHistDrawW->setMinimumSize(600, 200);
+    wHistDrawW->setMinimumSize(600, 400);
     if (av && av->value().valueVariant().canConvert<KKSHistogram>())
     {
         KKSValue hval = av->value();

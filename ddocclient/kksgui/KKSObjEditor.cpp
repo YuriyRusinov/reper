@@ -784,7 +784,7 @@ int KKSObjEditor :: constructObject()
             {
                 KKSHistogram h = val.value<KKSHistogram>();
                 value = h.toString();
-                qDebug () << __PRETTY_FUNCTION__ << value;
+                qDebug () << __PRETTY_FUNCTION__ << value << val.toString() << cAttrValue->value().valueForInsert();
             }
             //ksa
             else if(type == KKSAttrType::atVectorLayer)
@@ -1522,16 +1522,20 @@ void KKSObjEditor :: setValue (qint64 idAttrValue, KKSIndAttrClass sys, QVariant
                 return;
 
             KKSAttrValue * av = ioAttrValues[idAttrValue];
-            if (av->attribute()->type()->attrType() == KKSAttrType::atHistogram)
+            int idAType = av->attribute()->type()->attrType();
+            KKSValue v(val.toString(), idAType);
+            if (idAType == KKSAttrType::atCheckList)
+                v.setValue (QString("{%1}").arg (val.toStringList().join(",")), KKSAttrType::atCheckList);
+            else if (idAType == KKSAttrType::atHistogram)
             {
                 KKSHistogram h;
                 QString hStr = val.toString();//value<KKSHistogram>();
                 h.fromString (hStr);
-                //qDebug () << __PRETTY_FUNCTION__ << hStr << h.toString();
+                int ier = v.setValue (hStr, idAType);
+                qDebug () << __PRETTY_FUNCTION__ << ier << val.toString()
+                                                 << v.value() << v.valueVariant();
             }
-            KKSValue v(val.toString(), av->attribute()->type()->attrType());
-            if (av->attribute()->type()->attrType() == KKSAttrType::atCheckList)
-                v.setValue (QString("{%1}").arg (val.toStringList().join(",")), KKSAttrType::atCheckList);
+                
             //qDebug () << __PRETTY_FUNCTION__ << val << val.toString() << v.value() << v.valueVariant(); 
             av->setValue(v);
             isChanged = true;
