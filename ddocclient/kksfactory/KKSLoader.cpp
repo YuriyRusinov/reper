@@ -646,7 +646,10 @@ KKSValue  KKSLoader::constructValue(const QString & value,
         KKSHistogram h;
         h.fromString (value);
         QString valSql = QString();
-        valSql = QString ("select value from random_values;");
+        if (tName.compare(QString("message_series"), Qt::CaseInsensitive) == 0)
+            valSql = QString ("select value from random_values;");
+        else
+            valSql = QString ("select %2 from %1").arg (tName).arg(cName);
                        //QString ("select %1 from %2 as mser inner join message_streams ms on (mser.id_message_stream=ms.id and ms.id_io_object=%3)")
                        //     .arg (cName)
                        //     .arg (tName)

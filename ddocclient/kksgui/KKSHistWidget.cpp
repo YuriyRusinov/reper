@@ -144,10 +144,14 @@ void KKSHistWidget::init (void)
         lECount->setText (QString::number (hist->size()));
     hNumLay->addWidget (lECount);
     gHistLay->addLayout (hNumLay, 2, 0, 1, 1);
-    gParLay->addWidget (gbHist, 0, 1, 1, 1);
+    gParLay->addWidget (gbHist, 0, 0, 2, 1);
     
     QGroupBox * gbFilters = new QGroupBox (tr("Filters"), this);
-    gParLay->addWidget (gbFilters, 0, 0, 1, 1);
+    QString tName = this->m_av->attribute()->tableName();
+    //qDebug () << __PRETTY_FUNCTION__ << tName;
+    bool isFiltVisible = (tName.compare(QString("message_series"), Qt::CaseInsensitive) == 0);
+    gbFilters->setVisible(isFiltVisible);
+    gParLay->addWidget (gbFilters, 0, 1, 1, 1);
     QGridLayout * gFiltLay = new QGridLayout (gbFilters);
     QLabel * lScenario = new QLabel (tr("Scenario"), this);
     QHBoxLayout * hScenarioLay = new QHBoxLayout;
@@ -181,7 +185,7 @@ void KKSHistWidget::init (void)
     QGridLayout * gPicLay = new QGridLayout (gbPic);
     gPicLay->addWidget (wHistDrawW, 0, 0, 1, 1);
     gLay->addWidget (gbPic, 5, 0, 1, 1);
-    gHistLay->addWidget (pbCalc, 3, 0, 1, 1, Qt::AlignRight);
+    gParLay->addWidget (pbCalc, 2 - (isFiltVisible ? 1 : 0), 0, 1, 2, Qt::AlignRight);
 //    gLay->addWidget (wCharts, 5, 0, 1, 1);
 }
 
