@@ -66,16 +66,12 @@ void KKSHistDrawWidget::paintEvent(QPaintEvent *event)
 void KKSHistDrawWidget::setData (const QMap<int, double>& hData)
 {
     m_data = hData;
-    int i=0;
+    maxVal = 0.0;
     for (QMap<int, double>::const_iterator p=m_data.constBegin();
             p != m_data.constEnd();
             p++)
     {
-        if (i==0)
-            maxVal = p.value ();
-        else
-            maxVal = qMax (maxVal, p.value());
-        i++;
+        maxVal += p.value ();
     }
     show ();
 }
