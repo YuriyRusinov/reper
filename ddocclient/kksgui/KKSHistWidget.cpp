@@ -37,6 +37,7 @@ KKSHistWidget::KKSHistWidget(const KKSAttrValue *av, KKSIndAttrClass isSys, QWid
     cbScenario (new QComboBox),
     cbVariant (new QComboBox),
     cbCategory (new QComboBox),
+    cbIORef (new QComboBox),
     cbSource (new QComboBox),
     cbReceiver (new QComboBox),
     wHistDrawW (new KKSHistDrawWidget (0, Qt::Window | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint | Qt::WindowSoftkeysRespondHint)),
@@ -59,7 +60,7 @@ KKSHistWidget::KKSHistWidget(const KKSAttrValue *av, KKSIndAttrClass isSys, QWid
     connect (lECount, SIGNAL (editingFinished ()), this, SLOT (numChanged ()) );
 */
     connect (cbCategory, SIGNAL (activated(int)), this, SLOT (catChanged (int)) );
-    connect (cbSource, SIGNAL (activated(int)), this, SLOT (ioChanged(int)) );
+    connect (cbIORef, SIGNAL (activated(int)), this, SLOT (ioChanged(int)) );
 
     connect (pbCalc, SIGNAL (clicked()), this, SLOT (calcHist()) );
 }
@@ -71,6 +72,7 @@ KKSHistWidget::~KKSHistWidget()
     delete wHistDrawW;
     delete cbReceiver;
     delete cbSource;
+    delete cbIORef;
     delete cbCategory;
     delete cbVariant;
     delete cbScenario;
@@ -153,33 +155,42 @@ void KKSHistWidget::init (void)
     gbFilters->setVisible(isFiltVisible);
     gParLay->addWidget (gbFilters, 0, 1, 1, 1);
     QGridLayout * gFiltLay = new QGridLayout (gbFilters);
+
     QLabel * lScenario = new QLabel (tr("Scenario"), this);
     QHBoxLayout * hScenarioLay = new QHBoxLayout;
     hScenarioLay->addWidget (lScenario);
     hScenarioLay->addWidget (cbScenario);
     gFiltLay->addLayout(hScenarioLay, 0, 0, 1, 1);
+
     QLabel * lVariant = new QLabel (tr("Variant"), this);
     QHBoxLayout * hVariantLay = new QHBoxLayout;
     hVariantLay->addWidget (lVariant);
     hVariantLay->addWidget(cbVariant);
     gFiltLay->addLayout (hVariantLay, 1, 0, 1, 1);
+
     QLabel * lCategory = new QLabel (tr("Category"), this);
     QHBoxLayout * hCatLay = new QHBoxLayout;
     hCatLay->addWidget (lCategory);
     hCatLay->addWidget(cbCategory);
     gFiltLay->addLayout (hCatLay, 2, 0, 1, 1);
     
+    QLabel * lIO = new QLabel (tr("Information object"), this);
+    QHBoxLayout * hIOLay = new QHBoxLayout;
+    hIOLay->addWidget (lIO);
+    hIOLay->addWidget (cbIORef);
+    gFiltLay->addLayout (hIOLay, 3, 0, 1, 1);
+
     QLabel * lSource = new QLabel (tr("Source"), this);
     QHBoxLayout * hSourceLay = new QHBoxLayout;
     hSourceLay->addWidget (lSource);
     hSourceLay->addWidget (cbSource);
-    gFiltLay->addLayout (hSourceLay, 3, 0, 1, 1);
-
+    gFiltLay->addLayout (hSourceLay, 4, 0, 1, 1);
+    
     QLabel * lReceiver = new QLabel (tr("Receiver"), this);
     QHBoxLayout * hRecLay = new QHBoxLayout;
     hRecLay->addWidget (lReceiver);
     hRecLay->addWidget (cbReceiver);
-    gFiltLay->addLayout (hRecLay, 4, 0, 1, 1);
+    gFiltLay->addLayout (hRecLay, 5, 0, 1, 1);
     //gLay->addWidget (wHistDrawW, 5, 0, 1, 1);
     QGroupBox * gbPic = new QGroupBox (tr("View"), this);
     QGridLayout * gPicLay = new QGridLayout (gbPic);
@@ -243,18 +254,18 @@ void KKSHistWidget::loadCategories (const KKSMap<int, KKSCategory *>& catList)
 
 void KKSHistWidget::loadIOList (const KKSMap<int, KKSObject *>& IOList)
 {
-    cbSource->clear ();
+    cbIORef->clear ();
     for (KKSMap<int, KKSObject *>::const_iterator p = IOList.constBegin();
             p != IOList.constEnd();
             ++p)
     {
-        cbSource->addItem (p.value()->name(), p.key());
+        cbIORef->addItem (p.value()->name(), p.key());
     }
     if (hist && hist->srcObject())
     {
         qint64 idIO = hist->srcObject()->id();
-        int ioInd = this->cbSource->findData (QVariant (idIO));
-        cbSource->setCurrentIndex (ioInd);
+        int ioInd = this->cbIORef->findData (QVariant (idIO));
+        cbIORef->setCurrentIndex (ioInd);
     }
 }
 
@@ -295,8 +306,8 @@ void KKSHistWidget::setHist (const KKSHistogram& shist)
     qint64 idIO = hist->srcObject () ? hist->srcObject()->id() : -1;
     if (idIO > 0)
     {
-        int ioInd = cbSource->findData (idIO);
-        cbSource->setCurrentIndex (ioInd);
+        int ioInd = cbIORef->findData (idIO);
+        cbIORef->setCurrentIndex (ioInd);
     }
     qint64 idSc = hist->getScenario();
     if (idSc > 0)
@@ -336,7 +347,7 @@ void KKSHistWidget::catChanged (int cIndex)
 
 void KKSHistWidget::ioChanged (int ioIndex)
 {
-    int ioId = this->cbSource->itemData (ioIndex).toInt ();
+    int ioId = this->cbIORef->itemData (ioIndex).toInt ();
     KKSHistogram hist = m_av->value().valueVariant().value<KKSHistogram>();
     QVariant v = QVariant::fromValue<KKSHistogram>(hist);
     emit loadIO (ioId, &hist);
@@ -368,7 +379,7 @@ void KKSHistWidget::calcHist (void)
     int idScenario = cbScenario->itemData (cbScenario->currentIndex()).toInt();
     int idVariant = cbVariant->itemData (cbVariant->currentIndex()).toInt ();
     int idCategory = cbCategory->itemData (cbCategory->currentIndex()).toInt ();
-    int idIOObject = cbSource->itemData (cbSource->currentIndex()).toInt ();
+    int idIOObject = cbIORef->itemData (cbIORef->currentIndex()).toInt ();
     int idReceiver = cbReceiver->itemData (cbReceiver->currentIndex()).toInt ();
     hist->setScenario(idScenario);
     hist->setVariant(idVariant);
@@ -385,5 +396,5 @@ void KKSHistWidget::calcHist (void)
 
 void KKSHistWidget::clearIO (void)
 {
-    this->cbSource->clear();
+    this->cbIORef->clear();
 }

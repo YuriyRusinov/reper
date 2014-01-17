@@ -94,6 +94,7 @@ private:
     QComboBox * cbScenario;
     QComboBox * cbVariant;
     QComboBox * cbCategory;
+    QComboBox * cbIORef;
     QComboBox * cbSource;
     QComboBox * cbReceiver;
     
