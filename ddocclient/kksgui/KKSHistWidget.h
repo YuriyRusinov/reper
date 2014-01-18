@@ -28,6 +28,7 @@ class KKSCategory;
 class KKSObject;
 class KKSHistogram;
 class KKSHistDrawWidget;
+class KKSValue;
 
 class _GUI_EXPORT KKSHistWidget : public QWidget, public KKSAttrWidget
 {
@@ -53,16 +54,13 @@ public:
 
 public slots:
     void setHist (const KKSHistogram& hist);
+    void calcHist (void);
+    void saveHist (KKSValue & v);
     
 private slots:
-/*    void fromChanged ();
-    void toChanged ();
-    void numChanged ();
-*/
     void catChanged (int cIndex);
     void ioChanged (int ioIndex);
     
-    void calcHist (void);
 
 protected:
     //

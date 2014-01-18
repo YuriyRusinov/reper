@@ -394,6 +394,41 @@ void KKSHistWidget::calcHist (void)
     wHistDrawW->repaint();
 }
 
+void KKSHistWidget::saveHist (KKSValue & v)
+{
+        double xmin = lEFrom->text().toDouble ();
+    double xmax = lETo->text().toDouble ();
+    if (xmin >= xmax)
+    {
+        QMessageBox::warning (this, tr("Histogram"), tr("Minimum value has to be little than maximum"), QMessageBox::Ok);
+        return;
+    }
+    int num = lECount->text().toInt ();
+    KKSHistogram * hist = new KKSHistogram;
+    hist->setRange (xmin, xmax);
+    hist->setSize (num);
+    //double dx = (xmax-xmin)/num;
+    hist->clear ();
+    for (int i=0; i<num; i++)
+    {
+        //double x = xmin + i*dx;
+        hist->setValue (i, 0.0);
+    }
+    
+    int idScenario = cbScenario->itemData (cbScenario->currentIndex()).toInt();
+    int idVariant = cbVariant->itemData (cbVariant->currentIndex()).toInt ();
+    int idCategory = cbCategory->itemData (cbCategory->currentIndex()).toInt ();
+    int idIOObject = cbIORef->itemData (cbIORef->currentIndex()).toInt ();
+    int idReceiver = cbReceiver->itemData (cbReceiver->currentIndex()).toInt ();
+    hist->setScenario(idScenario);
+    hist->setVariant(idVariant);
+    hist->setReceiver(idReceiver);
+    emit loadCategory (idCategory, hist);
+    emit loadIO (idIOObject, hist);
+    QString hStr = hist->toString();
+    v = KKSValue (hStr, KKSAttrType::atHistogram);
+}
+
 void KKSHistWidget::clearIO (void)
 {
     this->cbIORef->clear();

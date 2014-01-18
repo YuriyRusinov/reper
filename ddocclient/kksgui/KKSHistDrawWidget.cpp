@@ -71,7 +71,7 @@ void KKSHistDrawWidget::setData (const QMap<int, double>& hData)
             p != m_data.constEnd();
             p++)
     {
-        maxVal += p.value ();
+        maxVal = qMax (maxVal, p.value ());
     }
     show ();
 }

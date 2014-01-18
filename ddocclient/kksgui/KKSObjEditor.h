@@ -271,6 +271,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSRecDialog
                                                //генерируем сигнал, его поймает ГИС-виджет, сохранить файл проекта, прочитает его в XML и вернет в качестве значения KKSValue
         void setHistCat (int idCat, KKSHistogram * vHist, KKSHistWidget * hW);
         void setHistIO (int idIO, KKSHistogram * vHist, KKSHistWidget * hW);
+        void needToUpdateHistogram (KKSValue &);
 
     public slots:
         //void slotRubricItemRequested();

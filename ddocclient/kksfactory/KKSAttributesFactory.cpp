@@ -1618,6 +1618,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                 haw->loadIOList(ioList);
                 connect (haw, SIGNAL (loadCategory (int, KKSHistogram *)), objEditor, SLOT (loadHistCat (int, KKSHistogram *)) );
                 connect (haw, SIGNAL (loadIO (int, KKSHistogram *)), objEditor, SLOT (loadHistIO (int, KKSHistogram *)) );
+                connect (objEditor, SIGNAL (needToUpdateHistogram (KKSValue &)), haw, SLOT (saveHist(KKSValue &)) );
                 
                 refIO->release ();
                 //QToolButton *tbRef = new QToolButton ();

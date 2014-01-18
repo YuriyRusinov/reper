@@ -356,7 +356,10 @@ int KKSObjEditor :: constructObject()
             //ksa
             else if (type == KKSAttrType::atHistogram)
             {
-                value = val.value<KKSHistogram>().toString();
+                KKSValue v;
+                emit needToUpdateHistogram (v);
+                (const_cast<KKSAttrValue *>(cAttrValue))->setValue(v);
+                value = v.valueVariant().value<KKSHistogram>().toString();
             }
             //ksa
             else if(type == KKSAttrType::atVectorLayer)
@@ -572,7 +575,10 @@ int KKSObjEditor :: constructObject()
             //ksa
             else if(type == KKSAttrType::atHistogram)
             {
-                KKSHistogram h = val.value<KKSHistogram>();
+                KKSValue v;
+                emit needToUpdateHistogram (v);
+                (const_cast<KKSAttrValue *>(cAttrValue))->setValue(v);
+                KKSHistogram h = v.valueVariant().value<KKSHistogram>();
                 value = h.toString();
             }
             //ksa
@@ -782,9 +788,13 @@ int KKSObjEditor :: constructObject()
             //ksa
             else if(type == KKSAttrType::atHistogram)
             {
-                KKSHistogram h = val.value<KKSHistogram>();
+                KKSValue v;
+                emit needToUpdateHistogram (v);
+                KKSHistogram h = v.valueVariant().value<KKSHistogram>();
                 value = h.toString();
-                qDebug () << __PRETTY_FUNCTION__ << value << val.toString() << cAttrValue->value().valueForInsert();
+                (const_cast<KKSAttrValue *>(cAttrValue))->setValue(v);
+                qDebug () << __PRETTY_FUNCTION__ << value << val.toString()
+                          << cAttrValue->value().valueForInsert();
             }
             //ksa
             else if(type == KKSAttrType::atVectorLayer)
