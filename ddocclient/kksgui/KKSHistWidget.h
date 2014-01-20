@@ -51,6 +51,8 @@ public:
     void loadIOList (const KKSMap<int, KKSObject *>& IOList);
     void loadRecvList (const QMap<int, QString>& posList);
     void clearIO (void);
+    
+    KKSValue getVal (void);
 
 public slots:
     void setHist (const KKSHistogram& hist);

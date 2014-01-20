@@ -249,7 +249,8 @@ bool KKSHistogram::fromString(const QString & str)
         hIn >> key;
         hIn.seek (hIn.pos()+sep.length());
         hIn >> val;
-        hIn.seek (hIn.pos()+sep.length());
+        if (i < m_num-1)
+            hIn.seek (hIn.pos()+sep.length());
         dHist.insert (key, val);
     }
     m_isEmpty = false;
