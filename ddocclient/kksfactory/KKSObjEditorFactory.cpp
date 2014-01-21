@@ -2747,7 +2747,8 @@ void KKSObjEditorFactory :: editExistOE (QWidget * editor,
     else{
         windowModality = editor ? editor->windowModality () : Qt::NonModal;
         parent = editor ? (editor->windowModality() == Qt::NonModal ? NULL : editor) : NULL;
-        flags = editor ? editor->windowFlags() : 0;
+        if (editor)
+            flags = editor->windowFlags();
     }
     
     KKSObjEditor * newObjEditor = this->createObjEditor (idObject, 
