@@ -249,7 +249,7 @@ void KKSHistWidget::init (void)
 void KKSHistWidget::loadScenario (const QMap<int, QString>& scList)
 {
     
-    UI->lwScenarios->clear ();
+    //UI->lwScenarios->clear ();
     /*
     for (QMap<int, QString>::const_iterator p=scList.constBegin();
             p != scList.constEnd();
@@ -268,7 +268,7 @@ void KKSHistWidget::loadScenario (const QMap<int, QString>& scList)
 
 void KKSHistWidget::loadVariants (const QMap<int, QString>& varList)
 {
-    UI->lwVariants->clear ();
+    //UI->lwVariants->clear ();
     /*
     for (QMap<int, QString>::const_iterator p=varList.constBegin();
             p != varList.constEnd();
@@ -287,7 +287,7 @@ void KKSHistWidget::loadVariants (const QMap<int, QString>& varList)
 
 void KKSHistWidget::loadCategories (const KKSMap<int, KKSCategory *>& catList)
 {
-    UI->lwCategories->clear();
+    //UI->lwCategories->clear();
     /*
     this->cbCategory->addItem (tr("No selected category"), -1);
     for (KKSMap<int, KKSCategory *>::const_iterator p=catList.constBegin();
@@ -307,7 +307,7 @@ void KKSHistWidget::loadCategories (const KKSMap<int, KKSCategory *>& catList)
 
 void KKSHistWidget::loadIOList (const KKSMap<int, KKSObject *>& IOList)
 {
-    UI->lwIO->clear ();
+    //UI->lwIO->clear ();
     /*
     for (KKSMap<int, KKSObject *>::const_iterator p = IOList.constBegin();
             p != IOList.constEnd();

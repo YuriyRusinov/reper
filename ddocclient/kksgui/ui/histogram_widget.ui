@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>815</width>
-    <height>706</height>
+    <height>786</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -41,7 +41,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>5</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="tabHistogram">
          <property name="sizePolicy">
@@ -136,17 +136,7 @@
           <item row="0" column="0">
            <layout class="QHBoxLayout" name="horizontalLayout_4">
             <item>
-             <widget class="QListWidget" name="lwScenarios">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="selectionMode">
-               <enum>QAbstractItemView::MultiSelection</enum>
-              </property>
-             </widget>
+             <widget class="QListView" name="lVScenarios"/>
             </item>
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -200,17 +190,7 @@
           <item row="0" column="0">
            <layout class="QHBoxLayout" name="horizontalLayout_5">
             <item>
-             <widget class="QListWidget" name="lwVariants">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="selectionMode">
-               <enum>QAbstractItemView::MultiSelection</enum>
-              </property>
-             </widget>
+             <widget class="QListView" name="lvVariants"/>
             </item>
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -264,17 +244,7 @@
           <item row="0" column="0">
            <layout class="QHBoxLayout" name="horizontalLayout_7">
             <item>
-             <widget class="QListWidget" name="lwCategories">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="selectionMode">
-               <enum>QAbstractItemView::MultiSelection</enum>
-              </property>
-             </widget>
+             <widget class="QListView" name="lvCategories"/>
             </item>
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -328,17 +298,7 @@
           <item row="0" column="0">
            <layout class="QHBoxLayout" name="horizontalLayout_8">
             <item>
-             <widget class="QListWidget" name="lwIO">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="selectionMode">
-               <enum>QAbstractItemView::MultiSelection</enum>
-              </property>
-             </widget>
+             <widget class="QListView" name="lvIOs"/>
             </item>
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -392,17 +352,7 @@
           <item row="0" column="0">
            <layout class="QHBoxLayout" name="horizontalLayout_9">
             <item>
-             <widget class="QListWidget" name="lwServices">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="selectionMode">
-               <enum>QAbstractItemView::MultiSelection</enum>
-              </property>
-             </widget>
+             <widget class="QListView" name="lvServices"/>
             </item>
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_7">
