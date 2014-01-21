@@ -55,8 +55,8 @@ comment on table processing_scenario is
 select setMacToNULL('processing_scenario');
 select createTriggerUID('processing_scenario');
 
-insert into processing_scenario (id, name) values (1, 'ïÓÎÏ×ÎÏÊ ÓÃÅÎÁÒÉÊ');
-insert into processing_variant (id, name) values (1, 'ïÓÎÏ×ÎÏÊ ×ÁÒÉÁÎÔ');
+insert into processing_scenario (id, name) values (1, 'Ñöåíàğèé ïî óìîë÷àíèş');
+insert into processing_variant (id, name) values (1, 'Âàğèàíò ïî óìîë÷àíèş');
 SELECT pg_catalog.setval('processing_scenario_id_seq', 1, true);
 SELECT pg_catalog.setval('processing_variant_id_seq', 1, true);
 
@@ -67,6 +67,8 @@ alter table chains_data add column id_processing_variant int4;
 update chains_data set id_processing_scenario = 1, id_processing_variant = 1;
 alter table chains_data alter column id_processing_scenario set not null;
 alter table chains_data alter column id_processing_variant set not null;
+alter table chains_data add column handler_in_data varchar;
+alter table chains_data add column handler_out_data varchar;
 
 alter table chains_data
    add constraint FK_CHAINS_D_REFERENCE_CHAINS_D foreign key (id_parent)

@@ -56,8 +56,8 @@ comment on table processing_scenario is
 select setMacToNULL('processing_scenario');
 select createTriggerUID('processing_scenario');
 
-insert into processing_scenario (id, name) values (1, 'пУОПЧОПК УГЕОБТЙК');
-insert into processing_variant (id, name) values (1, 'пУОПЧОПК ЧБТЙБОФ');
+insert into processing_scenario (id, name) values (1, 'Основной сценарий');
+insert into processing_variant (id, name) values (1, 'Основной вариант');
 SELECT pg_catalog.setval('processing_scenario_id_seq', 1, true);
 SELECT pg_catalog.setval('processing_variant_id_seq', 1, true);
 

@@ -182,6 +182,12 @@ begin
                 else
                     r_query := r_query || '=' || quote_literal (attrs_values[i]) || '::timestamp';
                 end if;
+            elsif (a_type_code = 'GEOMETRY') then
+                if (length (trim (attrs_values[i])) = 0) then
+                    r_query := r_query || '= NULL::geometry';
+                else
+                    r_query := r_query || '=' || quote_literal (attrs_values[i]) || '::geometry';
+                end if;
             elsif (position ('null' in lower (attrs_values[i])) != 0) then
                 r_query := r_query || '=' || 'NULL';
             elsif (length (trim (attrs_values[i])) = 0 and a_type_code <> 'VARCHAR' and a_type_code <> 'TEXT' and a_type_code <> 'BYTEA') then

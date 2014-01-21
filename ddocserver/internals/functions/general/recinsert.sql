@@ -159,7 +159,7 @@ begin
                     raise warning 'external query is %, record id is % ids is %', exQuery, idRec, ids;
 
                     continue;
-                elsif (id_a_type = 12) then
+                elsif (id_a_type = 12) then  --atCheckList
                     query := query || '"' || attr_code || '"';
                     if (attrs_values[i] is null or length (trim (attrs_values[i])) =0
                         or position ('null' in lower (attrs_values[i])) != 0) then
@@ -265,6 +265,8 @@ begin
                         values_query := values_query || quote_literal('{' || attrs_values[i] || '}');
                     elsif (at_type = 'XML') then
                         values_query := values_query || 'xmlparse (document(' || quote_literal (attrs_values[i]) || '))';
+                    elsif (at_type = 'GEOMETRY') then
+                        values_query := values_query || quote_literal(attrs_values[i]) || '::geometry';
                     else
                         values_query := values_query || attrs_values[i];
                     end if;

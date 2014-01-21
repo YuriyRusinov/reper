@@ -19,19 +19,21 @@ begin
         select h.id,
                h.name,
                h.description,
-               h.service,
-               h.extra_params,
+               hp.service,
+               hp.extra_params,
                h.is_external,
-               h.h_host,
-               h.h_port
+               hp.h_host,
+               hp.h_port
         from
             handlers h,
+            handler_params hp,
             chains c,
             chains_data cd
         where
             cd.id = idChainData
             and cd.id_chain = c.id
             and c.id_handler = h.id
+            and h.id_handler_params = hp.id
     loop
         update chains_data set handled_time = current_timestamp where id = idChainData;
         return next r;

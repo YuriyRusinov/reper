@@ -9,9 +9,10 @@ PG_FUNCTION_INFO_V1 (histogram);
 Datum histogram(PG_FUNCTION_ARGS)
 {
     size_t nr_rand = strlen ( VARDATA (PG_GETARG_VARCHAR_P(0)));
-    char * sql = (char *) palloc (nr_rand+1);
+    char * sql = (char *) palloc (nr_rand+10);
 //    strncpy (sql, (char *)PG_GETARG_VARCHAR_P(0), nr_rand);
-    snprintf (sql, nr_rand+1, "%s", VARDATA (PG_GETARG_VARCHAR_P (0)));
+    sprintf (sql, "%s;", VARDATA (PG_GETARG_VARCHAR_P (0)));
+
     float8 xmin = PG_GETARG_FLOAT8 (1);
     float8 xmax = PG_GETARG_FLOAT8 (2);
     unsigned int num = PG_GETARG_UINT32(3);

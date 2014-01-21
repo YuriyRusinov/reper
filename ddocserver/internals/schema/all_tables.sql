@@ -1,7 +1,8 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     26.12.2013 14:15:57                          */
+/* Created on:     21.01.2014 14:58:00                          */
 /*==============================================================*/
+
 
 /*==============================================================*/
 /* Table: root_table                                            */
@@ -22,8 +23,6 @@ select setMacToNULL('root_table');
 create unique index Index_1 on root_table using BTREE (
 unique_id
 );
-
-
 
 /*==============================================================*/
 /* User: public                                                 */
@@ -939,9 +938,11 @@ create table chains_data (
    start_service_time   TIMESTAMP            null,
    end_service_time     TIMESTAMP            null,
    return_code          INT4                 null,
-   what_happens         INT2                 null,
+   what_happens         INT2                 not null
+      constraint CKC_WHAT_HAPPENS_CHAINS_D check (what_happens in (1,2,3,4,5,6,7,8)),
    handler_in_data      VARCHAR              null,
    handler_out_data     VARCHAR              null,
+   lc_is_parent         BOOL                 not null default TRUE,
    constraint PK_CHAINS_DATA primary key (id)
 )
 inherits (root_table);
@@ -974,7 +975,10 @@ comment on column chains_data.insert_time is
 'дата, время создания записи в таблице очередей (формируется автоматически при создании записи)';
 
 comment on column chains_data.is_handled is
-'признак обработки записи хранимой процедурой (в исходном состоянии=0, после обработки=1). Состояние=1 свидетельствует о том, что хранимая процедура обработки данной таблицы вызвала необходимый сервис обработки и передала ему исходные данные для обработки(номер записи в таблице очередей)';
+'признак обработки записи хранимой процедурой (в исходном состоянии=0, после обработки=1). 
+Состояние=1 свидетельствует о том, что хранимая процедура обработки данной таблицы 
+вызвала необходимый сервис обработки и передала ему исходные данные для обработки
+(номер записи в таблице очередей)';
 
 comment on column chains_data.handled_time is
 'дата, время обработки данной записи хранимой процедурой (триггером)';
@@ -988,11 +992,25 @@ comment on column chains_data.end_service_time is
 comment on column chains_data.return_code is
 'код возврата сервиса обработки';
 
+comment on column chains_data.what_happens is
+'Причина, по которой запись добавлена в очередь
+1 - создан новый ИО
+2 - изменились атрибуты (пользовательские) ИО
+3 - изменилось состояние ИО
+4 - создан новый ЭИО
+5 - изменены табличные атрибуты ЭИО
+6 - изменены показатели ЭИО
+7 - изменилось состояние ЭИО
+8 - запись порождена в результате работы некоторого сервиса (имеется запись в таблице logistic)';
+
 comment on column chains_data.handler_in_data is
 'Входные данные обработчика очереди>, в которые помещаются входные данные для обработчика очереди, и задача сервиса-обработчика очереди заключается в том, чтобы использовать их при обработке';
 
 comment on column chains_data.handler_out_data is
 '<Выходные данные обработчика очереди>, в которые помещаются выходные данные обработчика очереди и задача сервиса-обработчика очереди заключается в том, чтобы сформировать их при обработке';
+
+comment on column chains_data.lc_is_parent is
+'логический атрибут, который в состоянии <истина> показывает, что инициатор помещения ИО в очеред - его ЖЦ (т.е данная запись появилась вследствие обработки ЖЦ)';
 
 select setMacToNULL('chains_data');
 select createTriggerUID('chains_data');
@@ -1497,16 +1515,65 @@ comment on table guard_objects_devices is
 select setMacToNULL('guard_objects_devices');
 
 /*==============================================================*/
-/* Table: handlers                                              */
+/* Table: handler_params                                        */
 /*==============================================================*/
-create table handlers (
+create table handler_params (
    id                   SERIAL               not null,
-   name                 VARCHAR              not null,
-   description          VARCHAR              null,
+   name                 VARCHAR              null,
+   handler_version      VARCHAR              not null,
    h_host               VARCHAR              null,
    h_port               int4                 null,
    service              VARCHAR              not null,
    extra_params         VARCHAR              null,
+   handler_in_data      VARCHAR              null,
+   constraint PK_HANDLER_PARAMS primary key (id)
+)
+inherits (root_table);
+
+comment on table handler_params is
+'Параметры сервисов-обработчиков
+Обеспечивают версионность. 
+Вынесение параметров сервиса в отдельную таблицу позволяет задавать для обработки очереди некоторый фиксированный сервис, а потом осуществлять ведение его различных версий';
+
+comment on column handler_params.name is
+'название сервиса';
+
+comment on column handler_params.handler_version is
+'версия сервиса';
+
+comment on column handler_params.h_host is
+'IP-адрес хоста, на котором функционирует сервис-обработчик';
+
+comment on column handler_params.h_port is
+'Порт хоста, на котором функционирует сервис-обработчик';
+
+comment on column handler_params.service is
+'параметры сервиса (сигнатура сервиса)
+Каждый сервис должен иметь следующие вх. параметры:
+-Идентификатор записи таблицы очередей, инициировавшей обработчик
+Каждый сервис при его вызове обязан:
+-произвести отметку записи в таблице очередей, когда он начал обработку
+-произвести отметку записи в таблице очередей, когда он завершил обработку
+-выдать результат обработки в выходную очередь (в общем случае- в очереди)
+';
+
+comment on column handler_params.extra_params is
+'Дополнительные параметры для запуска (если требуются)';
+
+comment on column handler_params.handler_in_data is
+'XML-атрибут сервиса';
+
+select setMacToNULL('handler_params');
+select createTriggerUID('handler_params');
+
+/*==============================================================*/
+/* Table: handlers                                              */
+/*==============================================================*/
+create table handlers (
+   id                   SERIAL               not null,
+   id_handler_params    INT4                 null,
+   name                 VARCHAR              not null,
+   description          VARCHAR              null,
    is_external          BOOL                 not null default FALSE,
    constraint PK_HANDLERS primary key (id)
 )
@@ -1523,30 +1590,93 @@ comment on column handlers.name is
 comment on column handlers.description is
 'Описание';
 
-comment on column handlers.h_host is
-'IP-адрес хоста, на котором функционирует сервис-обработчик';
-
-comment on column handlers.h_port is
-'Порт хоста, на котором функционирует сервис-обработчик';
-
-comment on column handlers.service is
-'параметры сервиса (сигнатура сервиса)
-Каждый сервис должен иметь следующие вх. параметры:
--Идентификатор записи таблицы очередей, инициировавшей обработчик
-Каждый сервис при его вызове обязан:
--произвести отметку записи в таблице очередей, когда он начал обработку
--произвести отметку записи в таблице очередей, когда он завершил обработку
--выдать результат обработки в выходную очередь (в общем случае- в очереди)
-';
-
-comment on column handlers.extra_params is
-'Дополнительные параметры для запуска (если требуются)';
-
 comment on column handlers.is_external is
 'Поле определяет, является ли сервис-обработчик очереди внешней по отношению к БД программой или же явлется хранимой процедурой БД. ';
 
 select setMacToNULL('handlers');
 select createTriggerUID('handlers');
+
+/*==============================================================*/
+/* Table: histogram_graphics_chains                             */
+/*==============================================================*/
+create table histogram_graphics_chains (
+   id                   SERIAL               not null,
+   id_histogram_params_chains INT4                 not null,
+   h_order              INT4                 not null,
+   h_x                  float8               not null,
+   h_y                  float8               not null,
+   constraint PK_HISTOGRAM_GRAPHICS_CHAINS primary key (id)
+)
+inherits (root_table);
+
+comment on table histogram_graphics_chains is
+'Таблица графиков гистограмм для сервисов';
+
+select setMacToNULL('histogram_graphics_chains');
+select createTriggerUID('histogram_graphics_chains');
+
+/*==============================================================*/
+/* Table: histogram_graphics_streams                            */
+/*==============================================================*/
+create table histogram_graphics_streams (
+   id                   SERIAL               not null,
+   id_histogram_params_streams INT4                 not null,
+   h_order              INT4                 not null,
+   h_x                  float8               not null,
+   h_y                  float8               not null,
+   constraint PK_HISTOGRAM_GRAPHICS_STREAMS primary key (id)
+)
+inherits (root_table);
+
+comment on table histogram_graphics_streams is
+'Таблица графиков гистограмм';
+
+select setMacToNULL('histogram_graphics_streams');
+select createTriggerUID('histogram_graphics_streams');
+
+/*==============================================================*/
+/* Table: histogram_params_chains                               */
+/*==============================================================*/
+create table histogram_params_chains (
+   id                   SERIAL               not null,
+   name                 VARCHAR              not null,
+   scenarios            INT4[]               null,
+   variants             INT4[]               null,
+   life_cycles          INT4[]               null,
+   io_objects           INT4[]               null,
+   services             INT4[]               null,
+   constraint PK_HISTOGRAM_PARAMS_CHAINS primary key (id)
+)
+inherits (root_table);
+
+comment on table histogram_params_chains is
+'Таблица запросов для построения гистограмм по сервисам';
+
+select setMacToNULL('histogram_params_chains');
+select createTriggerUID('histogram_params_chains');
+
+/*==============================================================*/
+/* Table: histogram_params_streams                              */
+/*==============================================================*/
+create table histogram_params_streams (
+   id                   SERIAL               not null,
+   name                 VARCHAR              not null,
+   scenarios            INT4[]               null,
+   variants             INT4[]               null,
+   dl_froms             INT4[]               null,
+   dl_tos               INT4[]               null,
+   io_categories        INT4[]               null,
+   io_objects           INT4[]               null,
+   partition_lows       INT4[]               null,
+   constraint PK_HISTOGRAM_PARAMS_STREAMS primary key (id)
+)
+inherits (root_table);
+
+comment on table histogram_params_streams is
+'Таблица запросов для построения гистограмм по потокам сообщений';
+
+select setMacToNULL('histogram_params_streams');
+select createTriggerUID('histogram_params_streams');
 
 /*==============================================================*/
 /* Table: indicator                                             */
@@ -2313,6 +2443,82 @@ comment on table log is
 - и т.п.';
 
 select setMacToNULL('log');
+
+/*==============================================================*/
+/* Table: logistic                                              */
+/*==============================================================*/
+create table logistic (
+   id                   SERIAL               not null,
+   name                 VARCHAR              null,
+   id_processing_scenario INT4                 not null,
+   id_processing_variant INT4                 not null,
+   id_io_object         INT4                 not null,
+   id_handler           INT4                 not null,
+   return_code          INT4                 not null,
+   handler_in_data      VARCHAR              null,
+   handler_out_data     VARCHAR              null,
+   description          VARCHAR              null,
+   constraint PK_LOGISTIC primary key (id)
+)
+inherits (root_table);
+
+comment on table logistic is
+'Управляющая таблица, обеспечивающая реализацию логики обработки ИО различных категорий цепочкой взаимосвязанных сервисов (т.е. обеспечивающая вызов необходимых для дальнейшей обработки сервисов в зависимости от результата обработки текущим сервисом)
+
+данная таблица фактически несет следующий смысл:
+Если Активным является некоторый зафиксированный сценарий обработки и в chains_data некоторым сервисом обработан заданный ИО (ЭИО), и при этом код возврата равен заданному, то необходимо данный ИО (ЭИО) поместить в указанную очередь (набор очередей)';
+
+comment on column logistic.id_processing_scenario is
+'Сценарий обработки (для различных сценариев могут быть различные последовательности)
+';
+
+comment on column logistic.id_processing_variant is
+'Вариант обработки';
+
+comment on column logistic.id_io_object is
+'ИО';
+
+comment on column logistic.id_handler is
+'Сервис (ссылка на таблицу каталога сервисов)
+';
+
+comment on column logistic.handler_in_data is
+'XML-вх. атрибут сервиса (входные параметры сервиса)';
+
+comment on column logistic.handler_out_data is
+'XML-атрибут сервиса (возвращаемые параметры)
+';
+
+select setMacToNULL('logistic');
+select createTriggerUID('logistic');
+
+/*==============================================================*/
+/* Index: i_main_index                                          */
+/*==============================================================*/
+create unique index i_main_index on logistic (
+id_processing_scenario,
+id_processing_variant,
+id_io_object,
+id_handler,
+return_code
+);
+
+/*==============================================================*/
+/* Table: logistic_chains                                       */
+/*==============================================================*/
+create table logistic_chains (
+   id_chains            INT4                 not null,
+   id_logistic          INT4                 not null,
+   constraint PK_LOGISTIC_CHAINS primary key (id_chains, id_logistic)
+);
+
+comment on table logistic_chains is
+'Перечень очередей для
+последующей обработки ИО.
+(для одного и того-же кода возврата может быть несколько очередей обработки)
+';
+
+select setMacToNULL('logistic_chains');
 
 /*==============================================================*/
 /* Table: maclabels                                             */
@@ -3513,6 +3719,7 @@ create table roles_actions (
 );
 
 select setMacToNULL('roles_actions');
+
 
 /*==============================================================*/
 /* Table: rubric_records                                        */
@@ -4791,6 +4998,21 @@ alter table guard_objects_devices
       references guard_objects (id)
       on delete restrict on update restrict;
 
+alter table handlers
+   add constraint FK_HANDLERS_REFERENCE_HANDLER_ foreign key (id_handler_params)
+      references handler_params (id)
+      on delete restrict on update restrict;
+
+alter table histogram_graphics_chains
+   add constraint FK_HISTOGRA_REFERENCE_HISTOGRA foreign key (id_histogram_params_chains)
+      references histogram_params_chains (id)
+      on delete restrict on update restrict;
+
+alter table histogram_graphics_streams
+   add constraint FK_HISTOGRAM_REF_HIST_STREAMS foreign key (id_histogram_params_streams)
+      references histogram_params_streams (id)
+      on delete restrict on update restrict;
+
 alter table indicator
    add constraint FK_INDICATO_REFERENCE_INDICATO foreign key (id_indicator_type)
       references indicator_type (id)
@@ -5019,6 +5241,36 @@ alter table log
 alter table log
    add constraint FK_LOG_REFERENCE_IO_OBJEC foreign key (id_io_object)
       references io_objects (id)
+      on delete restrict on update restrict;
+
+alter table logistic
+   add constraint FK_LOGICTIC_REF_PROCESSING_SCENARIO foreign key (id_processing_scenario)
+      references processing_scenario (id)
+      on delete restrict on update restrict;
+
+alter table logistic
+   add constraint FK_LOGICTIC_REF_PROCESSING_VARIANT foreign key (id_processing_variant)
+      references processing_variant (id)
+      on delete restrict on update restrict;
+
+alter table logistic
+   add constraint FK_LOGISTIC_REFERENCE_IO_OBJEC foreign key (id_io_object)
+      references io_objects (id)
+      on delete restrict on update restrict;
+
+alter table logistic
+   add constraint FK_LOGISTIC_REFERENCE_HANDLERS foreign key (id_handler)
+      references handlers (id)
+      on delete restrict on update restrict;
+
+alter table logistic_chains
+   add constraint FK_LOGISTIC_REFERENCE_CHAINS foreign key (id_chains)
+      references chains (id)
+      on delete restrict on update restrict;
+
+alter table logistic_chains
+   add constraint FK_LOGISTIC_REFERENCE_LOGISTIC foreign key (id_logistic)
+      references logistic (id)
       on delete restrict on update restrict;
 
 alter table mail_lists_position

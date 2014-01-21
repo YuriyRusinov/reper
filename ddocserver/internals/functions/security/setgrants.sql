@@ -92,6 +92,11 @@ begin
     readTables[48] = 'chains_data';
     readTables[49] = 'io_processing_order';
     readTables[50] = 'io_processing_order_chains';
+    readTables[51] = 'handler_params';
+    readTables[52] = 'logistic';
+    readTables[53] = 'logistic_chains';
+    readTables[54] = 'processing_scenario';
+    readTables[55] = 'processing_variant';
 
 --(1)
 
