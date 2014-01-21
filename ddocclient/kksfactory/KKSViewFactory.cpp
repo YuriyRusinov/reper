@@ -925,6 +925,13 @@ KKSEIOData * KKSViewFactory :: getRecordData (const KKSObjectExemplar * rec)
             QDateTime dt = v.valueVariant().toDateTime();
             value = dt.toString("dd.MM.yyyy hh:mm:ss");
         }
+        
+        if (rec->attrValueIndex(col)->attribute()->type()->attrType() == KKSAttrType::atDateTimeEx)
+        {
+            KKSValue v(value, KKSAttrType::atDateTimeEx);
+            QDateTime dt = v.valueVariant().toDateTime();
+            value = dt.toString("dd.MM.yyyy hh:mm:ss.zzz");
+        }
 
         int ier = 0;
         if(a->type()->attrType() == KKSAttrType::atList ||

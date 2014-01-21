@@ -47,7 +47,8 @@ void KKSHistDrawWidget::paintEvent(QPaintEvent *event)
     painter.begin(this);
     wCharts = new KKSCharts;
     wCharts->setType(KKSCharts::Histogramm);
-    wCharts->setCords(100,100,this->width()/1.5,this->height()/1.5);
+    //ksa wCharts->setCords(100,100,this->width()/1.5,this->height()/1.5);
+    wCharts->setCords(100,100,this->width(),this->height()/1.5);
     int i = 0;
     int n = colors.size();
     for (QMap<int, double>::const_iterator p=m_data.constBegin();

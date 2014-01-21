@@ -1243,7 +1243,9 @@ void KKSFiltersEditorForm :: attrChanged (int index)
                                   }
         case KKSAttrType::atBool: stLayValue->setCurrentIndex (4); break;
         case KKSAttrType::atDate: stLayValue->setCurrentIndex (5); break;
-        case KKSAttrType::atDateTime: stLayValue->setCurrentIndex (6); break;
+        case KKSAttrType::atDateTime: 
+        case KKSAttrType::atDateTimeEx: 
+            stLayValue->setCurrentIndex (6); break;
         case KKSAttrType::atInterval: stLayValue->setCurrentIndex (7); break;
         case KKSAttrType::atList: 
         case KKSAttrType::atParent: 
@@ -1278,10 +1280,11 @@ void KKSFiltersEditorForm :: attrChanged (int index)
                                       
                                       break;
                                   }
-        case KKSAttrType::atObjRef: break;
         case KKSAttrType::atJPG: stLayValue->setCurrentIndex (9); break;
+        
         case KKSAttrType::atUndef: 
-        default: stLayValue->setCurrentIndex (-1); break;
+        default: 
+            stLayValue->setCurrentIndex (-1); break;
     }
 
     if (idAttrType == KKSAttrType::atInt ||

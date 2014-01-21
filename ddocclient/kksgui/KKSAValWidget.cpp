@@ -137,7 +137,6 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
         case KKSAttrType::atString:
         case KKSAttrType::atList:
         case KKSAttrType::atParent:
-        case KKSAttrType::atObjRef:
         case KKSAttrType::atUUID:
         case KKSAttrType::atUrl:
         case KKSAttrType::atRecordColorRef:
@@ -147,19 +146,6 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
             lEVal->setReadOnly (true);
             lEVal->setText(V.toString());
             valWidget = qobject_cast<QWidget *>(lEVal);
-            break;
-        }
-        case KKSAttrType::atMaclabel:
-        {
-            macVal = new QWidget;
-            QHBoxLayout * hLay = new QHBoxLayout (macVal);
-            for (int i=0; i<2; i++)
-            {
-                lE[i] = new QLineEdit (macVal);
-                lE[i]->setReadOnly(true);
-                hLay->addWidget (lE[i]);
-            }
-            valWidget = macVal;
             break;
         }
         case KKSAttrType::atDate:
@@ -174,7 +160,7 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
         {
             tEVal = new QTimeEdit;
             tEVal->setReadOnly (true);
-            tEVal->setTime(V.toTime());//QTime::fromString(pAttrValue->value().valueForInsert(), QString("hh.mm.ss")));
+            tEVal->setTime(V.toTime());//QTime::fromString(pAttrValue->value().valueForInsert(), QString("hh:mm:ss")));
             valWidget = qobject_cast<QWidget *>(tEVal);
             break;
         }
@@ -182,13 +168,22 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
         {
             dtEVal = new QDateTimeEdit;
             dtEVal->setReadOnly (true);
-            dtEVal->setDateTime(V.toDateTime());//QDateTime::fromString(pAttrValue->value().valueVariant(), QString("dd.MM.yyyy hh.mm.ss")));
+            dtEVal->setDateTime(V.toDateTime());//QDateTime::fromString(pAttrValue->value().valueVariant(), QString("dd.MM.yyyy hh:mm:ss")));
+            dtEVal->setDisplayFormat("dd.MM.yyyy hh:mm:ss");
+            valWidget = qobject_cast<QWidget *> (dtEVal);
+            break;
+        }
+        case KKSAttrType::atDateTimeEx:
+        {
+            dtEVal = new QDateTimeEdit;
+            dtEVal->setReadOnly (true);
+            dtEVal->setDateTime(V.toDateTime());//QDateTime::fromString(pAttrValue->value().valueVariant(), QString("dd.MM.yyyy hh:mm:ss.zzz")));
+            dtEVal->setDisplayFormat("dd.MM.yyyy hh:mm:ss.zzz");
             valWidget = qobject_cast<QWidget *> (dtEVal);
             break;
         }
         case KKSAttrType::atText:
-        //case KKSAttrType::atGeometry:
-        //case KKSAttrType::atGeometryPoly:
+        case KKSAttrType::atGeometry:
         {
             textEVal = new QTextEdit;
             textEVal->setReadOnly (true);
@@ -201,12 +196,6 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
             //ksa 
 
             break;
-        case KKSAttrType::atVectorLayer:
-            //ksa
-            break;
-        case KKSAttrType::atRasterLayer:
-            //ksa
-            break;
         case KKSAttrType::atGISMap:
             //ksa
 
@@ -215,12 +204,6 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
         {
             svgVal = new KKSSvgWidget (pAttrValue, iacIOUserAttr, V.toByteArray());
             valWidget = qobject_cast<QWidget *>(svgVal);
-            break;
-        }
-        case KKSAttrType::atPoints:
-        {
-            pointsVal = new KKSPointTable (pAttrValue, iacIOUserAttr, V.toList());
-            valWidget = qobject_cast<QWidget *>(pointsVal);
             break;
         }
         case KKSAttrType::atJPG:
@@ -354,7 +337,6 @@ void KKSAValWidget::initComplexWidget (KKSAttrValue * av, QGridLayout * gLay, QW
             case KKSAttrType::atInt64:
             case KKSAttrType::atString:
             case KKSAttrType::atList:
-            case KKSAttrType::atObjRef:
             case KKSAttrType::atUUID:
             case KKSAttrType::atUrl:
             {
@@ -362,22 +344,6 @@ void KKSAValWidget::initComplexWidget (KKSAttrValue * av, QGridLayout * gLay, QW
                 QLineEdit * lE = qobject_cast<QLineEdit *>(aW);
                 lE->setText (val.toString());
                 lE->setReadOnly (true);
-                break;
-            }
-            case KKSAttrType::atMaclabel:
-            {
-                aW = new QWidget (parent);
-                QHBoxLayout * hLay = new QHBoxLayout (aW);
-                QList<QVariant> macList = val.toList();
-                if (macList.count() < 2)
-                    break;
-                for (int i=0; i<2; i++)
-                {
-                    QLineEdit * lEMac = new QLineEdit (aW);
-                    lEMac->setText (macList[i].toString());
-                    lEMac->setReadOnly (true);
-                    hLay->addWidget (lEMac);
-                }
                 break;
             }
             case KKSAttrType::atDate:
@@ -400,13 +366,22 @@ void KKSAValWidget::initComplexWidget (KKSAttrValue * av, QGridLayout * gLay, QW
             {
                 aW = new QDateTimeEdit (parent);
                 QDateTimeEdit * dtE = qobject_cast<QDateTimeEdit *>(aW);
+                dtE->setDisplayFormat("dd.MM.yyyy hh:mm:ss");
                 dtE->setDateTime(val.toDateTime());
                 dtE->setReadOnly (true);
                 break;
             }
+            case KKSAttrType::atDateTimeEx:
+            {
+                aW = new QDateTimeEdit (parent);
+                QDateTimeEdit * dtE = qobject_cast<QDateTimeEdit *>(aW);
+                dtE->setDateTime(val.toDateTime());
+                dtE->setDisplayFormat("dd.MM.yyyy hh:mm:ss.zzz");
+                dtE->setReadOnly (true);
+                break;
+            }
             case KKSAttrType::atText:
-            //case KKSAttrType::atGeometry:
-            //case KKSAttrType::atGeometryPoly:
+            case KKSAttrType::atGeometry:
             {
                 aW = new QTextEdit (parent);
                 QTextEdit * textE = qobject_cast<QTextEdit *>(aW);
@@ -417,23 +392,12 @@ void KKSAValWidget::initComplexWidget (KKSAttrValue * av, QGridLayout * gLay, QW
             case KKSAttrType::atHistogram:
                 //ksa
                 break;
-            case KKSAttrType::atVectorLayer:
-                //ksa
-                break;
-            case KKSAttrType::atRasterLayer:
-                //ksa
-                break;
             case KKSAttrType::atGISMap:
                 //ksa
                 break;
             case KKSAttrType::atSVG:
             {
                 aW = new KKSSvgWidget (aV, iacIOUserAttr, val.toByteArray(), parent);
-                break;
-            }
-            case KKSAttrType::atPoints:
-            {
-                aW = new KKSPointTable (aV, iacIOUserAttr, val.toList());
                 break;
             }
             case KKSAttrType::atJPG:
@@ -544,7 +508,6 @@ void KKSAValWidget::setValue (const KKSAttribute * a, QVariant val)
         case KKSAttrType::atString:
         case KKSAttrType::atList:
         case KKSAttrType::atParent:
-        case KKSAttrType::atObjRef:
         case KKSAttrType::atUUID:
         case KKSAttrType::atUrl:
         case KKSAttrType::atRecordColorRef:
@@ -553,17 +516,6 @@ void KKSAValWidget::setValue (const KKSAttribute * a, QVariant val)
             //valWidget = new QLineEdit (this);
             //stLay->setCurrentWidget (lEVal);
             lEVal->setText(val.toString());
-            break;
-        }
-        case KKSAttrType::atMaclabel:
-        {
-            QList<QVariant> macList = val.toList();
-            if (macList.count() < 2)
-                break;
-            for (int i=0; i<2; i++)
-            {
-                lE[i]->setText (macList[i].toString());
-            }
             break;
         }
         case KKSAttrType::atDate:
@@ -577,17 +529,23 @@ void KKSAValWidget::setValue (const KKSAttribute * a, QVariant val)
         {
             //valWidget = new QTimeEdit (this);
             //QTimeEdit * tE = qobject_cast<QTimeEdit *>(valWidget);
-            tEVal->setTime(val.toTime());//QTime::fromString(pAttrValue->value().valueForInsert(), QString("hh.mm.ss")));
+            tEVal->setTime(val.toTime());//QTime::fromString(pAttrValue->value().valueForInsert(), QString("hh:mm:ss")));
             break;
         }
         case KKSAttrType::atDateTime:
         {
-            dtEVal->setDateTime(val.toDateTime());//QDateTime::fromString(pAttrValue->value().valueVariant(), QString("dd.MM.yyyy hh.mm.ss")));
+            dtEVal->setDateTime(val.toDateTime());//QDateTime::fromString(pAttrValue->value().valueVariant(), QString("dd.MM.yyyy hh:mm:ss")));
+            dtEVal->setDisplayFormat("dd.MM.yyyy hh:mm:ss");
+            break;
+        }
+        case KKSAttrType::atDateTimeEx:
+        {
+            dtEVal->setDateTime(val.toDateTime());//QDateTime::fromString(pAttrValue->value().valueVariant(), QString("dd.MM.yyyy hh:mm:ss.zzz")));
+            dtEVal->setDisplayFormat("dd.MM.yyyy hh:mm:ss.zzz");
             break;
         }
         case KKSAttrType::atText:
-        //case KKSAttrType::atGeometry:
-        //case KKSAttrType::atGeometryPoly:
+        case KKSAttrType::atGeometry:
         {
             textEVal->setPlainText(val.toString());
             break;
@@ -602,24 +560,9 @@ void KKSAValWidget::setValue (const KKSAttribute * a, QVariant val)
             //ksa
             break;
         }
-        case KKSAttrType::atVectorLayer:
-        {
-            //ksa
-            break;
-        }
-        case KKSAttrType::atRasterLayer:
-        {
-            //ksa
-            break;
-        }
         case KKSAttrType::atGISMap:
         {
             //ksa
-            break;
-        }
-        case KKSAttrType::atPoints:
-        {
-            pointsVal->setData(val.toList());
             break;
         }
         case KKSAttrType::atJPG:
@@ -735,6 +678,19 @@ void KKSAValWidget::setComplexVals (const QVariant& val)
                     dtE->setDateTime(valW.toDateTime());
                 else
                     dtE->setDateTime(QDateTime());
+
+                dtE->setDisplayFormat("dd.MM.yyyy hh:mm:ss");
+                break;
+            }
+            case KKSAttrType::atDateTimeEx:
+            {
+                QDateTimeEdit * dtE = qobject_cast<QDateTimeEdit *>(aW);
+                if (valW.isValid())
+                    dtE->setDateTime(valW.toDateTime());
+                else
+                    dtE->setDateTime(QDateTime());
+
+                dtE->setDisplayFormat("dd.MM.yyyy hh:mm:ss.zzz");
                 break;
             }
             case KKSAttrType::atDate:
@@ -760,7 +716,6 @@ void KKSAValWidget::setComplexVals (const QVariant& val)
             case KKSAttrType::atInt:
             case KKSAttrType::atInt64:
             case KKSAttrType::atString:
-            case KKSAttrType::atObjRef:
             case KKSAttrType::atUUID:
             case KKSAttrType::atUrl:
             {
@@ -769,8 +724,7 @@ void KKSAValWidget::setComplexVals (const QVariant& val)
                 break;
             }
             case KKSAttrType::atText:
-            //case KKSAttrType::atGeometry:
-            //case KKSAttrType::atGeometryPoly:
+            case KKSAttrType::atGeometry:
             {
                 QTextEdit * textE = qobject_cast<QTextEdit *>(aW);
                 textE->setPlainText(valW.toString());
@@ -783,16 +737,6 @@ void KKSAValWidget::setComplexVals (const QVariant& val)
                 break;
             }
             case KKSAttrType::atHistogram:
-            {
-                //ksa
-                break;
-            }
-            case KKSAttrType::atVectorLayer:
-            {
-                //ksa
-                break;
-            }
-            case KKSAttrType::atRasterLayer:
             {
                 //ksa
                 break;

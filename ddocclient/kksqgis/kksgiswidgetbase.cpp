@@ -5014,3 +5014,8 @@ void KKSGISWidgetBase::panToSelected()
 {
   mpMapCanvas->panToSelected();
 }
+
+void KKSGISWidgetBase::showIOEditor(QWidget * parent, const QString & uid)
+{
+    emit signalShowIOEditor(parent, uid);
+}

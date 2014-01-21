@@ -79,8 +79,6 @@ void KKSComplexAttrWidget :: init()
     //    atRecordColorRef
     //    atRecordTextColor
     //    atRecordTextColorRef
-    //    atVectorLayer -- они вообще в другой таблице визуализируются
-    //    atRasterLayer -- они вообще в другой таблице визуализируются
     //    atGISMap -- они вообще в другой таблице визуализируются
     //
     //    все они отфильтровываются на триггерном уровне БД
@@ -94,8 +92,6 @@ void KKSComplexAttrWidget :: init()
             pa.value()->type()->attrType() == KKSAttrType::atRecordColorRef ||
             pa.value()->type()->attrType() == KKSAttrType::atRecordTextColor ||
             pa.value()->type()->attrType() == KKSAttrType::atRecordTextColorRef ||
-            pa.value()->type()->attrType() == KKSAttrType::atVectorLayer ||
-            pa.value()->type()->attrType() == KKSAttrType::atRasterLayer ||
             pa.value()->type()->attrType() == KKSAttrType::atGISMap
           )
         {

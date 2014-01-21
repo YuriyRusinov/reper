@@ -222,7 +222,8 @@ FORMS   += \
                 ui/attr_history.ui \
                 ui/save_search_template_form.ui \
                 ui/kks_life_cycle_form.ui \
-                ui/kks_state_form.ui
+                ui/kks_state_form.ui \
+                ui/histogram_widget.ui
 
 headers.files += \
                 KKSComplexAttrWidget.h \

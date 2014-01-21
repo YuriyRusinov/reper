@@ -893,9 +893,7 @@ void KKSAttributesFactory :: putAttrWidget (KKSAttrValue* av,
         QTabWidget * tabEnc = objEditor->getRecTab();
         aw = this->createAttrCheckWidget (av, pCatType, isSystem, tabEnc, objEditor);
     }
-    else if(pCatType->attrType() == KKSAttrType::atVectorLayer || 
-            pCatType->attrType() == KKSAttrType::atRasterLayer ||
-            pCatType->attrType() == KKSAttrType::atGISMap)
+    else if(pCatType->attrType() == KKSAttrType::atGISMap)
     {
         //ksa
         QWidget * mapWidget = objEditor->getMapWidget();
@@ -1181,8 +1179,6 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
             {
                 break;
             }
-        case KKSAttrType::atObjRef:
-            break;
         case KKSAttrType::atDate:
             {
                 if (!isRef)
@@ -1243,6 +1239,42 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                     v = V.toDateTime ();
 
                 attrWidget = new KKSDateTimeEdit (av, attrClass, v);
+                qobject_cast<QDateTimeEdit *>(attrWidget)->setDisplayFormat("dd.MM.yyyy hh:mm:ss");
+                qobject_cast<QDateTimeEdit *>(attrWidget)->setReadOnly (isRef);
+                attrWidget->setMinimumHeight (20);
+                attrWidget->setSizePolicy (hPw);
+                if (!isRef)
+                    gLayout->addWidget (attrWidget, n_str, 2, 1, 1);
+                if (ch)
+                {
+                    if (V.isNull() || !V.isValid())
+                        ch->setCheckState (Qt::Unchecked);
+                    else
+                        ch->setCheckState (Qt::Checked);
+                }
+            }
+            break;
+        case KKSAttrType::atDateTimeEx:
+            {
+                if (!isRef)
+                {
+                    lTitle = this->createAttrTitle (av, attrClass, objEditor);//, av->attribute()->title(), is_mandatory);
+                    ch = this->createChDateTime (is_mandatory, gLayout, lTitle, n_str);
+                }
+                QSizePolicy hPw (QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
+                hPw.setHorizontalStretch (10);
+
+                QDateTime v;
+                if (V.isNull() || V.toString() == "current_timestamp")
+                {
+                    v = QDateTime::currentDateTime();
+                    //QVariant var(v);
+                }
+                else
+                    v = V.toDateTime ();
+
+                attrWidget = new KKSDateTimeEdit (av, attrClass, v);
+                qobject_cast<QDateTimeEdit *>(attrWidget)->setDisplayFormat("dd.MM.yyyy hh:mm:ss.zzz");
                 qobject_cast<QDateTimeEdit *>(attrWidget)->setReadOnly (isRef);
                 attrWidget->setMinimumHeight (20);
                 attrWidget->setSizePolicy (hPw);
@@ -1345,7 +1377,6 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
         case KKSAttrType::atString: 
         case KKSAttrType::atFixString: 
         case KKSAttrType::atUrl:
-        case KKSAttrType::atMaclabel:
             {
                 if (!isRef)
                 {
@@ -1525,9 +1556,9 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                 attrWidget->setMinimumHeight (20);
             }
             break;
-        /*
+        
         case KKSAttrType::atGeometry:
-        case KKSAttrType::atGeometryPoly:
+        //case KKSAttrType::atGeometryPoly:
             {
                 if (!isRef)
                 {
@@ -1546,14 +1577,14 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                 attrWidget->setMinimumHeight (20);
             }
             break;
-        */
+        
         case KKSAttrType::atHistogram:
             {
                 //ksa
                 if (!isRef)
                 {
                     lTitle = this->createAttrTitle (av, attrClass, objEditor);//, av->attribute()->title(), is_mandatory);
-                    gLayout->addWidget (lTitle, n_str, 0, 2, 2, Qt::AlignRight);
+                    gLayout->addWidget (lTitle, n_str, 0, 2, 2, Qt::AlignRight | Qt::AlignTop);
                 }
                 
                 QString v = V.toString ();
@@ -1561,6 +1592,10 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                     v = QString("");
 
                 attrWidget = new KKSHistWidget(av, attrClass);
+                
+                /*********/
+                
+                {
                 QMap<int, QString> scList;
                 scList.insert (-1, tr("All scenarios"));
                 scList.insert (1, tr("One"));
@@ -1621,11 +1656,17 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                 connect (objEditor, SIGNAL (needToUpdateHistogram (KKSValue &)), haw, SLOT (saveHist(KKSValue &)) );
                 
                 refIO->release ();
+                }
+                
+                /********/
+
                 //QToolButton *tbRef = new QToolButton ();
                 //tbRef->setMinimumHeight (20);
                 //tbRef->setText ("...");
                 //--px->setSizePolicy (hPw);
+                
                 attrWidget->setMinimumHeight (20);
+                
                 //px->setSizeAdjustPolicy (QComboBox::AdjustToMinimumContentsLength);
                 //--QHBoxLayout *hLay = new QHBoxLayout ();
                 //--hLay->addWidget (px);
@@ -1634,23 +1675,17 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                 //--gLayout->addLayout (hLay, n_str, 2, 1, 1);
                 if (!isRef)
                 {
-                    gLayout->addWidget (attrWidget, n_str, 2, 1, 2, Qt::AlignCenter);
+                    //gLayout->addWidget (attrWidget, n_str, 2, 1, 2, Qt::AlignCenter);
+                    gLayout->addWidget (attrWidget, n_str, 2, 1, 2);
+                    attrWidget->setSizePolicy (hPw);
+                    //attrWidget->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Fixed);
+                    
                     //gLayout->addWidget (tbRef, n_str, 3, 1, 1);
                 
                     //QObject::connect (tbRef, SIGNAL(pressed()), attrWidget, SLOT(openFile()));
                 }   //break;
             }
             break;
-        case KKSAttrType::atVectorLayer:
-            {
-                //ksa
-                break;
-            }
-        case KKSAttrType::atRasterLayer:
-            {
-                //ksa
-                break;
-            }
         case KKSAttrType::atGISMap:
             {
                 //ksa
@@ -1716,22 +1751,6 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                 
                     QObject::connect (tbRef, SIGNAL(pressed()), attrWidget, SLOT(openFile()));
                 }
-            }
-            break;
-        case KKSAttrType::atPoints:
-            {
-                if (!isRef)
-                {
-                    lTitle = this->createAttrTitle (av, attrClass, objEditor);//, av->attribute()->title(), is_mandatory);
-                    gLayout->addWidget (lTitle, n_str, 0, 2, 2, Qt::AlignRight | Qt::AlignTop);
-                }
-                QList<QVariant> v = V.toList();
-                attrWidget = new KKSPointTable (av, attrClass, v);
-                QSizePolicy hPwt (QSizePolicy::Expanding, QSizePolicy::Expanding);
-                attrWidget->setSizePolicy (hPwt);
-                attrWidget->setMinimumHeight (20);
-                if (!isRef)
-                    gLayout->addWidget (attrWidget, n_str, 2, 1, 1);//, Qt::AlignJustify);//Qt::AlignCenter);
             }
             break;
         case KKSAttrType::atRecordColor:
@@ -1857,9 +1876,7 @@ QWidget * KKSAttributesFactory :: createMapWidget (const KKSAttrValue * av,
     if (!av || !pCatType || !parent)
         return 0;
 
-    if (pCatType->attrType() != KKSAttrType::atVectorLayer &&
-        pCatType->attrType() != KKSAttrType::atRasterLayer &&
-        pCatType->attrType() != KKSAttrType::atGISMap)
+    if (pCatType->attrType() != KKSAttrType::atGISMap)
     {
         return 0;
     }
@@ -1880,6 +1897,7 @@ QWidget * KKSAttributesFactory :: createMapWidget (const KKSAttrValue * av,
     connect(objEditor, SIGNAL(uploadGISFiles(qint64)), attrWidget, SLOT(slotUploadGISFiles(qint64)));//в редакторе ИО нажали на кнопку "сохранить". Требуется загрузить ГИС-файлы на сервер
     connect(objEditor, SIGNAL(needToSaveGISProject(KKSValue &)), attrWidget, SLOT(slotSaveGISProject(KKSValue &)));//сохраняем проект и возвращаем его XML в виде значения KKSValue
     connect(attrWidget, SIGNAL(uploadGISFiles(bool, const QStringList &, qint64, QWidget *)), m_oef, SLOT(slotUploadGISFiles(bool, const QStringList &, qint64, QWidget *)));
+    connect(attrWidget, SIGNAL(signalShowIOEditor(QWidget *, const QString &)), m_oef, SLOT(slotShowIOEditor(QWidget *, const QString &)));
 
     attrWidget->init();
 
@@ -2155,8 +2173,6 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
                     connectToSlots (aw, wEditor);
             }
             break;
-        case KKSAttrType::atObjRef:
-            break;
         case KKSAttrType::atDate:
             {
                 QDate v;
@@ -2203,6 +2219,51 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
             }
             break;
         case KKSAttrType::atDateTime:
+            {
+                QDateTime v;
+                if (av->attribute()->isMandatory() && (V.isNull() || V.toString() == "current_timestamp"))
+                {
+                    v = QDateTime::currentDateTime();
+                    QVariant var(v);
+                    if (objEditor && !isRef)
+                        objEditor->setValue (av->id(), isSystem, var);
+                }
+                else if (!av->attribute()->isMandatory() && V.isNull())
+                {
+                    v = QDateTime();
+                    QVariant var(v);
+                    if (objEditor && !isRef)
+                        objEditor->setValue (av->id(), isSystem, var);
+                }
+                else
+                {
+                    v = V.toDateTime ();
+                    if (objEditor && !isRef)
+                        objEditor->setValue (av->id(), isSystem, V);
+                }
+
+                if (ch && objEditor)
+                {
+                    objEditor->setOpt (av->id(), isSystem, ch);
+                    objEditor->addOptWidget (av->id(), isSystem, aw);
+                }
+                bool isEnable = (!ch || ch->checkState () == Qt::Checked);
+                if (!isRef)
+                {
+                    connectToSlots (aw, wEditor);
+                    qobject_cast<QDateTimeEdit *>(aw)->setDateTime (v);
+                }
+                else
+                {
+                    KKSAttrRefWidget * rdw = qobject_cast<KKSAttrRefWidget *>(aw);
+                    QDateTimeEdit *dtEdit = rdw ? qobject_cast<QDateTimeEdit *>(rdw->getAttrWidget ()) : qobject_cast<QDateTimeEdit *> (aw);
+                    if (dtEdit)
+                        dtEdit->setDateTime (v);
+                }
+                aw->setEnabled ((!isObjExist || !av->attribute()->isReadOnly()) && isEnable);
+            }
+            break;
+        case KKSAttrType::atDateTimeEx:
             {
                 QDateTime v;
                 if (av->attribute()->isMandatory() && (V.isNull() || V.toString() == "current_timestamp"))
@@ -2329,7 +2390,6 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
         case KKSAttrType::atString: 
         case KKSAttrType::atFixString:
         case KKSAttrType::atUrl:
-        case KKSAttrType::atMaclabel:
             {
                 QString v = V.toString ();
                 if (v.isNull())
@@ -2525,24 +2585,12 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
         //ksa
         case KKSAttrType::atHistogram:
             {
+                
                 KKSHistWidget * hw = qobject_cast<KKSHistWidget *>(aw);
                 hw->setHist(V.value<KKSHistogram>());
                 if (!isRef)
                     connectToSlots (aw, wEditor);
-            }
-            break;
-        //ksa
-        case KKSAttrType::atVectorLayer:
-            {
-                if (!isRef)
-                    connectToSlots (aw, wEditor);
-            }
-            break;
-        //ksa
-        case KKSAttrType::atRasterLayer:
-            {
-                if (!isRef)
-                    connectToSlots (aw, wEditor);
+                    
             }
             break;
         //ksa
@@ -2844,8 +2892,6 @@ void KKSAttributesFactory :: addComplexAttr (KKSAttribute *a, QAbstractItemModel
     filtValues << QString::number(KKSAttrType::atRecordTextColor);
     filtValues << QString::number(KKSAttrType::atRecordTextColorRef);
     filtValues << QString::number(KKSAttrType::atComplex);
-    filtValues << QString::number(KKSAttrType::atVectorLayer);
-    filtValues << QString::number(KKSAttrType::atRasterLayer);
     filtValues << QString::number(KKSAttrType::atGISMap);
 
     const KKSFilter * f = catAttr->createFilter(1,filtValues,KKSFilter::foNotIn);

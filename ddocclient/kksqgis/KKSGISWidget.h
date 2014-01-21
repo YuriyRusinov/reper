@@ -21,6 +21,7 @@ public:
 
     virtual ~KKSGISWidget(void);
 
+
 };
 
 #endif

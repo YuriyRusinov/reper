@@ -30,6 +30,11 @@ class KKSHistogram;
 class KKSHistDrawWidget;
 class KKSValue;
 
+namespace Ui
+{
+    class histogram_widget;
+};
+
 class _GUI_EXPORT KKSHistWidget : public QWidget, public KKSAttrWidget
 {
 public:
@@ -87,21 +92,23 @@ private:
     //
     // Variables
     //
-    QLineEdit * lEFrom;
-    QLineEdit * lETo;
-    QLineEdit * lECount;
+    Ui::histogram_widget *UI;
+
+    //QLineEdit * lEFrom;
+    //QLineEdit * lETo;
+    //QLineEdit * lECount;
     
-    QComboBox * cbScenario;
-    QComboBox * cbVariant;
-    QComboBox * cbCategory;
-    QComboBox * cbIORef;
-    QComboBox * cbSource;
-    QComboBox * cbReceiver;
+    //QComboBox * cbScenario;
+    //QComboBox * cbVariant;
+    //QComboBox * cbCategory;
+    //QComboBox * cbIORef;
+    //QComboBox * cbSource;
+    //QComboBox * cbReceiver;
     
     QWidget * wHistDrawW;
     KKSHistogram * hist;
     
-    QPushButton * pbCalc;
+    //QPushButton * pbCalc;
 private:
     Q_OBJECT
 };

@@ -992,8 +992,11 @@ void KKSRubricFactory::viewAttachments(QAbstractItemModel * attachModel, const K
                     objModel->setData(wIndex, avr->value().valueVariant(), Qt::DisplayRole);
                     oe->release();
                     refObj->release();
-                } else if (av->attribute()->type()->attrType() == KKSAttrType::atDateTime)
+                } 
+                else if (av->attribute()->type()->attrType() == KKSAttrType::atDateTime)
                     objModel->setData(wIndex, QDateTime::fromString(av->value().value(), Qt::ISODate).toString("dd.MM.yyyy hh:mm:ss"), Qt::DisplayRole);
+                else if (av->attribute()->type()->attrType() == KKSAttrType::atDateTimeEx)
+                    objModel->setData(wIndex, QDateTime::fromString(av->value().value(), Qt::ISODate).toString("dd.MM.yyyy hh:mm:ss.zzz"), Qt::DisplayRole);
                 else if (av->attribute()->type()->attrType() == KKSAttrType::atTime)
                     objModel->setData(wIndex, QDateTime::fromString(av->value().value(), Qt::ISODate).toString("hh:mm:ss"), Qt::DisplayRole);
                 else if (av->attribute()->type()->attrType() == KKSAttrType::atText ||

@@ -34,6 +34,9 @@ int main(int argc, char *argv[])
 #endif
 
 
+    QString pluginsPath = QApplication::applicationDirPath() + QDir::separator() + "qtplugins";
+    QCoreApplication::addLibraryPath( pluginsPath );
+
     KKSSito *sito = NULL;
 
     QMainWindow * mainWindow = NULL;

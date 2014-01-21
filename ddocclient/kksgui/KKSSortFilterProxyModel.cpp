@@ -85,6 +85,16 @@ bool KKSSortFilterProxyModel :: lessThan (const QModelIndex & left, const QModel
                                               return QDateTime::fromString (leftData.toString(), QString("dd.MM.yyyy H:mm:ss")) < QDateTime::fromString (rightData.toString(),  QString("dd.MM.yyyy H:mm:ss"));
                                      }
                                      break;
+        case KKSAttrType::atDateTimeEx:
+                                     {
+                                          if (leftData.toString().isEmpty())
+                                              return true;
+                                          else if (rightData.toString().isEmpty())
+                                              return false;
+                                          else
+                                              return QDateTime::fromString (leftData.toString(), QString("dd.MM.yyyy H:mm:ss.zzz")) < QDateTime::fromString (rightData.toString(),  QString("dd.MM.yyyy H:mm:ss.zzz"));
+                                     }
+                                     break;
         default: return leftData.toString() < rightData.toString();
     }
     return leftData.toString() < rightData.toString();

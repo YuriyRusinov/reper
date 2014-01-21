@@ -1243,6 +1243,24 @@ void QgsIdentifyResultsDialog::featureForm()
   if ( !vlayer->getFeatures( QgsFeatureRequest().setFilterFid( fid ) ).nextFeature( f ) )
     return;
 
+  //ksa
+  const QgsFields * fields = f.fields();
+  const QgsField field = fields->field("unique_id");
+  
+  //если поле unique_id присутствует, то считаем, что слой из нашей БД. Поэтому показываем нашу форму информационного ресурса
+  if(field.type() != QVariant::Invalid){
+      
+      QVariant v = f.attribute("unique_id");
+      if(v.type() == QVariant::Invalid){
+          return;
+      }
+
+      mWorkingWidget->showIOEditor(this, v.toString());//unique_id value
+      
+      return;
+  }
+  //ksa
+  
   QgsFeatureAction action( mWorkingWidget, tr( "Attribute changes" ), f, vlayer, idx, -1, this );
   if ( vlayer->isEditable() )
   {

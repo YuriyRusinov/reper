@@ -54,6 +54,13 @@ public:
     void initQGIS();
     bool initCorrectly() const {return m_bInit;}
 
+//ksa
+public:
+    void showIOEditor(QWidget * parent, const QString & uid);
+signals:
+    void signalShowIOEditor(QWidget * parent, const QString & uid);
+//ksa
+
 public:
 
     QStatusBar * statusBar() const;

@@ -280,6 +280,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
 
     QTabWidget * tabObj = new QTabWidget (objEditorWidget);
     objEditorWidget->setTabWidget (tabObj);
+
     if (idObject == IO_IO_ID)// && idObjE > 0 )
         this->setIONameSecret (objEditorWidget, wObjE, io, nWR, mainLayout);
 
@@ -301,7 +302,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
     if (tRecAttr && !tRecAttr->attributes().isEmpty())
     {
         QScrollArea *scIndAttrs = new QScrollArea (sysRecAttrWidget);
-        scIndAttrs->setWidgetResizable (true);
+        /*!!!*/scIndAttrs->setWidgetResizable (true);
         QWidget *indWidget = new QWidget ();
         scIndAttrs->setWidget (indWidget);
         QGridLayout * gIndLay = new QGridLayout (indWidget);
@@ -387,11 +388,12 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
 
     if (wObjE->io()->id() >= 300)
         this->putRubricator(wObjE, objEditorWidget, tabObj);
+
     QScrollArea *scSysAttrs = new QScrollArea (sysAttrTabWidget);
     scSysAttrs->setWidgetResizable (true);
     QWidget *attrWidget = new QWidget ();
     QGridLayout * gAttrLay = new QGridLayout (attrWidget);
-    attrWidget->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Fixed);
+	attrWidget->setSizePolicy (QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
 
     scSysAttrs->setWidget (attrWidget);
 
@@ -437,8 +439,6 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
             pa++)
     {
          isAttrMap = isAttrMap || 
-                     pa.value()->type ()->attrType() == KKSAttrType::atVectorLayer || 
-                     pa.value()->type ()->attrType() == KKSAttrType::atRasterLayer ||
                      pa.value()->type ()->attrType() == KKSAttrType::atGISMap;
     }
     
@@ -450,8 +450,6 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
                 pa++)
         {
              isAttrMap = isAttrMap || 
-                         pa.value()->type ()->attrType() == KKSAttrType::atVectorLayer || 
-                         pa.value()->type ()->attrType() == KKSAttrType::atRasterLayer ||
                          pa.value()->type ()->attrType() == KKSAttrType::atGISMap;
         }
     }
@@ -632,10 +630,9 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
     }
 
     //системные параметры для записей пользовательских справочников
-    if(!io && wObjE->io()->id() > _MAX_SYS_IO_ID_ ){
+	if(!io && wObjE->io()->id() > _MAX_SYS_IO_ID_ ){
         this->putSystemParams(wObjE, objEditorWidget, tabObj, tabObj->count());
     }
-
 
     if (mode)
     {
@@ -644,8 +641,10 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
         buttonsLayout->addWidget (objEditorWidget->pbCancel);
         buttonsLayout->addWidget (objEditorWidget->pbApply);
     }
+	
 
     mainLayout->addLayout (buttonsLayout, 1, 1, 2, 1);
+	
     setObjConnect (objEditorWidget);
     objEditorWidget->setObjChanged (idObjE<0);//false);
 
@@ -866,8 +865,6 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditorParam (int idObject,// идент
             pa++)
     {
          isAttrMap = isAttrMap || 
-                     pa.value()->type ()->attrType() == KKSAttrType::atVectorLayer || 
-                     pa.value()->type ()->attrType() == KKSAttrType::atRasterLayer ||
                      pa.value()->type ()->attrType() == KKSAttrType::atGISMap;
     }
     
@@ -879,8 +876,6 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditorParam (int idObject,// идент
                 pa++)
         {
              isAttrMap = isAttrMap || 
-                         pa.value()->type ()->attrType() == KKSAttrType::atVectorLayer || 
-                         pa.value()->type ()->attrType() == KKSAttrType::atRasterLayer ||
                          pa.value()->type ()->attrType() == KKSAttrType::atGISMap;
         }
     }
@@ -2677,6 +2672,18 @@ KKSObjEditor* KKSObjEditorFactory :: createNewEditorParam (QWidget * editor,
     return newObjEditor;
 }
 
+void KKSObjEditorFactory :: slotShowIOEditor(QWidget * parent, const QString & uid)//from unique_id
+{
+    if(uid.isEmpty())
+        return;
+
+    int idObject = 302;
+    qint64 idRecord = 2;
+    QString s;
+
+    editExistOE(parent, idObject, idRecord, NULL, s, 0, true);
+}
+
 /*
  * слот создания редактора существующего ИО/ЭИО, являющегося элементом справочника idObject.
  * Параметры:
@@ -2688,7 +2695,15 @@ KKSObjEditor* KKSObjEditorFactory :: createNewEditorParam (QWidget * editor,
  * nTab -- номер вкладки в редакторе, где произошел вызов
  * isModal -- флаг модальности
  */
-void KKSObjEditorFactory :: editExistOE (QWidget * editor, int idObject, qint64 idObjEx, const KKSCategory * c0, QString tableName, int nTab, bool isModal, QAbstractItemModel * recModel, const QModelIndex& recIndex)
+void KKSObjEditorFactory :: editExistOE (QWidget * editor, 
+                                         int idObject, 
+                                         qint64 idObjEx, 
+                                         const KKSCategory * c0, 
+                                         QString tableName, 
+                                         int nTab, 
+                                         bool isModal, 
+                                         QAbstractItemModel * recModel, 
+                                         const QModelIndex& recIndex)
 {
     //Q_UNUSED (recIndex);
     const KKSCategory *c = 0;//t ? t->category() : 0;
@@ -2719,6 +2734,22 @@ void KKSObjEditorFactory :: editExistOE (QWidget * editor, int idObject, qint64 
     c->addRef ();
     if (qobject_cast <KKSObjEditor *>(editor))
         qobject_cast <KKSObjEditor *>(editor)->clearW ();
+
+    Qt::WindowModality windowModality;
+    QWidget *parent = 0;
+    Qt::WindowFlags flags = 0;
+    
+    if(isModal){//принудительно делаем окно редактора ИО модальным
+        windowModality = Qt::ApplicationModal;
+        parent = editor;
+        flags = Qt::Dialog;
+    }
+    else{
+        windowModality = editor ? editor->windowModality () : Qt::NonModal;
+        parent = editor ? (editor->windowModality() == Qt::NonModal ? NULL : editor) : NULL;
+        flags = editor ? editor->windowFlags() : 0;
+    }
+    
     KKSObjEditor * newObjEditor = this->createObjEditor (idObject, 
                                                          idObjEx, 
                                                          KKSList<const KKSFilterGroup*>(), 
@@ -2727,9 +2758,9 @@ void KKSObjEditorFactory :: editExistOE (QWidget * editor, int idObject, qint64 
                                                          isModal,
                                                          tableName,
                                                          false,
-                                                         editor ? editor->windowModality () : Qt::NonModal,
-                                                         editor ? (editor->windowModality() == Qt::NonModal ? NULL : editor) : NULL,
-                                                         editor->windowFlags());
+                                                         windowModality,
+                                                         parent,
+                                                         flags);
     c->release ();
     io->release();
 
@@ -2756,13 +2787,17 @@ void KKSObjEditorFactory :: editExistOE (QWidget * editor, int idObject, qint64 
     newObjEditor->setParentTab (nTab);
     newObjEditor->setAttribute (Qt::WA_DeleteOnClose);
     newObjEditor->setRecordsIndex(recIndex);
-    //qDebug () << __PRETTY_FUNCTION__ << newObjEditor->isObjChanged() << nTab;
     newObjEditor->setObjChanged (false);
-    if(editor && editor->windowModality() != Qt::NonModal){
+    
+    if(isModal){
         newObjEditor->exec();
     }
-    else
+    else if(editor && editor->windowModality() != Qt::NonModal){
+        newObjEditor->exec();
+    }
+    else{
         emit editorCreated(newObjEditor);
+    }
 }
 
 /* Метод удаляет ЭИО из соответствующего ИО-справочника.
@@ -3041,9 +3076,7 @@ int KKSObjEditorFactory :: setAttributes (const KKSTemplate *t,
         bool isAtMap = !aGroup->childGroups().isEmpty();//false;
         for (int ii=0; ii<attrs_list.count() && !isAtMap; ii++)
             isAtMap = isAtMap || 
-                      (attrs_list[ii]->type()->attrType() != KKSAttrType::atVectorLayer &&
-                       attrs_list[ii]->type()->attrType() != KKSAttrType::atRasterLayer &&
-                       attrs_list[ii]->type()->attrType() != KKSAttrType::atGISMap);
+                      attrs_list[ii]->type()->attrType() != KKSAttrType::atGISMap;
 
         if (!isAtMap && isGrouped)
             continue;
@@ -3181,9 +3214,7 @@ int KKSObjEditorFactory :: setAttributes (const KKSTemplate *t,
         bool isAtMap = false;
         for (int ii=0; ii<attrs_list.count() && !isAtMap; ii++)
             isAtMap = isAtMap || 
-                      (attrs_list[ii]->type()->attrType() != KKSAttrType::atVectorLayer && 
-                       attrs_list[ii]->type()->attrType() != KKSAttrType::atRasterLayer &&
-                       attrs_list[ii]->type()->attrType() != KKSAttrType::atGISMap);
+                      attrs_list[ii]->type()->attrType() != KKSAttrType::atGISMap;
 
         if (!isAtMap && isIOGrouped)
             continue;
@@ -3364,9 +3395,7 @@ int KKSObjEditorFactory :: setIndicators (const KKSTemplate *t,
         bool isAtMap = !aGroup->childGroups().isEmpty();//false;
         for (int ii=0; ii<attrs_list.count() && !isAtMap; ii++)
             isAtMap = isAtMap || 
-                      (attrs_list[ii]->type()->attrType() != KKSAttrType::atVectorLayer &&
-                       attrs_list[ii]->type()->attrType() != KKSAttrType::atRasterLayer &&
-                       attrs_list[ii]->type()->attrType() != KKSAttrType::atGISMap);
+                      attrs_list[ii]->type()->attrType() != KKSAttrType::atGISMap;
 
         if (!isAtMap && isGrouped)
             continue;
@@ -5179,16 +5208,6 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io,
             {
                 KKSHistogram h;
                 val = KKSValue(h.toString(), iType);
-            }
-            //ksa
-            else if (iType == KKSAttrType::atVectorLayer)
-            {
-                val = KKSValue(QString("''"), iType);
-            }
-            //ksa
-            else if (iType == KKSAttrType::atRasterLayer)
-            {
-                val = KKSValue(QString("''"), iType);
             }
             //ksa
             else if (iType == KKSAttrType::atGISMap)
@@ -9141,6 +9160,7 @@ void KKSObjEditorFactory :: putSystemParams (KKSObjectExemplar * recio,
 {
     QWidget * pSysWidget = new QWidget (editor);
     QScrollArea * scSysArea = new QScrollArea (pSysWidget);
+	scSysArea->setWidgetResizable(true);
     QGridLayout * gLaySys = new QGridLayout (pSysWidget);
     gLaySys->addWidget (scSysArea, 0, 0, 1, 1);
     QWidget * pSysPW = new QWidget ();
@@ -9399,41 +9419,13 @@ void KKSObjEditorFactory :: putRubricator (KKSObject * obj, KKSObjEditor * edito
 
 void KKSObjEditorFactory :: putRubricator (KKSObjectExemplar * eio, KKSObjEditor * editor, QTabWidget * tabObj)
 {
-    if (!eio || !editor || ! tabObj)
+    if (!eio || !editor || !tabObj || !m_rf)
         return;
-    //
-    // Рубрикатор
-    //
-    //QWidget * includesW = new QWidget ();
-    QSizePolicy iwSizePolicy (QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-    //includesW->setSizePolicy (iwSizePolicy);
-    //qDebug () << __PRETTY_FUNCTION__ << includesW->sizePolicy ();
-    //QGridLayout *gIncludesLay = new QGridLayout (includesW);
-    KKSIncludesWidget * iW = m_rf->createRubricRecEditor(eio->rootRubric(), true, false, false, true);
-            //new KKSIncludesWidget (eio->rootRubric(), true, false, false, true);// includesW);
-    iW->setSizePolicy (iwSizePolicy);
-/*    if (iW && m_rf)
-    {
-        connect (iW, SIGNAL (saveRubric (KKSRubric *, bool)), m_rf, SLOT (saveRubric (KKSRubric *, bool)) );
-        connect (iW, SIGNAL (rubricItemRequested (const KKSRubric*, bool, QAbstractItemModel *)), m_rf, SLOT (rubricItemUpload(const KKSRubric*, bool, QAbstractItemModel *)) );
-        connect (iW, SIGNAL (rubricItemCreationRequested (const KKSRubric *, QAbstractItemModel*, const QModelIndex&)), m_rf, SLOT (rubricItemCreate(const KKSRubric *, QAbstractItemModel *, const QModelIndex&)) );
-        //connect (iW, SIGNAL (openRubricItemRequested (int)), m_rf, SLOT (openRubricItem (int)) );
-        connect (iW, SIGNAL (loadStuffModel (RubricForm *)), m_rf, SLOT (loadRubricPrivilegies(RubricForm *)) );
-        connect (iW, SIGNAL (loadSearchtemplate (RubricForm *)), m_rf, SLOT (loadSearchTemplate (RubricForm *)) );
-        connect (iW, SIGNAL (loadCategory (RubricForm *)), m_rf, SLOT (loadCategory (RubricForm *)) );
-        connect (iW, SIGNAL (rubricAttachmentsView (QAbstractItemModel *, const KKSRubric *)), m_rf, SLOT (viewAttachments (QAbstractItemModel *, const KKSRubric *)) );
-        connect (iW, SIGNAL (copyFromRubr(KKSRubric *, QAbstractItemModel *, const QModelIndex&)), m_rf, SLOT (copyFromRubric (KKSRubric *, QAbstractItemModel *, const QModelIndex&)) );
-        connect (iW, SIGNAL (initAttachmentsModel (const KKSRubric *, bool)), m_rf, SLOT (initRubricAttachments (const KKSRubric *, bool)) );
-        connect (iW, SIGNAL (appendRubricItemIntoModel (QAbstractItemModel *, const KKSRubricItem * )), m_rf, SLOT (appendRubricItem (QAbstractItemModel *, const KKSRubricItem *)) );
-        //connect (iW, SIGNAL (appendRubricRecord (int, const KKSRubric *, QAbstractItemModel *, const QModelIndex& )), m_rf, SLOT (appendRecord (int, const KKSRubric *, QAbstractItemModel *, const QModelIndex& )) );
 
-        connect (m_rf, SIGNAL (rubricAttachments (QAbstractItemModel *)), iW, SLOT (slotInitAttachmentsModel (QAbstractItemModel *)) );
-//        connect (eiW, SIGNAL (loadStuffModel(RubricForm *)), m_rf, SLOT (loadRubricPrivilegies(RubricForm *)) );
-//        connect (eiW, SIGNAL (loadSearchtemplate (RubricForm *)), m_rf, SLOT (loadSearchTemplate (RubricForm *)) );
-//        connect (eiW, SIGNAL (loadCategory (RubricForm *)), m_rf, SLOT (loadCategory (RubricForm *)) );
-//        connect (eiW, SIGNAL (rubricAttachmentsView (QAbstractItemModel *, const KKSRubric *)), m_rf, SLOT (viewAttachments (QAbstractItemModel *, const KKSRubric *)) );
-    }
- */
+	//ksa QSizePolicy iwSizePolicy (QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);  
+	KKSIncludesWidget * iW = m_rf->createRubricRecEditor(eio->rootRubric(), true, false, false, true);
+    //ksa iW->setSizePolicy (iwSizePolicy);
+
     QTreeView *tv = iW->tvRubr();
     KKSEventFilter *ef = new KKSEventFilter (iW);
     tv->viewport()->installEventFilter (ef);

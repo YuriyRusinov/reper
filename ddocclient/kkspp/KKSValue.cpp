@@ -119,19 +119,11 @@ void KKSValue::verify(void) const
             m_isLiteral = true;
             m_isNull = false;
         }
+		else if(a_type == KKSAttrType::atGeometry){
+		    m_isLiteral = true;
+			m_isNull = true;
+		}
         else if(a_type == KKSAttrType::atHistogram)
-        {
-            //ksa
-            m_isLiteral = true;
-            m_isNull = true;
-        }
-        else if(a_type == KKSAttrType::atVectorLayer)
-        {
-            //ksa
-            m_isLiteral = true;
-            m_isNull = true;
-        }
-        else if(a_type == KKSAttrType::atRasterLayer)
         {
             //ksa
             m_isLiteral = true;
@@ -151,8 +143,7 @@ void KKSValue::verify(void) const
         else if (a_type == KKSAttrType::atJPG ||
                  a_type == KKSAttrType::atSVG ||
                  a_type == KKSAttrType::atVideo ||
-                 a_type == KKSAttrType::atXMLDoc ||
-                 a_type == KKSAttrType::atPoints)
+                 a_type == KKSAttrType::atXMLDoc)
         {
             m_isLiteral = true;
             m_isNull = true;
@@ -191,22 +182,6 @@ void KKSValue::verify(void) const
         return;
     }
     //ksa
-    if(a_type == KKSAttrType::atVectorLayer){
-        if(m_value.canConvert(QVariant::String)){
-            m_isValid = true;
-        }
-        m_isLiteral = true;
-        return;
-    }
-    //ksa
-    if(a_type == KKSAttrType::atRasterLayer){
-        if(m_value.canConvert(QVariant::String)){
-            m_isValid = true;
-        }
-        m_isLiteral = true;
-        return;
-    }
-    //ksa
     if(a_type == KKSAttrType::atGISMap){
         if(m_value.canConvert(QVariant::String)){
             m_isValid = true;
@@ -232,6 +207,13 @@ void KKSValue::verify(void) const
     }
 
     if(a_type == KKSAttrType::atDateTime){
+        if(m_value.canConvert(QVariant::DateTime)){
+            m_isValid = true;
+        }
+        m_isLiteral = true;
+        return;
+    }
+    if(a_type == KKSAttrType::atDateTimeEx){
         if(m_value.canConvert(QVariant::DateTime)){
             m_isValid = true;
         }
@@ -327,15 +309,6 @@ void KKSValue::verify(void) const
         return;
     }
 
-    if(a_type == KKSAttrType::atPoints){
-        //!!!!!!!!!!!!!!!!
-        //!!!!!!!!!!!!!!!!
-        //!!!!!!!!!!!!!!!!
-        m_isValid = true;
-        m_isLiteral = true;
-        return;
-    }
-
     if( a_type == KKSAttrType::atString ||
         a_type == KKSAttrType::atUrl ||
         a_type == KKSAttrType::atFixString ||
@@ -375,7 +348,7 @@ void KKSValue::verify(void) const
     //для типов int64, ссылка на информационный объект, ссылки на цвета
     //значение атрибута ВСЕГДА должно быть целочисленным (64)!
     if( a_type == KKSAttrType::atInt64 ||
-        a_type == KKSAttrType::atObjRef ||
+        //a_type == KKSAttrType::atObjRef ||
         a_type == KKSAttrType::atRecordColorRef ||
         a_type == KKSAttrType::atRecordTextColorRef
        )
@@ -433,6 +406,14 @@ void KKSValue::verify(void) const
 
     }
 
+	if(a_type == KKSAttrType::atGeometry){
+		if(m_value.canConvert(QVariant::String)){
+            m_isValid = true;
+        }
+        m_isLiteral = true;
+        return;
+    }
+
     return;
 }
 
@@ -448,14 +429,14 @@ QDateTime KKSValue::stringToDateTime(const QString & s)
 			return dt;
 
 		dt.setDate(d);
-		dt.setTime(QTime::fromString("00:00:00"));
+		dt.setTime(QTime::fromString("00:00:00.000"));
 		return dt;
 	}
     //сначала пробуем взять из указанного формата
 	if(s.contains("T"))
-		dt = QDateTime::fromString(s, "dd.MM.yyyyTHH:mm:ss");
+		dt = QDateTime::fromString(s, "dd.MM.yyyyTHH:mm:ss.zzz");
 	else
-        dt = QDateTime::fromString(s, "dd.MM.yyyy HH:mm:ss");
+        dt = QDateTime::fromString(s, "dd.MM.yyyy HH:mm:ss.zzz");
     
     if(!dt.isValid()){
         //потом попробуем взять из текущей локали
@@ -489,7 +470,7 @@ QDateTime KKSValue::stringToDateTime(const QString & s)
     // приняв текущую дату за основу.
     //
     QTime _t;
-    _t = QTime::fromString (s, "HH:mm:ss");
+    _t = QTime::fromString (s, "HH:mm:ss.zzz");
 
     if(!_t.isValid()){
         //потом попробуем взять из текущей локали
@@ -556,7 +537,7 @@ QTime KKSValue::stringToTime(const QString & s)
 {
 
     QTime _t;
-    _t = QTime::fromString (s, "HH:mm:ss");
+    _t = QTime::fromString (s, "HH:mm:ss.zzz");
 
     if(!_t.isValid()){
         //потом попробуем взять из текущей локали
@@ -579,8 +560,9 @@ int KKSValue::setValue(const QString & _value, int _type)
     m_type = _type;
 
     KKSAttrType::KKSAttrTypes a_type = (KKSAttrType::KKSAttrTypes) m_type;
-    if(a_type == KKSAttrType::atDateTime &&
-       _value != "current_timestamp")
+    
+    if((a_type == KKSAttrType::atDateTime || a_type == KKSAttrType::atDateTimeEx)
+         && _value != "current_timestamp")
     {
         if(_value.isEmpty()){
             m_value = _value;
@@ -612,28 +594,7 @@ int KKSValue::setValue(const QString & _value, int _type)
         
         m_value = m_value.fromValue<KKSHistogram>(h);
     }
-    //ksa
-    else if(a_type == KKSAttrType::atVectorLayer){
-        if(_value.isEmpty()){
-            m_value = _value;
-            m_columnValue = value();
-            verify();
-            return OK_CODE;
-        }
 
-        m_value = _value;
-    }
-    //ksa
-    else if(a_type == KKSAttrType::atRasterLayer){
-        if(_value.isEmpty()){
-            m_value = _value;
-            m_columnValue = value();
-            verify();
-            return OK_CODE;
-        }
-
-        m_value = _value;
-    }
     //ksa
     else if(a_type == KKSAttrType::atGISMap){
         if(_value.isEmpty()){
@@ -755,68 +716,7 @@ int KKSValue::setValue(const QString & _value, int _type)
             m_value = sl;
         }
     }
-    else if(a_type == KKSAttrType::atPoints)
-    {
-        //
-        // данные по набору точек являются массивом QPointF
-        //
-        //m_value = _value;
-        // Серега не прав
-        QString v (_value);
-        if (v.size()>0 && v.at(0) == '{')
-        {
-            v.remove (0, 1);
-            v.remove (v.length()-1, 1);
-        }
-        if (v.startsWith ("\""))
-        {
-            v.remove (0, 1);
-            v.remove (v.length()-1, 1);
-        }
 
-        QRegExp rx ("\",\"");
-        QStringList sl = v.split (rx, QString::SkipEmptyParts);
-        //qDebug () << __PRETTY_FUNCTION__ << sl << v << rx;
-        if (sl.isEmpty())
-        {
-            m_value = QVariant();
-            return OK_CODE;
-        }
-        QList<QPointF> pList;
-        QList<QVariant> pvList;
-        for (int i=0; i<sl.count(); i++)
-        {
-            QString v_str = sl[i];
-            if (v_str.startsWith ("("))
-            {
-                v_str.remove (0, 1);
-                v_str.remove (v_str.length()-1, 1);
-            }
-            QStringList wsl = v_str.split (",");
-            if (wsl.count() < 2)
-            {
-                m_value = QVariant();
-                return OK_CODE;
-            }
-            bool ok_x;
-            bool ok_y;
-            double x = wsl[0].toDouble (&ok_x);
-            double y = wsl[1].toDouble (&ok_y);
-            if (ok_x && ok_y)
-            {
-                QPointF p (x, y);
-                pList.append (p);
-                QVariant vp (p);
-                pvList.append (vp);
-            }
-            else
-            {
-                m_value = QVariant();
-                return OK_CODE;
-            }
-        }
-        m_value = QVariant (pvList);
-    }
     else if (a_type == KKSAttrType::atRecordColor ||
              a_type == KKSAttrType::atRecordTextColor)
     {
@@ -863,14 +763,6 @@ QString KKSValue::value(void) const
         KKSHistogram h = m_value.value<KKSHistogram>();
 
         return h.toString();
-    }
-    //ksa
-    if(m_type == KKSAttrType::atVectorLayer){
-        return m_value.toString();
-    }
-    //ksa
-    if(m_type == KKSAttrType::atRasterLayer){
-        return m_value.toString();
     }
     //ksa
     if(m_type == KKSAttrType::atGISMap){
@@ -924,6 +816,7 @@ QString KKSValue::valueForInsert() const
 
 
     if(a_type == KKSAttrType::atDateTime ||
+       a_type == KKSAttrType::atDateTimeEx ||
        a_type == KKSAttrType::atDate
        )
     {
@@ -932,8 +825,8 @@ QString KKSValue::valueForInsert() const
             return tVal + "::timestamp";
         }
         QDateTime dt = m_value.toDateTime();
-        tVal = dt.toString("dd.MM.yyyy hh:mm:ss");
-        val = QString("to_timestamp('%1', 'DD.MM.YYYY HH24:MI:SS')::timestamp").arg(tVal);
+        tVal = dt.toString("dd.MM.yyyy hh:mm:ss.zzz");
+        val = QString("to_timestamp('%1', 'DD.MM.YYYY HH24:MI:SS.MS')::timestamp").arg(tVal);
         return val;
     }
     else if (a_type == KKSAttrType::atTime)
@@ -945,7 +838,7 @@ QString KKSValue::valueForInsert() const
             return tVal + "::timestamp";
         }
         QTime dt = m_value.toTime();
-        tVal = dt.toString("hh:mm:ss");
+        tVal = dt.toString("hh:mm:ss.zzz");
         val = QString("to_time('%1')").arg(tVal);
         return val;
     }
@@ -984,27 +877,6 @@ QString KKSValue::valueForInsert() const
         return val;
     }
 
-    if (a_type == KKSAttrType::atPoints)
-    {
-        QList<QVariant> pList = m_value.toList();
-        if (pList.isEmpty())
-            return "NULL";
-
-        int np = pList.count();
-        val = QString ("'{");
-        for (int i=0; i<np; i++)
-        {
-            QPointF p = pList[i].toPointF ();
-            if (p.isNull())
-                return "NULL";
-            val += QString("\"(%1,%2)\"").arg (p.x()).arg(p.y());
-            if (i<np-1)
-                val+= QString (",");
-        }
-        val += QString ("}'");
-        return val;
-    }
-
     if (a_type == KKSAttrType::atRecordColor ||
         a_type == KKSAttrType::atRecordTextColor)
     {
@@ -1029,9 +901,7 @@ QString KKSValue::valueForInsert() const
         return escVal;
     }
 
-    if (a_type == KKSAttrType::atVectorLayer ||
-        a_type == KKSAttrType::atGISMap ||
-        a_type == KKSAttrType::atRasterLayer ||
+    if (a_type == KKSAttrType::atGISMap ||
         a_type == KKSAttrType::atHistogram)
     {
         QString sVal (value());
@@ -1059,7 +929,12 @@ QString KKSValue::valueForInsert() const
         return val;
     }
 
-    if(isLiteral())
+    if(a_type == KKSAttrType::atGeometry){
+		val += QString("'%1'::geometry").arg(value());
+        return val;
+    }
+
+	if(isLiteral())
         val += QString("'%1'").arg(value());
     else
         val = value();

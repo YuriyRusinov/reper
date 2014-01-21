@@ -115,7 +115,6 @@ KKSAttrEditor :: KKSAttrEditor (KKSAttribute *attr,
               << KKSAttrType::atCheckListEx 
               << KKSAttrType::atRecordColorRef
               << KKSAttrType::atRecordTextColorRef
-              << KKSAttrType::atObjRef
               << KKSAttrType::atHistogram; //ksa
 
 
@@ -213,12 +212,7 @@ void KKSAttrEditor :: accept ()
         attribute->setTableName ("");
         attribute->setColumnName (ui->cbRefField->currentText());
     }
-    if (attribute->type ()->attrType() == KKSAttrType::atObjRef)
-    {
-        attribute->setTableName(io->tableName());
-        attribute->setColumnName(ui->cbRefField->currentText());
-    }
-    // attribute->setDesc (lEDesc->text());
+
     //
     // При существующем атрибуте тип изменен быть не может,
     // а при создании нового атрибута посылается соответствующий сигнал.

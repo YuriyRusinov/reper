@@ -54,7 +54,7 @@ void KKSAttrType::setAttrType()
         case 4: m_attrType = atDate;  break;              //дата
         case 5: m_attrType = atDateTime;  break;          //дата-время
         case 6: m_attrType = atDouble; break;             //дробное значение
-        case 7: m_attrType = atObjRef;  break;            //ссылка на информационный объект
+        //case 7: m_attrType = atObjRef;  break;            //ссылка на информационный объект
         case 8: m_attrType = atInt;  break;               //целочисленное
         case 9: m_attrType = atString;  break;            //строка
         case 10: m_attrType = atInterval; break;          //временной интервал (лет, месяцев, дней)
@@ -63,27 +63,28 @@ void KKSAttrType::setAttrType()
         case 13: m_attrType = atText; break;              //Текст
         case 14: m_attrType = atFixString; break;         //Строка фиксированной длины
         case 15: m_attrType = atJPG; break;               //Изображение JPG
-        case 16: m_attrType = atMaclabel; break;          //Мандатная метка
+        //case 16: m_attrType = atMaclabel; break;          //Мандатная метка
         case 17: m_attrType = atCheckListEx; break;       //Набор элементов справочника (модернизированный)
         case 18: m_attrType = atRecordColor; break;       //Цветовая гамма фона записи справочника (при отображении в списке)
         case 19: m_attrType = atRecordColorRef;break;     //Ссылка на цвет фона записи (при отображении в списке)
         case 20: m_attrType = atXMLDoc;break;             //XML-документ
         case 21: m_attrType = atIntervalH;break;          //временной интервал (часов, минут, секунд)
-        case 22: m_attrType = atPoints;break;             //Набор пространственных точек
+        //case 22: m_attrType = atPoints;break;             //Набор пространственных точек
         case 23: m_attrType = atSVG;break;                //Объект SVG
         case 24: m_attrType = atVideo;break;              //Видео-ролик
         case 25: m_attrType = atRecordTextColor; break;   //Цветовая гамма текста записи справочника (при отображении в списке)
         case 26: m_attrType = atRecordTextColorRef;break; //Ссылка на цвет текста записи (при отображении в списке)
         case 27: m_attrType = atTime; break;              //время
-        //case 28: m_attrType = atGeometry; break;          //ГИС-объект (базовый)
+        case 28: m_attrType = atGeometry; break;          //ГИС-объект
         //case 29: m_attrType = atGeometryPoly; break;      //ГИС-объект (стандартный полигон)
         case 30: m_attrType = atInt64; break;             //целочисленное (64 бита)
         case 31: m_attrType = atUUID; break;              //уникальный идентификатор (UUID)
         case 32: m_attrType = atComplex; break;           //составной атрибут
         case 33: m_attrType = atHistogram; break;         //Гистограмма
-        case 34: m_attrType = atVectorLayer; break;       //ГИС-объект (Векторный слой)
-        case 35: m_attrType = atRasterLayer; break;       //ГИС-объект (Растровый слой)
+        //case 34: m_attrType = atVectorLayer; break;       //ГИС-объект (Векторный слой)
+        //case 35: m_attrType = atRasterLayer; break;       //ГИС-объект (Растровый слой)
         case 36: m_attrType = atGISMap; break;            //ГИС-объект (Карта)
+        case 37: m_attrType = atDateTimeEx; break;        //Дата-время (с миллисекундами)
 
         default: m_attrType = atUserDef; break;           //пользовательский (for future use)
     }

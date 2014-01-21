@@ -2378,7 +2378,7 @@ QByteArray JKKSLoader :: readFilePartData(const QString & absUrl, qint64 blockSi
 QMap<qint64, JKKSIOUrl> JKKSLoader :: readDocumentFiles (qint64 idObject, qint64 idOrganization) const
 {
     QMap<qint64, JKKSIOUrl> urls;
-    QString sql = QString ("select * from ioGetFiles (%1);").arg (idObject);
+    QString sql = QString ("select * from ioGetAllFiles (%1);").arg (idObject);
     KKSResult *res = dbRead->execute (sql);
 
     if (res)
@@ -4443,10 +4443,12 @@ QPair<qint64, qint64> JKKSLoader :: getIDMap (const QString& ref_uid, const JKKS
                             .arg (escVal)//.isEmpty() ? "NULL::varchar" : value)
                             .arg (i < nAttrsV-1 ? QString (",") : QString ("]"));
         }
-        else
+        else{
             attrs_vals += QString("'%1'%2")
                             .arg (value)//.isEmpty() ? "NULL::varchar" : value)
                             .arg (i < nAttrsV-1 ? QString (",") : QString ("]"));
+        }
+
         i++;
     }
 

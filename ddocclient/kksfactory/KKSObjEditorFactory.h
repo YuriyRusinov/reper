@@ -276,6 +276,8 @@ public slots:
                       const QModelIndex& recIndex=QModelIndex());
     int deleteOE (QWidget * editor, int idObject, qint64 idObjEx, QString tableName, QAbstractItemModel * recModel, const QModelIndex& pRecIndex);
     
+    void slotShowIOEditor(QWidget * parent, const QString & uid);//from unique_id
+
     void addAttrSearchTemplate (void);
     void editAttrSearchTemplate (void);
     void delAttrSearchTemplate (void);

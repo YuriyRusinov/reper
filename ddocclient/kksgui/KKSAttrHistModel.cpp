@@ -109,14 +109,6 @@ QVariant KKSAttrHistModel::data (const QModelIndex& index, int role) const
                                 (rt && rt->attrType() == KKSAttrType::atHistogram)
                                )
                             return tr("<Histogram data %1>").arg(iRow);
-                        else if( tId == KKSAttrType::atVectorLayer || 
-                                (rt && rt->attrType() == KKSAttrType::atVectorLayer)
-                               )
-                            return tr("<Vector layer data %1>").arg(iRow);
-                        else if( tId == KKSAttrType::atRasterLayer || 
-                                (rt && rt->attrType() == KKSAttrType::atRasterLayer)
-                               )
-                            return tr("<Raster layer data %1>").arg(iRow);
                         else if( tId == KKSAttrType::atGISMap || 
                                 (rt && rt->attrType() == KKSAttrType::atGISMap)
                                )

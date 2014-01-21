@@ -45,11 +45,11 @@ QString KKSResult::getCellAsString( int row, int column, bool * ok ) const
     if(ok)
         *ok = TRUE;
     
-    //if(getColumnDataType(column) == dtTimestamp){
-    //    QDateTime dt = v.toDateTime();
-    //    QString s = dt.toString("dd.MM.yyyy H:mm:ss");
-    //    return s;
-    //}
+    if(getColumnDataType(column) == dtTimestamp){
+        QDateTime dt = v.toDateTime();
+        QString s = dt.toString("dd.MM.yyyy hh:mm:ss.zzz");
+        return s;
+    }
 
     if(v.type() == QVariant::StringList){
         QStringList sl = v.toStringList();

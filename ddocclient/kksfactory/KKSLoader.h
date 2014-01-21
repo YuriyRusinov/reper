@@ -113,7 +113,7 @@ class _F_EXPORT KKSLoader
         
         KKSMap<qint64, KKSEIOData *> loadRecList (const KKSRubric * r) const;
         
-        KKSEIOData * loadEIOInfo (int idObject, int idRec) const;
+        KKSEIOData * loadEIOInfo (int idObject, qint64 idRec) const;
         
         //
         // просто данные в этих методах возвращаются в виде QList, а не QMap

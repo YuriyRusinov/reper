@@ -451,8 +451,6 @@ KKSMap<int, KKSCategoryAttr *> KKSLoader::loadCategoryAttrs(int idCategory) cons
 
         //параметры атрибута в категории
         //дефолтное значение
-        if (attr->type()->attrType() == KKSAttrType::atPoints)
-            qDebug () << __PRETTY_FUNCTION__ << attr->id() << res->getCellAsString(row, 10);
         KKSValue defValue = constructValue(res->getCellAsString(row, 10), attr);
         if(!defValue.isValid())
             qWarning("defValue for attribute is NOT valid! defValue = %s, idCategory = %d, idAttribute = %d", 
@@ -654,6 +652,10 @@ KKSValue  KKSLoader::constructValue(const QString & value,
                        //     .arg (cName)
                        //     .arg (tName)
                        //     .arg (h.srcObject()->id());
+                QString("select %1 from %2;").arg(cName).arg(tName);
+        
+        
+        
         QString hsql = QString ("select * from histogram('%1', %2, %3, %4);").arg (valSql).arg(h.getXMin()).arg(h.getXMax()).arg (h.size());
         qDebug () << __PRETTY_FUNCTION__ << valSql << hsql;
         KKSResult * hRes = db->execute (hsql);
@@ -1329,7 +1331,7 @@ KKSAttrType * KKSLoader::loadAttrType(KKSAttrType::KKSAttrTypes type) const
         case KKSAttrType::atDate: id = 4;  break;               //дата
         case KKSAttrType::atDateTime: id = 5;  break;           //дата-время
         case KKSAttrType::atDouble: id = 6; break;              //дробное значение
-        case KKSAttrType::atObjRef: id = 7; break;              //ссылка на информационный объект
+        //case KKSAttrType::atObjRef: id = 7; break;              //ссылка на информационный объект
         case KKSAttrType::atInt: id = 8;  break;                //целочисленное
         case KKSAttrType::atString: id = 9;  break;             //строка
         case KKSAttrType::atInterval: id = 10; break;           //временной интервал (лет, месяцев, дней, часов, минут)
@@ -1338,27 +1340,28 @@ KKSAttrType * KKSLoader::loadAttrType(KKSAttrType::KKSAttrTypes type) const
         case KKSAttrType::atText: id = 13; break;               //Текст
         case KKSAttrType::atFixString: id = 14; break;          //Строка фиксированной длины
         case KKSAttrType::atJPG: id = 15; break;                //изображение JPG
-        case KKSAttrType::atMaclabel: id = 16; break;           //Мандатная метка
+        //case KKSAttrType::atMaclabel: id = 16; break;           //Мандатная метка
         case KKSAttrType::atCheckListEx: id = 17; break;        //набор значений справочника
         case KKSAttrType::atRecordColor: id = 18; break;        //Цветовая гамма фона записи справочника (при отображении в списке)
         case KKSAttrType::atRecordColorRef: id = 19; break;     //Ссылка на цвет фона записи (при отображении в списке)
         case KKSAttrType::atXMLDoc: id = 20; break;             //XML-документ
         case KKSAttrType::atIntervalH: id = 21; break;          //временной интервал (часов, минут, секунд)
-        case KKSAttrType::atPoints: id = 22; break;             //Набор пространственных точек
+        //case KKSAttrType::atPoints: id = 22; break;             //Набор пространственных точек
         case KKSAttrType::atSVG: id = 23; break;                //Объект SVG
         case KKSAttrType::atVideo: id = 24; break;              //Видео-ролик
         case KKSAttrType::atRecordTextColor: id = 25; break;    //Цветовая гамма текста записи справочника (при отображении в списке)
         case KKSAttrType::atRecordTextColorRef: id = 26; break; //Ссылка на цвет текста записи (при отображении в списке)
         case KKSAttrType::atTime: id = 27;  break;              //время
-        //case KKSAttrType::atGeometry: id = 28; break;           //ГИС-объект (базовый)
+        case KKSAttrType::atGeometry: id = 28; break;           //ГИС-объект
         //case KKSAttrType::atGeometryPoly: id = 29; break;       //ГИС-объект (стандартный полигон)
         case KKSAttrType::atInt64: id = 30; break;              //целочисленное (64 бита)
         case KKSAttrType::atUUID: id = 31; break;               //уникальный идентификатор (UUID)
         case KKSAttrType::atComplex: id = 32; break;            //Составной атрибут
         case KKSAttrType::atHistogram: id = 33; break;          //Гистограмма
-        case KKSAttrType::atVectorLayer: id = 34; break;        //ГИС-объект (векторный слой)
-        case KKSAttrType::atRasterLayer: id = 35; break;        //ГИС-объект (растровый слой)
+        //case KKSAttrType::atVectorLayer: id = 34; break;        //ГИС-объект (векторный слой)
+        //case KKSAttrType::atRasterLayer: id = 35; break;        //ГИС-объект (растровый слой)
         case KKSAttrType::atGISMap: id = 36; break;             //ГИС-объект (карта)
+        case KKSAttrType::atDateTimeEx: id = 37; break;             //Дата-время (с миллисекундами)
     }
 
     KKSAttrType * aType = loadAttrType(id);
@@ -1977,8 +1980,6 @@ KKSMap<int, KKSAttrGroup *> KKSLoader::loadTemplateAttrsGroups(int idTemplate) c
             //
             attr->KKSAttrView::setReadOnly (res->getCellAsBool(row, 12));
             attr->KKSAttrView::setOrder (res->getCellAsInt(row, 13));
-            if (attr->type()->attrType() == KKSAttrType::atPoints)
-                qDebug () << __PRETTY_FUNCTION__ << attr->id() << res->getCellAsString(row, 14);
             KKSValue defValue = constructValue (res->getCellAsString(row, 14), attr);
             if (!defValue.isValid())
                 qWarning("defValue for attribute is NOT valid! defValue = %s, idTemplate = %d, idAttribute = %d", 
@@ -2393,7 +2394,7 @@ KKSList<KKSEIOData *> KKSLoader::loadEIOList1(const KKSObject * io,
     return eioList;
 }
 
-KKSEIOData * KKSLoader::loadEIOInfo (int idObject, int idRec) const
+KKSEIOData * KKSLoader::loadEIOInfo (int idObject, qint64 idRec) const
 {
     KKSObject * io = loadIO (idObject, true);
     if (!io ||
@@ -2524,9 +2525,17 @@ KKSMap<qint64, KKSEIOData *> KKSLoader::loadEIOList(const KKSCategory * c0,
             }
 
             if(res->getColumnDataType(column) == KKSResult::dtTimestamp){
-                KKSValue v(value, KKSAttrType::atDateTime);
+                KKSValue v;
+                if(a->type()->attrType() == KKSAttrType::atDateTime)
+                    v = KKSValue(value, KKSAttrType::atDateTime);
+                else
+                    v = KKSValue(value, KKSAttrType::atDateTimeEx);
+
                 QDateTime dt = v.valueVariant().toDateTime();
-                value = dt.toString("dd.MM.yyyy hh:mm:ss");
+                if(a->type()->attrType() == KKSAttrType::atDateTime)
+                    value = dt.toString("dd.MM.yyyy hh:mm:ss");
+                else
+                    value = dt.toString("dd.MM.yyyy hh:mm:ss.zzz");
             }
 
             int ier = 0;
@@ -2657,9 +2666,17 @@ KKSList<KKSEIOData *> KKSLoader::loadEIOList1(const KKSCategory * c0,
             }
 
             if(res->getColumnDataType(column) == KKSResult::dtTimestamp){
-                KKSValue v(value, KKSAttrType::atDateTime);
+                KKSValue v;
+                if(a->type()->attrType() == KKSAttrType::atDateTime)
+                    v = KKSValue(value, KKSAttrType::atDateTime);
+                else
+                    v = KKSValue(value, KKSAttrType::atDateTimeEx);
+                
                 QDateTime dt = v.valueVariant().toDateTime();
-                value = dt.toString("dd.MM.yyyy hh:mm:ss");
+                if(a->type()->attrType() == KKSAttrType::atDateTime)
+                    value = dt.toString("dd.MM.yyyy hh:mm:ss");
+                else
+                    value = dt.toString("dd.MM.yyyy hh:mm:ss.zzz");
             }
 
             int ier = 0;

@@ -4,6 +4,7 @@
 #include <libpq-fe.h>
 #include <QVariant>
 #include <QByteArray>
+#include <QDebug>
 
 KKSPGResult::KKSPGResult( PGresult * _res)
 {
@@ -68,8 +69,12 @@ QVariant KKSPGResult::getCell( int row, int column ) const
         if(oid == pgTIMESTAMPOID){
             const char * d = PQgetvalue(res, row, column);
             QDateTime dt = QDateTime::fromString(d, Qt::ISODate);
+            //QString d = QString::fromUtf8(PQgetvalue( res, row, column ));
+            //d = d.left(d.length()-2);
+            //QDateTime dt = QDateTime::fromString(d, "yyyy-MM-dd hh:mm:ss.zzz");
             if(!dt.isValid())
-                qWarning("Datetime is invalid in KKSPGResult!");
+                qWarning() << QString("Datetime is invalid in KKSPGResult! String = %1").arg(d);
+            
             return QVariant(dt);
         }
         return QVariant(QString::fromUtf8(PQgetvalue( res, row, column )));
