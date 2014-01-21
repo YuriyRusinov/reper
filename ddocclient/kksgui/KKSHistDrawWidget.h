@@ -26,6 +26,7 @@ public:
     virtual ~KKSHistDrawWidget();
 
     void setData (const QMap<int, double>& hData);
+	virtual QSize sizeHint() const;
 
 protected:
     //

@@ -48,9 +48,14 @@ void KKSHistDrawWidget::paintEvent(QPaintEvent *event)
     wCharts = new KKSCharts;
     wCharts->setType(KKSCharts::Histogramm);
     //ksa wCharts->setCords(100,100,this->width()/1.5,this->height()/1.5);
-    wCharts->setCords(100,100,this->width(),this->height()/1.5);
+	//int w = parentWidget()->width();
+	//int h = parentWidget()->height();
+	int w1 = width();
+	int h1 = height();
+	wCharts->setCords(20, 20, w1-40, h1-40);
     int i = 0;
     int n = colors.size();
+
     for (QMap<int, double>::const_iterator p=m_data.constBegin();
             p != m_data.constEnd();
             p++)
@@ -64,6 +69,14 @@ void KKSHistDrawWidget::paintEvent(QPaintEvent *event)
     wCharts = 0;
 }
 
+QSize KKSHistDrawWidget :: sizeHint (void) const
+{
+    if (parentWidget())
+        return parentWidget()->size();
+    
+	return QWidget::sizeHint ();
+}
+
 void KKSHistDrawWidget::setData (const QMap<int, double>& hData)
 {
     m_data = hData;
@@ -74,5 +87,6 @@ void KKSHistDrawWidget::setData (const QMap<int, double>& hData)
     {
         maxVal = qMax (maxVal, p.value ());
     }
+
     show ();
 }

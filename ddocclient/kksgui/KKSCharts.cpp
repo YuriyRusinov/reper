@@ -323,6 +323,7 @@ int KKSCharts::draw(QPainter *painter)
             painter->drawLine(cX-3,cY+cH/10*i,cX+3,cY+cH/10*i);    //деления по оси Y
             //painter->drawText(cX-20,cY+cH/10*i,QString::number((10-i)*10)+"%");
         }
+
         painter->drawLine(cX,cY+cH,cX,cY);         //ось Y
         painter->drawLine(cX,cY,cX+4,cY+10);       //стрелки
         painter->drawLine(cX,cY,cX-4,cY+10);

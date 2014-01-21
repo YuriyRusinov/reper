@@ -1676,8 +1676,9 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                 if (!isRef)
                 {
                     //gLayout->addWidget (attrWidget, n_str, 2, 1, 2, Qt::AlignCenter);
-                    gLayout->addWidget (attrWidget, n_str, 2, 1, 2);
+                    gLayout->addWidget (attrWidget, n_str, 2, 1, 1);
                     attrWidget->setSizePolicy (hPw);
+					((KKSHistWidget*)attrWidget)->init();
                     //attrWidget->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Fixed);
                     
                     //gLayout->addWidget (tbRef, n_str, 3, 1, 1);

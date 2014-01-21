@@ -118,18 +118,25 @@ void KKSHistWidget::paintEvent(QPaintEvent *event)
 void KKSHistWidget::init (void)
 {
     
-    UI->wHistogramParent->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    QHBoxLayout * hHistLay = new QHBoxLayout(UI->wHistogramParent);
-    wHistDrawW = new KKSHistDrawWidget (UI->wHistogramParent);//,
+    //UI->wHistogramParent->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	//UI->wHistogramParent->setMinimumSize(600, 400);
+    
+	QHBoxLayout * hHistLay = new QHBoxLayout(UI->gbView);
+	wHistDrawW = new KKSHistDrawWidget (UI->gbView);//,
                                            //Qt::Window | 
                                            //Qt::WindowTitleHint | 
                                            //Qt::WindowSystemMenuHint | 
                                            //Qt::WindowMinimizeButtonHint | 
                                            //Qt::WindowMaximizeButtonHint | 
                                            //Qt::WindowSoftkeysRespondHint);
-    wHistDrawW->setMinimumSize(600, 400);
 
+	wHistDrawW->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	//wHistDrawW->resize(UI->gbView->size());
+	//wHistDrawW->setMinimumSize(600, 400);
     hHistLay->addWidget(wHistDrawW);
+	UI->gbView->setLayout(hHistLay);
+	wHistDrawW->setLayout(new QHBoxLayout(wHistDrawW));
+	//wHistDrawW->repaint();
 
 
     QValidator * dFromVal = new QDoubleValidator (this);
