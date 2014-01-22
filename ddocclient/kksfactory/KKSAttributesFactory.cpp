@@ -1597,13 +1597,27 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                 
                 {
                 QMap<int, QString> scList;
-                scList.insert (-1, tr("All scenarios"));
-                scList.insert (1, tr("One"));
+                //scList.insert (1, tr("One"));
+                KKSList<const KKSFilterGroup *> filters;
+                KKSObject * refSc = loader->loadIO (IO_SCENARIO_ID, true);
+                KKSMap<qint64, KKSEIOData *> scMaps = loader->loadEIOList(refSc, filters);
+                for (KKSMap<qint64, KKSEIOData *>::const_iterator p = scMaps.constBegin();
+                        p != scMaps.constEnd();
+                        p++)
+                {
+                    scList.insert (p.key(), p.value()->fields().value("name"));
+                }
+                refSc->release ();
                 KKSHistWidget * haw = qobject_cast <KKSHistWidget *>(attrWidget);
                 haw->loadScenario (scList);
                 QMap<int, QString> vList;
-                vList.insert (-1, tr("All variants"));
-                vList.insert (1, tr ("1st variant"));
+                KKSObject * refVar = loader->loadIO (IO_VARIANT_ID, true);
+                KKSMap<qint64, KKSEIOData *> vMaps = loader->loadEIOList(refVar, filters);
+                for (KKSMap<qint64, KKSEIOData *>::const_iterator p = vMaps.constBegin();
+                        p != vMaps.constEnd();
+                        p++)
+                    vList.insert (p.key(), p.value()->fields().value("name"));
+                refVar->release ();
                 haw->loadVariants (vList);
                 KKSMap<int, KKSCategory *> cats;
                 KKSObject * refCats = loader->loadIO(IO_CAT_ID);
@@ -1614,7 +1628,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                 KKSFilterGroup * fg = new KKSFilterGroup (true);
                 fg->addFilter (f);
                 f->release ();
-                KKSList<const KKSFilterGroup *> filters;
+                filters.clear ();
                 filters.append (fg);
                 fg->release ();
                 KKSMap<qint64, KKSEIOData *> catMaps = loader->loadEIOList (refCats, filters);
