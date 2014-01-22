@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>815</width>
-    <height>786</height>
+    <width>808</width>
+    <height>290</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -114,7 +114,7 @@
             <item>
              <widget class="QPushButton" name="pbUpdate">
               <property name="text">
-               <string>Update</string>
+               <string>Show Histogram</string>
               </property>
              </widget>
             </item>
@@ -395,29 +395,6 @@
        </widget>
       </item>
      </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="gbView">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="autoFillBackground">
-      <bool>false</bool>
-     </property>
-     <property name="title">
-      <string>View</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_7"/>
     </widget>
    </item>
   </layout>

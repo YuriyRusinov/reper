@@ -37,22 +37,22 @@ KKSHistDrawWidget::KKSHistDrawWidget(QWidget * parent, Qt::WindowFlags flags)
 
 KKSHistDrawWidget::~KKSHistDrawWidget()
 {
+
 }
 
 void KKSHistDrawWidget::paintEvent(QPaintEvent *event)
 {
-    //qDebug () << __PRETTY_FUNCTION__ ;
     QWidget::paintEvent (event);
     QPainter painter;
     painter.begin(this);
+    
     wCharts = new KKSCharts;
     wCharts->setType(KKSCharts::Histogramm);
-    //ksa wCharts->setCords(100,100,this->width()/1.5,this->height()/1.5);
-	//int w = parentWidget()->width();
-	//int h = parentWidget()->height();
+
 	int w1 = width();
 	int h1 = height();
 	wCharts->setCords(20, 20, w1-40, h1-40);
+
     int i = 0;
     int n = colors.size();
 
@@ -63,8 +63,10 @@ void KKSHistDrawWidget::paintEvent(QPaintEvent *event)
         wCharts->addPiece(QString::number(p.key()), colors[i%n], p.value()/maxVal*100);
         i++;
     }
+    
     wCharts->draw(&painter);
     painter.end();
+    
     delete wCharts;
     wCharts = 0;
 }
@@ -88,5 +90,5 @@ void KKSHistDrawWidget::setData (const QMap<int, double>& hData)
         maxVal = qMax (maxVal, p.value ());
     }
 
-    show ();
+    //show ();
 }

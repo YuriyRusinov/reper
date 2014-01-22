@@ -95,22 +95,10 @@ private:
     // Variables
     //
     Ui::histogram_widget *UI;
-
-    //QLineEdit * lEFrom;
-    //QLineEdit * lETo;
-    //QLineEdit * lECount;
-    
-    //QComboBox * cbScenario;
-    //QComboBox * cbVariant;
-    //QComboBox * cbCategory;
-    //QComboBox * cbIORef;
-    //QComboBox * cbSource;
-    //QComboBox * cbReceiver;
-    
+ 
     QWidget * wHistDrawW;
     KKSHistogram * hist;
-    
-    //QPushButton * pbCalc;
+
 private:
     Q_OBJECT
 };

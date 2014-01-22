@@ -32,20 +32,8 @@
 
 KKSHistWidget::KKSHistWidget(const KKSAttrValue *av, KKSIndAttrClass isSys, QWidget * parent, Qt::WindowFlags flags)
     : QWidget (parent, flags), KKSAttrWidget(av, isSys),
-/*
-    lEFrom (new QLineEdit),
-    lETo (new QLineEdit),
-    lECount (new QLineEdit),
-    cbScenario (new QComboBox),
-    cbVariant (new QComboBox),
-    cbCategory (new QComboBox),
-    cbIORef (new QComboBox),
-    cbSource (new QComboBox),
-    cbReceiver (new QComboBox),
-*/
     hist (0),
     UI (new Ui::histogram_widget)
-    //pbCalc (new QPushButton (tr("&Update")))
 {
 
     UI->setupUi (this);
@@ -60,8 +48,6 @@ KKSHistWidget::KKSHistWidget(const KKSAttrValue *av, KKSIndAttrClass isSys, QWid
         hist = new KKSHistogram;
     
 
-    init ();
-    
     //ksa connect (cbCategory, SIGNAL (activated(int)), this, SLOT (catChanged (int)) );
     //ksa connect (cbIORef, SIGNAL (activated(int)), this, SLOT (ioChanged(int)) );
 
@@ -72,18 +58,6 @@ KKSHistWidget::~KKSHistWidget()
 {
     hist->release ();
     delete wHistDrawW;
-/*
-    delete pbCalc;
-    delete cbReceiver;
-    delete cbSource;
-    delete cbIORef;
-    delete cbCategory;
-    delete cbVariant;
-    delete cbScenario;
-    delete lECount;
-    delete lETo;
-    delete lEFrom;
-*/
 }
 
 /*
@@ -117,28 +91,15 @@ void KKSHistWidget::paintEvent(QPaintEvent *event)
 
 void KKSHistWidget::init (void)
 {
+    wHistDrawW = new KKSHistDrawWidget (this,
+                                        Qt::Window | 
+                                        Qt::WindowTitleHint | 
+                                        Qt::WindowSystemMenuHint | 
+                                        Qt::WindowMinimizeButtonHint | 
+                                        Qt::WindowMaximizeButtonHint | 
+                                        Qt::WindowSoftkeysRespondHint);
+    wHistDrawW->setWindowTitle(tr("Histogram view"));    
     
-    //UI->wHistogramParent->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	//UI->wHistogramParent->setMinimumSize(600, 400);
-    
-	QHBoxLayout * hHistLay = new QHBoxLayout(UI->gbView);
-	wHistDrawW = new KKSHistDrawWidget (UI->gbView);//,
-                                           //Qt::Window | 
-                                           //Qt::WindowTitleHint | 
-                                           //Qt::WindowSystemMenuHint | 
-                                           //Qt::WindowMinimizeButtonHint | 
-                                           //Qt::WindowMaximizeButtonHint | 
-                                           //Qt::WindowSoftkeysRespondHint);
-
-	wHistDrawW->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	//wHistDrawW->resize(UI->gbView->size());
-	//wHistDrawW->setMinimumSize(600, 400);
-    hHistLay->addWidget(wHistDrawW);
-	UI->gbView->setLayout(hHistLay);
-	wHistDrawW->setLayout(new QHBoxLayout(wHistDrawW));
-	//wHistDrawW->repaint();
-
-
     QValidator * dFromVal = new QDoubleValidator (this);
     UI->leFrom->setValidator (dFromVal);
     if (hist && !hist->isEmpty())
@@ -154,9 +115,6 @@ void KKSHistWidget::init (void)
     UI->leCount->setValidator (nCountVal);
     if (hist && !hist->isEmpty())
         UI->leCount->setText (QString::number (hist->size()));
-
-    //wHistDrawW->setParent(UI->wHistogramParent);
-    //wHistDrawW->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
 
     /*
     QGridLayout * gLay = new QGridLayout (this);
@@ -251,6 +209,35 @@ void KKSHistWidget::init (void)
     gParLay->addWidget (pbCalc, 2 - (isFiltVisible ? 1 : 0), 0, 1, 2, Qt::AlignRight);
 //    gLay->addWidget (wCharts, 5, 0, 1, 1);
 */
+}
+
+void KKSHistWidget::calcHist (void)
+{
+    if(UI->leFrom->text().toInt() == UI->leTo->text().toInt() || UI->leCount->text().toInt() == 0){
+        QMessageBox::warning(this, tr("Incorrect params"), tr("Please, input correct parameters!"));
+        return;
+    }
+
+    KKSValue v = getVal();//(hStr, KKSAttrType::atHistogram);
+    QString hStr = v.valueForInsert();
+    emit valueChanged (m_av->id(), m_isSystem, hStr);//v.valueVariant());
+    
+    if(!wHistDrawW){
+        wHistDrawW = new KKSHistDrawWidget (this,
+                                            Qt::Window | 
+                                            Qt::WindowTitleHint | 
+                                            Qt::WindowSystemMenuHint | 
+                                            Qt::WindowMinimizeButtonHint | 
+                                            Qt::WindowMaximizeButtonHint | 
+                                            Qt::WindowSoftkeysRespondHint);
+        
+    }
+
+    wHistDrawW->show();
+    if(wHistDrawW->isMinimized())
+        wHistDrawW->showNormal();
+
+    wHistDrawW->repaint();
 }
 
 void KKSHistWidget::loadScenario (const QMap<int, QString>& scList)
@@ -400,9 +387,9 @@ void KKSHistWidget::setHist (const KKSHistogram& shist)
     
     (qobject_cast<KKSHistDrawWidget *>(wHistDrawW))->setData (hist->getVec());
     
-    wHistDrawW->repaint();
+    //ksa wHistDrawW->repaint();
 
-    //emit valueChanged (m_av->id(), m_isSystem, v);
+    emit valueChanged (m_av->id(), m_isSystem, v);
 }
 
 void KKSHistWidget::catChanged (int cIndex)
@@ -428,14 +415,6 @@ void KKSHistWidget::ioChanged (int ioIndex)
     //qDebug () << __PRETTY_FUNCTION__ << v << hist.toString();
     emit valueChanged (m_av->id(), m_isSystem, v);
     */
-}
-
-void KKSHistWidget::calcHist (void)
-{
-    KKSValue v = getVal();//(hStr, KKSAttrType::atHistogram);
-    QString hStr = v.valueForInsert();
-    emit valueChanged (m_av->id(), m_isSystem, hStr);//v.valueVariant());
-    wHistDrawW->repaint();
 }
 
 void KKSHistWidget::saveHist (KKSValue & v)
