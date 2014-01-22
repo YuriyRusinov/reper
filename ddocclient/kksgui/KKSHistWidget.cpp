@@ -28,6 +28,7 @@
 #include "KKSHistDrawWidget.h"
 #include "KKSValue.h"
 #include <KKSCategory.h>
+#include "KKSCheckableModel.h"
 #include <KKSObject.h>
 
 KKSHistWidget::KKSHistWidget(const KKSAttrValue *av, KKSIndAttrClass isSys, QWidget * parent, Qt::WindowFlags flags)
@@ -242,35 +243,72 @@ void KKSHistWidget::calcHist (void)
 
 void KKSHistWidget::loadScenario (const QMap<int, QString>& scList)
 {
-    
+    QAbstractItemModel * scMod = UI->lVScenarios->model ();
+    int nsc = scList.count();
+    if (!scMod)
+        scMod = new KKSCheckableModel (nsc, 1);
+    else
+    {
+        int nr = scMod->rowCount();
+        scMod->removeRows (0, nr);
+        scMod->insertRows (0, nsc);
+        if (scMod->columnCount() == 0)
+            scMod->insertColumns (0, 1);
+    }
     //UI->lwScenarios->clear ();
-    /*
+    int i=0;
     for (QMap<int, QString>::const_iterator p=scList.constBegin();
             p != scList.constEnd();
             ++p)
     {
-        cbScenario->addItem (p.value(), p.key());
+        QModelIndex scInd = scMod->index (i, 0);
+        scMod->setData (scInd, p.key(), Qt::UserRole);
+        scMod->setData (scInd, p.value(), Qt::DisplayRole);
+        i++;
     }
-    if (hist && hist->getScenario() > 0)
+    if (!UI->lVScenarios->model ())
+        UI->lVScenarios->setModel (scMod);
+/*    if (hist && hist->getScenario() > 0)
     {
         int indSc = hist->getScenario();
         int cind = cbScenario->findData (QVariant (indSc));
         cbScenario->setCurrentIndex (cind);
     }
-    */
+ */
 }
 
 void KKSHistWidget::loadVariants (const QMap<int, QString>& varList)
 {
+    QAbstractItemModel * varModel = UI->lvVariants->model ();
+    bool isSet (true);
+    int nvr = varList.count();
+    if (!varModel)
+    {
+        varModel = new KKSCheckableModel (nvr, 1);
+        isSet = false;
+    }
+    else
+    {
+        int nr = varModel->rowCount();
+        varModel->removeRows (0, nr);
+        varModel->insertRows (0, nvr);
+        if (varModel->columnCount () == 0)
+            varModel->insertColumns (0, 1);
+    }
     //UI->lwVariants->clear ();
-    /*
+    int i=0;
     for (QMap<int, QString>::const_iterator p=varList.constBegin();
             p != varList.constEnd();
             ++p)
     {
-        cbVariant->addItem (p.value(), p.key());
+        QModelIndex vIndex = varModel->index (i, 0);
+        varModel->setData (vIndex, p.key(), Qt::UserRole);
+        varModel->setData (vIndex, p.value(), Qt::DisplayRole);
+        i++;
     }
-    if (hist && hist->getVariant() > 0)
+    if (!isSet)
+        UI->lvVariants->setModel (varModel);
+/*    if (hist && hist->getVariant() > 0)
     {
         int indV = hist->getVariant ();
         int vInd = cbVariant->findData (QVariant (indV));
