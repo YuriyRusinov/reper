@@ -644,9 +644,12 @@ KKSValue  KKSLoader::constructValue(const QString & value,
         KKSHistogram h;
         h.fromString (value);
         QString valSql = QString();
-        if (tName.compare(QString("message_series"), Qt::CaseInsensitive) == 0)
-            valSql = QString ("select value from random_values;");
-        else
+        if (tName.compare(QString("histogram_params_streams"), Qt::CaseInsensitive) == 0)
+            ;//ksa !!!!! valSql = QString ("select h_order, h_x, h_y from histogram_graphics_streams where id = %1;").arg();
+        else{
+            return v;
+        }
+        /*
             valSql = QString ("select %2 from %1").arg (tName).arg(cName);
                        //QString ("select %1 from %2 as mser inner join message_streams ms on (mser.id_message_stream=ms.id and ms.id_io_object=%3)")
                        //     .arg (cName)
@@ -658,16 +661,20 @@ KKSValue  KKSLoader::constructValue(const QString & value,
         
         QString hsql = QString ("select * from histogram('%1', %2, %3, %4);").arg (valSql).arg(h.getXMin()).arg(h.getXMax()).arg (h.size());
         qDebug () << __PRETTY_FUNCTION__ << valSql << hsql;
-        KKSResult * hRes = db->execute (hsql);
+        */
+        KKSResult * hRes = db->execute (valSql);
         if (hRes)
         {
-            QMap<int, double> hData;
+            QMap<int, QPair<double, double> > hData;
             int n = hRes->getRowCount();
             for (int i=0; i<n; i++)
             {
                 int key = hRes->getCellAsInt (i, 0);
                 double val = hRes->getCellAsDouble (i, 1);
-                hData.insert(key, val);
+
+                QPair<double, double> v(key, val);
+
+                hData.insert(key, v);
             }
             h.setVec(hData);
             delete hRes;

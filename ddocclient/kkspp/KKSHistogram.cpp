@@ -17,7 +17,7 @@
 #include "KKSHistogram.h"
 
 KKSHistogram::KKSHistogram()
-    : KKSRecord(), dHist(QMap<int, double>()),
+    : KKSRecord(), dHist(QMap<int, QPair<double, double> >()),
     m_xmin(0.0),
     m_xmax(0.0),
     m_num(-1),
@@ -25,14 +25,12 @@ KKSHistogram::KKSHistogram()
     idScenario (-1),
     idVariant (-1),
     c (0),
-    io (0),
-    idSource (-1),
-    idReceiver (-1)
+    io (0)
 {
 
 }
 
-KKSHistogram::KKSHistogram(const QMap<int, double>& data, double xmin, double xmax, int n)
+KKSHistogram::KKSHistogram(const QMap<int, QPair<double, double> >& data, double xmin, double xmax, int n)
     : KKSRecord(), dHist (data),
     m_xmin (xmin),
     m_xmax (xmax),
@@ -41,9 +39,7 @@ KKSHistogram::KKSHistogram(const QMap<int, double>& data, double xmin, double xm
     idScenario (-1),
     idVariant (-1),
     c (0),
-    io (0),
-    idSource (-1),
-    idReceiver (-1)
+    io (0)
 {
     if(EQUAL_F(m_xmin, 0.0) && EQUAL_F(m_xmax, 0.0) && m_num == -1)
         m_isEmpty = true;
@@ -58,9 +54,7 @@ KKSHistogram::KKSHistogram(const KKSHistogram& orig)
     idScenario (orig.idScenario),
     idVariant (orig.idVariant),
     c (orig.c),
-    io (orig.io),
-    idSource (orig.idSource),
-    idReceiver (orig.idReceiver)
+    io (orig.io)
 {
     if (c)
         c->addRef();
@@ -76,12 +70,12 @@ KKSHistogram::~KKSHistogram()
         io->release();
 }
 
-const QMap<int, double>& KKSHistogram::getVec (void) const
+const QMap<int, QPair<double, double> >& KKSHistogram::getVec (void) const
 {
     return dHist;
 }
 
-void KKSHistogram::setVec (const QMap<int, double>& data)
+void KKSHistogram::setVec (const QMap<int, QPair<double, double> >& data)
 {
     dHist = data;
 
@@ -154,14 +148,13 @@ QString KKSHistogram::toString() const
             << (c && c->tableCategory() ? c->tableCategory()->type()->name() : QString()) << sep;
 
     outHist << (io ? io->id() : -1) << sep
-            << (io ? io->name () : QString()) << sep
-            << idSource << sep
-            << idReceiver << sep;
-    for (QMap<int, double>::const_iterator p=dHist.constBegin();
+            << (io ? io->name () : QString()) << sep;
+
+    for (QMap<int, QPair<double, double> >::const_iterator p=dHist.constBegin();
             p != dHist.constEnd();
             ++p)
     {
-        outHist << p.key() << sep << p.value() << sep;
+        outHist << p.key() << sep << p.value().first << sep << p.value().second << sep;
         //resStr += QString("%1%3%2%3").arg (p.key()).arg (p.value()).arg (sep);
         //i++;
 
@@ -184,6 +177,7 @@ bool KKSHistogram::fromString(const QString & str)
     QBuffer hBuffer (&bStr);
     if (!hBuffer.open(QIODevice::ReadOnly))
         return false;
+
     QTextStream hIn (&hBuffer);
     hIn.setAutoDetectUnicode(true);
     //QString sep1;
@@ -237,20 +231,27 @@ bool KKSHistogram::fromString(const QString & str)
     hIn.seek (hIn.pos()+objName.length()+sep.length());// >> objName >> sep;
     const KKSObject * obj = new KKSObject (idObj, const_cast<KKSCategory *>(cat), objName);
     setSrcObject (obj);
+/*    
     hIn >> idSource;
     hIn.seek (hIn.pos()+sep.length());
     hIn >> idReceiver;
     hIn.seek (hIn.pos()+sep.length());
+*/    
     dHist.clear ();
     for (int i=0; i<m_num && !hIn.atEnd(); i++)
     {
         int key;
-        double val;
+        QPair<double, double> val;
         hIn >> key;
         hIn.seek (hIn.pos()+sep.length());
-        hIn >> val;
+
+        hIn >> val.first;
         if (i < m_num-1)
             hIn.seek (hIn.pos()+sep.length());
+        if (i < m_num-1)
+            hIn.seek (hIn.pos()+sep.length());
+        hIn >> val.second;
+
         dHist.insert (key, val);
     }
     m_isEmpty = false;
@@ -323,32 +324,12 @@ void KKSHistogram::setSrcObject (const KKSObject * iosrc)
         io->addRef ();
 }
 
-int KKSHistogram::getSource (void) const
-{
-    return idSource;
-}
-
-void KKSHistogram::setSource (int ids)
-{
-    idSource = ids;
-}
-
-int KKSHistogram::getReceiver (void) const
-{
-    return idReceiver;
-}
-
-void KKSHistogram::setReceiver (int idr)
-{
-    idReceiver = idr;
-}
-
 void KKSHistogram::clear (void)
 {
     dHist.clear ();
 }
 
-void KKSHistogram::setValue (int key, double val)
+void KKSHistogram::setValue (int key, QPair<double, double> val)
 {
     dHist.insert (key, val);
 }

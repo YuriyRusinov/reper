@@ -10,6 +10,7 @@
 
 #include <QMetaType>
 #include <QMap>
+#include <QPair>
 
 #include "KKSRecord.h"
 #include "kkspp_config.h"
@@ -21,16 +22,16 @@ class KKSObjectExemplar;
 class _PP_EXPORT KKSHistogram : public KKSRecord
 {
 public:
-    KKSHistogram(const QMap<int, double>& data, double xmin, double xmax, int n);
+    KKSHistogram(const QMap<int, QPair<double, double> > & data, double xmin, double xmax, int n);
     KKSHistogram();
     KKSHistogram(const KKSHistogram& orig);
     virtual ~KKSHistogram();
     
-    const QMap<int, double>& getVec (void) const;
-    void setVec (const QMap<int, double>& data);
+    const QMap<int, QPair<double, double> > & getVec (void) const;
+    void setVec (const QMap<int, QPair<double, double> > & data);
     
     void clear (void);
-    void setValue (int key, double val);
+    void setValue (int key, QPair<double, double> val);
     
     void setRange (double xmin, double xmax);
     double getXMin (void) const;
@@ -56,18 +57,19 @@ public:
     
     const KKSObject * srcObject (void) const;
     void setSrcObject (const KKSObject * iosrc);
+
+   
+    //int getSource (void) const;
+    //void setSource (int ids);
     
-    int getSource (void) const;
-    void setSource (int ids);
-    
-    int getReceiver (void) const;
-    void setReceiver (int idr);
+    //int getReceiver (void) const;
+    //void setReceiver (int idr);
 
 private:
     //
     // Variables
     //
-    QMap<int, double> dHist;
+    QMap<int, QPair<double, double> > dHist;
     double m_xmin;
     double m_xmax;
     int m_num;
@@ -80,8 +82,8 @@ private:
     int idVariant;
     const KKSCategory * c;
     const KKSObject * io;
-    int idSource;
-    int idReceiver;
+    //int idSource;
+    //int idReceiver;
     
 
 };

@@ -3483,7 +3483,7 @@ void KKSObjEditorFactory :: loadAttributeReference (QString tableName, QWidget *
     else if (refObj->id() == IO_STATE_ID)
     {
         KKSObject * wObj = editor->getObj ();
-        KKSCategory *wC = wObj->category();
+        KKSCategory *wC = wObj ? wObj->category() : NULL;
         //qDebug () << __PRETTY_FUNCTION__ << wObj->id() << wC->lifeCycle();
         KKSCategory * ct = c->tableCategory ();
         if (!ct)

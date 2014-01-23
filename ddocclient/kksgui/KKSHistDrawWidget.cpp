@@ -13,7 +13,7 @@
 KKSHistDrawWidget::KKSHistDrawWidget(QWidget * parent, Qt::WindowFlags flags)
     : QWidget (parent, flags),
     wCharts (0),//new KKSCharts),
-    m_data (QMap<int, double>()),
+    m_data (QMap<int, QPair<double, double> >()),
     maxVal (-1.0)
 {
     colors.clear();
@@ -56,11 +56,12 @@ void KKSHistDrawWidget::paintEvent(QPaintEvent *event)
     int i = 0;
     int n = colors.size();
 
-    for (QMap<int, double>::const_iterator p=m_data.constBegin();
+    for (QMap<int, QPair<double, double> >::const_iterator p=m_data.constBegin();
             p != m_data.constEnd();
             p++)
     {
-        wCharts->addPiece(QString::number(p.key()), colors[i%n], p.value()/maxVal*100);
+        QPair<double, double> pair = p.value();
+        wCharts->addPiece(QString::number(pair.first), colors[i%n], pair.second/maxVal*100);
         i++;
     }
     
@@ -79,15 +80,15 @@ QSize KKSHistDrawWidget :: sizeHint (void) const
 	return QWidget::sizeHint ();
 }
 
-void KKSHistDrawWidget::setData (const QMap<int, double>& hData)
+void KKSHistDrawWidget::setData (const QMap<int, QPair<double, double> >& hData)
 {
     m_data = hData;
     maxVal = 0.0;
-    for (QMap<int, double>::const_iterator p=m_data.constBegin();
+    for (QMap<int, QPair<double, double> >::const_iterator p=m_data.constBegin();
             p != m_data.constEnd();
             p++)
     {
-        maxVal = qMax (maxVal, p.value ());
+        maxVal = qMax (maxVal, p.value ().second);
     }
 
     //show ();

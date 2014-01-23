@@ -10,6 +10,7 @@
 
 #include <QWidget>
 #include <QMap>
+#include <QPair>
 #include <QVector>
 #include <QColor>
 
@@ -25,7 +26,7 @@ public:
     KKSHistDrawWidget(QWidget * parent=0, Qt::WindowFlags flags=0);
     virtual ~KKSHistDrawWidget();
 
-    void setData (const QMap<int, double>& hData);
+    void setData (const QMap<int, QPair<double, double> >& hData);
 	virtual QSize sizeHint() const;
 
 protected:
@@ -39,7 +40,7 @@ private:
     // Variables
     //
     KKSCharts * wCharts;
-    QMap<int, double> m_data;
+    QMap<int, QPair<double, double> > m_data;
     double maxVal;
     QVector<QColor> colors;
 

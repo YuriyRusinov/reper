@@ -19,6 +19,7 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QtDebug>
+#include <QPair>
 
 #include <KKSHistogram.h>
 #include <KKSAttrValue.h>
@@ -522,10 +523,11 @@ KKSValue KKSHistWidget::getVal (void)
     hist->setSize (num);
     //double dx = (xmax-xmin)/num;
     hist->clear ();
+    
     for (int i=0; i<num; i++)
     {
         //double x = xmin + i*dx;
-        hist->setValue (i, 0.0);
+        hist->setValue (i, QPair<double, double>(0.0, 0.0));
     }
     
     /*
