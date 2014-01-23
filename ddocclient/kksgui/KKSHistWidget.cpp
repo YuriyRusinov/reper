@@ -320,15 +320,30 @@ void KKSHistWidget::loadVariants (const QMap<int, QString>& varList)
 void KKSHistWidget::loadCategories (const KKSMap<int, KKSCategory *>& catList)
 {
     //UI->lwCategories->clear();
-    /*
-    this->cbCategory->addItem (tr("No selected category"), -1);
+    QAbstractItemModel * catMod = UI->lvCategories->model();
+    bool isSet (!catMod);
+    int ncr = catList.count();
+    if (!catMod)
+        catMod = new KKSCheckableModel (ncr, 1);
+    else
+    {
+        int nr = catMod->rowCount();
+        catMod->removeRows (0, nr);
+        if (catMod->columnCount() == 0)
+            catMod->insertColumns (0, 1);
+    }
+    int i = 0;
     for (KKSMap<int, KKSCategory *>::const_iterator p=catList.constBegin();
             p != catList.constEnd();
             ++p)
     {
-        cbCategory->addItem (p.value()->name(), p.key());
+        QModelIndex catInd = catMod->index (i++, 0);
+        catMod->setData (catInd, p.key(), Qt::UserRole);
+        catMod->setData (catInd, p.value()->name(), Qt::DisplayRole);
     }
-    if (hist && hist->category())
+    if (!isSet)
+        UI->lvCategories->setModel (catMod);
+/*    if (hist && hist->category())
     {
         qint64 idc = hist->category()->id();
         int catInd = cbCategory->findData (QVariant (idc));
@@ -340,6 +355,29 @@ void KKSHistWidget::loadCategories (const KKSMap<int, KKSCategory *>& catList)
 void KKSHistWidget::loadIOList (const KKSMap<int, KKSObject *>& IOList)
 {
     //UI->lwIO->clear ();
+    QAbstractItemModel *ioMod = UI->lvIOs->model ();
+    bool isSet (!ioMod);
+    int ioc = IOList.count ();
+    if (!ioMod)
+        ioMod = new KKSCheckableModel (ioc, 1);
+    else
+    {
+        int nr = ioMod->rowCount();
+        ioMod->removeRows (0, nr);
+        if (ioMod->columnCount() == 0)
+            ioMod->insertColumns (0, 1);
+    }
+    int i = 0;
+    for (KKSMap<int, KKSObject *>::const_iterator p=IOList.constBegin();
+            p != IOList.constEnd();
+            ++p)
+    {
+        QModelIndex ioInd = ioMod->index (i++, 0);
+        ioMod->setData (ioInd, p.key(), Qt::UserRole);
+        ioMod->setData (ioInd, p.value()->name(), Qt::DisplayRole);
+    }
+    if (!isSet)
+        UI->lvIOs->setModel (ioMod);
     /*
     for (KKSMap<int, KKSObject *>::const_iterator p = IOList.constBegin();
             p != IOList.constEnd();

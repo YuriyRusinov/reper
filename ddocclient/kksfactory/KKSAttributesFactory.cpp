@@ -1596,28 +1596,12 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                 /*********/
                 
                 {
-                QMap<int, QString> scList;
                 //scList.insert (1, tr("One"));
                 KKSList<const KKSFilterGroup *> filters;
-                KKSObject * refSc = loader->loadIO (IO_SCENARIO_ID, true);
-                KKSMap<qint64, KKSEIOData *> scMaps = loader->loadEIOList(refSc, filters);
-                for (KKSMap<qint64, KKSEIOData *>::const_iterator p = scMaps.constBegin();
-                        p != scMaps.constEnd();
-                        p++)
-                {
-                    scList.insert (p.key(), p.value()->fields().value("name"));
-                }
-                refSc->release ();
+                QMap<int, QString> scList = this->getAttrValsList(IO_SCENARIO_ID);
                 KKSHistWidget * haw = qobject_cast <KKSHistWidget *>(attrWidget);
                 haw->loadScenario (scList);
-                QMap<int, QString> vList;
-                KKSObject * refVar = loader->loadIO (IO_VARIANT_ID, true);
-                KKSMap<qint64, KKSEIOData *> vMaps = loader->loadEIOList(refVar, filters);
-                for (KKSMap<qint64, KKSEIOData *>::const_iterator p = vMaps.constBegin();
-                        p != vMaps.constEnd();
-                        p++)
-                    vList.insert (p.key(), p.value()->fields().value("name"));
-                refVar->release ();
+                QMap<int, QString> vList = this->getAttrValsList (IO_VARIANT_ID);
                 haw->loadVariants (vList);
                 KKSMap<int, KKSCategory *> cats;
                 KKSObject * refCats = loader->loadIO(IO_CAT_ID);
@@ -3228,4 +3212,21 @@ void KKSAttributesFactory :: refreshAttrValue (const KKSAttrValue * av, int idAV
     }
     emit aValRefresh (av->attribute(), val);
     avNew->release();
+}
+
+
+QMap<int, QString> KKSAttributesFactory :: getAttrValsList (qint64 idObject, const KKSList<const KKSFilterGroup *>& filters)
+{
+    QMap<int, QString> vList;
+    KKSObject * refIO = loader->loadIO (idObject, true);
+    KKSMap<qint64, KKSEIOData *> vMaps = loader->loadEIOList(refIO, filters);
+    for (KKSMap<qint64, KKSEIOData *>::const_iterator p = vMaps.constBegin();
+            p != vMaps.constEnd();
+            p++)
+    {
+        vList.insert (p.key(), p.value()->fields().value("name"));
+    }
+    refIO->release ();
+    vMaps.clear ();
+    return vList;
 }
