@@ -210,10 +210,13 @@ alter table logistic_chains
 create table histogram_params_streams (
    id                   SERIAL               not null,
    name                 VARCHAR              not null,
+   h_min                float8               null,
+   h_max                float8               null,
+   h_count              int4                 not null,
    scenarios            INT4[]               null,
    variants             INT4[]               null,
-   dl_froms             INT4[]               null,
-   dl_tos               INT4[]               null,
+--   dl_froms             INT4[]               null,
+--   dl_tos               INT4[]               null,
    io_categories        INT4[]               null,
    io_objects           INT4[]               null,
    partition_lows       INT4[]               null,
@@ -234,10 +237,13 @@ select createTriggerUID('histogram_params_streams');
 create table histogram_params_chains (
    id                   SERIAL               not null,
    name                 VARCHAR              not null,
+   h_min                float8               null,
+   h_max                float8               null,
+   h_count              int4                 not null,
    scenarios            INT4[]               null,
    variants             INT4[]               null,
-   life_cycles          INT4[]               null,
-   io_objects           INT4[]               null,
+--   life_cycles          INT4[]               null,
+   io_categories        INT4[]               null,
    services             INT4[]               null,
    constraint PK_HISTOGRAM_PARAMS_CHAINS primary key (id)
 )
@@ -296,6 +302,18 @@ alter table histogram_graphics_chains
    add constraint FK_HISTOGRA_REFERENCE_HISTOGRA foreign key (id_histogram_params_chains)
       references histogram_params_chains (id)
       on delete restrict on update restrict;
+
+alter table message_streams add column id_processing_scenario int4;
+alter table message_streams add column id_processing_variant int4;
+alter table message_streams
+   add constraint FK_MESSAGE__REFERENCE_PROCESSI foreign key (id_processing_scenario)
+      references processing_scenario (id)
+      on delete restrict on update restrict;
+alter table message_streams
+   add constraint FK_MESSAGE__REF_VARIANT foreign key (id_processing_variant)
+      references processing_variant (id)
+      on delete restrict on update restrict;
+
 
 
 select setAsLogging(1);
@@ -357,13 +375,16 @@ insert into attributes (unique_id, id, id_a_type, code, name, title, table_name,
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-364', 364, 6, 'h_y', 'Ордината', 'Ордината', NULL, NULL, 150, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-365', 365, 12, 'scenarios', 'Сценарии', 'Сценарии', 'processing_scenario', 'name', 100, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-366', 366, 12, 'variants', 'Варианты', 'Варианты', 'processing_variant', 'name', 100, TRUE);
-insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-367', 367, 12, 'dl_froms', 'Источники', 'Источники', 'position', 'name', 100, TRUE);
-insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-368', 368, 12, 'dl_tos', 'Получатели', 'Получатели', 'position', 'name', 100, TRUE);
+--insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-367', 367, 12, 'dl_froms', 'Источники', 'Источники', 'position', 'name', 100, TRUE);
+--insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-368', 368, 12, 'dl_tos', 'Получатели', 'Получатели', 'position', 'name', 100, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-369', 369, 12, 'io_categories', 'Категории', 'Категории', 'io_categories', 'name', 100, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-370', 370, 12, 'io_objects', 'ИО', 'ИО', 'io_objects', 'name', 100, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-371', 371, 12, 'partition_lows', 'Законы распределения', 'Законы распределения', 'partition_lows', 'name', 100, TRUE);
-insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-372', 372, 12, 'life_cycles', 'ЖЦ', 'ЖЦ', 'life_cycle', 'name', 100, TRUE);
+--insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-372', 372, 12, 'life_cycles', 'ЖЦ', 'ЖЦ', 'life_cycle', 'name', 100, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-373', 373, 12, 'services', 'Сервисы', 'Сервисы', 'handlers', 'name', 100, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-374', 374, 6, 'h_min', 'Минимальное значение', 'Минимальное значение', NULL, NULL, 150, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-375', 375, 6, 'h_max', 'Максимальное значение', 'Максимальное значение', NULL, NULL, 150, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-376', 376, 8, 'h_count', 'Количество карманов', 'Количество карманов', NULL, NULL, 150, TRUE);
 
 
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (636, 203, 359, NULL, false, false);  --id_parent
@@ -422,20 +443,26 @@ insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (645, 220, 2, NULL, true, false); --name
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (646, 220, 365, NULL, false, false); --scenarios
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (647, 220, 366, NULL, false, false); --variants
-insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (648, 220, 367, NULL, false, false); --dl_froms
-insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (649, 220, 368, NULL, false, false); --dl_tos
+--insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (648, 220, 367, NULL, false, false); --dl_froms
+--insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (649, 220, 368, NULL, false, false); --dl_tos
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (650, 220, 369, NULL, false, false); --io_categories
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (651, 220, 370, NULL, false, false); --io_objects
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (652, 220, 371, NULL, false, false); --partition_lows
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (670, 220, 374, NULL, false, false); --h_min
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (671, 220, 375, NULL, false, false); --h_max
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (672, 220, 376, NULL, false, false); --h_count
 
 --таблица параметров гистограмм для сервисов
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (653, 222, 1, NULL, true, true); --id
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (654, 222, 2, NULL, true, false); --name
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (655, 222, 365, NULL, false, false); --scenarios
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (656, 222, 366, NULL, false, false); --variants
-insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (657, 222, 372, NULL, false, false); --life_cycles
-insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (658, 222, 370, NULL, false, false); --io_objects
+--insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (657, 222, 372, NULL, false, false); --life_cycles
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (658, 222, 369, NULL, false, false); --io_categories
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (659, 222, 373, NULL, false, false); --services
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (673, 222, 374, NULL, false, false); --h_min
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (674, 222, 375, NULL, false, false); --h_max
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (675, 222, 376, NULL, false, false); --h_count
 
 --таблица графиков гистограмм для потоков
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (660, 224, 1, NULL, true, true); --id
@@ -450,6 +477,10 @@ insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (667, 226, 362, NULL, true, false); --h_order
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (668, 226, 363, NULL, true, false); --h_x
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (669, 226, 364, NULL, true, false); --h_y
+
+--таблица потоков сообщений
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (676, 193, 352, NULL, true, false); --id_processing_scenario
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (677, 193, 353, NULL, true, false); --id_processing_variant
 
 
 select f_create_trigger('trgcheckcatforglobal', 'before', 'insert or update', 'io_categories', 'checkcatforglobal()');

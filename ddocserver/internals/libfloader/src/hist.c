@@ -8,24 +8,19 @@ PG_FUNCTION_INFO_V1 (histogram);
 
 Datum histogram(PG_FUNCTION_ARGS)
 {
-    size_t nr_rand = strlen ( VARDATA (PG_GETARG_VARCHAR_P(0)));
-    char * sql = (char *) palloc (nr_rand+10);
-//    strncpy (sql, (char *)PG_GETARG_VARCHAR_P(0), nr_rand);
-    sprintf (sql, "%s;", VARDATA (PG_GETARG_VARCHAR_P (0)));
+    char * sql = text_to_cstring_ex(PG_GETARG_TEXT_P(0));
+    elog (INFO, "query = %s\n", sql);
 
     float8 xmin = PG_GETARG_FLOAT8 (1);
     float8 xmax = PG_GETARG_FLOAT8 (2);
     unsigned int num = PG_GETARG_UINT32(3);
 
-    //float8 * result = (float8 *) (palloc (sizeof(float8)));
-
-    //*result= 5.0;
 
     gsl_histogram * gHist = gsl_histogram_alloc (num);
-    elog (INFO, "query = %s\n", sql);
     gsl_histogram_set_ranges_uniform (gHist, (double)xmin, (double)xmax);
-//    Datum d = PointerGetDatum (gHist);
+
     SPI_connect ();
+
     int retVal = SPI_execute (sql, true, 0);
     if (retVal != SPI_OK_SELECT)
     {
@@ -33,12 +28,11 @@ Datum histogram(PG_FUNCTION_ARGS)
         SPI_finish ();
         PG_RETURN_NULL();
     }
+
     elog (INFO, "%d\n", retVal);
     unsigned long int nproc = SPI_processed;
     elog (INFO, "number of points is %lu, number of bins is %u", nproc, num);
-//    SPI_finish ();
-//    pfree (sql);
-//    PG_RETURN_NULL();
+
     int i=0;
 
     TupleDesc tupdesc = SPI_tuptable->tupdesc;
@@ -58,9 +52,11 @@ Datum histogram(PG_FUNCTION_ARGS)
             continue;
         }
     }
+
     SPI_finish ();
     pfree (sql);
     elog (INFO, "Reading was completed\n");
+
 //    if (get_call_result_type (fcinfo, NULL, &tupdesc) != TYPEFUNC_COMPOSITE)
 //    {
 //        elog (ERROR, "Incorrect transformation");
@@ -134,6 +130,4 @@ Datum histogram(PG_FUNCTION_ARGS)
         SRF_RETURN_DONE(funcctx);
     }
 
-    //PG_RETURN_DATUM (d);//POINTER (result);//gHist);
-    //PG_RETURN_DATUM( HeapTupleGetDatum( tuple ) );
 }
