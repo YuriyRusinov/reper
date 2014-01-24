@@ -12,8 +12,12 @@ LIBS *= -L$$DESTDIR -lkksutils
 #pp support
 INCLUDEPATH *= ../kkspp
 DEPENDPATH *= ../kkspp
-
 LIBS *= -L$$DESTDIR -lkkspp
+
+INCLUDEPATH *= ../kksqwt
+DEPENDPATH *= ../kksqwt
+LIBS *= -L$$DESTDIR -lkksqwt
+
 
 CONFIG += qt
 

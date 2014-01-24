@@ -248,12 +248,13 @@ bool KKSHistogram::fromString(const QString & str)
         hIn >> val.first;
         if (i < m_num-1)
             hIn.seek (hIn.pos()+sep.length());
+        hIn >> val.second;
         if (i < m_num-1)
             hIn.seek (hIn.pos()+sep.length());
-        hIn >> val.second;
 
         dHist.insert (key, val);
     }
+
     m_isEmpty = false;
     if(EQUAL_F(m_xmin, 0.0) && EQUAL_F(m_xmax, 0.0) && m_num == -1)
         m_isEmpty = true;

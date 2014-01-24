@@ -18,6 +18,7 @@
 #include <windows.h>
 #pragma warning (disable:4251)
 #pragma warning (disable:4530)
+#pragma warning (disable:4660)
 #ifdef __USE_DLL_KKSGUI
 
 	#define _GUI_EXPORT __declspec(dllexport)

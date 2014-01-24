@@ -6,6 +6,7 @@ include(./ddocclient.conf)
 
 # Directories
 SUBDIRS += \
+    kksqwt \
     kksutils \
     dataaccess 
 
