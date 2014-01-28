@@ -260,12 +260,17 @@ void KKSHistWidget::loadScenario (const QMap<int, QString>& scList)
     }
     //UI->lwScenarios->clear ();
     int i=0;
+    QList<int> scHList = hist->getScenario();
     for (QMap<int, QString>::const_iterator p=scList.constBegin();
             p != scList.constEnd();
             ++p)
     {
         QModelIndex scInd = scMod->index (i, 0);
         scMod->setData (scInd, p.key(), Qt::UserRole);
+        if (scHList.contains(p.key()))
+            scMod->setData (scInd, Qt::Checked, Qt::CheckStateRole);
+        else
+            scMod->setData (scInd, Qt::Unchecked, Qt::CheckStateRole);
         scMod->setData (scInd, p.value(), Qt::DisplayRole);
         i++;
     }
@@ -523,7 +528,7 @@ KKSValue KKSHistWidget::getVal (void)
 
     int num = UI->leCount->text().toInt ();
     
-    KKSHistogram * hist = new KKSHistogram;
+    //KKSHistogram * hist = new KKSHistogram;
     hist->setRange (xmin, xmax);
     hist->setSize (num);
     //double dx = (xmax-xmin)/num;
@@ -551,18 +556,47 @@ KKSValue KKSHistWidget::getVal (void)
     QString hStr = hist->toString();
     qDebug () << __PRETTY_FUNCTION__ << hStr;
     KKSValue v (hStr, KKSAttrType::atHistogram);
-    hist->release ();
     return v;
 }
 
 void KKSHistWidget::scenarioSet (const QModelIndex& topLeft, const QModelIndex& bottomRight)
 {
-    qDebug () << __PRETTY_FUNCTION__ << topLeft << bottomRight;
+    //qDebug () << __PRETTY_FUNCTION__ << topLeft << bottomRight;
+    int iRow0 = topLeft.row();
+    int iRow1 = bottomRight.row();
+    QList<int> scList = hist->getScenario();
+    QAbstractItemModel * scMod = qobject_cast<QAbstractItemModel *>(sender());
+    for (int i=iRow0; i<=iRow1; i++)
+    {
+        QModelIndex wIndex = scMod->index (iRow0, 0, topLeft.parent());
+        Qt::CheckState chState = (Qt::CheckState)(scMod->data(wIndex, Qt::CheckStateRole).toInt());
+        int idSc = scMod->data (wIndex, Qt::UserRole).toInt();
+        if (chState == Qt::Checked && !scList.contains (idSc))
+            scList.append (idSc);
+        else if (chState == Qt::Unchecked && scList.contains(idSc))
+            scList.removeOne(idSc);
+    }
+    qDebug () << __PRETTY_FUNCTION__ << scList;
+    hist->setScenario(scList);
 }
 
 void KKSHistWidget::variantSet (const QModelIndex& topLeft, const QModelIndex& bottomRight)
 {
-    qDebug () << __PRETTY_FUNCTION__ << topLeft << bottomRight;
+    //qDebug () << __PRETTY_FUNCTION__ << topLeft << bottomRight;
+    int iRow0 = topLeft.row();
+    int iRow1 = bottomRight.row();
+    QList<int> vList = hist->getVariant();
+    QAbstractItemModel * vMod = qobject_cast<QAbstractItemModel *>(sender());
+    for (int i=iRow0; i<=iRow1; i++)
+    {
+        QModelIndex wIndex = vMod->index (iRow0, 0, topLeft.parent());
+        Qt::CheckState chState = (Qt::CheckState)(vMod->data(wIndex, Qt::CheckStateRole).toInt());
+        int idV = vMod->data (wIndex, Qt::UserRole).toInt();
+        if (chState == Qt::Checked && !vList.contains (idV))
+            vList.append (idV);
+        else if (chState == Qt::Unchecked && vList.contains(idV))
+            vList.removeOne(idV);
+    }
     
 }
 
