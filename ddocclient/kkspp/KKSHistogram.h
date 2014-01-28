@@ -11,8 +11,11 @@
 #include <QMetaType>
 #include <QMap>
 #include <QPair>
+#include <QList>
 
 #include "KKSRecord.h"
+#include "KKSList.h"
+#include "KKSMap.h"
 #include "kkspp_config.h"
 
 class KKSCategory;
@@ -46,24 +49,18 @@ public:
 
     bool isEmpty() const;
     
-    int getScenario (void) const;
-    void setScenario (int idSc);
+    const QList<int>& getScenario (void) const;
+    void setScenario (const QList<int>& idSc);
     
-    int getVariant (void) const;
-    void setVariant (int idv);
+    const QList<int>& getVariant (void) const;
+    void setVariant (const QList<int>& idv);
     
-    const KKSCategory * category (void) const;
-    void setCategory (const KKSCategory * cat);
+    const KKSMap<qint64, const KKSCategory *>& category (void) const;
+    void setCategory (const KKSMap<qint64, const KKSCategory *>& cat);
     
-    const KKSObject * srcObject (void) const;
-    void setSrcObject (const KKSObject * iosrc);
-
-   
-    //int getSource (void) const;
-    //void setSource (int ids);
+    const KKSList<const KKSObject *>& srcObject (void) const;
+    void setSrcObject (const KKSList<const KKSObject *>& iosrc);
     
-    //int getReceiver (void) const;
-    //void setReceiver (int idr);
 
 private:
     //
@@ -78,12 +75,12 @@ private:
     //
     // filter parameters
     //
-    int idScenario;
-    int idVariant;
-    const KKSCategory * c;
-    const KKSObject * io;
-    //int idSource;
-    //int idReceiver;
+    QList<int> scList;//idScenario;
+    QList<int> varList;//idVariant;
+    KKSMap<qint64, const KKSCategory *> catList;
+    KKSList<const KKSObject *> ioList;
+    //QList<int> sourceList;// idSource;
+    //QList<int> recvList;// idReceiver;
     
 
 };

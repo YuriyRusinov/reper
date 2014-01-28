@@ -516,8 +516,8 @@ int KKSObjEditor :: constructObject()
             v = cAttrValue->attribute()->defValue ();
 
         KKSAttrValue *av = new KKSAttrValue (*cAttrValue);
-        if (av->attribute()->code(false) == QString("id_maclabel"))
-            qDebug () << __PRETTY_FUNCTION__ << v.valueForInsert() << v.isNull();
+        //if (av->attribute()->code(false) == QString("id_maclabel"))
+        //    qDebug () << __PRETTY_FUNCTION__ << v.valueForInsert() << v.isNull();
         av->setValue(v);
         
         avalList.append (av);
@@ -757,6 +757,7 @@ int KKSObjEditor :: constructObject()
                 value = h.toString();
                 (const_cast<KKSAttrValue *>(cAttrValue))->setValue(v);
                 this->isChanged = true;
+                val = QVariant::fromValue<KKSHistogram>(h);
                 //qDebug () << __PRETTY_FUNCTION__ << value << val.toString();
                 //qDebug () << __PRETTY_FUNCTION__ << cAttrValue->value().valueForInsert();
             }

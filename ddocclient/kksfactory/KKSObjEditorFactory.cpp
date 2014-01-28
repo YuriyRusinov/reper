@@ -9851,7 +9851,10 @@ void KKSObjEditorFactory :: addLifeCycleState (KKSLifeCycleEx * lc, QAbstractIte
 
 void KKSObjEditorFactory :: loadCatHist (int idCat, KKSHistogram * vHist, KKSHistWidget * hw)
 {
-    KKSCategory * c = loader->loadCategory (idCat);
+    Q_UNUSED (idCat);
+    Q_UNUSED (vHist);
+    Q_UNUSED (hw);
+/*    KKSCategory * c = loader->loadCategory (idCat);
     vHist->setCategory (c);
     KKSMap<int, KKSObject *> ioList;
     KKSObject * refIO = loader->loadIO (IO_IO_ID);
@@ -9880,13 +9883,18 @@ void KKSObjEditorFactory :: loadCatHist (int idCat, KKSHistogram * vHist, KKSHis
     if (c)
         c->release ();
     //hw->setHist (vHist);
+ */
 }
 
 void KKSObjEditorFactory :: loadIOHist (int idIO, KKSHistogram * vHist, KKSHistWidget * hw)
 {
+/*
     KKSObject * io = loader->loadIO (idIO);
     vHist->setSrcObject (io);
     if (io)
         io->release ();
+ */
+    Q_UNUSED (idIO);
+    Q_UNUSED (vHist);
     Q_UNUSED (hw);
 }

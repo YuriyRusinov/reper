@@ -22,6 +22,7 @@ class QGroupBox;
 class QLineEdit;
 class QComboBox;
 class QPushButton;
+class QModelIndex;
 
 class KKSCharts;
 class KKSCategory;
@@ -54,12 +55,11 @@ public:
     void loadVariants (const QMap<int, QString>& varList);
     void loadCategories (const KKSMap<int, KKSCategory *>& catList);
     void loadIOList (const KKSMap<int, KKSObject *>& IOList);
-    void loadRecvList (const QMap<int, QString>& posList);
     void clearIO (void);
     
     KKSValue getVal (void);
 
-	void init (void);
+    void init (void);
 
 public slots:
     void setHist (const KKSHistogram& hist);
@@ -67,9 +67,14 @@ public slots:
     void saveHist (KKSValue & v);
     
 private slots:
-    void catChanged (int cIndex);
+/*    void catChanged (int cIndex);
     void ioChanged (int ioIndex);
-    
+*/
+    void scenarioSet (const QModelIndex& topLeft, const QModelIndex& bottomRight);
+    void variantSet (const QModelIndex& topLeft, const QModelIndex& bottomRight);
+    void catSet (const QModelIndex& topLeft, const QModelIndex& bottomRight);
+    void ioSet (const QModelIndex& topLeft, const QModelIndex& bottomRight);
+    void servSet (const QModelIndex& topLeft, const QModelIndex& bottomRight);
 
 protected:
     //
@@ -94,10 +99,10 @@ private:
     //
     // Variables
     //
+    KKSHistogram * hist;
     Ui::histogram_widget *UI;
  
     QWidget * wHistDrawW;
-    KKSHistogram * hist;
 
 private:
     Q_OBJECT

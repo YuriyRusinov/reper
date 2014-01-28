@@ -9,6 +9,7 @@
 #include <QDataStream>
 #include <QTextStream>
 #include <QTextCodec>
+#include <QRegExp>
 #include <QtDebug>
 
 #include "KKSCategory.h"
@@ -22,10 +23,10 @@ KKSHistogram::KKSHistogram()
     m_xmax(0.0),
     m_num(-1),
     m_isEmpty(true),
-    idScenario (-1),
-    idVariant (-1),
-    c (0),
-    io (0)
+    scList (QList<int>()),
+    varList (QList<int>()),
+    catList(KKSMap<qint64, const KKSCategory *>()),
+    ioList (KKSList<const KKSObject *>())
 {
 
 }
@@ -36,10 +37,10 @@ KKSHistogram::KKSHistogram(const QMap<int, QPair<double, double> >& data, double
     m_xmax (xmax),
     m_num (n),
     m_isEmpty(false),
-    idScenario (-1),
-    idVariant (-1),
-    c (0),
-    io (0)
+    scList (QList<int>()),
+    varList (QList<int>()),
+    catList(KKSMap<qint64, const KKSCategory *>()),
+    ioList (KKSList<const KKSObject *>())
 {
     if(EQUAL_F(m_xmin, 0.0) && EQUAL_F(m_xmax, 0.0) && m_num == -1)
         m_isEmpty = true;
@@ -51,23 +52,15 @@ KKSHistogram::KKSHistogram(const KKSHistogram& orig)
     m_xmax (orig.m_xmax),
     m_num (orig.m_num),
     m_isEmpty(orig.m_isEmpty),
-    idScenario (orig.idScenario),
-    idVariant (orig.idVariant),
-    c (orig.c),
-    io (orig.io)
+    scList (orig.scList),
+    varList (orig.varList),
+    catList(orig.catList),
+    ioList (orig.ioList)
 {
-    if (c)
-        c->addRef();
-    if (io)
-        io->addRef();
 }
 
 KKSHistogram::~KKSHistogram()
 {
-    if (c)
-        c->release();
-    if (io)
-        io->release();
 }
 
 const QMap<int, QPair<double, double> >& KKSHistogram::getVec (void) const
@@ -132,24 +125,49 @@ QString KKSHistogram::toString() const
     QTextStream outHist;// (&bh, QIODevice::WriteOnly);
     outHist.setString (&resStr);
     outHist.setCodec (QTextCodec::codecForName("UTF-8"));
-    outHist << m_xmin << sep << m_xmax << sep << m_num << sep;
+    outHist << id() << sep << m_xmin << sep << m_xmax << sep << m_num << sep;
 
     //int i (0);
-    outHist << idScenario << sep 
-            << idVariant << sep;
-    outHist << (c ? c->id() : -1) << sep 
-            << (c ? c->name () : QString()) << sep
-            << (c ? c->type()->id() : -1) << sep
-            << (c ? c->type()->name() : QString()) << sep;
+    //
+    int nsc = this->scList.count();
+    outHist << QString ("scenario begins %1").arg (nsc) << sep;
+    for (int i=0; i<nsc; i++)
+        outHist << scList[i] << sep;
+    outHist << QString ("scenario end") << sep;
+    int nvar = this->varList.count();
+    outHist << QString ("variant begins %1").arg (nvar) << sep;
+    for (int i=0; i<nvar; i++)
+        outHist << varList[i] << sep;
+    outHist << QString ("variant end") << sep;
+    int nCat = catList.count();
+    outHist << QString ("categories begins %1").arg (nCat) << sep;
+    for (KKSMap<qint64, const KKSCategory *>::const_iterator pc = catList.constBegin();
+         pc != catList.constEnd();
+         pc++)
+    {
+        const KKSCategory * c = pc.value();//catList[i];
+        outHist << (c ? c->id() : -1) << sep
+                << (c ? c->name () : QString()) << sep
+                << (c ? c->type()->id() : -1) << sep
+                << (c ? c->type()->name() : QString()) << sep;
 
-    outHist << (c && c->tableCategory() ? c->tableCategory()->id() : -1) << sep
-            << (c && c->tableCategory() ? c->tableCategory()->name() : QString())<< sep
-            << (c && c->tableCategory() ? c->tableCategory()->type()->id() : -1) << sep
-            << (c && c->tableCategory() ? c->tableCategory()->type()->name() : QString()) << sep;
+        outHist << (c && c->tableCategory() ? c->tableCategory()->id() : -1) << sep
+                << (c && c->tableCategory() ? c->tableCategory()->name() : QString())<< sep
+                << (c && c->tableCategory() ? c->tableCategory()->type()->id() : -1) << sep
+                << (c && c->tableCategory() ? c->tableCategory()->type()->name() : QString()) << sep;
+    }
+    outHist << QString ("categories end") << sep;
 
-    outHist << (io ? io->id() : -1) << sep
-            << (io ? io->name () : QString()) << sep;
-
+    int nio = ioList.count();
+    outHist << QString ("IO begins %1").arg (nio) << sep;
+    for (int i=0; i<nio; i++)
+    {
+        const KKSObject * io = ioList[i];
+        outHist << (io ? io->id() : -1) << sep
+                << (io ? io->name () : QString()) << sep
+                << (io ? io->category()->id() : -1) << sep;
+    }
+    outHist << QString ("IO end") << sep;
     for (QMap<int, QPair<double, double> >::const_iterator p=dHist.constBegin();
             p != dHist.constEnd();
             ++p)
@@ -180,16 +198,84 @@ bool KKSHistogram::fromString(const QString & str)
 
     QTextStream hIn (&hBuffer);
     hIn.setAutoDetectUnicode(true);
+    int idHist;
+    hIn >> idHist;
+    setId (idHist);
     //QString sep1;
+    hIn.seek (hIn.pos()+sep.length());
     hIn >> m_xmin;
     hIn.seek (hIn.pos()+sep.length());
     hIn >> m_xmax;
     hIn.seek (hIn.pos()+sep.length());// >> sep1;
     hIn >> m_num;
-    int mStart = 6;//m_num+26;
+//    int mStart = 6;//m_num+26;
 //    int nPars = sParList.count();
     hIn.seek (hIn.pos()+sep.length());
-    hIn >> idScenario;
+    QRegExp rScen (QString("scenario\\ begins\\ [0-9]*"), Qt::CaseInsensitive);
+    int mScenario = sParList.indexOf (rScen);
+    //qDebug () << __PRETTY_FUNCTION__ << mScenario << sParList[mScenario];//idHist;
+    int numInd = sParList[mScenario].lastIndexOf(" ");
+    int nsc = sParList[mScenario].mid (numInd).toInt();
+    scList.clear ();
+    for (int i=0; i<nsc; i++)
+    {
+        QString stdIdSc = sParList[mScenario+1+i];
+        int idScenario = stdIdSc.toInt();
+        scList.append (idScenario);
+    }
+    QRegExp rVar (QString("variant\\ begins\\ [0-9]*"), Qt::CaseInsensitive);
+    int mVar = sParList.indexOf (rVar);
+    int numVar = sParList[mVar].lastIndexOf (" ");
+    int nvar = sParList[mVar].mid (numVar).toInt();
+    this->varList.clear ();
+    for (int i=0; i<nvar; i++)
+    {
+        QString stdIdVar = sParList[mVar+1+i];
+        int idVar = stdIdVar.toInt();
+        varList.append(idVar);
+    }
+    QRegExp catReg(QString ("categories\\ begins\\ [0-9]*"), Qt::CaseInsensitive);
+    int mCat = sParList.indexOf(catReg);
+    int numCat = sParList[mCat].lastIndexOf (" ");
+    int nCat= sParList[mCat].mid (numCat).toInt();
+    catList.clear ();
+    for (int i=0; i<8*nCat; i+=8)
+    {
+        int idCat = sParList[mCat+1+i].toInt ();
+        QString cName = sParList[mCat+2+i];
+        int idType = sParList[mCat+3+i].toInt ();
+        QString cTypeName = sParList[mCat+4+i];
+        KKSType * cType = new KKSType (idType, cTypeName);
+        KKSCategory * c = new KKSCategory (idCat, cName, cType);
+        int idTCat = sParList[mCat+5+i].toInt ();
+        QString cTName = sParList[mCat+6+i];
+        int idTType = sParList[mCat+7+i].toInt ();
+        QString cTTypeName = sParList[mCat+8+i];
+        KKSType * ctType = new KKSType (idTType, cTTypeName);
+        KKSCategory * ct = new KKSCategory (idTCat, cTName, ctType);
+        c->setTableCategory(ct);
+        catList.insert (idCat, c);
+        c->release ();
+    }
+    QRegExp ioReg(QString("IO\\ begins\\ [0-9]*"), Qt::CaseInsensitive);
+    int mIO = sParList.indexOf (ioReg);
+    if (mIO > 0)
+    {
+        int numIO = sParList[mIO].lastIndexOf (" ");
+        int nIO = sParList[mIO].mid (numIO).toInt();
+        ioList.clear ();
+        for (int i=0; i<3*nIO; i+=3)
+        {
+            int idIO = sParList[mIO+i+1].toInt ();
+            QString ioName = sParList[mIO+i+2];
+            int idIOCat = sParList[mIO+i+3].toInt();
+            KKSCategory * c = new KKSCategory (*catList.value (idIOCat));
+            const KKSObject * io = new KKSObject (idIO, c, ioName);
+            ioList.append (io);
+            io->release ();
+        }
+    }
+/*    hIn >> idScenario;
     hIn.seek (hIn.pos()+sep.length());
     hIn >> idVariant;
     int idCat;
@@ -231,7 +317,7 @@ bool KKSHistogram::fromString(const QString & str)
     hIn.seek (hIn.pos()+objName.length()+sep.length());// >> objName >> sep;
     const KKSObject * obj = new KKSObject (idObj, const_cast<KKSCategory *>(cat), objName);
     setSrcObject (obj);
-/*    
+    
     hIn >> idSource;
     hIn.seek (hIn.pos()+sep.length());
     hIn >> idReceiver;
@@ -258,7 +344,6 @@ bool KKSHistogram::fromString(const QString & str)
     m_isEmpty = false;
     if(EQUAL_F(m_xmin, 0.0) && EQUAL_F(m_xmax, 0.0) && m_num == -1)
         m_isEmpty = true;
- 
     return true;
 }
 
@@ -267,63 +352,66 @@ bool KKSHistogram::isEmpty() const
     return m_isEmpty;
 }
 
-int KKSHistogram::getScenario (void) const
+const QList<int>& KKSHistogram::getScenario (void) const
 {
-    return idScenario;
+    return scList;//idScenario;
 }
 
-void KKSHistogram::setScenario (int idSc)
+void KKSHistogram::setScenario (const QList<int>& idSc)
 {
-    idScenario = idSc;
+    scList = idSc;
 }
 
-int KKSHistogram::getVariant (void) const
+const QList<int>& KKSHistogram::getVariant (void) const
 {
-    return idVariant;
+    return varList;
 }
 
-void KKSHistogram::setVariant (int idv)
+void KKSHistogram::setVariant (const QList<int>& idv)
 {
-    idVariant = idv;
+    varList = idv;
 }
 
-const KKSCategory * KKSHistogram::category (void) const
+const KKSMap<qint64, const KKSCategory *>& KKSHistogram::category (void) const
 {
-    return c;
+    return catList;
 }
 
-void KKSHistogram::setCategory (const KKSCategory * cat)
+void KKSHistogram::setCategory (const KKSMap<qint64, const KKSCategory *>& cat)
 {
-    if (c == cat)
-        return;
-
-    if (c)
-        c->release ();
-    
-    c = cat;
-    
-    if (c)
-        c->addRef();
+    catList = cat;
 }
 
-const KKSObject * KKSHistogram::srcObject (void) const
+const KKSList<const KKSObject *>& KKSHistogram::srcObject (void) const
 {
-    return io;
+    return ioList;
 }
 
-void KKSHistogram::setSrcObject (const KKSObject * iosrc)
+void KKSHistogram::setSrcObject (const KKSList<const KKSObject *>& iosrc)
 {
-    if (io == iosrc)
-        return;
-    
-    if (io)
-        io->release ();
-    
-    io = iosrc;
-    
-    if (io)
-        io->addRef ();
+    ioList == iosrc;
 }
+/*
+const QList<int>& KKSHistogram::getSource (void) const
+{
+    return sourceList;
+}
+
+void KKSHistogram::setSource (const QList<int>& ids)
+{
+    sourceList = ids;
+}
+
+const QList<int>& KKSHistogram::getReceiver (void) const
+{
+    return recvList;//idReceiver;
+}
+
+void KKSHistogram::setReceiver (const QList<int>& idr)
+{
+    recvList = idr;
+}
+ */
 
 void KKSHistogram::clear (void)
 {

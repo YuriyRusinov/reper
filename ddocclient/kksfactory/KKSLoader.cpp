@@ -644,8 +644,9 @@ KKSValue  KKSLoader::constructValue(const QString & value,
         KKSHistogram h;
         h.fromString (value);
         QString valSql = QString();
+        int idHist = h.id();
         if (tName.compare(QString("histogram_params_streams"), Qt::CaseInsensitive) == 0)
-            ;//ksa !!!!! valSql = QString ("select h_order, h_x, h_y from histogram_graphics_streams where id = %1;").arg();
+            valSql = QString ("select h_order, h_x, h_y from histogram_graphics_streams where id = %1;").arg(idHist);
         else{
             return v;
         }
