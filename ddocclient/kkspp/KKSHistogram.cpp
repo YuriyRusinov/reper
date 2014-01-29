@@ -21,10 +21,13 @@ KKSHistogram::KKSHistogram()
     m_xmax(0.0),
     m_num(-1),
     m_isEmpty(true),
+
     scList (QList<int>()),
-    varList (QList<int>()),
-    catList(KKSMap<qint64, const KKSCategory *>()),
-    ioList (KKSList<const KKSObject *>())
+    vList (QList<int>()),
+    cList(QList<int>()),
+    ioList (QList<int>()),
+    sList(QList<int>()),
+    plList(QList<int>())
 {
 
 }
@@ -35,10 +38,13 @@ KKSHistogram::KKSHistogram(const QMap<int, QPair<double, double> >& data, double
     m_xmax (xmax),
     m_num (n),
     m_isEmpty(false),
+
     scList (QList<int>()),
-    varList (QList<int>()),
-    catList(KKSMap<qint64, const KKSCategory *>()),
-    ioList (KKSList<const KKSObject *>())
+    vList (QList<int>()),
+    cList(QList<int>()),
+    ioList (QList<int>()),
+    sList(QList<int>()),
+    plList(QList<int>())
 {
     if(dHist.count() != m_num){
         dHist.clear();
@@ -57,10 +63,13 @@ KKSHistogram::KKSHistogram(const KKSHistogram& orig)
     m_xmax (orig.m_xmax),
     m_num (orig.m_num),
     m_isEmpty(orig.m_isEmpty),
+
     scList (orig.scList),
-    varList (orig.varList),
-    catList(orig.catList),
-    ioList (orig.ioList)
+    vList (orig.vList),
+    cList(orig.cList),
+    ioList (orig.ioList),
+    sList(orig.sList),
+    plList (orig.plList)
 {
 
     if(dHist.isEmpty())
@@ -166,9 +175,6 @@ QString KKSHistogram::toString() const
             ++p)
     {
         outHist << p.key() << sep << p.value().first << sep << p.value().second << sep;
-        //resStr += QString("%1%3%2%3").arg (p.key()).arg (p.value()).arg (sep);
-        //i++;
-
     }
 
     //далее идет информация о заданных фильтрах
@@ -181,43 +187,39 @@ QString KKSHistogram::toString() const
     outHist << QString ("scenario end") << sep;
 
     //варианты
-    int nvar = this->varList.count();
+    int nvar = this->vList.count();
     outHist << QString ("variant begins %1").arg (nvar) << sep;
     for (int i=0; i<nvar; i++)
-        outHist << varList[i] << sep;
+        outHist << vList[i] << sep;
     outHist << QString ("variant end") << sep;
     
     //категории
-    int nCat = catList.count();
-    outHist << QString ("categories begins %1").arg (nCat) << sep;
-    for (KKSMap<qint64, const KKSCategory *>::const_iterator pc = catList.constBegin();
-         pc != catList.constEnd();
-         pc++)
-    {
-        const KKSCategory * c = pc.value();//catList[i];
-        outHist << (c ? c->id() : -1) << sep
-                << (c ? c->name () : QString()) << sep
-                << (c ? c->type()->id() : -1) << sep
-                << (c ? c->type()->name() : QString()) << sep;
-
-        outHist << (c && c->tableCategory() ? c->tableCategory()->id() : -1) << sep
-                << (c && c->tableCategory() ? c->tableCategory()->name() : QString())<< sep
-                << (c && c->tableCategory() ? c->tableCategory()->type()->id() : -1) << sep
-                << (c && c->tableCategory() ? c->tableCategory()->type()->name() : QString()) << sep;
-    }
+    int ncat = this->cList.count();
+    outHist << QString ("categories begins %1").arg (ncat) << sep;
+    for (int i=0; i<ncat; i++)
+        outHist << cList[i] << sep;
     outHist << QString ("categories end") << sep;
 
     //ИО
-    int nio = ioList.count();
+    int nio = this->ioList.count();
     outHist << QString ("IO begins %1").arg (nio) << sep;
     for (int i=0; i<nio; i++)
-    {
-        const KKSObject * io = ioList[i];
-        outHist << (io ? io->id() : -1) << sep
-                << (io ? io->name () : QString()) << sep
-                << (io ? io->category()->id() : -1) << sep;
-    }
+        outHist << ioList[i] << sep;
     outHist << QString ("IO end") << sep;
+
+    //services
+    int nserv = this->sList.count();
+    outHist << QString ("services begins %1").arg (nserv) << sep;
+    for (int i=0; i<nserv; i++)
+        outHist << sList[i] << sep;
+    outHist << QString ("services end") << sep;
+
+    //partition lows
+    int npl = this->plList.count();
+    outHist << QString ("part_lows begins %1").arg (npl) << sep;
+    for (int i=0; i<npl; i++)
+        outHist << plList[i] << sep;
+    outHist << QString ("part_lows end") << sep;
     
     return QString (resStr.toLocal8Bit());
 }
@@ -292,60 +294,71 @@ bool KKSHistogram::fromString(const QString & str)
     if(mVar >= 0){
         int numVar = sParList[mVar].lastIndexOf (" ");
         int nvar = sParList[mVar].mid (numVar).toInt();
-        this->varList.clear ();
+        this->vList.clear ();
         for (int i=0; i<nvar; i++)
         {
             QString stdIdVar = sParList[mVar+1+i];
             int idVar = stdIdVar.toInt();
-            varList.append(idVar);
+            vList.append(idVar);
         }
     }
     
-    QRegExp catReg(QString ("categories\\ begins\\ [0-9]*"), Qt::CaseInsensitive);
-    int mCat = sParList.indexOf(catReg);
+    QRegExp rCat (QString("categories\\ begins\\ [0-9]*"), Qt::CaseInsensitive);
+    int mCat = sParList.indexOf (rCat);
     if(mCat >= 0){
         int numCat = sParList[mCat].lastIndexOf (" ");
-        int nCat= sParList[mCat].mid (numCat).toInt();
-        catList.clear ();
-        for (int i=0; i<8*nCat; i+=8)
+        int nCat = sParList[mCat].mid (numCat).toInt();
+        this->cList.clear ();
+        for (int i=0; i<nCat; i++)
         {
-            int idCat = sParList[mCat+1+i].toInt ();
-            QString cName = sParList[mCat+2+i];
-            int idType = sParList[mCat+3+i].toInt ();
-            QString cTypeName = sParList[mCat+4+i];
-            KKSType * cType = new KKSType (idType, cTypeName);
-            KKSCategory * c = new KKSCategory (idCat, cName, cType);
-            int idTCat = sParList[mCat+5+i].toInt ();
-            QString cTName = sParList[mCat+6+i];
-            int idTType = sParList[mCat+7+i].toInt ();
-            QString cTTypeName = sParList[mCat+8+i];
-            KKSType * ctType = new KKSType (idTType, cTTypeName);
-            KKSCategory * ct = new KKSCategory (idTCat, cTName, ctType);
-            c->setTableCategory(ct);
-            catList.insert (idCat, c);
-            c->release ();
+            QString stdIdCat = sParList[mCat+1+i];
+            int idCat = stdIdCat.toInt();
+            cList.append(idCat);
         }
     }
 
-    QRegExp ioReg(QString("IO\\ begins\\ [0-9]*"), Qt::CaseInsensitive);
-    int mIO = sParList.indexOf (ioReg);
-    if (mIO > 0)
-    {
+    QRegExp rIO (QString("IO\\ begins\\ [0-9]*"), Qt::CaseInsensitive);
+    int mIO = sParList.indexOf (rIO);
+    if(mIO >= 0){
         int numIO = sParList[mIO].lastIndexOf (" ");
         int nIO = sParList[mIO].mid (numIO).toInt();
-        ioList.clear ();
-        for (int i=0; i<3*nIO; i+=3)
+        this->ioList.clear ();
+        for (int i=0; i<nIO; i++)
         {
-            int idIO = sParList[mIO+i+1].toInt ();
-            QString ioName = sParList[mIO+i+2];
-            int idIOCat = sParList[mIO+i+3].toInt();
-            KKSCategory * c = new KKSCategory (*catList.value (idIOCat));
-            const KKSObject * io = new KKSObject (idIO, c, ioName);
-            ioList.append (io);
-            io->release ();
+            QString stdIdIO = sParList[mIO+1+i];
+            int idIO = stdIdIO.toInt();
+            ioList.append(idIO);
         }
     }
     
+    QRegExp rServ (QString("services\\ begins\\ [0-9]*"), Qt::CaseInsensitive);
+    int mServ = sParList.indexOf (rServ);
+    if(mServ >= 0){
+        int numServ = sParList[mServ].lastIndexOf (" ");
+        int nServ = sParList[mServ].mid (numServ).toInt();
+        this->sList.clear ();
+        for (int i=0; i<nServ; i++)
+        {
+            QString stdIdServ = sParList[mServ+1+i];
+            int idServ = stdIdServ.toInt();
+            sList.append(idServ);
+        }
+    }
+
+    QRegExp rPL (QString("part_lows\\ begins\\ [0-9]*"), Qt::CaseInsensitive);
+    int mPL = sParList.indexOf (rPL);
+    if(mPL >= 0){
+        int numPL = sParList[mPL].lastIndexOf (" ");
+        int nPL = sParList[mPL].mid (numPL).toInt();
+        this->plList.clear ();
+        for (int i=0; i<nPL; i++)
+        {
+            QString stdIdPL = sParList[mPL+1+i];
+            int idPL = stdIdPL.toInt();
+            plList.append(idPL);
+        }
+    }
+
     m_isEmpty = false;
     if(EQUAL_F(m_xmin, 0.0) && EQUAL_F(m_xmax, 0.0) && m_num == -1)
         m_isEmpty = true;
@@ -360,7 +373,7 @@ bool KKSHistogram::isEmpty() const
 
 const QList<int>& KKSHistogram::getScenario (void) const
 {
-    return scList;//idScenario;
+    return scList;
 }
 
 void KKSHistogram::setScenario (const QList<int>& idSc)
@@ -370,33 +383,54 @@ void KKSHistogram::setScenario (const QList<int>& idSc)
 
 const QList<int>& KKSHistogram::getVariant (void) const
 {
-    return varList;
+    return vList;
 }
 
 void KKSHistogram::setVariant (const QList<int>& idv)
 {
-    varList = idv;
+    vList = idv;
 }
 
-const KKSMap<qint64, const KKSCategory *>& KKSHistogram::category (void) const
+const QList<int>& KKSHistogram::getCategories(void) const
 {
-    return catList;
+    return cList;
 }
 
-void KKSHistogram::setCategory (const KKSMap<qint64, const KKSCategory *>& cat)
+void KKSHistogram::setCategories (const QList<int>& idCat)
 {
-    catList = cat;
+    cList = idCat;
 }
 
-const KKSList<const KKSObject *>& KKSHistogram::srcObject (void) const
+const QList<int>& KKSHistogram::getIO(void) const
 {
     return ioList;
 }
 
-void KKSHistogram::setSrcObject (const KKSList<const KKSObject *>& iosrc)
+void KKSHistogram::setIO (const QList<int>& idIO)
 {
-    ioList == iosrc;
+    ioList = idIO;
 }
+
+const QList<int>& KKSHistogram::getServices(void) const
+{
+    return sList;
+}
+
+void KKSHistogram::setServices(const QList<int>& idServ)
+{
+    sList = idServ;
+}
+
+const QList<int>& KKSHistogram::getPartLows(void) const
+{
+    return plList;
+}
+
+void KKSHistogram::setPartLows (const QList<int>& idPartLows)
+{
+    plList = idPartLows;
+}
+
 
 void KKSHistogram::clear (void)
 {

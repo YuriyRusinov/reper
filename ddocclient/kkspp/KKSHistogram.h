@@ -56,12 +56,17 @@ public:
     const QList<int>& getVariant (void) const;
     void setVariant (const QList<int>& idv);
     
-    const KKSMap<qint64, const KKSCategory *>& category (void) const;
-    void setCategory (const KKSMap<qint64, const KKSCategory *>& cat);
+    const QList<int>& getCategories(void) const;
+    void setCategories (const QList<int>& idCat);
     
-    const KKSList<const KKSObject *>& srcObject (void) const;
-    void setSrcObject (const KKSList<const KKSObject *>& iosrc);
-    
+    const QList<int>& getIO(void) const;
+    void setIO (const QList<int>& idIO);
+
+    const QList<int>& getServices(void) const;
+    void setServices(const QList<int>& idServ);
+
+    const QList<int>& getPartLows(void) const;
+    void setPartLows (const QList<int>& idPartLows);
 
 private:
     //
@@ -76,13 +81,12 @@ private:
     //
     // filter parameters
     //
-    QList<int> scList;//idScenario;
-    QList<int> varList;//idVariant;
-    KKSMap<qint64, const KKSCategory *> catList;
-    KKSList<const KKSObject *> ioList;
-    //QList<int> sourceList;// idSource;
-    //QList<int> recvList;// idReceiver;
-    
+    QList<int> scList;
+    QList<int> vList;
+    QList<int> cList;
+    QList<int> ioList;
+    QList<int> sList;
+    QList<int> plList;
 
 };
 

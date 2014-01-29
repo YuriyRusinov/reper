@@ -6528,3 +6528,244 @@ bool KKSLoader :: isIOSynced (const KKSCategory * cat) const
     delete res;
     return isc; 
 }
+
+QMap<int, QString> KKSLoader :: getVariantsInfoForStreams() const
+{
+    QMap<int, QString> list;
+    
+    QString sql = QString("select * from getVariantsInfoForStreams()");
+    KKSResult * res = db->execute(sql);
+    if (!res || res->getRowCount() <= 0)
+    {
+        if (res)
+            delete res;
+        return list;
+    }
+    
+    for(int i=0; i<res->getRowCount(); i++){
+        int id = res->getCellAsInt(i, 0);
+        QString name = res->getCellAsString(i, 1);
+        list.insert(id, name);
+    }
+    
+    delete res;
+    
+    return list;
+}
+
+QMap<int, QString> KKSLoader :: getVariantsInfoForChains() const
+{
+    QMap<int, QString> list;
+    
+    QString sql = QString("select * from getVariantsInfoForChains()");
+    KKSResult * res = db->execute(sql);
+    if (!res || res->getRowCount() <= 0)
+    {
+        if (res)
+            delete res;
+        return list;
+    }
+    
+    for(int i=0; i<res->getRowCount(); i++){
+        int id = res->getCellAsInt(i, 0);
+        QString name = res->getCellAsString(i, 1);
+        list.insert(id, name);
+    }
+    
+    delete res;
+    
+    return list;
+}
+
+QMap<int, QString> KKSLoader :: getScenariosInfoForChains() const
+{
+    QMap<int, QString> list;
+    
+    QString sql = QString("select * from getScenariosInfoForChains()");
+    KKSResult * res = db->execute(sql);
+    if (!res || res->getRowCount() <= 0)
+    {
+        if (res)
+            delete res;
+        return list;
+    }
+    
+    for(int i=0; i<res->getRowCount(); i++){
+        int id = res->getCellAsInt(i, 0);
+        QString name = res->getCellAsString(i, 1);
+        list.insert(id, name);
+    }
+    
+    delete res;
+    
+    return list;
+}
+
+QMap<int, QString> KKSLoader :: getScenariosInfoForStreams() const
+{
+    QMap<int, QString> list;
+    
+    QString sql = QString("select * from getScenariosInfoForStreams()");
+    KKSResult * res = db->execute(sql);
+    if (!res || res->getRowCount() <= 0)
+    {
+        if (res)
+            delete res;
+        return list;
+    }
+    
+    for(int i=0; i<res->getRowCount(); i++){
+        int id = res->getCellAsInt(i, 0);
+        QString name = res->getCellAsString(i, 1);
+        list.insert(id, name);
+    }
+    
+    delete res;
+    
+    return list;
+}
+
+QMap<int, QString> KKSLoader :: getCatInfoForChains() const
+{
+    QMap<int, QString> list;
+    
+    QString sql = QString("select * from getCategoriesInfoForChains()");
+    KKSResult * res = db->execute(sql);
+    if (!res || res->getRowCount() <= 0)
+    {
+        if (res)
+            delete res;
+        return list;
+    }
+    
+    for(int i=0; i<res->getRowCount(); i++){
+        int id = res->getCellAsInt(i, 0);
+        QString name = res->getCellAsString(i, 1);
+        list.insert(id, name);
+    }
+    
+    delete res;
+    
+    return list;
+}
+
+QMap<int, QString> KKSLoader :: getCatInfoForStreams() const
+{
+    QMap<int, QString> list;
+    
+    QString sql = QString("select * from getCategoriesInfoForStreams()");
+    KKSResult * res = db->execute(sql);
+    if (!res || res->getRowCount() <= 0)
+    {
+        if (res)
+            delete res;
+        return list;
+    }
+    
+    for(int i=0; i<res->getRowCount(); i++){
+        int id = res->getCellAsInt(i, 0);
+        QString name = res->getCellAsString(i, 1);
+        list.insert(id, name);
+    }
+    
+    delete res;
+    
+    return list;
+}
+
+QMap<int, QString> KKSLoader :: getIOInfoForChains() const
+{
+    QMap<int, QString> list;
+    
+    QString sql = QString("select * from getIOInfoForChains()");
+    KKSResult * res = db->execute(sql);
+    if (!res || res->getRowCount() <= 0)
+    {
+        if (res)
+            delete res;
+        return list;
+    }
+    
+    for(int i=0; i<res->getRowCount(); i++){
+        int id = res->getCellAsInt(i, 0);
+        QString name = res->getCellAsString(i, 1);
+        list.insert(id, name);
+    }
+    
+    delete res;
+    
+    return list;
+}
+
+QMap<int, QString> KKSLoader :: getIOInfoForStreams() const
+{
+    QMap<int, QString> list;
+    
+    QString sql = QString("select * from getIOInfoForStreams()");
+    KKSResult * res = db->execute(sql);
+    if (!res || res->getRowCount() <= 0)
+    {
+        if (res)
+            delete res;
+        return list;
+    }
+    
+    for(int i=0; i<res->getRowCount(); i++){
+        int id = res->getCellAsInt(i, 0);
+        QString name = res->getCellAsString(i, 1);
+        list.insert(id, name);
+    }
+    
+    delete res;
+    
+    return list;
+}
+
+QMap<int, QString> KKSLoader :: getServicesInfoForChains() const
+{
+    QMap<int, QString> list;
+    
+    QString sql = QString("select * from getServicesInfoForChains()");
+    KKSResult * res = db->execute(sql);
+    if (!res || res->getRowCount() <= 0)
+    {
+        if (res)
+            delete res;
+        return list;
+    }
+    
+    for(int i=0; i<res->getRowCount(); i++){
+        int id = res->getCellAsInt(i, 0);
+        QString name = res->getCellAsString(i, 1);
+        list.insert(id, name);
+    }
+    
+    delete res;
+    
+    return list;
+}
+
+QMap<int, QString> KKSLoader :: getPartLowInfoForStreams() const
+{
+    QMap<int, QString> list;
+    
+    QString sql = QString("select * from getPartLowInfoForStreams()");
+    KKSResult * res = db->execute(sql);
+    if (!res || res->getRowCount() <= 0)
+    {
+        if (res)
+            delete res;
+        return list;
+    }
+    
+    for(int i=0; i<res->getRowCount(); i++){
+        int id = res->getCellAsInt(i, 0);
+        QString name = res->getCellAsString(i, 1);
+        list.insert(id, name);
+    }
+    
+    delete res;
+    
+    return list;
+}
+

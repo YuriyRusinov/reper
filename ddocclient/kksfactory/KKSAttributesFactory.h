@@ -161,7 +161,7 @@ private:
     void connectToSlots (QObject *aw, QWidget* wEditor);
 
     KKSMap<qint64, KKSEIOData *> getAttrList (const KKSAttrValue * pAttrValue, const QVariant& val) const;
-    QMap<int, QString> getAttrValsList (qint64 idObject, const KKSList<const KKSFilterGroup *>& filters=KKSList<const KKSFilterGroup *>());
+    //QMap<int, QString> getAttrValsList (qint64 idObject, const KKSList<const KKSFilterGroup *>& filters=KKSList<const KKSFilterGroup *>());
 private:
     //
     // Variables

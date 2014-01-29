@@ -54,8 +54,11 @@ public:
     
     void loadScenario (const QMap<int, QString>& scList);
     void loadVariants (const QMap<int, QString>& varList);
-    void loadCategories (const KKSMap<int, KKSCategory *>& catList);
-    void loadIOList (const KKSMap<int, KKSObject *>& IOList);
+    void loadCategories (const QMap<int, QString>& cList);
+    void loadIOList (const QMap<int, QString>& ioList);
+    void loadPartLows(const QMap<int, QString>& plList);
+    void loadServices(const QMap<int, QString>& sList);
+    
     void clearIO (void);
     
     KKSValue getVal (void);
@@ -72,7 +75,8 @@ private slots:
     void variantSet (const QModelIndex& topLeft, const QModelIndex& bottomRight);
     void catSet (const QModelIndex& topLeft, const QModelIndex& bottomRight);
     void ioSet (const QModelIndex& topLeft, const QModelIndex& bottomRight);
-    void servSet (const QModelIndex& topLeft, const QModelIndex& bottomRight);
+    void serviceSet (const QModelIndex& topLeft, const QModelIndex& bottomRight);
+    void partLowSet (const QModelIndex& topLeft, const QModelIndex& bottomRight);
     
 signals:
     void valueChanged (qint64 id, KKSIndAttrClass isSys, QVariant val);

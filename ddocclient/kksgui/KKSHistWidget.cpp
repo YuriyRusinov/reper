@@ -78,8 +78,7 @@ void KKSHistWidget::init (void)
                                                 Qt::WindowTitleHint | 
                                                 Qt::WindowSystemMenuHint | 
                                                 Qt::WindowMinimizeButtonHint | 
-                                                Qt::WindowMaximizeButtonHint | 
-                                                Qt::WindowSoftkeysRespondHint);
+                                                Qt::WindowMaximizeButtonHint);
 
     m_qwtHistogramWidget->setWindowTitle(tr("Histogram view"));    
     
@@ -119,8 +118,7 @@ void KKSHistWidget::calcHist (void)
                                                     Qt::WindowTitleHint | 
                                                     Qt::WindowSystemMenuHint | 
                                                     Qt::WindowMinimizeButtonHint | 
-                                                    Qt::WindowMaximizeButtonHint | 
-                                                    Qt::WindowSoftkeysRespondHint);
+                                                    Qt::WindowMaximizeButtonHint);
 
         m_qwtHistogramWidget->setWindowTitle(tr("Histogram view"));    
     }

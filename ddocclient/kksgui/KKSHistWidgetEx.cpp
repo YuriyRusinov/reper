@@ -76,8 +76,7 @@ void KKSHistWidgetEx::init (void)
                                                 Qt::WindowTitleHint | 
                                                 Qt::WindowSystemMenuHint | 
                                                 Qt::WindowMinimizeButtonHint | 
-                                                Qt::WindowMaximizeButtonHint | 
-                                                Qt::WindowSoftkeysRespondHint);
+                                                Qt::WindowMaximizeButtonHint);
 
     m_qwtHistogramWidget->setWindowTitle(tr("Histogram view"));    
     
@@ -117,8 +116,7 @@ void KKSHistWidgetEx::calcHist (void)
                                                     Qt::WindowTitleHint | 
                                                     Qt::WindowSystemMenuHint | 
                                                     Qt::WindowMinimizeButtonHint | 
-                                                    Qt::WindowMaximizeButtonHint | 
-                                                    Qt::WindowSoftkeysRespondHint);
+                                                    Qt::WindowMaximizeButtonHint);
 
         m_qwtHistogramWidget->setWindowTitle(tr("Histogram view"));    
     }
@@ -207,8 +205,15 @@ void KKSHistWidgetEx::loadVariants (const QMap<int, QString>& varList)
         varModel->setData (vIndex, p.value(), Qt::DisplayRole);
         i++;
     }
-    if (!isSet)
+
+    if (!isSet){
         UI->lvVariants->setModel (varModel);
+        connect (varModel,
+                 SIGNAL (dataChanged(const QModelIndex&, const QModelIndex&)),
+                 this,
+                 SLOT (variantSet(const QModelIndex&, const QModelIndex&))
+                );
+    }
 /*    if (hist && hist->getVariant() > 0)
     {
         int indV = hist->getVariant ();
@@ -218,14 +223,16 @@ void KKSHistWidgetEx::loadVariants (const QMap<int, QString>& varList)
     */
 }
 
-void KKSHistWidgetEx::loadCategories (const KKSMap<int, KKSCategory *>& catList)
+void KKSHistWidgetEx::loadCategories (const QMap<int, QString>& cList)
 {
     //UI->lwCategories->clear();
     QAbstractItemModel * catMod = UI->lvCategories->model();
-    bool isSet (!catMod);
-    int ncr = catList.count();
-    if (!catMod)
+    bool isSet (true);
+    int ncr = cList.count();
+    if (!catMod){
         catMod = new KKSCheckableModel (ncr, 1);
+        isSet = false;
+    }
     else
     {
         int nr = catMod->rowCount();
@@ -233,34 +240,38 @@ void KKSHistWidgetEx::loadCategories (const KKSMap<int, KKSCategory *>& catList)
         if (catMod->columnCount() == 0)
             catMod->insertColumns (0, 1);
     }
-    int i = 0;
-    for (KKSMap<int, KKSCategory *>::const_iterator p=catList.constBegin();
-            p != catList.constEnd();
+
+    int i=0;
+    for (QMap<int, QString>::const_iterator p=cList.constBegin();
+            p != cList.constEnd();
             ++p)
     {
-        QModelIndex catInd = catMod->index (i++, 0);
-        catMod->setData (catInd, p.key(), Qt::UserRole);
-        catMod->setData (catInd, p.value()->name(), Qt::DisplayRole);
+        QModelIndex cIndex = catMod->index (i, 0);
+        catMod->setData (cIndex, p.key(), Qt::UserRole);
+        catMod->setData (cIndex, p.value(), Qt::DisplayRole);
+        i++;
     }
-    if (!isSet)
+
+    if (!isSet){
         UI->lvCategories->setModel (catMod);
-/*    if (hist && hist->category())
-    {
-        qint64 idc = hist->category()->id();
-        int catInd = cbCategory->findData (QVariant (idc));
-        cbCategory->setCurrentIndex (catInd);
+        connect (catMod,
+                 SIGNAL (dataChanged(const QModelIndex&, const QModelIndex&)),
+                 this,
+                 SLOT (catSet(const QModelIndex&, const QModelIndex&))
+                );
     }
-    */
 }
 
-void KKSHistWidgetEx::loadIOList (const KKSMap<int, KKSObject *>& IOList)
+void KKSHistWidgetEx::loadIOList (const QMap<int, QString>& ioList)
 {
-    //UI->lwIO->clear ();
-    QAbstractItemModel *ioMod = UI->lvIOs->model ();
-    bool isSet (!ioMod);
-    int ioc = IOList.count ();
-    if (!ioMod)
-        ioMod = new KKSCheckableModel (ioc, 1);
+    //UI->lwCategories->clear();
+    QAbstractItemModel * ioMod = UI->lvIOs->model();
+    bool isSet (true);
+    int ncr = ioList.count();
+    if (!ioMod){
+        ioMod = new KKSCheckableModel (ncr, 1);
+        isSet = false;
+    }
     else
     {
         int nr = ioMod->rowCount();
@@ -268,32 +279,106 @@ void KKSHistWidgetEx::loadIOList (const KKSMap<int, KKSObject *>& IOList)
         if (ioMod->columnCount() == 0)
             ioMod->insertColumns (0, 1);
     }
-    int i = 0;
-    for (KKSMap<int, KKSObject *>::const_iterator p=IOList.constBegin();
-            p != IOList.constEnd();
+
+    int i=0;
+    for (QMap<int, QString>::const_iterator p=ioList.constBegin();
+            p != ioList.constEnd();
             ++p)
     {
-        QModelIndex ioInd = ioMod->index (i++, 0);
-        ioMod->setData (ioInd, p.key(), Qt::UserRole);
-        ioMod->setData (ioInd, p.value()->name(), Qt::DisplayRole);
+        QModelIndex ioIndex = ioMod->index (i, 0);
+        ioMod->setData (ioIndex, p.key(), Qt::UserRole);
+        ioMod->setData (ioIndex, p.value(), Qt::DisplayRole);
+        i++;
     }
-    if (!isSet)
+
+    if (!isSet){
         UI->lvIOs->setModel (ioMod);
-    /*
-    for (KKSMap<int, KKSObject *>::const_iterator p = IOList.constBegin();
-            p != IOList.constEnd();
+        connect (ioMod,
+                 SIGNAL (dataChanged(const QModelIndex&, const QModelIndex&)),
+                 this,
+                 SLOT (ioSet(const QModelIndex&, const QModelIndex&))
+                );
+    }
+}
+
+void KKSHistWidgetEx::loadPartLows(const QMap<int, QString>& plList)
+{
+    //UI->lwCategories->clear();
+    QAbstractItemModel * plMod = UI->lvLows->model();
+    bool isSet (true);
+    int ncr = plList.count();
+    if (!plMod){
+        plMod = new KKSCheckableModel (ncr, 1);
+        isSet = false;
+    }
+    else
+    {
+        int nr = plMod->rowCount();
+        plMod->removeRows (0, nr);
+        if (plMod->columnCount() == 0)
+            plMod->insertColumns (0, 1);
+    }
+
+    int i=0;
+    for (QMap<int, QString>::const_iterator p=plList.constBegin();
+            p != plList.constEnd();
             ++p)
     {
-        cbIORef->addItem (p.value()->name(), p.key());
+        QModelIndex plIndex = plMod->index (i, 0);
+        plMod->setData (plIndex, p.key(), Qt::UserRole);
+        plMod->setData (plIndex, p.value(), Qt::DisplayRole);
+        i++;
     }
-    if (hist && hist->srcObject())
-    {
-        qint64 idIO = hist->srcObject()->id();
-        int ioInd = this->cbIORef->findData (QVariant (idIO));
-        cbIORef->setCurrentIndex (ioInd);
+
+    if (!isSet){
+        UI->lvLows->setModel (plMod);
+        connect (plMod,
+                 SIGNAL (dataChanged(const QModelIndex&, const QModelIndex&)),
+                 this,
+                 SLOT (partLowSet(const QModelIndex&, const QModelIndex&))
+                );
     }
-    */
 }
+
+void KKSHistWidgetEx::loadServices(const QMap<int, QString>& sList)
+{
+    //UI->lwCategories->clear();
+    QAbstractItemModel * sMod = UI->lvServices->model();
+    bool isSet (true);
+    int ncr = sList.count();
+    if (!sMod){
+        sMod = new KKSCheckableModel (ncr, 1);
+        isSet = false;
+    }
+    else
+    {
+        int nr = sMod->rowCount();
+        sMod->removeRows (0, nr);
+        if (sMod->columnCount() == 0)
+            sMod->insertColumns (0, 1);
+    }
+
+    int i=0;
+    for (QMap<int, QString>::const_iterator p=sList.constBegin();
+            p != sList.constEnd();
+            ++p)
+    {
+        QModelIndex sIndex = sMod->index (i, 0);
+        sMod->setData (sIndex, p.key(), Qt::UserRole);
+        sMod->setData (sIndex, p.value(), Qt::DisplayRole);
+        i++;
+    }
+
+    if (!isSet){
+        UI->lvServices->setModel (sMod);
+        connect (sMod,
+                 SIGNAL (dataChanged(const QModelIndex&, const QModelIndex&)),
+                 this,
+                 SLOT (serviceSet(const QModelIndex&, const QModelIndex&))
+                );
+    }
+}
+
 
 void KKSHistWidgetEx::setHist (const KKSHistogram& shist)
 {
@@ -354,8 +439,7 @@ void KKSHistWidgetEx::setHist (const KKSHistogram& shist)
                                                     Qt::WindowTitleHint | 
                                                     Qt::WindowSystemMenuHint | 
                                                     Qt::WindowMinimizeButtonHint | 
-                                                    Qt::WindowMaximizeButtonHint | 
-                                                    Qt::WindowSoftkeysRespondHint);
+                                                    Qt::WindowMaximizeButtonHint);
 
         m_qwtHistogramWidget->setWindowTitle(tr("Histogram view"));    
     }
@@ -427,10 +511,11 @@ KKSValue KKSHistWidgetEx::getVal (void)
 
 void KKSHistWidgetEx::scenarioSet (const QModelIndex& topLeft, const QModelIndex& bottomRight)
 {
-    //qDebug () << __PRETTY_FUNCTION__ << topLeft << bottomRight;
     int iRow0 = topLeft.row();
     int iRow1 = bottomRight.row();
+
     QList<int> scList = m_hist->getScenario();
+
     QAbstractItemModel * scMod = qobject_cast<QAbstractItemModel *>(sender());
     for (int i=iRow0; i<=iRow1; i++)
     {
@@ -442,16 +527,17 @@ void KKSHistWidgetEx::scenarioSet (const QModelIndex& topLeft, const QModelIndex
         else if (chState == Qt::Unchecked && scList.contains(idSc))
             scList.removeOne(idSc);
     }
-    //qDebug () << __PRETTY_FUNCTION__ << scList;
+
     m_hist->setScenario(scList);
 }
 
 void KKSHistWidgetEx::variantSet (const QModelIndex& topLeft, const QModelIndex& bottomRight)
 {
-    //qDebug () << __PRETTY_FUNCTION__ << topLeft << bottomRight;
     int iRow0 = topLeft.row();
     int iRow1 = bottomRight.row();
+
     QList<int> vList = m_hist->getVariant();
+    
     QAbstractItemModel * vMod = qobject_cast<QAbstractItemModel *>(sender());
     for (int i=iRow0; i<=iRow1; i++)
     {
@@ -463,23 +549,95 @@ void KKSHistWidgetEx::variantSet (const QModelIndex& topLeft, const QModelIndex&
         else if (chState == Qt::Unchecked && vList.contains(idV))
             vList.removeOne(idV);
     }
+
     m_hist->setVariant(vList);
 }
 
 void KKSHistWidgetEx::catSet (const QModelIndex& topLeft, const QModelIndex& bottomRight)
 {
-    qDebug () << __PRETTY_FUNCTION__ << topLeft << bottomRight;
+    int iRow0 = topLeft.row();
+    int iRow1 = bottomRight.row();
+
+    QList<int> cList = m_hist->getCategories();
+    
+    QAbstractItemModel * vMod = qobject_cast<QAbstractItemModel *>(sender());
+    for (int i=iRow0; i<=iRow1; i++)
+    {
+        QModelIndex wIndex = vMod->index (iRow0, 0, topLeft.parent());
+        Qt::CheckState chState = (Qt::CheckState)(vMod->data(wIndex, Qt::CheckStateRole).toInt());
+        int idV = vMod->data (wIndex, Qt::UserRole).toInt();
+        if (chState == Qt::Checked && !cList.contains (idV))
+            cList.append (idV);
+        else if (chState == Qt::Unchecked && cList.contains(idV))
+            cList.removeOne(idV);
+    }
+
+    m_hist->setCategories(cList);
     
 }
 
 void KKSHistWidgetEx::ioSet (const QModelIndex& topLeft, const QModelIndex& bottomRight)
 {
-    qDebug () << __PRETTY_FUNCTION__ << topLeft << bottomRight;
+    int iRow0 = topLeft.row();
+    int iRow1 = bottomRight.row();
+
+    QList<int> ioList = m_hist->getIO();
     
+    QAbstractItemModel * vMod = qobject_cast<QAbstractItemModel *>(sender());
+    for (int i=iRow0; i<=iRow1; i++)
+    {
+        QModelIndex wIndex = vMod->index (iRow0, 0, topLeft.parent());
+        Qt::CheckState chState = (Qt::CheckState)(vMod->data(wIndex, Qt::CheckStateRole).toInt());
+        int idV = vMod->data (wIndex, Qt::UserRole).toInt();
+        if (chState == Qt::Checked && !ioList.contains (idV))
+            ioList.append (idV);
+        else if (chState == Qt::Unchecked && ioList.contains(idV))
+            ioList.removeOne(idV);
+    }
+
+    m_hist->setVariant(ioList);
 }
 
-void KKSHistWidgetEx::servSet (const QModelIndex& topLeft, const QModelIndex& bottomRight)
+void KKSHistWidgetEx::serviceSet (const QModelIndex& topLeft, const QModelIndex& bottomRight)
 {
-    qDebug () << __PRETTY_FUNCTION__ << topLeft << bottomRight;
+    int iRow0 = topLeft.row();
+    int iRow1 = bottomRight.row();
+
+    QList<int> sList = m_hist->getServices();
     
+    QAbstractItemModel * vMod = qobject_cast<QAbstractItemModel *>(sender());
+    for (int i=iRow0; i<=iRow1; i++)
+    {
+        QModelIndex wIndex = vMod->index (iRow0, 0, topLeft.parent());
+        Qt::CheckState chState = (Qt::CheckState)(vMod->data(wIndex, Qt::CheckStateRole).toInt());
+        int idV = vMod->data (wIndex, Qt::UserRole).toInt();
+        if (chState == Qt::Checked && !sList.contains (idV))
+            sList.append (idV);
+        else if (chState == Qt::Unchecked && sList.contains(idV))
+            sList.removeOne(idV);
+    }
+
+    m_hist->setVariant(sList);
+}
+
+void KKSHistWidgetEx::partLowSet (const QModelIndex& topLeft, const QModelIndex& bottomRight)
+{
+    int iRow0 = topLeft.row();
+    int iRow1 = bottomRight.row();
+
+    QList<int> plList = m_hist->getPartLows();
+    
+    QAbstractItemModel * vMod = qobject_cast<QAbstractItemModel *>(sender());
+    for (int i=iRow0; i<=iRow1; i++)
+    {
+        QModelIndex wIndex = vMod->index (iRow0, 0, topLeft.parent());
+        Qt::CheckState chState = (Qt::CheckState)(vMod->data(wIndex, Qt::CheckStateRole).toInt());
+        int idV = vMod->data (wIndex, Qt::UserRole).toInt();
+        if (chState == Qt::Checked && !plList.contains (idV))
+            plList.append (idV);
+        else if (chState == Qt::Unchecked && plList.contains(idV))
+            plList.removeOne(idV);
+    }
+
+    m_hist->setVariant(plList);
 }

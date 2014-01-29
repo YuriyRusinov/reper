@@ -244,6 +244,18 @@ class _F_EXPORT KKSLoader
         
         bool isIOSynced (const KKSCategory * cat) const;
 
+        QMap<int, QString> getIOInfoForStreams() const;
+        QMap<int, QString> getIOInfoForChains() const;
+        QMap<int, QString> getCatInfoForStreams() const;
+        QMap<int, QString> getCatInfoForChains() const;
+        QMap<int, QString> getVariantsInfoForStreams() const;
+        QMap<int, QString> getVariantsInfoForChains() const;
+        QMap<int, QString> getScenariosInfoForStreams() const;
+        QMap<int, QString> getScenariosInfoForChains() const;
+        QMap<int, QString> getServicesInfoForChains() const;
+        QMap<int, QString> getPartLowInfoForStreams() const;
+
+
         KKSLoader();
         ~KKSLoader();
     protected:
