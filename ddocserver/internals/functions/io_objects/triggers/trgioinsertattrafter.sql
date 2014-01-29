@@ -55,6 +55,17 @@ begin
                 return NULL;
             end if;
         end if;
+
+        if(idType = 33) then --histogram attribute
+
+            res = insertHistogramParams(new.id, new.value, 0); -- 0 - using table attrs_values
+            if(res <= 0) then
+                raise exception 'Cannot parse and setup params for histogram!';
+                return NULL;
+            end if;
+        end if;
+
+
     end if;
 
 
