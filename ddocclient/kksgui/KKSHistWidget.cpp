@@ -312,17 +312,29 @@ void KKSHistWidget::loadVariants (const QMap<int, QString>& varList)
     }
     //UI->lwVariants->clear ();
     int i=0;
+    QList<int> vHList = hist->getVariant();
     for (QMap<int, QString>::const_iterator p=varList.constBegin();
             p != varList.constEnd();
             ++p)
     {
         QModelIndex vIndex = varModel->index (i, 0);
         varModel->setData (vIndex, p.key(), Qt::UserRole);
+        if (vHList.contains (p.key()))
+            varModel->setData (vIndex, Qt::Checked, Qt::CheckStateRole);
+        else
+            varModel->setData (vIndex, Qt::Unchecked, Qt::CheckStateRole);
         varModel->setData (vIndex, p.value(), Qt::DisplayRole);
         i++;
     }
     if (!isSet)
+    {
         UI->lvVariants->setModel (varModel);
+        connect (varModel,
+                 SIGNAL (dataChanged(const QModelIndex&, const QModelIndex&)),
+                 this,
+                 SLOT (variantSet(const QModelIndex&, const QModelIndex&))
+                );
+    }
 /*    if (hist && hist->getVariant() > 0)
     {
         int indV = hist->getVariant ();
@@ -576,7 +588,7 @@ void KKSHistWidget::scenarioSet (const QModelIndex& topLeft, const QModelIndex& 
         else if (chState == Qt::Unchecked && scList.contains(idSc))
             scList.removeOne(idSc);
     }
-    qDebug () << __PRETTY_FUNCTION__ << scList;
+    //qDebug () << __PRETTY_FUNCTION__ << scList;
     hist->setScenario(scList);
 }
 
@@ -597,7 +609,7 @@ void KKSHistWidget::variantSet (const QModelIndex& topLeft, const QModelIndex& b
         else if (chState == Qt::Unchecked && vList.contains(idV))
             vList.removeOne(idV);
     }
-    
+    hist->setVariant(vList);
 }
 
 void KKSHistWidget::catSet (const QModelIndex& topLeft, const QModelIndex& bottomRight)
