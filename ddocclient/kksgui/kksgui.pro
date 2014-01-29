@@ -15,6 +15,8 @@ DEPENDPATH *= ../kkspp
 LIBS *= -L$$DESTDIR -lkkspp
 
 INCLUDEPATH *= ../kksqwt
+INCLUDEPATH *= ../kksqwt/src
+INCLUDEPATH *= ../kksqwt/textengines
 DEPENDPATH *= ../kksqwt
 LIBS *= -L$$DESTDIR -lkksqwt
 
