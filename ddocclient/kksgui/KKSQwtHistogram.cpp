@@ -10,6 +10,12 @@
 #include <qwt_plot_grid.h>
 #include <qwt_plot_marker.h>
 #include <qwt_interval_data.h>
+#include <QGridLayout>
+#include <QSizePolicy>
+#include <QMap>
+#include <QPair>
+
+#include <KKSHistogram.h>
 
 class KKSQwtHistogramItem::PrivateData
 {
@@ -265,12 +271,18 @@ void KKSQwtHistogramItem::drawBar(QPainter *painter,
     //KKSQwtPlot plot;
 
 
-KKSQwtPlot::KKSQwtPlot(QWidget * parent) : QWidget(parent)
+KKSQwtPlotWidget::KKSQwtPlotWidget(const QString & title,
+                                   KKSHistogram * hist,
+                                   QWidget * parent, 
+                                   Qt::WindowFlags flags) : QWidget(parent, flags)
 {
-
-//    KKSQwtPlot plot;
+    m_histogramParams = hist;
+    if(m_histogramParams)
+        m_histogramParams->addRef();
+    
     plot.setCanvasBackground(QColor(Qt::white));
-    plot.setTitle(tr("Histogram"));
+    plot.setTitle(title);
+    plot.setParent(this);
 
     QwtPlotGrid *grid = new QwtPlotGrid;
     grid->enableXMin(true);
@@ -279,9 +291,12 @@ KKSQwtPlot::KKSQwtPlot(QWidget * parent) : QWidget(parent)
     grid->setMinPen(QPen(Qt::gray, 0 , Qt::DotLine));
     grid->attach(&plot);
 
-    KKSQwtHistogramItem *histogram = new KKSQwtHistogramItem();
-    histogram->setColor(Qt::darkCyan);
+    m_histogram = new KKSQwtHistogramItem();
+    m_histogram->setColor(Qt::darkCyan);
 
+    init(m_histogramParams);
+
+/*
     const int numValues = 20;
 
     QwtArray<QwtDoubleInterval> intervals(numValues);
@@ -305,14 +320,59 @@ KKSQwtPlot::KKSQwtPlot(QWidget * parent) : QWidget(parent)
     plot.setAxisScale(QwtPlot::yLeft, 0.0, 100.0);
     plot.setAxisScale(QwtPlot::xBottom, 0.0, pos);
     plot.replot();
-
-    //resize(600,400);
-    //show();
+*/
+    QGridLayout * gLay = new QGridLayout(this);
+    gLay->addWidget(&plot, 0, 0);
+    this->setLayout(gLay);
+    
+    plot.setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+    this->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 }
 
-KKSQwtPlot::~KKSQwtPlot()
+KKSQwtPlotWidget::~KKSQwtPlotWidget()
 {
-
+    if(m_histogramParams)
+        m_histogramParams->release();
 }
 
 
+void KKSQwtPlotWidget::init(KKSHistogram * hist)
+{
+    if(!hist || hist->isEmpty()){
+        plot.clear();
+        plot.replot();
+        return;
+    }
+
+    if(m_histogramParams)
+        m_histogramParams->release();
+
+    m_histogramParams = hist;
+    m_histogramParams->addRef();
+
+    const int numValues = m_histogramParams->size();
+
+    QwtArray<QwtDoubleInterval> intervals(numValues);
+    QwtArray<double> values(numValues);
+
+    //double pos = 0.0;
+    double yMax = 0.0;
+    QMap<int, QPair<double, double> > hData = m_histogramParams->getVec();
+    for ( int i = 0; i < (int)intervals.size(); i++ )
+    {
+        QPair<double, double> xyFrom = hData.value(i);
+        QPair<double, double> xyTo = hData.value(i+1);
+
+        intervals[i] = QwtDoubleInterval(xyFrom.first, xyTo.first);
+        values[i] = xyFrom.second; 
+        yMax = yMax < values[i] ? values[i] : yMax;
+    }
+
+    m_histogram->setData(QwtIntervalData(intervals, values));
+    m_histogram->attach(&plot);
+
+    plot.setAxisScale(QwtPlot::yLeft, 0.0, yMax);
+    plot.setAxisScale(QwtPlot::xBottom, m_histogramParams->getXMin(), m_histogramParams->getXMax());
+    plot.replot();
+
+}

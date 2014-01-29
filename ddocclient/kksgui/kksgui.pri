@@ -95,6 +95,7 @@ HEADERS += \
                 KKSRecDialog.h \
                 KKSMapWidget.h \
                 KKSHistWidget.h \
+                KKSHistWidgetEx.h \
                 KKSCharts.h \
                 KKSHistDrawWidget.h \
                 KKSQwtHistogram.h \
@@ -196,6 +197,7 @@ SOURCES += \
                 KKSMapWidget.cpp \
                 KKSRecDialog.cpp \
                 KKSHistWidget.cpp \
+                KKSHistWidgetEx.cpp \
                 KKSCharts.cpp \
                 KKSHistDrawWidget.cpp \
                 KKSQwtHistogram.cpp
@@ -324,6 +326,7 @@ headers.files += \
                 KKSRecDialog.h \
                 KKSMapWidget.h \
                 KKSHistWidget.h \
+                KKSHistWidgetEx.h \
                 KKSCharts.h \
                 KKSHistDrawWidget.h \
                 KKSQwtHistogram.h \

@@ -123,7 +123,7 @@
 #include <kksstateform.h>
 #include "defines.h"
 #include <KKSHistogram.h>
-#include <KKSHistWidget.h>
+#include <KKSHistWidgetEx.h>
 
 /*
  Заголовочные ф-лы генератора отчетов
@@ -1686,8 +1686,8 @@ void KKSObjEditorFactory :: setObjConnect (KKSObjEditor *editor)
     }
     
     connect (editor, SIGNAL (generateUUID (int, const KKSAttrValue *)), this, SLOT (genUUID (int, const KKSAttrValue *)) );
-    connect (editor, SIGNAL (setHistCat (int, KKSHistogram *, KKSHistWidget *)), this, SLOT (loadCatHist(int, KKSHistogram *, KKSHistWidget *)) );
-    connect (editor, SIGNAL (setHistIO (int, KKSHistogram *, KKSHistWidget *)), this, SLOT (loadIOHist (int, KKSHistogram *, KKSHistWidget *)) );
+    connect (editor, SIGNAL (setHistCat (int, KKSHistogram *, KKSHistWidgetEx *)), this, SLOT (loadCatHist(int, KKSHistogram *, KKSHistWidgetEx *)) );
+    connect (editor, SIGNAL (setHistIO (int, KKSHistogram *, KKSHistWidgetEx *)), this, SLOT (loadIOHist (int, KKSHistogram *, KKSHistWidgetEx *)) );
     connect (this, SIGNAL (setuuid (QString)), editor, SLOT (setIOUUID (QString)) );
     connect (this, SIGNAL (cioSaved(KKSObjectExemplar *)), editor, SLOT (recSaved(KKSObjectExemplar *)) );
 }
@@ -9849,7 +9849,7 @@ void KKSObjEditorFactory :: addLifeCycleState (KKSLifeCycleEx * lc, QAbstractIte
     refObj->release();
 }
 
-void KKSObjEditorFactory :: loadCatHist (int idCat, KKSHistogram * vHist, KKSHistWidget * hw)
+void KKSObjEditorFactory :: loadCatHist (int idCat, KKSHistogram * vHist, KKSHistWidgetEx * hw)
 {
     Q_UNUSED (idCat);
     Q_UNUSED (vHist);
@@ -9886,7 +9886,7 @@ void KKSObjEditorFactory :: loadCatHist (int idCat, KKSHistogram * vHist, KKSHis
  */
 }
 
-void KKSObjEditorFactory :: loadIOHist (int idIO, KKSHistogram * vHist, KKSHistWidget * hw)
+void KKSObjEditorFactory :: loadIOHist (int idIO, KKSHistogram * vHist, KKSHistWidgetEx * hw)
 {
 /*
     KKSObject * io = loader->loadIO (idIO);

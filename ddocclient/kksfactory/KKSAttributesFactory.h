@@ -72,6 +72,8 @@ public slots:
                         QString tableName = QString::null, 
                         int idCat=-1);
 
+    void getIdForHistogramParams(const QString & tableName, qint64 * id);
+
 private slots:
     void findAttributes (int idAttrs, QAbstractItemModel *aModel, KKSAttributesEditor * attrsEditor);
     void saveAttribute (const QModelIndex&, QAbstractItemModel * aModel, KKSAttributesEditor *aEditor);

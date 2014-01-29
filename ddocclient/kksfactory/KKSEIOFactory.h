@@ -72,6 +72,7 @@ private:
     friend class KKSSito;
     friend class KKSSitoWeb;
     friend class KKSPPFactory;
+    friend class KKSAttributesFactory;
     
     KKSEIOFactory();
     ~KKSEIOFactory();

@@ -71,7 +71,7 @@
 #include "KKSAttrUUIDWidget.h"
 #include "KKSAttrValueLabel.h"
 #include <KKSHistogram.h>
-#include "KKSHistWidget.h"
+#include "KKSHistWidgetEx.h"
 #include "defines.h"
 
 
@@ -357,9 +357,15 @@ int KKSObjEditor :: constructObject()
             else if (type == KKSAttrType::atHistogram)
             {
                 KKSValue v;
+                //получаем строковое представление значения атрибута типа "гистограмма"
+                //перед этим для новых гистограмм происходит получение значения поля id из соответствующей таблицы (для histogram_params_streams, histogram_params_chains)
+                //(вызывается в методе KKSHistWidgetEx::saveHist() )
                 emit needToUpdateHistogram (v);
                 (const_cast<KKSAttrValue *>(cAttrValue))->setValue(v);
-                value = v.valueVariant().value<KKSHistogram>().toString();
+                KKSHistogram h = v.valueVariant().value<KKSHistogram>();
+                value = h.toString();
+                val = v.valueVariant();
+                this->isChanged = true;
             }
 
             //ksa
@@ -554,10 +560,15 @@ int KKSObjEditor :: constructObject()
             else if(type == KKSAttrType::atHistogram)
             {
                 KKSValue v;
+                //получаем строковое представление значения атрибута типа "гистограмма"
+                //перед этим для новых гистограмм происходит получение значения поля id из соответствующей таблицы (для histogram_params_streams, histogram_params_chains)
+                //(вызывается в методе KKSHistWidgetEx::saveHist() )
                 emit needToUpdateHistogram (v);
                 (const_cast<KKSAttrValue *>(cAttrValue))->setValue(v);
                 KKSHistogram h = v.valueVariant().value<KKSHistogram>();
                 value = h.toString();
+                val = v.valueVariant();
+                this->isChanged = true;
             }
             //ksa
             else if(type == KKSAttrType::atGISMap)
@@ -728,8 +739,8 @@ int KKSObjEditor :: constructObject()
     //
     // если редактируемый ЭИО является ИО, то надо сохранить его атрибуты
     // а также задать ему его системные атрибуты, фактически преобразовав ЭИО в ИО
-    //
     // а также сохранить прикрепленные файлы
+
     if (pObj)
     {
         KKSList<KKSAttrValue*> avalList;
@@ -752,14 +763,15 @@ int KKSObjEditor :: constructObject()
             else if(type == KKSAttrType::atHistogram)
             {
                 KKSValue v;
+                //получаем строковое представление значения атрибута типа "гистограмма"
+                //перед этим для новых гистограмм происходит получение значения поля id из соответствующей таблицы (для histogram_params_streams, histogram_params_chains)
+                //(вызывается в методе KKSHistWidgetEx::saveHist() )
                 emit needToUpdateHistogram (v);
+                (const_cast<KKSAttrValue *>(cAttrValue))->setValue(v);
                 KKSHistogram h = v.valueVariant().value<KKSHistogram>();
                 value = h.toString();
-                (const_cast<KKSAttrValue *>(cAttrValue))->setValue(v);
+                val = v.valueVariant();
                 this->isChanged = true;
-                val = QVariant::fromValue<KKSHistogram>(h);
-                //qDebug () << __PRETTY_FUNCTION__ << value << val.toString();
-                //qDebug () << __PRETTY_FUNCTION__ << cAttrValue->value().valueForInsert();
             }
             //ksa
             else if(type == KKSAttrType::atGISMap)
@@ -2736,7 +2748,7 @@ void KKSObjEditor :: viewAHist (const KKSAttrValue * av, const KKSList<KKSAttrVa
 
 void KKSObjEditor :: loadHistCat (int idCat, KKSHistogram * vHist)
 {
-    KKSHistWidget * hw = qobject_cast<KKSHistWidget *> (this->sender());
+    KKSHistWidgetEx * hw = qobject_cast<KKSHistWidgetEx *> (this->sender());
     if (hw && idCat > 0)
         hw->clearIO();
     emit setHistCat (idCat, vHist, hw);
@@ -2744,6 +2756,6 @@ void KKSObjEditor :: loadHistCat (int idCat, KKSHistogram * vHist)
 
 void KKSObjEditor :: loadHistIO (int idIO, KKSHistogram * vHist)
 {
-    KKSHistWidget * hw = qobject_cast<KKSHistWidget *> (this->sender());
+    KKSHistWidgetEx * hw = qobject_cast<KKSHistWidgetEx *> (this->sender());
     emit setHistIO (idIO, vHist, hw);
 }

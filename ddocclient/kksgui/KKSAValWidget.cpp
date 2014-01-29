@@ -43,7 +43,7 @@
 #include "KKSIntervalWidget.h"
 #include "KKSHIntervalW.h"
 #include "KKSColorWidget.h"
-#include "KKSHistWidget.h"
+#include "KKSHistWidgetEx.h"
 #include "KKSMapWidget.h"
 
 KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFlags flags)

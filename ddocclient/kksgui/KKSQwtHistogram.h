@@ -22,6 +22,7 @@
 
 class QwtIntervalData;
 class QString;
+class KKSHistogram;
 
 class _GUI_EXPORT KKSQwtHistogramItem: public QwtPlotItem
 {
@@ -67,22 +68,27 @@ private:
 };
 
 
-class _GUI_EXPORT KKSQwtPlot : public QWidget //public QwtPlot
+class _GUI_EXPORT KKSQwtPlotWidget : public QWidget //public QwtPlot
 {
 private:
     Q_OBJECT
 
 public:
-    KKSQwtPlot(QWidget * parent = NULL);
-    ~KKSQwtPlot();
+    KKSQwtPlotWidget(const QString & title, 
+                     KKSHistogram * hist,
+                     QWidget * parent, 
+                     Qt::WindowFlags flags=0);
+    ~KKSQwtPlotWidget();
 
-    void init(){}
+    void init(KKSHistogram * hist);
 
 signals:
     void created();
 
 private:
     QwtPlot plot;
+    KKSHistogram * m_histogramParams;
+    KKSQwtHistogramItem * m_histogram;
 };
 
 #endif

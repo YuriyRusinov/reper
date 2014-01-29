@@ -81,7 +81,7 @@
 #include "KKSConverter.h"
 #include "KKSEIOFactory.h"
 #include "KKSPPFactory.h"
-#include "KKSHistWidget.h"
+#include "KKSHistWidgetEx.h"
 #include "KKSMapWidget.h"
 
 #include <defines.h>
@@ -1591,16 +1591,17 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                 if (v.isNull())
                     v = QString("");
 
-                attrWidget = new KKSHistWidget(av, attrClass);
+                attrWidget = new KKSHistWidgetEx(av, attrClass);
                 
                 /*********/
                 
                 {
-                //scList.insert (1, tr("One"));
                 KKSList<const KKSFilterGroup *> filters;
+                
                 QMap<int, QString> scList = this->getAttrValsList(IO_SCENARIO_ID);
-                KKSHistWidget * haw = qobject_cast <KKSHistWidget *>(attrWidget);
+                KKSHistWidgetEx * haw = qobject_cast <KKSHistWidgetEx *>(attrWidget);
                 haw->loadScenario (scList);
+                
                 QMap<int, QString> vList = this->getAttrValsList (IO_VARIANT_ID);
                 haw->loadVariants (vList);
                 KKSMap<int, KKSCategory *> cats;
@@ -1649,39 +1650,23 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                     io->release ();
                 }
                 haw->loadIOList(ioList);
+                
                 connect (haw, SIGNAL (loadCategory (int, KKSHistogram *)), objEditor, SLOT (loadHistCat (int, KKSHistogram *)) );
                 connect (haw, SIGNAL (loadIO (int, KKSHistogram *)), objEditor, SLOT (loadHistIO (int, KKSHistogram *)) );
                 connect (objEditor, SIGNAL (needToUpdateHistogram (KKSValue &)), haw, SLOT (saveHist(KKSValue &)) );
+                connect (haw, SIGNAL (getIdForHistogramParams(const QString &, qint64 *)), this, SLOT(getIdForHistogramParams(const QString &, qint64 *)) );
                 
                 refIO->release ();
                 }
                 
                 /********/
-
-                //QToolButton *tbRef = new QToolButton ();
-                //tbRef->setMinimumHeight (20);
-                //tbRef->setText ("...");
-                //--px->setSizePolicy (hPw);
-                
+               
                 attrWidget->setMinimumHeight (20);
-                
-                //px->setSizeAdjustPolicy (QComboBox::AdjustToMinimumContentsLength);
-                //--QHBoxLayout *hLay = new QHBoxLayout ();
-                //--hLay->addWidget (px);
-                //--hLay->addWidget (tbRef);
-
-                //--gLayout->addLayout (hLay, n_str, 2, 1, 1);
                 if (!isRef)
                 {
-                    //gLayout->addWidget (attrWidget, n_str, 2, 1, 2, Qt::AlignCenter);
                     gLayout->addWidget (attrWidget, n_str, 2, 1, 1);
                     attrWidget->setSizePolicy (hPw);
-					((KKSHistWidget*)attrWidget)->init();
-                    //attrWidget->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Fixed);
-                    
-                    //gLayout->addWidget (tbRef, n_str, 3, 1, 1);
-                
-                    //QObject::connect (tbRef, SIGNAL(pressed()), attrWidget, SLOT(openFile()));
+					((KKSHistWidgetEx*)attrWidget)->init();
                 }   //break;
             }
             break;
@@ -2585,7 +2570,7 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
         case KKSAttrType::atHistogram:
             {
                 
-                KKSHistWidget * hw = qobject_cast<KKSHistWidget *>(aw);
+                KKSHistWidgetEx * hw = qobject_cast<KKSHistWidgetEx *>(aw);
                 hw->setHist(V.value<KKSHistogram>());
                 if (!isRef)
                     connectToSlots (aw, wEditor);
@@ -3230,3 +3215,22 @@ QMap<int, QString> KKSAttributesFactory :: getAttrValsList (qint64 idObject, con
     vMaps.clear ();
     return vList;
 }
+
+void KKSAttributesFactory :: getIdForHistogramParams(const QString & tableName, qint64 * id)
+{
+    if(tableName.isEmpty() || !id)
+        return;
+
+    if (
+        tableName.compare(QString("histogram_params_streams"), Qt::CaseInsensitive) != 0 &&
+        tableName.compare(QString("histogram_params_chains"), Qt::CaseInsensitive) != 0
+       )
+    {
+        return;
+    }
+    
+    *id = eiof->getNextSeq(tableName, "id");
+    return;
+}
+
+

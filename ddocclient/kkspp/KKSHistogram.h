@@ -17,9 +17,10 @@
 #include "KKSList.h"
 #include "KKSMap.h"
 #include "kkspp_config.h"
-
-class KKSCategory;
-class KKSObject;
+#include <KKSCategory.h>
+#include <KKSObject.h>
+//class KKSCategory;
+//class KKSObject;
 class KKSObjectExemplar;
 
 class _PP_EXPORT KKSHistogram : public KKSRecord

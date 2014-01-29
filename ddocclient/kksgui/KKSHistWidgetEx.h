@@ -1,12 +1,12 @@
 /* 
- * File:   KKSHistWidget.h
- * Author: yuriyrusinov
+ * File:   KKSHistWidgetEx.h
+ * Author: ksa
  *
- * Created on 12 ƒекабрь 2013 г., 16:57
+ * Created on 27.01.2014 г., 10:00
  */
 
-#ifndef _KKSHISTWIDGET_H
-#define	_KKSHISTWIDGET_H
+#ifndef _KKSHISTWIDGETEX_H
+#define	_KKSHISTWIDGETEX_H
 
 #include <QWidget>
 #include <QVariant>
@@ -24,7 +24,7 @@ class QComboBox;
 class QPushButton;
 class QModelIndex;
 
-class KKSCharts;
+//class KKSCharts;
 class KKSCategory;
 class KKSObject;
 class KKSHistogram;
@@ -37,11 +37,11 @@ namespace Ui
     class histogram_widget;
 };
 
-class _GUI_EXPORT KKSHistWidget : public QWidget, public KKSAttrWidget
+class _GUI_EXPORT KKSHistWidgetEx : public QWidget, public KKSAttrWidget
 {
 public:
-    KKSHistWidget(const KKSAttrValue *av, KKSIndAttrClass isSys, QWidget * parent=0, Qt::WindowFlags flags=0);
-    virtual ~KKSHistWidget();
+    KKSHistWidgetEx(const KKSAttrValue *av, KKSIndAttrClass isSys, QWidget * parent=0, Qt::WindowFlags flags=0);
+    virtual ~KKSHistWidgetEx();
 
     enum FiltersType
     {
@@ -60,7 +60,7 @@ public:
     
     KKSValue getVal (void);
 
-    void init (void);
+	void init (void);
 
 public slots:
     void setHist (const KKSHistogram& hist);
@@ -68,20 +68,18 @@ public slots:
     void saveHist (KKSValue & v);
     
 private slots:
-/*    void catChanged (int cIndex);
-    void ioChanged (int ioIndex);
-*/
     void scenarioSet (const QModelIndex& topLeft, const QModelIndex& bottomRight);
     void variantSet (const QModelIndex& topLeft, const QModelIndex& bottomRight);
     void catSet (const QModelIndex& topLeft, const QModelIndex& bottomRight);
     void ioSet (const QModelIndex& topLeft, const QModelIndex& bottomRight);
     void servSet (const QModelIndex& topLeft, const QModelIndex& bottomRight);
+    
 signals:
     void valueChanged (qint64 id, KKSIndAttrClass isSys, QVariant val);
     void loadCategory (int idCat, KKSHistogram * h);
     void loadIO (int idIO, KKSHistogram * h);
     void updateVarsList (QComboBox *, FiltersType);
-    void updateWidgetPars (KKSHistWidget *);
+    void getIdForHistogramParams(const QString & tableName, qint64 * id);
 
 private:
     //
@@ -93,7 +91,6 @@ private:
     //
     // Variables
     //
-    KKSHistogram * hist;
     Ui::histogram_widget *UI;
  
     KKSHistogram * m_hist;
@@ -103,4 +100,4 @@ private:
     Q_OBJECT
 };
 
-#endif	/* _KKSHISTWIDGET_H */
+#endif	/* _KKSHISTWIDGETEX_H */

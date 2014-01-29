@@ -59,7 +59,7 @@ class KKSAccessEntity;
 class KKSStuffForm;
 class KKSIndicator;
 class KKSAttrValue;
-class KKSHistWidget;
+class KKSHistWidgetEx;
 class KKSHistogram;
 
 class _GUI_EXPORT KKSObjEditor : public KKSRecDialog
@@ -269,8 +269,8 @@ class _GUI_EXPORT KKSObjEditor : public KKSRecDialog
         
         void needToSaveGISProject(KKSValue &); //перед тем, как сохранить ИО (ЭИО) необходимо сохранить файл с ГИС-проектом (если присутствуют атрибуты ГИС)
                                                //генерируем сигнал, его поймает ГИС-виджет, сохранить файл проекта, прочитает его в XML и вернет в качестве значения KKSValue
-        void setHistCat (int idCat, KKSHistogram * vHist, KKSHistWidget * hW);
-        void setHistIO (int idIO, KKSHistogram * vHist, KKSHistWidget * hW);
+        void setHistCat (int idCat, KKSHistogram * vHist, KKSHistWidgetEx * hW);
+        void setHistIO (int idIO, KKSHistogram * vHist, KKSHistWidgetEx * hW);
         void needToUpdateHistogram (KKSValue &);
 
     public slots:

@@ -1028,6 +1028,7 @@ int KKSPPFactory::insertAttrValues(const KKSObject * io) const
         else
             dtMeas = QString("current_timestamp::timestamp");
         */
+        /*
         if (a->type()->attrType() == KKSAttrType::atHistogram)
         {
             KKSHistogram h = v.valueVariant().value<KKSHistogram>();
@@ -1038,6 +1039,7 @@ int KKSPPFactory::insertAttrValues(const KKSObject * io) const
             db->execute (setSql);
             v.setValue (h.toString(), KKSAttrType::atHistogram);
         }
+        */
 
         sql += QString("select ioInsertAttr(%1, %2, %3::varchar, %4, %5, %6, %7, %8);")
                               .arg(io->id())
