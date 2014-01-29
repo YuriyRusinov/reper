@@ -15,7 +15,9 @@ INCLUDEPATH += 	. \
 		../../kksfactory \
 		../../kkspp \
                 ../../kksgui \
-		../../kksgui/ui
+		../../kksgui/ui \
+                ../../kksqwt \
+                ../../kksqwt/src
 
 
 DEPENDPATH += 	\
@@ -25,7 +27,8 @@ DEPENDPATH += 	\
 		../../kksutils \
 		../../kkspp \
 		../../kksfactory \
-                ../../kksgui
+                ../../kksgui \
+                ../../kksqwt
 
 INCLUDEPATH *= ../../rptrenderer \
                ../../rptrenderer/src
@@ -33,7 +36,7 @@ INCLUDEPATH *= ../../rptrenderer \
 DEPENDPATH *= ../kkspp \
               ../../rptrenderer
 
-LIBS += -L$$DESTDIR -ldataaccess -lkkscore -lkksutils -lkkspp -lkksfactory -lkksgui -lrptrenderer
+LIBS += -L$$DESTDIR -ldataaccess -lkkscore -lkksutils -lkkspp -lkksfactory -lkksgui -lrptrenderer -lkksqwt
 
 
 qgis{

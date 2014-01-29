@@ -15,6 +15,7 @@ INCLUDEPATH += 	. \
 		../../kksutils \
                 ../../kksinteractor \
                 ../../kkshttpconnector \
+                ../../kksqwt/src \
                 ./include
 
 DEPENDPATH += 	. \
@@ -26,9 +27,10 @@ DEPENDPATH += 	. \
 		../../kksutils \
                 ../../kksinteractor \
                 ../../kkshttpconnector \
+                ../../kksqwt \
                 ./gost
 
-LIBS += -L$$DESTDIR -ldataaccess -lkksutils -lkkscore -lkksfactory -lkkspp -lkksgui -lkksinteractor -lkkshttpconnector
+LIBS += -L$$DESTDIR -ldataaccess -lkksutils -lkkscore -lkksfactory -lkkspp -lkksgui -lkksinteractor -lkkshttpconnectorc -lkksqwt
 
 # libpq support
 LIBS += -L$${PSQL_HOME}/lib
