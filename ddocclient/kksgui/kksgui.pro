@@ -18,10 +18,6 @@ INCLUDEPATH *= ../kksqwt
 DEPENDPATH *= ../kksqwt
 LIBS *= -L$$DESTDIR -lkksqwt
 
-INCLUDEPATH *= $$QWT_INCLUDE_DIR
-DEPENDPATH *= $$QWT_INCLUDE_DIR
-LIBS *= -lqwt
-
 CONFIG += qt
 
 CONFIG += warn_on dll
