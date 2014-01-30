@@ -51,6 +51,7 @@ KKSHistWidgetEx::KKSHistWidgetEx(const KKSAttrValue *av, KKSIndAttrClass isSys, 
         m_hist = new KKSHistogram;
     
 
+    init ();
     //ksa connect (cbCategory, SIGNAL (activated(int)), this, SLOT (catChanged (int)) );
     //ksa connect (cbIORef, SIGNAL (activated(int)), this, SLOT (ioChanged(int)) );
 

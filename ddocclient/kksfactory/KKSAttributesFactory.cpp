@@ -1660,7 +1660,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                 {
                     gLayout->addWidget (attrWidget, n_str, 2, 1, 1);
                     attrWidget->setSizePolicy (hPw);
-					((KKSHistWidgetEx*)attrWidget)->init();
+					//((KKSHistWidgetEx*)attrWidget)->init();
                 }   //break;
             }
             break;

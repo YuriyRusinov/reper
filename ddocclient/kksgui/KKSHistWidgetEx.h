@@ -63,8 +63,6 @@ public:
     
     KKSValue getVal (void);
 
-	void init (void);
-
 public slots:
     void setHist (const KKSHistogram& hist);
     void calcHist (void);
@@ -89,7 +87,7 @@ private:
     //
     // Functions
     //
-
+    void init (void);
     
 private:
     //
