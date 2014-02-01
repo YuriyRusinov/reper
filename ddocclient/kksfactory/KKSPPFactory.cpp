@@ -1071,6 +1071,7 @@ int KKSPPFactory::insertAttrValues(const KKSObject * io) const
         return ERROR_CODE;
 
     if(!sqlEx.isEmpty()){
+        qDebug () << __PRETTY_FUNCTION__ << sqlEx;
         KKSResult * res = db->execute(sqlEx);
         if(!res)
             return ERROR_CODE;

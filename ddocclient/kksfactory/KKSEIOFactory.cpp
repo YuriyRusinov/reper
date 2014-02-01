@@ -142,7 +142,7 @@ int KKSEIOFactory::insertRecord(KKSObjectExemplar* eio,
     if(!io)
         return ERROR_CODE;
 
-    qDebug () << __PRETTY_FUNCTION__ << table << io->tableName();
+    //qDebug () << __PRETTY_FUNCTION__ << table << io->tableName();
     //берем название таблицы, в которую необходимо будет сделать инсерт
     QString tableName = table.isEmpty() ? io->tableName() : table;
 
@@ -200,7 +200,8 @@ int KKSEIOFactory::insertRecord(KKSObjectExemplar* eio,
     if(id == ERROR_CODE || query.isEmpty())
         return ERROR_CODE;
 
-    qWarning() << __PRETTY_FUNCTION__ << query;
+    //qWarning() << __PRETTY_FUNCTION__ << query;
+    //qWarning() << __PRETTY_FUNCTION__ << exQuery;
     KKSResult * res = db->execute(query);
     if(!res || (res->resultStatus() != KKSResult::CommandOk && res->resultStatus() != KKSResult::TuplesOk)){
         if(res){
