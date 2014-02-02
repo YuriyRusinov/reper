@@ -14,11 +14,6 @@
 
 #include <qglobal.h>
 
-// QWT_VERSION is (major << 16) + (minor << 8) + patch.
-
-//#define QWT_VERSION       0x050201
-//#define QWT_VERSION_STR   "5.2.1"
-
 #if defined(_WIN32) && !defined(WIN32)
     #define WIN32
 #endif
@@ -37,7 +32,7 @@
 #endif // _MSC_VER
 
 #ifdef QWT_DLL
-
+//#if defined(__USE_DLL_KKSQWT)
 #if defined(QWT_MAKEDLL)     // create a Qwt DLL library 
 #define QWT_EXPORT  __declspec(dllexport)
 #define QWT_TEMPLATEDLL
@@ -52,7 +47,5 @@
 #ifndef QWT_EXPORT
 #define QWT_EXPORT
 #endif
-
-// #define QWT_NO_COMPAT 1 // disable withdrawn functionality
 
 #endif // QWT_GLOBAL_H

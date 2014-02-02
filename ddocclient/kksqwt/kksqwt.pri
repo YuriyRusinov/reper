@@ -1,39 +1,3 @@
-# -*- mode: sh -*- ###########################
-# Qwt Widget Library
-# Copyright (C) 1997   Josef Wilgen
-# Copyright (C) 2002   Uwe Rathmann
-#
-# This library is free software; you can redistribute it and/or
-# modify it under the terms of the Qwt License, Version 1.0
-##############################################
-
-# qmake project file for building the qwt libraries
-
-QWT_ROOT = ..
-
-include( $${QWT_ROOT}/kksqwtconfig.pri )
-
-#TARGET            = kksqwt
-#TEMPLATE          = lib
-
-#MOC_DIR           = moc
-#OBJECTS_DIR       = obj$${SUFFIX_STR}
-#DESTDIR           = $${QWT_ROOT}/lib
-
-contains(CONFIG, QwtDll ) {
-    CONFIG += dll
-} 
-else {
-    CONFIG += staticlib
-}
-
-win32:QwtDll {
-    DEFINES    += QT_DLL QWT_DLL QWT_MAKEDLL
-}
-
-symbian:QwtDll {
-    DEFINES    += QT_DLL QWT_DLL QWT_MAKEDLL
-}
 
 HEADERS += \
     qwt.h \
@@ -94,8 +58,6 @@ SOURCES += \
     qwt_symbol.cpp
 
  
-contains(CONFIG, QwtPlot) {
-
     HEADERS += \
         qwt_curve_fitter.h \
         qwt_data.h \
@@ -152,46 +114,4 @@ contains(CONFIG, QwtPlot) {
         qwt_plot_magnifier.cpp \
         qwt_raster_data.cpp \
         qwt_scale_widget.cpp 
-}
 
-contains(CONFIG, QwtSVGItem) {
-
-    QT += svg
-    HEADERS += qwt_plot_svgitem.h
-    SOURCES += qwt_plot_svgitem.cpp 
-}
-
-contains(CONFIG, QwtWidgets) {
-
-    HEADERS += \
-        qwt_abstract_slider.h \
-        qwt_abstract_scale.h \
-        qwt_arrow_button.h \
-        qwt_analog_clock.h \
-        qwt_compass.h \
-        qwt_compass_rose.h \
-        qwt_counter.h \
-        qwt_dial.h \
-        qwt_dial_needle.h \
-        qwt_double_range.h \
-        qwt_knob.h \
-        qwt_slider.h \
-        qwt_thermo.h \
-        qwt_wheel.h
-    
-    SOURCES += \
-        qwt_abstract_slider.cpp \
-        qwt_abstract_scale.cpp \
-        qwt_arrow_button.cpp \
-        qwt_analog_clock.cpp \
-        qwt_compass.cpp \
-        qwt_compass_rose.cpp \
-        qwt_counter.cpp \
-        qwt_dial.cpp \
-        qwt_dial_needle.cpp \
-        qwt_double_range.cpp \
-        qwt_knob.cpp \
-        qwt_slider.cpp \
-        qwt_thermo.cpp \
-        qwt_wheel.cpp
-}

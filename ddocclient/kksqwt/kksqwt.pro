@@ -1,17 +1,52 @@
-# -*- mode: sh -*- ###########################
-# Qwt Widget Library
-# Copyright (C) 1997   Josef Wilgen
-# Copyright (C) 2002   Uwe Rathmann
-#
-# This library is free software; you can redistribute it and/or
-# modify it under the terms of the Qwt License, Version 1.0
-##############################################
+######################################################################
+# Install paths
+######################################################################
 
-include( kksqwtconfig.pri )
+# kksqwt
+TEMPLATE = lib
+TARGET = kksqwt
 
-TEMPLATE = subdirs
-#CONFIG   += ordered
+DESTDIR = ../build
+include(../ddocclient.conf)
 
-SUBDIRS = \
-    src \
-    textengines
+CONFIG += warn_on dll
+CONFIG += qt     # Also for Qtopia Core!
+CONFIG += thread
+
+DEFINES += __USE_DLL_KKSQWT
+
+INCLUDEPATH += .
+
+DEFINES    += QT_DLL QWT_DLL QWT_MAKEDLL
+
+include( kksqwt.pri )
+
+
+# import lib
+win32 {
+	implib.path = $$KKS_LIB_DIR
+	implib.files = $$sprintf("%1/%2.lib", $$DESTDIR, $$TARGET)
+
+	# lib
+	target.path = $$KKS_BIN_DIR
+	debug {
+		target.files = \
+			$$sprintf("%1/%2.dll", $$DESTDIR, $$TARGET) \
+			$$sprintf("%1/%2.pdb", $$DESTDIR, $$TARGET) \
+			$$sprintf("%1/%2.ilk", $$DESTDIR, $$TARGET) \
+			$$sprintf("%1/%2.exp", $$DESTDIR, $$TARGET)
+	}
+	release {
+		target.files = \
+			$$sprintf("%1/%2.dll", $$DESTDIR, $$TARGET)
+	}
+}
+unix {
+	target.path = $$KKS_LIB_DIR 
+}
+
+
+INSTALLS += target headers
+win32{
+	INSTALLS += implib
+}
