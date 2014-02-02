@@ -80,7 +80,7 @@ Q_OBJECT
         void setActiveSubWindow(QWidget *window);
         void saveActiveSubWindow();
         void printActiveSubWindow();
-        void closeSubWindow(KKSDialog * t);
+        void closeSubWindow(QWidget * t);
 
 
         void slotConnect();

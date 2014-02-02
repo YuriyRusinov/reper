@@ -41,7 +41,7 @@ class _GUI_EXPORT KKSDialog : public QDialog
         void rejected (void);
         void finished (int r);
 
-        void aboutToClose(KKSDialog *);
+        void aboutToClose(QWidget *);
 
    protected:
         virtual void closeEvent (QCloseEvent * event);

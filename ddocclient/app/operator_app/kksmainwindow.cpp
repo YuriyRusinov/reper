@@ -195,10 +195,19 @@ void KKSMainWindow::updateMenus()
     for (int i = 0; i < windows.size(); i++)
     {
         
-        KKSDialog *child = qobject_cast<KKSDialog*>(windows.at(i)->widget());
+        QIcon childIcon;
+        QWidget *child = qobject_cast<KKSDialog*>(windows.at(i)->widget());
 
-        if(!child)
-            continue;
+		if(!child){
+			child = qobject_cast<KKSRecDialog*>(windows.at(i)->widget());
+            if(!child)
+				continue;
+			else
+				childIcon = ((KKSRecDialog *)child)->icon();
+		}
+		else{
+		    childIcon = ((KKSDialog *)child)->icon();
+		}
 
         WId winId = child->winId();
         QList<QAction *> aList = ui->aWindowMenu->actions();
@@ -222,17 +231,17 @@ void KKSMainWindow::updateMenus()
         action->setCheckable(true);
         action ->setChecked(child == activeKKSSubWindow());
         action->setData((int)winId);
-        action->setIcon(child->icon());
+        action->setIcon(childIcon);
         tbSubWindows->addAction(action);
         connect(action, SIGNAL(triggered()), m_windowMapper, SLOT(map()));
-        connect(child, SIGNAL(aboutToClose(KKSDialog *)), this, SLOT(closeSubWindow(KKSDialog *)));
+        connect(child, SIGNAL(aboutToClose(QWidget *)), this, SLOT(closeSubWindow(QWidget *)));
         m_windowMapper->setMapping(action, windows.at(i));
     }
 
 
 }
 
-void KKSMainWindow::closeSubWindow(KKSDialog * t)
+void KKSMainWindow::closeSubWindow(QWidget * t)
 {
     if(!t)
         return;

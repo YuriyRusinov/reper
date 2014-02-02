@@ -40,7 +40,7 @@ protected:
     QIcon m_icon; // иконка, которая отображается в меню и тулбаре главного окна, когда данное окно отображено как QMdiSubWindow
 
 signals:
-    void aboutToClose(KKSRecDialog *);
+    void aboutToClose(QWidget *);
 
 protected:
     //
