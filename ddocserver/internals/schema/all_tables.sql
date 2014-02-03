@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     21.01.2014 14:58:00                          */
+/* Created on:     03.02.2014 17:22:58                          */
 /*==============================================================*/
 
 
@@ -23,7 +23,6 @@ select setMacToNULL('root_table');
 create unique index Index_1 on root_table using BTREE (
 unique_id
 );
-
 /*==============================================================*/
 /* User: public                                                 */
 /*==============================================================*/
@@ -1640,10 +1639,12 @@ select createTriggerUID('histogram_graphics_streams');
 create table histogram_params_chains (
    id                   SERIAL               not null,
    name                 VARCHAR              not null,
+   h_min                float8               null,
+   h_max                float8               null,
+   h_count              int4                 not null,
    scenarios            INT4[]               null,
    variants             INT4[]               null,
-   life_cycles          INT4[]               null,
-   io_objects           INT4[]               null,
+   io_categories        INT4[]               null,
    services             INT4[]               null,
    constraint PK_HISTOGRAM_PARAMS_CHAINS primary key (id)
 )
@@ -1661,10 +1662,11 @@ select createTriggerUID('histogram_params_chains');
 create table histogram_params_streams (
    id                   SERIAL               not null,
    name                 VARCHAR              not null,
+   h_min                float8               null,
+   h_max                float8               null,
+   h_count              int4                 not null,
    scenarios            INT4[]               null,
    variants             INT4[]               null,
-   dl_froms             INT4[]               null,
-   dl_tos               INT4[]               null,
    io_categories        INT4[]               null,
    io_objects           INT4[]               null,
    partition_lows       INT4[]               null,
@@ -2681,6 +2683,8 @@ create table message_streams (
    id_dl_sender         INT4                 not null,
    id_dl_receiver       INT4                 not null,
    id_time_unit         INT4                 not null default 1,
+   id_processing_scenario INT4                 null,
+   id_processing_variant INT4                 null,
    name                 VARCHAR              not null,
    lambda               FLOAT8               null default 0,
    sigma                FLOAT8               null default 0,
@@ -2705,6 +2709,12 @@ comment on column message_streams.id_dl_sender is
 
 comment on column message_streams.id_dl_receiver is
 'Должностное лицо-адресат  потока';
+
+comment on column message_streams.id_processing_scenario is
+'задается текущий активный сценарий (из настроечного ИО)';
+
+comment on column message_streams.id_processing_variant is
+'задается текущий активный вариант (из настроечного ИО)';
 
 comment on column message_streams.lambda is
 'Входит в группу задания параметров закона распределения';
@@ -3719,6 +3729,7 @@ create table roles_actions (
 );
 
 select setMacToNULL('roles_actions');
+
 
 
 /*==============================================================*/
@@ -5331,6 +5342,16 @@ alter table message_streams
 alter table message_streams
    add constraint FK_MESSAGE__REF_POS_SENDER foreign key (id_dl_sender)
       references "position" (id)
+      on delete restrict on update restrict;
+
+alter table message_streams
+   add constraint FK_MESSAGE__REFERENCE_PROCESSI foreign key (id_processing_scenario)
+      references processing_scenario (id)
+      on delete restrict on update restrict;
+
+alter table message_streams
+   add constraint FK_MESSAGE__REF_VARIANT foreign key (id_processing_variant)
+      references processing_variant (id)
       on delete restrict on update restrict;
 
 alter table object_ref_tables
