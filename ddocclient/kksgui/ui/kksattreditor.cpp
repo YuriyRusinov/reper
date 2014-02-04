@@ -230,7 +230,7 @@ void KKSAttrEditor :: currentAttrTypeChanged (int index)
     if (index < 0 || !ui->cbType->isEnabled())
         return;
 
-    qDebug () << __PRETTY_FUNCTION__ << index;
+    //qDebug () << __PRETTY_FUNCTION__ << index;
     int cType = ui->cbType->itemData (index, Qt::UserRole).toInt();
     bool isRef (cRefTypes.contains (cType));
     ui->gbRef->setEnabled (isRef);

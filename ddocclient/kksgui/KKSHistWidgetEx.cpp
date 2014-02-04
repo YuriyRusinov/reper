@@ -34,9 +34,9 @@
 
 KKSHistWidgetEx::KKSHistWidgetEx(const KKSAttrValue *av, KKSIndAttrClass isSys, QWidget * parent, Qt::WindowFlags flags)
     : QWidget (parent, flags), KKSAttrWidget(av, isSys),
+    UI (new Ui::histogram_widget),
     m_hist (0),
-    m_qwtHistogramWidget(NULL),
-    UI (new Ui::histogram_widget)
+    m_qwtHistogramWidget(0)
 {
 
     UI->setupUi (this);
