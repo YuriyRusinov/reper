@@ -13,6 +13,7 @@ declare
     q varchar;
     r record;
     tmp int4;
+    hValArr text[]; 
 begin
 
     ok = 1;
@@ -44,14 +45,19 @@ begin
         return -1;
     end if;
 
-    select (string_to_array(hValue, '^~^~^'))[1] into hParamsId;
+    hValArr := string_to_array(hValue, '^~^~^');
+    select hValArr[1] into hParamsId;
     if(hParamsId is null or hParamsId <= 0) then
-        raise exception 'Incorrect ID of record with histogram parameters!';
-        return -1;
+        hParamsId := getnextseq (tableName, 'id');
+        if (hParamsId is null) then
+            raise exception 'Incorrect ID of record with histogram parameters!';
+            return -1;
+        end if;
+        hValArr[1] := hParamsId;
     end if;
 
     hParamsName = 'histogram_params_' || hParamsId;
-    select (string_to_array(hValue, '^~^~^'))[4] into hCount;
+    select hValArr[4] into hCount;
     if(hCount is null or hCount <= 0) then
         raise exception 'Incorrect h_count of record with histogram parameters!';
         return -1;
