@@ -3387,7 +3387,7 @@ create table q_base_table (
    id                   BIGSERIAL            not null,
    id_io_state          INT4                 not null default 1,
    uuid_t               UUID                 not null,
-   name                 VARCHAR              not null,
+--   name                 VARCHAR              not null,
    r_icon               VARCHAR              null,
    record_fill_color    INT8                 null,
    record_text_color    INT8                 null,
