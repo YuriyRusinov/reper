@@ -3260,6 +3260,30 @@ void KKSAttributesFactory :: loadHistReferences (KKSAttribute * attr, KKSAttrEdi
         KKSAttrType * aType = new KKSAttrType(KKSAttrType::atHistogram);
         attr->setType(aType);
     }
-    qDebug () << __PRETTY_FUNCTION__ << attr->type()->attrType();
+    //qDebug () << __PRETTY_FUNCTION__ << attr->type()->attrType();
+    QMap<int, QString> io_refs;
+
+    KKSObject *io = loader->loadIO (IO_IO_ID, true);
+    if(!io)
+        return;
+
+    KKSList<const KKSFilterGroup *> filters;
+    const KKSCategory * c = io->category();
+    const KKSCategory * ct = c->tableCategory();
+    const KKSFilter * f = ct->createFilter (1, "select id from tbl_io_objects where id in (110, 111)", KKSFilter::foInSQL);
+    KKSFilterGroup * fg = new KKSFilterGroup (true);
+    fg->addFilter (f);
+    f->release ();
+    filters.append (fg);
+    fg->release ();
+    KKSMap<qint64, KKSEIOData *> io_data = loader->loadEIOList (io, filters);
+    KKSMap<qint64, KKSEIOData *>::const_iterator p;
+
+    io_refs.clear ();
+    for (p=io_data.constBegin(); p != io_data.constEnd(); p++)
+        io_refs.insert (p.key(), p.value()->fields ().value ("name"));
+
+    io->release ();
+    aEditor->setReferences(io_refs);
     
 }
