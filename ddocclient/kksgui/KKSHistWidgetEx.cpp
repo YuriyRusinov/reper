@@ -25,7 +25,6 @@
 #include <KKSAttrValue.h>
 #include "ui_histogram_widget.h"
 #include "KKSHistWidgetEx.h"
-//#include "KKSHistDrawWidget.h"
 #include "KKSValue.h"
 #include <KKSCategory.h>
 #include "KKSCheckableModel.h"
@@ -36,7 +35,9 @@ KKSHistWidgetEx::KKSHistWidgetEx(const KKSAttrValue *av, KKSIndAttrClass isSys, 
     : QWidget (parent, flags), KKSAttrWidget(av, isSys),
     UI (new Ui::histogram_widget),
     m_hist (0),
-    m_qwtHistogramWidget(0)
+    m_qwtHistogramWidget(0),
+    m_paramsChanged(false),
+    m_completed(false)
 {
 
     UI->setupUi (this);
@@ -52,10 +53,9 @@ KKSHistWidgetEx::KKSHistWidgetEx(const KKSAttrValue *av, KKSIndAttrClass isSys, 
     
 
     init ();
-    //ksa connect (cbCategory, SIGNAL (activated(int)), this, SLOT (catChanged (int)) );
-    //ksa connect (cbIORef, SIGNAL (activated(int)), this, SLOT (ioChanged(int)) );
 
     connect (UI->pbUpdate, SIGNAL (clicked()), this, SLOT (calcHist()) );
+    connect (UI->leCount, SIGNAL(textEdited(const QString &)), this, SLOT(slotParamsChanged()));
 }
 
 KKSHistWidgetEx::~KKSHistWidgetEx()
@@ -105,9 +105,15 @@ void KKSHistWidgetEx::calcHist (void)
         return;
     }
 
-    KKSValue v = getVal();//(hStr, KKSAttrType::atHistogram);
-    QString hStr = v.valueForInsert();
-    emit valueChanged (m_av->id(), m_isSystem, hStr);//v.valueVariant());
+    if(m_paramsChanged){
+        QMessageBox::warning(this, tr(""), tr(""));
+        return;
+    }
+
+    //KKSValue v = getVal();//(hStr, KKSAttrType::atHistogram);
+    //QString hStr = v.valueForInsert();
+    
+    //emit valueChanged (m_av->id(), m_isSystem, hStr);//v.valueVariant());
 
     if(!m_qwtHistogramWidget){
         m_qwtHistogramWidget = new KKSQwtPlotWidget(m_av->attribute()->title(), 
@@ -138,8 +144,10 @@ void KKSHistWidgetEx::loadScenario (const QMap<int, QString>& scList)
 {
     QAbstractItemModel * scMod = UI->lVScenarios->model ();
     int nsc = scList.count();
-    if (!scMod)
+    if (!scMod){
         scMod = new KKSCheckableModel (nsc, 1);
+        //connect(scMod, SIGNAL(checkStateChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(slotParamsChanged(const QModelIndex &, const QModelIndex &)));
+    }
     else
     {
         int nr = scMod->rowCount();
@@ -148,7 +156,7 @@ void KKSHistWidgetEx::loadScenario (const QMap<int, QString>& scList)
         if (scMod->columnCount() == 0)
             scMod->insertColumns (0, 1);
     }
-    //UI->lwScenarios->clear ();
+
     int i=0;
     for (QMap<int, QString>::const_iterator p=scList.constBegin();
             p != scList.constEnd();
@@ -159,6 +167,7 @@ void KKSHistWidgetEx::loadScenario (const QMap<int, QString>& scList)
         scMod->setData (scInd, p.value(), Qt::DisplayRole);
         i++;
     }
+
     if (!UI->lVScenarios->model ())
     {
         UI->lVScenarios->setModel (scMod);
@@ -168,13 +177,10 @@ void KKSHistWidgetEx::loadScenario (const QMap<int, QString>& scList)
                  SLOT (scenarioSet(const QModelIndex&, const QModelIndex&))
                 );
     }
-/*    if (hist && hist->getScenario() > 0)
-    {
-        int indSc = hist->getScenario();
-        int cind = cbScenario->findData (QVariant (indSc));
-        cbScenario->setCurrentIndex (cind);
-    }
- */
+
+    if(m_hist)
+        setupCheckedData(UI->lVScenarios, m_hist->getScenario());
+
 }
 
 void KKSHistWidgetEx::loadVariants (const QMap<int, QString>& varList)
@@ -185,6 +191,7 @@ void KKSHistWidgetEx::loadVariants (const QMap<int, QString>& varList)
     if (!varModel)
     {
         varModel = new KKSCheckableModel (nvr, 1);
+        //connect(varModel, SIGNAL(checkStateChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(slotParamsChanged(const QModelIndex &, const QModelIndex &)));
         isSet = false;
     }
     else
@@ -195,7 +202,7 @@ void KKSHistWidgetEx::loadVariants (const QMap<int, QString>& varList)
         if (varModel->columnCount () == 0)
             varModel->insertColumns (0, 1);
     }
-    //UI->lwVariants->clear ();
+
     int i=0;
     for (QMap<int, QString>::const_iterator p=varList.constBegin();
             p != varList.constEnd();
@@ -215,13 +222,10 @@ void KKSHistWidgetEx::loadVariants (const QMap<int, QString>& varList)
                  SLOT (variantSet(const QModelIndex&, const QModelIndex&))
                 );
     }
-/*    if (hist && hist->getVariant() > 0)
-    {
-        int indV = hist->getVariant ();
-        int vInd = cbVariant->findData (QVariant (indV));
-        cbVariant->setCurrentIndex (vInd);
-    }
-    */
+
+    if(m_hist)
+        setupCheckedData(UI->lvVariants, m_hist->getVariant());
+
 }
 
 void KKSHistWidgetEx::loadCategories (const QMap<int, QString>& cList)
@@ -232,6 +236,7 @@ void KKSHistWidgetEx::loadCategories (const QMap<int, QString>& cList)
     int ncr = cList.count();
     if (!catMod){
         catMod = new KKSCheckableModel (ncr, 1);
+        //connect(catMod, SIGNAL(checkStateChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(slotParamsChanged(const QModelIndex &, const QModelIndex &)));
         isSet = false;
     }
     else
@@ -261,6 +266,9 @@ void KKSHistWidgetEx::loadCategories (const QMap<int, QString>& cList)
                  SLOT (catSet(const QModelIndex&, const QModelIndex&))
                 );
     }
+
+    if(m_hist)
+        setupCheckedData(UI->lvCategories, m_hist->getCategories());
 }
 
 void KKSHistWidgetEx::loadIOList (const QMap<int, QString>& ioList)
@@ -271,6 +279,7 @@ void KKSHistWidgetEx::loadIOList (const QMap<int, QString>& ioList)
     int ncr = ioList.count();
     if (!ioMod){
         ioMod = new KKSCheckableModel (ncr, 1);
+        //connect(ioMod, SIGNAL(checkStateChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(slotParamsChanged(const QModelIndex &, const QModelIndex &)));
         isSet = false;
     }
     else
@@ -300,6 +309,9 @@ void KKSHistWidgetEx::loadIOList (const QMap<int, QString>& ioList)
                  SLOT (ioSet(const QModelIndex&, const QModelIndex&))
                 );
     }
+
+    if(m_hist)
+        setupCheckedData(UI->lvIOs, m_hist->getIO());
 }
 
 void KKSHistWidgetEx::loadPartLows(const QMap<int, QString>& plList)
@@ -310,6 +322,7 @@ void KKSHistWidgetEx::loadPartLows(const QMap<int, QString>& plList)
     int ncr = plList.count();
     if (!plMod){
         plMod = new KKSCheckableModel (ncr, 1);
+        //connect(plMod, SIGNAL(checkStateChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(slotParamsChanged(const QModelIndex &, const QModelIndex &)));
         isSet = false;
     }
     else
@@ -339,6 +352,9 @@ void KKSHistWidgetEx::loadPartLows(const QMap<int, QString>& plList)
                  SLOT (partLowSet(const QModelIndex&, const QModelIndex&))
                 );
     }
+
+    if(m_hist)
+        setupCheckedData(UI->lvLows, m_hist->getPartLows());
 }
 
 void KKSHistWidgetEx::loadServices(const QMap<int, QString>& sList)
@@ -349,6 +365,7 @@ void KKSHistWidgetEx::loadServices(const QMap<int, QString>& sList)
     int ncr = sList.count();
     if (!sMod){
         sMod = new KKSCheckableModel (ncr, 1);
+        //connect(sMod, SIGNAL(checkStateChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(slotParamsChanged(const QModelIndex &, const QModelIndex &)));
         isSet = false;
     }
     else
@@ -378,6 +395,40 @@ void KKSHistWidgetEx::loadServices(const QMap<int, QString>& sList)
                  SLOT (serviceSet(const QModelIndex&, const QModelIndex&))
                 );
     }
+
+    if(m_hist)
+        setupCheckedData(UI->lvServices, m_hist->getServices());
+}
+
+void KKSHistWidgetEx::setupCheckedData(QListView * list, const QList<int> ids)
+{
+    if(!list)
+        return;
+
+    KKSCheckableModel * model = (KKSCheckableModel *)list->model();
+    if(!model)
+        return;
+
+    int rowCount = model->rowCount();
+    if(!rowCount)
+        return;
+
+    for(int i=0; i<rowCount; i++){
+        QModelIndex index = model->index(i, 0);
+        
+        //bool checked = model->data(index, Qt::CheckStateRole).toBool();
+        int id = model->data (index, Qt::UserRole).toInt();
+        
+        QVariant v(ids.contains (id));
+        model->setData(index, v,  Qt::CheckStateRole);
+        
+        /*
+        if (!ids.contains (id))
+            model->setData(index, false,  Qt::CheckStateRole);
+        else if (ids.contains(id))
+            model->setData(index, true,  Qt::CheckStateRole);
+        */
+    }
 }
 
 
@@ -389,49 +440,31 @@ void KKSHistWidgetEx::setHist (const KKSHistogram& shist)
     
     m_hist = new KKSHistogram (shist);
     
-    QVariant v = QVariant::fromValue<KKSHistogram>(shist);
+    //QVariant v = QVariant::fromValue<KKSHistogram>(shist);
     
     UI->leFrom->setText (QString::number (m_hist->getXMin()));
     UI->leTo->setText (QString::number (m_hist->getXMax()));
     UI->leCount->setText (QString::number (m_hist->size()));
 
-    /*
-    qint64 idCat = hist->category() ? hist->category()->id() : -1;
-    if (idCat > 0)
-    {
-        int cbInd = this->cbCategory->findData (idCat, Qt::UserRole);
-        cbCategory->setCurrentIndex (cbInd);
-    }
     
-    qint64 idIO = hist->srcObject () ? hist->srcObject()->id() : -1;
-    if (idIO > 0)
-    {
-        int ioInd = cbIORef->findData (idIO);
-        cbIORef->setCurrentIndex (ioInd);
-    }
-    qint64 idSc = hist->getScenario();
-    if (idSc > 0)
-    {
-        int scInd = cbScenario->findData (idSc);
-        cbScenario->setCurrentIndex (scInd);
-    }
-    qint64 idVar = hist->getVariant();
-    if (idVar > 0)
-    {
-        int vind = cbVariant->findData (idVar);
-        cbVariant->setCurrentIndex (vind);
-    }
-    qint64 idRecv = hist->getReceiver ();
-    if (idRecv > 0)
-    {
-        int rind = cbReceiver->findData (idRecv);
-        cbReceiver->setCurrentIndex (rind);
-    }
-    */
+    QList<int> data = m_hist->getScenario();
+    setupCheckedData(UI->lVScenarios, data);
+    
+    data = m_hist->getVariant();
+    setupCheckedData(UI->lvVariants, data);
 
-    
-    //ksa (qobject_cast<KKSHistDrawWidget *>(wHistDrawW))->setData (hist->getVec());
-    
+    data = m_hist->getCategories();
+    setupCheckedData(UI->lvCategories, data);
+
+    data = m_hist->getIO();
+    setupCheckedData(UI->lvIOs, data);
+
+    data = m_hist->getPartLows();
+    setupCheckedData(UI->lvLows, data);
+
+    data = m_hist->getServices();
+    setupCheckedData(UI->lvServices, data);
+
     if(!m_qwtHistogramWidget){
         m_qwtHistogramWidget = new KKSQwtPlotWidget(m_av->attribute()->title(), 
                                                     m_hist,
@@ -448,7 +481,22 @@ void KKSHistWidgetEx::setHist (const KKSHistogram& shist)
         m_qwtHistogramWidget->init(m_hist);
     }
     
-    emit valueChanged (m_av->id(), m_isSystem, v);
+    //emit valueChanged (m_av->id(), m_isSystem, v);
+
+}
+
+void KKSHistWidgetEx::slotParamsChanged()
+{
+    if(!m_completed)
+        return;
+
+    m_paramsChanged = true;
+
+
+    KKSValue v = getVal();//(hStr, KKSAttrType::atHistogram);
+    QString hStr = v.valueForInsert();
+    
+    emit valueChanged (m_av->id(), m_isSystem, hStr);//v.valueVariant());
 }
 
 void KKSHistWidgetEx::saveHist (KKSValue & v)
@@ -465,12 +513,6 @@ void KKSHistWidgetEx::saveHist (KKSValue & v)
     v = getVal();
 }
 
-void KKSHistWidgetEx::clearIO (void)
-{
-    /*
-    this->cbIORef->clear();
-    */
-}
 
 KKSValue KKSHistWidgetEx::getVal (void)
 {
@@ -489,19 +531,6 @@ KKSValue KKSHistWidgetEx::getVal (void)
 
     m_hist->setRange (xmin, xmax);
     m_hist->setSize (num);
-
-    /*
-    int idScenario = cbScenario->itemData (cbScenario->currentIndex()).toInt();
-    int idVariant = cbVariant->itemData (cbVariant->currentIndex()).toInt ();
-    int idCategory = cbCategory->itemData (cbCategory->currentIndex()).toInt ();
-    int idIOObject = cbIORef->itemData (cbIORef->currentIndex()).toInt ();
-    int idReceiver = cbReceiver->itemData (cbReceiver->currentIndex()).toInt ();
-    hist->setScenario(idScenario);
-    hist->setVariant(idVariant);
-    hist->setReceiver(idReceiver);
-    emit loadCategory (idCategory, hist);
-    emit loadIO (idIOObject, hist);
-    */
 
     QString hStr = m_hist->toString();
     qDebug () << __PRETTY_FUNCTION__ << hStr;
@@ -530,6 +559,7 @@ void KKSHistWidgetEx::scenarioSet (const QModelIndex& topLeft, const QModelIndex
     }
 
     m_hist->setScenario(scList);
+    slotParamsChanged();
 }
 
 void KKSHistWidgetEx::variantSet (const QModelIndex& topLeft, const QModelIndex& bottomRight)
@@ -552,6 +582,7 @@ void KKSHistWidgetEx::variantSet (const QModelIndex& topLeft, const QModelIndex&
     }
 
     m_hist->setVariant(vList);
+    slotParamsChanged();
 }
 
 void KKSHistWidgetEx::catSet (const QModelIndex& topLeft, const QModelIndex& bottomRight)
@@ -574,6 +605,7 @@ void KKSHistWidgetEx::catSet (const QModelIndex& topLeft, const QModelIndex& bot
     }
 
     m_hist->setCategories(cList);
+    slotParamsChanged();
     
 }
 
@@ -596,7 +628,8 @@ void KKSHistWidgetEx::ioSet (const QModelIndex& topLeft, const QModelIndex& bott
             ioList.removeOne(idV);
     }
 
-    m_hist->setVariant(ioList);
+    m_hist->setIO(ioList);
+    slotParamsChanged();
 }
 
 void KKSHistWidgetEx::serviceSet (const QModelIndex& topLeft, const QModelIndex& bottomRight)
@@ -618,7 +651,8 @@ void KKSHistWidgetEx::serviceSet (const QModelIndex& topLeft, const QModelIndex&
             sList.removeOne(idV);
     }
 
-    m_hist->setVariant(sList);
+    m_hist->setServices(sList);
+    slotParamsChanged();
 }
 
 void KKSHistWidgetEx::partLowSet (const QModelIndex& topLeft, const QModelIndex& bottomRight)
@@ -640,5 +674,25 @@ void KKSHistWidgetEx::partLowSet (const QModelIndex& topLeft, const QModelIndex&
             plList.removeOne(idV);
     }
 
-    m_hist->setVariant(plList);
+    m_hist->setPartLows(plList);
+    slotParamsChanged();
+}
+
+void KKSHistWidgetEx::needToUpdateHistogramGraphic()
+{
+
+    QString tName = m_av->attribute()->tableName();
+    emit getHistogramGraphic(*m_hist, tName);
+
+    UI->leFrom->setText (QString::number (m_hist->getXMin()));
+    UI->leTo->setText (QString::number (m_hist->getXMax()));
+    UI->leCount->setText (QString::number (m_hist->size()));
+
+    m_paramsChanged = false;
+
+}
+
+void KKSHistWidgetEx::completed(bool b)
+{
+    m_completed = b;
 }

@@ -198,8 +198,6 @@ class _GUI_EXPORT KKSObjEditor : public KKSRecDialog
         void recSaved (KKSObjectExemplar * rec);
         void viewAHist (const KKSAttrValue *, const KKSList<KKSAttrValue *>& histList);
         
-        void loadHistCat (int idCat, KKSHistogram * vHist);
-        void loadHistIO (int idIO, KKSHistogram * vHist);
 //        void editIndicator (void);
 //        void delIndicator (void);
 //        void addIndicator (void);
@@ -269,9 +267,12 @@ class _GUI_EXPORT KKSObjEditor : public KKSRecDialog
         
         void needToSaveGISProject(KKSValue &); //перед тем, как сохранить ИО (ЭИО) необходимо сохранить файл с ГИС-проектом (если присутствуют атрибуты ГИС)
                                                //генерируем сигнал, его поймает ГИС-виджет, сохранить файл проекта, прочитает его в XML и вернет в качестве значения KKSValue
-        void setHistCat (int idCat, KKSHistogram * vHist, KKSHistWidgetEx * hW);
-        void setHistIO (int idIO, KKSHistogram * vHist, KKSHistWidgetEx * hW);
-        void needToUpdateHistogram (KKSValue &);
+        
+        void needToUpdateHistogram (KKSValue &);//получаем строковое представление значения атрибута типа "гистограмма"
+                                                //перед этим для новых гистограмм происходит получение значения поля id из соответствующей таблицы (для histogram_params_streams, histogram_params_chains)
+                                                //(вызывается в методе KKSHistWidgetEx::saveHist() )
+
+        void updateHistogramGraphic();//для ИО и ЭИО, имеющих атрибут типа гистограмма, необходимо перечитать данные в значение этого атрибута из БД, каждый раз, когда ИО (ЭИО) сохранен в БД
 
     public slots:
         //void slotRubricItemRequested();

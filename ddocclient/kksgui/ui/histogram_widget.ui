@@ -64,7 +64,11 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="leFrom"/>
+             <widget class="QLineEdit" name="leFrom">
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
@@ -78,7 +82,11 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="leTo"/>
+             <widget class="QLineEdit" name="leTo">
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>

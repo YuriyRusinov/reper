@@ -639,87 +639,79 @@ KKSValue  KKSLoader::constructValue(const QString & value,
     {
         qint64 aid = a->id();
         QString tName = a->tableName();
-        QString cName = a->columnName();
-        //qDebug () << __PRETTY_FUNCTION__ << QString ("Load histogram attribute %1, its table %2, values from %3").arg (aid).arg(tName).arg(cName) << value;
-        
+        //QString cName = a->columnName();
         KKSHistogram h;
         h.fromString (value); //для того, чтобы только взять id
 
-        QString sql;
-        QString valSql;
 
-        if (tName.compare(QString("histogram_params_streams"), Qt::CaseInsensitive) == 0){
-            valSql = QString ("select h_order, h_x, h_y from histogram_graphics_streams where id_histogram_params_streams = %1;").arg(h.id());
-            sql = QString("select * from getHistogramParamsStreams(%1)").arg(h.id());
-        }
-        else if(tName.compare(QString("histogram_params_chains"), Qt::CaseInsensitive) == 0){
-            valSql = QString ("select h_order, h_x, h_y from histogram_graphics_chains where id_histogram_params_chains = %1;").arg(h.id());
-            sql = QString("select * from getHistogramParamsChains(%1)").arg(h.id());
-        }
-        else{
-            return v;
-        }
-
-        KKSResult * res = db->execute(sql);
-        if(!res || res->getRowCount() != 1){
-            if(res)
-                delete res;
-
-            return v;
-        }
-        
-        double hMin = 0.0;
-        double hMax = 0.0;
-        int hCount = -1;
-
-        hMin = res->getCellAsDouble(0, 1);
-        hMax = res->getCellAsDouble(0, 2);
-        hCount = res->getCellAsInt(0, 3);
-
-        h.setRange(hMin, hMax);
-        h.setSize(hCount);
-        
-        delete res;
-
-        /*
-            valSql = QString ("select %2 from %1").arg (tName).arg(cName);
-                       //QString ("select %1 from %2 as mser inner join message_streams ms on (mser.id_message_stream=ms.id and ms.id_io_object=%3)")
-                       //     .arg (cName)
-                       //     .arg (tName)
-                       //     .arg (h.srcObject()->id());
-                QString("select %1 from %2;").arg(cName).arg(tName);
-        
-        
-        
-        QString hsql = QString ("select * from histogram('%1', %2, %3, %4);").arg (valSql).arg(h.getXMin()).arg(h.getXMax()).arg (h.size());
-        qDebug () << __PRETTY_FUNCTION__ << valSql << hsql;
-        */
-        
-        KKSResult * hRes = db->execute (valSql);
-        if (hRes)
-        {
-            QMap<int, QPair<double, double> > hData;
-            int n = hRes->getRowCount();
-            for (int i=0; i<n; i++)
-            {
-                int key = hRes->getCellAsInt (i, 0);
-                double h_x = hRes->getCellAsDouble (i, 1);
-                double h_y = hRes->getCellAsDouble (i, 2);
-
-                QPair<double, double> v(h_x, h_y);
-
-                hData.insert(key, v);
-            }
-
-            h.setVec(hData);
-            delete hRes;
-        }
-
-        QString hStr = h.toString();
+        QString hStr = getHistogramValue(h, tName); 
         v.setValue (hStr, KKSAttrType::atHistogram);
     }
 
     return v;
+}
+
+QString KKSLoader::getHistogramValue(KKSHistogram & h, const QString & tName) const
+{
+    QString sql;
+    QString valSql;
+
+    if (tName.compare(QString("histogram_params_streams"), Qt::CaseInsensitive) == 0){
+        valSql = QString ("select h_order, h_x, h_y from histogram_graphics_streams where id_histogram_params_streams = %1;").arg(h.id());
+        sql = QString("select * from getHistogramParamsStreams(%1)").arg(h.id());
+    }
+    else if(tName.compare(QString("histogram_params_chains"), Qt::CaseInsensitive) == 0){
+        valSql = QString ("select h_order, h_x, h_y from histogram_graphics_chains where id_histogram_params_chains = %1;").arg(h.id());
+        sql = QString("select * from getHistogramParamsChains(%1)").arg(h.id());
+    }
+    else{
+        return QString::null;
+    }
+
+    KKSResult * res = db->execute(sql);
+    if(!res || res->getRowCount() != 1){
+        if(res)
+            delete res;
+
+        return QString::null;
+    }
+    
+    double hMin = 0.0;
+    double hMax = 0.0;
+    int hCount = -1;
+
+    hMin = res->getCellAsDouble(0, 1);
+    hMax = res->getCellAsDouble(0, 2);
+    hCount = res->getCellAsInt(0, 3);
+
+    h.setRange(hMin, hMax);
+    h.setSize(hCount);
+    
+    delete res;
+
+    KKSResult * hRes = db->execute (valSql);
+    if (hRes)
+    {
+        QMap<int, QPair<double, double> > hData;
+        int n = hRes->getRowCount();
+        for (int i=0; i<n; i++)
+        {
+            int key = hRes->getCellAsInt (i, 0);
+            double h_x = hRes->getCellAsDouble (i, 1);
+            double h_y = hRes->getCellAsDouble (i, 2);
+
+            QPair<double, double> v(h_x, h_y);
+
+            hData.insert(key, v);
+        }
+
+        h.setVec(hData);
+        delete hRes;
+    }
+
+    QString hStr = h.toString();
+
+    return hStr;
 }
 
 KKSCategory * KKSLoader::loadCategory(int id, bool simplify) const

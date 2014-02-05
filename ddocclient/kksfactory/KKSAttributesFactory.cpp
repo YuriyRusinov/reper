@@ -1645,15 +1645,19 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                 //Services
                 QMap<int, QString> sList;
                 if(av->attribute()->tableName() == "histogram_params_chains"){
-                    sList = loader->getPartLowInfoForStreams();
+                    sList = loader->getServicesInfoForChains();
                 }
                 haw->loadServices(sList);
 
-                connect (haw, SIGNAL (loadCategory (int, KKSHistogram *)), objEditor, SLOT (loadHistCat (int, KKSHistogram *)) );
-                connect (haw, SIGNAL (loadIO (int, KKSHistogram *)), objEditor, SLOT (loadHistIO (int, KKSHistogram *)) );
+                haw->completed(true);
+
+                //connect (haw, SIGNAL (loadCategory (int, KKSHistogram *)), objEditor, SLOT (loadHistCat (int, KKSHistogram *)) );
+                //connect (haw, SIGNAL (loadIO (int, KKSHistogram *)), objEditor, SLOT (loadHistIO (int, KKSHistogram *)) );
                 connect (objEditor, SIGNAL (needToUpdateHistogram (KKSValue &)), haw, SLOT (saveHist(KKSValue &)) );
+                connect (objEditor, SIGNAL (updateHistogramGraphic()), haw, SLOT(needToUpdateHistogramGraphic()));
                 connect (haw, SIGNAL (getIdForHistogramParams(const QString &, qint64 *)), this, SLOT(getIdForHistogramParams(const QString &, qint64 *)) );
-                
+                connect (haw, SIGNAL (getHistogramGraphic(KKSHistogram &, const QString &)), this, SLOT(getHistogramGraphic(KKSHistogram &, const QString &)));
+                //connect (
                
                 attrWidget->setMinimumHeight (20);
                 if (!isRef)
@@ -2565,9 +2569,11 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
             {
                 
                 KKSHistWidgetEx * hw = qobject_cast<KKSHistWidgetEx *>(aw);
+                hw->completed(false);
                 hw->setHist(V.value<KKSHistogram>());
                 if (!isRef)
                     connectToSlots (aw, wEditor);
+                hw->completed(true);
                     
             }
             break;
@@ -3227,4 +3233,8 @@ void KKSAttributesFactory :: getIdForHistogramParams(const QString & tableName, 
     return;
 }
 
+void KKSAttributesFactory :: getHistogramGraphic(KKSHistogram & h, const QString & tName)
+{
+    QString hStr = loader->getHistogramValue(h, tName);
+}
 

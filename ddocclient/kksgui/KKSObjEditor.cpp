@@ -975,6 +975,9 @@ void KKSObjEditor :: saveToDb (int num)
         //здесь (после сохранения ИО или ЭИО в БД) мы знаем их идентификатор
         //теперь можно сохранить файлы для ГИС-объектов (если такие атрибуты присутствуют в данном ИО или ЭИО)
         emit uploadGISFiles(pObjectEx->id());
+        
+        //для ИО и ЭИО, имеющих атрибут типа гистограмма, необходимо перечитать данные в значение этого атрибута из БД, каждый раз, когда ИО (ЭИО) сохранен в БД
+        emit updateHistogramGraphic();
     }
 
     //
@@ -989,6 +992,9 @@ void KKSObjEditor :: saveToDb (int num)
         //здесь (после сохранения ИО или ЭИО в БД) мы знаем их идентификатор
         //теперь можно сохранить файлы для ГИС-объектов (если такие атрибуты присутствуют в данном ИО или ЭИО)
         emit uploadGISFiles(pObj->id());
+
+        //для ИО и ЭИО, имеющих атрибут типа гистограмма, необходимо перечитать данные в значение этого атрибута из БД, каждый раз, когда ИО (ЭИО) сохранен в БД
+        emit updateHistogramGraphic();
     }
 
 }
@@ -2744,18 +2750,4 @@ void KKSObjEditor :: viewAHist (const KKSAttrValue * av, const KKSList<KKSAttrVa
         (qobject_cast<KKSAttrValueLabel *>(activeLabel))->viewAHist (av, histList);
     }
     //emit viewHist (histList);
-}
-
-void KKSObjEditor :: loadHistCat (int idCat, KKSHistogram * vHist)
-{
-    KKSHistWidgetEx * hw = qobject_cast<KKSHistWidgetEx *> (this->sender());
-    if (hw && idCat > 0)
-        hw->clearIO();
-    emit setHistCat (idCat, vHist, hw);
-}
-
-void KKSObjEditor :: loadHistIO (int idIO, KKSHistogram * vHist)
-{
-    KKSHistWidgetEx * hw = qobject_cast<KKSHistWidgetEx *> (this->sender());
-    emit setHistIO (idIO, vHist, hw);
 }

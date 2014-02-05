@@ -401,9 +401,6 @@ private slots:
     
     void GUIloadDBSearchTemplate (KKSSearchTemplate *st, const KKSCategory* c, QString tableName);
     
-    void loadCatHist (int idCat, KKSHistogram * vHist, KKSHistWidgetEx * hw);
-    void loadIOHist (int idIO, KKSHistogram * vHist, KKSHistWidgetEx * hw);
-
 private:
     //
     // Functions

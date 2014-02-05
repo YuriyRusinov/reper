@@ -43,6 +43,7 @@ bool KKSCheckableModel :: setData (const QModelIndex & index, const QVariant & v
     {
         bool retVal = QStandardItemModel::setData (index, value.toBool(), Qt::CheckStateRole);
         emit dataChanged (index, index);
+        emit checkStateChanged(index, index);
         return retVal;
     }
     else

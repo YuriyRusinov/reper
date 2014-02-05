@@ -17,7 +17,7 @@
 #include "KKSAttribute.h"
 #include "KKSAttrType.h"
 #include "KKSValue.h"
-//#include "KKSAttrGroup.h"
+#include "KKSHistogram.h"
 #include "KKSFilter.h"
 #include "KKSFile.h"
 #include "KKSStatElement.h"
@@ -254,6 +254,7 @@ class _F_EXPORT KKSLoader
         QMap<int, QString> getScenariosInfoForChains() const;
         QMap<int, QString> getServicesInfoForChains() const;
         QMap<int, QString> getPartLowInfoForStreams() const;
+        QString getHistogramValue(KKSHistogram & h, const QString & tName) const;
 
 
         KKSLoader();

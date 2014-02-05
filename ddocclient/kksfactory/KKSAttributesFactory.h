@@ -13,6 +13,7 @@
 #include <KKSFilter.h>
 #include "KKSEntityFactory.h"
 #include "KKSIndAttr.h"
+#include "KKSHistogram.h"
 
 class QGridLayout;
 class QLabel;
@@ -73,6 +74,7 @@ public slots:
                         int idCat=-1);
 
     void getIdForHistogramParams(const QString & tableName, qint64 * id);
+    void getHistogramGraphic(KKSHistogram &, const QString &);
 
 private slots:
     void findAttributes (int idAttrs, QAbstractItemModel *aModel, KKSAttributesEditor * attrsEditor);

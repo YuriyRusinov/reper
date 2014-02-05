@@ -24,6 +24,10 @@ class _GUI_EXPORT KKSCheckableModel : public QStandardItemModel
         virtual Qt::ItemFlags flags (const QModelIndex& index) const;
         virtual QVariant data (const QModelIndex& index, int role) const;
         virtual bool setData (const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
+
+    signals:
+        void checkStateChanged(const QModelIndex & topLeft, const QModelIndex & bottomRight);
+
     private:
         Q_OBJECT
 };

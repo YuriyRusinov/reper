@@ -23,6 +23,7 @@ class QLineEdit;
 class QComboBox;
 class QPushButton;
 class QModelIndex;
+class QListView;
 
 //class KKSCharts;
 class KKSCategory;
@@ -58,8 +59,8 @@ public:
     void loadIOList (const QMap<int, QString>& ioList);
     void loadPartLows(const QMap<int, QString>& plList);
     void loadServices(const QMap<int, QString>& sList);
-    
-    void clearIO (void);
+
+    void completed(bool b);//завершена ли загрузка данных в виджет. Все Дальнейшие действия (изменение параметров) после вызова этого метода будут приводить к вызову сигнала об изменении данных
     
     KKSValue getVal (void);
 
@@ -67,6 +68,8 @@ public slots:
     void setHist (const KKSHistogram& hist);
     void calcHist (void);
     void saveHist (KKSValue & v);
+    void needToUpdateHistogramGraphic();
+    void slotParamsChanged();
     
 private slots:
     void scenarioSet (const QModelIndex& topLeft, const QModelIndex& bottomRight);
@@ -75,13 +78,13 @@ private slots:
     void ioSet (const QModelIndex& topLeft, const QModelIndex& bottomRight);
     void serviceSet (const QModelIndex& topLeft, const QModelIndex& bottomRight);
     void partLowSet (const QModelIndex& topLeft, const QModelIndex& bottomRight);
+
+    void setupCheckedData(QListView * list, const QList<int> ids);
     
 signals:
     void valueChanged (qint64 id, KKSIndAttrClass isSys, QVariant val);
-    void loadCategory (int idCat, KKSHistogram * h);
-    void loadIO (int idIO, KKSHistogram * h);
-    void updateVarsList (QComboBox *, FiltersType);
     void getIdForHistogramParams(const QString & tableName, qint64 * id);
+    void getHistogramGraphic(KKSHistogram & h, const QString & tName);
 
 private:
     //
@@ -97,6 +100,9 @@ private:
  
     KKSHistogram * m_hist;
     KKSQwtPlotWidget * m_qwtHistogramWidget;
+
+    bool m_paramsChanged;
+    bool m_completed;
 
 private:
     Q_OBJECT
