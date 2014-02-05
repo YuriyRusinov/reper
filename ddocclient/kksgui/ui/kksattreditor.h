@@ -47,6 +47,8 @@ public:
     void setGroupId (int idGroup);
 
     void uploadReferenceFields (const QMap<QString, QString>& fields);
+    const QMap<int, QString>& getReferences (void) const;
+    void setReferences (const QMap<int, QString>& refs);
     void setIO (KKSObject *o);
     void setCurrentRef (int index);
     void setCurrentRef (const QString& text);
@@ -64,6 +66,8 @@ signals:
     void addAttribute(KKSAttribute *, QAbstractItemModel*, KKSAttrEditor *);
     void editAttribute(int, KKSAttribute *, QAbstractItemModel*, const QModelIndex&, KKSAttrEditor *);
     void delAttribute(int, KKSAttribute *, QAbstractItemModel*, const QModelIndex&, KKSAttrEditor *);
+    
+    void loadHistRefs (KKSAttribute * attr, KKSAttrEditor * aEditor);
 
 public slots:
     void addTriggered(QAbstractItemModel * sourceMod, const QModelIndex& parent);//испускает сигнал addAttribute

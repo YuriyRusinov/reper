@@ -261,6 +261,12 @@ void KKSAttributesFactory :: saveAttribute (const QModelIndex& parent, QAbstract
              SIGNAL(delAttribute(int, KKSAttribute *, QAbstractItemModel*, const QModelIndex&, KKSAttrEditor *)), 
              this, 
              SLOT(delComplexAttr(int, KKSAttribute *, QAbstractItemModel*, const QModelIndex&, KKSAttrEditor *)) );
+
+    connect (aEditor,
+             SIGNAL (loadHistRefs (KKSAttribute *, KKSAttrEditor *)),
+             this,
+             SLOT (loadHistReferences (KKSAttribute *, KKSAttrEditor *))
+            );
     
     connect (this, SIGNAL(expandIndex (const QModelIndex&)), aEditor, SLOT (expandAttrInd (const QModelIndex&)) );
 
@@ -422,6 +428,12 @@ void KKSAttributesFactory :: loadAttribute (int idAttr, QAbstractItemModel * aMo
              SIGNAL(delAttribute(int, KKSAttribute *, QAbstractItemModel*, const QModelIndex&, KKSAttrEditor *)), 
              this, 
              SLOT(delComplexAttr(int, KKSAttribute *, QAbstractItemModel*, const QModelIndex&, KKSAttrEditor *)) );
+    
+    connect (attrEditor,
+             SIGNAL (loadHistRefs (KKSAttribute *, KKSAttrEditor *)),
+             this,
+             SLOT (loadHistReferences (KKSAttribute *, KKSAttrEditor *))
+            );
 
     connect (this, SIGNAL(expandIndex (const QModelIndex&)), aEditor, SLOT (expandAttrInd (const QModelIndex&)) );
 
@@ -513,7 +525,7 @@ void KKSAttributesFactory :: loadAttribute (int idAttr, QAbstractItemModel * aMo
 void KKSAttributesFactory :: delAttribute (int idAttr, QAbstractItemModel * aModel, const QModelIndex& aIndex, KKSAttributesEditor *aEditor)
 {
     int row = aIndex.row();//recW->tv->selectionModel ()->currentIndex().row();
-    qDebug () << __PRETTY_FUNCTION__ << row << idAttr;
+    //qDebug () << __PRETTY_FUNCTION__ << row << idAttr;
     KKSAttribute *attr = loader->loadAttribute (idAttr);
     if (!attr)
         return;
@@ -629,7 +641,7 @@ void KKSAttributesFactory :: loadAttrsRefFields (KKSAttribute * attr, int idRef,
     for (KKSMap<int, KKSCategoryAttr*>::const_iterator pc = c->attributes().constBegin(); pc != c->attributes().constEnd(); pc++)
         fields.insert (pc.value()->code(), pc.value()->title ());//name ());
 
-    qDebug () << __PRETTY_FUNCTION__ << fields;
+    //qDebug () << __PRETTY_FUNCTION__ << fields;
     aEditor->setIO (io);
     aEditor->uploadReferenceFields (fields);
     io->release ();
@@ -3238,3 +3250,16 @@ void KKSAttributesFactory :: getHistogramGraphic(KKSHistogram & h, const QString
     QString hStr = loader->getHistogramValue(h, tName);
 }
 
+void KKSAttributesFactory :: loadHistReferences (KKSAttribute * attr, KKSAttrEditor * aEditor)
+{
+    if (!attr || !aEditor)
+        return;
+
+    if (!attr->type())
+    {
+        KKSAttrType * aType = new KKSAttrType(KKSAttrType::atHistogram);
+        attr->setType(aType);
+    }
+    qDebug () << __PRETTY_FUNCTION__ << attr->type()->attrType();
+    
+}

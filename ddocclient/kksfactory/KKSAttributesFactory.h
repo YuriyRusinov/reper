@@ -111,6 +111,8 @@ private slots:
     
     void updateAttrValueModel (const KKSAttrValue * pAttrValue, const QVariant& val, QAbstractItemModel * attrValModel);
     void initAttrValueModel (const KKSAttrValue * pAttrValue, const QVariant& val);
+    
+    void loadHistReferences (KKSAttribute * attr, KKSAttrEditor * aEditor);
 
 signals:
     void viewHistory(const KKSAttrValue *, const KKSList<KKSAttrValue *> &);

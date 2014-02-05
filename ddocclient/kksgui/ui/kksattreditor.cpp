@@ -261,6 +261,9 @@ void KKSAttrEditor :: currentAttrTypeChanged (int index)
         m_recW->setEIOModel(sortAttrMod);
     }
     ui->attrTabW->setTabEnabled(1, isComplex);
+    bool isHist (cType==KKSAttrType::atHistogram);
+    if (isHist)
+        emit loadHistRefs (attribute, this);
 
 }
 
@@ -386,6 +389,17 @@ void KKSAttrEditor :: uploadReferenceFields (const QMap<QString, QString>& field
         ui->cbRefField->setCurrentIndex (ind);
     else
         ui->cbRefField->setCurrentIndex (-1);
+}
+
+const QMap<int, QString>& KKSAttrEditor :: getReferences (void) const
+{
+    return ioRefs;
+}
+
+void KKSAttrEditor :: setReferences (const QMap<int, QString>& refs)
+{
+    ioRefs = refs;
+    this->set_references();
 }
 
 void KKSAttrEditor :: setIO (KKSObject *o)
