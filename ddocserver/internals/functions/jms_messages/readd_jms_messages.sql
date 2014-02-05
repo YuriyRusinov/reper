@@ -18,3 +18,6 @@
 \i ./functions/jms_messages/getscenariosinfoforchains.sql
 \i ./functions/jms_messages/getpartlowinfoforstreams.sql
 \i ./functions/jms_messages/getservicesinfoforchains.sql
+
+\i ./functions/jms_messages/parsehistogramparams.sql
+\i ./functions/jms_messages/getranges.sql

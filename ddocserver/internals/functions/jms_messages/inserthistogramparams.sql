@@ -67,16 +67,47 @@ begin
     q = 'select id from ' || tableName || ' where id = ' || hParamsId;
     execute q into tmp;
     if(tmp isnull) then
-        q = 'insert into ' || tableName || ' (id, name, h_min, h_max, h_count, scenarios, variants) values (' 
-                                             || hParamsId || ', ' 
-                                             || quote_literal(hParamsName) || ', ' 
-                                             || 'NULL' || ', ' 
-                                             || 'NULL' || ', ' 
-                                             || hCount || ', ' 
-                                             || 'NULL' || ', ' 
-                                             || 'NULL' || ')';
+        if(tableName = 'histogram_params_streams') then
+            q = 'insert into ' || tableName || ' (id, name, h_min, h_max, h_count, scenarios, variants, io_categories, io_objects, partition_lows) values (' 
+                                                 || hParamsId || ', ' 
+                                                 || quote_literal(hParamsName) || ', ' 
+                                                 || 'NULL' || ', ' 
+                                                 || 'NULL' || ', ' 
+                                                 || hCount || ', ' 
+                                                 || asString(parseHistogramParams(hValue, 'scenario'), true) || ', ' 
+                                                 || asString(parseHistogramParams(hValue, 'variant'), true) || ', ' 
+                                                 || asString(parseHistogramParams(hValue, 'categories'), true) || ', ' 
+                                                 || asString(parseHistogramParams(hValue, 'IO'), true) || ', ' 
+                                                 || asString(parseHistogramParams(hValue, 'part_lows'), true) || ')';
+        else
+            q = 'insert into ' || tableName || ' (id, name, h_min, h_max, h_count, scenarios, variants, io_categories, services) values (' 
+                                                 || hParamsId || ', ' 
+                                                 || quote_literal(hParamsName) || ', ' 
+                                                 || 'NULL' || ', ' 
+                                                 || 'NULL' || ', ' 
+                                                 || hCount || ', ' 
+                                                 || asString(parseHistogramParams(hValue, 'scenario'), true) || ', ' 
+                                                 || asString(parseHistogramParams(hValue, 'variant'), true) || ', ' 
+                                                 || asString(parseHistogramParams(hValue, 'categories'), true) || ', ' 
+                                                 || asString(parseHistogramParams(hValue, 'services'), true) || ')';
+        end if;
     else
-        q = 'update ' || tableName || ' set h_count = ' || hCount || ', scenarios = ' || 'NULL' || ', variants = ' || 'NULL' || ' where id = ' || hParamsId;
+        if(tableName = 'histogram_params_streams') then
+            q = 'update ' || tableName || ' set h_count = ' || hCount || ', ' 
+                                          || 'scenarios = ' || asString(parseHistogramParams(hValue, 'scenario'), true) || ', ' 
+                                          || 'variants = ' || asString(parseHistogramParams(hValue, 'variant'), true) || ', ' 
+                                          || 'io_categories = ' || asString(parseHistogramParams(hValue, 'categories'), true) || ', ' 
+                                          || 'io_objects = ' || asString(parseHistogramParams(hValue, 'IO'), true) || ', ' 
+                                          || 'partition_lows = ' || asString(parseHistogramParams(hValue, 'part_lows'), true) 
+                                          || ' where id = ' || hParamsId;
+        else
+            q = 'update ' || tableName || ' set h_count = ' || hCount || ', ' 
+                                          || 'scenarios = ' || asString(parseHistogramParams(hValue, 'scenario'), true) || ', ' 
+                                          || 'variants = ' || asString(parseHistogramParams(hValue, 'variant'), true) || ', ' 
+                                          || 'io_categories = ' || asString(parseHistogramParams(hValue, 'categories'), true) || ', ' 
+                                          || 'services = ' || asString(parseHistogramParams(hValue, 'services'), true) 
+                                          || ' where id = ' || hParamsId;
+        end if;
     end if;
 
     execute q;
