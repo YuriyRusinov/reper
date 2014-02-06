@@ -67,7 +67,7 @@ signals:
     void editAttribute(int, KKSAttribute *, QAbstractItemModel*, const QModelIndex&, KKSAttrEditor *);
     void delAttribute(int, KKSAttribute *, QAbstractItemModel*, const QModelIndex&, KKSAttrEditor *);
     
-    void loadHistRefs (KKSAttribute * attr, KKSAttrEditor * aEditor);
+    void loadHistRefs (KKSAttribute * attr, int aType, KKSAttrEditor * aEditor);
 
 public slots:
     void addTriggered(QAbstractItemModel * sourceMod, const QModelIndex& parent);//испускает сигнал addAttribute

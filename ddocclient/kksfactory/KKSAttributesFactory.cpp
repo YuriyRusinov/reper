@@ -263,9 +263,9 @@ void KKSAttributesFactory :: saveAttribute (const QModelIndex& parent, QAbstract
              SLOT(delComplexAttr(int, KKSAttribute *, QAbstractItemModel*, const QModelIndex&, KKSAttrEditor *)) );
 
     connect (aEditor,
-             SIGNAL (loadHistRefs (KKSAttribute *, KKSAttrEditor *)),
+             SIGNAL (loadHistRefs (KKSAttribute *, int, KKSAttrEditor *)),
              this,
-             SLOT (loadHistReferences (KKSAttribute *, KKSAttrEditor *))
+             SLOT (loadHistReferences (KKSAttribute *, int, KKSAttrEditor *))
             );
     
     connect (this, SIGNAL(expandIndex (const QModelIndex&)), aEditor, SLOT (expandAttrInd (const QModelIndex&)) );
@@ -395,6 +395,10 @@ void KKSAttributesFactory :: loadAttribute (int idAttr, QAbstractItemModel * aMo
     {
         loadAttrsRefs (attr, attrEditor);
     }
+    else if (attr->type()->attrType () == KKSAttrType::atHistogram)
+    {
+        this->loadHistReferences(attr, KKSAttrType::atHistogram, attrEditor);
+    }
 
     connect (attrEditor, SIGNAL (getReferences (KKSAttribute *, KKSAttrEditor *)),
              this,
@@ -430,9 +434,9 @@ void KKSAttributesFactory :: loadAttribute (int idAttr, QAbstractItemModel * aMo
              SLOT(delComplexAttr(int, KKSAttribute *, QAbstractItemModel*, const QModelIndex&, KKSAttrEditor *)) );
     
     connect (attrEditor,
-             SIGNAL (loadHistRefs (KKSAttribute *, KKSAttrEditor *)),
+             SIGNAL (loadHistRefs (KKSAttribute *, int, KKSAttrEditor *)),
              this,
-             SLOT (loadHistReferences (KKSAttribute *, KKSAttrEditor *))
+             SLOT (loadHistReferences (KKSAttribute *, int, KKSAttrEditor *))
             );
 
     connect (this, SIGNAL(expandIndex (const QModelIndex&)), aEditor, SLOT (expandAttrInd (const QModelIndex&)) );
@@ -3250,14 +3254,14 @@ void KKSAttributesFactory :: getHistogramGraphic(KKSHistogram & h, const QString
     QString hStr = loader->getHistogramValue(h, tName);
 }
 
-void KKSAttributesFactory :: loadHistReferences (KKSAttribute * attr, KKSAttrEditor * aEditor)
+void KKSAttributesFactory :: loadHistReferences (KKSAttribute * attr, int idatype, KKSAttrEditor * aEditor)
 {
     if (!attr || !aEditor)
         return;
 
     if (!attr->type())
     {
-        KKSAttrType * aType = new KKSAttrType(KKSAttrType::atHistogram);
+        KKSAttrType * aType = new KKSAttrType(idatype);
         attr->setType(aType);
     }
     //qDebug () << __PRETTY_FUNCTION__ << attr->type()->attrType();
@@ -3270,20 +3274,50 @@ void KKSAttributesFactory :: loadHistReferences (KKSAttribute * attr, KKSAttrEdi
     KKSList<const KKSFilterGroup *> filters;
     const KKSCategory * c = io->category();
     const KKSCategory * ct = c->tableCategory();
-    const KKSFilter * f = ct->createFilter (1, "select id from tbl_io_objects where id in (110, 111)", KKSFilter::foInSQL);
-    KKSFilterGroup * fg = new KKSFilterGroup (true);
-    fg->addFilter (f);
-    f->release ();
-    filters.append (fg);
-    fg->release ();
+    if (idatype == KKSAttrType::atHistogram)
+    {
+        const KKSFilter * f = ct->createFilter (1, "select id from tbl_io_objects where id in (110, 111)", KKSFilter::foInSQL);
+        KKSFilterGroup * fg = new KKSFilterGroup (true);
+        fg->addFilter (f);
+        f->release ();
+        filters.append (fg);
+        fg->release ();
+    }
     KKSMap<qint64, KKSEIOData *> io_data = loader->loadEIOList (io, filters);
     KKSMap<qint64, KKSEIOData *>::const_iterator p;
 
     io_refs.clear ();
+    int ind = -1;
+    int i = 0;
+    int idRef = -1;
     for (p=io_data.constBegin(); p != io_data.constEnd(); p++)
+    {
         io_refs.insert (p.key(), p.value()->fields ().value ("name"));
+        KKSObject *io = loader->loadIO (p.key(), true);
+        if(!io)
+            continue;
 
-    io->release ();
+        if (io->tableName() == attr->tableName())
+        {
+            ind = i;
+            idRef = p.key();//io->id ();
+            aEditor->setCurrentRef (p.value()->fields ().value ("name"));//ind);
+        }
+        i++;
+        io->release ();
+    }
+    if (ind >= 0)
+    {
+        loadAttrsRefFields (attr, idRef, aEditor);
+    }
+
     aEditor->setReferences(io_refs);
+    QMap<QString, QString> fields;
+    for (KKSMap<int, KKSCategoryAttr*>::const_iterator pc = ct->attributes().constBegin(); pc != ct->attributes().constEnd(); pc++)
+        fields.insert (pc.value()->code(), pc.value()->title ());//name ());
+    io->release ();
+
+    //qDebug () << __PRETTY_FUNCTION__ << fields;
+    //aEditor->uploadReferenceFields (fields);
     
 }

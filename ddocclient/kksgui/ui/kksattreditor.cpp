@@ -261,9 +261,8 @@ void KKSAttrEditor :: currentAttrTypeChanged (int index)
         m_recW->setEIOModel(sortAttrMod);
     }
     ui->attrTabW->setTabEnabled(1, isComplex);
-    bool isHist (cType==KKSAttrType::atHistogram);
-    if (isHist)
-        emit loadHistRefs (attribute, this);
+//    bool isHist (cType==KKSAttrType::atHistogram);
+    emit loadHistRefs (attribute, cType, this);
 
 }
 
@@ -371,7 +370,7 @@ void KKSAttrEditor :: uploadReferenceFields (const QMap<QString, QString>& field
 
     for (QMap<QString, QString>::const_iterator pf = fields.constBegin(); pf != fields.constEnd(); pf++)
         fieldList.insertMulti (pf.value(), pf.key());
-
+    
     int ind = -1;
     int i=0;
     for (QMultiMap<QString, QString>::const_iterator p = fieldList.constBegin(); p != fieldList.constEnd(); p++)
