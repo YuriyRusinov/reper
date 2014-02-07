@@ -154,6 +154,8 @@ public slots:
     void printReport (KKSObject* io);
     void sendEditor (KKSObjEditor * editor);
     KKSSearchTemplatesForm * GUISearchTemplate (bool mode=false, QWidget * parent=0, Qt::WindowFlags flags=0);
+    
+    void loadHistogramData(int id, const QString & tName, QWidget * parent);
 
 private:
     //

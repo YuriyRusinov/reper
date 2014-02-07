@@ -67,6 +67,7 @@ public:
 public slots:
     void setHist (const KKSHistogram& hist);
     void calcHist (void);
+    void slotShowHistogramData();
     void saveHist (KKSValue & v);
     void needToUpdateHistogramGraphic();
     void slotParamsChanged();
@@ -85,6 +86,7 @@ signals:
     void valueChanged (qint64 id, KKSIndAttrClass isSys, QVariant val);
     void getIdForHistogramParams(const QString & tableName, qint64 * id);
     void getHistogramGraphic(KKSHistogram & h, const QString & tName);
+    void loadHistogramData(int id, const QString & tableName, QWidget * parent);
 
 private:
     //

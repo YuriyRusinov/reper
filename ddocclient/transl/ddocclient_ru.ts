@@ -1668,7 +1668,7 @@ Files for transfer: %2 (for current file: %5 parts) ---&gt; %4 (for current file
     </message>
     <message>
         <source>Start querying</source>
-        <translation type="unfinished"></translation>
+        <translation>Начать опрос БД</translation>
     </message>
 </context>
 <context>
@@ -2367,14 +2367,6 @@ syncronization</source>
         <translation>Результат</translation>
     </message>
     <message>
-        <source>OD 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>OD 2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Additional table directory</source>
         <translation>Дополнительная таблица справочника</translation>
     </message>
@@ -2941,6 +2933,10 @@ syncronization</source>
         <source>Do you really want to remove selected attribute from list?</source>
         <translation>Вы действительно хотите удалить выбранный атрибут из списка?</translation>
     </message>
+    <message>
+        <source>ÈÄ</source>
+        <translation>ИД</translation>
+    </message>
 </context>
 <context>
     <name>KKSAttrHistModel</name>
@@ -2990,19 +2986,11 @@ syncronization</source>
     </message>
     <message>
         <source>&lt;Histogram data %1&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;Vector layer data %1&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;Raster layer data %1&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Фрагмент гистограммы %1&gt;</translation>
     </message>
     <message>
         <source>&lt;GIS map data %1&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Фрагмент ГИС объекта %1&gt;</translation>
     </message>
 </context>
 <context>
@@ -3169,7 +3157,7 @@ syncronization</source>
     </message>
     <message>
         <source>Category attribute is null</source>
-        <translation type="unfinished"></translation>
+        <translation>В категории данный атрибут не существует</translation>
     </message>
 </context>
 <context>
@@ -3774,31 +3762,31 @@ Press YES to clear the color value or NO to remains current value</source>
     </message>
     <message>
         <source>Clear log</source>
-        <translation type="unfinished"></translation>
+        <translation>Очистить журнал</translation>
     </message>
     <message>
         <source>Show debug messages</source>
-        <translation type="unfinished"></translation>
+        <translation>Показывать отладочные сообщения</translation>
     </message>
     <message>
         <source>Show info messages</source>
-        <translation type="unfinished"></translation>
+        <translation>Показывать информационные сообщения</translation>
     </message>
     <message>
         <source>Show important info messages</source>
-        <translation type="unfinished"></translation>
+        <translation>Показывать важные информационные сообщения</translation>
     </message>
     <message>
         <source>Show warning messages</source>
-        <translation type="unfinished"></translation>
+        <translation>Показывать предупреждения</translation>
     </message>
     <message>
         <source>Show error messages</source>
-        <translation type="unfinished"></translation>
+        <translation>Показывать сообщения об ошибках</translation>
     </message>
     <message>
         <source>Log details</source>
-        <translation type="unfinished"></translation>
+        <translation>Детализация журнала</translation>
     </message>
 </context>
 <context>
@@ -4530,8 +4518,6 @@ Error: %1</source>
         <comment>number of features to delete</comment>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -4674,43 +4660,58 @@ Error: %1</source>
     <name>KKSHistWidget</name>
     <message>
         <source>Parameters</source>
-        <translation type="unfinished">Параметры</translation>
+        <translation type="obsolete">Параметры</translation>
     </message>
     <message>
         <source>From:</source>
-        <translation type="unfinished">С:</translation>
+        <translation type="obsolete">С:</translation>
     </message>
     <message>
         <source>To:</source>
-        <translation type="unfinished">До:</translation>
-    </message>
-    <message>
-        <source>Number of bins:</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">До:</translation>
     </message>
     <message>
         <source>Filters</source>
-        <translation type="unfinished">Фильтры</translation>
-    </message>
-    <message>
-        <source>Scenario</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Variant</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Category</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Фильтры</translation>
     </message>
     <message>
         <source>Source</source>
-        <translation type="unfinished">Источник</translation>
+        <translation type="obsolete">Источник</translation>
+    </message>
+</context>
+<context>
+    <name>KKSHistWidgetEx</name>
+    <message>
+        <source>Histogram view</source>
+        <translation>Просмотр гистограммы</translation>
     </message>
     <message>
-        <source>Receiver</source>
-        <translation type="unfinished"></translation>
+        <source>Save histogram params</source>
+        <translation>Сохранить параметры гистограммы</translation>
+    </message>
+    <message>
+        <source>Params of histogram was not saved in database! You should save that in database first</source>
+        <translation>Параметры гистограммы не сохранены в БД! Сначала необходимо сохранить их в БД</translation>
+    </message>
+    <message>
+        <source>Incorrect params</source>
+        <translation>Некорректные значения параметров</translation>
+    </message>
+    <message>
+        <source>Please, input correct parameters!</source>
+        <translation>Введите корректные значения параметров!</translation>
+    </message>
+    <message>
+        <source>Params of histogram was changed! You should save that in database</source>
+        <translation>Параметры гистограммы были изменены! Сначала необходимо сохранить их в БД</translation>
+    </message>
+    <message>
+        <source>Histogram</source>
+        <translation>Гистограмма</translation>
+    </message>
+    <message>
+        <source>Minimum value has to be little than maximum</source>
+        <translation>Минимальное значение должно быть меньше максимального</translation>
     </message>
 </context>
 <context>
@@ -5561,11 +5562,11 @@ Please connect to your system administrator.</source>
     </message>
     <message utf8="true">
         <source>Журнал распоряжений, команд и сообщений</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message utf8="true">
         <source>Окно отладочных сообщений</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6521,11 +6522,11 @@ Please save it before creating new records in it.</source>
     </message>
     <message>
         <source>Map</source>
-        <translation type="unfinished"></translation>
+        <translation>Карта</translation>
     </message>
     <message>
         <source>An error was occured while downloading GIS files!</source>
-        <translation type="unfinished"></translation>
+        <translation>Произошла ошибка при загрузке файлов ГИС!</translation>
     </message>
 </context>
 <context>
@@ -6978,11 +6979,11 @@ This is not allowed!</source>
     </message>
     <message>
         <source>AND</source>
-        <translation type="unfinished"></translation>
+        <translation>И</translation>
     </message>
     <message>
         <source>OR</source>
-        <translation type="unfinished"></translation>
+        <translation>ИЛИ</translation>
     </message>
     <message>
         <source>Group</source>
@@ -8558,10 +8559,6 @@ Further work is impossible. You should use equal versions of client and server s
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Server options</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Timer options</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8574,16 +8571,28 @@ Further work is impossible. You should use equal versions of client and server s
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Manular mode:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Ok</source>
-        <translation type="unfinished">Да</translation>
+        <translation type="obsolete">Да</translation>
     </message>
     <message>
         <source>Cancel</source>
         <translation type="unfinished">Отмена</translation>
+    </message>
+    <message>
+        <source>Host options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CheckBox</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manual mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
     </message>
 </context>
 <context>
@@ -10391,8 +10400,6 @@ Path = %1</source>
         <source>Attribute table - %1 (%n Feature(s))</source>
         <comment>feature count</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -16826,6 +16833,69 @@ synchronization</source>
     <message>
         <source>Search template category :</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>histogram_widget</name>
+    <message>
+        <source>histogram</source>
+        <translation>Гистограмма</translation>
+    </message>
+    <message>
+        <source>Parameters</source>
+        <translation type="unfinished">Параметры</translation>
+    </message>
+    <message>
+        <source>Histogram</source>
+        <translation>Гистограмма</translation>
+    </message>
+    <message>
+        <source>From:</source>
+        <translation>Мин.:</translation>
+    </message>
+    <message>
+        <source>To:</source>
+        <translation>Макс.:</translation>
+    </message>
+    <message>
+        <source>Bins:</source>
+        <translation>Кол-во диапазонов:</translation>
+    </message>
+    <message>
+        <source>Show Histogram Data</source>
+        <translation>Показать результат в виде таблицы</translation>
+    </message>
+    <message>
+        <source>Show Histogram</source>
+        <translation>Показать результат в виде гистограммы</translation>
+    </message>
+    <message>
+        <source>Scenarios</source>
+        <translation>Сценарии</translation>
+    </message>
+    <message>
+        <source>...</source>
+        <translation>...</translation>
+    </message>
+    <message>
+        <source>Variants</source>
+        <translation>Варианты</translation>
+    </message>
+    <message>
+        <source>Categories</source>
+        <translation>Категории</translation>
+    </message>
+    <message>
+        <source>IO</source>
+        <translation>Информационные объекты</translation>
+    </message>
+    <message>
+        <source>Services</source>
+        <translation>Сервисы</translation>
+    </message>
+    <message>
+        <source>Partition Lows</source>
+        <translation>Законы распределения</translation>
     </message>
 </context>
 <context>

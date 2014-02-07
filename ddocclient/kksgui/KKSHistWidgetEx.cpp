@@ -21,6 +21,9 @@
 #include <QtDebug>
 #include <QPair>
 
+#include <QTabWidget>
+#include <QTabBar>
+
 #include <KKSHistogram.h>
 #include <KKSAttrValue.h>
 #include "ui_histogram_widget.h"
@@ -51,10 +54,10 @@ KKSHistWidgetEx::KKSHistWidgetEx(const KKSAttrValue *av, KKSIndAttrClass isSys, 
     else
         m_hist = new KKSHistogram;
     
-
     init ();
 
     connect (UI->pbUpdate, SIGNAL (clicked()), this, SLOT (calcHist()) );
+    connect (UI->pbShowHistogramData, SIGNAL(clicked()), this, SLOT(slotShowHistogramData()));
     connect (UI->leCount, SIGNAL(textEdited(const QString &)), this, SLOT(slotParamsChanged()));
 }
 
@@ -98,22 +101,43 @@ void KKSHistWidgetEx::init (void)
         UI->leCount->setText (QString::number (m_hist->size()));
 }
 
-void KKSHistWidgetEx::calcHist (void)
+void KKSHistWidgetEx::slotShowHistogramData()
 {
+    if(!m_hist || !m_av || !m_av->attribute() || m_hist->id() <= 0){
+        QMessageBox::warning(this, tr("Save histogram params"), tr("Params of histogram was not saved in database! You should save that in database first"));
+        return;
+    }
+
     if(UI->leFrom->text().toDouble() >= UI->leTo->text().toDouble() || UI->leCount->text().toInt() <= 0){
         QMessageBox::warning(this, tr("Incorrect params"), tr("Please, input correct parameters!"));
         return;
     }
 
     if(m_paramsChanged){
-        QMessageBox::warning(this, tr(""), tr(""));
+        QMessageBox::warning(this, tr("Save histogram params"), tr("Params of histogram was changed! You should save that in database"));
         return;
     }
 
-    //KKSValue v = getVal();//(hStr, KKSAttrType::atHistogram);
-    //QString hStr = v.valueForInsert();
-    
-    //emit valueChanged (m_av->id(), m_isSystem, hStr);//v.valueVariant());
+
+    emit loadHistogramData(m_hist->id(), m_av->attribute()->tableName(), this);
+}
+
+void KKSHistWidgetEx::calcHist (void)
+{
+    if(!m_hist || m_hist->id() <= 0){
+        QMessageBox::warning(this, tr("Save histogram params"), tr("Params of histogram was not saved in database! You should save that in database first"));
+        return;
+    }
+
+    if(UI->leFrom->text().toDouble() >= UI->leTo->text().toDouble() || UI->leCount->text().toInt() <= 0){
+        QMessageBox::warning(this, tr("Incorrect params"), tr("Please, input correct parameters!"));
+        return;
+    }
+
+    if(m_paramsChanged){
+        QMessageBox::warning(this, tr("Save histogram params"), tr("Params of histogram was changed! You should save that in database"));
+        return;
+    }
 
     if(!m_qwtHistogramWidget){
         m_qwtHistogramWidget = new KKSQwtPlotWidget(m_av->attribute()->title(), 
@@ -131,7 +155,7 @@ void KKSHistWidgetEx::calcHist (void)
         m_qwtHistogramWidget->init(m_hist);
     }
 
-    m_qwtHistogramWidget->resize(600,400);
+    m_qwtHistogramWidget->resize(800,600);
     
     m_qwtHistogramWidget->show();
     if(m_qwtHistogramWidget->isMinimized())
@@ -142,11 +166,17 @@ void KKSHistWidgetEx::calcHist (void)
 
 void KKSHistWidgetEx::loadScenario (const QMap<int, QString>& scList)
 {
+    if(scList.count() <= 0){
+        UI->tabScenarios->setEnabled(false);
+        return;
+    }
+
+    UI->tabScenarios->setEnabled(true);
+
     QAbstractItemModel * scMod = UI->lVScenarios->model ();
     int nsc = scList.count();
     if (!scMod){
         scMod = new KKSCheckableModel (nsc, 1);
-        //connect(scMod, SIGNAL(checkStateChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(slotParamsChanged(const QModelIndex &, const QModelIndex &)));
     }
     else
     {
@@ -185,13 +215,19 @@ void KKSHistWidgetEx::loadScenario (const QMap<int, QString>& scList)
 
 void KKSHistWidgetEx::loadVariants (const QMap<int, QString>& varList)
 {
+    if(varList.count() <= 0){
+        UI->tabVariants->setEnabled(false);
+        return;
+    }
+
+    UI->tabVariants->setEnabled(true);
+
     QAbstractItemModel * varModel = UI->lvVariants->model ();
     bool isSet (true);
     int nvr = varList.count();
     if (!varModel)
     {
         varModel = new KKSCheckableModel (nvr, 1);
-        //connect(varModel, SIGNAL(checkStateChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(slotParamsChanged(const QModelIndex &, const QModelIndex &)));
         isSet = false;
     }
     else
@@ -230,13 +266,18 @@ void KKSHistWidgetEx::loadVariants (const QMap<int, QString>& varList)
 
 void KKSHistWidgetEx::loadCategories (const QMap<int, QString>& cList)
 {
-    //UI->lwCategories->clear();
+    if(cList.count() <= 0){
+        UI->tabCategories->setEnabled(false);
+        return;
+    }
+
+    UI->tabCategories->setEnabled(true);
+
     QAbstractItemModel * catMod = UI->lvCategories->model();
     bool isSet (true);
     int ncr = cList.count();
     if (!catMod){
         catMod = new KKSCheckableModel (ncr, 1);
-        //connect(catMod, SIGNAL(checkStateChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(slotParamsChanged(const QModelIndex &, const QModelIndex &)));
         isSet = false;
     }
     else
@@ -273,13 +314,22 @@ void KKSHistWidgetEx::loadCategories (const QMap<int, QString>& cList)
 
 void KKSHistWidgetEx::loadIOList (const QMap<int, QString>& ioList)
 {
-    //UI->lwCategories->clear();
+    if(ioList.count() <= 0){
+        int index = UI->twHistogramParams->indexOf(UI->tabIO);
+        UI->twHistogramParams->setTabEnabled(index, false);
+        if(m_av && m_av->attribute()->tableName() == "histogram_params_chains"){
+            UI->twHistogramParams->removeTab(index);
+        }
+        return;
+    }
+
+    UI->tabIO->setEnabled(true);
+
     QAbstractItemModel * ioMod = UI->lvIOs->model();
     bool isSet (true);
     int ncr = ioList.count();
     if (!ioMod){
         ioMod = new KKSCheckableModel (ncr, 1);
-        //connect(ioMod, SIGNAL(checkStateChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(slotParamsChanged(const QModelIndex &, const QModelIndex &)));
         isSet = false;
     }
     else
@@ -316,13 +366,22 @@ void KKSHistWidgetEx::loadIOList (const QMap<int, QString>& ioList)
 
 void KKSHistWidgetEx::loadPartLows(const QMap<int, QString>& plList)
 {
-    //UI->lwCategories->clear();
+    if(plList.count() <= 0){
+        int index = UI->twHistogramParams->indexOf(UI->tabLows);
+        UI->twHistogramParams->setTabEnabled(index, false);
+        if(m_av && m_av->attribute()->tableName() == "histogram_params_chains"){
+            UI->twHistogramParams->removeTab(index);
+        }
+        return;
+    }
+
+    UI->tabLows->setEnabled(true);
+
     QAbstractItemModel * plMod = UI->lvLows->model();
     bool isSet (true);
     int ncr = plList.count();
     if (!plMod){
         plMod = new KKSCheckableModel (ncr, 1);
-        //connect(plMod, SIGNAL(checkStateChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(slotParamsChanged(const QModelIndex &, const QModelIndex &)));
         isSet = false;
     }
     else
@@ -359,13 +418,23 @@ void KKSHistWidgetEx::loadPartLows(const QMap<int, QString>& plList)
 
 void KKSHistWidgetEx::loadServices(const QMap<int, QString>& sList)
 {
-    //UI->lwCategories->clear();
+    if(sList.count() <= 0){
+        int index = UI->twHistogramParams->indexOf(UI->tabServices);
+        UI->twHistogramParams->setTabEnabled(index, false);
+        if(m_av && m_av->attribute()->tableName() == "histogram_params_streams"){
+            UI->twHistogramParams->removeTab(index);
+        }
+
+        return;
+    }
+
+    UI->tabServices->setEnabled(true);
+
     QAbstractItemModel * sMod = UI->lvServices->model();
     bool isSet (true);
     int ncr = sList.count();
     if (!sMod){
         sMod = new KKSCheckableModel (ncr, 1);
-        //connect(sMod, SIGNAL(checkStateChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(slotParamsChanged(const QModelIndex &, const QModelIndex &)));
         isSet = false;
     }
     else
@@ -416,18 +485,10 @@ void KKSHistWidgetEx::setupCheckedData(QListView * list, const QList<int> ids)
     for(int i=0; i<rowCount; i++){
         QModelIndex index = model->index(i, 0);
         
-        //bool checked = model->data(index, Qt::CheckStateRole).toBool();
         int id = model->data (index, Qt::UserRole).toInt();
         
         QVariant v(ids.contains (id));
         model->setData(index, v,  Qt::CheckStateRole);
-        
-        /*
-        if (!ids.contains (id))
-            model->setData(index, false,  Qt::CheckStateRole);
-        else if (ids.contains(id))
-            model->setData(index, true,  Qt::CheckStateRole);
-        */
     }
 }
 
@@ -439,8 +500,6 @@ void KKSHistWidgetEx::setHist (const KKSHistogram& shist)
         m_hist->release ();
     
     m_hist = new KKSHistogram (shist);
-    
-    //QVariant v = QVariant::fromValue<KKSHistogram>(shist);
     
     UI->leFrom->setText (QString::number (m_hist->getXMin()));
     UI->leTo->setText (QString::number (m_hist->getXMax()));
@@ -480,9 +539,6 @@ void KKSHistWidgetEx::setHist (const KKSHistogram& shist)
     else{
         m_qwtHistogramWidget->init(m_hist);
     }
-    
-    //emit valueChanged (m_av->id(), m_isSystem, v);
-
 }
 
 void KKSHistWidgetEx::slotParamsChanged()
@@ -493,10 +549,10 @@ void KKSHistWidgetEx::slotParamsChanged()
     m_paramsChanged = true;
 
 
-    KKSValue v = getVal();//(hStr, KKSAttrType::atHistogram);
+    KKSValue v = getVal();
     QString hStr = v.valueForInsert();
     
-    emit valueChanged (m_av->id(), m_isSystem, hStr);//v.valueVariant());
+    emit valueChanged (m_av->id(), m_isSystem, hStr);
 }
 
 void KKSHistWidgetEx::saveHist (KKSValue & v)
@@ -518,7 +574,7 @@ KKSValue KKSHistWidgetEx::getVal (void)
 {
     double xmin = UI->leFrom->text().toDouble ();
     double xmax = UI->leTo->text().toDouble ();
-    if (xmin >= xmax)
+    if (xmin > xmax)
     {
         QMessageBox::warning (this, tr("Histogram"), tr("Minimum value has to be little than maximum"), QMessageBox::Ok);
         return KKSValue();

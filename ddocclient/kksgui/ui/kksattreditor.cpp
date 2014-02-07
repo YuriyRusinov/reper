@@ -123,12 +123,22 @@ KKSAttrEditor :: KKSAttrEditor (KKSAttribute *attr,
     //--ksa
     if(attribute && 
        attribute->id() >= 0 && 
-       attribute->type()->attrType() == KKSAttrType::atParent)
+       attribute->type()->attrType() == KKSAttrType::atParent )
     {
         ui->cbRefName->setCurrentIndex(-1);
         ui->cbRefName->setEnabled(false);
         ui->cbRefField->setEditable(true);
         ui->cbRefField->setEditText(attribute->columnName());
+    }
+
+    if(attribute && 
+       attribute->id() >= 0 && 
+       attribute->type()->attrType() == KKSAttrType::atHistogram)
+    {
+        ui->cbRefName->setCurrentIndex(-1);
+        ui->cbRefName->setEnabled(true);
+        ui->cbRefField->setEditText(tr("ИД"));
+        ui->cbRefField->setEnabled(false);
     }
 
     //--ksa
@@ -176,6 +186,9 @@ void KKSAttrEditor :: accept ()
             QMessageBox::warning (this, tr ("Attribute edit"), tr ("Set reference field"), QMessageBox::Ok);
             return;
         }
+        else if(cType == KKSAttrType::atHistogram){
+            int a = 0;
+        }
         else if(cType != KKSAttrType::atParent && ui->cbRefField->currentIndex () < 0){
             qWarning() << tr ("Select reference field");
             QMessageBox::warning (this, tr ("Attribute edit"), tr ("Select reference field"), QMessageBox::Ok);
@@ -201,11 +214,15 @@ void KKSAttrEditor :: accept ()
         attribute->type ()->attrType() == KKSAttrType::atCheckList ||
         attribute->type ()->attrType() == KKSAttrType::atCheckListEx ||
         attribute->type ()->attrType() == KKSAttrType::atRecordColorRef ||
-        attribute->type ()->attrType() == KKSAttrType::atRecordTextColorRef ||
-        attribute->type ()->attrType() == KKSAttrType::atHistogram )
+        attribute->type ()->attrType() == KKSAttrType::atRecordTextColorRef )
     {
         attribute->setTableName (io->tableName());
         attribute->setColumnName (ui->cbRefField->itemData (ui->cbRefField->currentIndex()).toString());
+    }
+    if (attribute->type ()->attrType() == KKSAttrType::atHistogram)
+    {
+        attribute->setTableName (io->tableName());
+        attribute->setColumnName ("id");
     }
     if (attribute->type ()->attrType() == KKSAttrType::atParent)
     {
@@ -234,14 +251,24 @@ void KKSAttrEditor :: currentAttrTypeChanged (int index)
     int cType = ui->cbType->itemData (index, Qt::UserRole).toInt();
     bool isRef (cRefTypes.contains (cType));
     ui->gbRef->setEnabled (isRef);
-    
+
+    bool isHist (cType==KKSAttrType::atHistogram);
+    if (isHist)
+        emit loadHistRefs (attribute, cType, this);
+
     //--ksa
     if(isRef){
-        if(cType == 3){//родитель/потомок
+        if(cType == KKSAttrType::atParent){//родитель/потомок
             ui->cbRefName->setCurrentIndex(-1);
             ui->cbRefName->setEnabled(false);
             ui->cbRefField->setEditable(true);
             ui->cbRefField->setEditText("name");
+        }
+        else if(cType == KKSAttrType::atHistogram){
+            ui->cbRefName->setCurrentIndex(-1);
+            ui->cbRefName->setEnabled(true);
+            ui->cbRefField->setEditText(tr("ИД"));
+            ui->cbRefField->setEnabled(false);
         }
         else{
             ui->cbRefName->setCurrentIndex(-1);
@@ -260,10 +287,8 @@ void KKSAttrEditor :: currentAttrTypeChanged (int index)
         sortAttrMod->setSourceModel(attrMod);
         m_recW->setEIOModel(sortAttrMod);
     }
-    ui->attrTabW->setTabEnabled(1, isComplex);
-//    bool isHist (cType==KKSAttrType::atHistogram);
-    emit loadHistRefs (attribute, cType, this);
 
+    ui->attrTabW->setTabEnabled(1, isComplex);
 }
 
 void KKSAttrEditor :: init_widgets (void)
@@ -504,5 +529,15 @@ void KKSAttrEditor::delTriggered(QAbstractItemModel * sourceMod, const QModelInd
     {
         int idAttr = wIndex.sibling(wIndex.row(), 0).data(Qt::UserRole).toInt();
         emit delAttribute(idAttr, attribute, sourceMod, wIndex, this);
+    }
+}
+
+void KKSAttrEditor::checkForHistogramRefs()
+{
+    if(attribute && 
+       attribute->id() >= 0 && 
+       attribute->type()->attrType() == KKSAttrType::atHistogram)
+    {
+        emit loadHistRefs (attribute, attribute->type()->attrType(), this);
     }
 }

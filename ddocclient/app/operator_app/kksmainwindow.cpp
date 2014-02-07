@@ -225,13 +225,20 @@ void KKSMainWindow::updateMenus()
             continue;
         }
 
-        QString text = child->windowTitle();
+        QString title = child->windowTitle();
+        QString text;
+        //if(title.size() > 30){
+        //    text = title.left(27) + QString("...");
+        //}
+        //else
+            text = title;
 
         QAction *action  = ui->aWindowMenu->addAction(text);
         action->setCheckable(true);
         action ->setChecked(child == activeKKSSubWindow());
         action->setData((int)winId);
         action->setIcon(childIcon);
+        action->setText(text);
         tbSubWindows->addAction(action);
         connect(action, SIGNAL(triggered()), m_windowMapper, SLOT(map()));
         connect(child, SIGNAL(aboutToClose(QWidget *)), this, SLOT(closeSubWindow(QWidget *)));

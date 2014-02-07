@@ -355,13 +355,21 @@ void KKSQwtPlotWidget::init(KKSHistogram * hist)
     QwtArray<QwtDoubleInterval> intervals(numValues);
     QwtArray<double> values(numValues);
 
-    //double pos = 0.0;
     double yMax = 0.0;
     QMap<int, QPair<double, double> > hData = m_histogramParams->getVec();
-    for ( int i = 0; i < (int)intervals.size(); i++ )
+
+    int cnt = (int)intervals.size();
+    double d = 0.001;
+    for ( int i=0; i<cnt; i++ )
     {
         QPair<double, double> xyFrom = hData.value(i);
-        QPair<double, double> xyTo = hData.value(i+1);
+        QPair<double, double> xyTo;
+        if(i<cnt-1){
+            xyTo = hData.value(i+1);
+            d = xyTo.first - xyFrom.first;
+        }
+        else
+            xyTo.first = hData.value(i).first + d;
 
         intervals[i] = QwtDoubleInterval(xyFrom.first, xyTo.first);
         values[i] = xyFrom.second; 

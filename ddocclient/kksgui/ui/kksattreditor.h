@@ -55,6 +55,7 @@ public:
     void setSearchTemplate(KKSSearchTemplate * st);
 
     void setRecWidget(KKSRecWidget *recW);
+    void checkForHistogramRefs();
 
 
 signals:

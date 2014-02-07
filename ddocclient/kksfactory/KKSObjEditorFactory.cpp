@@ -545,6 +545,8 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
             else
                 tabObj->setCurrentIndex (0);
         }
+        else
+            tabObj->setCurrentIndex (0);
 
         //
         // Дополнительные таблицы, если таковые имеются
@@ -3437,6 +3439,7 @@ void KKSObjEditorFactory :: loadAttributeReference (QString tableName, QWidget *
     KKSObjEditor *editor = (qobject_cast<KKSObjEditor*>(this->sender()));
     QWidget * wEditor = qobject_cast<QWidget *>(this->sender());
 //    connect (this, SIGNAL (editorCreatedModal (KKSObjEditor *)), editor, SLOT (childWidget(KKSObjEditor *)) );
+    
     KKSObject *refObj = loader->loadIO (tableName, true);
     if (!refObj)
     {
@@ -3985,6 +3988,84 @@ void KKSObjEditorFactory :: loadAttributeReference (QString tableName, QWidget *
 
     recEditor->setParent (0);
     delete recEditor;
+    refObj->release();
+}
+
+/*Используется для загрузки данных для гистограмм в виде таблицы*/
+void KKSObjEditorFactory::loadHistogramData(int id, const QString & tName, QWidget * parent)
+{
+    QString tableName;
+    int filterFieldId;
+    if(tName == "histogram_params_streams"){
+        tableName = QString("histogram_graphics_streams");
+        filterFieldId = ATTR_ID_HISTOGRAM_PARAMS_STREAMS;
+    }
+    else if(tName == "histogram_params_chains"){
+        tableName = QString("histogram_graphics_chains");
+        filterFieldId = ATTR_ID_HISTOGRAM_PARAMS_CHAINS;
+    }
+    else
+        return;
+    
+    KKSObject *refObj = loader->loadIO (tableName, true);
+    if (!refObj)
+    {
+        return;
+    }
+
+    KKSCategory *c = refObj->category ();
+    if (!c){
+        refObj->release();
+        return;
+    }
+
+    KKSList<const KKSFilterGroup*> filters;
+    QString value = QString ("%1").arg (id);
+    KKSCategory * ct = c->tableCategory ();
+    if (!ct)
+    {
+        refObj->release();
+        return;
+    }
+    
+    KKSList<const KKSFilter *> fl;
+    const KKSFilter * f = ct->createFilter (filterFieldId, value, KKSFilter::foEq);
+    if (!f)
+    {
+        refObj->release();
+        return;
+    }
+    
+    fl.append (f);
+    f->release ();
+    KKSFilterGroup * fg = new KKSFilterGroup(true);
+    fg->setFilters(fl);
+    filters.append(fg);
+    fg->release();
+    
+    KKSRecDialog * recEditor = this->createObjRecEditor (IO_IO_ID, 
+                                                         refObj->id (), 
+                                                         filters,
+                                                         "",
+                                                         c,
+                                                         true,
+                                                         false,
+                                                         parent ? parent->windowModality () : Qt::ApplicationModal,
+                                                         parent, 
+                                                         Qt::Window | 
+                                                         Qt::WindowTitleHint | 
+                                                         Qt::WindowSystemMenuHint | 
+                                                         Qt::WindowMinimizeButtonHint | 
+                                                         Qt::WindowMaximizeButtonHint);
+    if (!recEditor){
+        refObj->release();
+        return;
+    }
+
+    recEditor->setAttribute( Qt::WA_DeleteOnClose );
+    
+    recEditor->show ();
+
     refObj->release();
 }
 

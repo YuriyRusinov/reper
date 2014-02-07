@@ -120,6 +120,13 @@
              </spacer>
             </item>
             <item>
+             <widget class="QPushButton" name="pbShowHistogramData">
+              <property name="text">
+               <string>Show Histogram Data</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QPushButton" name="pbUpdate">
               <property name="text">
                <string>Show Histogram</string>

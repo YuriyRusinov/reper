@@ -75,6 +75,7 @@ public slots:
 
     void getIdForHistogramParams(const QString & tableName, qint64 * id);
     void getHistogramGraphic(KKSHistogram &, const QString &);
+    void loadHistogramData(int id, const QString & tableName, QWidget * parent);
 
 private slots:
     void findAttributes (int idAttrs, QAbstractItemModel *aModel, KKSAttributesEditor * attrsEditor);

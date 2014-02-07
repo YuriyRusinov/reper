@@ -2,7 +2,7 @@
 #define KKSCLIENT_NAME_H
 #define EXECUTABLE_PREFIX "ddocclient" 
 #define ORGANIZATION "DynamicSoft" 
-#define PRODUCT_FULL_NAME "DynamicDocs Client 1.3.2" 
+#define PRODUCT_FULL_NAME "DynamicDocs Client 1.3.3" 
 #define PRODUCT_NAME "DynamicDocs Client" 
-#define KKS_VERSION "1.3.2"
+#define KKS_VERSION "1.3.3"
 #endif

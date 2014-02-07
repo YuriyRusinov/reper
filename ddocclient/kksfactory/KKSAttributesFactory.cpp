@@ -229,9 +229,12 @@ void KKSAttributesFactory :: saveAttribute (const QModelIndex& parent, QAbstract
     KKSMap<int, KKSAttrType *> attrTypes=attrEditor->getTypes();
     KKSMap<int, KKSAGroup *> attrsGroups=attrEditor->getAvailableGroups();
     QMap<int, QString> ioRefs=attrEditor->getReferences();
+    
     KKSAttrEditor *aEditor = new KKSAttrEditor (cAttr, attrTypes, attrsGroups, ioRefs, attrEditor);
+    
     int idAttrGroup = parent.data(Qt::UserRole).toInt();
     aEditor->setGroupId(idAttrGroup);
+    
     connect (aEditor, 
              SIGNAL (getReferenceFields (KKSAttribute *, int, KKSAttrEditor *)),
              attrEditor,
@@ -269,6 +272,8 @@ void KKSAttributesFactory :: saveAttribute (const QModelIndex& parent, QAbstract
             );
     
     connect (this, SIGNAL(expandIndex (const QModelIndex&)), aEditor, SLOT (expandAttrInd (const QModelIndex&)) );
+
+    aEditor->checkForHistogramRefs();
 
     if (aEditor->exec() != QDialog::Accepted)
     {
@@ -440,6 +445,8 @@ void KKSAttributesFactory :: loadAttribute (int idAttr, QAbstractItemModel * aMo
             );
 
     connect (this, SIGNAL(expandIndex (const QModelIndex&)), aEditor, SLOT (expandAttrInd (const QModelIndex&)) );
+
+    attrEditor->checkForHistogramRefs();
 
     QModelIndex pIndex = aIndex;
     while (pIndex.parent().isValid() && pIndex.data(Qt::UserRole+USER_ENTITY).toInt() > 0)
@@ -1600,7 +1607,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                 if (!isRef)
                 {
                     lTitle = this->createAttrTitle (av, attrClass, objEditor);//, av->attribute()->title(), is_mandatory);
-                    gLayout->addWidget (lTitle, n_str, 0, 2, 2, Qt::AlignRight | Qt::AlignTop);
+                    gLayout->addWidget (lTitle, n_str, 0, 2, 2, Qt::AlignRight | Qt::AlignCenter);
                 }
                 
                 QString v = V.toString ();
@@ -1644,7 +1651,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                 //хн
                 QMap<int, QString> ioList;
                 if(av->attribute()->tableName() == "histogram_params_chains"){
-                    ioList = loader->getIOInfoForChains();
+                    //ioList = loader->getIOInfoForChains();
                 }
                 else if(av->attribute()->tableName() == "histogram_params_streams"){
                     ioList = loader->getIOInfoForStreams();
@@ -1673,7 +1680,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                 connect (objEditor, SIGNAL (updateHistogramGraphic()), haw, SLOT(needToUpdateHistogramGraphic()));
                 connect (haw, SIGNAL (getIdForHistogramParams(const QString &, qint64 *)), this, SLOT(getIdForHistogramParams(const QString &, qint64 *)) );
                 connect (haw, SIGNAL (getHistogramGraphic(KKSHistogram &, const QString &)), this, SLOT(getHistogramGraphic(KKSHistogram &, const QString &)));
-                //connect (
+                connect (haw, SIGNAL (loadHistogramData(int, const QString &, QWidget *)), this, SLOT(loadHistogramData(int, const QString &, QWidget *)));
                
                 attrWidget->setMinimumHeight (20);
                 if (!isRef)
@@ -3254,35 +3261,43 @@ void KKSAttributesFactory :: getHistogramGraphic(KKSHistogram & h, const QString
     QString hStr = loader->getHistogramValue(h, tName);
 }
 
-void KKSAttributesFactory :: loadHistReferences (KKSAttribute * attr, int idatype, KKSAttrEditor * aEditor)
+void KKSAttributesFactory :: loadHistogramData(int id, const QString & tableName, QWidget * parent)
+{
+    m_oef->loadHistogramData(id, tableName, parent);
+}
+
+void KKSAttributesFactory :: loadHistReferences (KKSAttribute * attr, int aType, KKSAttrEditor * aEditor)
 {
     if (!attr || !aEditor)
         return;
 
     if (!attr->type())
     {
-        KKSAttrType * aType = new KKSAttrType(idatype);
-        attr->setType(aType);
+        KKSAttrType * t = new KKSAttrType(aType);
+        attr->setType(t);
     }
-    //qDebug () << __PRETTY_FUNCTION__ << attr->type()->attrType();
+
     QMap<int, QString> io_refs;
 
     KKSObject *io = loader->loadIO (IO_IO_ID, true);
     if(!io)
         return;
 
-    KKSList<const KKSFilterGroup *> filters;
     const KKSCategory * c = io->category();
     const KKSCategory * ct = c->tableCategory();
-    if (idatype == KKSAttrType::atHistogram)
+
+    KKSList<const KKSFilterGroup *> filters;
+
+    if(aType == KKSAttrType::atHistogram)
     {
-        const KKSFilter * f = ct->createFilter (1, "select id from tbl_io_objects where id in (110, 111)", KKSFilter::foInSQL);
+        const KKSFilter * f = ct->createFilter (1, "select id from tbl_io_objects where id in (108, 109)", KKSFilter::foInSQL);
         KKSFilterGroup * fg = new KKSFilterGroup (true);
         fg->addFilter (f);
         f->release ();
         filters.append (fg);
         fg->release ();
     }
+    
     KKSMap<qint64, KKSEIOData *> io_data = loader->loadEIOList (io, filters);
     KKSMap<qint64, KKSEIOData *>::const_iterator p;
 
@@ -3316,8 +3331,4 @@ void KKSAttributesFactory :: loadHistReferences (KKSAttribute * attr, int idatyp
     for (KKSMap<int, KKSCategoryAttr*>::const_iterator pc = ct->attributes().constBegin(); pc != ct->attributes().constEnd(); pc++)
         fields.insert (pc.value()->code(), pc.value()->title ());//name ());
     io->release ();
-
-    //qDebug () << __PRETTY_FUNCTION__ << fields;
-    //aEditor->uploadReferenceFields (fields);
-    
 }
