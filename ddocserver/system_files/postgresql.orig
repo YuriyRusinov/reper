@@ -1,227 +1,63 @@
 
-# PGMAJORVERSION is major version, e.g., 8.0 (this should match PG_VERSION)
-PGMAJORVERSION=`echo "$PGVERSION" | sed 's/^\([0-9]*\.[0-9]*\).*$/\1/'`
+# The path that is to be used for the script
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
-# Source function library.
-INITD=/etc/rc.d/init.d
-. $INITD/functions
+# What to use to start up the postmaster.  (If you want the script to wait
+# until the server has started, you could use "pg_ctl start -w" here.
+# But without -w, pg_ctl adds no value.)
+DAEMON="$prefix/bin/postmaster"
 
-# Get function listing for cross-distribution logic.
-TYPESET=`typeset -f|grep "declare"`
+# What to use to shut down the postmaster
+PGCTL="$prefix/bin/pg_ctl"
 
-# Get config.
-. /etc/sysconfig/network
+set -e
 
-# Find the name of the script
-NAME=`basename $0`
-if [ ${NAME:0:1} = "S" -o ${NAME:0:1} = "K" ]
-then
-	NAME=${NAME:3}
-fi
-
-# For SELinux we need to use 'runuser' not 'su'
-if [ -x /sbin/runuser ]
-then
-    SU=runuser
-else
-    SU=su
-fi
-
-
-# Set defaults for configuration variables
-PGENGINE=$PG_PREFIX/bin
-PGDATA=$PG_PREFIX/data
-PGSHELL=/bin/bash
-
-if [ -f "$PGDATA/PG_VERSION" ] && [ -d "$PGDATA/base/template1" ]
-then
-	echo "Using old-style directory structure"
-else
-	PGDATA=$PG_PREFIX/data
-fi
-
-PGLOG=$PG_PREFIX/pgstartup.log
-
-# Override defaults from /etc/sysconfig/pgsql if file is present
-[ -f /etc/sysconfig/pgsql/${NAME} ] && . /etc/sysconfig/pgsql/${NAME}
-
-export PGDATA
-export PGPORT
-
-# Check that networking is up.
-# Pretty much need it for postmaster.
-[ "${NETWORKING}" = "no" ] && exit 0
-
-[ -f "$PGENGINE/postmaster" ] || exit 1
-
-script_result=0
-
-start(){
-	PSQL_START=$"Запуск Линтер-ВС 8.0 "
-	export LD_LIBRARY_PATH="/usr/share/MediaInfo/lib:"$LD_LIBRARY_PATH
-	# Make sure startup-time log file is valid
-	if [ ! -e "$PGLOG" -a ! -h "$PGLOG" ]
-	then
-		touch "$PGLOG" || exit 1
-		chown postgres:postgres "$PGLOG"
-		chmod go-rwx "$PGLOG"
-		[ -x /usr/bin/chcon ] && /usr/bin/chcon -u system_u -r object_r -t postgresql_log_t "$PGLOG" 2>/dev/null
-	fi
-
-	# Check for the PGDATA structure
-	if [ -f "$PGDATA/PG_VERSION" ] && [ -d "$PGDATA/base" ]
-	then
-	# Check version of existing PGDATA
-
-		if [ x`cat "$PGDATA/PG_VERSION"` != x"$PGMAJORVERSION" ]
-		then
-			SYSDOCDIR="(Your System's documentation directory)"
-			if [ -d "/usr/doc/postgresql-$PGVERSION" ]
-			then
-				SYSDOCDIR=/usr/doc
-			fi
-			if [ -d "/usr/share/doc/postgresql-$PGVERSION" ]
-			then
-				SYSDOCDIR=/usr/share/doc
-			fi
-			if [ -d "/usr/doc/packages/postgresql-$PGVERSION" ]
-			then
-				SYSDOCDIR=/usr/doc/packages
-			fi
-			if [ -d "/usr/share/doc/packages/postgresql-$PGVERSION" ]
-			then
-				SYSDOCDIR=/usr/share/doc/packages
-			fi
-			echo
-			echo $"Обнаружена база данных старого формата. Необходимо обновить формат для использования"
-			echo $"Необходимо обновить формат для использования Линтер-ВС"
-			echo $"Обратитесь к $SYSDOCDIR/postgresql-$PGVERSION/README.rpm-dist для подробной информации"
-			exit 1
-		fi
-
-	# No existing PGDATA! Warn the user to initdb it.
-
-	else
-		echo
-		echo "$PGDATA Отсутствует. Используйте команду \"service postgresql initdb\" для первичной инициализации базы данных."
-		echo_failure
-		echo
-		exit 1
- 	fi
-
-	echo -n "$PSQL_START"
-	$SU -p postgres -s $PGSHELL -c "$PGENGINE/postmaster -p '$PGPORT' -D '$PGDATA' ${PGOPTS} &" >> "$PGLOG" 2>&1 < /dev/null
-	sleep 2
-	pid=`pidof -s "$PGENGINE/postmaster"`
-	if [ $pid ] && [ -f "$PGDATA/postmaster.pid" ]
-	then
-		success "$PSQL_START"
-		touch /var/lock/subsys/${NAME}
-		head -n 1 "$PGDATA/postmaster.pid" > "/var/run/postmaster.${PGPORT}.pid"
-		echo
-	else
-		failure "$PSQL_START"
-		echo
-		script_result=1
+# Only start if we can find the postmaster.
+test -x $DAEMON ||
+{
+	echo "$DAEMON not found"
+	if [ "$1" = "stop" ]
+	then exit 0
+	else exit 5
 	fi
 }
 
-stop(){
-	echo -n $"Остановка Линтер-ВС 8.0 "
-	$SU -p postgres -s $PGSHELL -c "$PGENGINE/pg_ctl stop -D '$PGDATA' -s -m fast" > /dev/null 2>&1 < /dev/null
-	ret=$? 
-	if [ $ret -eq 0 ]
-	then
-		echo_success
-	else
-		echo_failure
-		script_result=1
-	fi
-	echo
-	rm -f "/var/run/postmaster.${PGPORT}.pid"
-	rm -f "/var/lock/subsys/${NAME}"
-}
 
-restart(){
-    stop
-    start
-}
-
-initdb(){
-	export LD_LIBRARY_PATH="/usr/share/MediaInfo/lib:"$LD_LIBRARY_PATH
-		if [ -f "$PGDATA/PG_VERSION" ]
-		then
-			echo "Каталог $PGDATA, содержащий базу данных, не пуст."
-			echo "Для инициализации новой базы данных c потерей всех данных удалите содержимое $PGDATA "
-			echo_failure
-		else
-			echo -n $"Инициализация базы данных: "
-			if [ ! -e "$PGDATA" -a ! -h "$PGDATA" ]
-			then
-				mkdir -p "$PGDATA" || exit 1
-				chown postgres:postgres "$PGDATA"
-				chmod go-rwx "$PGDATA"
-			fi
-			# Clean up SELinux tagging for PGDATA
-			[ -x /sbin/restorecon ] && /sbin/restorecon "$PGDATA"
-			# Initialize the database
-			$SU -p postgres -s $PGSHELL -c "$PGENGINE/initdb --pgdata='$PGDATA' --auth='pam'" >> "$PGLOG" 2>&1 < /dev/null
-			# Create directory for postmaster log
-			mkdir "$PGDATA/pg_log"
-			chown postgres:postgres "$PGDATA/pg_log"
-			chmod go-rwx "$PGDATA/pg_log"
-
-			[ -f "$PGDATA/PG_VERSION" ] && echo_success
-			[ ! -f "$PGDATA/PG_VERSION" ] && echo_failure
-			echo
-		fi
-}
-condrestart(){
-    [ -e /var/lock/subsys/${NAME} ] && restart
-}
-
-condstop(){
-    [ -e /var/lock/subsys/${NAME} ] && stop
-}
-
-reload(){
-    export LD_LIBRARY_PATH="/usr/share/MediaInfo/lib:"$LD_LIBRARY_PATH
-    $SU -p postgres -s $PGSHELL -c "$PGENGINE/pg_ctl reload -D '$PGDATA' -s" > /dev/null 2>&1 < /dev/null
-}
-
-# This script is slightly unusual in that the name of the daemon (postmaster)
-# is not the same as the name of the subsystem (postgresql)
-
-# See how we were called.
-case "$1" in
+# Parse command line parameters.
+case $1 in
   start)
-	start
+	echo -n "Starting PostgreSQL: "
+	test x"$OOM_SCORE_ADJ" != x && echo "$OOM_SCORE_ADJ" > /proc/self/oom_score_adj
+	test x"$OOM_ADJ" != x && echo "$OOM_ADJ" > /proc/self/oom_adj
+	su - $PGUSER -c "$DAEMON -D '$PGDATA' -p $PGPORT &" >>$PGLOG 2>&1
+	echo "ok"
 	;;
   stop)
-	stop
-	;;
-  status)
-	status postmaster
-	script_result=$?
+	echo -n "Stopping PostgreSQL: "
+	su - $PGUSER -c "$PGCTL stop -D '$PGDATA' -s -m fast"
+	echo "ok"
 	;;
   restart)
-	restart
+	echo -n "Restarting PostgreSQL: "
+	su - $PGUSER -c "$PGCTL stop -D '$PGDATA' -s -m fast -w"
+	test x"$OOM_SCORE_ADJ" != x && echo "$OOM_SCORE_ADJ" > /proc/self/oom_score_adj
+	test x"$OOM_ADJ" != x && echo "$OOM_ADJ" > /proc/self/oom_adj
+	su - $PGUSER -c "$DAEMON -D '$PGDATA' -p $PGPORT &" >>$PGLOG 2>&1
+	echo "ok"
 	;;
-  initdb)
-	initdb
-	;;
-  condrestart)
-	condrestart
-	;;
-  condstop)
-	condstop
-	;;
-  reload|force-reload)
-	reload
+  reload)
+        echo -n "Reload PostgreSQL: "
+        su - $PGUSER -c "$PGCTL reload -D '$PGDATA' -s"
+        echo "ok"
+        ;;
+  status)
+	su - $PGUSER -c "$PGCTL status -D '$PGDATA'"
 	;;
   *)
-	echo $"Используйте: $0 {start|stop|status|restart|condrestart|condstop|reload|force-reload|initdb}"
+	# Print help
+	echo "Usage: $0 {start|stop|restart|reload|status}" 1>&2
 	exit 1
+	;;
 esac
 
-exit $script_result
+exit 0

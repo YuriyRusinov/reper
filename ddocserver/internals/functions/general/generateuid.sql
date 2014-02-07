@@ -52,7 +52,7 @@ declare
 begin
 
     if(new.last_update isnull) then
-        new.last_update = current_timestamp;
+        new.last_update = clock_timestamp;
     end if;
 
     if(TG_OP = 'UPDATE') then

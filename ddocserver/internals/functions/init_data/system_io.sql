@@ -3040,6 +3040,8 @@ insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only
 insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(539, 4, 13, false, 1, NULL); --name
 insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(541, 4, 13, false, 2, NULL); --id_dl_receiver
 insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(542, 4, 13, false, 3, NULL); --id_io_object
+insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(676, 4, 13, false, 4, '1'); --id_processing_scenario
+insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(677, 4, 13, false, 5, '1'); --id_processing_variant
 
 insert into a_groups (id_io_template, id_parent, name, "order") values(4, NULL, 'Параметры закона распределения', 1); --14
 insert into io_views (id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) values(540, 4, 14, false, 0, NULL); --id_partition_low

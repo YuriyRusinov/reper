@@ -9,6 +9,7 @@ begin
 
 
     if((new.h_min is null or new.h_max is null or new.h_min > new.h_max) or new.h_count <= 0)  then
+        drop table t_hist_filtered_data;
         raise exception 'Incorrect Params for histogram!';
         return NULL;
     end if;

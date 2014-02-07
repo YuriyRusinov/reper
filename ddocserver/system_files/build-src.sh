@@ -89,7 +89,8 @@ export LD_LIBRARY_PATH=$UUID_PREFIX/lib:$PREFIX/lib:$GSL_PREFIX
 
 gunzip < uuid-$UUID_VER.tar.gz | tar xf - &&
 cd $UUID_SRC_DIR && 
-./configure --prefix=$UUID_PREFIX --with-pgsql=no --with-cxx && 
+#./configure --prefix=$UUID_PREFIX --with-pgsql=no --with-cxx && 
+./configure --prefix=$UUID_PREFIX --with-pgsql=no && 
 make && 
 make install && 
 
@@ -132,7 +133,8 @@ make install &&
 cd $PREV &&
 gunzip < gdal-$GDAL_VER.tar.gz | tar xf - &&
 cd $GDAL_SRC_DIR &&
-./configure LDFLAGS="-L$PREFIX/lib" CPPFLAGS="-I$PREFIX/include" --prefix=$GDAL_PREFIX --with-geos=$GEOS_PREFIX/bin/geos-config &&
+./configure --prefix=$GDAL_PREFIX --with-geos=$GEOS_PREFIX/bin/geos-config --with-pg=$PG_PREFIX/bin/pg_config &&
+#./configure LDFLAGS="-L$PREFIX/lib" CPPFLAGS="-I$PREFIX/include" --prefix=$GDAL_PREFIX --with-geos=$GEOS_PREFIX/bin/geos-config &&
 make &&
 make install &&
 
@@ -149,6 +151,7 @@ sudo cp -f $SYS_FILES_ABS/pg_hba.conf $PGDATA &&
 sudo cp -f $SYS_FILES_ABS/postgresql.conf $PGDATA &&
 
 printf "#!/bin/sh\n" > ./ddocserver-$VERSION &&
+
 printf "# ddocserver-$VERSION This is the init script for starting up the PostgreSQL\n" >> ./ddocserver-$VERSION &&
 printf "#               server\n" >> ./ddocserver-$VERSION &&
 printf "#\n" >> ./ddocserver-$VERSION &&
@@ -158,7 +161,8 @@ printf "#              all database requests.\n" >> ./ddocserver-$VERSION &&
 printf "# processname: postmaster\n" >> ./ddocserver-$VERSION &&
 printf "# pidfile: /var/run/postmaster.pid\n" >> ./ddocserver-$VERSION &&
 
-printf "\nPGVERSION=$PGSQL_VER\nPG_PREFIX=$PG_PREFIX\nPGPORT=$PORT\n\n" >> ./ddocserver-$VERSION &&
+printf "\nPGVERSION=$PGSQL_VER\nprefix=$PG_PREFIX\nPGPORT=$PORT\nPGDATA=$PGDATA\nPGUSER=postgres\nPGLOG=$PGDATA/serverlog\n\n" >> ./ddocserver-$VERSION &&
+
 cat $SYS_FILES_ABS/postgresql.orig >> $SYS_FILES_ABS/ddocserver-$VERSION &&
 chmod a+x $SYS_FILES_ABS/ddocserver-$VERSION &&
 sudo cp $SYS_FILES_ABS/ddocserver-$VERSION /etc/init.d/ 

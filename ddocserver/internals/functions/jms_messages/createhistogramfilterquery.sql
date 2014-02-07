@@ -1,3 +1,4 @@
+drop function if exists createHistogramFilterQuery(int4);
 create or replace function createHistogramFilterQuery(int4[], int4[], int4[], int4[], int4[]) returns varchar as
 $BODY$
 declare
