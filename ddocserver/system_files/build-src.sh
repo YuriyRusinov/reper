@@ -38,7 +38,6 @@ if [ ! -f ./proj-$PROJ_VER.tar.gz ]; then
     printf "Can't find ./proj-$PROJ_VER.tar.gz in $SRC_DIR\n";
     exit 1
 fi
-
 if [ ! -f ./geos-$GEOS_VER.tar.bz2 ]; then 
     printf "Can't find ./geos-$GEOS_VER.tar.gz in $SRC_DIR\n";
     exit 1
@@ -159,7 +158,7 @@ printf "# chkconfig: - 64 36\n" >> ./ddocserver-$VERSION &&
 printf "# description: Starts and stops the PostgreSQL backend daemon that handles \\\n" >> ./ddocserver-$VERSION &&
 printf "#              all database requests.\n" >> ./ddocserver-$VERSION &&
 printf "# processname: postmaster\n" >> ./ddocserver-$VERSION &&
-printf "# pidfile: /var/run/postmaster.pid\n" >> ./ddocserver-$VERSION &&
+printf "# pidfile: /var/run/postmaster.pid\n" >> ./ddocserver-$ERSION &&
 
 printf "\nPGVERSION=$PGSQL_VER\nprefix=$PG_PREFIX\nPGPORT=$PORT\nPGDATA=$PGDATA\nPGUSER=postgres\nPGLOG=$PGDATA/serverlog\n\n" >> ./ddocserver-$VERSION &&
 
