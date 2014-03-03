@@ -8,3 +8,4 @@
 --\i ./functions/rubricator/triggers/trgrubric_acc.sql
 
 
+\i ./functions/rubricator/triggers/trgsysrubric.sql

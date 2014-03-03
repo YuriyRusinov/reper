@@ -425,6 +425,12 @@ void KKSIncludesWidget::delRubric (void)
             return;
         }
         else{//rubric selected
+            int idRubr = index.data (Qt::UserRole).toInt();
+            if (idRubr == REC_ROOT_RUBR_ID)
+            {
+                QMessageBox::warning (this, tr("Delete rubric"), tr ("Cannot remove system rubricator"), QMessageBox::Ok);
+                return;
+            }
             int res = QMessageBox::question (this, tr ("Delete rubric"), tr ("Do you really want to delete ?"), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
             if (res != QMessageBox::Yes)
                 return;
@@ -602,6 +608,12 @@ void KKSIncludesWidget :: editRubric (void)
             return;
         }
         else{//rubric selected
+            int idRubr = index.data (Qt::UserRole).toInt();
+            if (idRubr == REC_ROOT_RUBR_ID)
+            {
+                QMessageBox::warning (this, tr("Edit rubric"), tr ("System rubricator cannot been edited"), QMessageBox::Ok);
+                return;
+            }
             ;
         }
     }
