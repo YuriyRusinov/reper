@@ -123,6 +123,12 @@ KKSIncludesWidget * KKSRubricFactory :: createRubricEditor (int mode, const KKSL
         return 0;
     }
     KKSList<const KKSFilterGroup *> rfilters;
+    const KKSFilter * f = cr->createFilter(1, QString("select id from getRubricatorsOnly(%1, false)").arg (loader->getUserId()), KKSFilter::foInSQL);
+    KKSFilterGroup * fg = new KKSFilterGroup (true);
+    fg->addFilter (f);
+    f->release ();
+    rfilters.append (fg);
+    fg->release ();
     KKSMap<qint64, KKSEIOData *> rubrInfo = loader->loadEIOList(rubrIO, rfilters);
     QAbstractItemModel * rModel = new KKSRubricModel(rubrInfo);
     rubrIO->release();

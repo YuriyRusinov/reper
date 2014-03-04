@@ -11,5 +11,6 @@
 \i ./functions/rubricator/ioremovefromrubric.sql
 \i ./functions/rubricator/setrubriccategory.sql
 \i ./functions/rubricator/setrubricsearchtemplate.sql
+\i ./functions/rubricator/getrubricsonly.sql
 
 \i ./functions/rubricator/triggers/readd_triggers.sql
