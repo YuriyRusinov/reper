@@ -4911,7 +4911,6 @@ void KKSObjEditorFactory :: importEIO (KKSObjEditor * editor, int idObject, cons
         // категория справочника, полученная из xml-файла
         //
         if (!c1 || !c1->tableCategory() ||
-            xmlForm->getCSVFile().isEmpty() || 
             xmlForm->getXMLFile().isEmpty() || 
             xmlForm->getCharset().isEmpty() || 
             xmlForm->getFieldDelimiter().isEmpty()
@@ -5476,14 +5475,14 @@ void KKSObjEditorFactory :: exportEIO (KKSObjEditor * editor, int idObject, cons
 
     if (xmlForm->exec () == QDialog::Accepted)
     {
-        QString csvFileName = xmlForm->getCSVFile ();
+        //QString csvFileName = xmlForm->getCSVFile ();
         QString xmlFileName = xmlForm->getXMLFile ();
         QString charSet = xmlForm->getCharset ();
         QString fDelim = xmlForm->getFieldDelimiter ();
         QString tDelim = xmlForm->getTextDelimiter ();
         QFile *fXml = new QFile (xmlFileName);
         fXml->open (QIODevice::WriteOnly);
-        int res = this->exportHeader (fXml, cMain, charSet, fDelim, tDelim, editor);//Сюда передаем главную категорию
+        int res = this->exportHeader (fXml, cMain, objEx, charSet, fDelim, tDelim, editor);//Сюда передаем главную категорию
         fXml->close ();
         delete fXml;
         if (res == ERROR_CODE)
@@ -5498,9 +5497,9 @@ void KKSObjEditorFactory :: exportEIO (KKSObjEditor * editor, int idObject, cons
 
             return;
         }
-        QFile fCSV (csvFileName);
+        //QFile fCSV (xmlFileName);
         //res = this->exportCopies (&fCSV, cChild, oeList, charSet, fDelim, tDelim, editor, tableName);
-        res = this->exportCopies (&fCSV, cChild, objEx, charSet, fDelim, tDelim, editor);//сюда передаем табличную (подчиненную) категорию
+        /*res = this->exportCopies (fXml, cChild, objEx, charSet, fDelim, tDelim, editor);//сюда передаем табличную (подчиненную) категорию
         if (res == ERROR_CODE)
         {
             if (io)
@@ -5511,7 +5510,7 @@ void KKSObjEditorFactory :: exportEIO (KKSObjEditor * editor, int idObject, cons
             delete xmlForm;
 
             return;
-        }
+        }*/
     }
 
     xmlForm->setParent (0);
@@ -5541,6 +5540,7 @@ void KKSObjEditorFactory :: getModelIds (QAbstractItemModel * mod, const QModelI
  */
 int KKSObjEditorFactory :: exportHeader (QIODevice *xmlDev, // XML-файл, содержащий всю информацию
                                           const KKSCategory *c, // категория справочника, содержащего таблицу (io->category())
+                                          const KKSList<KKSEIOData *>& objEx,
                                           QString codeName, // кодировка выходных данных
                                           QString fDelim, // разделитель полей
                                           QString tDelim, // разделитель текста
@@ -5600,7 +5600,9 @@ int KKSObjEditorFactory :: exportHeader (QIODevice *xmlDev, // XML-файл, содержа
     xmlWriter->writeDTD (dtd);
     QString namespaceUri;
 
-    xmlWriter->writeStartElement (namespaceUri, QString("Categories"));
+    xmlWriter->writeStartElement (namespaceUri, QString("document"));
+    xmlWriter->writeCharacters (QString("\n"));
+    xmlWriter->writeStartElement (namespaceUri, QString("header"));
     xmlWriter->writeCharacters (QString("\n"));
     int ierc = exportCategory (xmlWriter, c);
     const KKSCategory * ct = c->tableCategory();
@@ -5611,9 +5613,22 @@ int KKSObjEditorFactory :: exportHeader (QIODevice *xmlDev, // XML-файл, содержа
         return ERROR_CODE;
 
     xmlWriter->writeEndElement ();
+    xmlWriter->writeCharacters (QString("\n"));
     //
-    // Categories
+    // Header
     //
+    xmlWriter->writeStartElement (namespaceUri, QString("body"));
+    xmlWriter->writeCharacters (QString("\n"));
+    int res = this->exportCopies (xmlWriter, ct, objEx, codeName, fDelim, tDelim, oEditor);//сюда передаем табличную (подчиненную) категорию
+    xmlWriter->writeEndElement ();
+    xmlWriter->writeCharacters (QString("\n"));
+    if (res < 0)
+        return ERROR_CODE;
+    
+    //
+    // Document
+    //
+    xmlWriter->writeEndElement ();
     xmlWriter->writeEndDocument ();
     xmlWriter->setDevice (0);
     if (!isXmlOpen)
@@ -5793,14 +5808,14 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // целевой CSV файл
         return ERROR_CODE;
     }
 
-    if (!csvDev->isOpen() && !csvDev->open (QIODevice::WriteOnly))
+    if (!csvDev->isOpen() && !csvDev->open (QIODevice::Append))
     {
         qCritical() << tr("Cannot open output file");
         QMessageBox::critical (oEditor, tr ("File open error"), tr("Cannot open output file"), QMessageBox::Ok);
         return ERROR_CODE;
     }
 
-    QTextStream csvFile (csvDev);
+    QXmlStreamWriter csvFile (csvDev);
     QTextCodec *csvCodec = QTextCodec::codecForName (codeName.toAscii());
     if (!csvCodec)
     {
@@ -5996,7 +6011,8 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // целевой CSV файл
             if (j < c->attributes().count())
                 oeStream << fDelim;
         }
-        csvFile << fstr << '\n';
+        csvFile.writeCharacters(fstr);
+        //csvFile << fstr << '\n';
     }
 
     csvDev->close ();
@@ -6004,7 +6020,7 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // целевой CSV файл
 }
 
 /* Вывод ЭИО в файл. Параметры
- * csvDev -- устройство вывода
+ * xmlWriter -- устройство вывода
  * c -- табличная категория
  * oeData -- список данных ЭИО
  * codeName -- кодировка
@@ -6012,7 +6028,7 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // целевой CSV файл
  * tDelim -- разделитель текста
  * oEditor -- родительский редактор
  */
-int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // целевой CSV файл
+int KKSObjEditorFactory :: exportCopies (QXmlStreamWriter * xmlWriter, // целевой CSV файл
                                          const KKSCategory *c, //подчиненная категория
                                          const KKSList<KKSEIOData *>& oeData,
                                          QString codeName, // кодировка выходных данных
@@ -6021,7 +6037,7 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // целевой CSV файл
                                          KKSObjEditor *oEditor // родительский редактор ИО и ЭИО
                                         )
 {
-    if (!csvDev)
+    if (!xmlWriter)
     {
         qCritical() << tr ("Invalid device");
         QMessageBox::critical(oEditor, tr("CSV file"), tr ("Invalid device"), QMessageBox::Ok);
@@ -6035,14 +6051,6 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // целевой CSV файл
         return ERROR_CODE;
     }
 
-    if (!csvDev->isOpen() && !csvDev->open (QIODevice::WriteOnly))
-    {
-        qCritical() << tr("Cannot open output file");
-        QMessageBox::critical (oEditor, tr ("File open error"), tr("Cannot open output file"), QMessageBox::Ok);
-        return ERROR_CODE;
-    }
-
-    QTextStream csvFile (csvDev);
     QTextCodec *csvCodec = QTextCodec::codecForName (codeName.toAscii());
     if (!csvCodec)
     {
@@ -6050,7 +6058,7 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // целевой CSV файл
         QMessageBox::critical (oEditor, tr ("CSV export"), tr ("Invalid encoding %1").arg (codeName), QMessageBox::Ok);
         return ERROR_CODE;
     }
-    csvFile.setCodec (csvCodec);
+    xmlWriter->setCodec (csvCodec);
 
     KKSTemplate *t = new KKSTemplate (c->defTemplate());
     if (!t)
@@ -6102,10 +6110,11 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // целевой CSV файл
             if (ii < attrs_list.count()-1)
                 oeStream << fDelim;
         }
-        csvFile << fstr << "\n";
+        xmlWriter->writeCharacters(fstr+"\n");
+        //csvFile << fstr << "\n";
     }
 
-    csvDev->close ();
+    //csvDev->close ();
     return OK_CODE;
 }
 

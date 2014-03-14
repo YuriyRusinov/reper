@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>XML_form</class>
- <widget class="QDialog" name="XML_form" >
-  <property name="geometry" >
+ <widget class="QDialog" name="XML_form">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,187 +10,131 @@
     <height>457</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Import/Export form</string>
   </property>
-  <layout class="QGridLayout" >
-   <item row="0" column="0" >
-    <widget class="QLabel" name="lFile" >
-     <property name="sizePolicy" >
-      <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+  <layout class="QGridLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="lFile">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>File :</string>
      </property>
-     <property name="alignment" >
+     <property name="alignment">
       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
      </property>
     </widget>
    </item>
-   <item row="0" column="1" colspan="4" >
-    <widget class="QLineEdit" name="lEFileName" >
-     <property name="readOnly" >
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="5" >
-    <widget class="QToolButton" name="tbFile" >
-     <property name="text" >
-      <string>...</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0" >
-    <widget class="QLabel" name="lHFile" >
-     <property name="sizePolicy" >
-      <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text" >
-      <string>Header file :</string>
-     </property>
-     <property name="alignment" >
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1" colspan="4" >
-    <widget class="QLineEdit" name="lEHFileName" >
-     <property name="readOnly" >
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="5" >
-    <widget class="QToolButton" name="tbHFile" >
-     <property name="text" >
-      <string>...</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0" colspan="6" >
-    <widget class="QGroupBox" name="gbPreview" >
-     <property name="title" >
-      <string>Preview</string>
-     </property>
-     <layout class="QGridLayout" >
-      <item row="0" column="0" >
-       <widget class="QTreeView" name="tVPreview" />
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="3" column="0" colspan="6" >
-    <widget class="QGroupBox" name="gbPars" >
-     <property name="title" >
+   <item row="2" column="0" colspan="6">
+    <widget class="QGroupBox" name="gbPars">
+     <property name="title">
       <string>Parameters</string>
      </property>
-     <layout class="QGridLayout" >
-      <item row="0" column="0" >
-       <widget class="QLabel" name="lFieldDelimiter" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+     <layout class="QGridLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="lFieldDelimiter">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="text" >
+        <property name="text">
          <string>Field delimiter :</string>
         </property>
-        <property name="alignment" >
+        <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" >
-       <widget class="QLineEdit" name="lEFieldDelimiter" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="lEFieldDelimiter">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="readOnly" >
+        <property name="readOnly">
          <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="0" column="2" >
-       <widget class="QLabel" name="lCharset" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+      <item row="0" column="2">
+       <widget class="QLabel" name="lCharset">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="text" >
+        <property name="text">
          <string>Data charset :</string>
         </property>
-        <property name="alignment" >
+        <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="lTextDelimiter" >
-        <property name="text" >
+      <item row="1" column="0">
+       <widget class="QLabel" name="lTextDelimiter">
+        <property name="text">
          <string>Text delimiter :</string>
         </property>
-        <property name="alignment" >
+        <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
-      <item row="1" column="1" >
-       <widget class="QLineEdit" name="lETextDelimiter" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="lETextDelimiter">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="readOnly" >
+        <property name="readOnly">
          <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="1" column="2" >
-       <widget class="QLabel" name="lErrorString" >
-        <property name="text" >
+      <item row="1" column="2">
+       <widget class="QLabel" name="lErrorString">
+        <property name="text">
          <string>Error string :</string>
         </property>
-        <property name="alignment" >
+        <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
-      <item row="1" column="3" >
-       <widget class="QLineEdit" name="lEErrorString" >
-        <property name="readOnly" >
+      <item row="1" column="3">
+       <widget class="QLineEdit" name="lEErrorString">
+        <property name="readOnly">
          <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="0" column="3" >
-       <widget class="QComboBox" name="cbCharset" >
+      <item row="0" column="3">
+       <widget class="QComboBox" name="cbCharset">
         <item>
-         <property name="text" >
+         <property name="text">
           <string>UTF-8</string>
          </property>
         </item>
         <item>
-         <property name="text" >
+         <property name="text">
           <string>CP1251</string>
          </property>
         </item>
         <item>
-         <property name="text" >
+         <property name="text">
           <string>KOI8-R</string>
          </property>
         </item>
@@ -198,39 +143,65 @@
      </layout>
     </widget>
    </item>
-   <item row="4" column="0" colspan="2" >
-    <widget class="QPushButton" name="pbPars" >
-     <property name="text" >
-      <string>&amp;Parameters >>></string>
+   <item row="3" column="0" colspan="2">
+    <widget class="QPushButton" name="pbPars">
+     <property name="text">
+      <string>&amp;Parameters &gt;&gt;&gt;</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="2" >
+   <item row="3" column="3">
+    <widget class="QPushButton" name="pbOK">
+     <property name="text">
+      <string>&amp;OK</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="4" colspan="2">
+    <widget class="QPushButton" name="pbCancel">
+     <property name="text">
+      <string>&amp;Cancel</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1" colspan="4">
+    <widget class="QLineEdit" name="lEFileName">
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="5">
+    <widget class="QToolButton" name="tbFile">
+     <property name="text">
+      <string>...</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="6">
+    <widget class="QGroupBox" name="gbPreview">
+     <property name="title">
+      <string>Preview</string>
+     </property>
+     <layout class="QGridLayout">
+      <item row="0" column="0">
+       <widget class="QTreeView" name="tVPreview"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="3" column="2">
     <spacer>
-     <property name="orientation" >
+     <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>171</width>
        <height>26</height>
       </size>
      </property>
     </spacer>
-   </item>
-   <item row="4" column="3" >
-    <widget class="QPushButton" name="pbOK" >
-     <property name="text" >
-      <string>&amp;OK</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="4" colspan="2" >
-    <widget class="QPushButton" name="pbCancel" >
-     <property name="text" >
-      <string>&amp;Cancel</string>
-     </property>
-    </widget>
    </item>
   </layout>
  </widget>

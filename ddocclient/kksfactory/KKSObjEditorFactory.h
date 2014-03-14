@@ -106,12 +106,15 @@ public:
 
     int exportHeader (QIODevice *xmlDev, // XML-файл, содержащий всю информацию
                       const KKSCategory *c, // категория, описывающая таблицу (io->category()->tableCategory())
+                      const KKSList<KKSEIOData *>& objEx,
                       QString codeName, // кодировка выходных данных
                       QString fDelim, // разделитель полей
                       QString tDelim, // разделитель текста
+                    
                       KKSObjEditor *oEditor // родительский редактор ИО и ЭИО
+     
                       );
-
+private:
     int exportCopies (QIODevice *csvDev, // целевой CSV файл
                       const KKSCategory *c,
                       const KKSList<KKSObjectExemplar *>& oeData,
@@ -122,7 +125,7 @@ public:
                       QString tableName // таблица экспорта
                       );
 
-    int exportCopies (QIODevice *csvDev, // целевой CSV файл
+    int exportCopies (QXmlStreamWriter *xmlWriter, // целевой CSV файл
                       const KKSCategory *c,
                       const KKSList<KKSEIOData *>& oeData,
                       QString codeName, // кодировка выходных данных
@@ -130,7 +133,7 @@ public:
                       QString tDelim, // разделитель текста
                       KKSObjEditor *oEditor // родительский редактор ИО и ЭИО
                       );
-    
+public:    
     KKSObjEditor* createObjEditorParam (int idObject,// идентификатор ИО, который будет содержать создаваемый (редактируемый) ЭИО (для ЭИО, которые являются ИО этот идентификатор должен быть равен IO_IO_ID)
                                         qint64 idObjE, // идентификатор создаваемого (редактируемого) ЭИО. Если ЭИО создается, должно быть равно -1
                                         const KKSList<const KKSFilterGroup *> & filters,// Применяется для ЭИО, которые являются контейнерными ИО. Содержит набор фильтров их таблицы

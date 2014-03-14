@@ -53,7 +53,6 @@ public:
 
     void setImport (bool value);
 
-    QString getCSVFile (void) const;
     QString getXMLFile (void) const;
     QString getCharset (void) const;
     QString getFieldDelimiter (void) const;
@@ -79,7 +78,7 @@ signals:
 
 private slots:
     void uploadFile (void);
-    void uploadHFile (void);
+    //void uploadHFile (void);
     void viewParameters (void);
     void setCharset (const QString& text);
     void setFieldDelim (const QString& text);
@@ -102,7 +101,6 @@ private:
     // Variables
     //
     Ui::XML_form *ui;
-    QString csvFileName;
     QString xmlFileName;
     QString charSet;
     QString fieldDelim;

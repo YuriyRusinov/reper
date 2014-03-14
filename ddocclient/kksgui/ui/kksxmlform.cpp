@@ -39,7 +39,6 @@
 
 KKSXMLForm :: KKSXMLForm (KKSObject *obj, QString formTitle, bool for_export, QWidget *parent)
     : QDialog (parent),
-    csvFileName (QString()),
     xmlFileName (QString()),
     c (0),
     io (obj),
@@ -72,7 +71,7 @@ KKSXMLForm :: KKSXMLForm (KKSObject *obj, QString formTitle, bool for_export, QW
     }
 
     connect (ui->tbFile, SIGNAL (clicked()), this, SLOT (uploadFile()) );
-    connect (ui->tbHFile, SIGNAL (clicked()), this, SLOT (uploadHFile()) );
+    //connect (ui->tbHFile, SIGNAL (clicked()), this, SLOT (uploadHFile()) );
     connect (ui->pbPars, SIGNAL (clicked()), this, SLOT (viewParameters()) );
 
     connect (ui->cbCharset, SIGNAL (currentIndexChanged (const QString &)), this, SLOT (setCharset (const QString&)) );
@@ -101,44 +100,48 @@ void KKSXMLForm :: setImport (bool value)
 void KKSXMLForm :: uploadFile (void)
 {
     QString fName;
-    QFileDialog *csvDialog = new QFileDialog (this, isExport ? tr ("Save file") : tr ("Open file"), QDir::currentPath());
+    QFileDialog *xmlDialog = new QFileDialog (this, isExport ? tr ("Save file") : tr ("Open file"), QDir::currentPath());
     QStringList filters;
-    filters << tr ("CSV files (*.csv)")
+    filters << tr ("XML files (*.xml)")
             << tr ("All files (*.*)");
 
-    csvDialog->setFilters (filters);
-    csvDialog->setModal (true);
-    csvDialog->setDefaultSuffix ("csv");
+    xmlDialog->setFilters (filters);
+    xmlDialog->setModal (true);
+    xmlDialog->setDefaultSuffix ("csv");
     if (isExport)
     {
-        csvDialog->setFileMode (QFileDialog::AnyFile);
-        csvDialog->setAcceptMode (QFileDialog::AcceptSave);
+        xmlDialog->setFileMode (QFileDialog::AnyFile);
+        xmlDialog->setAcceptMode (QFileDialog::AcceptSave);
     }
     else
     {
-        csvDialog->setFileMode (QFileDialog::ExistingFile);
-        csvDialog->setAcceptMode (QFileDialog::AcceptOpen);
+        xmlDialog->setFileMode (QFileDialog::ExistingFile);
+        xmlDialog->setAcceptMode (QFileDialog::AcceptOpen);
     }
 
-    if (csvDialog->exec () == QDialog::Accepted)
+    if (xmlDialog->exec () == QDialog::Accepted)
     {
-        QStringList files = csvDialog->selectedFiles ();
+        QStringList files = xmlDialog->selectedFiles ();
         if (!files.isEmpty())
             fName = files[0];
     }
 
-    csvDialog->setParent (0);
-    delete csvDialog;
+    xmlDialog->setParent (0);
+    delete xmlDialog;
     if (fName.isEmpty())
         return;
 
-    csvFileName = fName;
-    ui->lEFileName->setText (csvFileName);
+    xmlFileName = fName;
+    ui->lEFileName->setText (xmlFileName);
 
-    if (!xmlFileName.isEmpty())
-        readDataFile ();
+    if (!isExport)
+    {
+        this->xmlParse ();
+    }
+    readDataFile ();
+
 }
-
+/*
 void KKSXMLForm :: uploadHFile (void)
 {
     QString fXmlName;
@@ -180,6 +183,7 @@ void KKSXMLForm :: uploadHFile (void)
     if (!csvFileName.isEmpty())
         readDataFile ();
 }
+ */
 
 void KKSXMLForm :: xmlParse (void)
 {
@@ -230,7 +234,7 @@ void KKSXMLForm :: xmlParse (void)
             qCritical() << tr ("Error is %1, line is %2, column %3 ").arg (xmlStreamR->errorString()).arg (xmlStreamR->lineNumber()).arg (xmlStreamR->columnNumber());
             QMessageBox::critical (this, tr("XML header error"), tr ("Error is %1, line is %2, column %3 ").arg (xmlStreamR->errorString()).arg (xmlStreamR->lineNumber()).arg (xmlStreamR->columnNumber()), QMessageBox::Ok);
             ui->lEFileName->clear ();
-            ui->lEHFileName->clear ();
+            //ui->lEHFileName->clear ();
             ui->lEErrorString->setText (tr("File : %1, error is %2, line is %3, column is %4").arg (xmlFileName).arg (xmlStreamR->errorString()).arg (xmlStreamR->lineNumber()).arg (xmlStreamR->columnNumber()));
             return;
         }
@@ -428,11 +432,6 @@ void KKSXMLForm :: readAttribute (QXmlStreamReader* reader, KKSCategory * cat)
     qDebug () << __PRETTY_FUNCTION__ << idAttr << cat->attributes().count();
 }
 
-QString KKSXMLForm :: getCSVFile (void) const
-{
-    return csvFileName;
-}
-
 QString KKSXMLForm :: getXMLFile (void) const
 {
     return xmlFileName;
@@ -546,11 +545,11 @@ AttrFields KKSXMLForm :: getAttributes (void) const
 
 void KKSXMLForm :: readDataFile (void)
 {
-    if (csvFileName.isEmpty() || xmlFileName.isEmpty () || charSet.isEmpty () || fieldDelim.isEmpty() || textDelim.isEmpty() || !ui->tVPreview->model ())
+    if (xmlFileName.isEmpty() || charSet.isEmpty () || fieldDelim.isEmpty() || textDelim.isEmpty() || !ui->tVPreview->model ())
         return;
-    QFile csvFile (csvFileName);
+    QFile xmlFile (xmlFileName);
     if (!isExport)
-        emit loadCSV (&csvFile, charSet, fieldDelim, textDelim, ui->tVPreview->model (), this);
+        emit loadCSV (&xmlFile, charSet, fieldDelim, textDelim, ui->tVPreview->model (), this);
 }
 
 KKSCategory * KKSXMLForm :: getCategory (void) const
