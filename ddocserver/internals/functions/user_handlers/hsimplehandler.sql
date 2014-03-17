@@ -33,4 +33,18 @@ $BODY$
 language 'plpgsql';
 
 
+create or replace function hSimpleHandler(varchar) returns int4 as
+$BODY$
+declare
+
+    inData alias for $1;
+
+begin
+
+    return 20;   
+
+end
+$BODY$
+language 'plpgsql';
+
 --select hStartHandler('hsimplehandler', 2146);

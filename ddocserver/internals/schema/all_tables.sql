@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     03.02.2014 17:22:58                          */
+/* Created on:     17.03.2014 11:59:37                          */
 /*==============================================================*/
 
 
@@ -23,6 +23,7 @@ select setMacToNULL('root_table');
 create unique index Index_1 on root_table using BTREE (
 unique_id
 );
+
 /*==============================================================*/
 /* User: public                                                 */
 /*==============================================================*/
@@ -3387,7 +3388,7 @@ create table q_base_table (
    id                   BIGSERIAL            not null,
    id_io_state          INT4                 not null default 1,
    uuid_t               UUID                 not null,
---   name                 VARCHAR              not null,
+   name                 VARCHAR              not null,
    r_icon               VARCHAR              null,
    record_fill_color    INT8                 null,
    record_text_color    INT8                 null,
@@ -3731,7 +3732,6 @@ create table roles_actions (
 select setMacToNULL('roles_actions');
 
 
-
 /*==============================================================*/
 /* Table: rubric_records                                        */
 /*==============================================================*/
@@ -3900,6 +3900,34 @@ comment on table shape_types is
 
 select setMacToNULL('shape_types');
 select createTriggerUID('shape_types');
+
+/*==============================================================*/
+/* Table: sheduled_handlers                                     */
+/*==============================================================*/
+create table sheduled_handlers (
+   id                   SERIAL               not null,
+   id_handler           INT4                 not null,
+   name                 VARCHAR              not null,
+   exec_period          INT4[2]              not null,
+   last_exec            TIMESTAMP            null,
+   constraint PK_SHEDULED_HANDLERS primary key (id)
+);
+
+comment on table sheduled_handlers is
+'Перечень сервисов, запускаемых периодически';
+
+comment on column sheduled_handlers.id_handler is
+'Запускаемый сервис';
+
+comment on column sheduled_handlers.name is
+'Название запускаемого сервиса (если не задано - при создании по умолчанию возьмется из справочника сервисов)';
+
+comment on column sheduled_handlers.exec_period is
+'периодичность выполнения данного сервиса
+';
+
+comment on column sheduled_handlers.last_exec is
+'Дата и время последнего вызова';
 
 /*==============================================================*/
 /* Table: state_crosses                                         */
@@ -5602,6 +5630,11 @@ alter table shape_segments
 alter table shape_segments
    add constraint FK_SHAPE_SE_REFERENCE_ELEMENT_ foreign key (id_element_shape)
       references element_shapes (id)
+      on delete restrict on update restrict;
+
+alter table sheduled_handlers
+   add constraint FK_SHEDULED_REFERENCE_HANDLERS foreign key (id_handler)
+      references handlers (id)
       on delete restrict on update restrict;
 
 alter table state_crosses

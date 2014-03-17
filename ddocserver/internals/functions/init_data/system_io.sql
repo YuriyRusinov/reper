@@ -774,6 +774,13 @@ insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main
 insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
 values(227, -10, true, true, false, false, true);
          
+insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values ('localorg-categories-228', 228, 10, NULL, false, '–асписание периодического запуска сервисов', 'SYSCATEGORY_228', NULL::varchar, true, true, 1);
+insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
+values(228, -10, true, true, false, false, true);
+insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values ('localorg-categories-229', 229, 8, 228, true, '–асписание периодического запуска сервисов', 'SYSCATEGORY_229', NULL::varchar, true, true, 1);
+insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
+values(229, -10, true, true, false, false, true);
+
 SELECT pg_catalog.setval('io_categories_id_seq', 300, true); --все пользовательские категории будут начинатьс€ с номера 301
                                                              --это сделано дл€ того, чтобы оставить резерв дл€ системных категорий 
 
@@ -1236,6 +1243,7 @@ insert into attributes (unique_id, id, id_a_type, code, name, title, table_name,
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-374', 374, 6, 'h_min', 'ћинимальное значение', 'ћинимальное значение', NULL, NULL, 150, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-375', 375, 6, 'h_max', 'ћаксимальное значение', 'ћаксимальное значение', NULL, NULL, 150, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-376', 376, 8, 'h_count', ' оличество карманов', ' оличество карманов', NULL, NULL, 150, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-377', 377, 37, 'last_exec', 'ƒата и врем€ последнего запуска сервиса', 'ƒата и врем€ последнего запуска', NULL, NULL, 120, TRUE);
 
 
 SELECT pg_catalog.setval('attributes_id_seq', 1000, true); --все пользовательские атрибуты будут начинатьс€ с номера 1001
@@ -2403,6 +2411,16 @@ insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is
 --670-675 используютс€ в справочниках параметров гистограмм
 --676-677 используютс€ в справочнике потоков сообщений
 
+--таблица расписани€ периодического запуска сервисов
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (678, 228, 1, NULL, true, true); --id
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (679, 228, 2, NULL, true, false); --name
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (680, 228, 328, NULL, true, false); --id_handler
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (681, 228, 38, NULL, true, false); --exec_period
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (682, 228, 377, NULL, false, true); --last_exec
+
+
+
+
 SELECT pg_catalog.setval('attrs_categories_id_seq', 2000, true); --все пользовательские атрибуты в категори€х будут начинатьс€ с номера 2001
                                                                  --это сделано дл€ того, чтобы оставить резерв дл€ системных атрибутов
 
@@ -2955,6 +2973,11 @@ insert into tbl_io_objects (unique_id, id, id_io_category, author, id_io_state, 
 values ('localorg-io_objects-111', 111, 227, 1, 1, '—правочник графиков гистограмм дл€ сервисов', 'histogram_graphics_chains', NULL, '—истемный объект', true, true, 5, current_timestamp, 1, NULL, 3);
 insert into access_table (id_io_object, id_role, allow_readlist, allow_read, allow_delete, allow_update)
 values (111, -10, TRUE, TRUE, FALSE, FALSE);
+
+insert into tbl_io_objects (unique_id, id, id_io_category, author, id_io_state, name, table_name, description, information, is_system, is_global, id_sync_type, insert_time, id_maclabel, id_owner_org, id_io_type)
+values ('localorg-io_objects-112', 112, 229, 1, 1, '–асписание периодического запуска сервисов', 'sheduled_handlers', NULL, '—истемный объект', true, true, 5, current_timestamp, 1, NULL, 3);
+insert into access_table (id_io_object, id_role, allow_readlist, allow_read, allow_delete, allow_update)
+values (112, -10, TRUE, TRUE, FALSE, FALSE);
 
 SELECT pg_catalog.setval('tbl_io_objects_id_seq', 300, true); --все пользовательские информационные объекты будут начинатьс€ с номера 301
                                                               --это сделано дл€ того, чтобы оставить резерв дл€ системных »ќ

@@ -203,6 +203,10 @@ begin
                     what := 6;
                 elsif (lower (unit) = 'hours') then
                     what := 7;
+                elsif (lower (unit) = 'minutes') then
+                    what := 8;
+                elsif (lower (unit) = 'seconds') then
+                    what := 9;
                 else
                     raise exception 'Invalid unit';
                     return NULL;
