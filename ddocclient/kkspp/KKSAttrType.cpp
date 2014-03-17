@@ -106,7 +106,9 @@ QStringList KKSAttrType::getIntervalUnits()
           << QObject::tr("months") 
           << QObject::tr("weeks") 
           << QObject::tr("days") 
-          << QObject::tr("hours");
+          << QObject::tr("hours")
+          << QObject::tr("minutes")
+          << QObject::tr("seconds");
 
     return units;
 }
@@ -144,6 +146,14 @@ QString KKSAttrType::getIntervalValue(double amount, const QString & unit)
         v = QString("%1 %2").arg(amount).arg("hours");
     }
     
+    if(unit == QObject::tr("minutes")){
+        v = QString("%1 %2").arg(amount).arg("minutes");
+    }
+
+    if(unit == QObject::tr("seconds")){
+        v = QString("%1 %2").arg(amount).arg("seconds");
+    }
+
     return v;
 }
 
@@ -164,7 +174,11 @@ bool KKSAttrType::isValidUnit(const QString & unit)
        unit == QObject::tr("day") ||
        unit == QObject::tr("days") ||
        unit == QObject::tr("hour") ||
-       unit == QObject::tr("hours"))
+       unit == QObject::tr("hours") ||
+       unit == QObject::tr("seconds") ||
+       unit == QObject::tr("second") ||
+       unit == QObject::tr("minutes") ||
+       unit == QObject::tr("minute"))
     {
         return true;
     }
@@ -204,6 +218,14 @@ int KKSAttrType::intervalNameToId(const QString & name)
         id = 7;
     }
 
+    if(name == QObject::tr("minutes")){
+        id = 8;
+    }
+
+    if(name == QObject::tr("seconds")){
+        id = 9;
+    }
+
     return id;
 }
 
@@ -237,6 +259,14 @@ QString KKSAttrType::intervalIdToName(int id)
 
     if(id == 7){
         name = QObject::tr("hours");
+    }
+
+    if(id == 8){
+        name = QObject::tr("minutes");
+    }
+
+    if(id == 9){
+        name = QObject::tr("seconds");
     }
 
     return name;

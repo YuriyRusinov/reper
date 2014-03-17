@@ -35,6 +35,35 @@ private:
     KKSDaemon * m_parent;
 };
 
+class DDocHandlersSheduler : public QThread
+{
+    Q_OBJECT
+public:
+    DDocHandlersSheduler(KKSPGDatabase * db, QObject * parent):QThread(parent), m_db(NULL), m_parent(NULL){m_db = db;}
+    ~DDocHandlersSheduler(){}
+
+    void run();
+    void setDaemon(KKSDaemon * d){m_parent = d;}
+
+private:
+    KKSPGDatabase * m_db;
+    KKSDaemon * m_parent;
+    
+    struct Service{
+        qint64 idShedule;
+        qint64 id;
+        QString name;
+        bool isExternal;
+        QString host;
+        int port;
+        QString signature;
+        QString extraParams;
+        QString inData;
+    };
+
+    void startService(const Service & srv);
+};
+
 class DDocServerListener : public QThread, public IKKSListener
 {
     Q_OBJECT
@@ -81,6 +110,7 @@ private:
 
     friend class DDocServerListener;
     friend class DDocStreamsGenerator;
+    friend class DDocHandlersSheduler;
 
     bool readSettings();
 
@@ -88,13 +118,16 @@ private:
     bool bPause;
     bool bNeedAnalyzeDb; //флаг определяет необходимость работы механизма автоматической разводки документов по рубрикам
     bool bNeedGenerateStreams; //флаг определяет необходимость запуска механизма генерации потоков
+    bool bNeedHandlersShedule;//флаг определяет необходимость запуска сервисов по расписанию
     
     KKSPGDatabase * db;
     KKSPGDatabase * dbTimer;//для автоматической разводки документов по рубрикам
     KKSPGDatabase * dbStreams; //для генерации потоков сообщений
+    KKSPGDatabase * dbSheduledHandlers; //для запуска сервисов по расписанию
     
     DDocServerListener * listener;
     DDocStreamsGenerator * streamsGenerator;
+    DDocHandlersSheduler * handlersSheduler;
 
     QHttp * http;
 

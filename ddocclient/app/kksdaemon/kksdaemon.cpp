@@ -25,13 +25,16 @@ KKSDaemon::KKSDaemon(int argc, char **argv) :
     bNeedExit = false;
     bPause = false;
     bNeedGenerateStreams = false;
+    bNeedHandlersShedule = false;
     
     db = NULL;
     dbTimer = NULL;
     dbStreams = NULL;
+    dbSheduledHandlers = NULL;
 
     listener = NULL;
     streamsGenerator = NULL;
+    handlersSheduler = NULL;
 
     m_timerInterval = 60000;//1 min
 
@@ -69,6 +72,11 @@ KKSDaemon::~KKSDaemon()
         delete dbStreams;
     }
 
+    if(dbSheduledHandlers){
+        dbSheduledHandlers->disconnect();
+        delete dbSheduledHandlers;
+    }
+
     if(listener){
         listener->quit();
         delete listener;
@@ -77,6 +85,11 @@ KKSDaemon::~KKSDaemon()
     if(streamsGenerator){
         streamsGenerator->quit();
         delete streamsGenerator;
+    }
+
+    if(handlersSheduler){
+        handlersSheduler->quit();
+        delete handlersSheduler;
     }
 
 }
@@ -90,6 +103,7 @@ void KKSDaemon::start()
     db = new KKSPGDatabase(); 
     dbTimer = new KKSPGDatabase();
     dbStreams = new KKSPGDatabase();
+    dbSheduledHandlers = new KKSPGDatabase();
 
     if(!readSettings()){
         (*fLogOut) << QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm.ss") << " --- " << "Cannot open config file! Exited!\n";
@@ -114,6 +128,12 @@ void KKSDaemon::start()
             return;
     }
 
+    if(bNeedHandlersShedule){
+        ok = dbSheduledHandlers->connect(ipServer, database, user, passwd, port);
+        if(!ok)
+            return;
+    }
+
     QFile file(QString("%1").arg(sPgPass));
      if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
          return;
@@ -132,6 +152,12 @@ void KKSDaemon::start()
         streamsGenerator = new DDocStreamsGenerator(dbStreams, 0);
         streamsGenerator->setDaemon(this);
         streamsGenerator->start();
+    }
+
+    if(bNeedHandlersShedule){
+        handlersSheduler = new DDocHandlersSheduler(dbSheduledHandlers, 0);
+        handlersSheduler->setDaemon(this);
+        handlersSheduler->start();
     }
 
     if(bNeedAnalyzeDb){
@@ -229,6 +255,7 @@ bool KKSDaemon::readSettings()
     
     bNeedGenerateStreams = s->value("generateStreams").toBool();
     bNeedAnalyzeDb = s->value("autoRubrication").toBool();
+    bNeedHandlersShedule = s->value("sheduleHandlers").toBool();
 
 
     if(ipServer.isEmpty()){
@@ -269,6 +296,11 @@ bool KKSDaemon::readSettings()
     if(s->value("generateStreams").isNull()){
         bNeedGenerateStreams = true;
         s->setValue("generateStreams", true);
+    }
+
+    if(s->value("sheduleHandlers").isNull()){
+        bNeedHandlersShedule = true;
+        s->setValue("sheduleHandlers", true);
     }
 
     if(s->value("autoRubrication").isNull()){
@@ -408,6 +440,121 @@ void DDocServerListener::notify( char* notify_name, char * payload )
     else{
         
         QString sql = QString("\"select hStartHandler('%1', %2)\"").arg(service).arg(id);
+        
+        QString program = QString("%1 -h %2 -p %3 -U %4 -c %5 %6")
+                           .arg(m_parent->sPsqlPath)
+                           .arg(m_parent->ipServer)
+                           .arg(m_parent->port)
+                           .arg(m_parent->user)
+                           .arg(sql)
+                           .arg(m_parent->database);
+
+        QProcess::startDetached(program);
+    }
+}
+
+
+void DDocHandlersSheduler::run()
+{
+    if(!m_db)
+        return;
+
+    
+    //QString processedEntries;
+    while(1){
+
+        if(m_parent && m_parent->stopped())
+            break;
+        if(m_parent && m_parent->paused())
+            continue;
+
+        QString sql;
+        //if(processedEntries.isEmpty())
+            sql = QString("select * from getSheduledHandlers()");
+        //else
+        //    sql = QString("select * from getSheduledHandlers() where id_shedule not in (%1)");
+
+        KKSResult * res = m_db->execute(sql.toLocal8Bit().constData());
+        if(!res)
+            continue;
+
+        int cnt = res->getRowCount();
+        if(cnt <= 0){
+            delete res;
+            continue;
+        }
+
+        for(int row=0; row<cnt; row++){
+
+            Service srv;
+            srv.idShedule = res->getCellAsInt64(row, 0);
+            srv.id = res->getCellAsInt64(row, 1);
+            srv.name = res->getCellAsString(row, 2);
+            srv.signature = res->getCellAsString(row, 3);
+            srv.host = res->getCellAsString(row, 4);
+            srv.port = res->getCellAsInt(row, 5);
+            srv.extraParams = res->getCellAsString(row, 6);
+            srv.inData = res->getCellAsString(row, 7);
+            srv.isExternal = res->getCellAsBool(row, 8);
+
+            //if(processedEntries.isEmpty())
+            startService(srv);
+        }
+
+        delete res;
+    }
+    
+}
+
+void DDocHandlersSheduler::startService(const Service & srv)
+{
+    if(srv.id <= 0)
+        return;
+
+
+    if(srv.isExternal){
+        
+        QString uri = QString("http://") + srv.host + QString(":") + QString::number(srv.port) + QString("/") + srv.signature;
+	    //QString uri = QString("/") + service + QString("?id=") + QString::number(id); // + extraParams;
+	    QUrl u(uri);
+
+
+        QHttp::ConnectionMode mode = QHttp::ConnectionModeHttp;
+        m_parent->http->setHost(u.host(), mode, u.port());
+    
+        //QByteArray path = QUrl::toPercentEncoding(u.path(), "!$&'()*+,;=:@/");
+        QByteArray path = QUrl::toPercentEncoding(u.path(), "!$&'()*+,;=:@/");
+        //path += QString("?id=") + QString::number(srv.id); // + extraParams;
+        
+        QHttpRequestHeader h = QHttpRequestHeader("GET", path);
+        h.setValue("Host", u.host());
+        h.setValue("Port", QString::number(u.port()));
+        
+
+	    ////QEventLoop eventLoop;
+	    ////connect(m_parent->http,SIGNAL(requestFinished(int,bool)),&eventLoop,SLOT(quit()));
+        //httpGetId = http->post ( path, byteArray ) ;
+        //int uid = m_parent->http->get(path);
+        //int uid = 
+        m_parent->http->request(h);
+	    ////eventLoop.exec();
+
+        //qWarning() << "!!!!!!!  " << uid;
+        
+        //qint64 pid = 0;
+        //QStringList arguments;
+        //arguments << QString("%1").arg(id);
+        //QProcess::startDetached ( service, arguments, ".", &pid );
+        //if(pid <= 0){
+        //    qWarning() << "Program " << service << " cannot start!";
+        //}
+    }
+    else{
+        
+        QString sql = QString("\"select * from hStartSheduledHandler(%1, '%2', %3)\"")
+                                    .arg(srv.idShedule)
+                                    .arg(srv.signature)
+                                    .arg(srv.inData.isEmpty() ? QString("NULL") : QString("'" + srv.inData + "'"));
         
         QString program = QString("%1 -h %2 -p %3 -U %4 -c %5 %6")
                            .arg(m_parent->sPsqlPath)
