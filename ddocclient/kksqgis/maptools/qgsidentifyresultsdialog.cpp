@@ -20,7 +20,7 @@
 
 #include "qgsapplication.h"
 //#include "qgisapp.h"
-#include "kksgiswidget.h" //!!!!! גלוסעמ qgisapp.h
+#include "KKSGISWidget.h" //!!!!! גלוסעמ qgisapp.h
 #include "qgsmaplayer.h"
 #include "qgsvectorlayer.h"
 #include "qgsrasterlayer.h"

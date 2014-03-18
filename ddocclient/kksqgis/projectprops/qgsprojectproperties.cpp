@@ -22,7 +22,7 @@
 #include "qgsapplication.h"
 #include "qgsdistancearea.h"
 //#include "qgisapp.h"
-#include "kksgiswidget.h" //!!!!! גלוסעמ qgisapp.h
+#include "KKSGISWidget.h" //!!!!! גלוסעמ qgisapp.h
 //#include "qgscomposer.h"
 #include "qgscontexthelp.h"
 #include "qgscoordinatetransform.h"

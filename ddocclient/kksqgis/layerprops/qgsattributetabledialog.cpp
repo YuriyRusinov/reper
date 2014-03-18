@@ -27,7 +27,7 @@
 #include <qgsexpression.h>
 
 //#include "qgisapp.h"
-#include "kksgiswidget.h" //!!!! גלוסעמ qgisapp.h
+#include "KKSGISWidget.h" //!!!! גלוסעמ qgisapp.h
 #include "qgsaddattrdialog.h"
 #include "qgsdelattrdialog.h"
 #include "qgssearchquerybuilder.h"

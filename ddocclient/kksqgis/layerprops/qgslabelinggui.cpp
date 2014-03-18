@@ -28,7 +28,7 @@
 #include "qgsexpression.h"
 #include "qgsfontutils.h"
 //#include "qgisapp.h"
-#include "kksgiswidget.h" //!!!! גלוסעמ qgisapp.h
+#include "KKSGISWidget.h" //!!!! גלוסעמ qgisapp.h
 #include "qgsmaprenderer.h"
 #include "qgsproject.h"
 #include "qgssvgcache.h"

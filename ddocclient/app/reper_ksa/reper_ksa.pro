@@ -27,10 +27,17 @@ qgis{
     DEFINES *= __USE_EXPORTS  #for qgis export library
 
     INCLUDEPATH += $$OSGEODIR/include \
+                   $$QGISDIR/include/qgis \
                    $$QGISDIR/include
 
     LIBS += -L$$QGISDIR/lib -lqgis_core -lqgis_gui
-    LIBS += -L$$OSGEODIR/lib  -lproj_i -lgdal_i -lsqlite3_i
+
+    win32{
+        LIBS *= -L$$OSGEODIR/lib  -lproj_i -lgdal_i -lsqlite3_i
+    }
+    else{
+        LIBS *= -L$$OSGEODIR/lib  -lproj -lgdal -lsqlite3
+    }
 }
 
 LIBS *= -L$$DESTDIR -lkksqgis

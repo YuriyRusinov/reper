@@ -17,7 +17,7 @@ email                : jpalmer at linz dot govt dot nz
 
 #include "qgsmaptoolselectutils.h"
 //#include "qgisapp.h"
-#include "kksgiswidget.h" //!!!!! גלוסעמ qgisapp.h
+#include "KKSGISWidget.h" //!!!!! גלוסעמ qgisapp.h
 #include "qgsmessagebar.h"
 #include "qgsmapcanvas.h"
 #include "qgsvectorlayer.h"

@@ -22,7 +22,7 @@
 #include "qgsvectorlayerproperties.h"
 
 //#include "qgisapp.h"
-#include "kksgiswidget.h" //!!!! גלוסעמ qgisapp.h
+#include "KKSGISWidget.h" //!!!! גלוסעמ qgisapp.h
 #include "qgsaddjoindialog.h"
 #include "qgsapplication.h"
 #include "qgsattributeactiondialog.h"

@@ -118,9 +118,10 @@ private:
     bool bPause;
     bool bNeedAnalyzeDb; //флаг определ€ет необходимость работы механизма автоматической разводки документов по рубрикам
     bool bNeedGenerateStreams; //флаг определ€ет необходимость запуска механизма генерации потоков
+    bool bNeedCaptureNotify;//ловить ли квитанции о по€влении в очереди обработки »ќ очередной записи
     bool bNeedHandlersShedule;//флаг определ€ет необходимость запуска сервисов по расписанию
     
-    KKSPGDatabase * db;
+    KKSPGDatabase * dbNotify;//дл€ обработки »ќ в очеред€х
     KKSPGDatabase * dbTimer;//дл€ автоматической разводки документов по рубрикам
     KKSPGDatabase * dbStreams; //дл€ генерации потоков сообщений
     KKSPGDatabase * dbSheduledHandlers; //дл€ запуска сервисов по расписанию

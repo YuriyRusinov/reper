@@ -23,7 +23,7 @@
 #include "qgstextdiagram.h"
 
 //#include "qgisapp.h"
-#include "kksgiswidget.h" //!!!! גלוסעמ qgisapp.h
+#include "KKSGISWidget.h" //!!!! גלוסעמ qgisapp.h
 #include "qgsapplication.h"
 #include "qgsdiagramrendererv2.h"
 #include "qgslabelengineconfigdialog.h"

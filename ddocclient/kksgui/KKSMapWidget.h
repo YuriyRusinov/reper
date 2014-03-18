@@ -27,7 +27,7 @@ class KKSFile;
 #include <KKSValue.h>
 
 #ifdef __USE_QGIS__
-#include "kksgiswidget.h"
+#include "KKSGISWidget.h"
 //#include "kksgiswidgetqgis.h"
 //class KKSGISWidget;
 #endif

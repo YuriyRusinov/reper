@@ -238,6 +238,8 @@ void KKSCatEditor :: apply (void)
         isCloseIgnored = false;
 
     pCategory->setAsGlobal(cbGlobal->isChecked());
+	if(pTableCategory)
+		pTableCategory->setAsGlobal(cbGlobal->isChecked());
 
     if (pTableCategory)
     {
@@ -479,6 +481,7 @@ void KKSCatEditor :: addIndicator (void)
     if(!pRecAttrCategory){
         KKSType * cTableT = KKSType::createType10(); //child type
         pRecAttrCategory = new KKSCategory (-1, QString(), cTableT);
+		pRecAttrCategory->setMain(false);
         pRecAttrCategory->setName("Indicators of " + pCategory->name());
         KKSAccessEntity * acl = new KKSAccessEntity ();
         pRecAttrCategory->setAccessRules (acl);
@@ -737,6 +740,7 @@ void KKSCatEditor :: setCurrentType (int index)
         if (!pTableCategory)
         {
             pTableCategory = new KKSCategory(-1, tr("Table of %1").arg(pCategory->name()), tableType);
+			pTableCategory->setMain(false);
             KKSAccessEntity * acl = new KKSAccessEntity (*pCategory->getAccessRules());
             pTableCategory->setAccessRules (acl);
         }

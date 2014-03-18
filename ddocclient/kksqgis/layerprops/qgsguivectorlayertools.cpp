@@ -23,7 +23,7 @@
 #include "qgsvectordataprovider.h"
 #include "qgsmessagebar.h"
 //#include "qgisapp.h"
-#include "kksgiswidget.h" //!!!! גלוסעמ qgisapp.h
+#include "KKSGISWidget.h" //!!!! גלוסעמ qgisapp.h
 #include "qgsapplication.h"
 #include "qgsmessageviewer.h"
 #include "qgsfeatureaction.h"

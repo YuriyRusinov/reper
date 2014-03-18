@@ -25,9 +25,10 @@ KKSDaemon::KKSDaemon(int argc, char **argv) :
     bNeedExit = false;
     bPause = false;
     bNeedGenerateStreams = false;
+    bNeedCaptureNotify = false;
     bNeedHandlersShedule = false;
     
-    db = NULL;
+    dbNotify = NULL;
     dbTimer = NULL;
     dbStreams = NULL;
     dbSheduledHandlers = NULL;
@@ -57,9 +58,9 @@ KKSDaemon::~KKSDaemon()
         delete fLog;
     }
 
-    if(db){
-        db->disconnect();
-        delete db;
+    if(dbNotify){
+        dbNotify->disconnect();
+        delete dbNotify;
     }
 
     if(dbTimer){
@@ -98,9 +99,8 @@ void KKSDaemon::start()
 {
     (*fLogOut) << QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm.ss") << " --- " << "KKSDaemon started\n";
     fLogOut->flush();
-    //QCoreApplication * app = application();
     
-    db = new KKSPGDatabase(); 
+    dbNotify = new KKSPGDatabase(); 
     dbTimer = new KKSPGDatabase();
     dbStreams = new KKSPGDatabase();
     dbSheduledHandlers = new KKSPGDatabase();
@@ -112,9 +112,13 @@ void KKSDaemon::start()
         return;
     }
 
-    bool ok = db->connect(ipServer, database, user, passwd, port);
-    if(!ok)
-        return;
+    bool ok = false;
+    
+    if(bNeedCaptureNotify){
+        ok = dbNotify->connect(ipServer, database, user, passwd, port);
+        if(!ok)
+            return;
+    }
 
     if(bNeedAnalyzeDb){
         ok = dbTimer->connect(ipServer, database, user, passwd, port);
@@ -135,18 +139,21 @@ void KKSDaemon::start()
     }
 
     QFile file(QString("%1").arg(sPgPass));
-     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-         return;
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+        return;
 
-     QTextStream out(&file);
-     out << "*:*:*:" << user << ":" << passwd << "\n";
-     
+    QTextStream out(&file);
+    out << "*:*:*:" << user << ":" << passwd << "\n";
 
-    db->startListen();
 
-    listener = new DDocServerListener(db, 0);
-    listener->setDaemon(this);
-    listener->start();
+
+    if(bNeedCaptureNotify){
+        dbNotify->startListen();
+
+        listener = new DDocServerListener(dbNotify, 0);
+        listener->setDaemon(this);
+        listener->start();
+    }
 
     if(bNeedGenerateStreams){
         streamsGenerator = new DDocStreamsGenerator(dbStreams, 0);
@@ -168,6 +175,8 @@ void KKSDaemon::start()
     
 }
 
+/* автоматическая разводка документов по рубрикам и выдача очередного периодического распоряжения 
+(анализ журнала распоряжений на предмет наличия периодических)*/
 void KKSDaemon::analyzeDb()
 {
     (*fLogOut) << QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm.ss") << " --- " << "Start analyzing database...\n";
@@ -255,6 +264,7 @@ bool KKSDaemon::readSettings()
     
     bNeedGenerateStreams = s->value("generateStreams").toBool();
     bNeedAnalyzeDb = s->value("autoRubrication").toBool();
+    bNeedCaptureNotify = s->value("processServices").toBool();
     bNeedHandlersShedule = s->value("sheduleHandlers").toBool();
 
 
@@ -308,6 +318,10 @@ bool KKSDaemon::readSettings()
         s->setValue("autoRubrication", true);
     }
 
+    if(s->value("processServices").isNull()){
+        bNeedCaptureNotify = true;
+        s->setValue("processServices", true);
+    }
 
     //s->endGroup (); // Database
 

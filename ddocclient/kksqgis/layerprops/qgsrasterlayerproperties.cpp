@@ -21,7 +21,7 @@
 #include "qgsrasterlayerproperties.h"
 
 //#include "qgisapp.h"
-#include "kksgiswidget.h" //!!!! גלוסעמ qgisapp.h
+#include "KKSGISWidget.h" //!!!! גלוסעמ qgisapp.h
 #include "qgsapplication.h"
 #include "qgsbilinearrasterresampler.h"
 #include "qgscontexthelp.h"

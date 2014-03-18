@@ -1,7 +1,7 @@
  /**********************************************************************
  * Module:  JKKSLoader.cpp
- * Author:  yuriyrusinov
- * Modified: 1 апреля 2008 г. 17:15
+ * Author:  sergey karin
+ * Modified: 23 февраля 2014 г. 17:15
  * Purpose: Implementation of the class JKKSLoader
  ***********************************************************************/
 

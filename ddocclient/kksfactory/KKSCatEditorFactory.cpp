@@ -412,6 +412,7 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (int idCategory, // ид
             return 0;
         cat->setType (cType);
         cType->release ();
+		cat->setMain(false);
     }
     else if (isChildCat && parent && qobject_cast<KKSCatEditor *>(parent))
     {
@@ -444,6 +445,7 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (int idCategory, // ид
             // загрузка типа "подчиненная категория"
             //
             tableCat = new KKSCategory (-1, QString(), cTableT);
+			tableCat->setMain(false);
             cat->setTableCategory (tableCat);
             if (tableCat)
                 tableCat->release ();
@@ -594,6 +596,7 @@ KKSRecWidget * KKSCatEditorFactory :: getAttrsWidget (const KKSCategory *cat, bo
     {
         KKSType * cTableT = KKSType::createType10(); //child type
         cat = new KKSCategory (-1, QString(), cTableT);
+		(const_cast<KKSCategory*>(cat))->setMain(false);
         //cat->setName("Indicators of " + pCategory->name());
         KKSAccessEntity * acl = new KKSAccessEntity ();
         const_cast<KKSCategory *>(cat)->setAccessRules (acl);

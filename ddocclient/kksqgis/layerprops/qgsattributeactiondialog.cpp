@@ -24,7 +24,7 @@ back to QgsVectorLayer.
 #include "qgsattributeaction.h"
 #include "qgsexpressionbuilderdialog.h"
 //#include "qgisapp.h"
-#include "kksgiswidget.h" //!!!! גלוסעמ qgisapp.h
+#include "KKSGISWidget.h" //!!!! גלוסעמ qgisapp.h
 #include "qgsproject.h"
 #include "qgsmapcanvas.h"
 

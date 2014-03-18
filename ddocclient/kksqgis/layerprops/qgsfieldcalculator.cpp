@@ -16,7 +16,7 @@
 #include "qgsfieldcalculator.h"
 
 //#include "qgisapp.h"
-#include "kksgiswidget.h" //!!!! גלוסעמ qgisapp.h
+#include "KKSGISWidget.h" //!!!! גלוסעמ qgisapp.h
 #include "qgsdistancearea.h"
 #include "qgsexpression.h"
 #include "qgsmapcanvas.h"

@@ -15,7 +15,7 @@
 #include "qgsprojectlayergroupdialog.h"
 #include "qgsproject.h"
 //#include "qgisapp.h"
-//#include "kksgiswidget.h" //!!!!! גלוסעמ qgisapp.h
+//#include "KKSGISWidget.h" //!!!!! גלוסעמ qgisapp.h
 #include "qgsapplication.h"
 
 #include <QDomDocument>

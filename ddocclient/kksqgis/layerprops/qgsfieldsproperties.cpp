@@ -15,7 +15,7 @@
 
 #include "qgsfieldsproperties.h"
 
-#include "kksgiswidget.h" //!!!! גלוסעמ qgisapp.h
+#include "KKSGISWidget.h" //!!!! גלוסעמ qgisapp.h
 
 #include "qgseditorwidgetfactory.h"
 #include "qgseditorwidgetregistry.h"

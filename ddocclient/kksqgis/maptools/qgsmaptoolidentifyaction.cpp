@@ -33,7 +33,7 @@
 #include "qgsproject.h"
 #include "qgsmaplayerregistry.h"
 //#include "qgisapp.h"
-#include "kksgiswidget.h" //!!!!! גלוסעמ qgisapp.h
+#include "KKSGISWidget.h" //!!!!! גלוסעמ qgisapp.h
 #include "qgsrendererv2.h"
 
 #include <QSettings>

@@ -18,7 +18,7 @@
 #include "qgsfeatureaction.h"
 
 //#include "qgisapp.h"
-#include "kksgiswidget.h" //!!!! גלוסעמ qgisapp.h
+#include "KKSGISWidget.h" //!!!! גלוסעמ qgisapp.h
 #include "qgsattributedialog.h"
 #include "qgsdistancearea.h"
 #include "qgsguivectorlayertools.h"

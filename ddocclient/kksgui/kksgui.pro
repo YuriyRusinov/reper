@@ -43,6 +43,7 @@ qgis{
     INCLUDEPATH *= \
                    $$OSGEODIR/include \
                    $$OSGEODIR/include/qwt \
+                   $$QGISDIR/include/qgis \
                    $$QGISDIR/include \
                    ../kksqgis \
                    ../kksqgis/layerprops \
@@ -52,7 +53,12 @@ qgis{
 
     DEPENDPATH *= ../kksqgis
 
-    LIBS *= -L$$OSGEODIR/lib  -lproj_i -lgdal_i -lsqlite3_i
+    win32{
+        LIBS *= -L$$OSGEODIR/lib  -lproj_i -lgdal_i -lsqlite3_i
+    }
+    else{
+        LIBS *= -L$$OSGEODIR/lib  -lproj -lgdal -lsqlite3
+    }
 }
 
 
