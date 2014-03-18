@@ -1,8 +1,7 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     17.03.2014 11:59:37                          */
+/* Created on:     18.03.2014 15:08:32                          */
 /*==============================================================*/
-
 
 /*==============================================================*/
 /* Table: root_table                                            */
@@ -23,6 +22,7 @@ select setMacToNULL('root_table');
 create unique index Index_1 on root_table using BTREE (
 unique_id
 );
+
 
 /*==============================================================*/
 /* User: public                                                 */
@@ -3732,6 +3732,7 @@ create table roles_actions (
 select setMacToNULL('roles_actions');
 
 
+
 /*==============================================================*/
 /* Table: rubric_records                                        */
 /*==============================================================*/
@@ -3911,13 +3912,11 @@ create table sheduled_handlers (
    exec_period          INT4[2]              not null,
    last_exec            TIMESTAMP            null,
    constraint PK_SHEDULED_HANDLERS primary key (id)
-);
+)
+inherits (root_table);
 
 comment on table sheduled_handlers is
 'Перечень сервисов, запускаемых периодически';
-
-comment on column sheduled_handlers.id_handler is
-'Запускаемый сервис';
 
 comment on column sheduled_handlers.name is
 'Название запускаемого сервиса (если не задано - при создании по умолчанию возьмется из справочника сервисов)';
@@ -3928,6 +3927,9 @@ comment on column sheduled_handlers.exec_period is
 
 comment on column sheduled_handlers.last_exec is
 'Дата и время последнего вызова';
+
+select setMacToNULL('sheduled_handlers');
+select createTriggerUID('sheduled_handlers');
 
 /*==============================================================*/
 /* Table: state_crosses                                         */
