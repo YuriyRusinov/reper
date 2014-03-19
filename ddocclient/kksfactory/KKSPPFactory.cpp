@@ -4611,7 +4611,7 @@ int KKSPPFactory::insertAttrAttr(int idParentAttr, KKSCategoryAttr * aa) const
     bool isMandatory = aa->isMandatory();
     bool isReadOnly = aa->isReadOnly();
 
-    QString sql = QString("select aInsertAttrAttr(%1, %2, %3::varchar, %4, %5)")
+    QString sql = QString("select aInsertAttrAttr(%1, %2, %3::varchar, %4, %5, NULL)")
                             .arg(idParentAttr)
                             .arg(idAttr)
                             .arg(defVal)

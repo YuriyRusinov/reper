@@ -107,7 +107,7 @@ void KKSXMLForm :: uploadFile (void)
 
     xmlDialog->setFilters (filters);
     xmlDialog->setModal (true);
-    xmlDialog->setDefaultSuffix ("csv");
+    xmlDialog->setDefaultSuffix ("xml");
     if (isExport)
     {
         xmlDialog->setFileMode (QFileDialog::AnyFile);
@@ -125,6 +125,7 @@ void KKSXMLForm :: uploadFile (void)
         if (!files.isEmpty())
             fName = files[0];
     }
+    qDebug () << __PRETTY_FUNCTION__ << fName;
 
     xmlDialog->setParent (0);
     delete xmlDialog;
@@ -138,7 +139,7 @@ void KKSXMLForm :: uploadFile (void)
     {
         this->xmlParse ();
     }
-    readDataFile ();
+    //readDataFile ();
 
 }
 /*
@@ -203,10 +204,13 @@ void KKSXMLForm :: xmlParse (void)
         if (!xmlStreamR->error())
         {
             xmlStreamW->writeCurrentToken (*xmlStreamR);
-            qDebug () << __PRETTY_FUNCTION__ << tType;// << xmlStreamR.name().toString() << xmlStreamR.text ().toString();
+            qDebug () << __PRETTY_FUNCTION__ << tType << xmlStreamR->name().toString() << xmlStreamR->text ().toString();
             if (xmlStreamR->isDTD())
                 readNotation (xmlStreamR->entityDeclarations ());
-            else if (xmlStreamR->isStartElement () && xmlStreamR->name ().toString().compare ("Categories", Qt::CaseInsensitive) == 0)
+            else if (xmlStreamR->isStartElement () &&
+                    ((xmlStreamR->name ().toString().compare ("document", Qt::CaseInsensitive) == 0) ||
+                    (xmlStreamR->name().toString().compare("header", Qt::CaseInsensitive) == 0))
+                    )
                 continue;
             else if (xmlStreamR->isStartElement () && xmlStreamR->name ().toString().compare ("category",  Qt::CaseInsensitive) == 0)
             {
@@ -221,10 +225,15 @@ void KKSXMLForm :: xmlParse (void)
                 else if (pCat)
                 {
                     c->setTableCategory (pCat);
-                    qDebug () << __PRETTY_FUNCTION__ << pCat->attributes().count();
+                    //qDebug () << __PRETTY_FUNCTION__ << pCat->attributes().count();
                 }
                 if (pCat)
                     pCat->release ();
+            }
+            else if (xmlStreamR->isStartElement() && xmlStreamR->name().toString().compare ("body", Qt::CaseInsensitive) == 0)
+            {
+                qDebug () << __PRETTY_FUNCTION__ << "body";
+                this->readData (xmlStreamR);
             }
 //            else if (xmlStreamR->isStartElement () && xmlStreamR->name ().toString().compare ("Attributes", Qt::CaseInsensitive) == 0)
 //                readAttributes (xmlStreamR, attrFields);
@@ -677,4 +686,9 @@ void KKSXMLForm :: setFieldDelim (const QString& text)
 void KKSXMLForm :: setTextDelim (const QString& text)
 {
     textDelim = text;
+}
+
+void KKSXMLForm :: readData (QXmlStreamReader* reader)
+{
+    qDebug () << __PRETTY_FUNCTION__;
 }

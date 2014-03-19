@@ -4910,7 +4910,7 @@ void KKSObjEditorFactory :: importEIO (KKSObjEditor * editor, int idObject, cons
         cAttrId->release ();
         c0->release ();
     }
-    connect (xmlForm, SIGNAL (loadAttributes (KKSCategory *, const QStringList&)), this, SLOT (importCatAttrs (KKSCategory *, const QStringList&)) );
+    //connect (xmlForm, SIGNAL (loadAttributes (KKSCategory *, const QStringList&)), this, SLOT (importCatAttrs (KKSCategory *, const QStringList&)) );
     connect (xmlForm, SIGNAL (loadCSV (QIODevice *, QString, QString, QString, QAbstractItemModel *, KKSXMLForm *)), this, SLOT (importCSV (QIODevice *, QString, QString, QString, QAbstractItemModel *, KKSXMLForm *)) );
 
     if (xmlForm->exec () == QDialog::Accepted)
@@ -5593,8 +5593,9 @@ int KKSObjEditorFactory :: exportHeader (QIODevice *xmlDev, // XML-פאיכ, סמהונזא
 #endif
 */
     xmlWriter->writeStartDocument ();
-    QString dtd = QString ("\n<!DOCTYPE Categories [");
+    QString dtd = QString ("\n<!DOCTYPE Reference [");
     dtd += QString("\n <!ENTITY Charset '%1'> \n <!ENTITY field_delimiter '%2'> \n <!ENTITY text_delimiter '%3'> \n ").arg (codeName).arg (fDelim).arg (tDelim);
+    dtd += QString("\n <!ELEMENT Reference ()> \n <!ELEMENT header \"\">");
     dtd += QString("\n <!ELEMENT category (cname, ccode, ctype, cdescription, cis_main, id_child?, attributes)>");
     dtd += QString("\n <!ATTLIST category id ID #REQUIRED>");
     dtd += QString("\n <!ELEMENT cname (#PCDATA)>");
@@ -5610,7 +5611,7 @@ int KKSObjEditorFactory :: exportHeader (QIODevice *xmlDev, // XML-פאיכ, סמהונזא
     xmlWriter->writeDTD (dtd);
     QString namespaceUri;
 
-    xmlWriter->writeStartElement (namespaceUri, QString("document"));
+    xmlWriter->writeStartElement (namespaceUri, QString("Reference"));
     xmlWriter->writeCharacters (QString("\n"));
     xmlWriter->writeStartElement (namespaceUri, QString("header"));
     xmlWriter->writeCharacters (QString("\n"));
@@ -5636,7 +5637,7 @@ int KKSObjEditorFactory :: exportHeader (QIODevice *xmlDev, // XML-פאיכ, סמהונזא
         return ERROR_CODE;
     
     //
-    // Document
+    // Reference
     //
     xmlWriter->writeEndElement ();
     xmlWriter->writeEndDocument ();
@@ -6021,6 +6022,7 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // צוכוגמי CSV פאיכ
             if (j < c->attributes().count())
                 oeStream << fDelim;
         }
+        fstr.replace ("\\", "\\\\");
         csvFile.writeCharacters(fstr);
         //csvFile << fstr << '\n';
     }

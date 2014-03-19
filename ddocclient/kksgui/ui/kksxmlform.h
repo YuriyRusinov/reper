@@ -95,6 +95,7 @@ private:
     void readDataFile (void);
     KKSCategory * readCategory (QXmlStreamReader* reader);
     void readAttribute (QXmlStreamReader* reader, KKSCategory * cat);
+    void readData (QXmlStreamReader* reader);
 
 private:
     //
