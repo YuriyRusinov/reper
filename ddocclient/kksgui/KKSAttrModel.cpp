@@ -176,6 +176,19 @@ bool KKSAttrModel::setData (const QModelIndex& index, const QVariant& value, int
         emit dataChanged (this->index(irow, 0), this->index(nr, 4));
         return true;
     }
+    else if (role == Qt::UserRole+2 && attr)
+    {
+        KKSAttribute * attrNew = value.value<KKSAttribute *>();
+        if (!attrNew)
+            return false;
+        if (attr && attr != attrNew)
+            attr->release ();
+        attr = attrNew;
+        int irow = 0;
+        int nr = rowCount();
+        emit dataChanged (this->index(irow, 0), this->index(nr, 4));
+        return true;
+    }
     return false;
 }
 

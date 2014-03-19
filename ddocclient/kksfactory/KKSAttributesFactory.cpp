@@ -2890,7 +2890,9 @@ void KKSAttributesFactory :: addComplexAttr (KKSAttribute *a, QAbstractItemModel
     }
     catAttr = catAttr->tableCategory();
     
-    //перечисляем типы атрибутов, которые НЕ могут входить в составной атрибут
+    //
+    // перечисляем типы атрибутов, которые НЕ могут входить в составной атрибут
+    //
     QStringList filtValues;
     filtValues << QString::number(KKSAttrType::atParent);
     filtValues << QString::number(KKSAttrType::atCheckListEx);
@@ -2926,13 +2928,21 @@ void KKSAttributesFactory :: addComplexAttr (KKSAttribute *a, QAbstractItemModel
         attrModel->insertRows(nr, nAttrs);
         for (int i=0; i<nAttrs; i++)
         {
+            //QModelIndex aInd = attrModel->index (nr+i, 0);
             KKSAttribute * attr = loader->loadAttribute(attrsId[i]);
             KKSCategoryAttr * cAttr = KKSCategoryAttr::create(attr,false,false);
             int a_key = KKSCategoryAttr::getDefIdRow();
+            while (cAttrList.contains(a_key))
+                a_key--;
             cAttrList.insert(a_key, cAttr);
             KKSCategoryAttr::decDefIdRow();
+            const KKSAttribute * m_a = (attrModel->data (QModelIndex(), Qt::UserRole+2).value<const KKSAttribute *>());
+            qDebug () << __PRETTY_FUNCTION__ << attrModel->rowCount() << attrModel->columnCount() << m_a << a;
+            //attrModel->setData (aInd, a_key, Qt::UserRole);
+            //attrModel->setData (aInd, attr->name(), Qt::DisplayRole);
         }
         a->setAttrs(cAttrList);
+        attrModel->setData (QModelIndex(), (QVariant::fromValue<KKSAttribute *>(a)), Qt::UserRole+2);
     }
     refAttrs->release();
 }
