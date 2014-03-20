@@ -235,7 +235,7 @@ void KKSMainWindow::updateMenus()
 
         QAction *action  = ui->aWindowMenu->addAction(text);
         action->setCheckable(true);
-        action ->setChecked(child == activeKKSSubWindow());
+        action->setChecked(child == activeKKSSubWindow());
         action->setData((int)winId);
         action->setIcon(childIcon);
         action->setText(text);

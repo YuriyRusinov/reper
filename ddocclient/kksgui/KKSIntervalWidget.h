@@ -65,6 +65,7 @@ class _GUI_EXPORT KKSIntervalWidget : public QWidget, public KKSAttrWidget
 
     public slots:
         void setValue (void);
+        void setValue (const QString & str);
         void setValue(const IntervalValue & v);
         void setUnit (int index);
 

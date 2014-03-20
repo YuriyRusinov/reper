@@ -2195,8 +2195,6 @@ void KKSObjEditor :: setAttrView (void)
 
 void KKSObjEditor :: closeEvent (QCloseEvent * event)
 {
-    emit aboutToClose(this);
-
     if (isChanged)
     {
         QMessageBox::StandardButton res = QMessageBox::question (this, tr ("Object editor"), tr("Information object was changed.\n Do you want to save ?"), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Cancel);
@@ -2205,13 +2203,20 @@ void KKSObjEditor :: closeEvent (QCloseEvent * event)
             event->ignore ();
             return;
         }
-        else if (res == QMessageBox::Yes)
+		else if (res == QMessageBox::Yes){
             save ();
-        event->accept ();
+		}	
     }
-    else
-        QWidget::closeEvent (event);
+	//else{
+	//	emit aboutToClose(this);
+    //    QWidget::closeEvent (event);
+	//}
     
+	emit aboutToClose(this);
+
+    event->accept ();
+    QWidget::closeEvent (event);
+
     emit closeEditor ();
 }
 

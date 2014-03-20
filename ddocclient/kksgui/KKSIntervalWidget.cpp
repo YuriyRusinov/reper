@@ -33,7 +33,8 @@ void KKSIntervalWidget :: setLineEdit (QLineEdit *le)
         lEValue = le;
         hBLay->insertWidget (0, lEValue);//, 0, Qt::AlignLeft);
         lEValue->setParent (this);
-        connect (lEValue, SIGNAL (editingFinished()), this, SLOT (setValue()) );
+        //connect (lEValue, SIGNAL (editingFinished()), this, SLOT (setValue()) );
+        connect (lEValue, SIGNAL (textEdited(const QString&)), this, SLOT (setValue(const QString &)) );
     }
 }
 
@@ -61,6 +62,14 @@ void KKSIntervalWidget :: setValue (void)
     QVariant val (str);
     emit valueChanged(m_av->id(), m_isSystem, val);
 }
+
+void KKSIntervalWidget :: setValue (const QString & str)
+{
+    QString string = QString ("%1 %2").arg (str).arg (cbUnit->currentText ());
+    QVariant val (string);
+    emit valueChanged(m_av->id(), m_isSystem, val);
+}
+
 
 void KKSIntervalWidget :: setUnit (int index)
 {
