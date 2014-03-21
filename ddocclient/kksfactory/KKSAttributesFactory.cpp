@@ -2936,8 +2936,8 @@ void KKSAttributesFactory :: addComplexAttr (KKSAttribute *a, QAbstractItemModel
                 a_key--;
             cAttrList.insert(a_key, cAttr);
             KKSCategoryAttr::decDefIdRow();
-            const KKSAttribute * m_a = (attrModel->data (QModelIndex(), Qt::UserRole+2).value<const KKSAttribute *>());
-            qDebug () << __PRETTY_FUNCTION__ << attrModel->rowCount() << attrModel->columnCount() << m_a << a;
+            //const KKSAttribute * m_a = (attrModel->data (QModelIndex(), Qt::UserRole+2).value<const KKSAttribute *>());
+            //qDebug () << __PRETTY_FUNCTION__ << attrModel->rowCount() << attrModel->columnCount() << m_a << a;
             //attrModel->setData (aInd, a_key, Qt::UserRole);
             //attrModel->setData (aInd, attr->name(), Qt::DisplayRole);
         }
