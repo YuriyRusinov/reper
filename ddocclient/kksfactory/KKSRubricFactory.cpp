@@ -348,7 +348,7 @@ KKSIncludesWidget * KKSRubricFactory::createRubricRecEditor (KKSRubric * rootRub
 
 void KKSRubricFactory::saveRubric(KKSRubric * rootR, bool isMyDocs)
 {
-    qDebug () << __PRETTY_FUNCTION__ << rootR->childNumber() << rootR->rubrics().count();
+    //qDebug () << __PRETTY_FUNCTION__ << rootR->childNumber() << rootR->rubrics().count();
     int res = ppf->updateRubricators(rootR, isMyDocs);
 
     KKSIncludesWidget *wParent = qobject_cast<KKSIncludesWidget *>(this->sender());

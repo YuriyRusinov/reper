@@ -2,7 +2,7 @@ create or replace function isSysRubricatorUpdate () returns trigger as
 $BODY$
 declare
 begin
-    if (new.id = 1) then
+    if (new.id = 1 and (new.name <> old.name or new.code <> old.code)) then
         raise warning 'Cannot update root rubricator';
         return NULL;
     end if;
