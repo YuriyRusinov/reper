@@ -359,7 +359,8 @@ void KKSRubricFactory::saveRubric(KKSRubric * rootR, bool isMyDocs)
         wParent->setSaved(true);
 }
 
-void KKSRubricFactory::rubricItemCreate(const KKSRubric * r, QAbstractItemModel * itemModel, const QModelIndex& parent) {
+void KKSRubricFactory::rubricItemCreate(const KKSRubric * r, QAbstractItemModel * itemModel, const QModelIndex& parent)
+{
     KKSIncludesWidget *editor = qobject_cast<KKSIncludesWidget *>(this->sender());
     if (!editor)
         return;
@@ -1182,6 +1183,7 @@ void KKSRubricFactory::appendRubricItem(QAbstractItemModel * attachModel, const 
         QModelIndex wIndex = attachModel->index(cnt + i, 0);
         KKSObject * io = loader->loadIO(p.key());
         attachModel->setData(wIndex, QVariant::fromValue<KKSEIOData *>(p.value()), Qt::UserRole + 1);
+        attachModel->setData(wIndex, p.key(), Qt::UserRole);
         if (io && !io->icon().isNull())
             attachModel->setData(wIndex, io->icon(), Qt::DecorationRole);
         else
@@ -1191,7 +1193,8 @@ void KKSRubricFactory::appendRubricItem(QAbstractItemModel * attachModel, const 
     refIO->release();
 }
 
-void KKSRubricFactory::rubricItemCreated(KKSObjectExemplar * rec) {
+void KKSRubricFactory::rubricItemCreated(KKSObjectExemplar * rec)
+{
     KKSRubric * r = ioRubrs.value(rec);
     QAbstractItemModel * attachModel = ioModels.value(rec);
     QModelIndex pInd = ioParents.value(rec);
