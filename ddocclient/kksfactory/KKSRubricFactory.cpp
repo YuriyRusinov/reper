@@ -1211,7 +1211,8 @@ void KKSRubricFactory::rubricItemCreated(KKSObjectExemplar * rec)
         wObj->release();
 }
 
-void KKSRubricFactory::objEditorClosed() {
+void KKSRubricFactory::objEditorClosed()
+{
     KKSObjEditor * objEditor = qobject_cast<KKSObjEditor *>(this->sender());
     if (!objEditor)
         return;
@@ -1224,7 +1225,7 @@ void KKSRubricFactory::objEditorClosed() {
     int modres = ioModels.remove(rec);
     int pres = ioParents.remove(rec);
     int wres = includesW.remove(rec);
-    qDebug() << __PRETTY_FUNCTION__ << rubrres << modres << pres << wres;
+    //qDebug() << __PRETTY_FUNCTION__ << rubrres << modres << pres << wres;
 }
 
 void KKSRubricFactory::setSyncSettings(const QList<int>& ioIDList) {
