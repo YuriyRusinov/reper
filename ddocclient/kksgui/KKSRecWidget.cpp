@@ -125,6 +125,28 @@ qint64 KKSRecWidget :: getID (void) const
     return wIndex.data (Qt::UserRole).toLongLong ();
 }
 
+QList<qint64> KKSRecWidget :: getIDList (void) const
+{
+    if (!tView || !tView->model() || !tView->selectionModel())
+        return QList<qint64>();
+
+    QItemSelectionModel *selModel = tView->selectionModel ();
+    QModelIndexList sIndexes = selModel->selectedIndexes();
+    if (sIndexes.isEmpty())
+        return QList<qint64>();
+    
+    QList<qint64> sList;
+    int n = sIndexes.count();
+    for (int i=0; i<n; i++)
+    {
+        QModelIndex wInd = sIndexes.at(i);
+        qint64 id = wInd.data (Qt::UserRole).toLongLong ();
+        if (!sList.contains(id))
+            sList.append (id);
+    }
+    return sList;
+}
+
 void KKSRecWidget :: tvDoubleClicked(const QModelIndex & index)
 {
     if (!index.isValid())

@@ -25,6 +25,7 @@ public:
     virtual ~KKSRecDialog();
     
     virtual qint64 getID (void) const;
+    virtual QList<qint64> getIDList (void) const;
 
     KKSRecWidget* getRecordsWidget (void) const;
     void setRecordsWidget (KKSRecWidget *rw);

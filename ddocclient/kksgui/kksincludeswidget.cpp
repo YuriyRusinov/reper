@@ -950,7 +950,7 @@ void KKSIncludesWidget :: createRubricItem (QAbstractItemModel * itemModel, cons
         this->addRubricItem();
         return;
     }
-    qDebug () << __PRETTY_FUNCTION__ << itemModel << parent;
+    //qDebug () << __PRETTY_FUNCTION__ << itemModel << parent;
     QItemSelectionModel * sm (twIncludes->selectionModel());
 
 //    sm = twIncludes->selectionModel();

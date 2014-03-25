@@ -41,6 +41,7 @@ public:
     ~KKSRecWidget (void);
 
     qint64 getID (void) const;
+    QList<qint64> getIDList (void) const;
 
     void setEIOModel (QAbstractItemModel *model);
     QAbstractItemModel *getModel (void) const;

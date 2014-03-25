@@ -32,6 +32,11 @@ qint64 KKSRecDialog::getID (void) const
     return recW->getID();
 }
 
+QList<qint64> KKSRecDialog::getIDList (void) const
+{
+    return recW->getIDList();
+}
+
 KKSRecWidget* KKSRecDialog::getRecordsWidget (void) const
 {
     return recW;
