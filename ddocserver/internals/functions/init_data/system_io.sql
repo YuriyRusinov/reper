@@ -788,7 +788,7 @@ update io_categories set is_completed = 1;
 
 --атрибуты "дочерних категорий"
 --ВАЖНО!!! Для атрибутов ссылочных здесь не устанавливается тип атрибута, на который они ссылаются. Это делается отдельной операцией в конце данного скрипта
-insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-1', 1, 8, 'id', 'Идентификатор', 'ИД', NULL, NULL, 50, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-1', 1, 30, 'id', 'Идентификатор', 'ИД', NULL, NULL, 50, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-2', 2, 9, 'name', 'Название', 'Название', NULL, NULL, 300, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-3', 3, 9, 'description', 'Описание', 'Описание', NULL, NULL, 100, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-4', 4, 2, 'id_a_view', 'Визуальный элемент управления', 'Виджет', 'a_views', 'name', 200, TRUE);

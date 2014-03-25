@@ -28,6 +28,8 @@
 
 \i ./functions/jms_messages/readd_jms_messages.sql
 
+\i ./functions/xml_exchange/readd_xml_exchange.sql
+
 --\i ./functions/commands/readd_commands.sql
 
 --invoked in initmodules

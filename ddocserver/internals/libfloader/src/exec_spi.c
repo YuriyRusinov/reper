@@ -4,9 +4,9 @@
  * This is required for builds against pgsql 8.2
  */
 /*#include "pgmagic.h"*/
-//#ifdef PG_MODULE_MAGIC
-//PG_MODULE_MAGIC;
-//#endif
+#ifdef PG_MODULE_MAGIC
+PG_MODULE_MAGIC;
+#endif
 
 PG_FUNCTION_INFO_V1(exec_spi);
 
