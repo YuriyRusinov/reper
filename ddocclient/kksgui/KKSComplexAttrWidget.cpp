@@ -1,3 +1,4 @@
+#include <QAbstractItemView>
 #include <QMessageBox>
 #include <QtDebug>
 #include <QLayout>

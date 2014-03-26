@@ -674,3 +674,13 @@ void KKSRecWidget :: setToolBarActionEnabled (QAction * act, bool isEnabled)
         return;
     act->setEnabled (isEnabled);
 }
+
+QAbstractItemView::SelectionMode KKSRecWidget :: selectionMode (void) const
+{
+    return this->tView->selectionMode();
+}
+
+void KKSRecWidget :: setSelectionMode ( QAbstractItemView::SelectionMode mode )
+{
+    tView->setSelectionMode(mode);
+}

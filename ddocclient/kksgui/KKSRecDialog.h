@@ -10,6 +10,7 @@
 
 #include <QDialog>
 #include <QIcon>
+#include <QAbstractItemView>
 
 #include "kksgui_config.h"
 
@@ -29,6 +30,9 @@ public:
 
     KKSRecWidget* getRecordsWidget (void) const;
     void setRecordsWidget (KKSRecWidget *rw);
+
+    QAbstractItemView::SelectionMode selectionMode (void) const;
+    void setSelectionMode ( QAbstractItemView::SelectionMode mode );
 
     const QIcon & icon() const;
 

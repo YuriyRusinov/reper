@@ -487,6 +487,9 @@ void KKSRubricFactory::rubricItemUpload(const KKSRubric *r, bool forRecords, QAb
             editor,
             Qt::Dialog);
 
+    if (forRecords)
+        objEditor->setSelectionMode(QAbstractItemView::SingleSelection);
+
     int res = objEditor->exec();
 
     int idObject = -1;
@@ -537,6 +540,24 @@ void KKSRubricFactory::rubricItemUpload(const KKSRubric *r, bool forRecords, QAb
                     return;
                 }
                 c = c->tableCategory();
+                if (itemModel->rowCount() > 0)
+                {
+                    int n = itemModel->rowCount();
+                    for (int i=0; i<n; i++)
+                    {
+                        QModelIndex wInd = itemModel->index (i, 0);
+                        qint64 idObject = wInd.data (Qt::UserRole).toLongLong();
+                        KKSFilter * f = c->createFilter(1, QString::number (idObject), KKSFilter::foNotEq);
+                        filters.append (f);
+                    }
+                }
+
+                if(filters.count() > 0){
+                    KKSFilterGroup * group = new KKSFilterGroup(true);
+                    group->setFilters(filters);
+                    filterGroups.append(group);
+                    group->release();
+                }
                 KKSRecDialog *recEditor = oef->createObjRecEditor(IO_IO_ID,
                         idObject,
                         filterGroups,
@@ -559,37 +580,43 @@ void KKSRubricFactory::rubricItemUpload(const KKSRubric *r, bool forRecords, QAb
                     o->release();
                     return;
                 }
-                int idRec = recEditor->getID();
-                KKSObjectExemplar * ioRec = loader->loadEIO(idRec, o);
-                if (!ioRec)
+                QList<qint64> idRecList = recEditor->getIDList();
+                int nr = idRecList.count();
+                for (int i=0; i<nr; i++)
                 {
-                    qCritical() << tr("Cannot load record %1").arg(idRec);
-                    QMessageBox::critical (editor, tr("Add new item"), tr("Cannot load record %1").arg(idRec), QMessageBox::Ok);
-                    recEditor->setParent (0);
-                    delete recEditor;
-                    objEditor->setParent (0);
-                    delete objEditor;
-                    o->release();
-                    return;
+                    int idRec = idRecList[i];
+                    KKSObjectExemplar * ioRec = loader->loadEIO(idRec, o);
+                    if (!ioRec)
+                    {
+                        qCritical() << tr("Cannot load record %1").arg(idRec);
+                        QMessageBox::critical (editor, tr("Add new item"), tr("Cannot load record %1").arg(idRec), QMessageBox::Ok);
+                        recEditor->setParent (0);
+                        delete recEditor;
+                        objEditor->setParent (0);
+                        delete objEditor;
+                        o->release();
+                        return;
+                    }
+                    QString rubrItemName = ioRec->name();
+                    KKSRubricItem * item = new KKSRubricItem(idRec, rubrItemName, false);
+                    (const_cast<KKSRubric *> (r))->addItem(item);
+                    item->release();
+                    int nr = itemModel->rowCount();
+                    bool isIns = itemModel->insertRows (nr, 1);
+                    QModelIndex rIndex = itemModel->index (nr, 0);
+                    KKSEIOData * itemInfo = loader->loadEIOInfo(o->id(), idRec);
+                    bool isRubrSet = itemModel->setData (rIndex, QVariant::fromValue<KKSEIOData*>(itemInfo), Qt::UserRole+1);
+                    itemModel->setData (rIndex, KKSRubricItem::icon(), Qt::DecorationRole);
+                    qDebug () << __PRETTY_FUNCTION__ << isIns << isRubrSet << r->items().count();
+                    //this->appendRubricItem(itemModel, item);
+                    editor->setSaved(false);
+                    editor->slotAddRubricItem(idRec, o->name());
+                    ioRec->release();
                 }
-                QString rubrItemName = ioRec->name();
-                KKSRubricItem * item = new KKSRubricItem(idRec, rubrItemName, false);
-                (const_cast<KKSRubric *> (r))->addItem(item);
-                item->release();
-                int nr = itemModel->rowCount();
-                bool isIns = itemModel->insertRows (nr, 1);
-                QModelIndex rIndex = itemModel->index (nr, 0);
-                KKSEIOData * itemInfo = loader->loadEIOInfo(o->id(), idRec);
-                bool isRubrSet = itemModel->setData (rIndex, QVariant::fromValue<KKSEIOData*>(itemInfo), Qt::UserRole+1);
-                qDebug () << __PRETTY_FUNCTION__ << isIns << isRubrSet << r->items().count();
-                //this->appendRubricItem(itemModel, item);
-                editor->setSaved(false);
-                editor->slotAddRubricItem(idRec, o->name());
                 recEditor->setParent (0);
                 delete recEditor;
                 objEditor->setParent(0);
                 delete objEditor;
-                ioRec->release();
                 o->release();
                 return;
             }
@@ -1240,6 +1267,10 @@ void KKSRubricFactory::objEditorClosed()
     int modres = ioModels.remove(rec);
     int pres = ioParents.remove(rec);
     int wres = includesW.remove(rec);
+    Q_UNUSED (rubrres);
+    Q_UNUSED (modres);
+    Q_UNUSED (pres);
+    Q_UNUSED (wres);
     //qDebug() << __PRETTY_FUNCTION__ << rubrres << modres << pres << wres;
 }
 

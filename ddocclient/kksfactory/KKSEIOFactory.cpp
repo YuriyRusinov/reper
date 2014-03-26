@@ -1600,7 +1600,7 @@ int KKSEIOFactory::updateRubric(KKSRubric * r) const
     int idRubric = r->id();
     
     QString icon = r->iconAsString();
-    QString sql = QString("select * from recUpdateRubricLocal (%1, '%2', '%3', %4);")
+    QString sql = QString("select * from recUpdateRubricLocal (%1, '%2', '%3', %4, NULL);")
                           .arg(r->id())
                           .arg (r->name())
                           .arg (r->desc())

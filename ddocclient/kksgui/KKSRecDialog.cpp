@@ -37,6 +37,17 @@ QList<qint64> KKSRecDialog::getIDList (void) const
     return recW->getIDList();
 }
 
+QAbstractItemView::SelectionMode KKSRecDialog::selectionMode (void) const
+{
+    return recW->selectionMode();
+}
+
+void KKSRecDialog::setSelectionMode ( QAbstractItemView::SelectionMode mode )
+{
+    recW->setSelectionMode(mode);
+}
+
+
 KKSRecWidget* KKSRecDialog::getRecordsWidget (void) const
 {
     return recW;

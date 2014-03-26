@@ -13,6 +13,7 @@
 #include <QWidget>
 #include <QModelIndex>
 #include <QItemSelection>
+#include <QAbstractItemView>
 
 #include "kksgui_config.h"
 
@@ -55,6 +56,8 @@ public:
     QToolBar * getToolBar (void) const;
     QAbstractItemDelegate * getItemDelegate () const;
     void setItemDelegate (QAbstractItemDelegate * deleg);
+    QAbstractItemView::SelectionMode selectionMode (void) const;
+    void setSelectionMode ( QAbstractItemView::SelectionMode mode );
 
     void resizeSections (const QList<int>& hAttrWidths);
     void hideAllButtons (void);
