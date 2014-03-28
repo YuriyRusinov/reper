@@ -547,7 +547,7 @@ void KKSRubricFactory::rubricItemUpload(const KKSRubric *r, bool forRecords, QAb
                     {
                         QModelIndex wInd = itemModel->index (i, 0);
                         qint64 idObject = wInd.data (Qt::UserRole).toLongLong();
-                        qDebug () << __PRETTY_FUNCTION__ << idObject;
+                        //qDebug () << __PRETTY_FUNCTION__ << idObject;
                         KKSFilter * f = c->createFilter(ATTR_ID, QString::number (idObject), KKSFilter::foNotEq);
                         filters.append (f);
                         f->release ();

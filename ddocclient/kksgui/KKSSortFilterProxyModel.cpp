@@ -63,6 +63,7 @@ bool KKSSortFilterProxyModel :: lessThan (const QModelIndex & left, const QModel
     {
         case KKSAttrType::atString: return leftData.toString() < rightData.toString();
         case KKSAttrType::atInt: return leftData.toInt() < rightData.toInt();
+        case KKSAttrType::atInt64: return leftData.toLongLong() < rightData.toLongLong();
         case KKSAttrType::atDouble: return leftData.toDouble() < rightData.toDouble();
         case KKSAttrType::atBool: return leftData.toBool() < rightData.toBool();
         case KKSAttrType::atDate: 
