@@ -343,8 +343,47 @@ begin
 end
 $BODY$
 language 'plpgsql';
-/*
-create or replace function asString(geometry, boolean) returns varchar as'
+
+create or replace function asString(xml, boolean) returns varchar as
+$BODY$
+declare
+    num alias for $1;
+    need_quote alias for $2;
+begin
+    if(num isnull) then
+	return 'NULL';
+    end if;
+    
+    if(need_quote = true) then
+        return quote_literal(num::varchar);
+    end if;
+
+    return num::varchar;
+end
+$BODY$
+language 'plpgsql';
+
+create or replace function asString(bytea, boolean) returns varchar as
+$BODY$
+declare
+    num alias for $1;
+    need_quote alias for $2;
+begin
+    if(num isnull) then
+	return 'NULL';
+    end if;
+    
+    if(need_quote = true) then
+        return quote_literal(num::varchar);
+    end if;
+
+    return num::varchar;
+end
+$BODY$
+language 'plpgsql';
+
+create or replace function asString(geometry, boolean) returns varchar as
+$BODY$
 declare
     num alias for $1;
     need_quote alias for $2;
@@ -362,8 +401,9 @@ begin
 
     return sGeom;
 end
-'language 'plpgsql';
-*/
+$BODY$
+language 'plpgsql';
+
 
 create or replace function asString(BIT, boolean) returns varchar as
 $BODY$

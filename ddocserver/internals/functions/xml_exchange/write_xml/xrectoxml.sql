@@ -48,14 +48,16 @@ begin
     
     xml_str := xml_str || E'<category_description>\n';
     xml_str := xml_str || xCategoryToXML(idChild, 'table_category');
+    
     if(idChild2 is not null) then
         xml_str := xml_str || xCategoryToXML(idChild2, 'table_indicators_category');
     end if;
+
     xml_str := xml_str || E'</category_description>\n';
 
     xml_str = xml_str || xRefQualifierToXML(idObject, ioUUID, ioUniqueId);
 
-    xml_str := xml_str || xRecAttrsValuesToXML(idChild, ioTableName, idRecord);
+    xml_str := xml_str || xRecAttrsValuesToXML(idObject, idChild, ioTableName, idRecord);
 
     xml_str := xml_str || E'</inf_resource>\n';
 

@@ -54,7 +54,7 @@ begin
             mainAttr := 'id_' || tableName;
             childAttr := 'id_' || r.table_name;
 
-            attrs_code:= '( select getExValuesId (' || id_copy || ',' || quote_literal (refTable) || ',' || quote_literal (mainAttr) || ',' || quote_literal (childAttr) || '))';
+            attrs_code := '( select getExValuesId (' || id_copy || ',' || quote_literal (refTable) || ',' || quote_literal (mainAttr) || ',' || quote_literal (childAttr) || '))';
             raise notice '%', attrs_code;
         else
             attrs_code = r.code;

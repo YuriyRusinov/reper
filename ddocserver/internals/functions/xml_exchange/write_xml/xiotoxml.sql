@@ -61,8 +61,6 @@ begin
 
     xml_str := xml_str || E'</inf_resource>\n';
 
-    --raise exception '%', xml_str;
-
     return xml_str;
 end
 $BODY$

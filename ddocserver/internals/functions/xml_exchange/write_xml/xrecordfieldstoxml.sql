@@ -1,27 +1,49 @@
-create or replace function xRecordFieldsToXML(varchar, varchar, timestamp, varchar[], varchar[]) returns varchar as
+create or replace function xRecordFieldsToXML(int4, int8, varchar, varchar, timestamp, int4[], varchar[], varchar[], int4[], varchar[]) returns varchar as
 $BODY$
 declare
-    rUUID alias for $1;
-    rUniqueId alias for $2;
-    rLastUpdate alias for $3;
-    rFields alias for $4;
-    rFieldValues alias for $5;
+    idMainObject alias for $1;
+    idMainRecord alias for $2;
+    rUUID alias for $3;
+    rUniqueId alias for $4;
+    rLastUpdate alias for $5;
+    rIds alias for $6;
+    rFields alias for $7;
+    rRefTables alias for $8;
+    rTypes alias for $9;
+    rFieldValues alias for $10;
 
+    iCount int4;
     fCount int4;
+    tCount int4;
+    ttCount int4;
     vCount int4;
+    
     i int4;
 
     xml_str varchar;
 
+    rId int4;
     rField varchar;
+    rRefTable varchar;
+    rType int4;
     rFieldValue varchar;
+
 begin
 
+    iCount = array_upper (rIds, 1);
     fCount = array_upper (rFields, 1);
+    tCount = array_upper (rRefTables, 1);
+    ttCount = array_upper (rTypes, 1);
     vCount = array_upper (rFieldValues, 1);
 
-    if ( fCount <> vCount or rUUID isnull or rUniqueId isnull ) then
-        raise exception 'incorrect dimensions';
+    if(iCount isnull or fCount isnull or tCount isnull or ttCount isnull or vCount isnull) then
+        raise exception 'There are no any attributes!';
+        return NULL;
+    end if;
+    
+
+    if ( iCount <> fCount or fCount <> vCount or vCount <> tCount or tCount <> ttCount or rUUID isnull or rUniqueId isnull ) then
+        raise exception E'incorrect dimensions: \niCount = %\nfCount = %\ntCount = %\nttCount = %\nvCount = %', iCount, fCount, tCount, ttCount, vCount;
         return NULL;
     end if;
 
@@ -36,14 +58,13 @@ begin
 
     for i in 1..fCount 
     loop
+        rId = rIds[i];
         rField = rFields[i];
+        rRefTable = rRefTables[i];
+        rType = rTypes[i];
         rFieldValue = rFieldValues[i];
-        if(rFieldValue is not null) then
-            xml_str := xml_str || E'<' || xAttCodeToTag(rField) || E'> <![CDATA[ ' || rFieldValue || E' ]]> </' || xAttCodeToTag(rField) || E'>\n';
-        else
-            xml_str := xml_str || E'<' || xAttCodeToTag(rField) || E'>  </' || xAttCodeToTag(rField) || E'>\n';
-        end if;
 
+        xml_str := xml_str || xAttrValueToXML(idMainObject, idMainRecord, rId, rField, rRefTable, rType, rFieldValue, false);
     end loop;
 
     xml_str = xml_str || E'</attr_values>\n';

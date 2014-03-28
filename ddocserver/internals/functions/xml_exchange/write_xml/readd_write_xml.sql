@@ -7,6 +7,10 @@
 \i ./functions/xml_exchange/write_xml/xrectoxml.sql
 \i ./functions/xml_exchange/write_xml/xmultirectoxml.sql
 
+\i ./functions/xml_exchange/write_xml/xgetrecordfields.sql
+
+\i ./functions/xml_exchange/write_xml/xattrvaluetoxml.sql
+
 \i ./functions/xml_exchange/write_xml/xioattrsvaluestoxml.sql
 \i ./functions/xml_exchange/write_xml/xiosysattributestoxml.sql
 \i ./functions/xml_exchange/write_xml/xreadiofiles.sql

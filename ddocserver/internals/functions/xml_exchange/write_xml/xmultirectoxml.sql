@@ -13,13 +13,15 @@ declare
 
     xml_str varchar;
     r record;
+    cnt int4;
 begin
     if (idObject is null or idObject <= 0 or idRecords isnull) then
-        return null;
+        return '';
     end if;
 
-    if(array_upper(idRecords, 1) = 0) then
-        return null;
+    cnt = array_upper(idRecords, 1);
+    if(cnt isnull or cnt <= 0) then
+        return '';
     end if;
     
     for r in 

@@ -1,3 +1,4 @@
+
 create or replace function xIORecordsToXML(int4, int8[]) returns varchar as
 $BODY$
 declare
@@ -12,8 +13,9 @@ declare
     q varchar;
     qResult record;
 
-    rFields varchar[];
+    rFieldsData h_x_get_record_fields;
     rFieldsValues varchar[];
+
     xmlRecord varchar;
     i int4;
     idCategory int4;
@@ -44,11 +46,11 @@ begin
     --    rCount = array_upper (idRecords, 1);
     --end if;
 
-    rFields = xGetRecordFields(idCategory);
+    rFieldsData = xGetRecordFields(idCategory);
 
     i = 0;
 
-    q = xGenerateSelectRecordsQuery(idCategory, tableName, idRecords);
+    q = xGenerateSelectRecordsQuery(idObject, idCategory, tableName, idRecords);
     for qResult in execute q
     loop
         i = i + 1;
@@ -56,7 +58,17 @@ begin
         rFieldsValues = string_to_array(qResult.fields, '~^^^~');
         xml_str = xml_str || E'<record number = "' || i || E'">\n';
         
-        xmlRecord = xRecordFieldsToXML(qResult.uuid_t::varchar, qResult.unique_id, qResult.last_update, rFields, rFieldsValues);
+        xmlRecord = xRecordFieldsToXML(idObject, 
+                                       qResult.id, 
+                                       qResult.uuid_t::varchar, 
+                                       qResult.unique_id, 
+                                       qResult.last_update, 
+                                       rFieldsData.r_ids,
+                                       rFieldsData.r_fields, 
+                                       rFieldsData.r_ref_tables,
+                                       rFieldsData.r_types,
+                                       rFieldsValues);
+
         xml_str = xml_str || xmlRecord;
 
         xml_str = xml_str || xRecordIndicatorsToXML(qResult.id);
@@ -75,67 +87,26 @@ end
 $BODY$
 language 'plpgsql';
 
-create or replace function xGenerateSelectFieldsQuery(int4) returns varchar as
+
+create or replace function xGenerateSelectRecordsQuery(int4, int4, varchar, int8[]) returns varchar as
 $BODY$
 declare
-    idCategory alias for $1;
-    q varchar;
-begin
-
-    q := 'select 
-                  a.id as id_attribute, 
-                  a.code as a_code, 
-                  a.table_name, 
-                  a.column_name, 
-                  a.ref_column_name as ref_column_name,
-                  at.id as id_a_type
-              from 
-                  attributes a 
-                  inner join attrs_categories ac on (ac.id_io_attribute = a.id and ac.id_io_category = ' || idCategory || ') 
-                  inner join a_types at on (a.id_a_type = at.id) ';
-
-    return q;
-    
-end
-$BODY$
-language 'plpgsql';
-
-create or replace function xGetRecordFields(int4) returns varchar[] as
-$BODY$
-declare
-    idCategory alias for $1;
-    r record;
-    q varchar;
-    rFields varchar[];
-begin
-
-    rFields = ARRAY[] :: varchar[];
-
-    q = xGenerateSelectFieldsQuery(idCategory);
-
-    for r in execute q
-    loop
-        rFields = array_append(rFields, r.a_code);
-    end loop;
-
-    return rFields;
-end
-$BODY$
-language 'plpgsql';
-
-create or replace function xGenerateSelectRecordsQuery(int4, varchar, int8[]) returns varchar as
-$BODY$
-declare
-    idCategory alias for $1;
-    tableName alias for $2;
-    idRecords alias for $3;
+    idObject alias for $1;
+    idCategory alias for $2;
+    tableName alias for $3;
+    idRecords alias for $4;
 
     query varchar;
     q varchar;
     r record;
+    recCnt int4;
 begin
 
-    q = 'select id, uuid_t, unique_id, last_update, ';
+    if(idObject = 7 or idObject > 300) then
+        q = 'select id::int8, uuid_t, unique_id, last_update, ';
+    else
+        q = 'select id::int8, ' || quote_literal('00000000-0000-0000-0000-000000000000') || ' as uuid_t, unique_id, last_update, ';
+    end if;
 
     query = xGenerateSelectFieldsQuery(idCategory);
     for r in execute query
@@ -151,7 +122,8 @@ begin
 
     q = q || ' as fields ';
 
-    if(idRecords is not null and array_upper(idRecords, 1) > 0) then
+    recCnt = array_upper(idRecords, 1);
+    if(idRecords is not null and recCnt is not null and recCnt > 0) then
         q = q || ' from ' || tableName || ' where id = ANY(' || asString(idRecords, true) || ') ';
     else
         q = q || ' from ' || tableName;
