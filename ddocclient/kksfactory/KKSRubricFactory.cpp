@@ -540,6 +540,7 @@ void KKSRubricFactory::rubricItemUpload(const KKSRubric *r, bool forRecords, QAb
                     return;
                 }
                 c = c->tableCategory();
+                filters.clear ();
                 if (itemModel->rowCount() > 0)
                 {
                     int n = itemModel->rowCount();
