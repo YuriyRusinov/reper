@@ -2904,6 +2904,8 @@ void KKSObjEditorFactory :: updateEIOView (KKSObject * wObj, const KKSMap<qint64
         return;
 
     qDebug () << __PRETTY_FUNCTION__ <<  wObj->id() << idObjEx.keys();
+    KKSRecWidget * recW = editor->recW;
+    QAbstractItemView * rView = recW ? recW->getView() : 0;
     if (wObj->category() && wObj->category()->tableCategory())
     {
         QModelIndex cInd = QModelIndex();//KKSViewFactory::searchModelRowsIndex(recModel,);
@@ -2915,8 +2917,9 @@ void KKSObjEditorFactory :: updateEIOView (KKSObject * wObj, const KKSMap<qint64
         }
         else
             t->addRef ();
+        
 
-        KKSViewFactory::updateEIOEx (loader, wObj, idObjEx, t, recModel);
+        KKSViewFactory::updateEIOEx (loader, wObj, idObjEx, t, recModel, rView);
 
         t->release ();
 
@@ -2943,12 +2946,22 @@ void KKSObjEditorFactory :: updateEIOView (KKSObject * wObj, const KKSMap<qint64
             {
                 bool ok;
                 quint64 vl = d->fields().value (cAttrB->code(false)).toLongLong (&ok);
+                if ((vl == 0 || !ok ) && rView)
+                {
+                    QColor bc = rView->viewport()->palette().brush(QPalette::Base).color();
+                    vl = bc.rgba();
+                }
                 recModel->setData (recIndex, vl, Qt::BackgroundRole);
             }
             if (cAttrF)
             {
                 bool ok;
                 quint64 vl = d->fields().value (cAttrF->code(false)).toLongLong (&ok);
+                if ((vl == 0 || !ok ) && rView)
+                {
+                    QColor fc = rView->viewport()->palette().brush(QPalette::WindowText).color();//(Qt::black);
+                    vl = fc.rgba();
+                }
                 recModel->setData (recIndex, vl, Qt::ForegroundRole);
             }
         }
@@ -6572,7 +6585,9 @@ void KKSObjEditorFactory :: addSendIO (void)
             KKSObjEditor * oEditor = qobject_cast<KKSObjEditor *>(editor);
             KKSMap<qint64, KKSObjectExemplar *> recs;
             recs.insert(editor->getID(), oEditor->getObjectEx());
-            KKSViewFactory::updateEIOEx (loader, io, recs, t, sAttModel);
+            KKSRecWidget * recW = messDial->recWIOs;
+            QAbstractItemView * sAttView = recW ? recW->getView() : 0;
+            KKSViewFactory::updateEIOEx (loader, io, recs, t, sAttModel, sAttView);
             t->release ();
         }
     }

@@ -756,7 +756,8 @@ void KKSViewFactory :: updateEIOEx (KKSLoader *l,
                                     KKSObject *pObj,
                                     const KKSMap<qint64, KKSObjectExemplar*>& objRecs,
                                     const KKSTemplate *t,
-                                    QAbstractItemModel *sourceModel
+                                    QAbstractItemModel *sourceModel,
+                                    QAbstractItemView * recView
                                     )
 {
     Q_UNUSED (l);
@@ -838,14 +839,28 @@ void KKSViewFactory :: updateEIOEx (KKSLoader *l,
             if (cAttrB)
             {
                 bool ok;
-                quint64 vl = d->fields().value (cAttrB->code(false)).toLongLong (&ok);
+                QString colString = d->fields().value (cAttrB->code(false));
+                quint64 vl = colString.toLongLong (&ok);
+                if (recView && (!ok || vl == 0 || colString.isEmpty()))
+                {
+                    QColor bc = recView->viewport()->palette().brush(QPalette::Base).color();
+                    vl = bc.rgba();
+                }
                 sourceModel->setData (recIndex, vl, Qt::BackgroundRole);
+                //qDebug () << __PRETTY_FUNCTION__ << colString << isBSet;
             }
             if (cAttrF)
             {
                 bool ok;
-                quint64 vl = d->fields().value (cAttrF->code(false)).toLongLong (&ok);
+                QString colString = d->fields().value (cAttrF->code(false));
+                quint64 vl = colString.toLongLong (&ok);
+                if (recView && (!ok || vl == 0 || colString.isEmpty()))
+                {
+                    QColor fc = recView->viewport()->palette().brush(QPalette::WindowText).color();//(Qt::black);
+                    vl = fc.rgba();
+                }
                 sourceModel->setData (recIndex, vl, Qt::ForegroundRole);
+                //qDebug () << __PRETTY_FUNCTION__ << colString << isFSet;
             }
             sourceModel->setData(recIndex.sibling(recIndex.row(), 0), tIcon, Qt::DecorationRole );
         }

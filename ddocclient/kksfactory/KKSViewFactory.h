@@ -71,7 +71,8 @@ class _F_EXPORT KKSViewFactory
                                  KKSObject *pObj,
                                  const KKSMap<qint64, KKSObjectExemplar *>& idObjEx,
                                  const KKSTemplate *t,
-                                 QAbstractItemModel *sourceModel
+                                 QAbstractItemModel *sourceModel,
+                                 QAbstractItemView * recView
                                  );
 
         static void loadCategories (KKSCategoryTemplateWidget* catTemplW,

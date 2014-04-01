@@ -5,6 +5,8 @@
 #include <QIcon>
 #include <QSize>
 #include <QTimer>
+#include <QApplication>
+#include <QPalette>
 #include <QtDebug>
 
 #include "KKSTemplate.h"
@@ -155,7 +157,11 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
         //qDebug () << __PRETTY_FUNCTION__ << d->fields().value (cAttrBackground->code(false).toLower());
         quint64 vl = cAttrBackground ? d->fields().value (cAttrBackground->code(false)).toULongLong (&ok) : d->sysFieldValue("record_fill_color").toULongLong (&ok);
         if (!ok)
-            return QVariant ();
+        {
+            QVariant defBrushV;
+            defBrushV = QBrush (QColor(Qt::white));
+            return defBrushV;
+        }
         QVariant vc = QColor::fromRgba (vl);
         return vc;
     }
@@ -168,7 +174,11 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
         //qDebug () << __PRETTY_FUNCTION__ << d->fields().value (cAttrBackground->code(false).toLower());
         quint64 vl = cAttrForeground ? d->fields().value (cAttrForeground->code(false)).toULongLong (&ok) : d->sysFields().value("record_text_color").toULongLong (&ok);
         if (!ok)
-            return QVariant ();
+        {
+            QVariant defBrushV;
+            defBrushV = QBrush (QColor(Qt::black));
+            return defBrushV;
+        }
         QVariant vc = QColor::fromRgba (vl);
         return vc;
     }
