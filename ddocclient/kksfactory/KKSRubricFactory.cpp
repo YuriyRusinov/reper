@@ -940,7 +940,7 @@ void KKSRubricFactory::viewAttachments(QAbstractItemModel * attachModel, const K
             KKSAttrValue * av = cio->attrValueId(vcol->id());
             if (av && !av->value().value().isEmpty() && vcol->type()->attrType() == KKSAttrType::atRecordTextColor) {
                 vc = av->value().valueVariant(); //(QColor::fromRgba(rgb_colf));
-                qDebug() << __PRETTY_FUNCTION__ << vc << vc.value<QColor > ();
+                //qDebug() << __PRETTY_FUNCTION__ << vc << vc.value<QColor > ();
                 fgColVal = QVariant(QBrush(vc.value<QColor > ()));
             } else if (vcol->type()->attrType() == KKSAttrType::atRecordTextColorRef) {
                 int idVal = av->value().value().toInt();

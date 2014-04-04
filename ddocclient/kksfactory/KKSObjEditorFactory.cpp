@@ -2941,29 +2941,40 @@ void KKSObjEditorFactory :: updateEIOView (KKSObject * wObj, const KKSMap<qint64
             else
                 tIcon = QIcon(":/ddoc/rubric_item.png");
             const KKSCategoryAttr * cAttrB = recModel->data(QModelIndex(), Qt::UserRole+4).value<const KKSCategoryAttr*>();
+            if (!cAttrB)
+            {
+                KKSAttribute * a = loader->loadAttribute(ATTR_RECORD_FILL_COLOR);
+                cAttrB = KKSCategoryAttr::create(a,false,false, QString());
+                recModel->setData(QModelIndex(), cAttrB, Qt::UserRole+4);
+                a->release();
+            }
             const KKSCategoryAttr * cAttrF = recModel->data(QModelIndex(), Qt::UserRole+5).value<const KKSCategoryAttr*>();
-            if (cAttrB)
+            if (!cAttrF)
             {
-                bool ok;
-                quint64 vl = d->fields().value (cAttrB->code(false)).toLongLong (&ok);
-                if ((vl == 0 || !ok ) && rView)
-                {
-                    QColor bc = rView->viewport()->palette().brush(QPalette::Base).color();
-                    vl = bc.rgba();
-                }
-                recModel->setData (recIndex, vl, Qt::BackgroundRole);
+                KKSAttribute * a = loader->loadAttribute(ATTR_RECORD_TEXT_COLOR);
+                cAttrF = KKSCategoryAttr::create(a,false,false, QString());
+                recModel->setData(QModelIndex(), cAttrF, Qt::UserRole+5);
+                a->release ();
             }
-            if (cAttrF)
+            bool ok;
+            quint64 vlb = d->fields().value (cAttrB->code(false)).toLongLong (&ok);
+            if (vlb == 0)
+                vlb = d->sysFields().value (cAttrB->code(false)).toLongLong (&ok);
+            if ((vlb == 0 || !ok ) && rView)
             {
-                bool ok;
-                quint64 vl = d->fields().value (cAttrF->code(false)).toLongLong (&ok);
-                if ((vl == 0 || !ok ) && rView)
-                {
-                    QColor fc = rView->viewport()->palette().brush(QPalette::WindowText).color();//(Qt::black);
-                    vl = fc.rgba();
-                }
-                recModel->setData (recIndex, vl, Qt::ForegroundRole);
+                QColor bc = rView->viewport()->palette().brush(QPalette::Base).color();
+                vlb = bc.rgba();
             }
+            recModel->setData (recIndex, vlb, Qt::BackgroundRole);
+            quint64 vlf = d->fields().value (cAttrF->code(false)).toLongLong (&ok);
+            if (vlf == 0)
+                vlf = d->sysFields().value (cAttrF->code(false)).toLongLong (&ok);
+            if ((vlf == 0 || !ok ) && rView)
+            {
+                QColor fc = rView->viewport()->palette().brush(QPalette::WindowText).color();//(Qt::black);
+                vlf = fc.rgba();
+            }
+            recModel->setData (recIndex, vlf, Qt::ForegroundRole);
         }
         recModel->setData (recIndex.sibling(recIndex.row(), 0), tIcon, Qt::DecorationRole);
         d->release ();

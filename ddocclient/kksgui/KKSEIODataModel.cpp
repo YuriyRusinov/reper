@@ -159,7 +159,7 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
         if (!ok)
         {
             QVariant defBrushV;
-            defBrushV = QBrush (QColor(Qt::white));
+            //defBrushV = QBrush (QColor(Qt::white));
             return defBrushV;
         }
         QVariant vc = QColor::fromRgba (vl);
@@ -176,7 +176,7 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
         if (!ok)
         {
             QVariant defBrushV;
-            defBrushV = QBrush (QColor(Qt::black));
+            //defBrushV = QBrush (QColor(Qt::black));
             return defBrushV;
         }
         QVariant vc = QColor::fromRgba (vl);
@@ -229,6 +229,16 @@ QVariant KKSEIODataModel :: headerData (int section, Qt::Orientation orientation
 
 bool KKSEIODataModel :: setData (const QModelIndex& index, const QVariant& value, int role)
 {
+    if (role == Qt::UserRole+4)
+    {
+        cAttrBackground = value.value<const KKSCategoryAttr*>();
+        return true;
+    }
+    else if (role == Qt::UserRole+5)
+    {
+        cAttrForeground = value.value<const KKSCategoryAttr*>();
+        return true;
+    }
     KKSTreeItem * wItem = getItem (index);
     if (!wItem )//&& role != Qt::UserRole+1)
         return false;

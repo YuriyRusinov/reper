@@ -767,14 +767,29 @@ void KKSViewFactory :: updateEIOEx (KKSLoader *l,
 
     const KKSCategoryAttr * cAttrP = sourceModel->data(QModelIndex(), Qt::UserRole+3).value<const KKSCategoryAttr*>();
     const KKSCategoryAttr * cAttrB = sourceModel->data(QModelIndex(), Qt::UserRole+4).value<const KKSCategoryAttr*>();
+    if (!cAttrB)
+    {
+        KKSAttribute * a = l->loadAttribute(ATTR_RECORD_FILL_COLOR);
+        cAttrB = KKSCategoryAttr::create(a,false,false, QString());
+        sourceModel->setData(QModelIndex(), cAttrB, Qt::UserRole+4);
+        a->release();
+        
+    }
     const KKSCategoryAttr * cAttrF = sourceModel->data(QModelIndex(), Qt::UserRole+5).value<const KKSCategoryAttr*>();
+    if (!cAttrF)
+    {
+        KKSAttribute * a = l->loadAttribute(ATTR_RECORD_TEXT_COLOR);
+        cAttrF = KKSCategoryAttr::create(a,false,false, QString());
+        sourceModel->setData(QModelIndex(), cAttrF, Qt::UserRole+5);
+        a->release ();
+    }
     for (KKSMap<qint64, KKSObjectExemplar*>::const_iterator pr = objRecs.constBegin();
             pr != objRecs.constEnd(); 
             pr++)
     {
         QModelIndex recIndex = searchModelRowsIndex (sourceModel, pr.key());
         KKSObjectExemplar * rec = pr.value();
-        KKSEIOData * d = getRecordData (rec);
+        KKSEIOData * d = l->loadEIOInfo(rec->io()->id(), pr.key());//getRecordData (rec);
         if (cAttrP)
         {
             //
@@ -836,32 +851,30 @@ void KKSViewFactory :: updateEIOEx (KKSLoader *l,
             }
             else
                 tIcon = QIcon(":/ddoc/rubric_item.png");
-            if (cAttrB)
+            bool ok;
+            QString colString = d->fields().value (cAttrB->code(false));
+            if (colString.isEmpty())
+                colString = d->sysFields().value (cAttrB->code(false));
+            qDebug () << __PRETTY_FUNCTION__ << cAttrB->code(false) << colString;
+            quint64 vlb = colString.toLongLong (&ok);
+            if (recView && (!ok || vlb == 0 || colString.isEmpty()))
             {
-                bool ok;
-                QString colString = d->fields().value (cAttrB->code(false));
-                quint64 vl = colString.toLongLong (&ok);
-                if (recView && (!ok || vl == 0 || colString.isEmpty()))
-                {
-                    QColor bc = recView->viewport()->palette().brush(QPalette::Base).color();
-                    vl = bc.rgba();
-                }
-                sourceModel->setData (recIndex, vl, Qt::BackgroundRole);
+                QColor bc = recView->viewport()->palette().brush(QPalette::Base).color();
+                vlb = bc.rgba();
+            }
+            sourceModel->setData (recIndex, vlb, Qt::BackgroundRole);
                 //qDebug () << __PRETTY_FUNCTION__ << colString << isBSet;
-            }
-            if (cAttrF)
+            colString = d->fields().value (cAttrF->code(false));
+            if (colString.isEmpty())
+                colString = d->sysFields().value (cAttrF->code(false));
+            quint64 vlf = colString.toLongLong (&ok);
+            if (recView && (!ok || vlf == 0 || colString.isEmpty()))
             {
-                bool ok;
-                QString colString = d->fields().value (cAttrF->code(false));
-                quint64 vl = colString.toLongLong (&ok);
-                if (recView && (!ok || vl == 0 || colString.isEmpty()))
-                {
-                    QColor fc = recView->viewport()->palette().brush(QPalette::WindowText).color();//(Qt::black);
-                    vl = fc.rgba();
-                }
-                sourceModel->setData (recIndex, vl, Qt::ForegroundRole);
-                //qDebug () << __PRETTY_FUNCTION__ << colString << isFSet;
+                QColor fc = recView->viewport()->palette().brush(QPalette::WindowText).color();//(Qt::black);
+                vlf = fc.rgba();
             }
+            sourceModel->setData (recIndex, vlf, Qt::ForegroundRole);
+                //qDebug () << __PRETTY_FUNCTION__ << colString << isFSet;
             sourceModel->setData(recIndex.sibling(recIndex.row(), 0), tIcon, Qt::DecorationRole );
         }
         
