@@ -263,13 +263,22 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
     QAbstractItemModel *objModel = sortModel->sourceModel();//new QStandardItemModel ();
     if (!objModel)
         objModel = new KKSEIODataModel (t, objEx);//isCheckable ? new KKSCheckableModel (0, ncols) : new QStandardItemModel (0, ncols);
-    // new KKSEIODataModel (t, objEx);
     else
     {
         sortModel->setSourceModel (0);
         delete objModel;
         objModel = new KKSEIODataModel (t, objEx);
     }
+/*    KKSAttribute * aColBG = l->loadAttribute(ATTR_RECORD_FILL_COLOR);
+    const KKSCategoryAttr * caColBG = KKSCategoryAttr::create(aColBG,false,false);
+    bool isBGSet = objModel->setData(QModelIndex(), QVariant::fromValue<const KKSCategoryAttr *>(caColBG), Qt::UserRole+4);
+    //caColBG->release();
+    KKSAttribute * aColFG = l->loadAttribute(ATTR_RECORD_TEXT_COLOR);
+    const KKSCategoryAttr * caColFG = KKSCategoryAttr::create(aColFG,false,false);
+    bool isFGSet = objModel->setData(QModelIndex(), QVariant::fromValue<const KKSCategoryAttr *>(caColFG), Qt::UserRole+5);
+    //caColFG->release ();
+    //qDebug () << __PRETTY_FUNCTION__ << isBGSet << isFGSet;
+ */
     QItemSelectionModel *selModel = tv->selectionModel ();
     if (editor)
     {
@@ -421,6 +430,8 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
         i++;
         //qDebug () << __PRETTY_FUNCTION__ << QString ("Iteration %1. Time elapsed %2 ms").arg (i).arg (t.elapsed());
     }
+//    aColBG->release();
+//    aColFG->release ();
 
     if (isSetH || resize)
         for (int j=0; j<qMin (objModel->columnCount(), headers.count()); j++)
