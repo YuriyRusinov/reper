@@ -1244,6 +1244,7 @@ insert into attributes (unique_id, id, id_a_type, code, name, title, table_name,
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-375', 375, 6, 'h_max', 'Максимальное значение', 'Максимальное значение', NULL, NULL, 150, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-376', 376, 8, 'h_count', 'Количество карманов', 'Количество карманов', NULL, NULL, 150, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-377', 377, 37, 'last_exec', 'Дата и время последнего запуска сервиса', 'Дата и время последнего запуска', NULL, NULL, 120, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-378', 378, 9, 'rr_name', 'Название', 'Название', NULL, NULL, 300, TRUE);
 
 
 SELECT pg_catalog.setval('attributes_id_seq', 1000, true); --все пользовательские атрибуты будут начинаться с номера 1001

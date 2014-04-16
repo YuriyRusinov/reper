@@ -49,6 +49,8 @@ declare
     UID varchar;
     idUser int4;
     idObject int4;
+    hasName bool;
+    hasRName bool;
 begin
 
     if(new.last_update isnull) then
@@ -67,6 +69,25 @@ begin
                 raise exception 'You cannot change unique_id field of the record!';
                 return NULL;
             end if;
+
+        end if;
+
+        tableName = TG_RELNAME;
+
+        --raise exception 'rr_name = % --- name = %, tableName = %', new.rr_name, new.name, tableName;
+        hasRName = f_is_column_exist(tableName, 'rr_name');--system qualifiers does not have field rr_name!
+        if(hasRName is not null and hasRName = TRUE) then
+     
+            hasName = f_is_column_exist(tableName, 'name');
+
+            if(hasName is not null and hasName = TRUE) then
+                --raise exception 'rr_name = % --- name = %', new.rr_name, new.name;
+                new.rr_name = new.name;
+            end if;
+
+            if(new.rr_name is null or new.rr_name = 'New record' or new.rr_name = 'Новая запись') then
+                new.rr_name = 'Record ' || new.id;
+           end if;
 
         end if;
 
@@ -110,6 +131,21 @@ begin
     end if;
 
     new.unique_id = UID;
+
+    hasRName = f_is_column_exist(tableName, 'rr_name');--system qualifiers does not have field rr_name!
+    if(hasRName is not null and hasRName = TRUE) then
+
+        hasName = f_is_column_exist(tableName, 'name');
+
+        if(hasName is not null and hasName = TRUE) then
+            new.rr_name = new.name;
+        end if;
+
+        if(new.rr_name is null or new.rr_name = 'New record' or new.rr_name = 'Новая запись') then
+            new.rr_name = 'Record ' || new.id;
+       end if;
+
+    end if;
 
     --в качестве кода атрибута, когда он не задан, всегда используем UID. 
     --Это позволяет всегда иметь код атрибута (т.е. в т.ч. название колонки в таблицах справочников)

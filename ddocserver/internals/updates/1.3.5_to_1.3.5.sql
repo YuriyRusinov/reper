@@ -14,6 +14,67 @@ select setAsNotLogging(2);
 \i ./functions/general/createtriggeruidex.sql
 
 
+drop function recInsertRubric(int8, int8, varchar, varchar, varchar, varchar);
+drop function recUpdateRubric(int8, varchar, varchar, int4, int4, int4, int8, varchar, varchar);
+drop function recUpdateRubricEx(varchar, varchar, varchar, int8, int8, varchar);
+drop function recUpdateRubricLocal(int8, varchar, varchar, varchar, varchar);
+
+alter table record_rubricator add column id_io_object int4;
+alter table record_rubricator add column id_io_category int4;
+
+alter table record_rubricator
+   add constraint FK_RECORD_R_REFERENCE_IO_OBJEC foreign key (id_io_object)
+      references io_objects (id)
+      on delete restrict on update restrict;
+
+alter table record_rubricator
+   add constraint FK_RECORD_R_REFERENCE_IO_CATEG foreign key (id_io_category)
+      references io_categories (id)
+      on delete restrict on update restrict;
+
+alter table q_base_table add column rr_name varchar;
+
+create or replace function aaa() returns int4 as
+$BODY$
+declare
+    r record;
+    tName varchar;
+    q varchar;
+    i int4;
+begin
+
+    for r in select table_name from io_objects where id > 300 and table_name is not null
+    loop
+
+        tName = r.table_name;
+
+        
+        select f_is_view_exist(tName) into i;
+        if(i = 0) then
+            continue;
+        end if;
+        
+        q = 'drop view ' || tName || ' cascade';
+        execute q;
+        
+        q = 'select f_drop_funcs_' || tName || '();';
+        execute q;
+        
+        q = 'alter table tbl_' || tName || ' rename to ' || tName;
+        execute q;
+
+        perform acl_secureTable(tName);
+    end loop;
+
+    return 1;
+end
+$BODY$
+language 'plpgsql';
+
+select aaa();
+drop function aaa();
+
+
 \i ./functions/contribs/readd_contribs.sql
 
 --In readd_functions this calls does not invoked

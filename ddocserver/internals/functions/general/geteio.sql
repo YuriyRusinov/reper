@@ -81,12 +81,14 @@ begin
             fields := array_append(fields, 'NULL');
             fields := array_append(fields, 'NULL');
             fields := array_append(fields, 'NULL');
+            fields := array_append(fields, 'NULL');
             fields := array_append (fields, attrs_code);
         elsif (fields is null) then
             fields := ARRAY ['unique_id'];
             fields := array_append(fields, 'uuid_t');
             fields := array_append(fields, 'id_io_state');
             fields := array_append(fields, 'r_icon');
+            fields := array_append(fields, 'rr_name');
             fields := array_append(fields, 'record_fill_color');
             fields := array_append(fields, 'record_text_color');
             fields := array_append (fields, attrs_code);
@@ -104,7 +106,7 @@ begin
         if (fields[i] like '(%') then
             r_query := r_query || fields[i] || ' as f' || i;
         else
-            if(i >= 7) then
+            if(i >= 8) then
                 r_query := r_query || '"' || fields[i] || '"' || ' as f' || i;
             else
                 r_query := r_query || fields[i] || ' as f' || i;

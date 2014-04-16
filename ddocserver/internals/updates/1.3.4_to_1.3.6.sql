@@ -41,6 +41,7 @@ declare
     tName varchar;
     q varchar;
     i int4;
+    bHasName bool;
 begin
 
     for r in select table_name from io_objects where id > 300 and table_name is not null
@@ -64,12 +65,22 @@ begin
         execute q;
 
         perform acl_secureTable(tName);
+      
+        select f_is_column_exist('tbl_' || tName, 'name') into bHasName;
+        if(bHasName = true) then
+            q = 'update tbl_' || tName || ' set rr_name = name;';
+        else
+            q = 'update tbl_' || tName || ' set rr_name = ' || quote_literal('Record ') || ' || id';
+        end if;
+
+        execute q;
+        
     end loop;
 
     return 1;
 end
 $BODY$
-language 'plpgsql';
+language 'plpgsql' security definer;
 
 select aaa();
 drop function aaa();

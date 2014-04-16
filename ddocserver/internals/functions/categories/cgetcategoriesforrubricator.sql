@@ -27,6 +27,7 @@ begin
             io_categories c inner join
             io_category_types t on (c.is_main = true and c.id_io_category_type not in (8, 9, 10) and c.id_io_category_type = t.id) inner join
             io_states st on (st.id = c.id_io_state)
+        order by c.name
     loop
         return next r;
     end loop;

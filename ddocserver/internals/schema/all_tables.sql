@@ -1,7 +1,8 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     18.03.2014 15:08:32                          */
+/* Created on:     10.04.2014 12:31:23                          */
 /*==============================================================*/
+
 
 /*==============================================================*/
 /* Table: root_table                                            */
@@ -508,6 +509,9 @@ comment on column attributes.table_name is
 
 comment on column attributes.column_name is
 'Название колонки в таблице, которая содержит значение атрибута, если атрибут является ссылкой на элемент справочника';
+
+comment on column attributes.ref_column_name is
+'Название колонки в таблице, на которую ссылается данный атрибут, являющейся первичным ключом. По умолчанию это id';
 
 comment on column attributes.def_width is
 'Изначальный размер  колонки в KKSView при визуализации данного атрибута. Измеряется в пикселях.
@@ -3388,13 +3392,16 @@ create table q_base_table (
    id                   BIGSERIAL            not null,
    id_io_state          INT4                 not null default 1,
    uuid_t               UUID                 not null,
-   name                 VARCHAR              not null,
+   rr_name              VARCHAR              not null,
    r_icon               VARCHAR              null,
    record_fill_color    INT8                 null,
    record_text_color    INT8                 null,
    constraint PK_Q_BASE_TABLE primary key (id)
 )
 inherits (root_table);
+
+comment on column q_base_table.rr_name is
+'Название записи.';
 
 alter table q_base_table alter column uuid_t set default uuid_generate_v1();
 
@@ -3623,6 +3630,8 @@ create table record_rubricator (
    id                   BIGSERIAL            not null,
    id_parent            INT8                 null,
    id_record            INT8                 null,
+   id_io_object         INT4                 null,
+   id_io_category       INT4                 null,
    name                 VARCHAR              not null,
    description          VARCHAR              null,
    r_icon               VARCHAR              null,
@@ -3637,6 +3646,24 @@ comment on table record_rubricator is
 В НАСТОЯЩЕЕ ВРЕМЯ POSTGRESQL  НЕ ПОДДЕРЖИВАЕТ ВНЕШНИЕ КЛЮЧИ НА ИЕРАРХИЮ НАСЛЕДОВАНИЯ ТАБЛИЦ. ПО ЭТОЙ ПРИЧИНЕ ДЕЛАТЬ ВНЕШНИЙ КЛЮЧ ИЗ record_rubricator НА Q_BASE_TABLE НЕЛЬЗЯ. В ИНТЕРНЕТЕ СУЩЕСТВУЮТ РАЗЛИЧНЫЕ РЕШЕНИЯ ДАННОЙ ПРОБЛЕМЫ, ОДНАКО ИХ РАБОТОСПОСОБНОСТЬ, А ОСОБЕННО БЫСТРОДЕЙСТВИЕ ВЫЗЫВАЮТ СОМНЕНИЕ. ПО ЭТОЙ ПРИЧИНЕ РАССМАТРИВАЕМЫЙ ВНЕШНИЙ КЛЮЧ НЕ ГЕНЕРИРУЕТСЯ СКРИПТОМ СОЗДАНИЯ БД.
 ДЛЯ ПОДДЕРЖАНИЯ ССЫЛОЧНОЙ ЦЕЛОСТНОСТИ НАПИСАН ТРИГГЕР, КОТОРЫЙ ПРОВЕРЯЕТ ФАКТ СУЩЕСТВОВАНИЯ ЗАПИСИ, НА КОТОРУЮ ССЫЛАЕТСЯ СОЗДАВАЕМАЯ (ИЗМЕНЯЕМАЯ) ЗАПИСЬ В record_rubricator. 
 ';
+
+comment on column record_rubricator.id_parent is
+'Родительская рубрика';
+
+comment on column record_rubricator.id_record is
+'Ссылка за запись, к которой относится рубркатор';
+
+comment on column record_rubricator.id_io_object is
+'Ссылка на справочник. Если указан, то в рубрику могут быть помещены записи только из данного справочника';
+
+comment on column record_rubricator.id_io_category is
+'Ссылка на категорию. Если указана, то  в рубрику могут быть помещены записи только из справочников заданной категории';
+
+comment on column record_rubricator.name is
+'Название рубрики';
+
+comment on column record_rubricator.description is
+'Описание рубрики';
 
 comment on column record_rubricator.r_icon is
 'Иконка, используемая при отображении элемента в дереве рубрик. Если не задана, то используется значение по умолчанию (определяется клиентским приложением)';
@@ -3730,8 +3757,6 @@ create table roles_actions (
 );
 
 select setMacToNULL('roles_actions');
-
-
 
 /*==============================================================*/
 /* Table: rubric_records                                        */
@@ -5552,6 +5577,16 @@ alter table receivers
 alter table record_rubricator
    add constraint FK_RECORD_R_REFERENCE_RECORD_R foreign key (id_parent)
       references record_rubricator (id)
+      on delete restrict on update restrict;
+
+alter table record_rubricator
+   add constraint FK_RECORD_R_REFERENCE_IO_OBJEC foreign key (id_io_object)
+      references io_objects (id)
+      on delete restrict on update restrict;
+
+alter table record_rubricator
+   add constraint FK_RECORD_R_REFERENCE_IO_CATEG foreign key (id_io_category)
+      references io_categories (id)
       on delete restrict on update restrict;
 
 alter table report_organization

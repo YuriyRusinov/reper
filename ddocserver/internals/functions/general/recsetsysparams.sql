@@ -1,4 +1,4 @@
-create or replace function recSetSysParams(int8, int4, uuid, varchar, varchar, int8, int8) returns int8 as
+create or replace function recSetSysParams(int8, int4, uuid, varchar, varchar, varchar, int8, int8) returns int8 as
 $BODY$
 declare
     idRec alias for $1;
@@ -6,8 +6,9 @@ declare
     uuidT alias for $3;
     uniqueId alias for $4;
     rIcon alias for $5;
-    fillColor alias for $6;
-    textColor alias for $7;
+    rName alias for $6;
+    fillColor alias for $7;
+    textColor alias for $8;
 
     tableName varchar;
     q varchar;
@@ -21,6 +22,7 @@ begin
                                             ', uuid_t = ' || asString(uuidT, true) ||
                                          ', unique_id = ' || asString(uniqueId, true) ||
                                             ', r_icon = ' || asString(rIcon, true) ||
+                                           ', rr_name = ' || asString(rName, true) ||
                                  ', record_fill_color = ' || asString(fillColor, false) ||
                                  ', record_text_color = ' || asString(textColor, false) || 
                             ' where id = ' || idRec;
