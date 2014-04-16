@@ -338,7 +338,7 @@ private slots:
     void slotIncludeRequested (KKSObjEditor * editor);//используется при редактировании вложений ИО. Вызывает в режиме диалога редактор справочника ИО
     void slotIncludeRecRequested (KKSObjEditor * editor);//используется при редактировании вложений ИО. Вызывает в режиме диалога редактор справочника ИО
     void slotOpenRubricItemRequested (int idObject, KKSObjEditor * editor);
-    void slotOpenRubricItemRecRequested (int idObjectE, KKSObjEditor * editor);
+    void slotOpenRubricItemRequested (int idObject, int idRecord, KKSObjEditor * editor);
 
     void addSendIO (void);
 

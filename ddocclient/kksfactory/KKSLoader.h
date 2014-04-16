@@ -112,6 +112,7 @@ class _F_EXPORT KKSLoader
                                               bool isSys = false) const;//если true, то загружаются данные из системного справлчника, а значит у них нет полей uuid_t, id_state
         
         KKSMap<qint64, KKSEIOData *> loadRecList (const KKSRubric * r) const;
+        KKSMap<qint64, KKSEIOData *> loadRecList (QList<qint64> ids) const;
         
         KKSEIOData * loadEIOInfo (int idObject, qint64 idRec) const;
         
@@ -203,6 +204,7 @@ class _F_EXPORT KKSLoader
         KKSRubric * loadRubricators(bool bOnlyMyDocs) const;
         KKSRubricBase * loadCatRubricators(void) const;
         KKSRubric * loadRubric (int idRubr, bool withInherit = false) const;
+        KKSRubric * loadRecRubric (qint64 idRubric, bool withInherit = false) const;
 
         //метод загружает перечень атрибутов, которые заданы (используются) хотя бы одному информационному объекту
         //т.е. на них есть ссылки в таблице attrs_values

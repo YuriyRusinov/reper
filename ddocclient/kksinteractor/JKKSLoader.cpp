@@ -2904,7 +2904,7 @@ int JKKSLoader :: writeMessage (JKKSRefRecord *refRec, const QString& sender_uid
         }
 
         QString sql;//запрос для табличных атрибутов записи справочника
-        QString sysSql;//запрос для системных параметров записи справочника (in q_base_table)
+        //QString sysSql;//запрос для системных параметров записи справочника (in q_base_table)
 
         if (refRec->getSyncType() == 1 || (cnt == 0 && refRec->getSyncType() == 2))
         {
@@ -2924,7 +2924,7 @@ int JKKSLoader :: writeMessage (JKKSRefRecord *refRec, const QString& sender_uid
 
             sql = QString();
                 
-            sysSql = QString();
+            //sysSql = QString();
         }
         else if (cnt > 0 && refRec->getSyncType() == 2) //обновление записи справочника
         {
@@ -2995,11 +2995,11 @@ int JKKSLoader :: writeMessage (JKKSRefRecord *refRec, const QString& sender_uid
                                                         .arg (refRec->uid());//QString (" WHERE unique_id = '%1'").arg (refRec->uid());
             qDebug () << sql;
 
-            sysSql = QString("select recSetSysParams(");
+            //sysSql = QString("select recSetSysParams(");
         }
         else if (cnt > 0 && refRec->getSyncType() == 3){//удаление записи справочника
             sql = QString ("DELETE FROM %1 WHERE unique_id = '%2'").arg (newTableName).arg (refRec->uid());
-            sysSql = QString();
+            //sysSql = QString();
         }
 
         if (!sql.isEmpty())
@@ -3267,12 +3267,13 @@ int JKKSLoader :: writeRefRecordSysParams(JKKSRefRecord * refRec) const
     if(!refRec || refRec->id() <= 0)
         return ERROR_CODE;
 
-    QString sysSql = QString("select recSetSysParams(%1, %2, %3, %4, %5, %6, %7)")
+    QString sysSql = QString("select recSetSysParams(%1, %2, %3, %4, %5, %6, %7, %8)")
                                        .arg(refRec->id())
                                        .arg(refRec->idState() <= 0 ? QString("1") : QString("%1").arg(refRec->idState()))
                                        .arg(refRec->uuid().isEmpty() ? QString("NULL") : QString("'%1'").arg(refRec->uuid()))
                                        .arg(refRec->uid().isEmpty() ? QString("NULL") : QString("'%1'").arg(refRec->uid()))
                                        .arg(refRec->rIcon().isEmpty() ? QString("NULL") : QString("'%1'").arg(refRec->rIcon()))
+                                       .arg(refRec->rName().isEmpty() ? QString("NULL") : QString("'%1'").arg(refRec->rName()))
                                        .arg(!refRec->bgColor().isValid() ? QString("NULL") : QString("'%1'").arg(QString::number(refRec->bgColor().rgba())))
                                        .arg(!refRec->fgColor().isValid() ? QString("NULL") : QString("'%1'").arg(QString::number(refRec->fgColor().rgba())));
 
@@ -3378,12 +3379,15 @@ int JKKSLoader :: writeRefRecordRubrics(JKKSRefRecord * refRec) const
         }
         */
 
-        QString sql =  QString ("select * from recUpdateRubricEx('%1', '%2', '%3', %4, %5, NULL);")
+        QString sql =  QString ("select * from recUpdateRubricEx('%1', '%2', '%3', %4, %5, %6, %7, NULL);")
                                 .arg (wRubr.getUid  ())                    
                                 .arg (wRubr.getName ())
                                 .arg (wRubr.getDesc ())
                                 .arg (wRubr.getParent () <= 0 ? QString ("NULL::int8") : QString::number (wRubr.getParent ()))
-                                .arg (pr == rubrs.constBegin () ? QString::number (refRec->id()) : QString ("NULL::int8"));
+                                .arg (pr == rubrs.constBegin () ? QString::number (refRec->id()) : QString ("NULL::int8"))
+                                .arg ("NULL")
+                                .arg ("NULL");
+
 
         KKSResult * res = dbWrite->execute (sql);
         
@@ -3903,7 +3907,7 @@ int JKKSLoader :: readRefRecordRubrics(JKKSRefRecord & rec) const
     QMap<qint64, JKKSGlobalRubric> rubrs;
     for (int ii=0; ii<rubrRes->getRowCount(); ii++)
     {
-        if (rubrRes->getCellAsInt (ii, 5) == 2)
+        if (rubrRes->getCellAsInt (ii, 7) == 2)
         {
             //
             // rubric item cannot been sent
@@ -3911,11 +3915,11 @@ int JKKSLoader :: readRefRecordRubrics(JKKSRefRecord & rec) const
             continue;
         }
         JKKSGlobalRubric wRubr (rubrRes->getCellAsInt64 (ii, 0), // id
-                                rubrRes->getCellAsString(ii, 7), //uid
+                                rubrRes->getCellAsString(ii, 9), //uid
                                 rubrRes->getCellAsInt64 (ii, 1) <= 0 ? -1 : rubrRes->getCellAsInt64 (ii, 1), // idParent
                                 rubrRes->getCellAsInt64 (ii, 2) <= 0 ? -1 : rec.id(), // idRecord
-                                rubrRes->getCellAsString (ii, 3), // name
-                                rubrRes->getCellAsString (ii, 4) // description
+                                rubrRes->getCellAsString (ii, 5), // name
+                                rubrRes->getCellAsString (ii, 6) // description
                                 );
         /*
         qint64 idCategory = rubrRes->getCellAsInt (ii, 4);
@@ -4045,25 +4049,26 @@ int JKKSLoader :: readRefRecordTableValues(JKKSRefRecord & rec, qint64 idObject)
     rec.setUuid(dRes->getCellAsString(0, 1));//uuid_t
     rec.setIdState(dRes->getCellAsInt(0, 2));//id_io_state
     rec.setRIcon(dRes->getCellAsString(0, 3));//r_icon
+    rec.setRName(dRes->getCellAsString(0, 4));//rr_name
     //bgColor
     QColor bkcolor = QColor();
-    if (dRes->getCell (0, 4).isValid())
+    if (dRes->getCell (0, 5).isValid())
     {
-        unsigned int vlc = dRes->getCellAsInt64(0, 4);
+        unsigned int vlc = dRes->getCellAsInt64(0, 5);
         bkcolor = QColor::fromRgba (vlc);
         rec.setBgColor(bkcolor);
     }
     //fgColor
     QColor fgcolor = QColor();
-    if (dRes->getCell (0, 5).isValid())
+    if (dRes->getCell (0, 6).isValid())
     {
-        unsigned int vltc = dRes->getCellAsInt64(0, 5);
+        unsigned int vltc = dRes->getCellAsInt64(0, 6);
         fgcolor = QColor::fromRgba (vltc);
         rec.setFgColor(fgcolor);
     }
 
-    //пропустим первые 6 колонок из рез-та запроса - они системные и есть всегда
-    for (int i=6; i < dRes->getColumnCount() && pa != tc.attributes().constEnd(); i++)
+    //пропустим первые 7 колонок из рез-та запроса - они системные и есть всегда
+    for (int i=7; i < dRes->getColumnCount() && pa != tc.attributes().constEnd(); i++)
     {
         if (!dRes->getCellAsString (0, i).isEmpty() && 
                (pa.value().idAttrType () == 2 ||  //atList
@@ -4468,12 +4473,13 @@ QPair<qint64, qint64> JKKSLoader :: getIDMap (const QString& ref_uid, const JKKS
     id_old_new.second = idRecNew;
     delete tRecRes;
 
-    QString sysSql = QString("select recSetSysParams(%1, %2, %3, %4, %5, %6, %7)")
+    QString sysSql = QString("select recSetSysParams(%1, %2, %3, %4, %5, %6, %7, %8)")
                                        .arg(idRecNew)
                                        .arg(RR.idState() <= 0 ? QString("1") : QString("%1").arg(RR.idState()))
                                        .arg(RR.uuid().isEmpty() ? QString("NULL") : QString("'%1'").arg(RR.uuid()))
                                        .arg(RR.uid().isEmpty() ? QString("NULL") : QString("'%1'").arg(RR.uid()))
                                        .arg(RR.rIcon().isEmpty() ? QString("NULL") : QString("'%1'").arg(RR.rIcon()))
+                                       .arg(RR.rName().isEmpty() ? QString("NULL") : QString("'%1'").arg(RR.rName()))
                                        .arg(!RR.bgColor().isValid() ? QString("NULL") : QString("'%1'").arg(QString::number(RR.bgColor().rgba())))
                                        .arg(!RR.fgColor().isValid() ? QString("NULL") : QString("'%1'").arg(QString::number(RR.fgColor().rgba())));
 

@@ -24,13 +24,15 @@ class _I_EXPORT JKKSUID
                 qint64 idState = 1,
                 const QColor bkCol = QColor(),
                 const QColor fgCol = QColor(),
-                const QString & rIcon = QString()) : 
+                const QString & rIcon = QString(),
+                const QString & rName = QString()) : 
             m_uid(u),
             m_uuid(uuid),
             m_idState(idState),
             m_fgColor(fgCol),
             m_bgColor(bkCol),
-            m_rIcon(rIcon)
+            m_rIcon(rIcon),
+            m_rName(rName)
         {
             if(m_idState <= 0)
                 m_idState = 1;
@@ -42,7 +44,8 @@ class _I_EXPORT JKKSUID
             m_idState(U.m_idState),
             m_bgColor(U.m_bgColor),
             m_fgColor(U.m_fgColor),
-            m_rIcon(U.m_rIcon)
+            m_rIcon(U.m_rIcon),
+            m_rName(U.m_rName)
         {
             
         };
@@ -68,6 +71,8 @@ class _I_EXPORT JKKSUID
         const QString & rIcon() const {return m_rIcon;}
         void setRIcon(const QString & i){ m_rIcon = i;}
 
+        const QString & rName() const {return m_rName;}
+        void setRName(const QString & i){ m_rName = i;}
 protected:
         QString m_uid;
         QString m_uuid;
@@ -75,6 +80,7 @@ protected:
         QColor m_bgColor;
         QColor m_fgColor;
         QString m_rIcon;
+        QString m_rName;
 };
 
 #endif

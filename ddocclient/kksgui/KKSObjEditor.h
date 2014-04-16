@@ -227,8 +227,9 @@ class _GUI_EXPORT KKSObjEditor : public KKSRecDialog
         void rubricItemRecSelected(int idObjectRec, QString name);
         void includeRequested(KKSObjEditor * editor);
         void includeRecRequested(KKSObjEditor * editor);
+        
         void openRubricItemRequested(int idObject, KKSObjEditor * editor);
-        void openRubricItemRecRequested(int idObjectE, KKSObjEditor * editor);
+        void openRubricItemRequested(int idObject, int idRecord, KKSObjEditor * editor);
 
         void updateAttributes (QWidget *ioAttrWidget, QScrollArea *sc, QWidget *ioAttrsW, /*KKSObject * wObj*/ int idObj, const KKSCategory * wCat, KKSIndAttrClass isSystem, KKSObjEditor* editor);
         void closeEditor (void);
@@ -278,10 +279,13 @@ class _GUI_EXPORT KKSObjEditor : public KKSRecDialog
         //void slotRubricItemRequested();
         void slotIncludeSelected(int idObject, QString name);
         void slotIncludeRequested();
+        
         void slotOpenRubricItemRequested(int idObject);
+        void slotOpenRubricItemRequested(int idObject, int idRecord);
+        
         void slotIncludeRecSelected(int idObjectE, int idObject, QString name);
         void slotIncludeRecRequested();
-        void slotOpenRubricItemRecRequested(int idObjectE);
+        
         void setNumCopies (int n);
 
    protected:

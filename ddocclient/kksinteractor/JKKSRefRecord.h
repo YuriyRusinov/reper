@@ -46,7 +46,8 @@ public:
                    qint64 idState = 1, 
                    const QColor bkCol = QColor(),
                    const QColor fgCol = QColor(),
-                   const QString & rIcon = QString());
+                   const QString & rIcon = QString(),
+                   const QString & rName = QString());
     
     JKKSRefRecord (const JKKSRefRecord& RR);
     

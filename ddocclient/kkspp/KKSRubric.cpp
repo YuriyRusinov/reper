@@ -10,6 +10,7 @@
 #include "KKSSearchTemplate.h"
 #include "KKSPrivilege.h"
 #include "KKSCategory.h"
+#include "KKSObject.h"
 #include "KKSAccessEntity.h"
 #include "defines.h"
 
@@ -95,14 +96,14 @@ int KKSRubricBase :: childNumber (void) const
         int idc = -1;
         const KKSRubric * prubr = static_cast<const KKSRubric *>(parent());
         int rCount;
-        if (this->rubricType() == atRubricItem)
+        if (this->rubricType() == btRubricItem)
             rCount = prubr->items().count();
         else
             rCount = prubr->rubrics().count();
         for (int i=0; i<rCount && idc<0; i++)
         {
             const KKSRubricBase * rw (0);
-            if (this->rubricType() == atRubricItem)
+            if (this->rubricType() == btRubricItem)
                 rw = prubr->item(i);
             else
                 rw = prubr->rubric(i);
@@ -110,7 +111,8 @@ int KKSRubricBase :: childNumber (void) const
             if (rw->id() == id())
                 idc = i;
         }
-        if (this->rubricType() == atRubricItem && idc > 0)
+
+        if (this->rubricType() == btRubricItem && idc > 0)
             idc += prubr->rubrics().count();
         return idc;
     }
@@ -200,7 +202,7 @@ QPixmap KKSRubricOthers :: getDefaultIcon (void) const
 
 int KKSRubricOthers :: rubricType (void) const
 {
-    return KKSRubricBase::atOthers;
+    return KKSRubricBase::btOthers;
 }
 
 /*============*/
@@ -276,16 +278,17 @@ QPixmap KKSRubricItem::icon()
 
 int KKSRubricItem::rubricType (void) const
 {
-    return KKSRubricBase::atRubricItem;
+    return KKSRubricBase::btRubricItem;
 }
 
 /*===========================================*/
 KKSRubric::KKSRubric() : KKSRubricBase(),
     m_searchTemplate (0),
     m_category (0),
-    m_isCategorized (false),
+    m_io (0),
     m_acl (0),
-    m_intId (-1)
+    m_intId (-1),
+    m_baseType(btRubric)
 {
 
 }
@@ -293,13 +296,14 @@ KKSRubric::KKSRubric() : KKSRubricBase(),
 KKSRubric::KKSRubric(const KKSRubric & other) : KKSRubricBase(other),
     m_searchTemplate (other.m_searchTemplate),
     m_category (other.m_category),
-    m_isCategorized (other.m_isCategorized),
+    m_io (other.m_io),
     m_acl (other.m_acl),
 /*    m_privileges(other.m_privileges),
     m_bossPrivileges(other.m_bossPrivileges),
     m_unitPrivileges(other.m_unitPrivileges),
     m_othersPrivilege(NULL),*/
-    m_intId(other.m_intId)
+    m_intId(other.m_intId),
+    m_baseType(other.m_baseType)
 {
     m_items = other.items();
     m_rubrics = other.rubrics();
@@ -313,21 +317,29 @@ KKSRubric::KKSRubric(const KKSRubric & other) : KKSRubricBase(other),
     if (m_category)
         m_category->addRef ();
 
+    if(m_io)
+        m_io->addRef();
+
     if (m_acl)
         m_acl->addRef ();
     //setOthersPrivilege(other.othersPrivilege());
 }
 
-KKSRubric::KKSRubric(qint64 id, const QString & name, KKSSearchTemplate * st, KKSCategory * c, KKSAccessEntity * ac) : KKSRubricBase(id, name),
+KKSRubric::KKSRubric(qint64 id, 
+                     const QString & name, 
+                     KKSSearchTemplate * st, 
+                     KKSCategory * c, 
+                     KKSAccessEntity * ac) : KKSRubricBase(id, name),
     m_searchTemplate (st),
     m_category (c),
-    m_isCategorized (false),
+    m_io (0),
     m_acl (ac),
 /*    m_privileges (KKSMap<int, KKSPrivilege *>()),
     m_bossPrivileges (KKSMap<int, KKSPrivilege *>()),
     m_unitPrivileges (KKSMap<int, KKSPrivilege *>()),
     m_othersPrivilege (0),*/
-    m_intId (-1)
+    m_intId (-1),
+    m_baseType(btRubric)
 {
     if (m_searchTemplate)
         m_searchTemplate->addRef ();
@@ -345,6 +357,9 @@ KKSRubric::~KKSRubric()
         m_category->release ();
     if (m_acl)
         m_acl->release ();
+
+    if(m_io)
+        m_io->release();
 }
 
 KKSRubric & KKSRubric::operator = (const KKSRubric & other) 
@@ -356,6 +371,8 @@ KKSRubric & KKSRubric::operator = (const KKSRubric & other)
     setParent(const_cast<KKSRecord*>(other.parent()));
 
     m_intId = other.m_intId;
+
+    m_baseType = other.m_baseType;
 
     setItems(other.items());
     setRubrics(other.rubrics());
@@ -371,23 +388,31 @@ KKSRubric & KKSRubric::operator = (const KKSRubric & other)
     if (m_category)
         m_category->addRef ();
     
+    m_io = other.m_io;
+    if (m_io)
+        m_io->addRef ();
+
     //setOthersPrivilege (other.m_othersPrivilege);
     m_acl = other.m_acl;
     if (m_acl)
         m_acl->addRef();
     
-//    m_rubricIcon = other.m_rubricIcon;
-//    m_iconData = other.m_iconData;
-    m_isCategorized = other.m_isCategorized;
-    
+    //m_rubricIcon = other.m_rubricIcon;
+    //m_iconData = other.m_iconData;
+   
     return *this;
 }
 
+//добавить в рубрику можно один и тот же итем лишь один раз.
+//поэтому перед добавлением итема необходимо проверить, а не существует ли уже с этим же идентификатором в рубрике
+//если существует, то произведем замену существующего итема на новый
 void KKSRubric::addItem(const KKSRubricItem * item)
 {
     if(!item)
         return;
     
+    KKSRubricItem * i = itemForId(item->id());
+    //if(i)
     m_items.append(item);
     addNode (item);
     
@@ -427,11 +452,12 @@ void KKSRubric::setItems(const KKSList<const KKSRubricItem *> & items)
     KKSList<const KKSRubricBase *> subNodes = subnodes();
     for (int i=0; i<subNodes.count(); )
     {
-        if (subNodes[i]->rubricType() == KKSRubricBase::atRubricItem)
+        if (subNodes[i]->rubricType() == KKSRubricBase::btRubricItem)
             subNodes.removeAt(i);
         else
             i++;
     }
+
     setNodes (subNodes);
 
     m_isChanged = true;
@@ -471,7 +497,7 @@ void KKSRubric::clearItems()
     KKSList<const KKSRubricBase *> subNodes = subnodes();
     for (int i=0; i<subNodes.count(); )
     {
-        if (subNodes[i]->rubricType() == KKSRubricBase::atRubricItem)
+        if (subNodes[i]->rubricType() == KKSRubricBase::btRubricItem)
             subNodes.removeAt(i);
         else
             i++;
@@ -490,7 +516,7 @@ void KKSRubric::clearRubrics()
     KKSList<const KKSRubricBase *> subNodes = subnodes();
     for (int i=0; i<subNodes.count(); )
     {
-        if (subNodes[i]->rubricType() != KKSRubricBase::atRubricItem)
+        if (subNodes[i]->rubricType() != KKSRubricBase::btRubricItem)
             subNodes.removeAt(i);
         else
             i++;
@@ -554,9 +580,10 @@ void KKSRubric::setRubrics(const KKSList<const KKSRubric*> & rubrics)
     KKSList<const KKSRubricBase *> subNodes = subnodes();
     for (int i=0; i<subNodes.count(); )
     {
-        if (subNodes[i]->rubricType() == KKSRubricBase::atRootRubric ||
-            subNodes[i]->rubricType() == KKSRubricBase::atRubric ||
-            subNodes[i]->rubricType() == KKSRubricBase::atRubricCategory
+        if (subNodes[i]->rubricType() == KKSRubricBase::btRootRubric ||
+            subNodes[i]->rubricType() == KKSRubricBase::btRubric ||
+            subNodes[i]->rubricType() == KKSRubricBase::btRubricAsCategory ||
+            subNodes[i]->rubricType() == KKSRubricBase::btRecordRubric
             )
             subNodes.removeAt(i);
         else
@@ -762,6 +789,24 @@ void KKSRubric::setCategory (KKSCategory *c)
     m_isChanged = true;
 }
 
+KKSObject * KKSRubric::getIO(void) const
+{
+    return m_io;
+}
+
+void KKSRubric::setIO(KKSObject * io)
+{
+    if (m_io)
+        m_io->release ();
+
+    m_io = io;
+
+    if (m_io)
+        m_io->addRef ();
+
+    m_isChanged = true;
+}
+
 KKSAccessEntity * KKSRubric::getAccessRules (void) const
 {
     return m_acl;
@@ -876,23 +921,53 @@ QPixmap KKSRubric :: getDefaultIcon (void) const
 
 int KKSRubric :: rubricType (void) const
 {
-    if (m_isCategorized)
-        return KKSRubricBase::atRubricCategory;
+    
+    /*if (m_isCategorized)
+        return KKSRubricBase::btRubricCategory;
     else
-        return KKSRubricBase::atRubric;
+        return KKSRubricBase::btRubric;
+        */
+
+    return m_baseType;
 
 }
 
+void KKSRubric :: setCategorized ()
+{
+    m_baseType = btRubricAsCategory;
+}
+
+void KKSRubric :: setForRecord ()
+{
+    m_baseType = btRecordRubric;
+}
+
+void KKSRubric :: setForIO()
+{
+    m_baseType = btRubric;
+}
+
+/*
 bool KKSRubric :: isCategorized (void) const
 {
     return m_isCategorized;
 }
 
-void KKSRubric :: setCategorized (bool c)
+void KKSRubric :: setCategorized ()
 {
-    m_isCategorized = c;
+    m_baseType = btRubricAsCategory;
 }
 
+bool KKSRubric :: isForRecord (void) const
+{
+    return m_isForRecord;
+}
+
+void KKSRubric :: setForRecord ()
+{
+    m_baseType = btRecordRubric;
+}
+*/
 const KKSList<const KKSRubricItem *> & KKSRubric :: deletedItems() const
 {
     return m_deletedItems;

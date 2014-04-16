@@ -371,12 +371,16 @@ bool KKSEIODataModel :: insertRows (int row, int count, const QModelIndex& paren
 
 bool KKSEIODataModel :: removeRows (int row, int count, const QModelIndex& parent)
 {
-    //qDebug () << __PRETTY_FUNCTION__ << row << count << parent;
+    if(count == 0)
+        return true;
+
     KKSTreeItem * pItem = getItem (parent);
     bool ok (true);
+    
     beginRemoveRows (parent, row, row+count-1);
     ok = pItem->removeChildren (row, count);
     endRemoveRows ();
+    
     return ok;
 }
 
@@ -469,9 +473,11 @@ void KKSEIODataModel :: setupData (KKSTreeItem * parent)
             pIcon.loadFromData (strIcon.toUtf8());
             tIcon = QIcon (pIcon);
         }
+
         KKSTreeItem * t = new KKSTreeItem (p.value()->sysFieldValue("id").toLongLong(), p.value(), tRef, visibleAttrs, tIcon);
         if (!t->getData() || !t->getData()->isVisible())
             continue;
+        
         QString valStr = p.value()->sysFieldValue(cAttrP->code(false));
         if (valStr.isEmpty())
             parent->appendChild (t);

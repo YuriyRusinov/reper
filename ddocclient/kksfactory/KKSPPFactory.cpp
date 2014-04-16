@@ -3109,13 +3109,14 @@ int KKSPPFactory::updateRubrics(KKSRubric * parent, int idMyDocsRubricator) cons
     if(!parent)
         return ERROR_CODE;
 
-    if (parent->isCategorized())
+    if (parent->rubricType() == KKSRubricBase::btRubricAsCategory)
         return OK_CODE;
+
     int cnt = parent->rubrics().count();
 
     for(int i=0; i<cnt; i++){
         KKSRubric * r = parent->rubric(i);
-        if (r->isCategorized())
+        if (r->rubricType() == KKSRubricBase::btRubricAsCategory)
             continue;
         
         //сохранять в БД можно только информацию о инициализированных рубриках
@@ -3216,7 +3217,7 @@ int KKSPPFactory::updateRubric(KKSRubric * r) const
     if (!r || r->id() <= 0)
         return ERROR_CODE;
     
-    if (r->isCategorized())
+    if (r->rubricType() == KKSRubricBase::btRubricAsCategory)
         return OK_CODE;
 
     int idRubric = r->id();
@@ -3257,7 +3258,7 @@ int KKSPPFactory::insertRubric(KKSRubric * r, int idParent, int idObject, bool r
     if (!r)
         return ERROR_CODE;
     
-    if (r->isCategorized())
+    if (r->rubricType() == KKSRubricBase::btRubricAsCategory)
         return OK_CODE;
 
     int idRubric = ERROR_CODE;//eiof->getNextSeq("rubricator", "id");

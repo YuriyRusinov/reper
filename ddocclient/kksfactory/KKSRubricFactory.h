@@ -14,8 +14,10 @@
 #include "kksfactory_config.h"
 
 #include "KKSEntityFactory.h"
+#include <kksincludeswidget.h>
 
 #include <KKSList.h>
+#include <KKSMap.h>
 #include <KKSFilter.h>
 
 class QAbstractItemModel;
@@ -23,7 +25,6 @@ class QModelIndex;
 class QObject;
 
 class KKSLoader;
-class KKSIncludesWidget;
 class KKSFilterGroup;
 class KKSPPFactory;
 class KKSRubric;
@@ -35,25 +36,48 @@ class RubricForm;
 class KKSObjectExemplar;
 class KKSEIOFactory;
 class KKSTemplate;
+class KKSEIOData;
+class KKSObject;
 
 class _F_EXPORT KKSRubricFactory : public KKSEntityFactory
 {
     public:
-        KKSIncludesWidget * createRubricEditor (int mode, const KKSList<const KKSFilterGroup *>& filters, bool withCategories=true, QWidget* parent=0);
+        
+        //что показываем в общесистемном рубрикаторе
         enum RubricMode
         {
-            atRootRubric = 0,
-            atMyDocsRubric = 1,
-            atOthers = 2
+            atRootRubric = 0, //только общесистемный рубрикатор (без категорий)
+            atMyDocsRubric = 1, //только "мои документы"
+            atOthers = 2 //общесистемный рубрикатор с категориями
         };
-        KKSIncludesWidget * createModalRubricEditor (int mode, const KKSList<const KKSFilterGroup *>& filters, bool withCategories=true, QWidget* parent=0);
+
+        //лпределяет, показывать ли рубрики с вложениями, или только одни рубрики 
+        //(в последнем случае виджет с вложениями будет скрыт)
+        enum RubricShowMode
+        {
+            smRubricsOnly = 0,
+            smRubricsWithIncludes = 1
+        };
+
+
+
+        KKSIncludesWidget * createRubricEditor (RubricMode mode, 
+                                                RubricShowMode showMode = smRubricsWithIncludes,
+                                                bool bModal = false, //редактор рубрикатора будет открыт модально. Не надо слать сигнал о том, что он создан, чтобы он не помещался на панель открытых окон MDI-приложения
+                                                QWidget* parent=0,
+                                                Qt::WindowFlags flags=0);
+        
+
+        //KKSIncludesWidget * createModalRubricEditor (RubricMode mode, 
+        //                                             bool withCategories=true, 
+        //                                             QWidget* parent=0);
+
         KKSIncludesWidget * createRubricRecEditor (KKSRubric * rootRubric,
-                                     bool isAttach,
-                                     bool isDocs,
-                                     bool forCategory,
-                                     bool forRecord,
-                                     QWidget *parent=0,
-                                     Qt::WindowFlags flags=0);
+                                                   KKSIncludesWidget::RubricatorSource rSource,
+                                                   RubricShowMode showMode = smRubricsWithIncludes,
+                                                   QWidget *parent=0,
+                                                   Qt::WindowFlags flags=0);
+
         static KKSTemplate * rubrRecTemlate (void);
 
     signals:
@@ -64,11 +88,17 @@ class _F_EXPORT KKSRubricFactory : public KKSEntityFactory
     private slots:
         void saveRubric (KKSRubric * rootR, bool isMyDocs);
         void rubricItemUpload (const KKSRubric * r, bool forRecords, QAbstractItemModel * itemModel);
+        void recRubricItemUpload(const KKSRubric *r, QAbstractItemModel * itemModel, KKSObject * o, KKSIncludesWidget *editor);
         void rubricItemCreate (const KKSRubric * r, QAbstractItemModel * itemModel, const QModelIndex& parent);
+        
         void openRubricItem (int idObject);
+        void openRubricItem (int idObject, int idRecord);
+
         void loadRubricPrivilegies (RubricForm * rForm);
         void loadSearchTemplate (RubricForm * rForm);
         void loadCategory (RubricForm * rForm);
+        void loadIO(RubricForm * rForm);
+
         void copyFromRubric (KKSRubric * rDest, QAbstractItemModel * attachModel, const QModelIndex& wIndex);
         void viewAttachments (QAbstractItemModel * attachModel, const KKSRubric * r);
         void initRubricAttachments (const KKSRubric * r, bool isRec);
@@ -90,6 +120,11 @@ class _F_EXPORT KKSRubricFactory : public KKSEntityFactory
         friend class KKSSito;
         KKSRubricFactory (KKSLoader *l, KKSPPFactory *_ppf, KKSEIOFactory * _eiof, KKSObjEditorFactory *_oef, KKSStuffFactory * _stf, QObject* parent=0);
         ~KKSRubricFactory (void);
+
+        void initConnections(KKSIncludesWidget * iW) const; //соединения сигнал-слот для виджета рубрикатора
+        QString getEditorTitle(RubricMode mode) const; //определяем заголовок окна с рубрикатором
+        int addCategoriesToRubricator(QAbstractItemModel * rubrMod) const;//добавляем категории в дерево рубрик (секция Others)
+        KKSMap<qint64, KKSEIOData * > getRubricatorsData() const; //получаем данные в виде KKSEIOData для дерева рубрик
 
     private:
         //

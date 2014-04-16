@@ -715,47 +715,101 @@ KKSMap<qint64, KKSEIOData *> KKSConverter :: rubricEntityToData (const KKSLoader
         refRubr->release ();
         return rubricData;
     }
+    
     ct = ct->tableCategory();
-    KKSAttribute * aid = loader->loadAttribute (1);
+    
+    KKSAttribute * aid = loader->loadAttribute (ATTR_ID);
     if (!aid)
     {
         refIO->release ();
         refRubr->release ();
         return rubricData;
     }
+
     QString sql;
-    if (rubricB->rubricType () != KKSRubricBase::atRubricCategory)
+    if (rubricB->rubricType () == KKSRubricBase::btRubric)
         sql = QString ("select id_io_object from io_rubricator ior where ior.id_rubric=%1").arg (rubricB->id());
-    else
+    else if(rubricB->rubricType () == KKSRubricBase::btRubricAsCategory)
         sql = QString ("select id from io_objects io where io.id_io_category=%1").arg (rubricB->id());
+
     KKSValue * val = new KKSValue (sql, KKSAttrType::atInt64);
     const KKSFilter * f = new KKSFilter (aid, val, KKSFilter::foInSQL);
-    KKSFilterGroup * fg = new KKSFilterGroup (false);
+    
+    KKSFilterGroup * fg = new KKSFilterGroup (false);//группа типа ИЛИ
+    KKSFilterGroup * fgNotIn = new KKSFilterGroup (true);//группа типа И, которая содержит итемы, не требующие включения в результирующий список
+    //все вместе группы объединяются оператором И
+    
     fg->addFilter (f);
     f->release ();
     val->release();
-    for (int i=0; i<rubricB->items().count(); i++)
-    {
-        KKSValue * valItem = new KKSValue (QString::number (rubricB->item(i)->id()), KKSAttrType::atInt64);
-        const KKSFilter * fitem = new KKSFilter (aid, valItem, KKSFilter::foEq);
-        fg->addFilter (fitem);
-        fitem->release();
-        valItem->release();
+
+    //добавляем идентификаторы ИО в группу фильтров типа ИЛИ
+    //в случае, если имеем дело с рубрикой типа btRubricAsCategory, то это делать не надо
+    if(rubricB->rubricType () != KKSRubricBase::btRubricAsCategory && rubricB->items().count() > 0){
+        
+        KKSFilter * fIn = new KKSFilter();
+        fIn->setAttribute(aid);
+        fIn->setOperation(KKSFilter::foIn);
+        
+        //добавляем ИО, добавленные в рубрику
+        for (int i=0; i<rubricB->items().count(); i++)
+        {
+            KKSValue * valItem = new KKSValue (QString::number (rubricB->item(i)->id()), KKSAttrType::atInt64);
+            fIn->addValue(valItem);
+            valItem->release();
+        }
+
+        fg->addFilter (fIn);
+        fIn->release();
     }
+
+    //исключаем ИО, удаленные из рубрики
+    if(rubricB->rubricType () != KKSRubricBase::btRubricAsCategory && rubricB->deletedItems().count() > 0){
+        
+        KKSFilter * fNotIn = new KKSFilter();
+        fNotIn->setAttribute(aid);
+        fNotIn->setOperation(KKSFilter::foNotIn);
+
+        for (int i=0; i<rubricB->deletedItems().count(); i++)
+        {
+            KKSValue * valItem = new KKSValue (QString::number (rubricB->deletedItems().at(i)->id()), KKSAttrType::atInt64);
+            fNotIn->addValue(valItem);
+            valItem->release();
+        }
+
+        fgNotIn->addFilter (fNotIn);
+        fNotIn->release();
+    }
+
     KKSList<const KKSFilterGroup *> filters;
+
     filters.append (fg);
     fg->release ();
+
+    if(fgNotIn->filters().count() > 0)
+        filters.append(fgNotIn);
+    fgNotIn->release();
+
+    //в итоге получается запрос вида
+    //select <...> from io_objects where 1=1 and (id in (select id_io_object from io_rubricator where id_rubric = XXX) or id in (ARRAY[YYY]) and id not in (ARRAY[ZZZ])
     rubricData = loader->loadEIOList (cat, refIO->tableName(), filters, refIO->id() <= _MAX_SYS_IO_ID_ ? true : false);
+
     int nItems = rubricData.count();
-    qDebug () << __PRETTY_FUNCTION__ << nItems;
+
+    const_cast<KKSRubric *>(rubricB)->clear();
+    
     for (int i=0; i<nItems; i++)
     {
         KKSMap<qint64, KKSEIOData *>::const_iterator p = rubricData.constBegin();
         p += i;
-        KKSRubricItem * rItem = new KKSRubricItem(p.key(), p.value()->fieldValue("name"), true, p.value()->fieldValue("r_icon"));
+        qint64 idItem = p.key();
+        QString name = p.value()->fieldValue("name");
+        QString icon = p.value()->sysFieldValue("r_icon");
+        KKSRubricItem * rItem = new KKSRubricItem(idItem, name, true, icon);
         const_cast<KKSRubric *>(rubricB)->addItem (rItem);
         rItem->release();
     }
+
     refRubr->release();
     refIO->release();
 

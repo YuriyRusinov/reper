@@ -29,14 +29,29 @@ class _GUI_EXPORT KKSIncludesWidget: public KKSDialog
     Q_OBJECT
 
 public:
+
+    //владелец рубрикатора
+    //рубрикатор может быть сам по себе (весь общесистемный рубрикатор, мои документы)
+    //рубрикатор может содержаться в категории
+    //в информационном объекте
+    //в записи справочника
+    enum RubricatorSource{
+        rsRubricator = 0,
+        rsMyDocs = 1,
+        rsCategory = 2,
+        rsIO = 3,
+        rsRecord = 4
+    };
+
+
     KKSIncludesWidget (KKSRubric * rootRubric,
-                       bool isAttach=true,
-                       bool isDocs=false,
-                       bool forCategory=false,
-                       bool forRecord=true,
+                       RubricatorSource rSource = rsRubricator,
+                       //bool isDocs=false,
+                       //bool forCategory=false,
+                       //bool forRecord=true,
                        QWidget *parent = 0,
                        Qt::WindowFlags flags = 0);
-
+    
     ~KKSIncludesWidget();
 
     KKSRubric * rootRubric() const;
@@ -57,19 +72,15 @@ public:
     void setSaved (bool isSaved);
 
     const KKSRubric * getSelectedRubric (void);
-    bool isRubrics (void) const;
+    
+    bool isRubrics (void) const; //виджет создается только для просмотра рубрик без вложений (виджет с вложениями становится невидимым)
     void setForRubrics (bool isr);
 
 protected:
-    //
-    // Overrides
-    //
     virtual void closeEvent (QCloseEvent * event);
     virtual void contextMenuEvent (QContextMenuEvent * event);
 
 private slots:
-    //void on_pbOK_clicked();
-    //void on_pbCancel_clicked();
     void addRubric (void);
     void editRubric (void);
     void delRubric (void);
@@ -87,6 +98,8 @@ private slots:
 
     void addSearchTemplateIntoRubric (void);
     void addCategoryIntoRubric (void);
+    void addIOIntoRubric (void);
+
     void rubricSelectionChanged (const QItemSelection& selected, const QItemSelection& deselected);
     void turnRubricSplitter (void);
     void setRubricIcon (void);
@@ -110,21 +123,22 @@ signals:
     void rubricCategoryRequested (KKSRubric *r);
     void rubricItemRequested(const KKSRubric * r, bool isRec, QAbstractItemModel * itemModel);
     void rubricItemCreationRequested(const KKSRubric * r, QAbstractItemModel * itemModel, const QModelIndex& parent);
+    
     void openRubricItemRequested(int idRubricItem);
+    void openRubricItemRequested(int idObject, int idRecord);
+    
     void saveRubric (KKSRubric * r, bool isMyDocs);
     void rubricsChanged (void);
     void copyFromRubr (KKSRubric * rDest, QAbstractItemModel * attachModel, const QModelIndex& index);
 
-    //void aboutToClose();
-
     void loadStuffModel (RubricForm * rForm);
     void loadSearchtemplate (RubricForm * rForm);
     void loadCategory (RubricForm * rForm);
+    void loadIO(RubricForm * rForm);
     void rubricAttachmentsView (QAbstractItemModel * attachModel, const KKSRubric * r);
     
     void initAttachmentsModel (const KKSRubric * r, bool forRecs);
     void appendRubricItemIntoModel (QAbstractItemModel * attachModel, const KKSRubricItem * rItem);
-    //void appendRubricRecord (int idObject, const KKSRubric * r, QAbstractItemModel * attachModel, const QModelIndex& parent);
     
     void setSyncIO (const QList<int>& ioIDList);
     void putIOSIntoRubr (const QList<int>& ioIDList, const KKSRubric* cRubric);
@@ -135,11 +149,12 @@ private:
     //
     // Variables
     //
-    //Ui::kksincludes_widget * ui;
     KKSRubric * m_rootRubric;
-    bool isMyDoc;
+    RubricatorSource m_rSource; //владелец рубрикатора (см. выше описание перечисления)
+    //bool isMyDoc;
+    //bool isRec;
     bool isChanged;
-    bool isRec;
+    
     bool rubricsOnly;
 
     QToolBar * tBRubrActions;

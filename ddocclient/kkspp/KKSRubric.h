@@ -23,6 +23,7 @@ class KKSSearchTemplate;
 //class KKSPrivilege;
 class KKSCategory;
 class KKSAccessEntity;
+class KKSObject;
 
 class _PP_EXPORT KKSRubricBase : public KKSRecord
 {
@@ -44,11 +45,12 @@ public:
     
     enum RubricBaseType
     {
-        atRootRubric = 0,
-        atRubric = 1,
-        atRubricItem = 2,
-        atRubricCategory = 3,
-        atOthers = 4
+        btRootRubric = 0, //виртуальная корневая рубрика
+        btRubric = 1, //рубрика для ИО или общесистемного рубрикатора
+        btRubricItem = 2, //элемент рубрики (ИО или ЭИО)
+        btRubricAsCategory = 3, //категория в виде рубрики, отображенная в дереве рубрикатора
+        btOthers = 4, //запись в рубрикаторе "Others"
+        btRecordRubric = 5 //рубрика в записи справочника
     };
     
     virtual int rubricType (void) const=0;
@@ -175,6 +177,9 @@ public:
 
     const KKSRubricItem * item(int index) const;
     const KKSList<const KKSRubricItem *> & items() const;
+    const KKSList<const KKSRubricItem *> & deletedItems() const;//список удаленных из рубрики итемов
+
+
     const KKSRubric * rubric(int index) const;
     const KKSList<const KKSRubric*> & rubrics() const;
     const KKSRubric * rubricForId(qint64 id, bool recursivelly = true) const;
@@ -189,26 +194,32 @@ public:
 
     KKSRubric * deepCopy(bool dropIds = false) const;
 
+    //поисковый запрос на рубрику (только для рубрик в общесистемном рубрикаторе, в информационных объектах)
     KKSSearchTemplate * getSearchTemplate (void) const;
     void setSearchTemplate (KKSSearchTemplate * st);
 
-    //
-    // работа с категориями
-    //
+    //информационный объект (справочник) на рубрику (только для рубрик в записях справочников)
+    KKSObject * getIO(void) const;
+    void setIO(KKSObject * io);
+
+    //категория на рубрику (в итоге только записи справочников данной категории и информационные объекты данной категории попадают в рубрику)
     KKSCategory * getCategory (void) const;
     void setCategory (KKSCategory *c);
 
-    //
-    // работа с дискреционными правами доступа
-    //
+    //  дискреционные права доступа к рубрике (только для рубрик в общесистемном рубрикаторе, в информационных объектах)
     KKSAccessEntity * getAccessRules (void) const;
     void setAccessRules (KKSAccessEntity * _acl);
 
-    bool isCategorized (void) const;
-    void setCategorized (bool c);
+    //категория в дереве рубрик
+    void setCategorized();
+    //рубрика относится к записи справочника
+    void setForRecord();
+    //рубрика относится к ИО
+    void  setForIO();
 
     virtual void setDefaultIcon (const QPixmap& px);
     virtual QPixmap getDefaultIcon (void) const;
+    
     virtual int rubricType (void) const;
 
 private:
@@ -221,13 +232,11 @@ private:
     
     KKSSearchTemplate * m_searchTemplate;
     KKSCategory * m_category;
+    KKSObject * m_io;
 
     bool m_isUpdated;
-    
-    //QIcon m_rubricIcon;
-    //QString m_iconData;
-    
-    bool m_isCategorized;
+        
+    RubricBaseType m_baseType;//тип рубрики. Здесь возможны 3 варианта btRubric, btRubricAsCategory, btRecordRubric
 
     friend class KKSLoader;
     friend class KKSPPFactory;
@@ -254,7 +263,6 @@ private:
     QString getFullTreeOfIdsString() const;//возвращает список идентификаторов вложенных подрубрик (включая данную рурику) в виде id1, id2, id3
     QString getFullTreeOfDeletedIds() const;//возвращает список удаленных подрубрик
 
-    const KKSList<const KKSRubricItem *> & deletedItems() const;
 };
 
 Q_DECLARE_METATYPE(const KKSRubricBase *);

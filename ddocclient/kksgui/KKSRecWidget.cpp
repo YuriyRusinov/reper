@@ -486,7 +486,7 @@ void KKSRecWidget :: addRec (void)
 
 void KKSRecWidget :: editRec (void)
 {
-    qDebug () << __PRETTY_FUNCTION__;
+    
     QAbstractItemModel * sourceMod = getSourceModel ();
     if (!sourceMod)
         return;

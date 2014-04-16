@@ -11,15 +11,22 @@
 
 #include <KKSSearchTemplate.h>
 #include <KKSCategory.h>
+#include <KKSObject.h>
 #include <KKSAccessEntity.h>
 #include "kksstuffform.h"
 //#include "KKSCheckableModel.h"
 
-RubricForm :: RubricForm (QString defaultRubricName, QString defaultRubricDesc, bool forRecords, QWidget* parent, Qt::WFlags f)
+RubricForm :: RubricForm (QString defaultRubricName, 
+                          QString defaultRubricDesc, 
+                          bool forRecords, 
+                          QWidget* parent, 
+                          Qt::WFlags f)
     : QDialog (parent, f),
     UI (new Ui::rubric_form),
     searchTemplate (0),
     cat (0),
+    m_io(0),
+    m_forRecords(forRecords),
     stuffForm (0)
 {
     UI->setupUi (this);
@@ -30,9 +37,9 @@ RubricForm :: RubricForm (QString defaultRubricName, QString defaultRubricDesc, 
     UI->lESearchTemplate->setVisible (!forRecords);
     UI->tbSearchTemplate->setVisible (!forRecords);
 
-    UI->lCategory->setVisible (!forRecords);
-    UI->lECategory->setVisible (!forRecords);
-    UI->tbCategory->setVisible (!forRecords);
+    UI->lIO->setVisible(forRecords);
+    UI->lEIO->setVisible(forRecords);
+    UI->tbIO->setVisible(forRecords);
 
     UI->gbAccessRules->setVisible (!forRecords);
     if (forRecords)
@@ -41,6 +48,7 @@ RubricForm :: RubricForm (QString defaultRubricName, QString defaultRubricDesc, 
 
     connect (UI->tbSearchTemplate, SIGNAL (clicked()), this, SLOT (loadSearchTemplate()) );
     connect (UI->tbCategory, SIGNAL (clicked()), this, SLOT (loadCategory ()) );
+    connect (UI->tbIO, SIGNAL (clicked()), this, SLOT (loadIO()) );
     connect (UI->tbRubricIcon, SIGNAL (clicked()), this, SLOT (loadRubricImage()) );
 
     connect (UI->pbOk, SIGNAL (clicked()), this, SLOT (accept()) );
@@ -101,6 +109,24 @@ void RubricForm :: setCategory (KKSCategory * c)
     }
 }
 
+KKSObject * RubricForm :: getIO(void) const
+{
+    return m_io;
+}
+
+void RubricForm :: setIO(KKSObject * io)
+{
+    UI->lEIO->clear ();
+    if (m_io)
+        m_io->release ();
+
+    m_io = io;
+    if (m_io)
+    { 
+        m_io->addRef ();
+        UI->lEIO->setText (m_io->name());
+    }
+}
 
 void RubricForm :: loadSearchTemplate (void)
 {
@@ -111,6 +137,13 @@ void RubricForm :: loadCategory (void)
 {
     emit requestCategory ();
 }
+
+void RubricForm :: loadIO (void)
+{
+    emit requestIO ();
+}
+
+
 /*
 QAbstractItemModel * RubricForm :: getStuffModel (void) const
 {

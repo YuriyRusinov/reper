@@ -209,6 +209,7 @@ const int ATTR_RECORD_TEXT_COLOR = 207;
 #define ATTR_ID_HISTOGRAM_PARAMS_CHAINS 361
 const int ATTR_R_ICON = 312;
 const int ATTR_UUID_T = 348;
+const int ATTR_RR_NAME = 378;
 
 
 

@@ -738,6 +738,8 @@ qint64 KKSEIOFactory::generateInsertQuery(const KKSRecord * rec,
         idState = rec->state()->id();
     }
     
+    QString rName = rec->name();
+
     QString rIcon = KKSRecord::defIconAsString();
     if(rec){
         rIcon = rec->iconAsString();
@@ -760,16 +762,17 @@ qint64 KKSEIOFactory::generateInsertQuery(const KKSRecord * rec,
     }
     else{
         if(attrArray.trimmed().isEmpty()){
-            query = QString("INSERT INTO %1 (id, id_io_state, r_icon, record_fill_color, record_text_color) VALUES (%2, %3, %4, %5::int8, %6::int8);")
+            query = QString("INSERT INTO %1 (id, id_io_state, r_icon, rr_name, record_fill_color, record_text_color) VALUES (%2, %3, %4, %7, %5::int8, %6::int8);")
                             .arg(tableName)
                             .arg(idValue)
                             .arg(idState)
                             .arg(rIcon.isEmpty() ? QString("NULL") : QString("'") + rIcon + QString("'"))
                             .arg(fillColor < 0 ? QString("NULL") : QString::number(fillColor))
-                            .arg(textColor < 0 ? QString("NULL") : QString::number(textColor));
+                            .arg(textColor < 0 ? QString("NULL") : QString::number(textColor))
+                            .arg(rName.isEmpty() ? QString("NULL") : QString("'") + rName + QString("'"));
         }
         else{
-            query = QString("INSERT INTO %1 (id, id_io_state, r_icon, record_fill_color, record_text_color, %2) VALUES (%3, %5, %6, %7::int8, %8::int8, %4);")
+            query = QString("INSERT INTO %1 (id, id_io_state, r_icon, rr_name, record_fill_color, record_text_color, %2) VALUES (%3, %5, %6, %9, %7::int8, %8::int8, %4);")
                             .arg(tableName)
                             .arg(attrArray)
                             .arg(idValue)
@@ -777,7 +780,8 @@ qint64 KKSEIOFactory::generateInsertQuery(const KKSRecord * rec,
                             .arg(idState)
                             .arg(rIcon.isEmpty() ? QString("NULL") : QString("'") + rIcon + QString("'"))
                             .arg(fillColor < 0 ? QString("NULL") : QString::number(fillColor))
-                            .arg(textColor < 0 ? QString("NULL") : QString::number(textColor));
+                            .arg(textColor < 0 ? QString("NULL") : QString::number(textColor))
+                            .arg(rName.isEmpty() ? QString("NULL") : QString("'") + rName + QString("'"));
         }
     }
 
@@ -902,6 +906,8 @@ qint64 KKSEIOFactory::generateUpdateQuery(const KKSRecord * rec,
         idState = rec->state()->id();
     }
     
+    QString rName = rec->name();
+
     QString rIcon = KKSRecord::defIconAsString();
     if(rec){
         rIcon = rec->iconAsString();
@@ -925,14 +931,15 @@ qint64 KKSEIOFactory::generateUpdateQuery(const KKSRecord * rec,
     }
     else{
         if(!attrArray.trimmed().isEmpty()){
-            query = QString("UPDATE %1 SET id_io_state = %2, r_icon = %5, record_fill_color = %6::int8, record_text_color = %7::int8, %3 WHERE id = %4::int8;")
+            query = QString("UPDATE %1 SET id_io_state = %2, r_icon = %5, rr_name = %8, record_fill_color = %6::int8, record_text_color = %7::int8, %3 WHERE id = %4::int8;")
                             .arg(tableName)
                             .arg(idState)
                             .arg(attrArray)
                             .arg(idEIO)
                             .arg(rIcon.isEmpty() ? QString("NULL") : QString("'") + rIcon + QString("'"))
                             .arg(fillColor < 0 ? QString("NULL") : QString::number(fillColor))
-                            .arg(textColor < 0 ? QString("NULL") : QString::number(textColor));
+                            .arg(textColor < 0 ? QString("NULL") : QString::number(textColor))
+                            .arg(rName.isEmpty() ? QString("NULL") : QString("'") + rName + QString("'"));
         }
     }
 
@@ -1600,8 +1607,10 @@ int KKSEIOFactory::updateRubric(KKSRubric * r) const
     int idRubric = r->id();
     
     QString icon = r->iconAsString();
-    QString sql = QString("select * from recUpdateRubricLocal (%1, '%2', '%3', %4, NULL);")
-                          .arg(r->id())
+    QString sql = QString("select * from recUpdateRubricLocal (%1, %2, %3, '%4', '%5', %6, NULL);")
+                          .arg (r->id())
+                          .arg (r->getIO() ? QString::number(r->getIO()->id()) : QString("NULL"))
+                          .arg (r->getCategory() ? QString::number(r->getCategory()->id()) : QString("NULL"))
                           .arg (r->name())
                           .arg (r->desc())
                           .arg (icon.isEmpty() ? QString("NULL") : QString("'%1'").arg(icon));
@@ -1658,9 +1667,11 @@ int KKSEIOFactory::insertRubric(KKSRubric * r, qint64 idParent, qint64 idRec, bo
     int idRubric = ERROR_CODE;//eiof->getNextSeq("rubricator", "id");
     
     QString icon = r->iconAsString();
-    QString sql = QString("select * from recInsertRubric(%1, %2, '%3', '%4', %5, NULL::varchar);")
+    QString sql = QString("select * from recInsertRubric(%1, %2, %3, %4, '%5', '%6', %7, NULL::varchar);")
                           .arg ( (root || idParent <= 0) ? QString("NULL::int8") : QString::number(idParent))
                           .arg (root ? QString::number(idRec) : QString("NULL::int8"))
+                          .arg (r->getIO() ? QString::number(r->getIO()->id()) : QString("NULL"))
+                          .arg (r->getCategory() ? QString::number(r->getCategory()->id()) : QString("NULL"))
                           .arg (r->name())
                           .arg (r->desc())
                           .arg (icon.isEmpty() ? QString("NULL") : QString("'%1'").arg(icon));

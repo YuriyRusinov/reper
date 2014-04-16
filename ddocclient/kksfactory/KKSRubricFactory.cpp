@@ -8,7 +8,6 @@
 #include <QVariant>
 #include <QtDebug>
 
-#include <kksincludeswidget.h>
 #include <KKSIncludesDialog.h>
 #include <rubricform.h>
 #include "KKSLoader.h"
@@ -60,29 +59,11 @@ KKSRubricFactory :: ~KKSRubricFactory (void)
 {
 }
 
-KKSIncludesWidget * KKSRubricFactory :: createRubricEditor (int mode, const KKSList<const KKSFilterGroup *> & filters, bool withCategories, QWidget* parent)
+//определяем заголовок виджета
+QString KKSRubricFactory::getEditorTitle(RubricMode mode) const
 {
-    Q_UNUSED(filters);
-    bool isDocs(mode == atMyDocsRubric);
-
-    /*    KKSRubric * rootR = loader->loadRubricators ( isDocs );
-        if (!rootR){
-            rootR = new KKSRubric(-1, "root rubric for all tree");
-            KKSRubric * rubrMyDocs = new KKSRubric (-1, tr("My Documents"));
-            if (!rubrMyDocs)
-                return 0;
-            rootR->addRubric (rubrMyDocs);
-            int res = ppf->updateRubricators (rootR, isDocs);
-            if (res != OK_CODE)
-            {
-                QMessageBox::warning (parent, tr("Rubricator"), tr ("Cannot load My documents"), QMessageBox::Ok);
-                return 0;
-            }
-
-            ppf->createMyDocsRubricator (rubrMyDocs->id());
-        }
-     */
     QString title;
+
     switch (mode)
     {
         case atRootRubric:
@@ -97,265 +78,248 @@ KKSIncludesWidget * KKSRubricFactory :: createRubricEditor (int mode, const KKSL
         }
         case atOthers:
         {
-            title = tr("Others");
+            title = tr("All rubrics with categories");
             break;
         }
         default:
         {
-            //rootR->release();
-            return 0;
+            return QString::null;
             break;
         }
     }
-    KKSObject * rubrIO = loader->loadIO(IO_RUBR_ID);
-    if (!rubrIO)
-        return 0;
-    KKSCategory * cr = rubrIO->category();
-    if (!cr)
-    {
-        rubrIO->release();
-        return 0;
-    }
-    cr = cr->tableCategory();
-    if (!cr)
-    {
-        rubrIO->release();
-        return 0;
-    }
-    KKSList<const KKSFilterGroup *> rfilters;
-    const KKSFilter * f = cr->createFilter(1, QString("select id from getRubricatorsOnly(%1, false)").arg (loader->getUserId()), KKSFilter::foInSQL);
-    KKSFilterGroup * fg = new KKSFilterGroup (true);
-    fg->addFilter (f);
-    f->release ();
-    rfilters.append (fg);
-    fg->release ();
-    KKSMap<qint64, KKSEIOData *> rubrInfo = loader->loadEIOList(rubrIO, rfilters);
-    QAbstractItemModel * rModel = new KKSRubricModel(rubrInfo);
-    rubrIO->release();
 
-    KKSIncludesWidget *iW = new KKSIncludesWidget(0, false, isDocs, false, false, parent); // rootR
+    return title;
+}
+
+//создаем виджет
+KKSIncludesWidget * KKSRubricFactory :: createRubricEditor (RubricMode mode, 
+                                                            RubricShowMode showMode,
+                                                            bool bModal,
+                                                            QWidget* parent,
+                                                            Qt::WindowFlags flags)
+{
+    bool isDocs(mode == atMyDocsRubric);
+
+    QString title = getEditorTitle(mode);
+    if(title == QString::null)
+        return 0;
+
+    //если у нас рубрикатор только для "мои документы", 
+    //то проверяем существование такой рубрики 
+    //и при необходимости создаем ее для данного пользователя
+    if(isDocs){
+        KKSRubric * rootR = loader->loadRubricators(isDocs);
+        if (!rootR) {
+            rootR = new KKSRubric(-1, "root rubric for all tree");
+            KKSRubric * rubrMyDocs = new KKSRubric(-1, tr("My Documents"));
+            if (!rubrMyDocs)
+                return 0;
+
+            rootR->addRubric(rubrMyDocs);
+            int res = ppf->updateRubricators(rootR, isDocs);
+            if (res != OK_CODE) {
+                qCritical() << tr("Cannot load My documents");
+                QMessageBox::critical(parent, tr("Rubricator"), tr("Cannot load My documents"), QMessageBox::Ok);
+                return 0;
+            }
+
+            ppf->createMyDocsRubricator(rubrMyDocs->id());
+        }
+        
+        KKSIncludesWidget *iW = createRubricRecEditor (rootR, 
+                                                       KKSIncludesWidget::rsMyDocs,
+                                                       showMode,
+                                                       parent,
+                                                       flags);
+        KKSEventFilter *ef = new KKSEventFilter(iW);
+        iW->setWindowTitle(title);
+        QTreeView *tv = iW->tvRubr();
+        tv->viewport()->installEventFilter(ef);
+
+        if(!bModal)//если окно открывается не модально, то надо отослать сигнал, о том, что оно создано. Тогда оно поместится на панель открытых окон MDI-приложения
+            emit rubricEditorCreated(iW);    
+
+        return iW;
+    }
+    
+    KKSMap<qint64, KKSEIOData *> rubrInfo = getRubricatorsData();
+
+    QAbstractItemModel * rModel = new KKSRubricModel(rubrInfo);
+    //rubrIO->release();
+
+    KKSIncludesWidget *iW = new KKSIncludesWidget(0, 
+                                                  isDocs ? KKSIncludesWidget::rsMyDocs : KKSIncludesWidget::rsRubricator, 
+                                                  parent);
+    if(showMode == smRubricsOnly)
+        iW->setForRubrics(true);
+    else
+        iW->setForRubrics(false);
+
     iW->setRubrModel(rModel);
     QTreeView *tv = iW->tvRubr();
     QAbstractItemModel * rubrMod = iW->rubrModel();
-    if (rubrMod && withCategories)
-    {
-        int nr = rubrMod->rowCount();
-        bool isIns = rubrMod->insertRows(nr, 1);
-        if (isIns)
-        {
-            QModelIndex wIndex = rubrMod->index(nr, 0);
-            const KKSRubricBase * rOthers = new KKSRubricOthers(-1, tr("Others"));
-            // loader->loadCatRubricators ();//
-            bool isRubrDataSet = rubrMod->setData(wIndex, QVariant::fromValue<const KKSRubricBase *>(rOthers), Qt::UserRole + 1);
-            if (!isRubrDataSet)
-            {
-                iW->setParent (0);
-                delete iW;
-                return 0;
-            }
-            KKSObject * catIO = loader->loadIO(IO_CAT_ID);
-            if (!catIO)
-            {
-                iW->setParent (0);
-                delete iW;
-                return 0;
-            }
-            KKSCategory * catCatIO = catIO->category();
-            if (!catCatIO)
-            {
-                catIO->release();
-                iW->setParent (0);
-                delete iW;
-            }
-            catCatIO = catCatIO->tableCategory();
-            if (!catCatIO)
-            {
-                catIO->release();
-                iW->setParent (0);
-                delete iW;
-            }
-            const KKSFilter * f = catCatIO->createFilter(1, "select id from cGetCategoriesForRubricator() order by id", KKSFilter::foInSQL);
-            //
-            // io_categories where id_io_category_type != 10 and is_main and not is_archived
-            //
-            KKSList<const KKSFilter *> cFilters;
-            cFilters.append (f);
-            f->release();
-            KKSFilterGroup * fg = new KKSFilterGroup (true);
-            fg->setFilters (cFilters);
-            rfilters.append (fg);
-            fg->release();
-            KKSMap<qint64, KKSEIOData *> catInfo = loader->loadEIOList(catIO, rfilters);
-            int nrc = rubrMod->rowCount (wIndex);
-            for (KKSMap<qint64, KKSEIOData *>::const_iterator pc = catInfo.constBegin();
-                    pc != catInfo.constEnd();
-                    pc++)
-            {
-                rubrMod->insertRows (nrc, 1, wIndex);
-                const KKSRubric * rCat = new KKSRubric(pc.key(), pc.value()->fieldValue("name"));
-                //KKSCategory * c = loader->loadCategory(pc.key(), true);
-                (const_cast<KKSRubric *> (rCat))->setCategorized(true);
-                //(const_cast<KKSRubric *> (rCat))->setCategory(c);
-                //if (c)
-                //    c->release();
-                (const_cast<KKSRubricBase *> (rOthers))->addNode(rCat);
-                QModelIndex wcIndex = rubrMod->index (nrc, 0, wIndex);
-                rubrMod->setData (wcIndex, QVariant::fromValue<const KKSRubricBase *>(rCat), Qt::UserRole+1);
-                rCat->release();
-                nrc++;
-            }
-            catIO->release();
+    
+    if (rubrMod && mode == atOthers){//если еще надо и категории добавить в виде рубрик
+        int ok = addCategoriesToRubricator(rubrMod);
+        
+        if(ok == ERROR_CODE){
+            iW->setParent (0);
+            delete iW;
+        
+            return 0;
         }
     }
+
     KKSEventFilter *ef = new KKSEventFilter(iW);
     iW->setWindowTitle(title);
     tv->viewport()->installEventFilter(ef);
-    //    if (rootR)
-    //        rootR->release ();
 
-    //QAbstractItemDelegate *iDeleg = tv->itemDelegate ();
-    //qDebug () << __PRETTY_FUNCTION__ << iDeleg;
+    initConnections(iW);
 
-    connect(iW, SIGNAL(saveRubric(KKSRubric *, bool)), this, SLOT(saveRubric(KKSRubric *, bool)));
-    connect(iW, SIGNAL(rubricItemRequested(const KKSRubric*, bool, QAbstractItemModel *)), this, SLOT(rubricItemUpload(const KKSRubric *, bool, QAbstractItemModel *)));
-    connect(iW, SIGNAL(rubricItemCreationRequested(const KKSRubric *, QAbstractItemModel*, const QModelIndex&)), this, SLOT(rubricItemCreate(const KKSRubric *, QAbstractItemModel *, const QModelIndex&)));
-    connect(iW, SIGNAL(openRubricItemRequested(int)), this, SLOT(openRubricItem(int)));
-    connect(iW, SIGNAL(loadStuffModel(RubricForm *)), this, SLOT(loadRubricPrivilegies(RubricForm *)));
-    connect(iW, SIGNAL(loadSearchtemplate(RubricForm *)), this, SLOT(loadSearchTemplate(RubricForm *)));
-    connect(iW, SIGNAL(loadCategory(RubricForm *)), this, SLOT(loadCategory(RubricForm *)));
-    connect(iW, SIGNAL(rubricAttachmentsView(QAbstractItemModel *, const KKSRubric *)), this, SLOT(viewAttachments(QAbstractItemModel *, const KKSRubric *)));
-    connect(iW, SIGNAL(copyFromRubr(KKSRubric *, QAbstractItemModel *, const QModelIndex&)), this, SLOT(copyFromRubric(KKSRubric *, QAbstractItemModel *, const QModelIndex&)));
-    connect(iW, SIGNAL(initAttachmentsModel(const KKSRubric *, bool)), this, SLOT(initRubricAttachments(const KKSRubric *, bool)));
-    connect(iW, SIGNAL(appendRubricItemIntoModel(QAbstractItemModel *, const KKSRubricItem *)), this, SLOT(appendRubricItem(QAbstractItemModel *, const KKSRubricItem *)));
-    connect(iW, SIGNAL(setSyncIO(const QList<int>&)), this, SLOT(setSyncSettings(const QList<int>&)));
-    connect(iW, SIGNAL(putIOSIntoRubr(const QList<int>&, const KKSRubric*)), this, SLOT(putIntoRubr(const QList<int>&, const KKSRubric*)));
-    connect(iW, SIGNAL(sendIOS(const QList<int>&)), this, SLOT(sendDocs(const QList<int>&)));
-    connect(iW, SIGNAL(setAccessIOS(const QList<int>&)), this, SLOT(setAccessDocs(const QList<int>&)));
-    connect(iW, SIGNAL(rubricRequested(KKSRubric *, int, QAbstractItemModel*, const QModelIndex&)), this, SLOT(loadRubric(KKSRubric *, int, QAbstractItemModel*, const QModelIndex&)));
-    connect(iW, SIGNAL(rubricCategoryRequested(KKSRubric *)), this, SLOT(loadCategoryIntoRubric(KKSRubric *)));
-
-    connect(this, SIGNAL(rubricAttachments(QAbstractItemModel *, KKSIncludesWidget *)), iW, SLOT(slotInitAttachmentsModel(QAbstractItemModel *, KKSIncludesWidget *)));
-    emit rubricEditorCreated(iW);
+    if(!bModal)//если окно открывается не модально, то надо отослать сигнал, о том, что оно создано. Тогда оно поместится на панель открытых окон MDI-приложения        
+        emit rubricEditorCreated(iW);
 
     return iW;
 }
 
-KKSIncludesWidget * KKSRubricFactory::createModalRubricEditor(int mode, const KKSList<const KKSFilterGroup *> & filters, bool withCategories, QWidget* parent)
+int KKSRubricFactory::addCategoriesToRubricator(QAbstractItemModel * rubrMod) const
 {
-    Q_UNUSED(filters);
-    bool isDocs(mode == atMyDocsRubric);
+    if(!rubrMod)
+        return ERROR_CODE;
 
-    KKSRubric * rootR = loader->loadRubricators(isDocs);
-    if (!rootR) {
-        rootR = new KKSRubric(-1, "root rubric for all tree");
-        KKSRubric * rubrMyDocs = new KKSRubric(-1, tr("My Documents"));
-        if (!rubrMyDocs)
-            return 0;
-        rootR->addRubric(rubrMyDocs);
-        int res = ppf->updateRubricators(rootR, isDocs);
-        if (res != OK_CODE) {
-            qCritical() << tr("Cannot load My documents");
-            QMessageBox::critical(parent, tr("Rubricator"), tr("Cannot load My documents"), QMessageBox::Ok);
-            return 0;
+    int nr = rubrMod->rowCount();
+    bool isIns = rubrMod->insertRows(nr, 1);
+    if (isIns)
+    {
+        QModelIndex wIndex = rubrMod->index(nr, 0);
+        const KKSRubricBase * rOthers = new KKSRubricOthers(-1, tr("Groupped by categories"));
+        // loader->loadCatRubricators ();//
+        bool isRubrDataSet = rubrMod->setData(wIndex, QVariant::fromValue<const KKSRubricBase *>(rOthers), Qt::UserRole + 1);
+        if (!isRubrDataSet)
+        {
+            return ERROR_CODE;
         }
 
-        ppf->createMyDocsRubricator(rubrMyDocs->id());
+        KKSObject * catIO = loader->loadIO(IO_CAT_ID, true);
+        if (!catIO)
+        {
+            return ERROR_CODE;
+        }
+
+        KKSCategory * catCatIO = catIO->category();
+        if (!catCatIO)
+        {
+            catIO->release();
+        }
+
+        catCatIO = catCatIO->tableCategory();
+        if (!catCatIO)
+        {
+            catIO->release();
+        }
+        
+        //создаем фильтр на получение категорий в виде рубрик
+        KKSList<const KKSFilterGroup *> rfilters;
+        const KKSFilter * f = catCatIO->createFilter(1, "select id from cGetCategoriesForRubricator()", KKSFilter::foInSQL);
+        KKSList<const KKSFilter *> cFilters;
+        cFilters.append (f);
+        f->release();
+        KKSFilterGroup * fg = new KKSFilterGroup (true);
+        fg->setFilters (cFilters);
+        rfilters.append (fg);
+        fg->release();
+
+        //получаем данные (категории в виде рубрик)
+        KKSMap<qint64, KKSEIOData *> catInfo = loader->loadEIOList(catIO, rfilters);
+        int nrc = rubrMod->rowCount (wIndex);
+        
+        for (KKSMap<qint64, KKSEIOData *>::const_iterator pc = catInfo.constBegin();
+                pc != catInfo.constEnd();
+                pc++)
+        {
+            rubrMod->insertRows (nrc, 1, wIndex);
+            const KKSRubric * rCat = new KKSRubric(pc.key(), pc.value()->fieldValue("name"));
+            (const_cast<KKSRubric *> (rCat))->setCategorized();
+            (const_cast<KKSRubricBase *> (rOthers))->addNode(rCat);
+            QModelIndex wcIndex = rubrMod->index (nrc, 0, wIndex);
+            rubrMod->setData (wcIndex, QVariant::fromValue<const KKSRubricBase *>(rCat), Qt::UserRole+1);
+            rCat->release();
+            nrc++;
+        }
+        catIO->release();
     }
 
-    QString title;
-    switch (mode) {
-        case atRootRubric:
-        {
-            title = tr("All rubrics");
-            break;
-        }
-        case atMyDocsRubric:
-        {
-            title = tr("My Documents");
-            break;
-        }
-        case atOthers:
-        {
-            title = tr("Others");
-            break;
-        }
-        default:
-        {
-            rootR->release();
-            return 0;
-            break;
-        }
-    }
-
-    KKSIncludesWidget *iW = new KKSIncludesWidget(rootR, false, isDocs, false, false, parent);
-    iW->setForRubrics(true);
-    QTreeView *tv = iW->tvRubr();
-    QAbstractItemModel * rubrMod = iW->rubrModel();
-    if (rubrMod && withCategories) {
-        int nr = rubrMod->rowCount();
-        bool isIns = rubrMod->insertRows(nr, 1);
-        if (isIns) {
-            QModelIndex wIndex = rubrMod->index(nr, 0);
-            const KKSRubricBase * rOthers = loader->loadCatRubricators(); //new KKSRubricOthers (-1, tr("Others"));
-            bool isRubrDataSet = rubrMod->setData(wIndex, QVariant::fromValue<const KKSRubricBase *>(rOthers), Qt::UserRole + 1);
-            Q_UNUSED(isRubrDataSet);
-        }
-    }
-    KKSEventFilter *ef = new KKSEventFilter(iW);
-    iW->setWindowTitle(title);
-    tv->viewport()->installEventFilter(ef);
-    if (rootR)
-        rootR->release();
-
-    //QAbstractItemDelegate *iDeleg = tv->itemDelegate ();
-    //qDebug () << __PRETTY_FUNCTION__ << iDeleg;
-    return iW;
+    return OK_CODE;
 }
 
 KKSIncludesWidget * KKSRubricFactory::createRubricRecEditor (KKSRubric * rootRubric,
-                                                             bool isAttach,
-                                                             bool isDocs,
-                                                             bool forCategory,
-                                                             bool forRecord,
+                                                             KKSIncludesWidget::RubricatorSource rSource,
+                                                             RubricShowMode showMode,
                                                              QWidget *parent,
                                                              Qt::WindowFlags flags)
 {
-    KKSIncludesWidget * iW = new KKSIncludesWidget (rootRubric, isAttach, isDocs, forCategory, forRecord, parent, flags);
+    KKSIncludesWidget * iW = new KKSIncludesWidget (rootRubric, rSource, parent, flags);
+    
+    if(showMode == smRubricsOnly)
+        iW->setForRubrics(true);
+    else
+        iW->setForRubrics(false);
 
-    connect(iW, SIGNAL(saveRubric(KKSRubric *, bool)), this, SLOT(saveRubric(KKSRubric *, bool)));
-    connect(iW, SIGNAL(rubricItemRequested(const KKSRubric*, bool, QAbstractItemModel *)), this, SLOT(rubricItemUpload(const KKSRubric *, bool, QAbstractItemModel *)));
-    connect(iW, SIGNAL(rubricItemCreationRequested(const KKSRubric *, QAbstractItemModel*, const QModelIndex&)), this, SLOT(rubricItemCreate(const KKSRubric *, QAbstractItemModel *, const QModelIndex&)));
-    connect(iW, SIGNAL(openRubricItemRequested(int)), this, SLOT(openRubricItem(int)));
-    connect(iW, SIGNAL(loadStuffModel(RubricForm *)), this, SLOT(loadRubricPrivilegies(RubricForm *)));
-    connect(iW, SIGNAL(loadSearchtemplate(RubricForm *)), this, SLOT(loadSearchTemplate(RubricForm *)));
-    connect(iW, SIGNAL(loadCategory(RubricForm *)), this, SLOT(loadCategory(RubricForm *)));
-    connect(iW, SIGNAL(rubricAttachmentsView(QAbstractItemModel *, const KKSRubric *)), this, SLOT(viewAttachments(QAbstractItemModel *, const KKSRubric *)));
-    connect(iW, SIGNAL(copyFromRubr(KKSRubric *, QAbstractItemModel *, const QModelIndex&)), this, SLOT(copyFromRubric(KKSRubric *, QAbstractItemModel *, const QModelIndex&)));
-    connect(iW, SIGNAL(initAttachmentsModel(const KKSRubric *, bool)), this, SLOT(initRubricAttachments(const KKSRubric *, bool)));
-    connect(iW, SIGNAL(appendRubricItemIntoModel(QAbstractItemModel *, const KKSRubricItem *)), this, SLOT(appendRubricItem(QAbstractItemModel *, const KKSRubricItem *)));
-    connect(iW, SIGNAL(setSyncIO(const QList<int>&)), this, SLOT(setSyncSettings(const QList<int>&)));
-    connect(iW, SIGNAL(putIOSIntoRubr(const QList<int>&, const KKSRubric*)), this, SLOT(putIntoRubr(const QList<int>&, const KKSRubric*)));
-    connect(iW, SIGNAL(sendIOS(const QList<int>&)), this, SLOT(sendDocs(const QList<int>&)));
-    connect(iW, SIGNAL(setAccessIOS(const QList<int>&)), this, SLOT(setAccessDocs(const QList<int>&)));
-    connect(iW, SIGNAL(rubricRequested(KKSRubric *, int, QAbstractItemModel*, const QModelIndex&)), this, SLOT(loadRubric(KKSRubric *, int, QAbstractItemModel*, const QModelIndex&)));
-    connect(iW, SIGNAL(rubricCategoryRequested(KKSRubric *)), this, SLOT(loadCategoryIntoRubric(KKSRubric *)));
-
-    connect(this, SIGNAL(rubricAttachments(QAbstractItemModel *, KKSIncludesWidget *)), iW, SLOT(slotInitAttachmentsModel(QAbstractItemModel *, KKSIncludesWidget *)));
+    initConnections(iW);
     //emit rubricEditorCreated(iW);
 
     return iW;
 }
 
+void KKSRubricFactory::initConnections(KKSIncludesWidget * iW) const
+{
+    if(!iW)
+        return;
+
+    //сохранение рубрики в БД
+    connect(iW, SIGNAL(saveRubric(KKSRubric *, bool)), this, SLOT(saveRubric(KKSRubric *, bool)));
+    //добавление сущемтвующего ИО или записи справочника в рубрику
+    connect(iW, SIGNAL(rubricItemRequested(const KKSRubric*, bool, QAbstractItemModel *)), this, SLOT(rubricItemUpload(const KKSRubric *, bool, QAbstractItemModel *)));
+    //создание нового ИО в рубрике, для которой задана категория (по этой категории)
+    connect(iW, SIGNAL(rubricItemCreationRequested(const KKSRubric *, QAbstractItemModel*, const QModelIndex&)), this, SLOT(rubricItemCreate(const KKSRubric *, QAbstractItemModel *, const QModelIndex&)));
+    
+    //открытие редактора ИО для заданного ИО
+    connect(iW, SIGNAL(openRubricItemRequested(int)), this, SLOT(openRubricItem(int)));
+    //открытие редактора ИО для заданной записи справочника
+    connect(iW, SIGNAL(openRubricItemRequested(int, int)), this, SLOT(openRubricItem(int, int)));
+
+    connect(iW, SIGNAL(loadStuffModel(RubricForm *)), this, SLOT(loadRubricPrivilegies(RubricForm *)));
+    connect(iW, SIGNAL(loadSearchtemplate(RubricForm *)), this, SLOT(loadSearchTemplate(RubricForm *)));
+    connect(iW, SIGNAL(loadCategory(RubricForm *)), this, SLOT(loadCategory(RubricForm *)));
+    connect(iW, SIGNAL(loadIO(RubricForm *)), this, SLOT(loadIO(RubricForm *)));
+    
+    
+    connect(iW, SIGNAL(rubricAttachmentsView(QAbstractItemModel *, const KKSRubric *)), this, SLOT(viewAttachments(QAbstractItemModel *, const KKSRubric *)));
+
+    connect(iW, SIGNAL(copyFromRubr(KKSRubric *, QAbstractItemModel *, const QModelIndex&)), this, SLOT(copyFromRubric(KKSRubric *, QAbstractItemModel *, const QModelIndex&)));
+    connect(iW, SIGNAL(initAttachmentsModel(const KKSRubric *, bool)), this, SLOT(initRubricAttachments(const KKSRubric *, bool)));
+    connect(iW, SIGNAL(appendRubricItemIntoModel(QAbstractItemModel *, const KKSRubricItem *)), this, SLOT(appendRubricItem(QAbstractItemModel *, const KKSRubricItem *)));
+    connect(iW, SIGNAL(setSyncIO(const QList<int>&)), this, SLOT(setSyncSettings(const QList<int>&)));
+    connect(iW, SIGNAL(putIOSIntoRubr(const QList<int>&, const KKSRubric*)), this, SLOT(putIntoRubr(const QList<int>&, const KKSRubric*)));
+    connect(iW, SIGNAL(sendIOS(const QList<int>&)), this, SLOT(sendDocs(const QList<int>&)));
+    connect(iW, SIGNAL(setAccessIOS(const QList<int>&)), this, SLOT(setAccessDocs(const QList<int>&)));
+    connect(iW, SIGNAL(rubricRequested(KKSRubric *, int, QAbstractItemModel*, const QModelIndex&)), this, SLOT(loadRubric(KKSRubric *, int, QAbstractItemModel*, const QModelIndex&)));
+    connect(iW, SIGNAL(rubricCategoryRequested(KKSRubric *)), this, SLOT(loadCategoryIntoRubric(KKSRubric *)));//задать категорию в виде рубрики
+
+    connect(this, SIGNAL(rubricAttachments(QAbstractItemModel *, KKSIncludesWidget *)), iW, SLOT(slotInitAttachmentsModel(QAbstractItemModel *, KKSIncludesWidget *)));
+}
+
 void KKSRubricFactory::saveRubric(KKSRubric * rootR, bool isMyDocs)
 {
-    //qDebug () << __PRETTY_FUNCTION__ << rootR->childNumber() << rootR->rubrics().count();
     int res = ppf->updateRubricators(rootR, isMyDocs);
 
     KKSIncludesWidget *wParent = qobject_cast<KKSIncludesWidget *>(this->sender());
+    
     if (res != OK_CODE) {
         qCritical() << tr("Cannot save rubricators");
         QMessageBox::critical(wParent, tr("Rubricators"), tr("Cannot save rubricators"), QMessageBox::Ok);
-    } else
+    } 
+    else
         wParent->setSaved(true);
 }
 
@@ -384,48 +348,33 @@ void KKSRubricFactory::rubricItemCreate(const KKSRubric * r, QAbstractItemModel 
             editor,
             Qt::Dialog);
 
-    //int res = objEditor->exec();
-    //Q_UNUSED (res);
+    //днный код используется, чтобы запомнить, из какой рубрики и редактора рубрик было вызвано создание редактора ИО
+    //в фабрике ИО при создании ИО ИО генерируется сигнал cioSaved, который ловится фабрикой рубрик и обрабатывается слотом rubricItemCreated
     connect(objEditor, SIGNAL(closeEditor()), this, SLOT(objEditorClosed()));
+    
     KKSObjectExemplar * pObjectRec = objEditor->getObjectEx();
+    
     ioRubrs.insert(pObjectRec, const_cast<KKSRubric *> (r));
     ioModels.insert(pObjectRec, itemModel);
     ioParents.insert(pObjectRec, parent);
     includesW.insert(pObjectRec, editor);
-    oef->sendEditor(objEditor);
-    /*
-        int idObject = -1;
-        QString name;
+    
+    //oef->sendEditor(objEditor);
 
-
-        KKSObject * o = objEditor->getObj();
-        if(!o){
-            delete objEditor;
-            return;
-        }
-	
-        idObject = o->id();
-        name = o->name();
-
-        if(idObject < 0)
-            return;
-
-        editor->slotAddRubricItem (idObject, name);
-     */
-    objEditor->setAttribute(Qt::WA_DeleteOnClose);
+    //этот атрибут все равно ставится в методе KKSMainWindow::slotCreateNewObjEditor
+    //objEditor->setAttribute(Qt::WA_DeleteOnClose);
 
     bool mode(editor->windowModality() == Qt::NonModal);
     if (mode)
         emit objEditorCreated(objEditor);
 }
 
+//помещение существующего ИО или записи справочника в рубрику (выбор ИО или записи справочника из списка существующих, открывавется в редакторе ИО)
 void KKSRubricFactory::rubricItemUpload(const KKSRubric *r, bool forRecords, QAbstractItemModel * itemModel) 
 {
     KKSIncludesWidget *editor = qobject_cast<KKSIncludesWidget *>(this->sender());
     if (!editor || !r || !itemModel)
         return;
-
-    
 
     KKSObject * o = loader->loadIO(IO_IO_ID, true);
     if (!o)
@@ -436,17 +385,31 @@ void KKSRubricFactory::rubricItemUpload(const KKSRubric *r, bool forRecords, QAb
         return;
     }
 
-    //KKSObjEditorFactory * oef = kksSito->oef();
+    //если имеем дело с рубрикой в записи справочника и ей задан информационный объект
+    //то нам надо лишь выбрать запись именно из этого ИО
+    if(forRecords && r->getIO())
+    {
+        KKSObject * o = r->getIO();
+        recRubricItemUpload(r, itemModel, o, editor);
+        return;
+    }
 
     KKSList<const KKSFilterGroup *> filterGroups;
     KKSList<const KKSFilter*> filters;
 
+    //для добавления записи справочника нам сначала надо предложить пользователю выбрать справочник
     if (forRecords) {
         KKSFilter * filterTab = c->createFilter(ATTR_TABLE_NAME, QString("is not null"), KKSFilter::foIsNotNull);
         filters.append(filterTab);
         filterTab->release();
+        
+        //также надо исключить системные справочники, поскольку они не наследуются от q_base_table
+        filterTab = c->createFilter(ATTR_ID, QString("300"), KKSFilter::foGr);
+        filters.append(filterTab);
+        filterTab->release();
     }
 
+    //если для рубрики задана категория, то в фильтр добавим условие, что должны отображаться только ИО имеено этой категории
     if(r->getCategory()){
         KKSFilter * filter = c->createFilter(ATTR_ID_IO_CATEGORY, QString::number(r->getCategory()->id()), KKSFilter::foEq);
         if (!filter) {
@@ -457,7 +420,11 @@ void KKSRubricFactory::rubricItemUpload(const KKSRubric *r, bool forRecords, QAb
         filters.append(filter);
         filter->release();
     }
-    if (itemModel->rowCount() > 0)
+
+    //если мы добавляем в рубрику ИО
+    //и если в рубрике уже есть прикрепленные ИО, то добавим фильтр, исключающий их из выбора
+    //нельзя добавить один и тот же ИО в рубрику дважды
+    if (!forRecords && itemModel->rowCount() > 0)
     {
         int n = itemModel->rowCount();
         for (int i=0; i<n; i++)
@@ -466,6 +433,7 @@ void KKSRubricFactory::rubricItemUpload(const KKSRubric *r, bool forRecords, QAb
             qint64 idObject = wInd.data (Qt::UserRole).toLongLong();
             KKSFilter * f = c->createFilter(1, QString::number (idObject), KKSFilter::foNotEq);
             filters.append (f);
+            f->release();
         }
     }
 
@@ -476,6 +444,7 @@ void KKSRubricFactory::rubricItemUpload(const KKSRubric *r, bool forRecords, QAb
         group->release();
     }
 
+    
     KKSRecDialog *objEditor = oef->createObjRecEditor(IO_IO_ID,
             IO_IO_ID,
             filterGroups,
@@ -487,6 +456,7 @@ void KKSRubricFactory::rubricItemUpload(const KKSRubric *r, bool forRecords, QAb
             editor,
             Qt::Dialog);
 
+    //если выбираем записи справочника, то необходимо их выбирать из одного спрпавочника, поэтому на данном этапе ограничим выбор справочника одним единственным
     if (forRecords)
         objEditor->setSelectionMode(QAbstractItemView::SingleSelection);
 
@@ -497,6 +467,7 @@ void KKSRubricFactory::rubricItemUpload(const KKSRubric *r, bool forRecords, QAb
 
     if (res == QDialog::Accepted)
     {
+        //если пользователь в редакторе ИО нажал на ОК, то пробуем добавить ИО (ЭИО) в рубрику
         QList<qint64> idObjectList = objEditor->getIDList();
         int no = idObjectList.count();
         for (int i=0; i<no; i++)
@@ -508,6 +479,18 @@ void KKSRubricFactory::rubricItemUpload(const KKSRubric *r, bool forRecords, QAb
                 delete objEditor;
                 return;
             }
+            
+            if (forRecords)
+            {
+                recRubricItemUpload(r, itemModel, o, editor);
+
+                o->release();
+                objEditor->setParent(0);
+                delete objEditor;
+
+                return;
+            }
+            
             name = o->name();
             if (r->getCategory())
             {
@@ -528,107 +511,22 @@ void KKSRubricFactory::rubricItemUpload(const KKSRubric *r, bool forRecords, QAb
                     return;
                 }
             }
-            else if (forRecords)
-            {
-                filterGroups.clear();
-                const KKSCategory * c = o->category();
-                if (!c)
-                {
-                    objEditor->setParent (0);
-                    delete objEditor;
-                    o->release();
-                    return;
-                }
-                c = c->tableCategory();
-                filters.clear ();
-                if (itemModel->rowCount() > 0)
-                {
-                    int n = itemModel->rowCount();
-                    for (int i=0; i<n; i++)
-                    {
-                        QModelIndex wInd = itemModel->index (i, 0);
-                        qint64 idObject = wInd.data (Qt::UserRole).toLongLong();
-                        //qDebug () << __PRETTY_FUNCTION__ << idObject;
-                        KKSFilter * f = c->createFilter(ATTR_ID, QString::number (idObject), KKSFilter::foNotEq);
-                        filters.append (f);
-                        f->release ();
-                    }
-                }
+            
+            //здесь работает случай, когда добавляются в рубрику ИО
 
-                if(filters.count() > 0){
-                    KKSFilterGroup * group = new KKSFilterGroup(true);
-                    group->setFilters(filters);
-                    filterGroups.append(group);
-                    group->release();
-                }
-                KKSRecDialog *recEditor = oef->createObjRecEditor(IO_IO_ID,
-                        idObject,
-                        filterGroups,
-                        tr("Select record for rubric"),
-                        c,
-                        true,
-                        false,
-                        Qt::WindowModal,
-                        editor,
-                        Qt::Dialog);
-                if (!recEditor || recEditor->exec() != QDialog::Accepted)
-                {
-                    if (recEditor)
-                    {
-                        recEditor->setParent (0);
-                        delete recEditor;
-                    }
-                    objEditor->setParent (0);
-                    delete objEditor;
-                    o->release();
-                    return;
-                }
-                QList<qint64> idRecList = recEditor->getIDList();
-                int nr = idRecList.count();
-                for (int i=0; i<nr; i++)
-                {
-                    int idRec = idRecList[i];
-                    KKSObjectExemplar * ioRec = loader->loadEIO(idRec, o);
-                    if (!ioRec)
-                    {
-                        qCritical() << tr("Cannot load record %1").arg(idRec);
-                        QMessageBox::critical (editor, tr("Add new item"), tr("Cannot load record %1").arg(idRec), QMessageBox::Ok);
-                        recEditor->setParent (0);
-                        delete recEditor;
-                        objEditor->setParent (0);
-                        delete objEditor;
-                        o->release();
-                        return;
-                    }
-                    QString rubrItemName = ioRec->name();
-                    KKSRubricItem * item = new KKSRubricItem(idRec, rubrItemName, false);
-                    (const_cast<KKSRubric *> (r))->addItem(item);
-                    item->release();
-                    int nr = itemModel->rowCount();
-                    bool isIns = itemModel->insertRows (nr, 1);
-                    QModelIndex rIndex = itemModel->index (nr, 0);
-                    KKSEIOData * itemInfo = loader->loadEIOInfo(o->id(), idRec);
-                    bool isRubrSet = itemModel->setData (rIndex, QVariant::fromValue<KKSEIOData*>(itemInfo), Qt::UserRole+1);
-                    itemModel->setData (rIndex, KKSRubricItem::icon(), Qt::DecorationRole);
-                    qDebug () << __PRETTY_FUNCTION__ << isIns << isRubrSet << r->items().count();
-                    //this->appendRubricItem(itemModel, item);
-                    editor->setSaved(false);
-                    editor->slotAddRubricItem(idRec, o->name());
-                    ioRec->release();
-                }
-                recEditor->setParent (0);
-                delete recEditor;
-                objEditor->setParent(0);
-                delete objEditor;
-                o->release();
-                return;
-            }
             o->release();
+            
+            //создаем из ИО вложение в рубрику, помещаем его в рубрику
             KKSRubricItem * item = new KKSRubricItem(idObject, name, false);
             (const_cast<KKSRubric *> (r))->addItem(item);
+            
+            //добавляем ИО в модель в виде KKSEIOData
             this->appendRubricItem(itemModel, item);
+            
+            //помечаем редактор ИО как несохраненный (при закрытии будет вопрос)
             editor->setSaved(false);
-        }
+        
+        }//для каждого выбранного ИО (конец цикла)
     }
     else
     {
@@ -649,6 +547,123 @@ void KKSRubricFactory::rubricItemUpload(const KKSRubric *r, bool forRecords, QAb
 
     delete objEditor;
     o->release();
+}
+
+void KKSRubricFactory::recRubricItemUpload(const KKSRubric *r, QAbstractItemModel * itemModel, KKSObject * o, KKSIncludesWidget *editor)
+{
+    if(!itemModel || !editor)
+        return;
+
+    //если добавляем ЭИО, то надо еще вызвать редактор ИО, в котором отобразить записи выбранного справочника
+    KKSList<const KKSFilterGroup *> filterGroups;
+    KKSList<const KKSFilter*> filters;
+
+    //filterGroups.clear();
+    //filters.clear ();
+/*
+    if (itemModel->rowCount() > 0)
+    {
+        int n = itemModel->rowCount();
+        for (int i=0; i<n; i++)
+        {
+            QModelIndex wInd = itemModel->index (i, 0);
+            qint64 idRecord = wInd.data (Qt::UserRole).toLongLong();
+            KKSFilter * f = c->createFilter(ATTR_ID, QString::number (idRecord), KKSFilter::foNotEq);
+            filters.append (f);
+            f->release();
+        }
+    }
+*/
+    const KKSCategory * c = o->category();
+    if (!c)
+    {
+        //objEditor->setParent (0);
+        //delete objEditor;
+        //o->release();
+        return;
+    }
+
+    c = c->tableCategory();
+    
+    if (itemModel->rowCount() > 0)
+    {
+        int n = itemModel->rowCount();
+        for (int i=0; i<n; i++)
+        {
+            QModelIndex wInd = itemModel->index (i, 0);
+            qint64 idRecord = wInd.data (Qt::UserRole).toLongLong();
+            
+            KKSFilter * f = c->createFilter(ATTR_ID, QString::number (idRecord), KKSFilter::foNotEq);
+            filters.append (f);
+            f->release ();
+        }
+    }
+
+    if(filters.count() > 0){
+        KKSFilterGroup * group = new KKSFilterGroup(true); //группа И
+        group->setFilters(filters);
+        filterGroups.append(group);
+        group->release();
+    }
+
+    KKSRecDialog *recEditor = oef->createObjRecEditor(IO_IO_ID,
+            o->id(),
+            filterGroups,
+            tr("Select record for rubric"),
+            c,
+            true,
+            false,
+            Qt::WindowModal,
+            editor,
+            Qt::Dialog);
+
+    if (!recEditor || recEditor->exec() != QDialog::Accepted)
+    {
+        if (recEditor)
+        {
+            recEditor->setParent (0);
+            delete recEditor;
+        }
+
+        return;
+    }
+
+    //если пользователь также нажал на ОК - добавляем запись
+    //при этом сначала получим информацию о ней
+    //(выполняется для каждой из выбранных записей)
+    QList<qint64> idRecList = recEditor->getIDList();
+    KKSMap<qint64, KKSEIOData *> itemsData = loader->loadRecList (idRecList);
+
+    for (KKSMap<qint64, KKSEIOData *>::const_iterator p = itemsData.constBegin();
+            p != itemsData.constEnd();
+            p++) 
+    {
+        //добавили к рубрике итем
+        QString rubrItemName = p.value()->sysFieldValue("rr_name");
+        qint64 idRec = p.value()->sysFieldValue("id").toLongLong();
+        KKSRubricItem * item = new KKSRubricItem(idRec, rubrItemName, false);
+        (const_cast<KKSRubric *> (r))->addItem(item);
+        item->release();
+
+        //теперь добавим его в модель
+        int nr = itemModel->rowCount();
+        bool isIns = itemModel->insertRows (nr, 1);
+        QModelIndex rIndex = itemModel->index (nr, 0);
+        
+        KKSEIOData * itemInfo = p.value();
+        
+        bool isRubrSet = itemModel->setData (rIndex, QVariant::fromValue<KKSEIOData*>(itemInfo), Qt::UserRole+1);
+        itemModel->setData (rIndex, KKSRubricItem::icon(), Qt::DecorationRole);
+        itemModel->setData (rIndex, idRec, Qt::UserRole);
+        
+        //this->appendRubricItem(itemModel, item);
+        editor->setSaved(false);
+        editor->slotAddRubricItem((int)idRec, rubrItemName);
+        //ioRec->release();
+    }
+
+    recEditor->setParent (0);
+    delete recEditor;
 }
 
 void KKSRubricFactory::appendRecord(int idObject, const KKSRubric* r, QAbstractItemModel * attachModel, const QModelIndex& parent) {
@@ -696,7 +711,9 @@ void KKSRubricFactory::appendRecord(int idObject, const KKSRubric* r, QAbstractI
 
 }
 
-void KKSRubricFactory::openRubricItem(int idObject) {
+void KKSRubricFactory::openRubricItem(int idObject) 
+{
+    
     KKSIncludesWidget *editor = qobject_cast<KKSIncludesWidget *>(this->sender());
     if (!editor)
         return;
@@ -717,6 +734,46 @@ void KKSRubricFactory::openRubricItem(int idObject) {
 
     KKSObjEditor *objEditor = oef->createObjEditor(IO_IO_ID,
             idObject,
+            filterGroups,
+            "",
+            c,
+            !mode,
+            QString(),
+            false,
+            editor->windowModality(),
+            0,
+            Qt::Dialog);
+
+    if (mode)
+        emit objEditorCreated(objEditor);
+
+    o->release();
+}
+
+void KKSRubricFactory::openRubricItem(int idObject, int idRecord) 
+{
+    
+    KKSIncludesWidget *editor = qobject_cast<KKSIncludesWidget *>(this->sender());
+    if (!editor)
+        return;
+
+    KKSList<const KKSFilter*> filters;
+
+    KKSObject * o = loader->loadIO(idObject, true);
+    if (!o)
+        return;
+    
+    KKSCategory * c = o->category(); //->tableCategory();
+    if (!c) {
+        o->release();
+        return;
+    }
+
+    KKSList<const KKSFilterGroup *> filterGroups;
+    bool mode(editor->windowModality() == Qt::NonModal);
+
+    KKSObjEditor *objEditor = oef->createObjEditor(idObject,
+            idRecord,
             filterGroups,
             "",
             c,
@@ -761,7 +818,6 @@ void KKSRubricFactory::loadSearchTemplate(RubricForm * rForm)
 
 void KKSRubricFactory::loadCategory(RubricForm * rForm)
 {
-    qDebug() << __PRETTY_FUNCTION__;
     if (!rForm)
         return;
 
@@ -781,16 +837,41 @@ void KKSRubricFactory::loadCategory(RubricForm * rForm)
         return;
     }
 
-    QString value = QString("select id from io_categories where id_io_category_type != 10 and not is_system");
-    const KKSFilter * f = ct->createFilter(ATTR_ID, value, KKSFilter::foInSQL);
-    if (!f) {
-        refObj->release();
-        return;
-    }
-
     KKSList<const KKSFilter*> fl;
-    fl.append(f);
-    f->release();
+    
+    //QString value = QString("select id from io_categories where id_io_category_type != 10 and not is_system");
+    const KKSFilter * f = NULL;
+    
+    //в рубрики записей справочников мы можем поместить только записи справочников, поэтому задавая категорию, мы выбираем только тип категории "Справочник"
+    if(rForm->forRecords()){
+        f = ct->createFilter(ATTR_ID_IO_CAT_TYPE, "1", KKSFilter::foEq);
+        if (!f) {
+            refObj->release();
+            return;
+        }
+        fl.append(f);
+        f->release();
+    }
+    else{
+        //в рубрики общесистемного рубрикатора и ИО мы можем поместить только ИО, поэтому задавая категорию, мы просто исключаем служебный тип категории "Подчиненная категория"
+        f = ct->createFilter(ATTR_ID_IO_CAT_TYPE, "10", KKSFilter::foNotEq);
+        if (!f) {
+            refObj->release();
+            return;
+        }
+        fl.append(f);
+        f->release();
+
+        //также исключим системные категории
+        f = ct->createFilter(ATTR_ID, "300", KKSFilter::foGr);
+        if (!f) {
+            refObj->release();
+            return;
+        }
+        fl.append(f);
+        f->release();
+    }
+    
     KKSFilterGroup * fg = new KKSFilterGroup(true);
     fg->setFilters(fl);
     filters.append(fg);
@@ -818,6 +899,82 @@ void KKSRubricFactory::loadCategory(RubricForm * rForm)
         }
         rForm->setCategory(cat);
         cat->release();
+    }
+    refObj->release();
+}
+
+//ИО в рубрику можно задать только для рубрик в записях справочников
+void KKSRubricFactory::loadIO(RubricForm * rForm)
+{
+    if (!rForm)
+        return;
+
+    KKSObject *refObj = loader->loadIO(IO_IO_ID, true);
+    if (!refObj)
+        return;
+
+    KKSCategory *c = refObj->category();
+    if (!c) {
+        refObj->release();
+        return;
+    }
+
+    KKSList<const KKSFilterGroup*> filters;
+    KKSCategory * ct = c->tableCategory();
+    if (!ct) {
+        refObj->release();
+        return;
+    }
+
+    KKSList<const KKSFilter*> fl;
+
+    //берем только пользовательские справочники (два фильтра для этого)
+    QString value = QString("300");
+    const KKSFilter * f = ct->createFilter(ATTR_ID, value, KKSFilter::foGr);
+    if (!f) {
+        refObj->release();
+        return;
+    }
+    fl.append(f);
+    f->release();
+    
+    f = ct->createFilter(ATTR_TABLE_NAME, "", KKSFilter::foIsNotNull);
+    if (!f) {
+        refObj->release();
+        return;
+    }
+    fl.append(f);
+    f->release();
+
+    KKSFilterGroup * fg = new KKSFilterGroup(true);
+    fg->setFilters(fl);
+    filters.append(fg);
+    fg->release();
+
+    KKSRecDialog * recEditor = oef->createObjRecEditor(IO_IO_ID,
+            refObj->id(),
+            filters,
+            "",
+            c,
+            true, false,
+            Qt::ApplicationModal,
+            rForm,
+            Qt::Dialog);
+
+    if (!recEditor) {
+        refObj->release();
+        return;
+    }
+
+    if (recEditor->exec() == QDialog::Accepted) {
+        int idObject = recEditor->getID();
+        KKSObject * io = loader->loadIO(idObject);
+        if (!io) {
+            refObj->release();
+            return;
+        }
+        rForm->setIO(io);
+        io->release();
     }
     refObj->release();
 }
@@ -1120,10 +1277,13 @@ void KKSRubricFactory::initRubricAttachments(const KKSRubric * r, bool isRec)
 {
     if (!r)
         return;
+
     KKSIncludesWidget * iW = qobject_cast<KKSIncludesWidget *>(this->sender());
-    //qDebug () << __PRETTY_FUNCTION__ << r->items().count();
+    
     const KKSTemplate * t = isRec ? rubrRecTemlate() : 0;
+
     KKSMap<qint64, KKSEIOData *> rData = isRec ? loader->loadRecList (r) : KKSConverter::rubricEntityToData(loader, r);
+
     const KKSCategory * cat(0);
     KKSObject * refIO (0);
 
@@ -1136,7 +1296,9 @@ void KKSRubricFactory::initRubricAttachments(const KKSRubric * r, bool isRec)
         cat = refIO->category()->tableCategory();
         t = new KKSTemplate(cat->defTemplate());
     }
-    QAbstractItemModel * attachModel = new KKSEIODataModel(t, rData); //new QStandardItemModel (0, 0);
+
+    QAbstractItemModel * attachModel = new KKSEIODataModel(t, rData);
+
     if (!isRec)
     {
         int nr = attachModel->rowCount();
@@ -1148,12 +1310,8 @@ void KKSRubricFactory::initRubricAttachments(const KKSRubric * r, bool isRec)
             // поскольку справочник неиерархический, то достаточно пройтись только по индексам верхнего уровня
             //
             int id = iconInd.data(Qt::UserRole).toInt();
-            //KKSObject * io = loader->loadIO (id);
-            //if (!io)
-            //    continue;
+
             const KKSRubricItem * rItem = r->itemForId(id);
-            //        QIcon ioIcon;// = io->icon();
-            //        qDebug () << __PRETTY_FUNCTION__ << rData.value(id)->fields().keys();
             QPixmap rIconP;
             if (rItem)
                 rIconP.loadFromData(rItem->iconAsString().toUtf8()); //rData.value(id)->fields().value("r_icon").toUtf8());
@@ -1162,7 +1320,7 @@ void KKSRubricFactory::initRubricAttachments(const KKSRubric * r, bool isRec)
                 //qDebug () << __PRETTY_FUNCTION__ << QString::compare (rItem->iconAsString(), io->iconAsString());
                 attachModel->setData(iconInd, ioIcon, Qt::DecorationRole);
             }
-            else if (r->rubricType() == KKSRubricBase::atRubricCategory)
+            else if (r->rubricType() == KKSRubricBase::btRubricAsCategory)
             {
                 if (ioIcon.isNull())
                 {
@@ -1183,8 +1341,10 @@ void KKSRubricFactory::initRubricAttachments(const KKSRubric * r, bool isRec)
             }
             //io->release ();
         }
+
         refIO->release();
     }
+
     t->release();
 
     emit rubricAttachments(attachModel, iW);
@@ -1197,7 +1357,7 @@ void KKSRubricFactory::appendRubricItem(QAbstractItemModel * attachModel, const 
     if (!attachModel || !rItem)
         return;
 
-    KKSObject * refIO = loader->loadIO(IO_IO_ID);
+    KKSObject * refIO = loader->loadIO(IO_IO_ID, true);
     if (!refIO)
         return;
 
@@ -1206,38 +1366,64 @@ void KKSRubricFactory::appendRubricItem(QAbstractItemModel * attachModel, const 
         refIO->release();
         return;
     }
+
+    //сделаем фильтр
     c = c->tableCategory();
-    const KKSFilter * f = c->createFilter(1, QString::number(rItem->id()), KKSFilter::foEq);
+    const KKSFilter * f = c->createFilter(ATTR_ID, QString::number(rItem->id()), KKSFilter::foEq);
     KKSFilterGroup * fg = new KKSFilterGroup(false);
     fg->addFilter(f);
     KKSList<const KKSFilterGroup *> filters;
     filters.append(fg);
     fg->release();
     f->release();
+    
+    //получим данные в виде KKSEIOData
     KKSMap<qint64, KKSEIOData *> itemData = loader->loadEIOList(refIO, filters);
+    
     int cnt = attachModel->rowCount();
     if (!attachModel->insertRows(cnt, itemData.count()))
     {
         refIO->release();
         return;
     }
+
     int i = 0;
     for (KKSMap<qint64, KKSEIOData *>::const_iterator p = itemData.constBegin();
             p != itemData.constEnd();
-            p++) {
+            p++) 
+    {
         QModelIndex wIndex = attachModel->index(cnt + i, 0);
-        KKSObject * io = loader->loadIO(p.key());
+
+        //KKSObject * io = loader->loadIO(p.key(), true);
+        
         attachModel->setData(wIndex, QVariant::fromValue<KKSEIOData *>(p.value()), Qt::UserRole + 1);
+        
         attachModel->setData(wIndex, p.key(), Qt::UserRole);
-        if (io && !io->icon().isNull())
-            attachModel->setData(wIndex, io->icon(), Qt::DecorationRole);
+        
+        QString icon;
+        icon = p.value()->sysFieldValue("r_icon");
+
+        if (!icon.isNull()){
+            QPixmap px;
+            bool isOk = px.loadFromData(icon.toUtf8(), "XPM");
+            if(!isOk)
+                attachModel->setData(wIndex, KKSRubricItem::icon(), Qt::DecorationRole);
+            else
+                attachModel->setData(wIndex, px, Qt::DecorationRole);
+        }
         else
             attachModel->setData(wIndex, KKSRubricItem::icon(), Qt::DecorationRole);
+        
+        //io->release();
+        
         i++;
     }
+
     refIO->release();
 }
 
+//вызывается при создании в БД нового ИО, входящего в рубрику
+//используется только при создании именно ИО
 void KKSRubricFactory::rubricItemCreated(KKSObjectExemplar * rec)
 {
     KKSRubric * r = ioRubrs.value(rec);
@@ -1248,7 +1434,7 @@ void KKSRubricFactory::rubricItemCreated(KKSObjectExemplar * rec)
     if (!r || !attachModel)
         return;
 
-    KKSObject * wObj = loader->loadIO(rec->id());
+    KKSObject * wObj = loader->loadIO(rec->id(), true);
     if (iW && wObj)
         iW->slotAddRubricItem(rec->id(), wObj->name());
 
@@ -1284,7 +1470,7 @@ void KKSRubricFactory::setSyncSettings(const QList<int>& ioIDList) {
     KKSSyncDialog * syncD = new KKSSyncDialog();
     KKSSyncWidget * syncW = syncD->getSyncWidget();
     //int idUser = loader->getUserId();
-    KKSObject * refObj = loader->loadIO(IO_IO_ID);
+    KKSObject * refObj = loader->loadIO(IO_IO_ID, true);
     KKSObjectExemplar * wObjE = loader->loadEIO(ioIDList.at(0), refObj);
     int attrId = ATTR_ID_SYNC_TYPE;
     KKSAttribute * attr = loader->loadAttribute(attrId);
@@ -1334,7 +1520,7 @@ void KKSRubricFactory::setSyncSettings(const QList<int>& ioIDList) {
     if (syncD->exec() == QDialog::Accepted) {
         KKSAttrValue * syncVal = syncW->getSyncAttrVal();
         KKSAttrValue * syncType = syncW->getSyncAttrType();
-        KKSObject * ioRef = loader->loadIO(IO_IO_ID);
+        KKSObject * ioRef = loader->loadIO(IO_IO_ID, true);
         qDebug() << __PRETTY_FUNCTION__ << syncVal->value().value();
         for (int i = 0; i < ioIDList.count(); i++) {
             KKSObjectExemplar * rio = loader->loadEIO(ioIDList[i], ioRef);
@@ -1367,16 +1553,18 @@ void KKSRubricFactory::setSyncSettings(const QList<int>& ioIDList) {
     }
 }
 
-void KKSRubricFactory::putIntoRubr(const QList<int>& ioIDList, const KKSRubric * oldRubric) {
+void KKSRubricFactory::putIntoRubr(const QList<int>& ioIDList, const KKSRubric * oldRubric) 
+{
     if (ioIDList.isEmpty())
         return;
-    KKSList<const KKSFilterGroup*> filters;
-    KKSIncludesWidget * anotherW = this->createModalRubricEditor(atRootRubric, filters, false);
+    
+    KKSIncludesWidget * anotherW = this->createRubricEditor(atRootRubric, smRubricsOnly, true);
+
     KKSIncludesDialog * rubrDial = new KKSIncludesDialog(anotherW);
     anotherW->hideIncludes();
+
     QWidget * pWidget = qobject_cast<QWidget *>(this->sender());
-    //KKSIncludesWidget * iW = qobject_cast<KKSIncludesWidget *>(this->sender());
-    //QAbstractItemModel * attachModel = iW->rubrItemsModel();
+
     if (rubrDial->exec() == QDialog::Accepted) {
         const KKSRubric * r = anotherW->getSelectedRubric();
         if (!r) {
@@ -1390,7 +1578,7 @@ void KKSRubricFactory::putIntoRubr(const QList<int>& ioIDList, const KKSRubric *
             return;
         }
         for (int i = 0; i < ioIDList.count(); i++) {
-            KKSObject * wObj = loader->loadIO(ioIDList[i]);
+            KKSObject * wObj = loader->loadIO(ioIDList[i], true);
             if (!wObj)
                 continue;
             KKSRubricItem * rItem = new KKSRubricItem(ioIDList[i], wObj->name());
@@ -1439,7 +1627,13 @@ void KKSRubricFactory::setAccessDocs(const QList<int>& ioIDList) {
 
 KKSRubric * KKSRubricFactory::loadRubric(KKSRubric * r, int idRubr, QAbstractItemModel * rubrMod, const QModelIndex& recIndex)
 {
-    KKSRubric * rw = loader->loadRubric(idRubr);
+    //здесь рубрика загружается без загрузки подрубрик и вложений. Только сведения о ней
+    KKSRubric * rw = NULL;
+    if(r->rubricType() == KKSRubricBase::btRubric)
+        rw = loader->loadRubric(idRubr);
+    else
+        rw = loader->loadRecRubric(idRubr);
+
     if (!rw)
         return r;
 
@@ -1453,8 +1647,10 @@ KKSRubric * KKSRubricFactory::loadRubric(KKSRubric * r, int idRubr, QAbstractIte
 
     KKSSearchTemplate * st = rw->getSearchTemplate();
     r->setSearchTemplate(st);
+
     KKSAccessEntity * acr = rw->getAccessRules();
     r->setAccessRules(acr);
+    
     rubrMod->setData(recIndex, QVariant::fromValue<const KKSRubricBase *>(r), Qt::UserRole + 1);
     if (!rw->getIcon().isNull())
         rubrMod->setData (recIndex, rw->getIcon(), Qt::DecorationRole);
@@ -1464,7 +1660,6 @@ KKSRubric * KKSRubricFactory::loadRubric(KKSRubric * r, int idRubr, QAbstractIte
     r->setInitialized(true);//сохранять в БД в дальнейшем мы будем только рубрики, для которых сделан данный вызов
                             //фактически он означает, что на рубрику кликнули мышкой и информация о ней полностью подгрузилась из БД в модель.
                             
-
     return r;
 }
 
@@ -1482,21 +1677,39 @@ KKSTemplate * KKSRubricFactory::rubrRecTemlate (void)
     KKSTemplate * tRec = new KKSTemplate;// (ctRec->defTemplate());
     KKSAttrGroup * ag = new KKSAttrGroup;
     tRec->addGroup(ag);
+
     QStringList aNames;
-    aNames << tr("id")
-           << tr("name")
-           << tr("state")
-           << tr("uuid_t");
+    aNames << tr("IdObject")
+           << tr("Qualifier Name")
+           << tr("IdRecord")
+           << tr("Record Name")
+           << tr("State")
+           << tr("UUID");
+    
     QStringList aCodes;
-    aCodes << tr("id")
-           << tr("name")
-           << tr("id_io_state")
-           << tr("uuid_t");
+    aCodes << QString("id_object")
+           << QString("io_name")
+           << QString("id")
+           << QString("rr_name")
+           << QString("state_name")
+           << QString("uuid_t");
+    
     QList<int> aTypes;
-    aTypes << KKSAttrType::atInt64
+    aTypes << KKSAttrType::atInt
+           << KKSAttrType::atString
+           << KKSAttrType::atInt64
            << KKSAttrType::atString
            << KKSAttrType::atString
            << KKSAttrType::atString;
+
+    QList<int> aWidths;
+    aWidths << 70
+            << 350
+            << 50
+            << 350
+            << 150
+            << 250;
+
     int na = aNames.count();
     for (int i=0; i<na; i++)
     {
@@ -1504,6 +1717,7 @@ KKSTemplate * KKSRubricFactory::rubrRecTemlate (void)
         attr->setName(aNames[i]);
         attr->setTitle(aNames[i]);
         attr->setCode(aCodes[i]);
+        attr->setDefWidth(aWidths[i]);
         KKSAttrType * aType = new KKSAttrType (aTypes[i]);
         attr->setType (aType);
         aType->release();
@@ -1522,3 +1736,39 @@ KKSTemplate * KKSRubricFactory::rubrRecTemlate (void)
     ctRec->release();
     return tRec;
 }
+
+KKSMap<qint64, KKSEIOData *> KKSRubricFactory::getRubricatorsData() const
+{
+    KKSObject * rubrIO = loader->loadIO(IO_RUBR_ID, true);
+    if (!rubrIO)
+        return KKSMap<qint64, KKSEIOData *>();
+
+    KKSCategory * cr = rubrIO->category();
+    if (!cr)
+    {
+        rubrIO->release();
+        return KKSMap<qint64, KKSEIOData *>();
+    }
+
+    cr = cr->tableCategory();
+    if (!cr)
+    {
+        rubrIO->release();
+        return KKSMap<qint64, KKSEIOData *>();
+    }
+
+    //создаем фильтр на получение только рубрик из рубрикатора
+    KKSList<const KKSFilterGroup *> rfilters;
+    const KKSFilter * f = cr->createFilter(1, QString("select id from getRubricatorsOnly(%1, false)").arg (loader->getUserId()), KKSFilter::foInSQL);
+    KKSFilterGroup * fg = new KKSFilterGroup (true);
+    fg->addFilter (f);
+    f->release ();
+    rfilters.append (fg);
+    fg->release ();
+
+    //получаем сами данные в дерево рубрик
+    KKSMap<qint64, KKSEIOData *> rubrInfo = loader->loadEIOList(rubrIO, rfilters);
+
+    return rubrInfo;
+}
+

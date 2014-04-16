@@ -1643,7 +1643,7 @@ void KKSObjEditorFactory :: setObjConnect (KKSObjEditor *editor)
     connect (editor, SIGNAL(includeRequested(KKSObjEditor*)), this, SLOT(slotIncludeRequested(KKSObjEditor*)));
     connect (editor, SIGNAL(includeRecRequested(KKSObjEditor*)), this, SLOT(slotIncludeRecRequested(KKSObjEditor*)));
     connect (editor, SIGNAL(openRubricItemRequested(int, KKSObjEditor*)), this, SLOT(slotOpenRubricItemRequested(int, KKSObjEditor*)));
-    connect (editor, SIGNAL(openRubricItemRecRequested(int, KKSObjEditor*)), this, SLOT(slotOpenRubricItemRecRequested(int, KKSObjEditor*)));
+    connect (editor, SIGNAL(openRubricItemRequested(int, int, KKSObjEditor*)), this, SLOT(slotOpenRubricItemRequested(int, int, KKSObjEditor*)));
     connect (editor, SIGNAL (updateAttributes (QWidget *, QScrollArea *, QWidget *, int, const KKSCategory *, KKSIndAttrClass, KKSObjEditor*)), this, SLOT (regroupAttrs (QWidget *, QScrollArea *, QWidget *, int, const KKSCategory*, KKSIndAttrClass, KKSObjEditor*)) );
     connect (editor, SIGNAL (saveObj(KKSObjEditor*, KKSObject*, KKSObjectExemplar*, int, QAbstractItemModel *)), this, SLOT (saveObject(KKSObjEditor*, KKSObject*, KKSObjectExemplar*, int, QAbstractItemModel *)) );
     connect (editor, SIGNAL (saveObjAsCommandResult(KKSObjEditor*, KKSObject*, KKSObjectExemplar*, int, QAbstractItemModel *)), this, SLOT (saveObjectAsCommandResult(KKSObjEditor*, KKSObject*, KKSObjectExemplar*, int, QAbstractItemModel *)) );
@@ -4694,9 +4694,9 @@ void KKSObjEditorFactory :: slotOpenRubricItemRequested(int idObject, KKSObjEdit
     emit editorCreated(newObjEditor);
 }
 
-void KKSObjEditorFactory :: slotOpenRubricItemRecRequested(int idObjectE, KKSObjEditor * editor)
+void KKSObjEditorFactory :: slotOpenRubricItemRequested(int idObject, int idRecord, KKSObjEditor * editor)
 {
-    int idObject = loader->getRefIO(idObjectE);
+    //int idObject = loader->getRefIO(idObjectE);
     KKSObject * o = loader->loadIO(idObject, true);
     if(!o)
         return;
@@ -4712,7 +4712,7 @@ void KKSObjEditorFactory :: slotOpenRubricItemRecRequested(int idObjectE, KKSObj
     }*/
 
     KKSObjEditor * newObjEditor = this->createObjEditor (idObject, 
-                                                         idObjectE, 
+                                                         idRecord, 
                                                          KKSList<const KKSFilterGroup*>(), 
                                                          "",
                                                          c,
@@ -9356,14 +9356,31 @@ void KKSObjEditorFactory :: putSystemParams (KKSObjectExemplar * recio,
         QHBoxLayout * edLay = new QHBoxLayout;
         QWidget * lE = 0;
 
-        if(i == 8){
+        if(i == 8){ //last_update
             lE = new QDateTimeEdit (currentGroupBox);
             edLay->addWidget (lE);
             QFont f  = l->font();
             f.setBold(true);
             l->setFont(f);
         }
-        else if(i == 3){
+        else if(i == 1){//rr_name
+            KKSAttribute * attr = new KKSAttribute();
+            attr->setId(ATTR_RR_NAME);
+            KKSCategoryAttr * ca = new KKSCategoryAttr (*attr);
+            KKSAttrValue * av = new KKSAttrValue;//recio->attrValue(ATTR_RECORD_FILL_COLOR);
+            av->setAttribute(ca);
+            av->setId(attr->id());
+            attr->release();
+            ca->release();
+            
+            lE = new KKSEdit(av, iacEIOSysAttr, recio->name(), currentGroupBox);
+            edLay->addWidget(lE);//, Qt::AlignCenter | Qt::AlignVCenter);
+            QObject::connect (lE, 
+                              SIGNAL (valueChanged(qint64, KKSIndAttrClass, QVariant)), 
+                              editor, 
+                              SLOT (setValue (qint64, KKSIndAttrClass, QVariant)) );
+        }
+        else if(i == 3){//r_icon
             KKSAttribute * attr = new KKSAttribute();
             attr->setId(ATTR_R_ICON);
             KKSCategoryAttr * ca = new KKSCategoryAttr (*attr);
@@ -9389,7 +9406,7 @@ void KKSObjEditorFactory :: putSystemParams (KKSObjectExemplar * recio,
                               editor, 
                               SLOT (setValue (qint64, KKSIndAttrClass, QVariant)) );
         }
-        else if(i == 4 || i == 5)
+        else if(i == 4 || i == 5) //fill_color, text_color
         {
             QColor rgb_color;
             KKSAttribute * attr = new KKSAttribute();
@@ -9430,7 +9447,7 @@ void KKSObjEditorFactory :: putSystemParams (KKSObjectExemplar * recio,
             edLay->addWidget (lE);
         }
         
-        if (qobject_cast<QLineEdit *>(lE))
+        if (i != 1 && qobject_cast<QLineEdit *>(lE)) // rr_name позволяем редактировать
             (qobject_cast<QLineEdit *>(lE))->setReadOnly(true);
         else if (qobject_cast<QDateTimeEdit *>(lE))
             (qobject_cast<QDateTimeEdit *>(lE))->setReadOnly(true);
@@ -9438,15 +9455,17 @@ void KKSObjEditorFactory :: putSystemParams (KKSObjectExemplar * recio,
         
         switch (i)
         {
-            case 0: {
+            case 0: {//id
                         (qobject_cast<QLineEdit *>(lE))->setText (QString::number(recio->id())); 
                         QFont f = l->font();
                         f.setBold(true);
                         l->setFont(f);
                         break;
                     }
-            case 1: (qobject_cast<QLineEdit *>(lE))->setText (recio->name()); break;
-            case 2:
+            //case 1: //rr_name
+            //    (qobject_cast<QLineEdit *>(lE))->setText (recio->name()); 
+            //    break; 
+            case 2://id_state
             {
                 QToolButton * tbState = new QToolButton (currentGroupBox);
                 tbState->setText(tr("..."));
@@ -9467,7 +9486,7 @@ void KKSObjEditorFactory :: putSystemParams (KKSObjectExemplar * recio,
             //case 3: (qobject_cast<QLineEdit *>(lE))->setText (recio->iconAsString()); break;
             //case 4: (qobject_cast<QLineEdit *>(lE))->setText (QString::number((int)(recio->recordFillColor().rgba()))); break;
             //case 5: (qobject_cast<QLineEdit *>(lE))->setText (QString::number((int)(recio->recordTextColor().rgba()))); break;
-            case 6: 
+            case 6: //uuid
             {
                 (qobject_cast<QLineEdit *>(lE))->setText (recio->uuid()); 
                 QFont f = l->font();
@@ -9475,7 +9494,7 @@ void KKSObjEditorFactory :: putSystemParams (KKSObjectExemplar * recio,
                 l->setFont(f);
                 break;
             }
-            case 7: 
+            case 7: //unique_id
             {
                 (qobject_cast<QLineEdit *>(lE))->setText (recio->uniqueId()); 
                 QFont f = l->font();
@@ -9483,7 +9502,7 @@ void KKSObjEditorFactory :: putSystemParams (KKSObjectExemplar * recio,
                 l->setFont(f);
                 break;
             }
-            case 8: 
+            case 8: //last_update
             {
                 (qobject_cast<QDateTimeEdit *>(lE))->setDateTime (recio->lastUpdate()); 
                 QFont f = l->font();
@@ -9505,43 +9524,18 @@ void KKSObjEditorFactory :: putRubricator (KKSObject * obj, KKSObjEditor * edito
 {
     if (!obj || !editor || ! tabObj)
         return;
-    //
-    // Рубрикатор
-    //
-    //QWidget * includesW = new QWidget ();
-    QSizePolicy iwSizePolicy (QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);// MinimumExpanding
-    //includesW->setSizePolicy (iwSizePolicy);
-    //qDebug () << __PRETTY_FUNCTION__ << includesW->sizePolicy ();
-    //QGridLayout *gIncludesLay = new QGridLayout (includesW);
-    KKSIncludesWidget * iW = m_rf->createRubricRecEditor (obj->rootRubric(), true, false, false, false);
-    //new KKSIncludesWidget (obj->rootRubric(), true, false, false, false);//includesW);
-//    qDebug () << __FUNCTION__ << iW->sizePolicy().horizontalPolicy() << iW->sizePolicy().verticalPolicy();
-    //iW->setSizePolicy (iwSizePolicy);
-/*    if (iW && m_rf)
-    {
-        connect (iW, SIGNAL (saveRubric (KKSRubric *, bool)), m_rf, SLOT (saveRubric (KKSRubric *, bool)) );
-        connect (iW, SIGNAL (rubricItemRequested (const KKSRubric*, bool, QAbstractItemModel *)), m_rf, SLOT (rubricItemUpload(const KKSRubric*, bool, QAbstractItemModel *)) );
-        connect (iW, SIGNAL (rubricItemCreationRequested (const KKSRubric *, QAbstractItemModel*, const QModelIndex&)), m_rf, SLOT (rubricItemCreate(const KKSRubric *, QAbstractItemModel *, const QModelIndex&)) );
-        connect (iW, SIGNAL (openRubricItemRequested (int)), m_rf, SLOT (openRubricItem (int)) );
-        connect (iW, SIGNAL (loadStuffModel (RubricForm *)), m_rf, SLOT (loadRubricPrivilegies(RubricForm *)) );
-        connect (iW, SIGNAL (loadSearchtemplate (RubricForm *)), m_rf, SLOT (loadSearchTemplate (RubricForm *)) );
-        connect (iW, SIGNAL (loadCategory (RubricForm *)), m_rf, SLOT (loadCategory (RubricForm *)) );
-        connect (iW, SIGNAL (rubricAttachmentsView (QAbstractItemModel *, const KKSRubric *)), m_rf, SLOT (viewAttachments (QAbstractItemModel *, const KKSRubric *)) );
-        connect (iW, SIGNAL (copyFromRubr(KKSRubric *, QAbstractItemModel *, const QModelIndex&)), m_rf, SLOT (copyFromRubric (KKSRubric *, QAbstractItemModel *, const QModelIndex&)) );
-        connect (iW, SIGNAL (initAttachmentsModel (const KKSRubric *, bool)), m_rf, SLOT (initRubricAttachments (const KKSRubric *, bool)) );
-        connect (iW, SIGNAL (appendRubricItemIntoModel (QAbstractItemModel *, const KKSRubricItem * )), m_rf, SLOT (appendRubricItem (QAbstractItemModel *, const KKSRubricItem *)) );
 
-        connect (m_rf, SIGNAL (rubricAttachments (QAbstractItemModel *)), iW, SLOT (slotInitAttachmentsModel (QAbstractItemModel *)) );
-    }
- */
+    QSizePolicy iwSizePolicy (QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);// MinimumExpanding
+    
+    KKSIncludesWidget * iW = m_rf->createRubricRecEditor (obj->rootRubric(), 
+                                                          KKSIncludesWidget::rsIO); //рубрикатор для ИО
+
     QTreeView *tv = iW->tvRubr();
     KKSEventFilter *ef = new KKSEventFilter (iW);
     tv->viewport()->installEventFilter (ef);
 
-    //connect(this, SIGNAL(includeSelected(int, QString)), objEditorWidget, SLOT(slotIncludeSelected(int, QString)));
     editor->addIncludesWidget (iW);
     tabObj->addTab (iW/*includesW*/, tr("Assotiated IO"));
-    //gIncludesLay->addWidget (iW, 0, 0, 1, 1);
 }
 
 void KKSObjEditorFactory :: putRubricator (KKSObjectExemplar * eio, KKSObjEditor * editor, QTabWidget * tabObj)
@@ -9550,7 +9544,8 @@ void KKSObjEditorFactory :: putRubricator (KKSObjectExemplar * eio, KKSObjEditor
         return;
 
 	//ksa QSizePolicy iwSizePolicy (QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);  
-	KKSIncludesWidget * iW = m_rf->createRubricRecEditor(eio->rootRubric(), true, false, false, true);
+	KKSIncludesWidget * iW = m_rf->createRubricRecEditor(eio->rootRubric(), 
+                                                         KKSIncludesWidget::rsRecord);//рубрикатор для записей справочников
     //ksa iW->setSizePolicy (iwSizePolicy);
 
     QTreeView *tv = iW->tvRubr();

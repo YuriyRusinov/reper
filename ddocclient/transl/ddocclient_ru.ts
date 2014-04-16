@@ -4634,7 +4634,7 @@ Error: %1</source>
     </message>
     <message>
         <source>No active vector layer</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Нет активного векторного слоя</translation>
     </message>
     <message>
         <source>To select features, choose a vector layer in the legend</source>
@@ -4911,6 +4911,14 @@ Error: %1</source>
     <message>
         <source>Cannot transform icon to QPixmap</source>
         <translation>Не могу преобразовать иконку в объект QPixmap</translation>
+    </message>
+    <message>
+        <source>Cannot remove system rubricator</source>
+        <translation>Нельзя удалить системный рубрикатор</translation>
+    </message>
+    <message>
+        <source>System rubricator cannot been edited</source>
+        <translation>Системный рубрикатор не подлежит редактированию</translation>
     </message>
 </context>
 <context>
@@ -5573,78 +5581,85 @@ Please connect to your system administrator.</source>
     <name>KKSMapWidget</name>
     <message>
         <source>Warning</source>
-        <translation type="unfinished">Внимание</translation>
+        <translation>Внимание</translation>
     </message>
     <message>
         <source>Current IO contains GIS-object attribute!
 But current build of DynamicDocs Client does not support GIS capabilities!
 Working with this attribute will be disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Текущий информационный объект содержит ГИС-атрибут,
+но текущая сборка DynamicDocs Client не поддерживает работу с ГИС-атрибутами!
+Работа с данным атрибутом будет невозможна</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished">Ошибка</translation>
+        <translation>Ошибка</translation>
     </message>
     <message>
         <source>Current version of DynamicDocs Client supports only one opened GIS-enabled window!</source>
-        <translation type="unfinished"></translation>
+        <translation>Текущая версия DynamicDocs Client поддерживает работу только с одинм активным ГИС-атрибутом!</translation>
     </message>
     <message>
         <source>Layers</source>
-        <translation type="unfinished"></translation>
+        <translation>Слои</translation>
     </message>
     <message>
         <source>Layer order</source>
-        <translation type="unfinished"></translation>
+        <translation>Порядок слоев</translation>
     </message>
     <message>
         <source>QGIS temporary files home dir does not exist! Cannot create that! Path = %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Каталог для временных файлов QGIS не существует! Не могу создать его. Путь = %1</translation>
     </message>
     <message>
         <source>Open QGIS project</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть проект QGIS</translation>
     </message>
     <message>
         <source>directory with name
 %1
 exist in QGIS projects home dir!
 It will be removed and all data in it will be lost. Do you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>Каталог с названием
+%1
+сушествует в каталоге временных файлов GIS!
+Он будет удален и данные, находящиеся в нем будут утеряны. Продолжить?</translation>
     </message>
     <message>
         <source>Cannot remove directory!
 Path = %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Не могу удалить каталог!
+Путь = %1</translation>
     </message>
     <message>
         <source>Cannot create QGIS project home directory!
 Path = %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Не могу создать каталог для временных файлов QGIS!
+Путь = %1</translation>
     </message>
     <message>
         <source>Cannot create file for storing QGIS project file (%1)!</source>
-        <translation type="unfinished"></translation>
+        <translation>Не могу создать файл с проектом QGIS (%1)!</translation>
     </message>
     <message>
         <source>Cannot write data to QGIS project file (%1)!</source>
-        <translation type="unfinished"></translation>
+        <translation>Не могу записать данные в файл проекта QGIS (%1)!</translation>
     </message>
     <message>
         <source>Records system attributes cannot contains GIS-object!</source>
-        <translation type="unfinished"></translation>
+        <translation>Служебные атрибуты записи справочника не согут содержать ГИС-объект!</translation>
     </message>
     <message>
         <source>Complex attributes cannot contains GIS-object!</source>
-        <translation type="unfinished"></translation>
+        <translation>Комплексные атрибуты не могут содержать ГИС-объект!</translation>
     </message>
     <message>
         <source>Cannot set attribute value for GIS attribute!</source>
-        <translation type="unfinished"></translation>
+        <translation>Не могу задать значение ГИС-объекту!</translation>
     </message>
     <message>
         <source>Cannot open project file! Path = %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Не могу открыть файл проекта! Путь = %1</translation>
     </message>
 </context>
 <context>
@@ -6725,7 +6740,7 @@ Please save it before creating new records in it.</source>
     </message>
     <message>
         <source>Others</source>
-        <translation>Остальные</translation>
+        <translation type="obsolete">Остальные</translation>
     </message>
     <message>
         <source>Copy documents</source>
@@ -6779,31 +6794,55 @@ This is not allowed!</source>
     </message>
     <message>
         <source>Add new item</source>
-        <translation>Добавить новый элемент</translation>
+        <translation type="obsolete">Добавить новый элемент</translation>
     </message>
     <message>
         <source>Cannot load record %1</source>
-        <translation>Не могу загрузить запись справочника %1</translation>
+        <translation type="obsolete">Не могу загрузить запись справочника %1</translation>
     </message>
     <message>
         <source>id</source>
-        <translation>ИД</translation>
+        <translation type="obsolete">ИД</translation>
     </message>
     <message>
         <source>name</source>
-        <translation>Название</translation>
+        <translation type="obsolete">Название</translation>
     </message>
     <message>
         <source>state</source>
+        <translation type="obsolete">Состояние</translation>
+    </message>
+    <message>
+        <source>All rubrics with categories</source>
+        <translation>Все рубрики с категориями</translation>
+    </message>
+    <message>
+        <source>IdObject</source>
+        <translation>ИД справочника</translation>
+    </message>
+    <message>
+        <source>Qualifier Name</source>
+        <translation>Название справочника</translation>
+    </message>
+    <message>
+        <source>IdRecord</source>
+        <translation>ИД записи</translation>
+    </message>
+    <message>
+        <source>Record Name</source>
+        <translation>Название записи</translation>
+    </message>
+    <message>
+        <source>State</source>
         <translation>Состояние</translation>
     </message>
     <message>
-        <source>uuid_t</source>
-        <translation></translation>
+        <source>UUID</source>
+        <translation>Уникальный идентификатор</translation>
     </message>
     <message>
-        <source>id_io_state</source>
-        <translation></translation>
+        <source>Groupped by categories</source>
+        <translation>Сгруппированные по категориям</translation>
     </message>
 </context>
 <context>
@@ -7121,11 +7160,11 @@ This is not allowed!</source>
     </message>
     <message>
         <source>&amp;Refresh model</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Обновить</translation>
     </message>
     <message>
         <source>E&amp;xecute search template</source>
-        <translation>Выполнить поисковый запрос</translation>
+        <translation>&amp;Выполнить поисковый запрос</translation>
     </message>
     <message>
         <source>Search in results</source>
@@ -7145,7 +7184,7 @@ This is not allowed!</source>
     </message>
     <message>
         <source>Search template application</source>
-        <translation type="unfinished"></translation>
+        <translation>Задание поискового запроса</translation>
     </message>
     <message>
         <source>Select search template</source>
@@ -7280,11 +7319,11 @@ Further work is impossible. You should use equal versions of client and server s
     </message>
     <message>
         <source>QgsApplication object does not exist!</source>
-        <translation type="unfinished"></translation>
+        <translation>QgsApplication-объект не существует!</translation>
     </message>
     <message>
         <source>There should be only one KKSSito object</source>
-        <translation type="unfinished"></translation>
+        <translation>В приложении может быть инициализирован только один KKSSito-объект</translation>
     </message>
 </context>
 <context>
@@ -7956,11 +7995,11 @@ Further work is impossible. You should use equal versions of client and server s
     </message>
     <message>
         <source>Save header file</source>
-        <translation>Сохранить заголовочный файл</translation>
+        <translation type="obsolete">Сохранить заголовочный файл</translation>
     </message>
     <message>
         <source>Open header file</source>
-        <translation>Открыть заголовочный файл</translation>
+        <translation type="obsolete">Открыть заголовочный файл</translation>
     </message>
     <message>
         <source>XML header error</source>
@@ -7976,7 +8015,7 @@ Further work is impossible. You should use equal versions of client and server s
     </message>
     <message>
         <source>CSV files (*.csv)</source>
-        <translation>CSV-файлы (*.csv)</translation>
+        <translation type="obsolete">CSV-файлы (*.csv)</translation>
     </message>
     <message>
         <source>All files (*.*)</source>
@@ -9274,7 +9313,7 @@ Avg speed: %3 Kb/sec</source>
     </message>
     <message>
         <source>Others</source>
-        <translation>Остальные</translation>
+        <translation type="obsolete">Остальные</translation>
     </message>
     <message>
         <source>The category contains references on some associated KKSTemplate objects. The list will be destroyed because of changing all attributes!</source>
@@ -9282,11 +9321,11 @@ Avg speed: %3 Kb/sec</source>
     </message>
     <message>
         <source>Will also remove all occurrence of the attribute in assotiated KKSTemplate objects!</source>
-        <translation type="unfinished"></translation>
+        <translation>Будут также удалены все вхождения атрибута в ассоциированные шаблоны!</translation>
     </message>
     <message>
         <source>The template already present in given KKSCategory!</source>
-        <translation type="unfinished"></translation>
+        <translation>Заданный шаблон уже присутствует в выбранной категории!</translation>
     </message>
     <message>
         <source>Cannot add it twise.</source>
@@ -9294,7 +9333,7 @@ Avg speed: %3 Kb/sec</source>
     </message>
     <message>
         <source>The template cannot be assigned with given category because of KKSTemplate::category() method does not return THIS</source>
-        <translation type="unfinished"></translation>
+        <translation>Шаблон не может быть ассоциирован с данной категорией, т.к. метод KKSTemplate::category() не вернул THIS</translation>
     </message>
     <message>
         <source>Â¿Â¿Â¿Â¿Â¿ Â¿Â¿Â¿Â¿Â¿Â¿Â¿Â¿Â¿ Â¿Â¿Â¿Â¿Â¿Â¿Â¿</source>
@@ -9452,15 +9491,15 @@ Please contact your Systems Administrator and report this issue.</source>
     </message>
     <message>
         <source>Log started at </source>
-        <translation type="unfinished"></translation>
+        <translation>Журнал начат в</translation>
     </message>
     <message>
         <source>Filter records by criterion(ia)</source>
-        <translation type="unfinished"></translation>
+        <translation>Фильтровать записи по критерию</translation>
     </message>
     <message>
         <source>Filter records by preared search templates</source>
-        <translation type="unfinished"></translation>
+        <translation>фильтровать записи по предсохраненному поисковому запросу</translation>
     </message>
     <message>
         <source>Add new record</source>
@@ -9484,7 +9523,7 @@ Please contact your Systems Administrator and report this issue.</source>
     </message>
     <message>
         <source>Set view template</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Select category</source>
@@ -9492,11 +9531,11 @@ Please contact your Systems Administrator and report this issue.</source>
     </message>
     <message>
         <source>INFO:</source>
-        <translation type="unfinished"></translation>
+        <translation>ИНФО:</translation>
     </message>
     <message>
         <source>DEBUG:</source>
-        <translation type="unfinished"></translation>
+        <translation>ОТЛАДКА:</translation>
     </message>
     <message>
         <source>&lt;Set of references %1, dbl-click for details&gt;</source>
@@ -9628,11 +9667,11 @@ Please contact your Systems Administrator and report this issue.</source>
     </message>
     <message>
         <source>Error: unknown message type</source>
-        <translation type="unfinished">Ошибка: Неизвестный тип сообщения</translation>
+        <translation>Ошибка: Неизвестный тип сообщения</translation>
     </message>
     <message>
         <source>Error in command creation! SQL = %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка при создании команды! SQL = %1</translation>
     </message>
     <message>
         <source>cinsert() for categoryUID = %1 failed!</source>
@@ -9708,11 +9747,11 @@ Please contact your Systems Administrator and report this issue.</source>
     </message>
     <message>
         <source>ERROR in SQL query! SQL = %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка в SQL-запросе! SQL = %1</translation>
     </message>
     <message>
         <source>Cannot insert system parameters for the record! SQL = %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Не могу сохранить системные параметры для записи справочника! SQL = %1</translation>
     </message>
     <message>
         <source>eioUpdateIndicatorEx() for record with UID = %1 failed!</source>
@@ -9744,11 +9783,11 @@ Please contact your Systems Administrator and report this issue.</source>
     </message>
     <message>
         <source>Cannot execute query %1. Function error</source>
-        <translation type="unfinished"></translation>
+        <translation>Не могу выполнить запрос: %1. Ошибка БД</translation>
     </message>
     <message>
         <source>Cannot execute query %1. Result is %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Не могу выполнить запрос: %1. Результат = %2</translation>
     </message>
     <message>
         <source>Bad category in refRecord!</source>
@@ -9813,11 +9852,12 @@ Please contact your Systems Administrator and report this issue.</source>
     <message>
         <source>Cannot download GIS file.
 ID = %1, to URL = %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Не могу загрузить с сервера ГИС-файл.
+ID = %1, путь загрузки = %2</translation>
     </message>
     <message>
         <source>Cannot remove old GIS files from server for %1 with ID = %2!</source>
-        <translation type="unfinished"></translation>
+        <translation>Не могу удалить старые ГИС-файлы с сервера для %1 с ID = %2!</translation>
     </message>
     <message>
         <source>record</source>
@@ -9830,16 +9870,18 @@ ID = %1, to URL = %2</source>
     <message>
         <source>GIS-object file does not exist!
 Path = %1</source>
-        <translation type="unfinished"></translation>
+        <translation>ГИС-файл не существует!
+Путь = %1</translation>
     </message>
     <message>
         <source>Cannot upload GIS-object file!
 Path = %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Не могу загрузить на сервер ГИС-файл!
+Путь = %1</translation>
     </message>
     <message>
         <source>Save style to DB (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Соххранение стиля в БД (%1)</translation>
     </message>
     <message>
         <source>Ping response received and saved</source>
@@ -9847,11 +9889,11 @@ Path = %1</source>
     </message>
     <message>
         <source>System type for embedded GIS files</source>
-        <translation type="unfinished"></translation>
+        <translation>Системный тип для встроенных ГИС-файлов</translation>
     </message>
     <message>
         <source>No active vector layer</source>
-        <translation type="unfinished"></translation>
+        <translation>Нет активного векторного слоя</translation>
     </message>
     <message>
         <source>To select features, choose a vector layer in the legend</source>
@@ -9864,6 +9906,26 @@ Path = %1</source>
     <message>
         <source>Selection extends beyond layer&apos;s coordinate system.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>минут(ы)</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>секунды</translation>
+    </message>
+    <message>
+        <source>second</source>
+        <translation>секунда</translation>
+    </message>
+    <message>
+        <source>minute</source>
+        <translation>минута</translation>
+    </message>
+    <message>
+        <source>Groupped by categories</source>
+        <translation>Сгруппированные по категориям</translation>
     </message>
 </context>
 <context>
@@ -10799,7 +10861,7 @@ Error was:%2</source>
     </message>
     <message>
         <source>Histogram</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Гистограмма</translation>
     </message>
     <message>
         <source>Height</source>
@@ -13717,7 +13779,7 @@ Proceed?</source>
     </message>
     <message>
         <source>Histogram</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Гистограмма</translation>
     </message>
     <message>
         <source>Metadata</source>
@@ -15942,7 +16004,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>Header file :</source>
-        <translation>Заголовочный файл :</translation>
+        <translation type="obsolete">Заголовочный файл :</translation>
     </message>
     <message>
         <source>Preview</source>
@@ -16812,27 +16874,27 @@ synchronization</source>
     </message>
     <message>
         <source>Search Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Подзапрос</translation>
     </message>
     <message>
         <source>Search Template Parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>Параметры поискового запроса</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search template name :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Название поискового запроса :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search template type :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Тип поискового запроса :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>...</source>
-        <translation type="unfinished">...</translation>
+        <translation>...</translation>
     </message>
     <message>
         <source>Search template category :</source>
-        <translation type="unfinished"></translation>
+        <translation>Категория поискового запроса :</translation>
     </message>
 </context>
 <context>
@@ -16843,7 +16905,7 @@ synchronization</source>
     </message>
     <message>
         <source>Parameters</source>
-        <translation type="unfinished">Параметры</translation>
+        <translation>Параметры</translation>
     </message>
     <message>
         <source>Histogram</source>
@@ -17679,71 +17741,71 @@ synchronization</source>
     <name>kkssearch_template_form</name>
     <message>
         <source>Search template editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Редактор поисковых запросов</translation>
     </message>
     <message>
         <source>S&amp;how SQL</source>
-        <translation type="unfinished">Показать &amp;SQL</translation>
+        <translation>Показать &amp;SQL</translation>
     </message>
     <message>
         <source>&amp;Save to DB</source>
-        <translation type="unfinished">&amp;Сохранение в БД</translation>
+        <translation>&amp;Сохранение в БД</translation>
     </message>
     <message>
         <source>&amp;Load from DB</source>
-        <translation type="unfinished">&amp;Загрузить из БД</translation>
+        <translation>&amp;Загрузить из БД</translation>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation type="unfinished">&amp;OK</translation>
+        <translation>&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
+        <translation>&amp;Отмена</translation>
     </message>
     <message>
         <source>Search Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Подзапрос</translation>
     </message>
     <message>
         <source>Create filter group</source>
-        <translation type="unfinished">Создать группу фильтров</translation>
+        <translation>Создать группу фильтров</translation>
     </message>
     <message>
         <source>with operator OR</source>
-        <translation type="unfinished">с операцией ИЛИ</translation>
+        <translation>с операцией ИЛИ</translation>
     </message>
     <message>
         <source>with operator AND</source>
-        <translation type="unfinished">с операцией И</translation>
+        <translation>с операцией И</translation>
     </message>
     <message>
         <source>Add &amp;group</source>
-        <translation type="unfinished">Добавить &amp;группу</translation>
+        <translation>Добавить &amp;группу</translation>
     </message>
     <message>
         <source>Set filter</source>
-        <translation type="unfinished">Параметры фильтра</translation>
+        <translation>Параметры подзапроса</translation>
     </message>
     <message>
         <source>Search Template Parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>Параметры поискового запроса</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search template name :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Название поискового запроса :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search template type :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Тип поискового запроса :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>Search template category :</source>
-        <translation type="unfinished"></translation>
+        <translation>Категория поискового запроса :</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Description :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Описание :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Описание :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -18154,6 +18216,14 @@ System Error &apos;%1&apos;
     <message>
         <source>Rubric icon :</source>
         <translation>Иконка рубрики:</translation>
+    </message>
+    <message>
+        <source>Source category :</source>
+        <translation>Базовая категория :</translation>
+    </message>
+    <message>
+        <source>Source qualifier :</source>
+        <translation>Базовый справочник :</translation>
     </message>
 </context>
 <context>

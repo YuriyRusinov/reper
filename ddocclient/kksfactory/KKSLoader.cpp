@@ -998,6 +998,30 @@ KKSObject * KKSLoader::loadIO(int id, bool simplify) const
 KKSObject * KKSLoader::loadIO(const QString & tableName, bool simplify) const
 {
     KKSObject * io = NULL;
+
+    if(simplify){
+        int id = -1;
+        for (QHash< int, KKSObject * >::const_iterator p = loadedObjects.constBegin();
+                p != loadedObjects.constEnd();
+                p++)
+        {
+            KKSObject * obj = p.value();
+            if(obj->tableName() == tableName){
+                id = obj->id();
+                break;
+            }
+        }
+        
+        if(id > 0){
+            io = loadedObjects.value(id, NULL);
+            if(io){
+                io->addRef();
+                return io;
+            }
+        }
+    }
+
+
     QString sql = QString("select ioGetObjectIDByTableName ('%1');").arg(tableName);
     //
     // io.id from io_objects io where table_name = '%1'
@@ -1117,7 +1141,7 @@ KKSObjectExemplar * KKSLoader::loadEIO(qint64 id,
         if(io->id() <= _MAX_SYS_IO_ID_)
             sql = QString("select last_update, unique_id, %1 from %2 where id = %3").arg(fields).arg(tableName).arg(id);
         else
-            sql = QString("select id_io_state, uuid_t, last_update, unique_id, r_icon, record_fill_color, record_text_color, %1 from %2 where id = %3").arg(fields).arg(tableName).arg(id);
+            sql = QString("select id_io_state, uuid_t, last_update, unique_id, r_icon, rr_name, record_fill_color, record_text_color, %1 from %2 where id = %3").arg(fields).arg(tableName).arg(id);
     }
 
     qDebug() << __PRETTY_FUNCTION__ << sql;
@@ -1162,30 +1186,31 @@ KKSObjectExemplar * KKSLoader::loadEIO(qint64 id,
         eio->setUniqueId(res->getCellAsString(0, 1));
         rIcon = KKSObjectExemplar::defIconAsString();
         eio->setIcon(rIcon);
-        i = 2;
+        i = 2;//количество системных атрибутов
     }
     else{
         eio->setUuid(res->getCellAsString(0, 1));
         eio->setLastUpdate(res->getCellAsDateTime(0, 2));
         eio->setUniqueId(res->getCellAsString(0, 3));
         eio->setIcon(res->getCellAsString(0, 4));
+        eio->setName(res->getCellAsString(0, 5));
         QColor bkcolor = QColor();//res->getCell (0, 20).value<QColor>();//QColor::fromRgba ();
-        if (res->getCell (0, 5).isValid())
+        if (res->getCell (0, 6).isValid())
         {
-            unsigned int vlc = res->getCellAsInt64(0, 5);
+            unsigned int vlc = res->getCellAsInt64(0, 6);
             bkcolor = QColor::fromRgba (vlc);
             eio->setRecordFillColor(bkcolor);
         }
 
         QColor fgcolor = QColor();//.value<QColor>();//QColor::;
-        if (res->getCell (0, 6).isValid())
+        if (res->getCell (0, 7).isValid())
         {
-            unsigned int vltc = res->getCellAsInt64(0, 6);
+            unsigned int vltc = res->getCellAsInt64(0, 7);
             fgcolor = QColor::fromRgba (vltc);
             eio->setRecordTextColor(fgcolor);
         }
 
-        i = 7;
+       i = 8; //количество системных атрибутов
     }
 
     
@@ -2114,18 +2139,30 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
     
     QString attrsWith;
     QString attrsWith1;
-    if(isSys){
+    if(tableName.toLower() == QString("io_objects")){
+        attrsWith = "id, unique_id, last_update, r_icon, record_fill_color, record_text_color  ";
+        attrsWith1 = tableName + ".id, " + 
+                     tableName + ".unique_id, " + 
+                     tableName + ".last_update, " + 
+                     tableName + ".r_icon, " + 
+                     tableName + ".record_fill_color, " + 
+                     tableName + ".record_text_color "; //колонки в подзапросе нерекурсивной части предложени€ WITH
+    }
+    else if(isSys){
         attrsWith = "id, unique_id, last_update ";
-        attrsWith1 = tableName + ".id, " + tableName + ".unique_id, " + tableName + ".last_update "; //колонки в подзапросе нерекурсивной части предложени€ WITH
+        attrsWith1 = tableName + ".id, " + 
+                     tableName + ".unique_id, " + 
+                     tableName + ".last_update "; //колонки в подзапросе нерекурсивной части предложени€ WITH
     }
     else{
-        attrsWith = "id, unique_id, last_update, uuid_t, id_io_state, r_icon, record_fill_color, record_text_color ";
+        attrsWith = "id, unique_id, last_update, uuid_t, id_io_state, r_icon, rr_name, record_fill_color, record_text_color ";
         attrsWith1 = tableName + ".id, " + 
                      tableName + ".unique_id, " + 
                      tableName + ".last_update, " + 
                      tableName + ".uuid_t, " + 
                      tableName + ".id_io_state ," + 
                      tableName + ".r_icon, " + 
+                     tableName + ".rr_name, " + 
                      tableName + ".record_fill_color, " + 
                      tableName + ".record_text_color "; //колонки в подзапросе нерекурсивной части предложени€ WITH
     }
@@ -2151,8 +2188,10 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
             continue;
         if(a->code() == "last_update")
             continue;
-        if(a->code() == "id_io_state")
+        if(a->code() == "id_io_state"){
+            if(tableName.toLower() != "io_objects" && tableName.toLower() != "tbl_io_objects")//в справочнике »ќ есть атрибут id_io_state
             continue;
+        }
         if(a->code() == "uuid_t"){
             if(tableName.toLower() != "io_objects" && tableName.toLower() != "tbl_io_objects")//в справочнике »ќ есть атрибут uuit_t
                 continue;
@@ -2160,6 +2199,9 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
         if(a->code() == "r_icon"){ 
             if(tableName.toLower() != "rubricator") //в справочнике "общесистемный рубрикатор" имеетс€ колонка r_icon, но он при этом €вл€етс€ системным, т.е. isSys = true
                 continue;
+        }
+        if(a->code() == "rr_name"){
+            continue;
         }
         if(a->code() == "record_fill_color")
             continue;
@@ -2344,23 +2386,37 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
         }
         
         if(!withRecursive){
+            QString systemColumns;
+            if(tableName.toLower() == QString("io_objects"))
+                systemColumns = QString(", %1.r_icon, %1.record_fill_color, %1.record_text_color  ").arg(tableName);
+            else if(isSys)
+                systemColumns = QString("");
+            else
+                systemColumns = QString(", %1.uuid_t, %1.id_io_state, %1.r_icon, %1.rr_name, %1.record_fill_color, %1.record_text_color ").arg(tableName);
+
             sql = QString("select %4 %1.id, %1.unique_id, %1.last_update %6 %2 from %1 %3 %5 where 1=1 ")
                                 .arg(tableName)
                                 .arg(attrs)
                                 .arg(joinWord)
                                 .arg (isXml ? QString() : QString("distinct"))
                                 .arg(exTablesStr)
-                                .arg(isSys ? QString("") : QString(", %1.uuid_t, %1.id_io_state, %1.r_icon, %1.record_fill_color, %1.record_text_color ").arg(tableName));//.arg(fromWord).arg(joinWord);//.arg(whereWord);
+                                .arg(systemColumns);
             
             if(!filterWhere.isEmpty())
                 sql += filterWhere;
         }
         else{
-            //QString attrPK;
-            //QString attrFK;
             
             if(parentFilter.isEmpty())
                 parentFilter = defParentFilter;
+
+            QString systemColumns;
+            if(tableName.toLower() == QString("io_objects"))
+                systemColumns = QString(", %1.r_icon, %1.record_fill_color, %1.record_text_color  ").arg(withTableName);
+            else if(isSys)
+                systemColumns = QString("");
+            else
+                systemColumns = QString(", %1.uuid_t, %1.id_io_state, %1.r_icon, %1.rr_name, %1.record_fill_color, %1.record_text_color ").arg(withTableName);
 
             sql = QString("with recursive %1 (%2, ii_rec_order) as (" 
                           "select %3 %4, 0 from %5 where %6 UNION ALL select %4, %1.ii_rec_order+1 from %1, %5 where %1.%7 = %5.%8"
@@ -2377,7 +2433,8 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
                               .arg(withAttrs)
                               .arg(withJoinWord)
                               .arg(exTablesStr)
-                              .arg(isSys ? QString("") : QString(", %1.uuid_t, %1.id_io_state, %1.r_icon, %1.record_fill_color, %1.record_text_color").arg(withTableName));
+                              .arg(systemColumns);
+
             if(!filterWhere.isEmpty())
                 sql += filterWhere;
             
@@ -2516,6 +2573,7 @@ KKSMap<qint64, KKSEIOData *> KKSLoader::loadEIOList(const KKSCategory * c0,
                code == "id_io_state" || 
                code == "uuid_t" ||
                code == "r_icon" || 
+               code == "rr_name" ||
                code == "record_fill_color" || 
                code == "record_text_color")
             {
@@ -2660,6 +2718,7 @@ KKSList<KKSEIOData *> KKSLoader::loadEIOList1(const KKSCategory * c0,
                code == "uuid_t" || 
                code == "id_io_state" || 
                code == "r_icon" || 
+               code == "rr_name" || 
                code == "record_fill_color" || 
                code == "record_text_color")
             {
@@ -3756,7 +3815,6 @@ void KKSLoader::loadRecRubrics (KKSObjectExemplar * eio) const
     if(!eio || eio->id() <= 0)
         return;
 
-    //QString sql = QString("select * from recGetRubrics(%1) order by 5,1").arg(eio->id());
     QString sql = QString("select * from recGetRubrics(%1)").arg(eio->id());
     KKSResult * res = db->execute(sql);
     if(!res || res->getRowCount() == 0){
@@ -3775,13 +3833,28 @@ void KKSLoader::loadRecRubrics (KKSObjectExemplar * eio) const
             idParent = res->getCellAsInt(i, 1);
 
         KKSSearchTemplate * st = 0;
+
+        int idObject = -1;
+        KKSObject * io = 0;
+        if (!res->isEmpty (i, 3))
+        {
+            idObject = res->getCellAsInt (i, 3);
+            io = loadIO(idObject, true);
+        }
+
+        int idCategory = -1;
         KKSCategory * c = 0;
+        if (!res->isEmpty (i, 4))
+        {
+            idCategory = res->getCellAsInt (i, 4);
+            c = loadCategory(idCategory);
+        }
 
-        QString name = res->getCellAsString(i, 3);
-        QString code = QString();//res->getCellAsString(i, 6);
-        QString desc = res->getCellAsString(i, 4);
+        QString name = res->getCellAsString(i, 5);
+        QString code = QString();
+        QString desc = res->getCellAsString(i, 6);
 
-        int type = res->getCellAsInt(i, 5);
+        int type = res->getCellAsInt(i, 7);
 
         if(type == 0){//root rubric
             rootRubric = new KKSRubric(id, name);
@@ -3789,7 +3862,9 @@ void KKSLoader::loadRecRubrics (KKSObjectExemplar * eio) const
             rootRubric->setDesc(desc);
             rootRubric->setSearchTemplate (st);
             rootRubric->setCategory(c);
-            rootRubric->setIcon(res->getCellAsString(i, 6));
+            rootRubric->setIO(io);
+            rootRubric->setIcon(res->getCellAsString(i, 8));
+            rootRubric->setForRecord();
             
             rootRubric->m_intId = id;//рубрика информационного объекта загружена из Ѕƒ (используетс€ в операции update класса KKSPPFactory)
 
@@ -3801,14 +3876,17 @@ void KKSLoader::loadRecRubrics (KKSObjectExemplar * eio) const
             subRubric->setDesc(desc);
             subRubric->setSearchTemplate (st);
             subRubric->setCategory(c);
-            subRubric->setIcon(res->getCellAsString(i, 6));
+            subRubric->setIO(io);
+            subRubric->setIcon(res->getCellAsString(i, 8));
             subRubric->m_intId = id;
+            subRubric->setForRecord();
 
             if(idParent <= 0){
                 qWarning() << "Bad subRubric!";
                 subRubric->release();
                 continue;
             }
+
             KKSRubric * parent = eio->rootRubric()->rubricForId(idParent);
             if(!parent){
                 qWarning() << "Bad subRubric! Parent is NULL!";
@@ -3819,9 +3897,9 @@ void KKSLoader::loadRecRubrics (KKSObjectExemplar * eio) const
             subRubric->release();
         }
         else if(type == 2){//rubric items
-            bool isAutomated = false;//res->getCellAsBool(i, 10);
+            bool isAutomated = false;
             KKSRubricItem * item = new KKSRubricItem(id, name, isAutomated);
-            item->setIcon(res->getCellAsString(i, 6));
+            item->setIcon(res->getCellAsString(i, 8));
 
             if(idParent <= 0){
                 qWarning() << "Bad subRubric!";
@@ -3845,6 +3923,143 @@ void KKSLoader::loadRecRubrics (KKSObjectExemplar * eio) const
 
 }
 
+//загрузка рубрики из записи справочника (с рекурсией, если €вно указано)
+KKSRubric * KKSLoader::loadRecRubric (qint64 idRubric, bool withInherit) const
+{
+    if(idRubric <= 0)
+        return 0;
+
+    QString sql = QString("select * from recGetRubric(%1, %2)").arg(idRubric).arg(withInherit ? QString("TRUE") : QString("FALSE"));
+    KKSResult * res = db->execute(sql);
+    if(!res || res->getRowCount() == 0){
+        if(res)
+            delete res;
+        return 0;
+    }
+    
+    qint64 id = res->getCellAsInt(0, 0);
+    
+    int idObject = -1;
+    KKSObject * io = 0;
+    if (!res->isEmpty (0, 3))
+    {
+        idObject = res->getCellAsInt (0, 3);
+        io = loadIO(idObject, true);
+    }
+
+    int idCategory = -1;
+    KKSCategory * c = 0;
+    if (!res->isEmpty (0, 4))
+    {
+        idCategory = res->getCellAsInt (0, 4);
+        c = loadCategory(idCategory);
+    }
+
+    QString name = res->getCellAsString(0, 3);
+
+    KKSRubric * rootRubric = new KKSRubric(id, name);
+
+    QString desc = res->getCellAsString(0, 4);
+    QString icon = res->getCellAsString(0, 6);
+    rootRubric->setDesc (desc);
+    rootRubric->setIcon (icon);
+    rootRubric->setCategory(c);
+    rootRubric->setIO(io);
+
+    int cnt = res->getRowCount();
+    
+    for(int i=1; i<cnt; i++){
+        qint64 id = res->getCellAsInt(i, 0);
+
+        qint64 idParent = -1;
+        if(!res->isEmpty(i, 1))
+            idParent = res->getCellAsInt64(i, 1);
+
+        int idObject = -1;
+        KKSObject * io = 0;
+        if (!res->isEmpty (i, 3))
+        {
+            idObject = res->getCellAsInt (i, 3);
+            io = loadIO(idObject, true);
+        }
+
+        int idCategory = -1;
+        KKSCategory * c = 0;
+        if (!res->isEmpty (i, 4))
+        {
+            idCategory = res->getCellAsInt (i, 4);
+            c = loadCategory(idCategory);
+        }
+
+        QString name = res->getCellAsString(i, 3);
+        QString desc = res->getCellAsString(i, 4);
+        QString icon = res->getCellAsString(i, 6);
+
+        int type = res->getCellAsInt(i, 5);
+
+        if(type == 0){//rubricator
+            KKSRubric * theRubric = new KKSRubric(id, name);
+            theRubric->setDesc(desc);
+            theRubric->setIcon(icon);
+            theRubric->setCategory(c);
+            theRubric->setIO(io);
+            //loadPrivileges (theRubric);
+            theRubric->m_intId = id;
+
+            rootRubric->addRubric(theRubric);
+            theRubric->release();
+        }
+        else if(type == 1){//rubrics
+            KKSRubric * subRubric = new KKSRubric(id, name);
+            subRubric->setDesc(desc);
+            subRubric->setIcon(icon);
+            subRubric->setCategory(c);
+            subRubric->setIO(io);
+            //loadPrivileges (subRubric);
+            subRubric->m_intId = id;
+
+            if(idParent <= 0){
+                qWarning() << "Bad rubric!";
+                subRubric->release();
+                continue;
+            }
+
+            KKSRubric * parent = rootRubric->rubricForId(idParent);
+            if(!parent){
+                qWarning() << "Bad rubric! Parent is NULL!";
+                subRubric->release();
+                continue;
+            }
+
+            parent->addRubric(subRubric);
+            subRubric->release();
+        }
+        else if(type == 2){//rubric items
+            //bool b = res->getCellAsBool(i, 10);
+            KKSRubricItem * item = new KKSRubricItem(id, name, false);
+            item->setIcon(icon);
+
+            if(idParent <= 0){
+                qWarning() << "Bad subRubric!";
+                item->release();
+                continue;
+            }
+
+            KKSRubric * parent = rootRubric->rubricForId(idParent);
+            if(!parent){
+                qWarning() << "Bad subRubric! Parent is NULL!";
+                item->release();
+                continue;
+            }
+
+            parent->addItem(item);
+            item->release();
+        }
+    }
+
+    return rootRubric;
+}
+
 QString KKSLoader::getRecTable (int idRec) const
 {
     QString sql = QString ("select getRecordTable(%1);").arg (idRec);
@@ -3860,12 +4075,42 @@ QString KKSLoader::getRecTable (int idRec) const
     return tName;
 }
 
+//получаем записи, вход€щие в рубрику в Ѕƒ, а также записи, добавленные в рубрику пока локально, исключа€ удаленные локально
 KKSMap<qint64, KKSEIOData *> KKSLoader::loadRecList (const KKSRubric * r) const
 {
     if (!r)
         return KKSMap<qint64, KKSEIOData *>();
 
-    QString sql = QString("select * from recGetRubricItems(%1) order by 5,1").arg(r->id());
+    QString idsArrayIn;
+    int addCnt = r->items().count();
+    if(addCnt > 0){
+        idsArrayIn = QString("ARRAY[");
+        for(int i=0; i<addCnt; i++){
+            idsArrayIn += QString::number(r->items().at(i)->id());
+            if(i < addCnt-1)
+                idsArrayIn += QString(",");
+        }
+        idsArrayIn += QString("]");
+    }
+
+    QString idsArrayNotIn;
+    int delCnt = r->deletedItems().count();
+    if(delCnt > 0){
+        idsArrayNotIn = QString("ARRAY[");
+        for(int i=0; i<delCnt; i++){
+            idsArrayNotIn += QString::number(r->deletedItems().at(i)->id());
+            if(i < delCnt-1)
+                idsArrayNotIn += QString(",");
+        }
+        idsArrayNotIn += QString("]");
+    }
+
+
+    QString sql = QString("select * from recGetRubricRecords(%1, %2, %3)")
+                           .arg(r->id())
+                           .arg(idsArrayIn.isEmpty() ? QString("NULL") : idsArrayIn)
+                           .arg(idsArrayNotIn.isEmpty() ? QString("NULL") : idsArrayNotIn);
+
     KKSResult * res = db->execute(sql);
     if(!res || res->getRowCount() == 0)
     {
@@ -3878,17 +4123,91 @@ KKSMap<qint64, KKSEIOData *> KKSLoader::loadRecList (const KKSRubric * r) const
     KKSMap<qint64, KKSEIOData *> results;
     for (int i=0; i<count; i++)
     {
-        qint64 idr = res->getCellAsInt (i, 0);
-        QString tableName = getRecTable (idr);
-        KKSObject * io = this->loadIO (tableName, true);
+        KKSEIOData * eio = new KKSEIOData();
+        eio->addField("id_object", res->getCellAsString(i, 0));
+        eio->addField("io_name", res->getCellAsString(i, 1));
+        eio->addSysField("id", res->getCellAsString(i, 2));
+        eio->addSysField("rr_name", res->getCellAsString(i, 3));
+        eio->addSysField("unique_id", res->getCellAsString(i, 4));
+        eio->addSysField("uuid_t", res->getCellAsString(i, 5));
+        eio->addSysField("last_update", res->getCellAsString(i, 6));
+        eio->addSysField("id_io_state", res->getCellAsString(i, 7));
+        eio->addField("state_name", res->getCellAsString(i, 8));
+        eio->addSysField("r_icon", res->getCellAsString(i, 9));
+        eio->addSysField("record_fill_color", res->getCellAsString(i, 10));
+        eio->addSysField("record_text_color", res->getCellAsString(i, 11));
+        eio->addSysField("ii_rec_order", QString::number(i));
         
-        if (!io)
-            continue;
-        KKSEIOData * d = this->loadEIOInfo(io->id(), idr);
-        results.insert(idr, d);
-        d->release();
-        io->release();
+        qint64 idRecord = res->getCellAsInt (i, 2);
+        //QString tableName = getRecTable (idRecord);
+        //KKSObject * io = this->loadIO (tableName, true);
+        
+        //if (!io)
+        //    continue;
+        //KKSEIOData * d = this->loadEIOInfo(io->id(), idr);
+        
+        results.insert(idRecord, eio);
+        eio->release();
+        
     }
+
+    return results;
+}
+
+KKSMap<qint64, KKSEIOData *> KKSLoader::loadRecList (QList<qint64> ids) const
+{
+    if (ids.count() <= 0)
+        return KKSMap<qint64, KKSEIOData *>();
+
+    QString idsArray = QString("ARRAY[");
+    for(int i=0; i<ids.count(); i++){
+        idsArray += QString::number(ids.at(i));
+        if(i < ids.count()-1)
+            idsArray += QString(",");
+    }
+    idsArray += QString("]");
+
+    QString sql = QString("select * from recGetRecordsInfo(%1)").arg(idsArray);
+    KKSResult * res = db->execute(sql);
+    if(!res || res->getRowCount() == 0)
+    {
+        if(res)
+            delete res;
+        return KKSMap<qint64, KKSEIOData *>();
+    }
+
+    int count = res->getRowCount();
+    KKSMap<qint64, KKSEIOData *> results;
+    for (int i=0; i<count; i++)
+    {
+        KKSEIOData * eio = new KKSEIOData();
+        eio->addField("id_object", res->getCellAsString(i, 0));
+        eio->addField("io_name", res->getCellAsString(i, 1));
+        eio->addSysField("id", res->getCellAsString(i, 2));
+        eio->addSysField("rr_name", res->getCellAsString(i, 3));
+        eio->addSysField("unique_id", res->getCellAsString(i, 4));
+        eio->addSysField("uuid_t", res->getCellAsString(i, 5));
+        eio->addSysField("last_update", res->getCellAsString(i, 6));
+        eio->addSysField("id_io_state", res->getCellAsString(i, 7));
+        eio->addField("state_name", res->getCellAsString(i, 8));
+        eio->addSysField("r_icon", res->getCellAsString(i, 9));
+        eio->addSysField("record_fill_color", res->getCellAsString(i, 10));
+        eio->addSysField("record_text_color", res->getCellAsString(i, 11));
+        eio->addSysField("ii_rec_order", QString::number(i));
+        
+        qint64 idRecord = res->getCellAsInt (i, 2);
+        //QString tableName = getRecTable (idRecord);
+        //KKSObject * io = this->loadIO (tableName, true);
+        
+        //if (!io)
+        //    continue;
+        //KKSEIOData * d = this->loadEIOInfo(io->id(), idr);
+        
+        results.insert(idRecord, eio);
+        eio->release();
+        
+    }
+
     return results;
 }
 
@@ -4004,7 +4323,7 @@ KKSRubric * KKSLoader::loadRubricators(bool bOnlyMyDocs) const
 
 KKSRubricBase * KKSLoader::loadCatRubricators(void) const
 {
-    QString sql = QString("select * from cgetcategoriesforrubricator() order by id;");
+    QString sql = QString("select * from cgetcategoriesforrubricator();");
     KKSResult * res = db->execute(sql);
     if(!res || res->getRowCount() == 0){
         if(res)
@@ -4012,7 +4331,7 @@ KKSRubricBase * KKSLoader::loadCatRubricators(void) const
         return NULL;
     }
     
-    KKSRubricBase * rootRubric = new KKSRubricOthers (-1, QObject::tr("Others"));//KKSRubric(-1, "Categories rubric for all tree");
+    KKSRubricBase * rootRubric = new KKSRubricOthers (-1, QObject::tr("Groupped by categories"));//KKSRubric(-1, "Categories rubric for all tree");
 
     int cnt = res->getRowCount();
     for(int i=0; i<cnt; i++){
@@ -4032,7 +4351,7 @@ KKSRubricBase * KKSLoader::loadCatRubricators(void) const
         //int type = 0;//res->getCellAsInt(i, 8);
 
         KKSRubric * theRubric = new KKSRubric(id, name);
-        theRubric->setCategorized (true);
+        theRubric->setCategorized ();
         theRubric->setCode(code);
         theRubric->setDesc(desc);
         //theRubric->setSearchTemplate (st);
@@ -4058,7 +4377,7 @@ KKSList<const KKSRubricItem *> KKSLoader::loadCatRubricItems (const KKSCategory*
     if (!cat)
         return rItems;
 
-    QString sql = QString("select id,name,r_icon from io_objects io where io.id_io_category=%1;").arg (cat->id());
+    QString sql = QString("select id, name, r_icon from io_objects io where io.id_io_category=%1;").arg (cat->id());
     KKSResult * res = db->execute (sql);
     if (!res || res->getRowCount() == 0)
     {

@@ -46,17 +46,18 @@
 #include <QDir>
 
 KKSIncludesWidget::KKSIncludesWidget(KKSRubric * rootRubric, 
-                                     bool isAttach,
-                                     bool isDocs,
-                                     bool forCategory,
-                                     bool forRecord,
+                                     RubricatorSource rSource,
+                                     //bool isDocs,
+                                     //bool forCategory,
+                                     //bool forRecord,
                                      QWidget *parent,
                                      Qt::WindowFlags flags)
     : KKSDialog (parent, flags),
     m_rootRubric (rootRubric),
-    isMyDoc (isDocs),
+    m_rSource(rSource),
     isChanged (false),
-    isRec (forRecord),
+    //isMyDoc (isDocs),
+    //isRec (forRecord),
     rubricsOnly (false),
     tBRubrActions (new QToolBar (this)),
     spRubrics (new QSplitter (Qt::Horizontal, this)),
@@ -73,16 +74,18 @@ KKSIncludesWidget::KKSIncludesWidget(KKSRubric * rootRubric,
     else
         m_rootRubric = new KKSRubric ();
     
-    if (isRec)
+    if (m_rSource == rsRecord)
         twIncludes->setSelectionMode (QAbstractItemView::ExtendedSelection);
     else
         tvItems->setSelectionMode (QAbstractItemView::ExtendedSelection);
 
     tBRubrActions->setIconSize (QSize (24, 24));
+    
     QHeaderView * hItems = tvItems->header();
     hItems->setSortIndicatorShown (true);
     hItems->setStretchLastSection (true);
     hItems->setClickable (true);
+
     QAbstractItemDelegate * iDeleg = new KKSItemDelegate ();
     tvItems->setItemDelegate (iDeleg);
     KKSEventFilter * ef = new KKSEventFilter ();
@@ -98,12 +101,13 @@ KKSIncludesWidget::KKSIncludesWidget(KKSRubric * rootRubric,
         rLay->setContentsMargins (0, 0, 0, 0);
         rLay->setSpacing (0);
     }
+
     spRubrics->addWidget (recWItems);
     gLay->addWidget (spRubrics, 1, 0, 1, 1);
 
     init ();
     initActions ();
-    Q_UNUSED (isAttach);
+    
     QSizePolicy rSizeP (QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
     tvItems->setSizePolicy (rSizeP);
     recWItems->setVisible (false);
@@ -114,26 +118,27 @@ KKSIncludesWidget::KKSIncludesWidget(KKSRubric * rootRubric,
     recWItems->hideGroup (2);//hideToolBar();//hideGroup (2);
     recWItems->hideGroup (3);
 
-    if (forCategory)
+    if (m_rSource == rsCategory)
         this->setWindowTitle (tr("Rubrics"));
 
     m_icon = QIcon(":/ddoc/rubricators.png");
 
     QItemSelectionModel * selModel = twIncludes->selectionModel ();
-    if (selModel)
-        connect (selModel, \
-                 SIGNAL (selectionChanged (const QItemSelection&, const QItemSelection&)), \
-                 this, \
+    if (selModel){
+        connect (selModel, 
+                 SIGNAL (selectionChanged (const QItemSelection&, const QItemSelection&)), 
+                 this, 
                  SLOT (rubricSelectionChanged (const QItemSelection&, const QItemSelection&))
                 );
+    }
+
     connect (recWItems, SIGNAL (addEntity(QAbstractItemModel *, const QModelIndex&)), this, SLOT (createRubricItem(QAbstractItemModel *, const QModelIndex&)) );
     connect (recWItems, SIGNAL (editEntitiesList (QAbstractItemModel *, const QItemSelection&)), this, SLOT (editSelectedDocs (QAbstractItemModel *, const QItemSelection&)) );
-//    connect (recWItems, SIGNAL (editEntity(QAbstractItemModel *, const QModelIndex& )), this, SLOT (editRubricDoc(QAbstractItemModel *, const QModelIndex&)) );
-    connect (twIncludes, SIGNAL (doubleClicked(const QModelIndex &)), this, SLOT (slotRubricItemDblClicked(const QModelIndex &)) );
-    connect (recWItems->getView(), SIGNAL (doubleClicked(const QModelIndex &)), this, SLOT (slotRubricItemEdit(const QModelIndex &)) );
     connect (recWItems, SIGNAL (delEntitiesList (QAbstractItemModel *, const QItemSelection&)), this, SLOT (delSelectedDocs (QAbstractItemModel *, const QItemSelection&)) );
     connect (recWItems, SIGNAL (refreshMod(QAbstractItemModel *)), this, SLOT (refreshRubricItems(QAbstractItemModel *)) );
-//    connect (recWItems->actDel, SIGNAL (triggered()), this, SLOT (delRubricItem()) );
+
+    connect (twIncludes, SIGNAL (doubleClicked(const QModelIndex &)), this, SLOT (slotRubricItemDblClicked(const QModelIndex &)) );
+    connect (recWItems->getView(), SIGNAL (doubleClicked(const QModelIndex &)), this, SLOT (slotRubricItemEdit(const QModelIndex &)) );
 }
 
 KKSIncludesWidget::~KKSIncludesWidget()
@@ -144,6 +149,7 @@ KKSIncludesWidget::~KKSIncludesWidget()
 
 void KKSIncludesWidget::init()
 {
+    bool isRec (m_rSource == rsRecord);
     QAbstractItemModel * model = new KKSRubricModel (m_rootRubric, isRec);
     //new KKSRubricModel (m_rootRubric);new QStandardItemModel (0, 1);
     model->setHeaderData(0, Qt::Horizontal, tr("Name"), Qt::DisplayRole);
@@ -193,7 +199,7 @@ void KKSIncludesWidget :: initActions (void)
     {
         QAction * aRubricA = new QAction (QIcon(icons[i]), titlesList[i], this);
         tBRubrActions->addAction (aRubricA);
-        if (!isRec && i != 4 && i != 5)
+        if (m_rSource != rsRecord && i != 4 && i != 5)
             pMenu->addAction (aRubricA);
         connect (aRubricA, SIGNAL (triggered()), this, slotList[i].toAscii().constData() );
         if (i==2)
@@ -212,7 +218,7 @@ void KKSIncludesWidget :: initActions (void)
     actSyncSep->setSeparator (true);
     this->recWItems->insertToolBarAction (recWItems->actRefresh, actSyncSep);
 
-    if (!isRec)
+    if (m_rSource != rsRecord)
     {
         QAction * actSyncSet = new QAction (QIcon(":/ddoc/sync.png"), tr ("Set synchronization parameters"), this);
         recWItems->insertToolBarAction (actSyncSep, actSyncSet);
@@ -412,10 +418,11 @@ void KKSIncludesWidget::delRubric (void)
     else{
         index = sel.indexes().at(0);
         index = index.sibling(index.row(), 0);
+        
         int rType = twIncludes->model()->data(index, Qt::UserRole+2).toInt();
-        qDebug () << __PRETTY_FUNCTION__ << rType;
-        if(rType == KKSRubricBase::atRubricCategory ||
-           rType == KKSRubricBase::atOthers)
+        
+        if(rType == KKSRubricBase::btRubricAsCategory ||
+           rType == KKSRubricBase::btOthers)
         { 
             //
             // item or category-rubric selected
@@ -431,7 +438,11 @@ void KKSIncludesWidget::delRubric (void)
                 QMessageBox::warning (this, tr("Delete rubric"), tr ("Cannot remove system rubricator"), QMessageBox::Ok);
                 return;
             }
-            int res = QMessageBox::question (this, tr ("Delete rubric"), tr ("Do you really want to delete ?"), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+            
+            int res = QMessageBox::question (this, 
+                                             tr ("Delete rubric"), 
+                                             tr ("Do you really want to delete ?"), 
+                                             QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
             if (res != QMessageBox::Yes)
                 return;
         }
@@ -451,17 +462,13 @@ void KKSIncludesWidget::delRubric (void)
     const_cast<KKSRubric *>(r)->removeRubric(irow);
     twIncludes->model()->removeRows(irow, 1, iPar);
     isChanged = true;
+
     emit rubricsChanged ();
 }
 
 void KKSIncludesWidget :: addRubric (void)
 {
     QItemSelectionModel * sm = twIncludes->selectionModel();
-//    if (/*isMyDoc &&*/ !sm->currentIndex().isValid())
-//    {
-//        QMessageBox::warning (this, tr ("Rubric editor"), tr ("You cannot add rubrics into root level"), QMessageBox::Ok, QMessageBox::NoButton);
-//        return;
-//    }
 
     QModelIndex index;
     QItemSelection sel = sm ? sm->selection() : QItemSelection();
@@ -472,12 +479,13 @@ void KKSIncludesWidget :: addRubric (void)
     else{
         index = sel.indexes().at (0);
         index = index.sibling(index.row(), 0);
-        if(index.data(Qt::UserRole+2).toInt() == KKSRubricBase::atRubricItem){ //item selected
+        
+        if(index.data(Qt::UserRole+2).toInt() == KKSRubricBase::btRubricItem){ //item selected
             index = index.parent();
             index = index.sibling(index.row(), 0);
         }
-        else if (index.data (Qt::UserRole+2).toInt() == KKSRubricBase::atRubricCategory ||
-                 index.data (Qt::UserRole+2).toInt() == KKSRubricBase::atOthers)
+        else if (index.data (Qt::UserRole+2).toInt() == KKSRubricBase::btRubricAsCategory ||
+                 index.data (Qt::UserRole+2).toInt() == KKSRubricBase::btOthers)
         {
             qWarning() << tr ("Cannot add subrubric into categorized rubric or another");
             QMessageBox::warning (this,
@@ -491,27 +499,32 @@ void KKSIncludesWidget :: addRubric (void)
         }
     }
 
-    bool ok = false;
-    Q_UNUSED (ok);
     QString rName;
+    bool isRec (m_rSource == rsRecord);
     RubricForm * rForm = new RubricForm (tr("New rubric %1").arg(twIncludes->model()->rowCount(index)+1), QString(), isRec, this);
     if (!rForm)
         return;
 
     emit loadStuffModel (rForm);
+
     connect (rForm, SIGNAL (requestSearchTemplate()), this, SLOT (addSearchTemplateIntoRubric()) );
     connect (rForm, SIGNAL (requestCategory()), this, SLOT (addCategoryIntoRubric()) );
+    connect (rForm, SIGNAL (requestIO()), this, SLOT (addIOIntoRubric()) );
+    
     KKSSearchTemplate * rst = 0;
     KKSCategory * rc = 0;
     KKSAccessEntity * ac = 0;
+    KKSObject * io = 0;
     QString rDesc;
     QString icon;
+
     if (rForm && rForm->exec() == QDialog::Accepted)
     {
         rName = rForm->getRubricName ();
         rst = rForm->getSearchTemplate ();
         rc = rForm->getCategory ();
         ac = rForm->getAccessEntity ();
+        io = rForm->getIO();
         rDesc = rForm->getRubricDesc ();
         icon = rForm->getIconAsString();
         if (rName.trimmed().isEmpty())
@@ -525,8 +538,14 @@ void KKSIncludesWidget :: addRubric (void)
     }
 
     KKSRubric * r = new KKSRubric(-1, rName, rst, rc, ac);
+    r->setIO(io);
     r->setIcon(icon);
     r->setDesc (rDesc);
+    
+    //если работаем с рубрикатором в записи справочника, то создаваемые рубрики должны иметь тип btRecordRubric
+    if(isRec)
+        r->setForRecord();
+    
     rForm->setParent (0);
     delete rForm;
 
@@ -548,11 +567,13 @@ void KKSIncludesWidget :: addRubric (void)
     QAbstractItemModel * rModel = twIncludes->model();
     
     twIncludes->setCurrentIndex(cIndex);
+    
     bool isSet = rModel->setData (cIndex, r->getIcon(), Qt::DecorationRole);
-    qDebug () << __PRETTY_FUNCTION__ << cIndex << rModel->rowCount() << isSet;
+    
 
     r->release();
     isChanged = true;
+
     emit rubricsChanged ();
 }
 
@@ -595,13 +616,15 @@ void KKSIncludesWidget :: editRubric (void)
     else{
         index = sel.indexes().at (0);
         index = index.sibling(index.row(), 0);
+        
         int rType = index.data(Qt::UserRole+2).toInt();
-        if(rType == KKSRubricBase::atRubricItem){ //item selected
+        
+        if(rType == KKSRubricBase::btRubricItem){ //item selected
             index = index.parent();
             index = index.sibling(index.row(), 0);
         }
-        else if (rType == KKSRubricBase::atOthers ||
-                 rType == KKSRubricBase::atRubricCategory)
+        else if (rType == KKSRubricBase::btOthers ||
+                 rType == KKSRubricBase::btRubricAsCategory)
         {
             qWarning() << tr ("Category or others rubric cannot been edited");
             QMessageBox::warning(this, tr("Edit rubric"), tr ("Category or others rubric cannot been edited"), QMessageBox::Ok);
@@ -627,29 +650,39 @@ void KKSIncludesWidget :: editRubric (void)
     if (!r)
         return;
 
+    bool isRec (m_rSource == rsRecord);
+    
     RubricForm * rForm = new RubricForm (index.data (Qt::DisplayRole).toString(), r->desc(), isRec, this);
+    
     rForm->setSearchTemplate (r->getSearchTemplate());
     rForm->setCategory (r->getCategory());
+    rForm->setIO(r->getIO());
     rForm->setAccessEntity (r->getAccessRules());
     rForm->setIcon (r->getIcon().pixmap(24, 24));
-    if (!rForm)
-        return;
 
     emit loadStuffModel (rForm);
+
     connect (rForm, SIGNAL (requestSearchTemplate()), this, SLOT (addSearchTemplateIntoRubric()) );
     connect (rForm, SIGNAL (requestCategory()), this, SLOT (addCategoryIntoRubric()) );
+    connect (rForm, SIGNAL (requestIO()), this, SLOT (addIOIntoRubric()) );
+
     KKSSearchTemplate * rst = 0;
     KKSCategory * rc = 0;
+    KKSObject * io = 0;
     KKSAccessEntity * ac =0;
+
     bool isCatAvail = !r->getCategory() || recWItems->getSourceModel()->rowCount() == 0;
     rForm->setCatEnabled(isCatAvail);
+    
     QString rDesc;
     QString rIcon;
+    
     if (rForm && rForm->exec() == QDialog::Accepted)
     {
         rName = rForm->getRubricName ();
         rst = rForm->getSearchTemplate ();
         rc = rForm->getCategory ();
+        io = rForm->getIO();
         ac = rForm->getAccessEntity();
         rDesc = rForm->getRubricDesc ();
         rIcon = rForm->getIconAsString();
@@ -666,15 +699,19 @@ void KKSIncludesWidget :: editRubric (void)
     r->setName (rName);
     r->setSearchTemplate (rst);
     r->setCategory (rc);
+    r->setIO(io);
     r->setAccessRules (ac);
     r->setDesc (rDesc);
     r->setIcon (rIcon);
+    
     rForm->setParent (0);
     delete rForm;
 
     twIncludes->model()->setData (index, rName, Qt::DisplayRole);
     twIncludes->model()->setData (index, r->getIcon(), Qt::DecorationRole);
+
     isChanged = true;
+
     emit rubricsChanged ();
 }
 /*
@@ -786,14 +823,18 @@ void KKSIncludesWidget :: delSelectedDocs (QAbstractItemModel * itemModel, const
     {
         QModelIndex index = selDocs.indexes().at(i);
         index = index.sibling (index.row(), 0);
+        
         int pType = index.data (Qt::UserRole+2).toInt();
-        if ((isRec && pType != KKSRubricBase::atRubricItem))
-            continue;
-        else
+        
+        //if ((m_rSource == rsRecord && pType != KKSRubricBase::btRubricItem))
+        //    continue;
+        //else
             index = this->recWItems->getSourceIndex();
+
         QModelIndex wIndex (smInc->currentIndex());
-        if (isRec)
-            wIndex = wIndex.parent ();
+        //if (m_rSource == rsRecord)
+        //    wIndex = wIndex.parent ();
+        
         KKSRubric * r = NULL;
     //    if(isRubr)
     //        r = const_cast<KKSRubric *>(getRubric(wIndex.parent()));
@@ -811,6 +852,7 @@ void KKSIncludesWidget :: delSelectedDocs (QAbstractItemModel * itemModel, const
     //    else
         itemModel->removeRows (index.row(), 1, index.parent());
     }
+
     isChanged = true;
     emit rubricsChanged ();
     qDebug () << __PRETTY_FUNCTION__ << isDbDel;
@@ -828,6 +870,8 @@ void KKSIncludesWidget :: delRubricItem (void)
 
     QModelIndex index;// = sm ? sm->currentIndex() : QModelIndex ();
     QModelIndex indexInc;
+    bool isRec (m_rSource == rsRecord);
+
     if (((!sm || sel.indexes().isEmpty()) && !isRec) || ((!smInc || selInc.indexes().isEmpty()) && isRec))
     {
         return;
@@ -852,8 +896,12 @@ void KKSIncludesWidget :: delRubricItem (void)
         index = index.sibling(index.row(), 0);
         QModelIndex pIndex = selInc.indexes().at(0);
         pIndex = pIndex.sibling (pIndex.row(), 0);
+        
         int pType = pIndex.data(Qt::UserRole+2).toInt();
-        if ( pType == KKSRubricBase::atRubric || pType == KKSRubricBase::atRootRubric)
+        
+        if ( pType == KKSRubricBase::btRubric || 
+             pType == KKSRubricBase::btRecordRubric || 
+             pType == KKSRubricBase::btRootRubric)
                 //(index.data(Qt::UserRole+2).toInt() == KKSRubricBase::atRubricItem && 
                  //pType != KKSRubricBase::atRubricCategory)
                 //)
@@ -861,7 +909,10 @@ void KKSIncludesWidget :: delRubricItem (void)
             //
             // item selected
             //
-            int res = QMessageBox::question (this, tr ("Delete rubric item"), tr ("Do you really want to delete ?"), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+            int res = QMessageBox::question (this, 
+                                             tr ("Delete rubric item"), 
+                                             tr ("Do you really want to delete ?"), 
+                                             QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
             if (res != QMessageBox::Yes)
                 return;
         }
@@ -870,7 +921,7 @@ void KKSIncludesWidget :: delRubricItem (void)
             //
             // rubric selected
             //
-            if (pType == KKSRubricBase::atRubricCategory){
+            if (pType == KKSRubricBase::btRubricAsCategory){
                 qWarning() << tr ("Cannot delete item from categorized rubric.");
                 QMessageBox::warning (this, tr ("Delete rubric item"), tr ("Cannot delete item from categorized rubric."), QMessageBox::Ok);
             }
@@ -905,6 +956,7 @@ void KKSIncludesWidget :: delRubricItem (void)
     emit rubricsChanged ();
 }
 
+//добавление ИО или записи справочника в рубрику
 void KKSIncludesWidget :: addRubricItem (void)
 {
     QItemSelectionModel * sm (twIncludes->selectionModel());
@@ -922,8 +974,8 @@ void KKSIncludesWidget :: addRubricItem (void)
                              QMessageBox::Ok);
         return;
     }
-    else if (index.data (Qt::UserRole+2).toInt() == KKSRubricBase::atRubricCategory ||
-             index.data (Qt::UserRole+2).toInt() == KKSRubricBase::atOthers)
+    else if (index.data (Qt::UserRole+2).toInt() == KKSRubricBase::btRubricAsCategory ||
+             index.data (Qt::UserRole+2).toInt() == KKSRubricBase::btOthers)
     {
         qWarning() << tr ("Cannot add document into categorized rubric or another");
         QMessageBox::warning (this,
@@ -938,13 +990,17 @@ void KKSIncludesWidget :: addRubricItem (void)
         return;
     QAbstractItemModel * itemModel = recWItems->getSourceModel ();
 
+    bool isRec (m_rSource == rsRecord);
+    
     emit rubricItemRequested(r, isRec, itemModel);
+    
     QSortFilterProxyModel * sortMod = qobject_cast<QSortFilterProxyModel *>(this->recWItems->getModel());
     sortMod->sort(tvItems->header()->sortIndicatorSection());
 }
 
 void KKSIncludesWidget :: createRubricItem (QAbstractItemModel * itemModel, const QModelIndex& parent)
 {
+    bool isRec (m_rSource == rsRecord);
     if (isRec)
     {
         this->addRubricItem();
@@ -1011,6 +1067,7 @@ void KKSIncludesWidget::slotAddRubricItem(int idObject, QString name)
     if (!r)
         return;
     
+    bool isRec (m_rSource == rsRecord);
     if (isRec)
     {
         //emit appendRubricRecord (idObject, r, twIncludes->model(), index);
@@ -1038,15 +1095,16 @@ void KKSIncludesWidget::slotAddRubricItem(int idObject, QString name)
     //
     // rubric item is selected
     //
-    while (index.data(Qt::UserRole+2) == KKSRubricBase::atRubricItem)
+    while (index.data(Qt::UserRole+2) == KKSRubricBase::btRubricItem)
         index = index.parent();
 
 //    if (r->getCategory())
 //    {
 //        qDebug () << __PRETTY_FUNCTION__ << r->name() << rIsEmpty;
     QAbstractItemModel * attachModel = recWItems->getSourceModel ();
+   
     if (!attachModel)
-        emit initAttachmentsModel (r, this->isRec);
+        emit initAttachmentsModel (r, isRec);
     else if (isRec)
     {
         qDebug () << __PRETTY_FUNCTION__ ;
@@ -1113,6 +1171,17 @@ void KKSIncludesWidget :: slotInitAttachmentsModel (QAbstractItemModel * attachM
 
 void KKSIncludesWidget :: editRubricItem (void)
 {
+/*
+    QAbstractItemModel * sourceMod = getSourceModel ();
+    if (!sourceMod)
+        return;
+
+    QModelIndex wIndex = getSourceIndex ();
+    emit editEntity (sourceMod, wIndex);
+    QItemSelection sel = getSourceSelection ();
+    emit editEntitiesList (sourceMod, sel);*/
+
+    
     QItemSelectionModel * sm;
 
     bool isRubr = true;
@@ -1130,22 +1199,21 @@ void KKSIncludesWidget :: editRubricItem (void)
     {
         return;
     }
-    else{
+    else
+    {
         index = index.sibling(index.row(), 0);
+
         int rType = index.data(Qt::UserRole+2).toInt();
-        if (!isRubr || rType == KKSRubricBase::atRubricItem){ //item selected
+        if (!isRubr || rType == KKSRubricBase::btRubricItem){ //item selected
             ;
         }
         else{//rubric selected
             return;
         }
     }
-    if (isRec)
-    {
-        emit openRubricItemRequested (index.data (Qt::UserRole).toInt());
-        return;
-    }
+
     editRubricDoc (tvItems->model(), index);
+    
 
 }
 
@@ -1163,28 +1231,42 @@ void KKSIncludesWidget :: editRubricDoc (QAbstractItemModel * itemModel, const Q
 {
     if (!itemModel)
         return;
-    int idObject = -1;
-
-    idObject = index.data(Qt::UserRole).toInt();//idObject
     
-    if(idObject > 0){
-        emit openRubricItemRequested(idObject);
+    QVariant v = itemModel->data(index, Qt::UserRole+1);
+    KKSEIOData * eio = v.value<KKSEIOData*>();
+    if(!eio)
+        return;
+
+    int idRecord = eio->sysFieldValue("id").toInt();
+
+    //int idRecord = index.data(Qt::UserRole).toInt();//idObject или idRecord
+    if(idRecord <= 0){
+        qCritical() << tr("Cannot open rubric item. Data is corrupt!");
+        QMessageBox::critical(this,
+                              tr("Error"),
+                              tr("Cannot open rubric item. Data is corrupt!"),
+                              QMessageBox::Ok);
         return;
     }
-
-    qCritical() << tr("Cannot open rubric item. Data is corrupt!");
-    QMessageBox::critical(this,
-                          tr("Error"),
-                          tr("Cannot open rubric item. Data is corrupt!"),
-                          QMessageBox::Ok);
-
+    
+    bool isRec (m_rSource == rsRecord);
+    if(isRec){
+        int idObject = eio->fieldValue("id_object").toInt();
+        emit openRubricItemRequested(idObject, idRecord);
+    }
+    else{    
+        emit openRubricItemRequested(idRecord);
+    }
+    
 }
 
 void KKSIncludesWidget::slotRubricItemDblClicked(const QModelIndex & index)
 {
-    qDebug () << __PRETTY_FUNCTION__ << index.data(Qt::UserRole+2).toInt();
-    if (index.data(Qt::UserRole+2).toInt() == KKSRubricBase::atRubricItem)
+    if (index.data(Qt::UserRole+2).toInt() == KKSRubricBase::btRubricItem){
+        //QAbstractItemModel * itemModel = recWItems->getSourceModel();
+        //editRubricDoc(itemModel, index);
         editRubricItem();
+    }
     else
         editRubric();
 }
@@ -1192,6 +1274,9 @@ void KKSIncludesWidget::slotRubricItemDblClicked(const QModelIndex & index)
 void KKSIncludesWidget::slotRubricItemEdit(const QModelIndex & /*index*/)
 {
     editRubricItem();
+    //QAbstractItemModel * itemModel = recWItems->getSourceModel();
+    //editRubricDoc(itemModel, index);
+
 }
 /*
 void KKSIncludesWidget::on_cbUseIncludes_stateChanged(int state)
@@ -1215,31 +1300,34 @@ const KKSRubric * KKSIncludesWidget::getRubric(QModelIndex index)
     const KKSRubricBase * wr = model->data (index, Qt::UserRole+1).value<const KKSRubricBase *>();
     if (!wr)
         return 0;
-    if (wr->rubricType() == KKSRubricBase::atRubricItem)
+    if (wr->rubricType() == KKSRubricBase::btRubricItem)
     {
         KKSRubricBase * wrp = index.parent().data (Qt::UserRole+1).value<KKSRubricBase *>();
         if (!wrp)
             return 0;
+
         return static_cast<const KKSRubric *>(wrp);
     }
-    else if (wr->rubricType() == KKSRubricBase::atRubricCategory)
+    else if (wr->rubricType() == KKSRubricBase::btRubricAsCategory)
     {
         const KKSRubric * r = static_cast<const KKSRubric *>(wr);
         if(r->getCategory())
             return r;
         
         //
-        //ЗАГРУЗИТЬ КАТЕГОРИЮ С ИД = r->id() и задать ее в категорию
+        //ЗАГРУЗИТЬ КАТЕГОРИЮ С ИД = r->id() и задать ее в виде рубрики
         //emit rubricRequested(const_cast<KKSRubric *>(r), index.data(Qt::UserRole).toInt(), model, index);
         //
         emit rubricCategoryRequested (const_cast<KKSRubric *>(r));
+
         return r;//static_cast<const KKSRubric *>(wr);
     }
-    else if (wr->rubricType() != KKSRubricBase::atOthers)
+    else if (wr->rubricType() != KKSRubricBase::btOthers)
     {
         const KKSRubric * r = static_cast<const KKSRubric *>(wr);
-        qDebug () << __PRETTY_FUNCTION__ << r->items().count();
+
         emit rubricRequested(const_cast<KKSRubric *>(r), index.data(Qt::UserRole).toInt(), model, index);
+
         return r;//static_cast<const KKSRubric *>(wr);
     }
     else
@@ -1258,6 +1346,7 @@ const KKSRubric * KKSIncludesWidget::currentRubric()
     }
 
     index = sel.indexes().at (0);
+
     return getRubric(index);
 }
 
@@ -1278,6 +1367,7 @@ QTreeView *KKSIncludesWidget::tvRubr (void)
 
 void KKSIncludesWidget::save (void)
 {
+    bool isMyDoc (m_rSource == rsMyDocs);
     emit saveRubric (m_rootRubric, isMyDoc);
 }
 
@@ -1331,9 +1421,17 @@ void KKSIncludesWidget::addCategoryIntoRubric (void)
     emit loadCategory (rForm);
 }
 
+void KKSIncludesWidget::addIOIntoRubric (void)
+{
+    RubricForm * rForm = qobject_cast<RubricForm *>(this->sender());
+    if (!rForm)
+        return;
+
+    emit loadIO(rForm);
+}
+
 void KKSIncludesWidget::rubricSelectionChanged (const QItemSelection& selected, const QItemSelection& deselected)
 {
-    //qDebug () << __PRETTY_FUNCTION__ << selected << deselected;
     QModelIndexList wIndexList (selected.indexes());
     QModelIndexList oldIndexList (deselected.indexes());
 
@@ -1348,49 +1446,36 @@ void KKSIncludesWidget::rubricSelectionChanged (const QItemSelection& selected, 
     QModelIndex wIndex = wIndexList[0];
     int rType = wIndex.data (Qt::UserRole+2).toInt();
     int idr = wIndex.data (Qt::UserRole).toInt();
-    bool isRubrCat (rType == KKSRubricBase::atRubricCategory ||
-                    rType == KKSRubricBase::atOthers);
+    
+    bool isRubrCat (rType == KKSRubricBase::btRubricAsCategory ||
+                    rType == KKSRubricBase::btOthers);
+    
     QList<QAction *> actList = tBRubrActions->actions();
+    
     for (int i=4; i<=6; i++)
     {
         QAction * act = actList.at(i);
         act->setEnabled (!isRubrCat);
     }
+
     QAction * act = actList.at (9);
     act->setEnabled (!isRubrCat);
-    if (!wIndex.isValid() || idr == 1 || rType == KKSRubricBase::atRootRubric 
-                                      || rType == KKSRubricBase::atOthers)
+
+    if (!wIndex.isValid() || idr == 1 || rType == KKSRubricBase::btRootRubric 
+                                      || rType == KKSRubricBase::btOthers)
     {
         recWItems->setVisible (false);
         return;
     }
     
     const KKSRubric * rubr = getRubric (wIndex);
-//    KKSCategory * c = rubr->getCategory();
-//    KKSSearchTemplate * st = rubr->getSearchTemplate();
-//    bool isr = ((c && c->id()>0) || (st && st->id()>0));
+
     if (rubr)
     {
+        bool isRec (m_rSource == rsRecord);
         emit initAttachmentsModel (rubr, isRec);
         recWItems->setVisible (true);
     }
-/*
-    if (rubr && rubr->getCategory())
-    {
-        recWItems->setVisible (true);
-        QAbstractItemModel * attachModel = recWItems->getSourceModel ();
-        if (!attachModel)
-        {
-            QSortFilterProxyModel * sortModel = new KKSSortFilterProxyModel();
-            attachModel = new QStandardItemModel (0, 0);
-            sortModel->setSourceModel (attachModel);
-            recWItems->setEIOModel (sortModel);
-        }
-        emit rubricAttachmentsView (attachModel, rubr);
-    }
-    else
-        recWItems->setVisible (false);
- */
 }
 
 void KKSIncludesWidget :: turnRubricSplitter (void)
@@ -1426,13 +1511,15 @@ void KKSIncludesWidget :: setRubricIcon (void)
     else{
         index = sel.indexes().at (0);
         index = index.sibling(index.row(), 0);
+        
         int rType = index.data(Qt::UserRole+2).toInt();
-        if(rType == KKSRubricBase::atRubricItem){ //item selected
+        
+        if(rType == KKSRubricBase::btRubricItem){ //item selected
             index = index.parent();
             index = index.sibling(index.row(), 0);
         }
-        else if (rType == KKSRubricBase::atOthers ||
-                 rType == KKSRubricBase::atRubricCategory)
+        else if (rType == KKSRubricBase::btOthers ||
+                 rType == KKSRubricBase::btRubricAsCategory)
         {
             qWarning() << tr ("Category or others rubric cannot been edited");
             QMessageBox::warning(this, tr("Edit rubric"), tr ("Category or others rubric cannot been edited"), QMessageBox::Ok);
@@ -1442,6 +1529,7 @@ void KKSIncludesWidget :: setRubricIcon (void)
             ;
         }
     }
+
     QString iconFile = QFileDialog::getOpenFileName(this, tr("Open Image File"),
                                                     QDir::currentPath(),
                                                     tr("Image files (*.xpm *.png *.ico *.jpg *.jpeg *.bmp *.gif *.pbm *.pgm *.xbm);;All files (*)")
@@ -1634,9 +1722,12 @@ void KKSIncludesWidget :: refreshRubricItems (QAbstractItemModel * sourceMod)
 {
     if (!sourceMod)
         return;
+  
+    bool isRec (m_rSource == rsRecord);
+    
     const KKSRubric * r = currentRubric();
     sourceMod->removeRows(0, sourceMod->rowCount());
-    //const_cast<KKSRubric *>(r)->clearItems();
+    
     emit initAttachmentsModel (r, isRec);
 }
 /*=================*/

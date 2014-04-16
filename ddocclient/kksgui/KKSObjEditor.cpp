@@ -1556,6 +1556,11 @@ void KKSObjEditor :: setValue (qint64 idAttrValue, KKSIndAttrClass sys, QVariant
                     pObjectEx->setIcon(val.toString());
                     break;
                 }
+                case ATTR_RR_NAME:
+                {
+                    pObjectEx->setName(val.toString());
+                    break;
+                }
                 default: break;
             }
             //KKSAttrValue * av = pObjectEx->attrValue(idAttrValue);
@@ -2029,7 +2034,9 @@ void KKSObjEditor :: addIncludesRecWidget (KKSIncludesWidget *iw)
     includesRecWidget = iw;
     includesRecWidget->setParent(this);
     //connect (includesRecWidget, SIGNAL(rubricItemRequested()), this, SLOT(slotIncludeRecRequested()));
-    connect (includesRecWidget, SIGNAL(openRubricItemRequested(int)), this, SLOT(slotOpenRubricItemRecRequested(int)));
+    //connect (includesRecWidget, SIGNAL(openRubricItemRequested(int)), this, SLOT(slotOpenRubricItemRequested(int)));
+    //connect (includesRecWidget, SIGNAL(openRubricItemRequested(int, int)), this, SLOT(slotOpenRubricItemRequested(int, int)));
+    
     connect (includesRecWidget, SIGNAL (rubricsChanged()), this, SLOT (rubricsChanged()) );
     //connect (this, SIGNAL(rubricItemRecSelected(int, QString)), includesRecWidget, SLOT(slotAddRubricItem(int, QString)));
 }
@@ -2062,10 +2069,10 @@ void KKSObjEditor::slotIncludeRecRequested()
     emit includeRecRequested(this);
 }
 
-void KKSObjEditor::slotOpenRubricItemRecRequested(int idObjectE)
+void KKSObjEditor::slotOpenRubricItemRequested(int idObject, int idRecord)
 {
-    qDebug () << __PRETTY_FUNCTION__ << idObjectE;
-    emit openRubricItemRecRequested(idObjectE, this);
+    qDebug () << __PRETTY_FUNCTION__ << idObject << idRecord;
+    emit openRubricItemRequested(idObject, idRecord, this);
 }
 
 void KKSObjEditor :: setView (void)

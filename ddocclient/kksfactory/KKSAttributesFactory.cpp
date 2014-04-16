@@ -2147,7 +2147,7 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
                 KKSAttrCheckWidget * arw = qobject_cast<KKSAttrCheckWidget *>(aw);
                 if (!arw)
                     break;
-                QAbstractItemModel * sAttrModel = aValComplexModel(av);//new KKSEIODataModel (ctempl, eioList);
+                QAbstractItemModel * sAttrModel = aValComplexModel(av);
                 QObject :: connect (arw, 
                                     SIGNAL (addAttrRef (const KKSAttrValue*,  KKSIndAttrClass, QAbstractItemModel*)), 
                                     wEditor, 

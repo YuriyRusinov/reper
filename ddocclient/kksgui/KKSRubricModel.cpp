@@ -87,7 +87,7 @@ QVariant KKSRubricModel :: data (const QModelIndex &index, int role) const
         {
             if (rubr->getIcon().isNull())
             {
-                if (rubr->rubricType() == KKSRubricBase::atRubricItem)
+                if (rubr->rubricType() == KKSRubricBase::btRubricItem)
                     return KKSRubricItem::icon();
                 else
                     return KKSRubric::icon();
@@ -172,7 +172,7 @@ QModelIndex KKSRubricModel :: parent (const QModelIndex &index) const
 int KKSRubricModel :: rowCount (const QModelIndex& parent) const
 {
      const KKSRubricTreeItem *parentItem = getRubricEntity (parent);
-     if (!parentItem || (parentItem->getData() && !forRecords && parentItem->getData()->rubricType() == KKSRubricBase::atRubricItem))
+     if (!parentItem || (parentItem->getData() && !forRecords && parentItem->getData()->rubricType() == KKSRubricBase::btRubricItem))
          return 0;
 
      const KKSRubricBase * parentRubr = parentItem->getData ();
@@ -231,6 +231,7 @@ bool KKSRubricModel :: setData (const QModelIndex& index, const QVariant& value,
         emit dataChanged (index, index);
         return true;
     }
+
     return false;
 }
 
@@ -271,11 +272,11 @@ KKSRubricTreeItem * KKSRubricModel :: getRubricEntity (const QModelIndex& index)
 
 void KKSRubricModel :: setupRubrData (KKSRubricTreeItem * parent, bool forRecs)
 {
-    if (!parent || !parent->getData() || parent->getData()->rubricType()==KKSRubricBase::atRubricItem)
+    if (!parent || !parent->getData() || parent->getData()->rubricType()==KKSRubricBase::btRubricItem)
         return;
     
     const KKSRubricBase * wRubr = parent->getData ();
-    if (wRubr->rubricType() != KKSRubricBase::atOthers)
+    if (wRubr->rubricType() != KKSRubricBase::btOthers)
     {
         //
         // это рубрика (или категорированная рубрика)
@@ -319,7 +320,7 @@ void KKSRubricModel :: setupData (const KKSMap< qint64, KKSEIOData * >& rubrRecs
     //QModelIndex pIndex = QModelIndex ();
 
     //KKSRubricTreeItem * prevItem (0);
-    KKSRubric * rootRubric = /*(const_cast<KKSRubricBase *>(parent->getData())) ? (const_cast<KKSRubricBase *>(parent->getData())) :*/ new KKSRubric(-1, "root rubric for all tree");
+    KKSRubric * rootRubric = new KKSRubric(-1, "root rubric for all tree"); /*(const_cast<KKSRubricBase *>(parent->getData())) ? (const_cast<KKSRubricBase *>(parent->getData())) :*/ 
         
     for (KKSMap<qint64, KKSEIOData* >::const_iterator p = rubrRecs.constBegin();
             p != rubrRecs.constEnd();

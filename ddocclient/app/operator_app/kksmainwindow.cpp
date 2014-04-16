@@ -31,7 +31,6 @@
 #include <KKSAttributesFactory.h>
 #include <KKSStuffFactory.h>
 #include <KKSRubricFactory.h>
-//#include <KKSIndFactory.h>
 
 #include <kksincludeswidget.h>
 #include <kkscmdjournalitem.h>
@@ -628,9 +627,8 @@ void KKSMainWindow::initStatusBar()
     statusBar->showStatusBar();
 
     setStatusBar(statusBar);
+    this->statusBar()->hide();
 }
-
-
 
 bool KKSMainWindow::connectToDb()
 {
@@ -1285,8 +1283,10 @@ void KKSMainWindow :: slotMyDocs (void)
         return;
 
     KKSRubricFactory * rf = kksSito->rf ();
-    KKSList<const KKSFilterGroup*> filterGroups;
-    KKSIncludesWidget * iW = rf->createRubricEditor (1, filterGroups, this);
+    KKSIncludesWidget * iW = rf->createRubricEditor (KKSRubricFactory::atMyDocsRubric, 
+                                                     KKSRubricFactory::smRubricsWithIncludes, 
+                                                     false,
+                                                     this); //только "мои документы"
     if (!iW)
         return;
 }
@@ -1297,8 +1297,10 @@ void KKSMainWindow :: slotRubricControl (void)
         return;
 
     KKSRubricFactory * rf = kksSito->rf ();
-    KKSList<const KKSFilterGroup*> filterGroups;
-    KKSIncludesWidget * iW = rf->createRubricEditor (0, filterGroups, this);
+    KKSIncludesWidget * iW = rf->createRubricEditor (KKSRubricFactory::atOthers, 
+                                                     KKSRubricFactory::smRubricsWithIncludes, 
+                                                     false,
+                                                     this);//общесистемный рубрикатор с категориями
     
     if (!iW)
         return;

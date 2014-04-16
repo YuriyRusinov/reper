@@ -15,6 +15,7 @@ class QPixmap;
 
 class KKSSearchTemplate;
 class KKSCategory;
+class KKSObject;
 class KKSAccessEntity;
 
 class KKSStuffForm;
@@ -22,8 +23,15 @@ class KKSStuffForm;
 class _GUI_EXPORT RubricForm : public QDialog
 {
 public:
-    RubricForm (QString defaultRubricName=QString(), QString defaultRubricDesc=QString(), bool forRecords=false, QWidget* parent=0, Qt::WFlags f=0);
+    RubricForm (QString defaultRubricName=QString(), 
+                QString defaultRubricDesc=QString(), 
+                bool forRecords=false, 
+                QWidget* parent=0, 
+                Qt::WFlags f=0);
+
     virtual ~RubricForm (void);
+
+    bool forRecords() const {return m_forRecords;}
 
     QString getRubricName (void) const;
     void setRubricName (QString rName);
@@ -39,6 +47,9 @@ public:
     KKSCategory * getCategory (void) const;
     void setCategory (KKSCategory * c);
     
+    KKSObject * getIO(void) const;
+    void setIO (KKSObject * io);
+
     QString getRubricDesc (void) const;
     void setRubricDesc (QString rDesc);
 
@@ -55,12 +66,14 @@ public slots:
 private slots:
     void loadSearchTemplate (void);
     void loadCategory (void);
+    void loadIO();
     void loadRubricImage (void);
     //void currentPrivilegiesChanged (const QModelIndex& ind);
 
 signals:
     void requestSearchTemplate (void);
     void requestCategory (void);
+    void requestIO();
 
 private:
     //
@@ -75,7 +88,9 @@ private:
     Ui::rubric_form * UI;
     KKSSearchTemplate * searchTemplate;
     KKSCategory * cat;
+    KKSObject * m_io;
     KKSStuffForm * stuffForm;
+    bool m_forRecords;
     //KKSAccessEntity * acl;
 
 private:

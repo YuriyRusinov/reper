@@ -23,9 +23,10 @@ JKKSRefRecord :: JKKSRefRecord (qint64 id_queue,
                                 qint64 idState, 
                                 const QColor bkCol,
                                 const QColor fgCol,
-                                const QString & rIcon)
+                                const QString & rIcon,
+                                const QString & rName)
     : JKKSMessage (addr, mess_code),
-      JKKSUID (uid, uuid, idState, bkCol, fgCol, rIcon),
+      JKKSUID (uid, uuid, idState, bkCol, fgCol, rIcon, rName),
       idQueue (id_queue),
       idRec (id_rec),
       idEntityType (id_entity_type),
