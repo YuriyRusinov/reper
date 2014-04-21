@@ -23,6 +23,12 @@ int main(int argc, char *argv[])
 #ifdef __USE_QGIS__
     QApplication * app = new QgsApplication(argc, argv, true);
 
+    //
+    // Set up the QSettings environment must be done after qapp is created
+    QCoreApplication::setOrganizationName( ORGANIZATION );
+    //QCoreApplication::setOrganizationDomain( "qgis.org" );
+    QCoreApplication::setApplicationName( PRODUCT_FULL_NAME );
+
     //QgsApplication * a = static_cast <QgsApplication *> (app);
     // ---- invoked in KKSSito::loadQGISPlugins ----
     //a->setPluginPath(pluginPath);

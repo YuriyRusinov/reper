@@ -21,7 +21,12 @@
 #include <QStatusBar>
 #include <QUrl>
 
-KKSMapWidget::KKSMapWidget(qint64 idObj, const QString & gisHomeDir, const KKSAttrValue* attr, KKSIndAttrClass isSys, QWidget *parent)
+KKSMapWidget::KKSMapWidget(QMap<QString, QString> connectionParams,
+                           qint64 idObj, 
+                           const QString & gisHomeDir, 
+                           const KKSAttrValue* attr, 
+                           KKSIndAttrClass isSys, 
+                           QWidget *parent)
 #ifdef __USE_QGIS__
     : KKSGISWidget(true, false, parent),
 #else
@@ -34,6 +39,7 @@ KKSMapWidget::KKSMapWidget(qint64 idObj, const QString & gisHomeDir, const KKSAt
       m_dataChanged(false),
       m_idObj(idObj)
 {
+    m_connectionParams = connectionParams;
 }
 
 KKSMapWidget::~KKSMapWidget()
@@ -155,7 +161,7 @@ int KKSMapWidget::openProject()//открываем проект, заданный в качестве значения 
 {
 #ifdef __USE_QGIS__ 
 	
-    QString xmlPrj; //здесь будет содержимое проекта (для существующих ИО, ЭИО)
+    QString xmlPrj; //здесь будет XML-описание проекта (для существующих ИО, ЭИО)
 
     if(!m_av || m_idObj <= 0){
         ;//return -1;
@@ -213,6 +219,9 @@ int KKSMapWidget::openProject()//открываем проект, заданный в качестве значения 
             QMessageBox::critical(this, tr("Error"), tr("Cannot create file for storing QGIS project file (%1)!").arg(path));
             return -1;
         }
+
+        //перед тем, как записать содержимое проекта, надо обновить datasource для всех postgis-слоев
+        xmlPrj = updateProjectXML(xmlPrj, false);
 
         qint64 bytes = f.write(xmlPrj.toLocal8Bit());
         if(bytes <= 0){
@@ -279,8 +288,7 @@ void KKSMapWidget::slotDataChanged()
 
     //необходимо заменить пути к файлам слоев в тэге datasource на относительные вида ./filename. 
     //Т.е. полагаем, что все файлы находятся в том же каталоге, что и файл проекта
-
-    xml = updateProjectXML(xml);
+    xml = updateProjectXML(xml, true);
 
     KKSValue v(xml, KKSAttrType::atGISMap);
     if(!v.isValid()){
@@ -370,6 +378,8 @@ void KKSMapWidget::slotUploadGISFiles(qint64 idObj)
     emit uploadGISFiles(bForRec, files, m_idObj, this);//загрузка файлов ГИС-проекта на сервер. Файлы задаются абсолютными путями
 }
 
+
+//для слоев, представленных файлами, получаем список этих самых файлов (полностью отдельные url-ы)
 QStringList KKSMapWidget::readGISProjectLayerFiles(const QString & xml) const
 {
     QStringList files;
@@ -394,41 +404,46 @@ QStringList KKSMapWidget::readGISProjectLayerFiles(const QString & xml) const
         mne = mnl.toElement();
         provider = mne.text();
         
-        if(provider == "postgres" || provider == "spatialite" || provider == "wms"){
-            continue;//эти источники представлены ресурсами БД в сети, а не файлами
-        }
-
         mnl = layer.namedItem( "datasource" );
         mne = mnl.toElement();
         dataSource = mne.text();
 
-        QString fileAbsUrl;
+        if(provider == "spatialite" || provider == "wms"){
+            continue;//эти источники представлены ресурсами БД в сети, а не файлами
+        }
+        else if(provider == "postgres"){
+            ;
+        }
+        else{
 
-        if(provider == "ogr"){
-            QStringList theURIParts = dataSource.split( "|" );
-            fileAbsUrl = this->readLayerFilePath( theURIParts[0] );//возвращает абсолютный путь к файлу слоя, который прочитан из файла проекта QGIS
-        }
-        else if ( provider == "delimitedtext" ){
-            //???????????
-        }
-        else{ //rasters ??
-            fileAbsUrl = this->readLayerFilePath( dataSource );//возвращает абсолютный путь к файлу слоя, который прочитан из файла проекта QGIS
-        }
-        
-        QFileInfo fi(fileAbsUrl);
-        if(fi.exists()){
-            QStringList filter;
-            filter << fi.baseName() + ".*";
-            QDir dir = fi.absoluteDir();
-            dir.setNameFilters(filter);
-            QFileInfoList fiList = dir.entryInfoList(filter, QDir::Files);
-            for(int j=0; j<fiList.count(); j++){
-                QFileInfo f = fiList.at(j);
-                QString absFilePath = f.absoluteFilePath();
-                files.append(absFilePath);
+            QString fileAbsUrl;
+
+            if(provider == "ogr"){
+                QStringList theURIParts = dataSource.split( "|" );
+                fileAbsUrl = this->readLayerFilePath( theURIParts[0] );//возвращает абсолютный путь к файлу слоя, который прочитан из файла проекта QGIS
+            }
+            else if ( provider == "delimitedtext" ){
+                //???????????
+            }
+            else{ //rasters ??
+                fileAbsUrl = this->readLayerFilePath( dataSource );//возвращает абсолютный путь к файлу слоя, который прочитан из файла проекта QGIS
             }
             
-        }
+            QFileInfo fi(fileAbsUrl);
+            if(fi.exists()){
+                QStringList filter;
+                filter << fi.baseName() + ".*";
+                QDir dir = fi.absoluteDir();
+                dir.setNameFilters(filter);
+                QFileInfoList fiList = dir.entryInfoList(filter, QDir::Files);
+                for(int j=0; j<fiList.count(); j++){
+                    QFileInfo f = fiList.at(j);
+                    QString absFilePath = f.absoluteFilePath();
+                    files.append(absFilePath);
+                }
+                
+            }
+        }//datasource in files
     }
 
 #endif
@@ -436,8 +451,13 @@ QStringList KKSMapWidget::readGISProjectLayerFiles(const QString & xml) const
     return files;
 }
 
-//!!!не заменяет файл проекта!!! только готовит измененный xml для занесения в kksattrvalue
-QString KKSMapWidget::updateProjectXML(const QString & xml) const
+
+//второй параметр если true, то XML обновляется для записи в БД.
+//в этом случае меняем URI postgis-слоев так, чтобы там не было user и password
+//а также URI файловых слоев, чтобы там были только относительные ссылки на файлы, причем на текущий каталог (т.е. ./ )
+//если параметр = false, XML обновляется для открытия файла проекта в QGIS
+//в этом случае меняем URI postgis-слоев так, чтобы datasource содержал параметры соединения к БД, с которой соединен DynamicDocs Client
+QString KKSMapWidget::updateProjectXML(const QString & xml, bool bForWriteToDb) const
 {
     QString updatedXML;
 
@@ -468,40 +488,89 @@ QString KKSMapWidget::updateProjectXML(const QString & xml) const
         mne = mnl.toElement();
         provider = mne.text();
         
-        if(provider == "postgres" || provider == "spatialite" || provider == "wms"){
-            continue;//эти источники представлены ресурсами БД в сети, а не файлами
-        }
-
         mnl = layer.namedItem( "datasource" );
         mne = mnl.toElement();
         dataSource = mne.text();
 
-        QString fileAbsUrl;
-
-        if(provider == "ogr"){
-            QStringList theURIParts = dataSource.split( "|" );
-            fileAbsUrl = this->readLayerFilePath( theURIParts[0] );//возвращает абсолютный путь к файлу слоя, который прочитан из файла проекта QGIS
+        if(provider == "spatialite" || provider == "wms"){
+            continue;//эти источники представлены ресурсами БД в сети, а не файлами
+        }
+        else if(provider == "postgres"){
+        
+            QString updatedUri;
+            QStringList uriSections = dataSource.split(" ");
             
-            QFileInfo fi(fileAbsUrl);
-            theURIParts[0] = QString("./") + fi.fileName();
-            dataSource = theURIParts.join("|");
+            for(int i=0; i<uriSections.count(); i++){
+                QString & sec = uriSections[i];
+                if(sec.startsWith("dbname=")){
+                    QString val = m_connectionParams.value("dbname");
+                    if(!val.isEmpty())
+                        uriSections[i] = QString("dbname=%1").arg(val); 
+                }
+                else if(sec.startsWith("host=")){
+                    QString val = m_connectionParams.value("host");
+                    if(!val.isEmpty())
+                        uriSections[i] = QString("host=%1").arg(val); 
+                }
+                else if(sec.startsWith("port=")){
+                    QString val = m_connectionParams.value("port");
+                    if(!val.isEmpty())
+                        uriSections[i] = QString("port=%1").arg(val); 
+                }
+                else if(sec.startsWith("user=")){
+                    QString val;
+                    if(!bForWriteToDb)
+                        val = m_connectionParams.value("user");//т.е. читаем проект
+                    uriSections[i] = QString("user=%1").arg(val); 
+                }
+                else if(sec.startsWith("password=")){
+                    QString val;
+                    if(!bForWriteToDb)
+                        val = m_connectionParams.value("password");//т.е. читаем проект
+                    uriSections[i] = QString("password=%1").arg(val); 
+                }
+            }
+            
+            updatedUri = uriSections.join(" ");            
+            
+            // datasource
+            QDomElement dsNode = d.createElement( "datasource" );
+            QDomText dsText = d.createTextNode( updatedUri );
+            dsNode.appendChild( dsText);
+            mapLayers.item(index).replaceChild(dsNode, mnl);
+            
+            continue;
         }
-        //else if ( provider == "delimitedtext" ){
-            //???????????
-        //}
-        else{ //rasters ??
-            fileAbsUrl = this->readLayerFilePath( dataSource );//возвращает абсолютный путь к файлу слоя, который прочитан из файла проекта QGIS
-            QFileInfo fi(fileAbsUrl);
-            dataSource = QString("./") + fi.fileName();
-        }
+        else{    
 
-        // datasource
-        //QDomNode newLayer(layer);
-        QDomElement dsNode = d.createElement( "datasource" );
-        QDomText dsText = d.createTextNode( dataSource );
-        dsNode.appendChild( dsText);
-        mapLayers.item(index).replaceChild(dsNode, mnl);
-        //prjLayers.replaceChild(newLayer, layer);
+            if(!bForWriteToDb)
+                continue;//при чтении проекта не надо обновлять пути к файлам
+
+            QString fileAbsUrl;
+
+            if(provider == "ogr"){
+                QStringList theURIParts = dataSource.split( "|" );
+                fileAbsUrl = this->readLayerFilePath( theURIParts[0] );//возвращает абсолютный путь к файлу слоя, который прочитан из файла проекта QGIS
+                
+                QFileInfo fi(fileAbsUrl);
+                theURIParts[0] = QString("./") + fi.fileName();
+                dataSource = theURIParts.join("|");
+            }
+            //else if ( provider == "delimitedtext" ){
+                //???????????
+            //}
+            else{ //rasters ??
+                fileAbsUrl = this->readLayerFilePath( dataSource );//возвращает абсолютный путь к файлу слоя, который прочитан из файла проекта QGIS
+                QFileInfo fi(fileAbsUrl);
+                dataSource = QString("./") + fi.fileName();
+            }
+
+            // datasource
+            QDomElement dsNode = d.createElement( "datasource" );
+            QDomText dsText = d.createTextNode( dataSource );
+            dsNode.appendChild( dsText);
+            mapLayers.item(index).replaceChild(dsNode, mnl);
+        }
 
     }
 
@@ -561,8 +630,7 @@ void KKSMapWidget::slotSaveGISProject(KKSValue & v)
 
     //необходимо заменить пути к файлам слоев в тэге datasource на относительные вида ./filename. 
     //Т.е. полагаем, что все файлы находятся в том же каталоге, что и файл проекта
-
-    xml = updateProjectXML(xml);
+    xml = updateProjectXML(xml, true);
     
     connect(this, SIGNAL(mapSaved(QDomDocument &)), this, SLOT(slotMapChanged(QDomDocument&)));
     

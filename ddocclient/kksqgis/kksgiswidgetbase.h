@@ -85,7 +85,6 @@ public:
     void openRasterLayer(const QString & rLayerFile);
     void openDatabaseLayer();
 
-
     bool addVectorLayers( QStringList const & theLayerQStringList, const QString& enc, const QString dataSourceType );
     bool addRasterLayers( QStringList const & theLayerQStringList, bool guiWarning = true );
 
@@ -240,6 +239,8 @@ private slots:
     void SLOTmpActionAddVectorLayer();
     void SLOTmpActionAddRasterLayer();
     void SLOTmpActionAddPostGISLayer();
+
+    void addDatabaseLayers( QStringList const & layerPathList, QString const & providerKey );
 
     void SLOTmpActionVectorize();
     void SLOTsetRenderer();
@@ -613,9 +614,9 @@ private:
 
     // dn's
     DNSpecBath *dnThemTaskSpecBath;
-
     // functions
     long azGetEPSG(const QString rastrPath);
+
 };
 
 

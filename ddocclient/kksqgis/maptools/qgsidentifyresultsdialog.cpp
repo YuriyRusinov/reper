@@ -1245,10 +1245,10 @@ void QgsIdentifyResultsDialog::featureForm()
 
   //ksa
   const QgsFields * fields = f.fields();
-  const QgsField field = fields->field("unique_id");
-  
+
   //если поле unique_id присутствует, то считаем, что слой из нашей БД. Поэтому показываем нашу форму информационного ресурса
-  if(field.type() != QVariant::Invalid){
+  int indx = fields->indexFromName("unique_id");
+  if(indx > -1){
       
       QVariant v = f.attribute("unique_id");
       if(v.type() == QVariant::Invalid){

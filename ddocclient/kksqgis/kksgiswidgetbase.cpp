@@ -8,6 +8,7 @@
 #include "qgsclipboard.h"
 #include "qgsguivectorlayertools.h"
 #include "qgsprojectproperties.h"
+#include "qgsdatasourceuri.h"
 
 #include <qgslegendmodel.h>
 #include <qgslegendinterface.h>
@@ -1763,6 +1764,76 @@ void KKSGISWidgetBase::saveAsVectorFileGeneral( bool saveOnlySelection, QgsVecto
   }
 
   delete dialog;
+}
+
+void KKSGISWidgetBase::addDatabaseLayers( QStringList const & layerPathList, QString const & providerKey )
+{
+  QList<QgsMapLayer *> myList;
+  if ( mpMapCanvas && mpMapCanvas->isDrawing() )
+  {
+    return;
+  }
+
+  if ( layerPathList.empty() )
+  {
+    // no layers to add so bail out, but
+    // allow mMapCanvas to handle events
+    // first
+    mpMapCanvas->freeze( false );
+    return;
+  }
+
+  mpMapCanvas->freeze( true );
+
+  QApplication::setOverrideCursor( Qt::WaitCursor );
+
+  foreach ( QString layerPath, layerPathList )
+  {
+    // create the layer
+    QgsDataSourceURI uri( layerPath );
+
+    QgsVectorLayer *layer = new QgsVectorLayer( uri.uri(), uri.table(), providerKey );
+    Q_CHECK_PTR( layer );
+
+    if ( ! layer )
+    {
+      mpMapCanvas->freeze( false );
+      QApplication::restoreOverrideCursor();
+
+      // XXX insert meaningful whine to the user here
+      return;
+    }
+
+    if ( layer->isValid() )
+    {
+      // add to list of layers to register
+      //with the central layers registry
+      myList << layer;
+    }
+    else
+    {
+      qWarning() << tr( "%1 is an invalid layer - not loaded" ).arg( layerPath );
+      //QLabel *msgLabel = new QLabel( tr( "%1 is an invalid layer and cannot be loaded. Please check the <a href=\"#messageLog\">message log</a> for further info." ).arg( layerPath ), messageBar() );
+      //msgLabel->setWordWrap( true );
+      //connect( msgLabel, SIGNAL( linkActivated( QString ) ), mLogDock, SLOT( show() ) );
+      //QgsMessageBarItem *item = new QgsMessageBarItem( msgLabel, QgsMessageBar::WARNING );
+      //messageBar()->pushItem( item );
+      delete layer;
+    }
+    //qWarning("incrementing iterator");
+  }
+
+  QgsMapLayerRegistry::instance()->addMapLayers( myList );
+  statusBar()->showMessage( mpMapCanvas->extent().toString( 2 ) );
+
+  // update UI
+  qApp->processEvents();
+
+  // draw the map
+  mpMapCanvas->freeze( false );
+  mpMapCanvas->refresh();
+
+  QApplication::restoreOverrideCursor();
 }
 
 bool KKSGISWidgetBase::addVectorLayers( QStringList const & theLayerQStringList, const QString& enc, const QString dataSourceType )
@@ -3827,6 +3898,8 @@ void KKSGISWidgetBase::SLOTmpActionFileOpenProject() // Open QGIS Project in Map
     if (projectFileName.isNull())
         return;
     
+    //TODO возможно, здесь тоже надо изменить URL для postgis-слоев...
+
     openProject(projectFileName);
 }
 
@@ -4041,29 +4114,28 @@ void KKSGISWidgetBase::openProject(const QString & prjFile)
 
     mpMapCanvas->updateScale();
 
-  // k // QgsMapLayer *layer;
     QMapIterator < QString, QgsMapLayer * > i(QgsMapLayerRegistry::instance()->mapLayers());
     i.toBack();
     while (i.hasPrevious())
     {
         i.previous();
-        if (i.value()->type() == QgsMapLayer::VectorLayer)
-                {
-                    if (i.value()->isValid())
-                    {
-                        mpRegistry->addMapLayer(i.value(), TRUE);
-                        connect(i.value(), SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
-                        mpLayerSet.append(QgsMapCanvasLayer(i.value()));
-                    }
+        
+        QgsMapLayer * currLayer = i.value();
+        
+        if (currLayer->type() == QgsMapLayer::VectorLayer){
+            if (currLayer->isValid()){
+                mpRegistry->addMapLayer(currLayer, TRUE);
+                connect(currLayer, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
+                mpLayerSet.append(QgsMapCanvasLayer(currLayer));
+            }
 
-                }
-        else if (i.value()->type() == QgsMapLayer::RasterLayer)
-        {
-            mpRegistry->addMapLayer(i.value(), TRUE);
-            connect(i.value(), SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
-            mpLayerSet.append(QgsMapCanvasLayer(i.value()));
         }
-
+        else if (currLayer->type() == QgsMapLayer::RasterLayer)
+        {
+            mpRegistry->addMapLayer(currLayer, TRUE);
+            connect(currLayer, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
+            mpLayerSet.append(QgsMapCanvasLayer(currLayer));
+        }
     }
     
     QSettings settings;

@@ -40,7 +40,8 @@ class _GUI_EXPORT KKSMapWidget : public QWidget, public KKSAttrWidget
 {
     Q_OBJECT
 public:
-    KKSMapWidget(qint64 idObj, 
+    KKSMapWidget(QMap<QString, QString> connectionParams,
+                 qint64 idObj, 
                  const QString & gisHomeDir, 
                  const KKSAttrValue* attr = 0, 
                  KKSIndAttrClass isSys = iacIOUserAttr, 
@@ -73,8 +74,15 @@ private:
     int downloadLayers(const QString & homeDir, const QString & xmlPrj);//выгрузка на клиент файлов со слоями, если слои представлены файлами (т.е. не PostGIS)
     bool removeQGISPrjDir(const QString & path);
     QStringList readGISProjectLayerFiles(const QString & xml) const;
-    QString updateProjectXML(const QString & xml) const;
+    QString updateProjectXML(const QString & xml, 
+                             bool bForWriteToDb) const; //второй параметр если true, то XML обновляется для записи в БД.
+                                                        //в этом случае меняем URI postgis-слоев так, чтобы там не было user и password
+                                                        //а также URI файловых слоев, чтобы там были только относительные ссылки на файлы, причем на текущий каталог (т.е. ./ )
+                                                        //если параметр = false, XML обновляется для открытия файла проекта в QGIS
+                                                        //в этом случае меняем URI postgis-слоев так, чтобы datasource содержал параметры соединения к БД, с которой соединен DynamicDocs Client
     QString readGISProjectFile();
+
+    QMap<QString, QString> m_connectionParams;//используется для подмены URI postgis-слоев
 
 private:
     void initQGIS();

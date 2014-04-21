@@ -85,6 +85,8 @@
 #include "KKSMapWidget.h"
 
 #include <defines.h>
+#include <kkssito.h>
+#include <kksdatabase.h>
 
 /* Метод формирует виджет с древовидной структурой групп атрибутов и атрибутов.
  * Параметры:
@@ -1896,7 +1898,15 @@ QWidget * KKSAttributesFactory :: createMapWidget (const KKSAttrValue * av,
     //QVBoxLayout * vBoxLayout = new QVBoxLayout();
     //parent->setLayout(vBoxLayout);
 
-    attrWidget = new KKSMapWidget(idObj, m_GISHomeDir, av, isSystem, parent);
+    //используется при открытии проекта для подмены URI postgis-слоев
+    QMap<QString, QString> connectionParams;
+    connectionParams.insert("dbname", loader->getDb()->getName());
+    connectionParams.insert("host", loader->getDb()->getHost());
+    connectionParams.insert("port", loader->getDb()->getPort());
+    connectionParams.insert("user", loader->getDb()->getUser());
+    connectionParams.insert("password", loader->getDb()->getPass());
+    
+    attrWidget = new KKSMapWidget(connectionParams, idObj, m_GISHomeDir, av, isSystem, parent);
     
     connect(attrWidget, SIGNAL(downloadGISFiles(bool, const QString &, qint64, QWidget *)), m_oef, SLOT(slotDownloadGISFiles(bool, const QString &, qint64, QWidget *)));
     connect(objEditor, SIGNAL(uploadGISFiles(qint64)), attrWidget, SLOT(slotUploadGISFiles(qint64)));//в редакторе ИО нажали на кнопку "сохранить". Требуется загрузить ГИС-файлы на сервер

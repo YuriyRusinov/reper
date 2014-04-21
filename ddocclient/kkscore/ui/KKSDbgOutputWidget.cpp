@@ -6,10 +6,14 @@
 #include <QDateTime>
 #include <QScrollArea>
 #include <QScrollBar>
+#include <QMutex>
 
 #include "KKSDbgOutputWidget.h"
 #include <kksdebug.h>
 #include <defines.h>
+
+//чтобы в окно отладки все сыпалось по очереди. Для поддержки многопоточности
+QMutex mutex;
 
 KKSDbgOutputWidget :: KKSDbgOutputWidget(bool bForDockable, QWidget *parent, Qt::WindowFlags flags)
     : QDockWidget (tr("Debug output window"), parent, flags)
@@ -79,13 +83,20 @@ void KKSDbgOutputWidget :: initWidget()
 
 void KKSDbgOutputWidget :: printMessage(Criticality c, const QString & message)
 {
+    //все остальные потоки, имеющие желание вывести отладочное сообщение будут ждать
+    bool b = mutex.tryLock();
+    if(!b)
+        return;
+
     Criticality oldCriticality = m_criticality;
     m_criticality = c;
     //QString oldMessage = m_message;
 
     QString sCriticality = criticalityAsString(c);
-    if(!m_logWidgetCursor)
+    if(!m_logWidgetCursor){
+        mutex.unlock();
         return;
+    }
         
     QBrush brush;
         
@@ -121,6 +132,8 @@ void KKSDbgOutputWidget :: printMessage(Criticality c, const QString & message)
 
     m_criticality = oldCriticality;
     //m_message = oldMessage;
+
+    mutex.unlock();
 }
 
 QString KKSDbgOutputWidget :: criticalityAsString(Criticality c)
