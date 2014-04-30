@@ -23,7 +23,7 @@
 #include <qgslogger.h>
 #include "qgslegendgroup.h"
 #include "qgslegendlayer.h"
-#include "qgslegendpropertygroup.h"
+//#include "qgslegendpropertygroup.h"
 #include "qgslegendsymbologyitem.h"
 #include "qgsmapcanvas.h"
 #include "qgsmapcanvasmap.h"
@@ -183,8 +183,9 @@ void QgsLegend::showItem( QString msg, QTreeWidgetItem *item )
 
 void QgsLegend::handleCurrentItemChanged( QTreeWidgetItem* current, QTreeWidgetItem* previous )
 {
-  Q_UNUSED( current );
-  Q_UNUSED( previous );
+  if ( legendLayerForItem( current ) == legendLayerForItem( previous ) )
+    return; // do not re-emit signal when not necessary
+
   QgsMapLayer *layer = currentLayer();
 
   if ( mMapCanvas )
@@ -778,7 +779,7 @@ void QgsLegend::mouseDoubleClickEvent( QMouseEvent *e )
       mWorkingWidget->layerProperties();
       break;
     case 1:
-      //QgisApp::instance()->attributeTable();
+      //ksa mWorkingWidget->attributeTable();
       break;
     default:
       break;
@@ -787,7 +788,6 @@ void QgsLegend::mouseDoubleClickEvent( QMouseEvent *e )
 
 void QgsLegend::handleRightClickEvent( QTreeWidgetItem* item, const QPoint& position )
 {
-  
   if ( !mMapCanvas || mMapCanvas->isDrawing() )
   {
     return;
@@ -919,7 +919,7 @@ void QgsLegend::handleRightClickEvent( QTreeWidgetItem* item, const QPoint& posi
   updateDrawingOrderAction->setChecked( mUpdateDrawingOrder );
 
   theMenu.exec( position );
-  
+ 
 }
 
 void QgsLegend::initPixmaps()
@@ -1059,7 +1059,7 @@ QgsLegendGroup* QgsLegend::addEmbeddedGroup( const QString& groupName, const QSt
           addEmbeddedGroup( childElem.attribute( "name" ), projectFilePath, group );
         }
       }
-      checkLayerOrderUpdate();
+      updateMapCanvasLayerSet();
       return group;
     }
   }
@@ -1165,6 +1165,7 @@ void QgsLegend::addLayers( QList<QgsMapLayer *> theLayerList )
     updateMapCanvasLayerSet();
     emit itemAdded( indexFromItem( llayer ) );
   }
+
   // first layer?
   if ( myFirstLayerFlag )
   {
@@ -1218,7 +1219,12 @@ void QgsLegend::setLayerVisible( QgsMapLayer * layer, bool visible )
 
 QgsLegendLayer* QgsLegend::currentLegendLayer()
 {
-  QgsLegendItem* citem = dynamic_cast<QgsLegendItem *>( currentItem() );
+  return legendLayerForItem( currentItem() );
+}
+
+QgsLegendLayer* QgsLegend::legendLayerForItem( QTreeWidgetItem* item )
+{
+  QgsLegendItem* citem = dynamic_cast<QgsLegendItem *>( item );
 
   if ( citem )
   {
@@ -1997,8 +2003,7 @@ bool QgsLegend::readXML( QgsLegendGroup *parent, const QDomNode &node )
         }
         else if ( childelem.tagName() == "propertygroup" )
         {
-          QgsLegendPropertyGroup* thePropertyGroup = new QgsLegendPropertyGroup( currentLayer, "Properties" );
-          setItemExpanded( thePropertyGroup, childelem.attribute( "open" ) == "true" );
+          // not used
         }
         else
         {
@@ -2163,7 +2168,7 @@ QgsLegendGroup* QgsLegend::findLegendGroup( const QString& name, const QString& 
 
 void QgsLegend::adjustIconSize()
 {
-  if ( mPixmapWidthValues.size() > 0 && mPixmapHeightValues.size() > 0 )
+  if ( !mPixmapWidthValues.empty() && !mPixmapHeightValues.empty() )
   {
     std::multiset<int>::const_reverse_iterator width_it = mPixmapWidthValues.rbegin();
     std::multiset<int>::const_reverse_iterator height_it = mPixmapHeightValues.rbegin();

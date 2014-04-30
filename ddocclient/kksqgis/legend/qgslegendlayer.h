@@ -26,7 +26,6 @@
 #include "qgsmapcanvas.h"
 
 class QgsLegendLayer;
-class QgsLegendPropertyGroup;
 class QgsMapLayer;
 class QgsRasterLayer;
 class QgsVectorLayer;

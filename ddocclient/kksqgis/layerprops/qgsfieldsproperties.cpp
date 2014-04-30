@@ -24,6 +24,7 @@
 #include "qgsapplication.h"
 #include "qgsattributetypedialog.h"
 #include "qgsfieldcalculator.h"
+#include "qgsfieldsproperties.h"
 #include "qgslogger.h"
 #include "qgsmaplayerregistry.h"
 #include "qgsproject.h"
@@ -210,7 +211,8 @@ void QgsFieldsProperties::loadRows()
 
 void QgsFieldsProperties::setRow( int row, int idx, const QgsField &field )
 {
-  QTableWidgetItem* dataItem = new QTableWidgetItem( idx );
+  QTableWidgetItem* dataItem = new QTableWidgetItem();
+  dataItem->setData( Qt::DisplayRole, idx );
   DesignerTreeItemData itemData( DesignerTreeItemData::Field, field.name() );
   dataItem->setData( DesignerTreeRole, itemData.asQVariant() );
   mFieldsList->setItem( row, attrIdCol, dataItem );
@@ -502,19 +504,20 @@ void QgsFieldsProperties::attributeTypeDialog()
 void QgsFieldsProperties::attributeAdded( int idx )
 {
   bool sorted = mFieldsList->isSortingEnabled();
-  mFieldsList->setSortingEnabled( false );
+  if ( sorted )
+    mFieldsList->setSortingEnabled( false );
+
   const QgsFields &fields = mLayer->pendingFields();
   int row = mFieldsList->rowCount();
   mFieldsList->insertRow( row );
   setRow( row, idx, fields[idx] );
-
-  for ( int i = idx; i < mIndexedWidgets.count(); i++ )
-  {
-    mIndexedWidgets[i]->setData( Qt::DisplayRole, i );
-  }
-
   mFieldsList->setCurrentCell( row, idx );
-  mFieldsList->setSortingEnabled( sorted );
+
+  for ( int i = idx + 1; i < mIndexedWidgets.count(); i++ )
+    mIndexedWidgets[i]->setData( Qt::DisplayRole, i );
+
+  if ( sorted )
+    mFieldsList->setSortingEnabled( true );
 }
 
 
@@ -682,7 +685,7 @@ void QgsFieldsProperties::on_mCalculateFieldButton_clicked()
     return;
   }
 
-  QgsFieldCalculator calc( mLayer );
+  QgsFieldCalculator calc( mWorkingWidget, mLayer );
   calc.setWorkingWidget(mWorkingWidget);
   calc.exec();
 }
@@ -784,6 +787,8 @@ void QgsFieldsProperties::on_pbnSelectEditForm_clicked()
   if ( uifilename.isNull() )
     return;
 
+  QFileInfo fi( uifilename );
+  myQSettings.setValue( "style/lastUIDir", fi.path() );
   leEditForm->setText( uifilename );
 }
 

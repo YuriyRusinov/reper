@@ -125,6 +125,8 @@ class _QGIS_EXPORT QgsVectorLayerProperties : public QgsOptionsDialogBase, priva
     void on_mMinimumScaleSetCurrentPushButton_clicked();
     void on_mMaximumScaleSetCurrentPushButton_clicked();
 
+    void on_mSimplifyDrawingGroupBox_toggled( bool checked );
+
   signals:
 
     /** emitted when changes to layer were saved to update legend */

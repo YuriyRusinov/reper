@@ -8,8 +8,10 @@
 #include <QFileDialog>
 #include <QtDebug>
 #include <QString>
+#include <QMenu>
 
-KKSFileWidget::KKSFileWidget(const KKSList<KKSFile*> & files, 
+KKSFileWidget::KKSFileWidget(QAction * edsAction, 
+                             const KKSList<KKSFile*> & files, 
                              const KKSList<KKSFileType*> & fileTypes,
                              bool dialogMode, 
                              QWidget *parent)
@@ -20,6 +22,17 @@ KKSFileWidget::KKSFileWidget(const KKSList<KKSFile*> & files,
 
     m_files = files;    
     m_fileTypes = fileTypes;
+    
+    m_edsAction = edsAction;
+
+    if(edsAction){
+        QMenu * menu = new QMenu(ui->pbDigitalSignature);
+        menu->addAction(edsAction);
+        ui->pbDigitalSignature->setMenu(menu);
+    }
+    else{
+        ui->pbDigitalSignature->setEnabled(false);
+    }
 
     init();
 

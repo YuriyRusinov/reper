@@ -124,6 +124,7 @@
 #include "defines.h"
 #include <KKSHistogram.h>
 #include <KKSHistWidgetEx.h>
+#include <kkspluginloader.h>
 
 /*
  Заголовочные ф-лы генератора отчетов
@@ -581,11 +582,27 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
         //
         // прикрепленные файлы
         //
+        QAction * edsPlugin = NULL;
+        if(m_pluginLoader){
+            QList<QAction *> * ioPlugins = m_pluginLoader->getPluginActions(KKSPluginLoader::ptKKSIOPlugin);
+            if(ioPlugins){
+                int cnt=ioPlugins->count();
+                for(int i=0; i<cnt; i++){
+                    edsPlugin = ioPlugins->at(i);
+                    if(edsPlugin && edsPlugin->text() == tr("Digital Signature Plugin")){
+                        break;
+                    }
+                    else
+                        edsPlugin = NULL;
+                }
+            }
+        }
+
         QWidget * filesW = new QWidget ();
         QGridLayout *gFilesLay = new QGridLayout ();
         filesW->setLayout (gFilesLay);
         KKSList<KKSFileType*> fileTypes = loader->loadFileTypes();
-        KKSFileWidget * W = new KKSFileWidget(io->files(), fileTypes, false);
+        KKSFileWidget * W = new KKSFileWidget(edsPlugin, io->files(), fileTypes, false);
         connect(W, SIGNAL(downloadFile(KKSFile*, QWidget *)), this, SLOT(slotDownloadFile(KKSFile*, QWidget*)));
         objEditorWidget->addFileWidget (W);
         tabObj->addTab (filesW, tr("Files"));
@@ -612,12 +629,28 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
         //
         // прикрепленные файлы (теперь они также доступны для записей справочников DynamicDocs)
         //
+        QAction * edsPlugin = NULL;
+        if(m_pluginLoader){
+            QList<QAction *> * ioPlugins = m_pluginLoader->getPluginActions(KKSPluginLoader::ptKKSIOPlugin);
+            if(ioPlugins){
+                int cnt=ioPlugins->count();
+                for(int i=0; i<cnt; i++){
+                    edsPlugin = ioPlugins->at(i);
+                    if(edsPlugin && edsPlugin->text() == tr("Digital Signature Plugin")){
+                        break;
+                    }
+                    else
+                        edsPlugin = NULL;
+                }
+            }
+        }
+
         QWidget * filesW = new QWidget ();
         QGridLayout *gFilesLay = new QGridLayout ();
         filesW->setLayout (gFilesLay);
         KKSList<KKSFileType*> fileTypes = loader->loadFileTypes();
         KKSList<KKSFile*> files = wObjE->files();
-        KKSFileWidget * W = new KKSFileWidget(files, fileTypes, false);
+        KKSFileWidget * W = new KKSFileWidget(edsPlugin, files, fileTypes, false);
         connect(W, SIGNAL(downloadFile(KKSFile*, QWidget *)), this, SLOT(slotDownloadFile(KKSFile*, QWidget*)));
         objEditorWidget->addFileWidget (W);
         tabObj->addTab (filesW, tr("Files"));
@@ -1005,11 +1038,27 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditorParam (int idObject,// идент
         //
         // прикрепленные файлы
         //
+        QAction * edsPlugin = NULL;
+        if(m_pluginLoader){
+            QList<QAction *> * ioPlugins = m_pluginLoader->getPluginActions(KKSPluginLoader::ptKKSIOPlugin);
+            if(ioPlugins){
+                int cnt=ioPlugins->count();
+                for(int i=0; i<cnt; i++){
+                    edsPlugin = ioPlugins->at(i);
+                    if(edsPlugin && edsPlugin->text() == tr("Digital Signature Plugin")){
+                        break;
+                    }
+                    else
+                        edsPlugin = NULL;
+                }
+            }
+        }
+
         QWidget * filesW = new QWidget ();
         QGridLayout *gFilesLay = new QGridLayout ();
         filesW->setLayout (gFilesLay);
         KKSList<KKSFileType*> fileTypes = loader->loadFileTypes();
-        KKSFileWidget * W = new KKSFileWidget(io->files(), fileTypes, false);
+        KKSFileWidget * W = new KKSFileWidget(edsPlugin, io->files(), fileTypes, false);
         connect(W, SIGNAL(downloadFile(KKSFile*, QWidget*)), this, SLOT(slotDownloadFile(KKSFile*, QWidget *)));
         objEditorWidget->addFileWidget (W);
         tabObj->addTab (filesW, tr("Files"));

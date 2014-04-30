@@ -13,19 +13,18 @@
  *                                                                         *
  ***************************************************************************/
 #include "qgslegenditem.h"
-
 #include <QCoreApplication>
 #include "qgslegend.h"
 #include "qgslogger.h"
 
 
-QgsLegendItem::QgsLegendItem( QTreeWidgetItem * theItem, QString theName )
+QgsLegendItem::QgsLegendItem( QTreeWidgetItem *theItem, QString theName )
     : QTreeWidgetItem( theItem )
 {
   setText( 0, theName );
 }
 
-QgsLegendItem::QgsLegendItem( QTreeWidget* theListView, QString theString )
+QgsLegendItem::QgsLegendItem( QTreeWidget *theListView, QString theString )
     : QTreeWidgetItem( theListView )
 {
   setText( 0, theString );

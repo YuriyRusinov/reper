@@ -58,6 +58,7 @@ class kksstateform;
 class KKSSearchTemplateForm;
 class KKSHistWidgetEx;
 class KKSHistogram;
+class KKSPluginLoader;
 
 class QScrollArea;
 class QGridLayout;
@@ -178,6 +179,8 @@ private:
                     KKSAttributesFactory * awf,
                     KKSEIOFactory * _eiof,
                     KKSStuffFactory * _sf);
+
+    void setPluginLoader(KKSPluginLoader * pLoader) {m_pluginLoader = pLoader;}
 
     void setStuffFactory (KKSStuffFactory * _sf);
 
@@ -542,6 +545,7 @@ private:
     //QItemSelection cSelection;
     KKSStuffFactory * m_sf;
     KKSRubricFactory * m_rf;
+    KKSPluginLoader * m_pluginLoader;
 
 private:
     Q_OBJECT

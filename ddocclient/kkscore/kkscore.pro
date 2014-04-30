@@ -22,8 +22,11 @@ DEPENDPATH *= ../kkspp
 #gui support
 INCLUDEPATH *= ../kksgui ../kksgui/ui
 DEPENDPATH *= ../kksgui
+#plugins support
+INCLUDEPATH *= ../kkspluginmanager
+DEPENDPATH *= ../kkspluginmanager
 
-LIBS *= -L$$DESTDIR -lkksutils -ldataaccess -lkksfactory -lkkspp -lkksgui
+LIBS *= -L$$DESTDIR -lkksutils -ldataaccess -lkksfactory -lkkspp -lkksgui -lkkspluginmanager
 
 qgis{
     DEFINES *= __USE_QGIS__

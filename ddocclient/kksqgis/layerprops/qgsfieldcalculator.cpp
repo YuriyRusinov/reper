@@ -27,10 +27,11 @@
 #include <QMessageBox>
 #include <QSettings>
 
-QgsFieldCalculator::QgsFieldCalculator( QgsVectorLayer* vl )
+QgsFieldCalculator::QgsFieldCalculator( KKSGISWidgetBase * w, QgsVectorLayer* vl )
     : QDialog()
     , mVectorLayer( vl )
     , mAttributeId( -1 )
+    , mWorkingWidget( w )
 {
   setupUi( this );
 
@@ -44,6 +45,12 @@ QgsFieldCalculator::QgsFieldCalculator( QgsVectorLayer* vl )
   populateOutputFieldTypes();
 
   connect( builder, SIGNAL( expressionParsed( bool ) ), this, SLOT( setOkButtonState() ) );
+
+  QgsDistanceArea myDa;
+  myDa.setSourceCrs( vl->crs().srsid() );
+  myDa.setEllipsoidalMode( mWorkingWidget->mapCanvas()->mapRenderer()->hasCrsTransformEnabled() );
+  myDa.setEllipsoid( QgsProject::instance()->readEntry( "Measure", "/Ellipsoid", GEO_NONE ) );
+  builder->setGeomCalculator( myDa );
 
   //default values for field width and precision
   mOutputFieldWidthSpinBox->setValue( 10 );
@@ -112,6 +119,8 @@ void QgsFieldCalculator::accept()
     return;
   }
 
+  QApplication::setOverrideCursor( Qt::WaitCursor );
+
   mVectorLayer->beginEditCommand( "Field calculator" );
 
   //update existing field
@@ -150,11 +159,18 @@ void QgsFieldCalculator::accept()
         break;
       }
     }
+
+    if ( ! exp.prepare( mVectorLayer->pendingFields() ) )
+    {
+      QMessageBox::critical( 0, tr( "Evaluation error" ), exp.evalErrorString() );
+      return;
+    }
   }
 
   if ( mAttributeId == -1 )
   {
     mVectorLayer->destroyEditCommand();
+    QApplication::restoreOverrideCursor();
     return;
   }
 
@@ -168,6 +184,11 @@ void QgsFieldCalculator::accept()
 
   bool useGeometry = exp.needsGeometry();
   int rownum = 1;
+
+  bool newField = !mUpdateExistingGroupBox->isChecked();
+  QVariant emptyAttribute;
+  if ( newField )
+    emptyAttribute = QVariant( mVectorLayer->pendingFields()[mAttributeId].type() );
 
   QgsFeatureIterator fit = mVectorLayer->getFeatures( QgsFeatureRequest().setFlags( useGeometry ? QgsFeatureRequest::NoFlags : QgsFeatureRequest::NoGeometry ) );
   while ( fit.nextFeature( feature ) )
@@ -190,15 +211,13 @@ void QgsFieldCalculator::accept()
     }
     else
     {
-      // FIXME workaround while QgsVectorLayer::changeAttributeValue's emitSignal is ignored (see #7071)
-      mVectorLayer->blockSignals( true );
-      mVectorLayer->changeAttributeValue( feature.id(), mAttributeId, value, false );
-      mVectorLayer->blockSignals( false );
+      mVectorLayer->changeAttributeValue( feature.id(), mAttributeId, value, newField ? emptyAttribute : feature.attributes().value( mAttributeId ) );
     }
 
     rownum++;
   }
 
+  QApplication::restoreOverrideCursor();
 
   if ( !calculationSuccess )
   {

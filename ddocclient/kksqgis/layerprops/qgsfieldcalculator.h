@@ -28,7 +28,7 @@ class _QGIS_EXPORT QgsFieldCalculator: public QDialog, private Ui::QgsFieldCalcu
 {
     Q_OBJECT
   public:
-    QgsFieldCalculator( QgsVectorLayer* vl );
+    QgsFieldCalculator( KKSGISWidgetBase * w, QgsVectorLayer* vl );
     ~QgsFieldCalculator();
 
     int changedAttributeId() const { return mAttributeId; }

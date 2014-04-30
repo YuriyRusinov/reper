@@ -66,6 +66,9 @@ QgsAttributeTableDialog::QgsAttributeTableDialog( KKSGISWidgetBase * w, QgsVecto
 {
   setupUi( this );
 
+  // Fix selection color on loosing focus (Windows)
+  setStyleSheet( mWorkingWidget->styleSheet() );
+
   setAttribute( Qt::WA_DeleteOnClose );
 
   QSettings settings;
@@ -155,6 +158,7 @@ QgsAttributeTableDialog::QgsAttributeTableDialog( KKSGISWidgetBase * w, QgsVecto
   mTableViewButton->setIcon( QgsApplication::getThemeIcon( "/mActionOpenTable.png" ) );
   mAttributeViewButton->setIcon( QgsApplication::getThemeIcon( "/mActionPropertyItem.png" ) );
   mExpressionSelectButton->setIcon( QgsApplication::getThemeIcon( "/mIconExpressionSelect.svg" ) );
+  mAddFeature->setIcon( QgsApplication::getThemeIcon( "/mActionNewTableRow.png" ) );
 
   // toggle editing
   bool canChangeAttributes = mLayer->dataProvider()->capabilities() & QgsVectorDataProvider::ChangeAttributeValues;
@@ -223,6 +227,16 @@ void QgsAttributeTableDialog::closeEvent( QCloseEvent* event )
   {
     QSettings settings;
     settings.setValue( "/Windows/BetterAttributeTable/geometry", saveGeometry() );
+  }
+}
+
+void QgsAttributeTableDialog::keyPressEvent( QKeyEvent* event )
+{
+  QDialog::keyPressEvent( event );
+
+  if (( event->key() == Qt::Key_Backspace || event->key() == Qt::Key_Delete ) && mDeleteSelectedButton->isEnabled() )
+  {
+      mWorkingWidget->deleteSelected( mLayer, this );
   }
 }
 
@@ -360,7 +374,7 @@ void QgsAttributeTableDialog::on_mOpenFieldCalculator_clicked()
 {
   QgsAttributeTableModel* masterModel = mMainView->masterModel();
 
-  QgsFieldCalculator calc( mLayer );
+  QgsFieldCalculator calc( mWorkingWidget, mLayer );
   if ( calc.exec() == QDialog::Accepted )
   {
     int col = masterModel->fieldCol( calc.changedAttributeId() );
@@ -608,8 +622,6 @@ void QgsAttributeTableDialog::setFilterExpression( QString filterString )
     mWorkingWidget->messageBar()->pushMessage( tr( "Evaluation error" ), filterExpression.evalErrorString(), QgsMessageBar::WARNING, mWorkingWidget->messageTimeout() );
   }
 
-  // TODO: fetch only necessary columns
-  // QStringList columns = search.referencedColumns();
   bool fetchGeom = filterExpression.needsGeometry();
 
   QApplication::setOverrideCursor( Qt::WaitCursor );

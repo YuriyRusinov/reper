@@ -19,7 +19,8 @@ class _GUI_EXPORT KKSFileWidget: public QWidget
     Q_OBJECT
 
 public:
-    KKSFileWidget(const KKSList<KKSFile*> & files, 
+    KKSFileWidget(QAction * edsPlugin,
+                  const KKSList<KKSFile*> & files, 
                   const KKSList<KKSFileType*> & fileTypes,
                   bool dialogMode = false,
                   QWidget *parent = 0);
@@ -51,6 +52,8 @@ private:
     Ui::kksfile_widget * ui;
     KKSList<KKSFile*> m_files;
     KKSList<KKSFileType*> m_fileTypes;
+
+    QAction * m_edsAction;
 
     KKSFile * getCurrentFile();
     void appendFileRow(KKSFile * f);

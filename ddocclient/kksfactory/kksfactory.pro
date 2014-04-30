@@ -6,8 +6,8 @@ TARGET = kksfactory
 DESTDIR = ../build
 include(../ddocclient.conf)
 #libraries support
-INCLUDEPATH *= ../kksutils ../dataaccess ../kkspp ../kksgui ../kksgui/ui ../kkscore ../kkscore/base_classes
-DEPENDPATH *= ../kksutils ../dataaccess ../kkspp ../kksgui ../kkscore
+INCLUDEPATH *= ../kksutils ../dataaccess ../kkspp ../kksgui ../kksgui/ui ../kkscore ../kkscore/base_classes ../kkspluginmanager
+DEPENDPATH *= ../kksutils ../dataaccess ../kkspp ../kksgui ../kkscore ../kkspluginmanager
 
 #librenderer support
 INCLUDEPATH *= ../rptrenderer \
@@ -16,22 +16,7 @@ INCLUDEPATH *= ../rptrenderer \
 DEPENDPATH *= ../kkspp \
               ../rptrenderer
 
-#INCLUDEPATH *= /home/rusinov/schedule/openrpt_git/openrpt/trunk/common \
-#               /home/rusinov/schedule/openrpt_git/openrpt/trunk/OpenRPT/renderer \
-#               /home/rusinov/schedule/openrpt_git/openrpt/trunk/OpenRPT/bldtbls \
-#               /home/rusinov/schedule/openrpt_git/openrpt/trunk/OpenRPT/common \
-#               /home/rusinov/schedule/openrpt_git/openrpt/trunk/OpenRPT/wrtembed
-
-#DEPENDPATH *=  /home/rusinov/schedule/openrpt_git/openrpt/trunk/common \
-#               /home/rusinov/schedule/openrpt_git/openrpt/trunk/OpenRPT/renderer \
-#               /home/rusinov/schedule/openrpt_git/openrpt/trunk/OpenRPT/bldtbls \
-#               /home/rusinov/schedule/openrpt_git/openrpt/trunk/OpenRPT/common \
-#               /home/rusinov/schedule/openrpt_git/openrpt/trunk/OpenRPT/wrtembed
-#
-#LIBS *= -L/home/rusinov/schedule/openrpt_git/openrpt/trunk/lib/librenderer.a
-## -lrenderer
-
-LIBS *= -L$$DESTDIR -lkksutils -ldataaccess -lkkspp -lkksgui -lrptrenderer
+LIBS *= -L$$DESTDIR -lkksutils -ldataaccess -lkkspp -lkksgui -lrptrenderer -lkkspluginmanager
 
 unix {
 LIBS += -lcurses

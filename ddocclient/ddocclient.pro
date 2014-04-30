@@ -22,6 +22,7 @@ SUBDIRS += \
     openrpt \
     kksgui \
     kksfactory \
+    kkspluginmanager \
     kkscore \
     kksinteractor \
     kkshttpconnector \
@@ -29,6 +30,8 @@ SUBDIRS += \
     sync_queue_viewer
 
 SUBDIRS += app
+
+SUBDIRS += ddocplugins
 
 RESOURCES = ./ddocs_ico/ddocs_icon_set.qrc
 

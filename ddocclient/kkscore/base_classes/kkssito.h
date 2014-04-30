@@ -33,6 +33,7 @@
 
 class KKSSettings;
 class KKSDatabase;
+class KKSPluginLoader;
 
 //class KKSRecordFactory;
 class KKSPPFactory;
@@ -74,7 +75,11 @@ private:
 public:
     KKSError * getLastError();  
     void showConnectionInfo(QWidget * parent = NULL) const;
-    void showConnectionInfo(KKSDatabase * db, const QString & userName, const QString & dlName, const QString & macLabel, QWidget * parent = NULL) const;
+    void showConnectionInfo(KKSDatabase * db, 
+                            const QString & userName, 
+                            const QString & dlName, 
+                            const QString & macLabel, 
+                            QWidget * parent = NULL) const;
 
     void updateLastError(KKSError::ErrorTypes type, 
                          QString code, 
@@ -116,6 +121,7 @@ public:
     //KKSRecordFactory * rf() const;
     KKSLoader * loader() const;
     KKSFileLoader * fileLoader() const;
+    KKSPluginLoader * pluginLoader() const;
     KKSPPFactory * ppf() const;
     KKSEIOFactory * eiof() const;
     KKSObjEditorFactory * oef() const;
@@ -140,6 +146,8 @@ public:
 
     void loadTranslator();
     void loadQGISPlugins();
+    void loadKKSPlugins();
+
     const QString & GISHomeDir() const;
 
     QByteArray toCString(QString str)
@@ -200,6 +208,7 @@ private:
     mutable KKSDatabase * poDb;
     mutable KKSDatabase * poDb1;//для отдельного потока
     mutable KKSLoader * m_loader;
+    mutable KKSPluginLoader * m_pluginLoader;
     mutable KKSFileLoader * m_fileLoader;
     mutable KKSPPFactory * m_ppf;
     mutable KKSEIOFactory * m_eiof;

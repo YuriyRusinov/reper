@@ -19,6 +19,8 @@
 #include <kkspgdatabase.h>
 #include <kksdatabase.h>
 
+#include "kkspluginloader.h"
+
 #include "KKSLoader.h"
 #include "KKSFileLoader.h"
 #include "KKSPPFactory.h"
@@ -105,6 +107,8 @@ KKSSito::KKSSito(const QString & userName, bool msgToWindow) :
     poDb1 = 0;
     tor = 0;
 
+    m_pluginLoader = 0;
+
     Q_INIT_RESOURCE (ddocs_icon_set);
     Q_INIT_RESOURCE (ddocs_icon_set1);
 
@@ -134,8 +138,10 @@ KKSSito::KKSSito(const QString & userName, bool msgToWindow) :
 
     loadQGISPlugins(); //only if qgis linked
 
+    loadKKSPlugins();
     initFactories();
     
+
     initLogStream();
 
     getLastError();//это типа чтоп файл журнала создать в текущей папке (там где exe-шник лежџт)
@@ -181,6 +187,38 @@ void KKSSito::loadQGISPlugins()
 
 #endif
     
+}
+
+void KKSSito::loadKKSPlugins()
+{
+    
+    KKSSettings *kksSettings = kksSito->getKKSSettings();
+    if(!kksSettings)
+        return;
+    
+    QString plugins_path = getWDir() + "/ddocplugins";
+    
+    kksSettings->beginGroup (QString("System settings/") + kksSitoNameEng);
+
+    if ( kksSettings->getParam("DDoc_plugins_path").isEmpty() )
+    {
+        kksSettings->endGroup();
+        kksSettings->writeSettings (QString("System settings/") + kksSitoNameEng, 
+                                     "DDoc_plugins_path", 
+                                     plugins_path);
+        kksSettings->beginGroup (QString("System settings/") + kksSitoNameEng);
+    }
+    
+    plugins_path = kksSettings->getParam("DDoc_plugins_path");
+
+    kksSettings->endGroup();
+    
+    qDebug() << "Try to load DynamicDocs plugins from " << plugins_path;
+    
+    QDir d(plugins_path);
+
+    m_pluginLoader = new KKSPluginLoader(d);
+    m_pluginLoader->initPlugins();
 }
 
 const QString & KKSSito::GISHomeDir() const
@@ -1176,8 +1214,10 @@ void KKSSito::initFactories()
     }
 
 
-    if (!m_objf)
+    if (!m_objf){
         m_objf = new KKSObjEditorFactory(m_ppf, m_loader, m_fileLoader, m_attrf, m_eiof);
+        m_objf->setPluginLoader(m_pluginLoader);
+    }
 
     m_attrf->setOEF(m_objf);
 

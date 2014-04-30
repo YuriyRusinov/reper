@@ -88,7 +88,7 @@
            <string>General</string>
           </property>
           <property name="icon">
-           <iconset resource="../images/images.qrc">
+           <iconset resource="../../images/images.qrc">
             <normaloff>:/images/themes/default/propertyicons/general.svg</normaloff>:/images/themes/default/propertyicons/general.svg</iconset>
           </property>
          </item>
@@ -100,7 +100,7 @@
            <string>Style</string>
           </property>
           <property name="icon">
-           <iconset resource="../images/images.qrc">
+           <iconset resource="../../images/images.qrc">
             <normaloff>:/images/themes/default/propertyicons/symbology.png</normaloff>:/images/themes/default/propertyicons/symbology.png</iconset>
           </property>
          </item>
@@ -112,7 +112,7 @@
            <string>Transparency</string>
           </property>
           <property name="icon">
-           <iconset resource="../images/images.qrc">
+           <iconset resource="../../images/images.qrc">
             <normaloff>:/images/themes/default/propertyicons/transparency.png</normaloff>:/images/themes/default/propertyicons/transparency.png</iconset>
           </property>
          </item>
@@ -124,7 +124,7 @@
            <string>Pyramids</string>
           </property>
           <property name="icon">
-           <iconset resource="../images/images.qrc">
+           <iconset resource="../../images/images.qrc">
             <normaloff>:/images/themes/default/propertyicons/pyramids.png</normaloff>:/images/themes/default/propertyicons/pyramids.png</iconset>
           </property>
          </item>
@@ -136,7 +136,7 @@
            <string>Histogram</string>
           </property>
           <property name="icon">
-           <iconset resource="../images/images.qrc">
+           <iconset resource="../../images/images.qrc">
             <normaloff>:/images/themes/default/propertyicons/histogram.png</normaloff>:/images/themes/default/propertyicons/histogram.png</iconset>
           </property>
          </item>
@@ -148,7 +148,7 @@
            <string>Metadata</string>
           </property>
           <property name="icon">
-           <iconset resource="../images/images.qrc">
+           <iconset resource="../../images/images.qrc">
             <normaloff>:/images/themes/default/propertyicons/metadata.png</normaloff>:/images/themes/default/propertyicons/metadata.png</iconset>
           </property>
          </item>
@@ -190,16 +190,6 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QLabel" name="label_7">
-             <property name="styleSheet">
-              <string notr="true">font-weight:bold;</string>
-             </property>
-             <property name="text">
-              <string>General</string>
-             </property>
-            </widget>
-           </item>
-           <item>
             <widget class="QScrollArea" name="scrollArea_3">
              <property name="frameShape">
               <enum>QFrame::NoFrame</enum>
@@ -212,8 +202,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>701</width>
-                <height>675</height>
+                <width>700</width>
+                <height>686</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -472,7 +462,7 @@
                      <string/>
                     </property>
                     <property name="pixmap">
-                     <pixmap resource="../images/images.qrc">:/images/themes/default/mActionZoomIn.svg</pixmap>
+                     <pixmap resource="../../images/images.qrc">:/images/themes/default/mActionZoomIn.svg</pixmap>
                     </property>
                     <property name="scaledContents">
                      <bool>true</bool>
@@ -503,7 +493,7 @@
                      <string/>
                     </property>
                     <property name="pixmap">
-                     <pixmap resource="../images/images.qrc">:/images/themes/default/mActionZoomOut.svg</pixmap>
+                     <pixmap resource="../../images/images.qrc">:/images/themes/default/mActionZoomOut.svg</pixmap>
                     </property>
                     <property name="scaledContents">
                      <bool>true</bool>
@@ -661,16 +651,6 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QLabel" name="label">
-             <property name="styleSheet">
-              <string notr="true">font-weight:bold;</string>
-             </property>
-             <property name="text">
-              <string>Style</string>
-             </property>
-            </widget>
-           </item>
-           <item>
             <widget class="QScrollArea" name="scrollArea">
              <property name="frameShape">
               <enum>QFrame::NoFrame</enum>
@@ -683,8 +663,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>460</width>
-                <height>270</height>
+                <width>700</width>
+                <height>686</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_13">
@@ -1076,7 +1056,7 @@
                      <string>Reset</string>
                     </property>
                     <property name="icon">
-                     <iconset resource="../images/images.qrc">
+                     <iconset resource="../../images/images.qrc">
                       <normaloff>:/images/themes/default/mActionUndo.png</normaloff>:/images/themes/default/mActionUndo.png</iconset>
                     </property>
                     <property name="toolButtonStyle">
@@ -1176,16 +1156,6 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QLabel" name="label_4">
-             <property name="styleSheet">
-              <string notr="true">font-weight:bold;</string>
-             </property>
-             <property name="text">
-              <string>Transparency</string>
-             </property>
-            </widget>
-           </item>
-           <item>
             <widget class="QScrollArea" name="scrollArea_2">
              <property name="frameShape">
               <enum>QFrame::NoFrame</enum>
@@ -1198,8 +1168,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>362</width>
-                <height>354</height>
+                <width>700</width>
+                <height>686</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -1465,7 +1435,7 @@
                        <string>...</string>
                       </property>
                       <property name="icon">
-                       <iconset resource="../images/images.qrc">
+                       <iconset resource="../../images/images.qrc">
                         <normaloff>:/images/themes/default/mActionSignPlus.png</normaloff>:/images/themes/default/mActionSignPlus.png</iconset>
                       </property>
                      </widget>
@@ -1482,7 +1452,7 @@
                        <string>...</string>
                       </property>
                       <property name="icon">
-                       <iconset resource="../images/images.qrc">
+                       <iconset resource="../../images/images.qrc">
                         <normaloff>:/images/themes/default/mActionContextHelp.png</normaloff>:/images/themes/default/mActionContextHelp.png</iconset>
                       </property>
                      </widget>
@@ -1496,7 +1466,7 @@
                        <string>...</string>
                       </property>
                       <property name="icon">
-                       <iconset resource="../images/images.qrc">
+                       <iconset resource="../../images/images.qrc">
                         <normaloff>:/images/themes/default/mActionSignMinus.png</normaloff>:/images/themes/default/mActionSignMinus.png</iconset>
                       </property>
                      </widget>
@@ -1510,7 +1480,7 @@
                        <string>...</string>
                       </property>
                       <property name="icon">
-                       <iconset resource="../images/images.qrc">
+                       <iconset resource="../../images/images.qrc">
                         <normaloff>:/images/themes/default/mActionOpenTable.png</normaloff>:/images/themes/default/mActionOpenTable.png</iconset>
                       </property>
                      </widget>
@@ -1524,7 +1494,7 @@
                        <string>...</string>
                       </property>
                       <property name="icon">
-                       <iconset resource="../images/images.qrc">
+                       <iconset resource="../../images/images.qrc">
                         <normaloff>:/images/themes/default/mActionFileOpen.svg</normaloff>:/images/themes/default/mActionFileOpen.svg</iconset>
                       </property>
                      </widget>
@@ -1538,7 +1508,7 @@
                        <string>...</string>
                       </property>
                       <property name="icon">
-                       <iconset resource="../images/images.qrc">
+                       <iconset resource="../../images/images.qrc">
                         <normaloff>:/images/themes/default/mActionFileSave.svg</normaloff>:/images/themes/default/mActionFileSave.svg</iconset>
                       </property>
                      </widget>
@@ -1593,16 +1563,6 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QLabel" name="label_10">
-             <property name="styleSheet">
-              <string notr="true">font-weight:bold;</string>
-             </property>
-             <property name="text">
-              <string>Pyramids</string>
-             </property>
-            </widget>
-           </item>
-           <item>
             <widget class="QScrollArea" name="scrollArea_5">
              <property name="frameShape">
               <enum>QFrame::NoFrame</enum>
@@ -1615,8 +1575,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>457</width>
-                <height>169</height>
+                <width>700</width>
+                <height>686</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_12">
@@ -1679,8 +1639,8 @@
                        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Cantarell'; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Cantarell';&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                       </property>
                      </widget>
                     </item>
@@ -1764,16 +1724,6 @@ p, li { white-space: pre-wrap; }
             <number>0</number>
            </property>
            <item>
-            <widget class="QLabel" name="label_13">
-             <property name="styleSheet">
-              <string notr="true">font-weight:bold;</string>
-             </property>
-             <property name="text">
-              <string>Histogram</string>
-             </property>
-            </widget>
-           </item>
-           <item>
             <widget class="QScrollArea" name="scrollArea_6">
              <property name="frameShape">
               <enum>QFrame::NoFrame</enum>
@@ -1786,8 +1736,8 @@ p, li { white-space: pre-wrap; }
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>100</width>
-                <height>30</height>
+                <width>700</width>
+                <height>686</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_16">
@@ -1824,16 +1774,6 @@ p, li { white-space: pre-wrap; }
             <number>0</number>
            </property>
            <item>
-            <widget class="QLabel" name="label_9">
-             <property name="styleSheet">
-              <string notr="true">font-weight:bold;</string>
-             </property>
-             <property name="text">
-              <string>Metadata</string>
-             </property>
-            </widget>
-           </item>
-           <item>
             <widget class="QScrollArea" name="scrollArea_4">
              <property name="frameShape">
               <enum>QFrame::NoFrame</enum>
@@ -1846,8 +1786,8 @@ p, li { white-space: pre-wrap; }
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>297</width>
-                <height>451</height>
+                <width>700</width>
+                <height>686</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -2177,15 +2117,15 @@ p, li { white-space: pre-wrap; }
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QgsScaleComboBox</class>
-   <extends>QComboBox</extends>
-   <header>qgsscalecombobox.h</header>
-  </customwidget>
-  <customwidget>
    <class>QgsCollapsibleGroupBox</class>
    <extends>QGroupBox</extends>
    <header>qgscollapsiblegroupbox.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QgsBlendModeComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qgsblendmodecombobox.h</header>
   </customwidget>
   <customwidget>
    <class>QgsColorButton</class>
@@ -2193,13 +2133,12 @@ p, li { white-space: pre-wrap; }
    <header>qgscolorbutton.h</header>
   </customwidget>
   <customwidget>
-   <class>QgsBlendModeComboBox</class>
+   <class>QgsScaleComboBox</class>
    <extends>QComboBox</extends>
-   <header>qgsblendmodecombobox.h</header>
+   <header>qgsscalecombobox.h</header>
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../images/images.qrc"/>
   <include location="../../images/images.qrc"/>
  </resources>
  <connections>

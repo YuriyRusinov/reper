@@ -181,6 +181,12 @@ class _QGIS_EXPORT QgsAttributeTableDialog : public QDialog, private Ui::QgsAttr
      */
     void closeEvent( QCloseEvent* event );
 
+    /*
+     * Handle KeyPress event of the window
+     * @param event
+     */
+    void keyPressEvent( QKeyEvent* event );
+
   private slots:
     /**
      * Initialize column box

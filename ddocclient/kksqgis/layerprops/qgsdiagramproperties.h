@@ -47,6 +47,8 @@ class _QGIS_EXPORT QgsDiagramProperties : public QWidget, private Ui::QgsDiagram
     void on_mDiagramFontButton_clicked();
     void on_mDiagramAttributesTreeWidget_itemDoubleClicked( QTreeWidgetItem * item, int column );
     void on_mEngineSettingsButton_clicked();
+    void showSizeAttributeExpressionDialog();
+    void showAddAttributeExpressionDialog();
 
   protected:
     QFont mDiagramFont;
@@ -55,6 +57,8 @@ class _QGIS_EXPORT QgsDiagramProperties : public QWidget, private Ui::QgsDiagram
 
   private:
     KKSGISWidgetBase * mWorkingWidget;
+    int mAvailableAttributes;
+
 };
 
 #endif // QGSDIAGRAMPROPERTIES_H

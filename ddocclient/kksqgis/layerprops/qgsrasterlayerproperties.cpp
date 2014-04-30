@@ -43,6 +43,7 @@
 #include "qgsrasterhistogramwidget.h"
 #include "qgsrasteridentifyresult.h"
 #include "qgsrasterlayer.h"
+#include "qgsrasterlayerproperties.h"
 #include "qgsrasterpyramid.h"
 #include "qgsrasterrange.h"
 #include "qgsrasterrenderer.h"
@@ -227,8 +228,6 @@ QgsRasterLayerProperties::QgsRasterLayerProperties( QgsMapLayer* lyr, QgsMapCanv
                                  .arg( pyramidSentence2 ).arg( pyramidSentence3 )
                                  .arg( pyramidSentence4 ).arg( pyramidSentence5 ) );
 
-  setWindowTitle( tr( "Layer Properties - %1" ).arg( lyr->name() ) );
-
   tableTransparency->horizontalHeader()->setResizeMode( 0, QHeaderView::Stretch );
   tableTransparency->horizontalHeader()->setResizeMode( 1, QHeaderView::Stretch );
 
@@ -404,7 +403,8 @@ QgsRasterLayerProperties::QgsRasterLayerProperties( QgsMapLayer* lyr, QgsMapCanv
 
   mResetColorRenderingBtn->setIcon( QgsApplication::getThemeIcon( "/mActionUndo.png" ) );
 
-  restoreOptionsBaseUi();
+  QString title = QString( tr( "Layer Properties - %1" ) ).arg( lyr->name() );
+  restoreOptionsBaseUi( title );
 } // QgsRasterLayerProperties ctor
 
 

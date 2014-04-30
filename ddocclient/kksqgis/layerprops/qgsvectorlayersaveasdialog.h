@@ -66,7 +66,7 @@ class _QGIS_EXPORT QgsVectorLayerSaveAsDialog : public QDialog, private Ui::QgsV
     void on_browseCRS_clicked();
     void on_buttonBox_helpRequested() { QgsContextHelp::run( metaObject()->className() ); }
     void on_mSymbologyExportComboBox_currentIndexChanged( const QString& text );
-    void on_mOptionsButton_toggled( bool checked );
+    //void on_mOptionsButton_toggled( bool checked );
     void accept();
 
   private:

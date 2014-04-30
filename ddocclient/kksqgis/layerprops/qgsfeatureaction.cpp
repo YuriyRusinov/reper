@@ -21,9 +21,9 @@
 #include "KKSGISWidget.h" //!!!! גלוסעמ qgisapp.h
 #include "qgsattributedialog.h"
 #include "qgsdistancearea.h"
+#include "qgsfeatureaction.h"
 #include "qgsguivectorlayertools.h"
-//#include "qgsidentifyresultsdialog.h"
-#include "qgsattributeaction.h"
+#include "qgsidentifyresultsdialog.h"
 #include "qgslogger.h"
 #include "qgsmapcanvas.h"
 #include "qgsproject.h"
@@ -31,8 +31,6 @@
 #include "qgsvectorlayer.h"
 
 #include <QPushButton>
-#include <QDialog>
-#include <QAction>
 #include <QSettings>
 
 QgsFeatureAction::QgsFeatureAction( KKSGISWidgetBase * w, const QString &name, QgsFeature &f, QgsVectorLayer *layer, int action, int defaultAttr, QObject *parent )
@@ -134,7 +132,7 @@ bool QgsFeatureAction::editFeature()
       {
         if ( dst[i] != src[i] )
         {
-          mLayer->changeAttributeValue( mFeature.id(), i, dst[i] );
+          mLayer->changeAttributeValue( mFeature.id(), i, dst[i], src[i] );
         }
       }
 

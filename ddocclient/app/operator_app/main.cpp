@@ -53,13 +53,13 @@ int main(int argc, char *argv[])
 
     if(argc == 2 && strcmp(argv[1], "admin") == 0){
         //sito = KKSSito::init (false);//, QString("admin"));
-        sito = KKSSito::init (argc, argv, false, QString("admin"), true);
+        sito = KKSSito::init (argc, argv, false, QString("admin"), false);
         mainWindow = new KKSMainWindow();
         mainWindow->setWindowTitle(QObject::tr("DynamicDocs ") + QObject::tr("Administrator") + " " + KKS_VERSION);
         //mainWindow->setWindowTitle(QObject::tr("PK IR ") + QObject::tr("Administrator") + " " + KKS_VERSION);
     }
     else{
-        sito = KKSSito::init (argc, argv, false, QString(), true);
+        sito = KKSSito::init (argc, argv, false, QString(), false);
         mainWindow = new KKSMainWindow();
         mainWindow->setWindowTitle(QObject::tr("DynamicDocs ") + QObject::tr("Operator") + " " + KKS_VERSION);
         //mainWindow->setWindowTitle(QObject::tr("PK IR ") + QObject::tr("Operator") + " " + KKS_VERSION);

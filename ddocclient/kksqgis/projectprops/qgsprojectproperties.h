@@ -119,6 +119,12 @@ class _QGIS_EXPORT QgsProjectProperties : public QgsOptionsDialogBase, private U
     void on_pbnWFSLayersUnselectAll_clicked();
 
     /*!
+     * Slots to select/unselect all the WCS layers
+     */
+    void on_pbnWCSLayersSelectAll_clicked();
+    void on_pbnWCSLayersUnselectAll_clicked();
+
+    /*!
      * Slots for Styles
      */
     void on_pbtnStyleManager_clicked();
@@ -143,6 +149,11 @@ class _QGIS_EXPORT QgsProjectProperties : public QgsOptionsDialogBase, private U
     void cbxWFSUpdateStateChanged( int aIdx );
     void cbxWFSInsertStateChanged( int aIdx );
     void cbxWFSDeleteStateChanged( int aIdx );
+
+    /*!
+     * Slot to link WCS checkboxes
+     */
+    void cbxWCSPubliedStateChanged( int aIdx );
 
     /*!
       * If user changes the CRS, set the corresponding map units

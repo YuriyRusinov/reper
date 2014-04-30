@@ -33,7 +33,7 @@ qgis{
 
     INCLUDEPATH *= $$OSGEODIR/include \
                    $$OSGEODIR/include/qwt \
-                   $$QGISDIR/include/qgis \
+                   #$$QGISDIR/include/qgis \
                    $$QGISDIR/include
 
 
