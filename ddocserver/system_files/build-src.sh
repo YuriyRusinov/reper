@@ -80,9 +80,12 @@ POSTGIS_PREFIX=$PREFIX
 
 GSL_PREFIX=/usr/
 
-adduser postgres
-
-
+OS_NAME=`uname -a | grep -o gentoo`
+if [ "$OS_NAME" = "gentoo" ]; then
+    useradd postgres
+else
+    adduser postgres
+fi
 
 export LD_LIBRARY_PATH=$UUID_PREFIX/lib:$PREFIX/lib:$GSL_PREFIX
 
@@ -169,7 +172,7 @@ sudo cp $SYS_FILES_ABS/ddocserver-$VERSION /etc/init.d/
 OS_NAME=`uname -a | grep -o gentoo`
 SERVICE_ADDED=0
 if [ "$OS_NAME" = "gentoo" ]; then
-    rc_update add ddocserver-$VERSION default &&
+    rc-update add ddocserver-$VERSION default &&
     SERVICE_ADDED=1
 else
     chkconfig --add ddocserver-$VERSION &&
@@ -178,8 +181,13 @@ fi
 
 SERVICE_STARTED=0
 if [ $SERVICE_ADDED = 1 ]; then
-    service ddocserver-$VERSION start &&
-    SERVICE_STARTED=1
+    if [ "$OS_NAME" = "gentoo" ]; then
+        rc-config start ddocserver-$VERSION &&
+        SERVICE_STARTED=1
+    else
+        service ddocserver-$VERSION start &&
+        SERVICE_STARTED=1
+    fi
 else
     ./pg_start.sh start $PGSQL_VER $PG_PREFIX $PORT &&
     SERVICE_STARTED=1

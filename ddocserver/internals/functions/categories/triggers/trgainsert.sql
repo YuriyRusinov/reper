@@ -13,6 +13,10 @@ begin
     и поскольку это поле задается в триггере uidCheck, то и автоматическая генерация уникального кода атрибута также осуцществляется в ней, а не здесь.
     */
 
+    if(new.code = 'rr_name') then
+        raise exception 'Attributes could not have CODE = rr_name! There are exist system field rr_name for all qualifiers! Use another code!';
+        return NULL;
+    end if;
 
     if(trim(new.table_name) = '') then
         new.table_name := NULL;
