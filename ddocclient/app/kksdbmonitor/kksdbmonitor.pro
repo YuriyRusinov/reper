@@ -30,7 +30,7 @@ DEPENDPATH += 	. \
                 ../../sync_queue_viewer \
                 ../../kksqwt
 
-LIBS += -L$$DESTDIR -ldataaccess -lkksutils -lkkscore -lkksfactory -lkkspp -lkksgui -lkksinteractor -lkkshttpconnector -lsync_queue_viewer -lkksqwt
+LIBS += -L$$DESTDIR -ldataaccess -lkksutils -lkkscore -lkksfactory -lkkspp -lkksgui -lkksinteractor -lkkshttpconnector -lsync_queue_viewer -lkksqwt -lkkspluginmanager
 
 # libpq support
 LIBS += -L$${PSQL_HOME}/lib

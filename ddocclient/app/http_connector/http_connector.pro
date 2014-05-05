@@ -30,7 +30,7 @@ DEPENDPATH += 	. \
                 ../../kksqwt \
                 ./gost
 
-LIBS += -L$$DESTDIR -ldataaccess -lkksutils -lkkscore -lkksfactory -lkkspp -lkksgui -lkksinteractor -lkkshttpconnector -lkksqwt
+LIBS += -L$$DESTDIR -ldataaccess -lkksutils -lkkscore -lkksfactory -lkkspp -lkksgui -lkksinteractor -lkkshttpconnector -lkksqwt -lkkspluginmanager
 
 # libpq support
 LIBS += -L$${PSQL_HOME}/lib

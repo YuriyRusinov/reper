@@ -36,7 +36,7 @@ INCLUDEPATH *= ../../rptrenderer \
 DEPENDPATH *= ../kkspp \
               ../../rptrenderer
 
-LIBS += -L$$DESTDIR -ldataaccess -lkkscore -lkksutils -lkkspp -lkksfactory -lkksgui -lrptrenderer -lkksqwt
+LIBS += -L$$DESTDIR -ldataaccess -lkkscore -lkksutils -lkkspp -lkksfactory -lkksgui -lrptrenderer -lkksqwt -lkkspluginmanager
 
 
 qgis{

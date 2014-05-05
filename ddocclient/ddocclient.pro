@@ -21,8 +21,8 @@ SUBDIRS += \
     rptrenderer \
     openrpt \
     kksgui \
-    kksfactory \
     kkspluginmanager \
+    kksfactory \
     kkscore \
     kksinteractor \
     kkshttpconnector \

@@ -1,7 +1,7 @@
 #include <QtGui>
 #include <QMessageBox>
 
-#include <kksobject.h>
+#include <KKSObject.h>
 
 #include "edsplugin.h"
 #include "digitalsignatureform.h"
