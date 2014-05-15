@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ReperMainWindowForm</class>
+ <widget class="QMainWindow" name="ReperMainWindowForm">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>19</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_DB">
+    <property name="title">
+     <string>&amp;DB</string>
+    </property>
+    <addaction name="actConnect"/>
+    <addaction name="actDisconnect"/>
+    <addaction name="separator"/>
+    <addaction name="act3D_Models"/>
+    <addaction name="actRLI"/>
+    <addaction name="separator"/>
+    <addaction name="actE_xit"/>
+   </widget>
+   <widget class="QMenu" name="menu_RLI_Analisys">
+    <property name="title">
+     <string>&amp;RLI Analisys</string>
+    </property>
+    <addaction name="actSearch_region"/>
+    <addaction name="actComparison"/>
+   </widget>
+   <addaction name="menu_DB"/>
+   <addaction name="menu_RLI_Analisys"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actConnect">
+   <property name="text">
+    <string>&amp;Connect</string>
+   </property>
+  </action>
+  <action name="actDisconnect">
+   <property name="text">
+    <string>&amp;Disconnect</string>
+   </property>
+  </action>
+  <action name="act3D_Models">
+   <property name="text">
+    <string>3D &amp;Models</string>
+   </property>
+  </action>
+  <action name="actRLI">
+   <property name="text">
+    <string>&amp;RLI</string>
+   </property>
+  </action>
+  <action name="actE_xit">
+   <property name="text">
+    <string>E&amp;xit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actSearch_region">
+   <property name="text">
+    <string>&amp;Search region</string>
+   </property>
+  </action>
+  <action name="actComparison">
+   <property name="text">
+    <string>&amp;Comparison</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
