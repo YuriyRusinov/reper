@@ -83,7 +83,7 @@ unix: LIBS += -lpq
 RC_FILE = operator.rc
 
 
-include(operator_app.pri)
+include(reper_app.pri)
 
 target.path = $$KKS_EXEC_DIR
 INSTALLS += target

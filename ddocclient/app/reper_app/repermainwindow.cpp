@@ -9,7 +9,7 @@ ReperMainWindow :: ReperMainWindow (QWidget * parent, Qt::WindowFlags flags)
     m_mdiArea (new QMdiArea)
 {
     UI->setupUi (this);
-    UI->setCentralWidget (m_mdiArea);
+    this->setCentralWidget (m_mdiArea);
 
     connect (UI->actConnect, SIGNAL (triggered()), this, SLOT (slotConnect()) );
     connect (UI->actDisconnect, SIGNAL (triggered()), this, SLOT (slotDisconnect()) );
