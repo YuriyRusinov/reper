@@ -1,5 +1,7 @@
 #include <QMdiArea>
 
+#include "kkssito.h"
+#include <kksdatabase.h>
 #include "repermainwindow.h"
 #include "ui_reper_main_window.h"
 
@@ -28,10 +30,12 @@ ReperMainWindow :: ~ReperMainWindow (void)
 
 void ReperMainWindow :: slotConnect (void)
 {
+    int res = kksSito->GUIConnect(this);
 }
 
 void ReperMainWindow :: slotDisconnect (void)
 {
+    kksSito->db()->disconnect();
 }
 
 void ReperMainWindow :: slot3DMod (void)
