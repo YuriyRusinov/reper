@@ -4,4 +4,5 @@ include(../ddocclient.conf)
 
 # Directories
 SUBDIRS += \
-	digital_signature 
+	digital_signature \
+        radio_image
