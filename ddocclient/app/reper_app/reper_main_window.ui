@@ -42,15 +42,8 @@
     <addaction name="actSearch_region"/>
     <addaction name="actComparison"/>
    </widget>
-   <widget class="QMenu" name="menu_Plugins">
-    <property name="title">
-     <string>&amp;Plugins</string>
-    </property>
-    <addaction name="actTestPlugin"/>
-   </widget>
    <addaction name="menu_DB"/>
    <addaction name="menu_RLI_Analisys"/>
-   <addaction name="menu_Plugins"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actConnect">
