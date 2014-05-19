@@ -92,6 +92,8 @@
 #include "dn/Added/dnvector.h"
 
 #include <QProgressDialog>
+#include <QMessageBox>
+#include <QFileDialog>
 
 
 KKSGISWidgetBase::KKSGISWidgetBase(bool withSubWindows, bool withAddons, QWidget* parent, Qt::WFlags fl)

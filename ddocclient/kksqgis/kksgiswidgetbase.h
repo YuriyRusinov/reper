@@ -24,6 +24,8 @@
 
 #include <qgspoint.h>
 
+class QToolButton;
+
 //Denis Includes (dn)
 class DNSpecBath;
 

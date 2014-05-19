@@ -13,7 +13,7 @@
 #include "kksclient_name.h"
 
 #ifdef __USE_QGIS__ 
-#include <QgsApplication.h>
+#include <qgsapplication.h>
 #endif
 
 
