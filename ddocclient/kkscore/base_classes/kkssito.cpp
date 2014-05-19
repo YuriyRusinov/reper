@@ -1733,3 +1733,8 @@ QTextStream & KKSSito::logStream()
 {
     return m_logStream;
 }
+
+KKSPluginLoader * KKSSito::pluginLoader() const
+{
+    return m_pluginLoader;
+}

@@ -1,6 +1,6 @@
 #include <QMessageBox>
 #include <QAction>
-#include <QtCore/qplugin.h> 
+#include <QtPlugin>
 
 #include <KKSObject.h>
 

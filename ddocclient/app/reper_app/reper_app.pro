@@ -17,7 +17,9 @@ INCLUDEPATH += 	. \
                 ../../kksgui \
 		../../kksgui/ui \
                 ../../kksqwt \
-                ../../kksqwt/src
+                ../../kksqwt/src \
+                ../../kkspluginmanager \
+                ../../ddocplugins/radio_image
 
 
 DEPENDPATH += 	\
@@ -28,7 +30,9 @@ DEPENDPATH += 	\
 		../../kkspp \
 		../../kksfactory \
                 ../../kksgui \
-                ../../kksqwt
+                ../../kksqwt \
+                ../../kkspluginmanager \
+                ../../ddocplugins/radio_image
 
 INCLUDEPATH *= ../../rptrenderer \
                ../../rptrenderer/src
@@ -36,7 +40,8 @@ INCLUDEPATH *= ../../rptrenderer \
 DEPENDPATH *= ../kkspp \
               ../../rptrenderer
 
-LIBS += -L$$DESTDIR -ldataaccess -lkkscore -lkksutils -lkkspp -lkksfactory -lkksgui -lrptrenderer -lkksqwt -lkkspluginmanager
+LIBS += -L$$DESTDIR -ldataaccess -lkkscore -lkksutils -lkkspp -lkksfactory -lkksgui -lrptrenderer -lkksqwt -lkkspluginmanager 
+LIBS *= -L$$DESTDIR/ddocplugins -lradio_image
 
 
 qgis{
