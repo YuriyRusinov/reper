@@ -1,6 +1,6 @@
 TEMPLATE = app
 
-include(../../ddocclient.conf)
+#include(../../ddocclient.conf)
 
 TARGET = reper_app
 

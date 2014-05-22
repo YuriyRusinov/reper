@@ -8,8 +8,8 @@ SUBDIRS += \
 	http_connector \
 #        sync_queue_viewer \
         kksdbmonitor \
-        kksdaemon \
-        reper_app
+        kksdaemon #\
+#        reper_app
 
 #win32{
 #        SUBDIRS += \

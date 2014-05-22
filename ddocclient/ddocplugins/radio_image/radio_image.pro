@@ -1,4 +1,4 @@
-# Digital Signature for IO plugin
+# Radio Image for IO plugin
 
 TEMPLATE = lib
 CONFIG += plugin dll
