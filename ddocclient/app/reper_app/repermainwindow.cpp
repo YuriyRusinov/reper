@@ -3,6 +3,7 @@
 #include "kkssito.h"
 #include <kksdatabase.h>
 #include <kkspluginloader.h>
+#include <kksbaseplugin.h>
 #include <radio_image_plugin.h>
 #include "repermainwindow.h"
 #include "ui_reper_main_window.h"
@@ -19,18 +20,27 @@ ReperMainWindow :: ReperMainWindow (QWidget * parent, Qt::WindowFlags flags)
     QList<QObject*> * plugins = pLoader->getPlugins();
     if (plugins)
     {
+        QMenu * plugMenu = new QMenu;
         int nPlug = plugins->count();
-        bool isRadIm = false;
-        for (int i=0; i<nPlug && !isRadIm; i++)
+        //bool isRadIm = false;
+        for (int i=0; i<nPlug ; i++)
         {
             QObject * plug = plugins->at(i);
-            if (qobject_cast<RadioImagePlugin *>(plug))
+            QAction * aPlug = new QAction (plug);
+            KKSBasePlugin * kksBaseP = qobject_cast<KKSBasePlugin *>(plug);
+            aPlug->setText (kksBaseP->getName());
+            aPlug->setIcon (QIcon (kksBaseP->getPixmap()));
+            plugMenu->addAction (aPlug);
+            kksBaseP->setAction (aPlug);
+/*            if (qobject_cast<RadioImagePlugin *>(plug))
             {
-                isRadIm = true;
+                //isRadIm = true;
                 RadioImagePlugin * rImPlug = qobject_cast<RadioImagePlugin *>(plug);
                 rImPlug->setAction (UI->actRLI);
             }
+*/
         }
+        UI->actPlugins->setMenu (plugMenu);
     }
 
     connect (UI->actConnect, SIGNAL (triggered()), this, SLOT (slotConnect()) );

@@ -41,6 +41,7 @@
     </property>
     <addaction name="actSearch_region"/>
     <addaction name="actComparison"/>
+    <addaction name="actPlugins"/>
    </widget>
    <addaction name="menu_DB"/>
    <addaction name="menu_RLI_Analisys"/>
@@ -73,6 +74,9 @@
    <property name="shortcut">
     <string>Ctrl+Q</string>
    </property>
+   <property name="menuRole">
+    <enum>QAction::QuitRole</enum>
+   </property>
   </action>
   <action name="actSearch_region">
    <property name="text">
@@ -87,6 +91,11 @@
   <action name="actTestPlugin">
    <property name="text">
     <string>test plugin</string>
+   </property>
+  </action>
+  <action name="actPlugins">
+   <property name="text">
+    <string>&amp;Plugins ...</string>
    </property>
   </action>
  </widget>
