@@ -7,4 +7,4 @@ SOURCES += \
 
 FORMS += \
 
-#RESOURCES = resource.qrc
+RESOURCES = radio_image.qrc

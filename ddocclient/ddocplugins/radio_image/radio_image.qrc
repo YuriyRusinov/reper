@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/" >
+	<file>pics/radio_antenna.png</file>
+    </qresource>
+</RCC>
