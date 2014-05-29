@@ -26,8 +26,10 @@
 
 class QToolButton;
 
+#ifdef WIN32
 //Denis Includes (dn)
 class DNSpecBath;
+#endif
 
 class KKSBadLayerHandler;
 class QgsMapLayer;
@@ -613,9 +615,11 @@ private:
     bool m_bWithAddons; //надо ли создавать меню для тематической обработки (нет, если работаем в составе DynamicDocs)
     bool m_bInit; //если виджет был инициализирован (т.е. создан канвас, окна и т.п.), то true
 
-
+#ifdef WIN32
     // dn's
     DNSpecBath *dnThemTaskSpecBath;
+#endif
+
     // functions
     long azGetEPSG(const QString rastrPath);
 

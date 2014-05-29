@@ -36,10 +36,11 @@
 #include <KKSRecDialog.h>
 #include <KKSFile.h>
 
-#ifndef WIN32
-#include <curses.h>
-#include <unistd.h>
-#endif
+//ksa
+//#ifndef WIN32
+//#include <curses.h>
+//#include <unistd.h>
+//#endif
 
 KKSJMonitor::KKSJMonitor(KKSCmdJSettings * settings, 
                          KKSDatabase * db1, 
@@ -194,11 +195,12 @@ void KKSJMonitor::queryWorkModeInfo()
                 Sleep(100);
                 Beep(950, 100);
             #else
-                beep();
-                usleep(100*1000);
-                beep();
-                usleep(100*1000);
-                beep();
+                //ksa
+                //beep();
+                //usleep(100*1000);
+                //beep();
+                //usleep(100*1000);
+                //beep();
 
             #endif
         /*}*/
@@ -292,9 +294,10 @@ void KKSJMonitor::queryCmdJournal()
         else{
         */
 #ifdef WIN32
-            Beep(750, 500);
+        Beep(750, 500);
 #else
-            beep();
+        //ksa
+        //beep();
 #endif
         /*}*/
 
@@ -381,9 +384,10 @@ void KKSJMonitor::queryMsgJournal()
         else{
         */
 #ifdef WIN32
-            Beep(750, 500);
+        Beep(750, 500);
 #else
-            beep();
+        //ksa
+        //beep();
 #endif
         /*}*/
 

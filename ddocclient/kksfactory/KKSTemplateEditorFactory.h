@@ -27,6 +27,10 @@ class KKSTemplate;
 class KKSCategory;
 class KKSAttrGroup;
 
+/*!\ingroup FACTORY_GROUP
+
+\brief Класс для формирования визуальных элементов для редактора шаблонов
+*/
 class _F_EXPORT KKSTemplateEditorFactory : public KKSEntityFactory
 {
     public:

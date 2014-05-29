@@ -70,6 +70,10 @@ class QTabWidget;
 class QXmlStreamWriter;
 class QLineEdit;
 
+/*!\ingroup FACTORY_GROUP
+
+\brief Класс формирования визуальных элементов для редактирования информационных ресурсов
+*/
 class _F_EXPORT KKSObjEditorFactory : public KKSEntityFactory
 {
 public:

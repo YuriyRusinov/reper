@@ -43,7 +43,7 @@ DEPENDPATH += ../kkscore ../kkscore/base_classes
 LIBS += -L$$DESTDIR -lkkscore
 
 unix {
-LIBS += -lcurses
+#LIBS += -lcurses
 }
 CONFIG += qt
 

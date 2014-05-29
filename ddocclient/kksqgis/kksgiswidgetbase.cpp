@@ -87,9 +87,10 @@
 #include <qgssinglesymbolrendererv2.h>
 #include <qgsstylev2.h>
 
-
+#ifdef WIN32
 #include "dn/dnspecbath.h"
 #include "dn/Added/dnvector.h"
+#endif
 
 #include <QProgressDialog>
 #include <QMessageBox>
@@ -175,8 +176,10 @@ KKSGISWidgetBase::KKSGISWidgetBase(bool withSubWindows, bool withAddons, QWidget
     mpRegistry(QgsMapLayerRegistry::instance()),
     mShowProjectionTab( false )
 {
-    
+#ifdef WIN32    
     dnThemTaskSpecBath = NULL; //???
+#endif
+
     azWorkList.clear();
 
     m_bWithSubwindows = withSubWindows; //надо ли создавать дополнительные окна (меню, тулбар, статусбыр и т.п.)
@@ -3717,6 +3720,7 @@ void KKSGISWidgetBase::azAddWorkListToMap(QStringList &pList)
 
 void KKSGISWidgetBase::azVectorize()
 {
+#ifdef WIN32
     dnThemTaskSpecBath->close();
     QString pMessage(""); // сообщение в статус баре о результате векторизации
     if (this->dnThemTaskSpecBath->Polygons.count() < 1)
@@ -3784,7 +3788,7 @@ void KKSGISWidgetBase::azVectorize()
     delete dnThemTaskSpecBath;
     dnThemTaskSpecBath = NULL;
     return;
-
+#endif
 }
 
 
@@ -4019,6 +4023,7 @@ void KKSGISWidgetBase::SLOTazGetSelectedLegendItem()
 
 void KKSGISWidgetBase::SLOTazThemTaskSpectralBathynometry()
 {
+#ifdef WIN32
     //ksa -- if (dnThemTaskSpecBath == NULL);
     if (dnThemTaskSpecBath != NULL)
     {
@@ -4030,7 +4035,7 @@ void KKSGISWidgetBase::SLOTazThemTaskSpectralBathynometry()
 //    QMessageBox::about(0, "a", "a");
 //    QFileInfo pFile("D:/!Share/layers/baba.shp");
 //    this->azAddLayerVector(pFile);
-
+#endif
 }
 
 void KKSGISWidgetBase::SLOTazCoordsCenter()

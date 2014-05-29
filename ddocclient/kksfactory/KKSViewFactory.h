@@ -36,7 +36,10 @@ class KKSEIOData;
 class KKSObjectExemplar;
 class KKSSearchTemplate;
 
-class _F_EXPORT KKSViewFactory
+/*!\ingroup FACTORY_GROUP
+
+\brief Класс для формирования табличного представления загружаемых из БД данных
+*/class _F_EXPORT KKSViewFactory
 {
     public:
         static KKSRecWidget * createView (KKSTemplate* theTemplate, 

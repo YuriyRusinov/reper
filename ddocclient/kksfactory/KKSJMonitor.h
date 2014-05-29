@@ -33,6 +33,10 @@ class KKSObjEditor;
 class KKSFile;
 class KKSJournalWidget;
 
+/*!\ingroup FACTORY_GROUP
+
+\brief Класс для мониторинга в БД предназначенных для пользователя сообщений и распоряжений
+*/
 class _F_EXPORT KKSJMonitor : public QObject
 {
     Q_OBJECT

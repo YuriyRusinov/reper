@@ -43,12 +43,20 @@ class KKSAclTemplate;
 class KKSPrivilege;
 class KKSAccessEntity;
 
+/*!\ingroup FACTORY_GROUP
+
+\brief Класс для создания, изменения и удаления данных в БД
+*/
 class _F_EXPORT KKSPPFactory
 {
     public:
+        /*!\brief Метод осуществляет создание информационного ресурса в БД*/
         int insertIO(KKSObject * io, bool useDefaultTable = true, QWidget * parent = NULL);
+        /*!\brief Метод осуществляет обновление информационного ресурса в БД*/
         int updateIO(KKSObject * io, QWidget * parent = NULL);
+        /*!\brief Метод осуществляет удаление информационного ресурса из БД*/
         int deleteIO(KKSObject * io) const;
+        /*!\brief Метод осуществляет создание дополнительной таблицы справочника в БД*/
         int insertAddTable (KKSObject * io, 
                             const QString& tableName, 
                             KKSCategory * c, 
@@ -58,29 +66,52 @@ class _F_EXPORT KKSPPFactory
         int setAsExecutedCommand(int idObject, int idJournal, bool draft = false) const;
         int setAsCommandResult(int idObject, int idJournal) const;
 
+        /*!\brief Метод осуществляет создание новой категории в БД*/
         int insertCategory(KKSCategory* c) const;
+        /*!\brief Создание нового типа категории*/
         int insertType(KKSType * t) const;
+        /*!\brief Создание нового типа информационного ресурса*/
         int insertIOType(KKSType * t) const;
+        /*!\brief Добавление атрибута в категорию*/
         int insertCategoryAttr(int idCategory, KKSCategoryAttr * a) const;
         
-        //работа с жизненным циклом
+        /*!\brief Создание нового состояния*/
         int insertState(KKSState * s) const;
+        /*!\brief Изменение характеристик состояния*/
         int updateState(KKSState * s) const;
+        /*!\brief Удаление состояния*/
         int deleteState(int idState) const;
+        /*!\brief Создание нового жизненного цикла*/
         int insertLifeCycle(KKSLifeCycleEx * lc) const;
+        /*!\brief Изменение характеристик жизненного цикла*/
         int updateLifeCycle(KKSLifeCycleEx * lc) const;
+        /*!\brief Удаление жизненного цикла*/
         int deleteLifeCycle(int idLifeCycle) const;
 
+        /*!\brief Добавление атрибута в заданный составной атрибут
+        */
         int insertAttrAttr(int idParentAttr, KKSCategoryAttr * aa) const;
+        
+        /*!\brief Метод сохраняет в БД атрибуты входящие в составной атрибут, заданный в качестве параметра
+
+        Если в БД у данного составного атрибута были иные входящие в него втрибуты, то они будут удалены
+        */
         int insertAttrAttrs(const KKSAttribute * a) const;
     
+        /*!\brief Изменение характеристик категории*/
         int updateCategory(const KKSCategory* c) const;
+        /*!\brief Изменение характеристик атрибута, входящего в категорию*/
         int updateCategoryAttr(int idCategory, KKSCategoryAttr * a) const;
+        /*!\brief Удаление категории*/
         int deleteCategory(KKSCategory* c) const;
 
+        /*!\brief Создание в БД нового шаблона визуализации*/
         int insertTemplate(KKSTemplate * t) const;
+        /*!\brief Изменение характеристик заданного шаблона визуализации*/
         int updateTemplate(const KKSTemplate * t) const;
+        /*!\brief Удаление заданного шаблона визуализации*/
         int deleteTemplate(KKSTemplate * t) const;
+        /*!\brief Удаление заданного шаблона визуализации*/
         int deleteTemplate(int idTemplate) const;
 
         int insertAclTemplate (KKSAccessEntity * at) const;
@@ -94,13 +125,21 @@ class _F_EXPORT KKSPPFactory
                        KKSDatabase * db);
         KKSDatabase * getDb() const;
 
-        //метод создает атрибут по заданным параметрам
-        //при этом проверяется наличие атрибута с аналогичным ИД в БД
-        //если таковой существует, то он загружается, и возвращается именно он.
-        //если атрибут был не создан а именно загружен, то параметр loaded устанавливается в TRUE
-        //в противном случае в FALSE
-        //если атрибут не загружен и при этом создать его не удалось 
-        //(указан неверный тип), то возвращается NULL
+        /*!\brief Метод создает атрибут по заданным параметрам.
+
+        При этом проверяется наличие атрибута с аналогичным ИД в БД.
+        если таковой существует, то он загружается, и возвращается именно он.
+        если атрибут был не создан а именно загружен, то параметр loaded устанавливается в TRUE
+        в противном случае в FALSE
+        если атрибут не загружен и при этом создать его не удалось 
+        (указан неверный тип), то возвращается NULL
+
+        \param id идентификатор атрибута
+        \param code код атрибута
+        \param name название атрибута
+        \param type тип атрибута
+        \param loaded если атрибут был не создан а именно загружен, то параметр loaded устанавливается в TRUE
+        */
         KKSAttribute * createAttribute(int id, 
                                    const QString & code, 
                                    const QString & name, 
@@ -116,12 +155,16 @@ class _F_EXPORT KKSPPFactory
         int deleteSearchGroup (int idGroup) const;
         int clearCriteriaGroup (int idGroup) const;
 
+        /*!\brief Создание нового шаблона поискового запроса*/
         int insertSearchTemplate (KKSSearchTemplate * st) const;
+        /*!\brief Изменение характеристик шаблона поискового запроса*/
         int updateSearchTemplate (KKSSearchTemplate * st) const;
+        /*!\brief Удаление шаблона поискового запроса*/
         int deleteSearchTemplate (int idSearchTemplate) const;
         
         int insertSearchTemplateType (KKSSearchTemplateType * t) const;
 
+        /*!\brief Создание поискового критерия*/
         int insertSearchCriterion (KKSFilter * f) const;
         int insertSearchCriterionIntoGroup (int idCriterion, int idGroup) const;
 
@@ -130,7 +173,7 @@ class _F_EXPORT KKSPPFactory
         friend class KKSSito;
         friend class KKSSitoWeb;
         friend class KKSObjEditorFactory;//чтобы напрямую пользовательские шаблоны обновить
-                                         //впринципе можно просто сделать эту функцию публичной
+                                         //в принципе можно просто сделать эту функцию публичной
         KKSPPFactory();
         ~KKSPPFactory();
 

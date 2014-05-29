@@ -11,6 +11,10 @@ class KKSResult;
 class KKSDatabase;
 class QWidget;
 
+/*!\ingroup FACTORY_GROUP
+
+\brief Класс для загрузки на сервер и выгрузки с сервера на клиент содержимого прикрепленных к информационным ресурсам файлов
+*/
 class _F_EXPORT KKSFileLoader : public QObject
 {
     Q_OBJECT   

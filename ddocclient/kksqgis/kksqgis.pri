@@ -22,7 +22,11 @@ headers.files += \
 
 
 include (legend/legend.pri)
-include (dn/dn.pri)
+
+win32{
+    include (dn/dn.pri)
+}
+
 include (layerprops/layerprops.pri)
 include (projectprops/projectprops.pri)
 include (maptools/maptools.pri)

@@ -837,12 +837,12 @@ KKSCategory * KKSLoader::loadCategory(int id, bool simplify) const
 
     return c;
 }
-
+/*
 KKSObject * KKSLoader::loadIO_id(int id, bool simplify) const
 {
     return loadIO(id, simplify);
 }
-
+*/
 KKSObject * KKSLoader::loadIO(int id, bool simplify) const
 {
     KKSObject * io = NULL;
@@ -7080,3 +7080,23 @@ QMap<int, QString> KKSLoader :: getPartLowInfoForStreams() const
     return list;
 }
 
+
+qint64 KKSLoader :: getIdObjectByRecordUID(const QString & uid)
+{
+    if(uid.isEmpty())
+        return 0;
+
+    QString sql = QString("select getIdObjectByRecordUID('%1')").arg(uid);
+    KKSResult * res = db->execute(sql);
+    if(!res || res->getRowCount() <= 0){
+        if(res)
+            delete res;
+
+        return 0;
+    }
+
+    qint64 idObject = res->getCellAsInt64(0, 0);
+    delete res;
+
+    return idObject;
+}

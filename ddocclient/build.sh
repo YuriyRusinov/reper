@@ -2,6 +2,7 @@
 QTDIR=/usr/lib/qt4
 
 PROJECT_NAME=DynamicDocs
+PROJECT_PRO_FILE=ddocclient.pro
 
 QTINC=$QTDIR/include
 QTLIB=$QTDIR/lib
@@ -26,7 +27,7 @@ rm -f ./kksutils/configEndians.h
 
 BUILD_OK=0
 
-$QTBINDIR/qmake -recursive &&
+$QTBINDIR/qmake -recursive $PROJECT_PRO_FILE &&
 make > ./errors.log &&
 sudo make install &&
 BUILD_OK=1
@@ -58,7 +59,8 @@ fi
 mkdir -p ./sbin
 #chown $USER:$GROUP $PREFIX/sbin
 
-printf "LD_LIBRARY_PATH=../lib:$QTDIR/lib;export LD_LIBRARY_PATH" > ./ddocclient.ld.so.conf
+#printf "LD_LIBRARY_PATH=../lib:$QTDIR/lib;export LD_LIBRARY_PATH" > ./ddocclient.ld.so.conf
+printf "LD_LIBRARY_PATH=../lib;export LD_LIBRARY_PATH" > ./ddocclient.ld.so.conf
 
 
 cd ./bin

@@ -5,7 +5,15 @@ TEMPLATE = subdirs
 include(./ddocclient.conf)
 
 qgis{
-    SUBDIRS += kksqgis app/reper_ksa
+    SUBDIRS += \
+        kksutils \
+        dataaccess \
+        kkspp \
+        kksfactory \
+        kkscore \
+        kkspluginmanager \
+        kksqgis \
+        app/reper_ksa
 }
 
 RESOURCES = ./ddocs_ico/ddocs_icon_set.qrc

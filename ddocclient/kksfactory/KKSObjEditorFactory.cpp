@@ -2732,12 +2732,10 @@ void KKSObjEditorFactory :: slotShowIOEditor(QWidget * parent, const QString & u
 
     qint64 idRecord = parts.at(2).toLongLong();
 
-	QString table = parts.at(1);
-	parts = table.split("_");
-	if(parts.count() != 3)
-		return;
+    int idObject = loader->getIdObjectByRecordUID(uid);
+    if(idObject <= 0)
+        return;
 
-	int idObject = parts.at(2).toInt();
     QString s;
 
     editExistOE(parent, idObject, idRecord, NULL, s, 0, true);

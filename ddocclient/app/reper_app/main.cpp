@@ -14,9 +14,9 @@
 #include "kkssito.h"
 #include "kksclient_name.h"
 
-//#ifdef __USE_QGIS__ 
-//#include <QgsApplication.h>
-//#endif
+#ifdef __USE_QGIS__ 
+#include <qgsapplication.h>
+#endif
 
 int main(int argc, char *argv[])
 {

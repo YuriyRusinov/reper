@@ -39,6 +39,9 @@ class KKSTemplate;
 class KKSEIOData;
 class KKSObject;
 
+/*!\ingroup FACTORY_GROUP
+\brief Класс для формирования визуальных элементов для редактирования рубрик и рубрикаторов
+*/
 class _F_EXPORT KKSRubricFactory : public KKSEntityFactory
 {
     public:

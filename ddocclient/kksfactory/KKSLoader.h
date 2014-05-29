@@ -5,6 +5,18 @@
  * Purpose: Declaration of the class KKSLoader
  ***********************************************************************/
 
+/*!\defgroup FACTORY_GROUP Подсистема управления данными
+
+Содержит классы-фабрики, которые отвечают за:
+- загрузку данных из ДЗ, формирование объектной модели данных на клиенте, которая соответствует структурам данных в БД (классы KKSLoader, KKSFileLoader)
+- сохранение (создание, удаление, модификацию) данных в БД (классы KKSPPFactory, KKSEIOFactory)
+- формирование визуальных элементов управления информационными ресурсами (классы KKSAttributesFactory, KKSObjEditorFactory)
+- формирование визуальных элементов для отображения табличных данных (класс KKSViewFactory)
+- формирование визуальных элементов для редактирования атрибутов и категорий (классы KKSCatEditor, KKSTemplateEditorFactory)
+- формирование визуальных элементов для редактирования рубрик (класс KKSRubricFactory)
+- мониторинг предназначенных для пользователя сообщений и распоряжений (KKSJMonitor)
+*/
+
 #if !defined(__KKSSITOOOM_KKSLoader_h)
 #define __KKSSITOOOM_KKSLoader_h
 
@@ -50,28 +62,44 @@ class KKSIndicatorValue;
 class KKSIndicatorType;
 class KKSIndicator;
 
+/*!\ingroup FACTORY_GROUP
+\class KKSLoader
+\brief Класс для загрузки данных из БД
+*/
 class _F_EXPORT KKSLoader
 {
     public:
-        //возвращает набор возможных значений из справочника
-        //для атрибутов типа atList и atParent
-        //возвращаются в виде QMap, где ключом является 
-        //идентификатор (поле id ) соответствующего значения в таблице соответствующего справочника
-        //если второй параметр задан как TRUE - 
-        //будет произведена сортировка значений по алфавиту по возрастанию A->Z
+        /*!\brief Возвращает набор возможных значений из справочника
+        для атрибутов типа atList и atParent
+        
+        
+        Данные возвращаются в виде QMap, где ключом является 
+        идентификатор (поле id ) соответствующего значения в таблице соответствующего справочника
+        если четвертый параметр задан как TRUE - 
+        будет произведена сортировка значений по алфавиту по возрастанию A->Z.
+        
+        Последний параметр возврашает значения 
+        поля, на которое в действительности ссылается атрибут
+        Бывают случаи, когда реальный reference в таблице идет 
+        не на поле id, а на некоторое другое.
+        Такое возможно, если структура БД разрабатывалась вне DynamicDocs
+        В этом случае поле id в таблицах всегда есть, и оно уникально
+        Наличие или отсутствие значения в данном параметре определяется
+        наличием или отсутствием параметра refColumnName
+
+        \param a атрибут
+        \param refColumnValues  сюда попадут значения ключевого поля для каждого из возможных значений
+        \param isXml имеется ли в справочнике поле, для которого задан тип XML
+        \param orderByValue признак сортировки значений по алфавиту по возрастанию A->Z
+        \param tableName зарезервировано
+        \param filters фильтры (критерии), которым должны удовлетворять данные, чтобы попасть в результат
+        */
         QMap<int, QString> loadAttributeValues(const KKSAttribute * a,
                                                QMap<int, QString> & refColumnValues, // = QMap< int, QString > ()
                                                bool isXml = false,
                                                bool orderByValue = true,
                                                QString tableName = QString::null,
-                                               const KKSList<const KKSFilterGroup* > filters = KKSList<const KKSFilterGroup* > ()) const;//последний параметр возврашает значения 
-                                                                                                                  //поля, на которое в действительности ссылается атрибут
-                                                                                                                  //Бывают случаи, когда реальный reference в таблице идет 
-                                                                                                                  //не на поле id, а на некоторое другое
-                                                                                                                  //Такое возможно, если структура БД разрабатывалась вне DynamicDocs
-                                                                                                                  //В этом случае поле id в таблицах всегда есть, и оно уникально
-                                                                                                                  //Наличие или отсутствие значения в данном параметре определяется
-                                                                                                                  //наличием или отсутствием параметра refColumnName
+                                               const KKSList<const KKSFilterGroup* > filters = KKSList<const KKSFilterGroup* > ()) const;
    
         KKSList<KKSTemplate*> loadCategoryTemplates(int idCategory, bool bWithAllMandatories = false) const;
         KKSList<KKSTemplate*> loadCategoryTemplates(KKSCategory * c, bool bWithAllMandatories = false) const;
@@ -79,46 +107,97 @@ class _F_EXPORT KKSLoader
 
         KKSList<KKSStatElement *> loadIOStatistic(int id) const;
         
-        //параметр simplify определяет загружаются или не загружаются все характеристики ИО
-        //Если указано true, то загружаются только системные атрибуты ИО и информация о категории.
-        //в случае с true целесообразно использовать для внутренних целей, 
-        //в частности для ускорения загрузки различных списков и т.п.
+        /*!\brief Загрузка категории из БД
+        
+        Параметр simplify определяет загружаются или не загружаются все характеристики категории
+        Если указано true, то загружаются только системные атрибуты категории.
+        в случае с true целесообразно использовать для внутренних целей, 
+        в частности для ускорения загрузки различных списков и т.п.
+
+        \param id идентификатор категории
+        \param simplify загрузить только системные данные
+        */
         KKSCategory * loadCategory(int id, bool simplify = false) const;
 
+        /*!\brief Загрузка информационного ресурса из БД
+        
+        Параметр simplify определяет загружаются или не загружаются все характеристики информационного ресурса.
+        Если указано true, то загружаются только его системные атрибуты ИО и информация о категории.
+        в случае с true целесообразно использовать для внутренних целей, 
+        в частности для ускорения загрузки различных списков и т.п.
+
+        \param id идентификатор информационного ресурса
+        \param simplify загрузить только системные данные
+        */
         KKSObject * loadIO(int id, bool simplify = false) const;
-        KKSObject * loadIO_id(int id, bool simplify = false) const;
-        //метод возвращает информационный объект, который описывает справочник,
-        //хранящий свои записи в таблице tableName
-        //Если таблица tableName не соответствует ни одному справочнику
-        //то возвращается NULL
+        //KKSObject * loadIO_id(int id, bool simplify = false) const;
+        
+        
+        /*!\brief Метод возвращает информационный объект, который описывает справочник,
+        хранящий свои записи в таблице tableName.
+
+        Если таблица tableName не соответствует ни одному справочнику, то возвращается NULL
+        Параметр simplify определяет загружаются или не загружаются все характеристики информационного ресурса.
+        Если указано true, то загружаются только его системные атрибуты ИО и информация о категории.
+        в случае с true целесообразно использовать для внутренних целей, 
+        в частности для ускорения загрузки различных списков и т.п.
+
+        \param tableName название таблицы справочника
+        \param simplify загрузить только системные данные
+        */
         KKSObject * loadIO(const QString & tableName, bool simplify = false) const;
 
+        /*!\brief Метод возвращает запись справочника
+        
+        \param id идентификатор записи справочника в заданном справочнике
+        \param io информационный ресурс типа справочник, из которого загружается запись
+        \param c0 зарезервировано
+        \param table зарезервировано
+        \param simplify загрузить только системные данные
+        */
         KKSObjectExemplar * loadEIO(qint64 id, 
 									const KKSObject * io, 
 									const KKSCategory *c0=0, 
 									const QString& table=QString(),
 									bool simplify = true) const;
-        //метод производит загрузку всех ЭИО данного ИО (в соответствии с фильтрами. 
-        //Фильтры применимы только к таблице, содержащей экземпляры ИО).
-        //Возвращается KKSMap, который в качестве ключа содержит идентификатор ЭИО
-        //а в качестве значения - объект KKSEIOData, который содержит KKSMap<QString, QString>
-        //где в качестве ключа выступает код атрибута (см. KKSAttribute::code() ), а в качестве значения - значение атрибута
+        
+        /*!\brief Метод производит загрузку всех ЭИО данного ИО (в соответствии с фильтрами. 
+        
+        Фильтры применимы только к таблице, содержащей экземпляры ИО).
+        Возвращается KKSMap, который в качестве ключа содержит идентификатор ЭИО,
+        а в качестве значения - объект KKSEIOData, который содержит KKSMap<QString, QString>
+        где в качестве ключа выступает код атрибута (см. KKSAttribute::code() ), а в качестве значения - значение атрибута
+
+        \param io информационный ресурс типа справочник, из которого загружаются записи
+        \param filters фильтры
+
+        \sa loadEIOList1
+        */
         KKSMap<qint64, KKSEIOData *> loadEIOList(const KKSObject * io, 
                                               const KKSList<const KKSFilterGroup *>& filters = KKSList<const KKSFilterGroup*>()) const;
 
         KKSMap<qint64, KKSEIOData *> loadEIOList(const KKSCategory * c0,
                                               const QString& tableName,
                                               const KKSList<const KKSFilterGroup *>& filters = KKSList<const KKSFilterGroup*>(),
-                                              bool isSys = false) const;//если true, то загружаются данные из системного справлчника, а значит у них нет полей uuid_t, id_state
+                                              bool isSys = false) const;//если true, то загружаются данные из системного справочника, а значит у них нет полей uuid_t, id_state
         
+        /*!\brief Метод загружает список информационных ресурсов (или записей справочников), входящих в указанную рубрику
+
+        \param r рубрика
+        */
         KKSMap<qint64, KKSEIOData *> loadRecList (const KKSRubric * r) const;
         KKSMap<qint64, KKSEIOData *> loadRecList (QList<qint64> ids) const;
         
         KKSEIOData * loadEIOInfo (int idObject, qint64 idRec) const;
         
-        //
-        // просто данные в этих методах возвращаются в виде QList, а не QMap
-        //
+        /*!\brief Метод возвращает список записей указанного справочника в соответствии с фильтрами
+        
+        Просто данные возвращаются в виде QList, а не QMap
+        \param io информационный ресурс типа справочник, из которого загружаются записи
+        \param filters фильтры
+
+        \sa loadEIOList
+        */
         KKSList<KKSEIOData *> loadEIOList1(const KKSObject * io, 
                                            const KKSList<const KKSFilterGroup *>& filters = KKSList<const KKSFilterGroup*>()) const;
 
@@ -127,66 +206,113 @@ class _F_EXPORT KKSLoader
                                            const KKSList<const KKSFilterGroup *>& filters = KKSList<const KKSFilterGroup*>(),
                                            bool isSys = false) const;//если true, то загружаются данные из системного справлчника, а значит у них нет полей uuid_t, id_state
         
+        /*!\brief Загрузить доступные типы файлов, которые можно прикрепить к информационным ресурсам и записям справочников
+        */
         KKSList<KKSFileType *> loadFileTypes() const;
+        /*!\brief Загрузить расширения файлов, ассоциированные с заданным типом файлов
+        */
         KKSList<KKSFileExtention*> loadFileExtentions(int idFileType) const;
+        /*!\brief Загрузить тип категории
+        */
         KKSType * loadType(int id) const;
+        /*!\brief Загрузить тип информационного ресурса
+        */
         KKSType * loadIOType(int id) const;
+        /*!\brief Загрузить доступные типы категорий
+        */
         KKSMap<int, KKSType *> loadAvailableTypes (void) const;
+        /*!\brief Метод загружает из БД атрибут с указанным идентификатором
+        */
         KKSAttribute * loadAttribute(int id) const;
+        /*!\brief Метод загружает из БД атрибут с указанным кодом, который является ссылкой на указанный справочник.
+
+        Пара код атрибута и название таблицы справочника является уникальной
+        \param code код атрибута (название колонки в таблице справочника)
+        \param tableName название таблицы справочника, на который ссылается атрибут
+        */
         KKSAttribute * loadAttribute(const QString & code, const QString & tableName) const;
+        /*!Загрузить тип атрибута
+
+        \param id идентификатор типа атрибута, который надо загрузить
+        */
         KKSAttrType * loadAttrType(int id) const;
         KKSAttrType * loadAttrType(KKSAttrType::KKSAttrTypes type) const;
         KKSSyncType * loadSyncType(int id) const;
 
-        //работа с жизненным циклом
+        /*!\brief Загрузить жизненный цикл с заданным идентификатором
+        */
         KKSLifeCycleEx * loadLifeCycle(int idLifeCycle) const;
+        /*!\brief Загрузить состояние с заданным идентификатором
+        */
         KKSState * loadState(int id) const;
         KKSList<KKSState * > loadStates() const;
+        /*!\brief Загрузить состояния, входящие в указанный жизненный цикл
+        */
         KKSList<KKSState * > loadStates(int idLifeCycle) const;
 
+        /*!\brief Загрузить описания дополнительных таблиц справочника
+        */
         KKSMap<int, KKSAddTable *> loadIOTables (KKSObject * io) const;
 
         void setDb(KKSDatabase * db);
         KKSDatabase * getDb() const;
 
-        //метод возвращает идентификатор текущего должностного лица
-        //под которым в данный момент происходит работа пользователя
+        /*!\brief Метод возвращает идентификатор текущего должностного лица,
+        под которым в данный момент происходит работа пользователя
+        */
         int getDlId() const;
+        /*!\brief Возвращается идентификатор текущего пользователя
+        */
         int getUserId(void) const;
+        /*!\brief Возвращается имя должностного лица, под которым происходит работа текущего пользователя
+        */
         QString getDlName() const;
+        /*!\brief Возвращается имя текущего пользователя
+        */
         QString getUserName() const;
         bool isLocalDl (int idDl) const;
         bool isPublicDl (int idDl) const;
 
-        //Возвращается почтовое сообщение в виде KKSObjectExemplar
+        /*!\brief Возвращается почтовое сообщение в виде KKSObjectExemplar
+        */
         KKSObjectExemplar * getMessage(int idMsg) const;
 
-        //Возвращается распоряжение в виде KKSObjectExemplar
+        /*!\brief Возвращается распоряжение в виде KKSObjectExemplar
+        */
         KKSObjectExemplar * getCommand(int idCmd) const;
 
-        int getLocalOrgId() const; //метод возвращает идентификатор локальной организации
-                                   //или -1, если локальная организация еще не создана
-                                   //в последнем случае работа оператора становится невозможной
-                                   //администратор должен сначала создать ОШС организации
+        /*!\brief Метод возвращает идентификатор локальной организации
+
+        или -1, если локальная организация еще не создана
+        в последнем случае работа оператора становится невозможной
+        администратор должен сначала создать ОШС организации
+        */
+        int getLocalOrgId() const; 
         int getOrgId (void) const;
         QString getOrgName (void) const;
         QByteArray getOrgLogo (void) const;
         QString getOrgModeName (void) const;
 
-        //метод возвращает текущий гриф секретности пользователя
+        /*!\brief метод возвращает текущий гриф секретности пользователя
+        */
         QString getCurrMacLabelName() const;
         int getCurrMacLabelId() const;
-        //метод определяет, можно ли задать данный гриф секретности текущему документу, 
-        //находясь в текущем уровне доступа (getCurrMacLabelName())
+        /*!\brief метод определяет, можно ли задать данный гриф секретности текущему документу, 
+        находясь в текущем уровне доступа (getCurrMacLabelName())
+        */
         bool canChangeMac(int idMaclabel) const;
-        //метод меняет текущий уровень доступа пользователя, 
-        //если пользователь имеет право на такуцю операцию
+        /*!\brief метод меняет текущий уровень доступа пользователя, 
+        если пользователь имеет право на такуцю операцию
+        */
         int setCurrentMaclabel(int idMaclabel) const;
         
-        //методы возвращают идентификаторы ролей, 
-        //которые определяют начальника и подразделение 
-        //текущего должностного лица
+        /*!\brief метод возвращает идентификатор роли, 
+        которая определяет начальника текущего должностного лица
+        */
         int getMyBoss() const;
+        /*!\brief метод возвращает идентификатор роли, 
+        которая определяет подразделение текущего должностного лица
+        */
         int getMyUnit() const;
         QList<int> getBossList(int idUser) const;
         QList<int> getUnitList(int idUser) const;
@@ -199,18 +325,24 @@ class _F_EXPORT KKSLoader
 
         bool getPrivilege(int idRole, int idObject, int whatPrivilege, bool withInherit) const;
 
-        //метод загружает рубрикаторы, доступные текущему пользователю.
-        //Если параметр задан как TRUE, то озвращается только рубрикатор "Мои документы" для текущего пользователя
+        /*!\brief метод загружает рубрикаторы, доступные текущему пользователю.
+
+        Если параметр задан как TRUE, то озвращается только рубрикатор "Мои документы" для текущего пользователя
+        */
         KKSRubric * loadRubricators(bool bOnlyMyDocs) const;
         KKSRubricBase * loadCatRubricators(void) const;
         KKSRubric * loadRubric (int idRubr, bool withInherit = false) const;
         KKSRubric * loadRecRubric (qint64 idRubric, bool withInherit = false) const;
 
-        //метод загружает перечень атрибутов, которые заданы (используются) хотя бы одному информационному объекту
-        //т.е. на них есть ссылки в таблице attrs_values
+        /*!\brief Метод загружает перечень атрибутов, которые заданы (используются) хотя бы одному информационному объекту
+
+        т.е. на них есть ссылки в таблице attrs_values
+        */
         KKSMap<int, KKSAttribute*> loadIOUsedAttrs() const;
 
         KKSList<KKSSearchTemplate *> loadSearchTemplates (void) const;
+        /*!\brief Метод возвращает шаблон поискового запроса с заданным идентификатором
+        */
         KKSSearchTemplate * loadSearchTemplate (int idSearchTemplate) const;
         KKSMap<int, KKSSearchTemplateType *> loadSearchTemplateTypes() const;
         KKSMap<qint64, KKSSearchTemplate *> loadSearchTemplatesByType (KKSSearchTemplateType * stt) const;
@@ -223,6 +355,11 @@ class _F_EXPORT KKSLoader
         KKSMap<int, KKSAGroup *> loadAttrsGroups (void) const;
         KKSMap<int, KKSAGroup *> loadAvailAttrsGroups (void) const;
         
+        /*!\brief Метод возвращает историю изменения значений атрибута
+
+        \param av атрибут
+        \param forRecords если true, то считается, что рассматривается атрибут-показатель записи справочника
+        */
         KKSList<KKSAttrValue *> loadIOAttrValueHistory(const KKSAttrValue * av, bool forRecords = false) const;
         KKSAttrValue * loadIOAttrValue(const KKSAttrValue * av, int idVal, bool forRecords = false) const;
         
@@ -230,8 +367,20 @@ class _F_EXPORT KKSLoader
         KKSIndicator * loadIndicator (int idIndicator) const;
         KKSMap<int, KKSIndicatorType *> loadIndicatorTypes (void) const;
 
+        /*!\brief Метод загружает атрибуты, входящие в состав составного атрибута. 
+        
+        Изначально метод loadAttribute(), если атрибут составной, не загружает список атрибутов, входящих в него. Это сделано с целью ускорения работы.
+        */
         void loadAttrAttrs(KKSAttribute * a) const;
+        /*!\brief Метод загружает и возвращает атрибуты, входящие в состав составного атрибута, заданного своим идентификатором. 
+        
+        */
         KKSMap<int, KKSCategoryAttr*> loadAttrAttrs(int idAttr) const;
+        /*!\brief Метод загружает знаечения атрибутов входящие в состав значения составного атрибута
+
+        \param av значение составного атрибута
+        \param forRecords если true, то считается, что рассматривается атрибут-показатель записи справочника
+        */
         KKSMap<qint64, KKSAttrValue *> loadAttrAttrValues(KKSAttrValue * av, bool forRec = false) const;
         
         QList<int> getForbiddenTypes (void) const;
@@ -239,6 +388,9 @@ class _F_EXPORT KKSLoader
         int getRefIO (int idObjectE) const;
         
         qint64 getIdByUID (const QString& tableName, const QString& uid) const;
+        /*!\brief Метод возвращает идентификатор информационного ресурса типа справочник, в который входит запись с указанным уникальным идентификатором
+        */
+        qint64 getIdObjectByRecordUID(const QString & uid);
         
         bool isApplicable (KKSSearchTemplate * st, int idCategory) const;
         

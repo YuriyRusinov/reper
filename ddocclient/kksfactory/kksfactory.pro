@@ -19,7 +19,7 @@ DEPENDPATH *= ../kkspp \
 LIBS *= -L$$DESTDIR -lkksutils -ldataaccess -lkkspp -lkksgui -lrptrenderer -lkkspluginmanager
 
 unix {
-LIBS += -lcurses
+#LIBS += -lcurses
 }
 CONFIG += qt
 

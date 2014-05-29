@@ -998,7 +998,9 @@ int KKSSito::GUIConnect(QWidget * parent)
     }
     
     QString serverVersion = res->getCellAsString(0, 0);
-    if(serverVersion != QString(KKS_VERSION)){
+    QString clientVersion = QString(KKS_VERSION);
+    clientVersion = clientVersion.split("-").at(0);
+    if(serverVersion != clientVersion){
         if(res)
             delete res;
         m_db->disconnect();
@@ -1007,12 +1009,12 @@ int KKSSito::GUIConnect(QWidget * parent)
         
         qCritical() <<        tr("Current version of your client software is %1,\n"
                               "Current version of server you connected to is %2.\n\n"
-                              "Further work is impossible. You should use equal versions of client and server software").arg(KKS_VERSION).arg(serverVersion);
+                              "Further work is impossible. You should use equal versions of client and server software").arg(clientVersion).arg(serverVersion);
         QMessageBox::critical(parent, 
                               tr("Database version mismatch"), 
                               tr("Current version of your client software is %1,\n"
                               "Current version of server you connected to is %2.\n\n"
-                              "Further work is impossible. You should use equal versions of client and server software").arg(KKS_VERSION).arg(serverVersion),
+                              "Further work is impossible. You should use equal versions of client and server software").arg(clientVersion).arg(serverVersion),
                               QMessageBox::Ok, QMessageBox::NoButton);
         return ERROR_CODE;
     }

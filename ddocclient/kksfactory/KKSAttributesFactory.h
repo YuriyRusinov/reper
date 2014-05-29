@@ -39,6 +39,10 @@ class KKSAttrType;
 class KKSObject;
 class KKSEIOData;
 
+/*!\ingroup FACTORY_GROUP
+
+\brief Класс для формирования визуальных элементов компоновки значений атритутов в редакторе информационных ресурсов
+*/
 class _F_EXPORT KKSAttributesFactory : public KKSEntityFactory
 {
 public:

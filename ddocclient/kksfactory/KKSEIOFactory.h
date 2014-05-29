@@ -27,7 +27,10 @@ class KKSPPFactory;
 
 class QProgressDialog;
 
-class _F_EXPORT KKSEIOFactory
+/*!\ingroup FACTORY_GROUP
+
+\brief Класс для управления (создания, изменения, удаления) в БД записями справочников
+*/class _F_EXPORT KKSEIOFactory
 {
 public:
 

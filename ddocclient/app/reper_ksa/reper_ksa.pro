@@ -9,17 +9,30 @@ TARGET = reper_ksa
 
 DESTDIR = ../../build
 
-INCLUDEPATH +=  . \
-                ../../dataaccess \
-                ../../kksutils \
+INCLUDEPATH += 	. \
+		../../dataaccess \
+		../../kkscore/base_classes \
+		../../kkscore/ui \
+		../../kkscore \
+		../../kksutils \
+                ../../kkspluginmanager \
+                ../../kkspp \
+                ../../kksfactory \
                 ../../kksqgis
 
 
 DEPENDPATH += 	\
-                . \
-                ../../dataaccess \
-                ../../kksutils \
+		. \
+		../../dataaccess \
+		../../kkscore \
+                ../../kkspluginmanager \
+		../../kksutils \
+                ../../kkspp \
+                ../../kksfactory \
                 ../../kksqgis
+
+LIBS += -L$$DESTDIR -ldataaccess -lkkscore -lkksutils -lkkspluginmanager -lkkspp -lkksfactory
+
 
 #LIBS += -L$$DESTDIR -ldataaccess -lkksutils -lkksrunservice
 qgis{

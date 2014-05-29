@@ -45,8 +45,10 @@ unix {
 	target.path = $$KKS_LIB_DIR 
 }
 
+headers.path = $$KKS_INCLUDE_DIR
 
-INSTALLS += target headers
+INSTALLS += target
+INSTALLS += headers
 win32{
 	INSTALLS += implib
 }

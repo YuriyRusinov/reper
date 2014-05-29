@@ -43,6 +43,10 @@ class KKSRecDialog;
 class kkslifecycleform;
 class KKSLifeCycleEx;
 
+/*!\ingroup FACTORY_GROUP
+
+\brief Класс для формирования визуальных элементов для редактора атрибутов и категорий
+*/
 class _F_EXPORT KKSCatEditorFactory : public KKSEntityFactory
 {
     public:

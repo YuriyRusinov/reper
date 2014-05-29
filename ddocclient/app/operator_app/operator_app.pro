@@ -63,7 +63,7 @@ qgis{
         LIBS *= -L$$OSGEODIR/lib  -lproj_i -lgdal_i -lsqlite3_i
     }
     else{
-        LIBS *= -L$$OSGEODIR/lib  -lproj -lgdal -lsqlite3
+        LIBS *= -L$$OSGEODIR/lib  -lproj -lgdal -lsqlite3 -lgeos_c -lspatialindex -lqwt -lspatialite
     }
 }
 

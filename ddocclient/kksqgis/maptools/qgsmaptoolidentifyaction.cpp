@@ -104,6 +104,27 @@ void QgsMapToolIdentifyAction::canvasReleaseEvent( QMouseEvent *e )
 
   if ( !results.isEmpty() )
   {
+    //ksa
+    //пробуем открыть форму DynamicDocs, если определился только один объект и он является объектом слоя DynamicDocs
+    if(results.size() == 1){
+      QgsFeature f = results.at(0).mFeature;
+      const QgsFields * fields = f.fields();
+
+      //если поле unique_id присутствует, то считаем, что слой из нашей БД. Поэтому показываем нашу форму информационного ресурса
+      int indx = fields->indexFromName("unique_id");
+      if(indx > -1){
+          
+          QVariant v = f.attribute("unique_id");
+          if(v.type() == QVariant::Invalid){
+              return;
+          }
+
+          mWorkingWidget->showIOEditor(mCanvas, v.toString());//unique_id value
+          
+          return;
+      }
+    
+    }
     // Show the dialog before items are inserted so that items can resize themselves
     // according to dialog size also the first time, see also #9377
     if ( results.size() != 1 || !QSettings().value( "/Map/identifyAutoFeatureForm", false ).toBool() )

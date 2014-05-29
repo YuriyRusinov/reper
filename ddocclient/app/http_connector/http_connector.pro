@@ -50,9 +50,9 @@ QT += network
 !exists ($${DESTDIR}/http.ini) {
 system (cp http.ini.example $${DESTDIR}/http.ini)
 }
-DISTFILES *= $${DESTDIR}/interactor.ini
 
-target.files *= $${DISTFILES}
+DISTFILES = $${DESTDIR}/http_connector $${DESTDIR}/http.ini
+
+target.files = $${DISTFILES}
 target.path = $$KKS_EXEC_DIR
 INSTALLS += target
-

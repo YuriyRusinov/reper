@@ -1,5 +1,7 @@
 #include "map_window.h"
 #include "kksgiswidget.h"
+#include "kkssito.h"
+#include "kkspluginloader.h"
 
 MapWindow::MapWindow(QWidget* parent, Qt::WFlags fl)
     : QMainWindow(parent,fl)
@@ -76,6 +78,11 @@ MapWindow::MapWindow(QWidget* parent, Qt::WFlags fl)
     addToolBar(mpToolBars.value("mpLayerToolBar"));
     addToolBar(mpToolBars.value("mpTaskToolBar"));
 
+    KKSPluginLoader * pLoader = kksSito->pluginLoader();
+    
+    QList<QObject * > * plugins = pLoader->getPlugins();
+
+
     statusBar()->showMessage("ПК Репер готов к работе.");
 }
 
@@ -127,3 +134,12 @@ void MapWindow::SLOTmpActionChangeTitle()
     setWindowTitle(mpKKSGISWidget->windowTitle());
 }
 
+
+/*
+void KKSMainWindow::slotSettings()
+{
+    KKSSettings * s = kksSito->getKKSSettings();
+    if(s)
+        s->editSettings(this);
+}
+*/
