@@ -5,14 +5,16 @@ TEMPLATE = subdirs
 include(./ddocclient.conf)
 
 qgis{
+
     SUBDIRS += \
         kksutils \
         dataaccess \
+        kksqgis \
         kkspp \
+        kksgui \
+        kkspluginmanager \
         kksfactory \
         kkscore \
-        kkspluginmanager \
-        kksqgis \
         app/reper_ksa
 }
 
