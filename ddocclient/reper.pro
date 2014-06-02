@@ -8,9 +8,12 @@ qgis{
 
     SUBDIRS += \
         kksutils \
+        kksqwt \
         dataaccess \
         kksqgis \
         kkspp \
+        rptrenderer \
+        openrpt \
         kksgui \
         kkspluginmanager \
         kksfactory \
