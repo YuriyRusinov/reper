@@ -3,6 +3,7 @@
 #include <QtPlugin>
 
 #include <KKSObject.h>
+#include <kksdatabase.h>
 
 #include "radio_image_plugin.h"
 
@@ -27,7 +28,21 @@ void RadioImagePlugin :: setAction( QAction * _action)
 
 void RadioImagePlugin :: runPlug (void)
 {
-    QMessageBox::information (0, tr("Radio image"), tr ("Radio image test"));
+    if (!m_fManager)
+    {
+        QMessageBox::information (0, tr("Radio image"), tr ("Radio image test"));
+        return;
+    }
+    KKSDatabase * db = m_fManager->db();
+    if (!db->connected())
+    {
+        int res=m_fManager->GUIConnect(0);
+        if (res < 0)
+        {
+            QMessageBox::warning (0, tr("Connect to db"), tr ("Cannot connect to database"), QMessageBox::Ok);
+            return;
+        }
+    }
     return;
 }
 

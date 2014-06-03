@@ -32,13 +32,14 @@ ReperMainWindow :: ReperMainWindow (QWidget * parent, Qt::WindowFlags flags)
             aPlug->setIcon (QIcon (kksBaseP->getPixmap()));
             plugMenu->addAction (aPlug);
             kksBaseP->setAction (aPlug);
-/*            if (qobject_cast<RadioImagePlugin *>(plug))
+            if (qobject_cast<RadioImagePlugin *>(plug))
             {
                 //isRadIm = true;
                 RadioImagePlugin * rImPlug = qobject_cast<RadioImagePlugin *>(plug);
-                rImPlug->setAction (UI->actRLI);
+                rImPlug->setFactoryManager (kksSito);
+                //rImPlug->setAction (UI->actRLI);
             }
-*/
+
         }
         UI->actPlugins->setMenu (plugMenu);
     }
