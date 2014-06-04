@@ -1,0 +1,74 @@
+<ui version="4.0" >
+ <class>cmd_journal_form</class>
+ <widget class="QWidget" name="cmd_journal_form" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>791</width>
+    <height>346</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Журнал входящих и исходящих распоряжений</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout" >
+   <item row="0" column="0" colspan="2" >
+    <widget class="QTreeWidget" name="treeWidget" >
+     <column>
+      <property name="text" >
+       <string>№ п/п</string>
+      </property>
+     </column>
+     <column>
+      <property name="text" >
+       <string>Тело сообщения</string>
+      </property>
+     </column>
+     <column>
+      <property name="text" >
+       <string>Название прикрепленного документа</string>
+      </property>
+     </column>
+     <column>
+      <property name="text" >
+       <string>Категория документа</string>
+      </property>
+     </column>
+     <column>
+      <property name="text" >
+       <string>Отправитель</string>
+      </property>
+     </column>
+     <column>
+      <property name="text" >
+       <string>Получатель</string>
+      </property>
+     </column>
+     <column>
+      <property name="text" >
+       <string>Дата отправки</string>
+      </property>
+     </column>
+     <column>
+      <property name="text" >
+       <string>Время отправки</string>
+      </property>
+     </column>
+     <column>
+      <property name="text" >
+       <string>Дата получения</string>
+      </property>
+     </column>
+     <column>
+      <property name="text" >
+       <string>Время получения</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
