@@ -1,1 +1,0 @@
-#undef WORDS_BIGENDIAN 

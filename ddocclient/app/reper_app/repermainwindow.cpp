@@ -1,6 +1,6 @@
 #include <QMdiArea>
 
-#include "kkssito.h"
+#include "kkscoreapplication.h"
 #include <kksdatabase.h>
 #include <kkspluginloader.h>
 #include <kksbaseplugin.h>
@@ -16,7 +16,7 @@ ReperMainWindow :: ReperMainWindow (QWidget * parent, Qt::WindowFlags flags)
     UI->setupUi (this);
     this->setCentralWidget (m_mdiArea);
 
-    KKSPluginLoader * pLoader = kksSito->pluginLoader();
+    KKSPluginLoader * pLoader = kksCoreApp->pluginLoader();
     QList<QObject*> * plugins = pLoader->getPlugins();
     if (plugins)
     {
@@ -32,13 +32,16 @@ ReperMainWindow :: ReperMainWindow (QWidget * parent, Qt::WindowFlags flags)
             aPlug->setIcon (QIcon (kksBaseP->getPixmap()));
             plugMenu->addAction (aPlug);
             kksBaseP->setAction (aPlug);
+            kksBaseP->setFactoryManager (kksCoreApp);
+            /*
             if (qobject_cast<RadioImagePlugin *>(plug))
             {
                 //isRadIm = true;
                 RadioImagePlugin * rImPlug = qobject_cast<RadioImagePlugin *>(plug);
-                rImPlug->setFactoryManager (kksSito);
+                rImPlug->setFactoryManager (kksCoreApp);
                 //rImPlug->setAction (UI->actRLI);
             }
+            */
 
         }
         UI->actPlugins->setMenu (plugMenu);
@@ -61,12 +64,12 @@ ReperMainWindow :: ~ReperMainWindow (void)
 
 void ReperMainWindow :: slotConnect (void)
 {
-    int res = kksSito->GUIConnect(this);
+    int res = kksCoreApp->GUIConnect(this);
 }
 
 void ReperMainWindow :: slotDisconnect (void)
 {
-    kksSito->db()->disconnect();
+    kksCoreApp->db()->disconnect();
 }
 
 void ReperMainWindow :: slot3DMod (void)

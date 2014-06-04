@@ -8,7 +8,6 @@
 // Qt Includes
 #include <QTranslator>
 #include <QMessageBox>
-#include "kkssito.h"
 
 int main(int argc, char ** argv) 
 {
@@ -38,8 +37,6 @@ int main(int argc, char ** argv)
     app->setPluginPath(myPluginsDir);
     
     app->initQgis();
-
-    KKSSito * sito = KKSSito::init(argc, argv, false, "admin", false);
 
     QString s = app->showSettings();
     qWarning() << s;

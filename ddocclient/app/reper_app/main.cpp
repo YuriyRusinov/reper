@@ -11,7 +11,7 @@
 #include <QTextCodec>
 
 /* ui */
-#include "kkssito.h"
+#include "kkscoreapplication.h"
 #include "kksclient_name.h"
 
 #ifdef __USE_QGIS__ 
@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     QString pluginsPath = QApplication::applicationDirPath() + QDir::separator() + "qtplugins";
     QCoreApplication::addLibraryPath( pluginsPath );
 
-    KKSSito *sito = NULL;
+    KKSCoreApplication *sito = NULL;
 
     QMainWindow * mainWindow = NULL;
 
@@ -54,13 +54,13 @@ int main(int argc, char *argv[])
 
     if(argc == 2 && strcmp(argv[1], "admin") == 0){
         //sito = KKSSito::init (false);//, QString("admin"));
-        sito = KKSSito::init (argc, argv, false, QString("admin"), false);
+        sito = KKSCoreApplication::init (argc, argv, false, QString("admin"), false);
         mainWindow = new ReperMainWindow;//KKSMainWindow();
         mainWindow->setWindowTitle(QObject::tr("DynamicDocs reper") + QObject::tr("Administrator") + " " + KKS_VERSION);
         //mainWindow->setWindowTitle(QObject::tr("PK IR ") + QObject::tr("Administrator") + " " + KKS_VERSION);
     }
     else{
-        sito = KKSSito::init (argc, argv, false, QString(), false);
+        sito = KKSCoreApplication::init (argc, argv, false, QString(), false);
         mainWindow = new ReperMainWindow();
         mainWindow->setWindowTitle(QObject::tr("DynamicDocs reper") + QObject::tr("Application") + " " + KKS_VERSION);
         //mainWindow->setWindowTitle(QObject::tr("PK IR ") + QObject::tr("Operator") + " " + KKS_VERSION);

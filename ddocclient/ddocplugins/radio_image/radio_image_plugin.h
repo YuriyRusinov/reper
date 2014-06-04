@@ -5,7 +5,7 @@
 
 #include <kksbaseplugin.h>
 #include <kksioplugin.h>
-#include <kkssito.h>
+#include <kkscoreapplication.h>
 
 class QAction;
 
@@ -26,7 +26,7 @@ public:
     void setAction( QAction * _action);
     QAction * getAction() { return action; }
 
-    void setFactoryManager(KKSSito * fManager);
+    void setFactoryManager(KKSCoreApplication* fManager);
     void setIO(KKSObject * io);
     KKSIOPluginType getIOPluginType();
 
@@ -37,7 +37,7 @@ private:
     //
     // Variables
     //
-    KKSSito *m_fManager;
+    KKSCoreApplication *m_fManager;
     KKSObject * m_io;
 
 private:

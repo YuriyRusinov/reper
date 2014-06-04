@@ -33,6 +33,7 @@ void RadioImagePlugin :: runPlug (void)
         QMessageBox::information (0, tr("Radio image"), tr ("Radio image test"));
         return;
     }
+
     KKSDatabase * db = m_fManager->db();
     if (!db->connected())
     {
@@ -46,7 +47,7 @@ void RadioImagePlugin :: runPlug (void)
     return;
 }
 
-void RadioImagePlugin :: setFactoryManager(KKSSito * fManager)
+void RadioImagePlugin :: setFactoryManager(KKSCoreApplication * fManager)
 {
     m_fManager = fManager;
 }

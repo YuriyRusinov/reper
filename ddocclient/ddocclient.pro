@@ -4,32 +4,21 @@ TEMPLATE = subdirs
 
 include(./ddocclient.conf)
 
-# Directories
 SUBDIRS += \
-    kksqwt \
-    kksutils \
-    dataaccess 
+            ./corelibs \
+            ./openreport \
 
 qgis{
 
 SUBDIRS += \
-    kksqgis 
+            ./kksqgis 
 }
 
 SUBDIRS += \
-    kkspp \
-    rptrenderer \
-    openrpt \
-    kksgui \
-    kkspluginmanager \
-    kksfactory \
-    kkscore \
-    kksinteractor \
-    kkshttpconnector \
-    kksrunservice \
-    sync_queue_viewer
-
-SUBDIRS += app
+            ./guilibs \
+            ./mgrlibs \
+            ./interaction \
+            ./app
 
 SUBDIRS += ddocplugins
 

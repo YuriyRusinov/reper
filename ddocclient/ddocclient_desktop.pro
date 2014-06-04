@@ -6,11 +6,20 @@ include(./ddocclient.conf)
 
 SUBDIRS += \
             ./corelibs \
-            ./kksqgis/kksqgis \
-            ./mgrlibs/kkscoreapplication \
-            ./app/reper_ksa \
-            ./ddocplugins/radio_image \
-            ./app/reper_app
+            ./openreport \
+
+qgis{
+
+SUBDIRS += \
+            ./kksqgis 
+}
+
+SUBDIRS += \
+            ./guilibs \
+            ./mgrlibs \
+            ./app
+
+SUBDIRS += ./ddocplugins
 
 RESOURCES = ./ddocs_ico/ddocs_icon_set.qrc
 

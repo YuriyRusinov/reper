@@ -1,47 +1,35 @@
 TEMPLATE = app
 
-#include(../../ddocclient.conf)
+include(../../ddocclient.conf)
 
 TARGET = reper_app
 
 DESTDIR = ../../build
 
 INCLUDEPATH += 	. \
-		../../dataaccess \
-		../../kkscore/base_classes \
-		../../kkscore/ui \
-		../../kkscore \
-		../../kksutils \
-		../../kksfactory \
-		../../kkspp \
-                ../../kksgui \
-		../../kksgui/ui \
-                ../../kksqwt \
-                ../../kksqwt/src \
-                ../../kkspluginmanager \
+		../../corelibs/dataaccess \
+		../../corelibs/kksutils \
+		../../corelibs/kksdatafactory \
+		../../corelibs/kkspp \
+                ../../corelibs/kkspluginmanager \
+		../../mgrlibs/kkscoreapplication/base_classes \
+		../../mgrlibs/kkscoreapplication/ui \
+		../../mgrlibs/kkscoreapplication \
                 ../../ddocplugins/radio_image
 
 
 DEPENDPATH += 	\
-		. \
-		../../dataaccess \
-		../../kkscore \
-		../../kksutils \
-		../../kkspp \
-		../../kksfactory \
-                ../../kksgui \
-                ../../kksqwt \
-                ../../kkspluginmanager \
+		../../corelibs/dataaccess \
+		../../corelibs/kksutils \
+		../../corelibs/kksdatafactory \
+		../../corelibs/kkspp \
+                ../../corelibs/kkspluginmanager \
+		../../mgrlibs/kkscoreapplication \
                 ../../ddocplugins/radio_image
 
-INCLUDEPATH *= ../../rptrenderer \
-               ../../rptrenderer/src
 
-DEPENDPATH *= ../kkspp \
-              ../../rptrenderer
-
-LIBS += -L$$DESTDIR -ldataaccess -lkkscore -lkksutils -lkkspp -lkksfactory -lkksgui -lrptrenderer -lkksqwt -lkkspluginmanager 
-LIBS *= -L$$DESTDIR/ddocplugins -lradio_image
+LIBS += -L$$DESTDIR -ldataaccess -lkkscoreapplication -lkksutils -lkkspp -lkksdatafactory -lkkspluginmanager 
+#LIBS *= -L$$DESTDIR/ddocplugins -lradio_image
 
 
 qgis{
@@ -56,19 +44,19 @@ qgis{
                    $$OSGEODIR/include/qwt \
                    $$QGISDIR/include/qgis \
                    $$QGISDIR/include \
-                   ../../kksqgis \
-                   ../../kksqgis/layerprops \
-                   ../../kksqgis/legend \
-                   ../../kksqgis/projectprops \
-                   ../../kksqgis/maptools
+                   ../../kksqgis/kksqgis \
+                   ../../kksqgis/kksqgis/layerprops \
+                   ../../kksqgis/kksqgis/legend \
+                   ../../kksqgis/kksqgis/projectprops \
+                   ../../kksqgis/kksqgis/maptools
 
-    DEPENDPATH += ../../kksqgis
+    DEPENDPATH += ../../kksqgis/kksqgis
 
     win32{
         LIBS *= -L$$OSGEODIR/lib  -lproj_i -lgdal_i -lsqlite3_i
     }
     else{
-        LIBS *= -L$$OSGEODIR/lib  -lproj -lgdal -lsqlite3
+        LIBS *= -L$$OSGEODIR/lib  -lproj -lgdal -lsqlite3 -lgeos_c -lspatialindex -lqwt -lspatialite
     }
 }
 
@@ -85,7 +73,7 @@ win32-g++:LIBS += $${PSQL_HOME}/lib/libpq.dll.a
 }
 unix: LIBS += -lpq
 
-RC_FILE = operator.rc
+#RC_FILE = operator.rc
 
 
 include(reper_app.pri)

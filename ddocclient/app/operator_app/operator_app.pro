@@ -7,36 +7,40 @@ TARGET = $${EXECUTABLE_PREFIX}_app
 DESTDIR = ../../build
 
 INCLUDEPATH += 	. \
-		../../dataaccess \
-		../../kkscore/base_classes \
-		../../kkscore/ui \
-		../../kkscore \
-		../../kksutils \
-		../../kksfactory \
-		../../kkspp \
-                ../../kksgui \
-		../../kksgui/ui \
-                ../../kksqwt \
-                ../../kksqwt/src
+		../../corelibs/dataaccess \
+		../../corelibs/kksutils \
+		../../corelibs/kkspp \
+		../../corelibs/kksdatafactory \
+		../../corelibs/kkspluginmanager \
+		../../mgrlibs/kkscoreapplication/base_classes \
+		../../mgrlibs/kkscoreapplication/ui \
+		../../mgrlibs/kkscoreapplication \
+                ../../guilibs/kksgui \
+		../../guilibs/kksgui/ui \
+                ../../guilibs/kksqwt \
+                ../../guilibs/kksqwt/src \
+                ../../guilibs/kksguifactory \
+                ../../openreport/rptrenderer \
+                ../../openreport/rptrenderer/src \
+		../../mgrlibs/kksapplication
 
 
 DEPENDPATH += 	\
 		. \
-		../../dataaccess \
-		../../kkscore \
-		../../kksutils \
-		../../kkspp \
-		../../kksfactory \
-                ../../kksgui \
-                ../../kksqwt
+		../../corelibs/dataaccess \
+		../../corelibs/kksutils \
+		../../corelibs/kkspp \
+		../../corelibs/kksdatafactory \
+		../../corelibs/kkspluginmanager \
+		../../mgrlibs/kkscoreapplication \
+		../../mgrlibs/kksapplication \
+                ../../guilibs/kksgui \
+                ../../guilibs/kksqwt \
+                ../../guilibs/kksguifactory \
+                ../../openreport/rptrenderer
 
-INCLUDEPATH *= ../../rptrenderer \
-               ../../rptrenderer/src
 
-DEPENDPATH *= ../kkspp \
-              ../../rptrenderer
-
-LIBS += -L$$DESTDIR -ldataaccess -lkkscore -lkksutils -lkkspp -lkksfactory -lkksgui -lrptrenderer -lkksqwt -lkkspluginmanager
+LIBS += -L$$DESTDIR -ldataaccess -lkkscoreapplication -lkksapplication -lkksutils -lkkspp -lkksdatafactory -lkksguifactory -lkksgui -lrptrenderer -lkksqwt -lkkspluginmanager
 
 
 qgis{
@@ -51,13 +55,13 @@ qgis{
                    $$OSGEODIR/include/qwt \
                    $$QGISDIR/include/qgis \
                    $$QGISDIR/include \
-                   ../../kksqgis \
-                   ../../kksqgis/layerprops \
-                   ../../kksqgis/legend \
-                   ../../kksqgis/projectprops \
-                   ../../kksqgis/maptools
+                   ../../kksqgis/kksqgis \
+                   ../../kksqgis/kksqgis/layerprops \
+                   ../../kksqgis/kksqgis/legend \
+                   ../../kksqgis/kksqgis/projectprops \
+                   ../../kksqgis/kksqgis/maptools
 
-    DEPENDPATH += ../../kksqgis
+    DEPENDPATH += ../../kksqgis/kksqgis
 
     win32{
         LIBS *= -L$$OSGEODIR/lib  -lproj_i -lgdal_i -lsqlite3_i

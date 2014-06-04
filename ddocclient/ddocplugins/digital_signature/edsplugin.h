@@ -5,7 +5,7 @@
 
 #include <kksbaseplugin.h>
 #include <kksioplugin.h>
-#include <kkssito.h>
+#include <kkscoreapplication.h>
 
 #include "digitalsignatureform.h"
 
@@ -31,16 +31,16 @@ class EDSPlugin : public QObject,
         void setAction( QAction * _action);
         QAction * getAction() { return action; }
 
-        void setFactoryManager(KKSSito * fManager);
         void setIO(KKSObject * io);
         KKSIOPluginType getIOPluginType();
+        void setFactoryManager(KKSCoreApplication* fManager);
   
     public slots:
         void loadForm();
 
     private:
-        KKSSito *m_fManager;
         KKSObject * m_io;
+        KKSCoreApplication *m_fManager;
         
         bool initplugin;
 

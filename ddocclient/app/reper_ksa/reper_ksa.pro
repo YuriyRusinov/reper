@@ -9,32 +9,25 @@ TARGET = reper_ksa
 
 DESTDIR = ../../build
 
-INCLUDEPATH += 	. \
-		../../dataaccess \
-		../../kkscore/base_classes \
-		../../kkscore/ui \
-		../../kkscore \
-		../../kksutils \
-                ../../kkspluginmanager \
-                ../../kkspp \
-                ../../kksfactory \
-                ../../kksqgis
+INCLUDEPATH +=  . \
+                ../../corelibs/dataaccess \
+                ../../corelibs/kksutils \
+                ../../corelibs/kksdatafactory \
+                ../../corelibs/kkspp \
+                ../../corelibs/kkspluginmanager \
+                ../../kksqgis/kksqgis
 
 
 DEPENDPATH += 	\
-		. \
-		../../dataaccess \
-		../../kkscore \
-                ../../kkspluginmanager \
-		../../kksutils \
-                ../../kkspp \
-                ../../kksfactory \
-                ../../kksqgis
+                ../../corelibs/dataaccess \
+                ../../corelibs/kksutils \
+                ../../corelibs/kksdatafactory \
+                ../../corelibs/kkspp \
+                ../../corelibs/kkspluginmanager \
+                ../../kksqgis/kksqgis
 
-LIBS += -L$$DESTDIR -ldataaccess -lkkscore -lkksutils -lkkspluginmanager -lkkspp -lkksfactory
+LIBS += -L$$DESTDIR -ldataaccess -lkksutils -lkkspp -lkkspluginmanager -lkksdatafactory
 
-
-#LIBS += -L$$DESTDIR -ldataaccess -lkksutils -lkksrunservice
 qgis{
     DEFINES *= __USE_QGIS__
     DEFINES *= __USE_EXPORTS  #for qgis export library
@@ -49,7 +42,7 @@ qgis{
         LIBS *= -L$$OSGEODIR/lib  -lproj_i -lgdal_i -lsqlite3_i
     }
     else{
-        LIBS *= -L$$OSGEODIR/lib  -lproj -lgdal -lsqlite3
+        LIBS *= -L$$OSGEODIR/lib  -lproj -lgdal -lsqlite3 -lgeos_c -lspatialindex -lqwt -lspatialite
     }
 }
 

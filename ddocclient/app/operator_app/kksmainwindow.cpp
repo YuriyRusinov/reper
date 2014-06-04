@@ -5,7 +5,7 @@
 #include "msgjournalform.h"
 #include "kksstatusbar.h"
 #include "kksabout.h"
-#include "kkssito.h"
+#include "kksapplication.h"
 #include "kksclient_name.h"
 #include "kkssettings.h"
 #include "defines.h"
@@ -85,11 +85,11 @@ KKSMainWindow::KKSMainWindow(QWidget *parent)
     m_jmonitor = 0;
     //m_masscreateW = 0;
 
-    KKSObjEditorFactory * oef = kksSito->oef();
-    KKSCatEditorFactory * catf = kksSito->catf ();
-    KKSTemplateEditorFactory * tf = kksSito->tf ();
-    KKSRubricFactory * rf = kksSito->rf ();
-    KKSAttributesFactory * af = kksSito->attrf();
+    KKSObjEditorFactory * oef = kksApp->oef();
+    KKSCatEditorFactory * catf = kksApp->catf ();
+    KKSTemplateEditorFactory * tf = kksApp->tf ();
+    KKSRubricFactory * rf = kksApp->rf ();
+    KKSAttributesFactory * af = kksApp->attrf();
 
     connect (oef, 
              SIGNAL(editorCreated(KKSObjEditor *)), 
@@ -347,7 +347,7 @@ void KKSMainWindow::setActionsEnabled(bool enabled)
     ui->actLCOpen->setEnabled(false);
 
     if(enabled){
-        QString uName = kksSito->loader()->getDb()->getUser();
+        QString uName = kksApp->loader()->getDb()->getUser();
         if(uName == "admin"){
             ui->aCreateCat->setEnabled(enabled);
             ui->aViewCat->setEnabled(enabled);
@@ -429,7 +429,7 @@ void KKSMainWindow::initJournal()
 
 void KKSMainWindow::initDebugWindow()
 {
-    m_debugWidget = kksSito->dbgWidget(true, true);
+    m_debugWidget = kksApp->dbgWidget(true, true);
 
     if (!m_debugWidget)
         return;
@@ -632,42 +632,42 @@ void KKSMainWindow::initStatusBar()
 
 bool KKSMainWindow::connectToDb()
 {
-    int res = kksSito->GUIConnect(this);
+    int res = kksApp->GUIConnect(this);
     if(res == ERROR_CODE){
         setActionsEnabled(false);
     }
     else
         setActionsEnabled(true);
     
-    if(kksSito->db1()->connected()){
+    if(kksApp->db1()->connected()){
         //создаем копии и передаем управление ими в класс KKSJMonitor. 
         //В деструкторе этого класса они будут удалены
-        KKSCmdJSettings * settings = new KKSCmdJSettings(*(kksSito->getCmdJSettings()));
-        KKSMsgJSettings * msgSettings = new KKSMsgJSettings(*(kksSito->getMsgJSettings()));
+        KKSCmdJSettings * settings = new KKSCmdJSettings(*(kksApp->getCmdJSettings()));
+        KKSMsgJSettings * msgSettings = new KKSMsgJSettings(*(kksApp->getMsgJSettings()));
         m_jmonitor = new KKSJMonitor(settings, 
                                      msgSettings,
-                                     kksSito->db1(), 
-                                     kksSito->oef(),
-                                     kksSito->eiof());
+                                     kksApp->db1(), 
+                                     kksApp->oef(),
+                                     kksApp->eiof());
         
 
         connect(m_jmonitor, 
                 SIGNAL(editorCreated(KKSObjEditor *)), 
                 this, 
                 SLOT(slotCreateNewObjEditor(KKSObjEditor*)));
-        connect(m_jmonitor, SIGNAL(settingsChanged(KKSCmdJSettings *)), kksSito, SLOT(saveCmdJSettings(KKSCmdJSettings *)));
-        connect(m_jmonitor, SIGNAL(msgSettingsChanged(KKSMsgJSettings *)), kksSito, SLOT(saveMsgJSettings(KKSMsgJSettings *)));
+        connect(m_jmonitor, SIGNAL(settingsChanged(KKSCmdJSettings *)), kksApp, SLOT(saveCmdJSettings(KKSCmdJSettings *)));
+        connect(m_jmonitor, SIGNAL(msgSettingsChanged(KKSMsgJSettings *)), kksApp, SLOT(saveMsgJSettings(KKSMsgJSettings *)));
     }
     else
         return false;
 
-    m_userName = kksSito->loader()->getUserName();
-    m_dlName = kksSito->loader()->getDlName();
-    m_maclabelName = kksSito->loader()->getCurrMacLabelName();
+    m_userName = kksApp->loader()->getUserName();
+    m_dlName = kksApp->loader()->getDlName();
+    m_maclabelName = kksApp->loader()->getCurrMacLabelName();
     
-    m_modeName = kksSito->loader()->getOrgModeName ();
+    m_modeName = kksApp->loader()->getOrgModeName ();
     lModeName->setText (m_modeName);
-    m_orgSymbol = kksSito->loader()->getOrgLogo ();
+    m_orgSymbol = kksApp->loader()->getOrgLogo ();
     //QByteArray ba = m_orgSymbol.toLocal8Bit();
     QPixmap logo;
     //bool ok = logo.loadFromData(m_orgSymbol, "XPM");
@@ -700,7 +700,7 @@ bool KKSMainWindow::connectToDb()
     ui->menuView->addAction(aJ);
     ui->menuView->addAction(aD);
 
-    if(kksSito->loader()->getLocalOrgId() == -1){
+    if(kksApp->loader()->getLocalOrgId() == -1){
         qWarning() << tr("Local organization in current database does not set."
                                 "\nMany operations such as creation of documnts and some others will not work correctly."
                                 "\nPlease connect to your system administrator.");
@@ -730,8 +730,8 @@ bool KKSMainWindow::disconnectFromDb()
         m_jmonitor = NULL;
     }
 
-    kksSito->db()->disconnect();
-    kksSito->db1()->disconnect();
+    kksApp->db()->disconnect();
+    kksApp->db1()->disconnect();
     setActionsEnabled(false);
     QList<QMdiSubWindow *> windows = m_mdiArea->subWindowList();
     for (int i=0; i<windows.count(); i++)
@@ -920,11 +920,11 @@ void KKSMainWindow::slotCreateNewObjEditor(int idObject,
                                            const KKSList<const KKSFilterGroup *> & filters,
                                            const QString & extraTitle)
 {
-    if(!kksSito->db()->connected())
+    if(!kksApp->db()->connected())
         return;
 
     KKSCategory *c = NULL;
-    KKSObject *wObj = kksSito->loader()->loadIO (idObjExemplar, true);
+    KKSObject *wObj = kksApp->loader()->loadIO (idObjExemplar, true);
     //
     // Если экземпляр ИО также сам является информационным объектом, то задать категорию
     //
@@ -934,7 +934,7 @@ void KKSMainWindow::slotCreateNewObjEditor(int idObject,
             c = wObj->category();//->tableCategory ();
     }
 
-    KKSObjEditor *objEditor = kksSito->oef()->createObjEditor (idObject, 
+    KKSObjEditor *objEditor = kksApp->oef()->createObjEditor (idObject, 
                                                                idObjExemplar, 
                                                                filters, 
                                                                extraTitle,
@@ -1007,12 +1007,12 @@ void KKSMainWindow::slotCreateNewObjEditor(int attrId,
                                            const QString & value, 
                                            const QString & extraTitle)
 {
-    if(!kksSito->db()->connected())
+    if(!kksApp->db()->connected())
         return;
 
     KKSList<const KKSFilter *> filters;
 
-    KKSObject * io = kksSito->loader()->loadIO(IO_IO_ID, true);
+    KKSObject * io = kksApp->loader()->loadIO(IO_IO_ID, true);
     if(!io)
         return;
 
@@ -1109,7 +1109,7 @@ void KKSMainWindow::slotAbout()
 
 void KKSMainWindow::slotSettings()
 {
-    KKSSettings * s = kksSito->getKKSSettings();
+    KKSSettings * s = kksApp->getKKSSettings();
     if(s)
         s->editSettings(this);
 }
@@ -1134,19 +1134,19 @@ void KKSMainWindow::slotChangeUser()
 
 void KKSMainWindow::slotConnInfo()
 {
-    kksSito->showConnectionInfo(this);
+    kksApp->showConnectionInfo(this);
 }
 
 void KKSMainWindow :: slotCreateDoc()
 {
-    if(!kksSito->db()->connected())
+    if(!kksApp->db()->connected())
         return;
 
-    KKSCatEditorFactory * catf = kksSito->catf();
+    KKSCatEditorFactory * catf = kksApp->catf();
     KKSList<const KKSFilterGroup *> filterGroups;
     KKSList<const KKSFilter*> filters;
     
-    KKSObject * refCatTypeObj = kksSito->loader()->loadIO (IO_CAT_TYPE_ID, true);
+    KKSObject * refCatTypeObj = kksApp->loader()->loadIO (IO_CAT_TYPE_ID, true);
     if (!refCatTypeObj || !refCatTypeObj->category() || !refCatTypeObj->category()->tableCategory())
         return;
 
@@ -1160,7 +1160,7 @@ void KKSMainWindow :: slotCreateDoc()
     refCatTypeObj->release();
 
     /*
-    KKSObject * refCatObj = kksSito->loader()->loadIO (IO_CAT_ID, true);
+    KKSObject * refCatObj = kksApp->loader()->loadIO (IO_CAT_ID, true);
     if (!refCatObj || !refCatObj->category() || !refCatObj->category()->tableCategory())
         return;
     
@@ -1201,14 +1201,14 @@ void KKSMainWindow :: slotCreateDoc()
     KKSCategory * c = NULL;
     if (idTemplate <= 0)
     {
-        c = kksSito->loader()->loadCategory(idCategory);
+        c = kksApp->loader()->loadCategory(idCategory);
         if (!c)
             return;
 
         t = new KKSTemplate(c->defTemplate());
     }
     else{
-        t = kksSito->loader()->loadTemplate(idTemplate);
+        t = kksApp->loader()->loadTemplate(idTemplate);
         if(!t)
             return;
         c = t->category ();
@@ -1217,7 +1217,7 @@ void KKSMainWindow :: slotCreateDoc()
         c->addRef ();
     }
 
-    KKSObjEditorFactory *oef = kksSito->oef ();
+    KKSObjEditorFactory *oef = kksApp->oef ();
     KKSObjEditor *objEditor = oef->createObjEditor(IO_IO_ID, 
                                                    -1, 
                                                    KKSList<const KKSFilterGroup*>(), 
@@ -1236,7 +1236,7 @@ void KKSMainWindow :: slotCreateDoc()
 void KKSMainWindow::slotFindDoc()
 {
     KKSList<const KKSFilter*> filters;
-    KKSObject * o = kksSito->loader()->loadIO(IO_IO_ID, true);
+    KKSObject * o = kksApp->loader()->loadIO(IO_IO_ID, true);
     if(!o || !o->category())
         return;
     KKSCategory * c = o->category();//->tableCategory();
@@ -1247,9 +1247,9 @@ void KKSMainWindow::slotFindDoc()
 
     c = c->tableCategory();
 
-    KKSObjEditorFactory * oef = kksSito->oef();
+    KKSObjEditorFactory * oef = kksApp->oef();
 
-    int idUser = kksSito->loader()->getUserId();
+    int idUser = kksApp->loader()->getUserId();
     KKSFilter * filter = c->createFilter(ATTR_AUTHOR, QString::number(idUser), KKSFilter::foEq);
     if(!filter)
         return;
@@ -1279,10 +1279,10 @@ void KKSMainWindow::slotFindDoc()
 
 void KKSMainWindow :: slotMyDocs (void)
 {
-    if(!kksSito->db()->connected())
+    if(!kksApp->db()->connected())
         return;
 
-    KKSRubricFactory * rf = kksSito->rf ();
+    KKSRubricFactory * rf = kksApp->rf ();
     KKSIncludesWidget * iW = rf->createRubricEditor (KKSRubricFactory::atMyDocsRubric, 
                                                      KKSRubricFactory::smRubricsWithIncludes, 
                                                      false,
@@ -1293,10 +1293,10 @@ void KKSMainWindow :: slotMyDocs (void)
 
 void KKSMainWindow :: slotRubricControl (void)
 {
-    if(!kksSito->db()->connected())
+    if(!kksApp->db()->connected())
         return;
 
-    KKSRubricFactory * rf = kksSito->rf ();
+    KKSRubricFactory * rf = kksApp->rf ();
     KKSIncludesWidget * iW = rf->createRubricEditor (KKSRubricFactory::atOthers, 
                                                      KKSRubricFactory::smRubricsWithIncludes, 
                                                      false,
@@ -1313,7 +1313,7 @@ void KKSMainWindow::slotPrintDoc()
 
 void KKSMainWindow::slotCreateSearchQuery()
 {
-    KKSObjEditorFactory * oef = kksSito->oef();
+    KKSObjEditorFactory * oef = kksApp->oef();
     if(!oef)
         return;
     
@@ -1322,7 +1322,7 @@ void KKSMainWindow::slotCreateSearchQuery()
 
 void KKSMainWindow::slotShowSearchQueries()
 {
-    KKSObjEditorFactory * oef = kksSito->oef();
+    KKSObjEditorFactory * oef = kksApp->oef();
     if(!oef)
         return;
     
@@ -1347,7 +1347,7 @@ void KKSMainWindow::slotCreateCmd()
 
 void KKSMainWindow::slotCreateTSDRecord()
 {
-    KKSObjEditorFactory * oef =  kksSito->oef();
+    KKSObjEditorFactory * oef =  kksApp->oef();
     QWidget *parent = this->centralWidget ();
     oef->insertReport (-1, parent, Qt::Dialog);
 }
@@ -1359,10 +1359,10 @@ void KKSMainWindow::slotShowTSD()
 
 void KKSMainWindow::slotCreateCat()
 {
-    if(!kksSito->db()->connected())
+    if(!kksApp->db()->connected())
         return;
 
-    KKSCatEditorFactory * catf = kksSito->catf();
+    KKSCatEditorFactory * catf = kksApp->catf();
 
     KKSList<const KKSFilterGroup*> filterGroups;
     KKSCatEditor *catEditor = catf->createCategoryEditor (-1/*IO_CAT_ID*/, filterGroups, false, 3, false, Qt::NonModal, this, Qt::Dialog);
@@ -1372,12 +1372,12 @@ void KKSMainWindow::slotCreateCat()
 
 void KKSMainWindow::slotViewCat()
 {
-    if(!kksSito->db()->connected())
+    if(!kksApp->db()->connected())
         return;
 
     KKSList<const KKSFilterGroup *> filterGroups;
     KKSList<const KKSFilter*> filters;
-    KKSObject * refCatTypeObj = kksSito->loader()->loadIO (IO_CAT_TYPE_ID, true);
+    KKSObject * refCatTypeObj = kksApp->loader()->loadIO (IO_CAT_TYPE_ID, true);
     if (!refCatTypeObj || !refCatTypeObj->category() || !refCatTypeObj->category()->tableCategory())
         return;
 
@@ -1391,7 +1391,7 @@ void KKSMainWindow::slotViewCat()
     refCatTypeObj->release();
 
     /*
-    KKSObject * refCatObj = kksSito->loader()->loadIO (IO_CAT_ID, true);
+    KKSObject * refCatObj = kksApp->loader()->loadIO (IO_CAT_ID, true);
     if (!refCatObj || !refCatObj->category() || !refCatObj->category()->tableCategory())
         return;
     
@@ -1413,7 +1413,7 @@ void KKSMainWindow::slotViewCat()
 
     //refCatTypeObj->release ();
 
-    KKSCategoryTemplateWidget* ctw = kksSito->catf()->viewCategories (filterGroups, 
+    KKSCategoryTemplateWidget* ctw = kksApp->catf()->viewCategories (filterGroups, 
                                                                       false, 
                                                                       Qt::NonModal,
                                                                       this, 
@@ -1426,12 +1426,12 @@ void KKSMainWindow::slotViewCat()
 
 void KKSMainWindow::slotViewAttrs()
 {
-    if(!kksSito->db()->connected())
+    if(!kksApp->db()->connected())
         return;
 
     KKSList<const KKSFilterGroup *> filterGroups;
     KKSList<const KKSFilter*> filters;
-    KKSObject * refAttrObj = kksSito->loader()->loadIO (IO_ATTR_ID, true);
+    KKSObject * refAttrObj = kksApp->loader()->loadIO (IO_ATTR_ID, true);
     if (!refAttrObj || !refAttrObj->category() || !refAttrObj->category()->tableCategory())
         return;
 
@@ -1449,7 +1449,7 @@ void KKSMainWindow::slotViewAttrs()
 
     refAttrObj->release ();
 
-    KKSAttributesEditor * aEditor = kksSito->attrf()->viewAttributes (filterGroups,
+    KKSAttributesEditor * aEditor = kksApp->attrf()->viewAttributes (filterGroups,
                                                                       false,
                                                                       this->centralWidget (),
                                                                       Qt::Dialog);
@@ -1460,7 +1460,7 @@ void KKSMainWindow::slotViewAttrs()
 
 void KKSMainWindow::slotEditOSS()
 {
-    KKSStuffFactory *stf = kksSito->sf ();
+    KKSStuffFactory *stf = kksApp->sf ();
     KKSStuffForm * sForm = stf->createStuffEditorForm (4);
     QMdiSubWindow * m_UserPrivW = m_mdiArea->addSubWindow (sForm);
     m_UserPrivW->setAttribute (Qt::WA_DeleteOnClose);
@@ -1491,7 +1491,7 @@ void KKSMainWindow::slotMess()
 
 void KKSMainWindow::slotCreateLC()
 {
-    KKSCatEditorFactory * catF = kksSito->catf();
+    KKSCatEditorFactory * catF = kksApp->catf();
     kkslifecycleform * lcForm = catF->createLifeCycle ();
     QMdiSubWindow * m_LCW = m_mdiArea->addSubWindow (lcForm);
     m_LCW->setAttribute (Qt::WA_DeleteOnClose);
@@ -1501,7 +1501,7 @@ void KKSMainWindow::slotCreateLC()
 
 void KKSMainWindow::slotOpenLC()
 {
-    KKSCatEditorFactory * catF = kksSito->catf();
+    KKSCatEditorFactory * catF = kksApp->catf();
     KKSObjEditor * lcEditor = qobject_cast<KKSObjEditor *>(catF->openLifeCycle());
 
     slotCreateNewObjEditor (lcEditor);

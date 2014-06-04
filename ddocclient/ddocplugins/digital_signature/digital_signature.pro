@@ -10,25 +10,24 @@ DEPLIBS_DIR = ../../build
 include(../../ddocclient.conf)
 
 INCLUDEPATH += 	. \
-		../../dataaccess \
-		../../kkscore/base_classes \
-		../../kkscore/ui \
-		../../kkscore \
-		../../kksutils \
-		../../kksfactory \
-		../../kkspp \
-                ../../kkspluginmanager
+		../../corelibs/dataaccess \
+		../../corelibs/kksutils \
+		../../corelibs/kksdatafactory \
+		../../corelibs/kkspp \
+                ../../corelibs/kkspluginmanager \
+               ../../mgrlibs/kkscoreapplication \
+               ../../mgrlibs/kkscoreapplication/base_classes \
+               ../../mgrlibs/kkscoreapplication/ui
 
 DEPENDPATH += 	\
-		. \
-		../../dataaccess \
-		../../kkscore \
-		../../kksutils \
-		../../kkspp \
-		../../kksfactory \
-                ../../kkspluginmanager
+		../../corelibs/dataaccess \
+		../../corelibs/kksutils \
+		../../corelibs/kksdatafactory \
+		../../corelibs/kkspp \
+                ../../corelibs/kkspluginmanager \
+               ../../mgrlibs/kkscoreapplication
 
-LIBS += -L$$DEPLIBS_DIR -ldataaccess -lkkscore -lkksutils -lkkspp -lkksfactory -lkkspluginmanager
+LIBS += -L$$DEPLIBS_DIR -ldataaccess -lkksutils -lkkspp -lkksdatafactory -lkkspluginmanager
 
 include(digital_signature.pri)
 

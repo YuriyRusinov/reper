@@ -2,7 +2,7 @@
 QTDIR=/usr/lib/qt4
 
 PROJECT_NAME=DynamicDocs
-PROJECT_PRO_FILE=ddocclient.pro
+PROJECT_PRO_FILE=ddocclient_desktop.pro
 
 QTINC=$QTDIR/include
 QTLIB=$QTDIR/lib
@@ -22,8 +22,8 @@ fi
 cd ../
 
 
-rm -f ./kkscore/kksclient_name.h
-rm -f ./kksutils/configEndians.h
+rm -f ./mgrlibs/kkscoreapplication/kksclient_name.h
+rm -f ./corelibs/kksutils/configEndians.h
 
 BUILD_OK=0
 
