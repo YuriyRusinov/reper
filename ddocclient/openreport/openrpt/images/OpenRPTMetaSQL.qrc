@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/icons" >
+        <file>filenew.xpm</file>
+        <file>fileopen.xpm</file>
+        <file>filesave.xpm</file>
+        <file>fileprint.xpm</file>
+        <file>editundo.xpm</file>
+        <file>editcut.xpm</file>
+        <file>editcopy.xpm</file>
+        <file>editpaste.xpm</file>
+    </qresource>
+</RCC>

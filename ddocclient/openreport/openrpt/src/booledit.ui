@@ -1,0 +1,175 @@
+<ui version="4.0" stdsetdef="1" >
+  <author></author>
+  <comment> * OpenRPT report writer and rendering engine
+ * Copyright (C) 2001-2008 by OpenMFG, LLC
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * Please contact info@openmfg.com with any questions on this license.</comment>
+  <exportmacro></exportmacro>
+  <class>BoolEdit</class>
+  <widget class="QDialog" name="BoolEdit" >
+    <property name="geometry" >
+      <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>286</width>
+        <height>129</height>
+      </rect>
+    </property>
+    <property name="windowTitle" >
+      <string>Bool</string>
+    </property>
+    <layout class="QHBoxLayout" >
+      <item>
+        <layout class="QGridLayout" >
+          <property name="margin" >
+            <number>0</number>
+          </property>
+          <item row="0" column="1" >
+            <widget class="QLabel" name="_name" >
+              <property name="text" >
+                <string>name</string>
+              </property>
+            </widget>
+          </item>
+          <item row="1" column="0" >
+            <widget class="QLabel" name="_lblValue" >
+              <property name="text" >
+                <string>Value:</string>
+              </property>
+              <property name="alignment" >
+                <set>Qt::AlignVCenter|Qt::AlignRight</set>
+              </property>
+            </widget>
+          </item>
+          <item row="1" column="1" >
+            <widget class="QComboBox" name="_value" >
+              <property name="sizePolicy" >
+                <sizepolicy>
+                  <hsizetype>3</hsizetype>
+                  <vsizetype>0</vsizetype>
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                </sizepolicy>
+              </property>
+              <item>
+                <property name="text" >
+                  <string>True</string>
+                </property>
+              </item>
+              <item>
+                <property name="text" >
+                  <string>False</string>
+                </property>
+              </item>
+            </widget>
+          </item>
+          <item row="2" column="1" >
+            <widget class="QCheckBox" name="_active" >
+              <property name="text" >
+                <string>Active</string>
+              </property>
+            </widget>
+          </item>
+          <item row="3" column="1" >
+            <spacer name="spacer2" >
+              <property name="sizeHint" >
+                <size>
+                  <width>20</width>
+                  <height>40</height>
+                </size>
+              </property>
+              <property name="sizeType" >
+                <enum>Expanding</enum>
+              </property>
+              <property name="orientation" >
+                <enum>Vertical</enum>
+              </property>
+            </spacer>
+          </item>
+          <item row="0" column="0" >
+            <widget class="QLabel" name="_lblName" >
+              <property name="text" >
+                <string>Name:</string>
+              </property>
+              <property name="alignment" >
+                <set>Qt::AlignVCenter|Qt::AlignRight</set>
+              </property>
+            </widget>
+          </item>
+        </layout>
+      </item>
+      <item>
+        <layout class="QVBoxLayout" >
+          <property name="margin" >
+            <number>0</number>
+          </property>
+          <item>
+            <widget class="QPushButton" name="_ok" >
+              <property name="text" >
+                <string>&amp;OK</string>
+              </property>
+              <property name="shortcut" >
+                <string>Alt+O</string>
+              </property>
+            </widget>
+          </item>
+          <item>
+            <widget class="QPushButton" name="_cancel" >
+              <property name="text" >
+                <string>&amp;Cancel</string>
+              </property>
+              <property name="shortcut" >
+                <string>Alt+C</string>
+              </property>
+            </widget>
+          </item>
+          <item>
+            <spacer name="spacer1" >
+              <property name="sizeHint" >
+                <size>
+                  <width>20</width>
+                  <height>40</height>
+                </size>
+              </property>
+              <property name="sizeType" >
+                <enum>Expanding</enum>
+              </property>
+              <property name="orientation" >
+                <enum>Vertical</enum>
+              </property>
+            </spacer>
+          </item>
+        </layout>
+      </item>
+    </layout>
+  </widget>
+  <layoutdefault spacing="6" margin="11" />
+  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
+  <connections>
+    <connection>
+      <sender>_ok</sender>
+      <signal>clicked()</signal>
+      <receiver>BoolEdit</receiver>
+      <slot>accept()</slot>
+    </connection>
+    <connection>
+      <sender>_cancel</sender>
+      <signal>clicked()</signal>
+      <receiver>BoolEdit</receiver>
+      <slot>reject()</slot>
+    </connection>
+  </connections>
+</ui>
