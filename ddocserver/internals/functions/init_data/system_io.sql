@@ -781,6 +781,27 @@ insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main
 insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
 values(229, -10, true, true, false, false, true);
 
+insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values ('localorg-categories-230', 230, 10, NULL, false, 'Форматы информационного взаимодействия с внешними системами ', 'SYSCATEGORY_230', NULL::varchar, true, true, 1);
+insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
+values(230, -10, true, true, false, false, true);
+insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values ('localorg-categories-231', 231, 8, 230, true, 'Справочник форматов информационного взаимодействия с внешними системами', 'SYSCATEGORY_231', NULL::varchar, true, true, 1);
+insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
+values(231, -10, true, true, false, false, true);
+
+insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values ('localorg-categories-232', 232, 10, NULL, false, 'Таблицы исходящей очереди информационного взаимодействия с внешними системами', 'SYSCATEGORY_232', NULL::varchar, true, true, 1);
+insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
+values(232, -10, true, true, false, false, true);
+insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values ('localorg-categories-233', 233, 8, 232, true, 'Исходящая очередь информационного взаимодействия с внешними системами', 'SYSCATEGORY_233', NULL::varchar, true, true, 1);
+insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
+values(233, -10, true, true, false, false, true);
+
+insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values ('localorg-categories-234', 234, 10, NULL, false, 'Таблицы входящей очереди информационного взаимодействия с внешними системами', 'SYSCATEGORY_234', NULL::varchar, true, true, 1);
+insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
+values(234, -10, true, true, false, false, true);
+insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values ('localorg-categories-235', 235, 8, 234, true, 'Входящая очередь информационного взаимодействия с внешними системами', 'SYSCATEGORY_235', NULL::varchar, true, true, 1);
+insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
+values(235, -10, true, true, false, false, true);
+
 SELECT pg_catalog.setval('io_categories_id_seq', 300, true); --все пользовательские категории будут начинаться с номера 301
                                                              --это сделано для того, чтобы оставить резерв для системных категорий 
 
@@ -1245,6 +1266,12 @@ insert into attributes (unique_id, id, id_a_type, code, name, title, table_name,
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-376', 376, 8, 'h_count', 'Количество карманов', 'Количество карманов', NULL, NULL, 150, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-377', 377, 37, 'last_exec', 'Дата и время последнего запуска сервиса', 'Дата и время последнего запуска', NULL, NULL, 120, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-378', 378, 9, 'rr_name', 'Название', 'Название', NULL, NULL, 300, TRUE);
+
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-379', 379, 2, 'id_format', 'Формат информационного взаимодействия', 'Формат взаимодействия', 'interaction_formats', 'name', 150, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-380', 380, 30, 'id_entity', 'Идентификатор записи', 'Идентификатор записи', NULL, NULL, 100, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-381', 381, 8, 'interaction_type', 'Тип взаимодействия', 'Тип взаимодействия', NULL, NULL, 100, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-382', 382, 8, 'interaction_result', 'Результат взаимодействия', 'Результат взаимодействия', NULL, NULL, 100, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-383', 383, 13, 'in_data', 'Пришедшие данные', 'Пришедшие данные', NULL, NULL, 100, TRUE);
 
 
 SELECT pg_catalog.setval('attributes_id_seq', 1000, true); --все пользовательские атрибуты будут начинаться с номера 1001
@@ -2419,7 +2446,27 @@ insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (681, 228, 38, NULL, true, false); --exec_period
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (682, 228, 377, NULL, false, true); --last_exec
 
+--исходящая очередь информационного взаимодействия с внешними системами
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (683, 232, 1, NULL, true, true); --id
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (684, 232, 74, NULL, true, false); --id_organization
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (685, 232, 379, NULL, true, false); --id_format
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (686, 232, 48, NULL, true, false); --id_io_object
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (687, 232, 380, NULL, false, false); --id_entity
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (688, 232, 381, NULL, true, false); --interaction_type
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (689, 232, 382, NULL, true, false); --interaction_result
 
+--входящая очередь информационного взаимодействия с внешними системами
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (690, 234, 1, NULL, true, true); --id
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (691, 234, 74, NULL, true, false); --id_organization
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (692, 234, 379, NULL, true, false); --id_format
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (693, 234, 383, NULL, true, false); --in_data
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (694, 234, 381, NULL, true, false); --interaction_type
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (695, 234, 382, NULL, true, false); --interaction_result
+
+--таблица фопматов информационного взаимодействия с внешними системами
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (696, 230, 1, NULL, true, true); --id
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (697, 230, 2, NULL, true, false); --name
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (698, 230, 3, NULL, false, false);  --description
 
 
 SELECT pg_catalog.setval('attrs_categories_id_seq', 2000, true); --все пользовательские атрибуты в категориях будут начинаться с номера 2001
@@ -2979,6 +3026,21 @@ insert into tbl_io_objects (unique_id, id, id_io_category, author, id_io_state, 
 values ('localorg-io_objects-112', 112, 229, 1, 1, 'Расписание периодического запуска сервисов', 'sheduled_handlers', NULL, 'Системный объект', true, true, 5, current_timestamp, 1, NULL, 3);
 insert into access_table (id_io_object, id_role, allow_readlist, allow_read, allow_delete, allow_update)
 values (112, -10, TRUE, TRUE, FALSE, FALSE);
+
+insert into tbl_io_objects (unique_id, id, id_io_category, author, id_io_state, name, table_name, description, information, is_system, is_global, id_sync_type, insert_time, id_maclabel, id_owner_org, id_io_type)
+values ('localorg-io_objects-113', 113, 231, 1, 1, 'Справочник форматов информационного взаимодействия с внешними системами', 'interaction_formats', NULL, 'Системный объект', true, true, 5, current_timestamp, 1, NULL, 3);
+insert into access_table (id_io_object, id_role, allow_readlist, allow_read, allow_delete, allow_update)
+values (113, -10, TRUE, TRUE, FALSE, FALSE);
+
+insert into tbl_io_objects (unique_id, id, id_io_category, author, id_io_state, name, table_name, description, information, is_system, is_global, id_sync_type, insert_time, id_maclabel, id_owner_org, id_io_type)
+values ('localorg-io_objects-114', 114, 233, 1, 1, 'Исходящая очередь информационного взаимодействия с внешними системами', 'out_external_queue', NULL, 'Системный объект', true, true, 5, current_timestamp, 1, NULL, 3);
+insert into access_table (id_io_object, id_role, allow_readlist, allow_read, allow_delete, allow_update)
+values (114, -10, TRUE, TRUE, FALSE, FALSE);
+
+insert into tbl_io_objects (unique_id, id, id_io_category, author, id_io_state, name, table_name, description, information, is_system, is_global, id_sync_type, insert_time, id_maclabel, id_owner_org, id_io_type)
+values ('localorg-io_objects-115', 115, 235, 1, 1, 'Входящая очередь информационного взаимодействия с внешними системами', 'in_external_queue', NULL, 'Системный объект', true, true, 5, current_timestamp, 1, NULL, 3);
+insert into access_table (id_io_object, id_role, allow_readlist, allow_read, allow_delete, allow_update)
+values (115, -10, TRUE, TRUE, FALSE, FALSE);
 
 SELECT pg_catalog.setval('tbl_io_objects_id_seq', 300, true); --все пользовательские информационные объекты будут начинаться с номера 301
                                                               --это сделано для того, чтобы оставить резерв для системных ИО

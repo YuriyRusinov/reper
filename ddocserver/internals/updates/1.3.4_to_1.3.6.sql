@@ -112,7 +112,9 @@ select f_safe_drop_trigger('trgcheckcatforglobal', 'io_categories');
 select f_safe_drop_trigger('trgacrecinsert', 'attrs_categories');
 select f_safe_drop_trigger('trgacrecdelete', 'attrs_categories');
 
+select f_safe_drop_trigger('trgainsert', 'attributes');
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-378', 378, 9, 'rr_name', 'Название', 'Название', NULL, NULL, 300, TRUE);
+select f_create_trigger('trgainsert', 'before', 'insert or update', 'attributes', 'ainsertcheck()');
 
 select f_create_trigger('trgcheckcatforglobal', 'before', 'insert or update', 'io_categories', 'checkcatforglobal()');
 select f_create_trigger('trgacrecinsert', 'before', 'insert or update', 'attrs_categories', 'arecinsertcheck()');

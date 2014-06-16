@@ -32,6 +32,7 @@
 
 \i ./functions/general/convertattrattrvalue.sql
 \i ./functions/general/createtriggeruidex.sql
+\i ./functions/general/getidobjectbyrecorduid.sql
 
 \i ./functions/general/triggers/readd_triggers.sql
 

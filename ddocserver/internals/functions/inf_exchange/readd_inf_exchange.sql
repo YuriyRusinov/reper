@@ -25,3 +25,4 @@
 \i ./functions/inf_exchange/ugetpingresults.sql
 
 \i ./functions/inf_exchange/organization/readd_organization.sql 
+\i ./functions/inf_exchange/external_systems/readd_external_systems.sql

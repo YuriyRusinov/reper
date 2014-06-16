@@ -169,6 +169,9 @@ cat $SYS_FILES_ABS/postgresql.orig >> $SYS_FILES_ABS/ddocserver-$VERSION &&
 chmod a+x $SYS_FILES_ABS/ddocserver-$VERSION &&
 sudo cp $SYS_FILES_ABS/ddocserver-$VERSION /etc/init.d/ 
 
+#under redhat and debian/ubuntu - there are exist chkconfig utility
+#under gentoo - using rc-update utility
+#under others - ? -- need to testing...
 OS_NAME=`uname -a | grep -o gentoo`
 SERVICE_ADDED=0
 if [ "$OS_NAME" = "gentoo" ]; then

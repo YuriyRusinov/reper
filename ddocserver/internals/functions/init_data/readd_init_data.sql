@@ -43,3 +43,4 @@
 \i ./functions/init_data/distribution_f.sql
 \i ./functions/init_data/time_units.sql
 \i ./functions/init_data/processing_scenario.sql
+\i ./functions/init_data/interaction_formats.sql
