@@ -168,6 +168,9 @@ class _F_DATA_EXPORT KKSPPFactory
         int insertSearchCriterion (KKSFilter * f) const;
         int insertSearchCriterionIntoGroup (int idCriterion, int idGroup) const;
 
+        int sendIOToExternalSystem(int idOrg, int idFormat, int idObject) const;
+
+
     protected:
     private:
         friend class KKSCoreApplication;

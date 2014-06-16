@@ -559,3 +559,103 @@ QList< QObject * > * KKSPluginLoader::getGISPlugins( )
 
     return m_gisPlugins;
 }
+
+QAction * KKSPluginLoader::getPluginAction(KKSPluginType type, const QString & name) 
+{
+    if(name.isEmpty())
+        return NULL;
+
+    QList<QObject*> * allPlugins = getPlugins(type);
+    if(!allPlugins) 
+        return NULL;
+
+    QListIterator<QObject*> iterator(*allPlugins);
+    while (iterator.hasNext()) {
+        QObject * object = iterator.peekNext();
+        KKSBasePlugin *iNextPlugin = qobject_cast<KKSBasePlugin *>(object);
+        
+        if(iNextPlugin->getName() == name){
+            return iNextPlugin->getAction();
+            break;
+        }
+        else 
+            iterator.next();
+    }
+
+    return NULL;
+}
+
+QAction * KKSPluginLoader::getPluginAction(const QString & name) 
+{
+    if(name.isEmpty())
+        return NULL;
+
+    QList<QObject*> * allPlugins = getPlugins();
+    if(!allPlugins) 
+        return NULL;
+
+    QListIterator<QObject*> iterator(*allPlugins);
+    while (iterator.hasNext()) {
+        QObject * object = iterator.peekNext();
+        KKSBasePlugin *iNextPlugin = qobject_cast<KKSBasePlugin *>(object);
+        
+        if(iNextPlugin->getName() == name){
+            return iNextPlugin->getAction();
+            break;
+        }
+        else 
+            iterator.next();
+    }
+
+    return NULL;
+}
+
+QObject * KKSPluginLoader::getPlugin(KKSPluginType type, const QString & name) 
+{
+    if(name.isEmpty())
+        return NULL;
+
+    QList<QObject*> * allPlugins = getPlugins(type);
+    if(!allPlugins) 
+        return NULL;
+
+    QListIterator<QObject*> iterator(*allPlugins);
+    while (iterator.hasNext()) {
+        QObject * object = iterator.peekNext();
+        KKSBasePlugin *iNextPlugin = qobject_cast<KKSBasePlugin *>(object);
+        
+        if(iNextPlugin->getName() == name){
+            return object;
+            break;
+        }
+        else 
+            iterator.next();
+    }
+
+    return NULL;
+}
+
+QObject * KKSPluginLoader::getPlugin(const QString & name) 
+{
+    if(name.isEmpty())
+        return NULL;
+
+    QList<QObject*> * allPlugins = getPlugins();
+    if(!allPlugins) 
+        return NULL;
+
+    QListIterator<QObject*> iterator(*allPlugins);
+    while (iterator.hasNext()) {
+        QObject * object = iterator.peekNext();
+        KKSBasePlugin *iNextPlugin = qobject_cast<KKSBasePlugin *>(object);
+        
+        if(iNextPlugin->getName() == name){
+            return object;
+            break;
+        }
+        else 
+            iterator.next();
+    }
+
+    return NULL;
+}

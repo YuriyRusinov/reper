@@ -93,6 +93,8 @@ Q_OBJECT
         void slotShowDbgWin(bool yes);
 
 
+        void isActiveSubWindow(const KKSObjEditor * editor, bool * yes);
+
         void slotCreateDoc();
         void slotFindDoc();
         void slotMyDocs ();

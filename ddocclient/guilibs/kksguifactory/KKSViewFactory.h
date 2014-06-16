@@ -42,7 +42,7 @@ class KKSSearchTemplate;
 */class _GF_EXPORT KKSViewFactory
 {
     public:
-        static KKSRecWidget * createView (KKSTemplate* theTemplate, 
+        static KKSRecWidget * createViewOld (KKSTemplate* theTemplate, 
                                      KKSObjEditor *objEditor, 
                                      KKSObject* obj, 
                                      KKSLoader *l, 
@@ -50,13 +50,20 @@ class KKSSearchTemplate;
                                      QWidget *parent=0,
                                      Qt::WindowFlags f=0);
 
+        static KKSRecWidget * createView (KKSTemplate* theTemplate, 
+                                          KKSObject* obj,
+                                          KKSLoader *l, 
+                                          const KKSList<const KKSFilterGroup *> & filters,
+                                          QWidget *parent=0,
+                                          Qt::WindowFlags f=0);
+
         static void loadEIOEx (KKSObjEditor * editor, 
                                const KKSObject *pObj, 
                                KKSLoader *l, 
                                const KKSTemplate *t, 
                                QTreeView *tv,
                                const KKSList<const KKSFilterGroup *> & filters, 
-                               bool resize=false,
+                               bool resize, /*=false,*/
                                const KKSCategory * cat = 0,
                                const QString& tableName = QString(),
                                QProgressDialog *pgDial=0,
@@ -82,7 +89,9 @@ class KKSSearchTemplate;
                                     KKSLoader* l,
                                     const KKSList<const KKSFilterGroup *> & filters);
 
-        static QAbstractItemModel* initCategoriesModel (KKSLoader* l, const KKSList<const KKSFilterGroup *>& catTypeFilters, const KKSList<const KKSFilterGroup *>& catFilters);
+        static QAbstractItemModel* initCategoriesModel (KKSLoader* l, 
+                                                        const KKSList<const KKSFilterGroup *>& catTypeFilters, 
+                                                        const KKSList<const KKSFilterGroup *>& catFilters);
 
         static KKSRecWidget * createCategoryTemplates (int idCat,
                                                        KKSLoader *l,
@@ -115,7 +124,9 @@ class KKSSearchTemplate;
         
         static void updateAttributesModel (KKSLoader *l, QAbstractItemModel * wModel);
 
-        static void filterAttributesModel (KKSLoader *l, const KKSList<const KKSFilterGroup *> & filters, QAbstractItemModel * wModel);
+        static void filterAttributesModel (KKSLoader *l, 
+                                           const KKSList<const KKSFilterGroup *> & filters, 
+                                           QAbstractItemModel * wModel);
 
         static void updateAttrModel (const KKSCategory *cat, QAbstractItemModel *model);
         static void updateAttrAttrsModel (const KKSAttribute *a, QAbstractItemModel *model);
@@ -142,24 +153,51 @@ class KKSSearchTemplate;
                                                     QWidget *parent=0,
                                                     Qt::WindowFlags f=0);
 
-        static QVariant drawViewCells (const KKSCategory * cat, KKSEIOData * d, int type, KKSLoader *l, QAbstractItemModel * objModel, const QModelIndex& wIndex, int icolor=0);
+        static QVariant drawViewCells (const KKSCategory * cat, 
+                                       KKSEIOData * d, 
+                                       int type, 
+                                       KKSLoader *l, 
+                                       QAbstractItemModel * objModel, 
+                                       const QModelIndex& wIndex, 
+                                       int icolor=0);
         
-        static QModelIndex searchModelIndex (QAbstractItemModel * sourceMod, qint64 iData, const QModelIndex& parent = QModelIndex(), int role=Qt::UserRole);
-        static QModelIndex searchModelRowsIndex (QAbstractItemModel * sourceMod, qint64 iData, const QModelIndex& parent = QModelIndex(), int role=Qt::UserRole);
-        static QModelIndex searchModelRowsIndexMultiType (QAbstractItemModel * sourceMod, qint64 iData, qint64 typeVal=0, const QModelIndex& parent = QModelIndex(), int role=Qt::UserRole);
+        static QModelIndex searchModelIndex (QAbstractItemModel * sourceMod, 
+                                             qint64 iData, 
+                                             const QModelIndex& parent = QModelIndex(), 
+                                             int role=Qt::UserRole);
+
+        static QModelIndex searchModelRowsIndex (QAbstractItemModel * sourceMod, 
+                                                 qint64 iData, 
+                                                 const QModelIndex& parent = QModelIndex(), 
+                                                 int role=Qt::UserRole);
+
+        static QModelIndex searchModelRowsIndexMultiType (QAbstractItemModel * sourceMod, 
+                                                          qint64 iData, 
+                                                          qint64 typeVal=0, 
+                                                          const QModelIndex& parent = QModelIndex(), 
+                                                          int role=Qt::UserRole);
         
         static KKSEIOData * getRecordData (const KKSObjectExemplar * rec);
         
-        static void getSearchTemplates (KKSLoader * loader, QAbstractItemModel * searchTModel, const QModelIndex& pIndex=QModelIndex(), bool withSearchTemplates=true);
+        static void getSearchTemplates (KKSLoader * loader, 
+                                        QAbstractItemModel * searchTModel, 
+                                        const QModelIndex& pIndex=QModelIndex(), 
+                                        bool withSearchTemplates=true);
         
-        static void setSearchTemplateIntoModel (const KKSSearchTemplate * stdb, QAbstractItemModel * searchMod, const QModelIndex& wIndex);
+        static void setSearchTemplateIntoModel (const KKSSearchTemplate * stdb, 
+                                                QAbstractItemModel * searchMod, 
+                                                const QModelIndex& wIndex);
 
     protected:
     private:
         KKSViewFactory (void);
         ~KKSViewFactory (void);
 
-        static void parseAttrGroup (KKSLoader *l, const KKSAGroup* aGroup, const KKSList<const KKSFilterGroup *> & filters, QAbstractItemModel * aModel, const QModelIndex& parent=QModelIndex());
+        static void parseAttrGroup (KKSLoader *l, 
+                                    const KKSAGroup* aGroup, 
+                                    const KKSList<const KKSFilterGroup *> & filters, 
+                                    QAbstractItemModel * aModel, 
+                                    const QModelIndex& parent=QModelIndex());
 
 };
 

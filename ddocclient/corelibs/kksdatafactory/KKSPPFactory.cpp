@@ -4673,3 +4673,24 @@ int KKSPPFactory::insertAttrAttrs(const KKSAttribute * a) const
 
     return OK_CODE;
 }
+
+int KKSPPFactory::sendIOToExternalSystem(int idOrg, int idFormat, int idObject) const
+{
+    QString sql = QString("select sendIOToExternalSystem(%1, %2, %3)").arg(idOrg).arg(idFormat).arg(idObject);
+    KKSResult * res = db->execute (sql);
+    if (!res || res->getRowCount() != 1)
+    {
+        if (res)
+            delete res;
+
+        return ERROR_CODE;
+    }
+
+    int idQueue = res->getCellAsInt(0, 0);
+    delete res;
+
+    if(idQueue <= 0)
+        return ERROR_CODE;
+
+    return idQueue;
+}

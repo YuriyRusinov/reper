@@ -187,9 +187,14 @@ private:
     //их можно использовать только когда категория описывает таблицу 
     //(в этом случае гарантированно все коды атрибутов будут уникальными)
     //используется при заполнении класса KKSEIOData в KKSLoader
+    
+    //ksa попробуем сделать их публичными
+
     friend class KKSLoader;
     friend class KKSViewFactory;
     friend class KKSRubricFactory;
+
+public:
     KKSCategoryAttr * attribute(const QString & code);
     const KKSCategoryAttr * attribute(const QString & code) const;
 

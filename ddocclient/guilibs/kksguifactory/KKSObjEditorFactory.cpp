@@ -52,6 +52,7 @@
 #include <QVector>
 #include <QtDebug>
 #include <QFileInfo>
+#include <QMenu>
 
 #include "KKSObjEditorFactory.h"
 #include <KKSObjEditor.h>
@@ -125,6 +126,8 @@
 #include <KKSHistogram.h>
 #include <KKSHistWidgetEx.h>
 #include <kkspluginloader.h>
+#include <kksioplugin.h>
+#include <kksbaseplugin.h>
 
 /*
  Заголовочные ф-лы генератора отчетов
@@ -252,7 +255,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
 
     KKSTemplate * tRec = this->getRecordTemplate(io, wCat);
 
-    QToolBar * tbOper = new QToolBar ();//objEditorWidget);
+    QToolBar * tbOper = new QToolBar ();//самый верхний (общий) тулбар в редакторе ИО. Кнопки "Сохранить", "Сохранить и закрыть", "Закрыть" и некоторые другие
     KKSObjEditor * objEditorWidget = new KKSObjEditor (tSystem, 
                                                        ioTemplate, 
                                                        tRec, 
@@ -274,7 +277,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
 
     QGridLayout *mainLayout = objEditorWidget->getLayout ();
     mainLayout->addWidget (tbOper, 0, 0, 1, 1);
-    initActions (tbOper, objEditorWidget);
+    initActions (tbOper, objEditorWidget);//создаем кнопки на основном тулбаре. Там в том числе и плагин для отправки ИО (ЭИО) получателю (отправляется в виде XML)
 
     int nCount = 0;
     int nWR = 1;
@@ -517,7 +520,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
                 tChild = new KKSTemplate (io->tableTemplate() != 0 ? *(io->tableTemplate()) : io->category()->tableCategory()->defTemplate());
                 QWidget * copiesW = new QWidget ();
                 QGridLayout *gRecLay = new QGridLayout (copiesW);
-                recW = KKSViewFactory::createView (tChild, objEditorWidget, io, loader, filters, 0);//copiesW);
+                recW = KKSViewFactory::createViewOld (tChild, objEditorWidget, io, loader, filters, 0);//copiesW);
                 KKSList<KKSTemplate*> lTempls = loader->loadCategoryTemplates (io->category()->tableCategory()->id());
                 int nTemplC = lTempls.count();
                 recW->actSetView->setEnabled ( nTemplC > 0 );
@@ -535,7 +538,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
                 QWidget * copiesW = new QWidget ();
                 QGridLayout *gRecLay = new QGridLayout ();
                 copiesW->setLayout (gRecLay);
-                recW = KKSViewFactory::createView (tChild, objEditorWidget, io, loader, filters, 0);//copiesW);
+                recW = KKSViewFactory::createViewOld (tChild, objEditorWidget, io, loader, filters, 0);//copiesW);
                 recW->actSetView->setEnabled ( nTemplC > 0 );
                 objEditorWidget->setRecordsWidget (recW);
                 tabEnc->insertTab (0, copiesW, wCat->tableCategory()->name() );
@@ -584,18 +587,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
         //
         QAction * edsPlugin = NULL;
         if(m_pluginLoader){
-            QList<QAction *> * ioPlugins = m_pluginLoader->getPluginActions(KKSPluginLoader::ptKKSIOPlugin);
-            if(ioPlugins){
-                int cnt=ioPlugins->count();
-                for(int i=0; i<cnt; i++){
-                    edsPlugin = ioPlugins->at(i);
-                    if(edsPlugin && edsPlugin->text() == tr("Digital Signature Plugin")){
-                        break;
-                    }
-                    else
-                        edsPlugin = NULL;
-                }
-            }
+            edsPlugin = m_pluginLoader->getPluginAction(KKSPluginLoader::ptKKSIOPlugin, tr("Digital Signature Plugin"));
         }
 
         QWidget * filesW = new QWidget ();
@@ -631,18 +623,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
         //
         QAction * edsPlugin = NULL;
         if(m_pluginLoader){
-            QList<QAction *> * ioPlugins = m_pluginLoader->getPluginActions(KKSPluginLoader::ptKKSIOPlugin);
-            if(ioPlugins){
-                int cnt=ioPlugins->count();
-                for(int i=0; i<cnt; i++){
-                    edsPlugin = ioPlugins->at(i);
-                    if(edsPlugin && edsPlugin->text() == tr("Digital Signature Plugin")){
-                        break;
-                    }
-                    else
-                        edsPlugin = NULL;
-                }
-            }
+            edsPlugin = m_pluginLoader->getPluginAction(KKSPluginLoader::ptKKSIOPlugin, tr("Digital Signature Plugin"));
         }
 
         QWidget * filesW = new QWidget ();
@@ -976,7 +957,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditorParam (int idObject,// идент
             tChild = new KKSTemplate (io->tableTemplate() != 0 ? *(io->tableTemplate()) : io->category()->tableCategory()->defTemplate());
             QWidget * copiesW = new QWidget ();
             QGridLayout *gRecLay = new QGridLayout (copiesW);
-            KKSRecWidget * recW = KKSViewFactory::createView (tChild, objEditorWidget, io, loader, filters, 0);//copiesW);
+            KKSRecWidget * recW = KKSViewFactory::createViewOld (tChild, objEditorWidget, io, loader, filters, 0);//copiesW);
             KKSList<KKSTemplate*> lTempls = loader->loadCategoryTemplates (io->category()->tableCategory()->id());
             int nTemplC = lTempls.count();
             recW->actSetView->setEnabled ( nTemplC > 0 );
@@ -994,7 +975,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditorParam (int idObject,// идент
             QWidget * copiesW = new QWidget ();
             QGridLayout *gRecLay = new QGridLayout ();
             copiesW->setLayout (gRecLay);
-            KKSRecWidget * recW = KKSViewFactory::createView (tChild, objEditorWidget, io, loader, filters, 0);//copiesW);
+            KKSRecWidget * recW = KKSViewFactory::createViewOld (tChild, objEditorWidget, io, loader, filters, 0);//copiesW);
             recW->actSetView->setEnabled ( nTemplC > 0 );
             objEditorWidget->setRecordsWidget (recW);
             tabEnc->insertTab (0, copiesW, wCat->tableCategory()->name() );
@@ -1040,18 +1021,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditorParam (int idObject,// идент
         //
         QAction * edsPlugin = NULL;
         if(m_pluginLoader){
-            QList<QAction *> * ioPlugins = m_pluginLoader->getPluginActions(KKSPluginLoader::ptKKSIOPlugin);
-            if(ioPlugins){
-                int cnt=ioPlugins->count();
-                for(int i=0; i<cnt; i++){
-                    edsPlugin = ioPlugins->at(i);
-                    if(edsPlugin && edsPlugin->text() == tr("Digital Signature Plugin")){
-                        break;
-                    }
-                    else
-                        edsPlugin = NULL;
-                }
-            }
+            edsPlugin = m_pluginLoader->getPluginAction(KKSPluginLoader::ptKKSIOPlugin, tr("Digital Signature Plugin"));
         }
 
         QWidget * filesW = new QWidget ();
@@ -1601,7 +1571,7 @@ KKSRecDialog* KKSObjEditorFactory :: createObjRecEditor (int idObject,// идентиф
         {
             KKSTemplate * tChild = NULL;
             tChild = new KKSTemplate (io->tableTemplate() != 0 ? *(io->tableTemplate()) : io->category()->tableCategory()->defTemplate());
-            recW = KKSViewFactory::createView (tChild, objEditorWidget, io, loader, filters, 0);//copiesW);
+            recW = KKSViewFactory::createViewOld (tChild, objEditorWidget, io, loader, filters, 0);//copiesW);
             if (!recW)
                 return objEditorWidget;
             KKSList<KKSTemplate*> lTempls = loader->loadCategoryTemplates (io->category()->tableCategory()->id());
@@ -1617,7 +1587,7 @@ KKSRecDialog* KKSObjEditorFactory :: createObjRecEditor (int idObject,// идентиф
             int nTemplC = lTempls.count();
             KKSTemplate *tChild = nTemplC > 0 ? lTempls[0] : new KKSTemplate (wCat->tableCategory()->defTemplate());
 
-            recW = KKSViewFactory::createView (tChild, objEditorWidget, io, loader, filters, 0);//copiesW);
+            recW = KKSViewFactory::createViewOld (tChild, objEditorWidget, io, loader, filters, 0);//copiesW);
             if (!recW)
                 return objEditorWidget;
             recW->actSetView->setEnabled ( nTemplC > 0 );
@@ -6237,31 +6207,48 @@ void KKSObjEditorFactory :: initActions (QToolBar *tBar, KKSObjEditor *editor)
     kvList.append (kView);
     aViewAttrs->setShortcuts (kvList);
     connect (aViewAttrs, SIGNAL (triggered()), editor, SLOT (setAttrView()) );
+    
+    QAction * aSend = new QAction(QIcon(":/ddoc/send_as_mail.png"), tr ("Send"), editor);
+    QMenu * menuSend = new QMenu(editor);
 
     if (editor->getObj() )
     {
-        QAction *aSendIO = new QAction (QIcon(":/ddoc/send_as_mail.png"), tr ("Send"), editor);
+        QAction *aSendIO = new QAction (QIcon(":/ddoc/send_as_mail.png"), tr ("Send as message"), editor);
         QKeySequence kSend (Qt::CTRL+Qt::Key_Return);
-        tBar->addAction (aSendIO);
+        menuSend->addAction (aSendIO);
         aSendIO->setShortcut (kSend);
         connect (aSendIO, SIGNAL (triggered()), editor, SLOT (sendIO()) );
+    }
+
+    //загружаем плагин для отправки в виде XML в  другую систему
+    QAction * sendAsXMLPlugin = NULL;
+    if(m_pluginLoader){
+        QObject * plugin = m_pluginLoader->getPlugin(KKSPluginLoader::ptKKSIOPlugin, tr("Send As XML Plugin"));
+        KKSBasePlugin * bp = qobject_cast<KKSBasePlugin *>(plugin);
+        if(bp){
+            sendAsXMLPlugin = bp->getAction();
+            menuSend->addAction(sendAsXMLPlugin);
+
+            KKSIOPlugin * iop = qobject_cast<KKSIOPlugin *>(plugin);
+            connect(plugin, SIGNAL(getCurrentIO(KKSObject **)), editor, SLOT(getCurrentIO(KKSObject **)));
+            connect(plugin, SIGNAL(getCurrentEIO(KKSObjectExemplar **)), editor, SLOT(getCurrentEIO(KKSObjectExemplar **)));
+        }
+    }
+    
+    aSend->setMenu(menuSend);
+    tBar->addAction (aSend);
+    if(menuSend->actions().count() == 0)
+        aSend->setEnabled(false);
+    else{
+        //connect(aSend, SIGNAL(triggered(), );
     }
 
     tBar->addSeparator ();
 
     if (editor->showExecButton())
     {
-/*        QWidget * wExec = new QWidget (tBar, Qt::Tool);
-        QToolButton * tbExecW = new QToolButton (wExec);//, Qt::Tool);
-        tbExecW->setIconSize (QSize (24, 24));
-        tbExecW->setToolButtonStyle (Qt::ToolButtonTextBesideIcon);
-        QHBoxLayout *hExecLay = new QHBoxLayout ();
-        wExec->setLayout (hExecLay);
-        hExecLay->addStretch ();*/
         QAction *aExecCommand = new QAction (QIcon(":/ddoc/exec_cmd.png"), tr ("Execute command"), editor);
-        //tbExecW->setDefaultAction (aExecCommand);
-        //hExecLay->addWidget (tbExecW);
-        tBar->addAction (aExecCommand);//addWidget (wExec);
+        tBar->addAction (aExecCommand);
         connect (aExecCommand, SIGNAL (triggered()), editor, SLOT (saveAsCommandResult()) );
     }
 }

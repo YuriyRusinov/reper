@@ -60,7 +60,12 @@ class _KKSPLUGIN_EXPORT KKSPluginLoader{
           
         QList<QObject*> * getPlugins(KKSPluginType type);
         QList<QObject*> * getPlugins();
+
+        QAction * getPluginAction(KKSPluginType type, const QString & name) ;
+        QAction * getPluginAction(const QString & name) ;
   
+        QObject * getPlugin(KKSPluginType type, const QString & name) ;
+        QObject * getPlugin(const QString & name) ;
   
     private:
         int initPlugins();

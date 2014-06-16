@@ -410,7 +410,6 @@ class _F_DATA_EXPORT KKSLoader
         QMap<int, QString> getPartLowInfoForStreams() const;
         QString getHistogramValue(KKSHistogram & h, const QString & tName) const;
 
-
         KKSLoader();
         ~KKSLoader();
     protected:

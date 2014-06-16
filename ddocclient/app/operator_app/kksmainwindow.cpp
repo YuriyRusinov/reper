@@ -768,6 +768,25 @@ QWidget * KKSMainWindow::activeKKSSubWindow()
     return 0;
 }
 
+void KKSMainWindow::isActiveSubWindow(const KKSObjEditor * editor, bool * yes)
+{
+    if(!editor)
+        return;
+    if(!yes)
+        return;
+
+    QWidget * w = activeKKSSubWindow();
+    if(!w)
+        return;
+
+    if(w == editor){
+        *yes = true;
+        return;
+    }
+
+    *yes = false;
+}
+
 
 KKSObjEditor * KKSMainWindow::activeObjEditor()
 {
@@ -964,34 +983,18 @@ void KKSMainWindow::slotCreateNewObjEditor(KKSObjEditor * objEditor)
     QMdiSubWindow * m_objEditorW = m_mdiArea->addSubWindow (objEditor);
     m_objEditorW->setAttribute (Qt::WA_DeleteOnClose);
     connect (objEditor, SIGNAL (closeEditor()), m_objEditorW, SLOT (close()) );
-//    int idObj = objEditor->getObj () ? objEditor->getObj()->id() : -1;
-//    int idObjC = objEditor->getObjectEx() ? objEditor->getObjectEx()->id() : -1;
-//   if (idObj == IO_IO_ID && idObjC == IO_IO_ID)
-//    {
+    
+    //помечаем, что редактор ИО является MDI-окном. В этом случае при определении активного окна необходимо будет слать сигнал isActiveSubWindow()
+    objEditor->setAsSubWindow(true);
+    connect(objEditor, SIGNAL(isActiveSubWindow(const KKSObjEditor *, bool *)), this, SLOT(isActiveSubWindow(const KKSObjEditor *, bool *)));
+
+
     objEditor->setWindowState (objEditor->windowState() | Qt::WindowMaximized | Qt::WindowActive);
     m_objEditorW->setWindowState (m_objEditorW->windowState() | Qt::WindowMaximized | Qt::WindowActive);
-    objEditor->show();//Maximized();
+    objEditor->show();
     objEditor->setNumCopies (m_masscreateW->num());
 
     connect (this->m_masscreateW, SIGNAL (setNum(int)), objEditor, SLOT (setNumCopies (int)) );
-    //    qDebug () << __PRETTY_FUNCTION__ << objEditor->size () << m_objEditorW->size ();
-//    }
-//    else
-//        qDebug () << __PRETTY_FUNCTION__ << objEditor->size () << m_objEditorW->size ();
-/*    objEditor->show();
-    QSize sobj (objEditor->layout ()->minimumSize ());
-
-    objEditor->resize (objEditor->width(),
-                       sobj.height() +
-                           objEditor->geometry().y() -
-                           objEditor->y());
-
-    m_objEditorW->resize (m_objEditorW->layout()->sizeHint().width(),
-                          m_objEditorW->layout()->minimumSize().height() +
-                              m_objEditorW->geometry().y() -
-                              m_objEditorW->y() +
-                              34);*/
-
 }
 
 void KKSMainWindow::slotSearchTemplateEdit (QWidget * stForm)

@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/" >
+	<file>pics/send_as_xml.xpm</file>
+    </qresource>
+</RCC>

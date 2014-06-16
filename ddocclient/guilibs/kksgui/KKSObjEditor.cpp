@@ -149,6 +149,8 @@ KKSObjEditor :: KKSObjEditor (const KKSTemplate *t,
 
     m_filters = filters;
 
+    m_isSubWindow = false; //если редактор »ќ будет вставлен в MDI-окно, то главное приложение установит этот параметр в true
+
     this->setLayout (mainLayout);
     this->setRecordsWidget(0);
     
@@ -2762,4 +2764,46 @@ void KKSObjEditor :: viewAHist (const KKSAttrValue * av, const KKSList<KKSAttrVa
         (qobject_cast<KKSAttrValueLabel *>(activeLabel))->viewAHist (av, histList);
     }
     //emit viewHist (histList);
+}
+
+void KKSObjEditor::getCurrentIO(KKSObject ** io)
+{
+    if(!io)
+        return;
+    
+    if(isActive())
+        *io = pObj;
+}
+
+void KKSObjEditor::getCurrentEIO(KKSObjectExemplar ** eio)
+{
+    if(!eio)
+        return;
+    
+    if(isActive())
+        *eio = pObjectEx;
+}
+
+void KKSObjEditor::setAsSubWindow(bool yes)
+{
+    m_isSubWindow = yes;
+}
+
+bool KKSObjEditor::isSubWindow() const
+{
+    return m_isSubWindow;
+}
+
+bool KKSObjEditor::isActive() const
+{
+    if(!m_isSubWindow){
+        if(isActiveWindow())
+            return true;
+        return false;
+    }
+
+    bool yes = false;
+    emit isActiveSubWindow(this, &yes);
+
+    return yes;
 }

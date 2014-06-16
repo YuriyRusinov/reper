@@ -65,6 +65,8 @@ public:
     int insertTSDRecord(KKSObjectExemplar* eio) const;
 
     int insertFile(qint64 idRecord, KKSFile * f, QWidget * parent = NULL) const;
+
+    int sendEIOToExternalSystem(int idOrg, int idFormat, int idObject, int idRecord) const;
     
 
     void setDb(KKSDatabase * db);

@@ -112,7 +112,8 @@ class _GUI_EXPORT KKSObjEditor : public KKSRecDialog
         bool showExecButton() const;
         void setShowExecButton(bool yes = true);
 
-        //int getID (void) const;
+        void setAsSubWindow(bool yes);
+        bool isSubWindow() const;
 
         void save(int num=1);
 
@@ -132,6 +133,12 @@ class _GUI_EXPORT KKSObjEditor : public KKSRecDialog
         //void setIndValue (int id, bool sys, QVariant val);
 
         void loadAttrHistory (const KKSAttrValue * av, bool forRecs);
+        
+        //ksa для плагина
+        //Если текущий редактор ИО является активным окном, то возвращается его ИО (ЭИО). 
+        //В противном случае никаких действий с входным параметром не производится
+        void getCurrentIO(KKSObject ** io);
+        void getCurrentEIO(KKSObjectExemplar ** eio);
     private slots:
 
         void accept (void);
@@ -275,6 +282,10 @@ class _GUI_EXPORT KKSObjEditor : public KKSRecDialog
 
         void updateHistogramGraphic();//для ИО и ЭИО, имеющих атрибут типа гистограмма, необходимо перечитать данные в значение этого атрибута из БД, каждый раз, когда ИО (ЭИО) сохранен в БД
 
+        void isActiveSubWindow(const KKSObjEditor * editor, bool * yes) const; //вызывается, чтобы определить, является ли данный редактор ИО 
+                                                                               //(в случае, если он является mdi-окном, т.е. m_isSubWindow = true)
+                                                                               //активным mdi-окном. сигнал ловится главным приложением
+
     public slots:
         //void slotRubricItemRequested();
         void slotIncludeSelected(int idObject, QString name);
@@ -345,6 +356,7 @@ class _GUI_EXPORT KKSObjEditor : public KKSRecDialog
         
         void addIndRow (int idIndicator, QWidget *editor, QLabel * lab);
 */
+        bool isActive() const;
     private:
         //
         // Functions
@@ -388,6 +400,9 @@ class _GUI_EXPORT KKSObjEditor : public KKSRecDialog
         int m_idJournal;
         bool m_draft;
         bool m_showExecButton;
+        
+        //если true, то редактор ИО является MDI-окном (устанавливается в главном приложении)
+        bool m_isSubWindow;
 
         KKSList<const KKSFilterGroup*> m_filters;
 

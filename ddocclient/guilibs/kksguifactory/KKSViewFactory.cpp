@@ -75,7 +75,7 @@
 // Return:     KKSRecWidget * с моделью данных
 ////////////////////////////////////////////////////////////////////////
 
-KKSRecWidget * KKSViewFactory :: createView (KKSTemplate* theTemplate, 
+KKSRecWidget * KKSViewFactory :: createViewOld (KKSTemplate* theTemplate, 
                                         KKSObjEditor *objEditor, 
                                         KKSObject* obj, 
                                         KKSLoader *l,
@@ -166,6 +166,64 @@ KKSRecWidget * KKSViewFactory :: createView (KKSTemplate* theTemplate,
 }
 
 ////////////////////////////////////////////////////////////////////////
+// Name:       KKSViewFactory::createView(KKSTemplate* theTemplate, QString tableName)
+// Purpose:    Implementation of KKSViewFactory::createView()
+// Parameters:
+// - theTemplate -- шаблон табличной категории
+// - objEditor -- редактор ИО
+// - obj -- ИО-справочник
+// - l -- загрузчик данных из БД
+// - filters -- применяемые фильтры
+// - parent -- родительский виджет
+// - f -- флаги визуального отображения
+// Return:     KKSRecWidget * с моделью данных
+////////////////////////////////////////////////////////////////////////
+
+KKSRecWidget * KKSViewFactory :: createView (KKSTemplate* theTemplate, 
+                                             KKSObject* obj, 
+                                             KKSLoader *l,
+                                             const KKSList<const KKSFilterGroup *> & filters,
+                                             QWidget *parent,
+                                             Qt::WindowFlags f)
+{
+//    KKSView *tv = new KKSView ();
+    KKSRecWidget *resWidget = new KKSRecWidget (false, Qt::Vertical, parent, f);
+    QTreeView *tv = resWidget->getView();//new QTreeView ();
+    tv->header()->setClickable (true);
+    tv->header()->setSortIndicatorShown (true);
+    tv->header()->setSortIndicator (0, Qt::AscendingOrder);
+    tv->setSortingEnabled (true);
+
+    KKSItemDelegate *itemDeleg = new KKSItemDelegate (parent);
+    itemDeleg->setTemplate (theTemplate);
+    //setCategory (theTemplate->category());
+    tv->setItemDelegate (itemDeleg);
+    resWidget->showFilter ();
+    KKSEventFilter *ef = new KKSEventFilter (resWidget);
+    tv->viewport()->installEventFilter (ef);
+    if (tv->selectionModel())
+        tv->selectionModel()->clearSelection ();
+
+    tv->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    tv->setSelectionBehavior(QAbstractItemView::SelectRows);
+
+    loadEIOEx (0, obj, l, theTemplate, tv, filters, true);
+    
+    const KKSCategory * cat = theTemplate->category();
+    QList<int> idP = cat->searchAttributesByType(KKSAttrType::atParent);
+    bool isHier (!idP.isEmpty());
+    resWidget->enableGroupMenu (!isHier);
+    resWidget->enableFilterMenu (false);//isHier);
+    //
+    // пока с проксевыми моделями имеются проблемы, обсуждаемые в Qt
+    // разумнее сделать пока фильтрацию по регулярному выражению, отложив
+    // более правильное вычленение записей до лучших времен.
+    //
+    return resWidget;
+   // TODO : implement
+}
+
+////////////////////////////////////////////////////////////////////////
 // Name:       KKSViewFactory::KKSViewFactory()
 // Purpose:    Implementation of KKSViewFactory::KKSViewFactory()
 // Return:     
@@ -240,14 +298,14 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
 
     if (!tv->model())
     {
-        sortModel = new KKSSortFilterProxyModel (editor);
+        sortModel = new KKSSortFilterProxyModel (tv);//ksa было editor
         tv->setModel (sortModel);
     }
     else
     {
         sortModel = qobject_cast <KKSSortFilterProxyModel *>(tv->model());
         if (!sortModel)
-            sortModel = new KKSSortFilterProxyModel (editor);
+            sortModel = new KKSSortFilterProxyModel (tv); //ksa было editor
         sortModel->clearAttrs ();
         //itemDeleg->clearAttrs ();
         qDebug () << __PRETTY_FUNCTION__ << "Model was previously set";
@@ -627,6 +685,7 @@ void KKSViewFactory :: loadEIOEx (QWidget *editor,
         objModel->removeRows (0, objModel->rowCount());
         objModel->removeColumns (0, objModel->columnCount());
     }
+
     QAbstractItemModel *oldObjModel = qobject_cast <QAbstractProxyModel *>(oldModel) ? qobject_cast <QAbstractProxyModel *>(oldModel)->sourceModel () : oldModel;
     objModel->insertColumns (0, oldObjModel ? oldObjModel->columnCount() : 1);
     if (oldObjModel)
@@ -658,6 +717,7 @@ void KKSViewFactory :: loadEIOEx (QWidget *editor,
     {
         if (pgDial)
             pgDial->setValue (counter);
+        
         KKSEIOData * d = p.value();
         if (idPAttr > 0)
         {

@@ -6,16 +6,12 @@
 #include "edsplugin.h"
 #include "digitalsignatureform.h"
 
-EDSPlugin::EDSPlugin(): initplugin (false), m_fManager (0)
+EDSPlugin::EDSPlugin(): m_fManager (0)
 {
-    m_form = new DigitalSignatureForm();
-    m_io = NULL;
 }
 
 EDSPlugin::~EDSPlugin()
 {
-    if(m_form)
-        delete m_form;
 }
 
 void EDSPlugin::setAction( QAction * _act )
@@ -29,24 +25,20 @@ void EDSPlugin::setAction( QAction * _act )
 
 void EDSPlugin::loadForm()
 {
-    if(!initplugin)
-    {
-        initplugin = true;
-    }
-
+    DigitalSignatureForm * m_form = new DigitalSignatureForm();
     m_form->exec();
+    delete m_form;
 }
 
 
 void EDSPlugin::setIO(KKSObject * io)
 {
-    if(m_io)
-        m_io->release();
+    Q_UNUSED(io);
+}
 
-    m_io = io;
-
-    if(m_io)
-        m_io->addRef();
+void EDSPlugin::setEIO(KKSObjectExemplar * eio)
+{
+    Q_UNUSED(eio);
 }
 
 void EDSPlugin :: setFactoryManager(KKSCoreApplication * fManager)

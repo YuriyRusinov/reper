@@ -1997,3 +1997,25 @@ int KKSEIOFactory::uploadFile(KKSFile * f, QWidget * parent) const
 
     return OK_CODE;
 }
+
+int KKSEIOFactory::sendEIOToExternalSystem(int idOrg, int idFormat, int idObject, int idRecord) const
+{
+    QString sql = QString("select sendEIOToExternalSystem(%1, %2, %3, %4)").arg(idOrg).arg(idFormat).arg(idObject).arg(idRecord);
+    KKSResult * res = db->execute (sql);
+    if (!res || res->getRowCount() != 1)
+    {
+        if (res)
+            delete res;
+
+        return ERROR_CODE;
+    }
+
+    int idQueue = res->getCellAsInt(0, 0);
+    delete res;
+
+    if(idQueue <= 0)
+        return ERROR_CODE;
+
+    return idQueue;
+}
+

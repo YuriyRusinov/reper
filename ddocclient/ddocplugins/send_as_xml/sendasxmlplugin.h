@@ -1,5 +1,5 @@
-#ifndef EDSPLUGIN_H
-#define EDSPLUGIN_H
+#ifndef SENDASXMLPLUGIN_H
+#define SENDASXMLPLUGIN_H
 
 #include <QObject>
 
@@ -7,26 +7,27 @@
 #include <kksioplugin.h>
 #include <kkscoreapplication.h>
 
-#include "digitalsignatureform.h"
+#include "sendasxmlform.h"
 
 class QAction;
 class KKSObject;
+class KKSObjectExemplar;
 
-class EDSPlugin : public QObject,
-                  public KKSBasePlugin,
-                  public KKSIOPlugin
+class SendAsXMLPlugin : public QObject,
+                        public KKSBasePlugin,
+                        public KKSIOPlugin
 {    
     Q_OBJECT
     Q_INTERFACES(KKSBasePlugin)
     Q_INTERFACES(KKSIOPlugin)
 
     public:
-        EDSPlugin();
-        ~EDSPlugin();
+        SendAsXMLPlugin();
+        ~SendAsXMLPlugin();
           
-        QString getName() const {return tr("Digital Signature Plugin");}
-        QString getDesc() const {return tr("Digital Signature Plugin");}
-        QPixmap getPixmap() const {return QPixmap(":/pics/eds.xpm");}
+        QString getName() const {return tr("Send As XML Plugin");}
+        QString getDesc() const {return tr("Send As XML Plugin");}
+        QPixmap getPixmap() const {return QPixmap(":/pics/send_as_xml.xpm");}
           
         void setAction( QAction * _action);
         QAction * getAction() { return action; }
@@ -38,7 +39,7 @@ class EDSPlugin : public QObject,
         void setFactoryManager(KKSCoreApplication* fManager);
   
     public slots:
-        void loadForm();
+        void openForm();
 
     signals:
         void getCurrentIO(KKSObject ** io);
@@ -46,10 +47,13 @@ class EDSPlugin : public QObject,
         void ioChanged(KKSObject * io);
         void eioChanged(KKSObjectExemplar * io);
 
-private:
+    private:
+        //KKSObject * m_io;
         KKSCoreApplication *m_fManager;
         
-        DigitalSignatureForm *m_form;
+        //bool initplugin;
+
+        //SendAsXMLForm *m_form;
 };
 
 #endif
