@@ -10,6 +10,7 @@
 class QAction;
 
 class KKSObject;
+class KKSObjectExemplar;
 
 class RadioImagePlugin : public QObject,
                          public KKSBasePlugin,
@@ -28,10 +29,18 @@ public:
 
     void setFactoryManager(KKSCoreApplication* fManager);
     void setIO(KKSObject * io);
+    void setEIO(KKSObjectExemplar * rio);
     KKSIOPluginType getIOPluginType();
 
 public slots:
     void runPlug (void);
+
+signals:
+
+    void getCurrentIO(KKSObject ** io);
+    void getCurrentEIO(KKSObjectExemplar ** eio);
+    void ioChanged(KKSObject * io);
+    void eioChanged(KKSObjectExemplar * io);
 
 private:
     //

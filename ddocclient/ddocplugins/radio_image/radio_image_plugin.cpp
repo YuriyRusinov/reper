@@ -3,6 +3,7 @@
 #include <QtPlugin>
 
 #include <KKSObject.h>
+#include <KKSObjectExemplar.h>
 #include <kksdatabase.h>
 
 #include "radio_image_plugin.h"
@@ -61,6 +62,11 @@ void RadioImagePlugin :: setIO(KKSObject * io)
 
     if(m_io)
         m_io->addRef();
+}
+
+void RadioImagePlugin :: setEIO(KKSObjectExemplar * rio)
+{
+    Q_UNUSED (rio);
 }
 
 KKSIOPlugin::KKSIOPluginType RadioImagePlugin :: getIOPluginType()
