@@ -29,6 +29,8 @@
 #include "KKSDbgOutputWidget.h"
 
 #include "kkssettings.h"
+#include "kkscommandlineopts.h"
+#include "commandlineparamsform.h"
 
 #include "connectioninfoform.h"
 
@@ -77,7 +79,7 @@ void KKSDbgOutputHandler(QtMsgType type, const char *msg)
 
 Кроме того загружаются необходимые данные для класса QTranslator (русификация). По умолчанию используется файл ddocclient_ru.ts в корневом каталоге приложения.
 */
-KKSCoreApplication::KKSCoreApplication(const QString & userName, bool msgToWindow) :
+KKSCoreApplication::KKSCoreApplication(KKSCommandLineOpts * opts, bool msgToWindow) :
     poDb (0),
     m_dbgWidget(0)
 {
@@ -101,7 +103,10 @@ KKSCoreApplication::KKSCoreApplication(const QString & userName, bool msgToWindo
     m_eiof = NULL;
 
     selfCore = this;
-    allowedUserName = userName;
+    
+    m_kksOpts = opts;
+    if(m_kksOpts)
+        setAllowedUserName(m_kksOpts->user);
 
     QDir dir;
     workingDir = dir.absolutePath();
@@ -224,11 +229,22 @@ KKSCoreApplication::~KKSCoreApplication( )
     if(m_eiof) 
         delete m_eiof;
 
+    if(m_kksOpts)
+        delete m_kksOpts;
+
     selfCore = 0;
 
     m_logStream.flush();
 }
 
+
+const KKSCommandLineOpts * KKSCoreApplication::commandLineOpts() const
+{
+    if(!m_kksOpts)
+        m_kksOpts = new KKSCommandLineOpts();
+
+    return m_kksOpts;
+}
 
 KKSDatabase * KKSCoreApplication::db() const 
 {
@@ -621,8 +637,8 @@ void KKSCoreApplication::loadLastSelectedFilter()
 
 KKSCoreApplication * KKSCoreApplication::init (int argc, 
                                                char *argv[], 
-                                               bool with_connect, 
-                                               const QString & userName, 
+                                               //bool with_connect, 
+                                               //const QString & userName, 
                                                bool msgToWindow)
 {
     if ( selfCore )
@@ -642,29 +658,86 @@ KKSCoreApplication * KKSCoreApplication::init (int argc,
     KKSCoreApplication * xG0;
     bool bDel = false;
     if ( !selfCore ){
-        xG0 = new KKSCoreApplication (userName, msgToWindow);
+        KKSCommandLineOpts * opts = KKSCoreApplication::parseCommandLineOptions(argc, argv);
+        xG0 = new KKSCoreApplication (opts, msgToWindow);
         bDel = true;
     }
     else
         xG0 = selfCore;
 
-    if(with_connect){
+    
+    int ok = connectIfReady();
+    if(ok != OK_CODE){
+        if(bDel)
+            delete xG0;
+        return 0;
+    }
+
+    return xG0;
+
+    /*
+    if(kksCoreApp->commandLineOpts() && kksCoreApp->commandLineOpts()->withAutoConnect){
         KKSDatabase * m_db = xG0->db();
 
         if ( ! m_db->connected() )
         {
+            int ok = 0;
+            if(kksCoreApp->commandLineOpts()->readyToAutoConnect()){
+                ok = autoConnect();
+                if(ok != OK_CODE)
+                    ok = GUIConnect();
+            }
+            else{
+                ok = GUIConnect();
+            }
 
-            int ok = GUIConnect();
-            if(ok != OK_CODE)
-            {
+            if(ok != OK_CODE){
                 if(bDel)
                     delete xG0;
                 return 0;
             }
+
         }
     }
 
     return xG0;
+    */
+}
+
+int KKSCoreApplication::connectIfReady()
+{
+    if(kksCoreApp->commandLineOpts() && kksCoreApp->commandLineOpts()->withAutoConnect){
+        KKSDatabase * m_db = kksCoreApp->db();
+
+        if ( ! m_db->connected() )
+        {
+            int ok = 0;
+            if(kksCoreApp->commandLineOpts()->readyToAutoConnect()){
+                ok = autoConnect();
+                if(ok != OK_CODE){
+                    int b = QMessageBox::warning(0, 
+                                                 tr("Connect to database"), 
+                                                 tr("Cannot automatically connect to database!\nDo you want to connect with another connection params?"), 
+                                                 QMessageBox::Yes | QMessageBox::No, 
+                                                 QMessageBox::Yes);
+                    if(b == QMessageBox::Yes)
+                        ok = GUIConnect();
+                    else
+                        return OK_CODE;
+                }
+            }
+            else{
+                ok = GUIConnect();
+            }
+
+            if(ok != OK_CODE){
+                return ERROR_CODE;
+            }
+
+        }
+    }
+
+    return OK_CODE;
 }
 
 int KKSCoreApplication::GUIConnect(QWidget * parent)
@@ -676,48 +749,72 @@ int KKSCoreApplication::GUIConnect(QWidget * parent)
     if(!m_db)
         return ERROR_CODE;
 
+    const KKSCommandLineOpts * opts = kksCoreApp->commandLineOpts();
+
     KKSSettings * poSettings = kksCoreApp->getKKSSettings();
     KKSList<KKSAccLevel*> levels = kksCoreApp->getAccLevels();
 
     poSettings->beginGroup ("System settings/Database");
-    QString ip = poSettings->getParam("hostName");
-    QString dbname = poSettings->getParam("databaseName");
-    //QString port = poSettings->getParam("databasePort");
-	
-	QString user;
-	if(kksCoreApp->allowedUserName.isEmpty())
+    
+    QString ip;
+    QString dbname;
+    QString user;
+    QString port;
+
+    if(opts->host.isEmpty())
+        ip = poSettings->getParam("hostName");
+    else
+        ip = opts->host;
+
+    if(opts->database.isEmpty())
+        dbname = poSettings->getParam("databaseName");
+    else
+        dbname = opts->database;
+
+    if(opts->user.isEmpty())
 		user = poSettings->getParam("userName");
 	else
-		user = kksCoreApp->allowedUserName;
+        user = opts->user;
+
+    //QString port = poSettings->getParam("databasePort");
+	
+	
 
     QString currentLevel = poSettings->getParam("currentLevel");
-    QString port;
     int currentLevelIndex = 0; //используется для определения текущего выбранного индекса уровня доступа в комбобоксе
 
     if(currentLevel.isEmpty()){
         if(levels.count() == 0){
             currentLevel = tr("Not Secret");
-            port = "5432";
+            if(opts->port.isEmpty())
+                port = "5432";
+            else
+                port = opts->port;
         }
         else{
             currentLevel = levels.at(0)->name();
-            port = levels.at(0)->port();
+            if(opts->port.isEmpty())
+                port = levels.at(0)->port();
+            else
+                port = opts->port;
         }
     }
     else{
         for(int i=0; i<levels.count(); i++){
             if(levels.at(i)->name() == currentLevel){
                 currentLevelIndex = i;
-                port = levels.at(i)->port();
+                
+                if(opts->port.isEmpty())
+                    port = levels.at(i)->port();
+                else
+                    port = opts->port;
             }
         }
     }
 
     KKSAccLevel currLevel(currentLevel, port);
-//    QDialog * dlW = new QDialog ();
-//    if (dlW->exec() == QDialog::Accepted)
-//        qDebug () << __PRETTY_FUNCTION__;
-    LoginForm * lf = new LoginForm( levels, currLevel, 0 );
+
+    LoginForm * lf = new LoginForm( levels, currLevel, opts->port.isEmpty() ? true:false, 0 );
     
     bool result = false;
 
@@ -725,10 +822,10 @@ int KKSCoreApplication::GUIConnect(QWidget * parent)
     {
         //lf->setAccLevels(m_accLevels);
 
-        lf->setUser(user, kksCoreApp->allowedUserName.isEmpty() ? true : false);
-        lf->setHost(ip);
-        lf->setName(dbname);
-        //lf->setPort(port);
+        lf->setUser(user, opts->user.isEmpty() ? true : false);
+        lf->setHost(ip, opts->host.isEmpty() ? true : false);
+        lf->setName(dbname, opts->database.isEmpty() ? true : false);
+        lf->setPort(port);
         //lf->setLevel(currentLevel);
         
 #ifndef WIN32
@@ -807,6 +904,12 @@ int KKSCoreApplication::GUIConnect(QWidget * parent)
         return ERROR_CODE;
     }
 
+    if(verifyConnection(parent) == ERROR_CODE)
+        return ERROR_CODE;
+    
+    return OK_CODE;
+
+    /*
     KKSResult * res = NULL;
 
     res = m_db->execute("select kkssitoversion1()");
@@ -957,6 +1060,295 @@ int KKSCoreApplication::GUIConnect(QWidget * parent)
     }
 
     int idDl = f->currentDl();
+    QString sql = QString("select setCurrentDl(%1);").arg(idDl);
+    KKSResult * r = m_db->execute(sql);
+    if(!r || r->getCellAsInt(0, 0) != 1){
+        
+        if(r->getCellAsInt(0, 0) == -1){
+            qCritical() <<        tr("Cannot make connection between\n"
+                                  "current user and current position.\n"
+                                  "Current user does not have rights of current position.");
+            QMessageBox::critical(parent, 
+                                  tr("Database authorization error"), 
+                                  tr("Cannot make connection between\n"
+                                  "current user and current position.\n"
+                                  "Current user does not have rights of current position."), 
+                                  QMessageBox::Ok, QMessageBox::NoButton);
+        }
+        else if(r->getCellAsInt(0, 0) == -2){
+            qCritical() << tr("You are authorized for this position but not at current object.\nMake sure that you are at your home object!");
+            QMessageBox::critical(parent, 
+                                  tr("Database authorization error"), 
+                                  tr("You are authorized for this position but not at current object.\nMake sure that you are at your home object!"), 
+                                  QMessageBox::Ok, QMessageBox::NoButton);
+        }
+
+        if(r)
+            delete r;
+        m_db->disconnect();
+        if(m_db1)
+            m_db1->disconnect();
+        return ERROR_CODE;
+    }
+    
+    delete r;
+
+    if(m_db1){
+        r = m_db1->execute(sql);
+        if(!r || r->getCellAsInt(0, 0) != 1){
+            if(r)
+                delete r;
+            m_db->disconnect();
+            m_db1->disconnect();
+            return ERROR_CODE;
+        }
+        delete r;
+    }
+
+    m_db->setCurrentDl(idDl);
+    if(m_db1)
+        m_db1->setCurrentDl(idDl);
+
+    return OK_CODE;
+    */
+}
+
+
+int KKSCoreApplication::autoConnect(QWidget * parent)
+{
+    if(!kksCoreApp)
+        return ERROR_CODE;
+
+    KKSDatabase * m_db = kksCoreApp->db();
+    if(!m_db)
+        return ERROR_CODE;
+
+    if(!kksCoreApp->commandLineOpts() || !kksCoreApp->commandLineOpts()->readyToAutoConnect())
+        return ERROR_CODE;
+
+    KKSSettings * poSettings = kksCoreApp->getKKSSettings();
+
+    poSettings->beginGroup ("System settings/Database");
+	
+    const KKSCommandLineOpts * opts = kksCoreApp->commandLineOpts();
+    if (! m_db->connect( opts->host, 
+                         opts->database, 
+                         opts->user, 
+                         opts->passwd,
+                         opts->port.isEmpty() ? QString("5432") : opts->port ) )
+    {
+            qCritical() << m_db->lastError();
+            QMessageBox::critical( 0, 
+                                   QObject::tr( "Error!" ), 
+                                   QObject::tr(m_db->lastError()) );
+
+            poSettings->endGroup (); // System settings/Database
+            return ERROR_CODE;
+    }
+    
+
+    poSettings->endGroup (); // System settings/Database
+
+    poSettings->writeSettings("System settings/Database", 
+                              "hostName", 
+                              opts->host);
+    poSettings->writeSettings("System settings/Database", 
+                              "databaseName", 
+                              opts->database);
+
+    poSettings->writeSettings("System settings/Database", 
+                              "userName", 
+                              opts->user);
+
+    if(!m_db->connected())
+        return ERROR_CODE;
+    
+
+    KKSDatabase * m_db1 = kksCoreApp->db1();
+    m_db1->connect(m_db->getHost(), m_db->getName(), m_db->getUser(), m_db->getPass(), m_db->getPort());
+    if(!m_db1->connected()){
+        m_db->disconnect();
+        return ERROR_CODE;
+    }
+
+    if(verifyConnection(parent) == ERROR_CODE)
+        return ERROR_CODE;
+
+    return OK_CODE;
+}
+
+int KKSCoreApplication::verifyConnection(QWidget * parent)
+{
+    KKSDatabase * m_db = kksCoreApp->db();
+    KKSDatabase * m_db1 = kksCoreApp->db1();
+    
+    if(!m_db || !m_db->connected() || !m_db1 || !m_db1->connected())
+        return ERROR_CODE;
+
+    KKSResult * res = NULL;
+
+    res = m_db->execute("select kkssitoversion1()");
+    if(!res || res->getRowCount() == 0){
+        if(res)
+            delete res;
+        m_db->disconnect();
+        if(m_db1)
+            m_db1->disconnect();
+        
+        qCritical() <<        tr("Cannot get information about current version of server software you connected to.\n\n"
+                              "Further work is impossible. You should use equal versions of client and server software");
+        QMessageBox::critical(parent, 
+                              tr("Database version mismatch"), 
+                              tr("Cannot get information about current version of server software you connected to.\n\n"
+                              "Further work is impossible. You should use equal versions of client and server software"),
+                              QMessageBox::Ok, QMessageBox::NoButton);
+
+        return ERROR_CODE;
+    }
+    
+    QString serverVersion = res->getCellAsString(0, 0);
+    QString clientVersion = QString(KKS_VERSION);
+    clientVersion = clientVersion.split("-").at(0);
+    if(serverVersion != clientVersion){
+        if(res)
+            delete res;
+        m_db->disconnect();
+        if(m_db1)
+            m_db1->disconnect();
+        
+        qCritical() <<        tr("Current version of your client software is %1,\n"
+                              "Current version of server you connected to is %2.\n\n"
+                              "Further work is impossible. You should use equal versions of client and server software").arg(clientVersion).arg(serverVersion);
+        QMessageBox::critical(parent, 
+                              tr("Database version mismatch"), 
+                              tr("Current version of your client software is %1,\n"
+                              "Current version of server you connected to is %2.\n\n"
+                              "Further work is impossible. You should use equal versions of client and server software").arg(clientVersion).arg(serverVersion),
+                              QMessageBox::Ok, QMessageBox::NoButton);
+        return ERROR_CODE;
+    }
+
+    delete res;
+    res = 0;
+    
+    int idDl = 0;
+
+    int allowedDlCount = 0;//сюда будет записано количество должностей, на которые назначен пользователь
+
+    if(kksCoreApp->commandLineOpts()->idDl > 0){
+        idDl = kksCoreApp->commandLineOpts()->idDl;
+    }
+    else{
+        res = m_db->execute("select * from getUserDls();");
+        if(!res || res->getRowCount() == 0){
+            if(res)
+                delete res;
+            m_db->disconnect();
+            if(m_db1)
+                m_db1->disconnect();
+
+            qCritical() <<        tr("You successfully connect with DB,\n"
+                                  "but no registered positions responsed.\n\n"
+                                  "Further work is impossible.");
+            QMessageBox::critical(parent, 
+                                  tr("Database authorization error"), 
+                                  tr("You successfully connect with DB,\n"
+                                  "but no registered positions responsed.\n\n"
+                                  "Further work is impossible."),
+                                  QMessageBox::Ok, QMessageBox::NoButton);
+
+            return ERROR_CODE;
+        }
+
+        allowedDlCount = res->getRowCount();
+        if(allowedDlCount == 1)
+            idDl = res->getCellAsInt(0, 0);
+    }
+
+    if(idDl > 0){
+        //int idDl = res->getCellAsInt(0, 0);
+        QString sql = QString("select setCurrentDl(%1);").arg(idDl);
+        KKSResult * r = m_db->execute(sql);
+        if(!r || r->getCellAsInt(0, 0) != 1){
+            if(r->getCellAsInt(0, 0) == -1){
+                qCritical() << tr("Cannot make connection between\n"
+                                      "current user and current position.\n"
+                                      "Current user does not have rights of current position.");
+                QMessageBox::critical(parent, 
+                                      tr("Database authorization error"), 
+                                      tr("Cannot make connection between\n"
+                                      "current user and current position.\n"
+                                      "Current user does not have rights of current position."), 
+                                      QMessageBox::Ok, QMessageBox::NoButton);
+            }
+            else if(r->getCellAsInt(0, 0) == -2){
+                qCritical() << tr("You are authorized for this position but not at current object.\nMake sure that you are at your home object!");
+                QMessageBox::critical(parent, 
+                                      tr("Database authorization error"), 
+                                      tr("You are authorized for this position but not at current object.\nMake sure that you are at your home object!"), 
+                                      QMessageBox::Ok, QMessageBox::NoButton);
+            }
+
+            if(r)
+                delete r;
+            delete res;
+            m_db->disconnect();
+            if(m_db1)
+                m_db1->disconnect();
+            
+            return ERROR_CODE;
+        }
+
+        delete r;
+        
+        if(m_db1){
+            r = m_db1->execute(sql);
+            if(!r || r->getCellAsInt(0, 0) != 1){
+                if(r)
+                    delete r;
+                delete res;
+                m_db->disconnect();
+                m_db1->disconnect();
+                return ERROR_CODE;
+            }
+            delete r;
+        }
+        
+        delete res;
+        m_db->setCurrentDl(idDl);
+        if(m_db1)
+            m_db1->setCurrentDl(idDl);
+        
+        return OK_CODE;
+    }
+    
+    ChooseDlForm * f = new ChooseDlForm(parent);
+    for(int i=0; i<allowedDlCount; i++){
+        int id = res->getCellAsInt(i, 0);
+        QString dlName = res->getCellAsString(i, 4);
+        QString unitName = res->getCellAsString(i, 5);
+        f->addDl(id, dlName, dlName, unitName);
+    }
+    
+    delete res;
+
+    if(f->exec() != QDialog::Accepted ){
+        qCritical() << tr("You haven't selected current position.\n"
+                                                     "Further work is impossible.");
+        QMessageBox::critical(parent, 
+                              tr("Select position"),
+                              tr("You haven't selected current position.\n"
+                                                     "Further work is impossible."),
+                              QMessageBox::Ok, QMessageBox::NoButton);
+
+        delete f;
+        m_db->disconnect();
+        if(m_db1)
+            m_db1->disconnect();
+        return ERROR_CODE;
+    }
+
+    idDl = f->currentDl();
     QString sql = QString("select setCurrentDl(%1);").arg(idDl);
     KKSResult * r = m_db->execute(sql);
     if(!r || r->getCellAsInt(0, 0) != 1){
@@ -1168,6 +1560,15 @@ void KKSCoreApplication::showConnectionInfo(QWidget * parent) const
     delete cif;
 }
 
+void KKSCoreApplication::showCommandLineParamsHelp(QWidget * parent)
+{
+    CommandLineParamsForm * f = new CommandLineParamsForm(parent);
+    
+    f->exec();
+    delete f;
+}
+
+
 void KKSCoreApplication::showConnectionInfo(KKSDatabase * db, const QString & userName, const QString & dlName, const QString & macLabel, QWidget * parent) const
 {
     if(!db){
@@ -1192,4 +1593,150 @@ QTextStream & KKSCoreApplication::logStream()
 KKSPluginLoader * KKSCoreApplication::pluginLoader() const
 {
     return m_pluginLoader;
+}
+
+/**************************************************/
+#include <stdio.h>
+#include <string.h>
+
+int   opterr = 1,    // if error message should be printed
+      optind = 1,    // index into parent argv vector
+      optopt,        // character checked for validity
+      optreset;      // reset getopt
+char *optarg;        // argument associated with option 
+
+#define  BADCH (int)'?'
+#define  BADARG   (int)':'
+#define  EMSG  ""
+
+/*
+ * getopt --
+ * Parse argc/argv argument vector.
+ */
+int getopt(int argc, char * const argv[], const char *optstring)
+{
+    static char *place = EMSG;    // option letter processing 
+    const char *oli;                    // option letter list index 
+
+    if (optreset || *place == 0) {// update scanning pointer 
+        optreset = 0;
+        place = argv[optind];
+        if (optind >= argc || *place++ != '-') {
+            // Argument is absent or is not an option
+            place = EMSG;
+            return (-1);
+        }
+
+        optopt = *place++;
+        
+        if (optopt == '-' && *place == 0) {
+            // "--" => end of options
+            ++optind;
+            place = EMSG;
+            return (-1);
+        }
+        if (optopt == 0) {
+            // Solitary '-', treat as a '-' option if the program (eg su) is looking for it.
+            place = EMSG;
+            if (strchr(optstring, '-') == NULL)
+                return -1;
+            optopt = '-';
+        }
+    } 
+    else
+      optopt = *place++;
+
+    // See if option letter is one the caller wanted... 
+    if (optopt == ':' || (oli = strchr(optstring, optopt)) == NULL) {
+        if (*place == 0)
+            ++optind;
+        if (opterr && *optstring != ':')
+            (void)fprintf(stderr, "unknown option -- %cn", optopt);
+        
+        return (BADCH);
+    }
+
+    // Does this option need an argument?
+    if (oli[1] != ':') {
+        // don't need argument
+        optarg = NULL;
+        if (*place == 0)
+            ++optind;
+    } 
+    else {
+        // Option-argument is either the rest of this argument or the entire next argument.
+        if (*place)
+            optarg = place;
+        else if (argc > ++optind)
+            optarg = argv[optind];
+        else {
+            // option-argument absent
+            place = EMSG;
+            if (*optstring == ':')
+                return (BADARG);
+            if (opterr)
+                (void)fprintf(stderr, "option requires an argument -- %cn", optopt);
+            
+            return (BADCH);
+        }
+      
+        place = EMSG;
+        ++optind;
+    }
+
+    return (optopt);// return option letter
+}
+
+/**************************************************/
+
+
+KKSCommandLineOpts * KKSCoreApplication::parseCommandLineOptions(int argc, char *argv[])
+{
+    KKSCommandLineOpts * kksOpts = new KKSCommandLineOpts();
+
+    if(argc == 1) { // если запускаем без аргументов, выводим справку
+        return kksOpts;
+    }
+
+    char *opts = "hH:p:U:x:b:o:cwd:"; // доступные опции, каждая принимает аргумент
+    int opt; // каждая следующая опция попадает сюда
+    while((opt = getopt(argc, argv, opts)) != -1) { // вызываем getopt пока она не вернет -1
+        switch(opt) {
+            case 'h':
+                kksOpts->showHelp = true;
+                break;
+            case 'H': 
+                kksOpts->host = QString::fromLocal8Bit(optarg);
+                break;
+            case 'p': 
+                kksOpts->port = QString::fromLocal8Bit(optarg);
+                break;
+            case 'U': 
+                kksOpts->user = QString::fromLocal8Bit(optarg);
+                break;
+            case 'x': 
+                kksOpts->passwd = QString::fromLocal8Bit(optarg);
+                break;
+            case 'b': 
+                kksOpts->database = QString::fromLocal8Bit(optarg);
+                break;
+            case 'o': 
+                kksOpts->idObject = QString::fromLocal8Bit(optarg).toInt();
+                break;
+            case 'c': 
+                kksOpts->withAutoConnect = true;
+                break;
+            case 'w': 
+                kksOpts->showLoginWindow = true;
+                break;
+            case 'd': 
+                kksOpts->idDl = QString::fromLocal8Bit(optarg).toInt();
+                break;
+        }
+    }
+
+    optreset = 1;
+    optind = 1;
+
+    return kksOpts;
 }

@@ -120,6 +120,7 @@ Q_OBJECT
         void slotSettings();
 
         void slotAbout();
+        void slotCmdParamsHelp();
         void slotMess();
     
     private:

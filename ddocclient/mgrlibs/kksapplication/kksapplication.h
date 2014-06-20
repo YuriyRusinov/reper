@@ -58,7 +58,7 @@ class __KKSAPP_EXPORT KKSApplication : public KKSCoreApplication
     Q_OBJECT
 
 private:
-    KKSApplication(const QString & userName = QString(), bool msgToWindow = true);
+    KKSApplication(KKSCommandLineOpts * opts, bool msgToWindow = true);
     virtual ~KKSApplication();
 
 public:
@@ -81,8 +81,8 @@ public:
     static KKSApplication * instance() { return self; }
     static KKSApplication * init (int argc, 
                                   char *argv[],
-                                  bool with_connect = true, 
-                                  const QString & userName = QString(), 
+                                  //bool with_connect = true, 
+                                  //const QString & userName = QString(), 
                                   bool msgToWindow = true);
     //static int GUIConnect(QWidget * parent = NULL);
 

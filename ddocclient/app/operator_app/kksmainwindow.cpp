@@ -44,6 +44,7 @@
 
 #include "cmdjournalsettingsform.h"
 #include "msgjournalsettingsform.h"
+#include "kkscommandlineopts.h"
 
 #include "ui_kksmainwindowdlg.h"
 
@@ -134,6 +135,15 @@ KKSMainWindow::KKSMainWindow(QWidget *parent)
     init();
     
     showMaximized();
+    
+    if(kksApp->db()->connected()){
+        connectToDb();//там только кнопки и док-виджеты все активируютс€ в этом случае
+        
+        if(kksApp->commandLineOpts()->idObject > 0){ //открываем указанный »ќ
+            KKSList<const KKSFilterGroup *> filterGroups;
+            slotCreateNewObjEditor(IO_IO_ID, kksApp->commandLineOpts()->idObject, filterGroups, QString());
+        }
+    }
 }
 
 KKSMainWindow::~KKSMainWindow()
@@ -557,6 +567,7 @@ void KKSMainWindow::initIcons()
 
     ui->aSettings->setIcon(QIcon(":/ddoc/settings.png"));
     ui->aAbout->setIcon(QIcon(":/ddoc/about.png"));
+    ui->aCmdParamsHelp->setIcon(QIcon(":/ddoc/about.png"));
 
     
     /*
@@ -615,6 +626,8 @@ void KKSMainWindow::initConnections()
     connect(ui->aSettings, SIGNAL(triggered()), this, SLOT(slotSettings()));
 
     connect(ui->aAbout, SIGNAL(triggered()), this, SLOT(slotAbout()));
+    connect(ui->aCmdParamsHelp, SIGNAL(triggered()), this, SLOT(slotCmdParamsHelp()));
+
 }
 
 void KKSMainWindow::initStatusBar()
@@ -632,13 +645,18 @@ void KKSMainWindow::initStatusBar()
 
 bool KKSMainWindow::connectToDb()
 {
-    int res = kksApp->GUIConnect(this);
-    if(res == ERROR_CODE){
-        setActionsEnabled(false);
+    if(!kksApp->db()->connected()){
+        int res = kksApp->GUIConnect(this);
+        if(res == ERROR_CODE){
+            setActionsEnabled(false);
+        }
+        else
+            setActionsEnabled(true);
     }
-    else
+    else{
         setActionsEnabled(true);
-    
+    }
+
     if(kksApp->db1()->connected()){
         //создаем копии и передаем управление ими в класс KKSJMonitor. 
         //¬ деструкторе этого класса они будут удалены
@@ -1110,6 +1128,11 @@ void KKSMainWindow::slotAbout()
     delete f;
 }
 
+void KKSMainWindow::slotCmdParamsHelp()
+{
+    KKSCoreApplication::showCommandLineParamsHelp(this);
+}
+
 void KKSMainWindow::slotSettings()
 {
     KKSSettings * s = kksApp->getKKSSettings();
@@ -1125,6 +1148,7 @@ void KKSMainWindow::slotConnect()
 void KKSMainWindow::slotDisconnect()
 {
     disconnectFromDb();
+    kksApp->setAllowedUserName(QString::null);
 }
 
 void KKSMainWindow::slotChangeUser()
@@ -1132,6 +1156,8 @@ void KKSMainWindow::slotChangeUser()
     if(!disconnectFromDb())
         return;
     
+    kksApp->setAllowedUserName(QString::null);
+
     connectToDb();
 }
 

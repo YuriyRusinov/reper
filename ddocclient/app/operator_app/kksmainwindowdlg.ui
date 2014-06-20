@@ -63,6 +63,7 @@
      <string>Помощь</string>
     </property>
     <addaction name="aAbout"/>
+    <addaction name="aCmdParamsHelp"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -288,6 +289,11 @@
    </property>
    <property name="text">
     <string>Окно отладочных сообщений</string>
+   </property>
+  </action>
+  <action name="aCmdParamsHelp">
+   <property name="text">
+    <string>Параметры командной строки...</string>
    </property>
   </action>
  </widget>

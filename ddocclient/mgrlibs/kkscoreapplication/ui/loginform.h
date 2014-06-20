@@ -39,14 +39,14 @@ class LoginForm : public QDialog//, private Ui::login_form
 {
   Q_OBJECT
   public:
-    LoginForm(const KKSList<KKSAccLevel*> & levels, KKSAccLevel & currentLevel, QWidget *parent = 0);
+    LoginForm(const KKSList<KKSAccLevel*> & levels, KKSAccLevel & currentLevel, bool canEditPort, QWidget *parent = 0);
     virtual ~LoginForm();
 
-    void setHost(const QString &str);
-    void setName(const QString &str);
+    void setHost(const QString &str, bool canEdit = true);
+    void setName(const QString &str, bool canEdit = true);
     void setUser(const QString &str, bool canEdit = true);
     void setPass(const QString &str);
-    void setPort(const QString &str);
+    void setPort(const QString &str, bool canEdit = true);
     //void setLevel(const QString &str);
     //void setPorts(const QMap<QString, QString> & ports);
 
@@ -63,6 +63,11 @@ class LoginForm : public QDialog//, private Ui::login_form
 
   private:
     bool moreShown;
+
+    bool bCanEditHost;
+    bool bCanEditPort;
+    bool bCanEditDBName;
+
 
     LoginExtForm * ext;
 	Ui::login_form * ui;

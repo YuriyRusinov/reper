@@ -15,12 +15,17 @@ LoginExtForm::~LoginExtForm()
 {
 }
 
-LoginForm::LoginForm(const KKSList<KKSAccLevel*> & levels, KKSAccLevel & currentLevel, QWidget *parent) : QDialog(parent)
+LoginForm::LoginForm(const KKSList<KKSAccLevel*> & levels, KKSAccLevel & currentLevel, bool canEditPort, QWidget *parent) : QDialog(parent)
 {
 	ui = new Ui::login_form;
 	ui->setupUi(this);
 
     ext = NULL;
+
+    bCanEditHost = true;
+    bCanEditPort = canEditPort;
+    bCanEditDBName = true;
+
 
     connect( ui->pbOk, SIGNAL( clicked() ), this, SLOT( accept() ) );
     connect( ui->pbCancel, SIGNAL( clicked() ), this, SLOT( reject() ) );
@@ -41,6 +46,8 @@ LoginForm::LoginForm(const KKSList<KKSAccLevel*> & levels, KKSAccLevel & current
     if(!bIndexSet && m_levels.count() > 0)
         ui->cbLevel->setCurrentIndex(0);
     
+    ui->cbLevel->setEnabled(bCanEditPort);
+
     //connect( ui->cbLevel, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(on_cbLevel_itemChanged(const QString&)));
 
     moreShown = false;
@@ -58,9 +65,15 @@ void LoginForm::pbOptions_clicked()
     {
         ext = new LoginExtForm( this );
         setExtension( ext );
+        
         ext->ui->leDBName->setText( sName );
+        ext->ui->leDBName->setEnabled(bCanEditDBName);
+        
         ext->ui->leDBServer->setText( sHost );
+        ext->ui->leDBServer->setEnabled(bCanEditHost);
+        
         ext->ui->leDBPort->setText( sPort );
+        ext->ui->leDBPort->setEnabled(bCanEditPort);
     }
 
     moreShown = !moreShown;
@@ -71,19 +84,22 @@ void LoginForm::pbOptions_clicked()
     ui->pbOptions->setText(old + txt);
 }
 
-void LoginForm::setHost( const QString &str )
+void LoginForm::setHost( const QString &str, bool canEdit )
 {
     sHost = str;
+    bCanEditHost = canEdit;
 }
 
-void LoginForm::setName( const QString &str )
+void LoginForm::setName( const QString &str, bool canEdit )
 {
     sName = str;
+    bCanEditDBName = canEdit;
 }
 
-void LoginForm::setPort( const QString &str )
+void LoginForm::setPort( const QString &str, bool canEdit )
 {
     sPort = str;
+    bCanEditPort = canEdit;
 }
 
 void LoginForm::setUser( const QString &str, bool canEdit)
@@ -131,7 +147,7 @@ void LoginForm::on_cbLevel_currentIndexChanged(const QString& level)
 
     QString port = ui->cbLevel->itemData(index).toString();
 
-    setPort(port);
+    sPort = port;
     if(ext)
         ext->ui->leDBPort->setText(port);
 }
@@ -148,7 +164,6 @@ int LoginForm::levelIndex() const
 
 int LoginForm::exec (void)
 {
-    qDebug () << __PRETTY_FUNCTION__;
     int r = QDialog::exec();
     return r;
 }

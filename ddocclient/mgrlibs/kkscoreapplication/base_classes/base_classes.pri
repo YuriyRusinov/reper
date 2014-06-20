@@ -5,7 +5,8 @@ HEADERS += \
         base_classes/kkserror.h \
 	base_classes/kkssettings.h \
         base_classes/kksacclevel.h \
-        base_classes/kksdebug.h
+        base_classes/kksdebug.h \
+        base_classes/kkscommandlineopts.h
 
 SOURCES += \
         base_classes/kkscoreapplication.cpp \
@@ -19,4 +20,5 @@ headers.files += \
         base_classes/kkserror.h \
         base_classes/kkssettings.h \
         base_classes/kksacclevel.h \
-        base_classes/kksdebug.h
+        base_classes/kksdebug.h \
+        base_classes/kkscommandlineopts.h

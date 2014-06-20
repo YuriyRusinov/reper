@@ -18,6 +18,7 @@
 #include "kksclient_name.h"
 #include <kksdatabase.h>
 #include "defines.h"
+#include "kkscommandlineopts.h"
 
 
 #ifdef __USE_QGIS__
@@ -39,8 +40,8 @@ const QString kksAppNameEng = QString(EXECUTABLE_PREFIX);
 
 Кроме того загружаются необходимые данные для класса QTranslator (русификация). По умолчанию используется файл ddocclient_ru.ts в корневом каталоге приложения.
 */
-KKSApplication::KKSApplication(const QString & userName, bool msgToWindow) :
-    KKSCoreApplication(userName, msgToWindow),
+KKSApplication::KKSApplication(KKSCommandLineOpts * opts, bool msgToWindow) :
+    KKSCoreApplication(opts, msgToWindow),
     m_objf (0),
     m_catf (0),
     m_tf (0),
@@ -214,8 +215,8 @@ KKSApplication::~KKSApplication( )
 
 KKSApplication * KKSApplication::init (int argc, 
                                        char *argv[], 
-                                       bool with_connect, 
-                                       const QString & userName, 
+                                       //bool with_connect, 
+                                       //const QString & userName, 
                                        bool msgToWindow)
 {
     if ( self )
@@ -242,29 +243,50 @@ KKSApplication * KKSApplication::init (int argc,
     KKSApplication * xG0;
     bool bDel = false;
     if ( !self ){
-        xG0 = new KKSApplication (userName, msgToWindow);
+        KKSCommandLineOpts * opts = KKSCoreApplication::parseCommandLineOptions(argc, argv);
+        xG0 = new KKSApplication (opts, msgToWindow);
         bDel = true;
     }
     else
         xG0 = self;
 
-    if(with_connect){
+    int ok = connectIfReady();
+    if(ok != OK_CODE){
+        if(bDel)
+            delete xG0;
+        return 0;
+    }
+
+    return xG0;
+    /*
+    if(kksCoreApp->commandLineOpts() && kksCoreApp->commandLineOpts()->withAutoConnect){
         KKSDatabase * m_db = xG0->db();
 
         if ( ! m_db->connected() )
         {
 
-            int ok = GUIConnect();
-            if(ok != OK_CODE)
-            {
+            int ok = 0;
+            if(kksCoreApp->commandLineOpts()->readyToAutoConnect()){
+                ok = autoConnect();
+                if(ok != OK_CODE)
+                    ok = GUIConnect();
+            }
+            else{
+                ok = GUIConnect();
+            }
+
+            if(ok != OK_CODE){
                 if(bDel)
                     delete xG0;
                 return 0;
             }
+
         }
     }
+    
 
     return xG0;
+    */
 }
 
 void KKSApplication::initGUIFactories()

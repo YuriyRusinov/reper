@@ -47,6 +47,7 @@ class QWidget;
 class QTextEdit;
 class QTextCodec;
 class QTranslator;
+class KKSCommandLineOpts;
 
 /*! \class KKSApplication
   \ingroup SystemGroup
@@ -62,18 +63,19 @@ class __COREAPP_EXPORT KKSCoreApplication : public QObject
     Q_OBJECT
 
 protected:
-    KKSCoreApplication(const QString & userName = QString(), bool msgToWindow = true);
+    KKSCoreApplication(KKSCommandLineOpts * opts, bool msgToWindow = true);
     virtual ~KKSCoreApplication();
 
 public:
     KKSError * getLastError();  
+    const KKSCommandLineOpts * commandLineOpts() const;
     void showConnectionInfo(QWidget * parent = NULL) const;
     void showConnectionInfo(KKSDatabase * db, 
                             const QString & userName, 
                             const QString & dlName, 
                             const QString & macLabel, 
                             QWidget * parent = NULL) const;
-
+    
     void updateLastError(KKSError::ErrorTypes type, 
                          QString code, 
                          QString name, 
@@ -118,6 +120,9 @@ public:
 
     KKSDbgOutputWidget * dbgWidget(bool bCreateMenu = true, bool bForDockable = true) const;
     QTextStream & logStream();
+
+    const QString & getAllowedUserName() const {return allowedUserName;}
+    void setAllowedUserName(const QString & name) {allowedUserName = name;}
 
 protected:
     KKSSettings * getKKSSettings (const QString & organization, 
@@ -174,12 +179,18 @@ public:
 
     static KKSCoreApplication * init (int argc, 
                                       char *argv[],
-                                      bool with_connect = true, 
-                                      const QString & userName = QString(), 
+                                      //bool with_connect = true, 
+                                      //const QString & userName = QString(), 
                                       bool msgToWindow = true);
 
 
     static int GUIConnect(QWidget * parent = NULL);
+    static int autoConnect(QWidget * parent = NULL);
+    static int connectIfReady();
+    static int verifyConnection(QWidget * parent = NULL);
+
+    static KKSCommandLineOpts * parseCommandLineOptions(int argc, char * argv[]);
+    static void showCommandLineParamsHelp(QWidget * parent = NULL);
 
 
 protected:
@@ -192,6 +203,8 @@ private:
     KKSError * lastError;
     mutable KKSDatabase * poDb;
     mutable KKSDatabase * poDb1;//для отдельного потока
+
+    mutable KKSCommandLineOpts * m_kksOpts;// аргументы командной строки, переданные в приложение
 
     mutable KKSLoader * m_loader;
     mutable KKSPluginLoader * m_pluginLoader;
