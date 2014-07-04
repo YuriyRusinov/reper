@@ -16,13 +16,13 @@
 #include <QLineEdit>
 #include <QValidator>
 #include <QProgressBar>
-
 #include <QDomDocument>
 
 #undef min
 #undef max
 
 #include <qgspoint.h>
+#include "qgsfeaturestore.h"
 
 class QToolButton;
 
@@ -47,6 +47,7 @@ class QgsScaleComboBox;
 class QgsVectorLayer;
 class QgsClipboard;
 class QgsVectorLayerTools;
+class QgsMapTip;
 
 class _QGIS_EXPORT KKSGISWidgetBase : public QWidget
 {
@@ -61,8 +62,11 @@ public:
 //ksa
 public:
     void showIOEditor(QWidget * parent, const QString & uid);
+    bool featureFromEIO(QWidget * parent, QgsFeature & feature, const QString & geomAsEWKT, const QString & layerTable);
 signals:
     void signalShowIOEditor(QWidget * parent, const QString & uid);
+
+    void signalFeatureFromEIO(QWidget * parent, QgsFeature & feature, const QString & geomAsEWKT, const QString & layerTable);
 //ksa
 
 public:
@@ -97,7 +101,9 @@ public:
     QgsMapCanvas * mapCanvas() {return mpMapCanvas;}
     QgsPalLabeling * palLabeling();
     QgsMessageBar* messageBar();
-    int messageTimeout();
+    
+    QgsLegend * legend();
+
 
     /**
      * Access the vector layer tools. This will be an instance of {@see QgsGuiVectorLayerTools}
@@ -151,11 +157,21 @@ public:
     QAction *actionZoomNext() { return mActionZoomNext; }
     QAction *actionZoomActualSize() { return mActionZoomActualSize; }
     QAction *actionDraw() { return mActionDraw; }
+    QAction *actionMapTips() { return mActionMapTips; }
 
+
+#ifdef Q_OS_WIN
+    //! ugly hack
+    void skipNextContextMenuEvent();
+#endif
 
 
     //! Returns a pointer to the internal clipboard
     QgsClipboard * clipboard();
+
+    /** Get timeout for timed messages: default of 5 seconds
+     * @note added in 1.9 */
+    int messageTimeout();
 
 public slots:
     void layerProperties();
@@ -169,6 +185,39 @@ public slots:
     void saveActiveLayerEdits();
     void saveAllEdits( bool verifyAction = true );
     void saveEdits();
+
+    /** Rollback current edits for selected layer(s) and start new transaction(s)
+      * @note added in 1.9 */
+    void rollbackEdits();
+
+    /** Rollback edits for all layers and start new transactions
+     * @note added in 1.9 */
+    void rollbackAllEdits( bool verifyAction = true );
+
+    /** Cancel edits for selected layer(s) and toggle off editing
+      * @note added in 1.9 */
+    void cancelEdits();
+    
+    void updateUndoActions();
+    
+    void reloadLayer(const QString & theLayerId);
+
+    /** Cancel edits for a layer
+      * @param leaveEditable leave the layer in editing mode when done
+      * @param triggerRepaint send layer signal to repaint canvas when done
+      * @note added in 1.9
+      */
+    void cancelEdits( QgsMapLayer *layer, bool leaveEditable = true, bool triggerRepaint = true );
+
+    /** Cancel all edits for all layers and toggle off editing
+     * @note added in 1.9 */
+    void cancelAllEdits( bool verifyAction = true );
+    //! cuts selected features on the active layer to the clipboard
+    /**
+       \param layerContainingSelection  The layer that the selection will be taken from
+                                        (defaults to the active layer on the legend)
+     */
+    void editCut( QgsMapLayer * layerContainingSelection = 0 );
 
     //! copies selected features on the active layer to the clipboard
     /**
@@ -231,7 +280,7 @@ private slots:
     void SLOTazGetSelectedLegendItem();
     void SLOTazThemTaskSpectralBathynometry();
     void SLOTazShowContextMenuForLegend(const QPoint & pos);
-    void SLOTazShowMouseCoordinate(const QgsPoint & p);
+    //void SLOTazShowMouseCoordinate(const QgsPoint & p);
     
     //void SLOTmpActionFileExit();
     void SLOTmpActionFileNew();
@@ -262,9 +311,23 @@ private slots:
     //! Set project properties, including map untis
     void projectProperties();
 
+    //! Slot to show the map coordinate position of the mouse cursor
+    void showMouseCoordinate( const QgsPoint & );
+
+    /** Alerts user when commit errors occured
+     * @note added in 2.0
+     */
+    void commitError( QgsVectorLayer* vlayer );
+
+    /** Called when some layer's editing mode was toggled on/off
+     * @note added in 1.9 */
+    void layerEditStateChanged();
+
+    /* changed from layerWasAdded in 1.8 */
+    void layersWereAdded( QList<QgsMapLayer *> );
 
     /*from QgsApp*/
-    void removeLayer();
+    void removeLayer(bool promptConfirmation = true);
     /** Duplicate map layer(s) in legend
      * @note added in 1.9 */
     void duplicateLayers( const QList<QgsMapLayer *> lyrList = QList<QgsMapLayer *>() );
@@ -299,6 +362,15 @@ private slots:
     //! change layer subset of current vector layer
     void layerSubsetString();
 
+    //! map tool changed
+    void mapToolChanged( QgsMapTool *tool );
+    //! Toggle map tips on/off
+    void toggleMapTips();
+    //! Show the map tip
+    void showMapTip();
+
+    void extentsViewToggled( bool theFlag );
+
     void showProgress( int theProgress, int theTotalSteps );
 
     //! layer selection changed
@@ -309,6 +381,30 @@ private slots:
     //! Add a raster layer to the map (will prompt user for file name using dlg )
     void addRasterLayer();
     void loadOGRSublayers( QString layertype, QString uri, QStringList list );
+
+    /** Update gui actions/menus when layers are modified
+     * @note added in 1.9 */
+    void updateLayerModifiedActions();
+
+    /** Alerts user when labeling font for layer has not been found on system
+     * @note added in 1.9
+     */
+    void labelingFontNotFound( QgsVectorLayer* vlayer, const QString& fontfamily );
+    /** Opens the labeling dialog for a layer when called from labelingFontNotFound alert
+     * @note added in 1.9
+     */
+    void labelingDialogFontNotFound( QAction* act );
+
+    void showExtents();
+    void selectionChanged( QgsMapLayer *layer );
+    //! catch MapCanvas keyPress event so we can check if selected feature collection must be deleted
+    void mapCanvas_keyPressed( QKeyEvent *e );
+    void showStatusMessage( QString theMessage );
+    /* layer will be removed - changed from removingLayer to removingLayers
+       in 1.8.    */
+    void removingLayers( QStringList );
+    //! copies features to internal clipboard
+    void copyFeatures( QgsFeatureStore & featureStore );
 
     /** open a raster layer for the given file
       @returns false if unable to open a raster layer for rasterFile
@@ -365,6 +461,13 @@ private slots:
     //! Pan map to selected features
     //! @note added in 2.0
     void panToSelected();
+    //! activates the add feature tool
+    void addFeature();
+    //! activates the move feature tool
+    void moveFeature();
+    //! provides operations with nodes
+    void nodeTool();
+
 
 
 private:
@@ -374,6 +477,7 @@ private:
     void initUserSettings();
     void initMapCanvas();
     //void initLegend();
+    void createMapTips();
     void initMapLegend();
     void initActions();
     void initConnections();
@@ -414,6 +518,17 @@ private:
 
     bool addRasterLayer( QgsRasterLayer * theRasterLayer );
 
+protected:
+
+    //! refresh map canvas only
+    void refreshMapCanvasOnly();
+
+#ifdef Q_OS_WIN
+    //! reimplements context menu event
+    virtual void contextMenuEvent( QContextMenuEvent *event );
+#endif
+
+
 private:
     QStringList azWorkList; // working list of anyone
     QgsMapLayer * mpSelectedLayer; //selected map layer
@@ -446,7 +561,7 @@ private:
     QWidget * mpMapLegendWidget;
     QgsLayerOrder *mpMapLayerOrder;
     QWidget * mpMapLayerOrderWidget;
-    QList<QgsMapCanvasLayer> mpLayerSet;
+    //ksa QList<QgsMapCanvasLayer> mpLayerSet;
     QgsPalLabeling* mLBL;
 
     QgsClipboard * mInternalClipboard;
@@ -456,6 +571,7 @@ private:
     QToolBar * mpLayerToolBar;
     QToolBar * mpToolsToolBar;
     QToolBar * mpTaskToolBar;
+    QToolBar * mpLayerEditsToolBar; //редактирование векторных слоев
     QMap<QString, QToolBar *> mpToolBarMap;
 
     /*
@@ -478,8 +594,8 @@ private:
         QgsMapTool* mMeasureDist;
         QgsMapTool* mMeasureArea;
         QgsMapTool* mMeasureAngle;
-        //QgsMapTool* mAddFeature;
-        //QgsMapTool* mMoveFeature;
+        QgsMapTool* mAddFeature;
+        QgsMapTool* mMoveFeature;
         //QgsMapTool* mOffsetCurve;
         //QgsMapTool* mReshapeFeatures;
         //QgsMapTool* mSplitFeatures;
@@ -497,7 +613,7 @@ private:
         //QgsMapTool* mSimplifyFeature;
         //QgsMapTool* mDeleteRing;
         //QgsMapTool* mDeletePart;
-        //QgsMapTool* mNodeTool;
+        QgsMapTool* mNodeTool;
         //QgsMapTool* mRotatePointSymbolsTool;
         //QgsMapTool* mAnnotation;
         //QgsMapTool* mFormAnnotation;
@@ -512,6 +628,7 @@ private:
         //QgsMapTool* mChangeLabelProperties;
     } mMapTools;
 
+    QgsMapTool *mNonEditMapTool;
 
 
     //! a bar to display warnings in a non-blocker manner
@@ -523,6 +640,9 @@ private:
     QToolButton * mOnTheFlyProjectionStatusButton;
     //! Menu that contains the list of actions of the selected vector layer
 
+    //! A toggle to switch between mouse coords and view extents display
+    QToolButton * mToggleExtentsViewButton;
+
     //строка меню
     QMenuBar * mpMenuBar;
     QMap<QString, QMenu *> mpMenuMap;
@@ -530,6 +650,8 @@ private:
     QAction * mpVectorize;
     QAction * mpActionBathymetry;
     
+    QAction * mActionMapTips;
+
     //добавление слоев
     QAction * mpActionAddVectorLayer;
     QAction * mpActionAddRasterLayer;
@@ -578,19 +700,38 @@ private:
     QAction * mActionSetProjectCRSFromLayer;//
     QAction * mActionLayerProperties;//
     QAction * mActionLayerSubsetString;//
+
+    //редактирование векторных слоев
+    QAction * mActionAllEdits;//
     QAction * mActionToggleEditing;//
     QAction * mActionSaveLayerEdits;//
-    QAction * mActionAllEdits;//
+    QAction * mActionAddFeature;
+    QAction * mActionMoveFeature;
+    QAction * mActionNodeTool;
+    QAction * mActionDeleteSelected;
+    QAction * mActionCutFeatures;
+    QAction * mActionCopyFeatures;
+    QAction * mActionPasteFeatures;
+    //--
     QAction * mActionSaveEdits;//
+    QAction * mActionRollbackEdits;
+    QAction * mActionCancelEdits;
     QAction * mActionSaveAllEdits;//
+    QAction * mActionRollbackAllEdits;
+    QAction * mActionCancelAllEdits;
+    
+    //операции со слоями
     QAction * mActionCopyStyle;//
     QAction * mActionPasteStyle;//
     QAction * mActionOpenTable;//
     QAction * mActionLayerSaveAs;
     QAction * mActionLayerSelectionSaveAs;
 
-    //
-
+    /** Flag to indicate an edits save/rollback for active layer is in progress
+     * @note added in QGIS 1.9
+     */
+    bool mSaveRollbackInProgress;
+    
     //! How to determine the number of decimal places used to
     //! display the mouse position
     bool mMousePrecisionAutomatic;
@@ -608,6 +749,22 @@ private:
 
     QgsVectorLayerTools* mVectorLayerTools;
 
+    /** Timer for map tips
+     */
+    QTimer *mpMapTipsTimer;
+
+    /** Point of last mouse position in map coordinates (used with MapTips)
+     */
+    QgsPoint mLastMapPosition;
+
+    /* Maptip object
+     */
+    QgsMapTip *mpMaptip;
+
+    // Flag to indicate if maptips are on or off
+    bool mMapTipsVisible;
+
+
     QString mpAppPath;
     QString m_pluginsDir;
 
@@ -622,6 +779,10 @@ private:
 
     // functions
     long azGetEPSG(const QString rastrPath);
+
+#ifdef Q_OS_WIN
+    int mSkipNextContextMenuEvent; // ugly hack
+#endif
 
 };
 

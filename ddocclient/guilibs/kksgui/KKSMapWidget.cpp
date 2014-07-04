@@ -9,8 +9,11 @@
 
 #include <QtDebug>
 #include <QDomDocument>
+#include "KKSAttribute.h"
 #include "KKSAttrValue.h"
+#include "KKSObjectExemplar.h"
 #include "KKSAttrType.h"
+#include "KKSState.h"
 #include "KKSFile.h"
 #include "defines.h"
 #include <QDir>
@@ -44,8 +47,11 @@ KKSMapWidget::KKSMapWidget(QMap<QString, QString> connectionParams,
 
 KKSMapWidget::~KKSMapWidget()
 {
-    if(m_legendWidget && m_layerOrderWidget)
+    if(m_legendWidget && m_layerOrderWidget){
+        QWidget * legend = this->mapLegendWidget();
+        legend->setParent(NULL);
         emit aboutToDestroy(m_legendWidget, m_layerOrderWidget);
+    }
     
     m_legendWidget = 0;
     m_layerOrderWidget = 0;
@@ -65,6 +71,9 @@ void KKSMapWidget::init()
 {
 #ifdef __USE_QGIS__
     this->initQGIS();
+    
+    connect(this, SIGNAL(signalFeatureFromEIO(QWidget *, QgsFeature &, const QString &, const QString &)), this, SLOT(slotFeatureFromEIO(QWidget *, QgsFeature &, const QString &, const QString &)));
+    
 #else
     QMessageBox::warning(this, tr("Warning"), tr("Current IO contains GIS-object attribute!\nBut current build of DynamicDocs Client does not support GIS capabilities!\nWorking with this attribute will be disabled"), QMessageBox::Ok);
 #endif
@@ -108,6 +117,7 @@ void KKSMapWidget::initQGIS()
     mpToolBarLayout->addWidget(mpToolBars.value("mpDataSourceToolBar"));
     mpToolBarLayout->addWidget(mpToolBars.value("mpToolsToolBar"));
     mpToolBarLayout->addWidget(mpToolBars.value("mpLayerToolBar"));
+    mpToolBarLayout->addWidget(mpToolBars.value("mpLayerEditsToolBar"));
     QSpacerItem * sp = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
     mpToolBarLayout->addSpacerItem(sp);
     
@@ -239,6 +249,7 @@ int KKSMapWidget::openProject()//открываем проект, заданный в качестве значения 
         //}
 
         KKSGISWidget::openProject(path);
+        KKSGISWidget::refreshMapCanvasOnly();
     }
     else{//для новых ИО (ЭИО) - сохраняем начальный пустой проект в указанный файл
         saveProjectAs(path);
@@ -639,5 +650,75 @@ void KKSMapWidget::slotSaveGISProject(KKSValue & v)
         QMessageBox::critical(this, tr("Error"), tr("Cannot set attribute value for GIS attribute!"));
         return;
     }
+#endif
+}
+
+void KKSMapWidget::slotFeatureFromEIO(QWidget * parent, QgsFeature & feature, const QString & geomAsEWKT, const QString & layerTable)
+{
+#ifdef __USE_QGIS__
+    if(!parent)
+        return;
+    if(layerTable.isEmpty())
+        return;
+    
+    KKSObjectExemplar * eio = NULL;
+
+    emit constructNewEIO(parent, &eio, layerTable, geomAsEWKT);
+
+    if(!eio)
+        return;
+
+    const QgsFields * fields = feature.fields();
+    int cnt = fields->count();
+    for(int i=0; i<cnt; i++){
+        QgsField field = fields->at(i);
+        QString fName = field.name();
+        feature.attribute(fName);
+        QVariant avValue;
+        
+        if(fName == "unique_id")
+            avValue = QVariant(eio->uniqueId());
+        else if(fName == "last_update")
+            avValue = QVariant(eio->lastUpdate());
+        else if(fName == "id")
+            avValue = QVariant(eio->id());
+        else if(fName == "uuid_t")
+            avValue = QVariant(eio->uuid());
+        else if(fName == "id_io_state")
+            avValue = QVariant(eio->state()->id());
+        else if(fName == "r_icon")
+            avValue = QVariant(eio->iconAsString());
+        else if(fName == "record_fill_color")
+            avValue = QVariant(eio->recordFillColor());
+        else if(fName == "record_text_color")
+            avValue = QVariant(eio->recordTextColor());
+        else if(fName == "rr_name")
+            avValue = QVariant(eio->name());
+        else{ //работаем с обычными несистемными атрибутами
+            int avIndex = -1;
+            int avCnt = eio->attrValues().count();
+            
+            for(int j=0; j<avCnt; j++){
+                KKSAttrValue * av = eio->attrValues().at(j);
+                KKSCategoryAttr * ca = av->attribute();
+                QString attrCode = ca->code();
+                if(attrCode == fName){
+                    avIndex = j;
+                    break;
+                }
+            }
+
+            KKSAttrValue * av = eio->attrValue(avIndex);
+            if(!av)
+                continue;
+
+            avValue = av->value().valueVariant();
+        }
+
+        feature.setAttribute(fName, avValue);
+    }
+
+    eio->release();
+
 #endif
 }

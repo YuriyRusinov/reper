@@ -1595,7 +1595,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                     v = QString("");
                 attrWidget = new KKSText (av, attrClass, v);
                 qobject_cast<KKSText *>(attrWidget)->setFixedSymCount (av->attribute()->defWidth());
-                qobject_cast<QTextEdit *>(attrWidget)->setReadOnly (isRef);
+                qobject_cast<QTextEdit *>(attrWidget)->setReadOnly (true);
                 if (!isRef)
                     gLayout->addWidget (attrWidget, n_str, 2, 1, 1);
                 attrWidget->setSizePolicy (hPw);
@@ -1913,6 +1913,8 @@ QWidget * KKSAttributesFactory :: createMapWidget (const KKSAttrValue * av,
     connect(objEditor, SIGNAL(needToSaveGISProject(KKSValue &)), attrWidget, SLOT(slotSaveGISProject(KKSValue &)));//сохраняем проект и возвращаем его XML в виде значения KKSValue
     connect(attrWidget, SIGNAL(uploadGISFiles(bool, const QStringList &, qint64, QWidget *)), m_oef, SLOT(slotUploadGISFiles(bool, const QStringList &, qint64, QWidget *)));
     connect(attrWidget, SIGNAL(signalShowIOEditor(QWidget *, const QString &)), m_oef, SLOT(slotShowIOEditor(QWidget *, const QString &)));
+    connect(attrWidget, SIGNAL(constructNewEIO(QWidget *, KKSObjectExemplar **, const QString &, const QString &)), m_oef, SLOT(slotConstructNewEIO(QWidget *, KKSObjectExemplar **, const QString &, const QString &)));//запрос на создание нового EИО в справочнике, который задается названием своей таблицы в БД. 
+    
 
     attrWidget->init();
 

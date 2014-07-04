@@ -607,6 +607,10 @@ int KKSValue::setValue(const QString & _value, int _type)
         m_value = _value;
     }
 
+    else if(a_type == KKSAttrType::atGeometry){
+        m_value = _value;
+    }
+
     else if(a_type == KKSAttrType::atDate  &&
        _value != "current_timestamp" &&
 	   _value != "current_date")
@@ -930,7 +934,7 @@ QString KKSValue::valueForInsert() const
     }
 
     if(a_type == KKSAttrType::atGeometry){
-		val += QString("'%1'::geometry").arg(value());
+		val += QString("geomFromEWKT('%1')::geometry").arg(value());
         return val;
     }
 

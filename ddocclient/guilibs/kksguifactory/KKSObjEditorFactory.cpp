@@ -2711,6 +2711,65 @@ void KKSObjEditorFactory :: slotShowIOEditor(QWidget * parent, const QString & u
     editExistOE(parent, idObject, idRecord, NULL, s, 0, true);
 }
 
+void KKSObjEditorFactory :: slotConstructNewEIO(QWidget * parent, KKSObjectExemplar ** eio, const QString & layerTable, const QString & geomAsEWKT)
+{
+
+    if(!eio)
+        return;
+
+    KKSCategory *c = NULL;
+    KKSObject *wObj = loader->loadIO(layerTable, true);
+    //
+    // Если экземпляр ИО также сам является информационным объектом, то задать категорию
+    //
+    if (!wObj)
+        return;
+
+    
+    c = wObj->category();//->tableCategory ();
+
+    const KKSList<const KKSFilterGroup *> filters;
+
+    KKSObjEditor *objEditor = createObjEditor (wObj->id(), 
+                                               -1, 
+                                               filters, 
+                                               QString(),
+                                               c,
+                                               true, 
+                                               QString(),
+                                               false,
+                                               Qt::WindowModal,
+                                               0);
+    if(wObj)
+        wObj->release ();
+
+    if(!objEditor){
+        qCritical() << tr("Insufficient privileges!");
+        //QMessageBox::critical(this, tr("Error"), tr("Insufficient privileges!"), QMessageBox::Ok);
+        return;
+    }
+
+    if(objEditor->exec() != QDialog::Accepted)
+        return;
+
+    *eio = loader->loadEIO(objEditor->getObjectEx()->id(), wObj);
+    KKSList<KKSAttrValue *> avList = (*eio)->attrValues();
+    int cnt = avList.count();
+    for(int i=0; i<cnt; i++){
+        KKSAttrValue * av = avList.at(i);
+        if(av->attribute()->type()->attrType() == KKSAttrType::atGeometry ){
+            KKSValue v = KKSValue(geomAsEWKT, KKSAttrType::atGeometry);
+            (*eio)->attrValue(av->attribute()->id())->setValue(v);
+            break;
+        }
+    }
+
+    eiof->updateEIO(*eio);
+
+    delete objEditor;
+}
+
+
 /*
  * слот создания редактора существующего ИО/ЭИО, являющегося элементом справочника idObject.
  * Параметры:

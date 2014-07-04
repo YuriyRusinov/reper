@@ -209,29 +209,86 @@ bool QgsFeatureAction::addFeature( const QgsAttributeMap& defaultAttributes )
     if ( reuseLastValues )
       origValues = mFeature.attributes();
 
-    QgsAttributeDialog *dialog = newDialog( false );
-    if ( dialog->exec() )
-    {
-      if ( reuseLastValues )
-      {
-        for ( int idx = 0; idx < fields.count(); ++idx )
-        {
-          const QgsAttributes &newValues = mFeature.attributes();
-          if ( origValues[idx] != newValues[idx] )
-          {
-            QgsDebugMsg( QString( "saving %1 for %2" ).arg( mLastUsedValues[ mLayer ][idx].toString() ).arg( idx ) );
-            mLastUsedValues[ mLayer ][idx] = newValues[idx];
-          }
-        }
-      }
+    //ksa
+    //пробуем открыть форму DynamicDocs, если создается новый объект в слое DynamicDocs.
+    //определяем по наличию атрибута unique_id
+    bool uniqueIdFound = false;
+    const QgsFields * flds = mFeature.fields();
+    QString providerName = mLayer->dataProvider()->name();
+    if(providerName == "postgres" && flds){
+        //если поле unique_id присутствует, то считаем, что слой из нашей БД. Поэтому показываем нашу форму информационного ресурса
+        int indx = flds->indexFromName("unique_id");
+        if(indx > -1){
+            uniqueIdFound = true;
 
-      res = mLayer->addFeature( mFeature );
+            QString uri = mLayer->dataProvider()->dataSourceUri();
+            QStringList uriSections = uri.split(" ");
+            QString layerTable;
+
+            for(int i=0; i<uriSections.count(); i++){
+                QString & sec = uriSections[i];
+                if(sec.startsWith("table=")){
+                    QStringList tableSec = sec.split("=");
+                    if(tableSec.count() != 2){
+                        return false;
+                    }
+                    QString fullTableName = tableSec[1];
+                    QStringList tableNameSec = fullTableName.split(".");
+                    if(tableNameSec.count() != 2){
+                        return false;
+                    }
+                    layerTable = tableNameSec[1];
+                    layerTable.replace("\"", "");
+                }
+            }
+            
+            //поскольку класс QgsGeometry не имеет метода exportToEWkt, необходимо передать EWKT-строку самостоятельно
+            QString geomAsEWKT = mFeature.geometry()->exportToWkt();
+            long srid = mLayer->crs().postgisSrid();
+            geomAsEWKT = QString("SRID=%1;%2").arg(srid).arg(geomAsEWKT);
+
+            bool ok = mWorkingWidget->featureFromEIO(mWorkingWidget->mapCanvas(), mFeature, geomAsEWKT, layerTable);
+            if(ok){
+                //res = mLayer->addFeature( mFeature );
+                mWorkingWidget->reloadLayer(mLayer->id());
+                res = true;
+            }
+            else{
+                QgsDebugMsg( "Adding feature to layer failed" );
+                res = false;
+            }
+        }
     }
-    else
-    {
-      QgsDebugMsg( "Adding feature to layer failed" );
-      res = false;
+    
+
+    //-------------
+    if(!uniqueIdFound){
+        QgsAttributeDialog *dialog = newDialog( false );
+        if ( dialog->exec() )
+        {
+          if ( reuseLastValues )
+          {
+            for ( int idx = 0; idx < fields.count(); ++idx )
+            {
+              const QgsAttributes &newValues = mFeature.attributes();
+              if ( origValues[idx] != newValues[idx] )
+              {
+                QgsDebugMsg( QString( "saving %1 for %2" ).arg( mLastUsedValues[ mLayer ][idx].toString() ).arg( idx ) );
+                mLastUsedValues[ mLayer ][idx] = newValues[idx];
+              }
+            }
+          }
+
+          res = mLayer->addFeature( mFeature );
+        }
+        else
+        {
+          QgsDebugMsg( "Adding feature to layer failed" );
+          res = false;
+        }
     }
+    //-----------------
+
   }
 
   if ( res )

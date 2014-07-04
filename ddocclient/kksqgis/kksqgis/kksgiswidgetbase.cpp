@@ -16,6 +16,7 @@
 
 #include <qgsapplication.h>
 #include <qgsproject.h>
+#include "qgsmaptip.h"
 
 #include <qgsproviderregistry.h>
 #include <qgsmaplayerregistry.h>
@@ -36,6 +37,10 @@
 #include <qgsmaptool.h>
 #include <qgsmaptoolpan.h>
 #include <qgsmaptoolzoom.h>
+
+#include "qgsmaptooladdfeature.h"
+#include "qgsmaptoolmovefeature.h"
+#include "nodetool/qgsmaptoolnodetool.h"
 
 #include "qgsmaptoolselectutils.h"
 #include "qgsmaptoolidentifyaction.h"
@@ -104,6 +109,7 @@ KKSGISWidgetBase::KKSGISWidgetBase(bool withSubWindows, bool withAddons, QWidget
     mpCoordsEdit(NULL),
     mpCoordsEditValidator(NULL),
     mpStatusBar(NULL),
+    mToggleExtentsViewButton (NULL),
     m_badLayerHandler(NULL),
     mpMapCanvas(NULL),
     mpMapLegend(NULL),
@@ -117,6 +123,7 @@ KKSGISWidgetBase::KKSGISWidgetBase(bool withSubWindows, bool withAddons, QWidget
     mpMapToolBar(NULL),
     mpDataSourceToolBar(NULL),
     mpLayerToolBar(NULL),
+    mpLayerEditsToolBar(NULL),
     mpToolsToolBar(NULL),
     mpTaskToolBar(NULL),
     mInfoBar(NULL),
@@ -143,11 +150,26 @@ KKSGISWidgetBase::KKSGISWidgetBase(bool withSubWindows, bool withAddons, QWidget
     mActionSetProjectCRSFromLayer(NULL),
     mActionLayerProperties(NULL),
     mActionLayerSubsetString(NULL),
+    
+    //редактирование векторных слоев
+    mActionAllEdits(NULL),
     mActionToggleEditing(NULL),
     mActionSaveLayerEdits(NULL),
-    mActionAllEdits(NULL),
+    mActionAddFeature(NULL),
+    mActionMoveFeature(NULL),
+    mActionNodeTool(NULL),
+    mActionDeleteSelected(NULL),
+    mActionCutFeatures(NULL),
+    mActionCopyFeatures(NULL),
+    mActionPasteFeatures(NULL),
+    //--
     mActionSaveEdits(NULL),
+    mActionRollbackEdits(NULL),
+    mActionCancelEdits(NULL),
     mActionSaveAllEdits(NULL),
+    mActionRollbackAllEdits(NULL),
+    mActionCancelAllEdits(NULL),
+    
     mActionCopyStyle(NULL),
     mActionPasteStyle(NULL),
     mActionOpenTable(NULL),
@@ -160,6 +182,7 @@ KKSGISWidgetBase::KKSGISWidgetBase(bool withSubWindows, bool withAddons, QWidget
     mActionZoomActualSize(NULL),
     mActionDraw(NULL),
     mActionIdentify(NULL),
+    mActionMapTips(NULL),
     mActionSelect(NULL),
     mActionSelectRectangle(NULL),
     mActionSelectPolygon(NULL),
@@ -180,11 +203,19 @@ KKSGISWidgetBase::KKSGISWidgetBase(bool withSubWindows, bool withAddons, QWidget
     dnThemTaskSpecBath = NULL; //???
 #endif
 
+#ifdef Q_OS_WIN
+    mSkipNextContextMenuEvent = 0;
+#endif
+
     azWorkList.clear();
 
     m_bWithSubwindows = withSubWindows; //надо ли создавать дополнительные окна (меню, тулбар, статусбыр и т.п.)
     m_bWithAddons = withAddons;//надо ли создавать меню для тематической обработки (нет, если работаем в составе DynamicDocs)
     m_bInit = false;
+    mSaveRollbackInProgress = false;
+  
+    mMapTipsVisible = false;
+
 }
 
 
@@ -199,6 +230,7 @@ void KKSGISWidgetBase::initQGIS()
 
     //initLegend();
     initMapLegend();
+    createMapTips();
 
     initActions();
     initConnections();
@@ -249,7 +281,7 @@ KKSGISWidgetBase::~KKSGISWidgetBase()
 #ifdef HAVE_TOUCH
   //delete mMapTools.mTouch;
 #endif
-  //delete mMapTools.mAddFeature;
+  delete mMapTools.mAddFeature;
   //delete mMapTools.mAddPart;
   //delete mMapTools.mAddRing;
   //delete mMapTools.mAnnotation;
@@ -263,9 +295,9 @@ KKSGISWidgetBase::~KKSGISWidgetBase()
   delete mMapTools.mMeasureAngle;
   delete mMapTools.mMeasureArea;
   delete mMapTools.mMeasureDist;
-  //delete mMapTools.mMoveFeature;
+  delete mMapTools.mMoveFeature;
   //delete mMapTools.mMoveLabel;
-  //delete mMapTools.mNodeTool;
+  delete mMapTools.mNodeTool;
   //delete mMapTools.mOffsetCurve;
   //delete mMapTools.mPinLabels;
   //delete mMapTools.mReshapeFeatures;
@@ -296,6 +328,9 @@ KKSGISWidgetBase::~KKSGISWidgetBase()
     if(mpLayerToolBar)
         delete mpLayerToolBar;
 
+    if(mpLayerEditsToolBar)
+        delete mpLayerEditsToolBar;
+
     if(mpTaskToolBar)
         delete mpTaskToolBar;
 
@@ -307,6 +342,8 @@ KKSGISWidgetBase::~KKSGISWidgetBase()
 
     if(mInfoBar)
         delete mInfoBar;
+
+    delete mpMapLegendWidget; //в деструкторе класса KKSMapWidget этому виджету делается setParent(NULL), поэтому автоматически он не удаляется. Его надо удалить здесь явным образом
 
     delete mpMapCanvas;
 
@@ -338,6 +375,17 @@ void KKSGISWidgetBase::initStatusBar()
   
     QFont myFont("Arial", 9);
     mpStatusBar->setFont(myFont);
+    //toggle to switch between mouse pos and extents display in status bar widget
+    mToggleExtentsViewButton = new QToolButton( statusBar() );
+    mToggleExtentsViewButton->setObjectName( "mToggleExtentsViewButton" );
+    mToggleExtentsViewButton->setMaximumWidth( 20 );
+    mToggleExtentsViewButton->setMaximumHeight( 20 );
+    mToggleExtentsViewButton->setIcon( QgsApplication::getThemeIcon( "tracking.png" ) );
+    mToggleExtentsViewButton->setToolTip( tr( "Toggle extents and mouse position display" ) );
+    mToggleExtentsViewButton->setCheckable( true );
+    connect( mToggleExtentsViewButton, SIGNAL( toggled( bool ) ), this, SLOT( extentsViewToggled( bool ) ) );
+    statusBar()->addPermanentWidget( mToggleExtentsViewButton, 0 );
+
 
     mpCoordsLabel = new QLabel(QString(), mpStatusBar);
     mpCoordsLabel->setObjectName( "mCoordsLabel" );
@@ -491,10 +539,12 @@ void KKSGISWidgetBase::initMapLegend()
     orderCb->setChecked( false );
 
     connect( orderCb, SIGNAL( toggled( bool ) ), mpMapLegend, SLOT( unsetUpdateDrawingOrder( bool ) ) );
+    connect( orderCb, SIGNAL( toggled( bool ) ), this, SIGNAL( dataChanged( ) ) );
     connect( mpMapLegend, SIGNAL( updateDrawingOrderUnchecked( bool ) ), orderCb, SLOT( setChecked( bool ) ) );
     connect( mpMapLegend, SIGNAL( currentLayerChanged( QgsMapLayer * ) ), this, SLOT( activateDeactivateLayerRelatedActions( QgsMapLayer * ) ) );
     connect( mpMapLegend, SIGNAL( itemSelectionChanged() ), this, SLOT( legendLayerSelectionChanged() ) );
     connect( mpMapLegend, SIGNAL( zOrderChanged() ), this, SLOT( markDirty() ) );
+    connect( mpMapLegend, SIGNAL( zOrderChanged() ), this, SIGNAL( dataChanged() ) );
 
     mpMapLegendWidget = new QWidget( this );
     QLayout *l = new QVBoxLayout;
@@ -596,6 +646,7 @@ void KKSGISWidgetBase::initActions()
     mActionAllSelect->setMenu( menuAllSelect );
 
     mActionIdentify = new QAction(tr("Identify Features"), this);
+    mActionMapTips = new QAction(tr("Map Tips"), this);
     
     mActionAllMeasure = new QAction(tr("Measure"), this);
     QMenu* menuAllMeasure = new QMenu( tr( "Measure" ), this );
@@ -687,26 +738,41 @@ void KKSGISWidgetBase::initActions()
     mActionSetProjectCRSFromLayer = new QAction(tr("Set Project CRS from Layer"), this);
     mActionLayerProperties = new QAction(tr("Properties..."), this);
     mActionLayerSubsetString = new QAction(tr("Query..."), this);
-    mActionToggleEditing = new QAction(tr("Toggle Editing"), this);
-    mActionSaveLayerEdits = new QAction(tr("Save Layer Edits"), this);
-    mActionAllEdits = new QAction(tr("Current Edits"), this);
-    /*ksa*/mActionSaveEdits = new QAction(tr("Save Edits"), this);
-    /*ksa*/mActionSaveAllEdits = new QAction(tr("Save All Edits"), this);
+    
     mActionCopyStyle = new QAction(tr("Copy style"), this);
     mActionPasteStyle = new QAction(tr("Paste style"), this);
     mActionOpenTable = new QAction(tr("Open Attribute Table"), this);
     mActionLayerSaveAs = new QAction(tr("Save As..."), this);
     mActionLayerSelectionSaveAs = new QAction(tr("Save Selection as Vector File..."), this);
 
+
+    mActionAllEdits = new QAction(tr("Current Edits"), this);
+    mActionToggleEditing = new QAction(tr("Toggle Editing"), this);
+    mActionSaveLayerEdits = new QAction(tr("Save Layer Edits"), this);
+    mActionAddFeature = new QAction(tr("Add Feature"), this);
+    mActionMoveFeature = new QAction(tr("Move Feature(s)"), this);
+    mActionNodeTool = new QAction(tr("Node Tool"), this);
+    mActionDeleteSelected = new QAction(tr("Delete Selected"), this);
+    mActionCutFeatures = new QAction(tr("Cut Features"), this);
+    mActionCopyFeatures = new QAction(tr("Copy Features"), this);
+    mActionPasteFeatures = new QAction(tr("Paste Features"), this);
+    //--
+    mActionSaveEdits = new QAction(tr("Save Edits"), this);
+    mActionRollbackEdits = new QAction(tr("Rollback Edits"), this);
+    mActionCancelEdits = new QAction(tr("Cancel Edits"), this);
+    mActionSaveAllEdits = new QAction(tr("Save All Edits"), this);
+    mActionRollbackAllEdits = new QAction(tr("Rollback All Edits"), this);
+    mActionCancelAllEdits = new QAction(tr("Cancel All Edits"), this);
+
     // Vector edits menu
     QMenu* menuAllEdits = new QMenu( tr( "Current Edits" ), this );
     menuAllEdits->addAction( mActionSaveEdits );
-    //menuAllEdits->addAction( mActionRollbackEdits );
-    //menuAllEdits->addAction( mActionCancelEdits );
+    menuAllEdits->addAction( mActionRollbackEdits );
+    menuAllEdits->addAction( mActionCancelEdits );
     menuAllEdits->addSeparator();
     menuAllEdits->addAction( mActionSaveAllEdits );
-    //menuAllEdits->addAction( mActionRollbackAllEdits );
-    //menuAllEdits->addAction( mActionCancelAllEdits );
+    menuAllEdits->addAction( mActionRollbackAllEdits );
+    menuAllEdits->addAction( mActionCancelAllEdits );
     mActionAllEdits->setMenu( menuAllEdits );
 }
 
@@ -722,10 +788,25 @@ void KKSGISWidgetBase::initConnections()
     connect( mActionLayerSubsetString, SIGNAL( triggered() ), this, SLOT( layerSubsetString() ) );
     connect( mActionLayerSaveAs, SIGNAL( triggered() ), this, SLOT( saveAsFile() ) );
     connect( mActionLayerSelectionSaveAs, SIGNAL( triggered() ), this, SLOT( saveSelectionAsVectorFile() ) );
+    
+    //редактирование векторных слоев
     connect( mActionToggleEditing, SIGNAL( triggered() ), this, SLOT( toggleEditing() ) );
     connect( mActionSaveLayerEdits, SIGNAL( triggered() ), this, SLOT( saveActiveLayerEdits() ) );
+    connect( mActionAddFeature, SIGNAL( triggered() ), this, SLOT( addFeature() ) );
+    connect( mActionMoveFeature, SIGNAL( triggered() ), this, SLOT( moveFeature() ) );
+    connect( mActionNodeTool, SIGNAL( triggered() ), this, SLOT( nodeTool() ) );
+    connect( mActionDeleteSelected, SIGNAL( triggered() ), this, SLOT( deleteSelected() ) );
+    connect( mActionCutFeatures, SIGNAL( triggered() ), this, SLOT( editCut() ) );
+    connect( mActionCopyFeatures, SIGNAL( triggered() ), this, SLOT( editCopy() ) );
+    connect( mActionPasteFeatures, SIGNAL( triggered() ), this, SLOT( editPaste() ) );
+    //--    
     connect( mActionSaveEdits, SIGNAL( triggered() ), this, SLOT( saveEdits() ) );
+    connect( mActionRollbackEdits, SIGNAL( triggered() ), this, SLOT( rollbackEdits() ) );
+    connect( mActionCancelEdits, SIGNAL( triggered() ), this, SLOT( cancelEdits() ) );
     connect( mActionSaveAllEdits, SIGNAL( triggered() ), this, SLOT( saveAllEdits() ) );
+    connect( mActionRollbackAllEdits, SIGNAL( triggered() ), this, SLOT( rollbackAllEdits() ) );
+    connect( mActionCancelAllEdits, SIGNAL( triggered() ), this, SLOT( cancelAllEdits() ) );
+    
     connect( mActionOpenTable, SIGNAL( triggered() ), this, SLOT( attributeTable() ) );
     connect( mActionCopyStyle, SIGNAL( triggered() ), this, SLOT( copyStyle() ) );
     connect( mActionPasteStyle, SIGNAL( triggered() ), this, SLOT( pasteStyle() ) );
@@ -741,6 +822,7 @@ void KKSGISWidgetBase::initConnections()
     connect( mActionDraw, SIGNAL( triggered() ), this, SLOT( refreshMapCanvas() ) );
 
     connect( mActionIdentify, SIGNAL( triggered() ), this, SLOT( identify() ) );
+    connect( mActionMapTips, SIGNAL( triggered() ), this, SLOT( toggleMapTips() ) );
 
     connect( mActionSelect, SIGNAL( triggered() ), this, SLOT( select() ) );
     connect( mActionSelectRectangle, SIGNAL( triggered() ), this, SLOT( selectByRectangle() ) );
@@ -780,23 +862,40 @@ void KKSGISWidgetBase::initConnections()
     
     connect(this->mpActionBathymetry, SIGNAL(triggered()), this, SLOT(SLOTazThemTaskSpectralBathynometry()));
 
-    connect( mpMapCanvas, SIGNAL(xyCoordinates(const QgsPoint &)), this, SLOT(SLOTazShowMouseCoordinate(const QgsPoint &)));
-    connect( mpMapCanvas, SIGNAL(xyCoordinates(const QgsPoint &)), this, SLOT(SLOTazShowMouseCoordinate(const QgsPoint &)));
+    connect( mpMapCanvas, SIGNAL(xyCoordinates(const QgsPoint &)), this, SLOT(showMouseCoordinate(const QgsPoint &)));
     connect( mpMapCanvas, SIGNAL( extentsChanged() ), this, SLOT( markDirty() ) );
-    connect( mpMapCanvas, SIGNAL( layersChanged() ), this, SLOT( markDirty() ) );
-    connect( mpMapCanvas->mapRenderer(), SIGNAL( drawingProgress( int, int ) ), this, SLOT( showProgress( int, int ) ) );
+    connect( mpMapCanvas, SIGNAL( extentsChanged() ), this, SLOT( showExtents() ) );
     connect( mpMapCanvas, SIGNAL( scaleChanged( double ) ), this, SLOT( showScale( double ) ) );
     connect( mpMapCanvas, SIGNAL( scaleChanged( double ) ), this, SLOT( updateMouseCoordinatePrecision() ) );
+    connect( mpMapCanvas, SIGNAL( mapToolSet( QgsMapTool * ) ), this, SLOT( mapToolChanged( QgsMapTool * ) ) );
+    connect( mpMapCanvas, SIGNAL( selectionChanged( QgsMapLayer * ) ), this, SLOT( selectionChanged( QgsMapLayer * ) ) );
+    connect( mpMapCanvas, SIGNAL( layersChanged() ), this, SLOT( markDirty() ) );
+    connect( mpMapCanvas, SIGNAL( zoomLastStatusChanged( bool ) ), mActionZoomLast, SLOT( setEnabled( bool ) ) );
+    connect( mpMapCanvas, SIGNAL( zoomNextStatusChanged( bool ) ), mActionZoomNext, SLOT( setEnabled( bool ) ) );
+    // connect MapCanvas keyPress event so we can check if selected feature collection must be deleted
+    connect( mpMapCanvas, SIGNAL( keyPressed( QKeyEvent * ) ), this, SLOT( mapCanvas_keyPressed( QKeyEvent * ) ) );
+
+    //connect( mRenderSuppressionCBox, SIGNAL( toggled( bool ) ), mMapCanvas, SLOT( setRenderFlag( bool ) ) );
+
+    connect( mpMapCanvas->mapRenderer(), SIGNAL( drawingProgress( int, int ) ), this, SLOT( showProgress( int, int ) ) );
+    connect( mpMapCanvas->mapRenderer(), SIGNAL( hasCrsTransformEnabledChanged( bool ) ), this, SLOT( hasCrsTransformEnabled( bool ) ) );
     connect( mpMapCanvas->mapRenderer(), SIGNAL( destinationSrsChanged() ), this, SLOT( destinationSrsChanged() ) );
-    connect( mpMapCanvas->mapRenderer(), SIGNAL( hasCrsTransformEnabled( bool ) ), this, SLOT( hasCrsTransformEnabled( bool ) ) );
 
     connect(QgsProject::instance(), SIGNAL(readProject(QDomDocument)), mpMapCanvas, SLOT(readProject(QDomDocument)));
     connect( QgsProject::instance(), SIGNAL( layerLoaded( int, int ) ), this, SLOT( showProgress( int, int ) ) );
     connect( QgsProject::instance(), SIGNAL( writeProject(QDomDocument &) ), this, SIGNAL( mapSaved( QDomDocument& ) ) );
+    //connect( QgsProject::instance(), SIGNAL( writeProject( QDomDocument& ) ), this, SLOT( writeAnnotationItemsToProject( QDomDocument& ) ) );
+    connect( QgsProject::instance(), SIGNAL( loadingLayer( QString ) ), this, SLOT( showStatusMessage( QString ) ) );
 
-    connect(this->mpRegistry, SIGNAL(layersRemoved(QStringList)), this, SIGNAL(dataChanged()));
-    connect(this->mpRegistry, SIGNAL(layersAdded(QList<QgsMapLayer *>)), this, SIGNAL(dataChanged()));
+    // connect map layer registry
+    connect( this->mpRegistry, SIGNAL( layersRemoved(QStringList)), this, SIGNAL(dataChanged()));
+    connect( this->mpRegistry, SIGNAL( layersWillBeRemoved( QStringList ) ), this, SLOT( removingLayers( QStringList ) ) );
+    connect( this->mpRegistry, SIGNAL( layersAdded(QList<QgsMapLayer *>)), this, SIGNAL(dataChanged()));
+    connect( this->mpRegistry, SIGNAL( layersAdded( QList<QgsMapLayer *> ) ), this, SLOT( layersWereAdded( QList<QgsMapLayer *> ) ) );
 
+    // handle deprecated labels in project for QGIS 2.0
+    //connect( this, SIGNAL( newProject() ), this, SLOT( checkForDeprecatedLabelsInProject() ) );
+    //connect( this, SIGNAL( projectRead() ), this, SLOT( checkForDeprecatedLabelsInProject() ) );
 }
 
 
@@ -839,6 +938,7 @@ void KKSGISWidgetBase::initToolBar()
 
     mpToolsToolBar->addAction(mActionAllSelect);
     mpToolsToolBar->addAction(mActionIdentify);
+    mpToolsToolBar->addAction(mActionMapTips);
     mpToolsToolBar->addAction(mActionAllMeasure);
     mpToolsToolBar->addSeparator();
 
@@ -892,7 +992,21 @@ void KKSGISWidgetBase::initToolBar()
     mpLayerToolBar->addAction(mActionLayerProperties);
     //mpLayerToolBar->addAction(mActionLayerSubsetString);
     
-    mpToolBarMap.insert(mpLayerToolBar->objectName(), mpLayerToolBar);
+    //редактирование векторных слоев
+    mpLayerEditsToolBar = new QToolBar(tr("Редактирование векторных слоев"));
+    mpLayerEditsToolBar->setObjectName("mpLayerEditsToolBar");
+    mpLayerEditsToolBar->addAction(mActionAllEdits);
+    mpLayerEditsToolBar->addAction(mActionToggleEditing);
+    mpLayerEditsToolBar->addAction(mActionSaveLayerEdits);
+    mpLayerEditsToolBar->addAction(mActionAddFeature);
+    mpLayerEditsToolBar->addAction(mActionMoveFeature);
+    mpLayerEditsToolBar->addAction(mActionNodeTool);
+    mpLayerEditsToolBar->addAction(mActionDeleteSelected);
+    mpLayerEditsToolBar->addAction(mActionCutFeatures);
+    mpLayerEditsToolBar->addAction(mActionCopyFeatures);
+    mpLayerEditsToolBar->addAction(mActionPasteFeatures);
+
+    mpToolBarMap.insert(mpLayerEditsToolBar->objectName(), mpLayerEditsToolBar);
 
 }
 
@@ -955,6 +1069,24 @@ void KKSGISWidgetBase::initMenuBar()
     mpMenuBar->addMenu(menuLayer);
     mpMenuMap.insert(tr("Layer"), menuLayer);
 
+    QMenu * menuLayerEdits = new QMenu(tr("Редактирование"));
+    menuLayerEdits->addAction(mActionAllEdits);
+    menuLayerEdits->addAction(mActionToggleEditing);
+    menuLayerEdits->addAction(mActionSaveLayerEdits);
+    menuLayerEdits->addSeparator();
+    menuLayerEdits->addAction(mActionAddFeature);
+    menuLayerEdits->addAction(mActionMoveFeature);
+    menuLayerEdits->addAction(mActionNodeTool);
+    menuLayerEdits->addSeparator();
+    menuLayerEdits->addAction(mActionDeleteSelected);
+    menuLayerEdits->addAction(mActionCutFeatures);
+    menuLayerEdits->addAction(mActionCopyFeatures);
+    menuLayerEdits->addAction(mActionPasteFeatures);
+
+    mpMenuBar->addMenu(menuLayerEdits);
+    mpMenuMap.insert(tr("Edit"), menuLayerEdits);
+
+
     QMenu * menuTools = new QMenu(tr("Инструменты"));
     menuTools->addAction(mpActionPan);
     menuTools->addAction(mActionPanToSelected);
@@ -972,6 +1104,7 @@ void KKSGISWidgetBase::initMenuBar()
 
     menuTools->addAction(mActionAllSelect);
     menuTools->addAction(mActionIdentify);
+    menuTools->addAction(mActionMapTips);
     menuTools->addAction(mActionAllMeasure);
     menuTools->addSeparator();
 
@@ -1048,10 +1181,10 @@ void KKSGISWidgetBase::initCanvasTools()
   //mMapTools.mSvgAnnotation->setAction( mActionSvgAnnotation );
   //mMapTools.mAnnotation = new QgsMapToolAnnotation( mMapCanvas );
   //mMapTools.mAnnotation->setAction( mActionAnnotation );
-  //mMapTools.mAddFeature = new QgsMapToolAddFeature( mMapCanvas );
-  //mMapTools.mAddFeature->setAction( mActionAddFeature );
-  //mMapTools.mMoveFeature = new QgsMapToolMoveFeature( mMapCanvas );
-  //mMapTools.mMoveFeature->setAction( mActionMoveFeature );
+  mMapTools.mAddFeature = new QgsMapToolAddFeature( this,  mpMapCanvas );
+  mMapTools.mAddFeature->setAction( mActionAddFeature );
+  mMapTools.mMoveFeature = new QgsMapToolMoveFeature( this, mpMapCanvas );
+  mMapTools.mMoveFeature->setAction( mActionMoveFeature );
   //mMapTools.mRotateFeature = new QgsMapToolRotateFeature( mMapCanvas );
   //mMapTools.mRotateFeature->setAction( mActionRotateFeature );
   //need at least geos 3.3 for OffsetCurve tool
@@ -1097,8 +1230,8 @@ void KKSGISWidgetBase::initCanvasTools()
   //mMapTools.mDeleteRing->setAction( mActionDeleteRing );
   //mMapTools.mDeletePart = new QgsMapToolDeletePart( mMapCanvas );
   //mMapTools.mDeletePart->setAction( mActionDeletePart );
-  //mMapTools.mNodeTool = new QgsMapToolNodeTool( mMapCanvas );
-  //mMapTools.mNodeTool->setAction( mActionNodeTool );
+  mMapTools.mNodeTool = new QgsMapToolNodeTool( this, mpMapCanvas );
+  mMapTools.mNodeTool->setAction( mActionNodeTool );
   //mMapTools.mRotatePointSymbolsTool = new QgsMapToolRotatePointSymbols( mMapCanvas );
   //mMapTools.mRotatePointSymbolsTool->setAction( mActionRotatePointSymbols );
   //mMapTools.mPinLabels = new QgsMapToolPinLabels( mMapCanvas );
@@ -1112,8 +1245,9 @@ void KKSGISWidgetBase::initCanvasTools()
   //mMapTools.mRotateLabel->setAction( mActionRotateLabel );
   //mMapTools.mChangeLabelProperties = new QgsMapToolChangeLabelProperties( mMapCanvas );
   //mMapTools.mChangeLabelProperties->setAction( mActionChangeLabelProperties );
+
   //ensure that non edit tool is initialised or we will get crashes in some situations
-  //mNonEditMapTool = mMapTools.mPan;
+  mNonEditMapTool = mMapTools.mPan;
 }
 
 /*
@@ -1211,7 +1345,7 @@ void KKSGISWidgetBase::updateMouseCoordinatePrecision()
   mMousePrecisionDecimalPlaces = dp;
 }
 
-void KKSGISWidgetBase::removeLayer()
+void KKSGISWidgetBase::removeLayer(bool promptConfirmation )
 {
   if ( mpMapCanvas && mpMapCanvas->isDrawing() )
   {
@@ -1230,7 +1364,24 @@ void KKSGISWidgetBase::removeLayer()
       return;
   }
 
+  //validate selection
+  int numberOfRemovedItems = mpMapLegend->selectedItems().size();
+  if ( numberOfRemovedItems == 0 )
+  {
+    messageBar()->pushMessage( tr( "No Object Selected" ),
+                               tr( "To remove objects, you must select them in the legend" ),
+                               QgsMessageBar::INFO, messageTimeout() );
+    return;
+  }
+  //display a warning
+  if ( promptConfirmation && QMessageBox::warning( this, tr( "Remove objects" ), tr( "Remove %n object(s)?", "number of objects to remove", numberOfRemovedItems ), QMessageBox::Ok | QMessageBox::Cancel ) == QMessageBox::Cancel )
+  {
+    return;
+  }
+
   mpMapLegend->removeSelectedLayers();
+
+  showStatusMessage( tr( "%n object(s) removed.", "number of objects removed", numberOfRemovedItems ) );
 
   mpMapCanvas->refresh();
 }
@@ -2066,17 +2217,29 @@ void KKSGISWidgetBase::setTheme( QString theThemeName )
   //mActionRemoveAllFromOverview->setIcon( QgsApplication::getThemeIcon( "/mActionRemoveAllFromOverview.svg" ) );
   //mActionToggleFullScreen->setIcon( QgsApplication::getThemeIcon( "/mActionToggleFullScreen.png" ) );
   //mActionProjectProperties->setIcon( QgsApplication::getThemeIcon( "/mActionProjectProperties.png" ) );
+  
+  mActionAllEdits->setIcon( QgsApplication::getThemeIcon( "/mActionAllEdits.svg" ) );
   mActionToggleEditing->setIcon( QgsApplication::getThemeIcon( "/mActionToggleEditing.svg" ) );
   mActionSaveLayerEdits->setIcon( QgsApplication::getThemeIcon( "/mActionSaveAllEdits.svg" ) );
-  mActionAllEdits->setIcon( QgsApplication::getThemeIcon( "/mActionAllEdits.svg" ) );
+  mActionAddFeature->setIcon( QgsApplication::getThemeIcon( "/mActionCapturePoint.png" ) );
+  mActionMoveFeature->setIcon( QgsApplication::getThemeIcon( "/mActionMoveFeature.png" ) );
+  mActionNodeTool->setIcon( QgsApplication::getThemeIcon( "/mActionNodeTool.png" ) );
+  mActionDeleteSelected->setIcon( QgsApplication::getThemeIcon( "/mActionDeleteSelected.svg" ) );
+  mActionCutFeatures->setIcon( QgsApplication::getThemeIcon( "/mActionEditCut.png" ) );
+  mActionCopyFeatures->setIcon( QgsApplication::getThemeIcon( "/mActionEditCopy.png" ) );
+  mActionPasteFeatures->setIcon( QgsApplication::getThemeIcon( "/mActionEditPaste.png" ) );
+  //--
   mActionSaveEdits->setIcon( QgsApplication::getThemeIcon( "/mActionSaveEdits.svg" ) );
+  mActionRollbackEdits->setIcon( QgsApplication::getThemeIcon( "/mActionRollbackEdits.svg" ) );
+  mActionCancelEdits->setIcon( QgsApplication::getThemeIcon( "/mActionCancelEdits.svg" ) );
   mActionSaveAllEdits->setIcon( QgsApplication::getThemeIcon( "/mActionSaveAllEdits.svg" ) );
-  //mActionRollbackEdits->setIcon( QgsApplication::getThemeIcon( "/mActionRollbackEdits.svg" ) );
-  //mActionRollbackAllEdits->setIcon( QgsApplication::getThemeIcon( "/mActionRollbackAllEdits.svg" ) );
-  //mActionCancelEdits->setIcon( QgsApplication::getThemeIcon( "/mActionCancelEdits.svg" ) );
-  //mActionCancelAllEdits->setIcon( QgsApplication::getThemeIcon( "/mActionCancelAllEdits.svg" ) );
+  mActionRollbackAllEdits->setIcon( QgsApplication::getThemeIcon( "/mActionRollbackAllEdits.svg" ) );
+  mActionCancelAllEdits->setIcon( QgsApplication::getThemeIcon( "/mActionCancelAllEdits.svg" ) );
+  
+  
   //mActionUndo->setIcon( QgsApplication::getThemeIcon( "/mActionUndo.png" ) );
   //mActionRedo->setIcon( QgsApplication::getThemeIcon( "/mActionRedo.png" ) );
+  
   mActionOpenTable->setIcon( QgsApplication::getThemeIcon( "/mActionOpenTable.png" ) );
   mActionLayerProperties->setIcon( QgsApplication::getThemeIcon( "/mActionProjectProperties.png" ) );
   //mActionLabeling->setIcon( QgsApplication::getThemeIcon( "/mActionLabeling.png" ) );
@@ -2094,6 +2257,7 @@ void KKSGISWidgetBase::setTheme( QString theThemeName )
   mActionDraw->setIcon( QgsApplication::getThemeIcon( "/mActionDraw.svg" ) );
 
   mActionIdentify->setIcon( QgsApplication::getThemeIcon( "/mActionIdentify.svg" ) );
+  mActionMapTips->setIcon( QgsApplication::getThemeIcon( "/mActionMapTips.png" ) );
 
   mActionSelect->setIcon( QgsApplication::getThemeIcon( "/mActionSelect.svg" ) );
   mActionSelectRectangle->setIcon( QgsApplication::getThemeIcon( "/mActionSelectRectangle.svg" ) );
@@ -2144,17 +2308,16 @@ void KKSGISWidgetBase::legendLayerSelectionChanged( void )
   mActionSetProjectCRSFromLayer->setEnabled( mpMapLegend && mpMapLegend->selectedLayers().size() == 1 );
 
   mActionSaveEdits->setEnabled( mpMapLegend && mpMapLegend->selectedLayersEditable( true ) );
-  //mActionRollbackEdits->setEnabled( mMapLegend && mMapLegend->selectedLayersEditable( true ) );
-  //mActionCancelEdits->setEnabled( mMapLegend && mMapLegend->selectedLayersEditable() );
+  mActionRollbackEdits->setEnabled( mpMapLegend && mpMapLegend->selectedLayersEditable( true ) );
+  mActionCancelEdits->setEnabled( mpMapLegend && mpMapLegend->selectedLayersEditable() );
 }
 
 void KKSGISWidgetBase::activateDeactivateLayerRelatedActions( QgsMapLayer* layer )
 {
-    /*
   bool enableMove = false, enableRotate = false, enablePin = false, enableShowHide = false, enableChange = false;
 
   QMap<QString, QgsMapLayer*> layers = QgsMapLayerRegistry::instance()->mapLayers();
-  for ( QMap<QString, QgsMapLayer*>::iterator it = layers.begin(); it != layers.end(); it++ )
+  for ( QMap<QString, QgsMapLayer*>::iterator it = layers.begin(); it != layers.end(); ++it )
   {
     QgsVectorLayer *vlayer = qobject_cast<QgsVectorLayer *>( it.value() );
     if ( !vlayer || !vlayer->isEditable() ||
@@ -2162,27 +2325,32 @@ void KKSGISWidgetBase::activateDeactivateLayerRelatedActions( QgsMapLayer* layer
       continue;
 
     int colX, colY, colShow, colAng;
+    /*
     enablePin =
       enablePin ||
-      ( qobject_cast<QgsMapToolPinLabels*>( mMapTools.mPinLabels ) &&
-        qobject_cast<QgsMapToolPinLabels*>( mMapTools.mPinLabels )->layerCanPin( vlayer, colX, colY ) );
-
+      ( qobject_cast<QgsMapToolPinLabels*>( mpMapTools.mPinLabels ) &&
+        qobject_cast<QgsMapToolPinLabels*>( mpMapTools.mPinLabels )->layerCanPin( vlayer, colX, colY ) );
+    */
+    /*
     enableShowHide =
       enableShowHide ||
-      ( qobject_cast<QgsMapToolShowHideLabels*>( mMapTools.mShowHideLabels ) &&
-        qobject_cast<QgsMapToolShowHideLabels*>( mMapTools.mShowHideLabels )->layerCanShowHide( vlayer, colShow ) );
-
+      ( qobject_cast<QgsMapToolShowHideLabels*>( mpMapTools.mShowHideLabels ) &&
+        qobject_cast<QgsMapToolShowHideLabels*>( mpMapTools.mShowHideLabels )->layerCanShowHide( vlayer, colShow ) );
+    */
+    /*
     enableMove =
       enableMove ||
-      ( qobject_cast<QgsMapToolMoveLabel*>( mMapTools.mMoveLabel ) &&
-        ( qobject_cast<QgsMapToolMoveLabel*>( mMapTools.mMoveLabel )->labelMoveable( vlayer, colX, colY )
-          || qobject_cast<QgsMapToolMoveLabel*>( mMapTools.mMoveLabel )->diagramMoveable( vlayer, colX, colY ) )
+      ( qobject_cast<QgsMapToolMoveLabel*>( mpMapTools.mMoveLabel ) &&
+        ( qobject_cast<QgsMapToolMoveLabel*>( mpMapTools.mMoveLabel )->labelMoveable( vlayer, colX, colY )
+          || qobject_cast<QgsMapToolMoveLabel*>( mpMapTools.mMoveLabel )->diagramMoveable( vlayer, colX, colY ) )
       );
-
+    */
+    /*
     enableRotate =
       enableRotate ||
-      ( qobject_cast<QgsMapToolRotateLabel*>( mMapTools.mRotateLabel ) &&
-        qobject_cast<QgsMapToolRotateLabel*>( mMapTools.mRotateLabel )->layerIsRotatable( vlayer, colAng ) );
+      ( qobject_cast<QgsMapToolRotateLabel*>( mpMapTools.mRotateLabel ) &&
+        qobject_cast<QgsMapToolRotateLabel*>( mpMapTools.mRotateLabel )->layerIsRotatable( vlayer, colAng ) );
+    */
 
     enableChange = true;
 
@@ -2190,12 +2358,18 @@ void KKSGISWidgetBase::activateDeactivateLayerRelatedActions( QgsMapLayer* layer
       break;
   }
 
+  /*
   mActionPinLabels->setEnabled( enablePin );
   mActionShowHideLabels->setEnabled( enableShowHide );
   mActionMoveLabel->setEnabled( enableMove );
   mActionRotateLabel->setEnabled( enableRotate );
   mActionChangeLabelProperties->setEnabled( enableChange );
+  */
+    /*
   mMenuPasteAs->setEnabled( clipboard() && !clipboard()->empty() );
+  mActionPasteAsNewVector->setEnabled( clipboard() && !clipboard()->empty() );
+  mActionPasteAsNewMemoryVector->setEnabled( clipboard() && !clipboard()->empty() );
+  */
 
   updateLayerModifiedActions();
 
@@ -2208,9 +2382,9 @@ void KKSGISWidgetBase::activateDeactivateLayerRelatedActions( QgsMapLayer* layer
     mActionSelectRadius->setEnabled( false );
     mActionIdentify->setEnabled( QSettings().value( "/Map/identifyMode", 0 ).toInt() != 0 );
     mActionSelectByExpression->setEnabled( false );
-    mActionLabeling->setEnabled( false );
+    //mActionLabeling->setEnabled( false );
     mActionOpenTable->setEnabled( false );
-    mActionOpenFieldCalc->setEnabled( false );
+    //mActionOpenFieldCalc->setEnabled( false );
     mActionToggleEditing->setEnabled( false );
     mActionToggleEditing->setChecked( false );
     mActionSaveLayerEdits->setEnabled( false );
@@ -2218,12 +2392,12 @@ void KKSGISWidgetBase::activateDeactivateLayerRelatedActions( QgsMapLayer* layer
     mActionLayerSelectionSaveAs->setEnabled( false );
     mActionLayerProperties->setEnabled( false );
     mActionLayerSubsetString->setEnabled( false );
-    mActionAddToOverview->setEnabled( false );
-    mActionFeatureAction->setEnabled( false );
+    //mActionAddToOverview->setEnabled( false );
+    //mActionFeatureAction->setEnabled( false );
     mActionAddFeature->setEnabled( false );
     mActionMoveFeature->setEnabled( false );
-    mActionRotateFeature->setEnabled( false );
-    mActionOffsetCurve->setEnabled( false );
+    //mActionRotateFeature->setEnabled( false );
+    //mActionOffsetCurve->setEnabled( false );
     mActionNodeTool->setEnabled( false );
     mActionDeleteSelected->setEnabled( false );
     mActionCutFeatures->setEnabled( false );
@@ -2232,49 +2406,50 @@ void KKSGISWidgetBase::activateDeactivateLayerRelatedActions( QgsMapLayer* layer
     mActionCopyStyle->setEnabled( false );
     mActionPasteStyle->setEnabled( false );
 
-    mUndoWidget->dockContents()->setEnabled( false );
-    mActionUndo->setEnabled( false );
-    mActionRedo->setEnabled( false );
-    mActionSimplifyFeature->setEnabled( false );
-    mActionAddRing->setEnabled( false );
-    mActionAddPart->setEnabled( false );
-    mActionDeleteRing->setEnabled( false );
-    mActionDeletePart->setEnabled( false );
-    mActionReshapeFeatures->setEnabled( false );
-    mActionOffsetCurve->setEnabled( false );
-    mActionSplitFeatures->setEnabled( false );
-    mActionSplitParts->setEnabled( false );
-    mActionMergeFeatures->setEnabled( false );
-    mActionMergeFeatureAttributes->setEnabled( false );
-    mActionRotatePointSymbols->setEnabled( false );
+    //mUndoWidget->dockContents()->setEnabled( false );
+    //mActionUndo->setEnabled( false );
+    //mActionRedo->setEnabled( false );
+    //mActionSimplifyFeature->setEnabled( false );
+    //mActionAddRing->setEnabled( false );
+    //mActionFillRing->setEnabled( false );
+    //mActionAddPart->setEnabled( false );
+    //mActionDeleteRing->setEnabled( false );
+    //mActionDeletePart->setEnabled( false );
+    //mActionReshapeFeatures->setEnabled( false );
+    //mActionOffsetCurve->setEnabled( false );
+    //mActionSplitFeatures->setEnabled( false );
+    //mActionSplitParts->setEnabled( false );
+    //mActionMergeFeatures->setEnabled( false );
+    //mActionMergeFeatureAttributes->setEnabled( false );
+    //mActionRotatePointSymbols->setEnabled( false );
 
-    mActionPinLabels->setEnabled( false );
-    mActionShowHideLabels->setEnabled( false );
-    mActionMoveLabel->setEnabled( false );
-    mActionRotateLabel->setEnabled( false );
-    mActionChangeLabelProperties->setEnabled( false );
+    //mActionPinLabels->setEnabled( false );
+    //mActionShowHideLabels->setEnabled( false );
+    //mActionMoveLabel->setEnabled( false );
+    //mActionRotateLabel->setEnabled( false );
+    //mActionChangeLabelProperties->setEnabled( false );
 
-    mActionLocalHistogramStretch->setEnabled( false );
-    mActionFullHistogramStretch->setEnabled( false );
-    mActionLocalCumulativeCutStretch->setEnabled( false );
-    mActionFullCumulativeCutStretch->setEnabled( false );
-    mActionIncreaseBrightness->setEnabled( false );
-    mActionDecreaseBrightness->setEnabled( false );
-    mActionIncreaseContrast->setEnabled( false );
-    mActionDecreaseContrast->setEnabled( false );
+    //mActionLocalHistogramStretch->setEnabled( false );
+    //mActionFullHistogramStretch->setEnabled( false );
+    //mActionLocalCumulativeCutStretch->setEnabled( false );
+    //mActionFullCumulativeCutStretch->setEnabled( false );
+    //mActionIncreaseBrightness->setEnabled( false );
+    //mActionDecreaseBrightness->setEnabled( false );
+    //mActionIncreaseContrast->setEnabled( false );
+    //mActionDecreaseContrast->setEnabled( false );
     mActionZoomActualSize->setEnabled( false );
     mActionZoomToLayer->setEnabled( false );
     return;
   }
 
   mActionLayerProperties->setEnabled( QgsProject::instance()->layerIsEmbedded( layer->id() ).isEmpty() );
-  mActionAddToOverview->setEnabled( true );
+  //mActionAddToOverview->setEnabled( true );
   mActionZoomToLayer->setEnabled( true );
 
   mActionCopyStyle->setEnabled( true );
   mActionPasteStyle->setEnabled( clipboard()->hasFormat( QGSCLIPBOARD_STYLE_MIME ) );
 
-  // Vector layers
+  //***********Vector layers****************
   if ( layer->type() == QgsMapLayer::VectorLayer )
   {
     QgsVectorLayer* vlayer = qobject_cast<QgsVectorLayer *>( layer );
@@ -2282,7 +2457,7 @@ void KKSGISWidgetBase::activateDeactivateLayerRelatedActions( QgsMapLayer* layer
 
     bool isEditable = vlayer->isEditable();
     bool layerHasSelection = vlayer->selectedFeatureCount() > 0;
-    bool layerHasActions = vlayer->actions()->size() > 0;
+    //bool layerHasActions = vlayer->actions()->size() + QgsMapLayerActionRegistry::instance()->mapLayerActions( vlayer ).size() > 0;
 
     bool canChangeAttributes = dprovider->capabilities() & QgsVectorDataProvider::ChangeAttributeValues;
     bool canDeleteFeatures = dprovider->capabilities() & QgsVectorDataProvider::DeleteFeatures;
@@ -2291,16 +2466,16 @@ void KKSGISWidgetBase::activateDeactivateLayerRelatedActions( QgsMapLayer* layer
     bool canSupportEditing = dprovider->capabilities() & QgsVectorDataProvider::EditingCapabilities;
     bool canChangeGeometry = dprovider->capabilities() & QgsVectorDataProvider::ChangeGeometries;
 
-    mActionLocalHistogramStretch->setEnabled( false );
-    mActionFullHistogramStretch->setEnabled( false );
-    mActionLocalCumulativeCutStretch->setEnabled( false );
-    mActionFullCumulativeCutStretch->setEnabled( false );
-    mActionIncreaseBrightness->setEnabled( false );
-    mActionDecreaseBrightness->setEnabled( false );
-    mActionIncreaseContrast->setEnabled( false );
-    mActionDecreaseContrast->setEnabled( false );
+    //mActionLocalHistogramStretch->setEnabled( false );
+    //mActionFullHistogramStretch->setEnabled( false );
+    //mActionLocalCumulativeCutStretch->setEnabled( false );
+    //mActionFullCumulativeCutStretch->setEnabled( false );
+    //mActionIncreaseBrightness->setEnabled( false );
+    //mActionDecreaseBrightness->setEnabled( false );
+    //mActionIncreaseContrast->setEnabled( false );
+    //mActionDecreaseContrast->setEnabled( false );
     mActionZoomActualSize->setEnabled( false );
-    mActionLabeling->setEnabled( true );
+    //mActionLabeling->setEnabled( true );
 
     mActionSelect->setEnabled( true );
     mActionSelectRectangle->setEnabled( true );
@@ -2313,12 +2488,12 @@ void KKSGISWidgetBase::activateDeactivateLayerRelatedActions( QgsMapLayer* layer
     mActionLayerSaveAs->setEnabled( true );
     mActionLayerSelectionSaveAs->setEnabled( true );
     mActionCopyFeatures->setEnabled( layerHasSelection );
-    mActionFeatureAction->setEnabled( layerHasActions );
+    //mActionFeatureAction->setEnabled( layerHasActions );
 
-    if ( !isEditable && mMapCanvas->mapTool()
-         && mMapCanvas->mapTool()->isEditTool() && !mSaveRollbackInProgress )
+    if ( !isEditable && mpMapCanvas->mapTool()
+         && mpMapCanvas->mapTool()->isEditTool() && !mSaveRollbackInProgress )
     {
-      mMapCanvas->setMapTool( mNonEditMapTool );
+      mpMapCanvas->setMapTool( mNonEditMapTool );
     }
 
     if ( dprovider )
@@ -2328,9 +2503,9 @@ void KKSGISWidgetBase::activateDeactivateLayerRelatedActions( QgsMapLayer* layer
       mActionToggleEditing->setEnabled( canSupportEditing && !vlayer->isReadOnly() );
       mActionToggleEditing->setChecked( canSupportEditing && isEditable );
       mActionSaveLayerEdits->setEnabled( canSupportEditing && isEditable && vlayer->isModified() );
-      mUndoWidget->dockContents()->setEnabled( canSupportEditing && isEditable );
-      mActionUndo->setEnabled( canSupportEditing );
-      mActionRedo->setEnabled( canSupportEditing );
+      //mUndoWidget->dockContents()->setEnabled( canSupportEditing && isEditable );
+      //mActionUndo->setEnabled( canSupportEditing );
+      //mActionRedo->setEnabled( canSupportEditing );
 
       //start editing/stop editing
       if ( canSupportEditing )
@@ -2339,6 +2514,7 @@ void KKSGISWidgetBase::activateDeactivateLayerRelatedActions( QgsMapLayer* layer
       }
 
       mActionPasteFeatures->setEnabled( isEditable && canAddFeatures && !clipboard()->empty() );
+
       mActionAddFeature->setEnabled( isEditable && canAddFeatures );
 
       //does provider allow deleting of features?
@@ -2348,35 +2524,36 @@ void KKSGISWidgetBase::activateDeactivateLayerRelatedActions( QgsMapLayer* layer
       //merge tool needs editable layer and provider with the capability of adding and deleting features
       if ( isEditable && canChangeAttributes )
       {
-        mActionMergeFeatures->setEnabled( layerHasSelection && canDeleteFeatures && canAddFeatures );
-        mActionMergeFeatureAttributes->setEnabled( layerHasSelection );
+        //mActionMergeFeatures->setEnabled( layerHasSelection && canDeleteFeatures && canAddFeatures );
+        //mActionMergeFeatureAttributes->setEnabled( layerHasSelection );
       }
       else
       {
-        mActionMergeFeatures->setEnabled( false );
-        mActionMergeFeatureAttributes->setEnabled( false );
+        //mActionMergeFeatures->setEnabled( false );
+        //mActionMergeFeatureAttributes->setEnabled( false );
       }
 
       // moving enabled if geometry changes are supported
-      mActionAddPart->setEnabled( isEditable && canChangeGeometry );
-      mActionDeletePart->setEnabled( isEditable && canChangeGeometry );
+      //mActionAddPart->setEnabled( isEditable && canChangeGeometry );
+      //mActionDeletePart->setEnabled( isEditable && canChangeGeometry );
       mActionMoveFeature->setEnabled( isEditable && canChangeGeometry );
-      mActionRotateFeature->setEnabled( isEditable && canChangeGeometry );
+      //mActionRotateFeature->setEnabled( isEditable && canChangeGeometry );
       mActionNodeTool->setEnabled( isEditable && canChangeGeometry );
 
       if ( vlayer->geometryType() == QGis::Point )
       {
         mActionAddFeature->setIcon( QgsApplication::getThemeIcon( "/mActionCapturePoint.png" ) );
 
-        mActionAddRing->setEnabled( false );
-        mActionReshapeFeatures->setEnabled( false );
-        mActionSplitFeatures->setEnabled( false );
-        mActionSplitParts->setEnabled( false );
-        mActionSimplifyFeature->setEnabled( false );
-        mActionDeleteRing->setEnabled( false );
-        mActionRotatePointSymbols->setEnabled( false );
-        mActionOffsetCurve->setEnabled( false );
-
+        //mActionAddRing->setEnabled( false );
+        //mActionFillRing->setEnabled( false );
+        //mActionReshapeFeatures->setEnabled( false );
+        //mActionSplitFeatures->setEnabled( false );
+        //mActionSplitParts->setEnabled( false );
+        //mActionSimplifyFeature->setEnabled( false );
+        //mActionDeleteRing->setEnabled( false );
+        //mActionRotatePointSymbols->setEnabled( false );
+        //mActionOffsetCurve->setEnabled( false );
+        /*
         if ( isEditable && canChangeAttributes )
         {
           if ( QgsMapToolRotatePointSymbols::layerIsRotatable( vlayer ) )
@@ -2384,48 +2561,54 @@ void KKSGISWidgetBase::activateDeactivateLayerRelatedActions( QgsMapLayer* layer
             mActionRotatePointSymbols->setEnabled( true );
           }
         }
+        */
       }
       else if ( vlayer->geometryType() == QGis::Line )
       {
         mActionAddFeature->setIcon( QgsApplication::getThemeIcon( "/mActionCaptureLine.png" ) );
 
-        mActionReshapeFeatures->setEnabled( isEditable && canAddFeatures );
-        mActionSplitFeatures->setEnabled( isEditable && canAddFeatures );
-        mActionSplitParts->setEnabled( isEditable && canAddFeatures );
-        mActionSimplifyFeature->setEnabled( isEditable && canAddFeatures );
-        mActionOffsetCurve->setEnabled( isEditable && canAddFeatures && canChangeAttributes );
+        //mActionReshapeFeatures->setEnabled( isEditable && canAddFeatures );
+        //mActionSplitFeatures->setEnabled( isEditable && canAddFeatures );
+        //mActionSplitParts->setEnabled( isEditable && canAddFeatures );
+        //mActionSimplifyFeature->setEnabled( isEditable && canAddFeatures );
+        //mActionOffsetCurve->setEnabled( isEditable && canAddFeatures && canChangeAttributes );
 
-        mActionAddRing->setEnabled( false );
-        mActionDeleteRing->setEnabled( false );
+        //mActionAddRing->setEnabled( false );
+        //mActionFillRing->setEnabled( false );
+        //mActionDeleteRing->setEnabled( false );
       }
       else if ( vlayer->geometryType() == QGis::Polygon )
       {
         mActionAddFeature->setIcon( QgsApplication::getThemeIcon( "/mActionCapturePolygon.png" ) );
 
-        mActionAddRing->setEnabled( isEditable && canAddFeatures );
-        mActionReshapeFeatures->setEnabled( isEditable && canAddFeatures );
-        mActionSplitFeatures->setEnabled( isEditable && canAddFeatures );
-        mActionSplitParts->setEnabled( isEditable && canAddFeatures );
-        mActionSimplifyFeature->setEnabled( isEditable && canAddFeatures );
-        mActionDeleteRing->setEnabled( isEditable && canAddFeatures );
-        mActionOffsetCurve->setEnabled( false );
+        //mActionAddRing->setEnabled( isEditable && canChangeGeometry );
+        //mActionFillRing->setEnabled( isEditable && canChangeGeometry );
+        //mActionReshapeFeatures->setEnabled( isEditable && canChangeGeometry );
+        //mActionSplitFeatures->setEnabled( isEditable && canAddFeatures );
+        //mActionSplitParts->setEnabled( isEditable && canChangeGeometry );
+        //mActionSimplifyFeature->setEnabled( isEditable && canChangeGeometry );
+        //mActionDeleteRing->setEnabled( isEditable && canChangeGeometry );
+        //mActionOffsetCurve->setEnabled( false );
+      }
+      else if ( vlayer->geometryType() == QGis::NoGeometry )
+      {
+        mActionAddFeature->setIcon( QgsApplication::getThemeIcon( "/mActionNewTableRow.png" ) );
       }
 
-      mActionOpenFieldCalc->setEnabled( isEditable && ( canChangeAttributes || canAddAttributes ) );
+      //mActionOpenFieldCalc->setEnabled( isEditable && ( canChangeAttributes || canAddAttributes ) );
 
       return;
     }
     else
     {
-      mUndoWidget->dockContents()->setEnabled( false );
-      mActionUndo->setEnabled( false );
-      mActionRedo->setEnabled( false );
+      //mUndoWidget->dockContents()->setEnabled( false );
+      //mActionUndo->setEnabled( false );
+      //mActionRedo->setEnabled( false );
     }
 
     mActionLayerSubsetString->setEnabled( false );
   } //end vector layer block
-  
-  //Raster layers 
+  //*************Raster layers*************
   else if ( layer->type() == QgsMapLayer::RasterLayer )
   {
     const QgsRasterLayer *rlayer = qobject_cast<const QgsRasterLayer *>( layer );
@@ -2434,30 +2617,30 @@ void KKSGISWidgetBase::activateDeactivateLayerRelatedActions( QgsMapLayer* layer
     {
       if ( rlayer->dataProvider()->capabilities() & QgsRasterDataProvider::Size )
       {
-        mActionFullHistogramStretch->setEnabled( true );
+        //mActionFullHistogramStretch->setEnabled( true );
       }
       else
       {
         // it would hang up reading the data for WMS for example
-        mActionFullHistogramStretch->setEnabled( false );
+        //mActionFullHistogramStretch->setEnabled( false );
       }
-      mActionLocalHistogramStretch->setEnabled( true );
+      //mActionLocalHistogramStretch->setEnabled( true );
     }
     else
     {
-      mActionLocalHistogramStretch->setEnabled( false );
-      mActionFullHistogramStretch->setEnabled( false );
+      //mActionLocalHistogramStretch->setEnabled( false );
+      //mActionFullHistogramStretch->setEnabled( false );
     }
 
-    mActionLocalCumulativeCutStretch->setEnabled( true );
-    mActionFullCumulativeCutStretch->setEnabled( true );
-    mActionIncreaseBrightness->setEnabled( true );
-    mActionDecreaseBrightness->setEnabled( true );
-    mActionIncreaseContrast->setEnabled( true );
-    mActionDecreaseContrast->setEnabled( true );
+    //mActionLocalCumulativeCutStretch->setEnabled( true );
+    //mActionFullCumulativeCutStretch->setEnabled( true );
+    //mActionIncreaseBrightness->setEnabled( true );
+    //mActionDecreaseBrightness->setEnabled( true );
+    //mActionIncreaseContrast->setEnabled( true );
+    //mActionDecreaseContrast->setEnabled( true );
 
     mActionLayerSubsetString->setEnabled( false );
-    mActionFeatureAction->setEnabled( false );
+    //mActionFeatureAction->setEnabled( false );
     mActionSelect->setEnabled( false );
     mActionSelectRectangle->setEnabled( false );
     mActionSelectPolygon->setEnabled( false );
@@ -2465,34 +2648,35 @@ void KKSGISWidgetBase::activateDeactivateLayerRelatedActions( QgsMapLayer* layer
     mActionSelectRadius->setEnabled( false );
     mActionZoomActualSize->setEnabled( true );
     mActionOpenTable->setEnabled( false );
-    mActionOpenFieldCalc->setEnabled( false );
+    //mActionOpenFieldCalc->setEnabled( false );
     mActionToggleEditing->setEnabled( false );
     mActionToggleEditing->setChecked( false );
     mActionSaveLayerEdits->setEnabled( false );
-    mUndoWidget->dockContents()->setEnabled( false );
-    mActionUndo->setEnabled( false );
-    mActionRedo->setEnabled( false );
+    //mUndoWidget->dockContents()->setEnabled( false );
+    //mActionUndo->setEnabled( false );
+    //mActionRedo->setEnabled( false );
     mActionLayerSaveAs->setEnabled( true );
     mActionLayerSelectionSaveAs->setEnabled( false );
     mActionAddFeature->setEnabled( false );
     mActionDeleteSelected->setEnabled( false );
-    mActionAddRing->setEnabled( false );
-    mActionAddPart->setEnabled( false );
+    //mActionAddRing->setEnabled( false );
+    //mActionFillRing->setEnabled( false );
+    //mActionAddPart->setEnabled( false );
     mActionNodeTool->setEnabled( false );
     mActionMoveFeature->setEnabled( false );
-    mActionRotateFeature->setEnabled( false );
-    mActionOffsetCurve->setEnabled( false );
+    //mActionRotateFeature->setEnabled( false );
+    //mActionOffsetCurve->setEnabled( false );
     mActionCopyFeatures->setEnabled( false );
     mActionCutFeatures->setEnabled( false );
     mActionPasteFeatures->setEnabled( false );
-    mActionRotatePointSymbols->setEnabled( false );
-    mActionDeletePart->setEnabled( false );
-    mActionDeleteRing->setEnabled( false );
-    mActionSimplifyFeature->setEnabled( false );
-    mActionReshapeFeatures->setEnabled( false );
-    mActionSplitFeatures->setEnabled( false );
-    mActionSplitParts->setEnabled( false );
-    mActionLabeling->setEnabled( false );
+    //mActionRotatePointSymbols->setEnabled( false );
+    //mActionDeletePart->setEnabled( false );
+    //mActionDeleteRing->setEnabled( false );
+    //mActionSimplifyFeature->setEnabled( false );
+    //mActionReshapeFeatures->setEnabled( false );
+    //mActionSplitFeatures->setEnabled( false );
+    //mActionSplitParts->setEnabled( false );
+    //mActionLabeling->setEnabled( false );
 
     //NOTE: This check does not really add any protection, as it is called on load not on layer select/activate
     //If you load a layer with a provider and idenitfy ability then load another without, the tool would be disabled for both
@@ -2521,7 +2705,7 @@ void KKSGISWidgetBase::activateDeactivateLayerRelatedActions( QgsMapLayer* layer
       }
     }
   }
-  */
+  
 }
 
 
@@ -3137,13 +3321,13 @@ void KKSGISWidgetBase::saveEdits( QgsMapLayer *layer, bool leaveEditable, bool t
   if ( !vlayer || !vlayer->isEditable() || !vlayer->isModified() )
     return;
 
-  //ksa if ( vlayer == activeLayer() )
-  //ksa   mSaveRollbackInProgress = true;
+  if ( vlayer == activeLayer() )
+    mSaveRollbackInProgress = true;
 
   if ( !vlayer->commitChanges() )
   {
-    //ksa mSaveRollbackInProgress = false;
-    //ksa commitError( vlayer );
+    mSaveRollbackInProgress = false;
+    commitError( vlayer );
   }
 
   if ( leaveEditable )
@@ -3333,7 +3517,11 @@ void KKSGISWidgetBase::deleteSelected( QgsMapLayer *layer, QWidget* parent )
   {
     messageBar()->pushMessage( tr( "Problem deleting features" ),
                                tr( "A problem occured during deletion of features" ),
-                               QgsMessageBar::WARNING );
+                               QgsMessageBar::WARNING, messageTimeout() );
+  }
+  else
+  {
+    showStatusMessage( tr( "%n feature(s) deleted.", "number of features deleted", numberOfDeletedFeatures ) );
   }
 
   vlayer->endEditCommand();
@@ -3421,8 +3609,8 @@ void KKSGISWidgetBase::azRemoveAnnotationItems()
 
 void KKSGISWidgetBase::azRemoveAllLayers()
 {
-    QgsMapLayerRegistry::instance()->clearAllLayerCaches();
     QgsMapLayerRegistry::instance()->removeAllMapLayers();
+    //QgsMapLayerRegistry::instance()->clearAllLayerCaches();
 }
 
 bool KKSGISWidgetBase::azSelectLayer(const QString layerName)
@@ -3678,12 +3866,17 @@ bool KKSGISWidgetBase::azAddLayerVector(QFileInfo pFile)
     mpRegistry->addMapLayer(mypLayer, TRUE);
     connect(mypLayer, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
     // Add the Layer to the Layer Set
-    mpLayerSet.append(QgsMapCanvasLayer(mypLayer));
+    //ksa mpLayerSet.append(QgsMapCanvasLayer(mypLayer));
     // set the canvas to the extent of our layer
     mpMapCanvas->setExtent(mypLayer->extent());
     // Set the Map Canvas Layer Set
-    mpMapCanvas->setLayerSet(mpLayerSet);
+    //ksa mpMapCanvas->setLayerSet(mpLayerSet);
+    
+    // update UI
+    qApp->processEvents();
+    
     mpMapCanvas->refresh();
+    
     return true;
 }
 
@@ -3890,7 +4083,8 @@ void KKSGISWidgetBase::SLOTmpCloseProject()
     // clear out any stuff from project
     mpMapCanvas->freeze( true );
     azRemoveAllLayers();
-    mpLayerSet.clear();
+    
+    //ksa mpLayerSet.clear();
     mpMapCanvas->freeze( false);
     mpMapCanvas->refresh();
     mpMapCanvas->freeze( true );
@@ -3962,6 +4156,7 @@ void KKSGISWidgetBase::SLOTmpActionAddRasterLayer()
 
 }
 
+/*
 void KKSGISWidgetBase::SLOTazShowMouseCoordinate(const QgsPoint & p )
 {
     if(!mpCoordsEdit)
@@ -3996,7 +4191,7 @@ void KKSGISWidgetBase::SLOTazShowMouseCoordinate(const QgsPoint & p )
     }
  
 }
-
+*/
 
 void KKSGISWidgetBase::SLOTazShowContextMenuForLegend(const QPoint & pos)
 {
@@ -4121,6 +4316,7 @@ void KKSGISWidgetBase::openProject(const QString & prjFile)
 
     mpMapCanvas->updateScale();
 
+    /*ksa
     QMapIterator < QString, QgsMapLayer * > i(QgsMapLayerRegistry::instance()->mapLayers());
     i.toBack();
     while (i.hasPrevious())
@@ -4144,6 +4340,7 @@ void KKSGISWidgetBase::openProject(const QString & prjFile)
             mpLayerSet.append(QgsMapCanvasLayer(currLayer));
         }
     }
+    */
     
     QSettings settings;
     // load PAL engine settings
@@ -4155,7 +4352,8 @@ void KKSGISWidgetBase::openProject(const QString & prjFile)
     
     // TODO add last Open Project
     QApplication::restoreOverrideCursor();
-    mpMapCanvas->setLayerSet(mpLayerSet);
+    //ksa mpMapCanvas->setLayerSet(mpLayerSet);
+    
     mpMapCanvas->freeze(false);
     mpMapCanvas->refresh();
 }
@@ -4298,9 +4496,9 @@ void KKSGISWidgetBase::openRasterLayer(const QString & rLayerFile)
     mpRegistry->addMapLayer(mypLayer, TRUE);
     connect(mypLayer, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
     // Add the Layer to the Layer Set
-    mpLayerSet.append(QgsMapCanvasLayer(mypLayer));
+    //ksa mpLayerSet.append(QgsMapCanvasLayer(mypLayer));
     mpMapCanvas->setExtent(mypLayer->extent());
-    mpMapCanvas->setLayerSet(mpLayerSet);
+    //ksa mpMapCanvas->setLayerSet(mpLayerSet);
     mpMapCanvas->refresh();
 /*    QgsMapLayer *pLayer;
     pLayer = mypLayer;
@@ -4615,7 +4813,7 @@ bool KKSGISWidgetBase::toggleEditing( QgsMapLayer *layer, bool allowCancel )
         {
           messageBar()->pushMessage( tr( "Error" ),
                                      tr( "Problems during roll back" ),
-                                     QgsMessageBar::CRITICAL );
+                                     QgsMessageBar::CRITICAL, messageTimeout() );
           res = false;
         }
         mpMapCanvas->freeze( false );
@@ -4767,10 +4965,10 @@ void KKSGISWidgetBase::fileNew( bool thePromptToSaveFlag, bool forceBlank )
   // set the initial map tool
 #ifndef HAVE_TOUCH
   mpMapCanvas->setMapTool( mMapTools.mPan);
-  //mNonEditMapTool = mMapTools.mPan;  // signals are not yet setup to catch this
+  mNonEditMapTool = mMapTools.mPan;  // signals are not yet setup to catch this
 #else
-//  mpMapCanvas->setMapTool( mMapTools.mTouch );
-//  mNonEditMapTool = mMapTools.mTouch;  // signals are not yet setup to catch this
+  mpMapCanvas->setMapTool( mMapTools.mTouch );
+  mNonEditMapTool = mMapTools.mTouch;  // signals are not yet setup to catch this
 #endif
 
 } // QgisApp::fileNew(bool thePromptToSaveFlag)
@@ -5039,6 +5237,11 @@ void KKSGISWidgetBase::refreshMapCanvas()
   mpMapCanvas->refresh();
 }
 
+void KKSGISWidgetBase::refreshMapCanvasOnly()
+{
+  mpMapCanvas->refresh();
+}
+
 void KKSGISWidgetBase::identify()
 {
   mpMapCanvas->setMapTool( mMapTools.mIdentify );
@@ -5098,3 +5301,560 @@ void KKSGISWidgetBase::showIOEditor(QWidget * parent, const QString & uid)
 {
     emit signalShowIOEditor(parent, uid);
 }
+
+bool KKSGISWidgetBase::featureFromEIO(QWidget * parent, QgsFeature & feature, const QString & geomAsEWKT, const QString & layerTable)
+{
+    emit signalFeatureFromEIO(parent, feature, geomAsEWKT, layerTable);
+    if(feature.attribute(feature.fieldNameIndex("unique_id")).toString().isEmpty())
+        return false;
+    
+    return true;
+}
+
+void KKSGISWidgetBase::editCut( QgsMapLayer * layerContainingSelection )
+{
+  if ( mpMapCanvas && mpMapCanvas->isDrawing() )
+  {
+    return;
+  }
+
+  // Test for feature support in this layer
+  QgsVectorLayer* selectionVectorLayer = qobject_cast<QgsVectorLayer *>( layerContainingSelection ? layerContainingSelection : activeLayer() );
+  if ( !selectionVectorLayer )
+    return;
+
+  clipboard()->replaceWithCopyOf( selectionVectorLayer );
+
+  selectionVectorLayer->beginEditCommand( tr( "Features cut" ) );
+  selectionVectorLayer->deleteSelectedFeatures();
+  selectionVectorLayer->endEditCommand();
+}
+
+void KKSGISWidgetBase::addFeature()
+{
+  if ( mpMapCanvas && mpMapCanvas->isDrawing() )
+  {
+    return;
+  }
+  mpMapCanvas->setMapTool( mMapTools.mAddFeature );
+}
+
+void KKSGISWidgetBase::moveFeature()
+{
+  mpMapCanvas->setMapTool( mMapTools.mMoveFeature );
+}
+
+void KKSGISWidgetBase::nodeTool()
+{
+  mpMapCanvas->setMapTool( mMapTools.mNodeTool );
+}
+
+void KKSGISWidgetBase::rollbackEdits()
+{
+  if ( mpMapCanvas && mpMapCanvas->isDrawing() )
+    return;
+
+  foreach ( QgsMapLayer * layer, mpMapLegend->selectedLayers() )
+  {
+    cancelEdits( layer, true, false );
+  }
+  mpMapCanvas->refresh();
+  activateDeactivateLayerRelatedActions( activeLayer() );
+}
+
+void KKSGISWidgetBase::rollbackAllEdits( bool verifyAction )
+{
+  if ( mpMapCanvas && mpMapCanvas->isDrawing() )
+    return;
+
+  if ( verifyAction )
+  {
+    if ( !verifyEditsActionDialog( tr( "Rollback" ), tr( "all" ) ) )
+      return;
+  }
+
+  foreach ( QgsMapLayer * layer, editableLayers( true ) )
+  {
+    cancelEdits( layer, true, false );
+  }
+  mpMapCanvas->refresh();
+  activateDeactivateLayerRelatedActions( activeLayer() );
+}
+
+void KKSGISWidgetBase::cancelEdits()
+{
+  if ( mpMapCanvas && mpMapCanvas->isDrawing() )
+    return;
+
+  foreach ( QgsMapLayer * layer, mpMapLegend->selectedLayers() )
+  {
+    cancelEdits( layer, false, false );
+  }
+  mpMapCanvas->refresh();
+  activateDeactivateLayerRelatedActions( activeLayer() );
+}
+
+void KKSGISWidgetBase::cancelAllEdits( bool verifyAction )
+{
+  if ( mpMapCanvas && mpMapCanvas->isDrawing() )
+    return;
+
+  if ( verifyAction )
+  {
+    if ( !verifyEditsActionDialog( tr( "Cancel" ), tr( "all" ) ) )
+      return;
+  }
+
+  foreach ( QgsMapLayer * layer, editableLayers() )
+  {
+    cancelEdits( layer, false, false );
+  }
+  mpMapCanvas->refresh();
+  activateDeactivateLayerRelatedActions( activeLayer() );
+}
+
+void KKSGISWidgetBase::cancelEdits( QgsMapLayer *layer, bool leaveEditable, bool triggerRepaint )
+{
+  QgsVectorLayer *vlayer = qobject_cast<QgsVectorLayer *>( layer );
+  if ( !vlayer || !vlayer->isEditable() )
+    return;
+
+  if ( vlayer == activeLayer() && leaveEditable )
+    mSaveRollbackInProgress = true;
+
+  mpMapCanvas->freeze( true );
+  if ( !vlayer->rollBack( !leaveEditable ) )
+  {
+    mSaveRollbackInProgress = false;
+    QMessageBox::information( 0,
+                              tr( "Error" ),
+                              tr( "Could not %1 changes to layer %2\n\nErrors: %3\n" )
+                              .arg( leaveEditable ? tr( "rollback" ) : tr( "cancel" ) )
+                              .arg( vlayer->name() )
+                              .arg( vlayer->commitErrors().join( "\n  " ) ) );
+  }
+  mpMapCanvas->freeze( false );
+
+  if ( leaveEditable )
+  {
+    vlayer->startEditing();
+  }
+  if ( triggerRepaint )
+  {
+    vlayer->triggerRepaint();
+  }
+}
+
+void KKSGISWidgetBase::commitError( QgsVectorLayer* vlayer )
+{
+  QgsMessageViewer *mv = new QgsMessageViewer();
+  mv->setWindowTitle( tr( "Commit errors" ) );
+  mv->setMessageAsPlainText( tr( "Could not commit changes to layer %1" ).arg( vlayer->name() )
+                             + "\n\n"
+                             + tr( "Errors: %1\n" ).arg( vlayer->commitErrors().join( "\n  " ) )
+                           );
+
+  QToolButton *showMore = new QToolButton();
+  // store pointer to vlayer in data of QAction
+  QAction *act = new QAction( showMore );
+  act->setData( QVariant( QMetaType::QObjectStar, &vlayer ) );
+  act->setText( tr( "Show more" ) );
+  showMore->setStyleSheet( "background-color: rgba(255, 255, 255, 0); color: black; text-decoration: underline;" );
+  showMore->setCursor( Qt::PointingHandCursor );
+  showMore->setSizePolicy( QSizePolicy::Maximum, QSizePolicy::Preferred );
+  showMore->addAction( act );
+  showMore->setDefaultAction( act );
+  connect( showMore, SIGNAL( triggered( QAction* ) ), mv, SLOT( exec() ) );
+  connect( showMore, SIGNAL( triggered( QAction* ) ), showMore, SLOT( deleteLater() ) );
+
+  // no timeout set, since notice needs attention and is only shown first time layer is labeled
+  QgsMessageBarItem *errorMsg = new QgsMessageBarItem(
+    tr( "Commit errors" ),
+    tr( "Could not commit changes to layer %1" ).arg( vlayer->name() ),
+    showMore,
+    QgsMessageBar::WARNING,
+    0,
+    messageBar() );
+  messageBar()->pushItem( errorMsg );
+}
+
+void KKSGISWidgetBase::layerEditStateChanged()
+{
+  QgsMapLayer* layer = qobject_cast<QgsMapLayer *>( sender() );
+  if ( layer && layer == activeLayer() )
+  {
+    activateDeactivateLayerRelatedActions( layer );
+    mSaveRollbackInProgress = false;
+  }
+}
+
+//changed from layerWasAdded to layersWereAdded in 1.8
+void KKSGISWidgetBase::layersWereAdded( QList<QgsMapLayer *> theLayers )
+{
+  for ( int i = 0; i < theLayers.size(); ++i )
+  {
+    QgsMapLayer * layer = theLayers.at( i );
+    QgsDataProvider *provider = 0;
+
+    QgsVectorLayer *vlayer = qobject_cast<QgsVectorLayer *>( layer );
+    if ( vlayer )
+    {
+      // notify user about any font family substitution, but only when rendering labels (i.e. not when opening settings dialog)
+      connect( vlayer, SIGNAL( labelingFontNotFound( QgsVectorLayer*, QString ) ), this, SLOT( labelingFontNotFound( QgsVectorLayer*, QString ) ) );
+
+      QgsVectorDataProvider* vProvider = vlayer->dataProvider();
+      if ( vProvider && vProvider->capabilities() & QgsVectorDataProvider::EditingCapabilities )
+      {
+        connect( vlayer, SIGNAL( layerModified() ), this, SLOT( updateLayerModifiedActions() ) );
+        connect( vlayer, SIGNAL( editingStarted() ), this, SLOT( layerEditStateChanged() ) );
+        connect( vlayer, SIGNAL( editingStopped() ), this, SLOT( layerEditStateChanged() ) );
+      }
+      provider = vProvider;
+    }
+
+    QgsRasterLayer *rlayer = qobject_cast<QgsRasterLayer *>( layer );
+    if ( rlayer )
+    {
+      // connect up any request the raster may make to update the app progress
+      connect( rlayer, SIGNAL( drawingProgress( int, int ) ), this, SLOT( showProgress( int, int ) ) );
+
+      // connect up any request the raster may make to update the statusbar message
+      connect( rlayer, SIGNAL( statusChanged( QString ) ), this, SLOT( showStatusMessage( QString ) ) );
+
+      provider = rlayer->dataProvider();
+    }
+
+    if ( provider )
+    {
+      connect( provider, SIGNAL( dataChanged() ), layer, SLOT( clearCacheImage() ) );
+      connect( provider, SIGNAL( dataChanged() ), mpMapCanvas, SLOT( refresh() ) );
+    }
+  }
+}
+
+QgsLegend *KKSGISWidgetBase::legend()
+{
+  Q_ASSERT( mpMapLegend );
+  return mpMapLegend;
+}
+
+#ifdef Q_OS_WIN
+// hope your wearing your peril sensitive sunglasses.
+void KKSGISWidgetBase::contextMenuEvent( QContextMenuEvent *e )
+{
+  if ( mSkipNextContextMenuEvent )
+  {
+    mSkipNextContextMenuEvent--;
+    e->ignore();
+    return;
+  }
+
+  QWidget::contextMenuEvent( e );
+}
+
+void KKSGISWidgetBase::skipNextContextMenuEvent()
+{
+  mSkipNextContextMenuEvent++;
+}
+#endif
+
+void KKSGISWidgetBase::updateUndoActions()
+{
+  bool canUndo = false, canRedo = false;
+  QgsMapLayer* layer = activeLayer();
+  if ( layer )
+  {
+    QgsVectorLayer* vlayer = qobject_cast<QgsVectorLayer *>( layer );
+    if ( vlayer && vlayer->isEditable() )
+    {
+      canUndo = vlayer->undoStack()->canUndo();
+      canRedo = vlayer->undoStack()->canRedo();
+    }
+  }
+  //mActionUndo->setEnabled( canUndo );
+  //mActionRedo->setEnabled( canRedo );
+}
+
+void KKSGISWidgetBase::mapToolChanged( QgsMapTool *tool )
+{
+  if ( tool && !tool->isEditTool() )
+  {
+    mNonEditMapTool = tool;
+  }
+}
+
+void KKSGISWidgetBase::updateLayerModifiedActions()
+{
+  bool enableSaveLayerEdits = false;
+  QgsVectorLayer* vlayer = qobject_cast<QgsVectorLayer *>( activeLayer() );
+  if ( vlayer )
+  {
+    QgsVectorDataProvider* dprovider = vlayer->dataProvider();
+    if ( dprovider )
+    {
+      enableSaveLayerEdits = ( dprovider->capabilities() & QgsVectorDataProvider::ChangeAttributeValues
+                               && vlayer->isEditable()
+                               && vlayer->isModified() );
+    }
+  }
+  mActionSaveLayerEdits->setEnabled( enableSaveLayerEdits );
+
+  mActionSaveEdits->setEnabled( mpMapLegend && mpMapLegend->selectedLayersEditable( true ) );
+  mActionRollbackEdits->setEnabled( mpMapLegend && mpMapLegend->selectedLayersEditable( true ) );
+  mActionCancelEdits->setEnabled( mpMapLegend && mpMapLegend->selectedLayersEditable() );
+
+  bool hasEditLayers = ( editableLayers().count() > 0 );
+  mActionAllEdits->setEnabled( hasEditLayers );
+  mActionCancelAllEdits->setEnabled( hasEditLayers );
+
+  bool hasModifiedLayers = ( editableLayers( true ).count() > 0 );
+  mActionSaveAllEdits->setEnabled( hasModifiedLayers );
+  mActionRollbackAllEdits->setEnabled( hasModifiedLayers );
+}
+
+void KKSGISWidgetBase::showExtents()
+{
+  if ( !mToggleExtentsViewButton->isChecked() )
+  {
+    return;
+  }
+
+  // update the statusbar with the current extents.
+  QgsRectangle myExtents = mpMapCanvas->extent();
+  mpCoordsLabel->setText( tr( "Extents:" ) );
+  mpCoordsEdit->setText( myExtents.toString( true ) );
+  //ensure the label is big enough
+  if ( mpCoordsEdit->width() > mpCoordsEdit->minimumWidth() )
+  {
+    mpCoordsEdit->setMinimumWidth( mpCoordsEdit->width() );
+  }
+} 
+
+void KKSGISWidgetBase::selectionChanged( QgsMapLayer *layer )
+{
+    QgsVectorLayer *vlayer = qobject_cast<QgsVectorLayer *>( layer );
+    if ( vlayer ){
+        showStatusMessage( tr( "%n feature(s) selected on layer %1.", "number of selected features", vlayer->selectedFeatureCount() ).arg( vlayer->name() ) );
+    }
+
+    activateDeactivateLayerRelatedActions( layer );
+}
+
+void KKSGISWidgetBase::mapCanvas_keyPressed( QKeyEvent *e )
+{
+  // Delete selected features when it is possible and KeyEvent was not managed by current MapTool
+  if (( e->key() == Qt::Key_Backspace || e->key() == Qt::Key_Delete ) && e->isAccepted() )
+  {
+    deleteSelected();
+  }
+}
+
+void KKSGISWidgetBase::showStatusMessage( QString theMessage )
+{
+  statusBar()->showMessage( theMessage );
+}
+
+void KKSGISWidgetBase::removingLayers( QStringList theLayers )
+{
+  foreach ( const QString &layerId, theLayers )
+  {
+    QgsVectorLayer *vlayer = qobject_cast<QgsVectorLayer*>(
+                               QgsMapLayerRegistry::instance()->mapLayer( layerId ) );
+    if ( !vlayer || !vlayer->isEditable() )
+      return;
+
+    toggleEditing( vlayer, false );
+  }
+}
+
+void KKSGISWidgetBase::copyFeatures( QgsFeatureStore & featureStore )
+{
+  clipboard()->replaceWithCopyOf( featureStore );
+}
+
+void KKSGISWidgetBase::labelingFontNotFound( QgsVectorLayer* vlayer, const QString& fontfamily )
+{
+  // TODO: update when pref for how to resolve missing family (use matching algorithm or just default font) is implemented
+  QString substitute = tr( "Default system font substituted." );
+
+  QToolButton* btnOpenPrefs = new QToolButton();
+  btnOpenPrefs->setStyleSheet( "QToolButton{ background-color: rgba(255, 255, 255, 0); color: black; text-decoration: underline; }" );
+  btnOpenPrefs->setCursor( Qt::PointingHandCursor );
+  btnOpenPrefs->setSizePolicy( QSizePolicy::Maximum, QSizePolicy::Preferred );
+  btnOpenPrefs->setToolButtonStyle( Qt::ToolButtonTextOnly );
+
+  // store pointer to vlayer in data of QAction
+  QAction* act = new QAction( btnOpenPrefs );
+  act->setData( QVariant( QMetaType::QObjectStar, &vlayer ) );
+  act->setText( tr( "Open labeling dialog" ) );
+  btnOpenPrefs->addAction( act );
+  btnOpenPrefs->setDefaultAction( act );
+  btnOpenPrefs->setToolTip( "" );
+  connect( btnOpenPrefs, SIGNAL( triggered( QAction* ) ), this, SLOT( labelingDialogFontNotFound( QAction* ) ) );
+
+  // no timeout set, since notice needs attention and is only shown first time layer is labeled
+  QgsMessageBarItem* fontMsg = new QgsMessageBarItem(
+    tr( "Labeling" ),
+    tr( "Font for layer <b><u>%1</u></b> was not found (<i>%2</i>). %3" ).arg( vlayer->name() ).arg( fontfamily ).arg( substitute ),
+    btnOpenPrefs,
+    QgsMessageBar::WARNING,
+    0,
+    messageBar() );
+  messageBar()->pushItem( fontMsg );
+}
+
+void KKSGISWidgetBase::labelingDialogFontNotFound( QAction* act )
+{
+  if ( !act )
+  {
+    return;
+  }
+
+  // get base pointer to layer
+  QObject* obj = qvariant_cast<QObject*>( act->data() );
+
+  // remove calling messagebar widget
+  messageBar()->popWidget();
+
+  if ( !obj )
+  {
+    return;
+  }
+
+  QgsMapLayer* layer = qobject_cast<QgsMapLayer*>( obj );
+  if ( layer && setActiveLayer( layer ) )
+  {
+    labeling();
+  }
+}
+
+
+void KKSGISWidgetBase::showMouseCoordinate( const QgsPoint & p )
+{
+  if ( mMapTipsVisible )
+  {
+    // store the point, we need it for when the maptips timer fires
+    mLastMapPosition = p;
+
+    // we use this slot to control the timer for maptips since it is fired each time
+    // the mouse moves.
+    if ( mpMapCanvas->underMouse() )
+    {
+      // Clear the maptip (this is done conditionally)
+      mpMaptip->clear( mpMapCanvas );
+      // don't start the timer if the mouse is not over the map canvas
+      mpMapTipsTimer->start();
+      //QgsDebugMsg("Started maptips timer");
+    }
+  }
+  if ( mToggleExtentsViewButton->isChecked() )
+  {
+    //we are in show extents mode so no need to do anything
+    return;
+  }
+  else
+  {
+    if ( mpMapCanvas->mapUnits() == QGis::Degrees )
+    {
+      QString format = QgsProject::instance()->readEntry( "PositionPrecision", "/DegreeFormat", "D" );
+
+      if ( format == "DM" )
+        mpCoordsEdit->setText( p.toDegreesMinutes( mMousePrecisionDecimalPlaces ) );
+      else if ( format == "DMS" )
+        mpCoordsEdit->setText( p.toDegreesMinutesSeconds( mMousePrecisionDecimalPlaces ) );
+      else
+        mpCoordsEdit->setText( p.toString( mMousePrecisionDecimalPlaces ) );
+    }
+    else
+    {
+      mpCoordsEdit->setText( p.toString( mMousePrecisionDecimalPlaces ) );
+    }
+
+    if ( mpCoordsEdit->width() > mpCoordsEdit->minimumWidth() )
+    {
+      mpCoordsEdit->setMinimumWidth( mpCoordsEdit->width() );
+    }
+  }
+}
+
+void KKSGISWidgetBase::toggleMapTips()
+{
+  mMapTipsVisible = !mMapTipsVisible;
+  // if off, stop the timer
+  if ( !mMapTipsVisible )
+  {
+    mpMapTipsTimer->stop();
+  }
+}
+
+// Show the maptip using tooltip
+void KKSGISWidgetBase::showMapTip()
+{
+  // Stop the timer while we look for a maptip
+  mpMapTipsTimer->stop();
+
+  // Only show tooltip if the mouse is over the canvas
+  if ( mpMapCanvas->underMouse() )
+  {
+    QPoint myPointerPos = mpMapCanvas->mouseLastXY();
+
+    //  Make sure there is an active layer before proceeding
+    QgsMapLayer* mypLayer = mpMapCanvas->currentLayer();
+    if ( mypLayer )
+    {
+      //QgsDebugMsg("Current layer for maptip display is: " + mypLayer->source());
+      // only process vector layers
+      if ( mypLayer->type() == QgsMapLayer::VectorLayer )
+      {
+        // Show the maptip if the maptips button is depressed
+        if ( mMapTipsVisible )
+        {
+          mpMaptip->showMapTip( mypLayer, mLastMapPosition, myPointerPos, mpMapCanvas );
+        }
+      }
+    }
+    else
+    {
+      showStatusMessage( tr( "Maptips require an active layer" ) );
+    }
+  }
+}
+
+void KKSGISWidgetBase::createMapTips()
+{
+  // Set up the timer for maptips. The timer is reset everytime the mouse is moved
+  mpMapTipsTimer = new QTimer( mpMapCanvas );
+  // connect the timer to the maptips slot
+  connect( mpMapTipsTimer, SIGNAL( timeout() ), this, SLOT( showMapTip() ) );
+  // set the interval to 0.850 seconds - timer will be started next time the mouse moves
+  mpMapTipsTimer->setInterval( 850 );
+  // Create the maptips object
+  mpMaptip = new QgsMapTip();
+}
+
+void KKSGISWidgetBase::extentsViewToggled( bool theFlag )
+{
+  if ( theFlag )
+  {
+    //extents view mode!
+    mToggleExtentsViewButton->setIcon( QgsApplication::getThemeIcon( "extents.png" ) );
+    mpCoordsEdit->setToolTip( tr( "Map coordinates for the current view extents" ) );
+    mpCoordsEdit->setReadOnly( true );
+    showExtents();
+  }
+  else
+  {
+    //mouse cursor pos view mode!
+    mToggleExtentsViewButton->setIcon( QgsApplication::getThemeIcon( "tracking.png" ) );
+    mpCoordsEdit->setToolTip( tr( "Map coordinates at mouse cursor position" ) );
+    mpCoordsEdit->setReadOnly( false );
+    mpCoordsLabel->setText( tr( "Coordinate:" ) );
+  }
+}
+
+void KKSGISWidgetBase::reloadLayer(const QString & theLayerId)
+{
+    QgsMapLayerRegistry::instance()->mapLayer(theLayerId)->reload();
+    //mpMapCanvas->refresh();
+}
+

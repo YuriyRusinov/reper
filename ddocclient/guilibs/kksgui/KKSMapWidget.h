@@ -23,11 +23,14 @@
 
 class KKSAttrValue;
 class KKSFile;
+class KKSObjectExemplar;
 
 #include <KKSValue.h>
 
 #ifdef __USE_QGIS__
 #include "KKSGISWidget.h"
+#include <qgsfeature.h>
+#include <qgsgeometry.h>
 //#include "kksgiswidgetqgis.h"
 //class KKSGISWidget;
 #endif
@@ -58,11 +61,14 @@ signals:
     void aboutToDestroy(QDockWidget *, QDockWidget *);
     void downloadGISFiles(bool bForRec, const QString & homeDir, qint64 idObj, QWidget * parent);//запрос на выгрузку файла со слоем из БД. файл задается идентификатором из таблицы io_urls
     void uploadGISFiles(bool bForRec, const QStringList & files, qint64 idObj, QWidget * parent);//загрузка файлов ГИС-проекта на сервер. Файлы задаются абсолютными путями
+    void constructNewEIO(QWidget * parent, KKSObjectExemplar ** eio, const QString & layerTable, const QString & geomAsEWKT); //запрос на создание нового EИО в справочнике, который задается названием своей таблицы в БД. При этом создавать ИО в бД не надо
+    
 public slots:
     void slotMapChanged(QDomDocument&);
     void slotDataChanged();
     void slotUploadGISFiles(qint64 idObj);
     void slotSaveGISProject(KKSValue & v);
+    void slotFeatureFromEIO(QWidget * parent, QgsFeature & feature, const QString & geomAsEWKT, const QString & layerTable);
 private:
     QDockWidget * m_legendWidget;
     QDockWidget * m_layerOrderWidget;

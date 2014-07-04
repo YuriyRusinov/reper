@@ -1115,6 +1115,9 @@ KKSObjectExemplar * KKSLoader::loadEIO(qint64 id,
 
             code = QString("( select getExValuesId(%1, '%2', '%3', '%4') )").arg(id).arg(refTable).arg(mainAttr).arg(childAttr);
         }
+        else if(attr->type()->attrType() == KKSAttrType::atGeometry){
+            code = QString("ST_ASEWKT(%1)").arg(attr->code(true));
+        }
         else{
             code = attr->code(true);
         }

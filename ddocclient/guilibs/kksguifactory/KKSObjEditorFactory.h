@@ -289,6 +289,7 @@ public slots:
     int deleteOE (QWidget * editor, int idObject, qint64 idObjEx, QString tableName, QAbstractItemModel * recModel, const QModelIndex& pRecIndex);
     
     void slotShowIOEditor(QWidget * parent, const QString & uid);//from unique_id
+    void slotConstructNewEIO(QWidget * parent, KKSObjectExemplar ** eio, const QString & layerTable, const QString & geomAsEWKT);//construct new IO and save to database
 
     void addAttrSearchTemplate (void);
     void editAttrSearchTemplate (void);
