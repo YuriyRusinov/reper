@@ -68,7 +68,9 @@ public slots:
     void slotDataChanged();
     void slotUploadGISFiles(qint64 idObj);
     void slotSaveGISProject(KKSValue & v);
+#ifdef __USE_QGIS__
     void slotFeatureFromEIO(QWidget * parent, QgsFeature & feature, const QString & geomAsEWKT, const QString & layerTable);
+#endif
 private:
     QDockWidget * m_legendWidget;
     QDockWidget * m_layerOrderWidget;

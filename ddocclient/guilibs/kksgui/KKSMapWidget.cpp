@@ -48,8 +48,10 @@ KKSMapWidget::KKSMapWidget(QMap<QString, QString> connectionParams,
 KKSMapWidget::~KKSMapWidget()
 {
     if(m_legendWidget && m_layerOrderWidget){
+#ifdef __USE_QGIS__
         QWidget * legend = this->mapLegendWidget();
         legend->setParent(NULL);
+#endif
         emit aboutToDestroy(m_legendWidget, m_layerOrderWidget);
     }
     
@@ -653,9 +655,9 @@ void KKSMapWidget::slotSaveGISProject(KKSValue & v)
 #endif
 }
 
+#ifdef __USE_QGIS__
 void KKSMapWidget::slotFeatureFromEIO(QWidget * parent, QgsFeature & feature, const QString & geomAsEWKT, const QString & layerTable)
 {
-#ifdef __USE_QGIS__
     if(!parent)
         return;
     if(layerTable.isEmpty())
@@ -720,5 +722,5 @@ void KKSMapWidget::slotFeatureFromEIO(QWidget * parent, QgsFeature & feature, co
 
     eio->release();
 
-#endif
 }
+#endif
