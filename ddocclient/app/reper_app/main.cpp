@@ -11,7 +11,8 @@
 #include <QTextCodec>
 
 /* ui */
-#include "kkscoreapplication.h"
+#include "kkscommandlineopts.h"
+#include "kksapplication.h"
 #include "kksclient_name.h"
 
 #ifdef __USE_QGIS__ 
@@ -40,35 +41,46 @@ int main(int argc, char *argv[])
 
 #endif
 
-
-    QString pluginsPath = QApplication::applicationDirPath() + QDir::separator() + "qtplugins";
-    QCoreApplication::addLibraryPath( pluginsPath );
-
-    KKSCoreApplication *sito = NULL;
-
-    QMainWindow * mainWindow = NULL;
-
     QTextCodec::setCodecForTr(QTextCodec::codecForName("Windows-1251"));
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("cp1251"));
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("cp1251"));
 
-    if(argc == 2 && strcmp(argv[1], "admin") == 0){
-        //sito = KKSSito::init (false);//, QString("admin"));
-        sito = KKSCoreApplication::init (argc, argv, false, QString("admin"), false);
-        mainWindow = new ReperMainWindow;//KKSMainWindow();
-        mainWindow->setWindowTitle(QObject::tr("DynamicDocs reper") + QObject::tr("Administrator") + " " + KKS_VERSION);
-        //mainWindow->setWindowTitle(QObject::tr("PK IR ") + QObject::tr("Administrator") + " " + KKS_VERSION);
-    }
-    else{
-        sito = KKSCoreApplication::init (argc, argv, false, QString(), false);
-        mainWindow = new ReperMainWindow();
-        mainWindow->setWindowTitle(QObject::tr("DynamicDocs reper") + QObject::tr("Application") + " " + KKS_VERSION);
-        //mainWindow->setWindowTitle(QObject::tr("PK IR ") + QObject::tr("Operator") + " " + KKS_VERSION);
+
+    KKSCommandLineOpts * options = KKSApplication::parseCommandLineOptions(argc, argv);
+    if(options->showHelp){
+        QString msg = options->getHelpMessage();
+        fprintf(stdout, "%s", msg.toLocal8Bit().constData());
+        KKSCoreApplication::showCommandLineParamsHelp();
+        delete options;
+        delete app;
+        return 0;
     }
 
-    if(!sito){
-        delete mainWindow;
+    delete options;
+
+
+    QString pluginsPath = QApplication::applicationDirPath() + QDir::separator() + "qtplugins";
+    QCoreApplication::addLibraryPath( pluginsPath );
+
+    KKSApplication *kksApplication = NULL;
+
+    QMainWindow * mainWindow = NULL;
+
+
+    kksApplication = KKSApplication::init (argc, argv, false);
+    if(!kksApplication){
         return 1;
+    }
+
+    const KKSCommandLineOpts * opts = kksApplication->commandLineOpts();
+
+    mainWindow = new ReperMainWindow();
+
+    if(!opts->user.isEmpty() && opts->user == QString("admin")){
+        mainWindow->setWindowTitle(QObject::tr("Reper ") + QObject::tr("Administrator") + " " + KKS_VERSION);
+    }
+    else{
+        mainWindow->setWindowTitle(QObject::tr("Reper ") + QObject::tr("Operator") + " " + KKS_VERSION);
     }
 
     mainWindow->show();

@@ -977,9 +977,9 @@ void KKSGISWidgetBase::initToolBar()
     mpLayerToolBar->addSeparator();
     
     mpLayerToolBar->addAction(mActionOpenTable);
-    mpLayerToolBar->addAction(mActionToggleEditing);
-    mpLayerToolBar->addAction(mActionSaveLayerEdits);
-    mpLayerToolBar->addAction(mActionAllEdits);
+    //mpLayerToolBar->addAction(mActionToggleEditing);
+    //mpLayerToolBar->addAction(mActionSaveLayerEdits);
+    //mpLayerToolBar->addAction(mActionAllEdits);
     mpLayerToolBar->addSeparator();
 
     //mpLayerToolBar->addAction(mActionLayerSaveAs);
@@ -991,6 +991,8 @@ void KKSGISWidgetBase::initToolBar()
     //mpLayerToolBar->addAction(mActionSetProjectCRSFromLayer);
     mpLayerToolBar->addAction(mActionLayerProperties);
     //mpLayerToolBar->addAction(mActionLayerSubsetString);
+
+    mpToolBarMap.insert(mpLayerToolBar->objectName(), mpLayerToolBar);
     
     //редактирование векторных слоев
     mpLayerEditsToolBar = new QToolBar(tr("Редактирование векторных слоев"));

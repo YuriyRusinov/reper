@@ -70,10 +70,12 @@ MapWindow::MapWindow(QWidget* parent, Qt::WFlags fl)
     
     //addToolBar(mpKKSGISWidget->toolBar());
     QMap<QString, QToolBar *> mpToolBars = mpKKSGISWidget->toolBarMap();
+
     addToolBar(mpToolBars.value("mpMapToolBar"));
     addToolBar(mpToolBars.value("mpDataSourceToolBar"));
     addToolBar(mpToolBars.value("mpToolsToolBar"));
     addToolBar(mpToolBars.value("mpLayerToolBar"));
+    addToolBar(mpToolBars.value("mpLayerEditsToolBar"));
     addToolBar(mpToolBars.value("mpTaskToolBar"));
 
     statusBar()->showMessage("ПК Репер готов к работе.");
