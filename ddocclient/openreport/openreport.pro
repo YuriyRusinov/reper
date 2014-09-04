@@ -4,5 +4,6 @@ include(../ddocclient.conf)
 
 # Directories
 SUBDIRS += \
-#	openrpt \
-	rptrenderer
+        kksorpcommon \
+	kksorprenderer \
+        kksorpwrtembed
