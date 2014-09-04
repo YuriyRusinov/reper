@@ -1197,6 +1197,17 @@ void KKSObjEditor :: addObjectE (void)
     emit newObjectEx (this, idObject, c , tabName, i, false, sRecModel);
 }
 
+void KKSObjEditor :: showReportEditor(qint64 idReport)
+{
+    emit signalShowReportEditor(idReport);
+}
+
+void KKSObjEditor :: showReportViewer(qint64 idReport)
+{
+    emit signalShowReportViewer(idReport);
+}
+
+
 void KKSObjEditor :: editObjectE (void)
 {
     this->clearW ();

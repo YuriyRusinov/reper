@@ -108,6 +108,9 @@ SendAsXMLForm::SendAsXMLForm(QWidget * parent,  Qt::WFlags f) : QDialog(parent, 
     rec->actSetView->setVisible(false);
     rec->actViewAll->setVisible(false);
     rec->actEditSep->setVisible(false);
+    rec->actReportEdit->setVisible(false);
+    rec->actReportOpen->setVisible(false);
+    rec->actReportSep->setVisible(false);
     rec->actFilterSep->setVisible(false);
     rec->actImportExportSep->setVisible(false);
 

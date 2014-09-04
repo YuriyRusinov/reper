@@ -4,7 +4,7 @@
 #include <QToolBar>
 #include <QAction>
 #include <QIcon>
-#include <QTreeView>
+#include <QPixmap>
 #include <QGridLayout>
 #include <QBoxLayout>
 #include <QVBoxLayout>
@@ -33,7 +33,7 @@
 
 KKSRecWidget :: KKSRecWidget (bool mode, Qt::Orientation orient, QWidget *parent, Qt::WindowFlags f)
     : QWidget (parent, f),
-    tView (new QTreeView(this)),
+    tView (new KKSRecWidgetTreeView(this)),
     tBActions (new QToolBar(this)),
     pMenu (new QMenu(this)),
     pGroupBy (new QMenu (tr("Group &By ..."), this)),
@@ -43,6 +43,10 @@ KKSRecWidget :: KKSRecWidget (bool mode, Qt::Orientation orient, QWidget *parent
     actSearchT (new QAction (QIcon(":/ddoc/search_template.png"), tr("Search by template"), this)),
     actAdd (new QAction (QIcon(":/ddoc/add.png"), tr("&Add"), this)),
     actEdit (new QAction (QIcon(":/ddoc/edit.png"), tr("&Edit"), this)),
+    
+    actReportEdit (new QAction (QIcon(QPixmap(":/ddoc/orpfileedit.xpm")), tr("Edit &report"), this)),
+    actReportOpen (new QAction (QIcon(QPixmap(":/ddoc/orpfileprint.xpm")), tr("Prin&t report"), this)),
+    
     actDel (new QAction (QIcon(":/ddoc/delete.png"), tr("&Delete"), this)),
     actImport (new QAction (QIcon(":/ddoc/import_qualifier.png"), tr("&Import"), this)),
     actExport (new QAction (QIcon(":/ddoc/export_qualifier.png"), tr("E&xport"), this)),
@@ -59,9 +63,12 @@ KKSRecWidget :: KKSRecWidget (bool mode, Qt::Orientation orient, QWidget *parent
 {
     tView->setRootIsDecorated (true);
     tView->setSelectionBehavior (QAbstractItemView::SelectRows);
+    connect(tView, SIGNAL(recViewCurrentChanged(const QModelIndex&)), this, SLOT(recViewCurrentChanged(const QModelIndex&)));
     //Q_INIT_RESOURCE (kksgui_icon_set);
     this->init_widgets (mode, orient);
+    
     hideFilter ();
+    hideReportGroup();
 
     connect (actAdd, SIGNAL(triggered()), this, SLOT (addRec()) );
     connect (actEdit, SIGNAL(triggered()), this, SLOT (editRec()) );
@@ -70,6 +77,9 @@ KKSRecWidget :: KKSRecWidget (bool mode, Qt::Orientation orient, QWidget *parent
     connect (actHideRec, SIGNAL (triggered()), this, SLOT (hideRecord()) );
     connect (actViewAll, SIGNAL (triggered()), this, SLOT (viewAllRecs()) );
     connect (actViewOnlyFromHere, SIGNAL (triggered()), this, SLOT (viewRecsFromHere()) );
+
+    connect (actReportEdit, SIGNAL(triggered()), this, SLOT(slotReportEdit()));
+    connect (actReportOpen, SIGNAL(triggered()), this, SLOT(slotReportOpen()));
 
     connect (tView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(tvDoubleClicked(const QModelIndex &)));
     connect (filterLE, SIGNAL (textEdited ( const QString &)), this, SLOT (filterRecs (const QString&)) );
@@ -147,6 +157,47 @@ QList<qint64> KKSRecWidget :: getIDList (void) const
     return sList;
 }
 
+void KKSRecWidget :: recViewCurrentChanged(const QModelIndex & current)
+{
+    if (!current.isValid())
+        return;
+
+    QVariant v = current.data(Qt::UserRole+1);
+    KKSEIOData * d = v.value<KKSEIOData *>();
+    
+    if(!d)
+        return;
+
+    QString uid = d->sysFieldValue("unique_id");
+    if(uid.isEmpty())
+        return;
+
+    bool show = false;
+    if(uid.contains("-report-")){
+        show = true;
+    }
+
+    actReportEdit->setVisible(show);
+    actReportOpen->setVisible(show);
+    actReportSep->setVisible(show);
+
+}
+
+void KKSRecWidget :: slotReportEdit()
+{
+    qint64 idReport = getID();
+    if(idReport > 0)
+        emit showReportEditor(idReport);
+}
+
+void KKSRecWidget :: slotReportOpen()
+{
+    qint64 idReport = getID();
+    if(idReport > 0)
+        emit showReportViewer(idReport);
+}
+
+
 void KKSRecWidget :: tvDoubleClicked(const QModelIndex & index)
 {
     if (!index.isValid())
@@ -211,6 +262,14 @@ void KKSRecWidget :: init_widgets (bool mode, Qt::Orientation orient)
     actEditSep = tBActions->addSeparator ();
     pMenu->addSeparator ();
 
+    
+    tBActions->addAction (actReportEdit);
+    pMenu->addAction (actReportEdit);
+    tBActions->addAction (actReportOpen);
+    pMenu->addAction (actReportOpen);
+    actReportSep = tBActions->addSeparator ();
+    pMenu->addSeparator ();
+
     tBActions->addAction (actImport);
     tBActions->addAction (actExport);
     //pMenu->addAction (actImport);
@@ -267,14 +326,25 @@ void KKSRecWidget :: filterRecs (const QString& text)
 
 void KKSRecWidget :: hideAllButtons (void)
 {
-    for (int i=0; i<=3; i++)
-        hideGroup (i);
+    for (int i=0; i <= _GROUP_COUNT; i++)
+        hideActionGroup(i);
 }
 
 void KKSRecWidget :: showEditGroup (void)
 {
-    showGroup (1);
+    showActionGroup(_ID_ADD_EDIT_DEL_GROUP);
 }
+
+void KKSRecWidget :: hideReportGroup()
+{
+    hideActionGroup (_ID_REPORT_GROUP);
+}
+
+void KKSRecWidget :: showReportGroup()
+{
+    showActionGroup (_ID_REPORT_GROUP);
+}
+
 
 void KKSRecWidget :: hideToolBar (void)
 {
@@ -374,18 +444,18 @@ QTreeView * KKSRecWidget :: getView (void) const
     return this->tView;
 }
 
-void KKSRecWidget :: hideGroup (int num_gr)
+void KKSRecWidget :: hideActionGroup (int num_gr)
 {
     switch (num_gr)
     {
-        case 0: {
+        case _ID_FILTER_GROUP: {
                     actFilter->setVisible (false);
                     actFilterSep->setVisible (false);
                     QList<QAction*> acts = tBActions->actions();
                     acts.at (1)->setVisible (false);
                     break;
                 }
-        case 1: 
+        case _ID_ADD_EDIT_DEL_GROUP: 
                 {
                     actAdd->setVisible (false);
                     actEdit->setVisible (false);
@@ -393,30 +463,37 @@ void KKSRecWidget :: hideGroup (int num_gr)
                     actEditSep->setVisible (false);
                     break;
                 }
-        case 2: {
+        case _ID_IMPORT_GROUP: {
                     actImport->setVisible (false);
                     actExport->setVisible (false);
                     actImportExportSep->setVisible (false);
                     break;
                 }
-        case 3: actSetView->setVisible (false); break;
+        case _ID_VIEW_GROUP: 
+                    actSetView->setVisible (false); 
+                    break;
+        case _ID_REPORT_GROUP:
+                    actReportEdit->setVisible(false);
+                    actReportOpen->setVisible(false);
+                    actReportSep->setVisible(false);
+                    break;
         default: break;
     }
 
     return;
 }
 
-void KKSRecWidget :: showGroup (int num_gr)
+void KKSRecWidget :: showActionGroup (int num_gr)
 {
     switch (num_gr)
     {
-        case 0:
+        case _ID_FILTER_GROUP:
                 {
                     actFilter->setVisible (true);
                     actFilterSep->setVisible (false);
                     break;
                 }
-        case 1: 
+        case _ID_ADD_EDIT_DEL_GROUP: 
                 {
                     actAdd->setVisible (true);
                     actEdit->setVisible (true);
@@ -424,13 +501,20 @@ void KKSRecWidget :: showGroup (int num_gr)
                     actEditSep->setVisible (true);
                     break;
                 }
-        case 2: {
+        case _ID_IMPORT_GROUP: {
                     actImport->setVisible (true);
                     actExport->setVisible (true);
                     actImportExportSep->setVisible (true);
                     break;
                 }
-        case 3: actSetView->setVisible (true); break;
+        case _ID_VIEW_GROUP: 
+                    actSetView->setVisible (true); 
+                    break;
+        case _ID_REPORT_GROUP:
+                    actReportEdit->setVisible(true);
+                    actReportOpen->setVisible(true);
+                    actReportSep->setVisible(true);
+                    break;
         default: break;
     }
 
@@ -683,4 +767,10 @@ QAbstractItemView::SelectionMode KKSRecWidget :: selectionMode (void) const
 void KKSRecWidget :: setSelectionMode ( QAbstractItemView::SelectionMode mode )
 {
     tView->setSelectionMode(mode);
+}
+
+
+void KKSRecWidgetTreeView::currentChanged ( const QModelIndex & current, const QModelIndex & previous )
+{
+    emit recViewCurrentChanged(current);
 }

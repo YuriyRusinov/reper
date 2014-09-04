@@ -131,6 +131,8 @@ KKSIncludesWidget * KKSRubricFactory :: createRubricEditor (RubricMode mode,
                                                        showMode,
                                                        parent,
                                                        flags);
+
+
         KKSEventFilter *ef = new KKSEventFilter(iW);
         iW->setWindowTitle(title);
         QTreeView *tv = iW->tvRubr();
@@ -150,6 +152,7 @@ KKSIncludesWidget * KKSRubricFactory :: createRubricEditor (RubricMode mode,
     KKSIncludesWidget *iW = new KKSIncludesWidget(0, 
                                                   isDocs ? KKSIncludesWidget::rsMyDocs : KKSIncludesWidget::rsRubricator, 
                                                   parent);
+
     if(showMode == smRubricsOnly)
         iW->setForRubrics(true);
     else
@@ -283,6 +286,9 @@ void KKSRubricFactory::initConnections(KKSIncludesWidget * iW) const
     //создание нового ИО в рубрике, для которой задана категория (по этой категории)
     connect(iW, SIGNAL(rubricItemCreationRequested(const KKSRubric *, QAbstractItemModel*, const QModelIndex&)), this, SLOT(rubricItemCreate(const KKSRubric *, QAbstractItemModel *, const QModelIndex&)));
     
+    connect (iW, SIGNAL(signalShowReportViewer(qint64)), this, SIGNAL(showReportViewer(qint64)));
+    connect (iW, SIGNAL(signalShowReportEditor(qint64)), this, SIGNAL(showReportEditor(qint64)));
+
     //открытие редактора ИО для заданного ИО
     connect(iW, SIGNAL(openRubricItemRequested(int)), this, SLOT(openRubricItem(int)));
     //открытие редактора ИО для заданной записи справочника
@@ -404,7 +410,9 @@ void KKSRubricFactory::rubricItemUpload(const KKSRubric *r, bool forRecords, QAb
         filterTab->release();
         
         //также надо исключить системные справочники, поскольку они не наследуются от q_base_table
-        filterTab = c->createFilter(ATTR_ID, QString("300"), KKSFilter::foGr);
+        //однако системный справочник отчетов (таблица report) наследуется от q_base_table и имеет номер 300
+        //его надо включать в список
+        filterTab = c->createFilter(ATTR_ID, QString("300"), KKSFilter::foGrEq);
         filters.append(filterTab);
         filterTab->release();
     }

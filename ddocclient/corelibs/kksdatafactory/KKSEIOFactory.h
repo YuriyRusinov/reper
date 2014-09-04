@@ -43,12 +43,14 @@ public:
     int insertEIO(KKSObjectExemplar* eio, 
                   const KKSCategory* cat=0, 
                   const QString& table=QString(), 
-                  bool bImported = false) const; 
+                  bool bImported = false,
+                  QWidget * parent = 0) const; 
 
     int updateEIO(KKSObjectExemplar* eio, 
                   const KKSCategory* cat=0, 
                   const QString& table=QString(),
                   QWidget * parent = NULL) const;
+
     int deleteEIO(KKSObjectExemplar* eio, const QString& table=QString()) const;
     int deleteRecord(qint64 id, const QString & table) const;
     int deleteAllRecords(const QString & table) const;

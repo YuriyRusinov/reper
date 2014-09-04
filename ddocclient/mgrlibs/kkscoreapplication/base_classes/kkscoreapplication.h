@@ -187,6 +187,13 @@ public:
     static int GUIConnect(QWidget * parent = NULL);
     static int autoConnect(QWidget * parent = NULL);
     static int connectIfReady();
+    static int connectToDb(const QString & host,
+                           const QString & database,
+                           const QString & user,
+                           const QString & passwd,
+                           const QString & port = QString("5432"),
+                           QWidget * parent = 0);
+
     static int verifyConnection(QWidget * parent = NULL);
 
     static KKSCommandLineOpts * parseCommandLineOptions(int argc, char * argv[]);

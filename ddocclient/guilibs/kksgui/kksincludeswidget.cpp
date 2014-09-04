@@ -114,9 +114,10 @@ KKSIncludesWidget::KKSIncludesWidget(KKSRubric * rootRubric,
     recWItems->actAdd->setToolTip (tr("Create new document and put it into rubric"));
     recWItems->actEdit->setToolTip (tr("Edit document in rubric"));
     recWItems->actDel->setToolTip (tr("Delete document both from rubric and database"));
-    recWItems->hideGroup (0);
-    recWItems->hideGroup (2);//hideToolBar();//hideGroup (2);
-    recWItems->hideGroup (3);
+    recWItems->hideActionGroup (_ID_FILTER_GROUP);
+    recWItems->hideActionGroup (_ID_IMPORT_GROUP);//hideToolBar();//hideGroup (2);
+    recWItems->hideActionGroup (_ID_VIEW_GROUP);
+    recWItems->hideActionGroup (_ID_REPORT_GROUP);
 
     if (m_rSource == rsCategory)
         this->setWindowTitle (tr("Rubrics"));
@@ -136,6 +137,9 @@ KKSIncludesWidget::KKSIncludesWidget(KKSRubric * rootRubric,
     connect (recWItems, SIGNAL (editEntitiesList (QAbstractItemModel *, const QItemSelection&)), this, SLOT (editSelectedDocs (QAbstractItemModel *, const QItemSelection&)) );
     connect (recWItems, SIGNAL (delEntitiesList (QAbstractItemModel *, const QItemSelection&)), this, SLOT (delSelectedDocs (QAbstractItemModel *, const QItemSelection&)) );
     connect (recWItems, SIGNAL (refreshMod(QAbstractItemModel *)), this, SLOT (refreshRubricItems(QAbstractItemModel *)) );
+
+    connect (recWItems, SIGNAL (showReportEditor(qint64)), this, SLOT (showReportEditor(qint64)) );
+    connect (recWItems, SIGNAL (showReportViewer(qint64)), this, SLOT (showReportViewer(qint64)) );
 
     connect (twIncludes, SIGNAL (doubleClicked(const QModelIndex &)), this, SLOT (slotRubricItemDblClicked(const QModelIndex &)) );
     connect (recWItems->getView(), SIGNAL (doubleClicked(const QModelIndex &)), this, SLOT (slotRubricItemEdit(const QModelIndex &)) );
@@ -164,6 +168,16 @@ void KKSIncludesWidget::init()
     expandAllIndexes (pInd);
 
     //initTwIncludes();
+}
+
+void KKSIncludesWidget :: showReportEditor(qint64 idReport)
+{
+    emit signalShowReportEditor(idReport);
+}
+
+void KKSIncludesWidget :: showReportViewer(qint64 idReport)
+{
+    emit signalShowReportViewer(idReport);
 }
 
 void KKSIncludesWidget :: initActions (void)

@@ -9,7 +9,7 @@ HEADERS += \
         KKSRubricFactory.h \
 	KKSJMonitor.h \
         KKSStuffFactory.h \
-        KKSPrerender.h \
+#        KKSPrerender.h \
 	kksguifactory_config.h
 
 SOURCES += \
@@ -21,8 +21,8 @@ SOURCES += \
         KKSEntityFactory.cpp \
         KKSRubricFactory.cpp \
 	KKSJMonitor.cpp \
-        KKSStuffFactory.cpp \
-        KKSPrerender.cpp
+        KKSStuffFactory.cpp 
+#        KKSPrerender.cpp
 
 headers.files += \
         KKSAttributesFactory.h \
@@ -34,5 +34,5 @@ headers.files += \
         KKSRubricFactory.h \
 	KKSJMonitor.h \
         KKSStuffFactory.h \
-        KKSPrerender.h \
+#        KKSPrerender.h \
 	kksguifactory_config.h

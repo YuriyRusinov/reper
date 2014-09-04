@@ -2728,9 +2728,12 @@ void KKSAttributesFactory :: showAttrsWidget (KKSAttribute *a, KKSAttrEditor *pa
     {
         rw = new KKSRecWidget (true, Qt::Vertical, parent, parent->windowFlags());
         QTreeView * tvTableAttrs = rw->getView();//new QTreeView ();
-        rw->hideGroup (0);//gbSearch->setVisible (false);
-        rw->hideGroup (2);//tbSetView->setVisible (false);
-        rw->hideGroup (3);//gbImportExport->setVisible (false);
+        
+        rw->hideActionGroup (_ID_FILTER_GROUP);
+        rw->hideActionGroup (_ID_IMPORT_GROUP);
+        rw->hideActionGroup (_ID_VIEW_GROUP);
+        rw->hideActionGroup (_ID_REPORT_GROUP);
+
         QAbstractItemModel * acModel = new KKSCatAttrsModel (0, 4);//QStandardItemModel (0, 4);
         acModel->setHeaderData (0, Qt::Horizontal, QObject::tr ("Name"));
         acModel->setHeaderData (1, Qt::Horizontal, QObject::tr ("Default value"));

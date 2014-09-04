@@ -117,9 +117,15 @@
     <addaction name="actLCOpen"/>
     <addaction name="separator"/>
    </widget>
+   <widget class="QMenu" name="menuReports">
+    <property name="title">
+     <string>Отчеты</string>
+    </property>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
    <addaction name="menuDocs"/>
+   <addaction name="menuReports"/>
    <addaction name="menuSearch"/>
    <addaction name="menuJournals"/>
    <addaction name="menuAdmin"/>

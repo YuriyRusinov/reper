@@ -153,6 +153,10 @@ class _GUI_EXPORT KKSObjEditor : public KKSRecDialog
         void importObjectE (void);
         void exportObjectE (void);
         void setView (void);
+        
+        void showReportEditor(qint64 idReport);
+        void showReportViewer(qint64 idReport);
+
         void refreshRecModel (QAbstractItemModel * sourceMod);
 
         void saveChildObjE (KKSObjectExemplar *childObjE);
@@ -210,6 +214,10 @@ class _GUI_EXPORT KKSObjEditor : public KKSRecDialog
 //        void addIndicator (void);
 
     signals:
+ 
+        void signalShowReportViewer(qint64 idReport);
+        void signalShowReportEditor(qint64 idReport);
+
         void filterObjectEx(KKSObjEditor*, int idObject, const KKSCategory * c, QString tableName);
         void refreshObjectEx(KKSObjEditor*, int idObject, const KKSCategory * c, QString tableName, QAbstractItemModel * sourceMod);
         void filterObjectTemplateEx(KKSObjEditor*, int idObject, const KKSCategory * c, QString tableName);

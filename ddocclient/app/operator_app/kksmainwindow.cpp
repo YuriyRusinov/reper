@@ -61,6 +61,19 @@
 #include <QSpacerItem>
 #include <QFlags>
 
+// openreport
+//wrtembed
+#include "reporthandler.h"       // The Report Window Child
+#include "documentwindow.h"
+// common
+#include <dbtools.h>
+#include <xsqlquery.h>
+#include <data.h>
+// images
+//#include "../images/OpenReportsIcon.xpm" 
+//#include "builtinSqlFunctions.h"
+
+
 KKSMainWindow::KKSMainWindow(QWidget *parent)
     : QMainWindow(parent),
       m_masscreateW (0)
@@ -91,6 +104,27 @@ KKSMainWindow::KKSMainWindow(QWidget *parent)
     KKSTemplateEditorFactory * tf = kksApp->tf ();
     KKSRubricFactory * rf = kksApp->rf ();
     KKSAttributesFactory * af = kksApp->attrf();
+
+    connect (oef, 
+             SIGNAL(showReportEditor(qint64)), 
+             this, 
+             SLOT(slotCreateNewReportEditor(qint64)));
+    
+    connect (oef, 
+             SIGNAL(showReportViewer(qint64)), 
+             this, 
+             SLOT(slotCreateNewReportViewer(qint64)));
+
+    connect (rf, 
+             SIGNAL(showReportEditor(qint64)), 
+             this, 
+             SLOT(slotCreateNewReportEditor(qint64)));
+    
+    connect (rf, 
+             SIGNAL(showReportViewer(qint64)), 
+             this, 
+             SLOT(slotCreateNewReportViewer(qint64)));
+
 
     connect (oef, 
              SIGNAL(editorCreated(KKSObjEditor *)), 
@@ -160,6 +194,7 @@ void KKSMainWindow::init()
     initActions();
     initToolBars();
     initStatusBar();
+    initReports();
     
     initConnections();
     setActionsEnabled(false);
@@ -175,6 +210,64 @@ void KKSMainWindow::closeEvent(QCloseEvent *event)
         event->accept();
     }
 }
+
+void KKSMainWindow::initReports()
+{
+    m_reportHandler = new ReportHandler(this, "report handler");
+    QAction * sepid = m_reportHandler->populateMenuBar(ui->menuReports, NULL);
+    // setup the toolbar
+    
+    m_reportHandler->docToolBars(this);
+    this->insertToolBar(tbOrg, m_reportHandler->getTbFiles());
+    this->insertToolBar(tbOrg, m_reportHandler->getTbDatabase());
+    this->insertToolBar(tbOrg, m_reportHandler->getTbEdit());
+    this->insertToolBar(tbOrg, m_reportHandler->getTbOptions());
+    this->insertToolBar(tbOrg, m_reportHandler->getTbFont());
+    
+    
+    m_reportHandler->setParentWindow(m_mdiArea);
+
+    /*connect(m_reportHandler, SIGNAL(dbOpenClosed()), this, SLOT(setCaption()));
+    connect(m_reportHandler, SIGNAL(messageChanged(const QString &)),
+            statusBar(), SLOT(message(const QString &)));
+    connect(m_reportHandler, SIGNAL(messageCleared()),
+            statusBar(), SLOT(clear()));
+    */
+
+    m_reportHandler->onSubWinChanged(NULL);
+    connect(m_mdiArea, SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(slotSubWindowActivated(QMdiSubWindow*)));
+    connect(this, SIGNAL(reportSubWindowActivated(QMdiSubWindow*)), m_reportHandler, SLOT(onSubWinChanged(QMdiSubWindow*)));
+    
+
+}
+
+void KKSMainWindow::slotCreateNewReportViewer(qint64 idReport)
+{
+    m_reportHandler->print(idReport, true);
+}
+
+void KKSMainWindow::slotCreateNewReportEditor(qint64 idReport)
+{
+    m_reportHandler->dbLoadDoc(idReport);
+}
+
+
+void KKSMainWindow::slotSubWindowActivated(QMdiSubWindow * w)
+{
+    if(!w){
+        emit reportSubWindowActivated(w);
+        return;
+    }
+
+    DocumentWindow * dw = qobject_cast<DocumentWindow*>(w->widget());
+    if(dw)
+        emit reportSubWindowActivated(w);
+    else
+        emit reportSubWindowActivated(NULL);
+
+
+}
+
 
 void KKSMainWindow::updateMenus()
 {
@@ -209,8 +302,13 @@ void KKSMainWindow::updateMenus()
 
 		if(!child){
 			child = qobject_cast<KKSRecDialog*>(windows.at(i)->widget());
-            if(!child)
-				continue;
+            if(!child){
+                child = qobject_cast<DocumentWindow*>(windows.at(i)->widget());
+                if(!child)
+                    continue;
+                else
+                    childIcon = child->windowIcon();
+            }
 			else
 				childIcon = ((KKSRecDialog *)child)->icon();
 		}
@@ -236,10 +334,11 @@ void KKSMainWindow::updateMenus()
 
         QString title = child->windowTitle();
         QString text;
-        //if(title.size() > 30){
-        //    text = title.left(27) + QString("...");
-        //}
-        //else
+        if(title.size() > 30){
+            text = title.left(27);
+            text = text + QString("...");
+        }
+        else
             text = title;
 
         QAction *action  = ui->aWindowMenu->addAction(text);
@@ -453,7 +552,7 @@ void KKSMainWindow::initDebugWindow()
 
 void KKSMainWindow::initToolBars()
 {
-    QToolBar * tbActions = new QToolBar(tr("Docs and Journals toolbar"), this);
+    tbActions = new QToolBar(tr("Docs and Journals toolbar"), this);
     //tbActions->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     tbActions->setIconSize(QSize(32, 32));
     tbActions->addAction(ui->aCreateDoc);
@@ -469,7 +568,7 @@ void KKSMainWindow::initToolBars()
     tbActions->addAction(ui->aRubricControl);
     
     
-    QToolBar * tbPost = new QToolBar(tr("Post toolbar"), this);
+    tbPost = new QToolBar(tr("Post toolbar"), this);
     //tbPost->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     tbPost->setIconSize(QSize(32, 32));
     tbPost->addAction(ui->aCreateMsg);
@@ -479,13 +578,13 @@ void KKSMainWindow::initToolBars()
     tbPost->addAction(ui->aShowTSD);
     tbPost->addAction(aGenerateMess);
 
-    QToolBar * tbQuery = new QToolBar(tr("Search query toolbar"), this);
+    tbQuery = new QToolBar(tr("Search query toolbar"), this);
     //tbQuery->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     tbQuery->setIconSize(QSize(32, 32));
     tbQuery->addAction(ui->aCreateSearchQuery);
     tbQuery->addAction(ui->aShowSearchQueries);
 
-    QToolBar * tbAdmin = new QToolBar(tr("Admin toolbar"), this);
+    tbAdmin = new QToolBar(tr("Admin toolbar"), this);
     //tbAdmin->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     tbAdmin->setIconSize(QSize(32, 32));
     tbAdmin->addAction(ui->aCreateCat);
@@ -499,7 +598,7 @@ void KKSMainWindow::initToolBars()
     tbSubWindows->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     //tbSubWindows->setVisible(false);
 
-    QToolBar * tbOrg = new QToolBar (tr("Organization toolbar"), this);
+    tbOrg = new QToolBar (tr("Organization toolbar"), this);
     tbOrg->setIconSize (QSize (32, 32));
     QWidget * orgW = new QWidget (tbOrg);
     QHBoxLayout * hLay = new QHBoxLayout (orgW);
@@ -650,8 +749,14 @@ bool KKSMainWindow::connectToDb()
         if(res == ERROR_CODE){
             setActionsEnabled(false);
         }
-        else
+        else{
             setActionsEnabled(true);
+            m_reportHandler->dbConnect(kksApp->db()->getName(), 
+                                       kksApp->db()->getHost(), 
+                                       kksApp->db()->getPort(), 
+                                       kksApp->db()->getUser(), 
+                                       kksApp->db()->getPass());
+        }
     }
     else{
         setActionsEnabled(true);

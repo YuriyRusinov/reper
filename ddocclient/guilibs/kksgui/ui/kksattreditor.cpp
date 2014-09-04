@@ -55,9 +55,10 @@ KKSAttrEditor :: KKSAttrEditor (KKSAttribute *attr,
     QGridLayout * gExtLay = new QGridLayout;
     ui->tabExtended->setLayout (gExtLay);
     gExtLay->addWidget (m_recW, 0, 0, 1, 1);
-    m_recW->hideGroup(0);
-    for (int i=2; i<=3; i++)
-        m_recW->hideGroup(i);
+    
+    m_recW->hideActionGroup(_ID_FILTER_GROUP);
+    for (int i=2; i<=_GROUP_COUNT; i++)
+        m_recW->hideActionGroup(i);
 
     if (attribute && attribute->id() >= 0)
     {

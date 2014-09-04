@@ -1177,6 +1177,70 @@ int KKSCoreApplication::autoConnect(QWidget * parent)
     return OK_CODE;
 }
 
+int KKSCoreApplication::connectToDb(const QString & host,
+                                    const QString & database,
+                                    const QString & user,
+                                    const QString & passwd,
+                                    const QString & port,
+                                    QWidget * parent)
+{
+    if(!kksCoreApp)
+        return ERROR_CODE;
+
+    KKSDatabase * m_db = kksCoreApp->db();
+    if(!m_db)
+        return ERROR_CODE;
+
+    KKSSettings * poSettings = kksCoreApp->getKKSSettings();
+
+    poSettings->beginGroup ("System settings/Database");
+	
+    if (! m_db->connect( host, 
+                         database, 
+                         user, 
+                         passwd,
+                         port.isEmpty() ? QString("5432") : port ) )
+    {
+            qCritical() << m_db->lastError();
+            QMessageBox::critical( 0, 
+                                   QObject::tr( "Error!" ), 
+                                   QObject::tr(m_db->lastError()) );
+
+            poSettings->endGroup (); // System settings/Database
+            return ERROR_CODE;
+    }
+    
+
+    poSettings->endGroup (); // System settings/Database
+
+    poSettings->writeSettings("System settings/Database", 
+                              "hostName", 
+                              host);
+    poSettings->writeSettings("System settings/Database", 
+                              "databaseName", 
+                              database);
+
+    poSettings->writeSettings("System settings/Database", 
+                              "userName", 
+                              user);
+
+    if(!m_db->connected())
+        return ERROR_CODE;
+    
+
+    KKSDatabase * m_db1 = kksCoreApp->db1();
+    m_db1->connect(m_db->getHost(), m_db->getName(), m_db->getUser(), m_db->getPass(), m_db->getPort());
+    if(!m_db1->connected()){
+        m_db->disconnect();
+        return ERROR_CODE;
+    }
+
+    if(verifyConnection(parent) == ERROR_CODE)
+        return ERROR_CODE;
+
+    return OK_CODE;
+}
+
 int KKSCoreApplication::verifyConnection(QWidget * parent)
 {
     KKSDatabase * m_db = kksCoreApp->db();

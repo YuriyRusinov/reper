@@ -36,6 +36,11 @@ public:
     const KKSAttrValue * attrValueIndex(int index) const;
     KKSAttrValue * attrValue(int id);
     const KKSAttrValue * attrValue(int id) const;
+    KKSAttrValue * attrValue(const QString & code);//получить значение атрибута по коду атрибута (из KKSCategoryAttr::code())
+    const KKSAttrValue * attrValue(const QString & code) const;
+    
+    //создаются значения атрибутов записи справочника с значениями по умолчанию (пустые или взятые из KKSCategoryAttr::defValue()
+    int createDefaultAttrValues();
 
     void addAttrValue(KKSAttrValue * av);
     void addAttrValue(const QString & value, KKSCategoryAttr * attr, bool * bBadValue = NULL);

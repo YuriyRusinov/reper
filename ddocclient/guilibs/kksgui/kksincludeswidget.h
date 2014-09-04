@@ -117,8 +117,14 @@ public slots:
 
 private slots:
     void init();
+    void showReportEditor(qint64 idReport);
+    void showReportViewer(qint64 idReport);
 
 signals:
+
+    void signalShowReportViewer(qint64 idReport);
+    void signalShowReportEditor(qint64 idReport);
+
     void rubricRequested(KKSRubric *r, int idRubr, QAbstractItemModel * rubrModel, const QModelIndex& rubrIndex);
     void rubricCategoryRequested (KKSRubric *r);
     void rubricItemRequested(const KKSRubric * r, bool isRec, QAbstractItemModel * itemModel);

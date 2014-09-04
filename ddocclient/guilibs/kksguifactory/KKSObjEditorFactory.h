@@ -250,6 +250,9 @@ signals:
     void templateAdded (KKSTemplate *templ);
     void cioSaved (KKSObjectExemplar * cio);
     void setuuid (QString uuid);
+
+    void showReportEditor(qint64 idReport);
+    void showReportViewer(qint64 idReport);
     
     void editorSearchTemplate (QWidget * stForm);
 

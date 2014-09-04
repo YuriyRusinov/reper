@@ -83,7 +83,7 @@ KKSRecWidget * KKSViewFactory :: createViewOld (KKSTemplate* theTemplate,
                                         QWidget *parent,
                                         Qt::WindowFlags f)
 {
-//    KKSView *tv = new KKSView ();
+
     KKSRecWidget *resWidget = new KKSRecWidget (false, Qt::Vertical, parent, f);
     QTreeView *tv = resWidget->getView();//new QTreeView ();
     tv->header()->setClickable (true);
@@ -100,6 +100,7 @@ KKSRecWidget * KKSViewFactory :: createViewOld (KKSTemplate* theTemplate,
     if (tv->selectionModel())
         tv->selectionModel()->clearSelection ();
 
+    //filter group
     if (resWidget->actFilter)
     {
         resWidget->actFilter->setToolTip(QObject::tr("Filter records by criterion(ia)"));
@@ -110,6 +111,8 @@ KKSRecWidget * KKSViewFactory :: createViewOld (KKSTemplate* theTemplate,
         resWidget->actSearchT->setToolTip(QObject::tr("Filter records by preared search templates"));
         QObject::connect (resWidget->actSearchT, SIGNAL (triggered()), objEditor, SLOT (filterObjectT()) );
     }
+
+    //add_edit_del group
     if (resWidget->actAdd)
     {
         resWidget->actAdd->setToolTip(QObject::tr("Add new record"));
@@ -129,6 +132,20 @@ KKSRecWidget * KKSViewFactory :: createViewOld (KKSTemplate* theTemplate,
         resWidget->actDel->setToolTip(QObject::tr("Delete selected record"));
         QObject::connect (resWidget->actDel, SIGNAL (triggered()), objEditor, SLOT (delObjectE()) );
     }
+
+    //openRPT group
+    if (resWidget->actReportEdit)
+    {
+        resWidget->actReportEdit->setToolTip (QObject::tr("Edit selected record in openRPT report editor"));
+        QObject::connect (resWidget, SIGNAL (showReportEditor(qint64)), objEditor, SLOT (showReportEditor(qint64)) );
+    }
+    if (resWidget->actReportOpen)
+    {
+        resWidget->actReportOpen->setToolTip (QObject::tr("Print selected record in openRPT report viewer"));
+        QObject::connect (resWidget, SIGNAL (showReportViewer(qint64)), objEditor, SLOT (showReportViewer(qint64)) );
+    }
+
+    //import group
     if (resWidget->actImport)
     {
         resWidget->actImport->setToolTip(QObject::tr("Import records"));
@@ -139,11 +156,15 @@ KKSRecWidget * KKSViewFactory :: createViewOld (KKSTemplate* theTemplate,
         resWidget->actExport->setToolTip(QObject::tr("Export records"));
         QObject::connect (resWidget->actExport, SIGNAL (triggered()), objEditor, SLOT (exportObjectE()) );
     }
+
+    //view group
     if (resWidget->actSetView)
     {
         resWidget->actSetView->setToolTip(QObject::tr("Set view template"));
         QObject::connect (resWidget->actSetView, SIGNAL (triggered()), objEditor, SLOT (setView()) );
     }
+
+
     QObject::connect (resWidget, SIGNAL (refreshMod (QAbstractItemModel *)), objEditor, SLOT (refreshRecModel(QAbstractItemModel *)) );
     tv->setSelectionMode(QAbstractItemView::ExtendedSelection);
     tv->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -188,6 +209,7 @@ KKSRecWidget * KKSViewFactory :: createView (KKSTemplate* theTemplate,
 {
 //    KKSView *tv = new KKSView ();
     KKSRecWidget *resWidget = new KKSRecWidget (false, Qt::Vertical, parent, f);
+    
     QTreeView *tv = resWidget->getView();//new QTreeView ();
     tv->header()->setClickable (true);
     tv->header()->setSortIndicatorShown (true);
@@ -1207,9 +1229,12 @@ KKSRecWidget * KKSViewFactory :: createCategoryTemplates (int idCat, KKSLoader *
     tv->header()->setSortIndicatorShown (true);
     tv->header()->setSortIndicator (0, Qt::AscendingOrder);
     tv->setSortingEnabled (true);
-    resWidget->hideGroup (0);//gbSearch->setVisible (false);
-    resWidget->hideGroup (3);//tbSetView->setVisible (false);
-    resWidget->hideGroup (2);//gbImportExport->setVisible (false);
+    
+    resWidget->hideActionGroup (_ID_FILTER_GROUP);
+    resWidget->hideActionGroup (_ID_VIEW_GROUP);
+    resWidget->hideActionGroup (_ID_IMPORT_GROUP);
+    resWidget->hideActionGroup (_ID_REPORT_GROUP);
+
     KKSItemDelegate *itemDeleg = new KKSItemDelegate (resWidget);
     tv->setItemDelegate (itemDeleg);
     QSortFilterProxyModel *sortTemplModel = new QSortFilterProxyModel (resWidget);
@@ -1359,9 +1384,11 @@ KKSRecWidget * KKSViewFactory :: createCategAttrsView (const KKSCategory *cat,
     //
     // QObject::tr("Filter"), QObject::tr("&Add"), QObject::tr ("&Edit"), QObject::tr ("&Delete"), QObject::tr("&Import"), QObject::tr("E&xport"), 
     //
-    recWidget->hideGroup (0);//gbSearch->setVisible (false);
-    recWidget->hideGroup (2);//tbSetView->setVisible (false);
-    recWidget->hideGroup (3);//gbImportExport->setVisible (false);
+    recWidget->hideActionGroup (_ID_FILTER_GROUP);
+    recWidget->hideActionGroup (_ID_IMPORT_GROUP);
+    recWidget->hideActionGroup (_ID_VIEW_GROUP);
+    recWidget->hideActionGroup (_ID_REPORT_GROUP);
+
     QAbstractItemModel * acModel = new KKSAttrModel (cat);
 /*    QStandardItemModel * acModel = new KKSCatAttrsModel (0, 4);//QStandardItemModel (0, 4);
     acModel->setHeaderData (0, Qt::Horizontal, QObject::tr ("Name"));
@@ -1409,9 +1436,10 @@ KKSRecWidget * KKSViewFactory :: createAttrAttrsView (const KKSAttribute *a,
     KKSRecWidget * recWidget = new KKSRecWidget (mode, Qt::Vertical, parent, f);
     QTreeView *tv = recWidget->getView();//new QTreeView ();
 
-    recWidget->hideGroup (0);//gbSearch->setVisible (false);
-    recWidget->hideGroup (2);//tbSetView->setVisible (false);
-    recWidget->hideGroup (3);//gbImportExport->setVisible (false);
+    recWidget->hideActionGroup (_ID_FILTER_GROUP);
+    recWidget->hideActionGroup (_ID_VIEW_GROUP);
+    recWidget->hideActionGroup (_ID_IMPORT_GROUP);
+    recWidget->hideActionGroup (_ID_REPORT_GROUP);
     
     QStandardItemModel * acModel = new KKSCatAttrsModel (0, 4);//QStandardItemModel (0, 4);
     acModel->setHeaderData (0, Qt::Horizontal, QObject::tr ("Name"));
@@ -1619,10 +1647,11 @@ KKSAttributesEditor * KKSViewFactory :: createAttrView (KKSLoader *l,
     tvAttrs->setDropIndicatorShown (true);
 
     aEditor->setRecordsWidget (recW);
-    recW->hideGroup (3);//setVisible (false);
+    recW->hideActionGroup (_ID_VIEW_GROUP);
+    recW->hideActionGroup (_ID_IMPORT_GROUP);
+    recW->hideActionGroup (_ID_REPORT_GROUP);
+
     recW->pbApply->setVisible (false);
-//    recW->hideGroup (0);//gbSearch->setVisible (true);
-    recW->hideGroup (2);//gbImportExport->setVisible (false);
     KKSEventFilter *ef = new KKSEventFilter (recW);
     tvAttrs->viewport()->installEventFilter (ef);
 
@@ -1863,11 +1892,9 @@ KKSAttributesEditor * KKSViewFactory :: createAvailAttrView (const KKSMap<int, K
     QTreeView *tvAttrs = recW->getView();//new QTreeView ();
     aEditor->setRecordsWidget (recW);
     recW->pbApply->setVisible (false);
-    for (int i=0; i<=3; i++)
-        recW->hideGroup (i);//gbEdit->setVisible (false);
-//    recW->gbSearch->setVisible (false);
-//    recW->gbImportExport->setVisible (false);
-//    recW->tbSetView->setVisible (false);
+
+    for (int i=0; i<=_GROUP_COUNT; i++)
+        recW->hideActionGroup (i);
 
     QAbstractProxyModel * aSortModel = new KKSSortFilterProxyModel ();
     QStandardItemModel *wModel = new QStandardItemModel (avAttrs.size(), 1);
@@ -2131,8 +2158,11 @@ KKSRecWidget * KKSViewFactory :: createAdditionalView (KKSTemplate *t,
     if (tv->selectionModel())
         tv->selectionModel()->clearSelection ();
 
+    //filter group
     if (resWidget->actFilter)
         QObject::connect (resWidget->actFilter, SIGNAL (triggered()), objEditor, SLOT (filterObjectE()) );
+    
+    //add_edit_del group
     if (resWidget->actAdd)
         QObject::connect (resWidget->actAdd, SIGNAL (triggered()), objEditor, SLOT (addObjectE()) );
     if (resWidget->actEdit)
@@ -2143,10 +2173,20 @@ KKSRecWidget * KKSViewFactory :: createAdditionalView (KKSTemplate *t,
     }
     if (resWidget->actDel)
         QObject::connect (resWidget->actDel, SIGNAL (triggered()), objEditor, SLOT (delObjectE()) );
+
+    //openRPT group
+    if (resWidget->actReportEdit)
+        QObject::connect (resWidget->actReportEdit, SIGNAL (triggered()), objEditor, SLOT (editObjectEAsReport()) );
+    if (resWidget->actReportOpen)
+        QObject::connect (resWidget->actReportOpen, SIGNAL (triggered()), objEditor, SLOT (openObjectEAsReport()) );
+
+    //import group
     if (resWidget->actImport)
         QObject::connect (resWidget->actImport, SIGNAL (triggered()), objEditor, SLOT (importObjectE()) );
     if (resWidget->actExport)
         QObject::connect (resWidget->actExport, SIGNAL (triggered()), objEditor, SLOT (exportObjectE()) );
+    
+    //view group
     if (resWidget->actSetView)
         QObject::connect (resWidget->actSetView, SIGNAL (triggered()), objEditor, SLOT (setView()) );
 

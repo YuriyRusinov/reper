@@ -191,6 +191,80 @@ const KKSAttrValue * KKSObjectExemplar::attrValue(int id) const
     return av;
 }
 
+//получить значение атрибута по коду атрибута (из KKSCategoryAttr::code())
+KKSAttrValue * KKSObjectExemplar::attrValue(const QString & code)
+{
+    KKSAttrValue * av = NULL;
+    
+    for (int i=0; i<m_attrValues.count(); i++)
+    {
+        KKSAttrValue * av1 = m_attrValues [i];
+        if(av1->attribute()->code() == code){
+            av = av1;
+            break;            
+        }
+    }
+
+    return av;
+}
+
+const KKSAttrValue * KKSObjectExemplar::attrValue(const QString & code) const
+{
+    const KKSAttrValue * av = NULL;
+    
+    for (int i=0; i<m_attrValues.count(); i++)
+    {
+        KKSAttrValue * av1 = m_attrValues [i];
+        if(av1->attribute()->code() == code){
+            av = av1;
+            break;            
+        }
+    }
+
+    return av;
+}
+
+/*!\brief создаются значения атрибутов записи справочника с значениями по умолчанию (пустые или взятые из KKSCategoryAttr::defValue()
+
+Если для некоторых атрибутов были заданы значения, они бдут заменены на значения по умолчанию
+*/
+int KKSObjectExemplar::createDefaultAttrValues()
+{
+    if(!this->io())
+        return ERROR_CODE;
+
+    KKSCategory * c = io()->category();
+    if(!c)
+        return ERROR_CODE;
+
+    c = c->tableCategory();
+    if(!c)
+        return ERROR_CODE;
+
+    if(m_attrValues.count() > 0)
+        m_attrValues.clear();
+
+    KKSMap<int, KKSCategoryAttr *> attrs = c->attributes();
+    KKSMap<int, KKSCategoryAttr *>::const_iterator pa;
+
+    for (pa=attrs.constBegin(); pa != attrs.constEnd(); pa++)
+    {
+        KKSCategoryAttr * attr = pa.value();
+        QString code;
+        
+        KKSAttrValue * av = new KKSAttrValue();
+        av->setAttribute(attr);
+        KKSValue v = attr->defValue();
+        av->setValue(v);
+
+        m_attrValues.append(av);
+    }
+
+
+    return OK_CODE;
+}
+
+
 void KKSObjectExemplar::addAttrValue(const QString & value, KKSCategoryAttr * attr, bool * bBadValue)
 {
     if(!attr){

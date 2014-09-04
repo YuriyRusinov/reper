@@ -137,6 +137,7 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
     KKSTreeItem * wItem = static_cast<KKSTreeItem*>(index.internalPointer());
     if (!wItem)
         return QVariant ();
+
     qint64 idw = wItem->id();//index.internalId();
     KKSList<KKSAttrView*> avList = tRef ? tRef->sortedAttrs() : KKSList<KKSAttrView*>();
     int iCol (index.column());

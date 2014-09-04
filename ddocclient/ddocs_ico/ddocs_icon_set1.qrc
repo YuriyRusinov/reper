@@ -30,5 +30,7 @@
     <file>accept.png</file>
     <file>exec_cmd.png</file>
     <file>send_as_mail.png</file>
+    <file>orpfileedit.xpm</file>
+    <file>orpfileprint.xpm</file>
   </qresource>
 </RCC>

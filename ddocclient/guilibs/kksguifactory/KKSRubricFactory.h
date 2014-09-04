@@ -88,6 +88,10 @@ class _GF_EXPORT KKSRubricFactory : public KKSEntityFactory
         void objEditorCreated (KKSObjEditor *oEditor);
         void rubricAttachments (QAbstractItemModel * rModel, KKSIncludesWidget * iW);
 
+        void showReportEditor(qint64 idReport);
+        void showReportViewer(qint64 idReport);
+
+
     private slots:
         void saveRubric (KKSRubric * rootR, bool isMyDocs);
         void rubricItemUpload (const KKSRubric * r, bool forRecords, QAbstractItemModel * itemModel);

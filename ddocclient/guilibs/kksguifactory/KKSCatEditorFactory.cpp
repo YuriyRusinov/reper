@@ -602,9 +602,13 @@ KKSRecWidget * KKSCatEditorFactory :: getAttrsWidget (const KKSCategory *cat, bo
         const_cast<KKSCategory *>(cat)->setAccessRules (acl);
         rw = new KKSRecWidget (false); //mode);
         QTreeView * tvTableAttrs = rw->getView();//new QTreeView ();
-        rw->hideGroup (0);//gbSearch->setVisible (false);
-        rw->hideGroup (2);//tbSetView->setVisible (false);
-        rw->hideGroup (3);//gbImportExport->setVisible (false);
+        
+        rw->hideActionGroup (_ID_FILTER_GROUP);
+        rw->hideActionGroup (_ID_IMPORT_GROUP);
+        rw->hideActionGroup (_ID_VIEW_GROUP);
+        rw->hideActionGroup (_ID_REPORT_GROUP);
+
+
         QAbstractItemModel * acModel = new KKSAttrModel (cat);//QStandardItemModel (0, 4);
         acModel->setHeaderData (0, Qt::Horizontal, QObject::tr ("Name"));
         acModel->setHeaderData (1, Qt::Horizontal, QObject::tr ("Default value"));
@@ -631,9 +635,12 @@ KKSRecWidget * KKSCatEditorFactory :: getTemplateWidget (const KKSCategory * cat
         tvTableTempl->header()->setSortIndicatorShown (true);
         tvTableTempl->header()->setSortIndicator (0, Qt::AscendingOrder);
         tvTableTempl->setSortingEnabled (true);
-        rtw->hideGroup (0);//gbSearch->setVisible (false);
-        rtw->hideGroup (3);//tbSetView->setVisible (false);
-        rtw->hideGroup (2);//gbImportExport->setVisible (false);
+        
+        rtw->hideActionGroup (_ID_FILTER_GROUP);
+        rtw->hideActionGroup (_ID_VIEW_GROUP);
+        rtw->hideActionGroup (_ID_IMPORT_GROUP);
+        rtw->hideActionGroup (_ID_REPORT_GROUP);
+        
         KKSItemDelegate *itemDeleg = new KKSItemDelegate (rtw);
         tvTableTempl->setItemDelegate (itemDeleg);
         QSortFilterProxyModel *sortTemplModel = new QSortFilterProxyModel (rtw);

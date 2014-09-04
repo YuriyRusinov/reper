@@ -13,9 +13,7 @@ INCLUDEPATH *= \
                 ../../corelibs/kkspluginmanager \
                 ../../corelibs/kksdatafactory \
                 ../kksgui \
-                ../kksgui/ui \
-                ../../openreport/rptrenderer \
-                ../../openreport/rptrenderer/src
+                ../kksgui/ui 
 
 DEPENDPATH *= \
                 ../../corelibs/kksutils \
@@ -23,10 +21,9 @@ DEPENDPATH *= \
                 ../../corelibs/kkspp \
                 ../../corelibs/kksdatafactory \
                 ../../corelibs/kkspluginmanager \
-                ../kksgui \
-                ../../openreport/rptrenderer                
+                ../kksgui 
 
-LIBS *= -L$$DESTDIR -lkksutils -ldataaccess -lkkspp -lkksgui -lrptrenderer -lkkspluginmanager -lkksdatafactory
+LIBS *= -L$$DESTDIR -lkksutils -ldataaccess -lkkspp -lkksgui -lkkspluginmanager -lkksdatafactory
 
 unix {
 #LIBS += -lcurses

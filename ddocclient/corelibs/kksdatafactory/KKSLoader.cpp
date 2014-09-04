@@ -1051,9 +1051,9 @@ KKSObject * KKSLoader::loadIO(const QString & tableName, bool simplify) const
 
 KKSObjectExemplar * KKSLoader::loadEIO(qint64 id, 
 									   const KKSObject * io, 
+                                       bool simplify,
 									   const KKSCategory *c0, 
-									   const QString& table,
-									   bool simplify) const
+									   const QString& table) const
 {
     KKSObjectExemplar * eio = NULL;
     

@@ -91,7 +91,6 @@
 #include <KKSPixmap.h>
 #include <KKSColorWidget.h>
 #include <rubricform.h>
-#include "KKSPrerender.h"
 #include "kksdatabase.h"
 #include "defines.h"
 #include "choosetemplateform.h"
@@ -129,21 +128,7 @@
 #include <kksioplugin.h>
 #include <kksbaseplugin.h>
 
-/*
- Заголовочные ф-лы генератора отчетов
- Иванов В. И. 8.6.2010
-*/
-
 #include "kksdatabase.h"
-
-#include <openreports.h>
-#include <xsqlquery.h>
-
-#include <renderobjects.h>
-#include <orprerender.h>
-#include <orprintrender.h>
-#include <previewdialog.h>
-#include <parameter.h>
 
 #include <QPrintDialog>
 #include <QFile>
@@ -1256,7 +1241,7 @@ void KKSObjEditorFactory :: loadEntities (KKSObject *& obj,
     wObjE = NULL;
     if (idObjE > 0)
     {
-        wObjE = loader->loadEIO (idObjE, obj, wCat, tableName, simplify);
+        wObjE = loader->loadEIO (idObjE, obj, simplify, wCat, tableName);
         if (!wObjE)
         {
             qWarning() << "There is no object exemplar with id = " << idObjE;
@@ -1599,9 +1584,10 @@ KKSRecDialog* KKSObjEditorFactory :: createObjRecEditor (int idObject,// идентиф
         if (toolB)
         {
             recW->showToolBar();
-            recW->hideGroup (0);
-            recW->hideGroup (2);
-            recW->hideGroup (3);
+            recW->hideActionGroup (_ID_FILTER_GROUP);
+            recW->hideActionGroup (_ID_IMPORT_GROUP);
+            recW->hideActionGroup (_ID_VIEW_GROUP);
+            recW->hideActionGroup (_ID_REPORT_GROUP);
         }
         else
             recW->hideToolBar();//hideAllButtons ();//gbSearch->setVisible (true);
@@ -1681,6 +1667,9 @@ void KKSObjEditorFactory :: setObjConnect (KKSObjEditor *editor)
     connect (editor, SIGNAL (exportObjectEx (KKSObjEditor *, int, const KKSCategory *, QString, QAbstractItemModel *)), this, SLOT (exportEIO (KKSObjEditor *, int, const KKSCategory *, QString, QAbstractItemModel *)) );
     connect (editor, SIGNAL (prepareIO (KKSObject*, KKSObjectExemplar *, KKSObjEditor*)), this, SLOT (sendIO (KKSObject *, KKSObjectExemplar *, KKSObjEditor *)) );
     
+    connect (editor, SIGNAL (signalShowReportEditor(qint64)), this, SIGNAL(showReportEditor(qint64)));
+    connect (editor, SIGNAL (signalShowReportViewer(qint64)), this, SIGNAL(showReportViewer(qint64)));
+
     connect (editor, SIGNAL (editObjAttrRef (KKSObject *, const KKSAttrValue*, KKSIndAttrClass, QAbstractItemModel *)), this, SLOT (loadObjAttrRef (KKSObject *, const KKSAttrValue*, KKSIndAttrClass, QAbstractItemModel *)) );
     connect (editor, SIGNAL (editObjCAttrRef (KKSObjectExemplar *, const KKSAttrValue*, KKSIndAttrClass, QAbstractItemModel *) ), this, SLOT (loadObjCAttrRef (KKSObjectExemplar *, const KKSAttrValue*, KKSIndAttrClass, QAbstractItemModel *) ) );
     connect (editor, SIGNAL (delObjAttrRef (KKSObject *, const KKSAttrValue*, KKSIndAttrClass, QAbstractItemModel *, const QModelIndex&)), this, SLOT (loadObjDelAttrRef (KKSObject *, const KKSAttrValue*, KKSIndAttrClass, QAbstractItemModel *, const QModelIndex&)) );
@@ -8866,6 +8855,7 @@ void KKSObjEditorFactory :: setRubrFactory (KKSRubricFactory * _rf)
 
 void KKSObjEditorFactory :: printReport(KKSObject* io)
 {
+    /*
     QSqlDatabase db=QSqlDatabase::addDatabase("QPSQL7");
     KKSDatabase * k_db = loader->getDb();
     db.setHostName(k_db->getHost());
@@ -8900,11 +8890,7 @@ void KKSObjEditorFactory :: printReport(KKSObject* io)
                               QMessageBox::NoButton);
         return;
     }
-/*
-    query.first();
-    _doc.setContent(query.value(0).toString());
-    query.clear();
-*/
+
     qDebug () << __PRETTY_FUNCTION__ << res->getCellAsString (0, 0);
     _doc.setContent (res->getCellAsString (0, 0));
     delete res;
@@ -8913,39 +8899,7 @@ void KKSObjEditorFactory :: printReport(KKSObject* io)
     if (!pre)
         return;
     pre->setDom (_doc);
-/*
-    QString tblnm=io->tableName();//"eio_table_82";
-    KKSMap<QString, KKSCategory*> tables = io->getAdditionalTables ( );
-//   KKSMap<QString, KKSCategory *>::const_iterator p = tables.constBegin();
-//	qDebug()<<"Additional tables";
-//
-//	tblnm = p.key();
-//	qDebug()<<"Additional tables end";
-//
-    KKSMap<QString, KKSCategory*>::const_iterator i = tables.begin();
-    while (i != tables.end() )
-    {
-         tblnm = i.key();
-         break;
-     }
 
-    //query.prepare("select e.name, t. code as a_type, e.p_value from "+tblnm+" as e left join a_types as t on e.id_a_type=t.id;");
-    sql = QString ("select e.name, t. code as a_type, e.p_value from %1  as e left join a_types as t on e.id_a_type=t.id;").arg (tblnm);
-    ParameterList prm;
-    res = k_db->execute (sql);
-    if (res)//query.exec())
-    {
-//        QMessageBox::critical(this, tr("Error"), 
-//        		tr("Current version of KKS SITO Operator does not print this window"), QMessageBox::Ok);
-
-        //while (query.next())
-        for (int i=0; i<res->getRowCount(); i++)
-            prm.append (res->getCellAsString (i, 0), res->getCellAsInt (i, 2));
-//                prm.append(query.value(0).toString(), query.value(2).toInt());
-        pre.setParamList(prm);
-        delete res;
-    }
-*/
     ORODocument * doc = pre->generate ();//((KKSPrerender *)pre)->generate();
 
     if (doc)
@@ -8970,6 +8924,7 @@ void KKSObjEditorFactory :: printReport(KKSObject* io)
     }
 
     delete pre;
+    */
 
 }
 

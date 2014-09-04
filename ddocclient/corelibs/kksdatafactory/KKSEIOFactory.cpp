@@ -73,13 +73,14 @@ KKSDatabase * KKSEIOFactory::getDb() const
 int KKSEIOFactory::insertEIO(KKSObjectExemplar* eio, 
                              const KKSCategory* cat, 
                              const QString& table, 
-                             bool bImported) const
+                             bool bImported,
+                             QWidget * parent) const
 {
     
     if(!eio || !eio->io())
         return ERROR_CODE;
 
-    int res = insertRecord(eio, cat, table, bImported);
+    int res = insertRecord(eio, cat, table, bImported, parent);
     if (res <= 0)
         return ERROR_CODE;
 

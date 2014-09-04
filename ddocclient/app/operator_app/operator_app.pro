@@ -20,9 +20,10 @@ INCLUDEPATH += 	. \
                 ../../guilibs/kksqwt \
                 ../../guilibs/kksqwt/src \
                 ../../guilibs/kksguifactory \
-                ../../openreport/rptrenderer \
-                ../../openreport/rptrenderer/src \
-		../../mgrlibs/kksapplication
+		../../mgrlibs/kksapplication \
+                ../../openreport/kksorpcommon \
+                ../../openreport/kksorprenderer \
+                ../../openreport/kksorpwrtembed
 
 
 DEPENDPATH += 	\
@@ -37,10 +38,12 @@ DEPENDPATH += 	\
                 ../../guilibs/kksgui \
                 ../../guilibs/kksqwt \
                 ../../guilibs/kksguifactory \
-                ../../openreport/rptrenderer
+                ../../openreport/kksorpcommon \
+                ../../openreport/kksorprenderer \
+                ../../openreport/kksorpwrtembed
 
 
-LIBS += -L$$DESTDIR -ldataaccess -lkkscoreapplication -lkksapplication -lkksutils -lkkspp -lkksdatafactory -lkksguifactory -lkksgui -lrptrenderer -lkksqwt -lkkspluginmanager
+LIBS += -L$$DESTDIR -ldataaccess -lkkscoreapplication -lkksapplication -lkksutils -lkkspp -lkksdatafactory -lkksguifactory -lkksorpcommon -lkksorprenderer -lkksorpwrtembed -lkksgui -lkksqwt -lkkspluginmanager
 
 
 qgis{
@@ -77,6 +80,8 @@ qgis{
 LIBS += -L$${PSQL_HOME}/lib
 INCLUDEPATH *= $${PSQL_HOME}/include
 INCLUDEPATH *= $${PSQL_INCLUDE_DIR}
+
+QT += xml sql
 
 win32 {
 !win32-g++:LIBS *= libpqdll.lib

@@ -996,7 +996,7 @@ void KKSStuffFactory :: setUserToPosition (const QModelIndex& posIndex, QAbstrac
             return;
         }
         delete res;
-        KKSObjectExemplar * userCIO = loader->loadEIO(idUser, wObj, wCat, QString("users"));
+        KKSObjectExemplar * userCIO = loader->loadEIO(idUser, wObj, true, wCat, QString("users"));
         if (!userCIO)
             return;
         stuffModel->insertRows (0, 1, posIndex);

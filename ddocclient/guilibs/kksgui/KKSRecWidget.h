@@ -11,13 +11,13 @@
 #define __KKSSITOOOM_KKSRecWidget_h
 
 #include <QWidget>
+#include <QTreeView>
 #include <QModelIndex>
 #include <QItemSelection>
 #include <QAbstractItemView>
 
 #include "kksgui_config.h"
 
-class QTreeView;
 class QToolButton;
 class QPushButton;
 class QAbstractItemModel;
@@ -33,6 +33,25 @@ class QLineEdit;
 class QBoxLayout;
 
 class KKSAttribute;
+
+#define _ID_FILTER_GROUP 0
+#define _ID_ADD_EDIT_DEL_GROUP 1
+#define _ID_IMPORT_GROUP 2
+#define _ID_VIEW_GROUP 3
+#define _ID_REPORT_GROUP 4
+#define _GROUP_COUNT 4
+
+class KKSRecWidgetTreeView : public QTreeView
+{
+    Q_OBJECT
+public:
+    KKSRecWidgetTreeView(QWidget * parent = 0):QTreeView(parent){}
+    virtual ~KKSRecWidgetTreeView(){}
+protected:
+    void currentChanged ( const QModelIndex & current, const QModelIndex & previous );
+signals:
+    void recViewCurrentChanged(const QModelIndex & current);
+};
 
 class _GUI_EXPORT KKSRecWidget : public QWidget
 {
@@ -63,14 +82,17 @@ public:
     void hideAllButtons (void);
     void showEditGroup (void);
 
-    void hideGroup (int num_gr);
-    void showGroup (int num_gr);
+    void hideActionGroup (int num_gr);
+    void showActionGroup (int num_gr);
 
     void hideToolBar (void);
     void showToolBar (void);
     
     void hideFilter (void);
     void showFilter (void);
+
+    void hideReportGroup();
+    void showReportGroup();
 
     void addToolBarAction (QAction * act);
     QAction * addToolBarSeparator (void);
@@ -102,6 +124,9 @@ signals:
     void refreshMod (QAbstractItemModel * sourceMod);
     
     void entityDoubleClicked();
+
+    void showReportEditor(qint64 idReport);
+    void showReportViewer(qint64 idReport);
     
     void editEntitiesList (QAbstractItemModel * sourceMod, const QItemSelection& sel);
     void delEntitiesList (QAbstractItemModel * sourceMod, const QItemSelection& sel);
@@ -116,7 +141,11 @@ private slots:
     void viewRecsFromHere (void);
 
     void tvDoubleClicked(const QModelIndex & index);
+    void recViewCurrentChanged(const QModelIndex & current);
     void filterRecs (const QString& text);
+
+    void slotReportEdit();
+    void slotReportOpen();
 
 private:
     //
@@ -133,7 +162,7 @@ private:
     friend class KKSViewFactory;
     friend class KKSObjEditorFactory;
 
-    QTreeView * tView;
+    KKSRecWidgetTreeView * tView;
     QToolBar * tBActions;
     QMenu * pMenu;
     QMenu * pGroupBy;
@@ -153,6 +182,10 @@ public:
     QAction * actEdit;
     QAction * actDel;
     QAction * actEditSep;
+
+    QAction * actReportEdit;//for openRPT
+    QAction * actReportOpen;//for openRPT
+    QAction * actReportSep;
 
     QAction * actImport;
     QAction * actExport;

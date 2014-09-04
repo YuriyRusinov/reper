@@ -18,6 +18,7 @@ namespace Ui
     class KKSMainWindowDlg;
 }
 
+class ReportHandler;
 class KKSJMonitor;
 class KKSCmdJournal;
 class KKSMsgJournal;
@@ -52,7 +53,13 @@ Q_OBJECT
     protected:
         void closeEvent(QCloseEvent *event);
 
+    signals: 
+        void reportSubWindowActivated(QMdiSubWindow*);//for openRPT
+
     private slots:
+
+        void slotSubWindowActivated(QMdiSubWindow*);
+
         void setActionsEnabled(bool enabled);
 
         void slotCreateNewObjEditor(KKSObjEditor * editor);
@@ -122,6 +129,9 @@ Q_OBJECT
         void slotAbout();
         void slotCmdParamsHelp();
         void slotMess();
+
+        void slotCreateNewReportViewer(qint64 idReport);
+        void slotCreateNewReportEditor(qint64 idReport);
     
     private:
         Ui::KKSMainWindowDlg *ui;
@@ -139,6 +149,8 @@ Q_OBJECT
         void initActions();
         void initToolBars();
         void initIcons();
+        void initReports();
+
         void initJournal (void);
         void initDebugWindow();
         void initStatusBar();
@@ -160,6 +172,8 @@ Q_OBJECT
         //KKSMsgJournal * m_msgJ;
         KKSJournalWidget * m_journalW;
         KKSDbgOutputWidget * m_debugWidget;
+        ReportHandler * m_reportHandler;
+
 
         QAction *aCloseWindow;
         QAction *aCloseAllWindows;
@@ -175,6 +189,11 @@ Q_OBJECT
         MassWidget *m_masscreateW;
 
         QToolBar * tbSubWindows;
+        QToolBar * tbActions;
+        QToolBar * tbPost;
+        QToolBar * tbQuery;
+        QToolBar * tbAdmin;
+        QToolBar * tbOrg;
         
         QLabel * lModeName;
         QLabel * lOrgLogo;

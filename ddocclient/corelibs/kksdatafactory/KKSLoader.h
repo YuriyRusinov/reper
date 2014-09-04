@@ -151,15 +151,15 @@ class _F_DATA_EXPORT KKSLoader
         
         \param id идентификатор записи справочника в заданном справочнике
         \param io информационный ресурс типа справочник, из которого загружается запись
+        \param simplify загрузить только системные данные
         \param c0 зарезервировано
         \param table зарезервировано
-        \param simplify загрузить только системные данные
         */
         KKSObjectExemplar * loadEIO(qint64 id, 
 									const KKSObject * io, 
+                                    bool simplify = true,
 									const KKSCategory *c0=0, 
-									const QString& table=QString(),
-									bool simplify = true) const;
+									const QString& table=QString()) const;
         
         /*!\brief Метод производит загрузку всех ЭИО данного ИО (в соответствии с фильтрами. 
         

@@ -164,6 +164,10 @@ void KKSPGDatabase::disconnect() const
 
     if ( conn != NULL )
     {
+        if(!execute("select f_clear_function();")){
+            qCritical("cannot execute f_clear_function!");
+        }
+
         PQfinish( conn );
         conn = NULL;
     }
