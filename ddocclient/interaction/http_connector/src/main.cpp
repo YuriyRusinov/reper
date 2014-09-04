@@ -29,16 +29,32 @@
 #include "transportsettingsform.h"
 #include "kkscoreapplication.h"
 #include "kksdebug.h"
+#include "kkscommandlineopts.h"
+
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+
     QTextCodec::setCodecForTr(QTextCodec::codecForName("Windows-1251"));
+    QTextCodec::setCodecForCStrings(QTextCodec::codecForName("cp1251"));
+    QTextCodec::setCodecForLocale(QTextCodec::codecForName("cp1251"));
 
     KKSDebug::setMinMsgType(KKSInfoMsg);
     KKSDebug::setUseQDebug(true);
 
-    KKSCoreApplication *sito = KKSCoreApplication::init (argc, argv, false, QString(), false);
+    KKSCommandLineOpts * options = KKSCoreApplication::parseCommandLineOptions(argc, argv);
+    if(options->showHelp){
+        QString msg = options->getHelpMessage();
+        fprintf(stdout, "%s", msg.toLocal8Bit().constData());
+        KKSCoreApplication::showCommandLineParamsHelp();
+        delete options;
+        return 0;
+    }
+
+    delete options;
+
+    KKSCoreApplication *sito = KKSCoreApplication::init (argc, argv, false);
     if(!sito)
         return 1;
 

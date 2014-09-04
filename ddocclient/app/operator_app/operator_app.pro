@@ -43,7 +43,22 @@ DEPENDPATH += 	\
                 ../../openreport/kksorpwrtembed
 
 
-LIBS += -L$$DESTDIR -ldataaccess -lkkscoreapplication -lkksapplication -lkksutils -lkkspp -lkksdatafactory -lkksguifactory -lkksorpcommon -lkksorprenderer -lkksorpwrtembed -lkksgui -lkksqwt -lkkspluginmanager
+LIBS += -L$$DESTDIR 
+#важен порядок следования библиотек в списке!
+LIBS += \
+        -lkksorpwrtembed \
+        -lkksorpcommon \
+        -lkksorprenderer \
+        -ldataaccess \
+        -lkkscoreapplication \
+        -lkksapplication \
+        -lkksutils \
+        -lkkspp \
+        -lkksdatafactory \
+        -lkksguifactory \
+        -lkksgui \
+        -lkksqwt \
+        -lkkspluginmanager
 
 
 qgis{
