@@ -152,7 +152,7 @@ begin
             return refXML;
         end if;
 
-        refXML = xRecToXML(idObject, idRecord);
+        refXML = xRecToXML_private(idObject, idRecord);
 
     elsif(aType = 12 or aType = 17) then
         idRecords = aValue::int8[];
@@ -161,7 +161,7 @@ begin
             return refXML;
         end if;
 
-        refXML = xMultiRecToXML(idObject, idRecords);
+        refXML = xMultiRecToXML_private(idObject, idRecords);
 
     end if;
 
@@ -228,7 +228,7 @@ begin
         return refXML;
     end if;
 
-    refXML = xMultiRecToXML(idObject, idRecords);
+    refXML = xMultiRecToXML_private(idObject, idRecords);
 
     return refXML;
 end

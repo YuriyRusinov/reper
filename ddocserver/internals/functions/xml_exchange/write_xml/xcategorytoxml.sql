@@ -14,16 +14,22 @@ declare
     idChild2 int4;
 
     xml_str varchar;
+    full_xml_str varchar;
 begin
 
     catUUID := '';
     xml_str = '';
+    full_xml_str = '';
 
     if(idCategory isnull) then
-        return xml_str;
+        return '';
     end if;
     
     if(tagName <> 'document_category' and tagName <> 'table_category' and tagName <> 'table_indicators_category') then
+        return '';
+    end if;
+
+    if(xIsCategoryPrepared(idCategory) <> '') then
         return '';
     end if;
 
@@ -62,14 +68,18 @@ begin
 
 
     if(tagName = 'document_category' and idChild is not null and idChild > 0) then
-        xml_str := xml_str || xCategoryToXML(idChild, 'table_category');
+        full_xml_str := xml_str || xCategoryToXML(idChild, 'table_category');
 
         if(idChild2 is not null and idChild2 > 0) then
-            xml_str := xml_str || xCategoryToXML(idChild2, 'table_indicators_category');
+            full_xml_str := full_xml_str || xCategoryToXML(idChild2, 'table_indicators_category');
         end if;
+    else
+        full_xml_str := xml_str;
     end if;
 
-    return xml_str;
+    perform xInsertIntoTempTable(3::int2, NULL::int4, idCategory, asString(idCategory, false), xml_str);
+
+    return full_xml_str;
 end
 $BODY$
 language 'plpgsql';

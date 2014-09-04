@@ -20,6 +20,8 @@ begin
     rFieldsData = xGetRecordFields(idCategory);
 
     q = xGenerateSelectRecordsQuery(idObject, idCategory, tableName, idRecords);
+
+    --raise exception '!!! -- %', q;
     
     for qResult in execute q
     loop
@@ -28,7 +30,7 @@ begin
         
         xml_str = xRecordFieldsToXML(idObject, 
                                      idRecord, 
-                                     qResult.uuid_t::varchar, 
+                                     asString(qResult.uuid_t::uuid, false), 
                                      qResult.unique_id, 
                                      qResult.last_update, 
                                      rFieldsData.r_ids,

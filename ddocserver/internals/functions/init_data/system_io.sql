@@ -919,7 +919,7 @@ insert into attributes (unique_id, id, id_a_type, code, name, title, table_name,
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-101', 101, 9, 'report_name', 'Название шаблона', 'Название шаблона отчета', NULL, NULL, 150, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-102', 102, 9, 'report_descrip', 'Описание шаблона', 'Описание шаблона отчета', NULL, NULL, 150, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-103', 103, 8, 'report_grade', 'Уровень шаблона', 'Уровень шаблона отчета', NULL, NULL, 70, TRUE);
-insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-104', 104, 2, 'shb', 'Шаблон отчета', 'Шаблон отчета', 'report', 'report_name', 150, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-104', 104, 20, 'report_source', 'Шаблон отчета', 'Шаблон отчета', NULL, NULL, 150, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-105', 105, 9, 'p_value', 'Значение параметра', 'Значение параметра', NULL, NULL, 150, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-106', 106, 17, 'report_organization', 'Синхронизируемые организации', 'Синхронизируемые организации', 'organization', 'name', 200, TRUE);
 
@@ -1617,9 +1617,10 @@ insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is
 
 --таблица шаблонов отчетов
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (228, 71, 1, NULL, true, true); --id
-insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (229, 71, 101, NULL, true, false); --report_name
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (229, 71, 2, NULL, true, false); --name
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (230, 71, 102, NULL, false, false); --report_descrip
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (231, 71, 103, NULL, true, false); --report_grade
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (699, 71, 104, NULL, true, false); --report_source
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (232, 71, 106, NULL, false, false);--report_organization (separate table)
 
 --таблица поисковых запросов
@@ -2463,11 +2464,12 @@ insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (694, 234, 381, NULL, true, false); --interaction_type
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (695, 234, 382, NULL, true, false); --interaction_result
 
---таблица фопматов информационного взаимодействия с внешними системами
+--таблица форматов информационного взаимодействия с внешними системами
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (696, 230, 1, NULL, true, true); --id
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (697, 230, 2, NULL, true, false); --name
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (698, 230, 3, NULL, false, false);  --description
 
+--699 используется в справочнике шаблонов отчетов (поле report_source)
 
 SELECT pg_catalog.setval('attrs_categories_id_seq', 2000, true); --все пользовательские атрибуты в категориях будут начинаться с номера 2001
                                                                  --это сделано для того, чтобы оставить резерв для системных атрибутов
@@ -2631,9 +2633,9 @@ insert into access_table (id_io_object, id_role, allow_readlist, allow_read, all
 values (34, -10, TRUE, TRUE, FALSE, FALSE);
 
 insert into tbl_io_objects (unique_id, id, id_io_category, author, id_io_state, name, table_name, description, information, is_system, is_global, id_sync_type, insert_time, id_maclabel, id_owner_org, id_io_type)
-values ('localorg-io_objects-35', 35, 72, 1, 1, 'Справочник шаблонов отчетов', 'report', NULL, 'Системный объект', true, true, 5, current_timestamp, 1, NULL, 3);
+values ('localorg-io_objects-300', 300, 72, 1, 1, 'Справочник шаблонов отчетов', 'report', NULL, 'Системный объект', true, true, 5, current_timestamp, 1, NULL, 3);
 insert into access_table (id_io_object, id_role, allow_readlist, allow_read, allow_delete, allow_update)
-values (35, -10, TRUE, TRUE, FALSE, FALSE);
+values (300, -10, TRUE, TRUE, FALSE, FALSE);
 
 insert into tbl_io_objects (unique_id, id, id_io_category, author, id_io_state, name, table_name, description, information, is_system, is_global, id_sync_type, insert_time, id_maclabel, id_owner_org, id_io_type)
 values ('localorg-io_objects-36', 36, 74, 1, 1, 'Справочник поисковых запросов (фильтров)', 'search_templates', NULL, 'Системный объект', true, true, 5, current_timestamp, 1, NULL, 3);

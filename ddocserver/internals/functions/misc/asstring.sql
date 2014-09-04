@@ -393,7 +393,7 @@ begin
 	return 'NULL';
     end if;
     
-    sGeom := asEwkt(num);
+    sGeom := st_asEwkt(num);
 
     if(need_quote = true) then
         return quote_literal(sGeom);
@@ -421,6 +421,28 @@ begin
     end if;
 
     return bit_to_text(num)::varchar;
+end
+$BODY$
+language 'plpgsql';
+
+create or replace function asString(maclabel, boolean) returns varchar as
+$BODY$
+declare
+    num alias for $1;
+    needQuote alias for $2;
+    string varchar;
+begin
+    if(num isnull) then
+	return 'NULL';
+    end if;
+    
+    string := '' || num;
+
+    if(needQuote = TRUE) then
+        return quote_literal(string);
+    end if;
+    
+    return string;
 end
 $BODY$
 language 'plpgsql';

@@ -358,6 +358,7 @@ begin
     whatPart1 := whatPart1 || refTableName || asString('."r_icon", ', false);
     whatPart1 := whatPart1 || refTableName || asString('."record_fill_color", ', false);
     whatPart1 := whatPart1 || refTableName || asString('."record_text_color", ', false);
+    whatPart1 := whatPart1 || refTableName || asString('."rr_name", ', false);
 
     select 
         array_to_string(array_agg(refTableName || asString('."', false) || a.code || asString('"', false) ),  ',') into whatPart 
@@ -390,6 +391,10 @@ begin
     whatPart1 := whatPart1 || asString('new."last_update", ', false); 
     whatPart1 := whatPart1 || asString('new."uuid_t", ', false); 
     whatPart1 := whatPart1 || asString('new."id_io_state", ', false); 
+    whatPart1 := whatPart1 || asString('new."r_icon", ', false); 
+    whatPart1 := whatPart1 || asString('new."record_fill_color", ', false); 
+    whatPart1 := whatPart1 || asString('new."record_text_color", ', false); 
+    whatPart1 := whatPart1 || asString('new."rr_name", ', false); 
 
     select 
         array_to_string(array_agg(asString('new."', false) || a.code || asString('"', false)), ',') into whatPart 
@@ -415,6 +420,13 @@ begin
     columnsPart1 := columnsPart1 || asString('"last_update", ', false); 
     columnsPart1 := columnsPart1 || asString('"uuid_t", ', false); 
     columnsPart1 := columnsPart1 || asString('"id_io_state", ', false); 
+    columnsPart1 := columnsPart1 || asString('"r_icon", ', false); 
+    columnsPart1 := columnsPart1 || asString('"record_fill_color", ', false); 
+    columnsPart1 := columnsPart1 || asString('"record_text_color", ', false); 
+    columnsPart1 := columnsPart1 || asString('"rr_name", ', false); 
+
+
+
 
     columnsPart := columnsPart1 ||columnsPart;
 

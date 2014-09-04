@@ -25,3 +25,5 @@
 \i ./functions/misc/getrecordtable.sql
 
 \i ./functions/misc/getseconds.sql
+\i ./functions/misc/getprimarykey.sql
+\i ./functions/misc/f_clear_function.sql

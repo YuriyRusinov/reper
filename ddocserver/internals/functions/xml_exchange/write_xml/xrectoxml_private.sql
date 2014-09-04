@@ -1,4 +1,4 @@
-create or replace function xRecToXML(int4, int8) returns varchar as
+create or replace function xRecToXML_private(int4, int8) returns varchar as
 $BODY$
 declare
     idObject alias for $1;
@@ -12,18 +12,21 @@ declare
     ioTableName varchar;
 
     xml_str varchar;
-    cat_xml_str varchar;
-    infres_xml_str varchar;
-    recUUID varchar;
+    simple_xml_str varchar;
 
-    --idRecords int8[];
     r record;
     query varchar;
+    recUUID varchar;
     pkField varchar; --primary key of a table. Defined because of pk NOT always is ID
-    --result xml;
 begin
     if (idObject is null or idObject <= 0 or idRecord isnull or idRecord <= 0) then
         return null;
+    end if;
+
+    simple_xml_str = xIsRecordPrepared(idObject, idRecord);
+    if(simple_xml_str <> '') then
+        simple_xml_str := E'<inf_resource_ref> <![CDATA[ ' || simple_xml_str || E' ]]> </inf_resource_ref>\n';
+        return simple_xml_str;
     end if;
 
     for r in 
@@ -42,13 +45,12 @@ begin
         ioUniqueId = r.unique_id;
         ioTableName = r.table_name;
     end loop;
-
+                           
     if (idChild is null or idChild <= 0 or ioTableName is null) then
         raise exception 'Cannot find record with id = % in qualifier with id = %', idRecord, idObject;
         return null;
     end if;
 
-    perform xCreateTempTable();
     perform xCategoryToXML(idChild, 'table_category');
     perform xCategoryToXML(idChild2, 'table_indicators_category');
 
@@ -62,25 +64,27 @@ begin
     else
         query = 'select asString(uuid_t, false) as uid from ' || ioTableName || ' where ' || pkField || ' = ' || idRecord;
     end if;
+
     for r in execute query
     loop
         recUUID = r.uid;
     end loop;
+    
     if(recUUID isnull) then
         raise exception 'record uuid is NULL! Unexpected! tableName = %, idRecord = %', ioTableName, idRecord;
         return NULL;
     end if;
 
-    xml_str := E'<inf_resource root="true" uid="' || recUUID || E'">\n';
+    xml_str := E'<inf_resource root="false" uid="' || recUUID || E'">\n';
 
     xml_str := xml_str || E'<type> Record </type>\n';
-
+    
+    xml_str := xml_str || E'<category_description>\n';
     xml_str := xml_str || E'<table_category_uid> <![CDATA[ ' || asString(idChild, false) || E' ]]> </table_category_uid>\n';
-    if(idChild2 is not null) then 
+    if(idChild2 is not null) then
         xml_str := xml_str || E'<table_indicators_category_uid> <![CDATA[ ' || asString(idChild2, false) || E' ]]> </table_indicators_category_uid>\n';
     end if;
     xml_str := xml_str || E'</category_description>\n';
-    
 
     xml_str = xml_str || xRefQualifierToXML(idObject, ioUUID, ioUniqueId);
 
@@ -88,23 +92,12 @@ begin
 
     xml_str := xml_str || E'</inf_resource>\n';
 
-    cat_xml_str := E'<categories>\n';
-    cat_xml_str := cat_xml_str || xGetPreparedCategories();
-    cat_xml_str := cat_xml_str || E'</categories>\n';
+    perform xInsertIntoTempTable(2::int2, idObject, idRecord, recUUID, xml_str);
 
-    infres_xml_str := E'<inf_resources>\n';
-    infres_xml_str := infres_xml_str || xml_str;
-    xml_str := xGetPreparedRecords();
-    if(xml_str is not null) then
-        infres_xml_str := infres_xml_str || xml_str;
-    end if;
-    infres_xml_str := infres_xml_str || E'</inf_resources>\n';
+    simple_xml_str := E'<inf_resource_ref> <![CDATA[ ' || recUUID || E' ]]> </inf_resource_ref>\n';
+    return simple_xml_str;
 
-    xml_str := cat_xml_str || infres_xml_str;
-
-    perform xDropTempTable();
-
-    return xml_str;
+    --return xml_str;
 end
 $BODY$
 language 'plpgsql';

@@ -1,4 +1,4 @@
-create or replace function xMultiRecToXML(int4, int8[]) returns varchar as
+create or replace function xMultiRecToXML_private(int4, int8[]) returns varchar as
 $BODY$
 declare
     idObject alias for $1;
@@ -12,9 +12,6 @@ declare
     ioTableName varchar;
 
     xml_str varchar;
-    cat_xml_str varchar;
-    infres_xml_str varchar;
-
     r record;
     cnt int4;
 begin
@@ -49,7 +46,6 @@ begin
         return null;
     end if;
 
-    perform xCreateTempTable();
     perform xCategoryToXML(idChild, 'table_category');
     perform xCategoryToXML(idChild2, 'table_indicators_category');
 
@@ -57,11 +53,13 @@ begin
 
     xml_str := xml_str || E'<type> MultiRecord </type>\n';
     
+    xml_str := xml_str || E'<category_description>\n';
     xml_str := xml_str || E'<table_category_uid> <![CDATA[ ' || asString(idChild, false) || E' ]]> </table_category_uid>\n';
-    if(idChild2 is not null) then 
+    if(idChild2 is not null) then
         xml_str := xml_str || E'<table_indicators_category_uid> <![CDATA[ ' || asString(idChild2, false) || E' ]]> </table_indicators_category_uid>\n';
     end if;
     xml_str := xml_str || E'</category_description>\n';
+
 
     xml_str = xml_str || xRefQualifierToXML(idObject, ioUUID, ioUniqueId);
 
@@ -69,21 +67,7 @@ begin
 
     xml_str := xml_str || E'</inf_resource>\n';
 
-    cat_xml_str := E'<categories>\n';
-    cat_xml_str := cat_xml_str || xGetPreparedCategories();
-    cat_xml_str := cat_xml_str || '</categories>';
-
-    infres_xml_str := E'<inf_resources>\n';
-    infres_xml_str := infres_xml_str || xml_str;
-    xml_str := xGetPreparedRecords();
-    if(xml_str is not null) then
-        infres_xml_str := infres_xml_str || xml_str;
-    end if;
-    infres_xml_str := infres_xml_str || E'</inf_resources>\n';
-
-    xml_str := cat_xml_str || infres_xml_str;
-
-    perform xDropTempTable();
+    --raise exception '%', xml_str;
 
     return xml_str;
 end

@@ -100,12 +100,13 @@ declare
     q varchar;
     r record;
     recCnt int4;
+    pkField varchar;
 begin
 
     if(idObject = 7 or idObject > 300) then
         q = 'select id::int8, uuid_t, unique_id, last_update, ';
     else
-        q = 'select id::int8, ' || quote_literal('00000000-0000-0000-0000-000000000000') || ' as uuid_t, unique_id, last_update, ';
+        q = 'select id::int8, ' || quote_literal('00000000-0000-0000-0000-000000000000') || '::uuid as uuid_t, unique_id, last_update, ';
     end if;
 
     query = xGenerateSelectFieldsQuery(idCategory);
@@ -122,9 +123,11 @@ begin
 
     q = q || ' as fields ';
 
+    pkField = getPrimaryKey(tableName);
+    
     recCnt = array_upper(idRecords, 1);
     if(idRecords is not null and recCnt is not null and recCnt > 0) then
-        q = q || ' from ' || tableName || ' where id = ANY(' || asString(idRecords, true) || ') ';
+        q = q || ' from ' || tableName || ' where ' || pkField || ' = ANY(' || asString(idRecords, true) || ') ';
     else
         q = q || ' from ' || tableName;
     end if;

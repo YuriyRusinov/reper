@@ -1,7 +1,8 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     09.06.2014 11:39:29                          */
+/* Created on:     03.09.2014 17:00:45                          */
 /*==============================================================*/
+
 
 /*==============================================================*/
 /* Table: root_table                                            */
@@ -3786,22 +3787,129 @@ select createTriggerUID('record_rubricator');
 /* Table: report                                                */
 /*==============================================================*/
 create table report (
-   id                   SERIAL               not null,
+--   id                   SERIAL               not null,
+   report_id            INT4                 not null,
+   name                 VARCHAR              not null,
    report_name          VARCHAR              not null,
    report_descrip       VARCHAR              null,
    report_grade         INT4                 not null,
    report_source        VARCHAR              not null,
    constraint PK_REPORT primary key (id)
 )
-inherits (root_table);
+inherits (q_base_table);
 
 comment on table report is
 'системный справочник "Справочник шаблонов отчетов".
-Используется генератором отчетов
-данный справочник является глобальным объектового ведения, интегрируемым- т.е. на каждом объекте ведется своя таблица, но она может дополняться данными аналогичной таблицы другого объекта';
+Используется генератором отчетов openRPT.
+
+генератор отчетов OpenRPT, который работает с данной таблицей, требует, чтобы в данном справочнике было поле report_id и считает его первичным ключем. Поэтому кроме всего прочего на данную таблицу назначен триггер который дублирует значение поля id в это поле.
+
+данный справочник является глобальным объектового ведения, интегрируемым- т.е. на каждом объекте ведется своя таблица, но она может дополняться данными аналогичной таблицы другого объекта.';
+
+comment on column report.report_id is
+'генератор отчетов OpenRPT, который работает с данной таблицей, требует, чтобы это поле было и считает его первичным ключем. Поэтому кроме всего прочего на данную таблицу назначен триггер который дублирует значение поля id в это поле';
 
 select setMacToNULL('report');
 select createTriggerUID('report');
+
+create or replace function check_report_id() returns trigger as
+$BODY$
+declare
+    
+begin
+    if(new.report_id isnull) then
+        new.report_id = new.id;
+    end if;
+
+    if(new.report_name isnull and new.name is not null) then
+        new.report_name = new.name;
+    end if;
+
+    if(new.report_name is not null and new.name isnull) then
+        new.name = new.report_name;
+    end if;
+
+    return new;
+end
+$BODY$
+language 'plpgsql';
+
+--необходимо, чтобы данный триггер отрабатывал раньше, чем триггер trgsetuid, 
+--который задает значение колонке rr_name, используя значение колонки name
+--поэтому называться он должен так, чтобы по алфавиту раньше шел.
+create trigger trg_check_report_id
+before insert or update
+on report
+for each row 
+execute procedure check_report_id();
+
+
+
+create or replace function fkQBaseTableCheck1() returns trigger as
+$BODY$
+declare
+    theId int8;
+begin
+    if(TG_OP = 'UPDATE') then
+        if(old.id <> new.id) then
+            raise exception E'Change of primary keys on DynamicDocs tables is unsupported!';
+            return NULL;
+        end if;
+        return new;
+    end if;
+
+    delete from rec_attrs_attrs_values where id_rec_attr_value in (select id from rec_attrs_values where id_record = old.id);
+    delete from rec_attrs_values where id_record = old.id;
+    delete from rubric_records where id_record = old.id;
+    delete from rubric_records where id_rubric in (select id from recGetRubrics(old.id) where type in (0, 1));
+    delete from record_rubricator where id in (select id from recGetRubrics(old.id) where type in (0, 1));
+    delete from urls_records where id_record = old.id;
+
+    return old;
+end
+$BODY$
+language 'plpgsql';
+
+create trigger trg_fk_q_base_table_check1
+before update or delete
+on report
+for each row 
+execute procedure fkQBaseTableCheck1();
+
+
+create or replace function generateUUID() returns uuid as
+$BODY$
+declare
+    
+begin
+    return uuid_generate_v1();
+end
+$BODY$
+language 'plpgsql';
+
+
+create or replace function uuidCheck() returns trigger as
+$BODY$
+declare
+    tableName varchar;
+    uuid_t uuid;
+begin
+
+    if(new.uuid_t isnull) then
+        new.uuid_t = generateUUID();
+    end if;
+
+    return new;
+end
+$BODY$
+language 'plpgsql';
+
+
+create trigger trgSetUUID
+before insert or update
+on report
+for each row 
+execute procedure uuidCheck();
 
 /*==============================================================*/
 /* Table: report_organization                                   */
@@ -3868,7 +3976,6 @@ create table roles_actions (
 );
 
 select setMacToNULL('roles_actions');
-
 
 /*==============================================================*/
 /* Table: rubric_records                                        */

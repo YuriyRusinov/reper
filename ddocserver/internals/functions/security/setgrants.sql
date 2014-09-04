@@ -160,68 +160,67 @@ begin
     insTables[9] = 'mail_lists_position';
 
     insTables[10] = 'report';
-    insTablesSeq[4] = 'report_id_seq';
     
     insTables[11] = 'user_chains';
-    insTablesSeq[5] = 'user_chains_id_seq';
+    insTablesSeq[4] = 'user_chains_id_seq';
     insTables[12] = 'user_handlers_data';
 
     insTables[13] = 'user_templates';--insert controlled from trigger
 
     insTables[14] = 'io_rubricator';
     insTables[15] = 'rubricator';
-    insTablesSeq[6] = 'rubricator_id_seq';
+    insTablesSeq[5] = 'rubricator_id_seq';
     insTables[16] = 'user_rubricator';--insert controlled from trigger
 
     
     insTables[17] = 'search_templates';
-    insTablesSeq[7] = 'search_templates_id_seq';
+    insTablesSeq[6] = 'search_templates_id_seq';
     insTables[18] = 'groups';
-    insTablesSeq[8] = 'groups_id_seq';
+    insTablesSeq[7] = 'groups_id_seq';
     insTables[19] = 'criteria_types';
-    insTablesSeq[9] = 'criteria_types_id_seq';
+    insTablesSeq[8] = 'criteria_types_id_seq';
     insTables[20] = 'criteria';
-    insTablesSeq[10] = 'criteria_id_seq';
+    insTablesSeq[9] = 'criteria_id_seq';
     insTables[21] = 'operations';
-    insTablesSeq[11] = 'operations_id_seq';
+    insTablesSeq[10] = 'operations_id_seq';
     insTables[22] = 'groups_criteria';
 
 --just full access
     --xml
     ---???
     insTables[23] = 'xml_query_types';
-    insTablesSeq[12] = 'xml_query_types_id_seq';
+    insTablesSeq[11] = 'xml_query_types_id_seq';
     insTables[24] = 'xml_formats';
-    insTablesSeq[13] = 'xml_formats_id_seq';
+    insTablesSeq[12] = 'xml_formats_id_seq';
     insTables[25] = 'xml_paths';
-    insTablesSeq[14] = 'xml_paths_id_seq';
+    insTablesSeq[13] = 'xml_paths_id_seq';
     insTables[26] = 'xml_query_kinds';
-    insTablesSeq[15] = 'xml_query_kinds_id_seq';
+    insTablesSeq[14] = 'xml_query_kinds_id_seq';
     insTables[27] = 'xml_queries';
-    insTablesSeq[16] = 'xml_queries_id_seq';
+    insTablesSeq[15] = 'xml_queries_id_seq';
     insTables[28] = 'xml_query_responses';
-    insTablesSeq[17] = 'xml_query_responses_id_seq';
+    insTablesSeq[16] = 'xml_query_responses_id_seq';
 
     insTables[29] = 'urls_objects';
     insTables[30] = 'attrs_groups';
     insTables[31] = 'indicator_type';
-    insTablesSeq[18] = 'indicator_type_id_seq';
+    insTablesSeq[17] = 'indicator_type_id_seq';
     insTables[32] = 'indicator';
-    insTablesSeq[19] = 'indicator_id_seq';
+    insTablesSeq[18] = 'indicator_id_seq';
     insTables[33] = 'indicators_values';
-    insTablesSeq[20] = 'indicators_values_id_seq';
+    insTablesSeq[19] = 'indicators_values_id_seq';
     insTables[34] = 'io_types';
-    insTablesSeq[21] = 'io_types_id_seq';
+    insTablesSeq[20] = 'io_types_id_seq';
     insTables[35] = 'search_template_types';
-    insTablesSeq[22] = 'search_template_types_id_seq';
+    insTablesSeq[21] = 'search_template_types_id_seq';
     insTables[36] = 'attrs_attrs_values';
-    insTablesSeq[23] = 'attrs_attrs_values_id_seq';
+    insTablesSeq[22] = 'attrs_attrs_values_id_seq';
 --    insTables[37] = 'rec_attrs_values';
 --    insTablesSeq[24] = 'rec_attrs_values_id_seq';
     insTables[37] = 'urls_records';
 --    insTablesSeq[24] = 'urls_records_id_seq';
     insTables[38] = 'record_rubricator';
-    insTablesSeq[24] = 'record_rubricator_id_seq';
+    insTablesSeq[23] = 'record_rubricator_id_seq';
     insTables[39] = 'rubric_records';
 --    insTablesSeq[25] = 'rubric_records_id_seq';
 
