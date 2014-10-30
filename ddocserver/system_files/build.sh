@@ -91,6 +91,7 @@ chmod a+x ./configure
 chmod a+x ./build-aux/autogen.sh
 ./build-aux/autogen.sh &&
 ./configure $LIBFLOADER_OPTIONS &&
+printf "libfloader begins\n"
 make -f Makefile &&
 LIBFLOADER_BUILD=1
 
