@@ -46,8 +46,9 @@ begin
             --в этом случае в таблицу исходящей очереди надо записать XML-сообщение с данной квитанцией
             if(isLocalDl(msg.id_dl_sender) = FALSE and isDDocDl(msg.id_dl_sender) = false) then --отправляем только ДЛ, которые имеют тип "ДЛ во внешней сопрягаемой системе"
 
-            if(old.is_outed = true and isLocalDl(old.id_dl_receiver) = TRUE and isLocalDl(old.id_dl_sender) = FALSE) then
-                new.is_outed = false;
+                if(old.is_outed = true and isLocalDl(old.id_dl_receiver) = TRUE and isLocalDl(old.id_dl_sender) = FALSE) then
+                    new.is_outed := false;
+                end if;
             end if;
         end if;
 
@@ -56,33 +57,33 @@ begin
 
     --TG_OP = INSERT
     if(new.id_urgency_level isnull) then
-        new.id_urgency_level = 1;
+        new.id_urgency_level := 1;
     end if;
 
     if(new.sent_datetime isnull) then
-        new.sent_datetime = current_timestamp;
+        new.sent_datetime := current_timestamp;
     end if;
 
     idUser = getCurrentUser();
 
     if(idUser = 2) then --jupiter
-        new.read_datetime = NULL;
-        new.receive_datetime = current_timestamp;
-        new.is_outed = false;
+        new.read_datetime := NULL;
+        new.receive_datetime := current_timestamp;
+        new.is_outed := false;
     else
         select isLocalDl(new.id_dl_receiver) into isLocal;
         if(isLocal = true) then
-            new.is_outed = true;
-            new.receive_datetime = new.sent_datetime;
+            new.is_outed := true;
+            new.receive_datetime := new.sent_datetime;
         else
-            new.is_outed = false;
-            new.receive_datetime = NULL;
-            new.read_datetime = NULL;
+            new.is_outed := false;
+            new.receive_datetime := NULL;
+            new.read_datetime := NULL;
         end if;
     end if;
 
-    tableName = TG_RELNAME;
-    localId = new.id;
+    tableName := TG_RELNAME;
+    localId := new.id;
 
     --учетные номера
     --входящий и исходящий
@@ -92,12 +93,12 @@ begin
     if(idUser = 2) then --jupiter
         new.input_number = generateUID(localId, tableName);
         if(new.output_number isnull) then
-            new.output_number = '';
+            new.output_number := '';
         end if;
         --new.output_number = -- без изменений
     else
-        new.output_number = generateUID(localId, tableName);
-        new.input_number = '';
+        new.output_number := generateUID(localId, tableName);
+        new.input_number := '';
     end if;
 
     if(new.input_number isnull or new.output_number isnull) then
@@ -107,7 +108,8 @@ begin
 
     return new;
 
-end$BODY$
+end
+$BODY$
 language 'plpgsql';
 
 select f_safe_drop_trigger('trgmsgjinsert', 'message_journal');
