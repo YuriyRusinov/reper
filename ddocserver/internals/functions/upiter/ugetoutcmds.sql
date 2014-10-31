@@ -117,8 +117,8 @@ begin
             and p2.id = cmd.id_dl_executor
             and p3.id = cmd.id_dl_to
             and (
-                (cmd.id_jr_state = 1 and isLocalDl(cmd.id_dl_executor) = FALSE)
-                --or (cmd.id_jr_state = 1 and isLocalDl(cmd.id_dl_to) = FALSE)
+                --отправляем только должностным лицам, которые находятся на удаленных истемах и имеют тип "ДЛ в системе DynamicDocs"
+                (cmd.id_jr_state = 1 and isLocalDl(cmd.id_dl_executor) = FALSE and isDDocDl(cmd.id_dl_executor) = true) 
                 or (cmd.id_jr_state = 7 and isLocalDl(cmd.id_dl_executor) = TRUE) --virtual also transferred
                 )            
             and p1.id_unit = u1.id
@@ -222,7 +222,8 @@ begin
             and p3.id = cmd.id_dl_to
             and (
                 --( cmd.id_jr_state = 1 and isLocalDl(cmd.id_dl_executor) = FALSE)
-                (cmd.id_jr_state = 1 and isLocalDl(cmd.id_dl_to) = FALSE)
+                --отправляем только должностным лицам, которые находятся на удаленных истемах и имеют тип "ДЛ в системе DynamicDocs"
+                (cmd.id_jr_state = 1 and isLocalDl(cmd.id_dl_to) = FALSE and isDDocDl(cmd.id_dl_to) = true)
                 or (cmd.id_jr_state = 7 and isLocalDl(cmd.id_dl_executor) = TRUE) --virtual also transferred
                 )            
             and p1.id_unit = u1.id
@@ -310,7 +311,8 @@ begin
             and p2.id = cmd.id_dl_executor
             and p3.id = cmd.id_dl_to
             and (
-                (cmd.id_jr_state = 1 and isLocalDl(cmd.id_dl_executor) = FALSE)
+                --отправляем только должностным лицам, которые находятся на удаленных истемах и имеют тип "ДЛ в системе DynamicDocs"
+                (cmd.id_jr_state = 1 and isLocalDl(cmd.id_dl_executor) = FALSE and isDDocDl(cmd.id_dl_executor) = true)
                 or (cmd.id_jr_state = 7 and isLocalDl(cmd.id_dl_executor) = TRUE) --virtual also transferred
                 )
             and p1.id_unit = u1.id

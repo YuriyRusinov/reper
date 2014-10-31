@@ -12,6 +12,9 @@ declare
 
     idChild int4;
     idChild2 int4;
+    childCatUniqueId varchar;
+    child2CatUniqueId varchar;
+
 
     xml_str varchar;
     full_xml_str varchar;
@@ -33,13 +36,22 @@ begin
         return '';
     end if;
 
-    for r in select unique_id, name, description, id_child, id_child2 from io_categories where id = idCategory
+    for r in 
+        select c1.unique_id, c1.name, c1.description, c1.id_child, c1.id_child2, c2.unique_id as child_unique_id, c3.unique_id as child2_unique_id
+        from 
+            io_categories c1 
+            left join io_categories c2 on (c1.id_child = c2.id)
+            left join io_categories c3 on (c1.id_child2 = c3.id)
+        where c1.id = idCategory
+
     loop
         catUniqueId = r.unique_id;
         catName = r.name;
         catDesc = r.description;
         idChild = r.id_child;
         idChild2 = r.id_child2;
+        childCatUniqueId = r.child_unique_id;
+        child2CatUniqueId = r.child2_unique_id;
     end loop;
 
     if(catUniqueId isnull) then
@@ -53,6 +65,12 @@ begin
     xml_str := xml_str || E'<uuid_t> <![CDATA[ ' || catUUID || E' ]]> </uuid_t>\n';
     xml_str := xml_str || E'<unique_id> <![CDATA[ ' || catUniqueId || E' ]]> </unique_id>\n';
     xml_str := xml_str || E'<name> <![CDATA[ ' || catName || E' ]]> </name>\n';
+    if(idChild is not null) then
+        xml_str := xml_str || E'<table_category_uid> <![CDATA[ ' || childCatUniqueId || E' ]]> </table_category_uid>\n';
+    end if;
+    if(idChild2 is not null) then
+        xml_str := xml_str || E'<table_indicators_category_uid> <![CDATA[ ' || child2CatUniqueId || E' ]]> </table_indicators_category_uid>\n';
+    end if;
 
     if(catDesc is not null) then
         xml_str := xml_str || E'<description> <![CDATA[ ' || catDesc || E' ]]> </description>\n';

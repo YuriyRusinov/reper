@@ -7,6 +7,11 @@ declare
     idCategory int4;
     idChild int4;
     idChild2 int4;
+
+    categoryUid varchar;
+    tableCategoryUid varchar;
+    indCategoryUid varchar;    
+
     ioUUID varchar;
     ioUniqueId varchar;
     ioTableName varchar;
@@ -25,17 +30,29 @@ begin
     end if;
     
     for r in 
-        select 
+        select
             io.unique_id,
             io.uuid_t,
             io.table_name,
             c.id_child, 
-            c.id_child2 
-        from io_objects io, io_categories c 
-        where io.id = idObject and io.id_io_category = c.id
+            c.id_child2,
+            c.unique_id as c_uid,
+            c1.unique_id as c1_uid,
+            c2.unique_id as c2_uid
+        from 
+            io_objects io
+            inner join io_categories c on (io_id_io_category = c.id)
+            left join io_categories c1 on (c.id_child = c1.id)
+            left join io_categories c2 on (c.id_child2 = c2.id)
+        where io.id = idObject
     loop
         idChild = r.id_child;
         idChild2 = r.id_child2;
+
+        categoryUid = r.c_uid;
+        tableCategoryUid = r.c1_uid;
+        indCategoryUid = r.c2_uid;
+
         ioUUID = r.uuid_t;
         ioUniqueId = r.unique_id;
         ioTableName = r.table_name;
@@ -54,14 +71,14 @@ begin
     xml_str := xml_str || E'<type> MultiRecord </type>\n';
     
     xml_str := xml_str || E'<category_description>\n';
-    xml_str := xml_str || E'<table_category_uid> <![CDATA[ ' || asString(idChild, false) || E' ]]> </table_category_uid>\n';
-    if(idChild2 is not null) then
-        xml_str := xml_str || E'<table_indicators_category_uid> <![CDATA[ ' || asString(idChild2, false) || E' ]]> </table_indicators_category_uid>\n';
+    xml_str := xml_str || E'<table_category_uid> <![CDATA[ ' || tableCategoryUid || E' ]]> </table_category_uid>\n';
+    if(indCategoryUid is not null) then
+        xml_str := xml_str || E'<table_indicators_category_uid> <![CDATA[ ' || indCategoryUid || E' ]]> </table_indicators_category_uid>\n';
     end if;
     xml_str := xml_str || E'</category_description>\n';
 
 
-    xml_str = xml_str || xRefQualifierToXML(idObject, ioUUID, ioUniqueId);
+    xml_str = xml_str || xRefQualifierToXML(idObject, ioUUID, ioUniqueId, ioTableName);
 
     xml_str := xml_str || xRecordsToXML(idObject, idRecords);
 

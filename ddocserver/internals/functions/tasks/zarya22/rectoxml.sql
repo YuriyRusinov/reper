@@ -5,7 +5,7 @@ declare
     idObject alias for $2;
     idRecord alias for $3;
     idDlSender alias for $4;
-    idAddrList alias for $5;
+    idAddrList alias for $5;  --dynamicdocs dls!!!
 
     idCategory int4;
     result xml;
@@ -17,6 +17,8 @@ declare
     r record;
     query varchar;
     tableName varchar;
+
+    idAddrListShu int4[];  --dls in shushun terms!
     --regNumber varchar;
 begin
 
@@ -34,9 +36,19 @@ begin
     xml_str := E'<?xml version="1.0" encoding="UTF-8"?>\n<msg>';
     xml_str := xml_str || E'\n';
 
-    --
-    --
-    select into xml_msg_passport createRecPassport (idObject, idRecord, idMsg, idDlSender, idAddrList, 1);--, regNumber, 1);
+    idAddrListShu = ARRAY[]::int4[];
+    raise warning E'Receivres list = % \n', idAddrList;
+    for r in select sdp.id_shu_dls from shu_dls_position sdp where id_position = ANY(idAddrList)
+    loop
+        idAddrListShu = idAddrListShu || r.id_shu_dls;
+    end loop;
+
+    if(array_upper(idAddrListShu, 1) < 1) then
+        raise warning 'There no correcponding receiver in shushun tables for sending! Exiting...';
+        return NULL;
+    end if;
+    
+    select into xml_msg_passport createRecPassport (idObject, idRecord, idMsg, idDlSender, idAddrListShu, 1);--, regNumber, 1);
     if (xml_msg_passport is null) then
         raise warning 'Invalid passport';
         return null;

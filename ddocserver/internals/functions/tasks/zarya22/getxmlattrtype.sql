@@ -9,7 +9,7 @@ begin
     elseif(xmlType = 'Boolean') then
         return 1;
     elseif(xmlType = 'Integer') then
-        return 8;
+        return 30; --64 bits
     elseif(xmlType = 'Double') then
         return 6;
     elseif(xmlType = 'Date') then

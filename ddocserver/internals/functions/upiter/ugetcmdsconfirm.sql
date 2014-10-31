@@ -41,6 +41,7 @@ begin
         where
             cfm.id_cmd = cmd.id
             and isLocalDl(cmd.id_dl_from) = FALSE
+            and isDDocDl(cmd.id_dl_from) = true --отправляем только ДЛ, которые имеют тип "ДЛ в системе DynamicDocs"
     loop
         if(r.full_address is not null) then
             return next r;
@@ -83,6 +84,7 @@ begin
         where
             cfm.id_cmd = cmd.id
             and isLocalDl(cmd.id_dl_to) = FALSE
+            and isDDocDl(cmd.id_dl_to) = true --отправляем только ДЛ, которые имеют тип "ДЛ в системе DynamicDocs"
 
     loop
         if(r.full_address is not null) then

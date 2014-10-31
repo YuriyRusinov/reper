@@ -2,7 +2,12 @@ create or replace function trgOutExternalQueue() returns trigger as
 $BODY$
 declare
 begin
-    perform pg_notify('out_external_queue', asString(new.id, true));
+    if(getLocalOrgId() <> new.id_organization) then
+        perform pg_notify('out_external_queue', asString(new.id, true));
+        return new;
+    end if;
+
+    insert into in_external_queue (id_organization, id_format, in_data, interaction_type, interaction_result) values(new.id_organization, new.id_format, new.out_data, new.interaction_type, 1);
 
     return new;
 end

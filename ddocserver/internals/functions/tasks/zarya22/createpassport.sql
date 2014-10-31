@@ -4,7 +4,7 @@ $BODY$
 declare
     idObject alias for $1;
     idMsg alias for $2;
-    idAddrList alias for $3;
+    idAddrList alias for $3; --shushun dls!!!
     msgKind alias for $4;
     
     regNumber varchar;
@@ -36,6 +36,7 @@ begin
     limitFileSize := 2048;
     limitFileSize := limitFileSize*1024;
     limitFileSize := limitFileSize*1024;
+
     select into idPos getcurrentdl();
     if (idPos is null or idPos < 0) then
         raise warning 'Invalid position';
@@ -52,9 +53,10 @@ begin
 
     --   ,         doc_name
     if (idObject is not null) then
-        for rec in select io.name, io.description from io_objects io where io.id = idObject
+        for rec in select io.name, io.description, io.unique_id from io_objects io where io.id = idObject
         loop
             docName = rec.name;
+            regNumber = rec.unique_id;
             docRef = rec.description;
         end loop;
     end if;
@@ -63,7 +65,7 @@ begin
         for rec in select unique_id, id_urgency_level from message_journal where id = idMsg
         loop
             --if(rec.id_)
-            regNumber = rec.unique_id;
+            regNumber = rec.unique_id; --при отправке ИО как вложения сообщения из message_journal переписываем его unique_id
             msgPriority = rec.id_urgency_level;
         end loop;
     end if;

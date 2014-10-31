@@ -6,6 +6,8 @@ declare
     muid varchar;
     idt int4;
     val xml;
+ 
+    idOrganization int4; --org for send xml to
 
     idShuDl int4;
     ids int4[];
@@ -21,7 +23,23 @@ begin
     if(idShuDl isnull) then
         return new;
     end if;
-    
+
+    select 
+        o.id into idOrganization 
+        from 
+            organization o, 
+            units u, 
+            "position" p
+        where
+            p.id = new.id_dl_receiver
+            and p.id_position_type = 2 -- ДЛ в сопрягаемой унаследлванной системе. Только в этом случе мы сгенерируем XML!
+            and p.id_unit = u.id
+            and u.id_organization = o.id;
+
+    if(idOrganization isnull) then
+        raise exception E'The message is addressed to remove user. But we couldnt resolve the corresponding organization!\n';
+        return NULL;
+    end if;
 
     ids[1] = idShuDl;
 
@@ -40,7 +58,12 @@ begin
 
     
 
-    select jms_schema.add_out_mes (muid, 0, 0, false, xml2Text) into idt;
+    --select jms_schema.add_out_mes (muid, 0, 0, false, xml2Text) into idt;
+    if(new.id_io_object isnull) then
+        perform sendEIOToExternalSystem(idOrganization, 3, 20, new.id, xml2Text); --3 - shushun
+    else
+        perform sendIOToExternalSystem(idOrganization, 3, new.id_io_object, xml2Text); --3 - shushun
+    end if;
 
     return new;
 end

@@ -4,6 +4,10 @@ declare
 begin
     perform pg_notify('in_external_queue', asString(new.id, true));
 
+    if(new.id_format = 3) then --shushun
+        perform ioFromXML (new.in_data);
+    end if;
+
     return new;
 end
 $BODY$

@@ -47,8 +47,6 @@ begin
 
     end loop;
 
-    raise notice '%', insertQuery;
-
     execute insertQuery;
 
     return 1;

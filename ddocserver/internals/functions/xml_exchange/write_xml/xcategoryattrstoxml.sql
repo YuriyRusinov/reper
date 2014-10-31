@@ -15,8 +15,8 @@ begin
                   a.id as id_attribute, 
                   a.unique_id as unique_id,
                   a.code as a_code, 
-                  a.name as a_name, 
                   a.title as a_title, 
+                  a.name as a_name, 
                   a.table_name, 
                   a.column_name, 
                   a.ref_column_name as ref_column_name,
@@ -46,7 +46,7 @@ begin
                                                  r.unique_id, 
                                                  r.a_code, 
                                                  r.a_title, 
-                                                 r.a_name, 
+                                                 r.a_name,
                                                  r.id_a_type, 
                                                  r.table_name, 
                                                  r.column_name, 
@@ -72,14 +72,13 @@ end
 $BODY$
 language 'plpgsql';
 
-
 create or replace function xCategoryAttrToXML(int4,    --index
                                               int4,    --id
                                               varchar, --uuid_t
                                               varchar, --unique_id
                                               varchar, --code
-                                              varchar, --title (name)
-                                              varchar, --name (description)
+                                              varchar, --title 
+                                              varchar, --name
                                               int4,    --type
                                               varchar, --table_name
                                               varchar, --column_name
@@ -119,8 +118,8 @@ begin
     xml_str := xml_str || E'<uuid_t> <![CDATA[ ' || aUUID || E' ]]> </uuid_t>\n';
     xml_str := xml_str || E'<unique_id> <![CDATA[ ' || aUniqueId || E' ]]> </unique_id>\n';
     xml_str := xml_str || E'<code> ' || aCode || E' </code>\n';
-    xml_str := xml_str || E'<name> <![CDATA[ ' || aTitle || E' ]]> </name>\n';
-    xml_str := xml_str || E'<text_description> <![CDATA[ ' || aName || E' ]]> </text_description>\n';
+    xml_str := xml_str || E'<title> <![CDATA[ ' || aTitle || E' ]]> </title>\n';
+    xml_str := xml_str || E'<name> <![CDATA[ ' || aName || E' ]]> </name>\n';
 
     if(aTableName is not null) then
         xml_str := xml_str || E'<table_name> ' || aTableName || E' </table_name>\n';
@@ -137,7 +136,11 @@ begin
     if(aRefColumnName is not null) then
         xml_str := xml_str || E'<ref_column_name> ' || aRefColumnName || E' </ref_column_name>\n';
     else
-        xml_str := xml_str || E'<ref_column_name> id </ref_column_name>\n';
+        if(aColumnName is not null) then
+            xml_str := xml_str || E'<ref_column_name> id </ref_column_name>\n';
+        else
+            xml_str := xml_str || E'<ref_column_name> </ref_column_name>\n';
+        end if;
     end if;
     
     xml_str := xml_str || E'<mandatory> ' || asString(aIsMandatory, false) || E' </mandatory>\n';

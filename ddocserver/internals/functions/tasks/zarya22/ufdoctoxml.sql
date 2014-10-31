@@ -125,7 +125,9 @@ begin
             xml_str := xml_str || E'String';
         elsif (rattr.id_a_type = 1) then
             xml_str := xml_str || E'Boolean';
-        elsif (rattr.id_a_type = 8) then
+        elsif (rattr.id_a_type = 8) then --32 bits
+            xml_str := xml_str || E'Integer';
+        elsif (rattr.id_a_type = 30) then --64 bits
             xml_str := xml_str || E'Integer';
         elsif (rattr.id_a_type = 6) then
             xml_str := xml_str || E'Double';

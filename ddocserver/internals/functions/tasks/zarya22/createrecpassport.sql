@@ -5,8 +5,8 @@ declare
     idObject alias for $1;
     idRec alias for $2;
     idMsg alias for $3;
-    idDlSender alias for $4;
-    idAddrList alias for $5;
+    idDlSender alias for $4; --dynamicdocs dl
+    idAddrList alias for $5; --dls in shushun terms!
     msgKind alias for $6;
     
     regNumber varchar;

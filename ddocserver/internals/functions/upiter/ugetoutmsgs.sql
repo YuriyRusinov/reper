@@ -75,6 +75,7 @@ begin
             and p2.id_unit = u.id
             and msg.is_outed = false
             and isLocalDl(msg.id_dl_receiver) = FALSE
+            and isDDocDl(msg.id_dl_receiver) = true --отправляем только ДЛ, которые имеют тип "ДЛ в системе DynamicDocs"
     loop
         if(r.full_address is not null) then
             return next r;
@@ -138,6 +139,7 @@ begin
             and p2.id_unit = u.id
             and msg.is_outed = false
             and isLocalDl(msg.id_dl_receiver) = FALSE
+            and isDDocDl(msg.id_dl_receiver) = true --отправляем только ДЛ, которые имеют тип "ДЛ в системе DynamicDocs"
         limit 1
     loop
         if(r.full_address is not null) then

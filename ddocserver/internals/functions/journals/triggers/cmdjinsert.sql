@@ -44,6 +44,9 @@ begin
         --если от имени jupiter, то распор€жение €вл€етс€ вход€щим из удаленной системы и мы ему задаем вход€щий. исход€щий оставл€ем неизменным
         if(idUser = 2) then --jupiter
             new.input_number = generateUID(localId, tableName);
+            if(new.output_number isnull) then
+                new.output_number = '';
+            end if;
             --new.output_number = -- без изменений
         else
             new.output_number = generateUID(localId, tableName);
@@ -100,10 +103,12 @@ begin
     if(old.id_jr_state <> new.id_jr_state and new.id_jr_state = 3) then --executing
 
 --TODO 
---надо провер€ть, а надоо ли добавл€ть запись в эту таблицу. ќна используетс€ при информационном обмене.
+--надо провер€ть, а надо ли добавл€ть запись в эту таблицу. ќна используетс€ при информационном обмене.
 --поэтому если команда выдаетс€ локально или пришла из внешней унаследованной системы, то наверное сюда
 --добавл€ть ничего не надо
-        insert into cmd_confirmations (id_cmd) values(new.id);
+        if(isLocalDl(new.id_dl_from) = false or isLocalDl(new.id_dl_to) = false) then
+            insert into cmd_confirmations (id_cmd) values(new.id);
+        end if;
 
     end if;
 
@@ -135,7 +140,7 @@ begin
     
         if(idUser = 2 and isLocalDl(new.id_dl_executor) = TRUE) then --jupiter (we insert the record that come from another organization)
                                                                      --skip virtual orders
-            --raise warning 'QQQQQQQ';
+            
             insert into cmd_confirmations (id_cmd) values(new.id);--update receive_datetime on sender
         end if;
         

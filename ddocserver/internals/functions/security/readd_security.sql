@@ -30,6 +30,7 @@
 \i ./functions/security/csetprivileges.sql
 \i ./functions/security/dropprivileges.sql
 \i ./functions/security/getcurrentmaclabel.sql
+\i ./functions/security/isddocdl.sql
 \i ./functions/security/islocaldl.sql
 \i ./functions/security/ispublicdl.sql
 \i ./functions/security/getdl.sql

@@ -618,7 +618,7 @@ tappendixemer := '/msg/body/formalized_document_data/Information/EmergencySituat
             continue;
         end if;
         
-        perform jms_schema.add_out_mes (muid || '-receipt', 0, 0, true, xml2Text);
+        --ksa perform jms_schema.add_out_mes (muid || '-receipt', 0, 0, true, xml2Text);
     end loop;    
     
     return isMakeIO;

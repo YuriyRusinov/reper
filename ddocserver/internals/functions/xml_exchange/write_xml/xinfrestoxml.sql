@@ -10,7 +10,7 @@ begin
 
     xml_str := xml_str || xIOToXML(idObject);
 
-    raise exception '%', xml_str;
+    --raise exception '%', xml_str;
 
     result := xmlroot (xmlparse(document (xml_str)), version '1.0', standalone no);
 
@@ -34,7 +34,7 @@ begin
 
     xml_str := xml_str || xRecToXML(idObject, idRecord);
 
-    raise exception '%', xml_str;
+    --raise exception '%', xml_str;
 
     result := xmlroot (xmlparse(document (xml_str)), version '1.0', standalone no);
 
@@ -57,7 +57,7 @@ begin
 
     xml_str := xml_str || xMultiRecToXML(idObject, idRecords);
 
-    raise exception '%', xml_str;
+    --raise exception '%', xml_str;
 
     result := xmlroot (xmlparse(document (xml_str)), version '1.0', standalone no);
 

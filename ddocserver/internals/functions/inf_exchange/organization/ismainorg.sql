@@ -2,18 +2,18 @@
 create or replace function isMainOrg() returns bool as 
 $BODY$
 declare
-    isMain bool;
+    isMain int4;
 begin
 
-    isMain = false;
+    isMain = 0;
+    
+    select f_is_table_exist('main_org_table', NULL) into isMain;
 
-    select is_main into isMain from organization where id = getLocalOrgId();
-
-    if(isMain isnull) then
+    if(isMain isnull or isMain = 0) then
         return false;
     end if;
 
-    return isMain;    
+    return true;    
 
 end
 $BODY$

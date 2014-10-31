@@ -41,6 +41,7 @@ begin
 
     r_query := 'UPDATE ' || ref_table_name || ' SET ';
     n := array_upper (attrs_uids, 1);
+    
     for i in 1..n
     loop
         for r in
@@ -59,7 +60,8 @@ begin
             raise warning 'incorrect attribute unique_id';
             return -1;
         end if;
-        if (id_attr_type = 17) then
+
+        if (id_attr_type = 17) then --многие-ко-многим
             for rr in
                 select a.id,a.table_name from attributes a where a.unique_id = attrs_uids[i] --agetattribute (attr_code)
             loop
@@ -84,7 +86,8 @@ begin
                 end if;
                 mainAttr := 'id_' || ref_table_name;
                 childAttr := 'id_' || rr.table_name;
-                raise warning 'recUpdate, % % %', refTable, mainAttr, childAttr;
+
+                --raise warning 'recUpdate, % % %', refTable, mainAttr, childAttr;
 
                 ids := attrs_values[i];
                 select into unique_ids regexp_split_to_array (attrs_values[i], E'\\{|\\,|\\}');
@@ -121,10 +124,12 @@ begin
             if (i < n) then
                 r_query := r_query || ',';
             end if;
-         elsif (id_attr_type = 2 or id_attr_type = 3 or id_attr_type = 19 or id_attr_type = 26) then
+
+            --raise warning E'Found attr_type = 12. r_query = %', r_query;
+        elsif (id_attr_type = 2 or id_attr_type = 3 or id_attr_type = 19 or id_attr_type = 26) then
             r_query := r_query || '"' || attr_code || '"';
             for rattr in
-                select * from agetattributeByUID (attr_uids[i])
+                select * from agetattributeByUID (attrs_uids[i])
             loop
                 if (id_attr_type = 3) then
                     rTable := ref_table_name;
@@ -132,27 +137,34 @@ begin
                     rTable := rattr.table_name;
                 end if;
             end loop;
+
             if (position ('null' in lower (attrs_values[i])) != 0) then
-                r_query := r_query || '= NULL';
+                r_query := r_query || ' = NULL';
             else
-                if (rTable = 'work_mode' or
-                       rTable = 'organization_type' or
+                /*
+                if (1 = 0
+                       --rTable = 'work_mode' or
+                       --rTable = 'organization_type' or
                        --rTable = 'organization_transport' or
                        --rTable = 'transport' or
-                       rTable = 'position' or
-                       rTable = 'unit'
+                       --rTable = 'position' or
+                       --rTable = 'unit'
                     ) then
+                    
                     idAttrRec := attrs_values[i];
-                    raise warning 'attr code is % value % int8 %', attr_code, attrs_values[i], idAttrRec;
+
+                    --raise warning 'attr code is % value % int8 %', attr_code, attrs_values[i], idAttrRec;
                 elsif (ref_table_name = 'organization' or rTable = 'organization') then
+                */
+                if (rTable = 'organization') then
                     idAttrRec := NULL::int8;
-                    aexQuery := 'select id from organization where email_prefix= ' || quote_literal (attrs_values[i]);
+                    aexQuery := 'select id from organization where email_prefix = ' || quote_literal (attrs_values[i]);
                     for rattrrec in
                         execute aexQuery
                     loop
                         idAttrRec := rattrrec.id;
                     end loop;
-                    raise warning 'id organization is %, value is %', idAttrRec, attrs_values[i];
+                    --raise warning 'id organization is %, value is %', idAttrRec, attrs_values[i];
                 else
                     idAttrRec := NULL::int8;
                     aexQuery := 'select id::int8 from ' || rTable || ' where unique_id = ' || quote_literal (attrs_values[i]);
@@ -163,18 +175,24 @@ begin
                         idAttrRec := rattrrec.id;
                     end loop;
                 end if;
+
                 if (idAttrRec is not null) then
                     r_query := r_query || '=' || idAttrRec;
                 else
                     r_query := r_query || '=' || 'NULL::int4';
                 end if;
+
                 if (i<n) then
                     r_query := r_query || ',';
                 end if;
             end if;
+            --raise warning E'Found id_attr_type = %. r_query = %', id_attr_type, r_query;
         else
             r_query := r_query || '"' || attr_code || '"';
-            if (a_type_code = 'VARCHAR' or a_type_code = 'TEXT' or a_type_code = 'BYTEA' or a_type_code = 'MACLABEL') then
+
+            if(attrs_values[i] isnull) then
+                r_query = r_query || ' = NULL::' || a_type_code;
+            elsif (a_type_code = 'VARCHAR' or a_type_code = 'TEXT' or a_type_code = 'BYTEA' or a_type_code = 'MACLABEL') then
                 r_query := r_query || '=' || quote_literal (attrs_values[i]);
             elsif (a_type_code = 'TIMESTAMP' or a_type_code = 'DATE' or a_type_code = 'TIME') then
                 if (length (trim (attrs_values[i])) = 0) then
@@ -203,18 +221,22 @@ begin
             else
                 r_query := r_query || '=' || attrs_values[i];
             end if;
+            
             if (i<n) then
                 r_query := r_query || ',';
             end if;
         end if;
+        --raise warning E'Found attr_type = %. r_query = %, attr_uid = %', id_attr_type, r_query, attrs_uids[i];
     end loop;
+
+    --raise exception 'r_query is --- % -- key_attr = % --- key_val = %', r_query, key_attr, key_val;
 
     r_query := regexp_replace (r_query, E'\\,$', '');
     r_query := r_query || ' WHERE ' || key_attr || '=' || quote_literal (key_val);
 
---    raise warning 'update query is %', r_query;
 
     execute r_query;
+    
 --    if (not FOUND) then
 --        return -1;
 --    else
@@ -231,9 +253,9 @@ begin
 
     return 1;
 
-    exception when others then
-        raise warning 'update exception';
-        return -1;
+    --exception when others then
+    --    raise warning 'update exception';
+    --    return -1;
 end
 $BODY$
 language 'plpgsql';

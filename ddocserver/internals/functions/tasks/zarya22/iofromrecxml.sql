@@ -9,7 +9,7 @@ declare
     ttime	 varchar;
     treg 	 varchar;
     tmac 	 varchar;
-    tbody 	 varchar;
+    tBody 	 varchar;
     torg 	 varchar; 
     tpost	 varchar;
     trank 	 varchar;
@@ -45,6 +45,7 @@ declare
     deliveryPriority varchar;
     msgCreationDate varchar;
     msgCreationTime varchar;
+    msgSentDatetime timestamp;
     msgSenderUID varchar;
     msgRedirectingNumber varchar;
     receiptNumbers xml[];
@@ -65,6 +66,27 @@ begin
     create temp table AAA(id_attr int4, a_val varchar);
 
     isFound = false;
+
+    -- get sending_acs_registration_number
+    tBody :=  '/msg/passport/msg_created/as_having/sending_acs_registration_number/text()';
+    select getXMLValue(tBody, value) into msgSenderUID;
+
+    -- get date creating message
+    tBody :=  '/msg/passport/msg_created/as_having/creation_date/text()';
+    select getXMLValue(tBody, value) into msgCreationDate;
+
+    -- get time creating message
+    tbody :=  '/msg/passport/msg_created/as_having/creation_time/text()';
+    select getXMLValue(tBody, value) into msgCreationTime;
+
+    if(msgCreationDate isnull or trim(msgCreationDate) = '') then
+        msgCreationDate = to_char(now()::date, 'DD.MM.YYYY');
+    end if;
+    if(msgCreationTime isnull or trim(msgCreationTime) = '') then
+        msgCreationDate = to_char(now()::time, 'HH12:MI:SS');
+    end if;
+
+    msgSentDatetime = to_timestamp(msgCreationDate || ' ' || msgCreationTime, 'DD.MM.YYYY HH12:MI:SS');
 
     create temp table XXXX (tag_name varchar, the_name varchar, the_title varchar, the_type varchar, the_value varchar);
 
@@ -130,11 +152,15 @@ begin
     end if;
 
 
-    if (tcode is null) then
-        tcode := 'New income message from JMS';
+    if (tcode is null or trim(tcode) = '') then
+        tcode := 'New income message ' || msgSenderUID;
     end if;
 
-    ioName := tcode;
+    if(tcode is not null) then
+        ioName := tcode;
+    else
+        ioName = 'New unnamed income message';
+    end if;
 
     select into idOrg id_organization from getlocalorg();
 
@@ -188,22 +214,19 @@ begin
 
     tbody :=  '/msg/passport/msg_created/to_be_delivered_to_addressees_where/addressee[@number=1]/has_uri/text()';
     select getXMLValue(tBody, value) into addresseeURI;
---    query := 'SELECT (xpath('||quote_literal(tbody) ||', '||quote_literal(value) ||'::xml))[1] As addressee';
---    execute query INTO addresseeURI;
     query =  'select sdp.id_position from shu_dls sd, shu_dls_position sdp where sd.uri = trim(' || quote_literal(addresseeURI) ||') and sd.id = sdp.id_shu_dls;';
     if(query isnull) then
         idDlReceiver = 4;
     else
         execute query into idDlReceiver;
         if(idDlReceiver isnull) then
+            raise exception 'query = %', query;
             idDlReceiver = 4;  --admin
         end if;
     end if;
     
 
     tbody :=  '/msg/passport/msg_created/by_post_unit/with_uri/text()';
---    query := 'SELECT (xpath('||quote_literal(tbody) ||',  '||quote_literal(value) ||'::xml))[1] As uri_post';
---    execute query INTO tpost;
     select getXMLValue(tBody, value) into tpost;
     query =  'select sdp.id_position from shu_dls sd, shu_dls_position sdp where sd.uri = trim(' || quote_literal(tpost) ||') and sd.id = sdp.id_shu_dls;';
     if(query isnull) then
@@ -216,11 +239,6 @@ begin
     end if;
 
     tbody :=  '/msg/body/unformalized_document_data/human_readable_text/text()';
---    query := 'SELECT trim((xpath(' || quote_literal(tbody) || ', ' || quote_literal(value) || '::xml))[1]::varchar)';
---    if(query isnull) then
---        msgBody = '';
---    end if;
---    execute query INTO msgBody;
     select getXMLValue(tBody, value) into msgBody;
     if(msgBody isnull) then
         msgBody := 'new income message';
@@ -255,7 +273,8 @@ begin
                                 receive_datetime, 
                                 read_datetime, 
                                 message_body,
-                                id_urgency_level) 
+                                id_urgency_level,
+                                output_number) 
     values
                                     
                                (idMessage, 
@@ -263,11 +282,12 @@ begin
                                 idDlReceiver,
                                 idObject, 
                                 current_timestamp, 
-                                NULL, 
+                                msgSentDatetime, 
                                 NULL,
                                 NULL,
                                 msgBody,
-                                1);
+                                1,
+                                msgSenderUID);
 
     tbody := '/msg/passport/msg_created/to_be_confirmed_about_delivering_by_receipts_where/receipt/@number';
     query := 'SELECT (xpath('||quote_literal(tbody) ||', '|| quote_literal(value) ||'::xml)) As date';
@@ -285,8 +305,6 @@ begin
                   asString(receiptNumber, false) || 
                   ']/with_type/text()';
  
-        --query := 'SELECT trim((xpath('||quote_literal(tbody) ||', '||quote_literal(value) ||'::xml))[1]::varchar) As date';
-        --execute query INTO receiptType;
         select getXMLValue(tBody, value) into receiptType;
         if(lower(receiptType) <> 'dr.3') then
             continue;
@@ -306,7 +324,7 @@ begin
             continue;
         end if;
         
-        perform jms_schema.add_out_mes (muid || '-receipt', 0, 0, true, xml2Text);
+        --ksa perform jms_schema.add_out_mes (muid || '-receipt', 0, 0, true, xml2Text);
     end loop;    
 
     return isMakeIO;

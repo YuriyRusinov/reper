@@ -54,6 +54,7 @@ begin
             and tcj.is_outed = false
             and cmd.id_jr_state <> 6 --filter for documents saved as draft
             and isLocalDl(cmd.id_dl_to) = FALSE
+            and isDDocDl(cmd.id_dl_to) = true --отправляем только ДЛ, которые имеют тип "ДЛ в системе DynamicDocs"
             and cmd.id_dl_to = p1.id
             and p1.id_unit = u.id
     loop

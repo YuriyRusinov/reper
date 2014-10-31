@@ -14,8 +14,9 @@ commit;
 
 \encoding koi8r
 
-begin;
 create extension IF NOT EXISTS postgis;
+
+begin;
 \i ./schema/all_tables.sql
 commit;
 

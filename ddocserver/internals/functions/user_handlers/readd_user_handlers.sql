@@ -4,6 +4,7 @@
 \i ./functions/user_handlers/getcurrentprocessingscenario.sql
 \i ./functions/user_handlers/getcurrentprocessingvariant.sql
 \i ./functions/user_handlers/hstarthandler.sql
+\i ./functions/user_handlers/getsheduledhandlers.sql
 
 \i ./functions/user_handlers/hsimplehandler.sql
 

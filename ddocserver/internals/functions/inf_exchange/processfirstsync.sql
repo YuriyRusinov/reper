@@ -106,6 +106,7 @@ declare
     catUID varchar;
     isGlobal bool;
     idOrg int4;
+    ioMainTable varchar;
 
     r record;
     res int4;
@@ -131,16 +132,18 @@ begin
     end loop;
     
     if(idOrg is not null) then
-        raise notice 'object is already processed';
+        raise warning 'object is already processed! id = %', idObject;
         return 3;--object is already processed
     end if;
     
+    --получаем ряд характеристик ИО, для которого проводится первоначальная синхронизация
     for r in
         select 
             io.id_io_category, 
             io.unique_id, 
             io.is_global, 
             io.is_system,
+            io.table_name,
             c.unique_id as cat_uid 
         from 
             f_sel_io_objects(idObject) io, 
@@ -151,10 +154,12 @@ begin
     loop
         idCat = r.id_io_category;
         ioUID = r.unique_id;
+        ioMainTable = r.table_name;
         isGlobal = r.is_global;
         catUID = r.cat_uid;
     end loop;
     
+    --если ИО не глобальный, то не разрешаем синхронизировать всю цепочку взаимосвязанных ИО
     if(isGlobal <> TRUE) then
         raise exception 'We cannot sync nonglobal objects. Aborted. IO_UID = %.', ioUID;
         return -1;--we cannot sync nonglobal objects
@@ -174,11 +179,19 @@ begin
 
     q = 'insert into ' || lTable || ' (id_object) values(' || idObject || ')';
     execute q;
+
+    raise warning E'io_object % -- % looked!\n', idObject, ioMainTable;
     
+    --прежде чем начать синхронизацию (добавить запись в out_sync_queue) текущего ИО, необходимо начать синхронихацию все ИО, на которые он ссылается
+    --при этом, если текущий ИО (его запись) имемет атрибут, ссылающийся на справочник ИО, то выполнять синхронизацию справочника ИО не надо
+    --ИО, на который имеется ссылка, перешлем перед тем как синхронизировать текущий ИО явным образом.
     for r in select id_io_object from getRefIO(idCat)
     loop
-        if(r.id_io_object <> 27 and r.id_io_object <> 26) then --organizations are syncronyzed separately
-                                      --positions are syncronized separately
+        if(r.id_io_object <> 27 and  --organizations are syncronyzed separately
+           r.id_io_object <> 26 and  --positions are syncronized separately
+           r.id_io_object <> 6 and   --categories are synchronized separately
+           r.id_io_object <> 7)      --справочник информационных объектов как таковой вообще не синхронизируем. Если где-то имеются ссылки на справочник ИО, то соответствующие ИО пересылаем явным образом
+        then 
             res = processFirstSyncInt(r.id_io_object, idOrganization);
             if(res <= 0) then
                 return res;
@@ -186,17 +199,22 @@ begin
         end if;
     end loop;
     
-    --add category for sync
-    perform addSyncRecord(idOrganization, idCat, catUID, catUID, 'io_categories', 1, 1);
-        --perform addSyncRecord(r.id, new.id, new.unique_id, new.unique_id, 'io_categories', 1, 1);
+    --если ИО является системным, то на приемном конце однозначно будет и категория его и таблица справочника.
+    --поэтому пересылать их туда смысла нет.
+    --необходимо лишь переслать записи справочника
+    if(idObject >= 300) then
+        --add category for sync
+        perform addSyncRecord(idOrganization, idCat, catUID, catUID, 'io_categories', 1, 1);
 
-    --if the IO has no references to another IO
-    perform addSyncRecord(idOrganization, idObject, ioUID, ioUID, 'io_objects', 1, 2);
+        --if the IO has no references to another IO
+        perform addSyncRecord(idOrganization, idObject, ioUID, ioUID, 'io_objects', 1, 2);
+        
+    end if;
+    
     -- add all existing records in all ref tables of the IO
     --ONLY if io_objects::id_sync_type <> 4! (global, integrated)
     perform addAllRecordsInt(idObject, idOrganization, ioUID);
 
-    
     q = 'insert into ' || pTable || ' (id_object) values(' || idObject || ')';
     execute q;
 

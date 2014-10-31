@@ -72,7 +72,8 @@ declare
     ccc int4;
 begin
 
-    select cFindEqual(cName, cCode, cDesc, idType, idChild, isMain) into idCategory;
+    --select cFindEqual(cName, cCode, cDesc, idType, idChild, isMain) into idCategory;
+    select id into idCategory from io_categories where unique_id = uniqueID;
     if(idCategory is not null and idCategory > 0) then
         --child category for indicators can be added after creation and synchronization of the category.
         --so, we must detect this case and add child2 category to existing category

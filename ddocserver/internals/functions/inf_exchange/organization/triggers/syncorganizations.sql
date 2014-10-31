@@ -11,6 +11,7 @@ declare
     entityType int4;
     r record;
     idLocalOrg int4;
+    isMain int4;
 begin
 
 
@@ -126,11 +127,22 @@ begin
 
             end if;
             
-            --simple update information about organization
+            --обновляем информацию об изменениях  в описании организации
+            --однако есть ряд условий
+            --1) если организация была объявлена как имеющая тип "внешняя унаследованная система", то никаких обновлений слать не будем
+            --2) если изменилась нелокальная организация на не главной машине, то никаких обновлений слать не будем (измениться мог только тип организации на "внешняя унаследованная система" (триггер trgorginsertcheckbefore))
+
+            if(isMainOrg() = false and new.id <> idLocalOrg) then
+                return new;
+            end if;
+            if(new.id_type_org = 3) then
+                return new;
+            end if;
+            
             --just will send to all organizations updated record
             syncType = 2; --update exist entity on target object
             idEntity = new.id;
-            entityUID = 'not_used'; --for organization table this field is not used
+            entityUID = new.email_prefix; 
             
             if(getCurrentUser() = 2) then --jupiter
                 return new;
@@ -147,7 +159,7 @@ begin
     elsif (TG_OP = 'DELETE') then
         syncType = 3;
         idEntity = old.id;
-        entityUID = 'not_used'; --for organization table this field is not used
+        entityUID = old.email_prefix; 
         
         if(getCurrentUser() = 2) then --jupiter
             return new;

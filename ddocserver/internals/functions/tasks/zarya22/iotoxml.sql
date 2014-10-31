@@ -37,6 +37,8 @@ begin
         return null;
     end if;
 
+    raise warning E'Passport = %\n', xml_msg_passport::varchar;
+
     xml_str := xml_str || xml_msg_passport::varchar;
     xml_str := xml_str || E'\n\t';
     xml_str := xml_str || E'<body>\n';
@@ -58,6 +60,7 @@ begin
 
     --если нет ничего, то наверное нет смысла и передавать сообщение
     if (io_name is null) then
+        raise warning E'Cannot get io_name for <human_readable_text> tag!';
         return null;
     end if;
 
@@ -66,7 +69,12 @@ begin
     
     select into xml_form_pars ufdocToXML (idObject);
 
-    xml_str := xml_str || E'\t\t\t' || xml_form_pars::varchar || E'\t\t\t\n';
+    if(xml_form_pars is not null) then
+        xml_str := xml_str || E'\t\t\t' || xml_form_pars::varchar || E'\t\t\t\n';
+--    else
+--        xml_str := xml_str || E'\t\t\t' || E'\t\t\t\n';
+    end if;
+
     xml_str := xml_str || E'\t\t</unformalized_document_data>\n';
 
     xml_str := xml_str || E'\t\t<formalized_document_data>\n';

@@ -19,6 +19,7 @@ declare
     xml_doc xml;
     r record;
     id_maclabel int4;
+    idOrganization int4;
     result int4;
 begin
     id_mess_stream := new.id_message_stream;
@@ -43,6 +44,20 @@ begin
         tname = r.table_name;
         id_object = r.id;
         id_addrlist := id_addrlist || r.id_dl_receiver::int4;
+
+        select o.id into idOrganization 
+        from organization o,  units u, "position" p
+        where
+            p.id = r.id_dl_receiver
+            and p.id_position_type = 2 -- ДЛ в сопрягаемой унаследлванной системе. Только в этом случе мы сгенерируем XML!
+            and p.id_unit = u.id
+            and u.id_organization = o.id;
+
+        if(idOrganization isnull) then
+            raise exception E'The message is addressed to remote user on legacy system. But we couldnt resolve the corresponding organization!\n';
+            return NULL;
+        end if;
+
         idDlSender := r.id_dl_sender;
     end loop;
     
@@ -103,9 +118,9 @@ begin
     select into xml_doc recToXML (NULL::integer, id_object, id_record, idDlSender, id_addrlist);
 
     if (xml_doc is null) then
-        result := jms_schema.add_out_mes (new.unique_id, id_maclabel-1, 0, false, text(''));
+        result := sendEIOToExternalSystem(idOrganization, 3, id_object, id_record, text('')); -- 3 - shushun    --jms_schema.add_out_mes (new.unique_id, id_maclabel-1, 0, false, text(''));
     else
-        result := jms_schema.add_out_mes (new.unique_id, id_maclabel-1, 0, false, text(xml_doc));
+        result := sendEIOToExternalSystem(idOrganization, 3, id_object, id_record, text(xml_doc)); -- 3 - shushun   --jms_schema.add_out_mes (new.unique_id, id_maclabel-1, 0, false, text(xml_doc));
     end if;
 
     if (result is not null and result > 0) then

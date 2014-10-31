@@ -33,17 +33,18 @@ begin
 
     xml_str = '';
 
-    if(aType = 1) then
+    if(aType = 1) then --Boolean
         xml_str = openTag || aValue || closeTag;
-    elsif(aType = 2) then --list
+    elsif(aType = 2) then --Qualifier
         refXML = xCreateXMLForRef(aTableName, aValue, aType);
         xml_str = openTag || refXML || closeTag;
-    elsif(aType = 3) then --parent
-    elsif(aType = 4) then --date
+    elsif(aType = 3) then --Parent
+        xml_str = openTag || closeTag;
+    elsif(aType = 4) then --Date
         xml_str = openTag || E' <![CDATA[ ' || aValue || E' ]]> ' || closeTag;
-    elsif(aType = 5) then --datetime
+    elsif(aType = 5) then --Datetime
         xml_str = openTag || E' <![CDATA[ ' || aValue || E' ]]> ' || closeTag;
-    elsif(aType = 6) then --float
+    elsif(aType = 6) then --Double
         xml_str = openTag || E' <![CDATA[ ' || aValue || E' ]]> ' || closeTag;
 --    elsif(aType = 7) then    
     elsif(aType = 8) then --Integer

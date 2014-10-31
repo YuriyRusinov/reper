@@ -30,6 +30,7 @@ begin
             and (case when aTable is not null then table_name = aTable else table_name isnull end)
             and (case when aColumn is not null then column_name = aColumn else column_name isnull end)
             and (case when aDefWidth is not null then def_width = aDefWidth else 1 = 1 end)
+        order by id
     loop
         return r.id;
     end loop;
@@ -71,6 +72,7 @@ begin
             and (case when aTable is not null then table_name = aTable else table_name isnull end)
             and (case when aColumn is not null then column_name = aColumn else column_name isnull end)
             and (case when aDefWidth is not null then def_width = aDefWidth else 1 = 1 end)
+        order by id
     loop
         return r.id;
     end loop;

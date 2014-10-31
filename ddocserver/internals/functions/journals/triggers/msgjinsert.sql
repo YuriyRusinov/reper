@@ -42,11 +42,10 @@ begin
         end if;
 
         if(new.read_datetime is not null and old.read_datetime isnull) then
-            --≈я ’ ќЌ —¬ё–≈ Ё яЌЌјџ≈ћ’Џ ЏЅ Џ≈–яЏ  Ќ…ё ЁћЎЋ, ё Ќ–ќѕёЅ’–≈ Ё —ƒё ≈ћћЎЋ,
-            --–Ќ÷ƒё ћ≈Ќј”Ќƒ’ЋЌ ЅЎя–ёЅ’–Ё ƒёћћЌ≈ яЌЌјџ≈ћ’≈ …ё… ћ≈Ќ–ќѕёЅ ≈ћћЌ≈,
-            --ќЌя…Ќ Ё…— ћ≈Ќј”Ќƒ’ЋЌ Ќ–ќѕёЅ’–Ё Ќ–ќѕёЅ’–≈ „ …Ѕ’–ёћ∆’„ Ќ ќѕЌ¬–≈ћ’’.
-            --яёЋЌ яЌЌјџ≈ћ’≈ ќѕ’ ў–ЌЋ ћ≈ Ќ–ќѕёЅ’–яЏ,
-            --ќЌя…Ќ Ё…— “—ћ…∆’Џ ќЌ’я…ё яЌЌјџ≈ћ’» ћё Ќ–ќѕёЅ…— –ё…‘≈ ƒ≈ ё≈– ќЌƒЌјћ—„ ќѕЌЅ≈ѕ…—
+            --обрабатываем ситуацию, когда надо отправить квитанцию о прочтении сообщени€ на внешнюю сопргаемую систему
+            --в этом случае в таблицу исход€щей очереди надо записать XML-сообщение с данной квитанцией
+            if(isLocalDl(msg.id_dl_sender) = FALSE and isDDocDl(msg.id_dl_sender) = false) then --отправл€ем только ƒЋ, которые имеют тип "ƒЋ во внешней сопр€гаемой системе"
+
             if(old.is_outed = true and isLocalDl(old.id_dl_receiver) = TRUE and isLocalDl(old.id_dl_sender) = FALSE) then
                 new.is_outed = false;
             end if;
@@ -92,6 +91,9 @@ begin
     --если от имени jupiter, то распор€жение €вл€етс€ вход€щим из удаленной системы и мы ему задаем вход€щий. исход€щий оставл€ем неизменным
     if(idUser = 2) then --jupiter
         new.input_number = generateUID(localId, tableName);
+        if(new.output_number isnull) then
+            new.output_number = '';
+        end if;
         --new.output_number = -- без изменений
     else
         new.output_number = generateUID(localId, tableName);

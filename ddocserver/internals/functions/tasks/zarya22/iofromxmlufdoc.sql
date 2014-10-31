@@ -45,7 +45,8 @@ declare
     deliveryPriority varchar;
     msgCreationDate varchar;
     msgCreationTime varchar;
-    msgSenderUID varchar;
+    msgSentDatetime timestamp;
+    msgSenderUID varchar;  --
     msgRedirectingNumber varchar;
     receiptNumbers xml[];
     receiptNumber varchar;
@@ -62,43 +63,39 @@ begin
     
     create temp table AAA(id_attr int4, a_val varchar);
 
--- get date creating message
+    -- get date creating message
     tbody :=  '/msg/passport/msg_created/as_having/creation_date/text()';
-    --query := 'SELECT (xpath('||quote_literal(tbody) ||', '||quote_literal(value) ||'::xml))[1] As date';
     select getXMLValue(tBody, value) into msgCreationDate;
-    --execute query INTO msgCreationDate;
     insert into AAA (id_attr, a_val) values (233, msgCreationDate);
 
--- get time creating message
+    -- get time creating message
     tbody :=  '/msg/passport/msg_created/as_having/creation_time/text()';
---    query := 'SELECT (xpath('||quote_literal(tbody) ||', '||quote_literal(value) ||'::xml))[1] As time';
---    execute query INTO msgCreationTime;
     select getXMLValue(tBody, value) into msgCreationTime;
     insert into AAA (id_attr, a_val) values (234, msgCreationTime);
 
--- get sending_acs_registration_number
+    if(msgCreationDate isnull or trim(msgCreationDate) = '') then
+        msgCreationDate = to_char(now()::date, 'DD.MM.YYYY');
+    end if;
+    if(msgCreationTime isnull or trim(msgCreationTime) = '') then
+        msgCreationDate = to_char(now()::time, 'HH12:MI:SS');
+    end if;
+
+    msgSentDatetime = to_timestamp(msgCreationDate || ' ' || msgCreationTime, 'DD.MM.YYYY HH12:MI:SS');
+
+    -- get sending_acs_registration_number
     tbody :=  '/msg/passport/msg_created/as_having/sending_acs_registration_number/text()';
-    --query := 'SELECT (xpath('||quote_literal(tbody) ||', '||quote_literal(value) ||'::xml))[1] As reg';
-    --execute query INTO msgSenderUID;
     select getXMLValue(tBody, value) into msgSenderUID;
 
--- get redirecting_acs_registration_number
+    -- get redirecting_acs_registration_number
     tbody :=  '/msg/passport/msg_created/as_having/redirecting_acs_registration_number/text()';
---    query := 'SELECT (xpath('||quote_literal(tbody) ||', '||quote_literal(value) ||'::xml))[1] As reg';
---    execute query INTO msgRedirectingNumber;
     select getXMLValue(tBody, value) into msgRedirectingNumber;
-    --insert into XXX (id_attr, a_val) values (233, tdate);
 
--- get mac level message
+    -- get mac level message
     tbody :=  '/msg/passport/msg_created/as_having/mac_level/text()';
---    query := 'SELECT (xpath('||quote_literal(tbody) ||', '||quote_literal(value) ||'::xml))[1] As mac_level';
---    execute query INTO tmac;
     select getXMLValue(tBody, value) into tmac;
     insert into AAA (id_attr, a_val) values (235, tmac);
 
     tbody :=  '/msg/passport/msg_created/by_automated_control_system/with_uri/text()';
---    query := 'SELECT (xpath('||quote_literal(tbody) ||', '||quote_literal(value) ||'::xml))[1] As uri_acs';
---    execute query INTO torg;
     select getXMLValue(tBody, value) into torg;
 
     query =  'select id from shu_acs where uri = trim(' || asString(torg, true) ||')';
@@ -107,78 +104,58 @@ begin
 
 
     tbody :=  '/msg/passport/msg_created/by_automated_control_system/with_working_mode/text()';
---    query := 'SELECT (xpath('||quote_literal(tbody) ||', '||quote_literal(value) ||'::xml))[1] As mode';
---    execute query INTO torg;
     select getXMLValue(tBody, value) into torg;    
     insert into AAA (id_attr, a_val) values (231, torg);
 
 
 
--- get organization uri
+    -- get organization uri
     tbody :=  '/msg/passport/msg_created/by_organization_unit/with_uri/text()';
---    query := 'SELECT (xpath('||quote_literal(tbody) ||', '||quote_literal(value) ||'::xml))[1] As uri_org';
---    execute query INTO torg;
     select getXMLValue(tBody, value) into torg;
     query =  'select id from shu_orgs where uri = trim(' || asString(torg, true)||')';
     execute query into torg;
     insert into AAA (id_attr, a_val) values (226, torg);
 
--- get post uri
+    -- get post uri
     tbody :=  '/msg/passport/msg_created/by_post_unit/with_uri/text()';
---    query := 'SELECT (xpath('||quote_literal(tbody) ||', '||quote_literal(value) ||'::xml))[1] As uri_post';
---    execute query INTO tpost;
     select getXMLValue(tBody, value) into tpost;
     query =  'select id from shu_dls where uri = trim(' || asString(tpost, true)||')';
     execute query into tpost;
     insert into AAA (id_attr, a_val) values (228, tpost);
 
 
--- get rank id
+    -- get rank id
     tbody :=  '/msg/passport/msg_created/by_post_unit/with_rank_id/text()';
---    query := 'SELECT (xpath('||quote_literal(tbody) ||', '||quote_literal(value) ||'::xml))[1] As rank_id';
---    execute query INTO trank;
     select getXMLValue(tBody, value) into trank;
     query =  'select id from ranks where code = trim(' || asString(trank, true)||')';
     execute query into trank;
     insert into AAA (id_attr, a_val) values (20, trank);
 
--- get domain
+    -- get domain
     tbody :=  '/msg/passport/msg_created/as_having/community_domain_membership/text()';
- --   query := 'SELECT (xpath('||quote_literal(tbody) ||', '||quote_literal(value) ||'::xml))[1] As domain';
- --   execute query INTO trank;
     select getXMLValue(tBody, value) into trank;
     query =  'select id from shu_domains where code = trim(' || asString(trank, true)||')';
     execute query into trank;
     insert into AAA (id_attr, a_val) values (230, trank);
 
 
--- priority
-
+    -- priority
     tbody :=  '/msg/passport/msg_created/as_having/delivery_priority/text()';
---    query := 'SELECT (xpath('||quote_literal(tbody) ||', '||quote_literal(value) ||'::xml))[1] As prior';
---    execute query INTO deliveryPriority;
     select getXMLValue(tBody, value) into deliveryPriority;
     insert into AAA (id_attr, a_val) values (236, deliveryPriority);
 
-
--- name and text 
+    -- name and text 
     tbody :=  '/msg/passport/msg_created/as_having/unformalized_document_specific_data_where/doc_name/text()';
---    query := 'SELECT trim((xpath('||quote_literal(tbody) ||', '||quote_literal(value) ||'::xml))[1]::varchar)';
---    execute query INTO tcode;
     select getXMLValue(tBody, value) into tcode;
     insert into AAA (id_attr, a_val) values (2, tcode);
 
     tbody :=  '/msg/body/unformalized_document_data/human_readable_text/text()';
---    query := 'SELECT trim((xpath('||quote_literal(tbody) ||', '||quote_literal(value) ||'::xml))[1]::varchar)';
---    execute query INTO trank;
     select getXMLValue(tBody, value) into trank;
     insert into AAA (id_attr, a_val) values (237, trank);
 
 
--- get name post
+    -- get name post
     tbody :=  '/msg/passport/msg_created/by_post_unit/with_name/text()';
---    query := 'SELECT trim((xpath('||quote_literal(tbody) ||', ' || quote_literal(value) ||'::xml))[1]::varchar)';
---    execute query INTO tpostname;
     select getXMLValue(tBody, value) into tpostName;
     insert into AAA (id_attr, a_val) values (25, tpostname);
 
@@ -192,7 +169,7 @@ begin
     
     for r in select * from getXMLParams(value)
     loop
-        isFound = true;
+        isFound = true; -- в теле xml-сообщения в секции unformalized_document_data присутствуют тэги с данными, отличные от стандартного human_readable_text
 
         idAttrType = getXMLAttrType(r.attr_type);
         select aInsert(idAttrType, r.attr_code, r.attr_name, r.attr_title, NULL, NULL, NULL, NULL) into idAttr;
@@ -203,8 +180,7 @@ begin
             return false;
         end if;
         insert into AAA (id_attr, a_val) values (idAttr, r.attr_value);
-        --raise exception E'\n\n\n!!%!!\n\n\n', r.attr_value;
-        --exit;
+
     end loop;
 
     drop table XXXX;
@@ -212,13 +188,7 @@ begin
     if(isFound = false) then
         idCat = 168;
     else
-/*        select ac.id_io_category into idCat
-        from 
-           (select ac.id_io_category, array_agg(ac.id_io_attribute) as arr
-            from attrs_categories ac group by ac.id_io_category ) as ac
-        where
-            ac.arr = (select array_agg(id_attr) from AAA);
-*/
+
         select ac.id_io_category into idCat
         from 
            (select ac_ordered.id_io_category, array_agg(ac_ordered.id_io_attribute) as arr
@@ -244,16 +214,19 @@ begin
             end if;
 
             insert into attrs_categories (id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) select idCat, id_attr, NULL, false, false from AAA;
-            --perform cSetGlobal(idCat);
         end if;
     end if;
 
 
-    if (tcode is null) then
-        tcode := 'Новый входящий документ';
+    if (tcode is null or trim(tcode) = '') then
+        tcode := 'Новый входящий документ ' || msgSenderUID;
     end if;
 
-    ioName := tcode;
+    if(tcode is not null) then
+        ioName := tcode;
+    else
+        ioName = 'New unnamed income message';
+    end if;
 
     select into idOrg id_organization from getlocalorg();
 
@@ -322,6 +295,7 @@ begin
 
     end if;
 */
+
 --
 --Далее идет код, добавляющий запись в журнал сообщений
 --
@@ -329,22 +303,21 @@ begin
 
     tbody :=  '/msg/passport/msg_created/to_be_delivered_to_addressees_where/addressee[@number=1]/has_uri/text()';
     select getXMLValue(tBody, value) into addresseeURI;
---    query := 'SELECT (xpath('||quote_literal(tbody) ||', '||quote_literal(value) ||'::xml))[1] As addressee';
---    execute query INTO addresseeURI;
+
+    --если в принимающей БД нет информации о ДЛ-получателе, то виртуально считаем, что сообщение пришло администратору принимающей БД
     query =  'select sdp.id_position from shu_dls sd, shu_dls_position sdp where sd.uri = trim(' || quote_literal(addresseeURI) ||') and sd.id = sdp.id_shu_dls;';
     if(query isnull) then
-        idDlReceiver = 4;
+        idDlReceiver = 4; --admin
     else
         execute query into idDlReceiver;
         if(idDlReceiver isnull) then
             idDlReceiver = 4;  --admin
         end if;
     end if;
-    
 
     tbody :=  '/msg/passport/msg_created/by_post_unit/with_uri/text()';
---    query := 'SELECT (xpath('||quote_literal(tbody) ||',  '||quote_literal(value) ||'::xml))[1] As uri_post';
---    execute query INTO tpost;
+
+    --если в принимающей БД нет информации о ДЛ-отправителе, то виртуально считаем, что сообщение пришло от администратора принимающей БД
     select getXMLValue(tBody, value) into tpost;
     query =  'select sdp.id_position from shu_dls sd, shu_dls_position sdp where sd.uri = trim(' || quote_literal(tpost) ||') and sd.id = sdp.id_shu_dls;';
     if(query isnull) then
@@ -357,11 +330,6 @@ begin
     end if;
 
     tbody :=  '/msg/body/unformalized_document_data/human_readable_text/text()';
---    query := 'SELECT trim((xpath(' || quote_literal(tbody) || ', ' || quote_literal(value) || '::xml))[1]::varchar)';
---    if(query isnull) then
---        msgBody = '';
---    end if;
---    execute query INTO msgBody;
     select getXMLValue(tBody, value) into msgBody;
 
 
@@ -371,6 +339,7 @@ begin
             insert into access_table (id_io_object, id_role, allow_readlist, allow_read, allow_delete, allow_update, allow_send)
             values(idObject, -10, true, false, false, false, false);
         end if;
+
         return false;
     end if;
 
@@ -384,6 +353,8 @@ begin
 
     select getNextSeq('message_journal', 'id') into idMessage;
 
+    --raise exception 'receiver = %', idDlReceiver;
+    
     insert into message_journal(id, 
                                 id_dl_sender, 
                                 id_dl_receiver, 
@@ -393,7 +364,8 @@ begin
                                 receive_datetime, 
                                 read_datetime, 
                                 message_body,
-                                id_urgency_level) 
+                                id_urgency_level,
+                                output_number) 
     values
                                     
                                (idMessage, 
@@ -401,11 +373,12 @@ begin
                                 idDlReceiver,
                                 idObject, 
                                 current_timestamp, 
-                                NULL, 
+                                msgSentDatetime, 
                                 NULL,
                                 NULL,
                                 msgBody,
-                                1);
+                                1,
+                                msgSenderUID);
 
     tbody := '/msg/passport/msg_created/to_be_confirmed_about_delivering_by_receipts_where/receipt/@number';
     query := 'SELECT (xpath('||quote_literal(tbody) ||', '|| quote_literal(value) ||'::xml)) As date';
@@ -423,8 +396,6 @@ begin
                   asString(receiptNumber, false) || 
                   ']/with_type/text()';
  
-        --query := 'SELECT trim((xpath('||quote_literal(tbody) ||', '||quote_literal(value) ||'::xml))[1]::varchar) As date';
-        --execute query INTO receiptType;
         select getXMLValue(tBody, value) into receiptType;
         if(lower(receiptType) <> 'dr.3') then
             continue;
@@ -444,7 +415,7 @@ begin
             continue;
         end if;
         
-        perform jms_schema.add_out_mes (muid || '-receipt', 0, 0, true, xml2Text);
+        --ksa perform jms_schema.add_out_mes (muid || '-receipt', 0, 0, true, xml2Text);
     end loop;    
 
     return isMakeIO;

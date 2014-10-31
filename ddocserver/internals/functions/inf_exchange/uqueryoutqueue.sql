@@ -50,6 +50,7 @@ begin
             and q.entity_type not in (12, 13) --files (transferred by parts)
             and q.id_organization = o.id
         order by 2
+        limit 10 --чтобы не перенагружать данными клиента будем брать исходящие сообщения порциями не более чем по 10 штук
     loop
         if(r.full_address is not null) then
             return next r;

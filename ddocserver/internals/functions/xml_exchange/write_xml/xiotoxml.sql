@@ -8,9 +8,15 @@ declare
     ioUniqueId varchar;
     ioName varchar;
     ioDesc varchar;
+
     idCategory int4;
     idTableCategory int4;
     idIndCategory int4;
+
+    categoryUid varchar;
+    tableCategoryUid varchar;
+    indCategoryUid varchar;
+
     ioTableName varchar;
 
     xml_str varchar;
@@ -25,13 +31,22 @@ begin
     end if;
 
     for r in 
-        select io.unique_id, io.uuid_t, io.name, io.description, io.id_io_category, io.table_name, c.id_child, c.id_child2 
-        from io_objects io, io_categories c 
-        where io.id = idObject and io.id_io_category = c.id
+        select io.unique_id, io.uuid_t, io.name, io.description, io.id_io_category, io.table_name, c.id_child, c.id_child2, c.unique_id as c_uid, c1.unique_id as c1_uid, c2.unique_id as c2_uid
+        from 
+            io_objects io 
+            inner join io_categories c on (io.id_io_category = c.id)
+            left join io_categories c1 on (c.id_child = c1.id)
+            left join io_categories c2 on (c.id_child2 = c2.id)
+        where io.id = idObject
     loop
         idCategory = r.id_io_category;
         idTableCategory = r.id_child;
         idIndCategory = r.id_child2;
+
+        categoryUid = r.c_uid;
+        tableCategoryUid = r.c1_uid;
+        indCategoryUid = r.c2_uid;
+
         ioUUID = r.uuid_t;
         ioUniqueId = r.unique_id;
         ioName = r.name;
@@ -61,12 +76,12 @@ begin
     xml_str := xml_str || E'<type> ' || ioType || E' </type>\n';
 
     xml_str := xml_str || E'<category_description>\n';
-    xml_str := xml_str || E'<document_category_uid> <![CDATA[ ' || asString(idCategory, false) || E' ]]> </document_category_uid>\n';
-    if(idTableCategory is not null) then 
-        xml_str := xml_str || E'<table_category_uid> <![CDATA[ ' || asString(idTableCategory, false) || E' ]]> </table_category_uid>\n';
+    xml_str := xml_str || E'<document_category_uid> <![CDATA[ ' || categoryUid || E' ]]> </document_category_uid>\n';
+    if(tableCategoryUid is not null) then 
+        xml_str := xml_str || E'<table_category_uid> <![CDATA[ ' || tableCategoryUid || E' ]]> </table_category_uid>\n';
     end if;
-    if(idIndCategory is not null) then 
-        xml_str := xml_str || E'<table_indicators_category_uid> <![CDATA[ ' || asString(idIndCategory, false) || E' ]]> </table_indicators_category_uid>\n';
+    if(indCategoryUid is not null) then 
+        xml_str := xml_str || E'<table_indicators_category_uid> <![CDATA[ ' || indCategoryUid || E' ]]> </table_indicators_category_uid>\n';
     end if;
     xml_str := xml_str || E'</category_description>\n';
 
@@ -95,7 +110,7 @@ begin
     end if;
     infres_xml_str := infres_xml_str || E'</inf_resources>\n';
 
-    xml_str := cat_xml_str || infres_xml_str;
+    xml_str := E'<irl_body>\n' || cat_xml_str || infres_xml_str || E'</irl_body>\n';
 
 
     perform xDropTempTable();
