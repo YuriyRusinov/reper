@@ -4,6 +4,7 @@ HEADERS += \
            ddocinteractorwindow.h \
            ddocinteractorserver.h \
            ddocinteractorclient.h \
+           ddocinteractorclientforxml.h \
            ddocinteractorbase.h \
            timerform.h
 
@@ -11,6 +12,7 @@ SOURCES += \
            ddocinteractorwindow.cpp \
            ddocinteractorserver.cpp \
            ddocinteractorclient.cpp \
+           ddocinteractorclientforxml.cpp \
            ddocinteractorbase.cpp \
            timerform.cpp
 FORMS += \
@@ -21,4 +23,5 @@ headers.files += \
            ddocinteractorwindow.h \
            ddocinteractorserver.h \
            ddocinteractorclient.h \
+           ddocinteractorclientforxml.h \
            ddocinteractorbase.h

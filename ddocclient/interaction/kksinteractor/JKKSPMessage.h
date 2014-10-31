@@ -79,7 +79,7 @@ class _I_EXPORT JKKSPMessWithAddr
         JKKSPMessage pMess;
         JKKSAddress addr; //адрес (IP+порт), на который отправляется сообщение
         QString unp;// условный номер получателя сообщения. В качестве такового используется поле email_prefix организации (в настоящее время используется только для отправки через ТПС)
-        qint64 id; //идентификатор сообщения из табдицы out_sync_queue или message_journal или command_journal
+        qint64 id; //идентификатор сообщения из табдицы out_sync_queue или message_journal или command_journal или out_external_queue
 
         JKKSPMessWithAddr (void);
         JKKSPMessWithAddr (const JKKSPMessage& pm, const JKKSAddress & a, const qint64& c);

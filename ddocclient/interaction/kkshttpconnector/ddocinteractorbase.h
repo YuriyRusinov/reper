@@ -8,6 +8,7 @@
 #include <JKKSPing.h>
 
 class DDocInteractorClient;
+class DDocInteractorClientForXML;
 class DDocInteractorServer;
 
 class __HTTP_CONNECTOR_EXPORT DDocInteractorBase : public QObject
@@ -19,26 +20,40 @@ public:
     DDocInteractorBase(QObject * parent);
     ~DDocInteractorBase();
 
-    int start(bool mode, int interval);
+    int start(bool mode, int interval, bool bMain = true, bool bXML = false); //3 - надо ли начинать опрашивать главную исход€щую очередь
+                                                                              //4 - надо ли начинать опрашивать исход€щую очередь дл€ XML-сообщений
 
     bool isExiting(){return m_isExiting;}
     void setIsExiting(){m_isExiting = true;}
 
     friend class DDocInteractorServer;
     friend class DDocInteractorClient;
+    friend class DDocInteractorClientForXML;
 
 public slots:
     void slotExitThreads();
+    
     void slotStartClient();
     void slotStopClient();
+
+    void slotStartClientForXML();
+    void slotStopClientForXML();
+
+private slots:
+
+    void _startSending() { emit startSending(); }
+    void _startSendingForXML() { emit startSendingForXML(); }
 
 signals:
     void pingsSended(QMap<QString, JKKSPing> pings);//генерируетс€, когда отправка всех пингов на все интересующие оргнизации завершена и пришли все ответы на эти пинги
     void pingsSentCompleted();//генерируетс€, когда отправка всех пингов на все интересующие оргнизации завершена и пришли все ответы на эти пинги. «авершает соответствующий QEventLoop
+
     void sendingStarted();//генерируетс€, когда происходит в потоке чтени€ Ѕƒ получение данных и их отправка получателю
     void sendingCompleted();//генерируетс€, когда отправка данных получателю завершена
+
     void startSending();//генерируетс€, когда нажата кнопка "start" и необходимо начать опрос Ѕƒ и отправку данных (в ручном режиме)
-    //void showStatusText(QString);//генерируетс€, когда требуетс€ вывести на форму нектороый текст о текущем состо€нии отправки данных
+    void startSendingForXML();//генерируетс€, когда нажата кнопка "start" и необходимо начать опрос Ѕƒ и отправку данных (в ручном режиме) дл€ очереди XML-сообщений
+
     void refreshTimer(int interval); //изменить значение интервала таймера
 
     void theSignal();
@@ -63,6 +78,8 @@ private:
 
     DDocInteractorServer * m_server;
     DDocInteractorClient * m_client;
+    DDocInteractorClientForXML * m_clientForXML;
+
     JKKSLoader * m_loader;
 
     bool m_started;

@@ -163,47 +163,23 @@
     <name>BoolEdit</name>
     <message>
         <source>Name:</source>
-        <translation type="unfinished">Название:</translation>
+        <translation type="obsolete">Название:</translation>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation type="unfinished">&amp;OK</translation>
+        <translation type="obsolete">&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
-    </message>
-    <message>
-        <source>Bool</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">&amp;Отмена</translation>
     </message>
     <message>
         <source>name</source>
-        <translation type="unfinished">Название</translation>
-    </message>
-    <message>
-        <source>Value:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>True</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>False</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Название</translation>
     </message>
     <message>
         <source>Active</source>
-        <translation type="unfinished">Активный</translation>
-    </message>
-    <message>
-        <source>Alt+O</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Alt+C</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Активный</translation>
     </message>
 </context>
 <context>
@@ -1534,6 +1510,21 @@ Files for transfer: %2 (for current file: %5 parts) ---&gt; %4 (for current file
     </message>
 </context>
 <context>
+    <name>DDocInteractorClientForXML</name>
+    <message>
+        <source>XML Message sending request completed. Internal request ID = %1</source>
+        <translation>Запрос на отправку XML-сообщения завершен. Внутренний идентификатор запроса = %1</translation>
+    </message>
+    <message>
+        <source>Message sending request failed! Internal request ID = %1</source>
+        <translation>Запрос на передачу XML-сообщения завершился с ошибкой! Внутренний идентификатор запроса = %1</translation>
+    </message>
+    <message>
+        <source>Message sending request sheduled. Receiver = %1, Adress = (IP = %2, port = %3). Internal request ID = </source>
+        <translation>XML-запрос на отправку сообщения поставлен в очередь. Прлучатель = %1, адрес = (IP = %2, port = %3). Внутренний ИД запроса =</translation>
+    </message>
+</context>
+<context>
     <name>DDocInteractorServer</name>
     <message>
         <source>Bad socket! Cannot create connection!</source>
@@ -1611,6 +1602,18 @@ Files for transfer: %2 (for current file: %5 parts) ---&gt; %4 (for current file
         <source>Ping request notification received. Destination organization successfully received ping request</source>
         <translation>Получена квитанция об отправке запроса на проверку соединения. Удаленный сервер успешно получил запрос</translation>
     </message>
+    <message>
+        <source>Cannot processing income XML message! Data was not written to database</source>
+        <translation>Не могу обработать входящие XML-данные. Произошла ошибка при их записи в БД</translation>
+    </message>
+    <message>
+        <source>XML = %1</source>
+        <translation>XML = %1</translation>
+    </message>
+    <message>
+        <source>Income XML message was successfully written to database</source>
+        <translation>Входящие XML-данные успешно сохранены в БД</translation>
+    </message>
 </context>
 <context>
     <name>DDocInteractorWindow</name>
@@ -1669,6 +1672,18 @@ Files for transfer: %2 (for current file: %5 parts) ---&gt; %4 (for current file
     <message>
         <source>Start querying</source>
         <translation>Начать опрос БД</translation>
+    </message>
+    <message>
+        <source>Querying queues:</source>
+        <translation>Опрашиваемые очереди:</translation>
+    </message>
+    <message>
+        <source>Main (between DynamicDocs Servers)</source>
+        <translation>Основная (взаимодействие между серверами DynamicDocs)</translation>
+    </message>
+    <message>
+        <source>XML (between external systems)</source>
+        <translation>XML-данные (взаимодействие между внешними системами)</translation>
     </message>
 </context>
 <context>
@@ -2014,6 +2029,14 @@ permissions to the file you are trying to save to.</source>
         <source>Error saving to database</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Invalid Document</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The detail section %1 is not valid because no query is specified.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DocumentWindow</name>
@@ -2051,39 +2074,23 @@ Do you want to save the changes before closing?</source>
     <name>DoubleEdit</name>
     <message>
         <source>Name:</source>
-        <translation type="unfinished">Название:</translation>
+        <translation type="obsolete">Название:</translation>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation type="unfinished">&amp;OK</translation>
+        <translation type="obsolete">&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
-    </message>
-    <message>
-        <source>Double</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Value:</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">&amp;Отмена</translation>
     </message>
     <message>
         <source>name</source>
-        <translation type="unfinished">Название</translation>
+        <translation type="obsolete">Название</translation>
     </message>
     <message>
         <source>Active</source>
-        <translation type="unfinished">Активный</translation>
-    </message>
-    <message>
-        <source>Alt+O</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Alt+C</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Активный</translation>
     </message>
 </context>
 <context>
@@ -2138,6 +2145,13 @@ syncronization</source>
     <message>
         <source>poll</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>EDSPlugin</name>
+    <message>
+        <source>Digital Signature Plugin</source>
+        <translation type="unfinished">Подписывание ЭЦП</translation>
     </message>
 </context>
 <context>
@@ -2353,6 +2367,42 @@ syncronization</source>
     </message>
     <message>
         <source>&amp;Font...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Array</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1</source>
+        <translation type="unfinished">1</translation>
+    </message>
+    <message>
+        <source>Columns:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lines:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>H spacing:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>V spacing:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0</source>
+        <translation type="unfinished">0</translation>
+    </message>
+    <message>
+        <source>Page break</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fill columns first</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2776,39 +2826,23 @@ syncronization</source>
     <name>IntEdit</name>
     <message>
         <source>Name:</source>
-        <translation type="unfinished">Название:</translation>
+        <translation type="obsolete">Название:</translation>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation type="unfinished">&amp;OK</translation>
+        <translation type="obsolete">&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
-    </message>
-    <message>
-        <source>Int</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Value:</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">&amp;Отмена</translation>
     </message>
     <message>
         <source>name</source>
-        <translation type="unfinished">Название</translation>
+        <translation type="obsolete">Название</translation>
     </message>
     <message>
         <source>Active</source>
-        <translation type="unfinished">Активный</translation>
-    </message>
-    <message>
-        <source>Alt+O</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Alt+C</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Активный</translation>
     </message>
 </context>
 <context>
@@ -2862,6 +2896,17 @@ syncronization</source>
     <message>
         <source>Copyright (C) 2008-2011 by DynamicSoft Group</source>
         <translation>Все права защищены (C) 2008-2011 DynamicDocs Group</translation>
+    </message>
+</context>
+<context>
+    <name>KKSApplication</name>
+    <message>
+        <source>QgsApplication object does not exist!</source>
+        <translation>QgsApplication-объект не существует!</translation>
+    </message>
+    <message>
+        <source>There should be only one KKSApplication object</source>
+        <translation>В приложении должен быть создан только один объект QApplication</translation>
     </message>
 </context>
 <context>
@@ -3728,6 +3773,136 @@ Press YES to clear the color value or NO to remains current value</source>
     <message>
         <source> (complex attribute)</source>
         <translation> (Составной атрибут)</translation>
+    </message>
+</context>
+<context>
+    <name>KKSCoreApplication</name>
+    <message>
+        <source>All files (*.*)</source>
+        <translation>Все файлы (*.*)</translation>
+    </message>
+    <message>
+        <source>There should be only one KKSCoreApplication object</source>
+        <translation>В приложении должен быть создан только один объект KKSCoreApplication</translation>
+    </message>
+    <message>
+        <source>Connect to database</source>
+        <translation>Подключиться к БД</translation>
+    </message>
+    <message>
+        <source>Cannot automatically connect to database!
+Do you want to connect with another connection params?</source>
+        <translation>Не могу автоматически подключиться к базе данных!
+Хотите попробовать подключиться с другими параметрами?</translation>
+    </message>
+    <message>
+        <source>Not Secret</source>
+        <translation>Несекретно</translation>
+    </message>
+    <message>
+        <source>Cannot get information about current version of server software you connected to.
+
+Further work is impossible. You should use equal versions of client and server software</source>
+        <translation>Не могу получить версию сервера БД.
+
+Дальнейшая работа невозможна. Следует использовать эквивалентные версии клиента и сервера</translation>
+    </message>
+    <message>
+        <source>Database version mismatch</source>
+        <translation>Не соответствует версия БД</translation>
+    </message>
+    <message>
+        <source>Current version of your client software is %1,
+Current version of server you connected to is %2.
+
+Further work is impossible. You should use equal versions of client and server software</source>
+        <translation>Текущая версия клиентского ПО %1, 
+Текущая версия сервера %2.
+
+Дальнейшая работа невозможна. Следует использовать равные версии клиентского и серверного ПО</translation>
+    </message>
+    <message>
+        <source>You successfully connect with DB,
+but no registered positions responsed.
+
+Further work is impossible.</source>
+        <translation>Вы успешно соединились с БД,
+однако вам не соответствует ни одно
+зарегистрированное должностное лицо.
+
+Дальнейшее продолжение работы невозможно.</translation>
+    </message>
+    <message>
+        <source>Database authorization error</source>
+        <translation>Ошибка авторизации в БД</translation>
+    </message>
+    <message>
+        <source>Cannot make connection between
+current user and current position.
+Current user does not have rights of current position.</source>
+        <translation>Не удалось установить соответствие
+между текущим пользователем и текущим должностным лицом.
+Текущий пользователь не имеет права быть заявленным должностным лицом.</translation>
+    </message>
+    <message>
+        <source>You are authorized for this position but not at current object.
+Make sure that you are at your home object!</source>
+        <translation>Вы назначены на указанную должность, но &quot;домашним&quot; для Вас является другой объект.
+Выберите должность, на которую вы назначены именно на текущем объекте или обратитесь к администратору.</translation>
+    </message>
+    <message>
+        <source>You haven&apos;t selected current position.
+Further work is impossible.</source>
+        <translation>Вы не выбрали текущее должностное лицо.
+Дальнейшая работа невозможна.</translation>
+    </message>
+    <message>
+        <source>Select position</source>
+        <translation>Выбор должностного лица</translation>
+    </message>
+    <message>
+        <source>Office Using</source>
+        <translation>ДСП</translation>
+    </message>
+    <message>
+        <source>Secret</source>
+        <translation>Секретно</translation>
+    </message>
+    <message>
+        <source>Top Secret</source>
+        <translation>Совершенно секретно</translation>
+    </message>
+    <message>
+        <source>High Level</source>
+        <translation>Особой важности</translation>
+    </message>
+    <message>
+        <source>5432</source>
+        <translation>5432</translation>
+    </message>
+    <message>
+        <source>5433</source>
+        <translation>5433</translation>
+    </message>
+    <message>
+        <source>5434</source>
+        <translation>5434</translation>
+    </message>
+    <message>
+        <source>5435</source>
+        <translation>5435</translation>
+    </message>
+    <message>
+        <source>5436</source>
+        <translation>5436</translation>
+    </message>
+    <message>
+        <source>You are not connected to database</source>
+        <translation>Ввы не подсоединены к базе данных</translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation>Внимание</translation>
     </message>
 </context>
 <context>
@@ -4638,6 +4813,190 @@ Error: %1</source>
     </message>
     <message>
         <source>To select features, choose a vector layer in the legend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle extents and mouse position display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Map Tips</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Feature</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move Feature(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Node Tool</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete Selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cut Features</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy Features</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paste Features</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rollback Edits</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel Edits</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rollback All Edits</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel All Edits</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ðåäàêòèðîâàíèå âåêòîðíûõ ñëîåâ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ðåäàêòèðîâàíèå</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation type="unfinished">Редактировать</translation>
+    </message>
+    <message>
+        <source>No Object Selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To remove objects, you must select them in the legend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove objects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Remove %n object(s)?</source>
+        <comment>number of objects to remove</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n object(s) removed.</source>
+        <comment>number of objects removed</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>%1 is an invalid layer - not loaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n feature(s) deleted.</source>
+        <comment>number of features deleted</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Features cut</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rollback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Отмена</translation>
+    </message>
+    <message>
+        <source>Could not %1 changes to layer %2
+
+Errors: %3
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>rollback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commit errors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not commit changes to layer %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Errors: %1
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show more</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Extents:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n feature(s) selected on layer %1.</source>
+        <comment>number of selected features</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Default system font substituted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open labeling dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Labeling</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Font for layer &lt;b&gt;&lt;u&gt;%1&lt;/u&gt;&lt;/b&gt; was not found (&lt;i&gt;%2&lt;/i&gt;). %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maptips require an active layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Map coordinates for the current view extents</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Map coordinates at mouse cursor position</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5576,6 +5935,14 @@ Please connect to your system administrator.</source>
         <source>Окно отладочных сообщений</source>
         <translation></translation>
     </message>
+    <message utf8="true">
+        <source>Отчеты</source>
+        <translation></translation>
+    </message>
+    <message utf8="true">
+        <source>Параметры командной строки...</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>KKSMapWidget</name>
@@ -6243,7 +6610,7 @@ try to rename it with extention. Example: filename.vsd</source>
     </message>
     <message>
         <source>Current version of KKS SITO Operator does not print this window</source>
-        <translation>Текущая версия ККС СИТО Оператор не поддерживает печать содержимого данного окна</translation>
+        <translation type="obsolete">Текущая версия ККС СИТО Оператор не поддерживает печать содержимого данного окна</translation>
     </message>
     <message>
         <source>Set executor</source>
@@ -6287,11 +6654,11 @@ try to rename it with extention. Example: filename.vsd</source>
     </message>
     <message>
         <source>Report</source>
-        <translation>Отчет</translation>
+        <translation type="obsolete">Отчет</translation>
     </message>
     <message>
         <source>Cannot read report source from database</source>
-        <translation>Не могу загрузить шаблон отчета из БД</translation>
+        <translation type="obsolete">Не могу загрузить шаблон отчета из БД</translation>
     </message>
     <message>
         <source>User privileges was updated, but IO attributes stay unchanged because of only owner organization can modify the IO</source>
@@ -6543,6 +6910,22 @@ Please save it before creating new records in it.</source>
         <source>An error was occured while downloading GIS files!</source>
         <translation>Произошла ошибка при загрузке файлов ГИС!</translation>
     </message>
+    <message>
+        <source>Digital Signature Plugin</source>
+        <translation>Подписывание ЭЦП</translation>
+    </message>
+    <message>
+        <source>Insufficient privileges!</source>
+        <translation>Недостаточно прав!</translation>
+    </message>
+    <message>
+        <source>Send as message</source>
+        <translation>Отправить как сообщение</translation>
+    </message>
+    <message>
+        <source>Send As XML Plugin</source>
+        <translation>Отправка сообщения в виде XML</translation>
+    </message>
 </context>
 <context>
     <name>KKSOrganizationAddrForm</name>
@@ -6686,6 +7069,14 @@ Please save it before creating new records in it.</source>
     <message>
         <source>Filter</source>
         <translation>Фильтры</translation>
+    </message>
+    <message>
+        <source>Edit &amp;report</source>
+        <translation>Редактировать шаблон отчета</translation>
+    </message>
+    <message>
+        <source>Prin&amp;t report</source>
+        <translation>Открыть для печати</translation>
     </message>
 </context>
 <context>
@@ -7206,58 +7597,38 @@ This is not allowed!</source>
     <name>KKSSito</name>
     <message>
         <source>All files (*.*)</source>
-        <translation>Все файлы (*.*)</translation>
+        <translation type="obsolete">Все файлы (*.*)</translation>
     </message>
     <message>
         <source>Not Secret</source>
-        <translation>Несекретно</translation>
+        <translation type="obsolete">Несекретно</translation>
     </message>
     <message>
         <source>Office Using</source>
-        <translation>ДСП</translation>
+        <translation type="obsolete">ДСП</translation>
     </message>
     <message>
         <source>Secret</source>
-        <translation>Секретно</translation>
+        <translation type="obsolete">Секретно</translation>
     </message>
     <message>
         <source>Top Secret</source>
-        <translation>Совершенно секретно</translation>
+        <translation type="obsolete">Совершенно секретно</translation>
     </message>
     <message>
         <source>High Level</source>
-        <translation>Особой важности</translation>
-    </message>
-    <message>
-        <source>5432</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>5433</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>5434</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>5435</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>5436</source>
-        <translation></translation>
+        <translation type="obsolete">Особой важности</translation>
     </message>
     <message>
         <source>Database authorization error</source>
-        <translation>Ошибка авторизации в БД</translation>
+        <translation type="obsolete">Ошибка авторизации в БД</translation>
     </message>
     <message>
         <source>You successfully connect with DB,
 but no registered positions responsed.
 
 Further work is impossible.</source>
-        <translation>Вы успешно соединились с БД,
+        <translation type="obsolete">Вы успешно соединились с БД,
 однако вам не соответствует ни одно
 зарегистрированное должностное лицо.
 
@@ -7267,35 +7638,35 @@ Further work is impossible.</source>
         <source>Cannot make connection between
 current user and current position.
 Current user does not have rights of current position.</source>
-        <translation>Не удалось установить соответствие
+        <translation type="obsolete">Не удалось установить соответствие
 между текущим пользователем и текущим должностным лицом.
 Текущий пользователь не имеет права быть заявленным должностным лицом.</translation>
     </message>
     <message>
         <source>Select position</source>
-        <translation>Выбор должностного лица</translation>
+        <translation type="obsolete">Выбор должностного лица</translation>
     </message>
     <message>
         <source>You haven&apos;t selected current position.
 Further work is impossible.</source>
-        <translation>Вы не выбрали текущее должностное лицо.
+        <translation type="obsolete">Вы не выбрали текущее должностное лицо.
 Дальнейшая работа невозможна.</translation>
     </message>
     <message>
         <source>You are authorized for this position but not at current object.
 Make sure that you are at your home object!</source>
-        <translation>Вы назначены на указанную должность, но &quot;домашним&quot; для Вас является другой объект.
+        <translation type="obsolete">Вы назначены на указанную должность, но &quot;домашним&quot; для Вас является другой объект.
 Выберите должность, на которую вы назначены именно на текущем объекте или обратитесь к администратору.</translation>
     </message>
     <message>
         <source>Database version mismatch</source>
-        <translation>Не соответствует версия БД</translation>
+        <translation type="obsolete">Не соответствует версия БД</translation>
     </message>
     <message>
         <source>Cannot get information about current version of server software you connected to.
 
 Further work is impossible. You should use equal versions of client and server software</source>
-        <translation>Не могу получить версию сервера БД.
+        <translation type="obsolete">Не могу получить версию сервера БД.
 
 Дальнейшая работа невозможна. Следует использовать эквивалентные версии клиента и сервера</translation>
     </message>
@@ -7304,26 +7675,26 @@ Further work is impossible. You should use equal versions of client and server s
 Current version of server you connected to is %2.
 
 Further work is impossible. You should use equal versions of client and server software</source>
-        <translation>Текущая версия клиентского ПО %1, 
+        <translation type="obsolete">Текущая версия клиентского ПО %1, 
 Текущая версия сервера %2.
 
 Дальнейшая работа невозможна. Следует использовать равные версии клиентского и серверного ПО</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation>Внимание</translation>
+        <translation type="obsolete">Внимание</translation>
     </message>
     <message>
         <source>You are not connected to database</source>
-        <translation>Ввы не подсоединены к базе данных</translation>
+        <translation type="obsolete">Ввы не подсоединены к базе данных</translation>
     </message>
     <message>
         <source>QgsApplication object does not exist!</source>
-        <translation>QgsApplication-объект не существует!</translation>
+        <translation type="obsolete">QgsApplication-объект не существует!</translation>
     </message>
     <message>
         <source>There should be only one KKSSito object</source>
-        <translation>В приложении может быть инициализирован только один KKSSito-объект</translation>
+        <translation type="obsolete">В приложении может быть инициализирован только один KKSSito-объект</translation>
     </message>
 </context>
 <context>
@@ -8122,6 +8493,100 @@ Further work is impossible. You should use equal versions of client and server s
     </message>
 </context>
 <context>
+    <name>LabelDefinitionEditor</name>
+    <message>
+        <source>Label Definition Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Label Name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Label Properties</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paper Size:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Columns:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rows:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Width:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Height:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Offset X:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Offset Y:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Horizontal Gap:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vertical Gap:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Отмена</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished">Сохранить</translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation type="unfinished">Внимание</translation>
+    </message>
+</context>
+<context>
+    <name>LabelDefinitions</name>
+    <message>
+        <source>Label Definitions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished">Закрыть</translation>
+    </message>
+    <message>
+        <source>New</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation type="unfinished">Редактировать</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">Удалить</translation>
+    </message>
+    <message>
+        <source>Delete Label Definition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Really delete this label definition?  This cannot be undone.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>LabelEditor</name>
     <message>
         <source>0.01</source>
@@ -8239,107 +8704,35 @@ Further work is impossible. You should use equal versions of client and server s
     <name>ListEdit</name>
     <message>
         <source>Name:</source>
-        <translation type="unfinished">Название:</translation>
+        <translation type="obsolete">Название:</translation>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation type="unfinished">&amp;OK</translation>
+        <translation type="obsolete">&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
+        <translation type="obsolete">&amp;Отмена</translation>
     </message>
     <message>
         <source>&amp;Edit</source>
-        <translation type="unfinished">&amp;Редактировать</translation>
+        <translation type="obsolete">&amp;Редактировать</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Удалить</translation>
+        <translation type="obsolete">Удалить</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation type="unfinished">Внимание</translation>
-    </message>
-    <message>
-        <source>List</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Внимание</translation>
     </message>
     <message>
         <source>name</source>
-        <translation type="unfinished">Название</translation>
-    </message>
-    <message>
-        <source>Values:</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Название</translation>
     </message>
     <message>
         <source>Active</source>
-        <translation type="unfinished">Активный</translation>
-    </message>
-    <message>
-        <source>Alt+O</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Alt+C</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;New</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Alt+N</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Move &amp;Up</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Alt+U</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Alt+E</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Move &amp;Down</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Alt+D</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>String</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Int</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Double</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Bool</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unknown Type</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>I do not understand the type %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>I do not know how to edit QVariant type %1.</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Активный</translation>
     </message>
 </context>
 <context>
@@ -8486,51 +8879,19 @@ Further work is impossible. You should use equal versions of client and server s
     <name>NewVariant</name>
     <message>
         <source>Name:</source>
-        <translation type="unfinished">Название:</translation>
+        <translation type="obsolete">Название:</translation>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation type="unfinished">&amp;OK</translation>
+        <translation type="obsolete">&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
+        <translation type="obsolete">&amp;Отмена</translation>
     </message>
     <message>
         <source>Type:</source>
-        <translation type="unfinished">Тип:</translation>
-    </message>
-    <message>
-        <source>New Variant</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>String</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Int</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Double</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Bool</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>List</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Alt+O</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Alt+C</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Тип:</translation>
     </message>
 </context>
 <context>
@@ -8732,22 +9093,6 @@ Further work is impossible. You should use equal versions of client and server s
         <source>Label</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Avery 5263</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Avery 5264</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Avery 8460</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>CILS ALP1-9200-1</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>ParamListEdit</name>
@@ -8796,7 +9141,7 @@ Further work is impossible. You should use equal versions of client and server s
     </message>
     <message>
         <source>Warning</source>
-        <translation type="unfinished">Внимание</translation>
+        <translation type="obsolete">Внимание</translation>
     </message>
     <message>
         <source>Parameter List</source>
@@ -8849,11 +9194,26 @@ The root node is not &apos;report&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The name for the parameter you specified already exists in the list.</source>
+        <source>&lt;p&gt;The name for the parameter you specified already exists in the list.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ParameterProperties</name>
+    <message>
+        <source>Parameter Properties</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Type:</source>
+        <translation type="unfinished">Тип:</translation>
+    </message>
+    <message>
         <source>String</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bool</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8865,7 +9225,79 @@ The root node is not &apos;report&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Bool</source>
+        <source>List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation type="unfinished">Название:</translation>
+    </message>
+    <message>
+        <source>Value:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>False</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>True</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Values:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;New</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+N</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move &amp;Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+U</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation type="unfinished">&amp;Редактировать</translation>
+    </message>
+    <message>
+        <source>Alt+E</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move &amp;Down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+D</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">Удалить</translation>
+    </message>
+    <message>
+        <source>Active</source>
+        <translation type="unfinished">Активный</translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation type="unfinished">Внимание</translation>
+    </message>
+    <message>
+        <source>I do not know how to edit QVariant type %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I do not recognize type %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8874,10 +9306,6 @@ The root node is not &apos;report&apos;.</source>
     </message>
     <message>
         <source>I do not understand the type %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>I do not know how to edit QVariant type %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -9388,24 +9816,16 @@ Avg speed: %3 Kb/sec</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Context Query</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Parameter Query</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>-- Select Query --</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Connect to Database</source>
-        <translation type="unfinished"></translation>
+        <translation>Подключиться к БД</translation>
     </message>
     <message>
         <source>Disconnect from Database</source>
-        <translation type="unfinished"></translation>
+        <translation>Отключиться от БД</translation>
     </message>
     <message>
         <source>OpenRPT Report Writer for Windows</source>
@@ -9421,10 +9841,6 @@ Avg speed: %3 Kb/sec</source>
     </message>
     <message>
         <source>OpenRPT Report Writer</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Copyright (c) 2002-2009, OpenMFG, LLC.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -9885,7 +10301,7 @@ Path = %1</source>
     </message>
     <message>
         <source>Ping response received and saved</source>
-        <translation type="unfinished"></translation>
+        <translation>Запрос на проверку соединения получен и сохранен в БД</translation>
     </message>
     <message>
         <source>System type for embedded GIS files</source>
@@ -9926,6 +10342,144 @@ Path = %1</source>
     <message>
         <source>Groupped by categories</source>
         <translation>Сгруппированные по категориям</translation>
+    </message>
+    <message>
+        <source>Ñòðóêòóðà ïàðàìåòðîâ ñëåäóþùàÿ:
+ddocclient_app [-h] [-c] [-w] [-H host] [-p port] [-U user] [-x password] [-b database] [-o id_object] [-d id_dl] 
+
+-h - Âûâåñòè äàííîå ñîîáùåíèå è çàâåðøèòü ðàáîòó.
+
+-c - Óêàçûâàåò íà íåîáõîäèìîñòü âûïîëíåíèÿ àâòîìàòè÷åñàêîãî ïîäêëþ÷åíèÿ ê ÁÄ.
+     Àâòîìàòè÷åñêîå ïîäêëþ÷åíèå âîçìîæíî, òîëüêî åñëè çàäàíû õîòÿ áû ïàðàìåòðû -H, -U, -b.
+     Â ïðîòèâíîì ñëó÷àå ïðè ñòàðòå ïðèëîæåíèÿ áóäåò âûâåäåíî îêíî â ïàðàìåòðàìè ïîäêëþ÷åíèÿ ê ÁÄ.
+
+-w - Óêàçûâàåò íà íåîáõîäèìîñòü âûâîäà îêíà ñ ïàðàìåòðàìè ñîåäèíåíèÿ ñðàçó æå ïðè ñòàðòå ïðèëîæåíèÿ.
+     Ïàðàìåòð -c ïðè ýòîì èãíîðèðóåòñÿ.
+
+-H - Õîñò, íà êîòîðîì ôóíêöèîíèðóåò ÁÄ.
+     Â ïðîöåññå ðàáîòû ïðèëîæåíèÿ ïåðåïîäêëþ÷èòüñÿ ê ÁÄ íà äðóãîì õîñòå áóäåò íåëüçÿ.
+
+-p - Ïîðò, íà êîòîðîì ôóíêöèîíèðóåò ÁÄ.
+     Â ïðîöåññå ðàáîòû ïðèëîæåíèÿ ïåðåïîäêëþ÷èòüñÿ ê ÁÄ íà äðóãîì ïîðòó áóäåò íåëüçÿ.
+
+-U - Ïîëüçîâàòåëü ÁÄ.
+     Â ïðîöåññå ðàáîòû ïðèëîæåíèÿ ïåðåïîäêëþ÷èòüñÿ ê ÁÄ ïîä äðóãèì ïîëüçîâàòåëåì áóäåò íåëüçÿ.
+
+-x - Ïàðîëü ïîëüçîâàòåëÿ ÁÄ.
+
+-b - Èìÿ áàçû äàííûõ.
+     Â ïðîöåññå ðàáîòû ïðèëîæåíèÿ ïåðåïîäêëþ÷èòüñÿ ê äðóãîé ÁÄ áóäåò íåëüçÿ.
+
+-o - Èäåíòèôèêàòîð èíôîðìàöèîííîãî ðåñóðñà, êîòîðûé àâòîìàòè÷åñêè äîëæåí áûòü çàãðóæåí ïðè ñòàðòå ïðèëîæåíèÿ.
+
+-d - Èäåíòèôèêàòîð äîëæíîñòè, ïîä êîòîðîé íåîáõîäèìî âîéòè â ñèñòåìó.
+     Ïðè ýòîì áóäåò îñóùåñòâëåíà ïðîâåðêà äîïóñòèìîñòè àâòîðèçàöèè ïîä äàííîé äîëæíîñòüþ.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Íîâîå îïèñàíèå ïîðó÷åíèÿ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>íîâûé ôàéë</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Õàðàêòåðèñòèêà ïîðó÷åíèÿ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>åùå îäèí íîâûé ôàéë</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reper </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Organizations</source>
+        <translation type="unfinished">Организации</translation>
+    </message>
+    <message>
+        <source>Edit selected record in openRPT report editor</source>
+        <translation>Открыть шаблон отчета для редактирования в редакторе openRPT</translation>
+    </message>
+    <message>
+        <source>Print selected record in openRPT report viewer</source>
+        <translation>Открыть отчет для печати</translation>
+    </message>
+    <message>
+        <source>Deleted vertices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Moved vertices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 %2</source>
+        <translation type="unfinished">%1 %2</translation>
+    </message>
+    <message>
+        <source>Copyright (c) 2002-2011, OpenMFG, LLC.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>3.3.0</source>
+        <translation type="unfinished">3.3.0</translation>
+    </message>
+    <message>
+        <source>Found next %1 messages for sent</source>
+        <translation>Из БД прочитаны %1 сообщений для отправки</translation>
+    </message>
+    <message>
+        <source>Found internal data corruption! Some out messages will be skipped!</source>
+        <translation>Обнаружено внутренее повреждение данных! Сообщение будет пропущено!</translation>
+    </message>
+    <message>
+        <source>All found %1 messages sended! </source>
+        <translation>Все прочитанные из БД сообщения отправлены!</translation>
+    </message>
+    <message>
+        <source>Unsupported message format! XMLMessage expected!</source>
+        <translation>Неподдерживаемый формат сообщения! Ожидалось сообщение в формате XML!</translation>
+    </message>
+    <message>
+        <source>Cannot insert xml data to database! SQL = %1</source>
+        <translation>Не могу записать XML-данные в БД! SQL = %1</translation>
+    </message>
+    <message>
+        <source>Unrecognized input XML format! Income message was not saved in database!</source>
+        <translation>Не поддерживаемый формат входящих XML-данных! Входящее сообщение не записано в БД!</translation>
+    </message>
+    <message>
+        <source>XML = %1</source>
+        <translation>XML = %1</translation>
+    </message>
+    <message>
+        <source>Start of IO data writing. IO UID = %1</source>
+        <translation>Начинаю запись информационных ресурсов в БД. ИД = %1</translation>
+    </message>
+    <message>
+        <source>Current version of DynamicDocs Interactor does not support transferring of messages in xml data formats in internal representation!</source>
+        <translation>Текущая версия DynamicDocs Interactor не поддерживает передачу XML-сообщений во внутреннем формате DynamicDocs!</translation>
+    </message>
+    <message>
+        <source>XML is empty!</source>
+        <translation>XML пуст!</translation>
+    </message>
+    <message>
+        <source>%1</source>
+        <translation>%1</translation>
+    </message>
+    <message>
+        <source>Start of record data writing. Table UID = %1, Record UID = %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot parse record unique_id field! Unique_id = %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10299,20 +10853,8 @@ Path = %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>+</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Delete selected features (Ctrl+D)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>...</source>
         <translation type="unfinished">...</translation>
-    </message>
-    <message>
-        <source>Ctrl+D</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Select features using an expression</source>
@@ -10511,6 +11053,10 @@ Path = %1</source>
     </message>
     <message>
         <source>Error filtering</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete selected features (DEL)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -10935,6 +11481,10 @@ Error was:%2</source>
         <source>You did not specify an interpolation value. A default value of %1 has been set.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Expression based attribute</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QgsDiagramPropertiesBase</name>
@@ -11133,6 +11683,14 @@ Leave empty to automatically apply the maximum value.</source>
     </message>
     <message>
         <source>Color</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit expression</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add expression</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -12926,9 +13484,131 @@ not displayed</source>
     </message>
 </context>
 <context>
+    <name>QgsMapToolAddFeature</name>
+    <message>
+        <source>add feature</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Layer cannot be added to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The data provider for this layer does not support the addition of features.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wrong editing tool</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot apply the &apos;capture point&apos; tool on this vector layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Coordinate transform error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot transform the point to the layers coordinate system</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Feature added</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot apply the &apos;capture line&apos; tool on this vector layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot apply the &apos;capture polygon&apos; tool on this vector layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished">Ошибка</translation>
+    </message>
+    <message>
+        <source>Cannot add feature. Unknown WKB type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The feature could not be added because removing the polygon intersections would change the geometry type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error was reported during intersection removal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The feature cannot be added because it&apos;s geometry is empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The feature cannot be added because it&apos;s geometry collapsed due to intersection avoidance</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QgsMapToolCapture</name>
+    <message>
+        <source>Validation started.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Validation finished.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QgsMapToolEdit</name>
+    <message>
+        <source>No active vector layer</source>
+        <translation type="unfinished">Нет активного векторного слоя</translation>
+    </message>
+    <message>
+        <source>Choose a vector layer in the legend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Layer not editable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use &apos;Toggle Editing&apos; to make it editable</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QgsMapToolIdentifyAction</name>
     <message>
         <source>No features at this position found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QgsMapToolMoveFeature</name>
+    <message>
+        <source>Feature moved</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QgsMapToolNodeTool</name>
+    <message>
+        <source>Inserted vertex</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QgsMapToolVertexEdit</name>
+    <message>
+        <source>Snap tolerance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not snap segment. Have you set the tolerance in Settings &gt; Snapping Options?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -13342,10 +14022,6 @@ Proceed?</source>
         <translation type="unfinished">...</translation>
     </message>
     <message>
-        <source>Coordinate Reference System (CRS)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Enable &apos;on the fly&apos; CRS transformation</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13406,10 +14082,6 @@ Proceed?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Service capabilitities</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Person</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13447,10 +14119,6 @@ Proceed?</source>
     </message>
     <message>
         <source>Keyword list</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>WMS capabilitities</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -13514,10 +14182,6 @@ Proceed?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>WFS capabilitities</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Published</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13543,6 +14207,22 @@ Proceed?</source>
     </message>
     <message>
         <source>Python macros</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Service capabilities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>WMS capabilities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>WFS capabilities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>WCS capabilities</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -14042,14 +14722,6 @@ Proceed?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Build pyramids</source>
         <translation type="unfinished"></translation>
     </message>
@@ -14133,6 +14805,14 @@ p, li { white-space: pre-wrap; }
         <source>Save Style ...</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Cantarell&apos;;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QgsSaveStyleToDbDialog</name>
@@ -14189,6 +14869,44 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>Optionally pick an input form for attribute editing (QT Designer UI format), it will be stored in the database</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QgsSelectedFeature</name>
+    <message>
+        <source>Validation started.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Validation finished (%n error(s) found).</source>
+        <comment>number of geometry errors</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>ring %1, vertex %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>polygon %1, ring %2, vertex %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>polyline %1, vertex %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>vertex %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>point %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>single point</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -14308,6 +15026,10 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>Save Style</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not supported</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -14537,6 +15259,38 @@ p, li { white-space: pre-wrap; }
         <source>Save Style ...</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Rendering</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Simplify geometry</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Note:&lt;/b&gt; Feature simplification may speed up rendering but can result in rendering inconsistencies</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Simplification threshold (higher values result in more simplification): </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Higher values result in more simplification</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>pixels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Simplify on provider side if possible</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum scale at which the layer should be simplified (1:1 always simplifies): </source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QgsVectorLayerSaveAsDialog</name>
@@ -14702,7 +15456,7 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Any changes you have made the the sql query may be lost by turning this option on. Are you sure you want to continue?</source>
+        <source>&lt;p&gt;Any changes you have made to the sql query may be lost by turning this option on. Are you sure you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -14738,6 +15492,84 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>The name you specified already exists in the list of query names.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RadioImagePlugin</name>
+    <message>
+        <source>Radio image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Radio image test</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect to db</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot connect to database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Radio Image Plugin</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ReperMainWindowForm</name>
+    <message>
+        <source>MainWindow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;DB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;RLI Analisys</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Connect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>3D &amp;Models</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;RLI</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>E&amp;xit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+Q</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Search region</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Comparison</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>test plugin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Plugins ...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -14976,14 +15808,6 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Position [X: %s, Y: %s]    Size [W: %s, H: %s]</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Start Point [X: %s, Y: %s]    End Point [X: %s, Y: %s]</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Unknown Entity Type</source>
         <translation type="unfinished"></translation>
     </message>
@@ -15059,6 +15883,82 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>Angle (0-360) :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Undo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Redo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom In</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Label Definitions...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Position [X: %1, Y: %2]    Size [W: %3, H: %4]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Point [X: %1, Y: %2]    End Point [X: %3, Y: %4]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nothing to undo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nothing to redo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation type="unfinished">Внимание</translation>
+    </message>
+    <message>
+        <source>You must connect to a database with a &apos;labeldef&apos; table to edit label definitions.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Database Driver</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A connection could not be established with the specified
+Database as the Proper Database Drivers have not been installed.
+Contact your Systems Administrator.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot Connect to Database Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A connection to the specified Database Server cannot be made.  This may be due to an
+incorrect Username and/or Password or that the Database Server in question cannot
+support anymore connections.
+
+Please verify your Username and Password and try again or wait until the specified
+Database Server is less busy.
+
+System Error &apos;%1&apos;
+%2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ReportWriterWindow::dbLoadDoc() : ERROR on setContent()
+	%s (Line %d Column %d)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -15432,23 +16332,11 @@ p, li { white-space: pre-wrap; }
     <name>ReportWriterWindow</name>
     <message>
         <source>&amp;Cascade</source>
-        <translation type="unfinished">&amp;Каскадом</translation>
+        <translation type="obsolete">&amp;Каскадом</translation>
     </message>
     <message>
         <source>&amp;Tile</source>
-        <translation type="unfinished">&amp;Мозайкой</translation>
-    </message>
-    <message>
-        <source>E&amp;xit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Windows</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 - %2 on %3/%4 AS %5</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">&amp;Мозайкой</translation>
     </message>
 </context>
 <context>
@@ -15619,6 +16507,40 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>SendAsXMLForm</name>
+    <message>
+        <source>Send As XML</source>
+        <translation>Отравить в виде XML-сообщения</translation>
+    </message>
+    <message>
+        <source>You should select at least one organization</source>
+        <translation>Необходимо выбрать хотя-бы одного получателя</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Ошибка</translation>
+    </message>
+    <message>
+        <source>Cannot send selected data to external system!</source>
+        <translation>Не могу отправить данные во внешнюю систему!</translation>
+    </message>
+    <message>
+        <source>Inconsistent record found! Cannot send!</source>
+        <translation>Обнаружены поврежденные данные! Не могу отправить!</translation>
+    </message>
+    <message>
+        <source>Nothing to send...</source>
+        <translation>Нет данных для отправки...</translation>
+    </message>
+</context>
+<context>
+    <name>SendAsXMLPlugin</name>
+    <message>
+        <source>Send As XML Plugin</source>
+        <translation>Отправка сообщения в виде XML</translation>
+    </message>
+</context>
+<context>
     <name>SimpleMapWindowBase</name>
     <message>
         <source>Exit</source>
@@ -15629,39 +16551,23 @@ p, li { white-space: pre-wrap; }
     <name>StringEdit</name>
     <message>
         <source>Name:</source>
-        <translation type="unfinished">Название:</translation>
+        <translation type="obsolete">Название:</translation>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation type="unfinished">&amp;OK</translation>
+        <translation type="obsolete">&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
-    </message>
-    <message>
-        <source>String</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Value:</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">&amp;Отмена</translation>
     </message>
     <message>
         <source>name</source>
-        <translation type="unfinished">Название</translation>
+        <translation type="obsolete">Название</translation>
     </message>
     <message>
         <source>Active</source>
-        <translation type="unfinished">Активный</translation>
-    </message>
-    <message>
-        <source>Alt+O</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Alt+C</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Активный</translation>
     </message>
 </context>
 <context>
@@ -16320,6 +17226,17 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>command_line_params_form</name>
+    <message>
+        <source>Command Line Params</source>
+        <translation>Параметры командной строки</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Закрыть</translation>
+    </message>
+</context>
+<context>
     <name>command_widget</name>
     <message>
         <source>Create/edit command</source>
@@ -16656,6 +17573,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <source>Server port number</source>
         <translation type="obsolete">Порт этого сервера</translation>
+    </message>
+</context>
+<context>
+    <name>digital_signature_form</name>
+    <message>
+        <source>Digital Signature</source>
+        <translation>Электронная цифровая подпись</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
@@ -17729,6 +18657,10 @@ synchronization</source>
         <source>Добавить в список файлов информационного объекта</source>
         <translation></translation>
     </message>
+    <message>
+        <source>PushButton</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>kkslifecycleform</name>
@@ -18203,7 +19135,7 @@ System Error &apos;%1&apos;
     </message>
     <message>
         <source>Rubric category :</source>
-        <translation>Категория рубрики:</translation>
+        <translation type="obsolete">Категория рубрики:</translation>
     </message>
     <message>
         <source>Add/Edit rubric</source>
@@ -18258,6 +19190,21 @@ System Error &apos;%1&apos;
     <message>
         <source>OK</source>
         <translation>OK</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Отмена</translation>
+    </message>
+</context>
+<context>
+    <name>send_as_xml_form</name>
+    <message>
+        <source>Send As XML</source>
+        <translation>Отравить в виде XML-сообщения</translation>
+    </message>
+    <message>
+        <source>Send</source>
+        <translation>Отправить как сообщение</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -18601,6 +19548,54 @@ System Error &apos;%1&apos;
     <message>
         <source>Gateway (connect to):</source>
         <translation>Шлюз:</translation>
+    </message>
+    <message>
+        <source>Host:</source>
+        <translation>Хост:</translation>
+    </message>
+    <message>
+        <source>Database name:</source>
+        <translation>Название  БД:</translation>
+    </message>
+    <message>
+        <source>User name:</source>
+        <translation>Имя пользователя:</translation>
+    </message>
+    <message>
+        <source>jupiter</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Password:</source>
+        <translation>Пароль:</translation>
+    </message>
+    <message>
+        <source>Port:</source>
+        <translation>Порт:</translation>
+    </message>
+    <message>
+        <source>Gateway (connect to)</source>
+        <translation>Шлюз:</translation>
+    </message>
+    <message>
+        <source>Port on which server is accepted client connections</source>
+        <translation>Порт на удаленном хосте, на который передаются данные</translation>
+    </message>
+    <message>
+        <source>Timeout for wait incoming connection from clients (must be increase for slow connection)</source>
+        <translation>Таймаут сервера приожидании входящих данных (для медленных соединений необходимо увеличить)</translation>
+    </message>
+    <message>
+        <source>Timeout (msec):</source>
+        <translation>Таймаут (в миллисекундах):</translation>
+    </message>
+    <message>
+        <source>1000</source>
+        <translation>1000</translation>
+    </message>
+    <message>
+        <source>Id transport:</source>
+        <translation>ИД транспортной задачи:</translation>
     </message>
 </context>
 </TS>

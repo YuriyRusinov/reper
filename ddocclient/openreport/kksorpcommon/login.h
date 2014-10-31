@@ -25,12 +25,18 @@ class QSplashScreen;
 
 #include <QDialog>
 
+namespace Ui
+{
+    class login;
+}
+
 #include "parameter.h"
 
-#include "tmp/ui_login.h"
+//#include "tmp/ui_login.h"
+//#include "GeneratedFiles/ui_login.h"
 //#include "ui_login.h"
 
-class login : public QDialog, public Ui::login
+class login : public QDialog //, public Ui::login
 {
     Q_OBJECT
 
@@ -56,6 +62,8 @@ class login : public QDialog, public Ui::login
 
 
   private:
+    Ui::login * ui;
+    
     bool _captive;
     QSplashScreen *_splash;
     QString _cUsername;

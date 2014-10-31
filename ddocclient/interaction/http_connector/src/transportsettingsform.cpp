@@ -13,12 +13,18 @@ TransportSettingsForm :: TransportSettingsForm (QSettings *s, QWidget *parent, Q
 
     QIntValidator *pDbVal = new QIntValidator (0, 100000, this);
     UI->lEPort->setValidator (pDbVal);
+    
     QIntValidator *pHttpVal = new QIntValidator (0, 100000, this);
     UI->lEHttpPort->setValidator (pHttpVal);
+    
     QIntValidator *pHttpTVal = new QIntValidator (1, 100000, this);
     UI->lEHttpTransport->setValidator (pHttpTVal);
+    
     QIntValidator *pServerVal = new QIntValidator (0, 100000, this);
     UI->lEServerPort->setValidator (pServerVal);
+    
+    QIntValidator *pTimeoutVal = new QIntValidator (0, 100000, this);
+    UI->leConnectionTimeout->setValidator(pTimeoutVal);
 
     this->init ();
 
@@ -61,8 +67,10 @@ void TransportSettingsForm :: setConnectionSettings (void)
     settings->setValue ("port", UI->lEHttpPort->text ());
    
 
-    settings->setValue ("server_host", serverIp.toString());
+    //settings->setValue ("server_host", serverIp.toString());
     settings->setValue ("server_port", UI->lEServerPort->text ());
+    settings->setValue ("server_timeout", UI->leConnectionTimeout->text());
+
     settings->endGroup ();
     accept ();
 }
@@ -87,13 +95,13 @@ void TransportSettingsForm :: init (void)
     UI->lEServerPort->setToolTip(tr("Server port number"));
 
     UI->lEDBName->setText (settings->value ("database").toString());
-    UI->lEUserName->setText (settings->value ("user").toString());
+    //ksa UI->lEUserName->setText (settings->value ("user").toString());
     UI->lEPassword->setText (settings->value ("password").toString());
-    UI->lEPort->setText (settings->value ("port").toString());
+    UI->lEPort->setText (settings->value ("port", "5432").toString());
     settings->endGroup ();
 
     settings->beginGroup("Transport");
-    UI->lEHttpTransport->setText (settings->value ("transport").toString ());
+    UI->lEHttpTransport->setText (settings->value ("transport", "1").toString ());
     settings->endGroup ();
 
     settings->beginGroup ("Http");
@@ -110,7 +118,8 @@ void TransportSettingsForm :: init (void)
 	//string = serverIp.toString();
 
     //UI->lEServerHost->setText (settings->value ("server_host").toString ());//, UI->lEServerHost->text ());
-    UI->lEServerPort->setText (settings->value ("server_port").toString ());
+    UI->lEServerPort->setText (settings->value ("server_port", "9000").toString ());
+    UI->leConnectionTimeout->setText (settings->value ("server_timeout", "1000").toString ());
     //, UI->lEServerPort->text ());
     settings->endGroup ();
 }

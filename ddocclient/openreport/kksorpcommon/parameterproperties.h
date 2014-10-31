@@ -22,11 +22,17 @@
 #define PARAMETERPROPERTIES_H
 
 #include <QDialog>
+#include <QVariant>
+
+namespace Ui
+{
+    class ParameterProperties;
+}
 
 //ksa #include "tmp/ui_parameterproperties.h"
-#include "ui_parameterproperties.h"
+//#include "ui_parameterproperties.h"
 
-class ParameterProperties : public QDialog, public Ui::ParameterProperties
+class ParameterProperties : public QDialog //, public Ui::ParameterProperties
 {
   Q_OBJECT
 
@@ -54,5 +60,9 @@ class ParameterProperties : public QDialog, public Ui::ParameterProperties
     virtual void setType(QString p);
     virtual void setType(QVariant::Type p);
     virtual void setValue(QVariant p);
+
+  private:
+      Ui::ParameterProperties * ui;
+
 };
 #endif

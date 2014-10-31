@@ -7,12 +7,14 @@
 #include "ddocinteractorbase.h"
 
 #include "ddocinteractorclient.h"
+#include "ddocinteractorclientforxml.h"
 #include "ddocinteractorserver.h"
 
 DDocInteractorBase::DDocInteractorBase(QObject * parent) 
    : QObject(parent),
    m_server(NULL),
    m_client(NULL),
+   m_clientForXML(NULL),
    m_started(false),
    m_isExiting(false)
 {
@@ -37,9 +39,14 @@ DDocInteractorBase::~DDocInteractorBase()
         m_client->quit();
         delete m_client;
     }
+
+    if(m_clientForXML){
+        m_clientForXML->quit();
+        delete m_clientForXML;
+    }
 }
 
-int DDocInteractorBase::start(bool mode, int interval)
+int DDocInteractorBase::start(bool mode, int interval, bool bMain, bool bXML)
 {
     if(m_started)
         return 1;
@@ -56,6 +63,10 @@ int DDocInteractorBase::start(bool mode, int interval)
     int transport;//(settings.value("Http/transport","1").toInt());  
 
     int server_port;//(settings.value("Http/server_port", "6000").toInt());
+
+    int waitClientConnectionTimeout = 1000; //тайм-аут для функции QTcpSocket::waitForReadyRead()
+                                            //задается в миллисекундах
+                                            // по умолчанию 1000
       
     settings.beginGroup ("Database");
     dbName = settings.value ("database").toString ();
@@ -75,6 +86,8 @@ int DDocInteractorBase::start(bool mode, int interval)
     
     QString gatewayHost = settings.value ("host", "").toString();
     int gatewayPort = settings.value ("port", "0").toInt();
+
+    waitClientConnectionTimeout = settings.value("server_timeout", "1000").toInt();//in msec
 
     settings.endGroup ();
 
@@ -97,18 +110,23 @@ int DDocInteractorBase::start(bool mode, int interval)
     
     m_client = new DDocInteractorClient(m_loader, this);
     connect(m_client, SIGNAL(finished()), m_client, SLOT(deleteLater()));
-    m_client->setMode(mode);
+    if(mode || !bMain)
+        m_client->setManual(true); //true - is manual mode
+    else{
+        m_client->setManual(false);//если сказано не запускать поток опроса основной очереди (галочка не стоит), то считаем, что она работает в ручном режиме
+    }
+
     m_client->setInterval(interval);
     m_client->setGateway(gatewayHost, gatewayPort);
     
-    if(mode){//manual
+    if(mode || !bMain){//manual
         connect(this, SIGNAL(startSending()), m_client, SLOT(startProc()));
         connect(m_client, SIGNAL(sendingStarted()), this, SIGNAL(sendingStarted()));
         connect(m_client, SIGNAL(sendingCompleted()), this, SIGNAL(sendingCompleted()));
-        emit showManualStartButton();
+        //emit showManualStartButton();
     }
     else{
-        emit hideManualStartButton();
+        //emit hideManualStartButton();
     }
 
     connect(m_client, SIGNAL(pingsSended(QMap<QString, JKKSPing>)), this, SIGNAL(pingsSended(QMap<QString, JKKSPing>)));
@@ -120,7 +138,42 @@ int DDocInteractorBase::start(bool mode, int interval)
     emit theSignal();
     disconnect(this, SIGNAL(theSignal()), m_client, SLOT(init()));
 
+/****/
+    m_clientForXML = new DDocInteractorClientForXML(m_loader, this);
+    connect(m_clientForXML, SIGNAL(finished()), m_clientForXML, SLOT(deleteLater()));
+    if(mode || !bXML)
+        m_clientForXML->setManual(true); //true - is manual mode
+    else{
+        m_clientForXML->setManual(false);//если сказано не запускать поток опроса основной очереди (галочка не стоит), то считаем, что она работает в ручном режиме
+    }
+    m_clientForXML->setInterval(interval);
+    m_clientForXML->setGateway(gatewayHost, gatewayPort);
+    
+    if(mode || !bXML){//manual
+        connect(this, SIGNAL(startSendingForXML()), m_clientForXML, SLOT(startProc()));
+        connect(m_clientForXML, SIGNAL(sendingStarted()), this, SIGNAL(sendingStarted()));
+        connect(m_clientForXML, SIGNAL(sendingCompleted()), this, SIGNAL(sendingCompleted()));
+        //emit showManualStartButton();
+    }
+    else{
+        //emit hideManualStartButton();
+    }
+
+    if(mode)// || !(bXML && bMain)){
+        emit showManualStartButton();
+    else
+        emit hideManualStartButton();
+
+    connect(this, SIGNAL(refreshTimer(int)), m_clientForXML, SLOT(slotRefreshTimer(int)));
+   
+    connect(this, SIGNAL(theSignal()), m_clientForXML, SLOT(init()));
+    m_clientForXML->start();
+    emit theSignal();
+    disconnect(this, SIGNAL(theSignal()), m_clientForXML, SLOT(init()));
+
+/****/
     m_server = new DDocInteractorServer(m_loader, this);
+    m_server->setWaitClientConnectionTimeout(waitClientConnectionTimeout);
     connect(m_server, SIGNAL(finished()), m_server, SLOT(deleteLater()));
     m_server->setPort(server_port);
     connect(m_server, SIGNAL(pingsSended(QMap<QString, JKKSPing>)), this, SIGNAL(pingsSended(QMap<QString, JKKSPing>)));
@@ -141,7 +194,9 @@ int DDocInteractorBase::start(bool mode, int interval)
 
         m_server->quit();
         m_client->quit();
+        m_clientForXML->quit();
         delete m_client;
+        delete m_clientForXML;
         delete m_server;
 
         return 0;
@@ -154,26 +209,32 @@ int DDocInteractorBase::start(bool mode, int interval)
 
 void DDocInteractorBase::slotExitThreads()
 {
-    if(!m_server && !m_client)
+    if(!m_server && !m_client && !m_clientForXML)
         return;
 
     m_isExiting = true;
+
     m_client->m_isExiting = true;
+    m_clientForXML->m_isExiting = true;
     m_server->m_isExiting = true;
 
     emit exitThreads();
 
     m_server->quit();
     m_client->quit();
+    m_clientForXML->quit();
     
     m_server->wait();
     m_client->wait();
+    m_clientForXML->wait();
 
     delete m_server;
     delete m_client;
+    delete m_clientForXML;
     
     m_server = NULL;
     m_client = NULL;
+    m_clientForXML = NULL;
 
 }
 
@@ -210,5 +271,41 @@ void DDocInteractorBase::slotStopClient()
     connect(this, SIGNAL(startSending()), m_client, SLOT(startProc()));
     connect(m_client, SIGNAL(sendingStarted()), this, SIGNAL(sendingStarted()));
     connect(m_client, SIGNAL(sendingCompleted()), this, SIGNAL(sendingCompleted()));
+
+}
+
+void DDocInteractorBase::slotStartClientForXML()
+{
+    //для этого достаточно активизировать таймер
+    if(!m_clientForXML)
+        return;
+
+    if(!m_clientForXML->manual)//если и так в авто-режиме, ничего запускать не надо
+        return;
+
+    m_clientForXML->manual = false;
+    disconnect(this, SIGNAL(startSending()), m_clientForXML, SLOT(startProc()));
+    disconnect(m_clientForXML, SIGNAL(sendingStarted()), this, SIGNAL(sendingStarted()));
+    disconnect(m_clientForXML, SIGNAL(sendingCompleted()), this, SIGNAL(sendingCompleted()));
+    
+    if(!m_clientForXML->m_timer)
+        m_clientForXML->createTimer();
+    else
+        m_clientForXML->m_timer->start();
+}
+
+void DDocInteractorBase::slotStopClientForXML()
+{
+    //для этого достаточно остановить таймер и перевести поток в ручной режим
+    if(!m_clientForXML)
+        return;
+
+    m_clientForXML->manual = true; //выставление этого параметра в true приведет к тому, что даже если таймер уже остановлен для отправки данных, он не запустится вновь
+    if(m_clientForXML->m_timer)
+        m_clientForXML->m_timer->stop();
+
+    connect(this, SIGNAL(startSending()), m_clientForXML, SLOT(startProc()));
+    connect(m_clientForXML, SIGNAL(sendingStarted()), this, SIGNAL(sendingStarted()));
+    connect(m_clientForXML, SIGNAL(sendingCompleted()), this, SIGNAL(sendingCompleted()));
 
 }

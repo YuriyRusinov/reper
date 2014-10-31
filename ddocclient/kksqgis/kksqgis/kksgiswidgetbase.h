@@ -63,10 +63,12 @@ public:
 public:
     void showIOEditor(QWidget * parent, const QString & uid);
     bool featureFromEIO(QWidget * parent, QgsFeature & feature, const QString & geomAsEWKT, const QString & layerTable);
+    bool deleteFeaturesAsEIO(QWidget * parent, const QString & tableName, const QList<qint64> & ids);
 signals:
     void signalShowIOEditor(QWidget * parent, const QString & uid);
 
     void signalFeatureFromEIO(QWidget * parent, QgsFeature & feature, const QString & geomAsEWKT, const QString & layerTable);
+    void signalDeleteFeaturesAsEIO(QWidget * parent, const QString & tableName, const QList<qint64> & ids);
 //ksa
 
 public:

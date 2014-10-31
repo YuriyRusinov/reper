@@ -18,9 +18,13 @@
  * Please contact info@openmfg.com with any questions on this license.
  */
 
+#include "parameteredit.h"
+#include "ui_parameteredit.h"
+#include "ui_paramlistedit.h"
+
 #include "parsexmlutils.h"
 #include "xsqlquery.h"
-#include "parameteredit.h"
+
 #include "paramlistedit.h"
 
 #include <QMessageBox>
@@ -35,26 +39,27 @@
 ParameterEdit::ParameterEdit(QWidget* parent, Qt::WindowFlags fl)
     : QWidget(parent, fl)
 {
-  setupUi(this);
+    ui = new Ui::ParameterEdit;
+    ui->setupUi(this);
 
   // OK and Cancel are only appropriate if the widget is a stand-alone window
   if (parent)
   {
-    _ok->hide();
-    _cancel->hide();
-    _buttonDiv->hide();
+    ui->_ok->hide();
+    ui->_cancel->hide();
+    ui->_buttonDiv->hide();
   }
 
-  _list->hide(); // parameter lists come from document definitions, so are only visible after a call to setDocument()
-  _list->setDisabled(true);
-  _edit->setDisabled(true);
+  ui->_list->hide(); // parameter lists come from document definitions, so are only visible after a call to setDocument()
+  ui->_list->setDisabled(true);
+  ui->_edit->setDisabled(true);
 
-  connect(_new, SIGNAL(clicked()), this, SLOT(newItem()));
-  connect(_edit, SIGNAL(clicked()), this, SLOT(edit()));
-  connect(_list, SIGNAL(clicked()), this, SLOT(editItemList()));
-  connect(_delete, SIGNAL(clicked()), this, SLOT(deleteItem()));
-  connect(_table, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(doubleClick(int, int)));
-  connect(_table, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChange()));
+  connect(ui->_new, SIGNAL(clicked()), this, SLOT(newItem()));
+  connect(ui->_edit, SIGNAL(clicked()), this, SLOT(edit()));
+  connect(ui->_list, SIGNAL(clicked()), this, SLOT(editItemList()));
+  connect(ui->_delete, SIGNAL(clicked()), this, SLOT(deleteItem()));
+  connect(ui->_table, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(doubleClick(int, int)));
+  connect(ui->_table, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChange()));
 }
 
 ParameterEdit::~ParameterEdit()
@@ -64,7 +69,7 @@ ParameterEdit::~ParameterEdit()
 
 void ParameterEdit::languageChange()
 {
-    retranslateUi(this);
+    ui->retranslateUi(this);
 }
 
 bool ParameterEdit::setDocument(const QDomDocument & doc)
@@ -78,9 +83,9 @@ bool ParameterEdit::setDocument(const QDomDocument & doc)
     return false;
   }
 
-  _list->show();	
-  _new->hide();	
-  _delete->hide();	
+  ui->_list->show();	
+  ui->_new->hide();	
+  ui->_delete->hide();	
 
   for(QDomNode n = root.firstChild(); !n.isNull(); n = n.nextSibling())
   {
@@ -153,27 +158,27 @@ void ParameterEdit::updateParam(const QString & name, const QVariant & value, bo
 {
   _params[name] = value;
   int r;
-  for(r = 0; r < _table->rowCount(); r++) {
-    if(_table->item(r, 1)->text() == name)
+  for(r = 0; r < ui->_table->rowCount(); r++) {
+    if(ui->_table->item(r, 1)->text() == name)
     {
-      _table->item(r, 0)->setCheckState((active ? Qt::Checked : Qt::Unchecked));
-      _table->item(r, 2)->setText(value.typeName());
-      _table->item(r, 3)->setText(value.toString());
+      ui->_table->item(r, 0)->setCheckState((active ? Qt::Checked : Qt::Unchecked));
+      ui->_table->item(r, 2)->setText(value.typeName());
+      ui->_table->item(r, 3)->setText(value.toString());
       return;
     }
   }
 
   // If we didn't find an existing parameter by the name specified add one
-  r = _table->rowCount();
-  _table->setRowCount(r+1);
+  r = ui->_table->rowCount();
+  ui->_table->setRowCount(r+1);
   QTableWidgetItem * ctItem = 0;
   ctItem = new QTableWidgetItem();
   ctItem->setFlags(Qt::ItemIsUserCheckable);
   ctItem->setCheckState((active ? Qt::Checked : Qt::Unchecked));
-  _table->setItem(r, 0, ctItem);
-  _table->setItem(r, 1, new QTableWidgetItem(name));
-  _table->setItem(r, 2, new QTableWidgetItem(value.typeName()));
-  _table->setItem(r, 3, new QTableWidgetItem(value.toString()));
+  ui->_table->setItem(r, 0, ctItem);
+  ui->_table->setItem(r, 1, new QTableWidgetItem(name));
+  ui->_table->setItem(r, 2, new QTableWidgetItem(value.typeName()));
+  ui->_table->setItem(r, 3, new QTableWidgetItem(value.toString()));
 }
 
 void ParameterEdit::newItem()
@@ -190,44 +195,44 @@ void ParameterEdit::newItem()
 
     _params[name] = pedit.value();
 
-    int r = _table->rowCount();
-    _table->setRowCount(r+1);
+    int r = ui->_table->rowCount();
+    ui->_table->setRowCount(r+1);
     QTableWidgetItem * ctItem = 0;
     ctItem = new QTableWidgetItem();
     ctItem->setFlags(Qt::ItemIsUserCheckable);
     ctItem->setCheckState((pedit.active() ? Qt::Checked : Qt::Unchecked));
-    _table->setItem(r, 0, ctItem);
-    _table->setItem(r, 1, new QTableWidgetItem(name));
-    _table->setItem(r, 2, new QTableWidgetItem(pedit.value().typeName()));
-    _table->setItem(r, 3, new QTableWidgetItem(pedit.value().toString()));
+    ui->_table->setItem(r, 0, ctItem);
+    ui->_table->setItem(r, 1, new QTableWidgetItem(name));
+    ui->_table->setItem(r, 2, new QTableWidgetItem(pedit.value().typeName()));
+    ui->_table->setItem(r, 3, new QTableWidgetItem(pedit.value().toString()));
   }
 }
 
 void ParameterEdit::edit()
 {
-    if(_table->currentRow() != -1) 
+    if(ui->_table->currentRow() != -1) 
     {
-	editItem(_table->currentRow());
+	editItem(ui->_table->currentRow());
     }
 }
 
 void ParameterEdit::editItem(int row)
 {
-  QString name = _table->item(row, 1)->text();
+  QString name = ui->_table->item(row, 1)->text();
 
   ParameterProperties pedit(this);
   pedit.setName(name);
   pedit.setValue(_params[name]);
-  pedit.setActive(_table->item(row, 0)->checkState() == Qt::Checked);
+  pedit.setActive(ui->_table->item(row, 0)->checkState() == Qt::Checked);
 
   if (pedit.exec() == QDialog::Accepted)
   {
     _params[name] = pedit.value();
-    _table->item(row, 0)->setCheckState((pedit.active() ? Qt::Checked
+    ui->_table->item(row, 0)->setCheckState((pedit.active() ? Qt::Checked
                                                         : Qt::Unchecked));
-    _table->item(row, 1)->setText(pedit.name());
-    _table->item(row, 2)->setText(pedit.value().typeName());
-    _table->item(row, 3)->setText(pedit.value().toString());
+    ui->_table->item(row, 1)->setText(pedit.name());
+    ui->_table->item(row, 2)->setText(pedit.value().typeName());
+    ui->_table->item(row, 3)->setText(pedit.value().toString());
   }
 }
 
@@ -238,31 +243,31 @@ void ParameterEdit::doubleClick(int row, int /*col*/)
 
 void ParameterEdit::selectionChange()
 {
-    if(_table->currentRow() != -1)
+    if(ui->_table->currentRow() != -1)
     {
-        _edit->setDisabled(false);
+        ui->_edit->setDisabled(false);
 
-        int r = _table->currentRow();
-        QString name = _table->item(r, 1)->text();
+        int r = ui->_table->currentRow();
+        QString name = ui->_table->item(r, 1)->text();
         QList<QPair<QString, QString> > list = _lists[name];
         if(list.size()>0) 
-             _list->setDisabled(false); // the selected parameter is associated with a list
-        else _list->setDisabled(true); 
+             ui->_list->setDisabled(false); // the selected parameter is associated with a list
+        else ui->_list->setDisabled(true); 
     }
     else 
     {
-        _list->setDisabled(true);
-        _edit->setDisabled(true);
+        ui->_list->setDisabled(true);
+        ui->_edit->setDisabled(true);
     }
 }
 
 void ParameterEdit::editItemList()
 {
-    if(_table->currentRow() == -1)
+    if(ui->_table->currentRow() == -1)
         return;
 
-    int r = _table->currentRow();
-    QString name = _table->item(r, 1)->text();
+    int r = ui->_table->currentRow();
+    QString name = ui->_table->item(r, 1)->text();
     QVariant var = _params[name];
     QList<QPair<QString, QString> > list = _lists[name];
 
@@ -270,18 +275,18 @@ void ParameterEdit::editItemList()
     for(QList<QPair<QString, QString> >::iterator it = list.begin();
         it != list.end(); it++ )
     {
-        QListWidgetItem * item = new QListWidgetItem((*it).second, newdlg._list);
+        QListWidgetItem * item = new QListWidgetItem((*it).second, newdlg.ui->_list);
         if((*it).first == var.toString())
-            newdlg._list->setCurrentItem(item);
+            newdlg.ui->_list->setCurrentItem(item);
     }
 
     if(newdlg.exec() == QDialog::Accepted)
     {
-        QVariant tmp(list[newdlg._list->currentRow()].first);
+        QVariant tmp(list[newdlg.ui->_list->currentRow()].first);
         if(tmp.convert(var.type()))
         {
             _params[name] = tmp;
-            _table->item(r, 3)->setText(tmp.toString());
+            ui->_table->item(r, 3)->setText(tmp.toString());
         }
     }
 }
@@ -289,10 +294,10 @@ void ParameterEdit::editItemList()
 
 void ParameterEdit::deleteItem()
 {
-    if(_table->currentRow() != -1) {
-        QString name = _table->item(_table->currentRow(), 1)->text();
+    if(ui->_table->currentRow() != -1) {
+        QString name = ui->_table->item(ui->_table->currentRow(), 1)->text();
         _params.remove(name);
-        _table->removeRow(_table->currentRow());
+        ui->_table->removeRow(ui->_table->currentRow());
     }
 }
 
@@ -303,9 +308,9 @@ ParameterList ParameterEdit::getParameterList()
 
     QString name;
     QVariant value;
-    for(int r = 0; r < _table->rowCount(); r++) {
-        if(_table->item(r, 0)->checkState() == Qt::Checked) {
-            name = _table->item(r, 1)->text();
+    for(int r = 0; r < ui->_table->rowCount(); r++) {
+        if(ui->_table->item(r, 0)->checkState() == Qt::Checked) {
+            name = ui->_table->item(r, 1)->text();
             value = _params[name];
             plist.append(name, value);
         }
@@ -316,8 +321,8 @@ ParameterList ParameterEdit::getParameterList()
 
 void ParameterEdit::clear()
 {
-  while (_table->rowCount() > 0)
-    _table->removeRow(0);
+  while (ui->_table->rowCount() > 0)
+    ui->_table->removeRow(0);
 }
 
 QDialog *ParameterEdit::ParameterEditDialog(ParameterEdit *p, QWidget *parent, Qt::WindowFlags f)
@@ -327,12 +332,12 @@ QDialog *ParameterEdit::ParameterEditDialog(ParameterEdit *p, QWidget *parent, Q
   dlg->setLayout(lyt);
   lyt->addWidget(p);
 
-  p->_ok->show();
-  p->_cancel->show();
-  p->_buttonDiv->show();
+  p->ui->_ok->show();
+  p->ui->_cancel->show();
+  p->ui->_buttonDiv->show();
 
-  connect(p->_cancel, SIGNAL(clicked()), dlg, SLOT(reject()));
-  connect(p->_ok,     SIGNAL(clicked()), dlg, SLOT(accept()));
+  connect(p->ui->_cancel, SIGNAL(clicked()), dlg, SLOT(reject()));
+  connect(p->ui->_ok,     SIGNAL(clicked()), dlg, SLOT(accept()));
 
   return dlg;
 }

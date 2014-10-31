@@ -114,7 +114,9 @@ int main(int argc, char *argv[])
     httpWin.setTimerParams(interval, units, mode);
     httpWin.setInteractorBase(m_base);    
 
-    int ok = m_base->start(mode, intervalMs);
+    bool bMain = true;
+    bool bXML = false;
+    int ok = m_base->start(mode, intervalMs, bMain, bXML);
     if(ok != 1)
         return 1;
 

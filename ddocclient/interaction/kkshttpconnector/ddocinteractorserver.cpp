@@ -2,6 +2,9 @@
 #include <QtNetwork>
 #include <QCryptographicHash>
 
+#include <QXmlInputSource>
+#include <QXmlSimpleReader>
+
 #include "ddocinteractorbase.h"
 #include "ddocinteractorserver.h"
 #include <defines.h>
@@ -21,7 +24,8 @@ DDocInteractorServer::DDocInteractorServer(JKKSLoader* loader, DDocInteractorBas
       m_parent(NULL),
       m_succesed(false),
       m_tcpServer(NULL),
-      m_isExiting(false)
+      m_isExiting(false),
+      m_waitClientConnectionTimeout(1000)
 {
     m_loader = loader; 
     m_parent = parent;
@@ -92,7 +96,7 @@ void DDocInteractorServer::loadData(int socketDescriptor)
         numReadTotal += numRead;
          
         if (numRead == 0 && 
-            !clientConnection->waitForReadyRead(1000)
+            !clientConnection->waitForReadyRead(m_waitClientConnectionTimeout)
             )
         {
             break;
@@ -117,22 +121,44 @@ void DDocInteractorServer::loadData(int socketDescriptor)
         int sz_dt = header.contentLength();
         all_data = all_data.right(sz_dt); 
 
-        QMap<QString, QByteArray> byteArray = parsePost(all_data);
-        //QByteArray byteArray = all_data;
-
-        //Входящие данные имеют один из следующих форматов:
-        //mesid=<ID><type_digit_1><type_digit_2>&uno=<email_prefix>&data="........(base64)......"
-        //mesid=<ID><type_digit_1><type_digit_2>&uno=<email_prefix>&received=<code>
-        //в первом случае нам mesid и uno не интересны. Но надо в зависимости от типа сообщения правильно его обработать
-        //во втором случае нам интересен идентификатор и тип сообщения, которое было доведено и обработано с указанным в received результатом
-        if(byteArray.contains("mesid") && (byteArray.contains("unp") || byteArray.contains("uno")) && byteArray.contains("received")){
-            processNotification(byteArray, clientConnection);
-        }
-        else if(byteArray.contains("mesid") && (byteArray.contains("uno") || byteArray.contains("unp"))&& byteArray.contains("data") && byteArray.contains("hash") ){
-            processMessage(byteArray, clientConnection);
+        //входящее сообщение может быть двух типов:
+        // - сообщение во внутреннем формате DynamicDocs
+        // - сообщение в обменном XML-формате, который в свою очередь может быть двух типов:
+        //       - унифицированный обменный  формат IRL
+        //       - формат shushun (ЦНИИ ЭИСУ, Заря-взаимодействие)
+        
+        //Сначала попробуем данные преобразовать в XML
+        QByteArray byteArray = QByteArray::fromPercentEncoding(all_data);
+        //byteArray = qUncompress(byteArray);
+        byteArray = QByteArray::fromBase64(byteArray);
+        
+        QXmlInputSource * xmlInput = new QXmlInputSource();
+        xmlInput->setData(byteArray);
+        QXmlSimpleReader xmlReader;
+        bool ok = xmlReader.parse(xmlInput);
+        if(ok){
+            QString xml = xmlInput->data();
+            processXMLMessage(xml, clientConnection);
         }
         else{
-            sendBadBlock(clientConnection);
+            //данные пришли во внутреннем формате DynamicDocs
+
+            QMap<QString, QByteArray> byteArray = parsePost(all_data);
+
+            //Входящие данные имеют один из следующих форматов:
+            //mesid=<ID><type_digit_1><type_digit_2>&uno=<email_prefix>&data="........(base64)......"
+            //mesid=<ID><type_digit_1><type_digit_2>&uno=<email_prefix>&received=<code>
+            //в первом случае нам mesid и uno не интересны. Но надо в зависимости от типа сообщения правильно его обработать
+            //во втором случае нам интересен идентификатор и тип сообщения, которое было доведено и обработано с указанным в received результатом
+            if(byteArray.contains("mesid") && (byteArray.contains("unp") || byteArray.contains("uno")) && byteArray.contains("received")){
+                processNotification(byteArray, clientConnection);
+            }
+            else if(byteArray.contains("mesid") && (byteArray.contains("uno") || byteArray.contains("unp"))&& byteArray.contains("data") && byteArray.contains("hash") ){
+                processMessage(byteArray, clientConnection);
+            }
+            else{
+                sendBadBlock(clientConnection);
+            }
         }
      }
     else
@@ -175,6 +201,67 @@ void DDocInteractorServer :: sendBadBlock(QTcpSocket * clientConnection)
     block.append(str);
     clientConnection->write(block);
 
+}
+
+//пришло сообщение в XML-формате
+//надо опрнеделить формат и записать сообщение в таблицу in_external_queue
+int DDocInteractorServer::processXMLMessage(const QString & xml, QTcpSocket * clientConnection)
+{
+
+    bool ok = m_loader->beginTransaction();
+    if(!ok){
+        qCritical() << QObject::tr("Cannot start transaction for message writing");
+        sendBadBlock(clientConnection);
+        return 1;
+    }
+        
+    int res = m_loader->writeXMLMessage(xml);
+    if(res <= 0){
+        kksCritical() << tr("Cannot processing income XML message! Data was not written to database");
+        kksCritical() << tr("XML = %1").arg(xml);
+
+        bool ok = m_loader->rollbackTransaction();
+        if(!ok){
+            kksCritical() << QObject::tr("Cannot rollback transaction for message writing");
+            sendBadBlock(clientConnection);
+            return 1;
+        }
+
+    }
+    else{    
+        kksInfo() << tr("Income XML message was successfully written to database");
+        bool ok = m_loader->commitTransaction();
+        if(!ok){
+            kksCritical() << QObject::tr("Cannot commit transaction for message writing");
+            sendBadBlock(clientConnection);
+            return 1;
+        }
+
+        res = OK_CODE;
+    }
+
+    // --неверно -- в настоящее время мы полагаем, что вне зависимости от результата обработки входящего сообщения в БД
+    // --неверно -- мы в качестве ответа на запрос объекта-отправителя (ну или шлюза (ТПС)) возвращаем OK
+    // --неверно -- тем самым мы говорим о том, что факт приема сообщения состоялся успешно
+    // --неверно -- при этом результат обработки будет отправлен отдельно в виде спец. квитанции
+
+    if(res == OK_CODE)
+    {
+        sendOKBlock(clientConnection, true);    
+    }
+    else if(res == ERROR_CODE)
+    {
+        sendBadBlock(clientConnection);
+    }
+    else if(res == IGNORE_CODE)
+    {
+        sendOKBlock(clientConnection, true);
+    }
+    else{
+        sendBadBlock(clientConnection);//другое отрицательное число или 0
+    }
+
+    return 1;
 }
 
 int DDocInteractorServer::processMessage(QMap <QString, QByteArray> &post_data, QTcpSocket * clientConnection)
@@ -228,8 +315,8 @@ int DDocInteractorServer::processMessage(QMap <QString, QByteArray> &post_data, 
 
     int res = m_loader->writeMessage(pMessage);
     if(res <= 0){
-        qCritical() << tr("Cannot processing income message! Data was not writen to database");
-        qCritical() << tr("Sender = %1, receiver = %2, message type = %3. %4")
+        kksCritical() << tr("Cannot processing income message! Data was not writen to database");
+        kksCritical() << tr("Sender = %1, receiver = %2, message type = %3. %4")
                                        .arg(pMessage.senderUID())
                                        .arg(pMessage.receiverUID())
                                        .arg(pMessage.getType())
@@ -237,7 +324,7 @@ int DDocInteractorServer::processMessage(QMap <QString, QByteArray> &post_data, 
 
         bool ok = m_loader->rollbackTransaction();
         if(!ok){
-            qCritical() << QObject::tr("Cannot rollback transaction for message writing");
+            kksCritical() << QObject::tr("Cannot rollback transaction for message writing");
             sendBadBlock(clientConnection);
             return 1;
         }
@@ -247,7 +334,7 @@ int DDocInteractorServer::processMessage(QMap <QString, QByteArray> &post_data, 
         kksInfo() << tr("Income message was successfully written to database");
         bool ok = m_loader->commitTransaction();
         if(!ok){
-            qCritical() << QObject::tr("Cannot commit transaction for message writing");
+            kksCritical() << QObject::tr("Cannot commit transaction for message writing");
             sendBadBlock(clientConnection);
             return 1;
         }
@@ -288,7 +375,7 @@ int DDocInteractorServer::processNotification(QMap <QString, QByteArray> &post_d
 
 {
     if(!post_data.contains("mesid") ||  (!post_data.contains("uno") && !post_data.contains("unp")) || !post_data.contains("received")){
-        qCritical() << tr("Found inconsistent incoming notification! Bad format");
+        kksCritical() << tr("Found inconsistent incoming notification! Bad format");
         sendBadBlock(clientConnection);
         return -1;
     }
@@ -300,7 +387,7 @@ int DDocInteractorServer::processNotification(QMap <QString, QByteArray> &post_d
 	kksDebug() << QString("Mes ID: ") << idMsg;
 
     if(idMsg <= 0){
-        qCritical() << tr("Cannot parse MESID of the notification");
+        kksCritical() << tr("Cannot parse MESID of the notification");
         sendBadBlock(clientConnection);
         return -1;
     }
@@ -477,7 +564,7 @@ QMap<QString, QByteArray> DDocInteractorServer::parsePost (const QByteArray &arr
                 buff_v="";
             }
             else{
-	            QMap <QString, QByteArray> _message; // And some little piec of shit
+	            QMap <QString, QByteArray> _message; // And some little piece of shit
 		        return _message;
             }
         }

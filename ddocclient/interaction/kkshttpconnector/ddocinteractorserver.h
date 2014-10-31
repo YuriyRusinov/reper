@@ -45,6 +45,7 @@ public:
     void run();
     bool successed(){return m_succesed;}
     void setPort(int port) {m_port = port;}
+    void setWaitClientConnectionTimeout(int t = 1000) {m_waitClientConnectionTimeout = t;}
     QString errorString(){return m_tcpServer->errorString();}
 
 public slots:
@@ -61,6 +62,7 @@ signals:
     void pingsSentCompleted();//генерируетс€, когда отправка всех пингов на все интересующие оргнизации завершена и пришли все ответы на эти пинги. «авершает соответствующий QEventLoop
 
 private:
+    int processXMLMessage(const QString & xml, QTcpSocket * clientConnection);
     int processMessage(QMap <QString, QByteArray> & post_data, QTcpSocket * clientConnection);
     int processNotification(QMap <QString, QByteArray> & post_data, QTcpSocket * clientConnection);
 
@@ -77,6 +79,10 @@ private:
     int m_port;
     bool m_succesed;//запуск TCP-сервера прошел успешно
     bool m_isExiting;
+
+    int m_waitClientConnectionTimeout; //тайм-аут дл€ функции QTcpSocket::waitForReadyRead()
+                                       //задаетс€ в миллисекундах
+                                       // по умолчанию 1000
 
 
 };

@@ -3515,16 +3515,70 @@ void KKSGISWidgetBase::deleteSelected( QgsMapLayer *layer, QWidget* parent )
   }
 
   vlayer->beginEditCommand( tr( "Features deleted" ) );
-  if ( !vlayer->deleteSelectedFeatures() )
-  {
-    messageBar()->pushMessage( tr( "Problem deleting features" ),
-                               tr( "A problem occured during deletion of features" ),
-                               QgsMessageBar::WARNING, messageTimeout() );
+
+  QString providerName = vlayer->dataProvider()->name();
+  QString tableName = "";
+  int fIndex = vlayer->fieldNameIndex("unique_id");
+  
+  //ksa
+  //если слой из БД DynamicDocs - удалять объекты надо особым образом
+  if(providerName == "postgres" && fIndex >= 0){ //DynamicDocs layer!
+      QString uri = vlayer->dataProvider()->dataSourceUri();
+      QStringList uriSections = uri.split(" ");
+      QString layerTable;
+
+      for(int i=0; i<uriSections.count(); i++){
+          QString & sec = uriSections[i];
+          if(sec.startsWith("table=")){
+              QStringList tableSec = sec.split("=");
+              if(tableSec.count() != 2){
+                  return;
+              }
+              QString fullTableName = tableSec[1];
+              QStringList tableNameSec = fullTableName.split(".");
+              if(tableNameSec.count() != 2){
+                  return;
+              }
+              tableName = tableNameSec[1];
+              tableName.replace("\"", "");
+
+              break;
+          }
+      }
+
+      QgsFeatureList features = vlayer->selectedFeatures();
+      //QgsFeatureIds  fids = vlayer->selectedFeaturesIds();
+      QList<qint64> ids;// = fids.values();
+      for(int i=0; i<features.count(); i++){
+          QgsFeature f = features.at(i);
+          int fIndex = f.fieldNameIndex("id");
+          if(fIndex < 0)
+              return;
+          
+          QVariant v = f.attribute("id");
+          if(v.type() == QVariant::Invalid){
+              return;
+          }
+          ids.append(v.toLongLong());
+      }
+
+      deleteFeaturesAsEIO(this, tableName, ids);
+      vlayer->updateExtents();
   }
-  else
-  {
-    showStatusMessage( tr( "%n feature(s) deleted.", "number of features deleted", numberOfDeletedFeatures ) );
-  }
+  else{
+
+    if ( !vlayer->deleteSelectedFeatures() )
+    {
+      messageBar()->pushMessage( tr( "Problem deleting features" ),
+                                 tr( "A problem occured during deletion of features" ),
+                                 QgsMessageBar::WARNING, messageTimeout() );
+    }
+    else
+    {
+      showStatusMessage( tr( "%n feature(s) deleted.", "number of features deleted", numberOfDeletedFeatures ) );
+    }
+
+  } //NOT DynamicDocs layer
 
   vlayer->endEditCommand();
 }
@@ -5310,6 +5364,12 @@ bool KKSGISWidgetBase::featureFromEIO(QWidget * parent, QgsFeature & feature, co
     if(feature.attribute(feature.fieldNameIndex("unique_id")).toString().isEmpty())
         return false;
     
+    return true;
+}
+
+bool KKSGISWidgetBase::deleteFeaturesAsEIO(QWidget * parent, const QString & tableName, const QList<qint64> & ids)
+{
+    emit signalDeleteFeaturesAsEIO(parent, tableName, ids);
     return true;
 }
 

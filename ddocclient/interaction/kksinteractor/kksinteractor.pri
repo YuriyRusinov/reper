@@ -25,6 +25,7 @@ HEADERS += \
            JKKSGlobalRubric.h \
            JKKSOrgPackage.h \
            JKKSPing.h \
+           JKKSXMLMessage.h \
            kksinteractor_config.h
 
 SOURCES += \
@@ -51,6 +52,7 @@ SOURCES += \
            JKKSSearchTemplate.cpp \
            JKKSGlobalRubric.cpp \
            JKKSPing.cpp \
+           JKKSXMLMessage.cpp \
            JKKSOrgPackage.cpp
 
 headers.files += \
@@ -79,4 +81,5 @@ headers.files += \
            JKKSGlobalRubric.h \
            JKKSOrgPackage.h \
            JKKSPing.h \
+           JKKSXMLMessage.h \
            kksinteractor_config.h

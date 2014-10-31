@@ -19,18 +19,20 @@
  */
 
 #include "paramlistedit.h"
+#include "ui_paramlistedit.h"
 
 #include <QVariant>
 
 ParamListEdit::ParamListEdit(QWidget* parent, Qt::WindowFlags fl)
     : QDialog(parent, fl)
 {
-    setupUi(this);
+    ui = new Ui::ParamListEdit;
+    ui->setupUi(this);
 
     // signals and slots connections
-    connect(_cancel, SIGNAL(clicked()), this, SLOT(reject()));
-    connect(_select, SIGNAL(clicked()), this, SLOT(accept()));
-    connect(_list, SIGNAL(itemSelectionChanged()), this, SLOT(sSelectionChanged()));
+    connect(ui->_cancel, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(ui->_select, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(ui->_list, SIGNAL(itemSelectionChanged()), this, SLOT(sSelectionChanged()));
 }
 
 ParamListEdit::~ParamListEdit()
@@ -40,11 +42,11 @@ ParamListEdit::~ParamListEdit()
 
 void ParamListEdit::languageChange()
 {
-    retranslateUi(this);
+    ui->retranslateUi(this);
 }
 
 void ParamListEdit::sSelectionChanged()
 {
-  _select->setEnabled(_list->currentRow()!=-1);
+  ui->_select->setEnabled(ui->_list->currentRow()!=-1);
 }
 

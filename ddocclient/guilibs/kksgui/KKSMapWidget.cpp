@@ -75,6 +75,7 @@ void KKSMapWidget::init()
     this->initQGIS();
     
     connect(this, SIGNAL(signalFeatureFromEIO(QWidget *, QgsFeature &, const QString &, const QString &)), this, SLOT(slotFeatureFromEIO(QWidget *, QgsFeature &, const QString &, const QString &)));
+    connect(this, SIGNAL(signalDeleteFeaturesAsEIO(QWidget *, const QString &, const QList<qint64> &)), this, SLOT(slotDeleteFeaturesAsEIO(QWidget *, const QString &, const QList<qint64> &)));
     
 #else
     QMessageBox::warning(this, tr("Warning"), tr("Current IO contains GIS-object attribute!\nBut current build of DynamicDocs Client does not support GIS capabilities!\nWorking with this attribute will be disabled"), QMessageBox::Ok);
@@ -723,4 +724,10 @@ void KKSMapWidget::slotFeatureFromEIO(QWidget * parent, QgsFeature & feature, co
     eio->release();
 
 }
+
+void KKSMapWidget::slotDeleteFeaturesAsEIO(QWidget * parent, const QString & tableName, const QList<qint64> & ids)
+{
+    emit deleteEIOList(parent, tableName, ids);
+}
+
 #endif

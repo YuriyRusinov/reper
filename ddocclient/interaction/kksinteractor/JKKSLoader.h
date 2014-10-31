@@ -48,6 +48,7 @@ class JKKSSearchGroup;
 class JKKSSearchCriterion;
 class JKKSCategoryPair;
 class JKKSOrgPackage;
+class JKKSXMLMessage;
 
 //typedef QPair<qint64, qint64> idTableMap;
 
@@ -71,9 +72,15 @@ class _I_EXPORT JKKSLoader
 
         int getLocalOrgId() const;//идентификатор локальной организации
 
-        //возвращается все исходящие данные для отправки, которые необходимо отправить по текущему транспорту
+        //возвращается все исходящие данные для отправки (за исключением данных в XML-форматах из таблицы out_external_queue), 
+        //которые необходимо отправить по текущему транспорту.
         //receivers - перечень уникальных идентификаторов организаций-получателей корреспонденции
         QList<JKKSPMessWithAddr *> readMessages (QStringList & receivers) const;
+
+        //возвращается все исходящие данные для отправки в XML-форматах из таблицы out_external_queue, 
+        //которые необходимо отправить по текущему транспорту.
+        //receivers - перечень уникальных идентификаторов организаций-получателей корреспонденции
+        QList<JKKSPMessWithAddr *> readXMLMessages (QStringList & receivers) const;
         
         //получаем, обрабатываем и записываем в БД то, что пришло от организации-отправителя
         //именно этот метод вызывается в http_connector'е
@@ -88,7 +95,13 @@ class _I_EXPORT JKKSLoader
 
 //        void setDb1 (KKSDatabase * _db);
         KKSDatabase * getDbRead (void) const;
+        KKSDatabase * getDbReadXML (void) const;
         KKSDatabase * getDbWrite (void) const;
+
+        //
+        //for XML mrssages (IRL, shushun)
+        //
+        int writeXMLMessage(const QString & xml) const;
 
         //
         // for messages
@@ -106,6 +119,7 @@ class _I_EXPORT JKKSLoader
         int writeMessage (JKKSOrgPackage * OrgPack, const QString& senderUID, const QString& receiverUID) const;
         int writeMessage (JKKSFilePart * filePart, const QString& senderUID) const;
         int writeMessage (JKKSPing * ping, const QString & senderUID) const;
+        int writeMessage (JKKSXMLMessage * xml, const QString & senderUID) const;
 
         QMap<QString, JKKSPing> createPings() const; //создаются пинги для проверки всех организаций, занесенных в таблицу organization
         QMap<QString, JKKSPing> createPings(const QStringList & receivers) const; //создаются пинги для проверки указанных организаций (задаются своими email_prefix)
@@ -131,6 +145,8 @@ class _I_EXPORT JKKSLoader
         QList<JKKSPMessWithAddr *> readTableRecords (QStringList & receivers) const;
         QList<JKKSPMessWithAddr *> readQueueResults (QStringList & receivers) const;
         QList<JKKSPMessWithAddr *> readPingResults (QStringList & receivers) const;
+
+        QList<JKKSPMessWithAddr *> readOutXML(QStringList & receivers) const;
 
         int getDlId (void) const;
         int getUserId (void) const;
@@ -244,16 +260,15 @@ class _I_EXPORT JKKSLoader
         //идентификатор текущего транспорта
         qint64 m_idTransport;
 
-        //
-        // db1 предназначен для работы с исходящими
-        // сообщениями Юпитера
-        //
+        // dbRead предназначен для работы с исходящими сообщениями
         KKSDatabase * dbRead;
-        //
-        // db2 предназначен для работы с входящими
-        // сообщениями Юпитера
-        //
+        
+        // dbReadXML предназначен для работы с исходящими сообщениями в форматах XML (из таблицы out_external_queue)
+        KKSDatabase * dbReadXML;
+
+        // dbWrite предназначен для работы с входящими сообщениями 
         KKSDatabase * dbWrite;
+        
         mutable int idCurrentDl;//текущее должностное лицо
         mutable int idCurrentUser;//текущий пользователь
 

@@ -100,7 +100,8 @@ class _I_EXPORT JKKSMessage
             atFilePart = 12,
             atPing = 13,
             atPingResponse = 14,
-            atEcho = 15 //пересылаем строку из таблицы out_sync_queue с entity_type = 6 (проверка св€зи). ќтдельный тип нужен, чтобы в DDocInteractorClient можно было отправить такое сообщение даже дл€ "плохого" пинга
+            atEcho = 15, //пересылаем строку из таблицы out_sync_queue с entity_type = 6 (проверка св€зи). ќтдельный тип нужен, чтобы в DDocInteractorClient можно было отправить такое сообщение даже дл€ "плохого" пинга
+            atXMLMessage = 16 //сообщение из таблицы out_external_queue
         }; 
 
         virtual JKKSMessageType getMessageType (void) const;

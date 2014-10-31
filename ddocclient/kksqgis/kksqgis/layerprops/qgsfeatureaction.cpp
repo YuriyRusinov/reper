@@ -239,6 +239,7 @@ bool QgsFeatureAction::addFeature( const QgsAttributeMap& defaultAttributes )
                     }
                     layerTable = tableNameSec[1];
                     layerTable.replace("\"", "");
+                    break;
                 }
             }
             

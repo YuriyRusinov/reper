@@ -10,13 +10,17 @@ include(../../ddocclient.conf)
 #
 INCLUDEPATH *= \
                 ../../corelibs/kksutils \
-                ../../corelibs/dataaccess
+                ../../corelibs/dataaccess \
+		../../mgrlibs/kkscoreapplication/base_classes \
+		../../mgrlibs/kkscoreapplication/ui \
+		../../mgrlibs/kkscoreapplication \
 
 DEPENDPATH *= \
                 ../../corelibs/kksutils \
-                ../../corelibs/dataaccess
+                ../../corelibs/dataaccess \
+		../../mgrlibs/kkscoreapplication
 
-LIBS *= -L$$DESTDIR -lkksutils -ldataaccess
+LIBS *= -L$$DESTDIR -lkksutils -ldataaccess -lkkscoreapplication
 
 
 INCLUDEPATH *= $${PSQL_HOME}/include
@@ -37,6 +41,7 @@ unix {
 #LIBS += -lcurses
 }
 CONFIG += qt
+QT += xml
 
 CONFIG += warn_on dll
 

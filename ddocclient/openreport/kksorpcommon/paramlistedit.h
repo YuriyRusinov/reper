@@ -23,12 +23,18 @@
 
 #include <QDialog>
 
+namespace Ui
+{
+    class ParamListEdit;
+}
 //ksa #include "tmp/ui_paramlistedit.h"
-#include "ui_paramlistedit.h"
+//#include "ui_paramlistedit.h"
 
-class ParamListEdit : public QDialog, public Ui::ParamListEdit
+class ParamListEdit : public QDialog //, public Ui::ParamListEdit
 {
     Q_OBJECT
+
+        friend class ParameterEdit;
 
 public:
     ParamListEdit(QWidget* parent = 0, Qt::WindowFlags fl = 0);
@@ -39,6 +45,8 @@ public slots:
 
 protected slots:
     virtual void languageChange();
+private:
+      Ui::ParamListEdit * ui;
 
 };
 

@@ -1914,6 +1914,7 @@ QWidget * KKSAttributesFactory :: createMapWidget (const KKSAttrValue * av,
     connect(attrWidget, SIGNAL(uploadGISFiles(bool, const QStringList &, qint64, QWidget *)), m_oef, SLOT(slotUploadGISFiles(bool, const QStringList &, qint64, QWidget *)));
     connect(attrWidget, SIGNAL(signalShowIOEditor(QWidget *, const QString &)), m_oef, SLOT(slotShowIOEditor(QWidget *, const QString &)));
     connect(attrWidget, SIGNAL(constructNewEIO(QWidget *, KKSObjectExemplar **, const QString &, const QString &)), m_oef, SLOT(slotConstructNewEIO(QWidget *, KKSObjectExemplar **, const QString &, const QString &)));//запрос на создание нового EИО в справочнике, который задается названием своей таблицы в БД. 
+    connect(attrWidget, SIGNAL(deleteEIOList(QWidget *, const QString &, const QList<qint64> &)), m_oef, SLOT(slotDeleteEIOList(QWidget *, const QString &, const QList<qint64> &)));//запрос на удаление набора объектов карты, которые являются записями в справочнике DynamicDocs. 
     
 
     attrWidget->init();

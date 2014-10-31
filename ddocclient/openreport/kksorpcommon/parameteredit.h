@@ -24,13 +24,19 @@
 #include <QDialog>
 #include <QDomDocument>
 
+namespace Ui
+{
+    class ParameterEdit;
+}
+
 #include "parameter.h"
 
-#include "tmp/ui_parameteredit.h"
+//#include "tmp/ui_parameteredit.h"
+//#include "GeneratedFiles/ui_parameteredit.h"
 //#include "ui_parameteredit.h"
 
 
-class ParameterEdit : public QWidget, public Ui::ParameterEdit
+class ParameterEdit : public QWidget //, public Ui::ParameterEdit
 {
   Q_OBJECT
 
@@ -63,6 +69,8 @@ private:
     void updateParam(const QString & name, const QVariant & value, bool active);
 
     QMap<QString, QList<QPair<QString,QString> > > _lists;
+    
+    Ui::ParameterEdit * ui;
 
 };
 

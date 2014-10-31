@@ -19,6 +19,7 @@
  */
 
 #include "login.h"
+#include "ui_login.h"
 
 #include <QVariant>
 #include <QMessageBox>
@@ -31,7 +32,7 @@
 #include "dbtools.h"
 #include "xsqlquery.h"
 #include "loginOptions.h"
-#include "login.h"
+
 
 /*
  *  Constructs a login as a child of 'parent', with the
@@ -47,18 +48,20 @@ login::login(QWidget* parent, const char* name, bool modal, Qt::WFlags fl)
   setObjectName(name);
 
   Q_INIT_RESOURCE(OpenRPTCommon);
-  setupUi(this);
+  
+  ui = new Ui::login;
+  ui->setupUi(this);
 
 
   // signals and slots connections
-  connect(_login, SIGNAL(clicked()), this, SLOT(sLogin()));
-  connect(_options, SIGNAL(clicked()), this, SLOT(sOptions()));
+  connect(ui->_login, SIGNAL(clicked()), this, SLOT(sLogin()));
+  connect(ui->_options, SIGNAL(clicked()), this, SLOT(sOptions()));
 
   _splash = 0;
 
   _captive = false;
 
-  _password->setEchoMode(QLineEdit::Password);
+  ui->_password->setEchoMode(QLineEdit::Password);
 }
 
 /*
@@ -75,7 +78,7 @@ login::~login()
  */
 void login::languageChange()
 {
-  retranslateUi(this);
+  ui->retranslateUi(this);
 }
 
 int login::set(const ParameterList &pParams)
@@ -93,32 +96,32 @@ int login::set(const ParameterList &pParams, QSplashScreen *pSplash)
   param = pParams.value("username", &valid);
   if (valid)
   {
-    _username->setText(param.toString());
-    _password->setFocus();
+    ui->_username->setText(param.toString());
+    ui->_password->setFocus();
     _captive = TRUE;
   }
   else
   {
-    _username->setFocus();
+    ui->_username->setFocus();
     _captive = FALSE;
   }
 
   param = pParams.value("copyright", &valid);
   if (valid)
-    _copyrightLit->setText(param.toString());
+    ui->_copyrightLit->setText(param.toString());
 
   param = pParams.value("version", &valid);
   if (valid)
-    _versionLit->setText(tr("Version ") + param.toString());
+    ui->_versionLit->setText(tr("Version ") + param.toString());
 
   param = pParams.value("build", &valid);
   if (valid)
-    _build->setText(param.toString());
+    ui->_build->setText(param.toString());
 
   param = pParams.value("name", &valid);
   if (valid)
   {
-    _nameLit->setText(param.toString());
+    ui->_nameLit->setText(param.toString());
   }
 
   param = pParams.value("databaseURL", &valid);
@@ -168,8 +171,8 @@ void login::sLogin()
   }
 
 //  Try to connect to the Database
-  _cUsername = _username->text().trimmed();
-  _cPassword = _password->text().trimmed();
+  _cUsername = ui->_username->text().trimmed();
+  _cPassword = ui->_password->text().trimmed();
 
   db.setUserName(_cUsername);
   db.setPassword(_cPassword);
@@ -199,13 +202,13 @@ void login::sLogin()
                                "System Error '%1'\n%2" ).arg(db.lastError().text(), db.lastError().driverText()));
     if (!_captive)
     {
-      _username->setText("");
-      _username->setFocus();
+      ui->_username->setText("");
+      ui->_username->setFocus();
     }
     else
-      _password->setFocus();
+      ui->_password->setFocus();
 
-    _password->setText("");
+    ui->_password->setText("");
     return;
   }
 
@@ -241,8 +244,8 @@ void login::populateDatabaseInfo()
   QString port;
 
   parseDatabaseURL(_databaseURL, protocol, hostName, dbName, port);
-  _server->setText(hostName);
-  _database->setText(dbName);
+  ui->_server->setText(hostName);
+  ui->_database->setText(dbName);
 }
 
 QString login::username()

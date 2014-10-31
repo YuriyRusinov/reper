@@ -293,6 +293,7 @@ public slots:
     
     void slotShowIOEditor(QWidget * parent, const QString & uid);//from unique_id
     void slotConstructNewEIO(QWidget * parent, KKSObjectExemplar ** eio, const QString & layerTable, const QString & geomAsEWKT);//construct new IO and save to database
+    void slotDeleteEIOList(QWidget * parent, const QString & tableName, const QList<qint64> & ids);//delete EIOs
 
     void addAttrSearchTemplate (void);
     void editAttrSearchTemplate (void);

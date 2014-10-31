@@ -8,7 +8,7 @@ include(../../ddocclient.conf)
 
 CONFIG += qt
 CONFIG += warn_on dll
-QT += network
+QT += network xml
 
 DEFINES *= __USE_DLL_KKSHTTPCONNECTOR
 

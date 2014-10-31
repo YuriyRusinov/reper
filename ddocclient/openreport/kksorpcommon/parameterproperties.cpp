@@ -19,6 +19,7 @@
  */
 
 #include "parameterproperties.h"
+#include "ui_parameterproperties.h"
 
 #include <QMessageBox>
 #include <QLineEdit>
@@ -38,16 +39,18 @@ static QString formatVariant(const QVariant & var)
 ParameterProperties::ParameterProperties(QWidget* parent, Qt::WindowFlags fl)
     : QDialog(parent, fl)
 {
-  setupUi(this);
+  ui = new Ui::ParameterProperties;
 
-  connect(_listDelete, SIGNAL(clicked()), this, SLOT(deleteItem()));
-  connect(_listDown,   SIGNAL(clicked()), this, SLOT(moveItemDown()));
-  connect(_listEdit,   SIGNAL(clicked()), this, SLOT(editItem()));
-  connect(_listNew,    SIGNAL(clicked()), this, SLOT(newItem()));
-  connect(_listUp,     SIGNAL(clicked()), this, SLOT(moveItemUp()));
+  ui->setupUi(this);
 
-  _int->setValidator(new QIntValidator(this));
-  _double->setValidator(new QDoubleValidator(this));
+  connect(ui->_listDelete, SIGNAL(clicked()), this, SLOT(deleteItem()));
+  connect(ui->_listDown,   SIGNAL(clicked()), this, SLOT(moveItemDown()));
+  connect(ui->_listEdit,   SIGNAL(clicked()), this, SLOT(editItem()));
+  connect(ui->_listNew,    SIGNAL(clicked()), this, SLOT(newItem()));
+  connect(ui->_listUp,     SIGNAL(clicked()), this, SLOT(moveItemUp()));
+
+  ui->_int->setValidator(new QIntValidator(this));
+  ui->_double->setValidator(new QDoubleValidator(this));
 }
 
 ParameterProperties::~ParameterProperties()
@@ -57,7 +60,7 @@ ParameterProperties::~ParameterProperties()
 
 void ParameterProperties::languageChange()
 {
-  retranslateUi(this);
+  ui->retranslateUi(this);
 }
 
 void ParameterProperties::newItem()
@@ -65,13 +68,13 @@ void ParameterProperties::newItem()
   QListWidgetItem *lwi = 0;
   QVariant var;
   ParameterProperties pedit(this);
-  pedit._nameLit->hide();
-  pedit._name->hide();
+  pedit.ui->_nameLit->hide();
+  pedit.ui->_name->hide();
   if(pedit.exec() == QDialog::Accepted)
   {
     var = pedit.value();
 
-    lwi = new QListWidgetItem(formatVariant(var), _list);
+    lwi = new QListWidgetItem(formatVariant(var), ui->_list);
     lwi->setData(Qt::UserRole, var);
   }
 }
@@ -79,12 +82,12 @@ void ParameterProperties::newItem()
 void ParameterProperties::editItem()
 {
   QVariant var;
-  QListWidgetItem * item = _list->currentItem();
+  QListWidgetItem * item = ui->_list->currentItem();
   if (item)
   {
     ParameterProperties pedit(this);
-    pedit._nameLit->hide();
-    pedit._name->hide();
+    pedit.ui->_nameLit->hide();
+    pedit.ui->_name->hide();
 
     QVariant var = item->data(Qt::UserRole);
     QString typeName;
@@ -93,19 +96,19 @@ void ParameterProperties::editItem()
     {
       case QVariant::Bool:
         typeName = tr("Bool");
-        pedit._bool->setCurrentIndex(var.toBool() ? 1 : 0);
+        pedit.ui->_bool->setCurrentIndex(var.toBool() ? 1 : 0);
         break;
       case QVariant::Int:
         typeName = tr("Int");
-        pedit._int->setText(QString::number(var.toInt()));
+        pedit.ui->_int->setText(QString::number(var.toInt()));
         break;
       case QVariant::Double:
         typeName = tr("Double");
-        pedit._double->setText(QString::number(var.toDouble()));
+        pedit.ui->_double->setText(QString::number(var.toDouble()));
         break;
       case QVariant::String:
         typeName = tr("String");
-        pedit._string->setText(var.toString());
+        pedit.ui->_string->setText(var.toString());
         break;
       case QVariant::List:
         typeName = tr("List");
@@ -118,7 +121,7 @@ void ParameterProperties::editItem()
         return;
     };
 
-    pedit._type->setCurrentIndex(_type->findText(typeName));
+    pedit.ui->_type->setCurrentIndex(ui->_type->findText(typeName));
 
     if (pedit.exec() == QDialog::Accepted)
     {
@@ -132,56 +135,56 @@ void ParameterProperties::editItem()
 
 void ParameterProperties::deleteItem()
 {
-  QListWidgetItem * item = _list->currentItem();
+  QListWidgetItem * item = ui->_list->currentItem();
   if(item)
     delete item;  
 }
 
 void ParameterProperties::moveItemUp()
 {
-  int row = _list->currentRow();
+  int row = ui->_list->currentRow();
   if(row <= 1)
     return;
-  QListWidgetItem * item = _list->takeItem(row);
+  QListWidgetItem * item = ui->_list->takeItem(row);
   if (item)
-    _list->insertItem(row-1, item);
+    ui->_list->insertItem(row-1, item);
 }
 
 void ParameterProperties::moveItemDown()
 {
-  int row = _list->currentRow();
-  if(row >= _list->count())
+  int row = ui->_list->currentRow();
+  if(row >= ui->_list->count())
     return;
-  QListWidgetItem * item = _list->takeItem(row);
+  QListWidgetItem * item = ui->_list->takeItem(row);
   if(item)
-    _list->insertItem(row+1, item);
+    ui->_list->insertItem(row+1, item);
 }
 
 void ParameterProperties::setActive(bool p)
 {
-  _active->setChecked(p);
+  ui->_active->setChecked(p);
 }
 
 void ParameterProperties::setList( const QList<QVariant> & l )
 {
-  _list->clear();
+  ui->_list->clear();
   
   QList<QVariant>::const_iterator it;
   for(it = l.begin(); it != l.end(); ++it) {
-      new QListWidgetItem(formatVariant(*it), _list);
+      new QListWidgetItem(formatVariant(*it), ui->_list);
   }
 }
 
 void ParameterProperties::setName(QString p)
 {
-  _name->setText(p);
+  ui->_name->setText(p);
 }
 
 void ParameterProperties::setType(QString p)
 {
-  int idx = _type->findText(p);
+  int idx = ui->_type->findText(p);
   if (idx >= 0)
-    _type->setCurrentIndex(idx);
+    ui->_type->setCurrentIndex(idx);
   else if (QVariant::nameToType(qPrintable(p)) != QVariant::Invalid)
     setType(QVariant::nameToType(qPrintable(p)));
   else
@@ -214,9 +217,9 @@ void ParameterProperties::setType(QVariant::Type p)
                            tr("I do not recognize type %1.")
                            .arg(QVariant::typeToName(p)));
   }
-  int idx = _type->findText(typeName);
+  int idx = ui->_type->findText(typeName);
   if (idx >= 0)
-    _type->setCurrentIndex(idx);
+    ui->_type->setCurrentIndex(idx);
 }
 
 void ParameterProperties::setValue(QVariant p)
@@ -225,37 +228,37 @@ void ParameterProperties::setValue(QVariant p)
   switch (p.type())
   {
     case QVariant::Bool:
-      _bool->setCurrentIndex(p.toBool() ? 1 : 0);
+      ui->_bool->setCurrentIndex(p.toBool() ? 1 : 0);
       break;
     case QVariant::Int:
-      _int->setText(QString::number(p.toInt()));
+      ui->_int->setText(QString::number(p.toInt()));
       break;
     case QVariant::Double:
-      _double->setText(QString::number(p.toDouble()));
+      ui->_double->setText(QString::number(p.toDouble()));
       break;
     case QVariant::String:
-      _string->setText(p.toString());
+      ui->_string->setText(p.toString());
     break;
     case QVariant::List:
       setList(p.toList());
       break;
     default:
-      _string->setText(p.toString());
+      ui->_string->setText(p.toString());
   }
 }
 
 bool ParameterProperties::active()
 {
-  return _active->isChecked();
+  return ui->_active->isChecked();
 }
 
 QList<QVariant> ParameterProperties::list()
 {
   QList<QVariant> varlist;
   QListWidgetItem * item = 0;
-  for(int row = 0; row < _list->count(); row++)
+  for(int row = 0; row < ui->_list->count(); row++)
   {
-    item = _list->item(row);
+    item = ui->_list->item(row);
     varlist.append(item->data(Qt::UserRole));
   }
   return varlist;
@@ -263,22 +266,22 @@ QList<QVariant> ParameterProperties::list()
 
 QString ParameterProperties::name()
 {
-  return _name->text();
+  return ui->_name->text();
 }
 
 QVariant::Type ParameterProperties::type()
 {
   QVariant value;
-  QString valueType = _type->currentText();
+  QString valueType = ui->_type->currentText();
 
   if (valueType == tr("String"))
-    value = QVariant(_string->text());
+    value = QVariant(ui->_string->text());
   else if (valueType == tr("Int"))
-    value = QVariant(_int->text().toInt());
+    value = QVariant(ui->_int->text().toInt());
   else if (valueType == tr("Double"))
-    value = QVariant(_double->text().toDouble());
+    value = QVariant(ui->_double->text().toDouble());
   else if (valueType == tr("Bool"))
-    value = QVariant(_bool->currentText().toLower() == "true");
+    value = QVariant(ui->_bool->currentText().toLower() == "true");
   else if (valueType == tr("List"))
     value = QVariant(list());
   else
@@ -290,22 +293,22 @@ QVariant::Type ParameterProperties::type()
 
 QString ParameterProperties::typeName()
 {
-  return _type->currentText();
+  return ui->_type->currentText();
 }
 
 QVariant ParameterProperties::value()
 {
   QVariant value;
-  QString valueType = _type->currentText();
+  QString valueType = ui->_type->currentText();
 
   if (valueType == tr("String"))
-    value = QVariant(_string->text());
+    value = QVariant(ui->_string->text());
   else if (valueType == tr("Int"))
-    value = QVariant(_int->text().toInt());
+    value = QVariant(ui->_int->text().toInt());
   else if (valueType == tr("Double"))
-    value = QVariant(_double->text().toDouble());
+    value = QVariant(ui->_double->text().toDouble());
   else if (valueType == tr("Bool"))
-    value = QVariant(_bool->currentText().toLower() == "true");
+    value = QVariant(ui->_bool->currentText().toLower() == "true");
   else if (valueType == tr("List"))
     value = QVariant(list());
   else

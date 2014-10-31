@@ -12,6 +12,8 @@
 //gui
 class QLabel;
 class QPushButton;
+class QCheckBox;
+class QGroupBox;
 
 class DDocInteractorBase;
 
@@ -42,6 +44,12 @@ private slots:
     void slotSetTimerParams();
     void slotShowConnInfo();
 
+    void slotStopClients();
+    void slotStartClients();
+    void slotStartSending();
+
+    void slotCheckBoxStateChanged(int state);
+
 
 signals:
     void exitThreads();
@@ -56,6 +64,10 @@ private:
     QPushButton  *manualStartButton;
     QPushButton * quitButton;
     QPushButton * stopButton;
+    
+    QGroupBox * gbQueues;
+    QCheckBox * chQueryXML; //если выставлен, то опрашивается очередь исходящих XML-сообщений (без поддержки гарантированной доставки
+    QCheckBox * chQueryMain;//если выставлен, то опрашивается основная исходящая очередь в формате DynamicDocs Interactor
 
     DDocInteractorBase * m_base;
 

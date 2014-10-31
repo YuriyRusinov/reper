@@ -2758,6 +2758,13 @@ void KKSObjEditorFactory :: slotConstructNewEIO(QWidget * parent, KKSObjectExemp
     delete objEditor;
 }
 
+void KKSObjEditorFactory :: slotDeleteEIOList(QWidget * parent, const QString & tableName, const QList<qint64> & ids)//delete EIOs
+{
+    for(int i=0; i<ids.count(); i++){
+        int ok = eiof->deleteRecord(ids.at(i), tableName);
+    }
+}
+
 
 /*
  * слот создания редактора существующего ИО/ЭИО, являющегося элементом справочника idObject.

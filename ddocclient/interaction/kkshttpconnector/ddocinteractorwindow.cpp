@@ -12,6 +12,24 @@ DDocInteractorWindow::DDocInteractorWindow(QWidget *parent) : QDialog(parent)
 {
     m_base = 0;
 
+    gbQueues = new QGroupBox(tr("Querying queues:"));
+    
+    QVBoxLayout * gbLayout = new QVBoxLayout;
+    chQueryMain = new QCheckBox(tr("Main (between DynamicDocs Servers)")); 
+    chQueryXML = new QCheckBox(tr("XML (between external systems)")); 
+    gbLayout->addWidget(chQueryMain);
+    gbLayout->addWidget(chQueryXML);
+    //gbLayout->setSizeConstraint(QLayout::SetFixedSize);
+
+    gbQueues->setLayout(gbLayout);
+    
+    chQueryMain->setChecked(true);
+    chQueryXML->setChecked(false);
+
+    connect(chQueryMain, SIGNAL(stateChanged(int)), this, SLOT(slotCheckBoxStateChanged(int)));
+    connect(chQueryXML, SIGNAL(stateChanged(int)), this, SLOT(slotCheckBoxStateChanged(int)));
+
+
     stopButton = new QPushButton(tr("Stop querying"));
     
     manualStartButton = new QPushButton(tr("Single query database"));
@@ -25,6 +43,7 @@ DDocInteractorWindow::DDocInteractorWindow(QWidget *parent) : QDialog(parent)
     quitButton->setAutoDefault(false);
 
     QVBoxLayout * buttonLayout = new QVBoxLayout;
+    buttonLayout->addWidget(gbQueues);
     buttonLayout->addWidget(stopButton);
     buttonLayout->addWidget(manualStartButton);
 
@@ -67,6 +86,7 @@ void DDocInteractorWindow::setTimerParams(int v, int u, bool m)
     else{
         stopButton->setText(tr("Stop querying"));
         manualStartButton->setEnabled(false);
+        gbQueues->setEnabled(false);
     }
 
     QString sUnits;
@@ -125,13 +145,64 @@ void DDocInteractorWindow::setInteractorBase(DDocInteractorBase *b)
 
     connect(m_base, SIGNAL(sendingStarted()), this, SLOT(slotSendingStarted()));
     connect(m_base, SIGNAL(sendingCompleted()), this, SLOT(slotSendingCompleted()));
-    connect(manualStartButton, SIGNAL(clicked()), m_base, SIGNAL(startSending()));
+    
+    //connect(manualStartButton, SIGNAL(clicked()), m_base, SIGNAL(startSending()));
+    //connect(manualStartButton, SIGNAL(clicked()), m_base, SIGNAL(startSendingForXML()));
+    
+    connect(manualStartButton, SIGNAL(clicked()), this, SLOT(slotStartSending()));
+
     connect(this, SIGNAL(exitThreads()), m_base, SLOT(slotExitThreads()));
-    connect(this, SIGNAL(stopReadDatabase()), m_base, SLOT(slotStopClient()));
-    connect(this, SIGNAL(startReadDatabase()), m_base, SLOT(slotStartClient()));
+    
+    //connect(this, SIGNAL(stopReadDatabase()), m_base, SLOT(slotStopClient()));
+    //connect(this, SIGNAL(startReadDatabase()), m_base, SLOT(slotStartClient()));
+    
+    connect(this, SIGNAL(stopReadDatabase()), this, SLOT(slotStopClients()));
+    connect(this, SIGNAL(startReadDatabase()), this, SLOT(slotStartClients()));
+
     connect(m_base, SIGNAL(hideManualStartButton()), this, SLOT(slotHideManualStartButton()));
     connect(m_base, SIGNAL(showManualStartButton()), this, SLOT(slotShowManualStartButton()));
     connect(this, SIGNAL(refreshTimer(int)), m_base, SIGNAL(refreshTimer(int)));
+}
+
+void DDocInteractorWindow::slotStartSending()
+{
+    stopButton->setEnabled(false);
+    gbQueues->setEnabled(false);
+
+    if(chQueryXML->isChecked())
+        m_base->_startSendingForXML(); 
+
+    if(chQueryMain->isChecked())
+        m_base->_startSending(); 
+
+    stopButton->setEnabled(true);
+    gbQueues->setEnabled(true);
+}
+
+void DDocInteractorWindow::slotStopClients()
+{
+    if(chQueryXML->isChecked()){
+        m_base->slotStopClientForXML();
+    }
+
+    if(chQueryMain->isChecked()){
+        m_base->slotStopClient();
+    }
+
+    gbQueues->setEnabled(true);
+}
+
+void DDocInteractorWindow::slotStartClients()
+{
+    if(chQueryXML->isChecked()){
+        m_base->slotStartClientForXML();
+    }
+
+    if(chQueryMain->isChecked()){
+        m_base->slotStartClient();
+    }
+
+    gbQueues->setEnabled(false);
 }
 
 void DDocInteractorWindow::closeEvent(QCloseEvent *event)
@@ -194,4 +265,23 @@ void DDocInteractorWindow::slotSetTimerParams()
 void DDocInteractorWindow::slotShowConnInfo()
 {
     kksCoreApp->showConnectionInfo(m_base->m_loader->getDbRead(), m_base->m_loader->getUserName(), m_base->m_loader->getDlName(), tr("Not used"), this);
+}
+
+void DDocInteractorWindow::slotCheckBoxStateChanged(int state)
+{
+    Q_UNUSED(state);
+    //QObject * obj = this->sender();
+    //if(!obj)
+    //    return;
+
+    if(!chQueryMain->isChecked() && !chQueryXML->isChecked()){
+        stopButton->setEnabled(false);
+        manualStartButton->setEnabled(false);
+    }
+    else{
+        stopButton->setEnabled(true);
+
+        if(m_startManually)
+            manualStartButton->setEnabled(true);
+    }
 }

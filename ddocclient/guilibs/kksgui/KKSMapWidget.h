@@ -62,6 +62,7 @@ signals:
     void downloadGISFiles(bool bForRec, const QString & homeDir, qint64 idObj, QWidget * parent);//запрос на выгрузку файла со слоем из БД. файл задается идентификатором из таблицы io_urls
     void uploadGISFiles(bool bForRec, const QStringList & files, qint64 idObj, QWidget * parent);//загрузка файлов ГИС-проекта на сервер. Файлы задаются абсолютными путями
     void constructNewEIO(QWidget * parent, KKSObjectExemplar ** eio, const QString & layerTable, const QString & geomAsEWKT); //запрос на создание нового EИО в справочнике, который задается названием своей таблицы в БД. При этом создавать ИО в бД не надо
+    void deleteEIOList(QWidget * parent, const QString & tableName, const QList<qint64> & ids);
     
 public slots:
     void slotMapChanged(QDomDocument&);
@@ -70,6 +71,7 @@ public slots:
     void slotSaveGISProject(KKSValue & v);
 #ifdef __USE_QGIS__
     void slotFeatureFromEIO(QWidget * parent, QgsFeature & feature, const QString & geomAsEWKT, const QString & layerTable);
+    void slotDeleteFeaturesAsEIO(QWidget * parent, const QString & tableName, const QList<qint64> & ids);
 #endif
 private:
     QDockWidget * m_legendWidget;

@@ -32,7 +32,7 @@ public:
 
     void run();
     
-    void setMode(bool m){manual = m;}
+    void setManual(bool m){manual = m;}
     void setInterval(int i){m_interval = i;}
     void setGateway(const QString & host, int port){gatewayHost = host; gatewayPort = port;}
 
@@ -84,6 +84,7 @@ signals:
 
     void needToExitEventLoop(); //генерируется в httpRequestFinished. Означает, что завершился вызов __нашего__ вызова post-> . Говорит о том, что надо завершить EventLoop и приступить к отправке следующего пакета
     void needToExitEventLoopPing();//генерируется в pingHttpRequestFinished. Означает, что завершился вызов __нашего__ вызова post-> . Говорит о том, что надо завершить EventLoop и приступить к отправке следующего пакета для пингов
+    
     void httpMessageRemoved(int progress);
 
     void sendingStarted();//генерируется, когда происходит получение данных и их отправка получателю
@@ -99,11 +100,12 @@ private:
     QHttp *pingHttp; //используется для отправки пингов (синхронно)
     QHttp *pingResHttp; //используется для отправки ответов на пинги (асинхронно)
 
-	bool manual; //true - ручной режим опроса БД 
+    bool manual; //true - ручной режим опроса БД 
 
     QTimer * m_timer;
     int m_interval; //интервал таймера на опрос БД. Важно! при отправке данных таймер приостанавливается до окончания передачи
     bool m_isExiting;//true - происходит завершение работы приложения. Необходимо завершить работу потока
+    bool m_isSending;// true - происходит передача данных получателям. В этом случае необходимо обеспечить, чтобы таймер (даже случайно) не начал "несанкционированный" запуск метода startProc()
 
     QList<JKKSPMessWithAddr *> messageList;//список сообщений для отправки. Запрашивается из JKKSLoader и очищается сразу после отправки (вызова sendOutMessage() или sendPings() )
     QMap<int, QPair<qint64, qint64> > httpMessages;//отправленные сообщения через this->http. В качестве ключа используется идентификатор запроса из метода QHttp::request()
