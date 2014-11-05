@@ -160,102 +160,101 @@ begin
                 end if;
             end loop;
 
-            --continue;
-        --end if;
-        if(r.atypeid == 28) then --GIS-object (data type GEOMETRY)
-            bHasGIS = true;
-        else
+        else   --not many-to-many
 
-        create_query := create_query || '"' || r.code || '" ' || r.atype;
+            if(r.atypeid == 28) then --GIS-object (data type GEOMETRY)
+                bHasGIS = true;
+            end if;
 
-        --mandatory
-        
-        if (r.is_mandatory) then
-            create_query := create_query || ' not null';
-        else
-            create_query := create_query || ' null';
-        end if;
+            create_query := create_query || '"' || r.code || '" ' || r.atype;
 
-        --def_value
-        
-        if (r.def_value is not null) then
-            create_query := create_query || ' default ';
+            --mandatory
+            if (r.is_mandatory) then
+                create_query := create_query || ' not null';
+            else
+                create_query := create_query || ' null';
+            end if;
 
-            if (r.atypeid = 4 or r.atypeid = 5) then --DATE OR TIMESTAMP
-                if (r.def_value = 'current_timestamp') then
-                    create_query := create_query || ' current_timestamp';
-                else
-                    create_query := create_query || ' to_timestamp( ' || quote_literal (r.def_value) || ', ' || quote_literal ('DD.MM.YYYY HH24:MI:SS') || '::timestamp)';
-                end if;
-            elsif (r.atypeid = 10) then --INTERVAL
-                if (not is_int4 (split_part (r.def_value, ' ', 1))) then
-                    raise exception 'Interval value is invalid';
-                    return NULL;
-                end if;
-                amount := split_part (r.def_value, ' ', 1)::int4;
-                unit := split_part (r.def_value, ' ', 2);
-                what := 0;
-                if (lower (unit) = 'years') then
-                    what := 1;
-                elsif (lower (unit) = 'half-years') then
-                    what := 2;
-                elsif (lower (unit) = 'quarters') then
-                    what := 3;
-                elsif (lower (unit) = 'months') then
-                    what := 4;
-                elsif (lower (unit) = 'weeks') then
-                    what := 5;
-                elsif (lower (unit) = 'days') then
-                    what := 6;
-                elsif (lower (unit) = 'hours') then
-                    what := 7;
-                elsif (lower (unit) = 'minutes') then
-                    what := 8;
-                elsif (lower (unit) = 'seconds') then
-                    what := 9;
-                else
-                    raise exception 'Invalid unit';
-                    return NULL;
-                end if;
-                create_query := create_query || '{' || amount || ',' || what || '}';
-                ---r.def_value;
-                ---TODO : need working.
+            --def_value
+            if (r.def_value is not null) then
+                create_query := create_query || ' default ';
 
-            elsif (r.atypeid = 12) then -- INT8[]
-                if(substr(r.def_value, 1, 1) <> '{') then
-                    create_query := create_query || quote_literal ('{' || r.def_value || '}');
-                else
+                if (r.atypeid = 4 or r.atypeid = 5) then --DATE OR TIMESTAMP
+                    if (r.def_value = 'current_timestamp') then
+                        create_query := create_query || ' current_timestamp';
+                    else
+                        create_query := create_query || ' to_timestamp( ' || quote_literal (r.def_value) || ', ' || quote_literal ('DD.MM.YYYY HH24:MI:SS') || '::timestamp)';
+                    end if;
+                elsif (r.atypeid = 10) then --INTERVAL
+                    if (not is_int4 (split_part (r.def_value, ' ', 1))) then
+                        raise exception 'Interval value is invalid';
+                        return NULL;
+                    end if;
+
+                    amount := split_part (r.def_value, ' ', 1)::int4;
+                    unit := split_part (r.def_value, ' ', 2);
+                    what := 0;
+                    if (lower (unit) = 'years') then
+                        what := 1;
+                    elsif (lower (unit) = 'half-years') then
+                        what := 2;
+                    elsif (lower (unit) = 'quarters') then
+                        what := 3;
+                    elsif (lower (unit) = 'months') then
+                        what := 4;
+                    elsif (lower (unit) = 'weeks') then
+                        what := 5;
+                    elsif (lower (unit) = 'days') then
+                        what := 6;
+                    elsif (lower (unit) = 'hours') then
+                        what := 7;
+                    elsif (lower (unit) = 'minutes') then
+                        what := 8;
+                    elsif (lower (unit) = 'seconds') then
+                        what := 9;
+                    else
+                        raise exception 'Invalid unit';
+                        return NULL;
+                    end if;
+
+                    create_query := create_query || '{' || amount || ',' || what || '}';
+                    ---r.def_value;
+                    ---TODO : need working.
+
+                elsif (r.atypeid = 12) then -- INT8[]
+                    if(substr(r.def_value, 1, 1) <> '{') then
+                        create_query := create_query || quote_literal ('{' || r.def_value || '}');
+                    else
+                        create_query := create_query || quote_literal (r.def_value);
+                    end if;
+                elsif (r.atypeid = 9 or r.atypeid = 11 or r.atypeid = 14 or r.atypeid = 15) then
                     create_query := create_query || quote_literal (r.def_value);
-                end if;
-            elsif (r.atypeid = 9 or r.atypeid = 11 or r.atypeid = 14 or r.atypeid = 15) then
-                create_query := create_query || quote_literal (r.def_value);
-            else
-                create_query := create_query || r.def_value;
-            end if;
-        end if;  --defvalue
-
-        create_query = create_query || ', ';
-        --atList or atParent
-        
-        if (r.atypeid = 2 or r.atypeid = 3) then --atList, atParent
-            if (alter_query is null) then
-                alter_query := 'ALTER TABLE "' || table_name || '" ADD CONSTRAINT "FK_' || table_name || '_REF_' || r.code || '" foreign key ("' || r.code || '") references ';
-            else
-                alter_query := alter_query || 'ALTER TABLE "' || table_name || '" ADD CONSTRAINT "FK_' || table_name || '_REF_' || r.code || '" foreign key ("' || r.code || '") references ';
-            end if;
-            if (r.atypeid = 3) then
-                alter_query := alter_query || table_name;
-            else
-                select f_is_view_exist(r.atabname) into isExist; --≈сли представление с таким названием существует, то это означает, что реальна€ таблица имеет название с префиксом tbl_
-                if(isExist = 1) then
-                    alter_query := alter_query || 'tbl_' || r.atabname;
                 else
-                    alter_query := alter_query || r.atabname;
+                    create_query := create_query || r.def_value;
                 end if;
-            end if;
-            alter_query := alter_query || ' ("' || refColumnName || '") on delete restrict on update cascade;';
-        end if;
+            end if;  --defvalue
 
+            create_query = create_query || ', ';
+    
+            --atList or atParent
+            if (r.atypeid = 2 or r.atypeid = 3) then --atList, atParent
+                if (alter_query is null) then
+                    alter_query := 'ALTER TABLE "' || table_name || '" ADD CONSTRAINT "FK_' || table_name || '_REF_' || r.code || '" foreign key ("' || r.code || '") references ';
+                else
+                    alter_query := alter_query || 'ALTER TABLE "' || table_name || '" ADD CONSTRAINT "FK_' || table_name || '_REF_' || r.code || '" foreign key ("' || r.code || '") references ';
+                end if;
+                if (r.atypeid = 3) then
+                    alter_query := alter_query || table_name;
+                else
+                    select f_is_view_exist(r.atabname) into isExist; --≈сли представление с таким названием существует, то это означает, что реальна€ таблица имеет название с префиксом tbl_
+                    if(isExist = 1) then
+                        alter_query := alter_query || 'tbl_' || r.atabname;
+                    else
+                        alter_query := alter_query || r.atabname;
+                    end if;
+                end if;
+                alter_query := alter_query || ' ("' || refColumnName || '") on delete restrict on update cascade;';
+            end if;
         --i := i+1;
         end if;
     end loop; --main loop
@@ -273,7 +272,7 @@ begin
         create_query := create_query || ' create trigger trgCheckTableForOwner before insert or update or delete on ' || table_name || ' for each row execute procedure checkTableForOwner(); ';
         create_query := create_query || ' create trigger trgSetUUID before insert or update on ' || table_name || ' for each row execute procedure uuidCheck(); ';
         create_query := create_query || ' create trigger trg_fk_q_base_table_check1 before update or delete on ' || table_name || ' for each row execute procedure fkQBaseTableCheck1(); ';
-        if(bHasGIS = true) then
+        if(bHasGIS = true) then  --notification for automatic map updates
             create_query := create_query || ' create trigger trg_notify_gis_layer after insert or update or delete on ' || table_name || ' for each row execute procedure notifyGISLayer(); ';
         end if;
         create_query := create_query || ' create unique index i_unique_id_' || table_name || ' on ' || table_name || ' using BTREE (unique_id); ';
