@@ -88,6 +88,8 @@ declare
     rr RECORD; --for atCheckListEx
     isExist int4;
 
+    bHasGIS bool; --qualifier has gis attribute!
+
     refColumnName varchar;
 begin
     select into res count (*) from pg_tables as t where t.tablename = table_name;
@@ -120,6 +122,8 @@ begin
 
     alter_query = '';
     create_ref_table = '';
+    
+    bHasGIS = false;
 
     for r in
         execute query
@@ -158,6 +162,8 @@ begin
 
             --continue;
         --end if;
+        if(r.atypeid == 28) then --GIS-object (data type GEOMETRY)
+            bHasGIS = true;
         else
 
         create_query := create_query || '"' || r.code || '" ' || r.atype;
@@ -267,6 +273,9 @@ begin
         create_query := create_query || ' create trigger trgCheckTableForOwner before insert or update or delete on ' || table_name || ' for each row execute procedure checkTableForOwner(); ';
         create_query := create_query || ' create trigger trgSetUUID before insert or update on ' || table_name || ' for each row execute procedure uuidCheck(); ';
         create_query := create_query || ' create trigger trg_fk_q_base_table_check1 before update or delete on ' || table_name || ' for each row execute procedure fkQBaseTableCheck1(); ';
+        if(bHasGIS = true) then
+            create_query := create_query || ' create trigger trg_notify_gis_layer after insert or update or delete on ' || table_name || ' for each row execute procedure notifyGISLayer(); ';
+        end if;
         create_query := create_query || ' create unique index i_unique_id_' || table_name || ' on ' || table_name || ' using BTREE (unique_id); ';
     end if;
  

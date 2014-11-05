@@ -18,4 +18,6 @@
 
 \i ./functions/io_objects/triggers/trgcheckforowner.sql
 \i ./functions/io_objects/triggers/trgchecktableforowner.sql
+\i ./functions/io_objects/triggers/trgnotifygislayer.sql
+
 --\i ./functions/io_objects/triggers/logging/readd_logging.sql
