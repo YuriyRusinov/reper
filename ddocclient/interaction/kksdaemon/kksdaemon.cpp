@@ -415,6 +415,9 @@ void DDocServerListener::notify( char* notify_name, char * payload )
     delete res;
 
     if(isExternal){
+
+        if(hHost.isEmpty() && service.isEmpty())
+            return; //нечего запускать
         
         QString uri = QString("http://") + hHost + QString(":") + QString::number(hPort) + QString("/") + service;
 	    //QString uri = QString("/") + service + QString("?id=") + QString::number(id); // + extraParams;
@@ -452,6 +455,9 @@ void DDocServerListener::notify( char* notify_name, char * payload )
         //}
     }
     else{
+
+        if(service.isEmpty())
+            return; //нечего запускать. Имя хранимой процедуры не задано
         
         QString sql = QString("\"select hStartHandler('%1', %2)\"").arg(service).arg(id);
         

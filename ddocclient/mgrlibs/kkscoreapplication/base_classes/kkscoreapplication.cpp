@@ -204,7 +204,7 @@ void KKSCoreApplication::loadTranslator()
     QApplication::installTranslator(openRPTtor1);
 
     QTranslator * openRPTtor2 = new QTranslator(0);
-    bool ok1 = openRPTtor2->load(QString("renderer_ru"), transl_path);
+    bool ok2 = openRPTtor2->load(QString("renderer_ru"), transl_path);
     QApplication::installTranslator(openRPTtor2);
 
     tor = new QTranslator(0);
@@ -1876,4 +1876,6 @@ int KKSCoreApplication::createNotifyReceiver()
     connect(kksCoreApp->m_notifyReceiver, SIGNAL(databaseNotifyReceived(const QString &, const QString &, const QString &)), kksCoreApp->loader(), SIGNAL(databaseNotifyReceived(const QString &, const QString &, const QString &)));
 
     kksCoreApp->m_notifyReceiver->start();
+
+    return OK_CODE;
 }
