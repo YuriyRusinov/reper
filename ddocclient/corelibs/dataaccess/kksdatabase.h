@@ -4,6 +4,7 @@
 
 #include "config_dataaccess.h"
 #include "kksresult.h"
+#include "pqnotify.h"
 #include <QObject>
 
 
@@ -77,6 +78,14 @@ class __DA_EXPORT KKSDatabase : QObject
         virtual bool begin() const = 0;
         virtual bool commit() const = 0;
         virtual bool rollback() const = 0;
+
+#ifdef USE_NOTIFICATION
+        virtual void addListener( IKKSListener* listener, const char* notify_name ) = 0;
+        virtual void  removeListener( IKKSListener* listener, const char* notify_name ) = 0;
+        virtual void startListen() = 0;
+        virtual void stopListen() = 0;
+        virtual void checkNotifies() = 0;
+#endif
 
         virtual void createSavePoint(const char * savePointName = NULL) const = 0;
         virtual void releaseSavePoint(const char * savePointName = NULL) const = 0;

@@ -9,7 +9,8 @@
 
 using namespace std;
 /* использовать нотификацию*/
-#define USE_NOTIFICATION 1
+//объ€влено в config_dataaccess.h
+//#define USE_NOTIFICATION 1
 
 //------------------------------------------------------------------------------
 //

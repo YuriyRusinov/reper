@@ -12,6 +12,7 @@
 #include <QUrl>
 
 
+
 KKSGISWidget::KKSGISWidget(bool withSubWindows, bool withAddons, QWidget* parent, Qt::WFlags fl)
     : KKSGISWidgetBase(withSubWindows, withAddons, parent, fl)
 {
@@ -20,3 +21,4 @@ KKSGISWidget::KKSGISWidget(bool withSubWindows, bool withAddons, QWidget* parent
 KKSGISWidget::~KKSGISWidget()
 {
 }
+

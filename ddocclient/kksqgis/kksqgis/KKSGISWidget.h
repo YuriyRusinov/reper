@@ -13,6 +13,7 @@
 #include <QDockWidget>
 #include <QDomDocument>
 
+
 class _QGIS_EXPORT KKSGISWidget : public KKSGISWidgetBase
 {
     Q_OBJECT

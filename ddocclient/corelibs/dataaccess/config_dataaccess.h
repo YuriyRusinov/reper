@@ -11,6 +11,8 @@
     #define WIN32
 #endif
 
+/* использовать нотификацию*/
+#define USE_NOTIFICATION 1
 
 
 #ifdef WIN32

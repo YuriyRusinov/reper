@@ -27,6 +27,7 @@
 #include "KKSEIOFactory.h"
 
 #include "KKSDbgOutputWidget.h"
+#include <kksnotifyreceiver.h>
 
 #include "kkssettings.h"
 #include "kkscommandlineopts.h"
@@ -81,14 +82,16 @@ void KKSDbgOutputHandler(QtMsgType type, const char *msg)
 */
 KKSCoreApplication::KKSCoreApplication(KKSCommandLineOpts * opts, bool msgToWindow) :
     poDb (0),
-    m_dbgWidget(0)
+    poDb1(0),
+    poDb2(0),
+    m_dbgWidget(0),
+    m_notifyReceiver(0)
 {
     if ( selfCore )
         qFatal("There should be only one KKSCoreApplication object");
 
     poSettings = 0;
     lastError = 0;
-    poDb1 = 0;
     tor = 0;
 
     m_pluginLoader = 0;
@@ -191,6 +194,19 @@ void KKSCoreApplication::loadTranslator()
         QApplication::removeTranslator(tor);
         delete tor;
     }
+
+    QTranslator * openRPTtor = new QTranslator(0);
+    bool ok = openRPTtor->load(QString("common_ru"), transl_path);
+    QApplication::installTranslator(openRPTtor);
+
+    QTranslator * openRPTtor1 = new QTranslator(0);
+    bool ok1 = openRPTtor1->load(QString("wrtembed_ru"), transl_path);
+    QApplication::installTranslator(openRPTtor1);
+
+    QTranslator * openRPTtor2 = new QTranslator(0);
+    bool ok1 = openRPTtor2->load(QString("renderer_ru"), transl_path);
+    QApplication::installTranslator(openRPTtor2);
+
     tor = new QTranslator(0);
     tor->load(QString("ddocclient_ru"), transl_path);
     QApplication::installTranslator(tor);
@@ -202,11 +218,19 @@ void KKSCoreApplication::loadTranslator()
 KKSCoreApplication::~KKSCoreApplication( )
 {
 
+    if(m_notifyReceiver){
+        m_notifyReceiver->quit();
+        delete m_notifyReceiver;
+    }
+
     if(poDb)
         delete poDb;
 
     if(poDb1)
         delete poDb1;
+
+    if(poDb2)
+        delete poDb2;
 
     if ( tor )
         delete tor;
@@ -263,6 +287,15 @@ KKSDatabase * KKSCoreApplication::db1() const
     }
 
     return poDb1;
+}
+
+KKSDatabase * KKSCoreApplication::db2() const 
+{
+    if ( ! poDb2 ){
+        poDb2 = new KKSPGDatabase();
+    }
+
+    return poDb2;
 }
 
 void KKSCoreApplication::clearLoader()
@@ -906,7 +939,10 @@ int KKSCoreApplication::GUIConnect(QWidget * parent)
 
     if(verifyConnection(parent) == ERROR_CODE)
         return ERROR_CODE;
-    
+
+    if(createNotifyReceiver() == ERROR_CODE)
+        return ERROR_CODE;
+
     return OK_CODE;
 
     /*
@@ -1174,6 +1210,9 @@ int KKSCoreApplication::autoConnect(QWidget * parent)
     if(verifyConnection(parent) == ERROR_CODE)
         return ERROR_CODE;
 
+    if(createNotifyReceiver() == ERROR_CODE)
+        return ERROR_CODE;
+
     return OK_CODE;
 }
 
@@ -1236,6 +1275,10 @@ int KKSCoreApplication::connectToDb(const QString & host,
     }
 
     if(verifyConnection(parent) == ERROR_CODE)
+        return ERROR_CODE;
+
+    
+    if(createNotifyReceiver() == ERROR_CODE)
         return ERROR_CODE;
 
     return OK_CODE;
@@ -1803,4 +1846,34 @@ KKSCommandLineOpts * KKSCoreApplication::parseCommandLineOptions(int argc, char 
     optind = 1;
 
     return kksOpts;
+}
+
+
+int KKSCoreApplication::createNotifyReceiver()
+{
+    if(!kksCoreApp)
+        return ERROR_CODE;
+
+    KKSDatabase * m_db = kksCoreApp->db();
+
+    if(!m_db->connected())
+    {
+        return ERROR_CODE;
+    }
+    
+
+    KKSDatabase * m_db2 = kksCoreApp->db2();
+
+    m_db2->connect(m_db->getHost(), m_db->getName(), m_db->getUser(), m_db->getPass(), m_db->getPort());
+    if(!m_db2->connected()){
+        //m_db->disconnect();
+        return ERROR_CODE;
+    }
+    m_db2->startListen();
+
+    kksCoreApp->m_notifyReceiver = new KKSNotifyReceiver(m_db2, 0);
+    kksCoreApp->m_notifyReceiver->setKKSCoreApp(kksCoreApp);
+    connect(kksCoreApp->m_notifyReceiver, SIGNAL(databaseNotifyReceived(const QString &, const QString &, const QString &)), kksCoreApp->loader(), SIGNAL(databaseNotifyReceived(const QString &, const QString &, const QString &)));
+
+    kksCoreApp->m_notifyReceiver->start();
 }

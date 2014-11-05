@@ -237,6 +237,8 @@ public slots:
     /**Deletes the selected attributes for the currently selected vector layer*/
     void deleteSelected( QgsMapLayer *layer = 0, QWidget* parent = 0 );
 
+    void slotUpdateMapByNotify(const QString &, const QString &, const QString &);
+
 signals:
     /** emitted when a project file is successfully read
       @note

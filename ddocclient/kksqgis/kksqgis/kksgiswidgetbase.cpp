@@ -3520,6 +3520,9 @@ void KKSGISWidgetBase::deleteSelected( QgsMapLayer *layer, QWidget* parent )
   QString tableName = "";
   int fIndex = vlayer->fieldNameIndex("unique_id");
   
+  /*  Удаление реализовано штатными средствами. 
+      Просто подправлен postgresprovider
+
   //ksa
   //если слой из БД DynamicDocs - удалять объекты надо особым образом
   if(providerName == "postgres" && fIndex >= 0){ //DynamicDocs layer!
@@ -3566,7 +3569,7 @@ void KKSGISWidgetBase::deleteSelected( QgsMapLayer *layer, QWidget* parent )
       vlayer->updateExtents();
   }
   else{
-
+*/
     if ( !vlayer->deleteSelectedFeatures() )
     {
       messageBar()->pushMessage( tr( "Problem deleting features" ),
@@ -3577,8 +3580,9 @@ void KKSGISWidgetBase::deleteSelected( QgsMapLayer *layer, QWidget* parent )
     {
       showStatusMessage( tr( "%n feature(s) deleted.", "number of features deleted", numberOfDeletedFeatures ) );
     }
-
+/*
   } //NOT DynamicDocs layer
+  */
 
   vlayer->endEditCommand();
 }
@@ -5920,3 +5924,70 @@ void KKSGISWidgetBase::reloadLayer(const QString & theLayerId)
     //mpMapCanvas->refresh();
 }
 
+void KKSGISWidgetBase::slotUpdateMapByNotify(const QString & nName, const QString & tableName, const QString & idRecord)
+{
+    const QMap<QString, QgsMapLayer *> layers = QgsMapLayerRegistry::instance()->mapLayers();
+    if(layers.count() == 0)
+        return;
+
+    QMap<QString, QgsMapLayer *>::const_iterator pa;
+    QgsVectorLayer * changedLayer = NULL;
+
+    for (pa = layers.constBegin(); pa != layers.constEnd(); pa++)
+    {
+        QgsMapLayer * layer = pa.value();
+        if(layer->type() != QgsMapLayer::VectorLayer)
+            continue;
+        QgsVectorLayer * vLayer = (QgsVectorLayer*)layer;
+
+        QString providerName = vLayer->dataProvider()->name();
+        if(providerName != "postgres")
+            continue;
+
+        QString uri = vLayer->dataProvider()->dataSourceUri();
+        QStringList uriSections = uri.split(" ");
+        QString layerTable;
+
+        for(int i=0; i<uriSections.count(); i++){
+            QString & sec = uriSections[i];
+            if(sec.startsWith("table=")){
+                QStringList tableSec = sec.split("=");
+                if(tableSec.count() != 2){
+                    break;
+                }
+                QString fullTableName = tableSec[1];
+                QStringList tableNameSec = fullTableName.split(".");
+                if(tableNameSec.count() != 2){
+                    break;
+                }
+                layerTable = tableNameSec[1];
+                layerTable.replace("\"", "");
+                break;
+            }
+        }
+
+        if(layerTable != tableName)
+            continue;
+        
+        //vLayer->reload();
+        //mpMapCanvas->refresh();
+        changedLayer = vLayer;
+        break;
+    }
+
+    if(!changedLayer)
+        return;
+
+    changedLayer->setCacheImage(NULL);
+    
+
+    QgsFeature f;
+    QgsFeatureRequest fr(QString("unique_id = '%1'").arg(idRecord) );
+    QgsFeatureIterator fi = changedLayer->getFeatures(fr);
+    bool ok = fi.nextFeature(f);
+    //bool ok = changedLayer->updateFeature(f);
+    if(!ok){
+        int a=0;
+        return;
+    }
+}

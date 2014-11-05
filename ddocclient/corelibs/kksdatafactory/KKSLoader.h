@@ -62,12 +62,21 @@ class KKSIndicatorValue;
 class KKSIndicatorType;
 class KKSIndicator;
 
+//class KKSNotifyReceiver;
+
 /*!\ingroup FACTORY_GROUP
 \class KKSLoader
 \brief Класс для загрузки данных из БД
 */
-class _F_DATA_EXPORT KKSLoader
+class _F_DATA_EXPORT KKSLoader : public QObject
 {
+    Q_OBJECT
+    signals:
+        /*!\brief Сигнал генерируется, когда от БД получено асинхронное уведомление о том, что произолшо некоторое событие
+
+        Модули могут подписываться на это уведомление. Получение уведомлений организровано в виде отдельного потока (QThread)
+        */
+        void databaseNotifyReceived(const QString & nName, const QString & tableName, const QString & idRecord);
     public:
         /*!\brief Возвращает набор возможных значений из справочника
         для атрибутов типа atList и atParent
@@ -421,6 +430,7 @@ class _F_DATA_EXPORT KKSLoader
        // ~KKSLoader();
 
         KKSDatabase * db;
+        //KKSNotifyReceiver * m_notifyReceiver;//поток в котором происходит получение и обработка notify
 
         mutable QHash<int, KKSObject *> loadedObjects;
         mutable QHash<int, KKSCategory *> loadedCategories;

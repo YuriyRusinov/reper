@@ -85,8 +85,8 @@
 #include "KKSMapWidget.h"
 
 #include <defines.h>
-//#include <kkssito.h>
 #include <kksdatabase.h>
+
 
 /* Метод формирует виджет с древовидной структурой групп атрибутов и атрибутов.
  * Параметры:
@@ -1916,6 +1916,8 @@ QWidget * KKSAttributesFactory :: createMapWidget (const KKSAttrValue * av,
     connect(attrWidget, SIGNAL(constructNewEIO(QWidget *, KKSObjectExemplar **, const QString &, const QString &)), m_oef, SLOT(slotConstructNewEIO(QWidget *, KKSObjectExemplar **, const QString &, const QString &)));//запрос на создание нового EИО в справочнике, который задается названием своей таблицы в БД. 
     connect(attrWidget, SIGNAL(deleteEIOList(QWidget *, const QString &, const QList<qint64> &)), m_oef, SLOT(slotDeleteEIOList(QWidget *, const QString &, const QList<qint64> &)));//запрос на удаление набора объектов карты, которые являются записями в справочнике DynamicDocs. 
     
+    //связь для автоматического обновления карты при изменении данных в БД (ловим notify)
+    connect(loader, SIGNAL(databaseNotifyReceived(const QString &, const QString &, const QString &)), attrWidget, SLOT(slotUpdateMapByNotify(const QString &, const QString &, const QString &)));
 
     attrWidget->init();
 

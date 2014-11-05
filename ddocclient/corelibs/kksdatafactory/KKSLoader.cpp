@@ -33,6 +33,7 @@
 #include <KKSAccessEntity.h>
 #include "KKSIndicator.h"
 #include "KKSIndicatorValue.h"
+//#include "kksnotifyreceiver.h"
 
 
 //////
@@ -46,6 +47,7 @@
 KKSLoader::KKSLoader()
 {
     db = NULL;
+    //m_notifyReceiver = NULL;
 }
 
 KKSLoader::~KKSLoader()
@@ -66,6 +68,7 @@ void KKSLoader::setDb(KKSDatabase * _db)
 {
     db = _db;
 }
+
 
 KKSDatabase * KKSLoader::getDb() const
 {

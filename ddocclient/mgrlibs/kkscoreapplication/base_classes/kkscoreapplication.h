@@ -48,6 +48,7 @@ class QTextEdit;
 class QTextCodec;
 class QTranslator;
 class KKSCommandLineOpts;
+class KKSNotifyReceiver;
 
 /*! \class KKSApplication
   \ingroup SystemGroup
@@ -111,6 +112,7 @@ public:
     virtual KKSSettings * getKKSSettings();
     KKSDatabase * db() const;
     KKSDatabase * db1() const;//для отдельного потока
+    KKSDatabase * db2() const;//для m_notifyReceiver
 
     KKSLoader * loader() const;
     KKSFileLoader * fileLoader() const;
@@ -195,6 +197,7 @@ public:
                            QWidget * parent = 0);
 
     static int verifyConnection(QWidget * parent = NULL);
+    static int createNotifyReceiver();
 
     static KKSCommandLineOpts * parseCommandLineOptions(int argc, char * argv[]);
     static void showCommandLineParamsHelp(QWidget * parent = NULL);
@@ -210,6 +213,8 @@ private:
     KKSError * lastError;
     mutable KKSDatabase * poDb;
     mutable KKSDatabase * poDb1;//для отдельного потока
+    mutable KKSDatabase * poDb2;//для m_notifyReceiver;
+    mutable KKSNotifyReceiver * m_notifyReceiver;
 
     mutable KKSCommandLineOpts * m_kksOpts;// аргументы командной строки, переданные в приложение
 

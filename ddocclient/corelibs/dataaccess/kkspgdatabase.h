@@ -47,11 +47,11 @@ class __DA_EXPORT KKSPGDatabase : public KKSDatabase
         bool connected() const;
 
 #ifdef USE_NOTIFICATION
-        void addListener( IKKSListener* listener, const char* notify_name );
-        void  removeListener( IKKSListener* listener, const char* notify_name );
-        void startListen();
-        void stopListen();
-        void checkNotifies();
+        virtual void addListener( IKKSListener* listener, const char* notify_name );
+        virtual void  removeListener( IKKSListener* listener, const char* notify_name );
+        virtual void startListen();
+        virtual void stopListen();
+        virtual void checkNotifies();
 #endif
 
         KKSResult *    execute( const char* query ) const;
