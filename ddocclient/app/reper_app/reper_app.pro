@@ -16,6 +16,10 @@ INCLUDEPATH += 	. \
 		../../mgrlibs/kkscoreapplication/ui \
 		../../mgrlibs/kkscoreapplication \
 		../../mgrlibs/kksapplication \
+                ../../guilibs/kksgui \
+		../../guilibs/kksgui/ui \
+                ../../guilibs/kksqwt \
+                ../../guilibs/kksqwt/src \
                 ../../ddocplugins/radio_image
 
 
@@ -30,7 +34,7 @@ DEPENDPATH += 	\
                 ../../ddocplugins/radio_image
 
 
-LIBS += -L$$DESTDIR -ldataaccess -lkkscoreapplication -lkksutils -lkkspp -lkksdatafactory -lkkspluginmanager  -lkksapplication
+LIBS += -L$$DESTDIR -ldataaccess -lkkscoreapplication -lkksutils -lkkspp -lkksdatafactory -lkkspluginmanager  -lkksapplication -lkksguifactory -lkksgui -lkksqwt
 #LIBS *= -L$$DESTDIR/ddocplugins -lradio_image
 
 
