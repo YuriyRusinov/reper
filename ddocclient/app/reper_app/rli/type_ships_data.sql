@@ -3,6 +3,61 @@
 begin;
 
 --insert into io_categories (id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values (10, NULL, false, 'Типы кораблей'
+create or replace function a_type_ships_cat () returns int4 as
+$BODY$
+declare
+    idCategory int4;
+    unique_cat_id varchar;
+    query varchar;
+    i int4;
+    idChild int4;
+    idCatTypes int4[];
+    catNames varchar[];
+    idTableCategory int4;
+begin
+    --perform createTempTables();
+    --perform setCurrentDl(4);
+
+    idCategory := NULL::int4;
+    idTableCategory := NULL::int4;
+    idCatTypes := ARRAY [10, 1];
+    catNames := ARRAY ['Типы кораблей', 'Справочник типов кораблей'];
+
+    for i in 1..2
+    loop
+        if (idCategory is not null) then
+            idTableCategory := idCategory;
+        end if;
+        select getNextSeq ('io_categories', 'id') into idCategory;
+        unique_cat_id := 'localorg-categories-' || idCategory;
+
+        if (idTableCategory is null) then
+            query := E'insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values (''' || unique_cat_id || ''',' || idCategory || ', ' || idCatTypes[i] || ', NULL, false, ''' || catNames[i] || ''', ''SYSCATEGORY_' || idCategory || ''', NULL::varchar, false, false, 1)';
+        else
+            query := E'insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values (''' || unique_cat_id || ''',' || idCategory || ', ' || idCatTypes[i] || ', '|| idTableCategory || ' , false, ''' || catNames[i] || ''', ''SYSCATEGORY_' || idCategory || ''', NULL::varchar, false, false, 1)';
+        end if;
+        raise notice '%', query;
+        execute query;
+        perform cSetCompleted (idCategory, 1);
+        perform cSetGlobal (idCategory);
+    end loop;
+/*
+    select getNextSeq ('io_categories', 'id') into idCategory;
+    unique_cat_id := 'localorg-categories-' || idCategory;
+    query := E'insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values (''' || unique_cat_id || ''',' || idCategory || ', 1, ' || idCategory-1 || ', true, ''Справочник типов кораблей'', ''SYSCATEGORY_' || idCategory || ''', NULL::varchar, false, true, 1)';
+    raise notice '%', query;
+    perform query;
+    perform cSetCompleted (idCategory, 1);
+    perform cSetGlobal (idCategory);
+*/
+    return 1;
+end
+$BODY$
+language 'plpgsql';
+
+select a_type_ships_cat ();
+drop function a_type_ships_cat ();
+
 commit;
 
 begin;
