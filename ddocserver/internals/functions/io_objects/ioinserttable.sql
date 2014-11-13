@@ -162,7 +162,7 @@ begin
 
         else   --not many-to-many
 
-            if(r.atypeid == 28) then --GIS-object (data type GEOMETRY)
+            if(r.atypeid = 28) then --GIS-object (data type GEOMETRY)
                 bHasGIS = true;
             end if;
 

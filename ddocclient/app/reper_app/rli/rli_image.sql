@@ -1,13 +1,13 @@
-create table type_ship (id serial not null primary key,
+create table type_ship (
                          name varchar not null,
                          description varchar,
-                         code varchar not null) inherits (root_table);
+                         code varchar not null) inherits (q_base_table);
 
-create table radio_image (id serial not null primary key,
+create table radio_image (
                           image_width integer not null default 0,
                           image_height integer not null default 0,
                           id_type_ship integer not null,
-                          description varchar) inherits (root_table);
+                          description varchar) inherits (q_base_table);
 
 create table radio_image_raw (id serial not null primary key,
                               azimuth float not null,
