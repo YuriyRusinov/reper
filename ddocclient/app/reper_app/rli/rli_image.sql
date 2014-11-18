@@ -1,13 +1,13 @@
-create table type_ship (
+create table type_ship ( id serial not null primary key,
                          name varchar not null,
                          description varchar,
-                         code varchar not null) inherits (q_base_table);
+                         code varchar not null) inherits (root_table);
 
-create table radio_image (
+create table radio_image (id serial not null primary key,
                           image_width integer not null default 0,
                           image_height integer not null default 0,
                           id_type_ship integer not null,
-                          description varchar) inherits (q_base_table);
+                          description varchar) inherits (root_table);
 
 create table radio_image_raw (id serial not null primary key,
                               azimuth float not null,
@@ -34,3 +34,6 @@ alter table object_passport
     add constraint fk_radio_image_ref foreign key (id_radio_image)
         references radio_image (id)
         on delete restrict on update restrict;
+
+select f_safe_drop_trigger ('f_type_ships_uid', 'type_ship');
+select f_create_trigger ('f_type_ships_uid', 'before', 'insert or update', 'type_ship', 'uidcheck()');

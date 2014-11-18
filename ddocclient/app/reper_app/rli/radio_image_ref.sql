@@ -26,6 +26,7 @@ declare
     attr_mandatory boolean[];
     tableuid varchar;
     i int4;
+    idObject int4;
 begin
     idCategory := NULL::int4;
     idTableCategory := NULL::int4;
@@ -60,9 +61,9 @@ begin
     for i in 1..5
     loop
         if (i <> 4) then
-            query := E'select acInsert (' || idTableCategory || ', ' || id_attr_types[i] || ', ' || quote_literal (attr_codes[i]) ||'::varchar, ' || quote_literal (attr_names[i]) || '::varchar, ' || quote_literal (attr_titles[i]) || '::varchar, NULL::varchar, NULL::varchar,' || attr_defwidth[i] || ', ' || quote_literal (attr_defVals[i]) || '::varchar, ' || attr_mandatory[i] || ', false, NULL::varchar);';
+            query := E'select acInsert (' || idTableCategory || ', ' || id_attr_types[i] || ', ' || quote_literal (attr_codes[i]) ||'::varchar, ' || quote_literal (attr_names[i]) || '::varchar, ' || quote_literal (attr_titles[i]) || '::varchar, NULL::varchar, NULL::varchar,' || attr_defwidth[i] || ', ' || attr_defVals[i] || '::varchar, ' || attr_mandatory[i] || ', false, NULL::varchar);';
         else
-            query := E'select acInsert (' || idTableCategory || ', ' || id_attr_types[i] || ', ' || quote_literal (attr_codes[i]) ||'::varchar, ' || quote_literal (attr_names[i]) || '::varchar, ' || quote_literal (attr_titles[i]) || '::varchar, '|| quote_literal (attr_table) || '::varchar, '|| quote_literal (attr_column) || '::varchar,' || attr_defwidth[i] || ', ' || quote_literal (attr_defVals[i]) || '::varchar, ' || attr_mandatory[i] || ', false, NULL::varchar);';
+            query := E'select acInsert (' || idTableCategory || ', ' || id_attr_types[i] || ', ' || quote_literal (attr_codes[i]) ||'::varchar, ' || quote_literal (attr_names[i]) || '::varchar, ' || quote_literal (attr_titles[i]) || '::varchar, '|| quote_literal (tableuid) || '::varchar, '|| quote_literal (attr_column) || '::varchar,' || attr_defwidth[i] || ', ' || attr_defVals[i] || '::varchar, ' || attr_mandatory[i] || ', false, NULL::varchar);';
         end if;
         raise warning '%', query;
         execute query;

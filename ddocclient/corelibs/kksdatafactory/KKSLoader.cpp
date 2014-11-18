@@ -2122,6 +2122,7 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
 //        return sql;
     
     QString tableName = /*table.isEmpty() ? io->tableName() : */table;
+    qDebug () << __PRETTY_FUNCTION__ << tableName << QString::compare (tableName, QString("type_ship"), Qt::CaseInsensitive);
     if(tableName.isEmpty())
         return sql;
 
@@ -2153,6 +2154,14 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
                      tableName + ".r_icon, " + 
                      tableName + ".record_fill_color, " + 
                      tableName + ".record_text_color "; //колонки в подзапросе нерекурсивной части предложения WITH
+    }
+    else if (QString::compare (tableName, QString("type_ship"), Qt::CaseInsensitive) == 0)
+    {
+        attrsWith = "id, unique_id, last_update  ";
+        attrsWith1 = tableName + ".id, " + 
+                     tableName + ".unique_id, " + 
+                     tableName + ".last_update, ";
+        
     }
     else if(isSys){
         attrsWith = "id, unique_id, last_update ";
@@ -2395,6 +2404,8 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
             QString systemColumns;
             if(tableName.toLower() == QString("io_objects"))
                 systemColumns = QString(", %1.r_icon, %1.record_fill_color, %1.record_text_color  ").arg(tableName);
+            else if (QString::compare (tableName, QString("type_ship"), Qt::CaseInsensitive) == 0)
+                systemColumns = QString("");//.arg(tableName);
             else if(isSys)
                 systemColumns = QString("");
             else
@@ -2419,6 +2430,8 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
             QString systemColumns;
             if(tableName.toLower() == QString("io_objects"))
                 systemColumns = QString(", %1.r_icon, %1.record_fill_color, %1.record_text_color  ").arg(withTableName);
+            else if (QString::compare (tableName, QString("type_ship"), Qt::CaseInsensitive) == 0)
+                systemColumns = QString("");
             else if(isSys)
                 systemColumns = QString("");
             else
