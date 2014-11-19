@@ -165,10 +165,10 @@ class _F_DATA_EXPORT KKSLoader : public QObject
         \param table зарезервировано
         */
         KKSObjectExemplar * loadEIO(qint64 id, 
-									const KKSObject * io, 
+                                    const KKSObject * io, 
                                     bool simplify = true,
-									const KKSCategory *c0=0, 
-									const QString& table=QString()) const;
+                                    const KKSCategory *c0=0, 
+                                    const QString& table=QString()) const;
         
         /*!\brief Метод производит загрузку всех ЭИО данного ИО (в соответствии с фильтрами. 
         

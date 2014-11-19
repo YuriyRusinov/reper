@@ -37,3 +37,6 @@ alter table object_passport
 
 select f_safe_drop_trigger ('f_type_ships_uid', 'type_ship');
 select f_create_trigger ('f_type_ships_uid', 'before', 'insert or update', 'type_ship', 'uidcheck()');
+
+select f_safe_drop_trigger ('f_radio_image_uid', 'radio_image');
+select f_create_trigger ('f_radio_image_uid', 'before', 'insert or update', 'radio_image', 'uidcheck()');

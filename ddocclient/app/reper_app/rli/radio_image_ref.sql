@@ -27,6 +27,8 @@ declare
     tableuid varchar;
     i int4;
     idObject int4;
+    oldTable varchar;
+    dropquery varchar;
 begin
     idCategory := NULL::int4;
     idTableCategory := NULL::int4;
@@ -48,7 +50,7 @@ begin
         end if;
     end loop;
     id_attr_types := ARRAY[30, 30, 30, 2, 9];
-    attr_codes := ARRAY ['id', 'image_width', 'image_height', 'type_ship', 'description'];
+    attr_codes := ARRAY ['id', 'image_width', 'image_height', 'id_type_ship', 'description'];
     attr_names := ARRAY ['Идентификатор', 'Ширина изображения', 'Высота изображения', 'Тип корабля', 'Описание'];
     attr_titles := ARRAY ['ИД', 'Ширина', 'Высота', 'Тип корабля', 'Описание'];
     attr_table := 'type_ship';
@@ -68,8 +70,31 @@ begin
         raise warning '%', query;
         execute query;
     end loop;
+    select ioInsert('Qualifier for table radio_image',
+                    idCategory,
+                    getCurrentUser(), --author
+                    1, --id_state
+                    NULL, --'radio_image', --table_name (will autocreated new table!) 
+                    NULL, --desc
+                    NULL, --ioInfo
+                    getCurrentMaclabelId(), --id_maclabel
+                    NULL, --unique_id
+                    1, --id_sync_type (does not sync)
+                    getLocalOrgId(), --localorg
+                    false, --is_global,
+                    NULL::int4, --id_search_template
+                    NULL::varchar, --ref_table 
+                    NULL::int8, --fill_color
+                    NULL::int8, --test_color
+                    NULL::int4 --id_type
+                   ) into idObject;
 
-    return 1;
+    select o.table_name into oldTable from tbl_io_objects o where o.id=idObject;
+    update tbl_io_objects set table_name='radio_image' where id=idObject;
+    --raise warning '%', oldTable;
+    dropquery := E'drop table ' || oldTable;
+    perform dropquery;
+    return idObject;
 end
 $BODY$
 language 'plpgsql';

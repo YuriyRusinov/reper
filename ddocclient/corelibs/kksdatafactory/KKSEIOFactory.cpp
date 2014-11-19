@@ -755,7 +755,10 @@ qint64 KKSEIOFactory::generateInsertQuery(const KKSRecord * rec,
             textColor = rec->recordTextColor().rgba();
     }
     
-    if(isSys){
+    if(isSys ||
+            QString::compare (tableName, "type_ship", Qt::CaseInsensitive) == 0 ||
+            QString::compare (tableName, "radio_image", Qt::CaseInsensitive) == 0)
+    {
         if(attrArray.trimmed().isEmpty())
             query = QString("INSERT INTO %1 (id) VALUES (%2);").arg(tableName).arg(idValue);
         else
@@ -923,7 +926,10 @@ qint64 KKSEIOFactory::generateUpdateQuery(const KKSRecord * rec,
             textColor = rec->recordTextColor().rgba();
     }
 
-    if(isSys){
+    if(isSys ||
+            QString::compare (tableName, "type_ship", Qt::CaseInsensitive) == 0 ||
+            QString::compare (tableName, "radio_image", Qt::CaseInsensitive) == 0)
+    {
         if(!attrArray.trimmed().isEmpty())
             query = QString("UPDATE %1 SET %2 WHERE id = %3::int8;")
                             .arg(tableName)

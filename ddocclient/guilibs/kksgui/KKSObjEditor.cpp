@@ -187,7 +187,7 @@ KKSObjEditor :: KKSObjEditor (const KKSTemplate *t,
                 title += " - (" + pObjectEx->io()->name() + ")";
         }
         setWindowTitle(title);
-        if(!pObjectEx->icon().isNull())
+        if(pObjectEx && !pObjectEx->icon().isNull())
             m_icon = pObjectEx->icon();
     }
 
