@@ -1144,9 +1144,9 @@ KKSObjectExemplar * KKSLoader::loadEIO(qint64 id,
         if(tableName == "io_objects"){
                 tableName = QString("f_sel_io_objects(%1)").arg(id);
         }
-        if(io->id() <= _MAX_SYS_IO_ID_ ||
-           QString::compare (tableName, "type_ship", Qt::CaseInsensitive) == 0 || 
-           QString::compare (tableName, "radio_image", Qt::CaseInsensitive) == 0)
+        if(io->id() <= _MAX_SYS_IO_ID_ )//||
+//           QString::compare (tableName, "type_ship", Qt::CaseInsensitive) == 0 || 
+//           QString::compare (tableName, "radio_image", Qt::CaseInsensitive) == 0)
             sql = QString("select last_update, unique_id, %1 from %2 where id = %3").arg(fields).arg(tableName).arg(id);
         else
             sql = QString("select id_io_state, uuid_t, last_update, unique_id, r_icon, rr_name, record_fill_color, record_text_color, %1 from %2 where id = %3").arg(fields).arg(tableName).arg(id);
@@ -1197,7 +1197,7 @@ KKSObjectExemplar * KKSLoader::loadEIO(qint64 id,
         eio->setIcon(rIcon);
         i = 2;//количество системных атрибутов
     }
-    else if (QString::compare (tableName, "type_ship", Qt::CaseInsensitive) == 0 || 
+/*    else if (QString::compare (tableName, "type_ship", Qt::CaseInsensitive) == 0 || 
              QString::compare (tableName, "radio_image", Qt::CaseInsensitive) == 0)
     {
         eio->setLastUpdate(res->getCellAsDateTime(0, 0));
@@ -1205,7 +1205,7 @@ KKSObjectExemplar * KKSLoader::loadEIO(qint64 id,
         rIcon = KKSObjectExemplar::defIconAsString();
         eio->setIcon(rIcon);
         i = 2;
-    }
+    }*/
     else{
         eio->setUuid(res->getCellAsString(0, 1));
         eio->setLastUpdate(res->getCellAsDateTime(0, 2));
@@ -2167,14 +2167,14 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
                      tableName + ".record_fill_color, " + 
                      tableName + ".record_text_color "; //колонки в подзапросе нерекурсивной части предложения WITH
     }
-    else if (QString::compare (tableName, QString("type_ship"), Qt::CaseInsensitive) == 0)
+/*    else if (QString::compare (tableName, QString("type_ship"), Qt::CaseInsensitive) == 0)
     {
         attrsWith = "id, unique_id, last_update  ";
         attrsWith1 = tableName + ".id, " + 
                      tableName + ".unique_id, " + 
                      tableName + ".last_update, ";
         
-    }
+    }*/
     else if(isSys){
         attrsWith = "id, unique_id, last_update ";
         attrsWith1 = tableName + ".id, " + 
@@ -2416,9 +2416,9 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
             QString systemColumns;
             if(tableName.toLower() == QString("io_objects"))
                 systemColumns = QString(", %1.r_icon, %1.record_fill_color, %1.record_text_color  ").arg(tableName);
-            else if (QString::compare (tableName, QString("type_ship"), Qt::CaseInsensitive) == 0 ||
-                     QString::compare (tableName, QString("radio_image"), Qt::CaseInsensitive) == 0)
-                systemColumns = QString("");//.arg(tableName);
+//            else if (QString::compare (tableName, QString("type_ship"), Qt::CaseInsensitive) == 0 ||
+//                     QString::compare (tableName, QString("radio_image"), Qt::CaseInsensitive) == 0)
+//                systemColumns = QString("");//.arg(tableName);
             else if(isSys)
                 systemColumns = QString("");
             else
@@ -2443,9 +2443,9 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
             QString systemColumns;
             if(tableName.toLower() == QString("io_objects"))
                 systemColumns = QString(", %1.r_icon, %1.record_fill_color, %1.record_text_color  ").arg(withTableName);
-            else if (QString::compare (tableName, QString("type_ship"), Qt::CaseInsensitive) == 0 ||
-                     QString::compare (tableName, QString("radio_image"), Qt::CaseInsensitive) == 0)
-                systemColumns = QString("");
+//            else if (QString::compare (tableName, QString("type_ship"), Qt::CaseInsensitive) == 0 ||
+//                     QString::compare (tableName, QString("radio_image"), Qt::CaseInsensitive) == 0)
+//                systemColumns = QString("");
             else if(isSys)
                 systemColumns = QString("");
             else

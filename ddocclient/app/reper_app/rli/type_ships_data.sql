@@ -143,6 +143,6 @@ insert into type_ship (unique_id, id, name, code) values ('localorg_type_ship-18
 insert into type_ship (unique_id, id, name, code) values ('localorg_type_ship-19', 19, 'Транспортное судно боеприпасы', 'AE');
 insert into type_ship (unique_id, id, name, code) values ('localorg_type_ship-20', 20, 'Танкер-заправщик', 'AO');
 insert into type_ship (unique_id, id, name, code) values ('localorg_type_ship-21', 21, 'Минно-тральный корабль', 'AM');
-select setval('type_ship_id_seq', 22, false);
+--select setval('type_ship_id_seq', 22, false);
 
 commit;
