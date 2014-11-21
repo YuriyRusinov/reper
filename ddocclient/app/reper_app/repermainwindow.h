@@ -5,6 +5,8 @@
 
 class QMdiArea;
 
+class KKSObjEditor;
+
 namespace Ui
 {
     class ReperMainWindowForm;
@@ -26,6 +28,7 @@ private slots:
     void slotSearch (void);
     void slotCompare (void);
 
+    void slotCreateNewObjEditor(KKSObjEditor * objEditor);
 private:
     //
     // Variables

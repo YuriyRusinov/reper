@@ -18,6 +18,7 @@ INCLUDEPATH += 	. \
 		../../mgrlibs/kksapplication \
                 ../../guilibs/kksgui \
 		../../guilibs/kksgui/ui \
+                ../../guilibs/kksguifactory \
                 ../../guilibs/kksqwt \
                 ../../guilibs/kksqwt/src \
                 ../../ddocplugins/radio_image
