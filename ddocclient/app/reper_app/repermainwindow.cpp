@@ -21,6 +21,7 @@ ReperMainWindow :: ReperMainWindow (QWidget * parent, Qt::WindowFlags flags)
 {
     UI->setupUi (this);
     this->setCentralWidget (m_mdiArea);
+    setActionsEnabled (false);
 
     KKSPluginLoader * pLoader = kksCoreApp->pluginLoader();
     QList<QObject*> * plugins = pLoader->getPlugins();
@@ -52,6 +53,11 @@ ReperMainWindow :: ReperMainWindow (QWidget * parent, Qt::WindowFlags flags)
         }
         UI->actPlugins->setMenu (plugMenu);
     }
+    KKSObjEditorFactory * oef = kksApp->oef();
+    connect (oef, 
+             SIGNAL(editorCreated(KKSObjEditor *)), 
+             this, 
+             SLOT(slotCreateNewObjEditor(KKSObjEditor*)));
 
     connect (UI->actConnect, SIGNAL (triggered()), this, SLOT (slotConnect()) );
     connect (UI->actDisconnect, SIGNAL (triggered()), this, SLOT (slotDisconnect()) );
@@ -71,6 +77,17 @@ ReperMainWindow :: ~ReperMainWindow (void)
 void ReperMainWindow :: slotConnect (void)
 {
     int res = kksCoreApp->GUIConnect(this);
+    if(res == ERROR_CODE){
+        setActionsEnabled(false);
+    }
+    else{
+        setActionsEnabled(true);
+//        m_reportHandler->dbConnect(kksApp->db()->getName(), 
+//                                   kksApp->db()->getHost(), 
+//                                   kksApp->db()->getPort(), 
+//                                   kksApp->db()->getUser(), 
+//                                   kksApp->db()->getPass());
+    }
 }
 
 void ReperMainWindow :: slotDisconnect (void)
@@ -160,3 +177,35 @@ void ReperMainWindow::slotCreateNewObjEditor(KKSObjEditor * objEditor)
 
 //    connect (this->m_masscreateW, SIGNAL (setNum(int)), objEditor, SLOT (setNumCopies (int)) );
 }
+
+void ReperMainWindow::setActionsEnabled(bool enabled)
+{
+    UI->actRLI->setEnabled (enabled);
+}
+
+void ReperMainWindow::isActiveSubWindow(const KKSObjEditor * editor, bool * yes)
+{
+    if(!editor)
+        return;
+    if(!yes)
+        return;
+
+    QWidget * w = activeKKSSubWindow();
+    if(!w)
+        return;
+
+    if(w == editor){
+        *yes = true;
+        return;
+    }
+
+    *yes = false;
+}
+
+QWidget * ReperMainWindow::activeKKSSubWindow()
+{
+    if (QMdiSubWindow *activeSubWindow = m_mdiArea->activeSubWindow())
+        return qobject_cast<QWidget *>(activeSubWindow->widget());
+    return 0;
+}
+

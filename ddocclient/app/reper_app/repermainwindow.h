@@ -29,6 +29,14 @@ private slots:
     void slotCompare (void);
 
     void slotCreateNewObjEditor(KKSObjEditor * objEditor);
+
+    void setActionsEnabled(bool enabled);
+    void isActiveSubWindow(const KKSObjEditor * editor, bool * yes);
+private:
+    //
+    // Functions
+    //
+    QWidget * activeKKSSubWindow();
 private:
     //
     // Variables
