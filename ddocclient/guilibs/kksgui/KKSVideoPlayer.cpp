@@ -133,7 +133,8 @@ QByteArray KKSVideoPlayer::save (void)
     QImageWriter imWriter (buff, QByteArray ("png"));
     qDebug () << __PRETTY_FUNCTION__ << QImageWriter::supportedImageFormats ();
     bool isOk = true;
-    for (int i=0; i<m_movie->frameCount() && isOk; i++)
+    int nFrameCount = m_movie->frameCount();
+    for (int i=0; i< nFrameCount && isOk; i++)
     {
         m_movie->jumpToFrame (i);
         isOk = imWriter.write (m_movie->currentImage());
