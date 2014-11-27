@@ -178,7 +178,7 @@ begin
     xml_str := xml_str || xml_val_str;
     xml_str := xml_str || E'</creation_date>\n';
     xml_str := xml_str || E'\t\t\t\t<creation_time>';
-    select into xml_val_str to_char(now()::time, 'HH12:MI:SS');
+    select into xml_val_str to_char(now()::time, 'HH24:MI:SS.MS');
     xml_str := xml_str || xml_val_str;
     xml_str := xml_str || E'</creation_time>\n';
 

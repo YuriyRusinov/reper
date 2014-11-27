@@ -15,8 +15,12 @@ begin
         select uSetObjAsSended(id::int4) into res;
     elsif (itype = 2) then --message
         select uSetMsgAsSended(id::int4) into res;
-    elsif (itype = 3) then --mail confirmation
-        select uSetMsgAsConfirmed(id::int4) into res;
+    elsif (itype = 3 or itype = 17) then --mail receive confirmation or mail read confirmation
+        if(itype = 3) then
+            select uSetMsgAsConfirmed(id::int4, false) into res;
+        else
+            select uSetMsgAsConfirmed(id::int4, true) into res;
+        end if;
     elsif (itype = 4) then --cmd confirmation
         select uSetCmdAsConfirmed(id::int4) into res;
     elsif (itype = 5 or itype=11 or itype=15) then --record or org package or query for first sync (in out_sync_queue)
@@ -101,7 +105,7 @@ declare
     idMsgJournal alias for $1;
 begin
 
-    update message_journal set is_outed = true where id = idMsgJournal;
+    update message_journal set is_outed = 3 where id = idMsgJournal;
     if(FOUND = FALSE) then
         return 0;
     end if;

@@ -25,7 +25,7 @@ begin
     end if;
 
     if(new.id_io_object is not null and new.id_journal is not null) then
-        for r in select id_dl_to, id_dl_executor from command_journal where id = new.id_journal
+        for r in select id_dl_to, id_dl_executor, id_dl_from from command_journal where id = new.id_journal
         loop
             idDlTo = r.id_dl_to;
             idDlFrom = r.id_dl_from;

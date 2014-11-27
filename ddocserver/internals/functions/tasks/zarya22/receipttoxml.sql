@@ -57,7 +57,7 @@ begin
     xml_str := xml_str || to_char(current_date::date, 'DD.MM.YYYY');
     xml_str := xml_str || E'</creation_date>\n';
     xml_str := xml_str || E'\t\t\t\t<creation_time>';
-    xml_str := xml_str || to_char(current_time::time, 'HH24:MI:SS');
+    xml_str := xml_str || to_char(current_time::time, 'HH24:MI:SS.MS');
     xml_str := xml_str || E'</creation_time>\n';
     
     xml_str := xml_str || E'\t\t\t\t<registration_number></registration_number>\n';

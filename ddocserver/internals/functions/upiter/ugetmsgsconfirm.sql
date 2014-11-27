@@ -35,9 +35,8 @@ begin
         from
             message_journal msg
         where
-            msg.is_outed = false 
-            and msg.extra_id is not null --if is_outed = false but extra_id isnull that means  that message was created from XML!
-            and (msg.read_datetime is not null or msg.receive_datetime is not null)
+            ( ( msg.is_outed = 1 and msg.receive_datetime is not null) or (msg.is_outed = 2 and msg.read_datetime is not null) )
+            and msg.extra_id is not null --if is_outed <> 3 but extra_id isnull that means  that message was created from XML!
             and isLocalDl(msg.id_dl_sender) = FALSE
             and isDDocDl(msg.id_dl_sender) = true --отправляем только ДЛ, которые имеют тип "ДЛ в системе DynamicDocs"
 

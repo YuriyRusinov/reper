@@ -73,7 +73,7 @@ begin
             and msg.id_urgency_level = ul.id
             and p2.id = msg.id_dl_receiver
             and p2.id_unit = u.id
-            and msg.is_outed = false
+            and msg.is_outed = 0
             and isLocalDl(msg.id_dl_receiver) = FALSE
             and isDDocDl(msg.id_dl_receiver) = true --отправляем только ДЛ, которые имеют тип "ДЛ в системе DynamicDocs"
     loop
@@ -137,7 +137,7 @@ begin
             and msg.id_urgency_level = ul.id
             and p2.id = msg.id_dl_receiver
             and p2.id_unit = u.id
-            and msg.is_outed = false
+            and msg.is_outed = 0
             and isLocalDl(msg.id_dl_receiver) = FALSE
             and isDDocDl(msg.id_dl_receiver) = true --отправляем только ДЛ, которые имеют тип "ДЛ в системе DynamicDocs"
         limit 1

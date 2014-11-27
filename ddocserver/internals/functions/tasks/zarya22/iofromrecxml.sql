@@ -83,10 +83,10 @@ begin
         msgCreationDate = to_char(now()::date, 'DD.MM.YYYY');
     end if;
     if(msgCreationTime isnull or trim(msgCreationTime) = '') then
-        msgCreationDate = to_char(now()::time, 'HH12:MI:SS');
+        msgCreationDate = to_char(now()::time, 'HH24:MI:SS.MS');
     end if;
 
-    msgSentDatetime = to_timestamp(msgCreationDate || ' ' || msgCreationTime, 'DD.MM.YYYY HH12:MI:SS');
+    msgSentDatetime = to_timestamp(msgCreationDate || ' ' || msgCreationTime, 'DD.MM.YYYY HH24:MI:SS.MS');
 
     create temp table XXXX (tag_name varchar, the_name varchar, the_title varchar, the_type varchar, the_value varchar);
 

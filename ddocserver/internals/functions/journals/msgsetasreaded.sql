@@ -2,8 +2,12 @@ create or replace function msgSetAsReaded(int4) returns int4 as
 $BODY$
 declare
     idJournal alias for $1;
+
     r RECORD;
     idDl int4;
+    idUser int4;
+    isOuted int4;
+    isLocal bool;
 begin
     
     for r in select * from message_journal where id = idJournal
@@ -21,7 +25,23 @@ begin
         return 0;
     end if;
 
-    update message_journal set read_datetime = current_timestamp where id = idJournal;
+
+    isOuted = 2;
+
+    idUser = getCurrentUser();
+
+    if(idUser = 2) then --jupiter
+        isOuted := 3;
+    else
+        select isLocalDl(r.id_dl_sender) into isLocal;
+        if(isLocal = true) then
+            isOuted := 3;
+        else
+            isOuted := 2;
+        end if;
+    end if;
+
+    update message_journal set read_datetime = current_timestamp, is_outed = isOuted where id = idJournal;
     
     return 1;
 end

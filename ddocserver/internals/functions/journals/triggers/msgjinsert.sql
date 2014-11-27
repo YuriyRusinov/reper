@@ -44,10 +44,10 @@ begin
         if(new.read_datetime is not null and old.read_datetime isnull) then
             --обрабатываем ситуацию, когда надо отправить квитанцию о прочтении сообщения на внешнюю сопргаемую систему
             --в этом случае в таблицу исходящей очереди надо записать XML-сообщение с данной квитанцией
-            if(isLocalDl(msg.id_dl_sender) = FALSE and isDDocDl(msg.id_dl_sender) = false) then --отправляем только ДЛ, которые имеют тип "ДЛ во внешней сопрягаемой системе"
+            if(isLocalDl(new.id_dl_sender) = FALSE and isDDocDl(new.id_dl_sender) = false) then --отправляем только ДЛ, которые имеют тип "ДЛ во внешней сопрягаемой системе"
 
-                if(old.is_outed = true and isLocalDl(old.id_dl_receiver) = TRUE and isLocalDl(old.id_dl_sender) = FALSE) then
-                    new.is_outed := false;
+                if(old.is_outed = 1 and isLocalDl(old.id_dl_receiver) = TRUE and isLocalDl(old.id_dl_sender) = FALSE) then
+                    new.is_outed := 2;
                 end if;
             end if;
         end if;
@@ -69,14 +69,14 @@ begin
     if(idUser = 2) then --jupiter
         new.read_datetime := NULL;
         new.receive_datetime := current_timestamp;
-        new.is_outed := false;
+        new.is_outed := 1; --требуется отправка квитанции отправителю о получении
     else
         select isLocalDl(new.id_dl_receiver) into isLocal;
         if(isLocal = true) then
-            new.is_outed := true;
+            new.is_outed := 3; --отправитель и получатель локальные ДЛ. Отправка не требуется
             new.receive_datetime := new.sent_datetime;
         else
-            new.is_outed := false;
+            new.is_outed := 0; --отправитель является локальным ДЛ, получатель - удаленным. Требуется отправка сообщения получателю
             new.receive_datetime := NULL;
             new.read_datetime := NULL;
         end if;
