@@ -2007,8 +2007,59 @@ int KKSEIOFactory::uploadFile(KKSFile * f, QWidget * parent) const
 
 int KKSEIOFactory::sendEIOToExternalSystem(int idOrg, int idFormat, int idObject, int idRecord) const
 {
-    QString sql = QString("select sendEIOToExternalSystem(%1, %2, %3, %4)").arg(idOrg).arg(idFormat).arg(idObject).arg(idRecord);
-    KKSResult * res = db->execute (sql);
+    //отправитель
+    KKSResult * res = db->execute("select getCurrentDl();");
+    if(!res || res->getRowCount() != 1){
+        if(res)
+            delete res;
+        return ERROR_CODE;
+    }
+
+    int idDlSender = res->getCellAsInt(0, 0);
+    delete res;
+    if(idDlSender <= 0){
+        return ERROR_CODE;
+    }
+    
+    //получатель
+    QString sql(QString("select id from \"position\" ") + 
+                QString(" where ") + 
+                QString(" id_unit in (select id from units where id_organization = %1 and name = 'Публичные должностные лица')").arg(idOrg) +
+                QString(" and id_position_type = 2") + //ДЛ во внешней сопрягаемой системе
+                QString(" and is_public = true") +
+                QString(" limit 1;") );
+
+    res = db->execute(sql);
+    if(!res || res->getRowCount() != 1){
+        if(res)
+            delete res;
+        return ERROR_CODE;
+    }
+
+    int idDlReceiver = res->getCellAsInt(0, 0);
+    delete res;
+    if(idDlReceiver <= 0){
+        return ERROR_CODE;
+    }
+
+    //xml body
+    sql = QString("select recToXML (NULL::integer, %1, %2, %3, ARRAY[%4]::int4[]);").arg(idObject).arg(idRecord).arg(idDlSender).arg(idDlReceiver);
+    res = db->execute(sql);
+    if(!res || res->getRowCount() != 1){
+        if(res)
+            delete res;
+        return ERROR_CODE;
+    }
+
+    QString xmlBody = res->getCellAsString(0, 0);
+    delete res;
+    if(xmlBody.isEmpty()){
+        return ERROR_CODE;
+    }
+
+    //все получили - отправляем сообщение как xml
+    sql = QString("select sendEIOToExternalSystem(%1, %2, %3, %4, '%5')").arg(idOrg).arg(idFormat).arg(idObject).arg(idRecord).arg(xmlBody);
+    res = db->execute (sql);
     if (!res || res->getRowCount() != 1)
     {
         if (res)

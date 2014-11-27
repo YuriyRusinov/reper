@@ -1,8 +1,9 @@
 #!/bin/bash
+#QTDIR=/usr/local/Trolltech/Qt-4.8.3/
 QTDIR=/usr/lib/qt4
 
 PROJECT_NAME=DynamicDocs
-PROJECT_PRO_FILE=ddocclient_desktop.pro
+PROJECT_PRO_FILE=ddocclient.pro
 
 QTINC=$QTDIR/include
 QTLIB=$QTDIR/lib

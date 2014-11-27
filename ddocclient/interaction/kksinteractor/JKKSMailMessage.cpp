@@ -207,22 +207,27 @@ void JKKSMailMessage :: setAttachment (const JKKSDocument& doc)
 
 /***************************/
 
-JKKSMailConfirmation::JKKSMailConfirmation(qint64 idMess, 
+JKKSMailConfirmation::JKKSMailConfirmation(int confirmationType,
+                                           qint64 idMess, 
                                            qint64 extraId,
                                            const QDateTime & readDatetime,
                                            const QDateTime & receiveDatetime,
                                            const JKKSAddress & addr,
                                            const QString & kvs)
     : JKKSMessage (addr, kvs),
+    m_confirmationType(confirmationType),
     m_id(idMess),
     m_dst_id(extraId),
     m_readDatetime(readDatetime),
     m_receiveDatetime(receiveDatetime)
 {
+    if(m_confirmationType < 0 || m_confirmationType > 1)
+        m_confirmationType = 0;
 }
 
 JKKSMailConfirmation::JKKSMailConfirmation(const JKKSMailConfirmation & cfm)
     : JKKSMessage (cfm),
+    m_confirmationType(cfm.m_confirmationType),
     m_id(cfm.m_id),
     m_dst_id(cfm.m_dst_id),
     m_readDatetime(cfm.m_readDatetime),
@@ -249,6 +254,7 @@ QByteArray JKKSMailConfirmation::serialize (void) const
     out << extraId();
     out << readDatetime();
     out << receiveDatetime();
+    out << confirmationType();
 
     return qBuffer.buffer();
 }
@@ -270,6 +276,7 @@ int JKKSMailConfirmation::unserialize (const QByteArray& mess)
     in >> m_dst_id;
     in >> m_readDatetime;
     in >> m_receiveDatetime;
+    in >> m_confirmationType;
 
     setAddr (addr);
     setSenderAddr(senderAddr);
@@ -287,7 +294,10 @@ int JKKSMailConfirmation::writeToDB (const JKKSLoader * loader, const QString& s
 
 JKKSMessage::JKKSMessageType JKKSMailConfirmation::getMessageType (void) const
 {
-    return JKKSMessage::atMailConfirmation;
+    if(m_confirmationType == 0)
+        return JKKSMessage::atMailConfirmation;
+
+    return JKKSMessage::atMailReadConfirmation;
 }
 
 qint64 JKKSMailConfirmation::id (void) const
@@ -328,4 +338,9 @@ const QDateTime & JKKSMailConfirmation::receiveDatetime() const
 void JKKSMailConfirmation::setReceiveDatetime(const QDateTime & dt)
 {
     m_receiveDatetime = dt;
+}
+
+int JKKSMailConfirmation::confirmationType() const
+{
+    return m_confirmationType;
 }

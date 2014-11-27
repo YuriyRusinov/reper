@@ -22,7 +22,8 @@ class _I_EXPORT JKKSMailConfirmation: public JKKSMessage
 {
     public:
         
-        JKKSMailConfirmation(qint64 idMess=-1, 
+        JKKSMailConfirmation(int confirmationType,
+                             qint64 idMess=-1, 
                              qint64 extraId=-1,
                              const QDateTime & readDatetime = QDateTime::currentDateTime(),
                              const QDateTime & receiveDatetime = QDateTime::currentDateTime(),
@@ -49,11 +50,15 @@ class _I_EXPORT JKKSMailConfirmation: public JKKSMessage
         const QDateTime & receiveDatetime() const;
         void setReceiveDatetime(const QDateTime & dt);
 
+        int confirmationType() const;
+
 private:
         qint64 m_id;//m_src_id
         qint64 m_dst_id;//extra_id
         QDateTime m_readDatetime;
         QDateTime m_receiveDatetime;
+        int m_confirmationType; // 0 - квитанция о получении
+                                // 1 - квитанция о прочтении
 
 };
 

@@ -89,7 +89,7 @@ class _I_EXPORT JKKSMessage
             atCommand = 0,
             atDocument = 1,
             atMailMessage = 2,
-            atMailConfirmation = 3,
+            atMailConfirmation = 3, //квитанция о доставке сообщения получателю
             atCmdConfirmation = 4,
             atRecord = 5,
             atRecConfirmation = 6,
@@ -101,7 +101,8 @@ class _I_EXPORT JKKSMessage
             atPing = 13,
             atPingResponse = 14,
             atEcho = 15, //пересылаем строку из таблицы out_sync_queue с entity_type = 6 (проверка связи). Отдельный тип нужен, чтобы в DDocInteractorClient можно было отправить такое сообщение даже для "плохого" пинга
-            atXMLMessage = 16 //сообщение из таблицы out_external_queue
+            atXMLMessage = 16, //сообщение из таблицы out_external_queue
+            atMailReadConfirmation = 17 //квитанция о прочтении сообщения получателем
         }; 
 
         virtual JKKSMessageType getMessageType (void) const;

@@ -451,7 +451,12 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readMailConfirmations(QStringList & rec
             addr.setPort(res->getCellAsInt(i, 5));
             addr.setUseGateway(res->getCellAsBool(i, 7));
 
-            JKKSMailConfirmation cfm(res->getCellAsInt(i, 1),//src_id
+            int confirmationType = 0;
+            if(!res->getCellAsDateTime(i, 3).isNull())
+                confirmationType = 1;
+
+            JKKSMailConfirmation cfm(confirmationType, //0 - receive confirmation, 1 - read confirmation
+                                     res->getCellAsInt(i, 1),//src_id
                                      res->getCellAsInt (i, 2),//extra_id
                                      res->getCellAsDateTime (i, 3),//read_datetime,
                                      res->getCellAsDateTime(i, 4),//receive_datetime
@@ -1342,8 +1347,17 @@ qint64 JKKSLoader :: insertDocument (JKKSDocument *doc) const
             return ERROR_CODE;
         }
         else if(attr_ier == 0 && !val.isEmpty()){
-            kksCritical() << QObject::tr("ioInsertAttrEx() for document with UID = %1 failed! Result is 0, but value is not NULL! SQL = %2").arg(doc->uid()).arg(attrSql);
-            return ERROR_CODE;
+            kksCritical() << QObject::tr("ioInsertAttrEx() for document with UID = %1 returns 0, but attribute value is not NULL! SQL = %2").arg(doc->uid()).arg(attrSql);
+            kksCritical() << QObject::tr("Transaction will be continued but IO attribute value will be incorrect (NULL value assigned)");
+            //Возможна ситуация, когда атрибут у ИО является элементом некоторого справочника, но самого этого справочника или соответствующей записи в нем на приемном конце нет.
+            //это в настоящее время возможно, если передача ИО осуществляется не через синхронизацию ИО, а путем передачи через сообщение или команду.
+            //(в этом случае все "дерево" информационных ресурсов на приемный конец не пойдет)
+            //Если вернуть в этой ситуации ошибку, то транспорт информационного обмена будет постоянно пытаться передать этот ИО
+            //и не перейдет к передаче других ИО. Таким образом все встанет.
+            //Поэтому лучше пусть ИО будет передан не полностью (у атрибута будет пустое значение)
+            //чем, все встанет. По этой причине просто выводим сообщение об ошибке, но ошибкой эту ситуацию не считаем 
+            
+            //return OK_CODE;
         }
     }
 
@@ -1671,7 +1685,8 @@ JKKSMessage * JKKSLoader::unpackMessage (const JKKSPMessage & pMessage) const
         case JKKSMessage::atCommand: message = new JKKSCommand(); break;
         case JKKSMessage::atDocument: message = new JKKSDocument(); break;
         case JKKSMessage::atMailMessage: message = new JKKSMailMessage (); break;
-        case JKKSMessage::atMailConfirmation: message = new JKKSMailConfirmation(); break;
+        case JKKSMessage::atMailConfirmation: message = new JKKSMailConfirmation(0); break;
+        case JKKSMessage::atMailReadConfirmation: message = new JKKSMailConfirmation(1); break;
         case JKKSMessage::atCmdConfirmation: message = new JKKSCmdConfirmation(); break;
         case JKKSMessage::atEcho:
         case JKKSMessage::atRecord: message = new JKKSRefRecord(); break;
