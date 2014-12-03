@@ -906,12 +906,21 @@ QString KKSValue::valueForInsert() const
     }
     else if (a_type == KKSAttrType::atBinary)
     {
-        QString sVal (value());
-        QString escVal (sVal);
-        escVal.replace("'", "''");
+        QByteArray sVal (m_value.toByteArray());
+        int nc = sVal.length();
+        QString escVal;
+        for (int i=0; i<nc; i++)
+        {
+            char s = sVal.at(i);
+            if (QChar (s) >= 0 && QChar (s)<=31)
+                escVal += QString("\\\\%1").arg (s);
+            else
+                escVal += QString(s);
+        }
+/*        escVal.replace("'", "''");
         escVal.replace("\\", "\\\\");
         escVal.replace("\"", "\\\"");
-        escVal.replace("\0", "\\\\0");
+        escVal.replace("\0", "\\\\0");*/
         escVal.prepend("'");
         escVal.append ("'");
         return escVal;

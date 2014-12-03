@@ -2631,7 +2631,7 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
                 KKSBinaryWidget * bw = qobject_cast< KKSBinaryWidget *>(aw);
                 if (!isRef)
                     connectToSlots (aw, wEditor);
-                QByteArray v = V.toByteArray ();
+                QByteArray v = QByteArray::fromHex (V.toByteArray ());
                 if (v.isNull())
                     v = QByteArray();
                 qDebug () << __PRETTY_FUNCTION__ << v;

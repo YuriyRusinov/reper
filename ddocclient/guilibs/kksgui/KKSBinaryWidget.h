@@ -31,6 +31,11 @@ signals:
 
 private:
     //
+    // Functions
+    //
+    void setImage (void);
+private:
+    //
     // Variables
     //
     QByteArray binaryData;
