@@ -1439,6 +1439,7 @@ KKSAttrType * KKSLoader::loadAttrType(KKSAttrType::KKSAttrTypes type) const
         //case KKSAttrType::atRasterLayer: id = 35; break;        //ГИС-объект (растровый слой)
         case KKSAttrType::atGISMap: id = 36; break;             //ГИС-объект (карта)
         case KKSAttrType::atDateTimeEx: id = 37; break;             //Дата-время (с миллисекундами)
+        case KKSAttrType::atBinary: id = 38; break;                 // Бинарные данные
     }
 
     KKSAttrType * aType = loadAttrType(id);

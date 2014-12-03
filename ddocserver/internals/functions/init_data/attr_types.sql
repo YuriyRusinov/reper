@@ -59,6 +59,7 @@ insert into a_types (id, id_a_view, name, code) values (33, 19, 'Гистограмма', '
 --insert into a_types (id, id_a_view, name, code) values (35, 20, 'ГИС-объект (растровый слой)', 'VARCHAR');
 insert into a_types (id, id_a_view, name, code) values (36, 20, 'ГИС-объект (карта)', 'VARCHAR');
 insert into a_types (id, id_a_view, name, code) values (37, 4, 'Дата-время (с миллисекундами)', 'TIMESTAMP');
+insert into a_types (id, id_a_view, name, code) values (38, 14, 'Бинарные данные', 'BYTEA');
 
 SELECT pg_catalog.setval('a_views_id_seq', 20, true);
-SELECT pg_catalog.setval('a_types_id_seq', 37, true);
+SELECT pg_catalog.setval('a_types_id_seq', 38, true);

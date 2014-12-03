@@ -55,6 +55,7 @@
 #include <KKSColorWidget.h>
 #include <KKSSearchTemplate.h>
 #include <KKSVideoPlayer.h>
+#include <KKSBinaryWidget.h>
 
 #include <KKSRecWidget.h>
 #include <KKSCatAttrsModel.h>
@@ -1051,10 +1052,11 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
         return 0;
 
     QSizePolicy hPw (QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
-    if (isRef)
-        qDebug () << __PRETTY_FUNCTION__ << pCatType->attrType();
+    int aType = pCatType->attrType();
+    if (av->attribute()->id() == 1005)//isRef)
+        qDebug () << __PRETTY_FUNCTION__ << aType;//pCatType->attrType();
    
-    switch (pCatType->attrType())
+    switch (aType)
     {
         case KKSAttrType::atUndef: default:
             break;
@@ -1807,6 +1809,30 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                 }
             }
             break;
+        case KKSAttrType::atBinary:
+            {
+                if (!isRef)
+                {
+                    lTitle = this->createAttrTitle (av, attrClass, objEditor);//, av->attribute()->title(), is_mandatory);
+                    gLayout->addWidget (lTitle, n_str, 0, 1, 2);//, Qt::AlignRight | Qt::AlignTop);
+                }
+                qDebug () << __PRETTY_FUNCTION__ << QString("Binary data");
+                attrWidget = new KKSBinaryWidget (av, attrClass);
+                if (!isRef)
+                    gLayout->addWidget (attrWidget, n_str, 2, 1, 1);//, Qt::AlignJustify);//Qt::AlignCenter);
+                QToolButton *tbRef = new QToolButton ();
+                tbRef->setMinimumHeight (20);
+                tbRef->setText ("...");
+                attrWidget->setMinimumHeight (20);
+                if (!isRef)
+                {
+                    gLayout->addWidget (attrWidget, n_str, 2, 1, 2, Qt::AlignCenter);
+                    gLayout->addWidget (tbRef, n_str, 4, 1, 1);
+
+                    QObject::connect (tbRef, SIGNAL(pressed()), attrWidget, SLOT(openFile()));
+                }
+                break;
+            }
     }
     return attrWidget;
 }
@@ -2600,6 +2626,14 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
                 if (v.isNull())
                     v = QByteArray();
                 vw->setMovie (v);
+            }
+            break;
+        case KKSAttrType::atBinary:
+            {
+                if (!isRef)
+                    connectToSlots (aw, wEditor);
+                QByteArray v = V.toByteArray ();
+                qDebug () << __PRETTY_FUNCTION__ << v;
             }
             break;
         //ksa

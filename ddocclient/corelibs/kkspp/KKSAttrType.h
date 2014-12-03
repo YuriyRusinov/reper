@@ -59,7 +59,8 @@ public:
        //atRasterLayer = 35,        //ГИС-объект (растровый слой)
        atGISMap = 36,             //ГИС-объект (карта)
        atDateTimeEx = 37,         //Дата-время (с миллисекундами)  
-       atUserDef = 38             //пользовательский (for future use)
+       atBinary = 38,             // Бинарные данные
+       atUserDef = 39             //пользовательский (for future use)
    };
 
    KKSAttrTypes attrType() const;

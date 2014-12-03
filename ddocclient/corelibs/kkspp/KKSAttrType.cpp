@@ -85,6 +85,7 @@ void KKSAttrType::setAttrType()
         //case 35: m_attrType = atRasterLayer; break;       //ГИС-объект (Растровый слой)
         case 36: m_attrType = atGISMap; break;            //ГИС-объект (Карта)
         case 37: m_attrType = atDateTimeEx; break;        //Дата-время (с миллисекундами)
+        case 38: m_attrType = atBinary; break;
 
         default: m_attrType = atUserDef; break;           //пользовательский (for future use)
     }
