@@ -22,10 +22,17 @@ public:
     KKSBinaryWidget(const KKSAttrValue*attr, KKSIndAttrClass isSys, QWidget * parent=0, Qt::WindowFlags flags=0);
     virtual ~KKSBinaryWidget();
 
+public slots:
+    void openFile (void);
+    void setData (const QByteArray& ba);
+
 signals:
     void valueChanged (qint64 id, KKSIndAttrClass isSys, QVariant val);
 
 private:
+    //
+    // Variables
+    //
     QByteArray binaryData;
    
 private:

@@ -1053,8 +1053,6 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
 
     QSizePolicy hPw (QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
     int aType = pCatType->attrType();
-    if (av->attribute()->id() == 1005)//isRef)
-        qDebug () << __PRETTY_FUNCTION__ << aType;//pCatType->attrType();
    
     switch (aType)
     {
@@ -2630,10 +2628,14 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
             break;
         case KKSAttrType::atBinary:
             {
+                KKSBinaryWidget * bw = qobject_cast< KKSBinaryWidget *>(aw);
                 if (!isRef)
                     connectToSlots (aw, wEditor);
                 QByteArray v = V.toByteArray ();
+                if (v.isNull())
+                    v = QByteArray();
                 qDebug () << __PRETTY_FUNCTION__ << v;
+                bw->setData (v);
             }
             break;
         //ksa

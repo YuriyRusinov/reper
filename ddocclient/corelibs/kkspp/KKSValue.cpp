@@ -904,6 +904,18 @@ QString KKSValue::valueForInsert() const
         escVal.append ("'");
         return escVal;
     }
+    else if (a_type == KKSAttrType::atBinary)
+    {
+        QString sVal (value());
+        QString escVal (sVal);
+        escVal.replace("'", "''");
+        escVal.replace("\\", "\\\\");
+        escVal.replace("\"", "\\\"");
+        escVal.replace("\0", "\\\\0");
+        escVal.prepend("'");
+        escVal.append ("'");
+        return escVal;
+    }
 
     if (a_type == KKSAttrType::atGISMap ||
         a_type == KKSAttrType::atHistogram)
