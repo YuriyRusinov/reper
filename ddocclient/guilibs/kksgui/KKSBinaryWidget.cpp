@@ -174,6 +174,8 @@ void KKSBinaryWidget :: setData (const QByteArray& ba)
 
 void KKSBinaryWidget :: setImage (void)
 {
+    if (binaryData.isEmpty())
+        return;
     if (binaryData.contains("\\x"))
         binaryData = QByteArray::fromHex(binaryData);
     qDebug () << __PRETTY_FUNCTION__ << binaryData;
