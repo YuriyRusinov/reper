@@ -1,5 +1,7 @@
 #include <QMdiArea>
 #include <QMdiSubWindow>
+#include <QMessageBox>
+#include <QBuffer>
 
 #include "kksapplication.h"
 #include <kksdatabase.h>
@@ -12,6 +14,7 @@
 #include <radio_image_plugin.h>
 #include <defines.h>
 #include "repermainwindow.h"
+#include "searchradioform.h"
 #include "ui_reper_main_window.h"
 
 ReperMainWindow :: ReperMainWindow (QWidget * parent, Qt::WindowFlags flags)
@@ -64,7 +67,7 @@ ReperMainWindow :: ReperMainWindow (QWidget * parent, Qt::WindowFlags flags)
     connect (UI->act3D_Models, SIGNAL (triggered()), this, SLOT (slot3DMod()) );
     connect (UI->actRLI, SIGNAL (triggered()), this, SLOT (slotRLI()) );
     connect (UI->actE_xit, SIGNAL (triggered()), this, SLOT (slotClose()) );
-    connect (UI->actSearch_region, SIGNAL (triggered()), this, SLOT (slotSearch()) );
+    connect (UI->actSearchImage, SIGNAL (triggered()), this, SLOT (slotSearchByImage()) );
     connect (UI->actComparison, SIGNAL (triggered()), this, SLOT (slotCompare()) );
 }
 
@@ -148,8 +151,75 @@ void ReperMainWindow :: slotClose (void)
     close();
 }
 
-void ReperMainWindow :: slotSearch (void)
+void ReperMainWindow :: slotSearchByImage (void)
 {
+    qDebug () << __PRETTY_FUNCTION__;
+    SearchRadioForm * srForm = new SearchRadioForm();
+    QImage sIm ;
+    if (srForm->exec() == QDialog::Accepted)
+    {
+        sIm = srForm->getImage();
+        if (sIm.isNull())
+        {
+            delete srForm;
+            return;
+        }
+    }
+    else
+    {
+        delete srForm;
+        return;
+    }
+    KKSLoader * loader = kksApp->loader();
+    QString tName = "rli_image_raws";
+    KKSObject * io = loader->loadIO (tName, true);
+    if (!io)
+    {
+        QMessageBox::warning (0, tr("Select reference"),
+                                 tr ("Not available suitable reference"),
+                                 QMessageBox::Ok);
+        delete srForm;
+        return;
+    }
+    KKSObjEditorFactory * oef = kksApp->oef();
+    KKSList<const KKSFilterGroup *> filterGroups;
+    const KKSCategory * c = io->category();
+    const KKSCategory * ct = c->tableCategory();
+    QByteArray bytes;
+    QBuffer buffer(&bytes);
+
+    buffer.open(QIODevice::WriteOnly);
+    sIm.save (&buffer, "XPM");
+    buffer.close ();
+    KKSCategoryAttr * a = 0;//loader->loadAttribute ("image_jpg"
+    for (KKSMap<int, KKSCategoryAttr *>::const_iterator p = ct->attributes().constBegin();
+            p != ct->attributes().constEnd() && a == 0;
+            ++p)
+        if (QString::compare (p.value()->code(), QString("image_jpg"), Qt::CaseInsensitive) == 0)
+                a = p.value();
+
+    KKSFilter * filter = ct->createFilter (a->id(), bytes, KKSFilter::foEq); 
+    KKSList<const KKSFilter*> filters;
+    filters.append (filter);
+    filter->release ();
+    KKSFilterGroup * group = new KKSFilterGroup(true);
+    group->setFilters(filters);
+    filterGroups.append(group);
+    group->release();
+    KKSObjEditor *objEditor = oef->createObjEditor(IO_IO_ID, 
+                                                   io->id(), 
+                                                   filterGroups, 
+                                                   "",
+                                                   c,
+                                                   false,
+                                                   QString(),
+                                                   false,
+                                                   Qt::NonModal,
+                                                   0);
+    io->release ();
+    slotCreateNewObjEditor(objEditor);
+
+    delete srForm;
 }
 
 void ReperMainWindow :: slotCompare (void)
@@ -161,6 +231,23 @@ void ReperMainWindow::slotCreateNewObjEditor(KKSObjEditor * objEditor)
     if(!objEditor)
         return;
 
+    if (objEditor->getObj() && objEditor->getObj()->id() == IO_IO_ID)
+    {
+        QTabWidget * tObj = objEditor->getTabWidget();
+        for (int i=0; i<3; i++)
+        {
+            //QWidget * w = tObj->widget (0);
+            tObj->removeTab(0);//setTabEnabled (i, false);
+            //w->setParent (0);
+            //delete w;
+            //QWidget * w = tObj->widget (i);
+            //w->setEnabled (false);//setVisible (false);
+        }
+        //QWidget * w = tObj->widget (1);
+        tObj->removeTab (1);//setTabEnabled (4, false);
+        //w->setParent (0);
+        //delete w;
+    }
     QMdiSubWindow * m_objEditorW = m_mdiArea->addSubWindow (objEditor);
     m_objEditorW->setAttribute (Qt::WA_DeleteOnClose);
     connect (objEditor, SIGNAL (closeEditor()), m_objEditorW, SLOT (close()) );
@@ -181,6 +268,8 @@ void ReperMainWindow::slotCreateNewObjEditor(KKSObjEditor * objEditor)
 void ReperMainWindow::setActionsEnabled(bool enabled)
 {
     UI->actRLI->setEnabled (enabled);
+    UI->menu_Search->setEnabled (enabled);
+    UI->actSearchImage->setEnabled (enabled);
 }
 
 void ReperMainWindow::isActiveSubWindow(const KKSObjEditor * editor, bool * yes)

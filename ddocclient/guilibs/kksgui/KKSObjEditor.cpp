@@ -2190,6 +2190,11 @@ void KKSObjEditor :: setTabWidget (QTabWidget *tObj)
     tabObj = tObj;
 }
 
+QTabWidget * KKSObjEditor :: getTabWidget (void) const
+{
+    return tabObj;
+}
+
 void KKSObjEditor :: setAttrView (void)
 {
     KKSRecWidget * recWidget = this->getRecordsWidget ();

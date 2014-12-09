@@ -128,6 +128,9 @@ class _GUI_EXPORT KKSObjEditor : public KKSRecDialog
         QWidget * getMapWidget(void) const;
         void setMapWidget (QWidget * mapW);
 
+        QTabWidget * getTabWidget (void) const;
+        void setTabWidget (QTabWidget *tObj);
+
     public slots:
         void setValue (qint64 id, KKSIndAttrClass sys, QVariant val);
         //void setIndValue (int id, bool sys, QVariant val);
@@ -375,7 +378,6 @@ class _GUI_EXPORT KKSObjEditor : public KKSRecDialog
         void setSysAttrWidgets (QWidget *wSysAttr, QScrollArea *scSysAttr, QWidget *sysAttrs);
         void setIOAttrWidgets (QWidget *wIOAttr, QScrollArea *scIOattr, QWidget *ioAttrs);
         void setRecIndWidgets (QWidget *wIOAttr, QScrollArea *scIOattr, QWidget *ioAttrs);
-        void setTabWidget (QTabWidget *tObj);
 
         void clearAdditionalCopies (void);
         void addAdditionalCopy (KKSObjectExemplar * rec);

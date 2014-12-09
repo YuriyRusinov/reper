@@ -13,120 +13,156 @@
   <property name="windowTitle">
    <string>Search Radio Image</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
+  <layout class="QGridLayout" name="gridLayout_2">
    <item row="0" column="0">
-    <layout class="QVBoxLayout" name="vImagelLay">
-     <item>
-      <layout class="QHBoxLayout" name="hLayoutImage">
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <layout class="QVBoxLayout" name="vImageLay">
        <item>
-        <widget class="QLabel" name="lImage">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Image :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="hLayoutImage">
+         <item>
+          <widget class="QLabel" name="lImage">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Image :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QWidget" name="wImage" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
-        <widget class="QWidget" name="wImage" native="true">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="hAzimuthlLay">
+         <item>
+          <widget class="QLabel" name="lAzimuth">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Azimuth :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lEAzimuth"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="hElevationLay">
+         <item>
+          <widget class="QLabel" name="lElevation">
+           <property name="text">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Elevation :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lEElevationAngle">
+           <property name="text">
+            <string>0</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="hLengthlLay">
+         <item>
+          <widget class="QLabel" name="lLength">
+           <property name="text">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Length :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lELength">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>
-     <item>
-      <layout class="QHBoxLayout" name="hAzimuthlLay">
+     <item row="0" column="1">
+      <layout class="QVBoxLayout" name="vButtonsLay">
        <item>
-        <widget class="QLabel" name="lAzimuth">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
+        <widget class="QToolButton" name="tbLoadImage">
+         <property name="toolTip">
+          <string>Load Image</string>
          </property>
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Azimuth :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+          <string>Load Image</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="lEAzimuth"/>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="hElevationLay">
-       <item>
-        <widget class="QLabel" name="lElevation">
+        <widget class="QToolButton" name="tbClearImage">
+         <property name="toolTip">
+          <string>Clear Image</string>
+         </property>
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Elevation :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>Clear Image</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="lEElevationAngle">
+        <widget class="QToolButton" name="tbCalc">
+         <property name="toolTip">
+          <string>Calculate azimuth</string>
+         </property>
          <property name="text">
-          <string>0</string>
+          <string>Calculate 
+ parameters</string>
          </property>
         </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </item>
     </layout>
    </item>
-   <item row="0" column="1">
-    <layout class="QVBoxLayout" name="vButtonsLay">
-     <item>
-      <widget class="QToolButton" name="tbLoadImage">
-       <property name="toolTip">
-        <string>Load Image</string>
-       </property>
-       <property name="text">
-        <string>...</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="tbClearImage">
-       <property name="toolTip">
-        <string>Clear Image</string>
-       </property>
-       <property name="text">
-        <string>...</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="verticalSpacer">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
-   <item row="1" column="0" colspan="2">
+   <item row="1" column="0">
     <layout class="QHBoxLayout" name="hButtonsLay">
      <item>
       <spacer name="horizontalSpacer">
@@ -158,19 +194,6 @@
     </layout>
    </item>
   </layout>
-  <zorder>lImage</zorder>
-  <zorder>wImage</zorder>
-  <zorder>tbLoadImage</zorder>
-  <zorder>tbClearImage</zorder>
-  <zorder>verticalSpacer</zorder>
-  <zorder>pbOk</zorder>
-  <zorder>pbCancel</zorder>
-  <zorder>horizontalSpacer</zorder>
-  <zorder>lAzimuth</zorder>
-  <zorder>lEAzimuth</zorder>
-  <zorder>lElevation</zorder>
-  <zorder>lEElevationAngle</zorder>
-  <zorder>lElevation</zorder>
  </widget>
  <resources/>
  <connections/>

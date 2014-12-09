@@ -25,7 +25,7 @@ private slots:
     void slotRLI (void);
     void slotClose (void);
 
-    void slotSearch (void);
+    void slotSearchByImage (void);
     void slotCompare (void);
 
     void slotCreateNewObjEditor(KKSObjEditor * objEditor);

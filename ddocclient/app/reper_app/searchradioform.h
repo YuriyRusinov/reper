@@ -3,6 +3,8 @@
 
 #include <QDialog>
 
+class QLabel;
+
 namespace Ui
 {
     class Search_Radio_Form;
@@ -11,12 +13,15 @@ namespace Ui
 class SearchRadioForm : public QDialog
 {
 public:
-    SearchRadioForm (QWidget * parent=0; Qt::WindowFlags flags=0);
+    SearchRadioForm (QWidget * parent=0, Qt::WindowFlags flags=0);
     virtual ~SearchRadioForm (void);
+
+    QImage getImage (void) const;
 
 private slots:
     void loadImage (void);
     void clearImage (void);
+    void calcPars (void);
 
 private:
     //
@@ -30,6 +35,7 @@ private:
     //
     QImage sIm;
     Ui::Search_Radio_Form * UI;
+    QLabel * lImage;
 private:
     Q_OBJECT
 };
