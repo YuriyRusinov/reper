@@ -27,6 +27,7 @@ private slots:
 
     void slotSearchByImage (void);
     void slotCompare (void);
+    void slotGologram (void);
 
     void slotCreateNewObjEditor(KKSObjEditor * objEditor);
 

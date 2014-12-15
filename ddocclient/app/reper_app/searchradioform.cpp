@@ -47,13 +47,13 @@ void SearchRadioForm :: loadImage (void)
                                      tr("Cannot load %1.").arg(imageFileName));
         return;
     }
-    lImage->setPixmap (QPixmap::fromImage (sIm));
+    lImageP->setPixmap (QPixmap::fromImage (sIm));
 }
 
 void SearchRadioForm :: clearImage (void)
 {
     sIm = QImage ();
-    lImage->setPixmap (QPixmap());
+    lImageP->setPixmap (QPixmap());
 }
 
 void SearchRadioForm :: init (void)
@@ -65,8 +65,8 @@ void SearchRadioForm :: init (void)
     UI->lEElevationAngle->setValidator (dElevVal);
 
     QGridLayout * gImageLay = new QGridLayout (UI->wImage);
-    lImage = new QLabel (this);
-    gImageLay->addWidget (lImage, 0, 0, 1, 1);
+    lImageP = new QLabel (this);
+    gImageLay->addWidget (lImageP, 0, 0, 1, 1);
 }
 
 QImage SearchRadioForm :: getImage (void) const

@@ -2,6 +2,10 @@
 #include <QMdiSubWindow>
 #include <QMessageBox>
 #include <QBuffer>
+#include <QFileDialog>
+#include <QDir>
+#include <QVector>
+#include <QtDebug>
 
 #include "kksapplication.h"
 #include <kksdatabase.h>
@@ -10,12 +14,19 @@
 #include <KKSFilter.h>
 #include <KKSLoader.h>
 #include <KKSObjEditorFactory.h>
+#include <KKSEIOFactory.h>
 #include <KKSObjEditor.h>
+#include <KKSObject.h>
+#include <KKSObjectExemplar.h>
 #include <radio_image_plugin.h>
 #include <defines.h>
 #include "repermainwindow.h"
 #include "searchradioform.h"
+#include "objloader.h"
+#include "gologramma.h"
 #include "ui_reper_main_window.h"
+
+using mslLoader::OBJloader;
 
 ReperMainWindow :: ReperMainWindow (QWidget * parent, Qt::WindowFlags flags)
     : QMainWindow (parent, flags),
@@ -69,6 +80,7 @@ ReperMainWindow :: ReperMainWindow (QWidget * parent, Qt::WindowFlags flags)
     connect (UI->actE_xit, SIGNAL (triggered()), this, SLOT (slotClose()) );
     connect (UI->actSearchImage, SIGNAL (triggered()), this, SLOT (slotSearchByImage()) );
     connect (UI->actComparison, SIGNAL (triggered()), this, SLOT (slotCompare()) );
+    connect (UI->actGenerateGol, SIGNAL (triggered()), this, SLOT (slotGologram()) );
 }
 
 ReperMainWindow :: ~ReperMainWindow (void)
@@ -96,6 +108,7 @@ void ReperMainWindow :: slotConnect (void)
 void ReperMainWindow :: slotDisconnect (void)
 {
     kksCoreApp->db()->disconnect();
+    setActionsEnabled(false);
 }
 
 void ReperMainWindow :: slot3DMod (void)
@@ -171,7 +184,7 @@ void ReperMainWindow :: slotSearchByImage (void)
         return;
     }
     KKSLoader * loader = kksApp->loader();
-    QString tName = "rli_image_raws";
+    QString tName = QString ("rli_image_raws");
     KKSObject * io = loader->loadIO (tName, true);
     if (!io)
     {
@@ -231,9 +244,10 @@ void ReperMainWindow::slotCreateNewObjEditor(KKSObjEditor * objEditor)
     if(!objEditor)
         return;
 
-    if (objEditor->getObj() && objEditor->getObj()->id() == IO_IO_ID)
+    QTabWidget * tObj = objEditor->getTabWidget();
+    if ((objEditor->getObj() && objEditor->getObj()->id() == IO_IO_ID) ||
+        (objEditor->getObjectEx() && ((objEditor->getObjectEx()->id() == IO_IO_ID) || objEditor->getObjectEx()->io()->id() == IO_IO_ID )))
     {
-        QTabWidget * tObj = objEditor->getTabWidget();
         for (int i=0; i<3; i++)
         {
             //QWidget * w = tObj->widget (0);
@@ -248,6 +262,12 @@ void ReperMainWindow::slotCreateNewObjEditor(KKSObjEditor * objEditor)
         //w->setParent (0);
         //delete w;
     }
+    else if (tObj->count() > 1)
+    {
+        int n = tObj->count();
+        for (int i=1; i<n; i++)
+            tObj->removeTab (1);
+    }
     QMdiSubWindow * m_objEditorW = m_mdiArea->addSubWindow (objEditor);
     m_objEditorW->setAttribute (Qt::WA_DeleteOnClose);
     connect (objEditor, SIGNAL (closeEditor()), m_objEditorW, SLOT (close()) );
@@ -257,8 +277,8 @@ void ReperMainWindow::slotCreateNewObjEditor(KKSObjEditor * objEditor)
     connect(objEditor, SIGNAL(isActiveSubWindow(const KKSObjEditor *, bool *)), this, SLOT(isActiveSubWindow(const KKSObjEditor *, bool *)));
 
 
-    objEditor->setWindowState (objEditor->windowState() | Qt::WindowMaximized | Qt::WindowActive);
-    m_objEditorW->setWindowState (m_objEditorW->windowState() | Qt::WindowMaximized | Qt::WindowActive);
+    objEditor->setWindowState (objEditor->windowState() | Qt::WindowActive);
+    m_objEditorW->setWindowState (m_objEditorW->windowState() | Qt::WindowActive);
     objEditor->show();
     objEditor->setNumCopies (1);//m_masscreateW->num());
 
@@ -270,6 +290,8 @@ void ReperMainWindow::setActionsEnabled(bool enabled)
     UI->actRLI->setEnabled (enabled);
     UI->menu_Search->setEnabled (enabled);
     UI->actSearchImage->setEnabled (enabled);
+    UI->menuGologram->setEnabled (enabled);
+    UI->actGenerateGol->setEnabled (enabled);
 }
 
 void ReperMainWindow::isActiveSubWindow(const KKSObjEditor * editor, bool * yes)
@@ -298,3 +320,91 @@ QWidget * ReperMainWindow::activeKKSSubWindow()
     return 0;
 }
 
+void ReperMainWindow::slotGologram (void)
+{
+    QString gFileName = QFileDialog::getOpenFileName (this, tr("Open object file"),
+                                                      QDir::currentPath(),
+                                                      tr("Object files (*.obj);;All files (*.*)")
+            );
+    mslLoader::OBJloader *objL = new mslLoader::OBJloader;
+    loadModel (*objL, gFileName.toStdString ());
+    generatingData gD;
+    gD.lengthOfShip = 300;
+    gD.numberOfUnit = 5;
+    gD.XY_angleMax = 360.0;
+    gD.XY_angleMin = 0.0;
+    gD.XY_angleStep = 60;
+    gD.XZ_angleMax = 80.0;
+    gD.XZ_angleMin = 20.0;
+    gD.XZ_angleStep = 10.0;
+    QVector<returningData> resD = generateImages (gD, *objL);
+    delete objL;
+    int nd = resD.count();
+    qDebug () << __PRETTY_FUNCTION__ << nd;
+//    KKSLoader * dbL = kksCoreApp->loader();
+    KKSEIOFactory * eiof = kksCoreApp->eiof();
+    KKSLoader * loader = kksApp->loader();
+    QString tName = "rli_image_raws";
+    KKSObject * io = loader->loadIO (tName, true);
+    const KKSCategory * c = io->category();
+    const KKSCategory * ct = c->tableCategory();
+    KKSList<KKSAttrValue*> aVals;
+    for (int i=0; i<nd; i++)
+    {
+        KKSObjectExemplar * cef = new KKSObjectExemplar (-1, tr("Record %1").arg (i), io);
+//        int icol
+        aVals.clear ();
+        for (KKSMap<int, KKSCategoryAttr *>::const_iterator p = ct->attributes().constBegin();
+                p != ct->attributes().constEnd();
+                ++p)
+        {
+            KKSValue v;// = resD[i]
+            if (QString::compare (p.value()->code(), QString("azimuth"), Qt::CaseInsensitive) == 0)
+                v = KKSValue (QString :: number (resD[i].XY_angle), KKSAttrType::atDouble);
+            else if (QString::compare (p.value()->name(), QString("elevation_angle"), Qt::CaseInsensitive) == 0)
+                v = KKSValue (QString :: number (resD[i].XY_angle), KKSAttrType::atDouble);
+            else if (QString::compare (p.value()->name(), QString("depth"), Qt::CaseInsensitive) == 0)
+                v = KKSValue (QString :: number (resD[i].rowNumber), KKSAttrType::atInt);
+            else if (QString::compare (p.value()->code(), QString("image_raw"), Qt::CaseInsensitive) == 0)
+            {
+                QByteArray bData;
+                bData.clear ();
+                bData.append (QByteArray :: number (resD[i].XY_angle));
+                bData.append (" ");
+                bData.append (QByteArray :: number (resD[i].XZ_angle));
+                bData.append (" ");
+                bData.append (QByteArray :: number (resD[i].rowNumber));
+                bData.append (" ");
+                bData.append (QByteArray :: number (resD[i].columnNumber));
+                bData.append (" ");
+                bData.append (QByteArray :: number (resD[i].numberOfUnit));
+                bData.append (" ");
+                int nWidth = resD[i].rowNumber;
+                int nHeight = resD[i].columnNumber;
+                QByteArray bIm;// (imData);
+                //QFile debIm ("ddd.dat");
+                //QDataStream debImage (&bIm, QIODevice::WriteOnly);
+                //debIm.open (QIODevice::WriteOnly);
+                int ncount (0);
+                for (int ii=0; ii<nWidth; ii++)
+                {
+                    for (int iii=0; iii<nHeight; iii++)
+                    {
+                        bIm += QByteArray::number ((uchar)resD[i].data[ncount++]);
+                    }
+                    //debImage << QString("\r\n");
+                }
+                bData.append (bIm);
+                v = KKSValue (QString(bData), KKSAttrType::atBinary);
+            }
+
+            KKSAttrValue * av = new KKSAttrValue (v, p.value());
+            aVals.append (av);
+            av->release ();
+        }
+        cef->setAttrValues (aVals);
+        qint64 id = eiof->insertEIO (cef, ct, QString(), true);
+        qDebug () << __PRETTY_FUNCTION__ << id;
+    }
+    io->release ();
+}

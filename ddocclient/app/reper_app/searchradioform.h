@@ -35,7 +35,7 @@ private:
     //
     QImage sIm;
     Ui::Search_Radio_Form * UI;
-    QLabel * lImage;
+    QLabel * lImageP;
 private:
     Q_OBJECT
 };

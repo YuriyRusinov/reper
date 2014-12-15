@@ -45,9 +45,16 @@
      </property>
      <addaction name="actSearchImage"/>
     </widget>
+    <widget class="QMenu" name="menuGologram">
+     <property name="title">
+      <string>Gologram ...</string>
+     </property>
+     <addaction name="actGenerateGol"/>
+    </widget>
     <addaction name="menu_Search"/>
     <addaction name="actComparison"/>
     <addaction name="actPlugins"/>
+    <addaction name="menuGologram"/>
    </widget>
    <addaction name="menu_DB"/>
    <addaction name="menu_RLI_Analisys"/>
@@ -102,6 +109,16 @@
   <action name="actSearchImage">
    <property name="text">
     <string>by &amp;Image</string>
+   </property>
+  </action>
+  <action name="actGologram">
+   <property name="text">
+    <string>by &amp;Gologram</string>
+   </property>
+  </action>
+  <action name="actGenerateGol">
+   <property name="text">
+    <string>Generate &amp;gologram</string>
    </property>
   </action>
  </widget>
