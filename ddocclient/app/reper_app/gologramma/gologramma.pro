@@ -1,22 +1,33 @@
-QT       += gui
+#-------------------------------------------------
+#
+# Project created by QtCreator 2014-12-11T16:55:51
+#
+#-------------------------------------------------
 
-TARGET = gologramma
+QT       += core gui
+
+#greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+
+TARGET = gologram
 TEMPLATE = lib
 
-DESTDIR = ../../../build
-
 DEFINES += GOLOGRAMMA_LIBRARY
+DESTDIR = ../../../build
 
 SOURCES += gologramma.cpp \
            model3Dconst.cpp \
            objloader.cpp \
-           cuboid.cpp
+           cuboid.cpp \
+           imagecreatorform.cpp
 
-HEADERS += gologramma.h \
+HEADERS += gologramma.h\
            gologramma_global.h \
            model3Dconst.h \
            objloader.h \
-           cuboid.h
+           cuboid.h \
+           imagecreatorform.h
+
+FORMS    += imagecreatorform.ui
 
 unix {
     target.path = /usr/lib

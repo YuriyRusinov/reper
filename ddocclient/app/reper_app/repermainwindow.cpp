@@ -5,6 +5,8 @@
 #include <QFileDialog>
 #include <QDir>
 #include <QVector>
+#include <QProgressBar>
+#include <QProgressDialog>
 #include <QtDebug>
 
 #include "kksapplication.h"
@@ -322,11 +324,15 @@ QWidget * ReperMainWindow::activeKKSSubWindow()
 
 void ReperMainWindow::slotGologram (void)
 {
-    QString gFileName = QFileDialog::getOpenFileName (this, tr("Open object file"),
+    imageCreatorForm * icf = new imageCreatorForm (0);
+    connect (icf, SIGNAL (imagesData(generatingDataPlus)), this, SLOT (slotGologramCalc(generatingDataPlus)) );
+/*    QString gFileName = QFileDialog::getOpenFileName (this, tr("Open object file"),
                                                       QDir::currentPath(),
                                                       tr("Object files (*.obj);;All files (*.*)")
             );
-    mslLoader::OBJloader *objL = new mslLoader::OBJloader;
+*/
+    icf->exec();
+/*    mslLoader::OBJloader *objL = new mslLoader::OBJloader;
     loadModel (*objL, gFileName.toStdString ());
     generatingData gD;
     gD.lengthOfShip = 300;
@@ -338,7 +344,22 @@ void ReperMainWindow::slotGologram (void)
     gD.XZ_angleMin = 20.0;
     gD.XZ_angleStep = 10.0;
     QVector<returningData> resD = generateImages (gD, *objL);
-    delete objL;
+    delete objL;*/
+}
+
+void ReperMainWindow::slotGologramCalc (generatingDataPlus gdp)
+{
+    mslLoader::OBJloader *objL = new mslLoader::OBJloader;
+    loadModel (*objL, gdp.filename.toStdString ());
+    QProgressDialog * pProcD = new QProgressDialog;
+    QProgressBar * pb = new QProgressBar (pProcD);
+    pProcD->setBar (pb);
+//    pb->setRange (0, 100);
+//    pb->show();
+
+    pProcD->show ();
+    QVector<returningData> resD = generateImages (gdp.data, *objL, pb);
+    
     int nd = resD.count();
     qDebug () << __PRETTY_FUNCTION__ << nd;
 //    KKSLoader * dbL = kksCoreApp->loader();
@@ -407,4 +428,5 @@ void ReperMainWindow::slotGologram (void)
         qDebug () << __PRETTY_FUNCTION__ << id;
     }
     io->release ();
+    delete pProcD;
 }

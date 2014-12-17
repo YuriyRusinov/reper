@@ -39,7 +39,7 @@ DEPENDPATH *= gologramma
 
 SUBDIRS += gologramma
 
-LIBS *= -L$$DESTDIR -ldataaccess -lkkscoreapplication -lkksutils -lkkspp -lkksdatafactory -lkkspluginmanager  -lkksapplication -lkksguifactory -lkksgui -lkksqwt -lgologramma
+LIBS *= -L$$DESTDIR -ldataaccess -lkkscoreapplication -lkksutils -lkkspp -lkksdatafactory -lkkspluginmanager  -lkksapplication -lkksguifactory -lkksgui -lkksqwt -lgologram
 #LIBS *= -L$$DESTDIR/ddocplugins -lradio_image
 
 

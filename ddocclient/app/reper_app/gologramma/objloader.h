@@ -6,12 +6,12 @@
 #include <fstream>
 #include <sstream>
 
-#include "gologramma_global.h"
 #include "model3Dconst.h"
+#include "gologramma_global.h"
 
-namespace _GOL_EXPORT mslLoader
+namespace mslLoader
 {
-    class  OBJloader
+    class _GOL_EXPORT OBJloader
     {
     public:
         OBJloader(){};

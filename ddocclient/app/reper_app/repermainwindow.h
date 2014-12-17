@@ -3,9 +3,12 @@
 
 #include <QMainWindow>
 
+#include "imagecreatorform.h"
+
 class QMdiArea;
 
 class KKSObjEditor;
+class generatingDataPlus;
 
 namespace Ui
 {
@@ -28,6 +31,7 @@ private slots:
     void slotSearchByImage (void);
     void slotCompare (void);
     void slotGologram (void);
+    void slotGologramCalc (generatingDataPlus gdp);
 
     void slotCreateNewObjEditor(KKSObjEditor * objEditor);
 

@@ -4,6 +4,7 @@
 #include "gologramma_global.h"
 #include "cuboid.h"
 
+class QProgressBar;
 //programm
 void _GOL_EXPORT loadModel(mslLoader::OBJloader& loader,const std::string& str);
 
@@ -13,7 +14,7 @@ struct cubPair
     std::vector<Cuboid> cubs;
 };
 
-cubPair buildCub(const mslLoader::OBJloader& loader,const double lengthOfShip,const double numberOfUnit);
+cubPair _GOL_EXPORT buildCub(const mslLoader::OBJloader& loader,const double lengthOfShip,const double numberOfUnit);
 
 struct constDataStruct
 {
@@ -29,7 +30,7 @@ std::string _GOL_EXPORT createFileNamePNG(const constDataStruct& data,const std:
 void _GOL_EXPORT saveFileDAT(constDataStruct data,std::vector<unsigned char>& image, const std::string& str);
 void _GOL_EXPORT saveFilePNG(std::vector<unsigned char>& image, const std::string& str);
 
-struct _GOL_EXPORT generatingData
+struct _GOL_EXPORT  generatingData
 {
     double lengthOfShip;
     double numberOfUnit;
@@ -56,6 +57,12 @@ struct _GOL_EXPORT returningData
 
 void swap_STDtoQT_vector(QVector<unsigned char>& lhs,std::vector<unsigned char>& rhs);
 
-QVector<returningData> _GOL_EXPORT generateImages(const generatingData& data, mslLoader::OBJloader& loader);
+struct _GOL_EXPORT generatingDataPlus
+{
+    QString filename;
+    generatingData data;
+};
+
+QVector<returningData> _GOL_EXPORT generateImages(const generatingData& data, mslLoader::OBJloader& loader, QProgressBar * pb);
 
 #endif // GOLOGRAMMA_H

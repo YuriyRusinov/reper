@@ -1,3 +1,5 @@
+#include <QProgressBar>
+#include <QtDebug>
 #include "gologramma.h"
 
 void loadModel(mslLoader::OBJloader& loader,const std::string& str)
@@ -92,7 +94,7 @@ void swap_STDtoQT_vector(QVector<unsigned char>& lhs,std::vector<unsigned char>&
     }
 }
 
-QVector<returningData> generateImages(const generatingData &data, mslLoader::OBJloader &loader)
+QVector<returningData> generateImages(const generatingData &data, mslLoader::OBJloader &loader, QProgressBar * pb)
 {
     cubPair cubs = buildCub(loader,data.lengthOfShip,data.numberOfUnit);
     std::vector<Cuboid> cubusCubus;
@@ -100,6 +102,13 @@ QVector<returningData> generateImages(const generatingData &data, mslLoader::OBJ
 
     QVector<returningData> imagesData;
 
+    if (pb)
+    {
+        int nxy = (int)((data.XY_angleMax-data.XY_angleMin)/data.XY_angleStep)+1;
+        int nxz = (int)((data.XZ_angleMax-data.XZ_angleMin)/data.XZ_angleStep)+1;
+        pb->setRange (0, nxy*nxz);
+    }
+    int ncout(0);
     for(double XY_plane = data.XY_angleMin; XY_plane < data.XY_angleMax; XY_plane += data.XY_angleStep)
     {
         for(double XZ_plane = data.XZ_angleMin; XZ_plane <= data.XZ_angleMax; XZ_plane += data.XZ_angleStep)
@@ -130,6 +139,11 @@ QVector<returningData> generateImages(const generatingData &data, mslLoader::OBJ
             swap_STDtoQT_vector(buf.data,image);
 
             imagesData.push_back(buf);
+            if (pb)
+                pb->setValue (ncout++);
+            else
+                ncout++;
+            qDebug () << __PRETTY_FUNCTION__ << ncout;
         }
     }
 
