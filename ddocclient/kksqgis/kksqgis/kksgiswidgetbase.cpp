@@ -95,6 +95,7 @@
 #ifdef WIN32
 #include "dn/dnspecbath.h"
 #include "dn/Added/dnvector.h"
+#include "dn/azdialcalcroute.h"
 #endif
 
 #include <QProgressDialog>
@@ -681,11 +682,24 @@ void KKSGISWidgetBase::initActions()
     icon5.addFile(QString::fromUtf8(":/ico/mActionFileSave.png"), QSize(), QIcon::Normal, QIcon::On);
     mpActionFileSaveProject->setIcon(icon5);
     mpActionFileSaveProject->setText(tr("Сохранить проект"));
-    
+
     mpActionBathymetry = new QAction(this);
     mpActionBathymetry->setObjectName(QString::fromUtf8("mpActionBathymetry"));
-    mpActionBathymetry->setText(tr("Оценка глубин прибрежных территорий"));
-    
+    mpActionBathymetry->setText(tr("Тематические задачи"));
+
+    mpVectorize = new QAction(QIcon(":/ico/vectorize.png"), tr("Векторизация"), this); // Az
+    mpActionShortestPathAreaSelect = new QAction(QIcon(":/ico/vectorize.png"), tr("Выбрать зону для оценки"), this); // Az
+    mpActionShortestPathCalc = new QAction(QIcon(":/ico/vectorize.png"), tr("Построить маршрут"), this); // Az
+    mpActionShortestPathGrid = new QAction(QIcon(":/ico/vectorize.png"), tr("Сформировать дискретное поле"), this); // Az
+
+
+//    mpActionBathymetry = new QAction(this);
+//    mpActionBathymetry->setObjectName(QString::fromUtf8("mpActionBathymetry"));
+//    mpActionBathymetry->setText(tr("Построение маршрутов передвижений военной техники"));
+//    QIcon icon5;
+//    icon5.addFile(QString::fromUtf8(":/ico/mActionFileSave.png"), QSize(), QIcon::Normal, QIcon::On);
+//    mpActionFileSaveProject->setIcon(icon5);
+//    mpActionFileSaveProject->setText(tr("Сохранить проект"));
     /*
     mpActionAddRasterLayer = new QAction(this);
     mpActionAddRasterLayer->setObjectName(QString::fromUtf8("mpActionAddRasterLayer"));
@@ -713,9 +727,6 @@ void KKSGISWidgetBase::initActions()
     mpActionFileCloseProject->setObjectName(QString::fromUtf8("mpActionFileCloseProject"));
     mpActionFileCloseProject->setText(tr("Закрыть проект"));
 
-
-    mpVectorize = new QAction(QIcon(":/ico/vectorize.png"), tr("Векторизация"), this);
-    
     mpActionAddVectorLayer = new QAction(QIcon(":/ico/add_vector.png"), tr("Добавить &векторный слой"), this);
     mpActionAddVectorLayer->setStatusTip(tr("Добавить векторный слой в окно карты"));
 
@@ -845,7 +856,6 @@ void KKSGISWidgetBase::initConnections()
     connect(this->mpActionAddRasterLayer, SIGNAL(triggered()), this, SLOT(SLOTmpActionAddRasterLayer()));
     connect(this->mpActionAddPostGISLayer, SIGNAL(triggered()), this, SLOT(SLOTmpActionAddPostGISLayer()));
 
-    connect(this->mpVectorize, SIGNAL(triggered()), this, SLOT(SLOTtempUse()));
 
     connect(this->mActionProjectProperties, SIGNAL( triggered() ), this, SLOT( projectProperties() ) );
     connect(this->mActionNewProject, SIGNAL( triggered() ), this, SLOT( SLOTmpActionFileNew() ) );
@@ -860,7 +870,12 @@ void KKSGISWidgetBase::initConnections()
     if(mpCoordsEdit)
         connect(this->mpCoordsEdit, SIGNAL(editingFinished()), this, SLOT( SLOTazCoordsCenter()));
     
+    // task connections
+    connect(this->mpVectorize, SIGNAL(triggered()), this, SLOT(SLOTtempUse()));
     connect(this->mpActionBathymetry, SIGNAL(triggered()), this, SLOT(SLOTazThemTaskSpectralBathynometry()));
+    connect(this->mpActionShortestPathAreaSelect, SIGNAL(triggered()), this, SLOT(SLOTshortestPathSelectArea())); // Az
+    connect(this->mpActionShortestPathCalc, SIGNAL(triggered()), this, SLOT(SLOTshortestPathCalculate())); // Az
+    connect(this->mpActionShortestPathGrid, SIGNAL(triggered()), this, SLOT(SLOTshortestPathGridArea())); // Az
 
     connect( mpMapCanvas, SIGNAL(xyCoordinates(const QgsPoint &)), this, SLOT(showMouseCoordinate(const QgsPoint &)));
     connect( mpMapCanvas, SIGNAL( extentsChanged() ), this, SLOT( markDirty() ) );
@@ -1120,6 +1135,12 @@ void KKSGISWidgetBase::initMenuBar()
         QMenu * menuTasks = new QMenu(tr("Задачи"));
         menuTasks->addAction(mpVectorize);
         menuTasks->addAction(mpActionBathymetry);
+
+        QMenu * menuTaskShortestPath = new QMenu(tr("Поиск маршрутов передвижения военной техники")); // Az
+        menuTaskShortestPath->addAction(mpActionShortestPathAreaSelect); // Az
+        menuTaskShortestPath->addAction(mpActionShortestPathGrid); // Az
+        menuTaskShortestPath->addAction(mpActionShortestPathCalc); // Az
+        menuTasks->addMenu(menuTaskShortestPath);  // Az
 
         mpMenuBar->addMenu(menuTasks);
         mpMenuMap.insert(tr("Tasks"), menuTasks);
@@ -3997,11 +4018,7 @@ void KKSGISWidgetBase::azVectorize()
     pSRS.createFromOgcWmsCrs("EPSG:" +
                              QString::number(azGetEPSG(dnThemTaskSpecBath->Polygons.at(0).EPSG)));
     pSRS.validate();
-    QString myFileName (dnThemTaskSpecBath->Polygons.at(0).NameLayer +
-                        QString::number(QTime::currentTime().hour())  + "-" +
-                        QString::number(QTime::currentTime().minute())  + "-" +
-                        QString::number(QTime::currentTime().second()) + "-" +
-                        QString::number(QTime::currentTime().msec()) + ".shp");
+    QString myFileName (dnThemTaskSpecBath->Polygons.at(0).NameLayer + this->azCreateName(2) + ".shp");
     QgsVectorFileWriter myWriter( myFileName, mEncoding, mFields, QGis::WKBPolygon, &pSRS);
     azWorkList.clear();
     azWorkList.append(myFileName);
@@ -4174,6 +4191,64 @@ void KKSGISWidgetBase::SLOTsetRenderer()
     mpMapCanvas->refresh();
 }
 
+void KKSGISWidgetBase::SLOTshortestPathSelectArea() // Az
+{
+
+    bool bOk (false); // кнопка отмена или закрыть в диалоге
+    QString str = QInputDialog::getText( this,"Выделение зоны интереса",
+                                         "Название слоя:", QLineEdit::Normal,
+                                         "route_army_area_" + this->azCreateName(1) + "_a",
+                                         &bOk );
+    if (!bOk)
+    {
+        return; // нажата отмена
+    }
+    QgsFields pFlds;
+    if (!azCreateLayer(str + ".shp", pFlds, "D:/ArcGIS/RouteArmy/data2/", true))
+    {
+        return; // слой не создан
+    }
+    this->azAddWorkListToMap(azWorkList);
+    activateDeactivateLayerRelatedActions (this->activeLayer());
+    this->toggleEditing();
+    if ( mpMapCanvas && mpMapCanvas->isDrawing() )
+    {
+        return;
+    }
+    mpMapCanvas->setMapTool( mMapTools.mAddFeature );
+
+//    str = "";
+//    str = QInputDialog::getText( this,"Выделение зоны интереса",
+//                                         "Название слоя:", QLineEdit::Normal,
+//                                         "route_army_area_" + this->azCreateName(1) + "_a",
+//                                         &bOk );
+//    if (!bOk)
+//    {
+//        return; // нажата отмена
+//    }
+}
+
+void KKSGISWidgetBase::SLOTshortestPathCalculate()
+{
+    AzDialCalcRoute pDialog(this);
+//    pDialog.ui
+    pDialog.exec();
+}
+
+void KKSGISWidgetBase::SLOTshortestPathGridArea()
+{
+
+    bool bOk (false); // кнопка отмена или закрыть в диалоге
+    QString str = QInputDialog::getText( this,"Выделение зоны интереса",
+                                         "Название слоя:", QLineEdit::Normal,
+                                         "route_army_area_" + this->azCreateName(1) + "_a",
+                                         &bOk );
+    if (!bOk)
+    {
+        return; // нажата отмена
+    }
+}
+
 void KKSGISWidgetBase::SLOTtempUse()
 {
 //    QString pFilePath("D:/!Share/rastrs/union_den.tif");
@@ -4210,7 +4285,7 @@ void KKSGISWidgetBase::SLOTmpActionAddRasterLayer()
     // СЛОТ: добавление растра в окно карты
     // сначала вызываем диалог, получаем путь к файлу
     QString fullLayerName = QFileDialog::getOpenFileName(this, "Добавить растровый слой", "",
-                             "Все поддерживаемые растровые форматы (*.img *.asc *.tif *tiff *.bmp *.jpg *.jpeg);;Geotiff (*.tif *.tiff)");
+                             "Все поддерживаемые растровые форматы (*.img *.int *.asc *.tif *tiff *.bmp *.jpg *.jpeg);;Geotiff (*.tif *.tiff)");
     
     openRasterLayer(fullLayerName);
 
@@ -4543,11 +4618,11 @@ void KKSGISWidgetBase::openRasterLayer(const QString & rLayerFile)
         return;
     }
 
-    if (!this->azRasterEnhancement(*mypLayer)) // применяем улучшение снимка
+//    if (!this->azRasterEnhancement(*mypLayer)) // применяем улучшение снимка
         qDebug("Улучшение растра не использовано. Нераспознаный формат растра." + rLayerFile.toAscii());
 
     // применяем улучшение контраста (т.е. цвета отображаются от минимума до максимума)
-    mypLayer->setContrastEnhancement(QgsContrastEnhancement::StretchToMinimumMaximum);
+//    mypLayer->setContrastEnhancement(QgsContrastEnhancement::StretchToMinimumMaximum);
 
     // самообновление
     connect(mypLayer, SIGNAL(repaintRequested()), mpMapCanvas, SLOT(refresh()) );
@@ -4589,6 +4664,67 @@ void KKSGISWidgetBase::openDatabaseLayer()
     //connect(mypLayer, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
     dbs->exec();
     delete dbs;
+}
+
+QString KKSGISWidgetBase::azCreateName(const int option)
+{
+    QString pStr = "";
+    QDate pDate(QDate::currentDate());
+    QTime pTime(QTime::currentTime());
+    switch (option)
+    {
+    case 0:
+        // name like "yyyy-mm-dd--hh-mm-ss-ms"
+        pStr = QString::number(pDate.year()) + "-" +
+                QString::number(pDate.month()) + "-" +
+                QString::number(pDate.day()) + "--" +
+                QString::number(pTime.hour()) + "-" +
+                QString::number(pTime.minute()) + "-" +
+                QString::number(pTime.second()) + "-" +
+                QString::number(pTime.msec());
+        break;
+    case 1:
+        // name like "hh-mm-ss"
+        pStr = QString::number(pTime.hour()) + "-" +
+                QString::number(pTime.minute()) + "-" +
+                QString::number(pTime.second());
+        break;
+    case 2:
+        // name like "hh-mm-ss-ms"
+        pStr =  QString::number(pTime.hour()) + "-" +
+                QString::number(pTime.minute()) + "-" +
+                QString::number(pTime.second()) + "-" +
+                QString::number(pTime.msec());
+        break;
+    }
+    return pStr;
+}
+
+bool KKSGISWidgetBase::azCreateLayer(QString nameOfLayer, QgsFields pFields, QString pathOfLayer, bool addToMap, bool useDefaultFields, QGis::WkbType pType, const QString encoding, const long EPSG)
+{
+    QString pStr = pathOfLayer + nameOfLayer;
+    QgsCoordinateReferenceSystem pSRS;
+    pSRS.createFromOgcWmsCrs("EPSG:" + EPSG);
+    pSRS.validate();
+    if (pFields.count() < 1 || useDefaultFields)
+    {
+        QgsField myField( "comment", QVariant::String, "String", 10, 0, "Comment" );
+        pFields.append( myField );
+    }
+    QgsVectorFileWriter::WriterError mError;
+    QgsVectorFileWriter myWriter( pStr, encoding, pFields, pType, &pSRS);
+    mError = myWriter.hasError();
+    if (mError != 0)
+    {
+        qWarning() << myWriter.errorMessage();
+        return false;
+    }
+    if (addToMap)
+    {
+        azWorkList.clear();
+        azWorkList.append(pStr);
+    }
+    return true;
 }
 
 QString KKSGISWidgetBase::projectFileName()

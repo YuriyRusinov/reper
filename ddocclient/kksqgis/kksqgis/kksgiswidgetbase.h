@@ -94,6 +94,10 @@ public:
     void openVectorLayer(const QString & vLayerFile);
     void openRasterLayer(const QString & rLayerFile);
     void openDatabaseLayer();
+    QString azCreateName(const int option = 0); // Az
+    bool azCreateLayer(QString nameOfLayer, QgsFields pFields, QString pathOfLayer = "C:/temp/",
+                       bool addToMap = true, bool useDefaultFields = false, QGis::WkbType pType = QGis::WKBPolygon,
+                       const QString encoding = "UTF-8", const long EPSG = 4326); // Az
 
     bool addVectorLayers( QStringList const & theLayerQStringList, const QString& enc, const QString dataSourceType );
     bool addRasterLayers( QStringList const & theLayerQStringList, bool guiWarning = true );
@@ -284,6 +288,7 @@ private slots:
     void SLOTazGetSelectedLegendItem();
     void SLOTazThemTaskSpectralBathynometry();
     void SLOTazShowContextMenuForLegend(const QPoint & pos);
+
     //void SLOTazShowMouseCoordinate(const QgsPoint & p);
     
     //void SLOTmpActionFileExit();
@@ -301,8 +306,11 @@ private slots:
 
     void SLOTmpActionVectorize();
     void SLOTsetRenderer();
+    void SLOTshortestPathSelectArea(); //az
+    void SLOTshortestPathCalculate(); //az
+    void SLOTshortestPathGridArea();
     void SLOTtempUse();
-    
+
     //! Create a new blank project (no template)
     void fileNewBlank();
     //! As above but allows forcing without prompt and forcing blank project
@@ -651,9 +659,11 @@ private:
     QMenuBar * mpMenuBar;
     QMap<QString, QMenu *> mpMenuMap;
     // различные операции
-    QAction * mpVectorize;
-    QAction * mpActionBathymetry;
-    
+    QAction * mpVectorize;          //
+    QAction * mpActionBathymetry;   // Батинометрия
+    QAction * mpActionShortestPathAreaSelect; // Поиск маршрута военной техники, выбор зоны интереса Az
+    QAction * mpActionShortestPathCalc; // Поиск маршрута военной техники, расчет Az
+    QAction * mpActionShortestPathGrid; // Поиск маршрута военной техники, сетка Az
     QAction * mActionMapTips;
 
     //добавление слоев

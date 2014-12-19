@@ -26,9 +26,9 @@ int main(int argc, char ** argv)
 //    }
 //    app->installTranslator(&translator);
 
-    QString myPluginsDir        = "C:\\Program Files (x86)\\DynamicSoft\\DynamicDocs Client 1.3.0\\QGS21\\plugins";
+//    QString myPluginsDir        = "C:\\Program Files (x86)\\DynamicSoft\\DynamicDocs Client 1.3.0\\QGS21\\plugins";
     //QString myPluginsDir        = "C:\\build\\plugins";
-    //QString myPluginsDir        = "D:\\REP_EXT\\QGS21\\plugins";
+    QString myPluginsDir        = "D:\\REP_EXT\\QGS22\\plugins";
 
     //QDir dir;
     //QString workingDir = dir.absolutePath();
