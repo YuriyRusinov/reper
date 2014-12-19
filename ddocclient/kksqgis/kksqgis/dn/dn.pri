@@ -9,7 +9,8 @@ HEADERS += \
                 dn/Added/First/dnmathadd.h \
                 dn/Added/First/dncalcstring.h \
                 dn/dnwidgetimage.h \
-    dn/azdialcalcroute.h
+    dn/azdialcalcroute.h \
+    dn/azdialgeneral.h
 
 SOURCES += \
                 dn/imagearea.cpp \
@@ -21,9 +22,11 @@ SOURCES += \
                 dn/Added/First/dnmathadd.cpp \
                 dn/Added/First/dncalcstring.cpp \
                 dn/dnwidgetimage.cpp \
-    dn/azdialcalcroute.cpp
+    dn/azdialcalcroute.cpp \
+    dn/azdialgeneral.cpp
 
 FORMS += \
                 dn/dnspecbath.ui \
                 dn/DlgShowDeptch.ui \
-    dn/azdialcalcroute.ui
+    dn/azdialcalcroute.ui \
+    dn/azdialgeneral.ui

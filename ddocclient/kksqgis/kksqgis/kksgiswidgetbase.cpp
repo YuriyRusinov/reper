@@ -96,6 +96,7 @@
 #include "dn/dnspecbath.h"
 #include "dn/Added/dnvector.h"
 #include "dn/azdialcalcroute.h"
+#include "dn/azdialgeneral.h"
 #endif
 
 #include <QProgressDialog>
@@ -685,9 +686,9 @@ void KKSGISWidgetBase::initActions()
 
     mpActionBathymetry = new QAction(this);
     mpActionBathymetry->setObjectName(QString::fromUtf8("mpActionBathymetry"));
-    mpActionBathymetry->setText(tr("Тематические задачи"));
+    mpActionBathymetry->setText(tr("Тематическая обработка растровых данных"));
 
-    mpVectorize = new QAction(QIcon(":/ico/vectorize.png"), tr("Векторизация"), this); // Az
+    mpVectorize = new QAction(QIcon(":/ico/vectorize.png"), tr("Оценка разновременных данных"), this); // Az
     mpActionShortestPathAreaSelect = new QAction(QIcon(":/ico/vectorize.png"), tr("Выбрать зону для оценки"), this); // Az
     mpActionShortestPathCalc = new QAction(QIcon(":/ico/vectorize.png"), tr("Построить маршрут"), this); // Az
     mpActionShortestPathGrid = new QAction(QIcon(":/ico/vectorize.png"), tr("Сформировать дискретное поле"), this); // Az
@@ -4237,16 +4238,47 @@ void KKSGISWidgetBase::SLOTshortestPathCalculate()
 
 void KKSGISWidgetBase::SLOTshortestPathGridArea()
 {
-
-    bool bOk (false); // кнопка отмена или закрыть в диалоге
-    QString str = QInputDialog::getText( this,"Выделение зоны интереса",
-                                         "Название слоя:", QLineEdit::Normal,
-                                         "route_army_area_" + this->azCreateName(1) + "_a",
-                                         &bOk );
-    if (!bOk)
+    AzDialGeneral pDialog(this, 1);
+    QMapIterator < QString, QgsMapLayer * > i(QgsMapLayerRegistry::instance()->mapLayers());
+    i.toBack();
+    while (i.hasPrevious())
     {
-        return; // нажата отмена
+        i.previous();
+
+        QgsMapLayer * currLayer = i.value();
+        if (currLayer->type() == QgsMapLayer::VectorLayer)
+        {
+            QgsVectorLayer * pVLayer = qobject_cast<QgsVectorLayer *> ( currLayer );
+            if (currLayer->isValid() && pVLayer->geometryType() == QGis::Polygon)
+            {
+                pDialog.mComboBoxOne->addItem(currLayer->name());
+            }
+        }
     }
+    if (pDialog.mComboBoxOne->count() < 1)
+    {
+        QMessageBox::information(this, "Недостаточно данных", "Отсуствуют векторные слои, содержащие полигональные объекты.", QMessageBox::Ok);
+        return;
+    }
+    int selection = pDialog.exec();
+//    if (selection == QDialog::Accepted)
+//    {
+
+//    }
+//    if (selection == QDialog::Rejected)
+//        self.inShape.addItem( unicode( layer.name() ) )
+//        if layer == self.iface.activeLayer():
+//            self.inShape.setCurrentIndex( self.inShape.count() -1 )
+
+//    bool bOk (false); // кнопка отмена или закрыть в диалоге
+//    QString str = QInputDialog::getText( this,"Выделение зоны интереса",
+//                                         "Название слоя:", QLineEdit::Normal,
+//                                         "route_army_area_" + this->azCreateName(1) + "_a",
+//                                         &bOk );
+//    if (!bOk)
+//    {
+//        return; // нажата отмена
+//    }
 }
 
 void KKSGISWidgetBase::SLOTtempUse()
