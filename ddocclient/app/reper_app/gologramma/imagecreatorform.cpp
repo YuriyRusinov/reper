@@ -1,9 +1,9 @@
 #include "imagecreatorform.h"
-#include "ui_imagecreatorform.h"
+#include "ui_image_creator_form.h"
 
 imageCreatorForm::imageCreatorForm(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::imageCreatorForm)
+    ui(new Ui::image_creator_form)
 {
     ui->setupUi(this);
 
@@ -21,9 +21,9 @@ void imageCreatorForm::formInit()
 {
     connect(ui->exitButton,SIGNAL(clicked()),this,SLOT(close()));
     connect(ui->selectFolder,SIGNAL(clicked()),this,SLOT(selectFileName()));
-    connect(ui->loadModel,SIGNAL(clicked()),this,SLOT(loadFileModel()));
-    connect(ui->resolutionBox,SIGNAL(valueChanged(int)),this,SLOT(controllSpinBox()));
-    connect(ui->resolutionBox,SIGNAL(valueChanged(QString)),this,SLOT(controllSpinBox()));
+//    connect(ui->loadModel,SIGNAL(clicked()),this,SLOT(loadFileModel()));
+//    connect(ui->resolutionBox,SIGNAL(valueChanged(int)),this,SLOT(controllSpinBox()));
+//    connect(ui->resolutionBox,SIGNAL(valueChanged(QString)),this,SLOT(controllSpinBox()));
     connect(ui->startButton,SIGNAL(clicked()),this,SLOT(build()));
 
     ui->startButton->setEnabled(false);

@@ -32,6 +32,7 @@ private slots:
     void slotCompare (void);
     void slotGologram (void);
     void slotGologramCalc (generatingDataPlus gdp);
+    void slotViewImage (void);
 
     void slotCreateNewObjEditor(KKSObjEditor * objEditor);
 

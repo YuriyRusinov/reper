@@ -86,6 +86,7 @@ unix: LIBS += -lpq
 
 #RC_FILE = operator.rc
 
+TRANSLATIONS = ../../transl/ddocclient_ru.ts ../../transl/reper_app.ts
 
 include(reper_app.pri)
 

@@ -2,6 +2,7 @@
 
 /* qt */
 #include <QApplication>
+#include <QTranslator>
 #include <QFile>
 #include <QTextStream>
 #include <Qt>

@@ -26,6 +26,7 @@
 #include "searchradioform.h"
 #include "objloader.h"
 #include "gologramma.h"
+#include "imagewidget.h"
 #include "ui_reper_main_window.h"
 
 using mslLoader::OBJloader;
@@ -83,6 +84,7 @@ ReperMainWindow :: ReperMainWindow (QWidget * parent, Qt::WindowFlags flags)
     connect (UI->actSearchImage, SIGNAL (triggered()), this, SLOT (slotSearchByImage()) );
     connect (UI->actComparison, SIGNAL (triggered()), this, SLOT (slotCompare()) );
     connect (UI->actGenerateGol, SIGNAL (triggered()), this, SLOT (slotGologram()) );
+    connect (UI->actView_real_image, SIGNAL (triggered()), this, SLOT (slotViewImage()) );
 }
 
 ReperMainWindow :: ~ReperMainWindow (void)
@@ -324,7 +326,8 @@ QWidget * ReperMainWindow::activeKKSSubWindow()
 
 void ReperMainWindow::slotGologram (void)
 {
-    imageCreatorForm * icf = new imageCreatorForm (0);
+    qDebug () << __PRETTY_FUNCTION__ ;
+    imageCreatorForm * icf = new imageCreatorForm (this);
     connect (icf, SIGNAL (imagesData(generatingDataPlus)), this, SLOT (slotGologramCalc(generatingDataPlus)) );
 /*    QString gFileName = QFileDialog::getOpenFileName (this, tr("Open object file"),
                                                       QDir::currentPath(),
@@ -332,6 +335,7 @@ void ReperMainWindow::slotGologram (void)
             );
 */
     icf->exec();
+    qDebug () << __PRETTY_FUNCTION__ ;
 /*    mslLoader::OBJloader *objL = new mslLoader::OBJloader;
     loadModel (*objL, gFileName.toStdString ());
     generatingData gD;
@@ -429,4 +433,13 @@ void ReperMainWindow::slotGologramCalc (generatingDataPlus gdp)
     }
     io->release ();
     delete pProcD;
+}
+
+void ReperMainWindow::slotViewImage (void)
+{
+    ImageWidget * imW = new ImageWidget;
+    QMdiSubWindow * m_imW = m_mdiArea->addSubWindow (imW);
+    m_imW->setAttribute (Qt::WA_DeleteOnClose);
+    m_imW->setWindowState (m_imW->windowState() | Qt::WindowActive);
+    imW->show();
 }

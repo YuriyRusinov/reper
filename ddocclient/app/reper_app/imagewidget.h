@@ -1,0 +1,39 @@
+#ifndef _ImageWidget_H
+#define _ImageWidget_H
+
+#include <QWidget>
+#include <QImage>
+
+namespace Ui
+{
+    class Image_widget;
+};
+
+class ImageWidget : public QWidget
+{
+public:
+    ImageWidget (QWidget * parent=0, Qt::WindowFlags flags=0);
+    virtual ~ImageWidget (void);
+
+    void setImage (const QImage& im);
+
+private slots:
+    void loadImageFile (void);
+    void selectRect (void);
+    void saveImageToDb (void);
+    void loadImageFromDb (void);
+
+signals:
+    void saveImage (const QImage& );
+    void loadImage (void);
+
+private:
+    //
+    // Variables
+    //
+    Ui::Image_widget *UI;
+    QImage rGIm;
+private:
+    Q_OBJECT
+};
+#endif

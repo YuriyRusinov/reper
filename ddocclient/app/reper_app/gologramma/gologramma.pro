@@ -27,9 +27,12 @@ HEADERS += gologramma.h\
            cuboid.h \
            imagecreatorform.h
 
-FORMS    += imagecreatorform.ui
+FORMS    += image_creator_form.ui
 
 unix {
     target.path = /usr/lib
     INSTALLS += target
 }
+
+TRANSLATIONS = ../../../transl/reper_app.ts
+

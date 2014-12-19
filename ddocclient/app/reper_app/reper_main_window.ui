@@ -50,6 +50,7 @@
       <string>Gologram ...</string>
      </property>
      <addaction name="actGenerateGol"/>
+     <addaction name="actView_real_image"/>
     </widget>
     <addaction name="menu_Search"/>
     <addaction name="actComparison"/>
@@ -119,6 +120,11 @@
   <action name="actGenerateGol">
    <property name="text">
     <string>Generate &amp;gologram</string>
+   </property>
+  </action>
+  <action name="actView_real_image">
+   <property name="text">
+    <string>View real image</string>
    </property>
   </action>
  </widget>
