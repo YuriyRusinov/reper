@@ -10,6 +10,8 @@
 #include <QMainWindow>
 #include <QDir>
 #include <QTextCodec>
+#include <QLibraryInfo>
+#include <QtDebug>
 
 /* ui */
 #include "kkscommandlineopts.h"
@@ -66,7 +68,13 @@ int main(int argc, char *argv[])
     KKSApplication *kksApplication = NULL;
 
     QMainWindow * mainWindow = NULL;
+    qDebug () << __PRETTY_FUNCTION__ << QLibraryInfo::location( QLibraryInfo::TranslationsPath);
+    Q_INIT_RESOURCE (reper_rec);
+    QTranslator reperTr;
+    bool istr = reperTr.load ("./transl/reper_app_ru.qm", ".");
+    qDebug () << __PRETTY_FUNCTION__ << istr;
 
+    qApp->installTranslator (&reperTr);
 
     kksApplication = KKSApplication::init (argc, argv, false);
     if(!kksApplication){

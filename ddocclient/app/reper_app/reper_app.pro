@@ -39,6 +39,8 @@ DEPENDPATH *= gologramma
 
 SUBDIRS += gologramma
 
+
+
 LIBS *= -L$$DESTDIR -ldataaccess -lkkscoreapplication -lkksutils -lkkspp -lkksdatafactory -lkkspluginmanager  -lkksapplication -lkksguifactory -lkksgui -lkksqwt -lgologram
 #LIBS *= -L$$DESTDIR/ddocplugins -lradio_image
 
@@ -86,7 +88,9 @@ unix: LIBS += -lpq
 
 #RC_FILE = operator.rc
 
-TRANSLATIONS = ../../transl/ddocclient_ru.ts ../../transl/reper_app.ts
+RESOURCES = reper_rec.qrc
+
+TRANSLATIONS = ../../transl/reper_app_ru.ts
 
 include(reper_app.pri)
 
