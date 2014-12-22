@@ -1316,6 +1316,210 @@ void DNSpecBath::on_DlgEmbedObj_OK()
 {
  DlgEO->hide();
 
+ float DeltaGS=DlgEO->DeltaGS;
+ float DeltaMS=DlgEO->DeltaMS;
+ float MSIndex=DlgEO->MSIndex;
+ float Contrast630_690=DlgEO->Contrast630_690;
+ float Contrast800_1000=DlgEO->Contrast630_690;
+ float GSIndex=DlgEO->GSIndex;
+ float WBI=DlgEO->WBI;
+ float AKFMin=DlgEO->AKFMin;
+ float KofCorelPor=DlgEO->KofCorelPor;
+ float Brigth630_690=DlgEO->Brigth630_690;
+ float Brigth800_1000=DlgEO->Brigth630_690;
+
+ int NCh1[4],NCh2[4];
+
+ NCh1[0]=this->GdalImage->DetermNCh(DlgEO->LamMSIndex1[0]);
+ NCh2[0]=this->GdalImage->DetermNCh(DlgEO->LamMSIndex1[1]);
+
+ NCh1[1]=this->GdalImage->DetermNCh(DlgEO->LamMSIndex2[0]);
+ NCh2[1]=this->GdalImage->DetermNCh(DlgEO->LamMSIndex2[1]);
+
+ NCh1[2]=this->GdalImage->DetermNCh(DlgEO->LamContr1[0]);
+ NCh2[2]=this->GdalImage->DetermNCh(DlgEO->LamContr1[1]);
+
+ NCh1[3]=this->GdalImage->DetermNCh(DlgEO->LamContr2[0]);
+ NCh2[3]=this->GdalImage->DetermNCh(DlgEO->LamContr2[1]);
+
+
+ for(int i=0;i<4;i++)
+ {
+  float *LamMass;
+  LamMass=new float[NCh2[i]-NCh1[i]+1];
+  for(int j=NCh1[i];j<=NCh2[i];j++)
+  {
+   LamMass[j-NCh1[i]]=GdalImage->Lamda[j];
+  }//for(int j=NumCh1;j<=NumCh2;j++)
+
+  SerPoly->AddIntegralChanal(NCh1[i],NCh2[i],LamMass);
+  delete[] LamMass;
+ }//for(int i=0;i<3;i++)
+
+ int NNir1=SerPoly->Ch-4;
+ int NRed=SerPoly->Ch-3;
+ int NContr1=SerPoly->Ch-2;
+ int NContr2=SerPoly->Ch-1;
+
+ QString Formula="(["+QString().setNum(NNir1+1)+"]-["+QString().setNum(NRed+1)+"])/"+
+         "(["+QString().setNum(NNir1+1)+"]+["+QString().setNum(NRed+1)+"])";
+
+ SerPoly->AddChanal(Formula);
+
+ bool *NoBlackPix;
+ NoBlackPix=new bool[SerPoly->W*SerPoly->H];
+
+ for(quint64 i=0;i<SerPoly->W*SerPoly->H;i++)
+ {
+  NoBlackPix[i]=false;
+  if(SerPoly->ClassifMass[i]>=0)
+   NoBlackPix[i]=true;
+ }
+
+ Formula='['+QString().setNum(SerPoly->Ch)+']';
+
+ SerPoly->FilterPix(NoBlackPix,Formula,0,MSIndex+DeltaMS);
+ for(quint64 i=0;i<SerPoly->W*SerPoly->H;i++)
+ {
+  NoBlackPix[i]=false;
+  if(SerPoly->ClassifMass[i]>=0)
+   NoBlackPix[i]=true;
+ }
+ SerPoly->FilterPix(NoBlackPix,Formula,1,MSIndex-DeltaMS);
+
+ for(quint64 i=0;i<SerPoly->W*SerPoly->H;i++)
+ {
+  NoBlackPix[i]=false;
+  if(SerPoly->ClassifMass[i]>=0)
+   NoBlackPix[i]=true;
+ }
+
+
+ Formula="(["+QString().setNum(NContr1+1)+"]-"+QString().setNum(Brigth630_690,'d',3)+")/"+
+         "(["+QString().setNum(NContr1+1)+"]+"+QString().setNum(Brigth630_690,'d',3)+"])";
+ SerPoly->FilterPix(NoBlackPix,Formula,0,Contrast630_690);
+ for(quint64 i=0;i<SerPoly->W*SerPoly->H;i++)
+ {
+  NoBlackPix[i]=false;
+  if(SerPoly->ClassifMass[i]>=0)
+   NoBlackPix[i]=true;
+ }
+
+ Formula="(["+QString().setNum(NContr2+1)+"]-"+QString().setNum(Brigth800_1000,'d',3)+")/"+
+         "(["+QString().setNum(NContr2+1)+"]+"+QString().setNum(Brigth800_1000,'d',3)+"])";
+ SerPoly->FilterPix(NoBlackPix,Formula,0,Contrast800_1000);
+ for(quint64 i=0;i<SerPoly->W*SerPoly->H;i++)
+ {
+  NoBlackPix[i]=false;
+  if(SerPoly->ClassifMass[i]>=0)
+   NoBlackPix[i]=true;
+ }
+
+
+
+
+ int NChGS1=this->GdalImage->DetermNCh(DlgEO->LamGSIndex[0]);
+ int NChGS2=this->GdalImage->DetermNCh(DlgEO->LamGSIndex[1]);
+
+ Formula="(["+QString().setNum(NChGS1+1)+"]-["+QString().setNum(NChGS2+1)+"])/"+
+         "(["+QString().setNum(NChGS1+1)+"]+["+QString().setNum(NChGS2+1)+"])";
+
+
+ SerPoly->AddChanal(Formula);
+ Formula='['+QString().setNum(SerPoly->Ch)+']';
+
+ SerPoly->FilterPix(NoBlackPix,Formula,0,GSIndex+DeltaGS);
+ for(quint64 i=0;i<SerPoly->W*SerPoly->H;i++)
+ {
+  NoBlackPix[i]=false;
+  if(SerPoly->ClassifMass[i]>=0)
+   NoBlackPix[i]=true;
+ }
+ SerPoly->FilterPix(NoBlackPix,Formula,1,GSIndex-DeltaGS);
+
+ for(quint64 i=0;i<SerPoly->W*SerPoly->H;i++)
+ {
+  NoBlackPix[i]=false;
+  if(SerPoly->ClassifMass[i]>=0)
+   NoBlackPix[i]=true;
+ }
+
+
+ NChGS1=this->GdalImage->DetermNCh(900);
+ NChGS2=this->GdalImage->DetermNCh(970);
+
+ Formula="(["+QString().setNum(NChGS1+1)+"]/["+QString().setNum(NChGS2+1)+"])";
+
+
+ SerPoly->AddChanal(Formula);
+ Formula='['+QString().setNum(SerPoly->Ch)+']';
+
+ SerPoly->FilterPix(NoBlackPix,Formula,0,WBI);//меньше
+ for(quint64 i=0;i<SerPoly->W*SerPoly->H;i++)
+ {
+  NoBlackPix[i]=false;
+  if(SerPoly->ClassifMass[i]>=0)
+   NoBlackPix[i]=true;
+ }
+
+ bool *MaskCh;
+ float *DataSpec;
+ int NChAKF=0;
+
+ int NAKF1=this->GdalImage->DetermNCh(625);
+ int NAKF2=this->GdalImage->DetermNCh(750);
+ int NAKFStop=this->GdalImage->DetermNCh(670);
+
+ MaskCh=new bool[SerPoly->Ch];
+
+ for(int i=0;i<SerPoly->Ch;i++)
+ {
+  MaskCh[i]=false;
+  if(i>=NAKF1 && i<=NAKF2)
+  {
+   MaskCh[i]=true;
+   NChAKF++;
+  }
+ }
+
+ DataSpec=new float[NChAKF];
+ DNMathAdd MathAdd;
+ float AKFVol,MinAkfVol;
+
+
+ for(int x=0;x<SerPoly->W;x++)
+ {
+  for(int y=0;y<SerPoly->H;y++)
+  {
+   if(SerPoly->ClassifMass[x+y*SerPoly->W]>=0)
+   {
+    SerPoly->GetSpectrPoint(x+SerPoly->xn,y+SerPoly->yn,DataSpec,MaskCh);
+    for(int i=1;i<NAKF2-NAKFStop;i++)
+    {
+     float *AKFfunk1=new float[NChAKF-i];
+     float *AKFfunk2=new float[NChAKF-i];
+
+     for(int j=0;j<NChAKF-i;j++)
+     {
+      AKFfunk1[j]=DataSpec[j];
+      AKFfunk2[j]=DataSpec[i+j];
+     }//for(int j=0;j<NChAKF-i;j++)
+     AKFVol=MathAdd.CalcCorel(NChAKF-i,AKFfunk1,AKFfunk2);
+     if(i==1 || (i!=1 && AKFVol<MinAkfVol))
+     {
+      MinAkfVol=AKFVol;
+     }
+     delete[] AKFfunk1;
+     delete[] AKFfunk2;
+    }
+    if(MinAkfVol>AKFMin)
+     SerPoly->ClassifMass[x+y*SerPoly->W]=-1;
+   }//if(SerPoly->ClassifMass[x+y*SerPoly->W]>=0)
+  }//for(y=0;y<SerPoly->H;y++)
+ }//for(x=0;x<SerPoly->W;x++)
+ delete[] DataSpec;
+ delete[] MaskCh;
+
  {
   QDir Dir;
   if(!Dir.exists(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly))
