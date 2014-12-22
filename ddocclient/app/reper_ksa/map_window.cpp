@@ -78,7 +78,7 @@ MapWindow::MapWindow(QWidget* parent, Qt::WFlags fl)
     addToolBar(mpToolBars.value("mpLayerEditsToolBar"));
     addToolBar(mpToolBars.value("mpTaskToolBar"));
 
-    statusBar()->showMessage("ПК Репер готов к работе.");
+    statusBar()->showMessage("МПС Репер-ОЭ готов к работе.");
 }
 
 MapWindow::~MapWindow()

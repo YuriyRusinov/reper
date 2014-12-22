@@ -1,4 +1,4 @@
-#include "dn/Added/First/dncalcstring.h"
+#include "Added/First/dncalcstring.h"
 
 DNCalcString::DNCalcString()
 {
@@ -244,3 +244,5 @@ float DNCalcString::F_sqrt(QString Str)
   return result;
  }
 }
+
+

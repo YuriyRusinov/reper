@@ -264,7 +264,7 @@ void KKSGISWidgetBase::initQGIS()
     editorWidgetRegistry->registerWidget( "RelationReference", new QgsRelationReferenceFactory( context, tr( "Relation Reference" ) ) );
 
     if(mpStatusBar && m_bWithAddons)
-        mpStatusBar->showMessage("ПК Репер готов к работе.");
+        mpStatusBar->showMessage("МПС Репер-ОЭ готов к работе.");
 
     m_bInit = true;
 }
@@ -1294,7 +1294,7 @@ void KKSGISWidgetBase::initMapTools()
 void KKSGISWidgetBase::azSetTitleWindow(QWidget & azApp)
 
 {
-      QString caption = "ПК Репер";
+      QString caption = "МПС Репер-ОЭ";
       QFileInfo projectFileInfo( QgsProject::instance()->fileName() );
       if ( QgsProject::instance()->title().isEmpty() )
       {

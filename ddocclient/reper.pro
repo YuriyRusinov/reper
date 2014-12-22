@@ -10,7 +10,7 @@ SUBDIRS += \
             ./mgrlibs/kkscoreapplication \
             ./ddocplugins/radio_image \
             ./app/reper_ksa
-#            ./app/reper_app
+            ./app/reper_app
 
 RESOURCES = ./ddocs_ico/ddocs_icon_set.qrc
 

@@ -75,7 +75,7 @@ DNPoly::DNPoly(QString SerFileName)
  this->px=0;
  for(i=0;i<this->W*this->H;i++)
  {
-  if(this->MassPoly>=0)
+  if(this->MassPoly[i]>=0)
    this->px++;
  }
 
@@ -89,7 +89,104 @@ DNPoly::~DNPoly()
  this->pt.clear();
 
  if(this->ClassifMass!=NULL)
+ {
   delete[] this->ClassifMass;
+  this->ClassifMass=NULL;
+ }
+ //this->ClassifMass=NULL;
+}
+
+/*Определить окружение точки*/
+QList<QPoint> DNPoly::DefinePixels(int NumPixels,int x,int y)
+{
+ //QList<QPoint> DefPix;
+
+ bool *Prover;
+ bool *NoBlackPixels;
+
+ QPoint Pix1,Pix2;
+ int i,j_x,j_y;
+ int xP2,yP2,NullB;
+ quint64 KolvoPix;
+ QList <QPoint> PixSteck,DefPix;
+ int dx[4],dy[4];
+ dx[0]=0;
+ dx[1]=1;
+ dx[2]=0;
+ dx[3]=-1;
+
+ dy[0]=-1;
+ dy[1]=0;
+ dy[2]=1;
+ dy[3]=0;
+
+ PixSteck.clear();
+ DefPix.clear();
+
+ Prover=new bool[this->W*this->H];
+ NoBlackPixels=new bool[this->W*this->H];
+ KolvoPix=0;
+ for(j_y=0;j_y<this->H;j_y++)
+ {
+  for(j_x=0;j_x<this->W;j_x++)
+  {
+   Prover[j_x+j_y*this->W]=FALSE;
+   NoBlackPixels[j_x+j_y*this->W]=FALSE;
+  }//for(j_x=0;j_x<this->W;j_x++)
+ }//for(j_y=0;j_y<this->H;j_y++)
+
+
+ Pix1.setX(x);
+ Pix1.setY(y);
+ Prover[x+y*this->W]=TRUE;
+ PixSteck<<Pix1;
+ DefPix<<Pix1;
+ NoBlackPixels[x+y*this->W]=TRUE;
+
+ while(PixSteck.size()>0 &&DefPix.size()<NumPixels)
+ {
+  Pix1=PixSteck[0];
+  xP2=Pix1.x();
+  yP2=Pix1.y();
+
+  if(NoBlackPixels[xP2+this->W*yP2]==TRUE)
+  {
+   KolvoPix++;
+   PixSteck.removeFirst();
+   for(i=0;i<4;i++)
+   {
+    NullB=0;
+    if((Pix1.x()+dx[i]<this->W)&&(Pix1.x()+dx[i]>0)&&
+       (Pix1.y()+dy[i]<this->H)&&(Pix1.y()+dy[i]>0)&&
+       (NoBlackPixels[Pix1.x()+dx[i]+(Pix1.y()+dy[i])*this->W]==FALSE)&&
+       (Prover[Pix1.x()+dx[i]+(Pix1.y()+dy[i])*this->W]==FALSE))
+    {
+     xP2=Pix1.x()+dx[i];
+     yP2=Pix1.y()+dy[i];
+     NullB=1;
+     Prover[Pix1.x()+dx[i]+(Pix1.y()+dy[i])*this->W]=TRUE;
+    }
+    if(NullB==1)
+    {
+     if(this->ClassifMass[Pix1.x()+dx[i]+(Pix1.y()+dy[i])*this->W]>=0)
+     {
+      Pix2.setX(xP2);
+      Pix2.setY(yP2);
+      PixSteck<<Pix2;
+      DefPix<<Pix2;
+      NoBlackPixels[xP2+(this->W*yP2)]=TRUE;
+     }//if(FirstPix==AtherPix)
+    }//if(NullB==1)
+   }//for(i=0;i<4;i++)
+  }//if(NoBlackPixels[xP2+this->W*yP2]==TRUE)
+  else
+   PixSteck.removeFirst();
+ }//while(PixSteck.size()>0)
+
+ delete[] Prover;
+ delete[] NoBlackPixels;
+ PixSteck.clear();
+ return DefPix;
 }
 
 /*Функции определения спектральных характеристик*/
@@ -131,6 +228,33 @@ void DNPoly::GetSpectrPoint(int x,int y,float *DataSpec,bool *MaskCh)
  }//for(i=0;i<this->Ch;i++)
  delete[] SpecPoint;
 }
+void DNPoly::GetDerivatSpectrPoint(int x,int y,int nCh1,int nCh2,float *LamMass,float *DerivatData)
+{
+ bool *MaskCh;
+ MaskCh=new bool[this->Ch];
+ int iCh=0;
+ for(int i=0;i<this->Ch;i++)
+ {
+  if(i>=nCh1 && i<=nCh2)
+  {
+   MaskCh[i]=true;
+   iCh++;
+  }
+  else
+   MaskCh[i]=false;
+ }//for(int i=0;i<this->Ch;i++)
+ float *DataSpec;
+ DataSpec=new float[iCh];
+ GetSpectrPoint(x,y,DataSpec,MaskCh);
+
+ for(int i=0;i<iCh-1;i++)
+ {
+  DerivatData[i]=(DataSpec[i+1]-DataSpec[i])/(LamMass[i+1]-LamMass[i]);
+ }
+ delete[] MaskCh;
+ delete[] DataSpec;
+}
+
 /*Взять спектр строки*/
 void DNPoly::GetSpectrString(int y,float *DataSpec,bool *MaskCh)
 {
@@ -223,7 +347,7 @@ void DNPoly::GetBrigthChanPoly(float *DataSpec,int nCh,bool *NoBlackPixels)
 {
  int jx,jy,i,xn,yn,xk,yk;
  float *SpecString;
- unsigned long long ip;
+ quint64 ip;
  bool *MaskCh,ynOgr=FALSE,isXTrue;
 
  MaskCh=new bool[this->Ch];
@@ -279,6 +403,7 @@ void DNPoly::GetBrigthChanPoly(float *DataSpec,int nCh,bool *NoBlackPixels)
    }//if(PolyPix[jx+jy*this->W])
   }//for(jx=0;jx<this->W;jx++)
  }//for(jy=0;jy<this->H;jy++)
+
  delete[]SpecString;
  delete[]MaskCh;
 }
@@ -433,6 +558,56 @@ float DNPoly::GetSKOPoint(int x,int y,int nPixels,int NumCh)
  SelectPix.clear();
  return SKOPix[0];
 }
+
+float DNPoly::GetAKFPoint(int x,int y,int Side,float *Mask,int NumCh)
+{
+ bool *MaskCh;
+ bool IsAreaFool;
+ float *Brigth,*SpectrStr;
+ float Korel=-2;
+ MaskCh=new bool[this->Ch];
+ Brigth=new float[Side*Side];
+ SpectrStr=new float[W];
+ memset(MaskCh,0,this->Ch*sizeof(bool));
+ MaskCh[NumCh]=TRUE;
+ int xB=(x-Side/2)-xn;
+ int yB=(y-Side/2)-yn;
+
+ IsAreaFool=TRUE;
+ for(int i=xB;i<xB+Side;i++)
+ {
+  for(int j=yB;j<yB+Side;j++)
+  {
+   if(i>=W || j>=H || i<0 || j<0 || ClassifMass[i+j*W]<0)
+    IsAreaFool=FALSE;
+  }//for(int j=yB;j<Side;j++)
+ }//for(int i=xB;i<Side;i++)
+
+ if(IsAreaFool)
+ {
+  int n;
+  n=0;
+  for(int j=yB;j<yB+Side;j++)
+  {
+   GetSpectrString(j+yn,SpectrStr,MaskCh);
+   for(int i=xB;i<xB+Side;i++)
+   {
+    Brigth[n]=SpectrStr[i];
+    n++;
+   }//for(i=xB-xn;i<(xB-xn)+Side;i++)
+  }//for(int j=yB;j<Side;j++)
+
+
+
+
+  Korel=Math.CalcCorel(Side*Side,Mask,Brigth);
+ }//if(IsAreaFool)
+ delete[] MaskCh;
+ delete[] Brigth;
+ delete[] SpectrStr;
+ return Korel;
+}
+
 /*Функции работы с полигонами*/
 /*Выделить полигон к которому принадлежит заданная точка (получить массив NoBlackPixels)*/
 quint64 DNPoly::GetKolvoPointPoly(int x,int y,int *MassIsh,bool *NoBlackPixels)
@@ -619,6 +794,181 @@ void DNPoly::GetEntropPoly(bool *NoBlackPixels,unsigned long long KolvoPixPoly, 
 
  delete[] DataSpec;
 }
+//Функции экспорта и импорта полигонов
+void DNPoly::PolygonExpGeo(QString FileName, double xTopLeft,double XD,double XAngle,double yTopLeft,double YD,double yAngle, QString NameClassif)
+{
+// if(FileName.indexOf(".gp"),FileName.length()-4)
+//  FileName+=".gp";
+ /*Запись координат угловых точек*/
+ QFile ExpFilePoly(FileName);
+ int pX,pY;
+ double *gX,*gY;
+ gX=new double[this->KolvoPix];
+ gY=new double[this->KolvoPix];
+ ExpFilePoly.open(QIODevice::Truncate|QIODevice::WriteOnly);
+ for(int i=0;i<this->KolvoPix;i++)
+ {
+  double xGeo,yGeo;
+  pX=this->pt[i].x()/*+this->xn*/;
+  pY=this->pt[i].y()/*+this->yn*/;
+  this->PixToGeo(pX,pY,xTopLeft,XD,XAngle,yTopLeft,YD,yAngle,&xGeo,&yGeo);
+  gX[i]=xGeo;
+  gY[i]=yGeo;
+ }//for(int i=0;i<this->KolvoPix;i++)
+ ExpFilePoly.write((char*)&this->KolvoPix,sizeof(int));
+ ExpFilePoly.write((char*)gX,sizeof(double)*this->KolvoPix);
+ ExpFilePoly.write((char*)gY,sizeof(double)*this->KolvoPix);
+
+ /*Запись точек классификатора*/
+ if(NameClassif!="")
+ {
+  quint64 KPix=0;
+  for(quint64 i=0;i<this->W*this->H;i++)
+  {
+   if(ClassifMass[i]>=0)
+    KPix++;
+  }
+  ExpFilePoly.write((char*)&KPix,sizeof(quint64));
+  for(int x=0;x<this->W;x++)
+  {
+   for(int y=0;y<this->H;y++)
+   {
+    if(ClassifMass[x+y*this->W]>=0)
+    {
+     double xGeo,yGeo;
+     this->PixToGeo(x+xn,y+yn,xTopLeft,XD,XAngle,yTopLeft,YD,yAngle,&xGeo,&yGeo);
+     ExpFilePoly.write((char*)&xGeo,sizeof(double));
+     ExpFilePoly.write((char*)&yGeo,sizeof(double));
+    }
+   }//for(int y=0;y<this->H;y++)
+  }//for(int x=0;x<this->W;x++)
+  //ExpFilePoly.write((char*)&NameClassif.size(),sizeof(int));
+  ExpFilePoly.write(NameClassif.toAscii());
+
+ }//if(NameClassif!="")
+ else
+ {
+  quint64 KPix=0;
+  ExpFilePoly.write((char*)&KPix,sizeof(quint64));
+ }//else
+ ExpFilePoly.close();
+ delete[] gX;
+ delete[] gY;
+}
+QList<QPoint> DNPoly::PolygonImpGeo(QString FileName, double xTopLeft,double XD,double XAngle,double yTopLeft,double YD,double yAngle,bool **ClMass,QString *ClassName)
+{
+ QList <QPoint> pt;
+// *ClMass=new bool[200];
+// for(int i=0;i<200;i++)
+//     (*ClMass)[i]=false;
+ QPoint ptOne;
+ int KolvoPix,IntX,IntY;
+ double *GeoX,*GeoY;
+ double xp,yp;
+ //bool *ClMassDub;
+
+ QFile ImpFilePoly(FileName);
+ ImpFilePoly.open(QIODevice::ReadOnly);
+ ImpFilePoly.read((char*)&KolvoPix,sizeof(int));
+ GeoX=new double[KolvoPix];
+ GeoY=new double[KolvoPix];
+ ImpFilePoly.read((char*)GeoX,sizeof(double)*KolvoPix);
+ ImpFilePoly.read((char*)GeoY,sizeof(double)*KolvoPix);
+
+ int XMax,YMax,XMin,YMin;
+ for(int i=0;i<KolvoPix;i++)
+ {
+  GeoToPix(&xp,&yp,xTopLeft,XD,XAngle,yTopLeft,YD,yAngle,GeoX[i],GeoY[i]);
+  IntX=xp;
+  IntY=yp;
+  ptOne.setX(xp);
+  ptOne.setY(yp);
+  pt<<ptOne;
+  if(i==0)
+  {
+   XMax=IntX;
+   YMax=IntY;
+   XMin=IntX;
+   YMin=IntY;
+  }//if(i==0)
+  else
+  {
+   if(IntX>XMax)
+    XMax=IntX;
+   if(IntX<XMin)
+    XMin=IntX;
+
+   if(IntY>YMax)
+    YMax=IntY;
+   if(IntY<YMin)
+    YMin=IntY;
+  }//else
+ }//for(int i=0;i<KolvoPix;i++)
+ int W,H;
+ W=XMax-XMin;
+ H=YMax-YMin;
+ quint64 KPix;
+ ImpFilePoly.read((char*)&KPix,sizeof(quint64));
+ *ClMass=new bool[W*H];
+ if(KPix!=0)
+ {
+  for(quint64 i=0;i<W*H;i++)
+   (*ClMass)[i]=false;
+
+  for(quint64 i=0;i<KPix;i++)
+  {
+   double GX,GY;
+   ImpFilePoly.read((char*)&GX,sizeof(double));
+   ImpFilePoly.read((char*)&GY,sizeof(double));
+   GeoToPix(&xp,&yp,xTopLeft,XD,XAngle,yTopLeft,YD,yAngle,GX,GY);
+   IntX=xp-XMin;
+   IntY=yp-YMin;
+   (*ClMass)[IntX+W*IntY]=true;
+  }
+ }//if(KPix!=0)
+// QByteArray ByteArray;
+
+ // //ImpFilePoly.read(ByteArray);
+ QString proba;
+ char *pr;
+ pr=new char[ImpFilePoly.size()-ImpFilePoly.pos()];
+ int NameSize=(ImpFilePoly.size()-ImpFilePoly.pos())*sizeof(char);
+ ImpFilePoly.read((char*)pr,NameSize);
+ ClassName->clear();
+ *ClassName=QString::fromUtf8(pr,NameSize);
+ ImpFilePoly.close();
+ delete[] pr;
+ return pt;
+}
+QList<QPoint> DNPoly::PolygonImpGeo(QString FileName, double xTopLeft,double XD,double XAngle,double yTopLeft,double YD,double yAngle)
+{
+ QList <QPoint> pt;
+ QPoint ptOne;
+ int KolvoPix,IntX,IntY;
+ double *GeoX,*GeoY;
+ double xp,yp;
+
+ QFile ImpFilePoly(FileName);
+ ImpFilePoly.open(QIODevice::ReadOnly);
+ ImpFilePoly.read((char*)&KolvoPix,sizeof(int));
+ GeoX=new double[KolvoPix];
+ GeoY=new double[KolvoPix];
+ ImpFilePoly.read((char*)GeoX,sizeof(double)*KolvoPix);
+ ImpFilePoly.read((char*)GeoY,sizeof(double)*KolvoPix);
+
+ for(int i=0;i<KolvoPix;i++)
+ {
+  GeoToPix(&xp,&yp,xTopLeft,XD,XAngle,yTopLeft,YD,yAngle,GeoX[i],GeoY[i]);
+  IntX=xp;
+  IntY=yp;
+  ptOne.setX(xp);
+  ptOne.setY(yp);
+  pt<<ptOne;
+ }//for(int i=0;i<KolvoPix;i++)
+ ImpFilePoly.close();
+ return pt;
+}
+
 /*Функции работы с классами*/
 quint64 DNPoly::GetKolvoPointClass(int NumKl,int *MassIsh,bool *NoBlackPixels)
 {
@@ -927,6 +1277,80 @@ void DNPoly::AddIntegralChanal(int nCh1,int nCh2)
  delete[] SpecStringNew;
 }
 
+void DNPoly::AddIntegralChanal(int nCh1,int nCh2,float *LamMass)
+{
+ PolygonProp HeaderStruct;
+ bool *MaskCh;
+ float *SpecString,*SpecStringNew;
+ float Brigth;
+ float DeltaL;
+
+ MaskCh=new bool[this->Ch];
+ SpecString=new float[this->W*this->Ch];
+ SpecStringNew=new float [this->W*(this->Ch+1)];
+
+ for(int i=0;i<this->Ch;i++)
+  MaskCh[i]=TRUE;
+
+ HeaderStruct.xn=this->xn;
+ HeaderStruct.yn=this->yn;
+ HeaderStruct.W=this->W;
+ HeaderStruct.H=this->H;
+ HeaderStruct.KCh=this->Ch+1;
+ HeaderStruct.KPix=this->KolvoPix;
+
+ QFile SerFile(this->PathTempFile+"//Temp.pol");
+ SerFile.open(QIODevice::Truncate|QIODevice::WriteOnly);
+
+ SerFile.write((char*)&HeaderStruct,sizeof(PolygonProp));
+ SerFile.write((char*)this->MassPoly,sizeof(int)*W*H);
+
+ int i=0;
+ int xc,yc;
+ while(i<pt.size())
+ {
+  xc=this->pt[i].x();
+  yc=this->pt[i].y();
+  SerFile.write((char*)&xc,sizeof(int));
+  SerFile.write((char*)&yc,sizeof(int));
+  i++;
+ }//while(i<this->KolvoPixPoly)
+
+ for(int jy=0;jy<this->H;jy++)
+ {
+  this->GetSpectrString(jy+this->yn,SpecString,MaskCh);
+  for(int jx=0;jx<this->W;jx++)
+  {
+   Brigth=0;
+   for(int iCh=nCh1;iCh<nCh2;iCh++)
+   {
+    DeltaL=LamMass[(iCh-nCh1)+1]-LamMass[iCh-nCh1];
+//    QMessageBox msg;
+//    msg.setText(QString().setNum(nCh2-nCh1)+"\n"+QString().setNum(LamMass[(iCh-nCh1)+1],'d',3));
+//    msg.exec();
+    Brigth+=SpecString[iCh+jx*this->Ch]*DeltaL/(LamMass[nCh2-nCh1]-LamMass[0]);
+   }
+   for(int iCh=0;iCh<this->Ch;iCh++)
+   {
+    SpecStringNew[iCh+jx*(this->Ch+1)]=SpecString[iCh+jx*this->Ch];
+   }//for(int iCh=0;iCh<this->Ch;iCh++)
+   SpecStringNew[this->Ch+jx*(this->Ch+1)]=Brigth;
+  }//for(int jx=0;jx<this->W;jx++)
+  SerFile.write((char*)SpecStringNew,sizeof(float)*W*(this->Ch+1));
+ }//for(int jy=0;jy<this->H;jy++)
+
+ SerFile.close();
+
+ QFile::remove(this->SerFileName);
+ QFile::rename(this->PathTempFile+"//Temp.pol",this->SerFileName);
+
+ this->Ch=this->Ch+1;
+
+ delete[] MaskCh;
+ delete[] SpecString;
+ delete[] SpecStringNew;
+}
+
 void DNPoly::CreateIndexImg(QString BMPFileName,int NumCh)
 {
     FILEHEADER bfhFile;
@@ -1193,6 +1617,123 @@ void DNPoly::AddSKOChanal(int nPixels, int NumCh)
  delete[] SpecStringNew;
  delete[] SpecPoint;
 }
+
+/*Добавить канал значений автокорреляции*/
+void DNPoly::AddAKFChanal(int Side, int NumCh,int xb,int yb)
+{
+ bool *MaskCh;
+ float *SpecString,*SpecStringNew;
+ float *SpecPoint;
+ float *MaskAKF;
+ MaskAKF=new float[Side*Side];
+ int xish,yish;
+ xish=xb;
+ yish=yb;
+ xb=(xb-Side/2)-xn;
+ yb=(yb-Side/2)-yn;
+
+
+
+ bool IsAreaFool=TRUE;
+ for(int i=xb;i<xb+Side;i++)
+ {
+  for(int j=yb;j<yb+Side;j++)
+  {
+   if(i>=W || j>=H || ClassifMass[i+j*W]<0)
+    IsAreaFool=FALSE;
+  }//for(int j=yB;j<Side;j++)
+ }//for(int i=xB;i<Side;i++)
+
+ if(IsAreaFool)
+ {
+  MaskCh=new bool[this->Ch];
+  SpecString=new float[this->W*this->Ch];
+  SpecStringNew=new float [this->W*(this->Ch+1)];
+  SpecPoint=new float[this->Ch];
+
+  for(int i=0;i<this->Ch;i++)
+  {
+   MaskCh[i]=TRUE;
+  }
+
+  int n;
+  n=0;
+  for(int j=yb;j<yb+Side;j++)
+  {
+   GetSpectrString(j+yn,SpecString,MaskCh);
+   for(int i=xb;i<xb+Side;i++)
+   {
+    MaskAKF[n]=SpecString[NumCh+i*Ch];
+    n++;
+   }//for(i=xB-xn;i<(xB-xn)+Side;i++)
+  }//for(int j=yB;j<Side;j++)
+
+  PolygonProp HeaderStruct;
+
+
+  HeaderStruct.xn=this->xn;
+  HeaderStruct.yn=this->yn;
+  HeaderStruct.W=this->W;
+  HeaderStruct.H=this->H;
+  HeaderStruct.KCh=this->Ch+1;
+  HeaderStruct.KPix=this->KolvoPix;
+
+  QFile SerFile(this->PathTempFile+"//Temp.pol");
+  SerFile.open(QIODevice::Truncate|QIODevice::WriteOnly);
+
+  SerFile.write((char*)&HeaderStruct,sizeof(PolygonProp));
+  SerFile.write((char*)this->MassPoly,sizeof(int)*W*H);
+
+  int i=0;
+  int xc,yc;
+  while(i<pt.size())
+  {
+   xc=this->pt[i].x();
+   yc=this->pt[i].y();
+   SerFile.write((char*)&xc,sizeof(int));
+   SerFile.write((char*)&yc,sizeof(int));
+   i++;
+  }//while(i<this->KolvoPixPoly)
+
+  for(int jy=0;jy<this->H;jy++)
+  {
+   this->GetSpectrString(jy+yn,SpecString,MaskCh);
+   for(int jx=0;jx<this->W;jx++)
+   {
+    for(int iCh=0;iCh<this->Ch;iCh++)
+    {
+     SpecStringNew[iCh+jx*(this->Ch+1)]=SpecString[iCh+jx*this->Ch];
+    }//for(int iCh=0;iCh<this->Ch;iCh++)
+
+    SpecStringNew[this->Ch+jx*(this->Ch+1)]=this->GetAKFPoint(jx+xn,jy+yn,Side,MaskAKF,NumCh);
+//    if(/*jx+xn==xish && jy+yn==yish*/SpecStringNew[this->Ch+jx*(this->Ch+1)]==1.)
+//    {
+//     QMessageBox msg;
+//     msg.setText(QString().setNum(jx+xn)+"\n"+QString().setNum(jy+yn));
+//     msg.exec();
+//    }
+
+   }//for(int jx=0;jx<this->W;jx++)
+   SerFile.write((char*)SpecStringNew,sizeof(float)*W*(this->Ch+1));
+  }//for(int jy=0;jy<this->H;jy++)
+
+  SerFile.close();
+
+  QFile::remove(this->SerFileName);
+  QFile::rename(this->PathTempFile+"//Temp.pol",this->SerFileName);
+
+  this->Ch=this->Ch+1;
+
+  delete[] SpecString;
+  delete[] SpecStringNew;
+  delete[] SpecPoint;
+ }//if(IsAreaFool)
+ delete[] MaskAKF;
+ QMessageBox msg;
+ msg.setText("Процесс завершен");
+ msg.exec();
+}
+
 float DNPoly::CalcMidleBrigth(int NumCh1,int NumCh2,float *SpecData)
 {
  int KolvCh=NumCh2-NumCh1+1;
@@ -1207,6 +1748,7 @@ float DNPoly::CalcMidleBrigth(int NumCh1,int NumCh2,float *SpecData)
 
 /*Функции фильтрации каналов*/
 /*Линейная фильтрация*/
+/*Для канала*/
 float* DNPoly::LinearFilter(int side,float *Apert,float Kof,int NumCh)
 {
  float *NewCh;
@@ -1241,17 +1783,14 @@ float* DNPoly::LinearFilter(int side,float *Apert,float Kof,int NumCh)
     {
      float Summ=0;
      int i=0;
-     for(int xs=x-(int)n/2;xs<=x+(int)n/2;xs++)
+     for(int xs=x-(int)n/2;xs<x+(int)n/2;xs++)
      {
-      for(int ys=y-(int)n/2;ys<=y+(int)n/2;ys++)
+      for(int ys=y-(int)n/2;ys<y+(int)n/2;ys++)
       {
        Summ+=Brith[xs+this->W*ys]*Apert[i];
        i++;
       }//for(int ys=y-(int)n/2;ys<y+(int)n/2;y++)
      }//for(int xs=x-(int)n/2;xs<x+(int)n/2;x++)
-//     QMessageBox msg;
-//     msg.setText(QString().setNum(i));
-//     msg.exec();
      Summ=Summ*Kof;
      NewCh[x+this->W*y]=Summ;
 
@@ -1263,130 +1802,58 @@ float* DNPoly::LinearFilter(int side,float *Apert,float Kof,int NumCh)
  delete Brith;
  return NewCh;
 }
-/*Нелинейная фильтрация*/
-void DNPoly::MedianFilter(int side)
+
+/*Для массива классификации*/
+void DNPoly::LinearFilter(int side,int *Apert,float Kof)
 {
- int *MatrFilter=new int[side*side];
- int *NewMass=new int[this->W*this->H];
- int SredZnach=((side*side)-1)/2;
+ int *NewClassMass;
+ NewClassMass=new int[this->W*this->H];
  int n=side;
+
  for(quint64 i=0;i<this->W*this->H;i++)
-  NewMass[i]=-1;
+  NewClassMass[i]=-1;
 
  for(int y=(int)n/2;y<this->H-(int)n/2;y++)
  {
   for(int x=(int)n/2;x<this->W-(int)n/2;x++)
   {
-   if(this->ClassifMass[x+this->W*y]>=0)
+   if(ClassifMass[x+this->W*y]>=0)
    {
     bool BlackPix=FALSE;
     for(int xs=x-(int)n/2;xs<x+(int)n/2;xs++)
     {
      for(int ys=y-(int)n/2;ys<y+(int)n/2;ys++)
      {
-      if(this->ClassifMass[xs+this->W*ys]<0)
+      if(ClassifMass[xs+this->W*ys]<0)
        BlackPix=TRUE;
      }//for(int ys=y-(int)n/2;ys<y+(int)n/2;y++)
     }//for(int xs=x-(int)n/2;xs<x+(int)n/2;x++)
     if(!BlackPix)
     {
+     int Summ=0;
      int i=0;
-     for(int xs=x-(int)n/2;xs<=x+(int)n/2;xs++)
+     for(int xs=x-(int)n/2;xs<x+(int)n/2;xs++)
      {
-      for(int ys=y-(int)n/2;ys<=y+(int)n/2;ys++)
+      for(int ys=y-(int)n/2;ys<y+(int)n/2;ys++)
       {
-       MatrFilter[i]=this->ClassifMass[xs+this->W*ys];
+       Summ+=ClassifMass[xs+this->W*ys]*Apert[i];
        i++;
       }//for(int ys=y-(int)n/2;ys<y+(int)n/2;y++)
      }//for(int xs=x-(int)n/2;xs<x+(int)n/2;x++)
-
-
-     /*Сортировка массива фильтра*/
-     int var;
-     for(int j_y2=0;j_y2<side*side;j_y2++)
-     {
-      for(int j_x2=0;j_x2<side*side-1;j_x2++)
-      {
-       if(MatrFilter[j_x2]>MatrFilter[j_x2+1])
-       {
-        var=MatrFilter[j_x2];
-        MatrFilter[j_x2]=MatrFilter[j_x2+1];
-        MatrFilter[j_x2+1]=var;
-       }//if(MatrFilter[j_x2]>MatrFilter[j_x2+1])
-      }
-     }
-     NewMass[x+y*this->W]=MatrFilter[SredZnach];
+     Summ=Summ*Kof;
+     NewClassMass[x+this->W*y]=Summ;
     }//if(!BlackPix)
    }//if(Brith[x+this->W*y]>=0)
   }//for(int x=0;x<this->W;x++)
  }//for(int y=0;y<this->H;y++)
 
  for(quint64 i=0;i<this->W*this->H;i++)
-  this->ClassifMass[i]=NewMass[i];
-
- delete[] NewMass;
- delete[] MatrFilter;
+ {
+  ClassifMass[i]=NewClassMass[i];
+ }
+ delete[] NewClassMass;
 }
 
-/*Медианный фильтр*/
-//void DNPoly::MedianFilter(int *Mass,int side,int W,int H,int x1,int y1)
-//{
-// int i,j_x1,j_y1,j_x2,j_y2,OstX,OstY;
-// int *WindowF,var,SredZnach;
-// int *MassReturn;
-// WindowF=new int[side*side];
-// OstX=W-side+1;
-// OstY=H-side+1;
-// MassReturn=new int[OstX*OstY];
-// SredZnach=((side*side)-1)/2;
-// for(j_y1=0;j_y1<OstY;j_y1++)
-// {
-//  for(j_x1=0;j_x1<OstX;j_x1++)
-//  {
-//   /*Формирование массива фильтра*/
-//   for(j_y2=j_y1;j_y2<j_y1+side;j_y2++)
-//   {
-//    for(j_x2=j_x1;j_x2<j_x1+side;j_x2++)
-//    {
-//	 WindowF[(j_x2-j_x1)+(j_y2-j_y1)*side]=Mass[(j_x2+x1)+(j_y2+y1)*this->Width];
-//	}
-//   }//Конец формирования массива фильтра
-
-//   /*Сортировка массива фильтра*/
-//   for(j_y2=0;j_y2<side*side;j_y2++)
-//   {
-//    for(j_x2=0;j_x2<side*side-1;j_x2++)
-//    {
-//     if(WindowF[j_x2]>WindowF[j_x2+1])
-//     {
-//      var=WindowF[j_x2];
-//	  WindowF[j_x2]=WindowF[j_x2+1];
-//	  WindowF[j_x2+1]=var;
-//     }
-//    }
-//   }
-//   MassReturn[j_x1+j_y1*OstX]=WindowF[SredZnach];
-//  }
-// }
-
-///*Переделываем исходный массив*/
-// for(j_y1=0;j_y1<H;j_y1++)
-// {
-//  for(j_x1=0;j_x1<W;j_x1++)
-//  {
-//   if(j_y1<(H-OstY)/2 || j_y1>=H-((H-OstY)/2))
-//	Mass[(j_x1+x1)+(j_y1+y1)*this->Width]=-5;
-//   if(j_x1<(W-OstX)/2 || j_x1>=W-((W-OstX)/2))
-//	Mass[(j_x1+x1)+(j_y1+y1)*this->Width]=-5;
-
-//   if(j_x1>=(W-OstX)/2 && j_x1<W-((W-OstX)/2) && j_y1>=(H-OstY)/2 && j_y1<H-((H-OstY)/2))
-//   {
-//	Mass[(j_x1+x1)+(j_y1+y1)*this->Width]=MassReturn[(j_x1-((W-OstX)/2))+(j_y1-((H-OstY)/2))*OstX];
-//   }
-//  }
-// }
-// delete[] WindowF;
-//}
 /***********************************************************************************/
 
 /*Методы селекции и выделения*/
@@ -2049,6 +2516,271 @@ int DNPoly::SAM(bool *NoBlackPixels,QStringList PolyFileNames,bool IsSKOEnabled,
  return PolyFileNames.size();
 }
 
+/*Метод MaxLike*/
+void DNPoly::MaxLike(bool *NoBlackPixels,QStringList PolyFileNames,bool *MaskCh)
+{
+ DNPoly *ThisPoly;
+ int KolvoCh;
+ quint64 KolPoint;
+ KolvoCh=0;
+ int ProgR,ProgCV;
+
+ //Определение количества каналов
+ for(int i=0; i<this->Ch;i++)
+ {
+  if(MaskCh[i])
+   KolvoCh++;
+ }
+
+ ProgR=PolyFileNames.size()+this->H;
+ ProgCV=0;
+ emit ChangeProgressVal(ProgR,ProgCV);
+
+ //Открытие заданных полигонов и определение ключевых параметров
+ QList <float*> CovarMatrixs;
+ QList <float*> ObrCovMatr;
+ QList <float*> MLam;
+ QList <float> OpredCovMatr;
+
+ for(int i=0;i<PolyFileNames.size();i++)
+ {
+  CovarMatrixs<<new float[KolvoCh*KolvoCh];
+  ObrCovMatr<<new float[KolvoCh*KolvoCh];
+  MLam<<new float[KolvoCh];
+  ThisPoly=new DNPoly(PolyFileNames[i]);
+
+//  if(ThisPoly->Ch==this->Ch)
+  {
+   //Определение количества точек в полигоне
+   KolPoint=0;
+   for(quint64 ip=0;ip<ThisPoly->W*ThisPoly->H;ip++)
+   {
+    if(ThisPoly->CurrentPoly[ip])
+     KolPoint++;
+   }//for(quint64 ip=0;ip<ThisPoly->W*ThisPoly->H;ip++)
+
+   //Получение спектральных характеристик полигона
+   float *DataSpec;
+   DataSpec=new float[KolPoint*KolvoCh];
+   ThisPoly->GetSpectrZone(DataSpec,MaskCh);
+
+   //Расчёт средних значений яркостей точек полигона в каждом канале
+   for(int iCh=0;iCh<KolvoCh;iCh++)
+   {
+    MLam[i][iCh]=0;
+    for(quint64 ip=0;ip<KolPoint;ip++)
+    {
+     MLam[i][iCh]+=DataSpec[iCh+ip*KolvoCh]/KolPoint;
+    }//for(quint64 ip=0;ip<KolPoint;ip++)
+   }//for(int iCh=0;iCh<KolvoCh;iCh++)
+
+   //Рассчёт Ковариационных матриц
+   Math.MatrTranspon(DataSpec,KolvoCh,KolPoint);
+   Math.CalcCovMatr(KolPoint,KolvoCh,DataSpec,CovarMatrixs[CovarMatrixs.size()-1]);
+
+   delete[] DataSpec;
+  }//if(ThisPoly->Ch==this->Ch)
+//  else
+//  {
+//   QMessageBox msg;
+//   msg.setText(tr("Количество каналов эталона\n")+PolyFileNames[i]+"\n"+tr("Несоответствует классифицируемому изображению"));
+//   msg.exec();
+//  }
+  delete ThisPoly;
+  ProgCV++;
+  emit ChangeProgressVal(ProgR,ProgCV);
+ }//for(int i=0;i<PolyFileNames.size();i++)
+
+ //Приведение ковариационных матриц
+// float MaxCovEl,MaxCovMatr;
+
+ for(int i=0;i<PolyFileNames.size();i++)
+ {
+  for(int j=0;j<KolvoCh*KolvoCh;j++)
+   ObrCovMatr[i][j]=CovarMatrixs[i][j];
+
+  Math.MatrInverse(ObrCovMatr[i],KolvoCh);
+  OpredCovMatr<<Math.CalcOpredMatr(KolvoCh,CovarMatrixs[i]);
+ }//for(int i=0;i<PolyFileNames.size();i++)
+
+ //Классификация точек текущего полигона
+ float *SpecString;
+ float *Mass;
+ float pi,MaxPi;
+ float *RaznMatr;
+ float *MultMatr;
+ MultMatr=new float[1];
+ SpecString=new float[this->W*KolvoCh];
+ Mass=new float[KolvoCh];
+ RaznMatr=new float[KolvoCh];
+ for(int jy=0;jy<this->H;jy++)
+ {
+  this->GetSpectrString(jy+this->yn,SpecString,MaskCh);
+
+  for(int jx=0;jx<this->W;jx++)
+  {
+  this->ClassifMass[jx+jy*this->W]=-1;
+   if(NoBlackPixels[jx+jy*this->W])
+   {
+    for(int iCh=0;iCh<KolvoCh;iCh++)
+    {
+     Mass[iCh]=SpecString[iCh+jx*KolvoCh];
+    }//for(int iCh=0;iCh<KolvoCh;iCh++)
+    MaxPi=-1;
+
+    for(int i=0;i<PolyFileNames.size();i++)
+    {
+     for(int j=0;j<KolvoCh;j++)
+      RaznMatr[j]=fabs(MLam[i][j]-Mass[j]);
+
+     MultMatr=Math.MatrMulti(Math.MatrMulti(RaznMatr,KolvoCh,1,ObrCovMatr[i],KolvoCh,KolvoCh),KolvoCh,1,RaznMatr,1,KolvoCh);
+     if(OpredCovMatr[i]!=0)
+      pi=(1/(pow((float)OpredCovMatr[i],(float)0.5)*pow(2*3.14,KolvoCh/2.)))*exp((-0.5)*MultMatr[0]);
+     else
+      pi=0;
+
+//     QMessageBox msg;
+//     msg.setText(QString().setNum(MultMatr[0],'g',5));
+//     msg.exec();
+
+     if(pi>MaxPi)
+     {
+      MaxPi=pi;
+      this->ClassifMass[jx+jy*this->W]=i;
+     }//if(pi>MaxPi)
+    }//for(i=0;i<MLam.size();i++)
+   }//if(NoBlackPixels[jx+jy*this->W])
+  }//for(int jx=0;jx<this->W;jx++)
+  ProgCV++;
+  emit ChangeProgressVal(ProgR,ProgCV);
+ }//for(int jy=0;jy<this->H;jy++)
+
+ this->IsPolyClassif=TRUE;
+
+ for(int i=0;i<MLam.size();i++)
+ {
+  delete[] MLam[i];
+  delete[] CovarMatrixs[i];
+  delete[] ObrCovMatr[i];
+ }
+ MLam.clear();
+ OpredCovMatr.clear();
+ CovarMatrixs.clear();
+ ObrCovMatr.clear();
+
+ delete[] SpecString;
+ delete[] Mass;
+ delete[] RaznMatr;
+ delete[] MultMatr;
+}
+
+/*Субпиксельный анализ*/
+float* DNPoly::SubPixAnalis(QList <float*> SpectrObj,int NumCh, bool *MaskCh)
+{
+ float *DataSpec;
+ DataSpec=new float[NumCh];
+
+// for(int i=0;i<this->Ch;i++)
+// {
+//  if(MaskCh[i])
+//  {
+//   QMessageBox msg;
+//   msg.setText(QString().setNum(i)/*QString().setNum(DataSpec[j],'d',3)+"\n"+QString().setNum(SpectrObj[i][j],'d',3)*/);
+//   msg.exec();
+//  }
+// }
+
+ float *D,*L;
+ //L=new float[SpectrObj.size()*SpectrObj.size()];
+ float *Matr1;
+ float *Matr2;
+
+ Matr1=new float[SpectrObj.size()*NumCh];
+ Matr2=new float[SpectrObj.size()*NumCh];
+
+ for(int i=0;i<SpectrObj.size();i++)
+ {
+  for(int j=0;j<NumCh;j++)
+  {
+   Matr1[j+i*NumCh]=SpectrObj[i][j];
+   Matr2[i+j*SpectrObj.size()]=SpectrObj[i][j];
+  }
+ }
+ D=Math.MatrMulti(Matr2,SpectrObj.size(),NumCh,Matr1,NumCh,SpectrObj.size());
+ Math.MatrInverse(D,NumCh);
+ L=Math.MatrMulti(D,NumCh,NumCh,Matr2,SpectrObj.size(),NumCh);
+ delete[] D;
+ QList <float*> Etol;
+
+ for(int i=0;i<SpectrObj.size();i++)
+ {
+  Etol<<new float[NumCh];
+  for(int j=0;j<NumCh;j++)
+  {
+   Etol[Etol.size()-1][j]=L[i+j*SpectrObj.size()];
+//   QMessageBox msg;
+//   msg.setText(QString().setNum(Etol[Etol.size()-1][j],'d',3));
+//   msg.exec();
+  }
+ }//for(int i=0;i<SpectrObj.size();i++)
+ delete[] L;
+
+ float *CprojMass;
+// float SummSq;
+ float CprojMax;
+ int NumCMax;
+ float Cproj/*=new float[SpectrObj.size()]*/;
+ CprojMass=new float[W*H];
+ for(int x=0;x<W;x++)
+ {
+  for(int y=0;y<H;y++)
+  {
+   CprojMass[x+y*W]=-1.;
+   if(ClassifMass[x+y*W]>=0)
+   {
+//    float *Cproj;
+    GetSpectrPoint(x+xn,y+yn,DataSpec,MaskCh);
+//    Cproj=Math.MatrMulti(L,SpectrObj.size(),NumCh,DataSpec,NumCh,1);
+////    QMessageBox msg;
+////    msg.setText(QString().setNum(DataSpec[0],'d',3)/*+"\n"+QString().setNum(SpectrObj[i][j],'d',3)*/);
+////    msg.exec();
+
+    CprojMax=0;
+    NumCMax=0;
+    for(int i=0;i<SpectrObj.size();i++)
+    {
+     Cproj=Math.VectorProjection(DataSpec,Etol[i],NumCh);
+//     SummSq=0;
+//     for(int j=0;j<NumCh;j++)
+//     {
+//      Cproj[i]+=DataSpec[j]*SpectrObj[i][j];
+//      SummSq+=SpectrObj[i][j];
+//     }//for(j=0;j<NumCh;j++)
+//     SummSq=sqrt(SummSq);
+//     Cproj[i]=Cproj[i]/SummSq;
+     if(i==0)
+      CprojMax=Cproj;
+     if(Cproj>CprojMax)
+     {
+      CprojMax=Cproj;
+      NumCMax=i;
+     }//if(Cproj[i]>CprojMax)
+    }//for(i=0;i<SpectrObj.size();i++)
+//    CprojMass[x+y*W]=CprojMax;
+//    ClassifMass[x+y*W]=NumCMax;
+   }//if(ClassifMass[i]>=0)
+  }//for(int y=0;y<H;y++)
+ }//for(int x=0;x<W;x++)
+
+ delete[] DataSpec;
+
+ for(int i=0;i<Etol.size();i++)
+  delete[] Etol[i];
+ Etol.clear();
+
+ return CprojMass;
+}
+
 /*Фильтр*/
 void DNPoly::FilterPix(bool *NoBlackPixels,QString Formula,int Usl, float Value2)
 {
@@ -2419,7 +3151,7 @@ void DNPoly::Batinometr()
    this->ClassifMass[x+y*this->W]=-1;
    if(this->MassPoly[x+y*this->W]>=0)
    {
-    this->ClassifMass[x+y*this->W]=3; //Всё остальное
+    this->ClassifMass[x+y*this->W]=1; //Всё остальное
     if(Brigth[1+x*nCh.size()]>0.01)
      this->ClassifMass[x+y*this->W]=0; //Мокрофиты
     if(Brigth[x*nCh.size()]>0.03)
@@ -2485,11 +3217,8 @@ void DNPoly::Batinometr()
   }//for(int x=0;x<this->W;x++)
  }//for(int y=0;y<this->H;y++)
 
- if(HMax!=HMin && (HMax-HMin)/0.5>=10)
+ if(HMax!=HMin)
   Kof=(HMax-HMin)/10;
-
- if(HMax!=HMin && (HMax-HMin)/0.5<10)
-  Kof=0.5;
 
  this->KofV=Kof;
  this->MinV=HMin;
@@ -2549,7 +3278,7 @@ void DNPoly::Batinometr(int N590,int N830,int N900,
    this->ClassifMass[x+y*this->W]=-1;
    if(this->MassPoly[x+y*this->W]>=0)
    {
-    this->ClassifMass[x+y*this->W]=3; //Всё остальное
+    this->ClassifMass[x+y*this->W]=1; //Всё остальное
     if(Brigth[1+x*nCh.size()]>0.01)
      this->ClassifMass[x+y*this->W]=0; //Мокрофиты
     if(Brigth[x*nCh.size()]>0.03)
@@ -2566,9 +3295,6 @@ void DNPoly::Batinometr(int N590,int N830,int N900,
  MaskCh=this->FillMaskCh(nCh);
  Brigth=new float[this->W*nCh.size()];
  float *NewCh=new float[this->W*this->H];
- float AddSpec[6]={0.0276,0.0265,0.031,0.033,0.033,0.0336};
-
-
 
  DNTheam Theam;
  for(int y=0;y<this->H;y++)
@@ -2578,13 +3304,6 @@ void DNPoly::Batinometr(int N590,int N830,int N900,
   {
    if(this->MassPoly[x+y*this->W]>=0)
    {
-    if(this->IshCh==290)
-    {
-     for(int i=0;i<nCh.size();i++)
-     {
-      Brigth[x*nCh.size()+i]=Brigth[x*nCh.size()+i]-AddSpec[i];
-     }//for(int i=0;i<nCh.size();i++)
-    }//if(this->IshCh==290)
     NewCh[x+y*this->W]=Theam.Batinometr(ClassifMass[x+y*this->W],
                                         Brigth[x*nCh.size()+1],
                                         Brigth[x*nCh.size()+3],
@@ -2625,11 +3344,8 @@ void DNPoly::Batinometr(int N590,int N830,int N900,
   }//for(int x=0;x<this->W;x++)
  }//for(int y=0;y<this->H;y++)
 
- if(HMax!=HMin && (HMax-HMin)/0.5>=10)
+ if(HMax!=HMin)
   Kof=(HMax-HMin)/10;
-
- if(HMax!=HMin && (HMax-HMin)/0.5<10)
-  Kof=0.5;
 
  this->KofV=Kof;
  this->MinV=HMin;
@@ -2652,14 +3368,802 @@ void DNPoly::Batinometr(int N590,int N830,int N900,
  this->CreateIndexImg("Batinometr.bmp",this->Ch-1);
 }
 
+void DNPoly::MaskAreaMS(float DeltaMS,int TypeFone,int Nnir1,int Nnir2,int Nred,int Ngr,float IndexPor,float LRM, float AreaPor)
+{
+ /*Этап 1 Рассчёт многоспектральных индексов и фильтрация точек по значениям этих индексов*/
+ QString Formula;
+  if(TypeFone==0)
+  Formula="(["+QString().setNum(Nred+1)+"]-["+QString().setNum(Ngr+1)+"]-["+QString().setNum(Nnir1+1)+"]+["+QString().setNum(Nred+1)+"])/"+
+          "(["+QString().setNum(Nred+1)+"]-["+QString().setNum(Ngr+1)+"]+["+QString().setNum(Nnir1+1)+"]-["+QString().setNum(Nred+1)+"])";
+
+// if(TypeFone==1)
+//  Formula="(["+QString().setNum(Nnir2+1)+"]-["+QString().setNum(Nnir1+1)+"])/"+
+//          "(["+QString().setNum(Nnir2+1)+"]+["+QString().setNum(Nnir1+1)+"])";
+
+ if(TypeFone==2)
+  Formula="(["+QString().setNum(Nnir1+1)+"]-["+QString().setNum(Nred+1)+"])/"+
+          "(["+QString().setNum(Nnir1+1)+"]+["+QString().setNum(Nred+1)+"])";
+
+// if(this->Ch==this->IshCh)
+ AddChanal(Formula);
+
+ bool *NoBlackPix;
+ NoBlackPix=new bool[this->W*this->H];
+
+ for(quint64 i=0;i<this->W*this->H;i++)
+ {
+  NoBlackPix[i]=false;
+  if(ClassifMass[i]>=0)
+   NoBlackPix[i]=true;
+ }
+
+ Formula='['+QString().setNum(this->Ch)+']';
+
+FilterPix(NoBlackPix,Formula,0,IndexPor+DeltaMS);
+ for(quint64 i=0;i<this->W*this->H;i++)
+ {
+  NoBlackPix[i]=false;
+  if(ClassifMass[i]>=0)
+   NoBlackPix[i]=true;
+ }
+ FilterPix(NoBlackPix,Formula,1,IndexPor-DeltaMS);
+
+// if(TypeFone==2)
+// {
+//  Formula="(["+QString().setNum(Nred+1)+"]-["+QString().setNum(Ngr+1)+"]-["+QString().setNum(Nnir1+1)+"]+["+QString().setNum(Nred+1)+"])/"+
+//          "(["+QString().setNum(Nred+1)+"]-["+QString().setNum(Ngr+1)+"]+["+QString().setNum(Nnir1+1)+"]-["+QString().setNum(Nred+1)+"])";
+//  AddChanal(Formula);
+// }
+
+// if(TypeFone==1)
+// {
+//  FilterPix(NoBlackPix,Formula,0,IndexPor[i]+DeltaMS[i]);
+//  for(quint64 i=0;i<this->W*this->H;i++)
+//  {
+//   NoBlackPix[i]=false;
+//   if(ClassifMass[i]>=0)
+//    NoBlackPix[i]=true;
+//  }
+//  FilterPix(NoBlackPix,Formula,1,IndexPor[i]-DeltaMS[i]);
+// }//if(TypeFone==1)
+
+//  if(TypeFone==2)
+//  {
+//   FilterPix(NoBlackPix,Formula,0,IndexPor[i]+DeltaMS[i]);
+//   for(quint64 i=0;i<this->W*this->H;i++)
+//   {
+//    NoBlackPix[i]=false;
+//    if(ClassifMass[i]>=0)
+//     NoBlackPix[i]=true;
+//   }
+//   FilterPix(NoBlackPix,Formula,1,IndexPor[i]-DeltaMS[i]);
+//  }//if(TypeFone==2)
+
+// for(quint64 j=0;j<W*H;j++)
+// {
+//  if(ClassifMass[j]>=0)
+//   ClassifMassMask[j]=i;
+// }//for(quint64 j=0;j<W*H;j++)
+
+
+
+// for(quint64 j=0;j<W*H;j++)
+// {
+//  ClassifMass[j]=ClassifMassMask[j];
+// }//for(quint64 j=0;j<W*H;j++)
+
+// delete[] ClassifMassMask;
+ delete[] NoBlackPix;
+
+// QMessageBox msg;
+// msg.setText("dsdsdsdsdsdsds");
+// msg.exec();
+
+ /*Этап 2 ФотоФильтрация результатов классификации*/
+// int *Apert;
+// int n=3;
+// Apert=new int[n*n];
+
+// for(int i=0;i<n*n;i++)
+// {
+//  Apert[i]=1;
+// }
+// LinearFilter(n,Apert,(1./(n*n)));
+// delete[] Apert;
+
+
+ /*Этап 3 Фильтрация по размеру*/
+// NoBlackPix=new bool[this->W*this->H];
+// bool *ProvPix;
+// quint64 KPix,KPixPor;
+// float PixPor=AreaPor/(LRM*LRM);
+// KPixPor=PixPor;
+// ProvPix=new bool[this->W*this->H];
+
+//// QMessageBox msg;
+//// msg.setText("Третий этап");
+//// msg.exec();
+
+// for(quint64 i=0;i<this->W*this->H;i++)
+// {
+//  NoBlackPix[i]=false;
+//  ProvPix[i]=true;
+//  if(ClassifMass[i]>=0)
+//   ProvPix[i]=false;
+// }
+
+//// QMessageBox msg;
+//// msg.setText("Четвертый этап");
+//// msg.exec();
+
+// for(quint32 x=0; x<this->W;x++)
+// {
+//  for(quint32 y=0; y<this->H;y++)
+//  {
+//   if(!ProvPix[x+y*this->W])
+//   {
+//    ProvPix[x+y*this->W]=true;
+//    KPix=0;
+//    KPix=GetKolvoPointPoly(x+xn,y+yn,ClassifMass,NoBlackPix);
+
+////    QMessageBox msg;
+////    msg.setText(QString().setNum(KPix));
+////    msg.exec();
+
+//    for(quint64 i=0;i<this->W*this->H;i++)
+//    {
+//     if(NoBlackPix[i])
+//     {
+//      ProvPix[i]=/*ProvPix[i]|*/NoBlackPix[i];
+//      if(KPix<KPixPor && NoBlackPix[i])
+//      {
+//       ClassifMass[i]=-1;
+//      }//if(KPix<KPixPor && NoBlackPix[i])
+//     }//if(NoBlackPix[i])
+//    }//for(quint64 i=0;i<this->W*this->H;i++)
+//   }//if(!ProvPix[x+y*this->W])
+//  }//for(quint32 y=0; y<this->H;y++)
+// }//for(quint32 x=0; x<this->W;x++)
+
+//// QMessageBox msg;
+//// msg.setText("Пятый этап");
+//// msg.exec();
+
+// delete[] NoBlackPix;
+// delete[] ProvPix;
+}
+void DNPoly::MaskAreaGS(QString ClsId,QList<QString> ClsBackgroId,
+                        float DeltaGS,int TypeFone,int N705,int N750,int N1000,float GSIndexPor,float SubPixPor,float *LamMass,float MaxDerivant,int NDif1,int NDif2,
+                        float *LamMassSubPix,QList <int> NumChSubPix)
+{
+ /*Этап 4 Рассчёт гиперспектральных индексов*/
+ QString Formula;
+ if(TypeFone==0 || TypeFone==2)
+  Formula="(["+QString().setNum(N750+1)+"]-["+QString().setNum(N705+1)+"])/"+
+          "(["+QString().setNum(N750+1)+"]+["+QString().setNum(N705+1)+"])";
+
+ if(TypeFone==1)
+  Formula="(["+QString().setNum(N1000+1)+"]-["+QString().setNum(N750+1)+"])/"+
+          "(["+QString().setNum(N1000+1)+"]+["+QString().setNum(N750+1)+"])";
+
+// if(this->Ch==this->IshCh)
+  AddChanal(Formula);
+
+ bool *NoBlackPix;
+ NoBlackPix=new bool[this->W*this->H];
+
+ for(quint64 i=0;i<this->W*this->H;i++)
+ {
+  NoBlackPix[i]=false;
+  if(ClassifMass[i]>=0)
+   NoBlackPix[i]=true;
+ }
+
+ Formula='['+QString().setNum(this->Ch)+']';
+
+ FilterPix(NoBlackPix,Formula,0,GSIndexPor+DeltaGS);
+ for(quint64 i=0;i<this->W*this->H;i++)
+ {
+  NoBlackPix[i]=false;
+  if(ClassifMass[i]>=0)
+   NoBlackPix[i]=true;
+ }
+ FilterPix(NoBlackPix,Formula,1,GSIndexPor-DeltaGS);
+
+ delete[] NoBlackPix;
+
+
+ /*Этап 5 построение производной функции спектра и сравнение с максимальным значением*/
+ if(NDif1>=0 && NDif2>0)
+ {
+//  QMessageBox msg;
+//  msg.setText(QString().setNum(NDif1)+"\n"+QString().setNum(NDif2));
+//  msg.exec();
+
+  float *DataSpec;
+  float *MaxDerivantData;
+  bool *MaskCh;
+  MaskCh=new bool[this->Ch];
+  DataSpec=new float[2];
+  for(int i=0;i<this->Ch;i++)
+   MaskCh[i]=false;
+
+  MaskCh[NDif1]=true;
+  MaskCh[NDif2]=true;
+
+//  DNMathAdd MathAdd;
+//  DerivantData=new float [NDif2-NDif1];
+  MaxDerivantData=new float[W*H];
+  for(int x=0;x<this->W;x++)
+  {
+   for(int y=0;y<this->H;y++)
+   {
+    //GetDerivatSpectrPoint(x+xn,y+yn,NDif1,NDif2,LamMass,DerivantData);
+    GetSpectrPoint(x+xn,y+yn,DataSpec,MaskCh);
+    MaxDerivantData[x+y*W]=DataSpec[0]-DataSpec[1]/*MathAdd.GetMax(DerivantData,NDif2-NDif1)*/;
+//    QMessageBox msg;
+//    msg.setText(QString().setNum(DataSpec[0],'d',3)+"\n"+QString().setNum(DataSpec[1],'d',3));
+//    msg.exec();
+    if(ClassifMass[x+y*W]>=0)
+     if(MaxDerivantData[x+y*W]<MaxDerivant)
+      ClassifMass[x+y*W]=-1;
+   }//for(int y=0;y<this->H;y++)
+  }//for(int x=0;x<this->W;x++)
+  AddChanal(MaxDerivantData);
+
+  delete[] DataSpec;
+  delete[] MaxDerivantData;
+  delete[] MaskCh;
+ }//if(NDif1>=0 && NDif2>0)
+
+ /*Субпиксельный анализ*/
+ QList <float> SpectrObj;
+ QList <float*> SpectrSub;
+ float *SubPixMass;
+ float *Spec;
+ bool *MaskCh;
+ MaskCh=new bool[this->Ch];
+ Spec=new float[NumChSubPix.size()];
+ for(int i=0;i<this->Ch;i++)
+  MaskCh[i]=false;
+
+ for(int i=0;i<NumChSubPix.size();i++)
+ {
+  SpectrObj=BdSpectr->GetBrightLamda(LamMassSubPix[i],ClsId,ClsBackgroId);
+  Spec[i]=0;
+  int NB=0;
+  for(int j=0;j<SpectrObj.size();j++)
+   if(SpectrObj[j]>=0)
+   {
+    Spec[i]+=SpectrObj[j];
+    NB++;
+   }
+  Spec[i]=Spec[i]/NB;
+  MaskCh[NumChSubPix[i]]=true;
+ }
+
+ SpectrSub<<Spec;
+//  Spec=SpectrObj[i]
+
+// for(quint64 i=0;i<W*H;i++)
+// {
+//  if(ClassifMass[i]<0)
+//   ClassifMass[i]=10;
+// }
+ SubPixMass=new float[W*H];
+ //SubPixMass=SubPixAnalis(SpectrSub,NumChSubPix.size(),MaskCh);
+// bool *MaskCh;
+// MaskCh=new bool[Ch];
+// for(int i=0;i<Ch;i++)
+//  MaskCh[i]=false;
+
+// for(int i=0;i<NumChSubPix.size();i++)
+//  MaskCh[i]=false;
+// for(int x=0;x<W;x++)
+// {
+//  for(int y=0;y<H;y++)
+//  {
+//   float *DataSpec;
+//   DataSpec=new float[NumChSubPix.size()];
+//   GetSpectrPoint(x+xn,y+yn,DataSpec,MaskCh);
+//   SubPixMass[x+y*W]=Math.VectorProjection(DataSpec,Spec,NumChSubPix.size());
+////   QMessageBox msg;
+////   msg.setText(QString().setNum(SubPixMass[x+y*W],'d',3));
+////   msg.exec();
+//  }
+// }
+
+// for(quint64 i=0;i<W*H;i++)
+// {
+//  if(ClassifMass[i]>=0)
+//  {
+//   if(SubPixMass[i]>=SubPixPor)
+//    ClassifMass[i]=0;
+//   else
+//    ClassifMass[i]=-1;
+//  }
+// }
+// AddChanal(SubPixMass);
+ delete[] SubPixMass;
+ delete[] MaskCh;
+
+}
+
+void DNPoly::RoutMoveTap1(int Ngreen,int Nred,int Nnir,int NredEdge,float NDVIpor,int NumCl,float MaxSKO,float Qc,int I)
+{
+ bool *NoBlackPix;
+ NoBlackPix=new bool[this->W*this->H];
+
+ /*Этап 1 Получение NDVI изображения и фильтрация растительности*/
+ {
+  QString Formula;
+  Formula="(["+QString().setNum(Nnir+1)+"]-["+QString().setNum(Nred+1)+"])/"+
+          "(["+QString().setNum(Nnir+1)+"]+["+QString().setNum(Nred+1)+"])";
+
+
+//  if(this->Ch==this->IshCh)
+   AddChanal(Formula);
+
+
+  for(quint64 i=0;i<this->W*this->H;i++)
+  {
+   NoBlackPix[i]=false;
+   if(ClassifMass[i]>=0)
+    NoBlackPix[i]=true;
+  }
+
+  Formula='['+QString().setNum(this->Ch)+']';
+  FilterPix(NoBlackPix,Formula,1,NDVIpor);
+
+  for(quint64 i=0;i<this->W*this->H;i++)
+  {
+   NoBlackPix[i]=false;
+   if(ClassifMass[i]>=0)
+    NoBlackPix[i]=true;
+  }
+ }
+
+ /*Этап 2 Классификация ИСОДАТОЙ*/
+ {
+  bool *MaskCh;
+  MaskCh=new bool[Ch];
+  for(int i=0;i<Ch;i++)
+  {
+   MaskCh[i]=false;
+   if(i==Ngreen || i==Nred || i==Nnir || i==NredEdge)
+    MaskCh[i]=true;
+  }
+  IsoData(NoBlackPix,NumCl,MaxSKO,Qc,I,MaskCh);
+  delete[] MaskCh;
+ }
+
+ /*Этап 3 ФотоФильтрация результатов классификации*/
+ {
+  int *Apert;
+  int n=5;
+  Apert=new int[n*n];
+
+  for(int i=0;i<n*n;i++)
+  {
+   Apert[i]=1;
+  }
+  LinearFilter(n,Apert,(1./(n*n)));
+  delete[] Apert;
+ }
+
+ delete[] NoBlackPix;
+}
+
+void DNPoly::RoutMoveTap2(int N630,int N690,int N750,int N860,int N720,int N800,int N900,int N970,
+                          float NDVIPor1,float DeltaNDVIPor1,float NDVIPor2,float DeltaNDVIPor2,float NDVIPor3,float DeltaNDVIPor3,float WBIPor)
+{
+ //Рассчет многоспектральных признаков
+ int N630_690,N750_860,N690_720,N720_800,N800_900;
+
+ AddIntegralChanal(N630,N690);
+ N630_690=Ch-1;
+
+ AddIntegralChanal(N750,N860);
+ N750_860=Ch-1;
+
+ AddIntegralChanal(N690,N720);
+ N690_720=Ch-1;
+
+ AddIntegralChanal(N720,N800);
+ N720_800=Ch-1;
+
+ AddIntegralChanal(N800,N900);
+ N800_900=Ch-1;
+
+ int NNDVI1,NNDVI2,NNDVI3,WBI;
+
+ QString Formula;
+ Formula="(["+QString().setNum(N750_860+1)+"]-["+QString().setNum(N630_690+1)+"])/"+
+         "(["+QString().setNum(N750_860+1)+"]+["+QString().setNum(N630_690+1)+"])";
+ AddChanal(Formula);
+ NNDVI1=Ch;
+
+ Formula="(["+QString().setNum(N750_860+1)+"]-["+QString().setNum(N690_720+1)+"])/"+
+         "(["+QString().setNum(N750_860+1)+"]+["+QString().setNum(N690_720+1)+"])";
+ AddChanal(Formula);
+ NNDVI2=Ch;
+
+ Formula="(["+QString().setNum(N800_900+1)+"]-["+QString().setNum(N720_800+1)+"])/"+
+         "(["+QString().setNum(N800_900+1)+"]+["+QString().setNum(N720_800+1)+"])";
+ AddChanal(Formula);
+ NNDVI3=Ch;
+
+ Formula='['+QString().setNum(N900+1)+"]/["+QString().setNum(N970+1)+']';
+ AddChanal(Formula);
+ WBI=Ch;
+
+ bool *NoBlackPix;
+ NoBlackPix=new bool[this->W*this->H];
+ QStringList Formuls;
+ QString DataFormula;
+
+ DataFormula='['+QString().setNum(NNDVI1)+']';
+ Formuls<<DataFormula;
+ DataFormula='['+QString().setNum(NNDVI2)+']';
+ Formuls<<DataFormula;
+ DataFormula='['+QString().setNum(NNDVI3)+']';
+ Formuls<<DataFormula;
+ DataFormula='['+QString().setNum(WBI)+']';
+ Formuls<<DataFormula;
+
+ float Indexes[3],Delta[3];
+ Indexes[0]=NDVIPor1;
+ Indexes[1]=NDVIPor2;
+ Indexes[2]=NDVIPor3;
+ Delta[0]=DeltaNDVIPor1;
+ Delta[1]=DeltaNDVIPor2;
+ Delta[2]=DeltaNDVIPor3;
+ for(quint64 i=0;i<this->W*this->H;i++)
+ {
+  NoBlackPix[i]=false;
+  if(ClassifMass[i]>=0)
+   NoBlackPix[i]=true;
+ }
+
+
+ for(int j=0;j<Formuls.size()-1;j++)
+ {
+  FilterPix(NoBlackPix,Formuls[j],0,Indexes[j]+Delta[j]);
+  for(quint64 i=0;i<this->W*this->H;i++)
+  {
+   NoBlackPix[i]=false;
+   if(ClassifMass[i]>=0)
+    NoBlackPix[i]=true;
+  }
+  FilterPix(NoBlackPix,Formuls[j],1,Indexes[j]-Delta[j]);
+  for(quint64 i=0;i<this->W*this->H;i++)
+  {
+   NoBlackPix[i]=false;
+   if(ClassifMass[i]>=0)
+    NoBlackPix[i]=true;
+  }
+ }
+
+ FilterPix(NoBlackPix,Formuls[3],1,WBIPor);
+
+ delete[] NoBlackPix;
+}
+
+void DNPoly::SmocesTap1(int Nred,int Nnir,float NDVIPor)
+{
+ QString Formula;
+ Formula="(["+QString().setNum(Nnir+1)+"]-["+QString().setNum(Nred+1)+"])/"+
+         "(["+QString().setNum(Nnir+1)+"]+["+QString().setNum(Nred+1)+"])";
+ AddChanal(Formula);
+
+
+
+ //Алгоритм релаксационной разметки
+ bool *NoBlackPix;
+ NoBlackPix=new bool[W*H];
+
+
+ FilterPix(CurrentPoly,'['+QString().setNum(Nnir+1)+']',1,0);
+
+ for(quint64 i=0;i<W*H;i++)
+ {
+  NoBlackPix[i]=false;
+  if(ClassifMass[i]>=0)
+   NoBlackPix[i]=true;
+ }
+
+ FilterPix(NoBlackPix,'['+QString().setNum(Nred+1)+']',1,0);
+
+ quint64 KPix=0;
+ for(quint64 i=0;i<W*H;i++)
+ {
+  NoBlackPix[i]=false;
+  if(ClassifMass[i]>=0)
+  {
+   NoBlackPix[i]=true;
+   KPix++;
+  }
+ }
+
+ FilterPix(NoBlackPix,'['+QString().setNum(Ch)+']',0,NDVIPor);
+
+// float *DataSpec;
+// DataSpec=new float[KPix];
+
+// GetBrigthChanPoly(DataSpec,Ch-1,NoBlackPix);
+// float MinB,MaxB,MidlB;
+// MinB=DataSpec[0];
+// MaxB=DataSpec[0];
+// MidlB=DataSpec[0];
+
+// for(quint64 i=1;i<KPix;i++)
+// {
+//  if(DataSpec[i]<MinB)
+//   MinB=DataSpec[i];
+//  if(DataSpec[i]>MaxB)
+//   MaxB=DataSpec[i];
+
+//  MidlB+=DataSpec[i];
+// }
+// MidlB=MidlB/KPix;
+
+// bool Flag=false;
+// //int KolvoIt=0;
+// float *OldP,*NewP;
+// OldP=new float[2*KPix];
+// NewP=new float[2*KPix];
+
+// quint64 KolPx=0;
+// for(quint64 i=0;i<W*H;i++)
+// {
+//  if(NoBlackPix[i])
+//  {
+//   if(DataSpec[KolPx]<=MidlB)
+//   {
+//    NewP[2*KolPx]=(DataSpec[KolPx]-MinB)/(MidlB-MinB);
+//    NewP[2*KolPx+1]=(MidlB-DataSpec[KolPx])/(MidlB-MinB);
+//   }
+//   else
+//   {
+//    NewP[2*KolPx]=(DataSpec[KolPx]-MidlB)/(MaxB-MidlB);
+//    NewP[2*KolPx+1]=(MaxB-DataSpec[KolPx])/(MaxB-MidlB);
+//   }
+//   KolPx++;
+//  }//if(CurrentPoly)
+// }//for(quint64 i=0;i<W*H;i++)
+
+// delete[] DataSpec;
+// int KolIter=0;
+// do{
+//    Flag=false;
+//    float Q1=0,Q2=0;
+//    for(quint64 i=0;i<KPix;i++)
+//    {
+//     Q1+=NewP[2*i];
+//     Q2+=NewP[2*i+1];
+//     OldP[2*i]=NewP[2*i];
+//     OldP[2*i+1]=NewP[2*i+1];
+//    }
+
+//    for(quint64 i=0;i<KPix;i++)
+//    {
+//     NewP[2*i]=(OldP[2*i]*(Q1+1))/((OldP[2*i]*(Q1+1))+(OldP[2*i+1]*(Q2+1)));
+//     NewP[2*i+1]=(OldP[2*i+1]*(Q2+1))/((OldP[2*i]*(Q1+1))+(OldP[2*i+1]*(Q2+1)));
+//     if(fabs(NewP[2*i]-OldP[2*i])>0.1 || fabs(NewP[2*i+1]-OldP[2*i+1])>0.1)
+//      Flag=true;
+//    }
+//    KolIter++;
+
+
+//   }while(Flag && KolIter<10);
+
+// KolPx=0;
+// for(quint64 i=0;i<W*H;i++)
+// {
+//  if(NoBlackPix[i])
+//  {
+//   if(NewP[2*KolPx]>=NewP[2*KolPx+1])
+//    ClassifMass[i]=0;
+//   else
+//    ClassifMass[i]=1;
+//   KolPx++;
+//  }//if(CurrentPoly)
+// }//for(quint64 i=0;i<W*H;i++)
+// delete[] OldP;
+// delete[] NewP;
+// delete[] NoBlackPix;
+
+
+
+
+}
+
+void DNPoly::SmocesTap2(float R600Por,float KofCorrPor,int N600,int N500)
+{
+ bool *NoBlackPix;
+ bool *ProvPix;
+ bool *MaskCh1,*MaskCh2;
+ DNMathAdd MathAdd;
+ NoBlackPix=new bool[W*H];
+ ProvPix=new bool[W*H];
+ MaskCh1=new bool[Ch];
+ MaskCh2=new bool[Ch];
+
+ for(int i=0;i<Ch;i++)
+ {
+  MaskCh1[i]=false;
+  MaskCh2[i]=false;
+ }
+ MaskCh1[N600]=true;
+ MaskCh2[N500]=true;
+
+
+ for(quint64 i=0;i<W*H;i++)
+ {
+  ProvPix[i]=false;
+ }
+
+ for(int x=0;x<W;x++)
+ {
+  for(int y=0;y<H;y++)
+  {
+   if(ClassifMass[x+y*W]<0) ProvPix[x+W*y]=true;
+   if(ClassifMass[x+y*W]>=0 && !ProvPix[x+W*y])
+   {
+    GetKolvoPointPoly(x+xn,y+yn,ClassifMass,NoBlackPix);
+
+    quint64 KPix=0;
+    for(quint64 i=0;i<W*H;i++)
+    {
+     if(NoBlackPix[i])
+     {
+      ProvPix[i]=true;
+      KPix++;
+     }
+    }//for(quint64 i=0;i<W*H;i++)
+
+    float *MidleSpec;
+    double KofCorel;
+    bool IsSmouce=false;
+    MidleSpec=new float[1];
+
+    GetMidlSpecPoly(NoBlackPix,KPix,MidleSpec,MaskCh1);
+
+    if(MidleSpec[0]<R600Por)
+    {
+
+     float *DataSpec1,*DataSpec2;
+     DataSpec1=new float[KPix];
+     DataSpec2=new float[KPix];
+
+     GetBrigthChanPoly(DataSpec1,N600,NoBlackPix);
+     GetBrigthChanPoly(DataSpec2,N500,NoBlackPix);
+     KofCorel=MathAdd.CalcCorel(KPix,DataSpec1,DataSpec2);
+
+     if(KofCorel<KofCorrPor)
+      IsSmouce=true;
+     delete[] DataSpec1;
+     delete[] DataSpec2;
+    }//if(MidleSpec[0]<R600Por)
+    delete[] MidleSpec;
+
+    if(IsSmouce)
+    {
+     for(quint64 i=0;i<W*H;i++)
+     {
+      if(NoBlackPix[i])
+      {
+       ClassifMass[i]=10;
+      }
+     }//for(quint64 i=0;i<W*H;i++)
+    }//if(IsSmouce)
+    else
+    {
+     for(quint64 i=0;i<W*H;i++)
+     {
+      if(NoBlackPix[i])
+      {
+       ClassifMass[i]=-1;
+      }
+     }//for(quint64 i=0;i<W*H;i++)
+    }//else
+   }//if(ClassifMass[x+y*W]>=0 && !ProvPix[x+W*y])
+  }//for(int y=0;y<H;y++)
+ }//for(int x=0;x<W;x++)
+ delete[] NoBlackPix;
+ delete[] ProvPix;
+ delete[] MaskCh1;
+ delete[] MaskCh2;
+}
+
+void DNPoly::EmbedObjMS(int Nred,int Nnir,float NDVIPor,float DNDVI,int Nnir2,float B630_690,float B800_1100,float Cpor630_690,float Cpor800_1100)
+{
+ QString Formula;
+ Formula="(["+QString().setNum(Nnir+1)+"]-["+QString().setNum(Nred+1)+"])/"+
+         "(["+QString().setNum(Nnir+1)+"]+["+QString().setNum(Nred+1)+"])";
+ AddChanal(Formula);
+
+ bool *NoBlackPix;
+ NoBlackPix=new bool[this->W*this->H];
+
+ for(quint64 i=0;i<this->W*this->H;i++)
+ {
+  NoBlackPix[i]=false;
+  if(ClassifMass[i]>=0)
+   NoBlackPix[i]=true;
+ }
+
+ Formula='['+QString().setNum(this->Ch)+']';
+
+ FilterPix(NoBlackPix,Formula,0,NDVIPor+DNDVI);
+ for(quint64 i=0;i<this->W*this->H;i++)
+ {
+  NoBlackPix[i]=false;
+  if(ClassifMass[i]>=0)
+   NoBlackPix[i]=true;
+ }
+ FilterPix(NoBlackPix,Formula,1,NDVIPor-DNDVI);
+ for(quint64 i=0;i<this->W*this->H;i++)
+ {
+  NoBlackPix[i]=false;
+  if(ClassifMass[i]>=0)
+   NoBlackPix[i]=true;
+ }
+
+
+ Formula="(["+QString().setNum(Nred+1)+"]-"+QString().setNum(B630_690,'d',4)+")/"+
+         "(["+QString().setNum(Nred+1)+"]+"+QString().setNum(B630_690,'d',4)+")";
+
+ FilterPix(NoBlackPix,Formula,0,NDVIPor+DNDVI);
+ for(quint64 i=0;i<this->W*this->H;i++)
+ {
+  NoBlackPix[i]=false;
+  if(ClassifMass[i]>=0)
+   NoBlackPix[i]=true;
+ }
+ FilterPix(NoBlackPix,Formula,1,NDVIPor-DNDVI);
+ for(quint64 i=0;i<this->W*this->H;i++)
+ {
+  NoBlackPix[i]=false;
+  if(ClassifMass[i]>=0)
+   NoBlackPix[i]=true;
+ }
+
+ delete[] NoBlackPix;
+}
+
 /**********************************************************************************************************************************/
 
 //Векторизация
 void DNPoly::PixToGeo(int xp,int yp,double xTopLeft,double XD,double XAngle,double yTopLeft,double YD,double yAngle,double *xGeo,double *yGeo)
 {
- *xGeo=xTopLeft+xp*XD*cos(XAngle)-yp*YD*sin(XAngle);
- *yGeo=yTopLeft+yp*YD*cos(yAngle)-xp*XD*sin(yAngle);
+// *xGeo=xTopLeft+xp*XD*cos(XAngle)-yp*YD*sin(XAngle);
+// *yGeo=yTopLeft+yp*YD*cos(yAngle)-xp*XD*sin(yAngle);
+
+    *xGeo=xTopLeft+xp*XD+yp*XAngle;
+    *yGeo=yTopLeft+xp*yAngle+yp*YD;
+
+// QMessageBox msg;
+// msg.setText(QString().setNum(*xGeo,'d',6)+"      "+QString().setNum(*yGeo,'d',6));
+// msg.exec();
 }
+void DNPoly::GeoToPix(double *xp,double *yp,double xTopLeft,double XD,double XAngle,double yTopLeft,double YD,double yAngle,double xGeo,double yGeo)
+{
+ double /*A,B,C,D,*/ypp;
+// A=XD*cos(XAngle);
+// B=YD*sin(XAngle);
+// C=YD*cos(yAngle);
+// D=XD*sin(yAngle);
+
+ ypp=(yGeo-yTopLeft-xGeo*yAngle/XD+xTopLeft*yAngle/XD)/(YD-XAngle*yAngle/XD);
+
+
+// ypp=(yGeo-yTopLeft+D/A*xGeo-D/A*xTopLeft)/(C-D*B/A);
+ *yp=ypp;
+// *xp=(xGeo-xTopLeft+B*ypp)/A;
+ *xp=(xGeo-xTopLeft-ypp*XAngle)/XD;
+}
+
 QList <DNVector> DNPoly::RastrToVector(double xTopLeft,double XD,double XAngle,double yTopLeft,double YD,double YAngle,float Kof,float MinV, QString FileName)
 {
  using namespace std;
@@ -2697,7 +4201,7 @@ QList <DNVector> DNPoly::RastrToVector(double xTopLeft,double XD,double XAngle,d
  PointPlace Pix,Pix2;
  PointPlaceMass *ObjectKoord,*ObjectKoordUporadoch;
  PixArea *Points;
- std::vector <PointPlace> PixSteck;
+ vector<PointPlace> PixSteck;
 
  int *KolvoKraiPoint,*EllMass;
  int ObodX[4],ObodY[4],FlagArea=0;
@@ -3328,97 +4832,7 @@ QList <DNVector> DNPoly::RastrToVector(double xTopLeft,double XD,double XAngle,d
 
 //private
 //x и y в привате считаются от начала полигона
-QList<QPoint> DNPoly::DefinePixels(int NumPixels,int x,int y)
-{
- //QList<QPoint> DefPix;
 
- bool *Prover;
- bool *NoBlackPixels;
-
- QPoint Pix1,Pix2;
- int i,j_x,j_y;
- int xP2,yP2,NullB;
- quint64 KolvoPix;
- QList <QPoint> PixSteck,DefPix;
- int dx[4],dy[4];
- dx[0]=0;
- dx[1]=1;
- dx[2]=0;
- dx[3]=-1;
-
- dy[0]=-1;
- dy[1]=0;
- dy[2]=1;
- dy[3]=0;
-
- PixSteck.clear();
- DefPix.clear();
-
- Prover=new bool[this->W*this->H];
- NoBlackPixels=new bool[this->W*this->H];
- KolvoPix=0;
- for(j_y=0;j_y<this->H;j_y++)
- {
-  for(j_x=0;j_x<this->W;j_x++)
-  {
-   Prover[j_x+j_y*this->W]=FALSE;
-   NoBlackPixels[j_x+j_y*this->W]=FALSE;
-  }//for(j_x=0;j_x<this->W;j_x++)
- }//for(j_y=0;j_y<this->H;j_y++)
-
-
- Pix1.setX(x);
- Pix1.setY(y);
- Prover[x+y*this->W]=TRUE;
- PixSteck<<Pix1;
- DefPix<<Pix1;
- NoBlackPixels[x+y*this->W]=TRUE;
-
- while(PixSteck.size()>0 &&DefPix.size()<NumPixels)
- {
-  Pix1=PixSteck[0];
-  xP2=Pix1.x();
-  yP2=Pix1.y();
-
-  if(NoBlackPixels[xP2+this->W*yP2]==TRUE)
-  {
-   KolvoPix++;
-   PixSteck.removeFirst();
-   for(i=0;i<4;i++)
-   {
-    NullB=0;
-    if((Pix1.x()+dx[i]<this->W)&&(Pix1.x()+dx[i]>0)&&
-       (Pix1.y()+dy[i]<this->H)&&(Pix1.y()+dy[i]>0)&&
-       (NoBlackPixels[Pix1.x()+dx[i]+(Pix1.y()+dy[i])*this->W]==FALSE)&&
-       (Prover[Pix1.x()+dx[i]+(Pix1.y()+dy[i])*this->W]==FALSE))
-    {
-     xP2=Pix1.x()+dx[i];
-     yP2=Pix1.y()+dy[i];
-     NullB=1;
-     Prover[Pix1.x()+dx[i]+(Pix1.y()+dy[i])*this->W]=TRUE;
-    }
-    if(NullB==1)
-    {
-     if(this->ClassifMass[Pix1.x()+dx[i]+(Pix1.y()+dy[i])*this->W]>=0)
-     {
-      Pix2.setX(xP2);
-      Pix2.setY(yP2);
-      PixSteck<<Pix2;
-      DefPix<<Pix2;
-      NoBlackPixels[xP2+(this->W*yP2)]=TRUE;
-     }//if(FirstPix==AtherPix)
-    }//if(NullB==1)
-   }//for(i=0;i<4;i++)
-  }//if(NoBlackPixels[xP2+this->W*yP2]==TRUE)
-  else
-   PixSteck.removeFirst();
- }//while(PixSteck.size()>0)
-
- delete[] Prover;
- delete[] NoBlackPixels;
- PixSteck.clear();
- return DefPix;
-}
 bool* DNPoly::FillMaskCh(QList <int> nCh)
 {
  bool *MaskCh=new bool[this->Ch];

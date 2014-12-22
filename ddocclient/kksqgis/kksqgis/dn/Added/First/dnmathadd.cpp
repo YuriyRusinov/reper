@@ -17,10 +17,10 @@ float DNMathAdd::GetMax(float *Mass,unsigned long long RMass)
  return ReturnValue;
 }
 
-float DNMathAdd::GetMin(float *Mass,unsigned long long RMass)
+float DNMathAdd::GetMin(float *Mass,quint64 RMass)
 {
  float ReturnValue;
- unsigned long long  i;
+ quint64  i;
 
  ReturnValue=Mass[0];
  for(i=1;i<RMass;i++)
@@ -29,6 +29,17 @@ float DNMathAdd::GetMin(float *Mass,unsigned long long RMass)
    ReturnValue=Mass[i];
  }
  return ReturnValue;
+}
+
+float* DNMathAdd::GetDeriviant(int size,float *x, float *y)
+{
+ float *DerivatData;
+ DerivatData=new float[size-1];
+ for(int i=0;i<size-1;i++)
+ {
+  DerivatData[i]=(x[i+1]-x[i])/(y[i+1]-y[i]);
+ }
+ return DerivatData;
 }
 
 /****************************************************************************/
@@ -142,7 +153,7 @@ float DNMathAdd::CalcEvklid(float *Mass1,float *Mass2, quint64 RMass)
 }
 
 /*Функции работы с матрицами*/
-void DNMathAdd::CalcCovMatr(int nMass /*размер массива*/,int nElem,double *Mass /*Массив*/,double *CovMatr /*Указатель на массив матрицы*/)
+void DNMathAdd::CalcCovMatr(quint64 nMass /*размер массива*/,int nElem,float *Mass /*Массив*/,float *CovMatr /*Указатель на массив матрицы*/)
 {
  /*
 Массив Mass заполняется по принципу:
@@ -153,6 +164,14 @@ Mass[nMass][nElem]
 */
  int j_x=0,j_y=0,j_x2=0;
  double *sred,den;
+// /*Нормализация массива*/
+// float MassMax,Kof;
+// MassMax=GetMax(Mass,nMass*nElem);
+// Kof=1./MassMax;
+// for(quint64 i=0;i<nMass*nElem;i++)
+// {
+//  Mass[i]=Mass[i]*Kof;
+// }
 
  /*Вычисление средних для каждого массива*/
  sred=new double[nElem];
@@ -181,9 +200,26 @@ Mass[nMass][nElem]
   }//for(j_x=0;j_x<nMass;j_x++)
  }//for(j_y=0;j_y<nMass;j_y++)
  delete[] sred;
+
+// if(CovMatr[0]>10)
+// {
+//  while(CovMatr[0]>10)
+//  {
+//   for(int i=0;i<nElem*nElem;i++)
+//    CovMatr[i]=CovMatr[i]/10;
+//  }
+// }//if(CovMatr[0]>10)
+// else
+// {
+//  while(CovMatr[0]<10)
+//  {
+//   for(int i=0;i<nElem*nElem;i++)
+//    CovMatr[i]=CovMatr[i]*10;
+//  }
+// }//else
 }
 
-double DNMathAdd::CalcOpredMatr(int nMass /*размер массива*/,double *Matr /*Указатель на массив матрицы*/)
+double DNMathAdd::CalcOpredMatr(int nMass /*размер массива*/,float *Matr /*Указатель на массив матрицы*/)
 {
     double max,var,*a,Result;
     int i,j_x,j_y,NumString,znak;
@@ -265,7 +301,7 @@ double DNMathAdd::CalcOpredMatr(int nMass /*размер массива*/,double *Matr /*Указ
     return Result;
 }
 
-void DNMathAdd::MatrInverse(double *a,int n)
+void DNMathAdd::MatrInverse(float *a,int n)
 {
  double max,var;
  double *a2;
@@ -360,21 +396,21 @@ void DNMathAdd::MatrInverse(double *a,int n)
  delete a2;
 }
 
-void DNMathAdd::MatrTranspon(double *Matr,int x,int y)
+void DNMathAdd::MatrTranspon(float *Matr,quint64 x,quint64 y)
 {
- double *var,d;
- var=new double[y*x];
- for(int jy=0;jy<y;jy++)
+ float *var,d;
+ var=new float[y*x];
+ for(quint64 jy=0;jy<y;jy++)
  {
-  for(int jx=0;jx<x;jx++)
+  for(quint64 jx=0;jx<x;jx++)
   {
    d=Matr[jx+jy*x];
    var[jy+jx*y]=Matr[jx+jy*x];
   }//for(int jx=0;jx<x;jx++)
  }//for(int jy=0;jy<y;jy++)
- for(int jy=0;jy<y;jy++)
+ for(quint64 jy=0;jy<y;jy++)
  {
-  for(int jx=0;jx<x;jx++)
+  for(quint64 jx=0;jx<x;jx++)
   {
    Matr[jx+jy*x]=var[jx+jy*x];
   }//for(int jx=0;jx<x;jx++)
@@ -390,10 +426,10 @@ void DNMathAdd::MatrTranspon(double *Matr,int x,int y)
  delete var;
 }
 
-double* DNMathAdd::MatrMulti(double *Matr1,int x1,int y1,double *Matr2,int x2,int y2)
+float* DNMathAdd::MatrMulti(float *Matr1,int x1,int y1,float *Matr2,int x2,int y2)
 {
- double *MatrRes;
- MatrRes=new double[x2*y1];
+ float *MatrRes;
+ MatrRes=new float[x2*y1];
 
  for(int i=0;i<x2*y1;i++)
   MatrRes[i]=0;
@@ -417,16 +453,16 @@ double* DNMathAdd::MatrMulti(double *Matr1,int x1,int y1,double *Matr2,int x2,in
  return MatrRes;
 }
 
-double* DNMathAdd::MatrMulti(double *Matr,int x,int y,double a)
+float *DNMathAdd::MatrMulti(double *Matr,int x,int y,double a)
 {
- double *Res;
- Res=new double[x*y];
+ float *Res;
+ Res=new float[x*y];
  for(int i=0;i<x*y;i++)
   Res[i]=Matr[i]*a;
  return Res;
 }
 
-void DNMathAdd::MatrAdd(double *Matr1,double *Matr2,int x,int y)
+void DNMathAdd::MatrAdd(float *Matr1,float *Matr2,int x,int y)
 {
  for(int i=0;i<x*y;i++)
   Matr1[i]+=Matr2[i];
@@ -491,6 +527,24 @@ float DNMathAdd::CalcModulVect(int nMass,float *Mass)
  }//for(int i=0;i<nMass;i++)
  ModulVect=sqrt(ModulVect);
  return ModulVect;
+}
+
+//Работа с векторами
+
+float DNMathAdd::VectorProjection(float *Vec1, float *Vec2,int NVec)
+{
+ float Summ=0;
+ float Modul=0;
+ for(int i=0;i<NVec;i++)
+ {
+  Summ+=Vec1[i]*Vec2[i];
+  Modul+=Vec2[i]*Vec2[i];
+ }
+ Modul=sqrt(Modul);
+ float Result;
+
+ Result=Summ/Modul;
+ return Result;
 }
 
 /*****************************************************************************************/

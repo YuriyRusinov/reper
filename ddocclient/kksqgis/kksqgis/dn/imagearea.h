@@ -17,7 +17,7 @@ private:
 protected:
     virtual void paintEvent(QPaintEvent *pe);
 signals:
-
+    
 public slots:
     
 };

@@ -13,12 +13,20 @@ DNWidgetImage::DNWidgetImage(QWidget *parent) :
  this->SliderY=0;
  //this->KolvoPixPoly=0;
  //this->setMouseTracking(TRUE);
- for(int i=0;i<50;i++)
+ this->ColorClassR[0]=255;
+ this->ColorClassG[0]=0;
+ this->ColorClassB[0]=0;
+
+ this->ColorClassR[1]=255;
+ this->ColorClassG[1]=0;
+ this->ColorClassB[1]=128;
+ for(int i=2;i<50;i++)
  {
   this->ColorClassR[i]=rand()%255;
   this->ColorClassG[i]=rand()%255;
   this->ColorClassB[i]=rand()%255;
  }//for(int i=0;i<50;i++)
+ DlgAiSizeSide=3;
 }
 
 
@@ -59,24 +67,30 @@ void DNWidgetImage::paintEvent(QPaintEvent *pe)
   Painter.drawImage(0,0,this->img/*Scale*/,0,0);
  }//if(this->LoadImg)
 
-//Отрисовка текущего полигона
-
- if(this->Polygon.pt.size()>0)
+ /*Отрисовка квадрата сканирования*/
+ if(!IsDlgAIHidden)
  {
-//     QMessageBox msg;
-//     msg.setText(QString().setNum(this->Polygon.pt.size()));
-//     msg.exec();
+  int x,y;
+  x=XMouseCl-DlgAiSizeSide/2;
+  y=YMouseCl-DlgAiSizeSide/2;
+  Painter.setPen(QPen(Color,2));
+  Painter.drawRect(x,y,DlgAiSizeSide,DlgAiSizeSide);
+ }
 
-  xl1=this->Polygon.pt[0].x();
-  yl1=this->Polygon.pt[0].y();
+//Отрисовка создаваемого полигона
+ if(this->pt.size()>0)
+ {
+  xl1=this->pt[0].x();
+  yl1=this->pt[0].y();
   xl2=this->MouseX/this->NewKof;
   yl2=this->MouseY/this->NewKof;
 
   i=0;
-  while(i<this->Polygon.pt.size())
+  //Отрисовка точек
+  while(i<this->pt.size())
   {
-   xc=this->Polygon.pt[i].x();
-   yc=this->Polygon.pt[i].y();
+   xc=this->pt[i].x();
+   yc=this->pt[i].y();
    xc=xc*this->NewKof;
    yc=yc*this->NewKof;
 
@@ -84,20 +98,24 @@ void DNWidgetImage::paintEvent(QPaintEvent *pe)
    Painter.drawPoint(xc,yc);
    i++;
   }//while(i<this->KolvoPixPoly)
-  if(this->Polygon.pt.size()==1)
+
+  //Отрисовка линии
+  if(this->pt.size()==1)
   {
    Painter.setPen(QPen(Color,4));
    Painter.drawLine(xl1,yl1,xl2,yl2);
   }
-  if(this->Polygon.pt.size()>1)
+
+  //Отрисовка полигона
+  if(this->pt.size()>1)
   {
    Painter.setPen(QPen(Color,4));
    QPolygon Polygon;
    i=0;
-   while(i<this->Polygon.pt.size())
+   while(i<this->pt.size())
    {
-    xc=this->Polygon.pt[i].x();
-    yc=this->Polygon.pt[i].y();
+    xc=this->pt[i].x();
+    yc=this->pt[i].y();
     xc=xc*this->NewKof;
     yc=yc*this->NewKof;
     Polygon<<QPoint(xc,yc);
@@ -110,40 +128,9 @@ void DNWidgetImage::paintEvent(QPaintEvent *pe)
    Painter.drawPolygon(Polygon);
   }
 
-//Если к текущему полигону применялись методы классификации то отрисовываем на полигоне результаты классификации
-  if(this->Polygon.IsPolyClassif)
-  {
-   this->Polygon.maxY=this->Polygon.GetMaxP().y();
-   this->Polygon.minY=this->Polygon.GetMinP().y();
-   this->Polygon.maxX=this->Polygon.GetMaxP().x();
-   this->Polygon.minX=this->Polygon.GetMinP().x();
+////Если к текущему полигону применялись методы классификации то отрисовываем на полигоне результаты классификации
 
-//Размер отрисовки классифицированной области с учётом текущего масштаба изображения
-   int ThisWK=(this->Polygon.maxX-this->Polygon.minX)*this->NewKof;
-   int ThisHK=(this->Polygon.maxY-this->Polygon.minY)*this->NewKof;
-
-   int ThisW=(this->Polygon.maxX-this->Polygon.minX);
-   int ThisH=(this->Polygon.maxY-this->Polygon.minY);
-
-//Переменные перевода из масштабированного изображения в нормальное
-   int xp,yp;
-
-   for(int jy=0;jy<ThisHK;jy++)
-   {
-    for(int jx=0;jx<ThisWK;jx++)
-    {
-     xp=jx/this->NewKof;
-     yp=jy/this->NewKof;
-     if(this->Polygon.ClassifMass[xp+yp*ThisW]>=0)
-     {
-      int num=this->Polygon.ClassifMass[xp+yp*ThisW];
-      Painter.setPen(QPen(QColor(this->ColorClassR[num],this->ColorClassG[num],this->ColorClassB[num],255/*this->ProzrPol*/),1));
-      Painter.drawPoint(jx+this->Polygon.minX*this->NewKof,jy+this->Polygon.minY*this->NewKof);
-     }
-    }//for(int jx=0;jx<ThisWK;jx++)
-   }//for(int jy=0;jy<ThisHK;jy++)
-  }//if(this->Polygon.IsPolyClassif)
- }//if(this->KolvoPixPoly>0)
+ }//if(this->pt.size()>0)
 
  //Отрисовка полигонов
 
@@ -161,25 +148,92 @@ void DNWidgetImage::paintEvent(QPaintEvent *pe)
     xc=xc*this->NewKof;
     yc=yc*this->NewKof;
 
-
-
     Polygon[ip]<<QPoint(xc,yc);
 
     Painter.setPen(QPen(Color,4));
     Painter.drawPoint(xc,yc);
     i++;
-//    QMessageBox msg;
-//    msg.setText(QString().setNum(xc));
-//    msg.exec();
    }//while(i<this->KolvoPixPoly)
 
-   Painter.setPen(QPen(Color,2));
+   if(Polygons[ip].IsPolygonCurrent && !IsCretaePolyOn)
+    Painter.setPen(QPen(Color,4));
+   else
+    Painter.setPen(QPen(Color,2));
+
    Painter.drawPolygon(Polygon[ip]);
 
-  }//for(ip=0;ip<this->Polygons.size();ip++)
-  delete[] Polygon;
- }//if(this->Polygons.size()>0)
+//Отрисовка результатов классификации
+   if(this->Polygons[ip].IsPolyClassif && Polygons[ip].IsPolygonCurrent)
+   {
+    this->Polygons[ip].maxY=this->Polygons[ip].GetMaxP().y();
+    this->Polygons[ip].minY=this->Polygons[ip].GetMinP().y();
+    this->Polygons[ip].maxX=this->Polygons[ip].GetMaxP().x();
+    this->Polygons[ip].minX=this->Polygons[ip].GetMinP().x();
 
+    //Размер отрисовки классифицированной области с учётом текущего масштаба изображения
+    int ThisWK=(this->Polygons[ip].maxX-this->Polygons[ip].minX)*this->NewKof;
+    int ThisHK=(this->Polygons[ip].maxY-this->Polygons[ip].minY)*this->NewKof;
+
+    int ThisW=(this->Polygons[ip].maxX-this->Polygons[ip].minX);
+    int ThisH=(this->Polygons[ip].maxY-this->Polygons[ip].minY);
+
+    //Переменные перевода из масштабированного изображения в нормальное
+    int xp,yp;
+
+    for(int jy=0;jy<ThisHK;jy++)
+    {
+     for(int jx=0;jx<ThisWK;jx++)
+     {
+      xp=jx/this->NewKof;
+      yp=jy/this->NewKof;
+      if(this->Polygons[ip].ClassifMass[xp+yp*ThisW]>=0)
+      {
+       int num=this->Polygons[ip].ClassifMass[xp+yp*ThisW];
+       Painter.setPen(QPen(QColor(this->ColorClassR[num],this->ColorClassG[num],this->ColorClassB[num],255/*this->ProzrPol*/),1));
+       Painter.drawPoint(jx+this->Polygons[ip].minX*this->NewKof,jy+this->Polygons[ip].minY*this->NewKof);
+      }
+     }//for(int jx=0;jx<ThisWK;jx++)
+    }//for(int jy=0;jy<ThisHK;jy++)
+   }//if(this->Polygons[ip].IsPolyClassif)
+
+
+//Отрисовка особых параметров отображения полигона
+   if(this->Polygons[ip].IsPolyCreateImg && !this->Polygons[ip].IsPolyClassif && Polygons[ip].IsPolygonCurrent)
+   {
+    this->Polygons[ip].maxY=this->Polygons[ip].GetMaxP().y();
+    this->Polygons[ip].minY=this->Polygons[ip].GetMinP().y();
+    this->Polygons[ip].maxX=this->Polygons[ip].GetMaxP().x();
+    this->Polygons[ip].minX=this->Polygons[ip].GetMinP().x();
+
+    //Размер отрисовки классифицированной области с учётом текущего масштаба изображения
+    int ThisWK=(this->Polygons[ip].maxX-this->Polygons[ip].minX)*this->NewKof;
+    int ThisHK=(this->Polygons[ip].maxY-this->Polygons[ip].minY)*this->NewKof;
+
+    int ThisW=(this->Polygons[ip].maxX-this->Polygons[ip].minX);
+    int ThisH=(this->Polygons[ip].maxY-this->Polygons[ip].minY);
+
+    //Переменные перевода из масштабированного изображения в нормальное
+    int xp,yp;
+
+    quint64 px=0;
+
+    for(int jy=0;jy<ThisHK;jy++)
+    {
+     for(int jx=0;jx<ThisWK;jx++)
+     {
+      xp=jx/this->NewKof;
+      yp=jy/this->NewKof;
+      if(this->Polygons[ip].SelPoly[xp+yp*ThisW]>=0)
+      {
+       Painter.setPen(QPen(QColor(Polygons[ip].PImgR[px],Polygons[ip].PImgG[px],Polygons[ip].PImgB[px],255/*this->ProzrPol*/),1));
+       Painter.drawPoint(jx+this->Polygons[ip].minX*this->NewKof,jy+this->Polygons[ip].minY*this->NewKof);
+       px++;
+      }
+     }//for(int jx=0;jx<ThisWK;jx++)
+    }//for(int jy=0;jy<ThisHK;jy++)
+   }//if(this->Polygon.IsPolyCreateImg)
+  }//for(ip=0;ip<this->Polygons.size();ip++)
+ }//if(this->Polygons.size()>0)
  Painter.end();
 }
 void DNWidgetImage::mouseMoveEvent(QMouseEvent* mEvent)
@@ -189,7 +243,7 @@ void DNWidgetImage::mouseMoveEvent(QMouseEvent* mEvent)
 
  emit MouseMove(this->MouseX/this->NewKof,this->MouseY/this->NewKof);
 
- if(this->Polygon.pt.size()>0)
+ if(IsCretaePolyOn)
   this->repaint();
 }
 void DNWidgetImage::mousePressEvent(QMouseEvent *mEvent)
@@ -200,19 +254,49 @@ void DNWidgetImage::mousePressEvent(QMouseEvent *mEvent)
   QPoint Point;
   x=this->MouseX/this->NewKof;
   y=this->MouseY/this->NewKof;
+  XMouseCl=x;
+  YMouseCl=y;
   if(this->IsCretaePolyOn) //Если выбран пункт меню Выделить полигон
   {
    Point.setX(x);
    Point.setY(y);
-   this->Polygon.pt<<Point;
+   this->pt<<Point;
    //this->Polygon.KolvoPix++;
    this->repaint();
   }//if(this->IsCretaePolyOn)
-  // emit this->MouseClicked(x,y);
+  emit this->MouseLClicked(x,y);
  }//if(mEvent->button()==QMouseEvent)
- if(mEvent->button()==Qt::RightButton && this->Polygon.pt.size()>2)
+ if(mEvent->button()==Qt::RightButton && this->pt.size()>2)
  {
   emit OnRightButton(false);
+ }
+}
+void DNWidgetImage::mouseDoubleClickEvent(QMouseEvent *)
+{
+ int x,y;
+ x=this->MouseX/this->NewKof;
+ y=this->MouseY/this->NewKof;
+ emit this->MouseDoubleCliced(x,y);
+}
+
+int DNWidgetImage::NewPolygon()
+{
+ for(int i=0;i<Polygons.size();i++)
+ {
+  Polygons[i].IsPolygonCurrent=FALSE;
+ }//for(int i=0;i<Polygons.size();i++)
+ DNImgPoly NewPoly;
+ NewPoly.pt=this->pt;
+ Polygons<<NewPoly;
+ return Polygons.size();
+}
+void DNWidgetImage::ChangeCurPoly(int nPoly)
+{
+ for(int i=0;i<Polygons.size();i++)
+ {
+  Polygons[i].IsPolygonCurrent=FALSE;
+  if(i==nPoly)
+   Polygons[i].IsPolygonCurrent=TRUE;
  }
 }
 
@@ -239,12 +323,36 @@ void DNWidgetImage::DeselectPoly()
  }//for(int i=0;i<this->Polygons.size();i++)
 }
 
+
 /************************DNImgPoly************************************************************/
 
 DNImgPoly::DNImgPoly()
 {
  this->IsPolygonSelect=FALSE;
+ this->IsPolyCreateImg=FALSE;
+ this->IsPolyClassif=FALSE;
+ this->IsPolygonCurrent=TRUE;
+ PImgR=NULL;
+ PImgG=NULL;
+ PImgB=NULL;
+ ClassifMass=NULL;
+ SelPoly=NULL;
  //this->KolvoPix=0;
+}
+
+DNImgPoly::~DNImgPoly()
+{
+ if(PImgR!=NULL)
+  delete[] PImgR;
+ if(PImgG!=NULL)
+  delete[] PImgG;
+ if(PImgB!=NULL)
+  delete[] PImgB;
+// if(ClassifMass!=NULL)
+//  delete[] ClassifMass;
+// if(SelPoly!=NULL)
+//  delete[] SelPoly;
+ pt.clear();
 }
 
 QPoint DNImgPoly::GetMinP()
@@ -380,4 +488,21 @@ bool DNImgPoly::IsPointInside(int xp,int yp)
   prev_under = cur_under;
  }
  return (intersections_num&1) != 0;
+}
+
+void DNImgPoly::CreateImg(float *ImgPolyR,float *ImgPolyG,float *ImgPolyB, int *MassPoly,quint64 px)
+{
+ IsPolyCreateImg=TRUE;
+ PImgR=new int[px];
+ PImgG=new int[px];
+ PImgB=new int[px];
+
+ for(quint64 i=0;i<px;i++)
+ {
+  PImgR[i]=ImgPolyR[i];
+  PImgG[i]=ImgPolyG[i];
+  PImgB[i]=ImgPolyB[i];
+ }//for(quint64 i=0;i<px;i++)
+ SelPoly=MassPoly;
+ IsPolyCreateImg=TRUE;
 }

@@ -22,31 +22,27 @@ double DNTheam::Batinometr(int TypeBottom,float R485,float R560,float R660,float
 
  BatimetrResult Res;
 
-// if(TypeBottom==0) //Макрофиты
-// {
-//  R1b=0.02;
-//  R2b=0.06;
-//  R3b=0.065;
-// }
-// if(TypeBottom==1)  //Песок
-// {
-//  R1b=0.03;
-//  R2b=0.092;
-//  R3b=0.11;
-// }
-// if(TypeBottom==2) //Водоросли
-// {
-//  R1b=0.06;
-//  R2b=0.09;
-//  R3b=0.1;
-// }
 
-// if(TypeBottom==3) //Все остальное
-// {
-//  R1b=0.03;
-//  R2b=0.092;
-//  R3b=0.11;
-// }
+ TypeBottom=1;
+
+ if(TypeBottom==0) //Макрофиты
+ {
+  R1b=0.02;
+  R2b=0.06;
+  R3b=0.065;
+ }
+ if(TypeBottom==1)  //Песок
+ {
+  R1b=0.03;
+  R2b=0.092;
+  R3b=0.11;
+ }
+ if(TypeBottom==2) //Водоросли
+ {
+  R1b=0.06;
+  R2b=0.09;
+  R3b=0.1;
+ }
 
  double Schet=0,hMin,FMin;
  FirstIter=TRUE;
@@ -588,7 +584,7 @@ BatimetrResult DNTheam::CalcFunkBatimetr(double a,double b,double h,float R1a,fl
  d_fa[1]=(0.2895*(d_da[1]*(1-k2)+d2*(-1)*d_ka[1])+R2b*d_ka[1])*1;
  d_fa[2]=(0.2895*(d_da[2]*(1-k3)+d3*(-1)*d_ka[2])+R3b*d_ka[2])*1;
 
- double d_faap[3],d_fabp[3],d_fahp[3],d_faao[3],d_fabo[3],d_faho[3];
+ float d_faap[3],d_fabp[3],d_fahp[3],d_faao[3],d_fabo[3],d_faho[3];
  /*Плюс*/
  d_faap[0]=(0.2895*(d_daap[0]*(1-kap[0])+dap[0]*(-1)*d_kaap[0])+R1b*d_kaap[0])*1;
  d_faap[1]=(0.2895*(d_daap[1]*(1-kap[1])+dap[1]*(-1)*d_kaap[1])+R2b*d_kaap[1])*1;
@@ -619,7 +615,7 @@ BatimetrResult DNTheam::CalcFunkBatimetr(double a,double b,double h,float R1a,fl
  d_fb[1]=(0.2895*(d_db[1]*(1-k2)+d2*(-1)*d_kb[1])+R2b*d_kb[1])*1;
  d_fb[2]=(0.2895*(d_db[2]*(1-k3)+d3*(-1)*d_kb[2])+R3b*d_kb[2])*1;
 
- double d_fbap[3],d_fbbp[3],d_fbhp[3],d_fbao[3],d_fbbo[3],d_fbho[3];
+ float d_fbap[3],d_fbbp[3],d_fbhp[3],d_fbao[3],d_fbbo[3],d_fbho[3];
  /*Плюс*/
  d_fbap[0]=(0.2895*(d_dbap[0]*(1-kap[0])+dap[0]*(-1)*d_kbap[0])+R1b*d_kbap[0])*1;
  d_fbap[1]=(0.2895*(d_dbap[1]*(1-kap[1])+dap[1]*(-1)*d_kbap[1])+R2b*d_kbap[1])*1;
@@ -651,7 +647,7 @@ BatimetrResult DNTheam::CalcFunkBatimetr(double a,double b,double h,float R1a,fl
  d_fh[1]=(0.2895*d2*(-1)*d_kh[1]+R2b*d_kh[1])*1;
  d_fh[2]=(0.2895*d3*(-1)*d_kh[2]+R3b*d_kh[2])*1;
 
- double d_fhap[3],d_fhbp[3],d_fhhp[3],d_fhao[3],d_fhbo[3],d_fhho[3];
+ float d_fhap[3],d_fhbp[3],d_fhhp[3],d_fhao[3],d_fhbo[3],d_fhho[3];
  /*Плюс*/
  d_fhap[0]=(0.2895*dap[0]*(-1)*d_khap[0]+R1b*d_khap[0])*1;
  d_fhap[1]=(0.2895*dap[1]*(-1)*d_khap[1]+R2b*d_khap[1])*1;
@@ -681,7 +677,7 @@ BatimetrResult DNTheam::CalcFunkBatimetr(double a,double b,double h,float R1a,fl
  d_FMainB=2*f1*d_fb[0]+2*f2*d_fb[1]+2*f3*d_fb[2];
  d_FMainH=2*f1*d_fh[0]+2*f2*d_fh[1]+2*f3*d_fh[2];
 
- double d_FMain[3];
+ float d_FMain[3];
  d_FMain[0]=d_FMainA;
  d_FMain[1]=d_FMainB;
  d_FMain[2]=d_FMainH;
@@ -716,7 +712,7 @@ BatimetrResult DNTheam::CalcFunkBatimetr(double a,double b,double h,float R1a,fl
  d2_FMainO[7]=2*fbo[0]*d_fhbo[0]+2*fbo[1]*d_fhbo[1]+2*fbo[2]*d_fhbo[2];
  d2_FMainO[8]=2*fho[0]*d_fhho[0]+2*fho[1]*d_fhho[1]+2*fho[2]*d_fhho[2];
 
- double d2_FMain[9];
+ float d2_FMain[9];
 
  for(int i=0;i<9;i++)
   d2_FMain[i]=(d2_FMainP[i]-d2_FMainO[i])/(2*dh);
@@ -726,9 +722,9 @@ BatimetrResult DNTheam::CalcFunkBatimetr(double a,double b,double h,float R1a,fl
 
 
 
- double *dxy;
- double *NUI;
- double diskr;
+ float *dxy;
+ float *NUI;
+ float diskr;
  DNMathAdd Math1;
 
  /*nu*I*/
@@ -926,14 +922,6 @@ double DNTheam::CalcFunkBatimetrNew(int TypeBottom,float R485, float R560,float 
   Rb[2]=0.1;
  }
 
- if(TypeBottom==3)  //Все остальное
- {
-  Rb[0]=0.2;
-  Rb[1]=0.36;
-  Rb[2]=0.44;
- }
-
-
  ProbRa[0]=Ra[0];
  ProbRa[1]=Ra[1];
  ProbRa[2]=Ra[2];
@@ -974,13 +962,6 @@ double DNTheam::CalcFunkBatimetrNew(int TypeBottom,float R485, float R560,float 
 
 //  if(Chisl/Znam>0 && k_lam[i]!=0)
 //  {
-//   QMessageBox msg;
-//   msg.setText(QString().setNum(Ra[i],'d',4)+"\n"+
-//               QString().setNum(Rb[i],'d',4)+"\n"+
-//               QString().setNum(Rdp[i],'d',4)+"\n"+
-//               QString().setNum(k_lam[i],'d',4));
-//   msg.exec();
-
    H_lam[i]=this->CalcFunkNew(Rdp[i],Ra[i],Rb[i],k_lam[i]);/*log(Chisl/Znam)/(-2*k_lam[i]);*/
    H_main+=H_lam[i];
    sch++;

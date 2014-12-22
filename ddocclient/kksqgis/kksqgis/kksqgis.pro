@@ -10,7 +10,7 @@ CONFIG += qt
 
 CONFIG += warn_on dll
 
-QT += core gui xml svg xmlpatterns webkit network
+QT += core gui xml svg xmlpatterns webkit network sql
 
 DEFINES += __USE_DLL_KKSQGIS
 

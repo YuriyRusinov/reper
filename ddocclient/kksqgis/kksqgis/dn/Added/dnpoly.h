@@ -5,6 +5,17 @@
 2. массив полигона -1 - точка не рассматривается, 1 - точка рассматривается
 3. массив координат вершин многоугольника
 4. спектральные данные
+
+Структура файла PolygonExp и PolygonImp
+1. Количество угловых точек в полигоне (int)
+2. Географические x координаты в полигоне (double)
+3. Географические y координаты в полигоне (double)
+4. Размер массива результатов классификации (quint64) (если 0 - то конец файла)
+5. Географические x,y координаты учитываемых точек в полигоне (double)
+Массив точек классификации состоит из точек, которые подлежат дальнейшей обработке
+на другом изображении (ClassMass>=0)
+6. Размер строки названия классификации (int)
+7. Строка с названием классификации
 */
 
 #ifndef MULTISPECPOLYPROP_H
@@ -20,11 +31,17 @@
 #include <QList>
 #include <QMap>
 #include <QMessageBox>
-#include "dn/Added/First/structs.h"
-#include "dn/Added/First/dnmathadd.h"
-#include "dn/Added/First/dncalcstring.h"
-#include "dn/Added/First/dntheam.h"
-#include "dn/Added/dnvector.h"
+#include "Added/First/structs.h"
+#include "Added/First/dnmathadd.h"
+#include "Added/First/dncalcstring.h"
+#include "Added/First/dntheam.h"
+#include "Added/dnvector.h"
+#include "Added/dnbdspectr.h"
+//struct ClassToPoly
+//{
+// QList <QPoint> Pix;
+// int ClassNum;
+//};
 
 class DNPoly : public QObject
 {
@@ -33,8 +50,12 @@ class DNPoly : public QObject
 public:
     DNPoly(QString SerFileName);
     ~DNPoly();
+    bool* FillMaskCh(QList <int> nCh);
+//Определить окружение точки
+    QList <QPoint> DefinePixels(int NumPixels,int x,int y);
 //Функции определения спектральных характеристик
     void GetSpectrPoint(int x,int y,float *DataSpec,bool *MaskCh);
+    void GetDerivatSpectrPoint(int x,int y,int nCh1,int nCh2, float *LamMass, float *DerivatData);
     void GetSpectrString(int y,float *DataSpec,bool *MaskCh);
 
     /*Взять спектр участка изображения, обозначенного в массиве CurentPoly*/
@@ -54,6 +75,10 @@ public:
     float GetEntropPoint(int x,int y,int nPixels,quint64 KDiskr, int NumCh);
     /*Вычислить СКО окружения точки*/
     float GetSKOPoint(int x,int y,int nPixels,int NumCh);
+
+    /*Вычислить корреляцию точки Если возвращает -2, то значит не вычислила*/
+    float GetAKFPoint(int x,int y,int Side,float *Mask, int NumCh);
+
 //Функции работы с полигонами
     /*Выделить полигон к которому принадлежит заданная точка (получить массив NoBlackPixels)*/
     quint64 GetKolvoPointPoly(int x,int y,/*координаты точки на изображении*/int *MassIsh,bool *NoBlackPixels);
@@ -67,6 +92,13 @@ public:
     /*Взять энтропию полигона*/
     void GetEntropPoly(bool *NoBlackPixels,unsigned long long KolvoPixPoly, float *EntropPoly, quint64 KDistr, bool *MaskCh);
 
+    /*Функчия превращения результатов классификации в новые полигоны*/
+    //QList <ClassToPoly> ClassResultToPoly(float ProcentDetal);
+//Функции экспорта и импорта полигонов
+    void PolygonExpGeo(QString FileName, double xTopLeft, double XD, double XAngle, double yTopLeft, double YD, double yAngle,QString NameClassif="");
+    static QList <QPoint> PolygonImpGeo(QString FileName, double xTopLeft,double XD,double XAngle,double yTopLeft,double YD,double yAngle, bool **ClMass, QString *ClassName);
+    static QList <QPoint> PolygonImpGeo(QString FileName, double xTopLeft,double XD,double XAngle,double yTopLeft,double YD,double yAngle);
+
 //Функции работы с классами
     quint64 GetKolvoPointClass(int NumKl,int *MassIsh,bool *NoBlackPixels);
     QList <int> GetNumClassMass(int *MassIsh,bool *NoBlackPixels);
@@ -76,9 +108,14 @@ public:
     void AddChanal(QString Formula);
     void AddChanal(float *Brigth);
     void AddIntegralChanal(int nCh1,int nCh2);
+    void AddIntegralChanal(int nCh1,int nCh2,float *LamMass); //Размер LamMass должен быть (nCh2-nCh1+1)
     /*Создать изображение на основе показателя энтропии с соседними точками*/
     void AddEntropChanal(int nPixels, quint64 KDiskr, int NumCh);
     void AddSKOChanal(int nPixels, int NumCh);
+
+    /*Создать изображение на основе раассчёта автокорреляционной функции*/
+    void AddAKFChanal(int Side, int NumCh,int xb, int yb);
+
     /*Создать индексное изображение*/
     void CreateIndexImg(QString BMPFileName,int NumCh);
 
@@ -88,8 +125,7 @@ public:
 //Функции фильтрации
     /*Линейная фильтрация*/
     float *LinearFilter(int side,float *Apert,float Kof,int NumCh);
-    /*Нелинейная фильтрация*/
-    void MedianFilter(int side);
+    void LinearFilter(int side,int *Apert,float Kof); //В качестве фильтруемого массива используется ClassifMass
 
 //Методы классификации*/
     quint64 MagicWand(bool *NoBlackPixels,/*Входной массив, обрабатываются точки только со значениями TRUE*/
@@ -113,6 +149,12 @@ public:
             float LimitSKO, /*Лимит на расброс спектральных углов, если -1 - лимит не установлен*/
             bool *MaskCh);
 
+    void MaxLike(bool *NoBlackPixels,QStringList PolyFileNames,bool *MaskCh);
+
+    float *SubPixAnalis(QList <float*> SpectrObj,int NumCh /*Количество спектральных каналов*/, bool *MaskCh);
+    /*Количество элементов в массивах SpectrObj должно быть равным NumCh, и количеству учитываемых спектральных каналов MaskCh. Образцы спектров SpectrObj должны поканально
+    совпадать с каналами изображения*/
+
 //Фильтры
     void FilterPix(bool *NoBlackPixels,QString Formula,int Usl, float Value2);
     void FilterPoly(int *MassIsh,QString Formula,int Usl, float Value2);
@@ -123,8 +165,15 @@ public:
     void SelectWater(); //Выделение воды (RGB)
     void Batinometr();  //Батинометрия (WorldView 2)
     void Batinometr(int N590,int N830,int N900,int N580,int N620,int N485,int N560,int N660,int N450,int N545,int N605);  //Батинометрия (Лептон)
+
+    void MaskAreaMS(float DeltaMS,int TypeFone,int Nnir1,int Nnir2,int Nred,int Ngr,float IndexPor, float LRM, float AreaPor); //Выделение маскировочных покрытий
+    //TypeFone=0 - песок, 1 - снег, 2 - растительность
+    //LRM - Линейный размер пикселя
+    void MaskAreaGS(QString ClsId,QList<QString> ClsBackgroId,float DeltaGS,int TypeFone,int N705,int N750,int N1030,float GSIndexPor,float SubPixPor,float *LamMass,float MaxDerivant,int NDif1, int NDif2, float *LamMassSubPix, QList<int> NumChSubPix);
+    void RoutMoveTap1(int Ngreen,int Nred,int Nnir1,int NredEdge,float NDVIpor,int NumCl,float MaxSKO,float Qc,int I);
 /**********************************************************************************************************************************/
-    void PixToGeo(int xp,int yp,double xTopLeft,double XD,double XAngle,double yTopLeft,double YD,double yAngle,double *xGeo,double *yGeo);
+    static void PixToGeo(int xp,int yp,double xTopLeft,double XD,double XAngle,double yTopLeft,double YD,double yAngle,double *xGeo,double *yGeo);
+    static void GeoToPix(double *xp,double *yp,double xTopLeft,double XD,double XAngle,double yTopLeft,double YD,double yAngle,double xGeo,double yGeo);
     QList <DNVector> RastrToVector(double xTopLeft,double XD,double XAngle,double yTopLeft,double YD,double YAngle, float Kof, float MinV,QString FileName);
 public:
     int W,H,xn,yn,Ch,KolvoPix;
@@ -135,6 +184,9 @@ public:
     bool IsPolyClassif; //Применялись ли к полигону методы классификации (по умолчанию FALSE)
     int *ClassifMass;   //Массиф классификации
 
+    //База данных спектров
+    DNBDSpectr *BdSpectr;
+
     QQueue <QPoint> pt;
     quint64 px; //Количество пикселей в многоугольнике
     qint64 OffsetData;
@@ -144,10 +196,16 @@ public:
     /*Переменные для вектаризации*/
     float KofV;
     float MinV;
- private:
+
+    void RoutMoveTap2(int N630,int N690,int N750,int N860,int N720,int N800,int N900,int N970,
+                      float NDVIPor1, float DeltaNDVIPor1, float NDVIPor2, float DeltaNDVIPor2,
+                      float NDVIPor3, float DeltaNDVIPor3, float WBIPor);
+    void SmocesTap1(int Nred, int Nnir, float NDVIPor);
+    void SmocesTap2(float R600Por, float KofCorrPor, int N600, int N500);
+    void EmbedObjMS(int Nred, int Nnir, float NDVIPor, float DNDVI, int Nnir2, float B630_690, float B800_1100, float Cpor630_690, float Cpor800_1100);
+private:
      DNMathAdd Math;
-     QList <QPoint> DefinePixels(int NumPixels,int x,int y);
-     bool* FillMaskCh(QList <int> nCh);
+
 
 
  signals:

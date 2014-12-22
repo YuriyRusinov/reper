@@ -4,6 +4,7 @@
 #include <QString>
 #include <math.h>
 #include <QList>
+#include <QMessageBox>
 
 class DNCalcString
 {

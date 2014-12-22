@@ -1,5 +1,5 @@
 #include "dnspecbath.h"
-#include "dn/dnwidgetimage.h"
+#include "dnwidgetimage.h"
 
 DNSpecBath::DNSpecBath(QWidget *parent) :
     QMainWindow(parent),
@@ -15,34 +15,41 @@ DNSpecBath::DNSpecBath(QWidget *parent) :
  this->GdalImage=NULL;
  this->SerPoly=NULL;
  this->DlgShowDepth=NULL;
+ this->DlgSKOGraph=NULL;
+ this->DlgMouseCoord=NULL;
+ this->DlgSG=NULL;
+ this->DlgG=NULL;
+
+ this->DlgID=NULL;
+ this->DlgSM=NULL;
+ this->DlgMW=NULL;
+ this->DlgCIP=NULL;
+ this->DlgCF=NULL;
+ this->DlgAI=NULL;
+
+ /*Тематические диалоговые окна*/
+ DlgMask=NULL;
+ DlgRMove=NULL;
+ DlgRMove2=NULL;
+ DlgSmoce=NULL;
+ DlgEO=NULL;
+
  this->NameProg="SuperProga";
  this->NameOrg="VKA";
+ this->FileNameChan="ChanProp.ch";
+ PolygonsName="NewPolyCl";
  this->AppDir=QDir::currentPath();
  this->IsTreePolygonClear=FALSE;
  this->IsPolygonCreateMode=FALSE;
-
  connect(ui->DNWPic,SIGNAL(OnRightButton(bool)),ui->CreatePoly,SIGNAL(triggered(bool)));
  connect(ui->treePolygons,SIGNAL(clicked(QModelIndex)),ui->treePolygons,SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)));
+ ui->pbVectorize->setEnabled(true);
 }
 
 DNSpecBath::~DNSpecBath()
 {
  if(this->GdalImage!=NULL)
   delete this->GdalImage;
- if(this->SerPoly!=NULL)
-  delete this->SerPoly;
- if(this->DlgShowDepth!=NULL)
-  delete this->DlgShowDepth;
-
- Polygons.clear();
- NamesPoly.clear();
-
- for(int i=0;i<ui->DNWPic->Polygons.size();i++)
-  ui->DNWPic->Polygons[i].pt.clear();
-
- ui->DNWPic->Polygons.clear();
- ui->DNWPic->Polygon.pt.clear();
-
  delete ui;
 }
 
@@ -51,7 +58,7 @@ void DNSpecBath::resizeEvent(QResizeEvent*)
  int wMW,hMW;
  wMW=this->width();
  hMW=this->height();
- wMW=wMW-200;
+ wMW=wMW-230;
  hMW=hMW-70;
  if(wMW<0) wMW=0;
  if(hMW<0) hMW=0;
@@ -61,59 +68,10 @@ void DNSpecBath::resizeEvent(QResizeEvent*)
  ui->WidgetViewParam->setGeometry(wMW+10,10,ui->WidgetViewParam->width(),ui->WidgetViewParam->height());
 }
 
-void DNSpecBath::closeEvent(QCloseEvent *)
-{
- if(this->GdalImage!=NULL)
- {
-  delete this->GdalImage;
-  this->GdalImage=NULL;
- }
- if(this->SerPoly!=NULL)
- {
-  delete this->SerPoly;
-  this->SerPoly=NULL;
- }
- if(this->DlgShowDepth!=NULL)
- {
-  delete this->DlgShowDepth;
-  this->DlgShowDepth=NULL;
- }
- NamesPoly.clear();
-
- for(int i=0;i<ui->DNWPic->Polygons.size();i++)
-  ui->DNWPic->Polygons[i].pt.clear();
-
- ui->DNWPic->Polygons.clear();
- ui->DNWPic->Polygon.pt.clear();
-}
-
 void DNSpecBath::on_FileOpen_triggered()
 {
 
- if(this->GdalImage!=NULL)
- {
-  delete this->GdalImage;
-  this->GdalImage=NULL;
- }
- if(this->SerPoly!=NULL)
- {
-  delete this->SerPoly;
-  this->SerPoly=NULL;
- }
- if(this->DlgShowDepth!=NULL)
- {
-  delete this->DlgShowDepth;
-  this->DlgShowDepth=NULL;
- }
- NamesPoly.clear();
-
- for(int i=0;i<ui->DNWPic->Polygons.size();i++)
-  ui->DNWPic->Polygons[i].pt.clear();
-
- ui->DNWPic->Polygons.clear();
- ui->DNWPic->Polygon.pt.clear();
-
- this->FileNameOpen=QFileDialog::getOpenFileName(this,"Открыть файл проекта","","Raster files (*.img *.asc *.tif *tiff *.bmp *.jpg *.jpeg);;Geotiff (*.tif *.tiff)");
+ this->FileNameOpen=QFileDialog::getOpenFileName(this,"Открыть файл проекта","","Raster files (*.img *.asc *.tif *tiff *.bmp *.jpg *.jpeg *.ser *.int);;Geotiff (*.tif *.tiff)");
  if(!this->FileNameOpen.isEmpty())
  {
   if(this->GdalImage!=NULL)
@@ -145,26 +103,30 @@ void DNSpecBath::on_FileOpen_triggered()
    }
   }
 
+  if(this->GdalImage->Ch==1)
+  {
+   this->nCh[0]=0;
+   this->nCh[1]=0;
+   this->nCh[2]=0;
+  }
   ui->DNWPic->img=GdalImage->GenerateImg(nCh[0],nCh[1],nCh[2],BKof[0],BKof[1],BKof[2],1);
   ui->DNWPic->isImgLoad=true;
 
   this->FillMainForm();
 
 
-    //Если существуют полигоны в проекте, то делаем первый полигон текущим
-   if(this->NamesPoly.size()>0)
-   {
-    this->CurrentNamePoly=this->NamesPoly[0];
-    this->CurrentNameClassif='/'+this->CurrentNamePoly;
-    this->ChangeCurrentPoly();
-    this->ReadFilePoly(this->NamePolyToFile(this->CurrentNamePoly));
-   }
+  //Если существуют полигоны в проекте, то делаем первый полигон текущим
 
+  if(this->NamesPoly.size()>0)
+  {
+   this->CurrentNamePoly=this->NamesPoly[0];
+   this->CurrentNameClassif='/'+this->CurrentNamePoly;
    this->FillStackPolygons();
+   this->ChangeCurrentPoly();
+   this->ReadFilePoly(this->NamePolyToFile(this->CurrentNamePoly));
+  }
    ui->DNWPic->repaint();
-//     ui->WPic->ChangedBMP(this->ThisFileProj.FoolNameImageStart);
  }//if(FileName!="")
-
 
 }
 
@@ -202,6 +164,14 @@ void DNSpecBath::on_OpenLastImg_triggered()
     break;
    }
   }
+
+  if(this->GdalImage->Ch==1)
+  {
+   this->nCh[0]=0;
+   this->nCh[1]=0;
+   this->nCh[2]=0;
+  }
+
   ui->DNWPic->img=GdalImage->GenerateImg(nCh[0],nCh[1],nCh[2],BKof[0],BKof[1],BKof[2],1);
   ui->DNWPic->isImgLoad=true;
   this->FillMainForm();
@@ -209,11 +179,10 @@ void DNSpecBath::on_OpenLastImg_triggered()
   {
    this->CurrentNamePoly=this->NamesPoly[0];
    this->CurrentNameClassif='/'+this->CurrentNamePoly;
+   this->FillStackPolygons();
    this->ChangeCurrentPoly();
    this->ReadFilePoly(this->NamePolyToFile(this->CurrentNamePoly));
   }
-
-  this->FillStackPolygons();
   ui->DNWPic->repaint();
  }//if(!this->FileNameOpen.isEmpty())
 }
@@ -222,15 +191,14 @@ void DNSpecBath::on_CreatePoly_triggered(bool checked)
 {
  if(checked)
  {
-  ui->DNWPic->Polygon.pt.clear();
-  ui->DNWPic->Polygon.IsPolyClassif=FALSE;
   this->IsPolygonCreateMode=TRUE;
+  ui->DNWPic->pt.clear();
  }
 
  ui->DNWPic->IsCretaePolyOn=checked;
 
-//Сохранение полигона в файл (если снята галочка с меню Создать полигон и создаваемый полигон имеет больше двух точек)
- if(!checked && ui->DNWPic->Polygon.pt.size()>2 && this->IsPolygonCreateMode)
+ //Сохранение полигона в файл (если снята галочка с меню Создать полигон и создаваемый полигон имеет больше двух точек)
+ if(!checked && ui->DNWPic->pt.size()>2 && this->IsPolygonCreateMode)
  {
   ui->CreatePoly->setChecked(false);
   bool InputOk;
@@ -239,25 +207,194 @@ void DNSpecBath::on_CreatePoly_triggered(bool checked)
                                          &InputOk);
   if(InputOk && !NamePoly.isEmpty())
   {
-   ui->DNWPic->Polygons<<ui->DNWPic->Polygon;
+   int nPoly;
+   nPoly=ui->DNWPic->NewPolygon();
+
+   nPoly-=1;
    QPoint nP,kP;
-   nP=ui->DNWPic->Polygon.GetMinP();
-   kP=ui->DNWPic->Polygon.GetMaxP();
+   nP=ui->DNWPic->Polygons[nPoly].GetMinP();
+   kP=ui->DNWPic->Polygons[nPoly].GetMaxP();
    this->GdalImage->GenerateSpectrFile(nP.x(),nP.y(),
                                        kP.x()-nP.x(),kP.y()-nP.y(),
-                                       ui->DNWPic->Polygon.pt,NamePoly);
-   ui->DNWPic->Polygon.pt.clear();
-   ui->DNWPic->Polygon.IsPolygonSelect=FALSE;
+                                       ui->DNWPic->Polygons[nPoly].pt,NamePoly);
 
    this->CurrentNamePoly=NamePoly;
+
+   this->FillMainForm();
+   this->FillStackPolygons();
    this->ChangeCurrentPoly();
    this->ReadFilePoly(this->NamePolyToFile(this->CurrentNamePoly));
-   this->FillMainForm();
+
+
   }//if(InputOk && !NamePoly.isEmpty())
   this->IsPolygonCreateMode=FALSE;
+  ui->DNWPic->pt.clear();
  }//if(!checked && ui->DNWPic->Polygon.pt.size()>2)
-
  ui->DNWPic->repaint();
+}
+
+void DNSpecBath::on_ClassResultToPoly_triggered()
+{
+ QList <DNPoly2::ClassToPoly> NewPolygons;
+ NewPolygons=SerPoly->ClassResultToPoly(5);
+
+ int *IshClassif,IshXn,IshYn,WIsh;
+ IshClassif=new int[SerPoly->W*SerPoly->H];
+
+ for(quint64 i=0;i<SerPoly->W*SerPoly->H;i++)
+ {
+  IshClassif[i]=SerPoly->ClassifMass[i];
+ }
+ IshXn=SerPoly->xn;
+ IshYn=SerPoly->yn;
+ WIsh=SerPoly->W;
+
+ for(quint64 i=0;i<NewPolygons.size();i++)
+ {
+  int nPoly;
+  ui->DNWPic->pt=NewPolygons[i].Pix;
+  nPoly=ui->DNWPic->NewPolygon();
+
+  nPoly-=1;
+  QPoint nP,kP;
+  nP=ui->DNWPic->Polygons[nPoly].GetMinP();
+  kP=ui->DNWPic->Polygons[nPoly].GetMaxP();
+  this->GdalImage->GenerateSpectrFile(nP.x(),nP.y(),
+                                      kP.x()-nP.x(),kP.y()-nP.y(),
+                                      ui->DNWPic->Polygons[nPoly].pt,PolygonsName+QString().setNum(i+1));
+
+  this->CurrentNamePoly=PolygonsName+QString().setNum(i+1);
+  this->ChangeCurrentPoly();
+
+  this->FillMainForm();
+  this->FillStackPolygons();
+  this->ReadFilePoly(this->NamePolyToFile(this->CurrentNamePoly));
+  int Dx,Dy;
+  Dx=SerPoly->xn-IshXn;
+  Dy=SerPoly->yn-IshYn;
+  for(int x=0;x<SerPoly->W;x++)
+  {
+   for(int y=0;y<SerPoly->H;y++)
+   {
+    if(IshClassif[(x+Dx)+(y+Dy)*WIsh]!=NewPolygons[i].ClassNum)
+     SerPoly->ClassifMass[x+y*SerPoly->W]=-1;
+   }
+  }//for(int i=0;i<SerPoly->W;i++)
+  ui->DNWPic->pt.clear();
+ }
+ delete[] IshClassif;
+ NewPolygons.clear();
+ ui->DNWPic->repaint();
+}
+
+void DNSpecBath::on_PolyExp_triggered()
+{
+ double xg,yg,xp,yp;
+ QString FileName;
+ FileName=QFileDialog::getSaveFileName(this,"Сохранить файл геопривязки полигона","","GeoPolygon (*.gp)");
+ GeoDataStruct GDSt;
+ GdalImage->GetGeoData(&GDSt);
+
+ if(this->IsCurPolyClassif)
+ {
+  QString ClassifName=CurrentNameClassif.right(CurrentNameClassif.size()-CurrentNameClassif.lastIndexOf('/')-1);
+  ClassifName+="\0";
+  this->SerPoly->PolygonExpGeo(FileName,GDSt.XTopLeftPix,GDSt.XD,GDSt.XAngle,GDSt.YTopLeftPix,GDSt.YD,GDSt.YAngle,ClassifName);
+ }
+ else
+  this->SerPoly->PolygonExpGeo(FileName,GDSt.XTopLeftPix,GDSt.XD,GDSt.XAngle,GDSt.YTopLeftPix,GDSt.YD,GDSt.YAngle);
+}
+
+void DNSpecBath::on_PolyImp_triggered()
+{
+ QString FileName;
+ FileName=QFileDialog::getOpenFileName(this,"Открыть файл геопривязки полигона","","GeoPolygon (*.gp)");
+ ui->DNWPic->pt.clear();
+
+ /*Имя полигона*/
+ QString NamePoly;
+ QFileInfo FileInfo(FileName);
+ NamePoly=FileInfo.baseName();
+
+ QList <QPoint> pt;
+ GeoDataStruct GDSt;
+ GdalImage->GetGeoData(&GDSt);
+ QString ClassName;
+ bool *ClMass;
+ pt=DNPoly2::PolygonImpGeo(FileName,GDSt.XTopLeftPix,GDSt.XD,GDSt.XAngle,GDSt.YTopLeftPix,GDSt.YD,GDSt.YAngle,&ClMass,&ClassName);
+
+ /*Если некоторые точки выходят за рамки изображения*/
+ int Xmin,Xmax,Ymin,Ymax;
+ for(int i=0;i<pt.size();i++)
+ {
+  if(i==0)
+  {
+   Xmin=pt[i].x();
+   Ymin=pt[i].y();
+   Xmax=pt[i].x();
+   Ymax=pt[i].y();
+  }
+  else
+  {
+   if(Xmin>pt[i].x())
+    Xmin=pt[i].x();
+   if(Ymin>pt[i].y())
+    Ymin=pt[i].y();
+   if(Xmax<pt[i].x())
+    Xmax=pt[i].x();
+   if(Ymax<pt[i].y())
+    Ymax=pt[i].y();
+  }
+  if(pt[i].x()<0)
+   pt[i].setX(0);
+  if(pt[i].x()>=this->GdalImage->W)
+   pt[i].setX(this->GdalImage->W-1);
+  if(pt[i].y()<0)
+   pt[i].setY(0);
+  if(pt[i].y()>=this->GdalImage->H)
+   pt[i].setY(this->GdalImage->H-1);
+ }//for(i=0;i<pt.size();i++)
+
+ int nPoly;
+ ui->DNWPic->pt=pt;
+ nPoly=ui->DNWPic->NewPolygon();
+
+ nPoly-=1;
+ QPoint nP,kP;
+ nP=ui->DNWPic->Polygons[nPoly].GetMinP();
+ kP=ui->DNWPic->Polygons[nPoly].GetMaxP();
+ this->GdalImage->GenerateSpectrFile(nP.x(),nP.y(),
+                                     kP.x()-nP.x(),kP.y()-nP.y(),
+                                     ui->DNWPic->Polygons[nPoly].pt,NamePoly);
+
+ this->CurrentNamePoly=NamePoly;
+ this->ChangeCurrentPoly();
+
+ for(int x=this->SerPoly->xn;x<(this->SerPoly->xn+this->SerPoly->W);x++)
+ {
+  for(int y=this->SerPoly->yn;y<(this->SerPoly->yn+this->SerPoly->H);y++)
+  {
+   this->SerPoly->ClassifMass[(x-this->SerPoly->xn)+(y-this->SerPoly->yn)*this->SerPoly->W]=-1;
+   if(ClMass[(x-Xmin)+(y-Ymin)*(Xmax-Xmin)])
+    this->SerPoly->ClassifMass[(x-this->SerPoly->xn)+(y-this->SerPoly->yn)*this->SerPoly->W]=0;
+  }
+ }
+
+ QDir Dir;
+ if(!Dir.exists(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly))
+  Dir.mkdir(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly);
+ QFile FileClassMass(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly+'/'+ClassName+".kls");
+ FileClassMass.open(QIODevice::Truncate|QIODevice::WriteOnly);
+ FileClassMass.write((char*)this->SerPoly->ClassifMass,sizeof(int)*this->SerPoly->W*this->SerPoly->H);
+ FileClassMass.close();
+
+ this->FillMainForm();
+ this->FillStackPolygons();
+ this->ReadFilePoly(this->NamePolyToFile(this->CurrentNamePoly));
+
+ ui->DNWPic->pt.clear();
+ ui->DNWPic->repaint();
+ //delete[] ClMass;
 }
 
 void DNSpecBath::on_ButtonReCalcImg_clicked()
@@ -308,13 +445,9 @@ void DNSpecBath::on_treePolygons_itemClicked(QTreeWidgetItem *item, int column)
   this->CurrentNameClassif='/'+itemP->text(0)+this->CurrentNameClassif;
   FileNamePoly=this->NamePolyToFile(itemP->text(0));
 
-  this->ReadFilePoly(FileNamePoly);
-  this->FillStackPolygons();
-  this->ChangeCurrentPoly();
 
-//  QMessageBox msg;
-//  msg.setText(QString().setNum(ui->DNWPic->Polygons.size()));
-//  msg.exec();
+  this->ChangeCurrentPoly();
+  this->ReadFilePoly(FileNamePoly);
 
 
   //Если текущая позиция является результатом классификации
@@ -323,33 +456,9 @@ void DNSpecBath::on_treePolygons_itemClicked(QTreeWidgetItem *item, int column)
    this->ReadFileClassif(this->GdalImage->PathImgFile+'/'+this->GdalImage->NameImgFile+this->CurrentNameClassif+".kls");
   }
   ui->DNWPic->repaint();
-// }//if(!this->IsTreePolygonClear)
-// else
-// {
-//  this->IsTreePolygonClear=FALSE;
-// }
 }
 
-
-//void DNSpecBath::on_treePolygons_clicked(const QModelIndex &index)
-//{
-
-//// this->IsTreePolygonClear=FALSE;
-//// QMessageBox msg;
-//// msg.setText("clicked "+QString().setNum(this->IsTreePolygonClear));
-//// msg.exec();
-//}
-
-//void DNSpecBath::on_treePolygons_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous)
-//{
-//// QMessageBox msg;
-//// msg.setText(QString().setNum(this->IsTreePolygonClear));
-//// msg.exec();
-////    QMessageBox msg;
-////    msg.setText("currentItemChanged "+QString().setNum(this->IsTreePolygonClear));
-////    msg.exec();
-
-//}
+/*Тематические задачи*/
 
 void DNSpecBath::on_Batinometriy_triggered()
 {
@@ -367,7 +476,7 @@ void DNSpecBath::on_Batinometriy_triggered()
 
    this->SerPoly->Batinometr(nCh[0],nCh[1],nCh[2],nCh[3],nCh[4],nCh[5],nCh[6],nCh[7],nCh[8],nCh[9],nCh[10]);
   }
-  this->SerPoly->MedianFilter(3);
+
   QDir Dir;
   if(!Dir.exists(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly))
    Dir.mkdir(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly);
@@ -378,7 +487,12 @@ void DNSpecBath::on_Batinometriy_triggered()
 
   GeoDataStruct GDSt;
   GdalImage->GetGeoData(&GDSt);
-  Polygons=this->SerPoly->RastrToVector(GDSt.XTopLeftPix,GDSt.XD,GDSt.XAngle,GDSt.YTopLeftPix,GDSt.YD,GDSt.YAngle,SerPoly->KofV,SerPoly->MinV, this->FileNameOpen);
+  QList <QString> FieldsName;
+  QList <QString> FieldsType;
+  FieldsName<<"Deep";
+  FieldsType<<"double";
+  Polygons=this->SerPoly->RastrToVector(GDSt.XTopLeftPix,GDSt.XD,GDSt.XAngle,GDSt.YTopLeftPix,GDSt.YD,GDSt.YAngle,SerPoly->KofV,SerPoly->MinV,this->FileNameOpen,
+                                        FieldsName,FieldsType);
 
   ui->pbVectorize->setEnabled(true);
   ui->statusBar->showMessage(tr("Расчет спектральной батинометрии завершен"));
@@ -388,6 +502,833 @@ void DNSpecBath::on_Batinometriy_triggered()
 
  }//if(this->SerPoly!=NULL)
 }
+
+void DNSpecBath::on_MaskPokr_triggered()
+{
+ if(this->SerPoly!=NULL)
+ {
+  if(DlgMask!=NULL)
+   delete DlgMask;
+
+  DlgMask=new DlgMaskArea();
+  DlgMask->NameOrg=this->NameOrg;
+  DlgMask->NameProg=this->NameProg;
+
+  DlgMask->LamGrMS1=520;
+  DlgMask->LamGrMS2=590;
+
+  DlgMask->LamRedMS1=630;
+  DlgMask->LamRedMS2=690;
+
+  DlgMask->LamNir1MS1=760;
+  DlgMask->LamNir1MS2=900;
+
+  DlgMask->LamNir2MS1=900;
+  DlgMask->LamNir2MS2=1000;
+
+
+  DNBDSpectr BDSpec("QPSQL","REPER","repermaster","localhost","master");
+
+  QList <DNBDSpectr::NameAndNum> NameAndClsMask;
+  NameAndClsMask=BDSpec.ReadNamesSpectrs("Средства пассивной маскировки ВВСТ");
+
+  DlgMask->ListNameMask.clear();
+  for(int i=0;i<NameAndClsMask.size();i++)
+  {
+   DlgMask->ListNameMask<<NameAndClsMask[i].Name;//=BDSpec.ReadNamesSpectrs("Средства пассивной маскировки ВВСТ");
+   DlgMask->ListClsIdNameMask<<NameAndClsMask[i].Num.toInt();
+  }
+
+
+  connect(DlgMask,SIGNAL(ButtonOK()),this,SLOT(on_DlgMask_OK()));
+  DlgMask->show();
+ }//if(this->SerPoly!=NULL)
+// GeoDataStruct GDSt;
+// GdalImage->GetGeoData(&GDSt);
+// double xGeo,yGeo,xp,yp;
+// SerPoly->PixToGeo(200,300,GDSt.XTopLeftPix,GDSt.XD,GDSt.XAngle,GDSt.YTopLeftPix,GDSt.YD,GDSt.YAngle,&xGeo,&yGeo);
+// SerPoly->GeoToPix(&xp,&yp,GDSt.XTopLeftPix,GDSt.XD,GDSt.XAngle,GDSt.YTopLeftPix,GDSt.YD,GDSt.YAngle,xGeo,yGeo);
+// QMessageBox msg;
+// msg.setText(QString().setNum(yp,'d',6));
+// msg.exec();
+}
+
+void DNSpecBath::on_DlgMask_OK()
+{
+ float DeltaGS=DlgMask->DeltaGS;
+ float DeltaSub=DlgMask->DeltaSub;
+ float GSIndexPor=DlgMask->GSIndexPor;
+ float MaxDeriviant=DlgMask->MaxDeriviant;
+ int TypeFone=DlgMask->TypeFone;
+
+// QMessageBox msg;
+// msg.setText(QString().setNum(TypeFone));
+// msg.exec();
+
+ QString ClsId=DlgMask->ClsId;
+ QList <QString> ClsBackgroId;
+ ClsBackgroId.clear();
+ for(int i=0;i<DlgMask->ClsBackgroId.size();i++)
+  ClsBackgroId<<DlgMask->ClsBackgroId[i];
+
+ int NNir1=3,NNir2=2,NRed=1,NGreen=0;
+
+// if(this->GdalImage->Lamda!=NULL)
+// {
+//  NNir1=this->GdalImage->DetermNCh(750);
+//  NNir2=this->GdalImage->DetermNCh(850);
+//  NRed=this->GdalImage->DetermNCh(650);
+//  NGreen=this->GdalImage->DetermNCh(550);
+// }
+
+ int NCh1[3],NCh2[3];
+
+ NCh1[0]=this->GdalImage->DetermNCh(DlgMask->LamGrMS1);
+ NCh2[0]=this->GdalImage->DetermNCh(DlgMask->LamGrMS2);
+
+ NCh1[1]=this->GdalImage->DetermNCh(DlgMask->LamRedMS1);
+ NCh2[1]=this->GdalImage->DetermNCh(DlgMask->LamRedMS2);
+
+ NCh1[2]=this->GdalImage->DetermNCh(DlgMask->LamNir1MS1);
+ NCh2[2]=this->GdalImage->DetermNCh(DlgMask->LamNir1MS2);
+
+
+ for(int i=0;i<3;i++)
+ {
+  float *LamMass;
+  LamMass=new float[NCh2[i]-NCh1[i]+1];
+  for(int j=NCh1[i];j<=NCh2[i];j++)
+  {
+   LamMass[j-NCh1[i]]=GdalImage->Lamda[j];
+//   QMessageBox msg;
+//   msg.setText(QString().setNum(j-NCh1[2])+"\n"+QString().setNum(LamMass[j-NCh1[2]],'d',3));
+//   msg.exec();
+  }//for(int j=NumCh1;j<=NumCh2;j++)
+
+  SerPoly->AddIntegralChanal(NCh1[i],NCh2[i],LamMass);
+  delete[] LamMass;
+ }//for(int i=0;i<3;i++)
+
+ NNir1=SerPoly->Ch-1;
+ NRed=SerPoly->Ch-2;
+ NGreen=SerPoly->Ch-3;
+
+ SerPoly->MaskAreaMS(DlgMask->DeltaMS,DlgMask->TypeFone,
+                     NNir1,NNir2,NRed,NGreen,
+                     DlgMask->MSIndexPor,1.85,3
+                     /*0.7,0.8,0.9,1.85,500*/);
+
+ DlgMask->close();
+ {
+  QDir Dir;
+  if(!Dir.exists(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly))
+   Dir.mkdir(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly);
+  QFile FileClassMass(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly+'/'+"MaskAreaTap1"+".kls");
+  FileClassMass.open(QIODevice::Truncate|QIODevice::WriteOnly);
+  FileClassMass.write((char*)this->SerPoly->ClassifMass,sizeof(int)*this->SerPoly->W*this->SerPoly->H);
+  FileClassMass.close();
+  this->FillMainForm();
+ }
+
+ /*Перенос результата в гиперспектральные данные*/
+// GeoDataStruct GDSt;
+// GdalImage->GetGeoData(&GDSt);
+// SerPoly->PolygonExpGeo(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly+".gp",GDSt.XTopLeftPix,GDSt.XD,GDSt.XAngle,GDSt.YTopLeftPix,GDSt.YD,GDSt.YAngle,"MaskArea");
+// QString PathToMSPoly=this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly+".gp";
+
+// on_FileOpen_triggered();
+
+// /*Имя полигона*/
+// QString NamePoly;
+// QFileInfo FileInfo(PathToMSPoly);
+// NamePoly=FileInfo.baseName();
+
+// QList <QPoint> pt;
+// GdalImage->GetGeoData(&GDSt);
+// QString ClassName;
+// bool *ClMass;
+// pt=DNPoly::PolygonImpGeo(PathToMSPoly,GDSt.XTopLeftPix,GDSt.XD,GDSt.XAngle,GDSt.YTopLeftPix,GDSt.YD,GDSt.YAngle,&ClMass,&ClassName);
+
+// /*Если некоторые точки выходят за рамки изображения*/
+// int Xmin,Xmax,Ymin,Ymax;
+// for(int i=0;i<pt.size();i++)
+// {
+//  if(i==0)
+//  {
+//   Xmin=pt[i].x();
+//   Ymin=pt[i].y();
+//   Xmax=pt[i].x();
+//   Ymax=pt[i].y();
+//  }
+//  else
+//  {
+//   if(Xmin>pt[i].x())
+//    Xmin=pt[i].x();
+//   if(Ymin>pt[i].y())
+//    Ymin=pt[i].y();
+//   if(Xmax<pt[i].x())
+//    Xmax=pt[i].x();
+//   if(Ymax<pt[i].y())
+//    Ymax=pt[i].y();
+//  }
+//  if(pt[i].x()<0)
+//   pt[i].setX(0);
+//  if(pt[i].x()>=this->GdalImage->W)
+//   pt[i].setX(this->GdalImage->W-1);
+//  if(pt[i].y()<0)
+//   pt[i].setY(0);
+//  if(pt[i].y()>=this->GdalImage->H)
+//   pt[i].setY(this->GdalImage->H-1);
+// }//for(i=0;i<pt.size();i++)
+
+// int nPoly;
+// ui->DNWPic->pt=pt;
+// nPoly=ui->DNWPic->NewPolygon();
+
+// nPoly-=1;
+// QPoint nP,kP;
+// nP=ui->DNWPic->Polygons[nPoly].GetMinP();
+// kP=ui->DNWPic->Polygons[nPoly].GetMaxP();
+// this->GdalImage->GenerateSpectrFile(nP.x(),nP.y(),
+//                                     kP.x()-nP.x(),kP.y()-nP.y(),
+//                                     ui->DNWPic->Polygons[nPoly].pt,NamePoly);
+
+// this->CurrentNamePoly=NamePoly;
+// this->ChangeCurrentPoly();
+
+// on_MultiChan_triggered();
+
+// for(int x=this->SerPoly->xn;x<(this->SerPoly->xn+this->SerPoly->W);x++)
+// {
+//  for(int y=this->SerPoly->yn;y<(this->SerPoly->yn+this->SerPoly->H);y++)
+//  {
+//   this->SerPoly->ClassifMass[(x-this->SerPoly->xn)+(y-this->SerPoly->yn)*this->SerPoly->W]=-1;
+//   if(ClMass[(x-Xmin)+(y-Ymin)*(Xmax-Xmin)])
+//    this->SerPoly->ClassifMass[(x-this->SerPoly->xn)+(y-this->SerPoly->yn)*this->SerPoly->W]=0;
+//  }
+// }
+//*************************************************************************************************************
+ int N705,N750,N1000,NDif1,NDif2;
+ float *LamMass;
+ if(TypeFone==0)
+ {
+  NDif1=this->GdalImage->DetermNCh(550);
+  NDif2=this->GdalImage->DetermNCh(650);
+ }
+ if(TypeFone==1)
+ {
+  NDif1=-1;
+  NDif2=-1;
+ }
+
+ if(TypeFone==2)
+ {
+  NDif1=this->GdalImage->DetermNCh(535);
+  NDif2=this->GdalImage->DetermNCh(585);
+ }
+ N705=this->GdalImage->DetermNCh(705);
+ N750=this->GdalImage->DetermNCh(750);
+ N1000=this->GdalImage->DetermNCh(1000);
+
+ LamMass=new float[NDif2-NDif1+1];
+
+ for(int i=NDif1;i<=NDif2;i++)
+ {
+  LamMass[i-NDif1]=this->GdalImage->Lamda[i];
+ }//for(int i=NDif1;i<=NDif2;i++)
+
+
+ QList <int> NumChSubPix;
+
+ for(int i=500;i<=800;i+=5)
+ {
+  NumChSubPix<<this->GdalImage->DetermNCh(i);
+ }
+
+
+ float *LamMassSub;;
+ LamMassSub=new float[NumChSubPix.size()];
+ for(int i=0;i<NumChSubPix.size();i++)
+ {
+  LamMassSub[i]=this->GdalImage->Lamda[NumChSubPix[i]];
+ }
+
+////// QMessageBox msg;
+////// msg.setText(QString().setNum(LamMassSub[0],'d',3)+"\n"+QString().setNum(LamMassSub[SerPoly->IshCh-1],'d',3));
+////// msg.exec();
+
+ SerPoly->MaskAreaGS(ClsId,ClsBackgroId,DeltaGS,TypeFone,N705,N750,N1000,GSIndexPor,DeltaSub,LamMass,MaxDeriviant,NDif1,NDif2,LamMassSub,NumChSubPix);
+
+ delete[] LamMassSub;
+ delete[] LamMass;
+
+ {
+  QDir Dir;
+  if(!Dir.exists(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly))
+   Dir.mkdir(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly);
+  QFile FileClassMass(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly+'/'+/*ClassName*/"MaskAreaTap2"+".kls");
+  FileClassMass.open(QIODevice::Truncate|QIODevice::WriteOnly);
+  FileClassMass.write((char*)this->SerPoly->ClassifMass,sizeof(int)*this->SerPoly->W*this->SerPoly->H);
+  FileClassMass.close();
+ }
+
+ this->FillMainForm();
+// this->FillStackPolygons();
+// this->ReadFilePoly(this->NamePolyToFile(this->CurrentNamePoly));
+
+// ui->DNWPic->pt.clear();
+// ui->DNWPic->repaint();
+}
+
+void DNSpecBath::on_RoutMove_triggered()
+{
+ if(this->SerPoly!=NULL)
+ {
+  if(DlgRMove!=NULL)
+   delete DlgRMove;
+
+  DlgRMove=new DlgRoutMove();
+  DlgRMove->NameOrg=this->NameOrg;
+  DlgRMove->NameProg=this->NameProg;
+
+  connect(DlgRMove,SIGNAL(ButtonOK()),this,SLOT(on_DlgRMove_OK()));
+  DlgRMove->show();
+ }//if(this->SerPoly!=NULL)
+}
+
+void DNSpecBath::on_DlgRMove_OK()
+{
+ QList <QString> proba;
+ DNBDSpectr BDSpec("QPSQL","REPER","repermaster","localhost","master");
+
+ int Ngreen=2,Nred=4,Nnir=6,NredEdge=5;
+
+ float NDVIpor=DlgRMove->NDVIPor;
+ int NumCl=DlgRMove->NumCl;
+ float MaxSKO=DlgRMove->MaxSKO;
+ float Qc=DlgRMove->Qc;
+ int I=DlgRMove->I;
+ float LengthPor=DlgRMove->LengthPor;
+ float MultiCh=DlgRMove->MultiCh;
+ int Fenolog=DlgRMove->Fenolog;
+ DlgRMove->close();
+
+ QString PolyNameIsh=CurrentNamePoly;
+
+ int N630,N690,N700,N800,N520,N600,N1000;
+
+ N630=this->GdalImage->DetermNCh(630);
+ N690=this->GdalImage->DetermNCh(690);
+ N700=this->GdalImage->DetermNCh(700);
+ N800=this->GdalImage->DetermNCh(800);
+ N520=this->GdalImage->DetermNCh(520);
+ N600=this->GdalImage->DetermNCh(600);
+ N1000=this->GdalImage->DetermNCh(1000);
+
+
+ SerPoly->AddIntegralChanal(N630,N690);
+ Nred=SerPoly->Ch-1;
+
+ SerPoly->AddIntegralChanal(N800,N1000);
+ Nnir=SerPoly->Ch-1;
+
+ SerPoly->AddIntegralChanal(N700,N800);
+ NredEdge=SerPoly->Ch-1;
+
+ SerPoly->AddIntegralChanal(N520,N600);
+ Ngreen=SerPoly->Ch-1;
+
+ SerPoly->RoutMoveTap1(Ngreen,Nred,Nnir,NredEdge,NDVIpor,NumCl,MaxSKO,Qc,I);
+
+ {
+  QDir Dir;
+  if(!Dir.exists(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly))
+   Dir.mkdir(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly);
+  QFile FileClassMass(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly+'/'+"RoutMoveIsoData"+".kls");
+  FileClassMass.open(QIODevice::Truncate|QIODevice::WriteOnly);
+  FileClassMass.write((char*)this->SerPoly->ClassifMass,sizeof(int)*this->SerPoly->W*this->SerPoly->H);
+  FileClassMass.close();
+  this->FillMainForm();
+ }
+ /*Результаты классификации в новые полигоны*/
+ PolygonsName="RoutMoveCl";
+ on_ClassResultToPoly_triggered();
+ PolygonsName="NewPolyCl";
+
+ /*Чтение новых полигонов и получение спектральных данных*/
+ QStringList Files;
+ QString DataString;
+ QDir CurDir(this->GdalImage->PathImgFile+'/'+this->GdalImage->NameImgFile);
+ QList <float*> MidlSpec;
+ int nChObr=4;
+
+ Files=CurDir.entryList(QStringList()<<"RoutMoveCl*.pol",QDir::Files,QDir::Name);
+
+ foreach(DataString,Files)
+ {
+  ReadFilePoly(NamePolyToFile(DataString.remove(".pol")));
+
+  if(SerPoly->px>5)
+  {
+   bool *MaskCh;
+   MaskCh=new bool[SerPoly->Ch];
+   MidlSpec<<new float[nChObr];
+
+   for(int i=0;i<SerPoly->Ch;i++)
+   {
+    MaskCh[i]=false;
+    if(i==Ngreen || i==Nred || i==Nnir || i==NredEdge)
+     MaskCh[i]=true;
+   }
+   SerPoly->MultiCh(MultiCh);
+   SerPoly->GetMidlSpecPoly(SerPoly->CurrentPoly,SerPoly->px,MidlSpec[MidlSpec.size()-1],MaskCh);
+   delete[] MaskCh;
+  }//if(SerPoly->px>5)
+ }//foreach(DataString1,PolygonsFiles)
+
+ /*Вытаскивание данных из БД*/
+ float LamStart[4],LamFinish[4];
+ QList <float*> SpecEtolon;
+ LamStart[0]=540;
+ LamStart[1]=630;
+ LamStart[2]=690;
+ LamStart[3]=750;
+
+ LamFinish[0]=600;
+ LamFinish[1]=690;
+ LamFinish[2]=720;
+ LamFinish[3]=840;
+
+ QList <DNBDSpectr::NameAndNum> NameClsIdForests;
+ NameClsIdForests=BDSpec.ReadNamesSpectrs("Леса");
+ QList <QString> ClsBackGroId;
+ ClsBackGroId.clear();
+ ClsBackGroId<<"0";
+
+ QList <float> Green;
+ QList <float> Red;
+ QList <float> RedEdge;
+ QList <float> Nir;
+ QList <QString> ClsId;
+
+ for(int i=0;i<NameClsIdForests.size();i++)
+ {
+  Green.clear();
+  RedEdge.clear();
+  Red.clear();
+  Nir.clear();
+
+  Green=BDSpec.GetBrightIntegral(LamStart[0],LamFinish[0],NameClsIdForests[i].Num,ClsBackGroId,Fenolog);
+  RedEdge=BDSpec.GetBrightIntegral(LamStart[1],LamFinish[1],NameClsIdForests[i].Num,ClsBackGroId,Fenolog);
+  Red=BDSpec.GetBrightIntegral(LamStart[2],LamFinish[2],NameClsIdForests[i].Num,ClsBackGroId,Fenolog);
+  Nir=BDSpec.GetBrightIntegral(LamStart[3],LamFinish[3],NameClsIdForests[i].Num,ClsBackGroId,Fenolog);
+
+  for(int j=0;j<Green.size();j++)
+  {
+   if(Nir[j]>0 && Red[j]>0 && Green[j]>0 && RedEdge[j]>0)
+   {
+    SpecEtolon<<new float[4];
+    SpecEtolon[SpecEtolon.size()-1][0]=Green[j];
+    SpecEtolon[SpecEtolon.size()-1][1]=Red[j];
+    SpecEtolon[SpecEtolon.size()-1][2]=RedEdge[j];
+    SpecEtolon[SpecEtolon.size()-1][3]=Nir[j];
+    ClsId<<NameClsIdForests[i].Num;
+   }//if(Nir[j]>0 && Red[j]>0)
+  }//for(int j=0;j<Green.size();j++)
+ }//for(int i=0;i<NameClsIdForests.size();i++)
+
+ //Определение эталонов для реклассификации по Байесу
+ DNMathAdd MathAdd;
+ struct PolygonsEtolonProp
+ {
+  QString ClsId;
+  float MinEvkl;
+  QString NamePoly;
+  quint64 NumGraph;
+ };
+
+ PolygonsEtolonProp *PolEtol;
+ PolEtol=new PolygonsEtolonProp[MidlSpec.size()]; //Каждому полигону назначается свой эталон из бд по минимуму эвклида
+
+ //Отнесение каждого полигона к какому-либо классу по минимуму эвклида
+ for(quint64 i=0;i<MidlSpec.size();i++)
+ {
+  float MinEvkl,Evkl;
+  for(quint64 j=0; j<ClsId.size();j++)
+  {
+   Evkl=MathAdd.CalcEvklid(SpecEtolon[j],MidlSpec[i],nChObr);
+   if(j==0)
+   {
+    MinEvkl=Evkl;
+    PolEtol[i].ClsId=ClsId[0];
+    PolEtol[i].MinEvkl=MinEvkl;
+    PolEtol[i].NamePoly=Files[0];
+    PolEtol[i].NumGraph=i;
+   }//if(j==0)
+   if(j!=0 && Evkl<MinEvkl)
+   {
+    MinEvkl=Evkl;
+    PolEtol[i].ClsId=ClsId[j];
+    PolEtol[i].MinEvkl=MinEvkl;
+    PolEtol[i].NamePoly=Files[j];
+   }//if(j!=0 && Evkl<MinEvkl)
+  }//for(quint64 j=0; j<ClsId.size();j++)
+//  QMessageBox msg;
+//  msg.setText(PolEtol[i].ClsId);
+//  msg.exec();
+ }//for(quint64 i=0;i<MidlSpec.size();i++)
+
+ //Выделение из полигонов с одинаковыми классами (ClsId) эталонных (по минимуму расстояния)
+ QList <PolygonsEtolonProp> Etolons; //Из всех полигонов выбираются этолонные для каждого ClsId по минимуму эвклида внутри полигонов с одинаковым ClsId
+ PolygonsEtolonProp EtolMinEvkl;
+ for(quint64 i=0; i<MidlSpec.size();i++)
+ {
+  bool IsClsIdValid=false;
+  for(quint64 j=0; j<Etolons.size(); j++)
+  {
+   if(Etolons[j].ClsId==PolEtol[i].ClsId)
+   {
+    IsClsIdValid=true;
+    break;
+   }//if(Etolons[j].ClsId==PolEtol[i].ClsId)
+  }//for(quint64 j=0; j<Etolons.size(); j++)
+  if(!IsClsIdValid)
+  {
+   EtolMinEvkl=PolEtol[i];
+   for(quint64 j=0;j<MidlSpec.size();j++)
+   {
+    if(j!=i && PolEtol[i].ClsId==PolEtol[j].ClsId && PolEtol[i].MinEvkl>PolEtol[j].MinEvkl)
+    {
+     EtolMinEvkl=PolEtol[j];
+    }
+   }//for(quint64 j=0;j<MidlSpec.size();j++)
+   Etolons<<EtolMinEvkl;
+  }//if(!IsClsIdValid)
+ }//for(quint64 i=0; i<MidlSpec.size();i++)
+
+ delete[] PolEtol;
+
+ if(Etolons.size()>1)
+ {
+  ReadFilePoly(NamePolyToFile(PolyNameIsh));
+  ReadFileClassif(this->GdalImage->PathImgFile+'/'+this->GdalImage->NameImgFile+'/'+PolyNameIsh+'/'+"RoutMoveIsoData"+".kls");
+  bool *NoBlackPix;
+  NoBlackPix=new bool[SerPoly->W*SerPoly->H];
+  for(quint64 i=0;i<SerPoly->W*SerPoly->H;i++)
+  {
+   NoBlackPix[i]=false;
+   if(SerPoly->ClassifMass[i]>=0)
+   {
+    NoBlackPix[i]=true;
+   }
+  }
+  QStringList PolyFileNames;
+
+  for(int i=0;i<Etolons.size();i++)
+  {
+   PolyFileNames<<NamePolyToFile(Etolons[i].NamePoly.remove(".pol"));
+  }
+  bool *MaskCh;
+  MaskCh=new bool[SerPoly->Ch];
+  for(int i=0;i<SerPoly->Ch;i++)
+  {
+   MaskCh[i]=false;
+   if(i==Ngreen || i==Nred || i==Nnir || i==NredEdge)
+    MaskCh[i]=true;
+  }
+  SerPoly->MaxLike(NoBlackPix,PolyFileNames,MaskCh);
+  for(quint64 i=0;i<SerPoly->W*SerPoly->H;i++)
+  {
+   if(SerPoly->ClassifMass[i]>=0)
+    SerPoly->ClassifMass[i]=Etolons[SerPoly->ClassifMass[i]].ClsId.toInt();
+  }
+  {
+   QDir Dir;
+   if(!Dir.exists(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly))
+    Dir.mkdir(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly);
+   QFile FileClassMass(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly+'/'+"RoutMove"+".kls");
+   FileClassMass.open(QIODevice::Truncate|QIODevice::WriteOnly);
+   FileClassMass.write((char*)this->SerPoly->ClassifMass,sizeof(int)*this->SerPoly->W*this->SerPoly->H);
+   FileClassMass.close();
+   this->FillMainForm();
+  }
+  delete[] MaskCh;
+ }//if(Etolons.size()>1)
+
+ else
+ {
+  ReadFilePoly(NamePolyToFile(PolyNameIsh));
+  ReadFileClassif(this->GdalImage->PathImgFile+'/'+this->GdalImage->NameImgFile+'/'+PolyNameIsh+'/'+"RoutMoveIsoData"+".kls");
+//  QMessageBox msg;
+//  msg.setText(this->GdalImage->PathImgFile+'/'+this->GdalImage->NameImgFile+'/'+PolyNameIsh+'/'+"RoutMoveIsoData"+".kls");
+//  msg.exec();
+  for(quint64 i=0;i<SerPoly->W*SerPoly->H;i++)
+  {
+   if(SerPoly->ClassifMass[i]>=0)
+   {
+    SerPoly->ClassifMass[i]=Etolons[0].ClsId.toInt();
+   }
+  }
+  {
+   QDir Dir;
+   if(!Dir.exists(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly))
+    Dir.mkdir(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly);
+   QFile FileClassMass(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly+'/'+"RoutMove"+".kls");
+   FileClassMass.open(QIODevice::Truncate|QIODevice::WriteOnly);
+   FileClassMass.write((char*)this->SerPoly->ClassifMass,sizeof(int)*this->SerPoly->W*this->SerPoly->H);
+   FileClassMass.close();
+   this->FillMainForm();
+  }
+ }
+
+// QMessageBox msg;
+// msg.setText(Etolons[0].ClsId);//QString().setNum(Etolons.size()));
+// msg.exec();
+
+}
+
+void DNSpecBath::on_RoutMove2_triggered()
+{
+ if(this->SerPoly!=NULL)
+ {
+  if(DlgRMove2!=NULL)
+   delete DlgRMove2;
+
+  DlgRMove2=new DlgRoutMove2();
+  DlgRMove2->NameOrg=this->NameOrg;
+  DlgRMove2->NameProg=this->NameProg;
+
+  DlgRMove2->Lam1NDVI1[0]=750;
+  DlgRMove2->Lam1NDVI1[1]=860;
+
+  DlgRMove2->Lam2NDVI1[0]=630;
+  DlgRMove2->Lam2NDVI1[1]=690;
+
+  DlgRMove2->Lam1NDVI2[0]=750;
+  DlgRMove2->Lam1NDVI2[1]=860;
+
+  DlgRMove2->Lam2NDVI2[0]=690;
+  DlgRMove2->Lam2NDVI2[1]=720;
+
+  DlgRMove2->Lam1NDVI3[0]=800;
+  DlgRMove2->Lam1NDVI3[1]=900;
+
+  DlgRMove2->Lam2NDVI3[0]=720;
+  DlgRMove2->Lam2NDVI3[1]=800;
+
+  DlgRMove2->Lam1WBI=900;
+  DlgRMove2->Lam2WBI=970;
+
+  connect(DlgRMove2,SIGNAL(ButtonOK()),this,SLOT(on_DlgRMove2_OK()));
+  DlgRMove2->show();
+    }//if(this->SerPoly!=NULL)
+}
+
+void DNSpecBath::on_DlgRMove2_OK()
+{
+ int N630,N690,N750,N860,N720,N800,N900,N970;
+ float NDVIPor1,DeltaNDVIPor1,NDVIPor2,DeltaNDVIPor2,NDVIPor3,DeltaNDVIPor3,WBIPor;
+
+ N630=this->GdalImage->DetermNCh(DlgRMove2->Lam2NDVI1[0]);
+ N690=this->GdalImage->DetermNCh(DlgRMove2->Lam2NDVI1[1]);
+ N750=this->GdalImage->DetermNCh(DlgRMove2->Lam1NDVI2[0]);
+ N860=this->GdalImage->DetermNCh(DlgRMove2->Lam1NDVI1[1]);
+ N720=this->GdalImage->DetermNCh(DlgRMove2->Lam2NDVI3[0]);
+ N800=this->GdalImage->DetermNCh(DlgRMove2->Lam2NDVI3[1]);
+ N900=this->GdalImage->DetermNCh(DlgRMove2->Lam1WBI);
+ N970=this->GdalImage->DetermNCh(DlgRMove2->Lam2WBI);
+
+ NDVIPor1=DlgRMove2->PorNDVI1;
+ NDVIPor2=DlgRMove2->PorNDVI2;
+ NDVIPor3=DlgRMove2->PorNDVI3;
+ WBIPor=DlgRMove2->PorWBI;
+
+ DeltaNDVIPor1=DlgRMove2->DeltaNDVI1;
+ DeltaNDVIPor2=DlgRMove2->DeltaNDVI2;
+ DeltaNDVIPor3=DlgRMove2->DeltaNDVI3;
+
+
+ SerPoly->RoutMoveTap2(N630,N690,N750,N860,N720,N800,N900,N970,
+                       NDVIPor1,DeltaNDVIPor1,NDVIPor2,DeltaNDVIPor2,NDVIPor3,DeltaNDVIPor3,WBIPor);
+
+ DlgRMove2->close();
+
+ {
+  QDir Dir;
+  if(!Dir.exists(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly))
+   Dir.mkdir(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly);
+  QFile FileClassMass(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly+'/'+"RoutMoveTap2"+".kls");
+  FileClassMass.open(QIODevice::Truncate|QIODevice::WriteOnly);
+  FileClassMass.write((char*)this->SerPoly->ClassifMass,sizeof(int)*this->SerPoly->W*this->SerPoly->H);
+  FileClassMass.close();
+  this->FillMainForm();
+ }
+}
+
+void DNSpecBath::on_Smoces_triggered()
+{
+ if(this->SerPoly!=NULL)
+ {
+  if(DlgSmoce!=NULL)
+   delete DlgSmoce;
+
+  DlgSmoce=new DlgSmoces();
+  DlgSmoce->NameOrg=this->NameOrg;
+  DlgSmoce->NameProg=this->NameProg;
+  DlgSmoce->LamBegin=585;
+  DlgSmoce->LamEnd=625;
+
+  connect(DlgSmoce,SIGNAL(ButtonOK()),this,SLOT(on_DlgSmoces_OK()));
+  DlgSmoce->show();
+ }//if(this->SerPoly!=NULL)
+}
+
+void DNSpecBath::on_DlgSmoces_OK()
+{
+ float R600Por=DlgSmoce->R600por;
+ float KofCorrPor=DlgSmoce->KofCorpor;
+ int NRead=4;
+ int NNir=6;
+ int N600=3;
+ int N500=2;
+ SerPoly->SmocesTap1(NRead,NNir,0.3);
+
+ {
+  QDir Dir;
+  if(!Dir.exists(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly))
+   Dir.mkdir(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly);
+  QFile FileClassMass(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly+'/'+"SmocesTap1"+".kls");
+  FileClassMass.open(QIODevice::Truncate|QIODevice::WriteOnly);
+  FileClassMass.write((char*)this->SerPoly->ClassifMass,sizeof(int)*this->SerPoly->W*this->SerPoly->H);
+  FileClassMass.close();
+  this->FillMainForm();
+ }
+
+ //Этап 2 Отсеиваем класс с высоким NDVI
+// quint64 KPoint1=0,KPoint2=0;
+// float *DataSpec1,*DataSpec2;
+// bool *NoBlackPix;
+// bool *MaskCh;
+// NoBlackPix=new bool[SerPoly->W*SerPoly->H];
+// MaskCh=new bool[SerPoly->Ch];
+// DataSpec1=new float[1];
+// DataSpec2=new float[1];
+
+// for(int i=0;i<SerPoly->Ch;i++)
+// {
+//  MaskCh=false;
+// }
+
+// MaskCh[SerPoly->Ch-1]=true;
+// for(quint64 i=0;i<SerPoly->W*SerPoly->H;i++)
+// {
+//  NoBlackPix[i]=false;
+//  if(SerPoly->ClassifMass>=0)
+//   NoBlackPix[i]=true;
+//  if(SerPoly->ClassifMass[i]==0)
+//   KPoint1++;
+//  if(SerPoly->ClassifMass[i]==1)
+//   KPoint2++;
+// }
+
+// SerPoly->GetMidleSpectrClass(DataSpec1,KPoint1,0,SerPoly->ClassifMass,NoBlackPix,MaskCh);
+// SerPoly->GetMidleSpectrClass(DataSpec2,KPoint1,1,SerPoly->ClassifMass,NoBlackPix,MaskCh);
+
+// if(DataSpec1>DataSpec2)
+// {
+//  for(quint64 i=0;i<SerPoly->W*SerPoly->H;i++)
+//  {
+//   if(SerPoly->ClassifMass[i]==0)
+//    SerPoly->ClassifMass[i]=-1;
+//  }
+// }
+// else
+// {
+//  for(quint64 i=0;i<SerPoly->W*SerPoly->H;i++)
+//  {
+//   if(SerPoly->ClassifMass[i]==1)
+//    SerPoly->ClassifMass[i]=-1;
+//  }
+// }
+// delete[] DataSpec1;
+// delete[] DataSpec2;
+// delete[] MaskCh;
+// delete[] NoBlackPix;
+
+// {
+//  QDir Dir;
+//  if(!Dir.exists(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly))
+//   Dir.mkdir(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly);
+//  QFile FileClassMass(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly+'/'+"SmocesTap2"+".kls");
+//  FileClassMass.open(QIODevice::Truncate|QIODevice::WriteOnly);
+//  FileClassMass.write((char*)this->SerPoly->ClassifMass,sizeof(int)*this->SerPoly->W*this->SerPoly->H);
+//  FileClassMass.close();
+//  this->FillMainForm();
+// }
+
+ //Этап 3 Отсеиваем полигоны по пороговому значению R600 и коэффициенту корреляции
+ SerPoly->SmocesTap2(R600Por,KofCorrPor,N600,N500);
+
+ {
+  QDir Dir;
+  if(!Dir.exists(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly))
+   Dir.mkdir(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly);
+  QFile FileClassMass(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly+'/'+"SmocesTapFinal"+".kls");
+  FileClassMass.open(QIODevice::Truncate|QIODevice::WriteOnly);
+  FileClassMass.write((char*)this->SerPoly->ClassifMass,sizeof(int)*this->SerPoly->W*this->SerPoly->H);
+  FileClassMass.close();
+  this->FillMainForm();
+ }
+
+}
+
+void DNSpecBath::on_EmbedObj_triggered()
+{
+ if(DlgEO!=NULL)
+  delete DlgEO;
+
+ DlgEO=new DlgEmbedObj();
+ DlgEO->NameOrg=this->NameOrg;
+ DlgEO->NameProg=this->NameProg;
+// DlgEO->LamBegin=585;
+// DlgEO->LamEnd=625;
+
+ DlgEO->LamMSIndex1[0]=700;
+ DlgEO->LamMSIndex1[1]=800;
+
+ DlgEO->LamMSIndex2[0]=630;
+ DlgEO->LamMSIndex2[1]=690;
+
+ DlgEO->LamGSIndex[0]=750;
+ DlgEO->LamGSIndex[1]=705;
+
+ DlgEO->LamContr1[0]=630;
+ DlgEO->LamContr1[1]=690;
+
+ DlgEO->LamContr2[0]=800;
+ DlgEO->LamContr2[1]=1000;
+
+ connect(DlgEO,SIGNAL(ButtonOK()),this,SLOT(on_DlgEmbedObj_OK()));
+ DlgEO->show();
+}
+
+void DNSpecBath::on_DlgEmbedObj_OK()
+{
+ DlgEO->hide();
+
+ {
+  QDir Dir;
+  if(!Dir.exists(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly))
+   Dir.mkdir(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly);
+  QFile FileClassMass(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly+'/'+"EmbedObj"+".kls");
+  FileClassMass.open(QIODevice::Truncate|QIODevice::WriteOnly);
+  FileClassMass.write((char*)this->SerPoly->ClassifMass,sizeof(int)*this->SerPoly->W*this->SerPoly->H);
+  FileClassMass.close();
+  this->FillMainForm();
+ }
+}
+
+/*Конец тематических задач*/
 
 void DNSpecBath::on_MultiChan_triggered()
 {
@@ -403,6 +1344,622 @@ void DNSpecBath::on_MultiChan_triggered()
  }//if(this->SerPoly!=NULL)
 }
 
+void DNSpecBath::on_pbVectorize_clicked()
+{
+ emit SIGNALcreateVector(); // посылаем сигнал для выполнения векторизации
+}
+
+void DNSpecBath::on_ShowDeptch_triggered()
+{
+ if(this->DlgShowDepth!=NULL)
+  delete this->DlgShowDepth;
+
+ QDialog *Dlg;
+ Dlg=new QDialog(this);
+ this->DlgShowDepth=new Ui_DlgShowDeptch();
+ this->DlgShowDepth->setupUi(Dlg);
+ DlgShowDepth->ComboCh->clear();
+
+ for(int i=0;i<SerPoly->Ch;i++)
+ {
+  DlgShowDepth->ComboCh->addItem("Канал"+QString().setNum(i+1));
+ }
+
+ Dlg->show();
+
+ connect(ui->DNWPic,SIGNAL(MouseMove(int,int)),this,SLOT(MouseMove(int,int)));
+}
+
+void DNSpecBath::MouseMove(int x, int y)
+{
+ if(DlgShowDepth!=NULL)
+ {
+  DlgShowDepth->EditX->setText(QString().setNum(x));
+  DlgShowDepth->EditY->setText(QString().setNum(y));
+
+  if(this->SerPoly!=NULL &&
+     x>=this->SerPoly->xn && x<this->SerPoly->xn+this->SerPoly->W &&
+     y>=this->SerPoly->yn && y<this->SerPoly->yn+this->SerPoly->H /*&&
+     this->SerPoly->IsPolyClassif*/)
+  {
+   bool *MaskCh=new bool[this->SerPoly->Ch];
+   for(int i=0;i<this->SerPoly->Ch;i++)
+   {
+    MaskCh[i]=FALSE;
+    if(i==DlgShowDepth->ComboCh->currentIndex())
+     MaskCh[i]=TRUE;
+   }//for(int i=0;i<this->SerPoly->Ch;i++)
+   float Brigth;
+   this->SerPoly->GetSpectrPoint(x,y,&Brigth,MaskCh);
+   DlgShowDepth->EditBrigth->setText(QString().setNum(Brigth,'d',4));
+   delete[] MaskCh;
+  }
+ }//if(DlgShowDepth!=NULL)
+}
+
+void DNSpecBath::MouseLClicked(int x, int y)
+{
+ if(this->DlgSKOGraph!=NULL)
+ {
+  DlgSKOGraph->EditX->setText(QString().setNum(x));
+  DlgSKOGraph->EditY->setText(QString().setNum(y));
+ }//if(this->DlgSKOGraph!=NULL)
+ if(this->DlgMouseCoord!=NULL)
+ {
+  DlgMouseCoord->EditX->setText(QString().setNum(x));
+  DlgMouseCoord->EditY->setText(QString().setNum(y));
+ }
+ if(DlgAI!=NULL)
+ {
+  DlgAI->XMouse=x;
+  DlgAI->YMouse=y;
+  DlgAI->FillMouseCoord(x,y);
+  ui->DNWPic->IsDlgAIHidden=DlgAI->isHidden();
+  ui->DNWPic->repaint();
+ }
+
+ this->XMouse=x;
+ this->YMouse=y;
+}
+
+void DNSpecBath::on_CreateSpecGraph_triggered(bool checked)
+{
+ if(this->DlgSG==NULL)
+ {
+  DlgSG=new DlgSpecGraph(this);
+  connect(ui->DNWPic,SIGNAL(MouseDoubleCliced(int,int)),this->DlgSG,SLOT(MouseDoubleCliced(int,int)));
+ }
+ if(this->DlgSG->isHidden())
+ {
+  this->DlgSG->show();
+  this->DlgSG->ThisPoly=this->SerPoly;
+ }//if(this->DlgSG->isHidden())
+}
+
+void DNSpecBath::on_CreateSKOGraph_triggered()
+{
+ if(SerPoly!=NULL)
+ {
+  if(this->DlgSKOGraph!=NULL)
+   delete this->DlgSKOGraph;
+
+  QDialog *Dlg;
+  Dlg=new QDialog(this);
+  this->DlgSKOGraph=new Ui_DlgSKOGraph();
+  this->DlgSKOGraph->setupUi(Dlg);
+
+  DlgSKOGraph->ComboCh->clear();
+  for(int i=0;i<SerPoly->Ch;i++)
+  {
+   DlgSKOGraph->ComboCh->addItem("Канал "+QString().setNum(i+1));
+  }//for(int i=0;i<SerPoly->Ch;i++)
+  DlgSKOGraph->EditFrom->setText("5");
+  DlgSKOGraph->EditTo->setText("50");
+  Dlg->show();
+  connect(ui->DNWPic,SIGNAL(MouseLClicked(int,int)),this,SLOT(MouseLClicked(int,int)));
+  connect(this->DlgSKOGraph->ButtonOK,SIGNAL(clicked()),this,SLOT(on_DlgSKOGraph_OK()));
+ }//if(SerPoly!=NULL)
+}
+
+void DNSpecBath::on_DlgSKOGraph_OK()
+{
+// if(this->DlgG!=NULL)
+//  delete this->DlgG;
+ int xp,yp,nFrom,nTo,nCh;
+ xp=DlgSKOGraph->EditX->text().toInt();
+ yp=DlgSKOGraph->EditY->text().toInt();
+ nFrom=DlgSKOGraph->EditFrom->text().toInt();
+ nTo=DlgSKOGraph->EditTo->text().toInt();
+ nCh=DlgSKOGraph->ComboCh->currentIndex();
+
+ xp=xp-this->SerPoly->xn;
+ yp=yp-this->SerPoly->yn;
+
+ float *x,*y;
+ x=new float[nTo-nFrom];
+ y=new float[nTo-nFrom];
+
+ for(int i=nFrom;i<nTo;i++)
+ {
+  x[i-nFrom]=i;
+  y[i-nFrom]=this->SerPoly->GetSKOPoint(xp,yp,i,nCh);
+ }
+ if(this->DlgG==NULL)
+ {
+  this->DlgG=new DlgGraph(this);
+     connect(this->DlgG,SIGNAL(rejected()),this,SLOT(DlgGraphDestroy()));
+ }
+
+
+ this->DlgG->AddGraph(x,y,nTo-nFrom);
+
+ if(this->DlgG->isHidden())
+  this->DlgG->show();
+ this->DlgG->repaint();
+}
+
+void DNSpecBath::DlgGraphDestroy()
+{
+ delete this->DlgG;
+ this->DlgG=NULL;
+}
+
+void DNSpecBath::on_OilWater_triggered()
+{
+ if(this->DlgMouseCoord!=NULL)
+  delete this->DlgMouseCoord;
+
+ QDialog *Dlg;
+ Dlg=new QDialog(this);
+ this->DlgMouseCoord=new Ui_DlgMouseCoord();
+ this->DlgMouseCoord->setupUi(Dlg);
+
+ connect(ui->DNWPic,SIGNAL(MouseLClicked(int,int)),this,SLOT(MouseLClicked(int,int)));
+ connect(this->DlgMouseCoord->ButtonOK,SIGNAL(clicked()),this,SLOT(on_DlgMouseCoord_OK()));
+}
+
+void DNSpecBath::on_DlgMouseCoord_OK()
+{
+ int xp,yp;
+ QList <QPoint> Pt;
+
+ xp=DlgMouseCoord->EditX->text().toInt();
+ yp=DlgMouseCoord->EditY->text().toInt();
+
+ xp=xp-this->SerPoly->xn;
+ yp=yp-this->SerPoly->yn;
+
+ if(this->GdalImage->Lamda!=NULL)
+ {
+  float *SpectrPt,*SpectrZone;
+  bool *MaskCh;
+
+  int n510,n555;
+  int n600,n1000;
+  int n730,n980;
+  int n590,n710;
+  int n400,n405;
+  int n550,n580;
+
+  n600=GdalImage->DetermNCh(600);
+  n1000=GdalImage->DetermNCh(1000);
+
+//  if(SerPoly->Ch==SerPoly->IshCh)
+//  {
+//   QString Str;
+//   Str='['+QString().setNum(n600)+'-'+QString().setNum(n1000)+']';
+//   SerPoly->AddChanal();
+//  }//if(SerPoly->Ch==SerPoly->IshCh)
+
+  Pt=this->SerPoly->DefinePixels(5,xp,yp);
+  MaskCh=new bool[SerPoly->Ch];
+  for(int i=0;i<SerPoly->Ch;i++)
+  {
+   MaskCh[i]=true;
+  }
+
+
+
+  SpectrPt=new float[SerPoly->Ch];
+  SpectrZone=new float[SerPoly->Ch];
+  memset(SpectrZone,0,SerPoly->Ch*sizeof(float));
+
+  for(int i=0;i<Pt.size();i++)
+  {
+   int x,y;
+   x=Pt[i].x()+SerPoly->xn;
+   y=Pt[i].y()+SerPoly->yn;
+   SerPoly->GetSpectrPoint(x,y,SpectrPt,MaskCh);
+   for(int j=0;j<SerPoly->Ch;j++)
+   {
+    SpectrZone[j]+=SpectrPt[j]/Pt.size();
+   }//for(int j=0;j<SerPoly->Ch;j++)
+  }//for(int i=0;i<Pt.size();i++)
+  delete[] SpectrPt;
+  delete[] MaskCh;
+ }//if(this->GdalImage->Lamda!=NULL)
+}
+
+void DNSpecBath::on_IsoData_triggered()
+{
+ if(DlgID!=NULL)
+  delete DlgID;
+
+ this->DlgID=new DlgIsoData(this);
+ this->DlgID->NameOrg=this->NameOrg;
+ this->DlgID->NameProg=this->NameProg;
+
+ this->DlgID->ThisPoly=this->SerPoly;
+ this->DlgID->PathData=this->GdalImage->PathImgFile+'/'+this->GdalImage->NameImgFile;
+ this->DlgID->FileNameChan=this->FileNameChan;
+
+ this->DlgID->Lamda=GdalImage->Lamda;
+ this->DlgID->IsChanSpecColibr=GdalImage->Lamda;
+
+ DlgID->show();
+ connect(this->DlgID,SIGNAL(ButtonOK()),this,SLOT(on_DlgIsoData_OK()));
+}
+
+void DNSpecBath::on_DlgIsoData_OK()
+{
+ this->SerPoly->IsoData(this->SerPoly->CurrentPoly,
+                        DlgID->KolvoKl,
+                        DlgID->MaxSKO,
+                        DlgID->MinDist,
+                        DlgID->KolvoIt,
+                        DlgID->MaskCh);
+ QDir Dir;
+ if(!Dir.exists(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly))
+  Dir.mkdir(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly);
+ QFile FileClassMass(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly+'/'+"IsoData"+".kls");
+ FileClassMass.open(QIODevice::Truncate|QIODevice::WriteOnly);
+ FileClassMass.write((char*)this->SerPoly->ClassifMass,sizeof(int)*this->SerPoly->W*this->SerPoly->H);
+ FileClassMass.close();
+
+ this->FillMainForm();
+}
+
+void DNSpecBath::on_SAM_triggered()
+{
+ if(DlgSM!=NULL)
+  delete DlgSM;
+
+ this->DlgSM=new DlgSAM(this);
+
+ this->DlgSM->ThisPoly=this->SerPoly;
+ this->DlgSM->PathData=this->GdalImage->PathImgFile+'/'+this->GdalImage->NameImgFile;
+ this->DlgSM->FileNameChan=this->FileNameChan;
+ this->DlgSM->show();
+ connect(this->DlgSM,SIGNAL(ButtonOK()),this,SLOT(on_DlgSAM_OK()));
+}
+
+void DNSpecBath::on_DlgSAM_OK()
+{
+ SerPoly->SAM(SerPoly->CurrentPoly,
+              DlgSM->PolyFilesNames,
+              DlgSM->IsSKOEnable,
+              DlgSM->LimitSKO,DlgSM->MaskCh);
+ disconnect(this->DlgSM,SIGNAL(ButtonOK()),this,SLOT(on_DlgSAM_OK()));
+
+ DlgSM->close();
+ QDir Dir;
+ if(!Dir.exists(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly))
+  Dir.mkdir(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly);
+ QFile FileClassMass(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly+'/'+"SAM"+".kls");
+ FileClassMass.open(QIODevice::Truncate|QIODevice::WriteOnly);
+ FileClassMass.write((char*)this->SerPoly->ClassifMass,sizeof(int)*this->SerPoly->W*this->SerPoly->H);
+ FileClassMass.close();
+
+ this->FillMainForm();
+}
+
+void DNSpecBath::on_BayesClassif_triggered()
+{
+ if(DlgSM!=NULL)
+  delete DlgSM;
+
+ this->DlgSM=new DlgSAM(this);
+
+ this->DlgSM->ThisPoly=this->SerPoly;
+ this->DlgSM->PathData=this->GdalImage->PathImgFile+'/'+this->GdalImage->NameImgFile;
+ this->DlgSM->FileNameChan=this->FileNameChan;
+ this->DlgSM->show();
+ connect(this->DlgSM,SIGNAL(ButtonOK()),this,SLOT(on_BayesClassif_OK()));
+}
+
+void DNSpecBath::on_BayesClassif_OK()
+{
+ SerPoly->MaxLike(SerPoly->CurrentPoly,
+                  DlgSM->PolyFilesNames,
+                  DlgSM->MaskCh);
+ disconnect(this->DlgSM,SIGNAL(ButtonOK()),this,SLOT(on_DlgSAM_OK()));
+
+ DlgSM->close();
+ QDir Dir;
+ if(!Dir.exists(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly))
+  Dir.mkdir(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly);
+ QFile FileClassMass(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly+'/'+"MaxLike"+".kls");
+ FileClassMass.open(QIODevice::Truncate|QIODevice::WriteOnly);
+ FileClassMass.write((char*)this->SerPoly->ClassifMass,sizeof(int)*this->SerPoly->W*this->SerPoly->H);
+ FileClassMass.close();
+
+ this->FillMainForm();
+}
+
+void DNSpecBath::on_MagicWand_triggered()
+{
+ if(DlgMW!=NULL)
+  delete DlgMW;
+
+ this->DlgMW=new DlgMagicWand(this);
+ this->DlgMW->NameOrg=this->NameOrg;
+ this->DlgMW->NameProg=this->NameProg;
+
+ this->DlgMW->ThisPoly=this->SerPoly;
+ this->DlgMW->show();
+ connect(this->DlgMW,SIGNAL(ButtonOK()),this,SLOT(on_DlgMagicWand_OK()));
+ connect(ui->DNWPic,SIGNAL(MouseLClicked(int,int)),this->DlgMW,SLOT(MouseClicked(int,int)));
+}
+
+void DNSpecBath::on_DlgMagicWand_OK()
+{
+ bool *NoBlackPixels2;
+ NoBlackPixels2=new bool[this->SerPoly->W*this->SerPoly->H];
+ this->SerPoly->MagicWand(this->SerPoly->CurrentPoly,
+                          this->DlgMW->x,this->DlgMW->y,
+                          this->DlgMW->Contrast,this->DlgMW->NumCh,
+                          this->DlgMW->mode,NoBlackPixels2);
+
+ QDir Dir;
+ if(!Dir.exists(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly))
+  Dir.mkdir(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly);
+ QFile FileClassMass(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly+'/'+"MagikWand"+".kls");
+ FileClassMass.open(QIODevice::Truncate|QIODevice::WriteOnly);
+ FileClassMass.write((char*)this->SerPoly->ClassifMass,sizeof(int)*this->SerPoly->W*this->SerPoly->H);
+ FileClassMass.close();
+
+ this->FillMainForm();
+ delete[] NoBlackPixels2;
+}
+
+void DNSpecBath::on_AddChanal_triggered()
+{
+ bool InputOk;
+ QString Formula=QInputDialog::getText(this,"Добавить новый канал","Введите формулу",
+                                       QLineEdit::Normal,"",&InputOk);
+ if(!Formula.isEmpty())
+ {
+  this->SerPoly->AddChanal(Formula);
+ }//if(InputOk && !NamePoly.isEmpty())
+}
+
+void DNSpecBath::on_AddIntegralChanal_triggered()
+{
+ bool InputOk;
+ QString Formula=QInputDialog::getText(this,"Добавить Интегрированный канал","Введите формулу",
+                                          QLineEdit::Normal,"",&InputOk);
+ if(!Formula.isEmpty())
+ {
+  QStringList LamChan;
+  LamChan=Formula.split("-");
+  int NumCh1,NumCh2;
+  float Lam1,Lam2, *LamMass;
+  Lam1=LamChan[0].toFloat();
+  Lam2=LamChan[1].toFloat();
+
+  NumCh1=this->GdalImage->DetermNCh(Lam1);
+  NumCh2=this->GdalImage->DetermNCh(Lam2);
+  LamMass=new float[NumCh2-NumCh1+1];
+
+  for(int i=NumCh1;i<=NumCh2;i++)
+  {
+   LamMass[i-NumCh1]=GdalImage->Lamda[i];
+  }
+
+  this->SerPoly->AddIntegralChanal(NumCh1,NumCh2,LamMass);
+
+//  QMessageBox msg;
+//  msg.setText(LamChan[1]);
+//  msg.exec();
+  //this->SerPoly->AddChanal(Formula);
+ }//if(InputOk && !NamePoly.isEmpty())
+}
+
+void DNSpecBath::on_CreateImgPoly_triggered()
+{
+ if(DlgCIP!=NULL)
+  delete DlgCIP;
+ this->DlgCIP=new DlgCreateImgPoly(this);
+ this->DlgCIP->ThisPoly=this->SerPoly;
+ this->DlgCIP->show();
+ connect(this->DlgCIP,SIGNAL(ButtonOK()),this,SLOT(on_DlgCreateImgPoly_OK()));
+}
+
+void DNSpecBath::on_DlgCreateImgPoly_OK()
+{
+ float *ImgPolyR,MinR,MaxR;
+ float *ImgPolyG,MinG,MaxG;
+ float *ImgPolyB,MinB,MaxB;
+
+ ImgPolyR=new float[SerPoly->px];
+ ImgPolyG=new float[SerPoly->px];
+ ImgPolyB=new float[SerPoly->px];
+
+
+ SerPoly->GetBrigthChanPoly(ImgPolyR,DlgCIP->NumChR,SerPoly->CurrentPoly);
+ MinR=ImgPolyR[0];
+ MaxR=ImgPolyR[0];
+
+ SerPoly->GetBrigthChanPoly(ImgPolyG,DlgCIP->NumChG,SerPoly->CurrentPoly);
+ MinG=ImgPolyG[0];
+ MaxG=ImgPolyG[0];
+
+ SerPoly->GetBrigthChanPoly(ImgPolyB,DlgCIP->NumChB,SerPoly->CurrentPoly);
+ MinB=ImgPolyB[0];
+ MaxB=ImgPolyB[0];
+
+
+
+ for(quint64 i=1;i<SerPoly->px;i++)
+ {
+  if(MinR>=ImgPolyR[i])
+   MinR=ImgPolyR[i];
+  if(MinG>=ImgPolyG[i])
+   MinG=ImgPolyG[i];
+  if(MinB>=ImgPolyB[i])
+   MinB=ImgPolyB[i];
+
+  if(MaxR<=ImgPolyR[i])
+   MaxR=ImgPolyR[i];
+  if(MaxG<=ImgPolyG[i])
+   MaxG=ImgPolyG[i];
+  if(MaxB<=ImgPolyB[i])
+   MaxB=ImgPolyB[i];
+ }//for(quint64 i=1;i<SerPoly->px;i++)
+
+
+ float KofR=1;
+ float KofG=1;
+ float KofB=1;
+
+ if(MinR>=0.)
+  KofR=255/MaxR;
+ if(/*(MaxR-MinR)>255 &&*/ MinR<0.)
+  KofR=255/(MaxR-MinR);
+
+ if(MinG>=0.)
+  KofG=255/MaxG;
+ if(/*(MaxG-MinG)>255 &&*/ MinG<0.)
+  KofG=255/(MaxG-MinG);
+
+ if(MinB>=0.)
+  KofB=255/MaxB;
+ if(/*(MaxB-MinB)>255 && */MinB<0.)
+  KofB=255/(MaxB-MinB);
+
+
+
+ for(quint64 i=0;i<SerPoly->px;i++)
+ {
+
+  if(MinR>=0)
+   ImgPolyR[i]*=KofR;
+   //ui->DNWPic->Polygon.PImgR[i]=ImgPolyR[i]*KofR;
+  else
+  {
+   ImgPolyR[i]=(ImgPolyR[i]-MinR)*KofR;
+   if(ImgPolyR[i]<0)
+    ImgPolyR[i]=0;
+  }
+
+  if(MinG>=0)
+   ImgPolyG[i]*=KofG;
+  else
+  {
+   ImgPolyG[i]=(ImgPolyG[i]-MinG)*KofG;
+   if(ImgPolyG[i]<0)
+    ImgPolyG[i]=0;
+  }
+
+  if(MinB>=0)
+   ImgPolyB[i]*=KofB;
+  else
+  {
+   ImgPolyB[i]=(ImgPolyB[i]-MinB)*KofB;
+   if(ImgPolyB[i]<0)
+    ImgPolyB[i]=0;
+  }
+
+
+  ImgPolyR[i]*=DlgCIP->KofR;
+  ImgPolyG[i]*=DlgCIP->KofG;
+  ImgPolyB[i]*=DlgCIP->KofB;
+  if(ImgPolyR[i]>255) ImgPolyR[i]=255;
+  if(ImgPolyG[i]>255) ImgPolyG[i]=255;
+  if(ImgPolyB[i]>255) ImgPolyB[i]=255;
+
+ }//for(quint64 i=1;i<SerPoly->px;i++)
+
+ ui->DNWPic->Polygons[NumCurPoly()].CreateImg(ImgPolyR,ImgPolyG,ImgPolyB,SerPoly->MassPoly,SerPoly->px);
+
+ delete[] ImgPolyR;
+ delete[] ImgPolyG;
+ delete[] ImgPolyB;
+ ui->DNWPic->repaint();
+}
+
+void DNSpecBath::on_ClassFilter_triggered()
+{
+ if(DlgCF!=NULL)
+  delete DlgCF;
+
+ this->DlgCF=new DlgClassFilter(this);
+ this->DlgCF->ThisPoly=this->SerPoly;
+ this->DlgCF->WidgetChange=ui->DNWPic;
+ this->DlgCF->show();
+ connect(this->DlgCF,SIGNAL(ButtonOK()),this,SLOT(on_DlgClassFilter_OK()));
+}
+
+void DNSpecBath::on_DlgClassFilter_OK()
+{
+ ui->DNWPic->Polygons[NumCurPoly()].IsPolyClassif=this->SerPoly->IsPolyClassif;
+ ui->DNWPic->Polygons[NumCurPoly()].ClassifMass=this->SerPoly->ClassifMass;
+
+ QDir Dir;
+ if(!Dir.exists(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly))
+  Dir.mkdir(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly);
+ QFile FileClassMass(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly+'/'+"ClassFilter"+".kls");
+ FileClassMass.open(QIODevice::Truncate|QIODevice::WriteOnly);
+ FileClassMass.write((char*)this->SerPoly->ClassifMass,sizeof(int)*this->SerPoly->W*this->SerPoly->H);
+ FileClassMass.close();
+
+ this->FillMainForm();
+ ui->DNWPic->update();
+}
+
+void DNSpecBath::on_SaveSerFileShift_triggered()
+{
+ QStringList TagsName;
+ TagsName<<"SensivityCorrection"<<"DarkCorrection";
+
+ GdalImage->GetXMLRadiometricCorr(TagsName,"RadiometricCorr");
+ GdalImage->ShiftChanal(0,60,1,186,GdalImage->PathImgFile+'/'+"proba.ser");
+}
+
+void DNSpecBath::on_CreateAKFImg_triggered()
+{
+ if(DlgAI!=NULL)
+  delete DlgAI;
+
+ this->DlgAI=new DlgAKFImg(this);
+ this->DlgAI->ThisPoly=this->SerPoly;
+ this->DlgAI->show();
+ connect(ui->DNWPic,SIGNAL(MouseLClicked(int,int)),this,SLOT(MouseLClicked(int,int)));
+ connect(this->DlgAI,SIGNAL(ButtonOK()),this,SLOT(on_DlgCreateAKFImg_OK()));
+ connect(this->DlgAI,SIGNAL(rejected()),this,SLOT(on_DlgCreateAKFImg_Rejected()));
+ connect(this->DlgAI,SIGNAL(ComboSideSqClick(int)),this,SLOT(on_DlgCreateAKFImgCombo(int)));
+}
+
+void DNSpecBath::on_DlgCreateAKFImg_OK()
+{
+ SerPoly->AddAKFChanal(DlgAI->Side,DlgAI->NumCh,DlgAI->XMouse,DlgAI->YMouse);
+
+ ui->DNWPic->IsDlgAIHidden=DlgAI->isHidden();
+ ui->DNWPic->repaint();
+}
+
+void DNSpecBath::on_DlgCreateAKFImg_Rejected()
+{
+ ui->DNWPic->IsDlgAIHidden=DlgAI->isHidden();
+ ui->DNWPic->repaint();
+}
+
+void DNSpecBath::on_DlgCreateAKFImgCombo(int SideSq)
+{
+ ui->DNWPic->DlgAiSizeSide=SideSq;
+ ui->DNWPic->repaint();
+}
+
 /********************************************************************************************/
 void DNSpecBath::FillMainForm()
 {
@@ -412,6 +1969,7 @@ void DNSpecBath::FillMainForm()
 
  QStringList PolygonsFiles;
  QDir DirPolygons(this->GdalImage->PathImgFile+'/'+this->GdalImage->NameImgFile);
+
  QFileInfo *InfoPolygonsName;
  ui->ComboR->clear();
  ui->ComboG->clear();
@@ -422,6 +1980,11 @@ void DNSpecBath::FillMainForm()
  {
   DataString2.setNum((float)i+1,'d',0);
   DataString1=tr("Канал ")+DataString2;
+
+  if(GdalImage->IsChanSpecColibr)
+   DataString1+=" ("+QString().setNum(GdalImage->Lamda[i],'d',1)+")";
+
+
   ui->ComboR->addItem(DataString1);
   ui->ComboG->addItem(DataString1);
   ui->ComboB->addItem(DataString1);
@@ -510,18 +2073,17 @@ void DNSpecBath::ReadFilePoly(QString PolyFileName)
  if(this->SerPoly!=NULL)
   delete this->SerPoly;
 
- this->SerPoly= new DNPoly(PolyFileName);
+ this->SerPoly= new DNPoly2(PolyFileName);
  this->SerPoly->IshCh=this->GdalImage->Ch;
 
- if(ui->DNWPic->Polygon.pt.size()>0)
-  ui->DNWPic->Polygon.pt.clear();
 
- ui->DNWPic->Polygon.pt=this->SerPoly->pt;
+
 // QMessageBox msg;
-// msg.setText(QString().setNum(ui->DNWPic->Polygon.pt.size()));
+// msg.setText(QString().setNum(NumCurPoly()));
 // msg.exec();
- ui->DNWPic->Polygon.IsPolyClassif=this->SerPoly->IsPolyClassif;
- ui->DNWPic->Polygon.ClassifMass=this->SerPoly->ClassifMass;
+
+ ui->DNWPic->Polygons[NumCurPoly()].IsPolyClassif=this->SerPoly->IsPolyClassif;
+ ui->DNWPic->Polygons[NumCurPoly()].ClassifMass=this->SerPoly->ClassifMass;
 }
 
 void DNSpecBath::ReadFileClassif(QString PolyFileClassif)
@@ -543,8 +2105,8 @@ void DNSpecBath::ReadFileClassif(QString PolyFileClassif)
   if(this->SerPoly->ClassifMass[i]>=0)
    this->SerPoly->CurrentPoly[i]=TRUE;
  }
- ui->DNWPic->Polygon.IsPolyClassif=this->SerPoly->IsPolyClassif;
- ui->DNWPic->Polygon.ClassifMass=this->SerPoly->ClassifMass;
+ ui->DNWPic->Polygons[NumCurPoly()].IsPolyClassif=this->SerPoly->IsPolyClassif;
+ ui->DNWPic->Polygons[NumCurPoly()].ClassifMass=this->SerPoly->ClassifMass;
 }
 
 /*Перевод из имени полигона в полное имя файла полигона*/
@@ -560,16 +2122,13 @@ void DNSpecBath::FillStackPolygons()
 {
  int ip;
  DNImgPoly Pol;
- DNPoly *Ser;
- for(int i=0;i<ui->DNWPic->Polygons.size();i++)
-  ui->DNWPic->Polygons[i].pt.clear();
+ DNPoly2 *Ser;
  ui->DNWPic->Polygons.clear();
-
  for(ip=0;ip<this->NamesPoly.size();ip++)
  {
 //  if(this->NamesPoly[ip]!=this->CurrentNamePoly)
 //  {
-  Ser=new DNPoly(this->NamePolyToFile(this->NamesPoly[ip]));
+  Ser=new DNPoly2(this->NamePolyToFile(this->NamesPoly[ip]));
   Pol.pt=Ser->pt;
   ui->DNWPic->Polygons<<Pol;
   delete Ser;
@@ -579,61 +2138,91 @@ void DNSpecBath::FillStackPolygons()
 /*Событие изменения текущего полигона*/
 void DNSpecBath::ChangeCurrentPoly()
 {
+ if(NumCurPoly()>=0)
+  ui->DNWPic->ChangeCurPoly(NumCurPoly());
+
  if(this->SerPoly!=NULL)
   delete this->SerPoly;
 
- this->SerPoly=new DNPoly(this->NamePolyToFile(this->CurrentNamePoly));
+ this->SerPoly=new DNPoly2(this->NamePolyToFile(this->CurrentNamePoly));
  this->SerPoly->IshCh=this->GdalImage->Ch;
-// this->DlgPP->ThisPoly=this->SerPoly;
-// this->DlgSG->ThisPoly=this->SerPoly;
-// this->DlgMW->ThisPoly=this->SerPoly;
+
+ if(this->DlgSG!=NULL)
+  this->DlgSG->ThisPoly=this->SerPoly;
+ if(this->DlgMW!=NULL)
+  this->DlgMW->ThisPoly=this->SerPoly;
+ if(this->DlgID!=NULL)
+  this->DlgID->ThisPoly=this->SerPoly;
+ if(this->DlgSM!=NULL)
+  this->DlgSM->ThisPoly=this->SerPoly;
+ if(this->DlgCIP!=NULL)
+  this->DlgCIP->ThisPoly=this->SerPoly;
 }
-
-void DNSpecBath::on_pbVectorize_clicked()
+int DNSpecBath::NumCurPoly()
 {
-    emit SIGNALcreateVector(); // посылаем сигнал для выполнения векторизации
-}
-
-void DNSpecBath::on_ShowDeptch_triggered()
-{
- if(this->DlgShowDepth!=NULL)
-  delete this->DlgShowDepth;
-
- QDialog *Dlg;
- Dlg=new QDialog(this);
- this->DlgShowDepth=new Ui_DlgShowDeptch();
- this->DlgShowDepth->setupUi(Dlg);
- Dlg->show();
-
- connect(ui->DNWPic,SIGNAL(MouseMove(int,int)),this,SLOT(MouseMove(int,int)));
-}
-
-void DNSpecBath::MouseMove(int x, int y)
-{
- if(DlgShowDepth!=NULL)
+ int nCurPoly=-1;
+ if(NamesPoly.size()>0)
+  nCurPoly=0;
+ for(int i=0;i<NamesPoly.size();i++)
  {
-  DlgShowDepth->EditX->setText(QString().setNum(x));
-  DlgShowDepth->EditY->setText(QString().setNum(y));
-
-  if(this->SerPoly!=NULL &&
-     x>=this->SerPoly->xn && x<this->SerPoly->xn+this->SerPoly->W &&
-     y>=this->SerPoly->yn && y<this->SerPoly->yn+this->SerPoly->H &&
-     this->SerPoly->IsPolyClassif)
-  {
-   bool *MaskCh=new bool[this->SerPoly->Ch];
-   for(int i=0;i<this->SerPoly->Ch;i++)
-   {
-    MaskCh[i]=FALSE;
-    if(i==this->SerPoly->Ch-1)
-     MaskCh[i]=TRUE;
-   }//for(int i=0;i<this->SerPoly->Ch;i++)
-   float Brigth;
-   this->SerPoly->GetSpectrPoint(x,y,&Brigth,MaskCh);
-   DlgShowDepth->EditDeptch->setText(QString().setNum(Brigth,'d',4));
-   delete[] MaskCh;
-  }
- }//if(DlgShowDepth!=NULL)
+  if(NamesPoly[i]==CurrentNamePoly)
+   break;
+  nCurPoly++;
+ }
+ return nCurPoly;
 }
 
+void DNSpecBath::on_ForOlga_triggered()
+{
+ float *DataSpec;
+ bool *MaskCh;
+ MaskCh=new bool[SerPoly->Ch];
+ for(int i=0; i<SerPoly->Ch; i++)
+ {
+  MaskCh[i]=true;
+ }
+
+ int KolfoPoint=0;
+// for(int x=0;x<SerPoly->W;x++)
+// {
+//  for(int y=0;y<SerPoly->H;y++)
+//  {
+//   if(SerPoly->ClassifMass[x+y*SerPoly->W]>=0)
+//   {
+    DataSpec=new float[SerPoly->Ch];
+    SerPoly->GetSpectrPoint(85,752,DataSpec,MaskCh);
+    KolfoPoint++;
+//   }
+//   if(KolfoPoint>=20)
+//    break;
+//  }
+//  if(KolfoPoint>=20)
+//   break;
+// }
+
+ QTextCodec::setCodecForTr(QTextCodec::codecForName("system"));
+ QString FileName;
+ FileName=QFileDialog::getSaveFileName();
+ int txt;
+ if(!FileName.isEmpty())
+ {
+  txt=FileName.indexOf(".txt");
+  txt=FileName.length()-txt;
+  if(txt!=4)
+   FileName=FileName+".txt";
+
+  QFile FileTxt(FileName);
+  QString DataString;
+  FileTxt.open(QIODevice::Truncate|QIODevice::WriteOnly|QIODevice::Text);
+  QTextStream out(&FileTxt);
 
 
+   for(int i=0;i<SerPoly->Ch;i++)
+   {
+    out<<QString().setNum(i);
+    out<<"\t"<<QString().setNum(DataSpec[i],'d',4).replace(".",",");
+    out<<endl;
+   }//for(int i=0;i<this->Ch;i++)
+   FileTxt.close();
+  }//if(!FileName.isEmpty())
+}

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Оценка глубины прибрежных территорий</string>
+   <string>Блок автоматизированного дешифрирования</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QScrollArea" name="scrollArea">
@@ -53,9 +53,9 @@
    <widget class="QWidget" name="WidgetViewParam" native="true">
     <property name="geometry">
      <rect>
-      <x>740</x>
+      <x>710</x>
       <y>0</y>
-      <width>171</width>
+      <width>201</width>
       <height>461</height>
      </rect>
     </property>
@@ -167,6 +167,12 @@
        </item>
        <item row="3" column="1">
         <widget class="QComboBox" name="ComboB">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
            <width>100</width>
@@ -175,7 +181,7 @@
          </property>
          <property name="maximumSize">
           <size>
-           <width>100</width>
+           <width>150</width>
            <height>16777215</height>
           </size>
          </property>
@@ -183,24 +189,48 @@
        </item>
        <item row="2" column="1">
         <widget class="QComboBox" name="ComboG">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
            <width>100</width>
            <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>150</width>
+           <height>16777215</height>
           </size>
          </property>
         </widget>
        </item>
        <item row="1" column="1">
         <widget class="QComboBox" name="ComboR">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
            <width>100</width>
            <height>0</height>
           </size>
          </property>
+         <property name="maximumSize">
+          <size>
+           <width>150</width>
+           <height>16777215</height>
+          </size>
+         </property>
          <property name="sizeAdjustPolicy">
-          <enum>QComboBox::AdjustToContents</enum>
+          <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
          </property>
         </widget>
        </item>
@@ -252,7 +282,7 @@
      <x>0</x>
      <y>0</y>
      <width>921</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -267,8 +297,19 @@
      <string>Полигон</string>
     </property>
     <addaction name="CreatePoly"/>
+    <addaction name="ClassResultToPoly"/>
+    <addaction name="PolyExp"/>
+    <addaction name="PolyImp"/>
     <addaction name="separator"/>
     <addaction name="MultiChan"/>
+    <addaction name="separator"/>
+    <addaction name="AddChanal"/>
+    <addaction name="AddIntegralChanal"/>
+    <addaction name="separator"/>
+    <addaction name="CreateImgPoly"/>
+    <addaction name="CreateAKFImg"/>
+    <addaction name="separator"/>
+    <addaction name="ClassFilter"/>
    </widget>
    <widget class="QMenu" name="menu_3">
     <property name="title">
@@ -276,10 +317,46 @@
     </property>
     <addaction name="Batinometriy"/>
     <addaction name="ShowDeptch"/>
+    <addaction name="OilWater"/>
+    <addaction name="MaskPokr"/>
+    <addaction name="RoutMove"/>
+    <addaction name="RoutMove2"/>
+    <addaction name="Smoces"/>
+    <addaction name="EmbedObj"/>
+   </widget>
+   <widget class="QMenu" name="menu_4">
+    <property name="title">
+     <string>Свойства полигона</string>
+    </property>
+    <addaction name="CreateSpecGraph"/>
+    <addaction name="CreateAKFGraph"/>
+    <addaction name="CreateSKOGraph"/>
+   </widget>
+   <widget class="QMenu" name="menu_5">
+    <property name="title">
+     <string>Методы классификации</string>
+    </property>
+    <addaction name="MagicWand"/>
+    <addaction name="IsoData"/>
+    <addaction name="SAM"/>
+    <addaction name="BayesClassif"/>
+    <addaction name="separator"/>
+    <addaction name="ForOlga"/>
+   </widget>
+   <widget class="QMenu" name="menu_6">
+    <property name="title">
+     <string>Изображение</string>
+    </property>
+    <addaction name="CalibrateImg"/>
+    <addaction name="SaveSerFile"/>
+    <addaction name="SaveSerFileShift"/>
    </widget>
    <addaction name="menu"/>
+   <addaction name="menu_6"/>
    <addaction name="menu_2"/>
+   <addaction name="menu_4"/>
    <addaction name="menu_3"/>
+   <addaction name="menu_5"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -305,7 +382,7 @@
   </action>
   <action name="Batinometriy">
    <property name="text">
-    <string>Батиметрия</string>
+    <string>Оценивание глубин прибрежных территорий</string>
    </property>
   </action>
   <action name="OpenLastImg">
@@ -320,7 +397,135 @@
   </action>
   <action name="ShowDeptch">
    <property name="text">
-    <string>Показать значения глубин</string>
+    <string>Показать значения глубин 2</string>
+   </property>
+  </action>
+  <action name="CreateSpecGraph">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Спектральные графики</string>
+   </property>
+  </action>
+  <action name="CreateAKFGraph">
+   <property name="text">
+    <string>Автокореляционная функция</string>
+   </property>
+  </action>
+  <action name="CreateSKOGraph">
+   <property name="text">
+    <string>Кривая СКО</string>
+   </property>
+  </action>
+  <action name="OilWater">
+   <property name="text">
+    <string>Нефтепродукты на воде</string>
+   </property>
+  </action>
+  <action name="IsoData">
+   <property name="text">
+    <string>Неконтролируемая классификация</string>
+   </property>
+  </action>
+  <action name="SAM">
+   <property name="text">
+    <string>Метод спектральной угловой корреляции</string>
+   </property>
+  </action>
+  <action name="MagicWand">
+   <property name="text">
+    <string>Выделение по контрасту смежных пикселей</string>
+   </property>
+  </action>
+  <action name="AddChanal">
+   <property name="text">
+    <string>Добавить новый канал</string>
+   </property>
+  </action>
+  <action name="CreateImgPoly">
+   <property name="text">
+    <string>Синтезировать изображение канала</string>
+   </property>
+  </action>
+  <action name="ClassFilter">
+   <property name="text">
+    <string>Фильтр классов</string>
+   </property>
+  </action>
+  <action name="CalibrateImg">
+   <property name="text">
+    <string>Калибровать</string>
+   </property>
+  </action>
+  <action name="SaveSerFile">
+   <property name="text">
+    <string>Сохранить Ser</string>
+   </property>
+  </action>
+  <action name="SaveSerFileShift">
+   <property name="text">
+    <string>Сохранить Ser со смещением</string>
+   </property>
+  </action>
+  <action name="CreateAKFImg">
+   <property name="text">
+    <string>Синтезировать изображение АКФ</string>
+   </property>
+  </action>
+  <action name="PolyExp">
+   <property name="text">
+    <string>Экспорт полигона по координатам</string>
+   </property>
+  </action>
+  <action name="PolyImp">
+   <property name="text">
+    <string>Импорт полигона по координатам</string>
+   </property>
+  </action>
+  <action name="MaskPokr">
+   <property name="text">
+    <string>Обнаружение средств пассивной маскировки</string>
+   </property>
+  </action>
+  <action name="RoutMove">
+   <property name="text">
+    <string>pr1</string>
+   </property>
+  </action>
+  <action name="ClassResultToPoly">
+   <property name="text">
+    <string>Создать полигоны по результатам классификации</string>
+   </property>
+  </action>
+  <action name="BayesClassif">
+   <property name="text">
+    <string>Байесовский классификатор</string>
+   </property>
+  </action>
+  <action name="RoutMove2">
+   <property name="text">
+    <string>pr2</string>
+   </property>
+  </action>
+  <action name="Smoces">
+   <property name="text">
+    <string>Дымы</string>
+   </property>
+  </action>
+  <action name="AddIntegralChanal">
+   <property name="text">
+    <string>Добавить интегральный канал</string>
+   </property>
+  </action>
+  <action name="EmbedObj">
+   <property name="text">
+    <string>Заглубленные объедки</string>
+   </property>
+  </action>
+  <action name="ForOlga">
+   <property name="text">
+    <string>Для Ольги и меня</string>
    </property>
   </action>
  </widget>

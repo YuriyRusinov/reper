@@ -8,6 +8,9 @@ DnImageLib::DnImageLib(QString FileName)
  W=GdalData->GetRasterXSize();
  H=GdalData->GetRasterYSize();
  Ch=GdalData->GetRasterCount();
+ IsChanSpecColibr=false;
+ IsXMLFileFound=false;
+ IsRadiometricCorrData=false;
 
  QFileInfo OpenFile(FileName);
  this->PathImgFile=OpenFile.absolutePath();
@@ -19,23 +22,33 @@ DnImageLib::DnImageLib(QString FileName)
  this->IsChanUsed=new bool[this->Ch];
 
  this->Lamda=NULL;
+ XMLSensivity=NULL;
+ XMLDark=NULL;
+ nColibrData=0;
 
  for(int i=0;i<this->Ch;i++)
   this->IsChanUsed[i]=false;
 
+
+
+/*Открытие HDR файла с длинами волн*/
  QFile HDRFile(this->PathImgFile+'/'+this->NameImgFile+".hdr");
  HDRFile.open(QIODevice::ReadOnly|QIODevice::Text);
  if(HDRFile.isOpen())
  {
   this->Lamda=new float[this->Ch];
+
   QString DataString;
   QStringList ChanList;
   do{
      DataString=HDRFile.readLine();
-    }while(DataString.compare("wavelength")<0);
+//     QMessageBox msg;
+//     msg.setText(DataString+"\n"+QString().setNum(DataString.indexOf("wavelength")));
+//     msg.exec();
+    }while(DataString.indexOf("wavelength")<0);
   do{
      DataString=HDRFile.readLine();
-    }while(DataString.compare("wavelength")<0);
+    }while(DataString.indexOf("wavelength")<0);
   int nCh=0;
   do{
      DataString=HDRFile.readLine();
@@ -52,10 +65,48 @@ DnImageLib::DnImageLib(QString FileName)
       nCh++;
      }//for(int i=0;i<ChanList.size();i++)
     }while(DataString.indexOf('}')<0);
-
-
+   HDRFile.close();
+   IsChanSpecColibr=true;
  }//if(HDRFile)
 
+
+ /*Открытие XML файла с с калибровочными данными и длинами волн*/
+ QFile XMLFile(this->PathImgFile+'/'+this->NameImgFile+".xml");
+ XMLFile.open(QIODevice::ReadOnly|QIODevice::Text);
+ if(XMLFile.isOpen())
+ {
+  QStringList StrChNumber,StrLamda;
+  QDomDocument DomDoc;
+  if(DomDoc.setContent(&XMLFile))
+  {
+   QDomElement DomElement=DomDoc.documentElement();
+   StrChNumber=ReadXMLFile(DomElement,"ChannelNumber","WaveLength");
+   StrLamda=ReadXMLFile(DomElement,"WaveLen","WaveLength");
+
+   this->Lamda=new float[this->Ch];
+
+   for(int i=0;i<this->Ch;i++)
+    this->Lamda[i]=-1.;
+   for(int i=0;i<StrChNumber.size();i++)
+   {
+    if(StrChNumber[i].toInt()<this->Ch)
+     this->Lamda[i]=StrLamda[i].toFloat();
+   }//for(int i=0;i<StrLamda.size();i++)
+   IsChanSpecColibr=true;
+   IsXMLFileFound=true;
+
+  }//if(DomDoc.setContent(&XMLFile))
+  XMLFile.close();
+ }//if(XMLFile)
+
+ if(this->Lamda!=NULL)
+ {
+  for(int i=0;i<this->Ch;i++)
+  {
+   if(this->Lamda[i]<1)
+    this->Lamda[i]*=1000;
+  }
+ }
 }
 DnImageLib::~DnImageLib()
 {
@@ -66,6 +117,13 @@ DnImageLib::~DnImageLib()
 
  if(this->Lamda!=NULL)
   delete[] this->Lamda;
+
+ if(XMLSensivity!=NULL)
+  delete[] XMLSensivity;
+
+ if(XMLDark!=NULL)
+  delete[] XMLDark;
+
  delete[] RasterData;
 }
 
@@ -164,10 +222,10 @@ void DnImageLib::GetGeoData(GeoDataStruct *GD)
  GD->YAngle=adfGeoTransform[4];
 }
 /*Пересчитать координаты точки изображения в географические*/
-void DnImageLib::DetermGeoCoord(int xp,int yp,GeoDataStruct GD,double &XGeo,double &YGeo)
+void DnImageLib::DetermGeoCoord(int xp,int yp,GeoDataStruct GD,double *XGeo,double *YGeo)
 {
- XGeo=GD.XTopLeftPix+xp*GD.XD*cos(GD.XAngle)-yp*GD.YD*sin(GD.XAngle);
- YGeo=GD.YTopLeftPix+yp*GD.YD*cos(GD.YAngle)-xp*GD.XD*sin(GD.YAngle);
+ *XGeo=GD.XTopLeftPix+xp*GD.XD/**cos(GD.XAngle)*/+yp*/*GD.YD*sin(*/GD.XAngle/*)*/;
+ *YGeo=GD.YTopLeftPix+xp*/*GD.YD*cos(*/GD.YAngle/*)*/+yp*GD.YD/**sin(GD.YAngle)*/;
 }
 /*Функции визуализации*/
 QImage DnImageLib::GenerateImg(int Ch1,int Ch2,int Ch3,double B1,double B2,double B3,double Contrast)
@@ -179,7 +237,10 @@ QImage DnImageLib::GenerateImg(int Ch1,int Ch2,int Ch3,double B1,double B2,doubl
  MaskCh=this->FillMaskCh(nCh);
 
  float BMax,BMin,Kof;
- for(int i=0;i<3;i++)
+ int Num=3;
+ if(this->Ch==1)
+  Num=1;
+ for(int i=0;i<Num;i++)
  {
   if(!this->IsChanUsed[nCh.at(i)])
   {
@@ -199,6 +260,7 @@ QImage DnImageLib::GenerateImg(int Ch1,int Ch2,int Ch3,double B1,double B2,doubl
     BMin=this->MinBrigth[nCh.at(i)];
   }
  }//for(int i=0;i<3;i++)
+
  Kof=1;
  if(/*((BMax-BMin)>255 || (BMax-BMin)<1.) &&*/ BMin>=0.)
   Kof=255/BMax;
@@ -210,11 +272,13 @@ QImage DnImageLib::GenerateImg(int Ch1,int Ch2,int Ch3,double B1,double B2,doubl
  const int n=3;
  const int nRead=(int)this->H/n;
  const int OstRead=this->H%n;
+
  if(this->RasterData==NULL)
  {
   this->RasterData=new unsigned int[this->W*this->H];
   memset(this->RasterData,0,this->W*this->H*sizeof(unsigned int));
  }
+
 
  int r,g,b;
  quint64 Di=0;
@@ -222,9 +286,11 @@ QImage DnImageLib::GenerateImg(int Ch1,int Ch2,int Ch3,double B1,double B2,doubl
  for(int i=0;i<nRead;i++)
  {
   float *BrigthR,*BrigthG,*BrigthB;
+
   BrigthR=this->GetBandZone(Ch1,0,i*n,this->W-1,i*n+(n-1));
   BrigthG=this->GetBandZone(Ch2,0,i*n,this->W-1,i*n+(n-1));
   BrigthB=this->GetBandZone(Ch3,0,i*n,this->W-1,i*n+(n-1));
+
   for(quint32 j=0;j<this->W*n;j++)
   {
    if(BMin>=0)
@@ -293,13 +359,18 @@ QImage DnImageLib::GenerateImg(int Ch1,int Ch2,int Ch3,double B1,double B2,doubl
   delete[] BrigthB;
  }
 
- QImage img( (uchar*)&this->RasterData[0],this->W,this->H, QImage::Format_RGB32 );
+ QImage img( (uchar*)&this->RasterData[0],this->W,this->H, QImage::Format_RGB32);
  nCh.clear();
  return img;
 }
 /*Запись спектральных данных в файл*/
 void DnImageLib::GenerateSpectrFile(int x,int y,int W,int H,QList <QPoint> pt, QString PolyName)
 {
+
+// QMessageBox msg;
+// msg.setText(QString().setNum(this->W));
+// msg.exec();
+
  int xc,yc;
  QDir Dir;
  PolygonProp ThisPolygon;
@@ -363,9 +434,20 @@ void DnImageLib::GenerateSpectrFile(int x,int y,int W,int H,QList <QPoint> pt, Q
  {
   float *PBand;
   PBand=this->GetBandZone(i,x,y,x+W-1,y+H-1);
+  int WCurr;
   for(quint64 j=0;j<W*H;j++)
   {
+   if(WCurr==H) WCurr=0;
    SpectrZone[i+j*this->Ch]=PBand[j];
+
+   if(XMLSensivity!=NULL)
+    SpectrZone[i+j*this->Ch]*=XMLSensivity[(WCurr+x)+i*this->Ch];
+   if(XMLDark!=NULL)
+    SpectrZone[i+j*this->Ch]-=XMLDark[(WCurr+x)+i*this->Ch];
+   WCurr++;
+
+   if(SpectrZone[i+j*this->Ch]<0)
+    SpectrZone[i+j*this->Ch]=0;
   }//for(quint64 j=0;j<W*H;j++)
   delete[] PBand;
   ProgCV++;
@@ -375,6 +457,185 @@ void DnImageLib::GenerateSpectrFile(int x,int y,int W,int H,QList <QPoint> pt, Q
  SerFile.close();
  delete[] MaskChan;
  delete[] SpectrZone;
+}
+
+/*Радиометрическая калибровка из XML файла (заполение массивов XMLSensivity и XMLDark)*/
+void DnImageLib::GetXMLRadiometricCorr(QStringList TagsName,QString ParentTag)
+{
+ if(XMLSensivity!=NULL)
+  delete[] XMLSensivity;
+ if(XMLDark!=NULL)
+  delete[] XMLDark;
+
+ if(IsXMLFileFound)
+ {
+  QFile XMLFile(this->PathImgFile+'/'+this->NameImgFile+".xml");
+  XMLFile.open(QIODevice::ReadOnly|QIODevice::Text);
+  if(XMLFile.isOpen())
+  {
+   QStringList StrSensivityCorrection,StrDarkCorrection;
+   QDomDocument DomDoc;
+   if(DomDoc.setContent(&XMLFile))
+   {
+    QDomElement DomElement=DomDoc.documentElement();
+    StrSensivityCorrection=ReadXMLFile(DomElement,TagsName[0],ParentTag);
+    if(TagsName.size()>1)
+     StrDarkCorrection=ReadXMLFile(DomElement,TagsName[1],ParentTag);
+
+    QStringList StrKofSensCorrection;
+    QStringList StrKofDarkCorrection;
+
+    StrKofSensCorrection=StrSensivityCorrection[0].split("; ");
+    if(TagsName.size()>1)
+     StrKofDarkCorrection=StrDarkCorrection[0].split("; ");
+
+    int SizeKof=(StrKofSensCorrection.size()-1)*StrSensivityCorrection.size();
+    nColibrData=StrKofSensCorrection.size()-1;
+    XMLSensivity=new float[SizeKof];
+
+
+//     QMessageBox msg;
+//     msg.setText(QString().setNum(SizeKof));
+//     msg.exec();
+
+    if(TagsName.size()>1 && SizeKof==(StrKofDarkCorrection.size()-1)*StrDarkCorrection.size())
+     XMLDark=new float[SizeKof];
+
+    StrKofSensCorrection.clear();
+    StrKofDarkCorrection.clear();
+
+//    QFile TxtFile(this->PathImgFile+"/"+"den.txt");
+//    TxtFile.open(QIODevice::Truncate|QIODevice::WriteOnly);
+//    QString StrWrite;
+
+    for(int i=0;i<StrSensivityCorrection.size();i++)
+    {
+     StrKofSensCorrection=StrSensivityCorrection[i].split("; ");
+
+     if(XMLDark!=NULL)
+      StrKofDarkCorrection=StrDarkCorrection[i].split("; ");
+
+//     StrWrite=StrKofDarkCorrection[17]+"\n";
+//     TxtFile.write(StrWrite.toAscii());
+
+     for(int j=0;j<StrKofSensCorrection.size()-1;j++)
+     {
+
+      StrKofSensCorrection[j].remove("; ");
+      XMLSensivity[j+i*(StrKofSensCorrection.size()-1)]=StrKofSensCorrection[j].toFloat();
+
+
+
+      if(XMLDark!=NULL)
+      {
+       StrKofDarkCorrection[j].remove("; ");
+       XMLDark[j+i*(StrKofSensCorrection.size()-1)]=StrKofDarkCorrection[j].toFloat();
+      }
+//      if(j>1020)
+//      {
+//       QMessageBox msg;
+//       msg.setText(QString().setNum(XMLDark[j+i*(StrKofSensCorrection.size()-1)],'d',3));
+//       msg.exec();
+//      }
+     }//for(int j=0;j<StrKofSensCorrection.size();j++)
+    }//for(int i=0;i<StrSensivityCorrection.size();i++)
+    IsRadiometricCorrData=true;
+//    TxtFile.close();
+   }//if(DomDoc.setContent(&XMLFile))
+   XMLFile.close();
+  }//if(XMLFile)
+ }//if(IsXMLFileFound)
+}
+
+
+/*************************************Тупые функции**********************************************/
+void DnImageLib::ShiftChanal(int NumChB,int NumChE, int XShift,int YShift,QString FileName)
+{
+ float *Data;
+ int xn1,yn1,xk1,yk1; //xn и yn для каналов внутри интервала
+ int xn2,yn2,xk2,yk2; //xn и yn для каналов вне интервала
+
+ int DarkPixR,DarkPixL;
+ int OstPix;
+
+ if(XShift>=0)
+ {
+  xn1=XShift;
+  xk1=this->W-1;
+  xn2=0;
+  xk2=this->W-XShift-1;
+ }
+ else
+ {
+  xn1=0;
+  xk1=this->W+XShift-1;
+  xn2=-XShift;
+  xk2=this->W-1;
+ }
+
+ if(YShift>=0)
+ {
+  yn1=YShift;
+  yk1=this->H-1;
+  yn2=0;
+  yk2=this->H-YShift-1;
+ }
+ else
+ {
+  yn1=0;
+  yk1=this->H+YShift-1;
+  yn2=-YShift;
+  yk2=this->H-1;
+ }
+
+ DarkPixR=24;
+ DarkPixL=24;
+ OstPix=(xk1-xn1+1)-((DarkPixR+DarkPixL)+nColibrData);
+
+// QMessageBox msg;
+// msg.setText("dx1="+QString().setNum(xk1-xn1+1)+"\t"+"dx2="+QString().setNum(xk2-xn2+1)+"\n"+"dy1="+QString().setNum(yk1-yn1+1)+"\t"+"dy2="+QString().setNum(yk2-yn2+1));
+// msg.exec();
+
+// QMessageBox msg;
+// msg.setText("OstPix="+QString().setNum((xk1-xn1+1)-((DarkPixR+DarkPixL)+OstPix)));
+// msg.exec();
+
+ QFile SerFile(FileName);
+ SerFile.open(QIODevice::Truncate|QIODevice::WriteOnly);
+ for(int i=0;i<this->Ch;i++)
+ {
+  if(i<NumChB || i>NumChE)
+   Data=GetBandZone(i,xn2,yn2,xk2,yk2);
+  else
+   Data=GetBandZone(i,xn1,yn1,xk1,yk1);
+
+  /*Радиометрическая коррекция*/
+  if(nColibrData>0)
+  {
+   for(int ny=0;ny<(yk1-yn1+1);ny++)
+   {
+    for(int nx=OstPix+DarkPixL;nx<(xk1-xn1+1)-DarkPixR;nx++)
+    {
+     if(XMLDark!=NULL)
+     {
+      Data[nx+ny*(xk1-xn1+1)]-=XMLDark[(nx-(OstPix+DarkPixL))+i*nColibrData];
+//      if(nx>1020)
+//      {
+//       QMessageBox msg;
+//       msg.setText("nx="+QString().setNum((nx-(OstPix+DarkPixL))));
+//       msg.exec();
+//      }
+      if(Data[nx+ny*(xk1-xn1+1)]<0) Data[nx+ny*(xk1-xn1+1)]=0;
+     }
+     Data[nx+ny*(xk1-xn1+1)]/=XMLSensivity[(nx-(OstPix+DarkPixL))+i*nColibrData];
+    }//for(int nx=OstPix+DarkPixL;nx<(xk1-xn1+1);nx++)
+   }//for(int ny=0;ny<(yk1-yn1+1);ny++)
+  }//if(nColibrData>0)
+
+  SerFile.write((char*)Data,sizeof(float)*(xk1-xn1+1)*(yk1-yn1+1));
+  delete[] Data;
+ }//for(int i=NumChB;i<=NumChE;i++)
+ SerFile.close();
 }
 
 /*Определение номеров спектральных каналов*/
@@ -423,6 +684,7 @@ void DnImageLib::GetMinMaxBrigthChan(int nCh,float *BMin,float *BMax, float *BMi
  {
   float *Brigth;
   Brigth=this->GetBandZone(nCh,0,i*n,this->W-1,i*n+(n-1));
+
   if(i==0)
   {
    *BMax=Brigth[0];
@@ -450,7 +712,6 @@ void DnImageLib::GetMinMaxBrigthChan(int nCh,float *BMin,float *BMax, float *BMi
   }//else
   delete[] Brigth;
  }//for(int i=0;i<nRead;i++)
-
  if(OstRead>0)
  {
   float *Brigth;
@@ -519,4 +780,26 @@ bool DnImageLib::IsPointInside(int xp,int yp,QList <QPoint> pt)
   prev_under = cur_under;
  }
  return (intersections_num&1) != 0;
+}
+QStringList DnImageLib::ReadXMLFile(const QDomNode& node,QString TagName,QString ParrentTagName)
+{
+ QStringList Data;
+ QString Parrent;
+ Parrent=node.toElement().tagName();
+ QDomNode domNode=node.firstChild();
+ while(!domNode.isNull())
+ {
+  if(domNode.isElement())
+  {
+   QDomElement domElement=domNode.toElement();
+   if(!domElement.isNull())
+   {
+    if(TagName==domElement.tagName() && (ParrentTagName=="" || ParrentTagName==Parrent))
+     Data<<domElement.text();
+   }//if(!domElement.isNull())
+  }//if(domNode.isElement())
+  Data+=ReadXMLFile(domNode,TagName,ParrentTagName);
+  domNode=domNode.nextSibling();
+ }//while(!domNode.isNull())
+ return Data;
 }

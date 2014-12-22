@@ -9,17 +9,20 @@
 
 class DNImgPoly
 {
+
 /*Функции полигона*/
 public:
     DNImgPoly();
+    ~DNImgPoly();
     QPoint GetMinP();
     QPoint GetMaxP();
     void SelectPolygon();
 
 //    void PolygonToFile(QString FileName); //Строка с полным именем файла
 
-private:
+//private:
     bool IsPointInside(int xp,int yp);
+    void CreateImg(float *ImgPolyR,float *ImgPolyG,float *ImgPolyB, int *MassPoly, quint64 px);
 
 
 /*Свойства полигона*/
@@ -28,9 +31,11 @@ public:
     int *SelPoly; //Участок изображения
     QList <QPoint> pt; //Координаты углов полигона в проекции картинки
     QPoint Point;
-    bool IsPolygonSelect;
-
+    bool IsPolygonSelect; //Определены ли точки полигона
+    bool IsPolygonCurrent; //Этот полигон является текущим
     bool IsPolyClassif; //Применялись ли к полигону методы классификации (по умолчанию FALSE)
+    bool IsPolyCreateImg; //Применялись ли к полигону особые параметры отрисовки
+    int *PImgR,*PImgG,*PImgB;
     int *ClassifMass; //Массиф классификации
 };
 
@@ -45,37 +50,44 @@ public:
     bool IsCretaePolyOn; //Включён ли режим создания полигона
     bool IsSelPoly; //Выделен ли полигон
 
+    bool IsDlgAIHidden;
+    int DlgAiSizeSide;
 
     int ViewAreaX,ViewAreaY; //Размеры рабочей области куда выводится изображение
     QList <DNImgPoly> Polygons; //Список полигонов
-    DNImgPoly Polygon; //Текущий полигон
+    QList <QPoint> pt; //Список точек без полигона
+//    DNImgPoly *Polygon; //Текущий полигон
 //    PropPolygonSel Polygon; //Текущий полигон
 //    QPoint Point;
 //    int KolvoPixPoly;
 //    int ProzrPol; //Характеристика прозрачности полигона
     QImage img;
     QImage imgScale;
+
 protected:
     virtual void paintEvent(QPaintEvent *pe);
     virtual void mouseMoveEvent(QMouseEvent* mEvent);
     virtual void mousePressEvent(QMouseEvent* mEvent);
-//    virtual void mouseDoubleClickEvent(QMouseEvent *);
+    virtual void mouseDoubleClickEvent(QMouseEvent *);
 
 private:
     float NewKof; //Коэффициент размера изображения
-    int MouseX,MouseY;
     int SliderX,SliderY;
     int ColorClassR[50],ColorClassG[50],ColorClassB[50];
+    int MouseX,MouseY;
+    int XMouseCl,YMouseCl;
 
     int GetNumCurPoly();
     void DeselectPoly();
 
 signals:
-//    void MouseClicked(int x,int y);
-//    void MouseDoubleCliced(int x,int y);
+      void MouseLClicked(int x,int y);
+      void MouseDoubleCliced(int x,int y);
       void MouseMove(int x,int y);
       void OnRightButton(bool On);
 public slots:
+      int NewPolygon();
+      void ChangeCurPoly(int nPoly);
 //    void ImgReduc();
 //    void ImgIncrease();
 //    void ImgZoomScreen();
