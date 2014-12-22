@@ -282,7 +282,7 @@
      <x>0</x>
      <y>0</y>
      <width>921</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -316,8 +316,6 @@
      <string>Тематические задачи</string>
     </property>
     <addaction name="Batinometriy"/>
-    <addaction name="ShowDeptch"/>
-    <addaction name="OilWater"/>
     <addaction name="MaskPokr"/>
     <addaction name="RoutMove"/>
     <addaction name="RoutMove2"/>
@@ -340,8 +338,6 @@
     <addaction name="IsoData"/>
     <addaction name="SAM"/>
     <addaction name="BayesClassif"/>
-    <addaction name="separator"/>
-    <addaction name="ForOlga"/>
    </widget>
    <widget class="QMenu" name="menu_6">
     <property name="title">
@@ -397,7 +393,7 @@
   </action>
   <action name="ShowDeptch">
    <property name="text">
-    <string>Показать значения глубин 2</string>
+    <string>Показать значения глубин</string>
    </property>
   </action>
   <action name="CreateSpecGraph">
@@ -490,7 +486,7 @@
   </action>
   <action name="RoutMove">
    <property name="text">
-    <string>pr1</string>
+    <string>Определение залесенных объектов</string>
    </property>
   </action>
   <action name="ClassResultToPoly">
@@ -505,12 +501,12 @@
   </action>
   <action name="RoutMove2">
    <property name="text">
-    <string>pr2</string>
+    <string>Определение зон обводнения</string>
    </property>
   </action>
   <action name="Smoces">
    <property name="text">
-    <string>Дымы</string>
+    <string>Выделение аэрозольно-дымовых завес</string>
    </property>
   </action>
   <action name="AddIntegralChanal">
@@ -520,12 +516,17 @@
   </action>
   <action name="EmbedObj">
    <property name="text">
-    <string>Заглубленные объедки</string>
+    <string>Обнаружение скрытых и заглубленных объектов</string>
    </property>
   </action>
   <action name="ForOlga">
    <property name="text">
-    <string>Для Ольги и меня</string>
+    <string>Для Ольги</string>
+   </property>
+  </action>
+  <action name="action">
+   <property name="text">
+    <string>цййцйц</string>
    </property>
   </action>
  </widget>
