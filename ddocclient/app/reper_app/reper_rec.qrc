@@ -1,5 +1,5 @@
 <RCC>
     <qresource prefix="/reper" lang="ru">
-        <file>reper_app_ru.qm</file>
+        <file>../../transl/reper_app_ru.qm</file>
     </qresource>
 </RCC>
