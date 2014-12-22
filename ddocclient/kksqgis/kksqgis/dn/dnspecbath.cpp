@@ -43,7 +43,7 @@ DNSpecBath::DNSpecBath(QWidget *parent) :
  this->IsPolygonCreateMode=FALSE;
  connect(ui->DNWPic,SIGNAL(OnRightButton(bool)),ui->CreatePoly,SIGNAL(triggered(bool)));
  connect(ui->treePolygons,SIGNAL(clicked(QModelIndex)),ui->treePolygons,SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)));
- ui->pbVectorize->setEnabled(true);
+// ui->pbVectorize->setEnabled(true);
 }
 
 DNSpecBath::~DNSpecBath()
@@ -492,7 +492,7 @@ void DNSpecBath::on_Batinometriy_triggered()
   FieldsName<<"Deep";
   FieldsType<<"double";
   Polygons=this->SerPoly->RastrToVector(GDSt.XTopLeftPix,GDSt.XD,GDSt.XAngle,GDSt.YTopLeftPix,GDSt.YD,GDSt.YAngle,SerPoly->KofV,SerPoly->MinV,this->FileNameOpen,
-                                        FieldsName,FieldsType);
+                                        FieldsName,FieldsType,"Batimetr");
 
   ui->pbVectorize->setEnabled(true);
   ui->statusBar->showMessage(tr("–асчет спектральной батинометрии завершен"));
@@ -771,6 +771,19 @@ void DNSpecBath::on_DlgMask_OK()
   FileClassMass.write((char*)this->SerPoly->ClassifMass,sizeof(int)*this->SerPoly->W*this->SerPoly->H);
   FileClassMass.close();
  }
+
+ GeoDataStruct GDSt;
+ GdalImage->GetGeoData(&GDSt);
+ QList <QString> FieldsName;
+ QList <QString> FieldsType;
+ FieldsName<<"Comment";
+ FieldsType<<"String";
+ Polygons=this->SerPoly->RastrToVector(GDSt.XTopLeftPix,GDSt.XD,GDSt.XAngle,GDSt.YTopLeftPix,GDSt.YD,GDSt.YAngle,/*SerPoly->KofV*/1.,/*SerPoly->MinV*/1.,this->FileNameOpen,
+                                       FieldsName,FieldsType,"MaskAreaTap2");
+
+ ui->pbVectorize->setEnabled(true);
+ ui->statusBar->showMessage(tr("–асчет спектральной батинометрии завершен"));
+ QApplication::restoreOverrideCursor();
 
  this->FillMainForm();
 // this->FillStackPolygons();
@@ -1053,6 +1066,21 @@ void DNSpecBath::on_DlgRMove_OK()
    this->FillMainForm();
   }
   delete[] MaskCh;
+
+  GeoDataStruct GDSt;
+  GdalImage->GetGeoData(&GDSt);
+  QList <QString> FieldsName;
+  QList <QString> FieldsType;
+  FieldsName<<"Comment";
+  FieldsType<<"String";
+  Polygons=this->SerPoly->RastrToVector(GDSt.XTopLeftPix,GDSt.XD,GDSt.XAngle,GDSt.YTopLeftPix,GDSt.YD,GDSt.YAngle,/*SerPoly->KofV*/1.,/*SerPoly->MinV*/1.,this->FileNameOpen,
+                                        FieldsName,FieldsType,"RoutMove");
+
+  ui->pbVectorize->setEnabled(true);
+  ui->statusBar->showMessage(tr("–асчет спектральной батинометрии завершен"));
+  QApplication::restoreOverrideCursor();
+
+
  }//if(Etolons.size()>1)
 
  else
@@ -1163,6 +1191,19 @@ void DNSpecBath::on_DlgRMove2_OK()
   FileClassMass.close();
   this->FillMainForm();
  }
+ GeoDataStruct GDSt;
+ GdalImage->GetGeoData(&GDSt);
+ QList <QString> FieldsName;
+ QList <QString> FieldsType;
+ FieldsName<<"Comment";
+ FieldsType<<"String";
+ Polygons=this->SerPoly->RastrToVector(GDSt.XTopLeftPix,GDSt.XD,GDSt.XAngle,GDSt.YTopLeftPix,GDSt.YD,GDSt.YAngle,/*SerPoly->KofV*/1.,/*SerPoly->MinV*/1.,this->FileNameOpen,
+                                       FieldsName,FieldsType,"RoutMoveTap2");
+
+ ui->pbVectorize->setEnabled(true);
+ ui->statusBar->showMessage(tr("–асчет спектральной батинометрии завершен"));
+ QApplication::restoreOverrideCursor();
+
 }
 
 void DNSpecBath::on_Smoces_triggered()
@@ -1279,6 +1320,18 @@ void DNSpecBath::on_DlgSmoces_OK()
   FileClassMass.close();
   this->FillMainForm();
  }
+ GeoDataStruct GDSt;
+ GdalImage->GetGeoData(&GDSt);
+ QList <QString> FieldsName;
+ QList <QString> FieldsType;
+ FieldsName<<"Comment";
+ FieldsType<<"String";
+ Polygons=this->SerPoly->RastrToVector(GDSt.XTopLeftPix,GDSt.XD,GDSt.XAngle,GDSt.YTopLeftPix,GDSt.YD,GDSt.YAngle,/*SerPoly->KofV*/1.,/*SerPoly->MinV*/1.,this->FileNameOpen,
+                                       FieldsName,FieldsType,"SmocesTapFinal");
+
+ ui->pbVectorize->setEnabled(true);
+ ui->statusBar->showMessage(tr("–асчет спектральной батинометрии завершен"));
+ QApplication::restoreOverrideCursor();
 
 }
 
@@ -1530,6 +1583,19 @@ void DNSpecBath::on_DlgEmbedObj_OK()
   FileClassMass.close();
   this->FillMainForm();
  }
+ GeoDataStruct GDSt;
+ GdalImage->GetGeoData(&GDSt);
+ QList <QString> FieldsName;
+ QList <QString> FieldsType;
+ FieldsName<<"Comment";
+ FieldsType<<"String";
+ Polygons=this->SerPoly->RastrToVector(GDSt.XTopLeftPix,GDSt.XD,GDSt.XAngle,GDSt.YTopLeftPix,GDSt.YD,GDSt.YAngle,/*SerPoly->KofV*/1.,/*SerPoly->MinV*/1.,this->FileNameOpen,
+                                       FieldsName,FieldsType,"EmbedObj");
+
+ ui->pbVectorize->setEnabled(true);
+ ui->statusBar->showMessage(tr("–асчет спектральной батинометрии завершен"));
+ QApplication::restoreOverrideCursor();
+
 }
 
 /* онец тематических задач*/
