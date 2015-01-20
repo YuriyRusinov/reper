@@ -23,18 +23,6 @@
      <height>19</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menu_DB">
-    <property name="title">
-     <string>&amp;DB</string>
-    </property>
-    <addaction name="actConnect"/>
-    <addaction name="actDisconnect"/>
-    <addaction name="separator"/>
-    <addaction name="act3D_Models"/>
-    <addaction name="actRLI"/>
-    <addaction name="separator"/>
-    <addaction name="actE_xit"/>
-   </widget>
    <widget class="QMenu" name="menu_RLI_Analisys">
     <property name="title">
      <string>&amp;RLI Analisys</string>
@@ -44,21 +32,37 @@
       <string>&amp;Search...</string>
      </property>
      <addaction name="actSearchImage"/>
+     <addaction name="actBy_Image_fragment"/>
     </widget>
     <widget class="QMenu" name="menuGologram">
      <property name="title">
       <string>Gologram ...</string>
      </property>
      <addaction name="actGenerateGol"/>
-     <addaction name="actView_real_image"/>
     </widget>
     <addaction name="menu_Search"/>
-    <addaction name="actComparison"/>
-    <addaction name="actPlugins"/>
     <addaction name="menuGologram"/>
+   </widget>
+   <widget class="QMenu" name="menu_DB">
+    <property name="title">
+     <string>&amp;DB</string>
+    </property>
+    <addaction name="actConnect"/>
+    <addaction name="actDisconnect"/>
+    <addaction name="separator"/>
+    <addaction name="actRLI"/>
+    <addaction name="separator"/>
+    <addaction name="actE_xit"/>
+   </widget>
+   <widget class="QMenu" name="menu_Help">
+    <property name="title">
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="actionUser_Manual"/>
    </widget>
    <addaction name="menu_DB"/>
    <addaction name="menu_RLI_Analisys"/>
+   <addaction name="menu_Help"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actConnect">
@@ -125,6 +129,16 @@
   <action name="actView_real_image">
    <property name="text">
     <string>View real image</string>
+   </property>
+  </action>
+  <action name="actBy_Image_fragment">
+   <property name="text">
+    <string>by RLI fragment</string>
+   </property>
+  </action>
+  <action name="actionUser_Manual">
+   <property name="text">
+    <string>User Manual...</string>
    </property>
   </action>
  </widget>

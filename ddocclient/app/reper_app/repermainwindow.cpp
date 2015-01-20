@@ -78,13 +78,13 @@ ReperMainWindow :: ReperMainWindow (QWidget * parent, Qt::WindowFlags flags)
 
     connect (UI->actConnect, SIGNAL (triggered()), this, SLOT (slotConnect()) );
     connect (UI->actDisconnect, SIGNAL (triggered()), this, SLOT (slotDisconnect()) );
-    connect (UI->act3D_Models, SIGNAL (triggered()), this, SLOT (slot3DMod()) );
+//    connect (UI->act3D_Models, SIGNAL (triggered()), this, SLOT (slot3DMod()) );
     connect (UI->actRLI, SIGNAL (triggered()), this, SLOT (slotRLI()) );
     connect (UI->actE_xit, SIGNAL (triggered()), this, SLOT (slotClose()) );
     connect (UI->actSearchImage, SIGNAL (triggered()), this, SLOT (slotSearchByImage()) );
     connect (UI->actComparison, SIGNAL (triggered()), this, SLOT (slotCompare()) );
     connect (UI->actGenerateGol, SIGNAL (triggered()), this, SLOT (slotGologram()) );
-    connect (UI->actView_real_image, SIGNAL (triggered()), this, SLOT (slotViewImage()) );
+    connect (UI->actBy_Image_fragment, SIGNAL (triggered()), this, SLOT (slotViewImage()) );
 }
 
 ReperMainWindow :: ~ReperMainWindow (void)
@@ -140,8 +140,24 @@ void ReperMainWindow :: slotRLI (void)
     if(!filter)
         return;
 
+    KKSFilter * fUserFilter = c->createFilter (1, QString::number (300), KKSFilter::foGr);
+
     filters.append(filter);
     filter->release();
+
+    if (fUserFilter)
+    {
+        filters.append (fUserFilter);
+        fUserFilter->release ();
+    }
+    QStringList tNames;
+    tNames << QString ("type_ship") << QString ("radio_image") << QString("rli_image_raws") << QString("object_passports");
+    KKSFilter * fTableFilter = c->createFilter (ATTR_TABLE_NAME, tNames, KKSFilter::foIn);
+    if (fTableFilter)
+    {
+        filters.append (fTableFilter);
+        fTableFilter->release ();
+    }
     KKSList<const KKSFilterGroup *> filterGroups;
     KKSFilterGroup * group = new KKSFilterGroup(true);
     group->setFilters(filters);
