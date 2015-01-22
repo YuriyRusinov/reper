@@ -4,10 +4,14 @@
 #include <QWidget>
 #include <QImage>
 
-namespace Ui
+/*namespace Ui
 {
     class Image_widget;
 };
+*/
+
+class QLabel;
+class QToolButton;
 
 class ImageWidget : public QWidget
 {
@@ -29,9 +33,21 @@ signals:
 
 private:
     //
+    // Functions
+    //
+    void init (void);
+
+private:
+    //
     // Variables
     //
-    Ui::Image_widget *UI;
+//    Ui::Image_widget *UI;
+    QLabel * lRImage;
+    QToolButton * tbLoadImage;
+    QToolButton * tbSelect;
+    QToolButton * tbSaveToDb;
+    QToolButton * tbLoadFromDb;
+
     QImage rGIm;
 private:
     Q_OBJECT

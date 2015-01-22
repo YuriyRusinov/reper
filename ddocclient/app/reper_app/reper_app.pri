@@ -6,8 +6,7 @@ HEADERS += \
 
 FORMS += \
          reper_main_window.ui \
-         search_radio_form.ui \
-         image_widget.ui
+         search_radio_form.ui 
 
 SOURCES += \
            main.cpp \
