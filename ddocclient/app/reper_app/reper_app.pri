@@ -1,7 +1,8 @@
 HEADERS += \
            repermainwindow.h \
            searchradioform.h \
-           imagewidget.h
+           imagewidget.h \
+           ImageLabel.h
 
 FORMS += \
          reper_main_window.ui \
@@ -12,6 +13,7 @@ SOURCES += \
            main.cpp \
 	   repermainwindow.cpp \
            searchradioform.cpp \
-           imagewidget.cpp
+           imagewidget.cpp \
+           ImageLabel.cpp
 
 #RESOURCES = icon_set.qrc
