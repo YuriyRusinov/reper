@@ -4,12 +4,6 @@
 #include <QWidget>
 #include <QImage>
 
-/*namespace Ui
-{
-    class Image_widget;
-};
-*/
-
 class QLabel;
 class QToolButton;
 
@@ -41,7 +35,6 @@ private:
     //
     // Variables
     //
-//    Ui::Image_widget *UI;
     QLabel * lRImage;
     QToolButton * tbLoadImage;
     QToolButton * tbSelect;

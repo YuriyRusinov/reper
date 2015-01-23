@@ -4,19 +4,16 @@
 #include <QToolButton>
 #include <QGridLayout>
 #include "ImageLabel.h"
- #include <QSpacerItem>
+#include <QSpacerItem>
 #include <QtDebug>
 
 #include "imagewidget.h"
-//#include "ui_image_widget.h"
 
 ImageWidget :: ImageWidget (QWidget * parent, Qt::WindowFlags flags)
     : QWidget (parent, flags),
-//    UI (new Ui::Image_widget),
     rGIm (QImage())
 {
     this->init ();
-//    UI->setupUi (this);
 
     connect (tbLoadImage, SIGNAL (clicked()), this, SLOT (loadImageFile()) );
     connect (tbSelect, SIGNAL (pressed()), this, SLOT (selectRect()) );
@@ -26,7 +23,6 @@ ImageWidget :: ImageWidget (QWidget * parent, Qt::WindowFlags flags)
 
 ImageWidget :: ~ImageWidget (void)
 {
-//    delete UI;
 }
 
 void ImageWidget :: setImage (const QImage& im)
