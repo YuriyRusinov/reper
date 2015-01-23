@@ -54,6 +54,13 @@ void SearchRadioForm :: clearImage (void)
 {
     sIm = QImage ();
     lImageP->setPixmap (QPixmap());
+    lImageP->setPixmap (QPixmap::fromImage (sIm));
+}
+
+void SearchRadioForm :: setImage (const QImage& im)
+{
+    sIm = QImage (im);
+    lImageP->setPixmap (QPixmap::fromImage (sIm));
 }
 
 void SearchRadioForm :: init (void)

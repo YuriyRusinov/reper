@@ -38,6 +38,7 @@ private slots:
 
     void setActionsEnabled(bool enabled);
     void isActiveSubWindow(const KKSObjEditor * editor, bool * yes);
+    void searchIm (const QImage& sIm);
 private:
     //
     // Functions

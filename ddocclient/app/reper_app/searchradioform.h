@@ -17,6 +17,7 @@ public:
     virtual ~SearchRadioForm (void);
 
     QImage getImage (void) const;
+    void setImage (const QImage& im);
 
 private slots:
     void loadImage (void);

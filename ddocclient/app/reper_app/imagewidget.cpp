@@ -3,6 +3,8 @@
 #include <QMessageBox>
 #include <QToolButton>
 #include <QGridLayout>
+#include <QSize>
+#include <QRect>
 #include "ImageLabel.h"
 #include <QSpacerItem>
 #include <QtDebug>
@@ -47,10 +49,18 @@ void ImageWidget :: loadImageFile (void)
         return;
     }
     setImage (image);
+    QSize rSize = sizeHint();
+    resize (rSize);
 }
 
 void ImageWidget :: selectRect (void)
 {
+    ImageLabel * iL = qobject_cast<ImageLabel *>(lRImage);
+    if (!iL)
+        return;
+    QRect sRect = iL->getSelection ();
+    QImage sImage = rGIm.copy (sRect);
+    emit searchByIm (sImage);
 }
 
 void ImageWidget :: saveImageToDb (void)
@@ -78,7 +88,6 @@ void ImageWidget :: init (void)
 
     tbSelect = new QToolButton (this);
     tbSelect->setToolTip (tr("Select fragment"));
-    tbSelect->setCheckable (true);
     tbSelect->setText (tr("..."));
     grLay->addWidget (tbSelect, 1, 1, 1, 1);
 
@@ -86,11 +95,13 @@ void ImageWidget :: init (void)
     tbSaveToDb->setToolTip (tr("Save to database"));
     tbSaveToDb->setText (tr("..."));
     grLay->addWidget (tbSaveToDb, 2, 1, 1, 1);
+    tbSaveToDb->setVisible (false);
 
     tbLoadFromDb = new QToolButton (this);
     tbLoadFromDb->setToolTip (tr("Load image from database"));
     tbLoadFromDb->setText (tr("..."));
     grLay->addWidget (tbLoadFromDb, 3, 1, 1, 1);
+    tbLoadFromDb->setVisible (false);
 
     QSpacerItem * vSpacer = new QSpacerItem(20, 128, QSizePolicy::Minimum, QSizePolicy::Expanding);
     grLay->addItem (vSpacer, 4, 1, 1, 1);

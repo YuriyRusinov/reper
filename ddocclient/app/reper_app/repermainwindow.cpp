@@ -186,9 +186,15 @@ void ReperMainWindow :: slotClose (void)
 
 void ReperMainWindow :: slotSearchByImage (void)
 {
+    searchIm (QImage());
+}
+
+void ReperMainWindow :: searchIm (const QImage& sIm0)
+{
     qDebug () << __PRETTY_FUNCTION__;
     SearchRadioForm * srForm = new SearchRadioForm();
-    QImage sIm ;
+    srForm->setImage (sIm0);
+    QImage sIm (sIm0);
     if (srForm->exec() == QDialog::Accepted)
     {
         sIm = srForm->getImage();
@@ -458,4 +464,6 @@ void ReperMainWindow::slotViewImage (void)
     m_imW->setAttribute (Qt::WA_DeleteOnClose);
     m_imW->setWindowState (m_imW->windowState() | Qt::WindowActive);
     imW->show();
+
+    connect (imW, SIGNAL (searchByIm (const QImage&)), this, SLOT (searchIm (const QImage&)) );
 }

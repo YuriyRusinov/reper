@@ -24,6 +24,7 @@ private slots:
 signals:
     void saveImage (const QImage& );
     void loadImage (void);
+    void searchByIm (const QImage&);
 
 private:
     //
