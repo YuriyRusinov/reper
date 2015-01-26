@@ -34,5 +34,5 @@ unix {
     INSTALLS += target
 }
 
-TRANSLATIONS = ../../../transl/reper_app.ts
+TRANSLATIONS = ../../../transl/gologram_ru.ts
 

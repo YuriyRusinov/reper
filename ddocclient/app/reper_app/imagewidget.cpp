@@ -77,29 +77,31 @@ void ImageWidget :: init (void)
 {
     QGridLayout * grLay = new QGridLayout (this);
     lRImage = new ImageLabel (this);
+    QSize imMinSize (200, 200);
+    lRImage->setMinimumSize (imMinSize);
 
     grLay->addWidget (lRImage, 0, 0, 5, 1);
 
     tbLoadImage = new QToolButton (this);
     tbLoadImage->setToolTip (tr("Load golographic image from file"));
-    tbLoadImage->setText (tr("..."));
+    tbLoadImage->setText (tr("Load image..."));
 
     grLay->addWidget (tbLoadImage, 0, 1, 1, 1);
 
     tbSelect = new QToolButton (this);
-    tbSelect->setToolTip (tr("Select fragment"));
-    tbSelect->setText (tr("..."));
+    tbSelect->setToolTip (tr("Search by image fragment"));
+    tbSelect->setText (tr("Search..."));
     grLay->addWidget (tbSelect, 1, 1, 1, 1);
 
     tbSaveToDb = new QToolButton (this);
     tbSaveToDb->setToolTip (tr("Save to database"));
-    tbSaveToDb->setText (tr("..."));
+    tbSaveToDb->setText (tr("Save to DB"));
     grLay->addWidget (tbSaveToDb, 2, 1, 1, 1);
     tbSaveToDb->setVisible (false);
 
     tbLoadFromDb = new QToolButton (this);
     tbLoadFromDb->setToolTip (tr("Load image from database"));
-    tbLoadFromDb->setText (tr("..."));
+    tbLoadFromDb->setText (tr("Load from DB"));
     grLay->addWidget (tbLoadFromDb, 3, 1, 1, 1);
     tbLoadFromDb->setVisible (false);
 
