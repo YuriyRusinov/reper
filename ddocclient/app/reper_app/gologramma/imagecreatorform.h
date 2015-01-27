@@ -8,7 +8,7 @@
 #include "gologramma.h"
 
 namespace Ui {
-class image_creator_form;
+class imageCreatorForm;
 }
 
 class _GOL_EXPORT imageCreatorForm : public QDialog
@@ -20,10 +20,10 @@ public:
     ~imageCreatorForm();
 
 private:
-    Ui::image_creator_form *ui;
-    int controllSpinBox();
+    Ui::imageCreatorForm *ui;
 
     void formInit();
+    int controllSpinBox();
 
 private slots:
     void selectFileName();

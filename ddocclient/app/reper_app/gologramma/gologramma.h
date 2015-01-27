@@ -4,11 +4,10 @@
 #include "gologramma_global.h"
 #include "cuboid.h"
 
-class QProgressBar;
 //programm
 void _GOL_EXPORT loadModel(mslLoader::OBJloader& loader,const std::string& str);
 
-struct cubPair
+struct _GOL_EXPORT cubPair
 {
     Cuboid initialCub;
     std::vector<Cuboid> cubs;
@@ -16,7 +15,7 @@ struct cubPair
 
 cubPair _GOL_EXPORT buildCub(const mslLoader::OBJloader& loader,const double lengthOfShip,const double numberOfUnit);
 
-struct constDataStruct
+struct _GOL_EXPORT constDataStruct
 {
     unsigned int XY_plane;
     unsigned int XZ_plane;
@@ -30,7 +29,7 @@ std::string _GOL_EXPORT createFileNamePNG(const constDataStruct& data,const std:
 void _GOL_EXPORT saveFileDAT(constDataStruct data,std::vector<unsigned char>& image, const std::string& str);
 void _GOL_EXPORT saveFilePNG(std::vector<unsigned char>& image, const std::string& str);
 
-struct _GOL_EXPORT  generatingData
+struct _GOL_EXPORT generatingData
 {
     double lengthOfShip;
     double numberOfUnit;
@@ -55,7 +54,7 @@ struct _GOL_EXPORT returningData
     QVector<unsigned char> data;
 };
 
-void swap_STDtoQT_vector(QVector<unsigned char>& lhs,std::vector<unsigned char>& rhs);
+void _GOL_EXPORT swap_STDtoQT_vector(QVector<unsigned char>& lhs,std::vector<unsigned char>& rhs);
 
 struct _GOL_EXPORT generatingDataPlus
 {
@@ -63,6 +62,26 @@ struct _GOL_EXPORT generatingDataPlus
     generatingData data;
 };
 
-QVector<returningData> _GOL_EXPORT generateImages(const generatingData& data, mslLoader::OBJloader& loader, QProgressBar * pb);
+QVector<returningData> _GOL_EXPORT generateImages(const generatingData &data,mslLoader::OBJloader &loader,const std::string &folder);
+
+class _GOL_EXPORT ImageGenerator: public QObject
+{
+    Q_OBJECT
+
+public:
+    explicit ImageGenerator(const generatingDataPlus&,QObject* parent = 0);
+
+    void loadModel();
+    QVector<returningData> generateImages();
+
+private:
+    generatingDataPlus imageData;
+    mslLoader::OBJloader loader;
+
+signals:
+    void startCreating();
+    void createOneImage(int value);
+    void createAllImages();
+};
 
 #endif // GOLOGRAMMA_H

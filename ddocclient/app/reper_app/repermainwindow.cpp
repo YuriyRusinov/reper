@@ -379,16 +379,32 @@ void ReperMainWindow::slotGologram (void)
 
 void ReperMainWindow::slotGologramCalc (generatingDataPlus gdp)
 {
-    mslLoader::OBJloader *objL = new mslLoader::OBJloader;
-    loadModel (*objL, gdp.filename.toStdString ());
-    QProgressDialog * pProcD = new QProgressDialog;
-    QProgressBar * pb = new QProgressBar (pProcD);
-    pProcD->setBar (pb);
+    ImageGenerator* generator = new ImageGenerator(gdp,this);
+    
+    QProgressDialog* pProcD = new QProgressDialog;
+    QProgressBar* pb = new QProgressBar(pProcD);
+    pProcD->setBar(pb);
+
+    int maxValue = ((gdp.data.XY_angleMax - gdp.data.XY_angleMin)/gdp.data.XY_angleStep - 1)*((gdp.data.XZ_angleMax - gdp.data.XZ_angleMin)/gdp.data.XZ_angleStep);
+    pb->setRange(0,maxValue);
+
+    connect(generator,SIGNAL(createOneImage(int)),pb,SLOT(setValue(int)));
+
+    pProcD->show();
+
+    generator->loadModel();
+    QVector<returningData> resD = generator->generateImages();
+
+//    mslLoader::OBJloader *objL = new mslLoader::OBJloader;
+//    loadModel (*objL, gdp.filename.toStdString ());
+//    QProgressDialog * pProcD = new QProgressDialog;
+//    QProgressBar * pb = new QProgressBar (pProcD);
+//    pProcD->setBar (pb);
 //    pb->setRange (0, 100);
 //    pb->show();
 
-    pProcD->show ();
-    QVector<returningData> resD = generateImages (gdp.data, *objL, pb);
+//    pProcD->show ();
+//    QVector<returningData> resD = generateImages (gdp.data, *objL, pb);
     
     int nd = resD.count();
     qDebug () << __PRETTY_FUNCTION__ << nd;

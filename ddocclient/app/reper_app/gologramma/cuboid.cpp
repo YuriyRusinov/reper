@@ -597,7 +597,7 @@ std::vector<unsigned char> createImage(const std::vector<unsigned char> &imageMa
 
 QImage imageTransform(const std::vector<unsigned char>& in_image,const std::string& fileName)
 {
-    int size = static_cast<int>(sqrt(in_image.size()));
+    int size = static_cast<int>(sqrt(static_cast<double>(in_image.size())));
 
     QImage image(size,size,QImage::Format_RGB32);
 

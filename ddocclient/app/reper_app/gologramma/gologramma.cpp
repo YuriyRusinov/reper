@@ -1,5 +1,3 @@
-#include <QProgressBar>
-#include <QtDebug>
 #include "gologramma.h"
 
 void loadModel(mslLoader::OBJloader& loader,const std::string& str)
@@ -94,7 +92,7 @@ void swap_STDtoQT_vector(QVector<unsigned char>& lhs,std::vector<unsigned char>&
     }
 }
 
-QVector<returningData> generateImages(const generatingData &data, mslLoader::OBJloader &loader, QProgressBar * pb)
+QVector<returningData> generateImages(const generatingData &data, mslLoader::OBJloader &loader, const std::string &folder)
 {
     cubPair cubs = buildCub(loader,data.lengthOfShip,data.numberOfUnit);
     std::vector<Cuboid> cubusCubus;
@@ -102,13 +100,6 @@ QVector<returningData> generateImages(const generatingData &data, mslLoader::OBJ
 
     QVector<returningData> imagesData;
 
-    if (pb)
-    {
-        int nxy = (int)((data.XY_angleMax-data.XY_angleMin)/data.XY_angleStep)+1;
-        int nxz = (int)((data.XZ_angleMax-data.XZ_angleMin)/data.XZ_angleStep)+1;
-        pb->setRange (0, nxy*nxz);
-    }
-    int ncout(0);
     for(double XY_plane = data.XY_angleMin; XY_plane < data.XY_angleMax; XY_plane += data.XY_angleStep)
     {
         for(double XZ_plane = data.XZ_angleMin; XZ_plane <= data.XZ_angleMax; XZ_plane += data.XZ_angleStep)
@@ -129,7 +120,7 @@ QVector<returningData> generateImages(const generatingData &data, mslLoader::OBJ
 
             std::vector<unsigned char> image = createImage(createImageMatrix(cubusCubus,bufMesh));
 
-            unsigned int imageSize = static_cast<unsigned int>(sqrt(image.size()));
+            unsigned int imageSize = static_cast<unsigned int>(sqrt(static_cast<double>(image.size())));
 
             returningData buf;
             buf.XY_angle = static_cast<unsigned int>(XY_plane);
@@ -138,15 +129,97 @@ QVector<returningData> generateImages(const generatingData &data, mslLoader::OBJ
             buf.numberOfUnit = data.numberOfUnit;
             swap_STDtoQT_vector(buf.data,image);
 
+//****
+
+            //constDataStruct bufDat;
+            //bufDat.XY_plane = buf.XY_angle;
+            //bufDat.XZ_plane = buf.XZ_angle;
+            //bufDat.imageSize = imageSize;
+            //bufDat.numberOfUnit = data.numberOfUnit;
+
+            //saveFilePNG(image,createFileNamePNG(bufDat,"c:/image/pix/"));
+
+//****
+
             imagesData.push_back(buf);
-            if (pb)
-                pb->setValue (ncout++);
-            else
-                ncout++;
-            qDebug () << __PRETTY_FUNCTION__ << ncout;
         }
     }
 
     return imagesData;
 }
 
+ImageGenerator::ImageGenerator(const generatingDataPlus& data,QObject* parent):
+    QObject(parent),imageData(data)
+{
+}
+
+void ImageGenerator::loadModel()
+{
+    loader.load(imageData.filename.toStdString());
+}
+
+QVector<returningData> ImageGenerator::generateImages()
+{
+    cubPair cubs = buildCub(loader,imageData.data.lengthOfShip,imageData.data.numberOfUnit);
+    std::vector<Cuboid> cubusCubus;
+    Cuboid cubBig;
+
+    QVector<returningData> imagesData;
+
+	int value = 0;
+
+    for(double XY_plane = imageData.data.XY_angleMin; XY_plane < imageData.data.XY_angleMax; XY_plane += imageData.data.XY_angleStep)
+    {
+        for(double XZ_plane = imageData.data.XZ_angleMin; XZ_plane <= imageData.data.XZ_angleMax; XZ_plane += imageData.data.XZ_angleStep)
+        {
+            cubusCubus = cubs.cubs;
+            cubBig = cubs.initialCub;
+
+            cubBig.rotateInSpace(mslMesh::make_point3D(XZ_plane,XY_plane,0.0));
+
+            std::vector<Cuboid>::iterator cubusCubusIter = cubusCubus.begin();
+            for(; cubusCubusIter != cubusCubus.end(); ++cubusCubusIter)
+            {
+                (*cubusCubusIter).rotateInSpace(mslMesh::make_point3D(XZ_plane,XY_plane,0.0));
+            }
+
+            mslMesh::point3Ddouble bufPoint = cubBig.getVisionDirection();
+            mslMesh::mesh3D bufMesh = mslMesh::visibleMesh(bufPoint,loader.getMesh());
+
+            std::vector<unsigned char> image = createImage(createImageMatrix(cubusCubus,bufMesh));
+
+            unsigned int imageSize = static_cast<unsigned int>(sqrt(static_cast<double>(image.size())));
+
+            returningData buf;
+            buf.XY_angle = static_cast<unsigned int>(XY_plane);
+            buf.XZ_angle = static_cast<unsigned int>(XZ_plane);
+            buf.rowNumber = buf.columnNumber = imageSize;
+            buf.numberOfUnit = imageData.data.numberOfUnit;
+            swap_STDtoQT_vector(buf.data,image);
+
+//****
+
+            //constDataStruct bufDat;
+            //bufDat.XY_plane = buf.XY_angle;
+            //bufDat.XZ_plane = buf.XZ_angle;
+            //bufDat.imageSize = imageSize;
+            //bufDat.numberOfUnit = imageData.data.numberOfUnit;
+
+            //saveFilePNG(image,createFileNamePNG(bufDat,"c:/image/pix/"));
+
+//****
+
+            imagesData.push_back(buf);
+
+			value++;
+
+			emit createAllImages();
+        }
+
+		emit createOneImage(value);
+    }
+
+
+
+    return imagesData;
+}
