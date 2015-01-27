@@ -7,6 +7,7 @@
 #include <QVector>
 #include <QProgressBar>
 #include <QProgressDialog>
+#include <QTranslator>
 #include <QtDebug>
 
 #include "kksapplication.h"
@@ -349,6 +350,9 @@ QWidget * ReperMainWindow::activeKKSSubWindow()
 void ReperMainWindow::slotGologram (void)
 {
     qDebug () << __PRETTY_FUNCTION__ ;
+    QTranslator golTr;
+    golTr.load ("./transl/gologram_ru.qm", ".");
+    QCoreApplication::installTranslator (&golTr);
     imageCreatorForm * icf = new imageCreatorForm (this);
     connect (icf, SIGNAL (imagesData(generatingDataPlus)), this, SLOT (slotGologramCalc(generatingDataPlus)) );
 /*    QString gFileName = QFileDialog::getOpenFileName (this, tr("Open object file"),

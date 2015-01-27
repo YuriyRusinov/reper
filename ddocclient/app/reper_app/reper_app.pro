@@ -90,7 +90,8 @@ unix: LIBS += -lpq
 
 RESOURCES = reper_rec.qrc
 
-TRANSLATIONS = ../../transl/reper_app_ru.ts
+TRANSLATIONS += ../../transl/reper_app_ru.ts \
+                ../../transl/gologram_ru.ts
 
 include(reper_app.pri)
 

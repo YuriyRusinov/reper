@@ -10,7 +10,7 @@ FORMS += \
 
 SOURCES += \
            main.cpp \
-	   repermainwindow.cpp \
+           repermainwindow.cpp \
            searchradioform.cpp \
            imagewidget.cpp \
            ImageLabel.cpp
