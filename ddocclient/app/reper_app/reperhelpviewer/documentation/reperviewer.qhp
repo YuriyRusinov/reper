@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<QtHelpProject version="1.0">
+    <namespace>com.31.reperhelpviewer</namespace>
+    <virtualFolder>doc</virtualFolder>
+    <filterSection>
+        <toc>
+            <section title="Программный комплекс формирования и распознавания бинарного радиолокационного изображения объектов вооружения и военной техники" ref="index.html">
+
+
+
+              <section title="Общие сведения" ref="./sved.html"></section>
+              
+              <section title="Описание работы пользователя" ref="./user.html">
+              <section title="Описание работы с модулем формирования опорных бинарных радиолокационных изображений" ref="./opora.html"></section>
+              <section title="Описание работы с модулем  банка данных опорных РЛИ" ref="./bd.html"></section>
+              <section title="Описание работы с модулем распознавания" ref="./browse.html"></section>
+               </section>
+              
+              
+              
+                
+                </section>
+            </toc>
+        <keywords>
+
+          <keyword name="ПК ФРБРИ ОВВТ" ref="./index.html"/>
+          <keyword name="Программный комплекс формирования и распознавания бинарных радиолокационных изображений объектов вооружения и военной техники" ref="./index.html"/>
+          
+            <keyword name="Космический радиолокатор" ref="./sved.html"/>
+            <keyword name="Радиолокационное изображение" ref="./sved.html"/>
+            <keyword name="Объект вооружения и военной техники" ref="./sved.html"/> 
+          
+            <keyword name="Программный комплекс" ref="./user.html"/>
+            <keyword name="Программная среда функционирования" ref="./user.html"/>
+          
+            <keyword name="Модель отражения ЭМП" ref="./opora.html"/>
+            <keyword name="Cеточная модель морских объектов ВВТ" ref="./opora.html"/>
+            <keyword name="Опорное бинарное радиолокационное изображение" ref="./opora.html"/>
+          
+          
+            <keyword name="Модуль банка данных" ref="./bd.html"/>
+            <keyword name="БД ОРЛИ" ref="./bd.html"/>
+          
+          
+            <keyword name="Модуль распознавания" ref="./browse.html"/>
+            <keyword name="Распознавание морских ОВВТ " ref="./browse.html"/>
+          
+            </keywords>
+        <files>
+            <file>browse.html</file>
+            <file>index.html</file>
+            <file>sved.html</file>
+	    <file>user.html</file>	
+            <file>opora.html</file>
+            <file>bd.html</file>
+
+
+            <file>images/ris1.png</file>
+            <file>images/ris2.png</file>
+            <file>images/ris3.png</file>
+            <file>images/ris4.png</file>
+ 	    <file>images/ris5.png</file>			
+          
+            <file>images/ris6.gif</file>
+            <file>images/ris7.png</file>
+            <file>images/ris8.png</file>
+            <file>images/ris9.png</file>
+            <file>images/ris10.png</file>
+		<file>images/ris11.png</file>
+		<file>images/ris12.png</file>
+
+            </files>
+        </filterSection>
+    </QtHelpProject>

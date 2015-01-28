@@ -9,6 +9,7 @@ class QMdiArea;
 
 class KKSObjEditor;
 class generatingDataPlus;
+class Assistant;
 
 namespace Ui
 {
@@ -39,6 +40,8 @@ private slots:
     void setActionsEnabled(bool enabled);
     void isActiveSubWindow(const KKSObjEditor * editor, bool * yes);
     void searchIm (const QImage& sIm);
+
+    void slotHelp (void);
 private:
     //
     // Functions
@@ -50,6 +53,7 @@ private:
     //
     Ui::ReperMainWindowForm * UI;
     QMdiArea * m_mdiArea;
+    Assistant * ass;
 
 private:
     Q_OBJECT

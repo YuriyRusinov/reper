@@ -58,7 +58,7 @@
     <property name="title">
      <string>&amp;Help</string>
     </property>
-    <addaction name="actionUser_Manual"/>
+    <addaction name="actUser_Manual"/>
    </widget>
    <addaction name="menu_DB"/>
    <addaction name="menu_RLI_Analisys"/>
@@ -136,7 +136,7 @@
     <string>by RLI fragment</string>
    </property>
   </action>
-  <action name="actionUser_Manual">
+  <action name="actUser_Manual">
    <property name="text">
     <string>User Manual...</string>
    </property>

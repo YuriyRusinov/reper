@@ -10,6 +10,7 @@
 #include <QTranslator>
 #include <QtDebug>
 
+#include "assistant.h"
 #include "kksapplication.h"
 #include <kksdatabase.h>
 #include <kkspluginloader.h>
@@ -37,6 +38,7 @@ ReperMainWindow :: ReperMainWindow (QWidget * parent, Qt::WindowFlags flags)
     UI (new Ui::ReperMainWindowForm),
     m_mdiArea (new QMdiArea)
 {
+    ass = new Assistant;
     UI->setupUi (this);
     this->setCentralWidget (m_mdiArea);
     setActionsEnabled (false);
@@ -86,10 +88,12 @@ ReperMainWindow :: ReperMainWindow (QWidget * parent, Qt::WindowFlags flags)
     connect (UI->actComparison, SIGNAL (triggered()), this, SLOT (slotCompare()) );
     connect (UI->actGenerateGol, SIGNAL (triggered()), this, SLOT (slotGologram()) );
     connect (UI->actBy_Image_fragment, SIGNAL (triggered()), this, SLOT (slotViewImage()) );
+    connect (UI->actUser_Manual, SIGNAL (triggered()), this, SLOT (slotHelp()));
 }
 
 ReperMainWindow :: ~ReperMainWindow (void)
 {
+    delete ass;
     delete m_mdiArea;
     delete UI;
 }
@@ -487,4 +491,10 @@ void ReperMainWindow::slotViewImage (void)
     imW->show();
 
     connect (imW, SIGNAL (searchByIm (const QImage&)), this, SLOT (searchIm (const QImage&)) );
+}
+
+void ReperMainWindow::slotHelp (void)
+{
+    qDebug () << __PRETTY_FUNCTION__;
+    ass->showDocumentation ("index.html");
 }

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QHelpCollectionProject version="1.0">
+    <assistant>
+        <title>Reper Help Viewer</title>
+        <applicationIcon>images/handbook.png</applicationIcon>
+        <cacheDirectory>ReperViewer</cacheDirectory>
+        <startPage>qthelp://com.31.reperhelpviewer/doc/index.html</startPage>
+        <enableDocumentationManager>false</enableDocumentationManager>
+        <enableAddressBar>false</enableAddressBar>
+        <enableFilterFunctionality>false</enableFilterFunctionality>
+    </assistant>
+    <docFiles>
+        <generate>
+            <file>
+                <input>reperviewer.qhp</input>
+                <output>reperviewer.qch</output>
+                </file>
+            </generate>
+        <register>
+            <file>reperviewer.qch</file>
+            </register>
+        </docFiles>
+    </QHelpCollectionProject>
