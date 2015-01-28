@@ -381,7 +381,7 @@ void ReperMainWindow::slotGologramCalc (generatingDataPlus gdp)
 {
     ImageGenerator* generator = new ImageGenerator(gdp,this);
     
-    QProgressDialog* pProcD = new QProgressDialog;
+/*    QProgressDialog* pProcD = new QProgressDialog;
     QProgressBar* pb = new QProgressBar(pProcD);
     pProcD->setBar(pb);
 
@@ -391,9 +391,10 @@ void ReperMainWindow::slotGologramCalc (generatingDataPlus gdp)
     connect(generator,SIGNAL(createOneImage(int)),pb,SLOT(setValue(int)));
 
     pProcD->show();
-
+*/
     generator->loadModel();
     QVector<returningData> resD = generator->generateImages();
+    delete generator;
 
 //    mslLoader::OBJloader *objL = new mslLoader::OBJloader;
 //    loadModel (*objL, gdp.filename.toStdString ());
@@ -474,7 +475,7 @@ void ReperMainWindow::slotGologramCalc (generatingDataPlus gdp)
         qDebug () << __PRETTY_FUNCTION__ << id;
     }
     io->release ();
-    delete pProcD;
+//    delete pProcD;
 }
 
 void ReperMainWindow::slotViewImage (void)

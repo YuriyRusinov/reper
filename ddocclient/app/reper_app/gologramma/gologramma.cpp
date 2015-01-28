@@ -160,7 +160,14 @@ void ImageGenerator::loadModel()
 
 QVector<returningData> ImageGenerator::generateImages()
 {
-    cubPair cubs = buildCub(loader,imageData.data.lengthOfShip,imageData.data.numberOfUnit);
+    int imagesNum = ((imageData.data.XY_angleMax - imageData.data.XY_angleMin)/imageData.data.XY_angleStep) *
+            ((imageData.data.XZ_angleMax - imageData.data.XZ_angleMin)/imageData.data.XZ_angleStep - 1);
+	
+	QProgressDialog progress("Creating images...", "Cancel", 0, imagesNum);
+    progress.setWindowModality(Qt::WindowModal);
+	progress.show();
+	
+	cubPair cubs = buildCub(loader,imageData.data.lengthOfShip,imageData.data.numberOfUnit);
     std::vector<Cuboid> cubusCubus;
     Cuboid cubBig;
 
@@ -170,8 +177,16 @@ QVector<returningData> ImageGenerator::generateImages()
 
     for(double XY_plane = imageData.data.XY_angleMin; XY_plane < imageData.data.XY_angleMax; XY_plane += imageData.data.XY_angleStep)
     {
-        for(double XZ_plane = imageData.data.XZ_angleMin; XZ_plane <= imageData.data.XZ_angleMax; XZ_plane += imageData.data.XZ_angleStep)
+		progress.update();
+		
+		for(double XZ_plane = imageData.data.XZ_angleMin; XZ_plane <= imageData.data.XZ_angleMax; XZ_plane += imageData.data.XZ_angleStep)
         {
+            value++;
+			progress.setValue(value);
+
+            if (progress.wasCanceled())
+                break;
+
             cubusCubus = cubs.cubs;
             cubBig = cubs.initialCub;
 
@@ -211,15 +226,11 @@ QVector<returningData> ImageGenerator::generateImages()
 
             imagesData.push_back(buf);
 
-			value++;
-
-			emit createAllImages();
+			//value++;
         }
-
-		emit createOneImage(value);
     }
 
-
+    progress.setValue(imagesNum);
 
     return imagesData;
 }

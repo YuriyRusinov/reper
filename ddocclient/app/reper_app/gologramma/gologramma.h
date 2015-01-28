@@ -4,6 +4,8 @@
 #include "gologramma_global.h"
 #include "cuboid.h"
 
+#include <QProgressDialog>
+
 //programm
 void _GOL_EXPORT loadModel(mslLoader::OBJloader& loader,const std::string& str);
 
