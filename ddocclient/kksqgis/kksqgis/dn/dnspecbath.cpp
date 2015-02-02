@@ -1,5 +1,6 @@
 #include "dnspecbath.h"
 #include "dnwidgetimage.h"
+#include "ui_dnspecbath.h"
 
 DNSpecBath::DNSpecBath(QWidget *parent) :
     QMainWindow(parent),

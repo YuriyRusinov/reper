@@ -18,7 +18,6 @@
 #include "Added/dnvector.h"
 #include "ui_DlgShowDeptch.h"
 #include "ui_DlgSKOGraph.h"
-#include "ui_dnspecbath.h"
 #include "ui_DlgMouseCoord.h"
 
 #include "Dlg/dlgspecgraph.h"

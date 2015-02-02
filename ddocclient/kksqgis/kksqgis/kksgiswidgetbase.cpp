@@ -92,10 +92,11 @@
 #include <qgssinglesymbolrendererv2.h>
 #include <qgsstylev2.h>
 
+#include <qgsspatialindex.h> //az
+
 #ifdef WIN32
 #include "dn/dnspecbath.h"
 #include "dn/Added/dnvector.h"
-#include "dn/azdialcalcroute.h"
 #include "dn/azdialgeneral.h"
 #endif
 
@@ -1137,7 +1138,7 @@ void KKSGISWidgetBase::initMenuBar()
         menuTasks->addAction(mpVectorize);
         menuTasks->addAction(mpActionBathymetry);
 
-        QMenu * menuTaskShortestPath = new QMenu(tr("Поиск маршрутов передвижения военной техники")); // Az
+        QMenu * menuTaskShortestPath = new QMenu(tr("Поиск маршрутов передвижения воинских формирований")); // Az
         menuTaskShortestPath->addAction(mpActionShortestPathAreaSelect); // Az
         menuTaskShortestPath->addAction(mpActionShortestPathGrid); // Az
         menuTaskShortestPath->addAction(mpActionShortestPathCalc); // Az
@@ -3324,6 +3325,7 @@ bool KKSGISWidgetBase::addRasterLayers( QStringList const &theFileNameQStringLis
 
 }
 
+
 QgsClipboard * KKSGISWidgetBase::clipboard()
 {
   return mInternalClipboard;
@@ -3775,6 +3777,85 @@ bool KKSGISWidgetBase::azSelectLayer(const int layerNumber)
     return bComplete;
 }
 
+bool KKSGISWidgetBase::azSelectByIntersection(QgsVectorLayer * pMainLayer, QgsVectorLayer * pSelectLayer)
+{
+    mAzDialCalcRoute->mProgressBarText->setText("Текущая операция: обработка слоя '" + pSelectLayer->name() + "'");
+    QgsVectorDataProvider *pInputProvider;
+    QgsVectorDataProvider *pSelectProvider;
+    pInputProvider = pMainLayer->dataProvider();
+    pSelectProvider = pSelectLayer->dataProvider();
+
+    int pNumValColumn(-1); // колонка изменяемых значений
+    QgsFeature pInFeat;
+    QgsFeature pSelectFeat;
+    QgsSpatialIndex pSpIndex;
+    QgsGeometry * pGeom;
+//    QgsFeatureIds pSelectedFeats;
+    QList<QgsFeatureId> pListIntersects;
+    QgsFeatureIterator pFeatInIterator = pInputProvider->getFeatures();
+    QgsFeatureIterator pFeatSelectIterator = pSelectProvider->getFeatures();
+    quint64 pCount(0); // счетчик
+
+    mAzDialCalcRoute->mProgressBar->setValue(1);
+
+    // добавляем объекты из основного слоя в набор SpatialIndex
+    while ( pFeatInIterator.nextFeature( pInFeat ))
+    {
+        pCount++;
+        pSpIndex.insertFeature(pInFeat);
+    }
+
+    mAzDialCalcRoute->mProgressBar->setValue(2);
+    pListIntersects.clear();
+//    pSelectedFeats.clear();
+
+    pNumValColumn = pMainLayer->fieldNameIndex("val");
+    if (pNumValColumn < 0)
+    {
+        return false; // нет полей с таким именем
+    }
+
+    // режим редактирования
+    if ( !( pMainLayer->dataProvider()->capabilities() &
+            QgsVectorDataProvider::EditingCapabilities ) )
+    {
+        return false;
+    }
+    pMainLayer->startEditing();
+
+    mAzDialCalcRoute->mProgressBar->setValue(3);
+    // обрабатываем поочередно все объекты в "слое-выделителе"
+    while ( pFeatSelectIterator.nextFeature( pSelectFeat ) )
+    {
+        pGeom = pSelectFeat.geometry();
+        pListIntersects = pSpIndex.intersects(pGeom->boundingBox());
+                foreach (QgsFeatureId pIdFeat, pListIntersects)
+        {
+            pInputProvider->getFeatures(QgsFeatureRequest().setFilterFid ((long)pIdFeat)).nextFeature(pInFeat);
+            QgsGeometry * pTempGeom;
+            pTempGeom = pInFeat.geometry() ;
+            if (pGeom->intersects(pTempGeom))
+            {
+                pCount++;
+                if (!pMainLayer->changeAttributeValue(pIdFeat, pNumValColumn, QVariant(-3), pInFeat.attributes().value(pNumValColumn)))
+                {
+                    return false;
+                }
+//                pSelectedFeats.insert(pInFeat.id());
+            }
+        }
+        pCount++;
+        mAzDialCalcRoute->mProgressBar->setValue((int)( pCount*97/pSelectProvider->featureCount()));
+    }
+//    pMainLayer->setSelectedFeatures(pSelectedFeats);
+    mAzDialCalcRoute->mProgressBar->setValue(100);
+    if (!pMainLayer->commitChanges())
+    {
+        return false;
+    }
+    return true;
+}
+
 bool KKSGISWidgetBase::azRasterEnhancement(QgsRasterLayer & azRasterLayer)
 {
     // функция улучшения изображения
@@ -3929,7 +4010,7 @@ bool KKSGISWidgetBase::azMakeLayer(QGis::WkbType azType, QString pDestDir, QStri
 }
 */
 
-bool KKSGISWidgetBase::azAddLayerVector(QFileInfo pFile)
+bool KKSGISWidgetBase::azAddLayerVector(QFileInfo pFile, bool extent = false)
 {
     QString myProviderName      = "ogr";
     QgsVectorLayer * mypLayer = new QgsVectorLayer(pFile.filePath(), pFile.completeBaseName(), myProviderName);
@@ -3950,7 +4031,10 @@ bool KKSGISWidgetBase::azAddLayerVector(QFileInfo pFile)
     // Add the Layer to the Layer Set
     //ksa mpLayerSet.append(QgsMapCanvasLayer(mypLayer));
     // set the canvas to the extent of our layer
-    mpMapCanvas->setExtent(mypLayer->extent());
+    if (extent)
+    {
+        mpMapCanvas->setExtent(mypLayer->extent());
+    }
     // Set the Map Canvas Layer Set
     //ksa mpMapCanvas->setLayerSet(mpLayerSet);
     
@@ -4007,30 +4091,35 @@ void KKSGISWidgetBase::azVectorize()
 
     QString mEncoding; // кодировка
     mEncoding = "UTF-8";
-
-    QgsFields mFields; // набор полей
-    QgsField myField1("value", QVariant::Double, "Double", 0, 0);
+    QgsFields pFields; // набор полей
+//    DNVector dnVecForFields;
+//    dnVecForFields = dnThemTaskSpecBath->Polygons.at(0);
+    QgsField myField1( "value", QVariant::Double, "Double", 0, 0);
     QgsField myField2( "comment", QVariant::String, "String", 10, 0, "Comment" );
-    mFields.append( myField1 );
-    mFields.append( myField2 );
-    QgsCoordinateReferenceSystem pSRS;
+    pFields.append( myField1 );
+    pFields.append( myField2 );
 
+    QString myFileName (dnThemTaskSpecBath->Polygons.at(0).NameLayer + "_" + this->azCreateName(2) + ".shp");
+
+    QgsCoordinateReferenceSystem pSRS;
     // создаем систему координат идентичную растру
     pSRS.createFromOgcWmsCrs("EPSG:" +
                              QString::number(azGetEPSG(dnThemTaskSpecBath->Polygons.at(0).EPSG)));
     pSRS.validate();
-    QString myFileName (dnThemTaskSpecBath->Polygons.at(0).NameLayer + this->azCreateName(2) + ".shp");
-    QgsVectorFileWriter myWriter( myFileName, mEncoding, mFields, QGis::WKBPolygon, &pSRS);
+
+    QgsVectorFileWriter myWriter( myFileName, mEncoding, pFields, QGis::WKBPolygon, &pSRS);
+
     azWorkList.clear();
     azWorkList.append(myFileName);
 
-    for (int i = 0; i < dnThemTaskSpecBath->Polygons.size(); i++)
+    for (long i = 0; i < dnThemTaskSpecBath->Polygons.size(); i++)
     {
         DNVector dnVec;
         dnVec = dnThemTaskSpecBath->Polygons.at(i);
         QgsPolyline pPolyLine;
         QgsPoint pFirstPoint (dnVec.GPt.at(0).x, dnVec.GPt.at(0).y);
-        for (int j = 0; j < dnVec.GPt.size(); j++)
+
+        for (long j = 0; j < dnVec.GPt.size(); j++)
         {
             QgsPoint p(dnVec.GPt.at(j).x, dnVec.GPt.at(j).y);
             pPolyLine << p;
@@ -4040,16 +4129,13 @@ void KKSGISWidgetBase::azVectorize()
         pPolygon << pPolyLine;
         QgsGeometry * pPolygonGeometry = QgsGeometry::fromPolygon( pPolygon );
         QgsFeature pFeature;
-//        pFeature.setTypeName( "WKBPolygon" );
         pFeature.setGeometry( pPolygonGeometry );
         pFeature.initAttributes(2);
-        pFeature.setAttribute(1, "deep" );
-        pFeature.setAttribute(0,(double)dnVec.Vol);
-//        pFeature.setAttribute("comment", "deep" );
-//        pFeature.setAttribute("value",(double)dnVec.Vol);
+        pFeature.setAttribute(0, (double)dnVec.Vol);
+        pFeature.setAttribute(1, "deep");
 
         QgsVectorFileWriter::WriterError mError;
-        myWriter.addFeature( pFeature );
+        myWriter.addFeature ( pFeature );
         mError = myWriter.hasError();
         if (mError != 0)
         {
@@ -4231,17 +4317,45 @@ void KKSGISWidgetBase::SLOTshortestPathSelectArea() // Az
 
 void KKSGISWidgetBase::SLOTshortestPathCalculate()
 {
-    AzDialCalcRoute pDialog(this);
-//    pDialog.ui
-    pDialog.exec();
+    mAzDialCalcRoute = new AzDialCalcRoute(this);
+    QMapIterator < QString, QgsMapLayer * > i(QgsMapLayerRegistry::instance()->mapLayers());
+    i.toBack();
+    QObject::connect(mAzDialCalcRoute->mComboLayerRelief,
+                     SIGNAL(currentIndexChanged(int)),
+                     this, SLOT(SLOTazChangeColumns(int)));
+    QObject::connect(mAzDialCalcRoute, SIGNAL(SIGNALbuttonsClick(bool)),
+                     this, SLOT(SLOTshortestPathCalculateMath(bool)));
+    while (i.hasPrevious()) // add all layers to dialog's combobox
+    {
+        i.previous();
+
+        QgsMapLayer * currLayer = i.value();
+        if (currLayer->type() == QgsMapLayer::VectorLayer)
+        {
+            QgsVectorLayer * pVLayer = qobject_cast<QgsVectorLayer *> ( currLayer );
+            if (currLayer->isValid() && pVLayer->geometryType() == QGis::Polygon)
+            {
+                mAzDialCalcRoute->mComboLayerAoI->addItem(currLayer->name());
+                mAzDialCalcRoute->mComboLayerForest->addItem(currLayer->name());
+                mAzDialCalcRoute->mComboLayerWater->addItem(currLayer->name());
+                mAzDialCalcRoute->mComboLayerRelief->addItem(currLayer->name());
+            }
+        }
+    }
+    mAzDialCalcRoute->mCoordsRoute.xStart = 1;
+    mAzDialCalcRoute->mCoordsRoute.yStart = 1;
+    mAzDialCalcRoute->mCoordsRoute.xFinish = 60;
+    mAzDialCalcRoute->mCoordsRoute.yFinish = 60;
+    mAzDialCalcRoute->setWindowTitle("Расчет маршрута");
+    mAzDialCalcRoute->exec();
 }
 
 void KKSGISWidgetBase::SLOTshortestPathGridArea()
 {
-    AzDialGeneral pDialog(this, 1);
+    AzDialGeneral pDialog(this, 1); // dialog
     QMapIterator < QString, QgsMapLayer * > i(QgsMapLayerRegistry::instance()->mapLayers());
     i.toBack();
-    while (i.hasPrevious())
+    while (i.hasPrevious()) // add all layers to dialog's combobox
     {
         i.previous();
 
@@ -4255,30 +4369,143 @@ void KKSGISWidgetBase::SLOTshortestPathGridArea()
             }
         }
     }
-    if (pDialog.mComboBoxOne->count() < 1)
+    if (pDialog.mComboBoxOne->count() < 1) // no layers
     {
         QMessageBox::information(this, "Недостаточно данных", "Отсуствуют векторные слои, содержащие полигональные объекты.", QMessageBox::Ok);
         return;
     }
-    int selection = pDialog.exec();
-//    if (selection == QDialog::Accepted)
-//    {
+    pDialog.exec();
+    if (!pDialog.mOkClick)
+    {
+        return; // click "Cancel" or Close
+    }
+    if(!azSelectLayer(pDialog.mComboBoxOne->currentText()))
+    {
+        return; // there is no layer select
+    }
+    double offset = pDialog.mDoubleSpinBox->value();
+    if (offset <= 0.00000001)
+    {
+        QMessageBox::information(this, "Недостаточно данных", "Расчет по введенной величине ячейки дискретного поля невозможен", QMessageBox::Ok);
+        return;
+    }
 
-//    }
-//    if (selection == QDialog::Rejected)
-//        self.inShape.addItem( unicode( layer.name() ) )
-//        if layer == self.iface.activeLayer():
-//            self.inShape.setCurrentIndex( self.inShape.count() -1 )
+    QgsRectangle pRect(mpSelectedLayer->extent());
+    QString pStr("D:/ArcGIS/RouteArmy/data2/grid_" + azCreateName(1) + ".shp");
+    QgsCoordinateReferenceSystem pSRS;
+    pSRS.createFromSrsId(mpSelectedLayer->crs().srsid());
+    pSRS.validate();
+    QgsFields pFields;
+    {
+        QgsField pField0("id_num", QVariant::LongLong, "LongLong");
+        QgsField pField1("xMin", QVariant::Double, "Double");
+        QgsField pField2("xMax", QVariant::Double, "Double");
+        QgsField pField3("yMin", QVariant::Double, "Double");
+        QgsField pField4("yMax", QVariant::Double, "Double");
+        QgsField pField4_5("cell_coord", QVariant::String, "String");
+        QgsField pField5("dir", QVariant::Double, "Double");
+        QgsField pField6("slope", QVariant::Double, "Double");
+        QgsField pField7("val", QVariant::Double, "Double");
 
-//    bool bOk (false); // кнопка отмена или закрыть в диалоге
-//    QString str = QInputDialog::getText( this,"Выделение зоны интереса",
-//                                         "Название слоя:", QLineEdit::Normal,
-//                                         "route_army_area_" + this->azCreateName(1) + "_a",
-//                                         &bOk );
-//    if (!bOk)
-//    {
-//        return; // нажата отмена
-//    }
+        pFields.append( pField0 );
+        pFields.append( pField1 );
+        pFields.append( pField2 );
+        pFields.append( pField3 );
+        pFields.append( pField4 );
+        pFields.append( pField4_5 );
+        pFields.append( pField5 );
+        pFields.append( pField6 );
+        pFields.append( pField7 );
+    }
+    QgsVectorFileWriter::WriterError pError;
+    QgsVectorFileWriter myWriter( pStr, "UTF-8", pFields, QGis::WKBPolygon, &pSRS);
+    pError = myWriter.hasError();
+    if (pError != 0)
+    {
+        QMessageBox::information(this, "Error", myWriter.errorMessage(), QMessageBox::Ok);
+    }
+
+    quint32 idFeat(0);
+    quint64 countY = 1; // x - счетчик
+    quint64 countX = 1; // y - счетчик
+    double y, x;
+    y = pRect.yMaximum();
+    while (y >= pRect.yMinimum())
+    {
+        countX = 1;
+        x = pRect.xMinimum();
+        while (x <= pRect.xMaximum())
+        {
+            QgsPoint pt1(x, y);
+            QgsPoint pt2(x + offset, y);
+            QgsPoint pt3(x + offset, y - offset);
+            QgsPoint pt4(x, y - offset);
+            QgsPoint pt5(x, y);
+
+            QgsPolyline pPolyLine;
+            pPolyLine << pt1;
+            pPolyLine << pt2;
+            pPolyLine << pt3;
+            pPolyLine << pt4;
+            pPolyLine << pt5;
+
+            QgsPolygon pPolygon;
+            pPolygon << pPolyLine;
+            QgsGeometry * pPolygonGeometry = QgsGeometry::fromPolygon( pPolygon );
+            QgsFeature pFeature;
+            pFeature.setGeometry( pPolygonGeometry );
+            pFeature.initAttributes(6);
+            pFeature.setAttribute(0, (long)idFeat);
+            pFeature.setAttribute(1, (double)x);
+            pFeature.setAttribute(2, (double)(x + offset));
+            pFeature.setAttribute(3, (double)(y - offset));
+            pFeature.setAttribute(4, (double)y);
+            pFeature.setAttribute(5, QString::number(countX) + ";" + QString::number(countY));
+            myWriter.addFeature(pFeature);
+            pError = myWriter.hasError();
+            if (pError != 0)
+            {
+                QMessageBox::information(this, "Error", myWriter.errorMessage(), QMessageBox::Ok);
+            }
+            idFeat++;
+            countX++;
+            x = x + offset;
+        }
+        y = y - offset;
+        countY++;
+    }
+
+    QFileInfo pFile(pStr);
+    QString myProviderName = "ogr";
+    QgsVectorLayer * pVLayer = new QgsVectorLayer(pFile.filePath(), pFile.completeBaseName(), myProviderName);
+    pVLayer->updateExtents();
+    this->azAddLayerVector(pFile);
+}
+
+void KKSGISWidgetBase::SLOTshortestPathCalculateMath(bool CalcIt)
+{
+    if (!CalcIt)
+    {
+        mAzDialCalcRoute->close();
+        return;
+    }
+    azSelectLayer(mAzDialCalcRoute->mComboLayerAoI->currentText());
+    QgsVectorLayer * pAoILayer = qobject_cast<QgsVectorLayer *> ( mpSelectedLayer );
+    QStringList pList;
+    pList.clear();
+    pList << mAzDialCalcRoute->mComboLayerWater->currentText()
+          << mAzDialCalcRoute->mComboLayerForest->currentText();
+//          << mAzDialCalcRoute->mComboLayerRelief->currentText();
+    foreach (QString strLayer, pList)
+    {
+        azSelectLayer(strLayer);
+        QgsVectorLayer * pCurrLayer = qobject_cast<QgsVectorLayer *> ( mpSelectedLayer );
+        if (!azSelectByIntersection(pAoILayer, pCurrLayer))
+        {
+            QMessageBox::information(this, "Error", "Ошибка обработки слоя", QMessageBox::Ok);
+        }
+    }
+    pAoILayer->triggerRepaint();
 }
 
 void KKSGISWidgetBase::SLOTtempUse()
@@ -4745,6 +4972,7 @@ bool KKSGISWidgetBase::azCreateLayer(QString nameOfLayer, QgsFields pFields, QSt
     }
     QgsVectorFileWriter::WriterError mError;
     QgsVectorFileWriter myWriter( pStr, encoding, pFields, pType, &pSRS);
+
     mError = myWriter.hasError();
     if (mError != 0)
     {
@@ -6155,7 +6383,37 @@ void KKSGISWidgetBase::slotUpdateMapByNotify(const QString & nName, const QStrin
     bool ok = fi.nextFeature(f);
     //bool ok = changedLayer->updateFeature(f);
     if(!ok){
-        int a=0;
+        int a = 0;
         return;
+    }
+}
+
+void KKSGISWidgetBase::SLOTazChangeColumns(int num)
+{
+    mAzDialCalcRoute->mComboColDirectionSlope->clear();
+    mAzDialCalcRoute->mComboColSlope->clear();
+    if (!azSelectLayer(mAzDialCalcRoute->mComboLayerRelief->itemText(num)))
+    {
+        QMessageBox::information(this, "Ошибка", "Невозможно выбрать слой.", QMessageBox::Ok);
+        return;
+    }
+    if (mpSelectedLayer->type() != QgsMapLayer::VectorLayer)
+    {
+        QMessageBox::information(this, "Error", "Not a vector layer.", QMessageBox::Ok);
+        return;
+    }
+    QgsVectorLayer * pLayer = (QgsVectorLayer*) mpSelectedLayer;
+    QgsFields pFields;
+    pFields = pLayer->pendingFields();
+    for (int i = 0; i < pFields.count(); i++)
+    {
+        QgsField pField = pFields.at(i);
+        if (pField.type() == QVariant::Double ||
+            pField.type() == QVariant::Int ||
+            pField.type() == QVariant::LongLong)
+        {
+                mAzDialCalcRoute->mComboColDirectionSlope->addItem(pField.name());
+                mAzDialCalcRoute->mComboColSlope->addItem(pField.name());
+        }
     }
 }

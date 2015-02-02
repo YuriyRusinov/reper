@@ -12,9 +12,9 @@ class DNVector
 public:
     struct ClassLayer
     {
-     QString TypeField;
-     QString NameField;
-     QString VolPolygon;
+     QString TypeField; // тип поля
+     QString NameField; // имя поля
+     QString VolPolygon; // значение Value
     };
     DNVector();
     QString EPSG;

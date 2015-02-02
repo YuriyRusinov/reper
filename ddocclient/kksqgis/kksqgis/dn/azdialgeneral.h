@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QComboBox>
+#include <QDoubleSpinBox>
 #include <QLabel>
 
 namespace Ui {
@@ -18,9 +19,17 @@ public:
     ~AzDialGeneral();
     QComboBox * mComboBoxOne;
     QLabel * mTextLabelOne;
+    QDoubleSpinBox * mDoubleSpinBox;
+    bool mOkClick;
+
+private slots:
+    void on_buttonBox_accepted();
+
+    void on_buttonBox_rejected();
 
 private:
     Ui::AzDialGeneral *ui;
+
 };
 
 #endif // AZDIALGENERAL_H

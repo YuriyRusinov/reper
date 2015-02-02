@@ -24,6 +24,8 @@
 #include <qgspoint.h>
 #include "qgsfeaturestore.h"
 
+#include "dn/azdialcalcroute.h" //az
+
 class QToolButton;
 
 #ifdef WIN32
@@ -64,6 +66,7 @@ public:
     void showIOEditor(QWidget * parent, const QString & uid);
     bool featureFromEIO(QWidget * parent, QgsFeature & feature, const QString & geomAsEWKT, const QString & layerTable);
     bool deleteFeaturesAsEIO(QWidget * parent, const QString & tableName, const QList<qint64> & ids);
+
 signals:
     void signalShowIOEditor(QWidget * parent, const QString & uid);
 
@@ -87,6 +90,9 @@ public:
     QString projectFileName();
     QString readLayerFilePath(const QString & file) const;//возвращает абсолютный путь к файлу слоя, который прочитан из файла проекта QGIS
 
+    AzDialCalcRoute * mAzDialCalcRoute;
+
+
     void openProject(const QString & prjFile);
     void closeProject();
     void saveProjectAs(const QString & prjFile);
@@ -101,7 +107,6 @@ public:
 
     bool addVectorLayers( QStringList const & theLayerQStringList, const QString& enc, const QString dataSourceType );
     bool addRasterLayers( QStringList const & theLayerQStringList, bool guiWarning = true );
-
     void showLayerProperties( QgsMapLayer *ml );
 
     QgsMapCanvas * mapCanvas() {return mpMapCanvas;}
@@ -179,6 +184,7 @@ public:
      * @note added in 1.9 */
     int messageTimeout();
 
+
 public slots:
     void layerProperties();
     void markDirty();
@@ -242,6 +248,8 @@ public slots:
     void deleteSelected( QgsMapLayer *layer = 0, QWidget* parent = 0 );
 
     void slotUpdateMapByNotify(const QString &, const QString &, const QString &);
+    void SLOTazChangeColumns(int num); //az
+    void SLOTshortestPathCalculateMath(bool CalcIt); //az
 
 signals:
     /** emitted when a project file is successfully read
@@ -268,14 +276,14 @@ private slots:
     void azRemoveAllLayers();
     bool azSelectLayer(const QString layerName);
     bool azSelectLayer(const int layerNumber);
-
+    bool azSelectByIntersection(QgsVectorLayer * pMainLayer, QgsVectorLayer * pSelectLayer); //az
     bool azRasterEnhancement(QgsRasterLayer & azRasterLayer);
     bool azRasterCheckBandName(QgsRasterLayer & azRasterLayer, QString strBandName);
     bool azCopyFiles(QString azSource, QString azDestPath, bool bUse = false);
 
     void azVectorize();
     //bool azMakeLayer(QGis::WkbType azType, QString pDestDir, QString pName);
-    bool azAddLayerVector(QFileInfo pFile);
+    bool azAddLayerVector(QFileInfo pFile, bool extent);
     //void addLayerToTOC(QgsMapLayer *mapLayer);
 
     void clipboardChanged();
@@ -308,8 +316,9 @@ private slots:
     void SLOTsetRenderer();
     void SLOTshortestPathSelectArea(); //az
     void SLOTshortestPathCalculate(); //az
-    void SLOTshortestPathGridArea();
-    void SLOTtempUse();
+    void SLOTshortestPathGridArea(); //az
+
+    void SLOTtempUse(); //az
 
     //! Create a new blank project (no template)
     void fileNewBlank();

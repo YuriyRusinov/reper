@@ -310,3 +310,53 @@ void SLOTmpActionVectorize()
 //    return;
 
 //    }
+
+
+//    for (long i = 0; i < dnVecForFields.Polygons.count(); i++)
+//    {
+//        QString name = dnVecForFields.Polygons.at(i).NameField;
+//        QString type = dnVecForFields.Polygons.at(i).TypeField;
+//        if (type == "double")
+//        {
+//            QgsField pField(name, QVariant::Double, "Double");
+
+//            pFields.append( pField );
+//        }
+//        else if(type == "int")
+//        {
+//            QgsField pField(name, QVariant::Int, "Int");
+//            pFields.append( pField );
+//        }
+//        else // string
+//        {
+//            QgsField pField(name, QVariant::String, "String", 50, 0);
+//            pFields.append( pField );
+//        }
+//    }
+
+
+//    QgsField myField1("value", QVariant::Double, "Double", 0, 0);
+//    QgsField myField2( "comment", QVariant::String, "String", 10, 0, "Comment" );
+//    mFields.append( myField1 );
+//    mFields.append( myField2 );
+//    azCreateLayer(myFileName, pFields, QDir::currentPath() + "/", false, false,
+//                  QGis::WKBPolygon, "UTF-8",
+//                  QString::number(dnThemTaskSpecBath->Polygons.at(0).EPSG));
+
+//    myFileName = QDir::currentPath() + "/" + myFileName;
+
+//        pFeature.setTypeName( "WKBPolygon" );
+
+//        pFeature.setAttribute(1,(double)dnVec.Vol);
+//        pFeature.setAttribute("comment", "deep" );
+//        pFeature.setAttribute("value",(double)dnVec.Vol);
+
+
+//        for (long k = 0; k < dnVec.Polygons.count(); k++)
+//        {
+//            QString type = dnVec.Polygons.at(k).TypeField;
+//            if (type == "double")
+//            {
+//                pFeature.setAttribute(1, dnVec.Polygons.at(k).VolPolygon.toFloat() );
+//            }
+//        }
