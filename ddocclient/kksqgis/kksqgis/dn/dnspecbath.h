@@ -35,6 +35,7 @@
 #include "Dlg/TheamDlg/dlgroutmove2.h"
 #include "Dlg/TheamDlg/dlgsmoces.h"
 #include "Dlg/TheamDlg/dlgembedobj.h"
+#include "Dlg/TheamDlg/dlgmultitempdata.h"
 
 namespace Ui {
 class DNSpecBath;
@@ -88,6 +89,8 @@ public:
     DlgRoutMove2 *DlgRMove2;
     DlgSmoces *DlgSmoce;
     DlgEmbedObj *DlgEO;
+    DlgMultiTempData *DlgMTD;
+
 
 
 
@@ -173,6 +176,9 @@ private slots:
     void on_DlgEmbedObj_OK();
 
     void on_ForOlga_triggered();
+
+    void on_MultiTempDatal_triggered();
+    void on_DlgMultiTempDatal_OK();
 
 private:
     Ui::DNSpecBath *ui;

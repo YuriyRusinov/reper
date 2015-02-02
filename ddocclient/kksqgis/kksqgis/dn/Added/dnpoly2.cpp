@@ -3282,20 +3282,10 @@ void DNPoly2::MaxLike(bool *NoBlackPixels,QStringList PolyFileNames,bool *MaskCh
 }
 
 /*Субпиксельный анализ*/
-float* DNPoly2::SubPixAnalis(QList <float*> SpectrObj,int NumCh, bool *MaskCh)
+DNPoly2::SubPixAnalisStruct* DNPoly2::SubPixAnalis(QList <float*> SpectrObj,int NumCh, bool *MaskCh)
 {
  float *DataSpec;
  DataSpec=new float[NumCh];
-
-// for(int i=0;i<this->Ch;i++)
-// {
-//  if(MaskCh[i])
-//  {
-//   QMessageBox msg;
-//   msg.setText(QString().setNum(i)/*QString().setNum(DataSpec[j],'d',3)+"\n"+QString().setNum(SpectrObj[i][j],'d',3)*/);
-//   msg.exec();
-//  }
-// }
 
  float *D,*L;
  //L=new float[SpectrObj.size()*SpectrObj.size()];
@@ -3313,78 +3303,49 @@ float* DNPoly2::SubPixAnalis(QList <float*> SpectrObj,int NumCh, bool *MaskCh)
    Matr2[i+j*SpectrObj.size()]=SpectrObj[i][j];
   }
  }
- D=Math.MatrMulti(Matr2,SpectrObj.size(),NumCh,Matr1,NumCh,SpectrObj.size());
- Math.MatrInverse(D,NumCh);
- L=Math.MatrMulti(D,NumCh,NumCh,Matr2,SpectrObj.size(),NumCh);
+ D=Math.MatrMulti(Matr1,NumCh,SpectrObj.size(),Matr2,SpectrObj.size(),NumCh);
+ Math.MatrInverse(D,SpectrObj.size());
+ L=Math.MatrMulti(D,SpectrObj.size(),SpectrObj.size(),Matr1,NumCh,SpectrObj.size());
  delete[] D;
- QList <float*> Etol;
 
- for(int i=0;i<SpectrObj.size();i++)
- {
-  Etol<<new float[NumCh];
-  for(int j=0;j<NumCh;j++)
-  {
-   Etol[Etol.size()-1][j]=L[i+j*SpectrObj.size()];
-//   QMessageBox msg;
-//   msg.setText(QString().setNum(Etol[Etol.size()-1][j],'d',3));
-//   msg.exec();
-  }
- }//for(int i=0;i<SpectrObj.size();i++)
- delete[] L;
-
- float *CprojMass;
-// float SummSq;
+ SubPixAnalisStruct *CprojMass;
  float CprojMax;
  int NumCMax;
- float Cproj/*=new float[SpectrObj.size()]*/;
- CprojMass=new float[W*H];
+ float *Cproj;
+ CprojMass=new SubPixAnalisStruct[W*H];
  for(int x=0;x<W;x++)
  {
   for(int y=0;y<H;y++)
   {
-   CprojMass[x+y*W]=-1.;
+   CprojMass[x+y*W].MaxC=-1.;
+   CprojMass[x+y*W].NumObj=-1;
    if(ClassifMass[x+y*W]>=0)
    {
-//    float *Cproj;
     GetSpectrPoint(x+xn,y+yn,DataSpec,MaskCh);
-//    Cproj=Math.MatrMulti(L,SpectrObj.size(),NumCh,DataSpec,NumCh,1);
-////    QMessageBox msg;
-////    msg.setText(QString().setNum(DataSpec[0],'d',3)/*+"\n"+QString().setNum(SpectrObj[i][j],'d',3)*/);
-////    msg.exec();
+    Cproj=Math.MatrMulti(L,NumCh,SpectrObj.size(),DataSpec,1,NumCh);
 
     CprojMax=0;
     NumCMax=0;
     for(int i=0;i<SpectrObj.size();i++)
     {
-     Cproj=Math.VectorProjection(DataSpec,Etol[i],NumCh);
-//     SummSq=0;
-//     for(int j=0;j<NumCh;j++)
-//     {
-//      Cproj[i]+=DataSpec[j]*SpectrObj[i][j];
-//      SummSq+=SpectrObj[i][j];
-//     }//for(j=0;j<NumCh;j++)
-//     SummSq=sqrt(SummSq);
-//     Cproj[i]=Cproj[i]/SummSq;
      if(i==0)
-      CprojMax=Cproj;
-     if(Cproj>CprojMax)
      {
-      CprojMax=Cproj;
+      CprojMax=Cproj[i];
+      NumCMax=0;
+     }
+     if(Cproj[i]>CprojMax)
+     {
+      CprojMax=Cproj[i];
       NumCMax=i;
      }//if(Cproj[i]>CprojMax)
     }//for(i=0;i<SpectrObj.size();i++)
-//    CprojMass[x+y*W]=CprojMax;
-//    ClassifMass[x+y*W]=NumCMax;
+    CprojMass[x+y*W].MaxC=Cproj[0];//CprojMax;
+    CprojMass[x+y*W].NumObj=NumCMax;
    }//if(ClassifMass[i]>=0)
   }//for(int y=0;y<H;y++)
  }//for(int x=0;x<W;x++)
-
  delete[] DataSpec;
-
- for(int i=0;i<Etol.size();i++)
-  delete[] Etol[i];
- Etol.clear();
-
+ delete[] L;
  return CprojMass;
 }
 
@@ -4209,7 +4170,7 @@ void DNPoly2::MaskAreaGS(QString ClsId,QList<QString> ClsBackgroId,
     GetSpectrPoint(x+xn,y+yn,DataSpec,MaskCh);
     MaxDerivantData[x+y*W]=DataSpec[0]-DataSpec[1]/*MathAdd.GetMax(DerivantData,NDif2-NDif1)*/;
 //    QMessageBox msg;
-//    msg.setText(QString().setNum(DataSpec[0],'d',3)+"\n"+QString().setNum(DataSpec[1],'d',3));
+//    msg.setText(QString().setNum(MaxDerivant,'d',3));
 //    msg.exec();
     if(ClassifMass[x+y*W]>=0)
      if(MaxDerivantData[x+y*W]<MaxDerivant)
@@ -4224,32 +4185,51 @@ void DNPoly2::MaskAreaGS(QString ClsId,QList<QString> ClsBackgroId,
  }//if(NDif1>=0 && NDif2>0)
 
  /*Субпиксельный анализ*/
- QList <float> SpectrObj;
- QList <float*> SpectrSub;
- float *SubPixMass;
- float *Spec;
- bool *MaskCh;
- MaskCh=new bool[this->Ch];
- Spec=new float[NumChSubPix.size()];
- for(int i=0;i<this->Ch;i++)
-  MaskCh[i]=false;
 
- for(int i=0;i<NumChSubPix.size();i++)
+ if(TypeFone==0 || TypeFone==2)
  {
-  SpectrObj=BdSpectr->GetBrightLamda(LamMassSubPix[i],ClsId,ClsBackgroId);
-  Spec[i]=0;
-  int NB=0;
-  for(int j=0;j<SpectrObj.size();j++)
-   if(SpectrObj[j]>=0)
-   {
-    Spec[i]+=SpectrObj[j];
-    NB++;
-   }
-  Spec[i]=Spec[i]/NB;
-  MaskCh[NumChSubPix[i]]=true;
- }
+  QList <float> SpectrObj;
+  float SpectrFone;
+  QList <float*> SpectrSub;
+  SubPixAnalisStruct *SubPixMass;
+  float *SubPixKof;
+  float *Spec,*Spec2;
+  bool *MaskCh;
+  MaskCh=new bool[this->Ch];
+  Spec=new float[NumChSubPix.size()];
+  Spec2=new float[NumChSubPix.size()];
+  for(int i=0;i<this->Ch;i++)
+   MaskCh[i]=false;
 
- SpectrSub<<Spec;
+  for(int i=0;i<NumChSubPix.size();i++)
+  {
+   SpectrObj=BdSpectr->GetBrightLamda(LamMassSubPix[i],ClsId,ClsBackgroId);
+   Spec[i]=0;
+   int NB=0;
+   for(int j=0;j<SpectrObj.size();j++)
+    if(SpectrObj[j]>=0)
+    {
+     Spec[i]+=SpectrObj[j];
+     NB++;
+    }
+   Spec[i]=Spec[i]/NB;
+   MaskCh[NumChSubPix[i]]=true;
+  }
+
+  SpectrSub<<Spec;
+
+  for(int i=0;i<NumChSubPix.size();i++)
+  {
+   if(TypeFone==2)
+    SpectrFone=BdSpectr->GetBrightLamda(LamMassSubPix[i],3056);
+   if(TypeFone==0)
+    SpectrFone=BdSpectr->GetBrightLamda(LamMassSubPix[i],3057);
+   Spec2[i]=SpectrFone;
+  }
+
+  SpectrSub<<Spec2;
+
+
 //  Spec=SpectrObj[i]
 
 // for(quint64 i=0;i<W*H;i++)
@@ -4257,42 +4237,32 @@ void DNPoly2::MaskAreaGS(QString ClsId,QList<QString> ClsBackgroId,
 //  if(ClassifMass[i]<0)
 //   ClassifMass[i]=10;
 // }
- SubPixMass=new float[W*H];
- //SubPixMass=SubPixAnalis(SpectrSub,NumChSubPix.size(),MaskCh);
-// bool *MaskCh;
-// MaskCh=new bool[Ch];
-// for(int i=0;i<Ch;i++)
-//  MaskCh[i]=false;
+  SubPixMass=new SubPixAnalisStruct[W*H];
+  SubPixKof=new float[W*H];
+  SubPixMass=SubPixAnalis(SpectrSub,NumChSubPix.size(),MaskCh);
 
-// for(int i=0;i<NumChSubPix.size();i++)
-//  MaskCh[i]=false;
-// for(int x=0;x<W;x++)
-// {
-//  for(int y=0;y<H;y++)
-//  {
-//   float *DataSpec;
-//   DataSpec=new float[NumChSubPix.size()];
-//   GetSpectrPoint(x+xn,y+yn,DataSpec,MaskCh);
-//   SubPixMass[x+y*W]=Math.VectorProjection(DataSpec,Spec,NumChSubPix.size());
-////   QMessageBox msg;
-////   msg.setText(QString().setNum(SubPixMass[x+y*W],'d',3));
-////   msg.exec();
-//  }
-// }
-
-// for(quint64 i=0;i<W*H;i++)
-// {
-//  if(ClassifMass[i]>=0)
-//  {
-//   if(SubPixMass[i]>=SubPixPor)
-//    ClassifMass[i]=0;
-//   else
-//    ClassifMass[i]=-1;
-//  }
-// }
-// AddChanal(SubPixMass);
- delete[] SubPixMass;
- delete[] MaskCh;
+  for(quint64 i=0;i<W*H;i++)
+  {
+   if(ClassifMass[i]>=0)
+   {
+    if(SubPixMass[i].MaxC>=SubPixPor && SubPixMass[i].NumObj==0)
+    {
+     ClassifMass[i]=0;
+//     QMessageBox msg;
+//     msg.setText(QString().setNum(i-int(i/W)*W+xn)+"\n"+QString().setNum(int(i/W)+yn));
+//     msg.exec();
+    }
+    else
+     ClassifMass[i]=-1;
+   }
+   SubPixKof[i]=SubPixMass[i].MaxC;
+  }//for(quint64 i=0;i<W*H;i++)
+  AddChanal(SubPixKof);
+  delete[] SubPixMass;
+  delete[] MaskCh;
+  delete[] Spec;
+  delete[] Spec2;
+ }//if(TypeFone==0 || TypeFone==2)
 
 }
 

@@ -426,7 +426,7 @@ void DNMathAdd::MatrTranspon(float *Matr,quint64 x,quint64 y)
  delete var;
 }
 
-float* DNMathAdd::MatrMulti(float *Matr1,int x1,int y1,float *Matr2,int x2,int y2)
+float* DNMathAdd::MatrMulti(float *Matr1,quint64 x1,quint64 y1,float *Matr2,quint64 x2,quint64 y2)
 {
  float *MatrRes;
  MatrRes=new float[x2*y1];
@@ -573,4 +573,133 @@ DNMathAdd::Moments DNMathAdd::CalcMN(float *Mass,quint32 RMass)
  MValues.M4=MValues.M4/RMass;
 
  return MValues;
+}
+
+void DNMathAdd::MGK(float *CovarMatr,int NCovar,float *MatrVectors,float *ValuesSelf)
+{
+ float MaxCovar=CovarMatr[1];
+ int XMax=0,YMax=0;
+ float *AIter;
+ QList <float*> HKMatr;
+ AIter=new float[NCovar*NCovar];
+
+ for(quint64 i=0;i<NCovar*NCovar;i++)
+ {
+  AIter[i]=CovarMatr[i];
+ }
+
+
+ for(int x=0;x<NCovar;x++)
+ {
+  for(int y=0;y<NCovar;y++)
+  {
+   if(x>y && fabs(MaxCovar)<fabs(CovarMatr[x+y*NCovar]))
+   {
+    MaxCovar=fabs(CovarMatr[x+y*NCovar]);
+    XMax=x;
+    YMax=y;
+   }//if(x>y)
+  }//for(int y=0;y<NCovar;y++)
+ }//for(int x=0;x<NCovar;x++)
+
+ MaxCovar=CovarMatr[XMax+YMax*NCovar];
+ float Pogr=0;
+ do{
+    float alfa;
+    float SinAlfa,CosAlfa;
+    alfa=0.5*atan((2*MaxCovar)/(AIter[YMax+YMax*NCovar]-AIter[XMax+XMax*NCovar]));
+
+    SinAlfa=sin(alfa);
+    CosAlfa=cos(alfa);
+
+    float *HMatr;
+    HMatr=new float[NCovar*NCovar];
+
+    for(quint64 i=0;i<NCovar*NCovar;i++)
+     HMatr[i]=0.;
+
+    for(int i=0;i<NCovar;i++)
+     HMatr[i+i*NCovar]=1.;
+
+    HMatr[YMax+YMax*NCovar]=CosAlfa;
+    HMatr[XMax+XMax*NCovar]=CosAlfa;
+
+    HMatr[YMax+XMax*NCovar]=SinAlfa;
+    HMatr[XMax+YMax*NCovar]=-SinAlfa;
+
+    float *HMatrT;
+    HMatrT=new float[NCovar*NCovar];
+
+    HKMatr<<new float[NCovar*NCovar];
+
+    for(quint64 i=0;i<NCovar*NCovar;i++)
+    {
+     HMatrT[i]=HMatr[i];
+     HKMatr[HKMatr.size()-1][i]=HMatr[i];
+    }
+
+    this->MatrTranspon(HMatrT,NCovar,NCovar);
+
+    float *PromRes;
+    PromRes=this->MatrMulti(HMatrT,NCovar,NCovar,AIter,NCovar,NCovar);
+
+    delete[] AIter;
+
+    AIter=this->MatrMulti(PromRes,NCovar,NCovar,HMatr,NCovar,NCovar);
+
+    delete[] PromRes;
+    delete[] HMatr;
+    delete[] HMatrT;
+
+    MaxCovar=-1.;
+
+    Pogr=0;
+    for(int x=0;x<NCovar;x++)
+    {
+     for(int y=0;y<NCovar;y++)
+     {
+      if(x>y && MaxCovar<AIter[x+y* NCovar])
+      {
+       MaxCovar=fabs(AIter[x+y*NCovar]);
+       XMax=x;
+       YMax=y;
+       Pogr+=AIter[x+y*NCovar]*AIter[x+y*NCovar];
+      }//if(x>y)
+     }//for(int y=0;y<NCovar;y++)
+    }//for(int x=0;x<NCovar;x++)
+    Pogr=sqrt(Pogr);
+ }while(MaxCovar>0.0001);
+
+ float *MultMatr;
+ MultMatr=new float[NCovar*NCovar];
+
+ for(quint64 i=0;i<NCovar*NCovar;i++)
+ {
+  MultMatr[i]=HKMatr[0][i];
+ }
+
+ for(int i=1;i<HKMatr.size();i++)
+ {
+  MultMatr=this->MatrMulti(MultMatr,NCovar,NCovar,HKMatr[i],NCovar,NCovar);
+ }//for(int i=0;i<HKMatr.size();i++)
+
+ for(quint64 i=0;i<NCovar*NCovar;i++)
+ {
+  MatrVectors[i]=MultMatr[i];
+//  QMessageBox msg;
+//  msg.setText(QString().setNum(MatrVectors[i],'d',5));
+//  msg.exec();
+ }
+
+ for(int i=0;i<NCovar;i++)
+ {
+  ValuesSelf[i]=AIter[i+i* NCovar];
+//  QMessageBox msg;
+//  msg.setText(QString().setNum(ValuesSelf[i],'d',5));
+//  msg.exec();
+ }
+ delete[] MultMatr;
+
+ for(int i=0;i<HKMatr.size();i++)
+  delete[] HKMatr[i];
 }

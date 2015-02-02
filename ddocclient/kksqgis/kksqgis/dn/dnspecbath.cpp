@@ -33,6 +33,7 @@ DNSpecBath::DNSpecBath(QWidget *parent) :
  DlgRMove2=NULL;
  DlgSmoce=NULL;
  DlgEO=NULL;
+ DlgMTD=NULL;
 
  this->NameProg="SuperProga";
  this->NameOrg="VKA";
@@ -525,7 +526,6 @@ void DNSpecBath::on_MaskPokr_triggered()
 
   DlgMask->LamNir2MS1=900;
   DlgMask->LamNir2MS2=1000;
-
 
   DNBDSpectr BDSpec("QPSQL","REPER","repermaster","localhost","master");
 
@@ -1359,7 +1359,7 @@ void DNSpecBath::on_EmbedObj_triggered()
  DlgEO->LamContr1[1]=690;
 
  DlgEO->LamContr2[0]=800;
- DlgEO->LamContr2[1]=1000;
+ DlgEO->LamContr2[1]=900;
 
  connect(DlgEO,SIGNAL(ButtonOK()),this,SLOT(on_DlgEmbedObj_OK()));
  DlgEO->show();
@@ -1373,7 +1373,7 @@ void DNSpecBath::on_DlgEmbedObj_OK()
  float DeltaMS=DlgEO->DeltaMS;
  float MSIndex=DlgEO->MSIndex;
  float Contrast630_690=DlgEO->Contrast630_690;
- float Contrast800_1000=DlgEO->Contrast630_690;
+ float Contrast800_1000=DlgEO->Contrast800_1000;
  float GSIndex=DlgEO->GSIndex;
  float WBI=DlgEO->WBI;
  float AKFMin=DlgEO->AKFMin;
@@ -1402,10 +1402,17 @@ void DNSpecBath::on_DlgEmbedObj_OK()
   LamMass=new float[NCh2[i]-NCh1[i]+1];
   for(int j=NCh1[i];j<=NCh2[i];j++)
   {
+//   if(i==3)
+//   {
+//    QMessageBox msg;
+//    msg.setText(QString().setNum(GdalImage->Lamda[j],'d',3));
+//    msg.exec();
+//   }
    LamMass[j-NCh1[i]]=GdalImage->Lamda[j];
   }//for(int j=NumCh1;j<=NumCh2;j++)
 
   SerPoly->AddIntegralChanal(NCh1[i],NCh2[i],LamMass);
+
   delete[] LamMass;
  }//for(int i=0;i<3;i++)
 
@@ -1449,8 +1456,8 @@ void DNSpecBath::on_DlgEmbedObj_OK()
 
 
  Formula="(["+QString().setNum(NContr1+1)+"]-"+QString().setNum(Brigth630_690,'d',3)+")/"+
-         "(["+QString().setNum(NContr1+1)+"]+"+QString().setNum(Brigth630_690,'d',3)+"])";
- SerPoly->FilterPix(NoBlackPix,Formula,0,Contrast630_690);
+         "(["+QString().setNum(NContr1+1)+"]+"+QString().setNum(Brigth630_690,'d',3)+")";
+ SerPoly->FilterPix(NoBlackPix,Formula,1 ,Contrast630_690);
  for(quint64 i=0;i<SerPoly->W*SerPoly->H;i++)
  {
   NoBlackPix[i]=false;
@@ -1459,13 +1466,33 @@ void DNSpecBath::on_DlgEmbedObj_OK()
  }
 
  Formula="(["+QString().setNum(NContr2+1)+"]-"+QString().setNum(Brigth800_1000,'d',3)+")/"+
-         "(["+QString().setNum(NContr2+1)+"]+"+QString().setNum(Brigth800_1000,'d',3)+"])";
- SerPoly->FilterPix(NoBlackPix,Formula,0,Contrast800_1000);
- for(quint64 i=0;i<SerPoly->W*SerPoly->H;i++)
+         "(["+QString().setNum(NContr2+1)+"]+"+QString().setNum(Brigth800_1000,'d',3)+")";
+ SerPoly->AddChanal(Formula);
+
+ SerPoly->FilterPix(NoBlackPix,Formula,1,Contrast800_1000);
+// bool *MaskCh;
+// MaskCh=new bool[SerPoly->Ch];
+// for(int i=0;i<SerPoly->Ch;i++)
+// {
+//  MaskCh[i]=false;
+// }
+// MaskCh[SerPoly->Ch-1]=true;
+// float *DataSpec;
+// DataSpec=new float[1];
+ for(quint64 x=0;x<SerPoly->W;x++)
  {
-  NoBlackPix[i]=false;
-  if(SerPoly->ClassifMass[i]>=0)
-   NoBlackPix[i]=true;
+  for(quint64 y=0;y<SerPoly->H;y++)
+  {
+   NoBlackPix[x+y*SerPoly->W]=false;
+   if(SerPoly->ClassifMass[x+y*SerPoly->W]>=0)
+   {
+    NoBlackPix[x+y*SerPoly->W]=true;
+//    SerPoly->GetSpectrPoint(x,y,DataSpec,MaskCh);
+//    QMessageBox msg;
+//    msg.setText(QString().setNum(DataSpec[0],'d',3));
+//    msg.exec();
+   }
+  }
  }
 
 
@@ -1507,7 +1534,7 @@ void DNSpecBath::on_DlgEmbedObj_OK()
  SerPoly->AddChanal(Formula);
  Formula='['+QString().setNum(SerPoly->Ch)+']';
 
- SerPoly->FilterPix(NoBlackPix,Formula,0,WBI);//меньше
+ SerPoly->FilterPix(NoBlackPix,Formula,1,WBI);
  for(quint64 i=0;i<SerPoly->W*SerPoly->H;i++)
  {
   NoBlackPix[i]=false;
@@ -1565,6 +1592,9 @@ void DNSpecBath::on_DlgEmbedObj_OK()
      delete[] AKFfunk1;
      delete[] AKFfunk2;
     }
+//    QMessageBox msg;
+//    msg.setText(QString().setNum(MinAkfVol,'d',5));
+//    msg.exec();
     if(MinAkfVol>AKFMin)
      SerPoly->ClassifMass[x+y*SerPoly->W]=-1;
    }//if(SerPoly->ClassifMass[x+y*SerPoly->W]>=0)
@@ -1596,6 +1626,333 @@ void DNSpecBath::on_DlgEmbedObj_OK()
  ui->statusBar->showMessage(tr("Расчет спектральной батинометрии завершен"));
  QApplication::restoreOverrideCursor();
 
+}
+
+void DNSpecBath::on_MultiTempDatal_triggered()
+{
+ if(DlgMTD!=NULL)
+  delete DlgMTD;
+
+ DlgMTD=new DlgMultiTempData();
+ DlgMTD->NameOrg=this->NameOrg;
+ DlgMTD->NameProg=this->NameProg;
+
+ connect(DlgMTD,SIGNAL(ButtonOK()),this,SLOT(on_DlgMultiTempDatal_OK()));
+ DlgMTD->show();
+}
+
+void DNSpecBath::on_DlgMultiTempDatal_OK()
+{
+ float LeftPor,RigthPor;
+ QString FileNameSravn;
+
+ LeftPor=DlgMTD->LeftPor;
+ RigthPor=DlgMTD->RigthPor;
+ FileNameSravn=DlgMTD->FileName;
+
+ DlgMTD->hide();
+
+ QList <float*> Brigth;
+
+
+ for(int i=0;i<SerPoly->Ch;i++)
+ {
+  Brigth<<new float[SerPoly->W*SerPoly->H];
+  SerPoly->GetBrigthSqare(Brigth[Brigth.size()-1],i);
+ }//for(int i=0;i<SerPoly->Ch;i++)
+
+ QList <QPoint> pt;
+
+ for(int i=0;i<SerPoly->pt.size();i++)
+  pt<<SerPoly->pt[i];
+
+ bool *ClMass;
+ ClMass=new bool[SerPoly->W*SerPoly->H];
+
+ for(quint64 i=0;i<SerPoly->W*SerPoly->H;i++)
+ {
+  ClMass[i]=false;
+  if(SerPoly->ClassifMass[i]>=0)
+   ClMass[i]=true;
+ }//for(quint64 i=0;i<SerPoly->W*SerPoly->H;i++)
+
+ on_FileOpen_triggered();
+
+ /*Имя полигона*/
+ QString NamePoly="Poly";
+
+
+ int nPoly;
+ ui->DNWPic->pt=pt;
+ nPoly=ui->DNWPic->NewPolygon();
+
+ nPoly-=1;
+ QPoint nP,kP;
+ nP=ui->DNWPic->Polygons[nPoly].GetMinP();
+ kP=ui->DNWPic->Polygons[nPoly].GetMaxP();
+ this->GdalImage->GenerateSpectrFile(nP.x(),nP.y(),
+                                     kP.x()-nP.x(),kP.y()-nP.y(),
+                                     ui->DNWPic->Polygons[nPoly].pt,NamePoly);
+  this->CurrentNamePoly=NamePoly;
+  this->ChangeCurrentPoly();
+
+  for(int x=0;x<SerPoly->W;x++)
+  {
+   for(int y=0;y<SerPoly->H;y++)
+   {
+    this->SerPoly->ClassifMass[x+y*SerPoly->W]=-1;
+    if(ClMass[x+y*SerPoly->W])
+     this->SerPoly->ClassifMass[x+y*SerPoly->W]=0;
+   }
+  }
+
+ delete[] ClMass;
+ this->FillMainForm();
+
+ int ACh=0;
+ for(int i=0;i<Brigth.size();i++)
+ {
+  SerPoly->AddChanal(Brigth[i]);
+  delete[] Brigth[i];
+  ACh++;
+ }//for(int i=0;i<Brigth.size();i++)
+
+ QList <int> NumCh;
+ for(int i=0;i<ACh;i++)
+ {
+  QString Formula;
+  Formula='['+QString().setNum(i+1)+"]-["+QString().setNum(SerPoly->IshCh+i+1)+']';
+//  QMessageBox msg;
+//  msg.setText(Formula);
+//  msg.exec();
+  SerPoly->AddChanal(Formula);
+  NumCh<<SerPoly->Ch-1;
+ }
+
+ DNMathAdd Math;
+ QList <float*> Chanals;
+ bool *NoBlackPix;
+ NoBlackPix=new bool[SerPoly->W*SerPoly->H];
+ quint64 KPoint=0;
+
+ for(quint64 i=0;i<SerPoly->W*SerPoly->H;i++)
+ {
+  NoBlackPix[i]=false;
+  if(SerPoly->ClassifMass[i]>=0)
+  {
+   NoBlackPix[i]=true;
+   KPoint++;
+  }
+ }//for(quint64 i=0;i<SerPoly->W*SerPoly->H;i++)
+
+ for(int i=0;i<ACh;i++)
+ {
+  Chanals<<new float[KPoint];
+  SerPoly->GetBrigthChanPoly(Chanals[Chanals.size()-1],SerPoly->Ch-i-1,NoBlackPix);
+ }
+
+
+ float *Mass,*CovMatr;
+ Mass=new float[KPoint*ACh];
+ CovMatr=new float[ACh*ACh];
+
+ for(quint64 i=0;i<KPoint;i++)
+ {
+  for(int j=0;j<ACh;j++)
+  {
+   Mass[i+j*KPoint]=Chanals[j][i];
+  }//for(j=0;j<ACh;j++)
+ }//for(quint64 i=0;i<KPoint;i++)
+
+ for(int i=0;i<ACh;i++)
+ {
+  delete[] Chanals[i];
+ }
+
+ float *MatrVector;
+ float *ValueSel;
+ MatrVector=new float[ACh*ACh];
+ ValueSel=new float[ACh];
+ Math.CalcCovMatr(KPoint,ACh,Mass,CovMatr);
+
+// for(int i=0;i<ACh*ACh+5;i++)
+// {
+//  QMessageBox msg;
+//  msg.setText(QString().setNum(CovMatr[i],'d',4));
+//  msg.exec();
+// }
+
+
+//// CovMatr[0]=73.12651923292241;
+//// CovMatr[1]=53.09202812674408;
+//// CovMatr[2]=95.28200849420223;
+//// CovMatr[3]=57.48517321533324;
+//// CovMatr[4]=92.64024134912705;
+//// CovMatr[5]=2.779079206257377;
+//// CovMatr[6]=70.55040417607542;
+
+//// CovMatr[7]=53.09202812674408;
+//// CovMatr[8]=43.24882524911537;
+//// CovMatr[9]=77.48043447722121;
+//// CovMatr[10]=49.86737361965988;
+//// CovMatr[11]=78.86381999009156;
+//// CovMatr[12]=2.373301989149871;
+//// CovMatr[13]=59.23946370431676;
+
+//// CovMatr[14]=95.28200849420223;
+//// CovMatr[15]=77.48043447722121;
+//// CovMatr[16]=148.6147198405307;
+//// CovMatr[17]=91.59652447535429;
+//// CovMatr[18]=153.6836922820907;
+//// CovMatr[19]=5.576073469509119;
+//// CovMatr[20]=114.6625317259;
+
+//// CovMatr[21]=57.48517321533324;
+//// CovMatr[22]=49.86737361965988;
+//// CovMatr[23]=91.59652447535429;
+//// CovMatr[24]=105.4769567495374;
+//// CovMatr[25]=94.0738351643233;
+//// CovMatr[26]=-4.877646487902462;
+//// CovMatr[27]=65.82033625428947;
+
+//// CovMatr[28]=92.64024134912705;
+//// CovMatr[29]=78.86381999009156;
+//// CovMatr[30]=153.6836922820907;
+//// CovMatr[31]=94.0738351643233;
+//// CovMatr[32]=346.8931604914206;
+//// CovMatr[33]=33.76494495600135;
+//// CovMatr[34]=206.8380426279584;
+
+//// CovMatr[35]=2.779079206257377;
+//// CovMatr[36]=2.373301989149871;
+//// CovMatr[37]=5.576073469509119;
+//// CovMatr[38]=-4.877646487902462;
+//// CovMatr[39]=33.76494495600135;
+//// CovMatr[40]=19.64934622922803;
+//// CovMatr[41]=17.82070379602213;
+
+//// CovMatr[42]=70.55040417607542;
+//// CovMatr[43]=59.23946370431676;
+//// CovMatr[44]=114.6625317259;
+//// CovMatr[45]=65.82033625428947;
+//// CovMatr[46]=206.8380426279584;
+//// CovMatr[47]=17.82070379602213;
+//// CovMatr[48]=142.9272854661795;
+
+//// float *ProbMatr;
+//// ProbMatr=new float[9];
+//// ProbMatr[0]=4;
+//// ProbMatr[1]=2;
+//// ProbMatr[2]=1;
+//// ProbMatr[3]=2;
+//// ProbMatr[4]=5;
+//// ProbMatr[5]=3;
+//// ProbMatr[6]=1;
+//// ProbMatr[7]=3;
+//// ProbMatr[8]=6;
+
+
+
+ Math.MGK(CovMatr,ACh,MatrVector,ValueSel);
+ Math.MatrTranspon(MatrVector,ACh,ACh);
+
+ float *DataSpec,*DataRes;
+ DataSpec=new float[ACh*KPoint];
+ bool *MaskCh;
+ MaskCh=new bool[SerPoly->Ch];
+
+ for(int i=0;i<SerPoly->Ch;i++)
+ {
+  MaskCh[i]=false;
+ }
+
+ for(int i=0;i<NumCh.size();i++)
+  MaskCh[NumCh[i]]=true;
+
+ SerPoly->GetSpectrZone(DataSpec,MaskCh);
+ DataRes=Math.MatrMulti(DataSpec,ACh,KPoint,MatrVector,ACh,ACh);
+
+
+
+ float *Chan;
+ float SKO[3],Middle[3],Max[3],Min[3];
+ Chan=new float[KPoint];
+
+ for(int i=0;i<3;i++)
+ {
+  Middle[i]=0;
+  for(quint64 j=0;j<KPoint;j++)
+  {
+   Chan[j]=DataRes[i+j*ACh];
+   Middle[i]+=Chan[j];
+  }
+  Middle[i]=Middle[i]/KPoint;
+  SKO[i]=Math.CalcSKO(Chan,KPoint);
+  Max[i]=Middle[i]+SKO[i]*RigthPor;
+  Min[i]=Middle[i]-SKO[i]*LeftPor;
+ }
+ delete[] Chan;
+
+ float *DopChan;
+ DopChan=new float[SerPoly->W*SerPoly->H];
+ quint64 ip=0;
+ for(quint64 i=0;i<SerPoly->W*SerPoly->H;i++)
+ {
+  DopChan[i]=0.;
+  if(NoBlackPix[i])
+  {
+   DopChan[i]=DataRes[ip*ACh];
+   ip++;
+  }
+ }
+ SerPoly->AddChanal(DopChan);
+
+ ip=0;
+ for(quint64 i=0;i<SerPoly->W*SerPoly->H;i++)
+ {
+  SerPoly->ClassifMass[i]=-1;
+  if(NoBlackPix[i])
+  {
+   for(int j=0;j<3;j++)
+   if(DataRes[j+ip*ACh]>Max[j] || DataRes[j+ip*ACh]<Min[j])
+    SerPoly->ClassifMass[i]=0;
+   ip++;
+  }
+ }
+
+
+
+
+
+ delete[] NoBlackPix;
+ delete[] DataRes;
+
+ {
+  QDir Dir;
+  if(!Dir.exists(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly))
+   Dir.mkdir(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly);
+  QFile FileClassMass(this->SerPoly->PathTempFile+'/'+this->CurrentNamePoly+'/'+"MultiTempData"+".kls");
+  FileClassMass.open(QIODevice::Truncate|QIODevice::WriteOnly);
+  FileClassMass.write((char*)this->SerPoly->ClassifMass,sizeof(int)*this->SerPoly->W*this->SerPoly->H);
+  FileClassMass.close();
+  this->FillMainForm();
+ }
+
+
+ GeoDataStruct GDSt;
+ GdalImage->GetGeoData(&GDSt);
+ QList <QString> FieldsName;
+ QList <QString> FieldsType;
+ FieldsName<<"Comment";
+ FieldsType<<"String";
+ Polygons=this->SerPoly->RastrToVector(GDSt.XTopLeftPix,GDSt.XD,GDSt.XAngle,GDSt.YTopLeftPix,GDSt.YD,GDSt.YAngle,1.,1.,this->FileNameOpen,
+                                       FieldsName,FieldsType,"MultiTempData");
+
+// for(int i=0;i<Polygons.size();i++)
+
+ ui->pbVectorize->setEnabled(true);
+ ui->statusBar->showMessage(tr("Расчет завершен"));
+ QApplication::restoreOverrideCursor();
 }
 
 /*Конец тематических задач*/
@@ -2496,3 +2853,4 @@ void DNSpecBath::on_ForOlga_triggered()
    FileTxt.close();
   }//if(!FileName.isEmpty())
 }
+

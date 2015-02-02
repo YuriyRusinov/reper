@@ -31,7 +31,7 @@ public:
     double CalcOpredMatr(int nMass /*размер массива*/,float *Matr /*”казатель на массив матрицы*/);
     void MatrInverse(float *a,int n);
     void MatrTranspon(float *Matr,quint64 x,quint64 y);
-    float *MatrMulti(float *Matr1,int x1,int y1,float *Matr2,int x2,int y2);
+    float *MatrMulti(float *Matr1,quint64 x1,quint64 y1,float *Matr2,quint64 x2,quint64 y2);
     float *MatrMulti(double *Matr,int x,int y,double a);
     void MatrAdd(float *Matr1,float *Matr2,int x,int y);
 
@@ -41,6 +41,7 @@ public:
     float CalcModulVect(int nMass,float *Mass);
 
     float VectorProjection(float *Vec1, float *Vec2, int NVec);
+    void MGK(float *CovarMatr, int NCovar, float *MatrVectors, float *ValuesSelf);
 private:
     Moments CalcMN(float *Mass,quint32 RMass);
 

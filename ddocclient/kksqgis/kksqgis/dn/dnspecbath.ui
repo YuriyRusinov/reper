@@ -321,6 +321,8 @@
     <addaction name="RoutMove2"/>
     <addaction name="Smoces"/>
     <addaction name="EmbedObj"/>
+    <addaction name="MultiTempDatal"/>
+    <addaction name="ShowDeptch"/>
    </widget>
    <widget class="QMenu" name="menu_4">
     <property name="title">
@@ -389,11 +391,6 @@
   <action name="MultiChan">
    <property name="text">
     <string>Множитель каналов</string>
-   </property>
-  </action>
-  <action name="ShowDeptch">
-   <property name="text">
-    <string>Показать значения глубин</string>
    </property>
   </action>
   <action name="CreateSpecGraph">
@@ -527,6 +524,21 @@
   <action name="action">
    <property name="text">
     <string>цййцйц</string>
+   </property>
+  </action>
+  <action name="ShowDeptch_2">
+   <property name="text">
+    <string>Показать значения глубин</string>
+   </property>
+  </action>
+  <action name="ShowDeptch">
+   <property name="text">
+    <string>Показать значения глубин</string>
+   </property>
+  </action>
+  <action name="MultiTempDatal">
+   <property name="text">
+    <string>Разновременные данные</string>
    </property>
   </action>
  </widget>

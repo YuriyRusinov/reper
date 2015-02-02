@@ -21,6 +21,11 @@
 class DNPoly2 : public QObject
 {
  Q_OBJECT
+ struct SubPixAnalisStruct
+ {
+  float MaxC;
+  int NumObj;
+ };
 /*Функции*/
 public:
     struct ClassToPoly
@@ -131,7 +136,7 @@ public:
 
     void MaxLike(bool *NoBlackPixels,QStringList PolyFileNames,bool *MaskCh);
 
-    float *SubPixAnalis(QList <float*> SpectrObj,int NumCh /*Количество спектральных каналов*/, bool *MaskCh);
+    SubPixAnalisStruct *SubPixAnalis(QList <float*> SpectrObj,int NumCh /*Количество спектральных каналов*/, bool *MaskCh);
     /*Количество элементов в массивах SpectrObj должно быть равным NumCh, и количеству учитываемых спектральных каналов MaskCh. Образцы спектров SpectrObj должны поканально
     совпадать с каналами изображения*/
 
