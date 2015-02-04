@@ -2,6 +2,19 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="ru_RU">
 <context>
+    <name>ImageGenerator</name>
+    <message>
+        <location filename="../app/reper_app/gologramma/gologramma.cpp" line="167"/>
+        <source>Creating images...</source>
+        <translation>Генерация изображений...</translation>
+    </message>
+    <message>
+        <location filename="../app/reper_app/gologramma/gologramma.cpp" line="167"/>
+        <source>&amp;Cancel</source>
+        <translation>&amp;Отмена</translation>
+    </message>
+</context>
+<context>
     <name>imageCreatorForm</name>
     <message>
         <location filename="../app/reper_app/gologramma/image_creator_form.ui" line="14"/>
