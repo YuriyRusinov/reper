@@ -291,11 +291,9 @@ private slots:
 
 
 private slots:
-    void SLOTazContextShowExtent();
     void SLOTazCoordsCenter();
-    void SLOTazGetSelectedLegendItem();
     void SLOTazThemTaskSpectralBathynometry();
-    void SLOTazShowContextMenuForLegend(const QPoint & pos);
+
 
     //void SLOTazShowMouseCoordinate(const QgsPoint & p);
     
@@ -510,6 +508,7 @@ private:
     void updateCRSStatusBar();
 
     void azSetTitleWindow(QWidget & azApp);
+    bool azShortestPathWave(QgsVectorLayer *pVectorLayer, QMap<QString, QgsFeatureId> pMap);
     QgsMapLayer *activeLayer();
     bool setActiveLayer( QgsMapLayer * );
 

@@ -6,6 +6,7 @@
 #include <QDoubleSpinBox>
 #include <QLabel>
 
+
 namespace Ui {
 class AzDialGeneral;
 }

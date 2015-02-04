@@ -5,6 +5,7 @@
 #include <QComboBox>
 #include <QProgressBar>
 #include <QLabel>
+#include <QMessageBox>
 
 namespace Ui {
 class AzDialCalcRoute;
@@ -33,11 +34,15 @@ public:
     STRUCTcoordsRoute mCoordsRoute;
     QProgressBar * mProgressBar;
     QLabel * mProgressBarText;
+    QString mStrStart;
+    QString mStrFinish;
+    void setFinish();
 
 private slots:
     void SLOTbuttonOkClick();
     void SLOTcloseDialog();
-
+    void SLOTchangeTextStart(QString pStart);
+    void SLOTchangeTextFinish(QString pFinish);
 signals:
     void SIGNALbuttonsClick(bool);
 
