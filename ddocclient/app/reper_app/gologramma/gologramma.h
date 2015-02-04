@@ -76,6 +76,9 @@ public:
     void loadModel();
     QVector<returningData> generateImages();
 
+private slots:
+	void prCancel (void);
+
 private:
     generatingDataPlus imageData;
     mslLoader::OBJloader loader;

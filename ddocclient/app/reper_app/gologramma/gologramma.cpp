@@ -118,7 +118,8 @@ QVector<returningData> generateImages(const generatingData &data, mslLoader::OBJ
             mslMesh::point3Ddouble bufPoint = cubBig.getVisionDirection();
             mslMesh::mesh3D bufMesh = mslMesh::visibleMesh(bufPoint,loader.getMesh());
 
-            std::vector<unsigned char> image = createImage(createImageMatrix(cubusCubus,bufMesh));
+            std::vector<unsigned char> cIm = createImageMatrix(cubusCubus,bufMesh);
+            std::vector<unsigned char> image = createImage(cIm);
 
             unsigned int imageSize = static_cast<unsigned int>(sqrt(static_cast<double>(image.size())));
 
@@ -163,45 +164,78 @@ QVector<returningData> ImageGenerator::generateImages()
     int imagesNum = ((imageData.data.XY_angleMax - imageData.data.XY_angleMin)/imageData.data.XY_angleStep) *
             ((imageData.data.XZ_angleMax - imageData.data.XZ_angleMin)/imageData.data.XZ_angleStep - 1);
 	
-	QProgressDialog progress("Creating images...", "Cancel", 0, imagesNum);
-    progress.setWindowModality(Qt::WindowModal);
-	progress.show();
+    QProgressDialog * progressD = new QProgressDialog (tr("Creating images..."), tr("&Cancel"), 0, imagesNum);
+//    progressD->setWindowModality(Qt::WindowModal);
+    connect (progressD, SIGNAL (canceled()), this, SLOT (prCancel()));
+    progressD->show();
 	
-	cubPair cubs = buildCub(loader,imageData.data.lengthOfShip,imageData.data.numberOfUnit);
+    if (progressD->wasCanceled())
+    {
+        delete progressD;
+        return QVector<returningData>();//imagesData;
+    }
+    cubPair cubs = buildCub(loader,imageData.data.lengthOfShip,imageData.data.numberOfUnit);
     std::vector<Cuboid> cubusCubus;
     Cuboid cubBig;
 
     QVector<returningData> imagesData;
 
-	int value = 0;
-
+    int value = 0;
+    if (progressD->wasCanceled())
+    {
+        delete progressD;
+        return imagesData;
+    }
     for(double XY_plane = imageData.data.XY_angleMin; XY_plane < imageData.data.XY_angleMax; XY_plane += imageData.data.XY_angleStep)
     {
-		progress.update();
+        //progressD->update();
 		
-		for(double XZ_plane = imageData.data.XZ_angleMin; XZ_plane <= imageData.data.XZ_angleMax; XZ_plane += imageData.data.XZ_angleStep)
+        for(double XZ_plane = imageData.data.XZ_angleMin; XZ_plane <= imageData.data.XZ_angleMax; XZ_plane += imageData.data.XZ_angleStep)
         {
             value++;
-			progress.setValue(value);
+            progressD->setValue(value);
 
-            if (progress.wasCanceled())
-                break;
+            if (progressD->wasCanceled())
+            {
+                delete progressD;
+                return imagesData;
+            }
 
             cubusCubus = cubs.cubs;
             cubBig = cubs.initialCub;
 
             cubBig.rotateInSpace(mslMesh::make_point3D(XZ_plane,XY_plane,0.0));
+            if (progressD->wasCanceled())
+            {
+                delete progressD;
+                return imagesData;
+            }
 
             std::vector<Cuboid>::iterator cubusCubusIter = cubusCubus.begin();
             for(; cubusCubusIter != cubusCubus.end(); ++cubusCubusIter)
             {
                 (*cubusCubusIter).rotateInSpace(mslMesh::make_point3D(XZ_plane,XY_plane,0.0));
+                if (progressD->wasCanceled())
+                {
+                    delete progressD;
+                    return imagesData;
+                }
             }
 
             mslMesh::point3Ddouble bufPoint = cubBig.getVisionDirection();
             mslMesh::mesh3D bufMesh = mslMesh::visibleMesh(bufPoint,loader.getMesh());
-
-            std::vector<unsigned char> image = createImage(createImageMatrix(cubusCubus,bufMesh));
+            if (progressD->wasCanceled())
+            {
+                delete progressD;
+                return imagesData;
+            }
+            std::vector<unsigned char> cIm = createImageMatrix(cubusCubus,bufMesh);
+            std::vector<unsigned char> image = createImage(cIm);
+            if (progressD->wasCanceled())
+            {
+                delete progressD;
+                return imagesData;
+            }
 
             unsigned int imageSize = static_cast<unsigned int>(sqrt(static_cast<double>(image.size())));
 
@@ -230,7 +264,13 @@ QVector<returningData> ImageGenerator::generateImages()
         }
     }
 
-    progress.setValue(imagesNum);
+    progressD->setValue(imagesNum);
+    delete progressD;
 
     return imagesData;
+}
+
+void ImageGenerator::prCancel (void)
+{
+    deleteLater ();
 }

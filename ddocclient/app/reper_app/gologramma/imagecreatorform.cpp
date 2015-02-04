@@ -31,8 +31,10 @@ void imageCreatorForm::formInit()
 
     ui->shipLengthBox->setValue(300);
     ui->resolutionBox->setValue(10);
-    ui->maxXYBox->setValue(360);
-    ui->maxXZBox->setValue(80);
+    ui->maxXYBox->setValue(120);
+    ui->maxXZBox->setValue(40);
+    ui->angleStepBox->setValue (60);
+    ui->angleStepXZBox->setValue (20);
 }
 
 void imageCreatorForm::selectFileName()
