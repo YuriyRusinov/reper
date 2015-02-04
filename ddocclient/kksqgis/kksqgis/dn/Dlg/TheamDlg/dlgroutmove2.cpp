@@ -61,7 +61,7 @@ void DlgRoutMove2::FillFormFromBD()
  QList <float> N970;
 
  float NDVI1,NDVI2,NDVI3,WBI;
- float NDVI1Midl,NDVI2Midl,NDVI3Midl,WBIMin;
+ float NDVI1Midl=0.45,NDVI2Midl=0.25,NDVI3Midl=0.15,WBIMin=1.1;
 
  for(int i=0;i<NameClsIdSwamp.size();i++)
  {
@@ -116,9 +116,21 @@ void DlgRoutMove2::FillFormFromBD()
     KolvoIndex++;
    }
   }//for(int j=0;j<N750_860.size();j++)
-  NDVI1Midl=NDVI1Midl/KolvoIndex;
-  NDVI2Midl=NDVI2Midl/KolvoIndex;
-  NDVI3Midl=NDVI3Midl/KolvoIndex;
+
+  if(KolvoIndex>0)
+  {
+   NDVI1Midl=NDVI1Midl/KolvoIndex;
+   NDVI2Midl=NDVI2Midl/KolvoIndex;
+   NDVI3Midl=NDVI3Midl/KolvoIndex;
+  }
+
+  else
+  {
+   NDVI1Midl=0.45;
+   NDVI2Midl=0.25;
+   NDVI3Midl=0.15;
+   WBIMin=1.1;
+  }
 
  }//for(int i=0;i<NameClsIdForests.size();i++)
  ui->EditPorNDVI1->setText(QString().setNum(NDVI1Midl,'d',3));

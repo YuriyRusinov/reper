@@ -1110,6 +1110,20 @@ void DNSpecBath::on_DlgRMove_OK()
   }
  }
 
+ GeoDataStruct GDSt;
+ GdalImage->GetGeoData(&GDSt);
+ QList <QString> FieldsName;
+ QList <QString> FieldsType;
+ FieldsName<<"Comment";
+ FieldsType<<"String";
+ Polygons=this->SerPoly->RastrToVector(GDSt.XTopLeftPix,GDSt.XD,GDSt.XAngle,GDSt.YTopLeftPix,GDSt.YD,GDSt.YAngle,1.,1.,this->FileNameOpen,
+                                       FieldsName,FieldsType,"RoutMove");
+
+// for(int i=0;i<Polygons.size();i++)
+
+ ui->pbVectorize->setEnabled(true);
+ ui->statusBar->showMessage(tr("Расчет завершен"));
+ QApplication::restoreOverrideCursor();
 // QMessageBox msg;
 // msg.setText(Etolons[0].ClsId);//QString().setNum(Etolons.size()));
 // msg.exec();

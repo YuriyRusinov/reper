@@ -26,7 +26,7 @@ void DlgEmbedObj::showEvent(QShowEvent *)
  Contrast630_690=Settings.value("EmbedObj/Contrast630_690",0).toFloat();
  Contrast800_1000=Settings.value("EmbedObj/Contrast800_1000",0).toFloat();
 // WBI=Settings.value("EmbedObj/WBI",0).toFloat();
- AKFMin=Settings.value("EmbedObj/AKFMin",0).toFloat();
+ AKFMin=Settings.value("EmbedObj/AKFMin",0.1).toFloat();
  KofCorelPor=Settings.value("EmbedObj/KofCorelPor",0).toFloat();
 
  ui->ListNameEmbedObj->clear();
