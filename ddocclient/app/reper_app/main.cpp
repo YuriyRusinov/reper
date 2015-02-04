@@ -17,6 +17,7 @@
 #include "kkscommandlineopts.h"
 #include "kksapplication.h"
 #include "kksclient_name.h"
+#include "kkssettings.h"
 
 #ifdef __USE_QGIS__ 
 #include <qgsapplication.h>
@@ -65,33 +66,64 @@ int main(int argc, char *argv[])
     QString pluginsPath = QApplication::applicationDirPath() + QDir::separator() + "qtplugins";
     QCoreApplication::addLibraryPath( pluginsPath );
 
-    KKSApplication *kksApplication = NULL;
+    KKSApplication *kksApplication = 0;
 
     QMainWindow * mainWindow = NULL;
+    kksApplication = KKSApplication::init (argc, argv, false);
+    if(!kksApplication){
+        return 1;
+    }
+    
     qDebug () << __PRETTY_FUNCTION__ << QLibraryInfo::location( QLibraryInfo::TranslationsPath);
     Q_INIT_RESOURCE (reper_rec);
-    QTranslator reperTr;
-    bool istr = reperTr.load ("./transl/reper_app_ru.qm", ".");
-    qDebug () << __PRETTY_FUNCTION__ << istr;
+    QString transl_path = QDir::currentPath();//getWDir();
+    QTranslator * reperTr = new QTranslator (0);
+    KKSSettings *kksSettings = kksCoreApp ? kksCoreApp->getKKSSettings() : 0;
+    if(!kksSettings)
+        return 0;
+    
 
-    qApp->installTranslator (&reperTr);
+    QString kksAppNameEng = QApplication::applicationName ();
+    kksSettings->beginGroup (QString("System settings/") + kksAppNameEng);
 
+    if ( kksSettings->getParam("Translators_path").isEmpty() )
+    {
+        kksSettings->endGroup();
+        kksSettings->writeSettings (QString("System settings/") + kksAppNameEng, 
+                                     "Translators_path", 
+                                     transl_path);
+        kksSettings->beginGroup (QString("System settings/") + kksAppNameEng);
+    }
+    
+    transl_path = kksSettings->getParam("Translators_path");
+
+    kksSettings->endGroup();
+    bool istr = reperTr->load("reper_app_ru", transl_path);//.load (transl_path + QString ("reper_app_ru.qm"), ".");
+    QTranslator * golTr = new QTranslator (0);
+    bool isGTr = golTr->load("gologram_ru", transl_path);
+    qDebug () << __PRETTY_FUNCTION__ << istr << isGTr << transl_path;
+
+    qApp->installTranslator (reperTr);
+    qApp->installTranslator (golTr);
+
+
+/*
     kksApplication = KKSApplication::init (argc, argv, false);
     if(!kksApplication){
         return 1;
     }
 
     const KKSCommandLineOpts * opts = kksApplication->commandLineOpts();
-
+*/
     mainWindow = new ReperMainWindow();
-
+/*
     if(!opts->user.isEmpty() && opts->user == QString("admin")){
         mainWindow->setWindowTitle(QObject::tr("Reper ") + QObject::tr("Administrator") + " " + KKS_VERSION);
     }
     else{
         mainWindow->setWindowTitle(QObject::tr("Reper ") + QObject::tr("Operator") + " " + KKS_VERSION);
     }
-
+*/
     mainWindow->show();
 
     int r = qApp->exec();

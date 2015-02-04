@@ -60,9 +60,16 @@
     </property>
     <addaction name="actUser_Manual"/>
    </widget>
+   <widget class="QMenu" name="menu_Settings">
+    <property name="title">
+     <string>&amp;Parameters</string>
+    </property>
+    <addaction name="actSettings"/>
+   </widget>
    <addaction name="menu_DB"/>
    <addaction name="menu_RLI_Analisys"/>
    <addaction name="menu_Help"/>
+   <addaction name="menu_Settings"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actConnect">
@@ -139,6 +146,11 @@
   <action name="actUser_Manual">
    <property name="text">
     <string>User Manual...</string>
+   </property>
+  </action>
+  <action name="actSettings">
+   <property name="text">
+    <string>&amp;Settings</string>
    </property>
   </action>
  </widget>

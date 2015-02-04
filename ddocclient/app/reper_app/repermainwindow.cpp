@@ -11,6 +11,7 @@
 #include <QtDebug>
 
 #include "assistant.h"
+#include <kkssettings.h>
 #include "kksapplication.h"
 #include <kksdatabase.h>
 #include <kkspluginloader.h>
@@ -89,6 +90,7 @@ ReperMainWindow :: ReperMainWindow (QWidget * parent, Qt::WindowFlags flags)
     connect (UI->actGenerateGol, SIGNAL (triggered()), this, SLOT (slotGologram()) );
     connect (UI->actBy_Image_fragment, SIGNAL (triggered()), this, SLOT (slotViewImage()) );
     connect (UI->actUser_Manual, SIGNAL (triggered()), this, SLOT (slotHelp()));
+    connect (UI->actSettings, SIGNAL (triggered()), this, SLOT (slotSettings()) );
 }
 
 ReperMainWindow :: ~ReperMainWindow (void)
@@ -497,4 +499,11 @@ void ReperMainWindow::slotHelp (void)
 {
     qDebug () << __PRETTY_FUNCTION__;
     ass->showDocumentation ("index.html");
+}
+
+void ReperMainWindow::slotSettings (void)
+{
+    KKSSettings * s = kksApp->getKKSSettings();
+    if(s)
+        s->editSettings(this);
 }

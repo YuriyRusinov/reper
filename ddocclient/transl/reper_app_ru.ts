@@ -68,36 +68,30 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../app/reper_app/main.cpp" line="89"/>
-        <location filename="../app/reper_app/main.cpp" line="92"/>
-        <source>Reper </source>
-        <translation>Репер</translation>
+        <location filename="../app/reper_app/assistant.cpp" line="104"/>
+        <source>Reper Help Viewer</source>
+        <translation>Помощь по программе</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/main.cpp" line="89"/>
-        <source>Administrator</source>
-        <translation>Администратор</translation>
-    </message>
-    <message>
-        <location filename="../app/reper_app/main.cpp" line="92"/>
-        <source>Operator</source>
-        <translation>Оператор</translation>
+        <location filename="../app/reper_app/assistant.cpp" line="105"/>
+        <source>Unable to launch Qt Assistant (%1)</source>
+        <translation>Не могу запустить Qt Assistant (%1)</translation>
     </message>
 </context>
 <context>
     <name>ReperMainWindow</name>
     <message>
-        <location filename="../app/reper_app/repermainwindow.cpp" line="217"/>
+        <location filename="../app/reper_app/repermainwindow.cpp" line="224"/>
         <source>Select reference</source>
         <translation>Выбрать справочник</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/repermainwindow.cpp" line="218"/>
+        <location filename="../app/reper_app/repermainwindow.cpp" line="225"/>
         <source>Not available suitable reference</source>
         <translation>Невозможно выбрать подходящий справочник</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/repermainwindow.cpp" line="401"/>
+        <location filename="../app/reper_app/repermainwindow.cpp" line="428"/>
         <source>Record %1</source>
         <translation>Запись %1</translation>
     </message>
@@ -135,79 +129,89 @@
         <translation>&amp;Помощь</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/reper_main_window.ui" line="70"/>
+        <location filename="../app/reper_app/reper_main_window.ui" line="65"/>
+        <source>&amp;Parameters</source>
+        <translation>&amp;Параметры приложения</translation>
+    </message>
+    <message>
+        <location filename="../app/reper_app/reper_main_window.ui" line="77"/>
         <source>&amp;Connect</source>
         <translation>&amp;Соединение</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/reper_main_window.ui" line="75"/>
+        <location filename="../app/reper_app/reper_main_window.ui" line="82"/>
         <source>&amp;Disconnect</source>
         <translation>&amp;Отсоединиться</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/reper_main_window.ui" line="80"/>
+        <location filename="../app/reper_app/reper_main_window.ui" line="87"/>
         <source>3D &amp;Models</source>
         <translation>3D &amp;Модель</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/reper_main_window.ui" line="85"/>
+        <location filename="../app/reper_app/reper_main_window.ui" line="92"/>
         <source>&amp;RLI</source>
         <translation>&amp;Радиолокация</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/reper_main_window.ui" line="90"/>
+        <location filename="../app/reper_app/reper_main_window.ui" line="97"/>
         <source>E&amp;xit</source>
         <translation>В&amp;ыход</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/reper_main_window.ui" line="93"/>
+        <location filename="../app/reper_app/reper_main_window.ui" line="100"/>
         <source>Ctrl+Q</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../app/reper_app/reper_main_window.ui" line="101"/>
+        <location filename="../app/reper_app/reper_main_window.ui" line="108"/>
         <source>&amp;Comparison</source>
         <translation>&amp;Сравнение</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/reper_main_window.ui" line="106"/>
+        <location filename="../app/reper_app/reper_main_window.ui" line="113"/>
         <source>test plugin</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../app/reper_app/reper_main_window.ui" line="111"/>
+        <location filename="../app/reper_app/reper_main_window.ui" line="118"/>
         <source>&amp;Plugins ...</source>
         <translation>&amp;Расширения ...</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/reper_main_window.ui" line="116"/>
+        <location filename="../app/reper_app/reper_main_window.ui" line="123"/>
         <source>by &amp;Image</source>
         <translation>по &amp;Изображению</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/reper_main_window.ui" line="121"/>
+        <location filename="../app/reper_app/reper_main_window.ui" line="128"/>
         <source>by &amp;Gologram</source>
         <translation>по &amp;Голограмме</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/reper_main_window.ui" line="126"/>
+        <location filename="../app/reper_app/reper_main_window.ui" line="133"/>
         <source>Generate &amp;gologram</source>
         <translation>Сгенерировать &amp;Голограмму</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/reper_main_window.ui" line="131"/>
+        <location filename="../app/reper_app/reper_main_window.ui" line="138"/>
         <source>View real image</source>
         <translation>Просмотреть изображение</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/reper_main_window.ui" line="136"/>
+        <location filename="../app/reper_app/reper_main_window.ui" line="143"/>
         <source>by RLI fragment</source>
         <translation>По фрагменту радиолокационного изображения</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/reper_main_window.ui" line="141"/>
+        <location filename="../app/reper_app/reper_main_window.ui" line="148"/>
         <source>User Manual...</source>
         <translation>Руководство пользователя...</translation>
+    </message>
+    <message>
+        <location filename="../app/reper_app/reper_main_window.ui" line="153"/>
+        <source>&amp;Settings</source>
+        <translation>&amp;Настройки</translation>
     </message>
 </context>
 <context>

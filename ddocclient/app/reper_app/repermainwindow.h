@@ -42,6 +42,7 @@ private slots:
     void searchIm (const QImage& sIm);
 
     void slotHelp (void);
+    void slotSettings (void);
 private:
     //
     // Functions
