@@ -36,7 +36,7 @@ public:
     QLabel * mProgressBarText;
     QString mStrStart;
     QString mStrFinish;
-    void setFinish();
+    void setFinish(bool bReturn = true);
 
 private slots:
     void SLOTbuttonOkClick();

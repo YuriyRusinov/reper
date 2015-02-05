@@ -205,6 +205,8 @@ KKSGISWidgetBase::KKSGISWidgetBase(bool withSubWindows, bool withAddons, QWidget
 #ifdef WIN32    
     dnThemTaskSpecBath = NULL; //???
 #endif
+    azSettings = new QSettings ("VKA", "Reper"); // реестр: Организация + Имя //az
+
 
 #ifdef Q_OS_WIN
     mSkipNextContextMenuEvent = 0;
@@ -485,15 +487,14 @@ QStatusBar * KKSGISWidgetBase::statusBar() const
 
 void KKSGISWidgetBase::initUserSettings()
 {
-    mpAppPath = "D:/!Share/src/reper/ddocclient/app/reper/";
-    //QString myPluginsDir        = "C:\\Program Files (x86)\\Quantum GIS 1.7.0\\plugins";
-    m_pluginsDir        = "C:\\Program Files (x86)\\DynamicSoft\\DynamicDocs Client 1.2.3\\QGS21\\plugins";
-
-    //QString myPluginsDir        = "D:\\REP_EXT\\QGS21\\plugins";
+    mpAppPath = "D:/!Share/src/reper/ddocclient/app/reper/"; // зачем, если не используется?
+    m_pluginsDir = "C:\\Program Files (x86)\\DynamicSoft\\DynamicDocs Client 1.2.3\\QGS21\\plugins";
     QgsApplication::setPluginPath(m_pluginsDir);
     //QgsProviderRegistry::instance(m_pluginsDir);
-
-    //QgsProject::
+#ifdef WIN32
+    m_pluginsDir = azSettings->value("MainSettings/PluginsDirPath", "C:/REP_EXT/QGS22/plugins").toString();   // реестр: каталог плагинов
+    QgsApplication::setPluginPath(m_pluginsDir);
+#endif
 }
 
 const QString & KKSGISWidgetBase::pluginsDir()
@@ -693,6 +694,7 @@ void KKSGISWidgetBase::initActions()
     mpActionShortestPathAreaSelect = new QAction(QIcon(":/ico/vectorize.png"), tr("Выбрать зону для оценки"), this); // Az
     mpActionShortestPathCalc = new QAction(QIcon(":/ico/vectorize.png"), tr("Построить маршрут"), this); // Az
     mpActionShortestPathGrid = new QAction(QIcon(":/ico/vectorize.png"), tr("Сформировать дискретное поле"), this); // Az
+    mpActionDirSettings = new QAction(QIcon(":/ico/vectorize.png"), tr("Настройка рабочих каталогов"), this); // Az
 
 
 //    mpActionBathymetry = new QAction(this);
@@ -878,6 +880,7 @@ void KKSGISWidgetBase::initConnections()
     connect(this->mpActionShortestPathAreaSelect, SIGNAL(triggered()), this, SLOT(SLOTshortestPathSelectArea())); // Az
     connect(this->mpActionShortestPathCalc, SIGNAL(triggered()), this, SLOT(SLOTshortestPathCalculate())); // Az
     connect(this->mpActionShortestPathGrid, SIGNAL(triggered()), this, SLOT(SLOTshortestPathGridArea())); // Az
+    connect(this->mpActionDirSettings, SIGNAL(triggered()), this, SLOT(SLOTazActionDirSettings())); // Az
 
     connect( mpMapCanvas, SIGNAL(xyCoordinates(const QgsPoint &)), this, SLOT(showMouseCoordinate(const QgsPoint &)));
     connect( mpMapCanvas, SIGNAL( extentsChanged() ), this, SLOT( markDirty() ) );
@@ -1049,6 +1052,7 @@ void KKSGISWidgetBase::initMenuBar()
     menuFile->addAction(mpActionFileSaveProject);
     menuFile->addAction(mpActionFileSaveProjectAs);
     menuFile->addSeparator();
+    menuFile->addAction(mpActionDirSettings);
     menuFile->addAction(mActionProjectProperties);
     menuFile->addSeparator();
     menuFile->addAction(mpActionFileCloseProject);
@@ -4284,7 +4288,7 @@ void KKSGISWidgetBase::SLOTshortestPathSelectArea() // Az
         return; // нажата отмена
     }
     QgsFields pFlds;
-    if (!azCreateLayer(str + ".shp", pFlds, "D:/ArcGIS/RouteArmy/data2/", true))
+    if (!azCreateLayer(str + ".shp", pFlds, azSettings->value("MainSettings/SaveDirPath", "C:/").toString(), true))
     {
         return; // слой не создан
     }
@@ -4384,7 +4388,7 @@ void KKSGISWidgetBase::SLOTshortestPathGridArea()
     }
 
     QgsRectangle pRect(mpSelectedLayer->extent());
-    QString pStr("D:/ArcGIS/RouteArmy/data2/grid_" + azCreateName(1) + ".shp");
+    QString pStr(azSettings->value("MainSettings/SaveDirPath", "C:/").toString() + azCreateName(1) + ".shp");
     QgsCoordinateReferenceSystem pSRS;
     pSRS.createFromSrsId(mpSelectedLayer->crs().srsid());
     pSRS.validate();
@@ -4401,6 +4405,7 @@ void KKSGISWidgetBase::SLOTshortestPathGridArea()
         QgsField pField9("dir", QVariant::Double, "Double");
         QgsField pField10("slope", QVariant::Double, "Double");
         QgsField pField11("val", QVariant::Double, "Double");
+        QgsField pField12("settings", QVariant::String, "String");
 
 
         pFields.append( pField1 );
@@ -4414,6 +4419,7 @@ void KKSGISWidgetBase::SLOTshortestPathGridArea()
         pFields.append( pField9 );
         pFields.append( pField10 );
         pFields.append( pField11 );
+        pFields.append( pField12 );
     }
     QgsVectorFileWriter::WriterError pError;
     QgsVectorFileWriter myWriter( pStr, "UTF-8", pFields, QGis::WKBPolygon, &pSRS);
@@ -4497,48 +4503,106 @@ void KKSGISWidgetBase::SLOTshortestPathCalculateMath(bool CalcIt)
     QMap<QString, QgsFeatureId> pMapPath; // карта пути
     QgsVectorDataProvider *pVDProvider;
     pVDProvider = pAoILayer->dataProvider();
-    QgsFeature pFeat;
-    QgsFeature pFeatFinish;
 
+    // немножко о выделении
     //    QString pStr( "\"cell_x\"=11 AND \"cell_y\"=59" ); \\ выделение чисел в двух колонках
     //    QString pStr( "\"cell_coord\" = \'11;59\'" ); \\ выделение текста в колонке
 
-    QString pExpression( "\"cell_coord\" = \'" + mAzDialCalcRoute->mStrStart + "\'" );
-
-    // проверка начальной ячейки
-    if (!pAoILayer->getFeatures(QgsFeatureRequest().setFilterExpression( pExpression )).nextFeature(pFeat))
+    // проверка начальной и финишной ячеек
+    QgsFeature pFeatFinish;
+    QgsFeature pFeat;
+    if (!pAoILayer->getFeatures(QgsFeatureRequest().setFilterExpression( "\"cell_coord\" = \'" + mAzDialCalcRoute->mStrStart + "\'" )).nextFeature(pFeat)) bSuccess = false;
+    if (!pAoILayer->getFeatures(QgsFeatureRequest().setFilterExpression( "\"cell_coord\" = \'" + mAzDialCalcRoute->mStrFinish + "\'" )).nextFeature(pFeatFinish)) bSuccess = false;
+    if (!bSuccess)
     {
-        bSuccess = false;
+        QMessageBox::information(this, "Error", "Указанная ячейка начала/конца маршрута не существует", QMessageBox::Ok);
+        mAzDialCalcRoute->setFinish(true);
+        return;
     }
     else
     {
         pMapPath["start"] = pFeat.id();
-    }
-
-    // проверка финишной ячейки
-    pExpression = "\"cell_coord\" = \'" + mAzDialCalcRoute->mStrFinish + "\'";
-    if (!pAoILayer->getFeatures(QgsFeatureRequest().setFilterExpression( pExpression )).nextFeature(pFeatFinish))
-    {
-        bSuccess = false;
-    }
-    else
-    {
         pMapPath["finish"] = pFeatFinish.id();
     }
-    if (!bSuccess)
+
+    // временная прокладка маршрута
+    mAzDialCalcRoute->mProgressBarText->setText("Текущая операция: иницализация прокладки маршрута");
+    QgsFeature pCurrentFeature;
+    double pCurrentValue(0.0);
+
+    if (!pAoILayer->getFeatures(QgsFeatureRequest().setFilterFid(pMapPath.value("finish"))).nextFeature(pCurrentFeature))
     {
-        QMessageBox::information(this, "Error", "Указанная ячейка начала/конца маршрута не существует", QMessageBox::Ok);
-        mAzDialCalcRoute->setFinish();
+        // не выбрана финишная ячейка
         return;
     }
+    int pNumValColumn(-1);
+    int pNumCellColumn(-1);
+    int pNumXcolumn(-1);
+    int pNumYcolumn(-1);
+    pNumXcolumn = pAoILayer->fieldNameIndex("cell_x"); // узнаем номер столбца 'cell_x'
+    pNumYcolumn = pAoILayer->fieldNameIndex("cell_y"); // узнаем номер столбца 'cell_y'
+    pNumValColumn = pAoILayer->fieldNameIndex("val");
+    pNumCellColumn = pAoILayer->fieldNameIndex("cell_coord");
+    if (pNumXcolumn < 0 || pNumYcolumn < 0 || pNumValColumn < 0 || pNumCellColumn < 0) return; // нет полей с таким именем
+    int pMaxX(-1);
+    int pMaxY(-1);
+    pMaxX = pAoILayer->maximumValue(pNumXcolumn).toInt();
+    pMaxY = pAoILayer->maximumValue(pNumYcolumn).toInt();
 
-    if (!azShortestPathWave(pAoILayer, pMapPath))
+    if (pMaxX < 2 || pMaxY < 2)
     {
-//        pAoILayer->endEditCommand();
+        return;
+        QMessageBox::information(this, "Error", "Размерность дискретного поля недопустимо мала", QMessageBox::Ok);
+        mAzDialCalcRoute->setFinish(false);
     }
-    //Get Some Fun
-    return;
+    pCurrentValue = pCurrentFeature.attribute(pNumValColumn).toDouble();
+    mAzDialCalcRoute->mProgressBar->setMaximum((int)(pCurrentValue+1));
+    mAzDialCalcRoute->mProgressBar->setMinimum(0);
+    mAzDialCalcRoute->mProgressBar->setValue(1);
+    QString pMsg = "/" + QString::number(pCurrentValue) + ")";
+    int pIter(0);
+    bool bPathIsMoved(true); // флаг движения маршрута
+    while (pCurrentValue > 1.01 || bPathIsMoved) // пока не придем начальную точку или не упремся в стены
+    {
+        bPathIsMoved = false;
+        int cX(pCurrentFeature.attribute(pNumXcolumn).toInt()); //x
+        int cY(pCurrentFeature.attribute(pNumYcolumn).toInt()); //y
+        QStringList pSosedi = azGetNeighbors( (long)cX, (long)cY, 2);
+        for (int i = 0; i < pSosedi.count(); i++)
+        {
+            QgsFeature pNewFeat;
+            QString pExpression( "\"cell_coord\" = \'" + pSosedi.at(i) + "\'");
+            // проверяем есть ли такая ячейка в самом слое
+            if (pAoILayer->getFeatures(QgsFeatureRequest().setFilterExpression( pExpression )).nextFeature(pNewFeat))
+            {
+                double testVal(0.0);
+                testVal = pNewFeat.attribute(pNumValColumn).toDouble();
+                if (testVal > 0.0 && testVal < pCurrentValue) // не является "непроходимой" и меньше текущего значения
+                {
+                    pIter++;
+                    mAzDialCalcRoute->mProgressBarText->setText("Текущая операция: прокладки маршрута (итерация " + QString::number(pIter) + pMsg);
+                    mAzDialCalcRoute->mProgressBar->setValue(mAzDialCalcRoute->mProgressBar->value() + 1);
+                    bPathIsMoved = true; // есть подвижки
+                    pCurrentFeature = pNewFeat; // у нас новый чемпион
+                    pCurrentValue = pCurrentFeature.attribute(pNumValColumn).toDouble();
+                    pMapPath[QString::number(pCurrentValue)] = pNewFeat.id(); // добавляем в карту путь
+                    break;
+                } // проверка соседа
+            } // получение данных
+        } // анализ соседей
+    }
 
+    QgsFeatureIds pIds;
+    foreach (QgsFeatureId pId, pMapPath.values())
+    {
+        pIds.insert( pId );
+    }
+
+    pAoILayer->setSelectedFeatures(pIds);
+    mAzDialCalcRoute->close();
+
+    return;
+// ----------------------------------------------------------------------
     // обработка слоев "непроходимых зон"
     pList.clear();
     pList << mAzDialCalcRoute->mComboLayerWater->currentText()
@@ -4546,33 +4610,46 @@ void KKSGISWidgetBase::SLOTshortestPathCalculateMath(bool CalcIt)
 //          << mAzDialCalcRoute->mComboLayerRelief->currentText();
     foreach (QString strLayer, pList)
     {
-        azSelectLayer(strLayer);
-        QgsVectorLayer * pCurrLayer = qobject_cast<QgsVectorLayer *> ( mpSelectedLayer );
-        if (!azSelectByIntersection(pAoILayer, pCurrLayer))
+        if (azSelectLayer(strLayer))
         {
-            QMessageBox::information(this, "Error", "Ошибка обработки слоя", QMessageBox::Ok);
+            QgsVectorLayer * pCurrLayer = qobject_cast<QgsVectorLayer *> ( mpSelectedLayer );
+            if (!azSelectByIntersection(pAoILayer, pCurrLayer))
+            {
+                QMessageBox::information(this, "Error", "Ошибка в обработке слоя '" + strLayer + "'", QMessageBox::Ok);
+            }
         }
     }
 
     // построение волны
+    mAzDialCalcRoute->mProgressBarText->setText("Текущая операция: инициализация волны");
+    if (!azShortestPathWave(pAoILayer, pMapPath))
+    {
+        QMessageBox::information(this, "Error", "Ошибка формирования дискретного поля", QMessageBox::Ok);
+        mAzDialCalcRoute->mProgressBarText->setText("Прервано");
+        mAzDialCalcRoute->setFinish(false);
+        return;
+    }
 
-    mAzDialCalcRoute->setFinish();
+    // прокладка маршрута
+    mAzDialCalcRoute->mProgressBarText->setText("Текущая операция: прокладка маршрута");
+    mAzDialCalcRoute->setFinish(false);
     pAoILayer->triggerRepaint();
 }
 
+
 bool KKSGISWidgetBase::azShortestPathWave(QgsVectorLayer *pVectorLayer, QMap<QString, QgsFeatureId> pMap)
 {
-    mAzDialCalcRoute->mProgressBarText->setText("Текущая операция: инициализация волны");
-
     bool bSuccess(false);
     bool bWaveMoved(true);
     int pCount(1);
     int pNumValColumn(-1);
     int pNumCellColumn(-1);
+    int pNumSettingsColumn(-1);
 
     pNumValColumn = pVectorLayer->fieldNameIndex("val"); // узнаем номер столбца 'val'
     pNumCellColumn = pVectorLayer->fieldNameIndex("cell_coord");
-    if (pNumValColumn < 0 || pNumCellColumn < 0) return false; // нет полей с таким именем
+    pNumSettingsColumn = pVectorLayer->fieldNameIndex("settings");
+    if (pNumValColumn < 0 || pNumCellColumn < 0 || pNumSettingsColumn < 0) return false; // нет полей с таким именем
 
     QgsVectorDataProvider *pProvider;
     pProvider = pVectorLayer->dataProvider();
@@ -4581,19 +4658,27 @@ bool KKSGISWidgetBase::azShortestPathWave(QgsVectorLayer *pVectorLayer, QMap<QSt
 
     pVectorLayer->startEditing(); // включаем редактирование
 
-    mAzDialCalcRoute->mProgressBar->setMaximum(pVectorLayer->featureCount());
-    mAzDialCalcRoute->mProgressBar->setValue(1);
+    mAzDialCalcRoute->mProgressBar->setMinimum(0);
+    mAzDialCalcRoute->mProgressBar->setMaximum(150);
+    mAzDialCalcRoute->mProgressBar->setValue(0);
 
-    QQueue<QgsFeatureId> pQue; // перечень обрабатываемых QgsFeatureId
-    pQue.clear();
+    QList<QgsFeatureId> pQue; // перечень обрабатываемых QgsFeatureId
+    QList<QString> pListChecked;
 
     // помечаем стартовую ячейку
-    if (!pVectorLayer->changeAttributeValue(pMap.value("start"), pNumValColumn, QVariant(1.0), QVariant::String ))
-    {
-        return false;
-    }
 
-    pQue.enqueue(pMap.value("start"));
+    {
+        QgsFeature f;
+        pVectorLayer->changeAttributeValue(pMap.value("start"), pNumValColumn, QVariant(1.0), QVariant::String );
+        pVectorLayer->changeAttributeValue(pMap.value("start"), pNumSettingsColumn, QVariant("start"), QVariant::String );
+        if (!pVectorLayer->getFeatures(QgsFeatureRequest().setFilterFid(pMap.value("start"))).nextFeature(f))
+        {
+            return false;
+        }
+        pListChecked << f.attribute(pNumCellColumn).toString();
+    }
+    pQue << pMap.value("start");
+    if (!pQue.isEmpty()) bWaveMoved = true;
 
     // цикл распространения волны
     while (bWaveMoved) // до тех пор, пока "волна" движется
@@ -4601,93 +4686,79 @@ bool KKSGISWidgetBase::azShortestPathWave(QgsVectorLayer *pVectorLayer, QMap<QSt
         // очередь - набор FeatureId, которые надо прогнать "волной"
         // набор ячеек - набор новых ячеек соседних с ячейкой в очереди
 
-        if (pQue.count()<1) break; // очередь пуста
-        QQueue<QgsFeatureId> pNewQue; // очередь новых ячеек (передается после того как старая будет обработана)
-        pNewQue.clear();
-        pCount++; // счетчик
-        mAzDialCalcRoute->mProgressBar->setValue(pCount);
+        bWaveMoved = false; // по умолчанию волна не двигалась
+        if (pQue.isEmpty()) break; // очередь пуста
+        QList<QgsFeatureId> pNewQue; // очередь новых ячеек (передается после того как старая будет обработана)
+        pCount++; // счетчик волн
+        mAzDialCalcRoute->mProgressBar->setValue(mAzDialCalcRoute->mProgressBar->value()+1);
+
+//        QString pS("wave #" + QString::number(pCount));
+        qDebug( "============== wave #" + QString::number(pCount).toAscii());
         // обработка очереди
-        while (pQue.isEmpty())
+        while (!pQue.isEmpty())
         {
-            QStringList pNewCells; // набор новых координат ячеек
-            pNewCells.clear();
             QgsFeature pFeature;
-            if (!pVectorLayer->getFeatures(QgsFeatureRequest().setFilterFid( pQue.at(0))).nextFeature(pFeature)) pQue.removeAt(0);
+            if (!pVectorLayer->getFeatures(QgsFeatureRequest().setFilterFid( pQue.at(0))).nextFeature(pFeature))
+            {
+                // не получили доступ
+                pQue.removeAt(0);
+                continue;
+            }
+
             QStringList pCell = (pFeature.attribute(pNumCellColumn).toString().split(";"));
             int cX(pCell.at(0).toInt()); //x
             int cY(pCell.at(1).toInt()); //y
 
-            /* сетка новых ячеек
-            // 1 | 2 | 3
-            // 4 |x,y| 5
-            // 6 | 7 | 8  */
-
             // получаем набор новых ячеек
-            {
-                if (cX-1>=1 && cY-1>=1) pNewCells << QString::number(cX-1) + ";" +  QString::number(cY-1);  // 1
-                if (cY-1>=1)            pNewCells << QString::number(cX)   + ";" +  QString::number(cY-1);  // 2
-                if (cY-1>=1)            pNewCells << QString::number(cX+1) + ";" +  QString::number(cY-1);  // 3
-                if (cX-1>=1)            pNewCells << QString::number(cX-1) + ";" +  QString::number(cY);    // 4
-                pNewCells << QString::number(cX+1) + ";" +  QString::number(cY);    // 5
-                if (cX-1>=1)            pNewCells << QString::number(cX-1) + ";" +  QString::number(cY+1);  // 6
-                pNewCells << QString::number(cX)   + ";" +  QString::number(cY+1);  // 7
-                pNewCells << QString::number(cX+1) + ";" +  QString::number(cY+1);  // 8
-            }
+            QStringList pNewCells = azGetNeighbors((long)cX, (long)cY, 1); // набор новых координат ячеек
 
             // анализируем полученный набор
             for (int i = 0; i < pNewCells.count(); i++)
             {
+                if (pListChecked.contains(pNewCells.at(i)))
+                {
+                    continue;
+                }
+
                 QgsFeature pFeat;
                 QString pExpression( "\"cell_coord\" = \'" + pNewCells.at(i) + "\'");
+
                 // проверяем есть ли такая ячейка в самом слое
                 if (pVectorLayer->getFeatures(QgsFeatureRequest().setFilterExpression( pExpression )).nextFeature(pFeat))
                 {
-                    double valFeat(pFeat.attribute(pNumValColumn).toDouble());
+                    double valFeat(0.0);
+                    valFeat = pFeat.attribute(pNumValColumn).toDouble();
                     // уже есть заполненное значение ячейки
-                    if (valFeat >= 1.0)
+                    if (valFeat < 1.0 && valFeat > -1.0 && !pNewQue.contains(pFeat.id())) // ячейка не отмечена и уникальна
                     {
-                        bWaveMoved = false;
-                    }
-                    // ячейка отмечена как непроходимая
-                    else if (valFeat <= -1.0)
-                    {
-                        bWaveMoved = false;
-                    }
-                    // распространяем волну
-                    else
-                    {
-                        if (!pNewQue.contains(pFeat.id()))
+                        if (pVectorLayer->changeAttributeValue(pFeat.id(), pNumValColumn, QVariant((double)pCount), QVariant::String)) // атрибуты поменялись
                         {
-                            bWaveMoved = true;
-                            pNewQue.enqueue(pFeat.id());
+                            pListChecked << pNewCells.at(i);
+                            bWaveMoved = true; // волна сдвинулась
+                            pNewQue << pFeat.id();
                         }
                     }
                 }
+                else // ячейки нет
+                {
+                    pListChecked << pNewCells.at(i); // добавляем ее координаты, чтобы в следующие обходы не тратить на нее время
+                }
             }// конец цикла анализа набора ячеек
             pQue.removeAt(0);
-        }// конец цикла обработки очереди
 
-        bool insertVal(false); // флаг занесения информации о волне
-        while (pNewQue.isEmpty())
-        {
-            if (pVectorLayer->changeAttributeValue(pNewQue.at(0), pNumValColumn, QVariant((double)pCount), QVariant::String )) insertVal = true;
-            pQue.enqueue(pNewQue.dequeue());
-        }
-        if (!insertVal)
-        {
-            QMessageBox::information(this, "Error", "Ошибка доступа к данным, работа алгоритма будет остановлена", QMessageBox::Ok);
-            bWaveMoved = false;
-        }
-        else
-        {
-            bSuccess = true;
-        }
+        }// конец цикла обработки очереди
+        pQue << pNewQue; // передаем новые элементы
     } // конец цикла волны
 
     //    помечаем финишную ячейку
-    if (!pVectorLayer->changeAttributeValue(pMap.value("finish"), pNumValColumn, QVariant(1.5), QVariant::String ))
+    if (!pVectorLayer->changeAttributeValue(pMap.value("finish"), pNumSettingsColumn, QVariant("finish"), QVariant::String ))
     {
+        bSuccess = false;
         QMessageBox::information(this, "Error", "Ошибка обработки слоя", QMessageBox::Ok);
+    }
+    else
+    {
+        bSuccess = true;
     }
 
     if (bSuccess)
@@ -4795,11 +4866,15 @@ void KKSGISWidgetBase::SLOTazThemTaskSpectralBathynometry()
     dnThemTaskSpecBath = new DNSpecBath(this);
     connect(this->dnThemTaskSpecBath, SIGNAL(SIGNALcreateVector()), this, SLOT(SLOTmpActionVectorize()));
     dnThemTaskSpecBath->show();
-//    QMessageBox::about(0, "a", "a");
-//    QFileInfo pFile("D:/!Share/layers/baba.shp");
-//    this->azAddLayerVector(pFile);
 #endif
 }
+
+void KKSGISWidgetBase::SLOTazActionDirSettings()
+{
+    mAzDialDirSettings = new AzDialDirSettings(this->azSettings, this);
+    mAzDialDirSettings->exec();
+}
+
 
 void KKSGISWidgetBase::SLOTazCoordsCenter()
 {
@@ -5161,6 +5236,8 @@ bool KKSGISWidgetBase::azCreateLayer(QString nameOfLayer, QgsFields pFields, QSt
     return true;
 }
 
+
+
 QString KKSGISWidgetBase::projectFileName()
 {
     return QgsProject::instance()->fileName();
@@ -5480,6 +5557,41 @@ bool KKSGISWidgetBase::toggleEditing( QgsMapLayer *layer, bool allowCancel )
 QString KKSGISWidgetBase::readLayerFilePath(const QString & file) const
 {
     return QgsProject::instance()->readPath(file);
+}
+
+QStringList KKSGISWidgetBase::azGetNeighbors(long xPoint, long yPoint, int pStyleOfNeighbors)
+{
+    QStringList azGetNeighbors1;
+    switch (pStyleOfNeighbors)
+    {
+    case 1:
+        /* сетка новых ячеек
+    // 1 | 2 | 3
+    // 4 |x,y| 5
+    // 6 | 7 | 8
+    // при условии, что X и Y могут быть строго больше 0*/
+
+        if (xPoint-1>=1 && yPoint-1>=1) azGetNeighbors1 << QString::number(xPoint-1) + ";" +  QString::number(yPoint-1);  // 1
+        if (yPoint-1>=1)                azGetNeighbors1 << QString::number(xPoint)   + ";" +  QString::number(yPoint-1);  // 2
+        if (yPoint-1>=1)                azGetNeighbors1 << QString::number(xPoint+1) + ";" +  QString::number(yPoint-1);  // 3
+        if (xPoint-1>=1)                azGetNeighbors1 << QString::number(xPoint-1) + ";" +  QString::number(yPoint);    // 4
+                                        azGetNeighbors1 << QString::number(xPoint+1) + ";" +  QString::number(yPoint);    // 5
+        if (xPoint-1>=1)                azGetNeighbors1 << QString::number(xPoint-1) + ";" +  QString::number(yPoint+1);  // 6
+                                        azGetNeighbors1 << QString::number(xPoint)   + ";" +  QString::number(yPoint+1);  // 7
+                                        azGetNeighbors1 << QString::number(xPoint+1) + ";" +  QString::number(yPoint+1);  // 8
+        break;
+    case 2:
+        if (yPoint-1>=1)                azGetNeighbors1 << QString::number(xPoint)   + ";" +  QString::number(yPoint-1);  // 2
+                                        azGetNeighbors1 << QString::number(xPoint+1) + ";" +  QString::number(yPoint);    // 5
+                                        azGetNeighbors1 << QString::number(xPoint)   + ";" +  QString::number(yPoint+1);  // 7
+        if (xPoint-1>=1)                azGetNeighbors1 << QString::number(xPoint-1) + ";" +  QString::number(yPoint);    // 4
+        if (xPoint-1>=1 && yPoint-1>=1) azGetNeighbors1 << QString::number(xPoint-1) + ";" +  QString::number(yPoint-1);  // 1
+        if (yPoint-1>=1)                azGetNeighbors1 << QString::number(xPoint+1) + ";" +  QString::number(yPoint-1);  // 3
+                                        azGetNeighbors1 << QString::number(xPoint+1) + ";" +  QString::number(yPoint+1);  // 8
+        if (xPoint-1>=1)                azGetNeighbors1 << QString::number(xPoint-1) + ";" +  QString::number(yPoint+1);  // 6
+        break;
+    }
+    return azGetNeighbors1;
 }
 
 void KKSGISWidgetBase::SLOTmpActionFileNew()

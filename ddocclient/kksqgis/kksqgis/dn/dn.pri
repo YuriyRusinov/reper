@@ -1,8 +1,7 @@
 HEADERS += \
         dn/dnspecbath.h \
-        dn/config.h \
-        dn/Added/dnimagelib.h \
         dn/dnwidgetimage.h \
+        dn/Added/dnimagelib.h \
         dn/Added/dnpoly.h \
         dn/Added/dnpoly2.h \
         dn/Added/First/structs.h \
@@ -26,12 +25,13 @@ HEADERS += \
         dn/Dlg/TheamDlg/dlgembedobj.h \
         dn/Dlg/TheamDlg/dlgmultitempdata.h \
         dn/azdialcalcroute.h \
-        dn/azdialgeneral.h
+        dn/azdialgeneral.h \
+    dn/azdialdirsettings.h
 
 SOURCES += \
         dn/dnspecbath.cpp \
-        dn/Added/dnimagelib.cpp \
         dn/dnwidgetimage.cpp \
+        dn/Added/dnimagelib.cpp \
         dn/Added/dnpoly.cpp \
         dn/Added/dnpoly2.cpp \
         dn/Added/First/dnmathadd.cpp \
@@ -54,7 +54,8 @@ SOURCES += \
         dn/Dlg/TheamDlg/dlgembedobj.cpp \
         dn/Dlg/TheamDlg/dlgmultitempdata.cpp \
         dn/azdialcalcroute.cpp \
-        dn/azdialgeneral.cpp
+        dn/azdialgeneral.cpp \
+    dn/azdialdirsettings.cpp
 
 
 FORMS += \
@@ -77,4 +78,5 @@ FORMS += \
       dn/Dlg/TheamDlg/dlgembedobj.ui \
       dn/Dlg/TheamDlg/dlgmultitempdata.ui \
       dn/azdialcalcroute.ui \
-      dn/azdialgeneral.ui
+      dn/azdialgeneral.ui \
+    dn/azdialdirsettings.ui

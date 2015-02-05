@@ -29,13 +29,21 @@ AzDialCalcRoute::~AzDialCalcRoute()
     delete ui;
 }
 
-void AzDialCalcRoute::setFinish()
+void AzDialCalcRoute::setFinish(bool bReturn)
 {
-    if (!ui->buttonOk->isEnabled())
+    if (bReturn)
     {
+        ui->buttonOk->setEnabled(true);
         ui->buttonCancel->setEnabled(true);
-        ui->buttonCancel->setText("Закрыть");
-        ui->buttonOk->setVisible(false);
+    }
+    else
+    {
+        if (!ui->buttonOk->isEnabled())
+        {
+            ui->buttonCancel->setEnabled(true);
+            ui->buttonCancel->setText("Закрыть");
+            ui->buttonOk->setVisible(false);
+        }
     }
 }
 

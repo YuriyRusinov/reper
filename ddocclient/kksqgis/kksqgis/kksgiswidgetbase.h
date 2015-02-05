@@ -17,6 +17,7 @@
 #include <QValidator>
 #include <QProgressBar>
 #include <QDomDocument>
+#include <QSettings>
 
 #undef min
 #undef max
@@ -25,6 +26,7 @@
 #include "qgsfeaturestore.h"
 
 #include "dn/azdialcalcroute.h" //az
+#include "dn/azdialdirsettings.h" //az
 
 class QToolButton;
 
@@ -90,8 +92,11 @@ public:
     QString projectFileName();
     QString readLayerFilePath(const QString & file) const;//возвращает абсолютный путь к файлу слоя, который прочитан из файла проекта QGIS
 
-    AzDialCalcRoute * mAzDialCalcRoute;
+    QSettings *azSettings; //az
 
+    AzDialDirSettings * mAzDialDirSettings; //az
+    AzDialCalcRoute * mAzDialCalcRoute; //az
+    QStringList azGetNeighbors(long xPoint, long yPoint, int pStyleOfNeighbors = 1); // az
 
     void openProject(const QString & prjFile);
     void closeProject();
@@ -291,8 +296,9 @@ private slots:
 
 
 private slots:
-    void SLOTazCoordsCenter();
-    void SLOTazThemTaskSpectralBathynometry();
+    void SLOTazCoordsCenter(); // az
+    void SLOTazThemTaskSpectralBathynometry(); //az
+    void SLOTazActionDirSettings(); //az
 
 
     //void SLOTazShowMouseCoordinate(const QgsPoint & p);
@@ -673,6 +679,7 @@ private:
     QAction * mpActionShortestPathCalc; // Поиск маршрута военной техники, расчет Az
     QAction * mpActionShortestPathGrid; // Поиск маршрута военной техники, сетка Az
     QAction * mActionMapTips;
+    QAction * mpActionDirSettings; // настройка рабочих каталогов Az
 
     //добавление слоев
     QAction * mpActionAddVectorLayer;
