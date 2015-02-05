@@ -385,6 +385,9 @@ void ReperMainWindow::slotGologram (void)
 
 void ReperMainWindow::slotGologramCalc (generatingDataPlus gdp)
 {
+//    QWidget * iGW = qobject_cast<QWidget *>(this->sender());
+//    if (iGW)
+//        iGW->setVisible (false);
     ImageGenerator* generator = new ImageGenerator(gdp,this);
     
 /*    QProgressDialog* pProcD = new QProgressDialog;

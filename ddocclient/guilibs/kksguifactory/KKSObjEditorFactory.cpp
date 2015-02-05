@@ -5691,7 +5691,7 @@ int KKSObjEditorFactory :: exportHeader (QIODevice *xmlDev, // XML-פאיכ, סמהונזא
     xmlWriter->writeStartDocument ();
     QString dtd = QString ("\n<!DOCTYPE Reference [");
     dtd += QString("\n <!ENTITY Charset '%1'> \n <!ENTITY field_delimiter '%2'> \n <!ENTITY text_delimiter '%3'> \n ").arg (codeName).arg (fDelim).arg (tDelim);
-    dtd += QString("\n <!ELEMENT Reference ()> \n <!ELEMENT header \"\">");
+    dtd += QString("\n <!ELEMENT Reference (header, body)> \n <!ELEMENT header (category+)>");
     dtd += QString("\n <!ELEMENT category (cname, ccode, ctype, cdescription, cis_main, id_child?, attributes)>");
     dtd += QString("\n <!ATTLIST category id ID #REQUIRED>");
     dtd += QString("\n <!ELEMENT cname (#PCDATA)>");
@@ -5700,9 +5700,20 @@ int KKSObjEditorFactory :: exportHeader (QIODevice *xmlDev, // XML-פאיכ, סמהונזא
     dtd += QString("\n <!ELEMENT cdescription (#PCDATA)>");
     dtd += QString("\n <!ELEMENT cis_main (#PCDATA)>");
     dtd += QString("\n <!ELEMENT id_child (#PCDATA)>");
-    dtd += QString("\n <!ELEMENT attributes (#PCDATA)>");
+    dtd += QString("\n <!ELEMENT attributes (attribute*)>");
     dtd += QString("\n <!ATTLIST attributes number CDATA \"0\">\n");
-    dtd += QString("\n <!ELEMENT attribute (code, name, type, mandatory, read_only, def_width, table_name?, column_name?, ref_column_name?)> \n <!ELEMENT code (#PCDATA)> \n <!ELEMENT name (#PCDATA)> \n <!ELEMENT type (#PCDATA)> \n <!ELEMENT mandatory (#PCDATA)> \n <!ELEMENT read_only (#PCDATA)>\n <!ELEMENT table_name (#PCDATA)> \n <!ELEMENT column_name (#PCDATA)> \n <!ELEMENT ref_column_name (#PCDATA)> \n");
+    dtd += QString("\n <!ELEMENT attribute (code, name, type, mandatory, read_only, def_width, table_name?, column_name?, ref_column_name?)>");
+    dtd += QString("\n <!ATTLIST attribute id ID #REQUIRED>");
+    dtd += QString("\n <!ELEMENT code (#PCDATA)>");
+    dtd += QString("\n <!ELEMENT name (#PCDATA)>");
+    dtd += QString("\n <!ELEMENT type (#PCDATA)>");
+    dtd += QString("\n <!ELEMENT mandatory (#PCDATA)>");
+    dtd += QString("\n <!ELEMENT read_only (#PCDATA)>");
+    dtd += QString("\n <!ELEMENT table_name (#PCDATA)>");
+    dtd += QString("\n <!ELEMENT column_name (#PCDATA)>");
+    dtd += QString("\n <!ELEMENT ref_column_name (#PCDATA)>");
+    dtd += QString("\n <!ELEMENT def_width (#PCDATA)>\n");
+    dtd += QString("\n <!ELEMENT body (#PCDATA)> \n");
     dtd += QString ("]>\n");
     xmlWriter->writeDTD (dtd);
     QString namespaceUri;
@@ -5755,7 +5766,7 @@ int KKSObjEditorFactory :: exportCategory (QXmlStreamWriter * xmlWriter, const K
     QString catName = QString ("category");
     xmlWriter->writeStartElement(namespaceUri, catName);
     QString cid ("id");
-    xmlWriter->writeAttribute(cid, QString::number (c->id()));
+    xmlWriter->writeAttribute(cid, QString("x%1").arg (c->id()));
     xmlWriter->writeCharacters ("\n    ");
     xmlWriter->writeStartElement (QString("cname"));
     xmlWriter->writeCharacters (c->name());
@@ -5807,7 +5818,7 @@ int KKSObjEditorFactory :: exportCategory (QXmlStreamWriter * xmlWriter, const K
 
         xmlWriter->writeCharacters ("    ");
         xmlWriter->writeStartElement (fieldName);
-        xmlWriter->writeAttribute (attrId, QString::number(pc.key()));
+        xmlWriter->writeAttribute (attrId, QString("x%1").arg(pc.key()));
         xmlWriter->writeCharacters ("\n            ");
 
         xmlWriter->writeStartElement (acode);
