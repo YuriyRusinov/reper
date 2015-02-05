@@ -208,7 +208,7 @@ void KKSXMLForm :: xmlParse (void)
             if (xmlStreamR->isDTD())
                 readNotation (xmlStreamR->entityDeclarations ());
             else if (xmlStreamR->isStartElement () &&
-                    ((xmlStreamR->name ().toString().compare ("document", Qt::CaseInsensitive) == 0) ||
+                    ((xmlStreamR->name ().toString().compare ("Reference", Qt::CaseInsensitive) == 0) ||
                     (xmlStreamR->name().toString().compare("header", Qt::CaseInsensitive) == 0))
                     )
                 continue;
@@ -297,7 +297,7 @@ KKSCategory * KKSXMLForm :: readCategory (QXmlStreamReader* reader)
         return 0;
 
     QString cIdStr (cXmlAttrs[0].value().toString());
-    int idCat = cIdStr.toInt();
+    int idCat = cIdStr.mid(1, cIdStr.length()).toInt();
     qDebug () << __PRETTY_FUNCTION__ << cIdStr << idCat;
 
     KKSCategory * cat = new KKSCategory ();
@@ -375,7 +375,7 @@ void KKSXMLForm :: readAttribute (QXmlStreamReader* reader, KKSCategory * cat)
         return;
 
     QString aIdStr (aXmlAttrs[0].value().toString());
-    int idAttr = aIdStr.toInt();
+    int idAttr = aIdStr.mid(1, aIdStr.length()).toInt();
     qDebug () << __PRETTY_FUNCTION__ << aIdStr << idAttr;
     KKSCategoryAttr * cAttr = new KKSCategoryAttr;
     cAttr->setId (idAttr);
