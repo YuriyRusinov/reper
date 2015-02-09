@@ -1,13 +1,14 @@
 #include "azdialcalcroute.h"
 #include "ui_azdialcalcroute.h"
 
-AzDialCalcRoute::AzDialCalcRoute(QWidget *parent) :
+AzDialCalcRoute::AzDialCalcRoute(QSettings *linkSettings, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::AzDialCalcRoute)
 {
     ui->setupUi(this);
     QObject::connect(ui->buttonOk, SIGNAL(clicked()), this, SLOT(SLOTbuttonOkClick()));
     QObject::connect(ui->buttonCancel, SIGNAL(clicked()), this, SLOT(SLOTcloseDialog()));
+    this->linkSettings = linkSettings;
     mComboLayerAoI = ui->comboLayerAoI;
     mComboLayerForest = ui->comboLayerForest;
     mComboLayerWater = ui->comboLayerWater;
@@ -16,8 +17,8 @@ AzDialCalcRoute::AzDialCalcRoute(QWidget *parent) :
     mComboColSlope = ui->comboColSlope;
     mProgressBar = ui->progressBar;
     mProgressBarText = ui->labelProgress;
-    ui->textStart->setText("8;65");
-    ui->textEnd->setText("150;61");
+    ui->textStart->setText(linkSettings->value("ShortestPath/StartXY", "1;1").toString());
+    ui->textEnd->setText(linkSettings->value("ShortestPath/FinishXY", "2;2").toString());
     mStrStart = ui->textStart->text();
     mStrFinish = ui->textEnd->text();
     QObject::connect(ui->textStart, SIGNAL(textChanged(QString)), this, SLOT(SLOTchangeTextStart(QString)));
@@ -40,6 +41,9 @@ void AzDialCalcRoute::setFinish(bool bReturn)
     {
         if (!ui->buttonOk->isEnabled())
         {
+            mProgressBar->setMinimum(0);
+            mProgressBar->setMaximum(1);
+            mProgressBar->setValue(1);
             ui->buttonCancel->setEnabled(true);
             ui->buttonCancel->setText("Закрыть");
             ui->buttonOk->setVisible(false);

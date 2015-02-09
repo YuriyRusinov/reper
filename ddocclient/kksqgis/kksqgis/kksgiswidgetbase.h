@@ -97,6 +97,7 @@ public:
     AzDialDirSettings * mAzDialDirSettings; //az
     AzDialCalcRoute * mAzDialCalcRoute; //az
     QStringList azGetNeighbors(long xPoint, long yPoint, int pStyleOfNeighbors = 1); // az
+    QgsPoint azGetCentroid(QgsFeature &pFeature); // az
 
     void openProject(const QString & prjFile);
     void closeProject();
@@ -515,6 +516,7 @@ private:
 
     void azSetTitleWindow(QWidget & azApp);
     bool azShortestPathWave(QgsVectorLayer *pVectorLayer, QMap<QString, QgsFeatureId> pMap);
+    bool azShortestPathRoute(QgsVectorLayer *pVectorLayer, QMap<QString, QgsFeatureId> pMap);
     QgsMapLayer *activeLayer();
     bool setActiveLayer( QgsMapLayer * );
 

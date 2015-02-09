@@ -20,7 +20,6 @@ public:
     QString fromSlashToBackslash(QString pStr);
     QString fromBackslashToSlash(QString pStr);
 
-
 private slots:
     void SLOTpathOne();
     void SLOTpathTwo();

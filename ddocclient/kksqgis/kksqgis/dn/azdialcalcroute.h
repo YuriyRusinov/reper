@@ -6,6 +6,7 @@
 #include <QProgressBar>
 #include <QLabel>
 #include <QMessageBox>
+#include <QSettings>
 
 namespace Ui {
 class AzDialCalcRoute;
@@ -16,7 +17,8 @@ class AzDialCalcRoute : public QDialog
     Q_OBJECT
     
 public:
-    explicit AzDialCalcRoute(QWidget *parent = 0);
+    explicit AzDialCalcRoute(QSettings *linkSettings, QWidget *parent = 0);
+    QSettings *linkSettings;
     ~AzDialCalcRoute();
     QComboBox * mComboLayerAoI;
     QComboBox * mComboLayerForest;
