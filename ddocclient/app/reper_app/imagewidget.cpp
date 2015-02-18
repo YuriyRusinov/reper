@@ -7,6 +7,7 @@
 #include <QRect>
 #include "ImageLabel.h"
 #include <QSpacerItem>
+#include <QScrollArea>
 #include <QtDebug>
 
 #include "imagewidget.h"
@@ -79,8 +80,12 @@ void ImageWidget :: init (void)
     lRImage = new ImageLabel (this);
     QSize imMinSize (200, 200);
     lRImage->setMinimumSize (imMinSize);
+    QScrollArea * scImArea = new QScrollArea (this);
+    lRImage->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    lRImage->setScaledContents(true);
+    scImArea->setWidget (lRImage);
 
-    grLay->addWidget (lRImage, 0, 0, 5, 1);
+    grLay->addWidget (scImArea, 0, 0, 5, 1);
 
     tbLoadImage = new QToolButton (this);
     tbLoadImage->setToolTip (tr("Load golographic image from file"));

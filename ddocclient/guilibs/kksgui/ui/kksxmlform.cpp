@@ -201,10 +201,15 @@ void KKSXMLForm :: xmlParse (void)
     while (!xmlStreamR->atEnd())
     {
         QXmlStreamReader::TokenType tType = xmlStreamR->readNext ();
-        if (!xmlStreamR->error())
+        if (!xmlStreamR->hasError())
         {
             xmlStreamW->writeCurrentToken (*xmlStreamR);
             qDebug () << __PRETTY_FUNCTION__ << tType << xmlStreamR->name().toString() << xmlStreamR->text ().toString();
+            if (tType == QXmlStreamReader::Invalid)
+            {
+                qDebug() << __PRETTY_FUNCTION__ << QString ("Invalid token");
+                break;
+            }
             if (xmlStreamR->isDTD())
                 readNotation (xmlStreamR->entityDeclarations ());
             else if (xmlStreamR->isStartElement () &&
@@ -234,6 +239,10 @@ void KKSXMLForm :: xmlParse (void)
             {
                 qDebug () << __PRETTY_FUNCTION__ << "body";
                 this->readData (xmlStreamR);
+            }
+            else if (xmlStreamR->isEndDocument())
+            {
+                qDebug () << __PRETTY_FUNCTION__ << xmlStreamR->name ().toString() << tType;
             }
 //            else if (xmlStreamR->isStartElement () && xmlStreamR->name ().toString().compare ("Attributes", Qt::CaseInsensitive) == 0)
 //                readAttributes (xmlStreamR, attrFields);
@@ -383,6 +392,7 @@ void KKSXMLForm :: readAttribute (QXmlStreamReader* reader, KKSCategory * cat)
     //qDebug () << __PRETTY_FUNCTION__ << tType << reader->name().toString();
     for (tType = reader->readNext (); tType != QXmlStreamReader::EndElement && reader->name ().toString().compare ("attribute", Qt::CaseInsensitive) != 0; tType=reader->readNext ())
     {
+        qDebug () << __PRETTY_FUNCTION__ << tType << reader->name ().toString();
         if (tType == QXmlStreamReader::StartElement && reader->name ().toString().compare ("code", Qt::CaseInsensitive) == 0)
         {
             QString acCode = reader->readElementText();
@@ -434,6 +444,8 @@ void KKSXMLForm :: readAttribute (QXmlStreamReader* reader, KKSCategory * cat)
             QString crName = reader->readElementText();
             cAttr->setRefColumnName (crName);
         }
+        else if (tType == QXmlStreamReader::EndElement)
+            qDebug() << __PRETTY_FUNCTION__ << reader->name ().toString();
         //tType = reader->readNext ();
     }
     //reader->readNext ();
@@ -691,4 +703,6 @@ void KKSXMLForm :: setTextDelim (const QString& text)
 void KKSXMLForm :: readData (QXmlStreamReader* reader)
 {
     qDebug () << __PRETTY_FUNCTION__;
+    if (!reader)
+        return;
 }

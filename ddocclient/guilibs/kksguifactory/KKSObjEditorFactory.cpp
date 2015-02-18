@@ -5719,9 +5719,9 @@ int KKSObjEditorFactory :: exportHeader (QIODevice *xmlDev, // XML-файл, содержа
     QString namespaceUri;
 
     xmlWriter->writeStartElement (namespaceUri, QString("Reference"));
-    xmlWriter->writeCharacters (QString("\n"));
+    xmlWriter->writeCharacters (QString("\n    "));
     xmlWriter->writeStartElement (namespaceUri, QString("header"));
-    xmlWriter->writeCharacters (QString("\n"));
+    xmlWriter->writeCharacters (QString("\n        "));
     int ierc = exportCategory (xmlWriter, c);
     const KKSCategory * ct = c->tableCategory();
     if (ierc < 0)
@@ -5731,13 +5731,14 @@ int KKSObjEditorFactory :: exportHeader (QIODevice *xmlDev, // XML-файл, содержа
         return ERROR_CODE;
 
     xmlWriter->writeEndElement ();
-    xmlWriter->writeCharacters (QString("\n"));
+    xmlWriter->writeCharacters (QString("\n    "));
     //
     // Header
     //
     xmlWriter->writeStartElement (namespaceUri, QString("body"));
-    xmlWriter->writeCharacters (QString("\n"));
+    xmlWriter->writeCharacters (QString("\n        "));
     int res = this->exportCopies (xmlWriter, ct, objEx, codeName, fDelim, tDelim, oEditor);//сюда передаем табличную (подчиненную) категорию
+    //xmlWriter->writeCharacters (QString("\n        "));
     xmlWriter->writeEndElement ();
     xmlWriter->writeCharacters (QString("\n"));
     if (res < 0)
@@ -5767,38 +5768,38 @@ int KKSObjEditorFactory :: exportCategory (QXmlStreamWriter * xmlWriter, const K
     xmlWriter->writeStartElement(namespaceUri, catName);
     QString cid ("id");
     xmlWriter->writeAttribute(cid, QString("x%1").arg (c->id()));
-    xmlWriter->writeCharacters ("\n    ");
+    xmlWriter->writeCharacters ("\n        ");
     xmlWriter->writeStartElement (QString("cname"));
     xmlWriter->writeCharacters (c->name());
     xmlWriter->writeEndElement ();
-    xmlWriter->writeCharacters ("\n    ");
+    xmlWriter->writeCharacters ("\n        ");
     xmlWriter->writeStartElement (QString("ccode"));
     xmlWriter->writeCharacters (c->code());
     xmlWriter->writeEndElement ();
-    xmlWriter->writeCharacters ("\n    ");
+    xmlWriter->writeCharacters ("\n        ");
     xmlWriter->writeStartElement (QString("ctype"));
     xmlWriter->writeCharacters (QString::number (c->type()->id()));
     xmlWriter->writeEndElement ();
-    xmlWriter->writeCharacters ("\n    ");
+    xmlWriter->writeCharacters ("\n        ");
     xmlWriter->writeStartElement (QString("cdescription"));
     xmlWriter->writeCharacters (c->desc());
     xmlWriter->writeEndElement ();
-    xmlWriter->writeCharacters ("\n    ");
+    xmlWriter->writeCharacters ("\n        ");
     xmlWriter->writeStartElement (QString("cis_main"));
     xmlWriter->writeCharacters (c->isMain() ? QString("true") : QString ("false"));
     xmlWriter->writeEndElement ();
-    xmlWriter->writeCharacters ("\n    ");
+    xmlWriter->writeCharacters ("\n        ");
     if (c->tableCategory())
     {
         xmlWriter->writeStartElement (QString("id_child"));
         xmlWriter->writeCharacters (QString::number (c->tableCategory()->id()));
         xmlWriter->writeEndElement ();
-        xmlWriter->writeCharacters ("\n    ");
+        xmlWriter->writeCharacters ("\n        ");
     }
     QString attrsName = QString ("attributes");
     xmlWriter->writeStartElement (attrsName);
     xmlWriter->writeAttribute (QString ("number"), QString::number (c->attributes().count()));
-    xmlWriter->writeCharacters ("\n    ");
+    xmlWriter->writeCharacters ("\n        ");
 
     KKSMap<int, KKSCategoryAttr*>::const_iterator pc;
     int i=0;
@@ -5819,32 +5820,32 @@ int KKSObjEditorFactory :: exportCategory (QXmlStreamWriter * xmlWriter, const K
         xmlWriter->writeCharacters ("    ");
         xmlWriter->writeStartElement (fieldName);
         xmlWriter->writeAttribute (attrId, QString("x%1").arg(pc.key()));
-        xmlWriter->writeCharacters ("\n            ");
+        xmlWriter->writeCharacters ("\n                ");
 
         xmlWriter->writeStartElement (acode);
         xmlWriter->writeCharacters (pc.value()->code());
         xmlWriter->writeEndElement ();
-        xmlWriter->writeCharacters ("\n            ");
+        xmlWriter->writeCharacters ("\n                ");
 
         xmlWriter->writeStartElement (atitle);
         xmlWriter->writeCharacters (pc.value()->title());
         xmlWriter->writeEndElement ();
-        xmlWriter->writeCharacters ("\n            ");
+        xmlWriter->writeCharacters ("\n                ");
 
         xmlWriter->writeStartElement (atype);
         xmlWriter->writeCharacters (QString::number (pc.value()->type()->attrType()));
         xmlWriter->writeEndElement ();
-        xmlWriter->writeCharacters ("\n            ");
+        xmlWriter->writeCharacters ("\n                ");
         
         xmlWriter->writeStartElement (aMandatory);
         xmlWriter->writeCharacters(pc.value()->isMandatory() ? QString("true") : QString("false"));
         xmlWriter->writeEndElement ();
-        xmlWriter->writeCharacters ("\n            ");
+        xmlWriter->writeCharacters ("\n                ");
 
         xmlWriter->writeStartElement (aReadOnly);
         xmlWriter->writeCharacters(pc.value()->isReadOnly() ? QString("true") : QString("false"));
         xmlWriter->writeEndElement ();
-        xmlWriter->writeCharacters ("\n            ");
+        xmlWriter->writeCharacters ("\n                ");
         
         xmlWriter->writeStartElement (attrDefW);
         xmlWriter->writeCharacters (QString::number (pc.value()->defWidth()));
@@ -5857,22 +5858,22 @@ int KKSObjEditorFactory :: exportCategory (QXmlStreamWriter * xmlWriter, const K
             pc.value()->type()->attrType() == KKSAttrType::atRecordColorRef ||
             pc.value()->type()->attrType() == KKSAttrType::atRecordTextColorRef)
         {
-            xmlWriter->writeCharacters ("\n            ");
+            xmlWriter->writeCharacters ("\n                ");
             xmlWriter->writeStartElement (attrTableName);
             xmlWriter->writeCharacters (pc.value()->tableName());
             xmlWriter->writeEndElement ();
-            xmlWriter->writeCharacters ("\n            ");
+            xmlWriter->writeCharacters ("\n                ");
             xmlWriter->writeStartElement (attrColumnName);
             xmlWriter->writeCharacters (pc.value()->columnName());
             xmlWriter->writeEndElement ();
-            xmlWriter->writeCharacters ("\n            ");
+            xmlWriter->writeCharacters ("\n                ");
             xmlWriter->writeStartElement (attrRefColumnName);
             xmlWriter->writeCharacters (pc.value()->refColumnName(false));
             xmlWriter->writeEndElement ();
-            xmlWriter->writeCharacters ("\n        ");
+            xmlWriter->writeCharacters ("\n            ");
         }
         else
-            xmlWriter->writeCharacters ("\n        ");
+            xmlWriter->writeCharacters ("\n            ");
         
         xmlWriter->writeEndElement ();
         //
@@ -5880,15 +5881,15 @@ int KKSObjEditorFactory :: exportCategory (QXmlStreamWriter * xmlWriter, const K
         //
         i++;
         //if (i != c->attributes().count())
-        xmlWriter->writeCharacters ("\n    ");
+        xmlWriter->writeCharacters ("\n        ");
         //else
         //    xmlWriter->writeCharacters ("\n    ");
     }
 
     xmlWriter->writeEndElement ();
-    xmlWriter->writeCharacters ("\n");
+    xmlWriter->writeCharacters ("\n    ");
     xmlWriter->writeEndElement ();
-    xmlWriter->writeCharacters ("\n");
+    xmlWriter->writeCharacters ("\n    ");
     return OK_CODE;
 }
 
@@ -6229,7 +6230,7 @@ int KKSObjEditorFactory :: exportCopies (QXmlStreamWriter * xmlWriter, // целево
             if (ii < attrs_list.count()-1)
                 oeStream << fDelim;
         }
-        xmlWriter->writeCharacters(fstr+"\n");
+        xmlWriter->writeCharacters(QString("%1%2").arg (fstr).arg (i<noe-1 ? QString("\n        ") : QString("\n    ")));
         //csvFile << fstr << "\n";
     }
 
