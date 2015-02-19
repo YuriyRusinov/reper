@@ -310,20 +310,21 @@ KKSCategory * KKSXMLForm :: readCategory (QXmlStreamReader* reader)
     qDebug () << __PRETTY_FUNCTION__ << cIdStr << idCat;
 
     KKSCategory * cat = new KKSCategory ();
-    QXmlStreamReader::TokenType tType;// = reader->readNext ();
-    for (tType = reader->readNext(); tType != QXmlStreamReader::EndElement && reader->name ().toString().compare ("Category", Qt::CaseInsensitive) != 0 && !reader->atEnd(); tType = reader->readNext())
+    QXmlStreamReader::TokenType tTypeC;// = reader->readNext ();
+    for (tTypeC = reader->readNext(); tTypeC != QXmlStreamReader::EndElement && reader->name ().toString().compare ("Category", Qt::CaseInsensitive) != 0 && !reader->atEnd(); tTypeC = reader->readNext())
     {
-        if (tType == QXmlStreamReader::StartElement && reader->name ().toString().compare ("cname", Qt::CaseInsensitive) == 0)
+        qDebug() << __PRETTY_FUNCTION__ << tTypeC << reader->name ().toString();
+        if (tTypeC == QXmlStreamReader::StartElement && reader->name ().toString().compare ("cname", Qt::CaseInsensitive) == 0)
         {
             QString cName = reader->readElementText();
             cat->setName (cName);
         }
-        else if (tType == QXmlStreamReader::StartElement && reader->name ().toString().compare ("ccode", Qt::CaseInsensitive) == 0)
+        else if (tTypeC == QXmlStreamReader::StartElement && reader->name ().toString().compare ("ccode", Qt::CaseInsensitive) == 0)
         {
             QString cCode = reader->readElementText();
             cat->setCode (cCode);
         }
-        else if (tType == QXmlStreamReader::StartElement && reader->name ().toString().compare ("ctype", Qt::CaseInsensitive) == 0)
+        else if (tTypeC == QXmlStreamReader::StartElement && reader->name ().toString().compare ("ctype", Qt::CaseInsensitive) == 0)
         {
             int idType = reader->readElementText().toInt();
             //qDebug () << __PRETTY_FUNCTION__ << idType;
@@ -332,12 +333,12 @@ KKSCategory * KKSXMLForm :: readCategory (QXmlStreamReader* reader)
             else
                 cat->setType (KKSType::createType10());
         }
-        else if (tType == QXmlStreamReader::StartElement && reader->name ().toString().compare ("cdescription", Qt::CaseInsensitive) == 0)
+        else if (tTypeC == QXmlStreamReader::StartElement && reader->name ().toString().compare ("cdescription", Qt::CaseInsensitive) == 0)
         {
             QString cDesc = reader->readElementText();
             cat->setDesc (cDesc);
         }
-        else if (tType == QXmlStreamReader::StartElement && reader->name ().toString().compare ("cis_main", Qt::CaseInsensitive) == 0)
+        else if (tTypeC == QXmlStreamReader::StartElement && reader->name ().toString().compare ("cis_main", Qt::CaseInsensitive) == 0)
         {
             QString cMain = reader->readElementText();
             if (QString::compare (cMain, QString("true"), Qt::CaseInsensitive)==0)
@@ -345,7 +346,7 @@ KKSCategory * KKSXMLForm :: readCategory (QXmlStreamReader* reader)
             else
                 cat->setMain (false);
         }
-        else if (tType == QXmlStreamReader::StartElement && reader->name ().toString().compare ("attributes", Qt::CaseInsensitive) == 0)
+        else if (tTypeC == QXmlStreamReader::StartElement && reader->name ().toString().compare ("attributes", Qt::CaseInsensitive) == 0)
         {
             QXmlStreamAttributes cXmlNumAttrs = reader->attributes();
             int nAttrs = cXmlNumAttrs.isEmpty() ? 0 : cXmlNumAttrs[0].value().toString().toInt();
@@ -702,7 +703,15 @@ void KKSXMLForm :: setTextDelim (const QString& text)
 
 void KKSXMLForm :: readData (QXmlStreamReader* reader)
 {
-    qDebug () << __PRETTY_FUNCTION__;
+    qDebug () << __PRETTY_FUNCTION__ << QString ("Reading data");
     if (!reader)
         return;
+    QXmlStreamReader::TokenType tType;
+    for (tType = reader->readNext (); 
+         tType != QXmlStreamReader::EndElement
+            && reader->name ().toString().compare ("body", Qt::CaseInsensitive) != 0;
+         tType=reader->readNext ())
+    {
+        qDebug () << __PRETTY_FUNCTION__ << QString ("Reading data");
+    }
 }

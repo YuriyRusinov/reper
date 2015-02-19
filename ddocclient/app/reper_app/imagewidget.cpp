@@ -84,6 +84,7 @@ void ImageWidget :: init (void)
     lRImage->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
     lRImage->setScaledContents(true);
     scImArea->setWidget (lRImage);
+    scImArea->setWidgetResizable (true);
 
     grLay->addWidget (scImArea, 0, 0, 5, 1);
 
