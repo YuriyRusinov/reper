@@ -1,8 +1,7 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     07.10.2014 16:44:02                          */
+/* Created on:     29.01.2015 17:18:15                          */
 /*==============================================================*/
-
 
 /*==============================================================*/
 /* Table: root_table                                            */
@@ -2674,7 +2673,8 @@ create table message_journal (
    receive_datetime     TIMESTAMP            null,
    read_datetime        TIMESTAMP            null,
    message_body         VARCHAR              null,
-   is_outed             BOOL                 not null default true,
+   is_outed             int4                 not null default 3
+      constraint CKC_IS_OUTED_MESSAGE_ check (is_outed in (0,1,2,3)),
    extra_id             int4                 null,
    input_number         VARCHAR              not null,
    output_number        VARCHAR              not null,
@@ -2707,6 +2707,30 @@ comment on column message_journal.read_datetime is
 comment on column message_journal.message_body is
 'Тело сообщения. Не обязательное поле.
 Может содержать неформализованный текст';
+
+comment on column message_journal.is_outed is
+'Флаг, указывающий на то, что сообщение отправлено получателю.
+Поле используется следующим образом
+0 - не отправлено
+1 - отправлена информация о получении
+2 - отправлена информация о прочтении
+3 - отправка не требуется
+
+Если исходящее сообщение (т.е. пользователь инициировавший вставку не jupiter) 
+предназначено локальному ДЛ данной БД, то считается что отправка не требуется is_outed = 3
+
+Если оно предназначено удаленному ДЛ, то оно считается не отправленным. (is_outed = 0)
+В этом случае kksinteractor его отправит получателю и после его успешной доставки выставит этому полю значение 3
+
+Если сообщение является входящим и отправителем является удаленное ДЛ, то is_outed = 0
+В этом случае kksinteractor отправит квитанцию отправителю о времени доставки сообщения.
+После успешной доставки квитанции is_outed будет выставлено в 1.
+
+Если  сообщение является входящим и отправителем является удаленное ДЛ и получатель отметил сообщение как прочитанное, то 
+в этом случае kksinteractor отправит квитанцию отправителю о времени прочтения сообщения.
+После успешной доставки квитанции is_outed будет выставлено в 2.
+
+Во всех остальных случаях is_outed = 3. ';
 
 comment on column message_journal.extra_id is
 'служебное поле.
@@ -2941,6 +2965,26 @@ create table news_config (
 );
 
 /*==============================================================*/
+/* Table: notify_where                                          */
+/*==============================================================*/
+create table notify_where (
+   id                   SERIAL               not null,
+   name                 VARCHAR              not null,
+   constraint PK_NOTIFY_WHERE primary key (id)
+)
+inherits (root_table);
+
+comment on table notify_where is
+'Когда квитанция должна генерироваться
+1 - INSERT
+2 - UPDATE
+3 - DELETE
+Используется в справочнике асинхронных квитанций в виде атрибута типа старые чекбоксы';
+
+select setMacToNULL('notify_where');
+select createTriggerUID('notify_where');
+
+/*==============================================================*/
 /* Table: object_ref_tables                                     */
 /*==============================================================*/
 create table object_ref_tables (
@@ -3150,7 +3194,7 @@ create table organization_type (
 inherits (root_table);
 
 comment on table organization_type is
-'Тип организации (стационарный, мобильный)';
+'Тип организации (стационарный, мобильный, внешняя унаследованная система)';
 
 select setMacToNULL('organization_type');
 select createTriggerUID('organization_type');
@@ -3195,7 +3239,12 @@ comment on column out_external_queue.id_format is
 'При помощи какого формата представлять данные';
 
 comment on column out_external_queue.id_io_object is
-'Какой информационный рескрс передавать';
+'Какой информационный ресурс передавать.
+
+При этом если передается сообщение из message_journal, 
+то сюда должен быть записан идентификатор ИО "Журнал сообщений" (ИД=20), 
+а в поле id_entity должен быть записан идентификатор сообщения. 
+Но это в том случае, если к сообщению не прикреплен ИО';
 
 comment on column out_external_queue.id_entity is
 'Если указано значение, то передается не сам информационный ресурс, а запись его справочника (для информационных ресурсов, являющихся справочниками)';
@@ -4240,6 +4289,56 @@ create table system_table (
 select setMacToNULL('system_table');
 
 /*==============================================================*/
+/* Table: table_notifies                                        */
+/*==============================================================*/
+create table table_notifies (
+   id                   SERIAL               not null,
+   name                 VARCHAR              not null,
+   notify_where         int4[]               not null,
+   description          VARCHAR              null,
+   constraint PK_TABLE_NOTIFIES primary key (id)
+)
+inherits (root_table);
+
+comment on table table_notifies is
+'Справочник асинхронных квитанций, генерируемых сервером при создании, узменении и удалении тех или инх записей в справочниках (notify).
+Название асинхронной квитанции должно быть уникальным, при этом допустимо генерировать квитанцию с одним именем для разных справочников.
+Перечень справочников, для которых генерируется квитанция, задается в таблице table_notifies_io_objects (многие-ко-многим).
+Асинхронная квитанция генерируется следующим образом
+pg_notify(notify_name, payload)
+payload формируется следующим образом:
+tableName + ''~_~_~'' + idRecord + ''~_~_~'' + recordUniqueId + ''~_~_~'' +whatHappens
+whatHappens формируется следующим образом:
+1 - выполнена операция создания новой записи
+2 - выполнена операция изменения записи
+3 - выполнена операция удаления записи';
+
+comment on column table_notifies.name is
+'Название квитанции. Должно быть уникальным';
+
+comment on column table_notifies.notify_where is
+'Когда отправляется квитанция (старые чекбоксы)';
+
+select setMacToNULL('table_notifies');
+select createTriggerUID('table_notifies');
+
+/*==============================================================*/
+/* Index: i_u_table_notify_name                                 */
+/*==============================================================*/
+create unique index i_u_table_notify_name on table_notifies (
+name
+);
+
+/*==============================================================*/
+/* Table: table_notifies_io_objects                             */
+/*==============================================================*/
+create table table_notifies_io_objects (
+   id_table_notifies    INT4                 not null,
+   id_io_objects        INT4                 not null,
+   constraint PK_TABLE_NOTIFIES_IO_OBJECTS primary key (id_table_notifies, id_io_objects)
+);
+
+/*==============================================================*/
 /* Table: time_units                                            */
 /*==============================================================*/
 create table time_units (
@@ -5159,7 +5258,7 @@ alter table chains_data
       on delete restrict on update restrict;
 
 alter table chains_data
-   add constraint FK_CHAINS_D_REF_PROCESSING_VARIANT foreign key (id_processing_variant)
+   add constraint FK_CHAINS_D_PROC_VARIANT foreign key (id_processing_variant)
       references processing_variant (id)
       on delete restrict on update restrict;
 
@@ -5544,12 +5643,12 @@ alter table log
       on delete restrict on update restrict;
 
 alter table logistic
-   add constraint FK_LOGICTIC_REF_PROCESSING_SCENARIO foreign key (id_processing_scenario)
+   add constraint FK_LOGICTIC_PROC_SCENARIO foreign key (id_processing_scenario)
       references processing_scenario (id)
       on delete restrict on update restrict;
 
 alter table logistic
-   add constraint FK_LOGICTIC_REF_PROCESSING_VARIANT foreign key (id_processing_variant)
+   add constraint FK_LOGICTIC_PROC_VARIANT foreign key (id_processing_variant)
       references processing_variant (id)
       on delete restrict on update restrict;
 
@@ -5609,17 +5708,17 @@ alter table message_series
       on delete restrict on update restrict;
 
 alter table message_streams
-   add constraint FK_MESSAGE_STREAMS__REF_PARTITION foreign key (id_partition_low)
+   add constraint FK_MESSAGE_STREAMS_PART_LOWS foreign key (id_partition_low)
       references partition_lows (id)
       on delete restrict on update restrict;
 
 alter table message_streams
-   add constraint FK_MESSAGE_STREAMS__REF_IO_OBJEC foreign key (id_io_object)
+   add constraint FK_MESSAGE_STREAMS_IO_OBJECTS foreign key (id_io_object)
       references io_objects (id)
       on delete restrict on update restrict;
 
 alter table message_streams
-   add constraint FK_MESSAGE_STREAMS__REF_POSITION foreign key (id_dl_receiver)
+   add constraint FK_MESSAGE_STREAMS_POSITION foreign key (id_dl_receiver)
       references "position" (id)
       on delete restrict on update restrict;
 
@@ -5931,6 +6030,16 @@ alter table state_crosses
 alter table state_crosses
    add constraint FK_STATE_CR_REFERENCE_LIFE_CYC foreign key (id_life_cycle)
       references life_cycle (id)
+      on delete restrict on update restrict;
+
+alter table table_notifies_io_objects
+   add constraint FK_TABLE_NO_REFERENCE_TABLE_NO foreign key (id_table_notifies)
+      references table_notifies (id)
+      on delete restrict on update restrict;
+
+alter table table_notifies_io_objects
+   add constraint FK_TABLE_NO_REFERENCE_IO_OBJEC foreign key (id_io_objects)
+      references io_objects (id)
       on delete restrict on update restrict;
 
 alter table tsd

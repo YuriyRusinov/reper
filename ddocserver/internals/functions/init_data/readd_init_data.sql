@@ -1,6 +1,7 @@
 \i ./functions/init_data/system_table.sql
 \i ./functions/init_data/errors.sql
 \i ./functions/init_data/ranks.sql
+\i ./functions/init_data/notify_where.sql
 \i ./functions/init_data/maclabels.sql
 \i ./functions/init_data/mimetypes.sql
 \i ./functions/init_data/organization_types.sql

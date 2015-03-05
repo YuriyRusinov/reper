@@ -211,6 +211,7 @@ begin
 
     rTable := mainTable || '_' || aTableName;
     if (rTable = 'organization_work_mode' or 
+        rTable = 'table_notifies_io_objects' or
         rTable = 'position_work_mode' or 
         rTable = 'units_work_mode' or 
         rTable = 'io_objects_organization') 

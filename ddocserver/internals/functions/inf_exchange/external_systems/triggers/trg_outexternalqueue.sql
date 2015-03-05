@@ -7,7 +7,7 @@ begin
         return new;
     end if;
 
-    insert into in_external_queue (id_organization, id_format, in_data, interaction_type, interaction_result) values(new.id_organization, new.id_format, new.out_data, new.interaction_type, 1);
+    insert into in_external_queue (id_organization, id_format, in_data, interaction_type, interaction_result, id_external) values(new.id_organization, new.id_format, new.out_data, new.interaction_type, 1, new.id);
 
     return new;
 end

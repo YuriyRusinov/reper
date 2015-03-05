@@ -35,6 +35,10 @@ begin
         new.id_format = 2;
     end if;
 
+    if(new.id_external isnull) then
+        new.id_external = -1;
+    end if;
+
     return new;
 end
 $BODY$

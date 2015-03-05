@@ -68,6 +68,7 @@ begin
                 rTable := ref_table_name || '_' || rr.table_name;
                 raise warning 'attr table is %', rTable;
                 if (rTable = 'organization_work_mode' or 
+                    rTable = 'table_notifies_io_objects' or
                     rTable = 'position_work_mode' or 
                     rTable = 'units_work_mode' or 
                     rTable = 'io_objects_organization' or 
