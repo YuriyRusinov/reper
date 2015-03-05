@@ -216,6 +216,7 @@ const int ATTR_RR_NAME = 378;
 //названия для переходных таблиц некоторых системных справочников
 //имеющих атрибут типа atCheckListEx
 #define ORGANIZATION_WORK_MODE "organization_work_mode"
+#define TABLE_NOTIFIES_IO_OBJECTS "table_notifies_io_objects"
 #define LIFE_CYCLE_IO_STATES "life_cycle_io_states"
 #define IO_PROCESSING_ORDER_CHAINS "io_processing_order_chains"
 #define UNITS_WORK_MODE "units_work_mode"

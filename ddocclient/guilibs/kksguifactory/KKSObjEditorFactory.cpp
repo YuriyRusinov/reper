@@ -375,7 +375,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
         tabObj->addTab (sysAttrTabWidget, tr ("Attributes"));
     }
 
-    if (wObjE->io()->id() >= 300)
+    if (wObjE && wObjE->io()->id() >= 300)
         this->putRubricator(wObjE, objEditorWidget, tabObj);
 
     QScrollArea *scSysAttrs = new QScrollArea (sysAttrTabWidget);
@@ -615,7 +615,9 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
         QGridLayout *gFilesLay = new QGridLayout ();
         filesW->setLayout (gFilesLay);
         KKSList<KKSFileType*> fileTypes = loader->loadFileTypes();
-        KKSList<KKSFile*> files = wObjE->files();
+        KKSList<KKSFile*> files;
+        if(wObjE)
+            files = wObjE->files();
         KKSFileWidget * W = new KKSFileWidget(edsPlugin, files, fileTypes, false);
         connect(W, SIGNAL(downloadFile(KKSFile*, QWidget *)), this, SLOT(slotDownloadFile(KKSFile*, QWidget*)));
         objEditorWidget->addFileWidget (W);
@@ -631,7 +633,7 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
     }
 
     //системные параметры для записей пользовательских справочников
-	if(!io && wObjE->io()->id() > _MAX_SYS_IO_ID_ ){
+	if(!io && wObjE && wObjE->io()->id() > _MAX_SYS_IO_ID_ ){
         this->putSystemParams(wObjE, objEditorWidget, tabObj, tabObj->count());
     }
 
@@ -8263,23 +8265,24 @@ void KKSObjEditorFactory :: loadObjCAttrRef (KKSObjectExemplar * wObjE,
     }
 
     KKSObjEditor * wEditor = qobject_cast<KKSObjEditor *>(this->sender());
-    KKSList<const KKSFilterGroup*> filters;
     KKSCategory * ct = c->tableCategory ();
     if (!ct){
         refObj->release();
         return;
     }
 
-    QStringList sl;
-    for (int i=0; i<sMod->rowCount(); i++)
-        sl << QString::number (sMod->data (sMod->index (i, 0), Qt::UserRole).toInt());
+    //
+    //добавляем требуемые фильтры
+    //
 
-    QString value = sl.isEmpty() ? QString ("select id from %1").arg (tableName) : QString ("select id from %1 where id not in (%2)").arg (tableName).arg (sl.join (","));
-    
     KKSList<const KKSFilter*> fl;
+    KKSList<const KKSFilterGroup*> filters;
+
+    
+    //если открывавем справочник организаций - исключим локальную
     if (refObj->id() == IO_ORG_ID)
     {
-        QString orgValue = QString("select id from organization where id != getLocalOrgId()");
+        QString orgValue = QString("select id from organization where id <> getLocalOrgId()");
         const KKSFilter * fOrg = ct->createFilter (ATTR_ID, orgValue, KKSFilter::foInSQL);
         if (!fOrg){
             refObj->release();
@@ -8289,6 +8292,14 @@ void KKSObjEditorFactory :: loadObjCAttrRef (KKSObjectExemplar * wObjE,
         fl.append (fOrg);
         fOrg->release ();
     }
+
+    //Исключим из результирующего списка записи, уже добавленные в качестве значения атрибута многие-ко-многим
+    QStringList sl;
+    for (int i=0; i<sMod->rowCount(); i++)
+        sl << QString::number (sMod->data (sMod->index (i, 0), Qt::UserRole).toInt());
+
+    QString value = sl.isEmpty() ? QString ("select id from %1").arg (tableName) : QString ("select id from %1 where id not in (%2)").arg (tableName).arg (sl.join (","));
+
     const KKSFilter * f = ct->createFilter (ATTR_ID, value, KKSFilter::foInSQL);
     if (!f){
         refObj->release();
@@ -8296,8 +8307,19 @@ void KKSObjEditorFactory :: loadObjCAttrRef (KKSObjectExemplar * wObjE,
     }
     fl.append (f);
     f->release ();
-    KKSFilterGroup * fg = new KKSFilterGroup (true);
+
+    //добавим фильтры, которые заданы в качестве поискового шаблона непосредственно самого атрибута типа ссылка на набор элементов справочника
+    const KKSSearchTemplate * st = avE->attribute()->searchTemplate();
+    if(st){
+        KKSFilterGroup * g = st->getMainGroup();
+        if(g)
+            filters.append(g);
+    }
+
+    KKSFilterGroup * fg = new KKSFilterGroup (true); //создадим группу фильтров типа AND
+
     fg->setFilters (fl);
+
     filters.append (fg);
     fg->release ();
 

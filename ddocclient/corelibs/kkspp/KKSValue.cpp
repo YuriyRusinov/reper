@@ -904,7 +904,8 @@ QString KKSValue::valueForInsert() const
         escVal.append ("'");
         return escVal;
     }
-    else if (a_type == KKSAttrType::atBinary)
+    else if (a_type == KKSAttrType::atBinary || 
+             a_type == KKSAttrType::atVideo)
     {
         QByteArray sVal (m_value.toByteArray());
         int nc = sVal.length();

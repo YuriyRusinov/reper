@@ -966,7 +966,8 @@ int KKSPPFactory::insertAttrValues(const KKSObject * io) const
             //для них названия переходных таблиц являются жестко заданными при генерации БД
             QString rTable = "io_object_" + a->tableName();
             QString refTable;
-            if(rTable == ORGANIZATION_WORK_MODE || 
+            if(rTable == ORGANIZATION_WORK_MODE ||
+               rTable == TABLE_NOTIFIES_IO_OBJECTS ||
                rTable == POSITION_WORK_MODE || 
                rTable == UNITS_WORK_MODE ||
                rTable == IO_OBJECTS_ORGANIZATION ||
@@ -1116,6 +1117,7 @@ int KKSPPFactory::updateAttrValues(const KKSObject * io) const
             QString rTable = "io_object_" + a->tableName();
             QString refTable;
             if(rTable == ORGANIZATION_WORK_MODE || 
+               rTable == TABLE_NOTIFIES_IO_OBJECTS || 
                rTable == POSITION_WORK_MODE || 
                rTable == UNITS_WORK_MODE ||
                rTable == IO_OBJECTS_ORGANIZATION ||

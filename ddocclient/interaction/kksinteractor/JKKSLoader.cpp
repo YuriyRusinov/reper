@@ -375,7 +375,7 @@ QList<JKKSPMessWithAddr *> JKKSLoader :: readOutXML(QStringList & receivers) con
             addr.setPort(res->getCellAsInt(i, 6));
             addr.setUseGateway(res->getCellAsBool(i, 8));
 
-            JKKSXMLMessage xml(res->getCellAsInt64 (i, 1),//id
+            JKKSXMLMessage xml(res->getCellAsInt64 (i, 1),//id (на входном конце должно стать id_external)
                                res->getCellAsInt(i, 2),//id_format
                                res->getCellAsInt (i, 3),//id_organization
                                res->getCellAsInt(i, 4),//interaction_type
@@ -813,8 +813,9 @@ int JKKSLoader :: writeXMLMessage (const QString & xml) const
         int idFormat = 3; //в справочнике interaction_formats
         int interactionType = 2;//пока всегда ставим так
         int idOrganizationFrom = getLocalOrgId(); //временно
+        int idExternal = -1; //временно
 
-        QString sql = QString("select insertIncomeXML(%1, %2, %3, '%4')").arg(idFormat).arg(interactionType).arg(idOrganizationFrom).arg(xml);
+        QString sql = QString("select insertIncomeXML(%1, %2, %3, '%4', %5)").arg(idFormat).arg(interactionType).arg(idOrganizationFrom).arg(xml).arg(idExternal);
         KKSResult * res = dbWrite->execute(sql);
         if(!res || res->getRowCount() != 1 || res->getCellAsInt(0, 0) < 0){
             kksCritical() << QObject::tr("Cannot insert xml data to database! SQL = %1").arg(sql);
@@ -846,8 +847,9 @@ int JKKSLoader :: writeXMLMessage (const QString & xml) const
         int idFormat = 1; //в справочнике interaction_formats
         int interactionType = 2;//пока всегда ставим так
         int idOrganizationFrom = getLocalOrgId(); //временно
+        int idExternal = -1; //временно
 
-        QString sql = QString("select insertIncomeXML(%1, %2, %3, '%4')").arg(idFormat).arg(interactionType).arg(idOrganizationFrom).arg(xml);
+        QString sql = QString("select insertIncomeXML(%1, %2, %3, '%4', %5)").arg(idFormat).arg(interactionType).arg(idOrganizationFrom).arg(xml).arg(idExternal);
         KKSResult * res = dbWrite->execute(sql);
         if(!res || res->getRowCount() != 1 || res->getCellAsInt(0, 0) < 0){
             kksCritical() << QObject::tr("Cannot insert xml data to database! SQL = %1").arg(sql);

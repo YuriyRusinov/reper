@@ -1095,6 +1095,7 @@ KKSObjectExemplar * KKSLoader::loadEIO(qint64 id,
             QString rTable = tableName + "_" + attr->tableName();
             QString refTable;
             if(rTable == ORGANIZATION_WORK_MODE || 
+               rTable == TABLE_NOTIFIES_IO_OBJECTS ||
                rTable == POSITION_WORK_MODE || 
                rTable == UNITS_WORK_MODE ||
                rTable == IO_OBJECTS_ORGANIZATION ||

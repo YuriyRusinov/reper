@@ -1941,7 +1941,7 @@ QWidget * KKSAttributesFactory :: createMapWidget (const KKSAttrValue * av,
     connect(attrWidget, SIGNAL(deleteEIOList(QWidget *, const QString &, const QList<qint64> &)), m_oef, SLOT(slotDeleteEIOList(QWidget *, const QString &, const QList<qint64> &)));//запрос на удаление набора объектов карты, которые являются записями в справочнике DynamicDocs. 
     
     //связь для автоматического обновления карты при изменении данных в БД (ловим notify)
-    connect(loader, SIGNAL(databaseNotifyReceived(const QString &, const QString &, const QString &)), attrWidget, SLOT(slotUpdateMapByNotify(const QString &, const QString &, const QString &)));
+    connect(loader, SIGNAL(databaseNotifyReceived(const QString&, const QString&, const QString&)), attrWidget, SLOT(slotUpdateMapByNotify(const QString&, const QString&, const QString&)));
 
     attrWidget->init();
 

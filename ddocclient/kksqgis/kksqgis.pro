@@ -5,5 +5,5 @@ include(../ddocclient.conf)
 qgis{
 
 SUBDIRS += \
-            ./kksqgis 
+            ./kksqgis26 
 }

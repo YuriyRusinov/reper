@@ -49,8 +49,8 @@ KKSMapWidget::~KKSMapWidget()
 {
     if(m_legendWidget && m_layerOrderWidget){
 #ifdef __USE_QGIS__
-        QWidget * legend = this->mapLegendWidget();
-        legend->setParent(NULL);
+        //ksa QWidget * legend = this->mapLegendWidget();
+        //ksa legend->setParent(NULL);
 #endif
         emit aboutToDestroy(m_legendWidget, m_layerOrderWidget);
     }
@@ -116,11 +116,11 @@ void KKSMapWidget::initQGIS()
     
     QHBoxLayout * mpToolBarLayout = new QHBoxLayout();
     QMap<QString, QToolBar *> mpToolBars = toolBarMap();
-    mpToolBarLayout->addWidget(mpToolBars.value("mpMapToolBar"));
-    mpToolBarLayout->addWidget(mpToolBars.value("mpDataSourceToolBar"));
-    mpToolBarLayout->addWidget(mpToolBars.value("mpToolsToolBar"));
-    mpToolBarLayout->addWidget(mpToolBars.value("mpLayerToolBar"));
-    mpToolBarLayout->addWidget(mpToolBars.value("mpLayerEditsToolBar"));
+    mpToolBarLayout->addWidget(mpToolBars.value("mFileToolBar"));
+    mpToolBarLayout->addWidget(mpToolBars.value("mMapNavToolBar"));
+    mpToolBarLayout->addWidget(mpToolBars.value("mLayerToolBar"));
+    mpToolBarLayout->addWidget(mpToolBars.value("mDigitizeToolBar"));
+    mpToolBarLayout->addWidget(mpToolBars.value("mAttributesToolBar"));
     QSpacerItem * sp = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
     mpToolBarLayout->addSpacerItem(sp);
     
@@ -138,7 +138,13 @@ void KKSMapWidget::initQGIS()
     mpMapLayout->setMargin(0);
 
 
-    QWidget * legend = this->mapLegendWidget();
+    m_legendWidget = this->mapLegendDockWidget();
+    if(m_legendWidget){
+        //m_legendWidget->setParent(this);
+    }
+
+    //ksa
+    /*
     if(legend){
         m_legendWidget = new QDockWidget( tr( "Layers" ), this );
         m_legendWidget->setObjectName( "Legend" );
@@ -146,8 +152,17 @@ void KKSMapWidget::initQGIS()
         m_legendWidget->setWidget( legend );
         //addDockWidget( Qt::LeftDockWidgetArea, mLegendDock );
     }
+    */
+    //ksa
     
-    QWidget * layerOrder = this->mapLayerOrderWidget();
+    m_layerOrderWidget = this->mapLayerOrderDockWidget();
+    if(m_layerOrderWidget){
+        //m_layerOrderWidget->setParent(this);
+        m_layerOrderWidget->hide();
+    }
+    
+    //ksa
+    /*
     if(layerOrder){
         m_layerOrderWidget = new QDockWidget( tr( "Layer order" ), this );
         m_layerOrderWidget->setObjectName( "LayerOrder" );
@@ -156,6 +171,8 @@ void KKSMapWidget::initQGIS()
         //addDockWidget( Qt::LeftDockWidgetArea, mLayerOrderDock );
         m_layerOrderWidget->hide();
     }
+    */
+    //ksa
 
     //setWindowTitle(this->windowTitle());
 

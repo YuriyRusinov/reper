@@ -74,8 +74,9 @@ public slots:
     void slotDeleteFeaturesAsEIO(QWidget * parent, const QString & tableName, const QList<qint64> & ids);
 #endif
 private:
-    QDockWidget * m_legendWidget;
+    QDockWidget * m_legendWidget;  //берутся из QGisApp
     QDockWidget * m_layerOrderWidget;
+
     QString m_GISHomeDir;
     bool m_dataChanged;
     qint64 m_idObj;

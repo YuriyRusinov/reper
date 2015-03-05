@@ -157,6 +157,11 @@ bool KKSFilter::isCorrect() const
             if(m_values.at(0)->value().startsWith("select ", Qt::CaseInsensitive) == false)
                 bCorrect = false;
             break;
+        case foIsNotNull:
+        case foIsNull:
+            if(!this->attribute())
+                bCorrect = false;
+            break;
         default:
             if(m_values.count() != 0)
                 bCorrect = false;

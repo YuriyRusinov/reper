@@ -38,27 +38,29 @@ qgis{
     DEFINES *= __USE_EXPORTS  #for qgis export library
 
     LIBS *= -L$$QGISDIR/lib -lqgis_core -lqgis_gui
-    LIBS *= -L$$DESTDIR -lkksqgis
+    LIBS *= -L$$DESTDIR -l$$KKSQGIS_LIB_NAME
 
     INCLUDEPATH *= \
                    $$OSGEODIR/include \
                    $$OSGEODIR/include/qwt \
                    $$QGISDIR/include/qgis \
                    $$QGISDIR/include \
-                   ../../kksqgis/kksqgis \
-                   ../../kksqgis/kksqgis/layerprops \
-                   ../../kksqgis/kksqgis/legend \
-                   ../../kksqgis/kksqgis/projectprops \
-                   ../../kksqgis/kksqgis/maptools
+                   ../../kksqgis/$$KKSQGIS_DIR \
+                   ../../kksqgis/$$KKSQGIS_DIR/layerprops \
+                   ../../kksqgis/$$KKSQGIS_DIR/legend \
+                   ../../kksqgis/$$KKSQGIS_DIR/projectprops \
+                   ../../kksqgis/$$KKSQGIS_DIR/pluginmanager \
+                   ../../kksqgis/$$KKSQGIS_DIR/maptools
 
-    DEPENDPATH *= ../../kksqgis/kksqgis
+    DEPENDPATH *= ../../kksqgis/$$KKSQGIS_DIR
 
     win32{
-        LIBS *= -L$$OSGEODIR/lib  -lproj_i -lgdal_i -lsqlite3_i
+        LIBS *= -L$$OSGEODIR/lib  -lproj_i -lgdal_i -lsqlite3_i -l$$QWTLIB -l$$QSCI
     }
     else{
-        LIBS *= -L$$OSGEODIR/lib  -lproj -lgdal -lsqlite3
+        LIBS *= -L$$OSGEODIR/lib  -lproj -lgdal -lsqlite3 -l$$QWTLIB -l$$QSCI
     }
+
 }
 
 

@@ -1654,12 +1654,12 @@ void KKSMainWindow::destroyMapDockWidgets(QDockWidget * legend, QDockWidget * la
     if(legend){
         this->removeDockWidget(legend);
         legend->setParent(0);
-        delete legend;
+        //delete legend;
     }
     
     if(layerOrder){
         this->removeDockWidget(layerOrder);
         layerOrder->setParent(0);
-        delete layerOrder;
+        //delete layerOrder;
     }
 }
