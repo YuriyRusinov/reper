@@ -26,3 +26,4 @@
 
 \i ./functions/inf_exchange/organization/readd_organization.sql 
 \i ./functions/inf_exchange/external_systems/readd_external_systems.sql
+\i ./functions/inf_exchange/table_notifies/readd_table_notifies.sql

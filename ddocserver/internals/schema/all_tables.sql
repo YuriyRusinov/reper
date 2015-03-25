@@ -1,7 +1,8 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     29.01.2015 17:18:15                          */
+/* Created on:     25.03.2015 11:28:20                          */
 /*==============================================================*/
+
 
 /*==============================================================*/
 /* Table: root_table                                            */
@@ -1693,6 +1694,7 @@ create table in_external_queue (
    in_data              VARCHAR              not null,
    interaction_type     int4                 not null,
    interaction_result   int4                 not null,
+   id_external          INT8                 not null,
    constraint PK_IN_EXTERNAL_QUEUE primary key (id)
 )
 inherits (root_table);
@@ -1721,6 +1723,9 @@ comment on column in_external_queue.interaction_result is
 1 - Данные только поступили, их обработка еще не начиналась (значение по умолчанию).
 2 - создание информационного ресурса завершилась успешно
 3 - произошла ошибка при создании информационного ресурса в БД';
+
+comment on column in_external_queue.id_external is
+'Идентификатор в таблице исходящей очереди системы-отправителя данного пакета';
 
 select setMacToNULL('in_external_queue');
 select createTriggerUID('in_external_queue');
@@ -2962,6 +2967,47 @@ create table news_config (
    c_top                int                  not null,
    c_bottom             int                  not null,
    constraint PK_NEWS_CONFIG primary key (id)
+);
+
+/*==============================================================*/
+/* Table: notify_routing                                        */
+/*==============================================================*/
+create table notify_routing (
+   id                   SERIAL               not null,
+   id_notify            INT4                 not null,
+   id_subsystem         INT4                 not null,
+   name                 VARCHAR              not null,
+   description          VARCHAR              null,
+   constraint PK_NOTIFY_ROUTING primary key (id)
+)
+inherits (root_table);
+
+comment on table notify_routing is
+'Справочник маршрутизации асинхронных квитанций.
+Определяет, в какие подсистемы должны уйти те или иные асинхронные квитанции.
+В комплексе с подсистемой обработки ИО в очередях позволяет организовать оркестровку порядка обработки данных различными интегрируемыми подсистемами';
+
+comment on column notify_routing.id_notify is
+'Какое событие (квитанция) должна быть отправлена';
+
+comment on column notify_routing.id_subsystem is
+'В какую подсистему должна уйти квитанция';
+
+comment on column notify_routing.name is
+'Наименование сообщения';
+
+comment on column notify_routing.description is
+'Комментарии';
+
+select setMacToNULL('notify_routing');
+select createTriggerUID('notify_routing');
+
+/*==============================================================*/
+/* Index: u_i_notify_routing                                    */
+/*==============================================================*/
+create unique index u_i_notify_routing on notify_routing (
+id_notify,
+id_subsystem
 );
 
 /*==============================================================*/
@@ -4337,6 +4383,74 @@ create table table_notifies_io_objects (
    id_io_objects        INT4                 not null,
    constraint PK_TABLE_NOTIFIES_IO_OBJECTS primary key (id_table_notifies, id_io_objects)
 );
+
+/*==============================================================*/
+/* Table: table_notifies_log                                    */
+/*==============================================================*/
+create table table_notifies_log (
+   id                   BIGSERIAL            not null,
+   notify_name          VARCHAR              not null,
+   id_user              INT4                 not null,
+   user_name            VARCHAR              not null,
+   id_position          INT4                 not null,
+   position_name        VARCHAR              not null,
+   id_org               INT4                 not null,
+   org_name             VARCHAR              not null,
+   table_name           VARCHAR              not null,
+   id_record            INT8                 not null,
+   what_happens         INT4                 not null,
+   invocation_datetime  TIMESTAMP            not null,
+   constraint PK_TABLE_NOTIFIES_LOG primary key (id)
+)
+inherits (root_table);
+
+comment on table table_notifies_log is
+'Журнал истории возникновения асинхронных квитанций
+Каждый раз, когда генерируется асинхронная квитанция, информация об этом записывается в данный справочник.
+Далее информацию по квитанции с заданным идентификатором можно получить, вызвав специальную функцию getTableNotify(int8)
+
+Замечания: 
+1) колонки-идентификаторы пользователя, должности , подсистемы специально сделаны без ссылочной целостности, чтобы не зависеть от изменения данных в соответствующих справочниках.
+2) Сюда намеренно не добавлена ссылка на таблицу table_notifies, поскольку присутствует поле "название квитанции". Оно объявлено уникальным в таблице table_notifies, поэтому мы всегда можем идентифицировать нужную нам квитанцию, если она не была удалена из table_notifies';
+
+comment on column table_notifies_log.notify_name is
+'Название сгенерированной квитанции';
+
+comment on column table_notifies_log.id_user is
+'Идентификатор пользователя, действия которого привели к генерации квитанции';
+
+comment on column table_notifies_log.user_name is
+'Имя этого пользователя';
+
+comment on column table_notifies_log.id_position is
+'Должностное лицо, в рамках полномочий которого действовал данный пользователь';
+
+comment on column table_notifies_log.position_name is
+'Название этого должностного лица';
+
+comment on column table_notifies_log.id_org is
+'Идентификатор подсистемы, которой принадлежит пользователь (подразделение)';
+
+comment on column table_notifies_log.org_name is
+'Название данной подсистемы (подразделение)';
+
+comment on column table_notifies_log.table_name is
+'Название таблицы, действие над которой привело к генерации квитанции';
+
+comment on column table_notifies_log.id_record is
+'Идентификатор записи, над которой производились действия';
+
+comment on column table_notifies_log.what_happens is
+'Что за действие производилось
+1 - INSERT
+2 - UPDATE
+3 - DELETE';
+
+comment on column table_notifies_log.invocation_datetime is
+'Когда была сгенерирована квитанция';
+
+select setMacToNULL('table_notifies_log');
+select createTriggerUID('table_notifies_log');
 
 /*==============================================================*/
 /* Table: time_units                                            */
@@ -5740,6 +5854,16 @@ alter table message_streams
 alter table message_streams
    add constraint FK_MESSAGE__REF_VARIANT foreign key (id_processing_variant)
       references processing_variant (id)
+      on delete restrict on update restrict;
+
+alter table notify_routing
+   add constraint FK_NOTIFY_R_REFERENCE_TABLE_NO foreign key (id_notify)
+      references table_notifies (id)
+      on delete restrict on update restrict;
+
+alter table notify_routing
+   add constraint FK_NOTIFY_R_REFERENCE_UNITS foreign key (id_subsystem)
+      references units (id)
       on delete restrict on update restrict;
 
 alter table object_ref_tables

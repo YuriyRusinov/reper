@@ -19,6 +19,7 @@
 \i ./functions/io_objects/triggers/trgcheckforowner.sql
 \i ./functions/io_objects/triggers/trgchecktableforowner.sql
 \i ./functions/io_objects/triggers/trgnotifygislayer.sql
-\i ./functions/io_objects/triggers/trgcreatenotify.sql
+
+--\i ./functions/io_objects/triggers/trgcreatenotify.sql --moved to inf_exchange/table_notifies/triggers
 
 --\i ./functions/io_objects/triggers/logging/readd_logging.sql

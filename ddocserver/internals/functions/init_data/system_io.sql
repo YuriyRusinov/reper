@@ -816,6 +816,21 @@ insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main
 insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
 values(239, -10, true, true, false, false, true);
 
+insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values ('localorg-categories-240', 240, 10, NULL, false, 'Асинхронные квитанции (история)', 'SYSCATEGORY_240', NULL::varchar, true, true, 1);
+insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
+values(240, -10, true, true, false, false, true);
+insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values ('localorg-categories-241', 241, 8, 240, true, 'Журнал асинхронных квитанций (история)', 'SYSCATEGORY_241', NULL::varchar, true, true, 1);
+insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
+values(241, -10, true, true, false, false, true);
+
+insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values ('localorg-categories-242', 242, 10, NULL, false, 'Таблица маршрутизации асинхронных квитанций', 'SYSCATEGORY_242', NULL::varchar, true, true, 1);
+insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
+values(242, -10, true, true, false, false, true);
+insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values ('localorg-categories-243', 243, 8, 242, true, 'Справочник маршрутизации асинхронных квитанций', 'SYSCATEGORY_243', NULL::varchar, true, true, 1);
+insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
+values(243, -10, true, true, false, false, true);
+
+
 SELECT pg_catalog.setval('io_categories_id_seq', 300, true); --все пользовательские категории будут начинаться с номера 301
                                                              --это сделано для того, чтобы оставить резерв для системных категорий 
 
@@ -1291,6 +1306,20 @@ insert into attributes (unique_id, id, id_a_type, code, name, title, table_name,
 
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-385', 385, 12, 'notify_where', 'Условия генерации квитанции', 'Условия генерации квитанции', 'notify_where', 'name', 100, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-386', 386, 17, 'table_notifies_io_objects', 'Справочники, для которых генерируется квитанция', 'Справочники, для которых генерируется квитанция', 'io_objects', 'name', 200, TRUE);
+
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-387', 387, 8, 'what_happens', 'Событие (INSERT, UPDATE, DELETE)', 'Событие (INSERT, UPDATE, DELETE)', NULL, NULL, 100, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-388', 388, 8, 'id_org', 'ИД подсистемы', 'ИД подсистемы', NULL, NULL, 100, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-389', 389, 9, 'org_name', 'Название подсистемы', 'Название подсистемы', NULL, NULL, 300, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-390', 390, 9, 'position_name', 'Название должности', 'Название должности', NULL, NULL, 300, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-391', 391, 8, 'id_position', 'ИД должности', 'ИД должности', NULL, NULL, 100, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-392', 392, 9, 'user_name', 'Имя пользователя', 'Имя пользователя', NULL, NULL, 300, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-393', 393, 8, 'id_user', 'ИД пользователя', 'ИД пользователя', NULL, NULL, 100, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-394', 394, 9, 'notify_name', 'Название квитанции', 'Название квитанции', NULL, NULL, 300, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-395', 395, 37, 'invocation_datetime', 'Момент генерации квитанции', 'Момент генерации квитанции', NULL, NULL, 120, TRUE);
+
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-396', 396, 2, 'id_notify', 'Квитанция для отправки', 'Квитанция для отправки', 'table_notifies', 'name', 300, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-397', 397, 2, 'id_subsystem', 'В какую подсистему должна уйти', 'В какую подсистему должна уйти', 'units', 'name', 300, TRUE);
+
 
 
 SELECT pg_catalog.setval('attributes_id_seq', 1000, true); --все пользовательские атрибуты будут начинаться с номера 1001
@@ -2503,6 +2532,26 @@ insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (706, 238, 386, NULL, false, false); --table_notifies_io_objects
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (707, 238, 3, NULL, false, false);  --description
 
+--таблица журнала асинхронных квитанций (история)
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (708, 240, 1, NULL, true, true); --id
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (709, 240, 394, NULL, true, true); --notify_name
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (710, 240, 393, NULL, true, true); --id_user
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (711, 240, 392, NULL, true, true); --user_name
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (712, 240, 391, NULL, true, true); --id_position
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (713, 240, 390, NULL, true, true); --position_name
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (714, 240, 388, NULL, true, true); --id_org
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (715, 240, 389, NULL, true, true); --org_name
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (716, 240, 8, NULL, true, true); --table_name
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (717, 240, 330, NULL, true, true); --id_record
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (718, 240, 387, NULL, true, true); --what_happens
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (719, 240, 395, NULL, true, true); --invocation_datetime
+
+--таблица справочника маршрутизации асинхронных квитанций
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (720, 242, 1, NULL, true, true); --id
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (721, 242, 2, NULL, true, false); --name
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (722, 242, 396, NULL, true, false); --id_notify
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (723, 242, 397, NULL, true, false); --id_subsystem
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (724, 242, 3, NULL, false, false); --description
 
 
 SELECT pg_catalog.setval('attrs_categories_id_seq', 2000, true); --все пользовательские атрибуты в категориях будут начинаться с номера 2001
@@ -3087,6 +3136,16 @@ insert into tbl_io_objects (unique_id, id, id_io_category, author, id_io_state, 
 values ('localorg-io_objects-117', 117, 239, 1, 1, 'Справочник асинхронных квитанций для справочников', 'table_notifies', NULL, 'Системный объект', true, true, 5, current_timestamp, 1, NULL, 3);
 insert into access_table (id_io_object, id_role, allow_readlist, allow_read, allow_delete, allow_update)
 values (117, -10, TRUE, TRUE, FALSE, FALSE);
+
+insert into tbl_io_objects (unique_id, id, id_io_category, author, id_io_state, name, table_name, description, information, is_system, is_global, id_sync_type, insert_time, id_maclabel, id_owner_org, id_io_type)
+values ('localorg-io_objects-118', 118, 241, 1, 1, 'Журнал асинхронных квитанций (история)', 'table_notifies_log', NULL, 'Системный объект', true, true, 5, current_timestamp, 1, NULL, 3);
+insert into access_table (id_io_object, id_role, allow_readlist, allow_read, allow_delete, allow_update)
+values (118, -10, TRUE, TRUE, FALSE, FALSE);
+
+insert into tbl_io_objects (unique_id, id, id_io_category, author, id_io_state, name, table_name, description, information, is_system, is_global, id_sync_type, insert_time, id_maclabel, id_owner_org, id_io_type)
+values ('localorg-io_objects-119', 119, 243, 1, 1, 'Справочник маршрутизации асинхронных квитанций', 'notify_routing', NULL, 'Системный объект', true, true, 5, current_timestamp, 1, NULL, 3);
+insert into access_table (id_io_object, id_role, allow_readlist, allow_read, allow_delete, allow_update)
+values (119, -10, TRUE, TRUE, FALSE, FALSE);
 
 SELECT pg_catalog.setval('tbl_io_objects_id_seq', 300, true); --все пользовательские информационные объекты будут начинаться с номера 301
                                                               --это сделано для того, чтобы оставить резерв для системных ИО

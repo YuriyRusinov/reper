@@ -7,7 +7,7 @@ declare
     tableName varchar;
     recordUniqueId varchar;
     idRecord int8;
-    whatHappens int2;
+    whatHappens int4;
 
     notifyName varchar;
     payload varchar;
@@ -40,7 +40,10 @@ begin
         whatHappens := 3; --updated EIO
     end if;
 
-    payload = tableName || '~_~_~' || idRecord || '~_~_~' || recordUniqueId || '~_~_~' || whatHappens;
+    payload = createNotify(notifyName, tableName, idRecord, recordUniqueId, whatHappens);
+    if(payload isnull) then
+        return NULL;
+    end if;
                                
     perform pg_notify(notifyName, payload);
 
