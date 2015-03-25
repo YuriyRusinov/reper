@@ -36,7 +36,7 @@ class __DA_EXPORT KKSDatabase : QObject
 
         virtual bool connect( bool reconnect ) const = 0;
 
-        virtual void disconnect() const = 0;
+        virtual void disconnect(bool reconnect) const = 0;
         virtual bool connected() const = 0;
 
         virtual KKSResult * execute( const char* query ) const = 0;

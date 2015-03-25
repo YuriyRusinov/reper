@@ -43,7 +43,7 @@ class __DA_EXPORT KKSPGDatabase : public KKSDatabase
 
         virtual bool connect( bool reconnect ) const;
 
-        void disconnect() const;
+        void disconnect(bool reconnect) const;
         bool connected() const;
 
 #ifdef USE_NOTIFICATION

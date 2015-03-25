@@ -933,7 +933,7 @@ int KKSCoreApplication::GUIConnect(QWidget * parent)
     KKSDatabase * m_db1 = kksCoreApp->db1();
     m_db1->connect(m_db->getHost(), m_db->getName(), m_db->getUser(), m_db->getPass(), m_db->getPort());
     if(!m_db1->connected()){
-        m_db->disconnect();
+        m_db->disconnect(false);
         return ERROR_CODE;
     }
 
@@ -1203,7 +1203,7 @@ int KKSCoreApplication::autoConnect(QWidget * parent)
     KKSDatabase * m_db1 = kksCoreApp->db1();
     m_db1->connect(m_db->getHost(), m_db->getName(), m_db->getUser(), m_db->getPass(), m_db->getPort());
     if(!m_db1->connected()){
-        m_db->disconnect();
+        m_db->disconnect(false);
         return ERROR_CODE;
     }
 
@@ -1270,7 +1270,7 @@ int KKSCoreApplication::connectToDb(const QString & host,
     KKSDatabase * m_db1 = kksCoreApp->db1();
     m_db1->connect(m_db->getHost(), m_db->getName(), m_db->getUser(), m_db->getPass(), m_db->getPort());
     if(!m_db1->connected()){
-        m_db->disconnect();
+        m_db->disconnect(false);
         return ERROR_CODE;
     }
 
@@ -1298,9 +1298,9 @@ int KKSCoreApplication::verifyConnection(QWidget * parent)
     if(!res || res->getRowCount() == 0){
         if(res)
             delete res;
-        m_db->disconnect();
+        m_db->disconnect(false);
         if(m_db1)
-            m_db1->disconnect();
+            m_db1->disconnect(false);
         
         qCritical() <<        tr("Cannot get information about current version of server software you connected to.\n\n"
                               "Further work is impossible. You should use equal versions of client and server software");
@@ -1319,9 +1319,9 @@ int KKSCoreApplication::verifyConnection(QWidget * parent)
     if(serverVersion != clientVersion){
         if(res)
             delete res;
-        m_db->disconnect();
+        m_db->disconnect(false);
         if(m_db1)
-            m_db1->disconnect();
+            m_db1->disconnect(false);
         
         qCritical() <<        tr("Current version of your client software is %1,\n"
                               "Current version of server you connected to is %2.\n\n"
@@ -1350,9 +1350,9 @@ int KKSCoreApplication::verifyConnection(QWidget * parent)
         if(!res || res->getRowCount() == 0){
             if(res)
                 delete res;
-            m_db->disconnect();
+            m_db->disconnect(false);
             if(m_db1)
-                m_db1->disconnect();
+                m_db1->disconnect(false);
 
             qCritical() <<        tr("You successfully connect with DB,\n"
                                   "but no registered positions responsed.\n\n"
@@ -1399,9 +1399,9 @@ int KKSCoreApplication::verifyConnection(QWidget * parent)
             if(r)
                 delete r;
             delete res;
-            m_db->disconnect();
+            m_db->disconnect(false);
             if(m_db1)
-                m_db1->disconnect();
+                m_db1->disconnect(false);
             
             return ERROR_CODE;
         }
@@ -1414,8 +1414,8 @@ int KKSCoreApplication::verifyConnection(QWidget * parent)
                 if(r)
                     delete r;
                 delete res;
-                m_db->disconnect();
-                m_db1->disconnect();
+                m_db->disconnect(false);
+                m_db1->disconnect(false);
                 return ERROR_CODE;
             }
             delete r;
@@ -1449,9 +1449,9 @@ int KKSCoreApplication::verifyConnection(QWidget * parent)
                               QMessageBox::Ok, QMessageBox::NoButton);
 
         delete f;
-        m_db->disconnect();
+        m_db->disconnect(false);
         if(m_db1)
-            m_db1->disconnect();
+            m_db1->disconnect(false);
         return ERROR_CODE;
     }
 
@@ -1481,9 +1481,9 @@ int KKSCoreApplication::verifyConnection(QWidget * parent)
 
         if(r)
             delete r;
-        m_db->disconnect();
+        m_db->disconnect(false);
         if(m_db1)
-            m_db1->disconnect();
+            m_db1->disconnect(false);
         return ERROR_CODE;
     }
     
@@ -1494,8 +1494,8 @@ int KKSCoreApplication::verifyConnection(QWidget * parent)
         if(!r || r->getCellAsInt(0, 0) != 1){
             if(r)
                 delete r;
-            m_db->disconnect();
-            m_db1->disconnect();
+            m_db->disconnect(false);
+            m_db1->disconnect(false);
             return ERROR_CODE;
         }
         delete r;

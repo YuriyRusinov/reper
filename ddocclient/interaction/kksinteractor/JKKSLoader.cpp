@@ -189,15 +189,15 @@ bool JKKSLoader :: connectToDb (void)
     bool res2 = res1 && dbReadXML->connect (dbHost, dbName, dbUser, dbPassword, QString::number (dbPort));
     if (res1 && !res2 )
     {
-        dbRead->disconnect ();
+        dbRead->disconnect (false);
         return false;
     }
 
     bool res3 = res2 && dbWrite->connect (dbHost, dbName, dbUser, dbPassword, QString::number (dbPort));
     if (res2 && !res3 )
     {
-        dbRead->disconnect ();
-        dbReadXML->disconnect ();
+        dbRead->disconnect (false);
+        dbReadXML->disconnect (false);
         return false;
     }
 
@@ -209,9 +209,9 @@ bool JKKSLoader :: connectToDb (void)
         if (r)
             delete r;
 
-        dbRead->disconnect();
-        dbReadXML->disconnect();
-        dbWrite->disconnect();
+        dbRead->disconnect(false);
+        dbReadXML->disconnect(false);
+        dbWrite->disconnect(false);
 
         return false;
     }
@@ -224,9 +224,9 @@ bool JKKSLoader :: connectToDb (void)
         if (r)
             delete r;
 
-        dbRead->disconnect();
-        dbReadXML->disconnect();
-        dbWrite->disconnect();
+        dbRead->disconnect(false);
+        dbReadXML->disconnect(false);
+        dbWrite->disconnect(false);
 
         return false;
     }
@@ -239,9 +239,9 @@ bool JKKSLoader :: connectToDb (void)
         if (rw)
             delete rw;
 
-        dbRead->disconnect();
-        dbReadXML->disconnect();
-        dbWrite->disconnect();
+        dbRead->disconnect(false);
+        dbReadXML->disconnect(false);
+        dbWrite->disconnect(false);
 
         return false;
     }

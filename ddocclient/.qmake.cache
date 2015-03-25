@@ -4,5 +4,5 @@ OBJECTS_DIR =   .tmp
 MOC_DIR =       .tmp
 RCC_DIR =       .tmp
 
-CONFIG += debug
-CONFIG -= release
+CONFIG -= debug
+CONFIG += release

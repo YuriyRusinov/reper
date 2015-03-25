@@ -853,8 +853,8 @@ bool KKSMainWindow::disconnectFromDb()
         m_jmonitor = NULL;
     }
 
-    kksApp->db()->disconnect();
-    kksApp->db1()->disconnect();
+    kksApp->db()->disconnect(false);
+    kksApp->db1()->disconnect(false);
     setActionsEnabled(false);
     QList<QMdiSubWindow *> windows = m_mdiArea->subWindowList();
     for (int i=0; i<windows.count(); i++)

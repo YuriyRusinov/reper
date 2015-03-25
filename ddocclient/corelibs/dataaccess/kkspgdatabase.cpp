@@ -51,7 +51,7 @@ KKSPGDatabase::~KKSPGDatabase()
         delete *ii;
     stopListen();
 #endif
-    disconnect();
+    disconnect(false);
 }
 
 //------------------------------------------------------------------------------
@@ -67,7 +67,7 @@ bool KKSPGDatabase::connect( QString _ipServer,
 {
     if ( reconnect )
     {
-        disconnect();
+        disconnect(reconnect);
     }
     if ( connected() )
     {
@@ -119,35 +119,44 @@ bool KKSPGDatabase::connect( QString _ipServer,
     }
 #endif
     
-    if(!execute("set client_encoding to utf8")){
+    KKSResult * res = NULL;
+    res = execute("set client_encoding to utf8");
+    if(!res){
         qCritical("cannot set client_encoding to utf8");
-        disconnect();
+        disconnect(reconnect);
         return connected();
     }
+    delete res;
 
-    if(!execute("select f_set_all_schemas_visible()")){
+    res = execute("select f_set_all_schemas_visible()");
+    if(!res){
         qCritical("cannot set search_path to public, dic, nub");
-        disconnect();
+        disconnect(reconnect);
         return connected();
     }
-    
+    delete res;
 
-    if(!execute("select createTempTables()")){
+    res = execute("select createTempTables()");
+    if(!res){
         qCritical("cannot execute createTempTables()");
-        disconnect();
+        disconnect(reconnect);
         return connected();
     }
-        
+    delete res;
+
     if(idCurrentDl > 0){
         char * q = new char[100];
         snprintf(q, 99, "select setCurrentDl(%d)", idCurrentDl);
-        if(!execute(q)){
+        
+        res = execute(q);
+        if(!res){
             delete[] q;
             qCritical("cannot execute setCurrentDl()");
-            disconnect();
+            disconnect(reconnect);
             return connected();
         }
         delete[] q;
+        delete res;
     }
 
     return connected();
@@ -157,15 +166,20 @@ bool KKSPGDatabase::connect( QString _ipServer,
 //
 // KKSPGDatabase::disconnect
 //
-void KKSPGDatabase::disconnect() const
+void KKSPGDatabase::disconnect(bool reconnect) const
 {
     idCurrentDl = -1;
     idCurrentUser = -1;
 
     if ( conn != NULL )
     {
-        if(!execute("select f_clear_function();")){
-            qCritical("cannot execute f_clear_function!");
+        if(!reconnect){
+            KKSResult * res = execute("select f_clear_function();");
+            if(!res){
+                qCritical("cannot execute f_clear_function!");
+            }
+        
+            delete res;
         }
 
         PQfinish( conn );

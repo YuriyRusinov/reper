@@ -59,22 +59,22 @@ KKSDaemon::~KKSDaemon()
     }
 
     if(dbNotify){
-        dbNotify->disconnect();
+        dbNotify->disconnect(false);
         delete dbNotify;
     }
 
     if(dbTimer){
-        dbTimer->disconnect();
+        dbTimer->disconnect(false);
         delete dbTimer;
     }
 
     if(dbStreams){
-        dbStreams->disconnect();
+        dbStreams->disconnect(false);
         delete dbStreams;
     }
 
     if(dbSheduledHandlers){
-        dbSheduledHandlers->disconnect();
+        dbSheduledHandlers->disconnect(false);
         delete dbSheduledHandlers;
     }
 
