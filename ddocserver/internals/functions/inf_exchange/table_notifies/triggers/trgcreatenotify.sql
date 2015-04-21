@@ -1,63 +1,17 @@
 /* asyncronous notification for qualifiers */
 
-CREATE OR REPLACE FUNCTION notifyQualifier() RETURNS trigger AS
-$BODY$
-declare
-
-    tableName varchar;
-    recordUniqueId varchar;
-    idRecord int8;
-    whatHappens int4;
-
-    notifyName varchar;
-    payload varchar;
-
-begin
-
-    if(TG_NARGS<=0) then
-        return NULL;
-    end if;
-
-    notifyName = TG_ARGV[0];    
-
-    tableName := TG_RELNAME;
-    if(substr(tableName, 1, 4) = 'tbl_') then
-        tableName = substr(tableName, 5);
-    end if;
-
-                                                                                      
-    if(TG_OP = 'INSERT') then
-        idRecord = new.id;
-        recordUniqueId = new.unique_id;
-        whatHappens := 1; --new EIO
-    elsif(TG_OP = 'UPDATE') then
-        idRecord = new.id;
-        recordUniqueId = new.unique_id;
-        whatHappens := 2; --updated EIO
-    else
-        idRecord = old.id;
-        recordUniqueId = old.unique_id;
-        whatHappens := 3; --updated EIO
-    end if;
-
-    payload = createNotify(notifyName, tableName, idRecord, recordUniqueId, whatHappens);
-    if(payload isnull) then
-        return NULL;
-    end if;
-                               
-    perform pg_notify(notifyName, payload);
-
-    return new;
-end
-$BODY$ 
-language 'plpgsql' SECURITY DEFINER;
-
-
 create or replace function trgCreateNotifyTrigger() returns trigger as
 $BODY$
 declare
     tableName varchar;
-    notifyName varchar;
+
+    --params and criteria for notify generation
+    notifyName varchar; 
+    idPosition int4; 
+    idUnit int4;
+    idSearchTemplate int4;
+    isAccept bool;
+
     triggerName varchar;
     qualifierTableName varchar;
     notifyWhere varchar;
@@ -68,6 +22,7 @@ declare
     i int4;
     theIdTableNotifies int4;
     theIdObject int4;
+    r record;
 begin
 
     tableName = TG_RELNAME;
@@ -87,8 +42,20 @@ begin
         theIdObject = old.id_io_objects;
     end if;
 
-    select name into notifyName from table_notifies where id = theIdTableNotifies;
-    if(notifyName isnull) then
+    for r in 
+        select name, id_position, id_unit, id_search_template, is_accept, notify_where
+        from table_notifies 
+        where id = theIdTableNotifies
+    loop
+        notifyName = lower(r.name);
+        idPosition = r.id_position;
+        idUnit = r.id_unit;
+        isAccept = r.is_accept;
+        idSearchTemplate = r.id_search_template;
+        nWheres = r.notify_where;
+    end loop;
+
+    if(notifyName isnull or nWheres isnull) then
         return NULL;
     end if;
 
@@ -108,10 +75,6 @@ begin
         return old;
     end if;
 
-    select notify_where into nWheres from table_notifies where id = new.id_table_notifies;
-    if(nWheres isnull) then
-        return NULL;
-    end if;
 
     cnt = array_upper(nWheres, 1);
     if(cnt <= 0 or cnt > 3) then
@@ -133,9 +96,15 @@ begin
 
     end loop;
 
-    trgFunc = 'notifyqualifier(' || quote_literal(notifyName) || ')';
+    trgFunc = 'notifyqualifier(' || asString(notifyName, false) || ', ' || 
+                                    asString(idPosition, false) || ', ' || 
+                                    asString(idUnit, false) || ', ' || 
+                                    asString(idSearchTemplate, false) || ', ' || 
+                                    asString(isAccept, false) || 
+                             ')';
 
     if(TG_OP = 'INSERT') then
+        --raise exception '----- %', trgFunc;
         perform f_create_trigger(triggerName, 'after',  notifyWhere, qualifierTableName, trgFunc);
     end if;
 
@@ -153,16 +122,25 @@ $BODY$
 declare
     tableName varchar;
     qualifierTableName varchar;
-    notifyWhere varchar;
     trgFunc varchar;
     cnt int4;
     i int4;
     r record;
+
     oldNotifyName varchar;
     newNotifyName varchar;
     oldTriggerName varchar;
     newTriggerName varchar;
     nName varchar;
+
+    notifyWhere varchar;
+    --params and criteria for notify generation
+    notifyName varchar; 
+    idPosition int4; 
+    idUnit int4;
+    idSearchTemplate int4;
+    isAccept bool;
+
 begin
 
     tableName = TG_RELNAME;
@@ -183,8 +161,8 @@ begin
         return new;
     end if;
 
-    oldTriggerName = 'trgasyncnotify_' || old.name;
-    newTriggerName = 'trgasyncnotify_' || new.name;
+    oldTriggerName = 'trgasyncnotify_' || lower(old.name);
+    newTriggerName = 'trgasyncnotify_' || lower(new.name);
 
 
     
@@ -209,7 +187,19 @@ begin
 
     end loop;
 
-    trgFunc = 'notifyqualifier(' || quote_literal(new.name) || ')';
+    notifyName = lower(new.name);
+    idPosition = new.id_position;
+    idUnit = new.id_unit;
+    isAccept = new.is_accept;
+    idSearchTemplate = new.id_search_template;
+    --nWheres = new.notify_where;
+
+    trgFunc = 'notifyqualifier(' || asString(notifyName, false) || ', ' || 
+                                    asString(idPosition, false) || ', ' || 
+                                    asString(idUnit, false) || ', ' || 
+                                    asString(idSearchTemplate, false) || ', ' || 
+                                    asString(isAccept, false) || 
+                             ')';
 
 
     for r in 
@@ -233,3 +223,84 @@ language 'plpgsql' security definer;
 select f_safe_drop_trigger('trg_table_notifies', 'table_notifies');
 select f_create_trigger('trg_table_notifies', 'after',  'update', 'table_notifies', 'trgupdatenotifytrigger()');
 
+
+create or replace function trgInsertNotifyLowerTrigger() returns trigger as
+$BODY$
+declare
+    tableName varchar;
+
+begin
+
+    tableName = TG_RELNAME;
+    if(tableName <> 'table_notifies') then
+        return NULL;
+    end if;
+
+    if(TG_OP <> 'UPDATE' and TG_OP <> 'INSERT') then
+        return NULL;
+    end if;
+
+    if(new.notify_where isnull) then
+        return NULL;
+    end if;
+
+    new.name = lower(new.name);
+
+    return new;
+end
+$BODY$
+language 'plpgsql' security definer;
+
+select f_safe_drop_trigger('trg_table_notifies_lower', 'table_notifies');
+select f_create_trigger('trg_table_notifies_lower', 'before',  'insert or update', 'table_notifies', 'trginsertnotifylowertrigger()');
+
+
+create or replace function trgDeleteNotifyTrigger() returns trigger as
+$BODY$
+declare
+    tableName varchar;
+    qualifierTableName varchar;
+
+    oldNotifyName varchar;
+    oldTriggerName varchar;
+    cnt int4;
+    r record;
+
+begin
+
+    tableName = TG_RELNAME;
+    if(tableName <> 'table_notifies') then
+        return NULL;
+    end if;
+
+    if(TG_OP <> 'DELETE') then
+        return NULL;
+    end if;
+
+    select count(*) into cnt from table_notifies_io_objects where id_table_notifies = old.id;
+    if(cnt <= 0) then
+        return old;
+    end if;
+
+    oldTriggerName = 'trgasyncnotify_' || lower(old.name);
+    
+
+    for r in 
+        select io.table_name, io.id from tbl_io_objects io, table_notifies_io_objects t where io.id = t.id_io_objects and t.id_table_notifies = old.id
+    loop
+        qualifierTableName = r.table_name;
+        if(r.id > 300) then
+            qualifierTableName = 'tbl_' || qualifierTableName;
+        end if;
+    
+        perform f_safe_drop_trigger(oldTriggerName, qualifierTableName);
+
+    end loop;
+
+    return old;
+end
+$BODY$
+language 'plpgsql' security definer;
+
+select f_safe_drop_trigger('trg_table_notifies_delete', 'table_notifies');
+select f_create_trigger('trg_table_notifies_delete', 'before',  'delete', 'table_notifies', 'trgdeletenotifytrigger()');

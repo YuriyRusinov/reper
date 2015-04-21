@@ -1320,6 +1320,11 @@ insert into attributes (unique_id, id, id_a_type, code, name, title, table_name,
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-396', 396, 2, 'id_notify', 'Квитанция для отправки', 'Квитанция для отправки', 'table_notifies', 'name', 300, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-397', 397, 2, 'id_subsystem', 'В какую подсистему должна уйти', 'В какую подсистему должна уйти', 'units', 'name', 300, TRUE);
 
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-398', 398, 2, 'id_position', 'Должностное лицо', 'Должностное лицо', 'position', 'name', 150, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-399', 399, 2, 'id_unit', 'Подсистема (подразделение)', 'Подсистема (подразделение)', 'units', 'name', 150, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-400', 400, 2, 'id_search_template', 'Критерии отбора (поисковый запрос)', 'Критерии отбора (поисковый запрос)', 'search_templates', 'name', 150, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-401', 401, 1, 'is_accept', 'Генерировать при выполнении условий', 'Генерировать при выполнении условий', NULL, NULL, 100, TRUE);
+
 
 
 SELECT pg_catalog.setval('attributes_id_seq', 1000, true); --все пользовательские атрибуты будут начинаться с номера 1001
@@ -2529,6 +2534,10 @@ insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (703, 238, 1, NULL, true, true); --id
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (704, 238, 2, NULL, true, false); --name
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (705, 238, 385, NULL, true, false); --notify_where
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (725, 238, 398, NULL, false, false); --id_position
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (726, 238, 399, NULL, false, false); --id_unit
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (727, 238, 400, NULL, false, false); --id_search_template
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (728, 238, 401, 'true', false, false); --is_accept
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (706, 238, 386, NULL, false, false); --table_notifies_io_objects
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (707, 238, 3, NULL, false, false);  --description
 
@@ -2552,6 +2561,11 @@ insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (722, 242, 396, NULL, true, false); --id_notify
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (723, 242, 397, NULL, true, false); --id_subsystem
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only) values (724, 242, 3, NULL, false, false); --description
+
+--725 используется в справочнике асинхронных квитанций
+--276 используется в справочнике асинхронных квитанций
+--727 используется в справочнике асинхронных квитанций
+--728 используется в справочнике асинхронных квитанций
 
 
 SELECT pg_catalog.setval('attrs_categories_id_seq', 2000, true); --все пользовательские атрибуты в категориях будут начинаться с номера 2001

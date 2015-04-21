@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     25.03.2015 11:28:20                          */
+/* Created on:     30.03.2015 16:19:43                          */
 /*==============================================================*/
 
 
@@ -4339,8 +4339,12 @@ select setMacToNULL('system_table');
 /*==============================================================*/
 create table table_notifies (
    id                   SERIAL               not null,
+   id_position          INT4                 null,
+   id_unit              INT4                 null,
+   id_search_template   INT4                 null,
    name                 VARCHAR              not null,
    notify_where         int4[]               not null,
+   is_accept            BOOL                 not null default TRUE,
    description          VARCHAR              null,
    constraint PK_TABLE_NOTIFIES primary key (id)
 )
@@ -4350,6 +4354,12 @@ comment on table table_notifies is
 'Справочник асинхронных квитанций, генерируемых сервером при создании, узменении и удалении тех или инх записей в справочниках (notify).
 Название асинхронной квитанции должно быть уникальным, при этом допустимо генерировать квитанцию с одним именем для разных справочников.
 Перечень справочников, для которых генерируется квитанция, задается в таблице table_notifies_io_objects (многие-ко-многим).
+
+В общем случае квитанция генерируется по следующему алгоритму:
+Если в справочнике А произошли заданные изменения (INSERT, UPDATE, DELETE), при этом инициатором изменений выступило заданное ДЛ из заданной подсистемы, 
+и при этом изменения, которые произошли с записью таковы, что она удовлетворяет условиям заданного поискового запроса, то необходимо сгенерировать квитанцию.
+При этом если is_accept = FALSE, то наоборот, квитанцию при выполнении условий генерировать не надо
+
 Асинхронная квитанция генерируется следующим образом
 pg_notify(notify_name, payload)
 payload формируется следующим образом:
@@ -4359,11 +4369,29 @@ whatHappens формируется следующим образом:
 2 - выполнена операция изменения записи
 3 - выполнена операция удаления записи';
 
+comment on column table_notifies.id_position is
+'идентификатор должностного лица, который изменил запись
+Если поле задано, то квитанция генерируется лишь в том случае, если инициатором действия было это ДЛ';
+
+comment on column table_notifies.id_unit is
+'Идентификатор подразделения, ДЛ которого изменил запись.
+Если поле указано, то кватанция генерируется, если воздействие на заданный справочник (INSERT, UPDATE, DELETE) оказало ДЛ именно из данного подразделения.
+При реализации интеграционной платформы подразделение означает подсистему, 
+пользователи которой являются записями справочника должностных лиц.';
+
+comment on column table_notifies.id_search_template is
+'Поисковый запрос, условиям которого должна удовлетворять изменяемая (добавляемая) запись справочника, чтобы квитанция была сгенерирована';
+
 comment on column table_notifies.name is
 'Название квитанции. Должно быть уникальным';
 
 comment on column table_notifies.notify_where is
 'Когда отправляется квитанция (старые чекбоксы)';
+
+comment on column table_notifies.is_accept is
+'Если TRUE, то квитанция должна генерироваться, когда выполняются все заданные критерии
+Если FALSE - квитанция наоборот, не должна генерироваться, когда выполняются все критерии.
+Однако это не означает, что она должна генерироваться, если критерии не выполняются.';
 
 select setMacToNULL('table_notifies');
 select createTriggerUID('table_notifies');
@@ -6154,6 +6182,21 @@ alter table state_crosses
 alter table state_crosses
    add constraint FK_STATE_CR_REFERENCE_LIFE_CYC foreign key (id_life_cycle)
       references life_cycle (id)
+      on delete restrict on update restrict;
+
+alter table table_notifies
+   add constraint FK_TABLE_NO_REFERENCE_POSITION foreign key (id_position)
+      references "position" (id)
+      on delete restrict on update restrict;
+
+alter table table_notifies
+   add constraint FK_TABLE_NO_REFERENCE_UNITS foreign key (id_unit)
+      references units (id)
+      on delete restrict on update restrict;
+
+alter table table_notifies
+   add constraint FK_TABLE_NO_REFERENCE_SEARCH_T foreign key (id_search_template)
+      references search_templates (id)
       on delete restrict on update restrict;
 
 alter table table_notifies_io_objects

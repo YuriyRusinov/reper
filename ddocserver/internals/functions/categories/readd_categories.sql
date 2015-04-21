@@ -48,3 +48,4 @@
 \i ./functions/categories/agetrefvalue.sql
 \i ./functions/categories/iscatio.sql 
 \i ./functions/categories/iscatiosync.sql 
+\i ./functions/categories/cgetsourcetablenameforattr.sql 

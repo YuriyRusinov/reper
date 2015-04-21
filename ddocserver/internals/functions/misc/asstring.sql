@@ -2,6 +2,7 @@ create or replace function asString(int4, boolean) returns varchar as
 $BODY$
 declare
     num alias for $1;
+    needQuote alias for $2;
     string varchar;
 
 begin
@@ -11,6 +12,10 @@ begin
     
     string := '' || num;
     
+    if(needQuote = TRUE) then
+        return quote_literal(string);
+    end if;
+
     return string;
 end
 $BODY$

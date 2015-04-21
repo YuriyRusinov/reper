@@ -11,6 +11,41 @@ select setAsNotLogging(2);
 --СЮДА ЗАПРОСЫ НА СОЗДАНИЕ ТАБЛИЦ СПРАВОЧНИКОВ (ЕСЛИ СОЗДАВАЛИСЬ ИО)
 --ИХ ОБЯЗАТЕЛЬНО ПЕРЕД СОЗДАНИЕМ ФУНКЦИЙ!!!
 
+alter table table_notifies drop column if exists id_position;
+alter table table_notifies add column id_position int4;
+alter table table_notifies
+   add constraint FK_TABLE_NO_REFERENCE_POSITION foreign key (id_position)
+      references "position" (id)
+      on delete restrict on update restrict;
+
+alter table table_notifies drop column if exists id_unit;
+alter table table_notifies add column id_unit int4;
+alter table table_notifies
+   add constraint FK_TABLE_NO_REFERENCE_UNITS foreign key (id_unit)
+      references units (id)
+      on delete restrict on update restrict;
+
+alter table table_notifies drop column if exists id_search_template;
+alter table table_notifies add column id_search_template int4;
+alter table table_notifies
+   add constraint FK_TABLE_NO_REFERENCE_SEARCH_T foreign key (id_search_template)
+      references search_templates (id)
+      on delete restrict on update restrict;
+
+alter table table_notifies drop column if exists is_accept;
+alter table table_notifies add column is_accept bool;
+alter table table_notifies alter column is_accept set default true;
+update table_notifies set is_accept = true;
+alter table table_notifies alter column is_accept set not null;
+
+alter table table_notifies_io_objects
+   drop constraint FK_TABLE_NO_REFERENCE_TABLE_NO;
+
+alter table table_notifies_io_objects
+   add constraint FK_TABLE_NO_REFERENCE_TABLE_NO foreign key (id_table_notifies)
+      references table_notifies (id)
+      on delete cascade on update cascade;
+
 drop table if exists table_notifies_log;
 /*==============================================================*/
 /* Table: table_notifies_log                                    */
@@ -133,6 +168,8 @@ alter table notify_routing
       references units (id)
       on delete restrict on update restrict;
 
+
+drop function if exists createNotify(varchar, varchar, int8, varchar, int4);
 ---------------------------
 ---------------------------
 
@@ -188,6 +225,11 @@ insert into attributes (unique_id, id, id_a_type, code, name, title, table_name,
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-396', 396, 2, 'id_notify', 'Квитанция для отправки', 'Квитанция для отправки', 'table_notifies', 'name', 300, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-397', 397, 2, 'id_subsystem', 'В какую подсистему должна уйти', 'В какую подсистему должна уйти', 'units', 'name', 300, TRUE);
 
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-398', 398, 2, 'id_position', 'Должностное лицо', 'Должностное лицо', 'position', 'name', 150, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-399', 399, 2, 'id_unit', 'Подсистема (подразделение)', 'Подсистема (подразделение)', 'units', 'name', 150, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-400', 400, 2, 'id_search_template', 'Критерии отбора (поисковый запрос)', 'Критерии отбора (поисковый запрос)', 'search_templates', 'name', 150, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-401', 401, 1, 'is_accept', 'Генерировать при выполнении условий', 'Генерировать при выполнении условий', NULL, NULL, 100, TRUE);
+
 --таблица журнала асинхронных квитанций (история)
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only, name) values (708, 240, 1, NULL, true, true, 'ИД'); --id
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only, name) values (709, 240, 394, NULL, true, true, 'Название квитанции'); --notify_name
@@ -208,6 +250,12 @@ insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only, name) values (722, 242, 396, NULL, true, false, 'ИД квитанции для отправки'); --id_notify
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only, name) values (723, 242, 397, NULL, true, false, 'В какую подсистему должна уйти'); --id_subsystem
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only, name) values (724, 242, 3, NULL, false, false, 'Описание'); --description
+
+
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only, name) values (725, 238, 398, NULL, false, false, 'Должностное лицо'); --id_position
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only, name) values (726, 238, 399, NULL, false, false, 'Подсистема (подразделение)'); --id_unit
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only, name) values (727, 238, 400, NULL, false, false, 'Критерии отбора (поисковый запрос)'); --id_search_template
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only, name) values (728, 238, 401, 'true', false, false, 'Генерировать при выполнении условий'); --is_accept
 
 
 select f_create_trigger('trgcheckcatforglobal', 'before', 'insert or update', 'io_categories', 'checkcatforglobal()');

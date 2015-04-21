@@ -11,7 +11,8 @@ create type h_get_table_notify as(
                                   table_name varchar,
                                   id_record int8,
                                   what_happens int4,
-                                  invocation_datetime timestamp);
+                                  invocation_datetime timestamp,
+                                  record_uuid varchar);
 
 create or replace function getTableNotify(int8) returns setof h_get_table_notify as
 $BODY$
@@ -31,7 +32,8 @@ begin
                     table_name, 
                     id_record, 
                     what_happens,
-                    invocation_datetime 
+                    invocation_datetime,
+                    record_uuid 
               from table_notifies_log
               where id = idNotify
     loop

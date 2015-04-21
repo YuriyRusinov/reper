@@ -40,7 +40,8 @@ begin
                             is_global = isGlobal,
                             record_fill_color = recordFillColor,
                             record_text_color = recordTextColor,
-                            r_icon = rIcon
+                            r_icon = rIcon,
+                            last_update = CURRENT_TIMESTAMP
     where id=idObject;
 
 

@@ -22,7 +22,8 @@ create type h_get_attribute as(     id_attribute int4,
                                     attr_group_id int4,
                                     attr_group_name varchar,
                                     id_ex int4, --id либо из таблицы attrs_attrs либо attrs_categories (в зависимости от вызываемой функции)
-                                    unique_id_ex varchar);--unique_id либо из таблицы attrs_attrs либо attrs_categories (в зависимости от вызываемой функции)
+                                    unique_id_ex varchar,--unique_id либо из таблицы attrs_attrs либо attrs_categories (в зависимости от вызываемой функции)
+                                    attr_order int4);
 
 create or replace function aGetAttribute(int4) returns setof h_get_attribute as
 $BODY$
@@ -55,6 +56,7 @@ begin
             a.ref_column_name,
             a.id_attr_group,
             ag.name,
+            NULL,
             NULL,
             NULL
         from  
@@ -115,6 +117,7 @@ begin
             a.ref_column_name,
             a.id_attr_group,
             ag.name,
+            NULL,
             NULL,
             NULL
         from  
@@ -178,7 +181,8 @@ begin
             a.id_attr_group,
             ag.name,
             ac.id,
-            ac.unique_id
+            ac.unique_id,
+            ac.order
 
         from  
             attributes a,

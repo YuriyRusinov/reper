@@ -11,6 +11,41 @@ select setAsNotLogging(2);
 --СЮДА ЗАПРОСЫ НА СОЗДАНИЕ ТАБЛИЦ СПРАВОЧНИКОВ (ЕСЛИ СОЗДАВАЛИСЬ ИО)
 --ИХ ОБЯЗАТЕЛЬНО ПЕРЕД СОЗДАНИЕМ ФУНКЦИЙ!!!
 
+alter table table_notifies drop column if exists id_position;
+alter table table_notifies add column id_position int4;
+alter table table_notifies
+   add constraint FK_TABLE_NO_REFERENCE_POSITION foreign key (id_position)
+      references "position" (id)
+      on delete restrict on update restrict;
+
+alter table table_notifies drop column if exists id_unit;
+alter table table_notifies add column id_unit int4;
+alter table table_notifies
+   add constraint FK_TABLE_NO_REFERENCE_UNITS foreign key (id_unit)
+      references units (id)
+      on delete restrict on update restrict;
+
+alter table table_notifies drop column if exists id_search_template;
+alter table table_notifies add column id_search_template int4;
+alter table table_notifies
+   add constraint FK_TABLE_NO_REFERENCE_SEARCH_T foreign key (id_search_template)
+      references search_templates (id)
+      on delete restrict on update restrict;
+
+alter table table_notifies drop column if exists is_accept;
+alter table table_notifies add column is_accept bool;
+alter table table_notifies alter column is_accept set default true;
+update table_notifies set is_accept = true;
+alter table table_notifies alter column is_accept set not null;
+
+alter table table_notifies_io_objects
+   drop constraint FK_TABLE_NO_REFERENCE_TABLE_NO;
+
+alter table table_notifies_io_objects
+   add constraint FK_TABLE_NO_REFERENCE_TABLE_NO foreign key (id_table_notifies)
+      references table_notifies (id)
+      on delete cascade on update cascade;
+
 drop table if exists table_notifies_log;
 /*==============================================================*/
 /* Table: table_notifies_log                                    */
@@ -133,6 +168,9 @@ alter table notify_routing
       references units (id)
       on delete restrict on update restrict;
 
+
+drop function if exists createNotify(varchar, varchar, int8, varchar, int4);
+
 ---------------------------
 ---------------------------
 
@@ -175,6 +213,12 @@ insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main
 insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values ('localorg-categories-242', 242, 10, NULL, false, 'Таблица маршрутизации асинхронных квитанций', 'SYSCATEGORY_242', NULL::varchar, true, true, 1);
 insert into io_categories (unique_id, id, id_io_category_type, id_child, is_main, name, code, description, is_system, is_global, id_io_state) values ('localorg-categories-243', 243, 8, 242, true, 'Справочник маршрутизации асинхронных квитанций', 'SYSCATEGORY_243', NULL::varchar, true, true, 1);
 
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-398', 398, 2, 'id_position', 'Должностное лицо', 'Должностное лицо', 'position', 'name', 150, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-399', 399, 2, 'id_unit', 'Подсистема (подразделение)', 'Подсистема (подразделение)', 'units', 'name', 150, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-400', 400, 2, 'id_search_template', 'Критерии отбора (поисковый запрос)', 'Критерии отбора (поисковый запрос)', 'search_templates', 'name', 150, TRUE);
+insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-401', 401, 1, 'is_accept', 'Генерировать при выполнении условий', 'Генерировать при выполнении условий', NULL, NULL, 100, TRUE);
+
+
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-387', 387, 8, 'what_happens', 'Событие (INSERT, UPDATE, DELETE)', 'Событие (INSERT, UPDATE, DELETE)', NULL, NULL, 100, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-388', 388, 8, 'id_org', 'ИД подсистемы', 'ИД подсистемы', NULL, NULL, 100, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-389', 389, 9, 'org_name', 'Название подсистемы', 'Название подсистемы', NULL, NULL, 300, TRUE);
@@ -209,6 +253,11 @@ insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only, name) values (723, 242, 397, NULL, true, false, 'В какую подсистему должна уйти'); --id_subsystem
 insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only, name) values (724, 242, 3, NULL, false, false, 'Описание'); --description
 
+
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only, name) values (725, 238, 398, NULL, false, false, 'Должностное лицо'); --id_position
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only, name) values (726, 238, 399, NULL, false, false, 'Подсистема (подразделение)'); --id_unit
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only, name) values (727, 238, 400, NULL, false, false, 'Критерии отбора (поисковый запрос)'); --id_search_template
+insert into attrs_categories (id, id_io_category, id_io_attribute, def_value, is_mandatory, is_read_only, name) values (728, 238, 401, 'true', false, false, 'Генерировать при выполнении условий'); --is_accept
 
 select f_create_trigger('trgcheckcatforglobal', 'before', 'insert or update', 'io_categories', 'checkcatforglobal()');
 select f_create_trigger('trgacinsert', 'before', 'insert or update', 'attrs_categories', 'acinsertcheck()');
