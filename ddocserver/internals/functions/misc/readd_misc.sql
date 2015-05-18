@@ -9,6 +9,7 @@
 \i ./functions/misc/f_inc_table_column.sql
 
 \i ./functions/misc/f_create_trigger.sql
+\i ./functions/misc/f_enable_trigger.sql
 
 \i ./functions/misc/f_safe_drop_type.sql
 \i ./functions/misc/f_safe_drop_table.sql
@@ -30,3 +31,5 @@
 \i ./functions/misc/getseconds.sql
 \i ./functions/misc/getprimarykey.sql
 \i ./functions/misc/f_clear_function.sql
+
+\i ./functions/misc/pivot_func_example.sql

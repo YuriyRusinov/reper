@@ -1,4 +1,4 @@
-
+﻿
 create or replace function cInsertCheck() returns trigger as 
 $BODY$
 declare
@@ -11,6 +11,11 @@ begin
 
     insert into access_categories_table (id_io_category, id_role, allow_read, allow_readlist, allow_delete, allow_update, allow_use)
     values(new.id, getCurrentUser(), true, true, true, true, true);
+
+    if(new.id_child is not null) then
+        insert into attrs_categories (id_io_category, id_io_attribute, name, is_mandatory, is_read_only) values(new.id, 402, 'Ссылка на категорию таблицы справочника', false, true);
+        --raise exception 'aaaa';
+    end if;
 
     return new;
 

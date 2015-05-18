@@ -1,4 +1,4 @@
-create or replace function ioInsertCheck() returns trigger as
+п»їCREATE OR REPLACE FUNCTION ioinsertcheck()   RETURNS trigger AS
 $BODY$
 declare
     idMaclabel int4;
@@ -87,7 +87,7 @@ begin
         new.information := getAuthorInfo();
     end if;
 
-    --данный блок кода был перенесен из триггера-after, чтобы избежать ошибки с уникальным индексом на поле table_name
+    --РґР°РЅРЅС‹Р№ Р±Р»РѕРє РєРѕРґР° Р±С‹Р» РїРµСЂРµРЅРµСЃРµРЅ РёР· С‚СЂРёРіРіРµСЂР°-after, С‡С‚РѕР±С‹ РёР·Р±РµР¶Р°С‚СЊ РѕС€РёР±РєРё СЃ СѓРЅРёРєР°Р»СЊРЅС‹Рј РёРЅРґРµРєСЃРѕРј РЅР° РїРѕР»Рµ table_name
     if(TG_OP = 'INSERT') then
         select into idChild id_child from io_categories c where c.id = new.id_io_category;
 
@@ -114,7 +114,7 @@ begin
 
 end
 $BODY$
-language 'plpgsql';
+LANGUAGE 'plpgsql';
 
 select f_safe_drop_trigger('trgioinsert', 'io_objects');
 
@@ -141,6 +141,9 @@ declare
     idChainsData int4;
     whatHappens int2;
     r record;
+
+    idAttrCategory int4;
+    idChild int4;
 begin
 
 /*    
@@ -212,6 +215,14 @@ begin
             values (idChainsData, idChain, new.id, current_timestamp, whatHappens);
 
         end loop;
+
+        select into idChild id_child from io_categories c where c.id = new.id_io_category;
+        if(idChild is not null) then
+            select id into idAttrCategory from attrs_categories where id_io_category = new.id_io_category and id_io_attribute = 402;
+            if(idAttrCategory is not null) then
+                insert into attrs_values (id_io_object, id_attr_category, value) values(new.id, idAttrCategory, idChild);
+            end if;
+        end if;
 
     end if;
 
@@ -286,10 +297,10 @@ begin
 
     select into id_io_child_category id_child from io_categories c where c.id = new.id_io_category;
    
-    --в триггере, который на before осуществляется проверка корректности названия подчиненной таблицы
-    --и присвоение ей уникального названия при необходимости
-    --ранее этот код был тут, однако поскольку возникала ошибка с уникальным индексом на данное поле, то 
-    --этот блок кода был перенесен в триггер-before
+    --РІ С‚СЂРёРіРіРµСЂРµ, РєРѕС‚РѕСЂС‹Р№ РЅР° before РѕСЃСѓС‰РµСЃС‚РІР»СЏРµС‚СЃСЏ РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РЅР°Р·РІР°РЅРёСЏ РїРѕРґС‡РёРЅРµРЅРЅРѕР№ С‚Р°Р±Р»РёС†С‹
+    --Рё РїСЂРёСЃРІРѕРµРЅРёРµ РµР№ СѓРЅРёРєР°Р»СЊРЅРѕРіРѕ РЅР°Р·РІР°РЅРёСЏ РїСЂРё РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё
+    --СЂР°РЅРµРµ СЌС‚РѕС‚ РєРѕРґ Р±С‹Р» С‚СѓС‚, РѕРґРЅР°РєРѕ РїРѕСЃРєРѕР»СЊРєСѓ РІРѕР·РЅРёРєР°Р»Р° РѕС€РёР±РєР° СЃ СѓРЅРёРєР°Р»СЊРЅС‹Рј РёРЅРґРµРєСЃРѕРј РЅР° РґР°РЅРЅРѕРµ РїРѕР»Рµ, С‚Рѕ 
+    --СЌС‚РѕС‚ Р±Р»РѕРє РєРѕРґР° Р±С‹Р» РїРµСЂРµРЅРµСЃРµРЅ РІ С‚СЂРёРіРіРµСЂ-before
 
     if(new.id_search_template is not null and new.ref_table_name is not null) then
         if(isApplicable(new.id_search_template, id_io_child_category) = FALSE) then
@@ -328,3 +339,4 @@ language 'plpgsql';
 select f_safe_drop_trigger('zz_trgzioinserttableafter', 'io_objects');
 
 select f_create_trigger('zz_trgzioinserttableafter', 'after', 'insert', 'io_objects', 'ioinsertchecktableafter()');
+

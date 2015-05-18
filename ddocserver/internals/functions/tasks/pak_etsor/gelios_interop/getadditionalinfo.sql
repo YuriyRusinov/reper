@@ -1,9 +1,14 @@
 ﻿
 /*
 select * from getAdditionalInfo(1073); --hpost
-select * from getAdditionalInfo(1094); --modeling
+select * from getAdditionalInfo(2986); --modeling fire
+select * from getAdditionalInfo(1094); --modeling hpost
 select * from getAdditionalInfo(927); --camera
+select * from getAdditionalInfo(2195); --fire
+select * from getAdditionalInfo(4149); --PORTAL
 
+
+select * from fiks_incidents_1
 
 select * from io_objects where id = 490;
 select * from io_categories where id = 487
@@ -22,7 +27,7 @@ alter table tbl_eio_table_490 add  CONSTRAINT "FK_eio_table_490_REF_incident" FO
 
 insert into attrs_categories (id_io_category, id_io_attribute, name, is_mandatory, is_read_only, def_value) values (486, 1293, 'Ассоциированные события датчиков (аргус-спектр)', false, false, NULL);
 
-select * from eio_table_436
+select * from eio_table_492
 select * from position where id = 28
 select * from units where id = 18
 update units set code_name = 'MONITORING' where id = 18
@@ -202,32 +207,28 @@ declare
     r h_get_additional_info%rowtype;
 
     tableName varchar;
-    tableNameDevice varchar;
     
     params_code varchar[];
     params_type varchar[];
 
-    params_code_device varchar[];
-    params_type_device varchar[];
 
     params_sql_string varchar;
     params_code_string varchar;
     params_type_string varchar;
 
+    idChildCategory int4;
+
+    tableNameDevice varchar;
+    params_code_device varchar[];
+    params_type_device varchar[];
     params_sql_string_device varchar;
     params_code_string_device varchar;
     params_type_string_device varchar;
-
-    idChildCategory int4;
     idChildCategoryDevice int4;
 
     sql varchar;
 begin
 
-    /* ********************************/
-    return;--Не требуется выдавать в Гелиос доп.параметры по видеокамере
-    /* ********************************/
-    
     if(alarm_uuid isnull) then
         return;
     end if;
@@ -235,14 +236,8 @@ begin
     params_type = getCameraAdditionalParamsType();
     params_code = getCameraAdditionalParams();
 
-    params_type_device = getCameraDeviceAdditionalParamsType();
-    params_code_device = getCameraDeviceAdditionalParams();
-
     idChildCategory = 428;
-    idChildCategoryDevice = 402;
-
     tableName = 'eio_table_439';
-    tableNameDevice = 'eio_table_422';
 
     select array_to_string(array_agg('asString(t."' || t.code || '", false)'), ',') into params_sql_string
     from (select unnest(params_code) as code) as t;
@@ -252,7 +247,21 @@ begin
 
     select array_to_string(array_agg( asString(t.type, true) ), ',') into params_type_string
     from (select unnest(params_type) as type) as t;
-    
+    if(params_sql_string isnull) then
+        params_sql_string = '';
+    end if;
+    if(params_type_string isnull) then
+        params_type_string = '';
+    end if;
+    if(params_code_string isnull) then
+        params_code_string = '';
+    end if;
+
+
+    params_type_device = getCameraDeviceAdditionalParamsType();
+    params_code_device = getCameraDeviceAdditionalParams();
+    idChildCategoryDevice = 402;
+    tableNameDevice = 'eio_table_422';
 
     select array_to_string(array_agg('asString(t."' || t.code || '", false)'), ',') into params_sql_string_device
     from (select unnest(params_code_device) as code) as t;
@@ -262,14 +271,14 @@ begin
 
     select array_to_string(array_agg( asString(t.type, true) ), ',') into params_type_string_device
     from (select unnest(params_type_device) as type) as t;
-
-   sql = 'select t.colname, t.the_value, a.name, t.coltype
+    
+    sql = 'select t.colname, t.the_value, a.name, t.coltype
           from
               (SELECT 
                    t.id,
-                   unnest(ARRAY[' || params_code_string || ']) AS colname,
-                   unnest(ARRAY[' || params_type_string || ']) AS coltype,
-                   unnest(ARRAY[' || params_sql_string || ']) AS the_value
+                   unnest(ARRAY[' || params_code_string || ']::varchar[]) AS colname,
+                   unnest(ARRAY[' || params_type_string || ']::varchar[]) AS coltype,
+                   unnest(ARRAY[' || params_sql_string || ']::varchar[]) AS the_value
                FROM ' || tableName || ' t
                WHERE
                    t.uuid_t = ' || asString(alarm_uuid, true) || '
@@ -302,7 +311,7 @@ begin
               and ac.id_io_category = ' || idChildCategoryDevice || '
               and a.code = t.colname ';
 
-
+    
     for r in execute sql
     loop
         return next r;
@@ -319,7 +328,7 @@ declare
     res varchar[];
 begin
 
-    res = ARRAY['source_incident_rec']; -- из таблицы tbl_eio_table_439
+    res = ARRAY[]::varchar[]; -- из таблицы tbl_eio_table_439
     return res;
 end
 $BODY$
@@ -331,7 +340,7 @@ declare
     res varchar[];
 begin
 
-    res = ARRAY['CONTENT']; -- из таблицы tbl_eio_table_439
+    res = ARRAY[]::varchar[]; -- из таблицы tbl_eio_table_439
     return res;
 end
 $BODY$
@@ -344,7 +353,7 @@ declare
     res varchar[];
 begin
 
-    res = ARRAY['source']; -- из таблицы tbl_eio_table_422
+    res = ARRAY['name']; -- из таблицы tbl_eio_table_422
     return res;
 end
 $BODY$
@@ -356,7 +365,7 @@ declare
     res varchar[];
 begin
 
-    res = ARRAY['CONTENT']; -- из таблицы tbl_eio_table_422
+    res = ARRAY['STRING']; -- из таблицы tbl_eio_table_422
     return res;
 end
 $BODY$
@@ -383,8 +392,66 @@ declare
     params_type_string varchar;
 
     idChildCategory int4;
+
+    tableNameDevice varchar;
+    params_code_device varchar[];
+    params_type_device varchar[];
+    params_sql_string_device varchar;
+    params_code_string_device varchar;
+    params_type_string_device varchar;
+    idChildCategoryDevice int4;
+
+    tableNameMessage varchar;
     sql varchar;
+    fakeText varchar;
 begin
+/*
+    fakeText = 'Общие потери населения: 4283;  
+
+Безвозвратные человеческие потери: 7;
+
+Из них:
+
+Количество пострадавших людей среднего возраста: 2
+
+Количество пострадавших детей: 0;
+
+Количество пострадавших пенсионного возраста: 3;
+
+Количество пострадавших людей с ограниченными возможностями: 2;
+
+Санитарные человеческие потери: 4276;
+
+Из них:
+
+Количество пострадавших детей: 611;
+
+Количество пострадавших пенсионного возраста: 998;
+
+Количество пострадавших людей с ограниченными возможностями: 142;
+
+Общее количество поврежденных зданий: 58;
+
+ 
+
+Общее количество поврежденных зданий: 58;             
+
+Из них:
+
+Количество жилых зданий: 50;
+
+Количество общественных зданий: 8;
+
+Количество детских садов: 14;
+
+Количество школ: 4;
+
+Количество пансионатов для инвалидов: 0;
+
+ 
+
+Максимальная площадь поражения: 1800 гектаров.';
+*/
 
     if(alarm_uuid isnull) then
         return;
@@ -395,6 +462,10 @@ begin
 
     idChildCategory = 426;
     tableName = 'eio_table_438';
+    
+--    idChildCategory = 420;
+    --tableName = 'eio_table_436';
+
 
     select array_to_string(array_agg('asString(t."' || t.code || '", false)'), ',') into params_sql_string
     from (select unnest(params_code) as code) as t;
@@ -405,7 +476,22 @@ begin
     select array_to_string(array_agg( asString(t.type, true) ), ',') into params_type_string
     from (select unnest(params_type) as type) as t;
     
-   sql = 'select t.colname, t.the_value, a.name, t.coltype
+
+    params_type_device = getCameraDeviceAdditionalParamsType();
+    params_code_device = getCameraDeviceAdditionalParams();
+    idChildCategoryDevice = 402;
+    tableNameDevice = 'eio_table_422';
+
+    select array_to_string(array_agg('asString(t."' || t.code || '", false)'), ',') into params_sql_string_device
+    from (select unnest(params_code_device) as code) as t;
+
+    select array_to_string(array_agg( asString(t.code, true) ), ',') into params_code_string_device
+    from (select unnest(params_code_device) as code) as t;
+
+    select array_to_string(array_agg( asString(t.type, true) ), ',') into params_type_string_device
+    from (select unnest(params_type_device) as type) as t;
+
+    sql = 'select t.colname, t.the_value, a.name, t.coltype
           from
               (SELECT 
                    t.id,
@@ -421,8 +507,58 @@ begin
           where
               a.id = ac.id_io_attribute
               and ac.id_io_category = ' || idChildCategory || '
-              and a.code = t.colname';
+              and a.code = t.colname
 
+-- fake example for expo-19
+        --union all 
+        --  select ' || asString('modeling_results', true) || ', ' || asString(fakeText, true)|| ', ' || asString('Результаты расчета предполагаемого количества пострадавших и возможного ущерба от наводнения', true) || ', ' || asString('STRING', true) || '
+          --limit 1
+
+/*
+        union all
+
+          select t.colname, t.the_value, a.name, t.coltype
+          from
+              (SELECT 
+                   t.id,
+                   unnest(ARRAY[' || params_code_string_device || ']) AS colname,
+                   unnest(ARRAY[' || params_type_string_device || ']) AS coltype,
+                   unnest(ARRAY[' || params_sql_string_device || ']) AS the_value
+               FROM ' || tableNameDevice || ' t, ' || tableName || ' c, eio_table_436 m 
+               WHERE
+                   c.uuid_t = ' || asString(alarm_uuid, true) || '
+                   and c.event_id = m.id
+                   and m.device = t.id
+               ORDER BY t.id, colname) as t,
+              attributes a,
+              attrs_categories ac
+          where
+              a.id = ac.id_io_attribute
+              and ac.id_io_category = ' || idChildCategoryDevice || '
+              and a.code = t.colname 
+*/
+          union all
+
+--select * from getAdditionalInfo(2986); --modeling fire
+--select * from getAdditionalInfo(1094); --modeling hpost
+
+          select ' || asString('name', true) || ', d.name, ' || asString('Название', true) || ', ' || asString('STRING', true) || '
+          from eio_table_422 d --, eio_table_436 e, eio_table_438 m
+          where --e.device = d.id and e.id = m.event_id and m.uuid_t = ' || asString(alarm_uuid, true) || '::uuid
+             --and 
+             d.id = 2965
+           
+          union all
+
+          select ' || asString('uuid_t', true) || ', e.uuid_t::varchar, ' || asString('Уникальный идентификатор события датчика гидропоста', true) || ', ' || asString('STRING', true) || '
+          from eio_table_436 e, eio_table_438 m
+          where e.id = m.event_id and m.uuid_t = ' || asString(alarm_uuid, true) || '::uuid
+
+          union all
+
+          select ' || asString('uuid_t', true) || ', e.uuid_t::varchar, ' || asString('Уникальный идентификатор события детектирования Аргус-Спектр', true) || ', ' || asString('STRING', true) || '
+          from eio_table_492 e, eio_table_438 m
+          where e.id = m.argus_incident and m.uuid_t = ' || asString(alarm_uuid, true) || '::uuid' ;
 
     for r in execute sql
     loop
@@ -434,13 +570,15 @@ end
 $BODY$
 language 'plpgsql';
 
+--select * from getAdditionalInfo(1094); --modeling
+
 create or replace function getModelingAdditionalParams() returns varchar[] as
 $BODY$
 declare
     res varchar[];
 begin
 
-    res = ARRAY['affected_people', 'damage_building', 'death', 'spread_wms', 'spread_wfs', 'notification_wms', 'notification_wfs']; -- из таблицы tbl_eio_table_438
+    res = ARRAY['affected_people', 'damage_building', 'death']; --, 'spread_wms', 'spread_wfs', 'notification_wms', 'notification_wfs']; -- из таблицы tbl_eio_table_438
     return res;
 end
 $BODY$
@@ -452,7 +590,32 @@ declare
     res varchar[];
 begin
 
-    res = ARRAY['STRING', 'STRING', 'STRING', 'CONTENT', 'CONTENT', 'CONTENT', 'CONTENT']; -- из таблицы tbl_eio_table_438
+    res = ARRAY['STRING', 'STRING', 'STRING']; --, 'CONTENT', 'CONTENT', 'CONTENT', 'CONTENT']; -- из таблицы tbl_eio_table_438
+    return res;
+end
+$BODY$
+language 'plpgsql';
+
+
+create or replace function getModelingDeviceAdditionalParams() returns varchar[] as
+$BODY$
+declare
+    res varchar[];
+begin
+
+    res = ARRAY['name']; -- из таблицы tbl_eio_table_422
+    return res;
+end
+$BODY$
+language 'plpgsql';
+
+create or replace function getModelingDeviceAdditionalParamsType() returns varchar[] as
+$BODY$
+declare
+    res varchar[];
+begin
+
+    res = ARRAY['STRING']; -- из таблицы tbl_eio_table_422
     return res;
 end
 $BODY$
@@ -479,10 +642,6 @@ declare
     idChildCategory int4;
     sql varchar;
 begin
-
-    /* ********************************/
-    return;--Не требуется выдавать в Гелиос доп.параметры по порталу
-    /* ********************************/
     
     if(alarm_uuid isnull) then
         return;
@@ -503,14 +662,25 @@ begin
 
     select array_to_string(array_agg( asString(t.type, true) ), ',') into params_type_string
     from (select unnest(params_type) as type) as t;
+
+    if(params_sql_string isnull) then
+        params_sql_string = '';
+    end if;
+    if(params_type_string isnull) then
+        params_type_string = '';
+    end if;
+    if(params_code_string isnull) then
+        params_code_string = '';
+    end if;
+
     
-   sql = 'select t.colname, t.the_value, a.name, t.coltype
+    sql = 'select t.colname, t.the_value, a.name, t.coltype
           from
               (SELECT 
                    t.id,
-                   unnest(ARRAY[' || params_code_string || ']) AS colname,
-                   unnest(ARRAY[' || params_type_string || ']) AS coltype,
-                   unnest(ARRAY[' || params_sql_string || ']) AS the_value
+                   unnest(ARRAY[' || params_code_string || ']::varchar[]) AS colname,
+                   unnest(ARRAY[' || params_type_string || ']::varchar[]) AS coltype,
+                   unnest(ARRAY[' || params_sql_string || ']::varchar[]) AS the_value
                FROM ' || tableName || ' t
                WHERE
                    t.uuid_t = ' || asString(alarm_uuid, true) || '
@@ -520,7 +690,13 @@ begin
           where
               a.id = ac.id_io_attribute
               and ac.id_io_category = ' || idChildCategory || '
-              and a.code = t.colname';
+              and a.code = t.colname
+
+          union all
+
+          select ' || asString('name', true) || ', e.name, ' || asString('Название', true) || ', ' || asString('STRING', true) || '
+          from eio_table_422 e
+          where e.id = 2966';
 
 
     for r in execute sql
@@ -539,7 +715,7 @@ declare
     res varchar[];
 begin
 
-    res = ARRAY['guuid_chs3']; -- из таблицы tbl_fiks_incidents_1
+    res = ARRAY[]::varchar[]; -- из таблицы tbl_fiks_incidents_1
     return res;
 end
 $BODY$
@@ -551,7 +727,7 @@ declare
     res varchar[];
 begin
 
-    res = ARRAY['STRING']; -- из таблицы tbl_fiks_incidents_1
+    res = ARRAY[]::varchar[]; -- из таблицы tbl_fiks_incidents_1
     return res;
 end
 $BODY$
@@ -576,6 +752,15 @@ declare
     params_type_string varchar;
 
     idChildCategory int4;
+
+    tableNameDevice varchar;
+    params_code_device varchar[];
+    params_type_device varchar[];
+    params_sql_string_device varchar;
+    params_code_string_device varchar;
+    params_type_string_device varchar;
+    idChildCategoryDevice int4;
+
     sql varchar;
 begin
 
@@ -598,7 +783,21 @@ begin
     select array_to_string(array_agg( asString(t.type, true) ), ',') into params_type_string
     from (select unnest(params_type) as type) as t;
     
-   sql = 'select t.colname, t.the_value, a.name, t.coltype
+    params_type_device = getCameraDeviceAdditionalParamsType();
+    params_code_device = getCameraDeviceAdditionalParams();
+    idChildCategoryDevice = 402;
+    tableNameDevice = 'eio_table_422';
+
+    select array_to_string(array_agg('asString(t."' || t.code || '", false)'), ',') into params_sql_string_device
+    from (select unnest(params_code_device) as code) as t;
+
+    select array_to_string(array_agg( asString(t.code, true) ), ',') into params_code_string_device
+    from (select unnest(params_code_device) as code) as t;
+
+    select array_to_string(array_agg( asString(t.type, true) ), ',') into params_type_string_device
+    from (select unnest(params_type_device) as type) as t;
+
+    sql = 'select t.colname, t.the_value, a.name, t.coltype
           from
               (SELECT 
                    t.id,
@@ -614,7 +813,28 @@ begin
           where
               a.id = ac.id_io_attribute
               and ac.id_io_category = ' || idChildCategory || '
-              and a.code = t.colname';
+              and a.code = t.colname
+
+        union all
+
+          select t.colname, t.the_value, a.name, t.coltype
+          from
+              (SELECT 
+                   t.id,
+                   unnest(ARRAY[' || params_code_string_device || ']) AS colname,
+                   unnest(ARRAY[' || params_type_string_device || ']) AS coltype,
+                   unnest(ARRAY[' || params_sql_string_device || ']) AS the_value
+               FROM ' || tableNameDevice || ' t, ' || tableName || ' c 
+               WHERE
+                   c.uuid_t = ' || asString(alarm_uuid, true) || '
+                   and c.device = t.id
+               ORDER BY t.id, colname) as t,
+              attributes a,
+              attrs_categories ac
+          where
+              a.id = ac.id_io_attribute
+              and ac.id_io_category = ' || idChildCategoryDevice || '
+              and a.code = t.colname ';
 
 
     for r in execute sql
@@ -652,6 +872,30 @@ end
 $BODY$
 language 'plpgsql';
 
+create or replace function getHPostDeviceAdditionalParams() returns varchar[] as
+$BODY$
+declare
+    res varchar[];
+begin
+
+    res = ARRAY['name']; -- из таблицы tbl_eio_table_422
+    return res;
+end
+$BODY$
+language 'plpgsql';
+
+create or replace function getHPostDeviceAdditionalParamsType() returns varchar[] as
+$BODY$
+declare
+    res varchar[];
+begin
+
+    res = ARRAY['STRING']; -- из таблицы tbl_eio_table_422
+    return res;
+end
+$BODY$
+language 'plpgsql';
+
 
 /* ********************************** */
 --select * from io_objects where id = 492
@@ -672,6 +916,15 @@ declare
     params_type_string varchar;
 
     idChildCategory int4;
+
+    tableNameDevice varchar;
+    params_code_device varchar[];
+    params_type_device varchar[];
+    params_sql_string_device varchar;
+    params_code_string_device varchar;
+    params_type_string_device varchar;
+    idChildCategoryDevice int4;
+    
     sql varchar;
 begin
 
@@ -694,7 +947,21 @@ begin
     select array_to_string(array_agg( asString(t.type, true) ), ',') into params_type_string
     from (select unnest(params_type) as type) as t;
     
-   sql = 'select t.colname, t.the_value, a.name, t.coltype
+    params_type_device = getCameraDeviceAdditionalParamsType();
+    params_code_device = getCameraDeviceAdditionalParams();
+    idChildCategoryDevice = 402;
+    tableNameDevice = 'eio_table_422';
+
+    select array_to_string(array_agg('asString(t."' || t.code || '", false)'), ',') into params_sql_string_device
+    from (select unnest(params_code_device) as code) as t;
+
+    select array_to_string(array_agg( asString(t.code, true) ), ',') into params_code_string_device
+    from (select unnest(params_code_device) as code) as t;
+
+    select array_to_string(array_agg( asString(t.type, true) ), ',') into params_type_string_device
+    from (select unnest(params_type_device) as type) as t;
+
+    sql = 'select t.colname, t.the_value, a.name, t.coltype
           from
               (SELECT 
                    t.id,
@@ -710,7 +977,28 @@ begin
           where
               a.id = ac.id_io_attribute
               and ac.id_io_category = ' || idChildCategory || '
-              and a.code = t.colname';
+              and a.code = t.colname
+              
+        union all
+
+          select t.colname, t.the_value, a.name, t.coltype
+          from
+              (SELECT 
+                   t.id,
+                   unnest(ARRAY[' || params_code_string_device || ']) AS colname,
+                   unnest(ARRAY[' || params_type_string_device || ']) AS coltype,
+                   unnest(ARRAY[' || params_sql_string_device || ']) AS the_value
+               FROM ' || tableNameDevice || ' t, ' || tableName || ' c 
+               WHERE
+                   c.uuid_t = ' || asString(alarm_uuid, true) || '
+                   and c.device = t.id
+               ORDER BY t.id, colname) as t,
+              attributes a,
+              attrs_categories ac
+          where
+              a.id = ac.id_io_attribute
+              and ac.id_io_category = ' || idChildCategoryDevice || '
+              and a.code = t.colname ';
 
 
     for r in execute sql
@@ -746,3 +1034,29 @@ begin
 end
 $BODY$
 language 'plpgsql';
+
+create or replace function getHPostDeviceAdditionalParams() returns varchar[] as
+$BODY$
+declare
+    res varchar[];
+begin
+
+    res = ARRAY['name']; -- из таблицы tbl_eio_table_422
+    return res;
+end
+$BODY$
+language 'plpgsql';
+
+create or replace function getHPostDeviceAdditionalParamsType() returns varchar[] as
+$BODY$
+declare
+    res varchar[];
+begin
+
+    res = ARRAY['STRING']; -- из таблицы tbl_eio_table_422
+    return res;
+end
+$BODY$
+language 'plpgsql';
+
+

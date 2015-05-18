@@ -1,4 +1,4 @@
-create or replace function getEIO (int8, int4) returns varchar as
+﻿create or replace function getEIO (int8, int4) returns varchar as
 $BODY$
 declare
     id_copy alias for $1;
@@ -8,7 +8,7 @@ declare
     rTable varchar;
     refTable varchar;
     idIoCategory int4;
-
+                        
     attrs_code varchar;
     fields varchar[];
     mainAttr varchar;
@@ -58,7 +58,11 @@ begin
             attrs_code := '( select getExValuesId (' || id_copy || ',' || quote_literal (refTable) || ',' || quote_literal (mainAttr) || ',' || quote_literal (childAttr) || '))';
             raise notice '%', attrs_code;
         else
-            attrs_code = r.code;
+            if(r.code <> 'uuid_t') then
+                attrs_code = r.code;
+            else
+                continue;
+            end if;
         end if;
 
         --for all system qualifiers exclude fields from q_base_table!

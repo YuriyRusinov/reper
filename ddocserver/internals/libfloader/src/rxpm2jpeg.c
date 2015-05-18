@@ -21,7 +21,7 @@ Datum rxpm2jpeg(PG_FUNCTION_ARGS)
         PG_RETURN_NULL();
     }
     
-    elog(WARNING, "111");
+    --elog(WARNING, "111");
 
 
     data = (text*) palloc(VARHDRSZ + jpegDataSize);

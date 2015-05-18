@@ -69,7 +69,8 @@ begin
                         defValue, --def_value
                         r.attnotnull, --is_mandatory
                         false, --is_read_only
-                        NULL --unique_id
+                        NULL, --unique_id
+                        NULL --attr_directives
                        ) into idAttribute;
 
         if(idAttribute < 0) then

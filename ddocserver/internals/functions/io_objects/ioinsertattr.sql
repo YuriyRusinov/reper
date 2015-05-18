@@ -1,4 +1,4 @@
-create or replace function ioInsertAttr(int4, int4, varchar, timestamp, timestamp, int4, int4, varchar) returns int4 as
+п»їcreate or replace function ioInsertAttr(int4, int4, varchar, timestamp, timestamp, int4, int4, varchar) returns int4 as
 $BODY$
 declare
     idObject alias for $1;
@@ -68,7 +68,7 @@ end
 $BODY$
 language 'plpgsql';
 
---используется при информационном обмене
+--РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РїСЂРё РёРЅС„РѕСЂРјР°С†РёРѕРЅРЅРѕРј РѕР±РјРµРЅРµ
 create or replace function ioInsertAttrEx(int4, varchar, varchar, timestamp, timestamp, int4, int4, varchar) returns int4 as
 $BODY$
 declare
@@ -115,7 +115,8 @@ begin
        idType <> 12 and --old checkboxes
        idType <> 17 and --new checkboxes
        idType <> 19 and --ref to color (fill)
-       idType <> 26)    --ref to color (text)
+       idType <> 26 and    --ref to color (text)
+       idType <> 39) --ref to category
     then
         
         select ioInsertAttr(idObject, idAttr, ioValue, iStartTime, iStopTime, iIdObjectSrc, iIdObjectSrc1, iDesc) into ok;
@@ -128,7 +129,7 @@ begin
         return ok;
     end if;
 
-    if(idType <> 12 and idType <> 17) then --наборы элементов справочника
+    if(idType <> 12 and idType <> 17) then --РЅР°Р±РѕСЂС‹ СЌР»РµРјРµРЅС‚РѕРІ СЃРїСЂР°РІРѕС‡РЅРёРєР°
         theValue = getIDByUID(tableName, ioValue);
 
         if(theValue is not null) then

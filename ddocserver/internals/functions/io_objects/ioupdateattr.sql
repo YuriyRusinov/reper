@@ -67,7 +67,7 @@ begin
             query := query || 'NULL';
         end if;
 
-        query := query || ' where ' || 'id_io_object = ' || idObject || ' and id_attr_category = ' ||idCatAttr ||'; update io_objects set last_update = CURRENT_TIMESTAMP where id = '|| ioObject ||';';
+        query := query || ' where ' || 'id_io_object = ' || idObject || ' and id_attr_category = ' ||idCatAttr ||'; update io_objects set last_update = CURRENT_TIMESTAMP where id = '|| idObject ||';';
         raise warning 'query is %', query;
         execute query;
     else
@@ -196,7 +196,7 @@ begin
         return -1;
     end if;
 
-    if(idType <> 2 and idType <> 3 and idType <> 7 and idType <> 12 and idType <> 17 and idType <> 19 and idType <> 26)  then
+    if(idType <> 2 and idType <> 3 and idType <> 7 and idType <> 12 and idType <> 17 and idType <> 19 and idType <> 26 and idType <> 39)  then
         raise warning 'type is %', idType;
         select ioUpdateAttr(idObject, idAttr, ioValue, start_time, iStopTime, iIdObjectSrc, iIdObjectSrc1, iDesc) into ok;
         return ok;

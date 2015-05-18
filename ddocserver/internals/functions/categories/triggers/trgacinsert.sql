@@ -1,5 +1,5 @@
-/*
-�� ��������� ���������� ����� ���������, �� �� ��������� ������� ��������� � ����������� ������ � ����� ���������
+﻿/*
+Мы разрешаем повторение кодов атрибутов, но мы запрещаем наличие атрибутов с одинаковыми кодами в одной категории
 */
 create or replace function acInsertCheck() returns trigger as 
 $BODY$
@@ -9,6 +9,7 @@ declare
     aCode varchar; 
     aCount int4;
     aName varchar;
+    aType int4;
 begin
     select code into aCode from attributes where id = new.id_io_attribute;
     if(aCode isnull) then
@@ -40,6 +41,13 @@ begin
     select name into aName from attributes where id = new.id_io_attribute;
     
     new.name := aName;
+
+    --проверка на атрибут типа id_parent
+    select id_a_type into aType from attributes where id = new.id_io_attribute;
+    if(aType = 3) then --родитель-потомок
+        --в этом случае добавим в категорию таблицы справочника атрибут 403 (иерархический признак записи)
+        insert into attrs_categories (id_io_category, id_io_attribute, name, is_mandatory, is_read_only, directives) values(new.id_io_category, 403, 'Иерархический признак записи', false, false, NULL);
+    end if;
 
     return new;
 end

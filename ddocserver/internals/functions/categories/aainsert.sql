@@ -1,3 +1,4 @@
+drop function if exists aaInsert(int4, int4, varchar, varchar, varchar, varchar, varchar, int4, varchar, boolean, boolean, varchar, varchar);
 create or replace function aaInsert(int4,
                                     int4,
                                     varchar,
@@ -10,7 +11,9 @@ create or replace function aaInsert(int4,
                                     boolean,
                                     boolean,
                                     varchar,
-                                    varchar) returns int4 as
+                                    varchar,
+                                    varchar,
+                                    int4,) returns int4 as
 $BODY$
 declare
     idAttrParent alias for $1;
@@ -26,6 +29,8 @@ declare
     isReadOnly alias for $11;
     uniqueID alias for $12;
     attrAttrUniqueId alias for $13;
+    aaDirectives alias for $14;
+    aaOrder alias for $15;
 
     idAttr int4;
     ok int4;
@@ -38,7 +43,7 @@ begin
         return -1;
     end if;
 
-    select aInsertAttrAttr(idAttrParent, idAttr, aDefValue, isMandatory, isReadOnly, attrAttrUniqueId) into ok;
+    select aInsertAttrAttr(idAttrParent, idAttr, aDefValue, isMandatory, isReadOnly, attrAttrUniqueId, aaDirectives, aaOrder) into ok;
     if(ok <= 0) then
         return -1;
     end if;

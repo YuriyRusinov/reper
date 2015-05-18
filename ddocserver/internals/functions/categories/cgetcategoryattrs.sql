@@ -20,7 +20,8 @@ create type h_get_category_attrs as(id_attribute int4,
                                     ref_column_name varchar,
                                     id_ex,
                                     unique_id_ex,
-                                    attr_order int4);
+                                    attr_order int4,
+                                    attr_directives varchar);
 */
 
 create or replace function cGetCategoryAttr(int4) returns setof h_get_attribute as
@@ -56,7 +57,8 @@ begin
             ag.name,
             ca.id,
             ca.unique_id,
-            ca.order
+            ca.order,
+            ca.directives
         from  
             attrs_categories ca 
             inner join attributes a on (ca.id = ' || idCategoryAttr || E' and ca.id_io_attribute = a.id) 
@@ -118,7 +120,8 @@ begin
             ag.name,
             ca.id,
             ca.unique_id,
-            ca.order
+            ca.order,
+            ca.directives
         from  
             attrs_categories ca 
             inner join attributes a on (ca.id_io_category = ' || idCategory || E' and ca.id_io_attribute = ' || idAttr || E' and ca.id_io_attribute = a.id) 
@@ -178,7 +181,8 @@ begin
             ag.name,
             ca.id,
             ca.unique_id,
-            ca.order
+            ca.order,
+            ca.directives
         from  
             attrs_categories ca inner join attributes a on (ca.id_io_category = ' || idCategory || E' and ca.id_io_attribute = a.id) inner join a_types att on (a.id_a_type = att.id) inner join attrs_groups ag on (a.id_attr_group = ag.id)';
     raise warning 'query is %', query;
@@ -239,7 +243,8 @@ begin
             ag.name,
             ca.id,
             ca.unique_id,
-            ca.order
+            ca."order",
+            ca.directives
         from  
             attrs_categories ca,
             attributes a,

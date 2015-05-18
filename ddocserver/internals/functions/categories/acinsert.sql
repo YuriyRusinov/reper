@@ -9,7 +9,9 @@ create or replace function acInsert(int4,
                                    varchar,
                                    boolean,
                                    boolean,
-                                   varchar) returns int4 as
+                                   varchar,
+                                   varchar,
+                                   int4) returns int4 as
 $BODY$
 declare
     idCategory alias for $1;
@@ -24,6 +26,9 @@ declare
     isMandatory alias for $10;
     isReadOnly alias for $11;
     uniqueID alias for $12;
+    acDirectives alias for $13;
+    acOrder alias for $14;
+    
 
     idAttr int4;
     ok int4;
@@ -36,7 +41,7 @@ begin
         return -1;
     end if;
 
-    select cAddAttr(idCategory, idAttr, aDefValue, isMandatory, isReadOnly) into ok;
+    select cAddAttr(idCategory, idAttr, aDefValue, isMandatory, isReadOnly, acDirectives, acOrder) into ok;
     if(ok <= 0) then
         return -1;
     end if;
@@ -60,7 +65,9 @@ create or replace function acInsertEx(int4,
                                       varchar,
                                       boolean,
                                       boolean,
-                                      varchar) returns int4 as
+                                      varchar,
+                                      varchar,
+                                      int4) returns int4 as
 $BODY$
 declare
     idCategory alias for $1;
@@ -75,6 +82,8 @@ declare
     isMandatory alias for $10;
     isReadOnly alias for $11;
     uniqueID alias for $12;
+    acDirectives alias for $13;
+    acOrder alias for $14;
 
     idAttr int4;
     ok int4;
@@ -87,7 +96,7 @@ begin
         return -1;
     end if;
 
-    select cAddAttr(idCategory, idAttr, aDefValue, isMandatory, isReadOnly) into ok;
+    select cAddAttr(idCategory, idAttr, aDefValue, isMandatory, isReadOnly, acDirectives, acOrder) into ok;
     if(ok <= 0) then
         return -2;
     end if;
@@ -112,7 +121,9 @@ create or replace function acInsert1(int4,
                                    boolean,
                                    boolean,
                                    varchar,
-                                   varchar) returns int4 as
+                                   varchar,
+                                   varchar,
+                                   int4) returns int4 as
 $BODY$
 declare
     idCategory alias for $1;
@@ -128,6 +139,8 @@ declare
     isReadOnly alias for $11;
     uniqueID alias for $12;
     refColumn alias for $13;
+    acDirectives alias for $14;
+    acOrder alias for $15;
 
     idAttr int4;
     ok int4;
@@ -138,7 +151,7 @@ begin
         return -1;
     end if;
 
-    select cAddAttr(idCategory, idAttr, aDefValue, isMandatory, isReadOnly) into ok;
+    select cAddAttr(idCategory, idAttr, aDefValue, isMandatory, isReadOnly, acDirectives, acOrder) into ok;
     if(ok <= 0) then
         return -2;
     end if;

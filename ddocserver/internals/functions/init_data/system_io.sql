@@ -1325,7 +1325,10 @@ insert into attributes (unique_id, id, id_a_type, code, name, title, table_name,
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-400', 400, 2, 'id_search_template', 'Критерии отбора (поисковый запрос)', 'Критерии отбора (поисковый запрос)', 'search_templates', 'name', 150, TRUE);
 insert into attributes (unique_id, id, id_a_type, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-401', 401, 1, 'is_accept', 'Генерировать при выполнении условий', 'Генерировать при выполнении условий', NULL, NULL, 100, TRUE);
 
-
+--!!! не использовать эти строки в качестве шаблона для других атрибутов!!!
+--здесь дополнительно устанавливается поле id_attr_group
+insert into attributes (unique_id, id, id_a_type, id_attr_group, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-402', 402, 39, 3, 'id_table_category', 'Ссылка на категорию таблицы справочника', 'Ссылка на категорию таблицы справочника', 'io_categories', 'name', 300, TRUE);
+insert into attributes (unique_id, id, id_a_type, id_attr_group, code, name, title, table_name, column_name, def_width, is_system) values('localorg-attributes-403', 403, 8, 3, 'item_is_leaf', 'Иерархический признак записи', 'Иерархический признак записи', NULL, NULL, 300, TRUE);
 
 SELECT pg_catalog.setval('attributes_id_seq', 1000, true); --все пользовательские атрибуты будут начинаться с номера 1001
                                                            --это сделано для того, чтобы оставить резерв для системных атрибутов

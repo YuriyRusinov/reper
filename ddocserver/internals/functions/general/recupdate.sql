@@ -1,4 +1,4 @@
-create or replace function recUpdate (varchar, varchar[], varchar[], varchar, varchar) returns int8 as
+п»їcreate or replace function recUpdate (varchar, varchar[], varchar[], varchar, varchar) returns int8 as
 $BODY$
 declare
     table_uid alias for $1;
@@ -61,7 +61,7 @@ begin
             return -1;
         end if;
 
-        if (id_attr_type = 17) then --многие-ко-многим
+        if (id_attr_type = 17) then --РјРЅРѕРіРёРµ-РєРѕ-РјРЅРѕРіРёРј
             for rr in
                 select a.id,a.table_name from attributes a where a.unique_id = attrs_uids[i] --agetattribute (attr_code)
             loop
@@ -127,7 +127,7 @@ begin
             end if;
 
             --raise warning E'Found attr_type = 12. r_query = %', r_query;
-        elsif (id_attr_type = 2 or id_attr_type = 3 or id_attr_type = 19 or id_attr_type = 26) then
+        elsif (id_attr_type = 2 or id_attr_type = 3 or id_attr_type = 19 or id_attr_type = 26 or id_attr_type = 39) then
             r_query := r_query || '"' || attr_code || '"';
             for rattr in
                 select * from agetattributeByUID (attrs_uids[i])

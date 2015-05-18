@@ -19,7 +19,8 @@ create type h_get_object_attrs as(
                                   is_actual boolean,
                                   description varchar,
                                   attr_name varchar,
-                                  attr_order int4);
+                                  attr_order int4,
+                                  attr_directives varchar);
 
 */
 
@@ -77,7 +78,8 @@ begin
             av.is_actual,
             av.description,
             a.name,
-            ac.order
+            ac."order",
+            ac.directives
         from 
             (f_sel_attrs_values(idObject::int4) av inner join attrs_categories ac on (av.id_attr_category = ac.id) inner join attributes a on (ac.id_io_attribute=a.id and av.id_io_object = idObject))
         where 

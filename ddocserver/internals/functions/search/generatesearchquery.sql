@@ -113,7 +113,7 @@ begin
             continue;
         end if;
 
-        if (ar.id_a_type = 2 or ar.id_a_type = 3) then  --atList, atParent
+        if (ar.id_a_type = 2 or ar.id_a_type = 3 or ar.id_a_type = 39) then  --atList, atParent
             tName := ar.table_name;
             cName := ar.column_name;
 
@@ -470,22 +470,14 @@ begin
             
         elsif (r.id_operation = 13) then --in (select ...)
             res_query := res_query || ' (';
-            select into search_pos position (lower('search') in lower (r.value));
-            --raise notice 'position is %', search_pos;
-
-            search_query := substring (r.value from 1 for search_pos+5 );
-            search_query := search_query || 'Query' ||  substring (r.value from search_pos+6 ) || 'as sq';
-            --raise notice 'search query is %', search_query;
-            for rs in
-                execute search_query
-            loop
-                res_query := res_query || substring (rs.sq from 1 for char_length(rs.sq)-1);
-            end loop;
+            --select into search_pos position (lower('search') in lower (r.value));
+            search_query :=  r.value;
+            res_query := res_query || search_query;
             res_query := res_query || ' )';
+            
         end if;
     end loop;
 
-    --raise notice 'parse filter result query is %', res_query;
     return res_query;
 end
 $BODY$

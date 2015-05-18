@@ -1,10 +1,10 @@
-п»ї
--- С‚РёРї g_get_message_card РѕР±СЉСЏРІР»РµРЅ РІ getMessageCardAboutCamera.sql
+
+-- тип g_get_message_card объявлен в getMessageCardAboutCamera.sql
 
 
 /*
 select * from getIncidentCard(2082);
-select * from getIncidentMessages(2082)
+select * from getIncidentMessages(1971)
 select array_agg(mess_uuid::varchar) from getIncidentMessages(2082)
 select * from getAdditionalInfo((select mess_uuid from getIncidentMessages(2082) limit 1))
 */
@@ -66,12 +66,12 @@ begin
         it.uuid_t as type_uuid,
         it.incident_name as type_name,
 
-        --РєРѕРѕСЂРґРёРЅР°С‚С‹ СЃРѕР±С‹С‚РёСЏ
+        --координаты события
         card.latitude as latitude,
         card.longitude as longitude,
         NULL as altitude,
 
-        --Р°РґСЂРµСЃ СЃРѕР±С‹С‚РёСЏ
+        --адрес события
         addr1.formalname as addr_reg_name,
         addr1.uuid_t as addr_reg_uuid,
 
@@ -115,8 +115,8 @@ begin
         'GELIOS' as external_sys_name
         
     from
-        eio_table_490 card -- РЎРїСЂР°РІРѕС‡РЅРёРє СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ СЂР°СЃС‡РµС‚Р° РјРѕРґРµР»РёСЂРѕРІР°РЅРёСЏ
-        left join eio_table_424 it on (card.incident = it.id) -- РљР»Р°СЃСЃРёС„РёРєР°С‚РѕСЂ СЃРѕР±С‹С‚РёР№ СѓСЃС‚СЂРѕР№СЃС‚РІ РѕР±РЅР°СЂСѓР¶РµРЅРёСЏ
+        eio_table_490 card -- Справочник результатов расчета моделирования
+        left join eio_table_424 it on (card.incident = it.id) -- Классификатор событий устройств обнаружения
 
         left join eio_table_391 addr1 on (card.region = addr1.id)
         left join eio_table_391 addr2 on (card.sity = addr2.id)
@@ -199,35 +199,40 @@ begin
 
 
     for r in 
-        select q.uuid_t, q.uuid_t::varchar --'MONITORING'
-        from eio_table_490_eio_table_436_ref_1289 t, eio_table_436 q
+        select q.uuid_t, d.uuid_t::varchar --'MONITORING'
+        from eio_table_490_eio_table_436_ref_1289 t, eio_table_436 q, eio_table_422 d
         where q.id = t.id_eio_table_436
               and t.id_eio_table_490 = idCard
+              and q.device = d.id
 
         union all
 
-        select q.uuid_t, q.uuid_t::varchar --'VIDEO'
-        from eio_table_490_eio_table_439_ref_1288 t, eio_table_439 q
+        select q.uuid_t, d.uuid_t::varchar --'VIDEO'
+        from eio_table_490_eio_table_439_ref_1288 t, eio_table_439 q, eio_table_422 d
         where q.id = t.id_eio_table_439
               and t.id_eio_table_490 = idCard
+              and q.device = d.id
         
         union all
 
-        select q.uuid_t, q.uuid_t::varchar --'FORECASTING'
-        from eio_table_490_eio_table_438_ref_1290 t, eio_table_438 q
+        select q.uuid_t, d.uuid_t::varchar --'FORECASTING'
+        from eio_table_490_eio_table_438_ref_1290 t, eio_table_438 q, eio_table_436 e, eio_table_422 d
         where q.id = t.id_eio_table_438
               and t.id_eio_table_490 = idCard
+              and q.event_id = e.id
+              and e.device = d.id
 
         union all              
 
-        select q.uuid_t, q.uuid_t::varchar --'MONITORING' (РѕС‚ Р°СЂРіСѓСЃР°)
-        from eio_table_490_eio_table_492_ref_1293 t, eio_table_492 q
+        select q.uuid_t, d.uuid_t::varchar --'MONITORING' (от аргуса)
+        from eio_table_490_eio_table_492_ref_1293 t, eio_table_492 q, eio_table_422 d
         where q.id = t.id_eio_table_492
               and t.id_eio_table_490 = idCard
+              and q.device = d.id
 
         union all              
 
-        select q.uuid_t, q.uuid_t::varchar --'MONITORING' (РѕС‚ РёРЅС‚РµСЂРЅРµС‚-РїРѕСЂС‚Р°Р»Р°)
+        select q.uuid_t, q.uuid_t::varchar --'MONITORING' (от интернет-портала)
         from eio_table_490_fiks_incidents_1_ref_1329 t, fiks_incidents_1 q
         where q.id = t.id_fiks_incidents_1
               and t.id_eio_table_490 = idCard

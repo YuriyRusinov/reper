@@ -1,4 +1,4 @@
-п»ї/*
+/*
 select * from eio_table_436;
 select * from eio_table_438;
 
@@ -8,10 +8,13 @@ select * from eio_table_422;
 select * from eio_table_391;
 select * from units;
 
+select * from fiks_incidents_1
+
 --select * from attributes where id = 1198
 select * from getMessageCardAboutCamera(918);
 select * from getMessageCardAboutHPost(1998);
 select * from getMessageCardAboutModeling(694);
+select * from getMessageCardAboutPortal(4148);
 update units set code_name = 'MONITORING' where id = 19;
 select * from eio_table_492
 --select * from "position" where id = 23
@@ -170,7 +173,47 @@ end
 $BODY$
 language 'plpgsql';
 
+
 create or replace function getMessageCardAboutModeling(uuid) returns setof h_get_message_card as 
+$BODY$
+declare
+    externalBusUUID alias for $1;
+
+    hPostId int8;
+    argusId int8;
+    
+    rr record; --h_get_message_card%rowtype;
+    r h_get_message_card%rowtype;
+begin
+
+    hPostId = NULL;
+    argusId = NULL;
+    
+    for rr in select event_id, argus_incident from eio_table_438 where uuid_t = externalBusUUID
+    loop
+        hPostId = rr.event_id;
+        argusId = rr.argus_incident;
+    end loop;
+
+    if(hPostId is not null) then
+        for r in select * from getMessageCardAboutModelingHPost(externalBusUUID)
+        loop
+            return next r;
+        end loop;
+    else
+        for r in select * from getMessageCardAboutModelingArgus(externalBusUUID)
+        loop
+            return next r;
+        end loop;
+    end if;
+    
+    return;
+end
+$BODY$
+language 'plpgsql';
+
+
+create or replace function getMessageCardAboutModelingHPost(uuid) returns setof h_get_message_card as 
 $BODY$
 declare
     externalBusUUID alias for $1;
@@ -181,44 +224,48 @@ begin
     for r in 
 
     select 
-        vi.uuid_t::varchar as bus_uuid,
-        it.uuid_t as type_uuid,
-        it.incident_name as type_name,
+        '8de44fac-ea70-11e4-8339-7054d244cccc' as bus_uuid, --m.uuid_t::varchar as bus_uuid, --идентификатор системы ЦИЭКС в справочнике устройств (422)
+        it.uuid_t as type_uuid, -- тип ЧС
+        it.name as type_name,
 
-        --РєРѕРѕСЂРґРёРЅР°С‚С‹ СЃРѕР±С‹С‚РёСЏ
+        --координаты события
         ustr.latitude as latitude,
         ustr.longitude as longitude,
         NULL as altitude,
 
-        --Р°РґСЂРµСЃ СЃРѕР±С‹С‚РёСЏ
-        addr1.formalname as addr_reg_name,
-        addr1.uuid_t as addr_reg_uuid,
+        --адрес события
+        ustr.region_str_fias as addr_reg_name,
+        NULL --addr1.uuid_t 
+            as addr_reg_uuid,
 
-        addr2.formalname as addr_city_name,
-        addr2.uuid_t as addr_city_uuid,
+        ustr.city_str_fias as addr_city_name,
+        NULL -- addr2.uuid_t 
+            as addr_city_uuid,
 
-        addr3.formalname as addr_street_name,
-        addr3.uuid_t as addr_street_uuid,
+        ustr.street_str_fias as addr_street_name,
+        NULL -- addr3.uuid_t 
+            as addr_street_uuid,
 
-        NULL -- addr4.formalname 
+        ustr.corps_str
             as addr_house_number_add,
         NULL --addr4.uuid_t 
             as addr_house_number_add_uuid,
 
-        addr5.formalname as addr_house_number,
-        addr5.uuid_t as addr_house_uuid,
+        ustr.house_number_str as addr_house_number,
+        NULL -- addr5.uuid_t 
+            as addr_house_uuid,
 
-        NULL --addr6.formalname 
+        ustr.house_part_str
             as addr_house_part,
         NULL --addr6.uuid_t 
             as addr_house_part_uuid,
 
-        NULL -- addr7.formalname 
+        ustr.floor_str
             as addr_floor,
         NULL -- addr7.uuid_t 
             as addr_floor_uuid,
 
-        NULL --addr8.formalname 
+        ustr.apartment_str
             as addr_apartment,
         NULL --addr8.uuid_t 
             as addr_apartment_uuid,
@@ -226,7 +273,7 @@ begin
         NULL as message_description,
         ustr.param as addr_additional_info,
 
-        vi.dt as msg_date,
+        m.dt as msg_date,
 
         NULL as addressed_contact,
         NULL as addressed_fio,
@@ -234,15 +281,111 @@ begin
         u.code_name as external_sys_name
         
     from
-        eio_table_438 m -- РЎРїСЂР°РІРѕС‡РЅРёРє СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ СЂР°СЃС‡РµС‚Р° РјРѕРґРµР»РёСЂРѕРІР°РЅРёСЏ
-        left join eio_table_436 vi on (m.event_id = vi.id) -- РЎРїСЂР°РІРѕС‡РЅРёРє СЃРѕР±С‹С‚РёР№ РіРёРґСЂРѕРїРѕСЃС‚РѕРІ Р¦РР­РљРЎ
-        left join eio_table_424 it on (vi.incident = it.id) -- РљР»Р°СЃСЃРёС„РёРєР°С‚РѕСЂ СЃРѕР±С‹С‚РёР№ СѓСЃС‚СЂРѕР№СЃС‚РІ РѕР±РЅР°СЂСѓР¶РµРЅРёСЏ
-        left join eio_table_422 ustr on (vi.device = ustr.id) -- РЎРїСЂР°РІРѕС‡РЅРёРє СѓСЃС‚СЂРѕР№СЃС‚РІ (Deprecated)
+        eio_table_438 m -- Справочник результатов расчета моделирования
+        left join eio_table_436 vi on (m.event_id = vi.id) -- Справочник событий гидропостов ЦИЭКС
+        --left join eio_table_424 it on (vi.incident = it.id) -- Классификатор событий устройств обнаружения
+        left join reestr_chs it on (m.type_chs3 = it.id) -- Классификатор типов ЧС
+        left join eio_table_422 ustr on (vi.device = ustr.id) -- Справочник устройств (Deprecated)
 
-        left join eio_table_391 addr1 on (ustr.region = addr1.id)
-        left join eio_table_391 addr2 on (ustr.sity = addr2.id)
-        left join eio_table_391 addr3 on (ustr.street = addr3.id)
-        left join eio_table_391 addr5 on (ustr.house = addr5.id)
+        --left join eio_table_391 addr1 on (ustr.region = addr1.id)
+        --left join eio_table_391 addr2 on (ustr.sity = addr2.id)
+        --left join eio_table_391 addr3 on (ustr.street = addr3.id)
+        --left join eio_table_391 addr5 on (ustr.house = addr5.id)
+
+        left join "position" pos on (m."medical-attributes-1198" = pos.id)
+        left join units u on (pos.id_unit = u.id)
+
+
+    where
+        m.uuid_t = externalBusUUID
+
+    loop
+        return next r;
+    end loop;
+    
+    return;
+end
+$BODY$
+language 'plpgsql';
+
+create or replace function getMessageCardAboutModelingArgus(uuid) returns setof h_get_message_card as 
+$BODY$
+declare
+    externalBusUUID alias for $1;
+
+    r h_get_message_card%rowtype;
+begin
+
+    for r in 
+
+    select 
+        '8de44fac-ea70-11e4-8339-7054d244cccc' as bus_uuid, --m.uuid_t::varchar as bus_uuid, --идентификатор системы ЦИЭКС в справочнике устройств (422)
+        it.uuid_t as type_uuid, -- тип ЧС
+        it.name as type_name,
+
+        --координаты события
+        ustr.latitude as latitude,
+        ustr.longitude as longitude,
+        NULL as altitude,
+
+        --адрес события
+        ustr.region_str_fias as addr_reg_name,
+        NULL --addr1.uuid_t 
+            as addr_reg_uuid,
+
+        ustr.city_str_fias as addr_city_name,
+        NULL -- addr2.uuid_t 
+            as addr_city_uuid,
+
+        ustr.street_str_fias as addr_street_name,
+        NULL -- addr3.uuid_t 
+            as addr_street_uuid,
+
+        ustr.corps_str
+            as addr_house_number_add,
+        NULL --addr4.uuid_t 
+            as addr_house_number_add_uuid,
+
+        ustr.house_number_str as addr_house_number,
+        NULL -- addr5.uuid_t 
+            as addr_house_uuid,
+
+        ustr.house_part_str
+            as addr_house_part,
+        NULL --addr6.uuid_t 
+            as addr_house_part_uuid,
+
+        ustr.floor_str
+            as addr_floor,
+        NULL -- addr7.uuid_t 
+            as addr_floor_uuid,
+
+        ustr.apartment_str
+            as addr_apartment,
+        NULL --addr8.uuid_t 
+            as addr_apartment_uuid,
+
+        NULL as message_description,
+        ustr.param as addr_additional_info,
+
+        m.dt as msg_date,
+
+        NULL as addressed_contact,
+        NULL as addressed_fio,
+
+        u.code_name as external_sys_name
+        
+    from
+        eio_table_438 m -- Справочник результатов расчета моделирования
+        left join eio_table_492 vi on (m.argus_incident = vi.id) -- Справочник событий детектирования Аргус-Спектр
+        --left join eio_table_424 it on (vi.incident = it.id) -- Классификатор событий устройств обнаружения
+        left join reestr_chs it on (m.type_chs3 = it.id) -- Классификатор типов ЧС
+        left join eio_table_422 ustr on (vi.device = ustr.id) -- Справочник устройств (Deprecated)
+
+        --left join eio_table_391 addr1 on (ustr.region = addr1.id)
+        --left join eio_table_391 addr2 on (ustr.sity = addr2.id)
+        --left join eio_table_391 addr3 on (ustr.street = addr3.id)
+        --left join eio_table_391 addr5 on (ustr.house = addr5.id)
 
         left join "position" pos on (m."medical-attributes-1198" = pos.id)
         left join units u on (pos.id_unit = u.id)
@@ -313,44 +456,48 @@ begin
     for r in 
 
     select 
-        vi.uuid_t::varchar as bus_uuid,
+        ustr.uuid_t::varchar as bus_uuid, --идентификатор устройства
         it.uuid_t as type_uuid,
         it.incident_name as type_name,
 
-        --РєРѕРѕСЂРґРёРЅР°С‚С‹ СЃРѕР±С‹С‚РёСЏ
+        --координаты события
         ustr.latitude as latitude,
         ustr.longitude as longitude,
         NULL as altitude,
 
-        --Р°РґСЂРµСЃ СЃРѕР±С‹С‚РёСЏ
-        addr1.formalname as addr_reg_name,
-        addr1.uuid_t as addr_reg_uuid,
+        --адрес события
+        ustr.region_str_fias as addr_reg_name,
+        NULL --addr1.uuid_t 
+            as addr_reg_uuid,
 
-        addr2.formalname as addr_city_name,
-        addr2.uuid_t as addr_city_uuid,
+        ustr.city_str_fias as addr_city_name,
+        NULL -- addr2.uuid_t 
+            as addr_city_uuid,
 
-        addr3.formalname as addr_street_name,
-        addr3.uuid_t as addr_street_uuid,
+        ustr.street_str_fias as addr_street_name,
+        NULL -- addr3.uuid_t 
+            as addr_street_uuid,
 
-        NULL -- addr4.formalname 
+        ustr.corps_str
             as addr_house_number_add,
         NULL --addr4.uuid_t 
             as addr_house_number_add_uuid,
 
-        addr5.formalname as addr_house_number,
-        addr5.uuid_t as addr_house_uuid,
+        ustr.house_number_str as addr_house_number,
+        NULL -- addr5.uuid_t 
+            as addr_house_uuid,
 
-        NULL --addr6.formalname 
+        ustr.house_part_str
             as addr_house_part,
         NULL --addr6.uuid_t 
             as addr_house_part_uuid,
 
-        NULL -- addr7.formalname 
+        ustr.floor_str
             as addr_floor,
         NULL -- addr7.uuid_t 
             as addr_floor_uuid,
 
-        NULL --addr8.formalname 
+        ustr.apartment_str
             as addr_apartment,
         NULL --addr8.uuid_t 
             as addr_apartment_uuid,
@@ -366,29 +513,29 @@ begin
         u.code_name as external_sys_name
         
     from
-        eio_table_436 vi -- РЎРїСЂР°РІРѕС‡РЅРёРє СЃРѕР±С‹С‚РёР№ РіРёРґСЂРѕРїРѕСЃС‚РѕРІ Р¦РР­РљРЎ
-        left join eio_table_424 it on (vi.incident = it.id) -- РљР»Р°СЃСЃРёС„РёРєР°С‚РѕСЂ СЃРѕР±С‹С‚РёР№ СѓСЃС‚СЂРѕР№СЃС‚РІ РѕР±РЅР°СЂСѓР¶РµРЅРёСЏ
-        left join eio_table_422 ustr on (vi.device = ustr.id) -- РЎРїСЂР°РІРѕС‡РЅРёРє СѓСЃС‚СЂРѕР№СЃС‚РІ (Deprecated)
+        eio_table_436 vi -- Справочник событий гидропостов ЦИЭКС
+        left join eio_table_424 it on (vi.incident = it.id) -- Классификатор событий устройств обнаружения
+        left join eio_table_422 ustr on (vi.device = ustr.id) -- Справочник устройств (Deprecated)
 
-        left join eio_table_391 addr1 on (ustr.region = addr1.id)
-        left join eio_table_391 addr2 on (ustr.sity = addr2.id)
-        left join eio_table_391 addr3 on (ustr.street = addr3.id)
-        left join eio_table_391 addr5 on (ustr.house = addr5.id)
+        --left join eio_table_391 addr1 on (ustr.region = addr1.id)
+        --left join eio_table_391 addr2 on (ustr.sity = addr2.id)
+        --left join eio_table_391 addr3 on (ustr.street = addr3.id)
+        --left join eio_table_391 addr5 on (ustr.house = addr5.id)
 
         left join "position" pos on (vi."medical-attributes-1198" = pos.id)
         left join units u on (pos.id_unit = u.id)
 
 
-        --eio_table_424 it, -- РљР»Р°СЃСЃРёС„РёРєР°С‚РѕСЂ СЃРѕР±С‹С‚РёР№ СѓСЃС‚СЂРѕР№СЃС‚РІ РѕР±РЅР°СЂСѓР¶РµРЅРёСЏ
-        --eio_table_422 ustr, -- РЎРїСЂР°РІРѕС‡РЅРёРє СѓСЃС‚СЂРѕР№СЃС‚РІ (Deprecated)
+        --eio_table_424 it, -- Классификатор событий устройств обнаружения
+        --eio_table_422 ustr, -- Справочник устройств (Deprecated)
         
-        --eio_table_346 addr1, -- РЎРїСЂР°РІРѕС‡РЅРёРє Р°РґСЂРµСЃРѕРІ
-        --eio_table_346 addr2, -- РЎРїСЂР°РІРѕС‡РЅРёРє Р°РґСЂРµСЃРѕРІ
-        --eio_table_346 addr3, -- РЎРїСЂР°РІРѕС‡РЅРёРє Р°РґСЂРµСЃРѕРІ
-        --eio_table_346 addr4, -- РЎРїСЂР°РІРѕС‡РЅРёРє Р°РґСЂРµСЃРѕРІ
+        --eio_table_346 addr1, -- Справочник адресов
+        --eio_table_346 addr2, -- Справочник адресов
+        --eio_table_346 addr3, -- Справочник адресов
+        --eio_table_346 addr4, -- Справочник адресов
         
-        --"position" pos, --СЃРїР°СЂРІРѕС‡РЅРёРє РґРѕР»Р¶РЅРѕСЃС‚РµР№
-       -- units u --СЃРїСЂР°РІРѕС‡РЅРёРє РїРѕРґСЂР°Р·РґРµР»РµРЅРёР№ (РїРѕРґСЃРёСЃС‚РµРј)
+        --"position" pos, --спарвочник должностей
+       -- units u --справочник подразделений (подсистем)
 
     where
         vi.uuid_t = externalBusUUID
@@ -456,44 +603,48 @@ begin
     for r in 
 
     select 
-        vi.uuid_t::varchar as bus_uuid,
+        ustr.uuid_t::varchar as bus_uuid, --идентификатор устройства
         it.uuid_t as type_uuid,
         it.incident_name as type_name,
 
-        --РєРѕРѕСЂРґРёРЅР°С‚С‹ СЃРѕР±С‹С‚РёСЏ
+        --координаты события
         ustr.latitude as latitude,
         ustr.longitude as longitude,
         NULL as altitude,
 
-        --Р°РґСЂРµСЃ СЃРѕР±С‹С‚РёСЏ
-        addr1.formalname as addr_reg_name,
-        addr1.uuid_t as addr_reg_uuid,
+        --адрес события
+        ustr.region_str_fias as addr_reg_name,
+        NULL --addr1.uuid_t 
+            as addr_reg_uuid,
 
-        addr2.formalname as addr_city_name,
-        addr2.uuid_t as addr_city_uuid,
+        ustr.city_str_fias as addr_city_name,
+        NULL -- addr2.uuid_t 
+            as addr_city_uuid,
 
-        addr3.formalname as addr_street_name,
-        addr3.uuid_t as addr_street_uuid,
+        ustr.street_str_fias as addr_street_name,
+        NULL -- addr3.uuid_t 
+            as addr_street_uuid,
 
-        NULL -- addr4.formalname 
+        ustr.corps_str
             as addr_house_number_add,
         NULL --addr4.uuid_t 
             as addr_house_number_add_uuid,
 
-        addr5.formalname as addr_house_number,
-        addr5.uuid_t as addr_house_uuid,
+        ustr.house_number_str as addr_house_number,
+        NULL -- addr5.uuid_t 
+            as addr_house_uuid,
 
-        NULL --addr6.formalname 
+        ustr.house_part_str
             as addr_house_part,
         NULL --addr6.uuid_t 
             as addr_house_part_uuid,
 
-        NULL -- addr7.formalname 
+        ustr.floor_str
             as addr_floor,
         NULL -- addr7.uuid_t 
             as addr_floor_uuid,
 
-        NULL --addr8.formalname 
+        ustr.apartment_str
             as addr_apartment,
         NULL --addr8.uuid_t 
             as addr_apartment_uuid,
@@ -509,14 +660,14 @@ begin
         u.code_name as external_sys_name
         
     from
-        eio_table_492 vi -- РЎРїСЂР°РІРѕС‡РЅРёРє СЃРѕР±С‹С‚РёР№ РґР°С‚С‡РёРєРѕРІ РїРѕР¶Р°СЂР°
-        left join eio_table_424 it on (vi.incident = it.id) -- РљР»Р°СЃСЃРёС„РёРєР°С‚РѕСЂ СЃРѕР±С‹С‚РёР№ СѓСЃС‚СЂРѕР№СЃС‚РІ РѕР±РЅР°СЂСѓР¶РµРЅРёСЏ
-        left join eio_table_422 ustr on (vi.device = ustr.id) -- РЎРїСЂР°РІРѕС‡РЅРёРє СѓСЃС‚СЂРѕР№СЃС‚РІ (Deprecated)
+        eio_table_492 vi -- Справочник событий датчиков пожара
+        left join eio_table_424 it on (vi.incident = it.id) -- Классификатор событий устройств обнаружения
+        left join eio_table_422 ustr on (vi.device = ustr.id) -- Справочник устройств (Deprecated)
 
-        left join eio_table_391 addr1 on (ustr.region = addr1.id)
-        left join eio_table_391 addr2 on (ustr.sity = addr2.id)
-        left join eio_table_391 addr3 on (ustr.street = addr3.id)
-        left join eio_table_391 addr5 on (ustr.house = addr5.id)
+        --left join eio_table_391 addr1 on (ustr.region = addr1.id)
+        --left join eio_table_391 addr2 on (ustr.sity = addr2.id)
+        --left join eio_table_391 addr3 on (ustr.street = addr3.id)
+        --left join eio_table_391 addr5 on (ustr.house = addr5.id)
 
         left join "position" pos on (vi."medical-attributes-1198" = pos.id)
         left join units u on (pos.id_unit = u.id)
@@ -594,44 +745,48 @@ begin
     for r in 
 
     select 
-        vi.uuid_t::varchar as bus_uuid,
+        ustr.uuid_t::varchar as bus_uuid, --идентификатор устройства
         it.uuid_t as type_uuid,
         it.incident_name as type_name,
 
-        --РєРѕРѕСЂРґРёРЅР°С‚С‹ СЃРѕР±С‹С‚РёСЏ
+        --координаты события
         ustr.latitude as latitude,
         ustr.longitude as longitude,
         NULL as altitude,
 
-        --Р°РґСЂРµСЃ СЃРѕР±С‹С‚РёСЏ
-        addr1.formalname as addr_reg_name,
-        addr1.uuid_t as addr_reg_uuid,
+        --адрес события
+        ustr.region_str_fias as addr_reg_name,
+        NULL --addr1.uuid_t 
+            as addr_reg_uuid,
 
-        addr2.formalname as addr_city_name,
-        addr2.uuid_t as addr_city_uuid,
+        ustr.city_str_fias as addr_city_name,
+        NULL -- addr2.uuid_t 
+            as addr_city_uuid,
 
-        addr3.formalname as addr_street_name,
-        addr3.uuid_t as addr_street_uuid,
+        ustr.street_str_fias as addr_street_name,
+        NULL -- addr3.uuid_t 
+            as addr_street_uuid,
 
-        NULL -- addr4.formalname 
+        ustr.corps_str
             as addr_house_number_add,
         NULL --addr4.uuid_t 
             as addr_house_number_add_uuid,
 
-        addr5.formalname as addr_house_number,
-        addr5.uuid_t as addr_house_uuid,
+        ustr.house_number_str as addr_house_number,
+        NULL -- addr5.uuid_t 
+            as addr_house_uuid,
 
-        NULL --addr6.formalname 
+        ustr.house_part_str
             as addr_house_part,
         NULL --addr6.uuid_t 
             as addr_house_part_uuid,
 
-        NULL -- addr7.formalname 
+        ustr.floor_str
             as addr_floor,
         NULL -- addr7.uuid_t 
             as addr_floor_uuid,
 
-        NULL --addr8.formalname 
+        ustr.apartment_str
             as addr_apartment,
         NULL --addr8.uuid_t 
             as addr_apartment_uuid,
@@ -647,29 +802,29 @@ begin
         u.code_name as external_sys_name
         
     from
-        eio_table_439 vi -- РЎРїСЂР°РІРѕС‡РЅРёРє СЃРѕР±С‹С‚РёР№ РґРµС‚РµРєС‚РёСЂРѕРІР°РЅРёСЏ РєР°РјРµСЂ РІРёРґРµРѕР°РЅР°Р»РёС‚РёРєРё
+        eio_table_439 vi -- Справочник событий детектирования камер видеоаналитики
         left join eio_table_424 it on (vi.incident = it.id)
         left join eio_table_422 ustr on (vi.device = ustr.id)
 
-        left join eio_table_391 addr1 on (ustr.region = addr1.id)
-        left join eio_table_391 addr2 on (ustr.sity = addr2.id)
-        left join eio_table_391 addr3 on (ustr.street = addr3.id)
-        left join eio_table_391 addr5 on (ustr.house = addr5.id)
+        --left join eio_table_391 addr1 on (ustr.region = addr1.id)
+        --left join eio_table_391 addr2 on (ustr.sity = addr2.id)
+        --left join eio_table_391 addr3 on (ustr.street = addr3.id)
+        --left join eio_table_391 addr5 on (ustr.house = addr5.id)
 
         left join "position" pos on (vi.position = pos.id)
         left join units u on (pos.id_unit = u.id)
 
 
-        --eio_table_424 it, -- РљР»Р°СЃСЃРёС„РёРєР°С‚РѕСЂ СЃРѕР±С‹С‚РёР№ СѓСЃС‚СЂРѕР№СЃС‚РІ РѕР±РЅР°СЂСѓР¶РµРЅРёСЏ
-        --eio_table_422 ustr, -- РЎРїСЂР°РІРѕС‡РЅРёРє СѓСЃС‚СЂРѕР№СЃС‚РІ (Deprecated)
+        --eio_table_424 it, -- Классификатор событий устройств обнаружения
+        --eio_table_422 ustr, -- Справочник устройств (Deprecated)
         
-        --eio_table_346 addr1, -- РЎРїСЂР°РІРѕС‡РЅРёРє Р°РґСЂРµСЃРѕРІ
-        --eio_table_346 addr2, -- РЎРїСЂР°РІРѕС‡РЅРёРє Р°РґСЂРµСЃРѕРІ
-        --eio_table_346 addr3, -- РЎРїСЂР°РІРѕС‡РЅРёРє Р°РґСЂРµСЃРѕРІ
-        --eio_table_346 addr4, -- РЎРїСЂР°РІРѕС‡РЅРёРє Р°РґСЂРµСЃРѕРІ
+        --eio_table_346 addr1, -- Справочник адресов
+        --eio_table_346 addr2, -- Справочник адресов
+        --eio_table_346 addr3, -- Справочник адресов
+        --eio_table_346 addr4, -- Справочник адресов
         
-        --"position" pos, --СЃРїР°СЂРІРѕС‡РЅРёРє РґРѕР»Р¶РЅРѕСЃС‚РµР№
-       -- units u --СЃРїСЂР°РІРѕС‡РЅРёРє РїРѕРґСЂР°Р·РґРµР»РµРЅРёР№ (РїРѕРґСЃРёСЃС‚РµРј)
+        --"position" pos, --спарвочник должностей
+       -- units u --справочник подразделений (подсистем)
 
     where
         vi.uuid_t = externalBusUUID
@@ -750,14 +905,14 @@ begin
     select 
         fiks.uuid_t::varchar as bus_uuid,
         it.uuid_t as type_uuid,
-        it.incident_name as type_name,
+        it.name as type_name, -- тип чс
 
-        --РєРѕРѕСЂРґРёРЅР°С‚С‹ СЃРѕР±С‹С‚РёСЏ
+        --координаты события
         fiks.latitude as latitude,
         fiks.longitude as longitude,
         NULL as altitude,
 
-        --Р°РґСЂРµСЃ СЃРѕР±С‹С‚РёСЏ
+        --адрес события
         addr1.formalname as addr_reg_name,
         addr1.uuid_t as addr_reg_uuid,
 
@@ -804,8 +959,9 @@ begin
         --'' as external_sys_name
         
     from
-        fiks_incidents_1 fiks -- РЎРїСЂР°РІРѕС‡РЅРёРє СЃРѕР±С‹С‚РёР№ РёРЅС‚РµСЂРЅРµС‚ РїРѕСЂС‚Р°Р»Р°
-        left join eio_table_424 it on (fiks.incident = it.id) -- РљР»Р°СЃСЃРёС„РёРєР°С‚РѕСЂ СЃРѕР±С‹С‚РёР№ СѓСЃС‚СЂРѕР№СЃС‚РІ РѕР±РЅР°СЂСѓР¶РµРЅРёСЏ
+        fiks_incidents_1 fiks -- Справочник событий интернет портала
+        --left join eio_table_424 it on (fiks.incident = it.id) -- Классификатор событий устройств обнаружения
+        left join reestr_chs it on (fiks.type_chs3 = it.id) --Тип ЧС
 
         left join eio_table_391 addr1 on (fiks.region = addr1.id)
         left join eio_table_391 addr2 on (fiks.sity = addr2.id)
@@ -827,3 +983,5 @@ begin
 end
 $BODY$
 language 'plpgsql';
+
+--select * from tbl_reestr_chs;

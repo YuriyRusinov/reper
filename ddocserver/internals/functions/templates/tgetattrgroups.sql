@@ -22,8 +22,8 @@ create type h_get_attr_groups as(
                                  ref_column_name varchar,
                                  attr_group_id int4,
                                  attr_group_name varchar,
-                                 iv_id int4    --ID в таблице io_views
-                                 );
+                                 iv_id int4,    --ID в таблице io_views
+                                 attr_directives varchar);
                                  
 create or replace function tGetAttrGroups(int4) returns setof h_get_attr_groups as
 $BODY$
@@ -54,6 +54,7 @@ begin
             NULL,
             NULL,
             1,
+            NULL,
             NULL,
             NULL,
             NULL,
@@ -118,7 +119,8 @@ begin
             a.ref_column_name,
             a.id_attr_group,
             ag.name,
-            iv.id
+            iv.id,
+            ac.directives
         from
             attributes a inner join a_types att on (a.id_a_type=att.id)
             inner join attrs_categories ac on (a.id=ac.id_io_attribute)
@@ -178,6 +180,7 @@ begin
             NULL,
             NULL,
             1,
+            NULL,
             NULL,
             NULL,
             NULL,

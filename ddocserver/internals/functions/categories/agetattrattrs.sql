@@ -22,7 +22,8 @@ create type h_get_attribute as(     id_attribute int4,
                                     attr_group_name varchar,
                                     id_ex int4, --id либо из таблицы attrs_attrs либо category_attrs (в зависимости от вызываемой функции)
                                     unique_id_ex varchar,--unique_id либо из таблицы attrs_attrs либо category_attrs (в зависимости от вызываемой функции)
-                                    attr_order int4);
+                                    attr_order int4,
+                                    attr_directives varchar);
 */
 
 create or replace function aGetAttrAttrs(int4) returns setof h_get_attribute as
@@ -58,7 +59,8 @@ begin
             ag.name,
             aa.id,
             aa.unique_id,
-            aa.order
+            aa.order,
+            aa.directives
         from  
             attrs_attrs aa,
             attributes a,

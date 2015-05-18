@@ -18,6 +18,11 @@ begin
         return NULL;
     end if;
 
+    if(trim(new.code) = '') then
+        raise exception 'Attributes could not have empty CODE!';
+        return NULL;
+    end if;
+
     if(trim(new.table_name) = '') then
         new.table_name := NULL;
     end if;

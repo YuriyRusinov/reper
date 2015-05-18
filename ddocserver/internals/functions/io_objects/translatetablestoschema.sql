@@ -188,7 +188,8 @@ begin
                           isMandatory,
                           isReadOnly,
                           NULL, -- unique_id
-                          columnName);
+                          columnName,
+                          NULL); --attr_directives
 
         if(idAttr isnull or idAttr <= 0) then
             drop table t_cat_created;

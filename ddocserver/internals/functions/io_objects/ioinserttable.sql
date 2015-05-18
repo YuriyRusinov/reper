@@ -1,4 +1,4 @@
-create or replace function ioInsertTable (varchar, 
+п»їcreate or replace function ioInsertTable (varchar, 
                                           int4, 
                                           int4, 
                                           varchar, 
@@ -89,6 +89,8 @@ declare
     isExist int4;
 
     bHasGIS bool; --qualifier has gis attribute!
+    bHasParent bool;
+    parentCode varchar;
 
     refColumnName varchar;
 begin
@@ -124,6 +126,7 @@ begin
     create_ref_table = '';
     
     bHasGIS = false;
+    bHasParent = false;
 
     for r in
         execute query
@@ -147,10 +150,10 @@ begin
                 --else we should create the new table
                 if(rr.is_exist <> 1) then
                     create_ref_table := create_ref_table || ' create table ' || tName || ' (id_' || table_name || ' int8, id_' || r.atabname || ' int8); ';
-                    --На эту таблицу пока проверку на префикс tbl_ делать не надо, ибо она еще не переименована (находится в процессе создания в данном триггере)
+                    --РќР° СЌС‚Сѓ С‚Р°Р±Р»РёС†Сѓ РїРѕРєР° РїСЂРѕРІРµСЂРєСѓ РЅР° РїСЂРµС„РёРєСЃ tbl_ РґРµР»Р°С‚СЊ РЅРµ РЅР°РґРѕ, РёР±Рѕ РѕРЅР° РµС‰Рµ РЅРµ РїРµСЂРµРёРјРµРЅРѕРІР°РЅР° (РЅР°С…РѕРґРёС‚СЃСЏ РІ РїСЂРѕС†РµСЃСЃРµ СЃРѕР·РґР°РЅРёСЏ РІ РґР°РЅРЅРѕРј С‚СЂРёРіРіРµСЂРµ)
                     create_ref_table := create_ref_table || ' alter table '  || tName || ' ADD CONSTRAINT FK_ID_' || tName || '_1 FOREIGN KEY (ID_' || table_name || ') REFERENCES ' || table_name || ' (ID) ON DELETE CASCADE ON UPDATE CASCADE; ';
 
-                    select f_is_view_exist(r.atabname) into isExist; --Если представление с таким названием существует, то это означает, что реальная таблица имеет название с префиксом tbl_
+                    select f_is_view_exist(r.atabname) into isExist; --Р•СЃР»Рё РїСЂРµРґСЃС‚Р°РІР»РµРЅРёРµ СЃ С‚Р°РєРёРј РЅР°Р·РІР°РЅРёРµРј СЃСѓС‰РµСЃС‚РІСѓРµС‚, С‚Рѕ СЌС‚Рѕ РѕР·РЅР°С‡Р°РµС‚, С‡С‚Рѕ СЂРµР°Р»СЊРЅР°СЏ С‚Р°Р±Р»РёС†Р° РёРјРµРµС‚ РЅР°Р·РІР°РЅРёРµ СЃ РїСЂРµС„РёРєСЃРѕРј tbl_
                     if(isExist = 1) then
                         create_ref_table := create_ref_table || ' alter table '  || tName || ' ADD CONSTRAINT FK_ID_' || tName || '_2 FOREIGN KEY (ID_'|| r.atabname || ') REFERENCES tbl_' || r.atabname || ' (ID) ON DELETE RESTRICT ON UPDATE CASCADE; ';
                     else
@@ -245,8 +248,10 @@ begin
                 end if;
                 if (r.atypeid = 3) then
                     alter_query := alter_query || table_name;
+                    bHasParent = true;
+                    parentCode = r.code;
                 else
-                    select f_is_view_exist(r.atabname) into isExist; --Если представление с таким названием существует, то это означает, что реальная таблица имеет название с префиксом tbl_
+                    select f_is_view_exist(r.atabname) into isExist; --Р•СЃР»Рё РїСЂРµРґСЃС‚Р°РІР»РµРЅРёРµ СЃ С‚Р°РєРёРј РЅР°Р·РІР°РЅРёРµРј СЃСѓС‰РµСЃС‚РІСѓРµС‚, С‚Рѕ СЌС‚Рѕ РѕР·РЅР°С‡Р°РµС‚, С‡С‚Рѕ СЂРµР°Р»СЊРЅР°СЏ С‚Р°Р±Р»РёС†Р° РёРјРµРµС‚ РЅР°Р·РІР°РЅРёРµ СЃ РїСЂРµС„РёРєСЃРѕРј tbl_
                     if(isExist = 1) then
                         alter_query := alter_query || 'tbl_' || r.atabname;
                     else
@@ -274,6 +279,9 @@ begin
         create_query := create_query || ' create trigger trg_fk_q_base_table_check1 before update or delete on ' || table_name || ' for each row execute procedure fkQBaseTableCheck1(); ';
         if(bHasGIS = true) then  --notification for automatic map updates
             create_query := create_query || ' create trigger trg_notify_gis_layer after insert or update or delete on ' || table_name || ' for each row execute procedure notifyGISLayer(); ';
+        end if;
+        if(bHasParent = true) then
+            create_query := create_query || ' create trigger trg_check_leaf_attribute before insert or update or delete on ' || table_name || ' for each row execute procedure checkLeafAttribute(' || asString(parentCode, true) || '); ';
         end if;
         create_query := create_query || ' create unique index i_unique_id_' || table_name || ' on ' || table_name || ' using BTREE (unique_id); ';
     end if;
@@ -317,7 +325,7 @@ begin
         end if;
     end if;
 
-    --Применяем подсистему дискреционого разграничения доступа
+    --РџСЂРёРјРµРЅСЏРµРј РїРѕРґСЃРёСЃС‚РµРјСѓ РґРёСЃРєСЂРµС†РёРѕРЅРѕРіРѕ СЂР°Р·РіСЂР°РЅРёС‡РµРЅРёСЏ РґРѕСЃС‚СѓРїР°
     perform acl_secureTable(table_name);
 
     return table_name;
@@ -481,7 +489,7 @@ begin
         return NULL;
     end if;
 
-    --Применяем подсистему дискреционого разграничения доступа
+    --РџСЂРёРјРµРЅСЏРµРј РїРѕРґСЃРёСЃС‚РµРјСѓ РґРёСЃРєСЂРµС†РёРѕРЅРѕРіРѕ СЂР°Р·РіСЂР°РЅРёС‡РµРЅРёСЏ РґРѕСЃС‚СѓРїР°
     perform acl_secureTable(view_Name);
 
     return view_Name;

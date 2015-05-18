@@ -90,7 +90,8 @@ begin
        idType <> 12 and --old checkboxes
        idType <> 17 and --new checkboxes
        idType <> 19 and --ref to color (fill)
-       idType <> 26)    --ref to color (text)
+       idType <> 26 and    --ref to color (text)
+       idType <> 39) --ref to category
     then
         
         select eioInsertIndicator(idRecord, idAttrCategory, ioValue, iStartTime, iStopTime, iIdObjectSrc, iIdObjectSrc1, iDesc) into idRecAttrValue;

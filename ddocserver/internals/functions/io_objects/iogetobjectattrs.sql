@@ -1,10 +1,10 @@
-select f_safe_drop_type('h_get_object_attrs');
+п»їselect f_safe_drop_type('h_get_object_attrs');
 create type h_get_object_attrs as(
                                   id_io_object int4,
                                   id_io_category int4,
                                   id_io_attribute int4,
                                   value varchar,
-                                  attr_code varchar,  --при информационном обмене (в ф-и ioGetObjectAttrsEx() в качестве значения данного поля используется unique_id)
+                                  attr_code varchar,  --РїСЂРё РёРЅС„РѕСЂРјР°С†РёРѕРЅРЅРѕРј РѕР±РјРµРЅРµ (РІ С„-Рё ioGetObjectAttrsEx() РІ РєР°С‡РµСЃС‚РІРµ Р·РЅР°С‡РµРЅРёСЏ РґР°РЅРЅРѕРіРѕ РїРѕР»СЏ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ unique_id)
                                   id_attr_type int4,
                                   id_attr_category int4,
                                   id_attr_value int4, 
@@ -16,7 +16,8 @@ create type h_get_object_attrs as(
                                   is_actual boolean,
                                   description varchar,
                                   attr_name varchar,
-                                  attr_order int4);
+                                  attr_order int4,
+                                  attr_directives varchar);
 
 create or replace function ioGetObjectAttrs(int4, bool, timestamp, timestamp) returns setof h_get_object_attrs as
 $BODY$
@@ -69,7 +70,8 @@ begin
             av.is_actual,
             av.description,
             a.name,
-            ac.order
+            ac."order",
+            ac.directives
         from 
             (f_sel_attrs_values(idObject) av inner join attrs_categories ac on (av.id_attr_category = ac.id) inner join attributes a on (ac.id_io_attribute=a.id and av.id_io_object = idObject))
         where 
@@ -83,7 +85,7 @@ end
 $BODY$
 language 'plpgsql';
 
---используется в информационном обмене
+--РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РІ РёРЅС„РѕСЂРјР°С†РёРѕРЅРЅРѕРј РѕР±РјРµРЅРµ
 create or replace function ioGetObjectAttrsEx(int4) returns setof h_get_object_attrs as
 $BODY$
 declare
@@ -109,7 +111,8 @@ begin
             av.is_actual,
             av.description,
             a.name,
-            ac.order
+            ac."order",
+            ac.directives
         from 
             (f_sel_attrs_values(idObject) av inner join attrs_categories ac on (av.id_attr_category = ac.id) inner join attributes a on (ac.id_io_attribute=a.id and av.id_io_object = idObject))
         where 
@@ -142,7 +145,7 @@ declare
 
 begin
 
-    if(idType <> 2 and idType <> 3 and idType <> 7 and idType <> 12 and idType <> 17 and idType <> 19 and idType <> 26 and idType <> 32) then
+    if(idType <> 2 and idType <> 3 and idType <> 7 and idType <> 12 and idType <> 17 and idType <> 19 and idType <> 26 and idType <> 32 and idType <> 39) then
         return theValue;
     end if;
 
@@ -167,7 +170,7 @@ begin
         uniqueField = 'unique_id';
     end if;
 
-    if(idType <> 12 and idType <> 17) then -- не массивы значений
+    if(idType <> 12 and idType <> 17) then -- РЅРµ РјР°СЃСЃРёРІС‹ Р·РЅР°С‡РµРЅРёР№
   
         q = 'select ' || uniqueField || ' as theVal from ' || tableName || ' where id = ' || theValue;
         for r in execute q
@@ -241,7 +244,8 @@ for r in
         NULL,
         NULL,
         a.name,
-        ac.order
+        ac.order,
+        ac.directives
     from
         f_sel_io_objects(idObject) io,
         attrs_categories ac,
@@ -271,7 +275,8 @@ for r in
         av.is_actual,
         av.description,
         a.name,
-        ac.order
+        ac.order,
+        ac.directives
     from
         f_sel_io_objects(idObject) io,
         attributes a,

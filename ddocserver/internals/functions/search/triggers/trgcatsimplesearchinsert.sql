@@ -61,7 +61,7 @@ begin
         insert into a_groups (id, id_io_template, id_parent, name, "order") 
         values (idGroup, idTemplate, NULL, r.name, iOrder);
 
-        select acInsert1(new.id, 2, 'OPERATIONS_ATTR_' || iOrder, 'Операция', 'Операция', 'operations', 'name', 100, '1', r.is_mandatory, r.is_read_only, NULL, 'id') into idAttr;
+        select acInsert1(new.id, 2, 'OPERATIONS_ATTR_' || iOrder, 'Операция', 'Операция', 'operations', 'name', 100, '1', r.is_mandatory, r.is_read_only, NULL, 'id', NULL) into idAttr;
         if(idAttr <= 0) then
             return NULL;
         end if;

@@ -44,8 +44,9 @@
 \i ./functions/io_objects/columnstoattrs.sql
 \i ./functions/io_objects/translatetablestoschema.sql
 \i ./functions/io_objects/get_table_category_by_table_name.sql
+\i ./functions/io_objects/iochangecategory.sql
 
---\i ./functions/io_objects/isapplicable.sql
+\i ./functions/io_objects/tabletoio.sql
 
 -------------------
 --Do NOT uncomment!

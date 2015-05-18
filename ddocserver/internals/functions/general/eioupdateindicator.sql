@@ -1,4 +1,4 @@
-create or replace function eioUpdateIndicator(int8, int4, varchar, timestamp, timestamp, int4, int4, varchar) returns int8 as
+п»їcreate or replace function eioUpdateIndicator(int8, int4, varchar, timestamp, timestamp, int4, int4, varchar) returns int8 as
 $BODY$
 declare
     idRec alias for $1;
@@ -55,7 +55,7 @@ end
 $BODY$
 language 'plpgsql' security definer;
 
---используется при информационном обмене
+--РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РїСЂРё РёРЅС„РѕСЂРјР°С†РёРѕРЅРЅРѕРј РѕР±РјРµРЅРµ
 create or replace function eioUpdateIndicatorEx(int8, varchar, varchar, timestamp, timestamp, int4, int4, varchar) returns int8 as
 $BODY$
 declare
@@ -113,7 +113,7 @@ begin
     end if;
 
 
-    if(idType <> 2 and idType <> 3 and idType <> 12 and idType <> 17 and idType <> 19 and idType <> 26)  then
+    if(idType <> 2 and idType <> 3 and idType <> 12 and idType <> 17 and idType <> 19 and idType <> 26 and idType <> 39)  then
         raise warning 'type is %', idType;
         select eioUpdateIndicator(idRecord, idAttrCategory, ioValue, start_time, iStopTime, iIdObjectSrc, iIdObjectSrc1, iDesc) into idRecAttrValue;
         return idRecAttrValue;
@@ -125,7 +125,7 @@ begin
         return idRecAttrValue;
     end if;
 
-    if(idType <> 12 and idType <> 17) then --наборы элементов справочника
+    if(idType <> 12 and idType <> 17) then --РЅР°Р±РѕСЂС‹ СЌР»РµРјРµРЅС‚РѕРІ СЃРїСЂР°РІРѕС‡РЅРёРєР°
         theValue = getIDByUID(tableName, ioValue);
 
         if(theValue is not null) then

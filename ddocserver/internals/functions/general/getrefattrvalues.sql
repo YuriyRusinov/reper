@@ -1,9 +1,9 @@
-
+п»ї
 
 select f_safe_drop_type('h_get_ref_attr_values');
-create type h_get_ref_attr_values as (id int8, displayed_value varchar, id_ref_value int8); --id_ref_value - используется только если получилась ситуация, 
-                                                                                            --когда отображаемая колонка, на которую ссылается атрибут, сама является ссылкой на другую таблицу.
-                                                                                            --в этом случае отображаем реально отображаемое значение, а промежуточную ссылку запоминаем в этом поле
+create type h_get_ref_attr_values as (id int8, displayed_value varchar, id_ref_value int8); --id_ref_value - РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ С‚РѕР»СЊРєРѕ РµСЃР»Рё РїРѕР»СѓС‡РёР»Р°СЃСЊ СЃРёС‚СѓР°С†РёСЏ, 
+                                                                                            --РєРѕРіРґР° РѕС‚РѕР±СЂР°Р¶Р°РµРјР°СЏ РєРѕР»РѕРЅРєР°, РЅР° РєРѕС‚РѕСЂСѓСЋ СЃСЃС‹Р»Р°РµС‚СЃСЏ Р°С‚СЂРёР±СѓС‚, СЃР°РјР° СЏРІР»СЏРµС‚СЃСЏ СЃСЃС‹Р»РєРѕР№ РЅР° РґСЂСѓРіСѓСЋ С‚Р°Р±Р»РёС†Сѓ.
+                                                                                            --РІ СЌС‚РѕРј СЃР»СѓС‡Р°Рµ РѕС‚РѕР±СЂР°Р¶Р°РµРј СЂРµР°Р»СЊРЅРѕ РѕС‚РѕР±СЂР°Р¶Р°РµРјРѕРµ Р·РЅР°С‡РµРЅРёРµ, Р° РїСЂРѕРјРµР¶СѓС‚РѕС‡РЅСѓСЋ СЃСЃС‹Р»РєСѓ Р·Р°РїРѕРјРёРЅР°РµРј РІ СЌС‚РѕРј РїРѕР»Рµ
 
 create or replace function getRefAttrValues(int4, bool, bool, varchar) returns setof h_get_ref_attr_values as
 $BODY$
@@ -56,7 +56,7 @@ begin
         return;
     end if;
 
-    if(idAttrType <> 2 and idAttrType <> 3 and idAttrType <> 12 and idAttrType <> 17 and idAttrType <> 19 and idAttrType <> 26) then
+    if(idAttrType <> 2 and idAttrType <> 3 and idAttrType <> 12 and idAttrType <> 17 and idAttrType <> 19 and idAttrType <> 26 and idAttrType <> 39) then
         return;
     end if;
 
@@ -79,7 +79,7 @@ begin
         return;
     end if;
 
-    if(idRefAttrType = 2 or idRefAttrType = 3 or idRefAttrType = 12 or idRefAttrType = 17 or idRefAttrType = 19 or idRefAttrType = 26) then
+    if(idRefAttrType = 2 or idRefAttrType = 3 or idRefAttrType = 12 or idRefAttrType = 17 or idRefAttrType = 19 or idRefAttrType = 26 or idRefAttrType = 39) then
         refColumnName = '';
         for r in select table_name, column_name from aGetAttribute(columnName, tableName)
         loop
@@ -125,4 +125,4 @@ $BODY$
 language 'plpgsql';
 
 --getRefAttrValues(int4, bool, bool, varchar)
-select * from getRefAttrValues(1237, false, true, NULL::varchar);
+--select * from getRefAttrValues(1237, false, true, NULL::varchar);

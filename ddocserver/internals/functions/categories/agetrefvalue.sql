@@ -21,7 +21,7 @@ begin
     end if;
     select into idType a.id_a_type from attributes a where a.id=idAttribute;
 
-    if(idType <> 2 and idType <> 3 and idType <> 7 and idType <> 12 and idType <> 17 and idType <> 19 and idType <> 26) then
+    if(idType <> 2 and idType <> 3 and idType <> 7 and idType <> 12 and idType <> 17 and idType <> 19 and idType <> 26 and idType <> 39) then
         return theValue;
     end if;
 

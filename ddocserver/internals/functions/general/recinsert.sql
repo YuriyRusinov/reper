@@ -1,4 +1,4 @@
-create or replace function recInsert (varchar, varchar[], varchar[]) returns int8 as
+п»їcreate or replace function recInsert (varchar, varchar[], varchar[]) returns int8 as
 $BODY$
 declare
     ref_uid alias for $1;
@@ -85,7 +85,7 @@ begin
     n := array_upper (attrs_uids, 1);
     values_query := 'values (';
 
-    --сначала зададим id (всегда новый)
+    --СЃРЅР°С‡Р°Р»Р° Р·Р°РґР°РґРёРј id (РІСЃРµРіРґР° РЅРѕРІС‹Р№)
     query := query || 'id, ';
     values_query := values_query || idRec || ', ';
 
@@ -94,7 +94,7 @@ begin
         uniqueId = attrs_uids[i];
 
         if (attrs_uids[i] = 'localorg-attributes-1') then --id
-            continue;--id задаем всегда новый перед циклом
+            continue;--id Р·Р°РґР°РµРј РІСЃРµРіРґР° РЅРѕРІС‹Р№ РїРµСЂРµРґ С†РёРєР»РѕРј
         elsif (attr_code is null and attrs_uids[i] = 'unique_id') then
             query := query || 'unique_id';
             values_query := values_query || quote_literal (attrs_vals_key);
@@ -178,7 +178,7 @@ begin
                     else
                         values_query := values_query || ')';
                     end if;
-                elsif (id_a_type = 2 or id_a_type = 3 or id_a_type = 19 or id_a_type = 26) then
+                elsif (id_a_type = 2 or id_a_type = 3 or id_a_type = 19 or id_a_type = 26 or id_a_type = 39) then
                     --raise warning 'reference attribute % % % %', ref_table_name, query, values_query, attrs_values[i];
                     for rattr in
                         select * from aGetAttributeByUID (uniqueId)
