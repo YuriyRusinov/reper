@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     30.03.2015 16:19:43                          */
+/* Created on:     18.05.2015 16:40:57                          */
 /*==============================================================*/
 
 
@@ -23,6 +23,7 @@ select setMacToNULL('root_table');
 create unique index Index_1 on root_table using BTREE (
 unique_id
 );
+
 
 /*==============================================================*/
 /* User: public                                                 */
@@ -546,6 +547,7 @@ create table attrs_attrs (
    is_mandatory         BOOL                 null,
    is_read_only         BOOL                 null,
    "order"              INT4                 not null default 1,
+   directives           VARCHAR              null,
    constraint PK_ATTRS_ATTRS primary key (id)
 )
 inherits (root_table);
@@ -579,6 +581,9 @@ comment on column attrs_attrs.is_read_only is
 
 comment on column attrs_attrs."order" is
 'Порядок отображения атрибутов при визуализации его родителя.';
+
+comment on column attrs_attrs.directives is
+'Формализованные параметры по управлению отображением и поведением атрибута в категории (в специализированном формате)';
 
 select setMacToNULL('attrs_attrs');
 select createTriggerUID('attrs_attrs');
@@ -641,15 +646,28 @@ create table attrs_categories (
    is_mandatory         BOOL                 not null,
    is_read_only         BOOL                 not null,
    "order"              INT4                 not null default 0,
+   directives           VARCHAR              null,
    constraint PK_ATTRS_CATEGORIES primary key (id)
 )
 inherits (root_table);
+
+comment on column attrs_categories.name is
+'название атрибута в категории (изначально копируется из самого атрибута)';
+
+comment on column attrs_categories.def_value is
+'Значение по умолчанию';
 
 comment on column attrs_categories.is_mandatory is
 'Флаг, определяющий, является ли данный атрибут обязательным для заполнения для ИО данной категории';
 
 comment on column attrs_categories.is_read_only is
 'Флаг, определяющий, является ли данный атрибут доступным только для чтения';
+
+comment on column attrs_categories."order" is
+'Порядок следования атрибутов в категории (порядок может меняться в шаблоне, там имеемтся аналогичное поле)';
+
+comment on column attrs_categories.directives is
+'Формализованные параметры по управлению отображением и поведением атрибута в категории (в специализированном формате)';
 
 select setMacToNULL('attrs_categories');
 select createTriggerUID('attrs_categories');
@@ -4076,7 +4094,6 @@ create table roles_actions (
 
 select setMacToNULL('roles_actions');
 
-
 /*==============================================================*/
 /* Table: rubric_records                                        */
 /*==============================================================*/
@@ -6202,7 +6219,7 @@ alter table table_notifies
 alter table table_notifies_io_objects
    add constraint FK_TABLE_NO_REFERENCE_TABLE_NO foreign key (id_table_notifies)
       references table_notifies (id)
-      on delete restrict on update restrict;
+      on delete cascade on update cascade;
 
 alter table table_notifies_io_objects
    add constraint FK_TABLE_NO_REFERENCE_IO_OBJEC foreign key (id_io_objects)
