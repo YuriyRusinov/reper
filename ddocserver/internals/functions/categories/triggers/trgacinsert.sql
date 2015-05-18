@@ -1,5 +1,5 @@
-п»ї/*
-РњС‹ СЂР°Р·СЂРµС€Р°РµРј РїРѕРІС‚РѕСЂРµРЅРёРµ РєРѕРґРѕРІ Р°С‚СЂРёР±СѓС‚РѕРІ, РЅРѕ РјС‹ Р·Р°РїСЂРµС‰Р°РµРј РЅР°Р»РёС‡РёРµ Р°С‚СЂРёР±СѓС‚РѕРІ СЃ РѕРґРёРЅР°РєРѕРІС‹РјРё РєРѕРґР°РјРё РІ РѕРґРЅРѕР№ РєР°С‚РµРіРѕСЂРёРё
+/*
+Мы разрешаем повторение кодов атрибутов, но мы запрещаем наличие атрибутов с одинаковыми кодами в одной категории
 */
 create or replace function acInsertCheck() returns trigger as 
 $BODY$
@@ -42,11 +42,11 @@ begin
     
     new.name := aName;
 
-    --РїСЂРѕРІРµСЂРєР° РЅР° Р°С‚СЂРёР±СѓС‚ С‚РёРїР° id_parent
+    --проверка на атрибут типа id_parent
     select id_a_type into aType from attributes where id = new.id_io_attribute;
-    if(aType = 3) then --СЂРѕРґРёС‚РµР»СЊ-РїРѕС‚РѕРјРѕРє
-        --РІ СЌС‚РѕРј СЃР»СѓС‡Р°Рµ РґРѕР±Р°РІРёРј РІ РєР°С‚РµРіРѕСЂРёСЋ С‚Р°Р±Р»РёС†С‹ СЃРїСЂР°РІРѕС‡РЅРёРєР° Р°С‚СЂРёР±СѓС‚ 403 (РёРµСЂР°СЂС…РёС‡РµСЃРєРёР№ РїСЂРёР·РЅР°Рє Р·Р°РїРёСЃРё)
-        insert into attrs_categories (id_io_category, id_io_attribute, name, is_mandatory, is_read_only, directives) values(new.id_io_category, 403, 'РРµСЂР°СЂС…РёС‡РµСЃРєРёР№ РїСЂРёР·РЅР°Рє Р·Р°РїРёСЃРё', false, false, NULL);
+    if(aType = 3) then --родитель-потомок
+        --в этом случае добавим в категорию таблицы справочника атрибут 403 (иерархический признак записи)
+        insert into attrs_categories (id_io_category, id_io_attribute, name, is_mandatory, is_read_only, directives) values(new.id_io_category, 403, 'Иерархический признак записи', false, false, NULL);
     end if;
 
     return new;

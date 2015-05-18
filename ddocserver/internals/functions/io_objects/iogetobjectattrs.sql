@@ -1,4 +1,4 @@
-﻿select f_safe_drop_type('h_get_object_attrs');
+select f_safe_drop_type('h_get_object_attrs');
 create type h_get_object_attrs as(
                                   id_io_object int4,
                                   id_io_category int4,

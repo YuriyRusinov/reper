@@ -1,4 +1,4 @@
-﻿create or replace function eioUpdateIndicator(int8, int4, varchar, timestamp, timestamp, int4, int4, varchar) returns int8 as
+create or replace function eioUpdateIndicator(int8, int4, varchar, timestamp, timestamp, int4, int4, varchar) returns int8 as
 $BODY$
 declare
     idRec alias for $1;

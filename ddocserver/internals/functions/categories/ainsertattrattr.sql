@@ -1,4 +1,4 @@
-drop function if exists function aInsertAttrAttr(int4, int4, varchar, boolean, boolean, varchar);
+drop function if exists aInsertAttrAttr(int4, int4, varchar, boolean, boolean, varchar);
 create or replace function aInsertAttrAttr(int4, int4, varchar, boolean, boolean, varchar, varchar, int4) returns int4 as
 $BODY$
 declare

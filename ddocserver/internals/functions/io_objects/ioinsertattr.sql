@@ -1,4 +1,4 @@
-﻿create or replace function ioInsertAttr(int4, int4, varchar, timestamp, timestamp, int4, int4, varchar) returns int4 as
+create or replace function ioInsertAttr(int4, int4, varchar, timestamp, timestamp, int4, int4, varchar) returns int4 as
 $BODY$
 declare
     idObject alias for $1;

@@ -1,4 +1,4 @@
-п»ї
+
 /*
 select * from getAdditionalInfo(1073); --hpost
 select * from getAdditionalInfo(2986); --modeling fire
@@ -25,7 +25,7 @@ alter table tbl_eio_table_490 add  CONSTRAINT "FK_eio_table_490_REF_incident" FO
       REFERENCES "tbl_eio_table_424" (id) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE RESTRICT;
 
-insert into attrs_categories (id_io_category, id_io_attribute, name, is_mandatory, is_read_only, def_value) values (486, 1293, 'РђСЃСЃРѕС†РёРёСЂРѕРІР°РЅРЅС‹Рµ СЃРѕР±С‹С‚РёСЏ РґР°С‚С‡РёРєРѕРІ (Р°СЂРіСѓСЃ-СЃРїРµРєС‚СЂ)', false, false, NULL);
+insert into attrs_categories (id_io_category, id_io_attribute, name, is_mandatory, is_read_only, def_value) values (486, 1293, 'Ассоциированные события датчиков (аргус-спектр)', false, false, NULL);
 
 select * from eio_table_492
 select * from position where id = 28
@@ -57,7 +57,7 @@ alter table tbl_eio_table_438 add  CONSTRAINT "FK_eio_table_438_REF_medical-attr
 
 select * from attrs_categories where id_io_category = 426
 
-insert into attrs_categories (id_io_category, id_io_attribute, name, is_mandatory, is_read_only, def_value) values (426, 1198, 'РЎРёСЃС‚РµРјР°', true, false, '28');
+insert into attrs_categories (id_io_category, id_io_attribute, name, is_mandatory, is_read_only, def_value) values (426, 1198, 'Система', true, false, '28');
 
 alter table tbl_eio_table_438 rename to eio_table_438;
 select acl_secureTable('eio_table_438');
@@ -76,8 +76,8 @@ select * from io_categories where id = 429
 select a.* from attributes a, attrs_categories ac where ac.id_io_category = 428 and ac.id_io_attribute = a.id
 
 select * from io_categories where id_child in (select id_io_category from attrs_categories where id_io_attribute = 1206)
-update attributes set code = 'source_incident_rec', name = 'РЎРµС‚РµРІРѕР№ СЂРµСЃСѓСЂСЃ (Р·Р°РїРёСЃСЊ СЃРѕР±С‹С‚РёСЏ)', title = 'РЎРµС‚РµРІРѕР№ СЂРµСЃСѓСЂСЃ (Р·Р°РїРёСЃСЊ СЃРѕР±С‹С‚РёСЏ)' where id = 1206;
-update attrs_categories set name = 'РЎРµС‚РµРІРѕР№ СЂРµСЃСѓСЂСЃ (Р·Р°РїРёСЃСЊ СЃРѕР±С‹С‚РёСЏ)' where id_io_attribute = 1206
+update attributes set code = 'source_incident_rec', name = 'Сетевой ресурс (запись события)', title = 'Сетевой ресурс (запись события)' where id = 1206;
+update attrs_categories set name = 'Сетевой ресурс (запись события)' where id_io_attribute = 1206
 
 select table_name from io_objects where id_io_category in (417, 421, 429)
 
@@ -328,7 +328,7 @@ declare
     res varchar[];
 begin
 
-    res = ARRAY[]::varchar[]; -- РёР· С‚Р°Р±Р»РёС†С‹ tbl_eio_table_439
+    res = ARRAY[]::varchar[]; -- из таблицы tbl_eio_table_439
     return res;
 end
 $BODY$
@@ -340,7 +340,7 @@ declare
     res varchar[];
 begin
 
-    res = ARRAY[]::varchar[]; -- РёР· С‚Р°Р±Р»РёС†С‹ tbl_eio_table_439
+    res = ARRAY[]::varchar[]; -- из таблицы tbl_eio_table_439
     return res;
 end
 $BODY$
@@ -353,7 +353,7 @@ declare
     res varchar[];
 begin
 
-    res = ARRAY['name']; -- РёР· С‚Р°Р±Р»РёС†С‹ tbl_eio_table_422
+    res = ARRAY['name']; -- из таблицы tbl_eio_table_422
     return res;
 end
 $BODY$
@@ -365,7 +365,7 @@ declare
     res varchar[];
 begin
 
-    res = ARRAY['STRING']; -- РёР· С‚Р°Р±Р»РёС†С‹ tbl_eio_table_422
+    res = ARRAY['STRING']; -- из таблицы tbl_eio_table_422
     return res;
 end
 $BODY$
@@ -406,51 +406,51 @@ declare
     fakeText varchar;
 begin
 /*
-    fakeText = 'РћР±С‰РёРµ РїРѕС‚РµСЂРё РЅР°СЃРµР»РµРЅРёСЏ: 4283;  
+    fakeText = 'Общие потери населения: 4283;  
 
-Р‘РµР·РІРѕР·РІСЂР°С‚РЅС‹Рµ С‡РµР»РѕРІРµС‡РµСЃРєРёРµ РїРѕС‚РµСЂРё: 7;
+Безвозвратные человеческие потери: 7;
 
-РР· РЅРёС…:
+Из них:
 
-РљРѕР»РёС‡РµСЃС‚РІРѕ РїРѕСЃС‚СЂР°РґР°РІС€РёС… Р»СЋРґРµР№ СЃСЂРµРґРЅРµРіРѕ РІРѕР·СЂР°СЃС‚Р°: 2
+Количество пострадавших людей среднего возраста: 2
 
-РљРѕР»РёС‡РµСЃС‚РІРѕ РїРѕСЃС‚СЂР°РґР°РІС€РёС… РґРµС‚РµР№: 0;
+Количество пострадавших детей: 0;
 
-РљРѕР»РёС‡РµСЃС‚РІРѕ РїРѕСЃС‚СЂР°РґР°РІС€РёС… РїРµРЅСЃРёРѕРЅРЅРѕРіРѕ РІРѕР·СЂР°СЃС‚Р°: 3;
+Количество пострадавших пенсионного возраста: 3;
 
-РљРѕР»РёС‡РµСЃС‚РІРѕ РїРѕСЃС‚СЂР°РґР°РІС€РёС… Р»СЋРґРµР№ СЃ РѕРіСЂР°РЅРёС‡РµРЅРЅС‹РјРё РІРѕР·РјРѕР¶РЅРѕСЃС‚СЏРјРё: 2;
+Количество пострадавших людей с ограниченными возможностями: 2;
 
-РЎР°РЅРёС‚Р°СЂРЅС‹Рµ С‡РµР»РѕРІРµС‡РµСЃРєРёРµ РїРѕС‚РµСЂРё: 4276;
+Санитарные человеческие потери: 4276;
 
-РР· РЅРёС…:
+Из них:
 
-РљРѕР»РёС‡РµСЃС‚РІРѕ РїРѕСЃС‚СЂР°РґР°РІС€РёС… РґРµС‚РµР№: 611;
+Количество пострадавших детей: 611;
 
-РљРѕР»РёС‡РµСЃС‚РІРѕ РїРѕСЃС‚СЂР°РґР°РІС€РёС… РїРµРЅСЃРёРѕРЅРЅРѕРіРѕ РІРѕР·СЂР°СЃС‚Р°: 998;
+Количество пострадавших пенсионного возраста: 998;
 
-РљРѕР»РёС‡РµСЃС‚РІРѕ РїРѕСЃС‚СЂР°РґР°РІС€РёС… Р»СЋРґРµР№ СЃ РѕРіСЂР°РЅРёС‡РµРЅРЅС‹РјРё РІРѕР·РјРѕР¶РЅРѕСЃС‚СЏРјРё: 142;
+Количество пострадавших людей с ограниченными возможностями: 142;
 
-РћР±С‰РµРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РїРѕРІСЂРµР¶РґРµРЅРЅС‹С… Р·РґР°РЅРёР№: 58;
-
- 
-
-РћР±С‰РµРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РїРѕРІСЂРµР¶РґРµРЅРЅС‹С… Р·РґР°РЅРёР№: 58;             
-
-РР· РЅРёС…:
-
-РљРѕР»РёС‡РµСЃС‚РІРѕ Р¶РёР»С‹С… Р·РґР°РЅРёР№: 50;
-
-РљРѕР»РёС‡РµСЃС‚РІРѕ РѕР±С‰РµСЃС‚РІРµРЅРЅС‹С… Р·РґР°РЅРёР№: 8;
-
-РљРѕР»РёС‡РµСЃС‚РІРѕ РґРµС‚СЃРєРёС… СЃР°РґРѕРІ: 14;
-
-РљРѕР»РёС‡РµСЃС‚РІРѕ С€РєРѕР»: 4;
-
-РљРѕР»РёС‡РµСЃС‚РІРѕ РїР°РЅСЃРёРѕРЅР°С‚РѕРІ РґР»СЏ РёРЅРІР°Р»РёРґРѕРІ: 0;
+Общее количество поврежденных зданий: 58;
 
  
 
-РњР°РєСЃРёРјР°Р»СЊРЅР°СЏ РїР»РѕС‰Р°РґСЊ РїРѕСЂР°Р¶РµРЅРёСЏ: 1800 РіРµРєС‚Р°СЂРѕРІ.';
+Общее количество поврежденных зданий: 58;             
+
+Из них:
+
+Количество жилых зданий: 50;
+
+Количество общественных зданий: 8;
+
+Количество детских садов: 14;
+
+Количество школ: 4;
+
+Количество пансионатов для инвалидов: 0;
+
+ 
+
+Максимальная площадь поражения: 1800 гектаров.';
 */
 
     if(alarm_uuid isnull) then
@@ -511,7 +511,7 @@ begin
 
 -- fake example for expo-19
         --union all 
-        --  select ' || asString('modeling_results', true) || ', ' || asString(fakeText, true)|| ', ' || asString('Р РµР·СѓР»СЊС‚Р°С‚С‹ СЂР°СЃС‡РµС‚Р° РїСЂРµРґРїРѕР»Р°РіР°РµРјРѕРіРѕ РєРѕР»РёС‡РµСЃС‚РІР° РїРѕСЃС‚СЂР°РґР°РІС€РёС… Рё РІРѕР·РјРѕР¶РЅРѕРіРѕ СѓС‰РµСЂР±Р° РѕС‚ РЅР°РІРѕРґРЅРµРЅРёСЏ', true) || ', ' || asString('STRING', true) || '
+        --  select ' || asString('modeling_results', true) || ', ' || asString(fakeText, true)|| ', ' || asString('Результаты расчета предполагаемого количества пострадавших и возможного ущерба от наводнения', true) || ', ' || asString('STRING', true) || '
           --limit 1
 
 /*
@@ -542,7 +542,7 @@ begin
 --select * from getAdditionalInfo(2986); --modeling fire
 --select * from getAdditionalInfo(1094); --modeling hpost
 
-          select ' || asString('name', true) || ', d.name, ' || asString('РќР°Р·РІР°РЅРёРµ', true) || ', ' || asString('STRING', true) || '
+          select ' || asString('name', true) || ', d.name, ' || asString('Название', true) || ', ' || asString('STRING', true) || '
           from eio_table_422 d --, eio_table_436 e, eio_table_438 m
           where --e.device = d.id and e.id = m.event_id and m.uuid_t = ' || asString(alarm_uuid, true) || '::uuid
              --and 
@@ -550,13 +550,13 @@ begin
            
           union all
 
-          select ' || asString('uuid_t', true) || ', e.uuid_t::varchar, ' || asString('РЈРЅРёРєР°Р»СЊРЅС‹Р№ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СЃРѕР±С‹С‚РёСЏ РґР°С‚С‡РёРєР° РіРёРґСЂРѕРїРѕСЃС‚Р°', true) || ', ' || asString('STRING', true) || '
+          select ' || asString('uuid_t', true) || ', e.uuid_t::varchar, ' || asString('Уникальный идентификатор события датчика гидропоста', true) || ', ' || asString('STRING', true) || '
           from eio_table_436 e, eio_table_438 m
           where e.id = m.event_id and m.uuid_t = ' || asString(alarm_uuid, true) || '::uuid
 
           union all
 
-          select ' || asString('uuid_t', true) || ', e.uuid_t::varchar, ' || asString('РЈРЅРёРєР°Р»СЊРЅС‹Р№ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СЃРѕР±С‹С‚РёСЏ РґРµС‚РµРєС‚РёСЂРѕРІР°РЅРёСЏ РђСЂРіСѓСЃ-РЎРїРµРєС‚СЂ', true) || ', ' || asString('STRING', true) || '
+          select ' || asString('uuid_t', true) || ', e.uuid_t::varchar, ' || asString('Уникальный идентификатор события детектирования Аргус-Спектр', true) || ', ' || asString('STRING', true) || '
           from eio_table_492 e, eio_table_438 m
           where e.id = m.argus_incident and m.uuid_t = ' || asString(alarm_uuid, true) || '::uuid' ;
 
@@ -578,7 +578,7 @@ declare
     res varchar[];
 begin
 
-    res = ARRAY['affected_people', 'damage_building', 'death']; --, 'spread_wms', 'spread_wfs', 'notification_wms', 'notification_wfs']; -- РёР· С‚Р°Р±Р»РёС†С‹ tbl_eio_table_438
+    res = ARRAY['affected_people', 'damage_building', 'death']; --, 'spread_wms', 'spread_wfs', 'notification_wms', 'notification_wfs']; -- из таблицы tbl_eio_table_438
     return res;
 end
 $BODY$
@@ -590,7 +590,7 @@ declare
     res varchar[];
 begin
 
-    res = ARRAY['STRING', 'STRING', 'STRING']; --, 'CONTENT', 'CONTENT', 'CONTENT', 'CONTENT']; -- РёР· С‚Р°Р±Р»РёС†С‹ tbl_eio_table_438
+    res = ARRAY['STRING', 'STRING', 'STRING']; --, 'CONTENT', 'CONTENT', 'CONTENT', 'CONTENT']; -- из таблицы tbl_eio_table_438
     return res;
 end
 $BODY$
@@ -603,7 +603,7 @@ declare
     res varchar[];
 begin
 
-    res = ARRAY['name']; -- РёР· С‚Р°Р±Р»РёС†С‹ tbl_eio_table_422
+    res = ARRAY['name']; -- из таблицы tbl_eio_table_422
     return res;
 end
 $BODY$
@@ -615,7 +615,7 @@ declare
     res varchar[];
 begin
 
-    res = ARRAY['STRING']; -- РёР· С‚Р°Р±Р»РёС†С‹ tbl_eio_table_422
+    res = ARRAY['STRING']; -- из таблицы tbl_eio_table_422
     return res;
 end
 $BODY$
@@ -694,7 +694,7 @@ begin
 
           union all
 
-          select ' || asString('name', true) || ', e.name, ' || asString('РќР°Р·РІР°РЅРёРµ', true) || ', ' || asString('STRING', true) || '
+          select ' || asString('name', true) || ', e.name, ' || asString('Название', true) || ', ' || asString('STRING', true) || '
           from eio_table_422 e
           where e.id = 2966';
 
@@ -715,7 +715,7 @@ declare
     res varchar[];
 begin
 
-    res = ARRAY[]::varchar[]; -- РёР· С‚Р°Р±Р»РёС†С‹ tbl_fiks_incidents_1
+    res = ARRAY[]::varchar[]; -- из таблицы tbl_fiks_incidents_1
     return res;
 end
 $BODY$
@@ -727,7 +727,7 @@ declare
     res varchar[];
 begin
 
-    res = ARRAY[]::varchar[]; -- РёР· С‚Р°Р±Р»РёС†С‹ tbl_fiks_incidents_1
+    res = ARRAY[]::varchar[]; -- из таблицы tbl_fiks_incidents_1
     return res;
 end
 $BODY$
@@ -853,8 +853,8 @@ declare
     res varchar[];
 begin
 
-    --res = ARRAY['real_id', 'source_incident_rec', 'value', 'reference_bad', 'reference_critical', 'is_critical']; -- РёР· С‚Р°Р±Р»РёС†С‹ tbl_eio_table_436
-    res = ARRAY['real_id', 'value', 'reference_bad', 'reference_critical', 'is_critical']; -- РёР· С‚Р°Р±Р»РёС†С‹ tbl_eio_table_436
+    --res = ARRAY['real_id', 'source_incident_rec', 'value', 'reference_bad', 'reference_critical', 'is_critical']; -- из таблицы tbl_eio_table_436
+    res = ARRAY['real_id', 'value', 'reference_bad', 'reference_critical', 'is_critical']; -- из таблицы tbl_eio_table_436
     return res;
 end
 $BODY$
@@ -866,7 +866,7 @@ declare
     res varchar[];
 begin
 
-    res = ARRAY['STRING', 'STRING', 'STRING', 'STRING', 'STRING']; -- РёР· С‚Р°Р±Р»РёС†С‹ tbl_eio_table_436
+    res = ARRAY['STRING', 'STRING', 'STRING', 'STRING', 'STRING']; -- из таблицы tbl_eio_table_436
     return res;
 end
 $BODY$
@@ -878,7 +878,7 @@ declare
     res varchar[];
 begin
 
-    res = ARRAY['name']; -- РёР· С‚Р°Р±Р»РёС†С‹ tbl_eio_table_422
+    res = ARRAY['name']; -- из таблицы tbl_eio_table_422
     return res;
 end
 $BODY$
@@ -890,7 +890,7 @@ declare
     res varchar[];
 begin
 
-    res = ARRAY['STRING']; -- РёР· С‚Р°Р±Р»РёС†С‹ tbl_eio_table_422
+    res = ARRAY['STRING']; -- из таблицы tbl_eio_table_422
     return res;
 end
 $BODY$
@@ -1017,7 +1017,7 @@ declare
     res varchar[];
 begin
 
-    res = ARRAY['real_id']; -- РёР· С‚Р°Р±Р»РёС†С‹ tbl_eio_table_492
+    res = ARRAY['real_id']; -- из таблицы tbl_eio_table_492
     return res;
 end
 $BODY$
@@ -1029,7 +1029,7 @@ declare
     res varchar[];
 begin
 
-    res = ARRAY['STRING']; -- РёР· С‚Р°Р±Р»РёС†С‹ tbl_eio_table_492
+    res = ARRAY['STRING']; -- из таблицы tbl_eio_table_492
     return res;
 end
 $BODY$
@@ -1041,7 +1041,7 @@ declare
     res varchar[];
 begin
 
-    res = ARRAY['name']; -- РёР· С‚Р°Р±Р»РёС†С‹ tbl_eio_table_422
+    res = ARRAY['name']; -- из таблицы tbl_eio_table_422
     return res;
 end
 $BODY$
@@ -1053,7 +1053,7 @@ declare
     res varchar[];
 begin
 
-    res = ARRAY['STRING']; -- РёР· С‚Р°Р±Р»РёС†С‹ tbl_eio_table_422
+    res = ARRAY['STRING']; -- из таблицы tbl_eio_table_422
     return res;
 end
 $BODY$

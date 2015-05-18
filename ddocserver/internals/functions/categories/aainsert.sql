@@ -13,7 +13,7 @@ create or replace function aaInsert(int4,
                                     varchar,
                                     varchar,
                                     varchar,
-                                    int4,) returns int4 as
+                                    int4) returns int4 as
 $BODY$
 declare
     idAttrParent alias for $1;

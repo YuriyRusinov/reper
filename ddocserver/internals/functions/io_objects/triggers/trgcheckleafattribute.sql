@@ -1,4 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION checkLeafAttribute() RETURNS trigger AS
+CREATE OR REPLACE FUNCTION checkLeafAttribute() RETURNS trigger AS
 $BODY$
 declare
 

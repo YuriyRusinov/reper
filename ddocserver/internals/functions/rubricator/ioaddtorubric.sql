@@ -12,7 +12,7 @@ declare
     rr record;
 begin
 
-    select count(*) into cnt from io_rubricator where id_io_object = idObject and id_rubric=idRubric;
+    select count(*) into cnt from io_rubricator where id_io_object = idObject and id_rubric = idRubric;
     if (cnt is not null and cnt > 0) then
         update io_rubricator set r_icon  = rIcon where id_io_object = idObject and id_rubric = idRubric;
         return 1;

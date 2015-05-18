@@ -1,4 +1,4 @@
-﻿create or replace function recInsert (varchar, varchar[], varchar[]) returns int8 as
+create or replace function recInsert (varchar, varchar[], varchar[]) returns int8 as
 $BODY$
 declare
     ref_uid alias for $1;

@@ -1,4 +1,4 @@
-﻿
+
 create or replace function cInsertCheck() returns trigger as 
 $BODY$
 declare

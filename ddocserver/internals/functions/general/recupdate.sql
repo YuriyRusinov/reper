@@ -1,4 +1,4 @@
-﻿create or replace function recUpdate (varchar, varchar[], varchar[], varchar, varchar) returns int8 as
+create or replace function recUpdate (varchar, varchar[], varchar[], varchar, varchar) returns int8 as
 $BODY$
 declare
     table_uid alias for $1;

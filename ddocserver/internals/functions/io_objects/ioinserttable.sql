@@ -1,4 +1,4 @@
-﻿create or replace function ioInsertTable (varchar, 
+create or replace function ioInsertTable (varchar, 
                                           int4, 
                                           int4, 
                                           varchar, 

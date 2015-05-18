@@ -1,4 +1,4 @@
-﻿
+
 
 select f_safe_drop_type('h_get_ref_attr_values');
 create type h_get_ref_attr_values as (id int8, displayed_value varchar, id_ref_value int8); --id_ref_value - используется только если получилась ситуация, 

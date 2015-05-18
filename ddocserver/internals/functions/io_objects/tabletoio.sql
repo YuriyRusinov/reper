@@ -43,6 +43,7 @@ begin
         select 
             a.attname,
             a.attnum,
+            a.id_a_type,
             a.attnotnull,
             a.atthasdef,
             t.typname 
@@ -57,7 +58,7 @@ begin
             and a.attnum > 0
             and a.attislocal = true
     loop
-        idAttrType = --....
+        idAttrType = r.id_a_type; --....
         select acInsert(idChildCategory,
                         idAttrType,
                         r.attname, --code
@@ -106,7 +107,7 @@ begin
                     NULL, --unique_id
                     1, --id_sync_type (does not sync)
                     getLocalOrgId(), --localorg
-                    false --is_global,
+                    false, --is_global,
                     NULL::int4,--id_search_template
                     NULL::varchar, --ref_table 
                     NULL::int8,--fill_color

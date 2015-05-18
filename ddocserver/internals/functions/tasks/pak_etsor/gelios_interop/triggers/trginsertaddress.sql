@@ -54,5 +54,5 @@ $BODY$
 language 'plpgsql' security definer;
 
 
-select f_safe_drop_trigger('trg_insert_address', 'tbl_eio_table_422');
-select f_create_trigger('trg_insert_address', 'before',  'insert or update', 'tbl_eio_table_422', 'trginsertaddress()');
+--select f_safe_drop_trigger('trg_insert_address', 'tbl_eio_table_422');
+--select f_create_trigger('trg_insert_address', 'before',  'insert or update', 'tbl_eio_table_422', 'trginsertaddress()');

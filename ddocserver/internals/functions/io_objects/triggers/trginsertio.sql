@@ -1,4 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION ioinsertcheck()   RETURNS trigger AS
+CREATE OR REPLACE FUNCTION ioinsertcheck()   RETURNS trigger AS
 $BODY$
 declare
     idMaclabel int4;

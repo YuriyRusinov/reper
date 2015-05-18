@@ -32,4 +32,4 @@
 \i ./functions/misc/getprimarykey.sql
 \i ./functions/misc/f_clear_function.sql
 
-\i ./functions/misc/pivot_func_example.sql
+--\i ./functions/misc/pivot_func_example.sql
