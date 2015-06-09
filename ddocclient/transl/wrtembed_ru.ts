@@ -2133,7 +2133,7 @@ Do you want to save the changes before closing?</source>
     <message>
         <location filename="reporthandler.cpp" line="309"/>
         <source>Save to Database</source>
-        <translation>Сохоанить в Базу Данных</translation>
+        <translation>Сохранить в Базу Данных</translation>
     </message>
     <message>
         <location filename="reporthandler.cpp" line="358"/>

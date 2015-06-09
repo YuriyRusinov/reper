@@ -514,7 +514,8 @@ int KKSObjEditor :: constructObject()
             if (type == KKSAttrType::atList ||
                 type == KKSAttrType::atParent ||
                 type == KKSAttrType::atRecordColorRef ||
-                type == KKSAttrType::atRecordTextColorRef)
+                type == KKSAttrType::atRecordTextColorRef ||
+                type == KKSAttrType::atSysChildCategoryRef)
             {
                 v.setColumnValue (cAttrValue->value().columnValue());
                 //qDebug () << __PRETTY_FUNCTION__ << v.value() << v.columnValue();
@@ -709,7 +710,8 @@ int KKSObjEditor :: constructObject()
             if (type == KKSAttrType::atList ||
                 type == KKSAttrType::atParent ||
                 type == KKSAttrType::atRecordColorRef ||
-                type == KKSAttrType::atRecordTextColorRef)
+                type == KKSAttrType::atRecordTextColorRef ||
+                type == KKSAttrType::atSysChildCategoryRef)
             {
                 v.setColumnValue (cAttrValue->value().columnValue());
             }
@@ -915,7 +917,8 @@ int KKSObjEditor :: constructObject()
             if (type == KKSAttrType::atList ||
                 type == KKSAttrType::atParent ||
                 type == KKSAttrType::atRecordColorRef ||
-                type == KKSAttrType::atRecordTextColorRef)
+                type == KKSAttrType::atRecordTextColorRef ||
+                type == KKSAttrType::atSysChildCategoryRef)
             {
                 v.setColumnValue (cAttrValue->value().columnValue());
             }
@@ -1639,7 +1642,6 @@ void KKSObjEditor :: setValue (qint64 idAttrValue, KKSIndAttrClass sys, QVariant
 
 void KKSObjEditor :: generateIOUUID (qint64 idAttrVal)
 {
-    qDebug () << __PRETTY_FUNCTION__ << idAttrVal;
     QToolButton *tb = qobject_cast<KKSAttrUUIDWidget *>(this->sender())->getButton();
     if (!tb)
         return;

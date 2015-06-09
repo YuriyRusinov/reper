@@ -141,6 +141,7 @@ KKSAValWidget::KKSAValWidget(KKSAttrValue * _av, QWidget * parent, Qt::WindowFla
         case KKSAttrType::atUrl:
         case KKSAttrType::atRecordColorRef:
         case KKSAttrType::atRecordTextColorRef:
+        case KKSAttrType::atSysChildCategoryRef:
         {
             lEVal = new QLineEdit;
             lEVal->setReadOnly (true);
@@ -337,6 +338,7 @@ void KKSAValWidget::initComplexWidget (KKSAttrValue * av, QGridLayout * gLay, QW
             case KKSAttrType::atInt64:
             case KKSAttrType::atString:
             case KKSAttrType::atList:
+            case KKSAttrType::atSysChildCategoryRef:
             case KKSAttrType::atUUID:
             case KKSAttrType::atUrl:
             {
@@ -512,6 +514,7 @@ void KKSAValWidget::setValue (const KKSAttribute * a, QVariant val)
         case KKSAttrType::atUrl:
         case KKSAttrType::atRecordColorRef:
         case KKSAttrType::atRecordTextColorRef:
+        case KKSAttrType::atSysChildCategoryRef:
         {
             //valWidget = new QLineEdit (this);
             //stLay->setCurrentWidget (lEVal);

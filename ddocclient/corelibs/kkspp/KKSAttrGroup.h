@@ -64,6 +64,9 @@ public:
     KKSAttrGroup * childGroupForId (int id, bool recursive=true);
     QList<int> childKeys (void) const;
 
+    void setExpanded(bool yes) {m_isExpanded = yes;} //используетс€ дл€ целей отображени€ в редакторе шаблонов. ’ранит флаг, определ€ющий, €вл€етс€ ли элемент дерева развернутым или нет
+    bool isExpanded() const {return m_isExpanded;}
+
 protected:
 private:
     KKSMap<int, KKSAttrView*> m_attributes;
@@ -71,6 +74,7 @@ private:
     KKSAttrGroup * m_parent;
 
     KKSMap<int, KKSAttrGroup *> m_childGroups;
+    bool m_isExpanded;
 };
 
 inline bool compareAttrGroups(KKSAttrGroup * item1, KKSAttrGroup * item2)
@@ -78,6 +82,11 @@ inline bool compareAttrGroups(KKSAttrGroup * item1, KKSAttrGroup * item2)
     if(item1->order() < item2->order()) 
         return true; 
     
+    if(item1->order() == item2->order()){
+        if(item1->id() < item2->id())
+            return true;
+    }
+
     return false;
 }
 

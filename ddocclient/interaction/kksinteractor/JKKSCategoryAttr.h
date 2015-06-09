@@ -38,7 +38,9 @@ class _I_EXPORT JKKSCategoryAttr : public JKKSUID
                           const QString& aDefVal=QString(), 
                           bool isMandatory=false, 
                           bool isReadOnly=false,
-                          const QString & uid = QString());
+                          const QString & uid = QString(),
+                          const QString & directives = QString(),
+                          int order = 1);
 
         JKKSCategoryAttr (const JKKSCategoryAttr& cAttr);
         ~JKKSCategoryAttr (void);
@@ -85,6 +87,12 @@ class _I_EXPORT JKKSCategoryAttr : public JKKSUID
         const QString & attrAttrUid() const;
         void setAttrAttrUid(const QString & uid);
 
+        int order() const;
+        void setOrder(int o);
+
+        const QString & directives() const;
+        void setDirectives(const QString & d);
+
         void setAttrs(const QMap<qint64, JKKSCategoryAttr> & attrs);
         const QMap<qint64, JKKSCategoryAttr> & attrs() const;
         QMap<qint64, JKKSCategoryAttr> & attrs();
@@ -113,9 +121,13 @@ class _I_EXPORT JKKSCategoryAttr : public JKKSUID
         QString m_aTableUid;//unique_id »ќ, на таблицу которого ссылаетс€ данный атрибут (по нему будем получать насто€щее название таблицы на приемном конце)
         QString m_aColumn;
         int m_aDefWidth;
+
         QString m_aDefValue;
         bool m_isMandatory;
         bool m_isReadOnly;
+        int m_order;
+        QString m_directives;
+
         QString m_attrAttrUid; //unique_id in attrs_attrs table. ≈сли данный атрибут входит в состав составного
 
         QMap<qint64, JKKSCategoryAttr> m_attrs; //список атрибутов, описывающих данный атрибут. ƒл€ составных атрибутов

@@ -91,10 +91,11 @@ QMap<int, QString> KKSLoader::loadAttributeValues(const KKSAttribute * a,
         a->type()->attrType() != KKSAttrType::atCheckList && 
         a->type()->attrType() != KKSAttrType::atCheckListEx &&
         a->type()->attrType() != KKSAttrType::atRecordColorRef &&
-        a->type()->attrType() != KKSAttrType::atRecordTextColorRef)
+        a->type()->attrType() != KKSAttrType::atRecordTextColorRef &&
+        a->type()->attrType() != KKSAttrType::atSysChildCategoryRef)
     {
         qWarning("loadAttributeValues was invoked with KKSAttribute "
-                 "that type is neither atList, atParent or atCheckList or atCheckListEx!");
+                 "that type is neither atList, atSysChildCategoryRef, atParent or atCheckList or atCheckListEx!");
         return values;
     }
 
@@ -111,10 +112,22 @@ QMap<int, QString> KKSLoader::loadAttributeValues(const KKSAttribute * a,
 
     if(tableName.isEmpty() || columnName.isEmpty()){
         qWarning("loadAttributeValues was invoked with corrupt KKSAttribute "
-                 "(type is atList or atParent but tableName or columnName are empty)!");
+                 "(type is atList or atSysChildCategoryRef or atParent but tableName or columnName are empty)!");
         return values;
     }
 
+    QString tName1;
+    if(tName.isEmpty())
+        tName1 = QString("NULL");
+    else
+        tName1 = QString("'%1'").arg(tName);
+
+    QString sql = QString("select id, displayed_value, id_ref_value from getRefAttrValues(%1, %2, %3, %4)")
+                                                .arg(a->id())
+                                                .arg(isXml ? "true" : "false")
+                                                .arg(orderByValue ? "true" : "false")
+                                                .arg(tName1);
+    /*
     QString order;
     if(orderByValue)
         order = QString("order by \"%1\"").arg(columnName);
@@ -123,14 +136,25 @@ QMap<int, QString> KKSLoader::loadAttributeValues(const KKSAttribute * a,
     if (!refAttr)
         return values;
 
-    QString sql;
+    
 	//Т.е. проверяем ситуацию "ссылка на ссылку"
     if (refAttr->tableName().isEmpty()){
-		sql = QString("select id, \"%1\", \"%2\" from %3 %4")
+		
+        const KKSSearchTemplate * st = a->searchTemplate();
+        QString filterSQL;
+        if(st){
+            KKSList<const KKSFilterGroup *> filters;
+            filters.append(st->getMainGroup());
+            QStringList exTables;
+            filterSQL = generateFilterSQL(filters, tableName, exTables);//exTables - таблицы с отношением M:N(
+        }
+
+        sql = QString("select id, \"%1\", \"%2\" from %3 where 1=1 %5 %4")
                         .arg(columnName)
                         .arg(refColumnName)
                         .arg(tableName)
-                        .arg(order);
+                        .arg(order)
+                        .arg(filterSQL);
 	}
     else
     {
@@ -144,6 +168,7 @@ QMap<int, QString> KKSLoader::loadAttributeValues(const KKSAttribute * a,
                     //.arg (order);
         //qDebug () << __PRETTY_FUNCTION__ << sql;
     }
+    */
 
     KKSResult * res = db->execute(sql);
     if(!res)
@@ -206,9 +231,11 @@ KKSList<KKSAttrValue *> KKSLoader::loadAttrValues(KKSObject * io) const
         KKSAttrValue * attr = new KKSAttrValue();
         attr->setAttribute(a);
 
-//        if (a->type()->attrType() == KKSAttrType::atPoints)
-//            qDebug () << __PRETTY_FUNCTION__ << a->id() << res->getCellAsString(row, 3);
-        KKSValue v = constructValue(res->getCellAsString(row, 3), a, io->tableName());
+        QString columnValue;
+        if(!res->isEmpty(row, 26))
+            columnValue = res->getCellAsString(row, 26);
+
+        KKSValue v = constructValue(res->getCellAsString(row, 3), columnValue, a, io->tableName());
         if(!v.isValid())
         {
             qWarning("Value for attribute is NOT valid! Value = %s, idCategory = %d, idAttribute = %d, idObject = %d",
@@ -293,7 +320,7 @@ KKSMap<qint64, KKSAttrValue *> KKSLoader::loadAttrAttrValues(KKSAttrValue * av, 
         attrAttrValue->setAttribute(a);
 
         if(!res->isEmpty(row, 2)){
-            KKSValue v = constructValue(res->getCellAsString(row, 2), a, a->tableName()); //3-й параметр - parentTable. Для комплексных атрибутов не допускается в их составе иметь атрибут типа родитель-потомок
+            KKSValue v = constructValue(res->getCellAsString(row, 2), QString::null, a, a->tableName()); //3-й параметр - parentTable. Для комплексных атрибутов не допускается в их составе иметь атрибут типа родитель-потомок
             if(!v.isValid())
             {
                 //qWarning("Value for attribute is NOT valid! Value = %s, idCategoryAttr = %d, idAttrValue = %d, idAttrValue = %d",
@@ -454,7 +481,7 @@ KKSMap<int, KKSCategoryAttr *> KKSLoader::loadCategoryAttrs(int idCategory) cons
 
         //параметры атрибута в категории
         //дефолтное значение
-        KKSValue defValue = constructValue(res->getCellAsString(row, 10), attr);
+        KKSValue defValue = constructValue(res->getCellAsString(row, 10), QString::null, attr);
         if(!defValue.isValid())
             qWarning("defValue for attribute is NOT valid! defValue = %s, idCategory = %d, idAttribute = %d", 
                         res->getCellAsString(row, 10).toLocal8Bit().data(), 
@@ -491,6 +518,12 @@ KKSMap<int, KKSCategoryAttr *> KKSLoader::loadCategoryAttrs(int idCategory) cons
         KKSAGroup * g = new KKSAGroup(idGroup, groupName);
         attr->setGroup(g);
         g->release();
+
+        //порядок следования атрибута в категории
+        attr->setOrder(res->getCellAsInt(row, 23));
+
+        //директивы управления атрибута
+        attr->setDirectives(res->getCellAsString(row, 24));
 
         attrs.insert(attr->id(), attr);
         attr->release();
@@ -607,15 +640,14 @@ KKSLifeCycleEx * KKSLoader::loadLifeCycle(int idLifeCycle) const
     return lc;
 }
 
-KKSValue  KKSLoader::constructValue(const QString & value, 
+KKSValue  KKSLoader::constructValue(const QString & value,
+                                    const QString & columnValue,
                                     const KKSAttribute * a, 
                                     const QString & parentTable) const
 {
     KKSValue v;
     if(!a || !a->type())
         return v;
-
-    //qDebug () << __PRETTY_FUNCTION__ << a->id() << value;
 
     //в данном методе type предстает не как идентификатор строки в БД, а элемент enum KKSAttrType::KKSAttrTypes
     v.setValue(value, a->type()->attrType());
@@ -626,17 +658,23 @@ KKSValue  KKSLoader::constructValue(const QString & value,
         return v;
 
     if( a->type()->attrType() == KKSAttrType::atList ||
-        a->type()->attrType() == KKSAttrType::atParent
+        a->type()->attrType() == KKSAttrType::atParent ||
+        a->type()->attrType() == KKSAttrType::atSysChildCategoryRef
         )
     {
-        //в случае атрибутов типа список необходимо загрузить в KKSValue реальное значение из соответствующей таблицы БД
-        QString cv = loadColumnValue(a, 
-                                     v.valueVariant().toInt(), 
-                                     parentTable);
-        if(!cv.isEmpty())
-            v.setColumnValue(cv);
-        else
-            qWarning("The attribute KKSAttrType::atList points to empty or NULL value in corresponding table!");
+        if(!columnValue.isEmpty()){
+            v.setColumnValue(columnValue);
+        }
+        else{
+            //в случае атрибутов типа список необходимо загрузить в KKSValue реальное значение из соответствующей таблицы БД
+            QString cv = loadColumnValue(a, 
+                                         v.valueVariant().toInt(), 
+                                         parentTable);
+            if(!cv.isEmpty())
+                v.setColumnValue(cv);
+            else
+                qWarning("The attribute KKSAttrType::atList or KKSAttrType::atSysChildCategoryRef points to empty or NULL value in corresponding table!");
+        }
     }
     else if (a->type()->attrType() == KKSAttrType::atHistogram)
     {
@@ -1122,6 +1160,15 @@ KKSObjectExemplar * KKSLoader::loadEIO(qint64 id,
         else if(attr->type()->attrType() == KKSAttrType::atGeometry){
             code = QString("ST_ASEWKT(%1)").arg(attr->code(true));
         }
+        else if(attr->code().toLower() == QString("uuid_t")){
+            if(i==count-1){//если атрибут в списке был последним, 
+                           //в конце итоговой строки уже присутствует запятая, которую надо убрать
+                int index = fields.lastIndexOf(", ");
+                fields.remove(index, 2);
+            }   
+            i++;
+            continue;
+        }
         else{
             code = attr->code(true);
         }
@@ -1161,7 +1208,7 @@ KKSObjectExemplar * KKSLoader::loadEIO(qint64 id,
 
     count = res->getRowCount();
     if(count != 1){
-        qWarning("The too many EIO with given ID! EIO.id = %d, IO.id = %d", id, io->id());
+        qWarning("There are too many EIO with given ID! EIO.id = %d, IO.id = %d", id, io->id());
         delete res;
         return eio;
     }
@@ -1243,11 +1290,20 @@ KKSObjectExemplar * KKSLoader::loadEIO(qint64 id,
         av->setAttribute(attr);
 
         KKSValue v;
+        if(attr->code().toLower() == QString("uuid_t")){
+            v = constructValue(res->getCellAsString(0, 1), QString::null, attr);//uuid_t
+            av->setValue(v);
+            attrValues.append(av);
+            av->release();
+            //i++;
+            continue;
+        }
+
         if(attr->type()->attrType() == KKSAttrType::atParent){
-            v = constructValue(res->getCellAsString(0, i), attr, io->tableName());
+            v = constructValue(res->getCellAsString(0, i), QString::null, attr, io->tableName());
         }
         else{
-            v = constructValue(res->getCellAsString(0, i), attr);
+            v = constructValue(res->getCellAsString(0, i), QString::null, attr);
         }
         av->setValue(v);
         if(attr->code() == "name")
@@ -1441,6 +1497,8 @@ KKSAttrType * KKSLoader::loadAttrType(KKSAttrType::KKSAttrTypes type) const
         case KKSAttrType::atGISMap: id = 36; break;             //ГИС-объект (карта)
         case KKSAttrType::atDateTimeEx: id = 37; break;             //Дата-время (с миллисекундами)
         case KKSAttrType::atBinary: id = 38; break;                 // Бинарные данные
+        case KKSAttrType::atSysChildCategoryRef: id = 39; break; //ссылка на категорию таблицы справочника
+        case KKSAttrType::atSysUUID_T: id = 40; break;        //Уникальный идентификатор (поле UUID_T)
     }
 
     KKSAttrType * aType = loadAttrType(id);
@@ -2059,13 +2117,16 @@ KKSMap<int, KKSAttrGroup *> KKSLoader::loadTemplateAttrsGroups(int idTemplate) c
             //
             attr->KKSAttrView::setReadOnly (res->getCellAsBool(row, 12));
             attr->KKSAttrView::setOrder (res->getCellAsInt(row, 13));
-            KKSValue defValue = constructValue (res->getCellAsString(row, 14), attr);
+            KKSValue defValue = constructValue (res->getCellAsString(row, 14), QString::null, attr);
             if (!defValue.isValid())
                 qWarning("defValue for attribute is NOT valid! defValue = %s, idTemplate = %d, idAttribute = %d", 
                             res->getCellAsString(row, 14).toLocal8Bit().data(), 
                             idTemplate, 
                             id);
             attr->KKSAttrView::setDefValue(defValue);
+
+            attr->setDirectives(res->getCellAsString(row, 23));
+
             parent_group->addAttrView (id, attr);
 
         }
@@ -2136,7 +2197,7 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
 //        return sql;
     
     QString tableName = /*table.isEmpty() ? io->tableName() : */table;
-    qDebug () << __PRETTY_FUNCTION__ << tableName << QString::compare (tableName, QString("type_ship"), Qt::CaseInsensitive);
+    //qDebug () << __PRETTY_FUNCTION__ << tableName << QString::compare (tableName, QString("type_ship"), Qt::CaseInsensitive);
     if(tableName.isEmpty())
         return sql;
 
@@ -2222,7 +2283,7 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
             continue;
         }
         if(a->code() == "uuid_t"){
-            if(tableName.toLower() != "io_objects" && tableName.toLower() != "tbl_io_objects")//в справочнике ИО есть атрибут uuit_t
+            //if(tableName.toLower() != "io_objects" && tableName.toLower() != "tbl_io_objects")//в справочнике ИО есть атрибут uuit_t
                 continue;
         }
         if(a->code() == "r_icon"){ 
@@ -2253,7 +2314,8 @@ QString KKSLoader::generateSelectEIOQuery(const KKSCategory * cat,
         if(a->type()->attrType() == KKSAttrType::atList ||
            a->type()->attrType() == KKSAttrType::atParent ||
            a->type()->attrType() == KKSAttrType::atRecordColorRef ||
-           a->type()->attrType() == KKSAttrType::atRecordTextColorRef)
+           a->type()->attrType() == KKSAttrType::atRecordTextColorRef ||
+           a->type()->attrType() == KKSAttrType::atSysChildCategoryRef)
         {
             QString tName = a->tableName();
             QString cName = a->columnName(true); //quoted columnName
@@ -2667,7 +2729,8 @@ KKSMap<qint64, KKSEIOData *> KKSLoader::loadEIOList(const KKSCategory * c0,
 
             int ier = 0;
             if(a->type()->attrType() == KKSAttrType::atList ||
-                a->type()->attrType() == KKSAttrType::atParent
+                a->type()->attrType() == KKSAttrType::atParent ||
+                a->type()->attrType() == KKSAttrType::atSysChildCategoryRef
                 )
             {
                 QString sysValue = res->getCellAsString(row, ++column);
@@ -2809,7 +2872,8 @@ KKSList<KKSEIOData *> KKSLoader::loadEIOList1(const KKSCategory * c0,
 
             int ier = 0;
             if(a->type()->attrType() == KKSAttrType::atList ||
-                a->type()->attrType() == KKSAttrType::atParent
+                a->type()->attrType() == KKSAttrType::atParent ||
+                a->type()->attrType() == KKSAttrType::atSysChildCategoryRef
                 )
             {
                 QString sysValue = res->getCellAsString(row, ++column);
@@ -3110,7 +3174,8 @@ QString KKSLoader::parseFilter(const KKSFilter * f, const QString & tableName, Q
     //необходимо определить, как называется поле, на которое ссылается внешний ключ.
     //это может быть поле, отличное от id
     //в этом случае нам надо из БД подгрузить значение этого поля, поскольку у нас в KKSFilter::values() содержится значение только поля id
-    if(a->type()->attrType() == KKSAttrType::atList){
+    if(a->type()->attrType() == KKSAttrType::atList || 
+       a->type()->attrType() == KKSAttrType::atSysChildCategoryRef ){
         if(!a->refColumnName().isEmpty() && a->refColumnName() != "id"){
             QString sql = QString("select \"%1\" from %2 where id = %3")
                                     .arg(a->refColumnName())
@@ -3131,7 +3196,7 @@ QString KKSLoader::parseFilter(const KKSFilter * f, const QString & tableName, Q
             QString val = res->getCellAsString(0, 0);
             delete res;
             KKSValue * v = const_cast<KKSValue *>(values.at(0));
-            v->setValue(val, KKSAttrType::atList);
+            v->setValue(val, a->type()->attrType());
 
         }
     }
@@ -5540,7 +5605,7 @@ KKSObjectExemplar * KKSLoader::getMessage(int idMsg) const
     av->setAttribute(attr);
 
     KKSValue v;
-    v = constructValue(res->getCellAsString(0, 0), attr);
+    v = constructValue(res->getCellAsString(0, 0), QString::null, attr);
     av->setValue(v);
 
     attrValues.append(av);
@@ -5550,7 +5615,7 @@ KKSObjectExemplar * KKSLoader::getMessage(int idMsg) const
     av = new KKSAttrValue();
     av->setAttribute(attr);
 
-    v = constructValue(res->getCellAsString(0, 1), attr);
+    v = constructValue(res->getCellAsString(0, 1), QString::null, attr);
     av->setValue(v);
 
     attrValues.append(av);
@@ -5560,7 +5625,7 @@ KKSObjectExemplar * KKSLoader::getMessage(int idMsg) const
     av = new KKSAttrValue();
     av->setAttribute(attr);
 
-    v = constructValue(res->getCellAsString(0, 2), attr);
+    v = constructValue(res->getCellAsString(0, 2), QString::null, attr);
     av->setValue(v);
 
     attrValues.append(av);
@@ -5570,7 +5635,7 @@ KKSObjectExemplar * KKSLoader::getMessage(int idMsg) const
     av = new KKSAttrValue();
     av->setAttribute(attr);
 
-    v = constructValue(res->getCellAsString(0, 3), attr);
+    v = constructValue(res->getCellAsString(0, 3), QString::null, attr);
     av->setValue(v);
 
     attrValues.append(av);
@@ -5580,7 +5645,7 @@ KKSObjectExemplar * KKSLoader::getMessage(int idMsg) const
     av = new KKSAttrValue();
     av->setAttribute(attr);
 
-    v = constructValue(res->getCellAsString(0, 4), attr);
+    v = constructValue(res->getCellAsString(0, 4), QString::null, attr);
     av->setValue(v);
 
     attrValues.append(av);
@@ -5590,7 +5655,7 @@ KKSObjectExemplar * KKSLoader::getMessage(int idMsg) const
     av = new KKSAttrValue();
     av->setAttribute(attr);
 
-    v = constructValue(res->getCellAsString(0, 5), attr);
+    v = constructValue(res->getCellAsString(0, 5), QString::null, attr);
     av->setValue(v);
 
     attrValues.append(av);
@@ -5600,7 +5665,7 @@ KKSObjectExemplar * KKSLoader::getMessage(int idMsg) const
     av = new KKSAttrValue();
     av->setAttribute(attr);
 
-    v = constructValue(res->getCellAsString(0, 6), attr);
+    v = constructValue(res->getCellAsString(0, 6), QString::null, attr);
     av->setValue(v);
 
     attrValues.append(av);
@@ -5610,7 +5675,7 @@ KKSObjectExemplar * KKSLoader::getMessage(int idMsg) const
     av = new KKSAttrValue();
     av->setAttribute(attr);
 
-    v = constructValue(res->getCellAsString(0, 7), attr);
+    v = constructValue(res->getCellAsString(0, 7), QString::null, attr);
     av->setValue(v);
 
     attrValues.append(av);
@@ -5620,7 +5685,7 @@ KKSObjectExemplar * KKSLoader::getMessage(int idMsg) const
     av = new KKSAttrValue();
     av->setAttribute(attr);
 
-    v = constructValue(res->getCellAsString(0, 8), attr);
+    v = constructValue(res->getCellAsString(0, 8), QString::null, attr);
     av->setValue(v);
 
     attrValues.append(av);
@@ -5630,7 +5695,7 @@ KKSObjectExemplar * KKSLoader::getMessage(int idMsg) const
     av = new KKSAttrValue();
     av->setAttribute(attr);
 
-    v = constructValue(res->getCellAsString(0, 9), attr);
+    v = constructValue(res->getCellAsString(0, 9), QString::null, attr);
     av->setValue(v);
 
     attrValues.append(av);
@@ -5640,7 +5705,7 @@ KKSObjectExemplar * KKSLoader::getMessage(int idMsg) const
     av = new KKSAttrValue();
     av->setAttribute(attr);
 
-    v = constructValue(res->getCellAsString(0, 10), attr);
+    v = constructValue(res->getCellAsString(0, 10), QString::null, attr);
     av->setValue(v);
 
     attrValues.append(av);
@@ -5650,7 +5715,7 @@ KKSObjectExemplar * KKSLoader::getMessage(int idMsg) const
     av = new KKSAttrValue();
     av->setAttribute(attr);
 
-    v = constructValue(res->getCellAsString(0, 11), attr);
+    v = constructValue(res->getCellAsString(0, 11), QString::null, attr);
     av->setValue(v);
 
     attrValues.append(av);
@@ -5721,7 +5786,7 @@ KKSObjectExemplar * KKSLoader::getCommand(int idCmd) const
     av->setAttribute(attr);
 
     KKSValue v;
-    v = constructValue(res->getCellAsString(0, 0), attr);
+    v = constructValue(res->getCellAsString(0, 0), QString::null, attr);
     av->setValue(v);
 
     attrValues.append(av);
@@ -5731,7 +5796,7 @@ KKSObjectExemplar * KKSLoader::getCommand(int idCmd) const
     av = new KKSAttrValue();
     av->setAttribute(attr);
 
-    v = constructValue(res->getCellAsString(0, 1), attr);
+    v = constructValue(res->getCellAsString(0, 1), QString::null, attr);
     av->setValue(v);
 
     attrValues.append(av);
@@ -5741,7 +5806,7 @@ KKSObjectExemplar * KKSLoader::getCommand(int idCmd) const
     av = new KKSAttrValue();
     av->setAttribute(attr);
 
-    v = constructValue(res->getCellAsString(0, 2), attr);
+    v = constructValue(res->getCellAsString(0, 2), QString::null, attr);
     av->setValue(v);
 
     attrValues.append(av);
@@ -5751,7 +5816,7 @@ KKSObjectExemplar * KKSLoader::getCommand(int idCmd) const
     av = new KKSAttrValue();
     av->setAttribute(attr);
 
-    v = constructValue(res->getCellAsString(0, 3), attr);
+    v = constructValue(res->getCellAsString(0, 3), QString::null, attr);
     av->setValue(v);
 
     attrValues.append(av);
@@ -5761,7 +5826,7 @@ KKSObjectExemplar * KKSLoader::getCommand(int idCmd) const
     av = new KKSAttrValue();
     av->setAttribute(attr);
 
-    v = constructValue(res->getCellAsString(0, 4), attr);
+    v = constructValue(res->getCellAsString(0, 4), QString::null, attr);
     av->setValue(v);
 
     attrValues.append(av);
@@ -5771,7 +5836,7 @@ KKSObjectExemplar * KKSLoader::getCommand(int idCmd) const
     av = new KKSAttrValue();
     av->setAttribute(attr);
 
-    v = constructValue(res->getCellAsString(0, 5), attr);
+    v = constructValue(res->getCellAsString(0, 5), QString::null, attr);
     av->setValue(v);
 
     attrValues.append(av);
@@ -5781,7 +5846,7 @@ KKSObjectExemplar * KKSLoader::getCommand(int idCmd) const
     av = new KKSAttrValue();
     av->setAttribute(attr);
 
-    v = constructValue(res->getCellAsString(0, 6), attr);
+    v = constructValue(res->getCellAsString(0, 6), QString::null, attr);
     av->setValue(v);
 
     attrValues.append(av);
@@ -5791,7 +5856,7 @@ KKSObjectExemplar * KKSLoader::getCommand(int idCmd) const
     av = new KKSAttrValue();
     av->setAttribute(attr);
 
-    v = constructValue(res->getCellAsString(0, 7), attr);
+    v = constructValue(res->getCellAsString(0, 7), QString::null, attr);
     av->setValue(v);
 
     attrValues.append(av);
@@ -5801,7 +5866,7 @@ KKSObjectExemplar * KKSLoader::getCommand(int idCmd) const
     av = new KKSAttrValue();
     av->setAttribute(attr);
 
-    v = constructValue(res->getCellAsString(0, 8), attr);
+    v = constructValue(res->getCellAsString(0, 8), QString::null, attr);
     av->setValue(v);
 
     attrValues.append(av);
@@ -5811,7 +5876,7 @@ KKSObjectExemplar * KKSLoader::getCommand(int idCmd) const
     av = new KKSAttrValue();
     av->setAttribute(attr);
 
-    v = constructValue(res->getCellAsString(0, 9), attr);
+    v = constructValue(res->getCellAsString(0, 9), QString::null, attr);
     av->setValue(v);
 
     attrValues.append(av);
@@ -5821,7 +5886,7 @@ KKSObjectExemplar * KKSLoader::getCommand(int idCmd) const
     av = new KKSAttrValue();
     av->setAttribute(attr);
 
-    v = constructValue(res->getCellAsString(0, 10), attr);
+    v = constructValue(res->getCellAsString(0, 10), QString::null, attr);
     av->setValue(v);
 
     attrValues.append(av);
@@ -5831,7 +5896,7 @@ KKSObjectExemplar * KKSLoader::getCommand(int idCmd) const
     av = new KKSAttrValue();
     av->setAttribute(attr);
 
-    v = constructValue(res->getCellAsString(0, 11), attr);
+    v = constructValue(res->getCellAsString(0, 11), QString::null, attr);
     av->setValue(v);
 
     attrValues.append(av);
@@ -5841,7 +5906,7 @@ KKSObjectExemplar * KKSLoader::getCommand(int idCmd) const
     av = new KKSAttrValue();
     av->setAttribute(attr);
 
-    v = constructValue(res->getCellAsString(0, 12), attr);
+    v = constructValue(res->getCellAsString(0, 12), QString::null, attr);
     av->setValue(v);
 
     attrValues.append(av);
@@ -5851,7 +5916,7 @@ KKSObjectExemplar * KKSLoader::getCommand(int idCmd) const
     av = new KKSAttrValue();
     av->setAttribute(attr);
 
-    v = constructValue(res->getCellAsString(0, 13), attr);
+    v = constructValue(res->getCellAsString(0, 13), QString::null, attr);
     av->setValue(v);
 
     attrValues.append(av);
@@ -5861,7 +5926,7 @@ KKSObjectExemplar * KKSLoader::getCommand(int idCmd) const
     av = new KKSAttrValue();
     av->setAttribute(attr);
 
-    v = constructValue(res->getCellAsString(0, 14), attr);
+    v = constructValue(res->getCellAsString(0, 14), QString::null, attr);
     av->setValue(v);
 
     attrValues.append(av);
@@ -5871,7 +5936,7 @@ KKSObjectExemplar * KKSLoader::getCommand(int idCmd) const
     av = new KKSAttrValue();
     av->setAttribute(attr);
 
-    v = constructValue(res->getCellAsString(0, 15), attr);
+    v = constructValue(res->getCellAsString(0, 15), QString::null, attr);
     av->setValue(v);
 
     attrValues.append(av);
@@ -5881,7 +5946,7 @@ KKSObjectExemplar * KKSLoader::getCommand(int idCmd) const
     av = new KKSAttrValue();
     av->setAttribute(attr);
 
-    v = constructValue(res->getCellAsString(0, 16), attr);
+    v = constructValue(res->getCellAsString(0, 16), QString::null, attr);
     av->setValue(v);
 
     attrValues.append(av);
@@ -5891,7 +5956,7 @@ KKSObjectExemplar * KKSLoader::getCommand(int idCmd) const
     av = new KKSAttrValue();
     av->setAttribute(attr);
 
-    v = constructValue(res->getCellAsString(0, 17), attr);
+    v = constructValue(res->getCellAsString(0, 17), QString::null, attr);
     av->setValue(v);
 
     attrValues.append(av);
@@ -6255,7 +6320,7 @@ KKSList<KKSIndicatorValue *> KKSLoader::loadIndicatorValues(KKSObject * io) cons
             }
         }
 
-        KKSValue value = constructValue(res->getCellAsString(row, 15), ind, io->tableName());
+        KKSValue value = constructValue(res->getCellAsString(row, 15), QString::null, ind, io->tableName());
         if(!value.isValid())
         {
             qWarning("Value for indicator is NOT valid! Value = %s, idIndicatorValue = %d, idObject = %d",
@@ -6369,6 +6434,7 @@ KKSIndicator * KKSLoader::loadIndicator (int idIndicator) const
 }
 
 KKSValue  KKSLoader::constructValue(const QString & value, 
+                                    const QString & columnValue, //значение колонки, которая должна отображаться (для атрибутов-ссылок)
                                     const KKSIndicator * i, 
                                     const QString & parentTable) const
 {
@@ -6385,17 +6451,23 @@ KKSValue  KKSLoader::constructValue(const QString & value,
         return v;
 
     if( i->type()->attrType() == KKSAttrType::atList ||
-        i->type()->attrType() == KKSAttrType::atParent
+        i->type()->attrType() == KKSAttrType::atParent ||
+        i->type()->attrType() == KKSAttrType::atSysChildCategoryRef
         )
     {
-        //в случае атрибутов типа список необходимо загрузить в KKSValue реальное значение из соответствующей таблицы БД
-        QString cv = loadColumnValue(i, 
-                                     v.valueVariant().toInt(), 
-                                     parentTable);
-        if(!cv.isEmpty())
-            v.setColumnValue(cv);
-        else
-            qWarning("The indicator KKSAttrType::atList points to empty or NULL value in corresponding table!");
+        if(!columnValue.isEmpty()){
+            v.setColumnValue(columnValue);
+        }
+        else{
+            //в случае атрибутов типа список необходимо загрузить в KKSValue реальное значение из соответствующей таблицы БД
+            QString cv = loadColumnValue(i, 
+                                         v.valueVariant().toInt(), 
+                                         parentTable);
+            if(!cv.isEmpty())
+                v.setColumnValue(cv);
+            else
+                qWarning("The indicator KKSAttrType::atList points to empty or NULL value in corresponding table!");
+        }
     }
 
     return v;
@@ -6443,7 +6515,11 @@ KKSList<KKSAttrValue *> KKSLoader::loadIOAttrValueHistory(const KKSAttrValue * a
         KKSAttrValue * attr = new KKSAttrValue();
         attr->setAttribute(a);
 
-        KKSValue v = constructValue(res->getCellAsString(row, 3), a);
+        QString columnValue;
+        if(!res->isEmpty(row, 26))
+            columnValue = res->getCellAsString(row, 26);
+
+        KKSValue v = constructValue(res->getCellAsString(row, 3), columnValue, a);
         if(!v.isValid())
         {
             qWarning("Value for attribute is NOT valid! Value = %s, idAttrValue= %d ",
@@ -6517,7 +6593,12 @@ KKSAttrValue * KKSLoader::loadIOAttrValue(const KKSAttrValue * av, int idVal, bo
     attr->setAttribute(a);
 
     int row = 0;
-    KKSValue v = constructValue(res->getCellAsString(row, 3), a);
+
+    QString columnValue;
+    if(!res->isEmpty(row, 26))
+        columnValue = res->getCellAsString(row, 26);
+
+    KKSValue v = constructValue(res->getCellAsString(row, 3), columnValue, a);
     if(!v.isValid())
     {
         qWarning("Value for attribute is NOT valid! Value = %s, idAttrValue= %d ",
@@ -6649,7 +6730,7 @@ KKSMap<int, KKSCategoryAttr*> KKSLoader::loadAttrAttrs(int idAttr) const
 
         //параметры атрибута в категории
         //дефолтное значение
-        KKSValue defValue = constructValue(res->getCellAsString(row, 10), attr);
+        KKSValue defValue = constructValue(res->getCellAsString(row, 10), QString::null, attr);
         if(!defValue.isValid())
             qWarning("defValue for attribute is NOT valid! defValue = %s, idAttrAttr = %d", 
                         res->getCellAsString(row, 10).toLocal8Bit().data(), 
@@ -6685,6 +6766,12 @@ KKSMap<int, KKSCategoryAttr*> KKSLoader::loadAttrAttrs(int idAttr) const
         KKSAGroup * g = new KKSAGroup(idGroup, groupName);
         attr->setGroup(g);
         g->release();
+
+        //порядок отображения (следования) атрибута в категории
+        attr->setOrder(res->getCellAsInt(row, 23));
+
+        //директивы управления атрибутом
+        attr->setDirectives(res->getCellAsString(row, 24));
 /**/
         aaList.insert(idAttrAttr, attr);
         attr->release();
@@ -6749,7 +6836,11 @@ KKSList<KKSAttrValue *> KKSLoader::loadIndValues(KKSObjectExemplar * eio) const
         KKSAttrValue * attr = new KKSAttrValue();
         attr->setAttribute(a);
 
-        KKSValue v = constructValue(res->getCellAsString(row, 3), a, eio->io()->tableName());
+        QString columnValue;
+        if(!res->isEmpty(row, 26))
+            columnValue = res->getCellAsString(row, 26);
+
+        KKSValue v = constructValue(res->getCellAsString(row, 3), columnValue, a, eio->io()->tableName());
         if(!v.isValid())
         {
             qWarning("Value for attribute is NOT valid! Value = %s, idCategory = %d, idAttribute = %d, idObjectExemplar = %d",

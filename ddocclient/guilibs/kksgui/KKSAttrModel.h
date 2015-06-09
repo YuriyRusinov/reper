@@ -45,6 +45,7 @@ private:
     //
     const KKSAttribute * attr;
     const KKSCategory * cat;
+    mutable QMap<qint64, int> modelIndexesForIdList; //ассоциированные с QModelIndex идентификаторы соответствующих атрибутов
    
 private:
     Q_OBJECT

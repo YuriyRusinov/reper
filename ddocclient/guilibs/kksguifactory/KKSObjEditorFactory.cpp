@@ -228,7 +228,11 @@ KKSObjEditor* KKSObjEditorFactory :: createObjEditor (int idObject, //идентифика
 
     this->loadEntities (obj, wObjE, wCat, idObject, idObjE, tableName, tSystem, false, parent, false);
     this->loadRecEntities (obj, wObjE, wCat, idObject, idObjE, tableName, tRecAttr, false, parent);
-
+    
+    if(!wObjE){
+        int a = 0;
+    }
+    
     const KKSTemplate * ioTemplate = NULL;
     KKSObject * io = NULL;
     //
@@ -1272,9 +1276,7 @@ void KKSObjEditorFactory :: loadEntities (KKSObject *& obj,
     else if (!tSystem)
         tSystem = new KKSTemplate (obj->category()->tableCategory()->defTemplate());
     
-    //qDebug () << __PRETTY_FUNCTION__ << obj->category()->tableCategory()->id () << (wCat && wCat->tableCategory() ? wCat->tableCategory()->id() : -1);
 
-    //obj->release();
     return;
 }
 
@@ -3099,7 +3101,6 @@ int KKSObjEditorFactory :: setAttributes (const KKSTemplate *t,
                 && t->attributes().value(pa.key()))
         {
             KKSValue v = t->attributes().value(pa.key())->defValue().isNull() ? ca->defValue() : t->attributes().value(pa.key())->defValue();
-            qDebug () << __PRETTY_FUNCTION__ << pa.key() << v.value();
             av = new KKSAttrValue (v, ca);
         }
         else
@@ -3771,6 +3772,7 @@ void KKSObjEditorFactory :: loadAttributeReference (QString tableName, QWidget *
         switch (av->attribute()->type()->attrType())
         {
             case KKSAttrType::atList: 
+            case KKSAttrType::atSysChildCategoryRef: 
             case KKSAttrType::atRecordColorRef: 
             case KKSAttrType::atRecordTextColorRef: 
             default:
@@ -3815,7 +3817,8 @@ void KKSObjEditorFactory :: loadAttributeReference (QString tableName, QWidget *
         qDebug () << __PRETTY_FUNCTION__ << values << v_str;
         QVariant vc;
         if (av->attribute()->type()->attrType() == KKSAttrType::atList || 
-            av->attribute()->type()->attrType() == KKSAttrType::atParent )
+            av->attribute()->type()->attrType() == KKSAttrType::atParent ||
+            av->attribute()->type()->attrType() == KKSAttrType::atSysChildCategoryRef)
         {
             vc = QVariant (v_str);
             KKSValue v = av->value();
@@ -5327,7 +5330,8 @@ void KKSObjEditorFactory :: importCopies (KKSObject *io,
             if (iType == KKSAttrType::atList || 
                 iType == KKSAttrType::atParent ||
                 iType == KKSAttrType::atRecordColorRef ||
-                iType == KKSAttrType::atRecordTextColorRef)
+                iType == KKSAttrType::atRecordTextColorRef ||
+                iType == KKSAttrType::atSysChildCategoryRef)
             {
                 
                 QString av_str (oesList[i][j+1]);//(iType == KKSAttrType::atParent ? 0 : j+1)]);
@@ -5857,6 +5861,7 @@ int KKSObjEditorFactory :: exportCategory (QXmlStreamWriter * xmlWriter, const K
             pc.value()->type()->attrType() == KKSAttrType::atCheckListEx ||
             pc.value()->type()->attrType() == KKSAttrType::atList ||
             pc.value()->type()->attrType() == KKSAttrType::atParent ||
+            pc.value()->type()->attrType() == KKSAttrType::atSysChildCategoryRef ||
             pc.value()->type()->attrType() == KKSAttrType::atRecordColorRef ||
             pc.value()->type()->attrType() == KKSAttrType::atRecordTextColorRef)
         {
@@ -6009,6 +6014,7 @@ int KKSObjEditorFactory :: exportCopies (QIODevice *csvDev, // целевой CSV файл
                             }
                             else if (pc.value()->type()->attrType() == KKSAttrType::atList || 
                                      pc.value()->type()->attrType() == KKSAttrType::atParent ||
+                                     pc.value()->type()->attrType() == KKSAttrType::atSysChildCategoryRef ||
                                      pc.value()->type()->attrType() == KKSAttrType::atRecordColorRef ||
                                      pc.value()->type()->attrType() == KKSAttrType::atRecordTextColorRef)
                             {
@@ -6218,6 +6224,7 @@ int KKSObjEditorFactory :: exportCopies (QXmlStreamWriter * xmlWriter, // целево
                 }
                 case KKSAttrType::atList:
                 case KKSAttrType::atParent:
+                case KKSAttrType::atSysChildCategoryRef:
                 case KKSAttrType::atRecordColorRef:
                 case KKSAttrType::atRecordTextColorRef:
                 {
@@ -6959,6 +6966,7 @@ void KKSObjEditorFactory :: loadAttributeFilters (const QString & tableName, con
         mod->insertColumns (0, 1);
 
     if (attr->type()->attrType() == KKSAttrType::atList ||
+        attr->type()->attrType() == KKSAttrType::atSysChildCategoryRef ||
         attr->type()->attrType() == KKSAttrType::atParent)
     {
         loadAttributeSingleFilters (tableName, attr, mod);

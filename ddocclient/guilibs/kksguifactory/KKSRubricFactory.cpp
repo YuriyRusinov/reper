@@ -1169,7 +1169,8 @@ void KKSRubricFactory::viewAttachments(QAbstractItemModel * attachModel, const K
                         ) {
                     objModel->setData(wIndex, tr("<Video data %1>").arg(i), Qt::DisplayRole);
                 } else if (av->attribute()->type()->attrType() == KKSAttrType::atList ||
-                        av->attribute()->type()->attrType() == KKSAttrType::atParent) {
+                           av->attribute()->type()->attrType() == KKSAttrType::atSysChildCategoryRef ||
+                           av->attribute()->type()->attrType() == KKSAttrType::atParent) {
                     bool ok;
                     int idVal = av->value().value().toInt(&ok);
                     if (!ok)

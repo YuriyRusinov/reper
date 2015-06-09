@@ -29,12 +29,12 @@ public:
         foLessEq = 5, // <=
         foIn = 6, // in ()
         foNotIn = 7, // not in ()
-        foBetween = 8, // between %1 and %2
+        /**/foBetween = 8, // between %1 and %2
         foLike = 9, // like 'AAA'
         foNotEq = 10, // <>
         foIsNull = 11, //isnull
         foIsNotNull = 12, //is not null
-        foInSQL = 13, // in (select ...)
+        /**/foInSQL = 13, // in (select ...)
         foLikeIn = 14, //LIKE '%AAA%'
         foLikeStart = 15, //LIKE 'AAA%'
         foLikeEnd = 16, //LIKE '%AAA'

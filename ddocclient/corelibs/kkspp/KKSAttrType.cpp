@@ -86,6 +86,8 @@ void KKSAttrType::setAttrType()
         case 36: m_attrType = atGISMap; break;            //ГИС-объект (Карта)
         case 37: m_attrType = atDateTimeEx; break;        //Дата-время (с миллисекундами)
         case 38: m_attrType = atBinary; break;
+        case 39: m_attrType = atSysChildCategoryRef; break; //ссылка на категорию таблицы справочника
+        case 40: m_attrType = atSysUUID_T; break;        //Уникальный идентификатор (поле UUID_T)
 
         default: m_attrType = atUserDef; break;           //пользовательский (for future use)
     }

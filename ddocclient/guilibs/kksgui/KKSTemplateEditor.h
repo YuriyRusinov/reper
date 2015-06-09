@@ -58,6 +58,9 @@ class _GUI_EXPORT KKSTemplateEditor : public KKSDialog
         void saveErr (void);
         void dropErr (void);
 
+        void itemExpanded(const QModelIndex &);
+        void itemCollapsed(const QModelIndex &);
+
     signals:
         void saveTemplate (KKSTemplate *, KKSTemplateEditor *);
 

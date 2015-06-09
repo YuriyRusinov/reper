@@ -15,7 +15,9 @@ JKKSCategoryAttr :: JKKSCategoryAttr (qint64 idAttr,
                                       const QString& aDefVal, 
                                       bool isMandatory, 
                                       bool isReadOnly,
-                                      const QString & uid)
+                                      const QString & uid,
+                                      const QString & directives,
+                                      int order)
     : JKKSUID(uid, QString()),
     m_idAttribute (idAttr),
     m_idAttrType (idAttrType),
@@ -29,7 +31,9 @@ JKKSCategoryAttr :: JKKSCategoryAttr (qint64 idAttr,
     m_aDefValue (aDefVal),
     m_isMandatory (isMandatory),
     m_isReadOnly (isReadOnly),
-    m_transferrable(true)
+    m_transferrable(true),
+    m_directives(directives),
+    m_order(order)
 {
 }
 
@@ -49,7 +53,9 @@ JKKSCategoryAttr :: JKKSCategoryAttr (const JKKSCategoryAttr& cAttr)
     m_isReadOnly (cAttr.m_isReadOnly),
     m_transferrable(cAttr.m_transferrable),
     m_attrs(cAttr.m_attrs),
-    m_attrAttrUid(cAttr.m_attrAttrUid)
+    m_attrAttrUid(cAttr.m_attrAttrUid),
+    m_order(cAttr.m_order),
+    m_directives(cAttr.m_directives)
 {
 }
 
@@ -75,6 +81,8 @@ QDataStream& operator<< (QDataStream& out, const JKKSCategoryAttr& attr)
     out << attr.attrs();
     out << attr.m_transferrable;
     out << attr.m_attrAttrUid;
+    out << attr.m_order;
+    out << attr.m_directives;
 
     return out;
 }
@@ -99,6 +107,8 @@ QDataStream& operator>> (QDataStream& in, JKKSCategoryAttr& attr)
     in >> attr.m_attrs;
     in >> attr.m_transferrable;
     in >> attr.m_attrAttrUid;
+    in >> attr.m_order;
+    in >> attr.m_directives;
 
     return in;
 }
@@ -278,4 +288,24 @@ const QString & JKKSCategoryAttr :: attrAttrUid() const
 void JKKSCategoryAttr :: setAttrAttrUid(const QString & uid)
 {
     m_attrAttrUid = uid;
+}
+
+int JKKSCategoryAttr::order() const
+{
+    return m_order;
+}
+
+void JKKSCategoryAttr::setOrder(int o)
+{
+    m_order = o;
+}
+
+const QString & JKKSCategoryAttr::directives() const
+{
+    return m_directives;
+}
+
+void JKKSCategoryAttr::setDirectives(const QString & d)
+{
+    m_directives = d;
 }

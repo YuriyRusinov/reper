@@ -87,6 +87,8 @@
 
 #include <defines.h>
 #include <kksdatabase.h>
+#include <KKSSortFilterProxyModel.h>
+
 
 
 /* Метод формирует виджет с древовидной структурой групп атрибутов и атрибутов.
@@ -274,7 +276,7 @@ void KKSAttributesFactory :: saveAttribute (const QModelIndex& parent, QAbstract
              SLOT (loadHistReferences (KKSAttribute *, int, KKSAttrEditor *))
             );
     
-    connect (this, SIGNAL(expandIndex (const QModelIndex&)), aEditor, SLOT (expandAttrInd (const QModelIndex&)) );
+    //connect (this, SIGNAL(expandIndex (const QModelIndex&)), aEditor, SLOT (expandAttrInd (const QModelIndex&)) );
 
     aEditor->checkForHistogramRefs();
 
@@ -283,14 +285,9 @@ void KKSAttributesFactory :: saveAttribute (const QModelIndex& parent, QAbstract
         cAttr->release();
         return;
     }
-    //int idType = aEditor->getAttribute()->type()->id();
-    qDebug () << __PRETTY_FUNCTION__ << cAttr->id ();
 
-    //KKSAttrType::KKSAttrTypes idAttrType = (KKSAttrType::KKSAttrTypes)idType;
     KKSAttrType *aType = aEditor->getAttribute()->type();
-//    cAttr->setType (aType);
-//    if (cAttr->type() == 0)
-//        return;
+
     int idNewAttrGroup = aEditor->getGroupId();
     KKSAGroup * aGr = loader->loadAttrGroup(idNewAttrGroup);
     cAttr->setGroup (aGr);
@@ -335,7 +332,6 @@ void KKSAttributesFactory :: saveAttribute (const QModelIndex& parent, QAbstract
         if (aModel->columnCount(pGroupInd) == 0 && isIns)
             aModel->insertColumns(0, 4, pGroupInd);
         aInd = aModel->index(nr, 0, pGroupInd);
-        //qDebug () << __PRETTY_FUNCTION__ << aInd << isIns;
     }
     aModel->setData(aInd, cAttr->id(), Qt::UserRole);
     aModel->setData(aInd, cAttr->name(), Qt::DisplayRole);
@@ -366,7 +362,6 @@ void KKSAttributesFactory :: saveAttribute (const QModelIndex& parent, QAbstract
 
     aInd = aInd.sibling (aInd.row(), 0);
     emit expandIndex (aInd);
-    //KKSViewFactory::updateAttributesModel (loader, aModel);
 
     if (aType)
         aType->release ();
@@ -399,7 +394,8 @@ void KKSAttributesFactory :: loadAttribute (int idAttr, QAbstractItemModel * aMo
         attr->type()->attrType () == KKSAttrType::atCheckList ||
         attr->type()->attrType () == KKSAttrType::atCheckListEx ||
         attr->type()->attrType () == KKSAttrType::atRecordColorRef ||
-        attr->type()->attrType () == KKSAttrType::atRecordTextColorRef)
+        attr->type()->attrType () == KKSAttrType::atRecordTextColorRef ||
+        attr->type()->attrType () == KKSAttrType::atSysChildCategoryRef)
     {
         loadAttrsRefs (attr, attrEditor);
     }
@@ -734,7 +730,7 @@ void KKSAttributesFactory :: addAttrGroup (QAbstractItemModel *aModel, const QMo
         int idGroup = pIndex.data(Qt::UserRole).toInt();
         KKSValue val = KKSValue (QString::number(idGroup), KKSAttrType::atParent);
         KKSAttribute * aPar = loader->loadAttribute(ATTR_ID_PARENT);
-        KKSCategoryAttr * cAttr = KKSCategoryAttr::create(aPar, false, true, QString::number(idGroup));
+        KKSCategoryAttr * cAttr = KKSCategoryAttr::create(aPar, false, true, QString::number(idGroup), 1, QString::null);
         aPar->release();
         KKSAttrValue * av = new KKSAttrValue(val, cAttr);
         if (av)
@@ -1078,6 +1074,7 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
         case KKSAttrType::atParent:
         case KKSAttrType::atRecordColorRef:
         case KKSAttrType::atRecordTextColorRef:
+        case KKSAttrType::atSysChildCategoryRef:
             {
                 const KKSCategoryAttr * pCategAttr = av->attribute();
                 if (!isRef)
@@ -1100,13 +1097,15 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
 
                 QVariant vr = QVariant ();
                 bool isWRef (pCategAttr->refType()->attrType() != KKSAttrType::atList &&
-                             pCategAttr->refType()->attrType() != KKSAttrType::atParent);
+                             pCategAttr->refType()->attrType() != KKSAttrType::atParent &&
+                             pCategAttr->refType()->attrType() != KKSAttrType::atSysChildCategoryRef);
                 
                 qDebug () << __PRETTY_FUNCTION__ << "Widget creation" << pCategAttr->refType()->attrType() << isWRef << pCategAttr->id();
                 
                 const KKSAttribute * refAttr = 0;
                 if (pCategAttr->refType()->attrType () == KKSAttrType::atList ||
-                    pCategAttr->refType()->attrType () == KKSAttrType::atParent)
+                    pCategAttr->refType()->attrType () == KKSAttrType::atParent ||
+                    pCategAttr->refType()->attrType () == KKSAttrType::atSysChildCategoryRef)
                 {
                     QString aCode = pCategAttr->columnName ();
                     refAttr = loader->loadAttribute (aCode, pCategAttr->tableName());
@@ -1174,13 +1173,16 @@ QWidget * KKSAttributesFactory :: createAttrWidget (KKSAttrValue * av,
                     gLayout->addWidget (lTitle, n_str, 0, 1, 2, Qt::AlignRight | Qt::AlignTop);
                 }
                 hPw.setHorizontalStretch (10);
-                attrWidget = new KKSAttrUUIDWidget ();
+                attrWidget = new KKSAttrUUIDWidget (isRef);
                 
                 qDebug () << __PRETTY_FUNCTION__ << "Widget has created" << pCategAttr->type()->attrType();
                 attrWidget->setMinimumHeight (20);
                 attrWidget->setSizePolicy (hPw);
-                if (!isRef)
+                
+                if (!isRef){
+                    attrWidget->setEnabled(false);
                     gLayout->addWidget (attrWidget, n_str, 2, 1, 1);
+                }
             }
             break;
         case KKSAttrType::atCheckList:
@@ -1877,7 +1879,7 @@ QWidget * KKSAttributesFactory :: createAttrCheckWidget (const KKSAttrValue * av
         else if (objEditor)
         {
             connect (lHist, SIGNAL(loadHistory(const KKSAttrValue *, bool)), objEditor, SLOT(loadAttrHistory(const KKSAttrValue *, bool)));
-            connect (objEditor, SIGNAL (viewHist (const KKSAttrValue *, const KKSList<KKSAttrValue *>&)), lHist, SLOT(viewAHist(const KKSAttrValue *, const KKSList<KKSAttrValue *> &)));
+            connect (objEditor, SIGNAL (viewHistory (const KKSAttrValue *, const KKSList<KKSAttrValue *>&)), lHist, SLOT(viewAHist(const KKSAttrValue *, const KKSList<KKSAttrValue *> &)));
 //            connect (objEditor, SIGNAL(loadHistory(const KKSAttrValue *, qint64, qint64, bool)), this, SLOT(loadIOAttrValueHistoryR(const KKSAttrValue *, qint64, qint64, bool)));
 //            connect (this, SIGNAL(viewHistory(const KKSList<KKSAttrValue *> &)), objEditor, SLOT(viewAHist(const KKSList<KKSAttrValue *> &)));
         }
@@ -2030,6 +2032,7 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
         case KKSAttrType::atParent:
         case KKSAttrType::atRecordColorRef:
         case KKSAttrType::atRecordTextColorRef:
+        case KKSAttrType::atSysChildCategoryRef:
             {
                 KKSAttrRefWidget *aRefW = qobject_cast<KKSAttrRefWidget *>(aw);
                 if (!aRefW)
@@ -2126,7 +2129,10 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
                 }
                 
                 QVariant vRef;
-                if (pCatType->attrType() == KKSAttrType::atParent || pCatType->attrType() == KKSAttrType::atList)
+                if (pCatType->attrType() == KKSAttrType::atParent || 
+                    pCatType->attrType() == KKSAttrType::atList || 
+                    pCatType->attrType() == KKSAttrType::atSysChildCategoryRef
+                    )
                     vRef = QVariant (v_str);
                 else if (!v_str.isEmpty())
                     vRef = QVariant (QColor::fromRgba (v_str.toUInt()));
@@ -2403,10 +2409,10 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
             {
                 double v = V.toDouble ();
                 int vi = V.toInt ();
-                if (!isObjExist && av->attribute()->id() == 1)
+                if (!isObjExist && av->attribute()->id() == ATTR_ID)
                 {
                     vi = -1;
-                    KKSValue val (QString::number(-1), KKSAttrType::atInt);
+                    KKSValue val (QString::number(-1), KKSAttrType::atInt64);
                     (const_cast<KKSAttrValue *>(av))->setValue (val);
                 }
                 KKSEdit *lEdit = qobject_cast<KKSEdit *>(aw);
@@ -2429,6 +2435,9 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
                 }
                 lEdit->setVal (lEdit->text());
                 lEdit->setEnabled (!isObjExist || !av->attribute()->isReadOnly());
+                if (av->attribute()->id() == ATTR_ID){
+                    lEdit->setEnabled(false);
+                }
             }
             break;
         case KKSAttrType::atString: 
@@ -2487,7 +2496,7 @@ void KKSAttributesFactory :: setValue (QWidget *aw,
                     connectToSlots (aw, wEditor);
                     connect (uuidWidget, SIGNAL (generateUUID (qint64)), wEditor, SLOT (generateIOUUID (qint64)) );
                     connect (wEditor, SIGNAL (setUUID (QString)), uuidWidget, SLOT (setUUID (QString)) );
-                    uuidWidget->setEnabled (!isObjExist || !av->attribute()->isReadOnly());
+                    uuidWidget->setEnabled (!isObjExist);// || !av->attribute()->isReadOnly());
                 }
             }
             break;
@@ -2755,35 +2764,127 @@ void KKSAttributesFactory::loadIOAttrValueHistoryR(const KKSAttrValue * av, qint
     emit viewHistory(avR, avList);
 }
 
+/*
+Для атрибутов в атрибутах
+*/
 void KKSAttributesFactory :: showAttrsWidget (KKSAttribute *a, KKSAttrEditor *parent)
 {
     KKSRecWidget * rw (0);
 
     if (a){
-        rw = KKSViewFactory :: createAttrAttrsView (a, true, parent, parent->windowFlags());
+        rw = KKSViewFactory :: createAttrAttrsView (loader, a, true, parent, parent->windowFlags());
         parent->setRecWidget(rw);
     }
     else
     {
         rw = new KKSRecWidget (true, Qt::Vertical, parent, parent->windowFlags());
         QTreeView * tvTableAttrs = rw->getView();//new QTreeView ();
+        tvTableAttrs->header()->setClickable (true);
+        tvTableAttrs->header()->setSortIndicatorShown (true);
+        tvTableAttrs->header()->setSortIndicator (5, Qt::AscendingOrder);
+        tvTableAttrs->setSortingEnabled (true);
+        
+        //tvTableAttrs->setSelectionMode (QAbstractItemView::ExtendedSelection);
+        //tvTableAttrs->setDragDropMode (QAbstractItemView::DragOnly);
+        //tvTableAttrs->setDropIndicatorShown (true);
+
         
         rw->hideActionGroup (_ID_FILTER_GROUP);
         rw->hideActionGroup (_ID_IMPORT_GROUP);
         rw->hideActionGroup (_ID_VIEW_GROUP);
         rw->hideActionGroup (_ID_REPORT_GROUP);
 
-        QAbstractItemModel * acModel = new KKSCatAttrsModel (0, 4);//QStandardItemModel (0, 4);
+        QAbstractItemModel * acModel = new KKSCatAttrsModel (0, 6);//QStandardItemModel (0, 4);
         acModel->setHeaderData (0, Qt::Horizontal, QObject::tr ("Name"));
         acModel->setHeaderData (1, Qt::Horizontal, QObject::tr ("Default value"));
         acModel->setHeaderData (2, Qt::Horizontal, QObject::tr ("Mandatory"));
         acModel->setHeaderData (3, Qt::Horizontal, QObject::tr ("Read only"));
+        acModel->setHeaderData (4, Qt::Horizontal, QObject::tr ("Order"));
+        acModel->setHeaderData (5, Qt::Horizontal, QObject::tr ("Directives"));
         
         KKSViewFactory::updateAttrAttrsModel (0, acModel);
         //qDebug () << __PRETTY_FUNCTION__ << rw->pbOk->isVisible();
         
-        tvTableAttrs->setModel (acModel);
-        
+        //tvTableAttrs->setModel (acModel);
+
+        //делаем список с атрибутами в атрибуте сортируемым
+        KKSSortFilterProxyModel *sortModel = 0;
+        sortModel = new KKSSortFilterProxyModel (tvTableAttrs);//ksa было editor
+        tvTableAttrs->setModel (sortModel);
+        sortModel->setDynamicSortFilter (true);
+        sortModel->setSourceModel (acModel);
+
+
+        //добавим в KKSSortFilterProxyModel набор атрибутов, которые задаются справочником атрибутов в атрибутах
+        //это надо для правильной фильтрации по соответствующим колонкам в таблице (с учетом типа колонок(атрибутов))
+        KKSMap<int, KKSCategoryAttr *> acList = loader->loadCategoryAttrs(ATTRS_ATTR_TABLE_CATEGORY_ID);
+        if(acList.count() > 0){
+            KKSAttrView * av = 0;
+            KKSCategoryAttr * ac = 0;
+            
+            ac = acList.value(1); //id
+            if(ac)
+                av = new KKSAttrView(*ac);
+            else
+                av = new KKSAttrView();
+            sortModel->addAttrView(av);
+            av->release();
+
+            ac = acList.value(2);//name
+            if(ac)
+                av = new KKSAttrView(*ac);
+            else
+                av = new KKSAttrView();
+            sortModel->addAttrView(av);
+            av->release();
+
+            ac = acList.value(304);//def_value
+            if(ac)
+                av = new KKSAttrView(*ac);
+            else
+                av = new KKSAttrView();
+            sortModel->addAttrView(av);
+            av->release();
+
+            ac = acList.value(128); //is_mandatory
+            if(ac)
+                av = new KKSAttrView(*ac);
+            else
+                av = new KKSAttrView();
+            sortModel->addAttrView(av);
+            av->release();
+
+            ac = acList.value(305); //is_read_only
+            if(ac)
+                av = new KKSAttrView(*ac);
+            else
+                av = new KKSAttrView();
+            sortModel->addAttrView(av);
+            av->release();
+
+            ac = acList.value(404); //order
+            if(ac)
+                av = new KKSAttrView(*ac);
+            else
+                av = new KKSAttrView();
+            sortModel->addAttrView(av);
+            av->release();
+
+            ac = acList.value(405); //directives
+            if(ac)
+                av = new KKSAttrView(*ac);
+            else
+                av = new KKSAttrView();
+            sortModel->addAttrView(av);
+            av->release();
+        }
+
+
+
+        int sortCol = tvTableAttrs->header()->sortIndicatorSection ();
+        Qt::SortOrder sOrder = tvTableAttrs->header()->sortIndicatorOrder ();
+        sortModel->sort (sortCol, sOrder);
+
         QHeaderView * header = tvTableAttrs->header();
         int lIndex = header->logicalIndex(0);
         header->setResizeMode(lIndex, QHeaderView::ResizeToContents);
@@ -2845,7 +2946,7 @@ void KKSAttributesFactory :: addAttribute (KKSAttribute *a, QAbstractItemModel *
                 continue;
 
             bool is_bad;
-            KKSCategoryAttr *aAttr = KKSCategoryAttr::create (attr, false, false, QString(), &is_bad);
+            KKSCategoryAttr *aAttr = KKSCategoryAttr::create (attr, false, false, QString(), 1, QString::null, &is_bad);
             if (is_bad || !aAttr)
             {
                 if (aAttr)
@@ -2949,6 +3050,8 @@ void KKSAttributesFactory :: addComplexAttr (KKSAttribute *a, QAbstractItemModel
     //
     QStringList filtValues;
     filtValues << QString::number(KKSAttrType::atParent);
+    filtValues << QString::number(KKSAttrType::atSysChildCategoryRef);
+    filtValues << QString::number(KKSAttrType::atSysUUID_T);
     filtValues << QString::number(KKSAttrType::atCheckListEx);
     filtValues << QString::number(KKSAttrType::atRecordColor);
     filtValues << QString::number(KKSAttrType::atRecordColorRef);

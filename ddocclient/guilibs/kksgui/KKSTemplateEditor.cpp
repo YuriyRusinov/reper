@@ -59,11 +59,15 @@ KKSTemplateEditor :: KKSTemplateEditor (KKSTemplate *t, bool mode, QWidget *pare
     connect (pbEditAttr, SIGNAL (clicked()), this, SLOT (editAttribute()) );
     connect (pbDelAttr, SIGNAL (clicked()), this, SLOT (delAttribute()) );
 
-    pbUp->setEnabled (false);
-    pbDown->setEnabled (false);
+    connect (tvGroups, SIGNAL(expanded(const QModelIndex &)), this, SLOT(itemExpanded(const QModelIndex &)));
+    connect (tvGroups, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(itemCollapsed(const QModelIndex &)));
+
+    //pbUp->setEnabled (false);
+    //pbDown->setEnabled (false);
+
     pbApply->setVisible (false);
-//    connect (pbUp, SIGNAL (clicked()), this, SLOT (moveUp()) );
-//    connect (pbDown, SIGNAL (clicked()), this, SLOT (moveDown()) );
+    connect (pbUp, SIGNAL (clicked()), this, SLOT (moveUp()) );
+    connect (pbDown, SIGNAL (clicked()), this, SLOT (moveDown()) );
 
     connect (pbOk, SIGNAL (clicked()), this, SLOT (saveClose()) );
     connect (pbCancel, SIGNAL (clicked()), this, SLOT (reject()) );
@@ -202,24 +206,18 @@ void KKSTemplateEditor :: init_attr_widget (QTabWidget *tWidget)
 
 void KKSTemplateEditor :: addTemplateGroup (void)
 {
-    QModelIndex gIndex = this->getSelectedIndex ();//selModel->currentIndex ();
-/*    if (!gIndex.isValid () || gIndex.data (Qt::UserRole+USER_ENTITY).toInt() == 0)
-    {
-        QMessageBox::warning (this, tr("Edit group of attributes"), tr("Please select group"));
-        return;
-    }
-*/
-    qDebug () << __PRETTY_FUNCTION__ << gIndex << gIndex.data (Qt::UserRole+USER_ENTITY).toInt();
-    while (gIndex.isValid() && gIndex.data (Qt::UserRole+USER_ENTITY).toInt() == 0)
+    QModelIndex gIndex = this->getSelectedIndex (); //всегда возвращает колонку с индексом 0
+
+    while (gIndex.isValid() && gIndex.data (Qt::UserRole+USER_ENTITY).toInt() == 0) //Qt::UserRole+USER_ENTITY - это флаг (0 - группа / 1 - атрибут
         gIndex = gIndex.parent ();
-    qDebug () << __PRETTY_FUNCTION__ << gIndex << gIndex.data (Qt::UserRole+USER_ENTITY).toInt();
+
     emit addAttrGroup (tRef, gIndex, this);
 }
 
 void KKSTemplateEditor :: editTemplateGroup (void)
 {
-    QModelIndex gIndex = this->getSelectedIndex ();//selModel->currentIndex ();
-    if (!gIndex.isValid () || gIndex.data (Qt::UserRole+USER_ENTITY).toInt() == 0)
+    QModelIndex gIndex = this->getSelectedIndex ();//всегда возвращает колонку с индексом 0
+    if (!gIndex.isValid () || gIndex.data (Qt::UserRole+USER_ENTITY).toInt() == 0)//Qt::UserRole+USER_ENTITY - это флаг (0 - группа / 1 - атрибут
     {
         qWarning() << tr("Please select group");
         QMessageBox::warning (this, tr("Edit group of attributes"), tr("Please select group"));
@@ -231,8 +229,8 @@ void KKSTemplateEditor :: editTemplateGroup (void)
 
 void KKSTemplateEditor :: delTemplateGroup (void)
 {
-    QModelIndex gIndex = this->getSelectedIndex ();//selModel->currentIndex ();
-    if (!gIndex.isValid () || gIndex.data (Qt::UserRole+USER_ENTITY).toInt() == 0)
+    QModelIndex gIndex = this->getSelectedIndex ();//всегда возвращает колонку с индексом 0
+    if (!gIndex.isValid () || gIndex.data (Qt::UserRole+USER_ENTITY).toInt() == 0) //Qt::UserRole+USER_ENTITY - это флаг (0 - группа / 1 - атрибут
     {
         qWarning() << tr("Please select group");
         QMessageBox::warning (this, tr("Delete group of attributes"), tr("Please select group"));
@@ -271,8 +269,10 @@ void KKSTemplateEditor :: addAttribute (void)
         return;
     }
 
-    QModelIndex gIndex = this->getSelectedIndex ();
-    if (!gIndex.isValid () || gIndex.data (Qt::UserRole+USER_ENTITY).toInt() == 0)
+    QModelIndex gIndex = this->getSelectedIndex ();//всегда возвращает колонку с индексом 0
+    
+    //добавлять атрибут можно только в группу. Qt::UserRole+USER_ENTITY - это флаг (0 - группа / 1 - атрибут
+    if (!gIndex.isValid () || gIndex.data (Qt::UserRole+USER_ENTITY).toInt() == 0) 
     {
         qWarning() << tr("Please select target group");
         QMessageBox::warning (this, tr("Add attribute"), tr("Please select target group"), QMessageBox::Ok);
@@ -307,81 +307,158 @@ void KKSTemplateEditor :: moveUp (void)
     if (!gIndex.isValid())
         return;
 
-    if (gIndex.parent().isValid())
-    {
-        //
-        // Attribute
-        //
-        int idAttrGroup = gIndex.parent().data (Qt::UserRole).toInt();
-        int idAttr = gIndex.data (Qt::UserRole).toInt ();
-        KKSAttrGroup * aGroup = tRef->group (idAttrGroup);
-        if (!aGroup)
-            return;
-        KKSAttrView * aView = aGroup->attrView (idAttr);
-        if (!aView)
-            return;
-
-        if (gIndex.row() > 0)
-        {
-            QModelIndex gIndexP = gIndex.sibling (gIndex.row()-1, 0);//gIndex.column ());
-            qDebug () << __PRETTY_FUNCTION__ << gIndex << gIndexP;
-            if (!gIndexP.isValid())
+    //атрибут вне группы быть не может, поэтому если у выбранного элемента есть родитель, то это однозначно группа 
+    //if (gIndex.parent().isValid())
+    //{
+        int eType = gIndex.data(Qt::UserRole+USER_ENTITY).toInt();
+        if(eType == 0){//0 - атрибут
+            //
+            // Attribute (и у него однозначно есть родитель (это группа))
+            //
+            int idAttrGroup = gIndex.parent().data (Qt::UserRole).toInt();
+            int idAttr = gIndex.data (Qt::UserRole).toInt ();
+            KKSAttrGroup * aGroup = tRef->searchGroupById(idAttrGroup);
+            if (!aGroup)
                 return;
-            int idAttrP = gIndexP.data (Qt::UserRole).toInt();
-            KKSAttrView * aViewPrev = aGroup->attrView (idAttrP);
-            if (!aViewPrev)
+            KKSAttrView * aView = aGroup->attrView (idAttr);
+            if (!aView)
                 return;
 
-            this->swapAttrs (aView, aViewPrev, gIndex, gIndexP);
+            int parentRow = gIndex.parent().row();
+            int row = gIndex.row();
+
+            if ( row > 0) //меняем порядок атрибутов внутри группы
+            {
+                int prevRow = row;//-1;
+                int eType = 0;
+                QModelIndex gIndexPrev;// = gIndex.sibling (prevRow, 0);
+                do{
+                    gIndexPrev = gIndex.sibling (--prevRow, 0);
+                    eType = gIndexPrev.data(Qt::UserRole+USER_ENTITY).toInt();
+                }
+                while(prevRow >= 0 && eType == 1); //1 - группа
+
+                if (prevRow < 0 || !gIndexPrev.isValid())
+                    return;
+
+                int idAttrPrev = gIndexPrev.data (Qt::UserRole).toInt();
+                KKSAttrView * aViewPrev = aGroup->attrView (idAttrPrev);
+                if (!aViewPrev)
+                    return;
+
+                this->swapAttrs (aView, aViewPrev, gIndex, gIndexPrev);
+            }
+            else //атрибут в группе стал самым первым, надо перенести его в предыдущую группу (если она есть)
+            {
+                QModelIndex groupIndex = gIndex.parent();
+                int prevGroupRow = groupIndex.row() - 1;
+                //переносим атрибут из текущей группы в предыдущую только в случае если текущая группа не первая по списку
+                if(prevGroupRow >= 0){
+                    QModelIndex prevGroupIndex = groupIndex.sibling(prevGroupRow, 0);
+
+                    if (!prevGroupIndex.isValid())
+                        return;
+
+                    int idAttrGroupPrev = prevGroupIndex.data (Qt::UserRole).toInt ();
+                    emit delAttrFromGroup (idAttr, idAttrGroup, gIndex, groupIndex, tRef, this);
+                    emit appendAttrIntoGroup (idAttr, idAttrGroupPrev, prevGroupIndex, tRef, this);
+                
+                    //сохраняем перемещенный атрибут выделенным
+                    this->tvGroups->selectionModel ()->clearSelection();//select (gIndex, QItemSelectionModel::Deselect);
+                    QModelIndex cIndex = prevGroupIndex.child (this->tvGroups->model()->rowCount(prevGroupIndex)-1, 0);
+                    QItemSelection oldSel = this->tvGroups->selectionModel ()->selection();
+                    QItemSelection newSel = QItemSelection (cIndex.sibling (cIndex.row(), 0), cIndex.sibling(cIndex.row(), cIndex.model()->columnCount (cIndex.parent())-1));
+                    this->tvGroups->selectionModel ()->select (newSel, QItemSelectionModel::Select);
+                    this->tvGroups->selectionModel ()->setCurrentIndex (cIndex, QItemSelectionModel::Select);
+                    this->tvGroups->selectionModel ()->select (oldSel, QItemSelectionModel::Deselect);
+                }
+            }
+            
         }
-        else if (idAttrGroup != 0 && gIndex.parent().row() > 0)
-        {
-            QModelIndex gIndexGP = gIndex.parent().sibling (gIndex.parent().row()-1, 0);//gIndex.parent().column());
-            qDebug () << __PRETTY_FUNCTION__ << gIndexGP;
-            if (!gIndexGP.isValid())
+        else{
+            //
+            //Group
+            //
+            int idAttrGroup = gIndex.data (Qt::UserRole).toInt();
+            KKSAttrGroup * aGroup = tRef->searchGroupById(idAttrGroup);
+            if (!aGroup)
                 return;
 
-            int idAttrGroupPrev = gIndexGP.data (Qt::UserRole).toInt ();
-            emit delAttrFromGroup (idAttr, idAttrGroup, gIndex, gIndexGP, tRef, this);
-            emit appendAttrIntoGroup (idAttr, idAttrGroupPrev, gIndex, tRef, this);
-            this->tvGroups->selectionModel ()->clearSelection();//select (gIndex, QItemSelectionModel::Deselect);
-            QModelIndex cIndex = gIndexGP.child (this->tvGroups->model()->rowCount(gIndexGP)-1, 0);
+            int row = gIndex.row();
+            int prevRow = row;
+            int eType = 0;
+            QModelIndex gIndexPrev;// = gIndex.sibling (prevRow, 0);
+            do{
+                gIndexPrev = gIndex.sibling (--prevRow, 0);
+                eType = gIndexPrev.data(Qt::UserRole+USER_ENTITY).toInt();
+            }
+            while(prevRow >= 0 && eType == 0); //1 - атрибут
+
+            if (prevRow < 0 || !gIndexPrev.isValid()){
+                //если группа в группе стала самой первой, то ее необходимо переместить в предыдущую группу
+                /*
+                QModelIndex groupIndex = gIndex.parent();
+                int prevGroupRow = groupIndex.row() - 1;
+                //переносим группу из текущей группы в предыдущую только в случае если текущая группа не первая по списку
+                if(prevGroupRow >= 0){
+                    QModelIndex prevGroupIndex = groupIndex.sibling(prevGroupRow, 0);
+
+                    if (!prevGroupIndex.isValid())
+                        return;
+
+                    int idAttrGroupPrev = prevGroupIndex.data (Qt::UserRole).toInt ();
+                    emit delAttrFromGroup (idAttr, idAttrGroup, gIndex, groupIndex, tRef, this);
+                    emit appendAttrIntoGroup (idAttr, idAttrGroupPrev, prevGroupIndex, tRef, this);
+                
+                    //сохраняем перемещенный атрибут выделенным
+                    this->tvGroups->selectionModel ()->clearSelection();//select (gIndex, QItemSelectionModel::Deselect);
+                    QModelIndex cIndex = prevGroupIndex.child (this->tvGroups->model()->rowCount(prevGroupIndex)-1, 0);
+                    QItemSelection oldSel = this->tvGroups->selectionModel ()->selection();
+                    QItemSelection newSel = QItemSelection (cIndex.sibling (cIndex.row(), 0), cIndex.sibling(cIndex.row(), cIndex.model()->columnCount (cIndex.parent())-1));
+                    this->tvGroups->selectionModel ()->select (newSel, QItemSelectionModel::Select);
+                    this->tvGroups->selectionModel ()->setCurrentIndex (cIndex, QItemSelectionModel::Select);
+                    this->tvGroups->selectionModel ()->select (oldSel, QItemSelectionModel::Deselect);
+                }
+                */
+            }
+                
+
+            int idAttrGroupPrev = gIndexPrev.data (Qt::UserRole).toInt ();
+            KKSAttrGroup *aGroupPrev = tRef->searchGroupById(idAttrGroupPrev);
+            if (!aGroupPrev)
+                return;
+            
+            int worder = aGroup->order ();
+            int prevOrder = aGroupPrev->order();
+            aGroup->setOrder (prevOrder);
+            aGroupPrev->setOrder (worder);
+
+            //KKSMap <int, KKSAttrGroup *> tgr = tRef->groups();
+            //qSwap (tgr[gIndex.row()], tgr[gIndexPrev.row()]);
+            //qSwap (tgr[idAttrGroup], tgr[idAttrGroupPrev]);
+            
+            //qSwap(tRef->groupDirectly(idAttrGroup), tRef->groupDirectly(idAttrGroupPrev));
+
+            //tRef->setGroups (tgr);
+            
+            emit updateAttrGroups (tRef, this);
+            
+            //сохраним выделенным перемещенный элемент
+            /*
             QItemSelection oldSel = this->tvGroups->selectionModel ()->selection();
-            QItemSelection newSel = QItemSelection (cIndex.sibling (cIndex.row(), 0), cIndex.sibling(cIndex.row(), cIndex.model()->columnCount (cIndex.parent())-1));
-            this->tvGroups->selectionModel ()->select (newSel, QItemSelectionModel::Select);
-            this->tvGroups->selectionModel ()->setCurrentIndex (cIndex, QItemSelectionModel::Select);
+            int theRow = gIndexPrev.row();
+            int columnCount = this->tvGroups->model()->columnCount(gIndexPrev.parent());
+
+            QModelIndex topLeft = gIndexPrev.sibling (theRow, 0);
+            QModelIndex bottomRight = gIndexPrev.sibling(theRow, columnCount-1); //gIndexPrev.model()->columnCount (gIndexPrev.parent())-1);
+            QItemSelection newSel = QItemSelection (topLeft, bottomRight);
+
             this->tvGroups->selectionModel ()->select (oldSel, QItemSelectionModel::Deselect);
+            this->tvGroups->selectionModel ()->select (newSel, QItemSelectionModel::Select);
+            this->tvGroups->selectionModel ()->setCurrentIndex (gIndexPrev, QItemSelectionModel::Select);   
+            */
         }
-    }
-    else if (gIndex.row() > 1)
-    {
-        //
-        // Group
-        //
-        int idAttrGroup = gIndex.data (Qt::UserRole).toInt();
-        KKSAttrGroup * aGroup = tRef->group (idAttrGroup);
-        if (!aGroup)
-            return;
-        QModelIndex gIndexGP = gIndex.sibling (gIndex.row()-1, 0);//gIndex.column());
-        if (!gIndexGP.isValid())
-            return;
-        int idAttrGroupPrev = gIndexGP.data (Qt::UserRole).toInt ();
-        KKSAttrGroup *aGroupPrev = tRef->group (idAttrGroupPrev);
-        if (!aGroupPrev)
-            return;
-        int worder = aGroup->order ();
-        aGroup->setOrder (aGroupPrev->order());
-        aGroupPrev->setOrder (worder);
-        KKSMap <int, KKSAttrGroup *> tgr = tRef->groups();
-        qSwap (tgr[gIndex.row()], tgr[gIndexGP.row()]);
-        tRef->setGroups (tgr);
-        emit updateAttrGroups (tRef, this);
-        QItemSelection oldSel = this->tvGroups->selectionModel ()->selection();
-        QItemSelection newSel = QItemSelection (gIndexGP.sibling (gIndexGP.row(), 0), gIndexGP.sibling(gIndexGP.row(), gIndexGP.model()->columnCount (gIndexGP.parent())-1));
-        this->tvGroups->selectionModel ()->select (oldSel, QItemSelectionModel::Deselect);
-        this->tvGroups->selectionModel ()->select (newSel, QItemSelectionModel::Select);
-        this->tvGroups->selectionModel ()->setCurrentIndex (gIndexGP, QItemSelectionModel::Select);
-    }
+    
 }
 
 void KKSTemplateEditor :: moveDown (void)
@@ -543,3 +620,29 @@ void KKSTemplateEditor :: dropErr (void)
 {
     dbErr = false;
 }
+
+void KKSTemplateEditor :: itemExpanded(const QModelIndex & item)
+{
+    if(!item.isValid())
+        return;
+
+    int id = item.data(Qt::UserRole).toInt(); //id or group or attrview
+    KKSAttrGroup * g = tRef->searchGroupById(id);
+    if(!g)
+        return;
+    g->setExpanded(true);
+}
+
+void KKSTemplateEditor :: itemCollapsed(const QModelIndex & item)
+{
+    if(!item.isValid())
+        return;
+
+    int id = item.data(Qt::UserRole).toInt(); //id or group or attrview
+    KKSAttrGroup * g = tRef->searchGroupById(id);
+    if(!g)
+        return;
+    g->setExpanded(false);
+}
+
+

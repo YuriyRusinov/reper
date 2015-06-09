@@ -79,7 +79,7 @@ class _F_DATA_EXPORT KKSLoader : public QObject
         void databaseNotifyReceived(const QString & nName, const QString & tableName, const QString & idRecord);
     public:
         /*!\brief Возвращает набор возможных значений из справочника
-        для атрибутов типа atList и atParent
+        для атрибутов типа atList и atParent и atSysChildCategoryRef
         
         
         Данные возвращаются в виде QMap, где ключом является 
@@ -426,6 +426,9 @@ class _F_DATA_EXPORT KKSLoader : public QObject
         friend class KKSCoreApplication;
         friend class KKSJMonitor;
         friend class KKSPPFactory;
+        friend class KKSViewFactory;
+        friend class KKSCatEditorFactory;
+        friend class KKSAttributesFactory;
       // KKSLoader();
        // ~KKSLoader();
 
@@ -468,9 +471,11 @@ class _F_DATA_EXPORT KKSLoader : public QObject
         void addAttributesToGroup(KKSAGroup * ag) const;
 
         KKSValue constructValue(const QString & value, 
+                                const QString & columnValue, //значение колонки, которая должна отображаться (для атрибутов-ссылок)
                                 const KKSAttribute * a, 
                                 const QString & parentTable = QString()) const;
-        KKSValue constructValue(const QString & value, 
+        KKSValue constructValue(const QString & value,
+                                const QString & columnValue, //значение колонки, которая должна отображаться (для атрибутов-ссылок)
                                 const KKSIndicator * i, 
                                 const QString & parentTable = QString()) const;
 

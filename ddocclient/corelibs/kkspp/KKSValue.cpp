@@ -329,7 +329,8 @@ void KKSValue::verify(void) const
 
     //ссылочные типы могут быть не только целочисленными (64)
     if(a_type == KKSAttrType::atList ||
-       a_type == KKSAttrType::atParent)
+       a_type == KKSAttrType::atParent ||
+       a_type == KKSAttrType::atSysChildCategoryRef)
     {
         bool ok (true);
         int nv = m_value.toString().toLongLong (&ok);        
@@ -807,7 +808,8 @@ QString KKSValue::valueForInsert() const
                  a_type == KKSAttrType::atList ||
                  a_type == KKSAttrType::atParent ||
                  a_type == KKSAttrType::atRecordColorRef ||
-                 a_type == KKSAttrType::atRecordTextColorRef
+                 a_type == KKSAttrType::atRecordTextColorRef ||
+                 a_type == KKSAttrType::atSysChildCategoryRef
                  )
         {
             return "NULL::bigint";

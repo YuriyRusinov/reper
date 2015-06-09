@@ -12,6 +12,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QTreeView>
+#include <QHeaderView>
 #include <QMessageBox>
 #include <QSizePolicy>
 #include <QSpacerItem>
@@ -35,6 +36,8 @@
 #include "KKSCatEditor.h"
 #include "kksincludeswidget.h"
 #include "kksstuffform.h"
+#include "defines.h"
+#include "KKSSortFilterProxyModel.h"
 
 KKSCatEditor :: KKSCatEditor (KKSCategory *c, 
                               KKSRecWidget * rw, 
@@ -59,6 +62,8 @@ KKSCatEditor :: KKSCatEditor (KKSCategory *c,
     pbOk (new QPushButton (tr("&OK"))),
     pbCancel (new QPushButton (tr("&Cancel"))),
     pbApply (new QPushButton (tr("&Apply"))),
+    pbUp (new QPushButton (tr("&Up"))),
+    pbDown (new QPushButton (tr("&Down"))),
     lEID (new QLineEdit()),
     lEName (new QLineEdit()),
     cbChildCat (new QComboBox()),
@@ -227,7 +232,8 @@ void KKSCatEditor :: apply (void)
             }
             else
             {
-                emit setAttribute (1, pTableCategory, recTableW->getSourceModel(), this);
+                emit setAttribute (ATTR_ID, pTableCategory, recTableW->getView(), this);
+                emit setAttribute (ATTR_UUID_T, pTableCategory, recTableW->getView(), this);
                 isCloseIgnored = false;
             }
         }
@@ -351,8 +357,20 @@ void KKSCatEditor :: init_parameters (void)
 
     QVBoxLayout * vModalButtonsLay = new QVBoxLayout ();
     vModalButtonsLay->addStretch ();
+
+    vModalButtonsLay->addWidget (pbUp);
+    vModalButtonsLay->addWidget (pbDown);
+    QSpacerItem * spUpDown = new QSpacerItem (20, 0, QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
+    vModalButtonsLay->addItem (spUpDown);
     vModalButtonsLay->addWidget (pbOk);
     vModalButtonsLay->addWidget (pbCancel);
+
+    pbUp->setVisible(false); //делаем изначально кнопки "вверх" и "вниз" невидимыми. Они будут видимы только если активны вкладки с атрибутами
+    pbDown->setVisible(false);
+    //задаем обработку сигнала на смену вкладки
+    connect(tabCat, SIGNAL(currentChanged(int)), this, SLOT(tabCatCurrentChanged(int)));
+    connect(pbUp, SIGNAL(clicked(bool)), this, SLOT(pbUpClicked(bool)));
+    connect(pbDown, SIGNAL(clicked(bool)), this, SLOT(pbDownClicked(bool)));
 
     gCatLayout->addLayout (vModalButtonsLay, 0, 1, 1, 1);
 
@@ -360,6 +378,168 @@ void KKSCatEditor :: init_parameters (void)
     gCatPLayout->getContentsMargins (&l, &t, &r, &b);
     gCatPLayout->setContentsMargins (l, t, r, 0);
     gCatPLayout->getContentsMargins (&l, &t, &r, &b);
+}
+
+void KKSCatEditor :: tabCatCurrentChanged(int newIndex)
+{
+    if(newIndex < 0)
+        return;
+
+    //мы не знаем, какой индекс может быть у интересующих нас табов, 
+    //поскольку у ИО типа "документ", к примеру, нет вкладок с атрибутами и показателями записей справочника
+    //поэтому будем работать с именами вкладок. Их мы знаем точно
+    QString tabName = tabCat->tabText(newIndex);
+    if(tabName == tr("Attributes")){
+        pbUp->setVisible(true);
+        pbDown->setVisible(true);
+    }
+    else if(tabName == tr ("Table Attributes")){
+        pbUp->setVisible(true);
+        pbDown->setVisible(true);
+    }
+    else if(tabName == tr ("Indicators")){
+        pbUp->setVisible(true);
+        pbDown->setVisible(true);
+    }
+    else{
+        pbUp->setVisible(false);
+        pbDown->setVisible(false);
+    }
+
+}
+
+void KKSCatEditor :: pbUpClicked(bool checked)
+{
+    Q_UNUSED(checked);
+    int tabIndex = tabCat->currentIndex();
+    if(tabIndex < 0)
+        return;
+
+    QString tabName = tabCat->tabText(tabIndex);
+    QTreeView * tw = NULL;
+    if(tabName == tr("Attributes")){
+        tw = recWidget->getView();
+    }
+    else if(tabName == tr("Table Attributes")){
+        tw = recTableW->getView();
+    }
+    else if(tabName == tr("Indicators")){
+        tw = recAttrW->getView();
+    }
+    else{
+        return;
+    }
+
+    QModelIndexList selection = tw->selectionModel()->selectedRows();
+    if(selection.count() != 1)
+        return;
+    
+    QModelIndex selectedIndex = selection.at(0);
+    
+    if(!selectedIndex.isValid())
+        return;
+    if(selectedIndex.row() == 0)
+        return;
+
+    int selectedRow = selectedIndex.row();
+    int prevSelectedRow = selectedRow-1;
+
+    KKSSortFilterProxyModel *sortModel = 0;
+    sortModel = dynamic_cast<KKSSortFilterProxyModel*> (tw->model());
+    if(!sortModel)
+        return;
+
+    QModelIndex prevSelectedIndex = sortModel->index(prevSelectedRow, 0);
+
+    QModelIndex sourceIndex = sortModel->mapToSource(selectedIndex);
+    int sourceRow = sourceIndex.row();
+    QModelIndex prevSourceIndex = sortModel->mapToSource(prevSelectedIndex);
+    int prevSourceRow = prevSourceIndex.row();
+
+    QAbstractItemModel * sourceModel = ((QSortFilterProxyModel*)sortModel)->sourceModel();
+    
+    QModelIndex index = sourceModel->index(sourceRow, 5); //column "order"
+    QModelIndex prevIndex = sourceModel->index(prevSourceRow, 5); //column "order"
+    if(!index.isValid() || !prevIndex.isValid())
+        return;
+
+    int order = sourceModel->data(index).toInt();
+    int prevOrder = sourceModel->data(prevIndex).toInt();
+    sourceModel->setData(index, prevOrder, Qt::DisplayRole);
+    sourceModel->setData(prevIndex, order, Qt::DisplayRole);
+
+    ((QSortFilterProxyModel*)sortModel)->setDynamicSortFilter(false);
+    int sortCol = tw->header()->sortIndicatorSection ();
+    Qt::SortOrder sOrder = tw->header()->sortIndicatorOrder ();
+    sortModel->sort (sortCol, sOrder);
+    ((QSortFilterProxyModel*)sortModel)->setDynamicSortFilter(true);
+}
+
+void KKSCatEditor :: pbDownClicked(bool checked)
+{
+    Q_UNUSED(checked);
+    int tabIndex = tabCat->currentIndex();
+    if(tabIndex < 0)
+        return;
+
+    QString tabName = tabCat->tabText(tabIndex);
+    QTreeView * tw = NULL;
+    if(tabName == tr("Attributes")){
+        tw = recWidget->getView();
+    }
+    else if(tabName == tr("Table Attributes")){
+        tw = recTableW->getView();
+    }
+    else if(tabName == tr("Indicators")){
+        tw = recAttrW->getView();
+    }
+    else{
+        return;
+    }
+
+    QModelIndexList selection = tw->selectionModel()->selectedRows();
+    if(selection.count() != 1)
+        return;
+    
+    KKSSortFilterProxyModel *sortModel = 0;
+    sortModel = dynamic_cast<KKSSortFilterProxyModel*> (tw->model());
+    if(!sortModel)
+        return;
+
+    QModelIndex selectedIndex = selection.at(0);
+    
+    if(!selectedIndex.isValid())
+        return;
+    if(selectedIndex.row() >= sortModel->rowCount()-1)
+        return;
+
+    int selectedRow = selectedIndex.row();
+    int nextSelectedRow = selectedRow+1;
+
+    QModelIndex nextSelectedIndex = sortModel->index(nextSelectedRow, 0);
+
+    QModelIndex sourceIndex = sortModel->mapToSource(selectedIndex);
+    int sourceRow = sourceIndex.row();
+    QModelIndex nextSourceIndex = sortModel->mapToSource(nextSelectedIndex);
+    int nextSourceRow = nextSourceIndex.row();
+
+    QAbstractItemModel * sourceModel = ((QSortFilterProxyModel*)sortModel)->sourceModel();
+    
+    QModelIndex index = sourceModel->index(sourceRow, 5); //column "order"
+    QModelIndex nextIndex = sourceModel->index(nextSourceRow, 5); //column "order"
+    if(!index.isValid() || !nextIndex.isValid())
+        return;
+
+    int order = sourceModel->data(index).toInt();
+    int nextOrder = sourceModel->data(nextIndex).toInt();
+    sourceModel->setData(index, nextOrder, Qt::DisplayRole);
+    sourceModel->setData(nextIndex, order, Qt::DisplayRole);
+
+    ((QSortFilterProxyModel*)sortModel)->setDynamicSortFilter(false);
+    int sortCol = tw->header()->sortIndicatorSection ();
+    Qt::SortOrder sOrder = tw->header()->sortIndicatorOrder ();
+    sortModel->sort (sortCol, sOrder);
+    ((QSortFilterProxyModel*)sortModel)->setDynamicSortFilter(true);
 }
 
 void KKSCatEditor :: setChildCat (const QMap<int, QString> chItems)
@@ -380,6 +560,7 @@ void KKSCatEditor :: init_attributes (void)
 {
     if (!recWidget)
         return;
+
     QWidget *catAttrWidget = new QWidget (this);
     QGridLayout *gAttrLay = new QGridLayout ();
     catAttrWidget->setLayout (gAttrLay);
@@ -464,16 +645,16 @@ void KKSCatEditor :: init_rubrics (void)
 
 void KKSCatEditor :: addAttribute (void)
 {
-    QAbstractItemModel * aModel (recWidget->getSourceModel ());
+    //QAbstractItemModel * aModel (recWidget->getSourceModel ());
     KKSCategory * c(pCategory);
-    emit addAttrsIntoCat (c, aModel, this);
+    emit addAttrsIntoCat (c, recWidget->getView(), this);
 }
 
 void KKSCatEditor :: addTableAttribute (void)
 {
-    QAbstractItemModel * aModel (recTableW->getSourceModel ());
+    //QAbstractItemModel * aModel (recTableW->getSourceModel ());
     KKSCategory * c (pTableCategory);
-    emit addAttrsIntoCat (c, aModel, this);
+    emit addAttrsIntoCat (c, recTableW->getView(), this);
 }
 
 void KKSCatEditor :: addIndicator (void)
@@ -490,9 +671,9 @@ void KKSCatEditor :: addIndicator (void)
             acl->release ();
     }
 
-    QAbstractItemModel * aModel (recAttrW->getSourceModel ());
+    //QAbstractItemModel * aModel (recAttrW->getSourceModel ());
     KKSCategory * c (pRecAttrCategory);
-    emit addAttrsIntoCat (c, aModel, this);
+    emit addAttrsIntoCat (c, recAttrW->getView(), this);
 }
 
 void KKSCatEditor :: editAttribute (void)
@@ -508,7 +689,7 @@ void KKSCatEditor :: editAttribute (void)
     KKSCatAttrEditor *acEditor = new KKSCatAttrEditor (cAttr, attrTypes, false, this);
 
     if (acEditor->exec () == QDialog::Accepted)
-        emit setAttribute (cAttr, pCategory, recWidget->getSourceModel(), this);
+        emit setAttribute (cAttr, pCategory, recWidget->getView(), this);
 
     if (acEditor)
     {
@@ -530,7 +711,7 @@ void KKSCatEditor :: editTableAttribute (void)
     KKSCatAttrEditor *acEditor = new KKSCatAttrEditor (cAttr, attrTypes, false, this);
 
     if (acEditor->exec () == QDialog::Accepted)
-        emit setAttribute (cAttr, pTableCategory, recTableW->getSourceModel(), this);
+        emit setAttribute (cAttr, pTableCategory, recTableW->getView(), this);
 
     if (acEditor)
     {
@@ -553,7 +734,7 @@ void KKSCatEditor :: editIndicator (void)
     KKSCatAttrEditor *acEditor = new KKSCatAttrEditor (cAttr, attrTypes, false, this);
 
     if (acEditor->exec () == QDialog::Accepted)
-        emit setAttribute (cAttr, pRecAttrCategory, recAttrW->getSourceModel(), this);
+        emit setAttribute (cAttr, pRecAttrCategory, recAttrW->getView(), this);
 
     if (acEditor)
     {
@@ -608,6 +789,7 @@ void KKSCatEditor :: addTableTemplate (void)
 
 void KKSCatEditor :: addIndTemplate (void)
 {
+
     if (this->pRecAttrCategory)// && pRecAttrCategory->id() > 0)
         emit addNewCategoryTemplate (this, pRecAttrCategory, recAttrCatTemplatesW->getSourceModel());
 }
@@ -632,8 +814,9 @@ void KKSCatEditor :: editTableTemplate (void)
 
 void KKSCatEditor :: editIndTemplate (void)
 {
-    if (!recAttrCatTemplatesW || !recAttrCatTemplatesW->getSelectionModel())
+    if (!recAttrCatTemplatesW || !recAttrCatTemplatesW->getSelectionModel() || !recAttrCatTemplatesW->getSelectionModel()->currentIndex().isValid())
         return;
+
     int idTemplate = recAttrCatTemplatesW->getID ();
     KKSTemplate * t = pRecAttrCategory->getTemplate (idTemplate);
     emit editCategoryTemplate (this, t, recAttrCatTemplatesW->getSourceModel (), recAttrCatTemplatesW->getSourceIndex() );
@@ -641,8 +824,9 @@ void KKSCatEditor :: editIndTemplate (void)
 
 void KKSCatEditor :: delTemplate (void)
 {
-    if (!recCatTemplatesW)
+    if (!recCatTemplatesW || !recCatTemplatesW->getSelectionModel()->currentIndex().isValid())
         return;
+
     int idTemplate = recCatTemplatesW->getID ();
     
     int res = QMessageBox::question (this, 
@@ -666,7 +850,7 @@ void KKSCatEditor :: delTemplate (void)
 
 void KKSCatEditor :: delTableTemplate (void)
 {
-    if (!recTableCatTemplatesW)
+    if (!recTableCatTemplatesW || !recTableCatTemplatesW->getSelectionModel()->currentIndex().isValid())
         return;
     
     int idTemplate = recTableCatTemplatesW->getID ();
@@ -691,8 +875,9 @@ void KKSCatEditor :: delTableTemplate (void)
 
 void KKSCatEditor :: delIndTemplate (void)
 {
-    if (!recAttrCatTemplatesW)
+    if (!recAttrCatTemplatesW || !recAttrCatTemplatesW->getSelectionModel() || !recAttrCatTemplatesW->getSelectionModel()->currentIndex().isValid())
         return;
+
     int idTemplate = recAttrCatTemplatesW->getID ();
     int res = QMessageBox::question (this, tr("Delete template from category"), tr("Do you really want to delete template %1 ?").arg (idTemplate), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Cancel);
     if (idTemplate >= 0 && (res == QMessageBox::Yes) )
@@ -817,6 +1002,31 @@ QTreeView * KKSCatEditor :: getTemplView (void) const
         return recCatTemplatesW->getView ();
 }
 
+QTreeView * KKSCatEditor :: getAttrsView(void) const
+{
+    if (!recWidget)
+        return 0;
+    else
+        return recWidget->getView();
+}
+
+QTreeView * KKSCatEditor :: getTableAttrsView(void) const
+{
+    if (!recTableW)
+        return 0;
+    else
+        return recTableW->getView();
+}
+
+QTreeView * KKSCatEditor :: getAttrsAttrsView(void) const
+{
+    if (!recAttrW)
+        return 0;
+    else
+        return recAttrW->getView();
+}
+
+
 KKSStuffForm * KKSCatEditor :: getAccessWidget (void) const
 {
     return sForm;
@@ -899,7 +1109,7 @@ void KKSCatEditor :: catDbOk (KKSCategory * c)
 {
     if (c != pCategory)
         return;
-    qDebug () << __PRETTY_FUNCTION__;
+    
     emit refreshTemplates (pCategory, recCatTemplatesW->getSourceModel());
     if (pTableCategory)
         emit refreshTemplates (pTableCategory, recTableCatTemplatesW->getSourceModel());

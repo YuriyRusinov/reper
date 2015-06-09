@@ -395,7 +395,7 @@ const KKSTemplate & KKSCategory::defTemplate() const
     {
         KKSCategoryAttr * ca = pca.value();
         KKSAttrView * av = new KKSAttrView(*ca);
-        av->setOrder(order++);
+        av->setOrder(ca->order());
         a.insert(ca->id(), av);
         av->release();
     }

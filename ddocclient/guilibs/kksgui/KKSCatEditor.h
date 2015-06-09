@@ -70,7 +70,12 @@ class _GUI_EXPORT KKSCatEditor : public KKSDialog
         void updateChildCat (int idCat, QString catName);
         QAbstractItemModel *getTemplateModel (void);
         QModelIndex getSelectedTemplateIndex (void) const;
+        
         QTreeView * getTemplView (void) const;
+        QTreeView * getAttrsView(void) const;
+        QTreeView * getTableAttrsView(void) const;
+        QTreeView * getAttrsAttrsView(void) const;
+
 
         KKSStuffForm * getAccessWidget (void) const;
         void setAccessWidget (KKSStuffForm * sForm);
@@ -119,10 +124,16 @@ class _GUI_EXPORT KKSCatEditor : public KKSDialog
         void setCatLifeCycle (void);
         void clearCatLifeCycle (void);
 
+        void tabCatCurrentChanged(int newIndex);
+        void pbUpClicked(bool checked = false);
+        void pbDownClicked(bool checked = false);
+
     signals:
-        void addAttrsIntoCat (KKSCategory *c, QAbstractItemModel * attrModel, KKSCatEditor *editor);
-        void setAttribute (int id, KKSCategory *c, QAbstractItemModel * attrModel, KKSCatEditor *editor);
-        void setAttribute (KKSCategoryAttr *cAttr, KKSCategory *c, QAbstractItemModel * attrModel, KKSCatEditor *editor);
+        void addAttrsIntoCat (KKSCategory *c, QTreeView * tv, KKSCatEditor *editor);
+        
+        void setAttribute (int id, KKSCategory *c, QTreeView * tv, KKSCatEditor *editor);
+        void setAttribute (KKSCategoryAttr *cAttr, KKSCategory *c, QTreeView * tv, KKSCatEditor *editor);
+        
         void copyAttrsFromAnotherCat (KKSCategory *c, QAbstractItemModel * attrModel, KKSCatEditor *editor);
         void delAttrFromCategory (int id, KKSCategory *c, QAbstractItemModel * attrModel, KKSCatEditor *editor);
         void saveCategory (KKSCategory *cat, int idTableCat, int idType, KKSCatEditor *editor);
@@ -173,6 +184,9 @@ class _GUI_EXPORT KKSCatEditor : public KKSDialog
         QPushButton *pbCancel;
         QPushButton *pbApply;
 
+        QPushButton *pbUp;
+        QPushButton *pbDown;
+
         QLineEdit *lEID;
         QLineEdit *lEName;
         QComboBox *cbChildCat;
@@ -184,9 +198,9 @@ class _GUI_EXPORT KKSCatEditor : public KKSDialog
         QToolButton *tbClearLifeCycle;
 //        QToolButton *tbType;
 
-        KKSRecWidget *recWidget;
-        KKSRecWidget *recTableW;
-        KKSRecWidget *recAttrW;
+        KKSRecWidget *recWidget; //атрибуты непосредственно самого »ќ
+        KKSRecWidget *recTableW; //атрибуты таблицы справочника
+        KKSRecWidget *recAttrW;  //показатели записей справочника
         KKSRecWidget *recCatTemplatesW;
         KKSRecWidget *recTableCatTemplatesW;
         KKSRecWidget *recAttrCatTemplatesW;

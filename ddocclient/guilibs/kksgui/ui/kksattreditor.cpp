@@ -116,6 +116,7 @@ KKSAttrEditor :: KKSAttrEditor (KKSAttribute *attr,
               << KKSAttrType::atCheckListEx 
               << KKSAttrType::atRecordColorRef
               << KKSAttrType::atRecordTextColorRef
+              << KKSAttrType::atSysChildCategoryRef
               << KKSAttrType::atHistogram; //ksa
 
 
@@ -215,7 +216,8 @@ void KKSAttrEditor :: accept ()
         attribute->type ()->attrType() == KKSAttrType::atCheckList ||
         attribute->type ()->attrType() == KKSAttrType::atCheckListEx ||
         attribute->type ()->attrType() == KKSAttrType::atRecordColorRef ||
-        attribute->type ()->attrType() == KKSAttrType::atRecordTextColorRef )
+        attribute->type ()->attrType() == KKSAttrType::atRecordTextColorRef ||
+        attribute->type ()->attrType() == KKSAttrType::atSysChildCategoryRef )
     {
         attribute->setTableName (io->tableName());
         attribute->setColumnName (ui->cbRefField->itemData (ui->cbRefField->currentIndex()).toString());

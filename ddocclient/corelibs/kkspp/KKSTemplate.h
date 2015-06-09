@@ -55,6 +55,8 @@ class _PP_EXPORT KKSTemplate : public KKSRecord
         
         KKSAttrGroup * group(int index);
         const KKSAttrGroup * group(int index) const;
+        KKSAttrGroup * groupDirectly(int index); //прямой доступ к данным через оператор []
+        const KKSAttrGroup * groupDirectly(int index) const; //прямой доступ к данным через оператор []
         KKSTemplate & operator = (const KKSTemplate & t);
 
         //
@@ -78,6 +80,7 @@ class _PP_EXPORT KKSTemplate : public KKSRecord
         //
         KKSCategory* m_category;
         KKSMap<int, KKSAttrGroup*> m_groups;
+
 };
 
 Q_DECLARE_METATYPE (KKSTemplate);

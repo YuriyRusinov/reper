@@ -238,8 +238,10 @@ void KKSSearchTemplateForm :: initFilterTypes (KKSAttrType::KKSAttrTypes type)
 
     if (type == KKSAttrType::atDate ||
         type == KKSAttrType::atDateTime ||
+        type == KKSAttrType::atDateTimeEx ||
         type == KKSAttrType::atDouble ||
         type == KKSAttrType::atInt ||
+        type == KKSAttrType::atInt64 ||
         type == KKSAttrType::atString ||
         type == KKSAttrType::atInterval ||
         type == KKSAttrType::atIntervalH ||
@@ -302,6 +304,18 @@ void KKSSearchTemplateForm :: initFilterTypes (KKSAttrType::KKSAttrTypes type)
         data = QVariant ((int)KKSFilter::foNotIn);
         cbOper->addItem (oper, data);
         cbOper->setItemData(cbOper->count()-1, "not in", Qt::UserRole+1);
+    }
+
+    if (type == KKSAttrType::atCheckList ||
+        type == KKSAttrType::atCheckListEx ||
+        type == KKSAttrType::atList ||
+        type == KKSAttrType::atSysChildCategoryRef ||
+        type == KKSAttrType::atParent)
+    {
+        oper = tr("In SQL");//tr ("Contains");
+        data = QVariant ((int)KKSFilter::foInSQL);
+        cbOper->addItem (oper, data);
+        cbOper->setItemData(cbOper->count()-1, "in select", Qt::UserRole+1);
     }
 
     oper = tr("Is null (NULL)");
@@ -504,6 +518,31 @@ void KKSSearchTemplateForm :: initValuesWidgets (void)
     connect (tbImage, SIGNAL (clicked()), this, SLOT (loadImage()) );
     gLay1->addWidget (tbImage, 0, 1, 2, 1, Qt::AlignRight | Qt::AlignTop);
     stLayValue->addWidget (cWImage);//insertWidget (9, cWImage);
+
+    //
+    // In SQL values
+    //
+    /*
+    QWidget * cWTextSQL = new QWidget (wValue);
+    QSizePolicy stp_sql (QSizePolicy::Minimum, QSizePolicy::Preferred);
+    cWTextSQL->setSizePolicy (stp_sql);
+    QVBoxLayout * vLaySQL = new QVBoxLayout (cWTextSQL);
+    vLaySQL->setContentsMargins (0, 0, 0, 0);
+    //vLay4->setSizeConstraint (QLayout::SetMinimumSize);
+    teValue = new QTextEdit (cWText);
+    QSizePolicy sTextPSQL (QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
+    teValue->setSizePolicy (sTextPSQL);
+    cWTextSQL->setSizePolicy (stp_sql);
+    teValue->setVerticalScrollBarPolicy (Qt::ScrollBarAsNeeded);
+    chTextCaseSensitive = new QCheckBox (tr ("Case sensitive"), cWTextSQL);
+    //chTextCaseSensitive->setSizePolicy (stp);
+    //chTextCaseSensitive->setCheckState (Qt::Checked);
+    chTextCaseSensitive->setEnabled (false);
+    vLaySQL->addWidget (teValue);
+    vLaySQL->addWidget (chTextCaseSensitive);//, 0, Qt::AlignTop);
+    //vLay4->addStretch ();
+    stLayValue->addWidget (cWTextSQL);
+    */
 }
 
 void KKSSearchTemplateForm :: viewSQL()
@@ -782,6 +821,10 @@ void KKSSearchTemplateForm :: setValueWidget (int index)
         default:
             wValue->setEnabled(true);
             break;
+    }
+
+    if(oper == KKSFilter::foInSQL){
+        stLayValue->setCurrentIndex (1); 
     }
 }
 
@@ -1219,6 +1262,7 @@ void KKSSearchTemplateForm :: attrChanged (int index)
         case KKSAttrType::atInterval: stLayValue->setCurrentIndex (7); break;
         case KKSAttrType::atList: 
         case KKSAttrType::atParent: 
+        case KKSAttrType::atSysChildCategoryRef: 
         case KKSAttrType::atCheckList: 
         case KKSAttrType::atCheckListEx: 
                                   {
@@ -1236,11 +1280,11 @@ void KKSSearchTemplateForm :: attrChanged (int index)
                                               tableName = m_parentTable;
                                       }
                                       if (!checkRefModel)
-                                          checkRefModel = (idAttrType == KKSAttrType::atList || idAttrType == KKSAttrType::atParent) ? new QStandardItemModel (0, 1) : new KKSCheckableModel (0, 1);
+                                          checkRefModel = (idAttrType == KKSAttrType::atList || idAttrType == KKSAttrType::atParent || idAttrType == KKSAttrType::atSysChildCategoryRef) ? new QStandardItemModel (0, 1) : new KKSCheckableModel (0, 1);
                                       else
                                       {
                                           QAbstractItemModel * oldModel = checkRefModel;
-                                          checkRefModel = (idAttrType == KKSAttrType::atList || idAttrType == KKSAttrType::atParent) ? new QStandardItemModel (0, 1) : new KKSCheckableModel (0, 1);
+                                          checkRefModel = (idAttrType == KKSAttrType::atList || idAttrType == KKSAttrType::atParent || idAttrType == KKSAttrType::atSysChildCategoryRef) ? new QStandardItemModel (0, 1) : new KKSCheckableModel (0, 1);
                                           delete oldModel;
                                       }
                                       sortRefModel->setSourceModel (checkRefModel);

@@ -2208,7 +2208,9 @@ QMap<qint64, JKKSCategoryAttr> JKKSLoader :: readCategoryAttrs (qint64 idCat) co
                                                      res->getCellAsString (i, 10), // def value
                                                      res->getCellAsBool (i, 11), // mandatory
                                                      res->getCellAsBool (i, 12), // read only
-                                                     res->getCellAsString (i, 16) //uniqueID
+                                                     res->getCellAsString (i, 16), //uniqueID
+                                                     res->getCellAsString(i, 24), //directives
+                                                     res->getCellAsInt(i, 23) //order
                                                 ));
             if (!table.isEmpty())
             {
@@ -2264,7 +2266,9 @@ JKKSCategoryAttr JKKSLoader :: readAttribute (qint64 id) const
                                              res->getCellAsString (i, 10), // def value
                                              res->getCellAsBool (i, 11), // mandatory
                                              res->getCellAsBool (i, 12), // read only
-                                             res->getCellAsString (i, 16) //uniqueID
+                                             res->getCellAsString (i, 16), //uniqueID
+                                             res->getCellAsString(i, 24), //directives
+                                             res->getCellAsInt(i, 23) //order
                                         ));
 
     if (!table.isEmpty())
@@ -2306,7 +2310,7 @@ int JKKSLoader :: writeCategoryAttrs (const JKKSCategory& cat) const
 
         QString tableUid = pa.value().getTableUID ();
 
-        QString sql = QString ("select * from acInsertEx (%1, %2, '%3', '%4', '%5', %6, %7, %8, %9, %10, %11, %12);")
+        QString sql = QString ("select * from acInsertEx (%1, %2, '%3', '%4', '%5', %6, %7, %8, %9, %10, %11, %12, %13, %14);")
                                 .arg (cat.id())
                                 .arg (pa.value().idAttrType())
                                 .arg (pa.value().code())
@@ -2318,7 +2322,9 @@ int JKKSLoader :: writeCategoryAttrs (const JKKSCategory& cat) const
                                 .arg (pa.value().defValue().isEmpty() ? QString ("NULL") : QString ("'")+pa.value().defValue()+QString("'"))
                                 .arg (pa.value().isMandatory() ? QString("true") : QString("false"))
                                 .arg (pa.value().isReadOnly() ? QString("true") : QString("false"))
-                                .arg (pa.value().uid().isEmpty() ? QString ("NULL") : QString ("'")+pa.value().uid()+QString("'"));
+                                .arg (pa.value().uid().isEmpty() ? QString ("NULL") : QString ("'")+pa.value().uid()+QString("'"))
+                                .arg (pa.value().directives().isEmpty() ? QString ("NULL") : QString ("'")+pa.value().directives()+QString("'"))
+                                .arg (pa.value().order());
 
         KKSResult *res = dbWrite->execute (sql);
         if(!res || res->getRowCount() != 1 || res->getCellAsInt(0, 0) <= 0){
@@ -2361,7 +2367,7 @@ int JKKSLoader :: writeAttrAttrs (const JKKSCategoryAttr & attr) const
 
         QString tableUid = pa.value().getTableUID ();
 
-        QString sql = QString ("select * from aaInsert (%1, %2, '%3', '%4', '%5', %6, %7, %8, %9, %10, %11, %12, %13);")
+        QString sql = QString ("select * from aaInsert (%1, %2, '%3', '%4', '%5', %6, %7, %8, %9, %10, %11, %12, %13, %14, %15);")
                                 .arg (attr.id())
                                 .arg (pa.value().idAttrType())
                                 .arg (pa.value().code())
@@ -2374,7 +2380,9 @@ int JKKSLoader :: writeAttrAttrs (const JKKSCategoryAttr & attr) const
                                 .arg (pa.value().isMandatory() ? QString("true") : QString("false"))
                                 .arg (pa.value().isReadOnly() ? QString("true") : QString("false"))
                                 .arg (pa.value().uid().isEmpty() ? QString ("NULL") : QString ("'")+pa.value().uid()+QString("'"))
-                                .arg (pa.value().attrAttrUid().isEmpty() ? QString ("NULL") : QString ("'")+pa.value().attrAttrUid()+QString("'"));
+                                .arg (pa.value().attrAttrUid().isEmpty() ? QString ("NULL") : QString ("'")+pa.value().attrAttrUid()+QString("'"))
+                                .arg (pa.value().directives().isEmpty() ? QString ("NULL") : QString ("'")+pa.value().directives()+QString("'"))
+                                .arg (pa.value().order());
 
         KKSResult *res = dbWrite->execute (sql);
         if(!res || res->getRowCount() != 1 || res->getCellAsInt(0, 0) <= 0){

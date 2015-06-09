@@ -100,6 +100,8 @@ class _F_DATA_EXPORT KKSPPFactory
     
         /*!\brief Изменение характеристик категории*/
         int updateCategory(const KKSCategory* c) const;
+        /*!\brief Изменение отдельных характеристик категории*/
+        int updateCategoryEx(const KKSCategory* c) const;
         /*!\brief Изменение характеристик атрибута, входящего в категорию*/
         int updateCategoryAttr(int idCategory, KKSCategoryAttr * a) const;
         /*!\brief Удаление категории*/

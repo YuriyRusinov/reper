@@ -21,6 +21,7 @@ KKSAttrGroup::KKSAttrGroup() : KKSRecord()
 {
     m_order = 0;
     m_parent = 0;
+    m_isExpanded = false;
 }
 
 KKSAttrGroup::KKSAttrGroup(const KKSAttrGroup & g) : KKSRecord(g)
@@ -28,12 +29,14 @@ KKSAttrGroup::KKSAttrGroup(const KKSAttrGroup & g) : KKSRecord(g)
     m_order = g.order();
     m_attributes = g.attrViews();
     setParent(const_cast<KKSAttrGroup*>(g.parent()));
+    m_isExpanded = false;
 }
 
 KKSAttrGroup::KKSAttrGroup(int id, const QString & name, int _order) : KKSRecord(id, name)
 {
     m_order = _order;
     m_parent = 0;
+    m_isExpanded = false;
 }
 
 ////////////////////////////////////////////////////////////////////////

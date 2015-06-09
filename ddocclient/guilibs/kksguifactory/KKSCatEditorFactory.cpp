@@ -55,6 +55,7 @@
 #include <kkslifecycleform.h>
 #include <KKSAttrModel.h>
 #include <defines.h>
+#include <KKSSortFilterProxyModel.h>
 
 ////////////////////////////////////////////////////////////////////////
 // Name:       KKSCatEditorFactory::KKSCatEditorFactory()
@@ -491,17 +492,23 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (KKSCategory *cat, // 
         pEditor->category()->setTableCategory (cat);
     }
 
+    //загружаем атрибуты категории в целом
     KKSRecWidget *rAttrCw = getAttrsWidget (cat, mode, 0);
     //cEditor->setAttrs (rw);
     KKSType * cTableT = loader->loadType (10);
     bool isIOs = loader->isIOCreated(cat);
+    
+    //загружаем атрибуты таблицы
     KKSRecWidget * rAttrTCw = getAttrsWidget (cat->tableCategory(), mode, 0);
     rAttrTCw->setToolBarActionEnabled(rAttrTCw->actAdd, !isIOs);
     rAttrTCw->setToolBarActionEnabled(rAttrTCw->actEdit, !isIOs);
     rAttrTCw->setToolBarActionEnabled(rAttrTCw->actDel, !isIOs);
     if (isIOs)
         rAttrTCw->setStatusTip(tr("There are documents created by category %1, operations with attributes are unavailable").arg (cat->name()));
+    
+    //загружаем показатели записей таблицы
     KKSRecWidget * recAttrCw = getAttrsWidget (cat->recAttrCategory(), mode, 0);
+    
     bool isIOSync = loader->isIOSynced(cat);
     recAttrCw->setToolBarActionEnabled(recAttrCw->actAdd, !isIOSync);
     recAttrCw->setToolBarActionEnabled(recAttrCw->actDel, !isIOSync);
@@ -552,10 +559,10 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (KKSCategory *cat, // 
         cEditor->setAccessWidget (sForm);
     }
 
-    connect (cEditor, SIGNAL (addAttrsIntoCat (KKSCategory *, QAbstractItemModel *, KKSCatEditor *)), this, SLOT (addAttributeIntoCategory (KKSCategory *, QAbstractItemModel *, KKSCatEditor *)) );
+    connect (cEditor, SIGNAL (addAttrsIntoCat (KKSCategory *, QTreeView *, KKSCatEditor *)), this, SLOT (addAttributeIntoCategory (KKSCategory *, QTreeView *, KKSCatEditor *)) );
     connect (cEditor, SIGNAL (copyAttrsFromAnotherCat (KKSCategory *, QAbstractItemModel *, KKSCatEditor *)), this, SLOT (copyAttributesIntoCategory (KKSCategory *, QAbstractItemModel *, KKSCatEditor *)) );
-    connect (cEditor, SIGNAL (setAttribute (int, KKSCategory*, QAbstractItemModel *, KKSCatEditor *)), this, SLOT (loadCatAttribute (int, KKSCategory*, QAbstractItemModel *, KKSCatEditor *)));
-    connect (cEditor, SIGNAL (setAttribute (KKSCategoryAttr *, KKSCategory*, QAbstractItemModel *, KKSCatEditor *)), this, SLOT (loadCatAttribute (KKSCategoryAttr *, KKSCategory*, QAbstractItemModel *, KKSCatEditor *)) );
+    connect (cEditor, SIGNAL (setAttribute (int, KKSCategory*, QTreeView *, KKSCatEditor *)), this, SLOT (loadCatAttribute (int, KKSCategory*, QTreeView *, KKSCatEditor *)));
+    connect (cEditor, SIGNAL (setAttribute (KKSCategoryAttr *, KKSCategory*, QTreeView *, KKSCatEditor *)), this, SLOT (loadCatAttribute (KKSCategoryAttr *, KKSCategory*, QTreeView *, KKSCatEditor *)) );
     connect (cEditor, SIGNAL (delAttrFromCategory (int, KKSCategory *, QAbstractItemModel *, KKSCatEditor *)), this, SLOT (delCatAttribute(int, KKSCategory *, QAbstractItemModel *, KKSCatEditor *)) );
     
     connect (cEditor, SIGNAL (saveCategory (KKSCategory *, int, int, KKSCatEditor *)), this, SLOT (saveCategory (KKSCategory *, int, int, KKSCatEditor *)) );
@@ -591,7 +598,7 @@ KKSRecWidget * KKSCatEditorFactory :: getAttrsWidget (const KKSCategory *cat, bo
     KKSRecWidget * rw (0);
 
     if (cat)//cat->type()->id() != 10)
-        rw = KKSViewFactory :: createCategAttrsView (cat, parent);
+        rw = KKSViewFactory :: createCategAttrsView (loader, cat, parent);
     else
     {
         KKSType * cTableT = KKSType::createType10(); //child type
@@ -600,8 +607,13 @@ KKSRecWidget * KKSCatEditorFactory :: getAttrsWidget (const KKSCategory *cat, bo
         //cat->setName("Indicators of " + pCategory->name());
         KKSAccessEntity * acl = new KKSAccessEntity ();
         const_cast<KKSCategory *>(cat)->setAccessRules (acl);
+        
         rw = new KKSRecWidget (false); //mode);
         QTreeView * tvTableAttrs = rw->getView();//new QTreeView ();
+        tvTableAttrs->header()->setClickable (true);
+        tvTableAttrs->header()->setSortIndicatorShown (true);
+        tvTableAttrs->header()->setSortIndicator (5, Qt::AscendingOrder);
+        tvTableAttrs->setSortingEnabled (true);
         
         rw->hideActionGroup (_ID_FILTER_GROUP);
         rw->hideActionGroup (_ID_IMPORT_GROUP);
@@ -614,11 +626,92 @@ KKSRecWidget * KKSCatEditorFactory :: getAttrsWidget (const KKSCategory *cat, bo
         acModel->setHeaderData (1, Qt::Horizontal, QObject::tr ("Default value"));
         acModel->setHeaderData (2, Qt::Horizontal, QObject::tr ("Mandatory"));
         acModel->setHeaderData (3, Qt::Horizontal, QObject::tr ("Read only"));
+        acModel->setHeaderData (4, Qt::Horizontal, QObject::tr ("Order"));
+        acModel->setHeaderData (5, Qt::Horizontal, QObject::tr ("Directives"));
+
         KKSViewFactory::updateAttrModel (0, acModel);
-        tvTableAttrs->setModel (acModel);
+        //tvTableAttrs->setModel (acModel);
         KKSItemDelegate *itemDeleg = new KKSItemDelegate (rw);
         tvTableAttrs->setItemDelegate (itemDeleg);
+
+        //делаем список с атрибутами в категории сортируемым
+        KKSSortFilterProxyModel *sortModel = 0;
+        sortModel = new KKSSortFilterProxyModel (tvTableAttrs);//ksa было editor
+        tvTableAttrs->setModel (sortModel);
+        sortModel->setDynamicSortFilter (true);
+        sortModel->setSourceModel (acModel);
+
+        //добавим в KKSSortFilterProxyModel набор атрибутов, которые задаются справочником атрибутов в категории
+        //это надо для правильной фильтрации по соответствующим колонкам в таблице (с учетом типа колонок(атрибутов))
+        KKSMap<int, KKSCategoryAttr *> acList = loader->loadCategoryAttrs(ATTRS_CAT_TABLE_CATEGORY_ID);
+        if(acList.count() > 0){
+            KKSAttrView * av = 0;
+            KKSCategoryAttr * ac = 0;
+            
+            ac = acList.value(1); //id
+            if(ac)
+                av = new KKSAttrView(*ac);
+            else
+                av = new KKSAttrView();
+            sortModel->addAttrView(av);
+            av->release();
+
+            ac = acList.value(2);//name
+            if(ac)
+                av = new KKSAttrView(*ac);
+            else
+                av = new KKSAttrView();
+            sortModel->addAttrView(av);
+            av->release();
+
+            ac = acList.value(304);//def_value
+            if(ac)
+                av = new KKSAttrView(*ac);
+            else
+                av = new KKSAttrView();
+            sortModel->addAttrView(av);
+            av->release();
+
+            ac = acList.value(128); //is_mandatory
+            if(ac)
+                av = new KKSAttrView(*ac);
+            else
+                av = new KKSAttrView();
+            sortModel->addAttrView(av);
+            av->release();
+
+            ac = acList.value(305); //is_read_only
+            if(ac)
+                av = new KKSAttrView(*ac);
+            else
+                av = new KKSAttrView();
+            sortModel->addAttrView(av);
+            av->release();
+
+            ac = acList.value(404); //order
+            if(ac)
+                av = new KKSAttrView(*ac);
+            else
+                av = new KKSAttrView();
+            sortModel->addAttrView(av);
+            av->release();
+
+            ac = acList.value(405); //directives
+            if(ac)
+                av = new KKSAttrView(*ac);
+            else
+                av = new KKSAttrView();
+            sortModel->addAttrView(av);
+            av->release();
+        }
+
+
+        int sortCol = tvTableAttrs->header()->sortIndicatorSection ();
+        Qt::SortOrder sOrder = tvTableAttrs->header()->sortIndicatorOrder ();
+        sortModel->sort (sortCol, sOrder);
+
     }
+
     return rw;
 }
 
@@ -656,34 +749,60 @@ KKSRecWidget * KKSCatEditorFactory :: getTemplateWidget (const KKSCategory * cat
     return rtw;
 }
 
-void KKSCatEditorFactory :: loadCatAttribute (int id, KKSCategory *c, QAbstractItemModel * acModel, KKSCatEditor *editor)
+void KKSCatEditorFactory :: loadCatAttribute (int id, KKSCategory *c, QTreeView * tv, KKSCatEditor *editor)
 {
     if (!editor || !c)
         return;
+
+    KKSSortFilterProxyModel *sortModel = qobject_cast <KKSSortFilterProxyModel *>(tv->model());
+    if (!sortModel)
+        return;
+
+    QAbstractItemModel * acModel = sortModel->sourceModel();
+    if(!acModel)
+        return;
+
     KKSAttribute *attr = loader->loadAttribute (id);
     if (!attr)
         return;
     bool is_bad;
-    KKSCategoryAttr *cAttr = KKSCategoryAttr::create (attr, false, false, QString(), &is_bad);
+    
+    int nextOrder  = acModel->rowCount();
+    //если атрибут это ИД, то всегжа делаем его первым по порядку
+    if(id == ATTR_ID)
+        nextOrder = -1;
+
+    KKSCategoryAttr *cAttr = KKSCategoryAttr::create (attr, false, false, QString(), nextOrder+1, QString::null, &is_bad);
     if (is_bad)
     {
         if (cAttr)
             cAttr->release ();
         return;
     }
-    loadCatAttribute (cAttr, c, acModel, editor);
+    loadCatAttribute (cAttr, c, tv, editor);
     cAttr->release ();
 }
 
-void KKSCatEditorFactory :: addAttributeIntoCategory (KKSCategory *c, QAbstractItemModel * attrModel, KKSCatEditor *editor)
+void KKSCatEditorFactory :: addAttributeIntoCategory (KKSCategory *c, QTreeView * tv, KKSCatEditor *editor)
 {
-    if (!c || !attrModel)
+    if (!c || !tv)
         return;
+
     KKSList<const KKSFilterGroup *> filters;
     KKSAttributesEditor *aEditor = attrf->viewAttributes (filters, true, editor, Qt::Dialog);
-    //KKSViewFactory::createAttrView (loader, filters, true, editor, Qt::Dialog);
     if (!aEditor)
         return;
+
+    KKSSortFilterProxyModel *sortModel = qobject_cast <KKSSortFilterProxyModel *>(tv->model());
+    if (!sortModel)
+        return;
+
+    QAbstractItemModel * attrModel = sortModel->sourceModel();
+    if(!attrModel)
+        return;
+
+    sortModel->setDynamicSortFilter(false);
+
     aEditor->setWindowModality (Qt::WindowModal);
     if (aEditor->exec() == QDialog::Accepted)
     {
@@ -694,30 +813,39 @@ void KKSCatEditorFactory :: addAttributeIntoCategory (KKSCategory *c, QAbstractI
             if (!attr)
                 continue;
             bool is_bad;
-            KKSCategoryAttr *cAttr = KKSCategoryAttr::create (attr, false, false, QString(), &is_bad);
+            int nextOrder  = attrModel->rowCount();
+            KKSCategoryAttr *cAttr = KKSCategoryAttr::create (attr, false, false, QString(), nextOrder+1, QString::null, &is_bad);
             if (is_bad || !cAttr)
             {
                 if (cAttr)
                     cAttr->release ();
+                sortModel->setDynamicSortFilter(true);
                 return;
             }
             if (!c->attributes().contains (cAttr->id()))
             {
-                attrModel->insertRows(c->attributes().count(), 1);
+                attrModel->insertRows(attrModel->rowCount(), 1);
                 c->addAttribute(cAttr->id(), cAttr);
-                //qDebug () << __PRETTY_FUNCTION__ << c->attributes().count() << attrModel->rowCount();
             }
+
             cAttr->release ();
             attr->release();
         }
+
         bool isCat = attrModel->setData(QModelIndex(), QVariant::fromValue<KKSCategory *>(c), Qt::UserRole+2);
         if (!isCat)
         {
+            sortModel->setDynamicSortFilter(true);
             return;
         }
-        //qDebug () << __PRETTY_FUNCTION__ << c->attributes().count() << attrModel->rowCount() << isCat << attrModel;
-        //KKSViewFactory::updateAttrModel (c, attrModel);
     }
+
+    int sortCol = tv->header()->sortIndicatorSection ();
+    Qt::SortOrder sOrder = tv->header()->sortIndicatorOrder ();
+    sortModel->sort (sortCol, sOrder);
+    
+    sortModel->setDynamicSortFilter(true);
+
     editor->resize(editor->size() + QSize(1, 1));
     editor->update ();
     editor->resize(editor->size() - QSize(1, 1));
@@ -769,16 +897,23 @@ void KKSCatEditorFactory :: copyAttributesIntoCategory (KKSCategory *c, QAbstrac
     ioCat->release ();
 }
 
-void KKSCatEditorFactory :: loadCatAttribute (KKSCategoryAttr *cAttr, KKSCategory *c, QAbstractItemModel * acModel, KKSCatEditor *editor)
+void KKSCatEditorFactory :: loadCatAttribute (KKSCategoryAttr *cAttr, KKSCategory *c, QTreeView * tv, KKSCatEditor *editor)
 {
-    if (!cAttr || !c || !acModel || !editor)
+    if (!cAttr || !c || !tv || !editor)
         return;
 
+    KKSSortFilterProxyModel *sortModel = qobject_cast <KKSSortFilterProxyModel *>(tv->model());
+    if (!sortModel)
+        return;
+
+    QAbstractItemModel * acModel = sortModel->sourceModel();
+    if(!acModel)
+        return;
+    
     KKSMap<int, KKSCategoryAttr *> existsAttrs = c->attributes();
     int idattr = -1;
     for (KKSMap<int, KKSCategoryAttr *>::const_iterator p = existsAttrs.constBegin(); p!= existsAttrs.constEnd() && idattr < 0; p++)
     {
-        qDebug () << __PRETTY_FUNCTION__ << p.value()->id() << cAttr->id () << cAttr->defValue().value() << c->id();
         if (p.value()->id() == cAttr->id())
             idattr = p.key ();
     }
@@ -795,8 +930,15 @@ void KKSCatEditorFactory :: loadCatAttribute (KKSCategoryAttr *cAttr, KKSCategor
     if (res != OK_CODE)
         return;
 
+    sortModel->setDynamicSortFilter(false);
     KKSViewFactory::updateAttrModel (c, acModel);
     editor->update ();
+
+    int sortCol = tv->header()->sortIndicatorSection ();
+    Qt::SortOrder sOrder = tv->header()->sortIndicatorOrder ();
+    sortModel->sort (sortCol, sOrder);
+
+    sortModel->setDynamicSortFilter(true);
 }
 
 void KKSCatEditorFactory :: delCatAttribute (int id, KKSCategory *c, QAbstractItemModel *attrModel, KKSCatEditor *editor)
@@ -852,8 +994,9 @@ void KKSCatEditorFactory :: saveCategory (KKSCategory *cat, int idTableCat, int 
             pEditor->updateChildCat (cat->id(), cat->name());
         }
     }
-    else
-        res = ppf->updateCategory (cat);
+    else{
+        res = ppf->updateCategoryEx (cat);
+    }
 
     if (res == ERROR_CODE)
     {

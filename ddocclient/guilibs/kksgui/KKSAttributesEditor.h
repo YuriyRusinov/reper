@@ -117,6 +117,7 @@ private:
     // Variables
     //
     friend class KKSObjEditorFactory;
+    friend class KKSAttributesFactory;
     friend class KKSViewFactory;
 
     KKSRecWidget *recW;

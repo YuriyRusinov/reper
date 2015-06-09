@@ -22,12 +22,13 @@ class QLineEdit;
 class _GUI_EXPORT KKSAttrUUIDWidget : public QWidget
 {
 public:
-    KKSAttrUUIDWidget (QWidget *parent=0, Qt::WindowFlags f=0);
+    KKSAttrUUIDWidget (bool isRef, QWidget *parent=0, Qt::WindowFlags f=0);
     ~KKSAttrUUIDWidget (void);
 
     qint64 getIdAttrValue (void) const;
     KKSIndAttrClass isSysAttr (void) const;
     const QVariant& getValue (void) const;
+
     QToolButton * getButton (void) const;
     Qt::CheckState checkState (void) const;
 
@@ -53,6 +54,7 @@ private:
     qint64 idAttrValue;
     QVariant cVal;
     KKSIndAttrClass isSystem;
+    bool m_isRef;
 
 private:
     Q_OBJECT

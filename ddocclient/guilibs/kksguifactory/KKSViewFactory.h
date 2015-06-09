@@ -107,11 +107,13 @@ class KKSSearchTemplate;
                                            QAbstractItemModel *model,
                                            const QModelIndex& parent=QModelIndex());
 
-        static KKSRecWidget * createCategAttrsView (const KKSCategory *cat,
+        static KKSRecWidget * createCategAttrsView (KKSLoader * loader, 
+                                                    const KKSCategory *cat,
                                                     QWidget *parent=0,
                                                     Qt::WindowFlags f=0);
 
-        static KKSRecWidget * createAttrAttrsView (const KKSAttribute *a,
+        static KKSRecWidget * createAttrAttrsView (KKSLoader * loader, 
+                                                   const KKSAttribute *a,
                                                    bool mode,
                                                    QWidget *parent,
                                                    Qt::WindowFlags f);
@@ -131,8 +133,8 @@ class KKSSearchTemplate;
         static void updateAttrModel (const KKSCategory *cat, QAbstractItemModel *model);
         static void updateAttrAttrsModel (const KKSAttribute *a, QAbstractItemModel *model);
 
-        static void initTemplateGroups (KKSTemplate *t, QAbstractItemModel *tModel);
-        static void insertTemplateGroup (KKSAttrGroup *tAGroup, const QModelIndex& parent, int ind, QAbstractItemModel *tModel);
+        static void initTemplateGroups (KKSTemplate *t, QAbstractItemModel *tModel, QTreeView * tv);
+        static void insertTemplateGroup (KKSAttrGroup *tAGroup, const QModelIndex& parent, int ind, QAbstractItemModel *tModel, QTreeView * tv);
         static void updateTemplateGroup (KKSAttrGroup *tAGroup, const QModelIndex& gIndex, QAbstractItemModel *tModel);
 
         static KKSAttributesEditor * createAvailAttrView (const KKSMap<int, KKSCategoryAttr *>& avAttrs,

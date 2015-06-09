@@ -39,7 +39,7 @@ KKSTemplate & KKSTemplate::operator = (const KKSTemplate & t)
     
     setCategory(const_cast<KKSCategory*>(t.category()));
     m_groups = t.groups();
-   
+
     return *this;
 }
 
@@ -171,6 +171,26 @@ const KKSAttrGroup * KKSTemplate::group(int index) const
         return 0;
     const KKSAttrGroup * g = pg.value();
     return g;
+}
+
+KKSAttrGroup * KKSTemplate::groupDirectly (int index)
+{
+    KKSMap<int, KKSAttrGroup *>::const_iterator pg = m_groups.constFind (index);
+    if (pg == m_groups.constEnd())
+        return 0;
+    
+    //KKSAttrGroup * g = pg.value();
+    return m_groups[index];
+}
+
+const KKSAttrGroup * KKSTemplate::groupDirectly(int index) const
+{
+    KKSMap<int, KKSAttrGroup *>::const_iterator pg = m_groups.constFind (index);
+    if (pg == m_groups.constEnd())
+        return 0;
+    //const KKSAttrGroup * g = pg.value();
+    
+    return m_groups[index];
 }
 
 int KKSTemplate::attrsCount() const

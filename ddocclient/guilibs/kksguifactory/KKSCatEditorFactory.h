@@ -19,6 +19,7 @@
 class QModelIndex;
 class QAbstractItemModel;
 class QLineEdit;
+class QTreeView;
 
 class KKSLoader;
 class KKSObjEditorFactory;
@@ -92,12 +93,12 @@ class _GF_EXPORT KKSCatEditorFactory : public KKSEntityFactory
         void editCategory (QWidget* ctw, int idCat, bool isChild);
         void delCategory (QWidget * ctw, int idCat);
         //void loadAttributes (KKSCatEditor *editor);
-        void loadCatAttribute (int id, KKSCategory *c, QAbstractItemModel * acModel, KKSCatEditor *editor);
-        void loadCatAttribute (KKSCategoryAttr *cAttr, KKSCategory *c, QAbstractItemModel * acModel, KKSCatEditor *editor);
+        void loadCatAttribute (int id, KKSCategory *c, QTreeView *tv, KKSCatEditor *editor);
+        void loadCatAttribute (KKSCategoryAttr *cAttr, KKSCategory *c, QTreeView * tv, KKSCatEditor *editor);
         void delCatAttribute (int id, KKSCategory *c, QAbstractItemModel * attrModel, KKSCatEditor *editor);
 
         void saveCategory (KKSCategory *cat, int idTableCat, int idType, KKSCatEditor *cEditor);
-        void addAttributeIntoCategory (KKSCategory *c, QAbstractItemModel * attrModel, KKSCatEditor *editor);
+        void addAttributeIntoCategory (KKSCategory *c, QTreeView * tv, KKSCatEditor *editor);
         void copyAttributesIntoCategory (KKSCategory *c, QAbstractItemModel * attrModel, KKSCatEditor *cEditor);
         void refreshCategoryTemplates (KKSCategory * c, QAbstractItemModel * templModel);
 

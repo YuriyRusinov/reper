@@ -960,6 +960,10 @@ int KKSPPFactory::insertAttrValues(const KKSObject * io) const
         if(av->value().isNull())
             continue;
 
+        if(av->attribute()->id() == 402){
+            int a = 0;
+        }
+
         if(a->type()->attrType() == KKSAttrType::atCheckListEx){
             //коррекция для системных справочников, имеющих атрибут данного типа
             //такими справочниками являются organization, units, position
@@ -1957,6 +1961,141 @@ int KKSPPFactory::updateCategory(const KKSCategory* c) const
             return ERROR_CODE;
         }
     }
+
+    //шаблоны
+    if (!c->getTemplates().isEmpty())
+    {
+        setInTransaction();
+        int ok = this->saveCatTemplates (const_cast<KKSCategory*>(c));
+        restoreInTransaction();
+        if(ok != OK_CODE){
+            if(!inTransaction())
+                db->rollback();
+            return ERROR_CODE;
+        }
+    }
+
+    int accOk = this->writeCatAccessRules (c->getAccessRules(), c->id());
+    if (accOk < 0)
+    {
+        if(!inTransaction())
+            db->rollback();
+        return ERROR_CODE;
+    }
+
+    if(!inTransaction())
+        db->commit();
+
+    return OK_CODE;
+}
+
+/*Метод используется в визуальном редакторе категорий
+предполагается, что изменить можно только 
+- название категории
+- жизненный цикл
+- набор шаблонов
+- права доступа
+- для не дочерней категории можно изменить набор атрибутов
+*/
+int KKSPPFactory::updateCategoryEx(const KKSCategory* c) const
+{
+    if(!db || !c || c->id() <= 0 ||!c->type())
+        return ERROR_CODE;
+
+    //в этом методе производится начало новой транзакции
+    //или создается savepoint, если транзакция начата
+    //производится удаление категории (вызов deleteCategory())
+    //проверка, смогли ли удалить (если смогли, значит категория не используется)
+    //и выполнение отката (транзакции или savepoint'а), т.к. реально мы ее здесь не удаляем
+    
+    //!!!TODO Пока данную проверку делвть не надо, поскольку мы не изменяем набор атрибутов
+    //if(categoryInUse(const_cast<KKSCategory *>(c)))
+    //    return ERROR_CODE;
+
+    if(!inTransaction())
+        db->begin();
+
+    if(c->tableCategory()){
+        //если дочерняя категория не сохранена - считаем это ошибкой
+        if(c->tableCategory()->id() <= 0){
+            if(!inTransaction())
+                db->rollback();
+            return ERROR_CODE;
+        }
+    }
+
+    if(c->recAttrCategory()){
+        //если категория не сохранена - считаем это ошибкой
+        if(c->recAttrCategory()->id() <= 0){
+            if(!inTransaction())
+                db->rollback();
+            return ERROR_CODE;
+        }
+    }
+
+    //если у категории не сохранен тип - считаем это ошибкой
+    if(c->type()->id() <= 0){
+        if(!inTransaction())
+            db->rollback();
+        return ERROR_CODE;
+    }
+
+    //изменяем запись в таблице io_category
+    /*
+    KKSObjectExemplar * eio = KKSConverter::categoryToExemplar(loader, c);
+    int ok = eiof->updateEIO(eio);
+    if(ok == ERROR_CODE){
+        if(!inTransaction())
+            db->rollback();
+        return ERROR_CODE;
+    }
+    */
+    
+    //теперь обновим атрибуты категории
+    /*TODO На время запрещаем обновление атрибутов в категориях*/
+
+    /*
+    setInTransaction();
+    ok = deleteCategoryAttrs(c->id());
+    restoreInTransaction();
+    if(ok != OK_CODE)
+    {
+        if(!inTransaction())
+            db->rollback();
+        return ERROR_CODE;
+    }
+    */
+
+    //изменение характеристик атрибутов в категории
+    KKSMap<int, KKSCategoryAttr *>::const_iterator pca;
+    for (pca = c->attributes().constBegin(); pca != c->attributes().constEnd(); pca++)
+    {
+        KKSCategoryAttr * a = pca.value();
+        setInTransaction();
+        int ok = updateCategoryAttr(c->id(), a);
+        restoreInTransaction();
+        if(ok != OK_CODE){
+            if(!inTransaction())
+                db->rollback();
+            return ERROR_CODE;
+        }
+    }
+    
+    //
+    //рубрики
+    //
+    if(c->rootRubric()){
+        setInTransaction();
+        int ok = cUpdateRubrics(c);
+        restoreInTransaction();
+        if(ok != OK_CODE){
+            if(!inTransaction())
+                db->rollback();
+            return ERROR_CODE;
+        }
+    }
+
+    //шаблоны
     if (!c->getTemplates().isEmpty())
     {
         setInTransaction();
@@ -2085,13 +2224,17 @@ int KKSPPFactory::insertCategoryAttr(int idCategory, KKSCategoryAttr * a) const
         defVal = a->defValue().valueForInsert();
     bool isMandatory = a->isMandatory();
     bool isReadOnly = a->isReadOnly();
+    int order = a->order();
+    QString d = a->directives();
 
-    QString sql = QString("select cAddAttr(%1, %2, %3, %4, %5)")
+    QString sql = QString("select cAddAttr(%1, %2, %3, %4, %5, %6, %7)")
                             .arg(idCategory)
                             .arg(idAttr)
-                            .arg(defVal.isEmpty() ? QString("NULL") : QString("asString(%1, false)").arg(defVal))
+                            .arg(defVal.isEmpty() ? QString("NULL") : QString("asString('%1', false)").arg(defVal))
                             .arg(isMandatory ? "true" : "false")
-                            .arg(isReadOnly ? "true" : "false");
+                            .arg(isReadOnly ? "true" : "false")
+                            .arg(d.isEmpty() ? QString("NULL") : QString ("asString('%1', false)").arg(d))
+                            .arg(order);
 
     KKSResult * res = db->execute(sql);
 
@@ -2129,13 +2272,17 @@ int KKSPPFactory::updateCategoryAttr(int idCategory, KKSCategoryAttr * a) const
         defVal = a->defValue().valueForInsert();
     bool isMandatory = a->isMandatory();
     bool isReadOnly = a->isReadOnly();
+    int order = a->order();
+    QString d = a->directives();
 
-    QString sql = QString("select cUpdateAttr(%1, %2, %3, %4, %5)")
+    QString sql = QString("select cUpdateAttr(%1, %2, %3, %4, %5, %6, %7)")
                             .arg(idCategory)
                             .arg(idAttr)
                             .arg(defVal.isEmpty() ? QString("NULL") : QString("asString(%1, false)").arg(defVal))
                             .arg(isMandatory ? "true" : "false")
-                            .arg(isReadOnly ? "true" : "false");
+                            .arg(isReadOnly ? "true" : "false")
+                            .arg(d.isEmpty() ? QString("NULL") : QString ("asString('%1', false)").arg(d))
+                            .arg(order);
 
     KKSResult * res = db->execute(sql);
 
@@ -4613,13 +4760,16 @@ int KKSPPFactory::insertAttrAttr(int idParentAttr, KKSCategoryAttr * aa) const
     QString defVal = aa->defValue().valueForInsert();
     bool isMandatory = aa->isMandatory();
     bool isReadOnly = aa->isReadOnly();
+    int order = aa->order();
+    QString d = aa->directives();
 
-    QString sql = QString("select aInsertAttrAttr(%1, %2, %3::varchar, %4, %5, NULL)")
+    QString sql = QString("select aInsertAttrAttr(%1, %2, %3::varchar, %4, %5, NULL, %6, %7)")
                             .arg(idParentAttr)
                             .arg(idAttr)
                             .arg(defVal)
                             .arg(isMandatory ? "true" : "false")
-                            .arg(isReadOnly ? "true" : "false");
+                            .arg(isReadOnly ? "true" : "false")
+                            .arg(d.isEmpty() ? QString("NULL") : QString("asString('%1', false)").arg(d));
 
 
     KKSResult * res = db->execute (sql);

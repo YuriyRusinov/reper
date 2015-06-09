@@ -494,7 +494,9 @@ qint64 KKSEIOFactory::generateInsertQuery(const KKSRecord * rec,
         KKSCategoryAttr * attr = attrValue->attribute();
 
         //пропускаем идентификатор записи в таблице БД. Его бы зададим отдельно
-        if(attr->code() == "id")
+        if(attr->code().toLower() == "id")
+            continue;
+        if(attr->code().toLower() == "uuid_t")
             continue;
 
         //Атрибут может описывать поле таблицы. 
@@ -619,7 +621,10 @@ qint64 KKSEIOFactory::generateInsertQuery(const KKSRecord * rec,
         if (iType == KKSAttrType::atParent && bImported)
             qDebug () << __PRETTY_FUNCTION__ << value.value();
         
-        if ((iType == KKSAttrType::atList || iType == KKSAttrType::atParent) && 
+        if (( iType == KKSAttrType::atList || 
+              iType == KKSAttrType::atParent || 
+              iType == KKSAttrType::atSysChildCategoryRef
+             ) && 
             bImported && //в этом случае надо обязательно делать запрос за значением идентификатора записи.
             value.value() != QString("NULL") &&
             !value.value().isEmpty ()
@@ -709,7 +714,10 @@ qint64 KKSEIOFactory::generateInsertQuery(const KKSRecord * rec,
             //если значение атрибута отсутствует, то используем значение по умолчанию (при его наличии), 
             //но только в случае, когда у атрибута параметр isMandatory = true.
             if(value.isNull() ||
-               ((iType == KKSAttrType::atList || iType == KKSAttrType::atParent) && value.valueForInsert() == "''")
+               ((iType == KKSAttrType::atList || 
+                 iType == KKSAttrType::atParent || 
+                 iType == KKSAttrType::atSysChildCategoryRef
+                 ) && value.valueForInsert() == "''")
               )
             {
                 if(attr->isMandatory()){
@@ -826,7 +834,9 @@ qint64 KKSEIOFactory::generateUpdateQuery(const KKSRecord * rec,
         KKSCategoryAttr * attr = attrValue->attribute();
 
         //пропускаем идентификатор записи в таблице БД. Его бы зададим отдельно
-        if(attr->code() == "id")
+        if(attr->code().toLower() == "id")
+            continue;
+        if(attr->code().toLower() == "uuid_t")
             continue;
 
         //Атрибут может описывать поле таблицы. 

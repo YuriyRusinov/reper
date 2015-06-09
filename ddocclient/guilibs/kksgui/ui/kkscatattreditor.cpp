@@ -42,6 +42,8 @@ KKSCatAttrEditor :: KKSCatAttrEditor (KKSCategoryAttr *attr, const KKSMap<int, K
         ui->lECode->setReadOnly (true);
         ui->lEName->setReadOnly (true);
         ui->lEDefVal->setText (attr->defValue().value());
+        ui->sbOrder->setValue(attr->order());
+        ui->teDirectives->setText(attr->directives());
     }
 
     this->init_widgets (for_template);
@@ -73,6 +75,8 @@ void KKSCatAttrEditor :: accept ()
     attribute->setReadOnly ((ui->chReadOnly->checkState()==Qt::Checked));
     KKSValue val (ui->lEDefVal->text(), attribute->type()->attrType());
     attribute->setDefValue (val);
+    attribute->setOrder(ui->sbOrder->value());
+    attribute->setDirectives(ui->teDirectives->toPlainText());
 //    attribute->setDesc (lEDesc->text());
 }
 
@@ -89,6 +93,8 @@ void KKSCatAttrEditor :: init_widgets (bool for_template)
 {
     ui->chMandatory->setEnabled (!for_template);
     ui->chReadOnly->setEnabled (!for_template);
+    ui->tabDirectives->setEnabled(!for_template);
+    //ui->sbOrder
     this->set_types ();
 }
 

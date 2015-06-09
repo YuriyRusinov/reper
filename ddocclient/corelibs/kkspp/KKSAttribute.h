@@ -121,6 +121,9 @@ public:
    int order() const;
    void setOrder(int o);
 
+   const QString & directives() const;
+   void setDirectives(const QString & d);
+
    const KKSValue & defValue() const;
    KKSValue  & defValue();
    void setDefValue(const KKSValue & _defValue);
@@ -146,6 +149,8 @@ public:
                                     bool bMandatory, 
                                     bool bReadOnly, 
                                     const QString & defValue = QString::null,
+                                    int order = 1,
+                                    const QString & directives = QString::null,
                                     bool * bBadValue = NULL);
 
 
@@ -158,7 +163,8 @@ private:
 
    bool m_isMandatory;
    bool m_isReadOnly;
-   int m_order;
+   int m_order;//порядок отображения атрибута в категории
+   QString m_directives; //Формализованные параметры по управлению отображением и поведением атрибута в категории (в специализированном формате)
    int m_idRow; //id в таблице attrs_categories или в таблице attrs_attrs
 
    int m_idParent;//идентификатор описываемого атрибута (который содержит данный экземпляр класса) или категории (для KKSCategoryAttr)

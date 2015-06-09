@@ -73,13 +73,15 @@ KKSTemplateEditor *KKSTemplateEditorFactory :: createTemplateEditor (KKSTemplate
         return 0;
 
     QStandardItemModel *tGroupModel = new QStandardItemModel (0, 3);
+
     tGroupModel->setHeaderData (0, Qt::Horizontal, tr ("Attribute groups"));
     tGroupModel->setHeaderData (1, Qt::Horizontal, tr ("Default value"));
     tGroupModel->setHeaderData (2, Qt::Horizontal, tr ("Read only"));
+
     tEditor->setModel (tGroupModel);
     KKSItemDelegate *itemDeleg = new KKSItemDelegate (tEditor);
     tEditor->setItemDelegate (itemDeleg);
-    KKSViewFactory::initTemplateGroups (t, tGroupModel);
+    KKSViewFactory::initTemplateGroups (t, tGroupModel, tEditor->tvGroups);
     tEditor->setWindowModality (windowModality);
     tEditor->setWindowTitle (tr("New template for %1").arg (c->name()));
 
@@ -365,11 +367,10 @@ void KKSTemplateEditorFactory :: addAGroupToTemplate (KKSTemplate *t, const QMod
     KKSAttrGroup * pAttrG = 0;
     if (parent.isValid())
     {
-        qDebug () << __PRETTY_FUNCTION__ << parent;
-        //KKSMap<int, KKSAttrgroup*>::const_iterator pg = t->
         pAttrG = t->searchGroupById (parent.data(Qt::UserRole).toInt());//getParentGroup (parent, t);
         if (!pAttrG)
             return;
+
         tAttrG->setParent (pAttrG);
     }
 
@@ -387,29 +388,22 @@ void KKSTemplateEditorFactory :: addAGroupToTemplate (KKSTemplate *t, const QMod
     int id = -1;
     while (idList.contains (id))
         id--;
-    if (parent.isValid())
+    
+    if (parent.isValid())//если создаваемая группа не корневая (входит в другую группу)
     {
         tAttrG->setOrder (pAttrG->childGroups().count());
         tAttrG->setId (id);
-        ires=pAttrG->addChildGroup (id, tAttrG);
-        qDebug () << __PRETTY_FUNCTION__ << pAttrG->childGroups().keys();
+        ires = pAttrG->addChildGroup (id, tAttrG);
     }
     else
     {
         tAttrG->setOrder (t->groups().count());
-/*        QList<int> idList = t->groups().keys();
-        KKSMap<int, KKSAttrGroup*>::const_iterator pMin = t->groups().constBegin();
-        int id = -1;//idList.isEmpty() ? 0 : idList[idList.size()-1]+1;
-        if (pMin != t->groups().constEnd() && pMin.key() <= 0)
-            id = pMin.key()-1;
-*/
         tAttrG->setId (id);
         t->addGroup (tAttrG);
     }
     Q_UNUSED (ires);
 
-    qDebug () << __PRETTY_FUNCTION__ << t->groups().keys() << id << idList << tAttrG->id();
-    KKSViewFactory::insertTemplateGroup (tAttrG, parent, tGroupsModel->rowCount (parent)/*t->groups().count()-1*/, tGroupsModel);
+    KKSViewFactory::insertTemplateGroup (tAttrG, parent, tGroupsModel->rowCount (parent)/*t->groups().count()-1*/, tGroupsModel, tEditor->tvGroups);
     tAttrG->release ();
 }
 
@@ -473,7 +467,10 @@ void KKSTemplateEditorFactory :: addAttrToTemplate (int idAttrGroup, const QMode
     this->appendAttrToTemplate (idAttr, idAttrGroup, gIndex, t, tEditor);
 }
 
-void KKSTemplateEditorFactory :: appendAttrToTemplate (int idAttr, int idAttrGroup, const QModelIndex& gIndex, KKSTemplate *t, KKSTemplateEditor *tEditor)
+void KKSTemplateEditorFactory :: appendAttrToTemplate (int idAttr,
+                                                       int idAttrGroup, 
+                                                       const QModelIndex& gIndex, 
+                                                       KKSTemplate *t, KKSTemplateEditor *tEditor)
 {
     if (!t || !tEditor || !tEditor->tvGroups || !tEditor->tvGroups->model ())
         return;
@@ -645,7 +642,12 @@ void KKSTemplateEditorFactory :: editAttrInTemplate (int idAttr, int idAttrGroup
     attrTypesIO->release();
 }
 
-void KKSTemplateEditorFactory :: deleteAttrFromTemplate (int idAttr, int idAttrGroup, const QModelIndex& aIndex, const QModelIndex& gIndex, KKSTemplate *t, KKSTemplateEditor *tEditor)
+void KKSTemplateEditorFactory :: deleteAttrFromTemplate (int idAttr, 
+                                                         int idAttrGroup, 
+                                                         const QModelIndex& aIndex, 
+                                                         const QModelIndex& gIndex, 
+                                                         KKSTemplate *t, 
+                                                         KKSTemplateEditor *tEditor)
 {
      if (!t || !tEditor || !tEditor->tvGroups ||  !tEditor->tvGroups->model () || !aIndex.isValid() || !gIndex.isValid())
          return;
@@ -659,11 +661,7 @@ void KKSTemplateEditorFactory :: deleteAttrFromTemplate (int idAttr, int idAttrG
     KKSMap<int, KKSAttrView *>::const_iterator pa = aViews.constFind (idAttr);
     if (pa == aViews.constEnd())
         return;
-//    QList <KKSAttrView *> avList = aViews.values();
-//    qSort (avList.begin(), avList.end(), compareAttrViews);
-
-//    for (int i=avList.indexOf (pa.value())+1; i<avList.count(); i++)
-//        avList[i]->setOrder (avList[i]->order()-1);
+       //avList[i]->setOrder (avList[i]->order()-1);
 
     KKSMap<int, KKSAttrView *>::const_iterator pAttr = pa;
     pAttr++;
@@ -673,8 +671,6 @@ void KKSTemplateEditorFactory :: deleteAttrFromTemplate (int idAttr, int idAttrG
     tAttrG->setAttrViews (aViews);
     //removeAttrView (idAttr);
     tGroupsModel->removeRows (aIndex.row(), 1, gIndex);
-    qDebug () << __PRETTY_FUNCTION__ << t->searchGroupById (idAttrGroup)->attrViews().count() << tAttrG->attrViews().count();
-//    KKSViewFactory::updateTemplateGroup (tAttrG, gIndex, tGroupsModel);//tAttrG->order(), 
 }
 
 void KKSTemplateEditorFactory :: saveTemplate (KKSTemplate *t, KKSTemplateEditor *tEditor)
@@ -764,5 +760,5 @@ void KKSTemplateEditorFactory :: updateTemplate (KKSTemplate *t, KKSTemplateEdit
         return;
 
     QAbstractItemModel *tGroupsModel = tEditor->tvGroups->model ();
-    KKSViewFactory::initTemplateGroups (t, tGroupsModel);
+    KKSViewFactory::initTemplateGroups (t, tGroupsModel, tEditor->tvGroups);
 }

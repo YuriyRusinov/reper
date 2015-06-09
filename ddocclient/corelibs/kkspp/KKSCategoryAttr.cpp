@@ -52,6 +52,7 @@ KKSCategoryAttr::KKSCategoryAttr(const KKSCategoryAttr & a) : KKSAttribute(a)
     m_isReadOnly = a.isReadOnly();
     m_idRow = a.idRow();
     m_order = a.order();
+    m_directives = a.directives();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -131,6 +132,8 @@ KKSCategoryAttr * KKSCategoryAttr::create(KKSAttribute * a,
                                           bool bMandatory, 
                                           bool bReadOnly, 
                                           const QString & defValue,
+                                          int order,
+                                          const QString & directives,
                                           bool * bBadValue)
 {
     KKSCategoryAttr * ca = NULL;
@@ -139,6 +142,9 @@ KKSCategoryAttr * KKSCategoryAttr::create(KKSAttribute * a,
     ca = new KKSCategoryAttr(*a);
     ca->setMandatory(bMandatory);
     ca->setReadOnly(bReadOnly);
+    ca->setOrder(order);
+    ca->setDirectives(directives);
+
     KKSValue v;
     v.setValue(defValue, a->type()->attrType());
     ca->setDefValue(v);
@@ -190,4 +196,14 @@ int KKSCategoryAttr::order() const
 void KKSCategoryAttr::setOrder(int o)
 {
     m_order = o;
+}
+
+const QString & KKSCategoryAttr::directives() const
+{
+    return m_directives;
+}
+
+void KKSCategoryAttr::setDirectives(const QString & d)
+{
+    m_directives = d;
 }

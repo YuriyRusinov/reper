@@ -330,7 +330,7 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
             sortModel = new KKSSortFilterProxyModel (tv); //ksa было editor
         sortModel->clearAttrs ();
         //itemDeleg->clearAttrs ();
-        qDebug () << __PRETTY_FUNCTION__ << "Model was previously set";
+        //qDebug () << __PRETTY_FUNCTION__ << "Model was previously set";
     }
     sortModel->setDynamicSortFilter (true);
 
@@ -349,6 +349,7 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
         delete objModel;
         objModel = new KKSEIODataModel (t, objEx);
     }
+
 /*    KKSAttribute * aColBG = l->loadAttribute(ATTR_RECORD_FILL_COLOR);
     const KKSCategoryAttr * caColBG = KKSCategoryAttr::create(aColBG,false,false);
     bool isBGSet = objModel->setData(QModelIndex(), QVariant::fromValue<const KKSCategoryAttr *>(caColBG), Qt::UserRole+4);
@@ -520,7 +521,7 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
     for (int ii=0; ii<ncols; ii++)
     {
         KKSAttrView * v = attrs_list [visible_attrs[ii]];
-        QString attrCode = v->code();
+        //QString attrCode = v->code();
         sortModel->addAttrView (v);
 //        itemDeleg->addAttrView (v);
 
@@ -1067,7 +1068,8 @@ KKSEIOData * KKSViewFactory :: getRecordData (const KKSObjectExemplar * rec)
 
         int ier = 0;
         if(a->type()->attrType() == KKSAttrType::atList ||
-            a->type()->attrType() == KKSAttrType::atParent
+           a->type()->attrType() == KKSAttrType::atSysChildCategoryRef ||
+           a->type()->attrType() == KKSAttrType::atParent
             )
         {
             value = rec->attrValueIndex(col)->value().columnValue();
@@ -1373,31 +1375,129 @@ void KKSViewFactory :: loadCategoryTemplates (int idCat,
  * Результат:
  * виджет с атрибутами
  */
-KKSRecWidget * KKSViewFactory :: createCategAttrsView (const KKSCategory *cat,
-                                                    QWidget *parent,
-                                                    Qt::WindowFlags f)
+KKSRecWidget * KKSViewFactory :: createCategAttrsView (KKSLoader * loader, 
+                                                       const KKSCategory *cat,
+                                                       QWidget *parent,
+                                                       Qt::WindowFlags f)
 {
     if (!cat)
         return 0;
+
     KKSRecWidget * recWidget = new KKSRecWidget (false, Qt::Vertical, parent, f);
     QTreeView *tv = recWidget->getView();//new QTreeView ();
-    //
-    // QObject::tr("Filter"), QObject::tr("&Add"), QObject::tr ("&Edit"), QObject::tr ("&Delete"), QObject::tr("&Import"), QObject::tr("E&xport"), 
-    //
+    tv->header()->setClickable (true);
+    tv->header()->setSortIndicatorShown (true);
+    tv->header()->setSortIndicator (5, Qt::AscendingOrder);
+    tv->setSortingEnabled (true);
+
+
     recWidget->hideActionGroup (_ID_FILTER_GROUP);
     recWidget->hideActionGroup (_ID_IMPORT_GROUP);
     recWidget->hideActionGroup (_ID_VIEW_GROUP);
     recWidget->hideActionGroup (_ID_REPORT_GROUP);
 
-    QAbstractItemModel * acModel = new KKSAttrModel (cat);
-/*    QStandardItemModel * acModel = new KKSCatAttrsModel (0, 4);//QStandardItemModel (0, 4);
-    acModel->setHeaderData (0, Qt::Horizontal, QObject::tr ("Name"));
-    acModel->setHeaderData (1, Qt::Horizontal, QObject::tr ("Default value"));
-    acModel->setHeaderData (2, Qt::Horizontal, QObject::tr ("Mandatory"));
-    acModel->setHeaderData (3, Qt::Horizontal, QObject::tr ("Read only"));
-    updateAttrModel (cat, acModel);
- */
-    tv->setModel (acModel);
+    tv->setDragEnabled (true);
+    tv->setAcceptDrops (true);
+    tv->setDropIndicatorShown (true);
+    KKSItemDelegate *itemDeleg = new KKSItemDelegate (recWidget);
+    tv->setItemDelegate (itemDeleg);
+
+    //делаем список с атрибутами в категории сортируемым
+    KKSSortFilterProxyModel *sortModel = 0;
+    if (!tv->model())
+    {
+        sortModel = new KKSSortFilterProxyModel (tv);//ksa было editor
+        tv->setModel (sortModel);
+    }
+    else
+    {
+        sortModel = qobject_cast <KKSSortFilterProxyModel *>(tv->model());
+        if (!sortModel)
+            sortModel = new KKSSortFilterProxyModel (tv); 
+        sortModel->clearAttrs ();
+    }
+
+    QAbstractItemModel *acModel = sortModel->sourceModel();//new QStandardItemModel ();
+    if (!acModel)
+        acModel = new KKSAttrModel (cat);
+    else{
+        sortModel->setSourceModel (0);
+        delete acModel;
+        acModel = new KKSAttrModel (cat);
+    }
+
+    //добавим в KKSSortFilterProxyModel набор атрибутов, которые задаются справочником атрибутов в категории
+    //это надо для правильной фильтрации по соответствующим колонкам в таблице (с учетом типа колонок(атрибутов))
+    KKSMap<int, KKSCategoryAttr *> acList = loader->loadCategoryAttrs(ATTRS_CAT_TABLE_CATEGORY_ID);
+    if(acList.count() > 0){
+        KKSAttrView * av = 0;
+        KKSCategoryAttr * ac = 0;
+        
+        ac = acList.value(1); //id
+        if(ac)
+            av = new KKSAttrView(*ac);
+        else
+            av = new KKSAttrView();
+        sortModel->addAttrView(av);
+        av->release();
+
+        ac = acList.value(2);//name
+        if(ac)
+            av = new KKSAttrView(*ac);
+        else
+            av = new KKSAttrView();
+        sortModel->addAttrView(av);
+        av->release();
+
+        ac = acList.value(304);//def_value
+        if(ac)
+            av = new KKSAttrView(*ac);
+        else
+            av = new KKSAttrView();
+        sortModel->addAttrView(av);
+        av->release();
+
+        ac = acList.value(128); //is_mandatory
+        if(ac)
+            av = new KKSAttrView(*ac);
+        else
+            av = new KKSAttrView();
+        sortModel->addAttrView(av);
+        av->release();
+
+        ac = acList.value(305); //is_read_only
+        if(ac)
+            av = new KKSAttrView(*ac);
+        else
+            av = new KKSAttrView();
+        sortModel->addAttrView(av);
+        av->release();
+
+        ac = acList.value(404); //order
+        if(ac)
+            av = new KKSAttrView(*ac);
+        else
+            av = new KKSAttrView();
+        sortModel->addAttrView(av);
+        av->release();
+
+        ac = acList.value(405); //directives
+        if(ac)
+            av = new KKSAttrView(*ac);
+        else
+            av = new KKSAttrView();
+        sortModel->addAttrView(av);
+        av->release();
+    }
+
+
+    sortModel->setSourceModel (acModel);
+    int sortCol = tv->header()->sortIndicatorSection ();
+    Qt::SortOrder sOrder = tv->header()->sortIndicatorOrder ();
+    sortModel->sort (sortCol, sOrder);
+/**/
+
+    //sortModel->setDynamicSortFilter (true);
 
     QHeaderView * header = tv->header();
     int lIndex = header->logicalIndex(0);
@@ -1407,12 +1507,6 @@ KKSRecWidget * KKSViewFactory :: createCategAttrsView (const KKSCategory *cat,
         header->setResizeMode(QHeaderView::Interactive);
         header->resizeSection(lIndex, 300);
     }
-
-    tv->setDragEnabled (true);
-    tv->setAcceptDrops (true);
-    tv->setDropIndicatorShown (true);
-    KKSItemDelegate *itemDeleg = new KKSItemDelegate (recWidget);
-    tv->setItemDelegate (itemDeleg);
 
     return recWidget;
 }
@@ -1425,31 +1519,111 @@ KKSRecWidget * KKSViewFactory :: createCategAttrsView (const KKSCategory *cat,
  * Результат:
  * виджет с атрибутами
  */
-KKSRecWidget * KKSViewFactory :: createAttrAttrsView (const KKSAttribute *a,
-                                                    bool mode,
-                                                    QWidget *parent,
-                                                    Qt::WindowFlags f)
+KKSRecWidget * KKSViewFactory :: createAttrAttrsView (KKSLoader * loader, 
+                                                      const KKSAttribute *a,
+                                                      bool mode,
+                                                      QWidget *parent,
+                                                      Qt::WindowFlags f)
 {
     if (!a)
         return 0;
     
     KKSRecWidget * recWidget = new KKSRecWidget (mode, Qt::Vertical, parent, f);
     QTreeView *tv = recWidget->getView();//new QTreeView ();
+    tv->header()->setClickable (true);
+    tv->header()->setSortIndicatorShown (true);
+    tv->header()->setSortIndicator (4, Qt::AscendingOrder);
+    tv->setSortingEnabled (true);
 
     recWidget->hideActionGroup (_ID_FILTER_GROUP);
     recWidget->hideActionGroup (_ID_VIEW_GROUP);
     recWidget->hideActionGroup (_ID_IMPORT_GROUP);
     recWidget->hideActionGroup (_ID_REPORT_GROUP);
     
-    QStandardItemModel * acModel = new KKSCatAttrsModel (0, 4);//QStandardItemModel (0, 4);
+    QStandardItemModel * acModel = new KKSCatAttrsModel (0, 6);//QStandardItemModel (0, 4);
     acModel->setHeaderData (0, Qt::Horizontal, QObject::tr ("Name"));
     acModel->setHeaderData (1, Qt::Horizontal, QObject::tr ("Default value"));
     acModel->setHeaderData (2, Qt::Horizontal, QObject::tr ("Mandatory"));
     acModel->setHeaderData (3, Qt::Horizontal, QObject::tr ("Read only"));
+    acModel->setHeaderData (4, Qt::Horizontal, QObject::tr ("Order"));
+    acModel->setHeaderData (5, Qt::Horizontal, QObject::tr ("Directives"));
 
     updateAttrAttrsModel (a, acModel);
     
-    tv->setModel (acModel);
+    //делаем список с атрибутами в атрибуте сортируемым
+    KKSSortFilterProxyModel *sortModel = 0;
+    sortModel = new KKSSortFilterProxyModel (tv);//ksa было editor
+    tv->setModel (sortModel);
+    sortModel->setDynamicSortFilter (true);
+    sortModel->setSourceModel (acModel);
+    
+    //добавим в KKSSortFilterProxyModel набор атрибутов, которые задаются справочником атрибутов в атрибутах
+    //это надо для правильной фильтрации по соответствующим колонкам в таблице (с учетом типа колонок(атрибутов))
+    KKSMap<int, KKSCategoryAttr *> acList = loader->loadCategoryAttrs(ATTRS_ATTR_TABLE_CATEGORY_ID);
+    if(acList.count() > 0){
+        KKSAttrView * av = 0;
+        KKSCategoryAttr * ac = 0;
+        
+        ac = acList.value(1); //id
+        if(ac)
+            av = new KKSAttrView(*ac);
+        else
+            av = new KKSAttrView();
+        sortModel->addAttrView(av);
+        av->release();
+
+        ac = acList.value(2);//name
+        if(ac)
+            av = new KKSAttrView(*ac);
+        else
+            av = new KKSAttrView();
+        sortModel->addAttrView(av);
+        av->release();
+
+        ac = acList.value(304);//def_value
+        if(ac)
+            av = new KKSAttrView(*ac);
+        else
+            av = new KKSAttrView();
+        sortModel->addAttrView(av);
+        av->release();
+
+        ac = acList.value(128); //is_mandatory
+        if(ac)
+            av = new KKSAttrView(*ac);
+        else
+            av = new KKSAttrView();
+        sortModel->addAttrView(av);
+        av->release();
+
+        ac = acList.value(305); //is_read_only
+        if(ac)
+            av = new KKSAttrView(*ac);
+        else
+            av = new KKSAttrView();
+        sortModel->addAttrView(av);
+        av->release();
+
+        ac = acList.value(404); //order
+        if(ac)
+            av = new KKSAttrView(*ac);
+        else
+            av = new KKSAttrView();
+        sortModel->addAttrView(av);
+        av->release();
+
+        ac = acList.value(405); //directives
+        if(ac)
+            av = new KKSAttrView(*ac);
+        else
+            av = new KKSAttrView();
+        sortModel->addAttrView(av);
+        av->release();
+    }
+
+    int sortCol = tv->header()->sortIndicatorSection ();
+    Qt::SortOrder sOrder = tv->header()->sortIndicatorOrder ();
+    sortModel->sort (sortCol, sOrder);
 
     QHeaderView * header = tv->header();
     int lIndex = header->logicalIndex(0);
@@ -1469,7 +1643,7 @@ KKSRecWidget * KKSViewFactory :: createAttrAttrsView (const KKSAttribute *a,
     return recWidget;
 }
 
-/* Метод осуществляет обновление модели атрибутов.
+/* Метод осуществляет обновление модели атрибутов в категории.
  * Параметры:
  * cat --категория
  * model -- целевая модель.
@@ -1482,7 +1656,7 @@ void KKSViewFactory :: updateAttrModel (const KKSCategory *cat, QAbstractItemMod
     KKSMap<int, KKSCategoryAttr *> attrs = cat->attributes();
     int na = attrs.size();
     int nCol = model->columnCount ();
-    if (nCol < 4)
+    if (nCol < 6)
         return;
     bool isOk = true;
     if (n < na)
@@ -1498,21 +1672,38 @@ void KKSViewFactory :: updateAttrModel (const KKSCategory *cat, QAbstractItemMod
     for (p=attrs.constBegin(); p != attrs.constEnd(); p++)
     {
         QModelIndex wIndex = model->index (i, 0);
+        
         if (!wIndex.isValid())
             continue;
+        
         model->setData (wIndex, p.key(), Qt::UserRole);
         if (!p.value())
             continue;
+
         p.value()->addRef ();
+
+        //QVariant v = QVariant::fromValue<KKSCategoryAttr*>(p.value());
+        //model->setData(wIndex, v, Qt::UserData+3); //сам атрибут
+
         QString ctitle (p.value()->title());
-        qDebug () << __PRETTY_FUNCTION__ << p.value()->id() << wIndex;
+
         model->setData (wIndex, ctitle, Qt::DisplayRole);
+
         wIndex = model->index (i, 1);
         model->setData (wIndex, p.value()->defValue().valueVariant(), Qt::DisplayRole);
+
         wIndex = model->index (i, 2);
         model->setData (wIndex, (p.value()->isMandatory() ? QObject::tr("Yes") : QObject::tr("No")), Qt::DisplayRole);
+
         wIndex = model->index (i, 3);
         model->setData (wIndex, (p.value()->isReadOnly() ? QObject::tr("Yes") : QObject::tr("No")), Qt::DisplayRole);
+
+        wIndex = model->index (i, 4);
+        model->setData (wIndex, QString::number(p.value()->order()), Qt::DisplayRole);
+
+        wIndex = model->index (i, 5);
+        model->setData (wIndex, p.value()->directives(), Qt::DisplayRole);
+
         p.value()->release ();
         i++;
     }
@@ -1532,7 +1723,7 @@ void KKSViewFactory :: updateAttrAttrsModel (const KKSAttribute *a, QAbstractIte
     KKSMap<int, KKSCategoryAttr *> attrs = a->attrs();
     
     int nCol = model->columnCount ();
-    if (nCol < 4)
+    if (nCol < 6)
         return;
     
     bool isOk = true;
@@ -1569,6 +1760,12 @@ void KKSViewFactory :: updateAttrAttrsModel (const KKSAttribute *a, QAbstractIte
         wIndex = model->index (i, 3);
         model->setData (wIndex, (p.value()->isReadOnly() ? QObject::tr("Yes") : QObject::tr("No")), Qt::DisplayRole);
         
+        wIndex = model->index (i, 4);
+        model->setData (wIndex, QString::number(p.value()->order()), Qt::DisplayRole);
+
+        wIndex = model->index (i, 5);
+        model->setData (wIndex, p.value()->directives(), Qt::DisplayRole);
+
         p.value()->release ();
         
         i++;
@@ -1928,7 +2125,7 @@ KKSAttributesEditor * KKSViewFactory :: createAvailAttrView (const KKSMap<int, K
  * t -- шаблон
  * tModel -- модель
  */
-void KKSViewFactory :: initTemplateGroups (KKSTemplate *t, QAbstractItemModel *tModel)
+void KKSViewFactory :: initTemplateGroups (KKSTemplate *t, QAbstractItemModel *tModel, QTreeView * tv)
 {
     if (!tModel || (tModel->columnCount () == 0 && !tModel->insertColumns (0, 1)))
         return;
@@ -1937,16 +2134,16 @@ void KKSViewFactory :: initTemplateGroups (KKSTemplate *t, QAbstractItemModel *t
     tModel->removeRows (0, tModel->rowCount());
     if (tModel->columnCount () > 3)
         tModel->removeColumns (0, tModel->columnCount()-3);
-    qDebug () << __PRETTY_FUNCTION__ << tGroups.count();
+    
     if (!tModel->insertRows (0, tGroups.count()))
         return;
 
-    KKSMap<int, KKSAttrGroup *>::const_iterator pg = tGroups.constBegin();
-    int i=0;
-    for (; pg != tGroups.constEnd(); pg++)
+
+    QList<KKSAttrGroup*> sortedGroups = tGroups.values();
+    qSort (sortedGroups.begin(), sortedGroups.end(), compareAttrGroups);
+    for (int i=0; i<sortedGroups.count(); i++)
     {
-        insertTemplateGroup (pg.value(), QModelIndex(), i, tModel);
-        i++;
+        insertTemplateGroup (sortedGroups[i], QModelIndex(), i, tModel, tv);
     }
 }
 
@@ -1954,12 +2151,11 @@ void KKSViewFactory :: initTemplateGroups (KKSTemplate *t, QAbstractItemModel *t
  * Параметры:
  * tAGroup -- группа атрибутов
  * parent -- родительский индекс
- * ind -- приоритет группы
+ * ind -- приоритет группы (добавляем в конец списка - соответственно здесь должен быть номер строки, где будет располагаться запись)
  * tModel -- модель шаблона
  */
-void KKSViewFactory :: insertTemplateGroup (KKSAttrGroup *tAGroup, const QModelIndex& parent, int ind, QAbstractItemModel *tModel)
+void KKSViewFactory :: insertTemplateGroup (KKSAttrGroup *tAGroup, const QModelIndex& parent, int ind, QAbstractItemModel *tModel, QTreeView * tv)
 {
-    qDebug () << __PRETTY_FUNCTION__ << ind << tAGroup->order() << tAGroup->id();
     if (!tModel || !tAGroup || (!parent.isValid() && tAGroup->order()-ind > 1) )
         return;
 
@@ -1968,15 +2164,18 @@ void KKSViewFactory :: insertTemplateGroup (KKSAttrGroup *tAGroup, const QModelI
         tModel->insertRows (nR, ind-nR+1, parent);
 
     QModelIndex wIndex = tModel->index (ind, 0, parent);
-    qDebug () << __PRETTY_FUNCTION__ << wIndex;
     if (!wIndex.isValid())
         return;
 
     tModel->setData (wIndex, tAGroup->name(), Qt::DisplayRole);
     tModel->setData (wIndex, tAGroup->id(), Qt::UserRole);
     tModel->setData (wIndex, 1, Qt::UserRole+USER_ENTITY);
+
     KKSMap<int, KKSAttrView *>::const_iterator p = tAGroup->attrViews().constBegin ();
-    if ((tModel->columnCount (wIndex) < 3 && !tModel->insertColumns (0, 3, wIndex)) || (tModel->rowCount (wIndex) < tAGroup->attrViews ().size() && !tModel->insertRows (0, tAGroup->attrViews ().size(), wIndex)))
+    if ((tModel->columnCount (wIndex) < 3 && 
+         !tModel->insertColumns (0, 3, wIndex)) || 
+         (tModel->rowCount (wIndex) < tAGroup->attrViews ().size() && 
+         !tModel->insertRows (0, tAGroup->attrViews ().size(), wIndex)))
         return;
 
     KKSList < KKSAttrView *>  avList;
@@ -2001,9 +2200,12 @@ void KKSViewFactory :: insertTemplateGroup (KKSAttrGroup *tAGroup, const QModelI
     const KKSList<KKSAttrGroup *> childGroups = tAGroup->sortedChildGroups ();
     for (int i=0; i<childGroups.count(); i++)
     {
-        qDebug () << __PRETTY_FUNCTION__ << i << childGroups[i]->id() << wIndex;
-        insertTemplateGroup (childGroups[i], wIndex, avList.count()+i, tModel);
+        insertTemplateGroup (childGroups[i], wIndex, avList.count()+i, tModel, tv);
     }
+
+    if(tAGroup->isExpanded())
+        if(tv)
+            tv->setExpanded(wIndex, true);
 }
 
 /* Метод обновляет группу атрибутов шаблона в модели.

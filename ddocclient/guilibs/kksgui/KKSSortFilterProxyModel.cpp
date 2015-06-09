@@ -49,6 +49,12 @@ bool KKSSortFilterProxyModel :: filterAcceptsRow (int source_row, const QModelIn
 
 bool KKSSortFilterProxyModel :: lessThan (const QModelIndex & left, const QModelIndex & right) const
 {
+    //if(!left.isValid() && right.isValid())
+    //    return false;
+
+    //if(!right.isValid())
+    //    return true;
+
     int leftDataEn = this->sourceModel()->data (left, Qt::UserRole+USER_ENTITY).toInt();
     int rightDataEn = this->sourceModel()->data (right, Qt::UserRole+USER_ENTITY).toInt();
     if (leftDataEn != rightDataEn)
@@ -59,13 +65,29 @@ bool KKSSortFilterProxyModel :: lessThan (const QModelIndex & left, const QModel
     KKSMap<int, KKSAttrView*>::const_iterator p = attrViews.constBegin() + left.column();
     if (p == attrViews.constEnd() || !p.value())
         return leftData.toString() < rightData.toString();
-    switch (p.value()->type()->attrType())
+    
+    KKSAttrType* t = 0;
+    t = p.value()->type();
+    if(!t)
+        return leftData.toString() < rightData.toString();
+    
+    switch (t->attrType())
     {
-        case KKSAttrType::atString: return leftData.toString() < rightData.toString();
-        case KKSAttrType::atInt: return leftData.toInt() < rightData.toInt();
-        case KKSAttrType::atInt64: return leftData.toLongLong() < rightData.toLongLong();
-        case KKSAttrType::atDouble: return leftData.toDouble() < rightData.toDouble();
-        case KKSAttrType::atBool: return leftData.toBool() < rightData.toBool();
+        case KKSAttrType::atString: 
+            return leftData.toString() < rightData.toString();
+            break;
+        case KKSAttrType::atInt: 
+            return leftData.toInt() < rightData.toInt();
+            break;
+        case KKSAttrType::atInt64: 
+            return leftData.toLongLong() < rightData.toLongLong();
+            break;
+        case KKSAttrType::atDouble: 
+            return leftData.toDouble() < rightData.toDouble();
+            break;
+        case KKSAttrType::atBool: 
+            return leftData.toBool() < rightData.toBool();
+            break;
         case KKSAttrType::atDate: 
                                  {
                                       if (leftData.toString().isEmpty())
@@ -96,7 +118,9 @@ bool KKSSortFilterProxyModel :: lessThan (const QModelIndex & left, const QModel
                                               return QDateTime::fromString (leftData.toString(), QString("dd.MM.yyyy H:mm:ss.zzz")) < QDateTime::fromString (rightData.toString(),  QString("dd.MM.yyyy H:mm:ss.zzz"));
                                      }
                                      break;
-        default: return leftData.toString() < rightData.toString();
+        default: 
+            return leftData.toString() < rightData.toString();
     }
+
     return leftData.toString() < rightData.toString();
 }

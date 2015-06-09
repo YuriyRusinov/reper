@@ -227,8 +227,10 @@ void KKSFiltersEditorForm :: initFilterTypes (KKSAttrType::KKSAttrTypes type)
 
     if (type == KKSAttrType::atDate ||
         type == KKSAttrType::atDateTime ||
+        type == KKSAttrType::atDateTimeEx ||
         type == KKSAttrType::atDouble ||
         type == KKSAttrType::atInt ||
+        type == KKSAttrType::atInt64 ||
         type == KKSAttrType::atString ||
         type == KKSAttrType::atInterval ||
         type == KKSAttrType::atIntervalH ||
@@ -291,6 +293,18 @@ void KKSFiltersEditorForm :: initFilterTypes (KKSAttrType::KKSAttrTypes type)
         data = QVariant ((int)KKSFilter::foNotIn);
         cbOper->addItem (oper, data);
         cbOper->setItemData(cbOper->count()-1, "not in", Qt::UserRole+1);
+    }
+
+    if (type == KKSAttrType::atCheckList ||
+        type == KKSAttrType::atCheckListEx ||
+        type == KKSAttrType::atList || 
+        type == KKSAttrType::atSysChildCategoryRef || 
+        type == KKSAttrType::atParent)
+    {
+        oper = tr("In SQL");//tr ("Contains");
+        data = QVariant ((int)KKSFilter::foInSQL);
+        cbOper->addItem (oper, data);
+        cbOper->setItemData(cbOper->count()-1, "in select", Qt::UserRole+1);
     }
 
     oper = tr("Is null (NULL)");
@@ -1249,6 +1263,7 @@ void KKSFiltersEditorForm :: attrChanged (int index)
         case KKSAttrType::atInterval: stLayValue->setCurrentIndex (7); break;
         case KKSAttrType::atList: 
         case KKSAttrType::atParent: 
+        case KKSAttrType::atSysChildCategoryRef: 
         case KKSAttrType::atCheckList: 
         case KKSAttrType::atCheckListEx: 
                                   {
@@ -1266,11 +1281,11 @@ void KKSFiltersEditorForm :: attrChanged (int index)
                                               tableName = m_parentTable;
                                       }
                                       if (!checkRefModel)
-                                          checkRefModel = (idAttrType == KKSAttrType::atList || idAttrType == KKSAttrType::atParent) ? new QStandardItemModel (0, 1) : new KKSCheckableModel (0, 1);
+                                          checkRefModel = (idAttrType == KKSAttrType::atList || idAttrType == KKSAttrType::atParent || idAttrType == KKSAttrType::atSysChildCategoryRef) ? new QStandardItemModel (0, 1) : new KKSCheckableModel (0, 1);
                                       else
                                       {
                                           QAbstractItemModel * oldModel = checkRefModel;
-                                          checkRefModel = (idAttrType == KKSAttrType::atList || idAttrType == KKSAttrType::atParent) ? new QStandardItemModel (0, 1) : new KKSCheckableModel (0, 1);
+                                          checkRefModel = (idAttrType == KKSAttrType::atList || idAttrType == KKSAttrType::atParent || idAttrType == KKSAttrType::atSysChildCategoryRef) ? new QStandardItemModel (0, 1) : new KKSCheckableModel (0, 1);
                                           delete oldModel;
                                       }
                                       sortRefModel->setSourceModel (checkRefModel);

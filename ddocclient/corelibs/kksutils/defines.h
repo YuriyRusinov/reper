@@ -29,6 +29,19 @@ const int IO_TABLE_CATEGORY_ID = 13;
 #define CAT_CATEGORY_ID 12
 #define CAT_TABLE_CATEGORY_ID 11
 
+
+//
+//задает идентификатор системной категории, которая описывает таблицу с атрибутами в категории
+//
+#define ATTRS_CAT_CATEGORY_ID 186
+#define ATTRS_CAT_TABLE_CATEGORY_ID 185
+
+//
+//задает идентификатор системной категории, которая описывает таблицу с атрибутами в атрибутах
+//
+#define ATTRS_ATTR_CATEGORY_ID 190
+#define ATTRS_ATTR_TABLE_CATEGORY_ID 189
+
 //
 // задают идентификаторы типов системных категорий
 //
@@ -209,7 +222,9 @@ const int ATTR_RECORD_TEXT_COLOR = 207;
 #define ATTR_ID_HISTOGRAM_PARAMS_CHAINS 361
 const int ATTR_R_ICON = 312;
 const int ATTR_UUID_T = 348;
+const int ATTR_ID_TABLE_CATEGORY = 402;
 const int ATTR_RR_NAME = 378;
+const int ATTR_ITEM_IS_LEAF = 403;
 
 
 
