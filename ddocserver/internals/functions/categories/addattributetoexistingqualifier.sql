@@ -1,5 +1,38 @@
 /*
-select * from eio_table_438
+
+begin;
+
+select * from ioupdateattr_new(740,1071,'1~~~''1''',NULL,NULL,NULL,NULL,NULL) as result
+
+
+select * from io_objects where id = 391
+select * from io_categories where id = 367
+select * from attributes where id in (select id_io_attribute from attrs_categories where id_io_category = 366)
+select dropAttributeFromExistingQualifier(id, 391, false) from attributes where id in (1151, 1152, 1155, 1157)
+select addAttributeToExistingQualifier(id, 391, false, false, NULL, false) from attributes where id in (1360, 1093, 1092, 1402);
+
+
+select * from attributes where name in ('Адрес целиком', 'Номер дома', 'Корпус', 'Строение');
+select * from io_objects where id_io_category = 367
+select * from attributes where id = 1148
+
+select cUpdateAttr(366, 1148, NULL, true, false)
+alter table tbl_eio_table_391 add column item_is_leaf int4
+
+select * from attrs_categories
+select * from createTempTables();
+select setCurrentDl(4);
+select * from ioaddtorubric(613,46,'NULL');
+select f_enable_triggers('attributes', true, NULL);
+select * from ioinsert('Новый документ',305,1,1,NULL,NULL,'Администратор системы',1,NULL,1,1,'1',NULL,NULL,NULL,NULL,1);
+rollback;
+
+update attributes set code = 'm_has' where id = 1018
+select * from attrs_categories where id_io_category = 304
+select * from attributes where id in (select id_io_attribute from attrs_categories where id_io_category = 304)
+
+select * from eio_table_391
+update eio_table_391 set item_is_leaf = 1
 select * from io_objects where id = 438
 
 --select * from io_categories where id = 427
@@ -13,9 +46,9 @@ alter table tbl_eio_table_438 alter column dt set not null;
 alter table tbl_eio_table_438 alter column dt set default current_timestamp;
 
 
-drop view eio_table_438 cascade;
-alter table tbl_eio_table_438 rename to eio_table_438 ;
-select acl_secureTable('eio_table_438');
+drop view eio_table_391 cascade;
+alter table tbl_eio_table_391 rename to eio_table_391 ;
+select acl_secureTable('eio_table_391');
 
 select * from eio_table_438
 
@@ -118,14 +151,14 @@ select createTempTables();
 select setCurrentDl(4);
 select ioChangeCategory(539, 559);
 
-select * from io_objects where id in (547, 560)
+select * from io_objects where id in (547, 560, 562)
 select * from io_categories order by idwhere id = 566
 select * from attrs_categories where id_io_category = 565
 select * from tbl_eio_table_547
 select * from eio_table_547
 select * from tbl_eio_table_560
-select * from eio_table_560
-
+select * from eio_table_562
+select * from attributes where code = 'date_date_date'
 --1054 - дробное
 --1053 - дата
 -- 1052 - булево
@@ -134,7 +167,7 @@ select addAttributeToExistingQualifier(1054, 560, false, false, NULL, true)
 
 select cDeleteCategory(587)
 
-
+select * from attrs_categories where id_io_attribute = 1387
 
     select count(ac_to.*) 
     select ac_to.*
@@ -143,7 +176,7 @@ select cDeleteCategory(587)
         ac_to.id_io_category = 590 and ac_to.id_io_attribute not in (select ac_from.id_io_attribute from attrs_categories ac_from where ac_from.id_io_category = 566);
 
 
-select renameAttributeInExistingQualifier(1053, 560, 'date_date_date', true);
+select renameAttributeInExistingQualifier(1387, 562, 'date_date_date1', true);
 
 */
 
@@ -256,8 +289,7 @@ begin
 
     --внутри ф-и addAttrToTable вызывается ф-я acl_secureTable(). Соответственно, нельзя данный блок поставить после вызова addAttrToTable()
     perform f_enable_triggers('attrs_categories', false, ARRAY['trgsetuid']);
-    insert into attrs_categories (id_io_category, id_io_attribute, name, is_mandatory, is_read_only, def_value, "order", directives) 
-    values (idChildCategory, idAttribute, attrName, isMandatory, isReadOnly, defValue, 0, NULL);
+    insert into attrs_categories (id_io_category, id_io_attribute, name, is_mandatory, is_read_only, def_value) values (idChildCategory, idAttribute, attrName, isMandatory, isReadOnly, defValue);
     perform f_enable_triggers('attrs_categories', true, ARRAY['trgsetuid']);
 
     for r in 
@@ -811,8 +843,8 @@ begin
 
 
             perform f_enable_triggers('attrs_categories', false, ARRAY['trgsetuid']);
-            insert into attrs_categories (id_io_category, id_io_attribute, name, is_mandatory, is_read_only, def_value, "order", directives) 
-                select idChildCategory, idAttributeNew, ac.name, ac.is_mandatory, ac.is_read_only, ac.def_value, ac."order", ac.directives 
+            insert into attrs_categories (id_io_category, id_io_attribute, name, is_mandatory, is_read_only, def_value) 
+                select idChildCategory, idAttributeNew, ac.name, ac.is_mandatory, ac.is_read_only, ac.def_value 
                 from attrs_categories ac where id_io_attribute = idAttribute and id_io_category = idChildCategory;
             perform f_enable_triggers('attrs_categories', true, ARRAY['trgsetuid']);
 

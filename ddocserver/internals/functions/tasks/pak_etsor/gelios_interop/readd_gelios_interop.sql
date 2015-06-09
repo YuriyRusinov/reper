@@ -1,7 +1,5 @@
 
 \i ./functions/tasks/pak_etsor/gelios_interop/getadditionalinfo.sql
-\i ./functions/tasks/pak_etsor/gelios_interop/getaddresslastid.sql
-\i ./functions/tasks/pak_etsor/gelios_interop/getaddressstruct.sql
 
 --should be before getincidentcard
 \i ./functions/tasks/pak_etsor/gelios_interop/getmessagecard.sql

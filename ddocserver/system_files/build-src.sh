@@ -201,7 +201,7 @@ if [ $SERVICE_STARTED = 0 ]; then
     exit 1
 fi
 
-sleep 5 &&
+sleep 10 &&
 
 $PG_PREFIX/bin/psql -U postgres -p $PORT -c "create role $USER with superuser createdb createrole login password '$PASSWORD'" -d template1
 

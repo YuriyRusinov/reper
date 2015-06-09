@@ -67,7 +67,7 @@ begin
             query := query || 'NULL';
         end if;
 
-        query := query || ' where ' || 'id_io_object = ' || idObject || ' and id_attr_category = ' ||idCatAttr ||'; update io_objects set last_update = CURRENT_TIMESTAMP where id = '|| idObject ||';';
+        query := query || ' where ' || 'id_io_object = ' || idObject || ' and id_attr_category = ' ||idCatAttr ||'; update io_objects set last_update = clock_timestamp() where id = '|| idObject ||';';
         raise warning 'query is %', query;
         execute query;
     else

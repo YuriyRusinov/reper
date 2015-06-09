@@ -10,14 +10,27 @@ create type h_eio_get_indicators as(
                                   attr_code varchar,  --при информационном обмене (в ф-и ioGetObjectAttrsEx() в качестве значения данного поля используется unique_id)
                                   id_attr_type int4,
                                   id_attr_category int4,
-                                  id_attr_value int4, 
+                                  id_attr_value int8, 
                                   start_time timestamp,
                                   stop_time timestamp,
                                   insert_time timestamp,
                                   id_io_object_src int4,
                                   id_io_object_src1 int4,
                                   is_actual boolean,
-                                  description varchar);
+                                  description varchar,
+                                  attr_name varchar,
+                                  attr_order int4,
+                                  attr_directives varchar,
+                                  attr_def_value varchar,
+                                  attr_is_mandatory bool,
+                                  attr_is_read_only bool,
+                                  attr_def_width int4,
+                                  id_a_view int4,
+                                  a_type_code varchar,
+                                  a_type_name varchar,
+                                  attr_title varchar,
+                                  displayed_value varchar
+                                  );
 */
 
 create or replace function getRecAttrValueHistory(int8, timestamp, timestamp) returns setof h_eio_get_indicators as
@@ -72,9 +85,24 @@ begin
             av.id_io_object_src,
             av.id_io_object_src1,
             av.is_actual,
-            av.description
+            av.description,
+            a.name,
+            ac."order",
+            ac.directives,
+            ac.def_value,
+            ac.is_mandatory,
+            ac.is_read_only,
+            a.def_width,
+            att.id_a_view,
+            att.code as a_type_code,
+            att.name as a_type_name,
+            a.title,
+            ioGetAttrValueEx(av.value, a.id_a_type, a.table_name, idRecord, a.column_name) as displayed_value
         from 
-            (f_sel_rec_attrs_values(idRecord::int8) av inner join attrs_categories ac on (av.id_attr_category = ac.id) inner join attributes a on (ac.id_io_attribute=a.id and av.id_record = idRecord))
+            f_sel_rec_attrs_values(idRecord::int8) av 
+            inner join attrs_categories ac on (av.id_attr_category = ac.id) 
+            inner join attributes a on (ac.id_io_attribute=a.id and av.id_record = idRecord)
+            inner join a_types att on (a.id_a_type = att.id)
         where 
             av.start_time >= iStartTime 
             and (av.stop_time isnull or av.stop_time <= iStopTime)

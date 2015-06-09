@@ -7,6 +7,10 @@ declare
     idType bigint;
     isCatKind int4;
     cnt bigint;
+    r record;
+    rr record;
+    q varchar;
+    attrCode varchar;
 begin
 
     idCategory := new.id_io_category;
@@ -33,6 +37,24 @@ begin
 
     end if;
 
+    if(TG_OP = 'UPDATE') then
+        if(new.is_mandatory = old.is_mandatory or (new.is_mandatory = false and old.is_mandatory = true)) then
+            return new; --nothing to check
+        end if;
+    end if;
+
+    if(TG_OP = 'INSERT') then
+        if(new.is_mandatory = false) then
+            return new; --nothing to check
+        end if;
+    end if;
+
+    if(new.def_value is not null) then
+        return new; --nothing to check
+    end if;
+
+    --in all other cases new.is_mandatory = true and/or its value was changed from false and new.def_value isnull
+
     if (isCatKind = 1) then
         --
         -- insert or update attribute in table category
@@ -43,16 +65,29 @@ begin
             -- IOs with tables for this category do not exist
             --
             return new;
-        elsif (cnt > 0 and new.is_mandatory and new.def_value is null ) then
-            raise exception 'Insert mandatory attribute with null default values into category % with existing objects.', idMainCategory;
-            return null;
-        elsif (cnt > 0 and (not new.is_mandatory) or (new.is_mandatory and new.def_value is not null)) then
-            raise warning 'Insert nonmandatory attribute or mandatory attribute with default value ';
-            --
-            -- TODO: mechanism of existing tables update has to be developped.
-            --
-            return null;
+
+        elsif (cnt > 0) then
+            select code into attrCode from attributes where id = new.id_io_attribute;
+            if(attrCode isnull) then
+                raise exception 'Incorrect attribute added to attrs_categories table!';
+                return null;
+            end if;
+
+            for r in select table_name from io_objects where id_io_category = idMainCategory and table_name is not null
+            loop
+                q = 'select count(id) as cnt from ' || r.table_name || ' where "' || attrCode || '" isnull';
+                for rr in execute q
+                loop
+                    if(rr.cnt > 0) then
+                        raise exception 'Cannot change is_mandatory flag';
+                        return null;
+                    end if;
+                end loop;
+            end loop;
+
+            return new;
         end if;
+
     elsif (isCatKind = 0 or isCatKind = 2) then
         --
         -- insert attribute into category or rec_attrs_category
@@ -63,13 +98,7 @@ begin
             -- syncronization did not make
             --
             return new;
-        elsif (cnt > 0 and (not new.is_mandatory) or (new.is_mandatory and new.def_value is not null)) then
-            raise warning 'Insert nonmandatory attribute or mandatory attribute with default value ';
-            --
-            -- TODO: mechanism of existing IOs update has to be developped.
-            --
-            return null;
-        elsif (cnt > 0 and new.is_mandatory and new.def_value is null) then
+        elsif (cnt > 0) then
             raise exception 'Insert indicator into category with syncronized objects.';
             return null;
         end if;

@@ -41,9 +41,8 @@ begin
                             record_fill_color = recordFillColor,
                             record_text_color = recordTextColor,
                             r_icon = rIcon,
-                            last_update = CURRENT_TIMESTAMP
+                            last_update = clock_timestamp()
     where id=idObject;
-
 
     return idObject;
 

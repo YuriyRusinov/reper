@@ -37,6 +37,11 @@ begin
         new.uuid_t = generateUUID();
     end if;
 
+    if(new.last_update isnull) then
+        new.last_update = clock_timestamp();
+    end if;
+
+
     if(new.is_global = true) then
         select is_global into isGlobal from io_categories where id = new.id_io_category;
         if(isGlobal isnull or isGlobal = false) then

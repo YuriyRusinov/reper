@@ -14,7 +14,21 @@ create type h_eio_get_indicators as(
                                   id_io_object_src int4,
                                   id_io_object_src1 int4,
                                   is_actual boolean,
-                                  description varchar);
+                                  description varchar,
+                                  attr_name varchar,
+                                  attr_order int4,
+                                  attr_directives varchar,
+                                  attr_def_value varchar,
+                                  attr_is_mandatory bool,
+                                  attr_is_read_only bool,
+                                  attr_def_width int4,
+                                  id_a_view int4,
+                                  a_type_code varchar,
+                                  a_type_name varchar,
+                                  attr_title varchar,
+                                  displayed_value varchar
+                                  );
+
 
 create or replace function eioGetIndicators(int8, bool, timestamp, timestamp) returns setof h_eio_get_indicators as
 $BODY$
@@ -65,9 +79,24 @@ begin
             rav.id_io_object_src,
             rav.id_io_object_src1,
             rav.is_actual,
-            rav.description
+            rav.description,
+            a.name,
+            ac."order",
+            ac.directives,
+            ac.def_value,
+            ac.is_mandatory,
+            ac.is_read_only,
+            a.def_width,
+            att.id_a_view,
+            att.code as a_type_code,
+            att.name as a_type_name,
+            a.title,
+            ioGetAttrValueEx(rav.value, a.id_a_type, a.table_name, idRec, a.column_name) as displayed_value
         from 
-            ( f_sel_rec_attrs_values(idRec) rav inner join attrs_categories ac on (rav.id_attr_category = ac.id) inner join attributes a on (ac.id_io_attribute=a.id and rav.id_record = idRec))
+            f_sel_rec_attrs_values(idRec) rav 
+            inner join attrs_categories ac on (rav.id_attr_category = ac.id) 
+            inner join attributes a on (ac.id_io_attribute=a.id and rav.id_record = idRec)
+            inner join a_types att on (a.id_a_type = att.id)
             --( rec_attrs_values rav inner join attrs_categories ac on (rav.id_attr_category = ac.id) inner join attributes a on (ac.id_io_attribute=a.id and rav.id_record = idRec))
         where 
             case when isActual = true then rav.is_actual = true else (rav.start_time >= iStartTime and rav.stop_time <= iStopTime) end
@@ -105,9 +134,25 @@ begin
             rav.id_io_object_src,
             rav.id_io_object_src1,
             rav.is_actual,
-            rav.description
+            rav.description,
+            a.name,
+            ac."order",
+            ac.directives,
+            ac.def_value,
+            ac.is_mandatory,
+            ac.is_read_only,
+            a.def_width,
+            att.id_a_view,
+            att.code as a_type_code,
+            att.name as a_type_name,
+            a.title,
+            ioGetAttrValueEx(rav.value, a.id_a_type, a.table_name, idRecord, a.column_name) as displayed_value
         from 
-            (f_sel_rec_attrs_values(idRecord) rav inner join attrs_categories ac on (rav.id_attr_category = ac.id) inner join attributes a on (ac.id_io_attribute=a.id and rav.id_record = idRecord))
+            f_sel_rec_attrs_values(idRecord) rav 
+            inner join attrs_categories ac on (rav.id_attr_category = ac.id) 
+            inner join attributes a on (ac.id_io_attribute=a.id and rav.id_record = idRecord)
+            inner join a_types att on (a.id_a_type = att.id)
+
         where 
             rav.is_actual = true 
     loop

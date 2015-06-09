@@ -71,6 +71,7 @@ begin
 	    and aa.id_attr_child = a.id 
 	    and a.id_a_type = att.id
             and a.id_attr_group = ag.id
+        order by aa.order
     loop
         if(r.column_name is not null) then
             for rr in 

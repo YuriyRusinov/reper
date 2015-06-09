@@ -17,7 +17,17 @@ create type h_get_object_attrs as(
                                   description varchar,
                                   attr_name varchar,
                                   attr_order int4,
-                                  attr_directives varchar);
+                                  attr_directives varchar,
+                                  attr_def_value varchar,
+                                  attr_is_mandatory bool,
+                                  attr_is_read_only bool,
+                                  attr_def_width int4,
+                                  id_a_view int4,
+                                  a_type_code varchar,
+                                  a_type_name varchar,
+                                  attr_title varchar,
+                                  displayed_value varchar
+                                  );
 
 create or replace function ioGetObjectAttrs(int4, bool, timestamp, timestamp) returns setof h_get_object_attrs as
 $BODY$
@@ -71,9 +81,21 @@ begin
             av.description,
             a.name,
             ac."order",
-            ac.directives
+            ac.directives,
+            ac.def_value,
+            ac.is_mandatory,
+            ac.is_read_only,
+            a.def_width,
+            att.id_a_view,
+            att.code as a_type_code,
+            att.name as a_type_name,
+            a.title,
+            ioGetAttrValueEx(av.value, a.id_a_type, a.table_name, idObject, a.column_name) as displayed_value
         from 
-            (f_sel_attrs_values(idObject) av inner join attrs_categories ac on (av.id_attr_category = ac.id) inner join attributes a on (ac.id_io_attribute=a.id and av.id_io_object = idObject))
+            f_sel_attrs_values(idObject) av 
+            inner join attrs_categories ac on (av.id_attr_category = ac.id) 
+            inner join attributes a on (ac.id_io_attribute=a.id and av.id_io_object = idObject)
+            inner join a_types att on (a.id_a_type = att.id)
         where 
             case when isActual = true then av.is_actual = true else (av.start_time >= iStartTime and av.stop_time <= iStopTime) end
     loop
@@ -112,9 +134,21 @@ begin
             av.description,
             a.name,
             ac."order",
-            ac.directives
+            ac.directives,
+            ac.def_value,
+            ac.is_mandatory,
+            ac.is_read_only,
+            a.def_width,
+            att.id_a_view,
+            att.code as a_type_code,
+            att.name as a_type_name,
+            a.title,
+            ioGetAttrValueEx(av.value, a.id_a_type, a.table_name, idObject, a.column_name) as displayed_value
         from 
-            (f_sel_attrs_values(idObject) av inner join attrs_categories ac on (av.id_attr_category = ac.id) inner join attributes a on (ac.id_io_attribute=a.id and av.id_io_object = idObject))
+            f_sel_attrs_values(idObject) av 
+            inner join attrs_categories ac on (av.id_attr_category = ac.id) 
+            inner join attributes a on (ac.id_io_attribute=a.id and av.id_io_object = idObject)
+            inner join a_types att on (a.id_a_type = att.id)
         where 
             av.is_actual = true 
     loop
@@ -138,7 +172,6 @@ declare
     uniqueArray varchar[];
     r record;
     val varchar;
-    cnt int4;
 
     idAttrAttr int4;
     aValue varchar;
@@ -192,31 +225,19 @@ begin
         uniqueArray = r.a;
     end loop;
 
-    cnt := array_upper(uniqueArray, 1);
+    q = 'select array_agg(' || uniqueField || ') as theVal from ' || tableName || ' where id = ANY(' || quote_literal(uniqueArray) || ')';  
 
-    val = '{';
-    for i in 1..cnt
+    for r in execute q
     loop
-
-        q = 'select ' || uniqueField || ' as theVal from ' || tableName || ' where id = ' || uniqueArray[i];  
-
-        for r in execute q
-        loop
-            if(char_length(val) > 1) then
-                val = val || ',';
-            end if;
-
-            val = val || r.theVal;
-        end loop;
-
+        val = r.theVal;
     end loop;
 
-    val = val || '}';
 
     return val;
 end
 $BODY$
 language 'plpgsql';
+
 
 
 create or replace function ioGetObjectAttrsAll(int4) returns setof h_get_object_attrs as
@@ -245,16 +266,27 @@ for r in
         NULL,
         a.name,
         ac.order,
-        ac.directives
+        ac.directives,
+        ac.def_value,
+        ac.is_mandatory,
+        ac.is_read_only,
+        a.def_width,
+        att.id_a_view,
+        att.code as a_type_code,
+        att.name as a_type_name,
+        a.title,
+        NULL
     from
         f_sel_io_objects(idObject) io,
         attrs_categories ac,
-        attributes a
+        attributes a,
+        a_types att
     where 
         io.id_io_category = ac.id_io_category
         and ac.id_io_attribute = a.id
         and io.id = idObject
         and a.id not in(select ac.id_io_attribute from attrs_categories ac, f_sel_attrs_values(idObject) av where av.id_io_object = io.id and av.id_attr_category = ac.id)
+        and a.id_a_type = att.id
 
     union
 
@@ -276,19 +308,32 @@ for r in
         av.description,
         a.name,
         ac.order,
-        ac.directives
+        ac.directives,
+        ac.def_value,
+        ac.is_mandatory,
+        ac.is_read_only,
+        a.def_width,
+        att.id_a_view,
+        att.code as a_type_code,
+        att.name as a_type_name,
+        a.title,
+        ioGetAttrValueEx(av.value, a.id_a_type, a.table_name, idObject, a.column_name) as displayed_value
     from
         f_sel_io_objects(idObject) io,
         attributes a,
         attrs_categories ac,
-        f_sel_attrs_values(idObject) av
+        f_sel_attrs_values(idObject) av,
+        a_types att
     where 
         io.id_io_category = ac.id_io_category
         and ac.id_io_attribute = a.id
         and io.id = idObject
         and av.id_io_object = io.id
         and ac.id = av.id_attr_category
-        and is_actual = true
+        and av.is_actual = true
+        and a.id_a_type = att.id
+
+    order by 17
 loop
     return next r;
 end loop;

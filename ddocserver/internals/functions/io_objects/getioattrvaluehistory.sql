@@ -20,7 +20,18 @@ create type h_get_object_attrs as(
                                   description varchar,
                                   attr_name varchar,
                                   attr_order int4,
-                                  attr_directives varchar);
+                                  attr_directives varchar,
+                                  attr_def_value varchar,
+                                  attr_is_mandatory bool,
+                                  attr_is_read_only bool,
+                                  attr_def_width int4,
+                                  id_a_view int4,
+                                  a_type_code varchar,
+                                  a_type_name varchar,
+                                  attr_title varchar,
+                                  displayed_value varchar
+                                  );
+
 
 */
 
@@ -79,9 +90,21 @@ begin
             av.description,
             a.name,
             ac."order",
-            ac.directives
+            ac.directives,
+            ac.def_value,
+            ac.is_mandatory,
+            ac.is_read_only,
+            a.def_width,
+            att.id_a_view,
+            att.code as a_type_code,
+            att.name as a_type_name,
+            a.title,
+            ioGetAttrValueEx(av.value, a.id_a_type, a.table_name, idObject::int4, a.column_name) as displayed_value
         from 
-            (f_sel_attrs_values(idObject::int4) av inner join attrs_categories ac on (av.id_attr_category = ac.id) inner join attributes a on (ac.id_io_attribute=a.id and av.id_io_object = idObject))
+            f_sel_attrs_values(idObject::int4) av 
+            inner join attrs_categories ac on (av.id_attr_category = ac.id) 
+            inner join attributes a on (ac.id_io_attribute=a.id and av.id_io_object = idObject)
+            inner join a_types att on (a.id_a_type = att.id)
         where 
             av.start_time >= iStartTime 
             and (av.stop_time isnull or av.stop_time <= iStopTime)
