@@ -135,12 +135,15 @@ KKSCatEditor :: KKSCatEditor (KKSCategory *c,
         connect (recWidget, SIGNAL (entityDoubleClicked()), this, SLOT (editAttribute()) );
     }
 
-    if (recTableW && recTableW->actAdd->isEnabled())
+    if (recTableW)
     {
-        connect (recTableW->actAdd, SIGNAL (triggered()), this, SLOT (addTableAttribute()) );
         connect (recTableW->actEdit, SIGNAL (triggered()), this, SLOT (editTableAttribute()) );
-        connect (recTableW->actDel, SIGNAL (triggered()), this, SLOT (delTableAttribute()) );
         connect (recTableW, SIGNAL (entityDoubleClicked()), this, SLOT (editTableAttribute()) );
+        
+        if(recTableW->actAdd->isEnabled()){
+            connect (recTableW->actAdd, SIGNAL (triggered()), this, SLOT (addTableAttribute()) );
+            connect (recTableW->actDel, SIGNAL (triggered()), this, SLOT (delTableAttribute()) );
+        }
     }
 
     if (recAttrW)
@@ -224,7 +227,10 @@ void KKSCatEditor :: apply (void)
     {
         if(pCategory->tableCategory()->id() <= 0)
         {
-            int resID = QMessageBox::question (this, tr ("Save child category"), tr ("Creation category for table without system attribute ID does not allow. Do you want to add it ?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+            int resID = QMessageBox::question (this, 
+                                               tr ("Save child category"), 
+                                               tr ("Creation category for table without system attributes (ID, UUID_T) does not allow. Do you want to add that ?"), 
+                                               QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
             if (resID != QMessageBox::Yes)
             {
                 isCloseIgnored = true;

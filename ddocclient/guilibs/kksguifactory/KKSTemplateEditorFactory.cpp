@@ -72,11 +72,13 @@ KKSTemplateEditor *KKSTemplateEditorFactory :: createTemplateEditor (KKSTemplate
     if (!tEditor)
         return 0;
 
-    QStandardItemModel *tGroupModel = new QStandardItemModel (0, 3);
+    QStandardItemModel *tGroupModel = new QStandardItemModel (0, 5);
 
     tGroupModel->setHeaderData (0, Qt::Horizontal, tr ("Attribute groups"));
     tGroupModel->setHeaderData (1, Qt::Horizontal, tr ("Default value"));
     tGroupModel->setHeaderData (2, Qt::Horizontal, tr ("Read only"));
+    tGroupModel->setHeaderData (3, Qt::Horizontal, tr ("Mandatory"));
+    tGroupModel->setHeaderData (4, Qt::Horizontal, tr ("Order"));
 
     tEditor->setModel (tGroupModel);
     KKSItemDelegate *itemDeleg = new KKSItemDelegate (tEditor);
@@ -121,9 +123,9 @@ void KKSTemplateEditorFactory :: initTemplateConnections (KKSTemplateEditor *tEd
             SLOT (addAttrToTemplate (int, const QModelIndex&, KKSTemplate *, KKSTemplateEditor *))
             );
 
-    connect (tEditor, SIGNAL (appendAttrIntoGroup (int, int, const QModelIndex&, KKSTemplate *, KKSTemplateEditor *)),
+    connect (tEditor, SIGNAL (appendAttrIntoGroup (int, int, const QModelIndex&, KKSTemplate *, KKSTemplateEditor *, bool)),
             this,
-            SLOT (appendAttrToTemplate (int, int, const QModelIndex&, KKSTemplate *, KKSTemplateEditor *))
+            SLOT (appendAttrToTemplate (int, int, const QModelIndex&, KKSTemplate *, KKSTemplateEditor *, bool))
             );
 /*
     connect (tEditor, SIGNAL (pushAttrIntoGroup (int, int, KKSTemplate *, KKSTemplateEditor *)),
@@ -159,7 +161,6 @@ KKSTemplate * KKSTemplateEditorFactory :: initTemplate (int idTemplate, QString 
     if (!t)
         return 0;
 
-    qDebug () << __PRETTY_FUNCTION__ << t->groups().count();
     if (idTemplate > 0)
         return t;
 
@@ -192,7 +193,6 @@ KKSTemplate * KKSTemplateEditorFactory :: initTemplate (int idTemplate, QString 
 
 void KKSTemplateEditorFactory :: addTemplate (QWidget *ctw, KKSCategory *c, QAbstractItemModel *templMod)
 {
-    //KKSCategory *c = loader->loadCategory (idCat);
     if (!c)
         return;
 
@@ -422,12 +422,12 @@ void KKSTemplateEditorFactory :: editAGroupInTemplate (int idAttrGroup, const QM
     QString tgrName = QInputDialog::getText (tEditor, tr("Set group title"), tr("Name:"), QLineEdit::Normal, tAttrG->name(), &ok);
     if (ok && !tgrName.isEmpty())
         tAttrG->setName (tgrName);
+    
     KKSViewFactory::updateTemplateGroup (tAttrG, gIndex, tGroupsModel);// tAttrG->order(), 
 }
 
 void KKSTemplateEditorFactory :: delAGroupInTemplate (int idAttrGroup, const QModelIndex& gIndex, KKSTemplate *t, KKSTemplateEditor *tEditor)
 {
-     qDebug () << __PRETTY_FUNCTION__ << idAttrGroup;
      if (!t || !tEditor || !tEditor->tvGroups ||  !tEditor->tvGroups->model () /*|| idAttrGroup < 0 || idAttrGroup >= t->groups().count()*/)
         return;
 
@@ -470,7 +470,9 @@ void KKSTemplateEditorFactory :: addAttrToTemplate (int idAttrGroup, const QMode
 void KKSTemplateEditorFactory :: appendAttrToTemplate (int idAttr,
                                                        int idAttrGroup, 
                                                        const QModelIndex& gIndex, 
-                                                       KKSTemplate *t, KKSTemplateEditor *tEditor)
+                                                       KKSTemplate *t, 
+                                                       KKSTemplateEditor *tEditor,
+                                                       bool b_prepend)
 {
     if (!t || !tEditor || !tEditor->tvGroups || !tEditor->tvGroups->model ())
         return;
@@ -480,23 +482,31 @@ void KKSTemplateEditorFactory :: appendAttrToTemplate (int idAttr,
     if (!va)
         return;
 
-    qDebug () << __PRETTY_FUNCTION__ << t->groups().keys() << gIndex << gIndex.parent() << gIndex.data (Qt::UserRole).toInt();
     KKSAttrGroup *gAttr = t->searchGroupById (idAttrGroup);//group (idAttrGroup);
     if (!gAttr)
         return;
 
-    if (gAttr->parent())
-        qDebug () << __PRETTY_FUNCTION__ << gAttr->parent()->id();
-    va->setOrder (gAttr->attrViews().count());
+    KKSList<KKSAttrView*> vList = gAttr->sortedViews();
+    if(vList.count() == 0)
+        va->setOrder (gAttr->attrViews().count());
+    else{
+        if(!b_prepend){
+            int lastOrder = vList.at(vList.count()-1)->order();
+            va->setOrder(lastOrder+1);
+            //va->setOrder (gAttr->attrViews().count());
+        }
+        else{
+            int firstOrder = vList.at(0)->order();
+            va->setOrder(firstOrder-1);
+        }
+    }
 
     gAttr->addAttrView (va->id(), va);
     gAttr->addRef ();
     if (gAttr->parent())
     {
-        qDebug () << __PRETTY_FUNCTION__ << gAttr->parent()->id();
         KKSAttrGroup * gAttrP = gAttr->parent();
         gAttrP->removeChildGroup (idAttrGroup);
-        qDebug () <<  __PRETTY_FUNCTION__ << gAttr->id();
         gAttrP->addChildGroup (idAttrGroup, gAttr);
     }
     else
@@ -504,24 +514,28 @@ void KKSTemplateEditorFactory :: appendAttrToTemplate (int idAttr,
         t->removeGroup (idAttrGroup, true);
         t->addGroup (gAttr);
     }
+
     QAbstractItemModel *tGroupsModel = tEditor->tvGroups->model ();
     int nr = tGroupsModel->rowCount (gIndex);
     int iLastAttr = 0;
-    for (int i=0; i<nr; i++)
-    {
-        QModelIndex wIndex = tGroupsModel->index (i, 0, gIndex);
-        if (wIndex.isValid() && wIndex.data (Qt::UserRole+USER_ENTITY).toInt() == 0)
-            iLastAttr = i;
+    if(!b_prepend){
+        for (int i=0; i<nr; i++)
+        {
+            QModelIndex wIndex = tGroupsModel->index (i, 0, gIndex);
+            if (wIndex.isValid() && wIndex.data (Qt::UserRole+USER_ENTITY).toInt() == 0) //0 - атрибут
+                iLastAttr = i;
+        }
+
+        if (tGroupsModel->rowCount (gIndex) != 0 && tGroupsModel->index (0, 0, gIndex).data (Qt::UserRole+USER_ENTITY).toInt ()==0)
+            iLastAttr++;
     }
-    qDebug () << __PRETTY_FUNCTION__ << iLastAttr;
-    if (tGroupsModel->rowCount (gIndex) != 0 && tGroupsModel->index (0, 0, gIndex).data (Qt::UserRole+USER_ENTITY).toInt ()==0)
-        iLastAttr++;
+
     bool is_inserted = tGroupsModel->insertRows (iLastAttr, 1, gIndex);
     QModelIndex aNewIndex = tGroupsModel->index (iLastAttr, 0, gIndex);
-    qDebug () << __PRETTY_FUNCTION__ << iLastAttr << is_inserted;
     tGroupsModel->setData (aNewIndex, va->title(), Qt::DisplayRole);
     tGroupsModel->setData (aNewIndex, va->id(), Qt::UserRole);
     tGroupsModel->setData (aNewIndex, 0, Qt::UserRole+USER_ENTITY);
+    tGroupsModel->setData (aNewIndex, QIcon(":/ddoc/show_attrs.png"), Qt::DecorationRole);
 
     aNewIndex = aNewIndex.sibling (aNewIndex.row(), 1);
     tGroupsModel->setData (aNewIndex, va->defValue().valueVariant(), Qt::DisplayRole);
@@ -530,7 +544,14 @@ void KKSTemplateEditorFactory :: appendAttrToTemplate (int idAttr,
     aNewIndex = aNewIndex.sibling (aNewIndex.row(), 2);
     tGroupsModel->setData (aNewIndex, va->isReadOnly() ? QObject::tr("Yes") : QObject::tr ("No"), Qt::DisplayRole);
     tGroupsModel->setData (aNewIndex, va->isReadOnly(), Qt::UserRole);
-    //KKSViewFactory::updateTemplateGroup (gAttr, gIndex, iLastAttr, tGroupsModel);
+
+    aNewIndex = aNewIndex.sibling (aNewIndex.row(), 3);
+    tGroupsModel->setData (aNewIndex, va->isMandatory() ? QObject::tr("Yes") : QObject::tr ("No"), Qt::DisplayRole);
+    tGroupsModel->setData (aNewIndex, va->isMandatory(), Qt::UserRole);
+
+    aNewIndex = aNewIndex.sibling (aNewIndex.row(), 4);
+    tGroupsModel->setData (aNewIndex, va->order(), Qt::DisplayRole);
+    tGroupsModel->setData (aNewIndex, va->order(), Qt::UserRole);
 
     if (va)
         va->release ();
@@ -587,14 +608,11 @@ void KKSTemplateEditorFactory :: editAttrInTemplate (int idAttr, int idAttrGroup
     if (!gAttr)
         return;
 
-    //KKSMap<int, KKSAttrGroup *> gList = t->groups ();
-
     KKSCategoryAttr * cav = gAttr->attrView (idAttr);
     KKSAttrView * av = gAttr->attrView (idAttr);
     if (!av)
         return;
     cav->setDefValue (av->defValue());
-    qDebug () << __PRETTY_FUNCTION__ << idAttr << cav->defValue().value();
 
     KKSObject *attrTypesIO = loader->loadIO (IO_ATTR_TYPE_ID, true);
     if (!attrTypesIO)
@@ -629,6 +647,7 @@ void KKSTemplateEditorFactory :: editAttrInTemplate (int idAttr, int idAttrGroup
         tGroupsModel->setData (aIndex, av->title(), Qt::DisplayRole);
         tGroupsModel->setData (aIndex, av->id(), Qt::UserRole);
         tGroupsModel->setData (aIndex, 0, Qt::UserRole+USER_ENTITY);
+        tGroupsModel->setData (aIndex, QIcon(":/ddoc/show_attrs.png"), Qt::DecorationRole);
 
         QModelIndex aNewIndex = aIndex.sibling (aIndex.row(), 1);
         tGroupsModel->setData (aNewIndex, av->defValue().valueVariant(), Qt::DisplayRole);
@@ -637,6 +656,14 @@ void KKSTemplateEditorFactory :: editAttrInTemplate (int idAttr, int idAttrGroup
         aNewIndex = aIndex.sibling (aIndex.row(), 2);
         tGroupsModel->setData (aNewIndex, av->isReadOnly() ? QObject::tr("Yes") : QObject::tr ("No"), Qt::DisplayRole);
         tGroupsModel->setData (aNewIndex, av->isReadOnly(), Qt::UserRole);
+
+        aNewIndex = aIndex.sibling (aIndex.row(), 3);
+        tGroupsModel->setData (aNewIndex, av->isMandatory() ? QObject::tr("Yes") : QObject::tr ("No"), Qt::DisplayRole);
+        tGroupsModel->setData (aNewIndex, av->isMandatory(), Qt::UserRole);
+
+        aNewIndex = aIndex.sibling (aIndex.row(), 4);
+        tGroupsModel->setData (aNewIndex, av->order(), Qt::DisplayRole);
+        tGroupsModel->setData (aNewIndex, av->order(), Qt::UserRole);
     }
 
     attrTypesIO->release();
@@ -693,12 +720,10 @@ void KKSTemplateEditorFactory :: saveTemplate (KKSTemplate *t, KKSTemplateEditor
     }
     KKSCategory * c = t->category();
 
-    //qDebug () << __PRETTY_FUNCTION__ << t->groups().count();
     for (KKSMap<int, KKSAttrGroup *>::const_iterator pg=t->groups().constBegin(); \
          pg != t->groups().constEnd(); \
          pg++)
     {
-        //qDebug () << __PRETTY_FUNCTION__ << pg.value()->id() << pg.value()->attrViews ().count() << pg.value()->attrViews ().keys();
         KKSAttrGroup *g = pg.value();
         for (KKSMap<int, KKSAttrView *>::const_iterator pa=g->attrViews().constBegin(); \
                 pa != g->attrViews().constEnd(); \
@@ -707,7 +732,6 @@ void KKSTemplateEditorFactory :: saveTemplate (KKSTemplate *t, KKSTemplateEditor
             KKSAttrView * av = pa.value ();
             if (!av)
                 continue;
-            //qDebug () << __PRETTY_FUNCTION__ << av->defValue().valueForInsert() << av->defValue().valueVariant();
         }
     }
     if (!c->getTemplates().contains (t->id()))

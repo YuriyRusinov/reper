@@ -501,7 +501,7 @@ KKSCatEditor* KKSCatEditorFactory :: createCategoryEditor (KKSCategory *cat, // 
     //загружаем атрибуты таблицы
     KKSRecWidget * rAttrTCw = getAttrsWidget (cat->tableCategory(), mode, 0);
     rAttrTCw->setToolBarActionEnabled(rAttrTCw->actAdd, !isIOs);
-    rAttrTCw->setToolBarActionEnabled(rAttrTCw->actEdit, !isIOs);
+    //rAttrTCw->setToolBarActionEnabled(rAttrTCw->actEdit, !isIOs);
     rAttrTCw->setToolBarActionEnabled(rAttrTCw->actDel, !isIOs);
     if (isIOs)
         rAttrTCw->setStatusTip(tr("There are documents created by category %1, operations with attributes are unavailable").arg (cat->name()));
@@ -622,12 +622,13 @@ KKSRecWidget * KKSCatEditorFactory :: getAttrsWidget (const KKSCategory *cat, bo
 
 
         QAbstractItemModel * acModel = new KKSAttrModel (cat);//QStandardItemModel (0, 4);
-        acModel->setHeaderData (0, Qt::Horizontal, QObject::tr ("Name"));
-        acModel->setHeaderData (1, Qt::Horizontal, QObject::tr ("Default value"));
-        acModel->setHeaderData (2, Qt::Horizontal, QObject::tr ("Mandatory"));
-        acModel->setHeaderData (3, Qt::Horizontal, QObject::tr ("Read only"));
-        acModel->setHeaderData (4, Qt::Horizontal, QObject::tr ("Order"));
-        acModel->setHeaderData (5, Qt::Horizontal, QObject::tr ("Directives"));
+        acModel->setHeaderData (0, Qt::Horizontal, QObject::tr ("ID"));
+        acModel->setHeaderData (1, Qt::Horizontal, QObject::tr ("Name"));
+        acModel->setHeaderData (2, Qt::Horizontal, QObject::tr ("Default value"));
+        acModel->setHeaderData (3, Qt::Horizontal, QObject::tr ("Mandatory"));
+        acModel->setHeaderData (4, Qt::Horizontal, QObject::tr ("Read only"));
+        acModel->setHeaderData (5, Qt::Horizontal, QObject::tr ("Order"));
+        acModel->setHeaderData (6, Qt::Horizontal, QObject::tr ("Directives"));
 
         KKSViewFactory::updateAttrModel (0, acModel);
         //tvTableAttrs->setModel (acModel);

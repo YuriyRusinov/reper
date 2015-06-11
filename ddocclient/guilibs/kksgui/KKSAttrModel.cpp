@@ -154,10 +154,10 @@ QVariant KKSAttrModel::data (const QModelIndex& index, int role) const
                 return cAttr->defValue().valueVariant(); 
                 break;
             case 3: 
-                return (cAttr->isMandatory() ? tr("true") : tr("false")); 
+                return (cAttr->isMandatory() ? QObject::tr("Yes") : QObject::tr("No")); 
                 break;
             case 4: 
-                return (cAttr->isReadOnly() ? tr("true") : tr("false")); 
+                return (cAttr->isReadOnly() ? QObject::tr("Yes") : QObject::tr("No")); 
                 break;
             case 5: 
                 return QString::number(cAttr->order()); 
@@ -224,7 +224,7 @@ bool KKSAttrModel::setData (const QModelIndex& index, const QVariant& value, int
         else
             (const_cast<KKSCategory *>(cat))->setAttributes(cAttrs);
 
-        emit dataChanged (index.sibling(irow, 0), index.sibling(irow, 5));
+        emit dataChanged (index.sibling(irow, 0), index.sibling(irow, 6));
 
         return true;
     }
@@ -257,7 +257,7 @@ bool KKSAttrModel::setData (const QModelIndex& index, const QVariant& value, int
         int irow = 0;
         int nr = rowCount();
         
-        emit dataChanged (this->index(irow, 0), this->index(nr, 4));
+        emit dataChanged (this->index(irow, 0), this->index(nr, 6));
         
         return true;
     }
@@ -294,11 +294,24 @@ bool KKSAttrModel::setData (const QModelIndex& index, const QVariant& value, int
                 defValue.setValue(value.toString(), 9);
                 cAttr->setDefValue(defValue);
                 break;
-            case 3: 
-                cAttr->setMandatory(value.toBool());
+            case 3:
+                {
+                    QString sValue = value.toString();
+                    QString v = QObject::tr("No");
+                    if(sValue.isEmpty() || sValue == QObject::tr("No") || sValue == QObject::tr("no") || sValue == QString("false") || sValue == QObject::tr("false"))
+                        cAttr->setMandatory(false);
+                    else
+                        cAttr->setMandatory(true);
+                }
                 break;
             case 4: 
-                cAttr->setReadOnly(value.toBool());
+                {
+                    QString sValue = value.toString();
+                    if(sValue.isEmpty() || sValue == QObject::tr("No") || sValue == QObject::tr("no") || sValue == QString("false") || sValue == QObject::tr("false"))
+                        cAttr->setReadOnly(false);
+                    else
+                        cAttr->setReadOnly(true);
+                }
                 break;
             case 5: 
                 cAttr->setOrder(value.toInt());

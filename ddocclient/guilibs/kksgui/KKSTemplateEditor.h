@@ -71,7 +71,7 @@ class _GUI_EXPORT KKSTemplateEditor : public KKSDialog
         void delAttrGroup (int, const QModelIndex&, KKSTemplate *, KKSTemplateEditor *);
 
         void addAttrIntoGroup (int, const QModelIndex&, KKSTemplate *, KKSTemplateEditor *);
-        void appendAttrIntoGroup (int, int, const QModelIndex&, KKSTemplate *, KKSTemplateEditor *);
+        void appendAttrIntoGroup (int, int, const QModelIndex&, KKSTemplate *, KKSTemplateEditor *, bool);
         void pushAttrIntoGroup (int, int, KKSTemplate *, KKSTemplateEditor *);
         void editAttrInGroup (int, int, const QModelIndex&, const QModelIndex&, KKSTemplate *, KKSTemplateEditor *);
         void delAttrFromGroup (int, int, const QModelIndex&, const QModelIndex&, KKSTemplate *, KKSTemplateEditor *);
@@ -87,6 +87,10 @@ class _GUI_EXPORT KKSTemplateEditor : public KKSDialog
 
         QModelIndex getSelectedIndex (void) const;
         void swapAttrs (KKSAttrView *aView, KKSAttrView *aViewPrev, const QModelIndex& gIndex, const QModelIndex& gIndexP);
+        QModelIndex findModelIndex(int idAttrGroup, const QModelIndex & parent = QModelIndex()) const;
+        QModelIndex findModelIndex1(int idAttr, const QModelIndex & parent = QModelIndex()) const;
+        QModelIndex findTopLevelGroupIndex(const QModelIndex & child) const; //ищем предыдущий
+        QModelIndex findTopLevelGroupIndex1(const QModelIndex & child) const;//ищем следующий
 
     private:
         //

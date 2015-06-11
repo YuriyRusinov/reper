@@ -60,7 +60,7 @@ class _GF_EXPORT KKSTemplateEditorFactory : public KKSEntityFactory
         void delAGroupInTemplate (int idAttrGroup, const QModelIndex& gIndex, KKSTemplate *t, KKSTemplateEditor *tEditor);
 
         void addAttrToTemplate (int idAttrGroup, const QModelIndex& gIndex, KKSTemplate *t, KKSTemplateEditor *tEditor);
-        void appendAttrToTemplate (int idAttr, int idAttrGroup, const QModelIndex& gIndex, KKSTemplate *t, KKSTemplateEditor *tEditor);
+        void appendAttrToTemplate (int idAttr, int idAttrGroup, const QModelIndex& gIndex, KKSTemplate *t, KKSTemplateEditor *tEditor, bool b_prepend = false);
         //void pushAttrToTemplate (int idAttr, int idAttrGroup, KKSTemplate *t, KKSTemplateEditor *tEditor);
         void editAttrInTemplate (int idAttr, int idAttrGroup, const QModelIndex& aIndex, const QModelIndex& gIndex, KKSTemplate *t, KKSTemplateEditor *tEditor);
         void deleteAttrFromTemplate (int idAttr, int idAttrGroup, const QModelIndex& aIndex, const QModelIndex& gIndex, KKSTemplate *t, KKSTemplateEditor *tEditor);

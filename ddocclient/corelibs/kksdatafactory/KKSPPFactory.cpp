@@ -2230,7 +2230,7 @@ int KKSPPFactory::insertCategoryAttr(int idCategory, KKSCategoryAttr * a) const
     QString sql = QString("select cAddAttr(%1, %2, %3, %4, %5, %6, %7)")
                             .arg(idCategory)
                             .arg(idAttr)
-                            .arg(defVal.isEmpty() ? QString("NULL") : QString("asString('%1', false)").arg(defVal))
+                            .arg(defVal.isEmpty() ? QString("NULL") : QString("asString(%1, false)").arg(defVal))
                             .arg(isMandatory ? "true" : "false")
                             .arg(isReadOnly ? "true" : "false")
                             .arg(d.isEmpty() ? QString("NULL") : QString ("asString('%1', false)").arg(d))

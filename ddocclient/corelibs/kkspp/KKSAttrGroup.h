@@ -35,6 +35,7 @@ public:
     const KKSMap<int, KKSAttrGroup *> & childGroups() const;
     const KKSList<KKSAttrGroup *> sortedChildGroups() const;
     int addChildGroup(int idGroup, KKSAttrGroup * g);
+    int prependChildGroup(int idGroup, KKSAttrGroup * g);
     int removeChildGroup(int idGroup);
 
     int order(void) const;

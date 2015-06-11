@@ -1685,23 +1685,23 @@ void KKSViewFactory :: updateAttrModel (const KKSCategory *cat, QAbstractItemMod
         //QVariant v = QVariant::fromValue<KKSCategoryAttr*>(p.value());
         //model->setData(wIndex, v, Qt::UserData+3); //сам атрибут
 
+        wIndex = model->index (i, 1);
         QString ctitle (p.value()->title());
-
         model->setData (wIndex, ctitle, Qt::DisplayRole);
 
-        wIndex = model->index (i, 1);
+        wIndex = model->index (i, 2);
         model->setData (wIndex, p.value()->defValue().valueVariant(), Qt::DisplayRole);
 
-        wIndex = model->index (i, 2);
+        wIndex = model->index (i, 3);
         model->setData (wIndex, (p.value()->isMandatory() ? QObject::tr("Yes") : QObject::tr("No")), Qt::DisplayRole);
 
-        wIndex = model->index (i, 3);
+        wIndex = model->index (i, 4);
         model->setData (wIndex, (p.value()->isReadOnly() ? QObject::tr("Yes") : QObject::tr("No")), Qt::DisplayRole);
 
-        wIndex = model->index (i, 4);
+        wIndex = model->index (i, 5);
         model->setData (wIndex, QString::number(p.value()->order()), Qt::DisplayRole);
 
-        wIndex = model->index (i, 5);
+        wIndex = model->index (i, 6);
         model->setData (wIndex, p.value()->directives(), Qt::DisplayRole);
 
         p.value()->release ();
@@ -1748,22 +1748,23 @@ void KKSViewFactory :: updateAttrAttrsModel (const KKSAttribute *a, QAbstractIte
 
         p.value()->addRef ();
         
+        wIndex = model->index (i, 1);
         QString ctitle (p.value()->title());
         model->setData (wIndex, ctitle, Qt::DisplayRole);
 
-        wIndex = model->index (i, 1);
+        wIndex = model->index (i, 2);
         model->setData (wIndex, p.value()->defValue().valueVariant(), Qt::DisplayRole);
 
-        wIndex = model->index (i, 2);
+        wIndex = model->index (i, 3);
         model->setData (wIndex, (p.value()->isMandatory() ? QObject::tr("Yes") : QObject::tr("No")), Qt::DisplayRole);
 
-        wIndex = model->index (i, 3);
+        wIndex = model->index (i, 4);
         model->setData (wIndex, (p.value()->isReadOnly() ? QObject::tr("Yes") : QObject::tr("No")), Qt::DisplayRole);
         
-        wIndex = model->index (i, 4);
+        wIndex = model->index (i, 5);
         model->setData (wIndex, QString::number(p.value()->order()), Qt::DisplayRole);
 
-        wIndex = model->index (i, 5);
+        wIndex = model->index (i, 6);
         model->setData (wIndex, p.value()->directives(), Qt::DisplayRole);
 
         p.value()->release ();
@@ -2132,8 +2133,8 @@ void KKSViewFactory :: initTemplateGroups (KKSTemplate *t, QAbstractItemModel *t
 
     KKSMap<int, KKSAttrGroup *> tGroups = t->groups ();
     tModel->removeRows (0, tModel->rowCount());
-    if (tModel->columnCount () > 3)
-        tModel->removeColumns (0, tModel->columnCount()-3);
+    if (tModel->columnCount () > 5)
+        tModel->removeColumns (0, tModel->columnCount()-5);
     
     if (!tModel->insertRows (0, tGroups.count()))
         return;
@@ -2170,10 +2171,16 @@ void KKSViewFactory :: insertTemplateGroup (KKSAttrGroup *tAGroup, const QModelI
     tModel->setData (wIndex, tAGroup->name(), Qt::DisplayRole);
     tModel->setData (wIndex, tAGroup->id(), Qt::UserRole);
     tModel->setData (wIndex, 1, Qt::UserRole+USER_ENTITY);
+    tModel->setData (wIndex, QIcon(":/ddoc/rubric.png"), Qt::DecorationRole);
+
+    QModelIndex wIOrder = wIndex.sibling(wIndex.row(), 4);
+    tModel->setData (wIOrder, tAGroup->order(), Qt::UserRole);
+    tModel->setData (wIOrder, tAGroup->order(), Qt::DisplayRole);
+
 
     KKSMap<int, KKSAttrView *>::const_iterator p = tAGroup->attrViews().constBegin ();
-    if ((tModel->columnCount (wIndex) < 3 && 
-         !tModel->insertColumns (0, 3, wIndex)) || 
+    if ((tModel->columnCount (wIndex) < 5 && 
+         !tModel->insertColumns (0, 5, wIndex)) || 
          (tModel->rowCount (wIndex) < tAGroup->attrViews ().size() && 
          !tModel->insertRows (0, tAGroup->attrViews ().size(), wIndex)))
         return;
@@ -2189,12 +2196,23 @@ void KKSViewFactory :: insertTemplateGroup (KKSAttrGroup *tAGroup, const QModelI
         tModel->setData (attrIndex, avList[i]->title(), Qt::DisplayRole);
         tModel->setData (attrIndex, avList[i]->id (), Qt::UserRole);
         tModel->setData (attrIndex, 0, Qt::UserRole+USER_ENTITY);
+        tModel->setData (attrIndex, QIcon(":/ddoc/show_attrs.png"), Qt::DecorationRole);
+
         attrIndex = tModel->index (i, 1, wIndex);
         tModel->setData (attrIndex, avList[i]->defValue().valueVariant(), Qt::DisplayRole);
         tModel->setData (attrIndex, avList[i]->defValue().value(), Qt::UserRole);
+
         attrIndex = tModel->index (i, 2, wIndex);
         tModel->setData (attrIndex, avList[i]->isReadOnly() ? QObject::tr("Yes") : QObject::tr ("No"), Qt::DisplayRole);
         tModel->setData (attrIndex, avList[i]->isReadOnly(), Qt::UserRole);
+
+        attrIndex = tModel->index (i, 3, wIndex);
+        tModel->setData (attrIndex, avList[i]->isMandatory() ? QObject::tr("Yes") : QObject::tr ("No"), Qt::DisplayRole);
+        tModel->setData (attrIndex, avList[i]->isMandatory(), Qt::UserRole);
+
+        attrIndex = tModel->index (i, 4, wIndex);
+        tModel->setData (attrIndex, avList[i]->order(), Qt::DisplayRole);
+        tModel->setData (attrIndex, avList[i]->order(), Qt::UserRole);
     }
 
     const KKSList<KKSAttrGroup *> childGroups = tAGroup->sortedChildGroups ();
@@ -2223,10 +2241,15 @@ void KKSViewFactory :: updateTemplateGroup (KKSAttrGroup *tAGroup, const QModelI
     if (!wIndex.isValid())
         return;
 
-    qDebug () << __PRETTY_FUNCTION__ << wIndex.data (Qt::DisplayRole).toString() << wIndex.data (Qt::UserRole).toInt() << wIndex.data (Qt::UserRole+USER_ENTITY).toInt();
     tModel->setData (wIndex, tAGroup->name(), Qt::DisplayRole);
     tModel->setData (wIndex, tAGroup->id(), Qt::UserRole);
     tModel->setData (wIndex, 1, Qt::UserRole+USER_ENTITY);
+    tModel->setData (wIndex, QIcon(":/ddoc/rubric.png"), Qt::DecorationRole);
+    
+    QModelIndex wIOrder = wIndex.sibling(wIndex.row(), 4);
+    tModel->setData (wIOrder, tAGroup->order(), Qt::UserRole);
+    tModel->setData (wIOrder, tAGroup->order(), Qt::DisplayRole);
+
     if (tModel->rowCount (wIndex) > 0)
     {
         int nr = tModel->rowCount (wIndex);
@@ -2236,7 +2259,7 @@ void KKSViewFactory :: updateTemplateGroup (KKSAttrGroup *tAGroup, const QModelI
     }
 
     KKSMap<int, KKSAttrView *>::const_iterator p = tAGroup->attrViews().constBegin ();
-    if ((tModel->columnCount (wIndex) < 3 && !tModel->insertColumns (0, 3, wIndex)) || (tModel->rowCount (wIndex) < tAGroup->attrViews ().size() && !tModel->insertRows (0, tAGroup->attrViews ().size(), wIndex)))
+    if ((tModel->columnCount (wIndex) < 5 && !tModel->insertColumns (0, 5, wIndex)) || (tModel->rowCount (wIndex) < tAGroup->attrViews ().size() && !tModel->insertRows (0, tAGroup->attrViews ().size(), wIndex)))
         return;
 
     KKSList < KKSAttrView *>  avList;
@@ -2250,12 +2273,23 @@ void KKSViewFactory :: updateTemplateGroup (KKSAttrGroup *tAGroup, const QModelI
         tModel->setData (attrIndex, avList[i]->title(), Qt::DisplayRole);
         tModel->setData (attrIndex, avList[i]->id (), Qt::UserRole);
         tModel->setData (attrIndex, 0, Qt::UserRole+USER_ENTITY);
+        tModel->setData (attrIndex, QIcon(":/ddoc/show_attrs.png"), Qt::DecorationRole);
+
         attrIndex = tModel->index (i, 1, wIndex);
         tModel->setData (attrIndex, avList[i]->defValue().valueVariant(), Qt::DisplayRole);
         tModel->setData (attrIndex, avList[i]->defValue().value(), Qt::UserRole);
+
         attrIndex = tModel->index (i, 2, wIndex);
         tModel->setData (attrIndex, avList[i]->isReadOnly() ? QObject::tr("Yes") : QObject::tr ("No"), Qt::DisplayRole);
         tModel->setData (attrIndex, avList[i]->isReadOnly(), Qt::UserRole);
+
+        attrIndex = tModel->index (i, 3, wIndex);
+        tModel->setData (attrIndex, avList[i]->isMandatory() ? QObject::tr("Yes") : QObject::tr ("No"), Qt::DisplayRole);
+        tModel->setData (attrIndex, avList[i]->isMandatory(), Qt::UserRole);
+
+        attrIndex = tModel->index (i, 4, wIndex);
+        tModel->setData (attrIndex, avList[i]->order(), Qt::DisplayRole);
+        tModel->setData (attrIndex, avList[i]->order(), Qt::UserRole);
     }
 }
 

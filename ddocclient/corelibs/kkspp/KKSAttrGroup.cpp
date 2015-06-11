@@ -256,6 +256,49 @@ int KKSAttrGroup::addChildGroup(int idGroup, KKSAttrGroup * g)
     if(!cnt)
         return ERROR_CODE;
 
+    //найдем группу с таким же номером по порядку
+    //если таковая присутствует, то увеличим порядок на 1
+    if(g->order() == -1){
+        KKSList<KKSAttrGroup *> gList = sortedChildGroups();
+        int cnt = gList.count();
+        if(cnt == 1)
+            g->setOrder(0);
+        else{
+            KKSAttrGroup * lastGroup = gList.at(cnt-1);
+            int lastOrder = lastGroup->order();
+            lastOrder++;
+            g->setOrder(lastOrder);
+
+        }
+
+    }
+    
+    return OK_CODE;
+}
+
+int KKSAttrGroup::prependChildGroup(int idGroup, KKSAttrGroup * g)
+{
+    int cnt = m_childGroups.insert(idGroup, g);
+    if(!cnt)
+        return ERROR_CODE;
+
+    //найдем группу с таким же номером по порядку
+    //если таковая присутствует, то уменьшим порядок на 1
+    if(g->order() == -1){
+        KKSList<KKSAttrGroup *> gList = sortedChildGroups();
+        int cnt = gList.count();
+        if(cnt == 1)
+            g->setOrder(0);
+        else{
+            KKSAttrGroup * firstGroup = gList.at(0);
+            int firstOrder = firstGroup->order();
+            firstOrder--;
+            g->setOrder(firstOrder);
+
+        }
+
+    }
+    
     return OK_CODE;
 }
 
