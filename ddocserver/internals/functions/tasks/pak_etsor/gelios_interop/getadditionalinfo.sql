@@ -696,7 +696,13 @@ begin
 
           select ' || asString('name', true) || ', e.name, ' || asString('Название', true) || ', ' || asString('STRING', true) || '
           from eio_table_422 e
-          where e.id = 2966';
+          where e.id = 2966
+
+          union all
+
+          select ' || asString('id_file', true) || ', asString(f.id_url, false), ' || asString('Идентификатор файла', true) || ', ' || asString('STRING', true) || '
+          from recGetFilesByUUID(' || asString(alarm_uuid, true) || ') f
+          ';
 
 
     for r in execute sql

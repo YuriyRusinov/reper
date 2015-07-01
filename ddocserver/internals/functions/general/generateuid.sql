@@ -10,7 +10,7 @@ declare
     r record;
 begin
     
-    if(localId isnull or localId < 1 or tableName isnull) then
+    if(localId isnull or localId < 0 or tableName isnull) then
         return NULL;
     end if;
 

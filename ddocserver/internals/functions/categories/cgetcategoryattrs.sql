@@ -1,4 +1,4 @@
-/*select f_safe_drop_type('h_get_category_attrs');
+﻿/*select f_safe_drop_type('h_get_category_attrs');
 create type h_get_category_attrs as(id_attribute int4, 
                                     id_attr_type int4,
                                     attr_code varchar,
@@ -147,6 +147,59 @@ begin
 end
 $BODY$
 language 'plpgsql';
+
+create or replace function cGetCategoryAttrsByIO(int4) returns setof h_get_attribute as
+$BODY$
+declare
+    idObject alias for $1;
+
+    idCategory int4;
+    r h_get_attribute%rowtype;
+    rr RECORD;
+    query varchar;
+begin
+    
+    select c.id_child into idCategory from io_categories c, io_objects io where io.id = idObject and io.id_io_category = c.id;
+    if(idCategory isnull) then
+        return;
+    end if;
+
+    for r in select * from cGetCategoryAttrs(idCategory)
+    loop
+        return next r;
+    end loop; 
+    return;
+    
+end
+$BODY$
+language 'plpgsql';
+
+create or replace function cGetCategoryAttrsByTableName(varchar) returns setof h_get_attribute as
+$BODY$
+declare
+    tableName alias for $1;
+
+    idCategory int4;
+    r h_get_attribute%rowtype;
+    rr RECORD;
+    query varchar;
+begin
+    
+    select c.id_child into idCategory from io_categories c, io_objects io where io.table_name = tableName and io.id_io_category = c.id;
+    if(idCategory isnull) then
+        return;
+    end if;
+
+    for r in select * from cGetCategoryAttrs(idCategory)
+    loop
+        return next r;
+    end loop; 
+    return;
+    
+end
+$BODY$
+language 'plpgsql';
+
 
 create or replace function cGetCategoryAttrs(int4) returns setof h_get_attribute as
 $BODY$

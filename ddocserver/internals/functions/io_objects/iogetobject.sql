@@ -185,3 +185,19 @@ begin
 end
 $BODY$
 language 'plpgsql';
+
+create or replace function ioGetTableNameByUUID(varchar) returns varchar as
+$BODY$
+declare
+    theUUID alias for $1;
+    tableName varchar;
+begin
+    select table_name into tableName from io_objects where uuid_t = theUUID::uuid;
+    --if(tableName is null) then
+    --    select table_name into tableName from object_ref_tables where uuid_t = theUUID::uuid;
+    --end if;
+
+    return tableName;
+end
+$BODY$
+language 'plpgsql';

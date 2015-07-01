@@ -62,6 +62,48 @@ end
 $BODY$
 language 'plpgsql';
 
+create or replace function cGetCategory (varchar) returns setof h_get_category as
+$BODY$
+declare
+    tableName alias for $1;
+    r h_get_category%rowtype;
+begin
+
+    for r in
+        select distinct
+            cc.id, 
+            cc.id_io_category_type, 
+            cc.id_child, 
+            cc.name, 
+            cc.description, 
+            t.name, 
+            t.description, 
+            cc.is_main, 
+            cc.code,
+            cc.unique_id,
+            cc.is_system,
+            cc.id_io_state,
+            st.name,
+            st.description,
+            cc.is_global,
+            t.is_qualifier,
+            cc.id_child2,
+            cc.id_life_cycle
+        from 
+            f_sel_io_objects_tbl(tableName) io
+            inner join io_categories c on (c.id = io.id_io_category and io.table_name = tableName)
+            inner join io_categories cc on (c.id_child = cc.id)
+            inner join io_category_types t on (cc.id_io_category_type = t.id)
+            inner join io_states st on (cc.id_io_state = st.id)
+    loop
+        return next r;
+    end loop;
+
+    return;
+end
+$BODY$
+language 'plpgsql';
+
 create or replace function cGetCategoryIO (int4) returns setof h_get_category as
 $BODY$
 declare
@@ -146,5 +188,49 @@ begin
 end
 $BODY$
 language 'plpgsql';
+
+create or replace function cGetChildCategory(int4) returns setof h_get_category as
+$BODY$
+declare
+    idCategory alias for $1;
+    r h_get_category%rowtype;
+begin
+
+    for r in
+        select 
+            cc.id, 
+            cc.id_io_category_type, 
+            cc.id_child, 
+            cc.name, 
+            cc.description, 
+            t.name, 
+            t.description, 
+            cc.is_main, 
+            cc.code,
+            cc.unique_id,
+            cc.is_system,
+            cc.id_io_state,
+            st.name,
+            st.description,
+            cc.is_global,
+            t.is_qualifier,
+            cc.id_child2,
+            cc.id_life_cycle
+        from 
+            io_categories c
+            inner join io_categories cc on (c.id_child = cc.id)
+            inner join io_category_types t on (cc.id_io_category_type = t.id)
+            inner join io_states st on (cc.id_io_state = st.id)
+        where 
+            c.id = idCategory
+    loop
+        return next r;
+    end loop;
+
+    return;
+end
+$BODY$
+language 'plpgsql';
+
 
 
