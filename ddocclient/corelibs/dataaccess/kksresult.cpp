@@ -9,6 +9,11 @@ KKSResult::~ KKSResult( )
 {
 }
 
+QString KKSResult::getColumnNameAsString(int column) const
+{
+    return QString::fromUtf8(getColumnName(column));
+}
+
 int KKSResult::getCellAsInt( int row, int column, bool * ok ) const
 {
     QVariant v = getCell(row, column);

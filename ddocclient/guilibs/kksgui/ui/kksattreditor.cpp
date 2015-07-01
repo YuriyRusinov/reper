@@ -50,7 +50,7 @@ KKSAttrEditor :: KKSAttrEditor (KKSAttribute *attr,
 
     QRegExp cRegExp ("^([a-z])+([a-z0-9_])*");
     QRegExpValidator * vAttrCode = new QRegExpValidator (cRegExp, this);
-    ui->lECode->setValidator (vAttrCode);
+    //ui->lECode->setValidator (vAttrCode);
     ui->leFilter->setReadOnly(true);
     QGridLayout * gExtLay = new QGridLayout;
     ui->tabExtended->setLayout (gExtLay);

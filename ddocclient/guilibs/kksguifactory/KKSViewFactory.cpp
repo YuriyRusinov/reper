@@ -413,6 +413,8 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
     
     if (!pattrs.isEmpty())
         idPAttr = pattrs[0];
+    
+    /*
     for (p=objEx.constBegin(); p!=objEx.constEnd(); p++)
     {
         QTime time;
@@ -421,7 +423,10 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
             pgDial->setValue (c);
         KKSEIOData * d = p.value();
         Q_UNUSED (d);
-/*        
+        
+        i++;
+
+//закомментировано было отсюда /*        
         if (idPAttr > 0)
         {
             const KKSCategoryAttr * cAttr = cat ? cat->attribute(idPAttr) : cobjCat->attribute (idPAttr);
@@ -506,13 +511,12 @@ void KKSViewFactory :: loadEIOEx (KKSObjEditor * editor,
             if (ii == 0 && isCheckable)
                 objModel->setData (wcIndex, false, Qt::CheckStateRole);
         }
+// закомментировано было до сюда 
+
+
+    }
 */
 
-        i++;
-        //qDebug () << __PRETTY_FUNCTION__ << QString ("Iteration %1. Time elapsed %2 ms").arg (i).arg (t.elapsed());
-    }
-//    aColBG->release();
-//    aColFG->release ();
 
     if (isSetH || resize)
         for (int j=0; j<qMin (objModel->columnCount(), headers.count()); j++)

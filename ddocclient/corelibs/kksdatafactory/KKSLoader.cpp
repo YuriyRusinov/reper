@@ -2660,7 +2660,7 @@ KKSMap<qint64, KKSEIOData *> KKSLoader::loadEIOList(const KKSCategory * c0,
         KKSEIOData * eio = new KKSEIOData();
         
         for(int column=0; column<columns; column++){
-            QString code = QString(res->getColumnName(column));//использование названия колонки для ключа QMap в классе KKSEIOData допустимо
+            QString code = res->getColumnNameAsString(column);//использование названия колонки для ключа QMap в классе KKSEIOData допустимо
             QString value = res->getCellAsString(row, column);
             
             if(code == "ii_rec_order" || 
@@ -2806,7 +2806,7 @@ KKSList<KKSEIOData *> KKSLoader::loadEIOList1(const KKSCategory * c0,
         KKSEIOData * eio = new KKSEIOData();
         
         for(int column=0; column<columns; column++){
-            QString code = QString(res->getColumnName(column));//использование названия колонки для ключа QMap в классе KKSEIOData допустимо
+            QString code = res->getColumnNameAsString(column);//использование названия колонки для ключа QMap в классе KKSEIOData допустимо
             QString value = res->getCellAsString(row, column);
             
             if(code == "ii_rec_order" || 

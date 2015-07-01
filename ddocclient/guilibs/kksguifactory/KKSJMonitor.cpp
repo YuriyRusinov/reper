@@ -240,7 +240,7 @@ void KKSJMonitor::queryCmdJournal()
     for(int row=0; row<count; row++){
         KKSEIOData * eio = new KKSEIOData();
         for(int column=0; column<columns; column++){
-            QString code = QString(res->getColumnName(column));
+            QString code = res->getColumnNameAsString(column);
             QString value = res->getCellAsString(row, column);
 
             //проверим на тип ИНТЕРВАЛ
@@ -339,7 +339,7 @@ void KKSJMonitor::queryMsgJournal()
     for(int row=0; row<count; row++){
         KKSEIOData * eio = new KKSEIOData();
         for(int column=0; column<columns; column++){
-            QString code = QString(res->getColumnName(column));
+            QString code = res->getColumnNameAsString(column);
             QString value = res->getCellAsString(row, column);
             if(res->getColumnDataType(column) == KKSResult::dtBool){
                 QString s = value.toLower();

@@ -58,6 +58,8 @@ class __DA_EXPORT KKSResult
         virtual DataType getColumnDataType(int column) const = 0;
         virtual int getColumnNumber(const char * columnName) const = 0;
         virtual const char * getColumnName(int column) const = 0;
+        QString getColumnNameAsString(int column) const;
+
 
         virtual unsigned char * getCellData( int row, int column ) const = 0; // возвращает результат запроса в виде char *
         virtual int getCellLength( int row, int column ) const = 0;
