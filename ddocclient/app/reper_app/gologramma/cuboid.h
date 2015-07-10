@@ -41,7 +41,7 @@ private:
     void cuboidFromVector(const mslMesh::vertices3D& initVector);
 };
 
-std::vector<unsigned char> createImageMatrix(const std::vector<Cuboid>&,const mslMesh::mesh3D&);//, QProgressDialog * pD=0);
+std::vector<unsigned char> createImageMatrix(const std::vector<Cuboid>&,const mslMesh::mesh3D&, QProgressDialog * pD=0);
 std::vector<unsigned char> createImage(const std::vector<unsigned char> &);
 
 void recurseCub(const std::pair<mslMesh::point3D<int, int, int>, mslMesh::point3D<int, int, int> > &,

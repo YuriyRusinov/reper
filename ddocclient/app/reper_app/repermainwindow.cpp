@@ -118,7 +118,7 @@ void ReperMainWindow :: slotConnect (void)
 
 void ReperMainWindow :: slotDisconnect (void)
 {
-    kksCoreApp->db()->disconnect();
+    kksCoreApp->db()->disconnect(false);
     setActionsEnabled(false);
 }
 
@@ -385,9 +385,9 @@ void ReperMainWindow::slotGologram (void)
 
 void ReperMainWindow::slotGologramCalc (generatingDataPlus gdp)
 {
-//    QWidget * iGW = qobject_cast<QWidget *>(this->sender());
-//    if (iGW)
-//        iGW->setVisible (false);
+	QWidget * iGW = qobject_cast<QWidget *>(this->sender());
+	if (iGW)
+		iGW->setVisible (false);
     ImageGenerator* generator = new ImageGenerator(gdp,this);
     
 /*    QProgressDialog* pProcD = new QProgressDialog;

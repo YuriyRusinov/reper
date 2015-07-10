@@ -214,7 +214,7 @@ QVector<returningData> ImageGenerator::generateImages()
             std::vector<Cuboid>::iterator cubusCubusIter = cubusCubus.begin();
             for(; cubusCubusIter != cubusCubus.end(); ++cubusCubusIter)
             {
-                (*cubusCubusIter).rotateInSpace(mslMesh::make_point3D(XZ_plane,XY_plane,0.0));
+                cubusCubusIter->rotateInSpace(mslMesh::make_point3D(XZ_plane,XY_plane,0.0));
                 if (progressD->wasCanceled())
                 {
                     delete progressD;
@@ -229,7 +229,7 @@ QVector<returningData> ImageGenerator::generateImages()
                 delete progressD;
                 return imagesData;
             }
-            std::vector<unsigned char> cIm = createImageMatrix(cubusCubus,bufMesh);
+            std::vector<unsigned char> cIm = createImageMatrix(cubusCubus,bufMesh, progressD);
             std::vector<unsigned char> image = createImage(cIm);
             if (progressD->wasCanceled())
             {

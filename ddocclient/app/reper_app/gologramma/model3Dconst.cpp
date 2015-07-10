@@ -8,36 +8,6 @@ inline bool mslMesh::versionCompare(unsigned int &in_version)
         return false;
 }
 
-template <class T1,class T2,class T3>
-bool mslMesh::operator==(const point3D<T1,T2,T3>& lhs,const point3D<T1,T2,T3>& rhs)
-{
-    return (lhs.first == rhs.first) && (lhs.second == rhs.second) && (lhs.third == rhs.third);
-}
-
-template <class T1,class T2,class T3>
-bool mslMesh::operator!=(const point3D<T1,T2,T3>& lhs,const point3D<T1,T2,T3>& rhs)
-{
-    return (lhs.first != rhs.first) || (lhs.second != rhs.second) || (lhs.third != rhs.third);
-}
-
-template<class T1,class T2,class T3>
-mslMesh::point3D<T1,T2,T3> mslMesh::make_point3D(const T1& x,const T2& y,const T3& z)
-{
-    return mslMesh::point3D<T1,T2,T3>(x,y,z);
-}
-
-template <class T>
-bool mslMesh::operator==(const faceWithNormal3D<T>& lhs,const faceWithNormal3D<T>& rhs)
-{
-    return lhs.face == rhs.face && lhs.normal == rhs.normal;
-}
-
-template <class T>
-bool mslMesh::operator!=(const faceWithNormal3D<T>& lhs,const faceWithNormal3D<T>& rhs)
-{
-    return lhs.face != rhs.face || lhs.normal != rhs.normal;
-}
-
 void mslMesh::rotatePoint(mslMesh::point3Ddouble& in_point,const mslMesh::point3Ddouble& in_angle)
 {
     double first,second,third;

@@ -1,3 +1,4 @@
+#include <QProgressDialog>
 #include "cuboid.h"
 
 Cuboid::Cuboid(mslMesh::point3Ddouble& in_maxPoint,mslMesh::point3Ddouble& in_minPoint)
@@ -268,7 +269,7 @@ void Cuboid::toMaxPow2(double in_length)
     scale(mslMesh::make_point3D(lengthOf2,lengthOf2,lengthOf2));
 }
 
-std::vector<unsigned char> createImageMatrix(const std::vector<Cuboid>& in_cubs,const mslMesh::mesh3D& in_object)
+std::vector<unsigned char> createImageMatrix(const std::vector<Cuboid>& in_cubs,const mslMesh::mesh3D& in_object, QProgressDialog * pD)
 {
     std::vector<unsigned char> imageMatrix(in_cubs.size());
     int lineSize = static_cast<int>(pow(static_cast<double>(imageMatrix.size()),1.0/3.0)) + 1;
@@ -289,7 +290,11 @@ std::vector<unsigned char> createImageMatrix(const std::vector<Cuboid>& in_cubs,
         objects.push_back(in_object.getFace(iter));
     }
 
+	if (pD && pD->wasCanceled())
+		return imageMatrix;
     recurseCub(indexCubeVector,in_cubs,objects,imageMatrix,lineSize);
+	if (pD && pD->wasCanceled())
+		return imageMatrix;
 
     return imageMatrix;
 }
