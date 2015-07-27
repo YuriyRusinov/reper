@@ -51,6 +51,7 @@ void ImageWidget :: loadImageFile (void)
     }
     setImage (image);
     QSize rSize = sizeHint();
+    qDebug () << __PRETTY_FUNCTION__ << rSize << size ();
     resize (rSize);
 }
 
@@ -59,8 +60,7 @@ void ImageWidget :: selectRect (void)
     ImageLabel * iL = qobject_cast<ImageLabel *>(lRImage);
     if (!iL)
         return;
-//    QRect sRect = iL->getSelection ();
-    QImage sImage = getSelectedImage();//rGIm.copy (sRect);
+    QImage sImage = getSelectedImage();
     emit searchByIm (sImage);
 }
 
@@ -127,5 +127,5 @@ QImage ImageWidget :: getSelectedImage (void) const
 
     QRect selRect = (qobject_cast<ImageLabel *>(lRImage))->getSelection();
     qDebug () << __PRETTY_FUNCTION__ << selRect;
-    return rGIm.copy (selRect);
+    return rGIm.scaled(lRImage->pixmap()->size()).copy (selRect);
 }
