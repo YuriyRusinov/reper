@@ -3,6 +3,7 @@
 #include <QPen>
 #include <QBrush>
 #include <QColor>
+#include <QCursor>
 #include <QtDebug>
 #include "ImageLabel.h"
 
