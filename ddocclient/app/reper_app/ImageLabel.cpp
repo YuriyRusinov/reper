@@ -1,4 +1,6 @@
 #include <QMouseEvent>
+#include <QPaintEvent>
+#include <QResizeEvent>
 #include <QPainter>
 #include <QPen>
 #include <QBrush>
@@ -57,6 +59,22 @@ void ImageLabel :: paintEvent (QPaintEvent * ev)
     painter.drawRect (selectionRect);
     //qDebug () << __PRETTY_FUNCTION__ << selectionRect;
     //painter.end();
+}
+
+void ImageLabel :: resizeEvent (QResizeEvent * ev)
+{
+    //qDebug () << __PRETTY_FUNCTION__ << ev->size() << ev->oldSize() << selectionRect.size();
+    if (!selectionRect.size().isEmpty())
+    {
+        double scW = (double)(ev->size().width())/(double)(ev->oldSize().width());
+        double scH = (double)(ev->size().height())/(double)(ev->oldSize().height());
+        QSize rectSize = selectionRect.size();
+//        rectSize.scale (rectSize.width() *scW, rectSize.height() * scH, Qt::IgnoreAspectRatio);
+        qDebug () << __PRETTY_FUNCTION__ << scW << scH << ev->size()
+                                         << ev->oldSize() <<  selectionRect.size();
+        selectionRect.setSize (rectSize);
+    }
+    QLabel::resizeEvent (ev);
 }
 
 const QRect& ImageLabel :: getSelection (void) const

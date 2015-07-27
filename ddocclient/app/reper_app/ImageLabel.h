@@ -5,6 +5,8 @@
 #include <QRect>
 
 class QMouseEvent;
+class QPaintEvent;
+class QResizeEvent;
 
 class ImageLabel : public QLabel
 {
@@ -14,10 +16,14 @@ public:
 
     const QRect& getSelection (void) const;
 protected:
+    //
+    // Overrides
+    //
     virtual void mousePressEvent (QMouseEvent * ev);
     virtual void mouseReleaseEvent (QMouseEvent * ev);
     virtual void mouseMoveEvent (QMouseEvent * ev);
     virtual void paintEvent (QPaintEvent * ev);
+    virtual void resizeEvent (QResizeEvent * ev);
 
 private:
     bool selectionStarted;
