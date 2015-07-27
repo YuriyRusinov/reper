@@ -14,6 +14,9 @@ public:
     virtual ~ImageWidget (void);
 
     void setImage (const QImage& im);
+    const QImage& getImage (void) const;
+
+    QImage getSelectedImage (void) const;
 
 private slots:
     void loadImageFile (void);

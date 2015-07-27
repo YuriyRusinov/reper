@@ -59,8 +59,8 @@ void ImageWidget :: selectRect (void)
     ImageLabel * iL = qobject_cast<ImageLabel *>(lRImage);
     if (!iL)
         return;
-    QRect sRect = iL->getSelection ();
-    QImage sImage = rGIm.copy (sRect);
+//    QRect sRect = iL->getSelection ();
+    QImage sImage = getSelectedImage();//rGIm.copy (sRect);
     emit searchByIm (sImage);
 }
 
@@ -113,4 +113,18 @@ void ImageWidget :: init (void)
 
     QSpacerItem * vSpacer = new QSpacerItem(20, 128, QSizePolicy::Minimum, QSizePolicy::Expanding);
     grLay->addItem (vSpacer, 4, 1, 1, 1);
+}
+
+const QImage& ImageWidget :: getImage (void) const
+{
+    return rGIm;
+}
+
+QImage ImageWidget :: getSelectedImage (void) const
+{
+    if (!qobject_cast<ImageLabel *>(lRImage))
+        return QImage ();
+
+    QRect selRect = (qobject_cast<ImageLabel *>(lRImage))->getSelection();
+    return rGIm.copy (selRect);
 }
