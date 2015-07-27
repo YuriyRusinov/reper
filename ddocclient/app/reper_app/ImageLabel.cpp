@@ -53,8 +53,8 @@ void ImageLabel :: paintEvent (QPaintEvent * ev)
     QBrush sBrush (QColor(0,0,0,180));
     QPen selPen = QPen (sBrush, 1, Qt::DashLine);
     painter.setPen (QPen(QBrush(QColor(0,0,0,180)),1,Qt::DashLine));
-    painter.setBrush(QBrush(QColor(255,255,255,120)));
-    painter.drawRect(selectionRect);
+    painter.setBrush (QBrush(QColor(255,255,255,120)));
+    painter.drawRect (selectionRect);
     //qDebug () << __PRETTY_FUNCTION__ << selectionRect;
     //painter.end();
 }

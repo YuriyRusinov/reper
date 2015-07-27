@@ -126,5 +126,6 @@ QImage ImageWidget :: getSelectedImage (void) const
         return QImage ();
 
     QRect selRect = (qobject_cast<ImageLabel *>(lRImage))->getSelection();
+    qDebug () << __PRETTY_FUNCTION__ << selRect;
     return rGIm.copy (selRect);
 }
