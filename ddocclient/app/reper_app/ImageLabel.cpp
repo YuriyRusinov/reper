@@ -34,6 +34,13 @@ void ImageLabel :: mouseReleaseEvent (QMouseEvent * ev)
 {
     QLabel::mouseReleaseEvent (ev);
     selectionStarted=false;
+    if (selectionRect.size ().width() <= 1 || selectionRect.size ().height() <= 1)
+    {
+        selectionRect.setSize (QSize());
+        repaint ();
+    }
+    else
+        qDebug () << __PRETTY_FUNCTION__ << selectionRect;
 }
 
 void ImageLabel :: mouseMoveEvent (QMouseEvent * ev)
@@ -63,17 +70,20 @@ void ImageLabel :: paintEvent (QPaintEvent * ev)
 
 void ImageLabel :: resizeEvent (QResizeEvent * ev)
 {
-    //qDebug () << __PRETTY_FUNCTION__ << ev->size() << ev->oldSize() << selectionRect.size();
-    if (!selectionRect.size().isEmpty())
+    qDebug () << __PRETTY_FUNCTION__ << ev->size() << ev->oldSize() << selectionRect.size() << (pixmap() ? pixmap()->size() : QSize());
+/*    if (!selectionRect.size().isEmpty())
     {
-        double scW = (double)(ev->size().width())/(double)(ev->oldSize().width());
-        double scH = (double)(ev->size().height())/(double)(ev->oldSize().height());
+        //double scW = (double)(ev->size().width())/(double)(ev->oldSize().width());
+        //double scH = (double)(ev->size().height())/(double)(ev->oldSize().height());
+        int deltaW = ev->size().width() - ev->oldSize().width();
+        int deltaH = ev->size().height() - ev->oldSize().height();
         QSize rectSize = selectionRect.size();
-//        rectSize.scale (rectSize.width() *scW, rectSize.height() * scH, Qt::IgnoreAspectRatio);
-        qDebug () << __PRETTY_FUNCTION__ << scW << scH << ev->size()
-                                         << ev->oldSize() <<  selectionRect.size();
+        rectSize.scale (rectSize.width() +deltaW, rectSize.height() + deltaH, Qt::IgnoreAspectRatio);
+        //qDebug () << __PRETTY_FUNCTION__ << deltaW << deltaH << ev->size()
+        //                                 << ev->oldSize() <<  selectionRect.size();
         selectionRect.setSize (rectSize);
     }
+*/
     QLabel::resizeEvent (ev);
 }
 

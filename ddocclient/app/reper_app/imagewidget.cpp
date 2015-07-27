@@ -8,6 +8,7 @@
 #include "ImageLabel.h"
 #include <QSpacerItem>
 #include <QScrollArea>
+#include <QSizePolicy>
 #include <QtDebug>
 
 #include "imagewidget.h"
@@ -35,6 +36,8 @@ void ImageWidget :: setImage (const QImage& im)
         lRImage->setPixmap (QPixmap::fromImage (rGIm));
     else
         lRImage->setPixmap (QPixmap());
+
+    lRImage->resize (lRImage->pixmap()->size());
 }
 
 void ImageWidget :: loadImageFile (void)
@@ -52,7 +55,8 @@ void ImageWidget :: loadImageFile (void)
     setImage (image);
     QSize rSize = sizeHint();
     qDebug () << __PRETTY_FUNCTION__ << rSize << size ();
-    resize (rSize);
+    lRImage->adjustSize ();
+    //resize (rSize);
 }
 
 void ImageWidget :: selectRect (void)
@@ -61,7 +65,8 @@ void ImageWidget :: selectRect (void)
     if (!iL)
         return;
     QImage sImage = getSelectedImage();
-    emit searchByIm (sImage);
+    if (!sImage.isNull())
+        emit searchByIm (sImage);
 }
 
 void ImageWidget :: saveImageToDb (void)
@@ -81,7 +86,9 @@ void ImageWidget :: init (void)
     QSize imMinSize (200, 200);
     lRImage->setMinimumSize (imMinSize);
     QScrollArea * scImArea = new QScrollArea (this);
-    lRImage->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    QSizePolicy imSp = QSizePolicy (QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);//, QSizePolicy::Label);
+    imSp.setHorizontalStretch (0);
+    scImArea->setSizePolicy(imSp);//QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     lRImage->setScaledContents(true);
     scImArea->setWidget (lRImage);
     scImArea->setWidgetResizable (true);
@@ -126,6 +133,6 @@ QImage ImageWidget :: getSelectedImage (void) const
         return QImage ();
 
     QRect selRect = (qobject_cast<ImageLabel *>(lRImage))->getSelection();
-    qDebug () << __PRETTY_FUNCTION__ << selRect;
-    return lRImage->pixmap()->copy(selRect).toImage();//rGIm.scaled(lRImage->pixmap()->size()).copy (selRect);
+    qDebug () << __PRETTY_FUNCTION__ << selRect << (rGIm.copy (selRect) == lRImage->pixmap()->copy(selRect).toImage()) <<  (rGIm.copy (selRect) == rGIm.scaled(lRImage->pixmap()->size()).copy (selRect));
+    return rGIm.copy (selRect);//lRImage->pixmap()->copy(selRect).toImage();//rGIm.scaled(lRImage->pixmap()->size()).copy (selRect);
 }
