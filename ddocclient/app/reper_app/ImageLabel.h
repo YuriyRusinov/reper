@@ -15,6 +15,7 @@ public:
     virtual ~ImageLabel (void);
 
     const QRect& getSelection (void) const;
+    QImage getSelectedImage (void) const;
 protected:
     //
     // Overrides

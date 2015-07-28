@@ -59,6 +59,13 @@ void ImageLabel :: paintEvent (QPaintEvent * ev)
     QPainter painter(this);
     
     //painter.begin (this);
+    if (pixmap())
+    {
+        const QPixmap pix = *(pixmap());
+        QRect target = ev->rect();
+        QRect source = pixmap()->rect();
+        painter.drawPixmap (target, pix, source);//(QPointF (0.0, 0.0), pix);
+    }
     QBrush sBrush (QColor(0,0,0,180));
     QPen selPen = QPen (sBrush, 1, Qt::DashLine);
     painter.setPen (QPen(QBrush(QColor(0,0,0,180)),1,Qt::DashLine));
@@ -70,7 +77,7 @@ void ImageLabel :: paintEvent (QPaintEvent * ev)
 
 void ImageLabel :: resizeEvent (QResizeEvent * ev)
 {
-    qDebug () << __PRETTY_FUNCTION__ << ev->size() << ev->oldSize() << selectionRect.size() << (pixmap() ? pixmap()->size() : QSize());
+    qDebug () << __PRETTY_FUNCTION__ << (pixmap() ? pixmap()->size() : QSize()) << this->size() << ev->size();
 /*    if (!selectionRect.size().isEmpty())
     {
         //double scW = (double)(ev->size().width())/(double)(ev->oldSize().width());
@@ -90,4 +97,13 @@ void ImageLabel :: resizeEvent (QResizeEvent * ev)
 const QRect& ImageLabel :: getSelection (void) const
 {
     return selectionRect;
+}
+
+QImage ImageLabel :: getSelectedImage (void) const
+{
+    if (!pixmap())
+        return QImage ();
+
+    const QPixmap * pix = pixmap();
+    return pix->scaled (this->size()).copy (selectionRect).toImage();
 }

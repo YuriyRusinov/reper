@@ -82,13 +82,13 @@ void ImageWidget :: loadImageFromDb (void)
 void ImageWidget :: init (void)
 {
     QGridLayout * grLay = new QGridLayout (this);
-    lRImage = new ImageLabel (this);
-    QSize imMinSize (200, 200);
-    lRImage->setMinimumSize (imMinSize);
     QScrollArea * scImArea = new QScrollArea (this);
     QSizePolicy imSp = QSizePolicy (QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);//, QSizePolicy::Label);
     imSp.setHorizontalStretch (0);
     scImArea->setSizePolicy(imSp);//QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+    lRImage = new ImageLabel (this);
+    QSize imMinSize (200, 200);
+    lRImage->setMinimumSize (imMinSize);
     lRImage->setScaledContents(true);
     scImArea->setWidget (lRImage);
     scImArea->setWidgetResizable (true);
@@ -132,7 +132,9 @@ QImage ImageWidget :: getSelectedImage (void) const
     if (!qobject_cast<ImageLabel *>(lRImage))
         return QImage ();
 
-    QRect selRect = (qobject_cast<ImageLabel *>(lRImage))->getSelection();
-    qDebug () << __PRETTY_FUNCTION__ << selRect << (rGIm.copy (selRect) == lRImage->pixmap()->copy(selRect).toImage()) <<  (rGIm.copy (selRect) == rGIm.scaled(lRImage->pixmap()->size()).copy (selRect));
-    return rGIm.copy (selRect);//lRImage->pixmap()->copy(selRect).toImage();//rGIm.scaled(lRImage->pixmap()->size()).copy (selRect);
+    //QRect selRect = (qobject_cast<ImageLabel *>(lRImage))->getSelection();
+    //QRect trRect = selRect;
+    //QRect (mapToParent (selRect.topLeft()), selRect.size());
+    //qDebug () << __PRETTY_FUNCTION__ << selRect << (rGIm.copy (selRect) == lRImage->pixmap()->copy(selRect).toImage()) <<  (rGIm.copy (selRect) == rGIm.scaled(lRImage->pixmap()->size()).copy (selRect)) << selRect << trRect;
+    return (qobject_cast<ImageLabel *>(lRImage))->getSelectedImage();//rGIm.copy (trRect);//lRImage->pixmap()->copy(selRect).toImage();//rGIm.scaled(lRImage->pixmap()->size()).copy (selRect);
 }
