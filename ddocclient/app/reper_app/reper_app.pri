@@ -3,11 +3,13 @@ HEADERS += \
            searchradioform.h \
            imagewidget.h \
            ImageLabel.h \
-           assistant.h
+           assistant.h \
+           searchradioimagefragmentform.h
 
 FORMS += \
          reper_main_window.ui \
-         search_radio_form.ui 
+         search_radio_form.ui \
+         search_radio_image_fragment_form.ui
 
 SOURCES += \
            main.cpp \
@@ -15,6 +17,7 @@ SOURCES += \
            searchradioform.cpp \
            imagewidget.cpp \
            ImageLabel.cpp \
-           assistant.cpp
+           assistant.cpp \
+           searchradioimagefragmentform.cpp
 
 #RESOURCES = icon_set.qrc

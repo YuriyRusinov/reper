@@ -21,7 +21,7 @@ ImageLabel :: ~ImageLabel (void)
 
 void ImageLabel :: mousePressEvent (QMouseEvent * ev)
 {
-    if (ev->button () == Qt::LeftButton)
+    if (ev->button () == Qt::LeftButton && pixmap())
     {
         selectionStarted=true;
         selectionRect.setTopLeft (ev->pos());
@@ -33,6 +33,8 @@ void ImageLabel :: mousePressEvent (QMouseEvent * ev)
 void ImageLabel :: mouseReleaseEvent (QMouseEvent * ev)
 {
     QLabel::mouseReleaseEvent (ev);
+    if (!pixmap())
+        return;
     selectionStarted=false;
     if (selectionRect.size ().width() <= 1 || selectionRect.size ().height() <= 1)
     {
@@ -46,6 +48,8 @@ void ImageLabel :: mouseReleaseEvent (QMouseEvent * ev)
 void ImageLabel :: mouseMoveEvent (QMouseEvent * ev)
 {
     QLabel::mouseMoveEvent (ev);
+    if (!pixmap())
+        return;
     if (selectionStarted)
     {
         selectionRect.setBottomRight(ev->pos());
@@ -77,7 +81,7 @@ void ImageLabel :: paintEvent (QPaintEvent * ev)
 
 void ImageLabel :: resizeEvent (QResizeEvent * ev)
 {
-    qDebug () << __PRETTY_FUNCTION__ << (pixmap() ? pixmap()->size() : QSize()) << this->size() << ev->size();
+//    qDebug () << __PRETTY_FUNCTION__ << (pixmap() ? pixmap()->size() : QSize()) << this->size() << ev->size();
 /*    if (!selectionRect.size().isEmpty())
     {
         //double scW = (double)(ev->size().width())/(double)(ev->oldSize().width());

@@ -27,6 +27,7 @@
 #include <defines.h>
 #include "repermainwindow.h"
 #include "searchradioform.h"
+#include "searchradioimagefragmentform.h"
 #include "objloader.h"
 #include "gologramma.h"
 #include "imagewidget.h"
@@ -199,12 +200,12 @@ void ReperMainWindow :: slotSearchByImage (void)
 void ReperMainWindow :: searchIm (const QImage& sIm0)
 {
     qDebug () << __PRETTY_FUNCTION__;
-    SearchRadioForm * srForm = new SearchRadioForm();
-    srForm->setImage (sIm0);
+    SearchRadioImageFragmentForm * srForm = new SearchRadioImageFragmentForm (sIm0);
+    //srForm->setImage (sIm0);
     QImage sIm (sIm0);
     if (srForm->exec() == QDialog::Accepted)
     {
-        sIm = srForm->getImage();
+        sIm = srForm->getSourceImage();
         if (sIm.isNull())
         {
             delete srForm;
@@ -385,37 +386,15 @@ void ReperMainWindow::slotGologram (void)
 
 void ReperMainWindow::slotGologramCalc (generatingDataPlus gdp)
 {
-	QWidget * iGW = qobject_cast<QWidget *>(this->sender());
-	if (iGW)
-		iGW->setVisible (false);
+    QWidget * iGW = qobject_cast<QWidget *>(this->sender());
+    if (iGW)
+        iGW->setVisible (false);
     ImageGenerator* generator = new ImageGenerator(gdp,this);
     
-/*    QProgressDialog* pProcD = new QProgressDialog;
-    QProgressBar* pb = new QProgressBar(pProcD);
-    pProcD->setBar(pb);
-
-    int maxValue = ((gdp.data.XY_angleMax - gdp.data.XY_angleMin)/gdp.data.XY_angleStep - 1)*((gdp.data.XZ_angleMax - gdp.data.XZ_angleMin)/gdp.data.XZ_angleStep);
-    pb->setRange(0,maxValue);
-
-    connect(generator,SIGNAL(createOneImage(int)),pb,SLOT(setValue(int)));
-
-    pProcD->show();
-*/
     generator->loadModel();
     QVector<returningData> resD = generator->generateImages();
     delete generator;
 
-//    mslLoader::OBJloader *objL = new mslLoader::OBJloader;
-//    loadModel (*objL, gdp.filename.toStdString ());
-//    QProgressDialog * pProcD = new QProgressDialog;
-//    QProgressBar * pb = new QProgressBar (pProcD);
-//    pProcD->setBar (pb);
-//    pb->setRange (0, 100);
-//    pb->show();
-
-//    pProcD->show ();
-//    QVector<returningData> resD = generateImages (gdp.data, *objL, pb);
-    
     int nd = resD.count();
     qDebug () << __PRETTY_FUNCTION__ << nd;
 //    KKSLoader * dbL = kksCoreApp->loader();
