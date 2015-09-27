@@ -3,7 +3,7 @@ TEMPLATE = lib
 TARGET = kkspluginmanager
 
 DESTDIR = ../../build
-include(../../ddocclient.conf)
+include(../../io_client.conf)
 
 CONFIG += warn_on dll
 CONFIG += qt     # Also for Qtopia Core!

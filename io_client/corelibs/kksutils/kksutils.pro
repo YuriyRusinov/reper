@@ -3,7 +3,7 @@ TEMPLATE = lib
 TARGET = kksutils
 
 DESTDIR = ../../build
-include(../../ddocclient.conf)
+include(../../io_client.conf)
 
 
 CONFIG_FILE = configEndians.h

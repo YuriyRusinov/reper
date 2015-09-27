@@ -2,7 +2,7 @@ TEMPLATE = app
 
 TRANSLATIONS +=reper_ru.ts
 
-include(../../ddocclient.conf)
+include(../../io_client.conf)
 QT += network core gui xml
 
 TARGET = reper_ksa

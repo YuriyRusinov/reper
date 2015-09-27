@@ -24,7 +24,7 @@ CONFIG += qt warn_on
 CONFIG += staticlib
 
 DESTDIR = ../../build
-include(../../ddocclient.conf)
+include(../../io_client.conf)
 #include( ../../global.pri )
 include(kksorpcommon.pri)
 

@@ -3,7 +3,7 @@ TEMPLATE = app
 TARGET = kksdbmonitor
 DESTDIR = ../../build
 
-include(../../ddocclient.conf)
+include(../../io_client.conf)
 QT += network
 
 INCLUDEPATH += .\

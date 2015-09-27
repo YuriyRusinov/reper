@@ -4,7 +4,7 @@ TEMPLATE = lib
 TARGET = kksqgis
 
 DESTDIR = ../../build
-include(../../ddocclient.conf)
+include(../../io_client.conf)
 
 CONFIG += qt
 

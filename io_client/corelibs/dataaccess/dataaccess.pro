@@ -4,7 +4,7 @@ TEMPLATE = lib
 TARGET = dataaccess
 
 DESTDIR = ../../build
-include(../../ddocclient.conf)
+include(../../io_client.conf)
 #utils support
 INCLUDEPATH *= ../kksutils
 DEPENDPATH *= ../kksutils

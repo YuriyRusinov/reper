@@ -20,12 +20,21 @@ KKS_DATA_DIR = $$KKS_PREFIX/data
 
 
 #external libraries paths
-EXT = /usr/local
+EXT = /opt/qgis
 EXTERNAL_PREFIX = $$EXT
-PSQL_HOME = $$EXTERNAL_PREFIX/pgsql
+PSQL_HOME = $$EXTERNAL_PREFIX
 PSQL_INCLUDE_DIR = $$EXTERNAL_PREFIX/include
 PSQL_LIB_DIR = $$EXTERNAL_PREFIX/lib
-PHP_INCLUDE_DIR = $$EXTERNAL_PREFIX/lib64/php5/include/php
+
+CONFIG *= qgis
+#for KKSGIS
+QGISDIR = $$EXTERNAL_PREFIX
+OSGEODIR = $$EXTERNAL_PREFIX
+
+KKSQGIS_LIB_NAME = kksqgis26
+KKSQGIS_DIR = kksqgis26
+QWTLIB = qwt
+
 
 #additional installation params
 KKS_EXEC_DIR = $$KKS_PREFIX/bin
@@ -40,7 +49,7 @@ KKS_TRANSL_DIR = $$KKS_PREFIX/bin
 #default is litle endian (Intel, VAX)
 USE_BIGENDIAN = 0
 
-include(ddocclient_ext.conf)
+include(io_client_ext.conf)
 
 DEFINES *= _CRT_NONSTDC_NO_DEPRECATE
 DEFINES *= _CRT_SECURE_NO_WARNINGS

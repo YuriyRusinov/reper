@@ -3,7 +3,7 @@ TEMPLATE = lib
 TARGET = kksjsonparser
 
 DESTDIR = ../../build
-include(../../ddocclient.conf)
+include(../../io_client.conf)
 
 INCLUDEPATH += .
 

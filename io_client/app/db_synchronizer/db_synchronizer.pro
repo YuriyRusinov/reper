@@ -3,7 +3,7 @@
 
 TEMPLATE = app
 TARGET = db_synchronizer
-include(../../ddocclient.conf)
+include(../../io_client.conf)
 
 DESTDIR = ../../build
 

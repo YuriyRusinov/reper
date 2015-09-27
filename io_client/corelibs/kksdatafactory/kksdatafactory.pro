@@ -4,7 +4,7 @@ TEMPLATE = lib
 TARGET = kksdatafactory
 
 DESTDIR = ../../build
-include(../../ddocclient.conf)
+include(../../io_client.conf)
 #libraries support
 INCLUDEPATH *= ../kksutils ../dataaccess ../kkspp 
 DEPENDPATH *= ../kksutils ../dataaccess ../kkspp 

@@ -7,7 +7,7 @@ TARGET = radio_image
 DESTDIR = ../../build/ddocplugins
 DEPLIBS_DIR = ../../build
 
-include(../../ddocclient.conf)
+include(../../io_client.conf)
 
 INCLUDEPATH += 	. \
 		../../corelibs/dataaccess \

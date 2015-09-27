@@ -4,7 +4,7 @@ TEMPLATE = lib
 TARGET = kksinteractor
 
 DESTDIR = ../../build
-include(../../ddocclient.conf)
+include(../../io_client.conf)
 #
 #utils support
 #

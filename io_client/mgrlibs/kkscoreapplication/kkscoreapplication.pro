@@ -4,7 +4,7 @@ TEMPLATE = lib
 TARGET = kkscoreapplication
 
 DESTDIR = ../../build
-include(../../ddocclient.conf)
+include(../../io_client.conf)
 
 #utils support
 INCLUDEPATH *= \

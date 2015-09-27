@@ -15,25 +15,29 @@ EXECUTABLE_PREFIX = ddocclient
 
 
 #installation params
-KKS_PREFIX = /opt/$$EXECUTABLE_PREFIX-$$KKS_VERSION
+KKS_PREFIX = "C:/DynamicDocs/ddocclient-$$KKS_VERSION"
 KKS_DATA_DIR = $$KKS_PREFIX/data
 
 
 #external libraries paths
-EXT = /opt/qgis
+EXT = "C:/Program Files (x86)/DynamicSoft/DynamicDocs Client 1.3.0"
 EXTERNAL_PREFIX = $$EXT
 PSQL_HOME = $$EXTERNAL_PREFIX
 PSQL_INCLUDE_DIR = $$EXTERNAL_PREFIX/include
 PSQL_LIB_DIR = $$EXTERNAL_PREFIX/lib
 
-CONFIG *= qgis
-#for KKSGIS
-QGISDIR = $$EXTERNAL_PREFIX
-OSGEODIR = $$EXTERNAL_PREFIX
+win32{ 
+    CONFIG *= qgis
 
-KKSQGIS_LIB_NAME = kksqgis26
-KKSQGIS_DIR = kksqgis26
-QWTLIB = qwt
+    KKSQGIS_LIB_NAME = kksqgis26
+    KKSQGIS_DIR = kksqgis26
+    QWTLIB = qwt
+    QSCI = qscintilla2
+
+    #for KKSGIS
+    QGISDIR = $$EXTERNAL_PREFIX/QGS261R
+    OSGEODIR = $$EXTERNAL_PREFIX/OSGEO
+}
 
 
 #additional installation params
@@ -49,7 +53,8 @@ KKS_TRANSL_DIR = $$KKS_PREFIX/bin
 #default is litle endian (Intel, VAX)
 USE_BIGENDIAN = 0
 
-include(ddocclient_ext.conf)
+include(io_client_ext.conf)
 
 DEFINES *= _CRT_NONSTDC_NO_DEPRECATE
 DEFINES *= _CRT_SECURE_NO_WARNINGS
+DEFINES *= _CRT_SECURE_NO_DEPRECATE

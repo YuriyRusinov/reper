@@ -2,7 +2,7 @@
 
 TEMPLATE = subdirs
 
-include(./ddocclient.conf)
+include(./io_client.conf)
 
 SUBDIRS += ./corelibs/kksjsonparser
 

@@ -4,7 +4,7 @@ TEMPLATE = lib
 TARGET = kkshttpconnector
 
 DESTDIR = ../../build
-include(../../ddocclient.conf)
+include(../../io_client.conf)
 
 CONFIG += qt
 CONFIG += warn_on dll

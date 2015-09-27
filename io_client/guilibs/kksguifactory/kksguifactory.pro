@@ -4,7 +4,7 @@ TEMPLATE = lib
 TARGET = kksguifactory
 
 DESTDIR = ../../build
-include(../../ddocclient.conf)
+include(../../io_client.conf)
 #libraries support
 INCLUDEPATH *= \
                 ../../corelibs/kksutils \

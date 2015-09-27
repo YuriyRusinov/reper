@@ -1,6 +1,6 @@
 TEMPLATE = app
 
-include(../../ddocclient.conf)
+include(../../io_client.conf)
 
 TARGET = $${EXECUTABLE_PREFIX}_app
 

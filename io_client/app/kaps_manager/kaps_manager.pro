@@ -3,7 +3,7 @@
 
 TEMPLATE = app
 TARGET = kaps_manager
-include(../../ddocclient.conf)
+include(../../io_client.conf)
 
 DESTDIR = ../../build
 

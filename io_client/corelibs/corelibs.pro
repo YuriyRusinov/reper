@@ -1,6 +1,6 @@
 TEMPLATE = subdirs
 
-include(../ddocclient.conf)
+include(../io_client.conf)
 
 # Directories
 SUBDIRS += \
