@@ -1,4 +1,4 @@
-﻿/*select f_safe_drop_type('h_get_category_attrs');
+/* select f_safe_drop_type('h_get_category_attrs');
 create type h_get_category_attrs as(id_attribute int4, 
                                     id_attr_type int4,
                                     attr_code varchar,
