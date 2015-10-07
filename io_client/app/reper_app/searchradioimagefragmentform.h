@@ -24,6 +24,7 @@ public:
 
 private slots:
     void brFilt (void);
+    void pbCalc (void);
 
 private:
     //

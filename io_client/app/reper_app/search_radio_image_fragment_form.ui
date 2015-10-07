@@ -6,15 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>326</width>
-    <height>252</height>
+    <width>332</width>
+    <height>426</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Search by Image fragment</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
+  <layout class="QGridLayout" name="gridLayout_2">
+   <item row="0" column="0" colspan="2">
     <layout class="QGridLayout" name="gridImageLay">
      <item row="0" column="0">
       <widget class="QLabel" name="lRImageS">
@@ -78,7 +78,43 @@
      </item>
     </layout>
    </item>
-   <item row="2" column="0">
+   <item row="1" column="1">
+    <widget class="QPushButton" name="pbCalculate">
+     <property name="text">
+      <string>&amp;Calculate</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="2">
+    <widget class="QGroupBox" name="gbParams">
+     <property name="title">
+      <string>Image parameters</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="lLength">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Length :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="lELength"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="lWidth">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Width :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="lEWidth"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="2">
     <layout class="QHBoxLayout" name="hButtonsLay">
      <item>
       <spacer name="horizontalSpacer">
