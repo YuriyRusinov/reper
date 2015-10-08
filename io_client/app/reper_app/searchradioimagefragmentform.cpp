@@ -3,6 +3,7 @@
 #include <QPixmap>
 #include <QPoint>
 #include <QColor>
+#include <QMessageBox>
 #include <QtDebug>
 
 #include "searchradioimagefragmentform.h"
@@ -14,7 +15,8 @@ SearchRadioImageFragmentForm :: SearchRadioImageFragmentForm (const QImage& sIma
     sourceImage (sImage),
     filteredImage (QImage()),
     lSImage (new QLabel (this)),
-    lFImage (new QLabel (this))
+    lFImage (new QLabel (this)),
+    isFilt (false)
 {
     UI->setupUi (this);
 
@@ -80,9 +82,50 @@ void SearchRadioImageFragmentForm :: brFilt (void)
             filteredImage.setPixel (pos, fCol);
         }
     setFilteredImage (filteredImage);
+    isFilt = true;
 }
 
 void SearchRadioImageFragmentForm :: pbCalc (void)
 {
+    if (!isFilt)
+    {
+        QMessageBox::warning (this, tr ("Calculate image parameters"), tr ("Raw image has to be filtered"), QMessageBox::Ok);
+        return;
+    }
     UI->gbParams->setVisible (true);
+    int w = sourceImage.width();
+    int h = sourceImage.height();
+    double brRel = UI->spBrightess->value()/0.1e3;
+    double cVal = (1.0-brRel)*qGray (255, 255, 255);
+    QPoint np (0,0);
+    QPoint ep (0,0);
+    QPoint sp (0,0);
+    QPoint wp (0,0);
+    int lf (0);
+    int wf (0);
+    for (int i=1; i<w-1; i++)
+        for (int j=1; j<h-1; j++)
+        {
+            QPoint cPos = QPoint (i, j);
+            QPoint prPosX = QPoint (i-1, j);
+            QPoint prPosY = QPoint (i, j-1);
+            QPoint nPosX = QPoint (i+1, j);
+            QPoint nPosY = QPoint (i, j+1);
+            int sCol = qGray (filteredImage.pixel (cPos));
+            int pColX = qGray (filteredImage.pixel (prPosX));
+            int pColY = qGray (filteredImage.pixel (prPosY));
+            int nColX = qGray (filteredImage.pixel (nPosX));
+            int nColY = qGray (filteredImage.pixel (nPosY));
+            if (sCol >= cVal && (pColX < cVal || pColY < cVal || nColX < cVal || nColY < cVal))
+            {
+                //qDebug () << __PRETTY_FUNCTION__ << QString ("Comparison");
+                if (np.x() * np.x() + np.y() * np.y() > 0)
+                {
+                    if (np.y() >= cPos.y())
+                    {
+                        np = cPos;
+                    }
+                }
+            }
+        }
 }

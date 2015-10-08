@@ -35,6 +35,7 @@ private:
     QImage filteredImage;
     QLabel * lSImage;
     QLabel * lFImage;
+    bool isFilt;
 
 private:
     Q_OBJECT
