@@ -6,6 +6,8 @@
 #include <QMessageBox>
 #include <QtDebug>
 
+#include <math.h>
+
 #include "searchradioimagefragmentform.h"
 #include "ui_search_radio_image_fragment_form.h"
 
@@ -121,11 +123,49 @@ void SearchRadioImageFragmentForm :: pbCalc (void)
                 //qDebug () << __PRETTY_FUNCTION__ << QString ("Comparison");
                 if (np.x() * np.x() + np.y() * np.y() > 0)
                 {
-                    if (np.y() >= cPos.y())
+                    if (np.y() < cPos.y())
                     {
                         np = cPos;
                     }
                 }
+                else
+                    np = cPos;
+                if (sp.x() * sp.x() + sp.y() * sp.y() > 0)
+                {
+                    if (sp.y() > cPos.y())
+                    {
+                        sp = cPos;
+                    }
+                }
+                else
+                    sp = cPos;
+                if (ep.x() * ep.x() + ep.y() * ep.y() > 0)
+                {
+                    if (ep.x() > cPos.x())
+                    {
+                        ep = cPos;
+                    }
+                }
+                else
+                    ep = cPos;
+                if (wp.x() * wp.x() + wp.y() * wp.y() > 0)
+                {
+                    if (wp.x() < cPos.x())
+                    {
+                        wp = cPos;
+                    }
+                }
+                else
+                    wp = cPos;
             }
         }
+    qDebug () << __PRETTY_FUNCTION__ << np << ep << sp << wp;
+    double deltax = sp.x()-np.x();
+    double deltay = sp.y()-np.y();
+    lf = (int)sqrt (deltax*deltax+deltay*deltay);
+    deltax = wp.x()-ep.x();
+    deltay = wp.y()-ep.y();
+    wf = (int)sqrt (deltax*deltax+deltay*deltay);
+    UI->lELength->setText (QString::number (lf));
+    UI->lEWidth->setText (QString::number (wf));
 }
