@@ -90,10 +90,7 @@ void SearchRadioImageFragmentForm :: brFilt (void)
 void SearchRadioImageFragmentForm :: pbCalc (void)
 {
     if (!isFilt)
-    {
-        QMessageBox::warning (this, tr ("Calculate image parameters"), tr ("Raw image has to be filtered"), QMessageBox::Ok);
-        return;
-    }
+        brFilt ();
     UI->gbParams->setVisible (true);
     int w = sourceImage.width();
     int h = sourceImage.height();
