@@ -362,26 +362,8 @@ void ReperMainWindow::slotGologram (void)
     //QCoreApplication::installTranslator (&golTr);
     imageCreatorForm * icf = new imageCreatorForm (this);
     connect (icf, SIGNAL (imagesData(generatingDataPlus)), this, SLOT (slotGologramCalc(generatingDataPlus)) );
-/*    QString gFileName = QFileDialog::getOpenFileName (this, tr("Open object file"),
-                                                      QDir::currentPath(),
-                                                      tr("Object files (*.obj);;All files (*.*)")
-            );
-*/
     icf->exec();
     qDebug () << __PRETTY_FUNCTION__ ;
-/*    mslLoader::OBJloader *objL = new mslLoader::OBJloader;
-    loadModel (*objL, gFileName.toStdString ());
-    generatingData gD;
-    gD.lengthOfShip = 300;
-    gD.numberOfUnit = 5;
-    gD.XY_angleMax = 360.0;
-    gD.XY_angleMin = 0.0;
-    gD.XY_angleStep = 60;
-    gD.XZ_angleMax = 80.0;
-    gD.XZ_angleMin = 20.0;
-    gD.XZ_angleStep = 10.0;
-    QVector<returningData> resD = generateImages (gD, *objL);
-    delete objL;*/
 }
 
 void ReperMainWindow::slotGologramCalc (generatingDataPlus gdp)
