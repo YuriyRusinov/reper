@@ -4,7 +4,8 @@ HEADERS += \
            imagewidget.h \
            ImageLabel.h \
            assistant.h \
-           searchradioimagefragmentform.h
+           searchradioimagefragmentform.h \
+           searchradioimagecalc.h
 
 FORMS += \
          reper_main_window.ui \
@@ -18,6 +19,7 @@ SOURCES += \
            imagewidget.cpp \
            ImageLabel.cpp \
            assistant.cpp \
-           searchradioimagefragmentform.cpp
+           searchradioimagefragmentform.cpp \
+           searchradioimagecalc.cpp
 
 #RESOURCES = icon_set.qrc
