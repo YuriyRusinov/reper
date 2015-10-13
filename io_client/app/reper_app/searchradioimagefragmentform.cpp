@@ -166,3 +166,10 @@ void SearchRadioImageFragmentForm :: pbCalc (void)
     UI->lELength->setText (QString::number (lf));
     UI->lEWidth->setText (QString::number (wf));
 }
+
+void SearchRadioImageFragmentForm :: setResults (int pix_length, int pix_width, double azimuth)
+{
+    UI->lELength->setText (QString::number (pix_length));
+    UI->lEWidth->setText (QString::number (pix_width));
+    UI->lEAzimuth->setText (QString::number (azimuth));
+}

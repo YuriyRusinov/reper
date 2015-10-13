@@ -25,6 +25,10 @@ public:
 private slots:
     void brFilt (void);
     void pbCalc (void);
+    void setResults (int pix_length, int pix_width, double azimuth);
+
+signals:
+    void calcParams (const QImage& im);
 
 private:
     //
