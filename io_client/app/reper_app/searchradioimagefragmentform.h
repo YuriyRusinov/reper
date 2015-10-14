@@ -28,7 +28,7 @@ private slots:
     void setResults (int pix_length, int pix_width, double azimuth);
 
 signals:
-    void calcParams (const QImage& im);
+    void calcParams (const QImage& im, double cVal);
 
 private:
     //

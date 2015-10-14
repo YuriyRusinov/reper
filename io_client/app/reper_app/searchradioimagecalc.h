@@ -15,7 +15,7 @@ public:
     SearchRadioImageFragmentForm * GUIImageView (const QImage& im=QImage(), QWidget * parent=0, Qt::WindowFlags flags=0);
     
 private slots:
-    void calculateParameters (const QImage& im);
+    void calculateParameters (const QImage& im, double cVal);
 
 signals:
     void setVals (int pl, int pw, double az);

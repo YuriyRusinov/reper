@@ -28,6 +28,7 @@
 #include "repermainwindow.h"
 #include "searchradioform.h"
 #include "searchradioimagefragmentform.h"
+#include "searchradioimagecalc.h"
 #include "objloader.h"
 #include "gologramma.h"
 #include "imagewidget.h"
@@ -200,7 +201,8 @@ void ReperMainWindow :: slotSearchByImage (void)
 void ReperMainWindow :: searchIm (const QImage& sIm0)
 {
     qDebug () << __PRETTY_FUNCTION__;
-    SearchRadioImageFragmentForm * srForm = new SearchRadioImageFragmentForm (sIm0);
+    SearchRadioImageCalc * imCalc = new SearchRadioImageCalc ();
+    SearchRadioImageFragmentForm * srForm = imCalc->GUIImageView (sIm0);//new SearchRadioImageFragmentForm (sIm0);
     //srForm->setImage (sIm0);
     QImage sIm (sIm0);
     if (srForm->exec() == QDialog::Accepted)
@@ -208,13 +210,13 @@ void ReperMainWindow :: searchIm (const QImage& sIm0)
         sIm = srForm->getSourceImage();
         if (sIm.isNull())
         {
-            delete srForm;
+            delete imCalc;
             return;
         }
     }
     else
     {
-        delete srForm;
+        delete imCalc;//srForm;
         return;
     }
     KKSLoader * loader = kksApp->loader();
@@ -225,7 +227,7 @@ void ReperMainWindow :: searchIm (const QImage& sIm0)
         QMessageBox::warning (0, tr("Select reference"),
                                  tr ("Not available suitable reference"),
                                  QMessageBox::Ok);
-        delete srForm;
+        delete imCalc;
         return;
     }
     KKSObjEditorFactory * oef = kksApp->oef();
@@ -266,7 +268,7 @@ void ReperMainWindow :: searchIm (const QImage& sIm0)
     io->release ();
     slotCreateNewObjEditor(objEditor);
 
-    delete srForm;
+    delete imCalc;//srForm;
 }
 
 void ReperMainWindow :: slotCompare (void)
