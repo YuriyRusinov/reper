@@ -20,6 +20,7 @@ SearchRadioImageFragmentForm * SearchRadioImageCalc :: GUIImageView (const QImag
 
     connect (sForm, SIGNAL (calcParams (const QImage&, double)), this, SLOT (calculateParameters (const QImage&, double)) );
     connect (this, SIGNAL (setVals (int, int, double)), sForm, SLOT (setResults(int, int, double)) );
+    sForm->pbCalc ();
 
     return sForm;
 }

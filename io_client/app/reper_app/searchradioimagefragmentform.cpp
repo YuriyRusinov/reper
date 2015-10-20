@@ -30,13 +30,14 @@ SearchRadioImageFragmentForm :: SearchRadioImageFragmentForm (const QImage& sIma
     gFLay->addWidget (lFImage, 0, 0, 1, 1);
 
     UI->tbFilt->setToolTip (tr("Filter by brightness"));
-    UI->gbParams->setVisible (false);
+    UI->gbParams->setVisible (true);
 
     connect (UI->tbFilt, SIGNAL (clicked()), this, SLOT (brFilt()) );
-    connect (UI->pbCalculate, SIGNAL (clicked()), this, SLOT (pbCalc()) );
+    //connect (UI->pbCalculate, SIGNAL (clicked()), this, SLOT (pbCalc()) );
 
     connect (UI->pbCancel, SIGNAL (clicked()), this, SLOT (reject()) );
     connect (UI->pbOk, SIGNAL (clicked()), this, SLOT (accept()) );
+    this->pbCalc ();
 }
 
 SearchRadioImageFragmentForm :: ~SearchRadioImageFragmentForm (void)
@@ -83,6 +84,7 @@ void SearchRadioImageFragmentForm :: brFilt (void)
         }
     setFilteredImage (filteredImage);
     isFilt = true;
+    this->pbCalc ();
 }
 
 void SearchRadioImageFragmentForm :: pbCalc (void)

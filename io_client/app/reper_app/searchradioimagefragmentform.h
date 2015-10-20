@@ -22,9 +22,11 @@ public:
     void setSourceImage (const QImage& im);
     void setFilteredImage (const QImage& im);
 
+public slots:
+    void pbCalc (void);
+
 private slots:
     void brFilt (void);
-    void pbCalc (void);
     void setResults (int pix_length, int pix_width, double azimuth);
 
 signals:
