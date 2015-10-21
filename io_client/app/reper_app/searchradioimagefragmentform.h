@@ -22,6 +22,8 @@ public:
     void setSourceImage (const QImage& im);
     void setFilteredImage (const QImage& im);
 
+    double getAzimuth (void) const;
+
 public slots:
     void pbCalc (void);
 
@@ -42,6 +44,7 @@ private:
     QLabel * lSImage;
     QLabel * lFImage;
     bool isFilt;
+    double az;
 
 private:
     Q_OBJECT

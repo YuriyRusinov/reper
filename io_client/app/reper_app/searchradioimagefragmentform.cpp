@@ -16,7 +16,8 @@ SearchRadioImageFragmentForm :: SearchRadioImageFragmentForm (const QImage& sIma
     filteredImage (QImage()),
     lSImage (new QLabel (this)),
     lFImage (new QLabel (this)),
-    isFilt (false)
+    isFilt (false),
+    az (-1)
 {
     UI->setupUi (this);
 
@@ -106,4 +107,10 @@ void SearchRadioImageFragmentForm :: setResults (int pix_length, int pix_width, 
     UI->lELength->setText (QString::number (pix_length));
     UI->lEWidth->setText (QString::number (pix_width));
     UI->lEAzimuth->setText (QString::number (azimuth));
+    az = azimuth;
+}
+
+double SearchRadioImageFragmentForm :: getAzimuth (void) const
+{
+    return az;
 }

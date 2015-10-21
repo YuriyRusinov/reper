@@ -205,9 +205,11 @@ void ReperMainWindow :: searchIm (const QImage& sIm0)
     SearchRadioImageFragmentForm * srForm = imCalc->GUIImageView (sIm0);//new SearchRadioImageFragmentForm (sIm0);
     //srForm->setImage (sIm0);
     QImage sIm (sIm0);
+    double az (-1.0);
     if (srForm->exec() == QDialog::Accepted)
     {
         sIm = srForm->getSourceImage();
+        az = srForm->getAzimuth ();
         if (sIm.isNull())
         {
             delete imCalc;
@@ -240,19 +242,38 @@ void ReperMainWindow :: searchIm (const QImage& sIm0)
     buffer.open(QIODevice::WriteOnly);
     sIm.save (&buffer, "XPM");
     buffer.close ();
-    KKSCategoryAttr * a = 0;//loader->loadAttribute ("image_jpg"
+    KKSCategoryAttr * aIm = 0;//loader->loadAttribute ("image_jpg"
+    KKSCategoryAttr * aAz = 0;
     for (KKSMap<int, KKSCategoryAttr *>::const_iterator p = ct->attributes().constBegin();
-            p != ct->attributes().constEnd() && a == 0;
+            p != ct->attributes().constEnd() ;//&& aIm == 0 && aAz==0;
             ++p)
+    {
         if (QString::compare (p.value()->code(), QString("image_jpg"), Qt::CaseInsensitive) == 0)
-                a = p.value();
+            aIm = p.value ();
+        if (QString::compare (p.value()->code(), QString("azimuth"), Qt::CaseInsensitive) == 0)
+            aAz = p.value ();
+    }
+    if (!aAz)
+    {
+        delete imCalc;
+        return;
+    }
 
-    KKSFilter * filter = ct->createFilter (a->id(), bytes, KKSFilter::foEq); 
+    KKSFilter * filter = ct->createFilter (aIm->id(), bytes, KKSFilter::foEq);
+    KKSFilter * fAzMin = ct->createFilter (aAz->id(), QString::number ((int)az-3), KKSFilter::foGrEq);
+    KKSFilter * fAzMax = ct->createFilter (aAz->id(), QString::number ((int)az+3), KKSFilter::foLessEq);
     KKSList<const KKSFilter*> filters;
     filters.append (filter);
     filter->release ();
-    KKSFilterGroup * group = new KKSFilterGroup(true);
+    KKSFilterGroup * group = new KKSFilterGroup(false);
+    KKSFilterGroup * azGroup = new KKSFilterGroup (true);
+    azGroup->addFilter (fAzMin);
+    fAzMin->release ();
+    azGroup->addFilter (fAzMax);
+    fAzMax->release ();
     group->setFilters(filters);
+    group->addGroup (azGroup);
+    azGroup->release ();
     filterGroups.append(group);
     group->release();
     KKSObjEditor *objEditor = oef->createObjEditor(IO_IO_ID, 
