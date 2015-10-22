@@ -103,3 +103,8 @@ void imageCreatorForm::build()
     ui->loadModel->setEnabled(true);
     ui->startButton->setEnabled(true);
 }
+
+bool imageCreatorForm::forTests (void) const
+{
+    return (ui->cbTests->checkState() != Qt::Unchecked);
+}

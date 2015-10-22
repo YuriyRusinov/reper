@@ -19,6 +19,8 @@ public:
     explicit imageCreatorForm(QWidget *parent = 0);
     ~imageCreatorForm();
 
+    bool forTests (void) const;
+
 private:
     Ui::imageCreatorForm *ui;
 

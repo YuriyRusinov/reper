@@ -392,8 +392,12 @@ void ReperMainWindow::slotGologram (void)
 void ReperMainWindow::slotGologramCalc (generatingDataPlus gdp)
 {
     QWidget * iGW = qobject_cast<QWidget *>(this->sender());
+    bool fTests (false);
     if (iGW)
+    {
         iGW->setVisible (false);
+        fTests = qobject_cast<imageCreatorForm *>(iGW)->forTests();
+    }
     ImageGenerator* generator = new ImageGenerator(gdp,this);
     
     generator->loadModel();
@@ -404,12 +408,16 @@ void ReperMainWindow::slotGologramCalc (generatingDataPlus gdp)
     qDebug () << __PRETTY_FUNCTION__ << nd;
 //    KKSLoader * dbL = kksCoreApp->loader();
     KKSEIOFactory * eiof = kksCoreApp->eiof();
+    Q_UNUSED (eiof);
     KKSLoader * loader = kksApp->loader();
     QString tName = "rli_image_raws";
     KKSObject * io = loader->loadIO (tName, true);
     const KKSCategory * c = io->category();
     const KKSCategory * ct = c->tableCategory();
     KKSList<KKSAttrValue*> aVals;
+    QString imDir = QFileDialog::getExistingDirectory (this, tr("Save test images"));
+    if (fTests && imDir.isEmpty())
+        return;
     for (int i=0; i<nd; i++)
     {
         KKSObjectExemplar * cef = new KKSObjectExemplar (-1, tr("Record %1").arg (i), io);
@@ -442,7 +450,9 @@ void ReperMainWindow::slotGologramCalc (generatingDataPlus gdp)
                 bData.append (" ");
                 int nWidth = resD[i].rowNumber;
                 int nHeight = resD[i].columnNumber;
+                QImage pIm (nWidth, nHeight, QImage::Format_ARGB32);
                 QByteArray bIm;// (imData);
+                QFile imFile (imDir+QDir::separator()+QString("image_%1_%2.jpg").arg (resD[i].XY_angle).arg(resD[i].XZ_angle));
                 //QFile debIm ("ddd.dat");
                 //QDataStream debImage (&bIm, QIODevice::WriteOnly);
                 //debIm.open (QIODevice::WriteOnly);
@@ -451,10 +461,14 @@ void ReperMainWindow::slotGologramCalc (generatingDataPlus gdp)
                 {
                     for (int iii=0; iii<nHeight; iii++)
                     {
-                        bIm += QByteArray::number ((uchar)resD[i].data[ncount++]);
+                        uint c = (uchar)resD[i].data[ncount++];
+                        bIm += QByteArray::number (c);//(uchar)resD[i].data[ncount++]);
+                        c *= 255;
+                        pIm.setPixel(ii, iii, qRgb(c,c,c));
                     }
                     //debImage << QString("\r\n");
                 }
+                pIm.save (&imFile, "JPG");
                 bData.append (bIm);
                 v = KKSValue (QString(bData), KKSAttrType::atBinary);
             }
@@ -464,8 +478,12 @@ void ReperMainWindow::slotGologramCalc (generatingDataPlus gdp)
             av->release ();
         }
         cef->setAttrValues (aVals);
-        qint64 id = eiof->insertEIO (cef, ct, QString(), true);
-        qDebug () << __PRETTY_FUNCTION__ << id;
+        if (!fTests)
+        {
+            qint64 id = eiof->insertEIO (cef, ct, QString(), true);
+            qDebug () << __PRETTY_FUNCTION__ << id;
+        }
+        cef->release ();
     }
     io->release ();
 //    delete pProcD;
