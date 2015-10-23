@@ -5,7 +5,8 @@ HEADERS += \
            ImageLabel.h \
            assistant.h \
            searchradioimagefragmentform.h \
-           searchradioimagecalc.h
+           searchradioimagecalc.h \
+           searchresultsform.h
 
 FORMS += \
          reper_main_window.ui \
@@ -20,6 +21,7 @@ SOURCES += \
            ImageLabel.cpp \
            assistant.cpp \
            searchradioimagefragmentform.cpp \
-           searchradioimagecalc.cpp
+           searchradioimagecalc.cpp \
+           searchresultsform.cpp
 
 #RESOURCES = icon_set.qrc
