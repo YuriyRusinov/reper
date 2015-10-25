@@ -9,6 +9,7 @@ class QAbstractItemModel;
 class QLabel;
 class QToolBar;
 class QLineEdit;
+class QGroupBox;
 
 class SearchResultsForm : public QWidget
 {
@@ -18,6 +19,9 @@ public:
 
     void setSearchImage (const QImage& sIm);
     void setResultsModel (QAbstractItemModel * mod);
+
+private slots:
+    void filterRecs (const QString& text);
 
 private:
     //
@@ -29,12 +33,13 @@ private:
     //
     // Variables
     //
+    QImage sImage;
     QTreeView * tView;
     QLabel * lImage;
     QToolBar * tbActions;
     QLabel * lFilter;
     QLineEdit * filterLE;
-    QImage sImage;
+    QGroupBox * gbFilter;
 
 private:
     Q_OBJECT

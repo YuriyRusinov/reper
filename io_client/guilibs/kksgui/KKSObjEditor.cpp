@@ -1642,6 +1642,7 @@ void KKSObjEditor :: setValue (qint64 idAttrValue, KKSIndAttrClass sys, QVariant
 
 void KKSObjEditor :: generateIOUUID (qint64 idAttrVal)
 {
+    Q_UNUSED (idAttrVal);
     QToolButton *tb = qobject_cast<KKSAttrUUIDWidget *>(this->sender())->getButton();
     if (!tb)
         return;

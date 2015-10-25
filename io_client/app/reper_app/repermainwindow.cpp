@@ -23,6 +23,7 @@
 #include <KKSObjEditor.h>
 #include <KKSObject.h>
 #include <KKSObjectExemplar.h>
+#include <KKSRecWidget.h>
 #include <radio_image_plugin.h>
 #include <defines.h>
 #include "repermainwindow.h"
@@ -32,6 +33,7 @@
 #include "objloader.h"
 #include "gologramma.h"
 #include "imagewidget.h"
+#include "searchresultsform.h"
 #include "ui_reper_main_window.h"
 
 using mslLoader::OBJloader;
@@ -288,6 +290,14 @@ void ReperMainWindow :: searchIm (const QImage& sIm0)
                                                    0);
     io->release ();
     slotCreateNewObjEditor(objEditor);
+    SearchResultsForm *sresForm = new SearchResultsForm (sIm);
+    QMdiSubWindow * m_ResW = m_mdiArea->addSubWindow (sresForm);
+    m_ResW->setAttribute (Qt::WA_DeleteOnClose);
+    sresForm->show ();
+    KKSRecWidget * rw = objEditor->getRecordsWidget ();
+    QAbstractItemModel * sMod = rw->getModel ();
+    sresForm->setResultsModel (sMod);
+    //connect (objEditor, SIGNAL (closeEditor()), m_objEditorW, SLOT (close()) );
 
     delete imCalc;//srForm;
 }
@@ -328,11 +338,11 @@ void ReperMainWindow::slotCreateNewObjEditor(KKSObjEditor * objEditor)
     QMdiSubWindow * m_objEditorW = m_mdiArea->addSubWindow (objEditor);
     m_objEditorW->setAttribute (Qt::WA_DeleteOnClose);
     connect (objEditor, SIGNAL (closeEditor()), m_objEditorW, SLOT (close()) );
-    
-    //помечаем, что редактор ИО является MDI-окном. В этом случае при определении активного окна необходимо будет слать сигнал isActiveSubWindow()
+    //
+    // помечаем, что редактор ИО является MDI-окном. В этом случае при определении активного окна необходимо будет слать сигнал isActiveSubWindow()
+    //
     objEditor->setAsSubWindow(true);
     connect(objEditor, SIGNAL(isActiveSubWindow(const KKSObjEditor *, bool *)), this, SLOT(isActiveSubWindow(const KKSObjEditor *, bool *)));
-
 
     objEditor->setWindowState (objEditor->windowState() | Qt::WindowActive);
     m_objEditorW->setWindowState (m_objEditorW->windowState() | Qt::WindowActive);
