@@ -440,9 +440,9 @@ void ReperMainWindow::slotGologramCalc (generatingDataPlus gdp)
             KKSValue v;// = resD[i]
             if (QString::compare (p.value()->code(), QString("azimuth"), Qt::CaseInsensitive) == 0)
                 v = KKSValue (QString :: number (resD[i].XY_angle), KKSAttrType::atDouble);
-            else if (QString::compare (p.value()->name(), QString("elevation_angle"), Qt::CaseInsensitive) == 0)
-                v = KKSValue (QString :: number (resD[i].XY_angle), KKSAttrType::atDouble);
-            else if (QString::compare (p.value()->name(), QString("depth"), Qt::CaseInsensitive) == 0)
+            else if (QString::compare (p.value()->code(), QString("elevation_angle"), Qt::CaseInsensitive) == 0)
+                v = KKSValue (QString :: number (resD[i].XZ_angle), KKSAttrType::atDouble);
+            else if (QString::compare (p.value()->code(), QString("depth"), Qt::CaseInsensitive) == 0)
                 v = KKSValue (QString :: number (resD[i].rowNumber), KKSAttrType::atInt);
             else if (QString::compare (p.value()->code(), QString("image_raw"), Qt::CaseInsensitive) == 0)
             {
