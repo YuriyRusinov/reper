@@ -7103,7 +7103,7 @@ Please save it before creating new records in it.</source>
     </message>
     <message>
         <source>Cannot save rubricators</source>
-        <translation type="unfinished">Не могу сохранить рубрикаторы</translation>
+        <translation>Не могу сохранить рубрикаторы</translation>
     </message>
     <message>
         <source>Name</source>

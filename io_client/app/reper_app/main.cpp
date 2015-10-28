@@ -101,10 +101,13 @@ int main(int argc, char *argv[])
     bool istr = reperTr->load("reper_app_ru", transl_path);//.load (transl_path + QString ("reper_app_ru.qm"), ".");
     QTranslator * golTr = new QTranslator (0);
     bool isGTr = golTr->load("gologram_ru", transl_path);
-    qDebug () << __PRETTY_FUNCTION__ << istr << isGTr << transl_path;
+    QTranslator * ddocTr = new QTranslator (0);
+    bool isddocTr = ddocTr->load ("ddocclient_ru", transl_path);
+    qDebug () << __PRETTY_FUNCTION__ << istr << isGTr << transl_path << isddocTr;
 
     qApp->installTranslator (reperTr);
     qApp->installTranslator (golTr);
+    qApp->installTranslator (ddocTr);
     kksSettings->endGroup();
 
 /*

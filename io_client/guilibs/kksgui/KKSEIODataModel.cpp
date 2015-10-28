@@ -142,7 +142,14 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
     KKSList<KKSAttrView*> avList = tRef ? tRef->sortedAttrs() : KKSList<KKSAttrView*>();
     int iCol (index.column());
     if (role == Qt::DisplayRole || role == Qt::ToolTipRole)
+    {
+        KKSAttrView * v = avList[index.column()];
+        if ((v->type()->attrType() == KKSAttrType::atBinary ||
+              (v->refType() && v->refType()->attrType() == KKSAttrType::atBinary)) && role == Qt::DisplayRole)
+            return QVariant ();
+
         return wItem->columnData(iCol);
+    }
     else if (role == Qt::UserRole)
     {
         return idw;//wItem->id();//p.key();
@@ -200,13 +207,57 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
         else if ( v->type()->attrType() == KKSAttrType::atVideo ||
                   (v->refType() && v->refType()->attrType() == KKSAttrType::atVideo))
             return QIcon (":/ddoc/movie_track.png");
+        else if (v->type()->attrType() == KKSAttrType::atBinary ||
+                  (v->refType() && v->refType()->attrType() == KKSAttrType::atBinary))
+        {
+            QVariant cData = wItem->columnData(iCol);
+            QByteArray binaryData = cData.toByteArray ();
+            if (binaryData.contains("\\x"))
+                binaryData = QByteArray::fromHex(binaryData);
+            QTextStream bIm (binaryData);
+            unsigned az_dd;
+            bIm >> az_dd;
+            if (az_dd > 360)
+                return QVariant();
+            unsigned elev_dd;
+            bIm >> elev_dd;
+            unsigned nW, nH, nd;
+            bIm >> nW;
+            bIm >> nH;
+            bIm >> nd;
+            QImage pIm (nW, nH, QImage::Format_ARGB32);
+            //bIm.readRawData(imData, nW*nH);
+            QString imStr;// = bIm.read(nW*nH);
+            bIm >> imStr;
+            QByteArray imArr = imStr.toAscii();
+            //qDebug () << __PRETTY_FUNCTION__ << imArr;
+            if (imStr.isEmpty())
+                return QVariant();
+            int ncount (0);
+            for (uint i=0; i<nW; i++)
+            {
+                for (uint j=0; j<nH; j++)
+                {
+                    // = new char;// = (uchar)imData[ncount++];
+                    //bIm >> imData;
+                    //QByteArray s = QByteArray (imArr.at(ncount++));
+                    uint c = (uint)imStr.at(ncount++).digitValue();//s.toUInt();
+                    c *= 255;
+                    pIm.setPixel(i, j, qRgb(c,c,c));
+                }
+            }
+            return pIm;
+        }
         else
             return QVariant();
     }
     else if (role == Qt::SizeHintRole)
     {
         KKSAttrView * v = avList[index.column()];
-        return QSize (v->defWidth(),24);
+        if (!tRef->category()->searchAttributesByType (KKSAttrType::atBinary).isEmpty())
+            return QSize (v->defWidth(), 32);
+        else
+            return QSize (v->defWidth(),24);
     }
     return QVariant();
 }
