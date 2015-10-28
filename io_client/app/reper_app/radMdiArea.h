@@ -4,7 +4,7 @@
 #include <QMdiArea>
 #include <QFont>
 #include <QPen>
-#include "src_config.h"
+//#include "src_config.h"
 
 class QResizeEvent;
 class QPaintEvent;
@@ -12,7 +12,7 @@ class QShowEvent;
 class QContextMenuEvent;
 class QMenu;
 
-class _FFTMATR_EXPORT_ RadMdiArea : public QMdiArea
+class RadMdiArea : public QMdiArea
 {
 public:
     RadMdiArea (const QImage& im, QString title, QWidget * parent = 0);

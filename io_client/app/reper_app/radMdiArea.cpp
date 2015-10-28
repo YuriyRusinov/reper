@@ -12,8 +12,9 @@
 #include <QPalette>
 #include <QtDebug>
 
-#include "radapplication.h"
-#include "RadSettings.h"
+#include "kksapplication.h"
+#include "kkscoreapplication.h"
+#include "kkssettings.h"
 #include "radMdiArea.h"
 
 RadMdiArea :: RadMdiArea (const QImage& im, QString title, QWidget * parent)
@@ -60,45 +61,42 @@ void RadMdiArea :: paintEvent (QPaintEvent * pEvent)
 
 void RadMdiArea :: showEvent (QShowEvent * event)
 {
-    QCoreApplication * app = QCoreApplication::instance ();
-    if (qobject_cast<RadApplication *>(app))
+    KKSSettings * rSettings = kksCoreApp ? kksCoreApp->getKKSSettings() : 0;//qobject_cast<KKSApplication *>(app)->getKKSSettings ();
+//    QCoreApplication * app = QCoreApplication::instance ();
+//    if (qobject_cast<KKSApplication *>(app))
+//    {
+//        KKSSettings * rSettings = qobject_cast<KKSApplication *>(app)->getKKSSettings ();
+    if (rSettings)
     {
-        RadiusSettings * rSettings = qobject_cast<RadApplication *>(app)->getRadSettings ();
-        if (rSettings)
-        {
-            rSettings->beginGroup ("System settings");
-            rSettings->writeSettings ("graphics", "pen", tPen.color().name());
-            rSettings->writeSettings ("graphics", "font family", tFont.family());
-            rSettings->writeSettings ("graphics", "font size", QString::number (tFont.pointSize()));
-            rSettings->endGroup();
-        }
+        rSettings->beginGroup ("System settings");
+        rSettings->writeSettings ("graphics", "pen", tPen.color().name());
+        rSettings->writeSettings ("graphics", "font family", tFont.family());
+        rSettings->writeSettings ("graphics", "font size", QString::number (tFont.pointSize()));
+        rSettings->endGroup();
     }
+//    }
     QMdiArea::showEvent (event);
 }
 
 void RadMdiArea :: init (void)
 {
-    QCoreApplication * app = QCoreApplication::instance ();
-    if (qobject_cast<RadApplication *>(app))
+    KKSSettings * rSettings = kksCoreApp ? kksCoreApp->getKKSSettings() : 0;//qobject_cast<KKSApplication *>(app)->getKKSSettings ();
+    if (rSettings)
     {
-        RadiusSettings * rSettings = qobject_cast<RadApplication *>(app)->getRadSettings ();
-        if (rSettings)
-        {
-            rSettings->beginGroup ("System settings/graphics");
-            QString colName = rSettings->getParam ("pen");
-            if (colName.isEmpty())
-                tPen = QPen (this->palette().color(QPalette::Active, QPalette::Window));//(Qt::yellow);
-            else
-                tPen = QPen (QColor (colName));
-            QString fontFamily = rSettings->getParam ("font family");
-            int pointSize = rSettings->getParam ("font size").toInt();
-            if (fontFamily.isEmpty() || pointSize <= 0)
-                tFont = QFont("Arial", 60);
-            else
-                tFont = QFont (fontFamily, pointSize);
+        rSettings->beginGroup ("System settings/graphics");
+        QString colName = rSettings->getParam ("pen");
+        if (colName.isEmpty())
+            tPen = QPen (this->palette().color(QPalette::Active, QPalette::Window));//(Qt::yellow);
+        else
+            tPen = QPen (QColor (colName));
+        QString fontFamily = rSettings->getParam ("font family");
+        int pointSize = rSettings->getParam ("font size").toInt();
+        if (fontFamily.isEmpty() || pointSize <= 0)
+            tFont = QFont("Arial", 60);
+        else
+            tFont = QFont (fontFamily, pointSize);
 
-            rSettings->endGroup();
-        }
+        rSettings->endGroup();
     }
 
     QAction * actFont = new QAction (tr("Set title font"), this);
@@ -119,17 +117,14 @@ void RadMdiArea :: setTitleFont (void)
         return;
 
     tFont = font;
-    QCoreApplication * app = QCoreApplication::instance ();
-    if (qobject_cast<RadApplication *>(app))
+//    QCoreApplication * app = QCoreApplication::instance ();
+    KKSSettings * rSettings = kksCoreApp ? kksCoreApp->getKKSSettings() : 0;//qobject_cast<KKSApplication *>(app)->getKKSSettings ();
+    if (rSettings)
     {
-        RadiusSettings * rSettings = qobject_cast<RadApplication *>(app)->getRadSettings ();
-        if (rSettings)
-        {
-            rSettings->beginGroup ("System settings");
-            rSettings->writeSettings ("graphics", "font family", tFont.family());
-            rSettings->writeSettings ("graphics", "font size", QString::number (tFont.pointSize()));
-            rSettings->endGroup();
-        }
+        rSettings->beginGroup ("System settings");
+        rSettings->writeSettings ("graphics", "font family", tFont.family());
+        rSettings->writeSettings ("graphics", "font size", QString::number (tFont.pointSize()));
+        rSettings->endGroup();
     }
 }
 
@@ -140,16 +135,12 @@ void RadMdiArea :: setTitleColor (void)
         return;
 
     tPen.setColor (col);
-    QCoreApplication * app = QCoreApplication::instance ();
-    if (qobject_cast<RadApplication *>(app))
+    KKSSettings * rSettings = kksCoreApp ? kksCoreApp->getKKSSettings() : 0;//qobject_cast<KKSApplication *>(app)->getKKSSettings ();
+    if (rSettings)
     {
-        RadiusSettings * rSettings = qobject_cast<RadApplication *>(app)->getRadSettings ();
-        if (rSettings)
-        {
-            rSettings->beginGroup ("System settings");
-            rSettings->writeSettings ("graphics", "pen", tPen.color().name());
-            rSettings->endGroup();
-        }
+        rSettings->beginGroup ("System settings");
+        rSettings->writeSettings ("graphics", "pen", tPen.color().name());
+        rSettings->endGroup();
     }
 }
 

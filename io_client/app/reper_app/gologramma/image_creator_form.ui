@@ -279,6 +279,16 @@
      </property>
     </widget>
    </item>
+   <item row="3" column="2">
+    <widget class="QComboBox" name="cbShipType"/>
+   </item>
+   <item row="3" column="1" alignment="Qt::AlignRight">
+    <widget class="QLabel" name="lShipType">
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ship type :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>

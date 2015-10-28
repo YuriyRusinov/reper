@@ -6,5 +6,6 @@ include(../io_client.conf)
 SUBDIRS += \
 	operator_app \
         reper_app/gologramma \
+        reper_app/opengl \
         reper_app
 

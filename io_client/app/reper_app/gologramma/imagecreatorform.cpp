@@ -1,8 +1,10 @@
+#include <QComboBox>
+
 #include "imagecreatorform.h"
 #include "ui_image_creator_form.h"
 
-imageCreatorForm::imageCreatorForm(QWidget *parent) :
-    QDialog(parent),
+imageCreatorForm::imageCreatorForm(QWidget *parent, Qt::WindowFlags flags) :
+    QDialog(parent, flags),
     ui(new Ui::imageCreatorForm)
 {
     ui->setupUi(this);
@@ -107,4 +109,17 @@ void imageCreatorForm::build()
 bool imageCreatorForm::forTests (void) const
 {
     return (ui->cbTests->checkState() != Qt::Unchecked);
+}
+
+void imageCreatorForm::initShipTypes (const QMap<int, QString>& shipTypes)
+{
+    for (QMap<int, QString>::const_iterator p=shipTypes.constBegin();
+             p != shipTypes.constEnd();
+             p++)
+        ui->cbShipType->addItem (p.value(), p.key());
+}
+
+int imageCreatorForm::getShipType (void) const
+{
+    return ui->cbShipType->itemData (ui->cbShipType->currentIndex()).toInt();
 }

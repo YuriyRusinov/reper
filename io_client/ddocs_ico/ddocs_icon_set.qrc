@@ -90,5 +90,10 @@
     <file>execute_search.png</file>
     <file>orpfileedit.xpm</file>
     <file>orpfileprint.xpm</file>
+    <file alias="m31.jpg">m31_bers_1824.jpg</file>
+    <file>quit.png</file>
+    <file>galaxy3d.png</file>
+    <file>antenna_128.png</file>
+    <file>help.png</file>
   </qresource>
 </RCC>

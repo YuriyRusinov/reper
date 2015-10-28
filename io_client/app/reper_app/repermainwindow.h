@@ -6,6 +6,7 @@
 #include "imagecreatorform.h"
 
 class QMdiArea;
+class QToolBar;
 
 class KKSObjEditor;
 class generatingDataPlus;
@@ -26,6 +27,7 @@ private slots:
     void slotConnect (void);
     void slotDisconnect (void);
     void slot3DMod (void);
+    void slot3DView (void);
     void slotRLI (void);
     void slotClose (void);
 
@@ -48,6 +50,7 @@ private:
     // Functions
     //
     QWidget * activeKKSSubWindow();
+    void initToolBars (void);
 private:
     //
     // Variables
@@ -55,6 +58,9 @@ private:
     Ui::ReperMainWindowForm * UI;
     QMdiArea * m_mdiArea;
     Assistant * ass;
+    QToolBar * tbActions;
+    QToolBar * tbCalc;
+    QToolBar * tbOthers;
 
 private:
     Q_OBJECT

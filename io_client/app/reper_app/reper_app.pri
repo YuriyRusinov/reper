@@ -1,3 +1,5 @@
+#include (OpenGl/opengl.pri)
+
 HEADERS += \
            repermainwindow.h \
            searchradioform.h \
@@ -6,7 +8,8 @@ HEADERS += \
            assistant.h \
            searchradioimagefragmentform.h \
            searchradioimagecalc.h \
-           searchresultsform.h
+           searchresultsform.h \
+           radMdiArea.h
 
 FORMS += \
          reper_main_window.ui \
@@ -22,6 +25,7 @@ SOURCES += \
            assistant.cpp \
            searchradioimagefragmentform.cpp \
            searchradioimagecalc.cpp \
-           searchresultsform.cpp
+           searchresultsform.cpp \
+           radMdiArea.cpp
 
 #RESOURCES = icon_set.qrc

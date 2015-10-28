@@ -8,6 +8,7 @@
 #include <QProgressBar>
 #include <QProgressDialog>
 #include <QTranslator>
+#include <QToolBar>
 #include <QtDebug>
 
 #include "assistant.h"
@@ -24,6 +25,7 @@
 #include <KKSObject.h>
 #include <KKSObjectExemplar.h>
 #include <KKSRecWidget.h>
+#include <KKSAttribute.h>
 #include <radio_image_plugin.h>
 #include <defines.h>
 #include "repermainwindow.h"
@@ -34,19 +36,30 @@
 #include "gologramma.h"
 #include "imagewidget.h"
 #include "searchresultsform.h"
+#include "radMdiArea.h"
+#include <window.h>
 #include "ui_reper_main_window.h"
 
 using mslLoader::OBJloader;
 
+const int id_attr_type_ship = 1001;
+
 ReperMainWindow :: ReperMainWindow (QWidget * parent, Qt::WindowFlags flags)
     : QMainWindow (parent, flags),
     UI (new Ui::ReperMainWindowForm),
-    m_mdiArea (new QMdiArea)
+    m_mdiArea (new RadMdiArea(QImage(":/ddoc/m31.jpg"), tr("Software Reper"))),
+    ass (new Assistant),
+    tbActions (new QToolBar (this)),
+    tbCalc (new QToolBar (this)),
+    tbOthers (new QToolBar (this))
 {
-    ass = new Assistant;
     UI->setupUi (this);
     this->setCentralWidget (m_mdiArea);
+    tbActions->setIconSize (QSize(32, 32));
+    tbCalc->setIconSize (QSize(32, 32));
+    tbOthers->setIconSize (QSize(32, 32));
     setActionsEnabled (false);
+    this->initToolBars ();
 
     KKSPluginLoader * pLoader = kksCoreApp->pluginLoader();
     QList<QObject*> * plugins = pLoader->getPlugins();
@@ -95,6 +108,7 @@ ReperMainWindow :: ReperMainWindow (QWidget * parent, Qt::WindowFlags flags)
     connect (UI->actBy_Image_fragment, SIGNAL (triggered()), this, SLOT (slotViewImage()) );
     connect (UI->actUser_Manual, SIGNAL (triggered()), this, SLOT (slotHelp()));
     connect (UI->actSettings, SIGNAL (triggered()), this, SLOT (slotSettings()) );
+    connect (UI->actView3DMod, SIGNAL (triggered()), this, SLOT (slot3DView()) );
 }
 
 ReperMainWindow :: ~ReperMainWindow (void)
@@ -289,7 +303,7 @@ void ReperMainWindow :: searchIm (const QImage& sIm0)
                                                    Qt::NonModal,
                                                    0);
     io->release ();
-    slotCreateNewObjEditor(objEditor);
+    //slotCreateNewObjEditor(objEditor);
     SearchResultsForm *sresForm = new SearchResultsForm (sIm);
     QMdiSubWindow * m_ResW = m_mdiArea->addSubWindow (sresForm);
     m_ResW->setAttribute (Qt::WA_DeleteOnClose);
@@ -311,7 +325,8 @@ void ReperMainWindow::slotCreateNewObjEditor(KKSObjEditor * objEditor)
     if(!objEditor)
         return;
 
-    QTabWidget * tObj = objEditor->getTabWidget();
+/*    QTabWidget * tObj = objEditor->getTabWidget();
+    qDebug () << __PRETTY_FUNCTION__ << objEditor->getObj()->id() << objEditor->getObjectEx()->id();
     if ((objEditor->getObj() && objEditor->getObj()->id() == IO_IO_ID) ||
         (objEditor->getObjectEx() && ((objEditor->getObjectEx()->id() == IO_IO_ID) || objEditor->getObjectEx()->io()->id() == IO_IO_ID )))
     {
@@ -335,6 +350,7 @@ void ReperMainWindow::slotCreateNewObjEditor(KKSObjEditor * objEditor)
         for (int i=1; i<n; i++)
             tObj->removeTab (1);
     }
+*/
     QMdiSubWindow * m_objEditorW = m_mdiArea->addSubWindow (objEditor);
     m_objEditorW->setAttribute (Qt::WA_DeleteOnClose);
     connect (objEditor, SIGNAL (closeEditor()), m_objEditorW, SLOT (close()) );
@@ -357,8 +373,10 @@ void ReperMainWindow::setActionsEnabled(bool enabled)
     UI->actRLI->setEnabled (enabled);
     UI->menu_Search->setEnabled (enabled);
     UI->actSearchImage->setEnabled (enabled);
-    UI->menuGologram->setEnabled (enabled);
+//    UI->menuGologram->setEnabled (enabled);
+    UI->actBy_Image_fragment->setEnabled (enabled);
     UI->actGenerateGol->setEnabled (enabled);
+    UI->actView3DMod->setEnabled (enabled);
 }
 
 void ReperMainWindow::isActiveSubWindow(const KKSObjEditor * editor, bool * yes)
@@ -394,6 +412,23 @@ void ReperMainWindow::slotGologram (void)
     //golTr.load ("./transl/gologram_ru.qm", ".");
     //QCoreApplication::installTranslator (&golTr);
     imageCreatorForm * icf = new imageCreatorForm (this);
+    //
+    // Загрузка из БД возможных типов кораблей
+    //
+    KKSLoader * loader = kksApp->loader ();
+    KKSAttribute * a = loader->loadAttribute (id_attr_type_ship);//QString("id_type_ship"), QString("type_ship"));
+    if (!a)
+    {
+        QMessageBox::warning (this, tr("Available ship types"), tr ("Cannot load ship types list"), QMessageBox::Ok);
+        return;
+    }
+    //KKSObject * ioShipType = loader->loadIO (QString("type_ship"), true);
+    QMap<int, QString> refColumnValues;
+    QMap<int, QString> aVals = loader->loadAttributeValues (a, refColumnValues);
+    icf->initShipTypes (aVals);
+    //qDebug () << __PRETTY_FUNCTION__ << aVals << refColumnValues;
+    a->release ();
+
     connect (icf, SIGNAL (imagesData(generatingDataPlus)), this, SLOT (slotGologramCalc(generatingDataPlus)) );
     icf->exec();
     qDebug () << __PRETTY_FUNCTION__ ;
@@ -401,13 +436,16 @@ void ReperMainWindow::slotGologram (void)
 
 void ReperMainWindow::slotGologramCalc (generatingDataPlus gdp)
 {
-    QWidget * iGW = qobject_cast<QWidget *>(this->sender());
+    imageCreatorForm * iGW = qobject_cast<imageCreatorForm *>(this->sender());
     bool fTests (false);
+    int type_ship (-1);
     if (iGW)
     {
         iGW->setVisible (false);
-        fTests = qobject_cast<imageCreatorForm *>(iGW)->forTests();
+        fTests = iGW->forTests();
+        type_ship = iGW->getShipType ();
     }
+    qDebug () << __PRETTY_FUNCTION__ << type_ship;
     ImageGenerator* generator = new ImageGenerator(gdp,this);
     
     generator->loadModel();
@@ -418,16 +456,20 @@ void ReperMainWindow::slotGologramCalc (generatingDataPlus gdp)
     qDebug () << __PRETTY_FUNCTION__ << nd;
 //    KKSLoader * dbL = kksCoreApp->loader();
     KKSEIOFactory * eiof = kksCoreApp->eiof();
-    Q_UNUSED (eiof);
+//    Q_UNUSED (eiof);
     KKSLoader * loader = kksApp->loader();
     QString tName = "rli_image_raws";
     KKSObject * io = loader->loadIO (tName, true);
     const KKSCategory * c = io->category();
     const KKSCategory * ct = c->tableCategory();
     KKSList<KKSAttrValue*> aVals;
-    QString imDir = QFileDialog::getExistingDirectory (this, tr("Save test images"));
-    if (fTests && imDir.isEmpty())
-        return;
+    QString imDir = QString();
+    if (fTests)
+    {
+        imDir = QFileDialog::getExistingDirectory (this, tr("Save test images"));
+        if (imDir.isEmpty())
+            return;
+    }
     for (int i=0; i<nd; i++)
     {
         KKSObjectExemplar * cef = new KKSObjectExemplar (-1, tr("Record %1").arg (i), io);
@@ -438,7 +480,9 @@ void ReperMainWindow::slotGologramCalc (generatingDataPlus gdp)
                 ++p)
         {
             KKSValue v;// = resD[i]
-            if (QString::compare (p.value()->code(), QString("azimuth"), Qt::CaseInsensitive) == 0)
+            if (QString::compare (p.value()->code(), QString("id_type_ship"), Qt::CaseInsensitive) == 0)
+                v = KKSValue (QString::number (type_ship), KKSAttrType::atList);
+            else if (QString::compare (p.value()->code(), QString("azimuth"), Qt::CaseInsensitive) == 0)
                 v = KKSValue (QString :: number (resD[i].XY_angle), KKSAttrType::atDouble);
             else if (QString::compare (p.value()->code(), QString("elevation_angle"), Qt::CaseInsensitive) == 0)
                 v = KKSValue (QString :: number (resD[i].XZ_angle), KKSAttrType::atDouble);
@@ -462,7 +506,9 @@ void ReperMainWindow::slotGologramCalc (generatingDataPlus gdp)
                 int nHeight = resD[i].columnNumber;
                 QImage pIm (nWidth, nHeight, QImage::Format_ARGB32);
                 QByteArray bIm;// (imData);
-                QFile imFile (imDir+QDir::separator()+QString("image_%1_%2.jpg").arg (resD[i].XY_angle).arg(resD[i].XZ_angle));
+                QFile imFile (this);
+                if (fTests)
+                    imFile.setFileName (imDir+QDir::separator()+QString("image_%1_%2.jpg").arg (resD[i].XY_angle).arg(resD[i].XZ_angle));
                 //QFile debIm ("ddd.dat");
                 //QDataStream debImage (&bIm, QIODevice::WriteOnly);
                 //debIm.open (QIODevice::WriteOnly);
@@ -478,7 +524,8 @@ void ReperMainWindow::slotGologramCalc (generatingDataPlus gdp)
                     }
                     //debImage << QString("\r\n");
                 }
-                pIm.save (&imFile, "JPG");
+                if (fTests)
+                    pIm.save (&imFile, "JPG");
                 bData.append (bIm);
                 v = KKSValue (QString(bData), KKSAttrType::atBinary);
             }
@@ -522,3 +569,43 @@ void ReperMainWindow::slotSettings (void)
     if(s)
         s->editSettings(this);
 }
+
+void ReperMainWindow :: initToolBars (void)
+{
+    tbActions->addAction (UI->actConnect);
+    UI->actConnect->setIcon (QIcon(":/ddoc/connect.png"));
+    tbActions->addAction (UI->actDisconnect);
+    UI->actDisconnect->setIcon (QIcon(":/ddoc/disconnect.png"));
+    tbActions->addAction (UI->actRLI);
+    UI->actRLI->setIcon(QIcon(":/ddoc/find_doc.png"));
+    tbActions->addAction (UI->actE_xit);
+    UI->actE_xit->setIcon (QIcon(":/ddoc/quit.png"));
+    this->addToolBar (tbActions);
+    UI->actBy_Image_fragment->setIcon (QIcon (":/ddoc/search.png"));
+    tbCalc->addAction (UI->actBy_Image_fragment);
+    UI->actGenerateGol->setIcon (QIcon (":/ddoc/antenna_128.png"));
+    tbCalc->addAction (UI->actGenerateGol);
+    UI->actView3DMod->setIcon (QIcon (":/ddoc/galaxy3d.png"));
+    tbCalc->addAction (UI->actView3DMod);
+    this->addToolBar (tbCalc);
+    UI->actSettings->setIcon (QIcon (":/ddoc/settings.png"));
+    tbOthers->addAction (UI->actSettings);
+    UI->actUser_Manual->setIcon (QIcon (":/ddoc/help.png"));
+    tbOthers->addAction (UI->actUser_Manual);
+    this->addToolBar (tbOthers);
+}
+
+void ReperMainWindow :: slot3DView (void)
+{
+    qDebug () << __PRETTY_FUNCTION__;
+    QString filter (tr("Object files (*.obj);;All files(*);"));
+    QString objFileName = QFileDialog::getOpenFileName (this, tr("Select source file"), QDir::currentPath(), filter);
+    if (objFileName.isEmpty())
+        return;
+
+    QWidget * w = new Window (objFileName);
+    QMdiSubWindow * m_subW = m_mdiArea->addSubWindow (w, Qt::Window);
+    w->show();
+    m_subW->setAttribute (Qt::WA_DeleteOnClose);
+}
+

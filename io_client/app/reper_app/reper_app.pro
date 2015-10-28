@@ -23,7 +23,8 @@ INCLUDEPATH += 	. \
                 ../../guilibs/kksqwt/src \
                 ../../ddocplugins/radio_image
 
-INCLUDEPATH *= gologramma
+INCLUDEPATH += gologramma
+INCLUDEPATH += opengl
 
 DEPENDPATH += 	\
 		../../corelibs/dataaccess \
@@ -35,13 +36,14 @@ DEPENDPATH += 	\
 		../../mgrlibs/kksapplication \
                 ../../ddocplugins/radio_image
 
-DEPENDPATH *= gologramma
+DEPENDPATH += gologramma
+DEPENDPATH += opengl
 
-SUBDIRS += gologramma
+#SUBDIRS += gologramma
 
+QT += opengl
 
-
-LIBS *= -L$$DESTDIR -ldataaccess -lkkscoreapplication -lkksutils -lkkspp -lkksdatafactory -lkkspluginmanager  -lkksapplication -lkksguifactory -lkksgui -lkksqwt -lgologram
+LIBS *= -L$$DESTDIR -ldataaccess -lkkscoreapplication -lkksutils -lkkspp -lkksdatafactory -lkkspluginmanager  -lkksapplication -lkksguifactory -lkksgui -lkksqwt -lgologram -lrepopengl
 #LIBS *= -L$$DESTDIR/ddocplugins -lradio_image
 
 

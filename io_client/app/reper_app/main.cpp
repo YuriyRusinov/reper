@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
 
     qApp->installTranslator (reperTr);
     qApp->installTranslator (golTr);
-
+    kksSettings->endGroup();
 
 /*
     kksApplication = KKSApplication::init (argc, argv, false);
