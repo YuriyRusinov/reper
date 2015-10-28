@@ -72,7 +72,7 @@ Window::Window(const QString &in_fileName,QWidget *parent,Qt::WindowFlags f) :
     xSlider->setValue(15 * 16);
     ySlider->setValue(345 * 16);
     zSlider->setValue(0 * 16);
-    setWindowTitle(tr("Radius - 3D model viewer"));
+    setWindowTitle(tr("Reper - 3D model viewer"));
 }
 //! [1]
 

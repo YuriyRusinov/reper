@@ -18,6 +18,7 @@ ImageWidget :: ImageWidget (QWidget * parent, Qt::WindowFlags flags)
     rGIm (QImage())
 {
     this->init ();
+    setWindowTitle (tr("View golographic image"));
 
     connect (tbLoadImage, SIGNAL (clicked()), this, SLOT (loadImageFile()) );
     connect (tbSelect, SIGNAL (pressed()), this, SLOT (selectRect()) );

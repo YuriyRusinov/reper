@@ -17,63 +17,68 @@
 <context>
     <name>ImageWidget</name>
     <message>
-        <location filename="../app/reper_app/imagewidget.cpp" line="45"/>
+        <location filename="../app/reper_app/imagewidget.cpp" line="46"/>
         <source>Open File</source>
         <translation>Открытие файла</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/imagewidget.cpp" line="45"/>
+        <location filename="../app/reper_app/imagewidget.cpp" line="46"/>
         <source>Images (*.png *.xpm *.jpg *.PNG *.XPM *.JPG);;All files (*)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../app/reper_app/imagewidget.cpp" line="50"/>
-        <location filename="../app/reper_app/imagewidget.cpp" line="52"/>
+        <location filename="../app/reper_app/imagewidget.cpp" line="51"/>
+        <location filename="../app/reper_app/imagewidget.cpp" line="53"/>
         <source>Cannot load %1.</source>
         <translation>Ошибка загрузки %1.</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/imagewidget.cpp" line="51"/>
+        <location filename="../app/reper_app/imagewidget.cpp" line="52"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/imagewidget.cpp" line="99"/>
+        <location filename="../app/reper_app/imagewidget.cpp" line="100"/>
         <source>Load golographic image from file</source>
         <translation>Загрузка голографического изображения из файла </translation>
     </message>
     <message>
-        <location filename="../app/reper_app/imagewidget.cpp" line="100"/>
+        <location filename="../app/reper_app/imagewidget.cpp" line="101"/>
         <source>Load image...</source>
         <translation>Загрузить изображение...</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/imagewidget.cpp" line="105"/>
+        <location filename="../app/reper_app/imagewidget.cpp" line="106"/>
         <source>Search by image fragment</source>
         <translation>Поиск по фрагменту изображения </translation>
     </message>
     <message>
-        <location filename="../app/reper_app/imagewidget.cpp" line="106"/>
+        <location filename="../app/reper_app/imagewidget.cpp" line="107"/>
         <source>Search...</source>
         <translation>Поиск...</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/imagewidget.cpp" line="111"/>
+        <location filename="../app/reper_app/imagewidget.cpp" line="112"/>
         <source>Save to DB</source>
         <translation>Сохранить  в БД</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/imagewidget.cpp" line="117"/>
+        <location filename="../app/reper_app/imagewidget.cpp" line="118"/>
         <source>Load from DB</source>
         <translation>Загрузить изображение из базы</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/imagewidget.cpp" line="110"/>
+        <location filename="../app/reper_app/imagewidget.cpp" line="111"/>
         <source>Save to database</source>
         <translation>Сохранить  в БД</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/imagewidget.cpp" line="116"/>
+        <location filename="../app/reper_app/imagewidget.cpp" line="21"/>
+        <source>View golographic image</source>
+        <translation>Просмотреть голографическое изображение</translation>
+    </message>
+    <message>
+        <location filename="../app/reper_app/imagewidget.cpp" line="117"/>
         <source>Load image from database</source>
         <translation>Загрузить изображение из базы</translation>
     </message>
@@ -394,8 +399,8 @@
     <name>Window</name>
     <message>
         <location filename="../app/reper_app/opengl/window.cpp" line="75"/>
-        <source>Radius - 3D model viewer</source>
-        <translation>Просмотр 3D Модели</translation>
+        <source>Reper - 3D model viewer</source>
+        <translation>Репер, просмотр 3D изображения</translation>
     </message>
 </context>
 <context>
