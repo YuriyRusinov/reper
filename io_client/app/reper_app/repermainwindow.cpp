@@ -276,20 +276,68 @@ void ReperMainWindow :: searchIm (const QImage& sIm0)
     }
 
     KKSFilter * filter = ct->createFilter (aIm->id(), bytes, KKSFilter::foEq);
-    KKSFilter * fAzMin = ct->createFilter (aAz->id(), QString::number ((int)az-3), KKSFilter::foGrEq);
-    KKSFilter * fAzMax = ct->createFilter (aAz->id(), QString::number ((int)az+3), KKSFilter::foLessEq);
+
+    KKSFilter * fAzMin = 0;//ct->createFilter (aAz->id(), QString::number ((int)az-3), KKSFilter::foGrEq);
+    KKSFilter * fAzMax = 0;//ct->createFilter (aAz->id(), QString::number ((int)az+3), KKSFilter::foLessEq);
+    KKSFilter * fAzMinPi = 0;//ct->createFilter (aAz->id(), QString::number ((int)az-3), KKSFilter::foGrEq);
+    KKSFilter * fAzMaxPi = 0;//ct->createFilter (aAz->id(), QString::number ((int)az+3), KKSFilter::foLessEq);
     KKSList<const KKSFilter*> filters;
     filters.append (filter);
     filter->release ();
     KKSFilterGroup * group = new KKSFilterGroup(false);
-    KKSFilterGroup * azGroup = new KKSFilterGroup (true);
-    azGroup->addFilter (fAzMin);
-    fAzMin->release ();
-    azGroup->addFilter (fAzMax);
-    fAzMax->release ();
+    KKSFilterGroup * azGroup = 0;//new KKSFilterGroup (true);
+    KKSFilterGroup * azGroupR = new KKSFilterGroup (true);
+    if ((az-3.0)*(az+3.0) < 0)
+    {
+        azGroup = new KKSFilterGroup (false);
+        KKSFilter * fAzMin2Pi = ct->createFilter (aAz->id(), QString::number ((int)az-3+360), KKSFilter::foGrEq);
+        KKSFilter * fAzMax2Pi = ct->createFilter (aAz->id(), QString::number (360), KKSFilter::foLessEq);
+        KKSFilterGroup * az2PiGroup = new KKSFilterGroup (true);
+        az2PiGroup->addFilter (fAzMin2Pi);
+        fAzMin2Pi->release ();
+        az2PiGroup->addFilter (fAzMax2Pi);
+        fAzMax2Pi->release ();
+        KKSFilter * fAzMin0 = ct->createFilter (aAz->id(), QString::number (0), KKSFilter::foGrEq);
+        KKSFilter * fAzMax0 = ct->createFilter (aAz->id(), QString::number ((int)az+3), KKSFilter::foLessEq);
+        KKSFilterGroup * az0Group = new KKSFilterGroup (true);
+        az0Group->addFilter (fAzMin0);
+        fAzMin0->release ();
+        az0Group->addFilter (fAzMax0);
+        fAzMax0->release ();
+        azGroup->addGroup (az0Group);
+        az0Group->release ();
+        azGroup->addGroup (az2PiGroup);
+
+        fAzMinPi = ct->createFilter (aAz->id(), QString::number ((int)az-3+180), KKSFilter::foGrEq);
+        fAzMaxPi = ct->createFilter (aAz->id(), QString::number ((int)az+3+180), KKSFilter::foLessEq);
+        azGroupR->addFilter (fAzMinPi);
+        fAzMinPi->release ();
+        azGroupR->addFilter (fAzMaxPi);
+        fAzMaxPi->release ();
+        az2PiGroup->release ();
+    }
+    else
+    {
+        fAzMin = ct->createFilter (aAz->id(), QString::number ((int)az-3), KKSFilter::foGrEq);
+        fAzMax = ct->createFilter (aAz->id(), QString::number ((int)az+3), KKSFilter::foLessEq);
+        azGroup = new KKSFilterGroup (true);
+        azGroup->addFilter (fAzMin);
+        fAzMin->release ();
+        azGroup->addFilter (fAzMax);
+        fAzMax->release ();
+        fAzMinPi = ct->createFilter (aAz->id(), QString::number ((int)az-3+180), KKSFilter::foGrEq);
+        fAzMaxPi = ct->createFilter (aAz->id(), QString::number ((int)az+3+180), KKSFilter::foLessEq);
+        azGroupR->addFilter (fAzMinPi);
+        fAzMinPi->release ();
+        azGroupR->addFilter (fAzMaxPi);
+        fAzMaxPi->release ();
+    }
+
     group->setFilters(filters);
     group->addGroup (azGroup);
     azGroup->release ();
+    group->addGroup (azGroupR);
+    azGroupR->release ();
     filterGroups.append(group);
     group->release();
     KKSObjEditor *objEditor = oef->createObjEditor(IO_IO_ID, 
@@ -480,10 +528,11 @@ void ReperMainWindow::slotGologramCalc (generatingDataPlus gdp)
                 ++p)
         {
             KKSValue v;// = resD[i]
+            double az = resD[i].XY_angle < 90 ? resD[i].XY_angle+270 : resD[i].XY_angle-90;
             if (QString::compare (p.value()->code(), QString("id_type_ship"), Qt::CaseInsensitive) == 0)
                 v = KKSValue (QString::number (type_ship), KKSAttrType::atList);
             else if (QString::compare (p.value()->code(), QString("azimuth"), Qt::CaseInsensitive) == 0)
-                v = KKSValue (QString :: number (resD[i].XY_angle), KKSAttrType::atDouble);
+                v = KKSValue (QString("%1").arg (az), KKSAttrType::atDouble);
             else if (QString::compare (p.value()->code(), QString("elevation_angle"), Qt::CaseInsensitive) == 0)
                 v = KKSValue (QString :: number (resD[i].XZ_angle), KKSAttrType::atDouble);
             else if (QString::compare (p.value()->code(), QString("depth"), Qt::CaseInsensitive) == 0)
@@ -492,7 +541,7 @@ void ReperMainWindow::slotGologramCalc (generatingDataPlus gdp)
             {
                 QByteArray bData;
                 bData.clear ();
-                bData.append (QByteArray :: number (resD[i].XY_angle));
+                bData.append (QByteArray :: number (az));
                 bData.append (" ");
                 bData.append (QByteArray :: number (resD[i].XZ_angle));
                 bData.append (" ");
