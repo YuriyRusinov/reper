@@ -4,6 +4,9 @@
 #include <QPoint>
 #include <QColor>
 #include <QMessageBox>
+#include <QValidator>
+#include <QDoubleValidator>
+#include <QIntValidator>
 #include <QtDebug>
 
 #include "searchradioimagefragmentform.h"
@@ -32,6 +35,14 @@ SearchRadioImageFragmentForm :: SearchRadioImageFragmentForm (const QImage& sIma
 
     UI->tbFilt->setToolTip (tr("Filter by brightness"));
     UI->gbParams->setVisible (true);
+
+    QValidator * azVal = new QDoubleValidator (0, 183, 6, this);
+    UI->lEAzimuth->setValidator (azVal);
+
+    QValidator * lVal = new QIntValidator (0, 1000, this);
+    UI->lELength->setValidator (lVal);
+    QValidator * wVal = new QIntValidator (0, 1000, this);
+    UI->lEWidth->setValidator (wVal);
 
     connect (UI->tbFilt, SIGNAL (clicked()), this, SLOT (brFilt()) );
     //connect (UI->pbCalculate, SIGNAL (clicked()), this, SLOT (pbCalc()) );
@@ -112,5 +123,5 @@ void SearchRadioImageFragmentForm :: setResults (int pix_length, int pix_width, 
 
 double SearchRadioImageFragmentForm :: getAzimuth (void) const
 {
-    return az;
+    return UI->lEAzimuth->text().toDouble();
 }
