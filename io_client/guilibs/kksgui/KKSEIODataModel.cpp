@@ -16,6 +16,7 @@
 #include "KKSAttrView.h"
 #include "KKSTreeItem.h"
 #include "KKSEIODataModel.h"
+#include <defines.h>
 
 KKSEIODataModel :: KKSEIODataModel (const KKSTemplate * t, const KKSMap< qint64, KKSEIOData * > & objRecs, QObject *parent)
     : QAbstractItemModel (parent),
@@ -192,9 +193,13 @@ QVariant KKSEIODataModel :: data (const QModelIndex& index, int role) const
     }
     else if (role == Qt::DecorationRole)
     {
-        if (index.column() == 0)
-            return wItem->getIcon();
         KKSAttrView * v = avList[index.column()];
+        if (index.column() == 0 && 
+                (v->type()->attrType() != KKSAttrType::atSVG || (v->refType() && v->refType()->attrType() != KKSAttrType::atSVG)) &&
+                 (v->type()->attrType() != KKSAttrType::atVideo || (v->refType() && v->refType()->attrType() != KKSAttrType::atVideo)) &&
+                 (v->type()->attrType() != KKSAttrType::atBinary || (v->refType() && v->refType()->attrType() != KKSAttrType::atBinary))
+                )
+            return wItem->getIcon();
         if( v->type()->attrType() == KKSAttrType::atJPG ||
             (v->refType() && v->refType()->attrType() == KKSAttrType::atJPG)
             )

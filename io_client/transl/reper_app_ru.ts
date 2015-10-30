@@ -326,7 +326,7 @@
     <message>
         <location filename="../app/reper_app/searchresultsform.cpp" line="61"/>
         <source>Filter</source>
-        <translation>Уровень фильтрации</translation>
+        <translation>Фильтр</translation>
     </message>
 </context>
 <context>
