@@ -22,12 +22,16 @@ public:
 
 private slots:
     void filterRecs (const QString& text);
+    void calcChi2 (void);
 
 private:
     //
     // Functions
     //
     void init (void);
+
+signals:
+    void calcGoodnessOfFit (QAbstractItemModel * sModel, const QImage& sIm);
 
 private:
     //

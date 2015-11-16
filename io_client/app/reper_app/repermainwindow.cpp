@@ -51,7 +51,8 @@ ReperMainWindow :: ReperMainWindow (QWidget * parent, Qt::WindowFlags flags)
     ass (new Assistant),
     tbActions (new QToolBar (this)),
     tbCalc (new QToolBar (this)),
-    tbOthers (new QToolBar (this))
+    tbOthers (new QToolBar (this)),
+    imCalc (new SearchRadioImageCalc ())
 {
     UI->setupUi (this);
     this->setCentralWidget (m_mdiArea);
@@ -116,6 +117,7 @@ ReperMainWindow :: ~ReperMainWindow (void)
     delete ass;
     delete m_mdiArea;
     delete UI;
+    delete imCalc;
 }
 
 void ReperMainWindow :: slotConnect (void)
@@ -217,7 +219,6 @@ void ReperMainWindow :: slotSearchByImage (void)
 void ReperMainWindow :: searchIm (const QImage& sIm0)
 {
     qDebug () << __PRETTY_FUNCTION__;
-    SearchRadioImageCalc * imCalc = new SearchRadioImageCalc ();
     SearchRadioImageFragmentForm * srForm = imCalc->GUIImageView (sIm0);//new SearchRadioImageFragmentForm (sIm0);
     //srForm->setImage (sIm0);
     QImage sIm (sIm0);
@@ -228,13 +229,11 @@ void ReperMainWindow :: searchIm (const QImage& sIm0)
         az = srForm->getAzimuth ();
         if (sIm.isNull())
         {
-            delete imCalc;
             return;
         }
     }
     else
     {
-        delete imCalc;//srForm;
         return;
     }
     KKSLoader * loader = kksApp->loader();
@@ -245,7 +244,6 @@ void ReperMainWindow :: searchIm (const QImage& sIm0)
         QMessageBox::warning (0, tr("Select reference"),
                                  tr ("Not available suitable reference"),
                                  QMessageBox::Ok);
-        delete imCalc;
         return;
     }
     KKSObjEditorFactory * oef = kksApp->oef();
@@ -271,7 +269,6 @@ void ReperMainWindow :: searchIm (const QImage& sIm0)
     }
     if (!aAz)
     {
-        delete imCalc;
         return;
     }
 
@@ -352,7 +349,7 @@ void ReperMainWindow :: searchIm (const QImage& sIm0)
                                                    0);
     io->release ();
     //slotCreateNewObjEditor(objEditor);
-    SearchResultsForm *sresForm = new SearchResultsForm (sIm);
+    SearchResultsForm *sresForm = imCalc->GUIResultsView ();//new SearchResultsForm (sIm);
     QMdiSubWindow * m_ResW = m_mdiArea->addSubWindow (sresForm);
     m_ResW->setAttribute (Qt::WA_DeleteOnClose);
     sresForm->show ();
@@ -361,7 +358,6 @@ void ReperMainWindow :: searchIm (const QImage& sIm0)
     sresForm->setResultsModel (sMod);
     //connect (objEditor, SIGNAL (closeEditor()), m_objEditorW, SLOT (close()) );
 
-    delete imCalc;//srForm;
 }
 
 void ReperMainWindow :: slotCompare (void)
@@ -373,32 +369,6 @@ void ReperMainWindow::slotCreateNewObjEditor(KKSObjEditor * objEditor)
     if(!objEditor)
         return;
 
-/*    QTabWidget * tObj = objEditor->getTabWidget();
-    qDebug () << __PRETTY_FUNCTION__ << objEditor->getObj()->id() << objEditor->getObjectEx()->id();
-    if ((objEditor->getObj() && objEditor->getObj()->id() == IO_IO_ID) ||
-        (objEditor->getObjectEx() && ((objEditor->getObjectEx()->id() == IO_IO_ID) || objEditor->getObjectEx()->io()->id() == IO_IO_ID )))
-    {
-        for (int i=0; i<3; i++)
-        {
-            //QWidget * w = tObj->widget (0);
-            tObj->removeTab(0);//setTabEnabled (i, false);
-            //w->setParent (0);
-            //delete w;
-            //QWidget * w = tObj->widget (i);
-            //w->setEnabled (false);//setVisible (false);
-        }
-        //QWidget * w = tObj->widget (1);
-        tObj->removeTab (1);//setTabEnabled (4, false);
-        //w->setParent (0);
-        //delete w;
-    }
-    else if (tObj->count() > 1)
-    {
-        int n = tObj->count();
-        for (int i=1; i<n; i++)
-            tObj->removeTab (1);
-    }
-*/
     QMdiSubWindow * m_objEditorW = m_mdiArea->addSubWindow (objEditor);
     m_objEditorW->setAttribute (Qt::WA_DeleteOnClose);
     connect (objEditor, SIGNAL (closeEditor()), m_objEditorW, SLOT (close()) );

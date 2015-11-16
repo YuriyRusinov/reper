@@ -95,5 +95,6 @@
     <file>galaxy3d.png</file>
     <file>antenna_128.png</file>
     <file>help.png</file>
+    <file>chi2.png</file>
   </qresource>
 </RCC>

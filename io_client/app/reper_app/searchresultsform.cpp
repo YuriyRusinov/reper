@@ -9,6 +9,7 @@
 #include <QGroupBox>
 #include <QSortFilterProxyModel>
 #include <QHeaderView>
+#include <QAction>
 #include <QtDebug>
 
 #include "searchresultsform.h"
@@ -62,6 +63,9 @@ void SearchResultsForm :: init (void)
     gFLay->addWidget (lFilter, 0, 0, 1, 1);
     gFLay->addWidget (filterLE, 0, 1, 1, 1);
     tbActions->addWidget (gbFilter);
+    QAction * actChi2 = new QAction (QIcon(":/ddoc/chi2.png"), tr("Calculate chi2"), this);
+    connect (actChi2, SIGNAL (triggered()), this, SLOT (calcChi2()) );
+    tbActions->addAction (actChi2);
 }
 
 void SearchResultsForm :: filterRecs (const QString& text)
@@ -73,4 +77,10 @@ void SearchResultsForm :: filterRecs (const QString& text)
     sortMod->setFilterRegExp (text);
     sortMod->setFilterCaseSensitivity (Qt::CaseInsensitive);
     sortMod->setFilterKeyColumn (-1);
+}
+
+void SearchResultsForm :: calcChi2 (void)
+{
+    emit calcGoodnessOfFit (tView->model(), sImage);
+    qDebug () << __PRETTY_FUNCTION__;
 }

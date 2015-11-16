@@ -11,6 +11,7 @@ class QToolBar;
 class KKSObjEditor;
 class generatingDataPlus;
 class Assistant;
+class SearchRadioImageCalc;
 
 namespace Ui
 {
@@ -61,6 +62,7 @@ private:
     QToolBar * tbActions;
     QToolBar * tbCalc;
     QToolBar * tbOthers;
+    SearchRadioImageCalc * imCalc;
 
 private:
     Q_OBJECT

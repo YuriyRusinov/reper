@@ -1,8 +1,10 @@
+#include <QAbstractItemModel>
 #include <QtDebug>
 
 #include <math.h>
 
 #include "searchradioimagefragmentform.h"
+#include "searchresultsform.h"
 #include "searchradioimagecalc.h"
 
 SearchRadioImageCalc :: SearchRadioImageCalc (QObject * parent)
@@ -16,6 +18,7 @@ SearchRadioImageCalc :: ~SearchRadioImageCalc (void)
 
 SearchRadioImageFragmentForm * SearchRadioImageCalc :: GUIImageView (const QImage& im, QWidget * parent, Qt::WindowFlags flags)
 {
+    searchImage = im;
     SearchRadioImageFragmentForm * sForm = new SearchRadioImageFragmentForm (im, parent, flags);
 
     connect (sForm, SIGNAL (calcParams (const QImage&, double)), this, SLOT (calculateParameters (const QImage&, double)) );
@@ -105,4 +108,19 @@ void SearchRadioImageCalc :: calculateParameters (const QImage& im, double cVal)
     deltay = wp.y()-ep.y();
     wf = (int)sqrt (deltax*deltax+deltay*deltay);
     emit setVals (lf, wf, az);
+}
+
+SearchResultsForm * SearchRadioImageCalc :: GUIResultsView (QWidget * parent, Qt::WindowFlags flags)
+{
+    SearchResultsForm *sresForm = new SearchResultsForm (searchImage, parent, flags);
+    connect (sresForm, SIGNAL (calcGoodnessOfFit (QAbstractItemModel *, const QImage&)), this, SLOT (calcChi2(QAbstractItemModel *, const QImage&)) );
+
+    return sresForm;
+}
+
+void SearchRadioImageCalc :: calcChi2 (QAbstractItemModel * sModel, const QImage& sIm)
+{
+//    Q_UNUSED (sModel);
+//    Q_UNUSED (sIm);
+    qDebug () << __PRETTY_FUNCTION__ << sModel << sIm.isNull();
 }
