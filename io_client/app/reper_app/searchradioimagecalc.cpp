@@ -1,4 +1,6 @@
 #include <QAbstractItemModel>
+#include <QVector>
+#include <QPoint>
 #include <QtDebug>
 
 #include <math.h>
@@ -123,4 +125,56 @@ void SearchRadioImageCalc :: calcChi2 (QAbstractItemModel * sModel, const QImage
 //    Q_UNUSED (sModel);
 //    Q_UNUSED (sIm);
     qDebug () << __PRETTY_FUNCTION__ << sModel << sIm.isNull();
+    if (!sModel || sModel->rowCount() == 0 || sModel->columnCount() == 0 || sIm.isNull())
+        return;
+
+    int n = sModel->rowCount();
+    QVector<QPoint> borderPointsS;
+    int nSW = sIm.width ();
+    int nSH = sIm.height ();
+    for (int ii=1; ii<nSW-1; ii++)
+        for (int jj=1; jj<nSH-1; jj++)
+        {
+        }
+    for (int i=0; i<n; i++)
+    {
+        QVector<QPoint> borderPoints0;
+        QModelIndex wIndex = sModel->index (i, 0);
+        QByteArray binaryData = sModel->data (wIndex, Qt::ToolTipRole).toByteArray ();
+        if (binaryData.contains("\\x"))
+            binaryData = QByteArray::fromHex(binaryData);
+
+        QTextStream bIm (binaryData);
+        unsigned az_dd;
+        bIm >> az_dd;
+        if (az_dd > 360)
+            return;
+        unsigned elev_dd;
+        bIm >> elev_dd;
+        unsigned nW, nH, nd;
+        bIm >> nW;
+        bIm >> nH;
+        bIm >> nd;
+        QString imStr;
+        bIm >> imStr;
+//        int ncount (0);
+        for (unsigned int ii=1; ii<nW-1; ii++)
+            for (unsigned int jj=1; jj<nH-1; jj++)
+            {
+                uint c = (uint)imStr.at (ii*nW+jj).digitValue();
+                uint cPDiag = (uint)imStr.at ((ii-1)*nW+jj-1).digitValue();
+                uint cPRow = (uint)imStr.at ((ii-1)*nW+jj).digitValue();
+                uint cPCol = (uint)imStr.at (ii*nW+jj-1).digitValue();
+                uint cPDiag1 = (uint)imStr.at ((ii-1)*nW+jj+1).digitValue();
+                uint cNDiag = (uint)imStr.at ((ii+1)*nW+jj+1).digitValue();
+                uint cNDiag1 = (uint)imStr.at ((ii-1)*nW+jj+1).digitValue();
+                uint cNRow = (uint)imStr.at ((ii+1)*nW+jj).digitValue();
+                uint cNCol = (uint)imStr.at (ii*nW+jj+1).digitValue();
+                if (c != 0 && (cPDiag==0 || cPDiag1==0 || cPRow==0 || cPCol==0 || cNDiag==0 || cNDiag1==0 || cNRow==0 || cNCol==0) )
+                {
+                    qDebug () << __PRETTY_FUNCTION__ << "Border point" << ii << jj;
+                    borderPoints0.append (QPoint (ii, jj));
+                }
+            }
+    }
 }
