@@ -1,6 +1,7 @@
 #include <QAbstractItemModel>
 #include <QVector>
 #include <QPoint>
+#include <QColor>
 #include <QtDebug>
 
 #include <math.h>
@@ -132,10 +133,44 @@ void SearchRadioImageCalc :: calcChi2 (QAbstractItemModel * sModel, const QImage
     QVector<QPoint> borderPointsS;
     int nSW = sIm.width ();
     int nSH = sIm.height ();
+    int qColGrayMax = qGray (QColor (0, 0, 0).rgb());
+    for (int ii=0; ii<nSW; ii++)
+        for (int jj=0; jj<nSH; jj++)
+        {
+            QRgb pCol = sIm.pixel (ii, jj);
+            int pCCol = qGray (pCol);
+            if (pCCol > qColGrayMax)
+                qColGrayMax = pCCol;
+        }
     for (int ii=1; ii<nSW-1; ii++)
         for (int jj=1; jj<nSH-1; jj++)
         {
+            QRgb pCol = sIm.pixel (ii, jj);
+            QRgb pPDiagC = sIm.pixel (ii-1, jj-1);
+            QRgb pPDiagC1 = sIm.pixel (ii-1, jj+1);
+            QRgb pPRow = sIm.pixel (ii-1, jj);
+            QRgb pPCol = sIm.pixel (ii, jj-1);
+            QRgb pNDiagC = sIm.pixel (ii+1, jj+1);
+            QRgb pNDiagC1 = sIm.pixel (ii-1, jj+1);
+            QRgb pNRow = sIm.pixel (ii+1, jj);
+            QRgb pNCol = sIm.pixel (ii, jj+1);
+            int pColGray = qGray (pCol);
+            int pColPDiagC = qGray (pPDiagC);
+            int pColPDiagC1 = qGray (pPDiagC1);
+            int pColPRow = qGray (pPRow);
+            int pColPCol = qGray (pPCol);
+            int pColNDiagC = qGray (pNDiagC);
+            int pColNDiagC1 = qGray (pNDiagC1);
+            int pColNRow = qGray (pNRow);
+            int pColNCol = qGray (pNCol);
+            if (pColGray >= qColGrayMax/2 &&
+                    (pColPDiagC < qColGrayMax/2 || pColPDiagC1 < qColGrayMax/2 || pColPRow < qColGrayMax/2 || pColPCol < qColGrayMax/2 ||
+                     pColNDiagC < qColGrayMax/2 || pColNDiagC1 < qColGrayMax/2 || pColNRow  < qColGrayMax/2 || pColNCol < qColGrayMax/2) 
+               )
+                borderPointsS.append (QPoint (ii, jj));
+
         }
+    qDebug () << __PRETTY_FUNCTION__ << borderPointsS;
     for (int i=0; i<n; i++)
     {
         QVector<QPoint> borderPoints0;
@@ -172,7 +207,7 @@ void SearchRadioImageCalc :: calcChi2 (QAbstractItemModel * sModel, const QImage
                 uint cNCol = (uint)imStr.at (ii*nW+jj+1).digitValue();
                 if (c != 0 && (cPDiag==0 || cPDiag1==0 || cPRow==0 || cPCol==0 || cNDiag==0 || cNDiag1==0 || cNRow==0 || cNCol==0) )
                 {
-                    qDebug () << __PRETTY_FUNCTION__ << "Border point" << ii << jj;
+                    //qDebug () << __PRETTY_FUNCTION__ << "Border point" << ii << jj;
                     borderPoints0.append (QPoint (ii, jj));
                 }
             }
