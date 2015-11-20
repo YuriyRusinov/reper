@@ -43,6 +43,9 @@ DEPENDPATH += opengl
 
 QT += opengl
 
+CONFIG += link_pkgconfig
+PKGCONFIG += gsl
+
 LIBS *= -L$$DESTDIR -ldataaccess -lkkscoreapplication -lkksutils -lkkspp -lkksdatafactory -lkkspluginmanager  -lkksapplication -lkksguifactory -lkksgui -lkksqwt -lgologram -lrepopengl
 #LIBS *= -L$$DESTDIR/ddocplugins -lradio_image
 

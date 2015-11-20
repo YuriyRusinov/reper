@@ -4,6 +4,11 @@
 #include <QColor>
 #include <QtDebug>
 
+#include <gsl/gsl_fit.h>
+#include <gsl/gsl_vector.h>
+#include <gsl/gsl_matrix.h>
+#include <gsl/gsl_multifit.h>
+
 #include <math.h>
 
 #include "searchradioimagefragmentform.h"
@@ -129,6 +134,16 @@ void SearchRadioImageCalc :: calcChi2 (QAbstractItemModel * sModel, const QImage
     if (!sModel || sModel->rowCount() == 0 || sModel->columnCount() == 0 || sIm.isNull())
         return;
 
+    gsl_matrix *XMatr, *covMatr;
+    gsl_vector * c;
+    gsl_vector * yVec;
+//    Q_UNUSED (XMatr);
+//    Q_UNUSED (covMatr);
+    Q_UNUSED (c);
+//    Q_UNUSED (yVec);
+    XMatr = gsl_matrix_alloc (5, 5 );//n, nPol+1);
+    covMatr = gsl_matrix_alloc (5, 5);//(nPol+1, nPol+1);
+    yVec = gsl_vector_alloc (5);
     int n = sModel->rowCount();
     QVector<QPoint> borderPointsS;
     int nSW = sIm.width ();
@@ -212,4 +227,6 @@ void SearchRadioImageCalc :: calcChi2 (QAbstractItemModel * sModel, const QImage
                 }
             }
     }
+    gsl_matrix_free (covMatr);
+    gsl_matrix_free (XMatr);
 }
