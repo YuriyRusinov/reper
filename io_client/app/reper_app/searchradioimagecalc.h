@@ -21,6 +21,7 @@ public:
 private slots:
     void calculateParameters (const QImage& im, double cVal);
     void calcChi2 (QAbstractItemModel * sModel, const QImage& sIm);
+    void searchIm (const QImage& fImage);
 
 signals:
     void setVals (int pl, int pw, double az);

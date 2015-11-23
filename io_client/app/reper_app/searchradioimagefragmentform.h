@@ -30,9 +30,11 @@ public slots:
 private slots:
     void brFilt (void);
     void setResults (int pix_length, int pix_width, double azimuth);
+    void searchBegin (void);
 
 signals:
     void calcParams (const QImage& im, double cVal);
+    void searchByIm (const QImage& im);
 
 private:
     //

@@ -30,6 +30,7 @@ SearchRadioImageFragmentForm * SearchRadioImageCalc :: GUIImageView (const QImag
     SearchRadioImageFragmentForm * sForm = new SearchRadioImageFragmentForm (im, parent, flags);
 
     connect (sForm, SIGNAL (calcParams (const QImage&, double)), this, SLOT (calculateParameters (const QImage&, double)) );
+    connect (sForm, SIGNAL (searchByIm (const QImage&)), this, SLOT (searchIm (const QImage&)) );
     connect (this, SIGNAL (setVals (int, int, double)), sForm, SLOT (setResults(int, int, double)) );
     sForm->pbCalc ();
 
@@ -229,4 +230,11 @@ void SearchRadioImageCalc :: calcChi2 (QAbstractItemModel * sModel, const QImage
     }
     gsl_matrix_free (covMatr);
     gsl_matrix_free (XMatr);
+}
+
+void SearchRadioImageCalc :: searchIm (const QImage& fImage)
+{
+    qDebug () << __PRETTY_FUNCTION__ << fImage.isNull();
+    if (fImage.isNull())
+        return;
 }

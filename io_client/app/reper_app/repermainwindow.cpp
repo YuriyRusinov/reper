@@ -221,6 +221,7 @@ void ReperMainWindow :: searchIm (const QImage& sIm0)
     qDebug () << __PRETTY_FUNCTION__;
     SearchRadioImageFragmentForm * srForm = imCalc->GUIImageView (sIm0);//new SearchRadioImageFragmentForm (sIm0);
     //srForm->setImage (sIm0);
+
     QImage sIm (sIm0);
     double az (-1.0);
     if (srForm->exec() == QDialog::Accepted)

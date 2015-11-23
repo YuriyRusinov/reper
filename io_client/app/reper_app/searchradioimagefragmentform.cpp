@@ -48,7 +48,7 @@ SearchRadioImageFragmentForm :: SearchRadioImageFragmentForm (const QImage& sIma
     //connect (UI->pbCalculate, SIGNAL (clicked()), this, SLOT (pbCalc()) );
 
     connect (UI->pbCancel, SIGNAL (clicked()), this, SLOT (reject()) );
-    connect (UI->pbOk, SIGNAL (clicked()), this, SLOT (accept()) );
+    connect (UI->pbOk, SIGNAL (clicked()), this, SLOT (searchBegin()) );
     this->pbCalc ();
 }
 
@@ -124,4 +124,11 @@ void SearchRadioImageFragmentForm :: setResults (int pix_length, int pix_width, 
 double SearchRadioImageFragmentForm :: getAzimuth (void) const
 {
     return UI->lEAzimuth->text().toDouble();
+}
+
+void SearchRadioImageFragmentForm :: searchBegin (void)
+{
+    qDebug () << __PRETTY_FUNCTION__;
+    emit searchByIm (filteredImage);
+    accept ();
 }
