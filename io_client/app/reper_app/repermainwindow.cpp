@@ -601,12 +601,12 @@ void ReperMainWindow :: initToolBars (void)
     tbActions->addAction (UI->actE_xit);
     UI->actE_xit->setIcon (QIcon(":/ddoc/quit.png"));
     this->addToolBar (tbActions);
-    UI->actBy_Image_fragment->setIcon (QIcon (":/ddoc/search.png"));
-    tbCalc->addAction (UI->actBy_Image_fragment);
-    UI->actGenerateGol->setIcon (QIcon (":/ddoc/antenna_128.png"));
-    tbCalc->addAction (UI->actGenerateGol);
     UI->actView3DMod->setIcon (QIcon (":/ddoc/galaxy3d.png"));
     tbCalc->addAction (UI->actView3DMod);
+    UI->actGenerateGol->setIcon (QIcon (":/ddoc/antenna_128.png"));
+    tbCalc->addAction (UI->actGenerateGol);
+    UI->actBy_Image_fragment->setIcon (QIcon (":/ddoc/search.png"));
+    tbCalc->addAction (UI->actBy_Image_fragment);
     this->addToolBar (tbCalc);
     UI->actSettings->setIcon (QIcon (":/ddoc/settings.png"));
     tbOthers->addAction (UI->actSettings);
