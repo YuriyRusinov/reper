@@ -323,4 +323,3 @@ int xpm2jpeg(char *xpm, unsigned long xpmsize,
 
     return 0;
 }
-

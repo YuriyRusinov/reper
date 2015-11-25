@@ -8,7 +8,7 @@ PG_FUNCTION_INFO_V1 (test_function_array);
 
 Datum test_function_array (PG_FUNCTION_ARGS)
 {
-    VarChar *pArr = PG_GETARG_CHAR (0);
+    text * imageData = PG_GETARG_TEXT_P(0);
 
     int spi_res;
     spi_res = SPI_connect();
