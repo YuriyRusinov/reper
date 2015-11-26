@@ -47,6 +47,8 @@ FLOADER_EXPORT Datum testargs(PG_FUNCTION_ARGS);
 FLOADER_EXPORT Datum testspi(PG_FUNCTION_ARGS);
 
 FLOADER_EXPORT Datum histogram(PG_FUNCTION_ARGS);
+FLOADER_EXPORT Datum square_image(PG_FUNCTION_ARGS);
+
 
 
 FLOADER_EXPORT text* cstring_to_text_ex(const char *);

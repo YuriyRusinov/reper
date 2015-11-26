@@ -44,8 +44,8 @@ create or replace function saverand() returns int4
 create or replace function loadrand() returns int4
     as '$libdir/libfloader.so', 'loadrand' language 'c' strict security definer;
 
-create or replace function test_function_array(varchar) returns float8
-    as '$libdir/libfloader.so', 'test_function_array' language 'c' strict security definer;
+--create or replace function square_image(bytea) returns float8
+--    as '$libdir/libfloader.so', 'square_image' language 'c' strict security definer;
 
 select f_safe_drop_type('hist_point');
 create type hist_point as (inum bigint, bin float8);
