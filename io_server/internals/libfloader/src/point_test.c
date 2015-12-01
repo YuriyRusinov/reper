@@ -11,7 +11,7 @@ PG_FUNCTION_INFO_V1 (square_image);
 Datum square_image (PG_FUNCTION_ARGS)
 {
     bytea * imageData = PG_GETARG_BYTEA_P(0);
-    elog (INFO, "argument is %s\n", imageData);
+//    elog (INFO, "argument is %s\n", imageData);
 //    text * tImageData = PG_GETARG_TEXT_P (0);
 //    char * bImageStr = text_to_cstring (tImageData);
 
@@ -37,6 +37,7 @@ Datum square_image (PG_FUNCTION_ARGS)
     if (rSize != SPI_OK_SELECT || idproc != 1)
     {
         SPI_finish ();
+        pfree (command_image_size);
         pfree (oids);
         pfree (vals);
         PG_RETURN_FLOAT8 (rSize);
@@ -47,6 +48,7 @@ Datum square_image (PG_FUNCTION_ARGS)
     char * n_str = SPI_getvalue (tuple, tupdesc, 1);
     n = atoi (n_str);
     elog(INFO, "image data, size is  %zu\n", n);
+    pfree (n_str);
 /*
     char * xstr = "\\x";
 
@@ -61,9 +63,46 @@ Datum square_image (PG_FUNCTION_ARGS)
         //PG_RETURN_FLOAT8 (-1.0);
     }
 */
+    pfree (command_image_size);
+    nr_length = strlen ("select convert_from($1::bytea, \'UTF8\');");
+    char * command_convert = (char *)palloc (nr_length+1);
+    snprintf (command_convert, nr_length, "select convert_from($1::bytea, \'UTF8\');");
+    int rConv = SPI_execute_with_args (command_convert, nargs, oids, vals, nulls, true, 1L);
+    idproc = SPI_processed;
+    if (rConv != SPI_OK_SELECT || idproc != 1)
+    {
+        SPI_finish ();
+        pfree (command_convert);
+        pfree (oids);
+        pfree (vals);
+        PG_RETURN_FLOAT8 (rSize);
+    }
+    TupleDesc tupdescC = SPI_tuptable->tupdesc;
+    SPITupleTable *tuptableC = SPI_tuptable;
+    HeapTuple tupleC = tuptableC->vals[0];
+    char * nconv_str = SPI_getvalue (tupleC, tupdescC, 1);
+    int az_dd;
+    int elev_dd;
+    int nw;
+    int nh;
+    int depth;
+    char * im_str = (char *) palloc (strlen (nconv_str)+1);
+    sscanf (nconv_str, "%d %d %d %d %d %s", &az_dd, &elev_dd, &nw, &nh, &depth, im_str);
+    elog (INFO, "converted data are azimuth=%d elevation_angle=%d width=%d height=%d depth=%d image string is %s \n", az_dd, elev_dd, nw, nh, depth, im_str);
+    int n_image = strlen (im_str);
+    double sq = 0.0;
+    int i=0;
+    for (; i<n_image; i++)
+        if (im_str[i] != '0')
+            sq++;
+
+    pfree (im_str);
+    pfree (nconv_str);
+
+    pfree (command_convert);
     pfree (oids);
     pfree (vals);
     SPI_finish();
 
-    PG_RETURN_FLOAT8 (0.0);
+    PG_RETURN_FLOAT8 (sq);
 }
