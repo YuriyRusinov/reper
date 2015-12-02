@@ -34,18 +34,27 @@ SearchRadioImageFragmentForm :: SearchRadioImageFragmentForm (const QImage& sIma
     gFLay->addWidget (lFImage, 0, 0, 1, 1);
 
     UI->tbFilt->setToolTip (tr("Filter by brightness"));
-    UI->gbParams->setVisible (true);
+    UI->gbImageParams->setVisible (true);
 
-    QValidator * azVal = new QDoubleValidator (0, 183, 6, this);
+    QValidator * azVal = new QDoubleValidator (0, 183, 8, this);
     UI->lEAzimuth->setValidator (azVal);
+
+    QValidator * elVal = new QDoubleValidator (-1, 85, 8, this);
+    UI->lEElevation->setValidator (elVal);
+    UI->lEElevation->setEnabled (false);
 
     QValidator * lVal = new QIntValidator (0, 1000, this);
     UI->lELength->setValidator (lVal);
     QValidator * wVal = new QIntValidator (0, 1000, this);
     UI->lEWidth->setValidator (wVal);
+    QValidator * dVal = new QIntValidator (-1, 100, this);
+    UI->lEDepth->setValidator (dVal);
+    UI->lEDepth->setEnabled (false);
 
     connect (UI->tbFilt, SIGNAL (clicked()), this, SLOT (brFilt()) );
     //connect (UI->pbCalculate, SIGNAL (clicked()), this, SLOT (pbCalc()) );
+    connect (UI->cbDepth, SIGNAL (stateChanged(int)), this, SLOT (depthStateChanged (int)) );
+    connect (UI->cbElevation, SIGNAL (stateChanged(int)), this, SLOT (elevStateChanged (int)) );
 
     connect (UI->pbCancel, SIGNAL (clicked()), this, SLOT (reject()) );
     connect (UI->pbOk, SIGNAL (clicked()), this, SLOT (searchBegin()) );
@@ -103,7 +112,7 @@ void SearchRadioImageFragmentForm :: pbCalc (void)
 {
     if (!isFilt)
         brFilt ();
-    UI->gbParams->setVisible (true);
+    UI->gbImageParams->setVisible (true);
 //    int w = sourceImage.width();
 //    int h = sourceImage.height();
     double brRel = UI->spBrightess->value()/0.1e3;
@@ -131,4 +140,34 @@ void SearchRadioImageFragmentForm :: searchBegin (void)
     qDebug () << __PRETTY_FUNCTION__;
     emit searchByIm (filteredImage);
     accept ();
+}
+
+double SearchRadioImageFragmentForm :: getElevation (void) const
+{
+    return UI->lEElevation->text().toDouble ();
+}
+
+int SearchRadioImageFragmentForm :: getImageWidth (void) const
+{
+    return UI->lEWidth->text().toInt();
+}
+
+int SearchRadioImageFragmentForm :: getImageHeight (void) const
+{
+    return UI->lELength->text().toInt();
+}
+
+int SearchRadioImageFragmentForm :: getImageDepth (void) const
+{
+    return UI->lEDepth->text().toInt();
+}
+
+void SearchRadioImageFragmentForm :: elevStateChanged (int state)
+{
+    UI->lEElevation->setEnabled ((state==Qt::Checked));
+}
+
+void SearchRadioImageFragmentForm :: depthStateChanged (int state)
+{
+    UI->lEDepth->setEnabled ((state==Qt::Checked));
 }

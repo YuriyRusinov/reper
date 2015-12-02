@@ -23,6 +23,10 @@ public:
     void setFilteredImage (const QImage& im);
 
     double getAzimuth (void) const;
+    double getElevation (void) const;
+    int getImageWidth (void) const;
+    int getImageHeight (void) const;
+    int getImageDepth (void) const;
 
 public slots:
     void pbCalc (void);
@@ -31,6 +35,8 @@ private slots:
     void brFilt (void);
     void setResults (int pix_length, int pix_width, double azimuth);
     void searchBegin (void);
+    void elevStateChanged (int state);
+    void depthStateChanged (int state);
 
 signals:
     void calcParams (const QImage& im, double cVal);
