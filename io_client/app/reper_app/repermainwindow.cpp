@@ -224,12 +224,15 @@ void ReperMainWindow :: searchIm (const QImage& sIm0)
 
     QImage sIm (sIm0);
     double az (-1.0);
+    double elev (-1.0);
     if (srForm->exec() == QDialog::Accepted)
     {
         sIm = srForm->getSourceImage();
         az = srForm->getAzimuth ();
-        if (sIm.isNull())
+        elev = srForm->getElevation ();
+        if (sIm.isNull() || az < 0)
         {
+            QMessageBox::warning (srForm, tr("Search parameters"), tr("Required parameters are not set"), QMessageBox::Ok);
             return;
         }
     }
@@ -259,6 +262,7 @@ void ReperMainWindow :: searchIm (const QImage& sIm0)
     buffer.close ();
     KKSCategoryAttr * aIm = 0;//loader->loadAttribute ("image_jpg"
     KKSCategoryAttr * aAz = 0;
+    KKSCategoryAttr * aElev = 0;
     for (KKSMap<int, KKSCategoryAttr *>::const_iterator p = ct->attributes().constBegin();
             p != ct->attributes().constEnd() ;//&& aIm == 0 && aAz==0;
             ++p)
@@ -267,6 +271,8 @@ void ReperMainWindow :: searchIm (const QImage& sIm0)
             aIm = p.value ();
         if (QString::compare (p.value()->code(), QString("azimuth"), Qt::CaseInsensitive) == 0)
             aAz = p.value ();
+        if (QString::compare (p.value()->code(), QString("elevation_angle"), Qt::CaseInsensitive) == 0)
+            aElev = p.value ();
     }
     if (!aAz)
     {
@@ -285,6 +291,13 @@ void ReperMainWindow :: searchIm (const QImage& sIm0)
     KKSFilterGroup * group = new KKSFilterGroup(false);
     KKSFilterGroup * azGroup = 0;//new KKSFilterGroup (true);
     KKSFilterGroup * azGroupR = new KKSFilterGroup (true);
+    KKSFilter * fElev0 = 0;
+    KKSFilter * fElev = 0;
+    if (elev >= 0)
+    {
+        fElev0 = ct->createFilter (aElev->id(), QString::number (elev-3), KKSFilter::foGrEq);
+        fElev = ct->createFilter (aElev->id(), QString::number (elev+3), KKSFilter::foLessEq);
+    }
     if ((az-3.0)*(az+3.0) < 0)
     {
         azGroup = new KKSFilterGroup (false);
@@ -302,6 +315,13 @@ void ReperMainWindow :: searchIm (const QImage& sIm0)
         fAzMin0->release ();
         az0Group->addFilter (fAzMax0);
         fAzMax0->release ();
+        if (elev >= 0)
+        {
+            az2PiGroup->addFilter (fElev0);
+            az2PiGroup->addFilter (fElev);
+            az0Group->addFilter (fElev0);
+            az0Group->addFilter (fElev);
+        }
         azGroup->addGroup (az0Group);
         az0Group->release ();
         azGroup->addGroup (az2PiGroup);
@@ -329,8 +349,20 @@ void ReperMainWindow :: searchIm (const QImage& sIm0)
         fAzMinPi->release ();
         azGroupR->addFilter (fAzMaxPi);
         fAzMaxPi->release ();
+        if (elev >= 0)
+        {
+            azGroup->addFilter (fElev0);
+            azGroup->addFilter (fElev);
+            azGroupR->addFilter (fElev0);
+            azGroupR->addFilter (fElev);
+        }
     }
 
+    if (elev >= 0)
+    {
+        fElev0->release ();// = ct->createFilter (aElev->id(), QString::number (elev-3), KKSFilter::foGrEq);
+        fElev->release ();// = ct->createFilter (aElev->id(), QString::number (elev+3), KKSFilter::foLessEq);
+    }
     group->setFilters(filters);
     group->addGroup (azGroup);
     azGroup->release ();

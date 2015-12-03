@@ -144,7 +144,10 @@ void SearchRadioImageFragmentForm :: searchBegin (void)
 
 double SearchRadioImageFragmentForm :: getElevation (void) const
 {
-    return UI->lEElevation->text().toDouble ();
+    if (UI->cbElevation->checkState() == Qt::Checked)
+        return UI->lEElevation->text().toDouble ();
+    else
+        return -1.0;
 }
 
 int SearchRadioImageFragmentForm :: getImageWidth (void) const
@@ -159,7 +162,10 @@ int SearchRadioImageFragmentForm :: getImageHeight (void) const
 
 int SearchRadioImageFragmentForm :: getImageDepth (void) const
 {
-    return UI->lEDepth->text().toInt();
+    if (UI->cbDepth->checkState() == Qt::Checked)
+        return UI->lEDepth->text().toInt();
+    else
+        return -1;
 }
 
 void SearchRadioImageFragmentForm :: elevStateChanged (int state)
