@@ -2,6 +2,7 @@
 #include <QVector>
 #include <QPoint>
 #include <QColor>
+#include <QBuffer>
 #include <QtDebug>
 
 #include <gsl/gsl_fit.h>
@@ -122,6 +123,7 @@ void SearchRadioImageCalc :: calculateParameters (const QImage& im, double cVal)
 SearchResultsForm * SearchRadioImageCalc :: GUIResultsView (QWidget * parent, Qt::WindowFlags flags)
 {
     SearchResultsForm *sresForm = new SearchResultsForm (searchImage, azimuth, elevation_angle, parent, flags);
+    qDebug () << __PRETTY_FUNCTION__ << azimuth << elevation_angle;
     connect (sresForm, SIGNAL (calcGoodnessOfFit (QAbstractItemModel *, const QImage&, double, double)), this, SLOT (calcChi2(QAbstractItemModel *, const QImage&, double, double)) );
 
     return sresForm;
@@ -131,7 +133,7 @@ void SearchRadioImageCalc :: calcChi2 (QAbstractItemModel * sModel, const QImage
 {
 //    Q_UNUSED (sModel);
 //    Q_UNUSED (sIm);
-    qDebug () << __PRETTY_FUNCTION__ << sModel << sIm.isNull();
+    qDebug () << __PRETTY_FUNCTION__ << sModel << sIm.isNull() << az << elev;
     if (!sModel || sModel->rowCount() == 0 || sModel->columnCount() == 0 || sIm.isNull())
         return;
 
@@ -143,6 +145,69 @@ void SearchRadioImageCalc :: calcChi2 (QAbstractItemModel * sModel, const QImage
     Q_UNUSED (c);
     Q_UNUSED (yVec);
     QByteArray bImage;
+    QBuffer buffIm (&bImage);
+    buffIm.open (QIODevice::WriteOnly);
+    QTextStream bIm (&buffIm);
+    int nSW = sIm.width ();
+    int nSH = sIm.height ();
+    bIm << az << " "
+        << (elev < 0 ? 90 : elev) << " "
+        << nSW << " "
+        << nSH << " "
+        << 1 << " ";
+    int qColGrayMax = qGray (QColor (0, 0, 0).rgb());
+    for (int ii=0; ii<nSW; ii++)
+        for (int jj=0; jj<nSH; jj++)
+        {
+            QRgb pCol = sIm.pixel (ii, jj);
+            int pCCol = qGray (pCol);
+            if (pCCol > qColGrayMax)
+                qColGrayMax = pCCol;
+        }
+    for (int ii=0; ii<nSW; ii++)
+        for (int jj=0; jj<nSH; jj++)
+        {
+            QRgb pCol = sIm.pixel (ii, jj);
+            int pColGray = qGray (pCol);
+            if (pColGray >= qColGrayMax/2)
+                bIm << QString::number (1);
+            else
+                bIm << QString::number (0);
+        }
+
+    buffIm.close ();
+    int n = sModel->rowCount();
+    for (int i=0; i<n; i++)
+    {
+        QModelIndex wIndex = sModel->index (i, 0);
+        QByteArray binaryData = sModel->data (wIndex, Qt::ToolTipRole).toByteArray ();
+        if (binaryData.contains("\\x"))
+            binaryData = QByteArray::fromHex(binaryData);
+        QTextStream bIm (binaryData);
+        unsigned az_dd;
+        bIm >> az_dd;
+        if (az_dd > 360)
+            return;
+        unsigned elev_dd;
+        bIm >> elev_dd;
+        unsigned nW, nH, nd;
+        bIm >> nW;
+        bIm >> nH;
+        bIm >> nd;
+        QString imStr;// = bIm.read(nW*nH);
+        bIm >> imStr;
+        QByteArray imArr = imStr.toAscii();
+        uint np (0);
+        int ncount (0);
+        for (uint i=0; i<nW; i++)
+        {
+            for (uint j=0; j<nH; j++)
+            {
+                uint c = (uint)imStr.at(ncount++).digitValue();
+            }
+        }
+    }
+//    qDebug () << __PRETTY_FUNCTION__ << bImage;
 /*    XMatr = gsl_matrix_alloc (5, 5 );//n, nPol+1);
     covMatr = gsl_matrix_alloc (5, 5);//(nPol+1, nPol+1);
     yVec = gsl_vector_alloc (5);

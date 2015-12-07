@@ -83,7 +83,7 @@ void SearchResultsForm :: filterRecs (const QString& text)
 
 void SearchResultsForm :: calcChi2 (void)
 {
-    emit calcGoodnessOfFit (tView->model(), sImage);
+    emit calcGoodnessOfFit (tView->model(), sImage, azimuth_dd, elev_dd);
     qDebug () << __PRETTY_FUNCTION__;
 }
 
