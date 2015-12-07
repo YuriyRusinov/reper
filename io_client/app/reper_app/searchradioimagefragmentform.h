@@ -40,7 +40,7 @@ private slots:
 
 signals:
     void calcParams (const QImage& im, double cVal);
-    void searchByIm (const QImage& im);
+    void searchByIm (const QImage& im, double az, double elev);
 
 private:
     //

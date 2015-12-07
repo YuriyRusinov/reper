@@ -3,6 +3,7 @@
  * Author: yuriyrusinov
  * 
  * Created on 26 Ќо€брь 2014 г., 18:47
+ * содержит бинарные данные по изображени€м.
  */
 #include <QFileDialog>
 #include <QDir>

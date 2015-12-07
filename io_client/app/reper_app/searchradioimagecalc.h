@@ -20,8 +20,8 @@ public:
     
 private slots:
     void calculateParameters (const QImage& im, double cVal);
-    void calcChi2 (QAbstractItemModel * sModel, const QImage& sIm);
-    void searchIm (const QImage& fImage);
+    void calcChi2 (QAbstractItemModel * sModel, const QImage& sIm, double az, double elev);
+    void searchIm (const QImage& fImage, double az, double elev);
 
 signals:
     void setVals (int pl, int pw, double az);
@@ -31,6 +31,8 @@ private:
     // Variables
     //
     QImage searchImage;
+    double azimuth;
+    double elevation_angle;
 
 private:
     Q_OBJECT

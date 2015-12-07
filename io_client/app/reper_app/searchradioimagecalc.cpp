@@ -30,7 +30,7 @@ SearchRadioImageFragmentForm * SearchRadioImageCalc :: GUIImageView (const QImag
     SearchRadioImageFragmentForm * sForm = new SearchRadioImageFragmentForm (im, parent, flags);
 
     connect (sForm, SIGNAL (calcParams (const QImage&, double)), this, SLOT (calculateParameters (const QImage&, double)) );
-    connect (sForm, SIGNAL (searchByIm (const QImage&)), this, SLOT (searchIm (const QImage&)) );
+    connect (sForm, SIGNAL (searchByIm (const QImage&, double, double)), this, SLOT (searchIm (const QImage&, double, double)) );
     connect (this, SIGNAL (setVals (int, int, double)), sForm, SLOT (setResults(int, int, double)) );
     sForm->pbCalc ();
 
@@ -121,13 +121,13 @@ void SearchRadioImageCalc :: calculateParameters (const QImage& im, double cVal)
 
 SearchResultsForm * SearchRadioImageCalc :: GUIResultsView (QWidget * parent, Qt::WindowFlags flags)
 {
-    SearchResultsForm *sresForm = new SearchResultsForm (searchImage, parent, flags);
-    connect (sresForm, SIGNAL (calcGoodnessOfFit (QAbstractItemModel *, const QImage&)), this, SLOT (calcChi2(QAbstractItemModel *, const QImage&)) );
+    SearchResultsForm *sresForm = new SearchResultsForm (searchImage, azimuth, elevation_angle, parent, flags);
+    connect (sresForm, SIGNAL (calcGoodnessOfFit (QAbstractItemModel *, const QImage&, double, double)), this, SLOT (calcChi2(QAbstractItemModel *, const QImage&, double, double)) );
 
     return sresForm;
 }
 
-void SearchRadioImageCalc :: calcChi2 (QAbstractItemModel * sModel, const QImage& sIm)
+void SearchRadioImageCalc :: calcChi2 (QAbstractItemModel * sModel, const QImage& sIm, double az, double elev)
 {
 //    Q_UNUSED (sModel);
 //    Q_UNUSED (sIm);
@@ -138,11 +138,12 @@ void SearchRadioImageCalc :: calcChi2 (QAbstractItemModel * sModel, const QImage
     gsl_matrix *XMatr, *covMatr;
     gsl_vector * c;
     gsl_vector * yVec;
-//    Q_UNUSED (XMatr);
-//    Q_UNUSED (covMatr);
+    Q_UNUSED (XMatr);
+    Q_UNUSED (covMatr);
     Q_UNUSED (c);
-//    Q_UNUSED (yVec);
-    XMatr = gsl_matrix_alloc (5, 5 );//n, nPol+1);
+    Q_UNUSED (yVec);
+    QByteArray bImage;
+/*    XMatr = gsl_matrix_alloc (5, 5 );//n, nPol+1);
     covMatr = gsl_matrix_alloc (5, 5);//(nPol+1, nPol+1);
     yVec = gsl_vector_alloc (5);
     int n = sModel->rowCount();
@@ -230,11 +231,17 @@ void SearchRadioImageCalc :: calcChi2 (QAbstractItemModel * sModel, const QImage
     }
     gsl_matrix_free (covMatr);
     gsl_matrix_free (XMatr);
+*/
+    qDebug () << __PRETTY_FUNCTION__;
 }
 
-void SearchRadioImageCalc :: searchIm (const QImage& fImage)
+void SearchRadioImageCalc :: searchIm (const QImage& fImage, double az, double elev)
 {
-    qDebug () << __PRETTY_FUNCTION__ << fImage.isNull();
+    qDebug () << __PRETTY_FUNCTION__ << fImage.isNull() << az << elev;
     if (fImage.isNull())
         return;
+
+    azimuth = az;
+    elevation_angle = elev;
+    qDebug () << __PRETTY_FUNCTION__;
 }

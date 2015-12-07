@@ -14,7 +14,7 @@
 
 #include "searchresultsform.h"
 
-SearchResultsForm :: SearchResultsForm (const QImage& im, QWidget * parent, Qt::WindowFlags flags)
+SearchResultsForm :: SearchResultsForm (const QImage& im, double az, double elev, QWidget * parent, Qt::WindowFlags flags)
     : QWidget (parent, flags),
     sImage (im),
     tView (new QTreeView (this)),
@@ -22,7 +22,9 @@ SearchResultsForm :: SearchResultsForm (const QImage& im, QWidget * parent, Qt::
     tbActions (new QToolBar (this)),
     lFilter (0),//new QLabel(tr("Filter"), this)),
     filterLE (new QLineEdit (this)),
-    gbFilter (new QGroupBox (this))
+    gbFilter (new QGroupBox (this)),
+    azimuth_dd (az),
+    elev_dd (elev)
 {
     setWindowTitle (tr("Search results"));
     lImage->setPixmap(QPixmap::fromImage (sImage));
@@ -83,4 +85,14 @@ void SearchResultsForm :: calcChi2 (void)
 {
     emit calcGoodnessOfFit (tView->model(), sImage);
     qDebug () << __PRETTY_FUNCTION__;
+}
+
+double SearchResultsForm :: getAzimuth (void) const
+{
+    return azimuth_dd;
+}
+
+double SearchResultsForm :: getElevation (void) const
+{
+    return elev_dd;
 }

@@ -14,11 +14,14 @@ class QGroupBox;
 class SearchResultsForm : public QWidget
 {
 public:
-    SearchResultsForm (const QImage& im, QWidget * parent=0, Qt::WindowFlags flags=0);
+    SearchResultsForm (const QImage& im, double az, double elev, QWidget * parent=0, Qt::WindowFlags flags=0);
     virtual ~SearchResultsForm (void);
 
     void setSearchImage (const QImage& sIm);
     void setResultsModel (QAbstractItemModel * mod);
+
+    double getAzimuth (void) const;
+    double getElevation (void) const;
 
 private slots:
     void filterRecs (const QString& text);
@@ -31,7 +34,7 @@ private:
     void init (void);
 
 signals:
-    void calcGoodnessOfFit (QAbstractItemModel * sModel, const QImage& sIm);
+    void calcGoodnessOfFit (QAbstractItemModel * sModel, const QImage& sIm, double az, double elev);
 
 private:
     //
@@ -44,6 +47,9 @@ private:
     QLabel * lFilter;
     QLineEdit * filterLE;
     QGroupBox * gbFilter;
+
+    double azimuth_dd;
+    double elev_dd;
 
 private:
     Q_OBJECT

@@ -138,7 +138,9 @@ double SearchRadioImageFragmentForm :: getAzimuth (void) const
 void SearchRadioImageFragmentForm :: searchBegin (void)
 {
     qDebug () << __PRETTY_FUNCTION__;
-    emit searchByIm (filteredImage);
+    double im_az = getAzimuth();
+    double im_elev = getElevation ();
+    emit searchByIm (filteredImage, im_az, im_elev);
     accept ();
 }
 
