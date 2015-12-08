@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QImage>
+#include <QSize>
 
 class QAbstractItemModel;
 
@@ -26,6 +27,13 @@ private slots:
 signals:
     void setVals (int pl, int pw, double az);
 
+private:
+    //
+    // Functions
+    //
+    QSize imageShipParameters (const QImage& filteredIm) const;
+    QByteArray searchImageB (const QImage& sIm, double az, double elev) const;
+    QByteArray getImageStr (const QByteArray& b) const;
 private:
     //
     // Variables
