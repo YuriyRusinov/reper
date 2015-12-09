@@ -313,7 +313,7 @@ bool KKSEIODataModel :: setData (const QModelIndex& index, const QVariant& value
             objRecords.insert(id, 0);
         emit dataChanged (topL, bottomR);
     }
-    else if (role == Qt::DisplayRole || role == Qt::EditRole)
+    else if (role == Qt::DisplayRole)
     {
         KKSEIOData d = value.value<KKSEIOData>();
         KKSEIOData * dVal = new KKSEIOData (d);
@@ -325,6 +325,12 @@ bool KKSEIODataModel :: setData (const QModelIndex& index, const QVariant& value
         wItem->setData (dVal, tRef, visibleAttrs);
         dVal->release ();
         emit dataChanged (topL, bottomR);
+    }
+    else if (role == Qt::EditRole)
+    {
+        //qDebug () << __PRETTY_FUNCTION__ << value;//dVal->fields().value("Goodness of fit");
+        wItem->setData (index.column(), value);
+        emit dataChanged (index, index);
     }
     else if (role == Qt::UserRole+1)
     {

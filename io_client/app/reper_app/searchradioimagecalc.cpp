@@ -322,8 +322,9 @@ void SearchRadioImageCalc :: calcChi2 (QAbstractItemModel * sModel, const QImage
             if (bscImStr[ii] == imArr[ii])
                 np++;
         QModelIndex wPIndex = sModel->index (i, m-1);
-        qDebug () << __PRETTY_FUNCTION__ << np << imArr.size() << wPIndex << QString::compare(QString(bscImStr), QString (imArr), Qt::CaseInsensitive);
-        //sModel->setData (wPIndex, QString::number (np*100./bscImStr.size()), Qt::EditRole);
+        //qDebug () << __PRETTY_FUNCTION__ << np *100./imArr.size() << wPIndex << QString::compare(QString(bscImStr), QString (imArr), Qt::CaseInsensitive);
+        sModel->setData (wPIndex, QString::number (np*100./bscImStr.size()), Qt::EditRole);
+        //qDebug () << __PRETTY_FUNCTION__ << np *100./imArr.size() << wPIndex << QString::compare(QString(bscImStr), QString (imArr), Qt::CaseInsensitive) << isSet;
 
     }
 //    qDebug () << __PRETTY_FUNCTION__ << bImage;
