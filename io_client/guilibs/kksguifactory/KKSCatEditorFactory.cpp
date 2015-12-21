@@ -84,6 +84,7 @@ KKSCatEditorFactory :: KKSCatEditorFactory (KKSLoader *l, KKSObjEditorFactory * 
 KKSCatEditorFactory :: ~KKSCatEditorFactory (void)
 {
     tf = 0;
+    qDebug () << __PRETTY_FUNCTION__;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////

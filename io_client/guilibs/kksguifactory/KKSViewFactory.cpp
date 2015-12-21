@@ -264,6 +264,7 @@ KKSViewFactory::KKSViewFactory()
 KKSViewFactory::~KKSViewFactory()
 {
    // TODO : implement
+    qDebug () << __PRETTY_FUNCTION__;
 }
 
 /* Метод осуществляет загрузку записей ИО-справочника в модель.

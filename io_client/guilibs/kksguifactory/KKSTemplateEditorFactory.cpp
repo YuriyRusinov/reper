@@ -43,6 +43,7 @@ KKSTemplateEditorFactory :: KKSTemplateEditorFactory (KKSLoader *l, KKSPPFactory
 KKSTemplateEditorFactory :: ~KKSTemplateEditorFactory (void)
 {
     catf = 0;
+    qDebug () << __PRETTY_FUNCTION__;
 }
 
 void KKSTemplateEditorFactory :: setCatEditorFactory (KKSCatEditorFactory *cf)

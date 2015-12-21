@@ -170,6 +170,7 @@ KKSObjEditorFactory::KKSObjEditorFactory(KKSPPFactory * _ppf,
 
 KKSObjEditorFactory::~KKSObjEditorFactory()
 {
+    qDebug () << __PRETTY_FUNCTION__;
 }
 
 //с точки зрения подсистемы разграничения доступа 

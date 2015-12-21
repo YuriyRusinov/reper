@@ -57,6 +57,7 @@ KKSRubricFactory :: KKSRubricFactory (KKSLoader *l, KKSPPFactory *_ppf, KKSEIOFa
 
 KKSRubricFactory :: ~KKSRubricFactory (void)
 {
+    qDebug () << __PRETTY_FUNCTION__;
 }
 
 //определяем заголовок виджета

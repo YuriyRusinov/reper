@@ -210,6 +210,7 @@ KKSApplication::~KKSApplication( )
         delete m_savedMsgJSettings;
 
     self = 0;
+    qDebug () << __PRETTY_FUNCTION__;
 }
 
 

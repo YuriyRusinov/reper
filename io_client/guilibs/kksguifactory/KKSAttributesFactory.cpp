@@ -165,6 +165,7 @@ void KKSAttributesFactory ::setOEF(KKSObjEditorFactory * _oef)
 
 KKSAttributesFactory :: ~KKSAttributesFactory (void)
 {
+    qDebug () << __PRETTY_FUNCTION__;
 }
 
 /* Метод осуществляет поиск атрибутов в модели.

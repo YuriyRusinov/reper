@@ -130,9 +130,13 @@ int main(int argc, char *argv[])
     mainWindow->show();
 
     int r = qApp->exec();
+    qDebug () << __PRETTY_FUNCTION__;
 
     delete mainWindow;
+    qDebug () << __PRETTY_FUNCTION__ << QString ("~Main window %1").arg ((kksApplication==0));
+    //delete kksApplication;
     delete app;
+    qDebug () << __PRETTY_FUNCTION__ << QString ("~Application");
     return r;
 
 }

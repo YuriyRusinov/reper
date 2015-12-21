@@ -144,6 +144,7 @@ KKSJMonitor::~KKSJMonitor()
 
     if (journalW)
         delete journalW;
+    qDebug () << __PRETTY_FUNCTION__;
 }
 
 void KKSJMonitor::setInterval(int interval)

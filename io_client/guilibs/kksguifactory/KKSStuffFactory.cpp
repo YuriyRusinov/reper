@@ -48,6 +48,7 @@ KKSStuffFactory :: KKSStuffFactory (KKSLoader *l, KKSPPFactory * _ppf, KKSObjEdi
 KKSStuffFactory :: ~KKSStuffFactory (void)
 {
     wModels.clear ();
+    qDebug () << __PRETTY_FUNCTION__;
 }
 
 KKSDatabase * KKSStuffFactory :: getDb (void) const
