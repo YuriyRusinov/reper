@@ -178,7 +178,7 @@ void ReperMainWindow :: slotRLI (void)
         fUserFilter->release ();
     }
     QStringList tNames;
-    tNames << QString ("type_ship") << QString ("radio_image") << QString("rli_image_raws") << QString("object_passports");
+    tNames << QString ("type_ship") << QString ("radio_image") << QString("rli_image_raws") << QString("object_passports") << QString("rli_sky");
     KKSFilter * fTableFilter = c->createFilter (ATTR_TABLE_NAME, tNames, KKSFilter::foIn);
     if (fTableFilter)
     {
