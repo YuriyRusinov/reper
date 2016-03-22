@@ -24,6 +24,7 @@ public:
     void initShipTypes (const QMap<int, QString>& shipTypes);
 
     int getShipType (void) const;
+    double getResolution (void) const;
 
 private:
     Ui::imageCreatorForm *ui;

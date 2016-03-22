@@ -123,3 +123,8 @@ int imageCreatorForm::getShipType (void) const
 {
     return ui->cbShipType->itemData (ui->cbShipType->currentIndex()).toInt();
 }
+
+double imageCreatorForm :: getResolution (void) const
+{
+    return (double)ui->resolutionBox->value();
+}

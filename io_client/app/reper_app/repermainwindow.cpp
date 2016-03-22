@@ -490,11 +490,13 @@ void ReperMainWindow::slotGologramCalc (generatingDataPlus gdp)
     imageCreatorForm * iGW = qobject_cast<imageCreatorForm *>(this->sender());
     bool fTests (false);
     int type_ship (-1);
+    double resolution (-1);
     if (iGW)
     {
         iGW->setVisible (false);
         fTests = iGW->forTests();
         type_ship = iGW->getShipType ();
+        resolution = iGW->getResolution ();
     }
     qDebug () << __PRETTY_FUNCTION__ << type_ship;
     ImageGenerator* generator = new ImageGenerator(gdp,this);
@@ -539,7 +541,9 @@ void ReperMainWindow::slotGologramCalc (generatingDataPlus gdp)
             else if (QString::compare (p.value()->code(), QString("elevation_angle"), Qt::CaseInsensitive) == 0)
                 v = KKSValue (QString :: number (resD[i].XZ_angle), KKSAttrType::atDouble);
             else if (QString::compare (p.value()->code(), QString("depth"), Qt::CaseInsensitive) == 0)
-                v = KKSValue (QString :: number (resD[i].rowNumber), KKSAttrType::atInt);
+                v = KKSValue (QString :: number (resD[i].numberOfUnit), KKSAttrType::atInt);
+            else if (QString::compare (p.value()->code(), QString("resolution"), Qt::CaseInsensitive) == 0 && resolution >= 0.0)
+                v = KKSValue (QString :: number (resolution), KKSAttrType::atDouble);
             else if (QString::compare (p.value()->code(), QString("image_raw"), Qt::CaseInsensitive) == 0)
             {
                 QByteArray bData;
