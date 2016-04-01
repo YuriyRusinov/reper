@@ -34,6 +34,7 @@
 #include "searchradioimagecalc.h"
 #include "objloader.h"
 #include "gologramma.h"
+#include "gologramthread.h"
 #include "imagewidget.h"
 #include "searchresultsform.h"
 #include "radMdiArea.h"

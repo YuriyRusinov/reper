@@ -77,7 +77,7 @@ public:
     QVector<returningData> generateImages();
 
 private slots:
-	void prCancel (void);
+    void prCancel (void);
 
 private:
     generatingDataPlus imageData;

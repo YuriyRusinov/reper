@@ -9,7 +9,8 @@ HEADERS += \
            searchradioimagefragmentform.h \
            searchradioimagecalc.h \
            searchresultsform.h \
-           radMdiArea.h
+           radMdiArea.h \
+           gologramthread.h
 
 FORMS += \
          reper_main_window.ui \
@@ -26,6 +27,7 @@ SOURCES += \
            searchradioimagefragmentform.cpp \
            searchradioimagecalc.cpp \
            searchresultsform.cpp \
-           radMdiArea.cpp
+           radMdiArea.cpp \
+           gologramthread.cpp
 
 #RESOURCES = icon_set.qrc
