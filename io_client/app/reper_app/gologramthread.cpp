@@ -22,3 +22,10 @@ void ImageGeneratorControl :: imageGenerated (void)
 {
     deleteLater ();
 }
+
+void ImageGeneratorControl :: generateImages (void)
+{
+    generator->loadModel ();
+    resD = generator->generateImages();
+    emit imageGenerated (resD);
+}

@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QThread>
+#include <QVector>
 
 #include <gologramma.h>
 
@@ -12,8 +13,14 @@ public:
     ImageGeneratorControl (const generatingDataPlus& gdp, QObject * parent=0);
     virtual ~ImageGeneratorControl (void);
 
+public slots:
+    void generateImages (void);
+
 private slots:
     void imageGenerated (void);
+
+signals:
+    void imageGenerated (const QVector<returningData>& resD);
 
 private:
     //
@@ -21,6 +28,7 @@ private:
     //
     QThread * ImageThread;
     ImageGenerator * generator;
+    QVector<returningData> resD;
 
 private:
     Q_OBJECT
