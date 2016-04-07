@@ -13,6 +13,7 @@ public:
     ImageGeneratorControl (const generatingDataPlus& gdp, QObject * parent=0);
     virtual ~ImageGeneratorControl (void);
 
+    const QVector<returningData>& getImageResults (void) const;
 public slots:
     void generateImages (void);
 

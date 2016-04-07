@@ -4,11 +4,12 @@
 ImageGeneratorControl :: ImageGeneratorControl (const generatingDataPlus& gdp, QObject * parent)
     : QObject (parent),
     ImageThread (new QThread(this)),
-    generator (new ImageGenerator(gdp, this))
+    generator (new ImageGenerator(gdp, 0)),
+    resD (QVector<returningData>())
 {
     generator->moveToThread (ImageThread);
 
-    connect (ImageThread, SIGNAL (finished()), this, SLOT (imageGenerate()) );
+    connect (ImageThread, SIGNAL (finished()), this, SLOT (imageGenerated()) );
     ImageThread->start ();
 }
 
@@ -28,4 +29,9 @@ void ImageGeneratorControl :: generateImages (void)
     generator->loadModel ();
     resD = generator->generateImages();
     emit imageGenerated (resD);
+}
+
+ const QVector<returningData>& ImageGeneratorControl :: getImageResults (void) const
+{
+    return resD;
 }

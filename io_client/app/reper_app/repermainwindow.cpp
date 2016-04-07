@@ -500,11 +500,13 @@ void ReperMainWindow::slotGologramCalc (generatingDataPlus gdp)
         resolution = iGW->getResolution ();
     }
     qDebug () << __PRETTY_FUNCTION__ << type_ship;
-    ImageGenerator* generator = new ImageGenerator(gdp,this);
+    ImageGeneratorControl * gImC = new ImageGeneratorControl (gdp, this);
+//    ImageGenerator* generator = new ImageGenerator(gdp,this);
     
-    generator->loadModel();
-    QVector<returningData> resD = generator->generateImages();
-    delete generator;
+//    generator->loadModel();
+    gImC->generateImages ();
+    QVector<returningData> resD = gImC->getImageResults();//generator->generateImages();
+    delete gImC;//generator;
 
     int nd = resD.count();
     qDebug () << __PRETTY_FUNCTION__ << nd;
