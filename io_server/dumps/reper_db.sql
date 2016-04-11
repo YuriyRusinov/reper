@@ -107,13 +107,13 @@ INSERT INTO a_groups (unique_id, last_update, id, id_io_template, id_parent, nam
 
 SELECT pg_catalog.setval('a_groups_id_seq', 112, true);
 
-INSERT INTO io_views (unique_id, last_update, id, id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) VALUES ('localorg_prefix-io_views-330', '2015-10-28 20:25:23.622101', 330, 2135, 54, 112, false, 1, NULL);
+INSERT INTO io_views (unique_id, last_update, id, id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) VALUES ('localorg_prefix-io_views-330', '2015-10-28 20:25:23.622101', 330, 2135, 54, 112, false, 2, NULL);
 INSERT INTO io_views (unique_id, last_update, id, id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) VALUES ('localorg_prefix-io_views-331', '2015-10-28 20:25:23.622101', 331, 2133, 54, 112, false, 0, NULL);
-INSERT INTO io_views (unique_id, last_update, id, id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) VALUES ('localorg_prefix-io_views-332', '2015-10-30 15:31:10.048484', 332, 2130, 54, 112, false, 2, '0');
+INSERT INTO io_views (unique_id, last_update, id, id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) VALUES ('localorg_prefix-io_views-332', '2015-10-30 15:31:10.048484', 332, 2130, 54, 112, false, 1, '0');
 INSERT INTO io_views (unique_id, last_update, id, id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) VALUES ('localorg_prefix-io_views-333', '2015-10-30 15:31:10.048484', 333, 2131, 54, 112, false, 3, NULL);
 INSERT INTO io_views (unique_id, last_update, id, id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) VALUES ('localorg_prefix-io_views-334', '2015-10-30 15:31:10.048484', 334, 2136, 54, 112, false, 6, NULL);
-INSERT INTO io_views (unique_id, last_update, id, id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) VALUES ('localorg_prefix-io_views-335', '2016-03-16 16:31:10.048484', 335, 2144, 54, 112, false, 5, NULL);
-INSERT INTO io_views (unique_id, last_update, id, id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) VALUES ('localorg_prefix-io_views-336', '2016-03-16 16:31:10.048484', 336, 2145, 54, 112, false, 4, NULL);
+INSERT INTO io_views (unique_id, last_update, id, id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) VALUES ('localorg_prefix-io_views-335', '2016-03-16 16:31:10.048484', 335, 2144, 54, 112, false, 4, NULL);
+INSERT INTO io_views (unique_id, last_update, id, id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) VALUES ('localorg_prefix-io_views-336', '2016-03-16 16:31:10.048484', 336, 2145, 54, 112, false, 5, NULL);
 SELECT pg_catalog.setval('io_views_id_seq', 336, true);
 
 INSERT INTO user_templates (id_user, id_template, id_io_object, type) VALUES (1, 54, 303, 0);
