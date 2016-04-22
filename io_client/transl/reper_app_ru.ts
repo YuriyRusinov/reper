@@ -112,47 +112,57 @@
 <context>
     <name>ReperMainWindow</name>
     <message>
-        <location filename="../app/reper_app/repermainwindow.cpp" line="50"/>
+        <location filename="../app/reper_app/repermainwindow.cpp" line="51"/>
         <source>Software Reper</source>
         <translation>Программный комплекс &quot;Репер&quot;</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/repermainwindow.cpp" line="245"/>
+        <location filename="../app/reper_app/repermainwindow.cpp" line="236"/>
+        <source>Search parameters</source>
+        <translation>Параметры поиска</translation>
+    </message>
+    <message>
+        <location filename="../app/reper_app/repermainwindow.cpp" line="236"/>
+        <source>Required parameters are not set</source>
+        <translation>Параметры поиска не заданы</translation>
+    </message>
+    <message>
+        <location filename="../app/reper_app/repermainwindow.cpp" line="249"/>
         <source>Select reference</source>
         <translation>Выбрать справочник</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/repermainwindow.cpp" line="246"/>
+        <location filename="../app/reper_app/repermainwindow.cpp" line="250"/>
         <source>Not available suitable reference</source>
         <translation>Невозможно выбрать подходящий справочник</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/repermainwindow.cpp" line="422"/>
+        <location filename="../app/reper_app/repermainwindow.cpp" line="474"/>
         <source>Available ship types</source>
         <translation>Типы кораблей</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/repermainwindow.cpp" line="422"/>
+        <location filename="../app/reper_app/repermainwindow.cpp" line="474"/>
         <source>Cannot load ship types list</source>
         <translation>Ошибка загрузки списка типов кораблей</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/repermainwindow.cpp" line="469"/>
+        <location filename="../app/reper_app/repermainwindow.cpp" line="525"/>
         <source>Save test images</source>
         <translation>Сохранить тестовые изображения</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/repermainwindow.cpp" line="475"/>
+        <location filename="../app/reper_app/repermainwindow.cpp" line="531"/>
         <source>Record %1</source>
         <translation>Запись %1</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/repermainwindow.cpp" line="601"/>
+        <location filename="../app/reper_app/repermainwindow.cpp" line="660"/>
         <source>Object files (*.obj);;All files(*);</source>
         <translation>Объектные файлы (*.obj);;Все файлы (*); </translation>
     </message>
     <message>
-        <location filename="../app/reper_app/repermainwindow.cpp" line="602"/>
+        <location filename="../app/reper_app/repermainwindow.cpp" line="661"/>
         <source>Select source file</source>
         <translation>Выбрать файл модели</translation>
     </message>
@@ -311,7 +321,7 @@
 <context>
     <name>SearchRadioImageFragmentForm</name>
     <message>
-        <location filename="../app/reper_app/searchradioimagefragmentform.cpp" line="33"/>
+        <location filename="../app/reper_app/searchradioimagefragmentform.cpp" line="36"/>
         <source>Filter by brightness</source>
         <translation>Фильтрация по яркости</translation>
     </message>
@@ -319,14 +329,19 @@
 <context>
     <name>SearchResultsForm</name>
     <message>
-        <location filename="../app/reper_app/searchresultsform.cpp" line="26"/>
+        <location filename="../app/reper_app/searchresultsform.cpp" line="29"/>
         <source>Search results</source>
         <translation>Результаты поиска</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/searchresultsform.cpp" line="61"/>
+        <location filename="../app/reper_app/searchresultsform.cpp" line="64"/>
         <source>Filter</source>
         <translation>Фильтр</translation>
+    </message>
+    <message>
+        <location filename="../app/reper_app/searchresultsform.cpp" line="68"/>
+        <source>Calculate chi2</source>
+        <translation>Оценка chi2</translation>
     </message>
 </context>
 <context>
@@ -504,42 +519,57 @@
         <translation>Изображение </translation>
     </message>
     <message>
-        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="53"/>
+        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="84"/>
         <source>Image parameters</source>
         <translation>Параметры изображения</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="59"/>
+        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="93"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Length :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Длина</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="69"/>
+        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="103"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Width :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Ширина </translation>
     </message>
     <message>
-        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="79"/>
+        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="113"/>
+        <source>Depth :</source>
+        <translation>Глубина :</translation>
+    </message>
+    <message>
+        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="123"/>
+        <source>Physical parameters</source>
+        <translation>Физические параметры</translation>
+    </message>
+    <message>
+        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="132"/>
+        <source>Elevation angle :</source>
+        <translation>Угол вовышения :</translation>
+    </message>
+    <message>
+        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="139"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Azimuth :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Азимут</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="107"/>
+        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="167"/>
         <source>&amp;Search</source>
         <translation>&amp;Поиск</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="114"/>
+        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="174"/>
         <source>&amp;Cancel</source>
         <translation>&amp;Отмена</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="125"/>
+        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="55"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Brightness level, %:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Уровень яркости, %</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="145"/>
+        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="75"/>
         <source>...</source>
         <translation></translation>
     </message>
