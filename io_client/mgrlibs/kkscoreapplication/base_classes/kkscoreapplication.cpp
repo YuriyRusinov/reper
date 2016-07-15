@@ -84,8 +84,8 @@ KKSCoreApplication::KKSCoreApplication(KKSCommandLineOpts * opts, bool msgToWind
     poDb (0),
     poDb1(0),
     poDb2(0),
-    m_dbgWidget(0),
-    m_notifyReceiver(0)
+    m_notifyReceiver(0),
+    m_dbgWidget(0)
 {
     if ( selfCore )
         qFatal("There should be only one KKSCoreApplication object");
@@ -124,12 +124,10 @@ KKSCoreApplication::KKSCoreApplication(KKSCommandLineOpts * opts, bool msgToWind
     
 
     initLogStream();
-
     getLastError();//это типа чтоп файл журнала создать в текущей папке (там где exe-шник лежџт)
 
     if(msgToWindow)
         qInstallMsgHandler(KKSDbgOutputHandler);
-
 }
 
 
@@ -197,15 +195,18 @@ void KKSCoreApplication::loadTranslator()
 
     QTranslator * openRPTtor = new QTranslator(0);
     bool ok = openRPTtor->load(QString("common_ru"), transl_path);
-    QApplication::installTranslator(openRPTtor);
+    if (ok)
+        QApplication::installTranslator(openRPTtor);
 
     QTranslator * openRPTtor1 = new QTranslator(0);
     bool ok1 = openRPTtor1->load(QString("wrtembed_ru"), transl_path);
-    QApplication::installTranslator(openRPTtor1);
+    if (ok1)
+        QApplication::installTranslator(openRPTtor1);
 
     QTranslator * openRPTtor2 = new QTranslator(0);
     bool ok2 = openRPTtor2->load(QString("renderer_ru"), transl_path);
-    QApplication::installTranslator(openRPTtor2);
+    if (ok2)
+        QApplication::installTranslator(openRPTtor2);
 
     tor = new QTranslator(0);
     tor->load(QString("ddocclient_ru"), transl_path);
@@ -217,7 +218,7 @@ void KKSCoreApplication::loadTranslator()
 /*!\brief ƒеструктор класса. */
 KKSCoreApplication::~KKSCoreApplication( )
 {
-
+    qDebug () << __PRETTY_FUNCTION__;
     if(m_notifyReceiver){
         m_notifyReceiver->quit();
         delete m_notifyReceiver;

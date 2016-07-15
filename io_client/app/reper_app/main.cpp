@@ -49,7 +49,6 @@ int main(int argc, char *argv[])
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("cp1251"));
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("cp1251"));
 
-
     KKSCommandLineOpts * options = KKSApplication::parseCommandLineOptions(argc, argv);
     if(options->showHelp){
         QString msg = options->getHelpMessage();
@@ -61,7 +60,6 @@ int main(int argc, char *argv[])
     }
 
     delete options;
-
 
     QString pluginsPath = QApplication::applicationDirPath() + QDir::separator() + "qtplugins";
     QCoreApplication::addLibraryPath( pluginsPath );
@@ -138,5 +136,4 @@ int main(int argc, char *argv[])
     delete app;
     qDebug () << __PRETTY_FUNCTION__ << QString ("~Application");
     return r;
-
 }

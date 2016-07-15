@@ -65,7 +65,6 @@ KKSApplication::KKSApplication(KKSCommandLineOpts * opts, bool msgToWindow) :
     loadQGISPlugins(); //only if qgis linked
 
     initGUIFactories();
-    
 }
 
 void KKSApplication::loadQGISPlugins()
@@ -184,7 +183,7 @@ void KKSApplication::loadQGISTranslator()
 ”дал€етс€ созданный экземпл€р класса GISdb.*/
 KKSApplication::~KKSApplication( )
 {
-
+    qDebug () << __PRETTY_FUNCTION__;
     if(m_objf)
         delete m_objf;
 
@@ -220,6 +219,7 @@ KKSApplication * KKSApplication::init (int argc,
                                        //const QString & userName, 
                                        bool msgToWindow)
 {
+    qDebug () << __PRETTY_FUNCTION__;
     if ( self )
         qFatal(tr("There should be only one KKSApplication object").toLocal8Bit().constData());
 

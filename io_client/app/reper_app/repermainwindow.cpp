@@ -63,8 +63,8 @@ ReperMainWindow :: ReperMainWindow (QWidget * parent, Qt::WindowFlags flags)
     setActionsEnabled (false);
     this->initToolBars ();
 
-    KKSPluginLoader * pLoader = kksCoreApp->pluginLoader();
-    QList<QObject*> * plugins = pLoader->getPlugins();
+    KKSPluginLoader * pLoader = kksCoreApp ? kksCoreApp->pluginLoader() : 0;
+    QList<QObject*> * plugins = pLoader ? pLoader->getPlugins() : 0;
     if (plugins)
     {
         QMenu * plugMenu = new QMenu;
@@ -93,11 +93,12 @@ ReperMainWindow :: ReperMainWindow (QWidget * parent, Qt::WindowFlags flags)
         }
         UI->actPlugins->setMenu (plugMenu);
     }
-    KKSObjEditorFactory * oef = kksApp->oef();
-    connect (oef, 
-             SIGNAL(editorCreated(KKSObjEditor *)), 
-             this, 
-             SLOT(slotCreateNewObjEditor(KKSObjEditor*)));
+    KKSObjEditorFactory * oef = kksApp ? kksApp->oef() : 0;
+    if (oef)
+        connect (oef, 
+                 SIGNAL(editorCreated(KKSObjEditor *)), 
+                 this, 
+                 SLOT(slotCreateNewObjEditor(KKSObjEditor*)));
 
     connect (UI->actConnect, SIGNAL (triggered()), this, SLOT (slotConnect()) );
     connect (UI->actDisconnect, SIGNAL (triggered()), this, SLOT (slotDisconnect()) );
