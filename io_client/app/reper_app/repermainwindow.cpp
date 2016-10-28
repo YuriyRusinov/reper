@@ -500,7 +500,7 @@ void ReperMainWindow::slotGologramCalc (generatingDataPlus gdp)
         type_ship = iGW->getShipType ();
         resolution = iGW->getResolution ();
     }
-    qDebug () << __PRETTY_FUNCTION__ << type_ship;
+    qDebug () << __PRETTY_FUNCTION__ << type_ship << fTests;
     ImageGeneratorControl * gImC = new ImageGeneratorControl (gdp, this);
 //    ImageGenerator* generator = new ImageGenerator(gdp,this);
     
@@ -568,7 +568,7 @@ void ReperMainWindow::slotGologramCalc (generatingDataPlus gdp)
                 QByteArray bIm;// (imData);
                 QFile imFile (this);
                 if (fTests)
-                    imFile.setFileName (imDir+QDir::separator()+QString("image_%1_%2.jpg").arg (resD[i].XY_angle).arg(resD[i].XZ_angle));
+                    imFile.setFileName (imDir+QDir::separator()+QString("image_%1_%2.jpg").arg (resD[i].XY_angle, 3, 10, QChar('0')).arg(resD[i].XZ_angle, 2, 10, QChar('0')));
                 //QFile debIm ("ddd.dat");
                 //QDataStream debImage (&bIm, QIODevice::WriteOnly);
                 //debIm.open (QIODevice::WriteOnly);
