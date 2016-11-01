@@ -567,8 +567,15 @@ void ReperMainWindow::slotGologramCalc (generatingDataPlus gdp)
                 QImage pIm (nWidth, nHeight, QImage::Format_ARGB32);
                 QByteArray bIm;// (imData);
                 QFile imFile (this);
+                QFile descFile (this);
+                QDataStream descStr (&descFile);//, QIODevice::WriteOnly);
                 if (fTests)
+                {
                     imFile.setFileName (imDir+QDir::separator()+QString("image_%1_%2.jpg").arg (resD[i].XY_angle, 3, 10, QChar('0')).arg(resD[i].XZ_angle, 2, 10, QChar('0')));
+                    descFile.setFileName (imDir+QDir::separator()+QString("image_%1_%2_%3_%4.blb").arg (resD[i].XY_angle, 3, 10, QChar('0')).arg(resD[i].XZ_angle, 2, 10, QChar('0')).arg (resD[i].rowNumber).arg(resD[i].columnNumber));
+                    descFile.open (QIODevice::WriteOnly);
+                    //descStr << tr("Azimuth %1, Elevation %2").arg (resD[i].XY_angle).arg(resD[i].XZ_angle);
+                }
                 //QFile debIm ("ddd.dat");
                 //QDataStream debImage (&bIm, QIODevice::WriteOnly);
                 //debIm.open (QIODevice::WriteOnly);
@@ -579,8 +586,10 @@ void ReperMainWindow::slotGologramCalc (generatingDataPlus gdp)
                     {
                         uint c = (uchar)resD[i].data[ncount++];
                         bIm += QByteArray::number (c);//(uchar)resD[i].data[ncount++]);
-                        c *= 255;
-                        pIm.setPixel(ii, iii, qRgb(c,c,c));
+                        uint col = c*255;
+                        pIm.setPixel(ii, iii, qRgb(col,col,col));
+                        if (fTests)
+                            descStr << QByteArray::number(c);
                     }
                     //debImage << QString("\r\n");
                 }
