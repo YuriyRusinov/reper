@@ -546,7 +546,7 @@
     <message>
         <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="132"/>
         <source>Elevation angle :</source>
-        <translation>Угол вовышения :</translation>
+        <translation>Угол возвышения :</translation>
     </message>
     <message>
         <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="139"/>
