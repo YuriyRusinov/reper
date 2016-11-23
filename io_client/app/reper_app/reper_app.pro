@@ -47,6 +47,10 @@ CONFIG += link_pkgconfig
 PKGCONFIG += gsl
 
 LIBS *= -L$$DESTDIR -ldataaccess -lkkscoreapplication -lkksutils -lkkspp -lkksdatafactory -lkkspluginmanager  -lkksapplication -lkksguifactory -lkksgui -lkksqwt -lgologram -lrepopengl
+
+INCLUDEPATH *= /usr/include/opencv/
+LIBS *= -lopencv_features2d -lopencv_objdetect -lopencv_legacy -lopencv_ml
+PKGCONFIG += opencv
 #LIBS *= -L$$DESTDIR/ddocplugins -lradio_image
 
 

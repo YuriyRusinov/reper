@@ -16,6 +16,12 @@
 #include "searchresultsform.h"
 #include "searchradioimagecalc.h"
 
+//#include "opencv2/imgproc/imgproc.hpp"
+#include <opencv2/highgui/highgui.hpp>
+
+using cv::findContours;
+using cv::Vec4i;
+
 SearchRadioImageCalc :: SearchRadioImageCalc (QObject * parent)
     : QObject (parent)
 {
@@ -51,6 +57,16 @@ void SearchRadioImageCalc :: calculateParameters (const QImage& im, double cVal)
     QPoint wp (0,0);
     int lf (0);
     int wf (0);
+    Q_UNUSED (lf);
+    Q_UNUSED (wf);
+    QVector<QPoint> r_border;
+    cv::Mat rImage = cv::Mat(qimage_to_mat_cpy (im, CV_8UC1));
+    std::vector<std::vector<cv::Point> > contours;
+    cv::Mat contourOutput = rImage.clone();
+    cv::vector<Vec4i> hierarchy;
+    findContours( rImage, contours, hierarchy,
+        CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE );
+    qDebug () << __PRETTY_FUNCTION__ << contours.size ();
     for (int i=1; i<w-1; i++)
         for (int j=1; j<h-1; j++)
         {
@@ -67,7 +83,8 @@ void SearchRadioImageCalc :: calculateParameters (const QImage& im, double cVal)
             if (sCol >= cVal && (pColX < cVal || pColY < cVal || nColX < cVal || nColY < cVal))
             {
                 //qDebug () << __PRETTY_FUNCTION__ << QString ("Comparison");
-                if (np.x() * np.x() + np.y() * np.y() > 0)
+                r_border.append (cPos);
+/*                if (np.x() * np.x() + np.y() * np.y() > 0)
                 {
                     if (np.y() < cPos.y())
                     {
@@ -103,10 +120,11 @@ void SearchRadioImageCalc :: calculateParameters (const QImage& im, double cVal)
                 }
                 else
                     wp = cPos;
+*/
             }
         }
-    qDebug () << __PRETTY_FUNCTION__ << np << ep << sp << wp;
-    double deltax = sp.x()-np.x();
+    qDebug () << __PRETTY_FUNCTION__ << r_border;//np << ep << sp << wp;
+/*    double deltax = sp.x()-np.x();
     double deltay = sp.y()-np.y();
     lf = (int)sqrt (deltax*deltax+deltay*deltay);
     double az = atan2 (deltay, deltax);
@@ -118,6 +136,7 @@ void SearchRadioImageCalc :: calculateParameters (const QImage& im, double cVal)
     deltay = wp.y()-ep.y();
     wf = (int)sqrt (deltax*deltax+deltay*deltay);
     emit setVals (lf, wf, az);
+*/
 }
 
 QSize SearchRadioImageCalc :: imageShipParameters (const QImage& sIm) const
@@ -429,4 +448,15 @@ void SearchRadioImageCalc :: searchIm (const QImage& fImage, double az, double e
     azimuth = az;
     elevation_angle = elev;
     qDebug () << __PRETTY_FUNCTION__;
+}
+
+cv::Mat SearchRadioImageCalc :: qimage_to_mat_cpy(const QImage &img, int format)
+{
+    uchar* b = const_cast<uchar*> (img.bits ());
+    cv::Mat raw (img.height(), img.width(), 
+            format, b, img.bytesPerLine());
+    return raw;// mat(img.rows(), img.cols(),CV_8UC3,img.scanline());
+//    cv::Mat(img.height(), img.width(), format, 
+//                   const_cast<uchar*>(img.bits()), 
+//                   img.bytesPerLine()).clone();
 }

@@ -5,6 +5,10 @@
 #include <QImage>
 #include <QSize>
 
+#include <cv.h>
+
+using cv::Mat;
+
 class QAbstractItemModel;
 
 class SearchRadioImageFragmentForm;
@@ -34,6 +38,8 @@ private:
     QSize imageShipParameters (const QImage& filteredIm) const;
     QByteArray searchImageB (const QImage& sIm, double az, double elev) const;
     QByteArray getImageStr (const QByteArray& b) const;
+
+    cv::Mat qimage_to_mat_cpy(const QImage &img, int format);
 private:
     //
     // Variables
