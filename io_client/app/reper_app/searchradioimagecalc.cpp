@@ -64,9 +64,20 @@ void SearchRadioImageCalc :: calculateParameters (const QImage& im, double cVal)
     std::vector<std::vector<cv::Point> > contours;
     cv::Mat contourOutput = rImage.clone();
     cv::vector<Vec4i> hierarchy;
-    findContours( rImage, contours, hierarchy,
-        CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE );
-    qDebug () << __PRETTY_FUNCTION__ << contours.size ();
+    findContours( rImage, contours, hierarchy, 
+            CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE );
+    int nc = contours.size ();
+    for (int i=0; i<nc; i++)
+    {
+        int ncp = contours[i].size ();
+        for (int ii=0; ii<ncp; ii++)
+        {
+            QPointF p (contours[i][ii].x, contours[i][ii].y);
+            qDebug () << __PRETTY_FUNCTION__ << p;
+        }
+        qDebug () << __PRETTY_FUNCTION__;
+    }
+    //qDebug () << __PRETTY_FUNCTION__ << contours.size ();
     for (int i=1; i<w-1; i++)
         for (int j=1; j<h-1; j++)
         {
