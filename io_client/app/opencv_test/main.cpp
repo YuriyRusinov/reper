@@ -22,6 +22,8 @@ int main( int argc, char** argv )
     vector<vector<Point> > contours;
 
     findContours( bwimg, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE );
+    unsigned int n = contours.size();
+    cout << n << endl;
 
     for(unsigned int i=0;i<contours.size();i++)
     {
@@ -34,6 +36,9 @@ int main( int argc, char** argv )
         else
             cout << "Inner contour points \n";
 
+        //cout << contours[i].size();
+        unsigned int nc = contours[i].size();
+        cout << nc << endl;
         for(unsigned int j=0;j<contours[i].size();j++)
         {
             cout << "Point(x,y)=" << contours[i][j].x << "," << contours[i][j].y << endl;
