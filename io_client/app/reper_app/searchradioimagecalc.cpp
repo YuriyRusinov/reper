@@ -65,9 +65,13 @@ void SearchRadioImageCalc :: calculateParameters (const QImage& im, double cVal)
     Q_UNUSED (wf);
     QVector<QPoint> r_border;
     cv::Mat rImage = 
-      //cv::Mat::zeros(im.width(),im.height(), CV_8UC1);
-        cv::Mat(qimage_to_mat_cpy (im, CV_8UC1));
+              cv::Mat(qimage_to_mat_cpy (im, CV_8UC1));
+    //cv::Mat::zeros(im.width(),im.height(), CV_8UC1);
     qDebug () << __PRETTY_FUNCTION__ << cVal;
+    //im.convertToFormat (QImage::Format_RGB32);
+    im.save (QString ("object_t.bmp"));
+    rImage = cv::imread ("object_t.bmp", CV_LOAD_IMAGE_GRAYSCALE);
+
     std::vector<std::vector<cv::Point> > contours;
     for (int i=1; i<w-1; i++)
         for (int j=1; j<h-1; j++)
@@ -144,6 +148,7 @@ void SearchRadioImageCalc :: calculateParameters (const QImage& im, double cVal)
         return;
     }
 //    cout << __PRETTY_FUNCTION__ << "Opencv matrix is\n" << rImage;
+//    blur( rImage, rImage, cv::Size(3,3) );
     cv::Mat contourOutput = rImage.clone();
     cv::vector<Vec4i> hierarchy;
     Vec4i a = {1, -1, -1, -1};
@@ -503,10 +508,6 @@ cv::Mat SearchRadioImageCalc :: qimage_to_mat_cpy(const QImage &img, int format)
 {
     uchar* b = const_cast<uchar*> (img.bits ());
     int c = img.bytesPerLine();
-    cv::Mat raw (img.height(), img.width(), format, b, c);//img.height(), img.width(), 
-//            format, b, img.bytesPerLine());
-    return raw;// mat(img.rows(), img.cols(),CV_8UC3,img.scanline());
-//    cv::Mat(img.height(), img.width(), format, 
-//                   const_cast<uchar*>(img.bits()), 
-//                   img.bytesPerLine()).clone();
+    cv::Mat mat = cv::Mat(img.height(), img.width(), format, b, c).clone();
+    return mat;
 }
