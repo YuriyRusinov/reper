@@ -617,7 +617,7 @@ void ReperMainWindow::slotGologramCalc (generatingDataPlus gdp)
 
 void ReperMainWindow::slotViewImage (void)
 {
-    ImageWidget * imW = new ImageWidget;
+    ImageWidget * imW = imCalc->GUISearchInit();//new ImageWidget;
     QMdiSubWindow * m_imW = m_mdiArea->addSubWindow (imW);
     m_imW->setAttribute (Qt::WA_DeleteOnClose);
     m_imW->setWindowState (m_imW->windowState() | Qt::WindowActive);

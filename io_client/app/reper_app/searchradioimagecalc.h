@@ -13,6 +13,7 @@ class QAbstractItemModel;
 
 class SearchRadioImageFragmentForm;
 class SearchResultsForm;
+class ImageWidget;
 
 class SearchRadioImageCalc : public QObject
 {
@@ -20,12 +21,14 @@ public:
     SearchRadioImageCalc (QObject * parent=0);
     virtual ~SearchRadioImageCalc (void);
 
+    ImageWidget * GUISearchInit (QWidget * parent=0, Qt::WindowFlags flags=0);
     SearchRadioImageFragmentForm * GUIImageView (const QImage& im=QImage(), QWidget * parent=0, Qt::WindowFlags flags=0);
     SearchResultsForm * GUIResultsView (QWidget * parent=0, Qt::WindowFlags flags=0);
     
 private slots:
     void calculateParameters (const QImage& im, double cVal);
     void calcChi2 (QAbstractItemModel * sModel, const QImage& sIm, double az, double elev);
+    void searchInitIm (const QImage& im);
     void searchIm (const QImage& fImage, double az, double elev);
 
 signals:

@@ -6,6 +6,7 @@
 
 class QLabel;
 class QToolButton;
+class QRadioButton;
 
 class ImageWidget : public QWidget
 {
@@ -15,6 +16,8 @@ public:
 
     void setImage (const QImage& im);
     const QImage& getImage (void) const;
+
+    bool isMultiple (void) const;
 
     QImage getSelectedImage (void) const;
 
@@ -44,6 +47,8 @@ private:
     QToolButton * tbSelect;
     QToolButton * tbSaveToDb;
     QToolButton * tbLoadFromDb;
+    QRadioButton * rbMultiObject;
+    QRadioButton * rbSingleObject;
 
     QImage rGIm;
 private:

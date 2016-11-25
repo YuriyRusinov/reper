@@ -2,10 +2,12 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QToolButton>
+#include <QRadioButton>
 #include <QGridLayout>
 #include <QSize>
 #include <QRect>
 #include "ImageLabel.h"
+#include <QGroupBox>
 #include <QSpacerItem>
 #include <QScrollArea>
 #include <QSizePolicy>
@@ -94,7 +96,7 @@ void ImageWidget :: init (void)
     scImArea->setWidget (lRImage);
     scImArea->setWidgetResizable (true);
 
-    grLay->addWidget (scImArea, 0, 0, 5, 1);
+    grLay->addWidget (scImArea, 0, 0, 7, 1);
 
     tbLoadImage = new QToolButton (this);
     tbLoadImage->setToolTip (tr("Load golographic image from file"));
@@ -119,8 +121,18 @@ void ImageWidget :: init (void)
     grLay->addWidget (tbLoadFromDb, 3, 1, 1, 1);
     tbLoadFromDb->setVisible (false);
 
+    rbMultiObject = new QRadioButton (tr("Search in multiobject mode"), this);
+    rbMultiObject->setToolTip (tr("Multiple object selection is possible"));
+    rbMultiObject->setChecked (true);
+    grLay->addWidget (rbMultiObject, 4, 1, 1, 1);
+
+    rbSingleObject = new QRadioButton (tr("Search in single object mode"), this);
+    rbSingleObject->setToolTip (tr("Only one object can be selected"));
+    rbSingleObject->setChecked (false);
+    grLay->addWidget (rbSingleObject, 5, 1, 1, 1);
+
     QSpacerItem * vSpacer = new QSpacerItem(20, 128, QSizePolicy::Minimum, QSizePolicy::Expanding);
-    grLay->addItem (vSpacer, 4, 1, 1, 1);
+    grLay->addItem (vSpacer, 6, 1, 1, 1);
 }
 
 const QImage& ImageWidget :: getImage (void) const
@@ -138,4 +150,9 @@ QImage ImageWidget :: getSelectedImage (void) const
     //QRect (mapToParent (selRect.topLeft()), selRect.size());
     //qDebug () << __PRETTY_FUNCTION__ << selRect << (rGIm.copy (selRect) == lRImage->pixmap()->copy(selRect).toImage()) <<  (rGIm.copy (selRect) == rGIm.scaled(lRImage->pixmap()->size()).copy (selRect)) << selRect << trRect;
     return (qobject_cast<ImageLabel *>(lRImage))->getSelectedImage();//rGIm.copy (trRect);//lRImage->pixmap()->copy(selRect).toImage();//rGIm.scaled(lRImage->pixmap()->size()).copy (selRect);
+}
+
+bool ImageWidget :: isMultiple (void) const
+{
+    return rbMultiObject->isChecked();
 }

@@ -18,6 +18,7 @@
 #include "searchradioimagefragmentform.h"
 #include "searchresultsform.h"
 #include "searchradioimagecalc.h"
+#include "imagewidget.h"
 
 //#include "opencv2/imgproc/imgproc.hpp"
 #include <opencv2/highgui/highgui.hpp>
@@ -48,6 +49,13 @@ SearchRadioImageFragmentForm * SearchRadioImageCalc :: GUIImageView (const QImag
     sForm->pbCalc ();
 
     return sForm;
+}
+
+ImageWidget * SearchRadioImageCalc :: GUISearchInit (QWidget * parent, Qt::WindowFlags flags)
+{
+    ImageWidget * imW = new ImageWidget (parent, flags);
+    connect (imW, SIGNAL (searchByIm (const QImage&)), this, SLOT (searchInitIm (const QImage&)) );
+    return imW;
 }
 
 void SearchRadioImageCalc :: calculateParameters (const QImage& im, double cVal)
@@ -496,6 +504,12 @@ void SearchRadioImageCalc :: calcChi2 (QAbstractItemModel * sModel, const QImage
     gsl_matrix_free (XMatr);
 */
     qDebug () << __PRETTY_FUNCTION__;
+}
+
+void SearchRadioImageCalc :: searchInitIm (const QImage& im)
+{
+    if (im.isNull())
+        return;
 }
 
 void SearchRadioImageCalc :: searchIm (const QImage& fImage, double az, double elev)
