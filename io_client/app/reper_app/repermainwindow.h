@@ -46,6 +46,7 @@ private slots:
 
     void slotHelp (void);
     void slotSettings (void);
+    void slotSetWindow (QWidget *w);
 private:
     //
     // Functions

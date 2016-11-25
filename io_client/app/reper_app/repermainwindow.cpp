@@ -53,7 +53,7 @@ ReperMainWindow :: ReperMainWindow (QWidget * parent, Qt::WindowFlags flags)
     tbActions (new QToolBar (this)),
     tbCalc (new QToolBar (this)),
     tbOthers (new QToolBar (this)),
-    imCalc (new SearchRadioImageCalc ())
+    imCalc (new SearchRadioImageCalc (kksApp->loader(), kksApp->oef()))
 {
     UI->setupUi (this);
     this->setCentralWidget (m_mdiArea);
@@ -112,6 +112,7 @@ ReperMainWindow :: ReperMainWindow (QWidget * parent, Qt::WindowFlags flags)
     connect (UI->actUser_Manual, SIGNAL (triggered()), this, SLOT (slotHelp()));
     connect (UI->actSettings, SIGNAL (triggered()), this, SLOT (slotSettings()) );
     connect (UI->actView3DMod, SIGNAL (triggered()), this, SLOT (slot3DView()) );
+    connect (imCalc, SIGNAL (viewWidget (QWidget *)), this, SLOT (slotSetWindow (QWidget *)) );
 }
 
 ReperMainWindow :: ~ReperMainWindow (void)
@@ -220,7 +221,8 @@ void ReperMainWindow :: slotSearchByImage (void)
 
 void ReperMainWindow :: searchIm (const QImage& sIm0)
 {
-    qDebug () << __PRETTY_FUNCTION__;
+    Q_UNUSED (sIm0);
+/*    qDebug () << __PRETTY_FUNCTION__;
     SearchRadioImageFragmentForm * srForm = imCalc->GUIImageView (sIm0);//new SearchRadioImageFragmentForm (sIm0);
     //srForm->setImage (sIm0);
 
@@ -392,7 +394,14 @@ void ReperMainWindow :: searchIm (const QImage& sIm0)
     QAbstractItemModel * sMod = rw->getModel ();
     sresForm->setResultsModel (sMod);
     //connect (objEditor, SIGNAL (closeEditor()), m_objEditorW, SLOT (close()) );
+*/
+}
 
+void ReperMainWindow :: slotSetWindow (QWidget *w)
+{
+    QMdiSubWindow * m_ResW = m_mdiArea->addSubWindow (w);
+    m_ResW->setAttribute (Qt::WA_DeleteOnClose);
+    w->show ();
 }
 
 void ReperMainWindow :: slotCompare (void)

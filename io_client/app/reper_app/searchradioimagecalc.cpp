@@ -15,6 +15,14 @@
 #include <iostream>
 #include <fstream>
 
+#include <KKSObject.h>
+#include <KKSCategory.h>
+#include <KKSLoader.h>
+#include <KKSObjEditorFactory.h>
+#include <KKSObjEditor.h>
+#include <KKSRecWidget.h>
+#include <defines.h>
+
 #include "searchradioimagefragmentform.h"
 #include "searchresultsform.h"
 #include "searchradioimagecalc.h"
@@ -29,8 +37,10 @@ using cv::Vec4i;
 using std::cout;
 using std::ofstream;
 
-SearchRadioImageCalc :: SearchRadioImageCalc (QObject * parent)
-    : QObject (parent)
+SearchRadioImageCalc :: SearchRadioImageCalc (KKSLoader * _l, KKSObjEditorFactory * _oef, QObject * parent)
+    : QObject (parent),
+    loader (_l),
+    oef (_oef)
 {
 }
 
@@ -506,10 +516,183 @@ void SearchRadioImageCalc :: calcChi2 (QAbstractItemModel * sModel, const QImage
     qDebug () << __PRETTY_FUNCTION__;
 }
 
-void SearchRadioImageCalc :: searchInitIm (const QImage& im)
+void SearchRadioImageCalc :: searchInitIm (const QImage& sIm0)
 {
-    if (im.isNull())
+    if (sIm0.isNull())
         return;
+    qDebug () << __PRETTY_FUNCTION__;
+    SearchRadioImageFragmentForm * srForm = this->GUIImageView (sIm0);//new SearchRadioImageFragmentForm (sIm0);
+    //srForm->setImage (sIm0);
+
+    QImage sIm (sIm0);
+    double az (-1.0);
+    double elev (-1.0);
+    if (srForm->exec() == QDialog::Accepted)
+    {
+        sIm = srForm->getSourceImage();
+        az = srForm->getAzimuth ();
+        elev = srForm->getElevation ();
+        if (sIm.isNull() || az < 0)
+        {
+            QMessageBox::warning (srForm, tr("Search parameters"), tr("Required parameters are not set"), QMessageBox::Ok);
+            return;
+        }
+    }
+    else
+    {
+        return;
+    }
+    QString tName = QString ("rli_image_raws");
+    KKSObject * io = loader->loadIO (tName, true);
+    if (!io)
+    {
+        QMessageBox::warning (0, tr("Select reference"),
+                                 tr ("Not available suitable reference"),
+                                 QMessageBox::Ok);
+        return;
+    }
+    KKSList<const KKSFilterGroup *> filterGroups;
+    const KKSCategory * c = io->category();
+    const KKSCategory * ct = c->tableCategory();
+    QByteArray bytes;
+    QBuffer buffer(&bytes);
+
+    buffer.open(QIODevice::WriteOnly);
+    sIm.save (&buffer, "XPM");
+    buffer.close ();
+    KKSCategoryAttr * aIm = 0;//loader->loadAttribute ("image_jpg"
+    KKSCategoryAttr * aAz = 0;
+    KKSCategoryAttr * aElev = 0;
+    for (KKSMap<int, KKSCategoryAttr *>::const_iterator p = ct->attributes().constBegin();
+            p != ct->attributes().constEnd() ;//&& aIm == 0 && aAz==0;
+            ++p)
+    {
+        if (QString::compare (p.value()->code(), QString("image_jpg"), Qt::CaseInsensitive) == 0)
+            aIm = p.value ();
+        if (QString::compare (p.value()->code(), QString("azimuth"), Qt::CaseInsensitive) == 0)
+            aAz = p.value ();
+        if (QString::compare (p.value()->code(), QString("elevation_angle"), Qt::CaseInsensitive) == 0)
+            aElev = p.value ();
+    }
+    if (!aAz)
+    {
+        return;
+    }
+
+    KKSFilter * filter = ct->createFilter (aIm->id(), bytes, KKSFilter::foEq);
+
+    KKSFilter * fAzMin = 0;//ct->createFilter (aAz->id(), QString::number ((int)az-3), KKSFilter::foGrEq);
+    KKSFilter * fAzMax = 0;//ct->createFilter (aAz->id(), QString::number ((int)az+3), KKSFilter::foLessEq);
+    KKSFilter * fAzMinPi = 0;//ct->createFilter (aAz->id(), QString::number ((int)az-3), KKSFilter::foGrEq);
+    KKSFilter * fAzMaxPi = 0;//ct->createFilter (aAz->id(), QString::number ((int)az+3), KKSFilter::foLessEq);
+    KKSList<const KKSFilter*> filters;
+    filters.append (filter);
+    filter->release ();
+    KKSFilterGroup * group = new KKSFilterGroup(false);
+    KKSFilterGroup * azGroup = 0;//new KKSFilterGroup (true);
+    KKSFilterGroup * azGroupR = new KKSFilterGroup (true);
+    KKSFilter * fElev0 = 0;
+    KKSFilter * fElev = 0;
+    if (elev >= 0)
+    {
+        fElev0 = ct->createFilter (aElev->id(), QString::number (elev-3), KKSFilter::foGrEq);
+        fElev = ct->createFilter (aElev->id(), QString::number (elev+3), KKSFilter::foLessEq);
+    }
+    if ((az-3.0)*(az+3.0) < 0)
+    {
+        azGroup = new KKSFilterGroup (false);
+        KKSFilter * fAzMin2Pi = ct->createFilter (aAz->id(), QString::number ((int)az-3+360), KKSFilter::foGrEq);
+        KKSFilter * fAzMax2Pi = ct->createFilter (aAz->id(), QString::number (360), KKSFilter::foLessEq);
+        KKSFilterGroup * az2PiGroup = new KKSFilterGroup (true);
+        az2PiGroup->addFilter (fAzMin2Pi);
+        fAzMin2Pi->release ();
+        az2PiGroup->addFilter (fAzMax2Pi);
+        fAzMax2Pi->release ();
+        KKSFilter * fAzMin0 = ct->createFilter (aAz->id(), QString::number (0), KKSFilter::foGrEq);
+        KKSFilter * fAzMax0 = ct->createFilter (aAz->id(), QString::number ((int)az+3), KKSFilter::foLessEq);
+        KKSFilterGroup * az0Group = new KKSFilterGroup (true);
+        az0Group->addFilter (fAzMin0);
+        fAzMin0->release ();
+        az0Group->addFilter (fAzMax0);
+        fAzMax0->release ();
+        if (elev >= 0)
+        {
+            az2PiGroup->addFilter (fElev0);
+            az2PiGroup->addFilter (fElev);
+            az0Group->addFilter (fElev0);
+            az0Group->addFilter (fElev);
+        }
+        azGroup->addGroup (az0Group);
+        az0Group->release ();
+        azGroup->addGroup (az2PiGroup);
+
+        fAzMinPi = ct->createFilter (aAz->id(), QString::number ((int)az-3+180), KKSFilter::foGrEq);
+        fAzMaxPi = ct->createFilter (aAz->id(), QString::number ((int)az+3+180), KKSFilter::foLessEq);
+        azGroupR->addFilter (fAzMinPi);
+        fAzMinPi->release ();
+        azGroupR->addFilter (fAzMaxPi);
+        fAzMaxPi->release ();
+        az2PiGroup->release ();
+    }
+    else
+    {
+        fAzMin = ct->createFilter (aAz->id(), QString::number ((int)az-3), KKSFilter::foGrEq);
+        fAzMax = ct->createFilter (aAz->id(), QString::number ((int)az+3), KKSFilter::foLessEq);
+        azGroup = new KKSFilterGroup (true);
+        azGroup->addFilter (fAzMin);
+        fAzMin->release ();
+        azGroup->addFilter (fAzMax);
+        fAzMax->release ();
+        fAzMinPi = ct->createFilter (aAz->id(), QString::number ((int)az-3+180), KKSFilter::foGrEq);
+        fAzMaxPi = ct->createFilter (aAz->id(), QString::number ((int)az+3+180), KKSFilter::foLessEq);
+        azGroupR->addFilter (fAzMinPi);
+        fAzMinPi->release ();
+        azGroupR->addFilter (fAzMaxPi);
+        fAzMaxPi->release ();
+        if (elev >= 0)
+        {
+            azGroup->addFilter (fElev0);
+            azGroup->addFilter (fElev);
+            azGroupR->addFilter (fElev0);
+            azGroupR->addFilter (fElev);
+        }
+    }
+
+    if (elev >= 0)
+    {
+        fElev0->release ();// = ct->createFilter (aElev->id(), QString::number (elev-3), KKSFilter::foGrEq);
+        fElev->release ();// = ct->createFilter (aElev->id(), QString::number (elev+3), KKSFilter::foLessEq);
+    }
+    group->setFilters(filters);
+    group->addGroup (azGroup);
+    azGroup->release ();
+    group->addGroup (azGroupR);
+    azGroupR->release ();
+    filterGroups.append(group);
+    group->release();
+    KKSObjEditor *objEditor = oef->createObjEditor(IO_IO_ID, 
+                                                   io->id(), 
+                                                   filterGroups, 
+                                                   "",
+                                                   c,
+                                                   false,
+                                                   QString(),
+                                                   false,
+                                                   Qt::NonModal,
+                                                   0);
+    io->release ();
+    //slotCreateNewObjEditor(objEditor);
+    SearchResultsForm *sresForm = this->GUIResultsView ();//new SearchResultsForm (sIm);
+/*    QMdiSubWindow * m_ResW = m_mdiArea->addSubWindow (sresForm);
+    m_ResW->setAttribute (Qt::WA_DeleteOnClose);
+
+    sresForm->show ();
+*/
+    KKSRecWidget * rw = objEditor->getRecordsWidget ();
+    QAbstractItemModel * sMod = rw->getModel ();
+    sresForm->setResultsModel (sMod);
+    //connect (objEditor, SIGNAL (closeEditor()), m_objEditorW, SLOT (close()) );
+    emit viewWidget (sresForm);
 }
 
 void SearchRadioImageCalc :: searchIm (const QImage& fImage, double az, double elev)

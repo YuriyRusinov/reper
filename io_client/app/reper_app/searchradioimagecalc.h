@@ -10,15 +10,19 @@
 using cv::Mat;
 
 class QAbstractItemModel;
+class QWidget;
 
 class SearchRadioImageFragmentForm;
 class SearchResultsForm;
 class ImageWidget;
 
+class KKSLoader;
+class KKSObjEditorFactory;
+
 class SearchRadioImageCalc : public QObject
 {
 public:
-    SearchRadioImageCalc (QObject * parent=0);
+    SearchRadioImageCalc (KKSLoader * _l, KKSObjEditorFactory * _oef, QObject * parent=0);
     virtual ~SearchRadioImageCalc (void);
 
     ImageWidget * GUISearchInit (QWidget * parent=0, Qt::WindowFlags flags=0);
@@ -33,6 +37,7 @@ private slots:
 
 signals:
     void setVals (int pl, int pw, double az);
+    void viewWidget (QWidget *);
 
 private:
     //
@@ -51,6 +56,8 @@ private:
     QImage searchImage;
     double azimuth;
     double elevation_angle;
+    KKSLoader * loader;
+    KKSObjEditorFactory * oef;
 
 private:
     Q_OBJECT
