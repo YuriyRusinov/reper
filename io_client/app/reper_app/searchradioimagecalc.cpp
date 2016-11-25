@@ -13,6 +13,7 @@
 
 #include <math.h>
 #include <iostream>
+#include <fstream>
 
 #include "searchradioimagefragmentform.h"
 #include "searchresultsform.h"
@@ -25,6 +26,7 @@ using cv::findContours;
 using cv::Vec4i;
 
 using std::cout;
+using std::ofstream;
 
 SearchRadioImageCalc :: SearchRadioImageCalc (QObject * parent)
     : QObject (parent)
@@ -64,11 +66,14 @@ void SearchRadioImageCalc :: calculateParameters (const QImage& im, double cVal)
     Q_UNUSED (lf);
     Q_UNUSED (wf);
     QVector<QPoint> r_border;
-    cv::Mat rImage = 
-              cv::Mat(qimage_to_mat_cpy (im, CV_8UC1));
+    im.convertToFormat (QImage::Format_RGB32);
+    cv::Mat rImage = QImageToCvMat (im);
+    ofstream rImStr ("rImageMatr.txt");
+    rImStr << rImage << std::endl;
+//              cv::Mat(qimage_to_mat_cpy (im, CV_8UC1));
     //cv::Mat::zeros(im.width(),im.height(), CV_8UC1);
-    qDebug () << __PRETTY_FUNCTION__ << cVal;
-    //im.convertToFormat (QImage::Format_RGB32);
+//    qDebug () << __PRETTY_FUNCTION__ << cVal;
+    im.convertToFormat (QImage::Format_RGB32);
     im.save (QString ("object_t.bmp"));
     rImage = cv::imread ("object_t.bmp", CV_LOAD_IMAGE_GRAYSCALE);
 
@@ -504,10 +509,73 @@ void SearchRadioImageCalc :: searchIm (const QImage& fImage, double az, double e
     qDebug () << __PRETTY_FUNCTION__;
 }
 
+/*
 cv::Mat SearchRadioImageCalc :: qimage_to_mat_cpy(const QImage &img, int format)
 {
     uchar* b = const_cast<uchar*> (img.bits ());
     int c = img.bytesPerLine();
     cv::Mat mat = cv::Mat(img.height(), img.width(), format, b, c).clone();
     return mat;
+}
+*/
+
+cv::Mat SearchRadioImageCalc :: QImageToCvMat( const QImage &inImage, bool inCloneImageData )
+{
+    switch ( inImage.format() )
+    {
+        // 8-bit, 4 channel
+        case QImage::Format_ARGB32:
+        case QImage::Format_ARGB32_Premultiplied:
+        {
+            cv::Mat  mat( inImage.height(), inImage.width(),
+                          CV_8UC1,
+                          const_cast<uchar*>(inImage.bits()),
+                          static_cast<size_t>(inImage.bytesPerLine())
+                          );
+
+            return (inCloneImageData ? mat.clone() : mat);
+        }
+
+        // 8-bit, 3 channel
+        case QImage::Format_RGB32:
+        case QImage::Format_RGB888:
+        {
+            if ( !inCloneImageData )
+            {
+               qWarning() << "ASM::QImageToCvMat() - Conversion requires cloning because we use a temporary QImage";
+            }
+
+            QImage   swapped;
+
+            if ( inImage.format() == QImage::Format_RGB32 )
+               swapped = inImage.convertToFormat( QImage::Format_RGB888 );
+
+             swapped = inImage.rgbSwapped();
+
+            return cv::Mat( swapped.height(), swapped.width(),
+                            CV_8UC1,
+                            const_cast<uchar*>(swapped.bits()),
+                            static_cast<size_t>(swapped.bytesPerLine())
+                            ).clone();
+        }
+
+        // 8-bit, 1 channel
+        case QImage::Format_Indexed8:
+        {
+            qDebug () << __PRETTY_FUNCTION__ << "Indexed";
+            cv::Mat  mat( inImage.height(), inImage.width(),
+                          CV_8UC1,
+                          const_cast<uchar*>(inImage.bits()),
+                          static_cast<size_t>(inImage.bytesPerLine())
+                          );
+
+            return (inCloneImageData ? mat.clone() : mat);
+        }
+
+        default:
+        qWarning() << "ASM::QImageToCvMat() - QImage format not handled in switch:" << inImage.format();
+        break;
+    }
+
+    return cv::Mat();
 }
