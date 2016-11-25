@@ -3,6 +3,7 @@
 #include <QPoint>
 #include <QColor>
 #include <QBuffer>
+#include <QMessageBox>
 #include <QtDebug>
 
 #include <gsl/gsl_fit.h>
@@ -11,6 +12,7 @@
 #include <gsl/gsl_multifit.h>
 
 #include <math.h>
+#include <iostream>
 
 #include "searchradioimagefragmentform.h"
 #include "searchresultsform.h"
@@ -21,6 +23,8 @@
 
 using cv::findContours;
 using cv::Vec4i;
+
+using std::cout;
 
 SearchRadioImageCalc :: SearchRadioImageCalc (QObject * parent)
     : QObject (parent)
@@ -60,24 +64,11 @@ void SearchRadioImageCalc :: calculateParameters (const QImage& im, double cVal)
     Q_UNUSED (lf);
     Q_UNUSED (wf);
     QVector<QPoint> r_border;
-    cv::Mat rImage = cv::Mat(qimage_to_mat_cpy (im, CV_8UC1));
+    cv::Mat rImage = 
+      //cv::Mat::zeros(im.width(),im.height(), CV_8UC1);
+        cv::Mat(qimage_to_mat_cpy (im, CV_8UC1));
+    qDebug () << __PRETTY_FUNCTION__ << cVal;
     std::vector<std::vector<cv::Point> > contours;
-    cv::Mat contourOutput = rImage.clone();
-    cv::vector<Vec4i> hierarchy;
-    findContours( rImage, contours, hierarchy, 
-            CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE );
-    int nc = contours.size ();
-    for (int i=0; i<nc; i++)
-    {
-        int ncp = contours[i].size ();
-        for (int ii=0; ii<ncp; ii++)
-        {
-            QPointF p (contours[i][ii].x, contours[i][ii].y);
-            qDebug () << __PRETTY_FUNCTION__ << p;
-        }
-        qDebug () << __PRETTY_FUNCTION__;
-    }
-    //qDebug () << __PRETTY_FUNCTION__ << contours.size ();
     for (int i=1; i<w-1; i++)
         for (int j=1; j<h-1; j++)
         {
@@ -94,6 +85,18 @@ void SearchRadioImageCalc :: calculateParameters (const QImage& im, double cVal)
             if (sCol >= cVal && (pColX < cVal || pColY < cVal || nColX < cVal || nColY < cVal))
             {
                 //qDebug () << __PRETTY_FUNCTION__ << QString ("Comparison");
+/*                rImage.at<int> (cPos.x(), cPos.y()) = 255;
+                for (int iii=cPos.x(); iii<=cPos.x()+2; iii++)
+                {
+                    int jjj=cPos.y(); //jjj<=cPos.y(); jjj++)
+                    qDebug () << __PRETTY_FUNCTION__ << QString ("Fill matrix") << iii << jjj;
+                    rImage.at<int> (iii, jjj) = 255;
+                }
+                rImage.at<int> (prPosX.x(), prPosX.y()) = 255;
+                rImage.at<int> (prPosY.x(), prPosY.y()) = 255;
+                rImage.at<int> (nPosX.x(), nPosX.y()) = 255;
+                rImage.at<int> (nPosY.x(), nPosY.y()) = 255;
+*/
                 r_border.append (cPos);
 /*                if (np.x() * np.x() + np.y() * np.y() > 0)
                 {
@@ -135,6 +138,41 @@ void SearchRadioImageCalc :: calculateParameters (const QImage& im, double cVal)
             }
         }
     qDebug () << __PRETTY_FUNCTION__ << r_border;//np << ep << sp << wp;
+    if (r_border.isEmpty())
+    {
+        QMessageBox::warning (0, tr("Search"), tr("No objects in selection"), QMessageBox::Ok);
+        return;
+    }
+//    cout << __PRETTY_FUNCTION__ << "Opencv matrix is\n" << rImage;
+    cv::Mat contourOutput = rImage.clone();
+    cv::vector<Vec4i> hierarchy;
+    Vec4i a = {1, -1, -1, -1};
+    hierarchy.push_back (a);
+    Vec4i b = {2,  0, -1, -1};
+    hierarchy.push_back (b);
+    hierarchy.push_back (a);
+//    hierarchy << array([[[ 1, -1, -1, -1],
+//                         [ 2,  0, -1, -1],
+//                         [-1,  1, -1, -1]]]);
+    findContours( contourOutput, contours, hierarchy, 
+            CV_RETR_TREE, CV_CHAIN_APPROX_NONE );
+    int nc = contours.size ();
+    qDebug () << __PRETTY_FUNCTION__ << nc;//qCont;//contours.size ();
+    QVector<QVector<QPoint> > qCont;
+    for (int i=0; i<nc; i++)
+    {
+        double area = contourArea(contours[i], true);
+        int ncp = contours[i].size ();
+        QVector<QPoint> c;
+        for (int ii=0; ii<ncp; ii++)
+        {
+            QPoint p (contours[i][ii].x, contours[i][ii].y);
+            c.append (p);
+            //qDebug () << __PRETTY_FUNCTION__ << p;
+        }
+        qCont.append (c);
+        qDebug () << __PRETTY_FUNCTION__ << area << c;
+    }
 /*    double deltax = sp.x()-np.x();
     double deltay = sp.y()-np.y();
     lf = (int)sqrt (deltax*deltax+deltay*deltay);
@@ -464,8 +502,9 @@ void SearchRadioImageCalc :: searchIm (const QImage& fImage, double az, double e
 cv::Mat SearchRadioImageCalc :: qimage_to_mat_cpy(const QImage &img, int format)
 {
     uchar* b = const_cast<uchar*> (img.bits ());
-    cv::Mat raw (img.height(), img.width(), 
-            format, b, img.bytesPerLine());
+    int c = img.bytesPerLine();
+    cv::Mat raw (img.height(), img.width(), format, b, c);//img.height(), img.width(), 
+//            format, b, img.bytesPerLine());
     return raw;// mat(img.rows(), img.cols(),CV_8UC3,img.scanline());
 //    cv::Mat(img.height(), img.width(), format, 
 //                   const_cast<uchar*>(img.bits()), 

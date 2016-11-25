@@ -2,7 +2,7 @@ TEMPLATE = app
 
 include(../../io_client.conf)
 
-TARGET = reper_app
+TARGET = opencv_test
 QMAKE_CXXFLAGS += -std=c++11
 DESTDIR = ../../build
 
@@ -102,12 +102,12 @@ unix: LIBS += -lpq
 
 #RC_FILE = operator.rc
 
-RESOURCES = reper_rec.qrc
+#RESOURCES = reper_rec.qrc
 
 TRANSLATIONS += ../../transl/reper_app_ru.ts \
                 ../../transl/gologram_ru.ts
 
-include(reper_app.pri)
+include(opencv_test.pri)
 
 target.path = $$KKS_EXEC_DIR
 INSTALLS += target
