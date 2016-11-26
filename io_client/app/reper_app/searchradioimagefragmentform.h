@@ -37,6 +37,7 @@ private slots:
     void searchBegin (void);
     void elevStateChanged (int state);
     void depthStateChanged (int state);
+    void secPropStateChanged (int state);
 
 signals:
     void calcParams (const QImage& im, double cVal);

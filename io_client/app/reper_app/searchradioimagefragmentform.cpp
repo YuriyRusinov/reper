@@ -51,10 +51,14 @@ SearchRadioImageFragmentForm :: SearchRadioImageFragmentForm (const QImage& sIma
     UI->lEDepth->setValidator (dVal);
     UI->lEDepth->setEnabled (false);
 
+    UI->lESecProperty->setEnabled (false);
+    UI->tabPropWidget->setTabText (0, tr ("Object parameters %1").arg (1));
+
     connect (UI->tbFilt, SIGNAL (clicked()), this, SLOT (brFilt()) );
     //connect (UI->pbCalculate, SIGNAL (clicked()), this, SLOT (pbCalc()) );
     connect (UI->cbDepth, SIGNAL (stateChanged(int)), this, SLOT (depthStateChanged (int)) );
     connect (UI->cbElevation, SIGNAL (stateChanged(int)), this, SLOT (elevStateChanged (int)) );
+    connect (UI->cbSecondaryProp, SIGNAL (stateChanged(int)), this, SLOT (secPropStateChanged (int)) );
 
     connect (UI->pbCancel, SIGNAL (clicked()), this, SLOT (reject()) );
     connect (UI->pbOk, SIGNAL (clicked()), this, SLOT (searchBegin()) );
@@ -178,4 +182,9 @@ void SearchRadioImageFragmentForm :: elevStateChanged (int state)
 void SearchRadioImageFragmentForm :: depthStateChanged (int state)
 {
     UI->lEDepth->setEnabled ((state==Qt::Checked));
+}
+
+void SearchRadioImageFragmentForm :: secPropStateChanged (int state)
+{
+    UI->lESecProperty->setEnabled ((state==Qt::Checked));
 }
