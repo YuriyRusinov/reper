@@ -84,17 +84,17 @@ void SearchRadioImageCalc :: calculateParameters (const QImage& im, double cVal)
     Q_UNUSED (lf);
     Q_UNUSED (wf);
     QVector<QPoint> r_border;
-    im.convertToFormat (QImage::Format_RGB32);
+    im.convertToFormat (QImage::Format_Indexed8);
     cv::Mat rImage = QImageToCvMat (im);
     ofstream rImStr ("rImageMatr.txt");
     rImStr << rImage << std::endl;
 //              cv::Mat(qimage_to_mat_cpy (im, CV_8UC1));
     //cv::Mat::zeros(im.width(),im.height(), CV_8UC1);
 //    qDebug () << __PRETTY_FUNCTION__ << cVal;
-    im.convertToFormat (QImage::Format_RGB32);
+/*    im.convertToFormat (QImage::Format_RGB32);
     im.save (QString ("object_t.bmp"));
     rImage = cv::imread ("object_t.bmp", CV_LOAD_IMAGE_GRAYSCALE);
-
+*/
     std::vector<std::vector<cv::Point> > contours;
     for (int i=1; i<w-1; i++)
         for (int j=1; j<h-1; j++)
@@ -725,7 +725,7 @@ cv::Mat SearchRadioImageCalc :: QImageToCvMat( const QImage &inImage, bool inClo
         case QImage::Format_ARGB32_Premultiplied:
         {
             cv::Mat  mat( inImage.height(), inImage.width(),
-                          CV_8UC1,
+                          CV_8UC4,
                           const_cast<uchar*>(inImage.bits()),
                           static_cast<size_t>(inImage.bytesPerLine())
                           );
@@ -747,10 +747,10 @@ cv::Mat SearchRadioImageCalc :: QImageToCvMat( const QImage &inImage, bool inClo
             if ( inImage.format() == QImage::Format_RGB32 )
                swapped = inImage.convertToFormat( QImage::Format_RGB888 );
 
-             swapped = inImage.rgbSwapped();
+            swapped = inImage.rgbSwapped();
 
             return cv::Mat( swapped.height(), swapped.width(),
-                            CV_8UC1,
+                            CV_8UC3,
                             const_cast<uchar*>(swapped.bits()),
                             static_cast<size_t>(swapped.bytesPerLine())
                             ).clone();
