@@ -109,7 +109,7 @@ SeaObjectParameters ParamWidget :: getData (void) const
     double l = lELength->text().toDouble ();
     double w = lEWidth->text().toDouble ();
     double d = lEDepth->isEnabled() ? lEDepth->text().toDouble() : -1;
-    double az = lAzimuth->text().toDouble ();
+    double az = lEAzimuth->text().toDouble ();
     double elev = lEElev->isEnabled() ? lEElev->text().toDouble() : -1;
     QString sProp = lESec->isEnabled() ? lESec->text() : QString();
     SeaObjectParameters sp (l, w, d, az, elev, sProp);

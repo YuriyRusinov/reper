@@ -44,6 +44,7 @@ private slots:
 signals:
     void calcParams (const QImage& im, double cVal);
     void searchByIm (const QImage& im, double az, double elev);
+    void searchByParams (const QImage& im, const QVector<SeaObjectParameters>& sp);
 
 private:
     //
