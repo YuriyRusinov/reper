@@ -581,24 +581,24 @@ void SearchRadioImageCalc :: searchParams (const QImage& sIm, const QVector<SeaO
 
     for (int i=0; i<nsp; i++)
     {
-        KKSFilterGroup * group = new KKSFilterGroup(true);
+        KKSFilterGroup * group = new KKSFilterGroup(false);
         SeaObjectParameters sop = sp[i];
         double az = sop.azimuth;
         KKSFilter * fAzMin = ct->createFilter (aAz->id(), QString::number (az-3), KKSFilter::foGrEq);
         KKSFilter * fAzMax = ct->createFilter (aAz->id(), QString::number (az+3), KKSFilter::foLessEq);
         KKSFilterGroup * azGroup = new KKSFilterGroup (true);
-//        KKSFilterGroup * azGroupR = new KKSFilterGroup (true);
+        KKSFilterGroup * azGroupR = new KKSFilterGroup (true);
         azGroup->addFilter (fAzMin);
         fAzMin->release ();
         azGroup->addFilter (fAzMax);
         fAzMax->release ();
-//        KKSFilter * fAzMinPi = ct->createFilter (aAz->id(), QString::number (az-3+180), KKSFilter::foGrEq);
-//        KKSFilter * fAzMaxPi = ct->createFilter (aAz->id(), QString::number (az+3+180), KKSFilter::foLessEq);
-//        azGroupR->addFilter (fAzMinPi);
-//        fAzMinPi->release ();
-//        azGroupR->addFilter (fAzMaxPi);
-//        fAzMaxPi->release ();
-//        group->addGroup (azGroup);
+        KKSFilter * fAzMinPi = ct->createFilter (aAz->id(), QString::number (az-3+180), KKSFilter::foGrEq);
+        KKSFilter * fAzMaxPi = ct->createFilter (aAz->id(), QString::number (az+3+180), KKSFilter::foLessEq);
+        azGroupR->addFilter (fAzMinPi);
+        fAzMinPi->release ();
+        azGroupR->addFilter (fAzMaxPi);
+        fAzMaxPi->release ();
+        group->addGroup (azGroup);
         double elev = sop.elevation_angle;
         KKSFilter * fElev0 = 0;
         KKSFilter * fElev = 0;
@@ -608,16 +608,16 @@ void SearchRadioImageCalc :: searchParams (const QImage& sIm, const QVector<SeaO
             fElev = ct->createFilter (aElev->id(), QString::number (elev+3), KKSFilter::foLessEq);
             azGroup->addFilter (fElev0);
             azGroup->addFilter (fElev);
-//            azGroupR->addFilter (fElev0);
-//            azGroupR->addFilter (fElev);
+            azGroupR->addFilter (fElev0);
+            azGroupR->addFilter (fElev);
             fElev0->release ();
             fElev->release ();
         }
 //        group->setFilters(filters);
         group->addGroup (azGroup);
         azGroup->release ();
-//        group->addGroup (azGroupR);
-//        azGroupR->release ();
+        group->addGroup (azGroupR);
+        azGroupR->release ();
         allGroups->addGroup (group);
         group->release ();
 
