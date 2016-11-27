@@ -4,6 +4,8 @@
 #include <QDialog>
 #include <QImage>
 
+#include "seaobjectparameters.h"
+
 class QLabel;
 
 namespace Ui
@@ -14,7 +16,7 @@ namespace Ui
 class SearchRadioImageFragmentForm : public QDialog
 {
 public:
-    SearchRadioImageFragmentForm (const QImage& sImage=QImage(), QWidget * parent=0, Qt::WindowFlags flags=0);
+    SearchRadioImageFragmentForm (const QVector<SeaObjectParameters>& sp=QVector<SeaObjectParameters>(), const QImage& sImage=QImage(), QWidget * parent=0, Qt::WindowFlags flags=0);
     virtual ~SearchRadioImageFragmentForm (void);
 
     const QImage& getSourceImage (void) const;
@@ -48,6 +50,7 @@ private:
     // Variables
     //
     Ui::search_image_fragment_form * UI;
+    QVector<SeaObjectParameters> seaPars;
     QImage sourceImage;
     QImage filteredImage;
     QLabel * lSImage;

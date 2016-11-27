@@ -27,6 +27,7 @@
 #include "searchresultsform.h"
 #include "searchradioimagecalc.h"
 #include "imagewidget.h"
+#include "seaobjectparameters.h"
 
 //#include "opencv2/imgproc/imgproc.hpp"
 #include <opencv2/highgui/highgui.hpp>
@@ -51,7 +52,22 @@ SearchRadioImageCalc :: ~SearchRadioImageCalc (void)
 SearchRadioImageFragmentForm * SearchRadioImageCalc :: GUIImageView (const QImage& im, QWidget * parent, Qt::WindowFlags flags)
 {
     searchImage = im;
-    SearchRadioImageFragmentForm * sForm = new SearchRadioImageFragmentForm (im, parent, flags);
+    double brRel = 0.75;
+//    double cVal = (1.0-brRel)*qGray (255, 255, 255);
+    int w = im.width();
+    int h = im.height();
+    QImage filteredImage = QImage (w, h, im.format());
+    for (int i=0; i<w; i++)
+        for (int j=0; j<h; j++)
+        {
+            QPoint pos = QPoint (i, j);
+            int sCol = qGray (im.pixel (pos));
+            QRgb fCol = sCol < (1.0-brRel)*qGray (255, 255, 255) ? QColor(0, 0, 0).rgb() : QColor (255, 255, 255).rgb();
+            filteredImage.setPixel (pos, fCol);
+        }
+    QVector<SeaObjectParameters> sp = this->imageAnalyse (filteredImage);
+    qDebug () << __PRETTY_FUNCTION__ << sp.count ();
+    SearchRadioImageFragmentForm * sForm = new SearchRadioImageFragmentForm (sp, im, parent, flags);
 
     connect (sForm, SIGNAL (calcParams (const QImage&, double)), this, SLOT (calculateParameters (const QImage&, double)) );
     connect (sForm, SIGNAL (searchByIm (const QImage&, double, double)), this, SLOT (searchIm (const QImage&, double, double)) );
@@ -775,4 +791,57 @@ cv::Mat SearchRadioImageCalc :: QImageToCvMat( const QImage &inImage, bool inClo
     }
 
     return cv::Mat();
+}
+
+QVector<SeaObjectParameters> SearchRadioImageCalc :: imageAnalyse (const QImage& inImage)
+{
+    QImage im (inImage);
+    im.convertToFormat (QImage::Format_RGB32);
+    cv::Mat rImage;// = QImageToCvMat (im);
+//    ofstream rImStr ("rImageMatr.txt");
+//    rImStr << rImage << std::endl;
+//              cv::Mat(qimage_to_mat_cpy (im, CV_8UC1));
+    //cv::Mat::zeros(im.width(),im.height(), CV_8UC1);
+//    qDebug () << __PRETTY_FUNCTION__ << cVal;
+    im.convertToFormat (QImage::Format_RGB32);
+    im.save (QString ("object_t1.bmp"));
+    rImage = cv::imread ("object_t1.bmp", CV_LOAD_IMAGE_GRAYSCALE);
+
+    std::vector<std::vector<cv::Point> > contours;
+    cv::Mat contourOutput = rImage.clone();
+    cv::vector<Vec4i> hierarchy;
+    Vec4i a = {1, -1, -1, -1};
+    hierarchy.push_back (a);
+    Vec4i b = {2,  0, -1, -1};
+    hierarchy.push_back (b);
+    hierarchy.push_back (a);
+//    hierarchy << array([[[ 1, -1, -1, -1],
+//                         [ 2,  0, -1, -1],
+//                         [-1,  1, -1, -1]]]);
+    findContours( contourOutput, contours, hierarchy, 
+            CV_RETR_TREE, CV_CHAIN_APPROX_NONE );
+    int nc = contours.size ();
+    QVector<SeaObjectParameters> objPars;
+    for (int i=0; i<nc; i++)
+    {
+        int n = contours[i].size ();
+        QVector<QPoint> c;
+        for (int ii=0; ii<n; ii++)
+        {
+            QPoint p (contours[i][ii].x, contours[i][ii].y);
+            c.append (p);
+            //qDebug () << __PRETTY_FUNCTION__ << p;
+        }
+        QRect r = QPolygon (c).boundingRect ();
+        double l = qMax (r.width(), r.height());
+        double w = qMin (r.width(), r.height());
+        double d = -1.0;
+        double az = atan2 (w, l)*180/pi;
+        double elev = -1.0;
+        QString sProp = QString ();
+        SeaObjectParameters sp (l, w, d, az, elev, sProp);
+        objPars.append (sp);
+    }
+
+    return objPars;
 }

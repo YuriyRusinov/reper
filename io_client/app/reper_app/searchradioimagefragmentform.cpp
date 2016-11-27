@@ -11,10 +11,12 @@
 
 #include "searchradioimagefragmentform.h"
 #include "ui_search_radio_image_fragment_form.h"
+#include "paramwidget.h"
 
-SearchRadioImageFragmentForm :: SearchRadioImageFragmentForm (const QImage& sImage, QWidget * parent, Qt::WindowFlags flags)
+SearchRadioImageFragmentForm :: SearchRadioImageFragmentForm (const QVector<SeaObjectParameters>& sp, const QImage& sImage, QWidget * parent, Qt::WindowFlags flags)
     : QDialog (parent, flags),
     UI (new Ui::search_image_fragment_form),
+    seaPars (sp),
     sourceImage (sImage),
     filteredImage (QImage()),
     lSImage (new QLabel (this)),
@@ -53,6 +55,12 @@ SearchRadioImageFragmentForm :: SearchRadioImageFragmentForm (const QImage& sIma
 
     UI->lESecProperty->setEnabled (false);
     UI->tabPropWidget->setTabText (0, tr ("Object parameters %1").arg (1));
+    UI->tabPropWidget->clear ();
+    for (int i=0; i<sp.count(); i++)
+    {
+        ParamWidget *wp = new ParamWidget (sp[i], UI->tabPropWidget);
+        UI->tabPropWidget->addTab (wp, tr ("Object parameters %1").arg (i+1));
+    }
 
     connect (UI->tbFilt, SIGNAL (clicked()), this, SLOT (brFilt()) );
     //connect (UI->pbCalculate, SIGNAL (clicked()), this, SLOT (pbCalc()) );
@@ -62,7 +70,7 @@ SearchRadioImageFragmentForm :: SearchRadioImageFragmentForm (const QImage& sIma
 
     connect (UI->pbCancel, SIGNAL (clicked()), this, SLOT (reject()) );
     connect (UI->pbOk, SIGNAL (clicked()), this, SLOT (searchBegin()) );
-    this->pbCalc ();
+    //this->pbCalc ();
 }
 
 SearchRadioImageFragmentForm :: ~SearchRadioImageFragmentForm (void)
@@ -141,9 +149,9 @@ double SearchRadioImageFragmentForm :: getAzimuth (void) const
 
 void SearchRadioImageFragmentForm :: searchBegin (void)
 {
-    qDebug () << __PRETTY_FUNCTION__;
     double im_az = getAzimuth();
     double im_elev = getElevation ();
+    qDebug () << __PRETTY_FUNCTION__;
     emit searchByIm (filteredImage, im_az, im_elev);
     accept ();
 }

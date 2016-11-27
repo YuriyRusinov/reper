@@ -4,8 +4,11 @@
 #include <QObject>
 #include <QImage>
 #include <QSize>
+#include <QVector>
 
 #include <cv.h>
+
+#include "seaobjectparameters.h"
 
 using cv::Mat;
 
@@ -49,6 +52,7 @@ private:
 
     //cv::Mat qimage_to_mat_cpy(const QImage &img, int format);
     cv::Mat QImageToCvMat( const QImage &inImage, bool inCloneImageData = true );
+    QVector<SeaObjectParameters> imageAnalyse (const QImage& inImage);
 private:
     //
     // Variables
