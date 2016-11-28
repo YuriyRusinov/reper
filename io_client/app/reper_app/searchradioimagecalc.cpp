@@ -74,6 +74,7 @@ SearchRadioImageFragmentForm * SearchRadioImageCalc :: GUIImageView (const QImag
     connect (sForm, SIGNAL (searchByParams (const QImage&, const QVector<SeaObjectParameters>&)), this, SLOT (searchParams (const QImage&, const QVector<SeaObjectParameters>&)) );
     connect (this, SIGNAL (setVals (int, int, double)), sForm, SLOT (setResults(int, int, double)) );
     sForm->pbCalc ();
+    sForm->selObject (0);
 
     return sForm;
 }
@@ -943,7 +944,7 @@ QVector<SeaObjectParameters> SearchRadioImageCalc :: imageAnalyse (const QImage&
         double az = atan2 (w, l)*180/pi;
         double elev = -1.0;
         QString sProp = QString ();
-        SeaObjectParameters sp (l, w, d, az, elev, sProp);
+        SeaObjectParameters sp (r, l, w, d, az, elev, sProp);
         objPars.append (sp);
     }
 

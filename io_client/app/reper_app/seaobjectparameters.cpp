@@ -1,7 +1,8 @@
 #include "seaobjectparameters.h"
 
-SeaObjectParameters :: SeaObjectParameters (double l, double w, double d, double az, double elev, QString sProp)
-    : length (l),
+SeaObjectParameters :: SeaObjectParameters (QRect r, double l, double w, double d, double az, double elev, QString sProp)
+    : bRect (r),
+    length (l),
     width (w),
     depth (d),
     azimuth (az),
@@ -11,7 +12,8 @@ SeaObjectParameters :: SeaObjectParameters (double l, double w, double d, double
 }
 
 SeaObjectParameters :: SeaObjectParameters (const SeaObjectParameters& SOP)
-    : length (SOP.length),
+    : bRect (SOP.bRect),
+    length (SOP.length),
     width (SOP.width),
     depth (SOP.depth),
     azimuth (SOP.azimuth),

@@ -32,6 +32,7 @@ public:
 
 public slots:
     void pbCalc (void);
+    void selObject (int index);
 
 private slots:
     void brFilt (void);

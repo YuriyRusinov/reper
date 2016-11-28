@@ -2,6 +2,8 @@
 #include <QGridLayout>
 #include <QPixmap>
 #include <QPoint>
+#include <QPainter>
+#include <QRect>
 #include <QColor>
 #include <QMessageBox>
 #include <QValidator>
@@ -67,6 +69,7 @@ SearchRadioImageFragmentForm :: SearchRadioImageFragmentForm (const QVector<SeaO
     connect (UI->cbDepth, SIGNAL (stateChanged(int)), this, SLOT (depthStateChanged (int)) );
     connect (UI->cbElevation, SIGNAL (stateChanged(int)), this, SLOT (elevStateChanged (int)) );
     connect (UI->cbSecondaryProp, SIGNAL (stateChanged(int)), this, SLOT (secPropStateChanged (int)) );
+    connect (UI->tabPropWidget, SIGNAL (currentChanged(int)), this, SLOT (selObject (int)) );
 
     connect (UI->pbCancel, SIGNAL (clicked()), this, SLOT (reject()) );
     connect (UI->pbOk, SIGNAL (clicked()), this, SLOT (searchBegin()) );
@@ -207,4 +210,21 @@ void SearchRadioImageFragmentForm :: depthStateChanged (int state)
 void SearchRadioImageFragmentForm :: secPropStateChanged (int state)
 {
     UI->lESecProperty->setEnabled ((state==Qt::Checked));
+}
+
+void SearchRadioImageFragmentForm :: selObject (int index)
+{
+    ParamWidget * pw = qobject_cast <ParamWidget *>(UI->tabPropWidget->widget(index));
+    if (!pw)
+        return;
+
+    SeaObjectParameters sp = pw->getData ();
+    QRect r = sp.bRect;
+    QPixmap px = QPixmap::fromImage (filteredImage);
+    QPainter p (&px);
+    QBrush sBrush (QColor(255,255,0,180));
+    QPen selPen = QPen (sBrush, 1, Qt::SolidLine);
+    p.setPen (selPen);
+    p.drawRect (r);
+    lFImage->setPixmap (px);
 }

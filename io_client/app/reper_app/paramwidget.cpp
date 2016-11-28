@@ -9,6 +9,7 @@
 
 ParamWidget :: ParamWidget (SeaObjectParameters sp, QWidget * parent, Qt::WindowFlags flags)
     : QWidget (parent, flags),
+    sop (sp),
     lLength (new QLabel (tr("Length"), this)),
     lELength (new QLineEdit (this)),
     lWidth (new QLabel (tr("Width"), this)),
@@ -112,7 +113,7 @@ SeaObjectParameters ParamWidget :: getData (void) const
     double az = lEAzimuth->text().toDouble ();
     double elev = lEElev->isEnabled() ? lEElev->text().toDouble() : -1;
     QString sProp = lESec->isEnabled() ? lESec->text() : QString();
-    SeaObjectParameters sp (l, w, d, az, elev, sProp);
+    SeaObjectParameters sp (sop.bRect, l, w, d, az, elev, sProp);
     return sp;
 }
 

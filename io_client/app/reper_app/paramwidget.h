@@ -26,6 +26,7 @@ private:
     //
     // Variables
     //
+    SeaObjectParameters sop;
     QLabel * lLength;
     QLineEdit * lELength;
 
