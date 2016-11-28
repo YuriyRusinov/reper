@@ -927,6 +927,7 @@ QVector<SeaObjectParameters> SearchRadioImageCalc :: imageAnalyse (const QImage&
             CV_RETR_TREE, CV_CHAIN_APPROX_NONE );
     int nc = contours.size ();
     QVector<SeaObjectParameters> objPars;
+    bool isProp = false;
     for (int i=0; i<nc; i++)
     {
         int n = contours[i].size ();
@@ -938,6 +939,14 @@ QVector<SeaObjectParameters> SearchRadioImageCalc :: imageAnalyse (const QImage&
             //qDebug () << __PRETTY_FUNCTION__ << p;
         }
         QRect r = QPolygon (c).boundingRect ();
+        if (r.width() < 5 || r.height() < 5)
+        {
+            //
+            // Image too small
+            //
+            isProp = true;
+            continue;
+        }
         double l = qMax (r.width(), r.height());
         double w = qMin (r.width(), r.height());
         double d = -1.0;
@@ -947,6 +956,10 @@ QVector<SeaObjectParameters> SearchRadioImageCalc :: imageAnalyse (const QImage&
         SeaObjectParameters sp (r, l, w, d, az, elev, sProp);
         objPars.append (sp);
     }
+    int ncr = objPars.size ();
+    if (isProp)
+        for (int i=0; i<ncr; i++)
+            objPars[i].secProp = tr ("Control on the right");
 
     return objPars;
 }
