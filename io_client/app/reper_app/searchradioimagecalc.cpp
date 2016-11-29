@@ -939,7 +939,7 @@ QVector<SeaObjectParameters> SearchRadioImageCalc :: imageAnalyse (const QImage&
             //qDebug () << __PRETTY_FUNCTION__ << p;
         }
         QRect r = QPolygon (c).boundingRect ();
-        if (r.width() < 5 || r.height() < 5)
+        if (r.width() < 6 && r.height() < 6)
         {
             //
             // Image too small
