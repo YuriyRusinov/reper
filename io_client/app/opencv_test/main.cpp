@@ -18,12 +18,14 @@ int main( int argc, char** argv )
         return 1;
     }
     QImage srcIm (argv[1]);
-    QImage img2 = srcIm.convertToFormat(QImage::Format_RGB32);
+    QImage img2 = srcIm.convertToFormat(QImage::Format_ARGB32);
     Mat src_gray = QImageToCvMat (img2);
 //    src_gray = imread(argv[1],0);
-    blur( src_gray, src_gray, Size(3,3) );
+//    blur( src_gray, src_gray, Size(3,3) );
+    Mat src_gray1 = src_gray.clone ();
+    cvtColor (src_gray, src_gray1, CV_RGB2GRAY);
 
-    Mat bwimg = src_gray.clone();// > 127;
+    Mat bwimg = src_gray1.clone();// > 127;
     vector<vector<Point> > contours;
 
     findContours( bwimg, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE );

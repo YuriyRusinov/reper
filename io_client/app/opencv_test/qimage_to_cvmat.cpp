@@ -8,9 +8,12 @@ cv::Mat QImageToCvMat( const QImage &inImage, bool inCloneImageData )
     int c = inImage.bytesPerLine();
     return cv::Mat(inImage.height(), inImage.width(), CV_8UC4, b, c).clone();
 */
+    qDebug () << __PRETTY_FUNCTION__ << inImage.format ();
     switch ( inImage.format() )
     {
+        //
         // 8-bit, 4 channel
+        //
         case QImage::Format_ARGB32:
         case QImage::Format_ARGB32_Premultiplied:
         {
@@ -23,7 +26,9 @@ cv::Mat QImageToCvMat( const QImage &inImage, bool inCloneImageData )
             return (inCloneImageData ? mat.clone() : mat);
         }
 
+        //
         // 8-bit, 3 channel
+        //
         case QImage::Format_RGB32:
         case QImage::Format_RGB888:
         {
@@ -46,7 +51,9 @@ cv::Mat QImageToCvMat( const QImage &inImage, bool inCloneImageData )
                             ).clone();
         }
 
+        //
         // 8-bit, 1 channel
+        //
         case QImage::Format_Indexed8:
         {
             qDebug () << __PRETTY_FUNCTION__ << "Indexed";
@@ -65,5 +72,4 @@ cv::Mat QImageToCvMat( const QImage &inImage, bool inCloneImageData )
     }
 
     return cv::Mat();
-*/
 }
