@@ -260,4 +260,6 @@ const int ATTR_ITEM_IS_LEAF = 403;
 #define ID_INTERACTION_FORMAT_SHUSHUN 3 //XML-формат (ЦНИИ ЭИСУ) взаимодействия внешних систем
 #define ID_INTERACTION_FORMAT_DDOC 4 //внутренний формат взаимодействия систем DynamicDocs
 
+const double pi=3.14159265358969;
+
 #endif

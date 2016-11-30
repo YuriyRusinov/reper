@@ -27,6 +27,7 @@
 #include "searchresultsform.h"
 #include "searchradioimagecalc.h"
 #include "imagewidget.h"
+#include "seaobjectparameters.h"
 
 //#include "opencv2/imgproc/imgproc.hpp"
 #include <opencv2/highgui/highgui.hpp>
@@ -51,12 +52,29 @@ SearchRadioImageCalc :: ~SearchRadioImageCalc (void)
 SearchRadioImageFragmentForm * SearchRadioImageCalc :: GUIImageView (const QImage& im, QWidget * parent, Qt::WindowFlags flags)
 {
     searchImage = im;
-    SearchRadioImageFragmentForm * sForm = new SearchRadioImageFragmentForm (im, parent, flags);
+    double brRel = 0.75;
+//    double cVal = (1.0-brRel)*qGray (255, 255, 255);
+    int w = im.width();
+    int h = im.height();
+    QImage filteredImage = QImage (w, h, im.format());
+    for (int i=0; i<w; i++)
+        for (int j=0; j<h; j++)
+        {
+            QPoint pos = QPoint (i, j);
+            int sCol = qGray (im.pixel (pos));
+            QRgb fCol = sCol < (1.0-brRel)*qGray (255, 255, 255) ? QColor(0, 0, 0).rgb() : QColor (255, 255, 255).rgb();
+            filteredImage.setPixel (pos, fCol);
+        }
+    QVector<SeaObjectParameters> sp = this->imageAnalyse (filteredImage);
+    qDebug () << __PRETTY_FUNCTION__ << sp.count ();
+    SearchRadioImageFragmentForm * sForm = new SearchRadioImageFragmentForm (sp, im, parent, flags);
 
     connect (sForm, SIGNAL (calcParams (const QImage&, double)), this, SLOT (calculateParameters (const QImage&, double)) );
     connect (sForm, SIGNAL (searchByIm (const QImage&, double, double)), this, SLOT (searchIm (const QImage&, double, double)) );
+    connect (sForm, SIGNAL (searchByParams (const QImage&, const QVector<SeaObjectParameters>&)), this, SLOT (searchParams (const QImage&, const QVector<SeaObjectParameters>&)) );
     connect (this, SIGNAL (setVals (int, int, double)), sForm, SLOT (setResults(int, int, double)) );
     sForm->pbCalc ();
+    sForm->selObject (0);
 
     return sForm;
 }
@@ -516,6 +534,116 @@ void SearchRadioImageCalc :: calcChi2 (QAbstractItemModel * sModel, const QImage
     qDebug () << __PRETTY_FUNCTION__;
 }
 
+void SearchRadioImageCalc :: searchParams (const QImage& sIm, const QVector<SeaObjectParameters>& sp)
+{
+    qDebug () << __PRETTY_FUNCTION__ << sp.size ();
+    int nsp = sp.size ();
+    QString tName = QString ("rli_image_raws");
+    KKSObject * io = loader->loadIO (tName, true);
+    if (!io)
+    {
+        QMessageBox::warning (0, tr("Select reference"),
+                                 tr ("Not available suitable reference"),
+                                 QMessageBox::Ok);
+        return;
+    }
+    KKSList<const KKSFilterGroup *> filterGroups;
+    const KKSCategory * c = io->category();
+    const KKSCategory * ct = c->tableCategory();
+    QByteArray bytes;
+    QBuffer buffer(&bytes);
+
+    buffer.open(QIODevice::WriteOnly);
+    sIm.save (&buffer, "XPM");
+    buffer.close ();
+    KKSCategoryAttr * aIm = 0;//loader->loadAttribute ("image_jpg"
+    KKSCategoryAttr * aAz = 0;
+    KKSCategoryAttr * aElev = 0;
+    for (KKSMap<int, KKSCategoryAttr *>::const_iterator p = ct->attributes().constBegin();
+            p != ct->attributes().constEnd() ;//&& aIm == 0 && aAz==0;
+            ++p)
+    {
+        if (QString::compare (p.value()->code(), QString("image_jpg"), Qt::CaseInsensitive) == 0)
+            aIm = p.value ();
+        if (QString::compare (p.value()->code(), QString("azimuth"), Qt::CaseInsensitive) == 0)
+            aAz = p.value ();
+        if (QString::compare (p.value()->code(), QString("elevation_angle"), Qt::CaseInsensitive) == 0)
+            aElev = p.value ();
+    }
+    if (!aAz)
+    {
+        return;
+    }
+
+    KKSFilter * filter = ct->createFilter (aIm->id(), bytes, KKSFilter::foEq);
+    filter->release ();
+    Q_UNUSED (filter);
+    KKSFilterGroup * allGroups = new KKSFilterGroup(false);
+
+    for (int i=0; i<nsp; i++)
+    {
+        KKSFilterGroup * group = new KKSFilterGroup(false);
+        SeaObjectParameters sop = sp[i];
+        double az = sop.azimuth;
+        KKSFilter * fAzMin = ct->createFilter (aAz->id(), QString::number (az-3), KKSFilter::foGrEq);
+        KKSFilter * fAzMax = ct->createFilter (aAz->id(), QString::number (az+3), KKSFilter::foLessEq);
+        KKSFilterGroup * azGroup = new KKSFilterGroup (true);
+        KKSFilterGroup * azGroupR = new KKSFilterGroup (true);
+        azGroup->addFilter (fAzMin);
+        fAzMin->release ();
+        azGroup->addFilter (fAzMax);
+        fAzMax->release ();
+        KKSFilter * fAzMinPi = ct->createFilter (aAz->id(), QString::number (az-3+180), KKSFilter::foGrEq);
+        KKSFilter * fAzMaxPi = ct->createFilter (aAz->id(), QString::number (az+3+180), KKSFilter::foLessEq);
+        azGroupR->addFilter (fAzMinPi);
+        fAzMinPi->release ();
+        azGroupR->addFilter (fAzMaxPi);
+        fAzMaxPi->release ();
+        group->addGroup (azGroup);
+        double elev = sop.elevation_angle;
+        KKSFilter * fElev0 = 0;
+        KKSFilter * fElev = 0;
+        if (elev >= 0)
+        {
+            fElev0 = ct->createFilter (aElev->id(), QString::number (elev-3), KKSFilter::foGrEq);
+            fElev = ct->createFilter (aElev->id(), QString::number (elev+3), KKSFilter::foLessEq);
+            azGroup->addFilter (fElev0);
+            azGroup->addFilter (fElev);
+            azGroupR->addFilter (fElev0);
+            azGroupR->addFilter (fElev);
+            fElev0->release ();
+            fElev->release ();
+        }
+//        group->setFilters(filters);
+        group->addGroup (azGroup);
+        azGroup->release ();
+        group->addGroup (azGroupR);
+        azGroupR->release ();
+        allGroups->addGroup (group);
+        group->release ();
+
+    }
+    filterGroups.append(allGroups);
+    allGroups->release ();
+    KKSObjEditor *objEditor = oef->createObjEditor(IO_IO_ID, 
+                                                   io->id(), 
+                                                   filterGroups, 
+                                                   "",
+                                                   c,
+                                                   false,
+                                                   QString(),
+                                                   false,
+                                                   Qt::NonModal,
+                                                   0);
+    io->release ();
+    SearchResultsForm *sresForm = this->GUIResultsView ();//new SearchResultsForm (sIm);
+    KKSRecWidget * rw = objEditor->getRecordsWidget ();
+    QAbstractItemModel * sMod = rw->getModel ();
+    sresForm->setResultsModel (sMod);
+
+    emit viewWidget (sresForm);
+}
+
 void SearchRadioImageCalc :: searchInitIm (const QImage& sIm0)
 {
     if (sIm0.isNull())
@@ -523,7 +651,9 @@ void SearchRadioImageCalc :: searchInitIm (const QImage& sIm0)
     qDebug () << __PRETTY_FUNCTION__;
     SearchRadioImageFragmentForm * srForm = this->GUIImageView (sIm0);//new SearchRadioImageFragmentForm (sIm0);
     //srForm->setImage (sIm0);
-
+    if (srForm->exec() != QDialog::Accepted)
+        return;
+/*
     QImage sIm (sIm0);
     double az (-1.0);
     double elev (-1.0);
@@ -681,18 +811,9 @@ void SearchRadioImageCalc :: searchInitIm (const QImage& sIm0)
                                                    Qt::NonModal,
                                                    0);
     io->release ();
-    //slotCreateNewObjEditor(objEditor);
-    SearchResultsForm *sresForm = this->GUIResultsView ();//new SearchResultsForm (sIm);
-/*    QMdiSubWindow * m_ResW = m_mdiArea->addSubWindow (sresForm);
-    m_ResW->setAttribute (Qt::WA_DeleteOnClose);
 
-    sresForm->show ();
+    //slotCreateNewObjEditor(objEditor);
 */
-    KKSRecWidget * rw = objEditor->getRecordsWidget ();
-    QAbstractItemModel * sMod = rw->getModel ();
-    sresForm->setResultsModel (sMod);
-    //connect (objEditor, SIGNAL (closeEditor()), m_objEditorW, SLOT (close()) );
-    emit viewWidget (sresForm);
 }
 
 void SearchRadioImageCalc :: searchIm (const QImage& fImage, double az, double elev)
@@ -775,4 +896,70 @@ cv::Mat SearchRadioImageCalc :: QImageToCvMat( const QImage &inImage, bool inClo
     }
 
     return cv::Mat();
+}
+
+QVector<SeaObjectParameters> SearchRadioImageCalc :: imageAnalyse (const QImage& inImage)
+{
+    QImage im (inImage);
+    im.convertToFormat (QImage::Format_RGB32);
+    cv::Mat rImage;// = QImageToCvMat (im);
+//    ofstream rImStr ("rImageMatr.txt");
+//    rImStr << rImage << std::endl;
+//              cv::Mat(qimage_to_mat_cpy (im, CV_8UC1));
+    //cv::Mat::zeros(im.width(),im.height(), CV_8UC1);
+//    qDebug () << __PRETTY_FUNCTION__ << cVal;
+    im.convertToFormat (QImage::Format_RGB32);
+    im.save (QString ("object_t1.bmp"));
+    rImage = cv::imread ("object_t1.bmp", CV_LOAD_IMAGE_GRAYSCALE);
+
+    std::vector<std::vector<cv::Point> > contours;
+    cv::Mat contourOutput = rImage.clone();
+    cv::vector<Vec4i> hierarchy;
+    Vec4i a = {1, -1, -1, -1};
+    hierarchy.push_back (a);
+    Vec4i b = {2,  0, -1, -1};
+    hierarchy.push_back (b);
+    hierarchy.push_back (a);
+//    hierarchy << array([[[ 1, -1, -1, -1],
+//                         [ 2,  0, -1, -1],
+//                         [-1,  1, -1, -1]]]);
+    findContours( contourOutput, contours, hierarchy, 
+            CV_RETR_TREE, CV_CHAIN_APPROX_NONE );
+    int nc = contours.size ();
+    QVector<SeaObjectParameters> objPars;
+    bool isProp = false;
+    for (int i=0; i<nc; i++)
+    {
+        int n = contours[i].size ();
+        QVector<QPoint> c;
+        for (int ii=0; ii<n; ii++)
+        {
+            QPoint p (contours[i][ii].x, contours[i][ii].y);
+            c.append (p);
+            //qDebug () << __PRETTY_FUNCTION__ << p;
+        }
+        QRect r = QPolygon (c).boundingRect ();
+        if (r.width() < 6 && r.height() < 6)
+        {
+            //
+            // Image too small
+            //
+            isProp = true;
+            continue;
+        }
+        double l = qMax (r.width(), r.height());
+        double w = qMin (r.width(), r.height());
+        double d = -1.0;
+        double az = atan2 (w, l)*180/pi;
+        double elev = -1.0;
+        QString sProp = QString ();
+        SeaObjectParameters sp (r, l, w, d, az, elev, sProp);
+        objPars.append (sp);
+    }
+    int ncr = objPars.size ();
+    if (isProp)
+        for (int i=0; i<ncr; i++)
+            objPars[i].secProp = tr ("Control on the right");
+
+    return objPars;
 }

@@ -2,6 +2,8 @@
 #include <QGridLayout>
 #include <QPixmap>
 #include <QPoint>
+#include <QPainter>
+#include <QRect>
 #include <QColor>
 #include <QMessageBox>
 #include <QValidator>
@@ -11,10 +13,12 @@
 
 #include "searchradioimagefragmentform.h"
 #include "ui_search_radio_image_fragment_form.h"
+#include "paramwidget.h"
 
-SearchRadioImageFragmentForm :: SearchRadioImageFragmentForm (const QImage& sImage, QWidget * parent, Qt::WindowFlags flags)
+SearchRadioImageFragmentForm :: SearchRadioImageFragmentForm (const QVector<SeaObjectParameters>& sp, const QImage& sImage, QWidget * parent, Qt::WindowFlags flags)
     : QDialog (parent, flags),
     UI (new Ui::search_image_fragment_form),
+    seaPars (sp),
     sourceImage (sImage),
     filteredImage (QImage()),
     lSImage (new QLabel (this)),
@@ -53,16 +57,23 @@ SearchRadioImageFragmentForm :: SearchRadioImageFragmentForm (const QImage& sIma
 
     UI->lESecProperty->setEnabled (false);
     UI->tabPropWidget->setTabText (0, tr ("Object parameters %1").arg (1));
+    UI->tabPropWidget->clear ();
+    for (int i=0; i<sp.count(); i++)
+    {
+        ParamWidget *wp = new ParamWidget (sp[i], UI->tabPropWidget);
+        UI->tabPropWidget->addTab (wp, tr ("Object parameters %1").arg (i+1));
+    }
 
     connect (UI->tbFilt, SIGNAL (clicked()), this, SLOT (brFilt()) );
     //connect (UI->pbCalculate, SIGNAL (clicked()), this, SLOT (pbCalc()) );
     connect (UI->cbDepth, SIGNAL (stateChanged(int)), this, SLOT (depthStateChanged (int)) );
     connect (UI->cbElevation, SIGNAL (stateChanged(int)), this, SLOT (elevStateChanged (int)) );
     connect (UI->cbSecondaryProp, SIGNAL (stateChanged(int)), this, SLOT (secPropStateChanged (int)) );
+    connect (UI->tabPropWidget, SIGNAL (currentChanged(int)), this, SLOT (selObject (int)) );
 
     connect (UI->pbCancel, SIGNAL (clicked()), this, SLOT (reject()) );
     connect (UI->pbOk, SIGNAL (clicked()), this, SLOT (searchBegin()) );
-    this->pbCalc ();
+    //this->pbCalc ();
 }
 
 SearchRadioImageFragmentForm :: ~SearchRadioImageFragmentForm (void)
@@ -141,10 +152,22 @@ double SearchRadioImageFragmentForm :: getAzimuth (void) const
 
 void SearchRadioImageFragmentForm :: searchBegin (void)
 {
-    qDebug () << __PRETTY_FUNCTION__;
     double im_az = getAzimuth();
     double im_elev = getElevation ();
-    emit searchByIm (filteredImage, im_az, im_elev);
+    Q_UNUSED (im_az);
+    Q_UNUSED (im_elev);
+    qDebug () << __PRETTY_FUNCTION__;
+    seaPars.clear ();
+    for (int i=0; i<UI->tabPropWidget->count(); i++)
+    {
+        ParamWidget * pw = qobject_cast<ParamWidget *>(UI->tabPropWidget->widget (i));
+        if (!pw)
+            continue;
+        SeaObjectParameters sop = pw->getData ();
+        seaPars.append (sop);
+    }
+    //emit searchByIm (filteredImage, im_az, im_elev);
+    emit searchByParams (filteredImage, seaPars);
     accept ();
 }
 
@@ -187,4 +210,21 @@ void SearchRadioImageFragmentForm :: depthStateChanged (int state)
 void SearchRadioImageFragmentForm :: secPropStateChanged (int state)
 {
     UI->lESecProperty->setEnabled ((state==Qt::Checked));
+}
+
+void SearchRadioImageFragmentForm :: selObject (int index)
+{
+    ParamWidget * pw = qobject_cast <ParamWidget *>(UI->tabPropWidget->widget(index));
+    if (!pw)
+        return;
+
+    SeaObjectParameters sp = pw->getData ();
+    QRect r = sp.bRect;
+    QPixmap px = QPixmap::fromImage (filteredImage);
+    QPainter p (&px);
+    QBrush sBrush (QColor(255,255,0,180));
+    QPen selPen = QPen (sBrush, 1, Qt::SolidLine);
+    p.setPen (selPen);
+    p.drawRect (r);
+    lFImage->setPixmap (px);
 }

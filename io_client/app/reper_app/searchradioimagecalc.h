@@ -4,8 +4,11 @@
 #include <QObject>
 #include <QImage>
 #include <QSize>
+#include <QVector>
 
 #include <cv.h>
+
+#include "seaobjectparameters.h"
 
 using cv::Mat;
 
@@ -34,6 +37,7 @@ private slots:
     void calcChi2 (QAbstractItemModel * sModel, const QImage& sIm, double az, double elev);
     void searchInitIm (const QImage& im);
     void searchIm (const QImage& fImage, double az, double elev);
+    void searchParams (const QImage& sIm, const QVector<SeaObjectParameters>& sp);
 
 signals:
     void setVals (int pl, int pw, double az);
@@ -49,6 +53,7 @@ private:
 
     //cv::Mat qimage_to_mat_cpy(const QImage &img, int format);
     cv::Mat QImageToCvMat( const QImage &inImage, bool inCloneImageData = true );
+    QVector<SeaObjectParameters> imageAnalyse (const QImage& inImage);
 private:
     //
     // Variables

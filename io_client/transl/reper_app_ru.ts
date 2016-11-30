@@ -17,70 +17,133 @@
 <context>
     <name>ImageWidget</name>
     <message>
-        <location filename="../app/reper_app/imagewidget.cpp" line="46"/>
+        <location filename="../app/reper_app/imagewidget.cpp" line="48"/>
         <source>Open File</source>
         <translation>Открытие файла</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/imagewidget.cpp" line="46"/>
+        <location filename="../app/reper_app/imagewidget.cpp" line="48"/>
         <source>Images (*.png *.xpm *.jpg *.PNG *.XPM *.JPG);;All files (*)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../app/reper_app/imagewidget.cpp" line="51"/>
         <location filename="../app/reper_app/imagewidget.cpp" line="53"/>
+        <location filename="../app/reper_app/imagewidget.cpp" line="55"/>
         <source>Cannot load %1.</source>
         <translation>Ошибка загрузки %1.</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/imagewidget.cpp" line="52"/>
+        <location filename="../app/reper_app/imagewidget.cpp" line="54"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/imagewidget.cpp" line="100"/>
+        <location filename="../app/reper_app/imagewidget.cpp" line="102"/>
         <source>Load golographic image from file</source>
         <translation>Загрузка голографического изображения из файла </translation>
     </message>
     <message>
-        <location filename="../app/reper_app/imagewidget.cpp" line="101"/>
+        <location filename="../app/reper_app/imagewidget.cpp" line="103"/>
         <source>Load image...</source>
         <translation>Загрузить изображение...</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/imagewidget.cpp" line="106"/>
+        <location filename="../app/reper_app/imagewidget.cpp" line="108"/>
         <source>Search by image fragment</source>
         <translation>Поиск по фрагменту изображения </translation>
     </message>
     <message>
-        <location filename="../app/reper_app/imagewidget.cpp" line="107"/>
+        <location filename="../app/reper_app/imagewidget.cpp" line="109"/>
         <source>Search...</source>
         <translation>Поиск...</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/imagewidget.cpp" line="112"/>
+        <location filename="../app/reper_app/imagewidget.cpp" line="114"/>
         <source>Save to DB</source>
         <translation>Сохранить  в БД</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/imagewidget.cpp" line="118"/>
+        <location filename="../app/reper_app/imagewidget.cpp" line="120"/>
         <source>Load from DB</source>
         <translation>Загрузить изображение из базы</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/imagewidget.cpp" line="111"/>
+        <location filename="../app/reper_app/imagewidget.cpp" line="124"/>
+        <source>Search in multiobject mode</source>
+        <translation>Поиск многих объектов</translation>
+    </message>
+    <message>
+        <location filename="../app/reper_app/imagewidget.cpp" line="125"/>
+        <source>Multiple object selection is possible</source>
+        <translation>Поиск нескольких объектов</translation>
+    </message>
+    <message>
+        <location filename="../app/reper_app/imagewidget.cpp" line="129"/>
+        <source>Search in single object mode</source>
+        <translation>Поиск одного объекта</translation>
+    </message>
+    <message>
+        <location filename="../app/reper_app/imagewidget.cpp" line="130"/>
+        <source>Only one object can be selected</source>
+        <translation>Только один объект может быть выбран</translation>
+    </message>
+    <message>
+        <location filename="../app/reper_app/imagewidget.cpp" line="113"/>
         <source>Save to database</source>
         <translation>Сохранить  в БД</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/imagewidget.cpp" line="21"/>
+        <location filename="../app/reper_app/imagewidget.cpp" line="23"/>
         <source>View golographic image</source>
         <translation>Просмотреть голографическое изображение</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/imagewidget.cpp" line="117"/>
+        <location filename="../app/reper_app/imagewidget.cpp" line="119"/>
         <source>Load image from database</source>
         <translation>Загрузить изображение из базы</translation>
+    </message>
+</context>
+<context>
+    <name>ParamWidget</name>
+    <message>
+        <location filename="../app/reper_app/paramwidget.cpp" line="13"/>
+        <source>Length</source>
+        <translation>Длина</translation>
+    </message>
+    <message>
+        <location filename="../app/reper_app/paramwidget.cpp" line="15"/>
+        <source>Width</source>
+        <translation>Ширина</translation>
+    </message>
+    <message>
+        <location filename="../app/reper_app/paramwidget.cpp" line="17"/>
+        <source>Depth</source>
+        <translation>Глубина</translation>
+    </message>
+    <message>
+        <location filename="../app/reper_app/paramwidget.cpp" line="19"/>
+        <source>Azimuth</source>
+        <translation>Азимут</translation>
+    </message>
+    <message>
+        <location filename="../app/reper_app/paramwidget.cpp" line="21"/>
+        <source>Elevation angle</source>
+        <translation>Угол возвышения</translation>
+    </message>
+    <message>
+        <location filename="../app/reper_app/paramwidget.cpp" line="23"/>
+        <source>Secondary property</source>
+        <translation>Вторичные признаки</translation>
+    </message>
+    <message>
+        <location filename="../app/reper_app/paramwidget.cpp" line="27"/>
+        <source>Image parameters</source>
+        <translation>Параметры изображения</translation>
+    </message>
+    <message>
+        <location filename="../app/reper_app/paramwidget.cpp" line="58"/>
+        <source>Physical parameters</source>
+        <translation>Физические параметры</translation>
     </message>
 </context>
 <context>
@@ -117,52 +180,32 @@
         <translation>Программный комплекс &quot;Репер&quot;</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/repermainwindow.cpp" line="236"/>
-        <source>Search parameters</source>
-        <translation>Параметры поиска</translation>
-    </message>
-    <message>
-        <location filename="../app/reper_app/repermainwindow.cpp" line="236"/>
-        <source>Required parameters are not set</source>
-        <translation>Параметры поиска не заданы</translation>
-    </message>
-    <message>
-        <location filename="../app/reper_app/repermainwindow.cpp" line="249"/>
-        <source>Select reference</source>
-        <translation>Выбрать справочник</translation>
-    </message>
-    <message>
-        <location filename="../app/reper_app/repermainwindow.cpp" line="250"/>
-        <source>Not available suitable reference</source>
-        <translation>Невозможно выбрать подходящий справочник</translation>
-    </message>
-    <message>
-        <location filename="../app/reper_app/repermainwindow.cpp" line="474"/>
+        <location filename="../app/reper_app/repermainwindow.cpp" line="484"/>
         <source>Available ship types</source>
         <translation>Типы кораблей</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/repermainwindow.cpp" line="474"/>
+        <location filename="../app/reper_app/repermainwindow.cpp" line="484"/>
         <source>Cannot load ship types list</source>
         <translation>Ошибка загрузки списка типов кораблей</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/repermainwindow.cpp" line="525"/>
+        <location filename="../app/reper_app/repermainwindow.cpp" line="535"/>
         <source>Save test images</source>
         <translation>Сохранить тестовые изображения</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/repermainwindow.cpp" line="531"/>
+        <location filename="../app/reper_app/repermainwindow.cpp" line="541"/>
         <source>Record %1</source>
         <translation>Запись %1</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/repermainwindow.cpp" line="660"/>
+        <location filename="../app/reper_app/repermainwindow.cpp" line="679"/>
         <source>Object files (*.obj);;All files(*);</source>
         <translation>Объектные файлы (*.obj);;Все файлы (*); </translation>
     </message>
     <message>
-        <location filename="../app/reper_app/repermainwindow.cpp" line="661"/>
+        <location filename="../app/reper_app/repermainwindow.cpp" line="680"/>
         <source>Select source file</source>
         <translation>Выбрать файл модели</translation>
     </message>
@@ -319,11 +362,45 @@
     </message>
 </context>
 <context>
+    <name>SearchRadioImageCalc</name>
+    <message>
+        <location filename="../app/reper_app/searchradioimagecalc.cpp" line="188"/>
+        <source>Search</source>
+        <translation>Поиск</translation>
+    </message>
+    <message>
+        <location filename="../app/reper_app/searchradioimagecalc.cpp" line="188"/>
+        <source>No objects in selection</source>
+        <translation>Не выбрано ни одного объекта</translation>
+    </message>
+    <message>
+        <location filename="../app/reper_app/searchradioimagecalc.cpp" line="545"/>
+        <source>Select reference</source>
+        <translation>Выбрать справочник</translation>
+    </message>
+    <message>
+        <location filename="../app/reper_app/searchradioimagecalc.cpp" line="546"/>
+        <source>Not available suitable reference</source>
+        <translation>Невозможно выбрать подходящий справочник</translation>
+    </message>
+    <message>
+        <location filename="../app/reper_app/searchradioimagecalc.cpp" line="962"/>
+        <source>Control on the right</source>
+        <translation>Рубка справа</translation>
+    </message>
+</context>
+<context>
     <name>SearchRadioImageFragmentForm</name>
     <message>
-        <location filename="../app/reper_app/searchradioimagefragmentform.cpp" line="36"/>
+        <location filename="../app/reper_app/searchradioimagefragmentform.cpp" line="40"/>
         <source>Filter by brightness</source>
         <translation>Фильтрация по яркости</translation>
+    </message>
+    <message>
+        <location filename="../app/reper_app/searchradioimagefragmentform.cpp" line="59"/>
+        <location filename="../app/reper_app/searchradioimagefragmentform.cpp" line="64"/>
+        <source>Object parameters %1</source>
+        <translation>Параметры объекта N %1</translation>
     </message>
 </context>
 <context>
@@ -519,47 +596,57 @@
         <translation>Изображение </translation>
     </message>
     <message>
-        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="84"/>
+        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="90"/>
+        <source>Tab 1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="122"/>
+        <source>Secondary property</source>
+        <translation>Вторичные признаки</translation>
+    </message>
+    <message>
+        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="135"/>
         <source>Image parameters</source>
         <translation>Параметры изображения</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="93"/>
+        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="144"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Length :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Длина</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="103"/>
+        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="154"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Width :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Ширина </translation>
     </message>
     <message>
-        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="113"/>
+        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="164"/>
         <source>Depth :</source>
         <translation>Глубина :</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="123"/>
+        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="96"/>
         <source>Physical parameters</source>
         <translation>Физические параметры</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="132"/>
+        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="105"/>
         <source>Elevation angle :</source>
         <translation>Угол возвышения :</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="139"/>
+        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="112"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Azimuth :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Азимут</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="167"/>
+        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="219"/>
         <source>&amp;Search</source>
         <translation>&amp;Поиск</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="174"/>
+        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="226"/>
         <source>&amp;Cancel</source>
         <translation>&amp;Отмена</translation>
     </message>
@@ -570,6 +657,7 @@
     </message>
     <message>
         <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="75"/>
+        <location filename="../app/reper_app/search_radio_image_fragment_form.ui" line="180"/>
         <source>...</source>
         <translation></translation>
     </message>
