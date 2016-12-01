@@ -28,6 +28,7 @@
 #include "searchradioimagecalc.h"
 #include "imagewidget.h"
 #include "seaobjectparameters.h"
+#include "qimage_to_cvmat.h"
 
 //#include "opencv2/imgproc/imgproc.hpp"
 #include <opencv2/highgui/highgui.hpp>
@@ -102,17 +103,17 @@ void SearchRadioImageCalc :: calculateParameters (const QImage& im, double cVal)
     Q_UNUSED (lf);
     Q_UNUSED (wf);
     QVector<QPoint> r_border;
-    im.convertToFormat (QImage::Format_Indexed8);
+    im.convertToFormat (QImage::Format_ARGB32);
     cv::Mat rImage = QImageToCvMat (im);
     ofstream rImStr ("rImageMatr.txt");
     rImStr << rImage << std::endl;
 //              cv::Mat(qimage_to_mat_cpy (im, CV_8UC1));
     //cv::Mat::zeros(im.width(),im.height(), CV_8UC1);
 //    qDebug () << __PRETTY_FUNCTION__ << cVal;
-/*    im.convertToFormat (QImage::Format_RGB32);
+    im.convertToFormat (QImage::Format_ARGB32);
     im.save (QString ("object_t.bmp"));
     rImage = cv::imread ("object_t.bmp", CV_LOAD_IMAGE_GRAYSCALE);
-*/
+
     std::vector<std::vector<cv::Point> > contours;
     for (int i=1; i<w-1; i++)
         for (int j=1; j<h-1; j++)
@@ -836,7 +837,7 @@ cv::Mat SearchRadioImageCalc :: qimage_to_mat_cpy(const QImage &img, int format)
     return mat;
 }
 */
-
+/*
 cv::Mat SearchRadioImageCalc :: QImageToCvMat( const QImage &inImage, bool inCloneImageData )
 {
     switch ( inImage.format() )
@@ -897,6 +898,7 @@ cv::Mat SearchRadioImageCalc :: QImageToCvMat( const QImage &inImage, bool inClo
 
     return cv::Mat();
 }
+*/
 
 QVector<SeaObjectParameters> SearchRadioImageCalc :: imageAnalyse (const QImage& inImage)
 {

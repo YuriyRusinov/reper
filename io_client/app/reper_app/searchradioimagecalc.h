@@ -51,8 +51,7 @@ private:
     QByteArray searchImageB (const QImage& sIm, double az, double elev) const;
     QByteArray getImageStr (const QByteArray& b) const;
 
-    //cv::Mat qimage_to_mat_cpy(const QImage &img, int format);
-    cv::Mat QImageToCvMat( const QImage &inImage, bool inCloneImageData = true );
+    //cv::Mat QImageToCvMat( const QImage &inImage, bool inCloneImageData = true );
     QVector<SeaObjectParameters> imageAnalyse (const QImage& inImage);
 private:
     //

@@ -12,7 +12,8 @@ HEADERS += \
            radMdiArea.h \
            gologramthread.h \
            seaobjectparameters.h \
-           paramwidget.h
+           paramwidget.h \
+           qimage_to_cvmat.h
 
 FORMS += \
          reper_main_window.ui \
@@ -32,6 +33,7 @@ SOURCES += \
            radMdiArea.cpp \
            gologramthread.cpp \
            seaobjectparameters.cpp \
-           paramwidget.cpp
+           paramwidget.cpp \
+           qimage_to_cvmat.cpp
 
 #RESOURCES = icon_set.qrc
