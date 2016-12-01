@@ -105,8 +105,8 @@ void SearchRadioImageCalc :: calculateParameters (const QImage& im, double cVal)
     QVector<QPoint> r_border;
     im.convertToFormat (QImage::Format_ARGB32);
     cv::Mat rImage = QImageToCvMat (im);
-    ofstream rImStr ("rImageMatr.txt");
-    rImStr << rImage << std::endl;
+//    ofstream rImStr ("rImageMatr.txt");
+//    rImStr << rImage << std::endl;
 //              cv::Mat(qimage_to_mat_cpy (im, CV_8UC1));
     //cv::Mat::zeros(im.width(),im.height(), CV_8UC1);
 //    qDebug () << __PRETTY_FUNCTION__ << cVal;
@@ -654,167 +654,6 @@ void SearchRadioImageCalc :: searchInitIm (const QImage& sIm0)
     //srForm->setImage (sIm0);
     if (srForm->exec() != QDialog::Accepted)
         return;
-/*
-    QImage sIm (sIm0);
-    double az (-1.0);
-    double elev (-1.0);
-    if (srForm->exec() == QDialog::Accepted)
-    {
-        sIm = srForm->getSourceImage();
-        az = srForm->getAzimuth ();
-        elev = srForm->getElevation ();
-        if (sIm.isNull() || az < 0)
-        {
-            QMessageBox::warning (srForm, tr("Search parameters"), tr("Required parameters are not set"), QMessageBox::Ok);
-            return;
-        }
-    }
-    else
-    {
-        return;
-    }
-    QString tName = QString ("rli_image_raws");
-    KKSObject * io = loader->loadIO (tName, true);
-    if (!io)
-    {
-        QMessageBox::warning (0, tr("Select reference"),
-                                 tr ("Not available suitable reference"),
-                                 QMessageBox::Ok);
-        return;
-    }
-    KKSList<const KKSFilterGroup *> filterGroups;
-    const KKSCategory * c = io->category();
-    const KKSCategory * ct = c->tableCategory();
-    QByteArray bytes;
-    QBuffer buffer(&bytes);
-
-    buffer.open(QIODevice::WriteOnly);
-    sIm.save (&buffer, "XPM");
-    buffer.close ();
-    KKSCategoryAttr * aIm = 0;//loader->loadAttribute ("image_jpg"
-    KKSCategoryAttr * aAz = 0;
-    KKSCategoryAttr * aElev = 0;
-    for (KKSMap<int, KKSCategoryAttr *>::const_iterator p = ct->attributes().constBegin();
-            p != ct->attributes().constEnd() ;//&& aIm == 0 && aAz==0;
-            ++p)
-    {
-        if (QString::compare (p.value()->code(), QString("image_jpg"), Qt::CaseInsensitive) == 0)
-            aIm = p.value ();
-        if (QString::compare (p.value()->code(), QString("azimuth"), Qt::CaseInsensitive) == 0)
-            aAz = p.value ();
-        if (QString::compare (p.value()->code(), QString("elevation_angle"), Qt::CaseInsensitive) == 0)
-            aElev = p.value ();
-    }
-    if (!aAz)
-    {
-        return;
-    }
-
-    KKSFilter * filter = ct->createFilter (aIm->id(), bytes, KKSFilter::foEq);
-
-    KKSFilter * fAzMin = 0;//ct->createFilter (aAz->id(), QString::number ((int)az-3), KKSFilter::foGrEq);
-    KKSFilter * fAzMax = 0;//ct->createFilter (aAz->id(), QString::number ((int)az+3), KKSFilter::foLessEq);
-    KKSFilter * fAzMinPi = 0;//ct->createFilter (aAz->id(), QString::number ((int)az-3), KKSFilter::foGrEq);
-    KKSFilter * fAzMaxPi = 0;//ct->createFilter (aAz->id(), QString::number ((int)az+3), KKSFilter::foLessEq);
-    KKSList<const KKSFilter*> filters;
-    filters.append (filter);
-    filter->release ();
-    KKSFilterGroup * group = new KKSFilterGroup(false);
-    KKSFilterGroup * azGroup = 0;//new KKSFilterGroup (true);
-    KKSFilterGroup * azGroupR = new KKSFilterGroup (true);
-    KKSFilter * fElev0 = 0;
-    KKSFilter * fElev = 0;
-    if (elev >= 0)
-    {
-        fElev0 = ct->createFilter (aElev->id(), QString::number (elev-3), KKSFilter::foGrEq);
-        fElev = ct->createFilter (aElev->id(), QString::number (elev+3), KKSFilter::foLessEq);
-    }
-    if ((az-3.0)*(az+3.0) < 0)
-    {
-        azGroup = new KKSFilterGroup (false);
-        KKSFilter * fAzMin2Pi = ct->createFilter (aAz->id(), QString::number ((int)az-3+360), KKSFilter::foGrEq);
-        KKSFilter * fAzMax2Pi = ct->createFilter (aAz->id(), QString::number (360), KKSFilter::foLessEq);
-        KKSFilterGroup * az2PiGroup = new KKSFilterGroup (true);
-        az2PiGroup->addFilter (fAzMin2Pi);
-        fAzMin2Pi->release ();
-        az2PiGroup->addFilter (fAzMax2Pi);
-        fAzMax2Pi->release ();
-        KKSFilter * fAzMin0 = ct->createFilter (aAz->id(), QString::number (0), KKSFilter::foGrEq);
-        KKSFilter * fAzMax0 = ct->createFilter (aAz->id(), QString::number ((int)az+3), KKSFilter::foLessEq);
-        KKSFilterGroup * az0Group = new KKSFilterGroup (true);
-        az0Group->addFilter (fAzMin0);
-        fAzMin0->release ();
-        az0Group->addFilter (fAzMax0);
-        fAzMax0->release ();
-        if (elev >= 0)
-        {
-            az2PiGroup->addFilter (fElev0);
-            az2PiGroup->addFilter (fElev);
-            az0Group->addFilter (fElev0);
-            az0Group->addFilter (fElev);
-        }
-        azGroup->addGroup (az0Group);
-        az0Group->release ();
-        azGroup->addGroup (az2PiGroup);
-
-        fAzMinPi = ct->createFilter (aAz->id(), QString::number ((int)az-3+180), KKSFilter::foGrEq);
-        fAzMaxPi = ct->createFilter (aAz->id(), QString::number ((int)az+3+180), KKSFilter::foLessEq);
-        azGroupR->addFilter (fAzMinPi);
-        fAzMinPi->release ();
-        azGroupR->addFilter (fAzMaxPi);
-        fAzMaxPi->release ();
-        az2PiGroup->release ();
-    }
-    else
-    {
-        fAzMin = ct->createFilter (aAz->id(), QString::number ((int)az-3), KKSFilter::foGrEq);
-        fAzMax = ct->createFilter (aAz->id(), QString::number ((int)az+3), KKSFilter::foLessEq);
-        azGroup = new KKSFilterGroup (true);
-        azGroup->addFilter (fAzMin);
-        fAzMin->release ();
-        azGroup->addFilter (fAzMax);
-        fAzMax->release ();
-        fAzMinPi = ct->createFilter (aAz->id(), QString::number ((int)az-3+180), KKSFilter::foGrEq);
-        fAzMaxPi = ct->createFilter (aAz->id(), QString::number ((int)az+3+180), KKSFilter::foLessEq);
-        azGroupR->addFilter (fAzMinPi);
-        fAzMinPi->release ();
-        azGroupR->addFilter (fAzMaxPi);
-        fAzMaxPi->release ();
-        if (elev >= 0)
-        {
-            azGroup->addFilter (fElev0);
-            azGroup->addFilter (fElev);
-            azGroupR->addFilter (fElev0);
-            azGroupR->addFilter (fElev);
-        }
-    }
-
-    if (elev >= 0)
-    {
-        fElev0->release ();// = ct->createFilter (aElev->id(), QString::number (elev-3), KKSFilter::foGrEq);
-        fElev->release ();// = ct->createFilter (aElev->id(), QString::number (elev+3), KKSFilter::foLessEq);
-    }
-    group->setFilters(filters);
-    group->addGroup (azGroup);
-    azGroup->release ();
-    group->addGroup (azGroupR);
-    azGroupR->release ();
-    filterGroups.append(group);
-    group->release();
-    KKSObjEditor *objEditor = oef->createObjEditor(IO_IO_ID, 
-                                                   io->id(), 
-                                                   filterGroups, 
-                                                   "",
-                                                   c,
-                                                   false,
-                                                   QString(),
-                                                   false,
-                                                   Qt::NonModal,
-                                                   0);
-    io->release ();
-
-    //slotCreateNewObjEditor(objEditor);
-*/
 }
 
 void SearchRadioImageCalc :: searchIm (const QImage& fImage, double az, double elev)
@@ -903,25 +742,30 @@ cv::Mat SearchRadioImageCalc :: QImageToCvMat( const QImage &inImage, bool inClo
 QVector<SeaObjectParameters> SearchRadioImageCalc :: imageAnalyse (const QImage& inImage)
 {
     QImage im (inImage);
-    im.convertToFormat (QImage::Format_RGB32);
     cv::Mat rImage;// = QImageToCvMat (im);
-//    ofstream rImStr ("rImageMatr.txt");
 //    rImStr << rImage << std::endl;
 //              cv::Mat(qimage_to_mat_cpy (im, CV_8UC1));
     //cv::Mat::zeros(im.width(),im.height(), CV_8UC1);
 //    qDebug () << __PRETTY_FUNCTION__ << cVal;
-    im.convertToFormat (QImage::Format_RGB32);
+    im.convertToFormat (QImage::Format_ARGB32);
     im.save (QString ("object_t1.bmp"));
     rImage = cv::imread ("object_t1.bmp", CV_LOAD_IMAGE_GRAYSCALE);
+    ofstream rImStr ("rImageZeroMatr.dat");
+    im.convertToFormat (QImage::Format_RGB32);
+    cv::Mat rIm1 = QImageToCvMat (im);
+    cvtColor (rIm1, rIm1, CV_RGB2GRAY);
+    blur (rIm1, rIm1, Size (im.height(), im.width()));
+    rImStr << (rImage-rIm1) << std::endl;
 
     std::vector<std::vector<cv::Point> > contours;
     cv::Mat contourOutput = rImage.clone();
     cv::vector<Vec4i> hierarchy;
-    Vec4i a = {1, -1, -1, -1};
-    hierarchy.push_back (a);
-    Vec4i b = {2,  0, -1, -1};
-    hierarchy.push_back (b);
-    hierarchy.push_back (a);
+//    Vec4i a = {1, -1, -1, -1};
+//    hierarchy.push_back (a);
+//    Vec4i b = {2,  0, -1, -1};
+//    hierarchy.push_back (b);
+//    hierarchy.push_back (a);
+
 //    hierarchy << array([[[ 1, -1, -1, -1],
 //                         [ 2,  0, -1, -1],
 //                         [-1,  1, -1, -1]]]);
