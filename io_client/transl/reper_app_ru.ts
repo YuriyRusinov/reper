@@ -107,38 +107,38 @@
     <name>ParamWidget</name>
     <message>
         <location filename="../app/reper_app/paramwidget.cpp" line="13"/>
-        <source>Length</source>
-        <translation>Длина</translation>
+        <source>Length:</source>
+        <translation>Длина :</translation>
     </message>
     <message>
         <location filename="../app/reper_app/paramwidget.cpp" line="15"/>
-        <source>Width</source>
-        <translation>Ширина</translation>
+        <source>Width:</source>
+        <translation>Ширина :</translation>
     </message>
     <message>
         <location filename="../app/reper_app/paramwidget.cpp" line="17"/>
-        <source>Depth</source>
-        <translation>Глубина</translation>
+        <source>Depth:</source>
+        <translation>Глубина :</translation>
     </message>
     <message>
         <location filename="../app/reper_app/paramwidget.cpp" line="19"/>
-        <source>Resolution</source>
-        <translation>Разрешение</translation>
+        <source>Resolution:</source>
+        <translation>Разрешение :</translation>
     </message>
     <message>
         <location filename="../app/reper_app/paramwidget.cpp" line="21"/>
-        <source>Azimuth</source>
-        <translation>Азимут</translation>
+        <source>Azimuth:</source>
+        <translation>Азимут :</translation>
     </message>
     <message>
         <location filename="../app/reper_app/paramwidget.cpp" line="23"/>
-        <source>Elevation angle</source>
-        <translation>Угол возвышения</translation>
+        <source>Elevation angle:</source>
+        <translation>Угол возвышения :</translation>
     </message>
     <message>
         <location filename="../app/reper_app/paramwidget.cpp" line="25"/>
-        <source>Secondary property</source>
-        <translation>Вторичные признаки</translation>
+        <source>Secondary property:</source>
+        <translation>Вторичные признаки :</translation>
     </message>
     <message>
         <location filename="../app/reper_app/paramwidget.cpp" line="29"/>

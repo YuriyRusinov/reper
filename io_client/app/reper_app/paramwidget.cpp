@@ -10,19 +10,19 @@
 ParamWidget :: ParamWidget (SeaObjectParameters sp, QWidget * parent, Qt::WindowFlags flags)
     : QWidget (parent, flags),
     sop (sp),
-    lLength (new QLabel (tr("Length"), this)),
+    lLength (new QLabel (tr("Length:"), this)),
     lELength (new QLineEdit (this)),
-    lWidth (new QLabel (tr("Width"), this)),
+    lWidth (new QLabel (tr("Width:"), this)),
     lEWidth (new QLineEdit (this)),
-    cbDepth (new QCheckBox (tr("Depth"), this)),
+    cbDepth (new QCheckBox (tr("Depth:"), this)),
     lEDepth (new QLineEdit (this)),
-    cbResolv (new QCheckBox (tr("Resolution"), this)),
+    cbResolv (new QCheckBox (tr("Resolution:"), this)),
     lEResolv (new QLineEdit (this)),
-    lAzimuth (new QLabel (tr("Azimuth"), this)),
+    lAzimuth (new QLabel (tr("Azimuth:"), this)),
     lEAzimuth (new QLineEdit (this)),
-    cbElev (new QCheckBox (tr("Elevation angle"), this)),
+    cbElev (new QCheckBox (tr("Elevation angle:"), this)),
     lEElev (new QLineEdit (this)),
-    cbSecProp (new QCheckBox (tr("Secondary property"), this)),
+    cbSecProp (new QCheckBox (tr("Secondary property:"), this)),
     lESec (new QLineEdit (this))
 {
     QGridLayout * gLay = new QGridLayout (this);
