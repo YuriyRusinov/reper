@@ -268,11 +268,6 @@
         <translation>3D &amp;Модель</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/reper_main_window.ui" line="93"/>
-        <source>&amp;RLI</source>
-        <translation>&amp;Радиолокация</translation>
-    </message>
-    <message>
         <location filename="../app/reper_app/reper_main_window.ui" line="98"/>
         <source>E&amp;xit</source>
         <translation>В&amp;ыход</translation>
@@ -331,6 +326,11 @@
         <location filename="../app/reper_app/reper_main_window.ui" line="134"/>
         <source>View real image</source>
         <translation>Просмотреть изображение</translation>
+    </message>
+    <message>
+        <location filename="../app/reper_app/reper_main_window.ui" line="93"/>
+        <source>&amp;References</source>
+        <translation>Сп&amp;равочники</translation>
     </message>
     <message>
         <location filename="../app/reper_app/reper_main_window.ui" line="139"/>

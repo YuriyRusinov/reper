@@ -90,7 +90,7 @@
   </action>
   <action name="actRLI">
    <property name="text">
-    <string>&amp;RLI</string>
+    <string>&amp;References</string>
    </property>
   </action>
   <action name="actE_xit">
