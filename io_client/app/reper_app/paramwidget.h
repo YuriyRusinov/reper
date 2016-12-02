@@ -21,6 +21,7 @@ private slots:
     void depthStateChanged (int state);
     void elevStateChanged (int state);
     void secStateChanged (int state);
+    void resolvStateChanged (int state);
 
 private:
     //
@@ -35,6 +36,9 @@ private:
 
     QCheckBox * cbDepth;
     QLineEdit * lEDepth;
+
+    QCheckBox * cbResolv;
+    QLineEdit * lEResolv;
 
     QLabel * lAzimuth;
     QLineEdit * lEAzimuth;

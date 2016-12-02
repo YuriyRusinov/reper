@@ -37,7 +37,7 @@ private slots:
     void calcChi2 (QAbstractItemModel * sModel, const QImage& sIm, double az, double elev);
     void searchInitIm (const QImage& im);
     void searchIm (const QImage& fImage, double az, double elev);
-    void searchParams (const QImage& sIm, const QVector<SeaObjectParameters>& sp);
+    void searchParams (const QImage& sIm, SeaObjectParameters sp);
 
 signals:
     void setVals (int pl, int pw, double az);

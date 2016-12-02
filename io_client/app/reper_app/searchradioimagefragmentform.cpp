@@ -157,17 +157,12 @@ void SearchRadioImageFragmentForm :: searchBegin (void)
     Q_UNUSED (im_az);
     Q_UNUSED (im_elev);
     qDebug () << __PRETTY_FUNCTION__;
-    seaPars.clear ();
-    for (int i=0; i<UI->tabPropWidget->count(); i++)
-    {
-        ParamWidget * pw = qobject_cast<ParamWidget *>(UI->tabPropWidget->widget (i));
-        if (!pw)
-            continue;
-        SeaObjectParameters sop = pw->getData ();
-        seaPars.append (sop);
-    }
+    ParamWidget * pw = qobject_cast<ParamWidget *>(UI->tabPropWidget->currentWidget());
+    if (!pw)
+        return;
+    SeaObjectParameters sop = pw->getData ();
     //emit searchByIm (filteredImage, im_az, im_elev);
-    emit searchByParams (filteredImage, seaPars);
+    emit searchByParams (filteredImage, sop);//seaPars);
     accept ();
 }
 

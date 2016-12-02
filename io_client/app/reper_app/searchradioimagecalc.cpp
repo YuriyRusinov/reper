@@ -72,7 +72,7 @@ SearchRadioImageFragmentForm * SearchRadioImageCalc :: GUIImageView (const QImag
 
     connect (sForm, SIGNAL (calcParams (const QImage&, double)), this, SLOT (calculateParameters (const QImage&, double)) );
     connect (sForm, SIGNAL (searchByIm (const QImage&, double, double)), this, SLOT (searchIm (const QImage&, double, double)) );
-    connect (sForm, SIGNAL (searchByParams (const QImage&, const QVector<SeaObjectParameters>&)), this, SLOT (searchParams (const QImage&, const QVector<SeaObjectParameters>&)) );
+    connect (sForm, SIGNAL (searchByParams (const QImage&, SeaObjectParameters)), this, SLOT (searchParams (const QImage&, SeaObjectParameters)) );
     connect (this, SIGNAL (setVals (int, int, double)), sForm, SLOT (setResults(int, int, double)) );
     sForm->pbCalc ();
     sForm->selObject (0);
@@ -535,10 +535,10 @@ void SearchRadioImageCalc :: calcChi2 (QAbstractItemModel * sModel, const QImage
     qDebug () << __PRETTY_FUNCTION__;
 }
 
-void SearchRadioImageCalc :: searchParams (const QImage& sIm, const QVector<SeaObjectParameters>& sp)
+void SearchRadioImageCalc :: searchParams (const QImage& sIm, SeaObjectParameters sp)
 {
-    qDebug () << __PRETTY_FUNCTION__ << sp.size ();
-    int nsp = sp.size ();
+//    qDebug () << __PRETTY_FUNCTION__ << sp.size ();
+//    int nsp = sp.size ();
     QString tName = QString ("rli_image_raws");
     KKSObject * io = loader->loadIO (tName, true);
     if (!io)
@@ -560,6 +560,8 @@ void SearchRadioImageCalc :: searchParams (const QImage& sIm, const QVector<SeaO
     KKSCategoryAttr * aIm = 0;//loader->loadAttribute ("image_jpg"
     KKSCategoryAttr * aAz = 0;
     KKSCategoryAttr * aElev = 0;
+    KKSCategoryAttr * aShipType = 0;
+    KKSCategoryAttr * aResolv = 0;
     for (KKSMap<int, KKSCategoryAttr *>::const_iterator p = ct->attributes().constBegin();
             p != ct->attributes().constEnd() ;//&& aIm == 0 && aAz==0;
             ++p)
@@ -570,6 +572,10 @@ void SearchRadioImageCalc :: searchParams (const QImage& sIm, const QVector<SeaO
             aAz = p.value ();
         if (QString::compare (p.value()->code(), QString("elevation_angle"), Qt::CaseInsensitive) == 0)
             aElev = p.value ();
+        if (QString::compare (p.value()->code(), QString ("id_type_ship"), Qt::CaseInsensitive) == 0)
+            aShipType = p.value ();
+        if (QString::compare (p.value()->code(), QString ("resolution"), Qt::CaseInsensitive) == 0)
+             aResolv = p.value ();
     }
     if (!aAz)
     {
@@ -581,49 +587,62 @@ void SearchRadioImageCalc :: searchParams (const QImage& sIm, const QVector<SeaO
     Q_UNUSED (filter);
     KKSFilterGroup * allGroups = new KKSFilterGroup(false);
 
-    for (int i=0; i<nsp; i++)
+    KKSFilterGroup * group = new KKSFilterGroup(false);
+    SeaObjectParameters sop = sp;
+    double az = sop.azimuth;
+    KKSFilter * fAzMin = ct->createFilter (aAz->id(), QString::number (az-10), KKSFilter::foGrEq);
+    KKSFilter * fAzMax = ct->createFilter (aAz->id(), QString::number (az+10), KKSFilter::foLessEq);
+    KKSFilterGroup * azGroup = new KKSFilterGroup (true);
+    KKSFilterGroup * azGroupR = new KKSFilterGroup (true);
+    azGroup->addFilter (fAzMin);
+    fAzMin->release ();
+    azGroup->addFilter (fAzMax);
+    fAzMax->release ();
+    double l = sop.length;
+    if (l >= 200)
     {
-        KKSFilterGroup * group = new KKSFilterGroup(false);
-        SeaObjectParameters sop = sp[i];
-        double az = sop.azimuth;
-        KKSFilter * fAzMin = ct->createFilter (aAz->id(), QString::number (az-3), KKSFilter::foGrEq);
-        KKSFilter * fAzMax = ct->createFilter (aAz->id(), QString::number (az+3), KKSFilter::foLessEq);
-        KKSFilterGroup * azGroup = new KKSFilterGroup (true);
-        KKSFilterGroup * azGroupR = new KKSFilterGroup (true);
-        azGroup->addFilter (fAzMin);
-        fAzMin->release ();
-        azGroup->addFilter (fAzMax);
-        fAzMax->release ();
-        KKSFilter * fAzMinPi = ct->createFilter (aAz->id(), QString::number (az-3+180), KKSFilter::foGrEq);
-        KKSFilter * fAzMaxPi = ct->createFilter (aAz->id(), QString::number (az+3+180), KKSFilter::foLessEq);
-        azGroupR->addFilter (fAzMinPi);
-        fAzMinPi->release ();
-        azGroupR->addFilter (fAzMaxPi);
-        fAzMaxPi->release ();
-        group->addGroup (azGroup);
-        double elev = sop.elevation_angle;
-        KKSFilter * fElev0 = 0;
-        KKSFilter * fElev = 0;
-        if (elev >= 0)
-        {
-            fElev0 = ct->createFilter (aElev->id(), QString::number (elev-3), KKSFilter::foGrEq);
-            fElev = ct->createFilter (aElev->id(), QString::number (elev+3), KKSFilter::foLessEq);
-            azGroup->addFilter (fElev0);
-            azGroup->addFilter (fElev);
-            azGroupR->addFilter (fElev0);
-            azGroupR->addFilter (fElev);
-            fElev0->release ();
-            fElev->release ();
-        }
-//        group->setFilters(filters);
-        group->addGroup (azGroup);
-        azGroup->release ();
-        group->addGroup (azGroupR);
-        azGroupR->release ();
-        allGroups->addGroup (group);
-        group->release ();
-
+        KKSFilter * fType = ct->createFilter (aShipType->id(), QString::number (1), KKSFilter::foEq);
+        azGroup->addFilter (fType);
+        azGroupR->addFilter (fType);
+        fType->release ();
     }
+    double resolv = sop.resolution;
+    if (resolv >= 0.0)
+    {
+        KKSFilter * fResol = ct->createFilter (aResolv->id(), QString::number (resolv), KKSFilter::foEq);
+        azGroup->addFilter (fResol);
+        azGroupR->addFilter (fResol);
+        fResol->release ();
+    }
+    KKSFilter * fAzMinPi = ct->createFilter (aAz->id(), QString::number (az-10+180), KKSFilter::foGrEq);
+    KKSFilter * fAzMaxPi = ct->createFilter (aAz->id(), QString::number (az+10+180), KKSFilter::foLessEq);
+    azGroupR->addFilter (fAzMinPi);
+    fAzMinPi->release ();
+    azGroupR->addFilter (fAzMaxPi);
+    fAzMaxPi->release ();
+    group->addGroup (azGroup);
+    double elev = sop.elevation_angle;
+    KKSFilter * fElev0 = 0;
+    KKSFilter * fElev = 0;
+    if (elev >= 0)
+    {
+        fElev0 = ct->createFilter (aElev->id(), QString::number (elev-10), KKSFilter::foGrEq);
+        fElev = ct->createFilter (aElev->id(), QString::number (elev+10), KKSFilter::foLessEq);
+        azGroup->addFilter (fElev0);
+        azGroup->addFilter (fElev);
+        azGroupR->addFilter (fElev0);
+        azGroupR->addFilter (fElev);
+        fElev0->release ();
+        fElev->release ();
+    }
+//        group->setFilters(filters);
+    group->addGroup (azGroup);
+    azGroup->release ();
+    group->addGroup (azGroupR);
+    azGroupR->release ();
+    allGroups->addGroup (group);
+    group->release ();
+
     filterGroups.append(allGroups);
     allGroups->release ();
     KKSObjEditor *objEditor = oef->createObjEditor(IO_IO_ID, 
@@ -798,8 +817,9 @@ QVector<SeaObjectParameters> SearchRadioImageCalc :: imageAnalyse (const QImage&
         double d = -1.0;
         double az = atan2 (w, l)*180/pi;
         double elev = -1.0;
+        double resolv = -1.0;
         QString sProp = QString ();
-        SeaObjectParameters sp (r, l, w, d, az, elev, sProp);
+        SeaObjectParameters sp (r, l, w, d, az, elev, resolv, sProp);
         objPars.append (sp);
     }
     int ncr = objPars.size ();

@@ -16,6 +16,8 @@ ParamWidget :: ParamWidget (SeaObjectParameters sp, QWidget * parent, Qt::Window
     lEWidth (new QLineEdit (this)),
     cbDepth (new QCheckBox (tr("Depth"), this)),
     lEDepth (new QLineEdit (this)),
+    cbResolv (new QCheckBox (tr("Resolution"), this)),
+    lEResolv (new QLineEdit (this)),
     lAzimuth (new QLabel (tr("Azimuth"), this)),
     lEAzimuth (new QLineEdit (this)),
     cbElev (new QCheckBox (tr("Elevation angle"), this)),
@@ -54,6 +56,12 @@ ParamWidget :: ParamWidget (SeaObjectParameters sp, QWidget * parent, Qt::Window
         cbDepth->setCheckState (Qt::Unchecked);
         lEDepth->setEnabled (false);
     }
+    gImLay->addWidget (cbResolv, 3, 0, 1, 1);
+    gImLay->addWidget (lEResolv, 3, 1, 1, 1);
+    QDoubleValidator * dRVal = new QDoubleValidator (0.0, 100.0, 5, this);
+    lEResolv->setValidator (dRVal);
+    cbResolv->setCheckState (Qt::Unchecked);
+    lEResolv->setEnabled (false);
 
     QGroupBox * gbPhysParams = new QGroupBox (tr("Physical parameters"), this);
     gLay->addWidget (gbPhysParams, 1, 0, 1, 1);
@@ -97,6 +105,7 @@ ParamWidget :: ParamWidget (SeaObjectParameters sp, QWidget * parent, Qt::Window
     }
 
     connect (cbDepth, SIGNAL (stateChanged(int)), this, SLOT (depthStateChanged(int)) );
+    connect (cbResolv, SIGNAL (stateChanged(int)), this, SLOT (resolvStateChanged (int)) );
     connect (cbElev, SIGNAL (stateChanged(int)), this, SLOT (elevStateChanged (int)) );
     connect (cbSecProp, SIGNAL (stateChanged(int)), this, SLOT (secStateChanged (int)) );
 }
@@ -109,11 +118,12 @@ SeaObjectParameters ParamWidget :: getData (void) const
 {
     double l = lELength->text().toDouble ();
     double w = lEWidth->text().toDouble ();
-    double d = lEDepth->isEnabled() ? lEDepth->text().toDouble() : -1;
+    double d = lEDepth->isEnabled() ? lEDepth->text().toDouble() : -1.0;
     double az = lEAzimuth->text().toDouble ();
-    double elev = lEElev->isEnabled() ? lEElev->text().toDouble() : -1;
+    double elev = lEElev->isEnabled() ? lEElev->text().toDouble() : -1.0;
+    double r = lEResolv->isEnabled() ? lEResolv->text().toDouble() : -1.0;
     QString sProp = lESec->isEnabled() ? lESec->text() : QString();
-    SeaObjectParameters sp (sop.bRect, l, w, d, az, elev, sProp);
+    SeaObjectParameters sp (sop.bRect, l, w, d, az, elev, r, sProp);
     return sp;
 }
 
@@ -132,3 +142,7 @@ void ParamWidget :: secStateChanged (int state)
     lESec->setEnabled ((state == Qt::Checked));
 }
 
+void ParamWidget :: resolvStateChanged (int state)
+{
+    lEResolv->setEnabled ((state == Qt::Checked));
+}

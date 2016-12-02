@@ -122,26 +122,31 @@
     </message>
     <message>
         <location filename="../app/reper_app/paramwidget.cpp" line="19"/>
+        <source>Resolution</source>
+        <translation>Разрешение</translation>
+    </message>
+    <message>
+        <location filename="../app/reper_app/paramwidget.cpp" line="21"/>
         <source>Azimuth</source>
         <translation>Азимут</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/paramwidget.cpp" line="21"/>
+        <location filename="../app/reper_app/paramwidget.cpp" line="23"/>
         <source>Elevation angle</source>
         <translation>Угол возвышения</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/paramwidget.cpp" line="23"/>
+        <location filename="../app/reper_app/paramwidget.cpp" line="25"/>
         <source>Secondary property</source>
         <translation>Вторичные признаки</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/paramwidget.cpp" line="27"/>
+        <location filename="../app/reper_app/paramwidget.cpp" line="29"/>
         <source>Image parameters</source>
         <translation>Параметры изображения</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/paramwidget.cpp" line="58"/>
+        <location filename="../app/reper_app/paramwidget.cpp" line="66"/>
         <source>Physical parameters</source>
         <translation>Физические параметры</translation>
     </message>
@@ -364,29 +369,29 @@
 <context>
     <name>SearchRadioImageCalc</name>
     <message>
-        <location filename="../app/reper_app/searchradioimagecalc.cpp" line="188"/>
+        <location filename="../app/reper_app/searchradioimagecalc.cpp" line="189"/>
         <source>Search</source>
         <translation>Поиск</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/searchradioimagecalc.cpp" line="188"/>
+        <location filename="../app/reper_app/searchradioimagecalc.cpp" line="189"/>
         <source>No objects in selection</source>
         <translation>Не выбрано ни одного объекта</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/searchradioimagecalc.cpp" line="545"/>
+        <location filename="../app/reper_app/searchradioimagecalc.cpp" line="546"/>
         <source>Select reference</source>
         <translation>Выбрать справочник</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/searchradioimagecalc.cpp" line="546"/>
+        <location filename="../app/reper_app/searchradioimagecalc.cpp" line="547"/>
         <source>Not available suitable reference</source>
         <translation>Невозможно выбрать подходящий справочник</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/searchradioimagecalc.cpp" line="962"/>
+        <location filename="../app/reper_app/searchradioimagecalc.cpp" line="828"/>
         <source>Control on the right</source>
-        <translation>Рубка справа</translation>
+        <translation>Надстроечная конструкция</translation>
     </message>
 </context>
 <context>
