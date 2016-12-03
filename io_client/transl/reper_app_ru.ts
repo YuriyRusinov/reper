@@ -106,19 +106,14 @@
 <context>
     <name>ParamWidget</name>
     <message>
-        <location filename="../app/reper_app/paramwidget.cpp" line="13"/>
+        <location filename="../app/reper_app/paramwidget.cpp" line="14"/>
         <source>Length:</source>
         <translation>Длина :</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/paramwidget.cpp" line="15"/>
+        <location filename="../app/reper_app/paramwidget.cpp" line="16"/>
         <source>Width:</source>
         <translation>Ширина :</translation>
-    </message>
-    <message>
-        <location filename="../app/reper_app/paramwidget.cpp" line="17"/>
-        <source>Depth:</source>
-        <translation>Глубина :</translation>
     </message>
     <message>
         <location filename="../app/reper_app/paramwidget.cpp" line="19"/>
@@ -146,9 +141,19 @@
         <translation>Параметры изображения</translation>
     </message>
     <message>
-        <location filename="../app/reper_app/paramwidget.cpp" line="66"/>
+        <location filename="../app/reper_app/paramwidget.cpp" line="53"/>
         <source>Physical parameters</source>
         <translation>Физические параметры</translation>
+    </message>
+    <message>
+        <location filename="../app/reper_app/paramwidget.cpp" line="157"/>
+        <source>Parameters</source>
+        <translation>Параметры объекта</translation>
+    </message>
+    <message>
+        <location filename="../app/reper_app/paramwidget.cpp" line="157"/>
+        <source>Image is not geocoded</source>
+        <translation>Изображение не геокодировано</translation>
     </message>
 </context>
 <context>
@@ -406,6 +411,16 @@
         <location filename="../app/reper_app/searchradioimagefragmentform.cpp" line="64"/>
         <source>Object parameters %1</source>
         <translation>Параметры объекта N %1</translation>
+    </message>
+    <message>
+        <location filename="../app/reper_app/searchradioimagefragmentform.cpp" line="238"/>
+        <source>Parameters</source>
+        <translation>Параметры объекта</translation>
+    </message>
+    <message>
+        <location filename="../app/reper_app/searchradioimagefragmentform.cpp" line="238"/>
+        <source>Image is not geocoded</source>
+        <translation>Изображение не геокодировано</translation>
     </message>
 </context>
 <context>
