@@ -431,14 +431,31 @@ void SearchRadioImageCalc :: calcChi2 (QAbstractItemModel * sModel, const QImage
         }
 */
         QImage scImage = sIm.scaled (nW, nH);
+        int nType = sModel->data (sModel->index (i, m-1), Qt::UserRole).toInt();
         QByteArray bscIm = searchImageB (scImage, azimuth, elevation_angle);
         QByteArray bscImStr = getImageStr (bscIm);
         for (int ii=0; ii<bscImStr.size(); ii++)
             if (bscImStr[ii] == imArr[ii])
                 np++;
-        QModelIndex wPIndex = sModel->index (i, m-1);
+        QModelIndex wPIndex = sModel->index (i, m-2);
         //qDebug () << __PRETTY_FUNCTION__ << np *100./imArr.size() << wPIndex << QString::compare(QString(bscImStr), QString (imArr), Qt::CaseInsensitive);
-        sModel->setData (wPIndex, QString::number (np*100./bscImStr.size()), Qt::EditRole);
+        double chi2 = np*100./bscImStr.size()/nType;
+        /*
+         * df\area	.995	.990	.975	.950	.900	.750	.500	.250	.100	.050	.025	.010	.005
+1	                0.00004	0.00016	0.00098	0.00393	0.01579	0.10153	0.45494	1.32330	2.70554	3.84146	5.02389	6.63490	7.87944
+2	                0.01003	0.02010	0.05064	0.10259	0.21072	0.57536	1.38629	2.77259	4.60517	5.99146	7.37776	9.21034	10.59663
+*/
+        double prob;
+        qDebug () << __PRETTY_FUNCTION__ << chi2;
+        if (chi2 <= 0.07)
+            prob = 0.99;
+        else if (chi2 <= 0.1 )//&& nType > 1)
+            prob = 0.975;
+        else if (chi2 <= 0.575)
+            prob = 0.75;
+        else
+            prob = 0.025;
+        sModel->setData (wPIndex, QString::number (prob)/*np*100./bscImStr.size()/nType)*/, Qt::EditRole);
         //qDebug () << __PRETTY_FUNCTION__ << np *100./imArr.size() << wPIndex << QString::compare(QString(bscImStr), QString (imArr), Qt::CaseInsensitive) << isSet;
 
     }
@@ -446,7 +463,7 @@ void SearchRadioImageCalc :: calcChi2 (QAbstractItemModel * sModel, const QImage
 /*    XMatr = gsl_matrix_alloc (5, 5 );//n, nPol+1);
     covMatr = gsl_matrix_alloc (5, 5);//(nPol+1, nPol+1);
     yVec = gsl_vector_alloc (5);
-    int n = sModel->rowCount();
+//    int n = sModel->rowCount();
     QVector<QPoint> borderPointsS;
     int nSW = sIm.width ();
     int nSH = sIm.height ();
@@ -606,6 +623,14 @@ void SearchRadioImageCalc :: searchParams (const QImage& sIm, SeaObjectParameter
         azGroupR->addFilter (fType);
         fType->release ();
     }
+    else if (l >= 100 && l<200)
+    {
+        KKSFilter * fType = ct->createFilter (aShipType->id(), QString::number (20), KKSFilter::foEq);
+        azGroup->addFilter (fType);
+        azGroupR->addFilter (fType);
+        fType->release ();
+    }
+
     double resolv = sop.resolution;
     if (resolv >= 0.0)
     {
