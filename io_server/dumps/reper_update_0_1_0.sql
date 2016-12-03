@@ -38,8 +38,10 @@ update io_views set "order"=5 where id=334;
 update attrs_categories set "order"=9 where id=2136;
 update attrs_categories set "order"=8 where id=2144;
 --SELECT pg_catalog.setval('io_views_id_seq', 335, true);
-INSERT INTO io_views (unique_id, last_update, id, id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) VALUES ('localorg_prefix-io_views-336', '2016-03-16 16:31:10.048484', 336, 2145, 54, 112, false, 5, NULL);
+INSERT INTO io_views (unique_id, last_update, id, id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) VALUES ('localorg_prefix-io_views-336', '2016-03-16 16:31:10.048484', 336, 2145, 54, 112, false, 4, NULL);
 SELECT pg_catalog.setval('io_views_id_seq', 336, true);
+
+delete from io_views where id=330;
 
 INSERT INTO attributes (unique_id, last_update, id, id_a_type, id_search_template, id_attr_group, code, name, title, table_name, column_name, ref_column_name, def_width, is_system, id_ref_attr_type) VALUES ('localorg_prefix-attributes-1010', '2016-03-16 17:35:08.557668', 1010, 2, NULL, 4, 'id_sky', 'RLI parameters', 'Параметры объекта', 'rli_sky', 'id', 'id', 50, true, 9);
 

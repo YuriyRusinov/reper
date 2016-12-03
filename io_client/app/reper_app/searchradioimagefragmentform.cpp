@@ -223,3 +223,19 @@ void SearchRadioImageFragmentForm :: selObject (int index)
     p.drawRect (r);
     lFImage->setPixmap (px);
 }
+
+void SearchRadioImageFragmentForm :: showEvent (QShowEvent * event)
+{
+    QDialog :: showEvent (event);
+    QValidator::State w = qobject_cast<ParamWidget *>(UI->tabPropWidget->widget (0))->isValid();
+    for (int i=1; i<UI->tabPropWidget->count() && w == QValidator::Acceptable; i++)
+    {
+        ParamWidget * pw = qobject_cast<ParamWidget *>(UI->tabPropWidget->widget (i));
+        w = pw->isValid();
+    }
+    if (w != QValidator::Acceptable)
+    {
+        QMessageBox::warning (this, tr("Parameters"), tr("Image is not geocoded"), QMessageBox::Ok);
+        return;
+    }
+}

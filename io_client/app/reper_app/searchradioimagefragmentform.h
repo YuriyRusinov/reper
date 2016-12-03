@@ -47,6 +47,12 @@ signals:
     void searchByIm (const QImage& im, double az, double elev);
     void searchByParams (const QImage& im, SeaObjectParameters sp);
 
+protected:
+    //
+    // Overrides
+    //
+    void showEvent (QShowEvent * event);
+
 private:
     //
     // Variables
