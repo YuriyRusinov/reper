@@ -71,7 +71,8 @@ void Assistant::showDocumentation(const QString &page)
         return;
 
     QByteArray ba("SetSource ");
-    ba.append("qthelp://com.31.reperhelpviewer/doc/");
+    ba.append ("qthelp://com.trolltech.examples.simpletextviewer/doc/");
+    //ba.append("qthelp://com.31.reperhelpviewer/doc/");
     qDebug () << __PRETTY_FUNCTION__ << ba + page.toLocal8Bit();
     
     proc->write(ba + page.toLocal8Bit() + '\n');

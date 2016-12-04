@@ -2,6 +2,7 @@
 #define _ParamWidget_H
 
 #include <QWidget>
+#include <QValidator>
 
 #include "seaobjectparameters.h"
 
@@ -16,12 +17,15 @@ public:
     virtual ~ParamWidget (void);
 
     SeaObjectParameters getData (void) const;
+    QValidator::State isValid (void) const;
 
 private slots:
-    void depthStateChanged (int state);
+    void widthStateChanged (int state);
     void elevStateChanged (int state);
     void secStateChanged (int state);
     void resolvStateChanged (int state);
+    void lEEditFinished (void);
+    void lETextEdited (const QString& text);
 
 private:
     //
@@ -31,11 +35,12 @@ private:
     QLabel * lLength;
     QLineEdit * lELength;
 
-    QLabel * lWidth;
+    QCheckBox * cbWidth;
     QLineEdit * lEWidth;
+    double wlRel;
 
-    QCheckBox * cbDepth;
-    QLineEdit * lEDepth;
+//    QCheckBox * cbDepth;
+//    QLineEdit * lEDepth;
 
     QCheckBox * cbResolv;
     QLineEdit * lEResolv;

@@ -3,6 +3,7 @@
 #include <QCheckBox>
 #include <QGridLayout>
 #include <QDoubleValidator>
+#include <QMessageBox>
 #include <QGroupBox>
 
 #include "paramwidget.h"
@@ -12,10 +13,9 @@ ParamWidget :: ParamWidget (SeaObjectParameters sp, QWidget * parent, Qt::Window
     sop (sp),
     lLength (new QLabel (tr("Length:"), this)),
     lELength (new QLineEdit (this)),
-    lWidth (new QLabel (tr("Width:"), this)),
+    cbWidth (new QCheckBox (tr("Width:"), this)),
     lEWidth (new QLineEdit (this)),
-    cbDepth (new QCheckBox (tr("Depth:"), this)),
-    lEDepth (new QLineEdit (this)),
+    wlRel (sp.width / sp.length),
     cbResolv (new QCheckBox (tr("Resolution:"), this)),
     lEResolv (new QLineEdit (this)),
     lAzimuth (new QLabel (tr("Azimuth:"), this)),
@@ -31,33 +31,20 @@ ParamWidget :: ParamWidget (SeaObjectParameters sp, QWidget * parent, Qt::Window
     QGridLayout * gImLay = new QGridLayout ( gbImageParams );
     gImLay->addWidget (lLength, 0, 0, 1, 1);
     gImLay->addWidget (lELength, 0, 1, 1, 1);
-    QDoubleValidator * dLVal = new QDoubleValidator (0, 1000, 16, this);
+    QDoubleValidator * dLVal = new QDoubleValidator (10, 500, 16, this);
     lELength->setValidator (dLVal);
     lELength->setText (QString::number (sp.length));
 
-    gImLay->addWidget (lWidth, 1, 0, 1, 1);
+    gImLay->addWidget (cbWidth, 1, 0, 1, 1);
     gImLay->addWidget (lEWidth, 1, 1, 1, 1);
-    QDoubleValidator * dWVal = new QDoubleValidator (0, 1000, 16, this);
+    QDoubleValidator * dWVal = new QDoubleValidator (10, 200, 16, this);
     lEWidth->setValidator (dWVal);
     lEWidth->setText (QString::number (sp.width));
+    cbWidth->setCheckState (Qt::Unchecked);
+    lEWidth->setEnabled (false);
 
-    gImLay->addWidget (cbDepth, 2, 0, 1, 1);
-    gImLay->addWidget (lEDepth, 2, 1, 1, 1);
-    QDoubleValidator * dDVal = new QDoubleValidator (0, 1000, 16, this);
-    lEDepth->setValidator (dDVal);
-    if (sp.depth >= 0.0)
-    {
-        cbDepth->setCheckState (Qt::Checked);
-        lEDepth->setText (QString::number (sp.depth));
-        lEDepth->setEnabled (true);
-    }
-    else
-    {
-        cbDepth->setCheckState (Qt::Unchecked);
-        lEDepth->setEnabled (false);
-    }
-    gImLay->addWidget (cbResolv, 3, 0, 1, 1);
-    gImLay->addWidget (lEResolv, 3, 1, 1, 1);
+    gImLay->addWidget (cbResolv, 2, 0, 1, 1);
+    gImLay->addWidget (lEResolv, 2, 1, 1, 1);
     QDoubleValidator * dRVal = new QDoubleValidator (0.0, 100.0, 5, this);
     lEResolv->setValidator (dRVal);
     cbResolv->setCheckState (Qt::Unchecked);
@@ -104,7 +91,9 @@ ParamWidget :: ParamWidget (SeaObjectParameters sp, QWidget * parent, Qt::Window
         lESec->setEnabled (false);
     }
 
-    connect (cbDepth, SIGNAL (stateChanged(int)), this, SLOT (depthStateChanged(int)) );
+    connect (lELength, SIGNAL (editingFinished (void)), this, SLOT (lEEditFinished(void)) );
+    connect (lELength, SIGNAL (textEdited (const QString &)), this, SLOT (lETextEdited(const QString&)) );
+    connect (cbWidth, SIGNAL (stateChanged(int)), this, SLOT (widthStateChanged(int)) );
     connect (cbResolv, SIGNAL (stateChanged(int)), this, SLOT (resolvStateChanged (int)) );
     connect (cbElev, SIGNAL (stateChanged(int)), this, SLOT (elevStateChanged (int)) );
     connect (cbSecProp, SIGNAL (stateChanged(int)), this, SLOT (secStateChanged (int)) );
@@ -117,19 +106,14 @@ ParamWidget :: ~ParamWidget (void)
 SeaObjectParameters ParamWidget :: getData (void) const
 {
     double l = lELength->text().toDouble ();
-    double w = lEWidth->text().toDouble ();
-    double d = lEDepth->isEnabled() ? lEDepth->text().toDouble() : -1.0;
+    double w = lEWidth->isEnabled() ? lEWidth->text().toDouble () : -1.0;
+    double d = /*lEDepth->isEnabled() ? lEDepth->text().toDouble() :*/ -1.0;
     double az = lEAzimuth->text().toDouble ();
     double elev = lEElev->isEnabled() ? lEElev->text().toDouble() : -1.0;
     double r = lEResolv->isEnabled() ? lEResolv->text().toDouble() : -1.0;
     QString sProp = lESec->isEnabled() ? lESec->text() : QString();
     SeaObjectParameters sp (sop.bRect, l, w, d, az, elev, r, sProp);
     return sp;
-}
-
-void ParamWidget :: depthStateChanged (int state)
-{
-    lEDepth->setEnabled ((state == Qt::Checked));
 }
 
 void ParamWidget :: elevStateChanged (int state)
@@ -145,4 +129,40 @@ void ParamWidget :: secStateChanged (int state)
 void ParamWidget :: resolvStateChanged (int state)
 {
     lEResolv->setEnabled ((state == Qt::Checked));
+}
+
+void ParamWidget :: widthStateChanged (int state)
+{
+    lEWidth->setEnabled ((state == Qt::Checked));
+}
+
+QValidator::State ParamWidget :: isValid (void) const
+{
+    int pos;
+    QString lstr = lELength->text();
+    QValidator::State w = lELength->validator()->validate (lstr, pos);
+    if (w == QValidator::Acceptable)
+    {
+        lstr = lEWidth->text();
+        w = lEWidth->validator()->validate (lstr, pos);
+    }
+    return w;
+}
+
+void ParamWidget :: lEEditFinished (void)
+{
+    QValidator::State w = isValid();
+    if (w != QValidator::Acceptable)
+    {
+        QMessageBox::warning (this, tr("Parameters"), tr("Image is not geocoded"), QMessageBox::Ok);
+        return;
+    }
+}
+
+void ParamWidget :: lETextEdited (const QString& text)
+{
+    double l = text.toDouble ();
+    double w = l*wlRel;
+    if (cbWidth->checkState() == Qt::Unchecked)
+        lEWidth->setText (QString::number (w));
 }

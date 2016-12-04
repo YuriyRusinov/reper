@@ -19,7 +19,7 @@ select csetglobal (301);
 select csetglobal (302);
 select setval ('attrs_categories_id_seq', 2127, true);
 
-INSERT INTO tbl_io_objects (unique_id, id, id_io_category, id_io_state, id_io_type, id_maclabel, author, id_sync_type, id_owner_org, name, table_name, description, information, is_system, is_completed, is_global, record_fill_color, record_text_color, id_search_template, ref_table_name, r_icon, uuid_t) VALUES ('localorg_prefix-io_objects-302', 302, 302, 1, 1, 1, 1, 1, 1, 'Ship types', 'type_ship', NULL, 'Администратор системы', false, 2, true, NULL, NULL, NULL, NULL, NULL, 'a98240ba-73c0-11e4-942f-938951a6ce63');
+INSERT INTO tbl_io_objects (unique_id, id, id_io_category, id_io_state, id_io_type, id_maclabel, author, id_sync_type, id_owner_org, name, table_name, description, information, is_system, is_completed, is_global, record_fill_color, record_text_color, id_search_template, ref_table_name, r_icon, uuid_t) VALUES ('localorg_prefix-io_objects-302', 302, 302, 1, 1, 1, 1, 1, 1, 'Типы надводных кораблей', 'type_ship', NULL, 'Администратор системы', false, 2, true, NULL, NULL, NULL, NULL, NULL, 'a98240ba-73c0-11e4-942f-938951a6ce63');
 
 select setval ('tbl_io_objects_id_seq', 302, true);
 
@@ -95,7 +95,7 @@ INSERT INTO attrs_categories (unique_id, last_update, id, id_io_category, id_io_
 select setval ('attrs_categories_id_seq', 2145, true);
 
 
-INSERT INTO tbl_io_objects (unique_id, last_update, id, id_io_category, id_io_state, id_io_type, id_maclabel, author, id_sync_type, id_owner_org, name, table_name, description, information, is_system, insert_time, is_completed, is_global, record_fill_color, record_text_color, id_search_template, ref_table_name, r_icon, uuid_t) VALUES ('localorg_prefix-io_objects-303', '2014-12-04 12:50:05.647943', 303, 304, 1, 2, 1, 1, 1, 1, 'RLI Image raws', 'rli_image_raws', NULL, 'Администратор системы', false, '2014-12-04 04:12:20', 2, true, NULL, NULL, NULL, NULL, NULL, 'ecc82916-7b9a-11e4-af6b-9f445027ca5b');
+INSERT INTO tbl_io_objects (unique_id, last_update, id, id_io_category, id_io_state, id_io_type, id_maclabel, author, id_sync_type, id_owner_org, name, table_name, description, information, is_system, insert_time, is_completed, is_global, record_fill_color, record_text_color, id_search_template, ref_table_name, r_icon, uuid_t) VALUES ('localorg_prefix-io_objects-303', '2014-12-04 12:50:05.647943', 303, 304, 1, 2, 1, 1, 1, 1, 'Бинарные RLI', 'rli_image_raws', NULL, 'Администратор системы', false, '2014-12-04 04:12:20', 2, true, NULL, NULL, NULL, NULL, NULL, 'ecc82916-7b9a-11e4-af6b-9f445027ca5b');
 select setval ('tbl_io_objects_id_seq', 303, true);
 
 INSERT INTO io_templates (unique_id, last_update, id, id_io_category, name, code, description) VALUES ('localorg_prefix-io_templates-54', '2015-10-28 20:25:23.622101', 54, 303, 'Специальный шаблон для Справочника радиоизображений', 'TEMPLATE_54', NULL);
@@ -107,13 +107,13 @@ INSERT INTO a_groups (unique_id, last_update, id, id_io_template, id_parent, nam
 
 SELECT pg_catalog.setval('a_groups_id_seq', 112, true);
 
-INSERT INTO io_views (unique_id, last_update, id, id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) VALUES ('localorg_prefix-io_views-330', '2015-10-28 20:25:23.622101', 330, 2135, 54, 112, false, 2, NULL);
+--INSERT INTO io_views (unique_id, last_update, id, id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) VALUES ('localorg_prefix-io_views-330', '2015-10-28 20:25:23.622101', 330, 2135, 54, 112, false, 2, NULL);
 INSERT INTO io_views (unique_id, last_update, id, id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) VALUES ('localorg_prefix-io_views-331', '2015-10-28 20:25:23.622101', 331, 2133, 54, 112, false, 0, NULL);
 INSERT INTO io_views (unique_id, last_update, id, id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) VALUES ('localorg_prefix-io_views-332', '2015-10-30 15:31:10.048484', 332, 2130, 54, 112, false, 1, '0');
-INSERT INTO io_views (unique_id, last_update, id, id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) VALUES ('localorg_prefix-io_views-333', '2015-10-30 15:31:10.048484', 333, 2131, 54, 112, false, 3, NULL);
-INSERT INTO io_views (unique_id, last_update, id, id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) VALUES ('localorg_prefix-io_views-334', '2015-10-30 15:31:10.048484', 334, 2136, 54, 112, false, 6, NULL);
-INSERT INTO io_views (unique_id, last_update, id, id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) VALUES ('localorg_prefix-io_views-335', '2016-03-16 16:31:10.048484', 335, 2144, 54, 112, false, 4, NULL);
-INSERT INTO io_views (unique_id, last_update, id, id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) VALUES ('localorg_prefix-io_views-336', '2016-03-16 16:31:10.048484', 336, 2145, 54, 112, false, 5, NULL);
+INSERT INTO io_views (unique_id, last_update, id, id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) VALUES ('localorg_prefix-io_views-333', '2015-10-30 15:31:10.048484', 333, 2131, 54, 112, false, 2, NULL);
+INSERT INTO io_views (unique_id, last_update, id, id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) VALUES ('localorg_prefix-io_views-334', '2015-10-30 15:31:10.048484', 334, 2136, 54, 112, false, 5, NULL);
+INSERT INTO io_views (unique_id, last_update, id, id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) VALUES ('localorg_prefix-io_views-335', '2016-03-16 16:31:10.048484', 335, 2144, 54, 112, false, 3, NULL);
+INSERT INTO io_views (unique_id, last_update, id, id_attr_category, id_io_template, id_a_group, is_read_only, "order", def_value) VALUES ('localorg_prefix-io_views-336', '2016-03-16 16:31:10.048484', 336, 2145, 54, 112, false, 4, NULL);
 SELECT pg_catalog.setval('io_views_id_seq', 336, true);
 
 INSERT INTO user_templates (id_user, id_template, id_io_object, type) VALUES (1, 54, 303, 0);
