@@ -193,11 +193,12 @@ void SearchRadioImageCalc :: calculateParameters (const QImage& im, double cVal)
 //    blur( rImage, rImage, cv::Size(3,3) );
     cv::Mat contourOutput = rImage.clone();
     cv::vector<Vec4i> hierarchy;
-    Vec4i a = {1, -1, -1, -1};
+/*    Vec4i a = {1, -1, -1, -1};
     hierarchy.push_back (a);
     Vec4i b = {2,  0, -1, -1};
     hierarchy.push_back (b);
     hierarchy.push_back (a);
+*/
 //    hierarchy << array([[[ 1, -1, -1, -1],
 //                         [ 2,  0, -1, -1],
 //                         [-1,  1, -1, -1]]]);

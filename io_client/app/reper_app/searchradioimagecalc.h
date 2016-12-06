@@ -6,11 +6,12 @@
 #include <QSize>
 #include <QVector>
 
-#include <cv.h>
+//#include <cv.h>
 
+#include <opencv2/core/types_c.h>
 #include "seaobjectparameters.h"
 
-using cv::Mat;
+//using namespace cv;
 
 class QAbstractItemModel;
 class QWidget;
