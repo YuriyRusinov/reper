@@ -128,3 +128,8 @@ double imageCreatorForm :: getResolution (void) const
 {
     return (double)ui->resolutionBox->value();
 }
+
+double imageCreatorForm :: getLength (void) const
+{
+    return (double)ui->shipLengthBox->value();
+}

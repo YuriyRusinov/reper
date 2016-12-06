@@ -454,7 +454,7 @@ void SearchRadioImageCalc :: calcChi2 (QAbstractItemModel * sModel, const QImage
         else if (chi2 <= 0.575)
             prob = 0.75;
         else
-            prob = 0.025;
+            prob = 0.6;
         sModel->setData (wPIndex, QString::number (prob)/*np*100./bscImStr.size()/nType)*/, Qt::EditRole);
         //qDebug () << __PRETTY_FUNCTION__ << np *100./imArr.size() << wPIndex << QString::compare(QString(bscImStr), QString (imArr), Qt::CaseInsensitive) << isSet;
 

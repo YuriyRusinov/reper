@@ -478,17 +478,27 @@ void ReperMainWindow::slotGologram (void)
     // Загрузка из БД возможных типов кораблей
     //
     KKSLoader * loader = kksApp->loader ();
+    //KKSObject * ioShipType = loader->loadIO (QString("type_ship"), true);
+//    KKSAttribute * aShipType = loader->loadAttribute (QString("id_type_ship"), QString("type_ship"));
+    int id_attr_type_ship = ::id_attr_type_ship;//aShipType->id();
+//    aShipType->release ();
+    qDebug () << __PRETTY_FUNCTION__ << id_attr_type_ship;
     KKSAttribute * a = loader->loadAttribute (id_attr_type_ship);//QString("id_type_ship"), QString("type_ship"));
+    if (QString :: compare (a->tableName(), QString("type_ship")) != 0)
+    {
+        id_attr_type_ship = 1003;
+        a->release ();
+        a = loader->loadAttribute (id_attr_type_ship);
+    }
     if (!a)
     {
         QMessageBox::warning (this, tr("Available ship types"), tr ("Cannot load ship types list"), QMessageBox::Ok);
         return;
     }
-    //KKSObject * ioShipType = loader->loadIO (QString("type_ship"), true);
     QMap<int, QString> refColumnValues;
     QMap<int, QString> aVals = loader->loadAttributeValues (a, refColumnValues);
     icf->initShipTypes (aVals);
-    //qDebug () << __PRETTY_FUNCTION__ << aVals << refColumnValues;
+    qDebug () << __PRETTY_FUNCTION__ << aVals << refColumnValues;
     a->release ();
 
     connect (icf, SIGNAL (imagesData(generatingDataPlus)), this, SLOT (slotGologramCalc(generatingDataPlus)) );
@@ -502,12 +512,14 @@ void ReperMainWindow::slotGologramCalc (generatingDataPlus gdp)
     bool fTests (false);
     int type_ship (-1);
     double resolution (-1);
+    double shipLen (-1);
     if (iGW)
     {
         iGW->setVisible (false);
         fTests = iGW->forTests();
         type_ship = iGW->getShipType ();
         resolution = iGW->getResolution ();
+        shipLen = iGW->getLength ();
     }
     qDebug () << __PRETTY_FUNCTION__ << type_ship << fTests;
     ImageGeneratorControl * gImC = new ImageGeneratorControl (gdp, this);
@@ -546,7 +558,7 @@ void ReperMainWindow::slotGologramCalc (generatingDataPlus gdp)
                 ++p)
         {
             KKSValue v;// = resD[i]
-            double az = resD[i].XY_angle < 90 ? resD[i].XY_angle+270 : resD[i].XY_angle-90;
+            double az = resD[i].XY_angle;// < 90 ? resD[i].XY_angle+270 : resD[i].XY_angle-90;
             if (QString::compare (p.value()->code(), QString("id_type_ship"), Qt::CaseInsensitive) == 0)
                 v = KKSValue (QString::number (type_ship), KKSAttrType::atList);
             else if (QString::compare (p.value()->code(), QString("azimuth"), Qt::CaseInsensitive) == 0)
@@ -557,6 +569,8 @@ void ReperMainWindow::slotGologramCalc (generatingDataPlus gdp)
                 v = KKSValue (QString :: number (resD[i].numberOfUnit), KKSAttrType::atInt);
             else if (QString::compare (p.value()->code(), QString("resolution"), Qt::CaseInsensitive) == 0 && resolution >= 0.0)
                 v = KKSValue (QString :: number (resolution), KKSAttrType::atDouble);
+            else if (QString::compare (p.value()->code(), QString("ship_length"), Qt::CaseInsensitive) == 0)
+                v = KKSValue (QString::number (shipLen), KKSAttrType::atDouble);
             else if (QString::compare (p.value()->code(), QString("image_raw"), Qt::CaseInsensitive) == 0)
             {
                 QByteArray bData;

@@ -25,6 +25,7 @@ public:
 
     int getShipType (void) const;
     double getResolution (void) const;
+    double getLength (void) const;
 
 private:
     Ui::imageCreatorForm *ui;
