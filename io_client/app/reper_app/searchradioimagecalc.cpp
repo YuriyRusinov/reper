@@ -21,6 +21,7 @@
 #include <KKSObjEditorFactory.h>
 #include <KKSObjEditor.h>
 #include <KKSRecWidget.h>
+#include <KKSEIOData.h>
 #include <defines.h>
 
 #include "searchradioimagefragmentform.h"
@@ -397,6 +398,13 @@ void SearchRadioImageCalc :: calcChi2 (QAbstractItemModel * sModel, const QImage
     Q_UNUSED (yVec);
     int n = sModel->rowCount();
     int m = sModel->columnCount ();
+    QMap<QString, double> numberTypesP;
+    for (int i=0; i<n; i++)
+    {
+        QString sType = sModel->data (sModel->index (i, m-1), Qt::DisplayRole).toString();//.toInt();
+        if (!numberTypesP.contains (sType))
+            numberTypesP.insert (sType, 0.0);
+    }
     for (int i=0; i<n; i++)
     {
         QModelIndex wIndex = sModel->index (i, 0);
@@ -432,22 +440,22 @@ void SearchRadioImageCalc :: calcChi2 (QAbstractItemModel * sModel, const QImage
         }
 */
         QImage scImage = sIm.scaled (nW, nH);
-        int nType = sModel->data (sModel->index (i, m-1), Qt::UserRole).toInt();
+        QString sType = sModel->data (sModel->index (i, m-1), Qt::DisplayRole).toString();
+        int nType = sModel->data (sModel->index (i, m-1), Qt::UserRole+1).toInt();
         QByteArray bscIm = searchImageB (scImage, azimuth, elevation_angle);
         QByteArray bscImStr = getImageStr (bscIm);
         for (int ii=0; ii<bscImStr.size(); ii++)
             if (bscImStr[ii] == imArr[ii])
                 np++;
-        QModelIndex wPIndex = sModel->index (i, m-2);
         //qDebug () << __PRETTY_FUNCTION__ << np *100./imArr.size() << wPIndex << QString::compare(QString(bscImStr), QString (imArr), Qt::CaseInsensitive);
-        double chi2 = np*100./bscImStr.size()/nType;
+        double chi2 = np*1.00/bscImStr.size();///nType;
         /*
          * df\area	.995	.990	.975	.950	.900	.750	.500	.250	.100	.050	.025	.010	.005
 1	                0.00004	0.00016	0.00098	0.00393	0.01579	0.10153	0.45494	1.32330	2.70554	3.84146	5.02389	6.63490	7.87944
 2	                0.01003	0.02010	0.05064	0.10259	0.21072	0.57536	1.38629	2.77259	4.60517	5.99146	7.37776	9.21034	10.59663
 */
         double prob;
-        qDebug () << __PRETTY_FUNCTION__ << chi2;
+        qDebug () << __PRETTY_FUNCTION__ << chi2;// << sType << nType;
         if (chi2 <= 0.07)
             prob = 0.99;
         else if (chi2 <= 0.1 )//&& nType > 1)
@@ -456,7 +464,24 @@ void SearchRadioImageCalc :: calcChi2 (QAbstractItemModel * sModel, const QImage
             prob = 0.75;
         else
             prob = 0.6;
-        sModel->setData (wPIndex, QString::number (prob)/*np*100./bscImStr.size()/nType)*/, Qt::EditRole);
+        numberTypesP[sType] = prob;
+    }
+    double sp = 0.0;
+    for (QMap<QString, double>::const_iterator p = numberTypesP.constBegin();
+             p != numberTypesP.constEnd();
+             p++)
+    {
+        qDebug () << __PRETTY_FUNCTION__ << p.key();
+        sp += p.value ();
+    }
+    //qDebug () << __PRETTY_FUNCTION__ << sp;
+    sp = qMax (sp, (double)numberTypesP.count());
+    for (int i=0; i<n; i++)
+    {
+        QString sType = sModel->data (sModel->index (i, m-1), Qt::DisplayRole).toString();//.toInt();
+        double prob = numberTypesP.value (sType);
+        QModelIndex wPIndex = sModel->index (i, m-2);
+        sModel->setData (wPIndex, QString::number (prob/sp), Qt::EditRole);
         //qDebug () << __PRETTY_FUNCTION__ << np *100./imArr.size() << wPIndex << QString::compare(QString(bscImStr), QString (imArr), Qt::CaseInsensitive) << isSet;
 
     }
@@ -617,7 +642,44 @@ void SearchRadioImageCalc :: searchParams (const QImage& sIm, SeaObjectParameter
     azGroup->addFilter (fAzMax);
     fAzMax->release ();
     double l = sop.length;
-    if (l >= 200)
+    if (l >= 0)
+    {
+        QString tableName = QString("type_ship");
+        KKSFilterGroup * fTypeGroup = new KKSFilterGroup (false);
+        KKSObject * refTypeObj = loader->loadIO (tableName);
+        KKSCategory * cType = refTypeObj->category ();
+        KKSCategory * cTypeRef = cType->tableCategory ();
+        KKSAttribute * lAMin = loader->loadAttribute (1001);
+        KKSAttribute * lAMax = loader->loadAttribute (1002);
+        KKSFilter * fLenMin = cTypeRef->createFilter (lAMin->id(), QString::number (l), KKSFilter::foLessEq);
+        KKSFilter * fLenMax = cTypeRef->createFilter (lAMax->id(), QString::number (l), KKSFilter::foGrEq);
+        KKSFilterGroup * fSelType = new KKSFilterGroup (true);
+        fSelType->addFilter (fLenMin);
+        fLenMin->release ();
+        fSelType->addFilter (fLenMax);
+        fLenMax->release ();
+        KKSList<const KKSFilterGroup *> fGr;
+        fGr.append (fSelType);
+        lAMin->release ();
+        lAMax->release ();
+        KKSMap<qint64, KKSEIOData *> fTRecs = loader->loadEIOList (refTypeObj, fGr);
+        //QString val = QString ("select * from %2 where %1 >= length_min and %1 <= length_max").arg (l).arg (tableName);
+        for (KKSMap<qint64, KKSEIOData *>::const_iterator p=fTRecs.constBegin();
+                p != fTRecs.constEnd();
+                p++)
+        {
+            KKSFilter * fType = ct->createFilter (aShipType->id(), QString::number (p.key()), KKSFilter::foEq);
+            qDebug () << __PRETTY_FUNCTION__ << p.key();
+            fTypeGroup->addFilter (fType);
+            fType->release ();
+        }
+        refTypeObj->release ();
+        azGroup->addGroup (fTypeGroup);
+        azGroupR->addGroup (fTypeGroup);
+
+        fTypeGroup->release ();
+    }
+/*    if (l >= 200)
     {
         KKSFilter * fType = ct->createFilter (aShipType->id(), QString::number (1), KKSFilter::foEq);
         azGroup->addFilter (fType);
@@ -631,7 +693,7 @@ void SearchRadioImageCalc :: searchParams (const QImage& sIm, SeaObjectParameter
         azGroupR->addFilter (fType);
         fType->release ();
     }
-
+*/
     double resolv = sop.resolution;
     if (resolv >= 0.0)
     {
