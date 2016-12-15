@@ -83,12 +83,12 @@ INSERT INTO attrs_categories (unique_id, last_update, id, id_io_category, id_io_
 INSERT INTO attrs_categories (unique_id, last_update, id, id_io_category, id_io_attribute, name, def_value, is_mandatory, is_read_only, "order") VALUES ('localorg_prefix-attrs_categories-2131', '2014-11-24 13:36:10.593138', 2131, 303, 1006, 'image_raw', NULL, false, false, 4);
 INSERT INTO attrs_categories (unique_id, last_update, id, id_io_category, id_io_attribute, name, def_value, is_mandatory, is_read_only, "order") VALUES ('localorg_prefix-attrs_categories-2132', '2014-11-24 13:36:10.593138', 2132, 303, 1007, 'image_jpg', NULL, false, false, 5);
 INSERT INTO attrs_categories (unique_id, last_update, id, id_io_category, id_io_attribute, name, def_value, is_mandatory, is_read_only, "order") VALUES ('localorg_prefix-attrs_categories-2133', '2014-12-04 12:42:12.164466', 2133, 303, 1008, 'depth', NULL, false, false, 6);
-INSERT INTO attrs_categories (unique_id, last_update, id, id_io_category, id_io_attribute, name, def_value, is_mandatory, is_read_only, "order") VALUES ('localorg_prefix-attrs_categories-2134', '2014-11-24 13:32:44.581934', 2134, 303, 1012, 'Ship length', NULL, false, false, 7);
+INSERT INTO attrs_categories (unique_id, last_update, id, id_io_category, id_io_attribute, name, def_value, is_mandatory, is_read_only, "order") VALUES ('localorg_prefix-attrs_categories-2134', '2014-11-24 13:32:44.581934', 2134, 303, 1012, 'Ship length', NULL, true, false, 7);
 
 INSERT INTO attrs_categories (unique_id, last_update, id, id_io_category, id_io_attribute, name, def_value, is_mandatory, is_read_only, "order") VALUES ('localorg_prefix-attrs_categories-2135', '2014-11-24 13:32:44.581934', 2135, 303, 1003, 'Ship type', NULL, true, false, 8);
 
 
-INSERT INTO attrs_categories (unique_id, last_update, id, id_io_category, id_io_attribute, name, def_value, is_mandatory, is_read_only, "order") VALUES ('localorg_prefix-attrs_categories-2136', '2014-11-24 13:32:44.581934', 2136, 303, 1009, 'Goodness of fit', '-1', true, false, 9);
+INSERT INTO attrs_categories (unique_id, last_update, id, id_io_category, id_io_attribute, name, def_value, is_mandatory, is_read_only, "order") VALUES ('localorg_prefix-attrs_categories-2136', '2014-11-24 13:32:44.581934', 2136, 303, 1009, 'Goodness of fit', '-1.0', true, false, 9);
 
 select setval ('attrs_categories_id_seq', 2136, true);
 
@@ -156,119 +156,29 @@ select setval ('tbl_io_objects_id_seq', 305, true);
 
 INSERT INTO user_templates (id_user, id_template, id_io_object, type) VALUES (1, 54, 305, 0);
 
-/*
-alter table tbl_rli_image_raws add id_rli_object bigint;
-
-alter table tbl_rli_image_raws
-   add constraint FK_TBL_RLI__REFERENCE_TBL_OBJE foreign key (id_rli_object)
-      references tbl_object_passports (id)
-      on delete restrict on update restrict;
-
-drop view rli_image_raws ;
-
-create or replace function f_sel_rli_image_raws () returns setof "tbl_rli_image_raws" as
+create or replace function rli_insertcheck () returns trigger as
 $BODY$
 declare
-    r "tbl_rli_image_raws"%rowtype;
+    ship_length float8;
+    ship_length_min float8;
+    ship_length_max float8;
+    id_type_ship bigint;
 begin
-    for r 
-        in select * from "tbl_rli_image_raws"
-    loop
-        if (getPrivilege(getCurrentUser(), ioGetObjectIDByTableName('rli_image_raws'), 2, true) = false) then
-            raise exception 'You have insufficient permissions to do the operation!';
-            return;
-        end if;
-        return next r;
-    end loop;
-    return;
-end
-$BODY$
-language'plpgsql' security definer;
-
-DROP FUNCTION  if exists f_ins_rli_image_raws(character varying, timestamp without time zone, bigint, integer, uuid, character varying, character varying, bigint, bigint, double precision, bigint, double precision, double precision, bytea, character varying, integer, double precision, double precision) ;
-
-create or replace function f_ins_rli_image_raws (character varying, timestamp without time zone, bigint, integer, uuid, character varying, character varying, bigint, bigint, bigint, double precision, double precision, double precision, bytea, character varying, integer, double precision, double precision, bigint) returns int4 as
-$BODY$
-declare
-"ii_unique_id" alias for $1;
-"ii_last_update" alias for $2;
-"ii_id" alias for $3;
-"ii_id_io_state" alias for $4;                                                                                            
-"ii_uuid_t" alias for $5;                                                                                                 
-"ii_rr_name" alias for $6;                                                                                                
-"ii_r_icon" alias for $7;
-"ii_record_fill_color" alias for $8;
-"ii_record_text_color" alias for $9;
-"ii_id_type_ship" alias for $10;
-"ii_azimuth" alias for $11;
-"ii_elevation_angle" alias for $12;                                                                                                    
-"ii_image_raw" alias for $13;                                                                                                          
-"ii_image_jpg" alias for $14;                                                                                                          
-"ii_depth" alias for $15;                                                                                                              
-"ii_Goodness of fit" alias for $16;
-"ii_resolution" alias for $17;
-"ii_ship_length" alias for $18;
-"ii_id_rli_object" alias for $19;
-begin
-    if(getPrivilege(getCurrentUser(), ioGetObjectIDByTableName('rli_image_raws'), 4, true) = false) then 
-        raise exception 'You have insufficient permissions to do the operation!';
-        return 0;
+    ship_length := new.ship_length;
+    id_type_ship := new.id_type_ship;
+    select into ship_length_min length_min from tbl_type_ship ts where ts.id=id_type_ship;
+    select into ship_length_max length_max from tbl_type_ship ts where ts.id=id_type_ship;
+    if (ship_length < ship_length_min or ship_length > ship_length_max) then
+        raise exception 'Invalid length of vessel';
+        return null;
     end if;
-    insert into "tbl_rli_image_raws" ("unique_id", "last_update", "id", "id_io_state", "uuid_t", "rr_name", "r_icon", "record_fill_color", "record_text_color", "id_type_ship", "azimuth", "elevation_angle", "image_raw", "image_jpg", "depth", "Goodness of fit", "resolution", "ship_length", "id_rli_object") values ("ii_unique_id", "ii_last_update", "ii_id", "ii_id_io_state", "ii_uuid_t", "ii_rr_name", "ii_r_icon", "ii_record_fill_color", "ii_record_text_color", "ii_id_type_ship", "ii_azimuth", "ii_elevation_angle", "ii_image_raw", "ii_image_jpg", "ii_depth", "ii_Goodness of fit", "ii_resolution", "ii_ship_length", "ii_id_rli_object");
-    return 1;
+
+    return new;
+
 end
 $BODY$
-language'plpgsql' security definer;
+LANGUAGE 'plpgsql';
 
-drop function f_upd_rli_image_raws(character varying, timestamp without time zone, bigint, integer, uuid, character varying, character varying, bigint, bigint, double precision, bigint, double precision, double precision, bytea, character varying, integer, double precision, double precision);
+select f_safe_drop_trigger ('rli_length_insert', 'rli_image_raws');
 
--- character varying, timestamp without time zone, bigint, integer, uuid, character varying, character varying, bigint, bigint, bigint, double precision,  double precision, bytea, character varying, integer, double precision, double precision, double precision, bigint
-
-create or replace function f_upd_rli_image_raws (character varying, timestamp without time zone, bigint, integer, uuid, character varying, character varying, bigint, bigint, bigint, double precision, double precision, double precision, bytea, character varying, integer, double precision, double precision, bigint) returns int4 as
-$BODY$
-declare
-"ii_unique_id" alias for $1;
-"ii_last_update" alias for $2;
-"ii_id" alias for $3;
-"ii_id_io_state" alias for $4;                                                                                            
-"ii_uuid_t" alias for $5;                                                                                                 
-"ii_rr_name" alias for $6;                                                                                                
-"ii_r_icon" alias for $7;
-"ii_record_fill_color" alias for $8;
-"ii_record_text_color" alias for $9;
-"ii_azimuth" alias for $10;
-"ii_id_type_ship" alias for $11;
-"ii_elevation_angle" alias for $12;                                                                                                    
-"ii_image_raw" alias for $13;                                                                                                          
-"ii_image_jpg" alias for $14;                                                                                                          
-"ii_depth" alias for $15;                                                                                                              
-"ii_Goodness of fit" alias for $16;
-"ii_resolution" alias for $17;
-"ii_ship_length" alias for $18;
-"ii_id_rli_object" alias for $19;
-begin
-    if(getPrivilege(getCurrentUser(), ioGetObjectIDByTableName('rli_image_raws'), 4, true) == false) then 
-        raise exception 'You have insufficient permissions to do the operation!';
-        return 0;
-    end if;
-    update "tbl_rli_image_raws" set "unique_id" = "ii_unique_id", "last_update" = "ii_last_update", "id_io_state" = "ii_id_io_state", "uuid_t" = "ii_uuid_t", "rr_name" = "ii_rr_name", "r_icon" = "ii_r_icon", "record_fill_color" = "ii_record_fill_color",  "record_text_color" = "ii_record_text_color", "id_type_ship" = "ii_id_type_ship", "azimuth" = "ii_azimuth", "elevation_angle" = "ii_elevation_angle", "image_raw" = "ii_image_raw",  "image_jpg" = "ii_image_jpg", "depth" = "ii_depth", "Goodness of fit" = "ii_Goodness of fit", "resolution" = "ii_resolution", "ship_length" = "ii_ship_length", "id_rli_object" = "ii_id_rli_object" where id = ii_id;
-    return 1;
-end
-$BODY$
-language'plpgsql' security definer;
-
-create view rli_image_raws as SELECT f_sel_rli_image_raws.unique_id, f_sel_rli_image_raws.last_update, 
-    f_sel_rli_image_raws.id, f_sel_rli_image_raws.id_io_state, 
-    f_sel_rli_image_raws.uuid_t, f_sel_rli_image_raws.rr_name, 
-    f_sel_rli_image_raws.r_icon, f_sel_rli_image_raws.record_fill_color, 
-    f_sel_rli_image_raws.record_text_color, f_sel_rli_image_raws.id_type_ship, 
-    f_sel_rli_image_raws.azimuth, f_sel_rli_image_raws.elevation_angle, 
-    f_sel_rli_image_raws.image_raw, f_sel_rli_image_raws.image_jpg, 
-    f_sel_rli_image_raws.depth, f_sel_rli_image_raws.resolution, f_sel_rli_image_raws.ship_length, f_sel_rli_image_raws.id_rli_object, f_sel_rli_image_raws."Goodness of fit" FROM f_sel_rli_image_raws() f_sel_rli_image_raws(unique_id, last_update, id, id_io_state, uuid_t, rr_name, r_icon, record_fill_color, record_text_color, id_type_ship, azimuth, elevation_angle, image_raw, image_jpg, depth, "Goodness of fit", resolution, ship_length, id_rli_object);
-
-create or replace rule r_ins_rli_image_raws AS ON INSERT TO rli_image_raws DO INSTEAD SELECT f_ins_rli_image_raws(new.unique_id, new.last_update, new.id, new.id_io_state, new.uuid_t, new.rr_name, new.r_icon, new.record_fill_color, new.record_text_color, new.azimuth, new.id_type_ship,  new.elevation_angle, new.image_raw, new.image_jpg, new.depth, new."Goodness of fit", new.resolution, new.ship_length, new.id_rli_object) AS f_ins_rli_image_raws;
-
-create or replace rule r_upd_rli_image_raws AS ON UPDATE TO rli_image_raws DO INSTEAD SELECT f_upd_rli_image_raws(new.unique_id, new.last_update, new.id, new.id_io_state, new.uuid_t, new.rr_name, new.r_icon, new.record_fill_color, new.record_text_color, new.azimuth, new.id_type_ship, new.elevation_angle, new.image_raw, new.image_jpg, new.depth, new."Goodness of fit", new.resolution, new.ship_length, new.id_rli_object) AS f_upd_rli_image_raws;
-
-create or replace rule r_del_rli_image_raws AS ON DELETE TO rli_image_raws DO INSTEAD SELECT f_del_rli_image_raws(old.id) AS f_del_rli_image_raws;
-*/
+select f_create_trigger ('rli_length_insert', 'before', 'insert or update', 'rli_image_raws', 'rli_insertcheck ()');

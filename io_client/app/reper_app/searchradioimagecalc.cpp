@@ -4,6 +4,7 @@
 #include <QColor>
 #include <QBuffer>
 #include <QMessageBox>
+#include <QAbstractProxyModel>
 #include <QtDebug>
 
 #include <gsl/gsl_fit.h>
@@ -399,12 +400,16 @@ void SearchRadioImageCalc :: calcChi2 (QAbstractItemModel * sModel, const QImage
     int n = sModel->rowCount();
     int m = sModel->columnCount ();
     QMap<QString, double> numberTypesP;
+    QString pSType;
     for (int i=0; i<n; i++)
     {
         QString sType = sModel->data (sModel->index (i, m-1), Qt::DisplayRole).toString();//.toInt();
+        if (i==0)
+            pSType = sType;
         if (!numberTypesP.contains (sType))
             numberTypesP.insert (sType, 0.0);
     }
+    bool isc = false;
     for (int i=0; i<n; i++)
     {
         QModelIndex wIndex = sModel->index (i, 0);
@@ -442,6 +447,7 @@ void SearchRadioImageCalc :: calcChi2 (QAbstractItemModel * sModel, const QImage
         QImage scImage = sIm.scaled (nW, nH);
         QString sType = sModel->data (sModel->index (i, m-1), Qt::DisplayRole).toString();
         int nType = sModel->data (sModel->index (i, m-1), Qt::UserRole+1).toInt();
+        Q_UNUSED (nType);
         QByteArray bscIm = searchImageB (scImage, azimuth, elevation_angle);
         QByteArray bscImStr = getImageStr (bscIm);
         for (int ii=0; ii<bscImStr.size(); ii++)
@@ -455,33 +461,58 @@ void SearchRadioImageCalc :: calcChi2 (QAbstractItemModel * sModel, const QImage
 2	                0.01003	0.02010	0.05064	0.10259	0.21072	0.57536	1.38629	2.77259	4.60517	5.99146	7.37776	9.21034	10.59663
 */
         double prob;
-        qDebug () << __PRETTY_FUNCTION__ << chi2;// << sType << nType;
-        if (chi2 <= 0.07)
+        //qDebug () << __PRETTY_FUNCTION__ << chi2;// << sType << nType;
+        if (chi2 <= 0.02)
             prob = 0.99;
         else if (chi2 <= 0.1 )//&& nType > 1)
-            prob = 0.975;
+            prob = 0.95;
         else if (chi2 <= 0.575)
             prob = 0.75;
         else
             prob = 0.6;
+//        qDebug () << __PRETTY_FUNCTION__ << i << sType << pSType << QString::compare(sType, pSType, Qt::CaseInsensitive);
+        if (QString::compare(sType, pSType, Qt::CaseInsensitive) != 0 || isc)
+        {
+            isc = true;
+            prob = 1.0-prob;
+            //qDebug () << __PRETTY_FUNCTION__ << i << prob;
+        }
         numberTypesP[sType] = prob;
+        pSType = sType;
     }
     double sp = 0.0;
+    qDebug () << __PRETTY_FUNCTION__ << numberTypesP;
     for (QMap<QString, double>::const_iterator p = numberTypesP.constBegin();
              p != numberTypesP.constEnd();
              p++)
     {
-        qDebug () << __PRETTY_FUNCTION__ << p.key();
+        //qDebug () << __PRETTY_FUNCTION__ << p.key();
         sp += p.value ();
     }
     //qDebug () << __PRETTY_FUNCTION__ << sp;
-    sp = qMax (sp, (double)numberTypesP.count());
-    for (int i=0; i<n; i++)
+    //sp = qMax (sp, (double)numberTypesP.count());
+    for (int i=0; i<n; )
     {
         QString sType = sModel->data (sModel->index (i, m-1), Qt::DisplayRole).toString();//.toInt();
         double prob = numberTypesP.value (sType);
-        QModelIndex wPIndex = sModel->index (i, m-2);
-        sModel->setData (wPIndex, QString::number (prob/sp), Qt::EditRole);
+        if (prob/sp < 0.1)
+        {
+            qDebug () << __PRETTY_FUNCTION__ << sModel;// << ++i;
+            QAbstractItemModel * searchMod = sModel;
+            if (qobject_cast<QAbstractProxyModel *>(sModel))
+                searchMod = (qobject_cast<QAbstractProxyModel *>(sModel))->sourceModel();
+            bool ok = searchMod->removeRows (i, 1);
+            qDebug () << __PRETTY_FUNCTION__ << ok;// << ++i;
+            if (!ok)
+                i++;
+            //sModel->removeRows (i, 1);
+        }
+        else
+        {
+            QModelIndex wPIndex = sModel->index (i, m-2);
+            sModel->setData (wPIndex, QString::number (prob/sp), Qt::EditRole);
+            i++;
+        }
         //qDebug () << __PRETTY_FUNCTION__ << np *100./imArr.size() << wPIndex << QString::compare(QString(bscImStr), QString (imArr), Qt::CaseInsensitive) << isSet;
 
     }
