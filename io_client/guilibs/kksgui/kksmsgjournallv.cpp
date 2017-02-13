@@ -78,7 +78,7 @@ void KKSMsgJournalLv::removeMessage(const KKSMessage & msg)
     int row = 0;
     while(row < rowCount()){
         QModelIndex index = mdl->index(row, 0);
-        KKSMsgJournalItemData itemData = qVariantValue<KKSMsgJournalItemData>(index.data());
+        KKSMsgJournalItemData itemData = index.data().value<KKSMsgJournalItemData>();
         if(itemData.getMessage() == msg)
             mdl->removeRows(row, 1);
         else
@@ -125,7 +125,7 @@ KKSMessage KKSMsgJournalLv::currentMessage() const
     if(!index.isValid())
         return msg;
 
-    KKSMsgJournalItemData msgItemData = qVariantValue<KKSMsgJournalItemData> (model()->data(index));
+    KKSMsgJournalItemData msgItemData = model()->data(index).value<KKSMsgJournalItemData> ();
     msg = msgItemData.getMessage();
     
     return msg;
@@ -148,7 +148,7 @@ void KKSMsgJournalLv::mouseMoveEvent(QMouseEvent * e)
     if(!index.isValid())
         return;
 
-    KKSMsgJournalItemData msgItemData = qVariantValue<KKSMsgJournalItemData> (model()->data(index));
+    KKSMsgJournalItemData msgItemData = model()->data(index).value<KKSMsgJournalItemData> ();
     KKSMessage msg = msgItemData.getMessage();
     
     QToolTip::showText(e->globalPos(), msg.messageBody());
@@ -316,12 +316,12 @@ bool KKSMsgJournalModel :: removeRows ( int row, int count, const QModelIndex & 
     return true;
 }
 
-bool KKSMsgJournalModel :: setData ( const QModelIndex & index, const QVariant & value, int role )
+bool KKSMsgJournalModel :: setData ( const QModelIndex & index, const QVariant & val, int role )
 {
     int i=index.row();
     if ( index.isValid() && role == Qt::EditRole && i>=0 && i<m_messages.count() )
     {
-        KKSMsgJournalItemData msgItemData = qVariantValue<KKSMsgJournalItemData> (value);
+        KKSMsgJournalItemData msgItemData = val.value<KKSMsgJournalItemData> ();
         KKSMsgJournalItemData *msg = new KKSMsgJournalItemData( msgItemData );
         m_messages.replace(i, msg);
 
@@ -404,7 +404,7 @@ void KKSMsgJournalModel::slotDataChanged(int row)
     QModelIndex indexStart = index(row, 0);
     
     emit dataChanged(indexStart, indexStart);
-    KKSMsgJournalItemData itemData = qVariantValue<KKSMsgJournalItemData>(indexStart.data());
+    KKSMsgJournalItemData itemData = indexStart.data().value<KKSMsgJournalItemData>();
     KKSMessage msg = itemData.getMessage();
     emit dataChangedEx(msg);
 }

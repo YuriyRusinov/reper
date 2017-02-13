@@ -301,7 +301,7 @@ void KKSMsgJournalItemDelegate :: paint(QPainter *painter,
     QColor color;
     color = Qt::white;
 
-    KKSMsgJournalItemData msgItemData = qVariantValue<KKSMsgJournalItemData> (index.data());
+    KKSMsgJournalItemData msgItemData = index.data().value<KKSMsgJournalItemData> ();
 
     
     KKSMessage msg = msgItemData.getMessage();
@@ -373,7 +373,7 @@ QSize KKSMsgJournalItemDelegate :: sizeHint(const QStyleOptionViewItem& option,
         return QSize ();
 
     //return QSize(30, 19);
-    KKSMsgJournalItemData msgItemData = qVariantValue<KKSMsgJournalItemData> (index.data());
+    KKSMsgJournalItemData msgItemData = index.data().value<KKSMsgJournalItemData> ();
 
     KKSMessage m_msg = msgItemData.getMessage();
     

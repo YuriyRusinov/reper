@@ -466,7 +466,10 @@ void KKSCmdJournalItemDelegate :: paint(QPainter *painter,
     if(!index.data().isValid())
         return;
 
-    KKSCmdJournalItemData cmdItemData = qVariantValue<KKSCmdJournalItemData> (index.data());
+    KKSCmdJournalItemData cmdItemData = index.data().value<KKSCmdJournalItemData>();
+        // 
+        // qVariantValue<KKSCmdJournalItemData> (index.data());
+        // deprecated in qt5
 
     
     KKSCommand cmd = cmdItemData.getCommand();
@@ -547,7 +550,7 @@ QSize KKSCmdJournalItemDelegate :: sizeHint(const QStyleOptionViewItem& option,
     if (index.data().isNull())
         return QSize ();
 
-    KKSCmdJournalItemData cmdItemData = qVariantValue<KKSCmdJournalItemData> (index.data());
+    KKSCmdJournalItemData cmdItemData = index.data().value<KKSCmdJournalItemData>();
 
     KKSCommand m_cmd = cmdItemData.getCommand();
     QString text;// = index.data (Qt::DisplayRole).toString ();

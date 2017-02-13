@@ -109,7 +109,7 @@ void KKSCmdJournalLv::removeCommand(const KKSCommand & cmd)
     int row = 0;
     while(row < rowCount()){
         QModelIndex index = mdl->index(row, 0);
-        KKSCmdJournalItemData itemData = qVariantValue<KKSCmdJournalItemData>(index.data());
+        KKSCmdJournalItemData itemData = index.data().value<KKSCmdJournalItemData>();
         if(itemData.getCommand() == cmd)
             mdl->removeRows(row, 1);
         else
@@ -156,7 +156,7 @@ KKSCommand KKSCmdJournalLv::currentCommand() const
     if(!index.isValid())
         return cmd;
 
-    KKSCmdJournalItemData cmdItemData = qVariantValue<KKSCmdJournalItemData> (model()->data(index));
+    KKSCmdJournalItemData cmdItemData = model()->data(index).value<KKSCmdJournalItemData> ();
     cmd = cmdItemData.getCommand();
     
     return cmd;
@@ -179,7 +179,7 @@ void KKSCmdJournalLv::mouseMoveEvent(QMouseEvent * e)
     if(!index.isValid())
         return;
 
-    KKSCmdJournalItemData cmdItemData = qVariantValue<KKSCmdJournalItemData> (model()->data(index));
+    KKSCmdJournalItemData cmdItemData = model()->data(index).value<KKSCmdJournalItemData> ();
     KKSCommand cmd = cmdItemData.getCommand();
     
     QToolTip::showText(e->globalPos(), cmd.messageBody());
@@ -388,12 +388,12 @@ bool KKSCmdJournalModel :: removeRows ( int row, int count, const QModelIndex & 
     return true;
 }
 
-bool KKSCmdJournalModel :: setData ( const QModelIndex & index, const QVariant & value, int role )
+bool KKSCmdJournalModel :: setData ( const QModelIndex & index, const QVariant & val, int role )
 {
     int i=index.row();
     if ( index.isValid() && role == Qt::EditRole && i>=0 && i<m_commands.count() )
     {
-        KKSCmdJournalItemData cmdItemData = qVariantValue<KKSCmdJournalItemData> (value);
+        KKSCmdJournalItemData cmdItemData = val.value<KKSCmdJournalItemData> ();
         KKSCmdJournalItemData *cmd = new KKSCmdJournalItemData( cmdItemData );
         m_commands.replace(i, cmd);
 
@@ -477,7 +477,7 @@ void KKSCmdJournalModel::slotDataChanged(int row)
     //QModelIndex indexEnd = index(row, 7);
     
     emit dataChanged(indexStart, indexStart);
-    KKSCmdJournalItemData itemData = qVariantValue<KKSCmdJournalItemData>(indexStart.data());
+    KKSCmdJournalItemData itemData = indexStart.data().value<KKSCmdJournalItemData>();
     KKSCommand cmd = itemData.getCommand();
     emit dataChangedEx(cmd);
 }

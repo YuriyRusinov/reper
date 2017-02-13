@@ -17,38 +17,38 @@ QString KKSResult::getColumnNameAsString(int column) const
 int KKSResult::getCellAsInt( int row, int column, bool * ok ) const
 {
     QVariant v = getCell(row, column);
-    if(v.isValid() == FALSE){if(ok) *ok = FALSE; return 0;}
+    if(v.isValid() == false){if(ok) *ok = false; return 0;}
     return v.toInt(ok);
 }
 
 qlonglong KKSResult::getCellAsInt64( int row, int column, bool * ok ) const
 {
     QVariant v = getCell(row, column);
-    if(v.isValid() == FALSE){if(ok) *ok = FALSE; return 0;}
+    if(v.isValid() == false){if(ok) *ok = false; return 0;}
     return v.toLongLong(ok);
 }
 
 bool KKSResult::getCellAsBool( int row, int column, bool * ok ) const
 {
     QVariant v;
-    if(getCell(row, column) == "t") v = QVariant(TRUE);
-    else if(getCell(row, column) == "f") v = QVariant(FALSE);
+    if(getCell(row, column) == "t") v = QVariant(true);
+    else if(getCell(row, column) == "f") v = QVariant(false);
 
-    if(v.isValid() == FALSE){if(ok)*ok = FALSE; return FALSE;}
-    if(ok) *ok = TRUE;
+    if(v.isValid() == false){if(ok)*ok = false; return false;}
+    if(ok) *ok = true;
     return v.toBool();
 }
 
 QString KKSResult::getCellAsString( int row, int column, bool * ok ) const
 {
     QVariant v = getCell(row, column);
-    if(v.isValid() == FALSE){
+    if(v.isValid() == false){
         if(ok)
-            *ok = FALSE; 
+            *ok = false; 
         return QString::null;
     }
     if(ok)
-        *ok = TRUE;
+        *ok = true;
     
     if(getColumnDataType(column) == dtTimestamp){
         QDateTime dt = v.toDateTime();
@@ -66,22 +66,22 @@ QString KKSResult::getCellAsString( int row, int column, bool * ok ) const
 double KKSResult::getCellAsDouble( int row, int column, bool * ok ) const
 {
     QVariant v = getCell(row, column);
-    if(v.isValid() == FALSE){if(ok)*ok = FALSE; return 0.0;}
+    if(v.isValid() == false){if(ok)*ok = false; return 0.0;}
     return v.toDouble(ok);
 }
 
 QStringList KKSResult::getCellAsStringList( int row, int column, bool * ok ) const
 {
     QVariant v = getCell(row, column);
-    if(v.isValid() == FALSE){if(ok)*ok = FALSE; return QStringList();}
-    if(ok)*ok = TRUE;
+    if(v.isValid() == false){if(ok)*ok = false; return QStringList();}
+    if(ok)*ok = true;
     return v.toStringList();
 }
 
 QDateTime KKSResult::getCellAsDateTime( int row, int column, bool * ok ) const
 {
     QVariant v = getCell(row, column);
-    if(v.isValid() == FALSE){if(ok)*ok = FALSE; return QDateTime();}
-    if(ok)*ok = TRUE;
+    if(v.isValid() == false){if(ok)*ok = false; return QDateTime();}
+    if(ok)*ok = true;
     return v.toDateTime();
 }
