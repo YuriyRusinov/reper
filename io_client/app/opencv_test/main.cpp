@@ -1,8 +1,11 @@
 #include <QImage>
+#include <QApplication>
+#include <QtDebug>
 #include <opencv2/highgui/highgui.hpp>
 
 #include <opencv2/imgproc/imgproc.hpp>
 #include <iostream>
+#include <fstream>
 
 #include "qimage_to_cvmat.h"
 
@@ -11,7 +14,7 @@ using namespace std;
 
 int main( int argc, char** argv )
 {
-
+    QApplication app (argc, argv);
     if (argc < 1)
     {
         cerr << "Set filename of test image";
@@ -20,7 +23,13 @@ int main( int argc, char** argv )
     QImage srcIm (argv[1]);
     QImage img2 = srcIm.convertToFormat(QImage::Format_ARGB32);
     Mat src_gray = QImageToCvMat (img2);
-//    src_gray = imread(argv[1],0);
+    Mat src_gray_c = imread(argv[1], CV_LOAD_IMAGE_ANYDEPTH);
+    qDebug () << __PRETTY_FUNCTION__ << src_gray.size ().width << ' ' << src_gray.size ().height << endl
+                                     << src_gray_c.size ().width << ' ' << src_gray_c.size ().height;
+    Mat mDiff (src_gray_c.size(), CV_8UC4 );// - src_gray;
+    mDiff -= src_gray.clone ();
+    std::ofstream fdiff (QString ("%1_copy").arg(argv[1]).toLatin1());
+    fdiff << mDiff;//src_gray_c;
 //    blur( src_gray, src_gray, Size(3,3) );
     Mat src_gray1 = src_gray.clone ();
     cvtColor (src_gray, src_gray1, CV_RGB2GRAY);
@@ -30,7 +39,7 @@ int main( int argc, char** argv )
 
     findContours( bwimg, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE );
     unsigned int n = contours.size();
-    cout << n << endl;
+    cout << "Number of contours " << n << endl;
 
     for(unsigned int i=0;i<contours.size();i++)
     {
@@ -52,10 +61,10 @@ int main( int argc, char** argv )
             circle( src_gray, contours[i][j], 3, Scalar(0, 0, 255));//, FILLED, LINE_AA );
         }
         imshow( "Result", src_gray );
-        waitKey(0);
+        //waitKey(0);
     }
 
-    return 0;
+    return app.exec();
 }
 
 /*
