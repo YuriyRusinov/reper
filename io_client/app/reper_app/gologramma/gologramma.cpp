@@ -1,3 +1,4 @@
+#include <QtDebug>
 #include "gologramma.h"
 
 void loadModel(mslLoader::OBJloader& loader,const std::string& str)
@@ -14,6 +15,7 @@ cubPair buildCub(const mslLoader::OBJloader& loader,const double lengthOfShip,co
     double length = lengthOfUnit(cubusPair.first,cubusPair.second,lengthOfShip);
     cubus.toMaxPow2(length*numberOfUnit);
     std::vector<Cuboid> cubusCubus = cubus.divideCub(length*numberOfUnit);
+    qDebug () << __FUNCTION__ << "Divide cub";
 
     cubPair retCubs;
     retCubs.initialCub = cubus;

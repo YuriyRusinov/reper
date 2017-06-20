@@ -1,3 +1,4 @@
+#include <QtDebug>
 #include <QProgressDialog>
 #include "cuboid.h"
 
@@ -173,7 +174,10 @@ std::vector<Cuboid> Cuboid::divideCub(double in_length) const
     int col = static_cast<int>((maxPoint.first - minPoint.first) / in_length);
 
     std::vector<Cuboid> cubsVector;
-    cubsVector.reserve(col*col*col);
+    long col3 = col;
+    col3 *= col;
+    col3 *= col;
+    cubsVector.reserve(col3);
     std::vector<double> lengthNum;
     std::vector<double> lengthNumOne;
     lengthNum.reserve(col);
@@ -205,8 +209,10 @@ std::vector<Cuboid> Cuboid::divideCub(double in_length) const
 
                 maxP = mslMesh::make_point3D(maxX,maxY,maxZ);
                 minP = mslMesh::make_point3D(minX,minY,minZ);
+                Cuboid C (maxP,minP);
+                qDebug () << __PRETTY_FUNCTION__ << i << j << k << sizeof (C);
 
-                cubsVector.push_back(Cuboid(maxP,minP));
+                cubsVector.push_back(C);
             }
         }
     }
