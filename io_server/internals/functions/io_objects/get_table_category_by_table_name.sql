@@ -12,5 +12,5 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
 ALTER FUNCTION get_table_category_by_table_name(character varying)
-  OWNER TO admin;
+  OWNER TO yrusinov;
 

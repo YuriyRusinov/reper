@@ -20,4 +20,4 @@ $BODY$
   LANGUAGE plpgsql VOLATILE SECURITY DEFINER
   COST 100;
 ALTER FUNCTION lc_setparameters(integer, integer, integer)
-  OWNER TO admin;
+  OWNER TO yrusinov;

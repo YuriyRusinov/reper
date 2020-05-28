@@ -7,12 +7,12 @@ begin
 
     return m;
 
-    EXCEPTION 
-             when OTHERS
-             then 
-                   m.m1 = 0;
-                   m.m2 = 0;
-                   return m;
+--    EXCEPTION 
+--             when OTHERS
+--             then 
+--                   m.m1 = 0;
+--                   m.m2 = 0;
+--                   return m;
 end
 $BODY$
 language 'plpgsql';

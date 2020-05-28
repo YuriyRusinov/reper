@@ -1,9 +1,9 @@
 /*
 Системные пользователи
 */
-select safeCreateUser('admin', 'admin', true);
+select safeCreateUser('yrusinov', 'yrusinov', true);
 insert into users (unique_id, id_state, id_rank, id_maclabel, role_name, lastname, firstname, sirname, fio, insert_time) 
-values('localorg-users-1', 1, 1, 1, 'admin', 'Администратор системы', '', '', 'Администратор системы', current_timestamp);
+values('localorg-users-1', 1, 1, 1, 'yrusinov', 'Администратор системы', '', '', 'Администратор системы', current_timestamp);
 
 select safeCreateUser('jupiter', 'jupiter', true);
 insert into users (unique_id, id_state, id_rank, id_maclabel, role_name, lastname, firstname, sirname, fio, insert_time) 

@@ -18,9 +18,9 @@ begin
     execute query;
 
     if(asRoot = true) then
-        query := 'alter user ' || roleName || ' with createdb createuser ';
+        query := 'alter user ' || roleName || ' with createdb createrole ';
     else
-	query := 'alter user ' || roleName || ' WITH NOCREATEDB NOCREATEUSER ';
+	query := 'alter user ' || roleName || ' WITH NOCREATEDB NOCREATEROLE ';
     end if;
 
     if(sPass is not null) then
